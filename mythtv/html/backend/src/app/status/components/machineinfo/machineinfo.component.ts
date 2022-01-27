@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { MachineInfo, StorageGroup } from 'src/app/services/interfaces/status.interface';
+import { MachineInfo } from 'src/app/services/interfaces/status.interface';
+import { StorageGroup } from "src/app/services/interfaces/storagegroup.interface";
 
 @Component({
   selector: 'app-status-machineinfo',

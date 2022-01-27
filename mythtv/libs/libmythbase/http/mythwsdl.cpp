@@ -25,7 +25,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-HTTPResponse MythWSDL::GetWSDL(HTTPRequest2 Request)
+HTTPResponse MythWSDL::GetWSDL(const HTTPRequest2& Request)
 {
     m_typesToInclude.clear();
 
@@ -293,7 +293,8 @@ HTTPResponse MythWSDL::GetWSDL(HTTPRequest2 Request)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QDomElement MythWSDL::CreateBindingOperation( QString path, HTTPMethodPtr handler,
+QDomElement MythWSDL::CreateBindingOperation( const QString& path,
+                                          const HTTPMethodPtr& handler,
                                           const QString &sClassName)
 {
     // ------------------------------------------------------------------
@@ -371,7 +372,7 @@ QDomElement MythWSDL::CreateMessage( const QString& sMsgName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QDomElement MythWSDL::CreateMethodType( HTTPMethodPtr handler,
+QDomElement MythWSDL::CreateMethodType( const HTTPMethodPtr& handler,
                                     QString       sTypeName,
                                     bool          bReturnType /* = false */)
 {
@@ -488,7 +489,7 @@ QDomElement MythWSDL::CreateMethodType( HTTPMethodPtr handler,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool MythWSDL::IsCustomType( QString &sTypeName )
+bool MythWSDL::IsCustomType( const QString &sTypeName )
 {
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     int id = QMetaType::type( sTypeName.toUtf8() );

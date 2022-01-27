@@ -18,10 +18,17 @@ class MythUIButtonList;
 class MythUIScrollBar;
 class MythUIStateType;
 class MythUIGroup;
+class MythUIProgressBar;
 
 struct TextProperties {
     QString text;
     QString state;
+};
+
+struct ProgressInfo {
+    int8_t start {0}; // All in the range [0-100]
+    int8_t total {0};
+    int8_t used  {0};
 };
 
 using muibCbFn = QString (*)(const QString &name, void *data);
@@ -103,6 +110,9 @@ class MUI_PUBLIC MythUIButtonListItem
     void SetImageCb(muibCbFn fn, void *data);
     QString GetImageFilename(const QString &name="") const;
 
+    void SetProgress1(int start, int total, int used);
+    void SetProgress2(int start, int total, int used);
+
     void DisplayState(const QString &state, const QString &name);
     void SetStatesFromMap(const InfoMap &stateMap);
     void SetStateCb(muibCbFn fn, void *data);
@@ -134,6 +144,8 @@ class MUI_PUBLIC MythUIButtonListItem
     void DoButtonImage(MythUIImage *buttonimage);
     void DoButtonArrow(MythUIImage *buttonarrow) const;
     void DoButtonCheck(MythUIStateType *buttoncheck);
+    void DoButtonProgress1(MythUIProgressBar *buttonprogress) const;
+    void DoButtonProgress2(MythUIProgressBar *buttonprogress) const;
     void DoButtonLookupText(MythUIText *text, const TextProperties& textprop);
     static void DoButtonLookupFilename(MythUIImage *image, const QString& filename);
     static void DoButtonLookupImage(MythUIImage *uiimage, MythImage *image);
@@ -152,6 +164,8 @@ class MUI_PUBLIC MythUIButtonListItem
     bool            m_isVisible     {false};
     bool            m_enabled       {true};
     bool            m_debugme       {false};
+    ProgressInfo    m_progress1      {0,0,0};
+    ProgressInfo    m_progress2      {0,0,0};
 
     QMap<QString, TextProperties> m_strings;
     QMap<QString, MythImage*> m_images;

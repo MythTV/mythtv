@@ -22,6 +22,7 @@ class MythFontProperties;
 
 class QEvent;
 class QKeyEvent;
+class QInputMethodEvent;
 class MythGestureEvent;
 class MythMediaEvent;
 
@@ -164,6 +165,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     // This class is not based on QWidget, so this is a new function
     // and not an override of QWidget::keyPressEvent.
     virtual bool keyPressEvent(QKeyEvent *event);
+    virtual bool inputMethodEvent(QInputMethodEvent *event);
     virtual bool gestureEvent(MythGestureEvent *event);
     virtual void mediaEvent(MythMediaEvent *event);
 

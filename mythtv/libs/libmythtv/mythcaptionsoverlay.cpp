@@ -196,7 +196,8 @@ void MythCaptionsOverlay::DisableForcedSubtitles()
     if (HasWindow(OSD_WIN_SUBTITLE))
     {
         SubtitleScreen *sub = InitSubtitles();
-        sub->DisableForcedSubtitles();
+        if (sub)
+            sub->DisableForcedSubtitles();
     }
 }
 

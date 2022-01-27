@@ -19,7 +19,7 @@ Convenience inline random number generator functions
 /**
 @brief generate 32 random bits
 */
-MBASE_PUBLIC inline uint32_t MythRandom()
+inline uint32_t MythRandom()
 {
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
     return static_cast<uint32_t>(qrand());
@@ -32,7 +32,7 @@ MBASE_PUBLIC inline uint32_t MythRandom()
 /**
 @brief generate 64 random bits
 */
-MBASE_PUBLIC inline uint64_t MythRandom64()
+inline uint64_t MythRandom64()
 {
     return QRandomGenerator::global()->generate64();
 }
@@ -40,7 +40,7 @@ MBASE_PUBLIC inline uint64_t MythRandom64()
 /**
 @brief generate a random uint32_t in the range [min, max]
 */
-MBASE_PUBLIC inline uint32_t MythRandom(uint32_t min, uint32_t max)
+inline uint32_t MythRandom(uint32_t min, uint32_t max)
 {
     return QRandomGenerator::global()->bounded(min, max);
 }
@@ -48,7 +48,7 @@ MBASE_PUBLIC inline uint32_t MythRandom(uint32_t min, uint32_t max)
 /**
 @brief generate a random signed int in the range [min, max]
 */
-MBASE_PUBLIC inline int MythRandom(int min, int max)
+inline int MythRandom(int min, int max)
 {
     return QRandomGenerator::global()->bounded(min, max);
 }

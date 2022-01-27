@@ -313,7 +313,7 @@ class MythHTTP
     }
 
     // N.B. Value must be lower case
-    static QString GetHeader(const HTTPHeaders Headers, const QString& Value, const QString& Default = "")
+    static QString GetHeader(const HTTPHeaders& Headers, const QString& Value, const QString& Default = "")
     {
         if (Headers && Headers->contains(Value))
             return Headers->value(Value);

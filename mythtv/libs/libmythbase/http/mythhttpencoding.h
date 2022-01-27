@@ -15,6 +15,7 @@ class MythHTTPEncoding
   protected:
     static void           GetURLEncodedParameters(MythHTTPRequest* Request);
     static void           GetXMLEncodedParameters(MythHTTPRequest* Request);
+    static void           GetJSONEncodedParameters(MythHTTPRequest* Request);
 };
 
 #endif

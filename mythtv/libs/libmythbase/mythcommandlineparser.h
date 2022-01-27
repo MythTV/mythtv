@@ -129,6 +129,8 @@ class MBASE_PUBLIC MythCommandLineParser
         kInvalid      = 7
     };
 
+    static QStringList MythSplitCommandString(const QString &line); // used in MythExternRecApp
+
     explicit MythCommandLineParser(QString appname);
     virtual ~MythCommandLineParser();
 

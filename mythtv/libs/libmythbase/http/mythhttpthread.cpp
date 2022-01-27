@@ -7,11 +7,11 @@
 
 #define LOC (QString("%1: ").arg(objectName()))
 
-MythHTTPThread::MythHTTPThread(MythHTTPServer* Server, const MythHTTPConfig &Config,
+MythHTTPThread::MythHTTPThread(MythHTTPServer* Server, MythHTTPConfig Config,
                                const QString& ThreadName, qintptr Socket, bool Ssl)
   : MThread(ThreadName),
     m_server(Server),
-    m_config(Config),
+    m_config(std::move(Config)),
     m_socketFD(Socket),
     m_ssl(Ssl)
 {

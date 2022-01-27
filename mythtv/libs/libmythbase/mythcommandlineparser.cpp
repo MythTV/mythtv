@@ -38,13 +38,13 @@
 // System headers
 #include <sys/types.h>
 #ifndef _WIN32
-#include <sys/ioctl.h>
-#include <pwd.h>
-#include <grp.h>
-#if defined(__linux__) || defined(__LINUX__)
-#include <sys/prctl.h>
-#endif
-#endif
+#   include <sys/ioctl.h>
+#   include <pwd.h>
+#   include <grp.h>
+#   if defined(__linux__) || defined(__LINUX__)
+#       include <sys/prctl.h>
+#   endif // linux
+#endif // not _WIN32
 
 // Qt headers
 #include <QtGlobal>
@@ -68,6 +68,7 @@
   #define QT_ENDL Qt::endl
 #endif
 
+// MythTV headers
 #include "mythcommandlineparser.h"
 #include "mythcorecontext.h"
 #include "exitcodes.h"
@@ -78,37 +79,140 @@
 #include "mythmiscutil.h"
 #include "mythdate.h"
 
-#define TERMWIDTH 79
-
-bool openPidfile(std::ofstream &pidfs, const QString &pidfile);
-bool setUser(const QString &username);
-int GetTermWidth(void);
-QByteArray strip_quotes (QByteArray val);
+static constexpr int k_defaultWidth = 79;
 
 /** \fn GetTermWidth(void)
  *  \brief returns terminal width, or 79 on error
  */
-int GetTermWidth(void)
+static int GetTermWidth(void)
 {
 #if defined(_WIN32) || defined(Q_OS_ANDROID)
-    return TERMWIDTH;
+    return k_defaultWidth;
 #else
     struct winsize ws {};
 
     if (ioctl(0, TIOCGWINSZ, &ws) != 0)
-        return TERMWIDTH;
+        return k_defaultWidth;
 
     return static_cast<int>(ws.ws_col);
 #endif
 }
 
-QByteArray strip_quotes (QByteArray val)
+static QByteArray strip_quotes(const QByteArray& array)
 {
-    if (val.startsWith('"') && val.endsWith('"'))
-        return val.mid(1,val.size()-2);
-    if (val.startsWith('\'') && val.endsWith('\''))
-        return val.mid(1,val.size()-2);
-    return val;
+    return ((array.startsWith('"')  && array.endsWith('"') ) ||
+            (array.startsWith('\'') && array.endsWith('\''))
+           ) ? array.mid(1, array.size() - 2) : array;
+}
+
+static void wrapList(QStringList &list, int width)
+{
+    // Set a minimum width of 5 to prevent a crash; if this is triggered,
+    // something has gone seriously wrong and the result won't really be usable
+    width = std::max(width, 5);
+
+    for (int i = 0; i < list.size(); i++)
+    {
+        QString string = list.at(i);
+
+        if( string.size() <= width )
+            continue;
+
+        QString left   = string.left(width);
+        bool inserted  = false;
+
+        while( !inserted && !left.endsWith(" " ))
+        {
+            if( string.mid(left.size(), 1) == " " )
+            {
+                list.replace(i, left);
+                list.insert(i+1, string.mid(left.size()).trimmed());
+                inserted = true;
+            }
+            else
+            {
+                left.chop(1);
+                if( !left.contains(" ") )
+                {
+                    // Line is too long, just hyphenate it
+                    list.replace(i, left + "-");
+                    list.insert(i+1, string.mid(left.size()));
+                    inserted = true;
+                }
+            }
+        }
+
+        if( !inserted )
+        {
+            left.chop(1);
+            list.replace(i, left);
+            list.insert(i+1, string.mid(left.size()).trimmed());
+        }
+    }
+}
+
+/**
+ * Parse a string into separate tokens. This function understands
+ * quoting and the escape character.
+ */
+QStringList MythCommandLineParser::MythSplitCommandString(const QString &line)
+{
+    QStringList fields;
+/**
+ * States for the command line parser.
+ */
+    enum states {
+        START,     ///< No current token.
+        INTEXT,    ///< Collecting token text.
+        INSQUOTE,  ///< Collecting token, inside single quotes.
+        INDQUOTE,  ///< Collecting token, inside double quotes.
+        ESCTEXT,   ///< Saw backslash. Returns to generic text.
+        ESCSQUOTE, ///< Saw backslash. Returns to single quotes.
+        ESCDQUOTE, ///< Saw backslash. Returns to double quotes.
+    };
+    states state = START;
+    int tokenStart = -1;
+
+    for (int i = 0; i < line.size(); i++)
+    {
+        const QChar c = line.at(i);
+
+        switch (state) {
+          case START:
+            tokenStart = i;
+            if      (c.isSpace()) break;
+            if      (c == '\'') state = INSQUOTE;
+            else if (c == '\"') state = INDQUOTE;
+            else if (c == '\\') state = ESCTEXT;
+            else                state = INTEXT;
+            break;
+          case INTEXT:
+            if (c.isSpace()) {
+                fields += line.mid(tokenStart, i - tokenStart);
+                state = START;
+                break;
+            }
+            else if (c == '\'') state = INSQUOTE;
+            else if (c == '\"') state = INDQUOTE;
+            else if (c == '\\') state = ESCTEXT;
+            break;
+          case INSQUOTE:
+            if      (c == '\'') state = INTEXT;
+            else if (c == '\\') state = ESCSQUOTE;
+            break;
+          case INDQUOTE:
+            if      (c == '\"') state = INTEXT;
+            else if (c == '\\') state = ESCDQUOTE;
+            break;
+          case ESCTEXT:   state = INTEXT;   break;
+          case ESCSQUOTE: state = INSQUOTE; break;
+          case ESCDQUOTE: state = INDQUOTE; break;
+        }
+    }
+
+    if (state != START)
+        fields += line.mid(tokenStart);
+    return fields;
 }
 
 /** \fn NamedOptType
@@ -274,7 +378,7 @@ QString CommandLineArg::GetHelpString(int off, const QString& group, bool force)
         {
             // user is running uselessly narrow console, use a sane console
             // width instead
-            termwidth = 79;
+            termwidth = k_defaultWidth;
         }
     }
 
@@ -2841,7 +2945,7 @@ void MythCommandLineParser::ApplySettingsOverride(void)
     }
 }
 
-bool openPidfile(std::ofstream &pidfs, const QString &pidfile)
+static bool openPidfile(std::ofstream &pidfs, const QString &pidfile)
 {
     if (!pidfile.isEmpty())
     {
@@ -2857,7 +2961,7 @@ bool openPidfile(std::ofstream &pidfs, const QString &pidfile)
 
 /** \brief Drop permissions to the specified user
  */
-bool setUser(const QString &username)
+static bool setUser(const QString &username)
 {
     if (username.isEmpty())
         return true;

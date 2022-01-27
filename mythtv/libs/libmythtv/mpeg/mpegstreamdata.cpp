@@ -1664,10 +1664,20 @@ void MPEGStreamData::AddAVListener(TSPacketListenerAV *val)
     QMutexLocker locker(&m_listenerLock);
 
     for (auto & listener : m_tsAvListeners)
+    {
         if (((void*)val) == ((void*)listener))
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC + QString("AddAVListener 0x%1 already present")
+                .arg((uint64_t)val, 0, 16));
             return;
+        }
+    }
 
     m_tsAvListeners.push_back(val);
+#if 0
+    LOG(VB_RECORD, LOG_DEBUG, LOC + QString("AddAVListener 0x%1 added")
+        .arg((uint64_t)val, 0, 16));
+#endif
 }
 
 void MPEGStreamData::RemoveAVListener(TSPacketListenerAV *val)
@@ -1679,9 +1689,16 @@ void MPEGStreamData::RemoveAVListener(TSPacketListenerAV *val)
         if (((void*)val) == ((void*)*it))
         {
             m_tsAvListeners.erase(it);
+#if 0
+            LOG(VB_RECORD, LOG_DEBUG, LOC + QString("RemoveAVListener 0x%1 found and removed")
+                .arg((uint64_t)val, 0, 16));
+#endif
             return;
         }
     }
+
+    LOG(VB_RECORD, LOG_ERR, LOC + QString("RemoveAVListener 0x%1 NOT found")
+        .arg((uint64_t)val, 0, 16));
 }
 
 void MPEGStreamData::AddMPEGSPListener(MPEGSingleProgramStreamListener *val)

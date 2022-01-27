@@ -455,10 +455,27 @@
                         <area>240,1,130,24</area>
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
-                        <area>375,1,340,24</area>
+                        <area>375,1,300,24</area>
+                        <!--
+                        <progressbar name="buttonprogress2">
+                            <area>0,0,100%,100%</area>
+                            <layout>horizontal</layout>
+                            <style>reveal</style>
+                            <shape name="progressimage">
+                                <area>0,0,100%,100%</area>
+                                <type>box</type>
+                                <fill color="#000000" alpha="128"/>
+                            </shape>
+                        </progressbar>
+                        -->
                     </textarea>
+                    <textarea name="recordedpercent" from="buttontext">
+                        <area>675,1,45,24</area>
+                        <align>right,vcenter</align>
+                        <template>%|recordedpercent|%%</template>
+                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>715,1,35,24</area>
+                        <area>720,1,30,24</area>
                         <align>right,vcenter</align>
                     </textarea>
                 </state>
@@ -475,11 +492,16 @@
                     <textarea name="channel" from="shortstarttimedate">
                         <area>240,1,130,24</area>
                     </textarea>
-                    <textarea name="title" from="shortstarttimedate">
-                        <area>375,1,340,24</area>
+!                    <textarea name="title" from="shortstarttimedate">
+                        <area>375,1,300,24</area>
                     </textarea>
+                    <textarea name="recordedpercent" from="buttontext">
+                        <area>675,1,45,24</area>
+                        <align>right,vcenter</align>
+                        <template>%|recordedpercent|%%</template>
+                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>715,1,35,24</area>
+                        <area>720,1,30,24</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <shape name="selectbar">
@@ -494,6 +516,21 @@
             <area>20,360,800,40</area>
             <font>baselarge</font>
         </textarea>
+
+        <group name="recordedgroup" depends="recordedmagic">
+            <textarea name="recordedmagic">
+                <template>%recordedpercent%</template>
+            </textarea>
+            <area>50,570,200,30</area>
+            <progressbar name="recordedprogressbar" from="baseprogressbar2">
+                <area>0,0,100%,100%</area>
+            </progressbar>
+            <textarea name="recordedpercent" from="basetextarea">
+                <area>0,0,100%,100%</area>
+                <align>hcenter,vcenter</align>
+                <template>%|recordedpercent|%% recorded</template>
+            </textarea>
+        </group>
 
         <textarea name="channel" from="basetextarea">
             <area>20,400,160,30</area>

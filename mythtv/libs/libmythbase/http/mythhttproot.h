@@ -7,7 +7,7 @@
 class MBASE_PUBLIC MythHTTPRoot
 {
   public:
-    static HTTPResponse RedirectRoot(HTTPRequest2 Request, const QString& File);
+    static HTTPResponse RedirectRoot(const HTTPRequest2& Request, const QString& File);
 };
 
 #endif

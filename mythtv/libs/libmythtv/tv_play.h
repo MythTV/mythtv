@@ -109,12 +109,12 @@ enum NoRecorderMsg
 };
 
 enum {
-    kStartTVNoFlags          = 0x00,
-    kStartTVInPlayList       = 0x02,
-    kStartTVByNetworkCommand = 0x04,
-    kStartTVIgnoreBookmark   = 0x08,
-    kStartTVIgnoreProgStart  = 0x10,
-    kStartTVAllowLastPlayPos = 0x20,
+    kStartTVNoFlags           = 0x00,
+    kStartTVInPlayList        = 0x02,
+    kStartTVByNetworkCommand  = 0x04,
+    kStartTVIgnoreBookmark    = 0x08,
+    kStartTVIgnoreProgStart   = 0x10,
+    kStartTVIgnoreLastPlayPos = 0x20,
 };
 
 class AskProgramInfo
@@ -290,7 +290,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
         kBookmarkNever,
         kBookmarkAuto // set iff db_playback_exit_prompt==2
     };
-    void PrepareToExitPlayer(int Line, BookmarkAction Bookmark = kBookmarkAuto);
+    void PrepareToExitPlayer(int Line);
     void SetExitPlayer(bool SetIt, bool WantsTo);
 
     bool RequestNextRecorder(bool ShowDialogs, const ChannelInfoList &Selection = ChannelInfoList());
@@ -512,7 +512,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     bool              m_dbJumpPreferOsd {true};
     bool              m_dbUseGuiSizeForTv {false};
     bool              m_dbUseVideoModes {false};
-    bool              m_dbClearSavedPosition {false};
     bool              m_dbRunJobsOnRemote {false};
     bool              m_dbContinueEmbedded {false};
     bool              m_dbBrowseAlways {false};
@@ -543,6 +542,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     bool              m_allowRerecord {false};  ///< User wants to rerecord the last video if deleted
     bool              m_doSmartForward {false};
     bool              m_queuedTranscode {false};
+    bool              m_savePosOnExit {false};  ///< False until first timer event
     /// Picture attribute type to modify.
     PictureAdjustType m_adjustingPicture {kAdjustingPicture_None};
     /// Picture attribute to modify (on arrow left or right)
@@ -751,7 +751,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     static inline const std::chrono::milliseconds kSpeedChangeCheckFrequency    = 250ms;
     static inline const std::chrono::milliseconds kErrorRecoveryCheckFrequency  = 250ms;
     static inline const std::chrono::milliseconds kEndOfRecPromptCheckFrequency = 250ms;
-    static inline const std::chrono::milliseconds kSaveLastPlayPosTimeout       = 30s;
+    static inline const std::chrono::milliseconds kSaveLastPlayPosTimeout       = 5s;
 #ifdef USING_VALGRIND
     static inline const std::chrono::milliseconds kEndOfPlaybackFirstCheckTimer = 1min;
 #else

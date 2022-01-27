@@ -19,15 +19,15 @@ class MBASE_PUBLIC MythHTTPResponse
     MythHTTPResponse() = default;
     explicit MythHTTPResponse(const HTTPRequest2& Request);
 
-    static HTTPResponse HandleOptions       (HTTPRequest2 Request);
+    static HTTPResponse HandleOptions       (const HTTPRequest2& Request);
     static HTTPResponse ErrorResponse       (MythHTTPStatus Status, const QString& ServerName);
-    static HTTPResponse RedirectionResponse (HTTPRequest2 Request, const QString& Redirect);
-    static HTTPResponse ErrorResponse       (HTTPRequest2 Request, const QString& Message = {});
-    static HTTPResponse OptionsResponse     (HTTPRequest2 Request);
-    static HTTPResponse DataResponse        (HTTPRequest2 Request, HTTPData Data);
-    static HTTPResponse FileResponse        (HTTPRequest2 Request, HTTPFile File);
-    static HTTPResponse EmptyResponse       (HTTPRequest2 Request);
-    static HTTPResponse UpgradeResponse     (HTTPRequest2 Request, MythSocketProtocol& Protocol, bool& Testing);
+    static HTTPResponse RedirectionResponse (const HTTPRequest2& Request, const QString& Redirect);
+    static HTTPResponse ErrorResponse       (const HTTPRequest2& Request, const QString& Message = {});
+    static HTTPResponse OptionsResponse     (const HTTPRequest2& Request);
+    static HTTPResponse DataResponse        (const HTTPRequest2& Request, const HTTPData& Data);
+    static HTTPResponse FileResponse        (const HTTPRequest2& Request, const HTTPFile& File);
+    static HTTPResponse EmptyResponse       (const HTTPRequest2& Request);
+    static HTTPResponse UpgradeResponse     (const HTTPRequest2& Request, MythSocketProtocol& Protocol, bool& Testing);
 
     void Finalise  (const MythHTTPConfig& Config);
     template <class T>

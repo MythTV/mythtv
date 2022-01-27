@@ -25,9 +25,9 @@ using namespace std::chrono_literals;
 
 #define LOC QString(m_peer + ": ")
 
-MythHTTPSocket::MythHTTPSocket(qintptr Socket, bool SSL, const MythHTTPConfig& Config)
+MythHTTPSocket::MythHTTPSocket(qintptr Socket, bool SSL, MythHTTPConfig Config)
   : m_socketFD(Socket),
-    m_config(Config)
+    m_config(std::move(Config))
 {
     // Connect Finish signal to Stop
     connect(this, &MythHTTPSocket::Finish, this, &MythHTTPSocket::Stop);
@@ -88,6 +88,11 @@ MythHTTPSocket::MythHTTPSocket(qintptr Socket, bool SSL, const MythHTTPConfig& C
     auto service = MythHTTPService::Create<MythHTTPServices>();
     m_activeServices.emplace_back(service);
     auto * services = dynamic_cast<MythHTTPServices*>(service.get());
+    if (services == nullptr)
+    {
+        LOG(VB_HTTP, LOG_ERR, LOC + "Failed to get root services handler.");
+        return;
+    }
     connect(this, &MythHTTPSocket::UpdateServices, services, &MythHTTPServices::UpdateServices);
     services->UpdateServices(m_config.m_services);
 }
@@ -251,6 +256,7 @@ void MythHTTPSocket::Read()
     // Try (possibly file specific) handlers
     if (response == nullptr)
     {
+        // cppcheck-suppress unassignedVariable
         for (const auto& [path, function] : m_config.m_handlers)
         {
             if (path == request->m_url.toString())
@@ -284,6 +290,7 @@ void MythHTTPSocket::Read()
     // Then 'inactive' services
     if (response == nullptr)
     {
+        // cppcheck-suppress unassignedVariable
         for (const auto & [path, constructor] : m_config.m_services)
         {
             if (path == rpath)
@@ -301,6 +308,7 @@ void MythHTTPSocket::Read()
     // Try (dynamic) handlers
     if (response == nullptr)
     {
+        // cppcheck-suppress unassignedVariable
         for (const auto& [path, function] : m_config.m_handlers)
         {
             if (path == rpath)
@@ -309,16 +317,6 @@ void MythHTTPSocket::Read()
                 if (response)
                     break;
             }
-        }
-    }
-
-    // Try error page handler
-    if (response == nullptr)
-    {
-        if(m_config.m_errorPageHandler.first.length() > 0)
-        {
-            auto function = m_config.m_errorPageHandler.second;
-            response = std::invoke(function, request);
         }
     }
 
@@ -333,6 +331,16 @@ void MythHTTPSocket::Read()
                 if (response)
                     break;
             }
+        }
+    }
+
+    // Try error page handler
+    if (response == nullptr || response->m_status == HTTPNotFound)
+    {
+        if(m_config.m_errorPageHandler.first.length() > 0)
+        {
+            auto function = m_config.m_errorPageHandler.second;
+            response = std::invoke(function, request);
         }
     }
 
@@ -352,7 +360,7 @@ void MythHTTPSocket::Read()
  * Queue headers, queue content, signal whether to close the socket and push
  * first data to start the write.
 */
-void MythHTTPSocket::Respond(HTTPResponse Response)
+void MythHTTPSocket::Respond(const HTTPResponse& Response)
 {
     if (!Response || (m_socket->state() != QAbstractSocket::ConnectedState))
         return;
@@ -412,7 +420,7 @@ void MythHTTPSocket::Respond(HTTPResponse Response)
  *
  * This is used to send 503 Service Unavailable
 */
-void MythHTTPSocket::RespondDirect(qintptr Socket, HTTPResponse Response, const MythHTTPConfig &Config)
+void MythHTTPSocket::RespondDirect(qintptr Socket, const HTTPResponse& Response, const MythHTTPConfig &Config)
 {
     if (!(Socket && Response))
         return;
@@ -529,10 +537,10 @@ void MythHTTPSocket::Write(int64_t Written)
             written  = (*file)->m_written;
             itemsize = (*file)->m_partialSize > 0 ? (*file)->m_partialSize : static_cast<int64_t>((*file)->size());
             towrite  = std::min(itemsize - written, available);
-            int64_t offset = 0;
             HTTPMulti multipart { nullptr, nullptr };
             if (!(*file)->m_ranges.empty())
             {
+                int64_t offset = 0;
                 multipart = MythHTTPRanges::HandleRangeWrite(*file, available, towrite, offset);
                 if (offset != (*file)->pos())
                     (*file)->seek(offset);

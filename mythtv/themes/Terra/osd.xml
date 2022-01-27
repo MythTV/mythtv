@@ -286,8 +286,15 @@
             <area>310,6,280,50</area>
             <multiline>true</multiline>
             <font>basesmall</font>
-            <align>allcenter</align>
+            <align>right,vcenter</align>
             <template>%PLAYEDTIME% of %TOTALTIME%\n%(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</template>
+        </textarea>
+
+        <textarea name="recordedtime">
+            <font>basesmall</font>
+            <area>10,6,600,50</area>
+            <align>allcenter</align>
+            <template>%1</template>
         </textarea>
 
         <progressbar name="position">

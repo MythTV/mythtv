@@ -903,7 +903,7 @@ qint64 MSocketDevice::bytesAvailable() const
     {
         char c;
 
-        if (::recvfrom(m_fd, &c, sizeof(c), MSG_PEEK, 0, 0) == SOCKET_ERROR)
+        if (::recvfrom(m_fd, &c, sizeof(c), MSG_PEEK, nullptr, nullptr) == SOCKET_ERROR)
             return 0;
     }
 

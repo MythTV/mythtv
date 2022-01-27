@@ -110,7 +110,7 @@ class TestProgramInfo : public QObject
         "train Jesse ...|3|4|23|syndicatedepisode|Drama|1514|514|WNUVDT|"
         "WNUBDT (WNUV-DT)|/recordings/1514_20161025235800.ts|6056109800|"
         "1477440000|1477443600|20141007|localhost|0|0|0|7|0|19890314|0|15|8|1477439880|"
-        "1477443720|131600|Default||EP01922936|EP019229360055|ttvdb.py_279121|"
+        "1477443720|131600|Default||EP01922936|EP019229360055|ttvdb4.py_279121|"
         "1477444354|0.95|2016-10-26|Default|0|0|Default|8|1090|1|2016|50|133|4|715|"
         "Prime A-1|4294967295";
     QString m_supergirl23List = "Supergirl|Welcome to Earth|An attack is made "
@@ -118,7 +118,7 @@ class TestProgramInfo : public QObject
         "1514|514|WNUVDT|WNUBDT (WNUV-DT)|/recordings/1514_20161024235800.ts|"
         "6056109670|1477353600|1477357200|20151026|localhost|0|0|0|-1|0|19660922|0|15|8|"
         "1477353480|1477357320|1538|Default||EP02185451|EP021854510025|"
-        "ttvdb.py_295759|1477444354|0.94|2016-10-25|Default|0|0|Default|33|33|8|"
+        "ttvdb4.py_295759|1477444354|0.94|2016-10-25|Default|0|0|Default|33|33|8|"
         "2016|23|106|4|66247|Prime A-0|4294967295";
     InfoMap m_flash34Map = {
         {"00x00", "3x04"},
@@ -142,7 +142,7 @@ class TestProgramInfo : public QObject
         {"episode", "4"},
         {"filesize", "6,056,109,800"},
         {"filesize_str", "5.64 GB"},
-        {"inetref", "ttvdb.py_279121"},
+        {"inetref", "ttvdb4.py_279121"},
         {"input", "-"},
         {"inputname", "Prime A-1"},
         {"lastmodified", "Wed 26 October, 1:12 AM"},
@@ -159,7 +159,7 @@ class TestProgramInfo : public QObject
         {"parttotal", "133"},
         {"playgroup", "Default"},
         {"programflags", "131600"},
-        {"programflags_names", "BOOKMARK|WATCHED|ALLOWLASTPLAYPOS"},
+        {"programflags_names", "BOOKMARK|WATCHED|IGNORELASTPLAYPOS"},
         {"programid", "EP019229360055"},
         {"recenddate", "Wed 26"},
         {"recendtime", "1:02 AM"},
@@ -227,7 +227,7 @@ class TestProgramInfo : public QObject
         {"episode", "3"},
         {"filesize", "6,056,109,670"},
         {"filesize_str", "5.64 GB"},
-        {"inetref", "ttvdb.py_295759"},
+        {"inetref", "ttvdb4.py_295759"},
         {"input", "-"},
         {"inputname", "Prime A-0"},
         {"lastmodified", "Wed 26 October, 1:12 AM"},
@@ -316,7 +316,7 @@ class TestProgramInfo : public QObject
              QString("Default"), QString("Default"),
              "/recordings/1514_20161025235800.ts",
              "localhost", "Default",
-             "EP01922936", "EP019229360055", "ttvdb.py_279121",
+             "EP01922936", "EP019229360055", "ttvdb4.py_279121",
              ProgramInfo::kCategoryTVShow, 7, 6056109800,
              MythDate::fromString("2016-10-26 00:00:00"),
              MythDate::fromString("2016-10-26 01:00:00"),
@@ -327,7 +327,7 @@ class TestProgramInfo : public QObject
              RecStatus::Unknown, 19890314, // recordid
              kDupsInAll, kDupCheckSubThenDesc,
              20141007, // findId
-             FL_ALLOWLASTPLAYPOS | FL_WATCHED | FL_BOOKMARK,
+             FL_IGNORELASTPLAYPOS | FL_WATCHED | FL_BOOKMARK,
              AUD_DOLBY,
              VID_DAMAGED | VID_1080 | VID_HDTV,
              SUB_HARDHEAR,
@@ -343,7 +343,7 @@ class TestProgramInfo : public QObject
              "Default", "Default",
              "/recordings/1514_20161024235800.ts",
              "localhost", "Default",
-             "EP02185451", "EP021854510025", "ttvdb.py_295759",
+             "EP02185451", "EP021854510025", "ttvdb4.py_295759",
              ProgramInfo::kCategoryTVShow, -1, 6056109670,
              MythDate::fromString("2016-10-25 00:00:00"),
              MythDate::fromString("2016-10-25 01:00:00"),

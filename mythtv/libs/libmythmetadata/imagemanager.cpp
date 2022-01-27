@@ -169,8 +169,12 @@ int DeviceManager::OpenDevice(const QString &name, const QString &mount,
         id = m_devices.isEmpty() ? 0 : m_devices.lastKey() + 1;
         m_devices.insert(id, new Device(name, mount, media, dir));
     }
-    else if (m_devices.value(id))
-        m_devices.value(id)->setPresent(media);
+    else
+    {
+        Device *dev = m_devices.value(id);
+        if (dev)
+            dev->setPresent(media);
+    }
 
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("%1 device %2 mounted at '%3' [Id %4]")

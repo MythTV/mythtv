@@ -40,6 +40,7 @@ MythHTTPServer::MythHTTPServer()
     connect(this, &MythHTTPServer::MasterResolved, this, &MythHTTPServer::ResolveMaster);
     connect(this, &MythHTTPServer::HostResolved,   this, &MythHTTPServer::ResolveHost);
     connect(this, &MythHTTPServer::AddErrorPageHandler, this, & MythHTTPServer::NewErrorPageHandler);
+    connect(this, &MythHTTPServer::ProcessTCPQueue, this, & MythHTTPServer::ProcessTCPQueueHandler);
 
     // Find our static content
     m_config.m_rootDir = GetShareDir();
@@ -167,8 +168,7 @@ void MythHTTPServer::Init()
         version = version.right(version.length() - 1);
 
 #ifdef _WIN32
-    QString server = QStringLiteral("Windows/%1.%2").arg(LOBYTE(LOWORD(GetVersion())))
-                                                    .arg(HIBYTE(LOWORD(GetVersion())));
+    QString server = QStringLiteral("Windows");
 #else
     struct utsname uname_info {};
     uname(&uname_info);
@@ -250,7 +250,7 @@ void MythHTTPServer::ThreadFinished()
     }
 }
 
-void MythHTTPServer::ProcessTCPQueue()
+void MythHTTPServer::ProcessTCPQueueHandler()
 {
     if (AvailableThreads() > 0)
     {
@@ -525,8 +525,8 @@ void MythHTTPServer::BuildOrigins()
 
     // Add configured overrides - are these still needed?
     QStringList extras = gCoreContext->GetSetting("AllowedOriginsList", QString(
-                                                  "https://chromecast.mythtv.org,"
-                                                  "http://chromecast.mythtvcast.com")).split(",");
+                                                  "https://chromecast.mythtv.org"
+                                                  )).split(",");
     for (const auto & extra : extras)
     {
         QString clean = extra.trimmed();

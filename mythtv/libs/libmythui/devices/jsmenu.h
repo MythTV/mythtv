@@ -63,6 +63,11 @@ class JoystickMap
             m_axisMap.push_back(new_axis);
         }
 
+        void Clear(){
+            m_axisMap.clear();
+            m_buttonMap.clear();
+        }
+
         using button_map_t = std::vector<buttonMapType>;
         using axis_map_t = std::vector<axisMapType>;
         const button_map_t &buttonMap() const { return m_buttonMap; }
@@ -95,6 +100,11 @@ class JoystickMenuThread : public MThread
 
   private:
     void run() override; // MThread
+
+    bool m_configRead           {false};
+    bool m_readError            {false};
+    // put here to avoid changing other classes
+    QString m_configFile;
 
     QObject *m_mainWindow       {nullptr};
     QString m_devicename;

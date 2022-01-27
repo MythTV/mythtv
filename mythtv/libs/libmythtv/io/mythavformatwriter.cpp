@@ -17,19 +17,20 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#include "io/mythavformatwriter.h"
+
+#include <QtGlobal>
+#include <QtEndian>
 
 // MythTV
 #include "mythlogging.h"
 #include "mythcorecontext.h"
 #include "audiooutpututil.h"
 #include "mythavutil.h"
-#include "io/mythavformatwriter.h"
+
 
 // FFmpeg
 extern "C" {
-#if HAVE_BIGENDIAN
-#include "bswap.h"
-#endif
 #include "libavutil/opt.h"
 #include "libavutil/samplefmt.h"
 #include "libavutil/imgutils.h"
@@ -264,21 +265,12 @@ int MythAVFormatWriter::WriteVideoFrame(MythVideoFrame *Frame)
     return 1;
 }
 
-#if HAVE_BIGENDIAN
-static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
-    __attribute__ ((unused)); /* <- suppress compiler warning */
-
-static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
-{
-    for (int i = 0; i < audio_channels * buf_cnt; i++)
-        buf[i] = bswap_16(buf[i]);
-}
-#endif
-
 int MythAVFormatWriter::WriteAudioFrame(unsigned char *Buffer, int /*FrameNumber*/, std::chrono::milliseconds &Timecode)
 {
-#if HAVE_BIGENDIAN
-    bswap_16_buf((short int*) buf, m_audioFrameSize, m_audioChannels);
+#if (Q_BYTE_ORDER == Q_BIG_ENDIAN)
+    auto buf16 = reinterpret_cast<uint16_t *>(Buffer);
+    for (int i = 0; i < m_audioChannels * m_audioFrameSize; i++)
+        buf16[i] = qFromLittleEndian<uint16_t>(buf16[i]);
 #endif
 
     AVCodecContext *avctx   = m_codecMap.GetCodecContext(m_audioStream);
@@ -459,7 +451,7 @@ AVStream* MythAVFormatWriter::AddVideoStream(void)
         // the Baseline profile where the given bitrate and resolution permits
 
         if ((context->height > 720) || // Approximate highest resolution supported by Baseline 3.1
-            (context->bit_rate > 1000000)) // 14,000 Kbps aka 14Mbps maximum permissable rate for Baseline 3.1
+            (context->bit_rate > 1400000)) // 14,000 Kbps aka 14Mbps maximum permissable rate for Baseline 3.1
         {
             context->level = 40;
             // AVCodecContext AVOptions:

@@ -19,7 +19,7 @@
  *    MythHTTPService::AddHandlers( {{"/main.js", main_js }});
  * \endcode
 */
-HTTPResponse MythHTTPRewrite::RewriteFile(HTTPRequest2 Request, const QString &File)
+HTTPResponse MythHTTPRewrite::RewriteFile(const HTTPRequest2& Request, const QString &File)
 {
     auto result = static_cast<HTTPResponse>(nullptr);
     if (!Request)
@@ -29,6 +29,35 @@ HTTPResponse MythHTTPRewrite::RewriteFile(HTTPRequest2 Request, const QString &F
     if (!File.isEmpty())
     {
         Request->m_fileName = File;
+        result = MythHTTPFile::ProcessFile(Request);
+    }
+    return result;
+
+}
+
+/*! \brief A convenience method to seemlessly redirect requests to
+ * a Single Page web app (SPA)
+ *
+ * e.g. we want all requests not handled by API or static methods to
+ * be sent into the web app
+ *
+ * \code{.cpp}
+ *    auto spa_index = [](auto && PH1) { return MythHTTPRewrite::RewriteToSPA(std::forward<decltype(PH1)>(PH1), "apps/backend/index.html"); };
+ *
+ *    MythHTTPService::AddErrorPageHandler( {{"=404", spa_index }});
+ * \endcode
+*/
+HTTPResponse MythHTTPRewrite::RewriteToSPA(const HTTPRequest2& Request, const QString &File)
+{
+    auto result = static_cast<HTTPResponse>(nullptr);
+    if (!Request)
+        return result;
+
+    LOG(VB_HTTP, LOG_INFO, QString("Rewriting request to web app '%1'").arg(File));
+    if (!File.isEmpty())
+    {
+        Request->m_fileName = File;
+        Request->m_status = HTTPOK;
         result = MythHTTPFile::ProcessFile(Request);
     }
     return result;

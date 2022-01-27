@@ -24,7 +24,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 #ifndef RTJPEG_H
 #define RTJPEG_H
 
-#include "mythconfig.h"
 #include "mythtvexp.h"
 #include <cstdint>
 
@@ -37,22 +36,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 
 using RTjpegData16 = std::array<int16_t,64>;
 using RTjpegData32 = std::array<int32_t,64>;
-
-#if HAVE_BIGENDIAN
-#define RTJPEG_SWAP_WORD(a) ( ((a) << 24) | \
-			(((a) << 8) & 0x00ff0000) | \
-			(((a) >> 8) & 0x0000ff00) | \
-			((unsigned long)(a) >>24) )
-#define RTJPEG_SWAP_HALFWORD(a) ( (((a) << 8) & 0xff00) | \
-			(((a) >> 8) & 0x00ff) )
-#else
-#define RTJPEG_SWAP_WORD(a) (a)
-#define RTJPEG_SWAP_HALFWORD(a) (a)
-#endif
-
-#if HAVE_STDINT_H
-#include <cstdint>
-#endif
 
 #ifdef MMX
 #include "ffmpeg-mmx.h"

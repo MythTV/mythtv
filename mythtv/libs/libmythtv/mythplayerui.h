@@ -19,6 +19,7 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerEditorUI, public MythVideoScanT
     void ChangeOSDDebug();
     void UpdateOSDDebug();
     virtual void SetBookmark(bool Clear = false);
+    virtual void SetLastPlayPosition(uint64_t frame = 0);
 
   public:
     MythPlayerUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);

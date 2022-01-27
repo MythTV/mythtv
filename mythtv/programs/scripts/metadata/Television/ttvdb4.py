@@ -19,7 +19,7 @@ from configparser import ConfigParser
 
 __title__ = "TheTVDatabaseV4"
 __author__ = "Roland Ernst"
-__version__ = "0.4.1"
+__version__ = "0.5.0"
 
 
 def print_etree(etostr):
@@ -152,8 +152,9 @@ def main():
     parser.add_argument('--jsondebug', action="store_true", default=False, dest="jsondebug",
                         help="Enable raw json data output.")
 
-    parser.add_argument('--doctest', action="store_true", default=False,
-                        dest="doctest", help="Run doctests.")
+    parser.add_argument('--doctest', action="store_true", default=False, dest="doctest",
+                        help="Run doctests. You need to change to the folder where ttvdb4.py "
+                             "is installed.")
 
     args = parser.parse_args()
 

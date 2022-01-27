@@ -1,0 +1,12 @@
+.warning {
+    color: #cc8925;
+    background-color:#fff2e2;
+    }
+.connected {
+    color: #1ea97c;
+    background-color: #e4f8f0;
+}
+
+.medium-width {
+    width: "600";
+}

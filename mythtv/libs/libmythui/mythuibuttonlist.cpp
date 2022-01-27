@@ -23,6 +23,7 @@
 #include "mythuigroup.h"
 #include "mythuiimage.h"
 #include "mythgesture.h"
+#include "mythuiprogressbar.h"
 
 #define LOC     QString("MythUIButtonList(%1): ").arg(objectName())
 
@@ -3543,6 +3544,26 @@ QString MythUIButtonListItem::GetImageFilename(const QString &name) const
     return QString();
 }
 
+void MythUIButtonListItem::SetProgress1(int start, int total, int used)
+{
+    m_progress1.used  = used;
+    m_progress1.start = start;
+    m_progress1.total = total;
+
+    if (m_parent && m_isVisible)
+        m_parent->Update();
+}
+
+void MythUIButtonListItem::SetProgress2(int start, int total, int used)
+{
+    m_progress2.used  = used;
+    m_progress2.start = start;
+    m_progress2.total = total;
+
+    if (m_parent && m_isVisible)
+        m_parent->Update();
+}
+
 void MythUIButtonListItem::DisplayState(const QString &state,
                                         const QString &name)
 {
@@ -3705,6 +3726,22 @@ void MythUIButtonListItem::DoButtonCheck (MythUIStateType *buttoncheck)
         buttoncheck->DisplayState(MythUIStateType::Full);
 }
 
+void MythUIButtonListItem::DoButtonProgress1 (MythUIProgressBar *buttonprogress) const
+{
+    if (!buttonprogress)
+        return;
+
+    buttonprogress->Set(m_progress1.start, m_progress1.total, m_progress1.used);
+}
+
+void MythUIButtonListItem::DoButtonProgress2 (MythUIProgressBar *buttonprogress) const
+{
+    if (!buttonprogress)
+        return;
+
+    buttonprogress->Set(m_progress2.start, m_progress2.total, m_progress2.used);
+}
+
 void MythUIButtonListItem::DoButtonLookupText (MythUIText *text,
                                                const TextProperties& textprop)
 {
@@ -3847,6 +3884,10 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
             DoButtonArrow(dynamic_cast<MythUIImage *>(obj));
         else if (name == "buttoncheck")
             DoButtonCheck(dynamic_cast<MythUIStateType *>(obj));
+        else if (name == "buttonprogress1")
+            DoButtonProgress1(dynamic_cast<MythUIProgressBar *>(obj));
+        else if (name == "buttonprogress2")
+            DoButtonProgress2(dynamic_cast<MythUIProgressBar *>(obj));
 
         TextProperties textprop = GetTextProp(name);
         if (!textprop.text.isEmpty())

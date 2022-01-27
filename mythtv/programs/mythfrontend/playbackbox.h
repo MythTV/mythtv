@@ -147,8 +147,8 @@ class PlaybackBox : public ScheduleCommon
     void ItemLoaded(MythUIButtonListItem *item);
     void selected(MythUIButtonListItem *item);
     void updateRecGroup(MythUIButtonListItem *sel_item);
-    void PlayFromBookmarkOrProgStart(MythUIButtonListItem *item);
-    void PlayFromBookmarkOrProgStart() { PlayFromBookmarkOrProgStart(nullptr); }
+    void PlayFromAnyMark(MythUIButtonListItem *item);
+    void PlayFromAnyMark() { PlayFromAnyMark(nullptr); }
     void PlayFromBookmark(MythUIButtonListItem *item);
     void PlayFromBookmark() { PlayFromBookmark(nullptr); }
     void PlayFromBeginning(MythUIButtonListItem *item);
@@ -157,6 +157,7 @@ class PlaybackBox : public ScheduleCommon
     void PlayFromLastPlayPos() { PlayFromLastPlayPos(nullptr); }
     void deleteSelected(MythUIButtonListItem *item);
     void ClearBookmark();
+    void ClearLastPlayPos();
     void SwitchList(void);
 
     void ShowGroupPopup(void);
@@ -338,8 +339,7 @@ class PlaybackBox : public ScheduleCommon
     void HandlePreviewEvent(const QStringList &list);
     void HandleRecordingRemoveEvent(uint recordingID);
     void HandleRecordingAddEvent(const ProgramInfo &evinfo);
-    void HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo);
-    void HandleUpdateProgramInfoFileSizeEvent(uint recordingID, uint64_t filesize);
+    void HandleUpdateItemEvent(uint recordingId, uint flags);
 
     void ScheduleUpdateUIList(void);
     void ShowMenu(void) override; // MythScreenType
@@ -362,6 +362,9 @@ class PlaybackBox : public ScheduleCommon
     MythUIText *m_noRecordingsText            {nullptr};
 
     MythUIImage *m_previewImage               {nullptr};
+
+    MythUIProgressBar *m_recordedProgress     {nullptr};
+    MythUIProgressBar *m_watchedProgress      {nullptr};
 
     QString      m_artHostOverride;
     constexpr static int kNumArtImages = 3;

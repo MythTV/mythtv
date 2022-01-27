@@ -9,6 +9,9 @@
 
 // Qt
 #include <QDomDocument>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
 
 #define LOC QString("HTTPEnc: ")
 
@@ -95,11 +98,17 @@ void MythHTTPEncoding::GetContentType(MythHTTPRequest* Request)
         Request->m_content->m_mimeType = mime;
         if (mime.Name() == "application/x-www-form-urlencoded")
             GetURLEncodedParameters(Request);
-        if (mime.Name() == "text/xml" || mime.Name() == "application/xml"
-            || mime.Name() == "application/soap+xml")
+        else if (mime.Name() == "text/xml" || mime.Name() == "application/xml" ||
+                 mime.Name() == "application/soap+xml")
             GetXMLEncodedParameters(Request);
-
+        else if (mime.Name() == "application/json")
+            GetJSONEncodedParameters(Request);
+        else
+            LOG(VB_HTTP, LOG_ERR, QString("Don't know how to get the parameters for MIME type: '%1'").arg(mime.Name()));
     }
+    else
+        LOG(VB_HTTP, LOG_ERR, QString("Unknown MIME type: '%1'").arg(types[0]));
+
 }
 
 void MythHTTPEncoding::GetURLEncodedParameters(MythHTTPRequest* Request)
@@ -138,6 +147,7 @@ void MythHTTPEncoding::GetURLEncodedParameters(MythHTTPRequest* Request)
 void MythHTTPEncoding::GetXMLEncodedParameters(MythHTTPRequest* Request)
 {
     LOG(VB_HTTP, LOG_DEBUG, "Inspecting XML payload");
+
     if (!Request || !Request->m_content.get())
         return;
 
@@ -188,6 +198,35 @@ void MythHTTPEncoding::GetXMLEncodedParameters(MythHTTPRequest* Request)
                     LOG(VB_HTTP, LOG_DEBUG, QString("Found URL param (%1=%2)").arg(name, value));
                 }
             }
+        }
+    }
+}
+
+void MythHTTPEncoding::GetJSONEncodedParameters(MythHTTPRequest* Request)
+{
+    LOG(VB_HTTP, LOG_DEBUG, "Inspecting JSON payload");
+
+    if (!Request || !Request->m_content.get())
+        return;
+
+    QJsonParseError parseError {};
+    QJsonDocument doc = QJsonDocument::fromJson(static_cast<QByteArray>(Request->m_content->constData()), &parseError);
+    if (parseError.error != QJsonParseError::NoError)
+    {
+        LOG(VB_HTTP, LOG_WARNING, QString("Unable to parse JSON request body - Error at position %1, msg: %2")
+            .arg(parseError.offset).arg(parseError.errorString()));
+        return;
+    }
+
+    QJsonObject json = doc.object();
+    foreach(const QString& key, json.keys())
+    {
+        if (!key.isEmpty())
+        {
+            QString value = json.value(key).toVariant().toString();
+
+            Request->m_queries.insert(key.trimmed().toLower(), value);
+            LOG(VB_HTTP, LOG_DEBUG, QString("Found URL param (%1=%2)").arg(key, value));
         }
     }
 }

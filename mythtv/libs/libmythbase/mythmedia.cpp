@@ -22,6 +22,7 @@
 #include "exitcodes.h"
 
 #ifdef _WIN32
+#   undef O_NONBLOCK
 #   define O_NONBLOCK 0
 #endif
 

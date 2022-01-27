@@ -38,8 +38,8 @@ class MythWebSocket : public QObject
 
   private:
     void PingReceived   (DataPayload Payload);
-    void PongReceived   (DataPayload Payload);
-    void CloseReceived  (DataPayload Payload);
+    void PongReceived   (const DataPayload& Payload);
+    void CloseReceived  (const DataPayload& Payload);
     void CheckClose     ();
     void SendClose      (WSErrorCode Code, const QString& Message = {});
     void SendPing       ();

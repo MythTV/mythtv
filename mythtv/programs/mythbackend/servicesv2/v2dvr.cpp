@@ -1615,7 +1615,7 @@ V2RecRuleList* V2Dvr::GetRecordScheduleList( int nStartIndex,
                                               const QString  &Sort,
                                               bool Descending )
 {
-    Scheduler::SchedSortColumn sortingColumn = Scheduler::kSortTitle;
+    Scheduler::SchedSortColumn sortingColumn {Scheduler::kSortTitle};
     if (Sort.toLower() == "lastrecorded")
         sortingColumn = Scheduler::kSortLastRecorded;
     else if (Sort.toLower() == "nextrecording")

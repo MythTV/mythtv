@@ -163,7 +163,6 @@ void MythXMLPListSerialiser::AddProperty(const QString& Name, const QVariant& Va
         QMetaEnum metaEnum = MetaProperty->enumerator();
         value = MetaProperty->isFlagType() ? metaEnum.valueToKeys(Value.toInt()).constData() :
                                              metaEnum.valueToKey(Value.toInt());
-        return;
     }
     AddValue(GetContentName(Name, MetaObject), value.isEmpty() ? Value : value);
 }
@@ -185,23 +184,14 @@ void MythXMLPListSerialiser::AddList(const QString& Name, const QVariantList &Va
     {
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         auto type = static_cast<QMetaType::Type>(Values.front().type());
+        auto typesEqual = [type](const QVariant& value)
+            { return (static_cast<QMetaType::Type>(value.type()) == type); };
 #else
         auto type = static_cast<QMetaType::Type>(Values.front().typeId());
+        auto typesEqual = [type](const QVariant& value)
+            { return (static_cast<QMetaType::Type>(value.typeId()) == type); };
 #endif
-        for (const auto & value : Values)
-        {
-            if (
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-                static_cast<QMetaType::Type>(value.type())
-#else
-                static_cast<QMetaType::Type>(value.typeId())
-#endif
-                != type)
-            {
-                array = false;
-                break;
-            }
-        }
+        array = std::all_of(Values.cbegin(), Values.cend(), typesEqual);
     }
 
     QString name = GetItemName(Name);

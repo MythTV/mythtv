@@ -133,6 +133,7 @@ static std::shared_ptr<MythSortHelper> singleton = nullptr;
 std::shared_ptr<MythSortHelper> getMythSortHelper(void)
 {
     if (singleton == nullptr)
+        // converity[resource_leak]
         singleton = std::make_shared<MythSortHelper>(new MythSortHelper());
     return singleton;
 }

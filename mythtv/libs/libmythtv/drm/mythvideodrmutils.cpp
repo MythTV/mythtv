@@ -22,6 +22,7 @@ uint64_t MythVideoDRMUtils::FFmpegColorRangeToDRM(DRMProp Property, int Range)
         return result;
 
     auto searchstring = (Range == AVCOL_RANGE_MPEG) ? "limited" : "full";
+    // cppcheck-suppress unassignedVariable
     for (const auto & [value,name] : rangeprop->m_enums)
     {
         if (name.contains(searchstring, Qt::CaseInsensitive))
@@ -58,6 +59,7 @@ uint64_t MythVideoDRMUtils::FFmpegColorEncodingToDRM(DRMProp Property, int Encod
         default: break;
     }
 
+    // cppcheck-suppress unassignedVariable
     for (const auto & [value,name] : rangeprop->m_enums)
     {
         if (name.contains(searchstring, Qt::CaseInsensitive))

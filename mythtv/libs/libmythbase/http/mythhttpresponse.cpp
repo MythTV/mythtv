@@ -176,7 +176,7 @@ void MythHTTPResponse::Finalise(const MythHTTPConfig& Config)
     }
 }
 
-HTTPResponse MythHTTPResponse::HandleOptions(HTTPRequest2 Request)
+HTTPResponse MythHTTPResponse::HandleOptions(const HTTPRequest2& Request)
 {
     if (!Request)
         return nullptr;
@@ -217,7 +217,7 @@ HTTPResponse MythHTTPResponse::ErrorResponse(MythHTTPStatus Status, const QStrin
     return response;
 }
 
-HTTPResponse MythHTTPResponse::RedirectionResponse(HTTPRequest2 Request, const QString &Redirect)
+HTTPResponse MythHTTPResponse::RedirectionResponse(const HTTPRequest2& Request, const QString &Redirect)
 {
     Request->m_status = HTTPMovedPermanently;
     auto response = std::make_shared<MythHTTPResponse>(Request);
@@ -227,7 +227,7 @@ HTTPResponse MythHTTPResponse::RedirectionResponse(HTTPRequest2 Request, const Q
     return response;
 }
 
-HTTPResponse MythHTTPResponse::ErrorResponse(HTTPRequest2 Request, const QString& Message)
+HTTPResponse MythHTTPResponse::ErrorResponse(const HTTPRequest2& Request, const QString& Message)
 {
     auto response = std::make_shared<MythHTTPResponse>(Request);
     response->m_response = MythHTTPData::Create("error.html", s_defaultHTTPPage
@@ -237,7 +237,7 @@ HTTPResponse MythHTTPResponse::ErrorResponse(HTTPRequest2 Request, const QString
     return response;
 }
 
-HTTPResponse MythHTTPResponse::OptionsResponse(HTTPRequest2 Request)
+HTTPResponse MythHTTPResponse::OptionsResponse(const HTTPRequest2& Request)
 {
     auto response = std::make_shared<MythHTTPResponse>(Request);
     response->AddDefaultHeaders();
@@ -246,7 +246,7 @@ HTTPResponse MythHTTPResponse::OptionsResponse(HTTPRequest2 Request)
     return response;
 }
 
-HTTPResponse MythHTTPResponse::DataResponse(HTTPRequest2 Request, HTTPData Data)
+HTTPResponse MythHTTPResponse::DataResponse(const HTTPRequest2& Request, const HTTPData& Data)
 {
     auto response = std::make_shared<MythHTTPResponse>(Request);
     response->m_response = Data;
@@ -257,7 +257,7 @@ HTTPResponse MythHTTPResponse::DataResponse(HTTPRequest2 Request, HTTPData Data)
     return response;
 }
 
-HTTPResponse MythHTTPResponse::FileResponse(HTTPRequest2 Request, HTTPFile File)
+HTTPResponse MythHTTPResponse::FileResponse(const HTTPRequest2& Request, const HTTPFile& File)
 {
     auto response = std::make_shared<MythHTTPResponse>(Request);
     response->m_response = File;
@@ -268,7 +268,7 @@ HTTPResponse MythHTTPResponse::FileResponse(HTTPRequest2 Request, HTTPFile File)
     return response;
 }
 
-HTTPResponse MythHTTPResponse::EmptyResponse(HTTPRequest2 Request)
+HTTPResponse MythHTTPResponse::EmptyResponse(const HTTPRequest2& Request)
 {
     auto response = std::make_shared<MythHTTPResponse>(Request);
     response->AddDefaultHeaders();
@@ -368,7 +368,7 @@ void MythHTTPResponse::AddContentHeaders()
     }
 }
 
-HTTPResponse MythHTTPResponse::UpgradeResponse(HTTPRequest2 Request, MythSocketProtocol &Protocol, bool &Testing)
+HTTPResponse MythHTTPResponse::UpgradeResponse(const HTTPRequest2& Request, MythSocketProtocol &Protocol, bool &Testing)
 {
     // Assume the worst:) and create a default error response
     Request->m_status = HTTPBadRequest;

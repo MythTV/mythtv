@@ -1431,6 +1431,9 @@ void ProgramRecPriority::UpdateList()
         norecordingText->SetVisible(m_programData.isEmpty());
 }
 
+// Called whenever a new recording is selected from the list of
+// recordings. This function updates the screen with the information
+// on the newly selected recording.
 void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
 {
     if (!item)

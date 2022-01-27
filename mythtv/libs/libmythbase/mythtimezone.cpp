@@ -29,26 +29,6 @@ int calc_utc_offset(void)
     return utc.secsTo(loc);
 }
 
-/* Helper function for getTimeZoneID() that provides an unprocessed time zone
-   id obtained using system-dependent means of identifying the system's time
-   zone. */
-static QString getSystemTimeZoneID(void)
-{
-    QString zone_id("UNDEF");
-#ifdef _WIN32
-    // struct _TIME_ZONE_INFORMATION { ...
-    // GetTimeZoneInformation();
-    // ...
-    // Sadly, Windows zone names are different to the (probably Unix)
-    // backend's names - "AUS Eastern Standard Time" vs "Australia/Sydney".
-    // Translation is not worthwhile. Leave it as UNDEF to check the offset.
-#else
-    QDateTime dt = QDateTime::currentDateTime();
-    zone_id = dt.timeZone().id();
-#endif
-    return zone_id;
-}
-
 /** \fn getTimeZoneID()
  *  \brief Returns the zoneinfo time zone ID or as much time zone information
  *         as possible
@@ -63,7 +43,8 @@ QString getTimeZoneID(void)
     if (tz.isEmpty())
     {
         // No TZ, so attempt to determine the system-configured time zone ID
-        tz = getSystemTimeZoneID();
+        QDateTime dt = QDateTime::currentDateTime();
+        tz = dt.timeZone().id();
     }
 
     if (!tz.isEmpty())
@@ -80,7 +61,10 @@ QString getTimeZoneID(void)
         if (zone_id.startsWith("posix/"))
             zone_id.remove(0, 6);
     }
-
+#else
+    // Sadly, Windows zone names are different to the (probably Unix)
+    // backend's names - "AUS Eastern Standard Time" vs "Australia/Sydney".
+    // Translation is not worthwhile. Leave it as UNDEF to check the offset.
 #endif
     return zone_id;
 }

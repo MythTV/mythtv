@@ -69,7 +69,7 @@ class ActiveGame
     QString   getStartTimeAsString() const
         { return m_startTime.toString(Qt::ISODate); }
 
-    void      setInfo(SportInfo& info) { m_info = info; }
+    void      setInfo(const SportInfo& info) { m_info = info; }
     void      setTeams(QString team1, QString team2)
         { m_team1 = std::move(team1); m_team2 = std::move(team2); }
     void      setTeamsNorm(QString team1, QString team2)
@@ -271,7 +271,7 @@ class RecExtDataSource : public QObject
     virtual RecExtDataPage* loadPage(const ActiveGame& game, const QUrl& _url) = 0;
 
   protected:
-    RecExtDataSource(QObject *parent) : QObject(parent) {};
+    explicit RecExtDataSource(QObject *parent) : QObject(parent) {};
 
     QUrl m_url;
     static QHash<QString,QJsonDocument> s_downloadedJson;
@@ -280,7 +280,7 @@ class RecExtDataSource : public QObject
 class RecExtEspnDataSource : public RecExtDataSource
 {
   public:
-    RecExtEspnDataSource(QObject *parent) : RecExtDataSource(parent) {};
+    explicit RecExtEspnDataSource(QObject *parent) : RecExtDataSource(parent) {};
     RecExtDataPage* newPage(const QJsonDocument& doc) override
         { return new RecExtEspnDataPage(this, doc); }
     QUrl makeInfoUrl(const SportInfo& info, const QDateTime& dt) override;
@@ -292,7 +292,7 @@ class RecExtEspnDataSource : public RecExtDataSource
 class RecExtMlbDataSource : public RecExtDataSource
 {
   public:
-    RecExtMlbDataSource(QObject *parent) : RecExtDataSource(parent) {}
+    explicit RecExtMlbDataSource(QObject *parent) : RecExtDataSource(parent) {}
     RecExtDataPage* newPage(const QJsonDocument& doc) override
         { return new RecExtMlbDataPage(this, doc); }
     QUrl makeInfoUrl(const SportInfo& info, const QDateTime& dt) override;

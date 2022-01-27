@@ -9,6 +9,8 @@
 #include "mythvirtualkeyboard.h"
 #include "mythstorage.h"
 
+class QInputMethodEvent;
+
 class MythFontProperties;
 class MythUIStateType;
 class MythUIImage;
@@ -39,6 +41,7 @@ class MUI_PUBLIC MythUITextEdit : public MythUIType, public StorageUser
 
     void Pulse(void) override; // MythUIType
     bool keyPressEvent(QKeyEvent *event) override; // MythUIType
+    bool inputMethodEvent(QInputMethodEvent *event) override; // MythUIType
     bool gestureEvent(MythGestureEvent *event) override; // MythUIType
     void Reset(void) override; // MythUIType
 
@@ -83,6 +86,7 @@ class MUI_PUBLIC MythUITextEdit : public MythUIType, public StorageUser
     void CutTextToClipboard(void);
     void CopyTextToClipboard(void);
     void PasteTextFromClipboard(QClipboard::Mode mode = QClipboard::Clipboard);
+    bool UpdateTmpString(const QString &str);
 
     bool m_initialized;
 
@@ -105,6 +109,9 @@ class MUI_PUBLIC MythUITextEdit : public MythUIType, public StorageUser
     MythUIText  *m_text;
 
     int m_composeKey;
+
+    bool m_isIMEinput;
+    QString m_messageBak;
 };
 
 #endif

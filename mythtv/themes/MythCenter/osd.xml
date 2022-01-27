@@ -148,6 +148,11 @@
             <area>4,4,560,34</area>
             <align>left,vcenter</align>
         </textarea>
+        <textarea name="recordedtime">
+            <font>medium</font>
+            <area>4,4,560,34</area>
+            <align>hcenter,vcenter</align>
+        </textarea>
         <textarea name="description">
             <font>medium</font>
             <area>4,4,560,34</area>

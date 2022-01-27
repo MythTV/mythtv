@@ -151,6 +151,7 @@
                         <align>left,vcenter</align>
                     </textarea>
                 </state>
+                <state name="inactive" from="active"/>
                 <state name="selectedinactive" from="active">
                     <shape name="selectbar">
                         <area>0,0,100%,30</area>
@@ -192,46 +193,77 @@
             <triggerevent context="Global" action="MENU">RIGHT</triggerevent>
             <statetype name="buttonitem">
                 <state name="active">
-                <area>0,0,535,30</area>
-                <statetype name="status">
-                    <position>3,2</position>
-                    <state name="disabled">
-                        <imagetype name="statusimage">
-                            <filename>schedule_disabled.png</filename>
-                        </imagetype>
-                    </state>
-                    <state name="error">
-                        <imagetype name="statusimage">
-                            <filename>schedule_conflict.png</filename>
-                        </imagetype>
-                    </state>
-                    <state name="warning">
-                        <imagetype name="statusimage">
-                            <filename>schedule_other.png</filename>
-                        </imagetype>
-                    </state>
-<!--                <state name="normal">
-                        <imagetype name="statusimage">
-                            <filename>schedule_record.png</filename>
-                        </imagetype>
-                    </state> -->
-                    <state name="running">
-                        <imagetype name="statusimage">
-                            <filename>schedule_recording.png</filename>
-                        </imagetype>
-                    </state>
-                    <state name="marked"></state>
-                </statetype>
+                    <area>0,0,535,30</area>
+                    <!-- Watched progress -->
+                    <!--
+                    <progressbar name="buttonprogress1">
+                        <area>0,0%,100%,50%</area>
+                        <layout>horizontal</layout>
+                        <style>reveal</style>
+                        <shape name="progressimage">
+                            <area>0,1,100%,100%-1</area>
+                            <type>box</type>
+                            <fill color="#88dd44" alpha="128"/>
+                        </shape>
+                    </progressbar>
+                    -->
+                    <!-- Recorded progress -->
+                    <!--
+                    <progressbar name="buttonprogress2">
+                        <area>0,50%,100%,100%</area>
+                        <layout>horizontal</layout>
+                        <style>reveal</style>
+                        <shape name="progressimage">
+                            <area>0,1,100%,100%-1</area>
+                            <type>box</type>
+                            <fill color="#dd0000" alpha="128"/>
+                        </shape>
+                    </progressbar>
+                    -->
+                    <statetype name="status">
+                        <position>3,2</position>
+                        <state name="disabled">
+                            <imagetype name="statusimage">
+                                <filename>schedule_disabled.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="error">
+                            <imagetype name="statusimage">
+                                <filename>schedule_conflict.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="warning">
+                            <imagetype name="statusimage">
+                                <filename>schedule_other.png</filename>
+                            </imagetype>
+                        </state>
+<!--                    <state name="normal">
+                            <imagetype name="statusimage">
+                                <filename>schedule_record.png</filename>
+                            </imagetype>
+                            </state> -->
+                        <state name="running">
+                            <imagetype name="statusimage">
+                                <filename>schedule_recording.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="marked"></state>
+                    </statetype>
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,0,336,30</area>
+                        <area>32,0,343,30</area>
                         <align>vcenter</align>
                     </textarea>
-                    <textarea name="shortstartdate" from="titlesubtitle">
-                        <area>295,0,130,30</area>
+                    <textarea name="watchedpercent" from="buttontext">
+                        <area>375,0,45,30</area>
+                        <align>right,vcenter</align>
+                        <template>%|watchedpercent|%%</template>
+                     </textarea>
+                    <textarea name="shortstartdate" from="buttontext">
+                        <area>420,0,40,30</area>
                         <align>right,vcenter</align>
                     </textarea>
-                    <textarea name="starttime" from="shortstartdate">
-                        <area>415,0,114,30</area>
+                    <textarea name="starttime" from="buttontext">
+                        <area>460,0,70,30</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <statetype name="watched">
@@ -253,6 +285,7 @@
                         <state name="no" />
                     </statetype>
                 </state>
+                <state name="inactive" from="active"/>
                 <state name="selectedinactive" from="active">
                     <shape name="selectbar">
                         <area>0,0,100%,30</area>
@@ -262,8 +295,8 @@
                     <shape name="selectbar">
                         <area>0,0,100%,30</area>
                     </shape>
-                    <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,0,336,30</area>
+                    <textarea name="fonts" from="buttontext">
+                        <font>basesmall_normal_selected</font>
                         <font>basesmall_normal_selected</font>
                         <font state="disabled">basesmall_disabled_selected</font>
                         <font state="error">basesmall_error_selected</font>
@@ -272,12 +305,20 @@
                         <font state="running">basesmall_running_selected</font>
                         <align>vcenter</align>
                     </textarea>
-                    <textarea name="shortstartdate" from="titlesubtitle">
-                        <area>295,0,130,30</area>
+                    <textarea name="titlesubtitle" from="fonts">
+                        <area>32,0,343,30</area>
+                    </textarea>
+                    <textarea name="watchedpercent" from="fonts">
+                        <area>375,0,45,30</area>
+                        <align>right,vcenter</align>
+                        <template>%|watchedpercent|%%</template>
+                     </textarea>
+                    <textarea name="shortstartdate" from="fonts">
+                        <area>420,0,40,30</area>
                         <align>right,vcenter</align>
                     </textarea>
-                    <textarea name="starttime" from="shortstartdate">
-                        <area>415,0,114,30</area>
+                    <textarea name="starttime" from="fonts">
+                        <area>460,0,70,30</area>
                         <align>right,vcenter</align>
                     </textarea>
                 </state>
@@ -413,7 +454,7 @@
         </textarea>
 
         <textarea name="description" from="basetextarea">
-            <area>18,425,572,160</area>
+            <area>18,425,572,125</area>
             <multiline>yes</multiline>
             <scroll direction="vertical" />
             <cutdown>no</cutdown>
@@ -430,6 +471,36 @@
             <filename />
             <preserveaspect>true</preserveaspect>
         </imagetype>
+
+        <group name="recordedgroup" depends="recordedmagic">
+            <textarea name="recordedmagic">
+                <template>%recordedpercent%</template>
+            </textarea>
+            <area>50,551,200,30</area>
+            <progressbar name="recordedprogressbar" from="baseprogressbar2">
+                <area>0,0,100%,100%</area>
+            </progressbar>
+            <textarea name="recordedpercent" from="basetextarea">
+                <area>0,0,100%,100%</area>
+                <align>hcenter,vcenter</align>
+                <template>%|recordedpercent|%% recorded</template>
+            </textarea>
+        </group>
+
+        <group name="wachedgroup" depends="watchedmagic">
+            <textarea name="watchedmagic">
+                <template>%watchedpercent%</template>
+            </textarea>
+            <area>300,551,200,30</area>
+            <progressbar name="watchedprogressbar" from="baseprogressbar2">
+                <area>0,0,100%,100%</area>
+            </progressbar>
+            <textarea name="foo" from="basetextarea">
+                <area>0,0,100%,100%</area>
+                <align>hcenter,vcenter</align>
+                <template>%|watchedpercent|%% watched</template>
+            </textarea>
+        </group>
 
         <textarea name="norecordings">
             <area>20,74,760,300</area>

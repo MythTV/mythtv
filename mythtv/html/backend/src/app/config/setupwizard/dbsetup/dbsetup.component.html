@@ -1,0 +1,115 @@
+<p-toast></p-toast>
+
+<p-dialog header="Database Setup - Help" [(visible)]="m_showHelp">
+    <h4>Some very helpful help text goes here</h4>
+    <p>Some more very very helpful text goes here!</p>
+</p-dialog>
+
+<form class="ml-3 mr-3" name="databaseForm" #databaseForm="ngForm" (ngSubmit)="saveForm()">
+    <p-card class="m-5">
+        <ng-template pTemplate="title">
+            Database Setup
+        </ng-template>
+        <ng-template pTemplate="subtitle">
+            Enter the database login details
+        </ng-template>
+        <ng-template pTemplate="content">
+            <div class="formgrid grid form-group">
+                <div class="field col-12 md:col-6">
+                    <label for="ipaddress" class="block">MySQL Server IP</label>
+                    <input pInputText id="ipaddress" type="text" aria-describedby="ipaddress-help" 
+                           [(ngModel)]="m_wizardData.Database.Host" name="hostname" #host="ngModel" class="form-control w-full" 
+                           [ngClass]="{'is-invalid': host.invalid }" placeholder="Ex. 127.0.0.1 or localhost" required />
+                    <div *ngIf="host.invalid && (host.dirty || host.touched)">
+                        <small id="address-help" class="p-error block">Ip Address or Hostname is required</small>
+                    </div>
+                </div>
+
+                <div class="field col-12 md:col-6">
+                    <label for="port" class="block">MySQL Server Port</label>
+                    <input pInputText id="port" type="number" aria-describedby="port-help" 
+                           [(ngModel)]="m_wizardData.Database.Port" name="port" #port="ngModel" class="form-control" placeholder="Ex. 3306" min="0" max="65536"/>
+                    <div *ngIf="port.invalid && (port.dirty || port.touched)">
+                        <small id="port-help" class="p-error block">Port is required and must be a number between 0 and 65536</small>
+                    </div>
+                </div>
+
+                <div class="field col-12 md:col-6">
+                    <label for="user" class="block">MySQL User</label>
+                    <input pInputText id="user" type="text" aria-describedby="user-help" 
+                    [(ngModel)]="m_wizardData.Database.UserName" name="user" #user="ngModel" class="form-control w-full" placeholder="Ex. mythtv" required/>
+                    <div *ngIf="user.invalid && (user.dirty || user.touched)">
+                        <small id="user-help" class="p-error block">User is required</small>
+                    </div>
+                </div>
+                <div class="field col-12 md:col-6">
+                    <label for="password" class="block">MySQL Password</label>
+                    <input pInputText id="password" type="text" aria-describedby="password-help" 
+                           [(ngModel)]="m_wizardData.Database.Password" name="password" #password="ngModel" class="form-control w-full" placeholder="Ex. mythtv" required/>
+                    <div *ngIf="password.invalid && (password.dirty || password.touched)">
+                        <small id="password-help" class="p-error block">Password is required</small>
+                    </div>
+                </div>
+
+                <div class="field col-12 md:col-6">
+                    <label for="dbname" class="block">MySQL Database Name</label>
+                    <input pInputText id="dbname" type="text" aria-describedby="dbname-help" 
+                           [(ngModel)]="m_wizardData.Database.Name" name="dbname" #dbname="ngModel" class="form-control w-full" placeholder="Ex. mythconverg" required/>
+                    <div *ngIf="dbname.invalid && (dbname.dirty || dbname.touched)">
+                        <small id="dbname-help" class="p-error block">Database Name is required</small>
+                    </div>
+                </div>           
+             </div>
+             <div>
+                <button pButton type="button" class="mr-1 p-button-raised p-button-secondary" (click)="testConnection()" [disabled]="databaseForm.invalid">Test Connection</button>              
+            </div>
+            
+            <div class="pt-4" style="display: flex">
+                <!-- connected -->
+                <div *ngIf="m_wizardData.DatabaseStatus.DatabaseStatus.Connected else notconnected">
+                    <p-message class="pr-2" severity="success" text="Connected to database"></p-message>
+                </div>
+                
+                <ng-template #notconnected>
+                    <div #notconnected class="pr-2 notconnected">
+                        <p-message class="" severity="error" text="Not connected to database"></p-message>
+                    </div>
+                </ng-template>
+                
+                <!-- have database -->
+                <div *ngIf="m_wizardData.DatabaseStatus.DatabaseStatus.HaveDatabase else nodatabase">
+                    <p-message class="pr-2" severity="success" text="Have '{{m_wizardData.Database.Name}}' database"></p-message>
+                </div>
+                
+                <ng-template #nodatabase>
+                    <div #nodatabase class="pr-2 nodatabase">
+                        <p-message severity="error" text="Do not have '{{m_wizardData.Database.Name}}' database"></p-message>
+                    </div>
+                </ng-template>
+                
+                <!-- schema version -->
+                <div *ngIf="m_wizardData.DatabaseStatus.DatabaseStatus.Connected && m_wizardData.DatabaseStatus.DatabaseStatus.HaveDatabase else noschema">
+                    <p-message class="pr-2" severity="info"
+                        text="Database schema version is {{m_wizardData.DatabaseStatus.DatabaseStatus.SchemaVersion}}"></p-message>
+                </div>
+                
+                <ng-template #noschema>
+                    <div #nodatabase class="pr-2 noschema">
+                        <p-message severity="info" text="Database schema version is unknown"></p-message>
+                    </div>
+                </ng-template>
+            </div>
+
+        </ng-template>   
+        
+        <ng-template pTemplate="footer">
+            <div class="p-grid p-nogutter p-justify-end">
+                <p-button class="pr-1" label="Back" (onClick)="previousPage()" icon="pi pi-angle-left" iconPos="left"></p-button>
+                <p-button label="Next" (onClick)="nextPage()" icon="pi pi-angle-right" iconPos="right" 
+                          [disabled]="databaseForm.invalid || !m_wizardData.DatabaseStatus.DatabaseStatus.Connected || !m_wizardData.DatabaseStatus.DatabaseStatus.HaveDatabase">
+                </p-button>              
+                <p-button style="float: right;" label="Help" (onClick)="showHelp()" icon="pi pi-info-circle" styleClass="p-button-info" ></p-button>
+            </div>          
+        </ng-template>
+    </p-card>
+</form>

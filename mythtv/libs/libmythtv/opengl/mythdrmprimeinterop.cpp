@@ -67,9 +67,10 @@ MythDRMPRIMEInterop* MythDRMPRIMEInterop::CreateDRM(MythRenderOpenGL* Context, M
     const auto & types = Player->GetInteropTypes();
     if (const auto & drm = types.find(FMT_DRMPRIME); drm != types.cend())
     {
-        for (auto type : drm->second)
-            if ((type == GL_DRMPRIME) || (type == DRM_DRMPRIME))
-                return new MythDRMPRIMEInterop(Context, Player, type);
+        auto matchType = [](auto type){ return (type == GL_DRMPRIME) || (type == DRM_DRMPRIME); };
+        auto it = std::find_if(drm->second.cbegin(), drm->second.cend(), matchType);
+        if (it != drm->second.cend())
+            return new MythDRMPRIMEInterop(Context, Player, *it);
     }
     return nullptr;
 }

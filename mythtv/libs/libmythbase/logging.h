@@ -73,7 +73,7 @@ class LoggingItem: public QObject, public ReferenceCounter
     Q_PROPERTY(QString message READ message WRITE setMessage)
 
     friend class LoggerThread;
-    friend void LogPrintLine(uint64_t mask, LogLevel_t level, const char *file, int line,
+    friend MBASE_PUBLIC void LogPrintLine(uint64_t mask, LogLevel_t level, const char *file, int line,
                              const char *function, QString message);
 
   public:
@@ -153,7 +153,7 @@ class LoggerThread : public QObject, public MThread
 {
     Q_OBJECT
 
-    friend void LogPrintLine(uint64_t mask, LogLevel_t level, const char *file, int line,
+    friend MBASE_PUBLIC void LogPrintLine(uint64_t mask, LogLevel_t level, const char *file, int line,
                              const char *function, QString message);
   public:
     LoggerThread(QString filename, bool progress, bool quiet, QString table,

@@ -11,7 +11,7 @@ QT += xml
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
-HEADERS += mthread.h mthreadpool.h mythchrono.h
+HEADERS += mthread.h mthreadpool.h mythchrono.h mconcurrent.h
 HEADERS += mythsocket.h mythsocket_cb.h
 HEADERS += mythbaseexp.h mythdbcon.h mythdb.h mythdbparams.h
 HEADERS += verbosedefs.h mythversion.h compat.h mythconfig.h
@@ -27,7 +27,7 @@ HEADERS += mythdeque.h mythlogging.h
 HEADERS += mythbaseutil.h referencecounter.h referencecounterlist.h
 HEADERS += version.h mythcommandlineparser.h
 HEADERS += mythscheduler.h filesysteminfo.h hardwareprofile.h serverpool.h
-HEADERS += mythbinaryplist.h bswap.h signalhandling.h mythtimezone.h mythdate.h
+HEADERS += mythbinaryplist.h signalhandling.h mythtimezone.h mythdate.h
 HEADERS += mythplugin.h mythpluginapi.h housekeeper.h
 HEADERS += ffmpeg-mmx.h
 HEADERS += mythrandom.h
@@ -166,7 +166,7 @@ inc.files += mythcdrom.h autodeletedeque.h dbutil.h mythdeque.h
 inc.files += referencecounter.h referencecounterlist.h mythcommandlineparser.h
 inc.files += mthread.h mthreadpool.h mythchrono.h
 inc.files += filesysteminfo.h hardwareprofile.h bonjourregister.h serverpool.h
-inc.files += plist.h bswap.h signalhandling.h ffmpeg-mmx.h mythdate.h
+inc.files += plist.h signalhandling.h ffmpeg-mmx.h mythdate.h
 inc.files += mythplugin.h mythpluginapi.h
 inc.files += remotefile.h mythsystemlegacy.h mythtypes.h
 inc.files += threadedfilewriter.h mythsingledownload.h mythsession.h
@@ -246,7 +246,7 @@ QT += xml sql network widgets
 
 include ( ../libs-targetfix.pro )
 
-using_libudfread_external: {
+using_system_libudfread: {
     DEFINES += HAVE_LIBUDFREAD
     QMAKE_CXXFLAGS += $$LIBUDFREAD_CFLAGS
     LIBS           += $$LIBUDFREAD_LIBS

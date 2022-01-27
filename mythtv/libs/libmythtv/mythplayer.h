@@ -418,7 +418,6 @@ class MTV_PUBLIC MythPlayer : public QObject
 
     // Bookmark stuff
     uint64_t m_bookmarkSeek               {0};
-    int      m_clearSavedPosition         {1};
     int      m_endExitPrompt;
 
     // Seek

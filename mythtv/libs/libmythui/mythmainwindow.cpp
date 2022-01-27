@@ -19,6 +19,7 @@
 #include <QEvent>
 #include <QKeyEvent>
 #include <QKeySequence>
+#include <QInputMethodEvent>
 #include <QSize>
 #include <QWindow>
 
@@ -735,6 +736,7 @@ void MythMainWindow::Init(bool MayReInit)
         setAttribute(Qt::WA_NoSystemBackground);
         setAutoFillBackground(false);
     }
+    setAttribute(Qt::WA_InputMethodEnabled);
 
     MoveResize(m_screenRect);
     ShowPainterWindow();
@@ -1106,7 +1108,9 @@ bool MythMainWindow::TranslateKeyPress(const QString& Context, QKeyEvent* Event,
 
     // Special case for custom QKeyEvent where the action is embedded directly
     // in the QKeyEvent text property. Used by MythFEXML http extension
-    if (Event->key() == 0 && !Event->text().isEmpty() && Event->modifiers() == Qt::NoModifier)
+    if (Event && Event->key() == 0 &&
+        !Event->text().isEmpty() &&
+        Event->modifiers() == Qt::NoModifier)
     {
         QString action = Event->text();
         // check if it is a jumppoint
@@ -1690,6 +1694,35 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
                     if ((*it)->objectName() == "popup stack")
                         break;
                 }
+            }
+            break;
+        }
+        case QEvent::InputMethod:
+        {
+            ResetIdleTimer();
+            auto *ie = dynamic_cast<QInputMethodEvent*>(Event);
+            if (!ie)
+                return MythUIScreenBounds::eventFilter(Watched, Event);
+            QWidget *widget = QApplication::focusWidget();
+            if (widget)
+            {
+                ie->accept();
+                if (widget->isEnabled())
+                    QCoreApplication::instance()->notify(widget, ie);
+                break;
+            }
+            // NOLINTNEXTLINE(readability-qualified-auto) // qt6
+            for (auto it = m_priv->m_stackList.end()-1; it != m_priv->m_stackList.begin()-1; --it)
+            {
+                MythScreenType *top = (*it)->GetTopScreen();
+                if (top == nullptr)
+                    continue;
+                if (top->inputMethodEvent(ie))
+                    return true;
+                // Note:  The following break prevents keypresses being
+                //        sent to windows below popups
+                if ((*it)->objectName() == "popup stack")
+                    break;
             }
             break;
         }

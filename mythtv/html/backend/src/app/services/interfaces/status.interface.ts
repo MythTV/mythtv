@@ -1,6 +1,7 @@
 import { Encoder } from "./encoder.interface";
 import { JobQueueJob } from "./jobqueue.interface";
-import { ScheduleOrProgram } from "./schedule.interface";
+import { ScheduleOrProgram } from "./program.interface";
+import { StorageGroup } from "./storagegroup.interface";
 
 export interface Backend {
     IP:             string;
@@ -13,17 +14,6 @@ export interface Frontend {
     Name:           string;
     OnLine:         boolean;
     Port:           number;
-}
-
-export interface StorageGroup {
-    Deleted:        number; // Boolean?
-    Directory:      string;
-    Expirable:      number; // Boolean?
-    Free:           number;
-    Id:             string;
-    LiveTV:         number;
-    Total:          number;
-    Used:           number;
 }
 
 export interface MachineInfo {

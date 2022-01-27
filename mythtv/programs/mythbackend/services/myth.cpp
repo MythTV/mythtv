@@ -948,6 +948,8 @@ bool Myth::CheckDatabase( bool repair )
 bool Myth::DelayShutdown( void )
 {
     auto *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
+    if (scheduler == nullptr)
+        return false;
     scheduler->DelayShutdown();
     LOG(VB_GENERAL, LOG_NOTICE, "Shutdown delayed 5 minutes for external application.");
     return true;

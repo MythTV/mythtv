@@ -43,8 +43,6 @@ MBASE_PUBLIC QString getSymlinkTarget(const QString &start_file,
                                       QStringList   *intermediaries = nullptr,
                                       unsigned       maxLinks       = 255);
 
-MBASE_PUBLIC void wrapList(QStringList &list, int width);
-
 static inline QString xml_bool_to_string(bool val)
 {
     return (val) ? "true" : "false";
@@ -102,7 +100,5 @@ inline void rdtsc(uint64_t &x)
 #else // if !MMX
 inline void rdtsc(uint64_t &x) { x = 0ULL; }
 #endif // !MMX
-
-MBASE_PUBLIC QStringList MythSplitCommandString(const QString &line);
 
 #endif // MYTHMISCUTIL_H_

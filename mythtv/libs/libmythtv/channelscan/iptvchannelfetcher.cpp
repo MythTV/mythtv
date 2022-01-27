@@ -427,7 +427,14 @@ static bool parse_chan_info(const QString   &rawdata,
                 QString data = line.mid(line.indexOf(':')+1);
                 QString key = data.left(data.indexOf('='));
                 if (!key.isEmpty())
-                    values[key] = data.mid(data.indexOf('=')+1);
+                {
+                    if (key == "name")
+                        name = data.mid(data.indexOf('=')+1);
+                    else if (key == "channum")
+                        channum = data.mid(data.indexOf('=')+1);
+                    else
+                        values[key] = data.mid(data.indexOf('=')+1);
+                }
             }
             else if (line.startsWith("#EXTVLCOPT:program="))
             {
@@ -439,6 +446,10 @@ static bool parse_chan_info(const QString   &rawdata,
         if (name.isEmpty())
             return false;
 
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("parse_chan_info name='%2'").arg(name));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("parse_chan_info channum='%2'").arg(channum));
         for (auto it = values.cbegin(); it != values.cend(); ++it)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +

@@ -7,8 +7,8 @@
 class MythHTTPCache
 {
   public:
-    static void PreConditionCheck   (HTTPResponse Response);
-    static void PreConditionHeaders (HTTPResponse Response);
+    static void PreConditionCheck   (const HTTPResponse& Response);
+    static void PreConditionHeaders (const HTTPResponse& Response);
 };
 
 #endif

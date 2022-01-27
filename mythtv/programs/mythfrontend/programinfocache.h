@@ -20,7 +20,16 @@ class QObject;
 class ProgramInfoCache
 {
     friend class ProgramInfoLoader;
+
   public:
+    enum UpdateState {
+        PIC_NONE              = 0x00,
+        PIC_MARK_CHANGED      = 0x01,
+        PIC_RECGROUP_CHANGED  = 0x02,
+        PIC_NO_ACTION         = 0x80,
+    };
+    Q_DECLARE_FLAGS(UpdateStates, UpdateState);
+
     explicit ProgramInfoCache(QObject *o)
         : m_listener(o) {}
     ~ProgramInfoCache();
@@ -33,9 +42,8 @@ class ProgramInfoCache
     void Refresh(void);
     void Add(const ProgramInfo &pginfo);
     bool Remove(uint recordingID);
-    bool Update(const ProgramInfo &pginfo);
-    bool UpdateFileSize(uint recordingID, uint64_t filesize);
-    QString GetRecGroup(uint recordingID) const;
+    ProgramInfoCache::UpdateStates Update(const ProgramInfo &pginfo);
+    void UpdateFileSize(uint recordingID, uint64_t filesize, UpdateStates flags);
     void GetOrdered(std::vector<ProgramInfo*> &list, bool newest_first = false);
     /// \note This must only be called from the UI thread.
     bool empty(void) const { return m_cache.empty(); }
@@ -61,5 +69,7 @@ class ProgramInfoCache
     uint                    m_loadsInProgress   {0};
     mutable QWaitCondition  m_loadWait;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(ProgramInfoCache::UpdateStates)
 
 #endif // PROGRAM_INFO_CACHE_H

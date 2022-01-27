@@ -95,7 +95,6 @@ MythPlayer::MythPlayer(PlayerContext* Context, PlayerFlags Flags)
 
     m_vbiMode = VBIMode::Parse(gCoreContext->GetSetting("VbiFormat"));
     m_captionsEnabledbyDefault = gCoreContext->GetBoolSetting("DefaultCCMode");
-    m_clearSavedPosition = gCoreContext->GetNumSetting("ClearSavedPosition", 1);
     m_endExitPrompt      = gCoreContext->GetNumSetting("EndOfRecordingExitPrompt");
 
     // Get VBI page number
@@ -1315,14 +1314,7 @@ uint64_t MythPlayer::GetBookmark(void)
     {
         m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
         if (const ProgramInfo *pi = m_playerCtx->m_playingInfo)
-        {
-            bookmark = pi->QueryBookmark();
-            // Disable progstart if the program has a cutlist.
-            if (bookmark == 0 && !pi->HasCutlist())
-                bookmark = pi->QueryProgStart();
-            if (bookmark == 0)
-                bookmark = pi->QueryLastPlayPos();
-        }
+            bookmark = pi->QueryStartMark();
         m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
     }
 

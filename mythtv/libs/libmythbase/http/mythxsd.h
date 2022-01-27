@@ -38,14 +38,14 @@ class MythXSD : public QDomDocument
                                            const QString&  sPropName,
                                            const QString&  sKey );
 
-        bool        RenderXSD            ( HTTPRequest2 pRequest,
+        bool        RenderXSD            ( const HTTPRequest2& pRequest,
                                            QObject     *pClass );
 
-        bool        RenderArrayXSD       ( HTTPRequest2 pRequest,
+        bool        RenderArrayXSD       ( const HTTPRequest2& pRequest,
                                            const QString &sClassName,
                                            bool           bCustomType );
 
-        bool        RenderMapXSD         ( HTTPRequest2 pRequest,
+        bool        RenderMapXSD         ( const HTTPRequest2& pRequest,
                                            const QString &sClassName,
                                            bool           bCustomType );
 
@@ -58,11 +58,11 @@ class MythXSD : public QDomDocument
         static bool        IsEnum               ( const QMetaProperty &metaProperty,
                                            const QString       &sType );
 
-        static HTTPResponse Error(HTTPRequest2 pRequest, const QString &msg);
+        static HTTPResponse Error(const HTTPRequest2& pRequest, const QString &msg);
     public:
 
-        HTTPResponse GetXSD    ( HTTPRequest2 pRequest, QString sTypeName );
-        // HTTPResponse GetEnumXSD( HTTPRequest2 pRequest, const QString& sEnumName );
+        HTTPResponse GetXSD    ( const HTTPRequest2& pRequest, QString sTypeName );
+        // HTTPResponse GetEnumXSD( const HTTPRequest2& pRequest, const QString& sEnumName );
 
         static QString ConvertTypeToXSD( const QString &sType, bool bCustomType = false );
 };

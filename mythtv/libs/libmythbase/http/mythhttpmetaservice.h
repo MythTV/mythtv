@@ -11,7 +11,7 @@ class MBASE_PUBLIC MythHTTPMetaService
 {
   public:
     MythHTTPMetaService(const QString& Name, const QMetaObject& Meta,
-                        HTTPRegisterTypes RegisterCallback = nullptr,
+                        const HTTPRegisterTypes& RegisterCallback = nullptr,
                         const QString& MethodsToHide = {});
 
     static int ParseRequestTypes(const QMetaObject& Meta, const QString& Method, QString& ReturnName);

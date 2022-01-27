@@ -142,6 +142,8 @@ int CALLBACK AudioOutputDXPrivate::DSEnumCallback(LPGUID lpGuid,
         QString enum_desc = QString::fromLocal8Bit( lpcstrDesc );
 
 #endif
+    Q_UNUSED(lpcstrModule);
+
     AudioOutputDXPrivate *context = static_cast<AudioOutputDXPrivate*>(lpContext);
     const QString cfg_desc  = context->m_device_name;
     const int device_num    = context->m_device_num;
@@ -576,6 +578,8 @@ int AudioOutputDX::GetBufferedOnSoundcard(void) const
 
 int AudioOutputDX::GetVolumeChannel(int channel) const
 {
+    Q_UNUSED(channel);
+
     HRESULT dsresult;
     long dxVolume = 0;
     int volume;
@@ -598,6 +602,8 @@ int AudioOutputDX::GetVolumeChannel(int channel) const
 
 void AudioOutputDX::SetVolumeChannel(int channel, int volume)
 {
+    Q_UNUSED(channel);
+
     HRESULT dsresult;
     long dxVolume { DSBVOLUME_MIN };
     if (volume > 0)

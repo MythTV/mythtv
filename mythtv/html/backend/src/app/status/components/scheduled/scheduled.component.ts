@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { MatTooltipModule, TooltipPosition } from '@angular/material/tooltip';
-import { ScheduleOrProgram } from 'src/app/services/interfaces/schedule.interface';
+import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
 
 @Component({
   selector: 'app-status-scheduled',

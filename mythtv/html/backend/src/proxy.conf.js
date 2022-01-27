@@ -5,6 +5,7 @@ const PROXY_CONFIG = [
             "/images",
             "/Myth",
             "/Status",
+            "/Config",
         ],
         target: "http://localhost:6744",
     }

@@ -17,24 +17,26 @@ jobs:
           - cc: 'gcc'
             cxx: 'g++'
           - cc: 'clang'
-            cxx: 'clang++'  
+            cxx: 'clang++'
       fail-fast: false
     runs-on: ${{ matrix.os }}
 
     steps:
     - name: Checkout master
       uses: actions/checkout@v2
-      
+
     - name: Setup build environment
-      run: echo "MYTHTV_CONFIG=--prefix=${{ github.workspace }}/build/install --cc=${{ matrix.cc }} --cxx=${{ matrix.cxx }}" >> $GITHUB_ENV
-      
+      run: |
+        echo "MYTHTV_CONFIG=--prefix=${{ github.workspace }}/build/install --cc=${{ matrix.cc }} --cxx=${{ matrix.cxx }}" >> $GITHUB_ENV
+        echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
+
     - name: Check ccache
       uses: actions/cache@v2
       with:
         path: ~/.ccache
         key: ${{ matrix.os }}-${{ matrix.cc }}-ccache-${{ github.sha }}
         restore-keys: ${{ matrix.os }}-${{ matrix.cc }}-ccache
-  
+
     # N.B. These dependencies are for the master branch. Unlike the ansible playlists they do not include old dependencies that may
     # be required for older versions. The list is intended to provide as much code coverage as possible (i.e. enable as many options as possible)
     - name: Install core dependencies (linux)
@@ -46,45 +48,53 @@ jobs:
         sudo apt install libvpx-dev python3-mysqldb python3-lxml python3-simplejson python3-future python3-setuptools libdbi-perl libdbd-mysql-perl libnet-upnp-perl
         sudo apt install libio-socket-inet6-perl libxml-simple-perl libqt5sql5-mysql libwayland-dev qtbase5-private-dev libzip-dev libsoundtouch-dev
       if: runner.os == 'Linux'
-      
+
     - name: Install core dependencies (macOS)
       run: |
         brew install pkg-config ccache qt5 nasm libsamplerate taglib lzo libcec libbluray fftw libass libhdhomerun dav1d x264 x265 libvpx openssl sound-touch
         brew link qt5 --force
         echo "MYTHTV_CONFIG=$MYTHTV_CONFIG --extra-cxxflags=-I/usr/local/include --extra-ldflags=-L/usr/local/lib" >> $GITHUB_ENV
       if: runner.os == 'macOS'
-      
+
+    - name: ccache statistics [pre]
+      run: |
+        ccache -sV
+
     - name: Configure core
       working-directory: ./mythtv
       run: ./configure $MYTHTV_CONFIG --enable-libmp3lame --enable-libvpx --enable-libx264 --enable-libx265 --enable-bdjava --enable-vulkan
-      
+
     - name: Make core
       working-directory: ./mythtv
       run: make all_no_test -j4
-    
+
     - name: Install core
       working-directory: ./mythtv
       run: make install
-      
+
     # QTest requires a QT SQL plugin - but there are currently none available via brew on macOS
     - name: Unit test core
       working-directory: ./mythtv
       run: make test
       if: runner.os == 'Linux'
-    
+
     - name: Install plugin dependencies (linux)
       run: sudo apt install libvorbis-dev libflac++-dev libminizip-dev libcdio-dev libcdio-paranoia-dev python3-oauth python3-pycurl
            libxml-xpath-perl libdate-manip-perl libdatetime-format-iso8601-perl libsoap-lite-perl libjson-perl libimage-size-perl
       if: runner.os == 'Linux'
-      
+
     - name: Install plugin dependencies (macOS)
       run: brew install minizip flac libvorbis libcdio
       if: runner.os == 'macOS'
-      
+
     - name: Configure plugins
       working-directory: ./mythplugins
       run: ./configure $MYTHTV_CONFIG
-    
+
     - name: Make plugins
       working-directory: ./mythplugins
       run: make -j4
+
+    - name: ccache statistics [post]
+      run: |
+        ccache -sV

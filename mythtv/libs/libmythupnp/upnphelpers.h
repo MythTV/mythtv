@@ -220,7 +220,7 @@ namespace DLNA
      *      are mutally exclusive. FlagsString() should account for these
      *      but care should still be taken. Read the DLNA documentation.
      */
-    enum UPNP_PUBLIC DLNA_Flags
+    enum DLNA_Flags
     {
         // NAME                    BIT             BIT #      REFERENCE
 

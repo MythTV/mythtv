@@ -21,7 +21,7 @@
  *    MythHTTPService::AddHandlers( {{"/", frontend }});
  * \endcode
 */
-HTTPResponse MythHTTPRoot::RedirectRoot(HTTPRequest2 Request, const QString &File)
+HTTPResponse MythHTTPRoot::RedirectRoot(const HTTPRequest2& Request, const QString &File)
 {
     auto result = static_cast<HTTPResponse>(nullptr);
     if (!Request)

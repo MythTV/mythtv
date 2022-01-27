@@ -3474,7 +3474,7 @@ void TVRec::HandleTuning(void)
 
     if (HasFlags(kFlagWaitingForRecPause))
     {
-        if (!m_recorder->IsPaused())
+        if (!m_recorder || !m_recorder->IsPaused())
             return;
 
         ClearFlags(kFlagWaitingForRecPause, __FILE__, __LINE__);
@@ -3590,7 +3590,7 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
  *   the kFlagWaitForSignal flag is set.
  *
  *   The kFlagNeedToStartRecorder flag is ald set if this isn't
- *   an EIT scan so that the recorder is started or restarted a
+ *   an EIT scan so that the recorder is started or restarted as
  *   appropriate.
  */
 void TVRec::TuningFrequency(const TuningRequest &request)
@@ -3605,6 +3605,9 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         if (GetDTVRecorder())
             mpeg = GetDTVRecorder()->GetStreamData();
 
+        // Tune with SI table standard (dvb, atsc, mpeg) from database, see issue #452
+        m_channel->SetChannelByString(request.m_channel);
+
         const QString tuningmode = (HasFlags(kFlagEITScannerRunning)) ?
             dtvchan->GetSIStandard() :
             dtvchan->GetSuggestedTuningMode(
@@ -3614,16 +3617,12 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
         if (request.m_minorChan && (tuningmode == "atsc"))
         {
-            m_channel->SetChannelByString(request.m_channel);
-
             auto *atsc = dynamic_cast<ATSCStreamData*>(mpeg);
             if (atsc)
                 atsc->SetDesiredChannel(request.m_majorChan, request.m_minorChan);
         }
         else if (request.m_progNum >= 0)
         {
-            m_channel->SetChannelByString(request.m_channel);
-
             if (mpeg)
                 mpeg->SetDesiredProgram(request.m_progNum);
         }

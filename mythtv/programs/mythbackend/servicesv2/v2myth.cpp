@@ -146,6 +146,43 @@ V2ConnectionInfo* V2Myth::GetConnectionInfo( const QString  &sPin )
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
+bool V2Myth::SetConnectionInfo(const QString &Host, const QString &UserName, const QString &Password, const QString &Name, int Port, bool DoTest)
+{
+    bool bResult = false;
+
+    QString db("mythconverg");
+    int port = 3306;
+
+    if (!Name.isEmpty())
+        db = Name;
+
+    if (Port != 0)
+        port = Port;
+
+    if (DoTest && !TestDatabase(Host, UserName, Password, db, port))
+        throw( QString( "Database test failed. Not saving database connection information." ));
+
+    DatabaseParams dbparms;
+    dbparms.m_dbName = db;
+    dbparms.m_dbUserName = UserName;
+    dbparms.m_dbPassword = Password;
+    dbparms.m_dbHostName = Host;
+    dbparms.m_dbPort = port;
+
+    // Just use some sane defaults for these values
+    dbparms.m_wolEnabled = false;
+    dbparms.m_wolReconnect = 1s;
+    dbparms.m_wolRetry = 3;
+    dbparms.m_wolCommand = QString();
+
+    bResult = gContext->SaveDatabaseParams(dbparms);
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
 
 QString V2Myth::GetHostName( )
 {
@@ -928,6 +965,8 @@ bool V2Myth::CheckDatabase( bool repair )
 bool V2Myth::DelayShutdown( void )
 {
     auto *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
+    if (scheduler == nullptr)
+        return false;
     scheduler->DelayShutdown();
     LOG(VB_GENERAL, LOG_NOTICE, "Shutdown delayed 5 minutes for external application.");
     return true;

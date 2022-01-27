@@ -498,7 +498,7 @@ void MythWebSocket::CheckClose()
         m_socket->close();
 }
 
-void MythWebSocket::CloseReceived(DataPayload Payload)
+void MythWebSocket::CloseReceived(const DataPayload& Payload)
 {
     m_closeReceived = true;
 
@@ -560,10 +560,9 @@ void MythWebSocket::SendFrame(WSOpCode Code, const DataPayloads& Payloads)
         return;
 
     // Payload size (if needed)
-    int64_t length = 0;
-    for (const auto & payload : Payloads)
-        if (payload.get())
-            length += payload->size();
+    auto addNext = [](int64_t acc, const auto & payload)
+        { return payload.get() ? acc + payload->size() : acc; };
+    int64_t length = std::accumulate(Payloads.cbegin(), Payloads.cend(), 0, addNext);
 
     // Payload for control frames must not exceed 125bytes
     if ((Code & 0x8) && (length > 125))
@@ -634,10 +633,10 @@ void MythWebSocket::PingReceived(DataPayload Payload)
 {
     if (m_closeReceived || m_closeSent)
         return;
-    SendFrame(WSOpPong, { Payload });
+    SendFrame(WSOpPong, { std::move(Payload) });
 }
 
-void MythWebSocket::PongReceived(DataPayload Payload)
+void MythWebSocket::PongReceived(const DataPayload& Payload)
 {
     // Validate against the last known ping payload and warn on error
     auto sizein = Payload.get() ? Payload->size() : 0;

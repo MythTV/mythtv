@@ -395,7 +395,8 @@ bool StreamHandler::AddNamedOutputFile(const QString &file)
                 .arg(m_mptsBaseFile, fn));
         }
     }
-
+#else
+    Q_UNUSED(file);
 #endif //  !defined( USING_MINGW ) && !defined( _MSC_VER )
     return true;
 }
@@ -415,5 +416,7 @@ void StreamHandler::RemoveNamedOutputFile(const QString &file)
             m_mptsTfw = nullptr;
         }
     }
+#else
+    Q_UNUSED(file);
 #endif //  !defined( USING_MINGW ) && !defined( _MSC_VER )
 }

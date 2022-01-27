@@ -7,6 +7,9 @@
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
 int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* Event)
 {
+    if (Event == nullptr)
+        return Qt::Key_unknown;
+
     int keynum = Event->key();
 
     if ((keynum != Qt::Key_Shift  ) && (keynum !=Qt::Key_Control   ) &&

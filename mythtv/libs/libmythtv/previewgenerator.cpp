@@ -634,7 +634,6 @@ bool PreviewGenerator::LocalPreviewRun(void)
 {
     m_programInfo.MarkAsInUse(true, kPreviewGeneratorInUseID);
     m_programInfo.SetIgnoreProgStart(true);
-    m_programInfo.SetAllowLastPlayPos(false);
 
     float aspect = 0;
     std::chrono::seconds captime = m_captureTime;
@@ -646,7 +645,7 @@ bool PreviewGenerator::LocalPreviewRun(void)
         LOG(VB_GENERAL, LOG_INFO, "Preview from time spec");
     else
     {
-        capframe = m_programInfo.QueryBookmark();
+        capframe = m_programInfo.QueryStartMark();
         if (capframe > 0)
         {
             LOG(VB_GENERAL, LOG_INFO,

@@ -46,6 +46,7 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
 
     // Other connections
     connect(m_tv, &TV::UpdateBookmark, this, &MythPlayerUI::SetBookmark);
+    connect(m_tv, &TV::UpdateLastPlayPosition, this, &MythPlayerUI::SetLastPlayPosition);
     connect(m_tv, &TV::InitialisePlayerState, this, &MythPlayerUI::InitialiseState);
 }
 
@@ -95,11 +96,7 @@ void MythPlayerUI::InitialSeek()
 {
     // TODO handle initial commskip and/or cutlist skip as well
     if (m_bookmarkSeek > 30)
-    {
         DoJumpToFrame(m_bookmarkSeek, kInaccuracyNone);
-        if (m_clearSavedPosition)
-            SetBookmark(true);
-    }
 }
 
 void MythPlayerUI::EventLoop()
@@ -467,7 +464,7 @@ void MythPlayerUI::EventStart()
             // an actual bookmark and not progstart or lastplaypos information.
             m_playerCtx->m_playingInfo->SetIgnoreBookmark(false);
             m_playerCtx->m_playingInfo->SetIgnoreProgStart(true);
-            m_playerCtx->m_playingInfo->SetAllowLastPlayPos(false);
+            m_playerCtx->m_playingInfo->SetIgnoreLastPlayPos(true);
         }
     }
     m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
@@ -763,6 +760,14 @@ void MythPlayerUI::SetBookmark(bool Clear)
     m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
     if (m_playerCtx->m_playingInfo)
         m_playerCtx->m_playingInfo->SaveBookmark(Clear ? 0 : m_framesPlayed);
+    m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
+}
+
+void MythPlayerUI::SetLastPlayPosition(uint64_t frame)
+{
+    m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
+    if (m_playerCtx->m_playingInfo)
+        m_playerCtx->m_playingInfo->SaveLastPlayPos(frame);
     m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
 

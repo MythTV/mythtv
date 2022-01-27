@@ -3,6 +3,7 @@
 #include <QIODevice>
 #include <QGlobalStatic>
 #include <QMimeDatabase>
+#include <QStandardPaths>
 
 // MythTV
 #include "mythlogging.h"
@@ -23,6 +24,13 @@ class MythMimeDatabasePriv
   public:
     MythMimeDatabasePriv()
     {
+        auto paths =
+            QStandardPaths::locateAll(QStandardPaths::GenericDataLocation,
+                                      QLatin1String("mime/packages"),
+                                      QStandardPaths::LocateDirectory);
+        LOG(VB_GENERAL, LOG_DEBUG, LOC +
+            QString("Standard paths: %1").arg(paths.join(", ")));
+
         static const std::vector<MimeDesc> s_types =
         {
             { "application/cbor", ".cbor", { std::monostate() }, 90, {}},
@@ -33,6 +41,9 @@ class MythMimeDatabasePriv
               50, { "text/plain", "application/xml"}}
         };
 
+        LOG(VB_GENERAL, LOG_DEBUG, LOC +
+            QString("Custom entries: %1").arg(s_types.size()));
+        // cppcheck-suppress unassignedVariable
         for (const auto & [name, suffix, magic, weight, inherits] : s_types)
             m_mimes.push_back({name, suffix, magic, weight, inherits});
     }

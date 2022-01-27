@@ -223,8 +223,6 @@
 #    define SIGCONT 18
 #    define SIGSTOP 19
 
-#    define S_IRGRP 0
-#    define S_IROTH 0
 #    define O_SYNC 0
 
     #define mkfifo(path, mode) \
@@ -266,7 +264,7 @@
 #    define seteuid(x) 0
 #endif // _WIN32
 
-#if _MSC_VER && !defined(gmtime_r)
+#if defined(_MSC_VER) && !defined(gmtime_r)
 // FFmpeg libs already have a workaround, use it if the headers are included,
 // use this otherwise.
 static __inline struct tm *gmtime_r(const time_t *timep, struct tm *result)
@@ -283,7 +281,7 @@ static __inline struct tm *gmtime_r(const time_t *timep, struct tm *result)
 }
 #endif
 
-#if  _MSC_VER && !defined(localtime_r)
+#if defined(_MSC_VER) && !defined(localtime_r)
 // FFmpeg libs already have a workaround, use it if the headers are included,
 // use this otherwise.
 static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
@@ -330,11 +328,6 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #  ifndef lseek64
 #    define lseek64( f, o, w ) _lseeki64( f, o, w )
 #  endif
-#endif
-
-#ifdef _WIN32
-#    define fseeko(stream, offset, whence) fseeko64(stream, offset, whence)
-#    define ftello(stream) ftello64(stream)
 #endif
 
 #ifdef Q_OS_ANDROID

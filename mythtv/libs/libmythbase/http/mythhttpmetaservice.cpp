@@ -14,7 +14,7 @@
  * (i.e. qRegisterMetatype<>() has not been called).
 */
 MythHTTPMetaService::MythHTTPMetaService(const QString& Name, const QMetaObject& Meta,
-                                         HTTPRegisterTypes RegisterCallback,
+                                         const HTTPRegisterTypes& RegisterCallback,
                                          const QString& MethodsToHide)
   : m_meta(Meta),
     m_name(Name)
@@ -62,7 +62,7 @@ MythHTTPMetaService::MythHTTPMetaService(const QString& Name, const QMetaObject&
             if (hide.contains(name))
                 continue;
 
-            auto RemoveExisting = [](HTTPMethods& Methods, const HTTPMethodPtr Method, const QString& Search)
+            auto RemoveExisting = [](HTTPMethods& Methods, const HTTPMethodPtr& Method, const QString& Search)
             {
                 for (const auto & [_name, _method] : Methods)
                 {
@@ -179,11 +179,9 @@ bool MythHTTPMetaService::isProtected(const QMetaObject& Meta, const QString& Me
 #else
         QStringList infos = QString(Meta.classInfo(index).value()).split(';', Qt::SkipEmptyParts);
 #endif
-        foreach (const QString &info, infos)
-        {
-            if (info.startsWith(QStringLiteral("AuthRequired=")))
-                return true;
-        }
+        auto isAuth = [](const QString& info)
+            { return info.startsWith(QStringLiteral("AuthRequired=")); };
+        return std::any_of(infos.cbegin(), infos.cend(), isAuth);
     }
     return false;
 }

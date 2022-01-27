@@ -154,6 +154,11 @@
             <area>10,10,870,40</area>
             <align>left,vcenter</align>
         </textarea>
+        <textarea name="recordedtime">
+            <font>medium</font>
+            <area>10,10,870,40</area>
+            <align>hcenter,vcenter</align>
+        </textarea>
         <textarea name="description">
             <font>medium</font>
             <area>10,10,870,40</area>

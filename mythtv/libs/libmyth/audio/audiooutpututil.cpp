@@ -1,12 +1,14 @@
-#include <cinttypes>
+#include "audiooutpututil.h"
+
+#include <cstdint>
 #include <cmath>
 #include <sys/types.h>
 
+#include <QtEndian>
+
 #include "mythconfig.h"
 #include "mythlogging.h"
-#include "audiooutpututil.h"
 #include "audioconvert.h"
-#include "bswap.h"
 #include "mythaverror.h"
 
 extern "C" {
@@ -189,14 +191,6 @@ void AudioOutputUtil::MuteChannel(int obits, int channels, int ch,
         tMuteChannel((int *)buffer, channels, ch, frames);
 }
 
-#if HAVE_BIGENDIAN
-#define LE_SHORT(v)      bswap_16(v)
-#define LE_INT(v)        bswap_32(v)
-#else
-#define LE_SHORT(v)      (v)
-#define LE_INT(v)        (v)
-#endif
-
 char *AudioOutputUtil::GeneratePinkFrames(char *frames, int channels,
                                           int channel, int count, int bits)
 {
@@ -218,9 +212,9 @@ char *AudioOutputUtil::GeneratePinkFrames(char *frames, int channels,
                     static_cast<float>(0x03fffffff);
                 int32_t ires = res;
                 if (bits == 16)
-                    *samp16++ = LE_SHORT(ires >> 16);
+                    *samp16++ = qToLittleEndian<int16_t>(ires >> 16);
                 else
-                    *samp32++ = LE_INT(ires);
+                    *samp32++ = qToLittleEndian<int32_t>(ires);
             }
             else
             {

@@ -963,52 +963,6 @@ void setHttpProxy(void)
     LOG(VB_NETWORK, LOG_ERR, LOC + "failed to find a network proxy");
 }
 
-void wrapList(QStringList &list, int width)
-{
-    // if this is triggered, something has gone seriously wrong
-    // the result won't really be usable, but at least it won't crash
-    width = std::max(width, 5);
-
-    for (int i = 0; i < list.size(); i++)
-    {
-        QString string = list.at(i);
-
-        if( string.size() <= width )
-            continue;
-
-        QString left   = string.left(width);
-        bool inserted  = false;
-
-        while( !inserted && !left.endsWith(" " ))
-        {
-            if( string.mid(left.size(), 1) == " " )
-            {
-                list.replace(i, left);
-                list.insert(i+1, string.mid(left.size()).trimmed());
-                inserted = true;
-            }
-            else
-            {
-                left.chop(1);
-                if( !left.contains(" ") )
-                {
-                    // Line is too long, just hyphenate it
-                    list.replace(i, left + "-");
-                    list.insert(i+1, string.mid(left.size()));
-                    inserted = true;
-                }
-            }
-        }
-
-        if( !inserted )
-        {
-            left.chop(1);
-            list.replace(i, left);
-            list.insert(i+1, string.mid(left.size()).trimmed());
-        }
-    }
-}
-
 QString xml_indent(uint level)
 {
     static QReadWriteLock s_rwLock;
@@ -1233,71 +1187,6 @@ int naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity cas
     }
 
     return currA->isNull() ? -1 : + 1;
-}
-
-/*
- * States for the command line parser.
- */
-enum states {
-    START,     // No current token.
-    INTEXT,    // Collecting token text.
-    INSQUOTE,  // Collecting token, inside single quotes.
-    INDQUOTE,  // Collecting token, inside double quotes.
-    ESCTEXT,   // Saw backslash. Returns to generic text.
-    ESCSQUOTE, // Saw backslash. Returns to single quotes.
-    ESCDQUOTE, // Saw backslash. Returns to double quotes.
-};
-
-/*
- * Parse a string into separate tokens. This function understands
- * quoting and the escape character.
- */
-QStringList MythSplitCommandString(const QString &line)
-{
-    QStringList fields;
-    states state = START;
-    int tokenStart = -1;
-
-    for (int i = 0; i < line.size(); i++)
-    {
-        const QChar c = line.at(i);
-
-        switch (state) {
-          case START:
-            tokenStart = i;
-            if      (c.isSpace()) break;
-            if      (c == '\'') state = INSQUOTE;
-            else if (c == '\"') state = INDQUOTE;
-            else if (c == '\\') state = ESCTEXT;
-            else                state = INTEXT;
-            break;
-          case INTEXT:
-            if (c.isSpace()) {
-                fields += line.mid(tokenStart, i - tokenStart);
-                state = START;
-                break;
-            }
-            else if (c == '\'') state = INSQUOTE;
-            else if (c == '\"') state = INDQUOTE;
-            else if (c == '\\') state = ESCTEXT;
-            break;
-          case INSQUOTE:
-            if      (c == '\'') state = INTEXT;
-            else if (c == '\\') state = ESCSQUOTE;
-            break;
-          case INDQUOTE:
-            if      (c == '\"') state = INTEXT;
-            else if (c == '\\') state = ESCDQUOTE;
-            break;
-          case ESCTEXT:   state = INTEXT;   break;
-          case ESCSQUOTE: state = INSQUOTE; break;
-          case ESCDQUOTE: state = INDQUOTE; break;
-        }
-    }
-
-    if (state != START)
-        fields += line.mid(tokenStart);
-    return fields;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -480,6 +480,7 @@ class MPUBLIC ProgramInfo
     bool IsCommercialFlagged(void) const { return (m_programFlags & FL_COMMFLAG) != 0U;}
     bool HasCutlist(void)       const { return (m_programFlags & FL_CUTLIST) != 0U;     }
     bool IsBookmarkSet(void)    const { return (m_programFlags & FL_BOOKMARK) != 0U;    }
+    bool IsLastPlaySet(void)    const { return (m_programFlags & FL_LASTPLAYPOS) != 0U; }
     bool IsWatched(void)        const { return (m_programFlags & FL_WATCHED) != 0U;     }
     bool IsAutoExpirable(void)  const { return (m_programFlags & FL_AUTOEXP) != 0U;     }
     bool IsPreserved(void)      const { return (m_programFlags & FL_PRESERVED) != 0U;   }
@@ -571,10 +572,10 @@ class MPUBLIC ProgramInfo
     /// \brief If "ignore" is true QueryLastPlayPos() will return 0, otherwise
     ///        QueryLastPlayPos() will return the last playback position
     ///        if it exists.
-    void SetAllowLastPlayPos(bool allow)
+    void SetIgnoreLastPlayPos(bool ignore)
     {
-        m_programFlags &= ~FL_ALLOWLASTPLAYPOS;
-        m_programFlags |= (allow) ? FL_ALLOWLASTPLAYPOS : 0;
+        m_programFlags &= ~FL_IGNORELASTPLAYPOS;
+        m_programFlags |= (ignore) ? FL_IGNORELASTPLAYPOS : 0;
     }
     virtual void SetRecordingID(uint _recordedid)
         { m_recordedId = _recordedid; }
@@ -582,6 +583,13 @@ class MPUBLIC ProgramInfo
     void SetRecordingRuleType(RecordingType type)   { m_recType   = type;   }
     void SetPositionMapDBReplacement(PMapDBReplacement *pmap)
         { m_positionMapDBReplacement = pmap; }
+
+    void CalculateRecordedProgress();
+    uint GetRecordedPercent() const       { return m_recordedPercent; }
+    void CalculateWatchedProgress(uint64_t pos);
+    uint GetWatchedPercent() const        { return m_watchedPercent; }
+    void SetWatchedPercent(uint progress) { m_watchedPercent = progress; }
+    void CalculateProgress(uint64_t pos);
 
     // Slow DB gets
     QString     QueryBasename(void) const;
@@ -591,6 +599,7 @@ class MPUBLIC ProgramInfo
     uint64_t    QueryBookmark(void) const;
     uint64_t    QueryProgStart(void) const;
     uint64_t    QueryLastPlayPos(void) const;
+    uint64_t    QueryStartMark(void) const;
     CategoryType QueryCategoryType(void) const;
     QStringList QueryDVDBookmark(const QString &serialid) const;
     QStringList QueryBDBookmark(const QString &serialid) const;
@@ -617,6 +626,7 @@ class MPUBLIC ProgramInfo
 
     // Slow DB sets
     virtual void SaveFilesize(uint64_t fsize); /// TODO Move to RecordingInfo
+    void SaveLastPlayPos(uint64_t frame);
     void SaveBookmark(uint64_t frame);
     static void SaveDVDBookmark(const QStringList &fields) ;
     static void SaveBDBookmark(const QStringList &fields) ;
@@ -723,6 +733,8 @@ class MPUBLIC ProgramInfo
     static QStringList LoadFromScheduler(const QString &tmptable, int recordid);
 
     // Flagging map support methods
+    void UpdateMarkTimeStamp(bool bookmarked) const;
+    void UpdateLastPlayTimeStamp(bool lastplay) const;
     void QueryMarkupMap(frm_dir_map_t&marks, MarkTypes type,
                         bool merge = false) const;
     void SaveMarkupMap(const frm_dir_map_t &marks, MarkTypes type = MARK_ALL,
@@ -823,6 +835,8 @@ class MPUBLIC ProgramInfo
 
 // everything below this line is not serialized
     uint8_t         m_availableStatus {asAvailable}; // only used for playbackbox.cpp
+    int8_t          m_recordedPercent {-1};          // only used by UI
+    int8_t          m_watchedPercent  {-1};          // only used by UI
   public:
     void SetAvailableStatus(AvailableStatusType status, const QString &where);
     AvailableStatusType GetAvailableStatus(void) const

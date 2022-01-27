@@ -24,6 +24,7 @@
 #include "mythdirs.h"
 #include "mythmedia.h"
 #include "mythdate.h"
+#include "mconcurrent.h"
 
 // libmyth
 #include "programinfo.h"
@@ -286,7 +287,7 @@ bool TV::StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selectio
         curProgram = new ProgramInfo(*TVRec);
         curProgram->SetIgnoreBookmark((Flags & kStartTVIgnoreBookmark) != 0U);
         curProgram->SetIgnoreProgStart((Flags & kStartTVIgnoreProgStart) != 0U);
-        curProgram->SetAllowLastPlayPos((Flags & kStartTVAllowLastPlayPos) != 0U);
+        curProgram->SetIgnoreLastPlayPos((Flags & kStartTVIgnoreLastPlayPos) != 0U);
     }
 
     // Initialize TV
@@ -1011,7 +1012,6 @@ void TV::InitFromDB()
     kv["JumpToProgramOSD"]         = "1";
     kv["GuiSizeForTV"]             = "0";
     kv["UseVideoModes"]            = "0";
-    kv["ClearSavedPosition"]       = "1";
     kv["JobsRunOnRecordHost"]      = "0";
     kv["ContinueEmbeddedTVPlay"]   = "0";
     kv["UseFixedWindowSize"]       = "1";
@@ -1061,7 +1061,6 @@ void TV::InitFromDB()
     m_dbJumpPreferOsd      = (kv["JumpToProgramOSD"].toInt() != 0);
     m_dbUseGuiSizeForTv    = (kv["GuiSizeForTV"].toInt() != 0);
     m_dbUseVideoModes      = (kv["UseVideoModes"].toInt() != 0);
-    m_dbClearSavedPosition = (kv["ClearSavedPosition"].toInt() != 0);
     m_dbRunJobsOnRemote    = (kv["JobsRunOnRecordHost"].toInt() != 0);
     m_dbContinueEmbedded   = (kv["ContinueEmbeddedTVPlay"].toInt() != 0);
     m_dbBrowseAlways       = (kv["PersistentBrowseMode"].toInt() != 0);
@@ -2715,51 +2714,22 @@ void TV::PrepToSwitchToRecordedProgram(const ProgramInfo &ProgInfo)
     SetExitPlayer(true, true);
 }
 
-void TV::PrepareToExitPlayer(int Line, BookmarkAction Bookmark)
+void TV::PrepareToExitPlayer(int Line)
 {
-    bool bm_allowed = IsBookmarkAllowed();
     m_playerContext.LockDeletePlayer(__FILE__, Line);
-    if (m_player)
+    if (m_savePosOnExit && m_player && m_playerContext.m_playingInfo)
     {
-        if (bm_allowed)
-        {
-            // If we're exiting in the middle of the recording, we
-            // automatically save a bookmark when "Action on playback
-            // exit" is set to "Save position and exit".
-            bool allow_set_before_end =
-                (Bookmark == kBookmarkAlways ||
-                 (Bookmark == kBookmarkAuto &&
-                  m_dbPlaybackExitPrompt == 2));
-            // If we're exiting at the end of the recording, we
-            // automatically clear the bookmark when "Action on
-            // playback exit" is set to "Save position and exit" and
-            // "Clear bookmark on playback" is set to true.
-            bool allow_clear_at_end =
-                (Bookmark == kBookmarkAlways ||
-                 (Bookmark == kBookmarkAuto &&
-                  m_dbPlaybackExitPrompt == 2 &&
-                  m_dbClearSavedPosition));
-            // Whether to set/clear a bookmark depends on whether we're
-            // exiting at the end of a recording.
-            bool at_end = (m_player->IsNearEnd() || GetEndOfRecording());
-            // Don't consider ourselves at the end if the recording is
-            // in-progress.
-            at_end &= !StateIsRecording(GetState());
-            bool clear_lastplaypos = false;
-            if (at_end && allow_clear_at_end)
-            {
-                SetBookmark(true);
-                // Tidy up the lastplaypos mark only when we clear the
-                // bookmark due to exiting at the end.
-                clear_lastplaypos = true;
-            }
-            else if (!at_end && allow_set_before_end)
-            {
-                SetBookmark(false);
-            }
-            if (clear_lastplaypos && m_playerContext.m_playingInfo)
-                m_playerContext.m_playingInfo->ClearMarkupMap(MARK_UTIL_LASTPLAYPOS);
-        }
+        // Clear last play position when we're at the end of a recording.
+        // unless the recording is in-progress.
+        bool at_end = !StateIsRecording(m_playerContext.GetState()) &&
+                (GetEndOfRecording() || m_playerContext.m_player->IsNearEnd());
+
+        // Clear/Save play position without notification
+        // The change must be broadcast when file is no longer in use
+        // to update previews, ie. with the MarkNotInUse notification
+        uint64_t frame = at_end ? 0 : m_playerContext.m_player->GetFramesPlayed();
+        m_playerContext.m_playingInfo->SaveLastPlayPos(frame);
+        emit UpdateLastPlayPosition(frame);
         if (m_dbAutoSetWatched)
             m_player->SetWatched();
     }
@@ -4178,7 +4148,7 @@ bool TV::ActivePostQHandleAction(const QStringList &Actions)
     {
         NormalSpeed();
         StopFFRew();
-        SetBookmark();
+        PrepareToExitPlayer(__LINE__);
         ShowOSDPromptDeleteRecording(tr("Are you sure you want to delete:"));
     }
     else if (IsActionable(ACTION_JUMPTODVDROOTMENU, Actions) && isdisc)
@@ -4368,11 +4338,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
     }
     else if (tokens.size() == 2 && tokens[1] == "STOP")
     {
-        SetBookmark();
-        m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-        if (m_player && m_dbAutoSetWatched)
-            m_player->SetWatched();
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+        PrepareToExitPlayer(__LINE__);
         SetExitPlayer(true, true);
     }
     else if (tokens.size() >= 3 && tokens[1] == "SEEK" && m_playerContext.HasPlayer())
@@ -7233,7 +7199,7 @@ void TV::customEvent(QEvent *Event)
         if (device && filename.endsWith(device->getDevicePath()) && (device->getStatus() == MEDIASTAT_OPEN))
         {
             LOG(VB_GENERAL, LOG_NOTICE, "DVD has been ejected, exiting playback");
-            PrepareToExitPlayer(__LINE__, kBookmarkAuto);
+            PrepareToExitPlayer(__LINE__);
             SetExitPlayer(true, true);
         }
         ReturnPlayerLock();
@@ -9843,15 +9809,7 @@ void TV::ShowOSDStopWatchingRecording()
 
     MythOSDDialogData dialog { OSD_DLG_VIDEOEXIT, tr("You are exiting %1").arg(videotype) };
 
-    if (IsBookmarkAllowed())
-    {
-        dialog.m_buttons.push_back({tr("Save this position and go to the menu"), "DIALOG_VIDEOEXIT_SAVEPOSITIONANDEXIT_0"});
-        dialog.m_buttons.push_back({tr("Do not save, just exit to the menu"), ACTION_STOP});
-    }
-    else
-    {
-        dialog.m_buttons.push_back({tr("Exit %1").arg(videotype), ACTION_STOP});
-    }
+    dialog.m_buttons.push_back({tr("Exit %1").arg(videotype), ACTION_STOP});
 
     if (IsDeleteAllowed())
         dialog.m_buttons.push_back({tr("Delete this recording"), "DIALOG_VIDEOEXIT_CONFIRMDELETE_0"});
@@ -9973,7 +9931,6 @@ bool TV::HandleOSDVideoExit(const QString& Action)
 
     bool hide        = true;
     bool delete_ok   = IsDeleteAllowed();
-    bool bookmark_ok = IsBookmarkAllowed();
 
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     bool near_end = m_player && m_player->IsNearEnd();
@@ -9983,22 +9940,19 @@ bool TV::HandleOSDVideoExit(const QString& Action)
     {
         m_allowRerecord = true;
         m_requestDelete = true;
+        PrepareToExitPlayer(__LINE__);
         SetExitPlayer(true, true);
     }
     else if (Action == "JUSTDELETE" && delete_ok)
     {
         m_requestDelete = true;
+        PrepareToExitPlayer(__LINE__);
         SetExitPlayer(true, true);
     }
     else if (Action == "CONFIRMDELETE")
     {
         hide = false;
         ShowOSDPromptDeleteRecording(tr("Are you sure you want to delete:"), true);
-    }
-    else if (Action == "SAVEPOSITIONANDEXIT" && bookmark_ok)
-    {
-        PrepareToExitPlayer(__LINE__, kBookmarkAlways);
-        SetExitPlayer(true, true);
     }
     else if (Action == "KEEPWATCHING" && !near_end)
     {
@@ -10010,31 +9964,6 @@ bool TV::HandleOSDVideoExit(const QString& Action)
 
 void TV::HandleSaveLastPlayPosEvent()
 {
-    // Helper class to save the latest playback position (in a background thread
-    // to avoid playback glitches).  The ctor makes a copy of the ProgramInfo
-    // struct to avoid race conditions if playback ends and deletes objects
-    // before or while the background thread runs.
-    class PositionSaver : public QRunnable
-    {
-      public:
-        PositionSaver(const ProgramInfo &pginfo, uint64_t frame)
-          : m_pginfo(pginfo),
-            m_frame(frame) {}
-
-        void run() override
-        {
-            LOG(VB_PLAYBACK, LOG_DEBUG, QString("PositionSaver frame=%1").arg(m_frame));
-            frm_dir_map_t lastPlayPosMap;
-            lastPlayPosMap[m_frame] = MARK_UTIL_LASTPLAYPOS;
-            m_pginfo.ClearMarkupMap(MARK_UTIL_LASTPLAYPOS);
-            m_pginfo.SaveMarkupMap(lastPlayPosMap, MARK_UTIL_LASTPLAYPOS);
-        }
-
-      private:
-        const ProgramInfo m_pginfo;
-        const uint64_t m_frame;
-    };
-
     GetPlayerReadLock();
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     bool playing = m_player && !m_player->IsPaused();
@@ -10042,13 +9971,13 @@ void TV::HandleSaveLastPlayPosEvent()
     if (playing)
     {
         uint64_t framesPlayed = m_player->GetFramesPlayed();
-        MThreadPool::globalInstance()->start(new PositionSaver(*m_playerContext.m_playingInfo, framesPlayed), "PositionSaver");
+        MConcurrent::run("PositionSaver", m_playerContext.m_playingInfo,
+                         &ProgramInfo::SaveLastPlayPos, framesPlayed);
     }
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
     ReturnPlayerLock();
 
-    KillTimer(m_saveLastPlayPosTimerId);
-    m_saveLastPlayPosTimerId = StartTimer(kSaveLastPlayPosTimeout, __LINE__);
+    m_savePosOnExit = true;
 }
 
 void TV::SetLastProgram(const ProgramInfo* ProgInfo)

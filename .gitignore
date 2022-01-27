@@ -58,3 +58,5 @@ uic_wrapper.sh
 *.profraw
 *.profdata
 __pycache__
+mocinclude.opt
+build

@@ -29,6 +29,7 @@ QString VideoMetaDataUtil::GetArtPath(const QString &pathname,
     art_path_map_lock.lockForRead();
     ArtList ret(art_path_map.values(basename));
     art_path_map_lock.unlock();
+    // cppcheck-suppress unassignedVariable
     for (const auto & [arttype, artpath] : qAsConst(ret))
     {
         if (arttype == type)

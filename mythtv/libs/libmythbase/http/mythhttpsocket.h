@@ -35,10 +35,10 @@ class MythHTTPSocket : public QObject
     static void NewBinaryMessage (const DataPayloads& Payloads);
 
   public:
-    explicit MythHTTPSocket(qintptr Socket, bool SSL, const MythHTTPConfig& Config);
+    explicit MythHTTPSocket(qintptr Socket, bool SSL, MythHTTPConfig Config);
    ~MythHTTPSocket() override;
-    void Respond(HTTPResponse Response);
-    static void RespondDirect(qintptr Socket, HTTPResponse Response, const MythHTTPConfig& Config);
+    void Respond(const HTTPResponse& Response);
+    static void RespondDirect(qintptr Socket, const HTTPResponse& Response, const MythHTTPConfig& Config);
 
   protected slots:
     void Disconnected();

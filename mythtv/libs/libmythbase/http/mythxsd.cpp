@@ -27,7 +27,7 @@
 // The code for  creating the enum in xsd does not work
 // Since there is only one enum n the entire system, treat it as a string
 
-// HTTPResponse MythXSD::GetEnumXSD( HTTPRequest2 pRequest, const QString& sEnumName )
+// HTTPResponse MythXSD::GetEnumXSD( const HTTPRequest2& pRequest, const QString& sEnumName )
 // {
 //     if (sEnumName.isEmpty())
 //         return Error(pRequest, QString( "XSD request on empty invalid enum name"));
@@ -206,7 +206,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-HTTPResponse MythXSD::GetXSD( HTTPRequest2 pRequest, QString sTypeName )
+HTTPResponse MythXSD::GetXSD( const HTTPRequest2& pRequest, QString sTypeName )
 {
     bool    bIsArray     = false;
     bool    bIsMap       = false;
@@ -354,7 +354,7 @@ HTTPResponse MythXSD::GetXSD( HTTPRequest2 pRequest, QString sTypeName )
 //</xs:schema>
 /////////////////////////////////////////////////////////////////////////////
 
-bool MythXSD::RenderXSD( HTTPRequest2 pRequest, QObject *pClass )
+bool MythXSD::RenderXSD( const HTTPRequest2& pRequest, QObject *pClass )
 {
     const QMetaObject *pMetaObject = pClass->metaObject();
 
@@ -593,7 +593,7 @@ bool MythXSD::IsEnum( const QMetaProperty &metaProperty, const QString &/*sType*
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool MythXSD::RenderArrayXSD( HTTPRequest2 pRequest,
+bool MythXSD::RenderArrayXSD( const HTTPRequest2& pRequest,
                           const QString &sClassName,
                           bool           bCustomType )
 {
@@ -707,7 +707,7 @@ bool MythXSD::RenderArrayXSD( HTTPRequest2 pRequest,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool MythXSD::RenderMapXSD( HTTPRequest2 pRequest,
+bool MythXSD::RenderMapXSD( const HTTPRequest2& pRequest,
                         const QString &sClassName,
                         bool           bCustomType )
 {
@@ -969,17 +969,16 @@ QString MythXSD::ReadPropertyMetadata( QObject *pObject, const QString& sPropNam
 
         QString     sFullKey  = sKey + "=";
 
-        for (const QString& option : qAsConst(sOptions))
-        {
-            if (option.startsWith( sFullKey ))
-                return option.mid( sFullKey.length() );
-        }
+        auto hasKey = [&sFullKey](const QString& o) { return o.startsWith( sFullKey ); };
+        auto it = std::find_if(sOptions.cbegin(), sOptions.cend(), hasKey);
+        if (it != sOptions.cend())
+            return (*it).mid( sFullKey.length() );
     }
 
     return QString();
 }
 
-HTTPResponse MythXSD::Error(HTTPRequest2 pRequest, const QString &msg)
+HTTPResponse MythXSD::Error(const HTTPRequest2& pRequest, const QString &msg)
 {
     LOG(VB_GENERAL, LOG_ERR, "MythCSD Exception: " + msg);
     pRequest->m_status = HTTPBadRequest;

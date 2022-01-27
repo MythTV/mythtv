@@ -4,14 +4,14 @@
 // MythTV headers
 #include <standardsettings.h>
 
-class MPUBLIC MythWelcomeSettings : public GroupSetting
+class MythWelcomeSettings : public GroupSetting
 {
     Q_OBJECT
   public:
     MythWelcomeSettings();
 };
 
-class MPUBLIC MythShutdownSettings : public GroupSetting
+class MythShutdownSettings : public GroupSetting
 {
     Q_OBJECT
 public:
