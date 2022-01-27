@@ -372,6 +372,17 @@ static QString normalizeString(const QString& s)
 // http://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard
 // http://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard?dates=20180901
 // http://sports.core.api.espn.com/v2/sports/${sport}/leagues/${league}/events/${eventId}/competitions/${eventId}/status
+//
+// Mens College Basketball (Group 50)
+//
+// All teams:
+// http://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams?groups=50&limit=500
+//
+// This only shows teams in the  top 25:
+// http://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?date=20220126
+//
+// This shows all the scheduled games.
+// http://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?date=20220126&groups=50&limit=500
 
 static const QString espnInfoUrlFmt {"http://site.api.espn.com/apis/site/v2/sports/%1/%2/scoreboard"};
 static const QString espnGameUrlFmt {"http://sports.core.api.espn.com/v2/sports/%1/leagues/%2/events/%3/competitions/%3/status"};
@@ -606,7 +617,10 @@ QUrl RecExtEspnDataSource::makeInfoUrl (const SportInfo& info, const QDateTime& 
 {
     QUrl url {QString(espnInfoUrlFmt).arg(info.sport, info.league)};
     QUrlQuery query;
-    query.addQueryItem("limit", "100");
+    query.addQueryItem("limit", "500");
+    // Add this to get all games, otherwise only top-25 games are returned.
+    if (info.league.endsWith("college-basketball"))
+        query.addQueryItem("group", "50");
     if (dt.isValid())
         query.addQueryItem("dates", dt.toString("yyyyMMdd"));
     url.setQuery(query);
