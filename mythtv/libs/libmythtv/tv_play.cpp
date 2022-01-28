@@ -1534,7 +1534,7 @@ bool TV::RequestNextRecorder(bool ShowDialogs, const ChannelInfoList &Selection)
             QString channum = ci.m_chanNum;
             if (!chanid || channum.isEmpty())
                 continue;
-            QSet<uint> cards = IsTunableOn(&m_playerContext, chanid);
+            QVector<uint> cards = IsTunableOn(&m_playerContext, chanid);
 
             if (chanid && !channum.isEmpty() && !cards.isEmpty())
             {
@@ -5971,7 +5971,7 @@ void TV::ChangeChannel(uint Chanid, const QString &Channum)
 
     QString channum = Channum;
     QStringList reclist;
-    QSet<uint> tunable_on;
+    QVector<uint> tunable_on;
 
     QString oldinputname = m_playerContext.m_recorder->GetInput();
 
@@ -6640,7 +6640,7 @@ bool TV::IsTunablePriv(uint ChanId)
     return !IsTunableOn(&m_playerContext, ChanId).empty();
 }
 
-static QString toCommaList(const QSet<uint> &list)
+static QString toCommaList(const QVector<uint> &list)
 {
     QString ret = "";
     for (uint i : qAsConst(list))
@@ -6652,9 +6652,9 @@ static QString toCommaList(const QSet<uint> &list)
     return "";
 }
 
-QSet<uint> TV::IsTunableOn(PlayerContext* Context, uint ChanId)
+QVector<uint> TV::IsTunableOn(PlayerContext* Context, uint ChanId)
 {
-    QSet<uint> tunable_cards;
+    QVector<uint> tunable_cards;
 
     if (!ChanId)
     {
@@ -6686,7 +6686,7 @@ QSet<uint> TV::IsTunableOn(PlayerContext* Context, uint ChanId)
             input.m_chanId != ChanId)
             continue;
 
-        tunable_cards.insert(input.m_inputId);
+        tunable_cards.push_back(input.m_inputId);
     }
 
     if (tunable_cards.empty())
@@ -8709,7 +8709,7 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
         {
             uint inputid  = m_playerContext.GetCardID();
             std::vector<InputInfo> inputs = RemoteRequestFreeInputInfo(inputid);
-            QSet <QString> addednames;
+            QVector <QString> addednames;
             addednames += CardUtil::GetDisplayName(inputid);
             for (auto & input : inputs)
             {

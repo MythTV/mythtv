@@ -20,7 +20,7 @@
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 #include <QRecursiveMutex>
 #endif
-#include <QSet>
+#include <QVector>
 
 // MythTV
 #include "mythdeque.h"
@@ -253,7 +253,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     // Commands used by frontend UI screens (PlaybackBox, GuideGrid etc)
     void EditSchedule(int EditType = kScheduleProgramGuide);
     bool IsTunablePriv(uint ChanId);
-    static QSet<uint> IsTunableOn(PlayerContext* Context, uint ChanId);
+    static QVector<uint> IsTunableOn(PlayerContext* Context, uint ChanId);
     void ChangeChannel(const ChannelInfoList& Options);
     void DoEditSchedule(int EditType = kScheduleProgramGuide);
     QString GetRecordingGroup() const;
