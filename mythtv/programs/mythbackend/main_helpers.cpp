@@ -70,6 +70,7 @@
 #include "servicesv2/v2status.h"
 #include "servicesv2/v2capture.h"
 #include "servicesv2/v2music.h"
+#include "servicesv2/v2config.h"
 
 #define LOC      QString("MythBackend: ")
 #define LOC_WARN QString("MythBackend, Warning: ")
@@ -777,6 +778,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         { STATUS_SERVICE, &MythHTTPService::Create<V2Status> },
         { CAPTURE_SERVICE, &MythHTTPService::Create<V2Capture> },
         { MUSIC_SERVICE, &MythHTTPService::Create<V2Music> },
+        { CONFIG_SERVICE, &MythHTTPService::Create<V2Config> },
     };
 
     MythHTTPInstance::Addservices(be_services);
