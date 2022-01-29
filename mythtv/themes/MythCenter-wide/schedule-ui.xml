@@ -514,13 +514,13 @@
                 <area>0,0,1200,24</area>
                 <state name="active">
                     <textarea name="shortstarttimedate" from="buttontext">
-                        <area>10,1,250,26</area>
+                        <area>10,1,200,26</area>
                     </textarea>
                     <textarea name="channel" from="shortstarttimedate">
-                        <area>270,1,200,26</area>
+                        <area>210,1,220,26</area>
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
-                        <area>480,1,620,26</area>
+                        <area>435,1,645,26</area>
                         <!--
                         <progressbar name="buttonprogress2">
                             <area>0,0,100%,100%</area>
@@ -535,7 +535,7 @@
                         -->
                     </textarea>
                     <textarea name="recordedpercent" from="buttontext">
-                        <area>1105,1,45,26</area>
+                        <area>1080,1,65,26</area>
                         <align>right,vcenter</align>
                         <template>%|recordedpercent|%%</template>
                      </textarea>
@@ -546,7 +546,7 @@
                 </state>
                 <state name="selectedactive" from="active">
                     <textarea name="shortstarttimedate" from="buttontext">
-                        <area>10,1,250,26</area>
+                        <area>10,1,200,26</area>
                         <font>base_normal_selected</font>
                         <font state="disabled">basesmall_disabled_selected</font>
                         <font state="error">basesmall_error_selected</font>
@@ -555,13 +555,13 @@
                         <font state="running">basesmall_running_selected</font>
                     </textarea>
                     <textarea name="channel" from="shortstarttimedate">
-                        <area>270,1,200,26</area>
+                        <area>210,1,220,26</area>
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
-                        <area>480,1,620,26</area>
+                        <area>435,1,645,26</area>
                     </textarea>
                     <textarea name="recordedpercent" from="buttontext">
-                        <area>1105,1,45,26</area>
+                        <area>1080,1,65,26</area>
                         <align>right,vcenter</align>
                         <template>%|recordedpercent|%%</template>
                      </textarea>

@@ -250,16 +250,16 @@
                         <state name="marked"></state>
                     </statetype>
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,2,623,28</area>
+                        <area>32,2,618,28</area>
                         <align>vcenter</align>
                     </textarea>
                     <textarea name="watchedpercent" from="buttontext">
-                        <area>655,2,55,28</area>
+                        <area>650,2,60,28</area>
                         <align>right,vcenter</align>
                         <template>%|watchedpercent|%%</template>
                      </textarea>
                     <textarea name="shortstartdate" from="buttontext">
-                        <area>714,2,60,28</area>
+                        <area>710,2,70,28</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <textarea name="starttime" from="buttontext">
@@ -305,15 +305,15 @@
                         <align>vcenter</align>
                     </textarea>
                     <textarea name="titlesubtitle" from="fonts">
-                         <area>32,2,623,28</area>
+                        <area>32,2,618,28</area>
                     </textarea>
                     <textarea name="watchedpercent" from="fonts">
-                        <area>655,2,55,28</area>
+                        <area>650,2,60,28</area>
                         <align>right,vcenter</align>
                         <template>%|watchedpercent|%%</template>
                      </textarea>
                     <textarea name="shortstartdate" from="fonts">
-                       <area>714,2,60,28</area>
+                        <area>710,2,70,28</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <textarea name="starttime" from="fonts">
@@ -431,7 +431,7 @@
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>30,400,800,40</area>
+            <area>30,400,1200,40</area>
             <font>baselarge</font>
             <cutdown>yes</cutdown>
             <align>vcenter</align>
