@@ -7,6 +7,7 @@
 //
 
 // Qt
+#include <QtGlobal>
 #include <QMutexLocker>
 #include <QFile>
 
@@ -201,7 +202,11 @@ int MythAVCopy::Copy(AVFrame* To, AVPixelFormat ToFmt, const AVFrame* From, AVPi
                      int Width, int Height)
 {
     int newwidth = Width;
-#if ARCH_ARM
+#ifdef Q_PROCESSOR_ARM
+    // references https://code.mythtv.org/trac/ticket/12888 and
+    // https://trac.ffmpeg.org/ticket/6192
+    // TODO: This is from 2017-02-17 and probably needs to be tested again.
+
     // The ARM build of FFMPEG has a bug that if sws_scale is
     // called with source and dest sizes the same, and
     // formats as shown below, it causes a bus error and the
