@@ -13,7 +13,7 @@ extern "C" {
 #if ARCH_X86_64
 #   include "libavutil/x86/cpu.h"
 #   include <emmintrin.h>
-bool MythDeinterlacer::s_haveSIMD = true;
+static const bool s_haveSIMD = true;
 #elif HAVE_INTRINSICS_NEON
 #   if ARCH_AARCH64
 #       include "libavutil/aarch64/cpu.h"
@@ -21,9 +21,7 @@ bool MythDeinterlacer::s_haveSIMD = true;
 #       include "libavutil/arm/cpu.h"
 #   endif
 #   include <arm_neon.h>
-bool MythDeinterlacer::s_haveSIMD = have_neon(av_get_cpu_flags());
-#else
-bool MythDeinterlacer::s_haveSIMD = false;
+static const bool s_haveSIMD = have_neon(av_get_cpu_flags());
 #endif
 
 #define LOC QString("MythDeint: ")

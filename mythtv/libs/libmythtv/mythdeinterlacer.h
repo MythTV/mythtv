@@ -47,7 +47,6 @@ class MythDeinterlacer
     uint64_t         m_discontinuityCounter { 0 };
     bool             m_autoFieldOrder  { false };
     uint64_t         m_lastFieldChange { 0 };
-    static bool      s_haveSIMD;
 };
 
 #endif
