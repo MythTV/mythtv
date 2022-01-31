@@ -41,11 +41,6 @@ QMAKE_CXXFLAGS += $$CXXFLAGS $$ECXXFLAGS
 profile:!win32:!macx:CONFIG += debug
 
 QMAKE_CXXFLAGS_RELEASE = $$OPTFLAGS -fomit-frame-pointer
-release:contains( TARGET_ARCH_POWERPC, yes ) {
-    QMAKE_CXXFLAGS_RELEASE = $$OPTFLAGS
-    # Auto-inlining causes some Qt moc methods to go missing
-    macx:QMAKE_CXXFLAGS_RELEASE += -fno-inline-functions
-}
 QMAKE_CXXFLAGS_RELEASE += $$PROFILEFLAGS
 
 QMAKE_CFLAGS += $$ARCHFLAGS
