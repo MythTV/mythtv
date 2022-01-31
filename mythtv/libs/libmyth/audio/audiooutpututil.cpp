@@ -21,11 +21,10 @@ extern "C" {
 #define ISALIGN(x) (((unsigned long)(x) & 0xf) == 0)
 
 #ifdef Q_PROCESSOR_X86
-static int has_sse2 = -1;
-
 // Check cpuid for SSE2 support on x86 / x86_64
 static inline bool sse_check()
 {
+    static int has_sse2 = -1;
     if (has_sse2 != -1)
         return (bool)has_sse2;
     __asm__(
