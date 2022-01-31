@@ -5274,9 +5274,9 @@ DBUpdates getRecordingExtenderDbInfo (int version)
               id INT UNSIGNED PRIMARY KEY,
               provider TINYINT UNSIGNED DEFAULT 0,
               name VARCHAR(128) NOT NULL,
-              key1 VARCHAR(256) NOT NULL,
-              key2 VARCHAR(256) NOT NULL,
-              UNIQUE(provider,key1,key2)
+              key1 VARCHAR(64) NOT NULL,
+              key2 VARCHAR(64) NOT NULL,
+              UNIQUE(provider,key1(25),key2(50))
               ) ENGINE=MyISAM DEFAULT CHARSET=utf8;)",
             R"(INSERT INTO sportsapi
             VALUES

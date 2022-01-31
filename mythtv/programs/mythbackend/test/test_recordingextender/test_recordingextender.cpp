@@ -54,6 +54,8 @@ static void convertToSqlite (DBUpdates& updates)
     {
       replace_all(s, R"(\\)", R"(\)");
       replace_all(s, "ENGINE=MyISAM DEFAULT CHARSET=utf8", "");
+      replace_all(s, "UNIQUE(provider,key1(25),key2(50))",
+                     "UNIQUE(provider,key1,key2)");
     }
 }
 
