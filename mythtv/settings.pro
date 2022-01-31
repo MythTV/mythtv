@@ -283,11 +283,6 @@ macx {
 
 profile:!win32:!macx:CONFIG += debug
 
-release:contains( ARCH_POWERPC, yes ) {
-    # Auto-inlining causes some Qt moc methods to go missing
-    macx:QMAKE_CXXFLAGS_RELEASE += -fno-inline-functions
-}
-
 # figure out defines
 DEFINES += $$CONFIG_DEFINES
 DEFINES += _GNU_SOURCE
