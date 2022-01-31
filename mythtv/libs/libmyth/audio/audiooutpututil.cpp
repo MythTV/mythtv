@@ -54,10 +54,10 @@ static inline bool sse2_check()
 #endif //Q_PROCESSOR_X86
 
 /**
- * Returns true if platform has an FPU.
- * for the time being, this test is limited to testing if SSE2 is supported
+ * Returns true if the processor supports MythTV's optimized SIMD for AudioOutputUtil/AudioConvert.
+ * Currently, only SSE2 is implemented.
  */
-bool AudioOutputUtil::has_hardware_fpu()
+bool AudioOutputUtil::has_optimized_SIMD()
 {
 #ifdef Q_PROCESSOR_X86
     return sse2_check();

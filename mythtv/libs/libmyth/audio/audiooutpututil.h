@@ -12,7 +12,7 @@
 class MPUBLIC AudioOutputUtil
 {
  public:
-    static bool has_hardware_fpu();
+    static bool has_optimized_SIMD();
     static void AdjustVolume(void *buffer, int len, int volume,
                              bool music, bool upmix);
     static void MuteChannel(int obits, int channels, int ch,
