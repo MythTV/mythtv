@@ -10,22 +10,17 @@
 extern "C" {
 #include "libavfilter/buffersrc.h"
 #include "libavfilter/buffersink.h"
+#include "libavutil/cpu.h"
 }
 
 #include <QtGlobal>
 
 #ifdef Q_PROCESSOR_X86_64
-#   include "libavutil/x86/cpu.h"
 #   include <emmintrin.h>
 static const bool s_haveSIMD = true;
 #elif HAVE_INTRINSICS_NEON
-#   if defined(__aarch64__) || defined(_M_ARM64) || defined(Q_PROCESSOR_ARM_64)
-#       include "libavutil/aarch64/cpu.h"
-#   elif defined(Q_PROCESSOR_ARM)
-#       include "libavutil/arm/cpu.h"
-#   endif
 #   include <arm_neon.h>
-static const bool s_haveSIMD = have_neon(av_get_cpu_flags());
+static const bool s_haveSIMD = av_get_cpu_flags() & AV_CPU_FLAG_NEON;
 #endif
 
 #define LOC QString("MythDeint: ")
