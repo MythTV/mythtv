@@ -44,7 +44,7 @@ extern "C" {
 
 #ifdef Q_PROCESSOR_X86
 // Check cpuid for SSE2 support on x86 / x86_64
-static inline bool sse_check()
+static inline bool sse2_check()
 {
 #ifdef Q_PROCESSOR_X86_64
     return true;
@@ -99,7 +99,7 @@ static int toFloat8(float* out, const uchar* in, int len)
     float f = 1.0F / ((1<<7));
 
 #ifdef Q_PROCESSOR_X86
-    if (sse_check() && len >= 16)
+    if (sse2_check() && len >= 16)
     {
         int loops = len >> 4;
         i = loops << 4;
@@ -174,7 +174,7 @@ static int fromFloat8(uchar* out, const float* in, int len)
     float f = (1<<7);
 
 #ifdef Q_PROCESSOR_X86
-    if (sse_check() && len >= 16)
+    if (sse2_check() && len >= 16)
     {
         int loops = len >> 4;
         i = loops << 4;
@@ -226,7 +226,7 @@ static int toFloat16(float* out, const short* in, int len)
     float f = 1.0F / ((1<<15));
 
 #ifdef Q_PROCESSOR_X86
-    if (sse_check() && len >= 16)
+    if (sse2_check() && len >= 16)
     {
         int loops = len >> 4;
         i = loops << 4;
@@ -288,7 +288,7 @@ static int fromFloat16(short* out, const float* in, int len)
     float f = (1<<15);
 
 #ifdef Q_PROCESSOR_X86
-    if (sse_check() && len >= 16)
+    if (sse2_check() && len >= 16)
     {
         int loops = len >> 4;
         i = loops << 4;
@@ -340,7 +340,7 @@ static int toFloat32(AudioFormat format, float* out, const int* in, int len)
         shift = 0;
 
 #ifdef Q_PROCESSOR_X86
-    if (sse_check() && len >= 16)
+    if (sse2_check() && len >= 16)
     {
         int loops = len >> 4;
         i = loops << 4;
@@ -397,7 +397,7 @@ static int fromFloat32(AudioFormat format, int* out, const float* in, int len)
         shift = 0;
 
 #ifdef Q_PROCESSOR_X86
-    if (sse_check() && len >= 16)
+    if (sse2_check() && len >= 16)
     {
         float o = 0.99999995;
         float mo = -1;
@@ -479,7 +479,7 @@ static int fromFloatFLT(float* out, const float* in, int len)
     int i = 0;
 
 #ifdef Q_PROCESSOR_X86
-    if (sse_check() && len >= 16)
+    if (sse2_check() && len >= 16)
     {
         int loops = len >> 4;
         float o = 1;
