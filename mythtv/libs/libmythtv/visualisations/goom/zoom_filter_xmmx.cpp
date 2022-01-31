@@ -1,8 +1,6 @@
-#include "mythconfig.h"
-
 #include "goom/zoom_filters.h"
 
-#if defined(MMX) && !defined(ARCH_X86_64)
+#if 0 && defined(MMX) && !(defined(__x86_64) || defined(__x86_64__) || defined(__amd64) || defined(_M_X64))
 /* a definir pour avoir exactement le meme resultat que la fonction C
  * (un chouillat plus lent)
  */
