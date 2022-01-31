@@ -8,6 +8,7 @@
 #include <sys/time.h>
 
 // Qt headers
+#include <QtGlobal>
 #include <QMutexLocker>
 
 // MythTV headers
@@ -318,7 +319,7 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
         m_pSoundStretch->setSampleRate(m_sampleRate);
         m_pSoundStretch->setChannels(channels);
         m_pSoundStretch->setTempo(m_stretchFactor);
-#if ARCH_ARM || defined(Q_OS_ANDROID)
+#if defined(Q_PROCESSOR_ARM) || defined(Q_OS_ANDROID)
         // use less demanding settings for Raspberry pi
         m_pSoundStretch->setSetting(SETTING_SEQUENCE_MS, 82);
         m_pSoundStretch->setSetting(SETTING_USE_AA_FILTER, 0);
