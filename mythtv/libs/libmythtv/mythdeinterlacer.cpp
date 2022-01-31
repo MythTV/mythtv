@@ -12,10 +12,10 @@ extern "C" {
 #include "libavfilter/buffersink.h"
 }
 
-#if (HAVE_SSE2 && ARCH_X86_64)
+#if ARCH_X86_64
 #   include "libavutil/x86/cpu.h"
 #   include <emmintrin.h>
-bool MythDeinterlacer::s_haveSIMD = av_get_cpu_flags() & AV_CPU_FLAG_SSE2;
+bool MythDeinterlacer::s_haveSIMD = true;
 #elif HAVE_INTRINSICS_NEON
 #   if ARCH_AARCH64
 #       include "libavutil/aarch64/cpu.h"
@@ -514,7 +514,7 @@ static inline void BlendC4x4(unsigned char *Src, int Width, int FirstRow, int La
     }
 }
 
-#if (HAVE_SSE2 && ARCH_X86_64) || HAVE_INTRINSICS_NEON
+#if ARCH_X86_64 || HAVE_INTRINSICS_NEON
 // SIMD optimised version with 16x4 alignment
 static inline void BlendSIMD16x4(unsigned char *Src, int Width, int FirstRow, int LastRow, int Pitch,
                                  unsigned char *Dst, int DstPitch, bool Second)
@@ -547,7 +547,7 @@ static inline void BlendSIMD16x4(unsigned char *Src, int Width, int FirstRow, in
         }
         for (int col = 0; col < Width; col += 16)
         {
-#if (HAVE_SSE2 && ARCH_X86_64)
+#if ARCH_X86_64
             __m128i mid = *reinterpret_cast<__m128i*>(&middle[col]);
             *reinterpret_cast<__m128i*>(&dest1[col]) =
                     _mm_avg_epu8(*reinterpret_cast<__m128i*>(&above[col]), mid);
@@ -602,7 +602,7 @@ static inline void BlendSIMD8x4(unsigned char *Src, int Width, int FirstRow, int
         }
         for (int col = 0; col < Width; col += 16)
         {
-#if (HAVE_SSE2 && ARCH_X86_64)
+#if ARCH_X86_64
             __m128i mid = *reinterpret_cast<__m128i*>(&middle[col]);
             *reinterpret_cast<__m128i*>(&dest1[col]) =
                     _mm_avg_epu16(*reinterpret_cast<__m128i*>(&above[col]), mid);
@@ -657,7 +657,7 @@ void MythDeinterlacer::Blend(MythVideoFrame *Frame, FrameScanType Scan)
         bool width4  = (src->m_pitches[plane] % 4) == 0;
         // N.B. all frames allocated by MythTV should have 16 byte alignment
         // for all planes
-#if (HAVE_SSE2 && ARCH_X86_64) || HAVE_INTRINSICS_NEON
+#if ARCH_X86_64 || HAVE_INTRINSICS_NEON
         bool width16 = (src->m_pitches[plane] % 16) == 0;
         // profiling SSE2 suggests it is usually 4x faster - as expected
         if (s_haveSIMD && height4 && width16)
