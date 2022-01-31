@@ -39,8 +39,7 @@ class MythDVDPlayer : public MythPlayerUI
     void     ResetPlaying(bool ResetFrames = true) override;
     bool     PrebufferEnoughFrames(int MinBuffers = 0) override;
     void     DecoderPauseCheck(void) override;
-    bool     DecoderGetFrameFFREW(void) override;
-    bool     DecoderGetFrameREW(void) override;
+    void     DoFFRewSkip(void) override;
     void     ChangeSpeed(void) override;
     void     DisplayPauseFrame(void) override;
     void     PreProcessNormalFrame(void) override;

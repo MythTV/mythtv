@@ -96,23 +96,15 @@ bool MythDVDPlayer::PrebufferEnoughFrames(int /*MinBuffers*/)
     return MythPlayerUI::PrebufferEnoughFrames(1);
 }
 
-bool MythDVDPlayer::DecoderGetFrameFFREW(void)
+void MythDVDPlayer::DoFFRewSkip(void)
 {
-    bool res = MythPlayerUI::DecoderGetFrameFFREW();
+    MythPlayerUI::DoFFRewSkip();
     if (m_decoderChangeLock.tryLock(1))
     {
         if (m_decoder)
             m_decoder->UpdateFramesPlayed();
         m_decoderChangeLock.unlock();
     }
-    return res;
-}
-
-bool MythDVDPlayer::DecoderGetFrameREW(void)
-{
-    MythPlayerUI::DecoderGetFrameREW();
-    return (m_playerCtx->m_buffer->IsDVD() &&
-            (m_playerCtx->m_buffer->DVD()->GetCurrentTime() < 2s));
 }
 
 void MythDVDPlayer::PreProcessNormalFrame(void)
