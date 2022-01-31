@@ -46,6 +46,9 @@ extern "C" {
 // Check cpuid for SSE2 support on x86 / x86_64
 static inline bool sse_check()
 {
+#ifdef Q_PROCESSOR_X86_64
+    return true;
+#endif
     static int has_sse2 = -1;
     if (has_sse2 != -1)
         return (bool)has_sse2;
