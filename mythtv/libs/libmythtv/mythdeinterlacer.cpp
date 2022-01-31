@@ -11,16 +11,16 @@ extern "C" {
 }
 
 #if (HAVE_SSE2 && ARCH_X86_64)
-#include "libavutil/x86/cpu.h"
-#include <emmintrin.h>
+#   include "libavutil/x86/cpu.h"
+#   include <emmintrin.h>
 bool MythDeinterlacer::s_haveSIMD = av_get_cpu_flags() & AV_CPU_FLAG_SSE2;
 #elif HAVE_INTRINSICS_NEON
-#if ARCH_AARCH64
-#include "libavutil/aarch64/cpu.h"
-#elif ARCH_ARM
-#include "libavutil/arm/cpu.h"
-#endif
-#include <arm_neon.h>
+#   if ARCH_AARCH64
+#       include "libavutil/aarch64/cpu.h"
+#   elif ARCH_ARM
+#       include "libavutil/arm/cpu.h"
+#   endif
+#   include <arm_neon.h>
 bool MythDeinterlacer::s_haveSIMD = have_neon(av_get_cpu_flags());
 #else
 bool MythDeinterlacer::s_haveSIMD = false;
