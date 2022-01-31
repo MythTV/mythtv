@@ -599,6 +599,10 @@ void MythPlayer::ReleaseNextVideoFrame(MythVideoFrame *buffer,
     buffer->m_timecode = timecode;
     m_latestVideoTimecode = timecode;
 
+    if (m_decodeOneFrame)
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "Clearing decode one");
+    m_decodeOneFrame = false;
+
     if (m_videoOutput)
         m_videoOutput->ReleaseFrame(buffer);
 
@@ -1135,7 +1139,6 @@ void MythPlayer::DecoderLoop(bool pause)
             kDecodeAV : kDecodeVideo;
 
         DecoderGetFrame(dt);
-        m_decodeOneFrame = false;
     }
 
     // Clear any wait conditions
@@ -1148,10 +1151,12 @@ static float ffrewSkipThresh = 0.60F;
 static float ffrewScaleLowest = 1.00F;
 static float ffrewScaleHighest = 2.50F;
 
-bool MythPlayer::DecoderGetFrameFFREW(void)
+void MythPlayer::DoFFRewSkip(void)
 {
     if (!m_decoder)
-        return false;
+        return;
+
+    auto discard = false;
 
     if (m_ffrewSkip > 0)
     {
@@ -1159,7 +1164,7 @@ bool MythPlayer::DecoderGetFrameFFREW(void)
         long long real_skip = CalcMaxFFTime(m_ffrewSkip - m_ffrewAdjust + delta) - delta;
         long long target_frame = m_decoder->GetFramesRead() + real_skip;
         if (real_skip >= 0)
-            m_decoder->DoFastForward(target_frame, false);
+            m_decoder->DoFastForward(target_frame, discard);
 
         long long seek_frame = m_decoder->GetFramesRead();
         m_ffrewAdjust = seek_frame - target_frame;
@@ -1179,35 +1184,31 @@ bool MythPlayer::DecoderGetFrameFFREW(void)
     }
     else if (CalcRWTime(-m_ffrewSkip) >= 0)
     {
-        DecoderGetFrameREW();
+        long long cur_frame    = m_decoder->GetFramesPlayed();
+        bool      toBegin      = -cur_frame > m_ffrewSkip + m_ffrewAdjust;
+        long long real_skip    = (toBegin) ? -cur_frame : m_ffrewSkip + m_ffrewAdjust;
+        long long target_frame = cur_frame + real_skip;
+        m_decoder->DoRewind(target_frame, discard);
+
+        long long seek_frame  = m_decoder->GetFramesPlayed();
+        m_ffrewAdjust = target_frame - seek_frame;
+        float adjustRatio = float(m_ffrewAdjust) / m_ffrewSkip;
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("skip %1, adjust, %2, ratio %3")
+            .arg(m_ffrewSkip).arg(m_ffrewAdjust).arg(adjustRatio));
+
+        // If the needed adjustment is too large either way, adjust the
+        // scale factor up or down accordingly.
+        if (adjustRatio < -ffrewSkipThresh
+            && m_ffrewScale < (ffrewScaleHighest - 0.01F))
+            UpdateFFRewSkip(m_ffrewScale + ffrewScaleAdjust);
+        else if (adjustRatio  > ffrewSkipThresh
+                 && m_ffrewScale > (ffrewScaleLowest + 0.01F))
+            UpdateFFRewSkip(m_ffrewScale - ffrewScaleAdjust);
     }
-    return DoGetFrame(m_deleteMap.IsEditing() ? kDecodeAV : kDecodeVideo);
-}
 
-bool MythPlayer::DecoderGetFrameREW(void)
-{
-    long long cur_frame    = m_decoder->GetFramesPlayed();
-    bool      toBegin      = -cur_frame > m_ffrewSkip + m_ffrewAdjust;
-    long long real_skip    = (toBegin) ? -cur_frame : m_ffrewSkip + m_ffrewAdjust;
-    long long target_frame = cur_frame + real_skip;
-    bool ret = m_decoder->DoRewind(target_frame, false);
-
-    long long seek_frame  = m_decoder->GetFramesPlayed();
-    m_ffrewAdjust = target_frame - seek_frame;
-    float adjustRatio = float(m_ffrewAdjust) / m_ffrewSkip;
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("skip %1, adjust, %2, ratio %3")
-        .arg(m_ffrewSkip).arg(m_ffrewAdjust).arg(adjustRatio));
-
-    // If the needed adjustment is too large either way, adjust the
-    // scale factor up or down accordingly.
-    if (adjustRatio < -ffrewSkipThresh
-        && m_ffrewScale < (ffrewScaleHighest - 0.01F))
-        UpdateFFRewSkip(m_ffrewScale + ffrewScaleAdjust);
-    else if (adjustRatio  > ffrewSkipThresh
-             && m_ffrewScale > (ffrewScaleLowest + 0.01F))
-        UpdateFFRewSkip(m_ffrewScale - ffrewScaleAdjust);
-    return ret;
+    LOG(VB_PLAYBACK, LOG_DEBUG, "Setting decode one");
+    m_decodeOneFrame = true;
 }
 
 bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
@@ -1247,10 +1248,12 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
         return false;
     }
 
-    if (m_ffrewSkip == 1 || m_decodeOneFrame)
+    if (abs(m_ffrewSkip) > 1 && !m_decodeOneFrame)
+        DoFFRewSkip();
+
+    if (abs(m_ffrewSkip) > 0 || m_decodeOneFrame)
         ret = DoGetFrame(decodetype);
-    else if (m_ffrewSkip != 0)
-        ret = DecoderGetFrameFFREW();
+
     m_decoderChangeLock.unlock();
     return ret;
 }
@@ -1258,8 +1261,9 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
 /*! \brief Get one frame from the decoder.
  *
  * Certain decoders operate asynchronously and will return EAGAIN if a
- * video frame is not yet ready. We handle the retries here in MythPlayer
- * so that we can abort retries if we need to pause or stop the decoder.
+ * video frame is not yet ready. We handle the retries in the
+ * following DecoderLoop passes.  This lets us abort retries if we
+ * need to pause or stop the decoder.
  *
  * This is most relevant for MediaCodec decoding when using direct rendering
  * as there are a limited number of decoder output buffers that are retained by
@@ -1270,25 +1274,16 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
  */
 bool MythPlayer::DoGetFrame(DecodeType Type)
 {
-    bool ret = false;
-    QElapsedTimer timeout;
-    timeout.start();
-    bool retry = true;
-    // retry for a maximum of 5 seconds
-    while (retry && !m_pauseDecoder && !m_killDecoder && !timeout.hasExpired(5000))
+    bool retry = false;
+    bool ret = m_decoder->GetFrame(Type, retry);
+    if (retry)
     {
-        retry = false;
-        ret = m_decoder->GetFrame(Type, retry);
-        if (retry)
-        {
-            m_decoderChangeLock.unlock();
-            QThread::usleep(10000);
-            m_decoderChangeLock.lock();
-        }
-    }
-
-    if (timeout.hasExpired(5000))
+        // Delay here so we don't spin too fast.
+        m_decoderChangeLock.unlock();
+        std::this_thread::sleep_for(1ms);
+        m_decoderChangeLock.lock();
         return false;
+    }
     return ret;
 }
 

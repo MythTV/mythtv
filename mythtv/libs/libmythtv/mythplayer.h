@@ -336,8 +336,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     void  SetDecoder(DecoderBase *dec);
     /// Returns the stream decoder currently in use.
     const DecoderBase *GetDecoder(void) const { return m_decoder; }
-    virtual bool DecoderGetFrameFFREW(void);
-    virtual bool DecoderGetFrameREW(void);
+    virtual void DoFFRewSkip(void);
     bool         DecoderGetFrame(DecodeType decodetype, bool unsafe = false);
     bool         DoGetFrame(DecodeType DecodeType);
 
