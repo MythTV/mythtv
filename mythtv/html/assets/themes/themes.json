@@ -1,0 +1,208 @@
+{
+    "data": [
+        {
+            "Category": "Primeone - 2021",
+            "Name": "Arya Blue",
+            "CSS": "arya-blue.css",
+            "Image": "arya-blue.png"
+        },
+        {
+            "Category": "Primeone - 2021",
+            "Name": "Arya Green",
+            "CSS": "arya-green.css",
+            "Image": "arya-green.png"
+        },
+        {
+            "Category": "Primeone - 2021",
+            "Name": "Arya Orange",
+            "CSS": "arya-orange.css",
+            "Image": "arya-orange.png"
+        },
+        {
+            "Category": "Primeone - 2021",
+            "Name": "Arya Purple",
+            "CSS": "arya-purple.css",
+            "Image": "arya-purple.png"
+        },
+        {
+            "Category": "Bootstrap",
+            "Name": "Blue Light",
+            "CSS": "bootstrap4-light-blue.css",
+            "Image": "bootstrap4-light-blue.svg"
+        },
+        {
+            "Category": "Bootstrap",
+            "Name": "Purple Light",
+            "CSS": "bootstrap4-light-purple.css",
+            "Image": "bootstrap4-light-purple.svg"
+        },
+        {
+            "Category": "Bootstrap",
+            "Name": "Blue Dark",
+            "CSS": "bootstrap4-dark-blue.css",
+            "Image": "bootstrap4-dark-blue.svg"
+        },
+        {
+            "Category": "Bootstrap",
+            "Name": "Purple Dark",
+            "CSS": "bootstrap4-dark-purple.css",
+            "Image": "bootstrap4-dark-purple.svg"
+        },
+        {
+            "Category": "Material Design",
+            "Name": "Indigo Light",
+            "CSS": "md-light-indigo.css",
+            "Image": "md-light-indigo.svg"
+        },
+        {
+            "Category": "Material Design",
+            "Name": "Deep Purple Light",
+            "CSS": "md-light-deeppurple.css",
+            "Image": "md-light-deeppurple.svg"
+        },
+        {
+            "Category": "Material Design",
+            "Name": "Indigo Dark",
+            "CSS": "md-dark-indigo.css",
+            "Image": "md-dark-indigo.svg"
+        },
+        {
+            "Category": "Material Design",
+            "Name": "Deep Purple Dark",
+            "CSS": "md-dark-deeppurple.css",
+            "Image": "md-dark-deeppurple.svg"
+        },
+        {
+            "Category": "Fluent UI",
+            "Name": "Fluent Light",
+            "CSS": "fluent-light.css",
+            "Image": "fluent-light.png"
+        },
+        {
+            "Category": "Legacy",
+            "Name": "Luna Blue",
+            "CSS": "luna-blue.css",
+            "Image": "luna-blue.png"
+        },
+        {
+            "Category": "Legacy",
+            "Name": "Luna Green",
+            "CSS": "luna-green.css",
+            "Image": "luna-green.png"
+        },
+        {
+            "Category": "Legacy",
+            "Name": "Luna Amber",
+            "CSS": "luna-amber.css",
+            "Image": "luna-amber.png"
+        },
+        {
+            "Category": "Legacy",
+            "Name": "Luna Pink",
+            "CSS": "luna-pink.css",
+            "Image": "luna-pink.png"
+        },
+        {
+            "Category": "Material Design Compact",
+            "Name": "Indigo Light",
+            "CSS": "mdc-light-indigo.css",
+            "Image": "md-light-indigo.svg"
+        },
+        {
+            "Category": "Material Design Compact",
+            "Name": "Deep Purple Light",
+            "CSS": "mdc-light-deeppurple.css",
+            "Image": "md-light-deeppurple.svg"
+        },
+        {
+            "Category": "Material Design Compact",
+            "Name": "Indigo Dark",
+            "CSS": "mdc-dark-indigo.css",
+            "Image": "md-dark-indigo.svg"
+        },
+        {
+            "Category": "Material Design Compact",
+            "Name": "Deep Purple Dark",
+            "CSS": "mdc-dark-deeppurple.css",
+            "Image": "md-dark-deeppurple.svg"
+        },
+        {
+            "Category": "Legacy",
+            "Name": "Nova",
+            "CSS": "nova.css",
+            "Image": "nova.png"
+        },
+        {
+            "Category": "Legacy",
+            "Name": "Nova Accent",
+            "CSS": "nova-accent.css",
+            "Image": "nova-accent.png"
+        },
+        {
+            "Category": "Legacy",
+            "Name": "Nova Alt",
+            "CSS": "nova-alt.css",
+            "Image": "nova-alt.png"
+        },
+        {
+            "Category": "Legacy",
+            "Name": "Rhea",
+            "CSS": "rhea.css",
+            "Image": "rhea.png"
+        },
+        {
+            "Category": "Primeone - 2021",
+            "Name": "Saga Blue",
+            "CSS": "saga-blue.css",
+            "Image": "saga-blue.png"
+        },
+        {
+            "Category": "Primeone - 2021",
+            "Name": "Saga Green",
+            "CSS": "saga-green.css",
+            "Image": "saga-green.png"
+        },
+        {
+            "Category": "Primeone - 2021",
+            "Name": "Saga Orange",
+            "CSS": "saga-orange.css",
+            "Image": "saga-orange.png"
+        },
+        {
+            "Category": "Primeone - 2021",
+            "Name": "Saga Purple",
+            "CSS": "saga-purple.css",
+            "Image": "saga-purple.png"
+        },
+        {
+            "Category": "Tailwind Light",
+            "Name": "Tailwind Light",
+            "CSS": "tailwind-light.css",
+            "Image": "tailwind-light.png"
+        },
+        {
+            "Category": "Primeone - 2021",
+            "Name": "Vela Blue",
+            "CSS": "vela-blue.css",
+            "Image": "vela-blue.png"
+        },
+        {
+            "Category": "Primeone - 2021",
+            "Name": "Vela Green",
+            "CSS": "vela-green.css",
+            "Image": "vela-green.png"
+        },
+        {
+            "Category": "Primeone - 2021",
+            "Name": "Vela Orange",
+            "CSS": "vela-orange.css",
+            "Image": "vela-orange.png"
+        },
+        {
+            "Category": "Primeone - 2021",
+            "Name": "Vela Purple",
+            "CSS": "vela-purple.css",
+            "Image": "vela-purple.png"
+        }
+    ]
+}

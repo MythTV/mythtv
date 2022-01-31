@@ -51,7 +51,7 @@ MythHTTPServer::MythHTTPServer()
     // Add our default paths (mostly static js, css, images etc).
     // We need to pass individual directories to the threads, so inspect the
     // the paths we want for sub-directories
-    static const QStringList s_dirs = { "/3rdParty/", "/css/", "/images/", "/js/", "/misc/", "/apps/", "/xslt/" };
+    static const QStringList s_dirs = { "/assets/", "/3rdParty/", "/css/", "/images/", "/js/", "/misc/", "/apps/", "/xslt/" };
     m_config.m_filePaths.clear();
     QStringList dirs;
     for (const auto & dir : s_dirs)

@@ -1,9 +1,11 @@
 const PROXY_CONFIG = [
     {
         context: [
+            "/assets",
             "/3rdParty",
             "/images",
             "/Myth",
+            "/Guide",
             "/Status",
             "/Config",
         ],

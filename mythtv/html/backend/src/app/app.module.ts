@@ -24,6 +24,8 @@ import { ListboxModule } from 'primeng/listbox';
 import { DialogModule } from 'primeng/dialog';
 import { DataViewModule } from 'primeng/dataview';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { OverlayPanelModule } from 'primeng/overlaypanel'
+import { TableModule } from 'primeng/table';
 
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './layout/navbar/navbar.component';
@@ -99,7 +101,9 @@ import { TimebarComponent } from './guide/components/timebar/timebar.component';
     DialogModule,
     CardModule,
     DataViewModule,
-    ProgressSpinnerModule
+    ProgressSpinnerModule,
+    OverlayPanelModule,
+    TableModule
   ],
   providers: [],
   bootstrap: [AppComponent]

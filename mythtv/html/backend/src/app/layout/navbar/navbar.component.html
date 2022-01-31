@@ -72,18 +72,26 @@
                     </div>
 
                     <div class="pr-3">
-                        <a pripple=""
-                            class="p-ripple p-element cursor-pointer block lg:hidden text-300 hover:bg-gray-800">
-                            <i class="pi pi-ellipsis-v text-2xl"></i>
-                            <span class="p-ink"></span>
-                        </a>
-                        <ul
-                            class="toolbar list-none p-0 m-0 hidden lg:flex lg:align-items-center select-none lg:flex-row surface-section border-1 lg:border-none surface-border right-0 top-100 z-1 shadow-2 lg:shadow-none absolute lg:static">
+                        <ul class="toolbar list-none p-0 m-0 hidden lg:flex lg:align-items-center select-none lg:flex-row surface-section border-1 lg:border-none surface-border right-0 top-100 z-1 shadow-2 lg:shadow-none absolute lg:static">
+                            <li>
+                                <a pripple="" class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
+                                    <i class="pi pi-ellipsis-v mr-2 lg:mr-0 text-base lg:text-xl hidden"></i>
+                                    <span class="p-ink"></span>
+                                </a>
+                            </li>
                             <li>
                                 <a pripple="" tooltipPosition="bottom" pTooltip="Switch Server"
                                     class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
                                     <i class="pi pi-server mr-2 lg:mr-0 text-base lg:text-xl"></i>
                                     <span class="font-medium inline lg:hidden">Switch Server</span>
+                                    <span class="p-ink"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a pripple="" tooltipPosition="bottom" pTooltip="Switch Theme" (click)="themePanel.toggle($event)"
+                                    class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
+                                    <i class="pi pi-eye mr-2 lg:mr-0 text-base lg:text-xl"></i>
+                                    <span class="font-medium inline lg:hidden">Switch Theme</span>
                                     <span class="p-ink"></span>
                                 </a>
                             </li>
@@ -116,3 +124,23 @@
         </div>
     </div>
 </div>
+
+<p-overlayPanel #themePanel [showCloseIcon]="true" [style]="{width: '350px'}">
+    <ng-template pTemplate>
+        <p-table [value]="themes$" selectionMode="single" [paginator]="false" sortField="Name" sortMode="single" [scrollable]="true" scrollHeight="500px" rowGroupMode="subheader" groupRowsBy="Category" responsiveLayout="scroll">
+            <ng-template pTemplate="groupheader" let-theme>
+                <tr pRowGroupHeader>
+                    <td colspan="2">
+                        <span class="font-bold ml-2">{{theme.Category}}</span>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rowData let-theme>
+                <tr [pSelectableRow]="rowData" (click)="changeTheme(theme.CSS)">
+                    <td  style="max-width:80px"><img src="images/themes/{{theme.Image}}" [alt]="theme.image" class="theme-image" /></td>
+                    <td>{{theme.Name}}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </ng-template>
+</p-overlayPanel>
