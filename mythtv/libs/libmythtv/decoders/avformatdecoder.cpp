@@ -5240,8 +5240,8 @@ void AvFormatDecoder::ForceSetupAudioStream(void)
 inline bool AvFormatDecoder::DecoderWillDownmix(const AVCodecContext *ctx)
 {
     // Until ffmpeg properly implements dialnorm
-    // use Myth internal downmixer if machines has FPU/SSE
-    if (m_audio->CanDownmix() && AudioOutputUtil::has_hardware_fpu())
+    // use Myth internal downmixer if machine has SSE2
+    if (m_audio->CanDownmix() && AudioOutputUtil::has_optimized_SIMD())
         return false;
     if (!m_audio->CanDownmix())
         return true;
