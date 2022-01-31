@@ -22,7 +22,7 @@ extern "C" {
 
 #ifdef Q_PROCESSOR_X86
 // Check cpuid for SSE2 support on x86 / x86_64
-static inline bool sse_check()
+static inline bool sse2_check()
 {
 #ifdef Q_PROCESSOR_X86_64
     return true;
@@ -60,7 +60,7 @@ static inline bool sse_check()
 bool AudioOutputUtil::has_hardware_fpu()
 {
 #ifdef Q_PROCESSOR_X86
-    return sse_check();
+    return sse2_check();
 #else
     return false;
 #endif
@@ -125,7 +125,7 @@ void AudioOutputUtil::AdjustVolume(void *buf, int len, int volume,
         return;
 
 #ifdef Q_PROCESSOR_X86
-    if (sse_check() && samples >= 16)
+    if (sse2_check() && samples >= 16)
     {
         int loops = samples >> 4;
         i = loops << 4;
