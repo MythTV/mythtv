@@ -10,14 +10,16 @@ extern "C" {
 #include "libavfilter/buffersink.h"
 }
 
-#if ARCH_X86_64
+#include <QtGlobal>
+
+#ifdef Q_PROCESSOR_X86_64
 #   include "libavutil/x86/cpu.h"
 #   include <emmintrin.h>
 static const bool s_haveSIMD = true;
 #elif HAVE_INTRINSICS_NEON
-#   if ARCH_AARCH64
+#   if defined(__aarch64__) || defined(_M_ARM64) || defined(Q_PROCESSOR_ARM_64)
 #       include "libavutil/aarch64/cpu.h"
-#   elif ARCH_ARM
+#   elif defined(Q_PROCESSOR_ARM)
 #       include "libavutil/arm/cpu.h"
 #   endif
 #   include <arm_neon.h>
@@ -512,7 +514,7 @@ static inline void BlendC4x4(unsigned char *Src, int Width, int FirstRow, int La
     }
 }
 
-#if ARCH_X86_64 || HAVE_INTRINSICS_NEON
+#if defined(Q_PROCESSOR_X86_64) || HAVE_INTRINSICS_NEON
 // SIMD optimised version with 16x4 alignment
 static inline void BlendSIMD16x4(unsigned char *Src, int Width, int FirstRow, int LastRow, int Pitch,
                                  unsigned char *Dst, int DstPitch, bool Second)
@@ -545,7 +547,7 @@ static inline void BlendSIMD16x4(unsigned char *Src, int Width, int FirstRow, in
         }
         for (int col = 0; col < Width; col += 16)
         {
-#if ARCH_X86_64
+#if defined(Q_PROCESSOR_X86_64)
             __m128i mid = *reinterpret_cast<__m128i*>(&middle[col]);
             *reinterpret_cast<__m128i*>(&dest1[col]) =
                     _mm_avg_epu8(*reinterpret_cast<__m128i*>(&above[col]), mid);
@@ -600,7 +602,7 @@ static inline void BlendSIMD8x4(unsigned char *Src, int Width, int FirstRow, int
         }
         for (int col = 0; col < Width; col += 16)
         {
-#if ARCH_X86_64
+#if defined(Q_PROCESSOR_X86_64)
             __m128i mid = *reinterpret_cast<__m128i*>(&middle[col]);
             *reinterpret_cast<__m128i*>(&dest1[col]) =
                     _mm_avg_epu16(*reinterpret_cast<__m128i*>(&above[col]), mid);
@@ -655,7 +657,7 @@ void MythDeinterlacer::Blend(MythVideoFrame *Frame, FrameScanType Scan)
         bool width4  = (src->m_pitches[plane] % 4) == 0;
         // N.B. all frames allocated by MythTV should have 16 byte alignment
         // for all planes
-#if ARCH_X86_64 || HAVE_INTRINSICS_NEON
+#if defined(Q_PROCESSOR_X86_64) || HAVE_INTRINSICS_NEON
         bool width16 = (src->m_pitches[plane] % 16) == 0;
         // profiling SSE2 suggests it is usually 4x faster - as expected
         if (s_haveSIMD && height4 && width16)
