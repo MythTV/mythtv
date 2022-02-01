@@ -237,8 +237,13 @@
         </shape>
         <textarea name="title">
             <font>small</font>
-            <area>6,8,375,25</area>
+            <area>6,8,662,25</area>
             <align>left,top</align>
+        </textarea>
+        <textarea name="recordedtime">
+            <font>small</font>
+            <area>6,8,662,25</area>
+            <align>hcenter,top</align>
         </textarea>
         <textarea name="description">
             <font>small</font>
@@ -247,7 +252,7 @@
             <template>%DESCRIPTION% %VALUE%%UNITS%</template>
         </textarea>
         <clock name="clock">
-            <area>481,8,187,25</area>
+            <area>6,8,662,25</area>
             <font>small</font>
             <template>%TIME%</template>
             <align>right,top</align>
