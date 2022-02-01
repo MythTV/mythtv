@@ -705,7 +705,7 @@ static bool preBufferDebug = qEnvironmentVariableIsSet("PREBUFFERDEBUG");
 
 bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
 {
-    if (!m_videoOutput)
+    if (!m_videoOutput || !m_videoOutput->ValidVideoFrames())
         return false;
 
     if (!(min_buffers
