@@ -15,7 +15,8 @@ export class NavbarComponent implements OnInit {
     constructor(private themeService: ThemeService) {
         this.themeService.getThemes().then((themes: Theme[]) => {
             this.m_themes$ = themes;
-            this.m_selectedTheme = this.findThemeByName('Indigo Light');
+            this.m_selectedTheme = this.findThemeByName(localStorage.getItem('Theme') || 'Indigo Light');
+            this.themeService.switchTheme(this.m_selectedTheme.CSS);
         });
     }
 
@@ -35,5 +36,6 @@ export class NavbarComponent implements OnInit {
     changeTheme(theme: Theme) {
         this.m_selectedTheme = theme;
         this.themeService.switchTheme(theme.CSS);
+        localStorage.setItem('Theme', this.m_selectedTheme.Name);
     }
 }
