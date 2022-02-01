@@ -26,7 +26,7 @@ from ._version import __version__
 # an HTTP POST is potentially dangerous.                     #
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
 
-MYTHTV_VERSION_LIST = ('0.27', '0.28', '29', '30', '31', '32')
+MYTHTV_VERSION_LIST = ('0.27', '0.28', '29', '30', '31', '32', '33')
 
 
 class Send(object):
