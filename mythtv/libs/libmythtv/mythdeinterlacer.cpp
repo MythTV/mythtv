@@ -1,5 +1,4 @@
 // MythTV
-#include "mythconfig.h"
 #include "mythlogging.h"
 #include "mythavutil.h"
 #include "mythvideoprofile.h"
@@ -12,6 +11,12 @@ extern "C" {
 }
 
 #include <QtGlobal>
+
+#if defined(Q_PROCESSOR_ARM) && __has_include(<arm_neon.h>)
+#define HAVE_INTRINSICS_NEON 1
+#else
+#define HAVE_INTRINSICS_NEON 0
+#endif
 
 #ifdef Q_PROCESSOR_X86_64
 #   include <emmintrin.h>
