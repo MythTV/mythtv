@@ -9,17 +9,31 @@ import { ThemeService } from '../../services/theme.service';
 })
 export class NavbarComponent implements OnInit {
 
-    themes$!: Theme[];
-    selectedTheme!: Theme;
+    m_themes$!: Theme[];
+    m_selectedTheme!: Theme;
 
     constructor(private themeService: ThemeService) {
-        this.themeService.getThemes().then((themes: Theme[]) => this.themes$ = themes);
+        this.themeService.getThemes().then((themes: Theme[]) => {
+            this.m_themes$ = themes;
+            this.m_selectedTheme = this.findThemeByName('Indigo Light');
+        });
     }
 
     ngOnInit(): void {
     }
 
-    changeTheme(theme: string) {
-        this.themeService.switchTheme(theme);
+    findThemeByName(name: string) : Theme {
+        for (var x = 0; x < this.m_themes$.length; x++) {
+            if (this.m_themes$[x].Name === name)
+                return this.m_themes$[x];
+
+        }
+
+        return this.m_themes$[0];
+    }
+
+    changeTheme(theme: Theme) {
+        this.m_selectedTheme = theme;
+        this.themeService.switchTheme(theme.CSS);
     }
 }
