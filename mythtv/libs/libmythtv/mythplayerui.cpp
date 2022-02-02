@@ -507,6 +507,9 @@ void MythPlayerUI::RenderVideoFrame(MythVideoFrame *Frame, FrameScanType Scan, b
         m_videoOutput->PrepareFrame(Frame, Scan);
     PrepareVisualiser();
     m_videoOutput->RenderFrame(Frame, Scan);
+    if (m_renderOneFrame)
+        LOG(VB_PLAYBACK, LOG_DEBUG, QString("Clearing render one"));
+    m_renderOneFrame = false;
     RenderVisualiser();
     m_captionsOverlay.Draw(m_videoOutput->GetDisplayVisibleRect());
     m_osd.Draw();
@@ -572,6 +575,9 @@ void MythPlayerUI::DoDisplayVideoFrame(MythVideoFrame* Frame, std::chrono::micro
     if (Due < 0us)
     {
         m_videoOutput->SetFramesPlayed(static_cast<long long>(++m_framesPlayed));
+        if (m_renderOneFrame)
+            LOG(VB_PLAYBACK, LOG_DEBUG, QString("Clearing render one"));
+        m_renderOneFrame = false;
     }
     else if (!FlagIsSet(kVideoIsNull) && Frame)
     {
