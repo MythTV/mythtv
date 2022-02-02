@@ -361,6 +361,11 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
         paramsChanged = true;
     }
 
+    // Mediacodec/Surface has an issue rendering frames after seeks.
+    // Enable the FF/Rew work around when using it.
+    m_ffrewUseRenderOne =
+        m_decoder && codec_is_mediacodec(m_decoder->GetVideoCodecID());
+
     if (!paramsChanged)
         return;
 
@@ -604,7 +609,14 @@ void MythPlayer::ReleaseNextVideoFrame(MythVideoFrame *buffer,
     m_decodeOneFrame = false;
 
     if (m_videoOutput)
+    {
+        if (abs(m_ffrewSkip) > 1 && m_ffrewUseRenderOne)
+        {
+            LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "Setting render one");
+            m_renderOneFrame = true;
+        }
         m_videoOutput->ReleaseFrame(buffer);
+    }
 
     // FIXME need to handle this in the correct place in the main thread (DVD stills?)
     //if (m_allPaused)
@@ -636,7 +648,12 @@ void MythPlayer::DiscardVideoFrame(MythVideoFrame *buffer)
 void MythPlayer::DiscardVideoFrames(bool KeyFrame, bool Flushed)
 {
     if (m_videoOutput)
+    {
         m_videoOutput->DiscardFrames(KeyFrame, Flushed);
+        if (m_renderOneFrame)
+            LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "Clearing render one");
+        m_renderOneFrame = false;
+    }
 }
 
 bool MythPlayer::HasReachedEof(void) const
@@ -1156,15 +1173,13 @@ void MythPlayer::DoFFRewSkip(void)
     if (!m_decoder)
         return;
 
-    auto discard = false;
-
     if (m_ffrewSkip > 0)
     {
         long long delta = m_decoder->GetFramesRead() - m_framesPlayed;
         long long real_skip = CalcMaxFFTime(m_ffrewSkip - m_ffrewAdjust + delta) - delta;
         long long target_frame = m_decoder->GetFramesRead() + real_skip;
         if (real_skip >= 0)
-            m_decoder->DoFastForward(target_frame, discard);
+            m_decoder->DoFastForward(target_frame, m_ffrewUseRenderOne);
 
         long long seek_frame = m_decoder->GetFramesRead();
         m_ffrewAdjust = seek_frame - target_frame;
@@ -1188,7 +1203,7 @@ void MythPlayer::DoFFRewSkip(void)
         bool      toBegin      = -cur_frame > m_ffrewSkip + m_ffrewAdjust;
         long long real_skip    = (toBegin) ? -cur_frame : m_ffrewSkip + m_ffrewAdjust;
         long long target_frame = cur_frame + real_skip;
-        m_decoder->DoRewind(target_frame, discard);
+        m_decoder->DoRewind(target_frame, m_ffrewUseRenderOne);
 
         long long seek_frame  = m_decoder->GetFramesPlayed();
         m_ffrewAdjust = target_frame - seek_frame;
@@ -1248,10 +1263,10 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
         return false;
     }
 
-    if (abs(m_ffrewSkip) > 1 && !m_decodeOneFrame)
+    if (abs(m_ffrewSkip) > 1 && !m_decodeOneFrame && !m_renderOneFrame)
         DoFFRewSkip();
 
-    if (abs(m_ffrewSkip) > 0 || m_decodeOneFrame)
+    if ((abs(m_ffrewSkip) > 0 || m_decodeOneFrame) && !m_renderOneFrame)
         ret = DoGetFrame(decodetype);
 
     m_decoderChangeLock.unlock();
@@ -1330,6 +1345,7 @@ bool MythPlayer::UpdateFFRewSkip(float ffrewScale)
         m_frameInterval = microsecondsFromFloat((1000000.0 / m_videoFrameRate / static_cast<double>(temp_speed))
            / m_fpsMultiplier);
         m_ffrewSkip = static_cast<int>(m_playSpeed != 0.0F);
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "Clearing render one");
     }
     else
     {
