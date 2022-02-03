@@ -381,7 +381,10 @@ void MythPlayer::SetFrameRate(double fps)
 {
     m_videoFrameRate = fps;
     float temp_speed = (m_playSpeed == 0.0F) ? m_audio.GetStretchFactor() : m_playSpeed;
-    SetFrameInterval(kScan_Progressive, 1.0 / (m_videoFrameRate * static_cast<double>(temp_speed)));
+    if (abs(m_ffrewSkip) > 1)
+        UpdateFFRewSkip();
+    else
+        SetFrameInterval(kScan_Progressive, 1.0 / (m_videoFrameRate * static_cast<double>(temp_speed)));
 }
 
 void MythPlayer::SetFileLength(std::chrono::seconds total, int frames)
