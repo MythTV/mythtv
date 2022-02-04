@@ -438,12 +438,12 @@
     <message>
         <location filename="strings.h" line="64"/>
         <source>Sct Flurries/Wind</source>
-        <translation>Sct Flurries/Wind</translation>
+        <translation>Scattered Flurries/Wind</translation>
     </message>
     <message>
         <location filename="strings.h" line="65"/>
         <source>Sct Strong Storms</source>
-        <translation>Sct Strong Storms</translation>
+        <translation>Scattered Strong Storms</translation>
     </message>
     <message>
         <location filename="strings.h" line="66"/>
@@ -483,7 +483,7 @@
     <message>
         <location filename="strings.h" line="73"/>
         <source>Sct T-Storms/Wind</source>
-        <translation>Sct Thunderstorms/Wind</translation>
+        <translation>Scattered Thunderstorms/Wind</translation>
     </message>
     <message>
         <location filename="strings.h" line="74"/>
@@ -493,7 +493,7 @@
     <message>
         <location filename="strings.h" line="75"/>
         <source>Sct Snow Showers</source>
-        <translation>Sct Snow Showers</translation>
+        <translation>Scattered Snow Showers</translation>
     </message>
     <message>
         <location filename="strings.h" line="76"/>
@@ -931,7 +931,7 @@
     <message>
         <location filename="themestrings.h" line="98"/>
         <source>Wind(Dir)</source>
-        <translation>Wind(Dir)</translation>
+        <translation>Wind (Dir)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="99"/>
@@ -1310,12 +1310,12 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</tra
     <message>
         <location filename="themestrings.h" line="100"/>
         <source>Wind(Gust):</source>
-        <translation>Wind(Gust):</translation>
+        <translation>Wind (Gust):</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="101"/>
         <source>Wind(Gust): %1</source>
-        <translation>Wind(Gust): %1</translation>
+        <translation>Wind (Gust): %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="102"/>

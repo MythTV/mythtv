@@ -106,7 +106,7 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</translation>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="116"/>
         <source>This is the default text size that will be used. Valid values for the Internal browser are from 0.3 to 5.0 with 1.0 being normal size less than 1 is smaller and greater than 1 is larger than normal size.</source>
-        <translation>This is the default text size that will be used. Valid values for the Internal browser are from 0.3 to 5.0 with 1.0 being normal size less than 1 is smaller and greater than 1 is larger than normal size.</translation>
+        <translation>This is the default text size that will be used. Valid values for the Internal browser are in the range 0.3 - 5.0, with a value of 1.0 being normal size.</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="123"/>
