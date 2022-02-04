@@ -26,7 +26,7 @@
 <context>
     <name>BookmarkManager</name>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="154"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="153"/>
         <source>No bookmarks defined.
 
 Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
@@ -35,62 +35,62 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 Pro přidání nové záložky použijte v menu volbu &quot;Přidat záložku&quot;</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="263"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="255"/>
         <source>Actions</source>
         <translation>Činnosti</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="278"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="270"/>
         <source>Set Homepage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="279"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="271"/>
         <source>Add Bookmark</source>
         <translation>Přidat záložku</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="283"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="275"/>
         <source>Edit Bookmark</source>
         <translation>Upravit záložku</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="284"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="276"/>
         <source>Delete Bookmark</source>
         <translation>Smazat záložku</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="285"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="277"/>
         <source>Show Bookmark</source>
         <translation>Zobrazit záložku</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="290"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="282"/>
         <source>Delete Marked</source>
         <translation>Odstranit označené</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="291"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="283"/>
         <source>Show Marked</source>
         <translation>Zobrazit označené</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="292"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="284"/>
         <source>Clear Marked</source>
         <translation>Vymazat označené</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="295"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="287"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="500"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="494"/>
         <source>Are you sure you want to delete the selected bookmark?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="544"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="538"/>
         <source>Are you sure you want to delete the marked bookmarks?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -110,7 +110,7 @@ Pro přidání nové záložky použijte v menu volbu &quot;Přidat záložku&qu
 <context>
     <name>BrowserConfig</name>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="36"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="35"/>
         <source>MythBrowser Settings</source>
         <translation>Nastavení MythBrowser</translation>
     </message>
@@ -119,28 +119,28 @@ Pro přidání nové záložky použijte v menu volbu &quot;Přidat záložku&qu
         <translation type="obsolete">Zrušit</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="111"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="110"/>
         <source>This is the command that will be used to show the web browser. Use &apos;Internal&apos; to use the built in web browser&apos;. %ZOOM% and %URL% will be replaced with the zoom level and URL list.</source>
         <translation>Tento příkaz bude použit pro zobrazení webového prohlížeče. Při volbě &quot;Interní&quot; se použije vestavěný webový prohlížeč. Parametry %ZOOM% a %URL% budou nahrazeny úrovní zvětšení a URL seznamem.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="117"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="116"/>
         <source>This is the default text size that will be used. Valid values for the Internal browser are from 0.3 to 5.0 with 1.0 being normal size less than 1 is smaller and greater than 1 is larger than normal size.</source>
         <translatorcomment>?</translatorcomment>
         <translation>Toto je výchozí velikost textu, která bude použita. Platné hodnoty pro interní prohlížeč jsou od 0.3 do 5.0. Hodnota 1.0 bude pro normální velikost. Méně než 1 znamená menší a více než 1 znamená větší než normální velikost.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="124"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="123"/>
         <source>If checked this will enable browser plugins if the &apos;Internal&apos; browser is being used.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="129"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="128"/>
         <source>Exit without saving settings</source>
         <translation>Ukončit bez uložení nastavení</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="133"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="132"/>
         <source>Save settings and Exit</source>
         <translation>Uložit nastavení a ukončit</translation>
     </message>
@@ -148,53 +148,53 @@ Pro přidání nové záložky použijte v menu volbu &quot;Přidat záložku&qu
 <context>
     <name>MythBrowser</name>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="142"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="354"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="139"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="351"/>
         <source>Enter URL</source>
         <translation>Zadat URL</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="274"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="271"/>
         <source>Loading...</source>
         <translation>Nahrávám...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="343"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
         <source>Actions</source>
         <translation>Činnosti</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="354"/>
         <source>Back</source>
         <translation>Zpět</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="360"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
         <source>Forward</source>
         <translation>Vpřed</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="362"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="359"/>
         <source>Zoom In</source>
         <translation>Přiblížit</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="363"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="360"/>
         <source>Zoom Out</source>
         <translation>Oddálit</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="361"/>
         <source>New Tab</source>
         <translation>Nový panel</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="367"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
         <source>Delete Tab</source>
         <translation>Smazat panel</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="369"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="366"/>
         <source>Add Bookmark</source>
         <translation>Přidat záložku</translation>
     </message>
@@ -206,27 +206,27 @@ Pro přidání nové záložky použijte v menu volbu &quot;Přidat záložku&qu
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="107"/>
+        <location filename="../mythbrowser/main.cpp" line="109"/>
         <source>Move to next browser tab</source>
         <translation>Přesunout na následující panel prohlížeče</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="109"/>
+        <location filename="../mythbrowser/main.cpp" line="111"/>
         <source>Move to previous browser tab</source>
         <translation>Přesunout na předchozí panel prohlížeče</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="112"/>
+        <location filename="../mythbrowser/main.cpp" line="114"/>
         <source>Show the bookmark manager</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="114"/>
+        <location filename="../mythbrowser/main.cpp" line="116"/>
         <source>Show the webbrowser homepage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="117"/>
+        <location filename="../mythbrowser/main.cpp" line="119"/>
         <source>Internal Web Browser</source>
         <translation>Interní webový prohlížeč</translation>
     </message>
@@ -549,7 +549,7 @@ Až budete hotovi, vyberte OK nebo ZRUŠIT pro pokračování.</translation>
 <context>
     <name>WebPage</name>
     <message>
-        <location filename="../mythbrowser/webpage.cpp" line="124"/>
+        <location filename="../mythbrowser/webpage.cpp" line="122"/>
         <source>Loading...</source>
         <translation>Nahrávám...</translation>
     </message>
