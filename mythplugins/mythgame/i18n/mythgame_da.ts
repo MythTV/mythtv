@@ -67,7 +67,7 @@
 <context>
     <name>GameGeneralSettings</name>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="181"/>
+        <location filename="../mythgame/gamesettings.cpp" line="170"/>
         <source>MythGame Settings -- General</source>
         <translation type="unfinished">MythGame opsætning -- Generelt</translation>
     </message>
@@ -75,65 +75,65 @@
 <context>
     <name>GameHandler</name>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="155"/>
-        <location filename="../mythgame/gamehandler.cpp" line="430"/>
+        <location filename="../mythgame/gamehandler.cpp" line="159"/>
+        <location filename="../mythgame/gamehandler.cpp" line="428"/>
         <source>19xx</source>
         <comment>Default game year</comment>
         <translation>19xx</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="156"/>
-        <location filename="../mythgame/gamehandler.cpp" line="428"/>
+        <location filename="../mythgame/gamehandler.cpp" line="160"/>
+        <location filename="../mythgame/gamehandler.cpp" line="426"/>
         <source>Unknown</source>
         <comment>Unknown country</comment>
         <translation>Ukendt</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="157"/>
-        <location filename="../mythgame/gamehandler.cpp" line="431"/>
-        <location filename="../mythgame/gamehandler.cpp" line="439"/>
+        <location filename="../mythgame/gamehandler.cpp" line="161"/>
+        <location filename="../mythgame/gamehandler.cpp" line="429"/>
+        <location filename="../mythgame/gamehandler.cpp" line="437"/>
         <source>Unknown</source>
         <comment>Unknown game name</comment>
         <translation>Ukendt</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="158"/>
-        <location filename="../mythgame/gamehandler.cpp" line="186"/>
+        <location filename="../mythgame/gamehandler.cpp" line="162"/>
+        <location filename="../mythgame/gamehandler.cpp" line="190"/>
         <source>Unknown</source>
         <comment>Unknown genre</comment>
         <translation>Ukendt</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="159"/>
-        <location filename="../mythgame/gamehandler.cpp" line="432"/>
+        <location filename="../mythgame/gamehandler.cpp" line="163"/>
+        <location filename="../mythgame/gamehandler.cpp" line="430"/>
         <source>Unknown</source>
         <comment>Unknown plot</comment>
         <translation>Ukendt</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="160"/>
-        <location filename="../mythgame/gamehandler.cpp" line="433"/>
+        <location filename="../mythgame/gamehandler.cpp" line="164"/>
+        <location filename="../mythgame/gamehandler.cpp" line="431"/>
         <source>Unknown</source>
         <comment>Unknown publisher</comment>
         <translation>Ukendt</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="161"/>
-        <location filename="../mythgame/gamehandler.cpp" line="434"/>
+        <location filename="../mythgame/gamehandler.cpp" line="165"/>
+        <location filename="../mythgame/gamehandler.cpp" line="432"/>
         <source>0</source>
         <comment>Default game version</comment>
         <translation>0</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="187"/>
-        <location filename="../mythgame/gamehandler.cpp" line="427"/>
+        <location filename="../mythgame/gamehandler.cpp" line="191"/>
+        <location filename="../mythgame/gamehandler.cpp" line="425"/>
         <source>Unknown %1</source>
         <comment>Unknown genre</comment>
         <extracomment>%1 is the game type, when we don&apos;t know the genre we use the * game type</extracomment>
         <translation>Ukendt %1</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="228"/>
+        <location filename="../mythgame/gamehandler.cpp" line="232"/>
         <source>%1 appears to be missing.
 Remove it from the database?</source>
         <extracomment>%1 is the file name</extracomment>
@@ -141,47 +141,47 @@ Remove it from the database?</source>
 Fjern den fra databasen?</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="236"/>
-        <location filename="../mythgame/gamehandler.cpp" line="623"/>
+        <location filename="../mythgame/gamehandler.cpp" line="240"/>
+        <location filename="../mythgame/gamehandler.cpp" line="617"/>
         <source>No</source>
         <translation>Nej</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="237"/>
+        <location filename="../mythgame/gamehandler.cpp" line="241"/>
         <source>No to all</source>
         <translation>Nej til alle</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="238"/>
-        <location filename="../mythgame/gamehandler.cpp" line="624"/>
+        <location filename="../mythgame/gamehandler.cpp" line="242"/>
+        <location filename="../mythgame/gamehandler.cpp" line="618"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="239"/>
+        <location filename="../mythgame/gamehandler.cpp" line="243"/>
         <source>Yes to all</source>
         <translation>Ja til alle</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="384"/>
+        <location filename="../mythgame/gamehandler.cpp" line="387"/>
         <source>Updating %1 (%2) ROM database</source>
         <extracomment>%1 is the system name, %2 is the game type</extracomment>
         <translation>Opdaterer %1 (%2) ROM database</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="526"/>
+        <location filename="../mythgame/gamehandler.cpp" line="523"/>
         <source>Verifying %1 files...</source>
         <extracomment>%1 is the system name</extracomment>
         <translation>Verificerer %1 filer...</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="617"/>
+        <location filename="../mythgame/gamehandler.cpp" line="611"/>
         <source>This will clear all game metadata from the database. Are you sure you want to do this?</source>
         <translation>Dette vil slette alle spilmetadata fra databasen. Er du sikker på at du vil gøre dette?</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="713"/>
-        <location filename="../mythgame/gamehandler.cpp" line="741"/>
+        <location filename="../mythgame/gamehandler.cpp" line="699"/>
+        <location filename="../mythgame/gamehandler.cpp" line="727"/>
         <source>Scanning for %1 games...</source>
         <extracomment>%1 is the system name</extracomment>
         <translation>Scanner efter %1 spil...</translation>
@@ -190,24 +190,24 @@ Fjern den fra databasen?</translation>
 <context>
     <name>GamePlayersList</name>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="359"/>
+        <location filename="../mythgame/gamesettings.cpp" line="348"/>
         <source>Game Players</source>
         <translation type="unfinished">Spillesystemer</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="366"/>
+        <location filename="../mythgame/gamesettings.cpp" line="355"/>
         <source>(New Game Player)</source>
         <translation type="unfinished">(Nyt spillesystem)</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="372"/>
+        <location filename="../mythgame/gamesettings.cpp" line="361"/>
         <source>%1 (%2)</source>
         <comment>Game player/emulator display</comment>
         <extracomment>%1 is the player/emulator name, %2 is the type of player/emulator</extracomment>
         <translation type="unfinished">%1 (%2)</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="404"/>
+        <location filename="../mythgame/gamesettings.cpp" line="393"/>
         <source>Player Name</source>
         <translation type="unfinished">System navn</translation>
     </message>
@@ -215,17 +215,17 @@ Fjern den fra databasen?</translation>
 <context>
     <name>GameScanner</name>
     <message>
-        <location filename="../mythgame/gamescan.cpp" line="64"/>
+        <location filename="../mythgame/gamescan.cpp" line="66"/>
         <source>Verifying game files...</source>
         <translation>Verificerer spil-filer...</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamescan.cpp" line="105"/>
+        <location filename="../mythgame/gamescan.cpp" line="106"/>
         <source>Updating game database...</source>
         <translation>Opdaterer spil-database...</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamescan.cpp" line="138"/>
+        <location filename="../mythgame/gamescan.cpp" line="139"/>
         <source>Searching for games...</source>
         <translation>Søger efter spil...</translation>
     </message>
@@ -317,7 +317,7 @@ Fjern den fra databasen?</translation>
         <translation>Kontroller logs</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="922"/>
+        <location filename="../mythgame/gameui.cpp" line="925"/>
         <source>Fetching details for %1</source>
         <extracomment>%1 is the game name</extracomment>
         <translation>Henter detaljer for %1</translation>
