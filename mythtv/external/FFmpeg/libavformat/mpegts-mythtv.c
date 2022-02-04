@@ -239,67 +239,105 @@ struct MpegTSFilter {
     int pid;
     int es_id;
     int last_cc; /* last cc code (-1 if first packet) */
+    int64_t last_pcr;
+    int discard;
     enum MpegTSFilterType type;
     /** if set, chop off PMT at the end of the TS packet, regardless of the
      *  data length given in the packet.  This is for use by BBC iPlayer IPTV
      *  recordings which seem to only want to send the first packet of the PMT
      *  but give a length that requires 3 packets.  Without this, those
      *  recordings are unplayable */
-    int pmt_chop_at_ts;
+    int pmt_chop_at_ts; // MythTV
     union {
         MpegTSPESFilter pes_filter;
         MpegTSSectionFilter section_filter;
     } u;
 };
 
-#define MAX_PIDS_PER_PROGRAM 64
+struct Stream {
+    int idx;
+    int stream_identifier;
+};
+
+#define MAX_STREAMS_PER_PROGRAM 128
+#define MAX_PIDS_PER_PROGRAM (MAX_STREAMS_PER_PROGRAM + 2)
 struct Program {
-    unsigned int id; //program id/service id
-    unsigned int pid; // PMT PID
+    unsigned int id; // program id/service id
+    unsigned int pid; // PMT PID (not in upstream)
     unsigned int nb_pids;
     unsigned int pids[MAX_PIDS_PER_PROGRAM];
+    unsigned int nb_streams;
+    struct Stream streams[MAX_STREAMS_PER_PROGRAM];
+
+    /** have we found pmt for this program */
+    int pmt_found;
 };
 
 struct MpegTSContext {
     const AVClass *class;
     /* user data */
     AVFormatContext *stream;
-    /** raw packet size, including FEC if present            */
+    /** raw packet size, including FEC if present */
     int raw_packet_size;
 
-    int pos47;
+    int64_t pos47_full;
+    int pos47; // not in upstream (will be replaced by pos47_full)
 
-    /** if true, all pids are analyzed to find streams       */
+    /** if true, all pids are analyzed to find streams */
     int auto_guess;
 
-    /** compute exact PCR for each transport stream packet   */
+    /** compute exact PCR for each transport stream packet */
     int mpeg2ts_compute_pcr;
 
-    int64_t cur_pcr;    /**< used to estimate the exact PCR  */
-    int pcr_incr;       /**< used to estimate the exact PCR  */
+    /** fix dvb teletext pts                                 */
+    int fix_teletext_pts;
 
+    int64_t cur_pcr;    /**< used to estimate the exact PCR */
+    int64_t pcr_incr;   /**< used to estimate the exact PCR */
+
+    // MythTV only
     /** if set, stop_parse is set when PAT/PMT is found      */
     int scanning;
-    /* data needed to handle file based ts */
-    /** stop parsing loop                                    */
-    int stop_parse;
     /** set to PMT_NOT_IN_PAT in pat_cb when scanning is true
      *  and the MPEG program number "req_sid" is not found in PAT;
      *  set to PMT_FOUND when a PMT with a the "req_sid" program
      *  number is found. */
     int pmt_scan_state;
-    /** packet containing Audio/Video data                   */
+    // end MythTV only
+
+    /* data needed to handle file based ts */
+    /** stop parsing loop */
+    int stop_parse;
+    /** packet containing Audio/Video data */
     AVPacket *pkt;
-    /** to detect seek                                       */
+    /** to detect seek */
     int64_t last_pos;
+
+    int skip_changes;
+    int skip_clear;
+    int skip_unknown_pmt;
+
+    int scan_all_pmts;
+
+    int resync_size;
+    int merge_pmt_versions;
 
     /******************************************/
     /* private mpegts data */
     /* scan context */
-    /** structure to keep track of Program->pids mapping     */
+    /** structure to keep track of Program->pids mapping */
     unsigned int nb_prg;
     struct Program *prg;
 
+    int8_t crc_validity[NB_PID_MAX];
+    /** filters for various streams specified by PMT + for the PAT and PMT */
+    MpegTSFilter *pids[NB_PID_MAX];
+    int current_pid;
+
+    AVStream *epg_stream;
+    AVBufferPool* pools[32];
+
+    // MythTV only
     /** filter for the PAT                                   */
     MpegTSFilter *pat_filter;
     /** filter for the PMT for the MPEG program number specified by req_sid */
@@ -307,13 +345,11 @@ struct MpegTSContext {
     /** MPEG program number of stream we want to decode      */
     int req_sid;
 
-    /** filters for various streams specified by PMT + for the PAT and PMT */
-    MpegTSFilter *pids[NB_PID_MAX];
-
     /** number of streams in the last PMT seen */
     int pid_cnt;
     /** list of streams in the last PMT seen */
     int pmt_pids[PMT_PIDS_MAX];
+    // end MythTV only
 };
 
 static const AVOption options[] = {
@@ -3029,7 +3065,7 @@ static int mpegts_read_header(AVFormatContext *s)
         s->bit_rate = (TS_PACKET_SIZE * 8) * 27e6 / ts->pcr_incr;
         st->codecpar->bit_rate = s->bit_rate;
         st->start_time = ts->cur_pcr;
-        av_dlog(ts->stream, "start=%0.3f pcr=%0.3f incr=%d\n",
+        av_dlog(ts->stream, "start=%0.3f pcr=%0.3f incr=%"PRId64"\n",
                 st->start_time / 1000000.0, pcrs[0] / 27e6, ts->pcr_incr);
     }
 
