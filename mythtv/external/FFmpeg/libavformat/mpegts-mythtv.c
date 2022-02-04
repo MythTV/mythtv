@@ -44,6 +44,7 @@
 #include <iconv.h>
 #endif
 
+// MythTV only -----------------------------------------------------------------
 /* from APIchanges:
 2011-10-19 - d049257 / 569129a - lavf 53.17.0 / 53.10.0
   Add avformat_new_stream(). Deprecate av_new_stream().
@@ -181,39 +182,55 @@ static void av_mpegts_remove_stream(AVFormatContext *s, int id) {
 /** maximum number of streams we expect to be described in a PMT */
 #define PMT_PIDS_MAX 256
 
+// end MythTV only -------------------------------------------------------------
 
-/* maximum size in which we look for synchronisation if
-   synchronisation is lost */
+/* maximum size in which we look for synchronization if
+ * synchronization is lost */
 #define MAX_RESYNC_SIZE 65536
 
-#define MAX_PES_PAYLOAD 200*1024
+#define MAX_PES_PAYLOAD 200 * 1024
 
 #define MAX_MP4_DESCR_COUNT 16
+
+#define MOD_UNLIKELY(modulus, dividend, divisor, prev_dividend)                \
+    do {                                                                       \
+        if ((prev_dividend) == 0 || (dividend) - (prev_dividend) != (divisor)) \
+            (modulus) = (dividend) % (divisor);                                \
+        (prev_dividend) = (dividend);                                          \
+    } while (0)
+
+#define PROBE_PACKET_MAX_BUF 8192
+#define PROBE_PACKET_MARGIN 5
 
 enum MpegTSFilterType {
     MPEGTS_PES,
     MPEGTS_SECTION,
+    MPEGTS_PCR,
 };
 
 typedef struct MpegTSFilter MpegTSFilter;
 
-typedef int PESCallback(MpegTSFilter *f, const uint8_t *buf, int len, int is_start, int64_t pos);
+typedef int PESCallback (MpegTSFilter *f, const uint8_t *buf, int len,
+                         int is_start, int64_t pos);
 
 typedef struct MpegTSPESFilter {
     PESCallback *pes_cb;
     void *opaque;
 } MpegTSPESFilter;
 
-typedef void SectionCallback(MpegTSFilter *f, const uint8_t *buf, int len);
+typedef void SectionCallback (MpegTSFilter *f, const uint8_t *buf, int len);
 
-typedef void SetServiceCallback(void *opaque, int ret);
+typedef void SetServiceCallback (void *opaque, int ret);
 
 typedef struct MpegTSSectionFilter {
     int section_index;
     int section_h_size;
+    int last_ver;
+    unsigned crc;
+    unsigned last_crc;
     uint8_t *section_buf;
-    unsigned int check_crc:1;
-    unsigned int end_of_section_reached:1;
+    unsigned int check_crc : 1;
+    unsigned int end_of_section_reached : 1;
     SectionCallback *section_cb;
     void *opaque;
 } MpegTSSectionFilter;
