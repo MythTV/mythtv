@@ -1,9 +1,9 @@
 /*
- * MPEG2 transport stream (aka DVB) demuxer
+ * MPEG-2 transport stream (aka DVB) demuxer
  * Copyright (c) 2002-2003 Fabrice Bellard
  * Reworked for use with MythTV
  *
- * This file is part of MythTV.
+ * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,23 +20,29 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/buffer.h"
+#include "libavutil/common.h"
 #include "libavutil/crc.h"
+#include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/log.h"
 #include "libavutil/dict.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/opt.h"
 #include "libavutil/avassert.h"
+#include "libavutil/dovi_meta.h"
 #include "libavcodec/bytestream.h"
-#include "libavcodec/avcodec.h"
 #include "libavcodec/get_bits.h"
+#include "libavcodec/opus.h"
 #include "avformat.h"
 #include "mpegts-mythtv.h"
 #include "internal.h"
 #include "avio_internal.h"
 #include "mpeg.h"
 #include "isom.h"
-#include "internal.h"
+#if CONFIG_ICONV
+#include <iconv.h>
+#endif
 
 /* from APIchanges:
 2011-10-19 - d049257 / 569129a - lavf 53.17.0 / 53.10.0
