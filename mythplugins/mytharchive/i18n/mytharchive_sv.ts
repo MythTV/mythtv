@@ -4,7 +4,7 @@
 <context>
     <name>(ArchiveUtils)</name>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="77"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="74"/>
         <source>Cannot find the MythArchive work directory.
 Have you set the correct path in the settings?</source>
         <translation>Kan inte hitta arbetskatalog för MythArchive.
@@ -14,19 +14,19 @@ Har du ställt in rätt sökväg i inställningarna?</translation>
 <context>
     <name>(MythArchiveMain)</name>
     <message>
-        <location filename="../mytharchive/main.cpp" line="94"/>
+        <location filename="../mytharchive/main.cpp" line="92"/>
         <source>Found a lock file but the owning process isn&apos;t running!
 Removing stale lock file.</source>
         <translation>Hittade en låsfil, men processen som äger den körs inte!
 Tar bort föråldrad låsfil.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="215"/>
+        <location filename="../mytharchive/main.cpp" line="203"/>
         <source>Last run did not create a playable DVD.</source>
         <translation>Senaste körningen skapade inte en spelbar DVD.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="222"/>
+        <location filename="../mytharchive/main.cpp" line="210"/>
         <source>Last run failed to create a DVD.</source>
         <translation>Senaste körningen misslyckades att skapa en DVD.</translation>
     </message>
@@ -393,36 +393,36 @@ Tar bort föråldrad låsfil.</translation>
 <context>
     <name>BurnMenu</name>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1095"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1093"/>
         <source>Cannot burn a DVD.
 The last run failed to create a DVD.</source>
         <translation>Kan inte bränna en DVD.
 Den senaste körningen misslyckades skapa en DVD.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1101"/>
-        <location filename="../mytharchive/mythburn.cpp" line="1113"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1099"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1111"/>
         <source>Burn DVD</source>
         <translation>Bränn DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1102"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1100"/>
         <source>
 Place a blank DVD in the drive and select an option below.</source>
         <translation>Lägg en tom DVD i brännaren och välj ett alternativ nedan.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1114"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1112"/>
         <source>Burn DVD Rewritable</source>
         <translation>Bränn återskrivbar DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1115"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1113"/>
         <source>Burn DVD Rewritable (Force Erase)</source>
         <translation>Bränn återskrivbar DVD (tvinga radering)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1170"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1167"/>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
         <translation>Det var inte möjligt att köra &apos;mytharchivehelper&apos; för att bränna DVD:n.</translation>
     </message>
@@ -497,27 +497,27 @@ Place a blank DVD in the drive and select an option below.</source>
 <context>
     <name>ExportNative</name>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="199"/>
+        <location filename="../mytharchive/exportnative.cpp" line="197"/>
         <source>You need to add at least one item to archive!</source>
         <translation>Du måste lägga till minst en post att arkivera!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="351"/>
+        <location filename="../mytharchive/exportnative.cpp" line="349"/>
         <source>Remove Item</source>
         <translation>Ta bort post</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="443"/>
+        <location filename="../mytharchive/exportnative.cpp" line="441"/>
         <source>It was not possible to create the DVD. An error occured when running the scripts</source>
         <translation>Det var inte möjligt att skapa DVD:n. Ett fel uppstod när skripten kördes</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="479"/>
+        <location filename="../mytharchive/exportnative.cpp" line="477"/>
         <source>You don&apos;t have any videos!</source>
         <translation>Du har inga videor!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="344"/>
+        <location filename="../mytharchive/exportnative.cpp" line="342"/>
         <source>Menu</source>
         <translation>Meny</translation>
     </message>
@@ -525,22 +525,22 @@ Place a blank DVD in the drive and select an option below.</source>
 <context>
     <name>FileSelector</name>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="296"/>
+        <location filename="../mytharchive/fileselector.cpp" line="283"/>
         <source>The selected item is not a directory!</source>
         <translation>Vald post är inte en katalog!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="60"/>
+        <location filename="../mytharchive/fileselector.cpp" line="64"/>
         <source>Find File</source>
         <translation>Sök efter fil</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="63"/>
+        <location filename="../mytharchive/fileselector.cpp" line="67"/>
         <source>Find Directory</source>
         <translation>Sök efter katalog</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="66"/>
+        <location filename="../mytharchive/fileselector.cpp" line="70"/>
         <source>Find Files</source>
         <translation>Sök efter filer</translation>
     </message>
@@ -581,39 +581,39 @@ Place a blank DVD in the drive and select an option below.</source>
 <context>
     <name>LogViewer</name>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="348"/>
+        <location filename="../mytharchive/logviewer.cpp" line="349"/>
         <source>Show Progress Log</source>
         <translation>Visa förloppslogg</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="349"/>
+        <location filename="../mytharchive/logviewer.cpp" line="350"/>
         <source>Show Full Log</source>
         <translation>Visa hela loggen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="344"/>
+        <location filename="../mytharchive/logviewer.cpp" line="345"/>
         <source>Don&apos;t Auto Update</source>
         <translation>Ingen automatisk uppdatering</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="75"/>
+        <location filename="../mytharchive/logviewer.cpp" line="76"/>
         <source>Cannot find any logs to show!</source>
         <translation>Kan inte hitta några loggar att visa!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="197"/>
+        <location filename="../mytharchive/logviewer.cpp" line="198"/>
         <source>Background creation has been asked to stop.
 This may take a few minutes.</source>
         <translation>Bakgrundgenerering har skickats en begäran om att stoppa.
 Detta kan ta ett par minuter.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="346"/>
+        <location filename="../mytharchive/logviewer.cpp" line="347"/>
         <source>Auto Update</source>
         <translation>Automatisk uppdatering</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="336"/>
+        <location filename="../mytharchive/logviewer.cpp" line="337"/>
         <source>Menu</source>
         <translation>Meny</translation>
     </message>
@@ -621,80 +621,80 @@ Detta kan ta ett par minuter.</translation>
 <context>
     <name>MythBurn</name>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="332"/>
-        <location filename="../mytharchive/mythburn.cpp" line="452"/>
+        <location filename="../mytharchive/mythburn.cpp" line="330"/>
+        <location filename="../mytharchive/mythburn.cpp" line="450"/>
         <source>No Cut List</source>
         <translation>Ingen klipplista</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="343"/>
+        <location filename="../mytharchive/mythburn.cpp" line="341"/>
         <source>You need to add at least one item to archive!</source>
         <translation>Du måste lägga till minst en post att arkivera!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="389"/>
+        <location filename="../mytharchive/mythburn.cpp" line="387"/>
         <source>Retrieving File Information. Please Wait...</source>
         <translation>Hämtar information om filen. Vänta...</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="455"/>
+        <location filename="../mytharchive/mythburn.cpp" line="453"/>
         <source>Encoder: </source>
         <translation>Kodare: </translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="321"/>
-        <location filename="../mytharchive/mythburn.cpp" line="441"/>
+        <location filename="../mytharchive/mythburn.cpp" line="319"/>
+        <location filename="../mytharchive/mythburn.cpp" line="439"/>
         <source>Using Cut List</source>
         <translation>Använder klipplista</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="326"/>
-        <location filename="../mytharchive/mythburn.cpp" line="446"/>
+        <location filename="../mytharchive/mythburn.cpp" line="324"/>
+        <location filename="../mytharchive/mythburn.cpp" line="444"/>
         <source>Not Using Cut List</source>
         <translation>Använder inte klipplista</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="778"/>
+        <location filename="../mytharchive/mythburn.cpp" line="776"/>
         <source>Don&apos;t Use Cut List</source>
         <translation>Använd inte klipplista</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="783"/>
+        <location filename="../mytharchive/mythburn.cpp" line="781"/>
         <source>Use Cut List</source>
         <translation>Använd klipplista</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="788"/>
+        <location filename="../mytharchive/mythburn.cpp" line="786"/>
         <source>Remove Item</source>
         <translation>Ta bort post</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="789"/>
+        <location filename="../mytharchive/mythburn.cpp" line="787"/>
         <source>Edit Details</source>
         <translation>Redigera information</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="790"/>
+        <location filename="../mytharchive/mythburn.cpp" line="788"/>
         <source>Change Encoding Profile</source>
         <translation>Ändra kodningsprofil</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="791"/>
+        <location filename="../mytharchive/mythburn.cpp" line="789"/>
         <source>Edit Thumbnails</source>
         <translation>Redigera miniatyrbilder</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="926"/>
+        <location filename="../mytharchive/mythburn.cpp" line="924"/>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
         <translation>Det var inte möjligt att skapa DVD. Ett fel uppstod när skripten kördes</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="968"/>
+        <location filename="../mytharchive/mythburn.cpp" line="966"/>
         <source>You don&apos;t have any videos!</source>
         <translation>Du har inga videor!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="767"/>
+        <location filename="../mytharchive/mythburn.cpp" line="765"/>
         <source>Menu</source>
         <translation>Meny</translation>
     </message>
@@ -702,37 +702,37 @@ Detta kan ta ett par minuter.</translation>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mytharchive/main.cpp" line="335"/>
+        <location filename="../mytharchive/main.cpp" line="323"/>
         <source>Toggle use cut list state for selected program</source>
         <translation>Växla använd klipplista för valt program</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="338"/>
+        <location filename="../mytharchive/main.cpp" line="326"/>
         <source>Create DVD</source>
         <translation>Skapa DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="340"/>
+        <location filename="../mytharchive/main.cpp" line="328"/>
         <source>Create Archive</source>
         <translation>Skapa arkiv</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="342"/>
+        <location filename="../mytharchive/main.cpp" line="330"/>
         <source>Import Archive</source>
         <translation>Importera arkiv</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="344"/>
+        <location filename="../mytharchive/main.cpp" line="332"/>
         <source>View Archive Log</source>
         <translation>Visa arkiveringslogg</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="346"/>
+        <location filename="../mytharchive/main.cpp" line="334"/>
         <source>Play Created DVD</source>
         <translation>Spela skapad DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="348"/>
+        <location filename="../mytharchive/main.cpp" line="336"/>
         <source>Burn DVD</source>
         <translation>Bränn DVD</translation>
     </message>
@@ -777,42 +777,42 @@ Vänta...</translation>
 <context>
     <name>SelectDestination</name>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="31"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="30"/>
         <source>Single Layer DVD</source>
         <translation>DVD med ett lager</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="35"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="34"/>
         <source>Dual Layer DVD</source>
         <translation>DVD med två lager</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="32"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="31"/>
         <source>Single Layer DVD (4,482 MB)</source>
         <translation>DVD med ett lager (4482 MiB)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="36"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="35"/>
         <source>Dual Layer DVD (8,964 MB)</source>
         <translation>DVD med två lager (8964 MiB)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="39"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="38"/>
         <source>DVD +/- RW</source>
         <translation>DVD +/- RW</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="40"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="39"/>
         <source>Rewritable DVD</source>
         <translation>Återskrivbar DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="43"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="42"/>
         <source>File</source>
         <translation>Fil</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="44"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="43"/>
         <source>Any file accessable from your filesystem.</source>
         <translation>Vilken fil som helst, tillgänglig i filsystemet.</translation>
     </message>
@@ -2300,17 +2300,17 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="873"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="863"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Avbryt, spara miniatyrbilder</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="874"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="864"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Avbryt, spara inte miniatyrbilder</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="866"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="856"/>
         <source>Menu</source>
         <translation>Meny</translation>
     </message>
@@ -2318,28 +2318,28 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
 <context>
     <name>VideoSelector</name>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="148"/>
+        <location filename="../mytharchive/videoselector.cpp" line="147"/>
         <source>Clear All</source>
         <translation>Rensa alla</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="149"/>
+        <location filename="../mytharchive/videoselector.cpp" line="148"/>
         <source>Select All</source>
         <translation>Välj alla</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="552"/>
+        <location filename="../mytharchive/videoselector.cpp" line="549"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>Du måste ange ett giltigt lösenord för den här barnlåsnivån</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="331"/>
-        <location filename="../mytharchive/videoselector.cpp" line="499"/>
+        <location filename="../mytharchive/videoselector.cpp" line="330"/>
+        <location filename="../mytharchive/videoselector.cpp" line="496"/>
         <source>All Videos</source>
         <translation>Alla videor</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="141"/>
+        <location filename="../mytharchive/videoselector.cpp" line="140"/>
         <source>Menu</source>
         <translation>Meny</translation>
     </message>
