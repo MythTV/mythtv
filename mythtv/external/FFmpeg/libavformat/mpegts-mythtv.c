@@ -38,6 +38,24 @@
 #include "isom.h"
 #include "internal.h"
 
+/* from APIchanges:
+2011-10-19 - d049257 / 569129a - lavf 53.17.0 / 53.10.0
+  Add avformat_new_stream(). Deprecate av_new_stream().
+*/
+static AVStream *av_new_stream(AVFormatContext *s, int id)
+{
+    AVStream *st = avformat_new_stream(s, NULL);
+    if (st)
+        st->id = id;
+    return st;
+}
+
+static void av_set_pts_info(AVStream *s, int pts_wrap_bits,
+                     unsigned int pts_num, unsigned int pts_den)
+{
+    avpriv_set_pts_info(s, pts_wrap_bits, pts_num, pts_den);
+}
+
 /**
  * av_dlog macros
  * copied from libavutil/log.h since they are deprecated and removed from there
@@ -3269,20 +3287,6 @@ void avpriv_mpegts_parse_close(MpegTSContext *ts)
     for(i=0;i<NB_PID_MAX;i++)
         av_free(ts->pids[i]);
     av_free(ts);
-}
-
-AVStream *av_new_stream(AVFormatContext *s, int id)
-{
-    AVStream *st = avformat_new_stream(s, NULL);
-    if (st)
-        st->id = id;
-    return st;
-}
-
-void av_set_pts_info(AVStream *s, int pts_wrap_bits,
-                     unsigned int pts_num, unsigned int pts_den)
-{
-    avpriv_set_pts_info(s, pts_wrap_bits, pts_num, pts_den);
 }
 
 AVInputFormat ff_mythtv_mpegts_demuxer = {
