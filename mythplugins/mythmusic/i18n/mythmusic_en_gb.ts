@@ -295,7 +295,7 @@ Please select &apos;Scan For New Music&apos; to perform a scan for music.</trans
     <message>
         <location filename="../mythmusic/generalsettings.cpp" line="68"/>
         <source>CD-ROM device used for ripping/playback.</source>
-        <translation>CD-ROM device used for ripping/playback.</translation>
+        <translation>CD/DVD device used for ripping/playback.</translation>
     </message>
     <message>
         <location filename="../mythmusic/generalsettings.cpp" line="69"/>
@@ -875,7 +875,7 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="2234"/>
         <source>Change Visualizer</source>
-        <translation>Change Visualizer</translation>
+        <translation>Change Visualiser</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1365"/>
@@ -943,7 +943,7 @@ Do you want to continue playing in the background?</translation>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="2374"/>
         <source>Choose Visualizer</source>
-        <translation>Choose Visualizer</translation>
+        <translation>Choose Visualiser</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="2388"/>
@@ -1082,7 +1082,7 @@ Do you want to continue playing in the background?</translation>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="318"/>
         <source>Got too many track unavailable errors. Maybe the host with the music on is off-line?</source>
-        <translation>Got too many track unavailable errors. Maybe the host with the music on is off-line?</translation>
+        <translation>Got too many &quot;track unavailable&quot; errors. Maybe the host with the music on is offline?</translation>
     </message>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="326"/>
@@ -3028,7 +3028,7 @@ Broadcaster: %1 - Channel: %2</translation>
     <message>
         <location filename="themestrings.h" line="526"/>
         <source>Visualizer Settings</source>
-        <translation>Visualizer Settings</translation>
+        <translation>Visualiser Settings</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="381"/>

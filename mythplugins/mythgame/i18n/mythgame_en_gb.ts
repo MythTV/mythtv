@@ -562,7 +562,7 @@ Remove it from the database?</translation>
     <message>
         <location filename="themestrings.h" line="36"/>
         <source>Customize meta data of your games</source>
-        <translation>Customize metadata of your games</translation>
+        <translation>Customise metadata of your games</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="37"/>

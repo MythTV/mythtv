@@ -461,12 +461,12 @@
     <message>
         <location filename="themestrings.h" line="107"/>
         <source>Zoneminder Console</source>
-        <translation>Zoneminder Console</translation>
+        <translation>ZoneMinder Console</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>
         <source>Configure Your zoneminder.</source>
-        <translation>Configure Your zoneminder.</translation>
+        <translation>Configure ZoneMinder.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="91"/>
