@@ -4,22 +4,22 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnews/main.cpp" line="44"/>
+        <location filename="../mythnews/main.cpp" line="42"/>
         <source>RSS News feed reader</source>
         <translation>RSS nyhedsfeed læser</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="48"/>
+        <location filename="../mythnews/main.cpp" line="46"/>
         <source>Update news items</source>
         <translation>Opdater nyheder</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="50"/>
+        <location filename="../mythnews/main.cpp" line="48"/>
         <source>Force update news items</source>
         <translation>Gennemtving opdatering af nyheder</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="52"/>
+        <location filename="../mythnews/main.cpp" line="50"/>
         <source>Cancel news item updating</source>
         <translation>Annuller nyhedsopdateringen</translation>
     </message>
@@ -27,12 +27,12 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="379"/>
+        <location filename="../mythnews/mythnews.cpp" line="342"/>
         <source>Updated</source>
         <translation>Opdateret</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="386"/>
+        <location filename="../mythnews/mythnews.cpp" line="349"/>
         <source>Unknown</source>
         <translation>Ukendt</translation>
     </message>
@@ -42,32 +42,32 @@
         <translation>Du har ikke konfigureret MythNews til at bruge nogen nyhedskilder.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="579"/>
+        <location filename="../mythnews/mythnews.cpp" line="538"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Der er ikke opsat nogen browser kommando! MythNews kræver at MythBrowser er installeret.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="668"/>
+        <location filename="../mythnews/mythnews.cpp" line="627"/>
         <source>Manage Feeds</source>
         <translation>Administrer feeds</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="669"/>
+        <location filename="../mythnews/mythnews.cpp" line="628"/>
         <source>Add Feed</source>
         <translation>Tilføj feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="672"/>
+        <location filename="../mythnews/mythnews.cpp" line="631"/>
         <source>Edit Feed</source>
         <translation>Rediger feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="673"/>
+        <location filename="../mythnews/mythnews.cpp" line="632"/>
         <source>Delete Feed</source>
         <translation>Slet feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="655"/>
+        <location filename="../mythnews/mythnews.cpp" line="614"/>
         <source>Options</source>
         <translation>Indstillinger</translation>
     </message>
@@ -118,34 +118,34 @@
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="235"/>
-        <location filename="../mythnews/newssite.cpp" line="244"/>
-        <location filename="../mythnews/newssite.cpp" line="253"/>
+        <location filename="../mythnews/newssite.cpp" line="240"/>
+        <location filename="../mythnews/newssite.cpp" line="249"/>
+        <location filename="../mythnews/newssite.cpp" line="258"/>
         <source>Failed to retrieve news</source>
         <translation>Det lykkedes ikke at hente nyhederne</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="236"/>
+        <location filename="../mythnews/newssite.cpp" line="241"/>
         <source>No Cached News.</source>
         <translation>Ingen hentede nyheder.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="255"/>
+        <location filename="../mythnews/newssite.cpp" line="260"/>
         <source>Failed to read downloaded file.</source>
         <translation>Fejl ved læsning af den hentede fil.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="263"/>
+        <location filename="../mythnews/newssite.cpp" line="268"/>
         <source>Showing Cached News.</source>
         <translation>Viser hentede nyheder.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="283"/>
+        <location filename="../mythnews/newssite.cpp" line="288"/>
         <source>XML-file is not valid RSS-feed</source>
         <translation>XML-fil er ikke et gyldigt RSS-feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="228"/>
+        <location filename="../mythnews/newssite.cpp" line="233"/>
         <source>Retrieve Failed. </source>
         <translation>Hentning fejlede. </translation>
     </message>

@@ -4,22 +4,22 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnews/main.cpp" line="44"/>
+        <location filename="../mythnews/main.cpp" line="42"/>
         <source>RSS News feed reader</source>
         <translation>RSS čtečka novinek</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="48"/>
+        <location filename="../mythnews/main.cpp" line="46"/>
         <source>Update news items</source>
         <translation>Aktualizovat novinky</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="50"/>
+        <location filename="../mythnews/main.cpp" line="48"/>
         <source>Force update news items</source>
         <translation>Vynutit aktualizaci novinek</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="52"/>
+        <location filename="../mythnews/main.cpp" line="50"/>
         <source>Cancel news item updating</source>
         <translation>Zrušit aktualizaci novinek</translation>
     </message>
@@ -27,32 +27,32 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="379"/>
+        <location filename="../mythnews/mythnews.cpp" line="342"/>
         <source>Updated</source>
         <translation>Aktualizovaný</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="386"/>
+        <location filename="../mythnews/mythnews.cpp" line="349"/>
         <source>Unknown</source>
         <translation>Neznámý</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="668"/>
+        <location filename="../mythnews/mythnews.cpp" line="627"/>
         <source>Manage Feeds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="669"/>
+        <location filename="../mythnews/mythnews.cpp" line="628"/>
         <source>Add Feed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="672"/>
+        <location filename="../mythnews/mythnews.cpp" line="631"/>
         <source>Edit Feed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="673"/>
+        <location filename="../mythnews/mythnews.cpp" line="632"/>
         <source>Delete Feed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -76,7 +76,7 @@
         <translation type="vanished">%1 of %2 (%3 procent)</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="579"/>
+        <location filename="../mythnews/mythnews.cpp" line="538"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Není nastaven příkaz pro spuštění prohlížeče! MythNews vyžaduje instalovaný MythBrowser.</translation>
     </message>
@@ -90,7 +90,7 @@
         <translation type="vanished">Smazat zdroj zpráv</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="655"/>
+        <location filename="../mythnews/mythnews.cpp" line="614"/>
         <source>Options</source>
         <translation>Možnosti</translation>
     </message>
@@ -149,34 +149,34 @@
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="228"/>
+        <location filename="../mythnews/newssite.cpp" line="233"/>
         <source>Retrieve Failed. </source>
         <translation>Načítání selhalo.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="235"/>
-        <location filename="../mythnews/newssite.cpp" line="244"/>
-        <location filename="../mythnews/newssite.cpp" line="253"/>
+        <location filename="../mythnews/newssite.cpp" line="240"/>
+        <location filename="../mythnews/newssite.cpp" line="249"/>
+        <location filename="../mythnews/newssite.cpp" line="258"/>
         <source>Failed to retrieve news</source>
         <translation>Načítání zpráv selhalo</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="236"/>
+        <location filename="../mythnews/newssite.cpp" line="241"/>
         <source>No Cached News.</source>
         <translation>Žádné uložené novinky.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="255"/>
+        <location filename="../mythnews/newssite.cpp" line="260"/>
         <source>Failed to read downloaded file.</source>
         <translation>Chyba při čtení staženého souboru.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="263"/>
+        <location filename="../mythnews/newssite.cpp" line="268"/>
         <source>Showing Cached News.</source>
         <translation>Zobrazování uložených novinek.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="283"/>
+        <location filename="../mythnews/newssite.cpp" line="288"/>
         <source>XML-file is not valid RSS-feed</source>
         <translation>XML soubor není platným zdrojem RSS</translation>
     </message>
