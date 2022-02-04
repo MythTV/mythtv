@@ -22,7 +22,7 @@
 <context>
     <name>BookmarkManager</name>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="154"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="153"/>
         <source>No bookmarks defined.
 
 Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
@@ -31,62 +31,62 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 Χρησιμοποιείστε την επιλογή &apos;Προσθήκη Σελιδοδείκτη&apos; για να προσθέσετε</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="263"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="255"/>
         <source>Actions</source>
         <translation>Ενέργειες</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="278"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="270"/>
         <source>Set Homepage</source>
         <translation>Ορισμός Αρχικής Σελίδας</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="279"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="271"/>
         <source>Add Bookmark</source>
         <translation>Προσθήκη Σελιδοδείκτη</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="283"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="275"/>
         <source>Edit Bookmark</source>
         <translation>Επεξεργασία Σελιδοδείκτη</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="284"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="276"/>
         <source>Delete Bookmark</source>
         <translation>Διαγραφή Σελιδοδείκτη</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="285"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="277"/>
         <source>Show Bookmark</source>
         <translation>Εμφάνιση Σελιδοδείκτη</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="290"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="282"/>
         <source>Delete Marked</source>
         <translation>Διαγραφή Σημαδεμένου</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="291"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="283"/>
         <source>Show Marked</source>
         <translation>Εμφάνιση Σημειωμένου</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="292"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="284"/>
         <source>Clear Marked</source>
         <translation>Εκκαθάριση Σημαδεμένου</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="295"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="287"/>
         <source>Settings</source>
         <translation>Ρυθμίσεις</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="500"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="494"/>
         <source>Are you sure you want to delete the selected bookmark?</source>
         <translation>Σίγουρα θέλετε να διαγράψετε τον επιλεγμένο σελειδοδείκτη;</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="544"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="538"/>
         <source>Are you sure you want to delete the marked bookmarks?</source>
         <translation>Σίγουρα θέλετε να διαγράψετε τους σημαδεμένους σελειδοδείκτες;</translation>
     </message>
@@ -94,32 +94,32 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 <context>
     <name>BrowserConfig</name>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="36"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="35"/>
         <source>MythBrowser Settings</source>
         <translation>Επιλογές MythBrowser</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="111"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="110"/>
         <source>This is the command that will be used to show the web browser. Use &apos;Internal&apos; to use the built in web browser&apos;. %ZOOM% and %URL% will be replaced with the zoom level and URL list.</source>
         <translation>Η εντολή που θα εμφανίσει τον περιηγητή ιστοσελίδων. Δώστε &apos;Internal&apos; για χρήση του ενσωματωμένου στο πρόγραμμα. Τα %ZOOM% και %URL% θα αντικατασταθούν με το επίπεδο μεγέθυνσης και τη λίστα διεύθυνσης.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="117"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="116"/>
         <source>This is the default text size that will be used. Valid values for the Internal browser are from 0.3 to 5.0 with 1.0 being normal size less than 1 is smaller and greater than 1 is larger than normal size.</source>
         <translation>Είναι το προεπιλεγμένο μέγεθος κειμένου. Έγκυρες τιμές για τον Internal περιηγητή είναι από 0.3 ως 5.0 με 1.0 ως κανονικό, μικρότερο από 1 είναι μικρότερο και μεγαλύτερο του 1 είναι μεγαλύτερο του κανονικού.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="124"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="123"/>
         <source>If checked this will enable browser plugins if the &apos;Internal&apos; browser is being used.</source>
         <translation>Αν επιλεγεί, θα ενεργοποιήσει τα πρόσθετα περιήγησης αν επιλεγεί ο &apos;Internal&apos; περιηγητής.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="129"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="128"/>
         <source>Exit without saving settings</source>
         <translation>Έξοδος χωρίς αποθήκευση αλλαγών</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="133"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="132"/>
         <source>Save settings and Exit</source>
         <translation>Αποθήκευση αλλαγών και Έξοδος</translation>
     </message>
@@ -127,53 +127,53 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 <context>
     <name>MythBrowser</name>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="142"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="354"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="139"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="351"/>
         <source>Enter URL</source>
         <translation>Δώστε διεύθυνση</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="274"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="271"/>
         <source>Loading...</source>
         <translation>Φορτώνω...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="343"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
         <source>Actions</source>
         <translation>Ενέργειες</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="354"/>
         <source>Back</source>
         <translation>Πίσω</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="360"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
         <source>Forward</source>
         <translation>Μπροστά</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="362"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="359"/>
         <source>Zoom In</source>
         <translation>Μεγέθυνση</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="363"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="360"/>
         <source>Zoom Out</source>
         <translation>Σμίκρυνση</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="361"/>
         <source>New Tab</source>
         <translation>Νέα Καρτέλα</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="367"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
         <source>Delete Tab</source>
         <translation>Διαγραφή Καρτέλας</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="369"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="366"/>
         <source>Add Bookmark</source>
         <translation>Προσθήκη Σελιδοδείκτη</translation>
     </message>
@@ -181,27 +181,27 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="107"/>
+        <location filename="../mythbrowser/main.cpp" line="109"/>
         <source>Move to next browser tab</source>
         <translation>Στην επόμενη Καρτέλα</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="109"/>
+        <location filename="../mythbrowser/main.cpp" line="111"/>
         <source>Move to previous browser tab</source>
         <translation>Στην προηγούμενη Καρτέλα</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="112"/>
+        <location filename="../mythbrowser/main.cpp" line="114"/>
         <source>Show the bookmark manager</source>
         <translation>Εμφάνιση του διαχειριστή σελιδοδεικτών</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="114"/>
+        <location filename="../mythbrowser/main.cpp" line="116"/>
         <source>Show the webbrowser homepage</source>
         <translation>Εμφάνιση αρχικής σελίδας φυλλομετρητή</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="117"/>
+        <location filename="../mythbrowser/main.cpp" line="119"/>
         <source>Internal Web Browser</source>
         <translation>Ενσωματωμένος Περιηγηγής</translation>
     </message>
@@ -527,7 +527,7 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 <context>
     <name>WebPage</name>
     <message>
-        <location filename="../mythbrowser/webpage.cpp" line="124"/>
+        <location filename="../mythbrowser/webpage.cpp" line="122"/>
         <source>Loading...</source>
         <translation>Φορτώνω...</translation>
     </message>
