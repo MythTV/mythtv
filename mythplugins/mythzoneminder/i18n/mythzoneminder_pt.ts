@@ -11,22 +11,22 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="177"/>
+        <location filename="../mythzoneminder/main.cpp" line="175"/>
         <source>ZoneMinder Console</source>
         <translation>Consola ZoneMinder</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="179"/>
+        <location filename="../mythzoneminder/main.cpp" line="177"/>
         <source>ZoneMinder Live View</source>
         <translation>ZoneMinder Em Directo</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="181"/>
+        <location filename="../mythzoneminder/main.cpp" line="179"/>
         <source>ZoneMinder Events</source>
         <translation>Eventos ZoneMinder</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="183"/>
+        <location filename="../mythzoneminder/main.cpp" line="181"/>
         <source>ZoneMinder Mini Live View</source>
         <translation type="unfinished"></translation>
     </message>
@@ -660,12 +660,12 @@
 <context>
     <name>ZMConsole</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="198"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="199"/>
         <source>Running</source>
         <translation>Correndo</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="203"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="204"/>
         <source>Stopped</source>
         <translation>Parado</translation>
     </message>
