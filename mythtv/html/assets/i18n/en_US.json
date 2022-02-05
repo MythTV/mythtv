@@ -6,7 +6,15 @@
         "warning": "Please note this is a work in progress and some features are not fully working!"
     },
     "navbar": {
-        "dashboard": "Dashboard"
+        "backendSetup": "Backend Setup",
+        "backendStatus": "Backend Status",
+        "changeLanguage": "Change Language",
+        "dashboard": "Dashboard",
+        "login": "Log In",
+        "switchServer": "Switch Server",
+        "switchTheme": "Switch Theme",
+        "testbed": "Testbed",
+        "tvGuide": "TV Guide"
     },
     "primeng": {
         "accept": "Yes",
@@ -94,7 +102,7 @@
         "noFilter": "No Filter",
         "notContains": "Not contains",
         "notEquals": "Not equals",
-        "passwordPrompt": "Enter a password",
+        "passwordPrompt": "Enter a password - US",
         "reject": "No",
         "removeRule": "Remove Rule",
         "startsWith": "Starts with",

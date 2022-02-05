@@ -6,7 +6,15 @@
         "warning": "שימו לב שזו עבודה בתהליך וחלק מהתכונות אינן פועלות במלואן!"
     },
     "navbar": {
-        "dashboard": "DASHBOARD"
+        "backendSetup": "הגדרות אחורי",
+        "backendStatus": "מצב אחורי",
+        "changeLanguage": "שנה שפה",
+        "dashboard": "DASHBOARD",
+        "login": "התחברות",
+        "switchServer": "החלף שרת",
+        "switchTheme": "החלף ערכת נושא",
+        "testbed": "מיטת מבחן",
+        "tvGuide": "מדריך שידורי טלוויזיה"
     },
     "primeng": {
         "accept": "Yes",

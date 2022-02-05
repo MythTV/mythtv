@@ -6,7 +6,15 @@
         "warning": "Imajte na umu da je ovo rad u tijeku i da neke značajke ne rade u potpunosti!"
     },
     "navbar": {
-        "dashboard": "kontrolna ploča"
+        "backendSetup": "Postavljanje pozadine",
+        "backendStatus": "Status pozadine",
+        "changeLanguage": "Promijeni jezik",
+        "dashboard": "kontrolna ploča",
+        "login": "Prijaviti se",
+        "switchServer": "Promijeni poslužitelj",
+        "switchTheme": "Promijenite temu",
+        "testbed": "Testna ploča",
+        "tvGuide": "TV vodič"
     },
     "primeng": {
         "accept": "Yes",

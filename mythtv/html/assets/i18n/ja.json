@@ -6,7 +6,15 @@
         "warning": "これは進行中の作業であり、一部の機能が完全に機能していないことに注意してください。"
     },
     "navbar": {
-        "dashboard": "ダッシュボード"
+        "backendSetup": "バックエンドのセットアップ",
+        "backendStatus": "バックエンドステータス",
+        "changeLanguage": "言語を変えてください",
+        "dashboard": "ダッシュボード",
+        "login": "ログイン",
+        "switchServer": "スイッチサーバー",
+        "switchTheme": "テーマの切り替え",
+        "testbed": "テストベッド",
+        "tvGuide": "テレビガイド"
     },
     "primeng": {
         "accept": "Yes",

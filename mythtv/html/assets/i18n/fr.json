@@ -6,7 +6,15 @@
         "warning": "Veuillez noter qu'il s'agit d'un travail en cours et que certaines fonctionnalités ne fonctionnent pas entièrement !"
     },
     "navbar": {
-        "dashboard": "Tableau de bord"
+        "backendSetup": "Configuration du back-end",
+        "backendStatus": "État du backend",
+        "changeLanguage": "Changer de langue",
+        "dashboard": "Tableau de bord",
+        "login": "S'identifier",
+        "switchServer": "Changer de serveur",
+        "switchTheme": "Changer de thème",
+        "testbed": "Banc d'essai",
+        "tvGuide": "guide télévisé"
     },
     "primeng": {
         "accept": "Yes",

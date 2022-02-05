@@ -6,7 +6,15 @@
         "warning": "Tingueu en compte que això és un treball en curs i algunes funcions no funcionen del tot!"
     },
     "navbar": {
-        "dashboard": "panell"
+        "backendSetup": "Configuració del backend",
+        "backendStatus": "Estat del backend",
+        "changeLanguage": "Canviar d'idioma",
+        "dashboard": "panell",
+        "login": "Iniciar Sessió",
+        "switchServer": "Canvia de servidor",
+        "switchTheme": "Canvia el tema",
+        "testbed": "Banc de proves",
+        "tvGuide": "Guia televisiva"
     },
     "primeng": {
         "accept": "Yes",

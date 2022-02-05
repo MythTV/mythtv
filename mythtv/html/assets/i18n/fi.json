@@ -6,7 +6,15 @@
         "warning": "Huomaa, että tämä on työn alla ja jotkin ominaisuudet eivät toimi täysin!"
     },
     "navbar": {
-        "dashboard": "kojelauta"
+        "backendSetup": "Taustajärjestelmän asetukset",
+        "backendStatus": "Taustaohjelman tila",
+        "changeLanguage": "Vaihda kieltä",
+        "dashboard": "kojelauta",
+        "login": "kirjaudu sisään",
+        "switchServer": "Vaihda palvelinta",
+        "switchTheme": "Vaihda teemaa",
+        "testbed": "Testbed",
+        "tvGuide": "tv-opas"
     },
     "primeng": {
         "accept": "Yes",

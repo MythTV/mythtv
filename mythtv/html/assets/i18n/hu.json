@@ -6,7 +6,15 @@
         "warning": "Felhívjuk figyelmét, hogy ez egy folyamatban lévő munka, és néhány funkció nem működik teljesen!"
     },
     "navbar": {
-        "dashboard": "Irányítópult"
+        "backendSetup": "Háttérbeállítás",
+        "backendStatus": "Háttérállapot",
+        "changeLanguage": "Válts nyelvet",
+        "dashboard": "Irányítópult",
+        "login": "Belépés",
+        "switchServer": "Szerver váltása",
+        "switchTheme": "Váltás a témára",
+        "testbed": "Tesztágy",
+        "tvGuide": "műsorújság"
     },
     "primeng": {
         "accept": "Yes",

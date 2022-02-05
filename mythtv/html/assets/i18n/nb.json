@@ -6,7 +6,15 @@
         "warning": "Vær oppmerksom på at dette pågår og enkelte funksjoner fungerer ikke fullt ut!"
     },
     "navbar": {
-        "dashboard": "dashbord"
+        "backendSetup": "Oppsett av backend",
+        "backendStatus": "Backend Status",
+        "changeLanguage": "Skifte språk",
+        "dashboard": "dashbord",
+        "login": "Logg inn",
+        "switchServer": "Bytt server",
+        "switchTheme": "Bytt tema",
+        "testbed": "Prøveseng",
+        "tvGuide": "TV-guide"
     },
     "primeng": {
         "accept": "Yes",

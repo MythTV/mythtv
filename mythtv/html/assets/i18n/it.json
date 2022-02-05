@@ -6,7 +6,15 @@
         "warning": "Si prega di notare che questo è un lavoro in corso e alcune funzionalità non sono completamente funzionanti!"
     },
     "navbar": {
-        "dashboard": "Cruscotto"
+        "backendSetup": "Configurazione back-end",
+        "backendStatus": "Stato backend",
+        "changeLanguage": "Cambia lingua",
+        "dashboard": "Cruscotto",
+        "login": "Accesso",
+        "switchServer": "Cambia server",
+        "switchTheme": "Cambia tema",
+        "testbed": "Banco di prova",
+        "tvGuide": "guida tv"
     },
     "primeng": {
         "accept": "Yes",

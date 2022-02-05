@@ -6,7 +6,15 @@
         "warning": "Bemærk venligst, at dette er et igangværende arbejde, og nogle funktioner fungerer ikke fuldt ud!"
     },
     "navbar": {
-        "dashboard": "instrumentbræt"
+        "backendSetup": "Backend opsætning",
+        "backendStatus": "Backend-status",
+        "changeLanguage": "Skift sprog",
+        "dashboard": "instrumentbræt",
+        "login": "Log på",
+        "switchServer": "Skift server",
+        "switchTheme": "Skift tema",
+        "testbed": "Testbed",
+        "tvGuide": "TV Guide"
     },
     "primeng": {
         "accept": "Yes",

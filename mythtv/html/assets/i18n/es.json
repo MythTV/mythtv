@@ -6,7 +6,15 @@
         "warning": "¡Tenga en cuenta que este es un trabajo en progreso y algunas funciones no funcionan completamente!"
     },
     "navbar": {
-        "dashboard": "Tablero"
+        "backendSetup": "Configuración de back-end",
+        "backendStatus": "Estado del backend",
+        "changeLanguage": "Cambiar idioma",
+        "dashboard": "Tablero",
+        "login": "Iniciar sesión",
+        "switchServer": "Cambiar servidor",
+        "switchTheme": "Cambiar tema",
+        "testbed": "banco de pruebas",
+        "tvGuide": "guía de televisión"
     },
     "primeng": {
         "accept": "Yes",

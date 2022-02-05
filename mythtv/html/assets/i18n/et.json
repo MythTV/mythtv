@@ -6,7 +6,15 @@
         "warning": "Pange tähele, et see töö on pooleli ja mõned funktsioonid ei tööta täielikult!"
     },
     "navbar": {
-        "dashboard": "Armatuurlaud"
+        "backendSetup": "Taustaprogrammi häälestus",
+        "backendStatus": "Taustaprogrammi olek",
+        "changeLanguage": "Keele vahetamine",
+        "dashboard": "Armatuurlaud",
+        "login": "Logi sisse",
+        "switchServer": "Vaheta serverit",
+        "switchTheme": "Vaheta teemat",
+        "testbed": "Katsealus",
+        "tvGuide": "Telekava"
     },
     "primeng": {
         "accept": "Yes",

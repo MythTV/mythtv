@@ -6,7 +6,15 @@
         "warning": "Bitte beachten Sie, dass dies noch in Arbeit ist und einige Funktionen nicht vollständig funktionieren!"
     },
     "navbar": {
-        "dashboard": "Instrumententafel"
+        "backendSetup": "Backend-Setup",
+        "backendStatus": "Backend-Status",
+        "changeLanguage": "Sprache ändern",
+        "dashboard": "Instrumententafel",
+        "login": "Einloggen",
+        "switchServer": "Server wechseln",
+        "switchTheme": "Thema wechseln",
+        "testbed": "Prüfstand",
+        "tvGuide": "Fernsehprogramm"
     },
     "primeng": {
         "accept": "Yes",

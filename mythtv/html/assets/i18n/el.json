@@ -6,7 +6,15 @@
         "warning": "Λάβετε υπόψη ότι αυτό είναι ένα έργο σε εξέλιξη και ορισμένες λειτουργίες δεν λειτουργούν πλήρως!"
     },
     "navbar": {
-        "dashboard": "Ταμπλό"
+        "backendSetup": "Ρύθμιση Backend",
+        "backendStatus": "Κατάσταση Backend",
+        "changeLanguage": "Αλλαξε γλώσσα",
+        "dashboard": "Ταμπλό",
+        "login": "Σύνδεση",
+        "switchServer": "Εναλλαγή διακομιστή",
+        "switchTheme": "Εναλλαγή θέματος",
+        "testbed": "Δοκιμαστικό κρεβάτι",
+        "tvGuide": "οδηγός τηλεόρασης"
     },
     "primeng": {
         "accept": "Yes",

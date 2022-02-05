@@ -10,44 +10,41 @@
                     </div>
                     <div class="mt-3 select-none">
                         <ul class="list-none p-3 lg:py-3 lg:px-2 m-0">
-                            <li [routerLink]="''" pTooltip="Dashboard">
+                            <li [routerLink]="''" pTooltip="{{ 'navbar.dashboard' | translate }}">
                                 <a pripple=""
                                     class="p-ripple p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors"><i
                                         class="pi pi-home mr-2 lg:mr-0 text-base lg:text-xl"></i><span
-                                        class="font-medium inline lg:hidden">Dashboard</span><span class="p-ink"></span>
+                                        class="font-medium inline lg:hidden">{{ 'navbar.dashboard' | translate }}</span><span class="p-ink"></span>
                                 </a>
                             </li>
-                            <li [routerLink]="'status'" pTooltip="Backend Status">
+                            <li [routerLink]="'status'" pTooltip="{{ 'navbar.backendStatus' | translate }}">
                                 <a pripple=""
                                     class="p-ripple p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors"><i
                                         class="pi pi-info-circle mr-2 lg:mr-0 text-base lg:text-xl"></i><span
-                                        class="font-medium inline lg:hidden">Status</span><span
+                                        class="font-medium inline lg:hidden">{{ 'navbar.backendStatus' | translate }}</span><span
                                         class="p-ink"></span></a>
                             </li>
-                            <li [routerLink]="'settings'" pTooltip="Backend Setup">
+                            <li [routerLink]="'settings'" pTooltip="{{ 'navbar.backendSetup' | translate }}">
                                 <a pripple=""
                                     class="p-ripple p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
                                     <i class="pi pi-cog mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                                    <span class="font-medium inline lg:hidden">Settings
-                                    </span>
+                                    <span class="font-medium inline lg:hidden">{{ 'navbar.backendSetup' | translate }}</span>
                                     <span class="p-ink"></span>
                                 </a>
                             </li>
-                            <li [routerLink]="'guide'" pTooltip="TV Guide">
+                            <li [routerLink]="'guide'" pTooltip="{{ 'navbar.tvGuide' | translate }}">
                                 <a pripple=""
                                     class="p-ripple p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
                                     <i class="pi pi-map mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                                    <span class="font-medium inline lg:hidden">TV Guide
-                                    </span>
+                                    <span class="font-medium inline lg:hidden">{{ 'navbar.tvGuide' | translate }}</span>
                                     <span class="p-ink"></span>
                                 </a>
                             </li>
-                            <li [routerLink]="'testbed'" pTooltip="Testbed">
+                            <li [routerLink]="'testbed'" pTooltip="{{ 'navbar.testbed' | translate }}">
                                 <a pripple=""
                                     class="p-ripple p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
                                     <i class="pi pi-pencil mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                                    <span class="font-medium inline lg:hidden">Testbed
-                                    </span>
+                                    <span class="font-medium inline lg:hidden">{{ 'navbar.testbed' | translate }}</span>
                                     <span class="p-ink"></span>
                                 </a>
                             </li>
@@ -55,10 +52,10 @@
                     </div>
                     <div class="mt-auto">
                         <hr class="mb-3 mx-2 border-top-1 border-none border-gray-800">
-                        <a pripple="" pTooltip="Switch Server"
+                        <a pripple="" pTooltip="{{ 'navbar.switchServer' | translate }}"
                             class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
                             <i class="pi pi-server mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                            <span class="font-medium inline lg:hidden">Switch Server</span>
+                            <span class="font-medium inline lg:hidden">{{ 'navbar.switchServer' | translate }}</span>
                             <span class="p-ink"></span>
                         </a>
                     </div>
@@ -80,34 +77,34 @@
                                 </a>
                             </li>
                             <li>
-                                <a pripple="" tooltipPosition="bottom" pTooltip="Switch Server"
+                                <a pripple="" tooltipPosition="bottom" pTooltip="{{ 'navbar.switchServer' | translate }}"
                                     class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
                                     <i class="pi pi-server mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                                    <span class="font-medium inline lg:hidden">Switch Server</span>
+                                    <span class="font-medium inline lg:hidden">{{ 'navbar.switchServer' | translate }}</span>
                                     <span class="p-ink"></span>
                                 </a>
                             </li>
                             <li>
-                                <a pripple="" tooltipPosition="bottom" pTooltip="Switch Theme" (click)="themePanel.toggle($event)"
+                                <a pripple="" tooltipPosition="bottom" pTooltip="{{ 'navbar.switchTheme' | translate }}" (click)="themePanel.toggle($event)"
                                     class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
                                     <img src="images/themes/{{m_selectedTheme.Image}}" class="mr-3 lg:mr-0" style="width: 32px; height: 32px;">
-                                    <span class="font-medium inline lg:hidden">Switch Theme</span>
+                                    <span class="font-medium inline lg:hidden">{{ 'navbar.switchTheme' | translate }}</span>
                                     <span class="p-ink"></span>
                                 </a>
                             </li>
                             <li>
-                                <a pripple="" tooltipPosition="bottom" pTooltip="Change Language" (click)="languagePanel.toggle($event)"
+                                <a pripple="" tooltipPosition="bottom" pTooltip="{{ 'navbar.changeLanguage' | translate }}" (click)="languagePanel.toggle($event)"
                                 class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
                                 <img src="images/locale/{{m_selectedLanguage.Image}}" class="mr-3 lg:mr-0" style="width: 32px;">
-                                <span class="font-medium inline lg:hidden">Switch Theme</span>
+                                <span class="font-medium inline lg:hidden">{{ 'navbar.changeLanguage' | translate }}</span>
                                 <span class="p-ink"></span>
                             </a>
                             </li>
                             <li>
-                                <a pripple="" tooltipPosition="bottom" pTooltip="Log In"
+                                <a pripple="" tooltipPosition="bottom" pTooltip="{{ 'navbar.login' | translate }}"
                                     class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
                                     <i class="pi pi-sign-in mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                                    <span class="font-medium inline lg:hidden">Login</span>
+                                    <span class="font-medium inline lg:hidden">{{ 'navbar.login' | translate }}</span>
                                     <span class="p-ink"></span>
                                 </a>
                             </li>
