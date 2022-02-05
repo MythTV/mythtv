@@ -2838,6 +2838,8 @@ class DeliverySystem : public GroupSetting
 
 class InputDisplayName : public MythUITextEditSetting
 {
+    Q_DECLARE_TR_FUNCTIONS(InputDisplayName);
+
   public:
     explicit InputDisplayName(const CardInput &parent) :
         MythUITextEditSetting(new CardInputDBStorage(this, parent, "displayname")), m_parent(parent)
