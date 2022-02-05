@@ -661,24 +661,12 @@ static void write_section_data(MpegTSContext *ts, MpegTSFilter *tss1,
     }
 }
 
-static void mpegts_close_filter(MpegTSContext *ts, MpegTSFilter *filter);
-
-static MpegTSFilter *mpegts_open_section_filter(MpegTSContext *ts, unsigned int pid,
-                                         SectionCallback *section_cb, void *opaque,
-                                         int check_crc)
-
+static MpegTSFilter *mpegts_open_filter(MpegTSContext *ts, unsigned int pid,
+                                        enum MpegTSFilterType type)
 {
-    MpegTSFilter *filter = ts->pids[pid];
-    MpegTSSectionFilter *sec;
+    MpegTSFilter *filter;
 
-    av_dlog(ts->stream, "Filter: pid=0x%x\n", pid);
-
-    if (filter) {
-#ifdef DEBUG
-	av_log(ts->stream, AV_LOG_DEBUG, "Filter Already Exists\n");
-#endif
-        mpegts_close_filter(ts, filter);
-    }
+    av_log(ts->stream, AV_LOG_TRACE, "Filter: pid=0x%x type=%d\n", pid, type);
 
     if (pid >= NB_PID_MAX || ts->pids[pid])
         return NULL;
@@ -686,44 +674,76 @@ static MpegTSFilter *mpegts_open_section_filter(MpegTSContext *ts, unsigned int 
     if (!filter)
         return NULL;
     ts->pids[pid] = filter;
-    filter->type = MPEGTS_SECTION;
-    filter->pid = pid;
-    filter->es_id = -1;
+
+    filter->type    = type;
+    filter->pid     = pid;
+    filter->es_id   = -1;
     filter->last_cc = -1;
-    filter->pmt_chop_at_ts = 0;
-    sec = &filter->u.section_filter;
-    sec->section_cb = section_cb;
-    sec->opaque = opaque;
-    sec->section_buf = av_malloc(MAX_SECTION_SIZE);
-    sec->check_crc = check_crc;
-    if (!sec->section_buf) {
-        av_free(filter);
+    filter->last_pcr= -1;
+
+    return filter;
+}
+
+static void mpegts_close_filter(MpegTSContext *ts, MpegTSFilter *filter);
+
+static MpegTSFilter *mpegts_open_section_filter(MpegTSContext *ts,
+                                                unsigned int pid,
+                                                SectionCallback *section_cb,
+                                                void *opaque,
+                                                int check_crc)
+{
+    MpegTSFilter *filter;
+    MpegTSSectionFilter *sec;
+    uint8_t *section_buf = av_mallocz(MAX_SECTION_SIZE);
+
+    // MythTV from PMT tracking in ffmpeg patch from danielk.
+    if (filter = ts->pids[pid]) {
+        mpegts_close_filter(ts, filter);
+    }
+    // end MythTV
+
+    if (!section_buf)
+        return NULL;
+
+    if (!(filter = mpegts_open_filter(ts, pid, MPEGTS_SECTION))) {
+        av_free(section_buf);
         return NULL;
     }
+
+    // MythTV Deal with incomplete PMT streams in BBC iPlayer IPTV
+    // https://github.com/MythTV/mythtv/commit/c11ee69c81198dc221c874e8132f1f30a385fa63
+    filter->pmt_chop_at_ts = 0;
+    // end MythTV
+
+    sec = &filter->u.section_filter;
+    sec->section_cb  = section_cb;
+    sec->opaque      = opaque;
+    sec->section_buf = section_buf;
+    sec->check_crc   = check_crc;
+    sec->last_ver    = -1;
+
     return filter;
 }
 
 static MpegTSFilter *mpegts_open_pes_filter(MpegTSContext *ts, unsigned int pid,
-                                     PESCallback *pes_cb,
-                                     void *opaque)
+                                            PESCallback *pes_cb,
+                                            void *opaque)
 {
     MpegTSFilter *filter;
     MpegTSPESFilter *pes;
 
-    if (pid >= NB_PID_MAX || ts->pids[pid])
+    if (!(filter = mpegts_open_filter(ts, pid, MPEGTS_PES)))
         return NULL;
-    filter = av_mallocz(sizeof(MpegTSFilter));
-    if (!filter)
-        return NULL;
-    ts->pids[pid] = filter;
-    filter->type = MPEGTS_PES;
-    filter->pid = pid;
-    filter->es_id = -1;
-    filter->last_cc = -1;
+
     pes = &filter->u.pes_filter;
     pes->pes_cb = pes_cb;
     pes->opaque = opaque;
     return filter;
+}
+
+static MpegTSFilter *mpegts_open_pcr_filter(MpegTSContext *ts, unsigned int pid)
+{
+    return mpegts_open_filter(ts, pid, MPEGTS_PCR);
 }
 
 static void mpegts_close_filter(MpegTSContext *ts, MpegTSFilter *filter)
