@@ -10,6 +10,8 @@ class SatIPStreamHandler;
 
 class SatIPSignalMonitor : public DTVSignalMonitor
 {
+    Q_DECLARE_TR_FUNCTIONS(SatIPSignalMonitor);
+
   public:
     SatIPSignalMonitor(int db_cardnum, SatIPChannel* channel,
                       bool release_stream, uint64_t flags = 0);
