@@ -1878,6 +1878,54 @@ static void m4sl_cb(MpegTSFilter *filter, const uint8_t *section,
         av_free(mp4_descr[i].dec_config_descr);
 }
 
+static void scte_data_cb(MpegTSFilter *filter, const uint8_t *section,
+                    int section_len)
+{
+    AVProgram *prg = NULL;
+    MpegTSContext *ts = filter->u.section_filter.opaque;
+
+    int idx = ff_find_stream_index(ts->stream, filter->pid);
+    if (idx < 0)
+        return;
+
+    /**
+     * In case we receive an SCTE-35 packet before mpegts context is fully
+     * initialized.
+     */
+    if (!ts->pkt)
+        return;
+
+    new_data_packet(section, section_len, ts->pkt);
+    ts->pkt->stream_index = idx;
+    prg = av_find_program_from_stream(ts->stream, NULL, idx);
+    if (prg && prg->pcr_pid != -1 && prg->discard != AVDISCARD_ALL) {
+        MpegTSFilter *f = ts->pids[prg->pcr_pid];
+        if (f && f->last_pcr != -1)
+            ts->pkt->pts = ts->pkt->dts = f->last_pcr/300;
+    }
+    ts->stop_parse = 1;
+
+}
+
+static const uint8_t opus_coupled_stream_cnt[9] = {
+    1, 0, 1, 1, 2, 2, 2, 3, 3
+};
+
+static const uint8_t opus_stream_cnt[9] = {
+    1, 1, 1, 2, 2, 3, 4, 4, 5,
+};
+
+static const uint8_t opus_channel_map[8][8] = {
+    { 0 },
+    { 0,1 },
+    { 0,2,1 },
+    { 0,1,2,3 },
+    { 0,4,1,2,3 },
+    { 0,4,1,2,3,5 },
+    { 0,4,1,2,3,5,6 },
+    { 0,6,1,2,3,4,5,7 },
+};
+
 static void mpegts_find_stream_type_pmt(pmt_entry_t *st,
                                     uint32_t stream_type, const StreamType *types)
 {
