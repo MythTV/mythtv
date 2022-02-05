@@ -440,10 +440,99 @@ typedef struct PESContext {
 
 extern AVInputFormat ff_mythtv_mpegts_demuxer;
 
+static struct Program * get_program(MpegTSContext *ts, unsigned int programid)
+{
+    int i;
+    for (i = 0; i < ts->nb_prg; i++) {
+        if (ts->prg[i].id == programid) {
+            return &ts->prg[i];
+        }
+    }
+    return NULL;
+}
+
+static void clear_avprogram(MpegTSContext *ts, unsigned int programid)
+{
+    AVProgram *prg = NULL;
+    int i;
+
+    for (i = 0; i < ts->stream->nb_programs; i++)
+        if (ts->stream->programs[i]->id == programid) {
+            prg = ts->stream->programs[i];
+            break;
+        }
+    if (!prg)
+        return;
+    prg->nb_stream_indexes = 0;
+}
+
+static void clear_program(struct Program *p)
+{
+    if (!p)
+        return;
+    p->nb_pids = 0;
+    p->nb_streams = 0;
+    p->pmt_found = 0;
+}
+
 static void clear_programs(MpegTSContext *ts)
 {
     av_freep(&ts->prg);
-    ts->nb_prg=0;
+    ts->nb_prg = 0;
+}
+
+static struct Program * add_program(MpegTSContext *ts, unsigned int programid)
+{
+    struct Program *p = get_program(ts, programid);
+    if (p)
+        return p;
+    if (av_reallocp_array(&ts->prg, ts->nb_prg + 1, sizeof(*ts->prg)) < 0) {
+        ts->nb_prg = 0;
+        return NULL;
+    }
+    p = &ts->prg[ts->nb_prg];
+    p->id = programid;
+    clear_program(p);
+    ts->nb_prg++;
+    return p;
+}
+
+static void add_pid_to_program(struct Program *p, unsigned int pid)
+{
+    int i;
+    if (!p)
+        return;
+
+    if (p->nb_pids >= MAX_PIDS_PER_PROGRAM)
+        return;
+
+    for (i = 0; i < p->nb_pids; i++)
+        if (p->pids[i] == pid)
+            return;
+
+    p->pids[p->nb_pids++] = pid;
+}
+
+static void update_av_program_info(AVFormatContext *s, unsigned int programid,
+                                   unsigned int pid, int version)
+{
+    int i;
+    for (i = 0; i < s->nb_programs; i++) {
+        AVProgram *program = s->programs[i];
+        if (program->id == programid) {
+            int old_pcr_pid = program->pcr_pid,
+                old_version = program->pmt_version;
+            program->pcr_pid = pid;
+            program->pmt_version = version;
+
+            if (old_version != -1 && old_version != version) {
+                av_log(s, AV_LOG_VERBOSE,
+                       "detected PMT change (program=%d, version=%d/%d, pcr_pid=0x%x/0x%x)\n",
+                       programid, old_version, version, old_pcr_pid, pid);
+            }
+            break;
+        }
+    }
 }
 
 /**
@@ -459,15 +548,27 @@ static int discard_pid(MpegTSContext *ts, unsigned int pid)
     int i, j, k;
     int used = 0, discarded = 0;
     struct Program *p;
-    for(i=0; i<ts->nb_prg; i++) {
+
+    if (pid == PAT_PID)
+        return 0;
+
+    /* If none of the programs have .discard=AVDISCARD_ALL then there's
+     * no way we have to discard this packet */
+    for (k = 0; k < ts->stream->nb_programs; k++)
+        if (ts->stream->programs[k]->discard == AVDISCARD_ALL)
+            break;
+    if (k == ts->stream->nb_programs)
+        return 0;
+
+    for (i = 0; i < ts->nb_prg; i++) {
         p = &ts->prg[i];
-        for(j=0; j<p->nb_pids; j++) {
-            if(p->pids[j] != pid)
+        for (j = 0; j < p->nb_pids; j++) {
+            if (p->pids[j] != pid)
                 continue;
-            //is program with id p->id set to be discarded?
-            for(k=0; k<ts->stream->nb_programs; k++) {
-                if(ts->stream->programs[k]->id == p->id) {
-                    if(ts->stream->programs[k]->discard == AVDISCARD_ALL)
+            // is program with id p->id set to be discarded?
+            for (k = 0; k < ts->stream->nb_programs; k++) {
+                if (ts->stream->programs[k]->id == p->id) {
+                    if (ts->stream->programs[k]->discard == AVDISCARD_ALL)
                         discarded++;
                     else
                         used++;
