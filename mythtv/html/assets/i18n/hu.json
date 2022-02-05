@@ -1,0 +1,111 @@
+{
+    "common": {
+        "loading": "Betöltés"
+    },
+    "dashboard": {
+        "warning": "Felhívjuk figyelmét, hogy ez egy folyamatban lévő munka, és néhány funkció nem működik teljesen!"
+    },
+    "navbar": {
+        "dashboard": "Irányítópult"
+    },
+    "primeng": {
+        "accept": "Yes",
+        "addRule": "Add Rule",
+        "after": "After",
+        "apply": "Apply",
+        "before": "Before",
+        "cancel": "Cancel",
+        "choose": "választ",
+        "clear": "Egyértelmű",
+        "contains": "Contains",
+        "dateAfter": "Date is after",
+        "dateBefore": "Date is before",
+        "dateFormat": "mm/dd/yy",
+        "dateIs": "Date is",
+        "dateIsNot": "Date is not",
+        "dayNames": [
+            "vasárnap",
+            "hétfő",
+            "kedd",
+            "szerda",
+            "csütörtök",
+            "péntek",
+            "szombat"
+        ],
+        "dayNamesMin": [
+            "Su",
+            "Mo",
+            "tű",
+            "MI",
+            "th",
+            "Fr",
+            "SA"
+        ],
+        "dayNamesShort": [
+            "Sun",
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat"
+        ],
+        "emptyFilterMessage": "Nincs találat",
+        "emptyMessage": "Nincs találat",
+        "endsWith": "Ends with",
+        "equals": "Equals",
+        "gt": "Greater than",
+        "gte": "Greater than or equal to",
+        "is": "Is",
+        "isNot": "Is not",
+        "lt": "Less than",
+        "lte": "Less than or equal to",
+        "matchAll": "Match All",
+        "matchAny": "Match Any",
+        "medium": "Közepes",
+        "monthNames": [
+            "Január",
+            "Február",
+            "Március",
+            "Április",
+            "Lehet",
+            "Június",
+            "Július",
+            "Augusztus",
+            "Szeptember",
+            "Október",
+            "November",
+            "December"
+        ],
+        "monthNamesShort": [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+        ],
+        "noFilter": "No Filter",
+        "notContains": "Not contains",
+        "notEquals": "Not equals",
+        "passwordPrompt": "Enter a password",
+        "reject": "No",
+        "removeRule": "Remove Rule",
+        "startsWith": "Starts with",
+        "strong": "Erős",
+        "today": "Today",
+        "upload": "Upload",
+        "weak": "Gyenge",
+        "weekHeader": "Wk"
+    },
+    "testbed": {
+        "title": "Ez egy próbapad terület",
+        "welcome": "Üdvözöljük a gazdagépen futó MythTV háttérprogramban"
+    }
+}

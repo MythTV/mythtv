@@ -1,0 +1,111 @@
+{
+    "common": {
+        "loading": "Зареждане"
+    },
+    "dashboard": {
+        "warning": "Моля, имайте предвид, че това е в процес на работа и някои функции не работят напълно!"
+    },
+    "navbar": {
+        "dashboard": "Табло"
+    },
+    "primeng": {
+        "accept": "да",
+        "addRule": "Add Rule",
+        "after": "After",
+        "apply": "Apply",
+        "before": "Before",
+        "cancel": "Cancel",
+        "choose": "Избирам",
+        "clear": "ясно",
+        "contains": "Contains",
+        "dateAfter": "Date is after",
+        "dateBefore": "Date is before",
+        "dateFormat": "mm/dd/yy",
+        "dateIs": "Date is",
+        "dateIsNot": "Date is not",
+        "dayNames": [
+            "неделя",
+            "понеделник",
+            "вторник",
+            "сряда",
+            "четвъртък",
+            "петък",
+            "събота"
+        ],
+        "dayNamesMin": [
+            "Су",
+            "мн",
+            "Вт",
+            "ние",
+            "тата",
+            "о",
+            "Sa"
+        ],
+        "dayNamesShort": [
+            "Sun",
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat"
+        ],
+        "emptyFilterMessage": "No results found",
+        "emptyMessage": "Няма намерени резултати",
+        "endsWith": "Ends with",
+        "equals": "Equals",
+        "gt": "Greater than",
+        "gte": "Greater than or equal to",
+        "is": "Is",
+        "isNot": "Is not",
+        "lt": "Less than",
+        "lte": "Less than or equal to",
+        "matchAll": "Match All",
+        "matchAny": "Match Any",
+        "medium": "среда",
+        "monthNames": [
+            "януари",
+            "февруари",
+            "Март",
+            "април",
+            "Може",
+            "юни",
+            "Юли",
+            "Август",
+            "Септември",
+            "октомври",
+            "ноември",
+            "декември"
+        ],
+        "monthNamesShort": [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+        ],
+        "noFilter": "No Filter",
+        "notContains": "Not contains",
+        "notEquals": "Not equals",
+        "passwordPrompt": "Enter a password",
+        "reject": "No",
+        "removeRule": "Remove Rule",
+        "startsWith": "Starts with",
+        "strong": "силен",
+        "today": "Today",
+        "upload": "Upload",
+        "weak": "Слаба",
+        "weekHeader": "Wk"
+    },
+    "testbed": {
+        "title": "Това е зона за тестване",
+        "welcome": "Добре дошли в MythTV Backend, работещ на хост"
+    }
+}

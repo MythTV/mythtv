@@ -1,0 +1,111 @@
+{
+    "common": {
+        "loading": "Φόρτωση"
+    },
+    "dashboard": {
+        "warning": "Λάβετε υπόψη ότι αυτό είναι ένα έργο σε εξέλιξη και ορισμένες λειτουργίες δεν λειτουργούν πλήρως!"
+    },
+    "navbar": {
+        "dashboard": "Ταμπλό"
+    },
+    "primeng": {
+        "accept": "Yes",
+        "addRule": "Add Rule",
+        "after": "After",
+        "apply": "Apply",
+        "before": "Before",
+        "cancel": "Cancel",
+        "choose": "Επιλέγω",
+        "clear": "Σαφή",
+        "contains": "Contains",
+        "dateAfter": "Date is after",
+        "dateBefore": "Date is before",
+        "dateFormat": "mm/dd/yy",
+        "dateIs": "Date is",
+        "dateIsNot": "Date is not",
+        "dayNames": [
+            "Κυριακή",
+            "Δευτέρα",
+            "Τρίτη",
+            "Τετάρτη",
+            "Πέμπτη",
+            "Παρασκευή",
+            "Σάββατο"
+        ],
+        "dayNamesMin": [
+            "Su",
+            "Μω",
+            "Tu",
+            "Εμείς",
+            "Θ",
+            "Φρ",
+            "Sa"
+        ],
+        "dayNamesShort": [
+            "Sun",
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat"
+        ],
+        "emptyFilterMessage": "Δεν βρέθηκαν αποτελέσματα",
+        "emptyMessage": "Δεν βρέθηκαν αποτελέσματα",
+        "endsWith": "Ends with",
+        "equals": "Equals",
+        "gt": "Greater than",
+        "gte": "Greater than or equal to",
+        "is": "Is",
+        "isNot": "Is not",
+        "lt": "Less than",
+        "lte": "Less than or equal to",
+        "matchAll": "Match All",
+        "matchAny": "Match Any",
+        "medium": "Μεσαίο",
+        "monthNames": [
+            "Ιανουάριος",
+            "Φεβρουάριος",
+            "Μάρτιος",
+            "Απρίλιος",
+            "Ενδέχεται",
+            "Ιούνιος",
+            "Ιούλιος",
+            "Αύγουστος",
+            "Σεπτέμβριος",
+            "Οκτώβριος",
+            "Νοέμβριος",
+            "Δεκέμβριος"
+        ],
+        "monthNamesShort": [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+        ],
+        "noFilter": "No Filter",
+        "notContains": "Not contains",
+        "notEquals": "Not equals",
+        "passwordPrompt": "Enter a password",
+        "reject": "No",
+        "removeRule": "Remove Rule",
+        "startsWith": "Starts with",
+        "strong": "Ισχυρός",
+        "today": "Today",
+        "upload": "Upload",
+        "weak": "Αδύναμος",
+        "weekHeader": "Wk"
+    },
+    "testbed": {
+        "title": "Αυτή είναι μια περιοχή δοκιμής",
+        "welcome": "Καλώς ορίσατε στο MythTV Backend που εκτελείται στον κεντρικό υπολογιστή"
+    }
+}

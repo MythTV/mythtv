@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
-import { AppRoutingModule } from './app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 // PrimeNG
@@ -26,6 +26,8 @@ import { DataViewModule } from 'primeng/dataview';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { OverlayPanelModule } from 'primeng/overlaypanel'
 import { TableModule } from 'primeng/table';
+
+import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './layout/navbar/navbar.component';
@@ -50,6 +52,11 @@ import { GuideComponent } from './guide/guide.component';
 import { ChannelIconComponent } from './guide/components/channelicon/channelicon.component';
 import { ProgramEntryComponent } from './guide/components/programentry/programentry.component';
 import { TimebarComponent } from './guide/components/timebar/timebar.component';
+
+// AoT requires an exported function for factories
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http);
+}
 
 @NgModule({
   declarations: [
@@ -83,6 +90,15 @@ import { TimebarComponent } from './guide/components/timebar/timebar.component';
     BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
+    TranslateModule.forRoot({
+      defaultLanguage: 'en_US',
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient]
+      }
+    }),
+
     SetupWizardRoutingModule,
     // PrimeNG
     SidebarModule,

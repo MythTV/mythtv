@@ -1,0 +1,111 @@
+{
+    "common": {
+        "loading": "Ladataan"
+    },
+    "dashboard": {
+        "warning": "Huomaa, että tämä on työn alla ja jotkin ominaisuudet eivät toimi täysin!"
+    },
+    "navbar": {
+        "dashboard": "kojelauta"
+    },
+    "primeng": {
+        "accept": "Yes",
+        "addRule": "Add Rule",
+        "after": "After",
+        "apply": "Apply",
+        "before": "Before",
+        "cancel": "Cancel",
+        "choose": "valita",
+        "clear": "Asia selvä",
+        "contains": "Contains",
+        "dateAfter": "Date is after",
+        "dateBefore": "Date is before",
+        "dateFormat": "mm/dd/yy",
+        "dateIs": "Date is",
+        "dateIsNot": "Date is not",
+        "dayNames": [
+            "sunnuntai",
+            "maanantai",
+            "tiistai",
+            "keskiviikko",
+            "torstai",
+            "perjantai",
+            "lauantai"
+        ],
+        "dayNamesMin": [
+            "Su",
+            "mo",
+            "Tu",
+            "Me",
+            "th",
+            "fr",
+            "sa"
+        ],
+        "dayNamesShort": [
+            "Sun",
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat"
+        ],
+        "emptyFilterMessage": "Ei tuloksia",
+        "emptyMessage": "Ei tuloksia",
+        "endsWith": "Ends with",
+        "equals": "Equals",
+        "gt": "Greater than",
+        "gte": "Greater than or equal to",
+        "is": "Is",
+        "isNot": "Is not",
+        "lt": "Less than",
+        "lte": "Less than or equal to",
+        "matchAll": "Match All",
+        "matchAny": "Match Any",
+        "medium": "keskikokoinen",
+        "monthNames": [
+            "tammikuu",
+            "helmikuu",
+            "maaliskuu",
+            "huhtikuu",
+            "saattaa",
+            "kesäkuu",
+            "heinäkuu",
+            "elokuu",
+            "syyskuu",
+            "lokakuu",
+            "marraskuu",
+            "joulukuu"
+        ],
+        "monthNamesShort": [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+        ],
+        "noFilter": "No Filter",
+        "notContains": "Not contains",
+        "notEquals": "Not equals",
+        "passwordPrompt": "Enter a password",
+        "reject": "No",
+        "removeRule": "Remove Rule",
+        "startsWith": "Starts with",
+        "strong": "Vahva",
+        "today": "Today",
+        "upload": "Upload",
+        "weak": "Heikko",
+        "weekHeader": "Wk"
+    },
+    "testbed": {
+        "title": "Tämä on koealue",
+        "welcome": "Tervetuloa MythTV Backendiin, joka toimii isännässä"
+    }
+}

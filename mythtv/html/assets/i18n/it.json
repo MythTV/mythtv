@@ -1,0 +1,111 @@
+{
+    "common": {
+        "loading": "Caricamento in corso"
+    },
+    "dashboard": {
+        "warning": "Si prega di notare che questo è un lavoro in corso e alcune funzionalità non sono completamente funzionanti!"
+    },
+    "navbar": {
+        "dashboard": "Cruscotto"
+    },
+    "primeng": {
+        "accept": "Yes",
+        "addRule": "Add Rule",
+        "after": "After",
+        "apply": "Apply",
+        "before": "Before",
+        "cancel": "Cancel",
+        "choose": "Scegliere",
+        "clear": "Chiaro",
+        "contains": "Contains",
+        "dateAfter": "Date is after",
+        "dateBefore": "Date is before",
+        "dateFormat": "mm/dd/yy",
+        "dateIs": "Date is",
+        "dateIsNot": "Date is not",
+        "dayNames": [
+            "Domenica",
+            "Lunedì",
+            "Martedì",
+            "Mercoledì",
+            "Giovedì",
+            "Venerdì",
+            "Sabato"
+        ],
+        "dayNamesMin": [
+            "Su",
+            "MO",
+            "Tu",
+            "NOI",
+            "th",
+            "fr",
+            "Sa"
+        ],
+        "dayNamesShort": [
+            "Sun",
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat"
+        ],
+        "emptyFilterMessage": "Nessun risultato trovato",
+        "emptyMessage": "Nessun risultato trovato",
+        "endsWith": "Ends with",
+        "equals": "Equals",
+        "gt": "Greater than",
+        "gte": "Greater than or equal to",
+        "is": "Is",
+        "isNot": "Is not",
+        "lt": "Less than",
+        "lte": "Less than or equal to",
+        "matchAll": "Match All",
+        "matchAny": "Match Any",
+        "medium": "medio",
+        "monthNames": [
+            "Gennaio",
+            "Febbraio",
+            "Marzo",
+            "Aprile",
+            "potrebbe",
+            "Giugno",
+            "Luglio",
+            "Agosto",
+            "Settembre",
+            "Ottobre",
+            "Novembre",
+            "Dicembre"
+        ],
+        "monthNamesShort": [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+        ],
+        "noFilter": "No Filter",
+        "notContains": "Not contains",
+        "notEquals": "Not equals",
+        "passwordPrompt": "Enter a password",
+        "reject": "No",
+        "removeRule": "Remove Rule",
+        "startsWith": "Starts with",
+        "strong": "forte",
+        "today": "Today",
+        "upload": "Upload",
+        "weak": "Debole",
+        "weekHeader": "Wk"
+    },
+    "testbed": {
+        "title": "Questa è un'area del banco di prova",
+        "welcome": "Benvenuto in MythTV Backend in esecuzione sull'host"
+    }
+}

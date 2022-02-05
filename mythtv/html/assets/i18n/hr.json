@@ -1,0 +1,111 @@
+{
+    "common": {
+        "loading": "Učitavam"
+    },
+    "dashboard": {
+        "warning": "Imajte na umu da je ovo rad u tijeku i da neke značajke ne rade u potpunosti!"
+    },
+    "navbar": {
+        "dashboard": "kontrolna ploča"
+    },
+    "primeng": {
+        "accept": "Yes",
+        "addRule": "Add Rule",
+        "after": "After",
+        "apply": "Apply",
+        "before": "Before",
+        "cancel": "Cancel",
+        "choose": "izabrati",
+        "clear": "Čisto",
+        "contains": "Contains",
+        "dateAfter": "Date is after",
+        "dateBefore": "Date is before",
+        "dateFormat": "mm/dd/yy",
+        "dateIs": "Date is",
+        "dateIsNot": "Date is not",
+        "dayNames": [
+            "nedjelja",
+            "ponedjeljak",
+            "utorak",
+            "srijeda",
+            "četvrtak",
+            "petak",
+            "subota"
+        ],
+        "dayNamesMin": [
+            "Su",
+            "Mo",
+            "Uto",
+            "Mi",
+            "Th",
+            "Fr",
+            "Sa"
+        ],
+        "dayNamesShort": [
+            "Sun",
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat"
+        ],
+        "emptyFilterMessage": "Nema rezultata",
+        "emptyMessage": "Nema rezultata",
+        "endsWith": "Ends with",
+        "equals": "Equals",
+        "gt": "Greater than",
+        "gte": "Greater than or equal to",
+        "is": "Is",
+        "isNot": "Is not",
+        "lt": "Less than",
+        "lte": "Less than or equal to",
+        "matchAll": "Match All",
+        "matchAny": "Match Any",
+        "medium": "srednji",
+        "monthNames": [
+            "Siječnja",
+            "veljača",
+            "ožujak",
+            "travanj",
+            "svibanj",
+            "lipanj",
+            "srpanj",
+            "kolovoz",
+            "rujan",
+            "listopad",
+            "studeni",
+            "prosinac"
+        ],
+        "monthNamesShort": [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+        ],
+        "noFilter": "No Filter",
+        "notContains": "Not contains",
+        "notEquals": "Not equals",
+        "passwordPrompt": "Enter a password",
+        "reject": "No",
+        "removeRule": "Remove Rule",
+        "startsWith": "Starts with",
+        "strong": "jak",
+        "today": "Today",
+        "upload": "Upload",
+        "weak": "Slab",
+        "weekHeader": "Wk"
+    },
+    "testbed": {
+        "title": "Ovo je područje za testiranje",
+        "welcome": "Dobrodošli u MythTV Backend koji radi na hostu"
+    }
+}

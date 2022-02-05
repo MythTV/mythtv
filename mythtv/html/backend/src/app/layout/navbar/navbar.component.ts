@@ -3,6 +3,8 @@ import { Language, MythLanguageList } from 'src/app/services/interfaces/config.i
 import { Theme } from 'src/app/services/interfaces/theme.interface';
 import { ThemeService } from '../../services/theme.service';
 import { ConfigService } from '../../services/config.service';
+import { TranslateService } from '@ngx-translate/core';
+import { PrimeNGConfig } from 'primeng/api';
 
 @Component({
     selector: 'app-navbar',
@@ -18,7 +20,9 @@ export class NavbarComponent implements OnInit {
     m_selectedLanguage!: Language;
 
     constructor(private themeService: ThemeService,
-                private configService: ConfigService) {
+                private configService: ConfigService,
+                private translateService: TranslateService,
+                private primeconfigService: PrimeNGConfig ) {
         this.themeService.getThemes().then((themes: Theme[]) => {
             this.m_themes$ = themes;
             this.m_selectedTheme = this.findThemeByName(localStorage.getItem('Theme') || 'Indigo Light');
@@ -64,5 +68,7 @@ export class NavbarComponent implements OnInit {
         console.log("Language changed to ", language.NativeLanguage)
         this.m_selectedLanguage = language;
         localStorage.setItem('Language', this.m_selectedLanguage.Code);
+        this.translateService.use(this.m_selectedLanguage.Code);
+        this.translateService.get('primeng').subscribe(res => this.primeconfigService.setTranslation(res));
     }
 }

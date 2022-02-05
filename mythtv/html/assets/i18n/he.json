@@ -1,0 +1,111 @@
+{
+    "common": {
+        "loading": "טעינה"
+    },
+    "dashboard": {
+        "warning": "שימו לב שזו עבודה בתהליך וחלק מהתכונות אינן פועלות במלואן!"
+    },
+    "navbar": {
+        "dashboard": "DASHBOARD"
+    },
+    "primeng": {
+        "accept": "Yes",
+        "addRule": "Add Rule",
+        "after": "After",
+        "apply": "Apply",
+        "before": "Before",
+        "cancel": "Cancel",
+        "choose": "בחר",
+        "clear": "ברור",
+        "contains": "Contains",
+        "dateAfter": "Date is after",
+        "dateBefore": "Date is before",
+        "dateFormat": "mm/dd/yy",
+        "dateIs": "Date is",
+        "dateIsNot": "Date is not",
+        "dayNames": [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "יום רביעי",
+            "יום חמישי",
+            "יום שישי",
+            "יום שבת"
+        ],
+        "dayNamesMin": [
+            "Su",
+            "Mo",
+            "Tu",
+            "אנחנו",
+            "ת '",
+            "Fr",
+            "Sa"
+        ],
+        "dayNamesShort": [
+            "Sun",
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat"
+        ],
+        "emptyFilterMessage": "No results found",
+        "emptyMessage": "לא נמצאו תוצאות",
+        "endsWith": "Ends with",
+        "equals": "Equals",
+        "gt": "Greater than",
+        "gte": "Greater than or equal to",
+        "is": "Is",
+        "isNot": "Is not",
+        "lt": "Less than",
+        "lte": "Less than or equal to",
+        "matchAll": "Match All",
+        "matchAny": "Match Any",
+        "medium": "בינוני",
+        "monthNames": [
+            "ינואר",
+            "פברואר",
+            "מרץ",
+            "אפריל",
+            "מאי",
+            "יוני",
+            "יולי",
+            "אוגוסט",
+            "ספטמבר",
+            "אוקטובר",
+            "נובמבר",
+            "דצמבר"
+        ],
+        "monthNamesShort": [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+        ],
+        "noFilter": "No Filter",
+        "notContains": "Not contains",
+        "notEquals": "Not equals",
+        "passwordPrompt": "Enter a password",
+        "reject": "No",
+        "removeRule": "Remove Rule",
+        "startsWith": "Starts with",
+        "strong": "חזק",
+        "today": "Today",
+        "upload": "Upload",
+        "weak": "חלש",
+        "weekHeader": "Wk"
+    },
+    "testbed": {
+        "title": "זהו אזור מבחן",
+        "welcome": "ברוכים הבאים ל-MythTV Backend הפועל על מארח"
+    }
+}

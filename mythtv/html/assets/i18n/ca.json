@@ -1,0 +1,111 @@
+{
+    "common": {
+        "loading": "Carregant"
+    },
+    "dashboard": {
+        "warning": "Tingueu en compte que això és un treball en curs i algunes funcions no funcionen del tot!"
+    },
+    "navbar": {
+        "dashboard": "panell"
+    },
+    "primeng": {
+        "accept": "Yes",
+        "addRule": "Add Rule",
+        "after": "After",
+        "apply": "Apply",
+        "before": "Before",
+        "cancel": "Cancel",
+        "choose": "Trieu",
+        "clear": "Clar",
+        "contains": "Contains",
+        "dateAfter": "Date is after",
+        "dateBefore": "Date is before",
+        "dateFormat": "mm/dd/yy",
+        "dateIs": "Date is",
+        "dateIsNot": "Date is not",
+        "dayNames": [
+            "Diumenge",
+            "Dilluns",
+            "Dimarts",
+            "Dimecres",
+            "Dijous",
+            "Divendres",
+            "Dissabte"
+        ],
+        "dayNamesMin": [
+            "Su",
+            "MO",
+            "Tu",
+            "We",
+            "th",
+            "fr",
+            "SA"
+        ],
+        "dayNamesShort": [
+            "Sun",
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat"
+        ],
+        "emptyFilterMessage": "No results found",
+        "emptyMessage": "Sense resultats",
+        "endsWith": "Ends with",
+        "equals": "Equals",
+        "gt": "Greater than",
+        "gte": "Greater than or equal to",
+        "is": "Is",
+        "isNot": "Is not",
+        "lt": "Less than",
+        "lte": "Less than or equal to",
+        "matchAll": "Match All",
+        "matchAny": "Match Any",
+        "medium": "MEDI",
+        "monthNames": [
+            "gener",
+            "febrer",
+            "març",
+            "abril",
+            "maig",
+            "juny",
+            "juliol",
+            "agost",
+            "setembre",
+            "octubre",
+            "de novembre",
+            "desembre"
+        ],
+        "monthNamesShort": [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+        ],
+        "noFilter": "No Filter",
+        "notContains": "Not contains",
+        "notEquals": "Not equals",
+        "passwordPrompt": "Enter a password",
+        "reject": "No",
+        "removeRule": "Remove Rule",
+        "startsWith": "Starts with",
+        "strong": "FORÇA",
+        "today": "Today",
+        "upload": "Upload",
+        "weak": "Feble",
+        "weekHeader": "Wk"
+    },
+    "testbed": {
+        "title": "Aquesta és una zona de proves",
+        "welcome": "Benvingut a MythTV Backend que s'executa a l'amfitrió"
+    }
+}
