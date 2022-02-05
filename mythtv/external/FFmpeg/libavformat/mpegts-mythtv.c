@@ -280,7 +280,6 @@ struct MpegTSContext {
     int raw_packet_size;
 
     int64_t pos47_full;
-    int pos47; // not in upstream (will be replaced by pos47_full)
 
     /** if true, all pids are analyzed to find streams */
     int auto_guess;
