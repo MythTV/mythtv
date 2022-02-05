@@ -440,65 +440,11 @@ typedef struct PESContext {
 
 extern AVInputFormat ff_mythtv_mpegts_demuxer;
 
-static void clear_program_pid(MpegTSContext *ts, unsigned int programid)
-{
-    int i;
-
-    for(i=0; i<ts->nb_prg; i++)
-        if(ts->prg[i].id == programid)
-            ts->prg[i].nb_pids = 0;
-}
-
 static void clear_programs(MpegTSContext *ts)
 {
     av_freep(&ts->prg);
     ts->nb_prg=0;
 }
-
-static void add_pat_entry(MpegTSContext *ts, unsigned int programid, unsigned int pid)
-{
-    struct Program *p;
-    void *tmp = av_realloc(ts->prg, (ts->nb_prg+1)*sizeof(struct Program));
-    if(!tmp)
-        return;
-    ts->prg = tmp;
-    p = &ts->prg[ts->nb_prg];
-    p->id = programid;
-    p->pid = pid;
-    p->nb_pids = 0;
-    ts->nb_prg++;
-}
-
-static void add_pid_to_pmt(MpegTSContext *ts, unsigned int programid, unsigned int pid)
-{
-    int i;
-    struct Program *p = NULL;
-    for(i=0; i<ts->nb_prg; i++) {
-        if(ts->prg[i].id == programid) {
-            p = &ts->prg[i];
-            break;
-        }
-    }
-    if(!p)
-        return;
-
-    if(p->nb_pids >= MAX_PIDS_PER_PROGRAM)
-        return;
-    p->pids[p->nb_pids++] = pid;
-}
-
-static void set_pcr_pid(AVFormatContext *s, unsigned int programid, unsigned int pid)
-{
-    int i;
-    for(i=0; i<s->nb_programs; i++) {
-        if(s->programs[i]->id == programid) {
-            s->programs[i]->pcr_pid = pid;
-            break;
-        }
-    }
-}
-
-static void mpegts_close_filter(MpegTSContext *ts, MpegTSFilter *filter);
 
 /**
  * @brief discard_pid() decides if the pid is to be discarded according
@@ -614,6 +560,8 @@ static void write_section_data(MpegTSContext *ts, MpegTSFilter *tss1,
         }
     }
 }
+
+static void mpegts_close_filter(MpegTSContext *ts, MpegTSFilter *filter);
 
 static MpegTSFilter *mpegts_open_section_filter(MpegTSContext *ts, unsigned int pid,
                                          SectionCallback *section_cb, void *opaque,
@@ -2187,6 +2135,44 @@ static int is_desired_stream(pmt_entry_t *item)
     return val;
 }
 
+static void clear_program_pid(MpegTSContext *ts, unsigned int programid)
+{
+    int i;
+
+    for(i=0; i<ts->nb_prg; i++)
+        if(ts->prg[i].id == programid)
+            ts->prg[i].nb_pids = 0;
+}
+
+static void add_pid_to_pmt(MpegTSContext *ts, unsigned int programid, unsigned int pid)
+{
+    int i;
+    struct Program *p = NULL;
+    for(i=0; i<ts->nb_prg; i++) {
+        if(ts->prg[i].id == programid) {
+            p = &ts->prg[i];
+            break;
+        }
+    }
+    if(!p)
+        return;
+
+    if(p->nb_pids >= MAX_PIDS_PER_PROGRAM)
+        return;
+    p->pids[p->nb_pids++] = pid;
+}
+
+static void set_pcr_pid(AVFormatContext *s, unsigned int programid, unsigned int pid)
+{
+    int i;
+    for(i=0; i<s->nb_programs; i++) {
+        if(s->programs[i]->id == programid) {
+            s->programs[i]->pcr_pid = pid;
+            break;
+        }
+    }
+}
+
 #define HANDLE_PMT_ERROR(MSG) \
     do { av_log(NULL, AV_LOG_ERROR, MSG); return; } while (0)
 
@@ -2769,6 +2755,20 @@ void mpegts_remove_stream(MpegTSContext *ts, int pid)
     {
         av_log(NULL, AV_LOG_DEBUG, "ERROR: closing filter for pid 0x%x, indx = %i\n", pid, indx);
     }
+}
+
+static void add_pat_entry(MpegTSContext *ts, unsigned int programid, unsigned int pid)
+{
+    struct Program *p;
+    void *tmp = av_realloc(ts->prg, (ts->nb_prg+1)*sizeof(struct Program));
+    if(!tmp)
+        return;
+    ts->prg = tmp;
+    p = &ts->prg[ts->nb_prg];
+    p->id = programid;
+    p->pid = pid;
+    p->nb_pids = 0;
+    ts->nb_prg++;
 }
 
 static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len)
