@@ -440,7 +440,7 @@ typedef struct PESContext {
 
 extern AVInputFormat ff_mythtv_mpegts_demuxer;
 
-static void clear_program(MpegTSContext *ts, unsigned int programid)
+static void clear_program_pid(MpegTSContext *ts, unsigned int programid)
 {
     int i;
 
@@ -2248,7 +2248,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
          return;
     }
 
-    clear_program(ts, h->id);
+    clear_program_pid(ts, h->id);
     pcr_pid = get16(&p, p_end);
     if (pcr_pid < 0)
         return;
