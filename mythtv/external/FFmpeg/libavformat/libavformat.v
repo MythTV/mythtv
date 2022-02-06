@@ -10,7 +10,6 @@ LIBAVFORMAT_MAJOR {
         ffurl_open_whitelist;
         ffurl_close;
         ffurl_write;
-        ff_read_frame_flush;
     local:
         *;
 };
