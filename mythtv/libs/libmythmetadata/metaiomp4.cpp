@@ -124,7 +124,7 @@ MusicMetadata* MetaIOMP4::read(const QString &filename)
         genre = getFieldValue(p_context, "genre");
         tracknum = getFieldValue(p_context, "track").toInt();
         compilation = (getFieldValue(p_context, "").toInt() != 0);
-        length = getTrackLength(p_context);
+        length = duration_cast<std::chrono::milliseconds>(av_duration(p_context->duration));
     }
 
     metadataSanityCheck(&artist, &album, &title, &genre);
@@ -182,28 +182,12 @@ std::chrono::milliseconds MetaIOMP4::getTrackLength(const QString &filename)
     if (avformat_find_stream_info(p_context, nullptr) < 0)
         return 0ms;
 
-    std::chrono::milliseconds rv = getTrackLength(p_context);
+    std::chrono::milliseconds rv =
+        duration_cast<std::chrono::milliseconds>(av_duration(p_context->duration));
 
     avformat_close_input(&p_context);
 
     return rv;
-}
-
-/*!
- * \brief Find the length of the track (in milliseconds)
- *
- * \param pContext The AV Format Context.
- * \returns An integer (signed!) to represent the length in milliseconds.
- */
-std::chrono::milliseconds MetaIOMP4::getTrackLength(AVFormatContext* pContext)
-{
-    if (!pContext)
-        return 0ms;
-
-    av_estimate_timings(pContext, 0);
-
-    auto time = av_duration(pContext->duration);
-    return duration_cast<std::chrono::milliseconds>(time);
 }
 
 /*!

@@ -24,7 +24,6 @@ class META_PUBLIC MetaIOMP4 : public MetaIO
 
   private:
     std::chrono::milliseconds getTrackLength(const QString &filename) override; // MetaIO
-    static std::chrono::milliseconds getTrackLength(AVFormatContext* pContext);
     static QString getFieldValue(AVFormatContext* context, const char* tagname);
     static void metadataSanityCheck(QString *artist, QString *album, QString *title, QString *genre);
 };
