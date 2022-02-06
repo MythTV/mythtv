@@ -188,79 +188,6 @@ int  get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
 int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags);
 #endif
 
-// currently unused
-//static int determinable_frame_size(struct AVCodecContext *avctx)
-//{
-//    if (/*avctx->codec_id == AV_CODEC_ID_AAC ||*/
-//        avctx->codec_id == AV_CODEC_ID_MP1 ||
-//        avctx->codec_id == AV_CODEC_ID_MP2 ||
-//        avctx->codec_id == AV_CODEC_ID_MP3/* ||
-//        avctx->codec_id == AV_CODEC_ID_CELT*/)
-//        return 1;
-//    return 0;
-//}
-
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define FAIL(errmsg) do {                       \
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + (errmsg)); \
-    return false;                                   \
-} while (false)
-
-// This is a slightly modified static int has_codec_parameters() from libavformat/utils.c
-static bool StreamHasRequiredParameters(AVCodecContext *Context, AVStream *Stream)
-{
-    switch (Stream->codecpar->codec_type)
-    {
-        // We fail on video first as this is generally the most serious error
-        // and if we have video, we usually have everything else
-        case AVMEDIA_TYPE_VIDEO:
-            if (!Context)
-                FAIL("No codec for video stream");
-            if (!Stream->codecpar->width || !Stream->codecpar->height)
-                FAIL("Unspecified video size");
-            if (Stream->codecpar->format == AV_PIX_FMT_NONE)
-                FAIL("Unspecified video pixel format");
-            if (Context->codec_id == AV_CODEC_ID_RV30 || Context->codec_id == AV_CODEC_ID_RV40)
-                if (!Stream->sample_aspect_ratio.num && !Context->sample_aspect_ratio.num && !Stream->codec_info_nb_frames)
-                    FAIL("No frame in rv30/40 and no sar");
-            break;
-        case AVMEDIA_TYPE_AUDIO:
-            if (!Context)
-                FAIL("No codec for audio stream");
-
-            // These checks are currently disabled as they continually fail but
-            // codec initialisation is fine - which just delays live tv startup.
-            // The worst offender appears to be audio description channel...
-
-            //if (!Stream->codecpar->frame_size && determinable_frame_size(avctx))
-            //    FAIL("Unspecified audio frame size");
-            //if (Stream->codecpar->format == AV_SAMPLE_FMT_NONE)
-            //    FAIL("Unspecified audio sample format");
-            //if (!Stream->codecpar->sample_rate)
-            //    FAIL("Unspecified audio sample rate");
-            //if (!Stream->codecpar->channels)
-            //    FAIL("Unspecified number of audio channels");
-            // if (!Stream->internal->nb_decoded_frames && Context->codec_id == AV_CODEC_ID_DTS)
-            //     FAIL("No decodable DTS frames");
-            break;
-
-        case AVMEDIA_TYPE_SUBTITLE:
-            if (Stream->codecpar->codec_id == AV_CODEC_ID_HDMV_PGS_SUBTITLE && !Stream->codecpar->width)
-                FAIL("Unspecified subtitle size");
-            break;
-        case AVMEDIA_TYPE_DATA:
-            if (Stream->codecpar->codec_id == AV_CODEC_ID_NONE)
-                return true;
-            break;
-        default:
-            break;
-    }
-
-    if (Stream->codecpar->codec_id == AV_CODEC_ID_NONE)
-        FAIL("Unknown codec");
-    return true;
-}
-
 static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
 {
     if (silence_ffmpeg_logging)
@@ -1119,22 +1046,7 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
         }
         m_avfRingBuffer->SetInInit(false);
 
-        // final sanity check that scanned streams are valid for live tv
         scancomplete = true;
-        for (uint i = 0; m_livetv && (i < m_ic->nb_streams); i++)
-        {
-            if (!StreamHasRequiredParameters(m_codecMap.GetCodecContext(m_ic->streams[i]), m_ic->streams[i]))
-            {
-                scancomplete = false;
-                if (remainingscans)
-                {
-                    CloseContext();
-                    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Stream scan incomplete - retrying");
-                    QThread::usleep(250000); // wait 250ms
-                }
-                break;
-            }
-        }
     }
 
     if (!scancomplete)
