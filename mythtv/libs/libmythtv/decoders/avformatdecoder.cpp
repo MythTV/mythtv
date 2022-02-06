@@ -1123,10 +1123,6 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
 
     if (dur == 0s)
     {
-        if ((m_ic->duration == AV_NOPTS_VALUE) &&
-            (!m_livetv && !m_ringBuffer->IsDisc()))
-            av_estimate_timings(m_ic, 0);
-
         dur = duration_cast<std::chrono::seconds>(av_duration(m_ic->duration));
     }
 
