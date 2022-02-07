@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+
+Name: exiv2
+Description: @PROJECT_DESCRIPTION@
+Version: @PROJECT_VERSION@
+URL: @PACKAGE_URL@
+Libs: -L${libdir} -lexiv2
+Cflags: -I${includedir}
