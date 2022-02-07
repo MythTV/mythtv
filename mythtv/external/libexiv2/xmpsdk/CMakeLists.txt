@@ -56,8 +56,11 @@ if (BUILD_SHARED_LIBS)
     set_property(TARGET exiv2-xmp PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
 
+set_target_properties( exiv2-xmp PROPERTIES
+    OUTPUT_NAME   mythexiv2-xmp)
+
 # 1119  Install libxmp.a for use by third party applications (Thanks, Emmanuel)
-install(TARGETS exiv2-xmp EXPORT exiv2Config
+install(TARGETS exiv2-xmp EXPORT mythexiv2Config
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )

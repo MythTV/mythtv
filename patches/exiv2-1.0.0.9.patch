@@ -1,0 +1,50 @@
+diff --git a/cmake/compilerFlags.cmake b/cmake/compilerFlags.cmake
+index dc82f2b..53f293d 100644
+--- a/cmake/compilerFlags.cmake
++++ b/cmake/compilerFlags.cmake
+@@ -34,7 +34,7 @@ if ( MINGW OR UNIX OR MSYS ) # MINGW, Linux, APPLE, CYGWIN
+             endif()
+             check_cxx_compiler_flag(-fcf-protection HAS_FCF_PROTECTION)
+             check_cxx_compiler_flag(-fstack-protector-strong HAS_FSTACK_PROTECTOR_STRONG)
+-            if(HAS_FSTACK_CLASH_PROTECTION)
++            if(HAS_FSTACK_CLASH_PROTECTION AND NOT CMAKE_CROSSCOMPILING)
+                 add_compile_options(-fstack-clash-protection)
+             endif()
+             if(HAS_FCF_PROTECTION)
+@@ -62,6 +62,11 @@ if ( MINGW OR UNIX OR MSYS ) # MINGW, Linux, APPLE, CYGWIN
+         add_compile_options(-Wall -Wcast-align -Wpointer-arith -Wformat-security -Wmissing-format-attribute -Woverloaded-virtual -W)
+         add_compile_options(-Wno-error=format-nonliteral)
+ 
++        # Quiet a couple of warnings in the MythTV build.
++        if ( COMPILER_IS_GCC )
++            add_compile_options(-Wno-dangling-pointer -Wno-deprecated-copy -Wno-restrict -Wno-stringop-truncation)
++        endif()
++
+         # This seems to be causing issues in the Fedora_MinGW GitLab job
+         #add_compile_options(-fasynchronous-unwind-tables)
+ 
+diff --git a/cmake/exiv2.pc.in b/cmake/exiv2.pc.in
+index fb8f800..3091d53 100644
+--- a/cmake/exiv2.pc.in
++++ b/cmake/exiv2.pc.in
+@@ -8,6 +8,6 @@ Description: @PROJECT_DESCRIPTION@
+ Version: @PROJECT_VERSION@
+ URL: @PACKAGE_URL@
+ Requires.private: @requires_private_for_pc_file@
+-Libs: -L${libdir} -lexiv2
++Libs: -L${libdir} -lmythexiv2
+ Libs.private: @libs_private_for_pc_file@
+ Cflags: -I${includedir}
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 4d86f67..acd4b96 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -186,7 +186,7 @@ set_target_properties(
+   exiv2lib
+   PROPERTIES VERSION ${PROJECT_VERSION}
+              SOVERSION ${EXIV2LIB_SOVERSION}
+-             OUTPUT_NAME exiv2
++             OUTPUT_NAME mythexiv2
+              PDB_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+              COMPILE_FLAGS ${EXTRA_COMPILE_FLAGS}
+ )

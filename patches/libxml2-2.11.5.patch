@@ -1,0 +1,15 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 834b35d..5c343b4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -379,8 +379,8 @@ if(UNIX)
+ endif()
+ 
+ if(WIN32)
+-	target_link_libraries(LibXml2 PRIVATE ws2_32)
+-	set(WINSOCK_LIBS "-lws2_32")
++	target_link_libraries(LibXml2 PRIVATE ws2_32 ssp)
++	set(WINSOCK_LIBS "-lws2_32 -lssp")
+ endif()
+ 
+ if(LIBXML2_WITH_ICONV)

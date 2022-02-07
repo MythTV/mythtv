@@ -1,0 +1,7 @@
+<rules>
+    <dependencies>
+        <permission name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+        <permission name="android.permission.WAKE_LOCK"/>
+        <permission name="android.permission.WRITE_SETTINGS"/>
+    </dependencies>
+</rules>

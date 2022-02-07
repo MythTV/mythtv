@@ -41,4 +41,4 @@ install(FILES
             xmp_exiv2.hpp
             xmpsidecar.hpp
         DESTINATION
-            ${CMAKE_INSTALL_INCLUDEDIR}/exiv2)
+            ${CMAKE_INSTALL_INCLUDEDIR}/mythtv/exiv2)

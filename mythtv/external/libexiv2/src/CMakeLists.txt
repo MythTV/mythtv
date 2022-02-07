@@ -127,7 +127,7 @@ endif()
 set_target_properties( exiv2lib PROPERTIES
     VERSION       ${PROJECT_VERSION}
     SOVERSION     ${PROJECT_VERSION_MINOR}
-    OUTPUT_NAME   exiv2
+    OUTPUT_NAME   mythexiv2
     PDB_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMPILE_FLAGS ${EXTRA_COMPILE_FLAGS}
 )
@@ -219,9 +219,9 @@ if( EXV_NEED_BOOST_REGEX )
     target_include_directories(exiv2lib PUBLIC ${Boost_INCLUDE_DIRS})
 endif()
 
-write_basic_package_version_file(exiv2ConfigVersion.cmake COMPATIBILITY ExactVersion)
+write_basic_package_version_file(mythexiv2ConfigVersion.cmake COMPATIBILITY ExactVersion)
 
-install(TARGETS exiv2lib EXPORT exiv2Config
+install(TARGETS exiv2lib EXPORT mythexiv2Config
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -230,11 +230,11 @@ install(TARGETS exiv2lib EXPORT exiv2Config
 install(FILES
     ${CMAKE_BINARY_DIR}/exv_conf.h
     ${CMAKE_BINARY_DIR}/exiv2lib_export.h
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/exiv2)
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mythtv/exiv2)
 
-install(EXPORT exiv2Config DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/exiv2")
+install(EXPORT mythexiv2Config DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/mythexiv2")
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/exiv2ConfigVersion.cmake DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/exiv2")
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/mythexiv2ConfigVersion.cmake DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/mythexiv2")
 
 # ******************************************************************************
 # exiv2 application

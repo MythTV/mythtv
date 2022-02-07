@@ -1,0 +1,52 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index dff8025..916f533 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2,7 +2,8 @@
+ 
+ # This is the LGPL libmariadb project.
+ 
+-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12 FATAL_ERROR)
++#MythTV requires a minimum of 3.16. Bump the version here to eliminate a warning about 2.8.12.
++CMAKE_MINIMUM_REQUIRED(VERSION 3.16 FATAL_ERROR)
+ INCLUDE(CheckFunctionExists)
+ IF(COMMAND CMAKE_POLICY)
+   SET(NEW_POLICIES CMP0003 CMP0022 CMP0023 CMP0057 CMP0077 CMP0069 CMP0075)
+@@ -144,6 +145,9 @@ IF(CMAKE_COMPILER_IS_GNUCC)
+   ENDFOREACH()
+ ENDIF()
+ 
++# MythTV tweaks
++SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Dushort=uint16_t -Wno-pointer-sign")
++
+ # If the build type isn't specified, set to Relwithdebinfo as default.
+ IF(NOT CMAKE_BUILD_TYPE)
+   SET(CMAKE_BUILD_TYPE "RelWithDebInfo")
+diff --git a/cmake/check_include_files.cmake b/cmake/check_include_files.cmake
+index d8bbffc..0b028d7 100644
+--- a/cmake/check_include_files.cmake
++++ b/cmake/check_include_files.cmake
+@@ -47,7 +47,7 @@ CHECK_INCLUDE_FILES (unistd.h HAVE_UNISTD_H)
+ IF(APPLE)
+   SET(CMAKE_REQUIRED_DEFINITIONS -D_XOPEN_SOURCE=600)
+ ENDIF()
+-CHECK_INCLUDE_FILES (ucontext.h HAVE_FILE_UCONTEXT_H)
++#CHECK_INCLUDE_FILES (ucontext.h HAVE_FILE_UCONTEXT_H)
+ IF(NOT HAVE_FILE_UCONTEXT_H)
+-  CHECK_INCLUDE_FILES (sys/ucontext.h HAVE_FILE_UCONTEXT_H)
++  #CHECK_INCLUDE_FILES (sys/ucontext.h HAVE_FILE_UCONTEXT_H)
+ ENDIF()
+diff --git a/include/ma_global.h b/include/ma_global.h
+index 71bd3ea..19ead15 100644
+--- a/include/ma_global.h
++++ b/include/ma_global.h
+@@ -33,8 +33,8 @@
+ #if _MSC_VER < 1900
+ #define snprintf _snprintf
+ #endif
+-#define strerror_r(errno,buf,len) strerror_s(buf,len,errno)
+ #endif
++#define strerror_r(errno,buf,len) strerror_s(buf,len,errno)
+ #define STDCALL __stdcall 
+ #endif
+ 

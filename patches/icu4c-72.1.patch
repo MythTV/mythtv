@@ -1,0 +1,40 @@
+diff --git a/source/config/mh-linux b/source/config/mh-linux
+index 53d6780..fdaefd0 100644
+--- a/source/config/mh-linux
++++ b/source/config/mh-linux
+@@ -5,3 +5,7 @@
+ ## Copyright (c) 1999-2013, International Business Machines Corporation and
+ ## others. All Rights Reserved.
+ 
++# Android doesn't support versioned libraries
++FINAL_SO_TARGET = $(SO_TARGET)
++MIDDLE_SO_TARGET = $(SO_TARGET)
++SHARED_OBJECT = $(SO_TARGET)
+
+ ## Commands to generate dependency files
+ GEN_DEPS.c=  $(CC) -E -MM $(DEFS) $(CPPFLAGS)
+ GEN_DEPS.cc= $(CXX) -E -MM $(DEFS) $(CPPFLAGS) $(CXXFLAGS)
+diff --git a/source/config/mh-mingw64 b/source/config/mh-mingw64
+index fb64c56..dc8f2c9 100644
+--- a/source/config/mh-mingw64
++++ b/source/config/mh-mingw64
+@@ -60,8 +60,8 @@ LINK.c=       $(CXX) $(CXXFLAGS) $(LDFLAGS)
+ LD_SOOPTIONS=
+ 
+ ## Commands to make a shared library
+-SHLIB.c=	$(CC) $(CFLAGS) $(LDFLAGS) -shared $(LD_SOOPTIONS) -Wl,--enable-auto-import -Wl,--out-implib=$(dir $@)lib$(notdir $(@:$(SO_TARGET_VERSION_MAJOR).$(SO)=))$(IMPORT_LIB_EXT)#M#
+-SHLIB.cc=	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(LD_SOOPTIONS) -Wl,--enable-auto-import -Wl,--out-implib=$(dir $@)lib$(notdir $(@:$(SO_TARGET_VERSION_MAJOR).$(SO)=))$(IMPORT_LIB_EXT)#M#
++SHLIB.c=	$(CC) $(CFLAGS) $(LDFLAGS) -shared $(LD_SOOPTIONS) -Wl,--enable-auto-import -Wl,--out-implib=$(dir $@)lib$(notdir $(@:.$(SO)=))$(IMPORT_LIB_EXT)#M#
++SHLIB.cc=	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(LD_SOOPTIONS) -Wl,--enable-auto-import -Wl,--out-implib=$(dir $@)lib$(notdir $(@:.$(SO)=))$(IMPORT_LIB_EXT)#M#
+ 
+ ## Compiler switch to embed a runtime search path
+ LD_RPATH=	
+@@ -165,7 +165,7 @@ endif
+ ## Since symbolic links don't work the same way on Windows,
+ ## we only use the version major number.
+ #FINAL_SO_TARGET=$(basename $(SO_TARGET))$(SO_TARGET_VERSION).$(SO)
+-FINAL_SO_TARGET=$(basename $(SO_TARGET))$(SO_TARGET_VERSION_MAJOR).$(SO)
++FINAL_SO_TARGET=$(basename $(SO_TARGET)).$(SO)
+ MIDDLE_SO_TARGET=$(FINAL_SO_TARGET)
+ 
+ FINAL_IMPORT_LIB = $(dir $(SO_TARGET))lib$(notdir $(basename $(SO_TARGET)))$(IMPORT_LIB_EXT)#M#

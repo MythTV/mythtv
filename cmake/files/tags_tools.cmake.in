@@ -1,0 +1,38 @@
+# Install script for directory: /home/david/Projects/MythTV/cmake23
+
+set(CMAKE_INSTALL_PREFIX "@CMAKE_INSTALL_PREFIX@")
+set(PROJECT_SOURCE_DIR "@PROJECT_SOURCE_DIR@")
+set(PROJECT_BINARY_DIR "@PROJECT_BINARY_DIR@")
+
+string(RANDOM SUFFIX)
+set(TEST_FILENAME "${PROJECT_SOURCE_DIR}/.ignore-${SUFFIX}")
+execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${TEST_FILENAME}
+                OUTPUT_QUIET ERROR_QUIET)
+if(NOT EXISTS ${TEST_FILENAME})
+  message("Cannot create ${CMAKE_ARGV3} in a read-only directory.")
+  return()
+endif()
+file(REMOVE ${TEST_FILENAME})
+
+message("Building list of files...")
+execute_process(
+  COMMAND find mythtv mythplugins -name *.h -o -name *.c -o -name
+          *.cpp -fprint ${PROJECT_BINARY_DIR}/source-filenames.txt
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+if(${CMAKE_ARGV3} STREQUAL "tags" OR ${CMAKE_ARGV3} STREQUAL "ctags")
+  message("Running ctags files...")
+  execute_process(
+    COMMAND ctags -L ${PROJECT_BINARY_DIR}/source-filenames.txt
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+elseif(${CMAKE_ARGV3} STREQUAL "etags")
+  file(STRINGS ${PROJECT_BINARY_DIR}/source-filenames.txt FILENAMES)
+  message("Running etags...")
+  execute_process(COMMAND etags ${FILENAMES}
+                  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+elseif(${CMAKE_ARGV3} STREQUAL "gtags")
+  message("Running gtags...")
+  execute_process(
+    COMMAND gtags -f ${PROJECT_BINARY_DIR}/source-filenames.txt
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+endif()

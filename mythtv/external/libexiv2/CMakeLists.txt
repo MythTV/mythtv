@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 3.5.0 )
 
 project(exiv2
-    VERSION 0.27.99.0   # Fake version number to indicate that the next version will be 28.0
+    VERSION 0.99.0.0   # Fake version number to indicate that the next version will be 1.0
     LANGUAGES CXX C
 )
 
@@ -17,14 +17,14 @@ option( EXIV2_ENABLE_EXTERNAL_XMP     "Use external version of XMP"             
 option( EXIV2_ENABLE_PNG              "Build with png support (requires libz)"                ON  )
 option( EXIV2_ENABLE_NLS              "Build native language support (requires gettext)"      OFF )
 option( EXIV2_ENABLE_PRINTUCS2        "Build with Printucs2"                                  ON  )
-option( EXIV2_ENABLE_LENSDATA         "Build including lens data"                             ON  )
+option( EXIV2_ENABLE_LENSDATA         "Build including lens data"                             OFF )
 option( EXIV2_ENABLE_DYNAMIC_RUNTIME  "Use dynamic runtime (used for static libs)"            ON )
 option( EXIV2_ENABLE_WIN_UNICODE      "Use Unicode paths (wstring) on Windows"                OFF )
 option( EXIV2_ENABLE_WEBREADY         "Build webready support into library"                   OFF )
 option( EXIV2_ENABLE_CURL             "USE Libcurl for HttpIo (WEBREADY)"                     OFF )
 
-option( EXIV2_BUILD_SAMPLES           "Build sample applications"                             ON  )
-option( EXIV2_BUILD_EXIV2_COMMAND     "Build exiv2 command-line executable"                   ON  )
+option( EXIV2_BUILD_SAMPLES           "Build sample applications"                             OFF )
+option( EXIV2_BUILD_EXIV2_COMMAND     "Build exiv2 command-line executable"                   OFF )
 option( EXIV2_BUILD_UNIT_TESTS        "Build unit tests"                                      OFF )
 option( EXIV2_BUILD_FUZZ_TESTS        "Build fuzz tests (libFuzzer)"                          OFF )
 option( EXIV2_BUILD_DOC               "Add 'doc' target to generate documentation"            OFF )
@@ -44,7 +44,7 @@ mark_as_advanced(
     EXIV2_TEAM_USE_SANITIZERS
 )
 
-option( BUILD_WITH_CCACHE             "Use ccache to speed up compilations"                   OFF )
+option( BUILD_WITH_CCACHE             "Use ccache to speed up compilations"                   ON  )
 option( BUILD_WITH_COVERAGE           "Add compiler flags to generate coverage stats"         OFF )
 
 set( PACKAGE_BUGREPORT                "http://github.com/exiv2/exiv2" )
@@ -112,12 +112,12 @@ if (EXIV2_TEAM_PACKAGING)
     include(cmake/packaging.cmake)
 endif()
 
-configure_file(cmake/exiv2.pc.in exiv2.pc @ONLY)
-install(FILES ${CMAKE_BINARY_DIR}/exiv2.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+configure_file(cmake/exiv2.pc.in mythexiv2.pc @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/mythexiv2.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 # ******************************************************************************
 # Man page
-install( FILES ${PROJECT_SOURCE_DIR}/man/man1/exiv2.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1 )
+#install( FILES ${PROJECT_SOURCE_DIR}/man/man1/exiv2.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1 )
 
 
 include(cmake/printSummary.cmake)

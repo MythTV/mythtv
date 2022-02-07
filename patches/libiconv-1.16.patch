@@ -1,0 +1,33 @@
+diff --git a/lib/Makefile.in b/lib/Makefile.in
+index 47a6aec..5672e44 100644
+--- a/lib/Makefile.in
++++ b/lib/Makefile.in
+@@ -32,6 +32,7 @@ LIBTOOL_INSTALL = $(LIBTOOL) --mode=install
+ LIBTOOL_UNINSTALL = $(LIBTOOL) --mode=uninstall
+ AR = @AR@
+ # Windows resource compiler (windres). Used via libtool.
++WINDRES = @WINDRES@
+ RC = @RC@
+ CP = cp
+ MV = mv
+@@ -91,7 +92,7 @@ iconv-exports.lo : $(srcdir)/../woe32dll/iconv-exports.c
+ 	$(LIBTOOL_COMPILE) $(CC) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $(DEFS) -c $(srcdir)/../woe32dll/iconv-exports.c
+ 
+ libiconv.res.lo : $(srcdir)/../windows/libiconv.rc
+-	$(LIBTOOL_COMPILE) --tag=RC $(RC) `$(SHELL) $(srcdir)/../windows/windres-options --escape $(PACKAGE_VERSION)` -i $(srcdir)/../windows/libiconv.rc -o libiconv.res.lo --output-format=coff
++	$(LIBTOOL_COMPILE) --tag=RC $(WINDRES) `$(SHELL) $(srcdir)/../windows/windres-options --escape $(PACKAGE_VERSION)` -i $(srcdir)/../windows/libiconv.rc -o libiconv.res.lo --output-format=coff
+ 
+ # Installs the library and include files only. Typically called with only
+ # $(libdir) and $(includedir) - don't use $(prefix) and $(exec_prefix) here.
+diff --git a/src/Makefile.in b/src/Makefile.in
+index 7035316..880ea01 100644
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -28,6 +28,7 @@ LIBTOOL_LINK = $(LIBTOOL) --mode=link
+ LIBTOOL_INSTALL = $(LIBTOOL) --mode=install
+ LIBTOOL_UNINSTALL = $(LIBTOOL) --mode=uninstall
+ WINDRES = @WINDRES@
++RC = @RC@
+ RM = rm -f
+ @SET_MAKE@
+ 

@@ -1,0 +1,28 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#ifndef CONFIG_DARWIN
+#cmakedefine01 CONFIG_DARWIN
+#endif
+#ifndef ARCH_ALPHA
+#cmakedefine01 ARCH_ALPHA
+#endif
+#ifndef ARCH_X86
+#cmakedefine01 ARCH_X86
+#endif
+#ifndef HAVE_ALTIVEC_H
+#cmakedefine01 HAVE_ALTIVEC_H
+#endif
+// #ifndef HAVE_BUILTIN_EXPECT
+// #cmakedefine01 HAVE_BUILTIN_EXPECT
+// #endif
+#ifndef HAVE_MMX
+#cmakedefine01 HAVE_MMX
+#endif
+
+// Still need to figure this one out
+#ifndef HAVE_ALTIVEC
+#cmakedefine01 HAVE_ALTIVEC
+#endif
+
+#endif /* CONFIG_H */

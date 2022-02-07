@@ -1,0 +1,23 @@
+// errorid{:path{:line}}
+
+// Ignore all warnings in system headers
+*:/usr/include/*
+*:*/qt5/*
+*:*/qt6/*
+
+// Ignore all warnings in these files (third party code)
+*:*/contrib/*
+*:*/external/*
+
+// Ignore all warnings in these files (generated code)
+*:*/moc/*
+
+// Ignore all warnings of the following type
+cppcheckError
+cstyleCast
+missingInclude
+missingIncludeSystem
+preprocessorErrorDirective
+unknownMacro
+unmatchedSuppression
+unusedFunction
