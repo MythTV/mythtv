@@ -38,7 +38,7 @@
 #endif
 #define SYSLOG_NAMES
 #ifndef _WIN32
-#include <mythsyslog.h>
+#include "mythsyslog.h"
 #endif
 #include <unistd.h>
 

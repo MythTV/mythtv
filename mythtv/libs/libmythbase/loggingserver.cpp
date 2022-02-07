@@ -24,7 +24,7 @@
 
 #include <cstdlib>
 #ifndef _WIN32
-#include <mythsyslog.h>
+#include "mythsyslog.h"
 #if CONFIG_SYSTEMD_JOURNAL
 #define SD_JOURNAL_SUPPRESS_LOCATION 1
 #include <systemd/sd-journal.h>
