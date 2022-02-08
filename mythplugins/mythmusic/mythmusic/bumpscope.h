@@ -2,7 +2,6 @@
 #define BUMPSCOPE
 
 #include "mainvisual.h"
-#include "config.h"
 
 #include <vector>
 

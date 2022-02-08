@@ -26,7 +26,6 @@
 
 // MythMusic headers
 #include "constants.h"
-#include "config.h"
 
 #include <complex>
 extern "C" {

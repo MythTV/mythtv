@@ -6,8 +6,6 @@
 // modified 12-2004 by Kyle Schlansker to add 64 bit support
 //
 
-#include "config.h"
-
 // C++
 #include <cinttypes>
 #include <cmath>

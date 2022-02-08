@@ -9,8 +9,6 @@
 #include <QMutex>
 #include <QCoreApplication>
 
-#include "config.h"
-
 #include <mythobservable.h>
 #include <mthread.h>
 

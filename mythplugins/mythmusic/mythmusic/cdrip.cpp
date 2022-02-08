@@ -6,8 +6,6 @@
 #include <sys/types.h>
 #include <fcntl.h>
 
-#include "config.h"
-
 // C++ includes
 #include <chrono>
 #include <iostream>

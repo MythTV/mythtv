@@ -3,8 +3,6 @@
 
 #include "decoder.h"
 
-#include "config.h"
-
 #ifdef HAVE_CDIO
 # ifdef HAVE_CDPARANOIA_SUBDIR
 #  include <cdio/paranoia/cdda.h>

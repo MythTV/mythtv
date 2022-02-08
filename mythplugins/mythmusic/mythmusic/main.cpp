@@ -36,7 +36,6 @@
 #include "playlistcontainer.h"
 #include "musicdbcheck.h"
 #include "musicplayer.h"
-#include "config.h"
 #include "mainvisual.h"
 #include "generalsettings.h"
 #include "playersettings.h"

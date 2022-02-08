@@ -2,7 +2,6 @@
 #define MYTHGOOM
 
 #include "mainvisual.h"
-#include "config.h"
 
 class Goom : public VisualBase
 {
