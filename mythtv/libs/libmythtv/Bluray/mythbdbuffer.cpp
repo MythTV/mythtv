@@ -3,7 +3,6 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "config.h"
 #include "mythcdrom.h"
 #include "mythmainwindow.h"
 #include "mythevent.h"
