@@ -4,7 +4,6 @@
 #include <unistd.h>
 
 #include "mythcorecontext.h"
-#include "config.h"
 
 // libav headers
 extern "C" {

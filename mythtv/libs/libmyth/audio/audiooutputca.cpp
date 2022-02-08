@@ -22,7 +22,6 @@
 
 #include "mythcorecontext.h"
 #include "audiooutputca.h"
-#include "config.h"
 #include "SoundTouch.h"
 
 #define LOC QString("CoreAudio: ")

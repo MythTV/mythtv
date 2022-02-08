@@ -4,7 +4,7 @@
 #define DEFAULT_DVD "/dev/dvd"
 #define DEFAULT_CD  "/dev/cdrom"
 
-#include "config.h"
+#include "mythconfig.h"
 
 #include <QString>
 #if CONFIG_QTDBUS

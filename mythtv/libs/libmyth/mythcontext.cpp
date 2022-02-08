@@ -19,7 +19,6 @@
 #include <thread>
 #include <vector>
 
-#include "config.h"
 #include "mythcontext.h"
 #include "exitcodes.h"
 #include "mythdate.h"

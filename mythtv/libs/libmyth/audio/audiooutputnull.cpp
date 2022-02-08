@@ -13,8 +13,6 @@
 #include "compat.h"
 #endif
 
-#include "config.h"
-
 #include "mythlogging.h"
 #include "audiooutputnull.h"
 
