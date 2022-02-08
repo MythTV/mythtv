@@ -2,7 +2,6 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "config.h"
 #include "exitprompt.h"
 #include "mythcontext.h"
 #include "mythdialogbox.h"

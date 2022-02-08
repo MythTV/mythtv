@@ -12,7 +12,6 @@
 #include "mythversion.h"
 #include "mythdate.h"
 
-#include "config.h"
 #include "remoteutil.h"
 #include "tv.h"
 #include "jobqueue.h"

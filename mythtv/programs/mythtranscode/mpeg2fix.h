@@ -13,7 +13,6 @@ extern "C"
 #include "libavformat/avformat.h"
 
 //libmpeg2
-#include "config.h"
 #if CONFIG_LIBMPEG2EXTERNAL
 #include <mpeg2dec/mpeg2.h>
 #else
