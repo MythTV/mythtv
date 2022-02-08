@@ -1,6 +1,9 @@
 {
     "common": {
-        "loading": "Cargando"
+        "back": "atrás",
+        "help": "Ayuda",
+        "loading": "Cargando",
+        "next": "Siguiente"
     },
     "dashboard": {
         "warning": "¡Tenga en cuenta que este es un trabajo en progreso y algunas funciones no funcionan completamente!"
@@ -111,6 +114,38 @@
         "upload": "Upload",
         "weak": "Débiles",
         "weekHeader": "Wk"
+    },
+    "setupwizard": {
+        "IPorAddressRequired": "Se requiere dirección IP o nombre de host",
+        "MySQLDatabaseName": "Nombre de la base de datos MySQL",
+        "MySQLPassword": "Contraseña MySQL",
+        "MySQLServerIP": "IP del servidor MySQL",
+        "MySQLServerPort": "Puerto del servidor MySQL",
+        "MySQLUser": "Usuario MySQL",
+        "chooseLanguage": "Elige lengua",
+        "connectedToDatabase": "Conectado a la base de datos ",
+        "countryAndLanguage": "Ingrese su país e idioma",
+        "databaseNameRequired": "El nombre de la base de datos es obligatorio",
+        "databaseSchemaUnknown": "La versión del esquema de la base de datos es desconocida",
+        "databaseSetup": "Configuración de la base de datos",
+        "done": "hecho",
+        "enterDBLoginDetails": "Ingrese los datos de inicio de sesión de la base de datos",
+        "localSetup": "Configuración local",
+        "noCountry": "No se ha seleccionado ningún país",
+        "noLanguage": "Ningún idioma está seleccionado",
+        "notConnectedToDatabase": "No conectado a la base de datos",
+        "passwordRequired": "se requiere contraseña",
+        "portRequired": "El puerto es obligatorio y debe ser un número entre 0 y 65536",
+        "selectCountry": "Seleccionar país",
+        "selectLanguage": "Seleccione el idioma",
+        "selectedCountry": "El país seleccionado es:",
+        "selectedLanguage": "El idioma seleccionado es:",
+        "setupDatabase": "Configuración de la base de datos",
+        "setupNetwork": "Red interna",
+        "setupStorageGroups": "Grupos de almacenamiento",
+        "testConnection": "Conexión de prueba",
+        "title": "Asistente de configuración inicial",
+        "userRequired": "Se requiere usuario"
     },
     "testbed": {
         "title": "Esta es un área de prueba",

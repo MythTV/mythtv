@@ -1,6 +1,9 @@
 {
     "common": {
-        "loading": "Зареждане"
+        "back": "обратно",
+        "help": "Помогне",
+        "loading": "Зареждане",
+        "next": "Следващия"
     },
     "dashboard": {
         "warning": "Моля, имайте предвид, че това е в процес на работа и някои функции не работят напълно!"
@@ -111,6 +114,38 @@
         "upload": "Upload",
         "weak": "Слаба",
         "weekHeader": "Wk"
+    },
+    "setupwizard": {
+        "IPorAddressRequired": "Изисква се IP адрес или име на хост",
+        "MySQLDatabaseName": "Име на базата данни на MySQL",
+        "MySQLPassword": "MySQL парола",
+        "MySQLServerIP": "IP адрес на MySQL сървъра",
+        "MySQLServerPort": "Порт на MySQL сървър",
+        "MySQLUser": "Потребител на MySQL",
+        "chooseLanguage": "Изберете език",
+        "connectedToDatabase": "Свързан с базата данни",
+        "countryAndLanguage": "Въведете вашата страна и език",
+        "databaseNameRequired": "Изисква се име на базата данни",
+        "databaseSchemaUnknown": "Версията на схемата на базата данни е неизвестна",
+        "databaseSetup": "Настройка на база данни",
+        "done": "свършен",
+        "enterDBLoginDetails": "Въведете данните за вход в базата данни",
+        "localSetup": "Локална настройка",
+        "noCountry": "Не е избрана държава",
+        "noLanguage": "Не е избран език",
+        "notConnectedToDatabase": "Не е свързан с базата данни",
+        "passwordRequired": "Изисква се парола",
+        "portRequired": "Портът е задължителен и трябва да бъде число между 0 и 65536",
+        "selectCountry": "Изберете държава",
+        "selectLanguage": "Избери език",
+        "selectedCountry": "Избраната държава е:",
+        "selectedLanguage": "Избраният език е:",
+        "setupDatabase": "Настройка на база данни",
+        "setupNetwork": "Бекенд мрежа",
+        "setupStorageGroups": "Групи за съхранение",
+        "testConnection": "Тестване на връзката",
+        "title": "Съветник за първоначална настройка",
+        "userRequired": "Изисква се потребител"
     },
     "testbed": {
         "title": "Това е зона за тестване",

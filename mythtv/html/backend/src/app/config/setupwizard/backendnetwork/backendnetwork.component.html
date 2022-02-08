@@ -1,3 +1,8 @@
+<p-dialog header="Backend Network Setup - Help" [(visible)]="m_showHelp">
+    <h4>Some very helpful help text goes here</h4>
+    <p>Some more very very helpful text goes here!</p>
+</p-dialog>
+
 <div class="wizard-content">
     <p-card>
         <ng-template pTemplate="title">
@@ -13,9 +18,10 @@
         </ng-template>
         <ng-template pTemplate="footer">
             <div class="p-grid p-nogutter p-justify-end">
-                <p-button class="pr-1" label="Back" (onClick)="previousPage()" icon="pi pi-angle-left" iconPos="left"></p-button>
-                <p-button label="Next" (onClick)="nextPage()" icon="pi pi-angle-right" iconPos="right"></p-button>
+                <p-button class="pr-1" label="{{ 'common.back' | translate }}" (onClick)="previousPage()" icon="pi pi-angle-left" iconPos="left"></p-button>
+                <p-button label="{{'common.next' | translate}}" (onClick)="nextPage()" icon="pi pi-angle-right" iconPos="right"></p-button>
             </div>
+            <p-button style="float: right;" label="{{'common.help' | translate}}" (onClick)="showHelp()" icon="pi pi-info-circle" styleClass="p-button-info" ></p-button>
         </ng-template>
     </p-card>
 </div>

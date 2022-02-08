@@ -1,6 +1,9 @@
 {
     "common": {
-        "loading": "Laadimine"
+        "back": "tagasi",
+        "help": "ABI",
+        "loading": "Laadimine",
+        "next": "Järgmine"
     },
     "dashboard": {
         "warning": "Pange tähele, et see töö on pooleli ja mõned funktsioonid ei tööta täielikult!"
@@ -111,6 +114,38 @@
         "upload": "Upload",
         "weak": "Nõrk",
         "weekHeader": "Wk"
+    },
+    "setupwizard": {
+        "IPorAddressRequired": "Nõutav on IP-aadress või hostinimi",
+        "MySQLDatabaseName": "MySQL andmebaasi nimi",
+        "MySQLPassword": "MySQL parool",
+        "MySQLServerIP": "MySQL serveri IP",
+        "MySQLServerPort": "MySQL serveri port",
+        "MySQLUser": "MySQL-i kasutaja",
+        "chooseLanguage": "Valige keel",
+        "connectedToDatabase": "Ühendatud andmebaasiga",
+        "countryAndLanguage": "Sisestage oma riik ja keel",
+        "databaseNameRequired": "Andmebaasi nimi on kohustuslik",
+        "databaseSchemaUnknown": "Andmebaasi skeemi versioon pole teada",
+        "databaseSetup": "Andmebaasi häälestus",
+        "done": "Valmis",
+        "enterDBLoginDetails": "Sisestage andmebaasi sisselogimisandmed",
+        "localSetup": "Lokaadi seadistamine",
+        "noCountry": "Riik pole valitud",
+        "noLanguage": "Keelt pole valitud",
+        "notConnectedToDatabase": "Pole andmebaasiga ühendatud",
+        "passwordRequired": "Parool on kohustuslik",
+        "portRequired": "Port on nõutav ja see peab olema number vahemikus 0 kuni 65536",
+        "selectCountry": "Vali riik",
+        "selectLanguage": "Vali keel",
+        "selectedCountry": "Valitud riik on:",
+        "selectedLanguage": "Valitud keel on:",
+        "setupDatabase": "Andmebaasi häälestus",
+        "setupNetwork": "Taustavõrk",
+        "setupStorageGroups": "Salvestusrühmad",
+        "testConnection": "Testi ühendus",
+        "title": "Algseadistuse viisard",
+        "userRequired": "Kasutaja on nõutav"
     },
     "testbed": {
         "title": "See on katsealuse ala",

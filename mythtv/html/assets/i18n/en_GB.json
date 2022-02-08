@@ -1,6 +1,9 @@
 {
     "common": {
-        "loading": "Loading"
+        "back": "Back",
+        "help": "Help",
+        "loading": "Loading",
+        "next": "Next"
     },
     "dashboard": {
         "warning": "Please note this is a work in progress and some features are not fully working!"
@@ -111,6 +114,38 @@
         "upload": "Upload",
         "weak": "Weak",
         "weekHeader": "Wk"
+    },
+    "setupwizard": {
+        "IPorAddressRequired": "IP Address or Hostname is required",
+        "MySQLDatabaseName": "MySQL Database Name",
+        "MySQLPassword": "MySQL Password",
+        "MySQLServerIP": "MySQL Server IP",
+        "MySQLServerPort": "MySQL Server Port",
+        "MySQLUser": "MySQL User",
+        "chooseLanguage": "Choose Language",
+        "connectedToDatabase": "Connected to database",
+        "countryAndLanguage": "Enter your Country and Language",
+        "databaseNameRequired": "Database Name is required",
+        "databaseSchemaUnknown": "Database schema version is unknown",
+        "databaseSetup": "Database Setup",
+        "done": "Done",
+        "enterDBLoginDetails": "Enter the database login details",
+        "localSetup": "Locale Setup",
+        "noCountry": "No Country is selected",
+        "noLanguage": "No Language is selected",
+        "notConnectedToDatabase": "Not connected to database",
+        "passwordRequired": "Password is required",
+        "portRequired": "Port is required and must be a number between 0 and 65536",
+        "selectCountry": "Select Country",
+        "selectLanguage": "Select Language",
+        "selectedCountry": "Selected Country is:",
+        "selectedLanguage": "Selected Language is:",
+        "setupDatabase": "Database Setup",
+        "setupNetwork": "Backend Network",
+        "setupStorageGroups": "Storage Groups",
+        "testConnection": "Test Connection",
+        "title": "Initial Setup Wizard",
+        "userRequired": "User is required"
     },
     "testbed": {
         "title": "This is a testbed area ",

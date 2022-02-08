@@ -1,6 +1,9 @@
 {
     "common": {
-        "loading": "Chargement"
+        "back": "Retour",
+        "help": "Aidez-moi",
+        "loading": "Chargement",
+        "next": "Suivant"
     },
     "dashboard": {
         "warning": "Veuillez noter qu'il s'agit d'un travail en cours et que certaines fonctionnalités ne fonctionnent pas entièrement !"
@@ -111,6 +114,38 @@
         "upload": "Upload",
         "weak": "Faible",
         "weekHeader": "Wk"
+    },
+    "setupwizard": {
+        "IPorAddressRequired": "L'adresse IP ou le nom d'hôte est requis",
+        "MySQLDatabaseName": "Nom de la base de données MySQL",
+        "MySQLPassword": "Mot de passe MySQL",
+        "MySQLServerIP": "IP du serveur MySQL",
+        "MySQLServerPort": "Port du serveur MySQL",
+        "MySQLUser": "Utilisateur MySQL",
+        "chooseLanguage": "Choisissez la langue",
+        "connectedToDatabase": "Connecté à la base de données",
+        "countryAndLanguage": "Entrez votre pays et votre langue",
+        "databaseNameRequired": "Le nom de la base de données est requis",
+        "databaseSchemaUnknown": "La version du schéma de la base de données est inconnue",
+        "databaseSetup": "Configuration de la base de données",
+        "done": "Terminé",
+        "enterDBLoginDetails": "Entrez les informations de connexion à la base de données",
+        "localSetup": "Configuration des paramètres régionaux",
+        "noCountry": "Aucun pays n'est sélectionné",
+        "noLanguage": "Aucune langue n'est sélectionnée",
+        "notConnectedToDatabase": "Non connecté à la base de données",
+        "passwordRequired": "Mot de passe requis",
+        "portRequired": "Le port est obligatoire et doit être un nombre compris entre 0 et 65536",
+        "selectCountry": "Choisissez le pays",
+        "selectLanguage": "Choisir la langue",
+        "selectedCountry": "Le pays sélectionné est :",
+        "selectedLanguage": "La langue sélectionnée est :",
+        "setupDatabase": "Configuration de la base de données",
+        "setupNetwork": "Réseau principal",
+        "setupStorageGroups": "Groupes de stockage",
+        "testConnection": "test de connexion",
+        "title": "Assistant de configuration initiale",
+        "userRequired": "L'utilisateur est requis"
     },
     "testbed": {
         "title": "Ceci est une zone de banc d'essai",

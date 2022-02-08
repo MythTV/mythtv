@@ -1,6 +1,9 @@
 {
     "common": {
-        "loading": "Φόρτωση"
+        "back": "Πίσω",
+        "help": "Βοήθεια",
+        "loading": "Φόρτωση",
+        "next": "Επόμενο"
     },
     "dashboard": {
         "warning": "Λάβετε υπόψη ότι αυτό είναι ένα έργο σε εξέλιξη και ορισμένες λειτουργίες δεν λειτουργούν πλήρως!"
@@ -111,6 +114,38 @@
         "upload": "Upload",
         "weak": "Αδύναμος",
         "weekHeader": "Wk"
+    },
+    "setupwizard": {
+        "IPorAddressRequired": "Απαιτείται διεύθυνση IP ή όνομα κεντρικού υπολογιστή",
+        "MySQLDatabaseName": "Όνομα βάσης δεδομένων MySQL",
+        "MySQLPassword": "Κωδικός MySQL",
+        "MySQLServerIP": "IP διακομιστή MySQL",
+        "MySQLServerPort": "Θύρα διακομιστή MySQL",
+        "MySQLUser": "Χρήστης MySQL",
+        "chooseLanguage": "Διάλεξε γλώσσα",
+        "connectedToDatabase": "Συνδέθηκε στη βάση δεδομένων",
+        "countryAndLanguage": "Εισαγάγετε τη χώρα και τη γλώσσα σας",
+        "databaseNameRequired": "Απαιτείται όνομα βάσης δεδομένων",
+        "databaseSchemaUnknown": "Η έκδοση του σχήματος βάσης δεδομένων είναι άγνωστη",
+        "databaseSetup": "Ρύθμιση βάσης δεδομένων",
+        "done": "Εγινε",
+        "enterDBLoginDetails": "Εισαγάγετε τα στοιχεία σύνδεσης στη βάση δεδομένων",
+        "localSetup": "Τοπική ρύθμιση",
+        "noCountry": "Δεν έχει επιλεγεί καμία χώρα",
+        "noLanguage": "Δεν έχει επιλεγεί γλώσσα",
+        "notConnectedToDatabase": "Δεν συνδέεται με τη βάση δεδομένων",
+        "passwordRequired": "Απαιτείται κωδικός",
+        "portRequired": "Απαιτείται θύρα και πρέπει να είναι ένας αριθμός μεταξύ 0 και 65536",
+        "selectCountry": "Επιλέξτε χώρα",
+        "selectLanguage": "Επιλέξτε γλώσσα",
+        "selectedCountry": "Η επιλεγμένη χώρα είναι:",
+        "selectedLanguage": "Η επιλεγμένη γλώσσα είναι:",
+        "setupDatabase": "Ρύθμιση βάσης δεδομένων",
+        "setupNetwork": "Backend Network",
+        "setupStorageGroups": "Ομάδες αποθήκευσης",
+        "testConnection": "Δοκιμή σύνδεσης",
+        "title": "Οδηγός αρχικής εγκατάστασης",
+        "userRequired": "Απαιτείται χρήστης"
     },
     "testbed": {
         "title": "Αυτή είναι μια περιοχή δοκιμής",

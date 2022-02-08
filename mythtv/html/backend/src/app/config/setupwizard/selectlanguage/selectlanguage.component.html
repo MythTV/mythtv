@@ -7,10 +7,10 @@
 <div class="wizard-content m-3">
     <p-card>
         <ng-template pTemplate="title">
-            Locale Setup
+            {{ 'setupwizard.localSetup' | translate }}
         </ng-template>
         <ng-template pTemplate="subtitle">
-            Enter your Country and Language
+            {{ 'setupwizard.countryAndLanguage' | translate }}
         </ng-template>
         <ng-template pTemplate="content">
             <div class="grid m-3">
@@ -19,29 +19,23 @@
                         [filter]="true" optionLabel="Country" [listStyle]="{'max-height':'460px', 'min-height':'460px'}"
                         (onChange)="countrySelected($event)">
                         <ng-template pTemplate="header">
-                            <h2>Select Country</h2>
+                            <h2>{{ 'setupwizard.selectCountry' | translate }}</h2>
                         </ng-template>
                         <ng-template let-country pTemplate="item">
-                            <div #countryrow [attr.id]="country.Code" style="align-items: center;" class="country-item">
-                                <img src="images/locale/{{country.Image}}" style="width:50px;height:30px;"> <span
-                                    class="badge pl-2"></span>{{country.Code}} {{country.Country}}
-                                {{country.NativeCountry}}
+                            <div #countryrow [attr.id]="country.Code" class="language-item">
+                                <img class="pr-3" src="images/locale/{{country.Image}}" style="width:70px">
+                                <pre><span class="font-bold">{{country.Country}}</span>{{country.NativeCountry !== null ? " - " + country.NativeCountry : ""}} ({{ country.Code}})</pre>
                             </div>
                         </ng-template>
-                        <!-- <ng-template pTemplate="footer">
-                        <div class="p-4">
-                            <h3>Footer Content</h3>
-                        </div>
-                    </ng-template> -->
                     </p-listbox>
 
                     <div class="pt-5" *ngIf="((m_wizardData.Country.Code != '')) else noCountry">
-                        <p-message severity="success" text="Selected Country is: {{m_wizardData.Country.Country}}">
+                        <p-message severity="success" text="{{ 'setupwizard.selectedCountry' | translate }} {{m_wizardData.Country.Country}}">
                         </p-message>
                     </div>
                     <ng-template #noCountry>
                         <div class="pt-5">
-                            <p-message severity="error" text="No Country is selected"></p-message>
+                            <p-message severity="error" text="{{ 'setupwizard.noCountry' | translate }}"></p-message>
                         </div>
                     </ng-template>
 
@@ -53,26 +47,23 @@
                         [listStyle]="{'max-height':'460px', 'min-height':'460px'}"
                         (onChange)="languageSelected($event)">
                         <ng-template pTemplate="header">
-                            <h2>Select Language</h2>
+                            <h2>{{ 'setupwizard.selectLanguage' | translate }}</h2>
                         </ng-template>
                         <ng-template let-language pTemplate="item" >
                             <div #languagerow [attr.id]="language.Code" class="language-item">
-                                <img src="images/locale/{{language.Image}}" style="width:50px;height:30px;"> 
-                                <span class="pl-2">{{language.Language}} - {{language.NativeLanguage}} ({{language.Code}})</span>
+                                <img class="pr-3" src="images/locale/{{language.Image}}" style="width:70px"> 
+                                <pre><span class="font-bold">{{language.Language}}</span> - {{language.NativeLanguage}} ({{language.Code}})</pre>
                             </div>
                         </ng-template>
-                        <!-- <ng-template pTemplate="footer">
-                            Language selected: {{m_selectedLanguages[0].Language}} 
-                        </ng-template>  -->
                     </p-listbox>
 
                     <div class="pt-5" *ngIf="(m_wizardData.Language.Code != '') else noLanguage">
-                        <p-message severity="success" text="Selected Language is: {{m_wizardData.Language.NativeLanguage}}">
+                        <p-message severity="success" text="{{ 'setupwizard.selectedLanguage' | translate }} {{m_wizardData.Language.NativeLanguage}}">
                         </p-message>
                     </div>
                     <ng-template #noLanguage>
                         <div class="pt-5">
-                            <p-message class="pt-2" severity="error" text="No Language is selected"></p-message>
+                            <p-message class="pt-2" severity="error" text="{{ 'setupwizard.noLanguage' | translate }}"></p-message>
                         </div>
                     </ng-template>
                 </div>
@@ -81,10 +72,10 @@
 
         <ng-template pTemplate="footer">
             <div class="p-grid p-nogutter p-justify-end">
-                <p-button label="Next" (onClick)="nextPage()" icon="pi pi-angle-right" iconPos="right"
+                <p-button label="{{ 'common.next' | translate }}" (onClick)="nextPage()" icon="pi pi-angle-right" iconPos="right"
                     [disabled]="(m_wizardData.Country.Code == '') || (m_wizardData.Language.Code == '')">
                 </p-button>
-                <p-button style="float: right;" label="Help" (onClick)="showHelp()" icon="pi pi-info-circle" styleClass="p-button-info" ></p-button>
+                <p-button style="float: right;" label="{{ 'common.help' | translate }}" (onClick)="showHelp()" icon="pi pi-info-circle" styleClass="p-button-info" ></p-button>
             </div>
         </ng-template>
     </p-card>

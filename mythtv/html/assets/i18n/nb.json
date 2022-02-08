@@ -1,6 +1,9 @@
 {
     "common": {
-        "loading": "Laster"
+        "back": "Tilbake",
+        "help": "Hjelp",
+        "loading": "Laster",
+        "next": "neste"
     },
     "dashboard": {
         "warning": "Vær oppmerksom på at dette pågår og enkelte funksjoner fungerer ikke fullt ut!"
@@ -111,6 +114,38 @@
         "upload": "Upload",
         "weak": "Svak",
         "weekHeader": "Wk"
+    },
+    "setupwizard": {
+        "IPorAddressRequired": "IP-adresse eller vertsnavn kreves",
+        "MySQLDatabaseName": "MySQL-databasenavn",
+        "MySQLPassword": "MySQL-passord",
+        "MySQLServerIP": "MySQL Server IP",
+        "MySQLServerPort": "MySQL-serverport",
+        "MySQLUser": "MySQL-bruker",
+        "chooseLanguage": "Velg språk",
+        "connectedToDatabase": "Koblet til databasen",
+        "countryAndLanguage": "Skriv inn land og språk",
+        "databaseNameRequired": "Databasenavn er påkrevd",
+        "databaseSchemaUnknown": "Databaseskjemaversjonen er ukjent",
+        "databaseSetup": "Databaseoppsett",
+        "done": "FERDIG",
+        "enterDBLoginDetails": "Skriv inn påloggingsdetaljer for databasen",
+        "localSetup": "Lokale oppsett",
+        "noCountry": "Ingen land er valgt",
+        "noLanguage": "Ingen språk er valgt",
+        "notConnectedToDatabase": "Ikke koblet til databasen",
+        "passwordRequired": "Passord er påkrevd",
+        "portRequired": "Port er påkrevd og må være et tall mellom 0 og 65536",
+        "selectCountry": "Velg land",
+        "selectLanguage": "Velg språk",
+        "selectedCountry": "Valgt land er:",
+        "selectedLanguage": "Valgt språk er:",
+        "setupDatabase": "Databaseoppsett",
+        "setupNetwork": "Backend-nettverk",
+        "setupStorageGroups": "Lagringsgrupper",
+        "testConnection": "Testforbindelse",
+        "title": "Veiviser for første oppsett",
+        "userRequired": "Bruker kreves"
     },
     "testbed": {
         "title": "Dette er et testbed-område",

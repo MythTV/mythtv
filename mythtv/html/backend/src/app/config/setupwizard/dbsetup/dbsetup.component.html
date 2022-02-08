@@ -8,71 +8,71 @@
 <form class="ml-3 mr-3" name="databaseForm" #databaseForm="ngForm" (ngSubmit)="saveForm()">
     <p-card class="m-5">
         <ng-template pTemplate="title">
-            Database Setup
+            {{ 'setupwizard.databaseSetup' | translate }}
         </ng-template>
         <ng-template pTemplate="subtitle">
-            Enter the database login details
+            {{ 'setupwizard.enterDBLoginDetails' | translate }}
         </ng-template>
         <ng-template pTemplate="content">
             <div class="formgrid grid form-group">
                 <div class="field col-12 md:col-6">
-                    <label for="ipaddress" class="block">MySQL Server IP</label>
+                    <label for="ipaddress" class="block">{{ 'setupwizard.MySQLServerIP' | translate }}</label>
                     <input pInputText id="ipaddress" type="text" aria-describedby="ipaddress-help" 
                            [(ngModel)]="m_wizardData.Database.Host" name="hostname" #host="ngModel" class="form-control w-full" 
                            [ngClass]="{'is-invalid': host.invalid }" placeholder="Ex. 127.0.0.1 or localhost" required />
                     <div *ngIf="host.invalid && (host.dirty || host.touched)">
-                        <small id="address-help" class="p-error block">Ip Address or Hostname is required</small>
+                        <small id="address-help" class="p-error block">{{ 'setupwizard.IPorAddressRequired' | translate }}</small>
                     </div>
                 </div>
 
                 <div class="field col-12 md:col-6">
-                    <label for="port" class="block">MySQL Server Port</label>
+                    <label for="port" class="block">{{ 'setupwizard.MySQLServerPort' | translate }}</label>
                     <input pInputText id="port" type="number" aria-describedby="port-help" 
                            [(ngModel)]="m_wizardData.Database.Port" name="port" #port="ngModel" class="form-control" placeholder="Ex. 3306" min="0" max="65536"/>
                     <div *ngIf="port.invalid && (port.dirty || port.touched)">
-                        <small id="port-help" class="p-error block">Port is required and must be a number between 0 and 65536</small>
+                        <small id="port-help" class="p-error block">{{ 'setupwizard.portRequired' | translate }}</small>
                     </div>
                 </div>
 
                 <div class="field col-12 md:col-6">
-                    <label for="user" class="block">MySQL User</label>
+                    <label for="user" class="block">{{ 'setupwizard.MySQLUser' | translate }}</label>
                     <input pInputText id="user" type="text" aria-describedby="user-help" 
                     [(ngModel)]="m_wizardData.Database.UserName" name="user" #user="ngModel" class="form-control w-full" placeholder="Ex. mythtv" required/>
                     <div *ngIf="user.invalid && (user.dirty || user.touched)">
-                        <small id="user-help" class="p-error block">User is required</small>
+                        <small id="user-help" class="p-error block">{{ 'setupwizard.userRequired' | translate }}</small>
                     </div>
                 </div>
                 <div class="field col-12 md:col-6">
-                    <label for="password" class="block">MySQL Password</label>
+                    <label for="password" class="block">{{ 'setupwizard.MySQLPassword' | translate }}</label>
                     <input pInputText id="password" type="text" aria-describedby="password-help" 
                            [(ngModel)]="m_wizardData.Database.Password" name="password" #password="ngModel" class="form-control w-full" placeholder="Ex. mythtv" required/>
                     <div *ngIf="password.invalid && (password.dirty || password.touched)">
-                        <small id="password-help" class="p-error block">Password is required</small>
+                        <small id="password-help" class="p-error block">{{ 'setupwizard.passwordRequired' | translate }}</small>
                     </div>
                 </div>
 
                 <div class="field col-12 md:col-6">
-                    <label for="dbname" class="block">MySQL Database Name</label>
+                    <label for="dbname" class="block">{{ 'setupwizard.MySQLDatabaseName' | translate }}</label>
                     <input pInputText id="dbname" type="text" aria-describedby="dbname-help" 
                            [(ngModel)]="m_wizardData.Database.Name" name="dbname" #dbname="ngModel" class="form-control w-full" placeholder="Ex. mythconverg" required/>
                     <div *ngIf="dbname.invalid && (dbname.dirty || dbname.touched)">
-                        <small id="dbname-help" class="p-error block">Database Name is required</small>
+                        <small id="dbname-help" class="p-error block">{{ 'setupwizard.databaseNameRequired' | translate }}</small>
                     </div>
                 </div>           
              </div>
              <div>
-                <button pButton type="button" class="mr-1 p-button-raised p-button-secondary" (click)="testConnection()" [disabled]="databaseForm.invalid">Test Connection</button>              
+                <p-button type="button" class="mr-1 p-button-raised p-button-secondary" label="{{ 'setupwizard.testConnection' | translate }}" (click)="testConnection()" [disabled]="databaseForm.invalid == null || databaseForm.invalid"></p-button>              
             </div>
             
             <div class="pt-4" style="display: flex">
                 <!-- connected -->
                 <div *ngIf="m_wizardData.DatabaseStatus.DatabaseStatus.Connected else notconnected">
-                    <p-message class="pr-2" severity="success" text="Connected to database"></p-message>
+                    <p-message class="pr-2" severity="success" text="{{ 'setupwizard.connectedToDatabase' | translate }}"></p-message>
                 </div>
                 
                 <ng-template #notconnected>
                     <div #notconnected class="pr-2 notconnected">
-                        <p-message class="" severity="error" text="Not connected to database"></p-message>
+                        <p-message class="" severity="error" text="{{ 'setupwizard.notConnectedToDatabase' | translate }}"></p-message>
                     </div>
                 </ng-template>
                 
@@ -95,7 +95,7 @@
                 
                 <ng-template #noschema>
                     <div #nodatabase class="pr-2 noschema">
-                        <p-message severity="info" text="Database schema version is unknown"></p-message>
+                        <p-message severity="info" text="{{ 'setupwizard.databaseSchemaUnknown' | translate }}"></p-message>
                     </div>
                 </ng-template>
             </div>
@@ -104,11 +104,11 @@
         
         <ng-template pTemplate="footer">
             <div class="p-grid p-nogutter p-justify-end">
-                <p-button class="pr-1" label="Back" (onClick)="previousPage()" icon="pi pi-angle-left" iconPos="left"></p-button>
-                <p-button label="Next" (onClick)="nextPage()" icon="pi pi-angle-right" iconPos="right" 
+                <p-button class="pr-1" label="{{ 'common.back' | translate }}" (onClick)="previousPage()" icon="pi pi-angle-left" iconPos="left"></p-button>
+                <p-button label="{{'common.next' | translate}}" (onClick)="nextPage()" icon="pi pi-angle-right" iconPos="right" 
                           [disabled]="databaseForm.invalid || !m_wizardData.DatabaseStatus.DatabaseStatus.Connected || !m_wizardData.DatabaseStatus.DatabaseStatus.HaveDatabase">
                 </p-button>              
-                <p-button style="float: right;" label="Help" (onClick)="showHelp()" icon="pi pi-info-circle" styleClass="p-button-info" ></p-button>
+                <p-button style="float: right;" label="{{'common.help' | translate}}" (onClick)="showHelp()" icon="pi pi-info-circle" styleClass="p-button-info" ></p-button>
             </div>          
         </ng-template>
     </p-card>

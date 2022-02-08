@@ -1,6 +1,9 @@
 {
     "common": {
-        "loading": "Ladataan"
+        "back": "Takaisin",
+        "help": "auta",
+        "loading": "Ladataan",
+        "next": "Seuraava"
     },
     "dashboard": {
         "warning": "Huomaa, että tämä on työn alla ja jotkin ominaisuudet eivät toimi täysin!"
@@ -111,6 +114,38 @@
         "upload": "Upload",
         "weak": "Heikko",
         "weekHeader": "Wk"
+    },
+    "setupwizard": {
+        "IPorAddressRequired": "IP-osoite tai isäntänimi vaaditaan",
+        "MySQLDatabaseName": "MySQL-tietokannan nimi",
+        "MySQLPassword": "MySQL salasana",
+        "MySQLServerIP": "MySQL-palvelimen IP",
+        "MySQLServerPort": "MySQL-palvelimen portti",
+        "MySQLUser": "MySQL-käyttäjä",
+        "chooseLanguage": "Valitse kieli",
+        "connectedToDatabase": "Yhdistetty tietokantaan",
+        "countryAndLanguage": "Anna maasi ja kielisi",
+        "databaseNameRequired": "Tietokannan nimi vaaditaan",
+        "databaseSchemaUnknown": "Tietokantaskeeman versio on tuntematon",
+        "databaseSetup": "Tietokannan asetukset",
+        "done": "Tehty",
+        "enterDBLoginDetails": "Anna tietokantaan kirjautumistiedot",
+        "localSetup": "Kieliasetukset",
+        "noCountry": "Maata ei ole valittu",
+        "noLanguage": "Kieltä ei ole valittu",
+        "notConnectedToDatabase": "Ei yhdistetty tietokantaan",
+        "passwordRequired": "salasana tarvitaan",
+        "portRequired": "Portti vaaditaan, ja sen on oltava numero väliltä 0–65536",
+        "selectCountry": "Valitse maa",
+        "selectLanguage": "Valitse kieli",
+        "selectedCountry": "Valittu maa on:",
+        "selectedLanguage": "Valittu kieli on:",
+        "setupDatabase": "Tietokannan asetukset",
+        "setupNetwork": "Taustaverkko",
+        "setupStorageGroups": "Tallennusryhmät",
+        "testConnection": "Testiliitäntä",
+        "title": "Alkuasennuksen ohjattu toiminto",
+        "userRequired": "Käyttäjä vaaditaan"
     },
     "testbed": {
         "title": "Tämä on koealue",

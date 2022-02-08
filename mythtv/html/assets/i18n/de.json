@@ -1,6 +1,9 @@
 {
     "common": {
-        "loading": "Wird geladen"
+        "back": "Zurück",
+        "help": "Hilfe",
+        "loading": "Wird geladen",
+        "next": "Nächster"
     },
     "dashboard": {
         "warning": "Bitte beachten Sie, dass dies noch in Arbeit ist und einige Funktionen nicht vollständig funktionieren!"
@@ -111,6 +114,38 @@
         "upload": "Upload",
         "weak": "Schwach",
         "weekHeader": "Wk"
+    },
+    "setupwizard": {
+        "IPorAddressRequired": "IP-Adresse oder Hostname ist erforderlich",
+        "MySQLDatabaseName": "Name der MySQL-Datenbank",
+        "MySQLPassword": "MySQL-Passwort",
+        "MySQLServerIP": "MySQL-Server-IP",
+        "MySQLServerPort": "MySQL-Server-Port",
+        "MySQLUser": "MySQL-Benutzer",
+        "chooseLanguage": "Sprache wählen",
+        "connectedToDatabase": "Mit Datenbank verbunden",
+        "countryAndLanguage": "Geben Sie Ihr Land und Ihre Sprache ein",
+        "databaseNameRequired": "Datenbankname ist erforderlich",
+        "databaseSchemaUnknown": "Die Version des Datenbankschemas ist unbekannt",
+        "databaseSetup": "Datenbank-Setup",
+        "done": "Erledigt",
+        "enterDBLoginDetails": "Geben Sie die Anmeldedaten für die Datenbank ein",
+        "localSetup": "Gebietsschema einrichten",
+        "noCountry": "Es ist kein Land ausgewählt",
+        "noLanguage": "Keine Sprache ausgewählt",
+        "notConnectedToDatabase": "Keine Verbindung zur Datenbank",
+        "passwordRequired": "Passwort wird benötigt",
+        "portRequired": "Port ist erforderlich und muss eine Zahl zwischen 0 und 65536 sein",
+        "selectCountry": "Land auswählen",
+        "selectLanguage": "Sprache auswählen",
+        "selectedCountry": "Ausgewähltes Land ist:",
+        "selectedLanguage": "Ausgewählte Sprache ist:",
+        "setupDatabase": "Datenbank-Setup",
+        "setupNetwork": "Backend-Netzwerk",
+        "setupStorageGroups": "Speichergruppen",
+        "testConnection": "Testverbindung",
+        "title": "Assistent für die Ersteinrichtung",
+        "userRequired": "Benutzer ist erforderlich"
     },
     "testbed": {
         "title": "Dies ist ein Testbed-Bereich",

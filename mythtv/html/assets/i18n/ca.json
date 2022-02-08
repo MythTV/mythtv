@@ -1,6 +1,9 @@
 {
     "common": {
-        "loading": "Carregant"
+        "back": "esquena",
+        "help": "Ajuda",
+        "loading": "Carregant",
+        "next": "Pròxim"
     },
     "dashboard": {
         "warning": "Tingueu en compte que això és un treball en curs i algunes funcions no funcionen del tot!"
@@ -111,6 +114,38 @@
         "upload": "Upload",
         "weak": "Feble",
         "weekHeader": "Wk"
+    },
+    "setupwizard": {
+        "IPorAddressRequired": "Cal l'adreça IP o el nom d'amfitrió",
+        "MySQLDatabaseName": "Nom de la base de dades MySQL",
+        "MySQLPassword": "Contrasenya MySQL",
+        "MySQLServerIP": "IP del servidor MySQL",
+        "MySQLServerPort": "Port del servidor MySQL",
+        "MySQLUser": "Usuari de MySQL",
+        "chooseLanguage": "Trieu l’idioma",
+        "connectedToDatabase": "Connectat a la base de dades",
+        "countryAndLanguage": "Introduïu el vostre país i idioma",
+        "databaseNameRequired": "El nom de la base de dades és obligatori",
+        "databaseSchemaUnknown": "Es desconeix la versió de l'esquema de la base de dades",
+        "databaseSetup": "Configuració de la base de dades",
+        "done": "Fet",
+        "enterDBLoginDetails": "Introduïu les dades d'inici de sessió de la base de dades",
+        "localSetup": "Configuració local",
+        "noCountry": "No s'ha seleccionat cap país",
+        "noLanguage": "No s'ha seleccionat cap idioma",
+        "notConnectedToDatabase": "No connectat a la base de dades",
+        "passwordRequired": "Es requereix contrasenya",
+        "portRequired": "El port és obligatori i ha de ser un número entre 0 i 65536",
+        "selectCountry": "Selecciona país",
+        "selectLanguage": "Escolliu l'idioma",
+        "selectedCountry": "El país seleccionat és:",
+        "selectedLanguage": "L'idioma seleccionat és:",
+        "setupDatabase": "Configuració de la base de dades",
+        "setupNetwork": "Xarxa de fons",
+        "setupStorageGroups": "Grups d'emmagatzematge",
+        "testConnection": "Prova de connexió",
+        "title": "Assistent de configuració inicial",
+        "userRequired": "Es requereix l'usuari"
     },
     "testbed": {
         "title": "Aquesta és una zona de proves",

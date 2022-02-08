@@ -1,6 +1,9 @@
 {
     "common": {
-        "loading": "טעינה"
+        "back": "חזור",
+        "help": "עזרה",
+        "loading": "טעינה",
+        "next": "הבא"
     },
     "dashboard": {
         "warning": "שימו לב שזו עבודה בתהליך וחלק מהתכונות אינן פועלות במלואן!"
@@ -111,6 +114,38 @@
         "upload": "Upload",
         "weak": "חלש",
         "weekHeader": "Wk"
+    },
+    "setupwizard": {
+        "IPorAddressRequired": "נדרשת כתובת IP או שם מארח",
+        "MySQLDatabaseName": "שם מסד הנתונים של MySQL",
+        "MySQLPassword": "סיסמת MySQL",
+        "MySQLServerIP": "MySQL Server IP",
+        "MySQLServerPort": "יציאת שרת MySQL",
+        "MySQLUser": "משתמש MySQL",
+        "chooseLanguage": "בחר שפה",
+        "connectedToDatabase": "מחובר למסד נתונים",
+        "countryAndLanguage": "הזן את הארץ והשפה שלך",
+        "databaseNameRequired": "נדרש שם מסד נתונים",
+        "databaseSchemaUnknown": "גרסת סכימת מסד הנתונים אינה ידועה",
+        "databaseSetup": "הגדרת מסד נתונים",
+        "done": "בוצע",
+        "enterDBLoginDetails": "הזן את פרטי הכניסה למסד הנתונים",
+        "localSetup": "הגדרת מיקום",
+        "noCountry": "לא נבחרה מדינה",
+        "noLanguage": "לא נבחרה שפה",
+        "notConnectedToDatabase": "לא מחובר למסד נתונים",
+        "passwordRequired": "דרושה סיסמא",
+        "portRequired": "נדרשת יציאה וחייבת להיות מספר בין 0 ל-65536",
+        "selectCountry": "בחר מדינה",
+        "selectLanguage": "בחר שפה",
+        "selectedCountry": "המדינה שנבחרה היא:",
+        "selectedLanguage": "השפה שנבחרה היא:",
+        "setupDatabase": "הגדרת מסד נתונים",
+        "setupNetwork": "רשת עורפית",
+        "setupStorageGroups": "קבוצות אחסון",
+        "testConnection": "בדוק חיבור",
+        "title": "אשף ההתקנה הראשונית",
+        "userRequired": "נדרש משתמש"
     },
     "testbed": {
         "title": "זהו אזור מבחן",

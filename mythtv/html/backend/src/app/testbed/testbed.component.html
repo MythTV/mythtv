@@ -1,6 +1,6 @@
-<h1>This screen is a testbed area</h1><hr>
+<h1>{{ 'testbed.title' | translate }}</h1><hr>
 <div *ngIf="(m_hostname$ | async)?.String as hostname; else loading">
-    <p>Welcome to MythTV Backend running on host {{hostname}}</p>
+    <p>{{ 'testbed.welcome' | translate }} {{hostname}}</p>
 </div>
 <div *ngIf="(m_timezone$ | async)?.TimeZoneInfo as timezone; else loading">
     <p>It is currently {{timezone.CurrentDateTime}} in timezone {{timezone.TimeZoneID}}, UTC offset
@@ -28,9 +28,12 @@
 </ng-template>
 
 <ng-template #loading>
-    <p>Loading ...</p>
+    <p>{{ 'common.loading' | translate }} ...</p>
 </ng-template>
 
     
 <p-button class="p-2" (click)="setSecurityPin('1234')">Set PIN to 1234</p-button>
 <p-button (click)="setSecurityPin('0000')">Set PIN to 0000</p-button>
+
+<h4>Translation Test</h4>
+<div>{{ 'primeng.passwordPrompt' | translate }}</div> 

@@ -2,6 +2,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ConfigService } from '../../services/config.service';
 import { MenuItem } from 'primeng/api';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+
 
 @Component({
     selector: 'app-settings',
@@ -11,29 +13,29 @@ import { Router } from '@angular/router';
 export class SetupWizardComponent implements OnInit {
 
     constructor(private router: Router,
-                private configService: ConfigService) { }
-
+                private configService: ConfigService,
+                private translate: TranslateService) { }
     wizardItems: MenuItem[] = [];
     
     ngOnInit(): void {
         this.wizardItems = [{
-            label: 'Choose Language',
+            label: this.translate.instant('setupwizard.chooseLanguage'),
             routerLink: 'selectlanguage'
         },
         {
-            label: 'Database Setup',
+            label: this.translate.instant('setupwizard.setupDatabase'),
             routerLink: 'dbsetup'
         },
         {
-            label: 'Backend Network',
+            label: this.translate.instant('setupwizard.setupNetwork'),
             routerLink: 'backendnetwork'
         },
         {
-            label: 'Storage Groups',
+            label: this.translate.instant('setupwizard.setupStorageGroups'),
             routerLink: 'sgsetup'
         },
         {
-            label: 'Done',
+            label: this.translate.instant('setupwizard.done'),
             routerLink: 'restart'
         }
     ];

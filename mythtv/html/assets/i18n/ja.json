@@ -1,6 +1,9 @@
 {
     "common": {
-        "loading": "読み込み中"
+        "back": "バック",
+        "help": "助けて",
+        "loading": "読み込み中",
+        "next": "次"
     },
     "dashboard": {
         "warning": "これは進行中の作業であり、一部の機能が完全に機能していないことに注意してください。"
@@ -111,6 +114,38 @@
         "upload": "Upload",
         "weak": "弱い",
         "weekHeader": "Wk"
+    },
+    "setupwizard": {
+        "IPorAddressRequired": "IPアドレスまたはホスト名が必要です",
+        "MySQLDatabaseName": "MySQLデータベース名",
+        "MySQLPassword": "MySQLパスワード",
+        "MySQLServerIP": "MySQLサーバーIP",
+        "MySQLServerPort": "MySQLサーバーポート",
+        "MySQLUser": "MySQLユーザー",
+        "chooseLanguage": "言語を選択",
+        "connectedToDatabase": "データベースに接続",
+        "countryAndLanguage": "国と言語を入力してください",
+        "databaseNameRequired": "データベース名が必要です",
+        "databaseSchemaUnknown": "データベーススキーマのバージョンが不明です",
+        "databaseSetup": "データベースの設定",
+        "done": "完了",
+        "enterDBLoginDetails": "データベースログインの詳細を入力します",
+        "localSetup": "ロケールの設定",
+        "noCountry": "国が選択されていません",
+        "noLanguage": "言語が選択されていません",
+        "notConnectedToDatabase": "データベースに接続されていません",
+        "passwordRequired": "パスワードが必要です",
+        "portRequired": "ポートは必須であり、0〜65536の数値である必要があります",
+        "selectCountry": "国を選択",
+        "selectLanguage": "言語を選択する",
+        "selectedCountry": "選択した国は次のとおりです。",
+        "selectedLanguage": "選択された言語は次のとおりです。",
+        "setupDatabase": "データベースの設定",
+        "setupNetwork": "バックエンドネットワーク",
+        "setupStorageGroups": "ストレージグループ",
+        "testConnection": "接続テスト",
+        "title": "初期設定ウィザード",
+        "userRequired": "ユーザーが必要です"
     },
     "testbed": {
         "title": "これはテストベッドエリアです",

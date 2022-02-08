@@ -10,6 +10,8 @@ import { ConfigService } from '../../../services/config.service';
 })
 export class BackendnetworkComponent implements OnInit {
 
+    m_showHelp: boolean = false;
+
     constructor(private router: Router,
         private configService: ConfigService) { }
 
@@ -25,5 +27,9 @@ export class BackendnetworkComponent implements OnInit {
     nextPage() {
         this.router.navigate(['settings/sgsetup']);
         return;
+    }
+
+    showHelp() {
+        this.m_showHelp = true;
     }
 }

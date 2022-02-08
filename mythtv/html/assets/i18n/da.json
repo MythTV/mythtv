@@ -1,6 +1,9 @@
 {
     "common": {
-        "loading": "Indlæser"
+        "back": "Tilbage",
+        "help": "Hjælp",
+        "loading": "Indlæser",
+        "next": "Næste"
     },
     "dashboard": {
         "warning": "Bemærk venligst, at dette er et igangværende arbejde, og nogle funktioner fungerer ikke fuldt ud!"
@@ -111,6 +114,38 @@
         "upload": "Upload",
         "weak": "Svag",
         "weekHeader": "Wk"
+    },
+    "setupwizard": {
+        "IPorAddressRequired": "IP-adresse eller værtsnavn er påkrævet",
+        "MySQLDatabaseName": "MySQL-databasenavn",
+        "MySQLPassword": "MySQL adgangskode",
+        "MySQLServerIP": "MySQL Server IP",
+        "MySQLServerPort": "MySQL-serverport",
+        "MySQLUser": "MySQL bruger",
+        "chooseLanguage": "Vælg sprog",
+        "connectedToDatabase": "Forbundet til databasen",
+        "countryAndLanguage": "Indtast dit land og sprog",
+        "databaseNameRequired": "Databasenavn er påkrævet",
+        "databaseSchemaUnknown": "Databaseskemaversionen er ukendt",
+        "databaseSetup": "Database opsætning",
+        "done": "Færdig",
+        "enterDBLoginDetails": "Indtast databasens loginoplysninger",
+        "localSetup": "Opsætning af lokalitet",
+        "noCountry": "Intet land er valgt",
+        "noLanguage": "Intet sprog er valgt",
+        "notConnectedToDatabase": "Ikke forbundet til databasen",
+        "passwordRequired": "adgangskode er påkrævet",
+        "portRequired": "Port er påkrævet og skal være et tal mellem 0 og 65536",
+        "selectCountry": "Vælg land",
+        "selectLanguage": "Vælg sprog",
+        "selectedCountry": "Det valgte land er:",
+        "selectedLanguage": "Det valgte sprog er:",
+        "setupDatabase": "Database opsætning",
+        "setupNetwork": "Backend netværk",
+        "setupStorageGroups": "Lagergrupper",
+        "testConnection": "Testforbindelse",
+        "title": "Initial Setup Wizard",
+        "userRequired": "Bruger er påkrævet"
     },
     "testbed": {
         "title": "Dette er et testbed område",

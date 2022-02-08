@@ -1,6 +1,9 @@
 {
     "common": {
-        "loading": "Betöltés"
+        "back": "Hát",
+        "help": "Segítség",
+        "loading": "Betöltés",
+        "next": "Következő"
     },
     "dashboard": {
         "warning": "Felhívjuk figyelmét, hogy ez egy folyamatban lévő munka, és néhány funkció nem működik teljesen!"
@@ -111,6 +114,38 @@
         "upload": "Upload",
         "weak": "Gyenge",
         "weekHeader": "Wk"
+    },
+    "setupwizard": {
+        "IPorAddressRequired": "Az IP-cím vagy a gazdagépnév megadása kötelező",
+        "MySQLDatabaseName": "MySQL adatbázis neve",
+        "MySQLPassword": "MySQL jelszó",
+        "MySQLServerIP": "MySQL Server IP",
+        "MySQLServerPort": "MySQL szerver port",
+        "MySQLUser": "MySQL felhasználó",
+        "chooseLanguage": "Válassz nyelvet",
+        "connectedToDatabase": "Adatbázishoz csatlakozva",
+        "countryAndLanguage": "Adja meg országát és nyelvét",
+        "databaseNameRequired": "Az adatbázisnév megadása kötelező",
+        "databaseSchemaUnknown": "Az adatbázisséma verziója ismeretlen",
+        "databaseSetup": "Adatbázis beállítása",
+        "done": "Kesz",
+        "enterDBLoginDetails": "Adja meg az adatbázis bejelentkezési adatait",
+        "localSetup": "Nyelv-beállítás",
+        "noCountry": "Nincs ország kiválasztva",
+        "noLanguage": "Nincs nyelv kiválasztva",
+        "notConnectedToDatabase": "Nem kapcsolódik az adatbázishoz",
+        "passwordRequired": "Jelszó szükséges",
+        "portRequired": "A port kötelező, és 0 és 65536 közötti számnak kell lennie",
+        "selectCountry": "Válassz országot",
+        "selectLanguage": "Válasszon nyelvet",
+        "selectedCountry": "A kiválasztott ország:",
+        "selectedLanguage": "A kiválasztott nyelv:",
+        "setupDatabase": "Adatbázis beállítása",
+        "setupNetwork": "Háttérhálózat",
+        "setupStorageGroups": "Tárolási csoportok",
+        "testConnection": "Tesztelje a kapcsolatot",
+        "title": "Kezdeti beállítás varázsló",
+        "userRequired": "Felhasználó szükséges"
     },
     "testbed": {
         "title": "Ez egy próbapad terület",

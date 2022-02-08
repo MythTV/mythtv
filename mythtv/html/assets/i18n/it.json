@@ -1,6 +1,9 @@
 {
     "common": {
-        "loading": "Caricamento in corso"
+        "back": "indietro",
+        "help": "Aiuto",
+        "loading": "Caricamento in corso",
+        "next": "Il prossimo"
     },
     "dashboard": {
         "warning": "Si prega di notare che questo è un lavoro in corso e alcune funzionalità non sono completamente funzionanti!"
@@ -111,6 +114,38 @@
         "upload": "Upload",
         "weak": "Debole",
         "weekHeader": "Wk"
+    },
+    "setupwizard": {
+        "IPorAddressRequired": "È richiesto l'indirizzo IP o il nome host",
+        "MySQLDatabaseName": "Nome del database MySQL",
+        "MySQLPassword": "Password MySQL",
+        "MySQLServerIP": "IP del server MySQL",
+        "MySQLServerPort": "Porta del server MySQL",
+        "MySQLUser": "Utente MySQL",
+        "chooseLanguage": "Scegli la lingua",
+        "connectedToDatabase": "Collegato al database",
+        "countryAndLanguage": "Inserisci il tuo Paese e la tua lingua",
+        "databaseNameRequired": "Il nome del database è obbligatorio",
+        "databaseSchemaUnknown": "La versione dello schema del database è sconosciuta",
+        "databaseSetup": "Configurazione del database",
+        "done": "Fatto",
+        "enterDBLoginDetails": "Immettere i dettagli di accesso al database",
+        "localSetup": "Configurazione locale",
+        "noCountry": "Nessun Paese è selezionato",
+        "noLanguage": "Nessuna lingua è selezionata",
+        "notConnectedToDatabase": "Non connesso al database",
+        "passwordRequired": "E 'richiesta la password",
+        "portRequired": "La porta è obbligatoria e deve essere un numero compreso tra 0 e 65536",
+        "selectCountry": "Seleziona il paese",
+        "selectLanguage": "Seleziona la lingua",
+        "selectedCountry": "Il Paese selezionato è:",
+        "selectedLanguage": "La lingua selezionata è:",
+        "setupDatabase": "Configurazione del database",
+        "setupNetwork": "Rete di backend",
+        "setupStorageGroups": "Gruppi di archiviazione",
+        "testConnection": "test di connessione",
+        "title": "Procedura guidata di configurazione iniziale",
+        "userRequired": "Utente è richiesto"
     },
     "testbed": {
         "title": "Questa è un'area del banco di prova",

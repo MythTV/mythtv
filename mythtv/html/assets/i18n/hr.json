@@ -1,6 +1,9 @@
 {
     "common": {
-        "loading": "Učitavam"
+        "back": "leđa",
+        "help": "Pomozite",
+        "loading": "Učitavam",
+        "next": "sljedeći"
     },
     "dashboard": {
         "warning": "Imajte na umu da je ovo rad u tijeku i da neke značajke ne rade u potpunosti!"
@@ -111,6 +114,38 @@
         "upload": "Upload",
         "weak": "Slab",
         "weekHeader": "Wk"
+    },
+    "setupwizard": {
+        "IPorAddressRequired": "Potrebna je IP adresa ili ime hosta",
+        "MySQLDatabaseName": "Ime MySQL baze podataka",
+        "MySQLPassword": "MySQL lozinka",
+        "MySQLServerIP": "IP MySQL poslužitelja",
+        "MySQLServerPort": "Port za MySQL poslužitelj",
+        "MySQLUser": "Korisnik MySQL",
+        "chooseLanguage": "Odaberite jezik",
+        "connectedToDatabase": "Povezano s bazom podataka",
+        "countryAndLanguage": "Unesite svoju zemlju i jezik",
+        "databaseNameRequired": "Naziv baze podataka je obavezan",
+        "databaseSchemaUnknown": "Verzija sheme baze podataka nije poznata",
+        "databaseSetup": "Postavljanje baze podataka",
+        "done": "Gotovo",
+        "enterDBLoginDetails": "Unesite podatke za prijavu u bazu podataka",
+        "localSetup": "Locale Setup",
+        "noCountry": "Nije odabrana nijedna država",
+        "noLanguage": "Nije odabran jezik",
+        "notConnectedToDatabase": "Nije povezan s bazom podataka",
+        "passwordRequired": "potrebna je lozinka",
+        "portRequired": "Port je obavezan i mora biti broj između 0 i 65536",
+        "selectCountry": "Odaberi državu",
+        "selectLanguage": "Izaberi jezik",
+        "selectedCountry": "Odabrana zemlja je:",
+        "selectedLanguage": "Odabrani jezik je:",
+        "setupDatabase": "Postavljanje baze podataka",
+        "setupNetwork": "Pozadinska mreža",
+        "setupStorageGroups": "Grupe za pohranu",
+        "testConnection": "Testna veza",
+        "title": "Čarobnjak za početno postavljanje",
+        "userRequired": "Korisnik je obavezan"
     },
     "testbed": {
         "title": "Ovo je područje za testiranje",
