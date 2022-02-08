@@ -4,7 +4,7 @@
 #include "decoder.h"
 
 #ifdef HAVE_CDIO
-# ifdef HAVE_CDPARANOIA_SUBDIR
+# if __has_include(<cdio/paranoia/cdda.h>)
 #  include <cdio/paranoia/cdda.h>
 #  include <cdio/paranoia/paranoia.h>
 # else

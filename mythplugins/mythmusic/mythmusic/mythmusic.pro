@@ -70,6 +70,7 @@ cdio {
     SOURCES += cddecoder.cpp cdrip.cpp
     QT += network
     LIBS += -lcdio -lcdio_cdda -lcdio_paranoia
+    DEFINES += HAVE_CDIO
 }
 
 mingw {
