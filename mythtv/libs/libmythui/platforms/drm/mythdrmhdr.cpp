@@ -2,6 +2,7 @@
 #include "platforms/drm/mythdrmhdr.h"
 #include "platforms/mythdisplaydrm.h"
 #include "mythlogging.h"
+#include "mythconfig.h"
 
 // libdrm
 extern "C" {
