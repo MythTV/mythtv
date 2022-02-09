@@ -2631,7 +2631,7 @@ void StoreOptMixin::SetRecGroup(int recgroupID, QString recgroup)
 
         QString label = QObject::tr("Include in the \"%1\" recording group");
         auto *item = new MythUIButtonListItem(m_recgroupList, label.arg(recgroup),
-                                              QVariant::fromValue(recgroup));
+                                              QVariant::fromValue(recgroupID));
         m_recgroupList->SetItemCurrent(item);
 
         if (m_other && m_other->m_recgroupList)
