@@ -1,5 +1,4 @@
 .timebarbox {
-    display: block;
     grid-template-columns: 90px auto;
     grid-template-rows: 28px;
     width: 100%;
@@ -8,11 +7,9 @@
 .datebox {
     float: left;
     padding: 5px 8px 4px 7px;
-    color: #fdf6e3;
-    background: linear-gradient(to bottom, #777777 1%, #555555 20%, #222222 99%);
+    color: var(--primary-color-text);
+    background: linear-gradient(to bottom, var(--surface-800) 1%, var(--surface-500) 90%, var(--surface-200) 99%);
     border-radius: 10px;
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
 }
 
 .segmentsbox {
@@ -27,10 +24,8 @@
     float: left;
     width: 25%;
     padding: 5px 8px 4px 7px;
-    color: #fdf6e3;
+    color: var(--primary-color-text);
+    background: linear-gradient(to bottom, var(--surface-800) 1%, var(--surface-500) 90%, var(--surface-200) 99%);
     height: auto;
-    background: linear-gradient(to bottom, #777777 1%, #555555 20%, #222222 99%);
     border-radius: 10px;
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
 }

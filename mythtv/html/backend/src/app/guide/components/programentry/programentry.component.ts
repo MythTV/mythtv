@@ -10,6 +10,7 @@ export class ProgramEntryComponent implements OnInit {
   @Input() program! :         ScheduleOrProgram;
   @Input() guideStartTime! :  string;
   @Input() guideEndTime! :    string;
+  displayDetails :            boolean = false;
 
   constructor() { }
 
@@ -29,5 +30,29 @@ export class ProgramEntryComponent implements OnInit {
     let programWindow = endPoint.getTime() - startPoint.getTime();
     let program_width = ((programWindow / timeWindow)*100);
     return program_width;
+  }
+
+  // Taken from timebar.components.ts, but takes string arg, not Date. TODO: Refactor
+  toLocalShortTime(date : string) : string {
+    let d = new Date(date);
+    let ampm = 'AM';
+    let h;
+    let m = d.getMinutes().toString().padStart(2, '0');
+    let hour = d.getHours();
+    if (hour == 0) {
+        h = 12;
+    } else if (hour > 12) {
+        h = hour - 12;
+    } else {
+        h = hour;
+    }
+    if (hour >= 12) {
+        ampm = 'PM';
+    }
+    return h + ":" + m + " " + ampm;
+  }
+
+  showDetailsDialog() {
+    this.displayDetails = true;
   }
 }

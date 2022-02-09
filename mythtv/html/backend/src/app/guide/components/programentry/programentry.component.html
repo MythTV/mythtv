@@ -1,4 +1,4 @@
-<div class="programBox" [style.width.%]=durationToWidth()>
+<div class="programBox" [style.width.%]=durationToWidth() (click)="showDetailsDialog()">
     <div class="programTitle">{{ program.Title }}</div>
     <div class="programBody">
         <div *ngIf="program.SubTitle.length != 0">
@@ -7,3 +7,14 @@
         <div class="programDescription">{{ program.Description }}</div>
     </div>
 </div>
+<p-dialog header=" {{ program.Title }}" [(visible)]="displayDetails" [style]="{width: '50vw'}">
+    <div class="programSubtitle">{{ toLocalShortTime(program.StartTime) }} - {{ toLocalShortTime(program.EndTime) }}
+        <ng-container *ngIf="program.SubTitle.length != 0">
+            : {{ program.SubTitle }}
+        </ng-container>
+    </div>
+    <p>{{ program.Description }}</p>
+    <ng-template pTemplate="footer">
+        <p-button icon="pi pi-check" (click)="displayDetails=false" label="Ok" styleClass="p-button-text"></p-button>
+    </ng-template>
+</p-dialog>

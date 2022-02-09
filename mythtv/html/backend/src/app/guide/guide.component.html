@@ -1,21 +1,21 @@
 <div *ngIf="(m_guideData$ | async)?.ProgramGuide as pg; else loading">
-    <!--p-dataView [value]="pg.Channels" [totalRecords]="pg.TotalAvailable"
-        [lazy]="true" (onLazyLoad)="loadData($event)" [paginator]="true"-->
-    <!--p-dataView [value]="m_channelData" [totalRecords]="m_channelTotal"
-        [lazy]="true" (onLazyLoad)="loadData($event)" [paginator]="true"-->
-        <p-dataView [value]="pg.Channels" [totalRecords]="pg.TotalAvailable">
-        <ng-template pTemplate="header">
-            <div class="col-12 right-align">
+    <p-dataView [value]="pg.Channels" [totalRecords]="pg.TotalAvailable">
+        <ng-template pTemplate="header" styleClass="timeHeader">
+            <div class="col-12">
                 Time Selector goes here
             </div>
-            <app-guide-timebar [startTime]="pg.StartTime"></app-guide-timebar>
         </ng-template>
-        <ng-template let-channelrow pTemplate="listItem">
-            <div class="flex flex-row col-12">
+        <ng-template let-channelrow let-i="rowIndex" pTemplate="listItem">
+            <ng-container *ngIf="( i % 5 ) == 0">
+                <div class="col-12 p-3">
+                    <app-guide-timebar [startTime]="pg.StartTime"></app-guide-timebar>
+                </div>
+            </ng-container>
+            <div class="grid col-12 p-3">
                 <div class="col-1">
                     <app-guide-channelicon [channel]=channelrow></app-guide-channelicon>
                 </div>
-                <div class="flex-auto">
+                <div class="col">
                     <ng-container *ngFor="let program of channelrow.Programs">
                         <div *ngIf="inDisplayWindow(program.StartTime, pg.EndTime)">
                             <app-guide-programentry [program]="program" 

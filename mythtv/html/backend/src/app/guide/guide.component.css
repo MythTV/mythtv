@@ -5,3 +5,14 @@
     height: 82px;
     padding-bottom: 2px;
 }
+.programsBox {
+    grid-template-columns: 90px auto;
+    grid-template-rows: 28px;
+    width: 100%;
+}
+
+.timebarbox {
+    grid-template-columns: 90px auto;
+    grid-template-rows: 28px;
+    width: 100%;
+}
