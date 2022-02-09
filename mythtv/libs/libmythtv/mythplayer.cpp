@@ -1357,9 +1357,9 @@ bool MythPlayer::UpdateFFRewSkip(float ffrewScale)
         if (fabs(m_playSpeed) <= 10.0F)
             m_frameInterval = 200000us; // 5.00 fps
         else if (fabs(m_playSpeed) <= 20.0F)
-            m_frameInterval = 160000us; // 6.25 fps
+            m_frameInterval = 166667us; // 6.00 fps
         else
-            m_frameInterval = 133333us; // 7.50 fps
+            m_frameInterval = 150000us; // 6.67 fps
         m_frameInterval = chronomult(m_frameInterval, m_ffrewScale);
         float ffw_fps = fabs(static_cast<double>(m_playSpeed)) * m_videoFrameRate;
         float dis_fps = 1000000.0F / m_frameInterval.count();
