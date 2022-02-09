@@ -38,4 +38,7 @@ body {
     direction: ltr;
   }
   
+  .help-button {
+    float: right;
+}
   

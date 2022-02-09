@@ -75,7 +75,7 @@
                 <p-button label="{{ 'common.next' | translate }}" (onClick)="nextPage()" icon="pi pi-angle-right" iconPos="right"
                     [disabled]="(m_wizardData.Country.Code == '') || (m_wizardData.Language.Code == '')">
                 </p-button>
-                <p-button style="float: right;" label="{{ 'common.help' | translate }}" (onClick)="showHelp()" icon="pi pi-info-circle" styleClass="p-button-info" ></p-button>
+                <p-button class="help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()" icon="pi pi-info-circle" styleClass="p-button-info" ></p-button>
             </div>
         </ng-template>
     </p-card>
