@@ -235,8 +235,8 @@ static bool StreamHasRequiredParameters(AVCodecContext *Context, AVStream *Strea
             //    FAIL("Unspecified audio sample rate");
             //if (!Stream->codecpar->channels)
             //    FAIL("Unspecified number of audio channels");
-            if (!Stream->internal->nb_decoded_frames && Context->codec_id == AV_CODEC_ID_DTS)
-                FAIL("No decodable DTS frames");
+            // if (!Stream->internal->nb_decoded_frames && Context->codec_id == AV_CODEC_ID_DTS)
+            //     FAIL("No decodable DTS frames");
             break;
 
         case AVMEDIA_TYPE_SUBTITLE:
