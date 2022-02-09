@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, isDevMode, OnInit } from '@angular/core';
 import { Language, MythLanguageList } from 'src/app/services/interfaces/config.interface';
 import { Theme } from 'src/app/services/interfaces/theme.interface';
 import { ThemeService } from '../../services/theme.service';
@@ -18,6 +18,7 @@ export class NavbarComponent implements OnInit {
 
     m_languages!: Language[];
     m_selectedLanguage!: Language;
+    m_devMode : boolean = isDevMode();
 
     constructor(private themeService: ThemeService,
                 private configService: ConfigService,
