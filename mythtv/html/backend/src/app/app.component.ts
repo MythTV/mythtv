@@ -19,5 +19,7 @@ export class AppComponent {
 
     // load the primeng translations
     translate.get('primeng').subscribe(res => this.config.setTranslation(res));
+
+    this.config.ripple = true;
   }
 }
