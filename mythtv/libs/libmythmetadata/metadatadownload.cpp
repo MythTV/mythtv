@@ -635,8 +635,8 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup *lookup)
  * attempt to find television data via the following (in order)
  * 1- Local MXML: already done before
  * 2- Local NFO: already done
- * 3- By inetref with subtitle
- * 4- By inetref with season and episode
+ * 3- By inetref with season and episode
+ * 4- By inetref with subtitle
  * 5- By inetref
  * 6- By title and subtitle
  * 7- By title
@@ -655,17 +655,17 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup *lookup)
     {
         // with inetref
         lookup->SetStep(kLookupData);
-        if (!lookup->GetSubtitle().isEmpty())
+        if (lookup->GetSeason() || lookup->GetEpisode())
+        {
+            list = grabber.LookupData(lookup->GetInetref(), lookup->GetSeason(),
+                                      lookup->GetEpisode(), lookup);
+        }
+
+        if (list.isEmpty() && (!lookup->GetSubtitle().isEmpty()))
         {
             list = grabber.SearchSubtitle(lookup->GetInetref(),
                                           lookup->GetBaseTitle() /* unused */,
                                           lookup->GetSubtitle(), lookup, false);
-        }
-
-        if (list.isEmpty() && (lookup->GetSeason() || lookup->GetEpisode()))
-        {
-            list = grabber.LookupData(lookup->GetInetref(), lookup->GetSeason(),
-                                      lookup->GetEpisode(), lookup);
         }
 
         if (list.isEmpty() && !lookup->GetCollectionref().isEmpty())
