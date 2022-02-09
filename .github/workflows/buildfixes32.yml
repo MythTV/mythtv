@@ -1,10 +1,10 @@
-name: master
+name: fixes/32
 
 on:
   push:
-    branches: [ master ]
+    branches: [ fixes/32 ]
   pull_request:
-    branches: [ master ]
+    branches: [ fixes/32 ]
 
 jobs:
   build:
@@ -22,7 +22,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Checkout master
+    - name: Checkout fixes/32
       uses: actions/checkout@v2
 
     - name: Setup build environment
