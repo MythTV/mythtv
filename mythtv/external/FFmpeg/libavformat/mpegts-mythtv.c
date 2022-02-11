@@ -576,8 +576,6 @@ static MpegTSFilter *mpegts_open_filter(MpegTSContext *ts, unsigned int pid,
     return filter;
 }
 
-static void mpegts_close_filter(MpegTSContext *ts, MpegTSFilter *filter);
-
 static MpegTSFilter *mpegts_open_section_filter(MpegTSContext *ts,
                                                 unsigned int pid,
                                                 SectionCallback *section_cb,
@@ -587,12 +585,6 @@ static MpegTSFilter *mpegts_open_section_filter(MpegTSContext *ts,
     MpegTSFilter *filter;
     MpegTSSectionFilter *sec;
     uint8_t *section_buf = av_mallocz(MAX_SECTION_SIZE);
-
-    // MythTV from PMT tracking in ffmpeg patch from danielk. https://github.com/MythTV/mythtv/commit/236872aa4dc73c45f01d71f749eb50eaf7eb12e4
-    if (filter = ts->pids[pid]) {
-        mpegts_close_filter(ts, filter);
-    }
-    // end MythTV
 
     if (!section_buf)
         return NULL;
