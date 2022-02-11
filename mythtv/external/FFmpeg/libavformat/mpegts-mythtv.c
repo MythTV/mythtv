@@ -45,17 +45,6 @@
 #endif
 
 // MythTV only -----------------------------------------------------------------
-/* from APIchanges:
-2011-10-19 - d049257 / 569129a - lavf 53.17.0 / 53.10.0
-  Add avformat_new_stream(). Deprecate av_new_stream().
-*/
-static AVStream *av_new_stream(AVFormatContext *s, int id)
-{
-    AVStream *st = avformat_new_stream(s, NULL);
-    if (st)
-        st->id = id;
-    return st;
-}
 
 /**
  * av_dlog macros
@@ -2638,7 +2627,8 @@ static AVStream *new_section_av_stream(SectionContext *sect, enum AVMediaType ty
 {
     FF_ALLOCZ_OR_GOTO(NULL, sect->st, sizeof(AVStream), fail);
 
-    sect->st = av_new_stream(sect->stream, sect->pid);
+    sect->st = avformat_new_stream(sect->stream, NULL);
+    sect->st->id = sect->pid;
 
     avpriv_set_pts_info(sect->st, 33, 1, 90000);
 
@@ -2791,7 +2781,11 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
                 }
                 pes = add_pes_stream(ts, pid, pcr_pid);
                 if (pes)
-                    st = av_new_stream(pes->stream, pes->pid);
+                {
+                    st = avformat_new_stream(pes->stream, NULL);
+                    if (st)
+                        st->id = pes->pid;
+                }
                 else
                 {
                     av_log(NULL, AV_LOG_ERROR, "mpegts_add_stream: "
