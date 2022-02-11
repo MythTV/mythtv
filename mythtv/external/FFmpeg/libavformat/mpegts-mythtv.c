@@ -2876,10 +2876,14 @@ static void add_pat_entry(MpegTSContext *ts, unsigned int programid, unsigned in
 static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len)
 {
     MpegTSContext *ts = filter->u.section_filter.opaque;
+    MpegTSSectionFilter *tssf = &filter->u.section_filter;
     SectionHeader h1, *h = &h1;
     const uint8_t *p, *p_end;
-    //int sid, pmt_pid;
-    //AVProgram *program;
+    int sid, pmt_pid;
+    int nb_prg = 0;
+    AVProgram *program;
+
+    // MythTV added
     char buf[256];
 
     int pmt_pnums[PAT_MAX_PMT];
@@ -2887,16 +2891,23 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     unsigned int pmt_count = 0;
     int i;
     int found = 0;
+    // end MythTV added
 
-    av_dlog(ts->stream, "PAT:\n");
-    hex_dump_debug(ts->stream, (uint8_t *)section, section_len);
+    av_log(ts->stream, AV_LOG_TRACE, "PAT:\n");
+    hex_dump_debug(ts->stream, section, section_len);
 
     p_end = section + section_len - 4;
-    p = section;
+    p     = section;
     if (parse_section_header(h, &p, p_end) < 0)
         return;
     if (h->tid != PAT_TID)
         return;
+    if (ts->skip_changes)
+        return;
+
+    if (skip_identical(h, tssf))
+        return;
+    ts->stream->ts_id = h->id;
 
     for (i = 0; i < PAT_MAX_PMT; ++i)
     {
