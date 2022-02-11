@@ -232,8 +232,6 @@ struct MpegTSContext {
     AVBufferPool* pools[32];
 
     // MythTV only
-    /** filter for the PAT                                   */
-    MpegTSFilter *pat_filter;
     /** MPEG program number of stream we want to decode      */
     int req_sid;
 
@@ -590,7 +588,7 @@ static MpegTSFilter *mpegts_open_section_filter(MpegTSContext *ts,
     MpegTSSectionFilter *sec;
     uint8_t *section_buf = av_mallocz(MAX_SECTION_SIZE);
 
-    // MythTV from PMT tracking in ffmpeg patch from danielk.
+    // MythTV from PMT tracking in ffmpeg patch from danielk. https://github.com/MythTV/mythtv/commit/236872aa4dc73c45f01d71f749eb50eaf7eb12e4
     if (filter = ts->pids[pid]) {
         mpegts_close_filter(ts, filter);
     }
@@ -3197,14 +3195,6 @@ static int handle_packet(MpegTSContext *ts, const uint8_t *packet, int64_t pos)
         has_adaptation, has_payload;
     const uint8_t *p, *p_end;
 
-    // MythTV PMT tracking in ffmpeg patch from danielk. https://github.com/MythTV/mythtv/commit/236872aa4dc73c45f01d71f749eb50eaf7eb12e4
-    if (!ts->pids[0]) {
-        /* make sure we're always scanning for new PAT's */
-        av_log(ts->stream, AV_LOG_INFO, "opening pat filter\n");
-        ts->pat_filter = mpegts_open_section_filter(ts, PAT_PID, pat_cb, ts, 1);
-    }
-    // end MythTV
-
     pid = AV_RB16(packet + 1) & 0x1fff;
     is_start = packet[1] & 0x40;
     tss = ts->pids[pid];
@@ -3595,7 +3585,6 @@ static int mpegts_read_header(AVFormatContext *s)
         ts->req_sid = -1;
 
         ts->scanning = 1;
-        ts->pat_filter =
         mpegts_open_section_filter(ts, PAT_PID, pat_cb, ts, 1);
         mpegts_open_section_filter(ts, EIT_PID, eit_cb, ts, 1);
 
