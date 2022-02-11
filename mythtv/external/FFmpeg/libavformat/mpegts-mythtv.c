@@ -71,7 +71,6 @@ typedef struct SectionContext {
     AVStream *st;
 } SectionContext;
 
-static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item, uint32_t prog_reg_desc, int pcr_pid);
 static void mpegts_remove_stream(MpegTSContext *ts, int pid);
 
 /**
@@ -2292,6 +2291,205 @@ static void mpegts_cleanup_streams(MpegTSContext *ts)
     }
 }
 
+static AVStream *new_section_av_stream(SectionContext *sect, enum AVMediaType type,
+                                       enum AVCodecID id)
+{
+    sect->st = avformat_new_stream(sect->stream, NULL);
+    if (!(sect->st)) {
+        av_log(NULL, AV_LOG_ERROR, "Cannot allocate memory.\n");
+        return NULL;
+    }
+
+    sect->st->id = sect->pid;
+
+    avpriv_set_pts_info(sect->st, 33, 1, 90000);
+
+    sect->st->codecpar->codec_type = type;
+    sect->st->codecpar->codec_id   = id;
+    sect->st->priv_data = sect;
+    sect->st->need_parsing = AVSTREAM_PARSE_NONE;
+
+    return sect->st;
+}
+
+static SectionContext *add_section_stream(MpegTSContext *ts, int pid, int stream_type)
+{
+    MpegTSFilter *tss = ts->pids[pid];
+    SectionContext *sect = 0;
+    if (tss) { /* filter already exists */
+        if (tss->type == MPEGTS_SECTION)
+            sect = (SectionContext*) tss->u.section_filter.opaque;
+
+        if (sect && (sect->stream_type == stream_type))
+            return sect; /* if it's the same stream type, just return ok */
+
+        /* otherwise, kill it, and start a new stream */
+        mpegts_close_filter(ts, tss);
+    }
+
+    /* create a SECTION context */
+    if (!(sect=av_mallocz(sizeof(SectionContext)))) {
+        av_log(NULL, AV_LOG_ERROR, "Error: av_mallocz() failed in add_section_stream");
+        return 0;
+    }
+    sect->ts = ts;
+    sect->stream = ts->stream;
+    sect->pid = pid;
+    sect->stream_type = stream_type;
+    tss = mpegts_open_section_filter(ts, pid, mpegts_push_section, sect, 1);
+    if (!tss) {
+        av_free(sect);
+        av_log(NULL, AV_LOG_ERROR, "Error: unable to open mpegts Section filter in add_section_stream");
+        return 0;
+    }
+
+    return sect;
+}
+
+static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
+                              uint32_t prog_reg_desc, int pcr_pid)
+{
+    AVStream *st = NULL;
+    int pid = item->pid;
+
+    av_log(NULL, AV_LOG_DEBUG,
+           "mpegts_add_stream: at pid 0x%x with type %i\n", item->pid, item->type);
+
+    if (ts->pid_cnt < PMT_PIDS_MAX)
+    {
+        if (item->type == STREAM_TYPE_DSMCC_B)
+        {
+            SectionContext *sect = NULL;
+            sect = add_section_stream(ts, item->pid, item->type);
+            if (!sect)
+            {
+                av_log(NULL, AV_LOG_ERROR, "mpegts_add_stream: "
+                       "error creating Section context for pid 0x%x with type %i\n",
+                       item->pid, item->type);
+                return;
+            }
+
+            st = new_section_av_stream(sect, item->codec_type, item->codec_id);
+            if (!st)
+            {
+                av_log(NULL, AV_LOG_ERROR, "mpegts_add_stream: "
+                       "error creating A/V stream for pid 0x%x with type %i\n",
+                       item->pid, item->type);
+                return;
+            }
+
+            st->component_tag = item->dvbci.component_tag;
+            st->data_id  = item->dvbci.data_id;
+            st->carousel_id = item->dvbci.carousel_id;
+
+            ts->pmt_pids[ts->pid_cnt] = item->pid;
+            ts->pid_cnt++;
+
+            av_log(NULL, AV_LOG_DEBUG, "mpegts_add_stream: "
+                   "stream #%d, has id 0x%x and codec %s, type %s at 0x%p\n",
+                   st->index, st->id, avcodec_get_name(st->codecpar->codec_id),
+                   av_get_media_type_string(st->codecpar->codec_type), st);
+        } else {
+            PESContext *pes = NULL;
+
+            if (ts->pids[pid] && ts->pids[pid]->type == MPEGTS_PES) {
+                pes = ts->pids[pid]->u.pes_filter.opaque;
+                st = pes->st;
+            } else {
+                if (ts->pids[pid]) {
+                    //wrongly added sdt filter probably
+                    mpegts_close_filter(ts, ts->pids[pid]);
+                }
+                pes = add_pes_stream(ts, pid, pcr_pid);
+                if (pes)
+                {
+                    st = avformat_new_stream(pes->stream, NULL);
+                    if (st)
+                        st->id = pes->pid;
+                }
+                else
+                {
+                    av_log(NULL, AV_LOG_ERROR, "mpegts_add_stream: "
+                           "error creating PES context for pid 0x%x with type %i\n",
+                           item->pid, item->type);
+                    return;
+                }
+            }
+
+            if (!st)
+            {
+                av_log(NULL, AV_LOG_ERROR, "mpegts_add_stream: "
+                       "error creating A/V stream for pid 0x%x with type %i\n",
+                       item->pid, item->type);
+                return;
+            }
+
+            if (!pes->stream_type)
+                mpegts_set_stream_info(st, pes, item->type, prog_reg_desc);
+
+            st->codecpar->codec_tag = item->dvbci.codec_tag;
+
+            if (prog_reg_desc == AV_RL32("HDMV") && item->type == 0x83 && pes->sub_st) {
+                av_program_add_stream_index(ts->stream, id, pes->sub_st->index);
+                pes->sub_st->codecpar->codec_tag = st->codecpar->codec_tag;
+            }
+
+            if (st->codecpar->codec_type != item->codec_type ||
+                st->codecpar->codec_id   != item->codec_id) {
+                st->codecpar->codec_type = item->codec_type;
+                st->codecpar->codec_id   = item->codec_id;
+            }
+
+            ts->pmt_pids[ts->pid_cnt] = item->pid;
+            ts->pid_cnt++;
+
+            if (item->dvbci.language[0])
+                av_dict_set(&st->metadata, "language", item->dvbci.language, 0);
+
+            if (item->dvbci.sub_id && (item->codec_id == AV_CODEC_ID_DVB_SUBTITLE))
+                st->carousel_id = item->dvbci.sub_id;
+
+            st->component_tag = item->dvbci.component_tag;
+            st->disposition   = item->dvbci.disposition;
+
+            av_log(NULL, AV_LOG_DEBUG, "mpegts_add_stream: "
+                   "stream #%d, has id 0x%x and codec %s, type %s at 0x%p\n",
+                   st->index, st->id, avcodec_get_name(st->codecpar->codec_id),
+                   av_get_media_type_string(st->codecpar->codec_type), st);
+        }
+        add_pid_to_pmt(ts, id, pid);
+        av_program_add_stream_index(ts->stream, id, st->index);
+    }
+    else
+    {
+        av_log(NULL, AV_LOG_ERROR,
+               "ERROR: adding pes stream at pid 0x%x, pid_cnt = %i\n",
+               item->pid, ts->pid_cnt);
+    }
+}
+
+static void mpegts_remove_stream(MpegTSContext *ts, int pid)
+{
+    int indx = -1;
+    av_log(NULL, AV_LOG_DEBUG, "mpegts_remove_stream 0x%x\n", pid);
+    if (ts->pids[pid])
+    {
+        av_log(NULL, AV_LOG_DEBUG, "closing filter for pid 0x%x\n", pid);
+        mpegts_close_filter(ts, ts->pids[pid]);
+    }
+    indx = find_in_list(ts->pmt_pids, pid);
+    if (indx >= 0)
+    {
+        memmove(ts->pmt_pids+indx, ts->pmt_pids+indx+1, PMT_PIDS_MAX-indx-1);
+        ts->pmt_pids[PMT_PIDS_MAX-1] = 0;
+        ts->pid_cnt--;
+    }
+    else
+    {
+        av_log(NULL, AV_LOG_DEBUG, "ERROR: closing filter for pid 0x%x, indx = %i\n", pid, indx);
+    }
+}
+
 // Find number of equal streams in old and new pmt starting at 0
 // and stopping at the first different stream.
 static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
@@ -2603,27 +2801,6 @@ static int is_pat_same(MpegTSContext *mpegts_ctx,
     return 1;
 }
 
-static AVStream *new_section_av_stream(SectionContext *sect, enum AVMediaType type,
-                                       enum AVCodecID id)
-{
-    sect->st = avformat_new_stream(sect->stream, NULL);
-    if (!(sect->st)) {
-        av_log(NULL, AV_LOG_ERROR, "Cannot allocate memory.\n");
-        return NULL;
-    }
-
-    sect->st->id = sect->pid;
-
-    avpriv_set_pts_info(sect->st, 33, 1, 90000);
-
-    sect->st->codecpar->codec_type = type;
-    sect->st->codecpar->codec_id   = id;
-    sect->st->priv_data = sect;
-    sect->st->need_parsing = AVSTREAM_PARSE_NONE;
-
-    return sect->st;
-}
-
 /* mpegts_push_section: return one or more tables.  The tables may not completely fill
    the packet and there may be stuffing bytes at the end.
    This is complicated because a single TS packet may result in several tables being
@@ -2671,184 +2848,6 @@ static void mpegts_push_section(MpegTSFilter *filter, const uint8_t *section, in
         }
         memcpy(data, section, section_len);
    }
-}
-
-static SectionContext *add_section_stream(MpegTSContext *ts, int pid, int stream_type)
-{
-    MpegTSFilter *tss = ts->pids[pid];
-    SectionContext *sect = 0;
-    if (tss) { /* filter already exists */
-        if (tss->type == MPEGTS_SECTION)
-            sect = (SectionContext*) tss->u.section_filter.opaque;
-
-        if (sect && (sect->stream_type == stream_type))
-            return sect; /* if it's the same stream type, just return ok */
-
-        /* otherwise, kill it, and start a new stream */
-        mpegts_close_filter(ts, tss);
-    }
-
-    /* create a SECTION context */
-    if (!(sect=av_mallocz(sizeof(SectionContext)))) {
-        av_log(NULL, AV_LOG_ERROR, "Error: av_mallocz() failed in add_section_stream");
-        return 0;
-    }
-    sect->ts = ts;
-    sect->stream = ts->stream;
-    sect->pid = pid;
-    sect->stream_type = stream_type;
-    tss = mpegts_open_section_filter(ts, pid, mpegts_push_section, sect, 1);
-    if (!tss) {
-        av_free(sect);
-        av_log(NULL, AV_LOG_ERROR, "Error: unable to open mpegts Section filter in add_section_stream");
-        return 0;
-    }
-
-    return sect;
-}
-
-static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
-                              uint32_t prog_reg_desc, int pcr_pid)
-{
-    AVStream *st = NULL;
-    int pid = item->pid;
-
-    av_log(NULL, AV_LOG_DEBUG,
-           "mpegts_add_stream: at pid 0x%x with type %i\n", item->pid, item->type);
-
-    if (ts->pid_cnt < PMT_PIDS_MAX)
-    {
-        if (item->type == STREAM_TYPE_DSMCC_B)
-        {
-            SectionContext *sect = NULL;
-            sect = add_section_stream(ts, item->pid, item->type);
-            if (!sect)
-            {
-                av_log(NULL, AV_LOG_ERROR, "mpegts_add_stream: "
-                       "error creating Section context for pid 0x%x with type %i\n",
-                       item->pid, item->type);
-                return;
-            }
-
-            st = new_section_av_stream(sect, item->codec_type, item->codec_id);
-            if (!st)
-            {
-                av_log(NULL, AV_LOG_ERROR, "mpegts_add_stream: "
-                       "error creating A/V stream for pid 0x%x with type %i\n",
-                       item->pid, item->type);
-                return;
-            }
-
-            st->component_tag = item->dvbci.component_tag;
-            st->data_id  = item->dvbci.data_id;
-            st->carousel_id = item->dvbci.carousel_id;
-
-            ts->pmt_pids[ts->pid_cnt] = item->pid;
-            ts->pid_cnt++;
-
-            av_log(NULL, AV_LOG_DEBUG, "mpegts_add_stream: "
-                   "stream #%d, has id 0x%x and codec %s, type %s at 0x%p\n",
-                   st->index, st->id, avcodec_get_name(st->codecpar->codec_id),
-                   av_get_media_type_string(st->codecpar->codec_type), st);
-        } else {
-            PESContext *pes = NULL;
-
-            if (ts->pids[pid] && ts->pids[pid]->type == MPEGTS_PES) {
-                pes = ts->pids[pid]->u.pes_filter.opaque;
-                st = pes->st;
-            } else {
-                if (ts->pids[pid]) {
-                    //wrongly added sdt filter probably
-                    mpegts_close_filter(ts, ts->pids[pid]);
-                }
-                pes = add_pes_stream(ts, pid, pcr_pid);
-                if (pes)
-                {
-                    st = avformat_new_stream(pes->stream, NULL);
-                    if (st)
-                        st->id = pes->pid;
-                }
-                else
-                {
-                    av_log(NULL, AV_LOG_ERROR, "mpegts_add_stream: "
-                           "error creating PES context for pid 0x%x with type %i\n",
-                           item->pid, item->type);
-                    return;
-                }
-            }
-
-            if (!st)
-            {
-                av_log(NULL, AV_LOG_ERROR, "mpegts_add_stream: "
-                       "error creating A/V stream for pid 0x%x with type %i\n",
-                       item->pid, item->type);
-                return;
-            }
-
-            if (!pes->stream_type)
-                mpegts_set_stream_info(st, pes, item->type, prog_reg_desc);
-
-            st->codecpar->codec_tag = item->dvbci.codec_tag;
-
-            if (prog_reg_desc == AV_RL32("HDMV") && item->type == 0x83 && pes->sub_st) {
-                av_program_add_stream_index(ts->stream, id, pes->sub_st->index);
-                pes->sub_st->codecpar->codec_tag = st->codecpar->codec_tag;
-            }
-
-            if (st->codecpar->codec_type != item->codec_type ||
-                st->codecpar->codec_id   != item->codec_id) {
-                st->codecpar->codec_type = item->codec_type;
-                st->codecpar->codec_id   = item->codec_id;
-            }
-
-            ts->pmt_pids[ts->pid_cnt] = item->pid;
-            ts->pid_cnt++;
-
-            if (item->dvbci.language[0])
-                av_dict_set(&st->metadata, "language", item->dvbci.language, 0);
-
-            if (item->dvbci.sub_id && (item->codec_id == AV_CODEC_ID_DVB_SUBTITLE))
-                st->carousel_id = item->dvbci.sub_id;
-
-            st->component_tag = item->dvbci.component_tag;
-            st->disposition   = item->dvbci.disposition;
-
-            av_log(NULL, AV_LOG_DEBUG, "mpegts_add_stream: "
-                   "stream #%d, has id 0x%x and codec %s, type %s at 0x%p\n",
-                   st->index, st->id, avcodec_get_name(st->codecpar->codec_id),
-                   av_get_media_type_string(st->codecpar->codec_type), st);
-        }
-        add_pid_to_pmt(ts, id, pid);
-        av_program_add_stream_index(ts->stream, id, st->index);
-    }
-    else
-    {
-        av_log(NULL, AV_LOG_ERROR,
-               "ERROR: adding pes stream at pid 0x%x, pid_cnt = %i\n",
-               item->pid, ts->pid_cnt);
-    }
-}
-
-void mpegts_remove_stream(MpegTSContext *ts, int pid)
-{
-    int indx = -1;
-    av_log(NULL, AV_LOG_DEBUG, "mpegts_remove_stream 0x%x\n", pid);
-    if (ts->pids[pid])
-    {
-        av_log(NULL, AV_LOG_DEBUG, "closing filter for pid 0x%x\n", pid);
-        mpegts_close_filter(ts, ts->pids[pid]);
-    }
-    indx = find_in_list(ts->pmt_pids, pid);
-    if (indx >= 0)
-    {
-        memmove(ts->pmt_pids+indx, ts->pmt_pids+indx+1, PMT_PIDS_MAX-indx-1);
-        ts->pmt_pids[PMT_PIDS_MAX-1] = 0;
-        ts->pid_cnt--;
-    }
-    else
-    {
-        av_log(NULL, AV_LOG_DEBUG, "ERROR: closing filter for pid 0x%x, indx = %i\n", pid, indx);
-    }
 }
 
 // from FFmpeg sync
