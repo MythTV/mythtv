@@ -57,12 +57,6 @@ static AVStream *av_new_stream(AVFormatContext *s, int id)
     return st;
 }
 
-static void av_set_pts_info(AVStream *s, int pts_wrap_bits,
-                     unsigned int pts_num, unsigned int pts_den)
-{
-    avpriv_set_pts_info(s, pts_wrap_bits, pts_num, pts_den);
-}
-
 /**
  * av_dlog macros
  * copied from libavutil/log.h since they are deprecated and removed from there
@@ -2642,7 +2636,7 @@ static AVStream *new_section_av_stream(SectionContext *sect, enum AVMediaType ty
 
     sect->st = av_new_stream(sect->stream, sect->pid);
 
-    av_set_pts_info(sect->st, 33, 1, 90000);
+    avpriv_set_pts_info(sect->st, 33, 1, 90000);
 
     sect->st->codecpar->codec_type = type;
     sect->st->codecpar->codec_id   = id;
