@@ -4,6 +4,7 @@
 
 // C++ headers
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <iostream>
@@ -118,10 +119,6 @@ __inline AVRational GetAVTimeBaseQ()
 #define SEQ_PKT_ERR_MAX 50
 
 static const int max_video_queue_size = 220;
-
-static int cc608_parity(uint8_t byte);
-static int cc608_good_parity(const CC608Parity &parity_table, uint16_t data);
-static void cc608_build_parity_table(CC608Parity &parity_table);
 
 static bool silence_ffmpeg_logging = false;
 
@@ -357,8 +354,6 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
 
     m_audioIn.m_sampleSize = -32;// force SetupAudioStream to run once
     m_itv = m_parent->GetInteractiveTV();
-
-    cc608_build_parity_table(m_cc608ParityTable);
 
     AvFormatDecoder::SetIdrOnlyKeyframes(true);
     m_audioReadAhead = gCoreContext->GetDurSetting<std::chrono::milliseconds>("AudioReadAhead", 100ms);
@@ -1636,49 +1631,35 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     }
 }
 
-// CC Parity checking
-// taken from xine-lib libspucc
-
-static int cc608_parity(uint8_t byte)
+static bool cc608_good_parity(uint16_t data)
 {
-    int ones = 0;
-
-    for (int i = 0; i < 7; i++)
+    static constexpr std::array<uint8_t, 256> odd_parity_LUT
     {
-        if (byte & (1 << i))
-            ones++;
-    }
-
-    return ones & 1;
-}
-
-// CC Parity checking
-// taken from xine-lib libspucc
-
-static void cc608_build_parity_table(CC608Parity &parity_table)
-{
-    for (uint8_t byte = 0; byte <= 127; byte++)
-    {
-        int parity_v = cc608_parity(byte);
-        /* CC uses odd parity (i.e., # of 1's in byte is odd.) */
-        parity_table[byte] = parity_v;
-        parity_table[byte | 0x80] = (parity_v == 0 ? 1 : 0);
-    }
-}
-
-// CC Parity checking
-// taken from xine-lib libspucc
-
-static int cc608_good_parity(const CC608Parity &parity_table, uint16_t data)
-{
-    bool ret = (parity_table[data & 0xff] != 0)
-        && (parity_table[(data & 0xff00) >> 8] != 0);
+         0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+         1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+         1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+         0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+         1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+         0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+         0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+         1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+         1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+         0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+         0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+         1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+         0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+         1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+         1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+         0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    };
+    bool ret = (odd_parity_LUT[data & 0xff]          == 1) &&
+               (odd_parity_LUT[(data & 0xff00) >> 8] == 1);
     if (!ret)
     {
         LOG(VB_VBI, LOG_ERR, LOC +
             QString("VBI: Bad parity in EIA-608 data (%1)") .arg(data,0,16));
     }
-    return ret ? 1 : 0;
+    return ret;
 }
 
 void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
@@ -2915,7 +2896,7 @@ void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte)
                 field = cc_type ^ m_invertScteField;
             }
 
-            if (cc608_good_parity(m_cc608ParityTable, data))
+            if (cc608_good_parity(data))
             {
                 // in film mode, we may start at the wrong field;
                 // correct if XDS start/cont/end code is detected
@@ -3869,7 +3850,7 @@ void AvFormatDecoder::ProcessVBIDataPacket(
                 if (21 == line)
                 {
                     int data = (buf[2] << 8) | buf[1];
-                    if (cc608_good_parity(m_cc608ParityTable, data))
+                    if (cc608_good_parity(data))
                         m_ccd608->FormatCCField(duration_cast<std::chrono::milliseconds>(utc), field, data);
                     utc += 33367us;
                 }

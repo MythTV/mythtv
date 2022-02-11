@@ -2,6 +2,7 @@
 #ifndef AVFORMATDECODER_H_
 #define AVFORMATDECODER_H_
 
+#include <array>
 #include <cstdint>
 
 extern "C" {
@@ -36,8 +37,6 @@ class MythSqlDatabase;
 struct SwsContext;
 
 extern "C" void HandleStreamChange(void *data);
-
-using CC608Parity = std::array<int,256>;
 
 class AudioInfo
 {
@@ -329,7 +328,6 @@ class AvFormatDecoder : public DecoderBase
     CC608Decoder      *m_ccd608                       {nullptr};
     CC708Decoder      *m_ccd708                       {nullptr};
     TeletextDecoder   *m_ttd                          {nullptr};
-    CC608Parity        m_cc608ParityTable             {0};
     /// Lookup table for whether a stream was seen in the PMT
     /// entries 0-3 correspond to CEA-608 CC1 through CC4, while
     /// entries 4-67 corresport to CEA-708 streams 0 through 64
