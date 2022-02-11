@@ -71,16 +71,8 @@ typedef struct SectionContext {
     AVStream *st;
 } SectionContext;
 
-static void mpegts_cleanup_streams(MpegTSContext *ts);
-static int find_in_list(const int *pids, int pid);
-
-static int is_pat_same(MpegTSContext *mpegts_ctx,
-                       int *pmt_pnums, int *pmts_pids, unsigned int pmt_count);
-
 static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item, uint32_t prog_reg_desc, int pcr_pid);
 static void mpegts_remove_stream(MpegTSContext *ts, int pid);
-static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
-                             pmt_entry_t* items, int item_cnt);
 
 /**
  * @brief Remove a stream from a media stream.
@@ -2280,6 +2272,114 @@ static void set_pcr_pid(AVFormatContext *s, unsigned int programid, unsigned int
     }
 }
 
+static void mpegts_cleanup_streams(MpegTSContext *ts)
+{
+    int i;
+    int orig_pid_cnt = ts->pid_cnt;
+    for (i=0; i<ts->pid_cnt; i++)
+    {
+        if (!ts->pids[ts->pmt_pids[i]])
+        {
+            mpegts_remove_stream(ts, ts->pmt_pids[i]);
+            i--;
+        }
+    }
+    if (orig_pid_cnt != ts->pid_cnt)
+    {
+        av_log(NULL, AV_LOG_DEBUG,
+               "mpegts_cleanup_streams: pid_cnt bfr %d aft %d\n",
+               orig_pid_cnt, ts->pid_cnt);
+    }
+}
+
+// Find number of equal streams in old and new pmt starting at 0
+// and stopping at the first different stream.
+static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
+                             pmt_entry_t* items, int item_cnt)
+{
+    int limit = mpegts_ctx->pid_cnt < item_cnt ? mpegts_ctx->pid_cnt : item_cnt;
+    int idx;
+
+    for (idx = 0; idx < limit; idx++)
+    {
+        MpegTSFilter *tss;
+        /* check for pid */
+        int loc = find_in_list(mpegts_ctx->pmt_pids, items[idx].pid);
+        if (loc < 0)
+        {
+#ifdef DEBUG
+            av_log(NULL, AV_LOG_DEBUG,
+                   "find_in_list(..,[%d].pid=%d) => -1\n",
+                   idx, items[idx].pid);
+#endif
+            break;
+        }
+
+        /* check stream type */
+        tss = mpegts_ctx->pids[items[idx].pid];
+        if (!tss)
+        {
+#ifdef DEBUG
+            av_log(NULL, AV_LOG_DEBUG,
+                   "mpegts_ctx->pids[items[%d].pid=%d] => null\n",
+                   idx, items[idx].pid);
+#endif
+            break;
+        }
+        if (tss->type == MPEGTS_PES)
+        {
+            PESContext *pes = (PESContext*) tss->u.pes_filter.opaque;
+            if (!pes)
+            {
+#ifdef DEBUG
+                av_log(NULL, AV_LOG_DEBUG, "pes == null, where idx %d\n", idx);
+#endif
+                break;
+            }
+            if (pes->stream_type != items[idx].type)
+            {
+#ifdef DEBUG
+                av_log(NULL, AV_LOG_DEBUG,
+                       "pes->stream_type != items[%d].type\n", idx);
+#endif
+                break;
+            }
+        }
+        else if (tss->type == MPEGTS_SECTION)
+        {
+            SectionContext *sect = (SectionContext*) tss->u.section_filter.opaque;
+            if (!sect)
+            {
+#ifdef DEBUG
+                av_log(NULL, AV_LOG_DEBUG, "sect == null, where idx %d\n", idx);
+#endif
+                break;
+            }
+            if (sect->stream_type != items[idx].type)
+            {
+#ifdef DEBUG
+                av_log(NULL, AV_LOG_DEBUG,
+                       "sect->stream_type != items[%d].type\n", idx);
+#endif
+                break;
+            }
+        }
+        else
+        {
+#ifdef DEBUG
+            av_log(NULL, AV_LOG_DEBUG,
+                   "tss->type != MPEGTS_PES, where idx %d\n", idx);
+#endif
+            break;
+        }
+    }
+#ifdef DEBUG
+    av_log(NULL, AV_LOG_DEBUG, "pmt_equal_streams:%d old:%d new:%d limit:%d\n",
+        idx, mpegts_ctx->pid_cnt, item_cnt, limit);
+#endif
+    return idx;
+}
+
 #define HANDLE_PMT_ERROR(MSG) \
     do { av_log(NULL, AV_LOG_ERROR, MSG); return; } while (0)
 
@@ -2501,114 +2601,6 @@ static int is_pat_same(MpegTSContext *mpegts_ctx,
             return 0;
     }
     return 1;
-}
-
-// Find number of equal streams in old and new pmt starting at 0
-// and stopping at the first different stream.
-static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
-                             pmt_entry_t* items, int item_cnt)
-{
-    int limit = mpegts_ctx->pid_cnt < item_cnt ? mpegts_ctx->pid_cnt : item_cnt;
-    int idx;
-
-    for (idx = 0; idx < limit; idx++)
-    {
-        MpegTSFilter *tss;
-        /* check for pid */
-        int loc = find_in_list(mpegts_ctx->pmt_pids, items[idx].pid);
-        if (loc < 0)
-        {
-#ifdef DEBUG
-            av_log(NULL, AV_LOG_DEBUG,
-                   "find_in_list(..,[%d].pid=%d) => -1\n",
-                   idx, items[idx].pid);
-#endif
-            break;
-        }
-
-        /* check stream type */
-        tss = mpegts_ctx->pids[items[idx].pid];
-        if (!tss)
-        {
-#ifdef DEBUG
-            av_log(NULL, AV_LOG_DEBUG,
-                   "mpegts_ctx->pids[items[%d].pid=%d] => null\n",
-                   idx, items[idx].pid);
-#endif
-            break;
-        }
-        if (tss->type == MPEGTS_PES)
-        {
-            PESContext *pes = (PESContext*) tss->u.pes_filter.opaque;
-            if (!pes)
-            {
-#ifdef DEBUG
-                av_log(NULL, AV_LOG_DEBUG, "pes == null, where idx %d\n", idx);
-#endif
-                break;
-            }
-            if (pes->stream_type != items[idx].type)
-            {
-#ifdef DEBUG
-                av_log(NULL, AV_LOG_DEBUG,
-                       "pes->stream_type != items[%d].type\n", idx);
-#endif
-                break;
-            }
-        }
-        else if (tss->type == MPEGTS_SECTION)
-        {
-            SectionContext *sect = (SectionContext*) tss->u.section_filter.opaque;
-            if (!sect)
-            {
-#ifdef DEBUG
-                av_log(NULL, AV_LOG_DEBUG, "sect == null, where idx %d\n", idx);
-#endif
-                break;
-            }
-            if (sect->stream_type != items[idx].type)
-            {
-#ifdef DEBUG
-                av_log(NULL, AV_LOG_DEBUG,
-                       "sect->stream_type != items[%d].type\n", idx);
-#endif
-                break;
-            }
-        }
-        else
-        {
-#ifdef DEBUG
-            av_log(NULL, AV_LOG_DEBUG,
-                   "tss->type != MPEGTS_PES, where idx %d\n", idx);
-#endif
-            break;
-        }
-    }
-#ifdef DEBUG
-    av_log(NULL, AV_LOG_DEBUG, "pmt_equal_streams:%d old:%d new:%d limit:%d\n",
-        idx, mpegts_ctx->pid_cnt, item_cnt, limit);
-#endif
-    return idx;
-}
-
-static void mpegts_cleanup_streams(MpegTSContext *ts)
-{
-    int i;
-    int orig_pid_cnt = ts->pid_cnt;
-    for (i=0; i<ts->pid_cnt; i++)
-    {
-        if (!ts->pids[ts->pmt_pids[i]])
-        {
-            mpegts_remove_stream(ts, ts->pmt_pids[i]);
-            i--;
-        }
-    }
-    if (orig_pid_cnt != ts->pid_cnt)
-    {
-        av_log(NULL, AV_LOG_DEBUG,
-               "mpegts_cleanup_streams: pid_cnt bfr %d aft %d\n",
-               orig_pid_cnt, ts->pid_cnt);
-    }
 }
 
 static AVStream *new_section_av_stream(SectionContext *sect, enum AVMediaType type,
