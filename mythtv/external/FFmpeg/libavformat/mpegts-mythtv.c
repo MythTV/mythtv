@@ -2611,21 +2611,14 @@ static void mpegts_cleanup_streams(MpegTSContext *ts)
     }
 }
 
-// This was previously in libavutil/internal.h
-// Copied here because it is no longer used in the rest of ffmpeg
-#define FF_ALLOCZ_OR_GOTO(ctx, p, size, label)\
-{\
-    p = av_mallocz(size);\
-    if (!(p) && (size) != 0) {\
-        av_log(ctx, AV_LOG_ERROR, "Cannot allocate memory.\n");\
-        goto label;\
-    }\
-}
-
 static AVStream *new_section_av_stream(SectionContext *sect, enum AVMediaType type,
                                        enum AVCodecID id)
 {
-    FF_ALLOCZ_OR_GOTO(NULL, sect->st, sizeof(AVStream), fail);
+    sect->st = av_mallocz(sizeof(AVStream));
+    if (!(sect->st) && (sizeof(AVStream)) != 0) {
+        av_log(NULL, AV_LOG_ERROR, "Cannot allocate memory.\n");
+        return NULL;
+    }
 
     sect->st = avformat_new_stream(sect->stream, NULL);
     sect->st->id = sect->pid;
@@ -2638,8 +2631,6 @@ static AVStream *new_section_av_stream(SectionContext *sect, enum AVMediaType ty
     sect->st->need_parsing = AVSTREAM_PARSE_NONE;
 
     return sect->st;
-fail: /*for the CHECKED_ALLOCZ macro*/
-    return NULL;
 }
 
 /* mpegts_push_section: return one or more tables.  The tables may not completely fill
