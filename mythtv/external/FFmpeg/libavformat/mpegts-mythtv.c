@@ -2418,21 +2418,6 @@ FF_DISABLE_DEPRECATION_WARNINGS
         }
 FF_ENABLE_DEPRECATION_WARNINGS
 #endif
-#if 0
-        /* make sure format context is not using the codec context */
-        if (&s->streams[i] == s->cur_st) {
-            av_log(NULL, AV_LOG_DEBUG, "av_mpegts_remove_stream cur_st = NULL\n");
-            s->cur_st = NULL;
-        }
-     /*   else if (s->cur_st > &s->streams[i]) {
-            av_log(NULL, AV_LOG_DEBUG, "av_mpegts_remove_stream cur_st -= 1\n");
-            s->cur_st -= sizeof(AVFormatContext *);
-        } */
-        else {
-            av_log(NULL, AV_LOG_DEBUG,
-                   "av_mpegts_remove_stream: no change to cur_st\n");
-        }
-#endif
 
         av_log(NULL, AV_LOG_DEBUG, "av_mpegts_remove_stream: removing... "
                "s->nb_streams=%d i=%d\n", s->nb_streams, i);
