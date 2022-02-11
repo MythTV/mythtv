@@ -125,7 +125,6 @@ static void av_mpegts_remove_stream(AVFormatContext *s, int id) {
             av_log(NULL, AV_LOG_DEBUG, "av_mpegts_remove_stream cur_st = NULL\n");
             s->cur_st = NULL;
         }
-#endif
      /*   else if (s->cur_st > &s->streams[i]) {
             av_log(NULL, AV_LOG_DEBUG, "av_mpegts_remove_stream cur_st -= 1\n");
             s->cur_st -= sizeof(AVFormatContext *);
@@ -134,6 +133,7 @@ static void av_mpegts_remove_stream(AVFormatContext *s, int id) {
             av_log(NULL, AV_LOG_DEBUG,
                    "av_mpegts_remove_stream: no change to cur_st\n");
         }
+#endif
 
         av_log(NULL, AV_LOG_DEBUG, "av_mpegts_remove_stream: removing... "
                "s->nb_streams=%d i=%d\n", s->nb_streams, i);
