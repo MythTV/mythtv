@@ -2614,13 +2614,12 @@ static void mpegts_cleanup_streams(MpegTSContext *ts)
 static AVStream *new_section_av_stream(SectionContext *sect, enum AVMediaType type,
                                        enum AVCodecID id)
 {
-    sect->st = av_mallocz(sizeof(AVStream));
-    if (!(sect->st) && (sizeof(AVStream)) != 0) {
+    sect->st = avformat_new_stream(sect->stream, NULL);
+    if (!(sect->st)) {
         av_log(NULL, AV_LOG_ERROR, "Cannot allocate memory.\n");
         return NULL;
     }
 
-    sect->st = avformat_new_stream(sect->stream, NULL);
     sect->st->id = sect->pid;
 
     avpriv_set_pts_info(sect->st, 33, 1, 90000);
