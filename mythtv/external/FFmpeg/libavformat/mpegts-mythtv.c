@@ -2957,13 +2957,22 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
 
     for (i = 0; i < PAT_MAX_PMT; ++i)
     {
-        pmt_pnums[i] = get16(&p, p_end);
-        if (pmt_pnums[i] < 0)
+        sid = get16(&p, p_end);
+        if (sid < 0)
+            break;
+        pmt_pid = get16(&p, p_end);
+        if (pmt_pid < 0)
+            break;
+        pmt_pid &= 0x1fff;
+
+        if (pmt_pid == ts->current_pid)
             break;
 
-        pmt_pids[i] = get16(&p, p_end) & 0x1fff;
-        if (pmt_pids[i] < 0)
-            break;
+        av_log(ts->stream, AV_LOG_TRACE, "sid=0x%x pid=0x%x\n", sid, pmt_pid);
+        av_log(ts->stream, AV_LOG_TRACE, "req_sid=0x%x\n", ts->req_sid);
+
+        pmt_pnums[i] = sid;
+        pmt_pids[i] = pmt_pid;
 
         if (pmt_pids[i] == 0x0)
         {
@@ -2975,11 +2984,6 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
 
         pmt_count++;
 
-#ifdef DEBUG
-        av_log(ts->stream, AV_LOG_DEBUG,
-               "MPEG Program Number=0x%x pid=0x%x req_sid=0x%x\n",
-               pmt_pnums[i], pmt_pids[i], ts->req_sid);
-#endif
     }
 
     if (!is_pat_same(ts, pmt_pnums, pmt_pids, pmt_count))
