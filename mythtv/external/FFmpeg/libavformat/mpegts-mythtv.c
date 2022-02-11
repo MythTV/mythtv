@@ -113,12 +113,16 @@ static void av_mpegts_remove_stream(AVFormatContext *s, int id) {
 
         av_log(NULL, AV_LOG_DEBUG, "av_mpegts_remove_stream 0x%x\n", id);
 
+#if FF_API_LAVF_AVCTX
+FF_DISABLE_DEPRECATION_WARNINGS
         /* close codec context */
         codec_ctx = s->streams[i]->codec;
         if (codec_ctx->codec) {
             avcodec_close(codec_ctx);
             av_free(codec_ctx);
         }
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
 #if 0
         /* make sure format context is not using the codec context */
         if (&s->streams[i] == s->cur_st) {
