@@ -249,7 +249,7 @@ struct Stream {
 #define MAX_PIDS_PER_PROGRAM (MAX_STREAMS_PER_PROGRAM + 2)
 struct Program {
     unsigned int id; // program id/service id
-    unsigned int pid; // PMT PID (not in upstream)
+    unsigned int pid; // PMT PID (not in upstream), only used in add_pat_entry() and is_pat_same()
     unsigned int nb_pids;
     unsigned int pids[MAX_PIDS_PER_PROGRAM];
     unsigned int nb_streams;
@@ -2859,6 +2859,7 @@ void mpegts_remove_stream(MpegTSContext *ts, int pid)
     }
 }
 
+// from FFmpeg sync
 static void add_pat_entry(MpegTSContext *ts, unsigned int programid, unsigned int pid)
 {
     struct Program *p;
@@ -2868,7 +2869,7 @@ static void add_pat_entry(MpegTSContext *ts, unsigned int programid, unsigned in
     ts->prg = tmp;
     p = &ts->prg[ts->nb_prg];
     p->id = programid;
-    p->pid = pid;
+    p->pid = pid; // MythTV added
     p->nb_pids = 0;
     ts->nb_prg++;
 }
