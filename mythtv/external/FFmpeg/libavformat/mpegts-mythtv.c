@@ -2114,6 +2114,76 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
     return 0;
 }
 
+static AVStream *find_matching_stream(MpegTSContext *ts, int pid, unsigned int programid,
+                                      int stream_identifier, int pmt_stream_idx, struct Program *p)
+{
+    AVFormatContext *s = ts->stream;
+    int i;
+    AVStream *found = NULL;
+
+    if (stream_identifier) { /* match based on "stream identifier descriptor" if present */
+        for (i = 0; i < p->nb_streams; i++) {
+            if (p->streams[i].stream_identifier == stream_identifier)
+                if (!found || pmt_stream_idx == i) /* fallback to idx based guess if multiple streams have the same identifier */
+                    found = s->streams[p->streams[i].idx];
+        }
+    } else if (pmt_stream_idx < p->nb_streams) { /* match based on position within the PMT */
+        found = s->streams[p->streams[pmt_stream_idx].idx];
+    }
+
+    if (found) {
+        av_log(ts->stream, AV_LOG_VERBOSE,
+               "re-using existing %s stream %d (pid=0x%x) for new pid=0x%x\n",
+               av_get_media_type_string(found->codecpar->codec_type),
+               i, found->id, pid);
+    }
+
+    return found;
+}
+
+static int parse_stream_identifier_desc(const uint8_t *p, const uint8_t *p_end)
+{
+    const uint8_t **pp = &p;
+    const uint8_t *desc_list_end;
+    const uint8_t *desc_end;
+    int desc_list_len;
+    int desc_len, desc_tag;
+
+    desc_list_len = get16(pp, p_end);
+    if (desc_list_len < 0)
+        return -1;
+    desc_list_len &= 0xfff;
+    desc_list_end  = p + desc_list_len;
+    if (desc_list_end > p_end)
+        return -1;
+
+    while (1) {
+        desc_tag = get8(pp, desc_list_end);
+        if (desc_tag < 0)
+            return -1;
+        desc_len = get8(pp, desc_list_end);
+        if (desc_len < 0)
+            return -1;
+        desc_end = *pp + desc_len;
+        if (desc_end > desc_list_end)
+            return -1;
+
+        if (desc_tag == 0x52) {
+            return get8(pp, desc_end);
+        }
+        *pp = desc_end;
+    }
+
+    return -1;
+}
+
+static int is_pes_stream(int stream_type, uint32_t prog_reg_desc)
+{
+    return !(stream_type == 0x13 ||
+             (stream_type == 0x86 && prog_reg_desc == AV_RL32("CUEI")) );
+}
+
+// begin MythTV only -------------------------------------------------------
 static int find_in_list(const int *pids, int pid)
 {
     int i;
@@ -2567,6 +2637,7 @@ static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
 #define HANDLE_PMT_PARSE_ERROR(PMSG) \
     HANDLE_PMT_ERROR("Something went terribly wrong in PMT parsing" \
                      " when looking at " PMSG "\n")
+// End MythTV only ------------------------------------------------------
 
 static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len)
 {
