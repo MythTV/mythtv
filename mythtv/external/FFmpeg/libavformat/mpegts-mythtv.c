@@ -2672,10 +2672,8 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     /* if we require a specific PMT, and this isn't it return silently */
     if (ts->req_sid >= 0 && h->id != ts->req_sid)
     {
-#ifdef DEBUG
-        av_dlog(ts->stream, "We are looking for program 0x%x, not 0x%x",
+        av_log(ts->stream, AV_LOG_TRACE, "We are looking for program 0x%x, not 0x%x",
                ts->req_sid, h->id);
-#endif
          return;
     }
 
@@ -2687,7 +2685,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     add_pid_to_pmt(ts, h->id, pcr_pid);
     set_pcr_pid(ts->stream, h->id, pcr_pid);
 
-    av_dlog(ts->stream, "pcr_pid=0x%x\n", pcr_pid);
+    av_log(ts->stream, AV_LOG_TRACE, "pcr_pid=0x%x\n", pcr_pid);
 
     program_info_length = get16(&p, p_end);
     if (program_info_length < 0)
@@ -2698,7 +2696,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         tag = get8(&p, p_end);
         len = get8(&p, p_end);
 
-        av_dlog(ts->stream, "program tag: 0x%02x len=%d\n", tag, len);
+        av_log(ts->stream, AV_LOG_TRACE, "program tag: 0x%02x len=%d\n", tag, len);
 
         if(len > program_info_length - 2)
             //something else is broken, exit the program_descriptors_loop
