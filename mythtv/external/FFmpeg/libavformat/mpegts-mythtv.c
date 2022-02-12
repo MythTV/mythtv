@@ -2618,34 +2618,31 @@ static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
 #endif
     return idx;
 }
-
-#define HANDLE_PMT_ERROR(MSG) \
-    do { av_log(NULL, AV_LOG_ERROR, MSG); return; } while (0)
-
-#define HANDLE_PMT_PARSE_ERROR(PMSG) \
-    HANDLE_PMT_ERROR("Something went terribly wrong in PMT parsing" \
-                     " when looking at " PMSG "\n")
 // End MythTV only ------------------------------------------------------
 
 static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len)
 {
     MpegTSContext *ts = filter->u.section_filter.opaque;
+    MpegTSSectionFilter *tssf = &filter->u.section_filter;
+    struct Program old_program;
     SectionHeader h1, *h = &h1;
-
-    int last_item = 0;
-    int desc_count = 0;
-    //int streams_changed = 0;
-    //PESContext *pes;
+    PESContext *pes;
+    AVStream *st;
     const uint8_t *p, *p_end, *desc_list_end;
     int program_info_length, pcr_pid, pid, stream_type;
     int desc_list_len;
-    //char *language;
     uint32_t prog_reg_desc = 0; /* registration descriptor */
+    int stream_identifier = -1;
+    struct Program *prg;
 
-    Mp4Descr mp4_descr[MAX_MP4_DESCR_COUNT] = {{ 0 }};
     int mp4_descr_count = 0;
+    Mp4Descr mp4_descr[MAX_MP4_DESCR_COUNT] = { { 0 } };
+    int i;
 
+    // MythTV
     int equal_streams = 0;
+    int last_item = 0;
+    int desc_count = 0;
 
     pmt_entry_t items[PMT_PIDS_MAX];
     memset(&items, 0, sizeof(pmt_entry_t) * PMT_PIDS_MAX);
@@ -2655,21 +2652,22 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         items[i].codec_type = AVMEDIA_TYPE_UNKNOWN;
 
     mpegts_cleanup_streams(ts); /* in case someone else removed streams.. */
+    // end MythTV
 
-    av_dlog(ts->stream, "PMT: len %i\n", section_len);
-    hex_dump_debug(ts->stream, (uint8_t *)section, section_len);
+    av_log(ts->stream, AV_LOG_TRACE, "PMT: len %i\n", section_len);
+    hex_dump_debug(ts->stream, section, section_len);
 
     p_end = section + section_len - 4;
     p = section;
     if (parse_section_header(h, &p, p_end) < 0)
-        HANDLE_PMT_PARSE_ERROR("section header");
-
-    av_dlog(ts->stream, "sid=0x%x sec_num=%d/%d\n",
-           h->id, h->sec_num, h->last_sec_num);
-
-    /* Check if this is really a PMT, and if so the right one */
+        return;
     if (h->tid != PMT_TID)
-        HANDLE_PMT_ERROR("pmt_cb() got a TS packet that doesn't have PMT TID\n");
+        return;
+    if (skip_identical(h, tssf))
+        return;
+
+    av_log(ts->stream, AV_LOG_TRACE, "sid=0x%x sec_num=%d/%d version=%d tid=%d\n",
+            h->id, h->sec_num, h->last_sec_num, h->version, h->tid);
 
     /* if we require a specific PMT, and this isn't it return silently */
     if (ts->req_sid >= 0 && h->id != ts->req_sid)
