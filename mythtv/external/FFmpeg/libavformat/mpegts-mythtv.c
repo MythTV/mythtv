@@ -2634,6 +2634,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     av_log(ts->stream, AV_LOG_TRACE, "sid=0x%x sec_num=%d/%d version=%d tid=%d\n",
             h->id, h->sec_num, h->last_sec_num, h->version, h->tid);
 
+    // begin MythTV
     /* if we require a specific PMT, and this isn't it return silently */
     if (ts->req_sid >= 0 && h->id != ts->req_sid)
     {
@@ -2641,6 +2642,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
                ts->req_sid, h->id);
          return;
     }
+    // end MythTV
 
     if (!ts->scan_all_pmts && ts->skip_changes)
         return;
@@ -2762,6 +2764,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         desc_count++;
     }
 
+    // begin MythTV
     /* if the pmt has changed delete old streams,
      * create new ones, and notify any listener.
      */
@@ -2806,6 +2809,10 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         ts->pmt_scan_state = PMT_FOUND;
         ts->stop_parse = 1;
     }
+    // end MythTV
+
+    if (!ts->pids[pcr_pid])
+        mpegts_open_pcr_filter(ts, pcr_pid);
 
 out:
     for (i = 0; i < mp4_descr_count; i++)
