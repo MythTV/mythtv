@@ -2673,24 +2673,24 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     if (program_info_length < 0)
         return;
     program_info_length &= 0xfff;
-    while(program_info_length >= 2) {
+    while (program_info_length >= 2) {
         uint8_t tag, len;
         tag = get8(&p, p_end);
         len = get8(&p, p_end);
 
         av_log(ts->stream, AV_LOG_TRACE, "program tag: 0x%02x len=%d\n", tag, len);
 
-        if(len > program_info_length - 2)
-            //something else is broken, exit the program_descriptors_loop
+        if (len > program_info_length - 2)
+            // something else is broken, exit the program_descriptors_loop
             break;
         program_info_length -= len + 2;
-        if (tag == 0x1d) { // IOD descriptor
+        if (tag == IOD_DESCRIPTOR) {
             get8(&p, p_end); // scope
             get8(&p, p_end); // label
             len -= 2;
             mp4_read_iods(ts->stream, p, len, mp4_descr + mp4_descr_count,
                           &mp4_descr_count, MAX_MP4_DESCR_COUNT);
-        } else if (tag == 0x05 && len >= 4) { // registration descriptor
+        } else if (tag == REGISTRATION_DESCRIPTOR && len >= 4) {
             prog_reg_desc = bytestream_get_le32(&p);
             len -= 4;
         }
@@ -2698,11 +2698,14 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     }
     p += program_info_length;
     if (p >= p_end)
-	return;
+        goto out;
 
     // stop parsing after pmt, we found header
-    if (!ts->stream->nb_streams)
+    if (!ts->pkt)
         ts->stop_parse = 2;
+
+    if (prg)
+        prg->pmt_found = 1;
 
     for(;;) {
         dvb_caption_info_t dvbci;
@@ -2803,6 +2806,10 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         ts->pmt_scan_state = PMT_FOUND;
         ts->stop_parse = 1;
     }
+
+out:
+    for (i = 0; i < mp4_descr_count; i++)
+        av_free(mp4_descr[i].dec_config_descr);
 }
 
 static int is_pat_same(MpegTSContext *mpegts_ctx,
