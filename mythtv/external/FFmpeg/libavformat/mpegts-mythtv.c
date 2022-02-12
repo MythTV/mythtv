@@ -2209,44 +2209,6 @@ static int is_desired_stream(pmt_entry_t *item)
     return val;
 }
 
-static void clear_program_pid(MpegTSContext *ts, unsigned int programid)
-{
-    int i;
-
-    for(i=0; i<ts->nb_prg; i++)
-        if(ts->prg[i].id == programid)
-            ts->prg[i].nb_pids = 0;
-}
-
-static void add_pid_to_pmt(MpegTSContext *ts, unsigned int programid, unsigned int pid)
-{
-    int i;
-    struct Program *p = NULL;
-    for(i=0; i<ts->nb_prg; i++) {
-        if(ts->prg[i].id == programid) {
-            p = &ts->prg[i];
-            break;
-        }
-    }
-    if(!p)
-        return;
-
-    if(p->nb_pids >= MAX_PIDS_PER_PROGRAM)
-        return;
-    p->pids[p->nb_pids++] = pid;
-}
-
-static void set_pcr_pid(AVFormatContext *s, unsigned int programid, unsigned int pid)
-{
-    int i;
-    for(i=0; i<s->nb_programs; i++) {
-        if(s->programs[i]->id == programid) {
-            s->programs[i]->pcr_pid = pid;
-            break;
-        }
-    }
-}
-
 static AVStream *new_section_av_stream(SectionContext *sect, enum AVMediaType type,
                                        enum AVCodecID id)
 {
@@ -2413,7 +2375,10 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
                    st->index, st->id, avcodec_get_name(st->codecpar->codec_id),
                    av_get_media_type_string(st->codecpar->codec_type), st);
         }
-        add_pid_to_pmt(ts, id, pid);
+        {
+            struct Program *p = get_program(ts, id);
+            add_pid_to_program(p, pid);
+        }
         av_program_add_stream_index(ts->stream, id, st->index);
     }
     else
@@ -2677,13 +2642,30 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
          return;
     }
 
-    clear_program_pid(ts, h->id);
+    if (!ts->scan_all_pmts && ts->skip_changes)
+        return;
+
+    prg = get_program(ts, h->id);
+    if (prg)
+        old_program = *prg;
+    else
+        clear_program(&old_program);
+
+    if (ts->skip_unknown_pmt && !prg)
+        return;
+    if (prg && prg->nb_pids && prg->pids[0] != ts->current_pid)
+        return;
+    if (!ts->skip_clear)
+        clear_avprogram(ts, h->id);
+    clear_program(prg);
+    add_pid_to_program(prg, ts->current_pid);
+
     pcr_pid = get16(&p, p_end);
     if (pcr_pid < 0)
         return;
     pcr_pid &= 0x1fff;
-    add_pid_to_pmt(ts, h->id, pcr_pid);
-    set_pcr_pid(ts->stream, h->id, pcr_pid);
+    add_pid_to_program(prg, pcr_pid);
+    update_av_program_info(ts->stream, h->id, pcr_pid, h->version);
 
     av_log(ts->stream, AV_LOG_TRACE, "pcr_pid=0x%x\n", pcr_pid);
 
