@@ -1167,7 +1167,7 @@
         </shape>
 
         <textarea name="title" from="basetextarea">
-            <area>500,336,280,50</area>
+            <area>400,336,480,50</area>
             <font>baselarge</font>
             <align>allcenter</align>
             <value>Please Wait...</value>
