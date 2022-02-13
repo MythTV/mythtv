@@ -227,7 +227,7 @@ Im &apos;Lesezeichen anlegen&apos; Menü können Sie neue Lesezeichen hinzufüge
     <message>
         <location filename="themestrings.h" line="7"/>
         <source>Bookmark Manager</source>
-        <translation>Bookmarks verwalten</translation>
+        <translation>Lesezeichen verwalten</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
@@ -237,22 +237,22 @@ Im &apos;Lesezeichen anlegen&apos; Menü können Sie neue Lesezeichen hinzufüge
     <message>
         <location filename="themestrings.h" line="56"/>
         <source>WEB BROWSER</source>
-        <translation type="unfinished"></translation>
+        <translation>WEB BROWSER</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="60"/>
         <source>Website Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Name Webseite</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="61"/>
         <source>Website URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL Webseite</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="63"/>
         <source>Zoom:</source>
-        <translation type="unfinished"></translation>
+        <translation>Vergrößerung:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="64"/>
@@ -292,7 +292,7 @@ Im &apos;Lesezeichen anlegen&apos; Menü können Sie neue Lesezeichen hinzufüge
     <message>
         <location filename="themestrings.h" line="12"/>
         <source>Browse your favorite web sites.</source>
-        <translation>Durchsuchen Sie Ihre Lesezeichen.</translation>
+        <translation>Durchsuchen Sie Ihre Lieblings-Webseiten.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="17"/>
@@ -394,70 +394,70 @@ Wenn Sie fertig sind, wählen Sie &quot;OK&quot; zum Speichern und Beenden oder 
     <message numerus="yes">
         <location filename="themestrings.h" line="6"/>
         <source>%name% (%url%)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%name% (%url%)</numerusform>
+            <numerusform>%name% (%url%)</numerusform>
         </translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>Bookmark Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Name Lesezeichen:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>Bookmark URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL Lesezeichen:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>
         <source>Browse the web</source>
-        <translation type="unfinished"></translation>
+        <translation>Internet durchsuchen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Browser</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>Browser command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Browser Befehl:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
         <source>Choose a bookmark to open in the webbrowser</source>
-        <translation type="unfinished"></translation>
+        <translation>Lesezeichen zum Öffnen im Webbrowser auswählen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>Command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Befehl:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>
         <source>Configure web browser settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Webbrowser-Einstellungen konfigurieren</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="27"/>
         <source>Edit your bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Lesezeichen bearbeiten</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>Enable Plugins:</source>
-        <translation type="unfinished"></translation>
+        <translation>Plugins aktivieren:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
         <source>Enable browser plugins (Flash, etc)</source>
-        <translation>Browserplugins aktivieren (Flash, etc.)</translation>
+        <translation>Browserplugins aktivieren (Flash, usw.)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="31"/>
         <source>Enable browser plugins:</source>
-        <translation type="unfinished"></translation>
+        <translation>Browserplugins aktivieren:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="32"/>
@@ -472,12 +472,12 @@ Wenn Sie fertig sind, wählen Sie &quot;OK&quot; zum Speichern und Beenden oder 
     <message>
         <location filename="themestrings.h" line="35"/>
         <source>Find category</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorie suchen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="39"/>
         <source>Myth Web Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Webbrowser</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
@@ -487,37 +487,37 @@ Wenn Sie fertig sind, wählen Sie &quot;OK&quot; zum Speichern und Beenden oder 
     <message>
         <location filename="themestrings.h" line="43"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Suche</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="47"/>
         <source>Select bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Lesezeichen auswählen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="48"/>
         <source>Select bookmark or add a new one</source>
-        <translation type="unfinished"></translation>
+        <translation>Lesezeichen auswählen oder hinzufügen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="49"/>
         <source>Select bookmark:</source>
-        <translation type="unfinished"></translation>
+        <translation>Lesezeichen auswählen:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>Text size:</source>
-        <translation type="unfinished"></translation>
+        <translation>Textgröße:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
         <source>URL Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL Name:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>
