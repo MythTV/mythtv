@@ -646,15 +646,18 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    LOG(VB_GENERAL, LOG_INFO, "\n"
+    if (!cmdline.toBool("noresched"))
+    {
+        LOG(VB_GENERAL, LOG_INFO, "\n"
             "===============================================================\n"
             "| Attempting to contact the master backend for rescheduling.  |\n"
             "| If the master is not running, rescheduling will happen when |\n"
             "| the master backend is restarted.                            |\n"
             "===============================================================");
 
-    ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(),
-                                        "MythFillDatabase");
+        ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(),
+                                            "MythFillDatabase");
+    }
 
     gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
 
