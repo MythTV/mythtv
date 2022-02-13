@@ -104,6 +104,7 @@ void strings_null() {
     ThemeUI::tr("Burn Settings");
     ThemeUI::tr("Burning Settings");
     ThemeUI::tr("By %ARTIST%");
+    ThemeUI::tr("By the artist \"%ARTIST%\" from the album \"%ALBUM%\"");
     ThemeUI::tr("CD");
     ThemeUI::tr("CD Blanking Type:");
     ThemeUI::tr("CD Ripper");
@@ -207,7 +208,6 @@ void strings_null() {
     ThemeUI::tr("Fixed Date");
     ThemeUI::tr("Fixed Date:");
     ThemeUI::tr("Found:");
-    ThemeUI::tr("From the album %ALBUM% by the artist %ARTIST%");
     ThemeUI::tr("General");
     ThemeUI::tr("General Settings");
     ThemeUI::tr("General music");
@@ -264,6 +264,7 @@ void strings_null() {
     ThemeUI::tr("Logo URL:");
     ThemeUI::tr("Look Up");
     ThemeUI::tr("Look for new music files");
+    ThemeUI::tr("Lyrics View");
     ThemeUI::tr("Lyrics:");
     ThemeUI::tr("MUSIC PLAYER");
     ThemeUI::tr("MUSIC Playlist Editor");
