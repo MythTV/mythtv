@@ -168,4 +168,11 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
         ->SetDeprecated("It's no longer valid with Schedules Direct XMLTV.\n"
           "          Remove in mythtv-setup General -> Program Schedule\n"
           "          -> Downloading Options -> Guide Data Arguements");
+    add("--no-resched", "noresched", false,
+            "Do not invoke the rescheduler in the backend.",
+	    "This option prevents mythfilldatabase from asking the backend "
+	    "to invoke the rescheduler after importing new metadata.\n"
+	    "This is useful if you need to invoke mythfilldatabase multiple "
+	    "times in a row, or if some postprocessing is required before "
+	    "the scheduler should see the updated metadata.");
 }
