@@ -26,6 +26,7 @@ import { DataViewModule } from 'primeng/dataview';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { OverlayPanelModule } from 'primeng/overlaypanel'
 import { TableModule } from 'primeng/table';
+import { RippleModule } from 'primeng/ripple';
 
 import { AppRoutingModule } from './app-routing.module';
 
@@ -119,7 +120,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     DataViewModule,
     ProgressSpinnerModule,
     OverlayPanelModule,
-    TableModule
+    TableModule,
+    RippleModule
   ],
   providers: [],
   bootstrap: [AppComponent]

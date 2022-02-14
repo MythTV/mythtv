@@ -1,136 +1,73 @@
-<div class="block-content">
-    <div style="overflow: hidden;" class="ng-star-inserted">
-        <div class="min-h-screen flex relative lg:static surface-ground">
-            <div id="app-sidebar-4"
-                class="bg-gray-900  hidden lg:block flex-shrink-0 absolute lg:static left-0 top-0 z-1 border-gray-800 w-18rem lg:w-5rem select-none">
-                <div class="flex flex-column h-full">
-                    <div class="toolbar flex align-items-left flex-shrink-0" style="height: 80px;"><img class="p-2"
-                            src="images/mythtv.png" alt="Image" height="80">
-
-                    </div>
-                    <div class="mt-3 select-none">
-                        <ul class="list-none p-3 lg:py-3 lg:px-2 m-0">
-                            <li [routerLink]="''" pTooltip="{{ 'navbar.dashboard' | translate }}">
-                                <a pripple=""
-                                    class="p-ripple p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors"><i
-                                        class="pi pi-home mr-2 lg:mr-0 text-base lg:text-xl"></i><span
-                                        class="font-medium inline lg:hidden">{{ 'navbar.dashboard' | translate }}</span><span class="p-ink"></span>
-                                </a>
-                            </li>
-                            <li [routerLink]="'status'" pTooltip="{{ 'navbar.backendStatus' | translate }}">
-                                <a pripple=""
-                                    class="p-ripple p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors"><i
-                                        class="pi pi-info-circle mr-2 lg:mr-0 text-base lg:text-xl"></i><span
-                                        class="font-medium inline lg:hidden">{{ 'navbar.backendStatus' | translate }}</span><span
-                                        class="p-ink"></span></a>
-                            </li>
-                            <li [routerLink]="'settings'" pTooltip="{{ 'navbar.backendSetup' | translate }}">
-                                <a pripple=""
-                                    class="p-ripple p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
-                                    <i class="pi pi-cog mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                                    <span class="font-medium inline lg:hidden">{{ 'navbar.backendSetup' | translate }}</span>
-                                    <span class="p-ink"></span>
-                                </a>
-                            </li>
-                            <li [routerLink]="'guide'" pTooltip="{{ 'navbar.tvGuide' | translate }}">
-                                <a pripple=""
-                                    class="p-ripple p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
-                                    <i class="pi pi-map mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                                    <span class="font-medium inline lg:hidden">{{ 'navbar.tvGuide' | translate }}</span>
-                                    <span class="p-ink"></span>
-                                </a>
-                            </li>
-                            <ng-container *ngIf="m_devMode">
-                                <li [routerLink]="'testbed'" pTooltip="{{ 'navbar.testbed' | translate }}">
-                                    <a pripple=""
-                                        class="p-ripple p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
-                                        <i class="pi pi-pencil mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                                        <span class="font-medium inline lg:hidden">{{ 'navbar.testbed' | translate }}</span>
-                                        <span class="p-ink"></span>
-                                    </a>
-                                </li>
-                            </ng-container>
-                        </ul>
-                    </div>
-                    <div class="mt-auto">
-                        <hr class="mb-3 mx-2 border-top-1 border-none border-gray-800">
-                        <a pripple="" pTooltip="{{ 'navbar.switchServer' | translate }}"
-                            class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
-                            <i class="pi pi-server mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                            <span class="font-medium inline lg:hidden">{{ 'navbar.switchServer' | translate }}</span>
-                            <span class="p-ink"></span>
-                        </a>
-                    </div>
-                </div>
+<div class="flex flex-column relative flex-auto">
+    <div class="toolbar flex justify-content-between align-items-center pm-8 surface-section relative lg:static  surface-border"
+        style="height: 85px;">
+        <div class="toolbar flex align-items-left flex-shrink-0" style="height: 80px;">
+            <a pRipple class="p-ripple p-element my-3 mx-1 flex align-items-center cursor-pointer p-3 lg:hidden lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors" (click)="toggleShowSidebar()">
+                <i class="pi pi-bars mr-1 lg:ml-1 text-base lg:text-xl "></i>
+                <span class="p-ink" ng serve></span>
+            </a>
+            <img class="py-2 pl-1" src="images/mythtv.png" alt="Image" height="80">
+            <div class="hidden md:inline-flex">
+                <h1>MythTV Backend</h1>
             </div>
-            <div class="min-h-screen flex flex-column relative flex-auto">
-                <div class="toolbar flex justify-content-between align-items-center pm-8 surface-section relative lg:static border-bottom-1 surface-border"
-                    style="height: 80px;">
-                    <div style="padding: 7rem;">
-                        <h1>MythTV Backend</h1>
-                    </div>
+        </div>
 
-                    <div class="pr-3">
-                        <ul class="toolbar list-none p-0 m-0 hidden lg:flex lg:align-items-center select-none lg:flex-row surface-section border-1 lg:border-none surface-border right-0 top-100 z-1 shadow-2 lg:shadow-none absolute lg:static">
-                            <li>
-                                <a pripple="" class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
-                                    <i class="pi pi-ellipsis-v mr-2 lg:mr-0 text-base lg:text-xl hidden"></i>
-                                    <span class="p-ink"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a pripple="" tooltipPosition="bottom" pTooltip="{{ 'navbar.switchServer' | translate }}"
-                                    class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
-                                    <i class="pi pi-server mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                                    <span class="font-medium inline lg:hidden">{{ 'navbar.switchServer' | translate }}</span>
-                                    <span class="p-ink"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a pripple="" tooltipPosition="bottom" pTooltip="{{ 'navbar.switchTheme' | translate }}" (click)="themePanel.toggle($event)"
-                                    class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
-                                    <div *ngIf="m_selectedTheme">
-                                        <img src="images/themes/{{m_selectedTheme.Image}}" class="mr-3 lg:mr-0" style="width: 32px; height: 32px;">
-                                    </div>
-                                    <span class="font-medium inline lg:hidden">{{ 'navbar.switchTheme' | translate }}</span>
-                                    <span class="p-ink"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a pripple="" tooltipPosition="bottom" pTooltip="{{ 'navbar.changeLanguage' | translate }}" (click)="languagePanel.toggle($event)"
-                                class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
-                                <div *ngIf="m_selectedLanguage">
-                                    <img src="images/locale/{{m_selectedLanguage.Image}}" class="mr-3 lg:mr-0" style="width: 32px;">
-                                </div>
-                                <span class="font-medium inline lg:hidden">{{ 'navbar.changeLanguage' | translate }}</span>
-                                <span class="p-ink"></span>
-                            </a>
-                            </li>
-                            <li>
-                                <a pripple="" tooltipPosition="bottom" pTooltip="{{ 'navbar.login' | translate }}"
-                                    class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
-                                    <i class="pi pi-sign-in mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                                    <span class="font-medium inline lg:hidden">{{ 'navbar.login' | translate }}</span>
-                                    <span class="p-ink"></span>
-                                </a>
-                            </li>
-
-                        </ul>
-                    </div>
-                </div>
-                <div class="bg-gray-100 p-1 flex flex-column flex-auto">
-                    <div class="bg-gray-100 border-none surface-border border-round surface-section flex-auto">
-                        <router-outlet></router-outlet>
-                    </div>
-                </div>
-            </div>
+        <div class="pr-2">
+            <a pRipple class="p-ripple p-element my-2 mx-2 flex align-items-center cursor-pointer p-3 md:hidden md:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors" (click)="toggleShowNavbar()">
+                <i class="pi pi-ellipsis-v mr-1 md:mr-0 text-base md:text-xl "></i>
+                <span class="p-ink" ng serve></span>
+            </a>
+            <ul class="toolbar list-none p-0 m-0 md:flex md:align-items-center select-none md:flex-row surface-section border-1 md:border-none surface-border right-0 top-100 z-2 shadow-2 md:shadow-none absolute md:static" [hidden]="m_showNavbar">
+                <li>
+                    <a pRipple tooltipPosition="bottom" pTooltip="{{ 'navbar.switchServer' | translate }}"
+                        class="p-ripple p-element my-3 mx-1 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
+                        <i class="pi pi-server mr-2 md:mr-0 text-base md:text-xl"></i>
+                        <span class="font-medium inline md:hidden">{{ 'navbar.switchServer' | translate }}</span>
+                        <span class="p-ink"></span>
+                    </a>
+                </li>
+                <li>
+                    <a pRipple tooltipPosition="bottom" pTooltip="{{ 'navbar.switchTheme' | translate }}"
+                        (click)="themePanel.toggle($event)"
+                        class="p-ripple p-element my-3 mx-1 flex align-items-center cursor-pointer p-2 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
+                        <div *ngIf="m_selectedTheme">
+                            <img src="images/themes/{{m_selectedTheme.Image}}" class="mr-2 lg:mr-0"
+                                style="width: 32px; height: 32px;">
+                        </div>
+                        <span class="font-medium inline md:hidden">{{ 'navbar.switchTheme' | translate }}</span>
+                        <span class="p-ink"></span>
+                    </a>
+                </li>
+                <li>
+                    <a pRipple tooltipPosition="bottom" pTooltip="{{ 'navbar.changeLanguage' | translate }}"
+                        (click)="languagePanel.toggle($event)"
+                        class="p-ripple p-element my-3 mx-1 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
+                        <div *ngIf="m_selectedLanguage">
+                            <img src="images/locale/{{m_selectedLanguage.Image}}" class="mr-2 lg:mr-0"
+                                style="width: 32px;">
+                        </div>
+                        <span class="font-medium inline md:hidden">{{ 'navbar.changeLanguage' | translate }}</span>
+                        <span class="p-ink"></span>
+                    </a>
+                </li>
+                <li>
+                    <a pRipple tooltipPosition="bottom" pTooltip="{{ 'navbar.login' | translate }}"
+                        class="p-ripple p-element my-3 mx-1 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
+                        <i class="pi pi-sign-in mr-2 lg:mr-0 text-base lg:text-xl"></i>
+                        <span class="font-medium inline md:hidden">{{ 'navbar.login' | translate }}</span>
+                        <span class="p-ink"></span>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 </div>
 
 <p-overlayPanel #themePanel [showCloseIcon]="true" [style]="{width: '350px'}">
     <ng-template pTemplate>
-        <p-table [value]="m_themes$" selectionMode="single" [paginator]="false" sortField="Name" sortMode="single" [scrollable]="true" scrollHeight="500px" rowGroupMode="subheader" groupRowsBy="Category" responsiveLayout="scroll">
+        <p-table [value]="m_themes$" selectionMode="single" [paginator]="false" sortField="Name" sortMode="single"
+            [scrollable]="true" scrollHeight="500px" rowGroupMode="subheader" groupRowsBy="Category"
+            responsiveLayout="scroll">
             <ng-template pTemplate="groupheader" let-theme>
                 <tr pRowGroupHeader>
                     <td colspan="2">
@@ -140,7 +77,8 @@
             </ng-template>
             <ng-template pTemplate="body" let-rowData let-theme>
                 <tr [pSelectableRow]="rowData" (click)="changeTheme(theme)">
-                    <td  style="max-width:80px"><img src="images/themes/{{theme.Image}}" [alt]="theme.image" class="theme-image" /></td>
+                    <td style="max-width:80px"><img src="images/themes/{{theme.Image}}" [alt]="theme.image"
+                            class="theme-image" /></td>
                     <td>{{theme.Name}}</td>
                 </tr>
             </ng-template>
@@ -150,11 +88,15 @@
 
 <p-overlayPanel #languagePanel [showCloseIcon]="true" [style]="{width: '450px'}">
     <ng-template pTemplate>
-        <p-table [value]="m_languages" selectionMode="single" [paginator]="false" sortField="NativeLanguage" sortMode="single" [scrollable]="true" scrollHeight="500px" responsiveLayout="scroll">
-             <ng-template pTemplate="body" let-rowData let-language>
+        <p-table [value]="m_languages" selectionMode="single" [paginator]="false" sortField="NativeLanguage"
+            sortMode="single" [scrollable]="true" scrollHeight="500px" responsiveLayout="scroll">
+            <ng-template pTemplate="body" let-rowData let-language>
                 <tr [pSelectableRow]="rowData" (click)="languagePanel.hide(); changeLanguage(language)">
-                    <td style="max-width:80px"><img src="images/locale/{{language.Image}}" [alt]="language.image" class="theme-image" /></td>
-                    <td><pre><span class="font-bold">{{language.Language}}</span><br>{{language.NativeLanguage}} </pre> </td>                   
+                    <td style="max-width:80px"><img src="images/locale/{{language.Image}}" [alt]="language.image"
+                            class="theme-image" /></td>
+                    <td>
+                        <pre><span class="font-bold">{{language.Language}}</span><br>{{language.NativeLanguage}} </pre>
+                    </td>
                 </tr>
             </ng-template>
         </p-table>

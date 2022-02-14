@@ -5,6 +5,8 @@ import { ThemeService } from '../../services/theme.service';
 import { ConfigService } from '../../services/config.service';
 import { TranslateService } from '@ngx-translate/core';
 import { PrimeNGConfig } from 'primeng/api';
+import { DataService } from 'src/app/services/data.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-navbar',
@@ -18,12 +20,16 @@ export class NavbarComponent implements OnInit {
 
     m_languages!: Language[];
     m_selectedLanguage!: Language;
-    m_devMode : boolean = isDevMode();
+
+    m_showNavbar: boolean = true;
+    m_devMode: boolean = isDevMode();
+    m_haveDatabase: boolean = true;
 
     constructor(private themeService: ThemeService,
                 private configService: ConfigService,
                 private translateService: TranslateService,
-                private primeconfigService: PrimeNGConfig ) {
+                private primeconfigService: PrimeNGConfig,
+                private dataService: DataService) {
         this.themeService.getThemes().then((themes: Theme[]) => {
             this.m_themes$ = themes;
             this.m_selectedTheme = this.findThemeByName(localStorage.getItem('Theme') || 'Indigo Light');
@@ -71,5 +77,13 @@ export class NavbarComponent implements OnInit {
         localStorage.setItem('Language', this.m_selectedLanguage.Code);
         this.translateService.use(this.m_selectedLanguage.Code);
         this.translateService.get('primeng').subscribe(res => this.primeconfigService.setTranslation(res));
+    }
+
+    toggleShowNavbar() {
+        this.m_showNavbar = !this.m_showNavbar;
+    }
+
+    toggleShowSidebar() {
+        this.dataService.toggleShowSidebar();
     }
 }
