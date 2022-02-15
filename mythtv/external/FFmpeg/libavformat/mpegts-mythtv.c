@@ -2583,6 +2583,23 @@ static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
 #endif
     return idx;
 }
+
+/**
+@brief Copy PMT to AVFormatContext for use by MythTV.
+
+@param ctx          MpegTSContext.stream, assumed to be non-NULL
+@param section      Buffer to be duplicated
+@param section_len  Size in bytes of the buffer copied
+*/
+static void export_pmt(AVFormatContext *ctx, const uint8_t *section, int section_len)
+{
+    const uint8_t* tmp = av_memdup(section, section_len);
+    if (!tmp)
+        return; // AVERROR(ENOMEM)
+    FFSWAP(const uint8_t*, tmp, ctx->cur_pmt_sect);
+    ctx->cur_pmt_sect_len = section_len;
+    av_freep(&tmp); // NOP if ctx->cur_pmt_sect was NULL
+}
 // End MythTV only ------------------------------------------------------
 
 static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len)
@@ -2770,8 +2787,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     {
         AVFormatContext *avctx = ts->stream;
         int idx;
-        void* tmp0;
-        void* tmp1;
+
         /* flush out old AVPackets */
         ff_read_frame_flush(avctx);
 
@@ -2784,13 +2800,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
             mpegts_add_stream(ts, h->id, &items[idx], prog_reg_desc, pcr_pid);
 
         /* cache pmt */
-        tmp0 = (void*)avctx->cur_pmt_sect;
-        tmp1 = av_malloc(section_len);
-        memcpy(tmp1, section, section_len);
-        avctx->cur_pmt_sect = (uint8_t*) tmp1;
-        avctx->cur_pmt_sect_len = section_len;
-        if (tmp0)
-            av_free(tmp0);
+        export_pmt(avctx, section, section_len);
 
         /* notify stream_changed listeners */
         if (avctx->streams_changed)
