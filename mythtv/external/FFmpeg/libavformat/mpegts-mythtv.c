@@ -1896,22 +1896,22 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
                               MpegTSContext *ts, dvb_caption_info_t *dvbci)
 {
     const uint8_t *desc_end;
-    int desc_len, desc_tag;
-    //int desc_es_id;
-    char *language;
+    int desc_len, desc_tag, desc_es_id, ext_desc_tag, channels, channel_config_code;
+    //char language[252]; upstream
+    char *language = dvbci->language;
     int i;
 
     desc_tag = get8(pp, desc_list_end);
     if (desc_tag < 0)
-        return -1;
+        return AVERROR_INVALIDDATA;
     desc_len = get8(pp, desc_list_end);
     if (desc_len < 0)
-        return -1;
+        return AVERROR_INVALIDDATA;
     desc_end = *pp + desc_len;
     if (desc_end > desc_list_end)
-        return -1;
+        return AVERROR_INVALIDDATA;
 
-    av_dlog(fc, "tag: 0x%02x len=%d\n", desc_tag, desc_len);
+    av_log(fc, AV_LOG_TRACE, "tag: 0x%02x len=%d\n", desc_tag, desc_len);
 
     if (item->codec_id == AV_CODEC_ID_NONE &&
         stream_type == STREAM_TYPE_PRIVATE_DATA)
@@ -1922,93 +1922,183 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
             stream_type = 0;
     }
 
-    language = dvbci->language;
-
-    switch(desc_tag) {
-    case 0x02: /* video stream descriptor */
+    switch (desc_tag) {
+    case VIDEO_STREAM_DESCRIPTOR:
         if (get8(pp, desc_end) & 0x1) {
             dvbci->disposition |= AV_DISPOSITION_STILL_IMAGE;
         }
         break;
 #if 0
-    case 0x1E: /* SL descriptor */
+    case SL_DESCRIPTOR:
         desc_es_id = get16(pp, desc_end);
+        if (desc_es_id < 0)
+            break;
         if (ts && ts->pids[pid])
             ts->pids[pid]->es_id = desc_es_id;
         for (i = 0; i < mp4_descr_count; i++)
-        if (mp4_descr[i].dec_config_descr_len &&
-            mp4_descr[i].es_id == desc_es_id) {
-            AVIOContext pb;
-            ffio_init_context(&pb, mp4_descr[i].dec_config_descr,
-                          mp4_descr[i].dec_config_descr_len, 0, NULL, NULL, NULL, NULL);
-            ff_mp4_read_dec_config_descr(fc, st, &pb);
-            if (item->codec_id == AV_CODEC_ID_AAC &&
-                st->codecpar->extradata_size > 0)
-                st->need_parsing = 0;
-            if (item->codec_id == AV_CODEC_ID_MPEG4SYSTEMS)
-                mpegts_open_section_filter(ts, pid, m4sl_cb, ts, 1);
-        }
+            if (mp4_descr[i].dec_config_descr_len &&
+                mp4_descr[i].es_id == desc_es_id) {
+                AVIOContext pb;
+                ffio_init_context(&pb, mp4_descr[i].dec_config_descr,
+                                  mp4_descr[i].dec_config_descr_len, 0,
+                                  NULL, NULL, NULL, NULL);
+                ff_mp4_read_dec_config_descr(fc, st, &pb);
+                if (st->codecpar->codec_id == AV_CODEC_ID_AAC &&
+                    st->codecpar->extradata_size > 0) {
+                    st->need_parsing = 0;
+                    st->internal->need_context_update = 1;
+                }
+                if (st->codecpar->codec_id == AV_CODEC_ID_MPEG4SYSTEMS)
+                    mpegts_open_section_filter(ts, pid, m4sl_cb, ts, 1);
+            }
         break;
-    case 0x1F: /* FMC descriptor */
-        get16(pp, desc_end);
-        if (mp4_descr_count > 0 && (item->codec_id == AV_CODEC_ID_AAC_LATM || st->internal->request_probe>0) &&
+    case FMC_DESCRIPTOR:
+        if (get16(pp, desc_end) < 0)
+            break;
+        if (mp4_descr_count > 0 &&
+            (st->codecpar->codec_id == AV_CODEC_ID_AAC_LATM ||
+             (st->internal->request_probe == 0 && st->codecpar->codec_id == AV_CODEC_ID_NONE) ||
+             st->internal->request_probe > 0) &&
             mp4_descr->dec_config_descr_len && mp4_descr->es_id == pid) {
             AVIOContext pb;
             ffio_init_context(&pb, mp4_descr->dec_config_descr,
-                          mp4_descr->dec_config_descr_len, 0, NULL, NULL, NULL, NULL);
+                              mp4_descr->dec_config_descr_len, 0,
+                              NULL, NULL, NULL, NULL);
             ff_mp4_read_dec_config_descr(fc, st, &pb);
-            if (item->codec_id == AV_CODEC_ID_AAC &&
-                st->codecpar->extradata_size > 0){
-                st->internal->request_probe= st->need_parsing = 0;
-                st->codecpar->codec_type= AVMEDIA_TYPE_AUDIO;
+            if (st->codecpar->codec_id == AV_CODEC_ID_AAC &&
+                st->codecpar->extradata_size > 0) {
+                st->internal->request_probe = st->need_parsing = 0;
+                st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
+                st->internal->need_context_update = 1;
             }
         }
         break;
 #endif
     case 0x56: /* DVB teletext descriptor */
+#if 0
+        {
+            uint8_t *extradata = NULL;
+            int language_count = desc_len / 5, ret;
+
+            if (desc_len > 0 && desc_len % 5 != 0)
+                return AVERROR_INVALIDDATA;
+
+            if (language_count > 0) {
+                /* 4 bytes per language code (3 bytes) with comma or NUL byte should fit language buffer */
+                av_assert0(language_count <= sizeof(language) / 4);
+
+                if (st->codecpar->extradata == NULL) {
+                    ret = ff_alloc_extradata(st->codecpar, language_count * 2);
+                    if (ret < 0)
+                        return ret;
+                }
+
+                if (st->codecpar->extradata_size < language_count * 2)
+                    return AVERROR_INVALIDDATA;
+
+                extradata = st->codecpar->extradata;
+
+                for (i = 0; i < language_count; i++) {
+                    language[i * 4 + 0] = get8(pp, desc_end);
+                    language[i * 4 + 1] = get8(pp, desc_end);
+                    language[i * 4 + 2] = get8(pp, desc_end);
+                    language[i * 4 + 3] = ',';
+
+                    memcpy(extradata, *pp, 2);
+                    extradata += 2;
+
+                    *pp += 2;
+                }
+
+                language[i * 4 - 1] = 0;
+                av_dict_set(&st->metadata, "language", language, 0);
+                st->internal->need_context_update = 1;
+            }
+        }
+#else
         language[0] = get8(pp, desc_end);
         language[1] = get8(pp, desc_end);
         language[2] = get8(pp, desc_end);
         language[3] = 0;
+#endif
         break;
     case 0x59: /* subtitling descriptor */
+#if 0
+        {
+            /* 8 bytes per DVB subtitle substream data:
+             * ISO_639_language_code (3 bytes),
+             * subtitling_type (1 byte),
+             * composition_page_id (2 bytes),
+             * ancillary_page_id (2 bytes) */
+            int language_count = desc_len / 8, ret;
+
+            if (desc_len > 0 && desc_len % 8 != 0)
+                return AVERROR_INVALIDDATA;
+
+            if (language_count > 1) {
+                avpriv_request_sample(fc, "DVB subtitles with multiple languages");
+            }
+
+            if (language_count > 0) {
+                uint8_t *extradata;
+
+                /* 4 bytes per language code (3 bytes) with comma or NUL byte should fit language buffer */
+                av_assert0(language_count <= sizeof(language) / 4);
+
+                if (st->codecpar->extradata == NULL) {
+                    ret = ff_alloc_extradata(st->codecpar, language_count * 5);
+                    if (ret < 0)
+                        return ret;
+                }
+
+                if (st->codecpar->extradata_size < language_count * 5)
+                    return AVERROR_INVALIDDATA;
+
+                extradata = st->codecpar->extradata;
+
+                for (i = 0; i < language_count; i++) {
+                    language[i * 4 + 0] = get8(pp, desc_end);
+                    language[i * 4 + 1] = get8(pp, desc_end);
+                    language[i * 4 + 2] = get8(pp, desc_end);
+                    language[i * 4 + 3] = ',';
+
+                    /* hearing impaired subtitles detection using subtitling_type */
+                    switch (*pp[0]) {
+                    case 0x20: /* DVB subtitles (for the hard of hearing) with no monitor aspect ratio criticality */
+                    case 0x21: /* DVB subtitles (for the hard of hearing) for display on 4:3 aspect ratio monitor */
+                    case 0x22: /* DVB subtitles (for the hard of hearing) for display on 16:9 aspect ratio monitor */
+                    case 0x23: /* DVB subtitles (for the hard of hearing) for display on 2.21:1 aspect ratio monitor */
+                    case 0x24: /* DVB subtitles (for the hard of hearing) for display on a high definition monitor */
+                    case 0x25: /* DVB subtitles (for the hard of hearing) with plano-stereoscopic disparity for display on a high definition monitor */
+                        st->disposition |= AV_DISPOSITION_HEARING_IMPAIRED;
+                        break;
+                    }
+
+                    extradata[4] = get8(pp, desc_end); /* subtitling_type */
+                    memcpy(extradata, *pp, 4); /* composition_page_id and ancillary_page_id */
+                    extradata += 5;
+
+                    *pp += 4;
+                }
+
+                language[i * 4 - 1] = 0;
+                av_dict_set(&st->metadata, "language", language, 0);
+                st->internal->need_context_update = 1;
+            }
+        }
+#else
         language[0] = get8(pp, desc_end);
         language[1] = get8(pp, desc_end);
         language[2] = get8(pp, desc_end);
         language[3] = 0;
         get8(pp, desc_end);
 
-#if 0
-        /* hearing impaired subtitles detection */
-        switch(get8(pp, desc_end)) {
-        case 0x20: /* DVB subtitles (for the hard of hearing) with no monitor aspect ratio criticality */
-        case 0x21: /* DVB subtitles (for the hard of hearing) for display on 4:3 aspect ratio monitor */
-        case 0x22: /* DVB subtitles (for the hard of hearing) for display on 16:9 aspect ratio monitor */
-        case 0x23: /* DVB subtitles (for the hard of hearing) for display on 2.21:1 aspect ratio monitor */
-        case 0x24: /* DVB subtitles (for the hard of hearing) for display on a high definition monitor */
-        case 0x25: /* DVB subtitles (for the hard of hearing) with plano-stereoscopic disparity for display on a high definition monitor */
-            st->disposition |= AV_DISPOSITION_HEARING_IMPAIRED;
-            break;
-        }
-#endif
-
         dvbci->comp_page   = get16(pp, desc_end);
         dvbci->anc_page    = get16(pp, desc_end);
         dvbci->sub_id = (dvbci->anc_page << 16) | dvbci->comp_page;
 
-#if 0
-        if (st->codecpar->extradata) {
-            if (st->codecpar->extradata_size == 4 && memcmp(st->codecpar->extradata, *pp, 4))
-                av_log_ask_for_sample(fc, "DVB sub with multiple IDs\n");
-        } else {
-            st->codecpar->extradata = av_malloc(4 + AV_INPUT_BUFFER_PADDING_SIZE);
-            if (st->codecpar->extradata) {
-                st->codecpar->extradata_size = 4;
-                memcpy(st->codecpar->extradata, *pp, 4);
-            }
-        }
-#endif
         *pp += 4;
+#endif
         break;
     case ISO_639_LANGUAGE_DESCRIPTOR:
 #ifdef UPSTREAM_TO_MYTHTV
@@ -2049,16 +2139,22 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
         }
 #endif
         break;
-    case 0x05: /* registration descriptor */
+    case REGISTRATION_DESCRIPTOR:
+#if 0
+        st->codecpar->codec_tag = bytestream_get_le32(pp);
+        av_log(fc, AV_LOG_TRACE, "reg_desc=%.4s\n", (char *)&st->codecpar->codec_tag);
+        if (st->codecpar->codec_id == AV_CODEC_ID_NONE || st->internal->request_probe > 0) {
+            mpegts_find_stream_type(st, st->codecpar->codec_tag, REGD_types);
+            if (st->codecpar->codec_tag == MKTAG('B', 'S', 'S', 'D'))
+                st->internal->request_probe = 50;
+        }
+        break;
+#else
         dvbci->codec_tag = bytestream_get_le32(pp);
         av_dlog(fc, "reg_desc=%.4s\n", (char*)&dvbci->codec_tag);
         if (item->codec_id == AV_CODEC_ID_NONE &&
             stream_type == STREAM_TYPE_PRIVATE_DATA)
             mpegts_find_stream_type_pmt(item, dvbci->codec_tag, REGD_types);
-        break;
-#if 0
-    case 0x52: /* stream identifier descriptor */
-        st->stream_identifier = 1 + get8(pp, desc_end);
         break;
 #endif
     case DVB_BROADCAST_ID:
@@ -2074,6 +2170,10 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
             dvbci->carousel_id = carId;
         }
         break;
+#ifdef UPSTREAM_TO_MYTHTV
+    case 0x52: /* stream identifier descriptor */
+        st->stream_identifier = 1 + get8(pp, desc_end);
+#else
     case DVB_DATA_STREAM:
         dvbci->component_tag = get8(pp, desc_end);
         /* Audio and video are sometimes encoded in private streams labelled with
@@ -2085,6 +2185,7 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
              mpegts_find_stream_type_pmt(item, dvbci->component_tag,
                                          COMPONENT_TAG_types);
 #endif
+#endif
         break;
     case DVB_VBI_TELETEXT_ID:
         language[0] = get8(pp, desc_end);
@@ -2095,6 +2196,206 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
     case DVB_VBI_DATA_ID:
         dvbci->vbi_data = 1; //not parsing the data service descriptors
         break;
+#if 0
+    case METADATA_DESCRIPTOR:
+        if (get16(pp, desc_end) == 0xFFFF)
+            *pp += 4;
+        if (get8(pp, desc_end) == 0xFF) {
+            st->codecpar->codec_tag = bytestream_get_le32(pp);
+            if (st->codecpar->codec_id == AV_CODEC_ID_NONE)
+                mpegts_find_stream_type(st, st->codecpar->codec_tag, METADATA_types);
+        }
+        break;
+    case 0x7f: /* DVB extension descriptor */
+        ext_desc_tag = get8(pp, desc_end);
+        if (ext_desc_tag < 0)
+            return AVERROR_INVALIDDATA;
+        if (st->codecpar->codec_id == AV_CODEC_ID_OPUS &&
+            ext_desc_tag == 0x80) { /* User defined (provisional Opus) */
+            if (!st->codecpar->extradata) {
+                st->codecpar->extradata = av_mallocz(sizeof(opus_default_extradata) +
+                                                     AV_INPUT_BUFFER_PADDING_SIZE);
+                if (!st->codecpar->extradata)
+                    return AVERROR(ENOMEM);
+
+                st->codecpar->extradata_size = sizeof(opus_default_extradata);
+                memcpy(st->codecpar->extradata, opus_default_extradata, sizeof(opus_default_extradata));
+
+                channel_config_code = get8(pp, desc_end);
+                if (channel_config_code < 0)
+                    return AVERROR_INVALIDDATA;
+                if (channel_config_code <= 0x8) {
+                    st->codecpar->extradata[9]  = channels = channel_config_code ? channel_config_code : 2;
+                    AV_WL32(&st->codecpar->extradata[12], 48000);
+                    st->codecpar->extradata[18] = channel_config_code ? (channels > 2) : /* Dual Mono */ 255;
+                    st->codecpar->extradata[19] = opus_stream_cnt[channel_config_code];
+                    st->codecpar->extradata[20] = opus_coupled_stream_cnt[channel_config_code];
+                    memcpy(&st->codecpar->extradata[21], opus_channel_map[channels - 1], channels);
+                } else {
+                    avpriv_request_sample(fc, "Opus in MPEG-TS - channel_config_code > 0x8");
+                }
+                st->need_parsing = AVSTREAM_PARSE_FULL;
+                st->internal->need_context_update = 1;
+            }
+        }
+        if (ext_desc_tag == 0x06) { /* supplementary audio descriptor */
+            int flags;
+
+            if (desc_len < 1)
+                return AVERROR_INVALIDDATA;
+            flags = get8(pp, desc_end);
+
+            if ((flags & 0x80) == 0) /* mix_type */
+                st->disposition |= AV_DISPOSITION_DEPENDENT;
+
+            switch ((flags >> 2) & 0x1F) { /* editorial_classification */
+            case 0x01:
+                st->disposition |= AV_DISPOSITION_VISUAL_IMPAIRED;
+                st->disposition |= AV_DISPOSITION_DESCRIPTIONS;
+                break;
+            case 0x02:
+                st->disposition |= AV_DISPOSITION_HEARING_IMPAIRED;
+                break;
+            case 0x03:
+                st->disposition |= AV_DISPOSITION_VISUAL_IMPAIRED;
+                break;
+            }
+
+            if (flags & 0x01) { /* language_code_present */
+                if (desc_len < 4)
+                    return AVERROR_INVALIDDATA;
+                language[0] = get8(pp, desc_end);
+                language[1] = get8(pp, desc_end);
+                language[2] = get8(pp, desc_end);
+                language[3] = 0;
+
+                /* This language always has to override a possible
+                 * ISO 639 language descriptor language */
+                if (language[0])
+                    av_dict_set(&st->metadata, "language", language, 0);
+            }
+        }
+        break;
+    case 0x6a: /* ac-3_descriptor */
+        {
+            int component_type_flag = get8(pp, desc_end) & (1 << 7);
+            if (component_type_flag) {
+                int component_type = get8(pp, desc_end);
+                int service_type_mask = 0x38;  // 0b00111000
+                int service_type = ((component_type & service_type_mask) >> 3);
+                if (service_type == 0x02 /* 0b010 */) {
+                    st->disposition |= AV_DISPOSITION_DESCRIPTIONS;
+                    av_log(ts ? ts->stream : fc, AV_LOG_DEBUG, "New track disposition for id %u: %u\n", st->id, st->disposition);
+                }
+            }
+        }
+        break;
+    case 0x7a: /* enhanced_ac-3_descriptor */
+        {
+            int component_type_flag = get8(pp, desc_end) & (1 << 7);
+            if (component_type_flag) {
+                int component_type = get8(pp, desc_end);
+                int service_type_mask = 0x38;  // 0b00111000
+                int service_type = ((component_type & service_type_mask) >> 3);
+                if (service_type == 0x02 /* 0b010 */) {
+                    st->disposition |= AV_DISPOSITION_DESCRIPTIONS;
+                    av_log(ts ? ts->stream : fc, AV_LOG_DEBUG, "New track disposition for id %u: %u\n", st->id, st->disposition);
+                }
+            }
+        }
+        break;
+    case 0xfd: /* ARIB data coding type descriptor */
+        // STD-B24, fascicle 3, chapter 4 defines private_stream_1
+        // for captions
+        if (stream_type == STREAM_TYPE_PRIVATE_DATA) {
+            // This structure is defined in STD-B10, part 1, listing 5.4 and
+            // part 2, 6.2.20).
+            // Listing of data_component_ids is in STD-B10, part 2, Annex J.
+            // Component tag limits are documented in TR-B14, fascicle 2,
+            // Vol. 3, Section 2, 4.2.8.1
+            int actual_component_tag = st->stream_identifier - 1;
+            int picked_profile = FF_PROFILE_UNKNOWN;
+            int data_component_id = get16(pp, desc_end);
+            if (data_component_id < 0)
+                return AVERROR_INVALIDDATA;
+
+            switch (data_component_id) {
+            case 0x0008:
+                // [0x30..0x37] are component tags utilized for
+                // non-mobile captioning service ("profile A").
+                if (actual_component_tag >= 0x30 &&
+                    actual_component_tag <= 0x37) {
+                    picked_profile = FF_PROFILE_ARIB_PROFILE_A;
+                }
+                break;
+            case 0x0012:
+                // component tag 0x87 signifies a mobile/partial reception
+                // (1seg) captioning service ("profile C").
+                if (actual_component_tag == 0x87) {
+                    picked_profile = FF_PROFILE_ARIB_PROFILE_C;
+                }
+                break;
+            default:
+                break;
+            }
+
+            if (picked_profile == FF_PROFILE_UNKNOWN)
+                break;
+
+            st->codecpar->codec_type = AVMEDIA_TYPE_SUBTITLE;
+            st->codecpar->codec_id   = AV_CODEC_ID_ARIB_CAPTION;
+            st->codecpar->profile    = picked_profile;
+            st->internal->request_probe        = 0;
+        }
+        break;
+    case 0xb0: /* DOVI video stream descriptor */
+        {
+            uint32_t buf;
+            AVDOVIDecoderConfigurationRecord *dovi;
+            size_t dovi_size;
+            int ret;
+            if (desc_end - *pp < 4) // (8 + 8 + 7 + 6 + 1 + 1 + 1) / 8
+                return AVERROR_INVALIDDATA;
+
+            dovi = av_dovi_alloc(&dovi_size);
+            if (!dovi)
+                return AVERROR(ENOMEM);
+
+            dovi->dv_version_major = get8(pp, desc_end);
+            dovi->dv_version_minor = get8(pp, desc_end);
+            buf = get16(pp, desc_end);
+            dovi->dv_profile        = (buf >> 9) & 0x7f;    // 7 bits
+            dovi->dv_level          = (buf >> 3) & 0x3f;    // 6 bits
+            dovi->rpu_present_flag  = (buf >> 2) & 0x01;    // 1 bit
+            dovi->el_present_flag   = (buf >> 1) & 0x01;    // 1 bit
+            dovi->bl_present_flag   =  buf       & 0x01;    // 1 bit
+            if (desc_end - *pp >= 20) {  // 4 + 4 * 4
+                buf = get8(pp, desc_end);
+                dovi->dv_bl_signal_compatibility_id = (buf >> 4) & 0x0f; // 4 bits
+            } else {
+                // 0 stands for None
+                // Dolby Vision V1.2.93 profiles and levels
+                dovi->dv_bl_signal_compatibility_id = 0;
+            }
+
+            ret = av_stream_add_side_data(st, AV_PKT_DATA_DOVI_CONF,
+                                          (uint8_t *)dovi, dovi_size);
+            if (ret < 0) {
+                av_free(dovi);
+                return ret;
+            }
+
+            av_log(fc, AV_LOG_TRACE, "DOVI, version: %d.%d, profile: %d, level: %d, "
+                   "rpu flag: %d, el flag: %d, bl flag: %d, compatibility id: %d\n",
+                   dovi->dv_version_major, dovi->dv_version_minor,
+                   dovi->dv_profile, dovi->dv_level,
+                   dovi->rpu_present_flag,
+                   dovi->el_present_flag,
+                   dovi->bl_present_flag,
+                   dovi->dv_bl_signal_compatibility_id);
+        }
+        break;
+#endif
     default:
         break;
     }
