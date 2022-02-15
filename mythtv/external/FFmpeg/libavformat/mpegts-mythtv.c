@@ -2607,7 +2607,6 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     // MythTV
     int equal_streams = 0;
     int last_item = 0;
-    int desc_count = 0;
 
     pmt_entry_t items[PMT_PIDS_MAX];
     memset(&items, 0, sizeof(pmt_entry_t) * PMT_PIDS_MAX);
@@ -2760,8 +2759,6 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
                    sizeof(dvb_caption_info_t));
             last_item++;
         }
-
-        desc_count++;
     }
 
     // begin MythTV
