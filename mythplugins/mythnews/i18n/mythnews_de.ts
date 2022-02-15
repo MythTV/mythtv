@@ -6,7 +6,7 @@
     <message>
         <location filename="../mythnews/main.cpp" line="42"/>
         <source>RSS News feed reader</source>
-        <translation>RSS-Nachrichtenfeed</translation>
+        <translation>RSS-Nachrichtenfeeds</translation>
     </message>
     <message>
         <source>News</source>
@@ -20,7 +20,7 @@
     <message>
         <location filename="../mythnews/main.cpp" line="48"/>
         <source>Force update news items</source>
-        <translation>Aktualisierung der Nachrichten forcieren</translation>
+        <translation>Aktualisierung der Nachrichten erzwingen</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="50"/>
@@ -135,7 +135,7 @@
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="88"/>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -199,7 +199,7 @@
     <message>
         <location filename="themestrings.h" line="22"/>
         <source>Edit RSS News Feeds</source>
-        <translation>Newsfeed bearbeiten</translation>
+        <translation>Nachrichtenfeed bearbeiten</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="63"/>
@@ -263,7 +263,7 @@ Wenn Sie mit dem Bearbeiten fertig sind, wählen Sie &quot;OK&quot; oder &quot;A
     <message>
         <location filename="themestrings.h" line="33"/>
         <source>News Feeds</source>
-        <translation>Newsfeed</translation>
+        <translation>Nachrichtenfeed</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="35"/>
@@ -278,7 +278,7 @@ Wenn Sie mit dem Bearbeiten fertig sind, wählen Sie &quot;OK&quot; oder &quot;A
     <message>
         <location filename="themestrings.h" line="62"/>
         <source>You Haven&apos;t Specified Any News Feeds.</source>
-        <translation>Sie haben noch keine Nachrichten-Feeds definiert.</translation>
+        <translation>Sie haben noch keine Nachrichtenfeeds definiert.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
@@ -300,7 +300,9 @@ Wenn Sie mit dem Bearbeiten fertig sind, wählen Sie &quot;OK&quot; oder &quot;A
         <source>%&quot;|SUBTITLE|&quot;
 
 %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%&quot;|SUBTITLE|&quot;
+
+%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
@@ -310,7 +312,7 @@ Wenn Sie mit dem Bearbeiten fertig sind, wählen Sie &quot;OK&quot; oder &quot;A
     <message>
         <location filename="themestrings.h" line="12"/>
         <source>Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorien</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
@@ -320,147 +322,147 @@ Wenn Sie mit dem Bearbeiten fertig sind, wählen Sie &quot;OK&quot; oder &quot;A
     <message>
         <location filename="themestrings.h" line="15"/>
         <source>Choose sites you want to receive news from</source>
-        <translation type="unfinished"></translation>
+        <translation>Webseiten als Nachrichtenquellen auswählen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>Choose which news channels interest you</source>
-        <translation type="unfinished"></translation>
+        <translation>Interessante Nachrichtenkanäle auswählen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Datum:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>Enclosures:</source>
-        <translation type="unfinished"></translation>
+        <translation>Anhänge:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>Is Podcast:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ist Podcast:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="27"/>
         <source>NEWS</source>
-        <translation type="unfinished"></translation>
+        <translation>NACHRICHTEN</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>Name site:</source>
-        <translation type="unfinished"></translation>
+        <translation>Seitenname:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="30"/>
         <source>Needs Download:</source>
-        <translation type="unfinished"></translation>
+        <translation>Benötigt Download:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="34"/>
         <source>News Feeds Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Nachrichtenfeed Einstellungen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>News catagories</source>
-        <translation type="unfinished"></translation>
+        <translation>Nachrichtenkategorien</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="38"/>
         <source>News settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Nachrichten Einstellungen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="39"/>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>Nein</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="40"/>
         <source>No news sites available, please configure your subscriptions using the configuration menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine neuen Seiten verfügbar, bitte konfigurieren Sie ihre Abonnements über das Menü</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
         <source>Not Applicable</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht anwendbar</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="45"/>
         <source>RSS Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS bearbeiten</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>RSS Icon:</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS Icon:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="47"/>
         <source>RSS Newsfeeds</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS Nachrichtenfeeds</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="48"/>
         <source>RSS URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS URL:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="49"/>
         <source>RSS feed is podcast:</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS Feed ist Podcast:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
         <source>RSS feed name:</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS Feed-Name:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewertung</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="52"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichern</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
         <source>Select a feed to views</source>
-        <translation type="unfinished"></translation>
+        <translation>Feed zur Ansicht auswählen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>Site icon:</source>
-        <translation type="unfinished"></translation>
+        <translation>Seiten-Icon:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="55"/>
         <source>Subscribe to News Feeds</source>
-        <translation type="unfinished"></translation>
+        <translation>Nachrichtenfeeds abonnieren</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="56"/>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="57"/>
         <source>URL site:</source>
-        <translation type="unfinished"></translation>
+        <translation>Seiten-URL:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="59"/>
         <source>Unknown</source>
-        <translation type="unfinished">Unbekannt</translation>
+        <translation>Unbekannt</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="60"/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualisieren</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="64"/>
@@ -475,7 +477,7 @@ Wenn Sie mit dem Bearbeiten fertig sind, wählen Sie &quot;OK&quot; oder &quot;A
     <message>
         <location filename="themestrings.h" line="21"/>
         <source>Edit RSS News Feed</source>
-        <translation>Newsfeed bearbeiten</translation>
+        <translation>Nachrichtenfeeds bearbeiten</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
