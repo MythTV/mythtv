@@ -2758,7 +2758,8 @@ void ProgramInfo::UpdateLastPlayTimeStamp(bool hasLastPlay) const
 
 void ProgramInfo::SendUpdateEvent(void) const
 {
-    s_updater->insert(m_recordedId, kPIUpdate);
+    if (IsRecording())
+        s_updater->insert(m_recordedId, kPIUpdate);
 }
 
 void ProgramInfo::SendAddedEvent(void) const

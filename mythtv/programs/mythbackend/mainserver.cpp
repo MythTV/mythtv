@@ -1524,6 +1524,8 @@ void MainServer::customEvent(QEvent *e)
             uint recordedid = 0;
             if (tokens.size() >= 2)
                 recordedid = tokens[1].toUInt();
+            if (recordedid == 0)
+                return;
 
             ProgramInfo evinfo(recordedid);
             if (evinfo.GetChanID())
