@@ -3859,13 +3859,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1371")
     {
-        // Create the new tables first.
-        DBUpdates updates = getRecordingExtenderDbInfo(1);
-        if (!performUpdateSeries("MythtTV", updates))
-            return false;
+        // Recording extender tables are now created later.
 
         // If that worked, modify existing tables.
-        updates = getRecordingExtenderDbInfo(0);
+        DBUpdates updates = getRecordingExtenderDbInfo(0);
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1372", dbver))
             return false;
@@ -3901,11 +3898,30 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1374")
     {
-        // Add new tv listing name ->api name mappings for college
-        // basketball.
-        DBUpdates updates = getRecordingExtenderDbInfo(2);
+        // Recording extender tables are now created later.
+        DBUpdates updates {};
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1375", dbver))
+            return false;
+    }
+
+    if (dbver == "1375")
+    {
+        // Delete any existing recording extender tables.
+        DBUpdates updates = getRecordingExtenderDbInfo(-1);
+        if (!performUpdateSeries("MythtTV", updates))
+            return false;
+
+        // Now (re)create them.
+        updates = getRecordingExtenderDbInfo(1);
+        if (!performUpdateSeries("MythtTV", updates))
+            return false;
+
+        // Add new tv listing name ->api name mappings for college
+        // basketball.
+        updates = getRecordingExtenderDbInfo(2);
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1376", dbver))
             return false;
     }
 
@@ -5262,6 +5278,13 @@ DBUpdates getRecordingExtenderDbInfo (int version)
 {
     switch (version)
     {
+      case -1:
+        return {
+            R"(DROP TABLE IF EXISTS sportscleanup;)",
+            R"(DROP TABLE IF EXISTS sportslisting;)",
+            R"(DROP TABLE IF EXISTS sportsapi;)",
+        };
+
       case 0:
         return {
             R"(ALTER TABLE record ADD COLUMN autoextend
