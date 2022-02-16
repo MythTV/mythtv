@@ -1374,7 +1374,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
         lastPlayPresent = pginfo->QueryLastPlayPos() > 0;
     }
 
-    if (useBookmark && bookmarkPresent)
+    if (useBookmark && (bookmarkPresent || lastPlayPresent))
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
         auto *bookmarkdialog = new BookmarkDialog(pginfo, mainStack,
