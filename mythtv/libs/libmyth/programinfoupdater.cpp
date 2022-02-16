@@ -10,6 +10,8 @@
 void ProgramInfoUpdater::insert(
     uint     recordedid, PIAction action, uint64_t filesize)
 {
+    if (recordedid == 0)
+        return;
     QMutexLocker locker(&m_lock);
     if (kPIUpdate == action || kPIUpdateFileSize == action)
     {
