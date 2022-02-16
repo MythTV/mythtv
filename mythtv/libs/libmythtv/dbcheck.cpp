@@ -3909,12 +3909,12 @@ static bool doUpgradeTVDatabaseSchema(void)
     {
         // Delete any existing recording extender tables.
         DBUpdates updates = getRecordingExtenderDbInfo(-1);
-        if (!performUpdateSeries("MythtTV", updates))
+        if (!performUpdateSeries("MythTV", updates))
             return false;
 
         // Now (re)create them.
         updates = getRecordingExtenderDbInfo(1);
-        if (!performUpdateSeries("MythtTV", updates))
+        if (!performUpdateSeries("MythTV", updates))
             return false;
 
         // Add new tv listing name ->api name mappings for college
