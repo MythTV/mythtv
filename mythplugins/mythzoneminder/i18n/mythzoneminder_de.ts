@@ -91,7 +91,7 @@
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>Edit Monitor Function</source>
-        <translation>Überwachungsfunktionen bearbeiten</translation>
+        <translation>Monitorfunktionen bearbeiten</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="38"/>
@@ -132,57 +132,58 @@
         <location filename="themestrings.h" line="6"/>
         <source>%buttontext%
 %time%</source>
-        <translation type="unfinished"></translation>
+        <translation>%buttontext%
+%time%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="7"/>
         <source>%camera%:  %time% (%length%)</source>
-        <translation type="unfinished"></translation>
+        <translation>%camera%:  %time% (%length%)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>%length%</source>
-        <translation type="unfinished"></translation>
+        <translation>%length%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>0.12</source>
-        <translation type="unfinished">0.12</translation>
+        <translation>0.12</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
         <source>100%</source>
-        <translation type="unfinished">100%</translation>
+        <translation>100%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>CCTV Console</source>
-        <translation type="unfinished"></translation>
+        <translation>CCTV Konsole</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="14"/>
         <source>CCTV Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>CCTV Datum:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="15"/>
         <source>CCTV Event Player</source>
-        <translation type="unfinished"></translation>
+        <translation>CCTV Ereignisanzeige</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>CCTV Live Player</source>
-        <translation type="unfinished"></translation>
+        <translation>CCTV Live-Anzeige</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>CCTV Status:</source>
-        <translation type="unfinished"></translation>
+        <translation>CCTV Status:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
         <source>CCTV Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>CCTV Zeit:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
@@ -192,42 +193,42 @@
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>Configure Zoneminder console</source>
-        <translation type="unfinished"></translation>
+        <translation>ZoneMinder Konsole konfigurieren</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="27"/>
         <source>Console</source>
-        <translation type="unfinished"></translation>
+        <translation>Konsole</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="31"/>
         <source>Delete</source>
-        <translation type="unfinished">Löschen</translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="32"/>
         <source>Disk Usage:</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichernutzung:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="36"/>
         <source>Edit CCTV Monitor Function</source>
-        <translation type="unfinished"></translation>
+        <translation>CCTV Monitorfunktion bearbeiten</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
         <source>Event No:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ereignis Nr.:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="43"/>
         <source>Event number:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ereignisnummer:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>Events:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ereignisse:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="48"/>
@@ -237,67 +238,67 @@
     <message>
         <location filename="themestrings.h" line="49"/>
         <source>Function:</source>
-        <translation type="unfinished"></translation>
+        <translation>Funktion:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="52"/>
         <source>Length:</source>
-        <translation type="unfinished"></translation>
+        <translation>Länge:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>Live View</source>
-        <translation type="unfinished"></translation>
+        <translation>Live-Ansicht</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="56"/>
         <source>Look at the Zoneminder events list</source>
-        <translation type="unfinished"></translation>
+        <translation>ZoneMinder Ereignisliste ansehen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="66"/>
         <source>Monitor Function</source>
-        <translation type="unfinished"></translation>
+        <translation>Monitorfunktion</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="67"/>
         <source>Monitors</source>
-        <translation type="unfinished"></translation>
+        <translation>Monitore</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="71"/>
         <source>Play</source>
-        <translation type="unfinished">Abspielen</translation>
+        <translation>Abspielen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="74"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichern</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="75"/>
         <source>See what your system is doing</source>
-        <translation type="unfinished"></translation>
+        <translation>Systemstatus überprüfen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="84"/>
         <source>Show zoneminder</source>
-        <translation type="unfinished"></translation>
+        <translation>ZoneMinder anzeigen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="85"/>
         <source>Show zoneminder console</source>
-        <translation type="unfinished"></translation>
+        <translation>ZoneMinder Konsole anzeigen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="86"/>
         <source>Show zoneminder events</source>
-        <translation type="unfinished"></translation>
+        <translation>ZoneMinder Ereignisse anzeigen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="87"/>
         <source>Show zoneminder live cctv views</source>
-        <translation type="unfinished"></translation>
+        <translation>ZoneMinder CCTV Live-Bild anzeigen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="88"/>
@@ -449,17 +450,17 @@
     <message>
         <location filename="themestrings.h" line="89"/>
         <source>Source:</source>
-        <translation type="unfinished"></translation>
+        <translation>Quelle:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="92"/>
         <source>Stopped</source>
-        <translation type="unfinished">Gestoppt</translation>
+        <translation>Gestoppt</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="93"/>
         <source>Storage:</source>
-        <translation type="unfinished"></translation>
+        <translation>Speicher:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="94"/>
@@ -469,32 +470,32 @@
     <message>
         <location filename="themestrings.h" line="95"/>
         <source>System Load:</source>
-        <translation type="unfinished"></translation>
+        <translation>Systemlast:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="96"/>
         <source>System:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sytem:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="99"/>
         <source>Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeit:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="101"/>
         <source>Zone Minder Console</source>
-        <translation type="unfinished"></translation>
+        <translation>ZoneMinder Konsole</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="108"/>
         <source>Zoneminder console</source>
-        <translation type="unfinished"></translation>
+        <translation>ZoneMinder Konsole</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="110"/>
         <source>[R] = Running, [S] = Stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>[R] = Läuft, [S] = Gestoppt</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="112"/>
@@ -764,47 +765,47 @@ You don&apos;t have any monitors defined!</source>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="248"/>
         <source>Change View</source>
-        <translation type="unfinished">Ansicht ändern</translation>
+        <translation>Ansicht ändern</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="249"/>
         <source>Change Camera 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera 1 ändern</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="252"/>
         <source>Change Camera 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera 2 ändern</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="256"/>
         <source>Change Camera 3</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera 3 ändern</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="257"/>
         <source>Change Camera 4</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera 4 ändern</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="262"/>
         <source>Change Camera 5</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera 5 ändern</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="263"/>
         <source>Change Camera 6</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera 6 ändern</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="268"/>
         <source>Change Camera 7</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera 7 ändern</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="269"/>
         <source>Change Camera 8</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera 8 ändern</translation>
     </message>
 </context>
 <context>
