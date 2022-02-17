@@ -725,14 +725,20 @@ static bool preBufferDebug = qEnvironmentVariableIsSet("PREBUFFERDEBUG");
 
 bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
 {
-    if (!m_videoOutput || !m_videoOutput->ValidVideoFrames())
+    if (!m_videoOutput)
         return false;
 
-    if (!(min_buffers
-          ? (m_videoOutput->ValidVideoFrames() >= min_buffers)
-          : (GetEof() != kEofStateNone
-             || m_videoOutput->EnoughDecodedFrames()
-             || (m_ffrewSkip != 0 && m_ffrewSkip != 1))))
+    auto wait = false;
+    if (min_buffers)
+        wait = m_videoOutput->ValidVideoFrames() < min_buffers;
+    else if (GetEof() != kEofStateNone)
+        wait = false;
+    else if (abs(m_ffrewSkip) > 1)
+        wait = !m_videoOutput->ValidVideoFrames();
+    else
+        wait = !m_videoOutput->EnoughDecodedFrames();
+
+    if (wait)
     {
         SetBuffering(true);
 
@@ -742,12 +748,13 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         // This code inserts a brief pause and play when the potential
         // for the jerking is detected.
 
-        bool watchingTV = IsWatchingInprogress();
-        if ((m_liveTV || watchingTV) && !FlagIsSet(kMusicChoice))
+        if ((m_liveTV || IsWatchingInprogress())
+            && !FlagIsSet(kMusicChoice)
+            && m_ffrewSkip == 1)
         {
             uint64_t frameCount = GetCurrentFrameCount();
             uint64_t framesLeft = frameCount - m_framesPlayed;
-            auto margin = static_cast<uint64_t>(m_videoFrameRate * 3);
+            auto margin = static_cast<uint64_t>(m_videoFrameRate * 3.0);
             if (framesLeft < margin)
             {
                 if (m_avSync.ResetAVSyncForLiveTV(&m_audio))
@@ -825,6 +832,11 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         }
         return false;
     }
+
+    // Make sure we have at least one frame available.  The EOF case
+    // can get here without one.
+    if (!m_videoOutput->ValidVideoFrames())
+        return false;
 
     if (!m_avSync.GetAVSyncAudioPause())
         m_audio.Pause(false);
