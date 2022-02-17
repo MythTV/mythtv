@@ -16,7 +16,7 @@ from pprint import pprint
 from .definitions import *
 
 
-MYTHTV_TTVDBV4_API_VERSION = "4.5.0.1"
+MYTHTV_TTVDBV4_API_VERSION = "4.5.4.0"
 
 # set this to true for showing raw json data
 #JSONDEBUG = True
@@ -91,7 +91,7 @@ def _query_yielded(record, path, params, listname=None):
         params['page'] = curr_page
 
 
-"""Generated API for thetvdb.com TVDB API V4 v 4.5.0"""
+"""Generated API for thetvdb.com TVDB API V4 v 4.5.4"""
 # modifications marked with '### XXX'
 
 
@@ -111,7 +111,7 @@ getCompanyTypes_path = TTVDBV4_path + "/companies/types"
 getCompany_path = TTVDBV4_path + "/companies/{id}"
 getAllContentRatings_path = TTVDBV4_path + "/content/ratings"
 getAllCountries_path = TTVDBV4_path + "/countries"
-getEntityTypes_path = TTVDBV4_path + "/entities/types"
+getEntityTypes_path = TTVDBV4_path + "/entities"
 getEpisodeBase_path = TTVDBV4_path + "/episodes/{id}"
 getEpisodeExtended_path = TTVDBV4_path + "/episodes/{id}/extended"
 getEpisodeTranslation_path = TTVDBV4_path + "/episodes/{id}/translations/{language}"
@@ -141,6 +141,7 @@ getSeasonTypes_path = TTVDBV4_path + "/seasons/types"
 getSeasonTranslation_path = TTVDBV4_path + "/seasons/{id}/translations/{language}"
 getAllSeries_path = TTVDBV4_path + "/series"
 getSeriesBase_path = TTVDBV4_path + "/series/{id}"
+getSeriesArtworks_path = TTVDBV4_path + "/series/{id}/artworks"
 getSeriesExtended_path = TTVDBV4_path + "/series/{id}/extended"
 getSeriesEpisodes_path = TTVDBV4_path + "/series/{id}/episodes/{season_type}"
 getSeriesSeasonEpisodesTranslated_path = TTVDBV4_path + "/series/{id}/episodes/{season_type}/{lang}"
@@ -436,21 +437,56 @@ def getAllPeopleTypes():
     return( [PeopleType(x) for x in data] if data is not None else [] )
 
 
-def getSearchResults(q=None, query=None, type=None, remote_id=None, year=None, offset=None, limit=None):
+def getSearchResults(query=None, q=None, type=None, year=None, company=None, country=None,
+                     director=None, language=None, primaryType=None, network=None,
+                     remote_id=None, offset=None, limit=None):
     params = {}
-    if q is not None:
-        params['q'] = q
     if query is not None:
+        # The primary search string, which can include the main title for a record including
+        # all translations and aliases.
         params['query'] = query
+    if q is not None:
+        # Alias of the "query" parameter.  Recommend using query instead as this field will
+        # eventually be deprecated.
+        params['q'] = q
     if type is not None:
+        # Restrict results to a specific entity type.  Can be movie, series, person, or company.
         params['type'] = type
-    if remote_id is not None:
-        params['remote_id'] = remote_id
     if year is not None:
+        #  Restrict results to a specific year. Currently, only used for series and movies.
         params['year'] = year
+    if company is not None:
+        # Restrict results to a specific company (original network, production company, studio, etc).
+        # As an example, "The Walking Dead" would have companies of "AMC", "AMC+", and "Disney+".
+        params['company'] = company
+    if country is not None:
+        # Restrict results to a specific country of origin. Should contain a 3 character country code.
+        # Currently only used for series and movies.
+        params['country'] = country
+    if director is not None:
+        # Restrict results to a specific director.  Generally only used for movies.  Should include
+        # the full name of the director, such as "Steven Spielberg".
+        params['director'] = director
+    if language is not None:
+        # Restrict results to a specific primary language.  Should include the 3 character language
+        # code.  Currently only used for series and movies.
+        params['language'] = language
+    if primaryType is not None:
+        # Restrict results to a specific type of company.  Should include the full name of the
+        # type of company, such as "Production Company".  Only used for companies.
+        params['primaryType'] = primaryType
+    if network is not None:
+        # Restrict results to a specific network.  Used for TV and TV movies, and functions
+        # the same as the company parameter with more specificity.
+        params['network'] = network
+    if remote_id is not None:
+        # Search for a specific remote id.  Allows searching for an IMDB or EIDR id, for example.
+        params['remote_id'] = remote_id
     if offset is not None:
+        # Offset results.
         params['offset'] = offset
     if limit is not None:
+        # Limit results.
         params['limit'] = limit
     path = getSearchResults_path.format()
     res = _query_api(path, params)
@@ -489,7 +525,7 @@ def getSeasonTypes():
     path = getSeasonTypes_path.format()
     res = _query_api(path)
     data = res['data'] if res.get('data') is not None else None
-    return( SeasonType(data) if data is not None else None )
+    return( [SeasonType(x) for x in data] if data is not None else [] )
 
 
 def getSeasonTranslation(id, language):
@@ -517,6 +553,18 @@ def getSeriesBase(id):
     res = _query_api(path)
     data = res['data'] if res.get('data') is not None else None
     return( SeriesBaseRecord(data) if data is not None else None )
+
+
+def getSeriesArtworks(id, lang=None, type=None):
+    params = {}
+    if lang is not None:
+        params['lang'] = lang
+    if type is not None:
+        params['type'] = type
+    path = getSeriesArtworks_path.format(id=str(id))
+    res = _query_api(path, params)
+    data = res['data'] if res.get('data') is not None else None
+    return( SeriesExtendedRecord(data) if data is not None else None )
 
 
 def getSeriesExtended(id, meta=None):
@@ -555,12 +603,11 @@ def getSeriesSeasonEpisodesTranslated(id, season_type, lang, page=0, yielded=Fal
         params['page'] = page
     path = getSeriesSeasonEpisodesTranslated_path.format(id=str(id), season_type=season_type, lang=lang)
     if yielded:
-        return _query_yielded(EpisodeBaseRecord, path, params, listname='episodes')
+        return _query_yielded(SeriesBaseRecord, path, params, listname=None)
     else:
         res = _query_api(path, params)
         data = res['data'] if res.get('data') is not None else None
-        return( SeriesExtendedRecord(data['series']) if data is not None else None,
-                [EpisodeBaseRecord(x) for x in data['episodes']] if data is not None else [] )
+        return( SeriesBaseRecord(data['series']) if data is not None else None )
 
 
 def getSeriesTranslation(id, language):

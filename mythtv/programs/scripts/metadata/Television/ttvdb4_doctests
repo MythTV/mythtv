@@ -26,6 +26,7 @@
     <categories>
       <category name="Mini-Series"/>
       <category name="Drama"/>
+      <category name="Thriller"/>
       <category name="History"/>
     </categories>
     <countries>
@@ -69,6 +70,7 @@
     <categories>
       <category name="Mini-Series"/>
       <category name="Drama"/>
+      <category name="Thriller"/>
       <category name="History"/>
     </categories>
     <countries>
@@ -220,7 +222,9 @@
     <userrating>8.100000</userrating>
     <year>2010</year>
     <categories>
+      <category name="Drama"/>
       <category name="Crime"/>
+      <category name="Action"/>
     </categories>
     <countries>
       <country name="USA"/>
@@ -271,6 +275,7 @@
       <category name="Crime"/>
       <category name="Adventure"/>
       <category name="Action"/>
+      <category name="Mystery"/>
     </categories>
     <countries>
       <country name="USA"/>
@@ -471,6 +476,9 @@
     <year>1964</year>
     <runtime>25</runtime>
     <categories>
+      <category name="Horror"/>
+      <category name="Fantasy"/>
+      <category name="Family"/>
       <category name="Drama"/>
       <category name="Comedy"/>
     </categories>
@@ -531,6 +539,7 @@
       <certification locale="us" name="TV-Y"/>
     </certifications>
     <categories>
+      <category name="Family"/>
       <category name="Children"/>
       <category name="Animation"/>
     </categories>

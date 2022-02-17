@@ -750,7 +750,7 @@ class Myth4TTVDBv4(object):
         # or  option -N title timestamp    ### XXX ToDo implement me
         # this may take several minutes
         # $ ttvdb4.py -l de -N 76568 "Emily in Nöten" --debug
-        # $ ttvdb4.py -l en -a us - N 76568 "The Road Trip to Harvard" --debug
+        # $ ttvdb4.py -l en -a us -N 76568 "The Road Trip to Harvard" --debug
         # $ ttvdb4.py -l de -N "Die Munsters" "Der Liebestrank" --debug
         # $ ttvdb4.py -l de -N "Hawaii Five-0" "Geflügelsalat" --debug
         # $ ttvdb4.py -l en -N "The Munsters" 'My Fair Munster' --debug
