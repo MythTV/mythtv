@@ -1864,7 +1864,7 @@
         </checkbox>
 
         <textarea name="ruleactivelabel" from="basetextarea">
-            <area>655,586,300,30</area>
+            <area>670,586,315,30</area>
             <value>Recording Rule Active</value>
         </textarea>
 
@@ -1979,7 +1979,7 @@
         </checkbox>
 
         <textarea name="autoexpirelabel" from="basetextarea">
-            <area>500,582,450,30</area>
+            <area>300,582,500,30</area>
             <value>Allow recordings to expire?</value>
         </textarea>
 
@@ -1996,52 +1996,52 @@
         </group>
 
         <checkbox name="metadatalookup" from="basecheckbox">
-            <position>450,310</position>
+            <position>300,310</position>
         </checkbox>
 
         <textarea name="metadatalookuplabel" from="basetextarea">
-            <area>500,314,450,30</area>
+            <area>350,314,500,30</area>
             <value>Automatically Look Up Metadata</value>
         </textarea>
 
         <checkbox name="autocommflag" from="basecheckbox">
-            <position>450,354</position>
+            <position>300,354</position>
         </checkbox>
 
         <textarea name="autocommflaglabel" from="basetextarea">
-            <area>500,358,450,30</area>
+            <area>350,358,500,30</area>
             <value>Commercial Flag new recordings</value>
         </textarea>
 
         <checkbox name="autotranscode" from="basecheckbox">
-            <position>450,398</position>
+            <position>300,398</position>
         </checkbox>
 
         <textarea name="autotranscodelabel" from="basetextarea">
-            <area>500,402,300,30</area>
+            <area>350,402,500,30</area>
             <value>Transcode new recordings</value>
         </textarea>
 
         <buttonlist name="transcodeprofile" from="basewideselector">
-            <position>304,446</position>
+            <position>300,446</position>
             <helptext></helptext>
         </buttonlist>
 
         <checkbox name="userjob1" from="basecheckbox">
-            <position>400,534</position>
+            <position>300,534</position>
         </checkbox>
 
         <textarea name="userjob1label" from="basetextarea">
-            <area>450,538,300,30</area>
+            <area>350,538,400,30</area>
             <value>Run User Job #1</value>
         </textarea>
 
         <checkbox name="userjob2" from="basecheckbox">
-            <position>400,580</position>
+            <position>300,580</position>
         </checkbox>
 
         <textarea name="userjob2label" from="basetextarea">
-            <area>450,582,300,30</area>
+            <area>350,582,400,30</area>
             <value>Run User Job #2</value>
         </textarea>
 
