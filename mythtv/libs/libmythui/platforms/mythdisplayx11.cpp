@@ -1,5 +1,4 @@
 // MythTV
-#include "config.h"
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "mythdisplayx11.h"

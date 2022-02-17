@@ -2,7 +2,6 @@
 #define MYTHDRMHDR_H
 
 // MythTV
-#include "config.h"
 #include "mythhdr.h"
 #include "platforms/mythdrmdevice.h"
 

@@ -9,7 +9,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include "config.h"
+#include "mythconfig.h"
 
 #define LOC      QString("AOOSS: ")
 

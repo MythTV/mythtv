@@ -1,6 +1,3 @@
-
-#include "config.h"
-
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>
 #include <android/log.h>

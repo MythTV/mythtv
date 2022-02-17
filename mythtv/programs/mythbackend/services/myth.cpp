@@ -32,7 +32,6 @@
 #include <QHostAddress>
 #include <QUdpSocket>
 
-#include "config.h"
 #include "version.h"
 #include "mythversion.h"
 #include "mythcorecontext.h"

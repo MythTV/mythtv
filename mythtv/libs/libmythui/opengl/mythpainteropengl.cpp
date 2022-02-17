@@ -1,7 +1,5 @@
-// Config header generated in base directory by configure
-#include "config.h"
-
 // Qt
+#include <QtGlobal>
 #include <QCoreApplication>
 #include <QPainter>
 

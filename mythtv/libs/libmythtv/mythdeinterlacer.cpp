@@ -1,5 +1,5 @@
 // MythTV
-#include "config.h"
+#include "mythconfig.h"
 #include "mythlogging.h"
 #include "mythavutil.h"
 #include "mythvideoprofile.h"

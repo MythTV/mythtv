@@ -4,8 +4,6 @@
 #include <ctime>
 #include <sys/time.h>
 
-#include "config.h"
-
 #include <QFile>
 #include "mythcorecontext.h"
 #include "audiooutputalsa.h"

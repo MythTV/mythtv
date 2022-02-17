@@ -44,7 +44,7 @@
 #include <linux/joystick.h>
 
 // Myth headers
-#include "config.h"
+#include "mythconfig.h"
 #include "mythlogging.h"
 
 // Mythui headers

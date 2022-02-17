@@ -1,5 +1,3 @@
-#include "config.h"
-
 #include "mythcorecontext.h"
 
 #include "compat.h"

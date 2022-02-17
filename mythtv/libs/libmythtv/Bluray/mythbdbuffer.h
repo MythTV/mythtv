@@ -8,7 +8,6 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "config.h"
 #include "io/mythopticalbuffer.h"
 #include "Bluray/mythbdoverlay.h"
 

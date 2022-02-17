@@ -11,7 +11,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "config.h"
 #include "mpeg2fix.h"
 
 #include <QFileInfo>
