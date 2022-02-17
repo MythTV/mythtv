@@ -34,6 +34,7 @@ class MARKUP( object ):
     MARK_ASPECT_16_9      = 12
     MARK_ASPECT_2_21_1    = 13
     MARK_ASPECT_CUSTOM    = 14
+    MARK_SCAN_PROGRESSIVE = 15
     MARK_VIDEO_WIDTH      = 30
     MARK_VIDEO_HEIGHT     = 31
     MARK_VIDEO_RATE       = 32
@@ -65,6 +66,7 @@ class RECSEARCHTYPE( object ):
     kManualSearch       = 5
 
 class RECSTATUS( object ):
+    rsPending           = -15
     rsFailing           = -14
     rsTuning            = -10
     rsFailed            = -9
@@ -100,12 +102,18 @@ class AUDIO_PROPS( object ):
     AUD_VISUALIMPAIR    = 0x20
 
 class VIDEO_PROPS( object ):
-    VID_UNKNOWN         = 0x00
-    VID_HDTV            = 0x01
-    VID_WIDESCREEN      = 0x02
-    VID_AVC             = 0x04
-    VID_720             = 0x08
-    VID_1080            = 0x10
+    VID_UNKNOWN         = 0x0000
+    VID_WIDESCREEN      = 0x0001
+    VID_HDTV            = 0x0002
+    VID_MPEG2           = 0x0004
+    VID_AVC             = 0x0008
+    VID_HEVC            = 0x0010
+    VID_720             = 0x0020
+    VID_1080            = 0x0040
+    VID_4K              = 0x0080
+    VID_3DTV            = 0x0100
+    VID_PROGRESSIVE     = 0x0200
+    VID_DAMAGED         = 0x0400
 
 class SUBTITLE_TYPES( object ):
     SUB_UNKNOWN         = 0x00
