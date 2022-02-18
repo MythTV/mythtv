@@ -6,6 +6,7 @@
 #include "mythdeinterlacer.h"
 
 #include <algorithm>
+#include <thread>
 
 extern "C" {
 #include "libavfilter/buffersrc.h"
@@ -346,7 +347,7 @@ bool MythDeinterlacer::Initialise(MythVideoFrame *Frame, MythDeintType Deinterla
     uint threads = 1;
     if (Profile)
     {
-        threads = std::clamp(Profile->GetMaxCPUs(), 1U, 8U);
+        threads = std::clamp(Profile->GetMaxCPUs(), 1U, std::max(8U, std::thread::hardware_concurrency()));
     }
 
     AVFilterInOut* inputs = nullptr;
