@@ -243,7 +243,7 @@ event_map_t * EITCache::LoadChannel(uint chanid)
     }
 
     if (!eventMap->empty())
-        LOG(VB_EIT, LOG_INFO, LOC + QString("Loaded %1 entries for channel %2")
+        LOG(VB_EIT, LOG_INFO, LOC + QString("Loaded %1 entries for chanid %2")
                 .arg(eventMap->size()).arg(chanid));
 
     m_entryCnt += eventMap->size();
@@ -286,13 +286,13 @@ bool EITCache::WriteChannelToDB(QStringList &value_clauses, uint chanid)
     if (updated)
     {
         LOG(VB_EIT, LOG_INFO, LOC + QString("Writing %1 modified entries of %2 "
-                                      "for channel %3 to database.")
+                                      "for chanid %3 to database.")
                 .arg(updated).arg(size).arg(chanid));
     }
     if (removed)
     {
         LOG(VB_EIT, LOG_INFO, LOC + QString("Removed %1 old entries of %2 "
-                                      "for channel %3 from cache.")
+                                      "for chanid %3 from cache.")
                 .arg(removed).arg(size).arg(chanid));
     }
     m_pruneCnt += removed;
