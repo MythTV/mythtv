@@ -46,7 +46,7 @@ LIBS += -lmythavutil -lmythavcodec -lmythavformat -lmythswscale
 LIBS += $$EXTRA_LIBS $$LATE_LIBS $$QMAKE_LIBS_DYNLOAD
 using_mheg:LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 
-inc.path = $${PREFIX}/include/mythtv/protoserver
+inc.path = $${PREFIX}/include/mythtv/libmythprotoserver
 
 inc.files = $HEADERS
 

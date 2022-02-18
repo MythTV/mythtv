@@ -281,7 +281,7 @@ SOURCES += channelscan/iptvchannelfetcher.cpp
 HEADERS += captions/srtwriter.h
 SOURCES += captions/srtwriter.cpp
 
-inc.path = $${PREFIX}/include/mythtv/
+inc.path = $${PREFIX}/include/mythtv/libmythtv
 inc.files  = playgroup.h
 inc.files += mythtvexp.h            metadataimagehelper.h
 inc.files += mythavutil.h           mythframe.h

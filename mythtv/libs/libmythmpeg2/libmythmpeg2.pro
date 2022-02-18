@@ -14,7 +14,7 @@ SOURCES += cpu_accel.c cpu_state.c \
            alloc.c header.c decode.c slice.c \
            motion_comp.c idct.c
 
-inc.path = $${PREFIX}/include/mythtv/mpeg2dec/
+inc.path = $${PREFIX}/include/mythtv/libmythmpeg2/
 inc.files = mpeg2.h
 
 INCLUDEPATH += ../.. ../../external/FFmpeg

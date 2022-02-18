@@ -16,7 +16,7 @@
 #include <mythuibuttonlist.h>
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
-#include <metadata/videoutils.h>
+#include <libmythmetadata/videoutils.h>
 #include <remotefile.h>
 
 // mytharchive

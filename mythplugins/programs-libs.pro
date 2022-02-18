@@ -3,6 +3,7 @@ INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libmythbase
 INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libmythui
 INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libmyth
 INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libmythservicecontracts
+INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libmythtv
 DEPENDPATH *= $${INCLUDEPATH}
 
 LIBS += -L$${SYSROOT}$${LIBDIR} $$EXTRA_LIBS -lmythbase-$$LIBVERSION

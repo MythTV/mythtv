@@ -7,8 +7,8 @@
 #include <musicmetadata.h>
 #include <mythcontext.h>
 #include <mythdbcheck.h>
-#include <mythtv/mythdb.h>
-#include <mythtv/schemawizard.h>
+#include <libmythbase/mythdb.h>
+#include <libmyth/schemawizard.h>
 
 #include "musicdbcheck.h"
 

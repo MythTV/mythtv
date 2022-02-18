@@ -125,13 +125,9 @@ LIBS += -L../libmythservicecontracts         -lmythservicecontracts-$${LIBVERSIO
 }
 
 # Install headers so that plugins can compile independently
-inc.path = $${PREFIX}/include/mythtv/
+inc.path = $${PREFIX}/include/mythtv/libmyth
 inc.files  = dialogbox.h mythcontext.h
 inc.files += mythwidgets.h remotefile.h volumecontrol.h
-inc.files += audio/audiooutput.h audio/audiosettings.h
-inc.files += audio/audiooutputsettings.h audio/audiooutpututil.h
-inc.files += audio/audioconvert.h
-inc.files += audio/volumebase.h audio/eldutils.h
 inc.files += inetcomms.h schemawizard.h
 inc.files += mythaverror.h mythmediamonitor.h
 inc.files += visual.h output.h langsettings.h
@@ -142,15 +138,14 @@ inc.files += programtypes.h       recordingtypes.h
 inc.files += programtypeflags.h
 inc.files += rssparse.h
 inc.files += standardsettings.h
-
-# This stuff is not Qt5 compatible..
-# Really? It builds under Qt5, so lets let it
 inc.files += mythrssmanager.h     netutils.h
 inc.files += netgrabbermanager.h
 
-# Allow both #include <blah.h> and #include <libmyth/blah.h>
-inc2.path  = $${PREFIX}/include/mythtv/libmyth
-inc2.files = $${inc.files}
+inc2.path = $${PREFIX}/include/mythtv/libmyth/audio
+inc2.files += audio/audiooutput.h audio/audiosettings.h
+inc2.files += audio/audiooutputsettings.h audio/audiooutpututil.h
+inc2.files += audio/audioconvert.h
+inc2.files += audio/volumebase.h audio/eldutils.h
 
 using_oss {
     DEFINES += USING_OSS

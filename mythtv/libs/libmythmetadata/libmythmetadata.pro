@@ -101,7 +101,7 @@ win32-msvc* {
     INCLUDEPATH += $$SRC_PATH_BARE/../platform/win32/msvc/external/taglib/include/taglib
 }
 
-inc.path = $${PREFIX}/include/mythtv/metadata/
+inc.path = $${PREFIX}/include/mythtv/libmythmetadata/
 
 inc.files = cleanup.h  dbaccess.h  dirscan.h  globals.h  parentalcontrols.h
 inc.files += videoscan.h  videoutils.h  videometadata.h  videometadatalistmanager.h
