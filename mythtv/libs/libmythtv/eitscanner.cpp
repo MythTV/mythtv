@@ -127,7 +127,7 @@ void EITScanner::run(void)
                     m_eitHelper->SetChannelID(ChannelUtil::GetChanID(
                         m_rec->GetSourceID(), *m_activeScanNextChan));
                     LOG(VB_EIT, LOG_INFO, LOC_ID +
-                        QString("Now looking for EIT data on multiplex of channel %1 of source %2")
+                        QString("Next looking for EIT data on multiplex of channel %1 of source %2")
                         .arg(*m_activeScanNextChan).arg(m_rec->GetSourceID()));
                 }
             }
@@ -174,12 +174,12 @@ void EITScanner::RescheduleRecordings(void)
     m_eitHelper->RescheduleRecordings();
 }
 
-/** \fn EITScanner::StartPassiveScan(ChannelBase*, EITSource*, bool)
+/** \fn EITScanner::StartEITEventProcessing(ChannelBase*, EITSource*, bool)
  *  \brief Start inserting Event Information Tables from the multiplex
  *         we happen to be tuned to into the database.
  */
-void EITScanner::StartPassiveScan(ChannelBase *channel,
-                                  EITSource *eitSource)
+void EITScanner::StartEITEventProcessing(ChannelBase *channel,
+                                         EITSource *eitSource)
 {
     QMutexLocker locker(&m_lock);
 
@@ -194,7 +194,7 @@ void EITScanner::StartPassiveScan(ChannelBase *channel,
         m_eitHelper->SetChannelID(chanid);
         m_eitHelper->SetSourceID(ChannelUtil::GetSourceIDForChannel(chanid));
         LOG(VB_EIT, LOG_INFO, LOC_ID +
-            QString("Started processing EIT events in %1 scan for channel %2 chanid %3")
+            QString("Start processing EIT events in %1 scan for channel %2 chanid %3")
                 .arg(m_activeScan ? "active" : "passive",
                      m_channel->GetChannelName(),
                      QString::number(chanid)));
@@ -207,10 +207,10 @@ void EITScanner::StartPassiveScan(ChannelBase *channel,
     }
 }
 
-/** \fn EITScanner::StopPassiveScan(void)
+/** \fn EITScanner::StopEITEventProcessing(void)
  *  \brief Stops inserting Event Information Tables into DB.
  */
-void EITScanner::StopPassiveScan(void)
+void EITScanner::StopEITEventProcessing(void)
 {
     QMutexLocker locker(&m_lock);
 
@@ -225,7 +225,7 @@ void EITScanner::StopPassiveScan(void)
     m_eitHelper->SetChannelID(0);
     m_eitHelper->SetSourceID(0);
     LOG(VB_EIT, LOG_INFO, LOC_ID +
-        QString("Stopped processing EIT events in %1 scan")
+        QString("Stop processing EIT events in %1 scan")
             .arg(m_activeScanStopped ? "passive" : "active"));
 }
 
@@ -308,10 +308,8 @@ void EITScanner::StopActiveScan(void)
     m_exitThreadCond.wakeAll();
 
     locker.unlock();
-    StopPassiveScan();
+    StopEITEventProcessing();
     locker.relock();
-
-    LOG(VB_EIT, LOG_INFO, LOC_ID + "Stopped active scan");
 
     while (!m_activeScan && !m_activeScanStopped)
         m_activeScanCond.wait(&m_lock, 100);

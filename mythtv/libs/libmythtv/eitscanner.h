@@ -28,16 +28,14 @@ class EITSource
     virtual void SetEITRate(float rate) = 0;
 };
 
-class EITScanner;
-
 class EITScanner : public QRunnable
 {
   public:
     explicit EITScanner(uint cardnum);
     ~EITScanner() override { TeardownAll(); }
 
-    void StartPassiveScan(ChannelBase *channel, EITSource *eitSource);
-    void StopPassiveScan(void);
+    void StartEITEventProcessing(ChannelBase *channel, EITSource *eitSource);
+    void StopEITEventProcessing(void);
 
     void StartActiveScan(TVRec *rec, std::chrono::seconds max_seconds_per_source);
     void StopActiveScan(void);
@@ -60,7 +58,7 @@ class EITScanner : public QRunnable
     QWaitCondition        m_exitThreadCond;                     // protected by lock
 
     TVRec                *m_rec                     {nullptr};
-    volatile bool         m_activeScan              {false};
+    volatile bool         m_activeScan              {false};    // active scan true, passive scan false
     volatile bool         m_activeScanStopped       {true};     // protected by lock
     QWaitCondition        m_activeScanCond;                     // protected by lock
     QDateTime             m_activeScanNextTrig;
