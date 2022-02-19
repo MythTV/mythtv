@@ -2005,7 +2005,7 @@ Controleer of de video bestaat</translation>
     <message>
         <location filename="../libs/libmythbase/storagegroup.cpp" line="23"/>
         <source>LiveTV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LiveTV</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/storagegroup.cpp" line="25"/>
@@ -5579,7 +5579,7 @@ Apparaat ondersteunt tot %1</translation>
     <message>
         <location filename="../programs/mythfrontend/editvideometadata.cpp" line="1049"/>
         <source>Check logs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Logbestanden controleren</translation>
     </message>
 </context>
 <context>
@@ -6099,7 +6099,7 @@ of plaats/koppel lokale media.
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1069"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Instellingen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1090"/>
@@ -6385,7 +6385,7 @@ of plaats/koppel lokale media.
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1336"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1346"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Naam</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1337"/>
@@ -7560,7 +7560,7 @@ Error: %1</source>
     <message>
         <location filename="../html/htmlstrings.h" line="36"/>
         <source>Change Password</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Verander wachtwoord</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="37"/>
@@ -7747,7 +7747,7 @@ Error: %1</source>
         <location filename="../html/htmlstrings.h" line="72"/>
         <location filename="../html/htmlstrings.h" line="351"/>
         <source>Video Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Video galerij</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="73"/>
@@ -8603,7 +8603,7 @@ Error: %1</source>
     <message>
         <location filename="../html/htmlstrings.h" line="289"/>
         <source>LiveTV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LiveTV</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="290"/>
@@ -8623,7 +8623,7 @@ Error: %1</source>
     <message>
         <location filename="../html/htmlstrings.h" line="293"/>
         <source>Metadata Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Metadata opties</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="294"/>
@@ -8693,7 +8693,7 @@ Error: %1</source>
     <message>
         <location filename="../html/htmlstrings.h" line="311"/>
         <source>Schedule Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Opnameschema opties</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="312"/>
@@ -9057,7 +9057,7 @@ Error: %1</source>
         <location filename="../programs/mythfrontend/galleryinfo.cpp" line="202"/>
         <location filename="../programs/mythfrontend/galleryinfo.cpp" line="239"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Naam</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryinfo.cpp" line="235"/>
@@ -10204,12 +10204,12 @@ Error: %1</source>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="1881"/>
         <source>Failed to retrieve image(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kan afbeelding(en) niet ophalen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="1883"/>
         <source>Check logs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Logbestanden controleren</translation>
     </message>
 </context>
 <context>
@@ -12314,7 +12314,7 @@ Error: %1</source>
         <translation type="obsolete">Serieuze fout gedetecteerd in Video Output</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="824"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="831"/>
         <source>Video frame buffering failed too many times.</source>
         <translation>Video bufferen is te vaak mislukt.</translation>
     </message>
@@ -12428,12 +12428,12 @@ Error: %1</source>
     <message>
         <location filename="../libs/libmythtv/mythplayeraudioui.cpp" line="196"/>
         <source>Adjust Audio Sync</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Audio Sync aanpassen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythplayeraudioui.cpp" line="196"/>
         <source>Audio Sync</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Geluid synchronisatie</translation>
     </message>
 </context>
 <context>
@@ -16925,8 +16925,8 @@ mag niet leeg zijn.</translation>
         <translation type="vanished">TV-gids start bij zender</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3209"/>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5110"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3210"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5111"/>
         <location filename="../libs/libmythservicecontracts/enums/recStatus.cpp" line="180"/>
         <location filename="../libs/libmythservicecontracts/enums/recStatus.cpp" line="183"/>
         <location filename="../libs/libmythtv/channelinfo.cpp" line="516"/>
@@ -17318,7 +17318,7 @@ mag niet leeg zijn.</translation>
         <translation>Opgenomen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3220"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3221"/>
         <location filename="../libs/libmythservicecontracts/enums/recStatus.cpp" line="135"/>
         <source>Recording</source>
         <translation>Opname</translation>
@@ -18506,7 +18506,7 @@ De meeste DVB-C transports hebben 6,9 of 6,875 miljoen symbolen per seconde.</tr
     </message>
     <message>
         <source>All Programs</source>
-        <translation>Alle programma&apos;s</translation>
+        <translation type="vanished">Alle programma&apos;s</translation>
     </message>
     <message>
         <source>Skip %1</source>
@@ -20162,7 +20162,7 @@ The frequency for this transport (multiplex) in</source>
         <translation type="vanished">Volume-informatie op het LCD tonen.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3224"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3225"/>
         <source>Delete</source>
         <translation>Verwijderen</translation>
     </message>
@@ -20344,18 +20344,18 @@ The frequency for this transport (multiplex) in</source>
         <translation type="vanished">eindtijd</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3213"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3214"/>
         <location filename="../programs/mythfrontend/programinfocache.cpp" line="250"/>
         <source>Playing</source>
         <translation>Bezig met afspelen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3228"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3229"/>
         <source>Transcoding</source>
         <translation>Bezig met transcode</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3215"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3216"/>
         <source>PIP</source>
         <translation>&apos;PIP&apos;</translation>
     </message>
@@ -21978,7 +21978,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="vanished">Wilt u:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_rec.cpp" line="3643"/>
+        <location filename="../libs/libmythtv/tv_rec.cpp" line="3645"/>
         <source>On known multiplex...</source>
         <translation>Op bekende multiplex...</translation>
     </message>
@@ -22235,12 +22235,12 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="174"/>
         <source>Auto 3D</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Auto 3D</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="175"/>
         <source>Ignore 3D</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Negeer D</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="228"/>
@@ -23851,208 +23851,208 @@ Wellicht dient u de uitwerpknop onder de lade te gebruiken.</translation>
         <translation type="unfinished">Opname</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3222"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3223"/>
         <source>File transfer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3226"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3227"/>
         <source>Commercial Detection</source>
         <translation>Reclamedetectie</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3230"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3231"/>
         <source>Preview Generation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3232"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3233"/>
         <source>User Job</source>
         <translation>Gebruikerstaak</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5303"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5304"/>
         <source>Default</source>
         <comment>Recording Profile Default</comment>
         <translation>Standaard</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5304"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5305"/>
         <source>High Quality</source>
         <comment>Recording Profile High Quality</comment>
         <translation>Hoge Kwaliteit</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5305"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5306"/>
         <source>Live TV</source>
         <comment>Recording Profile Live TV</comment>
         <translation>Live TV</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5306"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5307"/>
         <source>Low Quality</source>
         <comment>Recording Profile Low Quality</comment>
         <translation>Lage Kwaliteit</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5307"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5308"/>
         <source>Medium Quality</source>
         <comment>Recording Profile Medium Quality</comment>
         <translation>Gemiddelde Kwaliteit</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5308"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5309"/>
         <source>MPEG-2</source>
         <comment>Recording Profile MPEG-2</comment>
         <translation>MPEG-2</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5309"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5310"/>
         <source>RTjpeg/MPEG-4</source>
         <comment>Recording Profile RTjpeg/MPEG-4</comment>
         <translation>RTjpeg/MPEG-4</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5331"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5332"/>
         <source>Software Encoders (V4L based)</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Software encoders (V4L gebaseerd)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5335"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5336"/>
         <source>USB MPEG-4 Encoder (Plextor ConvertX, etc)</source>
         <comment>Recording Profile Group Name</comment>
         <translation>USB MPEG-4 encoder (Plextor ConvertX, etc)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5337"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5338"/>
         <source>V4L2 Encoders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>V4L2 encoders</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5342"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5343"/>
         <source>All</source>
         <comment>Recording Group All Programs -- short form</comment>
         <translation>Alle</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5343"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5344"/>
         <source>Live TV</source>
         <comment>Recording Group Live TV</comment>
         <translation>Live TV</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5348"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5349"/>
         <source>All Programs - %1</source>
         <comment>Show all programs from a specific recording group</comment>
         <translation>Alle programma&apos;s - %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5353"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5354"/>
         <source>Live TV</source>
         <comment>Storage Group Name</comment>
         <translation>Live TV</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5313"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5314"/>
         <source>CRC IP Recorders</source>
         <comment>Recording Profile Group Name</comment>
         <translatorcomment>Opnameprofiel groepsnaam</translatorcomment>
         <translation>CRC IP opname apparaat</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5315"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5316"/>
         <source>FireWire Input</source>
         <comment>Recording Profile Group Name</comment>
         <translation>FireWire Ingang</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5317"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5318"/>
         <source>Freebox Input</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Freebox Ingang</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5319"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5320"/>
         <source>Hardware DVB Encoders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Hardware DVB Recorders</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5321"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5322"/>
         <source>Hardware HDTV</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Hardware HDTV</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5323"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5324"/>
         <source>Hardware MJPEG Encoders (Matrox G200-TV, Miro DC10, etc)</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Hardware MJPEG Encoders (Matrox G200-TV, Miro DC10, etc)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5325"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5326"/>
         <source>HD-PVR Recorders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>HD-PVR recorders</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5327"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5328"/>
         <source>HDHomeRun Recorders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>HDHomeRun recorders</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5329"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5330"/>
         <source>MPEG-2 Encoders (PVR-x50, PVR-500)</source>
         <comment>Recording Profile Group Name</comment>
         <translation>MPEG2 Encoders (PVR-x50, PVR-500)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5333"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5334"/>
         <source>Transcoders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Transcoders</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5341"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5342"/>
         <source>All Programs</source>
         <comment>Recording Group All Programs</comment>
         <translation>Alle programma&apos;s</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5344"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5345"/>
         <source>Default</source>
         <comment>Recording Group Default</comment>
         <translation>Standaard</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5345"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5346"/>
         <source>Deleted</source>
         <comment>Recording Group Deleted</comment>
         <translation>Verwijderd</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5352"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5353"/>
         <source>Default</source>
         <comment>Storage Group Name</comment>
         <translation>Standaard</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5354"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5355"/>
         <source>Thumbnails</source>
         <comment>Storage Group Name</comment>
         <translation>Miniaturen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5355"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5356"/>
         <source>DB Backups</source>
         <comment>Storage Group Name</comment>
         <translation>DB Backups</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5358"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5359"/>
         <source>Default</source>
         <comment>Playback Group Name</comment>
         <translation>Standaard</translation>
@@ -24492,7 +24492,7 @@ mag niet leeg zijn.</translation>
         <translation type="unfinished">Vooruitspoelen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3217"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3218"/>
         <source>PBP</source>
         <translation>PBP</translation>
     </message>
@@ -25480,7 +25480,7 @@ mag niet leeg zijn.</translation>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="2405"/>
         <source>LiveTV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LiveTV</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="2408"/>
@@ -29407,18 +29407,18 @@ Selecteer een huidige opname</translation>
 <context>
     <name>TVRec</name>
     <message>
-        <location filename="../libs/libmythtv/tv_rec.cpp" line="3861"/>
+        <location filename="../libs/libmythtv/tv_rec.cpp" line="3863"/>
         <source>Good signal seen after %1 ms</source>
         <translation>Goed signaal na %1 ms</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_rec.cpp" line="3870"/>
-        <location filename="../libs/libmythtv/tv_rec.cpp" line="3925"/>
+        <location filename="../libs/libmythtv/tv_rec.cpp" line="3872"/>
+        <location filename="../libs/libmythtv/tv_rec.cpp" line="3927"/>
         <source>See &apos;Tuning timeout&apos; in mythtv-setup for this input.</source>
         <translation>Zie &apos;Tuning timeout&apos; in mythtv-setup voor deze ingang.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_rec.cpp" line="3917"/>
+        <location filename="../libs/libmythtv/tv_rec.cpp" line="3919"/>
         <source>Taking more than %1 ms to get a lock.</source>
         <translation>Het duurt meer dan %1 ms om een vergrendeling te krijgen.</translation>
     </message>
@@ -30283,7 +30283,7 @@ Selecteer een huidige opname</translation>
     <message>
         <location filename="../themes/themestrings.h" line="1176"/>
         <source>Metadata Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Metadata opties</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1636"/>
@@ -32337,7 +32337,7 @@ Selecteer een huidige opname</translation>
     <message>
         <location filename="../themes/themestrings.h" line="748"/>
         <source>Damaged</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Beschadigd</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="750"/>
@@ -34500,7 +34500,7 @@ Selecteer een huidige opname</translation>
     <message>
         <location filename="../themes/themestrings.h" line="1764"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Instellingen</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1765"/>
@@ -36939,7 +36939,7 @@ When you have completed your configuration, press &quot;OK&quot; to search.</sou
     <message>
         <location filename="../themes/themestrings.h" line="909"/>
         <source>Filter Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Filter opties</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1742"/>
@@ -38828,7 +38828,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="1627"/>
         <source>Schedule Info</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Opnameschema informatie</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1449"/>
@@ -41197,7 +41197,7 @@ Als u &quot;Gebruik standaardspeler&quot; selecteert, wordt de speleropdracht vo
     <message>
         <location filename="../themes/themestrings.h" line="1179"/>
         <source>Metadata Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Metadata instellingen</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1198"/>

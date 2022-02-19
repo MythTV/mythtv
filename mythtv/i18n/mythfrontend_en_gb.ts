@@ -18306,7 +18306,7 @@ Most DVB-S transponders transmit at 27.5 million symbols per second.</translatio
         <translation> offset %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_rec.cpp" line="3643"/>
+        <location filename="../libs/libmythtv/tv_rec.cpp" line="3645"/>
         <source>On known multiplex...</source>
         <translation>On known multiplex...</translation>
     </message>
@@ -23570,18 +23570,18 @@ Do you wish to continue watching?</translation>
 <context>
     <name>TVRec</name>
     <message>
-        <location filename="../libs/libmythtv/tv_rec.cpp" line="3861"/>
+        <location filename="../libs/libmythtv/tv_rec.cpp" line="3863"/>
         <source>Good signal seen after %1 ms</source>
         <translation>Good signal seen after %1 ms</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_rec.cpp" line="3870"/>
-        <location filename="../libs/libmythtv/tv_rec.cpp" line="3925"/>
+        <location filename="../libs/libmythtv/tv_rec.cpp" line="3872"/>
+        <location filename="../libs/libmythtv/tv_rec.cpp" line="3927"/>
         <source>See &apos;Tuning timeout&apos; in mythtv-setup for this input.</source>
         <translation>See &apos;Tuning timeout&apos; in mythtv-setup for this input.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_rec.cpp" line="3917"/>
+        <location filename="../libs/libmythtv/tv_rec.cpp" line="3919"/>
         <source>Taking more than %1 ms to get a lock.</source>
         <translation>Taking more than %1 ms to get a lock.</translation>
     </message>
