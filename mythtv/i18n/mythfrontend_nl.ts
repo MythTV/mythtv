@@ -1580,7 +1580,7 @@ Wordt niet gebruikt bij hardware-encoder TV-kaarten.</translation>
     <message>
         <location filename="../libs/libmythmetadata/videoutils.cpp" line="174"/>
         <location filename="../libs/libmythmetadata/videoutils.cpp" line="186"/>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="262"/>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="261"/>
         <location filename="../programs/mythfrontend/videofilter.cpp" line="623"/>
         <location filename="../programs/mythfrontend/videofilter.cpp" line="632"/>
         <source>No</source>
@@ -2005,7 +2005,7 @@ Controleer of de video bestaat</translation>
     <message>
         <location filename="../libs/libmythbase/storagegroup.cpp" line="23"/>
         <source>LiveTV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LiveTV</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/storagegroup.cpp" line="25"/>
@@ -5579,7 +5579,7 @@ Apparaat ondersteunt tot %1</translation>
     <message>
         <location filename="../programs/mythfrontend/editvideometadata.cpp" line="1049"/>
         <source>Check logs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Logbestanden controleren</translation>
     </message>
 </context>
 <context>
@@ -5623,52 +5623,52 @@ Apparaat ondersteunt tot %1</translation>
 <context>
     <name>ExitPrompter</name>
     <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="246"/>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="245"/>
         <source>Do you really want to exit MythTV?</source>
         <translation>Bent u zeker dat u MythTV wilt sluiten?</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="264"/>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="263"/>
         <source>Yes, Exit now</source>
         <translation>Ja, nu afsluiten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="266"/>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="265"/>
         <source>Yes, Exit and Reboot</source>
         <translation>Ja, afsluiten en herstarten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="269"/>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="268"/>
         <source>Yes, Exit and Shutdown</source>
         <translation>Ja, afsluiten en uitschakelen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="272"/>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="271"/>
         <source>Yes, Enter Standby Mode</source>
         <translation>Ja, ga naar standby</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="274"/>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="273"/>
         <source>Yes, Suspend</source>
         <translation>Ja, slaapstand</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="292"/>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="291"/>
         <source>Are you sure you want to shutdown?</source>
         <translation>Weet je zeker dat je wilt afsluiten?</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="293"/>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="292"/>
         <source>Are you sure you want to reboot?</source>
         <translation>Weet je zeker dat je wilt herstarten?</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="294"/>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="293"/>
         <source>Are you sure you want to suspend?</source>
         <translation>Weet je zeker dat je naar de slaapstand wilt?</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="300"/>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="299"/>
         <source>Mythbackend is running on this system. </source>
         <translation>Mythbackend is bezig op dit systeem. </translation>
     </message>
@@ -6099,7 +6099,7 @@ of plaats/koppel lokale media.
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1069"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Instellingen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1090"/>
@@ -6385,7 +6385,7 @@ of plaats/koppel lokale media.
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1336"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1346"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Naam</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1337"/>
@@ -7560,7 +7560,7 @@ Error: %1</source>
     <message>
         <location filename="../html/htmlstrings.h" line="36"/>
         <source>Change Password</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Verander wachtwoord</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="37"/>
@@ -7747,7 +7747,7 @@ Error: %1</source>
         <location filename="../html/htmlstrings.h" line="72"/>
         <location filename="../html/htmlstrings.h" line="351"/>
         <source>Video Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Video galerij</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="73"/>
@@ -8603,7 +8603,7 @@ Error: %1</source>
     <message>
         <location filename="../html/htmlstrings.h" line="289"/>
         <source>LiveTV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LiveTV</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="290"/>
@@ -8623,7 +8623,7 @@ Error: %1</source>
     <message>
         <location filename="../html/htmlstrings.h" line="293"/>
         <source>Metadata Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Metadata opties</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="294"/>
@@ -8693,7 +8693,7 @@ Error: %1</source>
     <message>
         <location filename="../html/htmlstrings.h" line="311"/>
         <source>Schedule Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Opnameschema opties</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="312"/>
@@ -9057,7 +9057,7 @@ Error: %1</source>
         <location filename="../programs/mythfrontend/galleryinfo.cpp" line="202"/>
         <location filename="../programs/mythfrontend/galleryinfo.cpp" line="239"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Naam</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryinfo.cpp" line="235"/>
@@ -10204,12 +10204,12 @@ Error: %1</source>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="1881"/>
         <source>Failed to retrieve image(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kan afbeelding(en) niet ophalen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="1883"/>
         <source>Check logs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Logbestanden controleren</translation>
     </message>
 </context>
 <context>
@@ -10319,28 +10319,28 @@ Error: %1</source>
 <context>
     <name>MythBDBuffer</name>
     <message>
-        <location filename="../libs/libmythtv/Bluray/mythbdbuffer.cpp" line="184"/>
+        <location filename="../libs/libmythtv/Bluray/mythbdbuffer.cpp" line="183"/>
         <source>Title %1 chapter %2</source>
         <translation>Titel %1 hoofdstuk %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/Bluray/mythbdbuffer.cpp" line="331"/>
-        <location filename="../libs/libmythtv/Bluray/mythbdbuffer.cpp" line="360"/>
+        <location filename="../libs/libmythtv/Bluray/mythbdbuffer.cpp" line="330"/>
+        <location filename="../libs/libmythtv/Bluray/mythbdbuffer.cpp" line="359"/>
         <source>Could not open Blu-ray device: %1</source>
         <translation>Kan Blu-ray-apparaat niet openen: %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/Bluray/mythbdbuffer.cpp" line="372"/>
+        <location filename="../libs/libmythtv/Bluray/mythbdbuffer.cpp" line="371"/>
         <source>Could not open Blu-ray device %1, failed to decrypt</source>
         <translation>Kan Blu-ray-apparaat %1 niet openen, kan niet decoderen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/Bluray/mythbdbuffer.cpp" line="412"/>
+        <location filename="../libs/libmythtv/Bluray/mythbdbuffer.cpp" line="411"/>
         <source>Unable to find any Blu-ray compatible titles</source>
         <translation>Kan geen Blu-ray-compatibele titels vinden</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/Bluray/mythbdbuffer.cpp" line="518"/>
+        <location filename="../libs/libmythtv/Bluray/mythbdbuffer.cpp" line="517"/>
         <source>Unable to find any usable Blu-ray titles</source>
         <translation>Kan geen bruikbare Blu-ray-titels vinden</translation>
     </message>
@@ -12314,7 +12314,7 @@ Error: %1</source>
         <translation type="obsolete">Serieuze fout gedetecteerd in Video Output</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="824"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="831"/>
         <source>Video frame buffering failed too many times.</source>
         <translation>Video bufferen is te vaak mislukt.</translation>
     </message>
@@ -12428,12 +12428,12 @@ Error: %1</source>
     <message>
         <location filename="../libs/libmythtv/mythplayeraudioui.cpp" line="196"/>
         <source>Adjust Audio Sync</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Audio Sync aanpassen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythplayeraudioui.cpp" line="196"/>
         <source>Audio Sync</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Geluid synchronisatie</translation>
     </message>
 </context>
 <context>
@@ -16925,15 +16925,15 @@ mag niet leeg zijn.</translation>
         <translation type="vanished">TV-gids start bij zender</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3209"/>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5110"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3210"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5111"/>
         <location filename="../libs/libmythservicecontracts/enums/recStatus.cpp" line="180"/>
         <location filename="../libs/libmythservicecontracts/enums/recStatus.cpp" line="183"/>
         <location filename="../libs/libmythtv/channelinfo.cpp" line="516"/>
         <location filename="../libs/libmythtv/videoouttypes.h" line="179"/>
         <location filename="../libs/libmythtv/videoouttypes.h" line="208"/>
         <location filename="../libs/libmythui/mythhdr.cpp" line="70"/>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1056"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1055"/>
         <source>Unknown</source>
         <translation>Onbekend</translation>
     </message>
@@ -17318,7 +17318,7 @@ mag niet leeg zijn.</translation>
         <translation>Opgenomen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3220"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3221"/>
         <location filename="../libs/libmythservicecontracts/enums/recStatus.cpp" line="135"/>
         <source>Recording</source>
         <translation>Opname</translation>
@@ -18506,7 +18506,7 @@ De meeste DVB-C transports hebben 6,9 of 6,875 miljoen symbolen per seconde.</tr
     </message>
     <message>
         <source>All Programs</source>
-        <translation>Alle programma&apos;s</translation>
+        <translation type="vanished">Alle programma&apos;s</translation>
     </message>
     <message>
         <source>Skip %1</source>
@@ -20162,7 +20162,7 @@ The frequency for this transport (multiplex) in</source>
         <translation type="vanished">Volume-informatie op het LCD tonen.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3224"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3225"/>
         <source>Delete</source>
         <translation>Verwijderen</translation>
     </message>
@@ -20344,18 +20344,18 @@ The frequency for this transport (multiplex) in</source>
         <translation type="vanished">eindtijd</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3213"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3214"/>
         <location filename="../programs/mythfrontend/programinfocache.cpp" line="250"/>
         <source>Playing</source>
         <translation>Bezig met afspelen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3228"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3229"/>
         <source>Transcoding</source>
         <translation>Bezig met transcode</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3215"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3216"/>
         <source>PIP</source>
         <translation>&apos;PIP&apos;</translation>
     </message>
@@ -21879,12 +21879,12 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="obsolete">De backend of de database als standaard opslaan?</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1406"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1405"/>
         <source>The connection to the master backend server has gone away for some reason. Is it running?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1410"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1409"/>
         <source>Could not connect to the master backend server. Is it running?  Is the IP address set for it in mythtv-setup correct?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -21978,7 +21978,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="vanished">Wilt u:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_rec.cpp" line="3643"/>
+        <location filename="../libs/libmythtv/tv_rec.cpp" line="3645"/>
         <source>On known multiplex...</source>
         <translation>Op bekende multiplex...</translation>
     </message>
@@ -22235,12 +22235,12 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="174"/>
         <source>Auto 3D</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Auto 3D</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="175"/>
         <source>Ignore 3D</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Negeer D</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="228"/>
@@ -23851,208 +23851,208 @@ Wellicht dient u de uitwerpknop onder de lade te gebruiken.</translation>
         <translation type="unfinished">Opname</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3222"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3223"/>
         <source>File transfer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3226"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3227"/>
         <source>Commercial Detection</source>
         <translation>Reclamedetectie</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3230"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3231"/>
         <source>Preview Generation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3232"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3233"/>
         <source>User Job</source>
         <translation>Gebruikerstaak</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5303"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5304"/>
         <source>Default</source>
         <comment>Recording Profile Default</comment>
         <translation>Standaard</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5304"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5305"/>
         <source>High Quality</source>
         <comment>Recording Profile High Quality</comment>
         <translation>Hoge Kwaliteit</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5305"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5306"/>
         <source>Live TV</source>
         <comment>Recording Profile Live TV</comment>
         <translation>Live TV</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5306"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5307"/>
         <source>Low Quality</source>
         <comment>Recording Profile Low Quality</comment>
         <translation>Lage Kwaliteit</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5307"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5308"/>
         <source>Medium Quality</source>
         <comment>Recording Profile Medium Quality</comment>
         <translation>Gemiddelde Kwaliteit</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5308"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5309"/>
         <source>MPEG-2</source>
         <comment>Recording Profile MPEG-2</comment>
         <translation>MPEG-2</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5309"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5310"/>
         <source>RTjpeg/MPEG-4</source>
         <comment>Recording Profile RTjpeg/MPEG-4</comment>
         <translation>RTjpeg/MPEG-4</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5331"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5332"/>
         <source>Software Encoders (V4L based)</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Software encoders (V4L gebaseerd)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5335"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5336"/>
         <source>USB MPEG-4 Encoder (Plextor ConvertX, etc)</source>
         <comment>Recording Profile Group Name</comment>
         <translation>USB MPEG-4 encoder (Plextor ConvertX, etc)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5337"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5338"/>
         <source>V4L2 Encoders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>V4L2 encoders</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5342"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5343"/>
         <source>All</source>
         <comment>Recording Group All Programs -- short form</comment>
         <translation>Alle</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5343"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5344"/>
         <source>Live TV</source>
         <comment>Recording Group Live TV</comment>
         <translation>Live TV</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5348"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5349"/>
         <source>All Programs - %1</source>
         <comment>Show all programs from a specific recording group</comment>
         <translation>Alle programma&apos;s - %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5353"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5354"/>
         <source>Live TV</source>
         <comment>Storage Group Name</comment>
         <translation>Live TV</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5313"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5314"/>
         <source>CRC IP Recorders</source>
         <comment>Recording Profile Group Name</comment>
         <translatorcomment>Opnameprofiel groepsnaam</translatorcomment>
         <translation>CRC IP opname apparaat</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5315"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5316"/>
         <source>FireWire Input</source>
         <comment>Recording Profile Group Name</comment>
         <translation>FireWire Ingang</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5317"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5318"/>
         <source>Freebox Input</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Freebox Ingang</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5319"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5320"/>
         <source>Hardware DVB Encoders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Hardware DVB Recorders</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5321"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5322"/>
         <source>Hardware HDTV</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Hardware HDTV</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5323"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5324"/>
         <source>Hardware MJPEG Encoders (Matrox G200-TV, Miro DC10, etc)</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Hardware MJPEG Encoders (Matrox G200-TV, Miro DC10, etc)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5325"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5326"/>
         <source>HD-PVR Recorders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>HD-PVR recorders</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5327"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5328"/>
         <source>HDHomeRun Recorders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>HDHomeRun recorders</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5329"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5330"/>
         <source>MPEG-2 Encoders (PVR-x50, PVR-500)</source>
         <comment>Recording Profile Group Name</comment>
         <translation>MPEG2 Encoders (PVR-x50, PVR-500)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5333"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5334"/>
         <source>Transcoders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Transcoders</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5341"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5342"/>
         <source>All Programs</source>
         <comment>Recording Group All Programs</comment>
         <translation>Alle programma&apos;s</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5344"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5345"/>
         <source>Default</source>
         <comment>Recording Group Default</comment>
         <translation>Standaard</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5345"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5346"/>
         <source>Deleted</source>
         <comment>Recording Group Deleted</comment>
         <translation>Verwijderd</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5352"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5353"/>
         <source>Default</source>
         <comment>Storage Group Name</comment>
         <translation>Standaard</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5354"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5355"/>
         <source>Thumbnails</source>
         <comment>Storage Group Name</comment>
         <translation>Miniaturen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5355"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5356"/>
         <source>DB Backups</source>
         <comment>Storage Group Name</comment>
         <translation>DB Backups</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5358"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5359"/>
         <source>Default</source>
         <comment>Playback Group Name</comment>
         <translation>Standaard</translation>
@@ -24492,7 +24492,7 @@ mag niet leeg zijn.</translation>
         <translation type="unfinished">Vooruitspoelen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3217"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3218"/>
         <source>PBP</source>
         <translation>PBP</translation>
     </message>
@@ -24841,76 +24841,76 @@ mag niet leeg zijn.</translation>
         <translation type="vanished">Geen wijziging</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="191"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="190"/>
         <source>Could not find specified tuner (%1).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="196"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="195"/>
         <source>Specified tuner (%1) is already in use.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="202"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="201"/>
         <source>All tuners are currently in use. If you want to watch TV, you can cancel one of the in-progress recordings from the delete menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="222"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="221"/>
         <source>Failed to configure plugin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="234"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="233"/>
         <source>Plugin failure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="236"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="235"/>
         <source>%1 failed to run for some reason</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="456"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="455"/>
         <source>No UPnP backends found</source>
         <comment>Backend Setup</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1038"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1037"/>
         <source>Cannot find (ping) database host %1 on the network</source>
         <comment>Backend Setup</comment>
         <translation type="unfinished">Kan de database host %1 niet vinden (ping) op het netwerk</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1047"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1046"/>
         <source>Cannot login to database</source>
         <comment>Backend Setup</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1052"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1051"/>
         <source>Cannot connect to backend</source>
         <comment>Backend Setup</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1415"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1414"/>
         <source>Could not connect to master backend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1430"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1429"/>
         <source>Backend is online</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1444"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1443"/>
         <source>The server uses network protocol version %1, but this client only understands version %2.  Make sure you are running compatible versions of the backend and frontend.</source>
         <translation>De server gebruikt netwerk protocol versien %1, maar deze client begrijpt alleen versie %2. Zorg voor compatibele versies van het backend en frontend.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1595"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1594"/>
         <source>This application is not compatible with the installed MythTV libraries.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -25282,33 +25282,33 @@ mag niet leeg zijn.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/audio/audiooutputalsa.cpp" line="474"/>
+        <location filename="../libs/libmyth/audio/audiooutputalsa.cpp" line="472"/>
         <location filename="../libs/libmyth/audio/audiooutputopensles.cpp" line="173"/>
         <source>Unknown sample format: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/audio/audiooutputalsa.cpp" line="675"/>
+        <location filename="../libs/libmyth/audio/audiooutputalsa.cpp" line="673"/>
         <source>SetParameters() called with handle == nullptr!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="639"/>
+        <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="640"/>
         <source>Aborting Audio Reconfigure. Can&apos;t handle audio with more than 8 channels.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="691"/>
+        <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="692"/>
         <source>Error creating resampler: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="726"/>
+        <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="727"/>
         <source>AC-3 encoder initialization failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="789"/>
+        <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="790"/>
         <source>Aborting reconfigure</source>
         <translation type="unfinished"></translation>
     </message>
@@ -25480,7 +25480,7 @@ mag niet leeg zijn.</translation>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="2405"/>
         <source>LiveTV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LiveTV</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="2408"/>
@@ -25537,22 +25537,22 @@ mag niet leeg zijn.</translation>
         <translation type="unfinished">&apos;%1&apos; uitvoeren</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1036"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1035"/>
         <source>%1 TB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1041"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1040"/>
         <source>%1 GB</source>
         <translation type="unfinished">%1 GiB</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1046"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1045"/>
         <source>%1 MB</source>
         <translation type="unfinished">%1 MB</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1049"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1048"/>
         <source>%1 KB</source>
         <translation type="unfinished"></translation>
     </message>
@@ -27009,12 +27009,12 @@ Database Name: %2</translation>
         <translation type="vanished">is niet aan het opnemen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="981"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="980"/>
         <source>Job:</source>
         <translation>Taak:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="983"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="982"/>
         <source>Status: </source>
         <translation>Status: </translation>
     </message>
@@ -27039,32 +27039,32 @@ Geen verdere details</translation>
         <translation type="vanished">is niet beschikbaar</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="991"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="990"/>
         <source>Scheduled Run Time:</source>
         <translation>Geplande Run Time:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="722"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="721"/>
         <source>marked as HDTV</source>
         <translation>gemarkeerd als HDTV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="731"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="730"/>
         <source>from source</source>
         <translation>van bron</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="741"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="740"/>
         <source>on input</source>
         <translation>op ingang</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="112"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="111"/>
         <source>Listings Status</source>
         <translation>TV-gids</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="116"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="115"/>
         <source>Schedule Status</source>
         <translation>Opnameschema</translation>
     </message>
@@ -27077,34 +27077,34 @@ Geen verdere details</translation>
         <translation type="vanished">Logboek invoer</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="124"/>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="265"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="123"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="264"/>
         <source>Job Queue</source>
         <translation>Taakrij</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="120"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="119"/>
         <source>Input Status</source>
         <translation>Ingangen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="128"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="127"/>
         <source>Video decoders</source>
         <translation>Videodecoders</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="132"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="131"/>
         <source>Display</source>
         <translation>Beeldscherm</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="140"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="139"/>
         <source>Machine Status</source>
         <translation>Computer</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="144"/>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="320"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="143"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="319"/>
         <source>AutoExpire List</source>
         <translation>Vervallen</translation>
     </message>
@@ -27121,118 +27121,118 @@ Geen verdere details</translation>
         <translation type="vanished">Deze logboekinvoer bevestigen?</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="271"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="270"/>
         <source>Delete Job?</source>
         <translation>Taak verwijderen?</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="287"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="286"/>
         <source>Job Queue Actions:</source>
         <translation>Taakrij acties:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="300"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="299"/>
         <source>Resume</source>
         <translation>Hervatten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="302"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="301"/>
         <source>Pause</source>
         <translation>Pauze</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="303"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="302"/>
         <source>Stop</source>
         <translation>Einde</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="304"/>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="347"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="303"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="346"/>
         <source>No Change</source>
         <translation>Geen wijziging</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="308"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="307"/>
         <source>Requeue Job?</source>
         <translation>Taak opnieuw in taakrij?</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="326"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="325"/>
         <source>AutoExpire Actions:</source>
         <translation>Acties Automatisch vervallen:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="336"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="335"/>
         <source>Delete Now</source>
         <translation>Nu Verwijderen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="339"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="338"/>
         <source>Move to Default group</source>
         <translation>Verplaats naar standaard groep</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="343"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="342"/>
         <source>Undelete</source>
         <translation>Verwijderen ongedaan maken</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="345"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="344"/>
         <source>Disable AutoExpire</source>
         <translation>Automatisch vervallen Uitschakelen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="455"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="454"/>
         <source>Listings Status shows the latest status information from mythfilldatabase</source>
         <translation>TV-gids toont de laatste statusinformatie van mythfilldatabase en van de TV gids</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="487"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="486"/>
         <source>Mythfrontend version: %1 (%2)</source>
         <translation>MythTV Frontend versie %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="490"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="489"/>
         <source>Last mythfilldatabase guide update:</source>
         <translation>Laatste update TV-gids:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="491"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="490"/>
         <source>Started:   %1</source>
         <translation>Gestart: %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="498"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="497"/>
         <source>Finished: %1</source>
         <translation>Gereed: %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="505"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="504"/>
         <source>Result: %1</source>
         <translation>Resultaat: %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="510"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="509"/>
         <source>Suggested Next: %1</source>
         <translation>Volgende keer: %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="521"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="520"/>
         <source>There&apos;s no guide data available!</source>
         <translation>Er zijn geen programmagids-data aanwezig!</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="523"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="522"/>
         <source>Have you run mythfilldatabase?</source>
         <translation>Heeft u mythfilldatabase uitgevoerd?</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="529"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="528"/>
         <source>There is guide data until %1</source>
         <translation>Er zijn programmagidsgegevens tot %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="539"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="538"/>
         <source>WARNING: is mythfilldatabase running?</source>
         <translation>WAARSCHUWING: draait mythfilldatabase?</translation>
     </message>
@@ -27241,12 +27241,12 @@ Geen verdere details</translation>
         <translation type="vanished">DataDirect-status:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="549"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="548"/>
         <source>Schedule Status shows current statistics from the scheduler.</source>
         <translation>Opnameschema toont de statistieken van de opname planner.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="716"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="715"/>
         <source>with lower priority</source>
         <translation>met lagere prioriteit</translation>
     </message>
@@ -27267,12 +27267,12 @@ Geen verdere details</translation>
         <translation type="vanished">Tuner %1 %2 %3</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="892"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="891"/>
         <source>Log Entries shows any unread log entries from the system if you have logging enabled</source>
         <translation>Logboekinvoer toont alle ongelezen berichten van het systeem als u &quot;loggen&quot; ingeschakeld heeft</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="914"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="913"/>
         <source>On %1 from %2.%3
 %4
 </source>
@@ -27281,22 +27281,22 @@ Geen verdere details</translation>
 </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="926"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="925"/>
         <source>No further details</source>
         <translation>Geen verdere details</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="934"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="933"/>
         <source>No items found at priority level %1 or lower.</source>
         <translation>Geen items met prioriteit %1 of lager.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="936"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="935"/>
         <source>Use 1-8 to change priority level.</source>
         <translation>1-8 gebruiken om het niveau van prioriteit te veranderen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1018"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1017"/>
         <source>Job Queue is currently empty.</source>
         <translation>Taakrij is momenteel leeg.</translation>
     </message>
@@ -27317,18 +27317,18 @@ Geen verdere details</translation>
         <translation type="vanished">en de MythTV-server</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1207"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1206"/>
         <source>System:</source>
         <translation>Computer toont diverse informatie over frontend en backend zoals IP adressen en opslagruimte.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1209"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1208"/>
         <source>This machine:</source>
         <translation>Deze machine:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1279"/>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1356"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1278"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1355"/>
         <source>Load</source>
         <translation>Load</translation>
     </message>
@@ -27341,85 +27341,85 @@ Geen verdere details</translation>
         <translation type="vanished">gefaald</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1302"/>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1375"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1301"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1374"/>
         <source>RAM</source>
         <translation>RAM</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1312"/>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1385"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1311"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1384"/>
         <source>Swap</source>
         <translation>Swap</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1326"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1325"/>
         <source>MythTV server</source>
         <translation>MythTV-server</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1424"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1423"/>
         <source>Total Disk Space:</source>
         <translation>Totale schijfruimte:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1429"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1428"/>
         <source>MythTV Drive #%1:</source>
         <translation>MythTV Schijf #%1:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1436"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1435"/>
         <source>Directories:</source>
         <translation>Mappen:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1445"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1444"/>
         <source>Directory:</source>
         <translation>Map:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1487"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1486"/>
         <source>Display information.</source>
         <translation>Beeldscherm toont informatie over het beeldscherm en de huidige videomode.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1503"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1502"/>
         <source>Render information.</source>
         <translation>Weergave informatie.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1522"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1521"/>
         <source>Current fps: %1</source>
         <translation>Huidige fps:%1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1549"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1548"/>
         <source>GPU memory used     : %1MB</source>
         <translation>GPU geheugen in gebruik     : %1MB</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1561"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1560"/>
         <source>GPU memory free     : %1MB (or %2%)</source>
         <translation>GPU geheugen vrij     : %1MB (or %2%)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1567"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1566"/>
         <source>GPU memory total    : %1MB</source>
         <translation>GPU geheugen totaal    : %1MB</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1568"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1567"/>
         <source>GPU memory dedicated: %1MB</source>
         <translation>GPU geheugen toegewezen: %1MB</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1594"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1593"/>
         <source>The AutoExpire List shows all recordings which may be expired and the order of their expiration. Recordings at the top of the list will be expired first.</source>
         <translation>Deze lijst toont toont alle opnames die kunnen vervallen in de volgorde waarin ze vervallen. Opnames bovenaan de lijst zullen eerst vervallen.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="534"/>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1124"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="533"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1123"/>
         <source>%n day(s)</source>
         <translation>
             <numerusform>%n dag</numerusform>
@@ -27427,12 +27427,12 @@ Geen verdere details</translation>
         </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="136"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="135"/>
         <source>Rendering</source>
         <translation>Weergave</translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="562"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="561"/>
         <source>%n template rule(s) (is) defined</source>
         <translation>
             <numerusform>%n template regel gedefinieerd</numerusform>
@@ -27440,7 +27440,7 @@ Geen verdere details</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="578"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="577"/>
         <source>%n standard rule(s) (is) defined</source>
         <translation>
             <numerusform>%n standaard regel igedefinieerd</numerusform>
@@ -27448,7 +27448,7 @@ Geen verdere details</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="592"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="591"/>
         <source>%n search rule(s) are defined</source>
         <translation>
             <numerusform>%n zoekregel gedefinieerd</numerusform>
@@ -27456,7 +27456,7 @@ Geen verdere details</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="656"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="655"/>
         <source>%n matching showing(s)</source>
         <translation>
             <numerusform>%n overeenkomende aflevering</numerusform>
@@ -27464,67 +27464,67 @@ Geen verdere details</translation>
         </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="769"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="768"/>
         <source>Input Status shows the current information about the state of backend inputs</source>
         <translation>Ingangen toont informatie over de status van backend ingangen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="858"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="857"/>
         <source>%1 errored</source>
         <translation>%1 fout</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="860"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="859"/>
         <source>%1 unavailable</source>
         <translation>%1 niet beschikbaar</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="862"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="861"/>
         <source>%1 sleeping</source>
         <translation>%1 slapend</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="864"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="863"/>
         <source>%1 recording</source>
         <translation>%1 aan het opnemen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="866"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="865"/>
         <source>%1 live television</source>
         <translation>%1 live TV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="868"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="867"/>
         <source>%1 available</source>
         <translation>%1 beschikbaar</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="876"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="875"/>
         <source>Input %1 %2: %3</source>
         <translation>Ingang %1 %2: %3</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="878"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="877"/>
         <source>, </source>
         <translation>, </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="947"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="946"/>
         <source>Job Queue shows any jobs currently in MythTV&apos;s Job Queue such as a commercial detection job.</source>
         <translation>Taakrij toont de taken in MythTV&apos;s taakwachtrij zoals reclamedetectie en opzoeken van metadata.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1060"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1059"/>
         <source>%1 total, %2 used, %3 (or %4%) free.</source>
         <translation>%1 totaal, %2 gebruikt, %3 (of %4%) vrij.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1077"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1076"/>
         <source>, using your %1 rate of %2 kb/s</source>
         <translation>, met uw %1 snelheid van %2 kb/s</translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1093"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1092"/>
         <source>%n hour(s)</source>
         <translation>
             <numerusform>%n uur</numerusform>
@@ -27532,7 +27532,7 @@ Geen verdere details</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1094"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1093"/>
         <source>%n minute(s)</source>
         <translation>
             <numerusform>%n minuut</numerusform>
@@ -27540,108 +27540,108 @@ Geen verdere details</translation>
         </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1095"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1094"/>
         <source>%1 remaining</source>
         <comment>time</comment>
         <translation>%1 resterend</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1100"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1099"/>
         <source>%1 and %2 remaining</source>
         <comment>time</comment>
         <translation>%1 en %2 resterend</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1112"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1111"/>
         <source>Uptime</source>
         <translation>Uptime</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1115"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1114"/>
         <source>unknown</source>
         <comment>unknown uptime</comment>
         <translation>onbekend</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1154"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1153"/>
         <source>average</source>
         <comment>average rate</comment>
         <translation>gemiddeld</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1174"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1173"/>
         <source>maximum</source>
         <comment>maximum rate</comment>
         <translation>maximum</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1196"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1195"/>
         <source>Machine Status shows some operating system statistics of this machine and the MythTV server.</source>
         <translation>Machine Status toont enkele statistieken van het besturingssysteem van deze machine en de MythTV-server.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1216"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1215"/>
         <source>System time</source>
         <translation>Systeemtijd</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1223"/>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1330"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1222"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1329"/>
         <source>Hostname</source>
         <translation>Hostnaam</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1224"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1223"/>
         <source>OS</source>
         <translation>OS</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1226"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1225"/>
         <source>Qt version</source>
         <translation>Qt versie</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1241"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1240"/>
         <source>WiFi</source>
         <translation>WiFi</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1241"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1240"/>
         <source>Ethernet</source>
         <translation>Ethernet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1243"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1242"/>
         <source>Network</source>
         <translation>Netwerk</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1246"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1245"/>
         <source>MAC Address</source>
         <translation>MAC adres</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1253"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1252"/>
         <source>IP Address</source>
         <translation>IP adres</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1331"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1330"/>
         <source>IP</source>
         <translation>IP</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1464"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1463"/>
         <source>Available hardware decoders for video playback.</source>
         <translation>Videodecoders toont de beschikbare hardware videodecoders en de ondersteunde codecs en profielen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1473"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1472"/>
         <source>None</source>
         <translation>Geen</translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1640"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1639"/>
         <source>%n recording(s) consuming %1 (is) allowed to expire
 </source>
         <translation>
@@ -27657,7 +27657,7 @@ Geen verdere details</translation>
         <translation type="vanished">slaapt</translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1644"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1643"/>
         <source>%n (is) LiveTV and consume(s) %1
 </source>
         <translation>
@@ -27668,7 +27668,7 @@ Geen verdere details</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1649"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1648"/>
         <source>%n (is) Deleted and consume(s) %1
 </source>
         <translation>
@@ -29407,18 +29407,18 @@ Selecteer een huidige opname</translation>
 <context>
     <name>TVRec</name>
     <message>
-        <location filename="../libs/libmythtv/tv_rec.cpp" line="3861"/>
+        <location filename="../libs/libmythtv/tv_rec.cpp" line="3863"/>
         <source>Good signal seen after %1 ms</source>
         <translation>Goed signaal na %1 ms</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_rec.cpp" line="3870"/>
-        <location filename="../libs/libmythtv/tv_rec.cpp" line="3925"/>
+        <location filename="../libs/libmythtv/tv_rec.cpp" line="3872"/>
+        <location filename="../libs/libmythtv/tv_rec.cpp" line="3927"/>
         <source>See &apos;Tuning timeout&apos; in mythtv-setup for this input.</source>
         <translation>Zie &apos;Tuning timeout&apos; in mythtv-setup voor deze ingang.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_rec.cpp" line="3917"/>
+        <location filename="../libs/libmythtv/tv_rec.cpp" line="3919"/>
         <source>Taking more than %1 ms to get a lock.</source>
         <translation>Het duurt meer dan %1 ms om een vergrendeling te krijgen.</translation>
     </message>
@@ -30283,7 +30283,7 @@ Selecteer een huidige opname</translation>
     <message>
         <location filename="../themes/themestrings.h" line="1176"/>
         <source>Metadata Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Metadata opties</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1636"/>
@@ -32337,7 +32337,7 @@ Selecteer een huidige opname</translation>
     <message>
         <location filename="../themes/themestrings.h" line="748"/>
         <source>Damaged</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Beschadigd</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="750"/>
@@ -34500,7 +34500,7 @@ Selecteer een huidige opname</translation>
     <message>
         <location filename="../themes/themestrings.h" line="1764"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Instellingen</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1765"/>
@@ -36939,7 +36939,7 @@ When you have completed your configuration, press &quot;OK&quot; to search.</sou
     <message>
         <location filename="../themes/themestrings.h" line="909"/>
         <source>Filter Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Filter opties</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1742"/>
@@ -38828,7 +38828,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="1627"/>
         <source>Schedule Info</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Opnameschema informatie</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1449"/>
@@ -41197,7 +41197,7 @@ Als u &quot;Gebruik standaardspeler&quot; selecteert, wordt de speleropdracht vo
     <message>
         <location filename="../themes/themestrings.h" line="1179"/>
         <source>Metadata Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Metadata instellingen</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1198"/>
