@@ -26,6 +26,7 @@
 
 #include "dvbci.h"
 
+#include <array>
 #include <cctype>
 #include <cerrno>
 #include <cstring>
