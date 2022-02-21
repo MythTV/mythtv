@@ -4,7 +4,13 @@
 #include <QVector>
 #include "videovisual.h"
 
+extern "C" {
+#include "libavutil/mem.h"
+#include "libavcodec/avfft.h"
+}
+
 #define SPECTRUM_NAME QString("Spectrum")
+#undef FFT3_SUPPORT
 
 class VideoVisualSpectrum : public VideoVisual
 {
@@ -28,12 +34,18 @@ class VideoVisualSpectrum : public VideoVisual
     double             m_scaleFactor { 2.0 };
     double             m_falloff     { 3.0 };
 
+#ifdef FFT3_SUPPORT
     fftw_plan          m_lplan;
     fftw_plan          m_rplan;
     myth_fftw_float*   m_lin         { nullptr };
     myth_fftw_float*   m_rin         { nullptr };
     myth_fftw_complex* m_lout        { nullptr };
     myth_fftw_complex* m_rout        { nullptr };
+#else
+    FFTComplex*        m_dftL              { nullptr };
+    FFTComplex*        m_dftR              { nullptr };
+    FFTContext*        m_fftContextForward { nullptr };
+#endif
 
   private:
     QVector<QRect>     m_rects;
