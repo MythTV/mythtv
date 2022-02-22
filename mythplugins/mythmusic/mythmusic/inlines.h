@@ -175,6 +175,7 @@ static inline void mono16_from_monopcmfloat(short *l,
 }
 
 
+#undef FFTW3_SUPPORT
 #if FFTW3_SUPPORT
 static inline void fast_short_set(short *p,
 				  short v,

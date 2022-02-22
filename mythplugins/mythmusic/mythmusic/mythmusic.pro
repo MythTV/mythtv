@@ -17,6 +17,7 @@ INSTALLS += target
 
 INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/metadata
 INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/goom
+INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/
 INCLUDEPATH += $${CONFIG_TAGLIB_INCLUDES}
 
 LIBS += -lmythavformat
