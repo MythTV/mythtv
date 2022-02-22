@@ -5248,14 +5248,8 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
             totalKB += fsInfo.getTotalSpace();
             usedKB  += fsInfo.getUsedSpace();
         }
-        strlist << allHostList;
-        strlist << "TotalDiskSpace";
-        strlist << "0";
-        strlist << "-2";
-        strlist << "-2";
-        strlist << "0";
-        strlist << QString::number(totalKB);
-        strlist << QString::number(usedKB);
+        strlist << FileSystemInfo(allHostList, "TotalDiskSpace", false, -2, -2,
+                                  0, totalKB, usedKB).ToStringList();
     }
 }
 

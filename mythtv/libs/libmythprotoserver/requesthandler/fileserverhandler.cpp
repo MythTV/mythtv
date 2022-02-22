@@ -441,14 +441,8 @@ bool FileServerHandler::HandleQueryFreeSpaceList(SocketHandler *socket)
         used  += disk.getUsedSpace();
     }
 
-    res << hosts.join(",")
-        << "TotalDiskSpace"
-        << "0"
-        << "-2"
-        << "-2"
-        << "0"
-        << QString::number(total)
-        << QString::number(used);
+    res << FileSystemInfo(hosts.join(","), "TotalDiskSpace", false, -2, -2,
+                          0, total, used).ToStringList();
 
     socket->WriteStringList(res);
     return true;
