@@ -28,23 +28,10 @@
 #include "constants.h"
 #include "config.h"
 
-#undef FFTW3_SUPPORT
 #include <complex>
 extern "C" {
-#ifdef FFTW3_SUPPORT
-#include <fftw3.h>
-#define myth_fftw_float double /* need to use different plan function to change */
-#define fftw_real myth_fftw_float
-#define myth_fftw_complex std::complex<myth_fftw_float>
-#if (myth_fftw_float == double)
-#define myth_fftw_complex_cast fftw_complex
-#elif (myth_fftw_float == float)
-#define myth_fftw_complex_cast fftwf_complex
-#endif
-#else
-#include "libavutil/mem.h"
-#include "libavcodec/avfft.h"
-#endif
+    #include "libavutil/mem.h"
+    #include "libavcodec/avfft.h"
 }
 
 #define SAMPLES_DEFAULT_SIZE 512
@@ -203,18 +190,9 @@ class Spectrum : public VisualBase
     double             m_falloff          {10.0};
     int                m_analyzerBarWidth {6};
 
-#ifdef FFTW3_SUPPORT
-    fftw_plan          m_lplan;
-    fftw_plan          m_rplan;
-    myth_fftw_float   *m_lin              {nullptr};
-    myth_fftw_float   *m_rin              {nullptr};
-    myth_fftw_complex *m_lout             {nullptr};
-    myth_fftw_complex *m_rout             {nullptr};
-#else
     FFTComplex*        m_dftL              { nullptr };
     FFTComplex*        m_dftR              { nullptr };
     FFTContext*        m_fftContextForward { nullptr };
-#endif
 };
 
 class Squares : public Spectrum

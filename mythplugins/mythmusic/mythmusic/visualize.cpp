@@ -596,41 +596,17 @@ Spectrum::Spectrum()
 
     m_fps = 15;
 
-#ifdef FFT3_SUPPORT
-    m_lin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
-    m_rin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
-    m_lout = (myth_fftw_complex*) av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
-    m_rout = (myth_fftw_complex*) av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
-
-    m_lplan = fftw_plan_dft_r2c_1d(FFTW_N, m_lin, (myth_fftw_complex_cast*)m_lout, FFTW_MEASURE);
-    m_rplan = fftw_plan_dft_r2c_1d(FFTW_N, m_rin, (myth_fftw_complex_cast*)m_rout, FFTW_MEASURE);
-#else
     m_dftL = static_cast<FFTComplex*>(av_malloc(sizeof(FFTComplex) * FFTW_N));
     m_dftR = static_cast<FFTComplex*>(av_malloc(sizeof(FFTComplex) * FFTW_N));
 
     m_fftContextForward = av_fft_init(std::log2(FFTW_N), 0);
-#endif
 }
 
 Spectrum::~Spectrum()
 {
-#ifdef FFT3_SUPPORT
-    if (m_lin)
-        av_free(m_lin);
-    if (m_rin)
-        av_free(m_rin);
-    if (m_lout)
-        av_free(m_lout);
-    if (m_rout)
-        av_free(m_rout);
-
-    fftw_destroy_plan(m_lplan);
-    fftw_destroy_plan(m_rplan);
-#else
     av_freep(&m_dftL);
     av_freep(&m_dftR);
     av_fft_end(m_fftContextForward);
-#endif
 }
 
 void Spectrum::resize(const QSize &newsize)
@@ -688,25 +664,14 @@ bool Spectrum::process(VisualNode *node)
         i = node->m_length;
         if (i > FFTW_N)
             i = FFTW_N;
-#ifdef FFT3_SUPPORT
-        fast_real_set_from_short(m_lin, node->m_left, i);
-        if (node->m_right)
-            fast_real_set_from_short(m_rin, node->m_right, i);
-#else
         for (unsigned long k = 0; k < node->m_length; k++)
         {
             m_dftL[k] = (FFTComplex){ .re = (FFTSample)node->m_left[k], .im = 0 };
             if (node->m_right)
                 m_dftR[k] = (FFTComplex){ .re = (FFTSample)node->m_right[k], .im = 0 };
         }
-#endif
     }
 
-#ifdef FFT3_SUPPORT
-    fast_reals_set(m_lin + i, m_rin + i, 0, FFTW_N - i);
-    fftw_execute(m_lplan);
-    fftw_execute(m_rplan);
-#else
     for (auto k = i; k < FFTW_N; k++)
     {
         m_dftL[k] = (FFTComplex){ .re = 0, .im = 0 };
@@ -717,7 +682,6 @@ bool Spectrum::process(VisualNode *node)
 
     av_fft_permute(m_fftContextForward, m_dftR);
     av_fft_calc(m_fftContextForward, m_dftR);
-#endif
 
     long index = 1;
 
@@ -726,19 +690,11 @@ bool Spectrum::process(VisualNode *node)
         // The 1D output is Hermitian symmetric (Yk = Yn-k) so Yn = Y0 etc.
         // The dft_r2c_1d plan doesn't output these redundant values
         // and furthermore they're not allocated in the ctor
-#ifdef FFT3_SUPPORT
-        double tmp = 2 * sq(real(m_lout[index])); // + sq(real(m_lout[FFTW_N - index]));
-        double magL = (tmp > 1.) ? (log(tmp) - 22.0) * m_scaleFactor : 0.;
-
-        tmp = 2 * sq(real(m_rout[index])); // + sq(real(m_rout[FFTW_N - index]));
-        double magR = (tmp > 1.) ? (log(tmp) - 22.0) * m_scaleFactor : 0.;
-#else
         double tmp = 2 * sq(m_dftL[index].re);
         double magL = (tmp > 1.) ? (log(tmp) - 22.0) * m_scaleFactor : 0.;
 
         tmp = 2 * sq(m_dftR[index].re);
         double magR = (tmp > 1.) ? (log(tmp) - 22.0) * m_scaleFactor : 0.;
-#endif
 
         double adjHeight = static_cast<double>(m_size.height()) / 2.0;
         if (magL > adjHeight)
@@ -863,7 +819,6 @@ static class SpectrumFactory : public VisFactory
 ///////////////////////////////////////////////////////////////////////////////
 // Squares
 //
-// NOTE: This visualiser requires mythplugins to be compiled with --enable-fftw
 
 Squares::Squares()
 {

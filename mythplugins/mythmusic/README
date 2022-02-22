@@ -27,12 +27,6 @@ In addition to MythTV's requirements, you'll need these software packages:
    taglib     - A library for reading and editing audio meta data.
                 I'm using 1.7.  http://developer.kde.org/~wheeler/taglib.html
 
-Optionally:
-
-   fftw   - A very nice library for Fast Fourier Transforms (helps analyze
-            audio data for playback visualizations). Currently using 3.2.2.
-            http://www.fftw.org/
-
 Phew.  Lotta stuff required. If you're having problems, please check both
 the documentation and the mailing list archives at http://www.mythtv.org
 

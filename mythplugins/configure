@@ -869,15 +869,6 @@ if enabled music ; then
       echo "#undef  HAVE_CDIO" >> ./mythmusic/mythmusic/config.h
       echo "        libcdio        support will not be included in MythMusic"
     fi
-
-    if enabled fftw; then
-        echo "        FFTW v.3       support will be included in MythMusic"
-        echo "#define FFTW3_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
-        echo "LIBS += -lfftw3 -lm" >> \
-             ./mythmusic/mythmusic/config.pro
-    else
-        echo "        FFTW           support will not be included in MythMusic"
-    fi
 fi
 
 ###########################################################
