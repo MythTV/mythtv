@@ -45,7 +45,7 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerEditorUI, public MythVideoScanT
   protected:
     void InitFrameInterval() override;
     virtual void DisplayPauseFrame();
-    virtual void DisplayNormalFrame(bool CheckPrebuffer = true);
+    virtual bool DisplayNormalFrame(bool CheckPrebuffer = true);
 
     void FileChanged();
     void RefreshPauseFrame();

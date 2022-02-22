@@ -477,15 +477,17 @@ bool MythPlayerUI::VideoLoop()
 
     if (m_videoPaused || m_isDummy)
         DisplayPauseFrame();
-    else
-        DisplayNormalFrame();
-
-    if (FlagIsSet(kVideoIsNull) && m_decoder)
-        m_decoder->UpdateFramesPlayed();
-    else if (m_decoder && m_decoder->GetEof() != kEofStateNone)
-        ++m_framesPlayed;
-    else
-        m_framesPlayed = static_cast<uint64_t>(m_videoOutput->GetFramesPlayed());
+    else if (DisplayNormalFrame())
+    {
+        if (FlagIsSet(kVideoIsNull) && m_decoder)
+            m_decoder->UpdateFramesPlayed();
+        else if (m_decoder && m_decoder->GetEof() != kEofStateNone)
+            ++m_framesPlayed;
+        else
+            m_framesPlayed = static_cast<uint64_t>(
+                m_videoOutput->GetFramesPlayed());
+    }
+    
     return !IsErrored();
 }
 
@@ -641,13 +643,13 @@ void MythPlayerUI::DisplayPauseFrame()
     RenderVideoFrame(nullptr, scan, true, 0ms);
 }
 
-void MythPlayerUI::DisplayNormalFrame(bool CheckPrebuffer)
+bool MythPlayerUI::DisplayNormalFrame(bool CheckPrebuffer)
 {
     if (m_allPaused)
-        return;
+        return false;
 
     if (CheckPrebuffer && !PrebufferEnoughFrames())
-        return;
+        return false;
 
     // clear the buffering state
     SetBuffering(false);
@@ -688,6 +690,8 @@ void MythPlayerUI::DisplayNormalFrame(bool CheckPrebuffer)
     DoDisplayVideoFrame(frame, due);
     m_videoOutput->DoneDisplayingFrame(frame);
     m_outputJmeter.RecordCycleTime();
+
+    return true;
 }
 
 void MythPlayerUI::SetVideoParams(int Width, int Height, double FrameRate, float Aspect,
