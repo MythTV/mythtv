@@ -46,15 +46,6 @@ class ProcessRequestRunnable : public QRunnable
     MythSocket        *m_sock;
 };
 
-MythServer::MythServer(QObject *parent) : ServerPool(parent)
-{
-}
-
-void MythServer::newTcpConnection(qintptr socket)
-{
-    emit newConnection(socket);
-}
-
 MythSocketManager::MythSocketManager() :
     m_threadPool("MythSocketManager")
 {

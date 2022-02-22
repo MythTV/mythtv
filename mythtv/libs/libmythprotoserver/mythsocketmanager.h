@@ -17,19 +17,6 @@
 #include "mythsocket.h"
 #include "serverpool.h"
 
-class MythServer : public ServerPool
-{
-    Q_OBJECT
-  public:
-    explicit MythServer(QObject *parent=nullptr);
-
-  signals:
-    void newConnection(qintptr socket);
-
-  protected slots:
-    void newTcpConnection(qintptr socket) override; // ServerPool
-};
-
 class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCBs
 {
     Q_OBJECT
