@@ -1,5 +1,5 @@
 <ng-container *ngIf="m_haveDatabase">
-    <div class="min-h-screen flex relative lg:static surface-ground">
+    <div class="navbar flex relative lg:static surface-ground">
         <div id="sidebar"
             class="bg-gray-900 lg:block flex-shrink-0 absolute lg:static left-0 top-0 z-2 border-gray-800 w-18rem lg:w-5rem select-none" [hidden]="m_showSidebar">
             <div class="flex flex-column h-full">
@@ -51,7 +51,7 @@
                 </div>
             </div>
         </div>
-        <div class="px-3">
+        <div class="contentarea px-3 w-full">
             <router-outlet></router-outlet>
         </div>
     </div>

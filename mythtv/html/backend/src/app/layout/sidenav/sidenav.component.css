@@ -3,3 +3,13 @@
     height: 100%;
     margin: 0px;
 }
+
+.navbar {
+    min-height: calc(100vh - 85px);
+    max-height: calc(100vh - 85px);
+}
+
+.contentarea {
+    overflow: scroll;
+    height:calc(100vh - 85px)
+}
