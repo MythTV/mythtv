@@ -41,4 +41,27 @@ body {
   .help-button {
     float: right;
 }
-  
+
+.label {
+  font-weight: bold;
+}
+
+ul.debug1{
+  border-style: solid;
+  border-color: blue;
+}
+
+div.debug1{
+  border-style: solid;
+  border-color: red;
+}
+
+div.debug2{
+  border-style: solid;
+  border-color: yellow;
+}
+
+div.debug3{
+  border-style: solid;
+  border-color: green;
+}

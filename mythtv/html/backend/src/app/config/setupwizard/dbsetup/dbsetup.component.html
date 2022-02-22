@@ -16,47 +16,52 @@
         <ng-template pTemplate="content">
             <div class="formgrid grid form-group">
                 <div class="field col-12 md:col-6">
-                    <label for="ipaddress" class="block">{{ 'setupwizard.MySQLServerIP' | translate }}</label>
+                    <label for="ipaddress" class="label block">{{ 'setupwizard.MySQLServerIP' | translate }}</label>
                     <input pInputText id="ipaddress" type="text" aria-describedby="ipaddress-help" 
-                           [(ngModel)]="m_wizardData.Database.Host" name="hostname" #host="ngModel" class="form-control w-full" 
+                           [(ngModel)]="m_wizardData.Database.Host" name="hostname" #host="ngModel" class="mb-2 form-control w-full" 
                            [ngClass]="{'is-invalid': host.invalid }" placeholder="Ex. 127.0.0.1 or localhost" required />
+                    <small id="ipaddress-help">The hostname or IP address of the machine hosting the database.</small>
                     <div *ngIf="host.invalid && (host.dirty || host.touched)">
                         <small id="address-help" class="p-error block">{{ 'setupwizard.IPorAddressRequired' | translate }}</small>
                     </div>
                 </div>
 
                 <div class="field col-12 md:col-6">
-                    <label for="port" class="block">{{ 'setupwizard.MySQLServerPort' | translate }}</label>
+                    <label for="port" class="label block">{{ 'setupwizard.MySQLServerPort' | translate }}</label>
                     <input pInputText id="port" type="number" aria-describedby="port-help" 
-                           [(ngModel)]="m_wizardData.Database.Port" name="port" #port="ngModel" class="form-control" placeholder="Ex. 3306" min="0" max="65536"/>
-                    <div *ngIf="port.invalid && (port.dirty || port.touched)">
-                        <small id="port-help" class="p-error block">{{ 'setupwizard.portRequired' | translate }}</small>
+                           [(ngModel)]="m_wizardData.Database.Port" name="port" #port="ngModel" class=" mb-2 form-control w-full" placeholder="Ex. 3306" min="0" max="65536"/>
+                    <small id="port-help">The port number the database is running on. This is usually the default 3306.</small>
+                   <div *ngIf="port.invalid && (port.dirty || port.touched)">
+                        <small class="p-error block">{{ 'setupwizard.portRequired' | translate }}</small>
                     </div>
                 </div>
 
                 <div class="field col-12 md:col-6">
-                    <label for="user" class="block">{{ 'setupwizard.MySQLUser' | translate }}</label>
+                    <label for="user" class="label block">{{ 'setupwizard.MySQLUser' | translate }}</label>
                     <input pInputText id="user" type="text" aria-describedby="user-help" 
-                    [(ngModel)]="m_wizardData.Database.UserName" name="user" #user="ngModel" class="form-control w-full" placeholder="Ex. mythtv" required/>
+                        [(ngModel)]="m_wizardData.Database.UserName" name="user" #user="ngModel" class="mb-2 form-control w-full" placeholder="Ex. mythtv" required/>
+                    <small id="user-help">The MySQL user name to use while connecting to the database. The default is mythtv.</small>
                     <div *ngIf="user.invalid && (user.dirty || user.touched)">
-                        <small id="user-help" class="p-error block">{{ 'setupwizard.userRequired' | translate }}</small>
+                        <small class="p-error block">{{ 'setupwizard.userRequired' | translate }}</small>
                     </div>
                 </div>
                 <div class="field col-12 md:col-6">
-                    <label for="password" class="block">{{ 'setupwizard.MySQLPassword' | translate }}</label>
+                    <label for="password" class="label block">{{ 'setupwizard.MySQLPassword' | translate }}</label>
                     <input pInputText id="password" type="text" aria-describedby="password-help" 
-                           [(ngModel)]="m_wizardData.Database.Password" name="password" #password="ngModel" class="form-control w-full" placeholder="Ex. mythtv" required/>
-                    <div *ngIf="password.invalid && (password.dirty || password.touched)">
-                        <small id="password-help" class="p-error block">{{ 'setupwizard.passwordRequired' | translate }}</small>
+                           [(ngModel)]="m_wizardData.Database.Password" name="password" #password="ngModel" class="mb-2 form-control w-full" placeholder="Ex. mythtv" required/>
+                    <small id="password-help">The MySQL password to use while connecting to the database.</small>
+                   <div *ngIf="password.invalid && (password.dirty || password.touched)">
+                        <small class="p-error block">{{ 'setupwizard.passwordRequired' | translate }}</small>
                     </div>
                 </div>
 
                 <div class="field col-12 md:col-6">
-                    <label for="dbname" class="block">{{ 'setupwizard.MySQLDatabaseName' | translate }}</label>
+                    <label for="dbname" class="label block">{{ 'setupwizard.MySQLDatabaseName' | translate }}</label>
                     <input pInputText id="dbname" type="text" aria-describedby="dbname-help" 
-                           [(ngModel)]="m_wizardData.Database.Name" name="dbname" #dbname="ngModel" class="form-control w-full" placeholder="Ex. mythconverg" required/>
-                    <div *ngIf="dbname.invalid && (dbname.dirty || dbname.touched)">
-                        <small id="dbname-help" class="p-error block">{{ 'setupwizard.databaseNameRequired' | translate }}</small>
+                           [(ngModel)]="m_wizardData.Database.Name" name="dbname" #dbname="ngModel" class="mb-2 form-control w-full" placeholder="Ex. mythconverg" required/>
+                    <small id="dbname-help">The name of the database. This is usually 'mythconverg'.</small>
+                   <div *ngIf="dbname.invalid && (dbname.dirty || dbname.touched)">
+                        <small class="p-error block">{{ 'setupwizard.databaseNameRequired' | translate }}</small>
                     </div>
                 </div>           
              </div>
