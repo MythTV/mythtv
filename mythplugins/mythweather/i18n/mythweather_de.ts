@@ -1104,7 +1104,7 @@
     <message>
         <location filename="themestrings.h" line="102"/>
         <source>dddd,  MMMM dd,  yyyy  |  hh:mm AP</source>
-        <translation type="unfinished">dddd,  dd. MMMM  yyyy  |  hh:mm</translation>
+        <translation>dddd,  dd. MMMM  yyyy  |  hh:mm</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="103"/>
