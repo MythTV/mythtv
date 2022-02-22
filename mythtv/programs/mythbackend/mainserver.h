@@ -285,8 +285,6 @@ class MainServer : public QObject, public MythSocketCBs
 
     static QString LocalFilePath(const QString &path, const QString &wantgroup);
 
-    int GetfsID(const QList<FileSystemInfo>::iterator& fsInfo);
-
     void DoTruncateThread(DeleteStruct *ds);
     void DoDeleteThread(DeleteStruct *ds);
     static void DeleteRecordedFiles(DeleteStruct *ds);
@@ -353,8 +351,6 @@ class MainServer : public QObject, public MythSocketCBs
     QTimer *m_autoexpireUpdateTimer          {nullptr}; // audited ref #5318
     static QMutex s_truncate_and_close_lock;
 
-    QMap<QString, int>    m_fsIDcache;
-    QMutex                m_fsIDcacheLock;
     QList<FileSystemInfo> m_fsInfosCache;
     QMutex                m_fsInfosCacheLock;
 

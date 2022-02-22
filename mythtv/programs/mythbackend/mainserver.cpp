@@ -5099,16 +5099,6 @@ void MainServer::HandleIsActiveBackendQuery(const QStringList &slist,
     SendResponse(pbs->getSocket(), retlist);
 }
 
-int MainServer::GetfsID(const QList<FileSystemInfo>::iterator& fsInfo)
-{
-    QString fskey = fsInfo->getHostname() + ":" + fsInfo->getPath();
-    QMutexLocker lock(&m_fsIDcacheLock);
-    if (!m_fsIDcache.contains(fskey))
-        m_fsIDcache[fskey] = m_fsIDcache.count();
-
-    return m_fsIDcache[fskey];
-}
-
 size_t MainServer::GetCurrentMaxBitrate(void)
 {
     size_t totalKBperMin = 0;
@@ -5244,42 +5234,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     int64_t maxWriteFiveSec = GetCurrentMaxBitrate()/12 /*5 seconds*/;
     maxWriteFiveSec = std::max((int64_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
 
-    for (auto it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
-    {
-        if (it1->getFSysID() == -1)
-        {
-            it1->setFSysID(GetfsID(it1));
-            it1->setPath(
-                it1->getHostname().section(".", 0, 0) + ":" + it1->getPath());
-        }
-
-        for (auto it2 = it1 + 1; it2 != fsInfos.end(); )
-        {
-            // our fuzzy comparison uses the maximum of the two block sizes
-            // or 32, whichever is greater
-            int bSize = std::max(32, std::max(it1->getBlockSize(), it2->getBlockSize()) / 1024);
-            int64_t diffSize = it1->getTotalSpace() - it2->getTotalSpace();
-            int64_t diffUsed = it1->getUsedSpace() - it2->getUsedSpace();
-            if (diffSize < 0)
-                diffSize = 0 - diffSize;
-            if (diffUsed < 0)
-                diffUsed = 0 - diffUsed;
-
-            if (it2->getFSysID() == -1 && (diffSize <= bSize) &&
-                (diffUsed <= maxWriteFiveSec))
-            {
-                if (!it1->getHostname().contains(it2->getHostname()))
-                    it1->setHostname(it1->getHostname() + "," + it2->getHostname());
-                it1->setPath(it1->getPath() + "," +
-                    it2->getHostname().section(".", 0, 0) + ":" + it2->getPath());
-                it2 = fsInfos.erase(it2);
-            }
-            else
-            {
-                it2++;
-            }
-        }
-    }
+    FileSystemInfo::Consolidate(fsInfos, true, maxWriteFiveSec);
 
     // Passed the cleaned list back
     int64_t totalKB = 0;
