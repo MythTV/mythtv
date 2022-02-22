@@ -20,7 +20,8 @@
  *  collectively for any new connections.
  *
  *  This can be subclassed with new 'newTcpConnection()' and 'newConnection()'
- *  methods to allow signalling for alternate socket types.
+ *  methods to allow signalling for alternate socket types.  For a minimal
+ *  example see MythServer.
  */
 
 class PrivUdpSocket;
@@ -125,6 +126,22 @@ class MBASE_PUBLIC ServerPool : public QObject
     QList<PrivTcpServer*>   m_tcpServers;
     QList<PrivUdpSocket*>   m_udpSockets;
     PrivUdpSocket          *m_lastUdpSocket {nullptr};
+};
+
+class MBASE_PUBLIC MythServer : public ServerPool
+{
+    Q_OBJECT
+  public:
+    explicit MythServer(QObject *parent = nullptr) : ServerPool(parent) {}
+
+  signals:
+    void newConnection(qintptr socket);
+
+  protected slots:
+    void newTcpConnection(qintptr socket) override // ServerPool
+    {
+        emit newConnection(socket);
+    }
 };
 
 #endif

@@ -51,7 +51,7 @@
 #include "mythversion.h"
 #include "mythdb.h"
 #include "mainserver.h"
-#include "server.h"
+#include "serverpool.h"
 #include "mthread.h"
 #include "scheduler.h"
 #include "requesthandler/fileserverutil.h"
@@ -293,7 +293,7 @@ MainServer::MainServer(bool master, int port,
         SetExitCode(GENERIC_EXIT_SOCKET_ERROR, false);
         return;
     }
-    connect(m_mythserver, &MythServer::NewConnection,
+    connect(m_mythserver, &MythServer::newConnection,
             this,       &MainServer::NewConnection);
 
     gCoreContext->addListener(this);
