@@ -142,9 +142,9 @@ bool PlaybackSock::GoToSleep(void)
  */
 void PlaybackSock::GetDiskSpace(QStringList &o_strlist)
 {
-    QStringList strlist(QString("QUERY_FREE_SPACE"));
+    QStringList strlist(QString("QUERY_FREE_SPACE")); // should this be ..._SUMMARY? based on the comment above
 
-    if (SendReceiveStringList(strlist, 8))
+    if (SendReceiveStringList(strlist, 8)) // TODO replace magic numbers FileSystemInfo::k_lines; return a list of FileSystemInfos instead?
     {
         o_strlist += strlist;
     }
