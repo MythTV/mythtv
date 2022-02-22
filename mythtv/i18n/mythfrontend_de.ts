@@ -17101,7 +17101,7 @@ name cannot be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="642"/>
         <source>Director</source>
-        <translation>Regisseur</translation>
+        <translation>Regie</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="643"/>
@@ -36755,7 +36755,7 @@ Teil |PARTNUMBER| von %%PARTTOTAL%%
 
 Besetzung: |CAST%%
 
-Regisseur: |DIRECTOR%</translation>
+Regie: |DIRECTOR%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1843"/>
@@ -36775,7 +36775,7 @@ Regisseur: |DIRECTOR%</translation>
     <message>
         <location filename="../themes/themestrings.h" line="281"/>
         <source>(Last: %1)</source>
-        <translation>(Last: %1)</translation>
+        <translation>(Zuletzt: %1)</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="245"/>
@@ -37610,7 +37610,7 @@ Regisseur: |DIRECTOR%</translation>
     <message>
         <location filename="../themes/themestrings.h" line="60"/>
         <source>%Director: |director%</source>
-        <translation>%Regisseur: |director%</translation>
+        <translation>%Regie: |director%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="7"/>
@@ -38235,7 +38235,7 @@ Regisseur: |DIRECTOR%</translation>
     <message>
         <location filename="../themes/themestrings.h" line="208"/>
         <source>%rating |USERRATING%</source>
-        <translation>%rating |USERRATING%</translation>
+        <translation>%Bewertung |USERRATING%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="209"/>
@@ -38424,7 +38424,7 @@ Regisseur: |DIRECTOR%</translation>
     <message>
         <location filename="../themes/themestrings.h" line="271"/>
         <source>(%statusbefore%) -&gt; (%statusafter%):  %shorttimedate% on %channel%</source>
-        <translation>(%statusbefore%) -&gt; (%statusafter%):  %shorttimedate% on %channel%</translation>
+        <translation>(%statusbefore%) -&gt; (%statusafter%):  %shorttimedate% auf %channel%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="274"/>
@@ -39618,12 +39618,12 @@ Regisseur: |DIRECTOR%</translation>
     <message>
         <location filename="../themes/themestrings.h" line="783"/>
         <source>Director</source>
-        <translation>Regisseur</translation>
+        <translation>Regie</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="785"/>
         <source>Director: %director% - %length%</source>
-        <translation>Regisseur: %director% - %length%</translation>
+        <translation>Regie: %director% - %length%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="786"/>
@@ -44577,7 +44577,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
     <message>
         <location filename="../themes/themestrings.h" line="784"/>
         <source>Director:</source>
-        <translation>Regisseur:</translation>
+        <translation>Regie:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1342"/>
@@ -45400,7 +45400,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
 [font]myverysmallsub[/font]Part |PARTNUMBER| of %%PARTTOTAL%%
 [font]myverysmallsub[/font]|CAST| %%[font]myverysmallsub[/font]  
 [font]myverysmalllabel[/font]Director: |DIRECTOR| %</source>
-        <translation>[font]myverysmalllabel[/font]%(|s00e00|) %%|RATING| %%|(STARS|) %[font]myverysmall[/font]%DESCRIPTION%%\n\n[font]myverysmallsub[/font]Part |PARTNUMBER| of %%PARTTOTAL%%\n[font]myverysmallsub[/font]|CAST| %%[font]myverysmallsub[/font]  \n[font]myverysmalllabel[/font]Director: |DIRECTOR| %</translation>
+        <translation>[font]myverysmalllabel[/font]%(|s00e00|) %%|RATING| %%|(STARS|) %[font]myverysmall[/font]%DESCRIPTION%%\n\n[font]myverysmallsub[/font]Teil |PARTNUMBER| von %%PARTTOTAL%%\n[font]myverysmallsub[/font]|CAST| %%[font]myverysmallsub[/font]  \n[font]myverysmalllabel[/font]Regie: |DIRECTOR| %</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2231"/>
@@ -46319,7 +46319,7 @@ dd. MMM yyyy</translation>
     <message>
         <location filename="../programs/mythfrontend/videodlg.cpp" line="2529"/>
         <source>Director</source>
-        <translation>Regisseur</translation>
+        <translation>Regie</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videodlg.cpp" line="2532"/>
