@@ -494,6 +494,7 @@ using_frontend {
     HEADERS += mythvideocolourspace.h
     HEADERS += visualisations/videovisual.h
     HEADERS += visualisations/videovisualdefs.h
+    HEADERS += visualisations/videovisualspectrum.h
     HEADERS += mythdeinterlacer.h
     HEADERS += mythinteropgpu.h
     SOURCES += mythvideoout.cpp
@@ -506,6 +507,7 @@ using_frontend {
     SOURCES += mythvideobounds.cpp
     SOURCES += mythvideocolourspace.cpp
     SOURCES += visualisations/videovisual.cpp
+    SOURCES += visualisations/videovisualspectrum.cpp
     SOURCES += mythdeinterlacer.cpp
     SOURCES += mythinteropgpu.cpp
 
@@ -568,12 +570,6 @@ using_frontend {
         SOURCES += decoders/mythmediacodeccontext.cpp
     }
 
-    using_libfftw3 {
-        DEFINES += FFTW3_SUPPORT
-        HEADERS += visualisations/videovisualspectrum.h
-        SOURCES += visualisations/videovisualspectrum.cpp
-    }
-
     HEADERS += decoders/mythdrmprimecontext.h
     SOURCES += decoders/mythdrmprimecontext.cpp
 
@@ -590,23 +586,21 @@ using_frontend {
     }
 
     using_vulkan|using_opengl {
-        using_libfftw3 {
-            HEADERS += visualisations/videovisualmonoscope.h
-            SOURCES += visualisations/videovisualmonoscope.cpp
+        HEADERS += visualisations/videovisualmonoscope.h
+        SOURCES += visualisations/videovisualmonoscope.cpp
 
-            using_opengl {
-                HEADERS += visualisations/opengl/mythvisualmonoscopeopengl.h
-                SOURCES += visualisations/opengl/mythvisualmonoscopeopengl.cpp
-            }
+        using_opengl {
+            HEADERS += visualisations/opengl/mythvisualmonoscopeopengl.h
+            SOURCES += visualisations/opengl/mythvisualmonoscopeopengl.cpp
+        }
 
-            using_vulkan {
-                HEADERS += visualisations/vulkan/mythvisualvulkan.h
-                HEADERS += visualisations/vulkan/mythvisualcirclesvulkan.h
-                HEADERS += visualisations/vulkan/mythvisualmonoscopevulkan.h
-                SOURCES += visualisations/vulkan/mythvisualvulkan.cpp
-                SOURCES += visualisations/vulkan/mythvisualcirclesvulkan.cpp
-                SOURCES += visualisations/vulkan/mythvisualmonoscopevulkan.cpp
-            }
+        using_vulkan {
+            HEADERS += visualisations/vulkan/mythvisualvulkan.h
+            HEADERS += visualisations/vulkan/mythvisualcirclesvulkan.h
+            HEADERS += visualisations/vulkan/mythvisualmonoscopevulkan.h
+            SOURCES += visualisations/vulkan/mythvisualvulkan.cpp
+            SOURCES += visualisations/vulkan/mythvisualcirclesvulkan.cpp
+            SOURCES += visualisations/vulkan/mythvisualmonoscopevulkan.cpp
         }
     }
 
@@ -619,11 +613,14 @@ using_frontend {
         HEADERS += opengl/mythvideotextureopengl.h
         HEADERS += opengl/mythopengltonemap.h
         HEADERS += opengl/mythopenglcomputeshaders.h
+        HEADERS += visualisations/videovisualcircles.h
         SOURCES += opengl/mythopenglvideo.cpp
         SOURCES += opengl/mythvideooutopengl.cpp
         SOURCES += opengl/mythopenglinterop.cpp
         SOURCES += opengl/mythvideotextureopengl.cpp
         SOURCES += opengl/mythopengltonemap.cpp
+        SOURCES += visualisations/videovisualcircles.cpp
+
 
         using_vaapi {
             HEADERS += opengl/mythvaapiinterop.h   opengl/mythvaapiglxinterop.h
@@ -668,11 +665,6 @@ using_frontend {
                 HEADERS += opengl/mythvaapidrminterop.h
                 SOURCES += opengl/mythvaapidrminterop.cpp
             }
-        }
-
-        using_libfftw3 {
-            HEADERS += visualisations/videovisualcircles.h
-            SOURCES += visualisations/videovisualcircles.cpp
         }
 
         !win32-msvc* {
