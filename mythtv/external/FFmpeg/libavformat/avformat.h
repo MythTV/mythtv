@@ -1370,6 +1370,12 @@ typedef struct AVFormatContext {
     void *stream_change_data;
     const uint8_t *cur_pmt_sect;
     int cur_pmt_sect_len;
+
+    /**
+     * A reference-counted buffer holding the last seen PMT in an MPEG-TS.
+     * Only set by mpegts-mythtv.
+     */
+    AVBufferRef *pmt_section;
     /* End Myth addons */
 
     /**

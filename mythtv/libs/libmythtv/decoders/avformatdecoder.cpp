@@ -1682,14 +1682,19 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
     m_pmtTrackTypes.clear();
 
     // Figure out languages of ATSC captions
-    if (!m_ic->cur_pmt_sect)
+    if (!m_ic->pmt_section)
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             "ScanATSCCaptionStreams() called with no PMT");
         return;
     }
 
-    const ProgramMapTable pmt(PSIPTable(m_ic->cur_pmt_sect));
+    auto pmt_buffer = MythAVBufferRef(m_ic->pmt_section);
+    if (!pmt_buffer.has_buffer())
+    {
+        return;
+    }
+    const ProgramMapTable pmt(PSIPTable(pmt_buffer.data()));
 
     bool video_found = false;
     uint i = 0;
@@ -1824,10 +1829,15 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
     QMutexLocker locker(&m_trackLock);
 
     // ScanStreams() calls m_tracks[kTrackTypeTeletextCaptions].clear()
-    if (!m_ic->cur_pmt_sect || !m_tracks[kTrackTypeTeletextCaptions].empty())
+    if (!m_ic->pmt_section || !m_tracks[kTrackTypeTeletextCaptions].empty())
         return;
 
-    const ProgramMapTable pmt(PSIPTable(m_ic->cur_pmt_sect));
+    auto pmt_buffer = MythAVBufferRef(m_ic->pmt_section);
+    if (!pmt_buffer.has_buffer())
+    {
+        return;
+    }
+    const ProgramMapTable pmt(PSIPTable(pmt_buffer.data()));
 
     for (uint i = 0; i < pmt.StreamCount(); i++)
     {
@@ -1901,13 +1911,18 @@ void AvFormatDecoder::ScanRawTextCaptions(int av_stream_index)
  */
 void AvFormatDecoder::ScanDSMCCStreams(void)
 {
-    if (!m_ic || !m_ic->cur_pmt_sect)
+    if (!m_ic || !m_ic->pmt_section)
         return;
 
     if (!m_itv && ! (m_itv = m_parent->GetInteractiveTV()))
         return;
 
-    const ProgramMapTable pmt(PSIPTable(m_ic->cur_pmt_sect));
+    auto pmt_buffer = MythAVBufferRef(m_ic->pmt_section);
+    if (!pmt_buffer.has_buffer())
+    {
+        return;
+    }
+    const ProgramMapTable pmt(PSIPTable(pmt_buffer.data()));
 
     for (uint i = 0; i < pmt.StreamCount(); i++)
     {
@@ -5127,9 +5142,14 @@ int AvFormatDecoder::ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &/*sto
 
 bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)
 {
-    if (ic && ic->cur_pmt_sect)
+    if (ic && ic->pmt_section)
     {
-        const ProgramMapTable pmt(PSIPTable(ic->cur_pmt_sect));
+        auto pmt_buffer = MythAVBufferRef(m_ic->pmt_section);
+        if (!pmt_buffer.has_buffer())
+        {
+            return GetTrackCount(kTrackTypeVideo) != 0U;;
+        }
+        const ProgramMapTable pmt(PSIPTable(pmt_buffer.data()));
 
         for (uint i = 0; i < pmt.StreamCount(); i++)
         {
