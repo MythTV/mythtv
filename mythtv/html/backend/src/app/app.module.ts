@@ -6,27 +6,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-// PrimeNG
-import { ButtonModule } from 'primeng/button';
-import { SidebarModule } from 'primeng/sidebar';
-import { MenubarModule } from 'primeng/menubar';
-import { MenuItem } from 'primeng/api';
-import { ToolbarModule } from 'primeng/toolbar';
-import { CardModule } from 'primeng/card';
-import { StepsModule } from 'primeng/steps';
-import { TooltipModule } from 'primeng/tooltip';
-import { ToastModule } from 'primeng/toast';
-import { MessagesModule } from 'primeng/messages';
-import { MessageModule } from 'primeng/message';
-import { PanelModule } from 'primeng/panel';
-import { SkeletonModule } from 'primeng/skeleton';
-import { ListboxModule } from 'primeng/listbox';
-import { DialogModule } from 'primeng/dialog';
-import { DataViewModule } from 'primeng/dataview';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { OverlayPanelModule } from 'primeng/overlaypanel'
-import { TableModule } from 'primeng/table';
-import { RippleModule } from 'primeng/ripple';
+import { PrimeNGModule } from './primeng.module';
 
 import { AppRoutingModule } from './app-routing.module';
 
@@ -100,28 +80,8 @@ export function HttpLoaderFactory(http: HttpClient) {
       }
     }),
 
+    PrimeNGModule,
     SetupWizardRoutingModule,
-    // PrimeNG
-    SidebarModule,
-    ButtonModule,
-    MenubarModule,
-    ToolbarModule,
-    CardModule,
-    StepsModule,
-    TooltipModule,
-    ToastModule,
-    MessagesModule,
-    MessageModule,
-    PanelModule,
-    SkeletonModule,
-    ListboxModule,
-    DialogModule,
-    CardModule,
-    DataViewModule,
-    ProgressSpinnerModule,
-    OverlayPanelModule,
-    TableModule,
-    RippleModule
   ],
   providers: [],
   bootstrap: [AppComponent]
