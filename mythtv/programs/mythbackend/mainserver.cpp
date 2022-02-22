@@ -5240,26 +5240,18 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
 
     FileSystemInfo::Consolidate(fsInfos, true, maxWriteFiveSec);
 
-    // Passed the cleaned list back
-    int64_t totalKB = 0;
-    int64_t usedKB  = 0;
-    for (const auto & fsInfo : qAsConst(fsInfos))
-    {
-        strlist << fsInfo.getHostname();
-        strlist << fsInfo.getPath();
-        strlist << QString::number(static_cast<int>(fsInfo.isLocal()));
-        strlist << QString::number(fsInfo.getFSysID());
-        strlist << QString::number(fsInfo.getGroupID());
-        strlist << QString::number(fsInfo.getBlockSize());
-        strlist << QString::number(fsInfo.getTotalSpace());
-        strlist << QString::number(fsInfo.getUsedSpace());
-
-        totalKB += fsInfo.getTotalSpace();
-        usedKB  += fsInfo.getUsedSpace();
-    }
+    // Pass the cleaned list back
+    strlist << FileSystemInfoManager::ToStringList(fsInfos);
 
     if (allHosts)
     {
+        int64_t totalKB = 0;
+        int64_t usedKB  = 0;
+        for (const auto & fsInfo : qAsConst(fsInfos))
+        {
+            totalKB += fsInfo.getTotalSpace();
+            usedKB  += fsInfo.getUsedSpace();
+        }
         strlist << allHostList;
         strlist << "TotalDiskSpace";
         strlist << "0";
