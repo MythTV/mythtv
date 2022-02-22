@@ -2894,12 +2894,20 @@ static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
 */
 static void export_pmt(AVFormatContext *ctx, const uint8_t *section, int section_len)
 {
-    const uint8_t* tmp = av_memdup(section, section_len);
+    AVBufferRef *buf;
+    uint8_t* tmp = av_memdup(section, section_len);
     if (!tmp)
         return; // AVERROR(ENOMEM)
-    FFSWAP(const uint8_t*, tmp, ctx->cur_pmt_sect);
-    ctx->cur_pmt_sect_len = section_len;
-    av_freep(&tmp); // NOP if ctx->cur_pmt_sect was NULL
+
+    buf = av_buffer_create(tmp, section_len, av_buffer_default_free, NULL, AV_BUFFER_FLAG_READONLY);
+    // if creating the buffer fails, keep the previous PMT
+    if (!buf) {
+        av_freep(&tmp);
+        return; // AVERROR(ENOMEM)
+    }
+    av_buffer_replace(&ctx->pmt_section, buf);
+
+    av_buffer_unref(&buf);
 }
 // End MythTV only ------------------------------------------------------
 
