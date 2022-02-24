@@ -15,8 +15,6 @@
 #include <cerrno>
 #include <cmath>
 
-#include <QtGlobal>
-#include <QtEndian>
 #include <QStringList>
 
 #include <iostream>
@@ -34,6 +32,41 @@
 #include "vbitext/vbi.h"
 #include "mythavutil.h"
 #include "fourcc.h"
+
+#if HAVE_BIGENDIAN
+extern "C" {
+#ifndef MYTHTV_BSWAP_H
+#define MYTHTV_BSWAP_H
+
+#include <cstdint> /* uint32_t */
+
+#define bswap_dbl(x) bswap_64(x)
+
+#if HAVE_BYTESWAP_H
+#  include <byteswap.h> /* bswap_16|32|64 */
+#elif HAVE_SYS_ENDIAN_H
+#  include <sys/endian.h>
+#  if !defined(bswap_16) && defined(bswap16)
+#    define bswap_16(x) bswap16(x)
+#  endif
+#  if !defined(bswap_32) && defined(bswap32)
+#    define bswap_32(x) bswap32(x)
+#  endif
+#  if !defined(bswap_64) && defined(bswap64)
+#    define bswap_64(x) bswap64(x)
+#  endif
+#elif CONFIG_DARWIN
+#  include <libkern/OSByteOrder.h>
+#  define bswap_16(x) OSSwapInt16(x)
+#  define bswap_32(x) OSSwapInt32(x)
+#  define bswap_64(x) OSSwapInt64(x)
+#elif HAVE_BIGENDIAN
+#  error Byte swapping functions not defined for this platform
+#endif
+
+#endif /* ndef MYTHTV_BSWAP_H */
+}
+#endif
 
 extern "C" {
 #include "libswscale/swscale.h"
@@ -1441,9 +1474,9 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
 
 inline void NuppelVideoRecorder::WriteFrameheader(rtframeheader *fh)
 {
-#if (Q_BYTE_ORDER == Q_BIG_ENDIAN)
-    fh->timecode     = qToLittleEndian<qint32>(fh->timecode);
-    fh->packetlength = qToLittleEndian<qint32>(fh->packetlength);
+#if HAVE_BIGENDIAN
+    fh->timecode     = bswap_32(fh->timecode);
+    fh->packetlength = bswap_32(fh->packetlength);
 #endif
     m_ringBuffer->Write(fh, FRAMEHEADERSIZE);
 }
@@ -1487,17 +1520,17 @@ void NuppelVideoRecorder::WriteFileHeader(void)
     fileheader.textsblocks = -1; // TODO: make only -1 if VBI support active?
     fileheader.keyframedist = KEYFRAMEDIST;
 
-#if (Q_BYTE_ORDER == Q_BIG_ENDIAN)
-    fileheader.width         = qToLittleEndian<qint32>(fileheader.width);
-    fileheader.height        = qToLittleEndian<qint32>(fileheader.height);
-    fileheader.desiredwidth  = qToLittleEndian<qint32>(fileheader.desiredwidth);
-    fileheader.desiredheight = qToLittleEndian<qint32>(fileheader.desiredheight);
-    fileheader.aspect        = reinterpret_cast<double>(qToLittleEndian<quint64>(reinterpret_cast<quint64>(fileheader.aspect)));
-    fileheader.fps           = reinterpret_cast<double>(qToLittleEndian<quint64>(reinterpret_cast<quint64>(fileheader.fps)));
-    fileheader.videoblocks   = qToLittleEndian<qint32>(fileheader.videoblocks);
-    fileheader.audioblocks   = qToLittleEndian<qint32>(fileheader.audioblocks);
-    fileheader.textsblocks   = qToLittleEndian<qint32>(fileheader.textsblocks);
-    fileheader.keyframedist  = qToLittleEndian<qint32>(fileheader.keyframedist);
+#if HAVE_BIGENDIAN
+    fileheader.width         = bswap_32(fileheader.width);
+    fileheader.height        = bswap_32(fileheader.height);
+    fileheader.desiredwidth  = bswap_32(fileheader.desiredwidth);
+    fileheader.desiredheight = bswap_32(fileheader.desiredheight);
+    fileheader.aspect        = bswap_dbl(fileheader.aspect);
+    fileheader.fps           = bswap_dbl(fileheader.fps);
+    fileheader.videoblocks   = bswap_32(fileheader.videoblocks);
+    fileheader.audioblocks   = bswap_32(fileheader.audioblocks);
+    fileheader.textsblocks   = bswap_32(fileheader.textsblocks);
+    fileheader.keyframedist  = bswap_32(fileheader.keyframedist);
 #endif
     m_ringBuffer->Write(&fileheader, FILEHEADERSIZE);
 }
@@ -1591,24 +1624,24 @@ void NuppelVideoRecorder::WriteHeader(void)
 
     m_extendedDataOffset = m_ringBuffer->GetWritePosition();
 
-#if (Q_BYTE_ORDER == Q_BIG_ENDIAN)
-    moredata.version                 = qToLittleEndian<qint32>(moredata.version);
-    moredata.video_fourcc            = qToLittleEndian<qint32>(moredata.video_fourcc);
-    moredata.audio_fourcc            = qToLittleEndian<qint32>(moredata.audio_fourcc);
-    moredata.audio_sample_rate       = qToLittleEndian<qint32>(moredata.audio_sample_rate);
-    moredata.audio_bits_per_sample   = qToLittleEndian<qint32>(moredata.audio_bits_per_sample);
-    moredata.audio_channels          = qToLittleEndian<qint32>(moredata.audio_channels);
-    moredata.audio_compression_ratio = qToLittleEndian<qint32>(moredata.audio_compression_ratio);
-    moredata.audio_quality           = qToLittleEndian<qint32>(moredata.audio_quality);
-    moredata.rtjpeg_quality          = qToLittleEndian<qint32>(moredata.rtjpeg_quality);
-    moredata.rtjpeg_luma_filter      = qToLittleEndian<qint32>(moredata.rtjpeg_luma_filter);
-    moredata.rtjpeg_chroma_filter    = qToLittleEndian<qint32>(moredata.rtjpeg_chroma_filter);
-    moredata.lavc_bitrate            = qToLittleEndian<qint32>(moredata.lavc_bitrate);
-    moredata.lavc_qmin               = qToLittleEndian<qint32>(moredata.lavc_qmin);
-    moredata.lavc_qmax               = qToLittleEndian<qint32>(moredata.lavc_qmax);
-    moredata.lavc_maxqdiff           = qToLittleEndian<qint32>(moredata.lavc_maxqdiff);
-    moredata.seektable_offset        = qToLittleEndian<qint64>(moredata.seektable_offset);
-    moredata.keyframeadjust_offset   = qToLittleEndian<qint64>(moredata.keyframeadjust_offset);
+#if HAVE_BIGENDIAN
+    moredata.version                 = bswap_32(moredata.version);
+    moredata.video_fourcc            = bswap_32(moredata.video_fourcc);
+    moredata.audio_fourcc            = bswap_32(moredata.audio_fourcc);
+    moredata.audio_sample_rate       = bswap_32(moredata.audio_sample_rate);
+    moredata.audio_bits_per_sample   = bswap_32(moredata.audio_bits_per_sample);
+    moredata.audio_channels          = bswap_32(moredata.audio_channels);
+    moredata.audio_compression_ratio = bswap_32(moredata.audio_compression_ratio);
+    moredata.audio_quality           = bswap_32(moredata.audio_quality);
+    moredata.rtjpeg_quality          = bswap_32(moredata.rtjpeg_quality);
+    moredata.rtjpeg_luma_filter      = bswap_32(moredata.rtjpeg_luma_filter);
+    moredata.rtjpeg_chroma_filter    = bswap_32(moredata.rtjpeg_chroma_filter);
+    moredata.lavc_bitrate            = bswap_32(moredata.lavc_bitrate);
+    moredata.lavc_qmin               = bswap_32(moredata.lavc_qmin);
+    moredata.lavc_qmax               = bswap_32(moredata.lavc_qmax);
+    moredata.lavc_maxqdiff           = bswap_32(moredata.lavc_maxqdiff);
+    moredata.seektable_offset        = bswap_64(moredata.seektable_offset);
+    moredata.keyframeadjust_offset   = bswap_64(moredata.keyframeadjust_offset);
 #endif
     m_ringBuffer->Write(&moredata, sizeof(moredata));
 
@@ -2527,7 +2560,6 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, std::chrono::
         for (int i = 0; i < m_audioChannels * sample_cnt; i++)
             buf16[i] = qToLittleEndian<uint16_t>(buf16[i]);
 #endif
-
         if (m_audioChannels == 2)
         {
             lameret = lame_encode_buffer_interleaved(
