@@ -7,20 +7,20 @@
 #include <QVariant>
 
 // Myth
-#include <mythcontext.h>
-#include <mythdb.h>
-#include <mythuihelper.h>
-#include <mythuitext.h>
-#include <mythuitextedit.h>
-#include <mythuibutton.h>
-#include <mythuiimage.h>
-#include <mythuibuttonlist.h>
-#include <mythmainwindow.h>
-#include <mythdialogbox.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdb.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuihelper.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuitextedit.h>
 
 // mytharchive
-#include "fileselector.h"
 #include "archiveutil.h"
+#include "fileselector.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
 #define qEnvironmentVariable getenv

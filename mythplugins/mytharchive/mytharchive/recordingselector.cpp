@@ -4,32 +4,32 @@
 #include <unistd.h>
 
 // qt
+#include <QApplication>
 #include <QDir>
 #include <QKeyEvent>
 #include <QTimer>
-#include <QApplication>
 
 // mythtv
-#include <mythcontext.h>
-#include <mythdb.h>
-#include <mthread.h>
-#include <programinfo.h>
-#include <remoteutil.h>
-#include <mythtimer.h>
-#include <mythuitext.h>
-#include <mythuibutton.h>
-#include <mythuiimage.h>
-#include <mythuibuttonlist.h>
-#include <mythmainwindow.h>
-#include <mythprogressdialog.h>
-#include <mythdialogbox.h>
-#include <mythlogging.h>
-#include <mythdate.h>
-#include <stringutil.h>
+#include <libmyth/mythcontext.h>
+#include <libmyth/programinfo.h>
+#include <libmyth/remoteutil.h>
+#include <libmythbase/mthread.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythlogging.h>
+#include <libmythbase/mythtimer.h>
+#include <libmythbase/stringutil.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythprogressdialog.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuitext.h>
 
 // mytharchive
-#include "recordingselector.h"
 #include "archiveutil.h"
+#include "recordingselector.h"
 
 class GetRecordingListThread : public MThread
 {

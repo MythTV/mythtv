@@ -5,8 +5,8 @@
 
 #include <QString>
 
-#include <remotefile.h>
-#include <mythlogging.h>
+#include <libmythbase/mythlogging.h>
+#include <libmythbase/remotefile.h>
 
 extern "C" {
 #include <libavformat/avformat.h>

@@ -1,23 +1,24 @@
 #ifndef THUMBFINDER_H_
 #define THUMBFINDER_H_
 
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+}
+
 // qt
 #include <QString>
 #include <QStringList>
 #include <QScopedPointer>
 
 // mythtv
-#include <mythscreentype.h>
-extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-}
-#include "programtypes.h"
+#include <libmyth/programtypes.h>
+#include <libmythtv/mythavutil.h>
+#include <libmythui/mythscreentype.h>
 
 // mytharchive
 #include "archiveutil.h"
 #include "remoteavformatcontext.h"
-#include "mythavutil.h"
 
 struct SeekAmount
 {

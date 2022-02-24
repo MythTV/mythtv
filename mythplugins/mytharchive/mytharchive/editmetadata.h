@@ -7,7 +7,7 @@
 #include <QKeyEvent>
 
 // myth
-#include <mythscreentype.h>
+#include <libmythui/mythscreentype.h>
 
 // mytharchive
 #include "archiveutil.h"

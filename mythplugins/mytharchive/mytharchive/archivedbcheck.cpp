@@ -5,9 +5,9 @@
 #include <QSqlError>
 
 // MythTV
-#include <mythcontext.h>
-#include <mythdb.h>
-#include <mythdbcheck.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythdbcheck.h>
 
 // mytharchive
 #include "archivedbcheck.h"

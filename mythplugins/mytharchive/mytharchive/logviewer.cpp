@@ -4,19 +4,19 @@
 #include <unistd.h>
 
 // qt
-#include <QKeyEvent>
-#include <QFile>
-#include <QTextStream>
 #include <QCoreApplication>
+#include <QFile>
+#include <QKeyEvent>
+#include <QTextStream>
 
 // mythtv
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <mythmainwindow.h>
-#include <mythdialogbox.h>
-#include <mythuibutton.h>
-#include <mythuibuttonlist.h>
-#include <mythuitext.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuitext.h>
 
 // mytharchive
 #include "archiveutil.h"

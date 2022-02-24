@@ -8,16 +8,16 @@
 #include <QTimer>
 
 // mythtv
-#include <mythcontext.h>
-#include <mythdb.h>
-#include <mythuitext.h>
-#include <mythuibutton.h>
-#include <mythuiimage.h>
-#include <mythuibuttonlist.h>
-#include <mythmainwindow.h>
-#include <mythdialogbox.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/remotefile.h>
 #include <libmythmetadata/videoutils.h>
-#include <remotefile.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuitext.h>
 
 // mytharchive
 #include "archiveutil.h"

@@ -11,14 +11,14 @@
 #include <QCoreApplication>
 
 // myth
-#include <mythcontext.h>
-#include <mythdirs.h>
-#include <mythuihelper.h>
-#include <mythuitext.h>
-#include <mythuibutton.h>
-#include <mythuiimage.h>
-#include <mythuibuttonlist.h>
-#include <mythmainwindow.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuihelper.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuitext.h>
 
 // mytharchive
 #include "mythburn.h"

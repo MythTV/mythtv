@@ -2,10 +2,6 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
-INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libavformat
-INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libswscale
-DEPENDPATH *= $${INCLUDEPATH}
-
 LIBS += -lmythswscale
 LIBS += -lmythavformat
 LIBS += -lmythavcodec

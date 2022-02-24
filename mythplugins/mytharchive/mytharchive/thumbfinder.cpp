@@ -33,30 +33,30 @@
 
 // qt
 #include <QApplication>
+#include <QDir>
 #include <QDomDocument>
 #include <QFile>
-#include <QDir>
 #include <QPainter>
 
 // myth
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <programinfo.h>
-#include <mythuihelper.h>
-#include <mythmainwindow.h>
-#include <mythdialogbox.h>
-#include <mythdirs.h>
-#include <mythmiscutil.h> // for MythFile::copy
-#include <mythdate.h>
-#include <mythuitext.h>
-#include <mythuibutton.h>
-#include <mythuiimage.h>
-#include <mythuibuttonlist.h>
-#include <mythimage.h>
 #include <mythconfig.h>
+#include <libmyth/mythcontext.h>
+#include <libmyth/programinfo.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythbase/mythmiscutil.h> // for MythFile::copy
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythimage.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuihelper.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuitext.h>
 
 extern "C" {
-#include "libavutil/imgutils.h"
+    #include <libavutil/imgutils.h>
 }
 
 #ifndef INT64_C    // Used in FFmpeg headers to define some constants

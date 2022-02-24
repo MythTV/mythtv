@@ -7,22 +7,22 @@
 #include <QDomDocument>
 
 // Myth
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <mythuihelper.h>
-#include <mythmainwindow.h>
-#include <mythuitext.h>
-#include <mythuitextedit.h>
-#include <mythuibutton.h>
-#include <mythuibuttonlist.h>
-#include <mythdialogbox.h>
-#include <mythsystemlegacy.h>
-#include <exitcodes.h>
-#include <mythdate.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/exitcodes.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythsystemlegacy.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuihelper.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuitextedit.h>
 
 // mytharchive
-#include "importnative.h"
 #include "archiveutil.h"
+#include "importnative.h"
 #include "logviewer.h"
 
 

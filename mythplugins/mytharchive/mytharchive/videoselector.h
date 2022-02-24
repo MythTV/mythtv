@@ -11,8 +11,8 @@
 #include <vector>
 
 // mythtv
-#include <mythscreentype.h>
 #include <libmythmetadata/parentalcontrols.h>
+#include <libmythui/mythscreentype.h>
 
 // mytharchive
 #include "archiveutil.h"

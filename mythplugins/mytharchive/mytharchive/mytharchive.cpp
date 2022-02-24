@@ -15,29 +15,29 @@
 #include <QTimer>
 
 // mythtv
-#include <mythpluginapi.h>
-#include <mythcontext.h>
-#include <mythversion.h>
-#include <mythplugin.h>
-#include <mythcoreutil.h>
-#include <mythsystemlegacy.h>
-#include <myththemedmenu.h>
-#include <mythuihelper.h>
-#include <mythdialogbox.h>
-#include <mythmainwindow.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcoreutil.h>
+#include <libmythbase/mythplugin.h>
+#include <libmythbase/mythpluginapi.h>
+#include <libmythbase/mythsystemlegacy.h>
+#include <libmythbase/mythversion.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/myththemedmenu.h>
+#include <libmythui/mythuihelper.h>
 
 // mytharchive
-#include "archivesettings.h"
-#include "logviewer.h"
-#include "fileselector.h"
-#include "recordingselector.h"
-#include "videoselector.h"
 #include "archivedbcheck.h"
+#include "archivesettings.h"
 #include "archiveutil.h"
-#include "selectdestination.h"
 #include "exportnative.h"
+#include "fileselector.h"
 #include "importnative.h"
+#include "logviewer.h"
 #include "mythburn.h"
+#include "recordingselector.h"
+#include "selectdestination.h"
+#include "videoselector.h"
 
 // return true if the process belonging to the lock file is still running
 static bool checkProcess(const QString &lockFile)

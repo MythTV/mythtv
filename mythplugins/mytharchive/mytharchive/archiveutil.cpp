@@ -6,19 +6,19 @@
 #include <unistd.h>
 
 // qt
-#include <QDomDocument>
-#include <QDir>
 #include <QCoreApplication>
+#include <QDir>
+#include <QDomDocument>
 
 // myth
-#include <mythcontext.h>
-#include <programinfo.h>
-#include <mythmainwindow.h>
-#include <mythdialogbox.h>
-#include <mythdate.h>
-#include <mythsystemlegacy.h>
-#include <exitcodes.h>
-#include <mythlogging.h>
+#include <libmyth/mythcontext.h>
+#include <libmyth/programinfo.h>
+#include <libmythbase/exitcodes.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythlogging.h>
+#include <libmythbase/mythsystemlegacy.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
 
 // mytharchive
 #include "archiveutil.h"

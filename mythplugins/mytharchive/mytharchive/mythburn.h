@@ -4,7 +4,7 @@
 #include <utility>
 
 // mythtv
-#include <mythscreentype.h>
+#include <libmythui/mythscreentype.h>
 
 // mytharchive
 #include "archiveutil.h"

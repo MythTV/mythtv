@@ -13,7 +13,7 @@
 #include <QStringList>
 
 // myth
-#include <mythscreentype.h>
+#include <libmythui/mythscreentype.h>
 
 // mytharchive
 #include "fileselector.h"

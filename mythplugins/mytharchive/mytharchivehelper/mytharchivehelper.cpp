@@ -40,37 +40,36 @@
 
 // Qt headers
 #include <QApplication>
-#include <QFile>
 #include <QDir>
 #include <QDomElement>
+#include <QFile>
 #include <QImage>
 #include <QMutex>
 #include <QMutexLocker>
 #include <QTextStream>
 
 // MythTV headers
-#include <mythcommandlineparser.h>
-#include <mythmiscutil.h>
-#include <mythcoreutil.h>
-#include <mythcontext.h>
-#include <mythversion.h>
-#include <exitcodes.h>
-#include <mythdb.h>
-#include <programinfo.h>
-#include <mythdirs.h>
 #include <mythconfig.h>
-#include <mythsystemlegacy.h>
-#include <mythdate.h>
-#include <mythlogging.h>
-#include <mythavutil.h>
-
-#include <mythpluginexport.h>
+#include <libmyth/mythcontext.h>
+#include <libmyth/programinfo.h>
+#include <libmythbase/exitcodes.h>
+#include <libmythbase/mythcommandlineparser.h>
+#include <libmythbase/mythcoreutil.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythbase/mythlogging.h>
+#include <libmythbase/mythmiscutil.h>
+#include <libmythbase/mythpluginexport.h>
+#include <libmythbase/mythsystemlegacy.h>
+#include <libmythbase/mythversion.h>
+#include <libmythtv/mythavutil.h>
 
 extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include "external/pxsup2dast.h"
-#include "libavutil/imgutils.h"
+    #include <libavcodec/avcodec.h>
+    #include <libavformat/avformat.h>
+    #include <libavutil/imgutils.h>
+    #include "external/pxsup2dast.h"
 }
 
 // mytharchive headers
