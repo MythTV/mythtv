@@ -1984,7 +1984,6 @@ MYTHTV_CONFIG_LIST='
     libcrypto
     gnutls
     libdns_sd
-    libfftw3
     libmpeg2external
     libxml2
     lirc
@@ -2795,7 +2794,6 @@ enable v4l2
 enable v4l2prime
 enable x11
 disable indevs
-enable libfftw3
 enable taglib
 enable systemd_notify
 enable systemd_journal
@@ -6679,9 +6677,6 @@ if enabled firewire; then
     fi
 fi
 
-enabled libfftw3 && check_lib fftw3_threads fftw3.h fftw_init_threads -lfftw3_threads -lfftw3f -lfftw3 ||
-    disable libfftw3
-
 # ass_flush_events was added in 0.9.10
 if test $target_os = "android"; then
 	ASS_EXTRA_LIBS="-liconv -lfribidi -lfreetype"
@@ -7496,7 +7491,6 @@ if enabled frontend; then
     echo "Windows (Windows audio)   yes"
     echo "Windows (DirectX)         yes"
   fi
-  echo "libfftw3 support          ${libfftw3-no}"
   echo
   echo "# Video Output Support"
   echo "x11/xrandr support        ${x11-no}"

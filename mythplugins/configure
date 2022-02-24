@@ -291,7 +291,6 @@ flix
 
 CONFIG_LIST="
 opengl
-fftw
 exif
 newexif
 dcraw
@@ -349,7 +348,6 @@ MythGame related options:
 
 MythMusic related options:
   --enable-mythmusic       build the mythmusic plugin [$music]
-  --enable-fftw            enable fftw visualizers [$fftw]
   --enable-cdio            enable cd playback [$cdio]
 
 MythNetvision related options:
@@ -599,11 +597,6 @@ qt_version=$(version2num $qt_version_str)
 # rely on what was discover during MythTV configure
 if enabled opengl && test "$OPENGLV" != "CONFIG_OPENGL_VIDEO=yes"; then
     disable opengl
-fi
-
-#Test if fftw_lib3 is available
-if enabled fftw &&! check_lib2 fftw3.h fftw_init_threads -lfftw3_threads -lfftw3f -lfftw3 ; then
-    disable fftw
 fi
 
 if ! check_lib libexif/exif-data.h exif_loader_new -lexif ; then
