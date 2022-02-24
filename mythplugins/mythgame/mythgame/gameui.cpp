@@ -1,17 +1,19 @@
+// Qt
 #include <QMetaType>
 #include <QStringList>
 #include <QTimer>
 
-#include <mythcontext.h>
-#include <mythuibuttontree.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdirs.h>
 #include <libmythmetadata/mythuimetadataresults.h>
-#include <mythuiimage.h>
-#include <mythuitext.h>
-#include <mythuistatetype.h>
-#include <mythmainwindow.h>
-#include <mythdialogbox.h>
-#include <mythgenerictree.h>
-#include <mythdirs.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythgenerictree.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuibuttontree.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuistatetype.h>
+#include <libmythui/mythuitext.h>
 
 // MythGame headers
 #include "gamehandler.h"

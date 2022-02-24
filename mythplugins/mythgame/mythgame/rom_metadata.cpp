@@ -1,10 +1,14 @@
-#include "rom_metadata.h"
-
+// C++
 #include <array>
 
+// Qt
 #include <QFile>
 
-#include <mythcontext.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+
+// MythGame
+#include "rom_metadata.h"
 
 #include "zlib.h"
 #undef Z_NULL

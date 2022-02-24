@@ -1,10 +1,14 @@
+// C++
 #include <array>
 
+// Qt
 #include <QCoreApplication>
 
-#include <mythdb.h>
-#include <mythdirs.h>
+// MythTV
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythdirs.h>
 
+// MythGame
 #include "gamesettings.h"
 
 struct GameTypes {

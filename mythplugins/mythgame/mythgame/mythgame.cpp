@@ -1,15 +1,17 @@
-#include "gameui.h"
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/lcddevice.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythpluginapi.h>
+#include <libmythbase/mythversion.h>
+#include <libmythui/myththemedmenu.h>
+#include <libmythui/mythuihelper.h>
+
+// MythGame
+#include "gamedbcheck.h"
 #include "gamehandler.h"
 #include "gamesettings.h"
-#include "gamedbcheck.h"
-
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <mythversion.h>
-#include <lcddevice.h>
-#include <myththemedmenu.h>
-#include <mythpluginapi.h>
-#include <mythuihelper.h>
+#include "gameui.h"
 
 #define LOC_ERR QString("MythGame:MAIN Error: ")
 #define LOC QString("MythGame:MAIN: ")

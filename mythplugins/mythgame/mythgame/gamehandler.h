@@ -2,15 +2,19 @@
 #ifndef GAMEHANDLER_H_
 #define GAMEHANDLER_H_
 
+// C++
 #include <utility>
 
+// Qt
 #include <QEvent>
 #include <QMap>
 #include <QObject>
 #include <QStringList>
 
-#include <mythdbcon.h>
+// MythTV
+#include <libmythbase/mythdbcon.h>
 
+// MythGame
 #include "rom_metadata.h"
 #include "rominfo.h"
 

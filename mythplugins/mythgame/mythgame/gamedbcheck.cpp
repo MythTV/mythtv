@@ -1,12 +1,16 @@
+// C++
 #include <iostream>
 
+// Qt
 #include <QString>
 #include <QSqlError>
 
-#include <mythcontext.h>
-#include <mythdb.h>
-#include <mythdbcheck.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythdbcheck.h>
 
+// MythGame
 #include "gamedbcheck.h"
 #include "gamesettings.h"
 

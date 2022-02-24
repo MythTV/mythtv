@@ -1,13 +1,16 @@
-#include <QFile>
+// Qt
 #include <QApplication>
+#include <QFile>
 
-#include "mythcontext.h"
-#include "mythuihelper.h"
-#include "mythuitext.h"
-#include "mythuiimage.h"
-#include "mythuibutton.h"
-#include "mythdialogbox.h"
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuihelper.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuitext.h>
 
+// MythGame
 #include "gamedetails.h"
 
 void GameDetailsPopup::handleText(const QString &name, const QString &value)

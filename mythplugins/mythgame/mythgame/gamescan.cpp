@@ -1,19 +1,24 @@
+// C++
+#include <utility>
+
+// Qt
 #include <QApplication>
 #include <QImageReader>
 #include <QStringList>
 #include <QThread>
 #include <QUrl>
-#include <utility>
 
-#include <mythcontext.h>
-#include <mythmainwindow.h>
-#include <mythscreenstack.h>
-#include <mythprogressdialog.h>
-#include <mythdialogbox.h>
-#include <mythevent.h>
-#include <remoteutil.h>
-#include <mythlogging.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmyth/remoteutil.h>
+#include <libmythbase/mythevent.h>
+#include <libmythbase/mythlogging.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythprogressdialog.h>
+#include <libmythui/mythscreenstack.h>
 
+// MythGame
 #include "gamescan.h"
 #include "gamehandler.h"
 #include "rominfo.h"

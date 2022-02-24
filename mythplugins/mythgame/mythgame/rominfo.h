@@ -1,8 +1,10 @@
 #ifndef ROMINFO_H_
 #define ROMINFO_H_
 
+// C++
 #include <utility>
 
+// Qt
 #include <QList>
 #include <QMetaType>
 #include <QString>

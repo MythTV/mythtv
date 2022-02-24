@@ -1,15 +1,16 @@
 #ifndef GAMEUI_H_
 #define GAMEUI_H_
 
+// Qt
 #include <QString>
 #include <QObject>
 
-// myth
-#include <mythscreentype.h>
+// MythTV
 #include <libmythmetadata/metadatacommon.h>
 #include <libmythmetadata/metadatadownload.h>
 #include <libmythmetadata/metadataimagedownload.h>
-#include <mythprogressdialog.h>
+#include <libmythui/mythprogressdialog.h>
+#include <libmythui/mythscreentype.h>
 
 class MythUIButtonTree;
 class MythGenericTree;

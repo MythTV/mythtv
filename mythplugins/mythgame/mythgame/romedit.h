@@ -1,7 +1,8 @@
 #ifndef ROMEDITDLG_H_
 #define ROMEDITDLG_H_
 
-#include <mythscreentype.h>
+// MythTV
+#include <libmythui/mythscreentype.h>
 
 class RomInfo;
 

@@ -1,8 +1,10 @@
 #ifndef ROMMETADATA_H_
 #define ROMMETADATA_H_
 
+// C++
 #include <utility>
 
+// Qt
 #include <QMap>
 #include <QString>
 

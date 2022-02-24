@@ -1,9 +1,13 @@
 #ifndef GAMEDETAILS_H_
 #define GAMEDETAILS_H_
 
+// Qt
 #include <QString>
 
-#include "mythscreentype.h"
+// MythTV
+#include <libmythui/mythscreentype.h>
+
+// MythGame
 #include "rominfo.h"
 
 class GameDetailsPopup : public MythScreenType

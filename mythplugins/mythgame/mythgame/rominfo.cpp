@@ -1,10 +1,13 @@
+// Qt
 #include <QFile>
 
-#include <mythdb.h>
-#include <mythcontext.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdb.h>
 
-#include "rominfo.h"
+// MythGame
 #include "romedit.h"
+#include "rominfo.h"
 
 #define LOC_ERR QString("MythGame:ROMINFO Error: ")
 #define LOC QString("MythGame:ROMINFO: ")

@@ -1,21 +1,25 @@
+// C++
+#include <utility>
 
-#include "gamehandler.h"
-#include "rominfo.h"
-#include "rom_metadata.h"
-
+// Qt
 #include <QDir>
 #include <QList>
 #include <QRegularExpression>
-#include <utility>
 
-#include <mythdb.h>
-#include <mythdbcon.h>
-#include <mythsystemlegacy.h>
-#include <mythcontext.h>
-#include <mythuihelper.h>
-#include <mythdialogbox.h>
-#include <mythmainwindow.h>
-#include <mythprogressdialog.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythsystemlegacy.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythprogressdialog.h>
+#include <libmythui/mythuihelper.h>
+
+// MythGame
+#include "gamehandler.h"
+#include "rominfo.h"
+#include "rom_metadata.h"
 
 #define LOC_ERR QString("MythGame:GAMEHANDLER Error: ")
 #define LOC QString("MythGame:GAMEHANDLER: ")

@@ -1,15 +1,18 @@
 #ifndef GAMESCAN_H
 #define GAMESCAN_H
 
+// C++
 #include <map>
 #include <set>
 #include <utility>
 
+// Qt
 #include <QMap>
 #include <QObject> // for moc
 #include <QStringList>
 
-#include "mthread.h"
+// MythTV
+#include <libmythbase/mthread.h>
 
 class MythUIProgressDialog;
 class GameHandler;
