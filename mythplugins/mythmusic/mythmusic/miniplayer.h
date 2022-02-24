@@ -1,8 +1,9 @@
 #ifndef MINIPLAYER_H_
 #define MINIPLAYER_H_
 
-#include <mythpluginexport.h>
-#include <mythscreentype.h>
+// MythTV
+#include <libmythbase/mythpluginexport.h>
+#include <libmythui/mythscreentype.h>
 
 #include "musiccommon.h"
 

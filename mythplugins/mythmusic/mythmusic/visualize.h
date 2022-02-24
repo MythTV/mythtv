@@ -13,24 +13,24 @@
 #define VISUALIZE_H
 
 // C++ headers
-#include <QVector>
 #include <vector>
 
 // Qt headers
 #include <QCoreApplication>
+#include <QVector>
 
 // MythTV headers
-#include <visual.h>
-#include <musicmetadata.h>
-#include <mythbaseexp.h>
+#include <libmyth/visual.h>
+#include <libmythmetadata/musicmetadata.h>
+#include <libmythbase/mythbaseexp.h>
 
 // MythMusic headers
 #include "constants.h"
 
 #include <complex>
 extern "C" {
-    #include "libavutil/mem.h"
-    #include "libavcodec/avfft.h"
+    #include <libavutil/mem.h>
+    #include <libavcodec/avfft.h>
 }
 
 #define SAMPLES_DEFAULT_SIZE 512

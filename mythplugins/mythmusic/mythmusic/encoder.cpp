@@ -1,8 +1,11 @@
+// C++
 #include <iostream>
 
-#include <musicmetadata.h>
-#include <mythcontext.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythmetadata/musicmetadata.h>
 
+// MythMusic
 #include "encoder.h"
 
 

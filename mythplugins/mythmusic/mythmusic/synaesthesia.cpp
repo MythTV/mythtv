@@ -19,8 +19,8 @@
 #include <QImage>
 
 // MythTV
-#include <compat.h>
-#include <mythlogging.h>
+#include <libmythbase/compat.h>
+#include <libmythbase/mythlogging.h>
 
 // MythMusic
 #include "mainvisual.h"

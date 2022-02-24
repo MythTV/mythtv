@@ -1,7 +1,5 @@
-// ANSI C includes
-#include <cstdlib>
-
 // C++ includes
+#include <cstdlib>
 #include <iostream>
 
 // Qt includes
@@ -9,42 +7,39 @@
 #include <QLocale>
 
 // mythtv
-#include <mythuitextedit.h>
-#include <mythuistatetype.h>
-#include <mythuiprogressbar.h>
-#include <mythuibutton.h>
-#include <mythuiimage.h>
-#include <mythdialogbox.h>
-#include <mythuibuttonlist.h>
-#include <mythuibuttontree.h>
-#include <mythuicheckbox.h>
-#include <mythuivideo.h>
-#include <mythuitext.h>
-#include <audiooutput.h>
-#include <compat.h>
-#include <lcddevice.h>
-#include <musicmetadata.h>
-#include <mythdate.h>
-#include <mythrandom.h>
+#include <libmyth/audio/audiooutput.h>
+#include <libmythbase/lcddevice.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythrandom.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuibuttontree.h>
+#include <libmythui/mythuicheckbox.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuiprogressbar.h>
+#include <libmythui/mythuistatetype.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuitextedit.h>
+#include <libmythui/mythuivideo.h>
 
 // MythMusic includes
-#include "musicdata.h"
 #include "constants.h"
 #include "decoder.h"
-#include "mainvisual.h"
-#include "smartplaylist.h"
-#include "playlistcontainer.h"
-#include "search.h"
 #include "editmetadata.h"
-#include "playlist.h"
-
+#include "lyricsview.h"
+#include "mainvisual.h"
 #include "musiccommon.h"
-#include "playlistview.h"
+#include "musicdata.h"
+#include "playlist.h"
+#include "playlistcontainer.h"
 #include "playlisteditorview.h"
+#include "playlistview.h"
+#include "search.h"
+#include "searchview.h"
+#include "smartplaylist.h"
 #include "streamview.h"
 #include "visualizerview.h"
-#include "searchview.h"
-#include "lyricsview.h"
 
 MusicCommon::MusicCommon(MythScreenStack *parent, MythScreenType *parentScreen,
                          const QString &name)

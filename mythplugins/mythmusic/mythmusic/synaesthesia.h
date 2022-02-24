@@ -1,10 +1,15 @@
 #ifndef SYNAETHESIA
 #define SYNAETHESIA
 
+// C++
 #include <array>
-#include <visual.h>
-#include "polygon.h"
+
+// MythTV
+#include <libmyth/visual.h>
+
+// MythMusic
 #include "mainvisual.h"
+#include "polygon.h"
 
 class QImage;
 

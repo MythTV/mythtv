@@ -1,6 +1,7 @@
 #ifndef CDRIP_H_
 #define CDRIP_H_
 
+// C++
 #include <utility>
 
 // qt
@@ -8,11 +9,10 @@
 #include <QEvent>
 #include <QVector>
 
-// mythtv
-#include <musicmetadata.h>
-#include <mythscreentype.h>
-#include <mthread.h>
-
+// MythTV
+#include <libmythbase/mthread.h>
+#include <libmythmetadata/musicmetadata.h>
+#include <libmythui/mythscreentype.h>
 
 class MythUIText;
 class MythUITextEdit;

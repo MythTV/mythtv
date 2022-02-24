@@ -5,22 +5,21 @@
 
 // qt
 #include <QApplication>
-#include <QUrl>
 #include <QFileInfo>
+#include <QUrl>
 
-// mythtv
-#include <mythdownloadmanager.h>
-#include <mythdirs.h>
-#include <mythlogging.h>
-#include <mythrandom.h>
-#include <remotefile.h>
-#include <mythcorecontext.h>
-#include <musicmetadata.h>
-
+// MythTV
+#include <libmythbase/mythcorecontext.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythbase/mythdownloadmanager.h>
+#include <libmythbase/mythlogging.h>
+#include <libmythbase/mythrandom.h>
+#include <libmythbase/remotefile.h>
+#include <libmythmetadata/musicmetadata.h>
 
 // mythmusic
-#include "decoderhandler.h"
 #include "decoder.h"
+#include "decoderhandler.h"
 
 /**********************************************************************/
 

@@ -1,32 +1,32 @@
 // qt
+#include <QApplication>
 #include <QDir>
 #include <QFontMetrics>
-#include <QApplication>
 
-// myth
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <musicmetadata.h>
-#include <mythdialogbox.h>
-#include <mythuitext.h>
-#include <mythuiimage.h>
-#include <mythuicheckbox.h>
-#include <mythuitextedit.h>
-#include <mythuibutton.h>
-#include <mythuibuttonlist.h>
-#include <mythprogressdialog.h>
-#include <mythuifilebrowser.h>
-#include <mythlogging.h>
-#include <remotefile.h>
-#include <storagegroup.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythlogging.h>
+#include <libmythbase/remotefile.h>
+#include <libmythbase/storagegroup.h>
+#include <libmythmetadata/metaio.h>
+#include <libmythmetadata/musicmetadata.h>
+#include <libmythmetadata/musicutils.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythprogressdialog.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuicheckbox.h>
+#include <libmythui/mythuifilebrowser.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuitextedit.h>
 
 // mythmusic
-#include "importmusic.h"
-#include "genres.h"
 #include "editmetadata.h"
+#include "genres.h"
+#include "importmusic.h"
 #include "musicplayer.h"
-#include "metaio.h"
-#include "musicutils.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////

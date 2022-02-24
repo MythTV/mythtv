@@ -1,14 +1,17 @@
 #ifndef IMPORTMUSIC_H_
 #define IMPORTMUSIC_H_
 
+// C++
 #include <iostream>
 #include <utility>
 #include <vector>
 
+// Qt
 #include <QStringList>
 
-#include <mythscreentype.h>
-#include <mthread.h>
+// MythTV
+#include <libmythbase/mthread.h>
+#include <libmythui/mythscreentype.h>
 
 class MusicMetadata;
 class ImportMusicDialog;

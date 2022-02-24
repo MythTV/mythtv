@@ -5,12 +5,12 @@
 #include <QEvent>
 #include <QVector>
 
-#include <mythpluginexport.h>
-// mythui
-#include <mythscreentype.h>
+// MythTV
+#include <libmythbase/mythpluginexport.h>
+#include <libmythui/mythscreentype.h>
 
 // mythmusic
-#include <musiccommon.h>
+#include "musiccommon.h"
 
 class MythUIVideo;
 

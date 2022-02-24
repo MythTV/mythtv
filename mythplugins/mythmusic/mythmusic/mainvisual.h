@@ -7,21 +7,23 @@
 #ifndef MAINVISUAL_H
 #define MAINVISUAL_H
 
+// C++
 #include <vector>
 
 #include "constants.h"
 
-#include <QResizeEvent>
-#include <QPaintEvent>
-#include <QStringList>
+// Qt
 #include <QHideEvent>
-#include <QWidget>
-#include <QPixmap>
-#include <QTimer>
 #include <QList>
+#include <QPaintEvent>
+#include <QPixmap>
+#include <QResizeEvent>
+#include <QStringList>
+#include <QTimer>
+#include <QWidget>
 
 // MythTV headers
-#include <visual.h>
+#include <libmyth/visual.h>
 
 // MythMusic
 #include "visualize.h"

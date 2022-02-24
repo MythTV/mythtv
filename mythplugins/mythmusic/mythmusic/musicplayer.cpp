@@ -3,34 +3,35 @@
 
 // qt
 #include <QApplication>
-#include <QWidget>
+#include <QDir>
 #include <QFile>
 #include <QList>
-#include <QDir>
+#include <QWidget>
 
 // mythtv
-#include <mythcontext.h>
-#include <audiooutput.h>
-#include <mythdb.h>
-#include <mythdialogbox.h>
-#include <mythmainwindow.h>
-#include <musicutils.h>
-#include <mthreadpool.h>
-#include <mythuihelper.h>
+#include <libmyth/audio/audiooutput.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mthreadpool.h>
+#include <libmythbase/mythdb.h>
+#include <libmythmetadata/metaio.h>
+#include <libmythmetadata/musicutils.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuihelper.h>
 
 // mythmusic
-#include "musicdata.h"
-#include "musicplayer.h"
+#include "constants.h"
 #include "decoder.h"
 #include "decoderhandler.h"
-#include "metaio.h"
+#include "mainvisual.h"
+#include "miniplayer.h"
+#include "musicdata.h"
+#include "musicplayer.h"
+#include "playlistcontainer.h"
+
 #ifdef HAVE_CDIO
 #include "cddecoder.h"
 #endif
-#include "constants.h"
-#include "mainvisual.h"
-#include "miniplayer.h"
-#include "playlistcontainer.h"
 
 MusicPlayer  *gPlayer = nullptr;
 QString gCDdevice = "";

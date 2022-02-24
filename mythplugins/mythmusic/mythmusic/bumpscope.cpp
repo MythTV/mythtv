@@ -1,21 +1,24 @@
-#include "mainvisual.h"
-#include "bumpscope.h"
-
-#include <compat.h>
-#include <mythlogging.h>
-#include <mythrandom.h>
-
 // This was:
 // Bump Scope - Visualization Plugin for XMMS
 // Copyright (C) 1999-2001 Zinx Verituse
 
+// C++ headers
 #include <cmath>
 #include <cstdlib>
-
 #include <iostream>
 
+// QT headers
 #include <QCoreApplication>
 #include <QPainter>
+
+// MythTV headers
+#include <libmythbase/compat.h>
+#include <libmythbase/mythlogging.h>
+#include <libmythbase/mythrandom.h>
+
+// Mythmusic Headers
+#include "bumpscope.h"
+#include "mainvisual.h"
 
 BumpScope::BumpScope()
 {

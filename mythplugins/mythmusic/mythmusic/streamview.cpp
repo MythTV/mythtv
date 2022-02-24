@@ -1,28 +1,28 @@
 // C++ headers
 #include <chrono>
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 
 // qt
+#include <QDomDocument>
 #include <QKeyEvent>
 #include <QThread>
-#include <QDomDocument>
 
-// myth
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <mythmainwindow.h>
-#include <mythuibuttonlist.h>
-#include <mythuibutton.h>
-#include <mythuitext.h>
-#include <mythuiprogressbar.h>
-#include <mythuiutils.h>
-#include <mythdialogbox.h>
-#include <mythuihelper.h>
-#include <mythdownloadmanager.h>
-#include <mythdirs.h>
-#include <musicutils.h>
-#include <mythcoreutil.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcoreutil.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythbase/mythdownloadmanager.h>
+#include <libmythmetadata/musicutils.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuihelper.h>
+#include <libmythui/mythuiprogressbar.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuiutils.h>
 
 // mythmusic
 #include "musiccommon.h"

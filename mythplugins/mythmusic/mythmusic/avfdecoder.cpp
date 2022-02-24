@@ -22,36 +22,35 @@
 #include <chrono>
 
 // QT headers
-#include <QObject>
-#include <QIODevice>
 #include <QFile>
+#include <QIODevice>
+#include <QObject>
 #include <QRegularExpression>
 #include <QTimer>
 
-// Myth headers
+// MythTV headers
 #include <mythconfig.h>
-#include <mythcontext.h>
-#include <audiooutput.h>
-#include <audiooutpututil.h>
-#include <mythlogging.h>
-#include <decoderhandler.h>
-#include <mythavutil.h>
+#include <libmyth/audio/audiooutput.h>
+#include <libmyth/audio/audiooutpututil.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythlogging.h>
+#include <libmythmetadata/metaio.h>
+#include <libmythmetadata/metaioavfcomment.h>
+#include <libmythmetadata/metaioflacvorbis.h>
+#include <libmythmetadata/metaioid3.h>
+#include <libmythmetadata/metaiomp4.h>
+#include <libmythmetadata/metaiooggvorbis.h>
+#include <libmythmetadata/metaiowavpack.h>
+#include <libmythtv/mythavutil.h>
 
 // Mythmusic Headers
 #include "avfdecoder.h"
-#include "metaio.h"
-#include "metaioavfcomment.h"
-#include "metaioid3.h"
-#include "metaioflacvorbis.h"
-#include "metaiooggvorbis.h"
-#include "metaiomp4.h"
-#include "metaiowavpack.h"
 #include "decoderhandler.h"
 #include "musicplayer.h"
 
 extern "C" {
-#include "libavformat/avio.h"
-#include "libavutil/opt.h"
+    #include <libavformat/avio.h>
+    #include <libavutil/opt.h>
 }
 
 /****************************************************************************/

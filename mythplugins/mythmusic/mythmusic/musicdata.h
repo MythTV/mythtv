@@ -1,14 +1,15 @@
 #ifndef MUSICDATA_H_
 #define MUSICDATA_H_
 
+// C++
 #include <utility>
 
 // qt
 #include <QRunnable>
 
 // myth
-#include <mythpluginexport.h>
-#include <mythcorecontext.h>
+#include <libmythbase/mythcorecontext.h>
+#include <libmythbase/mythpluginexport.h>
 
 // mythmusic
 #include "playlistcontainer.h"

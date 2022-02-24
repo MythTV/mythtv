@@ -1,15 +1,19 @@
+// C++
+#include <iostream>
+
+// Qt
 #include <QString>
 #include <QDir>
 #include <QSqlError>
 
-#include <iostream>
-
-#include <musicmetadata.h>
-#include <mythcontext.h>
-#include <mythdbcheck.h>
-#include <libmythbase/mythdb.h>
+// MythTV
+#include <libmyth/mythcontext.h>
 #include <libmyth/schemawizard.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythdbcheck.h>
+#include <libmythmetadata/musicmetadata.h>
 
+// MythMusic
 #include "musicdbcheck.h"
 
 const QString currentDatabaseVersion = "1025";

@@ -1,13 +1,18 @@
 #ifndef AVFECODER_H_
 #define AVFECODER_H_
 
+// C++ headers
 #include <cstdint>
 
+// QT headers
 #include <QObject>
 
+// MythTV headers
+#include <libmyth/audio/audiooutputsettings.h>
+#include <libmythtv/mythavutil.h>
+
+// Mythmusic Headers
 #include "decoder.h"
-#include "mythavutil.h"
-#include <audiooutputsettings.h>
 #include "remoteavformatcontext.h"
 
 class QTimer;

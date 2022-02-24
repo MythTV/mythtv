@@ -1,35 +1,35 @@
-#include <iostream>
+// C++
 #include <cstdlib>
+#include <iostream>
 #include <unistd.h>
 
 // qt
+#include <QDomDocument>
 #include <QKeyEvent>
 #include <QThread>
-#include <QDomDocument>
 
-// myth
-#include <mythcontext.h>
-#include <mythversion.h>
-#include <mythdbcon.h>
-#include <mythmainwindow.h>
-#include <mythuibuttonlist.h>
-#include <mythuicheckbox.h>
-#include <mythuitext.h>
-#include <mythuibutton.h>
-#include <mythuitextedit.h>
-#include <mythuiutils.h>
-#include <mythdialogbox.h>
-#include <mythuistatetype.h>
-#include <mythuiprogressbar.h>
-#include <mythdownloadmanager.h>
-#include <mythuihelper.h>
-#include <mythdirs.h>
-#include <audiooutput.h>
-
+// MythTV
+#include <libmyth/audio/audiooutput.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythbase/mythdownloadmanager.h>
+#include <libmythbase/mythversion.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuicheckbox.h>
+#include <libmythui/mythuihelper.h>
+#include <libmythui/mythuiprogressbar.h>
+#include <libmythui/mythuistatetype.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuitextedit.h>
+#include <libmythui/mythuiutils.h>
 
 // mythmusic
-#include "musiccommon.h"
 #include "lyricsview.h"
+#include "musiccommon.h"
 #include "musicplayer.h"
 
 ///////////////////////////////////////////////////////////////////////////////

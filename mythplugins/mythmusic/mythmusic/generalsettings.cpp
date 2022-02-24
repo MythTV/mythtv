@@ -1,15 +1,15 @@
 // Qt
-#include <QString>
 #include <QDir>
+#include <QString>
 
 // MythTV
-#include <mythcorecontext.h>
-#include <mythdialogbox.h>
+#include <libmythbase/mythcorecontext.h>
+#include <libmythui/mythdialogbox.h>
 
 // MythMusic
-#include "musicplayer.h"
 #include "generalsettings.h"
 #include "musicdata.h"
+#include "musicplayer.h"
 
 bool GeneralSettings::Create()
 {

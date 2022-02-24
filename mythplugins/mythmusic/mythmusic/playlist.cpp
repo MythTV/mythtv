@@ -1,3 +1,4 @@
+// C++
 #include <algorithm>
 #include <cinttypes>
 #include <cstdlib>
@@ -10,21 +11,21 @@
 #include <QObject>
 #include <QRegularExpression>
 
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmyth/mythmediamonitor.h>
+#include <libmythbase/compat.h>
+#include <libmythbase/exitcodes.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythmiscutil.h>
+#include <libmythbase/mythsystemlegacy.h>
+
 // mythmusic
 #include "musicdata.h"
+#include "musicplayer.h"
 #include "playlist.h"
 #include "playlistcontainer.h"
 #include "smartplaylist.h"
-#include "musicplayer.h"
-
-// mythtv
-#include <mythcontext.h>
-#include <mythdb.h>
-#include <compat.h>
-#include <mythmediamonitor.h>
-#include <mythmiscutil.h>
-#include <mythsystemlegacy.h>
-#include <exitcodes.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Playlist

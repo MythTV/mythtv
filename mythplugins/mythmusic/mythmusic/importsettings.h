@@ -1,12 +1,12 @@
 #ifndef IMPORTSETTINGS_H
 #define IMPORTSETTINGS_H
 
-#include <mythscreentype.h>
-#include <mythuibutton.h>
-#include <mythuibuttonlist.h>
-#include <mythuicheckbox.h>
-#include <mythuitext.h>
-#include <mythuitextedit.h>
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuicheckbox.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuitextedit.h>
 
 class ImportSettings : public MythScreenType
 {

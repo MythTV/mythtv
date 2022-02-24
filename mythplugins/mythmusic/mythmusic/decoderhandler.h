@@ -5,18 +5,17 @@
 #include <iostream>
 
 // qt
-#include <QObject>
-#include <QIODevice>
 #include <QFile>
-#include <QUrl>
+#include <QIODevice>
 #include <QMutex>
+#include <QObject>
+#include <QUrl>
 
-// mythtv
-#include <mythobservable.h>
-#include <musicmetadata.h>
+// MythTV
+#include <libmythbase/mythobservable.h>
+#include <libmythmetadata/musicmetadata.h>
 
 // mythmusic
-
 #include "pls.h"
 
 class Decoder;

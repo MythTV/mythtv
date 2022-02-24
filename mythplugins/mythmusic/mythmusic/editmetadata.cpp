@@ -1,32 +1,34 @@
-// qt
-#include <QKeyEvent>
+// C++
 #include <utility>
 
-// mythtv
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <mythuihelper.h>
-#include <mythdirs.h>
-#include <mythdialogbox.h>
-#include <mythuitextedit.h>
-#include <mythuitext.h>
-#include <mythuibutton.h>
-#include <mythuicheckbox.h>
-#include <mythuistatetype.h>
-#include <mythuibuttonlist.h>
-#include <mythuispinbox.h>
-#include <mythuiimage.h>
-#include <mythuifilebrowser.h>
-#include <musicutils.h>
-#include <mythprogressdialog.h>
-#include <remotefile.h>
-#include <mthreadpool.h>
+// qt
+#include <QKeyEvent>
+
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mthreadpool.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythbase/remotefile.h>
+#include <libmythmetadata/metaio.h>
+#include <libmythmetadata/musicutils.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythprogressdialog.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuicheckbox.h>
+#include <libmythui/mythuifilebrowser.h>
+#include <libmythui/mythuihelper.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuispinbox.h>
+#include <libmythui/mythuistatetype.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuitextedit.h>
 
 // mythmusic
-#include "musicdata.h"
 #include "decoder.h"
 #include "genres.h"
-#include "metaio.h"
+#include "musicdata.h"
 #include "musicplayer.h"
 
 

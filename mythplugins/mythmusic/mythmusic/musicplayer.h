@@ -1,13 +1,11 @@
 #ifndef MUSICPLAYER_H_
 #define MUSICPLAYER_H_
 
-#include <mythpluginexport.h>
-// mythtv
-#include <audiooutput.h>
-#include <mythobservable.h>
-
-// libmythmetadata
-#include <musicmetadata.h>
+// MythTV
+#include <libmyth/audio/audiooutput.h>
+#include <libmythbase/mythobservable.h>
+#include <libmythbase/mythpluginexport.h>
+#include <libmythmetadata/musicmetadata.h>
 
 // mythmusic
 #include "decoderhandler.h"

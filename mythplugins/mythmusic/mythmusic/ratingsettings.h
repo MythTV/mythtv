@@ -1,9 +1,9 @@
 #ifndef RATINGSETTINGS_H
 #define RATINGSETTINGS_H
 
-#include <mythscreentype.h>
-#include <mythuispinbox.h>
-#include <mythuibutton.h>
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuispinbox.h>
 
 
 class RatingSettings : public MythScreenType

@@ -1,18 +1,19 @@
 
-#include "miniplayer.h"
-
+// C++
 #include <chrono>
 
-// mythtv
-#include <mythcontext.h>
-#include <mythmainwindow.h>
-#include <lcddevice.h>
+// Qt
+#include <QTimer>
+
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/lcddevice.h>
+#include <libmythui/mythmainwindow.h>
 
 // mythmusic
-#include "musicplayer.h"
 #include "decoder.h"
-
-#include <QTimer>
+#include "miniplayer.h"
+#include "musicplayer.h"
 
 
 MiniPlayer::MiniPlayer(MythScreenStack *parent)

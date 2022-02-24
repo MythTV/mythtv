@@ -1,10 +1,10 @@
 #ifndef VISUALIZATIONSETTINGS_H
 #define VISUALIZATIONSETTINGS_H
 
-#include <mythscreentype.h>
-#include <mythuispinbox.h>
-#include <mythuibutton.h>
-#include <mythuicheckbox.h>
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuicheckbox.h>
+#include <libmythui/mythuispinbox.h>
 
 class VisualizationSettings : public MythScreenType
 {

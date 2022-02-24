@@ -3,16 +3,20 @@
 #ifndef REMOTEAVFORMATCONTEXT_H
 #define REMOTEAVFORMATCONTEXT_H
 
+// C++
 #include <iostream>
+
+// Qt
 #include <QString>
 
-#include <remotefile.h>
-#include <mythlogging.h>
+// MythTV
+#include <libmythbase/mythlogging.h>
+#include <libmythbase/remotefile.h>
 
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavformat/avio.h>
-#include "libavutil/opt.h"
+#include <libavutil/opt.h>
 }
 
 class RemoteAVFormatContext

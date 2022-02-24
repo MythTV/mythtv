@@ -9,32 +9,30 @@
         music visualizers
 */
 
-// C
-#include <cmath>
-
 // C++
+#include <cmath>
 #include <iostream>
 
 // Qt
-#include <QCoreApplication>
 #include <QApplication>
-#include <QPainter>
+#include <QCoreApplication>
 #include <QImage>
+#include <QPainter>
 
 // MythTV
-#include <mythdbcon.h>
-#include <mythcontext.h>
-#include <mythmainwindow.h>
-#include <mythuihelper.h>
-#include <remotefile.h>
-#include <musicmetadata.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythbase/remotefile.h>
+#include <libmythmetadata/musicmetadata.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuihelper.h>
 
 // mythmusic
-#include "mainvisual.h"
-#include "visualize.h"
-#include "inlines.h"
 #include "decoder.h"
+#include "inlines.h"
+#include "mainvisual.h"
 #include "musicplayer.h"
+#include "visualize.h"
 
 static constexpr int FFTW_N { 512 };
 // static_assert(FFTW_N==SAMPLES_DEFAULT_SIZE)

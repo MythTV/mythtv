@@ -8,11 +8,11 @@
 #include <QEvent>
 #include <QVector>
 
-#include <mythpluginexport.h>
-// mythui
-#include <mythscreentype.h>
-#include <mythgenerictree.h>
-#include <mythuibuttonlist.h>
+// MythTV
+#include <libmythbase/mythpluginexport.h>
+#include <libmythui/mythgenerictree.h>
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythuibuttonlist.h>
 
 // mythmusic
 #include "musiccommon.h"

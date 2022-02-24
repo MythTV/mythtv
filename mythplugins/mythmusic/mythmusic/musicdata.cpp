@@ -1,20 +1,21 @@
+// C/C++
+#include <unistd.h> // for usleep()
+
 // qt
 #include <QApplication>
 
-// mythtv
-#include <mythscreenstack.h>
-#include <mythmainwindow.h>
-#include <mythprogressdialog.h>
-#include <musicmetadata.h>
-#include <musicfilescanner.h>
-#include <musicutils.h>
-#include <mthreadpool.h>
+// MythTV
+#include <libmythbase/mthreadpool.h>
+#include <libmythmetadata/musicfilescanner.h>
+#include <libmythmetadata/musicmetadata.h>
+#include <libmythmetadata/musicutils.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythprogressdialog.h>
+#include <libmythui/mythscreenstack.h>
 
 // mythmusic
 #include "musicdata.h"
 #include "musicplayer.h"
-
-#include <unistd.h> // for usleep()
 
 // this is the global MusicData object shared thoughout MythMusic
 MusicData  *gMusicData = nullptr;

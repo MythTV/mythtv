@@ -5,45 +5,46 @@
 #include <unistd.h>
 
 // Qt headers
-#include <QDir>
 #include <QApplication>
+#include <QDir>
 #include <QScopedPointer>
 
 // MythTV headers
-#include <mythcontext.h>
-#include <mythplugin.h>
-#include <mythmediamonitor.h>
-#include <mythdbcon.h>
-#include <mythdb.h>
-#include <mythpluginapi.h>
-#include <mythversion.h>
-#include <myththemedmenu.h>
-#include <compat.h>
-#include <mythuihelper.h>
-#include <mythprogressdialog.h>
-#include <lcddevice.h>
-#include <musicmetadata.h>
-#include <musicutils.h>
-#include <musicfilescanner.h>
+#include <libmyth/mythcontext.h>
+#include <libmyth/mythmediamonitor.h>
+#include <libmythbase/compat.h>
+#include <libmythbase/lcddevice.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythplugin.h>
+#include <libmythbase/mythpluginapi.h>
+#include <libmythbase/mythversion.h>
+#include <libmythmetadata/metaio.h>
+#include <libmythmetadata/musicfilescanner.h>
+#include <libmythmetadata/musicmetadata.h>
+#include <libmythmetadata/musicutils.h>
+#include <libmythui/mythprogressdialog.h>
+#include <libmythui/myththemedmenu.h>
+#include <libmythui/mythuihelper.h>
 
 // MythMusic headers
-#include "musicdata.h"
-#include "decoder.h"
 #include "cddecoder.h"
-#include "playlisteditorview.h"
-#include "playlistview.h"
-#include "streamview.h"
-#include "playlistcontainer.h"
+#include "config.h"
+#include "decoder.h"
+#include "generalsettings.h"
+#include "importmusic.h"
+#include "importsettings.h"
+#include "mainvisual.h"
+#include "musicdata.h"
 #include "musicdbcheck.h"
 #include "musicplayer.h"
-#include "mainvisual.h"
-#include "generalsettings.h"
 #include "playersettings.h"
-#include "visualizationsettings.h"
-#include "importsettings.h"
+#include "playlistcontainer.h"
+#include "playlisteditorview.h"
+#include "playlistview.h"
 #include "ratingsettings.h"
-#include "importmusic.h"
-#include "metaio.h"
+#include "streamview.h"
+#include "visualizationsettings.h"
 
 #ifdef HAVE_CDIO
 #include "cdrip.h"

@@ -2,13 +2,12 @@
 #define GENERALSETTINGS_H
 
 // MythTV
-#include <mythscreentype.h>
-#include <mythuispinbox.h>
-#include <mythuitext.h>
-#include <mythuitextedit.h>
-#include <mythuibutton.h>
-#include <mythuicheckbox.h>
-
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuicheckbox.h>
+#include <libmythui/mythuispinbox.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuitextedit.h>
 
 class GeneralSettings : public MythScreenType
 {

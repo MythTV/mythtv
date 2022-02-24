@@ -11,17 +11,17 @@
 #include <string>
 
 // qt
-#include <QPair>
+#include <QDomDocument>
+#include <QFileInfo>
 #include <QList>
 #include <QMap>
-#include <QStringList>
-#include <QFileInfo>
+#include <QPair>
 #include <QRegularExpression>
 #include <QSettings>
-#include <QDomDocument>
+#include <QStringList>
 
-// mythtv
-#include <mythlogging.h>
+// MythTV
+#include <libmythbase/mythlogging.h>
 
 // mythmusic
 #include "pls.h"

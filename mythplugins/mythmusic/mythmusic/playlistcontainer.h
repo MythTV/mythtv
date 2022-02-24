@@ -5,7 +5,7 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "mthread.h"
+#include <libmythbase/mthread.h>
 
 
 #define DEFAULT_PLAYLIST_NAME     "default_playlist_storage"

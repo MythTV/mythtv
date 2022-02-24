@@ -4,12 +4,11 @@
 // C
 #include <cstdlib>
 #include <cstring>
-
 #include <unistd.h>
 
 // Qt
-#include <QIODevice>
 #include <QFile>
+#include <QIODevice>
 #include <QObject>
 #include <QString>
 
@@ -18,9 +17,9 @@
 #include <cdio/logging.h>
 
 // MythTV
-#include <audiooutput.h>
-#include <mythcontext.h>
-#include <musicmetadata.h>
+#include <libmyth/audio/audiooutput.h>
+#include <libmyth/mythcontext.h>
+#include <libmythmetadata/musicmetadata.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>

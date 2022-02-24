@@ -1,14 +1,17 @@
-#include <unistd.h>
-
+// C++
 #include <cstdlib>
 #include <iostream>
+#include <unistd.h>
 
+// Qt
 #include <QString>
 
-// libmythmetadata
-#include <musicmetadata.h>
-#include <metaioflacvorbis.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythmetadata/metaioflacvorbis.h>
+#include <libmythmetadata/musicmetadata.h>
 
+// MythMusic
 #include "flacencoder.h"
 
 #include <FLAC/export.h>
@@ -21,7 +24,6 @@
 #endif
 
 #include <FLAC/assert.h>
-#include <mythcontext.h>
 
 FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
                          MusicMetadata *metadata)

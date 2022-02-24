@@ -1,7 +1,3 @@
-// ANSI C includes
-#include <cstdio>
-#include <cstring>
-
 // Unix C includes
 #include <sys/types.h>
 #include <fcntl.h>
@@ -10,6 +6,8 @@
 
 // C++ includes
 #include <chrono>
+#include <cstdio>
+#include <cstring>
 #include <iostream>
 #include <memory>
 
@@ -24,29 +22,27 @@
 #include <QUrl>
 #include <utility>
 
-// MythTV plugin includes
-#include <mythcontext.h>
-#include <mythdb.h>
-#include <lcddevice.h>
-#include <mythmediamonitor.h>
-#include <mythdirs.h>
-#include <mythdate.h>
-
-// MythUI
-#include <mythdialogbox.h>
-#include <mythuitext.h>
-#include <mythuicheckbox.h>
-#include <mythuitextedit.h>
-#include <mythuibutton.h>
-#include <mythuiprogressbar.h>
-#include <mythuibuttonlist.h>
-#include <mythsystemlegacy.h>
-#include <storagegroup.h>
-#include <remotefile.h>
-
-// MythUI headers
-#include <mythtv/libmythui/mythscreenstack.h>
-#include <mythtv/libmythui/mythprogressdialog.h>
+// MythTV includes
+#include <libmyth/mythcontext.h>
+#include <libmyth/mythmediamonitor.h>
+#include <libmythbase/lcddevice.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythbase/mythlogging.h>
+#include <libmythbase/mythsystemlegacy.h>
+#include <libmythbase/remotefile.h>
+#include <libmythbase/storagegroup.h>
+#include <libmythmetadata/musicutils.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythprogressdialog.h>
+#include <libmythui/mythscreenstack.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuicheckbox.h>
+#include <libmythui/mythuiprogressbar.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuitextedit.h>
 
 // MythMusic includes
 #include "cdrip.h"
@@ -58,8 +54,6 @@
 #include "flacencoder.h"
 #include "genres.h"
 #include "lameencoder.h"
-#include "musicutils.h"
-#include "mythlogging.h"
 #include "vorbisencoder.h"
 
 #ifdef HAVE_CDIO

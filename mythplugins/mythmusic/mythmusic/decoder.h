@@ -3,14 +3,16 @@
 #ifndef DECODER_H_
 #define DECODER_H_
 
-#include <QWaitCondition>
-#include <QStringList>
+// Qt
+#include <QCoreApplication>
 #include <QEvent>
 #include <QMutex>
-#include <QCoreApplication>
+#include <QStringList>
+#include <QWaitCondition>
 
-#include <mythobservable.h>
-#include <mthread.h>
+// MythTV
+#include <libmythbase/mthread.h>
+#include <libmythbase/mythobservable.h>
 
 class MusicMetadata;
 class MetaIO;

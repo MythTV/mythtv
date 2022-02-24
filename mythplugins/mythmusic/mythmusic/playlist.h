@@ -8,12 +8,12 @@
 #include <QList>
 #include <QMap>
 
-// libmythmetadata
-#include <musicmetadata.h>
+// MythTV
+#include <libmythmetadata/musicmetadata.h>
 
 // mythmusic
-#include "playlistcontainer.h"
 #include "musicplayer.h"
+#include "playlistcontainer.h"
 
 class PlaylistContainer;
 class Playlist;

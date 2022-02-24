@@ -3,8 +3,8 @@
 // qt
 #include <QKeyEvent>
 
-// myth
-#include <mythdialogbox.h>
+// MythTV
+#include <libmythui/mythdialogbox.h>
 
 // mythmusic
 #include "musiccommon.h"

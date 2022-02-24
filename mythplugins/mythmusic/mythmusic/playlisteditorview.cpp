@@ -1,27 +1,28 @@
-#include <iostream>
+// C++
 #include <cstdlib>
+#include <iostream>
 
 // qt
 #include <QKeyEvent>
 
-// myth
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <mythmainwindow.h>
-#include <mythuibuttontree.h>
-#include <mythuitext.h>
-#include <mythuiutils.h>
-#include <mythdialogbox.h>
-#include <mythdirs.h>
-#include <musicutils.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythmetadata/musicutils.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuibuttontree.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuiutils.h>
 
 // mythmusic
+#include "mainvisual.h"
+#include "musiccommon.h"
 #include "musicdata.h"
 #include "playlistcontainer.h"
-#include "musiccommon.h"
 #include "playlisteditorview.h"
 #include "smartplaylist.h"
-#include "mainvisual.h"
 
 MusicGenericTree::MusicGenericTree(MusicGenericTree *parent,
                                    const QString &name, const QString &action,

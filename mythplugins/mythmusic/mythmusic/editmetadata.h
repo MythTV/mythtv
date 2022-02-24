@@ -1,10 +1,12 @@
 #ifndef EDITMETADATA_H_
 #define EDITMETADATA_H_
 
+// C++
 #include <iostream>
 
-#include <mythscreentype.h>
-#include <musicmetadata.h>
+// MythTV
+#include <libmythmetadata/musicmetadata.h>
+#include <libmythui/mythscreentype.h>
 
 class MythUIStateType;
 class MythUIImage;

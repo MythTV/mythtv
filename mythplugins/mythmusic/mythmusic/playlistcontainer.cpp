@@ -1,10 +1,11 @@
-// MythTV
-#include <mythcontext.h>
-#include <mythdb.h>
-#include <compat.h>
-#include <mythlogging.h>
-
+// C/C++
 #include <utility>
+
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/compat.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythlogging.h>
 
 // mythmusic
 #include "playlist.h"

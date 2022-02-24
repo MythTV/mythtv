@@ -13,8 +13,8 @@ class MythUIButton;
 #include <QKeyEvent>
 #include <QCoreApplication>
 
-// mythtv
-#include <mythscreentype.h>
+// MythTV
+#include <libmythui/mythscreentype.h>
 
 struct SmartPLOperator;
 struct SmartPLField;

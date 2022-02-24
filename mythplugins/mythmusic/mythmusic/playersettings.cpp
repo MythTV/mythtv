@@ -2,10 +2,11 @@
 #include <QString>
 
 // MythTV
-#include <mythcorecontext.h>
+#include <libmythbase/mythcorecontext.h>
 
-#include "playersettings.h"
+// MythMusic
 #include "musicplayer.h"
+#include "playersettings.h"
 
 bool PlayerSettings::Create()
 {

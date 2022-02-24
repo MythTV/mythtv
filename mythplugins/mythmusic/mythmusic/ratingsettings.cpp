@@ -2,7 +2,7 @@
 #include <QString>
 
 // MythTV
-#include <mythcorecontext.h>
+#include <libmythbase/mythcorecontext.h>
 
 #include "ratingsettings.h"
 

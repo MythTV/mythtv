@@ -3,14 +3,14 @@
 
 // qt
 #include <QEvent>
-#include <QVector>
 #include <QTimer>
+#include <QVector>
 
-// myth
-#include <mythscreentype.h>
+// MythTV
+#include <libmythui/mythscreentype.h>
 
 // mythmusic
-#include <musiccommon.h>
+#include "musiccommon.h"
 
 class MythUIText;
 class MythUIProgressBar;

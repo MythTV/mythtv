@@ -4,25 +4,23 @@
 // warranty, or liability of any kind.
 //
 
-// C
-#include <cmath>
-#include <cstdio>
-
 // C++
 #include <algorithm>
+#include <cmath>
+#include <cstdio>
 #include <iostream>
 
 // Qt
 #include <QPainter>
 
-// mythtv
-#include <mythuivideo.h>
+// MythTV
+#include <libmythui/mythuivideo.h>
 
 // mythmusic
-#include "visualize.h"
-#include "mainvisual.h"
 #include "constants.h"
+#include "mainvisual.h"
 #include "musicplayer.h"
+#include "visualize.h"
 
 // fast inlines
 #include "inlines.h"

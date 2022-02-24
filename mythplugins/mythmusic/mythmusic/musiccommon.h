@@ -6,14 +6,14 @@
 #include <QObject>
 
 // mythtv
-#include <mythpluginexport.h>
-#include <audiooutput.h>
-#include <mythscreentype.h>
-#include <musicmetadata.h>
+#include <libmyth/audio/audiooutput.h>
+#include <libmythbase/mythpluginexport.h>
+#include <libmythmetadata/musicmetadata.h>
+#include <libmythui/mythscreentype.h>
 
 // mythmusic
-#include "playlist.h"
 #include "musicplayer.h"
+#include "playlist.h"
 
 class Output;
 class Decoder;

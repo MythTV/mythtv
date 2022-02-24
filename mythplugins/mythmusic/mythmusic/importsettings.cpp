@@ -2,8 +2,9 @@
 #include <QString>
 
 // MythTV
-#include <mythcorecontext.h>
+#include <libmythbase/mythcorecontext.h>
 
+// MythMusic
 #include "importsettings.h"
 
 bool ImportSettings::Create()

@@ -1,20 +1,21 @@
-#include <iostream>
+// C++
 #include <cstdlib>
+#include <iostream>
 
 // qt
 #include <QKeyEvent>
 #include <QTimer>
 
 // myth
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <mythmainwindow.h>
-#include <mythuibuttonlist.h>
-#include <mythuitext.h>
-#include <mythuiimage.h>
-#include <mythuistatetype.h>
-#include <mythuiutils.h>
-#include <mythdialogbox.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuistatetype.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuiutils.h>
+#include <libmythui/mythdialogbox.h>
 
 // mythmusic
 #include "musiccommon.h"

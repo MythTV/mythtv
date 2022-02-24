@@ -6,12 +6,12 @@
 #include <QVector>
 
 // myth
-#include <mythscreentype.h>
-#include <musicmetadata.h>
-#include <lyricsdata.h>
+#include <libmythmetadata/lyricsdata.h>
+#include <libmythmetadata/musicmetadata.h>
+#include <libmythui/mythscreentype.h>
 
 // mythmusic
-#include <musiccommon.h>
+#include "musiccommon.h"
 
 
 class LyricsView : public MusicCommon

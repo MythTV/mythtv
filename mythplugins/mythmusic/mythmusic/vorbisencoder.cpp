@@ -11,14 +11,14 @@
 #include <QString>
 
 // MythTV
-#include <mythcontext.h>
-#include <mythrandom.h>
-#include <musicmetadata.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythrandom.h>
+#include <libmythmetadata/metaiooggvorbis.h>
+#include <libmythmetadata/musicmetadata.h>
 
 // MythMusic
 #include "encoder.h"
 #include "vorbisencoder.h"
-#include "metaiooggvorbis.h"
 
 
 static int write_page(ogg_page *page, FILE *fp)

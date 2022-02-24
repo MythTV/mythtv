@@ -1,33 +1,33 @@
 // c/c++
-#include <unistd.h>
 #include <iostream>
+#include <unistd.h>
+#include <utility>
 
 // qt
 #include <QKeyEvent>
 #include <QSqlDriver>
 #include <QSqlField>
-#include <utility>
 
-// mythtv
-#include <mythcontext.h>
-#include <mythmainwindow.h>
-#include <mythdb.h>
-#include <mythuihelper.h>
-#include <mythscreentype.h>
-#include <mythuitext.h>
-#include <mythuitextedit.h>
-#include <mythuibuttonlist.h>
-#include <mythuibutton.h>
-#include <mythuispinbox.h>
-#include <mythuicheckbox.h>
-#include <mythdialogbox.h>
-#include <mythdate.h>
-#include <musicmetadata.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythdb.h>
+#include <libmythmetadata/musicmetadata.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuicheckbox.h>
+#include <libmythui/mythuihelper.h>
+#include <libmythui/mythuispinbox.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuitextedit.h>
 
 // mythmusic
+#include "musiccommon.h"
 #include "musicdata.h"
 #include "smartplaylist.h"
-#include "musiccommon.h"
 
 struct SmartPLField
 {

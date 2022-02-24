@@ -23,21 +23,21 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
 
+// c++
+#include <iostream>
+
 // qt
 #include <QApplication>
 #include <QString>
 
-// myth
-#include <mythcontext.h>
-#include <mythlogging.h>
-#include "musicmetadata.h"
-#include "metaioid3.h"
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythlogging.h>
+#include <libmythmetadata/metaioid3.h>
+#include <libmythmetadata/musicmetadata.h>
 
 // mythmusic
 #include "lameencoder.h"
-
-// c++
-#include <iostream>
 
 static int write_buffer(char *buf, int bufsize, FILE *fp)
 {

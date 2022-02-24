@@ -4,16 +4,16 @@
 // qt
 #include <QKeyEvent>
 
-// myth
-#include <mythdialogbox.h>
-#include <mythuitextedit.h>
-#include <mythuibuttonlist.h>
-#include <mythuitext.h>
-#include <mythdb.h>
+// MythTV
+#include <libmythbase/mythdb.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuitextedit.h>
 
 // mythmusic
-#include "musicdata.h"
 #include "musiccommon.h"
+#include "musicdata.h"
 #include "searchview.h"
 
 SearchView::SearchView(MythScreenStack *parent, MythScreenType *parentScreen)
