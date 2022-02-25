@@ -4,16 +4,16 @@
 // qt
 #include <QEvent>
 
-// myth
-#include "mythlogging.h"
-#include "mythcontext.h"
-#include "mythmainwindow.h"
-#include "mythuihelper.h"
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythlogging.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuihelper.h>
 
 // mythbrowser
-#include "webpage.h"
 #include "bookmarkeditor.h"
 #include "mythbrowser.h"
+#include "webpage.h"
 
 MythBrowser::MythBrowser(MythScreenStack *parent, QStringList &urlList)
     : MythScreenType (parent, "mythbrowser"),

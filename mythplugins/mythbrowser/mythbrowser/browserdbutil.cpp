@@ -1,15 +1,15 @@
 // Qt
 #include <QSqlError>
 
-// myth
-#include <mythcontext.h>
-#include <mythdb.h>
-#include <mythdbcheck.h>
-#include <mythsorthelper.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythdbcheck.h>
+#include <libmythbase/mythsorthelper.h>
 
 // mythbrowser
-#include "browserdbutil.h"
 #include "bookmarkmanager.h"
+#include "browserdbutil.h"
 
 const QString currentDatabaseVersion = "1003";
 const QString MythBrowserVersionName = "BrowserDBSchemaVer";

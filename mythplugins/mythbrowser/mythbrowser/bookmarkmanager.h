@@ -1,11 +1,9 @@
 #ifndef BOOKMARKMANAGER_H
 #define BOOKMARKMANAGER_H
 
-// libmythbase
-#include <stringutil.h>
-
-// libmythui
-#include <mythscreentype.h>
+// MythTV
+#include <libmythbase/stringutil.h>
+#include <libmythui/mythscreentype.h>
 
 class MythBrowser;
 class MythDialogBox;

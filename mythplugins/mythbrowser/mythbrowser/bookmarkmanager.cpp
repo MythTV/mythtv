@@ -5,13 +5,13 @@
 #include <QString>
 
 // MythTV
-#include <mythmainwindow.h>
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <mythdirs.h>
-#include <mythuicheckbox.h>
-#include <mythuibuttonlist.h>
-#include <mythsystemlegacy.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythbase/mythsystemlegacy.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuicheckbox.h>
 
 // mythbrowser
 #include "bookmarkmanager.h"

@@ -4,12 +4,12 @@
 // qt
 #include <QApplication>
 
-// myth
-#include <mythcontext.h>
-#include <mythversion.h>
-#include <mythscreenstack.h>
-#include <mythmainwindow.h>
-#include <mythpluginapi.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythpluginapi.h>
+#include <libmythbase/mythversion.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythscreenstack.h>
 
 // mythbrowser
 #include "bookmarkmanager.h"

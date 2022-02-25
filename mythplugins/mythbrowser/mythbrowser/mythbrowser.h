@@ -3,12 +3,13 @@
 
 #include <QUrl>
 
-#include <mythuiwebbrowser.h>
-#include <mythuibuttonlist.h>
-#include <mythuibutton.h>
-#include <mythscreentype.h>
-#include <mythdialogbox.h>
-#include <mythuiprogressbar.h>
+// MythTV
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuiprogressbar.h>
+#include <libmythui/mythuiwebbrowser.h>
 
 #include "bookmarkmanager.h"
 

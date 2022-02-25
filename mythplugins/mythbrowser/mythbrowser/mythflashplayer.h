@@ -1,7 +1,7 @@
 #ifndef MYTHFLASHPLAYER_H
 #define MYTHFLASHPLAYER_H
 
-#include <mythscreentype.h>
+#include <libmythui/mythscreentype.h>
 
 class MythUIWebBrowser;
 

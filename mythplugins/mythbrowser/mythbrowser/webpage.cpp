@@ -5,9 +5,9 @@
 #include <QEvent>
 #include <QIcon>
 
-// myth
-#include "mythlogging.h"
-#include "mythmainwindow.h"
+// MythTV
+#include <libmythbase/mythlogging.h>
+#include <libmythui/mythmainwindow.h>
 
 // mythbrowser
 #include "mythbrowser.h"
