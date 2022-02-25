@@ -7309,18 +7309,12 @@ if test "$ID" = "raspbian"; then
     esac
 fi
 
-## Call FFmpeg configure here
-echo
-echo '#### FFmpeg CONFIGURATION ####'
-currentpwd="$PWD"
-cd external/FFmpeg
-eval ./configure \
-$ffopts \
---extra-cflags='"$ffmpeg_extra_cflags"' \
---extra-ldflags='"$ffmpeg_extra_ldflags"' \
---extra-libs='"$ffmpeg_extra_ldflags"' \
+append ffopts \
+--extra-cflags=\'"$ffmpeg_extra_cflags"\' \
+--extra-ldflags=\'"$ffmpeg_extra_ldflags"\' \
+--extra-libs=\'"$ffmpeg_extra_ldflags"\' \
 --enable-stripping \
---strip='"echo skipping strip"' \
+--strip=\'"echo skipping strip"\' \
 --disable-manpages  \
 --disable-podpages  \
 --disable-doc \
@@ -7331,6 +7325,14 @@ $ffopts \
 --enable-pic \
 --disable-demuxer=mpegtsraw \
 --disable-indev=dshow
+echo
+echo "ffopts = $ffopts"
+## Call FFmpeg configure here
+echo
+echo '#### FFmpeg CONFIGURATION ####'
+currentpwd="$PWD"
+cd external/FFmpeg
+eval ./configure $ffopts
 rc=$?
 if [ $rc != 0 ] ; then
     echo "ERROR FFmpeg configure failed"
