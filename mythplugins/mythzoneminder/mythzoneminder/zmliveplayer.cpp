@@ -14,14 +14,14 @@
 
 // qt
 #include <QDateTime>
-#include <QTimer>
 #include <QKeyEvent>
+#include <QTimer>
 
-// myth
-#include <mythcontext.h>
-#include <mythuihelper.h>
-#include <mythmainwindow.h>
-#include <mythdialogbox.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuihelper.h>
 
 // zoneminder
 #include "zmliveplayer.h"

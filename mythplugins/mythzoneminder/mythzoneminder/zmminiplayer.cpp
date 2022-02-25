@@ -7,11 +7,11 @@
 // Qt
 #include <QTimer>
 
-// mythtv
-#include <mythcontext.h>
-#include <lcddevice.h>
-#include <mythuiimage.h>
-#include <mythmainwindow.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/lcddevice.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuiimage.h>
 
 // mythzoneminder
 #include "zmclient.h"

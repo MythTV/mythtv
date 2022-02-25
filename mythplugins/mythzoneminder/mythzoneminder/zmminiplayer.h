@@ -1,7 +1,8 @@
 #ifndef ZMMINIPLAYER_H_
 #define ZMMINIPLAYER_H_
 
-#include <mythpluginexport.h>
+#include <libmythbase/mythpluginexport.h>
+
 #include "zmliveplayer.h"
 
 class QTimer;

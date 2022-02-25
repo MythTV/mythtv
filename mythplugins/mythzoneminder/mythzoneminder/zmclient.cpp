@@ -2,17 +2,18 @@
     zmclient.cpp
 */
 
+// C++
 #include <unistd.h>
 
 // qt
 #include <QTimer>
 
-//myth
-#include "mythcontext.h"
-#include "mythdialogbox.h"
-#include <mythdate.h>
-#include "mythmainwindow.h"
-#include "mythlogging.h"
+//MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythlogging.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
 
 //zoneminder
 #include "zmclient.h"

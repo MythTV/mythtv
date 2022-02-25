@@ -18,12 +18,12 @@
 // qt
 #include <QKeyEvent>
 
-// libmythui
-#include <mythuibuttonlist.h>
-#include <mythuibutton.h>
-#include <mythuicheckbox.h>
-#include <mythscreentype.h>
-#include <mythdialogbox.h>
+// MythTV
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuicheckbox.h>
 
 // zm
 #include "zmdefines.h"

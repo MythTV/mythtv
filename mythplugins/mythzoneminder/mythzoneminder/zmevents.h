@@ -16,13 +16,13 @@
 #define ZMEVENTS_H
 
 // qt
-#include <QPixmap>
 #include <QKeyEvent>
+#include <QPixmap>
 
-// mythtv
-#include <mythuibuttonlist.h>
-#include <mythscreentype.h>
-#include <mythdialogbox.h>
+// MythTV
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythuibuttonlist.h>
 
 // zm
 #include <zmdefines.h>

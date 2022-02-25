@@ -4,7 +4,7 @@
 // Qt headers
 
 // MythTV headers
-#include "mthread.h"
+#include <libmythbase/mthread.h>
 
 // zm
 #include "zmdefines.h"

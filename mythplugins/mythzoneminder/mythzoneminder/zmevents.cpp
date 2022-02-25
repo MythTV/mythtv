@@ -12,17 +12,18 @@
  *
  * ============================================================ */
 
-#include <iostream>
+// C++
 #include <cstdlib>
+#include <iostream>
 
 // qt
 #include <QKeyEvent>
 
-// myth
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <mythmainwindow.h>
-#include <mythdate.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythui/mythmainwindow.h>
 
 // zoneminder
 #include "zmevents.h"

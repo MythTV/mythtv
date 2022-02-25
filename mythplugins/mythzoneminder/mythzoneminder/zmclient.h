@@ -1,14 +1,15 @@
 #ifndef ZMCLIENT_H_
 #define ZMCLIENT_H_
 
+// C++
 #include <array>
 #include <iostream>
 #include <vector>
 
-// myth
-#include <mythpluginexport.h>
-#include <mythsocket.h>
-#include <mythimage.h>
+// MythTV
+#include <libmythbase/mythpluginexport.h>
+#include <libmythbase/mythsocket.h>
+#include <libmythui/mythimage.h>
 
 // zm
 #include "zmdefines.h"

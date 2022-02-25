@@ -2,11 +2,12 @@
     zomeminder settings.cpp
 */
 
+// C++
 #include <unistd.h>
 
-// myth
-#include <mythcontext.h>
-#include <mythdate.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdate.h>
 
 // mythzoneminder
 #include "zmsettings.h"

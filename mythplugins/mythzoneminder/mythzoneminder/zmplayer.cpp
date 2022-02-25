@@ -12,11 +12,9 @@
  *
  * ============================================================ */
 
-// C
-#include <cstdlib>
-
 // C++
 #include <chrono>
+#include <cstdlib>
 #include <iostream>
 
 // Qt
@@ -24,11 +22,11 @@
 #include <QTimer>
 
 // MythTV
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <mythuihelper.h>
-#include <mythmainwindow.h>
-#include <mythdate.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuihelper.h>
 
 // zoneminder
 #include "zmclient.h"

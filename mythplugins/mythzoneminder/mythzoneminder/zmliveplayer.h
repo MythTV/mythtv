@@ -23,10 +23,10 @@
 #include <QObject>
 
 // mythtv
-#include <mythscreentype.h>
-#include <mythuiimage.h>
-#include <mythuitext.h>
-#include <mythdialogbox.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuitext.h>
 
 // mythzoneminder
 #include "zmdefines.h"

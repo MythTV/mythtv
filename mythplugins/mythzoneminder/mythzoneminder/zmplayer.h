@@ -15,16 +15,17 @@
 #ifndef ZMPLAYER_H
 #define ZMPLAYER_H
 
+// C++
 #include <vector>
 
 // qt
 #include <QKeyEvent>
 
-// myth
-#include <mythscreentype.h>
-#include <mythuibutton.h>
-#include <mythuiimage.h>
-#include <mythuitext.h>
+// MythTV
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuitext.h>
 
 // zm
 #include "zmdefines.h"

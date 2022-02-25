@@ -12,17 +12,18 @@
  *
  * ============================================================ */
 
+// C++
 #include <iostream>
 #include <unistd.h>
 
-// myth
-#include <mythcontext.h>
-#include <mythversion.h>
-#include <mythpluginapi.h>
-#include <mythmainwindow.h>
-#include <myththemedmenu.h>
-#include <mythuihelper.h>
-#include <mythlogging.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythlogging.h>
+#include <libmythbase/mythpluginapi.h>
+#include <libmythbase/mythversion.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/myththemedmenu.h>
+#include <libmythui/mythuihelper.h>
 
 //zone minder
 #include "zmsettings.h"
