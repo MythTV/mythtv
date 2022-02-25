@@ -8,28 +8,28 @@
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QDir>
-#include <QTimer>
 #include <QRegularExpression>
+#include <QTimer>
 #include <QUrl>
 
 // MythTV headers
-#include <mythuibuttonlist.h>
-#include <mythmainwindow.h>
-#include <mythdialogbox.h>
-#include <mythcontext.h>
-#include <mythuiimage.h>
-#include <mythsystemlegacy.h>
-#include <mythuitext.h>
-#include <mythdate.h>
-#include <mythdirs.h>
-#include <mythdb.h>
-#include <mythdownloadmanager.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythbase/mythdownloadmanager.h>
+#include <libmythbase/mythsystemlegacy.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuitext.h>
 
 // MythNews headers
 #include "mythnews.h"
+#include "mythnewsconfig.h"
 #include "mythnewseditor.h"
 #include "newsdbutil.h"
-#include "mythnewsconfig.h"
 
 #define LOC      QString("MythNews: ")
 #define LOC_WARN QString("MythNews, Warning: ")

@@ -10,7 +10,7 @@
 #endif
 
 // MythTV headers
-#include <mythscreentype.h>
+#include <libmythui/mythscreentype.h>
 
 class MythNewsConfigPriv;
 class MythUIButtonList;

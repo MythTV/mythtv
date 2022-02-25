@@ -5,22 +5,22 @@
 #include <vector>
 
 // QT headers
-#include <QObject>
-#include <QDomDocument>
 #include <QByteArray>
 #include <QDateTime>
-#include <QVariant>
+#include <QDomDocument>
+#include <QObject>
 #include <QObject>
 #include <QString>
+#include <QUrl>
+#include <QVariant>
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
 #include <QMutex>
 #else
 #include <QRecursiveMutex>
 #endif
-#include <QUrl>
 
 // MythTV headers
-#include <stringutil.h>
+#include <libmythbase/stringutil.h>
 
 // MythNews headers
 #include "newsarticle.h"

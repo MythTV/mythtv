@@ -2,7 +2,7 @@
 #define MYTHNEWS_H
 
 // MythTV headers
-#include <mythscreentype.h>
+#include <libmythui/mythscreentype.h>
 
 // MythNews headers
 #include "newssite.h"

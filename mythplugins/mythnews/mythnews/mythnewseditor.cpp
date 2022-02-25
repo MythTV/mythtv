@@ -1,14 +1,14 @@
 
 // MythTV headers
-#include <mythuibutton.h>
-#include <mythuitext.h>
-#include <mythuitextedit.h>
-#include <mythuicheckbox.h>
-#include <mythmainwindow.h>
-#include <mythdialogbox.h>
-#include <mythdate.h>
-#include <mythcontext.h>
-#include <mythdbcon.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuicheckbox.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuitextedit.h>
 
 // MythNews headers
 #include "mythnewseditor.h"

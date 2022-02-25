@@ -6,16 +6,16 @@
 #include <QApplication>
 
 // MythTV headers
-#include <mythcontext.h>
-#include <mythplugin.h>
-#include <mythpluginapi.h>
-#include <mythversion.h>
-#include <mythmainwindow.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythplugin.h>
+#include <libmythbase/mythpluginapi.h>
+#include <libmythbase/mythversion.h>
+#include <libmythui/mythmainwindow.h>
 
 // MythNews headers
-#include "newsdbcheck.h"
 #include "mythnews.h"
 #include "mythnewsconfig.h"
+#include "newsdbcheck.h"
 
 static int RunNews(void)
 {

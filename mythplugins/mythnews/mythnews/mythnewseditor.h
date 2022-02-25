@@ -11,7 +11,7 @@
 #include <QString>
 
 // MythTV headers
-#include <mythscreentype.h>
+#include <libmythui/mythscreentype.h>
 
 class MythUIText;
 class MythUITextEdit;

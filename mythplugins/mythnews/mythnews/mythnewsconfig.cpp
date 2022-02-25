@@ -1,14 +1,14 @@
 // QT Headers
-#include <QStringList>
 #include <QFile>
+#include <QStringList>
 
 // MythTV headers
-#include <mythuitext.h>
-#include <mythuibuttonlist.h>
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <mythmainwindow.h>
-#include <mythdirs.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuitext.h>
 
 // MythNews headers
 #include "mythnewsconfig.h"

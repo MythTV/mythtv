@@ -1,5 +1,5 @@
 // Myth headers
-#include <mythdb.h>
+#include <libmythbase/mythdb.h>
 
 // MythNews headers
 #include "newsdbutil.h"

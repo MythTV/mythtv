@@ -2,12 +2,12 @@
 #include <QFile>
 
 // MythTV headers
-#include <mythdate.h>
-#include <mythlogging.h>
-#include <mythdirs.h>
-#include <mythdownloadmanager.h>
-#include <mythevent.h>
-#include <mythsorthelper.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythbase/mythdownloadmanager.h>
+#include <libmythbase/mythevent.h>
+#include <libmythbase/mythlogging.h>
+#include <libmythbase/mythsorthelper.h>
 
 // MythNews headers
 #include "newssite.h"

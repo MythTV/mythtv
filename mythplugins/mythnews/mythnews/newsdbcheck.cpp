@@ -2,13 +2,13 @@
 #include <iostream>
 
 // QT headers
-#include <QString>
 #include <QSqlError>
+#include <QString>
 
 // Myth headers
-#include <mythcontext.h>
-#include <mythdb.h>
-#include <mythdbcheck.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythdbcheck.h>
 
 // MythNews headers
 #include "newsdbcheck.h"
