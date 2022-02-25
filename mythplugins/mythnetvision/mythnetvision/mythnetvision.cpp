@@ -5,13 +5,13 @@
 #include <QApplication>
 
 // MythTV headers
-#include <mythcontext.h>
-#include <mythplugin.h>
-#include <mythpluginapi.h>
-#include <mythversion.h>
-#include <mythmainwindow.h>
-#include <netgrabbermanager.h>
-#include <mythrssmanager.h>
+#include <libmyth/mythcontext.h>
+#include <libmyth/mythrssmanager.h>
+#include <libmyth/netgrabbermanager.h>
+#include <libmythbase/mythplugin.h>
+#include <libmythbase/mythpluginapi.h>
+#include <libmythbase/mythversion.h>
+#include <libmythui/mythmainwindow.h>
 
 // MythNetVision headers
 #include "netsearch.h"

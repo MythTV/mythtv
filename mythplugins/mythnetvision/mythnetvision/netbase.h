@@ -1,12 +1,12 @@
 #ifndef NETBASE_H_
 #define NETBASE_H_
 
-#include <QString>
 #include <QDomDocument>
+#include <QString>
 #include <QUrl>
 
-#include <netutils.h>
-#include <mythscreentype.h>
+#include <libmyth/netutils.h>
+#include <libmythui/mythscreentype.h>
 
 class MythUIImage;
 class MythUIStateType;

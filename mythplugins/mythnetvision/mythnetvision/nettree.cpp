@@ -1,31 +1,31 @@
 // qt
-#include <QString>
 #include <QFileInfo>
+#include <QString>
 #include <QtAlgorithms>
 
-// myth
-#include <mythdb.h>
-#include <mythcontext.h>
-#include <mythdirs.h>
-#include <mythsystemlegacy.h>
-#include <mythprogressdialog.h>
-#include <rssparse.h>
-#include <netutils.h>
-#include <mythrssmanager.h>
-#include <netgrabbermanager.h>
-#include <mythcoreutil.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmyth/mythrssmanager.h>
+#include <libmyth/netgrabbermanager.h>
+#include <libmyth/netutils.h>
+#include <libmyth/rssparse.h>
+#include <libmythbase/mythcoreutil.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythbase/mythsorthelper.h>
+#include <libmythbase/mythsystemlegacy.h>
 #include <libmythmetadata/videoutils.h>
-#include <mythuiimage.h>
-#include <mythuitext.h>
-#include <mythscreenstack.h>
-#include <mythmainwindow.h>
-#include <mythsorthelper.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythprogressdialog.h>
+#include <libmythui/mythscreenstack.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuitext.h>
 
 // mythnetvision
-#include "treeeditor.h"
+#include "netcommon.h"
 #include "nettree.h"
 #include "rsseditor.h"
-#include "netcommon.h"
+#include "treeeditor.h"
 
 class GrabberScript;
 

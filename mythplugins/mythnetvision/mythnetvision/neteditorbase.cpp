@@ -1,17 +1,17 @@
 #include <QDomDocument>
 
 // MythTV headers
-#include <mythuibuttonlist.h>
-#include <mythmainwindow.h>
-#include <mythdialogbox.h>
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <mythdirs.h>
-#include <netutils.h>
+#include <libmyth/mythcontext.h>
+#include <libmyth/netutils.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuibuttonlist.h>
 
 // Tree headers
-#include "neteditorbase.h"
 #include "netcommon.h"
+#include "neteditorbase.h"
 
 #define LOC      QString("NetEditorBase: ")
 #define LOC_WARN QString("NetEditorBase, Warning: ")

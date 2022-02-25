@@ -16,9 +16,8 @@
 #include <QString>
 
 // MythTV headers
-#include <mythscreentype.h>
-
-#include "mythrssmanager.h"
+#include <libmyth/mythrssmanager.h>
+#include <libmythui/mythscreentype.h>
 
 class MythUITextEdit;
 class MythUIButton;

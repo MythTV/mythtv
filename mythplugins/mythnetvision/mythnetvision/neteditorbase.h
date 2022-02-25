@@ -2,17 +2,16 @@
 #define NETEDITORBASE_H
 
 // Qt headers
-#include <QString>
 #include <QDomDocument>
-#include <QNetworkRequest>
-#include <QNetworkReply>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QString>
 
 // MythTV headers
-#include <mythscreentype.h>
-#include <netgrabbermanager.h>
-#include <mythscreentype.h>
-#include <mythprogressdialog.h>
+#include <libmyth/netgrabbermanager.h>
+#include <libmythui/mythprogressdialog.h>
+#include <libmythui/mythscreentype.h>
 
 class MythUIButtonList;
 

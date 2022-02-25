@@ -3,18 +3,18 @@
 
 #include "netbase.h"
 
-// libmythui
-#include <mythuibutton.h>
-#include <mythuibuttonlist.h>
-#include <mythuitextedit.h>
-#include <mythuiprogressbar.h>
-#include <mythprogressdialog.h>
-#include <mythuistatetype.h>
-#include <mythscreentype.h>
-#include <mythdialogbox.h>
-#include <netgrabbermanager.h>
-#include <mythrssmanager.h>
-#include <mythdownloadmanager.h>
+// MythTV
+#include <libmyth/mythrssmanager.h>
+#include <libmyth/netgrabbermanager.h>
+#include <libmythbase/mythdownloadmanager.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythprogressdialog.h>
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuiprogressbar.h>
+#include <libmythui/mythuistatetype.h>
+#include <libmythui/mythuitextedit.h>
 
 class NetSearch : public NetBase
 {

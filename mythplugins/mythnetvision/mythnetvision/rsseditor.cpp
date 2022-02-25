@@ -1,25 +1,26 @@
-#include <QDomDocument>
+// Qt
 #include <QDateTime>
+#include <QDomDocument>
 #include <QImageReader>
 
 // MythTV headers
-#include <mythuibutton.h>
-#include <mythuibuttonlist.h>
-#include <mythuitextedit.h>
-#include <mythuicheckbox.h>
-#include <mythuifilebrowser.h>
-#include <mythmainwindow.h>
-#include <mythdialogbox.h>
-#include <mythuiimage.h>
-#include <mythuitext.h>
-#include <mythdate.h>
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <mythdirs.h>
-#include <netutils.h>
-#include <rssparse.h>
-#include <mythdownloadmanager.h>
-#include <mythsorthelper.h>
+#include <libmyth/mythcontext.h>
+#include <libmyth/netutils.h>
+#include <libmyth/rssparse.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythbase/mythdownloadmanager.h>
+#include <libmythbase/mythsorthelper.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuicheckbox.h>
+#include <libmythui/mythuifilebrowser.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuitextedit.h>
 
 // RSS headers
 #include "rsseditor.h"

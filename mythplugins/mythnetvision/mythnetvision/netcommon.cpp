@@ -1,8 +1,8 @@
 #include <QDir>
 
-#include <mythdirs.h>
-#include <mythcontext.h>
-#include <remotefile.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythbase/remotefile.h>
 
 #include "netcommon.h"
 

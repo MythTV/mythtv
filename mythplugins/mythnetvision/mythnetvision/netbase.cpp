@@ -1,18 +1,18 @@
 #include <QDir>
 
-#include <mythdate.h>
-#include <mythdirs.h>
-#include <mythdate.h>
-#include <mythdialogbox.h>
-#include <mythcontext.h>
-#include <remotefile.h>
-#include <mythcoreutil.h>
-#include <mythscreenstack.h>
-#include <mythuihelper.h>
-#include <mythmainwindow.h>
-#include <mythprogressdialog.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcoreutil.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythbase/remotefile.h>
 #include <libmythmetadata/metadataimagedownload.h>
 #include <libmythmetadata/videoutils.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythprogressdialog.h>
+#include <libmythui/mythscreenstack.h>
+#include <libmythui/mythuihelper.h>
 
 #include "netbase.h"
 

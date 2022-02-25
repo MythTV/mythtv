@@ -1,12 +1,12 @@
 #ifndef NETCOMMON_H_
 #define NETCOMMON_H_
 
-#include <QString>
 #include <QDomDocument>
+#include <QString>
 #include <QUrl>
 
-#include <netutils.h>
-#include <mythscreentype.h>
+#include <libmyth/netutils.h>
+#include <libmythui/mythscreentype.h>
 
 // Generic Data Formatting
 QString GetThumbnailFilename(const QString& url, const QString& title);

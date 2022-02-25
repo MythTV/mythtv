@@ -8,22 +8,21 @@
 #include <QCoreApplication>
 #include <QEventLoop>
 
-// libmyth headers
-#include <exitcodes.h>
-#include <mythcontext.h>
-#include <mythdb.h>
-#include <mythversion.h>
-#include <remoteutil.h>
-#include <mythmiscutil.h>
-#include <netutils.h>
-#include <mythtranslation.h>
+// MythTV headers
 #include <mythconfig.h>
-#include <netgrabbermanager.h>
-#include <mythrssmanager.h>
-#include <mythcommandlineparser.h>
-#include <mythlogging.h>
-
-#include <mythpluginexport.h>
+#include <libmyth/mythcontext.h>
+#include <libmyth/mythrssmanager.h>
+#include <libmyth/netgrabbermanager.h>
+#include <libmyth/netutils.h>
+#include <libmyth/remoteutil.h>
+#include <libmythbase/exitcodes.h>
+#include <libmythbase/mythcommandlineparser.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythlogging.h>
+#include <libmythbase/mythmiscutil.h>
+#include <libmythbase/mythpluginexport.h>
+#include <libmythbase/mythtranslation.h>
+#include <libmythbase/mythversion.h>
 
 GrabberDownloadThread *gdt = nullptr;
 RSSManager *rssMan = nullptr;

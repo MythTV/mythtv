@@ -1,5 +1,6 @@
+#include <libmyth/netutils.h>
+
 #include "searcheditor.h"
-#include <netutils.h>
 
 bool SearchEditor::InsertInDB(GrabberScript *script)
 {

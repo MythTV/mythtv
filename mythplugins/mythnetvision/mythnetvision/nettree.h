@@ -3,19 +3,19 @@
 
 #include "netbase.h"
 
-// libmythui
-#include <mythuibuttonlist.h>
-#include <mythuibuttontree.h>
-#include <mythgenerictree.h>
-#include <mythuiprogressbar.h>
-#include <mythprogressdialog.h>
-#include <mythuistatetype.h>
-#include <mythscreentype.h>
-#include <mythdialogbox.h>
-#include <netgrabbermanager.h>
-#include <mythrssmanager.h>
-#include <mythdownloadmanager.h>
+// MythTV
+#include <libmyth/mythrssmanager.h>
+#include <libmyth/netgrabbermanager.h>
+#include <libmythbase/mythdownloadmanager.h>
 #include <libmythmetadata/metadataimagedownload.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythgenerictree.h>
+#include <libmythui/mythprogressdialog.h>
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuibuttontree.h>
+#include <libmythui/mythuiprogressbar.h>
+#include <libmythui/mythuistatetype.h>
 
 enum DialogType { DLG_DEFAULT = 0, DLG_GALLERY = 0x1, DLG_TREE = 0x2,
                   DLG_BROWSER = 0x4, dtLast };
