@@ -2,19 +2,19 @@
 #include <unistd.h>
 
 // MythTV headers
-#include <lcddevice.h>
-#include <mythcontext.h>
-#include <mythplugin.h>
-#include <mythpluginapi.h>
-#include <mythversion.h>
-#include <myththemedmenu.h>
-#include <mythmainwindow.h>
-#include <mythuihelper.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/lcddevice.h>
+#include <libmythbase/mythplugin.h>
+#include <libmythbase/mythpluginapi.h>
+#include <libmythbase/mythversion.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/myththemedmenu.h>
+#include <libmythui/mythuihelper.h>
 
 // MythWeather headers
+#include "sourceManager.h"
 #include "weather.h"
 #include "weatherSetup.h"
-#include "sourceManager.h"
 #include "weatherdbcheck.h"
 
 SourceManager *srcMan = nullptr;

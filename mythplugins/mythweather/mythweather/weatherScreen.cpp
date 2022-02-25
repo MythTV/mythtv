@@ -2,7 +2,7 @@
 #include <vector>
 
 // MythTV headers
-#include <mythcontext.h>
+#include <libmyth/mythcontext.h>
 
 // MythWeather headers
 #include "weather.h"

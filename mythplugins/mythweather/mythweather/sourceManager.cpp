@@ -1,22 +1,22 @@
 
 // QT headers
+#include <QApplication>
 #include <QDir>
 #include <QFileInfo>
 #include <QString>
 #include <QStringList>
-#include <QApplication>
 
 // MythTV headers
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <mythdb.h>
-#include <mythprogressdialog.h>
-#include <mythdirs.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythdirs.h>
+#include <libmythui/mythprogressdialog.h>
 
 // MythWeather headers
+#include "sourceManager.h"
 #include "weatherScreen.h"
 #include "weatherSource.h"
-#include "sourceManager.h"
 
 #define LOC QString("SourceManager: ")
 #define LOC_ERR QString("SourceManager Error: ")

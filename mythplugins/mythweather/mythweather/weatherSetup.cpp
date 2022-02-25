@@ -1,19 +1,17 @@
-
-// MythWeather headers
-#include "weatherScreen.h"
-#include "weatherSource.h"
-#include "sourceManager.h"
-#include "weatherSetup.h"
-
-// MythTV headers
-//#include <mythdbcon.h>
-#include <mythdb.h>
-#include <mythprogressdialog.h>
-
 // QT headers
 #include <QApplication>
 #include <QSqlError>
 #include <QVariant>
+
+// MythTV headers
+#include <libmythbase/mythdb.h>
+#include <libmythui/mythprogressdialog.h>
+
+// MythWeather headers
+#include "sourceManager.h"
+#include "weatherScreen.h"
+#include "weatherSetup.h"
+#include "weatherSource.h"
 
 #define GLBL_SCREEN 0
 #define SCREEN_SETUP_SCREEN 1

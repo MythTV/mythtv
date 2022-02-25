@@ -1,11 +1,14 @@
 #ifndef WEATHER_SOURCE_H
 #define WEATHER_SOURCE_H
 
-#include <QStringList>
-#include <QObject>
-#include <QTimer>
+// Qt
 #include <QFileInfo>
-#include "mythsystemlegacy.h"
+#include <QObject>
+#include <QStringList>
+#include <QTimer>
+
+// MythTV
+#include <libmythbase/mythsystemlegacy.h>
 
 // MythWeather headers
 #include "weatherUtils.h"

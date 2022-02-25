@@ -1,23 +1,22 @@
 
 // C headers
-#include <unistd.h>
 #include <cstdlib>
+#include <unistd.h>
 
 // QT headers
 #include <QApplication>
 
 // MythTV headers
-#include <mythdb.h>
-#include <mythcontext.h>
-
-#include <mythuitext.h>
-#include <mythdate.h>
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdate.h>
+#include <libmythbase/mythdb.h>
+#include <libmythui/mythuitext.h>
 
 // MythWeather headers
-#include "weatherScreen.h"
 #include "sourceManager.h"
-#include "weatherSetup.h"
 #include "weather.h"
+#include "weatherScreen.h"
+#include "weatherSetup.h"
 
 Weather::Weather(MythScreenStack *parent, const QString &name, SourceManager *srcMan)
     : MythScreenType(parent, name),

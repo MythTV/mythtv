@@ -1,12 +1,15 @@
-#include <QString>
+// Qt
 #include <QDir>
-#include <QStringList>
 #include <QSqlError>
+#include <QString>
+#include <QStringList>
 
-#include <mythcontext.h>
-#include <mythdb.h>
-#include <mythdbcheck.h>
+// MythTV
+#include <libmyth/mythcontext.h>
+#include <libmythbase/mythdb.h>
+#include <libmythbase/mythdbcheck.h>
 
+// MythWeather
 #include "weatherdbcheck.h"
 
 const QString currentDatabaseVersion = "1007";

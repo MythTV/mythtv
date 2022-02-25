@@ -1,11 +1,12 @@
 // QT headers
+#include <QCoreApplication>
 #include <QString>
 #include <QStringList>
-#include <QCoreApplication>
 
-#include <mythdirs.h>
-#include "mythmainwindow.h"
-#include "mythuihelper.h"
+// MythTV
+#include <libmythbase/mythdirs.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythuihelper.h>
 
 // MythWeather headers
 #include "weatherUtils.h"

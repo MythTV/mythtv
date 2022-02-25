@@ -2,13 +2,13 @@
 #define WEATHERSCREEN_H
 
 // QT headers
-#include <QStringList>
 #include <QMap>
+#include <QStringList>
 
 // MythTV headers
-#include <mythscreentype.h>
-#include <mythuitext.h>
-#include <mythuiimage.h>
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuitext.h>
 
 // MythWeather headers
 #include "weatherUtils.h"

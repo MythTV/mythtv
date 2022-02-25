@@ -1,6 +1,7 @@
 #ifndef WEATHERUTILS_H
 #define WEATHERUTILS_H
 
+// C++
 #include <utility>
 
 // QT headers
@@ -12,7 +13,7 @@
 #include <QString>
 
 // MythTV headers
-#include <mythcontext.h>
+#include <libmyth/mythcontext.h>
 
 #define SI_UNITS 0
 #define ENG_UNITS 1
