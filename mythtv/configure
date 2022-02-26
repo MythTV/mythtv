@@ -1449,7 +1449,6 @@ LICENSE_LIST="
 
 PROGRAM_LIST="
     ffprobe
-    ffserver
     ffmpeg
     ffplay
 "
@@ -2609,8 +2608,6 @@ ffmpeg_select="aformat_filter anull_filter atrim_filter format_filter
                null_filter
                trim_filter"
 ffprobe_deps="avcodec avformat"
-ffserver_deps="avformat fork sarestart"
-ffserver_select="ffm_muxer rtp_protocol rtsp_demuxer"
 
 # mythtv dependencies
 audio_oss_deps_any="soundcard_h sys_soundcard_h"
@@ -4811,7 +4808,6 @@ case $target_os in
         enable  windows
         disable x11
         disable qtdbus
-        disable ffserver
         ###### Standard ffmpeg configure stuff follows:
         if test $target_os = "mingw32ce"; then
             disable network
@@ -4907,7 +4903,6 @@ case $target_os in
         enabled shared && ! enabled small && check_cmd $windres --version && enable gnu_windres
         ;;
     *-dos|freedos|opendos)
-        disable ffserver
         disable $INDEV_LIST $OUTDEV_LIST
         network_extralibs="-lsocket"
         objformat="coff"
@@ -7681,7 +7676,6 @@ CXXPPFLAGS=$CXXPPFLAGS
 ECXXFLAGS=$ECXXFLAGS
 DOXYGEN=$doxygen
 LDFLAGS=$LDFLAGS
-LDFLAGS-ffserver=$FFSERVERLDFLAGS
 LDEXEFLAGS=$LDEXEFLAGS
 LDLIBFLAGS=$LDLIBFLAGS
 ASMSTRIPFLAGS=$ASMSTRIPFLAGS
