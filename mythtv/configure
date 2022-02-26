@@ -1444,7 +1444,6 @@ LICENSE_LIST="
 
 PROGRAM_LIST="
     ffprobe
-    ffserver
     ffmpeg
     ffplay
 "
@@ -4355,7 +4354,6 @@ case $target_os in
         enable  windows
         disable x11
         disable qtdbus
-        disable ffserver
         ###### Standard ffmpeg configure stuff follows:
         if test $target_os = "mingw32ce"; then
             disable network
@@ -4451,7 +4449,6 @@ case $target_os in
         enabled shared && ! enabled small && check_cmd $windres --version && enable gnu_windres
         ;;
     *-dos|freedos|opendos)
-        disable ffserver
         network_extralibs="-lsocket"
         objformat="coff"
         enable dos_paths
@@ -7175,7 +7172,6 @@ CXXPPFLAGS=$CXXPPFLAGS
 ECXXFLAGS=$ECXXFLAGS
 DOXYGEN=$doxygen
 LDFLAGS=$LDFLAGS
-LDFLAGS-ffserver=$FFSERVERLDFLAGS
 LDEXEFLAGS=$LDEXEFLAGS
 LDLIBFLAGS=$LDLIBFLAGS
 ASMSTRIPFLAGS=$ASMSTRIPFLAGS

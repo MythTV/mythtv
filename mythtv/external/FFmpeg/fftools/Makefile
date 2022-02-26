@@ -42,9 +42,6 @@ mythffmpeg:	ffmpeg_g
 mythffprobe: ffprobe_g
 	cp ffprobe_g mythffprobe
 
-mythffserver: ffserver_g
-	cp ffserver_g mythffserver
-
 mythffplay: ffplay_g
 	cp ffplay_g mythffplay
 
