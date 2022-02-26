@@ -3404,7 +3404,9 @@ if test "$cpu" = host; then
         ;;
     esac
 
-    if test "${cpu:-host}" = host ; then
+    if test "${cpu:-host}" != host ; then
+        cpuflags_native="-march=native"
+    else
         enable proc_opt_old
         cpu="$arch"
     fi
@@ -3947,6 +3949,9 @@ elif enabled x86; then
 
 fi
 
+if [ -n "$cpuflags_native" ]; then
+    cpuflags="$cpuflags_native"
+fi
 
 # if architecture specific flags don't work blank them
 if test -n "$cpuflags"; then
@@ -6375,6 +6380,10 @@ ffmpeg_optenableif() {
         shift
     done
 }
+
+if [ -n "$cpuflags_native" ]; then
+    cpu="host"
+fi
 
 ffopts=
 ffmpeg_optset arch cross_prefix sysroot sysinclude cc cxx ld cpu

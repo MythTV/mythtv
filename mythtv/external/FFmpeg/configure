@@ -5240,6 +5240,10 @@ if test "$cpu" = host; then
         ;;
     esac
 
+    if test "${cpu:-host}" != host ; then
+        cpuflags_native="-march=native"
+    fi
+
     test "${cpu:-host}" = host &&
         die "--cpu=host not supported with compiler $cc"
 fi
@@ -5604,6 +5608,10 @@ else
         enable fast_64bit
     fi
 
+fi
+
+if [ -n "$cpuflags_native" ]; then
+    cpuflags="$cpuflags_native"
 fi
 
 if [ "$cpu" != generic ]; then
