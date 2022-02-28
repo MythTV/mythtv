@@ -6,9 +6,9 @@ using_opengl: QT += opengl
 
 TEMPLATE = app
 TARGET = test_audioconvert
-DEPENDPATH += . ../.. ../../audio ../../logging ../../../libmythbase
+DEPENDPATH += . ../.. ../../audio ../../../libmythbase
 INCLUDEPATH += . ../.. ../../audio ../../../.. ../../../../external/FFmpeg
- INCLUDEPATH += ../../logging ../../../libmythbase
+INCLUDEPATH += ../../../libmythbase
 INCLUDEPATH += ../../../libmythservicecontracts
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION

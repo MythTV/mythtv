@@ -5,8 +5,8 @@ QT += xml sql network testlib
 
 TEMPLATE = app
 TARGET = test_mythsystem
-DEPENDPATH += . ../.. ../../logging
-INCLUDEPATH += . ../.. ../../logging
+DEPENDPATH += . ../..
+INCLUDEPATH += . ../..
 LIBS += -L../.. -lmythbase-$$LIBVERSION
 LIBS += -Wl,$$_RPATH_$${PWD}/../..
 

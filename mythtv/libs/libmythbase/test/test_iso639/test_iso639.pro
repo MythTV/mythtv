@@ -5,8 +5,8 @@ QT += testlib
 
 TEMPLATE = app
 TARGET = test_iso639
-DEPENDPATH += . ../.. ../../logging
-INCLUDEPATH += . ../.. ../../logging
+DEPENDPATH += . ../..
+INCLUDEPATH += . ../..
 LIBS += -L../.. -lmythbase-$$LIBVERSION
 LIBS += -Wl,$$_RPATH_$${PWD}/../..
 
