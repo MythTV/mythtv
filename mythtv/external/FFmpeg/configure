@@ -4887,7 +4887,7 @@ if test "$cpu" = host; then
     esac
 
     if test "${cpu:-host}" != host ; then
-        cpuflags_native="-march=native"
+        cpuflags_native="-march=native -mtune=native"
     fi
 
     test "${cpu:-host}" = host &&
