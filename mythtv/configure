@@ -3405,7 +3405,7 @@ if test "$cpu" = host; then
     esac
 
     if test "${cpu:-host}" != host ; then
-        cpuflags_native="-march=native"
+        cpuflags_native="-march=native -mtune=native"
     else
         enable proc_opt_old
         cpu="$arch"
