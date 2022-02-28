@@ -188,7 +188,7 @@ bool SatIPRTSP::Play(QStringList &pids)
     LOG(VB_RECORD, LOG_DEBUG, LOC2 + "PLAY");
 
     QUrl url = QUrl(m_requestUrl);
-    url.setQuery("");
+    url.setQuery(QString());
     url.setPath(QString("/stream=%1").arg(m_streamid));
 
     QString pids_str = QString("pids=%1").arg(!pids.empty() ? pids.join(",") : "none");
@@ -417,7 +417,7 @@ void SatIPRTSP::timerEvent(QTimerEvent* timerEvent)
 
     QUrl url = QUrl(m_requestUrl);
     url.setPath("/");
-    url.setQuery("");
+    url.setQuery(QString());
 
     sendMessage(url, "OPTIONS");
 }
