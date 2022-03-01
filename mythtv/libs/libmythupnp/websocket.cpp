@@ -1,7 +1,9 @@
-#include <chrono>
-
 // Own header
 #include "websocket.h"
+
+// C++
+#include <algorithm>
+#include <chrono>
 
 // MythTV headers
 #include "mythlogging.h"
@@ -27,7 +29,7 @@ WebSocketServer::WebSocketServer() :
 {
     setObjectName("WebSocketServer");
     // Number of connections processed concurrently
-    int maxThreads = qMax(QThread::idealThreadCount() * 2, 2); // idealThreadCount can return -1
+    int maxThreads = std::max(QThread::idealThreadCount() * 2, 2); // idealThreadCount can return -1
     // Don't allow more connections than we can process, it will simply cause
     // browsers to stall
     setMaxPendingConnections(maxThreads);
