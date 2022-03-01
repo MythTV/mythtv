@@ -6,8 +6,6 @@
 
 class QTcpSocket;
 
-#define HTTP_CHUNKSIZE 65536L  // 64k
-
 class MythHTTPParser
 {
   public:

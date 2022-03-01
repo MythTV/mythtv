@@ -9,11 +9,13 @@
 #include "mythbaseexp.h"
 
 // Std
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 
 /// A group of functions shared between HTTP and WebSocket code.
 
-#define HTTP_CHUNKSIZE 65536L // 64k
+#define HTTP_CHUNKSIZE INT64_C(65536) // 64k
 
 #define JSONRPC  QStringLiteral("jsonrpc")
 #define XMLRPC   QStringLiteral("xmlrpc")
