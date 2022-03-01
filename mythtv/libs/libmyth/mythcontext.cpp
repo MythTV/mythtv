@@ -621,10 +621,10 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
 bool MythContextPrivate::SaveDatabaseParams(
     const DatabaseParams &params, bool force)
 {
-    bool ret = true;
+    bool success = true;
 
     // only rewrite file if it has changed
-    if (params != m_dbParams || force)
+    if (force || (params != m_dbParams))
     {
         /* Read in the current file on the filesystem, only setting/clearing as
         necessary.  This prevents losing changes to the file from between when it
@@ -667,16 +667,16 @@ bool MythContextPrivate::SaveDatabaseParams(
         config.ClearValue(kDefaultMFE + "DBHostPing");
 
         // actually save the file
-        config.Save();
+        success = config.Save();
 
-        // Save the new settings:
+        // Use the new settings:
         m_dbParams = params;
         gCoreContext->GetDB()->SetDatabaseParams(m_dbParams);
 
         // If database has changed, force its use:
         ResetDatabase();
     }
-    return ret;
+    return success;
 }
 
 void MythContextSlotHandler::OnCloseDialog(void)
