@@ -113,7 +113,8 @@ class MythContextPrivate : public QObject
     void    EnableDBerrors(void);
     void    ResetDatabase(void) const;
 
-    int     ChooseBackend(const QString &error);
+    BackendSelection::Decision
+            ChooseBackend(const QString &error);
     int     UPnPautoconf(std::chrono::milliseconds milliSeconds = 2s);
     bool    DefaultUPnP(QString& Error);
     bool    UPnPconnect(const DeviceLocation *backend, const QString &PIN);
@@ -496,8 +497,7 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
         if (manualSelect)
         {
             // Get the user to select a backend from a possible list:
-            auto d = (BackendSelection::Decision)ChooseBackend(failure);
-            switch (d)
+            switch (ChooseBackend(failure))
             {
                 case BackendSelection::kAcceptConfigure:
                     break;
@@ -1154,7 +1154,7 @@ void MythContextPrivate::ResetDatabase(void) const
 /**
  * Search for backends via UPnP, put up a UI for the user to choose one
  */
-int MythContextPrivate::ChooseBackend(const QString &error)
+BackendSelection::Decision MythContextPrivate::ChooseBackend(const QString &error)
 {
     TempMainWindow();
 
@@ -1173,7 +1173,7 @@ int MythContextPrivate::ChooseBackend(const QString &error)
 
     EndTempWindow();
 
-    return (int)ret;
+    return ret;
 }
 
 /**
