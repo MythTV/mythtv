@@ -45,7 +45,7 @@ MMulticastSocketDevice::MMulticastSocketDevice(
     m_address(sAddress), m_port(nPort)
 {
 #if 0
-    ttl = gCoreContext->GetConfiguration()->GetValue( "UPnP/TTL", 4 );
+    ttl = XmlConfiguration().GetValue( "UPnP/TTL", 4 );
 #endif
 
     if (ttl == 0)

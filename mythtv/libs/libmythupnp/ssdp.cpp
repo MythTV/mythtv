@@ -9,6 +9,7 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
+#include "ssdp.h"
 
 #include <algorithm>
 #include <cerrno>
@@ -18,7 +19,6 @@
 
 #include "libmythbase/configuration.h"
 #include "libmythbase/mythchrono.h"
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
 
@@ -78,10 +78,12 @@ SSDP::SSDP() :
 {
     LOG(VB_UPNP, LOG_NOTICE, "Starting up SSDP Thread..." );
 
-    XmlConfiguration *pConfig = MythCoreContext::GetConfiguration();
+    {
+        auto config = XmlConfiguration();
 
-    m_nPort       = pConfig->GetValue("UPnP/SSDP/Port"      , SSDP_PORT      );
-    m_nSearchPort = pConfig->GetValue("UPnP/SSDP/SearchPort", SSDP_SEARCHPORT);
+        m_nPort       = config.GetValue("UPnP/SSDP/Port"      , SSDP_PORT      );
+        m_nSearchPort = config.GetValue("UPnP/SSDP/SearchPort", SSDP_SEARCHPORT);
+    }
 
     m_sockets[ SocketIdx_Search    ] =
         new MMulticastSocketDevice();
@@ -694,8 +696,7 @@ SSDPExtension::SSDPExtension( int nServicePort , const QString &sSharePath)
     m_nServicePort(nServicePort)
 {
     m_nSupportedMethods |= (RequestTypeMSearch | RequestTypeNotify);
-    m_sUPnpDescPath = MythCoreContext::GetConfiguration()->GetValue( "UPnP/DescXmlPath",
-                                                 m_sSharePath );
+    m_sUPnpDescPath = XmlConfiguration().GetValue("UPnP/DescXmlPath", m_sSharePath);
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -23,7 +23,6 @@
 #include "httprequest.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/configuration.h"
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 
 #include "upnp.h"
@@ -61,9 +60,9 @@ QString LookupUDN( const QString &sDeviceType )
     }
 
     sList.removeLast();
-    XmlConfiguration *pConfig = MythCoreContext::GetConfiguration();
+    auto config = XmlConfiguration(); // read-write
     QString sName = "UPnP/UDN/" + sList.last();
-    QString sUDN  = pConfig->GetValue( sName, "" );
+    QString sUDN  = config.GetValue(sName, "");
 
     LOG(VB_UPNP, LOG_INFO, sLoc + " sName=" + sName + ", sUDN=" + sUDN);
 
@@ -75,8 +74,8 @@ QString LookupUDN( const QString &sDeviceType )
         // DLNA compliant, we need to remove them
         sUDN = sUDN.mid(1, 36);
 
-        pConfig->SetValue( sName, sUDN );
-        pConfig->Save();
+        config.SetValue(sName, sUDN);
+        config.Save();
     }
 
     return( sUDN );
