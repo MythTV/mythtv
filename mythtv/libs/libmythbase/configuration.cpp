@@ -28,6 +28,8 @@ bool XmlConfiguration::Load()
 {
     QString pathName = m_path + '/' + m_fileName;
 
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Loading %1").arg(pathName));
+
     QFile file(pathName);
 
     if (file.exists() && !m_fileName.isEmpty())  // Ignore empty filenames
@@ -75,6 +77,8 @@ bool XmlConfiguration::Save()
 
     QString pathName = m_path + '/' + m_fileName;
     QString old      = pathName + ".old";
+
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Saving %1").arg(pathName));
 
     QFile file(pathName + ".new");
     
@@ -183,13 +187,19 @@ QString XmlConfiguration::GetValue(const QString &setting)
     // -=>TODO: This Always assumes firstChild is a Text Node... should change
     if (!node.isNull() && !(textNode = node.firstChild().toText()).isNull())
     {
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Got \"%1\" for \"%2\"").arg(textNode.nodeValue(), setting));
+
         return textNode.nodeValue();
     }
+
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Using default for \"%1\"").arg(setting));
     return QString();
 }
 
 void XmlConfiguration::SetValue(const QString &setting, const QString& value)
 {
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Setting \"%1\" to \"%2\"").arg(setting, value));
+
     QDomNode node = FindNode(setting, true);
 
     if (!node.isNull())
@@ -212,6 +222,7 @@ void XmlConfiguration::SetValue(const QString &setting, const QString& value)
 
 void XmlConfiguration::ClearValue(const QString &setting)
 {
+    LOG(VB_GENERAL, LOG_DEBUG, QString("clearing %1").arg(setting));
     QDomNode node = FindNode(setting, false);
     if (!node.isNull())
     {
