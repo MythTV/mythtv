@@ -370,7 +370,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
     request.m_eBrowseFlag       =
         GetBrowseFlag( pRequest->m_mapParams[ "browseflag"    ] );
     request.m_sFilter           = pRequest->m_mapParams[ "filter"        ];
-    request.m_nStartingIndex    = Max(pRequest->m_mapParams[ "startingindex" ].toUShort(),
+    request.m_nStartingIndex    = std::max(pRequest->m_mapParams[ "startingindex" ].toUShort(),
                                       uint16_t(0));
     request.m_nRequestedCount   =
         pRequest->m_mapParams[ "requestedcount"].toUShort();
@@ -447,8 +447,8 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                 if (request.m_nRequestedCount == 0)
                     request.m_nRequestedCount = nTotalMatches;
 
-                uint16_t nStart = Max( request.m_nStartingIndex, uint16_t( 0 ));
-                uint16_t nCount = Min( nTotalMatches, request.m_nRequestedCount );
+                uint16_t nStart = std::max(request.m_nStartingIndex, uint16_t(0));
+                uint16_t nCount = std::min(nTotalMatches, request.m_nRequestedCount);
 
                 DetermineClient( pRequest, &request );
 
