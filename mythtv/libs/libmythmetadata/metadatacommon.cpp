@@ -1,8 +1,10 @@
+#include <algorithm>
+#include <utility>
+
 // Qt headers
 #include <QCoreApplication>
 #include <QLocale>
 #include <QMetaType>
-#include <utility>
 
 #include "rssparse.h"
 #include "programinfo.h"
@@ -1364,7 +1366,7 @@ int editDistance( const QString& s, const QString& t )
                 int x = D( i - 1, j );
                 int y = D( i - 1, j - 1 );
                 int z = D( i, j - 1 );
-                D( i, j ) = 1 + qMin( qMin(x, y), z );
+                D( i, j ) = 1 + std::min({x, y, z});
             }
         }
     }
