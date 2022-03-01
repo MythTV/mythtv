@@ -1,3 +1,6 @@
+// C++
+#include <algorithm>
+
 // Qt
 #include <QtGlobal>
 #include <QCoreApplication>
@@ -115,7 +118,7 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
         static const int s_basesize = 64;
         m_lastSize = currentsize;
         float hdscreens = (static_cast<float>(m_lastSize.width() + 1) * m_lastSize.height()) / s_onehd;
-        int cpu = qMax(static_cast<int>(hdscreens * s_basesize), s_basesize);
+        int cpu = std::max(static_cast<int>(hdscreens * s_basesize), s_basesize);
         int gpu = cpu * 3 / 2;
         SetMaximumCacheSizes(gpu, cpu);
     }
