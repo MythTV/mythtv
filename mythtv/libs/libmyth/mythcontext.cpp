@@ -560,8 +560,8 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     if (hostname.isEmpty() ||
         hostname == "my-unique-identifier-goes-here")
     {
-        QString localhostname = QHostInfo::localHostName();
-        if (localhostname.isEmpty())
+        hostname = QHostInfo::localHostName();
+        if (hostname.isEmpty())
         {
             LOG(VB_GENERAL, LOG_ALERT,
                     "MCP: Error, could not determine host name." + ENO);
@@ -573,7 +573,7 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     exception=true; \
   }
 
-        if ((localhostname == "localhost") || localhostname.isEmpty())
+        if ((hostname == "localhost") || hostname.isEmpty())
         {
             hostname = "android";
             bool exception=false;
@@ -599,10 +599,6 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
             else
                 hostname = QString("android-%1").arg(androidId.toString());
         }
-        else
-            hostname = localhostname;
-#else
-        hostname = localhostname;
 #endif
         LOG(VB_GENERAL, LOG_INFO, "Empty LocalHostName. This is typical.");
     }
