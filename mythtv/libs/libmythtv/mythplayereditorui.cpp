@@ -1,3 +1,5 @@
+#include <algorithm>
+
 // MythTV
 #include "mythlogging.h"
 #include "mythuiactions.h"
@@ -288,7 +290,7 @@ bool MythPlayerEditorUI::DoFastForwardSecs(float Seconds, double Inaccuracy, boo
 
 bool MythPlayerEditorUI::DoRewindSecs(float Seconds, double Inaccuracy, bool UseCutlist)
 {
-    float target = qMax(0.0F, ComputeSecs(m_framesPlayed, UseCutlist) - Seconds);
+    float target = std::max(0.0F, ComputeSecs(m_framesPlayed, UseCutlist) - Seconds);
     uint64_t targetFrame = FindFrame(target, UseCutlist);
     return DoRewind(m_framesPlayed - targetFrame, Inaccuracy);
 }
