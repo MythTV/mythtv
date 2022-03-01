@@ -553,7 +553,7 @@ NoDBfound:
 bool MythContextPrivate::LoadDatabaseSettings(void)
 {
     auto config = XmlConfiguration(); // read-only
-    // try new format first
+
     m_dbParams.LoadDefaults();
 
     m_dbParams.m_localHostName  = config.GetValue("LocalHostName", "");
@@ -571,17 +571,7 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     m_dbParams.m_wolCommand     = config.GetValue(kDefaultWOL + "Command", "");
 
     bool ok = m_dbParams.IsValid(XmlConfiguration::k_default_filename);
-    if (!ok) // if new format fails, try legacy format
-    {
-        m_dbParams.LoadDefaults();
-        m_dbParams.m_dbHostName = config.GetValue(kDefaultMFE + "DBHostName", "");
-        m_dbParams.m_dbUserName = config.GetValue(kDefaultMFE + "DBUserName", "");
-        m_dbParams.m_dbPassword = config.GetValue(kDefaultMFE + "DBPassword", "");
-        m_dbParams.m_dbName = config.GetValue(kDefaultMFE + "DBName", "");
-        m_dbParams.m_dbPort = config.GetValue(kDefaultMFE + "DBPort", 0);
-        m_dbParams.m_forceSave = true;
-        ok = m_dbParams.IsValid(XmlConfiguration::k_default_filename);
-    }
+
     if (!ok)
         m_dbParams.LoadDefaults();
 
@@ -689,14 +679,6 @@ bool MythContextPrivate::SaveDatabaseParams(
             kDefaultWOL + "SQLReconnectWaitTime", params.m_wolReconnect);
         config.SetValue(kDefaultWOL + "SQLConnectRetry", params.m_wolRetry);
         config.SetValue(kDefaultWOL + "Command", params.m_wolCommand);
-
-        // clear out any legacy nodes..
-        config.ClearValue(kDefaultMFE + "DBHostName");
-        config.ClearValue(kDefaultMFE + "DBUserName");
-        config.ClearValue(kDefaultMFE + "DBPassword");
-        config.ClearValue(kDefaultMFE + "DBName");
-        config.ClearValue(kDefaultMFE + "DBPort");
-        config.ClearValue(kDefaultMFE + "DBHostPing");
 
         // actually save the file
         success = config.Save();
