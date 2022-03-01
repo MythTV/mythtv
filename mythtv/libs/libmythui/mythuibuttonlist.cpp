@@ -1,6 +1,7 @@
 #include "mythuibuttonlist.h"
 
 #include <cmath>
+#include <algorithm>
 #include <utility>
 
 // QT headers
@@ -784,7 +785,7 @@ bool MythUIButtonList::DistributeButtons(void)
         {
             case ScrollCenter:
             case ScrollGroupCenter:
-                start_button = qMax((m_maxVisible / 2) - 1, 0);
+                start_button = std::max((m_maxVisible / 2) - 1, 0);
                 break;
             case ScrollFree:
 
@@ -846,8 +847,8 @@ bool MythUIButtonList::DistributeButtons(void)
              * Attempt to pick a start_button which will minimize the need
              * for new button allocations.
              */
-            start_button = qMax(m_buttonList.size() / 2, 0);
-            start_button = (start_button / qMax(m_columns, 1)) * m_columns;
+            start_button = std::max(m_buttonList.size() / 2, 0);
+            start_button = (start_button / std::max(m_columns, 1)) * m_columns;
 
             if (start_button < m_itemCount / 2 &&
                 m_itemCount - m_selPosition - 1 < m_buttonList.size() / 2)
@@ -1011,19 +1012,19 @@ bool MythUIButtonList::DistributeButtons(void)
         if (m_scrollStyle == ScrollCenter)
         {
             // Adjust to compensate for top height less than bottom height
-            y += qMax(bottom_height - top_height, 0);
-            total = qMax(top_height, bottom_height) * 2;
+            y += std::max(bottom_height - top_height, 0);
+            total = std::max(top_height, bottom_height) * 2;
         }
         else
             total = top_height + bottom_height;
 
         // Adjust top margin so selected button ends up in the middle
-        y += (qMax(m_contentsRect.height() - total, 2) / 2);
+        y += (std::max(m_contentsRect.height() - total, 2) / 2);
     }
     else if ((m_alignment & Qt::AlignBottom) && m_arrange == ArrangeStack)
     {
         // Adjust top margin so buttons are bottom justified
-        y += qMax(m_contentsRect.height() -
+        y += std::max(m_contentsRect.height() -
                   (top_height + bottom_height), 0);
     }
     min_rect.setY(y);
@@ -1133,19 +1134,19 @@ bool MythUIButtonList::DistributeButtons(void)
         if (m_scrollStyle == ScrollCenter)
         {
             // Compensate for left being smaller than right
-            x_init += qMax(right_width - left_width, 0);
-            total = qMax(left_width, right_width) * 2;
+            x_init += std::max(right_width - left_width, 0);
+            total = std::max(left_width, right_width) * 2;
         }
         else
             total = left_width + right_width;
 
         // Adjust left margin so selected button ends up in the middle
-        x_init += (qMax(m_contentsRect.width() - total, 2) / 2);
+        x_init += (std::max(m_contentsRect.width() - total, 2) / 2);
     }
     else if ((m_alignment & Qt::AlignRight) && m_arrange == ArrangeStack)
     {
         // Adjust left margin, so buttons are right justified
-        x_init += qMax(m_contentsRect.width() -
+        x_init += std::max(m_contentsRect.width() -
                        (left_width + right_width), 0);
     }
     min_rect.setX(x_init);
@@ -1266,7 +1267,7 @@ void MythUIButtonList::CalculateButtonPositions(void)
     {
         case ScrollCenter:
         case ScrollGroupCenter:
-            m_topPosition = qMax(m_selPosition -
+            m_topPosition = std::max(m_selPosition -
                                  (int)((float)m_itemsVisible / 2), 0);
             break;
         case ScrollFree:
@@ -1302,7 +1303,7 @@ void MythUIButtonList::CalculateButtonPositions(void)
                  m_columns == 1)
                 m_topPosition = m_selPosition - (m_itemsVisible - 1);
 
-            m_topPosition = qMax(m_topPosition, 0);
+            m_topPosition = std::max(m_topPosition, 0);
             break;
         }
     }
@@ -1796,7 +1797,7 @@ int MythUIButtonList::PageUp(void)
          * grids where this is not true, then this will need to be modified.
          */
         pos -= (m_columns * (m_topRows + 2 +
-                             qMax(m_bottomRows - m_topRows, 0)));
+                             std::max(m_bottomRows - m_topRows, 0)));
         dec = m_columns;
     }
     else
@@ -1902,7 +1903,7 @@ int MythUIButtonList::PageDown(void)
          * grids where this is not true, then this will need to be modified.
          */
         pos += (m_columns * (m_bottomRows + 2 +
-                             qMax(m_topRows - m_bottomRows, 0)));
+                             std::max(m_topRows - m_bottomRows, 0)));
         inc = m_columns;
     }
     else
@@ -2010,7 +2011,7 @@ bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
                     m_selPosition = m_itemList.size() - 1;
 
                 if (m_layout == LayoutVertical)
-                    m_topPosition = qMax(0, m_selPosition - m_itemsVisible + 1);
+                    m_topPosition = std::max(0, m_selPosition - m_itemsVisible + 1);
             }
             else if (m_wrapStyle == WrapCaptive)
                 return true;
@@ -2021,7 +2022,7 @@ bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
 
         case MovePage:
             if (m_arrange == ArrangeFixed)
-                m_selPosition = qMax(0, m_selPosition - m_itemsVisible);
+                m_selPosition = std::max(0, m_selPosition - m_itemsVisible);
             else
                 m_selPosition = PageUp();
 
@@ -2215,7 +2216,7 @@ bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
                 m_selPosition += m_columns;
                 m_selPosition %= m_itemList.size();
             }
-            else if (((m_itemList.size() - 1) / qMax(m_columns, 0))
+            else if (((m_itemList.size() - 1) / std::max(m_columns, 0))
                      > (pos / m_columns))
             {
                 m_selPosition += m_columns;
@@ -2234,7 +2235,7 @@ bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
         case MovePage:
             if (m_arrange == ArrangeFixed)
             {
-                m_selPosition = qMin(m_itemCount - 1,
+                m_selPosition = std::min(m_itemCount - 1,
                                      m_selPosition + m_itemsVisible);
             }
             else

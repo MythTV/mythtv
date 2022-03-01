@@ -1,3 +1,6 @@
+// C++
+#include <algorithm>
+
 // Qt
 #include <QGuiApplication>
 
@@ -277,7 +280,7 @@ void MythPainterVulkan::Begin(QPaintDevice* /*Parent*/)
         static const int s_basesize = 64;
         m_lastSize = m_vulkan->Window()->size();
         float hdscreens = (static_cast<float>(m_lastSize.width() + 1) * m_lastSize.height()) / s_onehd;
-        int cpu = qMax(static_cast<int>(hdscreens * s_basesize), s_basesize);
+        int cpu = std::max(static_cast<int>(hdscreens * s_basesize), s_basesize);
         int gpu = cpu * 3 / 2;
         SetMaximumCacheSizes(gpu, cpu);
     }

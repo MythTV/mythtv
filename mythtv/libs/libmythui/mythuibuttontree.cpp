@@ -1,10 +1,12 @@
-
 // Own header
 #include "mythuibuttontree.h"
 
+// C++
+#include <algorithm>
+#include <utility>
+
 // Qt headers
 #include <QDomDocument>
-#include <utility>
 
 // Mythdb headers
 #include "mythlogging.h"
@@ -325,8 +327,8 @@ bool MythUIButtonTree::SetNodeByString(QStringList route)
 
     DoSetCurrentNode(foundNode);
 
-    m_currentDepth = qMax(0, (int)(foundNode->currentDepth() - m_depthOffset - m_numLists));
-    m_activeListID = qMin(foundNode->currentDepth() - m_depthOffset - 1, (int)(m_numLists - 1));
+    m_currentDepth = std::max(0, (int)(foundNode->currentDepth() - m_depthOffset - m_numLists));
+    m_activeListID = std::min(foundNode->currentDepth() - m_depthOffset - 1, (int)(m_numLists - 1));
 
     SetTreeState(true);
 

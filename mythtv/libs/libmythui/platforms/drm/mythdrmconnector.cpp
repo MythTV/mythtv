@@ -1,5 +1,6 @@
-// MythTV
 #include "platforms/drm/mythdrmconnector.h"
+
+#include <algorithm>
 
 /*! \class MythDRMConnector
  * \brief A wrapper around a DRM connector object.
@@ -68,7 +69,7 @@ QString MythDRMConnector::GetConnectorName(uint32_t Type, uint32_t Id)
         "None", "VGA", "DVI", "DVI",  "DVI",  "Composite", "TV", "LVDS",
         "CTV",  "DIN", "DP",  "HDMI", "HDMI", "TV", "eDP", "Virtual", "DSI", "DPI"
     };
-    uint32_t type = qMin(Type, static_cast<uint32_t>(DRM_MODE_CONNECTOR_DPI));
+    uint32_t type = std::min(Type, static_cast<uint32_t>(DRM_MODE_CONNECTOR_DPI));
     return QString("%1%2").arg(s_connectorNames[type]).arg(Id);
 }
 

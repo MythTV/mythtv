@@ -3,6 +3,7 @@
 
 // C++
 #include <cmath>
+#include <algorithm>
 
 // QT
 #include <QCoreApplication>
@@ -108,14 +109,14 @@ void MythUIScrollBar::CalculatePosition(void)
 
     if (m_layout == LayoutHorizontal)
     {
-        int width = qMax((int)lroundf(fillArea.width() * relativeSize),
+        int width = std::max((int)lroundf(fillArea.width() * relativeSize),
                          m_sliderArea.width());
         newSliderArea.setWidth(width);
         endPos.setX(lroundf((fillArea.width() - width) * percentage));
     }
     else
     {
-        int height = qMax((int)lroundf(fillArea.height() * relativeSize),
+        int height = std::max((int)lroundf(fillArea.height() * relativeSize),
                           m_sliderArea.height());
         newSliderArea.setHeight(height);
         endPos.setY(lroundf((fillArea.height() - height) * percentage));
