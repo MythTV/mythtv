@@ -1,6 +1,8 @@
 #include "galleryslide.h"
 
 #include <cmath>       // for roundf
+#include <algorithm>
+
 #include "mythmainwindow.h"
 #include "mythlogging.h"
 
@@ -449,8 +451,7 @@ void Slide::Zoom(int percentage)
     // Sentinel indicates reset to default zoom
     float newZoom = (percentage == 0)
             ? 1.0F
-            : qMax(MIN_ZOOM,
-                   qMin(MAX_ZOOM, m_zoom * (1.0F + percentage / 100.0F)));
+            : std::clamp(m_zoom * (1.0F + percentage / 100.0F), MIN_ZOOM, MAX_ZOOM);
     if (newZoom != m_zoom)
     {
         if (m_zoomAnimation)
@@ -530,22 +531,22 @@ void Slide::SetPan(QPoint pos)
     QRect imageArea = m_images[m_curPos]->rect();
     float hRatio    = float(imageArea.height()) / m_area.height();
     float wRatio    = float(imageArea.width()) / m_area.width();
-    float ratio     = qMax(hRatio, wRatio);
+    float ratio     = std::max(hRatio, wRatio); // TODO create a Rational number class
 
     if (m_zoom != 0.0F)
         ratio /= m_zoom;
 
     // Determine crop area
-    int h = qMin(int(roundf(m_area.height() * ratio)), imageArea.height());
-    int w = qMin(int(roundf(m_area.width() * ratio)), imageArea.width());
+    int h = std::min(int(roundf(m_area.height() * ratio)), imageArea.height());
+    int w = std::min(int(roundf(m_area.width() * ratio)), imageArea.width());
     int x = imageArea.center().x() - w / 2;
     int y = imageArea.center().y() - h / 2;
 
     // Constrain pan to boundaries
     int limitX = (imageArea.width() - w) / 2;
     int limitY = (imageArea.height() - h) / 2;
-    m_pan.setX(qMax(qMin(pos.x(), limitX), -limitX));
-    m_pan.setY(qMax(qMin(pos.y(), limitY), -limitY));
+    m_pan.setX(std::clamp(pos.x(), -limitX, limitX));
+    m_pan.setY(std::clamp(pos.y(), -limitY, limitY));
 
     SetCropRect(x + m_pan.x(), y + m_pan.y(), w, h);
     SetRedraw();
@@ -590,7 +591,7 @@ void SlideBuffer::Initialise(MythUIImage &image)
 {
     // Require at least 4 slides: 2 for transitions, 1 to handle further requests
     // and 1 to prevent solitary slide from being used whilst it is loading
-    int size = qMax(SLIDE_BUFFER_SIZE, 4);
+    int size = std::max(SLIDE_BUFFER_SIZE, 4);
 
     // Fill buffer with slides cloned from the XML image widget
 
