@@ -1,3 +1,6 @@
+// C++
+#include <algorithm>
+
 // Qt
 #include <QTcpSocket>
 
@@ -131,7 +134,7 @@ bool MythHTTPParser::Read(QTcpSocket* Socket, bool& Ready)
     {
         int64_t want = m_contentLength - m_content->size();
         int64_t have = Socket->bytesAvailable();
-        m_content->append(Socket->read(qMax(want, qMax(HTTP_CHUNKSIZE, have))));
+        m_content->append(Socket->read(std::max({want, HTTP_CHUNKSIZE, have})));
     }
 
     // Need more data...
