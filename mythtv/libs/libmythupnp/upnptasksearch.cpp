@@ -22,7 +22,6 @@
 
 #include "libmythbase/compat.h"
 #include "libmythbase/configuration.h"
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
@@ -58,7 +57,7 @@ UPnpSearchTask::UPnpSearchTask( int          nServicePort,
     m_sST         = std::move(sST);
     m_sUDN        = std::move(sUDN);
     m_nServicePort= nServicePort;
-    m_nMaxAge     = MythCoreContext::GetConfiguration()->GetDuration<std::chrono::seconds>( "UPnP/SSDP/MaxAge" , 1h );
+    m_nMaxAge     = XmlConfiguration().GetDuration<std::chrono::seconds>("UPnP/SSDP/MaxAge" , 1h);
 
 } 
 

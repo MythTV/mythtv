@@ -11,7 +11,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "libmythbase/configuration.h"
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 
 #include "upnp.h"
@@ -37,8 +36,7 @@ UPnpCMGR::UPnpCMGR ( UPnpDevice *pDevice,
     SetValue< QString >( "SinkProtocolInfo"    , sSinkProtocols   );
     SetValue< QString >( "FeatureList"         , "" );
 
-    QString sUPnpDescPath = MythCoreContext::GetConfiguration()->GetValue( "UPnP/DescXmlPath",
-                                                                m_sSharePath );
+    QString sUPnpDescPath = XmlConfiguration().GetValue( "UPnP/DescXmlPath", m_sSharePath);
     m_sServiceDescFileName = sUPnpDescPath + "CMGR_scpd.xml";
     m_sControlUrl          = "/CMGR_Control";
 

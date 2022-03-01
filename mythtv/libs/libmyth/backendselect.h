@@ -2,9 +2,9 @@
 #define BACKENDSELECT_H
 
 #include <QMutex>
+#include <QString>
 
 // MythTV
-#include "libmythbase/configuration.h"
 #include "libmythui/mythscreentype.h"
 #include "libmythupnp/upnpdevice.h"
 
@@ -44,11 +44,11 @@ class BackendSelection : public MythScreenType
         kCancelConfigure = 0,
         kAcceptConfigure = +1,
     };
-    static Decision Prompt(
-        DatabaseParams *dbParams, XmlConfiguration *pConfig);
+    static Decision Prompt(DatabaseParams *dbParams, const QString& config_filename);
+// TODO return a DatabaseParams, use a bool& parameter
 
     BackendSelection(MythScreenStack *parent, DatabaseParams *params,
-                     XmlConfiguration *pConfig, bool exitOnFinish = false);
+                     QString config_filename, bool exitOnFinish = false);
     ~BackendSelection() override;
 
     bool Create(void) override; // MythScreenType
@@ -72,7 +72,7 @@ class BackendSelection : public MythScreenType
     void CloseWithDecision(Decision d);
 
     DatabaseParams   *m_dbParams        {nullptr};
-    XmlConfiguration *m_pConfig         {nullptr};
+    QString           m_config_filename;
     bool              m_exitOnFinish;
     ItemMap           m_devices;
 

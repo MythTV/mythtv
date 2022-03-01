@@ -48,7 +48,6 @@
 #include "mythplugin.h"
 #include "mythmiscutil.h"
 #include "mythpower.h"
-#include "configuration.h"
 
 #define LOC      QString("MythCoreContext::%1(): ").arg(__func__)
 
@@ -1803,13 +1802,6 @@ void MythCoreContext::ResetSockets(void)
     if (d->m_eventSock)
         d->m_eventSock->DisconnectFromHost();
     dispatch(MythEvent("BACKEND_SOCKETS_CLOSED"));
-}
-
-XmlConfiguration *MythCoreContext::GetConfiguration()
-{
-    static auto config = XmlConfiguration("config.xml");
-
-    return &config;
 }
 
 void MythCoreContext::InitPower(bool Create)

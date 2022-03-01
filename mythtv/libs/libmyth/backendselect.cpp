@@ -1,4 +1,7 @@
 // -*- Mode: c++ -*-
+#include "backendselect.h"
+
+#include <utility>
 
 #include <QEventLoop>
 
@@ -12,13 +15,16 @@
 #include "libmythui/mythuistatetype.h"
 #include "libmythupnp/mythxmlclient.h"
 
-#include "backendselect.h"
-
 BackendSelection::BackendSelection(
-    MythScreenStack *parent, DatabaseParams *params,
-    XmlConfiguration *pConfig, bool exitOnFinish) :
+    MythScreenStack *parent,
+    DatabaseParams *params,
+    QString config_filename,
+    bool exitOnFinish
+    ) :
     MythScreenType(parent, "BackEnd Selection"),
-    m_dbParams(params), m_pConfig(pConfig), m_exitOnFinish(exitOnFinish)
+    m_dbParams(params),
+    m_config_filename(std::move(config_filename)),
+    m_exitOnFinish(exitOnFinish)
 {
     if (exitOnFinish)
     {
@@ -46,7 +52,7 @@ BackendSelection::~BackendSelection()
 }
 
 BackendSelection::Decision BackendSelection::Prompt(
-    DatabaseParams *dbParams, XmlConfiguration  *pConfig)
+    DatabaseParams *dbParams, const QString& config_filename)
 {
     Decision ret = kCancelConfigure;
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -54,7 +60,7 @@ BackendSelection::Decision BackendSelection::Prompt(
         return ret;
 
     auto *backendSettings =
-        new BackendSelection(mainStack, dbParams, pConfig, true);
+        new BackendSelection(mainStack, dbParams, config_filename, true);
 
     if (backendSettings->Create())
     {
@@ -109,12 +115,12 @@ void BackendSelection::Accept(MythUIButtonListItem *item)
 
     if (ConnectBackend(dev))
     {
-        if (m_pConfig)
         {
+            auto config = XmlConfiguration(m_config_filename);
             if (!m_pinCode.isEmpty())
-                m_pConfig->SetValue(kDefaultPIN, m_pinCode);
-            m_pConfig->SetValue(kDefaultUSN, m_usn);
-            m_pConfig->Save();
+                config.SetValue(kDefaultPIN, m_pinCode);
+            config.SetValue(kDefaultUSN, m_usn);
+            config.Save();
         }
         CloseWithDecision(kAcceptConfigure);
     }

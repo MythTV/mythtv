@@ -24,7 +24,6 @@
 #include "eventing.h"
 #include "upnptaskevent.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/configuration.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
@@ -77,7 +76,7 @@ Eventing::Eventing(const QString &sExtensionName,
     HttpServerExtension(sExtensionName, sSharePath),
     m_sEventMethodName(std::move(sEventMethodName)),
     m_nSubscriptionDuration(
-        MythCoreContext::GetConfiguration()->GetDuration<std::chrono::seconds>("UPnP/SubscriptionDuration", 30min))
+        XmlConfiguration().GetDuration<std::chrono::seconds>("UPnP/SubscriptionDuration", 30min))
 {
     m_nSupportedMethods |= (RequestTypeSubscribe | RequestTypeUnsubscribe);
 }

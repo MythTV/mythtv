@@ -45,7 +45,7 @@ class SSDPCacheTask : public Task
             m_nExecuteCount = 0;
             m_nInterval     = 30s;
 // TODO: Rework when separating upnp/ssdp stack
-//                gCoreContext->GetConfiguration()->GetDuration<std::chrono::seconds>("UPnP/SSDP/CacheInterval", 30s);
+//               XmlConfiguration().GetDuration<std::chrono::seconds>("UPnP/SSDP/CacheInterval", 30s);
         }
 
         QString Name() override // Task

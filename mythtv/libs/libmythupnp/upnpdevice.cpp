@@ -362,8 +362,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     // ----------------------------------------------------------------------
 
     if (pDevice == &m_rootDevice)
-        sFriendlyName = MythCoreContext::GetConfiguration()->GetValue( "UPnP/FriendlyName",
-                                                            sFriendlyName  );
+        sFriendlyName = XmlConfiguration().GetValue("UPnP/FriendlyName", sFriendlyName);
 
     os << "<device>\n";
     os << FormatValue( "deviceType"   , pDevice->m_sDeviceType );
@@ -676,8 +675,7 @@ QString UPnpDeviceDesc::GetHostName() const
             LOG(VB_GENERAL, LOG_ERR,
                 "UPnpDeviceDesc: Error, could not determine host name." + ENO);
 
-        return MythCoreContext::GetConfiguration()->GetValue("Settings/HostName",
-                                                  localHostName);
+        return XmlConfiguration().GetValue("Settings/HostName", localHostName);
     }
 
     return m_sHostName;
