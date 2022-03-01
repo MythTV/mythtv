@@ -45,7 +45,6 @@ class BackendSelection : public MythScreenType
         kAcceptConfigure = +1,
     };
     static Decision Prompt(DatabaseParams *dbParams, const QString& config_filename);
-// TODO return a DatabaseParams, use a bool& parameter
 
     BackendSelection(MythScreenStack *parent, DatabaseParams *params,
                      QString config_filename, bool exitOnFinish = false);
