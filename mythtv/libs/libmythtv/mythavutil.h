@@ -13,9 +13,12 @@
 // FFmpeg
 extern "C" {
 #include "libavcodec/avcodec.h"
+
+#include "libavutil/buffer.h"
 }
 
 // MythTV
+#include "libmythbase/mythlogging.h"
 #include "libmythtv/mythframe.h"
 #include "libmythui/mythhdr.h"
 
@@ -107,5 +110,41 @@ public:
     QString                 m_errorMsg;
     QVector<MythStreamInfo> m_streamInfoList;
 };
+
+/**
+@brief C++ wrapper for AVBufferRef.
+
+Using this avoids littering the code with manual memory management.
+
+You must verify that the instance has_buffer() before calling any other function.
+*/
+class MTV_PUBLIC MythAVBufferRef {
+  public:
+    /**
+    @param buf The AVBufferRef* to reference, must be non-NULL.
+    */
+    explicit MythAVBufferRef(AVBufferRef* buf) : buffer(av_buffer_ref(buf))
+    {
+        if (!buffer)
+        {
+            LOG(VB_GENERAL, LOG_ERR, "av_buffer_ref() failed to allocate memory.");
+        }
+    }
+    ~MythAVBufferRef()
+    {
+        if (has_buffer())
+        {
+            av_buffer_unref(&buffer);
+        }
+    }
+
+    bool has_buffer()       { return buffer != nullptr; }
+
+    const uint8_t*  data()  { return buffer->data; }
+    size_t          size()  { return buffer->size; }
+  private:
+    AVBufferRef* buffer {nullptr};
+};
+
 
 #endif
