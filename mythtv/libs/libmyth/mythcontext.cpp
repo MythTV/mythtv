@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <iostream>
 #include <queue>
@@ -57,6 +58,35 @@ MythContext *gContext = nullptr;
 
 static const QString sLocation = "MythContext";
 
+namespace
+{
+class GUISettingsCache
+{
+  public:
+    GUISettingsCache() = default;
+    GUISettingsCache(QString cache_filename, QString cache_path)
+        : m_cache_path(std::move(cache_path))
+    {
+        m_cache_filename = m_cache_path + '/' + cache_filename;
+        if (m_cache_path.isEmpty() || cache_filename.isEmpty())
+        {
+            m_cache_filename = m_cache_path = QString();
+        }
+    }
+
+    bool save();
+    void loadOverrides() const;
+    static void clearOverrides();
+
+  private:
+    QString m_cache_filename {"cache/contextcache.xml"};
+    QString m_cache_path     {"cache"};
+
+    static const std::array<QString, 13> k_settings;
+};
+
+} // anonymous namespace
+
 class MythContextPrivate : public QObject
 {
     friend class MythContextSlotHandler;
@@ -90,10 +120,6 @@ class MythContextPrivate : public QObject
     void    ShowGuiStartup(void);
     bool    checkPort(QString &host, int port, std::chrono::seconds timeLimit) const;
     static void processEvents(void);
-    bool    saveSettingsCache(void);
-    void    loadSettingsCacheOverride(void) const;
-    static void clearSettingsCacheOverride(void);
-
 
   protected:
     bool event(QEvent* /*e*/) override; // QObject
@@ -125,12 +151,13 @@ class MythContextPrivate : public QObject
     QEventLoop             *m_loop               {nullptr};
     bool                    m_needsBackend       {false};
 
+    GUISettingsCache        m_GUISettingsCache;
+
   private:
     MythConfirmationDialog *m_mbeVersionPopup    {nullptr};
     int                     m_registration       {-1};
     QDateTime               m_lastCheck;
     QTcpSocket             *m_socket             {nullptr};
-    static const std::vector<QString> kSettingsToSave;
 };
 
 static void exec_program_cb(const QString &cmd)
@@ -329,7 +356,10 @@ bool MythContextPrivate::Init(const bool gui,
 {
     gCoreContext->GetDB()->IgnoreDatabase(ignoreDB);
     m_gui = gui;
-    loadSettingsCacheOverride();
+    if (gui)
+    {
+        m_GUISettingsCache.loadOverrides();
+    }
 
     if (gCoreContext->IsFrontend())
         m_needsBackend = true;
@@ -1464,26 +1494,26 @@ void MythContextPrivate::processEvents(void)
 //    return ret;
 }
 
-// cache some settings in cache/contextcache.xml
+namespace
+{
+// cache some settings in GUISettingsCache::m_cache_filename
 // only call this if the database is available.
 
-const std::vector<QString> MythContextPrivate::kSettingsToSave
+const std::array<QString, 13> GUISettingsCache::k_settings
 { "Theme", "Language", "Country", "GuiHeight",
   "GuiOffsetX", "GuiOffsetY", "GuiWidth", "RunFrontendInWindow",
   "AlwaysOnTop", "HideMouseCursor", "ThemePainter", "libCECEnabled",
   "StartupScreenDelay" };
 
 
-bool MythContextPrivate::saveSettingsCache(void)
+bool GUISettingsCache::save()
 {
-    if (!m_gui)
-        return true;
-    QString cacheDirName = GetConfDir() + "/cache/";
+    QString cacheDirName = GetConfDir() + '/' + m_cache_path;
     QDir dir(cacheDirName);
     dir.mkpath(cacheDirName);
-    XmlConfiguration config = XmlConfiguration("cache/contextcache.xml");
+    XmlConfiguration config = XmlConfiguration(m_cache_filename);
     bool dirty = false;
-    for (const auto & setting : kSettingsToSave)
+    for (const auto & setting : k_settings)
     {
         QString cacheValue = config.GetValue("Settings/" + setting, QString());
         gCoreContext->ClearOverrideSettingForSession(setting);
@@ -1494,7 +1524,7 @@ bool MythContextPrivate::saveSettingsCache(void)
             dirty = true;
         }
     }
-    clearSettingsCacheOverride();
+    clearOverrides();
 
     if (dirty)
     {
@@ -1506,12 +1536,10 @@ bool MythContextPrivate::saveSettingsCache(void)
     return true;
 }
 
-void MythContextPrivate::loadSettingsCacheOverride(void) const
+void GUISettingsCache::loadOverrides() const
 {
-    if (!m_gui)
-        return;
-    XmlConfiguration config = XmlConfiguration("cache/contextcache.xml");
-    for (const auto & setting : kSettingsToSave)
+    auto config = XmlConfiguration(m_cache_filename); // read only
+    for (const auto & setting : k_settings)
     {
         if (!gCoreContext->GetSetting(setting, QString()).isEmpty())
             continue;
@@ -1525,10 +1553,10 @@ void MythContextPrivate::loadSettingsCacheOverride(void) const
     MythTranslation::load("mythfrontend");
 }
 
-void MythContextPrivate::clearSettingsCacheOverride(void)
+void GUISettingsCache::clearOverrides()
 {
     QString language = gCoreContext->GetSetting("Language", QString());
-    for (const auto & setting : kSettingsToSave)
+    for (const auto & setting : k_settings)
         gCoreContext->ClearOverrideSettingForSession(setting);
     // Restore power off TV setting
     gCoreContext->ClearOverrideSettingForSession("PowerOffTVAllowed");
@@ -1537,6 +1565,7 @@ void MythContextPrivate::clearSettingsCacheOverride(void)
         MythTranslation::load("mythfrontend");
 }
 
+} // anonymous namespace
 
 void MythContextSlotHandler::VersionMismatchPopupClosed(void)
 {
@@ -1648,7 +1677,11 @@ bool MythContext::Init(const bool gui,
     }
 
     SetDisableEventPopup(false);
-    saveSettingsCache();
+
+    if (d->m_gui)
+    {
+        saveSettingsCache();
+    }
 
     gCoreContext->ActivateSettingsCache(true);
     gCoreContext->InitPower();
@@ -1693,7 +1726,15 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
 
 bool MythContext::saveSettingsCache(void)
 {
-    return d->saveSettingsCache();
+    /* this check is technically redundant since this is only called from
+    MythContext::Init() and mythfrontend::main(); however, it is for safety
+    and clarity until MythGUIContext is refactored out.
+    */
+    if (d->m_gui)
+    {
+        return d->m_GUISettingsCache.save();
+    }
+    return true;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
