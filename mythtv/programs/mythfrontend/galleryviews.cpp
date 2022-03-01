@@ -1,5 +1,6 @@
 #include "galleryviews.h"
 
+#include <algorithm>
 #include <cmath> // for qsrand
 #include <random>
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
@@ -641,7 +642,7 @@ void DirectoryView::PopulateThumbs(ImageItem &parent, int thumbsNeeded,
 
     // Fill parent thumbs from child files first
     // Whilst they're available fill as many as possible for cache
-    for (int i = 0; i < qMin(kMaxFolderThumbnails, thumbFiles.size()); ++i)
+    for (int i = 0; i < std::min(kMaxFolderThumbnails, thumbFiles.size()); ++i)
     {
         parent.m_thumbNails.append(thumbFiles.at(i)->m_thumbNails.at(0));
         --thumbsNeeded;
