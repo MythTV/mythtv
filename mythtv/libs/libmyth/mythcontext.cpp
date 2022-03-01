@@ -124,7 +124,6 @@ class MythContextPrivate : public QObject
     GUIStartup             *m_guiStartup         {nullptr};
     QEventLoop             *m_loop               {nullptr};
     bool                    m_needsBackend       {false};
-    bool                    m_settingsCacheDirty {false};
 
   private:
     MythConfirmationDialog *m_mbeVersionPopup    {nullptr};
@@ -1483,6 +1482,7 @@ bool MythContextPrivate::saveSettingsCache(void)
     QDir dir(cacheDirName);
     dir.mkpath(cacheDirName);
     XmlConfiguration config = XmlConfiguration("cache/contextcache.xml");
+    bool dirty = false;
     for (const auto & setting : kSettingsToSave)
     {
         QString cacheValue = config.GetValue("Settings/" + setting, QString());
@@ -1491,11 +1491,19 @@ bool MythContextPrivate::saveSettingsCache(void)
         if (value != cacheValue)
         {
             config.SetValue("Settings/" + setting, value);
-            m_settingsCacheDirty = true;
+            dirty = true;
         }
     }
     clearSettingsCacheOverride();
-    return config.Save();
+
+    if (dirty)
+    {
+#ifndef Q_OS_ANDROID
+        DestroyMythMainWindow();
+#endif
+        return config.Save();
+    }
+    return true;
 }
 
 void MythContextPrivate::loadSettingsCacheOverride(void) const
@@ -1641,13 +1649,7 @@ bool MythContext::Init(const bool gui,
 
     SetDisableEventPopup(false);
     saveSettingsCache();
-    if (d->m_settingsCacheDirty)
-    {
-#ifndef Q_OS_ANDROID
-        DestroyMythMainWindow();
-#endif
-        d->m_settingsCacheDirty = false;
-    }
+
     gCoreContext->ActivateSettingsCache(true);
     gCoreContext->InitPower();
 
