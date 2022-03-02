@@ -1,6 +1,11 @@
 ﻿#ifndef MYTHPLAYER_H
 #define MYTHPLAYER_H
 
+// Std
+#include <cstdint>
+#include <utility>
+#include <thread>
+
 // Qt
 #include <QCoreApplication>
 #include <QList>
@@ -16,32 +21,27 @@
 #include <QWaitCondition>
 
 // MythTV
-#include "playercontext.h"
-#include "volumebase.h"
-#include "osd.h"
-#include "mythvideoout.h"
-#include "captions/teletextreader.h"
-#include "captions/subtitlereader.h"
-#include "captions/cc608reader.h"
-#include "captions/cc708reader.h"
-#include "decoders/decoderbase.h"
-#include "deletemap.h"
-#include "commbreakmap.h"
-#include "audioplayer.h"
-#include "mthread.h"
-#include "mythavutil.h"
-#include "mythtypes.h"
-#include "programtypes.h"
-#include "tv.h"
-#include "videoouttypes.h"
-#include "mythmiscutil.h"
-#include "mythplayeravsync.h"
-#include "mythtvexp.h"
-
-// Std
-#include <cstdint>
-#include <utility>
-#include <thread>
+#include "libmyth/audio/volumebase.h"
+#include "libmyth/programtypes.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythtypes.h"
+#include "libmythtv/audioplayer.h"
+#include "libmythtv/captions/cc608reader.h"
+#include "libmythtv/captions/cc708reader.h"
+#include "libmythtv/captions/subtitlereader.h"
+#include "libmythtv/captions/teletextreader.h"
+#include "libmythtv/commbreakmap.h"
+#include "libmythtv/decoders/decoderbase.h"
+#include "libmythtv/deletemap.h"
+#include "libmythtv/mythavutil.h"
+#include "libmythtv/mythplayeravsync.h"
+#include "libmythtv/mythtvexp.h"
+#include "libmythtv/mythvideoout.h"
+#include "libmythtv/osd.h"
+#include "libmythtv/playercontext.h"
+#include "libmythtv/tv.h"
+#include "libmythtv/videoouttypes.h"
 
 class ProgramInfo;
 class InteractiveTV;

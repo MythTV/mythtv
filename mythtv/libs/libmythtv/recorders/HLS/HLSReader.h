@@ -17,13 +17,13 @@
 */
 
 #ifdef HLS_USE_MYTHDOWNLOADMANAGER
-#include "mythdownloadmanager.h"
+#include "libmythbase/mythdownloadmanager.h"
 #else
-#include "mythsingledownload.h"
+#include "libmythbase/mythsingledownload.h"
 #endif
 
-#include "mythlogging.h"
-#include "mythtvexp.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/mythtvexp.h"
 
 #include "HLSSegment.h"
 #include "HLSStream.h"

@@ -10,8 +10,8 @@
 #endif
 
 // MythTV
-#include "mythchrono.h"
-#include "mythimage.h"
+#include "libmythbase/mythchrono.h"
+#include "libmythui/mythimage.h"
 
 enum ImageCacheMode
 {

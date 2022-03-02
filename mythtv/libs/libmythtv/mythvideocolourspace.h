@@ -6,14 +6,14 @@
 #include <QObject>
 #include <QMatrix4x4>
 
-// MythTV
-#include "mythcolourspace.h"
-#include "mythframe.h"
-#include "videoouttypes.h"
-#include "referencecounter.h"
-
 // FFmpeg
 #include "libavutil/pixfmt.h" // For AVCOL_xxx defines
+
+// MythTV
+#include "libmythbase/referencecounter.h"
+#include "libmythtv/mythframe.h"
+#include "libmythtv/videoouttypes.h"
+#include "libmythui/mythcolourspace.h"
 
 class MythVideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCounter
 {

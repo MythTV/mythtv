@@ -6,10 +6,9 @@
 #include <QMetaType>
 #include <QFileInfo>
 
-#include "mythuiexp.h"
-#include "mythtypes.h"
-
-#include "xmlparsebase.h" // for VERBOSE_XML && Xml Parsing helpers
+#include "libmythbase/mythtypes.h"
+#include "libmythui/mythuiexp.h"
+#include "libmythui/xmlparsebase.h" // for VERBOSE_XML && Xml Parsing helpers
 
 enum ThemeType {
     THEME_UNKN  = 0x00,

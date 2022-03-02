@@ -4,10 +4,10 @@
 #include <QString>
 #include <QClipboard>
 
-#include "mythtimer.h"
-#include "mythuitype.h"
-#include "mythvirtualkeyboard.h"
-#include "mythstorage.h"
+#include "libmythbase/mythstorage.h"
+#include "libmythbase/mythtimer.h"
+#include "libmythui/mythuitype.h"
+#include "libmythui/mythvirtualkeyboard.h"
 
 class QInputMethodEvent;
 

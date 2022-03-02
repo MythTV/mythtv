@@ -13,10 +13,10 @@
 #include <QUrl>
 
 // MythTV headers
-#include "mythtvexp.h"
-#include "mythlogging.h"
-#include "mythsingledownload.h"
-#include "recorders/HLS/HLSReader.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsingledownload.h"
+#include "libmythtv/mythtvexp.h"
+#include "libmythtv/recorders/HLS/HLSReader.h"
 
 class MTV_PUBLIC IPTVTuningData
 {

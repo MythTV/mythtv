@@ -17,8 +17,8 @@
 #endif
 #include <QChar>
 
-#include "format.h"
-#include "mythchrono.h"
+#include "libmythtv/format.h"
+#include "libmythbase/mythchrono.h"
 
 using CC608Seen        = std::array<bool,4>;
 using CC608ProgramType = std::array<QString,96>;

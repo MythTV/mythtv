@@ -5,8 +5,8 @@
 #include <QString>
 #include <QDateTime>
 
-#include "serviceexp.h"
-#include "programtypes.h"
+#include "libmyth/programtypes.h"
+#include "libmythservicecontracts/serviceexp.h"
 
 class SERVICE_PUBLIC RecStatus : public QObject
 {

@@ -5,8 +5,8 @@
 #include <QElapsedTimer>
 
 // MythTV
-#include "mythtypes.h"
-#include "mythframe.h"
+#include "libmythbase/mythtypes.h"
+#include "libmythtv/mythframe.h"
 
 class AudioPlayer;
 

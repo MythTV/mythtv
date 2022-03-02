@@ -8,16 +8,12 @@
 #include <QStringList>
 #include <QCoreApplication>
 
-// libmythbase
-#include "mythtvexp.h"
-
-// libmyth
-#include "programinfo.h"
-
-// libmythtv
-#include "programtypes.h"
-#include "recordinginfo.h"
-#include "recordingtypes.h"
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmyth/programtypes.h"
+#include "libmyth/recordingtypes.h"
+#include "libmythtv/mythtvexp.h"
+#include "libmythtv/recordinginfo.h"
 
 /** \class RecordingRule
  *  \brief Internal representation of a recording rule, mirrors the record

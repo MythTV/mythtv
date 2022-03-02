@@ -11,12 +11,12 @@
 #include <QString>
 
 // MythTV headers
-#include "mythtvexp.h"
-#include "videoouttypes.h"
-#include "tv.h"
-#include "mythtypes.h"
-#include "programtypes.h"
-#include "mythtimer.h"
+#include "libmyth/programtypes.h"
+#include "libmythbase/mythtimer.h"
+#include "libmythbase/mythtypes.h"
+#include "libmythtv/mythtvexp.h"
+#include "libmythtv/tv.h"
+#include "libmythtv/videoouttypes.h"
 
 class ProgramInfo;
 class MythSocket;

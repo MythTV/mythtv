@@ -7,7 +7,7 @@ using_opengl: QT += opengl
 TEMPLATE = app
 TARGET = test_rssparse
 DEPENDPATH += . ../..
-INCLUDEPATH += . ../.. ../../../libmythbase
+INCLUDEPATH += . ../.. ../../.. ../../../libmythbase
 
 # Add all the necessary libraries
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION

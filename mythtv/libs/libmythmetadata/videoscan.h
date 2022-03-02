@@ -13,9 +13,9 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "mythmetaexp.h"
-#include "mthread.h"
-#include "mythprogressdialog.h"
+#include "libmythbase/mthread.h"
+#include "libmythmetadata/mythmetaexp.h"
+#include "libmythui/mythprogressdialog.h"
 
 class VideoMetadataListManager;
 

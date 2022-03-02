@@ -7,6 +7,7 @@ TEMPLATE = app
 TARGET = test_videolist
 DEPENDPATH += . ../..
 INCLUDEPATH += . ../..
+INCLUDEPATH += ../../../../libs
 INCLUDEPATH += ../../../../libs/libmythbase
 INCLUDEPATH += ../../../../libs/libmythui
 INCLUDEPATH += ../../../../libs/libmyth

@@ -10,7 +10,7 @@
 #include <QMap>
 #include <QQueue>
 
-#include "mythsingledownload.h"
+#include "libmythbase/mythsingledownload.h"
 #include "HLSSegment.h"
 
 class HLSRecStream

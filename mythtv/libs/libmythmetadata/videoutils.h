@@ -1,9 +1,9 @@
 #ifndef VIDEOUTILS_H_
 #define VIDEOUTILS_H_
 
-#include "parentalcontrols.h"
-#include "mythmetaexp.h"
-#include "metadatacommon.h"
+#include "libmythmetadata/metadatacommon.h"
+#include "libmythmetadata/mythmetaexp.h"
+#include "libmythmetadata/parentalcontrols.h"
 
 template <typename T>
 inline void CheckedSet(T *uiItem, const QString &value)
@@ -60,8 +60,8 @@ META_PUBLIC QString ContentTypeToString(VideoContentType type);
 
 // this needs to be an inline and pull in the storage group and context
 // headers since it this used in dbcheck.cpp.
-#include <storagegroup.h>
-#include <mythcorecontext.h>
+#include <libmythbase/storagegroup.h>
+#include <libmythbase/mythcorecontext.h>
 inline QString generate_file_url(
     const QString &storage_group, const QString &host, const QString &path)
 {

@@ -29,8 +29,8 @@
 #include <QMutex>
 #include <QJsonDocument>
 
-#include "mthread.h"
-#include "recordingrule.h"
+#include "libmythbase/mthread.h"
+#include "libmythtv/recordingrule.h"
 
 class Scheduler;
 

@@ -5,8 +5,8 @@
 #include <QObject>
 #include <QString>
 
-#include "mythexp.h"
-#include "dbutil.h"
+#include "libmyth/mythexp.h"
+#include "libmythbase/dbutil.h"
 
 class MythUIBusyDialog;
 

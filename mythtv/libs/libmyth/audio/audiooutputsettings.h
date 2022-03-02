@@ -12,7 +12,7 @@
 #include <array>
 #include <vector>
 
-#include "mythexp.h"
+#include "libmyth/mythexp.h"
 
 #include <QString>
 

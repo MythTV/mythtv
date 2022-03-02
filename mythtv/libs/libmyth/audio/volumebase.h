@@ -1,7 +1,7 @@
 #ifndef VOLUME_BASE_H
 #define VOLUME_BASE_H
 
-#include "mythexp.h"
+#include "libmyth/mythexp.h"
 
 enum MuteState {
     kMuteOff = 0,

@@ -7,7 +7,7 @@ using_opengl: QT += opengl
 TEMPLATE = app
 TARGET = test_eitfixups
 DEPENDPATH += . ../..
-INCLUDEPATH += . ../.. ../../mpeg ../../../libmythui ../../../libmyth ../../../libmythbase
+INCLUDEPATH += . ../.. ../../.. ../../mpeg ../../../libmythui ../../../libmyth ../../../libmythbase
 INCLUDEPATH += ../../../libmythservicecontracts
 
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION

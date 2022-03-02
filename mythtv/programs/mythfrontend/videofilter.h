@@ -1,14 +1,14 @@
 #ifndef VIDEOFILTER_H_
 #define VIDEOFILTER_H_
 
-// MythTV headers
-#include "mythscreentype.h"
-#include "parentalcontrols.h"
-
 // Qt headers
 #include <QCoreApplication>
 #include <QDate>
 #include <QRegularExpression>
+
+// MythTV headers
+#include "libmythmetadata/parentalcontrols.h"
+#include "libmythui/mythscreentype.h"
 
 class MythUIButtonList;
 class MythUIButtonListItem;

@@ -2,12 +2,11 @@
 #define OSD_H
 
 // MythTV
-#include "mythtvexp.h"
-#include "programtypes.h"
-#include "mythscreentype.h"
-#include "mythtypes.h"
-#include "mythplayerstate.h"
-#include "mythmediaoverlay.h"
+#include "libmyth/programtypes.h"
+#include "libmythbase/mythtypes.h"
+#include "libmythtv/mythmediaoverlay.h"
+#include "libmythtv/mythplayerstate.h"
+#include "libmythui/mythscreentype.h"
 
 // Screen names are prepended with alphanumerics to force the correct ordering
 // when displayed. This is slightly complicated by the default windows

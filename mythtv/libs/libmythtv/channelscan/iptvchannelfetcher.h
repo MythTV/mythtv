@@ -17,8 +17,8 @@
 #include <QString>
 
 // MythTV headers
-#include "iptvtuningdata.h"
-#include "mthread.h"
+#include "libmythtv/iptvtuningdata.h"
+#include "libmythbase/mthread.h"
 
 class ScanMonitor;
 class IPTVChannelFetcher;

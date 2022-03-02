@@ -12,9 +12,9 @@
 #include <QList>
 #include <QDateTime>
 
-#include "mthread.h"
-#include "mythexp.h"
-#include "mythmedia.h"
+#include "libmyth/mythexp.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythmedia.h"
 
 /// Stores details of media handlers
 

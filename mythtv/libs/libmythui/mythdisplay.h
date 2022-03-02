@@ -7,12 +7,12 @@
 #include <QMutex>
 
 // MythTV
-#include "mythuiexp.h"
-#include "mythdisplaymode.h"
-#include "mythedid.h"
-#include "mythhdr.h"
-#include "mythvrr.h"
-#include "mythcommandlineparser.h"
+#include "libmythbase/mythcommandlineparser.h"
+#include "libmythui/mythdisplaymode.h"
+#include "libmythui/mythedid.h"
+#include "libmythui/mythhdr.h"
+#include "libmythui/mythuiexp.h"
+#include "libmythui/mythvrr.h"
 
 // Std
 #include <cmath>

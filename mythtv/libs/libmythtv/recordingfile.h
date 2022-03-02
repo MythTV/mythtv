@@ -4,8 +4,8 @@
 #include <QString>
 #include <QSize>
 
-#include "mythtvexp.h"
-#include "programinfo.h"
+#include "libmyth/programinfo.h"
+#include "libmythtv/mythtvexp.h"
 
 class RecordingRule;
 

@@ -7,8 +7,9 @@
 #include <array>
 #include <chrono>
 #include <cstdlib>
-#include "mythcontext.h"
-#include "mythtvexp.h"
+
+#include "libmyth/mythcontext.h"
+#include "libmythtv/mythtvexp.h"
 
 // n.b. these PID relationships are only a recommendation from ATSC,
 // but seem to be universal

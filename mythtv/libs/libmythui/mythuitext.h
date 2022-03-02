@@ -5,13 +5,11 @@
 #include <QTextLayout>
 #include <QColor>
 
-// Mythbase headers
-#include "mythstorage.h"
-#include "mythtypes.h"
-
-// Mythui headers
-#include "mythuitype.h"
-#include "mythmainwindow.h" // for MythMainWindow::drawRefresh
+// MythTV
+#include "libmythbase/mythstorage.h"
+#include "libmythbase/mythtypes.h"
+#include "libmythui/mythuitype.h"
+#include "libmythui/mythmainwindow.h" // for MythMainWindow::drawRefresh
 
 #define DEFAULT_REFRESH_RATE 70 // Hz
 

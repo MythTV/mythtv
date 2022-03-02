@@ -4,7 +4,7 @@
 #include <QWaitCondition>
 #include <QMutex>
 
-#include "mthread.h"
+#include "libmythbase/mthread.h"
 
 class HLSReader;
 

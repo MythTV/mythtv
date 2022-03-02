@@ -6,7 +6,7 @@ QT += xml sql network testlib widgets
 TEMPLATE = app
 TARGET = test_xine_demux
 DEPENDPATH += . ../..
-INCLUDEPATH += . ../.. ../../../libmyth ../../../libmythbase
+INCLUDEPATH += . ../.. ../../.. ../../../libmyth ../../../libmythbase
 INCLUDEPATH += ../../../../external/FFmpeg
 POST_TARGETDEPS = ../../$(OBJECTS_DIR)xine_demux_sputext.o
 

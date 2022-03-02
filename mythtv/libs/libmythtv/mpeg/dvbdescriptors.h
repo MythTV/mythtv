@@ -8,9 +8,9 @@
 #include <QMutex>
 #include <QString>
 
-#include "mythtvexp.h" // MTV_PUBLIC - Symbol Visibility
+#include "libmyth/programinfo.h" // for subtitle types and audio and video properties
+#include "libmythtv/mythtvexp.h" // MTV_PUBLIC - Symbol Visibility
 #include "mpegdescriptors.h"
-#include "programinfo.h" // for subtitle types and audio and video properties
 
 /*
 // needed for scanning

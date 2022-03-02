@@ -1,6 +1,9 @@
 #ifndef VIDEO_DISPLAY_PROFILE_H_
 #define VIDEO_DISPLAY_PROFILE_H_
 
+// Std
+#include <vector>
+
 // Qt
 #include <QStringList>
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
@@ -12,11 +15,8 @@
 #include <QMap>
 
 // MythTV
-#include "mythtvexp.h"
-#include "mythcontext.h"
-
-// Std
-#include <vector>
+#include "libmyth/mythcontext.h"
+#include "libmythtv/mythtvexp.h"
 
 #define DEINT_QUALITY_NONE   QString("none")
 #define DEINT_QUALITY_LOW    QString("low")

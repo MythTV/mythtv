@@ -7,7 +7,7 @@ using_opengl: QT += opengl
 TEMPLATE = app
 TARGET = test_audioutils
 DEPENDPATH += . ../.. ../../audio ../../../libmythbase
-INCLUDEPATH += . ../.. ../../audio ../../../.. ../../../../external/FFmpeg
+INCLUDEPATH += . ../.. ../../audio ../../.. ../../../../external/FFmpeg
 INCLUDEPATH += ../../../libmythbase
 INCLUDEPATH += ../../../libmythservicecontracts
 

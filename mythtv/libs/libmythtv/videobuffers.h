@@ -1,6 +1,10 @@
 #ifndef VIDEOBUFFERS_H
 #define VIDEOBUFFERS_H
 
+// Std
+#include <vector>
+#include <map>
+
 // Qt
 #include <QSize>
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
@@ -11,14 +15,10 @@
 #include <QString>
 
 // MythTV
-#include "mythtvexp.h"
-#include "mythframe.h"
-#include "mythdeque.h"
-#include "mythcodecid.h"
-
-// Std
-#include <vector>
-#include <map>
+#include "libmythbase/mythdeque.h"
+#include "libmythtv/mythtvexp.h"
+#include "libmythtv/mythframe.h"
+#include "libmythtv/mythcodecid.h"
 
 using frame_queue_t  = MythDeque<MythVideoFrame*> ;
 using frame_vector_t = std::vector<MythVideoFrame>;

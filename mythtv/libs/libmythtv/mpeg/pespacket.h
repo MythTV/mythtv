@@ -12,8 +12,9 @@
 
 using AspectArray = std::array<float,16>;
 
+#include "libmythbase/mythlogging.h"
+
 #include "tspacket.h"
-#include "mythlogging.h"
 
 MTV_PUBLIC unsigned char *pes_alloc(uint size);
 MTV_PUBLIC void pes_free(unsigned char *ptr);

@@ -16,8 +16,8 @@ class OutputEvent;
 #include <QMutex>
 #include <QList>
 
-#include "mythobservable.h"
-#include "mythexp.h"
+#include "libmyth/mythexp.h"
+#include "libmythbase/mythobservable.h"
 
 using namespace std::chrono_literals;
 

@@ -4,8 +4,8 @@
 #include <QVector>
 #include <QObject>
 
-#include "mythuiexp.h"
-#include "mythchrono.h"
+#include "libmythbase/mythchrono.h"
+#include "libmythui/mythuiexp.h"
 
 class QString;
 

@@ -5,9 +5,9 @@
 #include <QStringList>
 #include <QMutex>
 
-#include "mthread.h"
-#include "mythmetaexp.h"
-#include "metadatacommon.h"
+#include "libmythbase/mthread.h"
+#include "libmythmetadata/mythmetaexp.h"
+#include "libmythmetadata/metadatacommon.h"
 
 struct ThumbnailData {
     QString title;

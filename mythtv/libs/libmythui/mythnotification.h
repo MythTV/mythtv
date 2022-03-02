@@ -9,17 +9,17 @@
 #ifndef MYTHTV_MYTHNOTIFICATION_H
 #define MYTHTV_MYTHNOTIFICATION_H
 
+// Std
+#include <utility>
+
 // Qt
 #include <QImage>
 #include <QMap>
 #include <QMutex>
 
 // MythTV
-#include "mythevent.h"
-#include "mythuiexp.h"
-
-// Std
-#include <utility>
+#include "libmythbase/mythevent.h"
+#include "libmythui/mythuiexp.h"
 
 using namespace std::chrono_literals;
 

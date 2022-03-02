@@ -10,14 +10,14 @@
 #endif
 #include <QVector>
 
-// MythTV
-#include "mythframe.h"
-#include "mythhdr.h"
-
 // FFmpeg
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
+
+// MythTV
+#include "libmythtv/mythframe.h"
+#include "libmythui/mythhdr.h"
 
 struct SwsContext;
 struct AVStream;

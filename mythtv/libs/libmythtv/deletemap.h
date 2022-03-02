@@ -7,8 +7,8 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "mythtvexp.h"
-#include "programtypes.h"               // for frm_dir_map_t, MarkTypes
+#include "libmythtv/mythtvexp.h"
+#include "libmyth/programtypes.h"       // for frm_dir_map_t, MarkTypes
 
 class OSD;
 class PlayerContext;

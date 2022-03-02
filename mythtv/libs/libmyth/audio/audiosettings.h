@@ -15,8 +15,8 @@
 #include <QString>
 
 // MythTV headers
-#include "mythexp.h"
-#include "audiooutputsettings.h"
+#include "libmyth/mythexp.h"
+#include "libmyth/audio/audiooutputsettings.h"
 
 enum AudioOutputSource {
     AUDIOOUTPUT_UNKNOWN,

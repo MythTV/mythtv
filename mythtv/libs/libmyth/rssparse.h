@@ -14,8 +14,8 @@
 #include <QVariant>
 #include <sys/types.h>
 
-#include "mythexp.h"
-#include "mythtypes.h"
+#include "libmyth/mythexp.h"
+#include "libmythbase/mythtypes.h"
 
 enum ArticleType {
     VIDEO_FILE = 0,

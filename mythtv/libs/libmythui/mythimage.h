@@ -12,8 +12,8 @@
 #include <QMutex>
 #include <QPixmap>
 
-#include "referencecounter.h"
-#include "mythpainter.h"
+#include "libmythbase/referencecounter.h"
+#include "libmythui/mythpainter.h"
 
 enum class ReflectAxis {Horizontal, Vertical};
 enum class FillDirection {LeftToRight, TopToBottom};

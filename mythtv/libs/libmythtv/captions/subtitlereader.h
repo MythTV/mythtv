@@ -7,8 +7,8 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-#include "mythchrono.h"
-#include "mythdeque.h"
+#include "libmythbase/mythchrono.h"
+#include "libmythbase/mythdeque.h"
 #include "textsubtitleparser.h"
 
 class AVSubtitles

@@ -1,17 +1,17 @@
 #ifndef MYTHPLAYERSTATE_H
 #define MYTHPLAYERSTATE_H
 
-// MythTV
-#include "mythtvexp.h"
-#include "mythchrono.h"
-#include "volumebase.h"
-#include "videoouttypes.h"
-#include "audiooutputsettings.h"
-
 // FFmpeg
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
+
+// MythTV
+#include "libmyth/audio/audiooutputsettings.h"
+#include "libmyth/audio/volumebase.h"
+#include "libmythbase/mythchrono.h"
+#include "libmythtv/mythtvexp.h"
+#include "libmythtv/videoouttypes.h"
 
 class OSD;
 class AudioPlayer;

@@ -5,12 +5,12 @@
 #include <QTimer>
 
 // MythTV
-#include "mythchrono.h"
-#include "mythscreenstack.h"
-#include "mythnotificationcenter.h"
-#include "mythuiactions.h"
-#include "mythrect.h"
-#include "mythuiscreenbounds.h"
+#include "libmythbase/mythchrono.h"
+#include "libmythui/mythnotificationcenter.h"
+#include "libmythui/mythrect.h"
+#include "libmythui/mythscreenstack.h"
+#include "libmythui/mythuiactions.h"
+#include "libmythui/mythuiscreenbounds.h"
 
 class QEvent;
 class MythThemeBase;

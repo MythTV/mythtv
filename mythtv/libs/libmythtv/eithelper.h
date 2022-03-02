@@ -16,9 +16,9 @@
 #include <QString>
 
 // MythTV includes
-#include "mythchrono.h"
-#include "mythdeque.h"
-#include "mpegtables.h" // for GPS_LEAP_SECONDS
+#include "libmythbase/mythchrono.h"
+#include "libmythbase/mythdeque.h"
+#include "libmythtv/mpeg/mpegtables.h" // for GPS_LEAP_SECONDS
 
 class MSqlQuery;
 

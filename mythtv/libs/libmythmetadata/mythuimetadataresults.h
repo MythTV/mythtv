@@ -1,10 +1,9 @@
 #ifndef MYTHUIMETADATARESULTS_H_
 #define MYTHUIMETADATARESULTS_H_
 
-#include "mythuibuttonlist.h"
-
-#include "metadatacommon.h"
-#include "mythmetaexp.h"
+#include "libmythmetadata/metadatacommon.h"
+#include "libmythmetadata/mythmetaexp.h"
+#include "libmythui/mythuibuttonlist.h"
 
 class MetadataImageDownload;
 

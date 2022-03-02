@@ -7,7 +7,7 @@ using_opengl: QT += opengl
 TEMPLATE = app
 TARGET = test_metadatagrabber
 DEPENDPATH += . ../..
-INCLUDEPATH += . ../.. ../../../libmythbase 
+INCLUDEPATH += . ../.. ../../.. ../../../libmythbase
 
 LIBS += ../../$(OBJECTS_DIR)lyricsdata.o
 

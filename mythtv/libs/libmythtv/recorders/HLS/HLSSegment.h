@@ -6,7 +6,7 @@
 #include <QString>
 #include <QUrl>
 
-#include "mythchrono.h"
+#include "libmythbase/mythchrono.h"
 
 class HLSRecSegment
 {

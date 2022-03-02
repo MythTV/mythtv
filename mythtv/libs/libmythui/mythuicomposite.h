@@ -1,8 +1,8 @@
 #ifndef MYTHTV_MYTHUICOMPOSITE_H
 #define MYTHTV_MYTHUICOMPOSITE_H
 
-#include "mythuitype.h"
-#include "mythtypes.h"
+#include "libmythbase/mythtypes.h"
+#include "libmythui/mythuitype.h"
 
 class MUI_PUBLIC MythUIComposite : public MythUIType
 {

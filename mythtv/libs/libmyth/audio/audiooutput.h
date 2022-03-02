@@ -9,14 +9,14 @@
 #include <QVector>
 
 // MythTV headers
-#include "compat.h"
-#include "audiosettings.h"
-#include "audiooutputsettings.h"
-#include "mythchrono.h"
-#include "mythcorecontext.h"
-#include "mythaverror.h"
-#include "volumebase.h"
-#include "output.h"
+#include "libmyth/audio/audiooutputsettings.h"
+#include "libmyth/audio/audiosettings.h"
+#include "libmyth/audio/volumebase.h"
+#include "libmyth/mythaverror.h"
+#include "libmyth/output.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythchrono.h"
+#include "libmythbase/mythcorecontext.h"
 
 // forward declaration
 struct AVCodecContext;

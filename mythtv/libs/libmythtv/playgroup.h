@@ -3,8 +3,8 @@
 
 #include <QStringList>
 
-#include "mythtvexp.h"
-#include "standardsettings.h"
+#include "libmyth/standardsettings.h"
+#include "libmythtv/mythtvexp.h"
 
 class ProgramInfo;
 

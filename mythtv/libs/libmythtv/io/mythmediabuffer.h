@@ -9,10 +9,10 @@
 #include <QMap>
 
 // MythTV
-#include "mythtvexp.h"
-#include "mythchrono.h"
-#include "mythconfig.h"
-#include "mthread.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythtv/mythtvexp.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythchrono.h"
 
 // FFmpeg
 extern "C" {

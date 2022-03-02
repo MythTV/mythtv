@@ -1,8 +1,8 @@
 #ifndef MYTHPLUGINAPI_H_
 #define MYTHPLUGINAPI_H_
 
-#include "mythpluginexport.h"
-#include "mythplugin.h" // for MythPluginType
+#include "libmythbase/mythpluginexport.h"
+#include "libmythbase/mythplugin.h" // for MythPluginType
 
 extern "C"
 {

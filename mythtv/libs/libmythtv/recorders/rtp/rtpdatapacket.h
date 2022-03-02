@@ -8,8 +8,8 @@
 
 #include <QtEndian>
 
+#include "libmythbase/mythlogging.h"
 #include "udppacket.h"
-#include "mythlogging.h"
 
 #ifdef _MSC_VER
 #  include <WinSock2.h>

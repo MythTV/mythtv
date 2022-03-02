@@ -1,8 +1,8 @@
 #ifndef GOOMCORE_H
 #define GOOMCORE_H
 
-#include "goomconfig.h"
-#include "mythtvexp.h"
+#include "goom/goomconfig.h"
+#include "libmythtv/mythtvexp.h"
 
 #include <array>
 

@@ -4,10 +4,10 @@
 #include <QObject>
 #include <QString>
 
-#include "mythcorecontext.h"
-#include "mythevent.h"
-#include "mythexp.h"
-#include "mythlogging.h"
+#include "libmyth/mythexp.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythevent.h"
+#include "libmythbase/mythlogging.h"
 
 class MythContextPrivate;
 

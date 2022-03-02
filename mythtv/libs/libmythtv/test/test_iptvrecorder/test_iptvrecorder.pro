@@ -7,7 +7,7 @@ using_opengl: QT += opengl
 TEMPLATE = app
 TARGET = test_iptvrecorder
 DEPENDPATH += . ../..
-INCLUDEPATH += . ../.. ../../mpeg ../../../libmythui ../../../libmyth ../../../libmythbase
+INCLUDEPATH += . ../.. ../../mpeg ../../.. ../../../libmythui ../../../libmyth ../../../libmythbase
 INCLUDEPATH += ../../../libmythservicecontracts
 
 LIBS += ../../$(OBJECTS_DIR)iptvchannelfetcher.o

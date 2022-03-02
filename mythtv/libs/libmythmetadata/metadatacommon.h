@@ -15,12 +15,12 @@
 #include <QString>
 #include <QStringList>
 
-#include "mythtypes.h"
-#include "mythchrono.h"
-#include "mythmetaexp.h"
-#include "metadataimagehelper.h"
-#include "referencecounterlist.h"
-#include "metadatagrabber.h"
+#include "libmythbase/mythchrono.h"
+#include "libmythbase/mythtypes.h"
+#include "libmythbase/referencecounterlist.h"
+#include "libmythmetadata/metadatagrabber.h"
+#include "libmythmetadata/mythmetaexp.h"
+#include "libmythtv/metadataimagehelper.h"
 
 class ProgramInfo;
 

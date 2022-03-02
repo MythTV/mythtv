@@ -18,13 +18,13 @@
 #include <QDateTime>
 
 // MythTV headers
-#include "videoouttypes.h"
-#include "mythtimer.h"
-#include "mythtvexp.h"
-#include "mythdeque.h"
-#include "mythdate.h"
-#include "mythtypes.h"
-#include "tv.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdeque.h"
+#include "libmythbase/mythtimer.h"
+#include "libmythbase/mythtypes.h"
+#include "libmythtv/mythtvexp.h"
+#include "libmythtv/tv.h"
+#include "libmythtv/videoouttypes.h"
 
 class TV;
 class RemoteEncoder;

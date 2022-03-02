@@ -1,11 +1,12 @@
 #ifndef MYTHUIANIMATION_H
 #define MYTHUIANIMATION_H
 
-#include "mythchrono.h"
-#include "mythdate.h"
-#include "xmlparsebase.h"
 #include <QDateTime>
 #include <QVariantAnimation>
+
+#include "libmythbase/mythchrono.h"
+#include "libmythbase/mythdate.h"
+#include "libmythui/xmlparsebase.h"
 
 class MythUIType;
 

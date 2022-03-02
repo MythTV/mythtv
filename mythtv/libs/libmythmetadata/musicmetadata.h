@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <utility>
 
-
 // qt
 #include <QCoreApplication>
 #include <QDateTime>
@@ -15,11 +14,11 @@
 #include <QMetaType>
 #include <QStringList>
 
-// mythtv
-#include "mythtypes.h"
-#include "mythmetaexp.h"
-#include "mthread.h"
-#include "mythcorecontext.h"
+// MythTV
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythtypes.h"
+#include "libmythmetadata/mythmetaexp.h"
 
 class AllMusic;
 class AlbumArtImages;

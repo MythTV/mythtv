@@ -11,10 +11,10 @@
 #include <QStringList>
 
 // MythTV headers
-#include "mythscreentype.h"
-#include "mythuitextedit.h"
-#include "mythmainwindow.h"
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythscreentype.h"
+#include "libmythui/mythuitextedit.h"
 
 
 class QTimer;

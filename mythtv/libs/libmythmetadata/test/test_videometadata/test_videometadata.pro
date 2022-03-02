@@ -8,7 +8,7 @@ TEMPLATE = app
 TARGET = test_videometadata
 DEPENDPATH += . ../.. ../../../libmythbase ../../../libmythtv ../../../libmyth
 DEPENDPATH += ../../../libmythui
-INCLUDEPATH += . ../.. ../../../libmythbase ../../../libmythtv ../../../libmyth
+INCLUDEPATH += . ../.. ../../.. ../../../libmythbase ../../../libmythtv ../../../libmyth
 INCLUDEPATH += ../../../libmythui ../../../libmythservicecontracts
 
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION

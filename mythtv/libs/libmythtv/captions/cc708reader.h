@@ -5,9 +5,9 @@
 #define CC708READER_H
 
 #include <cstdint>
-#include "format.h"
-#include "compat.h"
-#include "captions/cc708window.h"
+#include "libmythbase/compat.h"
+#include "libmythtv/captions/cc708window.h"
+#include "libmythtv/format.h"
 
 class MythPlayer;
 

@@ -7,7 +7,7 @@ using_opengl: QT += opengl
 TEMPLATE = app
 TARGET = test_frequencies
 DEPENDPATH += . ../..
-INCLUDEPATH += . ../.. ../../../libmyth ../../../libmythbase
+INCLUDEPATH += . ../.. ../../.. ../../../libmyth ../../../libmythbase
 
 # Directly add objects w/non-exported functions
 LIBS += ../../$(OBJECTS_DIR)dsmccbiop.o

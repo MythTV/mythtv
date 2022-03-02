@@ -8,11 +8,11 @@
 // qt
 #include <QObject>
 
-// mythtv
-#include "mythmetaexp.h"
-#include "mythcorecontext.h"
-#include "musicmetadata.h"
-#include "mythdate.h"
+// MythTV
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythmetadata/musicmetadata.h"
+#include "libmythmetadata/mythmetaexp.h"
 
 class LyricsData;
 class TestLyrics;

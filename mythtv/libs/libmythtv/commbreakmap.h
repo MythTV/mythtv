@@ -1,12 +1,10 @@
 #ifndef BREAKMAP_H
 #define BREAKMAP_H
 
-// MythTV headers
-#include "tv.h"
-#include "programtypes.h"
-#include "playercontext.h"
+#include <cstdint>
 
 // Qt headers
+#include <QtGlobal>
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
 #include <QMutex>
 #else
@@ -15,8 +13,11 @@
 #include <QMap>
 #include <QCoreApplication>
 
-#include <cstdint>
-#include "compat.h"
+// MythTV headers
+#include "libmyth/programtypes.h"
+#include "libmythbase/compat.h"
+#include "libmythtv/tv.h"
+#include "libmythtv/playercontext.h"
 
 class CommBreakMap
 {

@@ -25,7 +25,7 @@
 
 #include <cstdint>
 #include <QString>
-#include "mythexp.h"
+#include "libmyth/mythexp.h"
 
 #define ELD_FIXED_BYTES    20
 #define ELD_MAX_SAD        16

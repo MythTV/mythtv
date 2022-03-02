@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QEvent>
 #include <QDomElement>
-#include "mthread.h"
 #include <QMetaType>
 #include <QMutex>
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
@@ -12,9 +11,10 @@
 #endif
 #include <QTimer>
 
-#include "rssparse.h"
-#include "mythexp.h"
-#include "mythsystemlegacy.h"
+#include "libmyth/mythexp.h"
+#include "libmyth/rssparse.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythsystemlegacy.h"
 
 class MPUBLIC GrabberScript : public QObject, public MThread
 {

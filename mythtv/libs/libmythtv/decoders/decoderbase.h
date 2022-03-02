@@ -5,14 +5,14 @@
 #include <cstdint>
 #include <vector>
 
-#include "io/mythmediabuffer.h"
-#include "remoteencoder.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
-#include "programinfo.h"
-#include "mythcodecid.h"
-#include "mythavutil.h"
-#include "mythvideoprofile.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythtv/io/mythmediabuffer.h"
+#include "libmythtv/mythavutil.h"
+#include "libmythtv/mythcodecid.h"
+#include "libmythtv/mythvideoprofile.h"
+#include "libmythtv/remoteencoder.h"
 
 class TeletextViewer;
 class MythPlayer;

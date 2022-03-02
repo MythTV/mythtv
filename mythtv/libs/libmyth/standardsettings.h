@@ -7,10 +7,10 @@
 #include <QMap>
 #include <QObject>
 
-#include "mythexp.h"
-#include "mythuibuttonlist.h"
-#include "mythdialogbox.h"
-#include "mythstorage.h"
+#include "libmyth/mythexp.h"
+#include "libmythbase/mythstorage.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythuibuttonlist.h"
 
 class StandardSetting;
 

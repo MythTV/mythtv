@@ -1,6 +1,9 @@
 ﻿#ifndef MYTH_VIDEOOUT_H_
 #define MYTH_VIDEOOUT_H_
 
+// Std
+#include <memory>
+
 // Qt
 #include <QSize>
 #include <QRect>
@@ -10,19 +13,16 @@
 #include <qwindowdefs.h>
 
 // MythTV
-#include "mythframe.h"
-#include "videobuffers.h"
-#include "mythcodecid.h"
-#include "videoouttypes.h"
-#include "mythvideobounds.h"
-#include "mythdisplay.h"
-#include "mythvideoprofile.h"
-#include "mythvideocolourspace.h"
-#include "mythavutil.h"
-#include "mythdeinterlacer.h"
-
-// Std
-#include <memory>
+#include "libmythtv/mythavutil.h"
+#include "libmythtv/mythcodecid.h"
+#include "libmythtv/mythdeinterlacer.h"
+#include "libmythtv/mythframe.h"
+#include "libmythtv/mythvideobounds.h"
+#include "libmythtv/mythvideocolourspace.h"
+#include "libmythtv/mythvideoprofile.h"
+#include "libmythtv/videobuffers.h"
+#include "libmythtv/videoouttypes.h"
+#include "libmythui/mythdisplay.h"
 
 class MythPlayer;
 class OSD;

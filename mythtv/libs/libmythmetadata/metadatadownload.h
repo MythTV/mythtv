@@ -5,8 +5,8 @@
 #include <QMutex>
 #include <QEvent>
 
-#include "metadatacommon.h"
-#include "mthread.h"
+#include "libmythbase/mthread.h"
+#include "libmythmetadata/metadatacommon.h"
 
 class META_PUBLIC MetadataLookupEvent : public QEvent
 {
