@@ -20,10 +20,11 @@
 
 #include "test_videolist.h"
 
-#include "mythcorecontext.h"
-#include "mythgenerictree.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythmetadata/videometadatalistmanager.h"
+#include "libmythui/mythgenerictree.h"
+
 #include "videofilter.h"
-#include "videometadatalistmanager.h"
 
 void TestVideoList::initTestCase()
 {

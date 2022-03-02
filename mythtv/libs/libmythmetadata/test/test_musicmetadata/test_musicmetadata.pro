@@ -6,8 +6,7 @@ using_opengl: QT += opengl
 
 TEMPLATE = app
 TARGET = test_musicmetadata
-DEPENDPATH += . ../..
-INCLUDEPATH += . ../.. ../../.. ../../../libmythbase
+INCLUDEPATH += ../../..
 
 # Add all the necessary libraries
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION

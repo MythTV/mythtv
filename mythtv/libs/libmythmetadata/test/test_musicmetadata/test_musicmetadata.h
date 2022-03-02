@@ -20,8 +20,9 @@
 
 #include <QtTest/QtTest>
 #include <iostream>
-#include "metaio.h"
-#include "mythcorecontext.h"
+
+#include "libmythbase/mythcorecontext.h"
+#include "libmythmetadata/metaio.h"
 
 class TestMusicMetadata : public QObject
 {

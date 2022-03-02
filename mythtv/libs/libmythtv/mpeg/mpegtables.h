@@ -8,9 +8,9 @@
 
 // MythTV headers
 #include "libmythbase/stringutil.h" // for xml_indent
-#include "mpegdescriptors.h"
-#include "mythtvexp.h"
-#include "pespacket.h"
+#include "libmythtv/mpeg/mpegdescriptors.h"
+#include "libmythtv/mpeg/pespacket.h"
+#include "libmythtv/mythtvexp.h"
 
 /** \file mpegtables.h
  *  \code

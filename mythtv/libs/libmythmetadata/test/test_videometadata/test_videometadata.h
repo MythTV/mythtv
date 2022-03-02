@@ -20,10 +20,10 @@
 
 #include <QtTest/QtTest>
 
-#include <videometadata.h>
-#include <programinfo.h>
-#include <recordinginfo.h>
-#include <metadatafactory.h>
+#include "libmyth/programinfo.h"
+#include "libmythmetadata/metadatafactory.h"
+#include "libmythmetadata/videometadata.h"
+#include "libmythtv/recordinginfo.h"
 
 class Testvideometadata: public QObject
 {

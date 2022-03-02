@@ -20,10 +20,10 @@
 
 #include <QtTest/QtTest>
 
-#include "iptvtuningdata.h"
-#include "channelscan/iptvchannelfetcher.h"
-#include "recorders/rtp/rtpdatapacket.h"
-#include "recorders/rtp/rtptsdatapacket.h"
+#include "libmythtv/iptvtuningdata.h"
+#include "libmythtv/channelscan/iptvchannelfetcher.h"
+#include "libmythtv/recorders/rtp/rtpdatapacket.h"
+#include "libmythtv/recorders/rtp/rtptsdatapacket.h"
 
 class TestIPTVRecorder: public QObject
 {

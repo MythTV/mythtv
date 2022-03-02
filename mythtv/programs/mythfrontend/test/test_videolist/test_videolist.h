@@ -20,7 +20,7 @@
 
 #include <QtTest/QtTest>
 #include <iostream>
-#include "videometadata.h"
+#include "libmythmetadata/videometadata.h"
 #include "videolist.h"
 
 class TestVideoList : public QObject

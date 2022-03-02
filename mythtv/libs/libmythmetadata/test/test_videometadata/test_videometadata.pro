@@ -6,10 +6,7 @@ using_opengl: QT += opengl
 
 TEMPLATE = app
 TARGET = test_videometadata
-DEPENDPATH += . ../.. ../../../libmythbase ../../../libmythtv ../../../libmyth
-DEPENDPATH += ../../../libmythui
-INCLUDEPATH += . ../.. ../../.. ../../../libmythbase ../../../libmythtv ../../../libmyth
-INCLUDEPATH += ../../../libmythui ../../../libmythservicecontracts
+INCLUDEPATH += ../../..
 
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../.. -lmythmetadata-$$LIBVERSION

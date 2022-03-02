@@ -5,9 +5,7 @@ using_opengl: QT += opengl
 
 TEMPLATE = app
 TARGET = test_settings
-INCLUDEPATH += ../.. ../../..
-INCLUDEPATH += ../../../libmythbase
-INCLUDEPATH += ../../../libmythui
+INCLUDEPATH += ../../..
 
 LIBS += -L../.. -lmyth-$$LIBVERSION
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION

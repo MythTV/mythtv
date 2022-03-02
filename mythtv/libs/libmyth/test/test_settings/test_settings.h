@@ -1,6 +1,6 @@
 #include <QtTest/QtTest>
 
-#include "standardsettings.h"
+#include "libmyth/standardsettings.h"
 
 class ComboBox : public MythUIComboBoxSetting {
 };

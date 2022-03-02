@@ -17,13 +17,16 @@
  */
 
 #include <QStringList>
-#include "mythversion.h"
-#include "mythdate.h"
-#include "test_datacontracts.h"
+
+#include "libmythbase/mythversion.h"
+#include "libmythbase/mythdate.h"
+
 #include "datacontracts/programAndChannel.h"
 #include "datacontracts/programList.h"
 #include "datacontracts/recRule.h"
 #include "datacontracts/recording.h"
+
+#include "test_datacontracts.h"
 
 void TestDataContracts::initTestCase(void)
 {

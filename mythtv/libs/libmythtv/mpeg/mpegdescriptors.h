@@ -13,7 +13,7 @@
 
 // MythTV
 #include "libmythbase/iso639.h"
-#include "mythtvexp.h"
+#include "libmythtv/mythtvexp.h"
 
 using desc_list_t = std::vector<const unsigned char *>;
 

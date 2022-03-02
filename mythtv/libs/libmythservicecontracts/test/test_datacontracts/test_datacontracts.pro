@@ -5,8 +5,8 @@ QT += xml sql network testlib
 
 TEMPLATE = app
 TARGET = test_datacontracts
-DEPENDPATH += . ../.. ../../../libmyth ../../../libmythbase
-INCLUDEPATH += . ../.. ../../.. ../../../libmyth ../../../libmythbase
+INCLUDEPATH += ../.. ../../..
+
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../../../libmyth -lmyth-$$LIBVERSION
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION

@@ -9,7 +9,7 @@
 #include <QString>
 
 // MythTV
-#include "mythtvexp.h"
+#include "libmythtv/mythtvexp.h"
 
 MTV_PUBLIC
 QString atsc_huffman1_to_string(const unsigned char *compressed,

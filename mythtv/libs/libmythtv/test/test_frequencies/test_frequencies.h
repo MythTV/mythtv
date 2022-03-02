@@ -21,8 +21,8 @@
 #include <QtTest/QtTest>
 #include <iostream>
 
-#include "frequencies.h"
-#include "frequencytables.h"
+#include "libmythtv/frequencies.h"
+#include "libmythtv/frequencytables.h"
 
 class TestFrequencies : public QObject
 {

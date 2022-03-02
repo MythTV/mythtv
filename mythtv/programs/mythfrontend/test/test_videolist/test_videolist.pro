@@ -8,11 +8,6 @@ TARGET = test_videolist
 DEPENDPATH += . ../..
 INCLUDEPATH += . ../..
 INCLUDEPATH += ../../../../libs
-INCLUDEPATH += ../../../../libs/libmythbase
-INCLUDEPATH += ../../../../libs/libmythui
-INCLUDEPATH += ../../../../libs/libmyth
-INCLUDEPATH += ../../../../libs/libmythtv
-INCLUDEPATH += ../../../../libs/libmythmetadata
 
 LIBS += ../../obj/videolist.o
 LIBS += ../../obj/videofilter.o ../../obj/moc_videofilter.o

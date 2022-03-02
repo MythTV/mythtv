@@ -8,12 +8,6 @@ TARGET = test_recordingextender
 DEPENDPATH += . ../..
 INCLUDEPATH += . ../..
 INCLUDEPATH += ../../../../libs
-INCLUDEPATH += ../../../../libs/libmythbase
-INCLUDEPATH += ../../../../libs/libmythui
-INCLUDEPATH += ../../../../libs/libmyth
-INCLUDEPATH += ../../../../libs/libmythtv
-INCLUDEPATH += ../../../../libs/libmythmetadata
-INCLUDEPATH += ../../../../libs/libmythservicecontracts
 
 LIBS += ../../obj/recordingextender.o
 LIBS += ../../obj/moc_recordingextender.o

@@ -22,9 +22,9 @@
 
 #include <QtTest/QtTest>
 
-#include "mythcorecontext.h"
-#include "audiooutpututil.h"
-#include "pink.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmyth/audio/audiooutpututil.h"
+#include "libmyth/audio/pink.h"
 
 #define SSEALIGN 16     // for 16 bytes memory alignment
 

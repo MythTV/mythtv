@@ -20,8 +20,8 @@
 
 #include <QtTest/QtTest>
 
-#include <eithelper.h> /* for FixupValue */
-#include <programdata.h>
+#include "libmythtv/eithelper.h" /* for FixupValue */
+#include "libmythtv/programdata.h"
 
 class TestEITFixups : public QObject
 {

@@ -20,15 +20,15 @@
 #include <iostream>
 #include <QDateTime>
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 #if CONFIG_SQLITE3
 #include <QSqlDriver>
 #include <sqlite3.h>
 #endif
 
-#include "mythcorecontext.h"
-#include "mythdb.h"
-#include "dbcheck.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythtv/dbcheck.h"
 #include "scheduler.h"
 #include "test_recordingextender.h"
 

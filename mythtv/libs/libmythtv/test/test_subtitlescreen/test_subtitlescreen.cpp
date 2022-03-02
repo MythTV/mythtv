@@ -20,11 +20,10 @@
 
 #include <iostream>
 #include <vector>
-#include "subtitlescreen.h"
 #include "test_subtitlescreen.h"
 
-#include "mythchrono.h"
-
+#include "libmythbase/mythchrono.h"
+#include "libmythtv/captions/subtitlescreen.h"
 
 void TestSubtitleScreen::initTestCase()
 {

@@ -22,10 +22,10 @@
 
 #include <iconv.h>
 
-#include "atsctables.h"
-#include "atsc_huffman.h"
-#include "mpegtables.h"
-#include "dvbtables.h"
+#include "libmythtv/mpeg/atsc_huffman.h"
+#include "libmythtv/mpeg/atsctables.h"
+#include "libmythtv/mpeg/dvbtables.h"
+#include "libmythtv/mpeg/mpegtables.h"
 
 static std::array<uint8_t,3+8*12> high8 {
     0x10, 0x00, 0x00,

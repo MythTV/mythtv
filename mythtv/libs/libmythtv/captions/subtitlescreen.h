@@ -19,12 +19,12 @@ extern "C" {
 #include <QVector>
 
 // MythTV headers
+#include "libmythtv/captions/subtitlereader.h"
+#include "libmythtv/mythplayer.h"
 #include "libmythui/mythscreentype.h"
-#include "subtitlereader.h"
-#include "mythplayer.h"
+#include "libmythui/mythuiimage.h"
 #include "libmythui/mythuishape.h"
 #include "libmythui/mythuisimpletext.h"
-#include "libmythui/mythuiimage.h"
 
 class SubtitleScreen;
 class TestSubtitleScreen;

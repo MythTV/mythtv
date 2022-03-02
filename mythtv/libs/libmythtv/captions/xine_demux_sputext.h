@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "io/mythmediabuffer.h"
+#include "libmythtv/io/mythmediabuffer.h"
 
 #define SUB_BUFSIZE   1024
 #define MAX_TIMEOUT 4

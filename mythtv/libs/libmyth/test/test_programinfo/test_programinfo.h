@@ -22,9 +22,9 @@
 #include <iostream>
 #include <QtTest/QtTest>
 
-#include "mythcorecontext.h"
-#include "programinfo.h"
-#include "programtypes.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmyth/programinfo.h"
+#include "libmyth/programtypes.h"
 
 #define DEBUG 0
 

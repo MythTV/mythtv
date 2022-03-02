@@ -1,6 +1,6 @@
-#include "mythscheduler.h"
-#include "mthread.h"
-#include "recordinginfo.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythscheduler.h"
+#include "libmythtv/recordinginfo.h"
 
 QMap<uint,RecordingInfo*> gFakeRecordings;
 

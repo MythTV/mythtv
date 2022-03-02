@@ -6,8 +6,7 @@ using_opengl: QT += opengl
 
 TEMPLATE = app
 TARGET = test_musicutils
-DEPENDPATH += . ../..
-INCLUDEPATH += . ../.. ../../.. ../../../libmythbase
+INCLUDEPATH += ../../..
 
 LIBS += ../../$(OBJECTS_DIR)lyricsdata.o
 

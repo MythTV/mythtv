@@ -6,9 +6,7 @@ using_opengl: QT += opengl
 
 TEMPLATE = app
 TARGET = test_mythiowrapper
-DEPENDPATH += . ../..
-INCLUDEPATH += . ../.. ../../mpeg ../../../libmythui ../../../libmyth ../../../libmythbase
-INCLUDEPATH += ../../../libmythservicecontracts
+INCLUDEPATH += ../../..
 
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION

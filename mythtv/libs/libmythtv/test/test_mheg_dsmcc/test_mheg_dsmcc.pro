@@ -5,8 +5,7 @@ QT += xml sql network testlib widgets
 
 TEMPLATE = app
 TARGET = test_mheg_dsmcc
-DEPENDPATH += . ../..
-INCLUDEPATH += . ../.. ../../mheg ../../../libmyth ../../../libmythbase
+INCLUDEPATH += ../../..
 
 # Directly add objects w/non-exported functions
 LIBS += ../../$(OBJECTS_DIR)dsmccbiop.o

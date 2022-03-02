@@ -2,7 +2,7 @@
 #define AUDIOPINK
 
 #include <array>
-#include "mythexp.h"
+#include "libmyth/mythexp.h"
 
 #define PINK_DEFAULT_ROWS      (12)
 #define PINK_MAX_RANDOM_ROWS   (32)

@@ -18,7 +18,7 @@
 #include <QColor>
 
 // MythTV headers
-#include "mythtvexp.h"
+#include "libmythtv/mythtvexp.h"
 
 extern const uint k708JustifyLeft;
 extern const uint k708JustifyRight;

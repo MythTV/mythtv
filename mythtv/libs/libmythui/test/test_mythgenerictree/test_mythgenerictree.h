@@ -20,7 +20,7 @@
 
 #include <QtTest/QtTest>
 #include <iostream>
-#include "mythgenerictree.h"
+#include "libmythui/mythgenerictree.h"
 
 class TestMythGenericTree : public QObject
 {

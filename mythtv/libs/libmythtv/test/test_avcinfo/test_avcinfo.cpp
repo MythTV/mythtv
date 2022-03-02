@@ -22,7 +22,7 @@
 #include <iostream>
 #include <random>
 #include "test_avcinfo.h"
-#include "recorders/avcinfo.h"
+#include "libmythtv/recorders/avcinfo.h"
 
 void TestAvcInfo::initTestCase(void)
 {

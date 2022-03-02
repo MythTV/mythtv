@@ -21,7 +21,7 @@
 #include <QtTest/QtTest>
 #include <iostream>
 
-#include "mheg/dsmcc.h"
+#include "libmythtv/mheg/dsmcc.h"
 
 class TestMhegDsmcc : public QObject
 {

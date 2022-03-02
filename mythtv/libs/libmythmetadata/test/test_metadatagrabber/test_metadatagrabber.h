@@ -20,8 +20,8 @@
 
 #include <QtTest/QtTest>
 #include <iostream>
-#include "musicmetadata.h"
-#include "metadatagrabber.h"
+#include "libmythmetadata/musicmetadata.h"
+#include "libmythmetadata/metadatagrabber.h"
 
 class TestMetadataGrabber : public QObject
 {

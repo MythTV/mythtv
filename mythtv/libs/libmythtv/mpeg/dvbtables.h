@@ -6,9 +6,9 @@
 #include <QString>
 #include <cstdint>  // uint32_t
 
-#include "dvbdescriptors.h"
-#include "mpegtables.h"
-#include "mythtvexp.h"
+#include "libmythtv/mpeg/dvbdescriptors.h"
+#include "libmythtv/mpeg/mpegtables.h"
+#include "libmythtv/mythtvexp.h"
 
 MTV_PUBLIC QDateTime dvbdate2qt(const unsigned char *buf);
 MTV_PUBLIC time_t dvbdate2unix(const unsigned char *buf);

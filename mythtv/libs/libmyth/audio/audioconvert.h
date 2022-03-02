@@ -24,8 +24,8 @@
 #ifndef MythXCode_audioconvert
 #define MythXCode_audioconvert
 
-#include "mythexp.h"
-#include "audiooutputsettings.h"
+#include "libmyth/mythexp.h"
+#include "libmyth/audio/audiooutputsettings.h"
 
 class AudioConvertInternal;
 

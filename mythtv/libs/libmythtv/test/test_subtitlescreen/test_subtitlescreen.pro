@@ -6,12 +6,7 @@ using_opengl: QT += opengl
 
 TEMPLATE = app
 TARGET = test_subtitlescreen
-DEPENDPATH += . ../..
-INCLUDEPATH += . ../.. ../../captions ../../..
-INCLUDEPATH += ../../../libmythbase
-INCLUDEPATH += ../../../libmythui
-INCLUDEPATH += ../../../libmythservicecontracts
-INCLUDEPATH += ../../../libmyth ../../../libmyth/audio
+INCLUDEPATH += ../../..
 INCLUDEPATH += ../../../../external/FFmpeg
 
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION

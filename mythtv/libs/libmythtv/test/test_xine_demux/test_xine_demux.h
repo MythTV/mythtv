@@ -20,7 +20,7 @@
 
 #include <QtTest/QtTest>
 #include <iostream>
-#include "captions/xine_demux_sputext.h"
+#include "libmythtv/captions/xine_demux_sputext.h"
 
 class TestXineDemux : public QObject
 {

@@ -6,11 +6,8 @@ using_opengl: QT += opengl
 
 TEMPLATE = app
 TARGET = test_copyframes
-DEPENDPATH += . ../..
-INCLUDEPATH += . ../.. ../../.. ../../../libmyth ../../../libmythbase
-INCLUDEPATH += ../../../.. ../../../../external/FFmpeg
-INCLUDEPATH += ../../../libmythbase
-INCLUDEPATH += ../../../libmythservicecontracts
+INCLUDEPATH += ../../..
+INCLUDEPATH += ../../../../external/FFmpeg
 
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION

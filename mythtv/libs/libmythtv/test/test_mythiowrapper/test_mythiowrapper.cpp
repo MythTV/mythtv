@@ -21,7 +21,7 @@
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
-#include "io/mythiowrapper.h"
+#include "libmythtv/io/mythiowrapper.h"
 #include "test_mythiowrapper.h"
 
 void TestMythIOWrapper::initTestCase(void)

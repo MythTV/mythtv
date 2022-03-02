@@ -2,10 +2,9 @@
 
 #include <climits>
 
-#include "mythcorecontext.h"
-
-#include "mythframe.h"
-#include "mythrandom.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythrandom.h"
+#include "libmythtv/mythframe.h"
 
 void TestCopyFrames::initTestCase(void)
 {

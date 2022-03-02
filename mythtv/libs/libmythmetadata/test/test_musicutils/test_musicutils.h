@@ -20,8 +20,9 @@
 
 #include <QtTest/QtTest>
 #include <iostream>
-#include "musicmetadata.h"
-#include "musicutils.h"
+
+#include "libmythmetadata/musicmetadata.h"
+#include "libmythmetadata/musicutils.h"
 
 class TestMusicUtils : public QObject
 {

@@ -5,8 +5,7 @@ QT += testlib
 
 TEMPLATE = app
 TARGET = test_avcinfo
-DEPENDPATH += . ../..
-INCLUDEPATH += . ../.. ../../mpeg ../../../libmythui ../../../libmyth ../../../libmythbase
+INCLUDEPATH += ../../..
 
 # Input
 HEADERS += test_avcinfo.h

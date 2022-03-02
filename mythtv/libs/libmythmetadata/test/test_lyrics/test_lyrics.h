@@ -20,7 +20,7 @@
 
 #include <QtTest/QtTest>
 #include <iostream>
-#include "lyricsdata.h"
+#include "libmythmetadata/lyricsdata.h"
 
 class TestLyrics : public QObject
 {

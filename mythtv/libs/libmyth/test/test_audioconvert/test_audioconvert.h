@@ -20,8 +20,8 @@
 
 #include <QtTest/QtTest>
 
-#include "mythcorecontext.h"
-#include "audioconvert.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmyth/audio/audioconvert.h"
 
 #define ISIZEOF(type) ((int)sizeof(type))
 
