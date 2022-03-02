@@ -15,7 +15,6 @@ TARGET = mythmusic
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
-INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/
 INCLUDEPATH += $${CONFIG_TAGLIB_INCLUDES}
 
 LIBS += -lmythavformat
