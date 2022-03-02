@@ -8,8 +8,7 @@ target.path = $${LIBDIR}
 
 INCLUDEPATH += . ../../
 INCLUDEPATH += ./dvdnav ./dvdread
-INCLUDEPATH += ../../libs/libmythbase
-INCLUDEPATH += ../../libs/libmythtv
+INCLUDEPATH += ../../libs
 
 POSTINC =
 

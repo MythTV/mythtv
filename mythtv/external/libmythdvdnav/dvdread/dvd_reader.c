@@ -76,7 +76,7 @@ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
 #include "dvdread_internal.h"
 #include "md5.h"
 #include "dvdread/ifo_read.h"
-#include "io/mythiowrapper.h"
+#include "libmythtv/io/mythiowrapper.h"
 
 #define DEFAULT_UDF_CACHE_LEVEL 1
 

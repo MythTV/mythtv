@@ -61,7 +61,7 @@
 #include <fcntl.h>  /* O_BINARY  */
 #endif
 
-#include "io/mythiowrapper.h"
+#include "libmythtv/io/mythiowrapper.h"
 
 /*
 #define DVDNAV_STRICT

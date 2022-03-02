@@ -11,7 +11,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "mythtvexp.h"
+#include "libmythtv/mythtvexp.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -27,7 +27,7 @@
 
 #include "dvdread/dvd_reader.h"      /* DVD_VIDEO_LB_LEN */
 #include "dvd_input.h"
-#include "io/mythiowrapper.h"
+#include "libmythtv/io/mythiowrapper.h"
 #include "mythdvdreadexp.h"
 
 /* The function pointers that is the exported interface of this file. */
