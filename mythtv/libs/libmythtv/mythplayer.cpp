@@ -732,14 +732,20 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
     if (min_buffers)
         wait = m_videoOutput->ValidVideoFrames() < min_buffers;
     else if (GetEof() != kEofStateNone)
-        wait = false;
+        wait = false; // other code detects EOF to exit playback, so keep playing
     else if (abs(m_ffrewSkip) > 1)
         wait = !m_videoOutput->ValidVideoFrames();
     else
         wait = !m_videoOutput->EnoughDecodedFrames();
 
-    if (wait)
+    if (!wait)
     {
+        if (!m_avSync.GetAVSyncAudioPause())
+            m_audio.Pause(false);
+        SetBuffering(false);
+        return true;
+    }
+
         SetBuffering(true);
 
         // This piece of code is to address the problem, when starting
@@ -831,17 +837,6 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
             SetErrored(tr("Video frame buffering failed too many times."));
         }
         return false;
-    }
-
-    // Make sure we have at least one frame available.  The EOF case
-    // can get here without one.
-    if (!m_videoOutput->ValidVideoFrames())
-        return false;
-
-    if (!m_avSync.GetAVSyncAudioPause())
-        m_audio.Pause(false);
-    SetBuffering(false);
-    return true;
 }
 
 void MythPlayer::VideoEnd(void)
