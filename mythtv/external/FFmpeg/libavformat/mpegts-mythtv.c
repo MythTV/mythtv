@@ -3109,6 +3109,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
             mpegts_add_stream(ts, h->id, &items[idx], prog_reg_desc, pcr_pid);
 
         /* cache pmt */
+        av_log(ts->stream, AV_LOG_TRACE, "exporting PMT\n");
         export_pmt(avctx, section, section_len);
 
         /* notify stream_changed listeners */
