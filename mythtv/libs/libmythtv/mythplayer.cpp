@@ -833,15 +833,10 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         return false;
     }
 
-    // Make sure we have at least one frame available.  The EOF case
-    // can get here without one.
-    if (!m_videoOutput->ValidVideoFrames())
-        return false;
-
     if (!m_avSync.GetAVSyncAudioPause())
         m_audio.Pause(false);
     SetBuffering(false);
-    return true;
+    return m_videoOutput->ValidVideoFrames();
 }
 
 void MythPlayer::VideoEnd(void)
