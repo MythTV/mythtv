@@ -377,7 +377,7 @@ void ContentDescriptor::Init(void)
     s_categoryDesc[0x15] = subCatStr
         .arg(QCoreApplication::translate("(Categories)", "Movie"),
              QCoreApplication::translate("(Categories)",
-                                         "Soap/melodrama/folkloric"));
+                                         "Soap/Melodrama/Folkloric"));
     s_categoryDesc[0x16] = subCatStr
         .arg(QCoreApplication::translate("(Categories)", "Movie"),
              QCoreApplication::translate("(Categories)", "Romance"));
@@ -392,9 +392,9 @@ void ContentDescriptor::Init(void)
 
     s_categoryDesc[0x20] = QCoreApplication::translate("(Categories)", "News");
     s_categoryDesc[0x21] = QCoreApplication::translate("(Categories)",
-                                                       "News/weather report");
+                                                       "News/Weather Report");
     s_categoryDesc[0x22] = QCoreApplication::translate("(Categories)",
-                                                       "News magazine");
+                                                       "News Magazine");
     s_categoryDesc[0x23] = QCoreApplication::translate("(Categories)",
                                                        "Documentary");
     s_categoryDesc[0x24] = QCoreApplication::translate("(Categories)",
@@ -487,7 +487,7 @@ void ContentDescriptor::Init(void)
     s_categoryDesc[0x7B] = QCoreApplication::translate("(Categories)", "Fashion");
 
     s_categoryDesc[0x80] = QCoreApplication::translate("(Categories)",
-                             "Social/Policical/Economics");
+                             "Social/Political/Economics");
     s_categoryDesc[0x81] = QCoreApplication::translate("(Categories)",
                              "Magazines/Reports/Documentary");
     s_categoryDesc[0x82] = QCoreApplication::translate("(Categories)",
@@ -498,7 +498,7 @@ void ContentDescriptor::Init(void)
     s_categoryDesc[0x90] = QCoreApplication::translate("(Categories)",
                              "Education/Science/Factual");
     s_categoryDesc[0x91] = QCoreApplication::translate("(Categories)",
-                             "Nature/animals/Environment");
+                             "Nature/Animals/Environment");
     s_categoryDesc[0x92] = QCoreApplication::translate("(Categories)",
                              "Technology/Natural Sciences");
     s_categoryDesc[0x93] = QCoreApplication::translate("(Categories)",
