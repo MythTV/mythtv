@@ -15,6 +15,7 @@
     "@angular/common": "~13.0.3",
     "@angular/compiler": "~13.0.3",
     "@angular/core": "~13.0.3",
+    "@angular/cli": "~13.0.3",
     "@angular/forms": "~13.0.3",
     "@angular/material": "^13.0.3",
     "@angular/platform-browser": "~13.0.3",
