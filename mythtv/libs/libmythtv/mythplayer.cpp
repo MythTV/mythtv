@@ -661,16 +661,13 @@ void MythPlayer::DiscardVideoFrames(bool KeyFrame, bool Flushed)
 
 bool MythPlayer::HasReachedEof(void) const
 {
-    EofState eof = GetEof();
-    if (eof != kEofStateNone && !m_allPaused)
-        return true;
     if (GetEditMode())
         return false;
     if (m_liveTV)
         return false;
     if (!m_deleteMap.IsEmpty() && m_framesPlayed >= m_deleteMap.GetLastFrame())
         return true;
-    return false;
+    return (GetEof() != kEofStateNone && !m_allPaused);
 }
 
 void MythPlayer::DeLimboFrame(MythVideoFrame *frame)
