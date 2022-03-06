@@ -254,6 +254,8 @@ class AvFormatDecoder : public DecoderBase
 
     virtual int ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &storePacket);
 
+    bool FlagIsSet(PlayerFlags arg) { return m_playerFlags & arg; }
+
     bool               m_isDbIgnored;
 
     AVCParser         *m_avcParser                    {nullptr};
