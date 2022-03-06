@@ -77,8 +77,6 @@ enum PlayerFlags
     kMusicChoice          = 0x040000,
 };
 
-#define FlagIsSet(arg) (m_playerFlags & (arg))
-
 // Padding between class members reduced from 113 to 73 bytes, but its
 // still higher than the default warning threshhold of 24 bytes.
 //
@@ -318,6 +316,8 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Edit mode stuff
     bool GetEditMode(void) const { return m_deleteMap.IsEditing(); }
     bool IsInDelete(uint64_t frame);
+
+    bool FlagIsSet(PlayerFlags arg) { return m_playerFlags & arg; }
 
   protected:
     // Private Sets
