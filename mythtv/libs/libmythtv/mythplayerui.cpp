@@ -226,7 +226,6 @@ void MythPlayerUI::EventLoop()
     }
 
     // Handle end of file
-    EofState eof = GetEof();
     if (HasReachedEof())
     {
 #ifdef USING_MHEG
@@ -257,7 +256,7 @@ void MythPlayerUI::EventLoop()
             // exit when all video frames are played
             drained = m_videoOutput && m_videoOutput->ValidVideoFrames() < 1;
         }
-        if (eof != kEofStateDelayed || (drained))
+        if (EofState eof = GetEof(); eof != kEofStateDelayed || (drained))
         {
             if (eof == kEofStateDelayed)
             {
