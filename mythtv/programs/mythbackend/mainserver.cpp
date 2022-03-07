@@ -312,7 +312,7 @@ MainServer::MainServer(bool master, int port,
     {
         // Make sure we have a good, fsinfo cache before setting
         // mainServer in the scheduler.
-        QList<FileSystemInfo> m_fsInfos;
+        FileSystemInfoList m_fsInfos;
         GetFilesystemInfos(m_fsInfos, false);
         sched->SetMainServer(this);
     }
@@ -5253,7 +5253,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     }
 }
 
-void MainServer::GetFilesystemInfos(QList<FileSystemInfo> &fsInfos,
+void MainServer::GetFilesystemInfos(FileSystemInfoList &fsInfos,
                                     bool useCache)
 {
     // Return cached information if requested.
@@ -5295,7 +5295,7 @@ void MainServer::GetFilesystemInfos(QList<FileSystemInfo> &fsInfos,
 
     FileSystemInfo::Consolidate(fsInfos, false, maxWriteFiveSec);
 
-    QList<FileSystemInfo>::iterator it1;
+    FileSystemInfoList::iterator it1;
     if (VERBOSE_LEVEL_CHECK(VB_FILE | VB_SCHEDULE, LOG_INFO))
     {
         LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
