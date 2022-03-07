@@ -15,6 +15,7 @@
 
 // MythTV headers
 #include "libmythbase/exitcodes.h"
+#include "libmythbase/filesysteminfo.h"
 #include "libmythbase/mthreadpool.h"
 #include "libmythbase/mythdeque.h"
 #include "libmythbase/mythdownloadmanager.h"
@@ -36,7 +37,6 @@
 class QUrl;
 class MythServer;
 class QTimer;
-class FileSystemInfo;
 class MetadataFactory;
 class FreeSpaceUpdater;
 
@@ -146,7 +146,7 @@ class MainServer : public QObject, public MythSocketCBs
     size_t GetCurrentMaxBitrate(void);
     void BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                                bool allHosts);
-    void GetFilesystemInfos(QList<FileSystemInfo> &fsInfos,
+    void GetFilesystemInfos(FileSystemInfoList &fsInfos,
                             bool useCache=true);
 
     int GetExitCode() const { return m_exitCode; }
@@ -351,7 +351,7 @@ class MainServer : public QObject, public MythSocketCBs
     QTimer *m_autoexpireUpdateTimer          {nullptr}; // audited ref #5318
     static QMutex s_truncate_and_close_lock;
 
-    QList<FileSystemInfo> m_fsInfosCache;
+    FileSystemInfoList    m_fsInfosCache;
     QMutex                m_fsInfosCacheLock;
 
     QMutex                     m_downloadURLsLock;

@@ -125,7 +125,7 @@ void AutoExpire::CalcParams()
 {
     LOG(VB_FILE, LOG_INFO, LOC + "CalcParams()");
 
-    QList<FileSystemInfo> fsInfos;
+    FileSystemInfoList fsInfos;
 
     m_instanceLock.lock();
     if (m_mainServer)
@@ -168,7 +168,7 @@ void AutoExpire::CalcParams()
     }
     m_instanceLock.unlock();
 
-    QList<FileSystemInfo>::iterator fsit;
+    FileSystemInfoList::iterator fsit;
     for (fsit = fsInfos.begin(); fsit != fsInfos.end(); ++fsit)
     {
         if (fsMap.contains(fsit->getFSysID()))
@@ -406,8 +406,8 @@ void AutoExpire::ExpireRecordings(void)
 {
     pginfolist_t expireList;
     pginfolist_t deleteList;
-    QList<FileSystemInfo> fsInfos;
-    QList<FileSystemInfo>::iterator fsit;
+    FileSystemInfoList fsInfos;
+    FileSystemInfoList::iterator fsit;
 
     LOG(VB_FILE, LOG_INFO, LOC + "ExpireRecordings()");
 
@@ -481,7 +481,7 @@ void AutoExpire::ExpireRecordings(void)
                     .arg(fsit->getFSysID()));
             LOG(VB_FILE, LOG_INFO, QString("Directories on filesystem ID %1:")
                     .arg(fsit->getFSysID()));
-            QList<FileSystemInfo>::iterator fsit2;
+            FileSystemInfoList::iterator fsit2;
             for (fsit2 = fsInfos.begin(); fsit2 != fsInfos.end(); ++fsit2)
             {
                 if (fsit2->getFSysID() == fsit->getFSysID())
@@ -512,7 +512,7 @@ void AutoExpire::ExpireRecordings(void)
                     .arg(m_desiredSpace[fsit->getFSysID()] / 1024));
 
             QMap<QString, int> dirList;
-            QList<FileSystemInfo>::iterator fsit2;
+            FileSystemInfoList::iterator fsit2;
 
             LOG(VB_FILE, LOG_INFO,
                 QString("    Directories on filesystem ID %1:")
