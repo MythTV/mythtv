@@ -96,7 +96,7 @@ bool FileSystemInfo::FromStringList(QStringList::const_iterator &it,
 }
 
 // default: sock = nullptr
-FileSystemInfoList FileSystemInfo::RemoteGetInfo(MythSocket *sock)
+FileSystemInfoList FileSystemInfoManager::GetInfoList(MythSocket *sock)
 {
     FileSystemInfoList fsInfos;
     QStringList strlist(QStringLiteral("QUERY_FREE_SPACE_LIST"));

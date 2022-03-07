@@ -82,8 +82,6 @@ class MBASE_PUBLIC FileSystemInfo
     bool        ToStringList(QStringList &slist) const;
     QStringList ToStringList() const;
 
-    static QList<FileSystemInfo> RemoteGetInfo(MythSocket *sock=nullptr);
-
     /// @brief update statfs filesystem statistics by reading from the storage device
     /// @returns If successful
     bool refresh();
@@ -113,6 +111,8 @@ namespace FileSystemInfoManager
 MBASE_PUBLIC FileSystemInfoList FromStringList(const QStringList& list);
 
 MBASE_PUBLIC QStringList ToStringList(const FileSystemInfoList& fsInfos);
+
+MBASE_PUBLIC FileSystemInfoList GetInfoList(MythSocket *sock = nullptr);
 
 MBASE_PUBLIC
 void Consolidate(FileSystemInfoList &disks, bool merge = true, int64_t fuzz = 14000);
