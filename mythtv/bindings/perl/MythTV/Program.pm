@@ -119,8 +119,19 @@ package MythTV::Program;
         $self->{'mono'}           = $self->{'audio_props'}   & 0x02;
         $self->{'surround'}       = $self->{'audio_props'}   & 0x04;
         $self->{'dolby'}          = $self->{'audio_props'}   & 0x08;
-        $self->{'hdtv'}           = $self->{'video_props'}   & 0x01;
-        $self->{'widescreen'}     = $self->{'video_props'}   & 0x02;
+
+        $self->{'widescreen'}     = $self->{'video_props'}   & 0x0001;
+        $self->{'hdtv'}           = $self->{'video_props'}   & 0x0002;
+        $self->{'mpeg2'}          = $self->{'video_props'}   & 0x0004;
+        $self->{'avc'}            = $self->{'video_props'}   & 0x0008;
+        $self->{'hevc'}           = $self->{'video_props'}   & 0x0010;
+        $self->{'720'}            = $self->{'video_props'}   & 0x0020;
+        $self->{'1080'}           = $self->{'video_props'}   & 0x0040;
+        $self->{'4k'}             = $self->{'video_props'}   & 0x0080;
+        $self->{'3dtv'}           = $self->{'video_props'}   & 0x0100;
+        $self->{'progressive'}    = $self->{'video_props'}   & 0x0200;
+        $self->{'damaged'}        = $self->{'video_props'}   & 0x0400;
+
         $self->{'closecaptioned'} = $self->{'subtitle_type'} & 0x01;
         $self->{'has_subtitles'}  = $self->{'subtitle_type'} & 0x02;
         $self->{'subtitled'}      = $self->{'subtitle_type'} & 0x04;
