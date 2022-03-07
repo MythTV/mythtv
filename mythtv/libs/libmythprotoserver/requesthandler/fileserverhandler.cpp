@@ -426,7 +426,7 @@ bool FileServerHandler::HandleQueryFreeSpaceList(SocketHandler *socket)
             hosts << disk.getHostname();
 
     // TODO: get max bitrate from encoderlink
-    FileSystemInfo::Consolidate(disks, true, 14000);
+    FileSystemInfoManager::Consolidate(disks, true, 14000);
 
     long long total = 0;
     long long used = 0;
@@ -449,7 +449,7 @@ bool FileServerHandler::HandleQueryFreeSpaceSummary(SocketHandler *socket)
     QStringList res;
     FileSystemInfoList disks = QueryAllFileSystems();
     // TODO: get max bitrate from encoderlink
-    FileSystemInfo::Consolidate(disks, true, 14000);
+    FileSystemInfoManager::Consolidate(disks, true, 14000);
 
     long long total = 0;
     long long used = 0;
