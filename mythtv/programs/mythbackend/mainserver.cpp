@@ -5234,7 +5234,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     int64_t maxWriteFiveSec = GetCurrentMaxBitrate()/12 /*5 seconds*/;
     maxWriteFiveSec = std::max((int64_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
 
-    FileSystemInfo::Consolidate(fsInfos, true, maxWriteFiveSec);
+    FileSystemInfoManager::Consolidate(fsInfos, true, maxWriteFiveSec);
 
     // Pass the cleaned list back
     strlist << FileSystemInfoManager::ToStringList(fsInfos);
@@ -5293,7 +5293,7 @@ void MainServer::GetFilesystemInfos(FileSystemInfoList &fsInfos,
     // safety for NFS mounted dirs
     maxWriteFiveSec = std::max((size_t)2048, maxWriteFiveSec);
 
-    FileSystemInfo::Consolidate(fsInfos, false, maxWriteFiveSec);
+    FileSystemInfoManager::Consolidate(fsInfos, false, maxWriteFiveSec);
 
     FileSystemInfoList::iterator it1;
     if (VERBOSE_LEVEL_CHECK(VB_FILE | VB_SCHEDULE, LOG_INFO))
