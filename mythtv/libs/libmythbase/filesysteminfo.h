@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <utility>
 
-#include <QList>
+#include <QVector>
 #include <QString>
 #include <QStringList>
 
@@ -105,7 +105,7 @@ class MBASE_PUBLIC FileSystemInfo
     int     m_weight    {0}; ///< set by setWeight
 };
 
-using FileSystemInfoList = QList<FileSystemInfo>; // TODO not a QList though
+using FileSystemInfoList = QVector<FileSystemInfo>;
 namespace FileSystemInfoManager
 {
 MBASE_PUBLIC FileSystemInfoList FromStringList(const QStringList& list);
