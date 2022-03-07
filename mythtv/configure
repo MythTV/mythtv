@@ -7250,6 +7250,7 @@ ffmpeg_optenable() {
 }
 
 if [ -n "$cpuflags_native" ]; then
+    cpu_detected="$cpu"
     cpu="host"
 fi
 
@@ -7364,7 +7365,14 @@ echo "install prefix            $prefix"
 echo "runtime prefix            $runprefix"
 echo
 if enabled cpu_override && test x"$cpu" != x"generic"; then
-    echo "CPU override              $arch $subarch ($cpu)"
+    if [ -n "$cpuflags_native" ]; then
+        echo "CPU override              $arch $subarch (cpu=host (native) is $cpu_detected)"
+        if test x"$processor" != x"" ; then
+            echo "                          [$processor]"
+        fi
+    else
+        echo "CPU override              $arch $subarch ($cpu)"
+    fi
 elif test x"$processor" != x"" ; then
     echo "CPU                       $arch $subarch ($processor)"
 else
