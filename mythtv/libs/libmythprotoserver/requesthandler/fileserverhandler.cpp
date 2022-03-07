@@ -538,7 +538,7 @@ FileSystemInfoList FileServerHandler::QueryAllFileSystems(void)
 
         QMap<QString, SocketHandler*>::iterator i;
         for (i = m_fsMap.begin(); i != m_fsMap.end(); ++i)
-            disks << FileSystemInfo::RemoteGetInfo((*i)->GetSocket());
+            disks << FileSystemInfoManager::GetInfoList((*i)->GetSocket());
     }
 
     return disks;
