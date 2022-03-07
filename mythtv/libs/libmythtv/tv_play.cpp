@@ -6783,7 +6783,7 @@ void TV::DoEditSchedule(int EditType)
         pause |= !m_player->GetVideoOutput();
         pause |= m_player->IsPaused();
         if (!pause)
-            pause |= m_player->IsNearEnd();
+            pause |= (!StateIsLiveTV(GetState()) && m_player->IsNearEnd());
     }
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
