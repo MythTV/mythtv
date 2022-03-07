@@ -113,8 +113,8 @@ FileSystemInfoList FileSystemInfo::RemoteGetInfo(MythSocket *sock)
 }
 
 // O(n^2)
-void FileSystemInfo::Consolidate(QList<FileSystemInfo> &disks,
-                                 bool merge, int64_t fuzz)
+void FileSystemInfoManager::Consolidate(FileSystemInfoList &disks,
+                                        bool merge, int64_t fuzz)
 {
     int newid = 0;
 
