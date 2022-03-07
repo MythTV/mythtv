@@ -5273,20 +5273,11 @@ void MainServer::GetFilesystemInfos(FileSystemInfoList &fsInfos,
 
     BackendQueryDiskSpace(strlist, false, true);
 
-    QStringList::const_iterator it = strlist.cbegin();
-    while (it != strlist.cend())
+    fsInfos = FileSystemInfoManager::FromStringList(strlist);
+    // clear fsid so it is regenerated in Consolidate()
+    for (auto & fsInfo : fsInfos)
     {
-        fsInfo.setHostname(*(it++));
-        fsInfo.setPath(*(it++));
-        fsInfo.setLocal((*(it++)).toInt() > 0);
         fsInfo.setFSysID(-1);
-        ++it;
-        fsInfo.setGroupID((*(it++)).toInt());
-        fsInfo.setBlockSize((*(it++)).toInt());
-        fsInfo.setTotalSpace((*(it++)).toLongLong());
-        fsInfo.setUsedSpace((*(it++)).toLongLong());
-        fsInfo.setWeight(0);
-        fsInfos.push_back(fsInfo);
     }
 
     LOG(VB_SCHEDULE | VB_FILE, LOG_DEBUG, LOC +
