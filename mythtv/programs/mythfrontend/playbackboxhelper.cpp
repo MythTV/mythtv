@@ -388,7 +388,7 @@ void PlaybackBoxHelper::UndeleteRecording(uint recordingID)
 
 void PlaybackBoxHelper::UpdateFreeSpace(void)
 {
-    QList<FileSystemInfo> fsInfos = FileSystemInfo::RemoteGetInfo();
+    FileSystemInfoList fsInfos = FileSystemInfo::RemoteGetInfo();
 
     QMutexLocker locker(&m_lock);
     for (const auto& fsInfo : qAsConst(fsInfos))
