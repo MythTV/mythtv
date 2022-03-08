@@ -19,7 +19,6 @@
 #include "io/mythmediabuffer.h"
 #include "exitcodes.h"
 #include "signalhandling.h"
-#include "loggingserver.h"
 #include "cleanupguard.h"
 
 namespace {
@@ -135,7 +134,6 @@ int main(int argc, char *argv[])
 
 #ifndef _WIN32
     SignalHandler::Init();
-    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);

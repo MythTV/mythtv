@@ -27,7 +27,6 @@
 #include "videosource.h" // for is_grabber..
 #include "dbcheck.h"
 #include "mythsystemevent.h"
-#include "loggingserver.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
 #include "cleanupguard.h"
@@ -251,7 +250,6 @@ int main(int argc, char *argv[])
 
 #ifndef _WIN32
     SignalHandler::Init();
-    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);

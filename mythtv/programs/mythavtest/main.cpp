@@ -251,7 +251,6 @@ int main(int argc, char *argv[])
 
 #ifndef _WIN32
     SignalHandler::Init();
-    signal(SIGHUP, SIG_IGN);
 #endif
 
     if (cmdline.toBool("test"))

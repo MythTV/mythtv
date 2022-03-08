@@ -15,7 +15,6 @@
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "dbutil.h"
-#include "loggingserver.h"
 #include "mythlogging.h"
 #include "mythversion.h"
 #include "langsettings.h"
@@ -299,7 +298,6 @@ int main(int argc, char *argv[])
 
 #ifndef _WIN32
     SignalHandler::Init();
-    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     if (cmdline.toBool("geometry"))
