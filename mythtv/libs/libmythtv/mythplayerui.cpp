@@ -48,6 +48,10 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
     connect(m_tv, &TV::UpdateBookmark, this, &MythPlayerUI::SetBookmark);
     connect(m_tv, &TV::UpdateLastPlayPosition, this, &MythPlayerUI::SetLastPlayPosition);
     connect(m_tv, &TV::InitialisePlayerState, this, &MythPlayerUI::InitialiseState);
+
+    // Setup refresh interval.
+    m_refreshInterval = m_display->GetRefreshInterval(16667us);
+    m_avSync.SetRefreshInterval(m_refreshInterval);
 }
 
 void MythPlayerUI::InitialiseState()
@@ -496,7 +500,7 @@ void MythPlayerUI::InitFrameInterval()
     SetFrameInterval(GetScanType(), 1.0 / (m_videoFrameRate * static_cast<double>(m_playSpeed)));
     MythPlayer::InitFrameInterval();
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Display Refresh Rate: %1 Video Frame Rate: %2")
-        .arg(1000000.0 / m_display->GetRefreshInterval(m_frameInterval).count(), 0, 'f', 3)
+        .arg(1000000.0 / m_refreshInterval.count(), 0, 'f', 3)
         .arg(1000000.0 / m_frameInterval.count(), 0, 'f', 3));
 }
 
@@ -783,10 +787,6 @@ void MythPlayerUI::SetLastPlayPosition(uint64_t frame)
 
 bool MythPlayerUI::CanSupportDoubleRate()
 {
-    std::chrono::microseconds refreshinterval = 1us;
-    if (m_display)
-        refreshinterval = m_display->GetRefreshInterval(m_frameInterval);
-
     // At this point we may not have the correct frame rate.
     // Since interlaced is always at 25 or 30 fps, if the interval
     // is less than 30000 (33fps) it must be representing one
@@ -794,7 +794,7 @@ bool MythPlayerUI::CanSupportDoubleRate()
     std::chrono::microseconds realfi = m_frameInterval;
     if (m_frameInterval < 30ms)
         realfi = m_frameInterval * 2;
-    return (duration_cast<floatusecs>(realfi) / 2.0) > (duration_cast<floatusecs>(refreshinterval) * 0.995);
+    return (duration_cast<floatusecs>(realfi) / 2.0) > (duration_cast<floatusecs>(m_refreshInterval) * 0.995);
 }
 
 void MythPlayerUI::GetPlaybackData(InfoMap& Map)

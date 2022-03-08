@@ -21,6 +21,7 @@ void MythPlayerAVSync::InitAVSync(void)
     m_priorVideoTimecode = 0ms;
     m_lastFix = 0.0;
     m_avsyncAvg = 0;
+    m_shortFrameDeltas = 0us;
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC + "Reset");
 }
 
@@ -77,6 +78,23 @@ std::chrono::microseconds MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideo
                                  std::chrono::microseconds FrameInterval, float PlaySpeed,
                                  bool HaveVideo, bool Force)
 {
+    // If the frame interval is less than the refresh interval, we
+    // have to drop frames.  Do that here deterministically.  This
+    // produces much smoother playback than doing in the normal, A/V,
+    // sync code below.  It is done by tracking the difference between
+    // the refresh and frame intervals.  When the accumlated
+    // difference exceeds the refresh interval, drop the frame.
+    if (FrameInterval < m_refreshInterval)
+    {
+        m_shortFrameDeltas += (m_refreshInterval - FrameInterval);
+        if (m_shortFrameDeltas >= m_refreshInterval)
+        {
+            LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Dropping short frame"));
+            m_shortFrameDeltas -= m_refreshInterval;
+            return -1ms;
+        }
+    }
+
     std::chrono::milliseconds videotimecode = 0ms;
     bool dropframe = false;
     bool pause_audio = false;

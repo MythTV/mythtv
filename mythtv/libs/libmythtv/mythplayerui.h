@@ -55,6 +55,7 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerEditorUI, public MythVideoScanT
     void EnableBitrateMonitor(bool Enable = false);
 
     Jitterometer    m_outputJmeter { "Player" };
+    std::chrono::microseconds m_refreshInterval { 0us };
 
   private:
     Q_DISABLE_COPY(MythPlayerUI)

@@ -28,6 +28,8 @@ class MythPlayerAVSync
     void     SetAVSyncAudioPause (bool Pause);
     bool     ResetAVSyncForLiveTV(AudioPlayer* Audio);
     void     SetAVSyncMusicChoice(AudioPlayer* Audio); // remove
+    void     SetRefreshInterval(std::chrono::microseconds interval)
+        { m_refreshInterval = interval; }
 
   private:
     QElapsedTimer m_avTimer;
@@ -41,6 +43,8 @@ class MythPlayerAVSync
     int        m_maxTcFrames        { 0 }; // number of frames seen since max to date tc
     int        m_numDroppedFrames   { 0 }; // number of consecutive dropped frames.
     float      m_lastFix            { 0.0F }; //last sync adjustment to prior frame]
+    std::chrono::microseconds m_refreshInterval   { 0us };
+    std::chrono::microseconds m_shortFrameDeltas  { 0us };
 };
 
 #endif
