@@ -842,13 +842,7 @@ int main(int argc, char **argv)
         return retval;
 
 #ifndef _WIN32
-    QList<int> signallist;
-    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
-               << SIGILL;
-#ifndef Q_OS_DARWIN
-    signallist << SIGRTMIN;
-#endif
-    SignalHandler::Init(signallist);
+    SignalHandler::Init();
     SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
