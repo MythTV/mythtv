@@ -95,6 +95,49 @@ bool FileSystemInfo::FromStringList(QStringList::const_iterator &it,
     return true;
 }
 
+bool FileSystemInfo::refresh()
+{
+    struct statfs statbuf {};
+
+    // there are cases where statfs will return 0 (good), but f_blocks and
+    // others are invalid and set to 0 (such as when an automounted directory
+    // is not mounted but still visible because --ghost was used),
+    // so check to make sure we can have a total size > 0
+    if ((statfs(getPath().toLocal8Bit().constData(), &statbuf) == 0) &&
+        (statbuf.f_blocks > 0) && (statbuf.f_bsize > 0)
+       )
+    {
+        m_total = statbuf.f_blocks * statbuf.f_bsize;
+        //free  = statbuf.f_bavail * statbuf.f_bsize;
+        m_used  = m_total - statbuf.f_bavail * statbuf.f_bsize;
+        m_blksize = statbuf.f_bsize;
+
+        // TODO keep as B not KiB
+        m_total >>= 10;
+        m_used  >>= 10;
+
+#ifdef Q_OS_DARWIN
+        char *fstypename = statbuf.f_fstypename;
+        m_local = !(
+                    (strcmp(fstypename, "nfs")   == 0) ||  // NFS|FTP
+                    (strcmp(fstypename, "afpfs") == 0) ||  // AppleShare
+                    (strcmp(fstypename, "smbfs") == 0)     // SMB
+                   );
+#elif defined(__linux__)
+        long fstype = statbuf.f_type;
+        m_local = !(
+                    (fstype == 0x6969)  ||   // NFS
+                    (fstype == 0x517B)  ||   // SMB
+                    (fstype == 0xFF534D42L)  // CIFS
+                   );
+#else
+        m_local = true; // for equivalent behavior
+#endif
+        return true;
+    }
+    return false;
+}
+
 // default: sock = nullptr
 FileSystemInfoList FileSystemInfoManager::GetInfoList(MythSocket *sock)
 {
@@ -158,50 +201,6 @@ void FileSystemInfoManager::Consolidate(FileSystemInfoList &disks,
         }
     }
 }
-
-bool FileSystemInfo::refresh()
-{
-    struct statfs statbuf {};
-
-    // there are cases where statfs will return 0 (good), but f_blocks and
-    // others are invalid and set to 0 (such as when an automounted directory
-    // is not mounted but still visible because --ghost was used),
-    // so check to make sure we can have a total size > 0
-    if ((statfs(getPath().toLocal8Bit().constData(), &statbuf) == 0) &&
-        (statbuf.f_blocks > 0) && (statbuf.f_bsize > 0)
-       )
-    {
-        m_total = statbuf.f_blocks * statbuf.f_bsize;
-        //free  = statbuf.f_bavail * statbuf.f_bsize;
-        m_used  = m_total - statbuf.f_bavail * statbuf.f_bsize;
-        m_blksize = statbuf.f_bsize;
-
-        // TODO keep as B not KiB
-        m_total >>= 10;
-        m_used  >>= 10;
-
-#ifdef Q_OS_DARWIN
-        char *fstypename = statbuf.f_fstypename;
-        m_local = !(
-                    (strcmp(fstypename, "nfs")   == 0) ||  // NFS|FTP
-                    (strcmp(fstypename, "afpfs") == 0) ||  // AppleShare
-                    (strcmp(fstypename, "smbfs") == 0)     // SMB
-                   );
-#elif defined(__linux__)
-        long fstype = statbuf.f_type;
-        m_local = !(
-                    (fstype == 0x6969)  ||   // NFS
-                    (fstype == 0x517B)  ||   // SMB
-                    (fstype == 0xFF534D42L)  // CIFS
-                   );
-#else
-        m_local = true; // for equivalent behavior
-#endif
-        return true;
-    }
-    return false;
-}
-
 
 FileSystemInfoList FileSystemInfoManager::FromStringList(const QStringList& list)
 {
