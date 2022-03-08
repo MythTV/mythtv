@@ -44,9 +44,7 @@ static void sig_str_init(void)
         sig_str_init(i, qPrintable(QString("Signal %1").arg(i)));
 }
 
-QList<int> SignalHandler::s_defaultHandlerList;
-
-SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
+SignalHandler::SignalHandler(QObject *parent) :
     QObject(parent)
 {
     s_exit_program = false; // set here due to "C++ static initializer madness"
@@ -66,16 +64,6 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
         delete [] m_sigStack;
         m_sigStack = nullptr;
     }
-#endif // _WIN32
-
-    if (s_defaultHandlerList.isEmpty())
-        s_defaultHandlerList << SIGINT << SIGTERM << SIGSEGV << SIGABRT
-                             << SIGFPE << SIGILL;
-#ifndef _WIN32
-    s_defaultHandlerList << SIGBUS;
-#ifndef Q_OS_DARWIN
-    s_defaultHandlerList << SIGRTMIN;
-#endif // Q_OS_DARWIN
 
     if (::socketpair(AF_UNIX, SOCK_STREAM, 0, s_sigFd.data()))
     {
@@ -85,18 +73,10 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
     m_notifier = new QSocketNotifier(s_sigFd[1], QSocketNotifier::Read, this);
     connect(m_notifier, &QSocketNotifier::activated, this, &SignalHandler::handleSignal);
 
-    for (int signum : qAsConst(signallist))
+    for (const int signum : k_defaultSignalList)
     {
-        if (!s_defaultHandlerList.contains(signum))
-        {
-            std::cerr << "No default handler for signal " << signum << std::endl;
-            continue;
-        }
-
         SetHandlerPrivate(signum, nullptr);
     }
-#else
-    Q_UNUSED(signallist);
 #endif // _WIN32
 }
 
@@ -124,11 +104,11 @@ SignalHandler::~SignalHandler()
 #endif
 }
 
-void SignalHandler::Init(QList<int> &signallist, QObject *parent)
+void SignalHandler::Init(QObject *parent)
 {
     QMutexLocker locker(&s_singletonLock);
     if (!s_singleton)
-        s_singleton = new SignalHandler(signallist, parent);
+        s_singleton = new SignalHandler(parent);
 }
 
 void SignalHandler::Done(void)
