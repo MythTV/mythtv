@@ -35,7 +35,6 @@
 #include "previewgenerator.h"
 #include "commandlineparser.h"
 #include "mythsystemevent.h"
-#include "loggingserver.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
 #include "cleanupguard.h"
@@ -179,7 +178,6 @@ int main(int argc, char **argv)
 
 #ifndef _WIN32
     SignalHandler::Init();
-    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)

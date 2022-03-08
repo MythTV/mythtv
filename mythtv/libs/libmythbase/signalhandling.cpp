@@ -17,6 +17,7 @@
 
 #include "compat.h"
 #include "mythlogging.h"
+#include "loggingserver.h"
 #include "exitcodes.h"
 #include "signalhandling.h"
 
@@ -77,6 +78,7 @@ SignalHandler::SignalHandler(QObject *parent) :
     {
         SetHandlerPrivate(signum, nullptr);
     }
+    SetHandlerPrivate(SIGHUP, logSigHup);
 #endif // _WIN32
 }
 
