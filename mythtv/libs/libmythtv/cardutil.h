@@ -219,8 +219,12 @@ class MTV_PUBLIC CardUtil
         return !(rawtype == "FREEBOX" || rawtype == "VBOX");
     }
 
+#ifdef USING_VBOX
     static bool         IsVBoxPresent(uint inputid);
+#endif
+#ifdef USING_SATIP
     static bool         IsSatIPPresent(uint inputid);
+#endif
 
     // Card creation and deletion
 

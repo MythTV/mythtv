@@ -107,6 +107,7 @@ bool TVRec::CreateChannel(const QString &startchannel,
         this, m_genOpt, m_dvbOpt, m_fwOpt,
         startchannel, enter_power_save_mode, m_rbFileExt, setchan);
 
+#ifdef USING_VBOX
     if (m_genOpt.m_inputType == "VBOX")
     {
         if (!CardUtil::IsVBoxPresent(m_inputId))
@@ -119,7 +120,9 @@ bool TVRec::CreateChannel(const QString &startchannel,
             m_channel = nullptr;
         }
     }
+#endif
 
+#ifdef USING_SATIP
     if (m_genOpt.m_inputType == "SATIP")
     {
         if (!CardUtil::IsSatIPPresent(m_inputId))
@@ -132,6 +135,7 @@ bool TVRec::CreateChannel(const QString &startchannel,
             m_channel = nullptr;
         }
     }
+#endif
 
     if (!m_channel)
     {

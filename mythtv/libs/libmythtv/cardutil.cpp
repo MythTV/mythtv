@@ -3252,6 +3252,7 @@ bool CardUtil::SetASIMode(uint device_num, uint mode, QString *error)
 #endif
 }
 
+#ifdef USING_VBOX
 /** \fn CardUtil::IsVBoxPresent(uint inputid)
  *  \brief Returns true if the VBox responds to a ping
  *  \param inputid  Inputid  as used in DB capturecard table
@@ -3314,7 +3315,9 @@ bool CardUtil::IsVBoxPresent(uint inputid)
 
     return true;
 }
+#endif
 
+#ifdef USING_SATIP
 /** \fn CardUtil::IsSatIPPresent(uint inputid)
  *  \brief Returns true if the SatIP box responds to a ping
  *  \param inputid  As used in DB capturecard table field cardid
@@ -3370,3 +3373,4 @@ bool CardUtil::IsSatIPPresent(uint inputid)
     }
     return false;
 }
+#endif
