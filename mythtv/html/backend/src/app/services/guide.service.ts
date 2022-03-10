@@ -9,7 +9,7 @@ import { GetProgramGuideRequest } from './interfaces/guide.interface';
   providedIn: 'root'
 })
 export class GuideService {
-  startDate : number = Date.now();
+  startDate : Date;
   guide_data$! : ProgramGuide;
 
   toTime(date : string) {
@@ -25,16 +25,21 @@ export class GuideService {
       let endAt = new Date(d.getTime()+7200000);
       return this.toTime(endAt.toISOString());
   }
-  toHalfHour(date : number) {
+  toHalfHour(date : Date) {
       let d = new Date(date);
       d.setMinutes((d.getMinutes() < 30) ? 0 : 30);
       d.setSeconds(0);
       return d;
   }
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient) {
+    this.startDate = new Date;
+  }
 
-  public GetProgramGuide() : Observable<ProgramGuide> {
+  public GetProgramGuide(reqDate?: Date) : Observable<ProgramGuide> {
+    if (typeof reqDate !== 'undefined') {
+      this.startDate = reqDate;
+    }
     let time : string = this.toHalfHour(this.startDate).toISOString();
     let params : GetProgramGuideRequest = {
       "StartTime": this.toStartTime(time),

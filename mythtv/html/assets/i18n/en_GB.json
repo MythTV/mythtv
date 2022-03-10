@@ -31,7 +31,7 @@
         "contains": "Contains",
         "dateAfter": "Date is after",
         "dateBefore": "Date is before",
-        "dateFormat": "mm/dd/yy",
+        "dateFormat": "dd/mm/yy",
         "dateIs": "Date is",
         "dateIsNot": "Date is not",
         "dayNames": [
