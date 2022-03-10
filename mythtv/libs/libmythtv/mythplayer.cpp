@@ -253,7 +253,7 @@ bool MythPlayer::IsPlaying(std::chrono::milliseconds wait_in_msec, bool wait_for
 {
     QMutexLocker locker(&m_playingLock);
 
-    if (wait_in_msec != 0ms)
+    if (wait_in_msec == 0ms)
         return m_playing;
 
     MythTimer t;
