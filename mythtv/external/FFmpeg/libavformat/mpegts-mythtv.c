@@ -2600,14 +2600,13 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
         } else {
             PESContext *pes = NULL;
 
+            /* now create stream */
             if (ts->pids[pid] && ts->pids[pid]->type == MPEGTS_PES) {
                 pes = ts->pids[pid]->u.pes_filter.opaque;
                 st = pes->st;
             } else {
-                if (ts->pids[pid]) {
-                    //wrongly added sdt filter probably
-                    mpegts_close_filter(ts, ts->pids[pid]);
-                }
+                if (ts->pids[pid])
+                    mpegts_close_filter(ts, ts->pids[pid]); // wrongly added sdt filter probably
                 pes = add_pes_stream(ts, pid, pcr_pid);
                 if (pes)
                 {
@@ -2637,8 +2636,10 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
 
             st->codecpar->codec_tag = item->dvbci.codec_tag;
 
-            if (prog_reg_desc == AV_RL32("HDMV") && stream_type == 0x83 && pes->sub_st) {
-                av_program_add_stream_index(ts->stream, id, pes->sub_st->index);
+            if (pes && prog_reg_desc == AV_RL32("HDMV") &&
+                stream_type == 0x83 && pes->sub_st) {
+                av_program_add_stream_index(ts->stream, id,
+                                            pes->sub_st->index);
                 pes->sub_st->codecpar->codec_tag = st->codecpar->codec_tag;
             }
 
