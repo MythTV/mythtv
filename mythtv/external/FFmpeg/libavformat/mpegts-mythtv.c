@@ -2800,11 +2800,9 @@ static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
         int loc = find_in_list(mpegts_ctx->pmt_pids, items[idx].pid);
         if (loc < 0)
         {
-#ifdef DEBUG
-            av_log(mpegts_ctx, AV_LOG_DEBUG,
+            av_log(mpegts_ctx, AV_LOG_TRACE,
                    "find_in_list(..,[%d].pid=%d) => -1\n",
                    idx, items[idx].pid);
-#endif
             break;
         }
 
@@ -2812,11 +2810,9 @@ static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
         tss = mpegts_ctx->pids[items[idx].pid];
         if (!tss)
         {
-#ifdef DEBUG
-            av_log(mpegts_ctx, AV_LOG_DEBUG,
+            av_log(mpegts_ctx, AV_LOG_TRACE,
                    "mpegts_ctx->pids[items[%d].pid=%d] => null\n",
                    idx, items[idx].pid);
-#endif
             break;
         }
         if (tss->type == MPEGTS_PES)
@@ -2824,17 +2820,13 @@ static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
             PESContext *pes = (PESContext*) tss->u.pes_filter.opaque;
             if (!pes)
             {
-#ifdef DEBUG
-                av_log(mpegts_ctx, AV_LOG_DEBUG, "pes == null, where idx %d\n", idx);
-#endif
+                av_log(mpegts_ctx, AV_LOG_TRACE, "pes == null, where idx %d\n", idx);
                 break;
             }
             if (pes->stream_type != items[idx].type)
             {
-#ifdef DEBUG
-                av_log(mpegts_ctx, AV_LOG_DEBUG,
+                av_log(mpegts_ctx, AV_LOG_TRACE,
                        "pes->stream_type != items[%d].type\n", idx);
-#endif
                 break;
             }
         }
@@ -2843,33 +2835,25 @@ static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
             SectionContext *sect = (SectionContext*) tss->u.section_filter.opaque;
             if (!sect)
             {
-#ifdef DEBUG
-                av_log(mpegts_ctx, AV_LOG_DEBUG, "sect == null, where idx %d\n", idx);
-#endif
+                av_log(mpegts_ctx, AV_LOG_TRACE, "sect == null, where idx %d\n", idx);
                 break;
             }
             if (sect->stream_type != items[idx].type)
             {
-#ifdef DEBUG
-                av_log(mpegts_ctx, AV_LOG_DEBUG,
+                av_log(mpegts_ctx, AV_LOG_TRACE,
                        "sect->stream_type != items[%d].type\n", idx);
-#endif
                 break;
             }
         }
         else
         {
-#ifdef DEBUG
-            av_log(mpegts_ctx, AV_LOG_DEBUG,
+            av_log(mpegts_ctx, AV_LOG_TRACE,
                    "tss->type != MPEGTS_PES, where idx %d\n", idx);
-#endif
             break;
         }
     }
-#ifdef DEBUG
-    av_log(mpegts_ctx, AV_LOG_DEBUG, "pmt_equal_streams:%d old:%d new:%d limit:%d\n",
+    av_log(mpegts_ctx, AV_LOG_TRACE, "pmt_equal_streams:%d old:%d new:%d limit:%d\n",
         idx, mpegts_ctx->pid_cnt, item_cnt, limit);
-#endif
     return idx;
 }
 
@@ -3887,10 +3871,8 @@ static int mpegts_read_header(AVFormatContext *s)
         for (int i = 0; ((i < ts->nb_prg) &&
                      (ts->pmt_scan_state == PMT_NOT_YET_FOUND)); i++)
         {
-#ifdef DEBUG
-            av_log(ts->stream, AV_LOG_DEBUG, "Tuning to pnum: 0x%x\n",
+            av_log(ts->stream, AV_LOG_TRACE, "Tuning to pnum: 0x%x\n",
                    ts->prg[i].id);
-#endif
 
             /* now find the info for the first service if we found any,
                otherwise try to filter all PATs */
