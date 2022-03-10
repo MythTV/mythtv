@@ -46,18 +46,6 @@
 
 // MythTV only -----------------------------------------------------------------
 
-/**
- * av_dlog macros
- * copied from libavutil/log.h since they are deprecated and removed from there
- * Useful to print debug messages that shouldn't get compiled in normally.
- */
-
-#ifdef DEBUG
-#    define av_dlog(pctx, ...) av_log(pctx, AV_LOG_DEBUG, __VA_ARGS__)
-#else
-#    define av_dlog(pctx, ...) do { if (0) av_log(pctx, AV_LOG_DEBUG, __VA_ARGS__); } while (0)
-#endif
-
 #define PMT_NOT_YET_FOUND 0
 #define PMT_NOT_IN_PAT    1
 #define PMT_FOUND         2
@@ -2151,7 +2139,7 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
         break;
 #else
         dvbci->codec_tag = bytestream_get_le32(pp);
-        av_dlog(fc, "reg_desc=%.4s\n", (char*)&dvbci->codec_tag);
+        av_log(fc, AV_LOG_TRACE, "reg_desc=%.4s\n", (char*)&dvbci->codec_tag);
         if (item->codec_id == AV_CODEC_ID_NONE &&
             stream_type == STREAM_TYPE_PRIVATE_DATA)
             mpegts_find_stream_type_pmt(item, dvbci->codec_tag, REGD_types);
