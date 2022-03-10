@@ -2557,22 +2557,23 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
                               uint32_t prog_reg_desc, int pcr_pid)
 {
     AVStream *st = NULL;
-    int pid = item->pid;
+    const int pid         = item->pid;
+    const int stream_type = item->type;
 
     av_log(ts, AV_LOG_DEBUG,
-           "mpegts_add_stream: at pid 0x%x with type %i\n", item->pid, item->type);
+           "mpegts_add_stream: at pid 0x%x with type %i\n", pid, stream_type);
 
     if (ts->pid_cnt < PMT_PIDS_MAX)
     {
-        if (item->type == STREAM_TYPE_DSMCC_B)
+        if (stream_type == STREAM_TYPE_DSMCC_B)
         {
             SectionContext *sect = NULL;
-            sect = add_section_stream(ts, item->pid, item->type);
+            sect = add_section_stream(ts, pid, stream_type);
             if (!sect)
             {
                 av_log(ts, AV_LOG_ERROR, "mpegts_add_stream: "
                        "error creating Section context for pid 0x%x with type %i\n",
-                       item->pid, item->type);
+                       pid, stream_type);
                 return;
             }
 
@@ -2581,7 +2582,7 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
             {
                 av_log(ts, AV_LOG_ERROR, "mpegts_add_stream: "
                        "error creating A/V stream for pid 0x%x with type %i\n",
-                       item->pid, item->type);
+                       pid, stream_type);
                 return;
             }
 
@@ -2589,7 +2590,7 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
             st->data_id  = item->dvbci.data_id;
             st->carousel_id = item->dvbci.carousel_id;
 
-            ts->pmt_pids[ts->pid_cnt] = item->pid;
+            ts->pmt_pids[ts->pid_cnt] = pid;
             ts->pid_cnt++;
 
             av_log(ts, AV_LOG_DEBUG, "mpegts_add_stream: "
@@ -2618,7 +2619,7 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
                 {
                     av_log(ts, AV_LOG_ERROR, "mpegts_add_stream: "
                            "error creating PES context for pid 0x%x with type %i\n",
-                           item->pid, item->type);
+                           pid, stream_type);
                     return;
                 }
             }
@@ -2627,16 +2628,16 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
             {
                 av_log(ts, AV_LOG_ERROR, "mpegts_add_stream: "
                        "error creating A/V stream for pid 0x%x with type %i\n",
-                       item->pid, item->type);
+                       pid, stream_type);
                 return;
             }
 
             if (!pes->stream_type)
-                mpegts_set_stream_info(st, pes, item->type, prog_reg_desc);
+                mpegts_set_stream_info(st, pes, stream_type, prog_reg_desc);
 
             st->codecpar->codec_tag = item->dvbci.codec_tag;
 
-            if (prog_reg_desc == AV_RL32("HDMV") && item->type == 0x83 && pes->sub_st) {
+            if (prog_reg_desc == AV_RL32("HDMV") && stream_type == 0x83 && pes->sub_st) {
                 av_program_add_stream_index(ts->stream, id, pes->sub_st->index);
                 pes->sub_st->codecpar->codec_tag = st->codecpar->codec_tag;
             }
@@ -2647,7 +2648,7 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
                 st->codecpar->codec_id   = item->codec_id;
             }
 
-            ts->pmt_pids[ts->pid_cnt] = item->pid;
+            ts->pmt_pids[ts->pid_cnt] = pid;
             ts->pid_cnt++;
 
             if (item->dvbci.language[0])
@@ -2674,7 +2675,7 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
     {
         av_log(ts, AV_LOG_ERROR,
                "ERROR: adding pes stream at pid 0x%x, pid_cnt = %i\n",
-               item->pid, ts->pid_cnt);
+               pid, ts->pid_cnt);
     }
 }
 
