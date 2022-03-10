@@ -3010,13 +3010,17 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
 
     for(;;) {
         dvb_caption_info_t dvbci;
+        st = 0;
+        pes = NULL;
         stream_type = get8(&p, p_end);
         if (stream_type < 0)
             break;
         pid = get16(&p, p_end);
         if (pid < 0)
-            break;
+            goto out;
         pid &= 0x1fff;
+        if (pid == ts->current_pid)
+            goto out;
 
         /* break if we are out of space. */
         if (last_item >= PMT_PIDS_MAX) {
@@ -3041,14 +3045,15 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
 
         desc_list_len = get16(&p, p_end);
         if (desc_list_len < 0)
-            break;
+            goto out;
         desc_list_len &= 0xfff;
-        desc_list_end = p + desc_list_len;
+        desc_list_end  = p + desc_list_len;
         if (desc_list_end > p_end)
-            break;
-        for(;;) {
-            if (ff_parse_mpeg2_descriptor(ts->stream, &items[last_item], stream_type, &p, desc_list_end,
-                mp4_descr, mp4_descr_count, pid, ts, &dvbci) < 0)
+            goto out;
+        for (;;) {
+            if (ff_parse_mpeg2_descriptor(ts->stream, &items[last_item], stream_type, &p,
+                                          desc_list_end, mp4_descr,
+                                          mp4_descr_count, pid, ts, &dvbci) < 0)
                 break;
         }
         p = desc_list_end;
