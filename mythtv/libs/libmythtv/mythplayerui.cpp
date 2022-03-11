@@ -239,13 +239,23 @@ void MythPlayerUI::EventLoop()
             return;
         }
 
-        bool videoDrained =
-            m_videoOutput && m_videoOutput->ValidVideoFrames() < 1;
-        bool audioDrained =
-            !m_audio.GetAudioOutput() ||
-            m_audio.IsPaused() ||
-            m_audio.GetAudioOutput()->GetAudioBufferedTime() < 100ms;
-        if (eof != kEofStateDelayed || (videoDrained && audioDrained))
+        bool drained = false;
+        if (FlagIsSet(kVideoIsNull) || FlagIsSet(kMusicChoice))
+        {
+            // We have audio only or mostly audio content.  Exit when
+            // the audio is drained.
+            drained =
+                !m_audio.GetAudioOutput() ||
+                m_audio.IsPaused() ||
+                m_audio.GetAudioOutput()->GetAudioBufferedTime() < 100ms;
+        }
+        else
+        {
+            // We have normal or video only content.  Exit when the
+            // video is drained.
+            drained = m_videoOutput && !m_videoOutput->ValidVideoFrames();
+        }
+        if (eof != kEofStateDelayed || drained)
         {
             if (eof == kEofStateDelayed)
             {
