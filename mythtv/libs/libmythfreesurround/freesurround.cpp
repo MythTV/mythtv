@@ -28,8 +28,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <list>
 #include <map>
 
-#include "compat.h"
-#include "mythlogging.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythlogging.h"
+
 #include "freesurround.h"
 #include "el_processor.h"
 
