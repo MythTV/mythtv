@@ -206,4 +206,34 @@ std::chrono::seconds secsInFuture (const QDateTime& future)
     return std::chrono::seconds(MythDate::current().secsTo(future));
 }
 
+/**
+ * \brief Format a milliseconds time value
+ *
+ * Convert a millisecond time value into a textual representation of the value.
+ *
+ * \param msecs The time value in milliseconds. Since the type of this
+ *     field is std::chrono::duration, any duration of a larger
+ *     interval can be passed to this function and the compiler will
+ *     convert it to milliseconds.
+ *
+ * \param fmt A formatting string specifying how to output the time.
+ *     See QTime::toString for the definition of valid formatting
+ *     characters.
+ */
+QString formatTime(std::chrono::milliseconds msecs, QString fmt)
+{
+    int count = 0;
+
+    // QTime can't handle times of more than 24 hours.  Do that part
+    // of the formatting manually, and then let QTime::toString handle
+    // the rest of the formatting.
+    while (fmt[count] == QLatin1Char('H'))
+        count++;
+    fmt.remove(0, count);
+
+    QString result = QString("%1").arg(msecs / 1h, count,10,QLatin1Char('0'));
+    msecs = msecs % 1h;
+    return result + QTime::fromMSecsSinceStartOfDay(msecs.count()).toString(fmt);
+}
+
 }; // namespace MythDate
