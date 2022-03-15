@@ -1,3 +1,4 @@
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GuideComponent } from './guide.component';
@@ -8,7 +9,8 @@ describe('GuideComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ GuideComponent ]
+      declarations: [ GuideComponent ],
+      imports:      [ HttpClientModule ]
     })
     .compileComponents();
   });

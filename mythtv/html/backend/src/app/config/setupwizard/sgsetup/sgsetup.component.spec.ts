@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { SgsetupComponent } from './sgsetup.component';
 
@@ -8,7 +9,8 @@ describe('SgsetupComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SgsetupComponent ]
+      declarations: [ SgsetupComponent ],
+      imports:      [ RouterTestingModule ]
     })
     .compileComponents();
   });

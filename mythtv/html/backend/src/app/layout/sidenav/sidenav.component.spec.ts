@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TranslateModule } from '@ngx-translate/core';
 
 import { SidenavComponent } from './sidenav.component';
 
@@ -8,7 +9,8 @@ describe('SidenavComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SidenavComponent ]
+      declarations: [ SidenavComponent ],
+      imports:      [ TranslateModule.forRoot() ]
     })
     .compileComponents();
   });
