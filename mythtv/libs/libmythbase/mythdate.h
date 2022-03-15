@@ -1,13 +1,11 @@
 #ifndef MYTH_DATE_H
 #define MYTH_DATE_H
 
-#include <chrono>
-using namespace std::chrono_literals;
-
 #include <QDateTime>
 #include <QString>
 
 #include "mythbaseexp.h"
+#include "mythchrono.h"
 
 namespace MythDate
 {

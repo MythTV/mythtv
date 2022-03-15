@@ -1,5 +1,6 @@
 #include <QtGlobal>
 #include <QCoreApplication>
+#include <QRegularExpression>
 
 #include "mythcorecontext.h"
 #include "mythdate.h"
@@ -209,7 +210,11 @@ std::chrono::seconds secsInFuture (const QDateTime& future)
 /**
  * \brief Format a milliseconds time value
  *
- * Convert a millisecond time value into a textual representation of the value.
+ * Convert a millisecond time value into a textual representation of
+ * the value. QTime can't handle overflow of any of the fields, so the
+ * formatting needs to be done manually.  Think a music playlist of
+ * more than 24 hours, or a single song of more than 60 minutes
+ * (e.g. a podcast or something like that).
  *
  * \param msecs The time value in milliseconds. Since the type of this
  *     field is std::chrono::duration, any duration of a larger
@@ -222,18 +227,47 @@ std::chrono::seconds secsInFuture (const QDateTime& future)
  */
 QString formatTime(std::chrono::milliseconds msecs, QString fmt)
 {
-    int count = 0;
+    static const QRegularExpression hRe("H+");
+    static const QRegularExpression mRe("m+");
+    static const QRegularExpression sRe("s+");
+    static const QRegularExpression zRe("z+");
 
-    // QTime can't handle times of more than 24 hours.  Do that part
-    // of the formatting manually, and then let QTime::toString handle
-    // the rest of the formatting.
-    while (fmt[count] == QLatin1Char('H'))
-        count++;
-    fmt.remove(0, count);
+    QRegularExpressionMatch match = hRe.match(fmt);
+    if (match.hasMatch())
+    {
+        int width = match.capturedLength();
+        QString text = QString("%1").arg(msecs / 1h, width,10,QLatin1Char('0'));
+        fmt.replace(match.capturedStart(), width, text);
+        msecs = msecs % 1h;
+    }
 
-    QString result = QString("%1").arg(msecs / 1h, count,10,QLatin1Char('0'));
-    msecs = msecs % 1h;
-    return result + QTime::fromMSecsSinceStartOfDay(msecs.count()).toString(fmt);
+    match = mRe.match(fmt);
+    if (match.hasMatch())
+    {
+        int width = match.capturedLength();
+        QString text = QString("%1").arg(msecs / 1min, width,10,QLatin1Char('0'));
+        fmt.replace(match.capturedStart(), width, text);
+        msecs = msecs % 1min;
+    }
+
+    match = sRe.match(fmt);
+    if (match.hasMatch())
+    {
+        int width = match.capturedLength();
+        QString text = QString("%1").arg(msecs / 1s, width,10,QLatin1Char('0'));
+        fmt.replace(match.capturedStart(), width, text);
+    }
+
+    match = zRe.match(fmt);
+    if (match.hasMatch())
+    {
+        static constexpr std::array<int,4> divisor = {1000, 100, 10, 1};
+        int width = std::min(3, static_cast<int>(match.capturedLength()));
+        int value = (msecs % 1s).count() / divisor[width];
+        QString text = QString("%1").arg(value, width,10,QLatin1Char('0'));
+        fmt.replace(match.capturedStart(), match.capturedLength(), text);
+    }
+    return fmt;
 }
 
 }; // namespace MythDate

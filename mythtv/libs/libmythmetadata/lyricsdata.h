@@ -38,8 +38,7 @@ class META_PUBLIC LyricsLine
   private:
     QString formatTime(void) const
     {
-        QString timestr = MythDate::formatTime(m_time,"mm:ss.zzz");
-        timestr.chop(1); // Chop 1 to return hundredths
+        QString timestr = MythDate::formatTime(m_time,"mm:ss.zz");
         return QString("[%1]").arg(timestr);
     }
 };

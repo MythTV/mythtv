@@ -718,8 +718,7 @@ bool MythBDBuffer::UpdateTitleInfo(void)
     m_titlesize = bd_get_title_size(m_bdnav);
     uint32_t chapter_count = GetNumChapters();
     auto total_msecs = duration_cast<std::chrono::milliseconds>(m_currentTitleLength);
-    auto duration = MythDate::formatTime(total_msecs, "HH:mm:ss.zzz");
-    duration.chop(2); // Chop 2 to show tenths
+    auto duration = MythDate::formatTime(total_msecs, "HH:mm:ss.z");
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New title info: Index %1 Playlist: %2 Duration: %3 ""Chapters: %5")
             .arg(m_currentTitle).arg(m_currentTitleInfo->playlist).arg(duration).arg(chapter_count));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New title info: Clips: %1 Angles: %2 Title Size: %3 Frame Rate %4")
