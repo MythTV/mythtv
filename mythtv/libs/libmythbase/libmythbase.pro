@@ -32,6 +32,7 @@ HEADERS += mythplugin.h mythpluginapi.h housekeeper.h
 HEADERS += mythpluginexport.h
 HEADERS += ffmpeg-mmx.h
 HEADERS += mythrandom.h
+HEADERS += stringutil.h
 HEADERS += mythsystemlegacy.h mythtypes.h
 HEADERS += threadedfilewriter.h mythsingledownload.h codecutil.h
 HEADERS += mythsession.h
@@ -59,6 +60,7 @@ SOURCES += mythbinaryplist.cpp signalhandling.cpp mythtimezone.cpp mythdate.cpp
 SOURCES += mythplugin.cpp housekeeper.cpp
 SOURCES += mythsystemlegacy.cpp mythtypes.cpp
 SOURCES += mythrandom.cpp
+SOURCES += stringutil.cpp
 SOURCES += threadedfilewriter.cpp mythsingledownload.cpp codecutil.cpp
 SOURCES += mythsession.cpp
 SOURCES += ../../external/qjsonwrapper/qjsonwrapper/Json.cpp
@@ -176,6 +178,7 @@ inc.files += remotefile.h mythsystemlegacy.h mythtypes.h
 inc.files += threadedfilewriter.h mythsingledownload.h mythsession.h
 inc.files += mythsorthelper.h mythdbcheck.h
 inc.files += mythrandom.h
+inc.files += stringutil.h
 inc.files += unziputil.h
 
 # Allow both #include <blah.h> and #include <libmythbase/blah.h>

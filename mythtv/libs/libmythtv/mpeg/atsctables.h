@@ -10,7 +10,6 @@
 #include <QtEndian>
 
 #include "atscdescriptors.h"
-#include "mythmiscutil.h" // for xml_indent
 #include "mpegtables.h"
 #include "mythtvexp.h"
 #include "mythdate.h"

@@ -20,7 +20,7 @@
  */
 
 #include "sctetables.h"
-#include "mythdate.h" // for xml_indent
+#include "stringutil.h"
 
 QString CarrierDefinitionSubtable::toString(void) const
 {
@@ -31,8 +31,8 @@ QString CarrierDefinitionSubtable::toString(void) const
 
 QString CarrierDefinitionSubtable::toStringXML(uint indent_level) const
 {
-    QString indent_0 = xml_indent(indent_level);
-    QString indent_1 = xml_indent(indent_level + 1);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
+    QString indent_1 = StringUtil::indentSpaces(indent_level + 1);
     QString str = indent_0 +
         QString("<CarrierDefinition descriptors_count=\"%2\" ")
         .arg(DescriptorsCount());
@@ -133,8 +133,8 @@ QString ModulationModeSubtable::toString(void)
 
 QString ModulationModeSubtable::toStringXML(uint indent_level) const
 {
-    QString indent_0 = xml_indent(indent_level);
-    QString indent_1 = xml_indent(indent_level + 1);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
+    QString indent_1 = StringUtil::indentSpaces(indent_level + 1);
     QString str = indent_0 +
         QString("<ModulationMode descriptors_count=\"%2\"")
         .arg(DescriptorsCount());
@@ -146,7 +146,7 @@ QString ModulationModeSubtable::toStringXML(uint indent_level) const
         .arg(InnerCodingMode()).arg(InnerCodingModeString());
     str += "\n" + indent_1;
     str += QString("split_bitstream_mode=\"%1\" ")
-        .arg(xml_bool_to_string(SplitBitstreamMode()));
+        .arg(StringUtil::bool_to_string(SplitBitstreamMode()));
     str += QString("symbol_rate=\"%1\"").arg(SymbolRate());
 
     std::vector<const unsigned char*> desc =
@@ -219,8 +219,8 @@ QString SCTENetworkInformationTable::toString(void) const
 
 QString SCTENetworkInformationTable::toStringXML(uint indent_level) const
 {
-    QString indent_0 = xml_indent(indent_level);
-    QString indent_1 = xml_indent(indent_level + 1);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
+    QString indent_1 = StringUtil::indentSpaces(indent_level + 1);
 
     QString str = indent_0 + "<SCTENetworkInformationSection psip=\"scte\" ";
     str += QString("transmission_medium=\"%1\" ").arg(TransmissionMedium());
@@ -268,7 +268,7 @@ QString NetworkTextTable::toString(void) const
 
 QString NetworkTextTable::toStringXML(uint indent_level) const
 {
-    QString indent_0 = xml_indent(indent_level);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
 
     QString str = indent_0 + "<NetworkTextSection ";
     str += QString("iso_639_language_code=\"%1\" ").arg(LanguageString());
@@ -367,8 +367,8 @@ bool ShortVirtualChannelTable::Parse(void)
 
 QString DefinedChannelsMapSubtable::toStringXML(uint indent_level) const
 {
-    QString indent_0 = xml_indent(indent_level);
-    QString indent_1 = xml_indent(indent_level + 1);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
+    QString indent_1 = StringUtil::indentSpaces(indent_level + 1);
     QString str = indent_0 + "<DefinedChannelsMap ";
     str += QString("first_virtual_channel=\"%1\" ")
         .arg(FirstVirtualChannel());
@@ -379,7 +379,7 @@ QString DefinedChannelsMapSubtable::toStringXML(uint indent_level) const
     {
         str += indent_1 + QString("<Range range_defined=\"%1\"%2 "
                                   "channels_count=\"%3\" />\n")
-            .arg(xml_bool_to_string(RangeDefined(i)),
+            .arg(StringUtil::bool_to_string(RangeDefined(i)),
                  RangeDefined(i) ? " " : "",
                  QString::number(ChannelsCount(i)));
     }
@@ -402,17 +402,17 @@ QString VirtualChannelMapSubtable::VideoStandardString(uint i) const
 
 QString VirtualChannelMapSubtable::toStringXML(uint indent_level) const
 {
-    QString indent_0 = xml_indent(indent_level);
-    QString indent_1 = xml_indent(indent_level + 1);
-    QString indent_2 = xml_indent(indent_level + 2);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
+    QString indent_1 = StringUtil::indentSpaces(indent_level + 1);
+    QString indent_2 = StringUtil::indentSpaces(indent_level + 2);
     QString str = indent_0 + "<DefinedChannelsMap ";
     str += QString("number_of_vc_records=\"%1\"")
         .arg(NumberOfVCRecords());
     str += "\n" + indent_1;
     str += QString("descriptors_included=\"%1\" ")
-        .arg(xml_bool_to_string(DescriptorsIncluded()));
+        .arg(StringUtil::bool_to_string(DescriptorsIncluded()));
     str += QString("splice=\"%1\" ")
-        .arg(xml_bool_to_string(Splice()));
+        .arg(StringUtil::bool_to_string(Splice()));
     str += "\n" + indent_1;
     str += QString(R"(activation_time="%1" actication_time_desc="%2")")
         .arg(ActivationTimeRaw())
@@ -426,7 +426,7 @@ QString VirtualChannelMapSubtable::toStringXML(uint indent_level) const
             .arg(VirtualChannelNumber(i));
         str += "\n" + indent_2;
         str += QString("application_virtual_channel=\"%1\" ")
-            .arg(xml_bool_to_string(ApplicationVirtualChannel(i)));
+            .arg(StringUtil::bool_to_string(ApplicationVirtualChannel(i)));
         str += QString("path_select=\"%1\" ").arg(PathSelect(i));
         str += "\n" + indent_2;
         str += QString(R"(transport_type="%1" transport_type_desc="%2" )")
@@ -478,8 +478,8 @@ QString VirtualChannelMapSubtable::toStringXML(uint indent_level) const
 
 QString InverseChannelMapSubtable::toStringXML(uint indent_level) const
 {
-    QString indent_0 = xml_indent(indent_level);
-    QString indent_1 = xml_indent(indent_level + 1);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
+    QString indent_1 = StringUtil::indentSpaces(indent_level + 1);
     QString str = indent_0 + "<InverseChannelMap ";
     str += QString("first_map_index=\"%1\" ")
         .arg(FirstMapIndex());
@@ -516,8 +516,8 @@ QString ShortVirtualChannelTable::toString(void) const
 
 QString ShortVirtualChannelTable::toStringXML(uint indent_level) const
 {
-    QString indent_0 = xml_indent(indent_level);
-    QString indent_1 = xml_indent(indent_level + 1);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
+    QString indent_1 = StringUtil::indentSpaces(indent_level + 1);
     QString str = indent_0 +
         QString("<ShortVirtualChannelSection vct_id=\"%1\" ").arg(ID());
     str += QString("transmission_medium=\"%1\" ").arg(TransmissionMedium());
@@ -557,8 +557,8 @@ QString SCTESystemTimeTable::toString(void) const
 
 QString SCTESystemTimeTable::toStringXML(uint indent_level) const
 {
-    QString indent_0 = xml_indent(indent_level);
-    QString indent_1 = xml_indent(indent_level + 1);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
+    QString indent_1 = StringUtil::indentSpaces(indent_level + 1);
     QString str = indent_0 +
         QString("<SCTESystemTimeSection system_time=\"%1\" "
                 "gps_utc_offset=\"%2\"\n%3utc_time_desc=\"%4\" psip=\"scte\"")
