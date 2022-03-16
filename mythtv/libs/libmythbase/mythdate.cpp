@@ -5,6 +5,7 @@
 
 #include "mythcorecontext.h"
 #include "mythdate.h"
+#include "stringutil.h"
 
 namespace MythDate
 {
@@ -239,7 +240,7 @@ QString formatTime(std::chrono::milliseconds msecs, QString fmt)
     if (match.hasMatch())
     {
         int width = match.capturedLength();
-        QString text = QString("%1").arg(msecs / 1h, width,10,QLatin1Char('0'));
+        QString text = StringUtil::intToPaddedString(msecs / 1h, width);
         fmt.replace(match.capturedStart(), width, text);
         msecs = msecs % 1h;
     }
@@ -248,7 +249,7 @@ QString formatTime(std::chrono::milliseconds msecs, QString fmt)
     if (match.hasMatch())
     {
         int width = match.capturedLength();
-        QString text = QString("%1").arg(msecs / 1min, width,10,QLatin1Char('0'));
+        QString text = StringUtil::intToPaddedString(msecs / 1min, width);
         fmt.replace(match.capturedStart(), width, text);
         msecs = msecs % 1min;
     }
@@ -257,7 +258,7 @@ QString formatTime(std::chrono::milliseconds msecs, QString fmt)
     if (match.hasMatch())
     {
         int width = match.capturedLength();
-        QString text = QString("%1").arg(msecs / 1s, width,10,QLatin1Char('0'));
+        QString text = StringUtil::intToPaddedString(msecs / 1s, width);
         fmt.replace(match.capturedStart(), width, text);
     }
 
@@ -267,7 +268,7 @@ QString formatTime(std::chrono::milliseconds msecs, QString fmt)
         static constexpr std::array<int,4> divisor = {1000, 100, 10, 1};
         int width = std::min(3, static_cast<int>(match.capturedLength()));
         int value = (msecs % 1s).count() / divisor[width];
-        QString text = QString("%1").arg(value, width,10,QLatin1Char('0'));
+        QString text = StringUtil::intToPaddedString(value, width);
         fmt.replace(match.capturedStart(), match.capturedLength(), text);
     }
     return fmt;
