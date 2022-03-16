@@ -2141,11 +2141,9 @@ void MusicCommon::updatePlaylistStats(void)
 QString MusicCommon::getTimeString(std::chrono::seconds exTime, std::chrono::seconds maxTime)
 {
     if (maxTime <= 0ms)
-        return MythDate::formatTime(exTime,
-                              (exTime >= 1h) ? "H:mm:ss" : "mm:ss");
+        return MythDate::formatDuration(exTime);
 
-    QString fmt = (maxTime >= 1h) ? "H:mm:ss" : "mm:ss";
-    return MythDate::formatTime(exTime, fmt) + " / " + MythDate::formatTime(maxTime, fmt);
+    return MythDate::formatDuration(exTime) + " / " + MythDate::formatDuration(maxTime);
 }
 
 void MusicCommon::searchButtonList(void)

@@ -404,7 +404,7 @@ QString ThumbFinder::frameToTime(int64_t frame, bool addFrame) const
     int sec = (int) (frame / m_fps);
     frame = frame - (int) (sec * m_fps);
 
-    QString str = MythDate::formatTime(std::chrono::seconds(sec), "HH:mm:ss");
+    QString str = MythDate::formatDuration(std::chrono::seconds(sec));
     if (addFrame)
         str += QString(".%1").arg(frame,10,2,QChar('0'));
     return str;

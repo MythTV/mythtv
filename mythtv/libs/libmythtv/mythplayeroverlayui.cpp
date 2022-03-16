@@ -210,22 +210,44 @@ void MythPlayerOverlayUI::UpdateSliderInfo(osdInfo &Info, bool PaddedFields)
         QString text3;
         if (PaddedFields)
         {
-            text1 = MythDate::formatTime(secsplayed, "HH:mm:ss");
-            text2 = MythDate::formatTime(playbackLen, "HH:mm:ss");
-            text3 = MythDate::formatTime(secsbehind, "HH:mm:ss");
+            text1 =
+                MythDate::formatDuration(secsplayed,
+                                         MythDate::FormatDurationUnit::s,
+                                         MythDate::FormatDurationUnit::h);
+            text2 =
+                MythDate::formatDuration(playbackLen,
+                                         MythDate::FormatDurationUnit::s,
+                                         MythDate::FormatDurationUnit::h);
+            text3 =
+                MythDate::formatDuration(secsbehind,
+                                         MythDate::FormatDurationUnit::s,
+                                         MythDate::FormatDurationUnit::h);
         }
         else
         {
-            QString fmt = (playbackLen >= 1h) ? "H:mm:ss" : "m:ss";
-            text1 = MythDate::formatTime(secsplayed, fmt);
-            text2 = MythDate::formatTime(playbackLen, fmt);
+            text1 =
+                MythDate::formatDuration(secsplayed,
+                                         MythDate::FormatDurationUnit::s,
+                                         MythDate::FormatDurationUnit::automatic,
+                                         false);
+            text2 =
+                MythDate::formatDuration(playbackLen,
+                                         MythDate::FormatDurationUnit::s,
+                                         MythDate::FormatDurationUnit::automatic,
+                                         false);
 
-            if (secsbehind >= 1h)
-                text3 = MythDate::formatTime(secsbehind, "H:mm:ss");
-            else if (secsbehind >= 1min)
-                text3 = MythDate::formatTime(secsbehind, "m:ss");
+            if (secsbehind >= 1min)
+            {
+                text3 =
+                    MythDate::formatDuration(secsbehind,
+                                             MythDate::FormatDurationUnit::s,
+                                             MythDate::FormatDurationUnit::automatic,
+                                             false);
+            }
             else
+            {
                 text3 = tr("%n second(s)", "", static_cast<int>(secsbehind.count()));
+            }
         }
 
         QString desc = stillFrame ? tr("Still Frame") : tr("%1 of %2").arg(text1, text2);

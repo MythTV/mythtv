@@ -1113,19 +1113,7 @@ static QString uptimeStr(std::chrono::seconds uptime)
     if (uptime == 0s)
         return str + StatusBox::tr("unknown", "unknown uptime");
 
-    auto days = duration_cast<std::chrono::days>(uptime);
-    auto secs = uptime % 24h;
-
-    QString astext;
-    if (days.count() > 0)
-    {
-        astext = QString("%1, %2")
-            .arg(StatusBox::tr("%n day(s)", "", days.count()),
-                 MythDate::formatTime(secs, "H:mm"));
-    } else {
-        astext = MythDate::formatTime(secs, "H:mm:ss");
-    }
-    return str + astext;
+    return str + MythDate::formatDuration(uptime);
 }
 
 /** \fn StatusBox::getActualRecordedBPS(QString hostnames)

@@ -164,10 +164,9 @@ QString DeleteMap::CreateTimeString(uint64_t frame, bool use_cutlist,
     const
 {
     std::chrono::milliseconds ms = TranslatePositionFrameToMs(frame, frame_rate, use_cutlist);
-    QString fmt = (ms >= 1h) ? "H:mm:ss" : "mm:ss";
     if (full_resolution)
-        fmt += ".zzz";
-    return MythDate::formatTime(ms, fmt);
+        return MythDate::formatDuration(ms, MythDate::FormatDurationUnit::ms);
+    return MythDate::formatDuration(ms);
 }
 
  /**

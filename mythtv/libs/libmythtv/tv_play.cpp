@@ -6607,7 +6607,7 @@ void TV::ShowLCDDVDInfo()
         int totalParts = dvd->NumPartsInTitle();
 
         mainStatus = tr("Title: %1 (%2)").arg(playingTitle)
-            .arg(MythDate::formatTime(dvd->GetTotalTimeOfTitle(), "HH:mm"));
+            .arg(MythDate::formatDuration(dvd->GetTotalTimeOfTitle(), MythDate::FormatDurationUnit::min));
         subStatus = tr("Chapter: %1/%2").arg(playingPart).arg(totalParts);
     }
     if ((dvdName != m_lcdCallsign) || (mainStatus != m_lcdTitle) || (subStatus != m_lcdSubtitle))
@@ -8667,7 +8667,7 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
             {
                 QString chapter1 = QString("%1").arg(i+1, size, 10, QChar(48));
                 QString chapter2 = QString("%1").arg(i+1, 3   , 10, QChar(48));
-                QString timestr = MythDate::formatTime(m_tvmChapterTimes[i], "HH:mm:ss");
+                QString timestr = MythDate::formatDuration(m_tvmChapterTimes[i]);
                 QString desc = chapter1 + QString(" (%1)").arg(timestr);
                 QString action = prefix + chapter2;
                 active = (m_tvmCurrentChapter == (i + 1));

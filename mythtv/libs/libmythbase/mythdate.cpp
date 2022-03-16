@@ -236,4 +236,135 @@ QString formatTime(std::chrono::milliseconds msecs, QString fmt)
     return result + QTime::fromMSecsSinceStartOfDay(msecs.count()).toString(fmt);
 }
 
+QString formatDuration(std::chrono::milliseconds dur,
+                       FormatDurationUnit min_unit,
+                       FormatDurationUnit max_unit,
+                       bool padded)
+{
+    bool negative = false;
+    if (dur.count() < 0)
+    {
+        negative = true;
+        dur *= -1;
+    }
+    if (max_unit == FormatDurationUnit::automatic)
+    {
+        if (dur > 24h)
+        {
+            max_unit = FormatDurationUnit::d;
+        }
+        else if (dur > 1h)
+        {
+            max_unit = FormatDurationUnit::h;
+        }
+        else if (dur > 1min)
+        {
+            max_unit = FormatDurationUnit::min;
+        }
+        else if (dur > 1s)
+        {
+            max_unit = FormatDurationUnit::s;
+        }
+        else
+        {
+            max_unit = FormatDurationUnit::ms;
+        }
+    }
+
+    QString ret;
+    switch (max_unit)
+    {
+    case FormatDurationUnit::d:
+        if (FormatDurationUnit::d >= min_unit)
+        {
+            auto days = duration_cast<std::chrono::days>(dur);
+            dur -= days;
+            ret += QCoreApplication::translate("(Common)", "%n day(s)", "", days.count());
+        }
+        [[fallthrough]];
+    case FormatDurationUnit::h:
+        if (FormatDurationUnit::h >= min_unit)
+        {
+            auto hours = duration_cast<std::chrono::hours>(dur);
+            dur -= hours;
+            if (!ret.isEmpty())
+            {
+                ret += QString(" %1").arg(hours.count(), 2, 10, QChar('0'));
+            }
+            else if (padded)
+            {
+                ret += QString("%1").arg(hours.count(), 2, 10, QChar('0'));
+            }
+            else
+            {
+                ret += QString::number(hours.count());
+            }
+        }
+        [[fallthrough]];
+    case FormatDurationUnit::min:
+        if (FormatDurationUnit::min >= min_unit)
+        {
+            auto minutes = duration_cast<std::chrono::minutes>(dur);
+            dur -= minutes;
+            if (!ret.isEmpty())
+            {
+                ret += QString(":%1").arg(minutes.count(), 2, 10, QChar('0'));
+            }
+            else if (padded)
+            {
+                ret += QString("%1").arg(minutes.count(), 2, 10, QChar('0'));
+            }
+            else
+            {
+                ret += QString::number(minutes.count());
+            }
+        }
+        [[fallthrough]];
+    case FormatDurationUnit::s:
+        if (FormatDurationUnit::s >= min_unit)
+        {
+            auto seconds = duration_cast<std::chrono::seconds>(dur);
+            dur -= seconds;
+            if (!ret.isEmpty())
+            {
+                ret += QString(":%1").arg(seconds.count(), 2, 10, QChar('0'));
+            }
+            else if (padded)
+            {
+                ret += QString("%1").arg(seconds.count(), 2, 10, QChar('0'));
+            }
+            else
+            {
+                ret += QString::number(seconds.count());
+            }
+        }
+        [[fallthrough]];
+    case FormatDurationUnit::ms:
+        if (FormatDurationUnit::ms >= min_unit)
+        {
+            if (!ret.isEmpty())
+            {
+                ret += QString(".%1").arg(dur.count(), 3, 10, QChar('0'));
+            }
+            else if (padded)
+            {
+                ret += QString("%1").arg(dur.count(), 3, 10, QChar('0'));
+            }
+            else
+            {
+                ret += QString::number(dur.count());
+            }
+        }
+        break;
+    default:
+        return QString(); // Programmer error
+    }
+
+    if (negative)
+    {
+        return "-" + ret;
+    }
+    return ret;
+}
+
 }; // namespace MythDate

@@ -63,6 +63,43 @@ MBASE_PUBLIC std::chrono::seconds secsInFuture (const QDateTime& future);
 MBASE_PUBLIC QString formatTime(std::chrono::milliseconds msecs,
                                 QString fmt = "HH:mm:ss");
 
+enum class FormatDurationUnit : int
+{
+    automatic = -1,
+    ms,
+    s,
+    min,
+    h,
+    d,
+};
+
+/**
+ * @brief Format a milliseconds duration.
+ *
+ * Convert a millisecond time value into a textual representation of the value
+ * in the format "n day(s) HH:mm:ss.zzz" where any subset of consecutive elements
+ * can be selected, omitting the rest.  All elements after the first are always
+ * 0 padded.
+ *
+ * @param dur The time value in milliseconds. Since the type of this
+ *     field is std::chrono::duration, any duration of a larger
+ *     interval can be passed to this function and the compiler will
+ *     convert it to milliseconds.
+ *
+ * @param min_unit The minimum sized unit that will be output.
+ *                 Automatic is invalid at this time.
+ * @param max_unit The maximum sized unit that will be output.  Automatic selects
+ *                 the minimum required unit for a fully reduced representation.
+ * @param padded   Whether or not the first entry should be padded with a 0.  The
+ *                 days value is never padded.
+ *
+ * @todo Implement trimming trailing zeroes, i.e. enable automatic for min_unit?
+ */
+MBASE_PUBLIC QString formatDuration(std::chrono::milliseconds dur,
+                                    FormatDurationUnit min_unit = FormatDurationUnit::s,
+                                    FormatDurationUnit max_unit = FormatDurationUnit::automatic,
+                                    bool padded = true);
+
 } // namespace MythDate
 
 #endif // MYTH_DATE_H

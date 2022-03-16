@@ -215,7 +215,9 @@ bool CommBreakMap::AutoCommercialSkip(uint64_t &jumpToFrame,
 
     auto skipped_seconds = std::chrono::seconds((int)((m_commBreakIter.key() -
                                  framesPlayed) / video_frame_rate));
-    QString skipTime = MythDate::formatTime(skipped_seconds, "m:ss");
+    QString skipTime =
+        MythDate::formatDuration(skipped_seconds, MythDate::FormatDurationUnit::s,
+                                 MythDate::FormatDurationUnit::automatic, false);
     if (kCommSkipOn == m_autocommercialskip)
     {
         //: %1 is the skip time
@@ -335,7 +337,9 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
         MergeShortCommercials(video_frame_rate);
     int64_t framediff = m_commBreakIter.key() - framesPlayed;
     auto skipped_seconds = std::chrono::seconds((int)(framediff / video_frame_rate));
-    QString skipTime = MythDate::formatTime(skipped_seconds, "m:ss");
+    QString skipTime =
+        MythDate::formatDuration(skipped_seconds, MythDate::FormatDurationUnit::s,
+                                 MythDate::FormatDurationUnit::automatic, false);
 
     if ((MythDate::secsInPast(m_lastIgnoredManualSkip) > 3s) &&
         (abs(skipped_seconds) >= m_maxskip))
