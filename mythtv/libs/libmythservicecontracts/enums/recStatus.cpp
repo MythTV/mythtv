@@ -1,5 +1,5 @@
 #include "recStatus.h"
-#include "mythdate.h"
+#include "libmythbase/mythdate.h"
 
 QString RecStatus::toUIState(RecStatus::Type recstatus)
 {

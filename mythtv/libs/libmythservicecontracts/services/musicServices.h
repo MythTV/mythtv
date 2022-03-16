@@ -16,9 +16,9 @@
 #include <QFileInfo>
 #include <QStringList>
 
-#include "service.h"
+#include "libmythservicecontracts/service.h"
 
-#include "datacontracts/musicMetadataInfoList.h"
+#include "libmythservicecontracts/datacontracts/musicMetadataInfoList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

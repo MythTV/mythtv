@@ -16,10 +16,10 @@
 #include <QFileInfo>
 #include <QStringList>
 
-#include "service.h"
+#include "libmythservicecontracts/service.h"
 
-#include "datacontracts/captureCard.h"
-#include "datacontracts/captureCardList.h"
+#include "libmythservicecontracts/datacontracts/captureCard.h"
+#include "libmythservicecontracts/datacontracts/captureCardList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

@@ -13,14 +13,14 @@
 #ifndef CHANNELSERVICES_H_
 #define CHANNELSERVICES_H_
 
-#include "service.h"
+#include "libmythservicecontracts/service.h"
 
-#include "datacontracts/channelInfoList.h"
-#include "datacontracts/videoSource.h"
-#include "datacontracts/videoSourceList.h"
-#include "datacontracts/videoMultiplex.h"
-#include "datacontracts/videoMultiplexList.h"
-#include "datacontracts/lineup.h"
+#include "libmythservicecontracts/datacontracts/channelInfoList.h"
+#include "libmythservicecontracts/datacontracts/lineup.h"
+#include "libmythservicecontracts/datacontracts/videoMultiplex.h"
+#include "libmythservicecontracts/datacontracts/videoMultiplexList.h"
+#include "libmythservicecontracts/datacontracts/videoSource.h"
+#include "libmythservicecontracts/datacontracts/videoSourceList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

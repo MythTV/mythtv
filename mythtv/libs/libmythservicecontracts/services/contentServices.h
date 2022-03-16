@@ -16,9 +16,10 @@
 #include <QFileInfo>
 #include <QStringList>
 
-#include "service.h"
-#include "datacontracts/artworkInfoList.h"
-#include "datacontracts/liveStreamInfoList.h"
+#include "libmythservicecontracts/service.h"
+
+#include "libmythservicecontracts/datacontracts/artworkInfoList.h"
+#include "libmythservicecontracts/datacontracts/liveStreamInfoList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

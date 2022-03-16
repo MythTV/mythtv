@@ -14,8 +14,8 @@
 #include <QString>
 #include <QVariantMap>
 
-#include "serviceexp.h" 
-#include "datacontracthelper.h"
+#include "libmythservicecontracts/serviceexp.h"
+#include "libmythservicecontracts/datacontracthelper.h"
 
 namespace DTC
 {

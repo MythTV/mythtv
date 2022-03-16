@@ -1,13 +1,17 @@
 // -*- Mode: c++ -*-
 
+// Posix headers
+#include <deque>
+
+// Qt headers
 #include <QDateTime>
 #include <QMutex>
 #include <QObject>
 
-#include "programtypes.h"
-#include "mythdate.h"
+// MythTV headers
+#include "libmythbase/mythdate.h"
 
-#include <deque>
+#include "programtypes.h"
 
 const QString kPlayerInUseID           { QStringLiteral("player") };
 const QString kPIPPlayerInUseID        { QStringLiteral("pipplayer") };

@@ -4,9 +4,10 @@
 #include <QFileInfo>
 #include <QStringList>
 
-#include "service.h"
-#include "datacontracts/imageMetadataInfoList.h"
-#include "datacontracts/imageSyncInfo.h"
+#include "libmythservicecontracts/service.h"
+
+#include "libmythservicecontracts/datacontracts/imageMetadataInfoList.h"
+#include "libmythservicecontracts/datacontracts/imageSyncInfo.h"
 
 
 

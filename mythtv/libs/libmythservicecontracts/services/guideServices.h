@@ -15,11 +15,12 @@
 
 #include <QFileInfo>
 
-#include "service.h"
-#include "datacontracts/programGuide.h"
-#include "datacontracts/programAndChannel.h"
-#include "datacontracts/channelGroupList.h"
-#include "datacontracts/programList.h"
+#include "libmythservicecontracts/service.h"
+
+#include "libmythservicecontracts/datacontracts/channelGroupList.h"
+#include "libmythservicecontracts/datacontracts/programAndChannel.h"
+#include "libmythservicecontracts/datacontracts/programGuide.h"
+#include "libmythservicecontracts/datacontracts/programList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

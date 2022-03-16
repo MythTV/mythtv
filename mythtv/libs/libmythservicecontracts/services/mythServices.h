@@ -15,15 +15,16 @@
 
 #include <QFileInfo>
 
-#include "service.h"
-#include "datacontracts/connectionInfo.h"
-#include "datacontracts/settingList.h"
-#include "datacontracts/storageGroupDirList.h"
-#include "datacontracts/timeZoneInfo.h"
-#include "datacontracts/logMessage.h"
-#include "datacontracts/logMessageList.h"
-#include <datacontracts/frontendList.h>
-#include "datacontracts/backendInfo.h"
+#include "libmythservicecontracts/service.h"
+
+#include "libmythservicecontracts/datacontracts/backendInfo.h"
+#include "libmythservicecontracts/datacontracts/connectionInfo.h"
+#include "libmythservicecontracts/datacontracts/frontendList.h"
+#include "libmythservicecontracts/datacontracts/logMessage.h"
+#include "libmythservicecontracts/datacontracts/logMessageList.h"
+#include "libmythservicecontracts/datacontracts/settingList.h"
+#include "libmythservicecontracts/datacontracts/storageGroupDirList.h"
+#include "libmythservicecontracts/datacontracts/timeZoneInfo.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

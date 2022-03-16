@@ -1,9 +1,10 @@
 #ifndef FRONTENDSERVICES_H
 #define FRONTENDSERVICES_H
 
-#include "service.h"
-#include "datacontracts/frontendStatus.h"
-#include "datacontracts/frontendActionList.h"
+#include "libmythservicecontracts/service.h"
+
+#include "libmythservicecontracts/datacontracts/frontendActionList.h"
+#include "libmythservicecontracts/datacontracts/frontendStatus.h"
 
 class SERVICE_PUBLIC FrontendServices : public Service
 {

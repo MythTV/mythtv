@@ -14,9 +14,9 @@
 #include <QDateTime>
 #include <QString>
 
-#include "serviceexp.h" 
-#include "datacontracthelper.h"
-#include "enums/recStatus.h"
+#include "libmythservicecontracts/serviceexp.h"
+#include "libmythservicecontracts/datacontracthelper.h"
+#include "libmythservicecontracts/enums/recStatus.h"
 #include "libmyth/programtypes.h"
 
 namespace DTC

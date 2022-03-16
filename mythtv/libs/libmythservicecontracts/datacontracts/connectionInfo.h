@@ -11,8 +11,8 @@
 #ifndef CONNECTIONINFO_H_
 #define CONNECTIONINFO_H_
 
-#include "serviceexp.h" 
-#include "datacontracthelper.h"
+#include "libmythservicecontracts/serviceexp.h"
+#include "libmythservicecontracts/datacontracthelper.h"
 
 #include "versionInfo.h"
 #include "databaseInfo.h"

@@ -11,8 +11,8 @@
 #ifndef BACKENDINFO_H_
 #define BACKENDINFO_H_
 
-#include "serviceexp.h"
-#include "datacontracthelper.h"
+#include "libmythservicecontracts/serviceexp.h"
+#include "libmythservicecontracts/datacontracthelper.h"
 
 #include "buildInfo.h"
 #include "envInfo.h"

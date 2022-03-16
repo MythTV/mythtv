@@ -13,8 +13,8 @@
 
 #include <QVariantList>
 
-#include "serviceexp.h"
-#include "datacontracthelper.h"
+#include "libmythservicecontracts/serviceexp.h"
+#include "libmythservicecontracts/datacontracthelper.h"
 
 #include "frontend.h"
 

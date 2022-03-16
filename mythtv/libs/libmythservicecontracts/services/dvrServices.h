@@ -13,19 +13,19 @@
 #ifndef DVRSERVICES_H_
 #define DVRSERVICES_H_
 
-#include "service.h"
+#include "libmythservicecontracts/service.h"
 
-#include "datacontracts/programList.h"
-#include "datacontracts/encoderList.h"
-#include "datacontracts/recRule.h"
-#include "datacontracts/recRuleList.h"
-#include "datacontracts/recRuleFilter.h"
-#include "datacontracts/recRuleFilterList.h"
-#include "datacontracts/titleInfoList.h"
-#include "datacontracts/input.h"
-#include "datacontracts/inputList.h"
-#include "datacontracts/cutList.h"
-#include "datacontracts/markupList.h"
+#include "libmythservicecontracts/datacontracts/cutList.h"
+#include "libmythservicecontracts/datacontracts/encoderList.h"
+#include "libmythservicecontracts/datacontracts/input.h"
+#include "libmythservicecontracts/datacontracts/inputList.h"
+#include "libmythservicecontracts/datacontracts/markupList.h"
+#include "libmythservicecontracts/datacontracts/programList.h"
+#include "libmythservicecontracts/datacontracts/recRule.h"
+#include "libmythservicecontracts/datacontracts/recRuleFilter.h"
+#include "libmythservicecontracts/datacontracts/recRuleFilterList.h"
+#include "libmythservicecontracts/datacontracts/recRuleList.h"
+#include "libmythservicecontracts/datacontracts/titleInfoList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

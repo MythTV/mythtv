@@ -16,12 +16,12 @@
 #include <QFileInfo>
 #include <QStringList>
 
-#include "service.h"
+#include "libmythservicecontracts/service.h"
 
-#include "datacontracts/videoMetadataInfoList.h"
-#include "datacontracts/videoLookupInfoList.h"
-#include "datacontracts/blurayInfo.h"
-#include "datacontracts/videoStreamInfoList.h"
+#include "libmythservicecontracts/datacontracts/blurayInfo.h"
+#include "libmythservicecontracts/datacontracts/videoLookupInfoList.h"
+#include "libmythservicecontracts/datacontracts/videoMetadataInfoList.h"
+#include "libmythservicecontracts/datacontracts/videoStreamInfoList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
