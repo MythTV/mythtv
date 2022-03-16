@@ -1690,26 +1690,44 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
 #endif
         *pp += 4;
         break;
-    case 0x0a: /* ISO 639 language descriptor */
+    case ISO_639_LANGUAGE_DESCRIPTOR:
+#ifdef UPSTREAM_TO_MYTHTV
         for (i = 0; i + 4 <= desc_len; i += 4) {
             language[i + 0] = get8(pp, desc_end);
             language[i + 1] = get8(pp, desc_end);
             language[i + 2] = get8(pp, desc_end);
             language[i + 3] = ',';
-#if 0
-        switch (get8(pp, desc_end)) {
-            case 0x01: st->disposition |= AV_DISPOSITION_CLEAN_EFFECTS; break;
-            case 0x02: st->disposition |= AV_DISPOSITION_HEARING_IMPAIRED; break;
-            case 0x03: st->disposition |= AV_DISPOSITION_VISUAL_IMPAIRED; break;
+            switch (get8(pp, desc_end)) {
+            case 0x01:
+                st->disposition |= AV_DISPOSITION_CLEAN_EFFECTS;
+                break;
+            case 0x02:
+                st->disposition |= AV_DISPOSITION_HEARING_IMPAIRED;
+                break;
+            case 0x03:
+                st->disposition |= AV_DISPOSITION_VISUAL_IMPAIRED;
+                st->disposition |= AV_DISPOSITION_DESCRIPTIONS;
+                break;
+            }
         }
-	}
-#else
-        }
-        get8(pp, desc_end);
-#endif
-        if (i) {
+        if (i && language[0]) {
             language[i - 1] = 0;
+            /* don't overwrite language, as it may already have been set by
+             * another, more specific descriptor (e.g. supplementary audio) */
+            av_dict_set(&st->metadata, "language", language, AV_DICT_DONT_OVERWRITE);
         }
+#else
+        language[0] = get8(pp, desc_end);
+        language[1] = get8(pp, desc_end);
+        language[2] = get8(pp, desc_end);
+        language[3] = 0;
+
+        switch (get8(pp, desc_end)) {
+            case 0x01: dvbci->disposition |= AV_DISPOSITION_CLEAN_EFFECTS; break;
+            case 0x02: dvbci->disposition |= AV_DISPOSITION_HEARING_IMPAIRED; break;
+            case 0x03: dvbci->disposition |= AV_DISPOSITION_VISUAL_IMPAIRED; break;
+        }
+#endif
         break;
     case 0x05: /* registration descriptor */
         dvbci->codec_tag = bytestream_get_le32(pp);
