@@ -3,14 +3,22 @@
 #ifndef EXTERNAL_STREAMHANDLER_H
 #define EXTERNAL_STREAMHANDLER_H
 
+// POSIX
+#include <sys/types.h> // for pid_t
+
 #include <cstdint>
 #include <vector>
 
 #include <QString>
 #include <QAtomicInt>
+#include <QByteArray>
+#include <QFileInfo>
 #include <QMutex>
 #include <QMap>
+#include <QStringList>
+#include <QTextStream>
 
+#include "mythchrono.h"
 #include "streamhandler.h"
 
 class DTVSignalMonitor;
