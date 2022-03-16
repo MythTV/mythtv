@@ -2,7 +2,7 @@
 #define BOOKMARKMANAGER_H
 
 // libmythbase
-#include <mythmiscutil.h>
+#include <stringutil.h>
 
 // libmythui
 #include <mythscreentype.h>
@@ -27,7 +27,7 @@ class Bookmark
         return m_category == b.m_category && m_name == b.m_name && m_url == b.m_url;
     }
     static inline bool sortByName(Bookmark *a, Bookmark *b)
-        { return naturalCompare(a->m_sortName, b->m_sortName) < 0; }
+        { return StringUtil::naturalCompare(a->m_sortName, b->m_sortName) < 0; }
 };
 
 class BrowserConfig : public MythScreenType

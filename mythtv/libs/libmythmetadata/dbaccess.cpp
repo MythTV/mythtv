@@ -5,7 +5,7 @@
 #include "mythdb.h"
 #include "cleanup.h"
 #include "dbaccess.h"
-#include "mythmiscutil.h"
+#include "stringutil.h"
 
 namespace
 {
@@ -149,7 +149,7 @@ class SingleValueImp
 
     virtual bool sort(const entry &lhs, const entry &rhs)
     {
-        return naturalCompare(lhs.second, rhs.second) < 0;
+        return StringUtil::naturalCompare(lhs.second, rhs.second) < 0;
     }
 
     void cleanup()

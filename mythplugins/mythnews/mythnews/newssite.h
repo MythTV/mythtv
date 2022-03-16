@@ -4,11 +4,8 @@
 // C++ headers
 #include <vector>
 
-// MythTV headers
-#include <QObject>
-#include <mythmiscutil.h>
-
 // QT headers
+#include <QObject>
 #include <QDomDocument>
 #include <QByteArray>
 #include <QDateTime>
@@ -21,6 +18,9 @@
 #include <QRecursiveMutex>
 #endif
 #include <QUrl>
+
+// MythTV headers
+#include <stringutil.h>
 
 // MythNews headers
 #include "newsarticle.h"
@@ -105,7 +105,7 @@ class NewsSite : public QObject
     void parseRSS(const QDomDocument& domDoc);
     void parseAtom(const QDomDocument& domDoc);
     static inline bool sortByName(NewsSite *a, NewsSite *b)
-        { return naturalCompare(a->m_sortName, b->m_sortName) < 0; }
+        { return StringUtil::naturalCompare(a->m_sortName, b->m_sortName) < 0; }
 
     bool     successful(void) const;
     QString  errorMsg(void) const;

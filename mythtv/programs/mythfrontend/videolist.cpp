@@ -9,7 +9,7 @@
 
 #include "mythcontext.h"
 #include "mythdate.h"
-#include "mythmiscutil.h"
+#include "stringutil.h"
 
 #include "mythgenerictree.h"
 #include "videometadatalistmanager.h"
@@ -194,7 +194,7 @@ struct metadata_path_sort
 
     static bool sort(const QString &lhs, const QString &rhs)
     {
-        return naturalCompare(lhs, rhs) < 0;
+        return StringUtil::naturalCompare(lhs, rhs) < 0;
     }
 };
 
