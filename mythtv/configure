@@ -2801,6 +2801,7 @@ enable system_libexiv2
 enable system_libbluray
 enable system_libudfread
 enable waylandextras
+enable qtwebkit
 
 # mythtv paths
 dvb_path_default="${sysinclude:-$sysroot/usr/include}"
@@ -6614,7 +6615,7 @@ case $target_os in
 esac
 
 # Omit Qt5 modules that aren't in Qt6.
-if [ $qt_version -lt $(version2num "6.0.0") ]; then
+if [ $qt_version -lt $(version2num "6.0.0") ] && enabled qtwebkit ; then
 if $(pkg-config --exists Qt5WebKit) || $(pkg-config --exists QtWebKit) ; then
     enable qtwebkit
 else
