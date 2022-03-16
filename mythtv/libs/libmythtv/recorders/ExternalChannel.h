@@ -9,8 +9,10 @@
 
 // Qt headers
 #include <QString>
+#include <QStringList>
 
 // MythTV headers
+#include "mythchrono.h"
 #include "dtvchannel.h"
 #include "ExternalStreamHandler.h"
 

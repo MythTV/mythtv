@@ -9,6 +9,7 @@
 #define EXTERNAL_RECORDER_H
 
 // MythTV includes
+#include "mythchrono.h"
 #include "dtvrecorder.h"
 
 class ExternalStreamHandler;
