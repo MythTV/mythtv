@@ -10,6 +10,7 @@
 #include "mythlogging.h"
 #include "mythcorecontext.h"
 #include "mythlocale.h"
+#include "stringutil.h"
 #include "mythdate.h"
 #include "mythdirs.h"
 #include "libbluray/bluray.h"
@@ -729,9 +730,9 @@ bool MythBDBuffer::UpdateTitleInfo(void)
     {
         uint64_t framenum   = GetChapterStartFrame(i);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Chapter %1 found @ [%2]->%3")
-            .arg(i + 1,   2, 10, QChar('0'))
-            .arg(MythDate::formatTime(GetChapterStartTimeMs(i), "HH:mm:ss.zzz"))
-            .arg(framenum));
+            .arg(StringUtil::intToPaddedString(i + 1),
+                 MythDate::formatTime(GetChapterStartTimeMs(i), "HH:mm:ss.zzz"),
+                 QString::number(framenum)));
     }
 
     int still = BLURAY_STILL_NONE;

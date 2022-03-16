@@ -19,7 +19,6 @@
 #include "dbaccess.h"
 #include "videometadatalistmanager.h"
 #include "videoutils.h"
-#include "programinfo.h" // for format_season_and_episode
 #include "mythsorthelper.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,15,2)
@@ -1303,15 +1302,15 @@ void VideoMetadata::toMap(InfoMap &metadataMap)
 
     if (GetSeason() > 0 || GetEpisode() > 0)
     {
-        metadataMap[QStringLiteral(u"season")] = format_season_and_episode(GetSeason(), 1);
-        metadataMap[QStringLiteral(u"episode")] = format_season_and_episode(GetEpisode(), 1);
+        metadataMap[QStringLiteral(u"season")] = StringUtil::intToPaddedString(GetSeason(), 1);
+        metadataMap[QStringLiteral(u"episode")] = StringUtil::intToPaddedString(GetEpisode(), 1);
         QString usingSE = QStringLiteral(u"s%1e%2")
-            .arg(format_season_and_episode(GetSeason(), 2),
-                 format_season_and_episode(GetEpisode(), 2));
+            .arg(StringUtil::intToPaddedString(GetSeason(), 2),
+                 StringUtil::intToPaddedString(GetEpisode(), 2));
         metadataMap[QStringLiteral(u"s##e##")] = metadataMap[QStringLiteral(u"s00e00")] = usingSE;
         QString usingX = QStringLiteral(u"%1x%2")
-            .arg(format_season_and_episode(GetSeason(), 1),
-                 format_season_and_episode(GetEpisode(), 2));
+            .arg(StringUtil::intToPaddedString(GetSeason(), 1),
+                 StringUtil::intToPaddedString(GetEpisode(), 2));
         metadataMap[QStringLiteral(u"##x##")] = metadataMap[QStringLiteral(u"00x00")] = usingX;
     }
     else
@@ -1383,22 +1382,22 @@ QString VideoMetadata::GetText(const QString& name) const
     if (GetSeason() > 0 || GetEpisode() > 0)
     {
         if (name == QStringLiteral(u"season"))
-            return format_season_and_episode(GetSeason(), 1);
+            return StringUtil::intToPaddedString(GetSeason(), 1);
         if (name == QStringLiteral(u"episode"))
-            return format_season_and_episode(GetEpisode(), 1);
+            return StringUtil::intToPaddedString(GetEpisode(), 1);
         if ((name == QStringLiteral(u"s##e##")) ||
             (name == QStringLiteral(u"s00e00")))
         {
             return QStringLiteral(u"s%1e%2")
-                .arg(format_season_and_episode(GetSeason(), 2),
-                     format_season_and_episode(GetEpisode(), 2));
+                .arg(StringUtil::intToPaddedString(GetSeason(), 2),
+                     StringUtil::intToPaddedString(GetEpisode(), 2));
         }
         if ((name == QStringLiteral(u"##x##")) ||
             (name == QStringLiteral(u"00x00")))
         {
             return QStringLiteral(u"%1x%2")
-                .arg(format_season_and_episode(GetSeason(), 1),
-                     format_season_and_episode(GetEpisode(), 2));
+                .arg(StringUtil::intToPaddedString(GetSeason(), 1),
+                     StringUtil::intToPaddedString(GetEpisode(), 2));
         }
     }
 

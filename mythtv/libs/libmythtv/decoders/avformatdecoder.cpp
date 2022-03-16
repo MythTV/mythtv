@@ -69,6 +69,7 @@ extern "C" {
 #include "io/mythmediabuffer.h"
 #include "mythframe.h"
 #include "mythchrono.h"
+#include "stringutil.h"
 #include "mythdate.h"
 #include "remoteencoder.h"
 #include "mythcorecontext.h"
@@ -1264,9 +1265,9 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
         auto framenum = static_cast<long long>(total_secs * static_cast<long double>(m_fps));
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Chapter %1 found @ [%2]->%3")
-                .arg(i + 1,   2,10,QChar('0'))
-                .arg(MythDate::formatTime(msec, "HH:mm:ss.zzz"))
-                .arg(framenum));
+                .arg(StringUtil::intToPaddedString(i + 1),
+                     MythDate::formatTime(msec, "HH:mm:ss.zzz"),
+                     QString::number(framenum)));
     }
 
     if (qEnvironmentVariableIsSet("FORCE_DTS_TIMESTAMPS"))
