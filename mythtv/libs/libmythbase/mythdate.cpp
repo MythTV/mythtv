@@ -222,8 +222,10 @@ std::chrono::seconds secsInFuture (const QDateTime& future)
  *     convert it to milliseconds.
  *
  * \param fmt A formatting string specifying how to output the time.
- *     See QTime::toString for the definition of valid formatting
- *     characters.
+ *     Valid formatting characters are <tt>"Hmsz"</tt> for hours, minutes, seconds,
+ *     and milliseconds, respectively.  Consecutive runs of these characters will
+ *     be replaced by at least as many characters as the run length, zero padding
+ *     if necessary.
  */
 QString formatTime(std::chrono::milliseconds msecs, QString fmt)
 {
