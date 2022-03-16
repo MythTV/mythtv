@@ -252,23 +252,20 @@ QString frameToTimestamp(long long frameno, float fps)
 {
     auto ms = millisecondsFromFloat(frameno / fps * 1000);
     auto secs = std::chrono::ceil<std::chrono::seconds>(ms);
-    return MythDate::formatTime(secs, "hh:mm:ss");
+    return MythDate::formatTime(secs, "HH:mm:ss");
 }
 
 QString frameToTimestampms(long long frameno, float fps)
 {
     auto ms = millisecondsFromFloat(frameno / fps * 1000);
-    QString timestr = MythDate::formatTime(ms, "mm:ss.zzz");
-    timestr.chop(1); // Chop 1 to return hundredths
+    QString timestr = MythDate::formatTime(ms, "mm:ss.zz");
     return timestr;
 }
 
 QString strftimeval(std::chrono::microseconds usecs)
 {
     auto msecs = duration_cast<std::chrono::milliseconds>(usecs);
-    return QString("%1.%2")
-        .arg(duration_cast<std::chrono::seconds>(usecs).count())
-        .arg((msecs % 1s).count(), 3, 10, QChar(QChar('0')));
+    return MythDate::formatTime(msecs, "s.zzz");
 }
 
 };  /* namespace */
