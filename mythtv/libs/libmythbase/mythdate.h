@@ -60,9 +60,6 @@ MBASE_PUBLIC std::chrono::milliseconds currentMSecsSinceEpochAsDuration(void);
 MBASE_PUBLIC std::chrono::seconds secsInPast (const QDateTime& past);
 MBASE_PUBLIC std::chrono::seconds secsInFuture (const QDateTime& future);
 
-MBASE_PUBLIC QString formatTime(std::chrono::milliseconds msecs,
-                                QString fmt = "HH:mm:ss");
-
 enum class FormatDurationUnit : int
 {
     automatic = -1,
