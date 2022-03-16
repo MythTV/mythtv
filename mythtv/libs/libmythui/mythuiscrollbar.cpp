@@ -10,7 +10,7 @@
 #include <QDomDocument>
 
 // myth
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 void MythUIScrollBar::Reset()
 {

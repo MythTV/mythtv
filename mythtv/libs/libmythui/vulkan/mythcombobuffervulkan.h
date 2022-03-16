@@ -6,7 +6,7 @@
 #include <QMatrix4x4>
 
 // MythTV
-#include "mythuiexp.h"
+#include "libmythui/mythuiexp.h"
 
 // Total Buffer size of 112bytes.
 // Vulkan spec guarantees 128 bytes for push constants

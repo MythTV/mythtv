@@ -2,8 +2,10 @@
 #include <thread> // for sleep_for
 
 #include <QCoreApplication>
+
+#include "libmythbase/mythevent.h"
+
 #include "mythmainwindow.h"
-#include "mythevent.h"
 #include "mythuistatetracker.h"
 #include "mythuiactions.h"
 

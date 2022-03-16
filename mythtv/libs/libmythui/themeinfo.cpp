@@ -9,8 +9,8 @@
 #include <QDomElement>
 
 // MythTV headers
-#include "mythlogging.h"
-#include "mythdownloadmanager.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
 
 #define LOC      QString("ThemeInfo: ")
 

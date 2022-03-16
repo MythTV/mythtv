@@ -1,6 +1,6 @@
 // MythTV
-#include "mythcorecontext.h"
-#include "mythlogging.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "mythdisplayx11.h"
 
 // X11

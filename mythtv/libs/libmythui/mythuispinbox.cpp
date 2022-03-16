@@ -1,7 +1,8 @@
 
+#include "libmythbase/mythlogging.h"
+
 #include "mythmainwindow.h"
 #include "mythuispinbox.h"
-#include "mythlogging.h"
 #include "mythuibutton.h"
 #include "mythuitextedit.h"
 #include "mythuitext.h"

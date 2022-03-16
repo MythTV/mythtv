@@ -3,10 +3,11 @@
 #include <QTimer>
 
 // MythTV
-#include "mythlogging.h"
-#include "mythcorecontext.h"
-#include "mythdate.h"
-#include "mythsystemlegacy.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsystemlegacy.h"
+
 #include "platforms/mythxdisplay.h"
 #include "platforms/mythscreensaverx11.h"
 

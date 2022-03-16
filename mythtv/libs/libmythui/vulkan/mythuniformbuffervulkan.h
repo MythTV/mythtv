@@ -2,7 +2,7 @@
 #define MYTHUNIFORMBUFFERVULKAN_H
 
 // MythTV
-#include "vulkan/mythrendervulkan.h"
+#include "libmythui/vulkan/mythrendervulkan.h"
 
 class MUI_PUBLIC MythUniformBufferVulkan : protected MythVulkanObject
 {

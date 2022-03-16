@@ -8,14 +8,13 @@
 #include <QString>
 #include <QHash>
 
-#include "mythlogging.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 
 #include "mythuihelper.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
-#include "mythcorecontext.h"
-
-#include "compat.h"
 
 MythUISimpleText::MythUISimpleText(const QString &text,
                                    const MythFontProperties &font,

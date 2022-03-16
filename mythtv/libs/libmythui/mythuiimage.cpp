@@ -20,19 +20,18 @@
 #include <QRunnable>
 
 // libmythbase
-#include "mythlogging.h"
-#include "mythmiscutil.h"
-#include "mthreadpool.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#ifdef _MSC_VER
+#  include "libmythbase/compat.h"   // random
+#endif
 
 // Mythui
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
 #include "mythscreentype.h"
-
-#ifdef _MSC_VER
-#  include "compat.h"   // random
-#endif
 
 class ImageLoadThread;
 

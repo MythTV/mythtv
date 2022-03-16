@@ -8,10 +8,10 @@
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 
-#include "mythcorecontext.h"
-#include "mythlogging.h"
-#include "mythdate.h"
-#include "mythdb.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
 
 MythUIClock::MythUIClock(MythUIType *parent, const QString &name)
     : MythUIText(parent, name)

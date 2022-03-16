@@ -6,7 +6,7 @@
 #include "mythpainter.h"
 #include "mythimage.h"
 
-#include "compat.h"
+#include "libmythbase/compat.h"
 
 class QPainter;
 

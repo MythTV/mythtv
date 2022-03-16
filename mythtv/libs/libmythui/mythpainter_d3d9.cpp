@@ -4,7 +4,7 @@
 #include <QMutex>
 
 // Mythdb headers
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 // Mythui headers
 #include "mythpainter_d3d9.h"

@@ -1,6 +1,6 @@
 // MythTV
 #include "mythnvcontrol.h"
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 #define LOC QString("NVCtrl: ")
 

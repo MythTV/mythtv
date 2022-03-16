@@ -11,7 +11,7 @@
 #include <QSize>
 
 // MythTV
-#include "mythuiexp.h"
+#include "libmythui/mythuiexp.h"
 
 // X11
 #include <X11/Xlib.h>

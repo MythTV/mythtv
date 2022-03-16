@@ -13,7 +13,8 @@
 #include <utility>
 
 // myth
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
+
 #include "mythpainter.h"
 #include "mythimage.h"
 #include "mythmainwindow.h"

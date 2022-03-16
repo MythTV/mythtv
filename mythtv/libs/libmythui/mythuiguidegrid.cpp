@@ -12,15 +12,16 @@
 #include <QDomElement>
 
 // myth
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+
 #include "mythfontproperties.h"
 #include "mythuihelper.h"
 #include "x11colors.h"
-#include "mythlogging.h"
 #include "mythimage.h"
 #include "mythuitype.h"
 #include "mythuiimage.h"
 #include "mythmainwindow.h"
-#include "mythdb.h"
 
 #define LOC QString("MythUIGuideGrid: ")
 

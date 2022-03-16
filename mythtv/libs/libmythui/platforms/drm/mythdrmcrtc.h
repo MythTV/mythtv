@@ -2,8 +2,8 @@
 #define MYTHDRMCRTC_H
 
 // MythTV
-#include "platforms/drm/mythdrmproperty.h"
-#include "platforms/drm/mythdrmmode.h"
+#include "libmythui/platforms/drm/mythdrmproperty.h"
+#include "libmythui/platforms/drm/mythdrmmode.h"
 
 using DRMCrtc  = std::shared_ptr<class MythDRMCrtc>;
 using DRMCrtcs = std::vector<DRMCrtc>;

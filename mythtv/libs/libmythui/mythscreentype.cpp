@@ -7,9 +7,10 @@
 #include <QRunnable>
 #include <utility>
 
-#include "mythcorecontext.h"
-#include "mythobservable.h"
-#include "mthreadpool.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythobservable.h"
 
 #include "mythscreenstack.h"
 #include "mythmainwindow.h"
@@ -17,7 +18,6 @@
 #include "mythprogressdialog.h"
 #include "mythuigroup.h"
 #include "mythuistatetype.h"
-#include "mythlogging.h"
 #include "mythgesture.h"
 #include "mythuitext.h"
 

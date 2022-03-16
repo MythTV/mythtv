@@ -8,9 +8,9 @@
 #include <QPainterPath>
 
 // libmythbase headers
-#include "mythlogging.h"
-#include "compat.h"
-#include "mythcorecontext.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 
 // libmythui headers
 #include "mythfontproperties.h"

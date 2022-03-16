@@ -5,8 +5,8 @@
 #include <QObject>
 
 // MythTV
-#include "mthread.h"
-#include "serverpool.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/serverpool.h"
 
 class MythUDPListener : public QObject
 {

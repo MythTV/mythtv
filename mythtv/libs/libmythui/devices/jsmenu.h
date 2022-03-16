@@ -14,7 +14,7 @@
 #include <QString>
 
 // MythTV headers
-#include "mthread.h"
+#include "libmythbase/mthread.h"
 
 struct buttonMapType
 {

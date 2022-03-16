@@ -8,7 +8,7 @@
 #include <QCoreApplication>
 
 // Myth headers
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 // MythUI headers
 #include "mythgesture.h"

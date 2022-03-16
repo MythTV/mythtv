@@ -3,7 +3,7 @@
 #include "mythprogressdialog.h"
 
 // libmythbase headers
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 // libmythui headers
 #include "mythuitext.h"

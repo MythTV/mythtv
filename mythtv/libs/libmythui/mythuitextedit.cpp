@@ -10,8 +10,8 @@
 #include <Qt>
 
 // libmythbase headers
-#include "mythlogging.h"
-#include "mythdb.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
 
 // MythUI headers
 #include "mythpainter.h"

@@ -4,9 +4,10 @@
 #include <QString>
 
 // MythTV
-#include "mythcorecontext.h"
-#include "mythlogging.h"
-#include "mythevent.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythevent.h"
+#include "libmythbase/mythlogging.h"
+
 #include "mythmainwindow.h"
 #include "mythdisplay.h"
 #include "mythcecadapter.h"

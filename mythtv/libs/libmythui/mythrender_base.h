@@ -9,7 +9,7 @@
 #include <QStringList>
 
 // MythTV
-#include "referencecounter.h"
+#include "libmythbase/referencecounter.h"
 #include "mythuiexp.h"
 
 enum RenderType

@@ -1,8 +1,9 @@
 // MythTV
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythlogging.h"
+
 #include "platforms/drm/mythdrmhdr.h"
 #include "platforms/mythdisplaydrm.h"
-#include "mythlogging.h"
-#include "mythconfig.h"
 
 // libdrm
 extern "C" {

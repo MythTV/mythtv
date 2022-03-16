@@ -4,8 +4,8 @@
 #include <QHostAddress>
 
 // MythTV
-#include "mythcorecontext.h"
-#include "mythlogging.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythudplistener.h"
 

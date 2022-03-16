@@ -1,6 +1,5 @@
 
 #include "mythfontproperties.h"
-#include "mythcorecontext.h"
 
 #include <cmath>
 
@@ -11,8 +10,9 @@
 #include <QRect>
 #include <QRegularExpression>
 
-#include "mythlogging.h"
-#include "mythdb.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
 
 #include "mythuihelper.h"
 #include "mythmainwindow.h"

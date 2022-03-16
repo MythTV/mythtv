@@ -6,7 +6,7 @@
 #include <qpa/qplatformnativeinterface.h>
 
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "platforms/mythwaylandextras.h"
 
 // Wayland

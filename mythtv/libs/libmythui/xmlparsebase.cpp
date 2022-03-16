@@ -14,10 +14,8 @@
 #include <QRadialGradient>
 
 // libmythbase headers
-#include "mythconfig.h"
-
-// libmyth headers
-#include "mythlogging.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythlogging.h"
 
 // Mythui headers
 #include "mythmainwindow.h"

@@ -5,7 +5,7 @@
 #include <QGuiApplication>
 
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "mythimage.h"
 #include "vulkan/mythshadersvulkan.h"
 #include "vulkan/mythshadervulkan.h"

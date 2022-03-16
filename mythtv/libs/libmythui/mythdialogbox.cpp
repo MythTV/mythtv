@@ -10,8 +10,8 @@
 #include <QTime>
 #include <utility>
 
-#include "mythlogging.h"
-#include "mythdate.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
 
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"

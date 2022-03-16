@@ -2,9 +2,9 @@
 #define MYTHDRMCONNECTOR_H
 
 // MythTV
-#include "platforms/drm/mythdrmproperty.h"
-#include "platforms/drm/mythdrmmode.h"
-#include "platforms/drm/mythdrmresources.h"
+#include "libmythui/platforms/drm/mythdrmmode.h"
+#include "libmythui/platforms/drm/mythdrmproperty.h"
+#include "libmythui/platforms/drm/mythdrmresources.h"
 
 using Encoders = std::vector<uint32_t>;
 using DRMConn  = std::shared_ptr<class MythDRMConnector>;

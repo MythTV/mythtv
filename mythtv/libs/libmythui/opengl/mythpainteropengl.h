@@ -1,6 +1,10 @@
 #ifndef MYTHPAINTER_OPENGL_H_
 #define MYTHPAINTER_OPENGL_H_
 
+// Std
+#include <array>
+#include <list>
+
 // Qt
 #include <QMutex>
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
@@ -9,12 +13,8 @@
 #include <QQueue>
 
 // MythTV
-#include "mythpaintergpu.h"
-#include "mythimage.h"
-
-// Std
-#include <array>
-#include <list>
+#include "libmythui/mythimage.h"
+#include "libmythui/mythpaintergpu.h"
 
 class MythMainWindow;
 class MythGLTexture;

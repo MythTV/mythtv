@@ -2,8 +2,8 @@
 #define MYTHDEBUGVULKAN_H
 
 // MythTV
-#include "mythuiexp.h"
-#include "vulkan/mythrendervulkan.h"
+#include "libmythui/mythuiexp.h"
+#include "libmythui/vulkan/mythrendervulkan.h"
 
 class MUI_PUBLIC MythDebugVulkan : protected MythVulkanObject
 {

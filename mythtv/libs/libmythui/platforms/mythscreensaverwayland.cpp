@@ -1,5 +1,5 @@
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "mythmainwindow.h"
 #include "platforms/mythscreensaverwayland.h"
 #include "platforms/waylandprotocols/idle_inhibit_unstable_v1.h"

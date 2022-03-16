@@ -8,8 +8,8 @@
 // Qt headers
 #include <QDomDocument>
 
-// Mythdb headers
-#include "mythlogging.h"
+// Mythbase headers
+#include "libmythbase/mythlogging.h"
 
 // Mythui Headers
 #include "mythmainwindow.h"

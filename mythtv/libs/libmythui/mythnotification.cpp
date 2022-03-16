@@ -11,7 +11,7 @@
 #include <QTime>
 
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "mythnotification.h"
 
 MythNotification::MythNotification(Type nType, void* Parent)

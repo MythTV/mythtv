@@ -2,7 +2,7 @@
 #define MYTHMAINWINDOWPRIVATE_H
 
 // MythTV
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 #include "mythmainwindow.h"
 #include "mythgesture.h"
 

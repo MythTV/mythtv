@@ -3,13 +3,23 @@
 #include "lirc.h"
 
 // C headers
-#include <cstdio>
-#include <cerrno>
-#include <cstdlib>
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/un.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 // C++ headers
 #include <algorithm>
+#include <cerrno>
 #include <chrono> // for milliseconds
+#include <cstdio>
+#include <cstdlib>
 #include <thread> // for sleep_for
 #include <vector>
 
@@ -20,22 +30,12 @@
 #include <QStringList>
 
 // MythTV headers
-#include "mythdb.h"
-#include "mythsystemlegacy.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsystemlegacy.h"
+
 #include "lircevent.h"
 #include "lirc_client.h"
-
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/select.h>
-#include <sys/un.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/wait.h>
-#include "mythlogging.h"
 
 #define LOC      QString("LIRC: ")
 

@@ -11,15 +11,14 @@
 #include <QHash>
 #include <QRegularExpression>
 
-#include "mythlogging.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 
 #include "mythuihelper.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
-#include "mythcorecontext.h"
-
-#include "compat.h"
 
 MythUIText::MythUIText(MythUIType *parent, const QString &name)
     : MythUIType(parent, name),

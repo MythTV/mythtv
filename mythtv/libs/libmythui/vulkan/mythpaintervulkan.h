@@ -5,11 +5,11 @@
 #include <QStack>
 
 // MythTV
-#include "mythuiexp.h"
-#include "mythpaintergpu.h"
-#include "mythuianimation.h"
-#include "vulkan/mythrendervulkan.h"
-#include "vulkan/mythwindowvulkan.h"
+#include "libmythui/mythuiexp.h"
+#include "libmythui/mythpaintergpu.h"
+#include "libmythui/mythuianimation.h"
+#include "libmythui/vulkan/mythrendervulkan.h"
+#include "libmythui/vulkan/mythwindowvulkan.h"
 
 class MythDebugVulkan;
 class MythUniformBufferVulkan;

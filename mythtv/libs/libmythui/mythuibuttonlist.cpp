@@ -10,14 +10,14 @@
 #include <QKeyEvent>
 #include <QRegularExpression>
 
-// libmyth headers
-#include "mythlogging.h"
+// libmythbase headers
+#include "libmythbase/lcddevice.h"
+#include "libmythbase/mythlogging.h"
 
 // mythui headers
 #include "mythmainwindow.h"
 #include "mythuiscrollbar.h"
 #include "mythuistatetype.h"
-#include "lcddevice.h"
 #include "mythuibutton.h"
 #include "mythuitext.h"
 #include "mythuitextedit.h"

@@ -2,8 +2,8 @@
 #define MYTHSCREENSAVERDRM_H
 
 // MythTV
-#include "platforms/mythdisplaydrm.h"
-#include "mythscreensaver.h"
+#include "libmythui/mythscreensaver.h"
+#include "libmythui/platforms/mythdisplaydrm.h"
 
 class MythScreenSaverDRM : public MythScreenSaver
 {

@@ -4,10 +4,11 @@
 #include <QDir>
 
 // MythTV
-#include "mythconfig.h"
-#include "mythlogging.h"
-#include "mythdb.h"
-#include "mythdirs.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+
 #include "mythmainwindow.h"
 #include "mythinputdevicehandler.h"
 

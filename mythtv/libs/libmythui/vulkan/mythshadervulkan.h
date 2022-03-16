@@ -2,7 +2,7 @@
 #define MYTHSHADERVULKAN_H
 
 // MythTV
-#include "vulkan/mythrendervulkan.h"
+#include "libmythui/vulkan/mythrendervulkan.h"
 
 using MythShaderMap   = std::map<int, std::pair<QString, std::vector<uint32_t>>>;
 using MythGLSLStage   = std::pair<VkShaderStageFlags, QString>;

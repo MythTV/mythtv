@@ -2,7 +2,7 @@
 #define MYTHDRMMODE_H
 
 // MythTV
-#include "platforms/drm/mythdrmresources.h"
+#include "libmythui/platforms/drm/mythdrmresources.h"
 
 using DRMMode  = std::shared_ptr<class MythDRMMode>;
 using DRMModes = std::vector<DRMMode>;

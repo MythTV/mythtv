@@ -1,6 +1,6 @@
+#include "libmythbase/mythlogging.h"
 #include "platforms/mythscreensaverandroid.h"
 #include <QtAndroidExtras>
-#include <mythlogging.h>
 
 // call in java is :
 //

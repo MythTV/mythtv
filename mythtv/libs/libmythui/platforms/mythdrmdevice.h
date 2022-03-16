@@ -2,15 +2,15 @@
 #define MYTHDRMDEVICE_H
 
 // MythTV
-#include "mythlogging.h"
-#include "mythdisplay.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythdisplay.h"
 #if defined (USING_QTPRIVATEHEADERS)
-#include "mythcommandlineparser.h"
+#include "libmythbase/mythcommandlineparser.h"
 #endif
-#include "platforms/drm/mythdrmconnector.h"
-#include "platforms/drm/mythdrmencoder.h"
-#include "platforms/drm/mythdrmcrtc.h"
-#include "platforms/drm/mythdrmplane.h"
+#include "libmythui/platforms/drm/mythdrmconnector.h"
+#include "libmythui/platforms/drm/mythdrmencoder.h"
+#include "libmythui/platforms/drm/mythdrmcrtc.h"
+#include "libmythui/platforms/drm/mythdrmplane.h"
 
 // Std
 #include <memory>

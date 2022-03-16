@@ -2,7 +2,7 @@
 #define MYTHDRMFRAMEBUFFER_H
 
 // MythTV
-#include "platforms/drm/mythdrmresources.h"
+#include "libmythui/platforms/drm/mythdrmresources.h"
 
 using DRMFb  = std::shared_ptr<class MythDRMFramebuffer>;
 using DRMFbs = std::vector<DRMFb>;

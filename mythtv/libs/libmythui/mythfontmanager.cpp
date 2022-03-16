@@ -4,8 +4,9 @@
 #include <QList>
 #include <QMutexLocker>
 
+#include "libmythbase/mythlogging.h"
+
 #include "mythfontmanager.h"
-#include "mythlogging.h"
 
 static MythFontManager *gFontManager = nullptr;
 

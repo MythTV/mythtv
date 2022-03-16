@@ -7,8 +7,8 @@
 #include <optional>
 
 // MythTV
-#include "mythuiexp.h"
-#include "mythrender_base.h"
+#include "libmythui/mythuiexp.h"
+#include "libmythui/mythrender_base.h"
 
 class MythImage;
 class MythDebugVulkan;

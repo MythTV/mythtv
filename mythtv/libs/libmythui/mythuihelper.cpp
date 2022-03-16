@@ -14,11 +14,11 @@
 #include <QTimer>
 
 // mythbase headers
-#include "mythdirs.h"
-#include "mythlogging.h"
-#include "mythdb.h"
-#include "mythcorecontext.h"
-#include "storagegroup.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/storagegroup.h"
 
 // mythui headers
 #include "mythprogressdialog.h"

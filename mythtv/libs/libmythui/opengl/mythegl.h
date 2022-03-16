@@ -5,7 +5,7 @@
 #include <QOpenGLContext>
 
 // MythTV
-#include "mythuiexp.h"
+#include "libmythui/mythuiexp.h"
 
 using MYTH_EGLIMAGETARGET  = void  (*)(GLenum, void*);
 using MYTH_EGLCREATEIMAGE  = void* (*)(void*, void*, unsigned int, void*, const int32_t *);

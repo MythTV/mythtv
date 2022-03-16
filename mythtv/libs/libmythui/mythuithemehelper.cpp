@@ -2,10 +2,11 @@
 #include <QDir>
 
 // MythTV
-#include "mythlogging.h"
-#include "storagegroup.h"
-#include "mythdirs.h"
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/storagegroup.h"
+
 #include "mythuithemehelper.h"
 
 #define LOC QString("ThemeHelper: ")

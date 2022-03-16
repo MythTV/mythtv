@@ -7,7 +7,7 @@
 #include <map>
 
 // MythTV headers
-#include "mthread.h"
+#include "libmythbase/mthread.h"
 
 #include <QTimer>
 

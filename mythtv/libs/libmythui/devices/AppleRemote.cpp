@@ -21,7 +21,7 @@
 
 #include <sstream>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 #if !defined(MAC_OS_VERSION_12_0)
 #define kIOMainPortDefault kIOMasterPortDefault

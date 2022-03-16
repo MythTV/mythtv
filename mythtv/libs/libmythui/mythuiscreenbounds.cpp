@@ -3,8 +3,9 @@
 #include <QRegularExpression>
 
 // MythTV
-#include "mythcorecontext.h"
-#include "mythlogging.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+
 #include "mythuihelper.h"
 #include "mythdisplay.h"
 #include "mythuiscreenbounds.h"

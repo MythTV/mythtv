@@ -5,7 +5,7 @@
 #include <QString>
 
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "platforms/mythscreensaverdbus.h"
 
 // Std

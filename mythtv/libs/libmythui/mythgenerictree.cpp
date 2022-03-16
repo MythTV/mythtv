@@ -4,8 +4,8 @@
 #include "mythuibuttonlist.h"
 
 // Myth headers
-#include "mythlogging.h"
-#include "mythsorthelper.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsorthelper.h"
 
 // QT headers
 #include <algorithm>

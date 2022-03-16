@@ -10,6 +10,18 @@
 #include <QFileInfo>
 #include <QTextStream>
 
+// libmythbase headers
+#include "libmythbase/lcddevice.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmedia.h"
+#include "libmythbase/mythplugin.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/mythversion.h"
+
 // libmythui headers
 #include "mythmainwindow.h"
 #include "mythdialogbox.h"
@@ -17,21 +29,7 @@
 #include "mythuitext.h"
 #include "mythuistatetype.h"
 #include "xmlparsebase.h"
-#include "mythsystemlegacy.h"
 #include "mythuihelper.h"
-#include "lcddevice.h"
-#include "mythcorecontext.h"
-
-// libmythbase headers
-#include "mythlogging.h"
-#include "mythdb.h"
-#include "mythdirs.h"
-#include "mythmedia.h"
-#include "mythversion.h"
-#include "mythdate.h"
-
-// libmythbase headers
-#include "mythplugin.h"
 
 bool MythThemedMenuState::Create(void)
 {

@@ -1,4 +1,7 @@
-// MythTV
+// libmythbase
+#include "libmythbase/mythlogging.h"
+
+// libmythui
 #include "mythvrr.h"
 #ifdef USING_DRM
 #include "platforms/mythdisplaydrm.h"
@@ -9,7 +12,6 @@
 #include "platforms/mythnvcontrol.h"
 #endif
 #include "mythdisplay.h"
-#include "mythlogging.h"
 
 // Qt
 #include <QObject>

@@ -9,9 +9,9 @@
 #include <QTimer>
 #include <QUrl>
 
-#include "mythlogging.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 
-#include "mythcorecontext.h"
 #include "mythdialogbox.h"
 #include "mythfontproperties.h"
 #include "mythmainwindow.h"

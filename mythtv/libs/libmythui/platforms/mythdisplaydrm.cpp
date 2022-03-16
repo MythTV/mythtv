@@ -1,5 +1,5 @@
 // MythTV
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
 #include "mythmainwindow.h"
 #include "platforms/mythdrmdevice.h"
 #include "platforms/mythdisplaydrm.h"

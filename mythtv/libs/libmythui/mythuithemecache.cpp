@@ -3,13 +3,14 @@
 #include <QDateTime>
 
 // MythTV
-#include "mythlogging.h"
-#include "mthreadpool.h"
-#include "mythdb.h"
-#include "remotefile.h"
-#include "mythdownloadmanager.h"
-#include "mythdate.h"
-#include "mythdirs.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/remotefile.h"
+
 #include "mythuithemecache.h"
 
 // Std

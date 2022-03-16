@@ -5,7 +5,7 @@
 #include <QString>
 
 // MythTV
-#include "mythuiexp.h"
+#include "libmythui/mythuiexp.h"
 
 // libdrm
 extern "C" {

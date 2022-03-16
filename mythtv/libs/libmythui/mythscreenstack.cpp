@@ -1,8 +1,9 @@
+#include "libmythbase/mythevent.h"
+
 #include "mythscreenstack.h"
 #include "mythmainwindow.h"
 #include "mythscreentype.h"
 #include "mythpainter.h"
-#include "mythevent.h"
 
 #include <chrono>
 

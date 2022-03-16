@@ -1,6 +1,6 @@
 // MythTV
-#include "mythcorecontext.h"
-#include "mythlogging.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "platforms/mythdisplaymutter.h"
 
 #ifdef USING_DRM

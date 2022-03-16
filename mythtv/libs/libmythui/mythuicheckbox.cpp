@@ -3,7 +3,7 @@
 #include "mythuicheckbox.h"
 
 // Myth headers
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 // MythUI headers
 #include "mythmainwindow.h"

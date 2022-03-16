@@ -2,7 +2,7 @@
 #define MYTHDRMENCODER_H
 
 // MythTV
-#include "platforms/drm/mythdrmresources.h"
+#include "libmythui/platforms/drm/mythdrmresources.h"
 
 using DRMEnc  = std::shared_ptr<class MythDRMEncoder>;
 using DRMEncs = std::vector<DRMEnc>;

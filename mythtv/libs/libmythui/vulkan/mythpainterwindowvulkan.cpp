@@ -3,7 +3,7 @@
 #include <QResizeEvent>
 
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "mythmainwindow.h"
 #include "vulkan/mythrendervulkan.h"
 #include "vulkan/mythwindowvulkan.h"

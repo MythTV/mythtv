@@ -11,14 +11,16 @@
 #include <QDomDocument>
 #include <QFile>
 
-// myth
+// libmythbase
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythcorecontext.h"
+
+// libmythui
 #include "mythmainwindow.h"
-#include "mythlogging.h"
 #include "mythfontproperties.h"
 #include "mythuihelper.h"
 #include "mythuibutton.h"
 #include "mythuitextedit.h"
-#include "mythcorecontext.h"
 
 
 #define LOC      QString("MythUIVirtualKeyboard: ")

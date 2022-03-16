@@ -2,7 +2,7 @@
 #include <QtAndroidExtras>
 
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "mythdisplayandroid.h"
 
 #define LOC QString("Display: ")

@@ -14,19 +14,18 @@
 #include <QTimer>
 
 // MythTV headers
-#include "mythcorecontext.h"
-#include "mythmainwindow.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
 
+#include "mythmainwindow.h"
 #include "mythnotificationcenter.h"
 #include "mythnotificationcenter_private.h"
-
 #include "mythpainter.h"
 #include "mythscreenstack.h"
 #include "mythscreentype.h"
 #include "mythuiimage.h"
-#include "mythuitext.h"
 #include "mythuiprogressbar.h"
-#include "mythdate.h"
+#include "mythuitext.h"
 
 #define LOC QString("NotificationCenter: ")
 

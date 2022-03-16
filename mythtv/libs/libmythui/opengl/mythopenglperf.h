@@ -32,7 +32,7 @@ class QOpenGLTimeMonitor
 #endif
 
 // MythTV
-#include "mythuiexp.h"
+#include "libmythui/mythuiexp.h"
 
 class MUI_PUBLIC MythOpenGLPerf : public QOpenGLTimeMonitor
 {

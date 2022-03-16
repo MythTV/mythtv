@@ -11,12 +11,10 @@
 #include <QPainter>
 #include <QRgb>
 
-// Mythdb headers
-#include "mythdownloadmanager.h"
-#include "mythlogging.h"
-
-// Myth headers
-#include "remotefile.h"
+// libmythbase headers
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/remotefile.h"
 
 // MythUI headers
 #include "mythuihelper.h"

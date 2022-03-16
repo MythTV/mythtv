@@ -2,7 +2,7 @@
 #define MYTHDRMPLANE_H
 
 // MythTV
-#include "platforms/drm/mythdrmproperty.h"
+#include "libmythui/platforms/drm/mythdrmproperty.h"
 
 // libdrm
 extern "C" {

@@ -3,7 +3,7 @@
 #include <QGuiApplication>
 
 // MythTV
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
 #include "mythmainwindow.h"
 #include "mythpainter_qt.h"
 #include "mythpainterwindowqt.h"

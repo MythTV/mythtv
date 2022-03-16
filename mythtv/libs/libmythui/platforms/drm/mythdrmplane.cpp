@@ -1,5 +1,5 @@
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "platforms/drm/mythdrmplane.h"
 
 #define LOC QString("DRMPlane: ")

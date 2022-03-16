@@ -6,7 +6,9 @@
 #include <QString>
 
 // libmythbase headers
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
+
+// libmythui headers
 #include "mythuitype.h"
 
 bool ETPrintWarning::Child(const MythUIType *container,

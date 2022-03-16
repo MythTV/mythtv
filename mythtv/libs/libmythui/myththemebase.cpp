@@ -1,4 +1,6 @@
 // MythTV
+#include "libmythbase/mythdirs.h"
+
 #include "myththemebase.h"
 #include "mythuiimage.h"
 #include "mythmainwindow.h"
@@ -6,7 +8,6 @@
 #include "xmlparsebase.h"
 #include "mythfontproperties.h"
 #include "mythfontmanager.h"
-#include "mythdirs.h"
 #include "mythuihelper.h"
 
 MythThemeBase::MythThemeBase(MythMainWindow* MainWindow)

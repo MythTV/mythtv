@@ -2,7 +2,7 @@
 #include <utility>
 
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "mythopenglperf.h"
 
 

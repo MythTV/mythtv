@@ -6,20 +6,9 @@
 
 #include "mythuiwebbrowser.h"
 
-// myth
-#include "mythpainter.h"
-#include "mythimage.h"
-#include "mythmainwindow.h"
-#include "mythfontproperties.h"
-#include "mythlogging.h"
-#include "mythdb.h"
-#include "mythdirs.h"
-#include "mythuihelper.h"
-#include "mythcorecontext.h"
-#include "mythdownloadmanager.h"
-#include "mythdialogbox.h"
-#include "mythprogressdialog.h"
-#include "mythuiscrollbar.h"
+// c++
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 // qt
 #include <QApplication>
@@ -34,8 +23,22 @@
 #include <QNetworkCookieJar>
 #include <QNetworkConfiguration>
 
-#include <chrono> // for milliseconds
-#include <thread> // for sleep_for
+// libmythbase
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
+
+//libmythui
+#include "mythpainter.h"
+#include "mythimage.h"
+#include "mythmainwindow.h"
+#include "mythfontproperties.h"
+#include "mythuihelper.h"
+#include "mythdialogbox.h"
+#include "mythprogressdialog.h"
+#include "mythuiscrollbar.h"
 
 struct MimeType
 {

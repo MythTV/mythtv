@@ -6,8 +6,8 @@
 #include <QCoreApplication>
 #include <QDomDocument>
 
-// MythDB
-#include "mythlogging.h"
+// MythBase
+#include "libmythbase/mythlogging.h"
 
 // MythUI
 #include "mythuishape.h"

@@ -5,7 +5,7 @@
 #include <cmath>
 
 // MythBase
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 // MythUI
 #include "mythuishape.h"

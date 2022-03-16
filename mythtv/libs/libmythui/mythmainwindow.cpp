@@ -27,15 +27,15 @@
 #include "unistd.h"
 
 // libmythbase headers
-#include "mythdb.h"
-#include "mythlogging.h"
-#include "mythevent.h"
-#include "mythdirs.h"
-#include "compat.h"
-#include "mythcorecontext.h"
-#include "mythmedia.h"
-#include "mythmiscutil.h"
-#include "mythdate.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythevent.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmedia.h"
+#include "libmythbase/mythmiscutil.h"
 
 // libmythui headers
 #include "myththemebase.h"

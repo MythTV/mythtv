@@ -4,7 +4,7 @@
 #include <QTextStream>
 
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "mythpainter.h"
 #include "mythuiprocedural.h"
 #include "mythuihelper.h"

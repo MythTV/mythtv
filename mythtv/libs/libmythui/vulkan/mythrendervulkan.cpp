@@ -2,7 +2,7 @@
 #include <QGuiApplication>
 
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "mythimage.h"
 #include "mythmainwindow.h"
 #include "vulkan/mythdebugvulkan.h"

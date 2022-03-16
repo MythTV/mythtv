@@ -34,12 +34,12 @@
 #include <QStack>
 
 // MythTV
-#include "mythuiexp.h"
-#include "mythlogging.h"
-#include "mythrender_base.h"
-#include "mythrenderopengldefs.h"
-#include "mythuianimation.h"
-#include "mythegl.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythuiexp.h"
+#include "libmythui/mythrender_base.h"
+#include "libmythui/mythuianimation.h"
+#include "libmythui/opengl/mythegl.h"
+#include "libmythui/opengl/mythrenderopengldefs.h"
 
 enum GLFeatures
 {

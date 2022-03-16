@@ -5,8 +5,8 @@
 #include <QString>
 
 // MythTV
-#include "vulkan/mythcombobuffervulkan.h"
-#include "vulkan/mythshadervulkan.h"
+#include "libmythui/vulkan/mythcombobuffervulkan.h"
+#include "libmythui/vulkan/mythshadervulkan.h"
 
 // GLSL 4.50 shaders for Vulkan.
 // N.B. These cannot, as written, be used for OpenGL as they use descriptor sets

@@ -12,7 +12,7 @@
 
 #include <sys/types.h>   // for uint
 
-#include "mthread.h"
+#include "libmythbase/mthread.h"
 
 class LIRCPriv;
 

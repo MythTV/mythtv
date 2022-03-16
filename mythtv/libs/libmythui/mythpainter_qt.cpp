@@ -9,8 +9,8 @@
 #include "mythmainwindow.h"
 
 // MythDB headers
-#include "compat.h"
-#include "mythlogging.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythlogging.h"
 
 class MythQtImage : public MythImage
 {

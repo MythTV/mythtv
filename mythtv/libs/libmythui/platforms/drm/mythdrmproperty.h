@@ -2,7 +2,7 @@
 #define MYTHDRMPROPERTY_H
 
 // MythTV
-#include "platforms/drm/mythdrmresources.h"
+#include "libmythui/platforms/drm/mythdrmresources.h"
 
 using DRMProp  = std::shared_ptr<class MythDRMProperty>;
 using DRMProps = std::vector<DRMProp>;
