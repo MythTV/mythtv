@@ -3,7 +3,7 @@
 
 #include "splicedescriptors.h"
 #include "atscdescriptors.h"
-#include "mythmiscutil.h" // for xml_indent
+#include "stringutil.h"
 #include "mythlogging.h"
 #include "mpegtables.h"
 
@@ -779,13 +779,13 @@ QString PSIPTable::toString(void) const
 
 QString PSIPTable::toStringXML(uint indent_level) const
 {
-    QString indent = xml_indent(indent_level);
+    QString indent = StringUtil::indentSpaces(indent_level);
     return indent + "<PSIPSection " + XMLValues(indent_level + 1) + " />";
 }
 
 QString PSIPTable::XMLValues(uint indent_level) const
 {
-    QString indent = xml_indent(indent_level);
+    QString indent = StringUtil::indentSpaces(indent_level);
 
     QString str = QString(
         R"(table_id="0x%1" length="%2")")
@@ -803,7 +803,7 @@ QString PSIPTable::XMLValues(uint indent_level) const
         str += QString("\n%1version=\"%2\" current=\"%3\" "
                        "protocol_version=\"%4\" extension=\"0x%5\"")
             .arg(indent)
-            .arg(Version()).arg(xml_bool_to_string(IsCurrent()))
+            .arg(Version()).arg(StringUtil::bool_to_string(IsCurrent()))
             .arg(ATSCProtocolVersion())
             .arg(TableIDExtension(), 0, 16);
     }
@@ -851,8 +851,8 @@ QString ProgramAssociationTable::toString(void) const
 
 QString ProgramAssociationTable::toStringXML(uint indent_level) const
 {
-    QString indent_0 = xml_indent(indent_level);
-    QString indent_1 = xml_indent(indent_level + 1);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
+    QString indent_1 = StringUtil::indentSpaces(indent_level + 1);
 
     QString str = QString(
         "%1<ProgramAssociationSection tsid=\"0x%2\" program_count=\"%3\""
@@ -913,8 +913,8 @@ QString ProgramMapTable::toString(void) const
 
 QString ProgramMapTable::toStringXML(uint indent_level) const
 {
-    QString indent_0 = xml_indent(indent_level);
-    QString indent_1 = xml_indent(indent_level + 1);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
+    QString indent_1 = StringUtil::indentSpaces(indent_level + 1);
 
     QString str = QString(
         "%1<ProgramMapSection pcr_pid=\"0x%2\" program_number=\"%3\"\n"
@@ -1188,7 +1188,7 @@ QString ConditionalAccessTable::toString(void) const
 
 QString ConditionalAccessTable::toStringXML(uint indent_level) const
 {
-    QString indent_0 = xml_indent(indent_level);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
 
     QString str =
         QString("%1<ConditionalAccessSection %3")
@@ -1237,7 +1237,7 @@ QString SpliceTimeView::toString(int64_t first, int64_t last) const
 QString SpliceTimeView::toStringXML(
     uint indent_level, int64_t first, int64_t last) const
 {
-    QString indent = xml_indent(indent_level);
+    QString indent = StringUtil::indentSpaces(indent_level);
 
     if (!IsTimeSpecified())
         return indent + "<SpliceTime />";
@@ -1464,7 +1464,7 @@ QString SpliceInsertView::toString(int64_t first, int64_t last) const
 QString SpliceInformationTable::toStringXML(
     uint indent_level, int64_t first, int64_t last) const
 {
-    QString indent = xml_indent(indent_level);
+    QString indent = StringUtil::indentSpaces(indent_level);
 
     QString cap_time = "";
     if (first >= 0)
@@ -1513,26 +1513,26 @@ QString SpliceInformationTable::toStringXML(
 QString SpliceInsertView::toStringXML(
     uint indent_level, int64_t first, int64_t last) const
 {
-    QString indent_0 = xml_indent(indent_level);
-    QString indent_1 = xml_indent(indent_level + 1);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
+    QString indent_1 = StringUtil::indentSpaces(indent_level + 1);
     QString str = QString(
         "%1<SpliceInsert eventid=\"0x%2\" cancel=\"%3\"\n")
         .arg(indent_0)
         .arg(SpliceEventID(),0,16)
-        .arg(xml_bool_to_string(IsSpliceEventCancel()));
+        .arg(StringUtil::bool_to_string(IsSpliceEventCancel()));
 
     str += QString(
         "%1out_of_network=\"%2\" program_splice=\"%3\" duration=\"%4\"\n")
         .arg(indent_1,
-             xml_bool_to_string(IsOutOfNetwork()),
-             xml_bool_to_string(IsProgramSplice()),
-             xml_bool_to_string(IsDuration()));
+             StringUtil::bool_to_string(IsOutOfNetwork()),
+             StringUtil::bool_to_string(IsProgramSplice()),
+             StringUtil::bool_to_string(IsDuration()));
 
     str += QString(
         "%1immediate=\"%2\" unique_program_id=\"%3\"\n"
         "%4avail_num=\"%5\" avails_expected=\"%6\">\n")
         .arg(indent_1,
-             xml_bool_to_string(IsSpliceImmediate()))
+             StringUtil::bool_to_string(IsSpliceImmediate()))
         .arg(UniqueProgramID())
         .arg(indent_1)
         .arg(AvailNum())

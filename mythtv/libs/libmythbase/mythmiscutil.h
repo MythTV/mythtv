@@ -43,13 +43,6 @@ MBASE_PUBLIC QString getSymlinkTarget(const QString &start_file,
                                       QStringList   *intermediaries = nullptr,
                                       unsigned       maxLinks       = 255);
 
-static inline QString xml_bool_to_string(bool val)
-{
-    return (val) ? "true" : "false";
-}
-
-MBASE_PUBLIC QString xml_indent(uint level);
-
 MBASE_PUBLIC bool IsMACAddress(const QString& MAC);
 MBASE_PUBLIC bool WakeOnLAN(const QString& MAC);
 MBASE_PUBLIC bool MythWakeup(const QString &wakeUpCommand,

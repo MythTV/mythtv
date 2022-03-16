@@ -1,10 +1,11 @@
+#include "recordingquality.h"
+
 #include <algorithm>
 #include <utility>
 
-#include "recordingquality.h"
 #include "mythcorecontext.h"
 #include "recordinginfo.h"
-#include "mythmiscutil.h"
+#include "stringutil.h"
 #include "mythlogging.h"
 
 static void merge_overlapping(RecordingGaps &gaps);
@@ -128,7 +129,7 @@ QString RecordingQuality::toStringXML(void) const
     str += ">\n";
 
     auto add_gap = [](const QString& s, const auto & gap) {
-        return s + xml_indent(1) +
+        return s + StringUtil::indentSpaces(1) +
             QString("<Gap start=\"%1\" end=\"%2\" duration=\"%3\" />\n")
             .arg(gap.GetStart().toString(Qt::ISODate))
             .arg(gap.GetEnd().toString(Qt::ISODate))

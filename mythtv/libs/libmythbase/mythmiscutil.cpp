@@ -963,32 +963,6 @@ void setHttpProxy(void)
     LOG(VB_NETWORK, LOG_ERR, LOC + "failed to find a network proxy");
 }
 
-QString xml_indent(uint level)
-{
-    static QReadWriteLock s_rwLock;
-    static QMap<uint,QString> s_cache;
-
-    s_rwLock.lockForRead();
-    QMap<uint,QString>::const_iterator it = s_cache.constFind(level);
-    if (it != s_cache.constEnd())
-    {
-        QString tmp = *it;
-        s_rwLock.unlock();
-        return tmp;
-    }
-    s_rwLock.unlock();
-
-    QString ret = "";
-    for (uint i = 0; i < level; i++)
-        ret += "    ";
-
-    s_rwLock.lockForWrite();
-    s_cache[level] = ret;
-    s_rwLock.unlock();
-
-    return ret;
-}
-
 int naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity caseSensitivity)
 {
     // This method chops the input a and b into pieces of

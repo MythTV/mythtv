@@ -115,9 +115,9 @@ QString MasterGuideTable::toString(void) const
 
 QString MasterGuideTable::toStringXML(uint indent_level) const
 {
-    QString indent_0 = xml_indent(indent_level);
-    QString indent_1 = xml_indent(indent_level + 1);
-    QString indent_2 = xml_indent(indent_level + 2);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
+    QString indent_1 = StringUtil::indentSpaces(indent_level + 1);
+    QString indent_2 = StringUtil::indentSpaces(indent_level + 2);
 
     QString str =
         QString("%1<MasterGuideSection table_count=\"%2\" "
@@ -238,8 +238,8 @@ QString VirtualChannelTable::toString(void) const
 
 QString VirtualChannelTable::toStringXML(uint indent_level) const
 {
-    QString indent_0 = xml_indent(indent_level);
-    QString indent_1 = xml_indent(indent_level + 1);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
+    QString indent_1 = StringUtil::indentSpaces(indent_level + 1);
 
     QString section_name = QString("%1VirtualChannelSection")
         .arg((TableID::TVCT == TableID()) ? "Terrestrial" : "Cable");
@@ -282,8 +282,8 @@ QString VirtualChannelTable::toStringXML(uint indent_level) const
 QString VirtualChannelTable::ChannelStringXML(
     uint indent_level, uint chan) const
 {
-    QString indent_0 = xml_indent(indent_level);
-    QString indent_1 = xml_indent(indent_level + 1);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
+    QString indent_1 = StringUtil::indentSpaces(indent_level + 1);
     QString str = QString("%1<Channel %2\n%3descriptors_length=\"%4\">\n")
         .arg(indent_0,
              XMLChannelValues(indent_level + 1, chan),
@@ -304,7 +304,7 @@ QString VirtualChannelTable::ChannelStringXML(
 QString VirtualChannelTable::XMLChannelValues(
     uint indent_level, uint chan) const
 {
-    QString indent_0 = xml_indent(indent_level);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
     QString str;
 
     str += QString("short_channel_name=\"%1\" ").arg(ShortChannelName(chan));
@@ -320,13 +320,13 @@ QString VirtualChannelTable::XMLChannelValues(
     str += QString("program_number=\"%1\" ").arg(ProgramNumber(chan));
     str += QString("etm_location=\"%1\" ").arg(ETMlocation(chan));
     str += QString("access_controlled=\"%1\"")
-        .arg(xml_bool_to_string(IsAccessControlled(chan)));
+        .arg(StringUtil::bool_to_string(IsAccessControlled(chan)));
     str += "\n" + indent_0;
 
     str += QString("hidden=\"%1\" ")
-        .arg(xml_bool_to_string(IsHidden(chan)));
+        .arg(StringUtil::bool_to_string(IsHidden(chan)));
     str += QString("hide_guide=\"%1\"")
-        .arg(xml_bool_to_string(IsHiddenInGuide(chan)));
+        .arg(StringUtil::bool_to_string(IsHiddenInGuide(chan)));
     str += "\n" + indent_0;
 
     str += QString(R"(service_type="0x%1" service_type_desc="%2")")
@@ -394,8 +394,8 @@ QString CableVirtualChannelTable::XMLChannelValues(
     return channel_info +
         VirtualChannelTable::XMLChannelValues(indent_level, chan) +
         QString(R"( path_select="%1" out_of_band="%2")")
-        .arg(xml_bool_to_string(IsPathSelect(chan)),
-             xml_bool_to_string(IsOutOfBand(chan)));
+        .arg(StringUtil::bool_to_string(IsPathSelect(chan)),
+             StringUtil::bool_to_string(IsOutOfBand(chan)));
 }
 
 QString CableVirtualChannelTable::ChannelString(uint chan) const
@@ -534,8 +534,8 @@ QString SystemTimeTable::toString(void) const
 
 QString SystemTimeTable::toStringXML(uint indent_level) const
 {
-    QString indent_0 = xml_indent(indent_level);
-    QString indent_1 = xml_indent(indent_level + 1);
+    QString indent_0 = StringUtil::indentSpaces(indent_level);
+    QString indent_1 = StringUtil::indentSpaces(indent_level + 1);
 
     return QString(
         "%1<SystemTimeSection system_time=\"%2\" system_time_iso=\"%3\""
@@ -545,7 +545,7 @@ QString SystemTimeTable::toStringXML(uint indent_level) const
              QString::number(GPSRaw()),
              SystemTimeGPS().toString(Qt::ISODate),
              indent_1,
-             xml_bool_to_string(InDaylightSavingsTime()),
+             StringUtil::bool_to_string(InDaylightSavingsTime()),
              QString::number(DayDaylightSavingsStarts()), /* day-of-month */
              QString::number(HourDaylightSavingsStarts()),
              indent_1,
