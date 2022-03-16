@@ -13,7 +13,7 @@
 #include "channelutil.h"
 #include "mythdb.h"
 #include "dvbtables.h"
-#include "mythmiscutil.h"
+#include "stringutil.h"
 #include "HLSReader.h"
 
 #define LOC QString("ChanUtil: ")
@@ -2159,7 +2159,7 @@ std::vector<uint> ChannelUtil::GetChanIDs(int sourceid, bool onlyVisible)
 
 inline bool lt_callsign(const ChannelInfo &a, const ChannelInfo &b)
 {
-    return naturalCompare(a.m_callSign, b.m_callSign) < 0;
+    return StringUtil::naturalCompare(a.m_callSign, b.m_callSign) < 0;
 }
 
 inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
@@ -2247,7 +2247,7 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     else
     {
         // neither of channels have a numeric channum
-        int cmp = naturalCompare(a.m_chanNum, b.m_chanNum);
+        int cmp = StringUtil::naturalCompare(a.m_chanNum, b.m_chanNum);
         if (cmp)
             return cmp < 0;
     }

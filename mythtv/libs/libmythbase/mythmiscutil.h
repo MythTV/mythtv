@@ -59,9 +59,6 @@ MBASE_PUBLIC bool MythRemoveDirectory(QDir &aDir);
 
 MBASE_PUBLIC void setHttpProxy(void);
 
-MBASE_PUBLIC int naturalCompare(const QString &_a, const QString &_b,
-                                Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
-
 // CPU Tick timing function
 #ifdef MMX
 #ifdef _WIN32

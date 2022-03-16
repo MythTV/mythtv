@@ -23,6 +23,10 @@ inline QString bool_to_string(bool val)
     return (val) ? QStringLiteral("true") : QStringLiteral("false");
 }
 
+MBASE_PUBLIC
+int naturalCompare(const QString &_a, const QString &_b,
+                   Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
+
 } // namespace StringUtil
 
 #endif // STRINGUTIL_H_

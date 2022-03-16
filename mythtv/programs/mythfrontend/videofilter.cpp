@@ -6,7 +6,7 @@
 #include "mythuibutton.h"
 #include "mythuitext.h"
 #include "mythuitextedit.h"
-#include "mythmiscutil.h"
+#include "stringutil.h"
 #include "globals.h"
 #include "dbaccess.h"
 #include "videometadatalistmanager.h"
@@ -325,8 +325,8 @@ bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
         case kOrderByLength:                return lhs.GetLength()      < rhs.GetLength();
         case kOrderByID:                    return lhs.GetID()          < rhs.GetID();
         case kOrderByFilename:
-            return naturalCompare(lhs.GetSortFilename(),
-                                  rhs.GetSortFilename()) < 0;
+            return StringUtil::naturalCompare(lhs.GetSortFilename(),
+                                              rhs.GetSortFilename()) < 0;
         case kOrderBySeasonEp:
         {
             if ((lhs.GetSeason() == rhs.GetSeason())

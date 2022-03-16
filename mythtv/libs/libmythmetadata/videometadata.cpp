@@ -6,7 +6,8 @@
 #include <QRegularExpression>
 
 #include "mythcorecontext.h"
-#include "mythmiscutil.h"
+#include "mythmiscutil.h" // for FileHash
+#include "stringutil.h"
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "storagegroup.h"
@@ -401,10 +402,10 @@ class VideoMetadataImp
  */
 bool VideoMetadataImp::sortBefore(const VideoMetadataImp *rhs) const
 {
-    int ret = naturalCompare(m_sortTitle, rhs->m_sortTitle);
+    int ret = StringUtil::naturalCompare(m_sortTitle, rhs->m_sortTitle);
     if (ret != 0)
         return (ret == -1);
-    ret = naturalCompare(m_sortFilename, rhs->m_sortFilename);
+    ret = StringUtil::naturalCompare(m_sortFilename, rhs->m_sortFilename);
     if (ret != 0)
         return (ret == -1);
     return (m_id < rhs->m_id);
