@@ -967,8 +967,6 @@ class MPUBLIC PMapDBReplacement
     QMap<MarkTypes,frm_pos_map_t> map;
 };
 
-MPUBLIC QString format_season_and_episode(int seasEp, int digits = -1);
-
 MPUBLIC QString myth_category_type_to_string(ProgramInfo::CategoryType category_type);
 MPUBLIC ProgramInfo::CategoryType string_to_myth_category_type(const QString &type);
 

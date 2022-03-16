@@ -11,7 +11,7 @@
 #include "mythcontext.h"
 #include "mythdirs.h"
 #include "mythdate.h"
-#include "programinfo.h" // for format_season_and_episode()
+#include "stringutil.h"
 #include "mythsorthelper.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,15,2)
@@ -158,14 +158,14 @@ void ResultItem::toMap(InfoMap &metadataMap)
 
     if (m_season > 0 || m_episode > 0)
     {
-        metadataMap["season"] = format_season_and_episode(m_season, 1);
-        metadataMap["episode"] = format_season_and_episode(m_episode, 1);
+        metadataMap["season"] = StringUtil::intToPaddedString(m_season, 1);
+        metadataMap["episode"] = StringUtil::intToPaddedString(m_episode, 1);
         metadataMap["s##e##"] = metadataMap["s00e00"] = QString("s%1e%2")
-            .arg(format_season_and_episode(m_season, 2),
-                 format_season_and_episode(m_episode, 2));
+            .arg(StringUtil::intToPaddedString(m_season, 2),
+                 StringUtil::intToPaddedString(m_episode, 2));
         metadataMap["##x##"] = metadataMap["00x00"] = QString("%1x%2")
-            .arg(format_season_and_episode(m_season, 1),
-                 format_season_and_episode(m_episode, 2));
+            .arg(StringUtil::intToPaddedString(m_season, 1),
+                 StringUtil::intToPaddedString(m_episode, 2));
     }
     else
     {

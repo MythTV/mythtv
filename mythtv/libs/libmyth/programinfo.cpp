@@ -20,6 +20,7 @@
 #include "mythcorecontext.h"
 #include "mythscheduler.h"
 #include "mythmiscutil.h"
+#include "stringutil.h"
 #include "storagegroup.h"
 #include "mythlogging.h"
 #include "programinfo.h"
@@ -1592,15 +1593,15 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 
     if (m_season > 0 || m_episode > 0)
     {
-        progMap["season"] = format_season_and_episode(m_season, 1);
-        progMap["episode"] = format_season_and_episode(m_episode, 1);
-        progMap["totalepisodes"] = format_season_and_episode(m_totalEpisodes, 1);
+        progMap["season"] = StringUtil::intToPaddedString(m_season, 1);
+        progMap["episode"] = StringUtil::intToPaddedString(m_episode, 1);
+        progMap["totalepisodes"] = StringUtil::intToPaddedString(m_totalEpisodes, 1);
         progMap["s00e00"] = QString("s%1e%2")
-            .arg(format_season_and_episode(GetSeason(), 2),
-                 format_season_and_episode(GetEpisode(), 2));
+            .arg(StringUtil::intToPaddedString(GetSeason(), 2),
+                 StringUtil::intToPaddedString(GetEpisode(), 2));
         progMap["00x00"] = QString("%1x%2")
-            .arg(format_season_and_episode(GetSeason(), 1),
-                 format_season_and_episode(GetEpisode(), 2));
+            .arg(StringUtil::intToPaddedString(GetSeason(), 1),
+                 StringUtil::intToPaddedString(GetEpisode(), 2));
     }
     else
     {
@@ -6295,21 +6296,6 @@ PMapDBReplacement::PMapDBReplacement() : lock(new QMutex())
 PMapDBReplacement::~PMapDBReplacement()
 {
     delete lock;
-}
-
-MPUBLIC QString format_season_and_episode(int seasEp, int digits)
-{
-    QString seasEpNum;
-
-    if (seasEp > -1)
-    {
-        seasEpNum = QString::number(seasEp);
-
-        if (digits == 2 && seasEpNum.size() < 2)
-            seasEpNum.prepend("0");
-    }
-
-    return seasEpNum;
 }
 
 // ---------------------------------------------------------------------------
