@@ -2547,19 +2547,6 @@ AudioTrackType AvFormatDecoder::GetAudioTrackType(uint StreamIndex)
     AudioTrackType type = kAudioTypeNormal;
     AVStream *stream = m_ic->streams[StreamIndex];
 
-    if (m_ic->cur_pmt_sect) // mpeg-ts
-    {
-        const ProgramMapTable pmt(PSIPTable(m_ic->cur_pmt_sect));
-        switch (pmt.GetAudioType(StreamIndex))
-        {
-            case 0x01 : type = kAudioTypeCleanEffects;     break;
-            case 0x02 : type = kAudioTypeHearingImpaired;  break;
-            case 0x03 : type = kAudioTypeAudioDescription; break;
-            case 0x00 :
-            default:    type = kAudioTypeNormal;
-        }
-    }
-    else // all other containers
     {
         // We only support labelling/filtering of these two types for now
         if (stream->disposition & AV_DISPOSITION_VISUAL_IMPAIRED)
