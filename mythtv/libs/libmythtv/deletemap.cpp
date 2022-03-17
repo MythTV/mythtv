@@ -3,16 +3,16 @@
 
 #include <cstdint>
 
-#include "mythlogging.h"
-#include "osd.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/mythcorecontext.h" // for MythCoreContext, etc
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythtypes.h"       // for InfoMap
+#include "libmythui/mythuiactions.h"     // for ACTION_DOWN, ACTION_UP
 #include "mythplayer.h"
-#include "programinfo.h"
-#include "mythcorecontext.h"            // for MythCoreContext, etc
-#include "mythdate.h"
-#include "mythtypes.h"                  // for InfoMap
-#include "mythuiactions.h"              // for ACTION_DOWN, ACTION_UP
-#include "playercontext.h"              // for PlayerContext
-#include "tv_actions.h"                 // for ACTION_CLEARMAP, etc
+#include "osd.h"
+#include "playercontext.h"               // for PlayerContext
+#include "tv_actions.h"                  // for ACTION_CLEARMAP, etc
 
 #define LOC     QString("DelMap: ")
 #define EDIT_CHECK do { \

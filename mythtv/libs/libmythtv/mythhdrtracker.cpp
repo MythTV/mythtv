@@ -1,10 +1,11 @@
 // MythTV
-#include "mythhdrtracker.h"
-#include "mythedid.h"
-#include "mythdisplay.h"
-#include "mythlogging.h"
-#include "mythframe.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythdisplay.h"
+#include "libmythui/mythedid.h"
+
 #include "mythavutil.h"
+#include "mythframe.h"
+#include "mythhdrtracker.h"
 
 #define LOC QString("HDRTracker: ")
 

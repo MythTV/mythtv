@@ -23,21 +23,22 @@
 #include <QVector>
 
 // MythTV
-#include "mythdeque.h"
-#include "tv.h"
-#include "channelinfo.h"
-#include "videoouttypes.h"
-#include "volumebase.h"
-#include "inputinfo.h"
+#include "libmyth/audio/volumebase.h"
+#include "libmythbase/mythdeque.h"
+#include "libmythbase/mythtimer.h"
+#include "libmythbase/referencecounter.h"
+
 #include "channelgroup.h"
-#include "mythtimer.h"
+#include "channelinfo.h"
+#include "decoders/decoderbase.h"
+#include "inputinfo.h"
+#include "mythtvmenu.h"
 #include "osd.h"
 #include "playercontext.h"
-#include "decoders/decoderbase.h"
+#include "tv.h"
 #include "tvbrowsehelper.h"
-#include "mythtvmenu.h"
 #include "tvplaybackstate.h"
-#include "referencecounter.h"
+#include "videoouttypes.h"
 
 class QEvent;
 class QKeyEvent;

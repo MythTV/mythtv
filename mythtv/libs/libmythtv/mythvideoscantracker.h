@@ -2,7 +2,7 @@
 #define MYTHVIDEOSCANTRACKER_H
 
 // MythTV
-#include "mthread.h"
+#include "libmythbase/mthread.h"
 #include "mythframe.h"
 #include "videoouttypes.h"
 

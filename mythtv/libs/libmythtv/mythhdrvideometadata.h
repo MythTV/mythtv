@@ -2,7 +2,7 @@
 #define MYTHHDRVIDEOMETADATA_H
 
 // MythTV
-#include "mythhdr.h"
+#include "libmythui/mythhdr.h"
 
 using MythHDRVideoPtr = std::shared_ptr<class MythHDRVideoMetadata>;
 

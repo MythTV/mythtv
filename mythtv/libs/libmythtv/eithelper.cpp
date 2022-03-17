@@ -4,21 +4,22 @@
 #include <algorithm>
 
 // MythTV includes
-#include "eithelper.h"
-#include "eitfixup.h"
-#include "eitcache.h"
-#include "mythdb.h"
+#include "libmyth/programinfo.h" // for subtitle types and audio and video properties
+#include "libmythbase/compat.h"  // for gmtime_r on windows.
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+
 #include "atsctables.h"
-#include "dvbtables.h"
-#include "premieretables.h"
-#include "dishdescriptors.h"
-#include "premieredescriptors.h"
 #include "channelutil.h"
-#include "mythdate.h"
+#include "dishdescriptors.h"
+#include "dvbtables.h"
+#include "eitcache.h"
+#include "eitfixup.h"
+#include "eithelper.h"
+#include "premieredescriptors.h"
+#include "premieretables.h"
 #include "programdata.h"
-#include "programinfo.h"        // for subtitle types and audio and video properties
-#include "scheduledrecording.h" // for ScheduledRecording
-#include "compat.h"             // for gmtime_r on windows.
+#include "scheduledrecording.h"  // for ScheduledRecording
 
 const uint EITHelper::kChunkSize =   20;
 const uint EITHelper::kMaxSize   = 1000;

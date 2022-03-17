@@ -1,15 +1,16 @@
-// MythTV
-#include "mythvideoprofile.h"
-#include "mythcorecontext.h"
-#include "mythdb.h"
-#include "mythlogging.h"
-#include "mythvideoout.h"
-#include "mythmainwindow.h"
-#include "mythcodeccontext.h"
-
 // Std
 #include <algorithm>
 #include <utility>
+
+// MythTV
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythmainwindow.h"
+
+#include "mythcodeccontext.h"
+#include "mythvideoout.h"
+#include "mythvideoprofile.h"
 
 void MythVideoProfileItem::Clear()
 {

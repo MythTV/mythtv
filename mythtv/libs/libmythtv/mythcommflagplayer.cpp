@@ -2,8 +2,8 @@
 #include <QRunnable>
 
 // MythTV
-#include "mthreadpool.h"
-#include "mythlogging.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythlogging.h"
 #include "mythcommflagplayer.h"
 
 // Std

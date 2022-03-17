@@ -10,10 +10,10 @@
 #include <QString>
 
 // MythTV
+#include "libmyth/standardsettings.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
 #include "mythtvexp.h"
-#include "standardsettings.h"
-#include "mythdb.h"
-#include "mythlogging.h"
 
 class QWidget;
 

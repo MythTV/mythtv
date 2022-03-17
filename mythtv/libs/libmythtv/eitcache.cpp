@@ -7,11 +7,12 @@
 
 #include <QDateTime>
 
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+
 #include "eitcache.h"
-#include "mythcontext.h"
-#include "mythdb.h"
-#include "mythlogging.h"
-#include "mythdate.h"
 
 #define LOC QString("EITCache: ")
 

@@ -2,14 +2,15 @@
 
 #include <QStringList>
 
+#include "libmyth/programinfo.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsocket.h"
+
 #include "remoteencoder.h"
-#include "programinfo.h"
-#include "mythdate.h"
-#include "mythcorecontext.h"
 #include "signalmonitor.h"
-#include "mythdb.h"
-#include "mythsocket.h"
-#include "mythlogging.h"
 
 #define LOC QString("RemoteEncoder(%1): ").arg(m_recordernum)
 

@@ -3,9 +3,9 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "mythlogging.h"
-#include "mythdirs.h"
-#include "mythuihelper.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythuihelper.h"
 #include "osd.h"
 #include "mythtvmenu.h"
 

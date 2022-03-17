@@ -1,5 +1,5 @@
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "tv_play.h"
 #include "interactivetv.h"
 #include "mythvideooutgpu.h"

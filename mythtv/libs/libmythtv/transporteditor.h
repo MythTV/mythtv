@@ -34,8 +34,9 @@
 
 #include <QObject>
 
+#include "libmyth/standardsettings.h"
+
 #include "mythtvexp.h"
-#include "standardsettings.h"
 #include "cardutil.h"
 
 class VideoSourceShow;

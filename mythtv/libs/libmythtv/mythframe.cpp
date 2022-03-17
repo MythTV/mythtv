@@ -1,7 +1,7 @@
 // MythTV
-#include "mythlogging.h"
-#include "mythvideoprofile.h"
+#include "libmythbase/mythlogging.h"
 #include "mythframe.h"
+#include "mythvideoprofile.h"
 
 // FFmpeg - for av_malloc/av_free
 extern "C" {

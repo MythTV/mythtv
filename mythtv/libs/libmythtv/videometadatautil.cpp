@@ -2,9 +2,10 @@
 #include <QHash>
 #include <QUrl>
 
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+
 #include "videometadatautil.h"
-#include "mythlogging.h"
-#include "mythdb.h"
 
 #define LOC      QString("VideoMetaDataUtil: ")
 

@@ -29,8 +29,6 @@ contains(INCLUDEPATH, /usr/X11R6/include) {
 
 
 DEPENDPATH  += .
-DEPENDPATH  += ../libmyth ../libmyth/audio
-DEPENDPATH  += ../libmythbase
 DEPENDPATH  += ./mpeg ./channelscan ./mheg ./decoders ./opengl ./io ./captions
 DEPENDPATH  += ./visualisations ./visualisations/opengl ./visualisations/vulkan
 DEPENDPATH  += ./vulkan ./drm
@@ -40,9 +38,6 @@ DEPENDPATH  += ./recorders/dvbdev
 DEPENDPATH  += ./recorders/rtp
 DEPENDPATH  += ./recorders/vbitext
 DEPENDPATH  += ./recorders/HLS
-DEPENDPATH  += ../libmythbase ../libmythui
-DEPENDPATH  += ../libmythupnp
-DEPENDPATH  += ../libmythservicecontracts
 
 INCLUDEPATH += .. ../.. # for avlib headers
 INCLUDEPATH += ../.. ../../external/FFmpeg

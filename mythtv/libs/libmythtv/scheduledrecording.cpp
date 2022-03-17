@@ -1,5 +1,5 @@
 #include "scheduledrecording.h"
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
 
 void ScheduledRecording::SendReschedule(const QStringList &request)
 {

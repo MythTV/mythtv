@@ -16,12 +16,13 @@
 #include <QString>
 
 // MythTV headers
-#include "mythcorecontext.h"
-#include "mythdb.h"
-#include "mythlogging.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+
 #include "diseqc.h"
 #include "dtvmultiplex.h"
-#include "compat.h"
 
 #ifdef USING_DVB
 #   include "dvbtypes.h"

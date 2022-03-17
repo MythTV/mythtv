@@ -26,27 +26,28 @@
 #include <utility>
 
 // MythTV headers
-#include "mythconfig.h"
-#include "mythcorecontext.h"
-#include "videosource.h"
-#include "scanwizard.h"
+#include "libmyth/mythterminal.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythui/mythnotification.h"
+#include "libmythupnp/httprequest.h"    // for TestMimeType()
+
 #include "cardutil.h"
-#include "sourceutil.h"
 #include "channelinfo.h"
 #include "channelutil.h"
-#include "frequencies.h"
 #include "diseqcsettings.h"
 #include "firewiredevice.h"
-#include "compat.h"
-#include "mythdb.h"
-#include "mythdirs.h"
-#include "mythlogging.h"
-#include "libmythupnp/httprequest.h"    // for TestMimeType()
-#include "mythsystemlegacy.h"
-#include "exitcodes.h"
+#include "frequencies.h"
+#include "scanwizard.h"
+#include "sourceutil.h"
 #include "v4l2util.h"
-#include "mythnotification.h"
-#include "mythterminal.h"
+#include "videosource.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"

@@ -1,8 +1,8 @@
 #include <algorithm>
 
 // MythTV
-#include "mythlogging.h"
-#include "mythuiactions.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythuiactions.h"
 #include "tv_actions.h"
 #include "tv_play.h"
 #include "mythplayereditorui.h"

@@ -42,16 +42,16 @@
 #include <iostream>
 
 // MythTV includes
-#include "restoredata.h"
-#include "videosource.h"
-#include "sourceutil.h"
-#include "mythcorecontext.h"
-#include "mythdb.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythuiimage.h"
+#include "libmythui/mythuitext.h"
+#include "libmythui/themeinfo.h"
 
-#include "mythuiimage.h"
-#include "mythuitext.h"
-#include "themeinfo.h"
-#include "mythdialogbox.h"
+#include "restoredata.h"
+#include "sourceutil.h"
+#include "videosource.h"
 
 #define LOC QString("RestoreData: ")
 

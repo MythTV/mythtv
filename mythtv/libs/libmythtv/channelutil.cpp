@@ -10,11 +10,12 @@
 #include <QReadWriteLock>
 #include <utility>
 
-#include "channelutil.h"
-#include "mythdb.h"
-#include "dvbtables.h"
-#include "stringutil.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/stringutil.h"
+
 #include "HLSReader.h"
+#include "channelutil.h"
+#include "dvbtables.h"
 
 #define LOC QString("ChanUtil: ")
 

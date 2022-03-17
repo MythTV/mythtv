@@ -11,13 +11,14 @@
 #include <QUrl>
 
 // MythTV headers
-#include "channelinfo.h"
-#include "mythcorecontext.h"
-#include "mythdb.h"
-#include "mythdirs.h"
-#include "mpegstreamdata.h" // for CryptStatus
-#include "remotefile.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/remotefile.h"
+
 #include "channelgroup.h"
+#include "channelinfo.h"
+#include "mpegstreamdata.h" // for CryptStatus
 #include "sourceutil.h"
 
 ////////////////////////////////////////////////////////////////////////////

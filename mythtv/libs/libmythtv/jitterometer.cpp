@@ -1,6 +1,6 @@
 // MythTV
-#include "mythchrono.h"
-#include "mythlogging.h"
+#include "libmythbase/mythchrono.h"
+#include "libmythbase/mythlogging.h"
 #include "jitterometer.h"
 
 // Std

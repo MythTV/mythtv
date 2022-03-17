@@ -1,7 +1,7 @@
 // MythTV
-#include "mythlogging.h"
-#include "mythmainwindow.h"
-#include "mythscreentype.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythscreentype.h"
 #include "mythmediaoverlay.h"
 
 // Std

@@ -2,10 +2,10 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "mythdb.h"
+#include "libmyth/programinfo.h"
+#include "libmyth/standardsettings.h"
+#include "libmythbase/mythdb.h"
 #include "playgroup.h"
-#include "programinfo.h"
-#include "standardsettings.h"
 
 // A parameter associated with the profile itself
 class PlayGroupDBStorage : public SimpleDBStorage

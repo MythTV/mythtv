@@ -20,19 +20,19 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
+// Std
+#include <cmath>
+
 // Qt
 #include <QApplication>
 
 // MythtTV
-#include "mythconfig.h"
-#include "mythmiscutil.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythui/mythmainwindow.h"
 #include "mythplayer.h"
-#include "mythcorecontext.h"
-#include "mythmainwindow.h"
 #include "mythvideobounds.h"
-
-// Std
-#include <cmath>
 
 #define LOC QString("VideoBounds: ")
 

@@ -1,9 +1,10 @@
+#include "libmythbase/mythdb.h"
+#include "libmythui/mythuihelper.h"
+
+#include "cardutil.h"
+#include "profilegroup.h"
 #include "recordingprofile.h"
 #include "videosource.h"
-#include "profilegroup.h"
-#include "mythdb.h"
-#include "mythuihelper.h"
-#include "cardutil.h"
 
 QString ProfileGroupStorage::GetWhereClause(MSqlBindings &bindings) const
 {

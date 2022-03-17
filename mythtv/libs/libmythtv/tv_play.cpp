@@ -11,34 +11,35 @@
 #include <QTimerEvent>
 #include <utility>
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 
 // libmythbase
-#include "mthreadpool.h"
-#include "signalhandling.h"
-#include "mythdb.h"
-#include "mythcorecontext.h"
-#include "mythlogging.h"
-#include "lcddevice.h"
-#include "compat.h"
-#include "mythdirs.h"
-#include "mythmedia.h"
-#include "mythdate.h"
-#include "mconcurrent.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/lcddevice.h"
+#include "libmythbase/mconcurrent.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmedia.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/signalhandling.h"
 
 // libmyth
-#include "programinfo.h"
-#include "remoteutil.h"
+#include "libmyth/programinfo.h"
+#include "libmyth/programtypes.h"
+#include "libmyth/remoteutil.h"
 
 // libmythui
-#include "mythuistatetracker.h"
-#include "mythuihelper.h"
-#include "mythdialogbox.h"
-#include "mythmainwindow.h"
-#include "mythmiscutil.h"
-#include "mythscreenstack.h"
-#include "mythscreentype.h"
-#include "mythuiactions.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythscreenstack.h"
+#include "libmythui/mythscreentype.h"
+#include "libmythui/mythuiactions.h"
+#include "libmythui/mythuihelper.h"
+#include "libmythui/mythuistatetracker.h"
 
 // libmythtv
 #include "DVD/mythdvdplayer.h"
@@ -61,7 +62,6 @@
 #include "mythsystemevent.h"
 #include "videometadatautil.h"
 #include "playercontext.h"
-#include "programtypes.h"
 #include "io/mythmediabuffer.h"
 #include "mythtvactionutils.h"
 #include "mythcodeccontext.h"

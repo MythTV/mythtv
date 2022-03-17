@@ -29,16 +29,18 @@
  *
  */
 
+#include <utility>
+
 #include "scanwizardconfig.h"
 #include "channelscanner_gui.h"
 #include "scanwizard.h"
 
+#include "libmythbase/mythlogging.h"
+
 #include "channelimporter.h"
-#include "mythlogging.h"
 #include "scaninfo.h"
 #include "sourceutil.h"
 #include "videosource.h"
-#include <utility>
 
 #define LOC QString("SWiz: ")
 

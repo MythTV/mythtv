@@ -1,5 +1,5 @@
 // MythTV
-#include "mythmainwindow.h"
+#include "libmythui/mythmainwindow.h"
 #include "mythplayeruibase.h"
 
 #define LOC QString("PlayerBase: ")

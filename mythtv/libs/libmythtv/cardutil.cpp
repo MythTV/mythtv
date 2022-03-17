@@ -13,17 +13,18 @@
 #include <QDir>
 
 // MythTV headers
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h" // for ping()
+
 #include "cardutil.h"
-#include "videosource.h"
-#include "dvbchannel.h"
 #include "diseqcsettings.h"
-#include "sourceutil.h"
-#include "mythdb.h"
-#include "mythlogging.h"
+#include "dvbchannel.h"
 #include "inputinfo.h"
-#include "mythmiscutil.h" // for ping()
-#include "mythdownloadmanager.h"
+#include "sourceutil.h"
+#include "videosource.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"
@@ -38,8 +39,8 @@
 #endif
 
 #ifdef USING_VBOX
+#include "libmythbase/mythmiscutil.h"
 #include "vboxutils.h"
-#include "mythmiscutil.h"
 #endif
 
 #ifdef USING_SATIP

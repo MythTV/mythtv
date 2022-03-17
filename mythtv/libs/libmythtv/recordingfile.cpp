@@ -1,8 +1,8 @@
 
 #include "recordingfile.h"
 
-#include "mythdbcon.h"
-#include "mythdb.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdbcon.h"
 
 bool RecordingFile::Load()
 {

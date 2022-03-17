@@ -1,18 +1,19 @@
 // MythTV
-#include "osd.h"
-#include "mythplayer.h"
-#include "mythvideoprofile.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuihelper.h"
+
 #include "decoderbase.h"
-#include "mythcorecontext.h"
-#include "mythlogging.h"
-#include "mythmainwindow.h"
-#include "mythuihelper.h"
 #include "mythavutil.h"
-#include "mthreadpool.h"
 #include "mythcodeccontext.h"
-#include "mythvideooutnull.h"
-#include "mythvideooutgpu.h"
+#include "mythplayer.h"
 #include "mythvideoout.h"
+#include "mythvideooutgpu.h"
+#include "mythvideooutnull.h"
+#include "mythvideoprofile.h"
+#include "osd.h"
 
 // std
 #include <cmath>

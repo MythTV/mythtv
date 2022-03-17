@@ -5,7 +5,7 @@
 #include <QCoreApplication>
 
 #include "mythtvexp.h"
-#include "standardsettings.h"
+#include "libmyth/standardsettings.h"
 
 class ProfileGroup;
 

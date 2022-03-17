@@ -1,11 +1,11 @@
 #include <chrono>
 
 // MythTV
+#include "libmythbase/mythdate.h"
+
 #include "tv_play.h"
 #include "livetvchain.h"
 #include "mythplayeroverlayui.h"
-
-#include "mythdate.h"
 
 #define LOC QString("PlayerOverlay: ")
 

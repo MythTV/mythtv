@@ -1,13 +1,14 @@
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 
-#include "tvremoteutil.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/mythcorecontext.h"
+
 #include "cardutil.h"
 #include "inputinfo.h"
-#include "programinfo.h"
-#include "mythcorecontext.h"
 #include "remoteencoder.h"
 #include "tv_rec.h"
+#include "tvremoteutil.h"
 
 uint RemoteGetFlags(uint inputid)
 {

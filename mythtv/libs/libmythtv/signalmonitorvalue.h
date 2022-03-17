@@ -8,7 +8,7 @@
 #include <QStringList>
 #include <QCoreApplication>
 
-#include "mythcontext.h"
+#include "libmyth/mythcontext.h"
 
 class SignalMonitorValue
 {

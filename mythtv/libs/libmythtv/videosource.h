@@ -5,9 +5,10 @@
 #include <vector>
 
 // MythTV headers
-#include "mthread.h"
-#include "standardsettings.h"
-#include "mythcontext.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/standardsettings.h"
+#include "libmythbase/mthread.h"
+
 #include "mythtvexp.h"
 
 class SignalTimeout;

@@ -2,8 +2,9 @@
 #include <algorithm>
 
 // mythtv
-#include "mythlogging.h"
-#include "mythdb.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+
 #include "channelgroup.h"
 
 #define LOC QString("Channel Group: ")

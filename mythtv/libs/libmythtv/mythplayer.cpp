@@ -21,33 +21,32 @@
 #include <utility>
 
 // MythTV headers
-#include "mthread.h"
-#include "mythconfig.h"
-#include "mythplayer.h"
+#include "libmyth/audio/audiooutput.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythtimer.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuiactions.h"
+
 #include "DetectLetterbox.h"
 #include "audioplayer.h"
-#include "programinfo.h"
-#include "mythcorecontext.h"
-#include "livetvchain.h"
 #include "avformatdecoder.h"
-#include "dummydecoder.h"
-#include "tv_play.h"
-#include "mythlogging.h"
-#include "mythmiscutil.h"
-#include "audiooutput.h"
 #include "cardutil.h"
-#include "mythavutil.h"
-#include "jitterometer.h"
-#include "mythtimer.h"
-#include "mythuiactions.h"
-#include "io/mythmediabuffer.h"
-#include "tv_actions.h"
 #include "decoders/mythdecoderthread.h"
-#include "mythvideooutnull.h"
+#include "dummydecoder.h"
+#include "io/mythmediabuffer.h"
+#include "jitterometer.h"
+#include "livetvchain.h"
+#include "mythavutil.h"
 #include "mythcodeccontext.h"
-
-// MythUI headers
-#include <mythmainwindow.h>
+#include "mythplayer.h"
+#include "mythvideooutnull.h"
+#include "tv_actions.h"
+#include "tv_play.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"

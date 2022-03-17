@@ -1,8 +1,9 @@
 // MythTV
+#include "libmyth/mythcontext.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/mythdate.h"
+
 #include "commbreakmap.h"
-#include "mythcontext.h"
-#include "mythdate.h"
-#include "programinfo.h"
 
 #define LOC QString("CommBreakMap: ")
 

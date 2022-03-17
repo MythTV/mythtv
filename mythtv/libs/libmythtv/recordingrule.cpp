@@ -4,17 +4,15 @@
 #include <utility>
 
 // libmythbase
-#include "mythdb.h"
-
-// libmyth
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythsorthelper.h"
 
 // libmythtv
 #include "scheduledrecording.h" // For RescheduleMatch()
 #include "playgroup.h" // For GetInitialName()
 #include "recordingprofile.h" // For constants
-#include "mythdate.h"
-#include "mythsorthelper.h"
 
 static inline QString null_to_empty(const QString &str)
 {

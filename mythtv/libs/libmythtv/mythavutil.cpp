@@ -12,8 +12,8 @@
 #include <QFile>
 
 // MythTV
-#include "mythconfig.h"
-#include "mythlogging.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythlogging.h"
 #include "mythdeinterlacer.h"
 #include "mythavutil.h"
 

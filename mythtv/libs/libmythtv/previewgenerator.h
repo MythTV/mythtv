@@ -10,10 +10,11 @@
 #include <QMap>
 #include <QSet>
 
-#include "programinfo.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythdate.h"
+
 #include "mythtvexp.h"
-#include "mthread.h"
-#include "mythdate.h"
 
 class PreviewGenerator;
 class QByteArray;

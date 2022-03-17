@@ -1,7 +1,7 @@
 #include <QString>
 #include <QLibrary>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "initguid.h"
 #include "mythrender_d3d9.h"
 #include "dxva2decoder.h"

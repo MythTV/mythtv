@@ -34,12 +34,13 @@
 #include <vector>
 
 // MythTV includes
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+
+#include "satiputils.h"
+#include "sourceutil.h"
 #include "transporteditor.h"
 #include "videosource.h"
-#include "sourceutil.h"
-#include "mythcorecontext.h"
-#include "mythdb.h"
-#include "satiputils.h"
 
 class MultiplexID : public AutoIncrementSetting
 {

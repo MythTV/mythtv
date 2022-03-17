@@ -1,11 +1,12 @@
-// MythTV headers
-#include "dtvmultiplex.h"
-
-#include "mpeg/dvbdescriptors.h"
-#include "mythdb.h"
-#include "mythlogging.h"
-#include "cardutil.h"
 #include <utility>
+
+// MythTV headers
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+
+#include "dtvmultiplex.h"
+#include "mpeg/dvbdescriptors.h"
+#include "cardutil.h"
 
 #define LOC      QString("DTVMux: ")
 

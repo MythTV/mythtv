@@ -13,7 +13,7 @@
 #endif
 
 #include "mythtvexp.h"
-#include "referencecounter.h"
+#include "libmythbase/referencecounter.h"
 
 
 class ProgramInfo;

@@ -44,11 +44,12 @@
 
 #include <vector>
 
-#include "mythuigroup.h"
-#include "mythtvexp.h"
-#include "standardsettings.h"
+#include "libmyth/standardsettings.h"
+#include "libmythui/mythuigroup.h"
+#include "libmythui/xmlparsebase.h"
+
 #include "cardutil.h"
-#include "xmlparsebase.h"
+#include "mythtvexp.h"
 #include "videosource.h"
 
 class VideoSourceShow;

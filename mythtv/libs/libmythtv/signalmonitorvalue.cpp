@@ -1,8 +1,9 @@
 #include <algorithm>
 #include <utility>
 
+#include "libmythbase/mythlogging.h"
+
 #include "signalmonitorvalue.h"
-#include "mythlogging.h"
 
 bool SignalMonitorValue::run_static_init = true;
 QStringList SignalMonitorValue::ERROR_NO_CHANNEL;

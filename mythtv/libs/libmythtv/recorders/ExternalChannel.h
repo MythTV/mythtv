@@ -12,7 +12,8 @@
 #include <QStringList>
 
 // MythTV headers
-#include "mythchrono.h"
+#include "libmythbase/mythchrono.h"
+
 #include "dtvchannel.h"
 #include "ExternalStreamHandler.h"
 

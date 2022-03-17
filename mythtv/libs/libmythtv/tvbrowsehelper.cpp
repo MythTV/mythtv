@@ -2,15 +2,16 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "mythcorecontext.h"
-#include "tvbrowsehelper.h"
-#include "playercontext.h"
-#include "remoteencoder.h"
-#include "recordinginfo.h"
-#include "channelutil.h"
-#include "mythlogging.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+
 #include "cardutil.h"
+#include "channelutil.h"
+#include "playercontext.h"
+#include "recordinginfo.h"
+#include "remoteencoder.h"
 #include "tv_play.h"
+#include "tvbrowsehelper.h"
 
 #define LOC QString("BrowseHelper: ")
 

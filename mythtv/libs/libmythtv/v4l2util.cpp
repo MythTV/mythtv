@@ -1,5 +1,5 @@
 #include "v4l2util.h"
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 #include <sys/ioctl.h>
 #include <sys/types.h>

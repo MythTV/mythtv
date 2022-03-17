@@ -1,9 +1,9 @@
 // MythTV
-#include "mythcorecontext.h"
-#include "mythlogging.h"
-#include "mythdisplay.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythdisplay.h"
 #include "mythavutil.h"
-#include "mythmainwindow.h"
+#include "libmythui/mythmainwindow.h"
 #include "mythvideocolourspace.h"
 
 // libavutil

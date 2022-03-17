@@ -1,12 +1,12 @@
-#include "recordingquality.h"
-
 #include <algorithm>
 #include <utility>
 
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/stringutil.h"
+
 #include "recordinginfo.h"
-#include "stringutil.h"
-#include "mythlogging.h"
+#include "recordingquality.h"
 
 static void merge_overlapping(RecordingGaps &gaps);
 static double score_gaps(const RecordingInfo& /*ri*/, const RecordingGaps& /*gaps*/);

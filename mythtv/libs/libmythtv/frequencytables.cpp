@@ -2,10 +2,11 @@
 
 #include <QMutex>
 
+#include "libmythbase/compat.h"
+
 #include "frequencies.h"
 #include "frequencytables.h"
 #include "channelutil.h"
-#include "compat.h"
 
 static bool             frequencies_initialized = false;
 static QMutex           frequencies_lock;

@@ -2,9 +2,9 @@
 #include "recordingprofile.h"
 
 #include "cardutil.h"
-#include "mythcorecontext.h"
-#include "mythdb.h"
-#include "mythlogging.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
 #include "v4l2util.h"
 #include <utility>
 

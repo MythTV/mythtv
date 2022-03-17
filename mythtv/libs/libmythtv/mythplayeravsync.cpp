@@ -2,7 +2,7 @@
 #include <QThread>
 
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "audioplayer.h"
 #include "mythplayeravsync.h"
 

@@ -8,15 +8,16 @@
 #include <QMap>
 
 // MythTV headers
+#include "libmyth/programinfoupdater.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+
+#include "jobqueue.h"
 #include "recordinginfo.h"
 #include "recordingrule.h"
 #include "scheduledrecording.h"
-#include "mythdate.h"
-#include "mythcorecontext.h"
-#include "programinfoupdater.h"
-#include "jobqueue.h"
-#include "mythdb.h"
-#include "mythlogging.h"
 
 #define LOC      QString("RecordingInfo(%1): ").arg(GetBasename())
 

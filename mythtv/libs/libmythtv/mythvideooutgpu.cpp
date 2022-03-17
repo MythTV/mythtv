@@ -1,17 +1,18 @@
 // MythTV
-#include "mythlogging.h"
-#include "mythmainwindow.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythpaintergpu.h"
+
 #include "mythplayer.h"
-#include "mythpaintergpu.h"
 #include "mythvideogpu.h"
 #include "mythvideooutgpu.h"
 
 #ifdef USING_OPENGL
-#include "opengl/mythpainteropengl.h"
+#include "libmythui/opengl/mythpainteropengl.h"
 #include "opengl/mythvideooutopengl.h"
 #endif
 #ifdef USING_VULKAN
-#include "vulkan/mythpaintervulkan.h"
+#include "libmythui/vulkan/mythpaintervulkan.h"
 #include "vulkan/mythvideooutputvulkan.h"
 #endif
 

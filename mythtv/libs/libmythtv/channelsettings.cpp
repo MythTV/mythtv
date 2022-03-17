@@ -7,12 +7,13 @@
 #include <QWidget>
 
 // MythTV headers
+#include "libmyth/programinfo.h" // for COMM_DETECT*, GetPreferredSkipTypeCombinations()
+#include "libmythbase/mythdirs.h"
+
+#include "cardutil.h"
 #include "channelsettings.h"
 #include "channelutil.h"
-#include "programinfo.h" // for COMM_DETECT*, GetPreferredSkipTypeCombinations()
 #include "mpegtables.h"
-#include "mythdirs.h"
-#include "cardutil.h"
 
 
 QString ChannelDBStorage::GetWhereClause(MSqlBindings &bindings) const

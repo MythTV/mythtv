@@ -5,9 +5,9 @@
 #endif
 
 // MythTV
-#include "mythmainwindow.h"
-#include "mythlogging.h"
-#include "mythuiprogressbar.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuiprogressbar.h"
 
 #include "tv_play_win.h"
 

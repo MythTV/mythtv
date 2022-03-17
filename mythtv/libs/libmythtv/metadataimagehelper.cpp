@@ -3,10 +3,10 @@
 
 #include <QUrl>
 
-#include "mythdirs.h"
-#include "mythdbcon.h"
-#include "mythcorecontext.h"
-#include "storagegroup.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/storagegroup.h"
 
 // a helper functions that is used only in this file
 namespace {

@@ -8,9 +8,10 @@
 #include <QMap>
 #include <QSet>
 
+#include "libmythbase/mthread.h"
+
 #include "previewgenerator.h"
 #include "mythtvexp.h"
-#include "mthread.h"
 
 class ProgramInfo;
 class QSize;

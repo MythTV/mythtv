@@ -1,13 +1,14 @@
 // -*- Mode: c++ -*-
 
 // MythTV headers
-#include "sourceutil.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsystemlegacy.h"
+
 #include "cardutil.h"
 #include "scaninfo.h"
-#include "mythdb.h"
-#include "mythdirs.h"
-#include "mythlogging.h"
-#include "mythsystemlegacy.h"
+#include "sourceutil.h"
 
 bool SourceUtil::HasDigitalChannel(uint sourceid)
 {

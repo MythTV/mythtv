@@ -7,7 +7,8 @@
 
 #include <QMap>
 
-#include "mythchrono.h"
+#include "libmythbase/mythchrono.h"
+
 #include "dtvsignalmonitor.h"
 #include "ExternalChannel.h"
 

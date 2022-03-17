@@ -3,9 +3,9 @@
 
 #include <array>
 
+#include "libmyth/standardsettings.h"
+#include "libmythbase/mythdbcon.h"
 #include "mythtvexp.h"
-#include "standardsettings.h"
-#include "mythdbcon.h"
 
 const std::array<QString,4> kAvailProfiles
       {"Default", "Live TV", "High Quality", "Low Quality" };

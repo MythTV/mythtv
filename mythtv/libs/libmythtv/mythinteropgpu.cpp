@@ -1,6 +1,6 @@
 // MythTV
-#include "mythcorecontext.h"
-#include "mythrender_base.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythui/mythrender_base.h"
 #include "mythinteropgpu.h"
 
 #ifdef USING_OPENGL

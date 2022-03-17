@@ -1,9 +1,10 @@
 
+#include "libmyth/audio/audiooutput.h"
+#include "libmythui/mythnotificationcenter.h"
+
 #include "audioplayer.h"
-#include "visualisations/videovisual.h"
 #include "mythplayer.h"
-#include "audiooutput.h"
-#include "mythnotificationcenter.h"
+#include "visualisations/videovisual.h"
 
 #define LOC QString("AudioPlayer: ")
 

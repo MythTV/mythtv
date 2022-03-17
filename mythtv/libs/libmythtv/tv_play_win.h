@@ -1,8 +1,8 @@
 #ifndef TVPLAYWIN_H_
 #define TVPLAYWIN_H_
 
-#include "mythscreentype.h"
-#include "mythgesture.h"
+#include "libmythui/mythgesture.h"
+#include "libmythui/mythscreentype.h"
 
 class MythUIProgressBar;
 

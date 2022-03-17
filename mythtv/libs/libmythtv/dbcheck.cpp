@@ -1,26 +1,26 @@
-#include "mythconfig.h"
-
 #include <cstdio>
 #include <iostream>
 
 #include <QString>
 #include <QSqlError>
-#include "dbcheck.h"
 
-#include "mythversion.h"
-#include "dbutil.h"
-#include "mythcorecontext.h"
-#include "schemawizard.h"
-#include "mythdb.h"
-#include "mythdbcheck.h"
-#include "mythlogging.h"
-#include "videodbcheck.h" // for 1267
-#include "compat.h"
-#include "recordingrule.h"
-#include "recordingprofile.h"
-#include "recordinginfo.h"
+#include "libmyth/schemawizard.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/dbutil.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdbcheck.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
+
 #include "cardutil.h"
+#include "dbcheck.h"
 #include "mythvideoprofile.h"
+#include "recordinginfo.h"
+#include "recordingprofile.h"
+#include "recordingrule.h"
+#include "videodbcheck.h" // for 1267
 
 // TODO convert all dates to UTC
 

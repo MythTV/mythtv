@@ -34,9 +34,9 @@
 #include <QFile>
 
 // MythTV headers
-#include "mythcontext.h"
-#include "mythdbcon.h"
-#include "mythlogging.h"
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
 #include "dtvconfparser.h"
 #include "channelutil.h"
 

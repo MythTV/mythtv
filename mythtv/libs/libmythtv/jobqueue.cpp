@@ -12,24 +12,23 @@
 #include <QEvent>
 #include <QCoreApplication>
 
-#include "mythconfig.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythsystemlegacy.h"
 
-#include "exitcodes.h"
 #include "jobqueue.h"
-#include "programinfo.h"
-#include "mythcorecontext.h"
-#include "mythdate.h"
 #include "previewgenerator.h"
-#include "compat.h"
-#include "recordingprofile.h"
 #include "recordinginfo.h"
-#include "mthread.h"
-
-#include "mythdb.h"
-#include "mythdirs.h"
-#include "mythsystemlegacy.h"
-#include "mythlogging.h"
-#include "mythmiscutil.h"
+#include "recordingprofile.h"
 
 #ifndef O_STREAMING
 #define O_STREAMING 0

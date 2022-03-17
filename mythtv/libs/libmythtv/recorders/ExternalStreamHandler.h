@@ -18,7 +18,8 @@
 #include <QStringList>
 #include <QTextStream>
 
-#include "mythchrono.h"
+#include "libmythbase/mythchrono.h"
+
 #include "streamhandler.h"
 
 class DTVSignalMonitor;

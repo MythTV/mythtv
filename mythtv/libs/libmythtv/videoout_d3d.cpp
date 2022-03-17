@@ -4,17 +4,17 @@
 #include <iostream>
 #include <algorithm>
 
-#include "mythcontext.h"
-#include "videoout_d3d.h"
-#include "osd.h"
-#include "fourcc.h"
-#include "mythvideoprofile.h"
-#include "mythmainwindow.h"
-#include "mythplayer.h"
-#include "mythavutil.h"
+#include "libmyth/mythcontext.h"
+#include "libmythui/mythmainwindow.h"
 
+#include "fourcc.h"
 #include "mmsystem.h"
+#include "mythavutil.h"
+#include "mythplayer.h"
+#include "mythvideoprofile.h"
+#include "osd.h"
 #include "tv.h"
+#include "videoout_d3d.h"
 
 extern "C" {
 #include "libavutil/imgutils.h"

@@ -1,21 +1,21 @@
 // Qt
 #include <utility>
 
-// libmyth
-#include "mythlogging.h"
+// libmythbase
+#include "libmythbase/mythlogging.h"
 
 // libmythui
-#include "mythmainwindow.h"
-#include "mythuihelper.h"
-#include "mythpainter.h"
-#include "mythuiimage.h"
-#include "mythuiprogressbar.h"
-#include "mythdialogbox.h"
-#include "mythuitext.h"
-#include "mythuibutton.h"
-#include "mythuieditbar.h"
-#include "mythuistatetype.h"
-#include "mythuigroup.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythpainter.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuieditbar.h"
+#include "libmythui/mythuigroup.h"
+#include "libmythui/mythuihelper.h"
+#include "libmythui/mythuiimage.h"
+#include "libmythui/mythuiprogressbar.h"
+#include "libmythui/mythuistatetype.h"
+#include "libmythui/mythuitext.h"
 
 // libmythtv
 #include "overlays/mythnavigationoverlay.h"

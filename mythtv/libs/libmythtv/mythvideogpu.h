@@ -6,7 +6,7 @@
 #include <QObject>
 
 // MythTV
-#include "mythrender_base.h"
+#include "libmythui/mythrender_base.h"
 #include "mythframe.h"
 #include "mythvideocolourspace.h"
 

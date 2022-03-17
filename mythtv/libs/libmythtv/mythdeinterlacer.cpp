@@ -1,9 +1,10 @@
 // MythTV
-#include "mythconfig.h"
-#include "mythlogging.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythlogging.h"
+
 #include "mythavutil.h"
-#include "mythvideoprofile.h"
 #include "mythdeinterlacer.h"
+#include "mythvideoprofile.h"
 
 #include <algorithm>
 #include <thread>

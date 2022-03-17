@@ -2,24 +2,25 @@
 
 // POSIX headers
 #include <sys/time.h>
-#include "compat.h"
+#include "libmythbase/compat.h"
 
 // C++
 #include <cstdlib>
 
 // MythTV
-#include "scheduledrecording.h"
+#include "libmythbase/iso639.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythrandom.h"
+#include "libmythbase/mythtimer.h"
+
 #include "channelbase.h"
 #include "channelutil.h"
-#include "mythlogging.h"
-#include "eitscanner.h"
 #include "eithelper.h"
-#include "mythtimer.h"
-#include "mythdate.h"
-#include "mythrandom.h"
-#include "mthread.h"
-#include "iso639.h"
-#include "mythdb.h"
+#include "eitscanner.h"
+#include "scheduledrecording.h"
 #include "tv_rec.h"
 
 #define LOC QString("EITScanner: ")

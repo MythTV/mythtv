@@ -26,11 +26,12 @@
 #include <QFileInfo>
 #include <QPainter>
 
-#include "captions/teletextextractorreader.h"
+#include "libmythbase/iso639.h"
+
 #include "avformatdecoder.h"
-#include "captions/subtitlescreen.h"
 #include "captions/srtwriter.h"
-#include "iso639.h"
+#include "captions/subtitlescreen.h"
+#include "captions/teletextextractorreader.h"
 #include "mythccextractorplayer.h"
 
 SRTStuff::~SRTStuff()

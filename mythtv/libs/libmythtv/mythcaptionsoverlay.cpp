@@ -1,5 +1,5 @@
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "mythplayerui.h"
 #include "Bluray/mythbdbuffer.h"
 #include "Bluray/mythbdoverlayscreen.h"

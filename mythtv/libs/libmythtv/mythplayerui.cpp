@@ -1,17 +1,18 @@
 #include <algorithm>
 
 // MythTV
-#include "mythsystemevent.h"
-#include "audiooutput.h"
-#include "mythmainwindow.h"
-#include "io/mythinteractivebuffer.h"
+#include "libmyth/audio/audiooutput.h"
+#include "libmythui/mythmainwindow.h"
+
 #include "decoders/avformatdecoder.h"
-#include "interactivetv.h"
-#include "osd.h"
 #include "interactivescreen.h"
-#include "tv_play.h"
+#include "interactivetv.h"
+#include "io/mythinteractivebuffer.h"
 #include "livetvchain.h"
 #include "mythplayerui.h"
+#include "mythsystemevent.h"
+#include "osd.h"
+#include "tv_play.h"
 
 #define LOC QString("PlayerUI: ")
 

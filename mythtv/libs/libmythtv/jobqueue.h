@@ -15,7 +15,7 @@
 #include <QMap>
 
 #include "mythtvexp.h"
-#include "mythchrono.h"
+#include "libmythbase/mythchrono.h"
 
 class MThread;
 class ProgramInfo;

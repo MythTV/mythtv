@@ -20,19 +20,18 @@
 #include <QHash>                        // for QHash
 
 // MythTV headers
-#include "mythtimer.h"
-#include "mthread.h"
+#include "libmyth/programtypes.h"       // for RecStatus, RecStatus::Type, etc
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythdeque.h"
+#include "libmythbase/mythtimer.h"
+
 #include "inputinfo.h"
-#include "mythdeque.h"
-
-#include "recordinginfo.h"
-#include "tv.h"
-#include "signalmonitorlistener.h"
 #include "mythtvexp.h"                  // for MTV_PUBLIC
-#include "programtypes.h"               // for RecStatus, RecStatus::Type, etc
+#include "recordinginfo.h"
+#include "signalmonitorlistener.h"
+#include "tv.h"
 #include "videoouttypes.h"              // for PictureAttribute
-
-#include "mythconfig.h"
 
 // locking order
 // setChannelLock -> stateChangeLock -> triggerEventLoopLock

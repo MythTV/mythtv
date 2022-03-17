@@ -9,11 +9,12 @@
 #include <QtCore> // for qAbs
 
 // MythTV headers
-#include "programdata.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+
 #include "channelutil.h"
-#include "mythdb.h"
-#include "mythlogging.h"
 #include "dvbdescriptors.h"
+#include "programdata.h"
 
 #define LOC      QString("ProgramData: ")
 

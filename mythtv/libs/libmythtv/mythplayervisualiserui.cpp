@@ -1,9 +1,10 @@
 // MythTV
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythui/mythmainwindow.h"
+
 #include "audioplayer.h"
-#include "mythmainwindow.h"
-#include "tv_play.h"
 #include "mythplayervisualiserui.h"
+#include "tv_play.h"
 
 #define LOC QString("PlayerVis: ")
 

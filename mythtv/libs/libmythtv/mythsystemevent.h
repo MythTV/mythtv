@@ -4,9 +4,9 @@
 #include <QEvent>
 #include <QObject>
 
-#include "programinfo.h"
+#include "libmyth/programinfo.h"
+#include "libmyth/rawsettingseditor.h"
 #include "recordinginfo.h"
-#include "rawsettingseditor.h"
 
 // Helper commands for formatting and sending a MythSystemEvent
 MTV_PUBLIC void SendMythSystemRecEvent(const QString &msg,

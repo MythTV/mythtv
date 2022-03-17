@@ -1,5 +1,5 @@
 #include "mythcodecid.h"
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 extern "C"
 {

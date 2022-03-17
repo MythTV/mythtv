@@ -1,5 +1,5 @@
 // MythTV
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
 #include "mythvideobounds.h"
 #include "mythvideoprofile.h"
 #include "mythvideogpu.h"

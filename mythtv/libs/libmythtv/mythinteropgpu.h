@@ -6,7 +6,7 @@
 #include <QObject>
 
 // MythTV
-#include "referencecounter.h"
+#include "libmythbase/referencecounter.h"
 #include "mythframe.h"
 
 // Std

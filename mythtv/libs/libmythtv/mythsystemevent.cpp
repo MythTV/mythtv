@@ -4,15 +4,16 @@
 #include <QRunnable>
 #include <utility>
 
-#include "mythcorecontext.h"
-#include "mthreadpool.h"
-#include "mythsystemlegacy.h"
-#include "mythsystemevent.h"
-#include "programinfo.h"
+#include "libmyth/programinfo.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsystemlegacy.h"
+
 #include "cardutil.h"
-#include "remoteutil.h"
-#include "exitcodes.h"
-#include "mythlogging.h"
+#include "mythsystemevent.h"
 
 #define LOC      QString("MythSystemEventHandler: ")
 

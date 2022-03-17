@@ -9,14 +9,14 @@
 #include <QFileInfo>
 
 // libmythbase
-#include "mythcorecontext.h"
-#include "mythlogging.h"
-#include "mythdirs.h"
-#include "mthread.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
 
 // libmyth
-#include "mythcontext.h"
-#include "remoteutil.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/remoteutil.h"
 
 // libmythtv
 #include "previewgenerator.h"

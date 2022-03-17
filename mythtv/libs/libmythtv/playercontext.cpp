@@ -3,24 +3,24 @@
 
 #include <QPainter>
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/storagegroup.h"
 
-#include "playercontext.h"
-#include "mythplayer.h"
-#include "remoteencoder.h"
-#include "livetvchain.h"
-#include "io/mythmediabuffer.h"
-#include "playgroup.h"
-#include "videoouttypes.h"
-#include "storagegroup.h"
-#include "mythcorecontext.h"
-#include "videometadatautil.h"
-#include "metadataimagehelper.h"
-#include "mythlogging.h"
-#include "DVD/mythdvdplayer.h"
 #include "Bluray/mythbdplayer.h"
+#include "DVD/mythdvdplayer.h"
 #include "channelutil.h"
+#include "io/mythmediabuffer.h"
+#include "livetvchain.h"
+#include "metadataimagehelper.h"
+#include "mythplayer.h"
+#include "playercontext.h"
+#include "playgroup.h"
+#include "remoteencoder.h"
 #include "tv_play.h"
+#include "videometadatautil.h"
+#include "videoouttypes.h"
 
 #define LOC QString("playCtx: ")
 
