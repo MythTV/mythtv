@@ -3,12 +3,11 @@
 #include <QDir>
 #include <QStringList>
 
-#include "mythlogging.h"
-#include "mythcorecontext.h"  // for events
-#include "mythsystemlegacy.h" // for previewgen
-#include "mythdirs.h"         // for previewgen
-#include "exitcodes.h"        // for previewgen
-#include "mythimage.h"
+#include "libmythbase/mythcorecontext.h"  // for MYTH_APPNAME_MYTHPREVIEWGEN
+#include "libmythbase/mythdirs.h"         // for GetAppBinDir
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythui/mythimage.h"
 
 #include "imagemetadata.h"
 

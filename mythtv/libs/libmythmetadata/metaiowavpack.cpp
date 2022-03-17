@@ -3,7 +3,7 @@
 #include <apetag.h>
 #include <apeitem.h>
 
-#include <mythcontext.h>
+#include "libmyth/mythcontext.h"
 
 // libmythmetadata
 #include "metaiowavpack.h"

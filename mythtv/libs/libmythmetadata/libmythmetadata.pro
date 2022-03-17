@@ -37,18 +37,10 @@ SOURCES += metaiowavpack.cpp metaioid3.cpp metaiooggvorbis.cpp
 SOURCES += imagemetadata.cpp imagethumbs.cpp imagescanner.cpp imagemanager.cpp
 SOURCES += musicfilescanner.cpp metadatagrabber.cpp lyricsdata.cpp
 
-INCLUDEPATH += ../libmythbase ../libmythtv
-INCLUDEPATH += ../.. ../ ./ ../libmythui
-INCLUDEPATH += ../.. ../../external/FFmpeg
-INCLUDEPATH += ../libmyth
-INCLUDEPATH += ../libmythservicecontracts
+INCLUDEPATH += .. ../../external/FFmpeg
 
 # for TagLib
 INCLUDEPATH += $${CONFIG_TAGLIB_INCLUDES}
-
-DEPENDPATH += ../ ../libmythui ../libmythbase
-DEPENDPATH += ../libmythtv ../libmyth
-DEPENDPATH += ../libmythservicecontracts
 
 LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}

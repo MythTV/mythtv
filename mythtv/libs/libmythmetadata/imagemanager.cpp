@@ -4,11 +4,11 @@
 #include <QRunnable>
 #include <utility>
 
-#include "dbaccess.h"  // for FileAssociations
-#include "mthreadpool.h"
-#include "mythdate.h"
-#include "mythmediamonitor.h"
+#include "libmyth/mythmediamonitor.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythdate.h"
 
+#include "dbaccess.h"  // for FileAssociations
 
 #define LOC QString("ImageManager: ")
 #define DBLOC QString("ImageDb(%1): ").arg(m_table)

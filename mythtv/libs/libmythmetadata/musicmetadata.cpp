@@ -10,24 +10,20 @@
 #include <utility>
 
 // mythtv
-#include "mythcontext.h"
-#include "mythdate.h"
-#include "mythdb.h"
-#include "mythdirs.h"
-#include "mythdownloadmanager.h"
-#include "mythlogging.h"
-#include "mythdate.h"
-#include "remotefile.h"
-#include "storagegroup.h"
-#include "mythsystem.h"
-#include "unziputil.h"
-
-// mythbase
-#include "mythsorthelper.h"
-
-// libmythui
-#include "mythprogressdialog.h"
-#include "mythmainwindow.h"
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsorthelper.h"
+#include "libmythbase/mythsystem.h"
+#include "libmythbase/remotefile.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythbase/unziputil.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythprogressdialog.h"
 
 // libmythmetadata
 #include "metaio.h"

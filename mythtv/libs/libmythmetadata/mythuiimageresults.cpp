@@ -4,12 +4,12 @@
 #include <QDir>
 #include <QFile>
 
-#include "mythdirs.h"
-#include "mythdate.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythui/mythuibuttonlist.h"
 
-#include "mythuibuttonlist.h"
 #include "metadataimagedownload.h"
-#include "mythcorecontext.h"
 
 ImageSearchResultsDialog::ImageSearchResultsDialog(
     MythScreenStack *lparent,

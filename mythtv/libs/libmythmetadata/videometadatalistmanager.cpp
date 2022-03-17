@@ -1,8 +1,8 @@
 #include <map>
 
-#include "mythdb.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythsorthelper.h"
 #include "videometadatalistmanager.h"
-#include "mythsorthelper.h"
 
 class VideoMetadataListManagerImp
 {

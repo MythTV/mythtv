@@ -6,13 +6,14 @@
 #include <QLocale>
 #include <QMetaType>
 
-#include "rssparse.h"
-#include "programinfo.h"
-#include "mythcorecontext.h"
+#include "libmyth/programinfo.h"
+#include "libmyth/rssparse.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlocale.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+
 #include "metadatacommon.h"
-#include "mythlogging.h"
-#include "mythlocale.h"
-#include "mythmiscutil.h"
 
 static int x0 = qRegisterMetaType< RefCountHandler<MetadataLookup> >();
 

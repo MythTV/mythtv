@@ -7,8 +7,8 @@
 #include <QBuffer>
 
 // Libmythbase
-#include <mythlogging.h>
-#include <mythcorecontext.h>
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythcorecontext.h"
 
 // Taglib
 #include <flacfile.h>

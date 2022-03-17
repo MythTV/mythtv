@@ -1,10 +1,8 @@
 #include "imagemetadata.h"
 
-#include "mythlogging.h"
-#include "mythcorecontext.h"  // for avcodeclock
-#include "mythdirs.h"         // for ffprobe
-#include "mythsystemlegacy.h" // for ffprobe
-#include "exitcodes.h"        // for ffprobe
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdirs.h"         // for GetAppBinDir
+#include "libmythbase/mythsystemlegacy.h" // for ffprobe
 
 // libexiv2 for Exif metadata
 #include <exiv2/exiv2.hpp>

@@ -9,9 +9,9 @@ extern "C" {
 #include "metaiomp4.h"
 #include "musicmetadata.h"
 
-// Libmyth
-#include <mythlogging.h>
-#include <mythcontext.h>
+// mythtv
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythlogging.h"
 
 /*!
  * \copydoc MetaIO::write()

@@ -1,10 +1,10 @@
 #include <map>
 
-#include "mythdate.h"
-#include "mythcontext.h"
-#include "mythmainwindow.h"
-#include "mythscreenstack.h"
-#include "mythdialogbox.h"
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythscreenstack.h"
 
 #include "parentalcontrols.h"
 

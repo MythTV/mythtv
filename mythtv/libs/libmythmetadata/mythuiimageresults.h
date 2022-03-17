@@ -1,8 +1,9 @@
 #include <QObject>
 
+#include "libmythtv/metadataimagehelper.h"
+#include "libmythui/mythscreentype.h"
+
 #include "mythmetaexp.h"
-#include "mythscreentype.h"
-#include "metadataimagehelper.h"
 
 class MythUIButtonList;
 class MetadataImageDownload;

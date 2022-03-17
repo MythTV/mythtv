@@ -3,13 +3,14 @@
 #include <QCoreApplication>
 #include <QStringList>
 
+#include "libmythbase/mythdirs.h"
+
 #ifdef HAVE_LIBBLURAY
 #include <libbluray/meta_data.h>
 #else
 #include "libbluray/bdnav/meta_data.h"
 #endif
 #include "bluraymetadata.h"
-#include "mythdirs.h"
 
 BlurayMetadata::~BlurayMetadata()
 {

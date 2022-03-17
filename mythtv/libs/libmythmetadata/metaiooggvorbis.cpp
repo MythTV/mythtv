@@ -5,7 +5,7 @@
 #include "musicutils.h"
 
 // Libmyth
-#include <mythcontext.h>
+#include "libmyth/mythcontext.h"
 
 /*!
 * \brief Open the file to read the tag

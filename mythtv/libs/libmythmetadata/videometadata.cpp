@@ -5,21 +5,23 @@
 #include <QFileInfo>
 #include <QRegularExpression>
 
-#include "mythcorecontext.h"
-#include "mythmiscutil.h" // for FileHash
-#include "stringutil.h"
-#include "mythcontext.h"
-#include "mythdb.h"
-#include "storagegroup.h"
-#include "remotefile.h"
-#include "remoteutil.h"
-#include "mythdate.h"
-#include "mythlogging.h"
-#include "globals.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/programinfo.h" // for format_season_and_episode
+#include "libmyth/remoteutil.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"// for FileHash
+#include "libmythbase/mythsorthelper.h"
+#include "libmythbase/remotefile.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythbase/stringutil.h"
+
 #include "dbaccess.h"
+#include "globals.h"
 #include "videometadatalistmanager.h"
 #include "videoutils.h"
-#include "mythsorthelper.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,15,2)
 #define capturedView capturedRef

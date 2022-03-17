@@ -2,10 +2,11 @@
 #include <vector>
 #include <map>
 
-#include "mythdb.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/stringutil.h"
+
 #include "cleanup.h"
 #include "dbaccess.h"
-#include "stringutil.h"
 
 namespace
 {

@@ -7,15 +7,16 @@
 #include <utility>
 
 // myth
-#include "mythcorecontext.h"
-#include "mythuihelper.h"
-#include "mythdirs.h"
-#include "storagegroup.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/remotefile.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythui/mythuihelper.h"
+
 #include "metadataimagedownload.h"
-#include "remotefile.h"
-#include "mythdownloadmanager.h"
-#include "mythlogging.h"
-#include "mythdate.h"
 
 QEvent::Type ImageDLEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();

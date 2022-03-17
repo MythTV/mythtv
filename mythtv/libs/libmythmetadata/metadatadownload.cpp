@@ -8,16 +8,17 @@
 #include <QUrl>
 
 // myth
-#include "mythcorecontext.h"
-#include "mythdirs.h"
-#include "mythuihelper.h"
-#include "mythsystemlegacy.h"
-#include "storagegroup.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/remotefile.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythui/mythuihelper.h"
+
 #include "metadatadownload.h"
 #include "metadatafactory.h"
-#include "mythmiscutil.h"
-#include "remotefile.h"
-#include "mythlogging.h"
 
 QEvent::Type MetadataLookupEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();

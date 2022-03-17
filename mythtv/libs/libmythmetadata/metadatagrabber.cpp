@@ -8,14 +8,15 @@
 #include <utility>
 
 // MythTV headers
-#include "metadatagrabber.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsystemlegacy.h"
+
 #include "metadatacommon.h"
-#include "mythsystemlegacy.h"
-#include "exitcodes.h"
-#include "mythdate.h"
-#include "mythdirs.h"
-#include "mythlogging.h"
-#include "mythcorecontext.h"
+#include "metadatagrabber.h"
 
 #define LOC QString("Metadata Grabber: ")
 static constexpr std::chrono::seconds kGrabberRefresh { 60s };

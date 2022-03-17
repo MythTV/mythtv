@@ -6,12 +6,13 @@
 #include <QDir>
 
 // MythTV headers
-#include <mythdate.h>
-#include <mythdb.h>
-#include <mythcontext.h>
-#include <musicmetadata.h>
-#include <metaio.h>
-#include <musicfilescanner.h>
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+
+#include "musicmetadata.h"
+#include "metaio.h"
+#include "musicfilescanner.h"
 
 MusicFileScanner::MusicFileScanner(bool force) : m_forceupdate{force}
 {

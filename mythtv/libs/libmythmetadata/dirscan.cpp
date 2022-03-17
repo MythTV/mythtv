@@ -3,14 +3,15 @@
 #include <QDir>
 #include <QUrl>
 
-#include "mythcorecontext.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/storagegroup.h"
+
 #include "dbaccess.h"
 #include "dirscan.h"
-#include "remoteutil.h"
-#include "mythcontext.h"
-#include "mythlogging.h"
 #include "videoutils.h"
-#include "storagegroup.h"
 
 namespace
 {

@@ -6,20 +6,16 @@
 #include <QUrl>
 #include <utility>
 
-// libmythbase
-#include "mythevent.h"
-#include "mythlogging.h"
-#include "mythdate.h"
-
-// libmyth
-#include "mythcontext.h"
-#include "remoteutil.h"
-
-// libmythui
-#include "mythscreenstack.h"
-#include "mythprogressdialog.h"
-#include "mythdialogbox.h"
-#include "mythmainwindow.h"
+// mythtv
+#include "libmyth/mythcontext.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythevent.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythprogressdialog.h"
+#include "libmythui/mythscreenstack.h"
 
 // libmythmetadata
 #include "videometadatalistmanager.h"

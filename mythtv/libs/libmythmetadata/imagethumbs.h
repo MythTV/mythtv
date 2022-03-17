@@ -22,8 +22,8 @@
 #include <QWaitCondition>
 
 // MythTV headers
+#include "libmythbase/mthread.h"
 #include "imagetypes.h"
-#include "mthread.h"
 
 //! \brief Priority of a thumbnail request. First/lowest are handled before later/higher
 //! \details Ordered to optimise perceived client performance, ie. pictures will be

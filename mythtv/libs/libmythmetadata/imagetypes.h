@@ -12,8 +12,8 @@
 #include <QMap>
 #include <QMetaType>
 
+#include "libmythbase/mythchrono.h"
 #include "mythmetaexp.h"
-#include "mythchrono.h"
 
 // Define this to log/count creation/deletion of ImageItem heap objects.
 // These are created liberally when processing images and are liable to leak.

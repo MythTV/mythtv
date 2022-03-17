@@ -1,7 +1,7 @@
 #include "imagescanner.h"
 
-#include "mythlogging.h"
-#include "mythcorecontext.h"  // for events
+#include "libmythbase/mythcorecontext.h"  // for gCoreContext
+#include "libmythbase/mythlogging.h"
 
 #include "imagemetadata.h"
 

@@ -7,10 +7,10 @@
 #include <QDir>
 
 // mythtv
-#include <mythdirs.h>
-#include <mythlogging.h>
-#include <mythcorecontext.h>
-#include <remotefile.h>
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/remotefile.h"
 
 extern "C" {
 #include <libavformat/avformat.h>

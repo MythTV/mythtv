@@ -10,13 +10,13 @@
 #include <QList>
 #include <QUrl>
 
-// libmythbase
-#include "mythlogging.h"
-#include "compat.h"
-
-// libmyth
-#include "mythcontext.h"
-#include "remoteutil.h"
+// mythtv
+#include "libmyth/mythcontext.h"
+#include "libmyth/programinfo.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/recordingrule.h"
 
 // libmythmetadata
 #include "videoutils.h"
@@ -31,8 +31,6 @@
 
 // Input for a lookup
 #include "videometadata.h"
-#include "programinfo.h"
-#include "recordingrule.h"
 
 
 QEvent::Type MetadataFactoryNoResult::kEventType =

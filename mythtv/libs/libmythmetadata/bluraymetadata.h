@@ -16,7 +16,7 @@
 #include <QString>
 
 // MythTV headers
-#include "mythtypes.h"
+#include "libmythbase/mythtypes.h"
 #include "mythmetaexp.h"
 
 using BlurayTitles = QList< QPair < uint,QString > >;

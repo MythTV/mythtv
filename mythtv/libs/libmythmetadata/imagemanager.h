@@ -51,9 +51,9 @@
 #include <QTemporaryDir>
 
 // MythTV headers
-#include "mythcorecontext.h"
-#include "storagegroup.h"
-#include "mythdirs.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/storagegroup.h"
 
 #include "imagescanner.h"
 #include "imagemetadata.h"
