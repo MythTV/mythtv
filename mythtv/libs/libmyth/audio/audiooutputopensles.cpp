@@ -4,7 +4,7 @@
 
 #include <QAndroidJniEnvironment>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "audiooutputopensles.h"
 
 

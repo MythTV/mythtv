@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "audiooutputwin.h"
 
 #include <windows.h>

@@ -1,11 +1,13 @@
-// MythTV headers
-#include "programinfoupdater.h"
-#include "mthreadpool.h"
-#include "mythlogging.h"
-#include "mythcorecontext.h"
-#include "remoteutil.h"
-
+// Posix headers
 #include <unistd.h> // for usleep()
+
+// MythTV headers
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+
+#include "programinfoupdater.h"
+#include "remoteutil.h"
 
 void ProgramInfoUpdater::insert(
     uint     recordedid, PIAction action, uint64_t filesize)

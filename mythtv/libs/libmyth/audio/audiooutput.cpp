@@ -7,10 +7,10 @@
 #include <QDateTime>
 #include <QDir>
 
-#include "audiooutput.h"
-#include "mythmiscutil.h"
-#include "compat.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythmiscutil.h"
 
+#include "audiooutput.h"
 #include "audiooutputnull.h"
 #ifdef _WIN32
 #include "audiooutputdx.h"

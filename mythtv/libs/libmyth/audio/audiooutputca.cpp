@@ -12,6 +12,8 @@
  * Jeremiah Morris, Andrew Kimpton, Nigel Pearson, Jean-Yves Avenard
  *****************************************************************************/
 
+#include <SoundTouch.h>
+
 #include <array>
 #include <vector>
 
@@ -21,9 +23,8 @@
 #include <AudioToolbox/AudioFormat.h>
 #include <AvailabilityMacros.h>
 
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
 #include "audiooutputca.h"
-#include "SoundTouch.h"
 
 #if !defined(MAC_OS_VERSION_12_0)
 #define kAudioObjectPropertyElementMain kAudioObjectPropertyElementMaster

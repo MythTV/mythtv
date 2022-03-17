@@ -7,12 +7,13 @@
 #include <QUrl>
 #include <QFileInfo>
 
-#include "rssparse.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythsorthelper.h"
+#include "libmythbase/stringutil.h"
+
 #include "mythcontext.h"
-#include "mythdirs.h"
-#include "mythdate.h"
-#include "stringutil.h"
-#include "mythsorthelper.h"
+#include "rssparse.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,15,2)
 #define capturedView capturedRef

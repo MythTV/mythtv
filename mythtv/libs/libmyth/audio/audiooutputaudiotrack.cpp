@@ -2,7 +2,7 @@
 #include <QAndroidJniEnvironment>
 #include <android/log.h>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "audiooutputaudiotrack.h"
 
 #define CHANNELS_MIN 1

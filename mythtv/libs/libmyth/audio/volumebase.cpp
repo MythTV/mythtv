@@ -7,9 +7,10 @@
 #include <QMutex>
 #include <QMutexLocker>
 
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythcorecontext.h"
+
 #include "volumebase.h"
-#include "mythcorecontext.h"
-#include "mthread.h"
 
 
 namespace {

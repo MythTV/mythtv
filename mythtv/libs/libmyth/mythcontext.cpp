@@ -1,58 +1,54 @@
-#include <QCoreApplication>
-#include <QDir>
-#include <QFileInfo>
-#include <QDebug>
-#include <QHostInfo>
-#include <QMutex>
-#include <QDateTime>
-#include <QTcpSocket>
-#include <QEventLoop>
-
-#ifdef Q_OS_ANDROID
-#include <QtAndroidExtras>
-#endif
-
 #include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <queue>
 #include <thread>
+#include <unistd.h> // for usleep(), gethostname
 #include <vector>
 
-#include "mythcontext.h"
-#include "exitcodes.h"
-#include "mythdate.h"
-#include "remotefile.h"
-#include "backendselect.h"
-#include "dbsettings.h"
-#include "langsettings.h"
-#include "mythtranslation.h"
-#include "mythevent.h"
-#include "dbutil.h"
-#include "mythmediamonitor.h"
-
-#include "mythdb.h"
-#include "mythdirs.h"
-#include "mythversion.h"
-#include "mythdialogbox.h"
-#include "mythmainwindow.h"
-#include "mythuihelper.h"
-#include "mythimage.h"
-#include "mythxmlclient.h"
-#include "upnp.h"
-#include "mythlogging.h"
-#include "mythsystemlegacy.h"
-#include "mythmiscutil.h"
-
-#include "mythplugin.h"
-#include "portchecker.h"
-#include "guistartup.h"
-
-#include <unistd.h> // for usleep(), gethostname
+#include <QCoreApplication>
+#include <QDateTime>
+#include <QDebug>
+#include <QDir>
+#include <QEventLoop>
+#include <QFileInfo>
+#include <QHostInfo>
+#include <QMutex>
+#include <QTcpSocket>
+#ifdef Q_OS_ANDROID
+#include <QtAndroidExtras>
+#endif
 
 #ifdef _WIN32
-#include "compat.h"
+#include "libmythbase/compat.h"
 #endif
+#include "libmythbase/dbutil.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythevent.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythplugin.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/mythtranslation.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/portchecker.h"
+#include "libmythbase/remotefile.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythimage.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuihelper.h"
+#include "libmythupnp/mythxmlclient.h"
+#include "libmythupnp/upnp.h"
+
+#include "backendselect.h"
+#include "dbsettings.h"
+#include "guistartup.h"
+#include "langsettings.h"
+#include "mythcontext.h"
+#include "mythmediamonitor.h"
 
 #define LOC      QString("MythContext: ")
 

@@ -9,7 +9,7 @@
 #include "mythexp.h"
 
 // MythUI headers
-#include "mythscreentype.h"
+#include "libmythui/mythscreentype.h"
 
 class QEventLoop;
 class MythUIButtonList;

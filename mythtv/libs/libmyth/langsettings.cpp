@@ -7,20 +7,20 @@
 #include <QFileInfo>
 
 // libmythbase
-#include "mythcorecontext.h"
-#include "mythstorage.h"
-#include "mythdirs.h"
-#include "mythlogging.h"
-#include "mythlocale.h"
-#include "mythtranslation.h"
-#include "iso3166.h"
-#include "iso639.h"
+#include "libmythbase/iso3166.h"
+#include "libmythbase/iso639.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlocale.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythstorage.h"
+#include "libmythbase/mythtranslation.h"
 
 // libmythui
-#include "mythuibuttonlist.h"
-#include "mythuibutton.h"
-#include "mythmainwindow.h"
-#include "mythscreenstack.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythscreenstack.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
 
 LanguageSelection::LanguageSelection(MythScreenStack *parent, bool exitOnFinish)
                  :MythScreenType(parent, "LanguageSelection"),

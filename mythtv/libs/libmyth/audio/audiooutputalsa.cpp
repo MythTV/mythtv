@@ -5,7 +5,7 @@
 #include <sys/time.h>
 
 #include <QFile>
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
 #include "audiooutputalsa.h"
 
 #define LOC QString("ALSA: ")

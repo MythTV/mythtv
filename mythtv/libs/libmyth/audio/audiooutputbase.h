@@ -10,10 +10,10 @@
 #include <QWaitCondition>
 
 // MythTV headers
-#include "audiooutput.h"
-#include "mythlogging.h"
-#include "mthread.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythlogging.h"
 
+#include "audiooutput.h"
 #include "samplerate.h"
 
 #define VBAUDIO(str)   LOG(VB_AUDIO, LOG_INFO, LOC + (str))

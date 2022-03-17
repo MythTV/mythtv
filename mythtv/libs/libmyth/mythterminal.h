@@ -15,7 +15,7 @@
 
 // MythTV headers
 #include "mythexp.h"
-#include "mythscreentype.h"
+#include "libmythui/mythscreentype.h"
 
 class MythUIButton;
 class MythUIButtonList;

@@ -7,12 +7,13 @@
 #include <utility>
 
 // MythTV headers
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythuifilebrowser.h"
+
 #include "storagegroupeditor.h"
-#include "mythcorecontext.h"
-#include "mythdb.h"
-#include "mythlogging.h"
-#include "mythdate.h"
-#include "mythuifilebrowser.h"
 
 #define LOC QString("SGE(%1): ").arg(m_groupname)
 

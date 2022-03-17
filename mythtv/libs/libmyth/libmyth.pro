@@ -89,17 +89,9 @@ HEADERS += netgrabbermanager.h
 SOURCES += mythrssmanager.cpp           netutils.cpp
 SOURCES += netgrabbermanager.cpp
 
-INCLUDEPATH += ../libmythfreesurround
-INCLUDEPATH += ../libmythbase
-INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
-INCLUDEPATH += ../.. ../../external/FFmpeg
-INCLUDEPATH += ../libmythservicecontracts
+INCLUDEPATH += ..
+INCLUDEPATH += ../../external/FFmpeg
 INCLUDEPATH += $${POSTINC}
-DEPENDPATH += ../libmythfreesurround
-DEPENDPATH += ../ ../libmythui ../libmythbase
-DEPENDPATH += ../libmythupnp
-DEPENDPATH += ./audio
-DEPENDPATH += ../libmythservicecontracts
 
 LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}

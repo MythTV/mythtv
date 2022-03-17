@@ -22,10 +22,9 @@
  */
 #include "audioconvert.h"
 
-#include <cstdint>
-#include <cmath>
-
 #include <algorithm>
+#include <cmath>
+#include <cstdint>
 
 // FFmpeg
 extern "C" {
@@ -35,7 +34,8 @@ extern "C" {
 
 #include <QtGlobal>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
+
 #include "mythaverror.h"
 
 #define LOC QString("AudioConvert: ")

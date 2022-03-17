@@ -10,10 +10,10 @@
 #ifndef _WIN32
 #include <sys/ioctl.h>
 #else
-#include "compat.h"
+#include "libmythbase/compat.h"
 #endif
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "audiooutputnull.h"
 
 #define CHANNELS_MIN 1

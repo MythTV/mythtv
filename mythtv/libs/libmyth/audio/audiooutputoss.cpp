@@ -9,14 +9,14 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythtimer.h"
+
+#include "audiooutputoss.h"
 
 #define LOC      QString("AOOSS: ")
-
-#include "mythcorecontext.h"
-#include "audiooutputoss.h"
-#include "mythtimer.h"
-#include "mythdate.h"
 
 AudioOutputOSS::AudioOutputOSS(const AudioSettings &settings) :
     AudioOutputBase(settings)

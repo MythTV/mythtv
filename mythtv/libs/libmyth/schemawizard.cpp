@@ -6,18 +6,18 @@ using std::endl;
 
 #include <QEventLoop>
 
-#include "mythdialogbox.h"
-#include "mythcorecontext.h"
-#include "schemawizard.h"
-#include "mythdate.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythtimer.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythprogressdialog.h"
+#include "libmythui/mythuihelper.h"
 
-#include "mythtimer.h"
-#include "mythlogging.h"
-#include "mythmainwindow.h"
-#include "mythprogressdialog.h"
-#include "mythuihelper.h"
-#include "mythmiscutil.h"
-#include "mythdb.h"
+#include "schemawizard.h"
 
 
 static SchemaUpgradeWizard * c_wizard = nullptr;

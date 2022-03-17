@@ -5,13 +5,13 @@
 
 #undef UNICODE
 #define _WIN32_WINNT 0x0500
-#include "compat.h"
+
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcdrom.h"
+#include "libmythbase/mythhdd.h"
+#include "libmythbase/mythlogging.h"
 
 #include "mediamonitor-windows.h"
-#include "mythcdrom.h"
-#include "mythhdd.h"
-#include "mythlogging.h"
-
 
 /**
  * \class MediaMonitorWindows

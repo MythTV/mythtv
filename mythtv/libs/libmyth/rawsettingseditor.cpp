@@ -1,11 +1,12 @@
 
-#include "mythcorecontext.h"
-#include "mythlogging.h"
-#include "mythuibutton.h"
-#include "mythuibuttonlist.h"
-#include "mythuishape.h"
-#include "mythuitext.h"
-#include "mythuitextedit.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuishape.h"
+#include "libmythui/mythuitext.h"
+#include "libmythui/mythuitextedit.h"
+
 #include "rawsettingseditor.h"
 #include "remoteutil.h"
 

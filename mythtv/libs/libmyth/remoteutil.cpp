@@ -5,13 +5,14 @@
 #include <QDir>
 #include <QList>
 
-#include "compat.h"
-#include "remoteutil.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythevent.h"
+#include "libmythbase/mythsocket.h"
+#include "libmythbase/storagegroup.h"
+
 #include "programinfo.h"
-#include "mythcorecontext.h"
-#include "storagegroup.h"
-#include "mythevent.h"
-#include "mythsocket.h"
+#include "remoteutil.h"
 
 std::vector<ProgramInfo *> *RemoteGetRecordedList(int sort)
 {

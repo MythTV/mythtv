@@ -2,16 +2,17 @@
 
 #include <QEventLoop>
 
-#include "mythuistatetype.h"
-#include "mythmainwindow.h"
-#include "mythdialogbox.h"
+#include "libmythbase/configuration.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuistatetype.h"
+#include "libmythupnp/mythxmlclient.h"
+
 #include "backendselect.h"
-#include "configuration.h"
-#include "mythxmlclient.h"
-#include "mythuibuttonlist.h"
-#include "mythuibutton.h"
-#include "mythlogging.h"
-#include "mythversion.h"
 
 BackendSelection::BackendSelection(
     MythScreenStack *parent, DatabaseParams *params,

@@ -3,8 +3,6 @@
 #include <cstring>
 #include <unistd.h>
 
-#include "mythcorecontext.h"
-
 // libav headers
 extern "C" {
 #include "libavutil/mem.h" // for av_free
@@ -12,10 +10,12 @@ extern "C" {
 }
 
 // MythTV headers
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+
 #include "audiooutputdigitalencoder.h"
 #include "audiooutpututil.h"
-#include "compat.h"
-#include "mythlogging.h"
 
 #define LOC QString("DEnc: ")
 

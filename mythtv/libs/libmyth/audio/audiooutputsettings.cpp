@@ -9,14 +9,15 @@
 #include <algorithm>
 #include <vector>
 
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+
 #include "audiooutputsettings.h"
-#include "mythlogging.h"
-#include "mythcorecontext.h"
+#include "eldutils.h"
 
 extern "C" {
 #include "libavutil/avutil.h"    // to check version of libavformat
 }
-#include "eldutils.h"
 
 #define LOC QString("AOS: ")
 

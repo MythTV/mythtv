@@ -14,17 +14,17 @@
 #include <QDir>
 
 // MythTV headers
-#include "mythmediamonitor.h"
-#include "mythcdrom.h"
-#include "mythcorecontext.h"
-#include "mythconfig.h"
-#include "mythdialogbox.h"
-#include "mythdate.h"
-#include "mythlogging.h"
-#include "mythmainwindow.h"
-#include "mythsystemlegacy.h"
-#include "mythmiscutil.h"
+#include "libmythbase/mythcdrom.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
 
+#include "mythmediamonitor.h"
 #ifdef USING_DARWIN_DA
 #include "mediamonitor-darwin.h"
 #elif defined(Q_OS_WIN)

@@ -31,16 +31,14 @@
 #include <QEventLoop>
 #include <QTimer>
 
-#include "mythchrono.h"
-
 // MythDB headers
 #include "mythexp.h"
 
 // MythBase headers
-#include "mythchrono.h"
+#include "libmythbase/mythchrono.h"
 
 // MythUI headers
-#include "mythscreentype.h"
+#include "libmythui/mythscreentype.h"
 
 class QEventLoop;
 class MythUIButton;

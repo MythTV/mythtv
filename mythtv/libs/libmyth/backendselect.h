@@ -3,11 +3,10 @@
 
 #include <QMutex>
 
-// libmythui
-#include "mythscreentype.h"
-
-#include "configuration.h"
-#include "upnpdevice.h"
+// MythTV
+#include "libmythbase/configuration.h"
+#include "libmythui/mythscreentype.h"
+#include "libmythupnp/upnpdevice.h"
 
 class QEventLoop;
 class MythUIButtonList;

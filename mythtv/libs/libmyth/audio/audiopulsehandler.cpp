@@ -5,10 +5,11 @@
 
 #include <unistd.h> // for usleep
 
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mthread.h"
+
 #include "audiopulsehandler.h"
-#include "mythmiscutil.h"
-#include "mythlogging.h"
-#include "mthread.h"
 
 #define LOC QString("Pulse: ")
 

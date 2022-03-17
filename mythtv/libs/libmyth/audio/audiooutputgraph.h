@@ -5,8 +5,8 @@
 #include <QMutex>
 
 // MythTV
-#include "mythexp.h"
-#include "visual.h"
+#include "libmyth/mythexp.h"
+#include "libmyth/visual.h"
 
 class MythImage;
 class MythPainter;

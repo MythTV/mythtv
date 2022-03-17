@@ -22,11 +22,12 @@
 #include <utility>
 
 // MythTV headers
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuitextedit.h"
+
 #include "mythterminal.h"
-#include "mythuibutton.h"
-#include "mythuibuttonlist.h"
-#include "mythuitextedit.h"
 
 MythTerminal::MythTerminal(MythScreenStack *parent, QString _program,
                            QStringList _arguments) :

@@ -5,14 +5,14 @@
 #include <QString>
 #include <utility>
 
-#include "mythdirs.h"
-#include "mythcontext.h"
-#include "mythsystemlegacy.h"
-#include "exitcodes.h"
-#include "mythdate.h"
-#include "mythlogging.h"
-#include "mythsystemlegacy.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/mythsystemlegacy.h"
 
+#include "mythcontext.h"
 #include "netgrabbermanager.h"
 #include "netutils.h"
 

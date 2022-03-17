@@ -6,7 +6,7 @@
 #include <QObject>
 
 #include "mythexp.h"
-#include "mythscreentype.h"
+#include "libmythui/mythscreentype.h"
 
 class MythUIButtonList;
 class MythUIButtonListItem;

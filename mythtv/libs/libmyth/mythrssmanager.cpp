@@ -3,15 +3,15 @@
 #include <QFile>
 #include <QString>
 
-#include "mythdate.h"
-#include "mythdirs.h"
-#include "mythcontext.h"
-#include "mythlogging.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsorthelper.h"
 
+#include "mythcontext.h"
 #include "mythrssmanager.h"
 #include "netutils.h"
 #include "rssparse.h"
-#include "mythsorthelper.h"
 
 #define LOC      QString("RSSSite: ")
 

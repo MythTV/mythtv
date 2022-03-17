@@ -1,8 +1,9 @@
-#include "mythcorecontext.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 
-#include "compat.h"
 #include "spdifencoder.h"
-#include "mythlogging.h"
+
 extern "C" {
 #include "libavformat/avformat.h"
 #include "libavutil/opt.h"

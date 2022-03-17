@@ -3,8 +3,8 @@
 
 #include <QString>
 
-#include "output.h"
-#include "audiooutput.h"
+#include "libmyth/output.h"
+#include "libmyth/audio/audiooutput.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"

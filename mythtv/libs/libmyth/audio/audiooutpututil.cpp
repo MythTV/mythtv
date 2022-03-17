@@ -5,7 +5,8 @@
 #include <QtGlobal>
 #include <QtEndian>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
+
 #include "audioconvert.h"
 #include "mythaverror.h"
 

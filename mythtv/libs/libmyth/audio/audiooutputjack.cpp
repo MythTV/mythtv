@@ -27,11 +27,10 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include <iostream>
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
 
-#include "mythcorecontext.h"
 #include "audiooutputjack.h"
-#include "mythdate.h"
 
 #define LOC QString("AOJack: ")
 

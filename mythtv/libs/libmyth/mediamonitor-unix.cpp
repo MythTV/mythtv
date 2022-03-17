@@ -18,9 +18,6 @@
 #include <sys/wait.h>
 #include <sys/param.h>
 
-// C++ headers
-#include <iostream>
-
 // Qt headers
 #include <QtGlobal>
 #if CONFIG_QTDBUS
@@ -33,15 +30,16 @@
 #include <QRegularExpression>
 
 // MythTV headers
-#include "mythmediamonitor.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythcdrom.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythhdd.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsystemlegacy.h"
+
 #include "mediamonitor-unix.h"
-#include "mythconfig.h"
-#include "mythcorecontext.h"
-#include "mythcdrom.h"
-#include "mythhdd.h"
-#include "mythlogging.h"
-#include "mythsystemlegacy.h"
-#include "exitcodes.h"
+#include "mythmediamonitor.h"
 
 #if HAVE_LIBUDEV
 extern "C" {

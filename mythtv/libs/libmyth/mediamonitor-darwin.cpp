@@ -8,12 +8,12 @@
 #include <QDir>
 #include <QMetaType>
 
-#include "mythmediamonitor.h"
-#include "mediamonitor-darwin.h"
-#include "mythcdrom.h"
-#include "mythhdd.h"
+#include "libmythbase/mythcdrom.h"
+#include "libmythbase/mythhdd.h"
+#include "libmythbase/mythlogging.h"
 
-#include "mythlogging.h"
+#include "mediamonitor-darwin.h"
+#include "mythmediamonitor.h"
 
 #include <IOKit/IOKitLib.h>
 #include <IOKit/storage/IOMedia.h>

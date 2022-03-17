@@ -34,24 +34,24 @@
 #include <QFileInfo>
 
 // libmythbase
-#include "mythcorecontext.h"
-#include "mythstorage.h"
-#include "mythdirs.h"
-#include "mythlogging.h"
-#include "mythlocale.h"
-#include "mythtranslation.h"
-#include "iso3166.h"
-#include "iso639.h"
-#include "mythtimer.h"
+#include "libmythbase/iso3166.h"
+#include "libmythbase/iso639.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlocale.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythstorage.h"
+#include "libmythbase/mythtimer.h"
+#include "libmythbase/mythtranslation.h"
 
 // libmythui
-#include "mythuibuttonlist.h"
-#include "mythuibutton.h"
-#include "mythmainwindow.h"
-#include "mythscreenstack.h"
-#include "mythuistatetype.h"
-#include "mythuiprogressbar.h"
-#include "mythdialogbox.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythscreenstack.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuiprogressbar.h"
+#include "libmythui/mythuistatetype.h"
 
 #include "guistartup.h"
 

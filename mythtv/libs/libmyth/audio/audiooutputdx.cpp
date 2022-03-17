@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cmath>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "audiooutputdx.h"
 
 #include <windows.h>

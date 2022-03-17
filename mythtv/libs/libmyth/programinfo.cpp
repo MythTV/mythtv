@@ -1,9 +1,7 @@
 // -*- Mode: c++ -*-
 
 // POSIX headers
-// FIXME What are these used for?
-// #include <sys/types.h>
-// #include <unistd.h>
+#include <unistd.h> // for getpid()
 
 // C++ headers
 #include <algorithm>
@@ -16,22 +14,21 @@
 #include <QDir>
 
 // MythTV headers
-#include "programinfoupdater.h"
-#include "mythcorecontext.h"
-#include "mythscheduler.h"
-#include "mythmiscutil.h"
-#include "stringutil.h"
-#include "storagegroup.h"
-#include "mythlogging.h"
-#include "programinfo.h"
-#include "remotefile.h"
-#include "remoteutil.h"
-#include "mythdb.h"
-#include "compat.h"
-#include "mythcdrom.h"
-#include "mythsorthelper.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcdrom.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythscheduler.h"
+#include "libmythbase/mythsorthelper.h"
+#include "libmythbase/remotefile.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythbase/stringutil.h"
 
-#include <unistd.h> // for getpid()
+#include "programinfo.h"
+#include "programinfoupdater.h"
+#include "remoteutil.h"
 
 #define LOC      QString("ProgramInfo(%1): ").arg(GetBasename())
 

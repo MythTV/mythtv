@@ -1,3 +1,8 @@
+// Std
+#include <climits>
+#include <cmath>
+#include <cstdint>
+
 // Qt
 #include <QtGlobal>
 #include <QImage>
@@ -6,16 +11,12 @@
 #include <QMutexLocker>
 
 // MythTV
-#include "audiooutputgraph.h"
-#include "mythlogging.h"
-#include "mythpainter.h"
-#include "mythimage.h"
-#include "compat.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythimage.h"
+#include "libmythui/mythpainter.h"
 
-// Std
-#include <climits>
-#include <cmath>
-#include <cstdint>
+#include "audiooutputgraph.h"
 
 using namespace std::chrono_literals;
 

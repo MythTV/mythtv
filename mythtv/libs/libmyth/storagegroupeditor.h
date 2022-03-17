@@ -1,7 +1,7 @@
 #ifndef STORAGEGROUPEDITOR_H
 #define STORAGEGROUPEDITOR_H
 
-#include "storagegroup.h"
+#include "libmythbase/storagegroup.h"
 #include "standardsettings.h"
 #include "mythexp.h"
 
