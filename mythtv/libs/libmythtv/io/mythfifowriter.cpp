@@ -1,8 +1,8 @@
 #include <QtGlobal>
 
 // MythTV
-#include "compat.h"
-#include "mythlogging.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythlogging.h"
 
 #ifdef Q_OS_DARWIN
 #include <sys/aio.h>

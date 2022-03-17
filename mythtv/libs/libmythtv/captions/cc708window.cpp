@@ -4,8 +4,8 @@
 #include <cassert>
 #include <algorithm>
 
+#include "libmythbase/mythlogging.h"
 #include "captions/cc708window.h"
-#include "mythlogging.h"
 
 /************************************************************************
 

@@ -1,4 +1,4 @@
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "captions/subtitlereader.h"
 
 // If the count of subtitle buffers is greater than this, force a clear

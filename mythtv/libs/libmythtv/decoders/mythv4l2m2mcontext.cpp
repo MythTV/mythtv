@@ -2,12 +2,13 @@
 #include <QDir>
 
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/opengl/mythrenderopengl.h"
+
 #include "v4l2util.h"
 #include "fourcc.h"
 #include "avformatdecoder.h"
 #include "mythplayerui.h"
-#include "opengl/mythrenderopengl.h"
 #ifdef USING_EGL
 #include "opengl/mythdrmprimeinterop.h"
 #endif

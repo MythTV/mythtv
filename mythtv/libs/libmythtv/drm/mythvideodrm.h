@@ -5,7 +5,7 @@
 #include <QObject>
 
 // MythTV
-#include "platforms/drm/mythdrmplane.h"
+#include "libmythui/platforms/drm/mythdrmplane.h"
 #include "drm/mythvideodrmbuffer.h"
 
 class MythVideoFrame;

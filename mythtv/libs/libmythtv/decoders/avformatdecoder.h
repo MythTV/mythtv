@@ -13,17 +13,18 @@ extern "C" {
 #include <QMap>
 #include <QList>
 
-#include "programinfo.h"
-#include "format.h"
-#include "decoderbase.h"
-#include "audiooutputsettings.h"
-#include "audiooutpututil.h"
-#include "spdifencoder.h"
-#include "vbilut.h"
+#include "libmyth/audio/audiooutputsettings.h"
+#include "libmyth/audio/audiooutpututil.h"
+#include "libmyth/audio/spdifencoder.h"
+#include "libmyth/programinfo.h"
+
 #include "AVCParser.h"
+#include "decoderbase.h"
+#include "format.h"
+#include "io/mythavformatbuffer.h"
 #include "mythcodeccontext.h"
 #include "mythplayer.h"
-#include "io/mythavformatbuffer.h"
+#include "vbilut.h"
 
 class TeletextDecoder;
 class CC608Decoder;

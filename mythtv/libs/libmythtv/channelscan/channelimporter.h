@@ -19,10 +19,11 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "mythtvexp.h"
+#include "libmythtv/mythtvexp.h"
+#include "libmythui/mythmainwindow.h"
+
 #include "scaninfo.h"
 #include "channelscantypes.h"
-#include "mythmainwindow.h"
 
 enum OkCancelType {
     kOCTCancelAll = -1,

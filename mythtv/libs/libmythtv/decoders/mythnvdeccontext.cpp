@@ -1,6 +1,6 @@
 // MythTV
-#include "mythlogging.h"
-#include "mythmainwindow.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythmainwindow.h"
 #include "avformatdecoder.h"
 #include "mythnvdecinterop.h"
 #include "mythvideoout.h"

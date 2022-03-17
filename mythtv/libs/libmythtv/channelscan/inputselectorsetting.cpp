@@ -31,9 +31,10 @@
 
 #include <utility>
 
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+
 #include "cardutil.h"
-#include "mythcorecontext.h"
-#include "mythdb.h"
 
 InputSelector::InputSelector(uint default_cardid,
                              QString default_inputname) :

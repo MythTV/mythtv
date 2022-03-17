@@ -19,12 +19,13 @@
 #include <QDataStream>
 
 // MythTV
-#include "mythcorecontext.h"
-#include "remotefile.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/remotefile.h"
+
 #include "captions/textsubtitleparser.h"
 #include "captions/xine_demux_sputext.h"
-#include "mythlogging.h"
-#include "mthreadpool.h"
 
 // This background thread helper class is adapted from the
 // RebuildSaver class in mythcommflagplayer.cpp.

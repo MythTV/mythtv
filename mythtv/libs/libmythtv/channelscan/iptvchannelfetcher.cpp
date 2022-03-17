@@ -10,13 +10,14 @@
 #include <QTextStream>
 
 // MythTV headers
-#include "mythcontext.h"
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
+
 #include "cardutil.h"
 #include "channelutil.h"
 #include "iptvchannelfetcher.h"
 #include "scanmonitor.h"
-#include "mythlogging.h"
-#include "mythdownloadmanager.h"
 
 #define LOC QString("IPTVChanFetch: ")
 

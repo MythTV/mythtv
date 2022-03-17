@@ -2,7 +2,7 @@
 #define MYTHVIDEODRMUTILS_H
 
 // MythTV
-#include "platforms/drm/mythdrmproperty.h"
+#include "libmythui/platforms/drm/mythdrmproperty.h"
 
 class MythVideoDRMUtils
 {

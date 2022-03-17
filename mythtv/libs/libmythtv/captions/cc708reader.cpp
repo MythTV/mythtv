@@ -3,7 +3,7 @@
 
 #include <cstdlib>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "decoderbase.h"
 #include "mythplayer.h"
 #include "captions/cc708reader.h"

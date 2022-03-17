@@ -34,7 +34,7 @@
 #include <QString>
 
 // MythTV headers
-#include "mythtvexp.h"
+#include "libmythtv/mythtvexp.h"
 #include "channelscanner.h"
 
 class MTV_PUBLIC ChannelScannerCLI : public ChannelScanner

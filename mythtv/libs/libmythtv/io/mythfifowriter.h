@@ -7,8 +7,8 @@
 #include <QMutex>
 
 // MythTV
-#include "mythtvexp.h"
-#include "mthread.h"
+#include "libmythbase/mthread.h"
+#include "libmythtv/mythtvexp.h"
 
 class MythFIFOWriter;
 

@@ -8,14 +8,14 @@
 #include <QTextStream>
 
 // MythTV headers
-#include "mythcontext.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
 #include "cardutil.h"
 #include "channelutil.h"
-#include "vboxchannelfetcher.h"
-#include "scanmonitor.h"
-#include "mythlogging.h"
-#include "mythdownloadmanager.h"
+#include "libmyth/mythcontext.h"
 #include "recorders/vboxutils.h"
+#include "scanmonitor.h"
+#include "vboxchannelfetcher.h"
 
 #define LOC QString("VBoxChanFetch: ")
 

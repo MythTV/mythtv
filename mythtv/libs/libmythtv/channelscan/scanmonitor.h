@@ -35,7 +35,7 @@
 #include <QEvent>
 
 // MythTV headers
-#include "signalmonitorlistener.h"
+#include "libmythtv/signalmonitorlistener.h"
 
 class ChannelScanner;
 class SignalMonitorValue;

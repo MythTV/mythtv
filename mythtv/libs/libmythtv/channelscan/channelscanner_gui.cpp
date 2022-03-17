@@ -34,7 +34,7 @@
 #include <algorithm>
 
 // MythTV headers
-#include "mythdialogbox.h"
+#include "libmythui/mythdialogbox.h"
 #include "channelscanner_gui.h"
 #include "channelscanner_gui_scan_pane.h"
 #include "channelimporter.h"

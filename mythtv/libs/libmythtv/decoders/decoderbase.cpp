@@ -1,16 +1,16 @@
 
 #include <algorithm>
 
-#include "mythconfig.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/iso639.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythlogging.h"
 
-#include "mythplayer.h"
-#include "mythlogging.h"
-#include "decoderbase.h"
-#include "programinfo.h"
-#include "iso639.h"
-#include "DVD/mythdvdbuffer.h"
 #include "Bluray/mythbdbuffer.h"
+#include "DVD/mythdvdbuffer.h"
+#include "decoderbase.h"
 #include "mythcodeccontext.h"
+#include "mythplayer.h"
 
 #define LOC QString("Dec: ")
 

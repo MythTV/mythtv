@@ -6,11 +6,11 @@
 #include <QString>
 
 // MythTV headers
-#include "mythdate.h"
-#include "mythdb.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
 #include "scaninfo.h"
-#include "mythdbcon.h"
-#include "mythlogging.h"
 
 ScanInfo::ScanInfo(uint scanid, uint cardid, uint sourceid,
                    bool processed, QDateTime scandate) :

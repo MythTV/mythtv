@@ -1,16 +1,17 @@
 #include <QFontMetrics>
 #include <QPainter>
 
-#include "mythlogging.h"
-#include "mythfontproperties.h"
-#include "mythuitext.h"
-#include "mythuishape.h"
-#include "vbilut.h"
-#include "mythimage.h"
-#include "mythuiimage.h"
-#include "mythpainter.h"
-#include "captions/teletextscreen.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythfontproperties.h"
+#include "libmythui/mythimage.h"
+#include "libmythui/mythpainter.h"
+#include "libmythui/mythuiimage.h"
+#include "libmythui/mythuishape.h"
+#include "libmythui/mythuitext.h"
+
 #include "captions/subtitlescreen.h"
+#include "captions/teletextscreen.h"
+#include "vbilut.h"
 
 #define LOC QString("TeletextScreen: ")
 

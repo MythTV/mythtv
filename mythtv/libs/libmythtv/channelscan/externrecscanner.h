@@ -15,7 +15,7 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "mthread.h"
+#include "libmythbase/mthread.h"
 
 class ScanMonitor;
 

@@ -5,11 +5,12 @@
 #include <QReadWriteLock>
 
 // MythTV
-#include "mythconfig.h"
-#include "compat.h"
-#include "mythcorecontext.h"
-#include "mythlogging.h"
-#include "remotefile.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/remotefile.h"
+
 #include "io/mythmediabuffer.h"
 #include "mythiowrapper.h"
 

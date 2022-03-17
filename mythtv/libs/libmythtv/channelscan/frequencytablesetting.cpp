@@ -30,8 +30,8 @@
 #include "frequencytablesetting.h"
 
 // libmythbase headers
-#include "mythcorecontext.h"
-#include "mythlocale.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlocale.h"
 
 // Frequency tables for USA/ATSC broadcast and cable networks
 ScanFrequencyTable::ScanFrequencyTable()

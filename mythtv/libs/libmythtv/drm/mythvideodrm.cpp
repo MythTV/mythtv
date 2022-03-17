@@ -3,12 +3,12 @@
 #include <qpa/qplatformnativeinterface.h>
 
 // MythTV
-#include "mythlogging.h"
-#include "mythmainwindow.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythmainwindow.h"
 #include "mythframe.h"
 #include "mythvideocolourspace.h"
-#include "platforms/mythdisplaydrm.h"
-#include "platforms/drm/mythdrmframebuffer.h"
+#include "libmythui/platforms/mythdisplaydrm.h"
+#include "libmythui/platforms/drm/mythdrmframebuffer.h"
 #include "drm/mythvideodrmutils.h"
 #include "drm/mythvideodrm.h"
 

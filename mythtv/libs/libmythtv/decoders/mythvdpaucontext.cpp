@@ -1,5 +1,5 @@
 // MythTV
-#include "mythmainwindow.h"
+#include "libmythui/mythmainwindow.h"
 #include "avformatdecoder.h"
 #include "mythvdpauinterop.h"
 #include "mythvdpauhelper.h"

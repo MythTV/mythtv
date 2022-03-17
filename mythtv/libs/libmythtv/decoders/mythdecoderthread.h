@@ -2,7 +2,7 @@
 #define MYTHDECODERTHREAD_H
 
 // MythTV
-#include "mthread.h"
+#include "libmythbase/mthread.h"
 
 class MythPlayer;
 

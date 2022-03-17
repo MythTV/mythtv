@@ -6,7 +6,7 @@
 #define MULTIPLEX_SETTING_H
 
 // MythTV headers
-#include "standardsettings.h"
+#include "libmyth/standardsettings.h"
 
 class MultiplexSetting : public TransMythUIComboBoxSetting
 {

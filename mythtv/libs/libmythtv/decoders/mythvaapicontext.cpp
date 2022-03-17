@@ -3,15 +3,16 @@
 #include <QWaitCondition>
 
 // Mythtv
-#include "mythcontext.h"
-#include "mythmainwindow.h"
-#include "mythlogging.h"
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/opengl/mythrenderopengl.h"
+
 #include "decoders/avformatdecoder.h"
-#include "opengl/mythrenderopengl.h"
-#include "videobuffers.h"
-#include "mythvaapiinterop.h"
 #include "mythplayerui.h"
 #include "mythvaapicontext.h"
+#include "mythvaapiinterop.h"
+#include "videobuffers.h"
 
 extern "C" {
 #include "libavutil/hwcontext_vaapi.h"

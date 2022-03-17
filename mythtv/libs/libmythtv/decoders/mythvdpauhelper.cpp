@@ -1,8 +1,8 @@
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "mythvideocolourspace.h"
 #include "mythvdpauhelper.h"
-#include "platforms/mythxdisplay.h" // always last
+#include "libmythui/platforms/mythxdisplay.h" // always last
 
 // Std
 #include <cmath>

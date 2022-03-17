@@ -5,8 +5,8 @@
 #include <QString>
 
 // MythTV
-#include "mythframe.h"
-#include "audiooutputsettings.h"
+#include "libmyth/audio/audiooutputsettings.h"
+#include "libmythtv/mythframe.h"
 
 class MTV_PUBLIC MythMediaWriter
 {

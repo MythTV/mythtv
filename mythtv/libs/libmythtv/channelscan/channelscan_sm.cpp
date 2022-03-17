@@ -39,16 +39,16 @@
 #include <QObject>
 
 // MythTV includes - General
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
+#include "cardutil.h"
 #include "channelscan_sm.h"
+#include "channelutil.h"
 #include "frequencies.h"
 #include "scanwizardconfig.h"
-#include "mythdbcon.h"
-#include "channelutil.h"
-#include "cardutil.h"
 #include "sourceutil.h"
-#include "mthread.h"
-#include "mythdb.h"
-#include "mythlogging.h"
 
 // MythTV includes - DTV
 #include "dtvsignalmonitor.h"

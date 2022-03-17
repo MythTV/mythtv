@@ -10,10 +10,11 @@
 #include <QCoreApplication>
 
 // MythTV headers
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythlogging.h"
+
 #include "format.h"
 #include "captions/cc608decoder.h"
-#include "mythcontext.h"
-#include "mythlogging.h"
 #include "vbilut.h"
 
 #define DEBUG_XDS 0

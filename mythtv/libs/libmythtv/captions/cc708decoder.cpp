@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "captions/cc708reader.h"
 #include "captions/cc708decoder.h"
 

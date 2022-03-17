@@ -27,12 +27,13 @@
  *
  */
 
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuiprogressbar.h"
+#include "libmythui/mythuitext.h"
+
 #include "channelscanner_gui_scan_pane.h"
-#include "mythlogging.h"
-#include "mythuiprogressbar.h"
-#include "mythuitext.h"
-#include "mythuibuttonlist.h"
-#include "mythuibutton.h"
 
 bool ChannelScannerGUIScanPane::Create()
 {

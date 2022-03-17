@@ -30,7 +30,7 @@
 #ifndef INPUT_SELECTOR_SETTING_H
 #define INPUT_SELECTOR_SETTING_H
 
-#include "standardsettings.h"
+#include "libmyth/standardsettings.h"
 
 class InputSelector : public TransMythUIComboBoxSetting
 {

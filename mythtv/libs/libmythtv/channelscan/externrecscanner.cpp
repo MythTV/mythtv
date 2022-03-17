@@ -10,13 +10,14 @@
 #include <QTextStream>
 
 // MythTV headers
-#include "mythcontext.h"
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythlogging.h"
+
+#include "ExternalRecChannelFetcher.h"
 #include "cardutil.h"
 #include "channelutil.h"
 #include "externrecscanner.h"
 #include "scanmonitor.h"
-#include "mythlogging.h"
-#include "ExternalRecChannelFetcher.h"
 
 #define LOC QString("ExternRecChanFetch: ")
 

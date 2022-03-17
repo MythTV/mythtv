@@ -2,7 +2,7 @@
 #define MYTHVAAPICONTEXT_H
 
 // MythTV
-#include "decoders/mythcodeccontext.h"
+#include "libmythtv/decoders/mythcodeccontext.h"
 
 // VAAPI
 #include "va/va.h"

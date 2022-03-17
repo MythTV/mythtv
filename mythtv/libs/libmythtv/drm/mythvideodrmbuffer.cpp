@@ -1,5 +1,5 @@
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "fourcc.h"
 #include "drm/mythvideodrmbuffer.h"
 

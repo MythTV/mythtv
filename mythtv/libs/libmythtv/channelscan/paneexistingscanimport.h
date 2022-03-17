@@ -34,9 +34,9 @@
 #include <QObject>
 
 // MythTV headers
+#include "libmythbase/mythdate.h"
 #include "channelscanmiscsettings.h"
 #include "scaninfo.h"
-#include "mythdate.h"
 
 class PaneExistingScanImport : public GroupSetting
 {

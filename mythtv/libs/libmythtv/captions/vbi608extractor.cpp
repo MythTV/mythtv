@@ -21,8 +21,8 @@
 #include <cfloat>
 #include <cstdint>
 
+#include "libmythbase/mythlogging.h"
 #include "captions/vbi608extractor.h"
-#include "mythlogging.h"
 
 #define LOC QString("VBI608Extractor: ")
 

@@ -22,9 +22,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "mythcorecontext.h"
-#include "mythlogging.h"
-#include "mythmainwindow.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythmainwindow.h"
 #include "mythinteropgpu.h"
 #include "avformatdecoder.h"
 #include "mythplayerui.h"

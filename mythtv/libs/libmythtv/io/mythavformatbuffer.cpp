@@ -1,6 +1,6 @@
 // MythTV
 #include "io/mythavformatbuffer.h"
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
 
 URLProtocol MythAVFormatBuffer::s_avfrURL;
 

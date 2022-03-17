@@ -7,10 +7,10 @@
 #include <cstdint>
 #include <ctime>
 
-#include "format.h"
-#include "compat.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythchrono.h"
 
-#include "mythchrono.h"
+#include "format.h"
 
 using cc708_seen_flags = std::array<bool,64>;
 using cc708_seen_times = std::array<SystemTime,64>;

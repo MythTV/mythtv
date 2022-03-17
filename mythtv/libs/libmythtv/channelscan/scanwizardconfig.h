@@ -31,10 +31,11 @@
 #define SCAN_WIZARD_CONFIG_H
 
 // MythTV headers
-#include "standardsettings.h"
+#include "libmyth/standardsettings.h"
+#include "libmythtv/dtvmultiplex.h"
+
 #include "inputselectorsetting.h"
 #include "channelscantypes.h"
-#include "dtvmultiplex.h"
 
 class ScanWizard;
 class VideoSourceSelector;

@@ -3,7 +3,8 @@
 
 #include <QFont>
 
-#include "mythscreentype.h"
+#include "libmythui/mythscreentype.h"
+
 #include "captions/teletextreader.h"
 #include "mythplayer.h"
 

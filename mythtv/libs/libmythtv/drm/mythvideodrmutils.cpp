@@ -1,6 +1,6 @@
 // MythTV
-#include "mythlogging.h"
-#include "mythedid.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythedid.h"
 #include "drm/mythvideodrmutils.h"
 
 // libavutil

@@ -2,7 +2,7 @@
 #define MYTHOPTICALBUFFER_H
 
 // MythTV
-#include "io/mythmediabuffer.h"
+#include "libmythtv/io/mythmediabuffer.h"
 
 class MythOpticalBuffer : public MythMediaBuffer
 {

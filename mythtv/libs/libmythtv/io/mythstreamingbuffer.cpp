@@ -2,8 +2,8 @@
 #include <QUrl>
 
 // MythTV
-#include "mythcorecontext.h"
-#include "mythlogging.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "io/mythstreamingbuffer.h"
 
 #define LOC QString("StreamRingBuf(%1): ").arg(m_filename)

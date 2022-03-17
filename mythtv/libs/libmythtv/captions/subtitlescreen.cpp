@@ -1,11 +1,12 @@
 #include <QFontMetrics>
 
-#include "mythlogging.h"
-#include "mythfontproperties.h"
-#include "mythuisimpletext.h"
-#include "mythuishape.h"
-#include "mythuiimage.h"
-#include "mythpainter.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythfontproperties.h"
+#include "libmythui/mythpainter.h"
+#include "libmythui/mythuiimage.h"
+#include "libmythui/mythuishape.h"
+#include "libmythui/mythuisimpletext.h"
+
 #include "captions/subtitlescreen.h"
 
 #define LOC      QString("Subtitles: ")

@@ -34,8 +34,9 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "mythtvexp.h"
-#include "dtvconfparser.h"
+#include "libmythtv/dtvconfparser.h"
+#include "libmythtv/mythtvexp.h"
+
 #include "iptvchannelfetcher.h"
 #include "scanmonitor.h"
 #include "channelscantypes.h"

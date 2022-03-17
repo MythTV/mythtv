@@ -2,7 +2,7 @@
 #define MYTHVIDEODRMBUFFER_H
 
 // MythTV
-#include "platforms/mythdrmdevice.h"
+#include "libmythui/platforms/mythdrmdevice.h"
 
 // Std
 #include <memory>

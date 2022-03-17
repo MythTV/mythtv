@@ -5,10 +5,10 @@
 #include <QList>
 
 // MythTV
-#include "mythconfig.h"
-#include "mythavutil.h"
-#include "io/mythmediawriter.h"
-#include "io/mythavformatbuffer.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythtv/io/mythavformatbuffer.h"
+#include "libmythtv/io/mythmediawriter.h"
+#include "libmythtv/mythavutil.h"
 
 #undef HAVE_AV_CONFIG_H
 extern "C" {

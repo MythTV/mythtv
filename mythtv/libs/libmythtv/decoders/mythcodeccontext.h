@@ -34,11 +34,12 @@
 #include <QAtomicInt>
 
 // MythTV
-#include "mythtvexp.h"
-#include "mythcodecid.h"
-#include "mythframe.h"
+#include "libmythtv/mythcodecid.h"
+#include "libmythtv/mythframe.h"
+#include "libmythtv/mythinteropgpu.h"
+#include "libmythtv/mythtvexp.h"
+
 #include "decoderbase.h"
-#include "mythinteropgpu.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"

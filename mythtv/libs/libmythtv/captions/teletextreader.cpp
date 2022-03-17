@@ -4,9 +4,9 @@
 
 #include "captions/vbilut.h"
 #include "tv.h"
-#include "mythuiactions.h"
+#include "libmythui/mythuiactions.h"
 #include "tv_actions.h"
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 #define MAGAZINE(page) ((page) / 256)
 

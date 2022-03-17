@@ -5,13 +5,14 @@
 #include <cstdint>
 using uint = unsigned;
 #include <vector>
+
 // Qt headers
 #include <QString>
 #include <QDateTime>
 
 // MythTV headers
-#include "mythtvexp.h"
-#include "dtvmultiplex.h"
+#include "libmythtv/dtvmultiplex.h"
+#include "libmythtv/mythtvexp.h"
 
 class ScanInfo
 {

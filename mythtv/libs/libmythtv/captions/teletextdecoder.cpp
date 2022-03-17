@@ -25,11 +25,12 @@ extern "C" {
 #include "vbitext/vt.h"
 }
 
+#include "libmythbase/mythlogging.h"
+
 #include "osd.h"
 #include "captions/teletextdecoder.h"
 #include "captions/teletextreader.h"
 #include "vbilut.h"
-#include "mythlogging.h"
 
 /** \fn TeletextDecoder::Decode(const unsigned char*, int)
  *  \brief Decodes teletext data

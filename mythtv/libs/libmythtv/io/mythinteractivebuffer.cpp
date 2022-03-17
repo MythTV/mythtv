@@ -3,8 +3,8 @@
 #include <QWriteLocker>
 
 // Mythtv
+#include "libmythbase/mythlogging.h"
 #include "netstream.h"
-#include "mythlogging.h"
 #include "io/mythinteractivebuffer.h"
 
 // Std
