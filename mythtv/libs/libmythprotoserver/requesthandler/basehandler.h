@@ -4,11 +4,11 @@
 #include <QString>
 #include <QStringList>
 
-#include "mythsocket.h"
-#include "mythsocketmanager.h"
-#include "socketrequesthandler.h"
-#include "sockethandler.h"
-#include "mythprotoserverexp.h"
+#include "libmythbase/mythsocket.h"
+#include "libmythprotoserver/mythprotoserverexp.h"
+#include "libmythprotoserver/mythsocketmanager.h"
+#include "libmythprotoserver/sockethandler.h"
+#include "libmythprotoserver/socketrequesthandler.h"
 
 class PROTOSERVER_PUBLIC BaseRequestHandler : public SocketRequestHandler
 {

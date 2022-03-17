@@ -10,11 +10,12 @@
 #include <QStringList>
 #include <QMutexLocker>
 
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+
 #include "requesthandler/deletethread.h"
-#include "mythmiscutil.h"
-#include "mythdb.h"
-#include "mythcorecontext.h"
-#include "mythlogging.h"
 
 /*
  Rather than attempt to calculate a delete speed from tuner card information

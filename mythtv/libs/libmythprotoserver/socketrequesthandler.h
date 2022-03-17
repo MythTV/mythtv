@@ -3,7 +3,7 @@
 
 #include <QString>
 
-#include "mythsocket.h"
+#include "libmythbase/mythsocket.h"
 #include "mythprotoserverexp.h"
 #include "sockethandler.h"
 

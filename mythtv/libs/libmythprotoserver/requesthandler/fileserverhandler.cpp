@@ -8,16 +8,16 @@
 #include <QWriteLocker>
 #include <utility>
 
-#include "mythmiscutil.h"
-#include "mythdb.h"
-#include "io/mythmediabuffer.h"
-#include "mythsocket.h"
-#include "mythlogging.h"
-#include "programinfo.h"
-#include "recordinginfo.h"
-#include "storagegroup.h"
-#include "mythcorecontext.h"
-#include "mythdownloadmanager.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythsocket.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythtv/io/mythmediabuffer.h"
+#include "libmythtv/recordinginfo.h"
 
 #include "sockethandler/filetransfer.h"
 #include "requesthandler/deletethread.h"

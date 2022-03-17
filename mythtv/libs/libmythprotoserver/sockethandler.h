@@ -7,8 +7,8 @@
 #include <QMutex>
 #include <QStringList>
 
-#include "mythsocket.h"
-#include "referencecounter.h"
+#include "libmythbase/mythsocket.h"
+#include "libmythbase/referencecounter.h"
 #include "mythprotoserverexp.h"
 
 class MythSocketManager;

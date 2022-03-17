@@ -3,15 +3,14 @@
 
 // C++ headers
 #include <cstdint>
+#include <vector>
 
 #include <QMutex>
 #include <QString>
 #include <QWaitCondition>
 
-#include <vector>
-
-#include "mythsocket.h"
-#include "sockethandler.h"
+#include "libmythbase/mythsocket.h"
+#include "libmythprotoserver/sockethandler.h"
 
 class ProgramInfo;
 class MythMediaBuffer;

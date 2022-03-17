@@ -11,11 +11,12 @@
 #include <QWaitCondition>
 
 // MythTV
-#include "socketrequesthandler.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythsocket.h"
+#include "libmythbase/serverpool.h"
+
 #include "sockethandler.h"
-#include "mthreadpool.h"
-#include "mythsocket.h"
-#include "serverpool.h"
+#include "socketrequesthandler.h"
 
 class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCBs
 {

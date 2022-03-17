@@ -13,7 +13,7 @@
 #include <QWaitCondition>
 
 // MythTV headers
-#include "mthread.h"
+#include "libmythbase/mthread.h"
 #include "requesthandler/fileserverutil.h"
 
 class DeleteThread : public QObject, public MThread

@@ -4,8 +4,8 @@
 #include <QEvent>
 #include <QStringList>
 
-#include "socketrequesthandler.h"
-#include "sockethandler.h"
+#include "libmythprotoserver/sockethandler.h"
+#include "libmythprotoserver/socketrequesthandler.h"
 
 class PROTOSERVER_PUBLIC MessageHandler : public SocketRequestHandler
 {

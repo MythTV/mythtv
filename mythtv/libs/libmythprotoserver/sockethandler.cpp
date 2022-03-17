@@ -1,8 +1,8 @@
 #include <QStringList>
 #include <utility>
 
+#include "libmythbase/mythlogging.h"
 #include "sockethandler.h"
-#include "mythlogging.h"
 
 SocketHandler::SocketHandler(MythSocket *sock, MythSocketManager *parent,
                   QString hostname) :

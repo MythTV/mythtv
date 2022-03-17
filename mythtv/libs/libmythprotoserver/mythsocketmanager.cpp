@@ -11,16 +11,17 @@
 #include <QRunnable>
 
 // MythTV
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/referencecounter.h"
+#include "libmythbase/serverpool.h"
+
 #include "mythsocketmanager.h"
-#include "socketrequesthandler.h"
 #include "sockethandler.h"
-#include "referencecounter.h"
-#include "mythcorecontext.h"
-#include "mythconfig.h"
-#include "mythversion.h"
-#include "mythlogging.h"
-#include "mthread.h"
-#include "serverpool.h"
+#include "socketrequesthandler.h"
 
 #define LOC      QString("MythSocketManager: ")
 

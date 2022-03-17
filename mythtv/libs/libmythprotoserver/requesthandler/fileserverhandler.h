@@ -3,12 +3,11 @@
 
 #include <QMutex>
 
-#include "mythsocketmanager.h"
-#include "filesysteminfo.h"
-#include "mythprotoserverexp.h"
-
-#include "sockethandler/filetransfer.h"
-#include "requesthandler/fileserverutil.h"
+#include "libmythbase/filesysteminfo.h"
+#include "libmythprotoserver/mythprotoserverexp.h"
+#include "libmythprotoserver/mythsocketmanager.h"
+#include "libmythprotoserver/requesthandler/fileserverutil.h"
+#include "libmythprotoserver/sockethandler/filetransfer.h"
 
 class PROTOSERVER_PUBLIC FileServerHandler : public SocketRequestHandler
 {

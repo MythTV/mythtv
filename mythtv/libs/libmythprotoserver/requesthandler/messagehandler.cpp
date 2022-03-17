@@ -1,5 +1,5 @@
-#include "mythcorecontext.h"
-#include "mythevent.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythevent.h"
 
 #include "requesthandler/messagehandler.h"
 

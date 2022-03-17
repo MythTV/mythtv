@@ -4,13 +4,14 @@
 #include <QString>
 #include <QStringList>
 
-#include "mythsocket.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsocket.h"
+
 #include "mythsocketmanager.h"
-#include "socketrequesthandler.h"
 #include "sockethandler.h"
-#include "mythlogging.h"
-#include "mythcorecontext.h"
-#include "compat.h"
+#include "socketrequesthandler.h"
 
 #include "requesthandler/outboundhandler.h"
 

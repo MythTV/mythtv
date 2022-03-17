@@ -13,8 +13,9 @@
 #include <QFile>
 #include <QMap>
 
+#include "libmyth/programinfo.h"
+
 #include "requesthandler/fileserverutil.h"
-#include "programinfo.h"
 
 DeleteHandler::DeleteHandler(void) :
     ReferenceCounter("DeleteHandler")
