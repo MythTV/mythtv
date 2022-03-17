@@ -7,11 +7,12 @@
 #include <QList>
 #include <QDateTime>
 
-#include "mythtvexp.h"
-#include "mythlogging.h"
-#include "visual.h"
-#include "mythrender_base.h"
-#include "mythpainter.h"
+#include "libmyth/visual.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/mythtvexp.h"
+#include "libmythui/mythpainter.h"
+#include "libmythui/mythrender_base.h"
+
 #include "videovisualdefs.h"
 
 using namespace std::chrono_literals;

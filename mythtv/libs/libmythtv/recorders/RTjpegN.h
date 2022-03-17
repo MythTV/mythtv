@@ -38,7 +38,7 @@ using RTjpegData16 = std::array<int16_t,64>;
 using RTjpegData32 = std::array<int32_t,64>;
 
 #ifdef MMX
-#include "ffmpeg-mmx.h"
+#include "libmythbase/ffmpeg-mmx.h"
 #endif
 
 /* Format definitions */

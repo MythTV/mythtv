@@ -9,11 +9,12 @@
 #include <sys/select.h>
 #endif
 
-#include "mythlogging.h"
-#include "mythdbcon.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
+
 #include "atscstreamdata.h"
-#include "mpegtables.h"
 #include "atsctables.h"
+#include "mpegtables.h"
 
 #include "v4lchannel.h"
 #include "v4l2encrecorder.h"

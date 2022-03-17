@@ -6,7 +6,7 @@
 #include <utility>
 
 // MythTV includes
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "mpegtables.h"
 #include "asichannel.h"
 

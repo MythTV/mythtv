@@ -10,12 +10,13 @@
 // Qt
 #include <QMap>
 
-#include "tspacket.h"
-#include "mythtimer.h"
+#include "libmythbase/mythtimer.h"
+#include "libmythtv/eitscanner.h"
+#include "libmythtv/mythtvexp.h"
+
 #include "streamlisteners.h"
-#include "eitscanner.h"
-#include "mythtvexp.h"
 #include "tablestatus.h"
+#include "tspacket.h"
 
 class EITHelper;
 class PSIPTable;

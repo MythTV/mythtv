@@ -11,8 +11,8 @@
 #include "dvbdescriptors.h"
 #include "iso6937tables.h"
 #include "freesat_huffman.h"
-#include "mythlogging.h"
-#include "programinfo.h"
+#include "libmythbase/mythlogging.h"
+#include "libmyth/programinfo.h"
 
 
 static QString decode_iso6937(const unsigned char *buf, uint length)

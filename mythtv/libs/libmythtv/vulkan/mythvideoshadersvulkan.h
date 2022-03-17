@@ -2,8 +2,8 @@
 #define MYTHVIDEOSHADERSVULKAN_H
 
 // MythTV
-#include "vulkan/mythcombobuffervulkan.h"
-#include "vulkan/mythshadervulkan.h"
+#include "libmythui/vulkan/mythcombobuffervulkan.h"
+#include "libmythui/vulkan/mythshadervulkan.h"
 
 #define VideoVertex450   (VK_SHADER_STAGE_VERTEX_BIT   | (1 << 6))
 #define VideoFragment450 (VK_SHADER_STAGE_VERTEX_BIT   | (1 << 7))

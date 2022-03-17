@@ -22,6 +22,8 @@
  */
 
 // MythTV includes
+#include "libmythbase/mythlogging.h"
+
 #include "dvbstreamhandler.h"
 #include "mpegstreamdata.h"
 #include "tsstreamdata.h"
@@ -29,7 +31,6 @@
 #include "dvbchannel.h"
 #include "io/mythmediabuffer.h"
 #include "tv_rec.h"
-#include "mythlogging.h"
 
 #define LOC QString("DVBRec[%1](%2): ") \
             .arg(m_tvrec ? m_tvrec->GetInputId() : -1).arg(m_videodevice)

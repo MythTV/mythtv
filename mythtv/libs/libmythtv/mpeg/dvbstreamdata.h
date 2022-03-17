@@ -3,8 +3,9 @@
 #ifndef DVBSTREAMDATA_H_
 #define DVBSTREAMDATA_H_
 
+#include "libmythtv/mythtvexp.h"
+
 #include "mpegstreamdata.h"
-#include "mythtvexp.h"
 #include "tablestatus.h"
 
 using nit_ptr_t       = NetworkInformationTable*;

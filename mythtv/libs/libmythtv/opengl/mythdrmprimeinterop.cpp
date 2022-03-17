@@ -4,8 +4,8 @@
 #include "mythdrmprimeinterop.h"
 
 #ifdef USING_DRM_VIDEO
-#include "mythmainwindow.h"
-#include "platforms/mythdisplaydrm.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/platforms/mythdisplaydrm.h"
 #endif
 
 // FFmpeg

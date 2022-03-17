@@ -17,7 +17,7 @@
 #if USING_OSX_FIREWIRE
 #include "darwinfirewiredevice.h"
 #endif
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "mpegtables.h"
 
 #define LOC      QString("FireDev(%1): ").arg(guid_to_string(m_guid))

@@ -12,15 +12,15 @@
 #include <QVector>
 
 // MythTV includes
-#include "satiprtsp.h"
-#include "mythlogging.h"
-#include "mythsocket.h"
-#include "rtppacketbuffer.h"
-#include "udppacketbuffer.h"
-#include "rtptsdatapacket.h"
-#include "satipstreamhandler.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsocket.h"
 #include "rtcpdatapacket.h"
+#include "rtppacketbuffer.h"
+#include "rtptsdatapacket.h"
 #include "satiprtcppacket.h"
+#include "satiprtsp.h"
+#include "satipstreamhandler.h"
+#include "udppacketbuffer.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,15,2)
 #define capturedView capturedRef

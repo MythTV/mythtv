@@ -9,9 +9,9 @@
 #include <utility>
 
 // MythTV headers
+#include "libmythbase/mythlogging.h"
 #include "interactivetv.h"
 #include "mhi.h"
-#include "mythlogging.h"
 
 InteractiveTV::InteractiveTV(MythPlayerCaptionsUI *Player)
   : m_context(new MHIContext(this)),

@@ -1,7 +1,7 @@
 // MythTV
-#include "mythlogging.h"
-#include "vulkan/mythwindowvulkan.h"
-#include "vulkan/mythuniformbuffervulkan.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/vulkan/mythuniformbuffervulkan.h"
+#include "libmythui/vulkan/mythwindowvulkan.h"
 #include "visualisations/vulkan/mythvisualvulkan.h"
 
 #include <utility>

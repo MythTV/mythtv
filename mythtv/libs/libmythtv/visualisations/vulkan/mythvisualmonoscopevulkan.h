@@ -2,7 +2,7 @@
 #define MYTHVISUALMONOSCOPEVULKAN_H
 
 // MythTV
-#include "vulkan/mythrendervulkan.h"
+#include "libmythui/vulkan/mythrendervulkan.h"
 #include "visualisations/vulkan/mythvisualvulkan.h"
 #include "visualisations/videovisualmonoscope.h"
 

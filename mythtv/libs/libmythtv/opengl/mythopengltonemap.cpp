@@ -1,5 +1,5 @@
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "opengl/mythopenglcomputeshaders.h"
 #include "opengl/mythopengltonemap.h"
 

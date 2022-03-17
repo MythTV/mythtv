@@ -8,9 +8,9 @@
 #include <vector>
 
 // MythTV headers
+#include "libmythbase/mythlogging.h"
 #include "darwinfirewiredevice.h"
 #include "darwinavcinfo.h"
-#include "mythlogging.h"
 
 #ifndef kIOFireWireAVCLibUnitInterfaceID2
 #define kIOFireWireAVCLibUnitInterfaceID2 \

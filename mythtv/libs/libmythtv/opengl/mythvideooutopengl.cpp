@@ -2,19 +2,20 @@
 #include <utility>
 
 // MythTV
-#include "mythcontext.h"
-#include "mythmainwindow.h"
+#include "libmyth/mythcontext.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuihelper.h"
+#include "libmythui/opengl/mythopenglperf.h"
+#include "libmythui/opengl/mythpainteropengl.h"
+#include "libmythui/opengl/mythrenderopengl.h"
+
+#include "decoders/mythcodeccontext.h"
 #include "mythplayer.h"
 #include "mythvideoprofile.h"
-#include "osd.h"
-#include "mythuihelper.h"
-#include "decoders/mythcodeccontext.h"
-#include "opengl/mythopenglperf.h"
-#include "opengl/mythrenderopengl.h"
-#include "opengl/mythpainteropengl.h"
 #include "opengl/mythopenglinterop.h"
 #include "opengl/mythopenglvideo.h"
 #include "opengl/mythvideooutopengl.h"
+#include "osd.h"
 
 #define LOC QString("VidOutGL: ")
 

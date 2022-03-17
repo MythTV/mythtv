@@ -6,7 +6,7 @@
 #include <QString>
 
 // MythTV includes
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "mpegtables.h"
 #include "tv_rec.h"
 #include "satiputils.h"

@@ -17,12 +17,13 @@
 #endif
 
 // MythTV headers
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythtimer.h"
+
+#include "cardutil.h"
+#include "channelbase.h"
 #include "signalmonitorlistener.h"
 #include "signalmonitorvalue.h"
-#include "channelbase.h"
-#include "mythtimer.h"
-#include "cardutil.h"
-#include "mthread.h"
 
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_DEBUG, \
     QString("SM(%1)::%2: %3") .arg(channel->GetDevice()).arg(FUNC).arg(<(MSG)));

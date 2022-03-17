@@ -11,13 +11,14 @@
 #include <thread> // for sleep_for
 
 // MythTV headers
+#include "libmythbase/mythlogging.h"
+
 #include "hdhrstreamhandler.h"
 #include "hdhrchannel.h"
 #include "dtvsignalmonitor.h"
 #include "streamlisteners.h"
 #include "mpegstreamdata.h"
 #include "cardutil.h"
-#include "mythlogging.h"
 
 #ifdef NEED_HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR
 static int hdhomerun_device_selector_load_from_str(struct hdhomerun_device_selector_t *hds, char *device_str);

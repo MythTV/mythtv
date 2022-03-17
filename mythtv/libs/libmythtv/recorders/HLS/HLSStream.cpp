@@ -3,7 +3,7 @@
 #include <array>
 #include <utility>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 #include "HLSReader.h"
 #include "HLSStream.h"

@@ -11,9 +11,10 @@
 #include <QVector>
 
 // MythTV includes
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsocket.h"
+
 #include "cetonrtsp.h"
-#include "mythlogging.h"
-#include "mythsocket.h"
 
 
 #define LOC QString("CetonRTSP(%1): ").arg(m_requestUrl.toString())

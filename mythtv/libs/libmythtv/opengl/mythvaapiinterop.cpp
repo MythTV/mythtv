@@ -1,6 +1,6 @@
 ﻿// MythTV
 #ifdef USING_DRM_VIDEO
-#include "platforms/mythdisplaydrm.h"
+#include "libmythui/platforms/mythdisplaydrm.h"
 #endif
 
 #include "mythvideoout.h"

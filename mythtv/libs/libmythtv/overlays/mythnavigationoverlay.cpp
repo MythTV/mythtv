@@ -1,11 +1,11 @@
 // MythTV
-#include "mythmainwindow.h"
-#include "mythdialogbox.h"
-#include "mythuigroup.h"
-#include "mythuibutton.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuigroup.h"
 #include "mythplayerui.h"
-#include "tv_play.h"
 #include "overlays/mythnavigationoverlay.h"
+#include "tv_play.h"
 
 MythNavigationOverlay::MythNavigationOverlay(MythMainWindow *MainWindow, TV* Tv,
                                              MythPlayerUI *Player, const QString& Name, OSD* Osd)

@@ -1,6 +1,6 @@
 // MythTV
-#include "mythmainwindow.h"
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythui/mythmainwindow.h"
 #include "mythvideocolourspace.h"
 #include "opengl/mythvtbinterop.h"
 

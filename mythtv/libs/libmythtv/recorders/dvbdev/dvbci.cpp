@@ -46,7 +46,7 @@
 
 #include <QString>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 #ifndef MALLOC
 #define MALLOC(type, size)  (type *)malloc(sizeof(type) * (size))

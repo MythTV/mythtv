@@ -18,13 +18,14 @@
 #include <QFile>
 
 // MythTV headers
+#include "libmythbase/exitcodes.h"
+
+#include "cardutil.h"
+#include "dtvsignalmonitor.h"
+#include "mpegstreamdata.h"
+#include "streamlisteners.h"
 #include "v4l2encstreamhandler.h"
 #include "v4lchannel.h"
-#include "dtvsignalmonitor.h"
-#include "streamlisteners.h"
-#include "mpegstreamdata.h"
-#include "cardutil.h"
-#include "exitcodes.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
   #define loadRelaxed load

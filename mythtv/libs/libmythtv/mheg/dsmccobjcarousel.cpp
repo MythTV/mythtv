@@ -8,12 +8,12 @@
 #undef Z_NULL
 #define Z_NULL nullptr
 
+#include "libmythbase/mythlogging.h"
+
 #include "dsmccobjcarousel.h"
 #include "dsmccreceiver.h"
 #include "dsmcccache.h"
 #include "dsmcc.h"
-
-#include "mythlogging.h"
 
 // Construct the data for a new module from a DII message.
 DSMCCCacheModuleData::DSMCCCacheModuleData(DsmccDii *dii,

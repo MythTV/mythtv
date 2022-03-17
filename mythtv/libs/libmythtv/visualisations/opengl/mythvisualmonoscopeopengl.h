@@ -2,7 +2,7 @@
 #define MYTHVISUALMONOSCOPEOPENGL_H
 
 // MythTV
-#include "opengl/mythrenderopengl.h"
+#include "libmythui/opengl/mythrenderopengl.h"
 #include "visualisations/videovisualmonoscope.h"
 
 // Vertex buffer + Hue,Alpha,Zoom

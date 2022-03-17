@@ -12,13 +12,6 @@
 #define MMX
 #endif
 
-#include "mythconfig.h"
-
-#undef HAVE_AV_CONFIG_H
-extern "C" {
-#include "libavcodec/avcodec.h"
-}
-
 // C++ std headers
 #include <cstdint>
 #include <ctime>
@@ -28,14 +21,20 @@ extern "C" {
 #include <QString>
 
 // MythTV headers
-#include "v4lrecorder.h"
-#include "format.h"
-#include "captions/cc608decoder.h"
-#include "lzo/lzo1x.h"
-#include "mthread.h"
-#include "mythframe.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythtv/captions/cc608decoder.h"
+#include "libmythtv/format.h"
+#include "libmythtv/mythframe.h"
+#include "libmythtv/mythtvexp.h"
 
-#include "mythtvexp.h"
+#include "lzo/lzo1x.h"
+#include "v4lrecorder.h"
+
+#undef HAVE_AV_CONFIG_H
+extern "C" {
+#include "libavcodec/avcodec.h"
+}
 
 #define KEYFRAMEDIST   30
 

@@ -1,5 +1,5 @@
 // MythTV
-#include "vulkan/mythwindowvulkan.h"
+#include "libmythui/vulkan/mythwindowvulkan.h"
 #include "mythvisualcirclesvulkan.h"
 
 #define CircleVertex450    (VK_SHADER_STAGE_VERTEX_BIT   | (1 << 6))

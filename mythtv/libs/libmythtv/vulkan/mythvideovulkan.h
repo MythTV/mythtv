@@ -2,10 +2,11 @@
 #define MYTHVULKANVIDEO_H
 
 // MythTV
+#include "libmythui/vulkan/mythrendervulkan.h"
+
 #include "mythframe.h"
-#include "videoouttypes.h"
 #include "mythvideogpu.h"
-#include "vulkan/mythrendervulkan.h"
+#include "videoouttypes.h"
 
 // Std
 #include <vector>

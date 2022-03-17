@@ -1,5 +1,5 @@
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "vulkan/mythvideotexturevulkan.h"
 
 #define LOC QString("VulkanVidTex: ")

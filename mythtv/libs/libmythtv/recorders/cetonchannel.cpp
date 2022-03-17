@@ -6,12 +6,13 @@
  */
 
 // MythTV includes
-#include "cetonstreamhandler.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
+
 #include "cetonchannel.h"
-#include "videosource.h"
-#include "mythlogging.h"
+#include "cetonstreamhandler.h"
 #include "channelutil.h"
-#include "mythdbcon.h"
+#include "videosource.h"
 
 #define LOC QString("CetonChan[%1](%2): ").arg(m_inputId).arg(CetonChannel::GetDevice())
 

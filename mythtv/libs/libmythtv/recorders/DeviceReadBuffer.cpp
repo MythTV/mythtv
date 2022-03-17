@@ -1,11 +1,12 @@
 #include <algorithm>
 
+#include "libmythbase/compat.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+
 #include "DeviceReadBuffer.h"
-#include "mythcorecontext.h"
-#include "mythlogging.h"
 #include "tspacket.h"
-#include "mthread.h"
-#include "compat.h"
 
 #ifndef _WIN32
 #include <sys/poll.h>

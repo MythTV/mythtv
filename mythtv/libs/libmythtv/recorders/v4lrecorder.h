@@ -2,11 +2,12 @@
 #ifndef V4L_RECORDER_H
 #define V4L_RECORDER_H
 
-#include "dtvrecorder.h"
-#include "captions/cc608decoder.h"
-#include "vbitext/vt.h"
-#include "mthread.h"
-#include "tv.h" // for VBIMode
+#include "libmythbase/mthread.h"
+
+#include "libmythtv/captions/cc608decoder.h"
+#include "libmythtv/recorders/dtvrecorder.h"
+#include "libmythtv/recorders/vbitext/vt.h"
+#include "libmythtv/tv.h" // for VBIMode
 
 class VBI608Extractor;
 class VBIThread;

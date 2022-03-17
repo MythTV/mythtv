@@ -12,11 +12,12 @@
 #include <QMutex>
 #include <QMap>
 
-#include "recordingquality.h"
-#include "programtypes.h" // for MarkTypes, frm_pos_map_t
-#include "mythtimer.h"
-#include "mythtvexp.h"
-#include "recordingfile.h"
+#include "libmyth/programtypes.h" // for MarkTypes, frm_pos_map_t
+#include "libmythbase/mythtimer.h"
+
+#include "libmythtv/mythtvexp.h"
+#include "libmythtv/recordingfile.h"
+#include "libmythtv/recordingquality.h"
 
 extern "C"
 {

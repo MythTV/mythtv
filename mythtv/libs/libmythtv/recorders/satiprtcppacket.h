@@ -7,7 +7,7 @@
 #include <QDataStream>
 
 // MythTV includes
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 #define RTCP_TYPE_APP  204
 

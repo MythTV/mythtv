@@ -2,7 +2,7 @@
 #define MYTHCHANNELOVERLAY_H
 
 // MythTV
-#include "mythscreentype.h"
+#include "libmythui/mythscreentype.h"
 
 class TV;
 class MythMainWindow;

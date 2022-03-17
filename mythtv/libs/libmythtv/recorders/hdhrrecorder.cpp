@@ -9,6 +9,7 @@
 #include <thread> // for sleep_for
 
 // MythTV includes
+#include "libmythbase/mythlogging.h"
 #include "hdhrstreamhandler.h"
 #include "atscstreamdata.h"
 #include "tsstreamdata.h"
@@ -16,7 +17,6 @@
 #include "hdhrchannel.h"
 #include "io/mythmediabuffer.h"
 #include "tv_rec.h"
-#include "mythlogging.h"
 
 #define LOC QString("HDHRRec[%1]: ") \
             .arg(m_tvrec ? m_tvrec->GetInputId() : -1)

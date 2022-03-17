@@ -2,7 +2,7 @@
 #include "AVCParser.h"
 #include <iostream>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "recorders/dtvrecorder.h" // for FrameRate
 
 

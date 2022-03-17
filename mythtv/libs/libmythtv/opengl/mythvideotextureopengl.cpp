@@ -1,6 +1,6 @@
 // MythTV
-#include "mythlogging.h"
-#include "opengl/mythvideotextureopengl.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/opengl/mythvideotextureopengl.h"
 
 #define LOC QString("MythVidTex: ")
 

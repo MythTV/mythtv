@@ -1,6 +1,10 @@
 #include <algorithm> // for min
 #include <cstdint>
 
+#include "libmyth/programinfo.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
+
 #include "firewirerecorder.h"
 #include "recordingprofile.h"
 #include "firewirechannel.h"
@@ -18,8 +22,6 @@
 #include "hdhrchannel.h"
 #include "iptvchannel.h"
 #include "mythsystemevent.h"
-#include "mythlogging.h"
-#include "programinfo.h"
 #include "asichannel.h"
 #include "dtvchannel.h"
 #include "dvbchannel.h"
@@ -29,7 +31,6 @@
 #include "io/mythmediabuffer.h"
 #include "cardutil.h"
 #include "tv_rec.h"
-#include "mythdate.h"
 #if CONFIG_LIBMP3LAME
 #include "NuppelVideoRecorder.h"
 #endif

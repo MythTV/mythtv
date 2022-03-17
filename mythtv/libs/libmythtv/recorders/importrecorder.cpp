@@ -33,11 +33,12 @@
 #include <QDir>
 
 // MythTV
-#include "mythcommflagplayer.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdirs.h"
+
 #include "importrecorder.h"
-#include "mythdirs.h"
+#include "mythcommflagplayer.h"
 #include "tv_rec.h"
-#include "mythdate.h"
 
 #define TVREC_CARDNUM \
         ((m_tvrec != nullptr) ? QString::number(m_tvrec->GetInputId()) : "NULL")

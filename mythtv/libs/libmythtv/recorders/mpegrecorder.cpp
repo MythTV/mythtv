@@ -19,17 +19,18 @@
 
 #include <linux/videodev2.h>
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 
 // MythTV headers
-#include "mpegrecorder.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+
+#include "cardutil.h"
 #include "io/mythmediabuffer.h"
-#include "mythcorecontext.h"
-#include "programinfo.h"
+#include "mpegrecorder.h"
 #include "recordingprofile.h"
 #include "tv_rec.h"
-#include "mythdate.h"
-#include "cardutil.h"
 
 #define LOC QString("MPEGRec[%1](%2): ") \
             .arg(m_tvrec ? m_tvrec->GetInputId() : -1).arg(m_videodevice)

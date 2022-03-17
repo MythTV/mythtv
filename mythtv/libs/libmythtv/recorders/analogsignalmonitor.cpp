@@ -6,7 +6,7 @@
 #include <sys/ioctl.h>
 #include <poll.h>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "analogsignalmonitor.h"
 #include "v4lchannel.h"
 

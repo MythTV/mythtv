@@ -5,13 +5,13 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "libmythbase/mythlogging.h"
+
 #include "dsmccbiop.h"
 #include "dsmccreceiver.h"
 #include "dsmcccache.h"
 #include "dsmccobjcarousel.h"
 #include "dsmcc.h"
-
-#include "mythlogging.h"
 
 BiopNameComp::~BiopNameComp()
 {

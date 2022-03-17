@@ -5,8 +5,8 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#include "mythlogging.h"
-#include "mythdbcon.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
 
 #include "cetonsignalmonitor.h"
 #include "cetonstreamhandler.h"

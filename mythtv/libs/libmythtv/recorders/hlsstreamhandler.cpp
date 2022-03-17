@@ -10,7 +10,7 @@
 
 // MythTV headers
 #include "hlsstreamhandler.h"
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "recorders/HLS/HLSReader.h"
 
 #define LOC QString("HLSSH[%1](%2): ").arg(m_inputId).arg(m_device)

@@ -16,6 +16,11 @@
 #include <QCoreApplication>
 
 // MythTV headers
+#include "libmythbase/compat.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+
 #ifdef USING_OSX_FIREWIRE
 #include "darwinfirewiredevice.h"
 #endif
@@ -23,7 +28,6 @@
 #include "linuxfirewiredevice.h"
 #endif
 #include "firewirechannel.h"
-#include "mythcorecontext.h"
 #include "cetonchannel.h"
 #include "dummychannel.h"
 #include "tvremoteutil.h"
@@ -32,16 +36,13 @@
 #include "frequencies.h"
 #include "hdhrchannel.h"
 #include "iptvchannel.h"
-#include "mythlogging.h"
 #include "asichannel.h"
 #include "dtvchannel.h"
 #include "dvbchannel.h"
 #include "v4lchannel.h"
 #include "ExternalChannel.h"
 #include "sourceutil.h"
-#include "exitcodes.h"
 #include "cardutil.h"
-#include "compat.h"
 #include "inputinfo.h"
 #include "satipchannel.h"
 

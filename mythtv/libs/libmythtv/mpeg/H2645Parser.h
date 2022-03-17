@@ -34,13 +34,11 @@
 
 #include <QString>
 #include <cstdint>
-#include "mythconfig.h"
-#include "compat.h" // for uint on Darwin, MinGW
-#include "recorders/recorderbase.h" // for ScanType
 
-#if 1
-#include "mythlogging.h"
-#endif
+#include "libmythbase/compat.h" // for uint on Darwin, MinGW
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/recorders/recorderbase.h" // for ScanType
 
 #ifndef INT_BIT
 #define INT_BIT (CHAR_BIT * sizeof(int))

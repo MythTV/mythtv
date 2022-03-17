@@ -2,13 +2,14 @@
 
 #include <algorithm> // for lower_bound
 
+#include "libmythbase/compat.h"
+
 #include "dtvchannel.h"
 #include "dtvsignalmonitor.h"
 #include "scanstreamdata.h"
 #include "mpegtables.h"
 #include "atsctables.h"
 #include "dvbtables.h"
-#include "compat.h"
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_INFO, \

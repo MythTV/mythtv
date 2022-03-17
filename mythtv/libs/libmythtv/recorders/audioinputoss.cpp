@@ -34,7 +34,7 @@
 
 #include <QtGlobal>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 #define LOC     QString("AudioInOSS: ")
 #define LOC_DEV QString("AudioInOSS(%1): ").arg(m_deviceName.constData())

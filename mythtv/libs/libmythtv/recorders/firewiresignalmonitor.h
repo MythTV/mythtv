@@ -11,9 +11,9 @@
 #include <QMap>
 
 // MythTV headers
+#include "libmythbase/mthread.h"
 #include "dtvsignalmonitor.h"
 #include "firewiredevice.h"
-#include "mthread.h"
 
 class FirewireChannel;
 

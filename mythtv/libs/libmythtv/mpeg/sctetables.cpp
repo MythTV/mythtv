@@ -19,8 +19,8 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
+#include "libmythbase/stringutil.h"
 #include "sctetables.h"
-#include "stringutil.h"
 
 QString CarrierDefinitionSubtable::toString(void) const
 {

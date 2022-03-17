@@ -12,7 +12,7 @@
 #include <QRecursiveMutex>
 #endif
 
-#include "mythdate.h"
+#include "libmythbase/mythdate.h"
 #include "DeviceReadBuffer.h"
 #include "mpegstreamdata.h"
 #include "streamhandler.h"

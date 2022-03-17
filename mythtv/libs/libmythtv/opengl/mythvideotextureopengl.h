@@ -2,7 +2,7 @@
 #define MYTHVIDEOTEXTURE_H
 
 // MythTV
-#include "opengl/mythrenderopengl.h"
+#include "libmythui/opengl/mythrenderopengl.h"
 #include "mythavutil.h"
 #include "mythframe.h"
 

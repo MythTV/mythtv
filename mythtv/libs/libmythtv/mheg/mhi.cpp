@@ -17,24 +17,25 @@
 #include <cstring>                      // for memcpy, memset
 #include <deque>                        // for _Deque_iterator, operator!=
 
+#include "libmythbase/mthread.h"        // for MThread
+#include "libmythbase/mythcorecontext.h"// for MythCoreContext, etc
+#include "libmythbase/mythdb.h"         // for MythDB
+#include "libmythbase/mythdbcon.h"      // for MSqlQuery
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythevent.h"      // for MythEvent
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythimage.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythpainter.h"
+#include "libmythui/mythrect.h"         // for MythRect
+#include "libmythui/mythuiactions.h"    // for ACTION_0, ACTION_1, etc
+#include "libmythui/mythuiimage.h"
+
 #include "dsmcc.h"                      // for Dsmcc
-#include "interactivetv.h"              // for InteractiveTV
 #include "interactivescreen.h"
-#include "mythpainter.h"
-#include "mythimage.h"
-#include "mythuiimage.h"
-#include "mythdirs.h"
-#include "mythlogging.h"
-#include "mythmainwindow.h"
+#include "interactivetv.h"              // for InteractiveTV
 #include "mythavutil.h"
-#include "mthread.h"                    // for MThread
-#include "mythcorecontext.h"            // for MythCoreContext, etc
-#include "mythdb.h"                     // for MythDB
-#include "mythdbcon.h"                  // for MSqlQuery
-#include "mythevent.h"                  // for MythEvent
 #include "mythplayerui.h"
-#include "mythrect.h"                   // for MythRect
-#include "mythuiactions.h"              // for ACTION_0, ACTION_1, etc
 #include "tv_actions.h"                 // for ACTION_MENUTEXT, etc
 
 extern "C" {

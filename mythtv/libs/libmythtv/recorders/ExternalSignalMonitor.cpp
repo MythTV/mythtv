@@ -9,8 +9,9 @@
 #include <sys/select.h>
 #endif
 
-#include "mythlogging.h"
-#include "mythdbcon.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
+
 #include "ExternalSignalMonitor.h"
 #include "atscstreamdata.h"
 #include "mpegtables.h"

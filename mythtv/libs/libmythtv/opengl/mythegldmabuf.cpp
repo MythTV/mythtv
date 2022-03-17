@@ -1,6 +1,7 @@
 // MythTV
+#include "libmythui/opengl/mythrenderopengl.h"
+
 #include "fourcc.h"
-#include "opengl/mythrenderopengl.h"
 #include "mythavutil.h"
 #include "opengl/mythvideotextureopengl.h"
 #include "opengl/mythegldmabuf.h"

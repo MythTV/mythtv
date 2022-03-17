@@ -9,8 +9,8 @@
 #include <QMutex>
 #include <QMap>
 
+#include "libmythbase/mythdate.h"
 #include "streamhandler.h"
-#include "mythdate.h"
 
 class ASIStreamHandler;
 class DTVSignalMonitor;

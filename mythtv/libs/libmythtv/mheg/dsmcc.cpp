@@ -4,7 +4,7 @@
  */
 #include <cstdint>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 #include "dsmccreceiver.h"
 #include "dsmccbiop.h"

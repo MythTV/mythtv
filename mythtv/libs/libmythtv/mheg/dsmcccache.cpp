@@ -6,12 +6,12 @@
 
 #include <QStringList>
 
+#include "libmythbase/mythlogging.h"
+
 #include "dsmcccache.h"
 #include "dsmccbiop.h"
 #include "dsmccreceiver.h"
 #include "dsmcc.h"
-
-#include "mythlogging.h"
 
 /** \class DSMCCCache
  *

@@ -12,21 +12,22 @@
 #include <QStringList>
 #include <QtEndian>
 
-#include <iostream>
+#include "libmyth/mythcontext.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
 
-#include "mythmiscutil.h"
-#include "mythcontext.h"
 #include "NuppelVideoRecorder.h"
-#include "channelbase.h"
-#include "recordingprofile.h"
-#include "tv_rec.h"
-#include "tv_play.h"
 #include "audioinput.h"
-#include "mythlogging.h"
+#include "channelbase.h"
+#include "fourcc.h"
+#include "mythavutil.h"
+#include "mythsystemevent.h"
+#include "recordingprofile.h"
+#include "tv_play.h"
+#include "tv_rec.h"
 #include "vbitext/cc.h"
 #include "vbitext/vbi.h"
-#include "mythavutil.h"
-#include "fourcc.h"
 
 #if HAVE_BIGENDIAN
 extern "C" {
@@ -75,9 +76,6 @@ extern "C" {
 
 #include "io/mythmediabuffer.h"
 #include "RTjpegN.h"
-
-#include "programinfo.h"
-#include "mythsystemevent.h"
 
 #define LOC QString("NVR(%1): ").arg(m_videodevice)
 

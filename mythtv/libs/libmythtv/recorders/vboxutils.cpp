@@ -7,11 +7,11 @@
 #include <QDomDocument>
 
 // MythTV headers
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythtimer.h"
+#include "libmythupnp/ssdp.h"
 #include "vboxutils.h"
-#include "mythdownloadmanager.h"
-#include "mythlogging.h"
-#include "ssdp.h"
-#include "mythtimer.h"
 
 #define LOC QString("VBox: ")
 

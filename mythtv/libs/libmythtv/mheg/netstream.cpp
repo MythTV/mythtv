@@ -38,9 +38,9 @@
 #endif
 
 // Myth
-#include "mythlogging.h"
-#include "mythcorecontext.h"
-#include "mythdirs.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
 #define qEnvironmentVariable std::getenv

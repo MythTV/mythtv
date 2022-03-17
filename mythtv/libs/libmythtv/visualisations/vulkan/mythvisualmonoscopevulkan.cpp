@@ -1,8 +1,8 @@
 // MythTV
-#include "vulkan/mythvertexbuffervulkan.h"
-#include "vulkan/mythuniformbuffervulkan.h"
-#include "vulkan/mythwindowvulkan.h"
-#include "vulkan/mythshadersvulkan.h"
+#include "libmythui/vulkan/mythshadersvulkan.h"
+#include "libmythui/vulkan/mythuniformbuffervulkan.h"
+#include "libmythui/vulkan/mythvertexbuffervulkan.h"
+#include "libmythui/vulkan/mythwindowvulkan.h"
 #include "visualisations/vulkan/mythvisualmonoscopevulkan.h"
 
 #define LineVertex450    (VK_SHADER_STAGE_VERTEX_BIT   | (1 << 6))

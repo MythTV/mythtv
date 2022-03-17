@@ -24,11 +24,11 @@
 #include <vector>
 
 // MythTV headers
-#include "darwinfirewiredevice.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythtimer.h"
 #include "darwinavcinfo.h"
-#include "mythlogging.h"
-#include "mthread.h"
-#include "mythtimer.h"
+#include "darwinfirewiredevice.h"
 
 // Apple Firewire example headers
 #include <AVCVideoServices/StringLogger.h>

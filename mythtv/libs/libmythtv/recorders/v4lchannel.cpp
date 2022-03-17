@@ -18,12 +18,13 @@
 #include <linux/videodev2.h>
 
 // MythTV headers
-#include "v4lchannel.h"
+#include "libmythbase/mythdb.h"
+
+#include "cardutil.h"
+#include "channelutil.h"
 #include "frequencies.h"
 #include "tv_rec.h"
-#include "mythdb.h"
-#include "channelutil.h"
-#include "cardutil.h"
+#include "v4lchannel.h"
 
 #define DEBUG_ATTRIB 1
 

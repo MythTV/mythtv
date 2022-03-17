@@ -1,8 +1,8 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2006, Daniel Thor Kristjansson
 
-#include "mythlogging.h"
-#include "mythdbcon.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
 
 #include "satipsignalmonitor.h"
 #include "satipstreamhandler.h"

@@ -11,11 +11,12 @@
 #include <QMutexLocker>
 
 // MythTV headers
+#include "libmythbase/mythlogging.h"
+
 #include "dtvsignalmonitor.h"
 #include "streamlisteners.h"
 #include "mpegstreamdata.h"
 #include "cardutil.h"
-#include "mythlogging.h"
 #include "satiputils.h"
 #include "satipchannel.h"
 #include "satipstreamhandler.h"

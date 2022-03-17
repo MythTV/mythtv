@@ -17,9 +17,9 @@
 #include <QApplication>
 
 // Myth
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "netstream.h"
-#include "mythlogging.h"
-#include "mythcorecontext.h"
 
 #define LOC QString("[mhegic] ")
 

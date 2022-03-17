@@ -3,8 +3,9 @@
 #ifndef ATSCSTREAMDATA_H_
 #define ATSCSTREAMDATA_H_
 
+#include "libmythtv/mythtvexp.h"
+
 #include "mpegstreamdata.h"
-#include "mythtvexp.h"
 #include "tablestatus.h"
 
 using pid_tsid_vec_t     = QMap<uint, uint_vec_t>;

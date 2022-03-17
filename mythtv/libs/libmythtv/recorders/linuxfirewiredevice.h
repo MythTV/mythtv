@@ -10,7 +10,7 @@
 #include <QRunnable>
 
 #include "firewiredevice.h"
-#include "mthread.h"
+#include "libmythbase/mthread.h"
 
 class LFDPriv;
 class LinuxAVCInfo;

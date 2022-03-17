@@ -18,11 +18,12 @@
  * 02110-1301, USA.
  */
 
-#include "mythlogging.h"
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythlogging.h"
+
 #include "audioinput.h"
-#include "audioinputoss.h"
 #include "audioinputalsa.h"
+#include "audioinputoss.h"
 
 #define LOC     QString("AudioIn: ")
 

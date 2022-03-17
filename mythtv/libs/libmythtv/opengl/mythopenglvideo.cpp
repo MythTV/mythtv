@@ -1,17 +1,17 @@
+// std
+#include <utility>
+
 // Qt
 #include <QPen>
 
 // MythTV
-#include "mythcontext.h"
-#include "tv.h"
-#include "opengl/mythrenderopengl.h"
+#include "libmyth/mythcontext.h"
+#include "libmythui/opengl/mythrenderopengl.h"
 #include "mythavutil.h"
-#include "opengl/mythopenglvideoshaders.h"
 #include "opengl/mythopengltonemap.h"
 #include "opengl/mythopenglvideo.h"
-
-// std
-#include <utility>
+#include "opengl/mythopenglvideoshaders.h"
+#include "tv.h"
 
 // FFmpeg
 extern "C" {

@@ -3,9 +3,10 @@
 #ifndef SCANSTREAMDATA_H_
 #define SCANSTREAMDATA_H_
 
+#include "libmythtv/mythtvexp.h"
+
 #include "atscstreamdata.h"
 #include "dvbstreamdata.h"
-#include "mythtvexp.h"
 
 class MTV_PUBLIC ScanStreamData :
     public virtual MPEGStreamData,

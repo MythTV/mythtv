@@ -11,6 +11,7 @@
 #include <QString>
 
 // MythTV headers
+#include "libmythbase/mythlogging.h"
 #include "dvbstreamhandler.h"
 #include "dvbchannel.h"
 #include "dtvsignalmonitor.h"
@@ -19,7 +20,6 @@
 #include "cardutil.h"
 #include "dvbtypes.h" // for pid filtering
 #include "diseqc.h" // for rotor retune
-#include "mythlogging.h"
 
 #define LOC      QString("DVBSH[%1](%2): ").arg(m_inputId).arg(m_device)
 

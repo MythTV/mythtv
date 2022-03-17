@@ -9,8 +9,8 @@
 #include <QMutex>
 
 // MythTV headers
+#include "libmythbase/mythsystemlegacy.h"
 #include "channelinfo.h"
-#include "mythsystemlegacy.h"
 #include "tv.h"
 #include "videoouttypes.h" // for PictureAttribute
 

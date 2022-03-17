@@ -31,11 +31,12 @@
 #include <QDateTime>
 
 // MythTV headers
-#include "linuxfirewiredevice.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+
 #include "firewirerecorder.h"
-#include "mythcorecontext.h"
 #include "linuxavcinfo.h"
-#include "mythlogging.h"
+#include "linuxfirewiredevice.h"
 
 #define LOC      QString("LFireDev(%1): ").arg(guid_to_string(m_guid))
 

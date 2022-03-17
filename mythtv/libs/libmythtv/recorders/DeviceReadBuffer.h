@@ -10,10 +10,11 @@
 #include <QWaitCondition>
 #include <QString>
 
-#include "mythbaseutil.h"
-#include "mythtimer.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythbaseutil.h"
+#include "libmythbase/mythtimer.h"
+
 #include "tspacket.h"
-#include "mthread.h"
 
 class DeviceReaderCB
 {

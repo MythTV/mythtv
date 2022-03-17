@@ -7,8 +7,8 @@
 #include <cstdint>
 
 // MythTV headers
+#include "libmythbase/mythrandom.h"
 #include "packetbuffer.h"
-#include "mythrandom.h"
 
 PacketBuffer::PacketBuffer(unsigned int bitrate) :
     m_bitrate(bitrate),

@@ -6,10 +6,10 @@
 #include <QObject>
 
 // MythTV
+#include "libmythui/opengl/mythrenderopengl.h"
 #include "mythvideoout.h"
 #include "mythvideogpu.h"
 #include "videoouttypes.h"
-#include "opengl/mythrenderopengl.h"
 #include "mythavutil.h"
 #include "opengl/mythopenglinterop.h"
 

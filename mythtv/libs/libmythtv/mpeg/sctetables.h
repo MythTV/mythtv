@@ -25,9 +25,10 @@
 #include <cassert>
 
 // MythTV
+#include "libmythbase/iso639.h"
+#include "libmythtv/mythtvexp.h"
+
 #include "mpegtables.h"
-#include "mythtvexp.h"
-#include "iso639.h"
 
 // NOTE: MasterGuideTable defined in atsctables.h
 // NOTE: VirtualChannelTable defined in atsctables.h

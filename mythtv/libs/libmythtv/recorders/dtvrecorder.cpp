@@ -18,16 +18,17 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
+#include "libmyth/programinfo.h"
+#include "libmythbase/mythlogging.h"
+
 #include "atscstreamdata.h"
-#include "mpegstreamdata.h"
-#include "dvbstreamdata.h"
 #include "dtvrecorder.h"
-#include "programinfo.h"
-#include "mythlogging.h"
-#include "mpegtables.h"
+#include "dvbstreamdata.h"
 #include "io/mythmediabuffer.h"
-#include "tv_rec.h"
+#include "mpegstreamdata.h"
+#include "mpegtables.h"
 #include "mythsystemevent.h"
+#include "tv_rec.h"
 
 #include "AVCParser.h"
 #include "HEVCParser.h"

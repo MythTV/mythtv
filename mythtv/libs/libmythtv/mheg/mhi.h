@@ -23,10 +23,11 @@
 #include <QSize>                        // for QSize
 
 // MythTV headers
-#include "mythconfig.h"
-#include "../libmythfreemheg/freemheg.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythdeque.h"
+#include "libmythfreemheg/freemheg.h"
+
 #include "mhegic.h"
-#include "mythdeque.h"
 
 class MythPainter;
 class InteractiveScreen;

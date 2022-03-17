@@ -1,11 +1,11 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "pespacket.h"
 #include "mpegtables.h"
 
 extern "C" {
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 #include "libavutil/crc.h"

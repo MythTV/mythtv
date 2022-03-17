@@ -12,9 +12,9 @@
 #include <QString>
 #include <QMap>
 
-#include "mythcontext.h"
-#include "mythdate.h"
-#include "mythdbcon.h"
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdbcon.h"
 #include "dtvchannel.h"
 #include "dtvconfparserhelpers.h" // for DTVTunerType
 #include "streamlisteners.h"

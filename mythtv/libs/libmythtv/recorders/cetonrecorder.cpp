@@ -6,10 +6,10 @@
  */
 
 // MythTV includes
+#include "libmythbase/mythlogging.h"
 #include "cetonstreamhandler.h"
 #include "cetonrecorder.h"
 #include "cetonchannel.h"
-#include "mythlogging.h"
 #include "tv_rec.h"
 
 #define LOC QString("CetonRec[%1]: ") \

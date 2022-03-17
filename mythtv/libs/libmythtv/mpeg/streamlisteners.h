@@ -2,8 +2,8 @@
 #ifndef STREAMLISTENERS_H
 #define STREAMLISTENERS_H
 
+#include "libmythbase/mythdate.h"
 #include "tspacket.h"
-#include "mythdate.h"
 
 class TSPacket;
 class TSPacket_nonconst;

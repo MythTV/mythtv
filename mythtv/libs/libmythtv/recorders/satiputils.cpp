@@ -7,11 +7,12 @@
 #include <QStringList>
 
 // MythTV headers
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythtimer.h"
+#include "libmythupnp/ssdp.h"
+
 #include "cardutil.h"
-#include "mythlogging.h"
-#include "mythtimer.h"
 #include "satiputils.h"
-#include "ssdp.h"
 
 #define LOC QString("SatIP: ")
 

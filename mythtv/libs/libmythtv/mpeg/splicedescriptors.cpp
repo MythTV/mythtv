@@ -21,8 +21,8 @@
 #ifndef SPLICE_DESCRIPTOR_H
 #define SPLICE_DESCRIPTOR_H
 
+#include "libmythbase/stringutil.h"
 #include "splicedescriptors.h"
-#include "stringutil.h"
 
 desc_list_t SpliceDescriptor::Parse(
     const unsigned char *data, uint len)

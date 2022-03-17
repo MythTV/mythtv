@@ -45,8 +45,8 @@
 #include <thread>
 
 // MythTV headers
-#include "mythconfig.h"
-#include "mythdb.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythdb.h"
 #include "cardutil.h"
 #include "channelutil.h"
 #include "dvbtypes.h"

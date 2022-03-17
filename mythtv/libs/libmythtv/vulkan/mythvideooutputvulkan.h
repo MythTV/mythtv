@@ -3,7 +3,7 @@
 
 // MythTV
 #include "mythvideooutgpu.h"
-#include "vulkan/mythrendervulkan.h"
+#include "libmythui/vulkan/mythrendervulkan.h"
 
 class MythPainterVulkan;
 class MythVideoVulkan;

@@ -1,12 +1,13 @@
 // MythTV
-#include "mythlogging.h"
-#include "mythmainwindow.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/vulkan/mythdebugvulkan.h"
+#include "libmythui/vulkan/mythpaintervulkan.h"
+#include "libmythui/vulkan/mythwindowvulkan.h"
+
 #include "osd.h"
-#include "vulkan/mythwindowvulkan.h"
-#include "vulkan/mythpaintervulkan.h"
-#include "vulkan/mythdebugvulkan.h"
-#include "vulkan/mythvideovulkan.h"
 #include "vulkan/mythvideooutputvulkan.h"
+#include "vulkan/mythvideovulkan.h"
 
 #define LOC QString("VidOutVulkan: ")
 

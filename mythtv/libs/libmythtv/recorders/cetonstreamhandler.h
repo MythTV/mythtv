@@ -15,8 +15,8 @@
 #include <QMap>
 
 // MythTV headers
+#include "libmythbase/mythmiscutil.h"
 #include "iptvstreamhandler.h"
-#include "mythmiscutil.h"
 
 class CetonStreamHandler;
 class CetonChannel;

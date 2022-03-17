@@ -1,8 +1,9 @@
 // MythTV
+#include "libmythbase/mythcorecontext.h"
+#include "libmythui/opengl/mythrenderopengl.h"
+
 #include "mythplayerui.h"
-#include "mythcorecontext.h"
 #include "mythvideocolourspace.h"
-#include "opengl/mythrenderopengl.h"
 #include "opengl/mythopenglinterop.h"
 
 #ifdef USING_VAAPI

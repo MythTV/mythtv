@@ -3,9 +3,10 @@
 
 #include <algorithm>
 
+#include "libmythbase/iso639.h"
+#include "libmythbase/mythlogging.h"
+
 #include "atscdescriptors.h"
-#include "mythlogging.h"
-#include "iso639.h"
 #include "atsc_huffman.h"
 
 QString MultipleStringStructure::CompressionTypeString(uint i, uint j) const

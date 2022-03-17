@@ -18,8 +18,8 @@
 // MythTV headers
 #include "DeviceReadBuffer.h" // for ReaderPausedCB
 #include "mpegstreamdata.h" // for PIDPriority
-#include "mthread.h"
-#include "mythdate.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythdate.h"
 
 class ThreadedFileWriter;
 

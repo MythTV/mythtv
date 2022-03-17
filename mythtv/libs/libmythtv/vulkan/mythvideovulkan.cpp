@@ -2,10 +2,10 @@
 #include <QGuiApplication>
 
 // MythTV
-#include "mythlogging.h"
-#include "vulkan/mythdebugvulkan.h"
-#include "vulkan/mythwindowvulkan.h"
-#include "vulkan/mythpaintervulkan.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/vulkan/mythdebugvulkan.h"
+#include "libmythui/vulkan/mythpaintervulkan.h"
+#include "libmythui/vulkan/mythwindowvulkan.h"
 #include "vulkan/mythvideoshadersvulkan.h"
 #include "vulkan/mythvideotexturevulkan.h"
 #include "vulkan/mythvideovulkan.h"

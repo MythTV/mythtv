@@ -1,5 +1,5 @@
 // MythTV
-#include "opengl/mythrenderopenglshaders.h"
+#include "libmythui/opengl/mythrenderopenglshaders.h"
 #include "mythvisualmonoscopeopengl.h"
 
 MythVisualMonoScopeOpenGL::MythVisualMonoScopeOpenGL(AudioPlayer* Audio, MythRender* Render, bool Fade)

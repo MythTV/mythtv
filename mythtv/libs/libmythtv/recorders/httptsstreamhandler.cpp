@@ -1,9 +1,9 @@
-// MythTV headers
-#include "httptsstreamhandler.h"
-#include "mythlogging.h"
-
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
+
+// MythTV headers
+#include "libmythbase/mythlogging.h"
+#include "httptsstreamhandler.h"
 
 #define LOC QString("HTTPTSSH[%1](%2): ").arg(m_inputId).arg(m_device)
 

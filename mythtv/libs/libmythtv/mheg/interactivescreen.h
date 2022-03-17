@@ -2,7 +2,7 @@
 #define INTERACTIVESCREEN_H
 
 // MythTV
-#include "mythscreentype.h"
+#include "libmythui/mythscreentype.h"
 
 class MythPlayerUI;
 

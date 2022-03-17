@@ -7,17 +7,18 @@
 #include <unistd.h>
 
 // MythTV headers
+#include "libmyth/mythcontext.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
+
 #include "scriptsignalmonitor.h"
 #include "signalmonitor.h"
-#include "mythcontext.h"
-#include "compat.h"
-#include "mythlogging.h"
 #include "tv_rec.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
-#include "mythdate.h"
 
 #ifdef USING_DVB
 #   include "dvbsignalmonitor.h"

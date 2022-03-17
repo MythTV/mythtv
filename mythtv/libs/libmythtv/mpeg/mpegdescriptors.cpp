@@ -3,10 +3,12 @@
 
 #include <climits>
 
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/stringutil.h"
+
 #include "sctedescriptors.h"
 #include "atscdescriptors.h"
 #include "dvbdescriptors.h"
-#include "stringutil.h"
 
 QMutex                RegistrationDescriptor::description_map_lock;
 bool                  RegistrationDescriptor::description_map_initialized = false;
@@ -51,8 +53,6 @@ desc_list_t MPEGDescriptor::ParseAndExclude(
     }
     return tmp;
 }
-
-#include "mythlogging.h"
 
 desc_list_t MPEGDescriptor::ParseOnlyInclude(
     const unsigned char *data, uint len, int excluded_descid)

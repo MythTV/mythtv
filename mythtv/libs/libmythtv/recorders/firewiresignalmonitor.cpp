@@ -6,13 +6,13 @@
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 
-#include "mythdbcon.h"
+#include "libmythbase/mythdbcon.h"
 #include "atscstreamdata.h"
 #include "mpegtables.h"
 #include "atsctables.h"
 #include "firewirechannel.h"
 #include "firewiresignalmonitor.h"
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 #define LOC QString("FireSigMon[%1](%2): ") \
             .arg(m_inputid).arg(m_channel->GetDevice())

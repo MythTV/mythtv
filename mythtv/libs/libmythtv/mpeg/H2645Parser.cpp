@@ -2,7 +2,7 @@
 #include "H2645Parser.h"
 #include <iostream>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "recorders/dtvrecorder.h" // for FrameRate and ScanType
 
 extern "C" {

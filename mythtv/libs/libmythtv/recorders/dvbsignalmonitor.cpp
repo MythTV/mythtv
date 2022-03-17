@@ -10,8 +10,8 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythdbcon.h"
 #include "dvbsignalmonitor.h"
 #include "dvbchannel.h"
 #include "dvbstreamdata.h"

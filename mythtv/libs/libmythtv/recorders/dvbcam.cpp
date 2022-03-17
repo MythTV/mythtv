@@ -49,14 +49,15 @@
 #include <QMap>
 
 // MythTV
-#include "dvbci.h"
-#include "recorderbase.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythlogging.h"
+
 #include "cardutil.h"
 #include "dvbcam.h"
-#include "mthread.h"
 #include "dvbchannel.h"
+#include "dvbci.h"
 #include "dvbrecorder.h"
-#include "mythlogging.h"
+#include "recorderbase.h"
 
 #define LOC QString("DVBCam(%1): ").arg(m_device)
 

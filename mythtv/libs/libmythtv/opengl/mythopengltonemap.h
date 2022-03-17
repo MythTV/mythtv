@@ -5,8 +5,8 @@
 #include <QObject>
 
 // MythTV
+#include "libmythui/opengl/mythrenderopengl.h"
 #include "mythvideocolourspace.h"
-#include "opengl/mythrenderopengl.h"
 #include "opengl/mythvideotextureopengl.h"
 
 class MythOpenGLTonemap : public QObject

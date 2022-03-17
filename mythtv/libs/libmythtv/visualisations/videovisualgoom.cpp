@@ -1,8 +1,8 @@
 // MythTV
-#include "mythlogging.h"
-#include "mythmainwindow.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythmainwindow.h"
 #ifdef USING_OPENGL
-#include "opengl/mythrenderopengl.h"
+#include "libmythui/opengl/mythrenderopengl.h"
 #endif
 #include "videovisualgoom.h"
 

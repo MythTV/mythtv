@@ -5,8 +5,8 @@
 #include <QObject>
 
 // MythTV
-#include "opengl/mythrenderopengl.h"
-#include "referencecounter.h"
+#include "libmythbase/referencecounter.h"
+#include "libmythui/opengl/mythrenderopengl.h"
 #include "videoouttypes.h"
 #include "mythframe.h"
 #include "opengl/mythvideotextureopengl.h"

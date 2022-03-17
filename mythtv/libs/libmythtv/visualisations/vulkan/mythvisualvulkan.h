@@ -2,7 +2,7 @@
 #define MYTHVISUALVULKAN_H
 
 // MythTV
-#include "vulkan/mythshadervulkan.h"
+#include "libmythui/vulkan/mythshadervulkan.h"
 
 class MythUniformBufferVulkan;
 

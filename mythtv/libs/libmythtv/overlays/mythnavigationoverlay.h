@@ -2,7 +2,7 @@
 #define MYTHNAVIGATIONOVERLAY_H
 
 // MythTV
-#include "mythscreentype.h"
+#include "libmythui/mythscreentype.h"
 #include "mythplayerstate.h"
 
 class MythMainWindow;

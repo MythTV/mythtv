@@ -14,13 +14,14 @@
 #include <QUrl>
 
 // MythTV headers
-#include "iptvstreamhandler.h"
-#include "httptsstreamhandler.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+
 #include "hlsstreamhandler.h"
-#include "iptvrecorder.h"
+#include "httptsstreamhandler.h"
 #include "iptvchannel.h"
-#include "mythlogging.h"
-#include "mythdb.h"
+#include "iptvrecorder.h"
+#include "iptvstreamhandler.h"
 
 #define LOC QString("IPTVChan[%1]: ").arg(m_inputId)
 

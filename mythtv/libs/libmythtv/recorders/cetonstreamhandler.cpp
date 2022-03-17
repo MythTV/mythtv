@@ -19,13 +19,14 @@
 #include <QUrlQuery>
 
 // MythTV headers
-#include "cetonstreamhandler.h"
-#include "streamlisteners.h"
-#include "mpegstreamdata.h"
-#include "cetonchannel.h"
-#include "mythlogging.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
+
 #include "cardutil.h"
-#include "mythdownloadmanager.h"
+#include "cetonchannel.h"
+#include "cetonstreamhandler.h"
+#include "mpegstreamdata.h"
+#include "streamlisteners.h"
 
 #define LOC QString("CetonSH[%1](%2): ").arg(m_inputId).arg(m_device)
 

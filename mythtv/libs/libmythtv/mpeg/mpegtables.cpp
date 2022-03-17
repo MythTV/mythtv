@@ -1,11 +1,12 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
 
-#include "splicedescriptors.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/stringutil.h"
+
 #include "atscdescriptors.h"
-#include "stringutil.h"
-#include "mythlogging.h"
 #include "mpegtables.h"
+#include "splicedescriptors.h"
 
 const std::array<const uint8_t,8> DEFAULT_PAT_HEADER
 {

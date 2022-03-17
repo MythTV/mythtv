@@ -2,7 +2,7 @@
 #define MYTHVIDEOTEXTUREVULKAN_H
 
 // MythTV
-#include "vulkan/mythrendervulkan.h"
+#include "libmythui/vulkan/mythrendervulkan.h"
 #include "mythframe.h"
 
 // FFmpeg

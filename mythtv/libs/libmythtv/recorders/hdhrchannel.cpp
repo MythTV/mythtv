@@ -21,8 +21,8 @@
 #include <utility>
 
 // MythTV includes
-#include "mythdbcon.h"
-#include "mythlogging.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
 #include "hdhrchannel.h"
 #include "videosource.h"
 #include "channelutil.h"
