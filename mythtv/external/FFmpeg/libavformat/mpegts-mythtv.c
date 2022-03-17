@@ -3067,6 +3067,11 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     }
 
     // begin MythTV
+
+    /* cache pmt */
+    av_log(ts->stream, AV_LOG_TRACE, "exporting PMT\n");
+    export_pmt(ts->stream, section, section_len);
+
     /* if the pmt has changed delete old streams,
      * create new ones, and notify any listener.
      */
@@ -3086,10 +3091,6 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         /* create new streams */
         for (idx = equal_streams; idx < last_item; idx++)
             mpegts_add_stream(ts, h->id, &items[idx], prog_reg_desc, pcr_pid);
-
-        /* cache pmt */
-        av_log(ts->stream, AV_LOG_TRACE, "exporting PMT\n");
-        export_pmt(avctx, section, section_len);
 
         /* notify stream_changed listeners */
         if (avctx->streams_changed)
