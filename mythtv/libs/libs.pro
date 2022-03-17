@@ -14,10 +14,9 @@ using_mheg:SUBDIRS += libmythfreemheg
 SUBDIRS += libmythui libmythupnp libmyth
 
 libmythui.depends = libmythbase
-libmythupnp.depends = libmythbase
+libmythupnp.depends = libmythbase libmythservicecontracts
 libmyth.depends =  libmythbase libmythui libmythupnp
 libmyth.depends += libmythfreesurround
-libmythupnp.depends = libmythbase libmythservicecontracts
 
 LIBMYTHTVDEPS = $$SUBDIRS
 
