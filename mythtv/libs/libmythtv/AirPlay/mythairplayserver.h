@@ -10,9 +10,10 @@
 #include <QUrl>
 #include <cstdint>     // for uintxx_t
 
-#include "serverpool.h"
-#include "mythtvexp.h"
-#include "mythmainwindow.h"
+#include "libmythbase/serverpool.h"
+#include "libmythui/mythmainwindow.h"
+
+#include "libmythtv/mythtvexp.h"
 
 class QTimer;
 class MThread;

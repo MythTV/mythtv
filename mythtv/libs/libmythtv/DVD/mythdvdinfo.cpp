@@ -2,7 +2,7 @@
 #include <QDir>
 
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "mythiowrapper.h"
 #include "mythdvdinfo.h"
 

@@ -1,7 +1,7 @@
 // MythTV
+#include "libmyth/audio/audiooutput.h"
 #include "tv_play.h"
 #include "mythdvdbuffer.h"
-#include "audiooutput.h"
 #include "mythdvddecoder.h"
 #include "mythdvdplayer.h"
 

@@ -15,9 +15,10 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "io/mythopticalbuffer.h"
-#include "mythdate.h"
-#include "referencecounter.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/referencecounter.h"
+#include "libmythtv/io/mythopticalbuffer.h"
+
 #include "mythdvdcontext.h"
 #include "mythdvdinfo.h"
 

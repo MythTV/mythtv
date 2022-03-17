@@ -5,7 +5,7 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "mythplayerui.h"
+#include "libmythtv/mythplayerui.h"
 
 class MythBDPlayer : public MythPlayerUI
 {

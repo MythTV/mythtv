@@ -8,7 +8,7 @@
 #include <QtAlgorithms>
 
 // MythTV
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "mythdvdstream.h"
 
 // Std

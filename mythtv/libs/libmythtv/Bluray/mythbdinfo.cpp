@@ -3,9 +3,10 @@
 #include <QCryptographicHash>
 
 // MythTV
-#include "mythlogging.h"
-#include "mythdirs.h"
-#include "mythcdrom.h"
+#include "libmythbase/mythcdrom.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+
 #include "io/mythiowrapper.h"
 #include "Bluray/mythbdiowrapper.h"
 #include "Bluray/mythbdinfo.h"

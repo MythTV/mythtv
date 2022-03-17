@@ -1,8 +1,8 @@
 #include <QStringList>
 #include <QUrl>
 
+#include "libmythbase/mythlogging.h"
 #include "HLS/m3u.h"
-#include "mythlogging.h"
 
 namespace M3U
 {

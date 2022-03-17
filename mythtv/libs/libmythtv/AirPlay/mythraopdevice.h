@@ -8,8 +8,8 @@
 #include <QRecursiveMutex>
 #endif
 
-#include "serverpool.h"
-#include "mythtvexp.h"
+#include "libmythbase/serverpool.h"
+#include "libmythtv/mythtvexp.h"
 
 class MThread;
 class BonjourRegister;

@@ -2,8 +2,8 @@
 #define MYTHDVDCONTEXT_H
 
 // MythTV
-#include "mythtvexp.h"
-#include "referencecounter.h"
+#include "libmythtv/mythtvexp.h"
+#include "libmythbase/referencecounter.h"
 
 // libdvd
 #include "dvdnav/dvdnav.h"

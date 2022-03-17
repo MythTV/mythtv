@@ -2,8 +2,8 @@
 #define BDOVERLAYSCREEN_H
 
 // MythTV
-#include "mythscreentype.h"
-#include "mythplayerui.h"
+#include "libmythui/mythscreentype.h"
+#include "libmythtv/mythplayerui.h"
 
 class MythBDOverlay;
 

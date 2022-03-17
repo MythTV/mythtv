@@ -8,7 +8,7 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "mythtvexp.h"
+#include "libmythtv/mythtvexp.h"
 
 // libdvd
 #include "dvdnav/dvdnav.h"

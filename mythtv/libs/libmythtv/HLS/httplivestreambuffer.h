@@ -23,8 +23,8 @@
 #ifndef MythXCode_hlsbuffer_h
 #define MythXCode_hlsbuffer_h
 
-#include "mythcorecontext.h"
-#include "io/mythmediabuffer.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythtv/io/mythmediabuffer.h"
 
 extern "C" {
 #include "libavformat/avformat.h"

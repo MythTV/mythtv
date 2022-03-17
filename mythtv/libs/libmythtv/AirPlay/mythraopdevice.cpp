@@ -5,12 +5,12 @@
 #include <QtAlgorithms>
 #include <QTcpSocket>
 
-#include "mthread.h"
-#include "mythlogging.h"
-#include "mythcorecontext.h"
-#include "mythmainwindow.h"
+#include "libmythbase/bonjourregister.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythmainwindow.h"
 
-#include "bonjourregister.h"
 #include "mythraopconnection.h"
 #include "mythraopdevice.h"
 #include "mythairplayserver.h"

@@ -1,4 +1,4 @@
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "io/mythiowrapper.h"
 #include "Bluray/mythbdiowrapper.h"
 

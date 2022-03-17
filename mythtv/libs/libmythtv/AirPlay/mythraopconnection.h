@@ -11,9 +11,9 @@
 #include <openssl/pem.h>
 #include <openssl/aes.h>
 
-#include "mythtvexp.h"
+#include "libmythtv/mythtvexp.h"
 
-#include "mythnotification.h"
+#include "libmythui/mythnotification.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"

@@ -2,7 +2,7 @@
 #define AVFORMATDECODERBD_H
 
 // MythTV
-#include "avformatdecoder.h"
+#include "libmythtv/decoders/avformatdecoder.h"
 
 class MythBDDecoder : public AvFormatDecoder
 {

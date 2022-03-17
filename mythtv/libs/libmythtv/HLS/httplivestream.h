@@ -3,9 +3,9 @@
 
 #include <QString>
 
-#include "datacontracts/liveStreamInfoList.h"
+#include "libmythservicecontracts/datacontracts/liveStreamInfoList.h"
 
-#include "mythframe.h"
+#include "libmythtv/mythframe.h"
 
 enum HTTPLiveStreamStatus {
     kHLSStatusUndefined    = -1,

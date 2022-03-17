@@ -2,8 +2,9 @@
 #include <QPainter>
 
 // MythTV
-#include "mythuiimage.h"
-#include "mythpainter.h"
+#include "libmythui/mythpainter.h"
+#include "libmythui/mythuiimage.h"
+
 #include "Bluray/mythbdbuffer.h"
 #include "Bluray/mythbdoverlayscreen.h"
 

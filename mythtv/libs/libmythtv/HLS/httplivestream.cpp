@@ -33,15 +33,16 @@
 #include <QUrl>
 #include <utility>
 
-#include "mythcorecontext.h"
-#include "mythdate.h"
-#include "mythdirs.h"
-#include "mythtimer.h"
-#include "mthreadpool.h"
-#include "mythsystemlegacy.h"
-#include "exitcodes.h"
-#include "mythlogging.h"
-#include "storagegroup.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/mythtimer.h"
+#include "libmythbase/storagegroup.h"
+
 #include "httplivestream.h"
 
 #define LOC QString("HLS(%1): ").arg(m_sourceFile)

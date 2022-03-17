@@ -17,20 +17,20 @@
 #include <QTimer>
 #include <QUrlQuery>
 
-#include "mthread.h"
-#include "mythrandom.h"
-#include "mythdate.h"
-#include "mythlogging.h"
-#include "mythcorecontext.h"
-#include "mythuiactions.h"
-#include "mythuistatetracker.h"
-#include "mythbinaryplist.h"
-#include "tv_play.h"
-#include "mythmainwindow.h"
-#include "tv_actions.h"
+#include "libmythbase/bonjourregister.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythbinaryplist.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythrandom.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuiactions.h"
+#include "libmythui/mythuistatetracker.h"
 
-#include "bonjourregister.h"
 #include "mythairplayserver.h"
+#include "tv_actions.h"
+#include "tv_play.h"
 
 MythAirplayServer* MythAirplayServer::gMythAirplayServer = nullptr;
 MThread*           MythAirplayServer::gMythAirplayServerThread = nullptr;

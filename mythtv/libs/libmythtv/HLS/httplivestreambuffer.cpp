@@ -39,9 +39,9 @@
 #include <array>
 
 // libmythbase
-#include "mthread.h"
-#include "mythdownloadmanager.h"
-#include "mythlogging.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
 
 // libmythtv
 #include "httplivestreambuffer.h"

@@ -10,20 +10,20 @@
 #include <QStringConverter>
 #endif
 
-#include "mythlogging.h"
-#include "mythcorecontext.h"
-#include "mythdirs.h"
-#include "serverpool.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/serverpool.h"
 
-#include "audiooutput.h"
-#include "audiooutpututil.h"
+#include "libmyth/audio/audiooutput.h"
+#include "libmyth/audio/audiooutpututil.h"
 
 #include "mythraopdevice.h"
 #include "mythraopconnection.h"
 #include "mythairplayserver.h"
-#include "mythchrono.h"
+#include "libmythbase/mythchrono.h"
 
-#include "mythmainwindow.h"
+#include "libmythui/mythmainwindow.h"
 
 #define LOC QString("RAOP Conn: ")
 #define MAX_PACKET_SIZE  2048

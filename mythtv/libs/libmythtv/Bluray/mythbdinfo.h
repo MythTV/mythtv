@@ -11,7 +11,7 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "mythtvexp.h"
+#include "libmythtv/mythtvexp.h"
 
 class MTV_PUBLIC MythBDInfo
 {

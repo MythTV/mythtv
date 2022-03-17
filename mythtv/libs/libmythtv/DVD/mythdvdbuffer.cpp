@@ -1,22 +1,23 @@
-﻿// Qt
+﻿// Std
+#include <thread>
+#include <algorithm>
+
+// Qt
 #include <QCoreApplication>
 
 // MythTV
-#include "mythconfig.h"
-#include "mythcontext.h"
-#include "mythmediamonitor.h"
-#include "iso639.h"
-#include "mythdvdplayer.h"
-#include "compat.h"
-#include "mythlogging.h"
-#include "mythmainwindow.h"
-#include "mythuiactions.h"
-#include "tv_actions.h"
-#include "mythdvdbuffer.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/mythmediamonitor.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/iso639.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuiactions.h"
 
-// Std
-#include <thread>
-#include <algorithm>
+#include "mythdvdbuffer.h"
+#include "mythdvdplayer.h"
+#include "tv_actions.h"
 
 #define LOC QString("DVDRB: ")
 

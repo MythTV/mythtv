@@ -8,8 +8,8 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "io/mythopticalbuffer.h"
-#include "Bluray/mythbdoverlay.h"
+#include "libmythtv/Bluray/mythbdoverlay.h"
+#include "libmythtv/io/mythopticalbuffer.h"
 
 #define BD_BLOCK_SIZE 6144LL
 
