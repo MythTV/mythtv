@@ -2,7 +2,7 @@
 #define MYTHHTTPROOT_H
 
 // MythTV
-#include "http/mythhttprequest.h"
+#include "libmythbase/http/mythhttprequest.h"
 
 class MBASE_PUBLIC MythHTTPRoot
 {

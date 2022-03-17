@@ -2,7 +2,7 @@
 #define MYTHHTTPENCODING_H
 
 // MythTV
-#include "http/mythhttptypes.h"
+#include "libmythbase/http/mythhttptypes.h"
 
 class MythHTTPEncoding
 {

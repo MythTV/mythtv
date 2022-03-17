@@ -2,8 +2,8 @@
 #define MYTHHTTPTHREAD_H
 
 // MythTV
-#include "mthread.h"
-#include "http/mythhttptypes.h"
+#include "libmythbase/http/mythhttptypes.h"
+#include "libmythbase/mthread.h"
 
 class MythHTTPSocket;
 class MythHTTPServer;

@@ -1,14 +1,14 @@
 #ifndef MYTHHTTPMETAMETHOD_H
 #define MYTHHTTPMETAMETHOD_H
 
+// Std
+#include <memory>
+
 // Qt
 #include <QMetaMethod>
 
 // MythTV
-#include "http/mythhttptypes.h"
-
-// Std
-#include <memory>
+#include "libmythbase/http/mythhttptypes.h"
 
 class MythHTTPMetaMethod;
 using HTTPMethodPtr  = std::shared_ptr<MythHTTPMetaMethod>;

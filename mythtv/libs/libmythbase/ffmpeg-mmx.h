@@ -21,7 +21,7 @@
 #ifndef AVCODEC_X86_MMX_H
 #define AVCODEC_X86_MMX_H
 
-#include <mythconfig.h>
+#include "libmythbase/mythconfig.h"
 
 #if HAVE_MMX
 

@@ -5,7 +5,7 @@
 #include <QMetaObject>
 
 // MythTV
-#include "http/mythhttpmetamethod.h"
+#include "libmythbase/http/mythhttpmetamethod.h"
 
 class MBASE_PUBLIC MythHTTPMetaService
 {

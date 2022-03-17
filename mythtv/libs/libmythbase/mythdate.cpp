@@ -1,3 +1,5 @@
+#include <array>
+
 #include <QtGlobal>
 #include <QCoreApplication>
 #include <QRegularExpression>

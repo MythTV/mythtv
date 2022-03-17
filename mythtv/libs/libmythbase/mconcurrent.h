@@ -1,8 +1,8 @@
 #ifndef MCONCURRENT_H
 #define MCONCURRENT_H
 
-#include "mthreadpool.h"
-#include "logging.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythlogging.h"
 
 
 /// Provides a simple version of QtConcurrent::run() that uses MThreadPool rather

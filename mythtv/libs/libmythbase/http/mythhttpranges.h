@@ -2,9 +2,9 @@
 #define MYTHHTTPRANGES_H
 
 // MythTV
-#include "http/mythhttptypes.h"
-#include "http/mythhttpdata.h"
-#include "http/mythhttpresponse.h"
+#include "libmythbase/http/mythhttpdata.h"
+#include "libmythbase/http/mythhttpresponse.h"
+#include "libmythbase/http/mythhttptypes.h"
 
 using HTTPRange  = std::pair<uint64_t,uint64_t>;
 using HTTPRanges = std::vector<HTTPRange>;

@@ -2,7 +2,7 @@
 #define MYTHHTTPTHREADPOOL_H
 
 // MythTV
-#include "serverpool.h"
+#include "libmythbase/serverpool.h"
 
 class MythHTTPThread;
 

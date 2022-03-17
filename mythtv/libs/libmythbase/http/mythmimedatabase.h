@@ -2,7 +2,7 @@
 #define MYTHMIMEDATABASE_H
 
 // MythTV
-#include "http/mythmimetype.h"
+#include "libmythbase/http/mythmimetype.h"
 
 class QIODevice;
 class MythMimeDatabasePriv;

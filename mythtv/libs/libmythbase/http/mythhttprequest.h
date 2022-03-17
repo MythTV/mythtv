@@ -5,7 +5,7 @@
 #include <QUrl>
 
 // MythTV
-#include "http/mythhttptypes.h"
+#include "libmythbase/http/mythhttptypes.h"
 
 class QTcpSocket;
 

@@ -1,15 +1,15 @@
 #ifndef MYTHHTTPRESPONSE_H
 #define MYTHHTTPRESPONSE_H
 
-// MythTV
-#include "http/mythhttpfile.h"
-#include "http/mythwebsockettypes.h"
-#include "http/mythhttptypes.h"
-#include "http/mythhttpdata.h"
-#include "http/mythhttprequest.h"
-
 // Std
 #include <vector>
+
+// MythTV
+#include "libmythbase/http/mythhttpdata.h"
+#include "libmythbase/http/mythhttpfile.h"
+#include "libmythbase/http/mythhttprequest.h"
+#include "libmythbase/http/mythhttptypes.h"
+#include "libmythbase/http/mythwebsockettypes.h"
 
 class QTcpSocket;
 

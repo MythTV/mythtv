@@ -1,14 +1,14 @@
 #ifndef MYTHWEBSOCKETTYPES_H
 #define MYTHWEBSOCKETTYPES_H
 
+// Std
+#include <deque>
+
 // Qt
 #include <QString>
 
 // MythTV
-#include "http/mythhttpcommon.h"
-
-// Std
-#include <deque>
+#include "libmythbase/http/mythhttpcommon.h"
 
 enum WSOpCode
 {

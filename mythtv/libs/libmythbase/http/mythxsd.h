@@ -19,8 +19,8 @@
 #include <QMap>
 #include <QDomDocument>
 
-#include "http/mythhttptypes.h"
-#include "http/mythhttpmetaservice.h"
+#include "libmythbase/http/mythhttpmetaservice.h"
+#include "libmythbase/http/mythhttptypes.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

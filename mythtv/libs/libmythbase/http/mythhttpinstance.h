@@ -2,8 +2,8 @@
 #define MYTHHTTPINSTANCE_H
 
 // MythTV
-#include "http/mythhttpservice.h"
-#include "http/mythhttptypes.h"
+#include "libmythbase/http/mythhttpservice.h"
+#include "libmythbase/http/mythhttptypes.h"
 
 class MThread;
 class MythHTTPServer;

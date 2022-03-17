@@ -5,8 +5,8 @@
 #include <QObject>
 
 // MythTV
-#include "http/mythhttprequest.h"
-#include "http/mythhttpresponse.h"
+#include "libmythbase/http/mythhttprequest.h"
+#include "libmythbase/http/mythhttpresponse.h"
 
 class MythHTTPMetaService;
 

@@ -187,8 +187,7 @@ inc2.files += mythconfig.h mythconfig.mak
 INSTALLS += inc inc2
 
 INCLUDEPATH += ../../external/qjsonwrapper/ .. ./platforms
-INCLUDEPATH += ./http ./http/serialisers
-DEPENDPATH  +=  ../../external/libudfread ./http ./http/serialisers
+DEPENDPATH  +=  ../../external/libudfread
 
 DEFINES += RUNPREFIX=\\\"$${RUNPREFIX}\\\"
 DEFINES += LIBDIRNAME=\\\"$${LIBDIRNAME}\\\"

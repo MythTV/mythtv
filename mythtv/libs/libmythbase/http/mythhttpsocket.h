@@ -7,8 +7,8 @@
 #include <QElapsedTimer>
 
 // MythTV
-#include "http/mythhttptypes.h"
-#include "http/mythhttpparser.h"
+#include "libmythbase/http/mythhttpparser.h"
+#include "libmythbase/http/mythhttptypes.h"
 
 class QTcpSocket;
 class QSslSocket;

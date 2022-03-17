@@ -1,7 +1,7 @@
 #include <QObject>
 #include <QString>
 
-#include "mythhttpcommon.h"
+#include "libmythbase/http/mythhttpcommon.h"
 
 class MythWebSocketEvent : public QObject
 {

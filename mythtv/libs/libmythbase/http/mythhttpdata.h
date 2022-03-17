@@ -5,7 +5,7 @@
 #include <QByteArray>
 
 // MythTV
-#include "http/mythhttptypes.h"
+#include "libmythbase/http/mythhttptypes.h"
 
 class MBASE_PUBLIC MythHTTPData : public QByteArray, public MythHTTPContent
 {

@@ -6,8 +6,8 @@
 #include <QQueue>
 
 // MythTV
-#include "http/mythhttptypes.h"
-#include "http/mythhttpthreadpool.h"
+#include "libmythbase/http/mythhttpthreadpool.h"
+#include "libmythbase/http/mythhttptypes.h"
 
 class MythHTTPServer : public MythHTTPThreadPool
 {

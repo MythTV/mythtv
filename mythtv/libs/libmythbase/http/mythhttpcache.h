@@ -2,7 +2,7 @@
 #define MYTHHTTPCACHE_H
 
 // MythTV
-#include "http/mythhttpresponse.h"
+#include "libmythbase/http/mythhttpresponse.h"
 
 class MythHTTPCache
 {

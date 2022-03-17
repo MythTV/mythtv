@@ -2,7 +2,7 @@
 #define MYTHHTTPSERVICES_H
 
 // MythTV
-#include "http/mythhttpservice.h"
+#include "libmythbase/http/mythhttpservice.h"
 
 class MythHTTPServices : public MythHTTPService
 {

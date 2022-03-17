@@ -1,6 +1,11 @@
 #ifndef MYTHHTTPTYPES_H
 #define MYTHHTTPTYPES_H
 
+// Std
+#include <array>
+#include <deque>
+#include <chrono>
+
 // Qt
 #include <QMap>
 #include <QFile>
@@ -13,13 +18,8 @@
 #endif
 
 // MythTV
-#include "http/mythmimetype.h"
-#include "http/mythhttpcommon.h"
-
-// Std
-#include <array>
-#include <deque>
-#include <chrono>
+#include "libmythbase/http/mythhttpcommon.h"
+#include "libmythbase/http/mythmimetype.h"
 
 #define HTTP_SOCKET_TIMEOUT_MS 10000 // 10 seconds
 #define HTTP_SERVICES_DIR QString("/services/")
