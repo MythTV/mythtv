@@ -17,10 +17,11 @@
 
 #include "soapclient.h"
 
-#include "mythlogging.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
+
 #include "httprequest.h"
 #include "upnp.h"
-#include "mythdownloadmanager.h"
 
 #define LOC      QString("SOAPClient: ")
 

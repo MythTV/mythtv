@@ -13,8 +13,8 @@
 #ifndef RTTISERVICES_H_
 #define RTTISERVICES_H_
 
-#include "service.h"
-#include "datacontracts/enum.h"
+#include "libmythservicecontracts/datacontracts/enum.h"
+#include "libmythservicecontracts/service.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

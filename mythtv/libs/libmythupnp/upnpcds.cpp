@@ -14,13 +14,14 @@
 #include <cmath>
 #include <cstdint>
 
+#include "libmythbase/configuration.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
+
 #include "upnp.h"
 #include "upnpcds.h"
 #include "upnputil.h"
-#include "mythlogging.h"
-#include "mythversion.h"
-#include "mythcorecontext.h"
-#include "configuration.h"
 
 #define DIDL_LITE_BEGIN "<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\">"
 #define DIDL_LITE_END   "</DIDL-Lite>";

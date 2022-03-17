@@ -13,8 +13,8 @@
 #ifndef SERIALIZER_H
 #define SERIALIZER_H
 
-#include "upnpexp.h"
-#include "upnputil.h"
+#include "libmythupnp/upnpexp.h"
+#include "libmythupnp/upnputil.h"
 
 #include <QList>
 #include <QMetaType>

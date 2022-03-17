@@ -25,9 +25,10 @@
 #include <QHostAddress>
 
 // MythTV headers
-#include "upnp.h"
-#include "msocketdevice.h"
-#include "compat.h"
+#include "libmythbase/compat.h"
+
+#include "libmythupnp/msocketdevice.h"
+#include "libmythupnp/upnp.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

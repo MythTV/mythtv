@@ -1,8 +1,9 @@
 #ifndef UPNPSUBSCRIPTION_H
 #define UPNPSUBSCRIPTION_H
 
-#include "mythevent.h"
-#include "upnp.h"
+#include "libmythbase/mythevent.h"
+
+#include "libmythupnp/upnp.h"
 
 class Subscription;
 

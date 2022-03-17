@@ -25,7 +25,8 @@
 #include <QMutex>
 
 // MythTV headers
-#include "compat.h"
+#include "libmythbase/compat.h"
+
 #include "taskqueue.h"
 
 class MSocketDevice;

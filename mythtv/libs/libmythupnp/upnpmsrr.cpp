@@ -5,13 +5,14 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
+#include <cmath>
+
+#include "libmythbase/configuration.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+
 #include "upnp.h"
 #include "upnpmsrr.h"
-#include "mythlogging.h"
-#include "mythcorecontext.h"
-#include "configuration.h"
-
-#include <cmath>
 
 /////////////////////////////////////////////////////////////////////////////
 //

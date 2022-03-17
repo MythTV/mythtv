@@ -21,11 +21,12 @@
 #include <QUrlQuery>
 
 // MythTV headers
-#include "compat.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythtypes.h"
+#include "libmythbase/referencecounter.h"
+
 #include "upnpexp.h"
 #include "upnputil.h"
-#include "mythtypes.h"
-#include "referencecounter.h"
 
 class UPnpDeviceDesc;
 class UPnpDevice;

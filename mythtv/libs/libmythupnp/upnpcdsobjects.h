@@ -18,9 +18,10 @@
 #include <QList>
 #include <QMap>
 
+#include "libmythbase/referencecounter.h"
+
 #include "upnpexp.h"
 #include "httprequest.h"
-#include <referencecounter.h>
 
 class CDSObject;
 class QTextStream;

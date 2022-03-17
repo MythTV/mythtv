@@ -26,9 +26,9 @@
 #ifndef RTTI_H
 #define RTTI_H
 
-#include "services/rttiServices.h"
-#include "datacontracts/enum.h"
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythservicecontracts/datacontracts/enum.h"
+#include "libmythservicecontracts/services/rttiServices.h"
 
 
 class Rtti : public RttiServices

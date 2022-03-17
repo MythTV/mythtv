@@ -15,8 +15,9 @@
 
 #include <QString>
 
+#include "libmythbase/mythlogging.h"
+
 #include "msocketdevice.h"
-#include "mythlogging.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // Broadcast Socket is used for XBox (original) since Multicast is not supported

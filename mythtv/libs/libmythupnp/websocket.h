@@ -13,9 +13,10 @@
 #ifndef WEBSOCKET_H
 #define WEBSOCKET_H
 
-#include "serverpool.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/serverpool.h"
+
 #include "upnpexp.h"
-#include "mthreadpool.h"
 
 #include <QRunnable>
 #include <QSslConfiguration>

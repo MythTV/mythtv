@@ -10,8 +10,9 @@
 #include <chrono>
 #include <cstdint>
 
+#include "libmythbase/compat.h"
+
 #include "upnpexp.h"
-#include "compat.h"
 
 using namespace std::chrono_literals;
 

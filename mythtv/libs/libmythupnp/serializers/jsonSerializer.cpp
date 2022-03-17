@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "jsonSerializer.h"
-#include "mythdate.h"
+#include "libmythbase/mythdate.h"
 
 #include <QVariant>
 

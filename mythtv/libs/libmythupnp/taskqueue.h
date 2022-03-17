@@ -28,10 +28,11 @@
 #include <QMutex>
 
 // MythTV headers
-#include "referencecounter.h"
-#include "upnputil.h"
-#include "mthread.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/referencecounter.h"
+
 #include "upnpexp.h"
+#include "upnputil.h"
 
 class Task;
 class TaskQueue;

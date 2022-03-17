@@ -34,14 +34,15 @@
 #include <QUuid>
 
 // MythTV headers
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
+
 #include "upnputil.h"
 #include "upnp.h" // only needed for Config... remove once config is moved.
-#include "compat.h"
-#include "mythdirs.h"
-#include "mythlogging.h"
 #include "htmlserver.h"
-#include "mythversion.h"
-#include "mythcorecontext.h"
 
 #include "serviceHosts/rttiServiceHost.h"
 

@@ -13,10 +13,9 @@
 
 #include <QVariantList>
 
-#include "serviceexp.h"
-#include "datacontracthelper.h"
-
-#include "enumItem.h"
+#include "libmythservicecontracts/serviceexp.h"
+#include "libmythservicecontracts/datacontracthelper.h"
+#include "libmythservicecontracts/datacontracts/enumItem.h"
 
 namespace DTC
 {

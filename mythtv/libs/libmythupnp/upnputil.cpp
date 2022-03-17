@@ -20,14 +20,15 @@
 #include <QStringList>
 
 // MythTV headers
-#include "upnputil.h"
+#include "httprequest.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/configuration.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+
 #include "upnp.h"
 #include "upnphelpers.h"
-#include "compat.h"
-#include "mythlogging.h"
-#include "httprequest.h"
-#include "mythcorecontext.h"
-#include "configuration.h"
+#include "upnputil.h"
 
 // POSIX headers 2, needs to be after compat.h for OS X
 #ifndef _WIN32

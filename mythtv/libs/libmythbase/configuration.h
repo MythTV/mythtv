@@ -15,7 +15,8 @@
 
 #include <QDomDocument>
 #include <QStringList>
-#include "mythbaseexp.h"
+#include "libmythbase/mythbaseexp.h"
+#include "libmythbase/mythchrono.h"
 
 class MBASE_PUBLIC Configuration
 {

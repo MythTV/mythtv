@@ -10,11 +10,12 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include "libmythbase/configuration.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+
 #include "upnp.h"
 #include "upnpcmgr.h"
-#include "mythlogging.h"
-#include "mythcorecontext.h"
-#include "configuration.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

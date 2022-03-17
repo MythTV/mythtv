@@ -12,7 +12,7 @@
 
 #include <QDomDocument>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 #include "servicehost.h"
 #include "wsdl.h"
 #include "xsd.h"

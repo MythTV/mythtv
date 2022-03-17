@@ -6,10 +6,11 @@
 #include <chrono>
 
 // MythTV headers
-#include "mythlogging.h"
-#include "mythcorecontext.h"
-#include "mythevent.h"
-#include "stringutil.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythevent.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/stringutil.h"
+
 #include "websocket_extensions/websocket_mythevent.h"
 
 // QT headers

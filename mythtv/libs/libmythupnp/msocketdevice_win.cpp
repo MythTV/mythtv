@@ -46,7 +46,7 @@
 #include <QDateTime>
 
 #include <QCoreApplication>
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 #include <cstring>
 

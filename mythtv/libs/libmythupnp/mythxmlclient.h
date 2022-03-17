@@ -15,11 +15,10 @@
 
 #include <QDomDocument>
 
-#include "upnpexp.h"
-
-#include "mythdbparams.h"
-#include "upnp.h"
-#include "soapclient.h"
+#include "libmythbase/mythdbparams.h"
+#include "libmythupnp/upnpexp.h"
+#include "libmythupnp/soapclient.h"
+#include "libmythupnp/upnp.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

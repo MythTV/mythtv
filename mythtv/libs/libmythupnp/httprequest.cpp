@@ -25,6 +25,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h> // for gethostname
 // FOR DEBUGGING
 #include <iostream>
 
@@ -34,21 +35,19 @@
 
 #include "upnp.h"
 
-#include "compat.h"
-#include "mythlogging.h"
-#include "mythversion.h"
-#include "mythdate.h"
-#include "mythcorecontext.h"
-#include "mythtimer.h"
-#include "unziputil.h"
-#include "configuration.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/configuration.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythtimer.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/unziputil.h"
 
 #include "serializers/xmlSerializer.h"
 #include "serializers/soapSerializer.h"
 #include "serializers/jsonSerializer.h"
 #include "serializers/xmlplistSerializer.h"
-
-#include <unistd.h> // for gethostname
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0

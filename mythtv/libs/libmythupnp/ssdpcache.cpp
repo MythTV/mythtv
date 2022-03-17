@@ -10,11 +10,12 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include "libmythbase/mythevent.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/portchecker.h"
+
 #include "upnp.h"
-#include "mythevent.h"
-#include "mythlogging.h"
 #include "upnptaskcache.h"
-#include "portchecker.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
   #define QT_ENDL endl

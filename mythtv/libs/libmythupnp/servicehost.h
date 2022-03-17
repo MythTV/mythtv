@@ -17,10 +17,11 @@
 #include <QMetaMethod>
 #include <QMap>
 
-#include "upnpexp.h"
-#include "upnp.h"
-#include "eventing.h"
-#include "service.h"
+#include "libmythservicecontracts/service.h"
+
+#include "libmythupnp/upnpexp.h"
+#include "libmythupnp/upnp.h"
+#include "libmythupnp/eventing.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

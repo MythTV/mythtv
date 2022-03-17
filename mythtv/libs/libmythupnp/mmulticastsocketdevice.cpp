@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <cerrno>
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 
 #ifdef _WIN32
 # include <winsock2.h>
@@ -31,9 +31,10 @@
 #include <QStringList>
 
 // MythTV headers
-#include "mythrandom.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythrandom.h"
+
 #include "mmulticastsocketdevice.h"
-#include "mythlogging.h"
 
 #define LOC      QString("MMulticastSocketDevice(%1:%2): ") \
                      .arg(m_address.toString()).arg(socket())

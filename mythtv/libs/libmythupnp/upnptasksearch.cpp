@@ -20,15 +20,16 @@
 #include <QNetworkInterface>
 #include <utility>
 
+#include "libmythbase/compat.h"
+#include "libmythbase/configuration.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythrandom.h"
+#include "libmythbase/mythversion.h"
+
 #include "upnp.h"
 #include "upnptasksearch.h"
-#include "mythversion.h"
-#include "compat.h"
-#include "mythrandom.h"
-#include "mythdate.h"
-#include "mythlogging.h"
-#include "mythcorecontext.h"
-#include "configuration.h"
 
 static QPair<QHostAddress, int> kLinkLocal6 =
                             QHostAddress::parseSubnet("fe80::/10");

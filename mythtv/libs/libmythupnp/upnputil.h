@@ -20,8 +20,9 @@
 #include <QStringList>
 
 // MythTV headers
+#include "libmythbase/mythchrono.h"
+
 #include "upnpexp.h"
-#include "mythchrono.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // Typedefs

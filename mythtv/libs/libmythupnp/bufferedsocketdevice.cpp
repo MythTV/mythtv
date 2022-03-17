@@ -16,10 +16,11 @@
 #include <thread> // for sleep_for
 #include <utility>
 
-#include "mythtimer.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythtimer.h"
+
 #include "bufferedsocketdevice.h"
 #include "upnputil.h"
-#include "mythlogging.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

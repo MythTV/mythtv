@@ -16,10 +16,11 @@
 #include <QVariant>
 #include <QVariantMap>
 
-#include "serverSideScripting.h"
-#include "mythlogging.h"
-#include <mythsession.h>
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsession.h"
+
 #include "httpserver.h"
+#include "serverSideScripting.h"
 
 QScriptValue formatStr(QScriptContext *context, QScriptEngine *interpreter);
 

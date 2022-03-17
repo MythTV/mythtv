@@ -42,7 +42,7 @@
 ****************************************************************************/
 
 #include "qplatformdefs.h"
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 #ifdef Q_OS_ANDROID
 #include <sys/socket.h>

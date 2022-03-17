@@ -17,8 +17,9 @@
 
 #include <QFile>
 
+#include "libmythbase/mthread.h"
+
 #include "upnpexp.h"
-#include "mthread.h"
 #include "httpserver.h"
 #include "taskqueue.h"
 #include "msocketdevice.h"

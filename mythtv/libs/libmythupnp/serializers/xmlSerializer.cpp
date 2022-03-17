@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "xmlSerializer.h"
-#include "mythdate.h"
+#include "libmythbase/mythdate.h"
 
 #include <QMetaClassInfo>
 

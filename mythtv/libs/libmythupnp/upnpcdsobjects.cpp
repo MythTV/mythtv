@@ -19,8 +19,9 @@
 #include <QTextStream>
 #include <QUrl>
 
+#include "libmythbase/mythlogging.h"
+
 #include "upnpcds.h"
-#include "mythlogging.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
   #define QT_ENDL endl

@@ -12,7 +12,8 @@
 
 #include <QCoreApplication>
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
+
 #include "xsd.h"
 
 #include "servicehost.h"

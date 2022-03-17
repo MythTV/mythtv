@@ -10,11 +10,12 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "mythversion.h"
-#include "mythxmlclient.h"
-#include "mythlogging.h"
-
 #include <QObject>
+
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
+
+#include "mythxmlclient.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

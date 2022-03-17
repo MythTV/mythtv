@@ -35,12 +35,12 @@
 #include <QSslSocket>
 
 // MythTV headers
-#include "serverpool.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/serverpool.h"
+
 #include "httprequest.h"
-#include "mthreadpool.h"
 #include "upnputil.h"
-#include "compat.h"
-#include "mythconfig.h"
 
 class HttpWorkerThread;
 #if CONFIG_QTSCRIPT

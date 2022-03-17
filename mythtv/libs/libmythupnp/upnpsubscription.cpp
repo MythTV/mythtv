@@ -17,9 +17,10 @@ QObject::customEvent to receive event notifications for subscribed services.
 #endif
 #include <utility>
 
-#include "mythcorecontext.h"
-#include "mythlogging.h"
-#include "mythtypes.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythtypes.h"
+
 #include "bufferedsocketdevice.h"
 
 // default requested time for subscription (actual is dictated by server)

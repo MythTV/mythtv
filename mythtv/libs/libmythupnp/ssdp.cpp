@@ -16,18 +16,18 @@
 #include <cstdlib>
 #include <thread> // for sleep_for
 
-#include "upnp.h"
-#include "mythchrono.h"
-#include "mythrandom.h"
-#include "mythlogging.h"
+#include "libmythbase/configuration.h"
+#include "libmythbase/mythchrono.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythrandom.h"
 
+#include "upnp.h"
 #include "upnptasksearch.h"
 #include "upnptaskcache.h"
 
 #include "mmulticastsocketdevice.h"
 #include "mbroadcastsocketdevice.h"
-#include "mythcorecontext.h"
-#include "configuration.h"
 
 #include <QStringList>
 

@@ -10,23 +10,23 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "upnp.h"
-#include "upnpdevice.h"
-#include "mythdownloadmanager.h"
-#include "mythlogging.h"
-#include "mythversion.h"  // for MYTH_BINARY_VERSION
-#include "mythcorecontext.h"
-#include "configuration.h"
-
-// MythDB
-#include "mythdb.h"
-
 #include <unistd.h> // for gethostname
 
 #include <QFile>
 #include <QTextStream>
 #include <QHostAddress>
 #include <QHostInfo>
+
+// MythDB
+#include "libmythbase/configuration.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"  // for MYTH_BINARY_VERSION
+
+#include "upnp.h"
+#include "upnpdevice.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
   #define QT_FLUSH flush

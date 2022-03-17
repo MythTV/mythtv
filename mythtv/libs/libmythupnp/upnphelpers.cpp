@@ -1,8 +1,8 @@
 
 #include "upnphelpers.h"
 
-#include "mythlogging.h"
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 
 namespace UPnPDateTime
 {

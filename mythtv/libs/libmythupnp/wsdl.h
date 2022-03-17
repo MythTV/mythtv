@@ -19,11 +19,10 @@
 #include <QMap>
 #include <QDomDocument>
 
-#include "upnpexp.h"
-#include "upnp.h"
-
-#include "servicehost.h"
-#include "xsd.h"
+#include "libmythupnp/upnpexp.h"
+#include "libmythupnp/upnp.h"
+#include "libmythupnp/servicehost.h"
+#include "libmythupnp/xsd.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

@@ -64,10 +64,9 @@ using_qtscript: {
     SOURCES += serverSideScripting.cpp
 }
 
-INCLUDEPATH += ../libmythbase ../libmythservicecontracts ..
+INCLUDEPATH += ..
 INCLUDEPATH += ./serializers
 
-DEPENDPATH  += ../libmythbase ..
 LIBS      += -L../libmythbase -lmythbase-$$LIBVERSION
 LIBS      += -L../libmythservicecontracts -lmythservicecontracts-$$LIBVERSION
 

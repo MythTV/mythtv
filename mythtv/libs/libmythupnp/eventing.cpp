@@ -23,9 +23,9 @@
 #include "upnp.h"
 #include "eventing.h"
 #include "upnptaskevent.h"
-#include "mythlogging.h"
-#include "mythcorecontext.h"
-#include "configuration.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/configuration.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
   #define QT_ENDL endl

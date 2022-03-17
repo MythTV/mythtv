@@ -12,11 +12,12 @@
 
 #include <QNetworkInterface>
 
-#include "mythcorecontext.h"
-#include "upnptaskcache.h"
-#include "mythlogging.h"
-#include "serverpool.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/serverpool.h"
+
 #include "upnp.h"
+#include "upnptaskcache.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // Global/Class Static variables

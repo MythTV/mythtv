@@ -19,8 +19,9 @@
 #include <QMap>
 
 // MythTV headers
-#include "referencecounter.h"
-#include "mythobservable.h"
+#include "libmythbase/mythobservable.h"
+#include "libmythbase/referencecounter.h"
+
 #include "upnpdevice.h"
 #include "upnpexp.h"
 
