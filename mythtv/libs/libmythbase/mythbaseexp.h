@@ -6,7 +6,7 @@
 
 #if defined( QT_CORE_LIB ) && defined( __cplusplus )
 # include <QtCore/qglobal.h>
-# ifdef MBASE_API
+# if defined(MBASE_API) || defined(MPLUGIN_API)
 #  define MBASE_PUBLIC Q_DECL_EXPORT
 # else
 #  define MBASE_PUBLIC Q_DECL_IMPORT

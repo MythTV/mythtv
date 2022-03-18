@@ -7,7 +7,7 @@
 
 // myth
 #include <mythsocket.h>
-#include <mythexp.h>
+#include <mythbaseexp.h>
 #include <mythimage.h>
 
 // zm
@@ -15,7 +15,7 @@
 #define MAX_IMAGE_SIZE  (2048*1536*3)
 using FrameData = std::array<uint8_t,MAX_IMAGE_SIZE>;
 
-class MPUBLIC ZMClient : public QObject
+class MBASE_PUBLIC ZMClient : public QObject
 {
     Q_OBJECT
 
