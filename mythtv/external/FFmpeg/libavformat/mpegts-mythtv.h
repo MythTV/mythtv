@@ -217,32 +217,6 @@ typedef struct DVBAC3Descriptor {
     uint8_t  asvc;
 } DVBAC3Descriptor;
 
-typedef struct
-{
-    char language[4];
-    int comp_page;
-    int anc_page;
-    int sub_id;
-    int txt_type;
-    int vbi_data;
-    int disposition;
-    /* DSMCC data */
-    int data_id;
-    int carousel_id;
-    int component_tag;
-    unsigned int codec_tag;
-} dvb_caption_info_t;
-
-typedef struct
-{
-    int pid;
-    int type;
-    enum AVCodecID       codec_id;
-    enum AVMediaType   codec_type;
-    dvb_caption_info_t dvbci;
-} pmt_entry_t;
-
-
 /**
  * Parse an MPEG-2 descriptor
  * @param[in] fc                    Format context (used for logging only)
@@ -252,10 +226,10 @@ typedef struct
  * @param desc_list_end             End of buffer
  * @return <0 to stop processing
  */
-int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream_type,
+int ff_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stream_type,
                               const uint8_t **pp, const uint8_t *desc_list_end,
                               Mp4Descr *mp4_descr, int mp4_descr_count, int pid,
-                              MpegTSContext *ts, dvb_caption_info_t *dvbci);
+                              MpegTSContext *ts);
 
 /**
  * Check presence of H264 startcode
