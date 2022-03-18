@@ -19,7 +19,7 @@
 
 */
 
-#include "compat.h"
+#include "libmythbase/compat.h"
 
 #include "Link.h"
 #include "Ingredients.h"

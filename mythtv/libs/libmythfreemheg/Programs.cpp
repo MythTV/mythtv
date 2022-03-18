@@ -19,7 +19,8 @@
 
 */
 
-#include "mythchrono.h"
+#include "libmythbase/mythchrono.h"
+#include "libmythbase/mythrandom.h"
 
 #include "Programs.h"
 #include "Ingredients.h"
@@ -30,7 +31,6 @@
 #include "Engine.h"
 #include "Logging.h"
 #include "freemheg.h"
-#include "mythrandom.h"
 
 #include <QDateTime>
 #include <QLocale>
@@ -47,7 +47,7 @@
 #endif
 
 #include "config.h"
-#include "compat.h"
+#include "libmythbase/compat.h"
 
 /*
  * Resident programs are subroutines to provide various string and date functions
