@@ -3093,6 +3093,8 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         }
 
         pmt_count++;
+        if (sid == ts->req_sid)
+            found = 1;
 
     }
 
@@ -3110,7 +3112,6 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         }
     }
 
-    found = 0;
     for (i = 0; i < pmt_count; ++i)
     {
         /* if an MPEG program number is requested, and this is that program,
@@ -3131,8 +3132,6 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
 
             if (!ts->pids[pmt_pid])
                 mpegts_open_section_filter(ts, pmt_pid, pmt_cb, ts, 1);
-
-            found = 1;
         }
     }
 
