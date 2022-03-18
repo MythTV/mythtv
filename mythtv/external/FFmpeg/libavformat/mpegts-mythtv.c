@@ -3631,9 +3631,15 @@ static int mpegts_read_header(AVFormatContext *s)
     if (s->iformat == &ff_mythtv_mpegts_demuxer) {
         /* normal demux */
 
-#ifdef UPSTREAM_TO_MYTHTV
         /* first do a scan to get all the services */
         seek_back(s, pb, pos);
+
+        // begin MythTV
+        /* we don't want any PMT pid filters created on first pass */
+        ts->req_sid = -1;
+
+        ts->scanning = 1;
+        // end MythTV
 
         mpegts_open_section_filter(ts, SDT_PID, sdt_cb, ts, 1);
         mpegts_open_section_filter(ts, PAT_PID, pat_cb, ts, 1);
@@ -3643,35 +3649,8 @@ static int mpegts_read_header(AVFormatContext *s)
         /* if could not find service, enable auto_guess */
 
         ts->auto_guess = 1;
-#else // MythTV version
-        if (!ts->auto_guess) { // MythTV if
 
-        /* first do a scan to get all the services */
-        seek_back(s, pb, pos);
-
-        /* SDT Scan Removed here. It caused startup delays in TS files
-           SDT will not exist in a stripped TS file created by myth. */
-#if 0
-        mpegts_open_section_filter(ts, SDT_PID, sdt_cb, ts, 1);
-#endif
-
-        /* we don't want any PMT pid filters created on first pass */
-        ts->req_sid = -1;
-
-        ts->scanning = 1;
-        mpegts_open_section_filter(ts, PAT_PID, pat_cb, ts, 1);
-        mpegts_open_section_filter(ts, EIT_PID, eit_cb, ts, 1);
-
-        handle_packets(ts, probesize / ts->raw_packet_size);
-        ts->scanning = 0;
-
-        if (ts->nb_prg <= 0) {
-            /* Guess this is a raw transport stream with no PAT tables. */
-            ts->auto_guess = 1;
-            s->ctx_flags |= AVFMTCTX_NOHEADER;
-               goto do_pcr;
-        }
-
+        // begin MythTV
         ts->scanning = 1;
         ts->pmt_scan_state = PMT_NOT_YET_FOUND;
         /* tune to first service found */
@@ -3728,9 +3707,7 @@ static int mpegts_read_header(AVFormatContext *s)
                    "mpegts_read_header: could not find any PMT's\n");
             return -1;
         }
-
-        } // end MythTV if
-#endif // UPSTREAM_TO_MYTHTV
+        // end MythTV
 
         av_log(ts->stream, AV_LOG_TRACE, "tuning done\n");
 
@@ -3742,7 +3719,6 @@ static int mpegts_read_header(AVFormatContext *s)
         uint8_t packet[TS_PACKET_SIZE];
         const uint8_t *data;
 
-    do_pcr: // only MythTV change to else branch
         /* only read packets */
 
         st = avformat_new_stream(s, NULL);
