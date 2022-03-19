@@ -26,7 +26,10 @@
 #ifndef CHANNELICON_H
 #define CHANNELICON_H
 
+#include "mythconfig.h"
+#if CONFIG_QTSCRIPT
 #include <QScriptEngine>
+#endif
 
 #include "services/channelIconServices.h"
 
@@ -64,6 +67,7 @@ class ChannelIcon : public ChannelIconServices
 // We should continue to look for a cleaning solution to this problem.
 // --------------------------------------------------------------------------
 
+#if CONFIG_QTSCRIPT
 class ScriptableChannelIcon : public QObject
 {
     Q_OBJECT
@@ -92,5 +96,6 @@ class ScriptableChannelIcon : public QObject
 
 
 Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableChannelIcon, QObject*);
+#endif
 
 #endif

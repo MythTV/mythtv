@@ -8,8 +8,11 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
+#include "mythconfig.h"
 #include <QTextStream>
+#if CONFIG_QTSCRIPT
 #include <QScriptEngine>
+#endif
 
 #include "upnpsubscription.h"
 #include "upnputil.h"
@@ -86,10 +89,12 @@ MediaRenderer::MediaRenderer()
     //          classes. - dblain
     // ------------------------------------------------------------------
 
+#if CONFIG_QTSCRIPT
     QScriptEngine* pEngine = pHtmlServer->ScriptEngine();
 
     pEngine->globalObject().setProperty("Frontend"   ,
         pEngine->scriptValueFromQMetaObject< ScriptableFrontend    >() );
+#endif
 
     // ----------------------------------------------------------------------
     // Initialize UPnp Stack

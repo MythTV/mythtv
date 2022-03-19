@@ -18,8 +18,11 @@
 #include "upnpcdstv.h"
 #include "upnpcdsmusic.h"
 #include "upnpcdsvideo.h"
+#include "mythconfig.h"
 
+#if CONFIG_QTSCRIPT
 #include <QScriptEngine>
+#endif
 #include <QNetworkProxy>
 #include <QNetworkInterface>
 
@@ -157,6 +160,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     //          classes. - dblain
     // ------------------------------------------------------------------
 
+#if CONFIG_QTSCRIPT
      QScriptEngine* pEngine = pHtmlServer->ScriptEngine();
 
      pEngine->globalObject().setProperty("Myth"   ,
@@ -177,6 +181,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
          pEngine->scriptValueFromQMetaObject< ScriptableCapture  >() );
      pEngine->globalObject().setProperty("Image"  ,
          pEngine->scriptValueFromQMetaObject< ScriptableImage   >() );
+#endif
 
     // ------------------------------------------------------------------
 

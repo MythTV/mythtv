@@ -11,7 +11,10 @@
 #ifndef MUSIC_H
 #define MUSIC_H
 
+#include "mythconfig.h"
+#if CONFIG_QTSCRIPT
 #include <QScriptEngine>
+#endif
 #include "services/musicServices.h"
 
 class Music : public MusicServices
@@ -49,6 +52,7 @@ class Music : public MusicServices
 // We should continue to look for a cleaning solution to this problem.
 // --------------------------------------------------------------------------
 
+#if CONFIG_QTSCRIPT
 class ScriptableMusic : public QObject
 {
     Q_OBJECT
@@ -85,5 +89,6 @@ class ScriptableMusic : public QObject
 
 // NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableMusic, QObject*);
+#endif
 
 #endif

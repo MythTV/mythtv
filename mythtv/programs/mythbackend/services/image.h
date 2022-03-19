@@ -22,7 +22,10 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+#include "mythconfig.h"
+#if CONFIG_QTSCRIPT
 #include <QScriptEngine>
+#endif
 #include "services/imageServices.h"
 #include "imagemanager.h"
 
@@ -67,6 +70,7 @@ public:
 // We should continue to look for a cleaning solution to this problem.
 // --------------------------------------------------------------------------
 
+#if CONFIG_QTSCRIPT
 class ScriptableImage : public QObject
 {
     Q_OBJECT
@@ -146,5 +150,6 @@ class ScriptableImage : public QObject
 
 // NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableImage, QObject*)
+#endif
 
 #endif

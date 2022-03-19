@@ -59,7 +59,7 @@ SOURCES += serializers/xmlplistSerializer.cpp
 
 SOURCES += websocket_extensions/*.cpp
 
-contains(QT_MAJOR_VERSION, 5) {
+using_qtscript: {
     HEADERS += serverSideScripting.h
     SOURCES += serverSideScripting.cpp
 }
@@ -106,7 +106,8 @@ macx {
 }
 
 QT += network xml sql
-contains(QT_MAJOR_VERSION, 5): QT += script
+
+using_qtscript: QT += script
 
 mingw | win32-msvc* {
 

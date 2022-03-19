@@ -28,8 +28,8 @@
 
 #include "services/rttiServices.h"
 #include "datacontracts/enum.h"
+#include "mythconfig.h"
 
-#include <QScriptEngine>
 
 class Rtti : public RttiServices
 {
@@ -44,6 +44,9 @@ class Rtti : public RttiServices
         DTC::Enum* GetEnum ( const QString   &FQN ) override; // RttiServices
 
 };
+
+#if CONFIG_QTSCRIPT
+#include <QScriptEngine>
 
 // --------------------------------------------------------------------------
 // The following class wrapper is due to a limitation in Qt Script Engine.  It
@@ -82,5 +85,6 @@ class ScriptableRtti : public QObject
 
 // NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableRtti, QObject*);
+#endif
 
 #endif 

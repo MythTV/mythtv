@@ -26,7 +26,10 @@
 #ifndef DVR_H
 #define DVR_H
 
+#include "mythconfig.h"
+#if CONFIG_QTSCRIPT
 #include <QScriptEngine>
+#endif
 
 #include "services/dvrServices.h"
 
@@ -322,6 +325,8 @@ class Dvr : public DvrServices
 // --------------------------------------------------------------------------
 
 
+#include <QtGlobal>
+#if CONFIG_QTSCRIPT
 class ScriptableDvr : public QObject
 {
     Q_OBJECT
@@ -697,5 +702,6 @@ class ScriptableDvr : public QObject
 
 // NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableDvr, QObject*)
+#endif
 
 #endif

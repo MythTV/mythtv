@@ -40,9 +40,12 @@
 #include "mthreadpool.h"
 #include "upnputil.h"
 #include "compat.h"
+#include "mythconfig.h"
 
 class HttpWorkerThread;
+#if CONFIG_QTSCRIPT
 class QScriptEngine;
+#endif
 class HttpServer;
 #ifndef QT_NO_OPENSSL
 class QSslKey;

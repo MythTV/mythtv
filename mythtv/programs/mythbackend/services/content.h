@@ -26,7 +26,10 @@
 #ifndef CONTENT_H
 #define CONTENT_H
 
+#include "mythconfig.h"
+#if CONFIG_QTSCRIPT
 #include <QScriptEngine>
+#endif
 
 #include "services/contentServices.h"
 
@@ -142,6 +145,7 @@ class Content : public ContentServices
 // We should continue to look for a cleaning solution to this problem.
 // --------------------------------------------------------------------------
 
+#if CONFIG_QTSCRIPT
 class ScriptableContent : public QObject
 {
     Q_OBJECT
@@ -262,5 +266,6 @@ class ScriptableContent : public QObject
 
 // NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableContent, QObject*);
+#endif
 
 #endif

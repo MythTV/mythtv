@@ -1,6 +1,6 @@
 include ( ../../settings.pro )
 
-contains(QT_MAJOR_VERSION, 5): QT += script
+using_qtscript: QT += script
 
 TEMPLATE = lib
 TARGET = mythservicecontracts-$$LIBVERSION
