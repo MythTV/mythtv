@@ -11,10 +11,4 @@
 #endif
 #endif /* __cplusplus */
 
-#if ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2)))
-# define MDEPRECATED __attribute__((deprecated))
-#else
-# define MDEPRECATED
-#endif
-
 #endif /* MYTHEXP_H_ */
