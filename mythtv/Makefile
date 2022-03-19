@@ -85,7 +85,7 @@ distclean: $(addsuffix _distclean,$(SUBDIRS))
 	-rm -f libs/libmythbase/version.h
 	-rm -f libs/libavutil/avconfig.h
 	-rm -f external/FFmpeg/libavutil/avconfig.h
-	-rm -f config.ep
+	-rm -f config.ep .qmake.stash
 	-rm -f $(addsuffix /Makefile,$(QT_SUBDIRS))
 	-rm -f ../GPATH ../GRTAGS ../GTAGS
 	-rm -f ../TAGS ../tags
