@@ -4,7 +4,7 @@
 #include "mythpluginexport.h"
 #include "mythplugin.h" // for MythPluginType
 
-extern "C++"
+extern "C"
 {
     MPLUGIN_PUBLIC int mythplugin_init(const char *libversion);
     MPLUGIN_PUBLIC int mythplugin_run();
