@@ -1,3 +1,4 @@
+// C/C++
 #include <cmath>
 #include <csignal>
 #include <cstdio>
@@ -11,32 +12,36 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+// Qt
 #include <QtGlobal>
-#include <QKeyEvent>
-#include <QEvent>
-#include <QWidget>
 #include <QApplication>
-#include <QString>
-#include <QFileInfo>
 #include <QDir>
+#include <QEvent>
+#include <QFileInfo>
+#include <QKeyEvent>
+#include <QString>
+#include <QWidget>
 
-#include "exitcodes.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
-#include "mythversion.h"
+// MythTV
+#include "libmyth/langsettings.h"
+#include "libmyth/mythcontext.h"
+#include "libmythbase/cleanupguard.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythtranslation.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/signalhandling.h"
+#include "libmythtv/mythsystemevent.h"
+#include "libmythui/mythdisplay.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuihelper.h"
+
+// MythScreenWizard
 #include "mythscreenwizard_commandlineparser.h"
-#include "compat.h"
-#include "mythsystemevent.h"
-#include "mythlogging.h"
-#include "signalhandling.h"
 #include "screenwizard.h"
-#include "langsettings.h"
-#include "mythtranslation.h"
-#include "mythmainwindow.h"
-#include "mythuihelper.h"
-#include "mythcorecontext.h"
-#include "cleanupguard.h"
-#include "mythdisplay.h"
 
 #define LOC      QString("MythScreenWizard: ")
 #define LOC_WARN QString("MythScreenWizard, Warning: ")

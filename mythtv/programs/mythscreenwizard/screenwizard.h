@@ -1,16 +1,18 @@
 #ifndef SCREENWIZARD_H
 #define SCREENWIZARD_H
 
-#include <QStringList>
+// Qt
 #include <QString>
+#include <QStringList>
 
-#include "mythscreentype.h"
-#include "mythuitext.h"
-#include "mythuibutton.h"
-#include "mythuiimage.h"
-#include "mythdialogbox.h"
-#include "mythuishape.h"
-#include "mythuitype.h"
+// MythTV
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythscreentype.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuiimage.h"
+#include "libmythui/mythuishape.h"
+#include "libmythui/mythuitext.h"
+#include "libmythui/mythuitype.h"
 
 class XMLParse;
 class ScreenWizard : public MythScreenType
