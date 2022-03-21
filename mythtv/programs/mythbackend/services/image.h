@@ -22,12 +22,12 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 #if CONFIG_QTSCRIPT
 #include <QScriptEngine>
 #endif
-#include "services/imageServices.h"
-#include "imagemanager.h"
+#include "libmythmetadata/imagemanager.h"
+#include "libmythservicecontracts/services/imageServices.h"
 
 
 class Image : public ImageServices

@@ -11,11 +11,11 @@
 #ifndef MUSIC_H
 #define MUSIC_H
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 #if CONFIG_QTSCRIPT
 #include <QScriptEngine>
 #endif
-#include "services/musicServices.h"
+#include "libmythservicecontracts/services/musicServices.h"
 
 class Music : public MusicServices
 {

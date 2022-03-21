@@ -26,12 +26,12 @@
 #ifndef CAPTURE_H
 #define CAPTURE_H
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 #if CONFIG_QTSCRIPT
 #include <QScriptEngine>
 #endif
 
-#include "services/captureServices.h"
+#include "libmythservicecontracts/services/captureServices.h"
 
 class Capture : public CaptureServices
 {

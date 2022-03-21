@@ -23,19 +23,22 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+// Qt
 #include <QUrl>
 
-#include "serviceUtil.h"
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmyth/recordingtypes.h"
+#include "libmythmetadata/videoutils.h"
+#include "libmythservicecontracts/datacontracts/cutList.h"
+#include "libmythtv/cardutil.h"
+#include "libmythtv/channelinfo.h"
+#include "libmythtv/channelutil.h"
+#include "libmythtv/metadataimagehelper.h"
+#include "libmythtv/recordinginfo.h"
 
-#include "programinfo.h"
-#include "recordinginfo.h"
-#include "recordingtypes.h"
-#include "channelutil.h"
-#include "channelinfo.h"
-#include "videoutils.h"
-#include "metadataimagehelper.h"
-#include "cardutil.h"
-#include "datacontracts/cutList.h"
+// MythBackend
+#include "serviceUtil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

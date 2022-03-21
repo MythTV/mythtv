@@ -21,13 +21,16 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include "mythchrono.h"
-#include "mythcorecontext.h"
-#include "mythdate.h"
-#include "mythdb.h"
-#include "mythdownloadmanager.h"
-#include "mythevent.h"
-#include "mythlogging.h"
+// MythTV
+#include "libmythbase/mythchrono.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythevent.h"
+#include "libmythbase/mythlogging.h"
+
+// MythBackend
 #include "recordingextender.h"
 #include "scheduler.h"
 

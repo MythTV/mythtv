@@ -26,26 +26,26 @@
 #ifndef SERVICEUTIL_H
 #define SERVICEUTIL_H
 
-#include "datacontracts/programAndChannel.h"
-#include "datacontracts/recRule.h"
-#include "datacontracts/artworkInfoList.h"
-#include "datacontracts/videoMetadataInfo.h"
-#include "datacontracts/musicMetadataInfo.h"
-#include "datacontracts/channelGroup.h"
-#include "datacontracts/input.h"
-#include "datacontracts/castMemberList.h"
-#include "datacontracts/cutList.h"
-#include "datacontracts/genreList.h"
-
-#include "programinfo.h"
-#include "programdata.h"
-#include "recordingrule.h"
-#include "videometadatalistmanager.h"
-#include "channelgroup.h"
-#include "inputinfo.h"
-#include "channelinfo.h"
-#include "recordinginfo.h"
-#include "musicmetadata.h"
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmythmetadata/musicmetadata.h"
+#include "libmythmetadata/videometadatalistmanager.h"
+#include "libmythservicecontracts/datacontracts/artworkInfoList.h"
+#include "libmythservicecontracts/datacontracts/castMemberList.h"
+#include "libmythservicecontracts/datacontracts/channelGroup.h"
+#include "libmythservicecontracts/datacontracts/cutList.h"
+#include "libmythservicecontracts/datacontracts/genreList.h"
+#include "libmythservicecontracts/datacontracts/input.h"
+#include "libmythservicecontracts/datacontracts/musicMetadataInfo.h"
+#include "libmythservicecontracts/datacontracts/programAndChannel.h"
+#include "libmythservicecontracts/datacontracts/recRule.h"
+#include "libmythservicecontracts/datacontracts/videoMetadataInfo.h"
+#include "libmythtv/channelgroup.h"
+#include "libmythtv/channelinfo.h"
+#include "libmythtv/inputinfo.h"
+#include "libmythtv/programdata.h"
+#include "libmythtv/recordinginfo.h"
+#include "libmythtv/recordingrule.h"
 
 #define ADD_SQL(settings_var, bindvar, col, api_param, val) { \
     (settings_var) += QString("%1=:%2, ").arg(col, api_param); \

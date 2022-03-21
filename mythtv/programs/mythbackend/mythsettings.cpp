@@ -1,12 +1,16 @@
-#include <QNetworkInterface>
+// Qt
 #include <QDomDocument>
 #include <QFile>
+#include <QNetworkInterface>
 
-#include "channelsettings.h" // for ChannelTVFormat::GetFormats()
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythtv/channelsettings.h" // for ChannelTVFormat::GetFormats()
+#include "libmythtv/frequencies.h"
+
+// MythBackend
 #include "mythsettings.h"
-#include "frequencies.h"
-#include "mythcontext.h"
-#include "mythdb.h"
 
 MythSetting::SettingType parse_setting_type(const QString &str);
 MythSetting::DataType parse_data_type(const QString &str);

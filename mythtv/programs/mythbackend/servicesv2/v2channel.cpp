@@ -24,27 +24,30 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <QList>
-
+// C++
 #include <cmath>
 
+// Qt
+#include <QList>
+
+// MythTV
 #include "libmythbase/http/mythhttpmetaservice.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythtv/channelutil.h"
+#include "libmythtv/sourceutil.h"
+#include "libmythtv/cardutil.h"
+#include "libmythbase/mythdate.h"
+
+// MythBackend
+#include "v2artworkInfoList.h"
+#include "v2castMemberList.h"
 #include "v2channel.h"
 #include "v2programAndChannel.h"
 #include "v2recording.h"
-#include "v2artworkInfoList.h"
-#include "v2castMemberList.h"
-
-#include "compat.h"
-#include "mythdbcon.h"
-#include "mythdirs.h"
-#include "mythversion.h"
-#include "mythcorecontext.h"
-#include "channelutil.h"
-#include "sourceutil.h"
-#include "cardutil.h"
-#include "mythdate.h"
-
 #include "v2serviceUtil.h"
 
 /////////////////////////////////////////////////////////////////////////////

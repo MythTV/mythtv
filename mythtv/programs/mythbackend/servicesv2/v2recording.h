@@ -11,12 +11,14 @@
 #ifndef V2RECORDING_H_
 #define V2RECORDING_H_
 
+// Qt
 #include <QDateTime>
 #include <QString>
 
+// MythTV
+#include "libmyth/programtypes.h"
 #include "libmythbase/http/mythhttpservice.h"
-#include "enums/recStatus.h"
-#include "programtypes.h"
+#include "libmythservicecontracts/enums/recStatus.h"
 
 class V2RecordingInfo : public QObject
 {

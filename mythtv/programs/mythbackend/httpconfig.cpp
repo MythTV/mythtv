@@ -9,13 +9,15 @@
 #include <QUrl>
 
 // MythTV headers
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythbase/unziputil.h"
+
+// MythBackend
 #include "httpconfig.h"
-#include "mythcontext.h"
-#include "mythdb.h"
-#include "mythdirs.h"
-#include "storagegroup.h"
-#include "mythdownloadmanager.h"
-#include "unziputil.h"
 
 HttpConfig::HttpConfig() : HttpServerExtension("HttpConfig", QString())
 {

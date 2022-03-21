@@ -23,18 +23,20 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+// Qt
 #include <QList>
 #include <QFile>
 #include <QMutex>
 
+// MythTV
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythversion.h"
+#include "libmythtv/cardutil.h"
+
+// MythBackend
 #include "capture.h"
-
-#include "cardutil.h"
-
-#include "compat.h"
-#include "mythversion.h"
-#include "mythcorecontext.h"
-#include "mythdate.h"
 #include "serviceUtil.h"
 
 /////////////////////////////////////////////////////////////////////////////

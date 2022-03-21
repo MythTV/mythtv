@@ -23,30 +23,34 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "content.h"
+// C++
+#include <cmath>
 
+// Qt
 #include <QDir>
 #include <QImage>
 #include <QImageWriter>
 
-#include <cmath>
-#include "compat.h"
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/remotefile.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythmetadata/musicmetadata.h"
+#include "libmythmetadata/videometadatalistmanager.h"
+#include "libmythprotoserver/requesthandler/fileserverutil.h"
+#include "libmythtv/HLS/httplivestream.h"
+#include "libmythtv/metadataimagehelper.h"
+#include "libmythtv/previewgenerator.h"
+#include "libmythupnp/httprequest.h"
 
-#include "mythcorecontext.h"
-#include "storagegroup.h"
-#include "programinfo.h"
-#include "previewgenerator.h"
-#include "requesthandler/fileserverutil.h"
-#include "httprequest.h"
+// MythBackend
+#include "content.h"
 #include "serviceUtil.h"
-#include "mythdate.h"
-#include "mythdownloadmanager.h"
-#include "metadataimagehelper.h"
-#include "musicmetadata.h"
-#include "videometadatalistmanager.h"
-#include "HLS/httplivestream.h"
-#include "mythmiscutil.h"
-#include "remotefile.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

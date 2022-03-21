@@ -24,30 +24,31 @@
 #include <QTextStream>
 
 // MythTV headers
-#include "v2status.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/exitcodes.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/mythversion.h"
+#include "libmythtv/cardutil.h"
+#include "libmythtv/jobqueue.h"
+#include "libmythtv/tv.h"
+#include "libmythtv/tv_rec.h"
+#include "libmythupnp/upnp.h"
+
+// MythBackend
+#include "autoexpire.h"
+#include "backendcontext.h"
+#include "encoderlink.h"
+#include "mainserver.h"
+#include "scheduler.h"
 #include "v2backendStatus.h"
 #include "v2serviceUtil.h"
-
-#include "mythcorecontext.h"
-#include "mythversion.h"
-#include "mythdbcon.h"
-#include "compat.h"
-#include "mythconfig.h"
-#include "autoexpire.h"
-#include "tv.h"
-#include "encoderlink.h"
-#include "scheduler.h"
-#include "mainserver.h"
-#include "cardutil.h"
-#include "mythmiscutil.h"
-#include "mythsystemlegacy.h"
-#include "exitcodes.h"
-#include "jobqueue.h"
-#include "upnp.h"
-#include "mythdate.h"
-#include "tv_rec.h"
-#include "backendcontext.h"
+#include "v2status.h"
 
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,

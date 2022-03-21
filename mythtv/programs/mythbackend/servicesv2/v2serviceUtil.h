@@ -1,21 +1,24 @@
 #ifndef V2SERVICEUTIL_H
 #define V2SERVICEUTIL_H
 
-#include "videometadatalistmanager.h"
-#include "v2videoMetadataInfo.h"
-#include "v2programList.h"
+// MythTV
+#include "libmythmetadata/musicmetadata.h"
+#include "libmythmetadata/videometadatalistmanager.h"
+#include "libmythtv/channelgroup.h"
+#include "libmythtv/channelinfo.h"
+#include "libmythtv/inputinfo.h"
+#include "libmythtv/programdata.h"
+#include "libmythtv/recordinginfo.h"
+#include "libmythtv/recordingrule.h"
+
+// MythBackend
 #include "v2channelGroup.h"
-#include "v2recRule.h"
 #include "v2cutList.h"
 #include "v2input.h"
 #include "v2musicMetadataInfoList.h"
-#include "channelinfo.h"
-#include "channelgroup.h"
-#include "recordingrule.h"
-#include "recordinginfo.h"
-#include "programdata.h"
-#include "inputinfo.h"
-#include "musicmetadata.h"
+#include "v2programList.h"
+#include "v2recRule.h"
+#include "v2videoMetadataInfo.h"
 
 #define ADD_SQL(settings_var, bindvar, col, api_param, val) { \
     (settings_var) += QString("%1=:%2, ").arg(col, api_param); \

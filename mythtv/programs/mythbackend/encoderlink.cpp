@@ -1,23 +1,25 @@
 // ANSI C++ headers
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
+#include <utility>
 
 // QT headers
 #include <QMap>                         // for QMap
-#include <utility>
 
 // MythTV headers
-#include "mythcorecontext.h"
+#include "libmyth/programinfo.h"          // for ProgramInfo
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"      // for LOG
+#include "libmythbase/referencecounter.h"
+#include "libmythprotoserver/requesthandler/fileserverutil.h"
+#include "libmythtv/inputinfo.h"          // for InputInfo
+#include "libmythtv/tv_rec.h"
+
+// MythBackend
 #include "encoderlink.h"
 #include "playbacksock.h"
-#include "tv_rec.h"
-#include "mythdate.h"
-#include "requesthandler/fileserverutil.h"
-#include "compat.h"
-#include "referencecounter.h"
-#include "inputinfo.h"                  // for InputInfo
-#include "mythlogging.h"                // for LOG
-#include "programinfo.h"                // for ProgramInfo
 
 #define LOC QString("EncoderLink(%1): ").arg(m_inputid)
 #define LOC_ERR QString("EncoderLink(%1) Error: ").arg(m_inputid)

@@ -24,22 +24,25 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <QList>
-
+// C++
 #include <cmath>
 
+// Qt
+#include <QList>
+
+// MythTV
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythversion.h"
+#include "libmythtv/cardutil.h"
+#include "libmythtv/channelutil.h"
+#include "libmythtv/sourceutil.h"
+
+// MythBackend
 #include "channel.h"
-
-#include "compat.h"
-#include "mythdbcon.h"
-#include "mythdirs.h"
-#include "mythversion.h"
-#include "mythcorecontext.h"
-#include "channelutil.h"
-#include "sourceutil.h"
-#include "cardutil.h"
-#include "mythdate.h"
-
 #include "serviceUtil.h"
 
 /////////////////////////////////////////////////////////////////////////////

@@ -26,19 +26,20 @@
 #ifndef GUIDE_H
 #define GUIDE_H
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 #if CONFIG_QTSCRIPT
 #include <QScriptEngine>
 #endif
 
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmythservicecontracts/datacontracts/channelGroupList.h"
+#include "libmythservicecontracts/datacontracts/programAndChannel.h"
+#include "libmythservicecontracts/datacontracts/programList.h"
+#include "libmythservicecontracts/services/guideServices.h"
+
+// MythBackend
 #include "serviceUtil.h"
-
-#include "services/guideServices.h"
-
-#include "datacontracts/programAndChannel.h"
-#include "datacontracts/channelGroupList.h"
-#include "datacontracts/programList.h"
-#include "programinfo.h"
 
 class Guide : public GuideServices
 {

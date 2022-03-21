@@ -28,7 +28,7 @@
 #ifndef MYTHSERVICEHOST_H_
 #define MYTHSERVICEHOST_H_
 
-#include "servicehost.h"
+#include "libmythupnp/servicehost.h"
 #include "services/myth.h"
 
 /////////////////////////////////////////////////////////////////////////////

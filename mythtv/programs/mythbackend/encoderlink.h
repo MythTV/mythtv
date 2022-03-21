@@ -10,9 +10,9 @@
 #include <QMutex>                       // for QMutex
 #include <QString>                      // for QString
 
-#include "enums/recStatus.h"
-#include "tv.h"                         // for SleepStatus, etc
-#include "videoouttypes.h"              // for PictureAttribute
+#include "libmythservicecontracts/enums/recStatus.h"
+#include "libmythtv/tv.h"               // for SleepStatus, etc
+#include "libmythtv/videoouttypes.h"    // for PictureAttribute
 
 class TVRec;
 class PlaybackSock;

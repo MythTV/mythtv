@@ -14,7 +14,7 @@
 #include <QSet>
 #include <QMap>
 
-#include "mthread.h"
+#include "libmythbase/mthread.h"
 
 class ProgramInfo;
 class EncoderLink;

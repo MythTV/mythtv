@@ -3,7 +3,7 @@
 #ifndef HTTPCONFIG_H
 #define HTTPCONFIG_H
 
-#include "httpserver.h"
+#include "libmythupnp/httpserver.h"
 #include "mythsettings.h"
 
 class QTextStream;

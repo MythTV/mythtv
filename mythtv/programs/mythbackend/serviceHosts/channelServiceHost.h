@@ -28,7 +28,7 @@
 #ifndef CHANNELSERVICEHOST_H_
 #define CHANNELSERVICEHOST_H_
 
-#include "servicehost.h"
+#include "libmythupnp/servicehost.h"
 #include "services/channel.h"
 
 /////////////////////////////////////////////////////////////////////////////

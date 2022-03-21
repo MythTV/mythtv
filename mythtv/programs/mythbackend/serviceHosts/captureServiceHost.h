@@ -28,7 +28,7 @@
 #ifndef CAPTURESERVICEHOST_H_
 #define CAPTURESERVICEHOST_H_
 
-#include "servicehost.h"
+#include "libmythupnp/servicehost.h"
 #include "services/capture.h"
 
 /////////////////////////////////////////////////////////////////////////////

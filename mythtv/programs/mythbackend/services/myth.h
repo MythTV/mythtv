@@ -26,13 +26,13 @@
 #ifndef MYTH_H
 #define MYTH_H
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 #if CONFIG_QTSCRIPT
 #include <QScriptEngine>
 #endif
 
-#include "services/mythServices.h"
-#include <datacontracts/frontend.h>
+#include "libmythservicecontracts/datacontracts/frontend.h"
+#include "libmythservicecontracts/services/mythServices.h"
 
 class Myth : public MythServices
 {

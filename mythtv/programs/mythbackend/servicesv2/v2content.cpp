@@ -23,31 +23,33 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "v2content.h"
-#include "libmythbase/http/mythhttpmetaservice.h"
+// C++
+#include <cmath>
 
+// Qt
 #include <QDir>
 #include <QImage>
 #include <QImageWriter>
 
-#include <cmath>
-#include "compat.h"
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/http/mythhttpmetaservice.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/remotefile.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythmetadata/musicmetadata.h"
+#include "libmythmetadata/videometadatalistmanager.h"
+#include "libmythprotoserver/requesthandler/fileserverutil.h"
+#include "libmythtv/metadataimagehelper.h"
+#include "libmythtv/previewgenerator.h"
 
-#include "mythcorecontext.h"
-#include "storagegroup.h"
-#include "programinfo.h"
-#include "previewgenerator.h"
-#include "requesthandler/fileserverutil.h"
-// #include "httprequest.h"
+// MythBackend
+#include "v2content.h"
 #include "v2serviceUtil.h"
-#include "mythdate.h"
-#include "mythdownloadmanager.h"
-#include "metadataimagehelper.h"
-#include "musicmetadata.h"
-#include "videometadatalistmanager.h"
-// #include "HLS/httplivestream.h"
-#include "mythmiscutil.h"
-#include "remotefile.h"
 
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,

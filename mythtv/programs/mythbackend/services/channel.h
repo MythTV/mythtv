@@ -26,12 +26,12 @@
 #ifndef CHANNEL_H
 #define CHANNEL_H
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 #if CONFIG_QTSCRIPT
 #include <QScriptEngine>
 #endif
 
-#include "services/channelServices.h"
+#include "libmythservicecontracts/services/channelServices.h"
 
 class Channel : public ChannelServices
 {

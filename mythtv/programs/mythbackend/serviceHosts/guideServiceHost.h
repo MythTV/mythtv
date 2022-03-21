@@ -28,7 +28,7 @@
 #ifndef GUIDESERVICEHOST_H_
 #define GUIDESERVICEHOST_H_
 
-#include "servicehost.h"
+#include "libmythupnp/servicehost.h"
 #include "services/guide.h"
 
 /////////////////////////////////////////////////////////////////////////////

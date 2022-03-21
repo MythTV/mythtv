@@ -1,19 +1,22 @@
-#include "v2serviceUtil.h"
-#include "videoutils.h"
-#include "programinfo.h"
-#include "recordinginfo.h"
-#include "recordingtypes.h"
-#include "channelutil.h"
-#include "channelinfo.h"
-#include "channelgroup.h"
-#include "v2encoder.h"
-#include "tv_rec.h"
-#include "cardutil.h"
-#include "encoderlink.h"
-#include "mythscheduler.h"
-#include "scheduler.h"
-#include "v2frontend.h"
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmyth/recordingtypes.h"
+#include "libmythbase/mythscheduler.h"
+#include "libmythmetadata/videoutils.h"
+#include "libmythtv/cardutil.h"
+#include "libmythtv/channelgroup.h"
+#include "libmythtv/channelinfo.h"
+#include "libmythtv/channelutil.h"
+#include "libmythtv/recordinginfo.h"
+#include "libmythtv/tv_rec.h"
+
+// MythBackend
 #include "backendcontext.h"
+#include "encoderlink.h"
+#include "scheduler.h"
+#include "v2encoder.h"
+#include "v2frontend.h"
+#include "v2serviceUtil.h"
 
 void V2FillProgramInfo( V2Program *pProgram,
                       ProgramInfo  *pInfo,

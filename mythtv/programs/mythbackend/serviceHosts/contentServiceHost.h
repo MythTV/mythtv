@@ -28,7 +28,7 @@
 #ifndef CONTENTSERVICEHOST_H_
 #define CONTENTSERVICEHOST_H_
 
-#include "servicehost.h"
+#include "libmythupnp/servicehost.h"
 #include "services/content.h"
 
 /////////////////////////////////////////////////////////////////////////////

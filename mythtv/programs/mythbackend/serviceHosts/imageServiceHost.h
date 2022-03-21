@@ -24,7 +24,7 @@
 #ifndef IMAGESERVICEHOST_H_
 #define IMAGESERVICEHOST_H_
 
-#include "servicehost.h"
+#include "libmythupnp/servicehost.h"
 #include "services/image.h"
 
 

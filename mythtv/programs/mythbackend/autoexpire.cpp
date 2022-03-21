@@ -12,12 +12,10 @@
 // POSIX headers
 #include <unistd.h>
 
-// C headers
-#include <cstdlib>
-
 // C++ headers
-#include <iostream>
 #include <algorithm>
+#include <cstdlib>
+#include <iostream>
 
 // Qt headers
 #include <QDateTime>
@@ -25,22 +23,24 @@
 #include <QList>
 
 // MythTV headers
-#include "filesysteminfo.h"
+#include "libmyth/programinfo.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/filesysteminfo.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythprotoserver/requesthandler/fileserverutil.h"
+#include "libmythtv/remoteencoder.h"
+#include "libmythtv/tv_rec.h"
+
+// MythBackend
 #include "autoexpire.h"
-#include "programinfo.h"
-#include "mythcorecontext.h"
-#include "mythdb.h"
-#include "mythdate.h"
-#include "storagegroup.h"
-#include "remoteutil.h"
-#include "remoteencoder.h"
-#include "encoderlink.h"
-#include "requesthandler/fileserverutil.h"
-#include "mainserver.h"
-#include "compat.h"
-#include "mythlogging.h"
-#include "tv_rec.h"
 #include "backendcontext.h"
+#include "encoderlink.h"
+#include "mainserver.h"
 
 #define LOC     QString("AutoExpire: ")
 #define LOC_ERR QString("AutoExpire Error: ")

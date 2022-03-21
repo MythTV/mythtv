@@ -23,25 +23,28 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "v2dvr.h"
+// MythTV
+#include "libmyth/programinfo.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
-#include "v2titleInfoList.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythscheduler.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythtv/cardutil.h"
+#include "libmythtv/channelutil.h"
+#include "libmythtv/jobqueue.h"
+#include "libmythtv/playgroup.h"
+#include "libmythtv/programdata.h"
+#include "libmythtv/tv_rec.h"
+
+// MythBackend
 #include "autoexpire.h"
-#include "programinfo.h"
-#include "programdata.h"
-#include "channelutil.h"
-#include "scheduler.h"
-#include "mythversion.h"
-#include "mythcorecontext.h"
-#include "mythscheduler.h"
-#include "jobqueue.h"
-#include "v2serviceUtil.h"
-#include "tv_rec.h"
-#include "cardutil.h"
-#include "encoderlink.h"
-#include "storagegroup.h"
-#include "playgroup.h"
 #include "backendcontext.h"
+#include "encoderlink.h"
+#include "scheduler.h"
+#include "v2dvr.h"
+#include "v2serviceUtil.h"
+#include "v2titleInfoList.h"
 
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,

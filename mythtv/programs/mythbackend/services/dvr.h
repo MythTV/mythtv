@@ -26,12 +26,12 @@
 #ifndef DVR_H
 #define DVR_H
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 #if CONFIG_QTSCRIPT
 #include <QScriptEngine>
 #endif
 
-#include "services/dvrServices.h"
+#include "libmythservicecontracts/services/dvrServices.h"
 
 class Dvr : public DvrServices
 {

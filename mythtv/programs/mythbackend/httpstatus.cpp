@@ -24,26 +24,27 @@
 #include <QTextStream>
 
 // MythTV headers
-#include "httpstatus.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/mythversion.h"
+#include "libmythtv/cardutil.h"
+#include "libmythtv/jobqueue.h"
+#include "libmythtv/tv.h"
+#include "libmythtv/tv_rec.h"
+#include "libmythupnp/upnp.h"
 
-#include "mythcorecontext.h"
-#include "mythversion.h"
-#include "mythdbcon.h"
-#include "compat.h"
-#include "mythconfig.h"
+// MythBackend
 #include "autoexpire.h"
-#include "tv.h"
 #include "encoderlink.h"
-#include "scheduler.h"
+#include "httpstatus.h"
 #include "mainserver.h"
-#include "cardutil.h"
-#include "mythmiscutil.h"
-#include "mythsystemlegacy.h"
-#include "exitcodes.h"
-#include "jobqueue.h"
-#include "upnp.h"
-#include "mythdate.h"
-#include "tv_rec.h"
+#include "scheduler.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

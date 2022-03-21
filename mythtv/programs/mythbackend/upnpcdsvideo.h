@@ -12,7 +12,7 @@
 #define UPnpCDSVIDEO_H_
 
 #include "mainserver.h"
-#include "upnpcds.h"
+#include "libmythupnp/upnpcds.h"
               
 using IntMap = QMap<int, QString>;
 

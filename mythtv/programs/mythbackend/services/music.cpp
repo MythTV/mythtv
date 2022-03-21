@@ -8,14 +8,16 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+// C++
 #include <cmath>
 #include <unistd.h>
 
+// MythTV
+#include "libmythbase/mythversion.h"
+#include "libmythmetadata/musicmetadata.h"
+
+// MythBackend
 #include "music.h"
-
-#include "musicmetadata.h"
-
-#include "mythversion.h"
 #include "serviceUtil.h"
 
 /////////////////////////////////////////////////////////////////////////////

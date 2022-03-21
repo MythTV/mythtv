@@ -1,7 +1,8 @@
-#include <iostream>
+// C++
 #include <algorithm>
-#include <list>
 #include <chrono> // for milliseconds
+#include <iostream>
+#include <list>
 #include <thread> // for sleep_for
 
 #ifdef __linux__
@@ -17,6 +18,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
+// Qt
 #include <QStringList>
 #include <QDateTime>
 #include <QString>
@@ -24,28 +26,31 @@
 #include <QFile>
 #include <QMap>
 
-#include "mythmiscutil.h"
-#include "mythsystemlegacy.h"
-#include "scheduler.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythtv/cardutil.h"
+#include "libmythtv/jobqueue.h"
+#include "libmythtv/mythsystemevent.h"
+#include "libmythtv/recordinginfo.h"
+#include "libmythtv/recordingrule.h"
+#include "libmythtv/scheduledrecording.h"
+#include "libmythtv/tv_rec.h"
+
+// MythBackend
 #include "encoderlink.h"
 #include "mainserver.h"
-#include "remoteutil.h"
-#include "mythdate.h"
-#include "exitcodes.h"
-#include "mythcontext.h"
-#include "mythdb.h"
-#include "compat.h"
-#include "storagegroup.h"
-#include "recordinginfo.h"
-#include "recordingrule.h"
-#include "scheduledrecording.h"
-#include "cardutil.h"
-#include "mythdb.h"
-#include "mythsystemevent.h"
-#include "mythlogging.h"
-#include "tv_rec.h"
-#include "jobqueue.h"
 #include "recordingextender.h"
+#include "scheduler.h"
 
 #define LOC QString("Scheduler: ")
 #define LOC_WARN QString("Scheduler, Warning: ")

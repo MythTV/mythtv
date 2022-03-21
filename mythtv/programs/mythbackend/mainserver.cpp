@@ -1,3 +1,4 @@
+// C++
 #include <algorithm>
 #include <cerrno>
 #include <chrono> // for milliseconds
@@ -9,7 +10,7 @@
 #include <memory>
 #include <thread> // for sleep_for
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 
 #ifndef _WIN32
 #include <sys/ioctl.h>
@@ -28,6 +29,7 @@
 #  endif // _WIN32
 #endif // !__linux__
 
+// Qt
 #include <QtGlobal>
 #include <QCoreApplication>
 #include <QDateTime>
@@ -43,47 +45,48 @@
 #include <QNetworkProxy>
 #include <QHostAddress>
 
-#include "previewgeneratorqueue.h"
-#include "mythmiscutil.h"
-#include "mythrandom.h"
-#include "mythsystemlegacy.h"
-#include "mythcontext.h"
-#include "mythversion.h"
-#include "mythdb.h"
-#include "mainserver.h"
-#include "serverpool.h"
-#include "mthread.h"
-#include "scheduler.h"
-#include "requesthandler/fileserverutil.h"
-#include "programinfo.h"
-#include "mythtimezone.h"
-#include "recordinginfo.h"
-#include "recordingrule.h"
-#include "scheduledrecording.h"
-#include "jobqueue.h"
-#include "autoexpire.h"
-#include "storagegroup.h"
-#include "compat.h"
-#include "io/mythmediabuffer.h"
-#include "remotefile.h"
-#include "mythsystemevent.h"
-#include "tv.h"
-#include "mythcorecontext.h"
-#include "mythcoreutil.h"
-#include "mythdirs.h"
-#include "mythdownloadmanager.h"
-#include "metadatafactory.h"
-#include "videoutils.h"
-#include "mythlogging.h"
-#include "filesysteminfo.h"
-#include "metaio.h"
-#include "musicmetadata.h"
-#include "imagemanager.h"
-#include "cardutil.h"
-#include "tv_rec.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/filesysteminfo.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythcoreutil.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythrandom.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/mythtimezone.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/remotefile.h"
+#include "libmythbase/serverpool.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythmetadata/imagemanager.h"
+#include "libmythmetadata/metadatafactory.h"
+#include "libmythmetadata/metaio.h"
+#include "libmythmetadata/musicmetadata.h"
+#include "libmythmetadata/videoutils.h"
+#include "libmythprotoserver/requesthandler/fileserverutil.h"
+#include "libmythtv/cardutil.h"
+#include "libmythtv/io/mythmediabuffer.h"
+#include "libmythtv/jobqueue.h"
+#include "libmythtv/mythsystemevent.h"
+#include "libmythtv/previewgeneratorqueue.h"
+#include "libmythtv/recordinginfo.h"
+#include "libmythtv/recordingrule.h"
+#include "libmythtv/scheduledrecording.h"
+#include "libmythtv/tv.h"
+#include "libmythtv/tv_rec.h"
 
 // mythbackend headers
+#include "autoexpire.h"
 #include "backendcontext.h"
+#include "mainserver.h"
+#include "scheduler.h"
 
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.

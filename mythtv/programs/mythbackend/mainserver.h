@@ -14,18 +14,20 @@
 #include <QMap>
 
 // MythTV headers
-#include "tv.h"
-#include "playbacksock.h"
-#include "mthreadpool.h"
-#include "encoderlink.h"
-#include "exitcodes.h"
-#include "filetransfer.h"
-#include "scheduler.h"
-#include "livetvchain.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythdeque.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythsocket.h"
+#include "libmythtv/livetvchain.h"
+#include "libmythtv/tv.h"
+
+// mythbackend headers
 #include "autoexpire.h"
-#include "mythsocket.h"
-#include "mythdeque.h"
-#include "mythdownloadmanager.h"
+#include "encoderlink.h"
+#include "filetransfer.h"
+#include "playbacksock.h"
+#include "scheduler.h"
 
 #ifdef DeleteFile
 #undef DeleteFile

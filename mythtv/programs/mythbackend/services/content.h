@@ -26,12 +26,12 @@
 #ifndef CONTENT_H
 #define CONTENT_H
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 #if CONFIG_QTSCRIPT
 #include <QScriptEngine>
 #endif
 
-#include "services/contentServices.h"
+#include "libmythservicecontracts/services/contentServices.h"
 
 class Content : public ContentServices
 {

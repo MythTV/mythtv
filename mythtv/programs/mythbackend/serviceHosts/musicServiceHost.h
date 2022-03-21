@@ -11,7 +11,7 @@
 #ifndef MUSICSERVICEHOST_H_
 #define MUSICSERVICEHOST_H_
 
-#include "servicehost.h"
+#include "libmythupnp/servicehost.h"
 #include "services/music.h"
 
 /////////////////////////////////////////////////////////////////////////////

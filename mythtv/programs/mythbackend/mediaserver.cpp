@@ -8,23 +8,29 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "mediaserver.h"
-#include "httpconfig.h"
-#include "internetContent.h"
-#include "mythdirs.h"
-#include "htmlserver.h"
-#include "configuration.h"
-
-#include "upnpcdstv.h"
-#include "upnpcdsmusic.h"
-#include "upnpcdsvideo.h"
-#include "mythconfig.h"
-
+// Qt
+#include <QNetworkInterface>
+#include <QNetworkProxy>
 #if CONFIG_QTSCRIPT
 #include <QScriptEngine>
 #endif
-#include <QNetworkProxy>
-#include <QNetworkInterface>
+
+// MythTV
+#ifdef USING_LIBDNS_SD
+#include "libmythbase/bonjourregister.h"
+#endif
+#include "libmythbase/configuration.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythupnp/htmlserver.h"
+
+// MythBackend
+#include "httpconfig.h"
+#include "internetContent.h"
+#include "mediaserver.h"
+#include "upnpcdsmusic.h"
+#include "upnpcdstv.h"
+#include "upnpcdsvideo.h"
 
 #include "serviceHosts/mythServiceHost.h"
 #include "serviceHosts/guideServiceHost.h"
@@ -35,10 +41,6 @@
 #include "serviceHosts/musicServiceHost.h"
 #include "serviceHosts/captureServiceHost.h"
 #include "serviceHosts/imageServiceHost.h"
-
-#ifdef USING_LIBDNS_SD
-#include "bonjourregister.h"
-#endif
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

@@ -23,14 +23,16 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+// Qt
 #include <QList>
 
+// MythTV
+#include "libmythbase/compat.h"
+#include "libmythbase/mythdownloadmanager.h"
+
+// MythBackend
 #include "channelicon.h"
-
-#include "compat.h"
-
 #include "serviceUtil.h"
-#include "mythdownloadmanager.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

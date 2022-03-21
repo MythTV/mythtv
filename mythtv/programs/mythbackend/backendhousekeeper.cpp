@@ -6,27 +6,28 @@
 #include <cstdlib>
 
 // Qt headers
-#include <QStringList>
 #include <QDateTime>
 #include <QDir>
 #include <QFileInfo>
+#include <QStringList>
 
 // MythTV headers
-#include "backendhousekeeper.h"
-#include "mythdb.h"
-#include "mythdirs.h"
-#include "jobqueue.h"
-#include "exitcodes.h"
-#include "mythsystemlegacy.h"
-#include "mythversion.h"
-#include "unziputil.h"
-#include "programtypes.h"
-#include "recordingtypes.h"
-#include "mythcorecontext.h"
-#include "mythdownloadmanager.h"
-#include "musicmetadata.h"
+#include "libmyth/programtypes.h"
+#include "libmyth/recordingtypes.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/unziputil.h"
+#include "libmythmetadata/musicmetadata.h"
+#include "libmythservicecontracts/enums/recStatus.h"
+#include "libmythtv/jobqueue.h"
 
-#include "enums/recStatus.h"
+// MythBackend
+#include "backendhousekeeper.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,15,2)
 #define capturedView capturedRef

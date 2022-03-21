@@ -1,23 +1,24 @@
-#include "v2config.h"
-#include "libmythbase/http/mythhttpmetaservice.h"
-
 // qt
 #include <QHostAddress>
 #include <QNetworkInterface>
 
-#include "version.h"
-#include "mythcorecontext.h"
-#include "mythcontext.h"
-#include "mythversion.h"
-#include "v2databaseInfo.h"
-#include "v2countryList.h"
-#include "v2languageList.h"
-#include "v2databaseStatus.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmythbase/http/mythhttpmetaservice.h"
+#include "libmythbase/iso3166.h"
+#include "libmythbase/iso639.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlocale.h"
+#include "libmythbase/mythtranslation.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/version.h"
 
-#include "mythlocale.h"
-#include "mythtranslation.h"
-#include "iso3166.h"
-#include "iso639.h"
+// MythBackend
+#include "v2config.h"
+#include "v2countryList.h"
+#include "v2databaseInfo.h"
+#include "v2databaseStatus.h"
+#include "v2languageList.h"
 
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,

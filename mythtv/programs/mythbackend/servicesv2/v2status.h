@@ -11,16 +11,19 @@
 #ifndef V2STATUS_H_
 #define V2STATUS_H_
 
+// Qt
 #include <QDomDocument>
 #include <QMutex>
 #include <QMap>
 
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmythbase/http/mythhttpdata.h"
 #include "libmythbase/http/mythhttpservice.h"
-#include "http/mythmimedatabase.h"
-#include "http/mythhttpdata.h"
-#include "preformat.h"
+#include "libmythbase/http/mythmimedatabase.h"
 
-#include "programinfo.h"
+// MythBackend
+#include "preformat.h"
 #include "v2backendStatus.h"
 
 class Scheduler;

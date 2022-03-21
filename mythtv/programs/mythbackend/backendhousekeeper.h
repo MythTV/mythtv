@@ -1,8 +1,8 @@
 #ifndef BACKENDHOUSEKEEPER_H_
 #define BACKENDHOUSEKEEPER_H_
 
-#include "housekeeper.h"
-#include "mythsystemlegacy.h"
+#include "libmythbase/housekeeper.h"
+#include "libmythbase/mythsystemlegacy.h"
 
 class LogCleanerTask : public DailyHouseKeeperTask
 {

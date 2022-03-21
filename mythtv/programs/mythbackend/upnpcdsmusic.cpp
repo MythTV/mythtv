@@ -8,17 +8,22 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+// C++
 #include <climits>
 
+// Qt
 #include <QFileInfo>
 #include <QUrl>
 #include <QUrlQuery>
 
-#include "storagegroup.h"
+// MythTV
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythupnp/httprequest.h"
+#include "libmythupnp/upnphelpers.h"
+
+// MythBackend
 #include "upnpcdsmusic.h"
-#include "httprequest.h"
-#include "mythcorecontext.h"
-#include "upnphelpers.h"
 
 /**
  * \brief Music Extension for UPnP ContentDirectory Service

@@ -23,19 +23,21 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+// Qt
 #include <QList>
 #include <QFile>
 #include <QMutex>
 
-#include "v2capture.h"
+// MythTV
+#include "libmythbase/compat.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythversion.h"
+#include "libmythtv/cardutil.h"
 
-#include "cardutil.h"
-
-#include "compat.h"
-#include "mythversion.h"
-#include "mythcorecontext.h"
-#include "mythdate.h"
+// MythBackend
+#include "v2capture.h"
 #include "v2serviceUtil.h"
 
 // This will be initialised in a thread safe manner on first use

@@ -23,28 +23,31 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+// C++
+#include <cmath>
+
+// Qt
 #include <QList>
 #include <QFile>
 #include <QMutex>
 
-#include <cmath>
+// MythTV
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/remotefile.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythmetadata/bluraymetadata.h"
+#include "libmythmetadata/globals.h"
+#include "libmythmetadata/metadatafactory.h"
+#include "libmythmetadata/videometadata.h"
+#include "libmythtv/mythavutil.h"
 
-#include "video.h"
-
-#include "videometadata.h"
-#include "metadatafactory.h"
-#include "bluraymetadata.h"
-
-#include "compat.h"
-#include "mythversion.h"
-#include "mythcorecontext.h"
-#include "storagegroup.h"
-#include "remotefile.h"
-#include "globals.h"
-#include "mythdate.h"
+// MythBackend
 #include "serviceUtil.h"
-#include "mythmiscutil.h"
-#include "mythavutil.h"
+#include "video.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -1,8 +1,8 @@
 
 #include "backendcontext.h"
 
-#include "mythlogging.h"
-#include "mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythcorecontext.h"
 
 QMap<int, EncoderLink *> gTVList;
 AutoExpire  *gExpirer      = nullptr;

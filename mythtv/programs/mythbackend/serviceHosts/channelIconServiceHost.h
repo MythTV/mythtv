@@ -28,7 +28,7 @@
 #ifndef CHANNELICONSERVICEHOST_H_
 #define CHANNELICONSERVICEHOST_H_
 
-#include "servicehost.h"
+#include "libmythupnp/servicehost.h"
 #include "services/channelicon.h"
 
 /////////////////////////////////////////////////////////////////////////////

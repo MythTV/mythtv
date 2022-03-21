@@ -23,37 +23,39 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+// Qt
 #include <QMap>
 
-#include "dvr.h"
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmyth/programtypes.h"
+#include "libmyth/recordingtypes.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythevent.h"
+#include "libmythbase/mythscheduler.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythtv/cardutil.h"
+#include "libmythtv/channelutil.h"
+#include "libmythtv/inputinfo.h"
+#include "libmythtv/jobqueue.h"
+#include "libmythtv/playgroup.h"
+#include "libmythtv/programdata.h"
+#include "libmythtv/recordinginfo.h"
+#include "libmythtv/recordingprofile.h"
+#include "libmythtv/tv_rec.h"
 
-#include "compat.h"
-#include "mythversion.h"
-#include "mythcorecontext.h"
-#include "mythevent.h"
-#include "scheduler.h"
+// MythBackend
 #include "autoexpire.h"
-#include "jobqueue.h"
-#include "encoderlink.h"
-#include "remoteutil.h"
-#include "mythdate.h"
-#include "recordinginfo.h"
-#include "cardutil.h"
-#include "inputinfo.h"
-#include "programinfo.h"
-#include "programdata.h"
-#include "programtypes.h"
-#include "recordingtypes.h"
-#include "channelutil.h"
-
-#include "serviceUtil.h"
-#include "mythscheduler.h"
-#include "storagegroup.h"
-#include "playgroup.h"
-#include "recordingprofile.h"
 #include "backendcontext.h"
+#include "dvr.h"
+#include "encoderlink.h"
 #include "scheduler.h"
-#include "tv_rec.h"
+#include "scheduler.h"
+#include "serviceUtil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

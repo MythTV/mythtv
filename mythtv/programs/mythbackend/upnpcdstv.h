@@ -11,7 +11,7 @@
 #ifndef UPnpCDSTV_H_
 #define UPnpCDSTV_H_
 
-#include "upnpcds.h"
+#include "libmythupnp/upnpcds.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //

@@ -8,10 +8,10 @@
 #include <QMutex>
 #include <QSize>
 
-#include "referencecounter.h"
-#include "programinfo.h" // ProgramInfo
-#include "programtypes.h" // RecStatus::Type
-#include "inputinfo.h"
+#include "libmyth/programinfo.h"  // ProgramInfo
+#include "libmyth/programtypes.h" // RecStatus::Type
+#include "libmythbase/referencecounter.h"
+#include "libmythtv/inputinfo.h"
 
 class MythSocket;
 class MainServer;

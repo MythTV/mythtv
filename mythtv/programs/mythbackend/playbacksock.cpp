@@ -1,15 +1,20 @@
-#include <QStringList>
+// C++
 #include <utility>
 
-#include "compat.h"
-#include "playbacksock.h"
-#include "programinfo.h"
-#include "mainserver.h"
+// Qt
+#include <QStringList>
 
-#include "mythcorecontext.h"
-#include "mythdate.h"
-#include "inputinfo.h"
-#include "referencecounter.h"
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/referencecounter.h"
+#include "libmythtv/inputinfo.h"
+
+// MythBackend
+#include "mainserver.h"
+#include "playbacksock.h"
 
 #define LOC QString("PlaybackSock: ")
 #define LOC_ERR QString("PlaybackSock, Error: ")

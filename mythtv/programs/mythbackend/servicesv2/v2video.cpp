@@ -1,24 +1,26 @@
-#include "v2video.h"
-#include "mythversion.h"
+// MythTV
+#include "libmyth/programinfo.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
-#include "videometadata.h"
-#include "metadatafactory.h"
-#include "bluraymetadata.h"
-#include "storagegroup.h"
-#include "globals.h"
-#include "programinfo.h"
-#include "mythmiscutil.h"
-#include "v2serviceUtil.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythmetadata/bluraymetadata.h"
+#include "libmythmetadata/globals.h"
+#include "libmythmetadata/metadatafactory.h"
+#include "libmythmetadata/videometadata.h"
+#include "libmythtv/mythavutil.h"
+
+// MythBackend
+#include "v2artworkInfoList.h"
 #include "v2artworkInfoList.h"
 #include "v2castMemberList.h"
 #include "v2genreList.h"
-#include "v2artworkInfoList.h"
-#include "mythdb.h"
-#include "mythdbcon.h"
-#include "mythlogging.h"
-#include "mythcorecontext.h"
-#include "mythavutil.h"
-// #include <vector>
+#include "v2serviceUtil.h"
+#include "v2video.h"
 
 
 // This will be initialised in a thread safe manner on first use

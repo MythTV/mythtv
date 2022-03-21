@@ -26,14 +26,13 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 #if CONFIG_QTSCRIPT
 #include <QScriptEngine>
 #endif
 
-#include "videometadatalistmanager.h"
-
-#include "services/videoServices.h"
+#include "libmythmetadata/videometadatalistmanager.h"
+#include "libmythservicecontracts/services/videoServices.h"
 
 class Video : public VideoServices
 {

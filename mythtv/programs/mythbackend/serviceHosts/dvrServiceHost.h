@@ -28,7 +28,7 @@
 #ifndef DVRSERVICEHOST_H_
 #define DVRSERVICEHOST_H_
 
-#include "servicehost.h"
+#include "libmythupnp/servicehost.h"
 #include "services/dvr.h"
 
 /////////////////////////////////////////////////////////////////////////////

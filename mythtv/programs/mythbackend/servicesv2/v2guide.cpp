@@ -23,22 +23,25 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+// C++
 #include <cmath>
 
-#include "v2guide.h"
+// MythTV
+#include "libmythbase/compat.h"
+#include "libmythbase/http/mythhttpmetaservice.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythtv/channelgroup.h"
+#include "libmythtv/channelutil.h"
+
+// MythBackend
+#include "autoexpire.h"
+#include "scheduler.h"
 #include "v2artworkInfoList.h"
 #include "v2castMemberList.h"
-#include "libmythbase/http/mythhttpmetaservice.h"
-#include "compat.h"
-#include "mythversion.h"
-#include "mythcorecontext.h"
-#include "scheduler.h"
-#include "autoexpire.h"
-#include "channelutil.h"
-#include "channelgroup.h"
-#include "storagegroup.h"
-
-#include "mythlogging.h"
+#include "v2guide.h"
 
 extern AutoExpire  *expirer;
 extern Scheduler   *sched;

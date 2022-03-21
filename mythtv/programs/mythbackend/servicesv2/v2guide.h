@@ -26,14 +26,16 @@
 #ifndef V2GUIDE_H
 #define V2GUIDE_H
 
-#include "v2serviceUtil.h"
-
+// MythTV
+#include "libmyth/programinfo.h"
 #include "libmythbase/http/mythhttpservice.h"
-#include "v2programAndChannel.h"
+
+// MythBackend
 #include "v2channelGroupList.h"
-#include "v2programList.h"
+#include "v2programAndChannel.h"
 #include "v2programGuide.h"
-#include "programinfo.h"
+#include "v2programList.h"
+#include "v2serviceUtil.h"
 
 #define GUIDE_SERVICE QString("/Guide/")
 #define GUIDE_HANDLE  QString("Guide")

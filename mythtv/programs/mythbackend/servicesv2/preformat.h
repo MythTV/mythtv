@@ -13,7 +13,7 @@
 
 #include <QBuffer>
 
-#include "http/mythhttpservice.h"
+#include "libmythbase/http/mythhttpservice.h"
 
 // Legacy return type for the status service
 class Preformat  : public QObject

@@ -13,11 +13,11 @@
 
 #include <QString>
 
-#include "upnp.h"
-#include "upnpcds.h"
-#include "upnpcmgr.h"
-#include "upnpmsrr.h"
-#include <websocket.h>
+#include "libmythupnp/upnp.h"
+#include "libmythupnp/upnpcds.h"
+#include "libmythupnp/upnpcmgr.h"
+#include "libmythupnp/upnpmsrr.h"
+#include "libmythupnp/websocket.h"
 
 class BonjourRegister;
 

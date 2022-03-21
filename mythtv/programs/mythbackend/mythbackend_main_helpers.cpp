@@ -1,4 +1,4 @@
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 #if CONFIG_SYSTEMD_NOTIFY
     #include <systemd/sd-daemon.h>
     #define be_sd_notify(x) \
@@ -17,45 +17,47 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+// Qt
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QFile>
 #include <QDir>
 #include <QMap>
 
-#include "tv_rec.h"
-#include "scheduledrecording.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmyth/programinfo.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/dbutil.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/hardwareprofile.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythtimezone.h"
+#include "libmythbase/mythtranslation.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/signalhandling.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythtv/dbcheck.h"
+#include "libmythtv/eitcache.h"
+#include "libmythtv/jobqueue.h"
+#include "libmythtv/mythsystemevent.h"
+#include "libmythtv/previewgenerator.h"
+#include "libmythtv/scheduledrecording.h"
+#include "libmythtv/tv_rec.h"
+
+// MythBackend
 #include "autoexpire.h"
-#include "scheduler.h"
-#include "mainserver.h"
-#include "encoderlink.h"
-#include "remoteutil.h"
-#include "backendhousekeeper.h"
-
-#include "mythcontext.h"
-#include "mythversion.h"
-#include "mythdb.h"
-#include "dbutil.h"
-#include "exitcodes.h"
-#include "compat.h"
-#include "storagegroup.h"
-#include "programinfo.h"
-#include "dbcheck.h"
-#include "jobqueue.h"
-#include "previewgenerator.h"
-#include "mythbackend_commandlineparser.h"
-#include "mythsystemevent.h"
-#include "mythbackend_main_helpers.h"
 #include "backendcontext.h"
-#include "mythtranslation.h"
-#include "mythtimezone.h"
-#include "signalhandling.h"
-#include "hardwareprofile.h"
-#include "eitcache.h"
-
-#include "mediaserver.h"
+#include "backendhousekeeper.h"
+#include "encoderlink.h"
 #include "httpstatus.h"
-#include "mythlogging.h"
+#include "mainserver.h"
+#include "mediaserver.h"
+#include "mythbackend_commandlineparser.h"
+#include "mythbackend_main_helpers.h"
+#include "scheduler.h"
 
 // New webserver
 #include "libmythbase/http/mythhttproot.h"

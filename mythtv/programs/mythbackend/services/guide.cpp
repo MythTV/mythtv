@@ -23,20 +23,22 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+// C++
 #include <cmath>
 
-#include "guide.h"
+// MythTV
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythtv/channelgroup.h"
+#include "libmythtv/channelutil.h"
 
-#include "compat.h"
-#include "mythversion.h"
-#include "mythcorecontext.h"
-#include "scheduler.h"
+// MythBackend
 #include "autoexpire.h"
-#include "channelutil.h"
-#include "channelgroup.h"
-#include "storagegroup.h"
-
-#include "mythlogging.h"
+#include "scheduler.h"
+#include "guide.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

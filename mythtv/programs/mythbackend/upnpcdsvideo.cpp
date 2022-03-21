@@ -13,12 +13,14 @@
 #include <QUrlQuery>
 
 // MythTV headers
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythupnp/httprequest.h"
+#include "libmythupnp/upnphelpers.h"
+
+// MythBackend
 #include "upnpcdsvideo.h"
-#include "httprequest.h"
-#include "mythdate.h"
-#include "mythcorecontext.h"
-#include "storagegroup.h"
-#include "upnphelpers.h"
 
 #define LOC QString("UPnpCDSVideo: ")
 #define LOC_WARN QString("UPnpCDSVideo, Warning: ")

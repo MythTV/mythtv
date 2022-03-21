@@ -1,4 +1,4 @@
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 #if CONFIG_SYSTEMD_NOTIFY
     #include <systemd/sd-daemon.h>
 #endif
@@ -13,40 +13,43 @@
 #include <QApplication>
 #endif
 
-#include <QFileInfo>
-#include <QFile>
 #include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include <QMap>
 #ifdef Q_OS_DARWIN
 #include <QProcessEnvironment>
 #endif
 
-#include "signalhandling.h"
-#include "mythbackend_commandlineparser.h"
-#include "scheduledrecording.h"
-#include "previewgenerator.h"
-#include "mythcorecontext.h"
-#include "mythsystemevent.h"
-#include "mythtranslation.h"
-#include "backendcontext.h"
-#include "mythbackend_main_helpers.h"
-#include "mythmiscutil.h"
-#include "storagegroup.h"
-#include "mediaserver.h"
-#include "mythlogging.h"
-#include "mythversion.h"
-#include "programinfo.h"
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/cleanupguard.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythtranslation.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/signalhandling.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythtv/dbcheck.h"
+#include "libmythtv/jobqueue.h"
+#include "libmythtv/mythsystemevent.h"
+#include "libmythtv/previewgenerator.h"
+#include "libmythtv/scheduledrecording.h"
+#include "libmythtv/tv_rec.h"
+
+// MythBackend
 #include "autoexpire.h"
+#include "backendcontext.h"
 #include "mainserver.h"
-#include "remoteutil.h"
-#include "exitcodes.h"
+#include "mediaserver.h"
+#include "mythbackend_commandlineparser.h"
+#include "mythbackend_main_helpers.h"
 #include "scheduler.h"
-#include "jobqueue.h"
-#include "dbcheck.h"
-#include "compat.h"
-#include "mythdb.h"
-#include "tv_rec.h"
-#include "cleanupguard.h"
 
 
 #define LOC      QString("MythBackend: ")

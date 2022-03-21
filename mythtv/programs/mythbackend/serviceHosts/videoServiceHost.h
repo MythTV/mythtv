@@ -28,7 +28,7 @@
 #ifndef VIDEOSERVICEHOST_H_
 #define VIDEOSERVICEHOST_H_
 
-#include "servicehost.h"
+#include "libmythupnp/servicehost.h"
 #include "services/video.h"
 
 /////////////////////////////////////////////////////////////////////////////

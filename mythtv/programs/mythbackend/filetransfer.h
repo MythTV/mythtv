@@ -10,7 +10,7 @@
 #include <QWaitCondition>
 
 // MythTV headers
-#include "referencecounter.h"
+#include "libmythbase/referencecounter.h"
 
 class ProgramInfo;
 class MythMediaBuffer;

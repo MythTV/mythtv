@@ -5,7 +5,8 @@
 #include <QMap>
 #include <QList>
 #include <QHostAddress>
-#include "mythsystemevent.h"
+
+#include "libmythtv/mythsystemevent.h"
 
 class EncoderLink;
 class AutoExpire;

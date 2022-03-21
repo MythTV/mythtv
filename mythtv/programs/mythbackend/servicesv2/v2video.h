@@ -2,7 +2,8 @@
 #define V2VIDEO_H
 
 #include "libmythbase/http/mythhttpservice.h"
-#include "videometadatalistmanager.h"
+#include "libmythmetadata/videometadatalistmanager.h"
+
 #include "v2videoMetadataInfoList.h"
 #include "v2videoLookupInfoList.h"
 #include "v2blurayInfo.h"

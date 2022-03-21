@@ -18,13 +18,15 @@
 #include <QUrlQuery>
 
 // MythTV headers
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythtv/recordinginfo.h"
+#include "libmythupnp/httprequest.h"
+#include "libmythupnp/upnphelpers.h"
+
+// MythBackend
 #include "upnpcdstv.h"
-#include "httprequest.h"
-#include "storagegroup.h"
-#include "mythdate.h"
-#include "mythcorecontext.h"
-#include "upnphelpers.h"
-#include "recordinginfo.h"
 
 /*
    Recordings                              RecTv

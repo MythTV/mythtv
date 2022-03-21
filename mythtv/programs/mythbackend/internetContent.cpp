@@ -7,22 +7,24 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <QTextStream>
-#include <QDir>
-#include <QFile>
+// Qt
 #include <QBuffer>
+#include <QDir>
 #include <QEventLoop>
+#include <QFile>
 #include <QImage>
+#include <QTextStream>
 
+// MythTV
+#include "libmyth/netgrabbermanager.h"
+#include "libmyth/rssparse.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythsystemlegacy.h"
+
+// MythBackend
 #include "internetContent.h"
-
-#include "mythcorecontext.h"
-#include "mythdate.h"
-#include "mythsystemlegacy.h"
-#include "mythdirs.h"
-
-#include "rssparse.h"
-#include "netgrabbermanager.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
