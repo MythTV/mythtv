@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
 
 /* This is a simple class that relays a QT custom event to an ordinary function
  * pointer.  Useful when you have a relativly small app like mythcommflag that

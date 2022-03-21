@@ -1,6 +1,6 @@
 #include <QString>
 
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
 #include "mythcommflag_commandlineparser.h"
 
 MythCommFlagCommandLineParser::MythCommFlagCommandLineParser() :

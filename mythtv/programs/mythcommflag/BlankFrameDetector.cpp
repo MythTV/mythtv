@@ -1,19 +1,19 @@
-// ANSI C headers
+// C++ headers
 #include <cmath>
 #include <cstdlib>
 #include <utility>
 
 // MythTV headers
-#include "mythcorecontext.h"    /* gContext */
-#include "mythplayer.h"
+#include "libmythbase/mythcorecontext.h"    /* gContext */
+#include "libmythtv/mythplayer.h"
 
 // Commercial Flagging headers
+#include "BlankFrameDetector.h"
 #include "CommDetector2.h"
 #include "FrameAnalyzer.h"
-#include "quickselect.h"
 #include "HistogramAnalyzer.h"
-#include "BlankFrameDetector.h"
 #include "TemplateMatcher.h"
+#include "quickselect.h"
 
 using namespace commDetector2;
 using namespace frameAnalyzer;

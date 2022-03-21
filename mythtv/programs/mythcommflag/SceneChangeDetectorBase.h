@@ -2,7 +2,7 @@
 #define SCENECHANGEDETECTORBASE_H
 
 #include <QObject>
-#include "mythframe.h"
+#include "libmythtv/mythframe.h"
 
 class SceneChangeDetectorBase : public QObject
 {

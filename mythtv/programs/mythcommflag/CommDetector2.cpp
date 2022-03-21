@@ -1,10 +1,8 @@
-// ANSI C headers
-#include <cmath>
-#include <cerrno>
-#include <thread> // for sleep_for
-
 // C++ headers
 #include <algorithm>
+#include <cerrno>
+#include <cmath>
+#include <thread> // for sleep_for
 
 // Qt headers
 #include <QCoreApplication>
@@ -12,22 +10,22 @@
 #include <QFileInfo>
 
 // MythTV headers
-#include "compat.h"
-#include "mythdb.h"
-#include "mythlogging.h"
-#include "mythdate.h"
-#include "mythcommflagplayer.h"
-#include "programinfo.h"
-#include "channelutil.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/channelutil.h"
+#include "libmythtv/mythcommflagplayer.h"
 
 // Commercial Flagging headers
-#include "CommDetector2.h"
-#include "CannyEdgeDetector.h"
-#include "FrameAnalyzer.h"
-#include "PGMConverter.h"
-#include "BorderDetector.h"
-#include "HistogramAnalyzer.h"
 #include "BlankFrameDetector.h"
+#include "BorderDetector.h"
+#include "CannyEdgeDetector.h"
+#include "CommDetector2.h"
+#include "FrameAnalyzer.h"
+#include "HistogramAnalyzer.h"
+#include "PGMConverter.h"
 #include "SceneChangeDetector.h"
 #include "TemplateFinder.h"
 #include "TemplateMatcher.h"

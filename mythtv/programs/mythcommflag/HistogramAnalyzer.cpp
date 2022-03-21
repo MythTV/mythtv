@@ -3,18 +3,18 @@
 #include <utility>
 
 // MythTV headers
-#include "mythcorecontext.h"
-#include "mythplayer.h"
-#include "mythlogging.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/mythplayer.h"
 
 // Commercial Flagging headers
+#include "BorderDetector.h"
 #include "CommDetector2.h"
 #include "FrameAnalyzer.h"
-#include "PGMConverter.h"
-#include "BorderDetector.h"
-#include "quickselect.h"
-#include "TemplateFinder.h"
 #include "HistogramAnalyzer.h"
+#include "PGMConverter.h"
+#include "TemplateFinder.h"
+#include "quickselect.h"
 
 using namespace commDetector2;
 using namespace frameAnalyzer;

@@ -4,16 +4,16 @@
 #include <utility>
 
 // MythTV headers
-#include "mythcorecontext.h"    /* gContext */
-#include "mythplayer.h"
-#include "mythlogging.h"
+#include "libmythbase/mythcorecontext.h"    /* gContext */
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/mythplayer.h"
 
 // Commercial Flagging headers
 #include "CommDetector2.h"
 #include "FrameAnalyzer.h"
-#include "quickselect.h"
 #include "HistogramAnalyzer.h"
 #include "SceneChangeDetector.h"
+#include "quickselect.h"
 
 using namespace commDetector2;
 using namespace frameAnalyzer;

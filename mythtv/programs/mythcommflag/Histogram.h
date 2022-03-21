@@ -1,7 +1,7 @@
 #ifndef HISTOGRAM_H
 #define HISTOGRAM_H
 
-#include "mythframe.h"
+#include "libmythtv/mythframe.h"
 
 class Histogram
 {

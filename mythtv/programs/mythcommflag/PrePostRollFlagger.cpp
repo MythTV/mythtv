@@ -6,9 +6,9 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "mythcorecontext.h"
-#include "programinfo.h"
-#include "mythcommflagplayer.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythtv/mythcommflagplayer.h"
 
 PrePostRollFlagger::PrePostRollFlagger(SkipType commDetectMethod,
                             bool showProgress, bool fullSpeed,

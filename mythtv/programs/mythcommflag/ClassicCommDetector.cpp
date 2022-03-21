@@ -1,8 +1,6 @@
-// ANSI C headers
-#include <cmath>
-
 // C++ headers
 #include <algorithm> // for min/max, clamp
+#include <cmath>
 #include <iostream> // for cerr
 #include <thread> // for sleep_for
 
@@ -11,10 +9,10 @@
 #include <QString>
 
 // MythTV headers
-#include "mythmiscutil.h"
-#include "mythcontext.h"
-#include "programinfo.h"
-#include "mythcommflagplayer.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythtv/mythcommflagplayer.h"
 
 // Commercial Flagging headers
 #include "ClassicCommDetector.h"

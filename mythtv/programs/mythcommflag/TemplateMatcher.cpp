@@ -1,9 +1,7 @@
-// ANSI C headers
-#include <cstdlib>
-#include <cmath>
-
 // C++ headers
 #include <algorithm>
+#include <cmath>
+#include <cstdlib>
 
 // Qt headers
 #include <QFile>
@@ -11,19 +9,19 @@
 #include <utility>
 
 // MythTV headers
-#include "mythplayer.h"
-#include "mythcorecontext.h"
-#include "mythlogging.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/mythplayer.h"
 
 // Commercial Flagging headers
-#include "CommDetector2.h"
-#include "FrameAnalyzer.h"
-#include "pgm.h"
-#include "PGMConverter.h"
-#include "EdgeDetector.h"
 #include "BlankFrameDetector.h"
+#include "CommDetector2.h"
+#include "EdgeDetector.h"
+#include "FrameAnalyzer.h"
+#include "PGMConverter.h"
 #include "TemplateFinder.h"
 #include "TemplateMatcher.h"
+#include "pgm.h"
 
 extern "C" {
 #include "libavutil/imgutils.h"

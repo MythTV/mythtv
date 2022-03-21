@@ -2,7 +2,7 @@
 #define LOGODETECTORBASE_H
 
 #include <QObject>
-#include "mythframe.h"
+#include "libmythtv/mythframe.h"
 
 class MythCommFlagPlayer;
 

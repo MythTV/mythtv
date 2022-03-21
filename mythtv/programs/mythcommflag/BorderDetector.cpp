@@ -1,18 +1,21 @@
 #include <sys/time.h>
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"        /* AVFrame */
 }
-#include "mythcorecontext.h"    /* gContext */
-#include "mythchrono.h"
-#include "compat.h"
 
+// MythTV
+#include "libmythbase/compat.h"
+#include "libmythbase/mythchrono.h"
+#include "libmythbase/mythcorecontext.h"    /* gContext */
+
+// Commercial Flagging headers
+#include "BorderDetector.h"
 #include "CommDetector2.h"
 #include "FrameAnalyzer.h"
 #include "TemplateFinder.h"
-#include "BorderDetector.h"
 
 using namespace frameAnalyzer;
 using namespace commDetector2;

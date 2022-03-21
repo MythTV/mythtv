@@ -1,28 +1,28 @@
 // ANSI C headers
 #include <cmath>
 #include <cstdlib>
+#include <utility>
 
 // Qt headers
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
-#include <utility>
 
 // MythTV headers
-#include "mythplayer.h"
-#include "mythcorecontext.h"    /* gContext */
-#include "mythframe.h"          /* VideoFrame */
-#include "mythdate.h"
-#include "mythsystemlegacy.h"
-#include "exitcodes.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythcorecontext.h"  /* gContext */
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythtv/mythframe.h"          /* VideoFrame */
+#include "libmythtv/mythplayer.h"
 
 // Commercial Flagging headers
-#include "CommDetector2.h"
-#include "pgm.h"
-#include "PGMConverter.h"
 #include "BorderDetector.h"
+#include "CommDetector2.h"
 #include "EdgeDetector.h"
+#include "PGMConverter.h"
 #include "TemplateFinder.h"
+#include "pgm.h"
 
 extern "C" {
     #include "libavutil/imgutils.h"

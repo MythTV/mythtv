@@ -1,15 +1,19 @@
-// ANSI C headers
+// C++ headers
 #include <cstdlib>
 #include <thread> // for sleep_for
 
-// MythTV headers
-#include "mythcorecontext.h"
-#include "mythcommflagplayer.h"
+// FFmpeg headers
+extern "C" {
 #include "libavutil/frame.h"
+}
+
+// MythTV headers
+#include "libmythbase/mythcorecontext.h"
+#include "libmythtv/mythcommflagplayer.h"
 
 // Commercial Flagging headers
-#include "ClassicLogoDetector.h"
 #include "ClassicCommDetector.h"
+#include "ClassicLogoDetector.h"
 
 struct EdgeMaskEntry
 {

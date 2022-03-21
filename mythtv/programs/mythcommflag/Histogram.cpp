@@ -1,9 +1,10 @@
-#include "Histogram.h"
-#include <string>
 #include <cmath>
 #include <cstring>
+#include <string>
 
-#include "mythframe.h"
+#include "libmythtv/mythframe.h"
+
+#include "Histogram.h"
 
 void Histogram::generateFromImage(MythVideoFrame* frame, unsigned int frameWidth,
          unsigned int frameHeight, unsigned int minScanX, unsigned int maxScanX,

@@ -8,50 +8,48 @@
 // POSIX headers
 #include <unistd.h>
 
-// ANSI C headers
-#include <cstdlib>
-#include <cstdio>
-#include <ctime>
-#include <cmath>
-
 // C++ headers
-#include <string>
-#include <iostream>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 #include <fstream>
+#include <iostream>
+#include <string>
 
 // Qt headers
-#include <QtGlobal>
 #include <QCoreApplication>
-#include <QString>
 #include <QDir>
 #include <QEvent>
+#include <QString>
+#include <QtGlobal>
 
 // MythTV headers
-#include "mythmiscutil.h"
-#include "mythdate.h"
-#include "exitcodes.h"
-#include "mythcontext.h"
-#include "mythdb.h"
-#include "mythversion.h"
-#include "mythcommflagplayer.h"
-#include "programinfo.h"
-#include "remoteutil.h"
-#include "remotefile.h"
-#include "tvremoteutil.h"
-#include "jobqueue.h"
-#include "remoteencoder.h"
-#include "io/mythmediabuffer.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/programinfo.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/cleanupguard.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythtranslation.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/remotefile.h"
+#include "libmythbase/signalhandling.h"
+#include "libmythtv/io/mythmediabuffer.h"
+#include "libmythtv/jobqueue.h"
+#include "libmythtv/mythcommflagplayer.h"
+#include "libmythtv/remoteencoder.h"
+#include "libmythtv/tvremoteutil.h"
+
 #include "mythcommflag_commandlineparser.h"
-#include "mythtranslation.h"
-#include "mythlogging.h"
-#include "signalhandling.h"
-#include "cleanupguard.h"
 
 // Commercial Flagging headers
 #include "CommDetectorBase.h"
 #include "CommDetectorFactory.h"
-#include "SlotRelayer.h"
 #include "CustomEventRelayer.h"
+#include "SlotRelayer.h"
 
 #define LOC      QString("MythCommFlag: ")
 #define LOC_WARN QString("MythCommFlag, Warning: ")

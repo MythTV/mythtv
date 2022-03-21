@@ -13,7 +13,7 @@
 #include <memory>
 
 #include <QMap>
-#include "mythframe.h"
+#include "libmythtv/mythframe.h"
 
 /*  
  * At least FreeBSD doesn't define LONG_LONG_MAX, but it does define  

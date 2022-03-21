@@ -1,10 +1,8 @@
-// ANSI C headers
-#include <cstdlib>
-
 // C++ headers
 #include <algorithm>
+#include <cstdlib>
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 
 // avlib/ffmpeg headers
 extern "C" {
@@ -12,12 +10,12 @@ extern "C" {
 }
 
 // MythTV headers
-#include "mythframe.h"          // VideoFrame
-#include "mythplayer.h"
+#include "libmythtv/mythframe.h"       // VideoFrame
+#include "libmythtv/mythplayer.h"
 
 // Commercial Flagging headers
-#include "FrameAnalyzer.h"
 #include "EdgeDetector.h"
+#include "FrameAnalyzer.h"
 
 namespace edgeDetector {
 

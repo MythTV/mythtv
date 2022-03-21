@@ -1,14 +1,14 @@
-// ANSI C headers
+// C++ headers
 #include <cmath>
 
 // MythTV headers
-#include "mythplayer.h"
-#include "mythframe.h"          // VideoFrame
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/mythframe.h"          // VideoFrame
+#include "libmythtv/mythplayer.h"
 
 // Commercial Flagging headers
-#include "pgm.h"
 #include "CannyEdgeDetector.h"
+#include "pgm.h"
 
 extern "C" {
 #include "libavutil/imgutils.h"

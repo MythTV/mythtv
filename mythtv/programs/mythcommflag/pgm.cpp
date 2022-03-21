@@ -1,14 +1,17 @@
 #include <climits>
 
-#include "mythconfig.h"
+// MythTV
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/mythframe.h"
+
+// Commercial Flagging headers
+#include "pgm.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavutil/imgutils.h"
 }
-#include "mythframe.h"
-#include "mythlogging.h"
-#include "pgm.h"
 
 // TODO: verify this
 /*
