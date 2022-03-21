@@ -1,7 +1,7 @@
 
 #include <QString>
 
-#include "mythcommandlineparser.h"
+#include "libmythbase/mythcommandlineparser.h"
 
 class MythJobQueueCommandLineParser : public MythCommandLineParser
 {

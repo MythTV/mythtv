@@ -1,3 +1,4 @@
+// C/C++
 #include <cmath>
 #include <csignal>
 #include <cstdio>
@@ -11,25 +12,29 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <QtGlobal>
+// Qt
 #include <QCoreApplication>
-#include <QString>
-#include <QFileInfo>
 #include <QDir>
+#include <QFileInfo>
+#include <QString>
+#include <QtGlobal>
 
-#include "exitcodes.h"
-#include "mythcontext.h"
-#include "jobqueue.h"
-#include "mythdbcon.h"
-#include "mythversion.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmythbase/cleanupguard.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/hardwareprofile.h"
+#include "libmythbase/housekeeper.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/signalhandling.h"
+#include "libmythtv/jobqueue.h"
+#include "libmythtv/mythsystemevent.h"
+
+// MythJobQueue
 #include "mythjobqueue_commandlineparser.h"
-#include "compat.h"
-#include "mythsystemevent.h"
-#include "mythlogging.h"
-#include "signalhandling.h"
-#include "housekeeper.h"
-#include "hardwareprofile.h"
-#include "cleanupguard.h"
 
 #define LOC      QString("MythJobQueue: ")
 #define LOC_WARN QString("MythJobQueue, Warning: ")
