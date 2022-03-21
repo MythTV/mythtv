@@ -1,14 +1,16 @@
+// Qt
 #include <QCoreApplication>
 
 // MythTV stuff
-#include "exitcodes.h"
-#include "mythcorecontext.h"
-#include "mythdialogbox.h"
-#include "mythmainwindow.h"
-#include "mythscreenstack.h"
-#include "remoteutil.h"
-#include "mythsystemlegacy.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythscreenstack.h"
 
+// MythTV Setup
 #include "checksetup.h"
 #include "exitprompt.h"
 

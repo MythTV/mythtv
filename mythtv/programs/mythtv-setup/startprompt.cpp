@@ -2,14 +2,15 @@
 #include <QCoreApplication>
 
 // MythTV stuff
-#include "exitcodes.h"
-#include "mythcorecontext.h"
-#include "mythdialogbox.h"
-#include "mythmainwindow.h"
-#include "mythscreenstack.h"
-#include "mythsystemlegacy.h"
-#include "tvremoteutil.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythtv/tvremoteutil.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythscreenstack.h"
 
+// MythTV Setup
 #include "startprompt.h"
 
 struct StartPrompterPrivate

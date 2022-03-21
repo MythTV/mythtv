@@ -1,9 +1,9 @@
 #ifndef EXPERTSETTINGSEDITOR_H
 #define EXPERTSETTINGSEDITOR_H
 
-#include "mythcorecontext.h"
-#include "mythdbcon.h"
-#include "rawsettingseditor.h"
+#include "libmyth/rawsettingseditor.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdbcon.h"
 
 class ExpertSettingsEditor : public RawSettingsEditor
 {

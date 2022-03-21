@@ -1,26 +1,28 @@
-#include <QCoreApplication>
-#include <QRegularExpression>
+// Qt
 #include <QBuffer>
+#include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
+#include <QRegularExpression>
 
-#include "mythdb.h"
-#include "mythdirs.h"
-#include "mythlogging.h"
+// MythTV
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/remotefile.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythprogressdialog.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuiimage.h"
+#include "libmythui/mythuitext.h"
+#include "libmythui/mythuitextedit.h"
+
+// MythTV Setup
 #include "importicons.h"
-#include "mythdate.h"
-#include "mythdownloadmanager.h"
-#include "remotefile.h"
-#include "mythcorecontext.h"
-
-// MythUI
-#include "mythuitext.h"
-#include "mythuiimage.h"
-#include "mythuibutton.h"
-#include "mythuibuttonlist.h"
-#include "mythuitextedit.h"
-#include "mythdialogbox.h"
-#include "mythprogressdialog.h"
 
 ImportIconsWizard::ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
                                      QString channelname)

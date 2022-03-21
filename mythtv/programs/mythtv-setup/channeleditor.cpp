@@ -2,27 +2,29 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "mythcorecontext.h"
-#include "mythprogressdialog.h"
-#include "mythuibuttonlist.h"
-#include "channelsettings.h"
-#include "transporteditor.h"
-#include "restoredata.h"
-#include "mythuicheckbox.h"
-#include "mythuitextedit.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/cardutil.h"
+#include "libmythtv/channelsettings.h"
+#include "libmythtv/channelutil.h"
+#include "libmythtv/restoredata.h"
+#include "libmythtv/scanwizard.h"
+#include "libmythtv/sourceutil.h"
+#include "libmythtv/transporteditor.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythprogressdialog.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuicheckbox.h"
+#include "libmythui/mythuiimage.h"
+#include "libmythui/mythuitext.h"
+#include "libmythui/mythuitextedit.h"
+
+// MythTV Setup
 #include "channeleditor.h"
-#include "mythdialogbox.h"
-#include "mythuibutton.h"
-#include "channelutil.h"
 #include "importicons.h"
-#include "mythlogging.h"
-#include "mythuiimage.h"
-#include "mythuitext.h"
-#include "scanwizard.h"
-#include "sourceutil.h"
-#include "cardutil.h"
-#include "mythdirs.h"
-#include "mythdb.h"
 
 #define LOC QString("ChannelEditor: ")
 

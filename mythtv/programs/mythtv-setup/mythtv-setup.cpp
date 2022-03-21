@@ -1,51 +1,55 @@
-#include <unistd.h>
+// C/C++
 #include <fcntl.h>
-
 #include <iostream>
 #include <memory>
+#include <unistd.h>
 
-#include <QtGlobal>
-#include <QString>
-#include <QDir>
-#include <QMap>
+// Qt
 #include <QApplication>
+#include <QDir>
 #include <QFileInfo>
+#include <QMap>
+#include <QString>
+#include <QtGlobal>
 
-#include "mythconfig.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
-#include "dbutil.h"
-#include "mythlogging.h"
-#include "mythversion.h"
-#include "langsettings.h"
-#include "mythtranslation.h"
-#include "exitcodes.h"
-#include "exitprompt.h"
-#include "storagegroupeditor.h"
-#include "myththemedmenu.h"
-#include "mythuihelper.h"
-#include "mythdirs.h"
-#include "channelscanner_cli.h"
-#include "scanwizardconfig.h"
-#include "scaninfo.h"
-#include "channelimporter.h"
-#include "cardutil.h"
-#include "dbcheck.h"
-#include "videosource.h"
-#include "channeleditor.h"
-#include "remoteutil.h"
+// MythTV
+#include "libmyth/langsettings.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/remoteutil.h"
+#include "libmyth/storagegroupeditor.h"
+#include "libmythbase/cleanupguard.h"
+#include "libmythbase/dbutil.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythtranslation.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/signalhandling.h"
+#include "libmythtv/cardutil.h"
+#include "libmythtv/channelscan/channelimporter.h"
+#include "libmythtv/channelscan/channelscanner_cli.h"
+#include "libmythtv/channelscan/scaninfo.h"
+#include "libmythtv/channelscan/scanwizardconfig.h"
+#include "libmythtv/dbcheck.h"
+#include "libmythtv/mythsystemevent.h"
+#include "libmythtv/profilegroup.h"
+#include "libmythtv/videosource.h"
+#include "libmythui/mythdisplay.h"
+#include "libmythui/myththemedmenu.h"
+#include "libmythui/mythuihelper.h"
+#include "libmythupnp/ssdp.h"
+
+// MythTV Setup
 #include "backendsettings.h"
+#include "channeleditor.h"
 #include "checksetup.h"
-#include "startprompt.h"
-#include "mythsystemevent.h"
+#include "exitprompt.h"
 #include "expertsettingseditor.h"
 #include "mythtv-setup_commandlineparser.h"
-#include "profilegroup.h"
-#include "signalhandling.h"
-#include "mythmiscutil.h"
-#include "ssdp.h"
-#include "cleanupguard.h"
-#include "mythdisplay.h"
+#include "startprompt.h"
 
 ExitPrompter   *exitPrompt  = nullptr;
 StartPrompter  *startPrompt = nullptr;

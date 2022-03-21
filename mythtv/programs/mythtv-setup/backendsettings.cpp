@@ -1,13 +1,17 @@
+// C/C++
 #include <cstdio>
-
-#include "backendsettings.h"
-#include "frequencies.h"
-#include "mythcorecontext.h"
-#include "channelsettings.h" // for ChannelTVFormat::GetFormats()
 #include <unistd.h>
 
+// Qt
 #include <QNetworkInterface>
 
+// MythTV
+#include "libmythbase/mythcorecontext.h"
+#include "libmythtv/channelsettings.h" // for ChannelTVFormat::GetFormats()
+#include "libmythtv/frequencies.h"
+
+// MythTV Setup
+#include "backendsettings.h"
 
 static TransMythUICheckBoxSetting *IsMasterBackend()
 {

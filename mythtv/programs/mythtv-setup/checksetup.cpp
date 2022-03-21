@@ -6,13 +6,17 @@
 // They all return true if any problems are found, and add to a
 // caller-supplied QString a message describing the problem.
 
+// Qt
 #include <QDir>
 
-#include "cardutil.h"
+// MythTV
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythtv/cardutil.h"
+
+// MythTV Setup
 #include "checksetup.h"
-#include "mythcorecontext.h"
-#include "mythdate.h"
-#include "mythdb.h"
 
 /// Check that a directory path exists and is writable
 
