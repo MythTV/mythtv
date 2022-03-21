@@ -1,28 +1,27 @@
-// ANSI C
-#include <cstdlib>
-
 // POSIX
 #include <unistd.h>
 
 // C++
 #include <chrono>
+#include <cstdlib>
 
 // qt
+#include <QEvent>
 #include <QGuiApplication>
 #include <QKeyEvent>
-#include <QEvent>
 
 // myth
-#include "exitcodes.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
-#include "lcddevice.h"
-#include "tv.h"
-#include "compat.h"
-#include "mythdirs.h"
-#include "remoteutil.h"
-#include "mythsystemlegacy.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/lcddevice.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythtv/tv.h"
 
+// mythwelcome
 #include "welcomedialog.h"
 #include "welcomesettings.h"
 

@@ -3,22 +3,20 @@
 #include <QApplication>
 
 // MythTV
-#include "mythcontext.h"
-#include "mythversion.h"
-#include "mythtranslation.h"
-#include "exitcodes.h"
-#include "compat.h"
-#include "lcddevice.h"
-#include "mythwelcome_commandlineparser.h"
-#include "mythlogging.h"
-#include "signalhandling.h"
-#include "mythdisplay.h"
-
-// libmythui
-#include "mythmainwindow.h"
-#include "mythuihelper.h"
+#include "libmyth/mythcontext.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/lcddevice.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythtranslation.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/signalhandling.h"
+#include "libmythui/mythdisplay.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuihelper.h"
 
 // mythwelcome
+#include "mythwelcome_commandlineparser.h"
 #include "welcomedialog.h"
 #include "welcomesettings.h"
 

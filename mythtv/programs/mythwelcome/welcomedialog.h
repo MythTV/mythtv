@@ -4,17 +4,13 @@
 // qt
 #include <QDateTime>
 
-// libmyth
-#include "programinfo.h"
-
-// libmythtv
-#include "tvremoteutil.h"
-
-// libmythui
-#include "mythscreentype.h"
-#include "mythuibutton.h"
-#include "mythuitext.h"
-#include "mythdialogbox.h"
+// myth
+#include "libmyth/programinfo.h"
+#include "libmythtv/tvremoteutil.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythscreentype.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuitext.h"
 
 class GroupSetting;
 

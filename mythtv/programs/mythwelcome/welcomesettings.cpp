@@ -1,6 +1,9 @@
+//myth
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdirs.h"
+
+// mythwelcome
 #include "welcomesettings.h"
-#include "mythcorecontext.h"
-#include "mythdirs.h"
 
 ///////////////////////////////////////////////////////////////////
 //  daily wakeup/shutdown settings
