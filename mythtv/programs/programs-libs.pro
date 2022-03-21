@@ -1,10 +1,11 @@
 #pthreads directory has config.h, need path to be after library paths
 win32-msvc*:INCLUDEPATH -= $$SRC_PATH_BARE/../platform/win32/msvc/external/pthreads.2
 
-INCLUDEPATH += ../.. ../../libs/ ../../libs/libmyth ../../libs/libmyth/audio
-INCLUDEPATH +=  ../../libs/libmythtv ../.. ../../external/FFmpeg
-INCLUDEPATH += ../../libs/libmythupnp ../../libs/libmythui ../../libs/libmythmetadata
-INCLUDEPATH += ../../libs/libmythbase
+# Find MythTV's config.h instead of FFmpeg's config.h
+INCLUDEPATH += ../..
+# Find everything else
+INCLUDEPATH += ../../libs/
+INCLUDEPATH += ../../external/FFmpeg
 
 !win32-msvc* {
   QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdnav
@@ -17,10 +18,6 @@ win32-msvc* {
 }
 
 !using_system_libbluray:INCLUDEPATH += ../../external/libmythbluray/src
-INCLUDEPATH += ../../libs/libmythtv/mpeg
-INCLUDEPATH += ../../libs/libmythtv/vbitext
-INCLUDEPATH += ../../libs/libmythservicecontracts
-INCLUDEPATH += ../../libs/libmythprotoserver
 
 win32-msvc*:INCLUDEPATH += $$SRC_PATH_BARE/../platform/win32/msvc/external/pthreads.2
 
@@ -96,13 +93,7 @@ win32 {
     POST_TARGETDEPS += ../../libs/libmythprotoserver/libmythprotoserver-$${MYTH_SHLIB_EXT}
 }
 
-DEPENDPATH += ../.. ../../libs ../../libs/libmyth ../../libs/libmyth/audio
-DEPENDPATH += ../../libs/libmythtv
-DEPENDPATH += ../../libs/libmythtv/mpeg ../../libs/libmythtv/vbitext
 DEPENDPATH += ../.. ../../external/FFmpeg
-DEPENDPATH += ../../libs/libmythupnp ../../libs/libmythui
-DEPENDPATH += ../../libmythbase
-DEPENDPATH +=../../libs/libmythservicecontracts ../../libs/libmythprotoserver
 
 using_mingw:DEFINES += USING_MINGW
 
