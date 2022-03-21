@@ -1,12 +1,14 @@
 #ifndef CONTROLREQUESTHANDLER_H
 #define CONTROLREQUESTHANDLER_H
 
+// Qt
 #include <QString>
 #include <QStringList>
 
-#include "mythsocket.h"
-#include "sockethandler.h"
-#include "requesthandler/outboundhandler.h"
+// MythTV
+#include "libmythbase/mythsocket.h"
+#include "libmythprotoserver/requesthandler/outboundhandler.h"
+#include "libmythprotoserver/sockethandler.h"
 
 class ControlRequestHandler : public OutboundRequestHandler
 {

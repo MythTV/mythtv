@@ -1,3 +1,4 @@
+// C/C++
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
@@ -7,27 +8,31 @@
 #include <string>
 #include <unistd.h>
 
+// Qt
 #include <QCoreApplication>
-#include <QString>
 #include <QDir>
+#include <QString>
 
-#include "mythconfig.h"
-#include "mythsocketmanager.h"
-#include "mythcontext.h"
-#include "exitcodes.h"
-#include "dbcheck.h"
-#include "mythdbcon.h"
-#include "mythlogging.h"
-#include "mythversion.h"
-#include "mythsystemevent.h"
-#include "mythmediaserver_commandlineparser.h"
-#include "signalhandling.h"
-#include "cleanupguard.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmythbase/cleanupguard.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/signalhandling.h"
+#include "libmythprotoserver/mythsocketmanager.h"
+#include "libmythprotoserver/requesthandler/basehandler.h"
+#include "libmythprotoserver/requesthandler/fileserverhandler.h"
+#include "libmythprotoserver/requesthandler/messagehandler.h"
+#include "libmythtv/dbcheck.h"
+#include "libmythtv/mythsystemevent.h"
 
+// MythMediaServer
 #include "controlrequesthandler.h"
-#include "requesthandler/basehandler.h"
-#include "requesthandler/fileserverhandler.h"
-#include "requesthandler/messagehandler.h"
+#include "mythmediaserver_commandlineparser.h"
+
 #if CONFIG_SYSTEMD_NOTIFY
 #include <systemd/sd-daemon.h>
 #define ms_sd_notify(x) \

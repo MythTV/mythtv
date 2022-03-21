@@ -1,11 +1,14 @@
+// Qt
 #include <QString>
 #include <QStringList>
 
-#include "mythsocket.h"
-#include "sockethandler.h"
-#include "mythlogging.h"
-#include "mythcorecontext.h"
+// MythTV
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsocket.h"
+#include "libmythprotoserver/sockethandler.h"
 
+// MythMediaServer
 #include "controlrequesthandler.h"
 
 bool ControlRequestHandler::AnnounceSocket(void)

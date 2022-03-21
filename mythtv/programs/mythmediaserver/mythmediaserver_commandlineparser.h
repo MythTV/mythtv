@@ -1,7 +1,8 @@
-
+// Qt
 #include <QString>
 
-#include "mythcommandlineparser.h"
+// MythTV
+#include "libmythbase/mythcommandlineparser.h"
 
 class MythMediaServerCommandLineParser : public MythCommandLineParser
 {

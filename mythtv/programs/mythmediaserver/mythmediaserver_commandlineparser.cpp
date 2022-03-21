@@ -1,6 +1,10 @@
+// Qt
 #include <QString>
 
-#include "mythcorecontext.h"
+// MythTV
+#include "libmythbase/mythcorecontext.h"
+
+// MythMediaServer
 #include "mythmediaserver_commandlineparser.h"
 
 MythMediaServerCommandLineParser::MythMediaServerCommandLineParser() :
