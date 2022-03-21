@@ -1,7 +1,7 @@
 // libmyth* headers
-#include "exitcodes.h"
-#include "mythdb.h"
-#include "mythlogging.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
 
 // local headers
 #include "eitutils.h"

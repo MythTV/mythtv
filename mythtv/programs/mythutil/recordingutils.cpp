@@ -9,12 +9,12 @@
 #include <QScopedPointer>
 
 // libmyth* includes
-#include "exitcodes.h"
-#include "mythlogging.h"
-#include "remoteutil.h"
-#include "remotefile.h"
-#include "mythsystem.h"
-#include "mythdirs.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsystem.h"
+#include "libmythbase/remotefile.h"
 
 // Local includes
 #include "recordingutils.h"

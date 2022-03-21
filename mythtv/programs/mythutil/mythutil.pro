@@ -11,7 +11,6 @@ target.path = $${PREFIX}/bin
 INSTALLS = target
 
 LIBS += $$EXTRA_LIBS 
-INCLUDEPATH += ../../libs/libmythbase
 
 QMAKE_CLEAN += $(TARGET)
 

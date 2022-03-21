@@ -1,5 +1,5 @@
 // libmyth* headers
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
 
 // local headers
 #include "mythutil_commandlineparser.h"

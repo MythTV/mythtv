@@ -9,25 +9,25 @@
 #include <QString>
 
 // libmyth* includes
-#include "mythconfig.h"
-#include "exitcodes.h"
-#include "mythcontext.h"
-#include "mythversion.h"
-#include "mythlogging.h"
+#include "libmyth/mythcontext.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/signalhandling.h"
 
 // Local includes
-#include "mythutil.h"
-#include "mythutil_commandlineparser.h"
 #include "backendutils.h"
 #include "eitutils.h"
 #include "fileutils.h"
-#include "mpegutils.h"
 #include "jobutils.h"
 #include "markuputils.h"
 #include "messageutils.h"
+#include "mpegutils.h"
 #include "musicmetautils.h"
+#include "mythutil.h"
+#include "mythutil_commandlineparser.h"
 #include "recordingutils.h"
-#include "signalhandling.h"
 
 bool GetProgramInfo(const MythUtilCommandLineParser &cmdline,
                     ProgramInfo &pginfo)

@@ -2,9 +2,9 @@
 #include <iostream>
 
 // libmyth* includes
-#include "exitcodes.h"
-#include "jobqueue.h"
-#include "mythlogging.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/jobqueue.h"
 
 // Local includes
 #include "jobutils.h"

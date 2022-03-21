@@ -1,20 +1,20 @@
 // qt
 #include <QDir>
-#include <QProcess>
 #include <QDomDocument>
+#include <QProcess>
 
 // libmyth* headers
-#include "mythconfig.h"
-#include "exitcodes.h"
-#include "mythlogging.h"
-#include "storagegroup.h"
-#include "musicmetadata.h"
-#include "metaio.h"
-#include "mythchrono.h"
-#include "mythcontext.h"
-#include "musicfilescanner.h"
-#include "musicutils.h"
-#include "mythdirs.h"
+#include "libmyth/mythcontext.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythchrono.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythmetadata/metaio.h"
+#include "libmythmetadata/musicfilescanner.h"
+#include "libmythmetadata/musicmetadata.h"
+#include "libmythmetadata/musicutils.h"
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -22,8 +22,8 @@ extern "C" {
 }
 
 // mythutils headers
-#include "mythutil_commandlineparser.h"
 #include "musicmetautils.h"
+#include "mythutil_commandlineparser.h"
 
 static int UpdateMeta(const MythUtilCommandLineParser &cmdline)
 {

@@ -4,19 +4,13 @@
 using std::cout;
 using std::endl;
 
-// libmythbase
-#include "exitcodes.h"
-#include "mythcorecontext.h"
-#include "mythlogging.h"
-
-// libmyth
-#include "remoteutil.h"
-
-// libmythtv
-#include "scheduledrecording.h"
-
-// libmythmetadata
-#include "videometadata.h"
+// MythTV
+#include "libmyth/remoteutil.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythmetadata/videometadata.h"
+#include "libmythtv/scheduledrecording.h"
 
 // local headers
 #include "backendutils.h"

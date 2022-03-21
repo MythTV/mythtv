@@ -3,7 +3,7 @@
 
 #include <QString>
 
-#include "mythcommandlineparser.h"
+#include "libmythbase/mythcommandlineparser.h"
 
 class MythUtilCommandLineParser : public MythCommandLineParser
 {

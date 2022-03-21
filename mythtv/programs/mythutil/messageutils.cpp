@@ -5,15 +5,15 @@ using std::cout;
 using std::endl;
 
 // Qt headers
-#include <QHostAddress>
-#include <QUdpSocket>
-#include <QString>
 #include <QFile>
+#include <QHostAddress>
+#include <QString>
+#include <QUdpSocket>
 
 // libmyth* includes
-#include "compat.h"
-#include "exitcodes.h"
-#include "mythlogging.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythlogging.h"
 
 // Local includes
 #include "messageutils.h"

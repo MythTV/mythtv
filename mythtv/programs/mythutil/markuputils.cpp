@@ -10,8 +10,8 @@ using std::cout;
 #include <QDomDocument>
 
 // libmyth* includes
-#include "exitcodes.h"
-#include "mythlogging.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythlogging.h"
 
 // Local includes
 #include "markuputils.h"

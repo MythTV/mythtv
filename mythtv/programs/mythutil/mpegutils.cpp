@@ -21,15 +21,15 @@
  */
 
 // MythTV headers
-#include "streamlisteners.h"
-#include "scanstreamdata.h"
-#include "premieretables.h"
-#include "mythlogging.h"
-#include "atsctables.h"
-#include "sctetables.h"
-#include "io/mythmediabuffer.h"
-#include "dvbtables.h"
-#include "exitcodes.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/io/mythmediabuffer.h"
+#include "libmythtv/mpeg/atsctables.h"
+#include "libmythtv/mpeg/dvbtables.h"
+#include "libmythtv/mpeg/premieretables.h"
+#include "libmythtv/mpeg/scanstreamdata.h"
+#include "libmythtv/mpeg/sctetables.h"
+#include "libmythtv/mpeg/streamlisteners.h"
 
 // Application local headers
 #include "mpegutils.h"

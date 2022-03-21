@@ -1,8 +1,8 @@
 // libmyth* headers
-#include "exitcodes.h"
-#include "mythlogging.h"
-#include "io/mythmediabuffer.h"
-#include "mythdownloadmanager.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/io/mythmediabuffer.h"
 
 // local headers
 #include "fileutils.h"
