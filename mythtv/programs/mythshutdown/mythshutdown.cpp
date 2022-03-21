@@ -1,27 +1,32 @@
 
-#include <iostream>
+// C/C++
 #include <cstdlib>
+#include <iostream>
 #include <unistd.h>
 
+// Qt
 #include <QtGlobal>
 #include <QCoreApplication>
 #include <QFile>
 
-#include "mythdate.h"
-#include "exitcodes.h"
-#include "mythcontext.h"
-#include "mythdb.h"
-#include "mythsystemlegacy.h"
-#include "mythversion.h"
-#include "jobqueue.h"
-#include "tv.h"
-#include "remoteutil.h"
-#include "tvremoteutil.h"
-#include "compat.h"
-#include "mythlogging.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmyth/programinfo.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/signalhandling.h"
+#include "libmythtv/jobqueue.h"
+#include "libmythtv/tv.h"
+#include "libmythtv/tvremoteutil.h"
+
+// MythShutdown
 #include "mythshutdown_commandlineparser.h"
-#include "programinfo.h"
-#include "signalhandling.h"
 
 static void setGlobalSetting(const QString &key, const QString &v)
 {
