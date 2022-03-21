@@ -7,8 +7,8 @@
 // Qt headers
 #include <QString>
 
-// libmythtv headers
-#include "programdata.h"
+// MythTV headers
+#include "libmythtv/programdata.h"
 
 // filldata headers
 #include "channeldata.h"

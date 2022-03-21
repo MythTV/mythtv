@@ -4,8 +4,8 @@
 // Qt headers
 #include <QString>
 
-// libmythtv
-#include "channelinfo.h"
+// MythTV
+#include "libmythtv/channelinfo.h"
 
 using ChannelList = QMultiHash<QString, ChannelInfo>;
 

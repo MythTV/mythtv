@@ -9,30 +9,28 @@
 #include <QCoreApplication>
 #include <QFileInfo>
 
-// libmyth headers
-#include "exitcodes.h"
-#include "mythcontext.h"
-#include "mythdb.h"
-#include "mythversion.h"
-#include "mythdate.h"
-#include "mythtranslation.h"
-
-#include "mythconfig.h"
-
-// libmythtv headers
-#include "mythfilldatabase_commandlineparser.h"
-#include "scheduledrecording.h"
-#include "mythmiscutil.h"
-#include "remoteutil.h"
-#include "videosource.h" // for is_grabber..
-#include "dbcheck.h"
-#include "mythsystemevent.h"
-#include "mythlogging.h"
-#include "signalhandling.h"
-#include "cleanupguard.h"
+// MythTV headers
+#include "libmyth/mythcontext.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/cleanupguard.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythtranslation.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/signalhandling.h"
+#include "libmythtv/dbcheck.h"
+#include "libmythtv/mythsystemevent.h"
+#include "libmythtv/scheduledrecording.h"
+#include "libmythtv/videosource.h" // for is_grabber..
 
 // filldata headers
 #include "filldata.h"
+#include "mythfilldatabase_commandlineparser.h"
+
 namespace
 {
     void cleanup()

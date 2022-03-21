@@ -6,8 +6,8 @@
 #include <QList>
 #include <QString>
 
-// libmythtv
-#include "channelinfo.h"
+// MythTV
+#include "libmythtv/channelinfo.h"
 
 class ProgInfo;
 class QUrl;

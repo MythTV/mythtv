@@ -1,29 +1,25 @@
 #include "xmltvparser.h"
 
+// C++ headers
+#include <cstdlib>
+#include <iostream>
+
 // Qt headers
-#include <QFile>
-#include <QStringList>
 #include <QDateTime>
 #include <QDomDocument>
+#include <QFile>
+#include <QStringList>
 #include <QUrl>
 
-// C++ headers
-#include <iostream>
-#include <cstdlib>
-
-// libmyth headers
-#include "exitcodes.h"
-#include "mythcorecontext.h"
-#include "mythdate.h"
-
-// libmythtv headers
-#include "programinfo.h"
-#include "programdata.h"
-#include "dvbdescriptors.h"
-#include "channelinfo.h"
-
-// libmythmetadata headers
-#include "metadatadownload.h"
+// MythTV headers
+#include "libmyth/programinfo.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythmetadata/metadatadownload.h"
+#include "libmythtv/channelinfo.h"
+#include "libmythtv/mpeg/dvbdescriptors.h"
+#include "libmythtv/programdata.h"
 
 // filldata headers
 #include "channeldata.h"
