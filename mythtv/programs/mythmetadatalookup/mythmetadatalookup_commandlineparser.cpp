@@ -1,7 +1,7 @@
-#include <QString>
 #include <QList>
+#include <QString>
 
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
 #include "mythmetadatalookup_commandlineparser.h"
 
 MythMetadataLookupCommandLineParser::MythMetadataLookupCommandLineParser() :

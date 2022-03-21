@@ -1,5 +1,5 @@
 
-#include "mythcommandlineparser.h"
+#include "libmythbase/mythcommandlineparser.h"
 
 class MythMetadataLookupCommandLineParser : public MythCommandLineParser
 {

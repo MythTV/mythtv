@@ -13,21 +13,22 @@
 #include <QProcessEnvironment>
 #endif
 
-// libmyth headers
-#include "exitcodes.h"
-#include "mythcontext.h"
-#include "mythdb.h"
-#include "mythversion.h"
-#include "mythmiscutil.h"
-#include "jobqueue.h"
-#include "mythtranslation.h"
-#include "mythconfig.h"
-#include "mythmetadatalookup_commandlineparser.h"
-#include "mythlogging.h"
-#include "signalhandling.h"
-#include "cleanupguard.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmythbase/cleanupguard.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythtranslation.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/signalhandling.h"
+#include "libmythtv/jobqueue.h"
 
+// MythMetadataLookup
 #include "lookup.h"
+#include "mythmetadatalookup_commandlineparser.h"
 
 namespace
 {

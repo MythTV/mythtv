@@ -1,18 +1,20 @@
-
-#include "lookup.h"
-
+// C++
 #include <vector>
 
+// Qt
 #include <QList>
 
-#include "programinfo.h"
-#include "recordingrule.h"
-#include "mythlogging.h"
-#include "jobqueue.h"
-#include "remoteutil.h"
-#include "mythcorecontext.h"
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/jobqueue.h"
+#include "libmythtv/metadataimagehelper.h"
+#include "libmythtv/recordingrule.h"
 
-#include "metadataimagehelper.h"
+// MythMetadataLookup
+#include "lookup.h"
 
 LookerUpper::LookerUpper()
 {
