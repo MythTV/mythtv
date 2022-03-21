@@ -9,7 +9,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <mythdate.h>
+#include "libmythbase/mythdate.h"
 
 class Commands;
 

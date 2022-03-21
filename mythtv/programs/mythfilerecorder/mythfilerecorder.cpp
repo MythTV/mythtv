@@ -1,24 +1,27 @@
 
+// C/C++
 #include <array>
-#include <sys/stat.h>
 #include <fcntl.h>
-
-#include <termios.h>
 #include <iostream>
 #include <sys/poll.h>
+#include <sys/stat.h>
+#include <termios.h>
 
+// Qt
 #include <QCoreApplication>
 #include <QDir>
 #include <QThread>
 #include <QTime>
 
-#include "mythfilerecorder_commandlineparser.h"
-#include "mythfilerecorder.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
 
-#include "exitcodes.h"
-#include "mythcontext.h"
-#include "mythversion.h"
-#include "mythlogging.h"
+// MythFileRecorder
+#include "mythfilerecorder.h"
+#include "mythfilerecorder_commandlineparser.h"
 
 #define API_VERSION 1
 #define VERSION "1.0.0"
