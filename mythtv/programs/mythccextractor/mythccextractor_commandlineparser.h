@@ -3,7 +3,7 @@
 #ifndef MYTH_CCEXTRACTOR_COMMAND_LINE_PARSER_H
 #define MYTH_CCEXTRACTOR_COMMAND_LINE_PARSER_H
 
-#include "mythcommandlineparser.h"
+#include "libmythbase/mythcommandlineparser.h"
 
 class MythCCExtractorCommandLineParser : public MythCommandLineParser
 {

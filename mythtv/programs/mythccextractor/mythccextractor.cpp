@@ -11,15 +11,17 @@
 #include <QtGui>
 
 // MythTV headers
-#include "mythccextractorplayer.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/cleanupguard.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/signalhandling.h"
+#include "libmythtv/io/mythmediabuffer.h"
+#include "libmythtv/mythccextractorplayer.h"
+
+// MythCCExtractor
 #include "mythccextractor_commandlineparser.h"
-#include "mythcontext.h"
-#include "mythversion.h"
-#include "programinfo.h"
-#include "io/mythmediabuffer.h"
-#include "exitcodes.h"
-#include "signalhandling.h"
-#include "cleanupguard.h"
 
 namespace {
     void cleanup()

@@ -1,5 +1,5 @@
+#include "libmythbase/mythcorecontext.h"
 #include "mythccextractor_commandlineparser.h"
-#include "mythcorecontext.h"
 
 MythCCExtractorCommandLineParser::MythCCExtractorCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHCCEXTRACTOR)
