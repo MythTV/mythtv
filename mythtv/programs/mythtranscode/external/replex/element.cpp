@@ -33,7 +33,7 @@
 #include "mpg_common.h"
 #include "pes.h"
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 std::array<unsigned int,4> _slots {12, 144, 0, 0};
 std::array<std::array<unsigned int,16>,3> bitrates {{

@@ -1,10 +1,10 @@
 // POSIX
 #include <pthread.h>
 
-// C
+// C++
 #include <cstdlib>
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 
 extern "C"
 {
@@ -16,15 +16,15 @@ extern "C"
 #if CONFIG_LIBMPEG2EXTERNAL
 #include <mpeg2dec/mpeg2.h>
 #else
-#include "mpeg2.h"
+#include "libmythmpeg2/mpeg2.h"
 #endif
 }
 
 //replex
-#include "external/replex/ringbuffer.h"
 #include "external/replex/multiplex.h"
+#include "external/replex/ringbuffer.h"
 
-//Qt
+// Qt
 #include <QMap>
 #include <QList>
 #include <QQueue>
@@ -32,9 +32,11 @@ extern "C"
 #include <QDateTime>
 
 // MythTV
+#include "libmyth/programtypes.h"
+#include "libmythtv/mythavutil.h"
+
+// MythTranscode
 #include "transcodedefs.h"
-#include "programtypes.h"
-#include "mythavutil.h"
 
 enum MPFListType {
     MPF_TYPE_CUTLIST = 0,
@@ -287,8 +289,8 @@ class MPEG2fixup
     #define GENERIC_EXIT_WRITE_FRAME_ERROR    149
     #define GENERIC_EXIT_DEADLOCK             150
 #else
-   #include "exitcodes.h"
-   #include "mythcontext.h"
+   #include "libmythbase/exitcodes.h"
+   #include "libmyth/mythcontext.h"
 #endif
 
 /*

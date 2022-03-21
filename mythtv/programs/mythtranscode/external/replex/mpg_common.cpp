@@ -32,7 +32,7 @@
 #include "pes.h"
 #include "ts.h"
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 void show_buf(uint8_t *buf, int length)
 {

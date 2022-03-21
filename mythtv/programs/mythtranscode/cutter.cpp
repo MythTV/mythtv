@@ -5,7 +5,7 @@
 
 #include <QMap>                         // for QMap
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 void Cutter::SetCutList(frm_dir_map_t &deleteMap, PlayerContext *ctx)
 {

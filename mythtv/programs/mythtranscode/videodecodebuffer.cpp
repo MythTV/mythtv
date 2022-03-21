@@ -1,10 +1,10 @@
-// MythTV
-#include "videodecodebuffer.h"
-#include "mythtranscodeplayer.h"
-
 // Std
 #include <chrono>
 #include <thread>
+
+// MythTV
+#include "mythtranscodeplayer.h"
+#include "videodecodebuffer.h"
 
 VideoDecodeBuffer::VideoDecodeBuffer(MythTranscodePlayer* Player, MythVideoOutput* Videoout,
                                      bool Cutlist, int Size)

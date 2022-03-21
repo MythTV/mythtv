@@ -62,7 +62,7 @@ extern "C" {
 #define O_LARGEFILE 0
 #endif
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 static int replex_all_set(struct replex *rx);
 

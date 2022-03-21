@@ -41,7 +41,7 @@
 #include "mpg_common.h"
 #endif
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 static uint32_t getle32(uint8_t *buf)
 {

@@ -4,7 +4,7 @@
 
 #include "multiplex.h"
 #include "ts.h"
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 static int buffers_filled(multiplex_t *mx)
 {

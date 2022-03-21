@@ -1,48 +1,50 @@
+// C++
 #include <cmath>
 #include <fcntl.h>
 #include <iostream>
 #include <memory>
+#include <unistd.h> // for unlink()
 
-#include <QStringList>
-#include <QMap>
+// Qt
 #include <QList>
-#include <QWaitCondition>
+#include <QMap>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QStringList>
+#include <QWaitCondition>
 #include <QtAlgorithms>
 
-#include "mythconfig.h"
+// MythTV
+#include "libmythbase/mythconfig.h"
 
-#include "transcode.h"
-#include "audiooutput.h"
-#include "recordingprofile.h"
-#include "mythcorecontext.h"
-#include "jobqueue.h"
-#include "exitcodes.h"
-#include "mthreadpool.h"
-#include "deletemap.h"
-#include "tvremoteutil.h"
-
+#include "libmyth/audio/audiooutput.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythtv/HLS/httplivestream.h"
+#include "libmythtv/deletemap.h"
+#include "libmythtv/io/mythavformatwriter.h"
+#include "libmythtv/jobqueue.h"
+#include "libmythtv/mythavutil.h"
+#include "libmythtv/recordingprofile.h"
+#include "libmythtv/tvremoteutil.h"
 #if CONFIG_LIBMP3LAME
-#include "NuppelVideoRecorder.h"
+#include "libmythtv/recorders/NuppelVideoRecorder.h"
 #endif
-#include "mythtranscodeplayer.h"
-#include "programinfo.h"
-#include "mythdbcon.h"
-#include "io/mythavformatwriter.h"
-#include "HLS/httplivestream.h"
 
-#include "videodecodebuffer.h"
-#include "cutter.h"
+// MythTranscode
 #include "audioreencodebuffer.h"
+#include "cutter.h"
+#include "mythtranscodeplayer.h"
+#include "transcode.h"
+#include "videodecodebuffer.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libswscale/swscale.h"
 }
-#include "mythavutil.h"
-
-#include <unistd.h> // for unlink()
 
 #define LOC QString("Transcode: ")
 

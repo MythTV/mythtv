@@ -38,7 +38,7 @@
 #endif
 
 #include "pes.h"
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 void printpts(int64_t pts)
 {

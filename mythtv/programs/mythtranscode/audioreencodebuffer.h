@@ -1,8 +1,8 @@
 #ifndef AUDIOREENCODEBUFFER_H
 #define AUDIOREENCODEBUFFER_H
 
-#include "mythconfig.h"
-#include "audiooutput.h"
+#include "libmyth/audio/audiooutput.h"
+#include "libmythbase/mythconfig.h"
 
 #define ABLOCK_SIZE   8192
 

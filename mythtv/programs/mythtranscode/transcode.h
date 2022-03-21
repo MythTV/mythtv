@@ -1,8 +1,11 @@
-#include "recordingprofile.h"
-#include "io/mythfifowriter.h"
+// MythTV
+#include "libmyth/programtypes.h"
+#include "libmythtv/io/mythfifowriter.h"
+#include "libmythtv/playercontext.h"
+#include "libmythtv/recordingprofile.h"
+
+// MythTranscode
 #include "transcodedefs.h"
-#include "programtypes.h"
-#include "playercontext.h"
 
 class ProgramInfo;
 class NuppelVideoRecorder;

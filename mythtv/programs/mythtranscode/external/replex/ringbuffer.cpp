@@ -31,7 +31,7 @@
 #include "ringbuffer.h"
 #include "pes.h"
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 #define DEBUG true
 

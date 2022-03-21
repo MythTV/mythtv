@@ -11,24 +11,26 @@
 #include <utility>
 
 // MythTV headers
-#include "mythmiscutil.h"
-#include "exitcodes.h"
-#include "programinfo.h"
-#include "jobqueue.h"
-#include "mythcontext.h"
-#include "mythdb.h"
-#include "mythversion.h"
-#include "mythdate.h"
-#include "transcode.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/cleanupguard.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythtranslation.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/remotefile.h"
+#include "libmythbase/signalhandling.h"
+#include "libmythtv/HLS/httplivestream.h"
+#include "libmythtv/jobqueue.h"
+#include "libmythtv/recordinginfo.h"
+
+// MythTranscode
 #include "mpeg2fix.h"
-#include "remotefile.h"
-#include "mythtranslation.h"
-#include "mythlogging.h"
 #include "mythtranscode_commandlineparser.h"
-#include "recordinginfo.h"
-#include "signalhandling.h"
-#include "HLS/httplivestream.h"
-#include "cleanupguard.h"
+#include "transcode.h"
 
 static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                         frm_dir_map_t *deleteMap, int &exitCode,

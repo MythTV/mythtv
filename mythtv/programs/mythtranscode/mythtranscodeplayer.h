@@ -2,7 +2,7 @@
 #define MYTHTRANSCODEPLAYER_H
 
 // MythTV
-#include "mythplayer.h"
+#include "libmythtv/mythplayer.h"
 
 class MythTranscodePlayer : public MythPlayer
 {

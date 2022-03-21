@@ -42,7 +42,7 @@
 #include "element.h"
 #include "pes.h"
 
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 uint16_t get_pid(const uint8_t *pid)
 {

@@ -15,8 +15,8 @@ HEADERS += avi.h element.h mpg_common.h multiplex.h ringbuffer.h
 HEADERS += ts.h replex.h pes.h
 
 INCLUDEPATH += replex
-INCLUDEPATH += ../../../.. ../../../../external/FFmpeg
-INCLUDEPATH += ../../../../libs/libmythbase
+INCLUDEPATH += ../../../../external/FFmpeg
+INCLUDEPATH += ../../../../libs
 
 QMAKE_CFLAGS += -w
 
@@ -40,6 +40,5 @@ POST_TARGETDEPS += ../../../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
 POST_TARGETDEPS += ../../../../external/FFmpeg/libavformat/$$avLibName(avformat)
 
 DEPENDPATH += ../../../.. ../../../../external/FFmpeg
-DEPENDPATH += ../../../../libs/libmythbase
 
 # NB the myth libraries need link link against Qt libs so CONFIG needs qt

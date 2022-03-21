@@ -8,7 +8,7 @@
 #include <QRunnable>
 
 // MythTV
-#include "mythvideoout.h"
+#include "libmythtv/mythvideoout.h"
 
 class MythTranscodePlayer;
 class MythVideoOutput;
