@@ -12,6 +12,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <thread> // for sleep_for
+#include <utility>
 
 //qt
 #include <QCoreApplication>
@@ -20,19 +21,18 @@
 #include <QStringConverter>
 #endif
 #include <QTimer>
-#include <utility>
 
 // mythtv
-#include "mythcontext.h"
-#include "mythdbcon.h"
-#include "mythdate.h"
-#include "tv.h"
-#include "compat.h"
+#include "libmyth/mythcontext.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/lcddevice.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythtv/tv.h"
 
-//mythlcdserver
+// mythlcdserver
 #include "lcdprocclient.h"
 #include "lcdserver.h"
-#include "lcddevice.h"
 
 #define LCD_START_COL 3
 

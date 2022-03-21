@@ -5,27 +5,31 @@
 
 */
 
+// c/c++
 #include <csignal>
 #include <fcntl.h>
 #include <iostream>
 #include <unistd.h>
 
+// Qt
 #include <QtGlobal>
 #include <QCoreApplication>
 #include <QFile>
 
-#include "exitcodes.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
-#include "mythlogging.h"
-#include "mythversion.h"
-#include "tv_play.h"
-#include "compat.h"
-#include "mythtranslation.h"
-#include "mythlcdserver_commandlineparser.h"
-#include "signalhandling.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythtranslation.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/signalhandling.h"
+#include "libmythtv/tv_play.h"
 
+// mythlcdserver
 #include "lcdserver.h"
+#include "mythlcdserver_commandlineparser.h"
 
 int main(int argc, char **argv)
 {

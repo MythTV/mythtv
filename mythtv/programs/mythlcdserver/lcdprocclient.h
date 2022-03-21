@@ -6,7 +6,7 @@
 #include <QList>
 #include <QTcpSocket>
 
-#include "tvremoteutil.h"
+#include "libmythtv/tvremoteutil.h"
 
 using namespace std::chrono_literals;
 

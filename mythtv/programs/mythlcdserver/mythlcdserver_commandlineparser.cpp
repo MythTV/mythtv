@@ -1,6 +1,6 @@
 #include <QString>
 
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
 #include "mythlcdserver_commandlineparser.h"
 
 MythLCDServerCommandLineParser::MythLCDServerCommandLineParser() :

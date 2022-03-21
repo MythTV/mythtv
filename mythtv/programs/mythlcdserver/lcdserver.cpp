@@ -55,18 +55,22 @@
 
 */
 
+// c/c++
 #include <cstdlib>
+#include <utility>
 
+//qt
 #include <QCoreApplication>
 #include <QDir>
 #include <QList>
 #include <QStringList>
-#include <utility>
 
-#include "mythdate.h"
-#include "mythcontext.h"
-#include "lcddevice.h"
+// mythtv
+#include "libmyth/mythcontext.h"
+#include "libmythbase/lcddevice.h"
+#include "libmythbase/mythdate.h"
 
+// mythlcdserver
 #include "lcdserver.h"
 
 int debug_level = 0;

@@ -11,7 +11,7 @@
 #include <QObject>
 #include <QTcpSocket>
 
-#include "serverpool.h"
+#include "libmythbase/serverpool.h"
 #include "lcdprocclient.h"
 
 /*
