@@ -18,21 +18,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "mythexternrecorder_commandlineparser.h"
-#include "MythExternRecApp.h"
-#include "MythExternControl.h"
-
-#include "exitcodes.h"
-#include "mythcontext.h"
-#include "mythversion.h"
-#include "mythlogging.h"
-
-#include <unistd.h>
-
+// C/C++
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
+// Qt
 #include <QCoreApplication>
+
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
+
+// MythExternRecorder
+#include "MythExternControl.h"
+#include "MythExternRecApp.h"
+#include "mythexternrecorder_commandlineparser.h"
 
 int main(int argc, char *argv[])
 {

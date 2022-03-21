@@ -19,16 +19,16 @@
  */
 
 #include "MythExternControl.h"
-#include "mythlogging.h"
+
+#include <array>
+#include <iostream>
+#include <poll.h>
+#include <unistd.h>
 
 #include <QFile>
 #include <QTextStream>
 
-#include <array>
-#include <unistd.h>
-#include <poll.h>
-
-#include <iostream>
+#include "libmythbase/mythlogging.h"
 
 using namespace std::chrono_literals;
 

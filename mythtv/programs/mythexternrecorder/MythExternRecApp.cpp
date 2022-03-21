@@ -18,17 +18,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <thread>
+// C/C++
 #include <csignal>
-#include "mythcommandlineparser.h"
-#include "MythExternRecApp.h"
-#include "mythchrono.h"
+#include <thread>
+#include <unistd.h>
 
+// Qt
 #include <QElapsedTimer>
 #include <QFileInfo>
 #include <QProcess>
 #include <QtCore/QtCore>
-#include <unistd.h>
+
+// MythTV
+#include "libmythbase/mythchrono.h"
+
+// MythExternRecorder
+#include "MythExternRecApp.h"
+#include "mythexternrecorder_commandlineparser.h"
 
 #define LOC Desc()
 
