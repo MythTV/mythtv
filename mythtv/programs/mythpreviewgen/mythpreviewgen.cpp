@@ -11,33 +11,36 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+// Qt
 #include <QtGlobal>
 #ifndef _WIN32
 #include <QCoreApplication>
 #else
 #include <QApplication>
 #endif
-
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QDir>
 #include <QMap>
 
-#include "mythcontext.h"
-#include "mythcorecontext.h"
-#include "mythversion.h"
-#include "mythdb.h"
-#include "exitcodes.h"
-#include "compat.h"
-#include "storagegroup.h"
-#include "programinfo.h"
-#include "dbcheck.h"
-#include "previewgenerator.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/cleanupguard.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/signalhandling.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythtv/dbcheck.h"
+#include "libmythtv/mythsystemevent.h"
+#include "libmythtv/previewgenerator.h"
+
+//MythPreviewGen
 #include "mythpreviewgen_commandlineparser.h"
-#include "mythsystemevent.h"
-#include "mythlogging.h"
-#include "signalhandling.h"
-#include "cleanupguard.h"
 
 #define LOC      QString("MythPreviewGen: ")
 #define LOC_WARN QString("MythPreviewGen, Warning: ")

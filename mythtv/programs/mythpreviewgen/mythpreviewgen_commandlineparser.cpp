@@ -1,6 +1,6 @@
 #include <QString>
 
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
 #include "mythpreviewgen_commandlineparser.h"
 
 MythPreviewGeneratorCommandLineParser::MythPreviewGeneratorCommandLineParser() :
