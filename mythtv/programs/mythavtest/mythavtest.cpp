@@ -1,5 +1,5 @@
-#include <unistd.h>
 #include <iostream>
+#include <unistd.h>
 #include <utility>
 
 #include <QtGlobal>
@@ -9,26 +9,25 @@
 #include <QSurfaceFormat>
 #include <QTime>
 
-#include "tv_play.h"
-#include "programinfo.h"
+// libmyth*
+#include "libmyth/mythcontext.h"
+#include "libmyth/programinfo.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/signalhandling.h"
+#include "libmythtv/dbcheck.h"
+#include "libmythtv/jitterometer.h"
+#include "libmythtv/mythplayerui.h"
+#include "libmythtv/mythvideoout.h"
+#include "libmythtv/tv_play.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuihelper.h"
+
 #include "mythavtest_commandlineparser.h"
-#include "mythplayerui.h"
-#include "jitterometer.h"
-
-#include "exitcodes.h"
-#include "mythcontext.h"
-#include "mythversion.h"
-#include "mythdbcon.h"
-#include "compat.h"
-#include "dbcheck.h"
-#include "mythlogging.h"
-#include "signalhandling.h"
-#include "mythmiscutil.h"
-#include "mythvideoout.h"
-
-// libmythui
-#include "mythuihelper.h"
-#include "mythmainwindow.h"
 
 class VideoPerformanceTest
 {
