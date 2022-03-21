@@ -2,14 +2,16 @@
 #include <QCoreApplication>
 
 // MythTV
+#include "libmyth/mythcontext.h"
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythscreenstack.h"
+
+// MythFrontend
 #include "exitprompt.h"
-#include "mythcontext.h"
-#include "mythdialogbox.h"
-#include "mythmainwindow.h"
-#include "mythscreenstack.h"
-#include "mythsystemlegacy.h"
-#include "mythlogging.h"
-#include "exitcodes.h"
 
 ExitPrompter::ExitPrompter()
   : m_power(MythPower::AcquireRelease(this, true)),

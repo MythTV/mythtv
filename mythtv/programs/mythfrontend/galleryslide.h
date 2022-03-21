@@ -12,8 +12,8 @@
 
 #include <QQueue>
 
-#include "mythuiimage.h"
-#include "imagetypes.h"
+#include "libmythmetadata/imagetypes.h"
+#include "libmythui/mythuiimage.h"
 
 // Min/max zoom extents available in slideshow
 #define MIN_ZOOM (0.1F)

@@ -7,7 +7,7 @@
 #include <QDateTime>
 #include <QStringList>
 
-#include "mythscreentype.h"
+#include "libmythui/mythscreentype.h"
 
 class QTimer;
 class ProgramInfo;

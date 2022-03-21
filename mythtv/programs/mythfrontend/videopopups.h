@@ -1,7 +1,7 @@
 #ifndef VIDEOPOPUPS_H_
 #define VIDEOPOPUPS_H_
 
-#include "mythscreentype.h"
+#include "libmythui/mythscreentype.h"
 
 class VideoMetadata;
 

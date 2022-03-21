@@ -1,23 +1,27 @@
+// C++
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
-#include "backendconnectionmanager.h"
-
+// Qt
 #include <QCoreApplication>
 #include <QRunnable>
 #include <QString>
 #include <QEvent>
 #include <QTimer>
 
-#include "mythcorecontext.h"
-#include "mythdialogbox.h"
-#include "mythscreenstack.h"
-#include "mythmainwindow.h"
-#include "mthreadpool.h"
-#include "mythlogging.h"
-#include "exitcodes.h"
-#include "mythtimezone.h"
+// MythTV
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythtimezone.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythscreenstack.h"
 
-#include <chrono> // for milliseconds
-#include <thread> // for sleep_for
+// MythFrontend
+#include "backendconnectionmanager.h"
+
 
 using namespace MythTZ;
 

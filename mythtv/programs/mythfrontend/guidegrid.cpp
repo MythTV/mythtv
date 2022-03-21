@@ -1,57 +1,49 @@
-
-#include "guidegrid.h"
-
-// c/c++
+// C/C++
 #include <algorithm>
 #include <cstdint>                     // for uint64_t
 #include <deque>                        // for _Deque_iterator, operator!=, etc
 
-//qt
+// Qt
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QKeyEvent>
 
-// libmythbase
-#include "mythdate.h"
-#include "mythcorecontext.h"
-#include "mythdbcon.h"
-#include "mythlogging.h"
-#include "autodeletedeque.h"            // for AutoDeleteDeque, etc
-#include "mythevent.h"                  // for MythEvent, etc
-#include "mythtypes.h"                  // for InfoMap
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmyth/programtypes.h"           // for RecStatus, etc
+#include "libmyth/recordingtypes.h"         // for toString, etc
+#include "libmyth/remoteutil.h"
+#include "libmythbase/autodeletedeque.h"    // for AutoDeleteDeque, etc
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythevent.h"          // for MythEvent, etc
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythtypes.h"          // for InfoMap
+#include "libmythtv/cardutil.h"
+#include "libmythtv/channelinfo.h"
+#include "libmythtv/channelutil.h"
+#include "libmythtv/recordingrule.h"
+#include "libmythtv/tv.h"                   // for ::kState_WatchingLiveTV
+#include "libmythtv/tv_actions.h"           // for ACTION_CHANNELSEARCH, etc
+#include "libmythtv/tv_play.h"
+#include "libmythtv/tvremoteutil.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythgesture.h"
+#include "libmythui/mythmainwindow.h"       // for GetMythMainWindow, etc
+#include "libmythui/mythrect.h"             // for MythRect
+#include "libmythui/mythscreenstack.h"      // for MythScreenStack
+#include "libmythui/mythscreentype.h"       // for MythScreenType
+#include "libmythui/mythuiactions.h"        // for ACTION_SELECT, ACTION_DOWN, etc
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuiguidegrid.h"
+#include "libmythui/mythuiimage.h"
+#include "libmythui/mythuistatetype.h"
+#include "libmythui/mythuitext.h"
+#include "libmythui/mythuiutils.h"          // for UIUtilW, UIUtilE
 
-// libmyth
-#include "programtypes.h"               // for RecStatus, etc
-
-// libmythtv
-#include "remoteutil.h"
-#include "channelutil.h"
-#include "cardutil.h"
-#include "tvremoteutil.h"
-#include "channelinfo.h"
-#include "programinfo.h"
-#include "recordingrule.h"
-#include "tv_play.h"
-#include "tv.h"                         // for ::kState_WatchingLiveTV
-#include "tv_actions.h"                 // for ACTION_CHANNELSEARCH, etc
-#include "recordingtypes.h"             // for toString, etc
-
-// libmythui
-#include "mythuibuttonlist.h"
-#include "mythuiguidegrid.h"
-#include "mythuistatetype.h"
-#include "mythdialogbox.h"
-#include "mythuiimage.h"
-#include "mythuitext.h"
-#include "mythmainwindow.h"             // for GetMythMainWindow, etc
-#include "mythrect.h"                   // for MythRect
-#include "mythscreenstack.h"            // for MythScreenStack
-#include "mythscreentype.h"             // for MythScreenType
-#include "mythuiactions.h"              // for ACTION_SELECT, ACTION_DOWN, etc
-#include "mythuiutils.h"                // for UIUtilW, UIUtilE
-#include "mythgesture.h"
-
-// mythfrontend
+// MythFrontend
+#include "guidegrid.h"
 #include "progfind.h"
 
 QWaitCondition epgIsVisibleCond;

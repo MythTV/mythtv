@@ -1,21 +1,17 @@
-// myth
-#include "mythcorecontext.h"
-#include "mythlogging.h"
-#include "remoteutil.h"
-#include "recordinginfo.h"
+// MythTV
+#include "libmyth/remoteutil.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/channelutil.h"
+#include "libmythtv/recordinginfo.h"
+#include "libmythtv/scheduledrecording.h"
+#include "libmythtv/tv.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuitext.h"
 
-//mythui
-#include "mythuitext.h"
-#include "mythuibuttonlist.h"
-#include "mythmainwindow.h"
-#include "mythdialogbox.h"
-
-//mythtv
-#include "channelutil.h"
-#include "scheduledrecording.h"
-#include "tv.h"
-
-//mythfrontend
+// MythFrontend
 #include "viewschedulediff.h"
 
 bool ViewScheduleDiff::Create()

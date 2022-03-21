@@ -1,32 +1,25 @@
-
-#include "schedulecommon.h"
-
-// QT
+// Qt
 #include <QCoreApplication>
 
-// libmyth
-#include "mythcorecontext.h"
-#include "programinfo.h"
-#include "remoteutil.h"
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythtv/channelutil.h"
+#include "libmythtv/recordinginfo.h"
+#include "libmythtv/tvremoteutil.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythscreentype.h"
 
-// libmythtv
-#include "channelutil.h"
-#include "recordinginfo.h"
-#include "tvremoteutil.h"
-
-// libmythui
-#include "mythscreentype.h"
-#include "mythdialogbox.h"
-#include "mythmainwindow.h"
-
-// mythfrontend
-#include "scheduleeditor.h"
-
-#include "proglist.h"
-#include "prevreclist.h"
+// MythFrontend
 #include "customedit.h"
 #include "guidegrid.h"
+#include "prevreclist.h"
 #include "progdetails.h"
+#include "proglist.h"
+#include "schedulecommon.h"
+#include "scheduleeditor.h"
 
 /**
 *  \brief Show the Program Details screen

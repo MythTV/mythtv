@@ -1,13 +1,13 @@
 #ifndef GENERALSETUPWIZARD_H
 #define GENERALSETUPWIZARD_H
 
-// libmythui
-#include "mythuitext.h"
-#include "mythuibutton.h"
-#include "mythuicheckbox.h"
-#include "mythscreentype.h"
-#include "mythdialogbox.h"
-#include "mythprogressdialog.h"
+// MythTV
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythprogressdialog.h"
+#include "libmythui/mythscreentype.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuicheckbox.h"
+#include "libmythui/mythuitext.h"
 
 class HardwareProfile;
 

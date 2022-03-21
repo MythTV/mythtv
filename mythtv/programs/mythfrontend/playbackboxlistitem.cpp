@@ -1,7 +1,10 @@
-#include "playbackboxlistitem.h"
-#include "programinfo.h"
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmythbase/mythlogging.h"
+
+//  MythFrontend
 #include "playbackbox.h"
-#include "mythlogging.h"
+#include "playbackboxlistitem.h"
 
 #ifdef INCLUDE_UNFINISHED
 PlaybackBoxListItem::PlaybackBoxListItem(

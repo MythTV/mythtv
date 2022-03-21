@@ -1,9 +1,9 @@
 #ifndef IDLESCREEN_H
 #define IDLESCREEN_H
 
-#include <mythscreentype.h>
-// libmyth
-#include "programinfo.h"
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmythui/mythscreentype.h"
 
 class MythUIStateType;
 class MythUIButtonList;

@@ -1,5 +1,5 @@
 // MythTV
-#include "mythpower.h"
+#include "libmythbase/mythpower.h"
 
 class MythDialogBox;
 

@@ -1,20 +1,22 @@
+// C++
 #include <set>
 
-#include "mythcontext.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/stringutil.h"
+#include "libmythmetadata/dbaccess.h"
+#include "libmythmetadata/globals.h"
+#include "libmythmetadata/videometadatalistmanager.h"
+#include "libmythmetadata/videoutils.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuitext.h"
+#include "libmythui/mythuitextedit.h"
 
-#include "mythuibuttonlist.h"
-#include "mythuibutton.h"
-#include "mythuitext.h"
-#include "mythuitextedit.h"
-#include "stringutil.h"
-#include "globals.h"
-#include "dbaccess.h"
-#include "videometadatalistmanager.h"
-#include "videoutils.h"
-#include "mythdate.h"
-
-#include "videolist.h"
+// MythFrontend
 #include "videofilter.h"
+#include "videolist.h"
 
 const QRegularExpression VideoFilterSettings::kReSeason {
     "(\\d+)x(\\d*)", QRegularExpression::CaseInsensitiveOption };

@@ -13,8 +13,8 @@
 #include <QRecursiveMutex>
 #endif
 
-#include "mthread.h"
-#include "serverpool.h"
+#include "libmythbase/mthread.h"
+#include "libmythbase/serverpool.h"
 
 class MainServer;
 class QTextStream;

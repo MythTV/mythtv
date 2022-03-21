@@ -3,10 +3,10 @@
 
 // Standard UNIX C headers
 #include <chrono> // for milliseconds
-#include <thread> // for sleep_for
 #include <fcntl.h>
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <thread> // for sleep_for
 
 // Qt headers
 #include <QtGlobal>
@@ -16,14 +16,16 @@
 #include <utility>
 
 // MythTV headers
-#include "mythconfig.h"
-#include "mythcorecontext.h"
-#include "mythdbcon.h"
-#include "audiooutpututil.h"
+#include "libmyth/audio/audiooutpututil.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+
+// MythFrontend
 #include "audiogeneralsettings.h"
-#include "mythdialogbox.h"
-#include "mythlogging.h"
-#include "mythmainwindow.h"
 
 extern "C" {
 #include "libavformat/avformat.h"

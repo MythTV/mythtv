@@ -5,26 +5,25 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "mythfexml.h"
-
-#include "mythcorecontext.h"
-#include "mythdate.h"
-#include "mythdbcon.h"
-#include "configuration.h"
-#include "mythmainwindow.h"
-
-#include <QTextStream>
+// Qt
+#include <QBuffer>
 #include <QCoreApplication>
-#include <QTextStream>
 #include <QDir>
 #include <QFile>
-#include <QBuffer>
 #include <QKeyEvent>
+#include <QTextStream>
 
-#include "../../config.h"
+// MythTV
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/configuration.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythui/mythmainwindow.h"
 
+// MythFrontend
 #include "keybindings.h"
-
+#include "mythfexml.h"
 #include "services/frontend.h"
 
 /////////////////////////////////////////////////////////////////////////////

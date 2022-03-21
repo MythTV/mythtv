@@ -14,7 +14,7 @@
 #include <utility>
 
 // MythTV headers
-#include "imagemanager.h"
+#include "libmythmetadata/imagemanager.h"
 
 
 //! Order of images in slideshow

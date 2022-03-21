@@ -26,8 +26,8 @@
  */
 
 // MythTV headers
-#include "mythdb.h"
-#include "mythmainwindow.h"
+#include "libmythbase/mythdb.h"
+#include "libmythui/mythmainwindow.h"
 
 // MythControls headers
 #include "keybindings.h"

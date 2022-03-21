@@ -1,10 +1,13 @@
+// C++
 #include <chrono>
 
-#include "galleryinfo.h"
+// MythTV
+#include "libmythbase/mythcoreutil.h"
+#include "libmythbase/mythdate.h"
+#include "libmythmetadata/imagemetadata.h"
 
-#include "imagemetadata.h"
-#include "mythcoreutil.h"
-#include "mythdate.h"
+// MythFrontend
+#include "galleryinfo.h"
 
 
 //! The exif/video tags comprising the Basic file info

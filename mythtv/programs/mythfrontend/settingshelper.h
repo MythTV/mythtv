@@ -1,8 +1,10 @@
+// Qt
 #include <QObject>
 
-#include <mythcorecontext.h>
-#include <mythuihelper.h>
-#include <scheduledrecording.h>
+// MythTV
+#include "libmythbase/mythcorecontext.h"
+#include "libmythtv/scheduledrecording.h"
+#include "libmythui/mythuihelper.h"
 
    class SettingsHelper : public QObject
     {

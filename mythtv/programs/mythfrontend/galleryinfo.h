@@ -6,8 +6,8 @@
 
 #include <QTimer>
 
-#include "mythuibuttonlist.h"
-#include "imagemanager.h"
+#include "libmythmetadata/imagemanager.h"
+#include "libmythui/mythuibuttonlist.h"
 
 
 class MythScreenType;

@@ -1,11 +1,13 @@
-#include "galleryslideview.h"
-
+// C++
 #include <utility>
 
-#include "mythmainwindow.h"
-#include "mythuitext.h"
-#include "mythdialogbox.h"
+// MythTV
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuitext.h"
 
+// MythFrontend
+#include "galleryslideview.h"
 #include "galleryviews.h"
 
 #define LOC QString("Slideview: ")

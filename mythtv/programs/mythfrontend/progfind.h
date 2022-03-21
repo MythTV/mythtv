@@ -6,12 +6,12 @@
 #include <QEvent>
 
 // MythTV
-#include "mythscreentype.h"
-#include "programinfo.h"
-#include "mythdialogbox.h"
-#include "playercontext.h"
+#include "libmyth/programinfo.h"
+#include "libmythtv/playercontext.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythscreentype.h"
 
-// mythfrontend
+// MythFrontend
 #include "schedulecommon.h"
 
 class TV;

@@ -1,28 +1,21 @@
-
-#include "customedit.h"
-
-// QT
+// Qt
 #include <QSqlError>
 
-// libmythbase
-#include "mythdb.h"
+// MythTV
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythtv/recordingrule.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuitext.h"
+#include "libmythui/mythuitextedit.h"
 
-// libmyth
-#include "mythcorecontext.h"
-
-// libmythui
-#include "mythuibuttonlist.h"
-#include "mythuitextedit.h"
-#include "mythuibutton.h"
-#include "mythdialogbox.h"
-#include "mythuitext.h"
-
-// libmythtv
-#include "recordingrule.h"
-
-// mythfrontend
-#include "scheduleeditor.h"
+// MythFrontend
+#include "customedit.h"
 #include "proglist.h"
+#include "scheduleeditor.h"
+
 
 CustomEdit::CustomEdit(MythScreenStack *parent, ProgramInfo *pginfo)
               : MythScreenType(parent, "CustomEdit")

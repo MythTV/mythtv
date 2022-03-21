@@ -4,19 +4,24 @@
 // Distributed as part of MythTV under GPL version 2
 // (or at your option a later version)
 
-#include "programinfocache.h"
-#include "mthreadpool.h"
-#include "mythlogging.h"
-#include "programinfo.h"
-#include "remoteutil.h"
-#include "mythevent.h"
-#include "mythdb.h"
-#include "mconcurrent.h"
+// C++
+#include <algorithm>
 
+// Qt
 #include <QCoreApplication>
 #include <QRunnable>
 
-#include <algorithm>
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/mconcurrent.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythevent.h"
+#include "libmythbase/mythlogging.h"
+
+// MythFrontend
+#include "programinfocache.h"
 
 using VPI_ptr = std::vector<ProgramInfo *> *;
 static void free_vec(VPI_ptr &v)

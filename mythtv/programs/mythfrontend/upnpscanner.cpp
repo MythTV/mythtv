@@ -1,3 +1,9 @@
+// C++
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
+#include <utility>
+
+// Qt
 #include <QCoreApplication>
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 #include <QStringConverter>
@@ -5,14 +11,13 @@
 #include <QTextCodec>
 #endif
 
-#include "mythcorecontext.h"
-#include "mythlogging.h"
-#include "ssdp.h"
-#include "upnpscanner.h"
+// MythTV
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythupnp/ssdp.h"
 
-#include <chrono> // for milliseconds
-#include <thread> // for sleep_for
-#include <utility>
+// MythFrontend
+#include "upnpscanner.h"
 
 #define LOC QString("UPnPScan: ")
 #define ERR QString("UPnPScan error: ")

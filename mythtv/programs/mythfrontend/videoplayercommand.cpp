@@ -1,16 +1,18 @@
+// Qt
 #include <QDir>
 
-#include "mythcontext.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/lcddevice.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythmetadata/dbaccess.h"
+#include "libmythmetadata/videometadata.h"
+#include "libmythmetadata/videoutils.h"
+#include "libmythui/mythmainwindow.h"
 
-#include "mythmainwindow.h"
-#include "mythsystemlegacy.h"
-#include "remoteutil.h"
-#include "lcddevice.h"
-#include "mythmiscutil.h"
-#include "dbaccess.h"
-#include "videometadata.h"
-#include "videoutils.h"
-
+// MythFrontend
 #include "videoplayercommand.h"
 
 namespace

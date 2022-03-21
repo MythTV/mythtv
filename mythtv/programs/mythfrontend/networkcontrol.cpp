@@ -1,54 +1,54 @@
-
-#include "networkcontrol.h"
-
+// C++
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 
+// Qt
 #include <QCoreApplication>
+#include <QDir>
+#include <QEvent>
+#include <QKeyEvent>
+#include <QMap>
 #include <QRegularExpression>
-#include <QStringList>
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 #include <QStringConverter>
 #endif
+#include <QStringList>
 #include <QTextStream>
-#include <QDir>
-#include <QKeyEvent>
-#include <QEvent>
-#include <QMap>
 
-#include "mythcorecontext.h"
-#include "mythmiscutil.h"
-#include "mythversion.h"
-#include "programinfo.h"
-#include "remoteutil.h"
-#include "previewgenerator.h"
-#include "compat.h"
-#include "mythsystemevent.h"
-#include "mythdirs.h"
-#include "mythlogging.h"
-
-// libmythui
-#include "mythmainwindow.h"
-#include "mythuihelper.h"
-#include "mythuigroup.h"
-#include "mythuiclock.h"
-#include "mythuishape.h"
-#include "mythuibutton.h"
-#include "mythuitextedit.h"
-#include "mythuibuttontree.h"
-#include "mythuivideo.h"
-#include "mythuiguidegrid.h"
-#include "mythuicheckbox.h"
-#include "mythuispinbox.h"
-
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythversion.h"
+#include "libmythtv/mythsystemevent.h"
+#include "libmythtv/previewgenerator.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttontree.h"
+#include "libmythui/mythuicheckbox.h"
+#include "libmythui/mythuiclock.h"
+#include "libmythui/mythuieditbar.h"
+#include "libmythui/mythuigroup.h"
+#include "libmythui/mythuiguidegrid.h"
+#include "libmythui/mythuihelper.h"
+#include "libmythui/mythuiimage.h"
+#include "libmythui/mythuiprogressbar.h"
+#include "libmythui/mythuiscrollbar.h"
+#include "libmythui/mythuishape.h"
+#include "libmythui/mythuispinbox.h"
+#include "libmythui/mythuitextedit.h"
+#include "libmythui/mythuivideo.h"
 #if CONFIG_QTWEBKIT
-#include "mythuiwebbrowser.h"
+#include "libmythui/mythuiwebbrowser.h"
 #endif
 
-#include "mythuiprogressbar.h"
-#include "mythuiscrollbar.h"
-#include "mythuieditbar.h"
-#include "mythuiimage.h"
+// MythFrontend
+#include "networkcontrol.h"
+
 
 #define LOC QString("NetworkControl: ")
 #define LOC_ERR QString("NetworkControl Error: ")

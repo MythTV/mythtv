@@ -1,7 +1,3 @@
-
-// Theme Chooser headers
-#include "themechooser.h"
-
 // C++ headers
 #include <chrono>
 
@@ -11,30 +7,31 @@
 #include <QRunnable>
 
 // MythTV headers
-#include "mythcorecontext.h"
-#include "mythcoreutil.h"
-#include "unziputil.h" // for extractZIP
-#include "mthreadpool.h"
-#include "remotefile.h"
-#include "mythdownloadmanager.h"
-#include "programtypes.h"
-#include "mythsystemevent.h"
-#include "mythdate.h"
-#include "mythversion.h"
-#include "mythlogging.h"
-#include "storagegroup.h"
+#include "libmyth/programtypes.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythcoreutil.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/remotefile.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythbase/unziputil.h" // for extractZIP
+#include "libmythtv/mythsystemevent.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythscreenstack.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuigroup.h"
+#include "libmythui/mythuihelper.h"
+#include "libmythui/mythuiimage.h"
+#include "libmythui/mythuiprogressbar.h"
+#include "libmythui/mythuistatetype.h"
+#include "libmythui/mythuitext.h"
 
-// LibMythUI headers
-#include "mythdialogbox.h"
-#include "mythmainwindow.h"
-#include "mythscreenstack.h"
-#include "mythuibuttonlist.h"
-#include "mythuigroup.h"
-#include "mythuihelper.h"
-#include "mythuiimage.h"
-#include "mythuiprogressbar.h"
-#include "mythuistatetype.h"
-#include "mythuitext.h"
+// Theme Chooser headers
+#include "themechooser.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,15,2)
 #define capturedView capturedRef

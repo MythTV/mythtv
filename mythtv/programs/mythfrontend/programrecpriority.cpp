@@ -1,32 +1,25 @@
-
-// own header
-#include "programrecpriority.h"
-
 // C/C++ headers
 #include <vector> // For std::vector
 
 // QT headers
 #include <QDateTime>
 
-// libmythtv headers
-#include "recordingrule.h"
-#include "scheduledrecording.h"
+// MythTV headers
+#include "libmyth/remoteutil.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/stringutil.h"
+#include "libmythtv/recordingrule.h"
+#include "libmythtv/scheduledrecording.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuihelper.h"
+#include "libmythui/mythuistatetype.h"
+#include "libmythui/mythuitext.h"
 
-// libmythbase
-#include "mythdb.h"
-#include "mythlogging.h"
-#include "stringutil.h"
-#include "remoteutil.h"
-
-// libmythui
-#include "mythuihelper.h"
-#include "mythuibuttonlist.h"
-#include "mythuitext.h"
-#include "mythuistatetype.h"
-#include "mythdialogbox.h"
-
-// mythfrontend
+// MythFrontend
 #include "proglist.h"
+#include "programrecpriority.h"
 #include "scheduleeditor.h"
 
 void ProgramRecPriorityInfo::clone(

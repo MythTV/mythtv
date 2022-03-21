@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 
+// Qt
 #include <QStringList>
 #include <QDateTime>
 #include <QMultiMap>
@@ -17,11 +18,11 @@
 #include <QMap>
 #include <QSet>
 
-#include "jobqueue.h"
-#include "tv_play.h"
-
-#include "mythscreentype.h"
-#include "metadatafactory.h"
+// MythTV
+#include "libmythmetadata/metadatafactory.h"
+#include "libmythtv/jobqueue.h"
+#include "libmythtv/tv_play.h"
+#include "libmythui/mythscreentype.h"
 
 // mythfrontend
 #include "schedulecommon.h"

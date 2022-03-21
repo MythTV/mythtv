@@ -2,26 +2,26 @@
 #ifndef GUIDEGRID_H_
 #define GUIDEGRID_H_
 
-// c++
+// C++
 #include <list>
 #include <utility>
 #include <vector>
 
-// qt
+// Qt
 #include <QString>
 #include <QDateTime>
 #include <QEvent>
 
-// myth
-#include "mythscreentype.h"
-#include "programinfo.h"
-#include "channelgroup.h"
-#include "channelutil.h"
-#include "mythuiguidegrid.h"
-#include "mthreadpool.h"
-#include "tv_play.h"
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmythbase/mthreadpool.h"
+#include "libmythtv/channelgroup.h"
+#include "libmythtv/channelutil.h"
+#include "libmythtv/tv_play.h"
+#include "libmythui/mythscreentype.h"
+#include "libmythui/mythuiguidegrid.h"
 
-// mythfrontend
+// MythFrontend
 #include "schedulecommon.h"
 
 class ProgramInfo;

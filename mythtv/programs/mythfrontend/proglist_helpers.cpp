@@ -1,16 +1,18 @@
 // MythTV
-#include "mythuibuttonlist.h"
-#include "proglist_helpers.h"
-#include "mythcorecontext.h"
-#include "mythuitextedit.h"
-#include "scheduleeditor.h"
-#include "recordingrule.h"
-#include "mythuibutton.h"
-#include "channelinfo.h"
-#include "channelutil.h"
-#include "mythuitext.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythtv/channelinfo.h"
+#include "libmythtv/channelutil.h"
+#include "libmythtv/recordingrule.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuitext.h"
+#include "libmythui/mythuitextedit.h"
+
+// MythFrontend
 #include "proglist.h"
-#include "mythdate.h"
+#include "proglist_helpers.h"
+#include "scheduleeditor.h"
 
 bool PhrasePopup::Create()
 {
@@ -486,7 +488,7 @@ void EditPowerSearchPopup::initLists(void)
     new MythUIButtonListItem(m_categoryList, tr("Series"), nullptr, false);
     m_categories << "series";
     new MythUIButtonListItem(m_categoryList, tr("Show"), nullptr, false);
-    m_categories << "tvshow";
+    m_categories << "libmythtv/tvshow";
     new MythUIButtonListItem(m_categoryList, tr("Sports"), nullptr, false);
     m_categories << "sports";
     m_categoryList->SetItemCurrent(m_categories.indexOf(field[3]));

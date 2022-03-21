@@ -1,13 +1,13 @@
 #ifndef GRABBERSETTINGS_H
 #define GRABBERSETTINGS_H
 
-// libmythui
-#include "mythuibutton.h"
-#include "mythuibuttonlist.h"
-#include "mythuicheckbox.h"
-#include "mythscreentype.h"
-#include "mythdialogbox.h"
-#include "metadatagrabber.h"
+// MythTV
+#include "libmythmetadata/metadatagrabber.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythscreentype.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuicheckbox.h"
 
 class MetaGrabberScript;
 class GrabberSettings : public MythScreenType

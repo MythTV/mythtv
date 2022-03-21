@@ -1,9 +1,8 @@
 #ifndef CHANNELRECPRIORITY_H_
 #define CHANNELRECPRIORITY_H_
 
-#include "mythscreentype.h"
-
-#include "programinfo.h"
+#include "libmyth/programinfo.h"
+#include "libmythui/mythscreentype.h"
 
 class ChannelInfo;
 

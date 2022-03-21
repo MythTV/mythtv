@@ -1,32 +1,32 @@
-
-#include "proglist.h"
-
 // C/C++
 #include <algorithm>
-#include <functional>
 #include <deque>                        // for _Deque_iterator, operator-, etc
+#include <functional>
 #include <iterator>                     // for reverse_iterator
+#include <utility>
 
 // Qt
 #include <QCoreApplication>
 #include <QLocale>
-#include <utility>
 
 // MythTV
-#include "stringutil.h"
-#include "scheduledrecording.h"
-#include "mythuibuttonlist.h"
-#include "mythuistatetype.h"
-#include "mythcorecontext.h"
-#include "mythdialogbox.h"
-#include "recordinginfo.h"
-#include "recordingrule.h"
-#include "channelinfo.h"
-#include "channelutil.h"
-#include "mythuitext.h"
-#include "tv_actions.h"                 // for ACTION_CHANNELSEARCH
-#include "mythdb.h"
-#include "mythdate.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/stringutil.h"
+#include "libmythtv/channelinfo.h"
+#include "libmythtv/channelutil.h"
+#include "libmythtv/recordinginfo.h"
+#include "libmythtv/recordingrule.h"
+#include "libmythtv/scheduledrecording.h"
+#include "libmythtv/tv_actions.h"       // for ACTION_CHANNELSEARCH
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuistatetype.h"
+#include "libmythui/mythuitext.h"
+
+// MythFrontend
+#include "proglist.h"
 
 #define LOC      QString("ProgLister: ")
 #define LOC_WARN QString("ProgLister, Warning: ")

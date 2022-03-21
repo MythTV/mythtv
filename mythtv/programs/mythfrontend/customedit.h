@@ -1,9 +1,9 @@
 #ifndef CUSTOMEDIT_H_
 #define CUSTOMEDIT_H_
 
-#include "mythplayer.h"
-#include "programinfo.h"
-#include "mythscreentype.h"
+#include "libmyth/programinfo.h"
+#include "libmythtv/mythplayer.h"
+#include "libmythui/mythscreentype.h"
 
 class MythUITextEdit;
 class MythUIButton;

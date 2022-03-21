@@ -1,10 +1,10 @@
 #ifndef EDITVIDEOMETADATA_H_
 #define EDITVIDEOMETADATA_H_
 
-#include "mythscreentype.h"
-#include "metadatacommon.h"
-#include "metadatadownload.h"
-#include "metadataimagedownload.h"
+#include "libmythmetadata/metadatacommon.h"
+#include "libmythmetadata/metadatadownload.h"
+#include "libmythmetadata/metadataimagedownload.h"
+#include "libmythui/mythscreentype.h"
 
 class VideoMetadata;
 class VideoMetadataListManager;

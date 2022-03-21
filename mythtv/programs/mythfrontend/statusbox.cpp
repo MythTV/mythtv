@@ -1,34 +1,34 @@
-
-#include "statusbox.h"
-
+// Qt
 #include <QHostAddress>
 #include <QNetworkInterface>
 
-#include "mythcorecontext.h"
-#include "filesysteminfo.h"
-#include "mythmiscutil.h"
-#include "mythdb.h"
-#include "mythlogging.h"
-#include "mythversion.h"
-#include "mythdate.h"
+// MythTV
+#include "libmyth/remoteutil.h"
+#include "libmythbase/filesysteminfo.h"
+#include "libmythbase/mythchrono.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythversion.h"
+#include "libmythtv/cardutil.h"
+#include "libmythtv/decoders/mythcodeccontext.h"
+#include "libmythtv/jobqueue.h"
+#include "libmythtv/recordinginfo.h"
+#include "libmythtv/tv.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythdisplay.h"
+#include "libmythui/mythrender_base.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuihelper.h"
+#include "libmythui/mythuistatetype.h"
+#include "libmythui/mythuitext.h"
+#include "libmythui/opengl/mythrenderopengl.h"
 
-#include "remoteutil.h"
-#include "tv.h"
-#include "jobqueue.h"
-#include "cardutil.h"
-#include "recordinginfo.h"
-
-#include "mythdate.h"
-#include "mythuihelper.h"
-#include "mythuibuttonlist.h"
-#include "mythuitext.h"
-#include "mythuistatetype.h"
-#include "mythdialogbox.h"
-#include "mythrender_base.h"
-#include "opengl/mythrenderopengl.h"
-#include "mythdisplay.h"
-#include "decoders/mythcodeccontext.h"
-#include "mythchrono.h"
+// MythFrontend
+#include "statusbox.h"
 
 struct LogLine {
     QString m_line;

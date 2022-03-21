@@ -1,12 +1,12 @@
 #ifndef FRONTEND_H
 #define FRONTEND_H
 
-#include "mythconfig.h"
+#include "libmythbase/mythconfig.h"
 #if CONFIG_QTSCRIPT
 #include <QScriptEngine>
 #endif
-#include "services/frontendServices.h"
-#include "service.h"
+#include "libmythservicecontracts/services/frontendServices.h"
+#include "libmythservicecontracts/service.h"
 
 class Frontend : public FrontendServices
 {

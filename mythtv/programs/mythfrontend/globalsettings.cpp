@@ -2,13 +2,12 @@
 // -*- Mode: c++ -*-
 
 // Standard UNIX C headers
-#include <unistd.h>
 #include <fcntl.h>
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 // Qt headers
-#include <QtGlobal>
 #include <QApplication>
 #include <QCursor>
 #include <QDialog>
@@ -19,41 +18,42 @@
 #include <QFontDatabase>
 #include <QImage>
 #include <QTextCodec>
+#include <QtGlobal>
 
 // MythTV headers
-#include "mythconfig.h"
-#include "mythcorecontext.h"
-#include "mythdbcon.h"
-#include "mythlogging.h"
-#include "dbsettings.h"
-#include "mythtranslation.h"
-#include "iso639.h"
-#include "playbackbox.h"
-#include "globalsettings.h"
-#include "recordingprofile.h"
-#include "mythdisplay.h"
-#include "cardutil.h"
-#include "themeinfo.h"
-#include "mythdirs.h"
-#include "mythuihelper.h"
-#include "langsettings.h"
-#include "decoders/mythcodeccontext.h"
-#include "mythsorthelper.h"
-#include "visualisations/videovisual.h"
+#include "libmyth/dbsettings.h"
+#include "libmyth/langsettings.h"
+#include "libmythbase/iso639.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythpower.h"
+#include "libmythbase/mythsorthelper.h"
+#include "libmythbase/mythtranslation.h"
+#include "libmythtv/cardutil.h"
+#include "libmythtv/decoders/mythcodeccontext.h"
+#include "libmythtv/playgroup.h" //Used for playBackGroup, to be remove at one point
+#include "libmythtv/recordingprofile.h"
+#include "libmythtv/visualisations/videovisual.h"
+#include "libmythui/mythdisplay.h"
+#include "libmythui/mythpainterwindow.h"
+#include "libmythui/mythuihelper.h"
+#include "libmythui/themeinfo.h"
 #ifdef USING_OPENGL
-#include "opengl/mythrenderopengl.h"
+#include "libmythui/opengl/mythrenderopengl.h"
 #endif
 #ifdef USING_AIRPLAY
-#include "AirPlay/mythraopconnection.h"
+#include "libmythtv/AirPlay/mythraopconnection.h"
 #endif
 #ifdef USING_VAAPI
-#include "decoders/mythvaapicontext.h"
+#include "libmythtv/decoders/mythvaapicontext.h"
 #endif
-#include "mythpower.h"
-#include "mythpainterwindow.h"
 
-//Use for playBackGroup, to be remove at one point
-#include "playgroup.h"
+// MythFrontend
+#include "globalsettings.h"
+#include "playbackbox.h"
 
 static HostSpinBoxSetting *AudioReadAhead()
 // was previously *DecodeExtraAudio()

@@ -1,18 +1,18 @@
-// qt
+// Qt
 #include <QString>
 #include <QVariant>
 
-// myth
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <mythdirs.h>
-#include <mythprogressdialog.h>
+// MythTV
+#include "libmyth/audio/audiooutpututil.h"
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythui/mythprogressdialog.h"
 
-#include <audiooutpututil.h>
-
+// MythFrontend
 #include "audiogeneralsettings.h"
-#include "setupwizard_general.h"
 #include "setupwizard_audio.h"
+#include "setupwizard_general.h"
 #include "setupwizard_video.h"
 
 bool AudioSetupWizard::Create()

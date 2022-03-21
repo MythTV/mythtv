@@ -1,28 +1,31 @@
+// C++
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
+
+// Qt
 #include <QCoreApplication>
 #include <QKeyEvent>
 #include <QEvent>
 
-#include <chrono> // for milliseconds
-#include <thread> // for sleep_for
+// MythTV
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythevent.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
+#include "libmythmetadata/videometadata.h"
+#include "libmythmetadata/videometadatalistmanager.h"
+#include "libmythmetadata/videoutils.h"
+#include "libmythtv/recordinginfo.h"
+#include "libmythtv/tv_actions.h"        // for ACTION_JUMPCHAPTER, etc
+#include "libmythtv/tv_play.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuiactions.h"     // for ACTION_HANDLEMEDIA, etc
+#include "libmythui/mythuihelper.h"
+#include "libmythui/mythuistatetracker.h"
 
-#include "mythcorecontext.h"
-#include "keybindings.h"
-#include "mythlogging.h"
-#include "mythevent.h"
-#include "mythuistatetracker.h"
-#include "mythuihelper.h"
-#include "mythmainwindow.h"
-#include "tv_play.h"
-#include "recordinginfo.h"
-#include "mythversion.h"
-#include "mythuiactions.h"              // for ACTION_HANDLEMEDIA, etc
-#include "tv_actions.h"                 // for ACTION_JUMPCHAPTER, etc
-
-#include "videometadatalistmanager.h"
-#include "videometadata.h"
-#include "videoutils.h"
-
+// MythFrontend
 #include "frontend.h"
+#include "keybindings.h"
 
 #define LOC QString("Frontend API: ")
 

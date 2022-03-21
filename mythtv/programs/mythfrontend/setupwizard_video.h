@@ -1,15 +1,13 @@
 #ifndef VIDEOSETUPWIZARD_H
 #define VIDEOSETUPWIZARD_H
 
-// Utility headers
-#include <mythvideoprofile.h>
-
-// libmythui
-#include <mythuibutton.h>
-#include <mythuibuttonlist.h>
-#include <mythprogressdialog.h>
-#include <mythscreentype.h>
-#include <mythdialogbox.h>
+// MythTV
+#include "libmythtv/mythvideoprofile.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythprogressdialog.h"
+#include "libmythui/mythscreentype.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
 
 extern const QString VIDEO_SAMPLE_HD_LOCATION;
 extern const QString VIDEO_SAMPLE_SD_LOCATION;

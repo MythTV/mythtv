@@ -1,8 +1,9 @@
-#include "mythmainwindow.h"
-#include "mythscreenstack.h"
-#include "mythscreentype.h"
-#include "mythuiimage.h"
-#include "mythuitext.h"
+// MythTV
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythscreenstack.h"
+#include "libmythui/mythscreentype.h"
+#include "libmythui/mythuiimage.h"
+#include "libmythui/mythuitext.h"
 
 // .h
 class AirPlayPictureScreen : public MythScreenType

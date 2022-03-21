@@ -1,47 +1,42 @@
+// C++
+#include <utility>
 
-#include "scheduleeditor.h"
-
-// QT
+// Qt
 #include <QCoreApplication>
 #include <QHash>
 #include <QString>
-#include <utility>
 
-// Libmyth
-#include "mythcorecontext.h"
-#include "storagegroup.h"
-#include "programtypes.h"
-#include "recordingtypes.h"
+// MythTV
+#include "libmyth/programtypes.h"
+#include "libmyth/recordingtypes.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythtypes.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythmetadata/mythuiimageresults.h"
+#include "libmythmetadata/mythuimetadataresults.h"
+#include "libmythmetadata/videoutils.h"
+#include "libmythtv/cardutil.h"
+#include "libmythtv/metadataimagehelper.h"
+#include "libmythtv/playgroup.h"
+#include "libmythtv/recordingprofile.h"
+#include "libmythtv/tv_play.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythprogressdialog.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuicheckbox.h"
+#include "libmythui/mythuifilebrowser.h"
+#include "libmythui/mythuihelper.h"
+#include "libmythui/mythuiimage.h"
+#include "libmythui/mythuispinbox.h"
+#include "libmythui/mythuistatetype.h"
+#include "libmythui/mythuitext.h"
+#include "libmythui/mythuiutils.h"
 
-// Libmythtv
-#include "playgroup.h"
-#include "tv_play.h"
-#include "recordingprofile.h"
-#include "cardutil.h"
-
-// Libmythui
-#include "mythmainwindow.h"
-#include "mythuihelper.h"
-#include "mythuibuttonlist.h"
-#include "mythuibutton.h"
-#include "mythuitext.h"
-#include "mythuiimage.h"
-#include "mythuistatetype.h"
-#include "mythuispinbox.h"
-#include "mythuicheckbox.h"
-#include "mythdialogbox.h"
-#include "mythprogressdialog.h"
-#include "mythuifilebrowser.h"
-#include "mythuimetadataresults.h"
-#include "mythuiimageresults.h"
-#include "videoutils.h"
-#include "mythuiutils.h"
-#include "mythtypes.h"
-
-#include "metadataimagehelper.h"
-
-// Mythfrontend
+// MythFrontend
 #include "proglist.h"
+#include "scheduleeditor.h"
 #include "viewschedulediff.h"
 
 #define ENUM_TO_QVARIANT(a) QVariant::fromValue(static_cast<int>(a))

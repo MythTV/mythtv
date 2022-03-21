@@ -1,6 +1,9 @@
 
-#include "mythcoreutil.h"
-#include "mythdate.h"
+ // MythTV
+#include "libmythbase/mythcoreutil.h"
+#include "libmythbase/mythdate.h"
+
+// MythFrontend
 #include "proginfolist.h"
 
 /*!

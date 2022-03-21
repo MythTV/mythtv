@@ -1,7 +1,7 @@
 #ifndef VIDEOFILEASSOC_H_
 #define VIDEOFILEASSOC_H_
 
-#include "mythscreentype.h"
+#include "libmythui/mythscreentype.h"
 
 class MythScreenStack;
 class MythUIButtonListItem;

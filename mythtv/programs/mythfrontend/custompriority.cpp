@@ -1,29 +1,21 @@
-
-#include "custompriority.h"
-
-// qt
+// Qt
 #include <QSqlError>
 
-// libmythbase
-#include "mythdb.h"
-#include "mythlogging.h"
+// MythTV
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/channelutil.h"
+#include "libmythtv/scheduledrecording.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuispinbox.h"
+#include "libmythui/mythuitextedit.h"
 
-// libmyth
-#include "mythcorecontext.h"
-
-// libmythtv
-#include "scheduledrecording.h"
-#include "channelutil.h"
-
-// libmythui
-#include "mythuibuttonlist.h"
-#include "mythuispinbox.h"
-#include "mythuitextedit.h"
-#include "mythuibutton.h"
-#include "mythdialogbox.h"
-#include "mythmainwindow.h"
-
-//mythfrontend
+// MythFrontend
+#include "custompriority.h"
 #include "viewschedulediff.h"
 
 CustomPriority::CustomPriority(MythScreenStack *parent, ProgramInfo *proginfo)

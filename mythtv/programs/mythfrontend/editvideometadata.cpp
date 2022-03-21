@@ -1,33 +1,36 @@
+// C++
 #include <algorithm>
 
+// Qt
 #include <QImageReader>
 #include <QUrl>
 
-#include <mythcontext.h>
-#include <mythdirs.h>
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/stringutil.h"
+#include "libmythmetadata/dbaccess.h"
+#include "libmythmetadata/globals.h"
+#include "libmythmetadata/metadatafactory.h"
+#include "libmythmetadata/mythuiimageresults.h"
+#include "libmythmetadata/videometadatalistmanager.h"
+#include "libmythmetadata/videoutils.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythprogressdialog.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuicheckbox.h"
+#include "libmythui/mythuifilebrowser.h"
+#include "libmythui/mythuihelper.h"
+#include "libmythui/mythuiimage.h"
+#include "libmythui/mythuispinbox.h"
+#include "libmythui/mythuitext.h"
+#include "libmythui/mythuitextedit.h"
 
-#include "mythmainwindow.h"
-#include "mythdialogbox.h"
-#include "mythuibuttonlist.h"
-#include "mythuitext.h"
-#include "mythuitextedit.h"
-#include "mythuibutton.h"
-#include "mythuicheckbox.h"
-#include "mythuispinbox.h"
-#include "mythuiimage.h"
-#include "mythuifilebrowser.h"
-#include "mythuiimageresults.h"
-#include "mythuihelper.h"
-#include "mythprogressdialog.h"
-#include "stringutil.h"
-#include "remoteutil.h"
-#include "globals.h"
-#include "dbaccess.h"
-#include "videometadatalistmanager.h"
-#include "videoutils.h"
-
+// MythFrontend
 #include "editvideometadata.h"
-#include "metadatafactory.h"
 
 //static const QString _Location = QObject::tr("Metadata Editor");
 

@@ -14,9 +14,9 @@
 #include <QObject>
 #include <QMutex>
 
-#include "upnp.h"
-#include "upnpcmgr.h"
-#include "mythxmlclient.h"
+#include "libmythupnp/mythxmlclient.h"
+#include "libmythupnp/upnp.h"
+#include "libmythupnp/upnpcmgr.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

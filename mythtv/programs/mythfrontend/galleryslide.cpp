@@ -1,12 +1,14 @@
-#include "galleryslide.h"
-
-#include <cmath>       // for roundf
+// C++
 #include <algorithm>
+#include <cmath>       // for roundf
 
-#include "mythmainwindow.h"
-#include "mythlogging.h"
+// MythTV
+#include "libmythbase/mythlogging.h"
+#include "libmythmetadata/imagemetadata.h"
+#include "libmythui/mythmainwindow.h"
 
-#include "imagemetadata.h"
+// MythFrontend
+#include "galleryslide.h"
 
 #define LOC QString("Slide: ")
 #define SBLOC QString("SlideBuffer: ")

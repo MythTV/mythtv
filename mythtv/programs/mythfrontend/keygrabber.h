@@ -3,7 +3,7 @@
 #define KEYGRABBER_H_
 
 // MythUI
-#include "mythscreentype.h"
+#include "libmythui/mythscreentype.h"
 
 class MythUIText;
 class MythUIButton;

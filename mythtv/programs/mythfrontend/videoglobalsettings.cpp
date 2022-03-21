@@ -1,11 +1,15 @@
+// C++
 #include <map>
 #include <vector>
 
+// Qt
 #include <QDir>
 
-#include "mythdirs.h"
-#include "globals.h"
+// MythTV
+#include "libmythbase/mythdirs.h"
+#include "libmythmetadata/globals.h"
 
+// MythFrontend
 #include "videodlg.h"
 #include "videoglobalsettings.h"
 

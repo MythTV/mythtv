@@ -1,12 +1,14 @@
 #ifndef PROGRAMRECPROIRITY_H_
 #define PROGRAMRECPROIRITY_H_
 
+// C++
 #include <vector>
 
-#include "recordinginfo.h"
-#include "mythscreentype.h"
+// MythTV headers
+#include "libmythtv/recordinginfo.h"
+#include "libmythui/mythscreentype.h"
 
-// mythfrontend
+// MythFrontend
 #include "schedulecommon.h"
 
 class QDateTime;

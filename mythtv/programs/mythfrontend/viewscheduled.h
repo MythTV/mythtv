@@ -7,9 +7,11 @@
 #include <QMap>
 
 // MythTV
+#include "libmyth/programinfo.h"
+#include "libmythui/mythscreentype.h"
+
+// MythFrontend
 #include "schedulecommon.h"
-#include "mythscreentype.h"
-#include "programinfo.h"
 
 class TV;
 class Timer;

@@ -1,16 +1,16 @@
 #ifndef STATUSBOX_H_
 #define STATUSBOX_H_
 
+// C++
+#include <utility>
+#include <vector>
+
 // Qt
 #include <QTimer>
 
 // MythTV
-#include "mythscreentype.h"
-#include "mythuibuttonlist.h"
-
-// Std
-#include <utility>
-#include <vector> // For std::vector
+#include "libmythui/mythscreentype.h"
+#include "libmythui/mythuibuttonlist.h"
 
 class ProgramInfo;
 class MythUIText;

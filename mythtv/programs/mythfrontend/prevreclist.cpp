@@ -17,8 +17,6 @@
  * along with MythTV. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "prevreclist.h"
-
 // C/C++
 #include <algorithm>
 #include <deque>                        // for _Deque_iterator, operator-, etc
@@ -29,22 +27,23 @@
 #include <QString>
 
 //MythTV
-#include "mythcorecontext.h"
-#include "mythdb.h"
-#include "stringutil.h"
-#include "xmlparsebase.h"
-#include "recordinginfo.h"
-#include "recordingrule.h"
-#include "scheduledrecording.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/stringutil.h"
+#include "libmythtv/recordinginfo.h"
+#include "libmythtv/recordingrule.h"
+#include "libmythtv/scheduledrecording.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythscreenstack.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuitext.h"
+#include "libmythui/mythuiutils.h"      // for UIUtilE, UIUtilW
+#include "libmythui/xmlparsebase.h"
 
-// MythUI
-#include "mythuitext.h"
-#include "mythuibuttonlist.h"
-#include "mythuibutton.h"
-#include "mythscreenstack.h"
-#include "mythmainwindow.h"
-#include "mythuiutils.h"                // for UIUtilE, UIUtilW
-#include "mythdialogbox.h"
+// MythFrontend
+#include "prevreclist.h"
 
 #define LOC      QString("PrevRecordedList: ")
 

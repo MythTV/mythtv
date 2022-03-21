@@ -1,29 +1,31 @@
+// C++
 #include <algorithm>
 #include <iterator>
 #include <map>
+#include <utility>
 
+// Qt
 #include <QFileInfo>
 #include <QList>
 #include <QScopedPointer>
-#include <utility>
 
-#include "mythcontext.h"
-#include "mythdate.h"
-#include "stringutil.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/stringutil.h"
+#include "libmythui/mythgenerictree.h"
+#include "libmythmetadata/videometadatalistmanager.h"
+#include "libmythmetadata/dbaccess.h"
+#include "libmythmetadata/quicksp.h"
+#include "libmythmetadata/dirscan.h"
+#include "libmythmetadata/videoutils.h"
+#include "libmythmetadata/parentalcontrols.h"
 
-#include "mythgenerictree.h"
-#include "videometadatalistmanager.h"
-#include "dbaccess.h"
-#include "quicksp.h"
-#include "dirscan.h"
-#include "videoutils.h"
-#include "parentalcontrols.h"
-
+// MythFrontend
+#include "upnpscanner.h"
+#include "videodlg.h"
 #include "videofilter.h"
 #include "videolist.h"
-#include "videodlg.h"
-
-#include "upnpscanner.h"
 
 // Sorting or not sorting the metadata list doesn't seem to have any
 // effect. The metadataViewFlat and metadataViewTree that are

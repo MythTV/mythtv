@@ -1,27 +1,29 @@
+// C++
+#include <thread>
+#include <algorithm>
+
 // Qt
 #include <QKeyEvent>
 #include <QGlobalStatic>
 #include <QCoreApplication>
 
 // MythTV
-#include "mythlogging.h"
-#include "mythcorecontext.h"
-#include "mythversion.h"
-#include "keybindings.h"
-#include "mythmainwindow.h"
-#include "mythuistatetracker.h"
-#include "recordinginfo.h"
-#include "tv_actions.h"
-#include "tv_play.h"
-#include "mythuihelper.h"
-#include "videoutils.h"
-#include "videometadatalistmanager.h"
-#include "services/mythfrontendservice.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
+#include "libmythmetadata/videometadatalistmanager.h"
+#include "libmythmetadata/videoutils.h"
+#include "libmythtv/recordinginfo.h"
+#include "libmythtv/tv_actions.h"
+#include "libmythtv/tv_play.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuihelper.h"
+#include "libmythui/mythuistatetracker.h"
 
-// Std
-#include <thread>
-#include <algorithm>
+// MythFrontend
+#include "keybindings.h"
+#include "services/mythfrontendservice.h"
 
 #define LOC QString("FrontendServices: ")
 using ActionDescs = QHash<QString,QStringList>;

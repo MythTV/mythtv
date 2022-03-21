@@ -1,12 +1,12 @@
 #ifndef AUDIOSETUPWIZARD_H
 #define AUDIOSETUPWIZARD_H
 
-// libmythui
-#include <mythuibutton.h>
-#include <mythuibuttonlist.h>
-#include <mythscreentype.h>
-#include <mythdialogbox.h>
-#include <audiooutput.h>
+// MythTV
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythscreentype.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmyth/audio/audiooutput.h"
 
 class AudioTestThread;
 

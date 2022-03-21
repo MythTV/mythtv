@@ -1,21 +1,23 @@
-#include "gallerythumbview.h"
-
+// C++
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
-
-#include <QApplication>
 #include <utility>
 
-#include "compat.h"
+// Qt
+#include <QApplication>
 
-#include "mythuitext.h"
-#include "mythprogressdialog.h"
-#include "mythuiprogressbar.h"
-#include "remotefile.h"
-#include "mythsystemlegacy.h"
-#include "mythdialogbox.h"
+// MythTV
+#include "libmythbase/compat.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/remotefile.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythprogressdialog.h"
+#include "libmythui/mythuiprogressbar.h"
+#include "libmythui/mythuitext.h"
 
+// MythFrontend
 #include "galleryconfig.h"
+#include "gallerythumbview.h"
 
 #define LOC QString("Thumbview: ")
 

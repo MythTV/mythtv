@@ -1,32 +1,24 @@
-
-#include "manualschedule.h"
-
-// qt
+// Qt
 #include <QDateTime>
 
-// libmythbase
-#include "mythdbcon.h"
-#include "mythlogging.h"
-#include "mythdate.h"
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmyth/recordingtypes.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/channelinfo.h"
+#include "libmythtv/channelutil.h"
+#include "libmythtv/recordingrule.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuispinbox.h"
+#include "libmythui/mythuitextedit.h"
 
-// libmyth
-#include "mythcorecontext.h"
-#include "programinfo.h"
-
-// libmythtv
-#include "recordingrule.h"
-#include "recordingtypes.h"
-#include "channelinfo.h"
-#include "channelutil.h"
-
-// libmythui
-#include "mythuitextedit.h"
-#include "mythuibutton.h"
-#include "mythuibuttonlist.h"
-#include "mythuispinbox.h"
-#include "mythmainwindow.h"
-
-// mythfrontend
+// MythFrontend
+#include "manualschedule.h"
 #include "scheduleeditor.h"
 
 ManualSchedule::ManualSchedule(MythScreenStack *parent)

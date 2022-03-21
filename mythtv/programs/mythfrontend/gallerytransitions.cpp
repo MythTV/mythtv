@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "mythcorecontext.h"
+#include "libmythbase/mythcorecontext.h"
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 #include <QRandomGenerator>

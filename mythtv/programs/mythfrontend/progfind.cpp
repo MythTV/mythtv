@@ -1,32 +1,28 @@
-
-#include "progfind.h"
-
 // Qt
-#include <QDateTime>
 #include <QCoreApplication>
-#include <QStringList>
+#include <QDateTime>
 #include <QEvent>
 #include <QList>                        // for QList
 #include <QRect>                        // for QRect
+#include <QStringList>
 
 // MythTV
-#include "mythdb.h"
-#include "mythdbcon.h"
-#include "mythcorecontext.h"
-#include "programtypes.h"               // for RecStatus
-#include "tv_play.h"
-#include "tv_actions.h"                 // for ACTION_CHANNELSEARCH
+#include "libmyth/programtypes.h"       // for RecStatus
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythtv/tv_actions.h"       // for ACTION_CHANNELSEARCH
+#include "libmythtv/tv_play.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythscreenstack.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuitext.h"
+#include "libmythui/mythuiutils.h"      // for UIUtilE, UIUtilW
 
-// MythUI
-#include "mythuitext.h"
-#include "mythuibuttonlist.h"
-#include "mythuibutton.h"
-#include "mythscreenstack.h"
-#include "mythmainwindow.h"
-#include "mythuiutils.h"                // for UIUtilE, UIUtilW
-
-// mythfrontend
+// MythFrontend
 #include "guidegrid.h"
+#include "progfind.h"
 
 #define LOC      QString("ProgFinder: ")
 #define LOC_ERR  QString("ProgFinder, Error: ")

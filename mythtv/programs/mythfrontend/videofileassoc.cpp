@@ -1,3 +1,4 @@
+// C++
 #include <algorithm>
 #include <functional>   //mem_fun
 #include <iterator>
@@ -6,16 +7,18 @@
 #include <utility>
 #include <vector>
 
-#include "mythlogging.h"
-#include "mythmainwindow.h"
-#include "mythdialogbox.h"
-#include "mythuibuttonlist.h"
-#include "mythuitextedit.h"
-#include "mythuicheckbox.h"
-#include "mythuibutton.h"
-#include "dbaccess.h"
-#include "videoutils.h"
+// MythTV
+#include "libmythbase/mythlogging.h"
+#include "libmythmetadata/dbaccess.h"
+#include "libmythmetadata/videoutils.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuicheckbox.h"
+#include "libmythui/mythuitextedit.h"
 
+// MythFrontend
 #include "videofileassoc.h"
 
 namespace

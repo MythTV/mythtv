@@ -1,16 +1,19 @@
 #ifndef PLAYBACKBOXHELPER_H
 #define PLAYBACKBOXHELPER_H
 
+// C++
 #include <cstdint>
 
+// Qt
 #include <QStringList>
 #include <QDateTime>
 #include <QMutex>
 
-#include "mythcorecontext.h"
-#include "metadatacommon.h"
-#include "mthread.h"
-#include "mythtypes.h"
+// MythTV
+#include "libmythbase/mthread.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythtypes.h"
+#include "libmythmetadata/metadatacommon.h"
 
 class PreviewGenerator;
 class PBHEventHandler;

@@ -1,13 +1,13 @@
 #ifndef SCHEDULE_COMMON_H
 #define SCHEDULE_COMMON_H
 
-// QT
+// Qt
 #include <QObject>
 #include <QEvent>
 
-// libmythui
-#include "mythscreentype.h"
-#include "mythmainwindow.h"
+// MythTV
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythscreentype.h"
 
 class ProgramInfo;
 class RecordingInfo;

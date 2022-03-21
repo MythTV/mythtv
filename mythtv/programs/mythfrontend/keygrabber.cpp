@@ -4,11 +4,9 @@
 #include <QString>
 
 // MythTV headers
-#include "mythlogging.h"
-
-// MythUI headers
-#include "mythuitext.h"
-#include "mythuibutton.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuitext.h"
 
 // MythControls headers
 #include "keygrabber.h"

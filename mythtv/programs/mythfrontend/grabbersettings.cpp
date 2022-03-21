@@ -1,18 +1,18 @@
 #include <iostream>
 
-// qt
-#include <QString>
+// Qt
 #include <QString>
 #include <QStringList>
 
-// myth
-#include "mythcorecontext.h"
-#include "mythsystemlegacy.h"
-#include "mythdbcon.h"
-#include "mythdirs.h"
+// MythTV
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythmetadata/metadatacommon.h"
+#include "libmythui/mythprogressdialog.h"
 
-#include "mythprogressdialog.h"
-#include "metadatacommon.h"
+// MythFrontend
 #include "grabbersettings.h"
 
 // ---------------------------------------------------

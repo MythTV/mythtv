@@ -6,9 +6,11 @@
 #include <QString>
 
 // MythTV headers
-#include "programinfo.h" // for ProgramList
-#include "schedulecommon.h"
+#include "libmyth/programinfo.h" // for ProgramList
+
+// MythFrontend
 #include "proglist_helpers.h"
+#include "schedulecommon.h"
 
 enum ProgListType {
     plUnknown = 0,

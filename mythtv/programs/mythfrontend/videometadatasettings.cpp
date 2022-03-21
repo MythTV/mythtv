@@ -1,14 +1,16 @@
+// C++
 #include <iostream>
 
-// qt
+// Qt
 #include <QString>
 
-// myth
-#include "mythcontext.h"
-#include "mythdbcon.h"
-#include "mythdirs.h"
-#include "mythprogressdialog.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythui/mythprogressdialog.h"
 
+// MythFrontend
 #include "videometadatasettings.h"
 
 // ---------------------------------------------------

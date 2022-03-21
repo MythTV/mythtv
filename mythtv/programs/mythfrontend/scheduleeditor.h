@@ -1,21 +1,16 @@
 #ifndef SCHEDULERECORDING_H_
 #define SCHEDULERECORDING_H_
 
-#include "mythscreentype.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythmetadata/metadatafactory.h"
+#include "libmythtv/recordinginfo.h"
+#include "libmythtv/recordingrule.h"
+#include "libmythui/mythscreentype.h"
+
+// MythFrontend
 #include "schedulecommon.h"
-
-// libmythbase
-#include "mythdb.h"
-
-// libmyth
-#include "mythcontext.h"
-
-// libmythtv
-#include "recordingrule.h"
-#include "recordinginfo.h"
-
-// libmythmetadata
-#include "metadatafactory.h"
 
 class ProgramInfo;
 class MythUIText;

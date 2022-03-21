@@ -5,9 +5,11 @@
 #include <QString>
 #include <QKeyEvent>
 
-// myth
-#include "mythscreentype.h"
-#include "programinfo.h"
+// MythTV
+#include "libmyth/programinfo.h"
+#include "libmythui/mythscreentype.h"
+
+//  MythFrontend
 #include "proginfolist.h"
 
 class ProgDetails : public MythScreenType

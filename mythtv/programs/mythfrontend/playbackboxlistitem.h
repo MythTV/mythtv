@@ -4,7 +4,7 @@
 #define PLAYBACKBOXLISTITEM_H
 
 
-#include "mythuibuttonlist.h"
+#include "libmythui/mythuibuttonlist.h"
 
 class PlaybackBox;
 class ProgramInfo;

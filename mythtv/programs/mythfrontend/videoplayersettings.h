@@ -1,12 +1,12 @@
 #ifndef PLAYERSETTINGS_H
 #define PLAYERSETTINGS_H
 
-// libmythui
-#include "mythuibutton.h"
-#include "mythuibuttonlist.h"
-#include "mythuicheckbox.h"
-#include "mythscreentype.h"
-#include "mythdialogbox.h"
+// MythTV
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythscreentype.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuicheckbox.h"
 
 class PlayerSettings : public MythScreenType
 {

@@ -11,46 +11,45 @@
 #include <QMap>
 
 // MythTV
-#include "mythnotificationcenter.h"     // for ShowNotificationError, etc
-#include "mythuimetadataresults.h"
-#include "previewgeneratorqueue.h"
-#include "mythprogressdialog.h"
-#include "mythuiprogressbar.h"
-#include "mythuibuttonlist.h"
-#include "mythcorecontext.h"
-#include "mythrandom.h"
-#include "stringutil.h"
-#include "mythmainwindow.h"             // for GetMythMainWindow, etc
-#include "mythscreenstack.h"            // for MythScreenStack
-#include "mythuistatetype.h"
-#include "mythuicheckbox.h"
-#include "mythuitextedit.h"
-#include "recordingtypes.h"
-#include "mythuiactions.h"              // for ACTION_1
-#include "mythuispinbox.h"
-#include "mythdialogbox.h"
-#include "recordinginfo.h"
-#include "recordingrule.h"
-#include "programtypes.h"               // for AudioProps, SubtitleTypes, etc
-#include "mythuibutton.h"
-#include "mythlogging.h"
-#include "mythuiimage.h"
-#include "programinfo.h"
-#include "mythuitext.h"
-#include "tv_actions.h"                 // for ACTION_LISTRECORDEDEPISODES, etc
-#include "mythdbcon.h"
-#include "mythevent.h"                  // for MythEvent, etc
-#include "playgroup.h"
-#include "mythdb.h"
-#include "mythdate.h"
-#include "tv.h"
-#include "mconcurrent.h"
-
+#include "libmyth/programinfo.h"
+#include "libmyth/programtypes.h"               // for AudioProps, SubtitleTypes, etc
+#include "libmyth/recordingtypes.h"
 #ifdef _MSC_VER
-#  include "compat.h"                   // for random
+#  include "libmythbase/compat.h"               // for random
 #endif
+#include "libmythbase/mconcurrent.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythevent.h"              // for MythEvent, etc
+#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythrandom.h"
+#include "libmythbase/stringutil.h"
+#include "libmythmetadata/mythuimetadataresults.h"
+#include "libmythtv/playgroup.h"
+#include "libmythtv/previewgeneratorqueue.h"
+#include "libmythtv/recordinginfo.h"
+#include "libmythtv/recordingrule.h"
+#include "libmythtv/tv.h"
+#include "libmythtv/tv_actions.h"               // for ACTION_LISTRECORDEDEPISODES, etc
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"           // for GetMythMainWindow, etc
+#include "libmythui/mythnotificationcenter.h"   // for ShowNotificationError, etc
+#include "libmythui/mythprogressdialog.h"
+#include "libmythui/mythscreenstack.h"          // for MythScreenStack
+#include "libmythui/mythuiactions.h"            // for ACTION_1
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuicheckbox.h"
+#include "libmythui/mythuiimage.h"
+#include "libmythui/mythuiprogressbar.h"
+#include "libmythui/mythuispinbox.h"
+#include "libmythui/mythuistatetype.h"
+#include "libmythui/mythuitext.h"
+#include "libmythui/mythuitextedit.h"
 
-//  Mythfrontend
+//  MythFrontend
 #include "playbackboxlistitem.h"
 
 #define LOC      QString("PlaybackBox: ")

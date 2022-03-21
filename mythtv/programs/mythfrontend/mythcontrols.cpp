@@ -25,24 +25,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-#include "mythcontrols.h"
-
 // Qt headers
-#include <QStringList>
 #include <QCoreApplication>
+#include <QStringList>
 
 // MythTV headers
-#include "mythcorecontext.h"
-#include "mythmainwindow.h"
-
-// MythUI headers
-#include "mythuitext.h"
-#include "mythuibutton.h"
-#include "mythuibuttonlist.h"
-#include "mythdialogbox.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuitext.h"
 
 // MythControls headers
 #include "keygrabber.h"
+#include "mythcontrols.h"
 
 #define LOC QString("MythControls: ")
 #define LOC_ERR QString("MythControls, Error: ")

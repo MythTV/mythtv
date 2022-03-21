@@ -1,9 +1,12 @@
-#include "galleryconfig.h"
-
+// Qt
 #include <QStringBuilder>
 
-#include "mythcorecontext.h"
-#include "mythdate.h"
+// MythTV
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+
+// MythFrontend
+#include "galleryconfig.h"
 #include "gallerytransitions.h"
 
 #define TR GallerySettings::tr

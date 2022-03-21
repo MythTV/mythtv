@@ -28,7 +28,7 @@
 #include <QHash>
 
 // MythUI
-#include "mythscreentype.h"
+#include "libmythui/mythscreentype.h"
 
 #include "keybindings.h"
 

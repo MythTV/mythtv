@@ -8,26 +8,29 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#include "mythconfig.h"
-#include <QTextStream>
+#include "libmythbase/mythconfig.h"
+
 #if CONFIG_QTSCRIPT
 #include <QScriptEngine>
 #endif
+#include <QTextStream>
 
-#include "upnpsubscription.h"
-#include "upnputil.h"
+// MythTV
+#include "libmythbase/compat.h"
+#include "libmythbase/configuration.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythversion.h"
+#include "libmythupnp/htmlserver.h"
+#include "libmythupnp/upnpsubscription.h"
+#include "libmythupnp/upnputil.h"
+
+// MythFrontend
 #include "mediarenderer.h"
-#include "mythversion.h"
-#include "upnpscanner.h"
 #include "mythfexml.h"
-#include "compat.h"
-#include "mythdate.h"
-#include "htmlserver.h"
-#include "mythcorecontext.h"
-#include "configuration.h"
-
 #include "serviceHosts/frontendServiceHost.h"
 #include "services/frontend.h"
+#include "upnpscanner.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

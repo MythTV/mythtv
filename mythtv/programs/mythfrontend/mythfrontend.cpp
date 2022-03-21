@@ -1,3 +1,4 @@
+// C/C++
 #include <cerrno>
 #include <csignal>
 #include <cstdlib>
@@ -5,92 +6,93 @@
 #include <iostream>
 #include <memory>
 
+// Qt
 #include <QtGlobal>
-#include <QFile>
-#include <QFileInfo>
-#include <QMap>
-#include <QKeyEvent>
-#include <QEvent>
-#include <QDir>
-#include <QApplication>
-#include <QTimer>
-#ifdef Q_OS_DARWIN
-#include <QProcessEnvironment>
-#endif
-
 #ifdef Q_OS_ANDROID
 #include <QtAndroidExtras>
 #endif
+#include <QApplication>
+#include <QDir>
+#include <QEvent>
+#include <QFile>
+#include <QFileInfo>
+#include <QKeyEvent>
+#include <QMap>
+#ifdef Q_OS_DARWIN
+#include <QProcessEnvironment>
+#endif
+#include <QTimer>
 
-#include "previewgeneratorqueue.h"
-#include "referencecounter.h"
-#include "mythmiscutil.h"
-#include "mythconfig.h"
-#include "mythcdrom.h"
-#include "mythsystemlegacy.h"
-#include "tv.h"
-#include "proglist.h"
+// MythTV
+#include "libmyth/audio/audiooutput.h"
+#include "libmyth/langsettings.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/mythmediamonitor.h"
+#include "libmyth/programinfo.h"
+#include "libmyth/remoteutil.h"
+#include "libmyth/standardsettings.h"
+#include "libmythbase/cleanupguard.h"
+#include "libmythbase/compat.h"  // For SIG* on MinGW
+#include "libmythbase/exitcodes.h"
+#include "libmythbase/hardwareprofile.h"
+#include "libmythbase/lcddevice.h"
+#include "libmythbase/mythcdrom.h"
+#include "libmythbase/mythconfig.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythplugin.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/mythtranslation.h"
+#include "libmythbase/mythversion.h"
+#include "libmythbase/referencecounter.h"
+#include "libmythbase/signalhandling.h"
+#include "libmythmetadata/cleanup.h"
+#include "libmythmetadata/globals.h"
+#include "libmythtv/channelutil.h"
+#include "libmythtv/dbcheck.h"
+#include "libmythtv/mythsystemevent.h"
+#include "libmythtv/playgroup.h"
+#include "libmythtv/previewgeneratorqueue.h"
+#include "libmythtv/scheduledrecording.h"
+#include "libmythtv/tv.h"
+#include "libmythtv/tvremoteutil.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/myththemedmenu.h"
+#include "libmythui/mythuihelper.h"
+#include "libmythupnp/taskqueue.h"
+
+// MythFrontend
+#include "audiogeneralsettings.h"
+#include "backendconnectionmanager.h"
+#include "channelrecpriority.h"
+#include "customedit.h"
+#include "custompriority.h"
+#include "exitprompt.h"
+#include "globalsettings.h"
+#include "grabbersettings.h"
+#include "guidegrid.h"
+#include "idlescreen.h"
+#include "manualschedule.h"
+#include "mediarenderer.h"
+#include "mythcontrols.h"
+#include "mythfrontend_commandlineparser.h"
+#include "networkcontrol.h"
+#include "playbackbox.h"
 #include "prevreclist.h"
 #include "progfind.h"
-#include "scheduleeditor.h"
-#include "manualschedule.h"
-#include "playbackbox.h"
-#include "themechooser.h"
-#include "setupwizard_general.h"
-#include "customedit.h"
-#include "viewscheduled.h"
+#include "proglist.h"
 #include "programrecpriority.h"
-#include "channelrecpriority.h"
-#include "custompriority.h"
-#include "audiooutput.h"
-#include "globalsettings.h"
-#include "audiogeneralsettings.h"
-#include "grabbersettings.h"
-#include "playgroup.h"
-#include "networkcontrol.h"
-#include "scheduledrecording.h"
-#include "mythsystemevent.h"
-#include "hardwareprofile.h"
-#include "signalhandling.h"
-
-#include "compat.h"  // For SIG* on MinGW
-#include "exitcodes.h"
-#include "exitprompt.h"
-#include "programinfo.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
-#include "guidegrid.h"
-#include "mythplugin.h"
-#include "remoteutil.h"
-#include "dbcheck.h"
-#include "mythmediamonitor.h"
-#include "statusbox.h"
-#include "idlescreen.h"
-#include "lcddevice.h"
-#include "langsettings.h"
-#include "mythtranslation.h"
-#include "mythfrontend_commandlineparser.h"
-#include "tvremoteutil.h"
-#include "channelutil.h"
-
-#include "myththemedmenu.h"
-#include "mediarenderer.h"
-#include "mythmainwindow.h"
-#include "mythcontrols.h"
-#include "mythuihelper.h"
-#include "mythdirs.h"
-#include "mythdb.h"
-#include "backendconnectionmanager.h"
-#include "themechooser.h"
-#include "mythversion.h"
-#include "taskqueue.h"
-#include "cleanupguard.h"
-#include "standardsettings.h"
+#include "scheduleeditor.h"
 #include "settingshelper.h"
+#include "setupwizard_general.h"
+#include "statusbox.h"
+#include "themechooser.h"
+#include "themechooser.h"
+#include "viewscheduled.h"
 
 // Video
-#include "cleanup.h"
-#include "globals.h"
 #include "videodlg.h"
 #include "videoglobalsettings.h"
 #include "videofileassoc.h"
@@ -102,19 +104,19 @@
 #include "gallerythumbview.h"
 
 // DVD & Bluray
-#include "DVD/mythdvdbuffer.h"
-#include "Bluray/mythbdinfo.h"
-#include "Bluray/mythbdbuffer.h"
+#include "libmythtv/Bluray/mythbdbuffer.h"
+#include "libmythtv/Bluray/mythbdinfo.h"
+#include "libmythtv/DVD/mythdvdbuffer.h"
 
 // AirPlay
 #ifdef USING_AIRPLAY
-#include "AirPlay/mythraopdevice.h"
-#include "AirPlay/mythairplayserver.h"
+#include "libmythtv/AirPlay/mythairplayserver.h"
+#include "libmythtv/AirPlay/mythraopdevice.h"
 #endif
 
 #ifdef USING_LIBDNS_SD
 #include <QScopedPointer>
-#include "bonjourregister.h"
+#include "libmythbase/bonjourregister.h"
 #endif
 #if CONFIG_SYSTEMD_NOTIFY
 #include <systemd/sd-daemon.h>

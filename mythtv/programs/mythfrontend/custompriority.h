@@ -1,9 +1,8 @@
 #ifndef CUSTOMPRIORITY_H_
 #define CUSTOMPRIORITY_H_
 
-#include "programinfo.h"
-
-#include "mythscreentype.h"
+#include "libmyth/programinfo.h"
+#include "libmythui/mythscreentype.h"
 
 class MythUITextEdit;
 class MythUIButton;

@@ -20,9 +20,11 @@
 #ifndef PREVRECLIST_H_
 #define PREVRECLIST_H_
 
+// MythTV
+#include "libmyth/programinfo.h"
+
 // mythfrontend
 #include "schedulecommon.h"
-#include "programinfo.h"
 
 class MythMenu;
 

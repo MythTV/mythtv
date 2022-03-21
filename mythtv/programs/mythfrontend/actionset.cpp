@@ -21,7 +21,7 @@
  */
 
 // MythTV headers
-#include "mythlogging.h"
+#include "libmythbase/mythlogging.h"
 
 // MythContext headers
 #include "action.h"

@@ -1,16 +1,17 @@
 #ifndef MYTHSETTINGS_H
 #define MYTHSETTINGS_H
 
+// Qt
 #include <QtGlobal>
-#include <QStringList>
-#include <QObject>
 #include <QCoreApplication>
-
-#include "standardsettings.h"
-#include "mythcontext.h"
-#include "mythvideoprofile.h"
-
 #include <QMutex>
+#include <QObject>
+#include <QStringList>
+
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmyth/standardsettings.h"
+#include "libmythtv/mythvideoprofile.h"
 
 class QFileInfo;
 

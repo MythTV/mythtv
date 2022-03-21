@@ -1,19 +1,20 @@
-// qt
+// Qt
+#include <QFileInfo>
 #include <QString>
 #include <QVariant>
-#include <QFileInfo>
 
-// myth
-#include "mythcontext.h"
-#include "mythdbcon.h"
-#include "mythdirs.h"
-#include "mythprogressdialog.h"
-#include "mythcoreutil.h"
-#include "videoutils.h"
-#include "remotefile.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmythbase/mythcoreutil.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/remotefile.h"
+#include "libmythmetadata/videoutils.h"
+#include "libmythui/mythprogressdialog.h"
 
-#include "setupwizard_general.h"
+// MythFrontend
 #include "setupwizard_audio.h"
+#include "setupwizard_general.h"
 #include "setupwizard_video.h"
 
 const QString VIDEO_SAMPLE_HD_LOCATION =

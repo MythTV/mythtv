@@ -1,34 +1,26 @@
-
-#include "viewscheduled.h"
-
+// Qt
 #include <QCoreApplication>
 
-// libmythbase
+// MythTV
+#include "libmyth/programtypes.h"          // for RecStatus, etc
+#include "libmyth/recordingtypes.h"        // for toString
+#include "libmyth/remoteutil.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/recordinginfo.h"
+#include "libmythtv/recordingrule.h"
+#include "libmythtv/tv_actions.h"          // for ACTION_CHANNELSEARCH
+#include "libmythtv/tv_play.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuiprogressbar.h"
+#include "libmythui/mythuistatetype.h"
+#include "libmythui/mythuitext.h"
 
-#include "mythcorecontext.h"
-#include "mythlogging.h"
-
-// libmythui
-
-#include "mythuitext.h"
-#include "mythuistatetype.h"
-#include "mythuibuttonlist.h"
-#include "mythuiprogressbar.h"
-#include "mythdialogbox.h"
-#include "mythmainwindow.h"
-
-// libmythtv
-
-#include "recordinginfo.h"
-#include "tv_play.h"
-#include "recordingrule.h"
-#include "remoteutil.h"
-#include "programtypes.h"               // for RecStatus, etc
-#include "recordingtypes.h"             // for toString
-#include "tv_actions.h"                 // for ACTION_CHANNELSEARCH
-
-// mythfrontend
+// mythFrontend
 #include "guidegrid.h"
+#include "viewscheduled.h"
 
 void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 {

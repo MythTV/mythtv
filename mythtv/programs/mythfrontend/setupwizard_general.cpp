@@ -1,15 +1,15 @@
-// qt
+// Qt
 #include <QString>
 #include <QVariant>
 
-// myth
-#include "mythcontext.h"
-#include "mythsystemlegacy.h"
-#include "mythdbcon.h"
-#include "mythdirs.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmythbase/hardwareprofile.h"
+#include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythsystemlegacy.h"
 
-#include "hardwareprofile.h"
-
+// MythFrontend
 #include "audiogeneralsettings.h"
 #include "setupwizard_general.h"
 #include "setupwizard_audio.h"

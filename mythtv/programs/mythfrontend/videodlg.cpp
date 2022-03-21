@@ -1,56 +1,58 @@
+// C++
 #include <chrono>
 #include <functional>   //binary_negate
 #include <map>
 #include <memory>
 #include <set>
 
+// Qt
 #include <QApplication>
-#include <QTimer>
-#include <QList>
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QDir>
+#include <QList>
+#include <QTimer>
 #include <QUrl>
 
-#include "mythcontext.h"
-#include "mythrandom.h"
-#include "mythdirs.h"
+// MythTV
+#include "libmyth/mythcontext.h"
+#include "libmyth/remoteutil.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythrandom.h"
+#include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/remotefile.h"
+#include "libmythbase/storagegroup.h"
+#include "libmythmetadata/dbaccess.h"
+#include "libmythmetadata/dirscan.h"
+#include "libmythmetadata/globals.h"
+#include "libmythmetadata/metadatafactory.h"
+#include "libmythmetadata/metadataimagedownload.h" // for ImageDLFailureEvent
+#include "libmythmetadata/mythuimetadataresults.h"
+#include "libmythmetadata/parentalcontrols.h"
+#include "libmythmetadata/videometadatalistmanager.h"
+#include "libmythmetadata/videoscan.h"
+#include "libmythmetadata/videoutils.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythgenerictree.h"
+#include "libmythui/mythprogressdialog.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuibuttontree.h"
+#include "libmythui/mythuihelper.h"
+#include "libmythui/mythuiimage.h"
+#include "libmythui/mythuistatetype.h"
+#include "libmythui/mythuitext.h"
 
-#include "mythuihelper.h"
-#include "mythprogressdialog.h"
-#include "mythuitext.h"
-#include "mythuibutton.h"
-#include "mythuibuttonlist.h"
-#include "mythuibuttontree.h"
-#include "mythuiimage.h"
-#include "mythuistatetype.h"
-#include "mythuimetadataresults.h"
-#include "mythdialogbox.h"
-#include "mythgenerictree.h"
-#include "mythsystemlegacy.h"
-#include "remotefile.h"
-#include "remoteutil.h"
-#include "storagegroup.h"
-
-#include "videoscan.h"
-#include "globals.h"
-#include "videometadatalistmanager.h"
-#include "parentalcontrols.h"
-#include "videoutils.h"
-#include "dbaccess.h"
-#include "dirscan.h"
-#include "metadatafactory.h"
-#include "videofilter.h"
+// MythFrontend
 #include "editvideometadata.h"
-#include "videopopups.h"
-#include "videolist.h"
-#include "videoplayercommand.h"
 #include "videodlg.h"
 #include "videofileassoc.h"
-#include "videoplayersettings.h"
+#include "videofilter.h"
+#include "videolist.h"
 #include "videometadatasettings.h"
-// for ImageDLFailureEvent
-#include "metadataimagedownload.h"
+#include "videoplayercommand.h"
+#include "videoplayersettings.h"
+#include "videopopups.h"
 
 #define LOC_MML QString("Manual Metadata Lookup: ")
 

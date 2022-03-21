@@ -16,10 +16,10 @@
 #include <QTimer>
 
 // MythTV headers
-#include "upnpsubscription.h"
-#include "mthread.h"
-#include "upnpexp.h"
-#include "videometadatalistmanager.h"
+#include "libmythbase/mthread.h"
+#include "libmythmetadata/videometadatalistmanager.h"
+#include "libmythupnp/upnpexp.h"
+#include "libmythupnp/upnpsubscription.h"
 
 class UpnpMediaServer;
 class UPNPSubscription;

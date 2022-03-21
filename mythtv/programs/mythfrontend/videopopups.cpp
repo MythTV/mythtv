@@ -1,13 +1,15 @@
+//Qt
 #include <QStringList>
 
-#include "mythlogging.h"
+// MythTV
+#include "libmythbase/mythlogging.h"
+#include "libmythmetadata/videometadata.h"
+#include "libmythmetadata/videoutils.h"
+#include "libmythui/mythuibutton.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuitext.h"
 
-#include "mythuibuttonlist.h"
-#include "mythuitext.h"
-#include "mythuibutton.h"
-#include "videometadata.h"
-#include "videoutils.h"
-
+// MythFrontend
 #include "videopopups.h"
 
 bool CastDialog::Create()

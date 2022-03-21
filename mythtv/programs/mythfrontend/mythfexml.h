@@ -8,9 +8,9 @@
 #ifndef MYTHFEXML_H_
 #define MYTHFEXML_H_
 
-#include "upnp.h"
-#include "eventing.h"
-#include "mythcontext.h"
+#include "libmyth/mythcontext.h"
+#include "libmythupnp/eventing.h"
+#include "libmythupnp/upnp.h"
 
 enum MythFEXMLMethod
 {

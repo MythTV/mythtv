@@ -1,14 +1,15 @@
 #ifndef VIDEODLG_H_
 #define VIDEODLG_H_
 
+// Qt
 #include <QPointer>
 #include <QStringList>
 
-#include "mythscreentype.h"
-#include "metadatacommon.h"
-
-#include "parentalcontrols.h"
-#include "quicksp.h"
+// MythTV
+#include "libmythmetadata/metadatacommon.h"
+#include "libmythmetadata/parentalcontrols.h"
+#include "libmythmetadata/quicksp.h"
+#include "libmythui/mythscreentype.h"
 
 class MythUIText;
 class MythUIButtonList;

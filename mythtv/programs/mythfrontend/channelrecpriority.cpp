@@ -1,24 +1,24 @@
-
-#include "channelrecpriority.h"
-
+// C++
 #include <algorithm> // For std::sort()
 #include <vector> // For std::vector
 
-#include "tv.h"
+// MythTV
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
+#include "libmythtv/channelinfo.h"
+#include "libmythtv/scheduledrecording.h"
+#include "libmythtv/tv.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuibuttonlist.h"
+#include "libmythui/mythuihelper.h"
+#include "libmythui/mythuiimage.h"
+#include "libmythui/mythuitext.h"
 
-#include "mythcorecontext.h"
-#include "mythdb.h"
-#include "mythlogging.h"
-#include "scheduledrecording.h"
+// MythFrontend
+#include "channelrecpriority.h"
 #include "proglist.h"
-#include "channelinfo.h"
-
-#include "mythuihelper.h"
-#include "mythuitext.h"
-#include "mythuiimage.h"
-#include "mythuibuttonlist.h"
-#include "mythdialogbox.h"
-#include "mythmainwindow.h"
 
 struct RecPriorityInfo
 {

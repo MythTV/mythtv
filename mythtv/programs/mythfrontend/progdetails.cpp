@@ -1,19 +1,20 @@
 
-// qt
-#include <QKeyEvent>
+// Qt
 #include <QFile>
+#include <QKeyEvent>
 #include <QTextStream>
 
-// myth
-#include "mythcorecontext.h"
-#include "mythdialogbox.h"
-#include "recordingrule.h"
-#include "mythdb.h"
-#include "mythuihelper.h"
-#include "mythmainwindow.h"
+// MythTV
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
+#include "libmythtv/recordingrule.h"
+#include "libmythui/mythdialogbox.h"
+#include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuihelper.h"
 
+//  MythFrontend
 #include "progdetails.h"
-#include "mythdate.h"
 
 #define LASTPAGE 2
 

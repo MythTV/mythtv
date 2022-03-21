@@ -4,7 +4,7 @@
 #ifndef PROG_INFO_LIST_H
 #define PROG_INFO_LIST_H
 
-#include "mythuibuttonlist.h"
+#include "libmythui/mythuibuttonlist.h"
 
 class MythScreenType;
 
