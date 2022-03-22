@@ -24,7 +24,6 @@
 #include "upnp.h"
 #include "upnphelpers.h"
 #include "compat.h"
-#include "mythconfig.h" // for HAVE_GETIFADDRS
 #include "mythlogging.h"
 #include "httprequest.h"
 #include "mythcorecontext.h"
