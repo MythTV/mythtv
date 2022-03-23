@@ -19,20 +19,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-
-#include "mythconfig.h"
-#if HAVE_SYS_SOUNDCARD_H
-    #include <sys/soundcard.h>
-#elif HAVE_SOUNDCARD_H
-    #include <soundcard.h>
-#endif
-
 #include "audioinputoss.h"
-#include "mythlogging.h"
+
 #include <fcntl.h>
 #include <sys/ioctl.h>
 
+#if __has_include(<sys/soundcard.h>)
+#   include <sys/soundcard.h>
+#elif __has_include(<soundcard.h>)
+#   include <soundcard.h>
+#else
+#   error attemping to compile OSS support without soundcard.h
+#endif
+
 #include <QtGlobal>
+
+#include "mythlogging.h"
 
 #define LOC     QString("AudioInOSS: ")
 #define LOC_DEV QString("AudioInOSS(%1): ").arg(m_deviceName.constData())

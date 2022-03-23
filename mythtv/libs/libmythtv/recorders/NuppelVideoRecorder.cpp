@@ -4,12 +4,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "mythconfig.h"
-#if HAVE_SYS_SOUNDCARD_H
-    #include <sys/soundcard.h>
-#elif HAVE_SOUNDCARD_H
-    #include <soundcard.h>
-#endif
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <cerrno>
