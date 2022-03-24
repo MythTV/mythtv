@@ -328,19 +328,21 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
 MythDRMPtr MythDRMDevice::Create(QScreen *qScreen, const QString &Device, bool NeedPlanes)
 {
 #ifdef USING_QTPRIVATEHEADERS
-    if (qScreen && qGuiApp && qGuiApp->platformName().contains("eglfs", Qt::CaseInsensitive))
+    auto * app = dynamic_cast<QGuiApplication *>(QCoreApplication::instance());
+    if (qScreen && app && QGuiApplication::platformName().contains("eglfs", Qt::CaseInsensitive))
     {
         int fd = 0;
         uint32_t crtc = 0;
         uint32_t connector = 0;
         bool useatomic = false;
-        if (auto * drifd = qGuiApp->platformNativeInterface()->nativeResourceForIntegration("dri_fd"); drifd)
+        auto * pni = QGuiApplication::platformNativeInterface();
+        if (auto * drifd = pni->nativeResourceForIntegration("dri_fd"); drifd)
             fd = static_cast<int>(reinterpret_cast<qintptr>(drifd));
-        if (auto * crtcid = qGuiApp->platformNativeInterface()->nativeResourceForScreen("dri_crtcid", qScreen); crtcid)
+        if (auto * crtcid = pni->nativeResourceForScreen("dri_crtcid", qScreen); crtcid)
             crtc = static_cast<uint32_t>(reinterpret_cast<qintptr>(crtcid));
-        if (auto * connid = qGuiApp->platformNativeInterface()->nativeResourceForScreen("dri_connectorid", qScreen); connid)
+        if (auto * connid = pni->nativeResourceForScreen("dri_connectorid", qScreen); connid)
             connector = static_cast<uint32_t>(reinterpret_cast<qintptr>(connid));
-        if (auto * atomic = qGuiApp->platformNativeInterface()->nativeResourceForIntegration("dri_atomic_request"); atomic)
+        if (auto * atomic = pni->nativeResourceForIntegration("dri_atomic_request"); atomic)
             if (auto * request = reinterpret_cast<drmModeAtomicReq*>(atomic); request != nullptr)
                 useatomic = true;
 
@@ -922,10 +924,12 @@ void MythDRMDevice::MainWindowReady()
 
 bool MythDRMDevice::QueueAtomics(const MythAtomics& Atomics) const
 {
-    if (!(m_atomic && m_authenticated && qGuiApp))
+    auto * app = dynamic_cast<QGuiApplication *>(QCoreApplication::instance());
+    if (!(m_atomic && m_authenticated && app))
         return false;
 
-    if (auto * dri = qGuiApp->platformNativeInterface()->nativeResourceForIntegration("dri_atomic_request"); dri)
+    auto * pni = QGuiApplication::platformNativeInterface();
+    if (auto * dri = pni->nativeResourceForIntegration("dri_atomic_request"); dri)
     {
         if (auto * request = reinterpret_cast<drmModeAtomicReq*>(dri); request != nullptr)
         {
