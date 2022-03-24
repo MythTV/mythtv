@@ -20,11 +20,17 @@ bool MythDisplayDRM::DirectRenderingAvailable()
     if (!HasMythMainWindow())
         return false;
 
-    if (auto mainwindow = GetMythMainWindow(); mainwindow)
-        if (auto drmdisplay = dynamic_cast<MythDisplayDRM*>(mainwindow->GetDisplay()); drmdisplay)
+    if (auto *mainwindow = GetMythMainWindow(); mainwindow)
+    {
+        if (auto *drmdisplay = dynamic_cast<MythDisplayDRM*>(mainwindow->GetDisplay()); drmdisplay)
+        {
             if (auto drm = drmdisplay->GetDevice(); drm && drm->Atomic() && drm->Authenticated())
+            {
                 if (auto plane = drm->GetVideoPlane(); plane && plane->m_id)
                     return true;
+            }
+        }
+    }
 #endif
     return false;
 }

@@ -7,8 +7,8 @@
 class MythVideoDRMUtils
 {
   public:
-    static uint64_t FFmpegColorRangeToDRM    (DRMProp Property, int Range);
-    static uint64_t FFmpegColorEncodingToDRM (DRMProp Property, int Encoding);
+    static uint64_t FFmpegColorRangeToDRM    (const DRMProp& Property, int Range);
+    static uint64_t FFmpegColorEncodingToDRM (const DRMProp& Property, int Encoding);
 };
 
 #endif

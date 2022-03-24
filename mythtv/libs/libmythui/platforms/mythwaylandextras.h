@@ -21,7 +21,7 @@ class MythWaylandExtras
   public:
     static void AnnounceGlobal(void* Opaque, struct wl_registry* Reg, uint32_t Name,
                                const char * Interface, uint32_t Version);
-    static const struct wl_registry_listener s_registryListener;
+    static const struct wl_registry_listener kRegistryListener;
 };
 
 class MythWaylandDevice
@@ -29,7 +29,7 @@ class MythWaylandDevice
   public:
     static bool IsAvailable();
     explicit MythWaylandDevice(QWidget* Widget);
-    bool SetOpaqueRegion(const QRect Region);
+    bool SetOpaqueRegion(QRect Region) const;
 
     wl_display*    m_display    { nullptr };
     wl_compositor* m_compositor { nullptr };

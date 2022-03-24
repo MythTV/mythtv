@@ -19,7 +19,7 @@ class MythVideoDRM : public QObject
     explicit MythVideoDRM(MythVideoColourSpace* ColourSpace);
    ~MythVideoDRM() override;
 
-    bool IsValid();
+    bool IsValid() const { return m_valid; };
     bool RenderFrame(AVDRMFrameDescriptor* DRMDesc, MythVideoFrame* Frame);
 
   public slots:

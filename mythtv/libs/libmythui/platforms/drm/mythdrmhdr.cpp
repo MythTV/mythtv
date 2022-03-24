@@ -68,11 +68,11 @@ MythHDRPtr MythDRMHDR::Create(MythDisplay* _Display, const MythHDRDesc& Desc)
     return nullptr;
 }
 
-MythDRMHDR::MythDRMHDR(MythDRMPtr Device, DRMProp HDRProp, const MythHDRDesc& Desc)
+MythDRMHDR::MythDRMHDR(const MythDRMPtr& Device, DRMProp HDRProp, MythHDRDesc Desc)
   : MythHDR(Desc),
     m_device(Device),
     m_connector(Device->GetConnector()),
-    m_hdrProp(HDRProp),
+    m_hdrProp(std::move(HDRProp)),
     m_crtc(Device->GetCrtc())
 {
     m_controllable = true;

@@ -33,14 +33,14 @@ static void inline DebugDRMFrame(AVDRMFrameDescriptor* Desc)
 
 DRMHandle MythVideoDRMBuffer::Create(MythDRMPtr Device, AVDRMFrameDescriptor* DRMDesc, QSize Size)
 {
-    DRMHandle result = std::shared_ptr<MythVideoDRMBuffer>(new MythVideoDRMBuffer(Device, DRMDesc, Size));
+    DRMHandle result = std::shared_ptr<MythVideoDRMBuffer>(new MythVideoDRMBuffer(std::move(Device), DRMDesc, Size));
     if (result->m_valid)
         return result;
     return nullptr;
 }
 
 MythVideoDRMBuffer::MythVideoDRMBuffer(MythDRMPtr Device, AVDRMFrameDescriptor* DRMDesc, QSize Size)
-  : m_device(Device)
+  : m_device(std::move(Device))
 {
     if (!DRMDesc || DRMDesc->nb_layers < 1)
         return;

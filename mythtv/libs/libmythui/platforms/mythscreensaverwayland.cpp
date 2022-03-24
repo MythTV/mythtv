@@ -3,6 +3,7 @@
 #include "mythmainwindow.h"
 #include "platforms/mythscreensaverwayland.h"
 #include "platforms/waylandprotocols/idle_inhibit_unstable_v1.h"
+// NOLINTNEXTLINE(bugprone-suspicious-include)
 #include "platforms/waylandprotocols/idle_inhibit_unstable_v1.c"
 
 #define LOC QString("ScreenSaverWayland: ")
@@ -45,7 +46,7 @@ void MythScreenSaverWayland::WindowReady()
 
         // Search for it
         wl_registry* registry = wl_display_get_registry(m_device->m_display);
-        wl_registry_add_listener(registry, &MythWaylandExtras::s_registryListener, &m_registry);
+        wl_registry_add_listener(registry, &MythWaylandExtras::kRegistryListener, &m_registry);
         wl_display_roundtrip(m_device->m_display);
 
         // Did we find it

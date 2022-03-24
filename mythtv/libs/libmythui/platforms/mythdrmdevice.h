@@ -60,12 +60,12 @@ class MUI_PUBLIC MythDRMDevice
     static void SetupDRM      (const MythCommandLineParser& CmdLine);
     DRMPlane GetVideoPlane    () const;
     DRMPlane GetGUIPlane      () const;
-    bool     QueueAtomics     (const MythAtomics& Atomics);
+    bool     QueueAtomics     (const MythAtomics& Atomics) const;
     void     DisableVideoPlane();
     void     MainWindowReady  ();
 
   protected:
-    MythDRMDevice(const QString& Device, bool NeedPlanes);
+    MythDRMDevice(QString Device, bool NeedPlanes);
     MythDRMDevice(int Fd, uint32_t CrtcId, uint32_t ConnectorId, bool Atomic);
 
   private:

@@ -150,11 +150,13 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
     // Note: Not sure which takes precedent in Qt or what happens if they are different.
     auto platform = CmdLine.toString("platform");
     if (platform.isEmpty())
+    {
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
         platform = QString(qgetenv("QT_QPA_PLATFORM"));
 #else
         platform = qEnvironmentVariable("QT_QPA_PLATFORM");
 #endif
+    }
     if (!platform.contains("eglfs", Qt::CaseInsensitive))
     {
         // Log something just in case it reminds someone to enable eglfs
@@ -284,7 +286,7 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
         "}\n";
 
     // Note: mode is not sanitised
-    auto wrote = qPrintable(s_json.arg(drmGetDeviceNameFromFd2(device->GetFD()))
+    const auto *wrote = qPrintable(s_json.arg(drmGetDeviceNameFromFd2(device->GetFD()))
         .arg(device->m_connector->m_name).arg(MythDRMPlane::FormatToString(format).toLower())
         .arg(s_mythDRMVideoMode.isEmpty() ? "current" : s_mythDRMVideoMode));
 
@@ -306,7 +308,7 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
     // Set the zpos if supported
     if (auto zposp = MythDRMProperty::GetProperty("zpos", guiplane->m_properties); zposp.get())
     {
-        if (auto range = dynamic_cast<MythDRMRangeProperty*>(zposp.get()); range)
+        if (auto *range = dynamic_cast<MythDRMRangeProperty*>(zposp.get()); range)
         {
             auto val = QString::number(std::min(range->m_min + 1, range->m_max));
             LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsPlaneZpos).arg(val));
@@ -462,7 +464,7 @@ MythDRMDevice::MythDRMDevice(int Fd, uint32_t CrtcId, uint32_t ConnectorId, bool
                                static_cast<int>(m_connector->m_mmHeight));
         // Get EDID
         auto prop = MythDRMProperty::GetProperty("EDID", m_connector->m_properties);
-        if (auto blob = dynamic_cast<MythDRMBlobProperty*>(prop.get()); blob)
+        if (auto *blob = dynamic_cast<MythDRMBlobProperty*>(prop.get()); blob)
         {
             MythEDID edid(blob->m_blob);
             if (edid.Valid())
@@ -498,10 +500,9 @@ MythDRMDevice::MythDRMDevice(int Fd, uint32_t CrtcId, uint32_t ConnectorId, bool
  * other DRM clients running (i.e. no X or Wayland), finds a connected connector
  * and analyses planes. If any steps fail, the device is deemed invalid.
 */
-MythDRMDevice::MythDRMDevice(const QString& Device, bool NeedPlanes)
-  : m_deviceName(Device),
-    m_atomic(true), // Just squashes some logging
-    m_verbose(LOG_INFO)
+MythDRMDevice::MythDRMDevice(QString Device, bool NeedPlanes)
+  : m_deviceName(std::move(Device)),
+    m_atomic(true) // Just squashes some logging
 {
     if (!Open())
         return;
@@ -919,7 +920,7 @@ void MythDRMDevice::MainWindowReady()
     */
 }
 
-bool MythDRMDevice::QueueAtomics(const MythAtomics& Atomics)
+bool MythDRMDevice::QueueAtomics(const MythAtomics& Atomics) const
 {
     if (!(m_atomic && m_authenticated && qGuiApp))
         return false;

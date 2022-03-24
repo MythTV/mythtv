@@ -51,7 +51,7 @@ MythWaylandDevice::MythWaylandDevice(QWidget* Widget)
  *
  * \sa MythDisplay::ConfigureQtGUI
 */
-bool MythWaylandDevice::SetOpaqueRegion(const QRect Region)
+bool MythWaylandDevice::SetOpaqueRegion(const QRect Region) const
 {
     if (!(m_surface && m_compositor))
         return false;
@@ -70,7 +70,7 @@ bool MythWaylandDevice::SetOpaqueRegion(const QRect Region)
     return true;
 }
 
-const struct wl_registry_listener MythWaylandExtras::s_registryListener = { &MythWaylandExtras::AnnounceGlobal, nullptr };
+const struct wl_registry_listener MythWaylandExtras::kRegistryListener = { &MythWaylandExtras::AnnounceGlobal, nullptr };
 
 /*! \brief MythTV implementation of the Wayland registry callback.
  *
@@ -109,8 +109,8 @@ bool MythWaylandDevice::IsAvailable()
 #else
         auto waylanddisplay = qEnvironmentVariable("WAYLAND_DISPLAY");
 #endif
-        auto name = waylanddisplay.isEmpty() ? nullptr : waylanddisplay.toLocal8Bit().constData();
-        if (auto display = wl_display_connect(name); display)
+        const auto *name = waylanddisplay.isEmpty() ? nullptr : waylanddisplay.toLocal8Bit().constData();
+        if (auto *display = wl_display_connect(name); display)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Available (WAYLAND_DISPLAY: '%1')")
                 .arg(waylanddisplay));
