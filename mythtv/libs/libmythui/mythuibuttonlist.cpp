@@ -847,7 +847,7 @@ bool MythUIButtonList::DistributeButtons(void)
              * Attempt to pick a start_button which will minimize the need
              * for new button allocations.
              */
-            start_button = std::max(m_buttonList.size() / 2, 0);
+            start_button = std::max(static_cast<int>(m_buttonList.size()) / 2, 0);
             start_button = (start_button / std::max(m_columns, 1)) * m_columns;
 
             if (start_button < m_itemCount / 2 &&
