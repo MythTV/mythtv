@@ -56,14 +56,14 @@ class MBASE_PUBLIC SignalHandler: public QObject
     QMutex m_sigMapLock;
     QMap<int, SigHandlerFunc> m_sigMap;
 
-    const std::array<const int, 6
+    static const std::array<const int, 6
 #ifndef _WIN32
         + 1
 #ifndef Q_OS_DARWIN
         + 1
 #endif // Q_OS_DARWIN
 #endif // _WIN32
-    > k_defaultSignalList
+    > kDefaultSignalList
     {
         SIGINT, SIGTERM, SIGSEGV, SIGABRT, SIGFPE, SIGILL,
 #ifndef _WIN32

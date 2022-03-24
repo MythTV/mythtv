@@ -74,7 +74,7 @@ SignalHandler::SignalHandler(QObject *parent) :
     m_notifier = new QSocketNotifier(s_sigFd[1], QSocketNotifier::Read, this);
     connect(m_notifier, &QSocketNotifier::activated, this, &SignalHandler::handleSignal);
 
-    for (const int signum : k_defaultSignalList)
+    for (const int signum : kDefaultSignalList)
     {
         SetHandlerPrivate(signum, nullptr);
     }
