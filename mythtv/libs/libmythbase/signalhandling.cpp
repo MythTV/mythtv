@@ -26,6 +26,24 @@ volatile bool SignalHandler::s_exit_program = false;
 QMutex SignalHandler::s_singletonLock;
 SignalHandler *SignalHandler::s_singleton;
 
+static const std::array<const int, 6
+#ifndef _WIN32
+    + 1
+#ifndef Q_OS_DARWIN
+    + 1
+#endif // Q_OS_DARWIN
+#endif // _WIN32
+    > kDefaultSignalList
+{
+    SIGINT, SIGTERM, SIGSEGV, SIGABRT, SIGFPE, SIGILL,
+#ifndef _WIN32
+    SIGBUS,
+#ifndef Q_OS_DARWIN
+    SIGRTMIN, // not necessarily constexpr
+#endif // Q_OS_DARWIN
+#endif // _WIN32
+};
+
 // We may need to write out signal info using just the write() function
 // so we create an array of C strings + measure their lengths.
 #define SIG_STR_COUNT 256

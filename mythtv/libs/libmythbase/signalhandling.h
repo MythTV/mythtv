@@ -56,24 +56,6 @@ class MBASE_PUBLIC SignalHandler: public QObject
     QMutex m_sigMapLock;
     QMap<int, SigHandlerFunc> m_sigMap;
 
-    static const std::array<const int, 6
-#ifndef _WIN32
-        + 1
-#ifndef Q_OS_DARWIN
-        + 1
-#endif // Q_OS_DARWIN
-#endif // _WIN32
-    > kDefaultSignalList
-    {
-        SIGINT, SIGTERM, SIGSEGV, SIGABRT, SIGFPE, SIGILL,
-#ifndef _WIN32
-        SIGBUS,
-#ifndef Q_OS_DARWIN
-        SIGRTMIN, // not necessarily constexpr
-#endif // Q_OS_DARWIN
-#endif // _WIN32
-    };
-
     static QMutex s_singletonLock;
     static SignalHandler *s_singleton;
 };
