@@ -15,5 +15,5 @@ QMAKE_CLEAN += $(TARGET)
 
 # Input
 HEADERS += lookup.h commandlineparser.h
-SOURCES += main.cpp lookup.cpp commandlineparser.cpp
+SOURCES += mythmetadatalookup.cpp lookup.cpp commandlineparser.cpp
 
