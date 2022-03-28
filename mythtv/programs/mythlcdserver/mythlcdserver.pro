@@ -13,4 +13,4 @@ INSTALLS += target
 
 HEADERS += lcdserver.h  lcdprocclient.h commandlineparser.h
 
-SOURCES += main.cpp lcdserver.cpp lcdprocclient.cpp commandlineparser.cpp
+SOURCES += mythlcdserver.cpp lcdserver.cpp lcdprocclient.cpp commandlineparser.cpp
