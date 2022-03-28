@@ -14,7 +14,7 @@ QMAKE_CLEAN += $(TARGET)
 
 HEADERS += commandlineparser.h
 
-SOURCES += main.cpp commandlineparser.cpp
+SOURCES += mythpreviewgen.cpp commandlineparser.cpp
 
 using_oss:DEFINES += USING_OSS
 
