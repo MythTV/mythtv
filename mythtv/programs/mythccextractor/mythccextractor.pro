@@ -12,5 +12,5 @@ QMAKE_CLEAN += $(TARGET)
 
 # Input
 HEADERS += commandlineparser.h
-SOURCES += commandlineparser.cpp main.cpp
+SOURCES += commandlineparser.cpp mythccextractor.cpp
 
