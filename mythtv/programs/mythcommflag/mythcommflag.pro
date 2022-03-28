@@ -50,7 +50,7 @@ SOURCES += BlankFrameDetector.cpp
 SOURCES += SceneChangeDetector.cpp
 SOURCES += PrePostRollFlagger.cpp
 
-SOURCES += main.cpp commandlineparser.cpp
+SOURCES += mythcommflag.cpp commandlineparser.cpp
 
 QT += xml sql network
 
