@@ -16,7 +16,7 @@ QMAKE_CLEAN += $(TARGET)
 
 # Input
 HEADERS += ../mytharchive/archiveutil.h ../mytharchive/remoteavformatcontext.h external/pxsup2dast.h
-SOURCES += main.cpp ../mytharchive/archiveutil.cpp external/pxsup2dast.c
+SOURCES += mytharchivehelper.cpp ../mytharchive/archiveutil.cpp external/pxsup2dast.c
 
 LIBS += -lmythswscale
 LIBS += -lmythavformat
