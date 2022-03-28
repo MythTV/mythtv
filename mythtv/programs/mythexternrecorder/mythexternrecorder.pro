@@ -30,5 +30,5 @@ HEADERS += MythExternRecApp.h
 SOURCES += commandlineparser.cpp
 SOURCES += MythExternControl.cpp
 SOURCES += MythExternRecApp.cpp
-SOURCES += main.cpp
+SOURCES += mythexternrecorder.cpp
 
