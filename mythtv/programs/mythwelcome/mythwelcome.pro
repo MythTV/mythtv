@@ -15,7 +15,7 @@ QMAKE_CLEAN += $(TARGET)
 
 # Input
 HEADERS += welcomedialog.h welcomesettings.h commandlineparser.h
-SOURCES += main.cpp welcomedialog.cpp welcomesettings.cpp commandlineparser.cpp
+SOURCES += mythwelcome.cpp welcomedialog.cpp welcomesettings.cpp commandlineparser.cpp
 
 macx {
     mac_bundle {
