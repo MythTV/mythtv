@@ -14,4 +14,4 @@ QMAKE_CLEAN += $(TARGET)
 
 # Input
 HEADERS += commandlineparser.h controlrequesthandler.h
-SOURCES += main.cpp commandlineparser.cpp controlrequesthandler.cpp
+SOURCES += mythmediaserver.cpp commandlineparser.cpp controlrequesthandler.cpp
