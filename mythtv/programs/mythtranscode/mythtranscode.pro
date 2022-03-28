@@ -16,7 +16,7 @@ QMAKE_CFLAGS += -w
 macx: QMAKE_CFLAGS -= -O3 -O2 -O1 -Os
 
 # Input
-SOURCES += main.cpp transcode.cpp mpeg2fix.cpp
+SOURCES += mythtranscode.cpp transcode.cpp mpeg2fix.cpp
 SOURCES += audioreencodebuffer.cpp cutter.cpp videodecodebuffer.cpp
 SOURCES += commandlineparser.cpp
 SOURCES += external/replex/element.cpp external/replex/mpg_common.cpp
