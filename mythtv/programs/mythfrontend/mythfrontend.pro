@@ -55,7 +55,7 @@ HEADERS += galleryslide.h               gallerytransitions.h
 HEADERS += galleryinfo.h                prevreclist.h
 HEADERS += settingshelper.h
 
-SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp audiogeneralsettings.cpp
+SOURCES += mythfrontend.cpp playbackbox.cpp viewscheduled.cpp audiogeneralsettings.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp
 SOURCES += channelrecpriority.cpp statusbox.cpp networkcontrol.cpp
 SOURCES += mediarenderer.cpp mythfexml.cpp playbackboxlistitem.cpp

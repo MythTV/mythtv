@@ -2233,5 +2233,9 @@ void handleSIGUSR2(void)
     GetMythMainWindow()->RestartInputHandlers();
 }
 
-#include "main.moc"
+/*
+include Qt MOC output for Q_OBJECT class defined in this file;
+filenames must match.
+*/
+#include "mythfrontend.moc"
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
