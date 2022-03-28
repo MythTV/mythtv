@@ -15,6 +15,6 @@ QMAKE_CLEAN += $(TARGET)
 # Input
 HEADERS += commandlineparser.h screenwizard.h
 
-SOURCES += main.cpp commandlineparser.cpp screenwizard.cpp
+SOURCES += mythscreenwizard.cpp commandlineparser.cpp screenwizard.cpp
 
 using_x11:DEFINES += USING_X11
