@@ -32,7 +32,7 @@ HEADERS += expertsettingseditor.h commandlineparser.h
 
 SOURCES += backendsettings.cpp channeleditor.cpp checksetup.cpp
 SOURCES += exitprompt.cpp      importicons.cpp   startprompt.cpp
-SOURCES += main.cpp commandlineparser.cpp
+SOURCES += mythtv-setup.cpp commandlineparser.cpp
 
 macx {
     mac_bundle {
