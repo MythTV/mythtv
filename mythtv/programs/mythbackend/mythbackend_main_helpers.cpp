@@ -45,7 +45,7 @@
 #include "previewgenerator.h"
 #include "commandlineparser.h"
 #include "mythsystemevent.h"
-#include "main_helpers.h"
+#include "mythbackend_main_helpers.h"
 #include "backendcontext.h"
 #include "mythtranslation.h"
 #include "mythtimezone.h"

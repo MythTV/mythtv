@@ -29,7 +29,7 @@
 #include "mythsystemevent.h"
 #include "mythtranslation.h"
 #include "backendcontext.h"
-#include "main_helpers.h"
+#include "mythbackend_main_helpers.h"
 #include "mythmiscutil.h"
 #include "storagegroup.h"
 #include "mediaserver.h"
