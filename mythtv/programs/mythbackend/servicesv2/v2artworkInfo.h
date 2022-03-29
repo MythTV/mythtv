@@ -8,8 +8,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef ARTWORKINFO_H_
-#define ARTWORKINFO_H_
+#ifndef V2ARTWORKINFO_H_
+#define V2ARTWORKINFO_H_
 
 #include <QString>
 

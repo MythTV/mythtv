@@ -139,19 +139,19 @@ V2ProgramList* V2Dvr::GetRecordedList( bool           bDescending,
                                        bool           bIncRecording
                                      )
 {
-    if (!HAS_PARAM("IncChannel"))
+    if (!HAS_PARAMv2("IncChannel"))
         bIncChannel = true;
 
-    if (!HAS_PARAM("Details"))
+    if (!HAS_PARAMv2("Details"))
         bDetails = true;
 
-    if (!HAS_PARAM("IncCast"))
+    if (!HAS_PARAMv2("IncCast"))
         bIncCast = true;
 
-    if (!HAS_PARAM("IncArtwork"))
+    if (!HAS_PARAMv2("IncArtwork"))
         bIncArtWork = true;
 
-    if (!HAS_PARAM("IncRecording"))
+    if (!HAS_PARAMv2("IncRecording"))
         bIncRecording = true;
 
     QMap< QString, ProgramInfo* > recMap;
@@ -1966,8 +1966,8 @@ int V2Dvr::ManageJobQueue( const QString   &sAction,
 {
     int nReturn = -1;
 
-    if (!HAS_PARAM("JobName") ||
-        !HAS_PARAM("RecordedId") )
+    if (!HAS_PARAMv2("JobName") ||
+        !HAS_PARAMv2("RecordedId") )
     {
         LOG(VB_GENERAL, LOG_ERR, "JobName and RecordedId are required.");
         return nReturn;
@@ -1988,7 +1988,7 @@ int V2Dvr::ManageJobQueue( const QString   &sAction,
 
     if ( sAction == "Remove")
     {
-        if (!HAS_PARAM("JobId") || nJobId < 0)
+        if (!HAS_PARAMv2("JobId") || nJobId < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, "For Remove, a valid JobId is required.");
             return nReturn;

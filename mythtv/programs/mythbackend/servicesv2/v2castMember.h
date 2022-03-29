@@ -8,8 +8,6 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-// #ifndef DTCCASTMEMBER_H_
-// #define DTCCASTMEMBER_H_
 #ifndef V2CASTMEMBER_H_
 #define V2CASTMEMBER_H_
 

@@ -192,7 +192,7 @@ bool V2Channel::UpdateDBChannel( uint          MplexID,
                                const QString &DefaultAuthority,
                                uint          ServiceType )
 {
-    if (!HAS_PARAM("ChannelID"))
+    if (!HAS_PARAMv2("ChannelID"))
         throw QString("ChannelId is required");
 
     if (m_request->m_queries.size() < 2 )
@@ -202,27 +202,27 @@ bool V2Channel::UpdateDBChannel( uint          MplexID,
     if (!channel.Load(ChannelID))
         throw QString("ChannelId %1 doesn't exist");
 
-    if (HAS_PARAM("MplexID"))
+    if (HAS_PARAMv2("MplexID"))
         channel.m_mplexId = MplexID;
-    if (HAS_PARAM("SourceID"))
+    if (HAS_PARAMv2("SourceID"))
         channel.m_sourceId = SourceID;
-    if (HAS_PARAM("CallSign"))
+    if (HAS_PARAMv2("CallSign"))
         channel.m_callSign = CallSign;
-    if (HAS_PARAM("ChannelName"))
+    if (HAS_PARAMv2("ChannelName"))
         channel.m_name = ChannelName;
-    if (HAS_PARAM("ChannelNumber"))
+    if (HAS_PARAMv2("ChannelNumber"))
         channel.m_chanNum = ChannelNumber;
-    if (HAS_PARAM("ServiceID"))
+    if (HAS_PARAMv2("ServiceID"))
         channel.m_serviceId = ServiceID;
-    if (HAS_PARAM("ATSCMajorChannel"))
+    if (HAS_PARAMv2("ATSCMajorChannel"))
         channel.m_atscMajorChan = ATSCMajorChannel;
-    if (HAS_PARAM("ATSCMinorChannel"))
+    if (HAS_PARAMv2("ATSCMinorChannel"))
         channel.m_atscMinorChan = ATSCMinorChannel;
-    if (HAS_PARAM("UseEIT"))
+    if (HAS_PARAMv2("UseEIT"))
         channel.m_useOnAirGuide = UseEIT;
-    if (HAS_PARAM("ExtendedVisible"))
+    if (HAS_PARAMv2("ExtendedVisible"))
         channel.m_visible = channelVisibleTypeFromString(ExtendedVisible);
-    else if (HAS_PARAM("Visible"))
+    else if (HAS_PARAMv2("Visible"))
     {
         if (channel.m_visible == kChannelVisible ||
             channel.m_visible == kChannelNotVisible)
@@ -236,17 +236,17 @@ bool V2Channel::UpdateDBChannel( uint          MplexID,
             throw QString("Can't override Always/NeverVisible");
         }
     }
-    if (HAS_PARAM("FrequencyID"))
+    if (HAS_PARAMv2("FrequencyID"))
         channel.m_freqId = FrequencyID;
-    if (HAS_PARAM("Icon"))
+    if (HAS_PARAMv2("Icon"))
         channel.m_icon = Icon;
-    if (HAS_PARAM("Format"))
+    if (HAS_PARAMv2("Format"))
         channel.m_tvFormat = Format;
-    if (HAS_PARAM("XMLTVID"))
+    if (HAS_PARAMv2("XMLTVID"))
         channel.m_xmltvId = XMLTVID;
-    if (HAS_PARAM("DefaultAuthority"))
+    if (HAS_PARAMv2("DefaultAuthority"))
         channel.m_defaultAuthority = DefaultAuthority;
-    if (HAS_PARAM("servicetype"))
+    if (HAS_PARAMv2("servicetype"))
         channel.m_serviceType = ServiceType;
 
     bool bResult = ChannelUtil::UpdateChannel(
@@ -281,9 +281,9 @@ bool V2Channel::AddDBChannel( uint          MplexID,
                             uint          ServiceType )
 {
     ChannelVisibleType chan_visible = kChannelVisible;
-    if (HAS_PARAM("ExtendedVisible"))
+    if (HAS_PARAMv2("ExtendedVisible"))
         chan_visible = channelVisibleTypeFromString(ExtendedVisible);
-    else if (HAS_PARAM("Visible"))
+    else if (HAS_PARAMv2("Visible"))
         chan_visible = (Visible ? kChannelVisible : kChannelNotVisible);
 
     bool bResult = ChannelUtil::CreateChannel( MplexID, SourceID, ChannelID,
@@ -436,7 +436,7 @@ bool V2Channel::UpdateVideoSource( uint          nSourceId,
                                  uint          nLCNOffset )
 {
 
-    if (!HAS_PARAM("SourceID"))
+    if (!HAS_PARAMv2("SourceID"))
     {
         LOG(VB_GENERAL, LOG_ERR, "SourceId is required");
         return false;
@@ -460,28 +460,28 @@ bool V2Channel::UpdateVideoSource( uint          nSourceId,
     MSqlBindings::const_iterator it;
     QString settings;
 
-    if ( HAS_PARAM("SourceName") )
+    if ( HAS_PARAMv2("SourceName") )
         ADD_SQL(settings, bindings, "name", "SourceName", sSourceName)
 
-    if ( HAS_PARAM("Grabber") )
+    if ( HAS_PARAMv2("Grabber") )
         ADD_SQL(settings, bindings, "xmltvgrabber", "Grabber", sGrabber)
 
-    if ( HAS_PARAM("UserId") )
+    if ( HAS_PARAMv2("UserId") )
         ADD_SQL(settings, bindings, "userid", "UserId", sUserId)
 
-    if ( HAS_PARAM("FreqTable") )
+    if ( HAS_PARAMv2("FreqTable") )
         ADD_SQL(settings, bindings, "freqtable", "FreqTable", sFreqTable)
 
-    if ( HAS_PARAM("LineupId") )
+    if ( HAS_PARAMv2("LineupId") )
         ADD_SQL(settings, bindings, "lineupid", "LineupId", sLineupId)
 
-    if ( HAS_PARAM("Password") )
+    if ( HAS_PARAMv2("Password") )
         ADD_SQL(settings, bindings, "password", "Password", sPassword)
 
-    if ( HAS_PARAM("UseEIT") )
+    if ( HAS_PARAMv2("UseEIT") )
         ADD_SQL(settings, bindings, "useeit", "UseEIT", bUseEIT)
 
-    if (HAS_PARAM("ConfigPath"))
+    if (HAS_PARAMv2("ConfigPath"))
     {
         if (sConfigPath.isEmpty())
             settings += "configpath=NULL, "; // mythfilldatabase grabber requirement
@@ -489,19 +489,19 @@ bool V2Channel::UpdateVideoSource( uint          nSourceId,
             ADD_SQL(settings, bindings, "configpath", "ConfigPath", sConfigPath)
     }
 
-    if ( HAS_PARAM("NITId") )
+    if ( HAS_PARAMv2("NITId") )
         ADD_SQL(settings, bindings, "dvb_nit_id", "NITId", nNITId)
 
-    if ( HAS_PARAM("BouquetId") )
+    if ( HAS_PARAMv2("BouquetId") )
         ADD_SQL(settings, bindings, "bouquet_id", "BouquetId", nBouquetId)
 
-    if ( HAS_PARAM("RegionId") )
+    if ( HAS_PARAMv2("RegionId") )
         ADD_SQL(settings, bindings, "region_id", "RegionId", nRegionId)
 
-    if ( HAS_PARAM("ScanFrequency") )
+    if ( HAS_PARAMv2("ScanFrequency") )
         ADD_SQL(settings, bindings, "scanfrequency", "ScanFrequency", nScanFrequency)
 
-    if ( HAS_PARAM("LCNOffset") )
+    if ( HAS_PARAMv2("LCNOffset") )
         ADD_SQL(settings, bindings, "lcnoffset", "LCNOffset", nLCNOffset)
 
     if ( settings.isEmpty() )

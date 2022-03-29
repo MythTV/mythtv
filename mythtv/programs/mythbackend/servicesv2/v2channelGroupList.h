@@ -1,5 +1,5 @@
-#ifndef CHANNELGROUPLIST_H_
-#define CHANNELGROUPLIST_H_
+#ifndef V2CHANNELGROUPLIST_H_
+#define V2CHANNELGROUPLIST_H_
 
 #include <QVariantList>
 #include <QString>

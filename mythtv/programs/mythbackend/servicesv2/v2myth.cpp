@@ -1155,7 +1155,7 @@ bool V2Myth::ManageUrlProtection( const QString &sServices,
 
     if (serviceList.size() == 1 && serviceList.first() == "All")
     {
-        for (const QString& service : KnownServices)
+        for (const QString& service : KnownServicesV2)
             protectedURLs << '/' + service;
     }
     else if (serviceList.size() == 1 && serviceList.first() == "None")
@@ -1166,7 +1166,7 @@ bool V2Myth::ManageUrlProtection( const QString &sServices,
     {
         for (const QString& service : serviceList)
         {
-            if (KnownServices.contains(service))
+            if (KnownServicesV2.contains(service))
                 protectedURLs << '/' + service;
             else
                 LOG(VB_GENERAL, LOG_ERR, QString("Invalid service name: '%1'")

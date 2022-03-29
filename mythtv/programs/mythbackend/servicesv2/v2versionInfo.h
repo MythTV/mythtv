@@ -1,5 +1,5 @@
-#ifndef VERSIONINFO_H_
-#define VERSIONINFO_H_
+#ifndef V2VERSIONINFO_H_
+#define V2VERSIONINFO_H_
 
 #include <QString>
 #include "libmythbase/http/mythhttpservice.h"

@@ -1,5 +1,5 @@
-#ifndef DATABASEINFO_H_
-#define DATABASEINFO_H_
+#ifndef V2DATABASEINFO_H_
+#define V2DATABASEINFO_H_
 
 #include <QString>
 #include "libmythbase/http/mythhttpservice.h"

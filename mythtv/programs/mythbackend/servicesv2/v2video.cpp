@@ -520,205 +520,205 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
         return false;
     }
 
-    if (HAS_PARAM("Title"))
+    if (HAS_PARAMv2("Title"))
     {
         metadata->SetTitle(sTitle);
         update_required = true;
     }
 
-    if (HAS_PARAM("SubTitle"))
+    if (HAS_PARAMv2("SubTitle"))
     {
         metadata->SetSubtitle(sSubTitle);
         update_required = true;
     }
 
-    if (HAS_PARAM("TagLine"))
+    if (HAS_PARAMv2("TagLine"))
     {
         metadata->SetTagline(sTagLine);
         update_required = true;
     }
 
-    if (HAS_PARAM("Director"))
+    if (HAS_PARAMv2("Director"))
     {
         metadata->SetDirector(sDirector);
         update_required = true;
     }
 
-    if (HAS_PARAM("Studio"))
+    if (HAS_PARAMv2("Studio"))
     {
         metadata->SetStudio(sStudio);
         update_required = true;
     }
 
-    if (HAS_PARAM("Plot"))
+    if (HAS_PARAMv2("Plot"))
     {
         metadata->SetPlot(sPlot);
         update_required = true;
     }
 
-    if (HAS_PARAM("UserRating"))
+    if (HAS_PARAMv2("UserRating"))
     {
         metadata->SetUserRating(fUserRating);
         update_required = true;
     }
 
-    if (HAS_PARAM("Inetref"))
+    if (HAS_PARAMv2("Inetref"))
     {
         metadata->SetInetRef(sInetref);
         update_required = true;
     }
 
-    if (HAS_PARAM("CollectionRef"))
+    if (HAS_PARAMv2("CollectionRef"))
     {
         metadata->SetCollectionRef(nCollectionRef);
         update_required = true;
     }
 
-    if (HAS_PARAM("HomePage"))
+    if (HAS_PARAMv2("HomePage"))
     {
         metadata->SetHomepage(sHomePage);
         update_required = true;
     }
 
-    if (HAS_PARAM("Year"))
+    if (HAS_PARAMv2("Year"))
     {
         metadata->SetYear(nYear);
         update_required = true;
     }
 
-    if (HAS_PARAM("ReleaseDate"))
+    if (HAS_PARAMv2("ReleaseDate"))
     {
         metadata->SetReleaseDate(sReleasedate);
         update_required = true;
     }
 
-    if (HAS_PARAM("Rating"))
+    if (HAS_PARAMv2("Rating"))
     {
         metadata->SetRating(sRating);
         update_required = true;
     }
 
-    if (HAS_PARAM("Length"))
+    if (HAS_PARAMv2("Length"))
     {
         metadata->SetLength(std::chrono::minutes(nLength));
         update_required = true;
     }
 
-    if (HAS_PARAM("PlayCount"))
+    if (HAS_PARAMv2("PlayCount"))
     {
         metadata->SetPlayCount(nPlayCount);
         update_required = true;
     }
 
-    if (HAS_PARAM("Season"))
+    if (HAS_PARAMv2("Season"))
     {
         metadata->SetSeason(nSeason);
         update_required = true;
     }
 
-    if (HAS_PARAM("Episode"))
+    if (HAS_PARAMv2("Episode"))
     {
         metadata->SetEpisode(nEpisode);
         update_required = true;
     }
 
-    if (HAS_PARAM("ShowLevel"))
+    if (HAS_PARAMv2("ShowLevel"))
     {
         metadata->SetShowLevel(ParentalLevel::Level(nShowLevel));
         update_required = true;
     }
 
-    if (HAS_PARAM("FileName"))
+    if (HAS_PARAMv2("FileName"))
     {
         metadata->SetFilename(sFileName);
         update_required = true;
     }
 
-    if (HAS_PARAM("Hash"))
+    if (HAS_PARAMv2("Hash"))
     {
         metadata->SetHash(sHash);
         update_required = true;
     }
 
-    if (HAS_PARAM("CoverFile"))
+    if (HAS_PARAMv2("CoverFile"))
     {
         metadata->SetCoverFile(sCoverFile);
         update_required = true;
     }
 
-    if (HAS_PARAM("ChildID"))
+    if (HAS_PARAMv2("ChildID"))
     {
         metadata->SetChildID(nChildID);
         update_required = true;
     }
 
-    if (HAS_PARAM("Browse"))
+    if (HAS_PARAMv2("Browse"))
     {
         metadata->SetBrowse(bBrowse);
         update_required = true;
     }
 
-    if (HAS_PARAM("Watched"))
+    if (HAS_PARAMv2("Watched"))
     {
         metadata->SetWatched(bWatched);
         update_required = true;
     }
 
-    if (HAS_PARAM("Processed"))
+    if (HAS_PARAMv2("Processed"))
     {
         metadata->SetProcessed(bProcessed);
         update_required = true;
     }
 
-    if (HAS_PARAM("PlayCommand"))
+    if (HAS_PARAMv2("PlayCommand"))
     {
         metadata->SetPlayCommand(sPlayCommand);
         update_required = true;
     }
 
-    if (HAS_PARAM("Category"))
+    if (HAS_PARAMv2("Category"))
     {
         metadata->SetCategoryID(nCategory);
         update_required = true;
     }
 
-    if (HAS_PARAM("Trailer"))
+    if (HAS_PARAMv2("Trailer"))
     {
         metadata->SetTrailer(sTrailer);
         update_required = true;
     }
 
-    if (HAS_PARAM("Host"))
+    if (HAS_PARAMv2("Host"))
     {
         metadata->SetHost(sHost);
         update_required = true;
     }
 
-    if (HAS_PARAM("Screenshot"))
+    if (HAS_PARAMv2("Screenshot"))
     {
         metadata->SetScreenshot(sScreenshot);
         update_required = true;
     }
 
-    if (HAS_PARAM("Banner"))
+    if (HAS_PARAMv2("Banner"))
     {
         metadata->SetBanner(sBanner);
         update_required = true;
     }
 
-    if (HAS_PARAM("Fanart"))
+    if (HAS_PARAMv2("Fanart"))
     {
         metadata->SetFanart(sFanart);
         update_required = true;
     }
 
-    if (HAS_PARAM("InsertDate"))
+    if (HAS_PARAMv2("InsertDate"))
     {
         metadata->SetInsertdate(sInsertDate);
         update_required = true;
     }
 
-    if (HAS_PARAM("ContentType"))
+    if (HAS_PARAMv2("ContentType"))
     {
         // valid values for ContentType are 'MOVIE','TELEVISION','ADULT','MUSICVIDEO','HOMEVIDEO'
         VideoContentType contentType = kContentUnknown;
@@ -746,7 +746,7 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
             LOG(VB_GENERAL, LOG_ERR, QString("UpdateVideoMetadata: Ignoring unknown ContentType: %1").arg(sContentType));
     }
 
-    if (HAS_PARAM("Genres"))
+    if (HAS_PARAMv2("Genres"))
     {
         VideoMetadata::genre_list genres;
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
@@ -763,7 +763,7 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
         update_required = true;
     }
 
-    if (HAS_PARAM("Cast"))
+    if (HAS_PARAMv2("Cast"))
     {
         VideoMetadata::cast_list cast;
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
@@ -780,7 +780,7 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
         update_required = true;
     }
 
-    if (HAS_PARAM("Countries"))
+    if (HAS_PARAMv2("Countries"))
     {
         VideoMetadata::country_list countries;
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
