@@ -33,11 +33,11 @@ bool DTVMultiplex::operator==(const DTVMultiplex &m) const
 
 QString DTVMultiplex::toString() const
 {
-    QString ret = QString("%1 %2 %3 ")
+    QString ret = QString("%1 %2 %3 %4")
         .arg(QString::number(m_frequency), m_modulation.toString(),
-             m_inversion.toString());
+             m_inversion.toString(), QString::number(m_symbolRate));
 
-    ret += QString("%1 %2 %3 %4 %5 %6 %7")
+    ret += QString(" %1 %2 %3 %4 %5 %6 %7")
         .arg(m_hpCodeRate.toString(),    m_lpCodeRate.toString(),
              m_bandwidth.toString(),     m_transMode.toString(),
              m_guardInterval.toString(), m_hierarchy.toString(),
