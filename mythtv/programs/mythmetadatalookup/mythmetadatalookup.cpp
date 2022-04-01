@@ -22,7 +22,7 @@
 #include "jobqueue.h"
 #include "mythtranslation.h"
 #include "mythconfig.h"
-#include "commandlineparser.h"
+#include "mythmetadatalookup_commandlineparser.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
 #include "cleanupguard.h"

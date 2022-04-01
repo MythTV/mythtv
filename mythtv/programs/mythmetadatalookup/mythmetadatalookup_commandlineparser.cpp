@@ -2,7 +2,7 @@
 #include <QList>
 
 #include "mythcorecontext.h"
-#include "commandlineparser.h"
+#include "mythmetadatalookup_commandlineparser.h"
 
 MythMetadataLookupCommandLineParser::MythMetadataLookupCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHMETADATALOOKUP)
