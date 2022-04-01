@@ -14,6 +14,6 @@ INSTALLS = target
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-HEADERS += commandlineparser.h
+HEADERS += mythjobqueue_commandlineparser.h
 
-SOURCES += mythjobqueue.cpp commandlineparser.cpp
+SOURCES += mythjobqueue.cpp mythjobqueue_commandlineparser.cpp

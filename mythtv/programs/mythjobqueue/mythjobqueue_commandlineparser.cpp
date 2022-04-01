@@ -1,7 +1,7 @@
 #include <QString>
 
 #include "mythcorecontext.h"
-#include "commandlineparser.h"
+#include "mythjobqueue_commandlineparser.h"
 
 MythJobQueueCommandLineParser::MythJobQueueCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHJOBQUEUE)

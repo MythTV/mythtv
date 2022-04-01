@@ -22,7 +22,7 @@
 #include "jobqueue.h"
 #include "mythdbcon.h"
 #include "mythversion.h"
-#include "commandlineparser.h"
+#include "mythjobqueue_commandlineparser.h"
 #include "compat.h"
 #include "mythsystemevent.h"
 #include "mythlogging.h"
