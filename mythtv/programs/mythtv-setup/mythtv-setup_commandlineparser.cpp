@@ -1,7 +1,7 @@
 #include <QString>
 
 #include "mythcorecontext.h"
-#include "commandlineparser.h"
+#include "mythtv-setup_commandlineparser.h"
 
 MythTVSetupCommandLineParser::MythTVSetupCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHTV_SETUP)

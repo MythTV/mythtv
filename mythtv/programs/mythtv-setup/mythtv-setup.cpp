@@ -39,7 +39,7 @@
 #include "startprompt.h"
 #include "mythsystemevent.h"
 #include "expertsettingseditor.h"
-#include "commandlineparser.h"
+#include "mythtv-setup_commandlineparser.h"
 #include "profilegroup.h"
 #include "signalhandling.h"
 #include "mythmiscutil.h"
