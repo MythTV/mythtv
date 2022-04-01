@@ -22,7 +22,7 @@
 #include "tv_play.h"
 #include "compat.h"
 #include "mythtranslation.h"
-#include "commandlineparser.h"
+#include "mythlcdserver_commandlineparser.h"
 #include "signalhandling.h"
 
 #include "lcdserver.h"
