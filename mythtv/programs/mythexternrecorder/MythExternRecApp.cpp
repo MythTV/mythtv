@@ -20,7 +20,7 @@
 
 #include <thread>
 #include <csignal>
-#include "commandlineparser.h"
+#include "mythcommandlineparser.h"
 #include "MythExternRecApp.h"
 #include "mythchrono.h"
 
