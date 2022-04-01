@@ -22,7 +22,7 @@ extern "C" {
 }
 
 // mythutils headers
-#include "commandlineparser.h"
+#include "mythutil_commandlineparser.h"
 #include "musicmetautils.h"
 
 static int UpdateMeta(const MythUtilCommandLineParser &cmdline)

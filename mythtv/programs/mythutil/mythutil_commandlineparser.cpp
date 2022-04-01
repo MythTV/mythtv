@@ -2,7 +2,7 @@
 #include "mythcorecontext.h"
 
 // local headers
-#include "commandlineparser.h"
+#include "mythutil_commandlineparser.h"
 
 MythUtilCommandLineParser::MythUtilCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHUTIL)

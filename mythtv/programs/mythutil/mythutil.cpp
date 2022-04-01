@@ -17,7 +17,7 @@
 
 // Local includes
 #include "mythutil.h"
-#include "commandlineparser.h"
+#include "mythutil_commandlineparser.h"
 #include "backendutils.h"
 #include "eitutils.h"
 #include "fileutils.h"
