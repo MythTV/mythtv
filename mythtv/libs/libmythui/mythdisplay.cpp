@@ -1,3 +1,6 @@
+// Std
+#include <algorithm>
+
 //Qt
 #include <QTimer>
 #include <QThread>
@@ -1166,7 +1169,7 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
     if (qEnvironmentVariableIsSet("MYTHTV_DEPTH"))
     {
         // Note: Don't set depth and stencil to give Qt as much flexibility as possible
-        int depth = qBound(6, qEnvironmentVariableIntValue("MYTHTV_DEPTH"), 16);
+        int depth = std::clamp(qEnvironmentVariableIntValue("MYTHTV_DEPTH"), 6, 16);
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Trying to force depth to '%1'").arg(depth));
         format.setRedBufferSize(depth);
     }

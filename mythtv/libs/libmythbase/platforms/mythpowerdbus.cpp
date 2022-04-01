@@ -4,6 +4,7 @@
 
 // Std
 #include <unistd.h>
+#include <algorithm>
 
 #define LOC QString("PowerDBus: ")
 
@@ -246,7 +247,7 @@ bool MythPowerDBus::UpdateStatus(void)
     // NB we don't care about user preference here. We are giving
     // MythTV interested components an opportunity to cleanup before
     // an externally initiated shutdown/suspend
-    auto delay = qBound(0s, m_maxRequestedDelay, m_maxSupportedDelay);
+    auto delay = std::clamp(m_maxRequestedDelay, 0s, m_maxSupportedDelay);
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Trying to delay system %1 for %2 seconds")
         .arg(FeatureToString(feature)).arg(delay.count()));
     m_delayTimer.start(delay);

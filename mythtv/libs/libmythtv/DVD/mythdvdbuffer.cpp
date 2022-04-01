@@ -1991,9 +1991,9 @@ void MythDVDBuffer::GuessPalette(uint32_t *RGBAPalette, const PaletteArray Palet
         uint y  = (yuv >> 16) & 0xff;
         uint cr = (yuv >> 8) & 0xff;
         uint cb = (yuv >> 0) & 0xff;
-        uint r  = qBound(0U, uint(y + 1.4022 * (cr - 128)), 0xFFU);
-        uint b  = qBound(0U, uint(y + 1.7710 * (cb - 128)), 0xFFU);
-        uint g  = qBound(0U, uint(1.7047 * y - (0.1952 * b) - (0.5647 * r)), 0xFFU);
+        uint r  = std::clamp(uint(y + 1.4022 * (cr - 128)), 0U, 0xFFU);
+        uint b  = std::clamp(uint(y + 1.7710 * (cb - 128)), 0U, 0xFFU);
+        uint g  = std::clamp(uint(1.7047 * y - (0.1952 * b) - (0.5647 * r)), 0U, 0xFFU);
         RGBAPalette[i] = ((Alpha[i] * 17U) << 24) | (r << 16 )| (g << 8) | b;
     }
 }
