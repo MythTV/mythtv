@@ -24,7 +24,7 @@
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "mythversion.h"
-#include "commandlineparser.h"
+#include "mythscreenwizard_commandlineparser.h"
 #include "compat.h"
 #include "mythsystemevent.h"
 #include "mythlogging.h"
