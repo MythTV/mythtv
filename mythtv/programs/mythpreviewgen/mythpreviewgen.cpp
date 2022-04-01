@@ -33,7 +33,7 @@
 #include "programinfo.h"
 #include "dbcheck.h"
 #include "previewgenerator.h"
-#include "commandlineparser.h"
+#include "mythpreviewgen_commandlineparser.h"
 #include "mythsystemevent.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
