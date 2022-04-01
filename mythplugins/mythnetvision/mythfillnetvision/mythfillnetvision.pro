@@ -15,6 +15,6 @@ INSTALLS = target
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-SOURCES += main.cpp
+SOURCES += mythfillnetvision.cpp
 
 include ( ../../libs-targetfix.pro )
