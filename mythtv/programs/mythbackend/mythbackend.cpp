@@ -22,7 +22,7 @@
 #endif
 
 #include "signalhandling.h"
-#include "commandlineparser.h"
+#include "mythbackend_commandlineparser.h"
 #include "scheduledrecording.h"
 #include "previewgenerator.h"
 #include "mythcorecontext.h"

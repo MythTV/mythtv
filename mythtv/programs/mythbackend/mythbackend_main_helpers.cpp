@@ -43,7 +43,7 @@
 #include "dbcheck.h"
 #include "jobqueue.h"
 #include "previewgenerator.h"
-#include "commandlineparser.h"
+#include "mythbackend_commandlineparser.h"
 #include "mythsystemevent.h"
 #include "mythbackend_main_helpers.h"
 #include "backendcontext.h"

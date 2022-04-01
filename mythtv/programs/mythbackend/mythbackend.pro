@@ -27,7 +27,7 @@ HEADERS += autoexpire.h encoderlink.h filetransfer.h httpstatus.h mainserver.h
 HEADERS += playbacksock.h scheduler.h backendhousekeeper.h
 HEADERS += upnpcdstv.h upnpcdsmusic.h upnpcdsvideo.h mediaserver.h
 HEADERS += internetContent.h mythbackend_main_helpers.h backendcontext.h
-HEADERS += httpconfig.h mythsettings.h commandlineparser.h
+HEADERS += httpconfig.h mythsettings.h mythbackend_commandlineparser.h
 HEADERS += recordingextender.h
 
 HEADERS += serviceHosts/mythServiceHost.h    serviceHosts/guideServiceHost.h
@@ -46,7 +46,7 @@ SOURCES += mythbackend.cpp mainserver.cpp playbacksock.cpp scheduler.cpp
 SOURCES += backendhousekeeper.cpp
 SOURCES += upnpcdstv.cpp upnpcdsmusic.cpp upnpcdsvideo.cpp mediaserver.cpp
 SOURCES += internetContent.cpp mythbackend_main_helpers.cpp backendcontext.cpp
-SOURCES += httpconfig.cpp mythsettings.cpp commandlineparser.cpp
+SOURCES += httpconfig.cpp mythsettings.cpp mythbackend_commandlineparser.cpp
 SOURCES += recordingextender.cpp
 
 SOURCES += services/myth.cpp services/guide.cpp services/content.cpp 
