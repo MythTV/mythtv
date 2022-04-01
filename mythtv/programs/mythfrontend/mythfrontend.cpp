@@ -69,7 +69,7 @@
 #include "lcddevice.h"
 #include "langsettings.h"
 #include "mythtranslation.h"
-#include "commandlineparser.h"
+#include "mythfrontend_commandlineparser.h"
 #include "tvremoteutil.h"
 #include "channelutil.h"
 
