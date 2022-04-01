@@ -1,7 +1,7 @@
 #include <QString>
 
 #include "mythcorecontext.h"
-#include "commandlineparser.h"
+#include "mythfilerecorder_commandlineparser.h"
 
 MythFileRecorderCommandLineParser::MythFileRecorderCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHAVTEST)
