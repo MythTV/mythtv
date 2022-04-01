@@ -41,7 +41,7 @@
 #include "jobqueue.h"
 #include "remoteencoder.h"
 #include "io/mythmediabuffer.h"
-#include "commandlineparser.h"
+#include "mythcommflag_commandlineparser.h"
 #include "mythtranslation.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
