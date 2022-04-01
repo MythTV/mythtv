@@ -19,7 +19,7 @@
 #include "tvremoteutil.h"
 #include "compat.h"
 #include "mythlogging.h"
-#include "commandlineparser.h"
+#include "mythshutdown_commandlineparser.h"
 #include "programinfo.h"
 #include "signalhandling.h"
 
