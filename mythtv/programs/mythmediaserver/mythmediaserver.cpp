@@ -20,7 +20,7 @@
 #include "mythlogging.h"
 #include "mythversion.h"
 #include "mythsystemevent.h"
-#include "commandlineparser.h"
+#include "mythmediaserver_commandlineparser.h"
 #include "signalhandling.h"
 #include "cleanupguard.h"
 

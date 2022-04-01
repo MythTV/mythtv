@@ -1,7 +1,7 @@
 #include <QString>
 
 #include "mythcorecontext.h"
-#include "commandlineparser.h"
+#include "mythmediaserver_commandlineparser.h"
 
 MythMediaServerCommandLineParser::MythMediaServerCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHMEDIASERVER)
