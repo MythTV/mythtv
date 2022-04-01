@@ -47,7 +47,7 @@ HEADERS += importsettings.h playersettings.h ratingsettings.h
 HEADERS += remoteavformatcontext.h lyricsview.h
 
 SOURCES += decoder.cpp
-SOURCES += flacencoder.cpp main.cpp
+SOURCES += flacencoder.cpp mythmusic.cpp
 SOURCES += mainvisual.cpp playlist.cpp
 SOURCES += encoder.cpp musicdbcheck.cpp
 SOURCES += synaesthesia.cpp lameencoder.cpp
