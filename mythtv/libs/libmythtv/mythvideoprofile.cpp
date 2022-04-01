@@ -368,7 +368,7 @@ QString MythVideoProfile::GetUpscaler() const
 
 uint MythVideoProfile::GetMaxCPUs() const
 {
-    return qBound(1U, GetPreference(PREF_CPUS).toUInt(), VIDEO_MAX_CPUS);
+    return std::clamp(GetPreference(PREF_CPUS).toUInt(), 1U, VIDEO_MAX_CPUS);
 }
 
 bool MythVideoProfile::IsSkipLoopEnabled() const
@@ -454,7 +454,7 @@ void MythVideoProfile::LoadBestPreferences(const QSize Size, float Framerate,
     }
     else
     {
-        int threads = qBound(1, QThread::idealThreadCount(), 4);
+        int threads = std::clamp(QThread::idealThreadCount(), 1, 4);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "No useable profile. Using defaults.");
         SetPreference(PREF_DEC,    "ffmpeg");
         SetPreference(PREF_CPUS,   QString::number(threads));
