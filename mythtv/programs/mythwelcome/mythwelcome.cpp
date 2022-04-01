@@ -9,7 +9,7 @@
 #include "exitcodes.h"
 #include "compat.h"
 #include "lcddevice.h"
-#include "commandlineparser.h"
+#include "mythwelcome_commandlineparser.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
 #include "mythdisplay.h"
