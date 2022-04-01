@@ -1,4 +1,4 @@
-#include "commandlineparser.h"
+#include "mythccextractor_commandlineparser.h"
 #include "mythcorecontext.h"
 
 MythCCExtractorCommandLineParser::MythCCExtractorCommandLineParser() :

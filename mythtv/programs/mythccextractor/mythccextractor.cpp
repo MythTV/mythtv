@@ -12,7 +12,7 @@
 
 // MythTV headers
 #include "mythccextractorplayer.h"
-#include "commandlineparser.h"
+#include "mythccextractor_commandlineparser.h"
 #include "mythcontext.h"
 #include "mythversion.h"
 #include "programinfo.h"
