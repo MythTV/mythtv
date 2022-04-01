@@ -20,7 +20,7 @@
 #include "mythconfig.h"
 
 // libmythtv headers
-#include "commandlineparser.h"
+#include "mythfilldatabase_commandlineparser.h"
 #include "scheduledrecording.h"
 #include "mythmiscutil.h"
 #include "remoteutil.h"

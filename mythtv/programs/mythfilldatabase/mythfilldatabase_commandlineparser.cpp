@@ -1,7 +1,7 @@
 #include <QString>
 
 #include "mythcorecontext.h"
-#include "commandlineparser.h"
+#include "mythfilldatabase_commandlineparser.h"
 
 MythFillDatabaseCommandLineParser::MythFillDatabaseCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHFILLDATABASE)
