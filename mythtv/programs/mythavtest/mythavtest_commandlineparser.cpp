@@ -3,7 +3,7 @@
 
 // MythTV
 #include "mythcorecontext.h"
-#include "commandlineparser.h"
+#include "mythavtest_commandlineparser.h"
 
 MythAVTestCommandLineParser::MythAVTestCommandLineParser()
   : MythCommandLineParser(MYTH_APPNAME_MYTHAVTEST)

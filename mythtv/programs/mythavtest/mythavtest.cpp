@@ -11,7 +11,7 @@
 
 #include "tv_play.h"
 #include "programinfo.h"
-#include "commandlineparser.h"
+#include "mythavtest_commandlineparser.h"
 #include "mythplayerui.h"
 #include "jitterometer.h"
 
