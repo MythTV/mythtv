@@ -24,7 +24,7 @@
 #include "remotefile.h"
 #include "mythtranslation.h"
 #include "mythlogging.h"
-#include "commandlineparser.h"
+#include "mythtranscode_commandlineparser.h"
 #include "recordinginfo.h"
 #include "signalhandling.h"
 #include "HLS/httplivestream.h"

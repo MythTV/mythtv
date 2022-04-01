@@ -1,7 +1,7 @@
 #include <QString>
 
 #include "mythcorecontext.h"
-#include "commandlineparser.h"
+#include "mythtranscode_commandlineparser.h"
 
 MythTranscodeCommandLineParser::MythTranscodeCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHTRANSCODE)
