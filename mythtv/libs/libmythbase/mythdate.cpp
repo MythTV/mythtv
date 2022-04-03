@@ -1,6 +1,7 @@
 #include <QtGlobal>
 #include <QCoreApplication>
 #include <QRegularExpression>
+#include <array>
 
 #include "mythcorecontext.h"
 #include "mythdate.h"
