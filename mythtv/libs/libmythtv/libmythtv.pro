@@ -108,6 +108,7 @@ HEADERS += mythframe.h
 
 # Misc. needed by backend/frontend
 HEADERS += mythtvexp.h
+HEADERS += bitreader.h
 HEADERS += bytereader.h
 HEADERS += recordinginfo.h
 HEADERS += dbcheck.h
