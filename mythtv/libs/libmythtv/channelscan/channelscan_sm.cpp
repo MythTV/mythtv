@@ -162,6 +162,7 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *scan_monitor,
       m_analogSignalHandler(new AnalogSignalHandler(this))
 {
     m_current = m_scanTransports.end();
+    m_scanDTVTunerType = GuessDTVTunerType(DTVTunerType(DTVTunerType::kTunerTypeUnknown));
 
     // Create a stream data for digital signal monitors
     DTVSignalMonitor* dtvSigMon = GetDTVSignalMonitor();
@@ -1825,7 +1826,7 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
 
     uint cardid = m_channel->GetInputID();
 
-    DTVTunerType tuner_type(DTVTunerType::kTunerTypeATSC);
+    DTVTunerType tuner_type;
     tuner_type = GuessDTVTunerType(tuner_type);
 
     for (const auto & it : qAsConst(m_channelList))
