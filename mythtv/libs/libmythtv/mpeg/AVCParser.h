@@ -132,10 +132,10 @@ class AVCParser : public H2645Parser
     void processRBSP(bool rbsp_complete);
 
   private:
-    bool decode_Header(GetBitContext *gb);
-    void decode_SPS(GetBitContext *gb);
-    void decode_PPS(GetBitContext * gb);
-    void decode_SEI(GetBitContext * gb);
+    bool decode_Header(BitReader& br);
+    void decode_SPS(BitReader& br);
+    void decode_PPS(BitReader& br);
+    void decode_SEI(BitReader& br);
 
 
     int        m_deltaPicOrderCntBottom      {0};
