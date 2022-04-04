@@ -257,14 +257,14 @@ class HEVCParser : public H2645Parser
   protected:
     bool newAU(void);
     void processRBSP(bool rbsp_complete);
-    bool profileTierLevel(GetBitContext *gb,
+    bool profileTierLevel(BitReader& br,
                           bool profilePresentFlag,
                           int maxNumSubLayersMinus1);
-    bool parseSliceSegmentLayer(GetBitContext *gb);
-    bool parseSliceSegmentHeader(GetBitContext *gb);
-    bool parseSPS(GetBitContext *gb);
-    bool parseVPS(GetBitContext *gb);
-    bool parsePPS(GetBitContext *gb);
+    bool parseSliceSegmentLayer(BitReader& br);
+    bool parseSliceSegmentHeader(BitReader& br);
+    bool parseSPS(BitReader& br);
+    bool parseVPS(BitReader& br);
+    bool parsePPS(BitReader& br);
 
   private:
     uint32_t m_maxPicOrderCntLsb          {0};

@@ -5,18 +5,13 @@
 #include "libmythbase/mythlogging.h"
 #include "recorders/dtvrecorder.h" // for FrameRate
 
-
-extern "C" {
-#include "libavcodec/avcodec.h"
-#include "libavutil/internal.h"
-#include "libavcodec/golomb.h"
-}
-
 #include <cmath>
 #include <strings.h>
 
-static const QString LOC { QStringLiteral("HEVCParser ") };
+#include "bitreader.h"
 #include "bytereader.h"
+
+static const QString LOC { QStringLiteral("HEVCParser ") };
 
 /*
   References:
@@ -461,8 +456,7 @@ bool HEVCParser::newAU(void)
 
 void HEVCParser::processRBSP(bool rbsp_complete)
 {
-    GetBitContext gb;
-    init_get_bits(&gb, m_rbspBuffer, 8 * m_rbspIndex);
+    auto br = BitReader(m_rbspBuffer, m_rbspIndex);
 
     if (m_nalUnitType == SPS_NUT ||
         m_nalUnitType == VPS_NUT ||
@@ -476,11 +470,11 @@ void HEVCParser::processRBSP(bool rbsp_complete)
             m_spsOffset = m_pktOffset;
 
         if (m_nalUnitType == SPS_NUT)
-            parseSPS(&gb);
+            parseSPS(br);
         else if (m_nalUnitType == VPS_NUT)
-            parseVPS(&gb);
+            parseVPS(br);
         else if (NALisVCL(m_nalUnitType))
-            parseSliceSegmentLayer(&gb);
+            parseSliceSegmentLayer(br);
     }
 
     /* If we got this far, we managed to parse a sufficient
@@ -579,7 +573,7 @@ void HEVCParser::processRBSP(bool rbsp_complete)
                   sub_layer_profile_space[ i + 1 ] of the same
                   profile_tier_level( ) syntax structure.
 */
-bool HEVCParser::profileTierLevel(GetBitContext *gb,
+bool HEVCParser::profileTierLevel(BitReader& br,
                                   bool profilePresentFlag,
                                   int  maxNumSubLayersMinus1)
 {
@@ -587,11 +581,11 @@ bool HEVCParser::profileTierLevel(GetBitContext *gb,
 
     if (profilePresentFlag)
     {
-        get_bits(gb, 2); // general_profile_space u(2);
-        get_bits1(gb);   // general_tier_flag u(1)
-        get_bits(gb, 5); // general_profile_idc u(5);
+        br.get_bits(2); // general_profile_space u(2);
+        br.get_bits(1); // general_tier_flag u(1)
+        br.get_bits(5); // general_profile_idc u(5);
         for (int j = 0; j < 32; ++j)
-            get_bits1(gb); // general_profile_compatibility_flag[j] u(1);
+            br.get_bits(1); // general_profile_compatibility_flag[j] u(1);
 
         /*
           general_progressive_source_flag and
@@ -628,16 +622,16 @@ bool HEVCParser::profileTierLevel(GetBitContext *gb,
                    values of general_progressive_source_flag and
                    general_interlaced_source_flag is unspecified.
         */
-        bool general_progressive_source_flag = get_bits1(gb); // u(1)
-        bool general_interlaced_source_flag  = get_bits1(gb); // u(1)
+        bool general_progressive_source_flag = br.get_bits(1); // u(1)
+        bool general_interlaced_source_flag  = br.get_bits(1); // u(1)
         if (!general_progressive_source_flag &&
             general_interlaced_source_flag)
             m_scanType = SCAN_t::INTERLACED;
         else
             m_scanType = SCAN_t::PROGRESSIVE;
 
-        get_bits1(gb); // general_non_packed_constraint_flag u(1)
-        get_bits1(gb); // general_frame_only_constraint_flag u(1)
+        br.get_bits(1); // general_non_packed_constraint_flag u(1)
+        br.get_bits(1); // general_frame_only_constraint_flag u(1)
 
 #if 0
         /* The number of bits in this syntax structure is not
@@ -659,15 +653,15 @@ bool HEVCParser::profileTierLevel(GetBitContext *gb,
             general_profile_idc == 11 ||
             general_profile_compatibility_flag[11])
         {
-            get_bits1(gb); //general_max_12bit_constraint_flag u(1)
-            get_bits1(gb); //general_max_10bit_constraint_flag u(1)
-            get_bits1(gb); //general_max_8bit_constraint_flag u(1)
-            get_bits1(gb); //general_max_422chroma_constraint_flag u(1)
-            get_bits1(gb); //general_max_420chroma_constraint_flag u(1)
-            get_bits1(gb); //general_max_monochrome_constraint_flag u(1)
-            get_bits1(gb); //general_intra_constraint_flag u(1)
-            get_bits1(gb); //general_one_picture_only_constraint_flag u(1)
-            get_bits1(gb); //general_lower_bit_rate_constraint_flag u(1)
+            br.get_bits(1); //general_max_12bit_constraint_flag u(1)
+            br.get_bits(1); //general_max_10bit_constraint_flag u(1)
+            br.get_bits(1); //general_max_8bit_constraint_flag u(1)
+            br.get_bits(1); //general_max_422chroma_constraint_flag u(1)
+            br.get_bits(1); //general_max_420chroma_constraint_flag u(1)
+            br.get_bits(1); //general_max_monochrome_constraint_flag u(1)
+            br.get_bits(1); //general_intra_constraint_flag u(1)
+            br.get_bits(1); //general_one_picture_only_constraint_flag u(1)
+            br.get_bits(1); //general_lower_bit_rate_constraint_flag u(1)
 
             if (general_profile_idc == 5 ||
                 general_profile_compatibility_flag[5] ||
@@ -678,37 +672,37 @@ bool HEVCParser::profileTierLevel(GetBitContext *gb,
                 general_profile_idc == 11 ||
                 general_profile_compatibility_flag[11])
             {
-                get_bits1(gb); //general_max_14bit_constraint_flag u(1)
+                br.get_bits(1); //general_max_14bit_constraint_flag u(1)
                 // general_reserved_zero_33bits
-                skip_bits(gb, 16); // bits[0..15]
-                skip_bits(gb, 16); // bits[16..31]
-                skip_bits(gb, 1); // bits[32]
+                br.skip_bits(16); // bits[0..15]
+                br.skip_bits(16); // bits[16..31]
+                br.skip_bits(1);  // bits[32]
             }
             else
             {
                 // general_reserved_zero_34bits u(34);
-                skip_bits(gb, 16); // bits[0..15]
-                skip_bits(gb, 16); // bits[16..31]
-                skip_bits(gb, 2); // bits[32..33]
+                br.skip_bits(16); // bits[0..15]
+                br.skip_bits(16); // bits[16..31]
+                br.skip_bits(2);  // bits[32..33]
             }
         }
         else if (general_profile_idc == 2 ||
                  general_profile_compatibility_flag[2])
         {
-            get_bits(gb, 7); // general_reserved_zero_7bits u(7);
-            get_bits1(gb);   //general_one_picture_only_constraint_flag u(1)
+            br.get_bits(7);   // general_reserved_zero_7bits u(7);
+            br.get_bits(1);   //general_one_picture_only_constraint_flag u(1)
             // general_reserved_zero_35bits u(35);
-            skip_bits(gb, 16); // bits[0..15]
-            skip_bits(gb, 16); // bits[16..31]
-            skip_bits(gb, 3); // bits[32..34]
+            br.skip_bits(16); // bits[0..15]
+            br.skip_bits(16); // bits[16..31]
+            br.skip_bits(3);  // bits[32..34]
         }
         else
 #endif
         {
             // general_reserved_zero_43bits
-            skip_bits(gb, 16); // bits[0..15]
-            skip_bits(gb, 16); // bits[16..31]
-            skip_bits(gb, 11); // bits[32..42]
+            br.skip_bits(16); // bits[0..15]
+            br.skip_bits(16); // bits[16..31]
+            br.skip_bits(11); // bits[32..42]
         }
 
 #if 0
@@ -728,13 +722,13 @@ bool HEVCParser::profileTierLevel(GetBitContext *gb,
             general_profile_compatibility_flag[9] ||
             general_profile_idc == 11 ||
             general_profile_compatibility_flag[11])
-            get_bits1(gb); //general_inbld_flag u(1)
+            br.get_bits(1); //general_inbld_flag u(1)
         else
 #endif
-            get_bits1(gb); //general_reserved_zero_bit u(1)
+            br.get_bits(1); //general_reserved_zero_bit u(1)
     }
 
-    get_bits(gb, 8); // general_level_idc u(8);
+    br.get_bits(8); // general_level_idc u(8);
 
     /*
        sub_layer_profile_present_flag[i] equal to 1, specifies that
@@ -752,31 +746,31 @@ bool HEVCParser::profileTierLevel(GetBitContext *gb,
     std::vector<bool> sub_layer_level_present_flag;
     for (i = 0; i < maxNumSubLayersMinus1; ++i)
     {
-        sub_layer_profile_present_flag.push_back(get_bits1(gb)); // u(1)
-        sub_layer_level_present_flag.push_back(get_bits1(gb)); // u(1)
+        sub_layer_profile_present_flag.push_back(br.get_bits(1)); // u(1)
+        sub_layer_level_present_flag.push_back(  br.get_bits(1)); // u(1)
     }
 
     if (maxNumSubLayersMinus1 > 0)
     {
         for (i = maxNumSubLayersMinus1; i < 8; ++i)
-            get_bits(gb, 2); // reserved_zero_2bits[i] u(2);
+            br.get_bits(2); // reserved_zero_2bits[i] u(2);
     }
 
     for (i = 0; i < maxNumSubLayersMinus1; ++i)
     {
         if (sub_layer_profile_present_flag[i])
         {
-            get_bits(gb, 2); // sub_layer_profile_space[i] u(2);
-            get_bits1(gb); //sub_layer_tier_flag[i] u(1)
-            get_bits(gb, 5); // sub_layer_profile_idc[i] u(5);
+            br.get_bits(2); // sub_layer_profile_space[i] u(2);
+            br.get_bits(1); // sub_layer_tier_flag[i]     u(1)
+            br.get_bits(5); // sub_layer_profile_idc[i]   u(5);
 
             for (int j = 0; j < 32; ++j)
-                get_bits1(gb); //sub_layer_profile_compatibility_flag[i][j] u(1)
+                br.get_bits(1); //sub_layer_profile_compatibility_flag[i][j] u(1)
 
-            get_bits1(gb); //sub_layer_progressive_source_flag[i] u(1)
-            get_bits1(gb); //sub_layer_interlaced_source_flag[i] u(1)
-            get_bits1(gb); //sub_layer_non_packed_constraint_flag[i] u(1)
-            get_bits1(gb); //sub_layer_frame_only_constraint_flag[i] u(1)
+            br.get_bits(1); //sub_layer_progressive_source_flag[i]    u(1)
+            br.get_bits(1); //sub_layer_interlaced_source_flag[i]     u(1)
+            br.get_bits(1); //sub_layer_non_packed_constraint_flag[i] u(1)
+            br.get_bits(1); //sub_layer_frame_only_constraint_flag[i] u(1)
 
 #if 0
             /* The number of bits in this syntax structure is not
@@ -798,15 +792,15 @@ bool HEVCParser::profileTierLevel(GetBitContext *gb,
                 sub_layer_profile_idc[i] == 11 ||
                 sub_layer_profile_compatibility_flag[i][11])
             {
-                get_bits1(gb); //sub_layer_max_12bit_constraint_flag[i] u(1)
-                get_bits1(gb); //sub_layer_max_10bit_constraint_flag[i] u(1)
-                get_bits1(gb); //sub_layer_max_8bit_constraint_flag[i] u(1)
-                get_bits1(gb); //sub_layer_max_422chroma_constraint_flag[i] u(1)
-                get_bits1(gb); //sub_layer_max_420chroma_constraint_flag[i] u(1)
-                get_bits1(gb); //sub_layer_max_monochrome_constraint_flag[i] u(1)
-                get_bits1(gb); //sub_layer_intra_constraint_flag[i] u(1)
-                get_bits1(gb); //sub_layer_one_picture_only_constraint_flag[i] u(1)
-                get_bits1(gb); //sub_layer_lower_bit_rate_constraint_flag[i] u(1)
+                br.get_bits(1); //sub_layer_max_12bit_constraint_flag[i] u(1)
+                br.get_bits(1); //sub_layer_max_10bit_constraint_flag[i] u(1)
+                br.get_bits(1); //sub_layer_max_8bit_constraint_flag[i] u(1)
+                br.get_bits(1); //sub_layer_max_422chroma_constraint_flag[i] u(1)
+                br.get_bits(1); //sub_layer_max_420chroma_constraint_flag[i] u(1)
+                br.get_bits(1); //sub_layer_max_monochrome_constraint_flag[i] u(1)
+                br.get_bits(1); //sub_layer_intra_constraint_flag[i] u(1)
+                br.get_bits(1); //sub_layer_one_picture_only_constraint_flag[i] u(1)
+                br.get_bits(1); //sub_layer_lower_bit_rate_constraint_flag[i] u(1)
                 if (sub_layer_profile_idc[i] == 5 ||
                     sub_layer_profile_compatibility_flag[i][5] ||
                     sub_layer_profile_idc[i] == 9 ||
@@ -816,37 +810,37 @@ bool HEVCParser::profileTierLevel(GetBitContext *gb,
                     sub_layer_profile_idc[i] == 11 ||
                     sub_layer_profile_compatibility_flag[i][11])
                 {
-                    get_bits1(gb); //sub_layer_max_14bit_constraint_flag[i] u(1)
+                    br.get_bits(1); //sub_layer_max_14bit_constraint_flag[i] u(1)
                     // sub_layer_reserved_zero_33bits[i] u(33);
-                    skip_bits(gb, 16); // bits[0..15]
-                    skip_bits(gb, 16); // bits[16..31]
-                    skip_bits(gb, 1); // bits[32..32]
+                    br.skip_bits(16); // bits[ 0..15]
+                    br.skip_bits(16); // bits[16..31]
+                    br.skip_bits( 1); // bits[32..32]
                 }
                 else
                 {
                     // sub_layer_reserved_zero_34bits[i] u(34);
-                    skip_bits(gb, 16); // bits[0..15]
-                    skip_bits(gb, 16); // bits[16..31]
-                    skip_bits(gb, 2); // bits[32..33]
+                    br.skip_bits(16); // bits[ 0..15]
+                    br.skip_bits(16); // bits[16..31]
+                    br.skip_bits( 2); // bits[32..33]
                 }
             }
             else if(sub_layer_profile_idc[i] == 2 ||
                      sub_layer_profile_compatibility_flag[i][2])
             {
-                get_bits(gb, 7); // sub_layer_reserved_zero_7bits[i] u(7);
-                get_bits1(gb); //sub_layer_one_picture_only_constraint_flag[i] u(1)
+                br.get_bits(7); // sub_layer_reserved_zero_7bits[i] u(7);
+                br.get_bits(1); // sub_layer_one_picture_only_constraint_flag[i] u(1)
                 // sub_layer_reserved_zero_35bits[i] u(35);
-                skip_bits(gb, 16); // bits[0..15]
-                skip_bits(gb, 16); // bits[16..31]
-                skip_bits(gb, 3);  // bits[32..34]
+                br.skip_bits(16); // bits[ 0..15]
+                br.skip_bits(16); // bits[16..31]
+                br.skip_bits( 3); // bits[32..34]
             }
             else
 #endif
             {
                 // sub_layer_reserved_zero_43bits[i] u(43);
-                skip_bits(gb, 16); // bits[0..15]
-                skip_bits(gb, 16); // bits[16..31]
-                skip_bits(gb, 12); // bits[32..43]
+                br.skip_bits(16); // bits[ 0..15]
+                br.skip_bits(16); // bits[16..31]
+                br.skip_bits(12); // bits[32..43]
             }
 
 #if 0
@@ -867,14 +861,14 @@ bool HEVCParser::profileTierLevel(GetBitContext *gb,
                 sub_layer_profile_idc[i] == 11 ||
                 sub_layer_profile_compatibility_flag[i][11])
 
-                get_bits1(gb); //sub_layer_inbld_flag[i] u(1)
+                br.get_bits(1); //sub_layer_inbld_flag[i] u(1)
             else
 #endif
-                get_bits1(gb); //sub_layer_reserved_zero_bit[i] u(1)
+                br.get_bits(1); //sub_layer_reserved_zero_bit[i] u(1)
         }
 
         if (sub_layer_level_present_flag[i])
-            get_bits(gb, 8); // sub_layer_level_idc[i] u(8);
+            br.get_bits(8); // sub_layer_level_idc[i] u(8);
     }
 
     return true;
@@ -917,7 +911,7 @@ static bool getScalingListParams(uint8_t sizeId, uint8_t matrixId,
   7.3.4 Scaling list data syntax
   We dont' need any of this data. We just need to get past the bits.
 */
-static bool scalingListData(GetBitContext * gb,
+static bool scalingListData(BitReader& br,
                             HEVCParser::ScalingList & dest_scaling_list,
                             bool use_default)
 {
@@ -961,9 +955,9 @@ static bool scalingListData(GetBitContext * gb,
             }
             else
             {
-                if (!get_bits1(gb)) // scaling_list_pred_mode_flag u(1)
+                if (!br.get_bits(1)) // scaling_list_pred_mode_flag u(1)
                 {
-                    get_ue_golomb(gb); // scaling_list_pred_matrix_id_delta ue(v)
+                    br.get_ue_golomb(); // scaling_list_pred_matrix_id_delta ue(v)
 #if 0 // Unneeded
                     if (!scaling_list_pred_matrix_id_delta)
                     {
@@ -1011,7 +1005,7 @@ static bool scalingListData(GetBitContext * gb,
                     if (sizeId > 1)
                     {
 //                        scaling_list_dc_coef_minus8[matrixId] =
-                        get_se_golomb(gb); // se(v)
+                        br.get_se_golomb(); // se(v)
 #if 0 // Unneeded
                         if (scaling_list_dc_coef_minus8[matrixId] < -7 ||
                             247 < scaling_list_dc_coef_minus8[matrixId])
@@ -1028,7 +1022,7 @@ static bool scalingListData(GetBitContext * gb,
 
                     for (uint8_t i = 0; i < size; ++i)
                     {
-                        get_se_golomb(gb); // scaling_list_delta_coef  se(v)
+                        br.get_se_golomb(); // scaling_list_delta_coef  se(v)
 #if 0 // Unneeded
                         if (scaling_list_delta_coef < -128 ||
                             scaling_list_delta_coef > 127)
@@ -1055,7 +1049,7 @@ static bool scalingListData(GetBitContext * gb,
   7.3.7 Short-term reference picture set syntax
   We don't any of this data, but we have to get past the bits
 */
-static bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
+static bool shortTermRefPicSet(BitReader& br, int stRPSIdx,
                                int num_short_term_ref_pic_sets,
                                std::array<HEVCParser::ShortTermRefPicSet,65> & stRPS,
                                uint8_t max_dec_pic_buffering_minus1)
@@ -1074,7 +1068,7 @@ static bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
        inferred to be equal to 0.
     */
     bool inter_ref_pic_set_prediction_flag = (stRPSIdx != 0) ?
-                                             get_bits1(gb) : false; // u(1)
+                                             br.get_bits(1) : false; // u(1)
 
     if (inter_ref_pic_set_prediction_flag)
     {
@@ -1090,13 +1084,13 @@ static bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
           inferred to be equal to 0.
         */
         int delta_idx_minus1 = (stRPSIdx == num_short_term_ref_pic_sets) ?
-                               get_ue_golomb(gb) : 0; // ue(v)
+                               br.get_ue_golomb() : 0; // ue(v)
         if (delta_idx_minus1 > stRPSIdx - 1)
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 QString("Invalid delta_idx_minus1? %1").arg(delta_idx_minus1));
 
-        get_bits1(gb); // delta_rps_sign; u(1)
-        if (get_ue_golomb(gb) > 32767) // abs_delta_rps_minus1;  ue(v)
+        br.get_bits(1); // delta_rps_sign; u(1)
+        if (br.get_ue_golomb() > 32767) // abs_delta_rps_minus1;  ue(v)
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 QString("Invalid abs_delta_rps_minus1"));
 
@@ -1119,7 +1113,7 @@ static bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
               short-term RPS. When use_delta_flag[ j ] is not
               present, its value is inferred to be equal to 1.
             */
-            bool val = get_bits1(gb);
+            bool val = br.get_bits(1);
             use_delta_flag[j] = used_by_curr_pic_flag[j] ? val : true;
         }
 
@@ -1187,15 +1181,15 @@ static bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
     }
     else
     {
-        stRPS[stRPSIdx].NumNegativePics = std::min((uint8_t)get_ue_golomb(gb), // ue(v)
+        stRPS[stRPSIdx].NumNegativePics = std::min((uint8_t)br.get_ue_golomb(), // ue(v)
                                           max_dec_pic_buffering_minus1);
-        stRPS[stRPSIdx].NumPositivePics = std::min((uint8_t)get_ue_golomb(gb), // ue(v)
+        stRPS[stRPSIdx].NumPositivePics = std::min((uint8_t)br.get_ue_golomb(), // ue(v)
                                           max_dec_pic_buffering_minus1);
 
         for (i = 0; i < stRPS[stRPSIdx].NumNegativePics; ++i)
         {
-            delta_poc_s0_minus1[i] = get_ue_golomb(gb); // ue(v)
-            get_bits1(gb); // used_by_curr_pic_s0_flag[i]; u(1)
+            delta_poc_s0_minus1[i] = br.get_ue_golomb(); // ue(v)
+            br.get_bits(1); // used_by_curr_pic_s0_flag[i]; u(1)
 
             if (i == 0)
                 stRPS[stRPSIdx].DeltaPocS0[i] = -(delta_poc_s0_minus1[i] + 1);
@@ -1205,8 +1199,8 @@ static bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
         }
         for (i = 0; i < stRPS[stRPSIdx].NumPositivePics; ++i)
         {
-            delta_poc_s1_minus1[i] = get_ue_golomb(gb); // ue(v)
-            get_bits1(gb); // used_by_curr_pic_s1_flag[i]; u(1)
+            delta_poc_s1_minus1[i] = br.get_ue_golomb(); // ue(v)
+            br.get_bits(1); // used_by_curr_pic_s1_flag[i]; u(1)
 
             if (i == 0)
                 stRPS[stRPSIdx].DeltaPocS1[i] = delta_poc_s1_minus1[i] + 1;
@@ -1227,15 +1221,15 @@ static bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
 }
 
 /* 7.3.2.9 Slice segment layer RBSP syntax */
-bool HEVCParser::parseSliceSegmentLayer(GetBitContext *gb)
+bool HEVCParser::parseSliceSegmentLayer(BitReader& br)
 {
     if (!m_seenSPS)
         return false;
 
-    parseSliceSegmentHeader(gb);
+    parseSliceSegmentHeader(br);
 #if 0
-    slice_segment_data(gb);
-    rbsp_slice_segment_trailing_bits(gb);
+    slice_segment_data(br);
+    rbsp_slice_segment_trailing_bits(br);
 #endif
     return true;
 }
@@ -1244,18 +1238,18 @@ bool HEVCParser::parseSliceSegmentLayer(GetBitContext *gb)
    7.3.6.1 General slice segment header syntax
    All we are after is the pic order count
 */
-bool HEVCParser::parseSliceSegmentHeader(GetBitContext *gb)
+bool HEVCParser::parseSliceSegmentHeader(BitReader& br)
 {
     bool dependent_slice_segment_flag = false; // check!
 
-    m_firstSliceSegmentInPicFlag = get_bits1(gb);
+    m_firstSliceSegmentInPicFlag = br.get_bits(1);
 
     if (m_nalUnitType >= BLA_W_LP && m_nalUnitType <= RSV_IRAP_VCL23 )
     {
-        get_bits1(gb); // no_output_of_prior_pics_flag; u(1)
+        br.get_bits(1); // no_output_of_prior_pics_flag; u(1)
     }
 
-    int pps_id = get_ue_golomb(gb); // slice_pic_parameter_set_id; ue(v)
+    int pps_id = br.get_ue_golomb(); // slice_pic_parameter_set_id; ue(v)
     if (m_pps.find(pps_id) == m_pps.end())
     {
         LOG(VB_RECORD, LOG_DEBUG, LOC +
@@ -1270,7 +1264,7 @@ bool HEVCParser::parseSliceSegmentHeader(GetBitContext *gb)
     {
         if (pps->dependent_slice_segments_enabled_flag)
         {
-            dependent_slice_segment_flag = get_bits1(gb); // u(1)
+            dependent_slice_segment_flag = br.get_bits(1); // u(1)
         }
 
         /* Figure out how many bits are in the slice_segment_address */
@@ -1288,7 +1282,7 @@ bool HEVCParser::parseSliceSegmentHeader(GetBitContext *gb)
         uint address_size = ceil_log2(PicWidthInCtbsY *
                                       PicHeightInCtbsY);
 
-        get_bits(gb, address_size); // slice_segment_address u(v)
+        br.get_bits(address_size); // slice_segment_address u(v)
     }
 
     // CuQpDeltaVal = 0;
@@ -1296,16 +1290,16 @@ bool HEVCParser::parseSliceSegmentHeader(GetBitContext *gb)
     {
         for (int i = 0; i < pps->num_extra_slice_header_bits; ++i)
         {
-            get_bits1(gb); // slice_reserved_flag[i]; // u(1)
+            br.get_bits(1); // slice_reserved_flag[i]; // u(1)
         }
-        get_ue_golomb(gb); // slice_type; // ue(v)
+        br.get_ue_golomb(); // slice_type; // ue(v)
         if (pps->output_flag_present_flag)
         {
-            get_bits1(gb); // pic_output_flag; // u(1)
+            br.get_bits(); // pic_output_flag; // u(1)
         }
         if (sps->separate_colour_plane_flag)
         {
-            get_bits(gb, 2); // colour_plane_id; // u(2)
+            br.get_bits(2); // colour_plane_id; // u(2)
         }
         if (m_nalUnitType == IDR_W_RADL || m_nalUnitType == IDR_N_LP)
         {
@@ -1316,7 +1310,7 @@ bool HEVCParser::parseSliceSegmentHeader(GetBitContext *gb)
         else
         {
             uint16_t slice_pic_order_cnt_lsb =
-                get_bits(gb, sps->log2_max_pic_order_cnt_lsb); // u(v)
+                br.get_bits(sps->log2_max_pic_order_cnt_lsb); // u(v)
 
             /*
               8.1.3 Decoding process for a coded picture with
@@ -1405,66 +1399,66 @@ bool HEVCParser::parseSliceSegmentHeader(GetBitContext *gb)
             m_noRaslOutputFlag = false;
 
 #if 0 // We dont' need the rest
-            get_bit1(gb); // short_term_ref_pic_set_sps_flag; // u(1)
+            br.get_bits(1); // short_term_ref_pic_set_sps_flag; // u(1)
             if (!short_term_ref_pic_set_sps_flag)
             {
                 shortTermRefPicSet(num_short_term_ref_pic_sets);
             }
             else if(num_short_term_ref_pic_sets > 1)
             {
-                get_bits(gb, ); // short_term_ref_pic_set_idx; // u(v)
+                br.get_bits(??? ); // short_term_ref_pic_set_idx; // u(v)
             }
             if (long_term_ref_pics_present_flag)
             {
                 if (num_long_term_ref_pics_sps > 0)
                 {
-                    get_ue_golomb(gb); // num_long_term_sps; // ue(v)
+                    br.get_ue_golomb(); // num_long_term_sps; // ue(v)
                 }
-                get_ue_golomb(gb); // num_long_term_pics; // ue(v)
+                br.get_ue_golomb(); // num_long_term_pics; // ue(v)
                 for (i = 0; i < num_long_term_sps + num_long_term_pics; ++i)
                 {
                     if (i < num_long_term_sps)
                     {
                         if (num_long_term_ref_pics_sps > 1)
-                            get_bits(gb, ); // lt_idx_sps[i]; // u(v)
+                            br.get_bits(??? ); // lt_idx_sps[i]; // u(v)
                     }
                     else
                     {
                         poc_lsb_lt[i] =
-                            get_bits(gb, sps->Log2MaxPicOrderCntLsb); // u(v)
-                        get_bit1(gb); // used_by_curr_pic_lt_flag[i]; // u(1)
+                            br.get_bits(sps->Log2MaxPicOrderCntLsb); // u(v)
+                        br.get_bits(1); // used_by_curr_pic_lt_flag[i]; // u(1)
                     }
-                    get_bit1(gb); // delta_poc_msb_present_flag[i]; // u(1)
+                    br.get_bits(1); // delta_poc_msb_present_flag[i]; // u(1)
                     if (delta_poc_msb_present_flag[i])
                     {
-                        get_ue_golomb(gb); // delta_poc_msb_cycle_lt[i]; // ue(v)
+                        br.get_ue_golomb(); // delta_poc_msb_cycle_lt[i]; // ue(v)
                     }
                 }
             }
             if (sps_temporal_mvp_enabled_flag)
             {
-                get_bit1(gb); // slice_temporal_mvp_enabled_flag; // u(1)
+                br.get_bits(1); // slice_temporal_mvp_enabled_flag; // u(1)
             }
 #endif
         }
 #if 0 // We don't need the rest
         if (sample_adaptive_offset_enabled_flag)
         {
-            get_bit1(gb); // slice_sao_luma_flag; // u(1)
+            br.get_bits(1); // slice_sao_luma_flag; // u(1)
             if (ChromaArrayType != 0)
             {
-                get_bit1(gb); // slice_sao_chroma_flag; // u(1)
+                br.get_bits(1); // slice_sao_chroma_flag; // u(1)
             }
         }
         if (slice_type == P || slice_type == B)
         {
-            get_bit1(gb); // num_ref_idx_active_override_flag; // u(1)
+            br.get_bits(1); // num_ref_idx_active_override_flag; // u(1)
             if (num_ref_idx_active_override_flag)
             {
-                get_ue_golomb(gb); // num_ref_idx_l0_active_minus1; // ue(v)
+                br.get_ue_golomb(); // num_ref_idx_l0_active_minus1; // ue(v)
                 if (slice_type == B)
                 {
-                    get_ue_golomb(gb); // num_ref_idx_l1_active_minus1; // ue(v)
+                    br.get_ue_golomb(); // num_ref_idx_l1_active_minus1; // ue(v)
                 }
             }
             if (lists_modification_present_flag && NumPicTotalCurr > 1)
@@ -1472,25 +1466,25 @@ bool HEVCParser::parseSliceSegmentHeader(GetBitContext *gb)
                 ref_pic_lists_modification();
                 if (slice_type == B)
                 {
-                    get_bit1(gb); // mvd_l1_zero_flag; // u(1)
+                    br.get_bits(1); // mvd_l1_zero_flag; // u(1)
                 }
             }
             if (cabac_init_present_flag)
             {
-                get_bit1(gb); // cabac_init_flag; // u(1)
+                br.get_bits(1); // cabac_init_flag; // u(1)
             }
             if (slice_temporal_mvp_enabled_flag)
             {
                 if (slice_type == B)
                 {
-                    get_bit1(gb); // collocated_from_l0_flag; // u(1)
+                    br.get_bits(1); // collocated_from_l0_flag; // u(1)
                 }
                 if (( collocated_from_l0_flag &&
                       num_ref_idx_l0_active_minus1 > 0) ||
                     (!collocated_from_l0_flag &&
                      num_ref_idx_l1_active_minus1 > 0))
                 {
-                    get_ue_golomb(gb); // collocated_ref_idx; // ue(v)
+                    br.get_ue_golomb(); // collocated_ref_idx; // ue(v)
                 }
             }
             if ((weighted_pred_flag && slice_type == P) ||
@@ -1498,65 +1492,65 @@ bool HEVCParser::parseSliceSegmentHeader(GetBitContext *gb)
             {
                 pred_weight_table();
             }
-            get_ue_golomb(gb); // five_minus_max_num_merge_cand; // ue(v)
+            br.get_ue_golomb(); // five_minus_max_num_merge_cand; // ue(v)
             if (motion_vector_resolution_control_idc == 2)
             {
-                get_bit1(gb); // use_integer_mv_flag; // u(1)
+                br.get_bits(1); // use_integer_mv_flag; // u(1)
             }
         }
-        get_se_golomb(gb); // slice_qp_delta; //se(v)
+        br.get_se_golomb(); // slice_qp_delta; //se(v)
         if (pps_slice_chroma_qp_offsets_present_flag)
         {
-            get_se_golomb(gb); // slice_cb_qp_offset; //se(v)
-            get_se_golomb(gb); // slice_cr_qp_offset; //se(v)
+            br.get_se_golomb(); // slice_cb_qp_offset; //se(v)
+            br.get_se_golomb(); // slice_cr_qp_offset; //se(v)
         }
         if (pps_slice_act_qp_offsets_present_flag)
         {
-            get_se_golomb(gb); // slice_act_y_qp_offset; //se(v)
-            get_se_golomb(gb); // slice_act_cb_qp_offset; //se(v)
-            get_se_golomb(gb); // slice_act_cr_qp_offset; //se(v)
+            br.get_se_golomb(); // slice_act_y_qp_offset;  //se(v)
+            br.get_se_golomb(); // slice_act_cb_qp_offset; //se(v)
+            br.get_se_golomb(); // slice_act_cr_qp_offset; //se(v)
         }
         if (chroma_qp_offset_list_enabled_flag)
         {
-            get_bit1(gb); // cu_chroma_qp_offset_enabled_flag; // u(1)
+            br.get_bits(1); // cu_chroma_qp_offset_enabled_flag; // u(1)
         }
         if (deblocking_filter_override_enabled_flag)
         {
-            get_bit1(gb); // deblocking_filter_override_flag; // u(1)
+            br.get_bits(1); // deblocking_filter_override_flag; // u(1)
         }
         if (deblocking_filter_override_flag)
         {
-            get_bit1(gb); // slice_deblocking_filter_disabled_flag; // u(1)
+            br.get_bits(1); // slice_deblocking_filter_disabled_flag; // u(1)
             if (!slice_deblocking_filter_disabled_flag)
             {
-                get_se_golomb(gb); // slice_beta_offset_div2; //se(v)
-                get_se_golomb(gb); // slice_tc_offset_div2; //se(v)
+                br.get_se_golomb(); // slice_beta_offset_div2; //se(v)
+                br.get_se_golomb(); // slice_tc_offset_div2; //se(v)
             }
         }
         if (pps_loop_filter_across_slices_enabled_flag &&
             ( slice_sao_luma_flag || slice_sao_chroma_flag ||
               !slice_deblocking_filter_disabled_flag))
         {
-            get_bit1(gb); // slice_loop_filter_across_slices_enabled_flag; // u(1)
+            br.get_bits(1); // slice_loop_filter_across_slices_enabled_flag; // u(1)
         }
 #endif
     }
 #if 0 // We don't need the rest
     if (tiles_enabled_flag || entropy_coding_sync_enabled_flag)
     {
-        get_ue_golomb(gb); // num_entry_point_offsets; // ue(v)
+        br.get_ue_golomb(); // num_entry_point_offsets; // ue(v)
         if (num_entry_point_offsets > 0)
         {
-            get_ue_golomb(gb); // offset_len_minus1; // ue(v)
+            br.get_ue_golomb(); // offset_len_minus1; // ue(v)
             for (i = 0; i < num_entry_point_offsets; ++i)
             {
-                get_bits(gb, ); // entry_point_offset_minus1[i]; // u(v)
+                br.get_bits(??? ); // entry_point_offset_minus1[i]; // u(v)
             }
         }
     }
     if (slice_segment_header_extension_present_flag)
     {
-        get_ue_golomb(gb); // slice_segment_header_extension_length; // ue(v)
+        br.get_ue_golomb(); // slice_segment_header_extension_length; // ue(v)
         for (i = 0; i < slice_segment_header_extension_length; ++i)
         {
             slice_segment_header_extension_data_byte[i]; // u(8)
@@ -1571,7 +1565,7 @@ bool HEVCParser::parseSliceSegmentHeader(GetBitContext *gb)
 /*
   F.7.3.2.2.1 General sequence parameter set RBSP
 */
-bool HEVCParser::parseSPS(GetBitContext *gb)
+bool HEVCParser::parseSPS(BitReader& br)
 {
     uint i = 0;
     static std::array<ShortTermRefPicSet,65> short_term_ref_pic_set;
@@ -1581,9 +1575,9 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
 
     m_seenSPS = true;
 
-    uint vps_id = get_bits(gb, 4); // sps_video_parameter_set_id u(4)
+    uint vps_id = br.get_bits(4); // sps_video_parameter_set_id u(4)
 
-    uint ext_or_max_sub_layers_minus1 = get_bits(gb, 3); // u(3)
+    uint ext_or_max_sub_layers_minus1 = br.get_bits(3); // u(3)
     uint max_sub_layers_minus1 = 0;
 
     if (m_nuhLayerId == 0)
@@ -1622,8 +1616,8 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
 
     if (!MultiLayerExtSpsFlag)
     {
-        get_bits1(gb); // sps_temporal_id_nesting_flag u(1)
-        if (!profileTierLevel(gb, true, max_sub_layers_minus1))
+        br.get_bits(1); // sps_temporal_id_nesting_flag u(1)
+        if (!profileTierLevel(br, true, max_sub_layers_minus1))
         {
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 QString("Failed to parse SPS profiel tier level."));
@@ -1631,21 +1625,21 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
         }
     }
 
-    uint sps_id = get_ue_golomb(gb); // sps_seq_parameter_set_id ue(v);
+    uint sps_id = br.get_ue_golomb(); // sps_seq_parameter_set_id ue(v);
     SPS* sps = &m_sps[sps_id];
 
     if (MultiLayerExtSpsFlag)
     {
-        if (get_bits1(gb)) // update_rep_format_flag u(1)
+        if (br.get_bits(1)) // update_rep_format_flag u(1)
         {
-            get_bits(gb, 8); // sps_rep_format_idx
+            br.get_bits(8); // sps_rep_format_idx
         }
     }
     else
     {
-        m_chromaFormatIdc = get_ue_golomb(gb); // ue(v);
+        m_chromaFormatIdc = br.get_ue_golomb(); // ue(v);
         if (m_chromaFormatIdc == 3)
-            m_separateColourPlaneFlag = get_bits1(gb); // u(1)
+            m_separateColourPlaneFlag = br.get_bits(1); // u(1)
 
         /*
           pic_width_in_luma_samples specifies the width of each decoded
@@ -1654,7 +1648,7 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
           pic_width_in_luma_samples shall not be equal to 0 and shall be
           an integer multiple of MinCbSizeY.
         */
-        m_picWidth = get_ue_golomb(gb); // pic_width_in_luma_samples ue(v);
+        m_picWidth = br.get_ue_golomb(); // pic_width_in_luma_samples ue(v);
 
         /*
           pic_height_in_luma_samples specifies the height of each decoded
@@ -1663,18 +1657,18 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
           pic_height_in_luma_samples shall not be equal to 0 and shall be
           an integer multiple of MinCbSizeY.
         */
-        m_picHeight = get_ue_golomb(gb); // pic_height_in_luma_samples ue(v);
+        m_picHeight = br.get_ue_golomb(); // pic_height_in_luma_samples ue(v);
 
-        if (get_bits1(gb)) //conformance_window_flag u(1)
+        if (br.get_bits(1)) //conformance_window_flag u(1)
         {
-            m_frameCropLeftOffset   = get_ue_golomb(gb); // ue(v);
-            m_frameCropRightOffset  = get_ue_golomb(gb); // ue(v);
-            m_frameCropTopOffset    = get_ue_golomb(gb); // ue(v);
-            m_frameCropBottomOffset = get_ue_golomb(gb); // ue(v);
+            m_frameCropLeftOffset   = br.get_ue_golomb(); // ue(v);
+            m_frameCropRightOffset  = br.get_ue_golomb(); // ue(v);
+            m_frameCropTopOffset    = br.get_ue_golomb(); // ue(v);
+            m_frameCropBottomOffset = br.get_ue_golomb(); // ue(v);
         }
 
-        get_ue_golomb(gb); // bit_depth_luma_minus8 ue(v);
-        get_ue_golomb(gb); // bit_depth_chroma_minus8 ue(v);
+        br.get_ue_golomb(); // bit_depth_luma_minus8   ue(v);
+        br.get_ue_golomb(); // bit_depth_chroma_minus8 ue(v);
     }
 
 #if 1
@@ -1691,7 +1685,7 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
                          m_frameCropTopOffset + m_frameCropBottomOffset);
 #endif
 
-    sps->log2_max_pic_order_cnt_lsb = get_ue_golomb(gb) + 4; // ue(v);
+    sps->log2_max_pic_order_cnt_lsb = br.get_ue_golomb() + 4; // ue(v);
     if (sps->log2_max_pic_order_cnt_lsb > 16)
     {
         LOG(VB_RECORD, LOG_WARNING, LOC +
@@ -1701,11 +1695,11 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
     }
     // MaxPicOrderCntLsb = 2 ^ ( log2_max_pic_order_cnt_lsb_minus4 + 4 )
 
-    sps->sub_layer_ordering_info_present_flag = get_bits1(gb); // u(1)
+    sps->sub_layer_ordering_info_present_flag = br.get_bits(1); // u(1)
     for (i = (sps->sub_layer_ordering_info_present_flag ? 0 :
               max_sub_layers_minus1); i <= max_sub_layers_minus1; ++i)
     {
-        max_dec_pic_buffering_minus1[i] = get_ue_golomb(gb); // ue(v);
+        max_dec_pic_buffering_minus1[i] = br.get_ue_golomb(); // ue(v);
         if (max_dec_pic_buffering_minus1[i] > 16)
         {
             LOG(VB_RECORD, LOG_WARNING, LOC +
@@ -1713,8 +1707,8 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
                 .arg(i)
                 .arg(max_dec_pic_buffering_minus1[i]));
         }
-        get_ue_golomb(gb); // sps_max_num_reorder_pics[i] ue(v);
-        get_ue_golomb(gb); // sps_max_latency_increase_plus1[i] ue(v);
+        br.get_ue_golomb(); // sps_max_num_reorder_pics[i] ue(v);
+        br.get_ue_golomb(); // sps_max_latency_increase_plus1[i] ue(v);
     }
 
 #if 0 // Unneeded
@@ -1734,44 +1728,44 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
     }
 #endif
 
-    sps->log2_min_luma_coding_block_size = get_ue_golomb(gb) + 3; // _minus3 ue(v);
-    sps->log2_diff_max_min_luma_coding_block_size = get_ue_golomb(gb); //  ue(v);
-    get_ue_golomb(gb); // log2_min_luma_transform_block_size_minus2 ue(v);
-    get_ue_golomb(gb); // log2_diff_max_min_luma_transform_block_size ue(v);
-    get_ue_golomb(gb); // max_transform_hierarchy_depth_inter ue(v);
-    get_ue_golomb(gb); // max_transform_hierarchy_depth_intra ue(v);
+    sps->log2_min_luma_coding_block_size = br.get_ue_golomb() + 3; // _minus3 ue(v);
+    sps->log2_diff_max_min_luma_coding_block_size = br.get_ue_golomb(); //  ue(v);
+    br.get_ue_golomb(); // log2_min_luma_transform_block_size_minus2 ue(v);
+    br.get_ue_golomb(); // log2_diff_max_min_luma_transform_block_size ue(v);
+    br.get_ue_golomb(); // max_transform_hierarchy_depth_inter ue(v);
+    br.get_ue_golomb(); // max_transform_hierarchy_depth_intra ue(v);
 
-    if (get_bits1(gb)) // scaling_list_enabled_flag // u(1)
+    if (br.get_bits(1)) // scaling_list_enabled_flag // u(1)
     {
         ScalingList scaling_list;
 
         /* When not present, the value of
          * sps_infer_scaling_list_flag is inferred to be 0 */
         bool sps_infer_scaling_list_flag = MultiLayerExtSpsFlag ?
-                                           get_bits1(gb) : false; // u(1)
+                                           br.get_bits(1) : false; // u(1)
         if (sps_infer_scaling_list_flag)
         {
-            get_bits(gb, 6); // sps_scaling_list_ref_layer_id; u(6)
+            br.get_bits(6); // sps_scaling_list_ref_layer_id; u(6)
         }
         else
         {
-            if (get_bits1(gb)) // sps_scaling_list_data_present_flag;
-                scalingListData(gb, scaling_list, false);
+            if (br.get_bits(1)) // sps_scaling_list_data_present_flag;
+                scalingListData(br, scaling_list, false);
         }
     }
 
-    get_bits1(gb);     // amp_enabled_flag u(1)
-    get_bits1(gb);     // sample_adaptive_offset_enabled_flag u(1)
-    if (get_bits1(gb)) // pcm_enabled_flag u(1)
+    br.get_bits(1);     // amp_enabled_flag u(1)
+    br.get_bits(1);     // sample_adaptive_offset_enabled_flag u(1)
+    if (br.get_bits(1)) // pcm_enabled_flag u(1)
     {
-        get_bits(gb, 4);   // pcm_sample_bit_depth_luma_minus1 u(4);
-        get_bits(gb, 4);   // pcm_sample_bit_depth_chroma_minus1 u(4);
-        get_ue_golomb(gb); // log2_min_pcm_luma_coding_block_size_minus3 ue(v);
-        get_ue_golomb(gb); // log2_diff_max_min_pcm_luma_coding_block_size ue(v);
-        get_bits1(gb);     // pcm_loop_filter_disabled_flag u(1)
+        br.get_bits(4);     // pcm_sample_bit_depth_luma_minus1 u(4);
+        br.get_bits(4);     // pcm_sample_bit_depth_chroma_minus1 u(4);
+        br.get_ue_golomb(); // log2_min_pcm_luma_coding_block_size_minus3 ue(v);
+        br.get_ue_golomb(); // log2_diff_max_min_pcm_luma_coding_block_size ue(v);
+        br.get_bits(1);     // pcm_loop_filter_disabled_flag u(1)
     }
 
-    uint num_short_term_ref_pic_sets = get_ue_golomb(gb); //  ue(v);
+    uint num_short_term_ref_pic_sets = br.get_ue_golomb(); //  ue(v);
     if (num_short_term_ref_pic_sets > short_term_ref_pic_set.size() - 1 )
     {
         LOG(VB_RECORD, LOG_WARNING, LOC +
@@ -1781,7 +1775,7 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
     }
     for(i = 0; i < num_short_term_ref_pic_sets; ++i)
     {
-        if (!shortTermRefPicSet(gb, i, num_short_term_ref_pic_sets,
+        if (!shortTermRefPicSet(br, i, num_short_term_ref_pic_sets,
                                 short_term_ref_pic_set,
                         max_dec_pic_buffering_minus1[max_sub_layers_minus1]))
         {
@@ -1789,9 +1783,9 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
         }
     }
 
-    if (get_bits1(gb)) // long_term_ref_pics_present_flag u(1)
+    if (br.get_bits(1)) // long_term_ref_pics_present_flag u(1)
     {
-        uint num_long_term_ref_pics_sps = get_ue_golomb(gb); // ue(v);
+        uint num_long_term_ref_pics_sps = br.get_ue_golomb(); // ue(v);
         for (i = 0; i < num_long_term_ref_pics_sps; ++i)
         {
             /*
@@ -1801,15 +1795,15 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
               number of bits used to represent lt_ref_pic_poc_lsb_sps[
               i ] is equal to log2_max_pic_order_cnt_lsb_minus4 + 4.
             */
-            m_poc[i] = get_bits(gb, sps->log2_max_pic_order_cnt_lsb); // u(v)
+            m_poc[i] = br.get_bits(sps->log2_max_pic_order_cnt_lsb); // u(v)
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 QString("POC[%1] %2").arg(i).arg(m_poc[i]));
-            get_bits1(gb); // used_by_curr_pic_lt_sps_flag[i] u(1)
+            br.get_bits(1); // used_by_curr_pic_lt_sps_flag[i] u(1)
         }
     }
 
-    get_bits1(gb); //sps_temporal_mvp_enabled_flag u(1)
-    get_bits1(gb); //strong_intra_smoothing_enabled_flag u(1)
+    br.get_bits(1); //sps_temporal_mvp_enabled_flag u(1)
+    br.get_bits(1); //strong_intra_smoothing_enabled_flag u(1)
 
     /*
       vui_parameters_present_flag equal to 1 specifies that the
@@ -1818,8 +1812,8 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
       the vui_parameters() syntax structure as specified in Annex E
       is not present.
      */
-    if (get_bits1(gb)) // vui_parameters_present_flag
-        vui_parameters(gb, true);
+    if (br.get_bits(1)) // vui_parameters_present_flag
+        vui_parameters(br, true);
 
     return true;
 }
@@ -1828,35 +1822,35 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
 /*
   F.7.3.2.1 Video parameter set RBSP
 */
-bool HEVCParser::parseVPS(GetBitContext *gb)
+bool HEVCParser::parseVPS(BitReader& br)
 {
     uint i = 0;
 
-    uint8_t vps_id = get_bits(gb, 4);  // vps_video_parameter_set_id u(4)
-    get_bits1(gb);    // vps_base_layer_internal_flag u(1)
-    get_bits1(gb);    // vps_base_layer_available_flag u(1)
-    get_bits(gb, 6);  // vps_max_layers_minus1 u(6)
-    uint8_t max_sub_layers_minus1 = get_bits(gb, 3); // u(3)
-    get_bits1(gb);    // vps_temporal_id_nesting_flag u(1)
+    uint8_t vps_id = br.get_bits(4);  // vps_video_parameter_set_id u(4)
+    br.get_bits(1);    // vps_base_layer_internal_flag u(1)
+    br.get_bits(1);    // vps_base_layer_available_flag u(1)
+    br.get_bits(6);    // vps_max_layers_minus1 u(6)
+    uint8_t max_sub_layers_minus1 = br.get_bits(3); // u(3)
+    br.get_bits(1);    // vps_temporal_id_nesting_flag u(1)
 
-    /* uint16_t check = */ get_bits(gb, 16); //  vps_reserved_0xffff_16bits u(16)
+    /* uint16_t check = */ br.get_bits(16); //  vps_reserved_0xffff_16bits u(16)
 
     m_vps[vps_id].max_sub_layers = max_sub_layers_minus1 + 1;
-    if (!profileTierLevel(gb, true, max_sub_layers_minus1))
+    if (!profileTierLevel(br, true, max_sub_layers_minus1))
     {
         LOG(VB_RECORD, LOG_WARNING, LOC +
             QString("Failed to parse VPS profile tier level."));
         return false;
     }
 
-    bool vps_sub_layer_ordering_info_present_flag = get_bits1(gb); // u(1)
+    bool vps_sub_layer_ordering_info_present_flag = br.get_bits(1); // u(1)
     for (i = (vps_sub_layer_ordering_info_present_flag ? 0 :
               max_sub_layers_minus1);
          i <= max_sub_layers_minus1; ++i)
     {
-        get_ue_golomb(gb); // vps_max_dec_pic_buffering_minus1[i]; ue(v)
-        get_ue_golomb(gb); // vps_max_num_reorder_pics[i]; ue(v)
-        get_ue_golomb(gb); // vps_max_latency_increase_plus1[i]; ue(v)
+        br.get_ue_golomb(); // vps_max_dec_pic_buffering_minus1[i]; ue(v)
+        br.get_ue_golomb(); // vps_max_num_reorder_pics[i]; ue(v)
+        br.get_ue_golomb(); // vps_max_latency_increase_plus1[i]; ue(v)
     }
 
 #if 0 // Unneeded
@@ -1877,17 +1871,17 @@ bool HEVCParser::parseVPS(GetBitContext *gb)
     }
 #endif
 
-    uint8_t vps_max_layer_id = get_bits(gb, 6); // u(6)
-    uint vps_num_layer_sets_minus1 = get_ue_golomb(gb); // ue(v)
+    uint8_t vps_max_layer_id = br.get_bits(6); // u(6)
+    uint vps_num_layer_sets_minus1 = br.get_ue_golomb(); // ue(v)
     for (i = 1; i <= vps_num_layer_sets_minus1; ++i)
     {
         for (int j = 0; j <= vps_max_layer_id; ++j)
         {
-            get_bits1(gb); // layer_id_included_flag[i][j] u(1)
+            br.get_bits(1); // layer_id_included_flag[i][j] u(1)
         }
     }
 
-    if (get_bits1(gb)) // vps_timing_info_present_flag u(1)
+    if (br.get_bits(1)) // vps_timing_info_present_flag u(1)
     {
         /*
           vps_num_units_in_tick is the number of time units of a clock
@@ -1901,7 +1895,7 @@ bool HEVCParser::parseVPS(GetBitContext *gb)
           000 and vps_num_units_in_tick may be equal to 1 080 000, and
           consequently a clock tick may be 0.04 seconds.
         */
-        m_unitsInTick = get_bits_long(gb, 32); // vps_num_units_in_tick
+        m_unitsInTick = br.get_bits(32); // vps_num_units_in_tick
 
         /*
           vps_time_scale is the number of time units that pass in one
@@ -1909,10 +1903,10 @@ bool HEVCParser::parseVPS(GetBitContext *gb)
           time using a 27 MHz clock has a vps_time_scale of 27 000
           000. The value of vps_time_scale shall be greater than 0.
         */
-        m_timeScale = get_bits_long(gb, 32); // vps_time_scale
+        m_timeScale = br.get_bits(32); // vps_time_scale
 
-        if (get_bits1(gb)) // vps_poc_proportional_to_timing_flag) u(1)
-            get_ue_golomb_long(gb); // vps_num_ticks_poc_diff_one_minus1 ue(v)
+        if (br.get_bits(1)) // vps_poc_proportional_to_timing_flag) u(1)
+            br.get_ue_golomb_long(); // vps_num_ticks_poc_diff_one_minus1 ue(v)
 
         LOG(VB_RECORD, LOG_DEBUG,
             QString("VUI unitsInTick %1 timeScale %2 fixedRate %3")
@@ -1921,31 +1915,31 @@ bool HEVCParser::parseVPS(GetBitContext *gb)
             .arg(m_fixedRate));
 
 #if 0  // We don't need the rest.
-        uint vps_num_hrd_parameters = get_ue_golomb(gb); // ue(v)
+        uint vps_num_hrd_parameters = br.get_ue_golomb(); // ue(v)
         for (i = 0; i < vps_num_hrd_parameters; ++i)
         {
-            get_ue_golomb(gb); // hrd_layer_set_idx[i]  ue(v)
+            br.get_ue_golomb(); // hrd_layer_set_idx[i]  ue(v)
             if (i > 0)
-                cprms_present_flag[i] = get_bits1(gb); // u(1)
+                cprms_present_flag[i] = br.get_bits(1); // u(1)
             hrd_parameters(cprms_present_flag[i], max_sub_layers_minus1);
         }
 #endif
     }
 
 #if 0 // We don't need the rest.
-    bool vps_extension_flag = get_bits(1); // u(1)
+    bool vps_extension_flag = br.get_bits(1); // u(1)
     if (vps_extension_flag)
     {
         while (!byte_aligned())
         {
-            get_bits1(gb); // vps_extension_alignment_bit_equal_to_one u(1)
+            br.get_bits(1); // vps_extension_alignment_bit_equal_to_one u(1)
         }
         vps_extension();
-        vps_extension2_flag = get_bits1(gb); // u(1)
+        vps_extension2_flag = br.get_bits(1); // u(1)
         if (vps_extension2_flag)
         {
             while (more_rbsp_data())
-                get_bits1(gb); // vps_extension_data_flag u(1)
+                br.get_bits(1); // vps_extension_data_flag u(1)
         }
     }
     rbsp_trailing_bits();
@@ -1955,16 +1949,16 @@ bool HEVCParser::parseVPS(GetBitContext *gb)
 }
 
 /* 7.3.2.3.1 General picture parameter set RBSP syntax */
-bool HEVCParser::parsePPS(GetBitContext *gb)
+bool HEVCParser::parsePPS(BitReader& br)
 {
-    uint pps_id = get_ue_golomb(gb); // pps_pic_parameter_set_id ue(v)
+    uint pps_id = br.get_ue_golomb(); // pps_pic_parameter_set_id ue(v)
     PPS* pps = &m_pps[pps_id];
 
-    pps->sps_id = get_ue_golomb(gb); // pps_seq_parameter_set_id; ue(v)
-    pps->dependent_slice_segments_enabled_flag = get_bits1(gb); // u(1)
+    pps->sps_id = br.get_ue_golomb(); // pps_seq_parameter_set_id; ue(v)
+    pps->dependent_slice_segments_enabled_flag = br.get_bits(1); // u(1)
 
-    pps->output_flag_present_flag = get_bits1(gb); // u(1)
-    pps->num_extra_slice_header_bits = get_bits(gb, 3); // u(3)
+    pps->output_flag_present_flag = br.get_bits(1); // u(1)
+    pps->num_extra_slice_header_bits = br.get_bits(3); // u(3)
 
 #if 0 // Rest not needed
     sign_data_hiding_enabled_flag;
