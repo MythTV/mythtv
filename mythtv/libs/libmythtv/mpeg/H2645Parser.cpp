@@ -4,12 +4,7 @@
 
 #include "libmythbase/mythlogging.h"
 #include "recorders/dtvrecorder.h" // for FrameRate and ScanType
-
-extern "C" {
-#include "libavcodec/avcodec.h"
-#include "libavutil/internal.h"
-#include "libavcodec/golomb.h"
-}
+#include "bitreader.h"
 
 #include <cmath>
 #include <strings.h>
@@ -141,12 +136,7 @@ void H2645Parser::resetRBSP(void)
 bool H2645Parser::fillRBSP(const uint8_t *byteP, uint32_t byte_count,
                           bool found_start_code)
 {
-    /*
-      bitstream buffer, must be AV_INPUT_BUFFER_PADDING_SIZE
-      bytes larger then the actual data
-    */
-    uint32_t required_size = m_rbspIndex + byte_count +
-                             AV_INPUT_BUFFER_PADDING_SIZE;
+    uint32_t required_size = m_rbspIndex + byte_count;
     if (m_rbspBufferSize < required_size)
     {
         // Round up to packet size
@@ -226,14 +216,14 @@ bool H2645Parser::fillRBSP(const uint8_t *byteP, uint32_t byte_count,
 }
 
 /* Video Usability Information */
-void H2645Parser::vui_parameters(GetBitContext * gb, bool hevc)
+void H2645Parser::vui_parameters(BitReader& br, bool hevc)
 {
     /*
       aspect_ratio_info_present_flag equal to 1 specifies that
       m_aspectRatioIdc is present. aspect_ratio_info_present_flag
       equal to 0 specifies that m_aspectRatioIdc is not present.
      */
-    if (get_bits1(gb)) //aspect_ratio_info_present_flag
+    if (br.next_bit()) //aspect_ratio_info_present_flag
     {
         /*
           m_aspectRatioIdc specifies the value of the sample aspect
@@ -244,7 +234,7 @@ void H2645Parser::vui_parameters(GetBitContext * gb, bool hevc)
           present, m_aspectRatioIdc value shall be inferred to be
           equal to 0.
          */
-        m_aspectRatioIdc = get_bits(gb, 8);
+        m_aspectRatioIdc = br.get_bits(8);
 
         switch (m_aspectRatioIdc)
         {
@@ -338,8 +328,8 @@ void H2645Parser::vui_parameters(GetBitContext * gb, bool hevc)
              */
             break;
           case EXTENDED_SAR:
-            m_sarWidth  = get_bits(gb, 16);
-            m_sarHeight = get_bits(gb, 16);
+            m_sarWidth  = br.get_bits(16);
+            m_sarHeight = br.get_bits(16);
             LOG(VB_RECORD, LOG_DEBUG,
                 QString("sarWidth %1 sarHeight %2")
                 .arg(m_sarWidth).arg(m_sarHeight));
@@ -349,45 +339,45 @@ void H2645Parser::vui_parameters(GetBitContext * gb, bool hevc)
     else
         m_sarWidth = m_sarHeight = 0;
 
-    if (get_bits1(gb)) //overscan_info_present_flag
-        get_bits1(gb); //overscan_appropriate_flag
+    if (br.next_bit()) //overscan_info_present_flag
+        br.next_bit(); //overscan_appropriate_flag
 
-    if (get_bits1(gb)) //video_signal_type_present_flag
+    if (br.next_bit()) //video_signal_type_present_flag
     {
-        get_bits(gb, 3); //video_format
-        get_bits1(gb);   //video_full_range_flag
-        if (get_bits1(gb)) // colour_description_present_flag
+        br.get_bits(3); //video_format
+        br.next_bit();  //video_full_range_flag
+        if (br.next_bit()) // colour_description_present_flag
         {
-            get_bits(gb, 8); // colour_primaries
-            get_bits(gb, 8); // transfer_characteristics
-            get_bits(gb, 8); // matrix_coefficients
+            br.get_bits(8); // colour_primaries
+            br.get_bits(8); // transfer_characteristics
+            br.get_bits(8); // matrix_coefficients
         }
     }
 
-    if (get_bits1(gb)) //chroma_loc_info_present_flag
+    if (br.next_bit()) //chroma_loc_info_present_flag
     {
-        get_ue_golomb(gb); //chroma_sample_loc_type_top_field ue(v)
-        get_ue_golomb(gb); //chroma_sample_loc_type_bottom_field ue(v)
+        br.get_ue_golomb(); //chroma_sample_loc_type_top_field ue(v)
+        br.get_ue_golomb(); //chroma_sample_loc_type_bottom_field ue(v)
     }
 
     if (hevc)
     {
-        get_bits1(gb);          // get_neutral_chroma_indication_flag u(1)
-        get_bits1(gb);          // field_seq_flag u(1);
-        get_bits1(gb);          // frame_field_info_present_flag u(1);
-        if (get_bits1(gb)) {    // default_display_window_flag u(1);
-            get_ue_golomb(gb);  // def_disp_win_left_offset ue(v);
-            get_ue_golomb(gb);  // def_disp_win_right_offset ue(v);
-            get_ue_golomb(gb);  // def_disp_win_top_offset ue(v);
-            get_ue_golomb(gb);  // def_disp_win_bottom_offset ue(v);
+        br.next_bit();           // get_neutral_chroma_indication_flag u(1)
+        br.next_bit();           // field_seq_flag u(1);
+        br.next_bit();           // frame_field_info_present_flag u(1);
+        if (br.next_bit()) {     // default_display_window_flag u(1);
+            br.get_ue_golomb();  // def_disp_win_left_offset ue(v);
+            br.get_ue_golomb();  // def_disp_win_right_offset ue(v);
+            br.get_ue_golomb();  // def_disp_win_top_offset ue(v);
+            br.get_ue_golomb();  // def_disp_win_bottom_offset ue(v);
         }
     }
 
-    if (get_bits1(gb)) //timing_info_present_flag
+    if (br.next_bit()) //timing_info_present_flag
     {
-        m_unitsInTick = get_bits_long(gb, 32); // num_units_in_tick
-        m_timeScale = get_bits_long(gb, 32);   // time_scale
-        m_fixedRate = (get_bits1(gb) != 0U);
+        m_unitsInTick = br.get_bits(32); // num_units_in_tick
+        m_timeScale = br.get_bits(32);   // time_scale
+        m_fixedRate = (br.get_bits(1) != 0U);
 
         LOG(VB_RECORD, LOG_DEBUG,
             QString("VUI unitsInTick %1 timeScale %2 fixedRate %3")
