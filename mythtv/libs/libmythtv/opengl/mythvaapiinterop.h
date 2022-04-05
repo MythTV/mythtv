@@ -18,6 +18,9 @@ struct AVFilterContext;
 #endif
 #define Cursor XCursor // Prevent conflicts with Qt6.
 #define pointer Xpointer // Prevent conflicts with Qt6.
+#if defined(_X11_XLIB_H_) && !defined(Bool)
+#define Bool int
+#endif
 #include "va/va_x11.h"
 #undef None            // X11/X.h defines this. Causes compile failure in Qt6.
 #undef Cursor
@@ -25,6 +28,7 @@ struct AVFilterContext;
 #include "va/va_glx.h"
 #include "va/va_drm.h"
 #include "va/va_drmcommon.h"
+#undef Bool            // Interferes with cmake moc file compilation
 
 #ifndef VA_FOURCC_I420
 #define VA_FOURCC_I420 0x30323449
