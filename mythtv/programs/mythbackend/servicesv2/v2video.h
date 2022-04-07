@@ -18,6 +18,7 @@ class V2Video : public MythHTTPService
     Q_CLASSINFO("description",  "Methods to access and update Video metadata and related topics")
     Q_CLASSINFO("LookupVideo",  "methods=GET,POST,HEAD")
     Q_CLASSINFO("GetSavedBookmark",  "name=long")
+    Q_CLASSINFO("GetLastPlayPos",  "name=long")
     Q_CLASSINFO("RemoveVideoFromDB",  "methods=POST;name=bool")
     Q_CLASSINFO("AddVideo",  "methods=POST;name=bool")
     Q_CLASSINFO("UpdateVideoWatchedStatus",  "methods=POST;name=bool")
@@ -33,6 +34,7 @@ class V2Video : public MythHTTPService
     static V2VideoMetadataInfo*   GetVideo   (int Id);
     static V2VideoMetadataInfo*   GetVideoByFileName ( const QString  &FileName  );
     static long                   GetSavedBookmark (int Id );
+    static long                   GetLastPlayPos (int Id );
     static V2VideoMetadataInfoList*  GetVideoList    ( const QString  &Folder,
                                                        const QString  &Sort,
                                                        bool           Descending,
@@ -92,6 +94,9 @@ class V2Video : public MythHTTPService
     );
 
     static bool            SetSavedBookmark (         int   Id,
+                                                          long  Offset );
+
+    static bool            SetLastPlayPos   (         int   Id,
                                                           long  Offset );
 
     static V2BlurayInfo*   GetBluray          ( const QString  &Path      );

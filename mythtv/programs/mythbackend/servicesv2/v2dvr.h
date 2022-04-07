@@ -54,7 +54,9 @@ class V2Dvr : public MythHTTPService
     Q_CLASSINFO("AllowReRecord",       "methods=POST;name=bool")
     Q_CLASSINFO("UpdateRecordedWatchedStatus","methods=POST;name=bool")
     Q_CLASSINFO("GetSavedBookmark",    "name=long")
+    Q_CLASSINFO("GetLastPlayPos",      "name=long")
     Q_CLASSINFO("SetSavedBookmark",    "name=bool")
+    Q_CLASSINFO("SetLastPlayPos",      "name=bool")
     Q_CLASSINFO("SetRecordedMarkup",   "name=bool")
     Q_CLASSINFO("AddRecordSchedule",   "methods=POST;name=uint")
     Q_CLASSINFO("UpdateRecordSchedule","methods=POST;name=bool")
@@ -150,7 +152,19 @@ class V2Dvr : public MythHTTPService
                                             const QDateTime &StartTime,
                                             const QString   &OffsetType );
 
+    static long       GetLastPlayPos      ( int              RecordedId,
+                                            int              ChanId,
+                                            const QDateTime &StartTime,
+                                            const QString   &OffsetType );
+
     static bool       SetSavedBookmark    ( int              RecordedId,
+                                            int              ChanId,
+                                            const QDateTime &StartTime,
+                                            const QString   &OffsetType,
+                                            long             Offset
+                                            );
+
+    static bool       SetLastPlayPos      ( int              RecordedId,
                                             int              ChanId,
                                             const QDateTime &StartTime,
                                             const QString   &OffsetType,
