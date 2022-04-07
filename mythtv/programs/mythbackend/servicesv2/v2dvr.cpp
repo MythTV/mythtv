@@ -772,6 +772,51 @@ long V2Dvr::GetSavedBookmark( int RecordedId,
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// Get last play position
+// Providing -1 for the RecordedId will return response of -1.
+// This is a way to check if this api, and the other LastPlayPos APIs,
+// are supported
+/////////////////////////////////////////////////////////////////////////////
+
+long V2Dvr::GetLastPlayPos( int RecordedId,
+                            int chanid,
+                            const QDateTime &StartTime,
+                            const QString &offsettype )
+{
+    if (RecordedId == -1)
+        return -1;
+
+    if ((RecordedId <= 0) &&
+        (chanid <= 0 || !StartTime.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
+
+    RecordingInfo ri;
+    if (RecordedId > 0)
+        ri = RecordingInfo(RecordedId);
+    else
+        ri = RecordingInfo(chanid, StartTime.toUTC());
+    uint64_t offset = 0;
+    bool isend=true;
+    uint64_t position = ri.QueryLastPlayPos();
+    // if no bookmark return 0
+    if (position == 0)
+        return 0;
+    if (offsettype.toLower() == "position"){
+        // if bookmark cannot be converted to a keyframe we will
+        // just return the actual frame saved as the bookmark
+        if (ri.QueryKeyFramePosition(&offset, position, isend))
+            return offset;
+    }
+    if (offsettype.toLower() == "duration"){
+        if (ri.QueryKeyFrameDuration(&offset, position, isend))
+            return offset;
+        // If bookmark cannot be converted to a duration return -1
+        return -1;
+    }
+    return position;
+}
+
+/////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
@@ -806,6 +851,45 @@ bool V2Dvr::SetSavedBookmark( int RecordedId,
     else
         position = Offset;
     ri.SaveBookmark(position);
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Set last Play Position. Check if this is supported by first calling
+// Get Last Play Position with -1.
+/////////////////////////////////////////////////////////////////////////////
+
+bool V2Dvr::SetLastPlayPos( int RecordedId,
+                            int chanid,
+                            const QDateTime &StartTime,
+                            const QString &offsettype,
+                            long Offset )
+{
+    if ((RecordedId <= 0) &&
+        (chanid <= 0 || !StartTime.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
+
+    if (Offset < 0)
+        throw QString("Offset must be >= 0.");
+
+    RecordingInfo ri;
+    if (RecordedId > 0)
+        ri = RecordingInfo(RecordedId);
+    else
+        ri = RecordingInfo(chanid, StartTime.toUTC());
+    uint64_t position = 0;
+    bool isend=true;
+    if (offsettype.toLower() == "position"){
+        if (!ri.QueryPositionKeyFrame(&position, Offset, isend))
+                return false;
+    }
+    else if (offsettype.toLower() == "duration"){
+        if (!ri.QueryDurationKeyFrame(&position, Offset, isend))
+                return false;
+    }
+    else
+        position = Offset;
+    ri.SaveLastPlayPos(position);
     return true;
 }
 

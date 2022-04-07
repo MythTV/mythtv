@@ -130,6 +130,54 @@ long V2Video::GetSavedBookmark( int  Id )
     return ret;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+// Get last play pos of a video as a frame number.
+/////////////////////////////////////////////////////////////////////////////
+
+long V2Video::GetLastPlayPos( int  Id )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT filename "
+                  "FROM videometadata "
+                  "WHERE intid = :ID ");
+    query.bindValue(":ID", Id);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Video::GetLastPlayPos", query);
+        return 0;
+    }
+
+    QString fileName;
+
+    if (query.next())
+        fileName = query.value(0).toString();
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("V2Video/GetLastPlayPos Video id %1 Not found.").arg(Id));
+        return -1;
+    }
+
+    ProgramInfo pi(fileName,
+                         nullptr, // _plot,
+                         nullptr, // _title,
+                         nullptr, // const QString &_sortTitle,
+                         nullptr, // const QString &_subtitle,
+                         nullptr, // const QString &_sortSubtitle,
+                         nullptr, // const QString &_director,
+                         0, // int _season,
+                         0, // int _episode,
+                         nullptr, // const QString &_inetref,
+                         0min, // uint _length_in_minutes,
+                         0, // uint _year,
+                         nullptr); //const QString &_programid);
+
+    long ret = pi.QueryLastPlayPos();
+    return ret;
+}
+
+
 V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
                                                  const QString &Sort,
                                                  bool bDescending,
@@ -799,6 +847,53 @@ bool V2Video::SetSavedBookmark( int  Id, long Offset )
                          nullptr); //const QString &_programid);
 
     pi.SaveBookmark(Offset);
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Set bookmark of a video as a frame number.
+/////////////////////////////////////////////////////////////////////////////
+
+bool V2Video::SetLastPlayPos( int  Id, long Offset )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT filename "
+                  "FROM videometadata "
+                  "WHERE intid = :ID ");
+    query.bindValue(":ID", Id);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("Video::SetLastPlayPos", query);
+        return false;
+    }
+
+    QString fileName;
+
+    if (query.next())
+        fileName = query.value(0).toString();
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Video/SetLastPlayPos Video id %1 Not found.").arg(Id));
+        return false;
+    }
+
+    ProgramInfo pi(fileName,
+                         nullptr, // _plot,
+                         nullptr, // _title,
+                         nullptr, // const QString &_sortTitle,
+                         nullptr, // const QString &_subtitle,
+                         nullptr, // const QString &_sortSubtitle,
+                         nullptr, // const QString &_director,
+                         0, // int _season,
+                         0, // int _episode,
+                         nullptr, // const QString &_inetref,
+                         0min, // uint _length_in_minutes,
+                         0, // uint _year,
+                         nullptr); //const QString &_programid);
+
+    pi.SaveLastPlayPos(Offset);
     return true;
 }
 
