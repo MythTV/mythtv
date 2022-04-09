@@ -58,25 +58,28 @@ QString StreamDescriptionToString(AudioStreamBasicDescription desc)
     switch (desc.mFormatID)
     {
         case kAudioFormatLinearPCM:
-            str = QString("[%1] %2%3 Channel %4-bit %5 %6 (%7Hz)")
+            str = QString("[%1] %2%3 Channel %4-bit %5 %6 (%7Hz) %8 Channels")
             .arg(fourCC)
             .arg((desc.mFormatFlags & kAudioFormatFlagIsNonMixable) ? "" : "Mixable ")
             .arg(desc.mChannelsPerFrame)
             .arg(desc.mBitsPerChannel)
             .arg((desc.mFormatFlags & kAudioFormatFlagIsFloat) ? "Floating Point" : "Signed Integer")
             .arg((desc.mFormatFlags & kAudioFormatFlagIsBigEndian) ? "BE" : "LE")
-            .arg((UInt32)desc.mSampleRate);
+            .arg((UInt32)desc.mSampleRate)
+            .arg(desc.mChannelsPerFrame);
             break;
         case kAudioFormatAC3:
-            str = QString("[%1] AC-3/DTS (%2Hz)")
+            str = QString("[%1] AC-3/DTS (%2Hz) %3 Channels")
             .arg(fourCC)
-            .arg((UInt32)desc.mSampleRate);
+            .arg((UInt32)desc.mSampleRate)
+            .arg(desc.mChannelsPerFrame);
             break;
         case kAudioFormat60958AC3:
-            str = QString("[%1] AC-3/DTS for S/PDIF %2 (%3Hz)")
+            str = QString("[%1] AC-3/DTS for S/PDIF %2 (%3Hz) %4 Channels")
             .arg(fourCC)
             .arg((desc.mFormatFlags & kAudioFormatFlagIsBigEndian) ? "BE" : "LE")
-            .arg((UInt32)desc.mSampleRate);
+            .arg((UInt32)desc.mSampleRate)
+            .arg(desc.mChannelsPerFrame);
             break;
         default:
             str = QString("[%1]").arg(fourCC);
@@ -122,7 +125,7 @@ public:
     static AudioStreamIDVec      StreamsList(AudioDeviceID d);
     static AudioStreamRangedVec  FormatsList(AudioStreamID s);
 
-    static int  AudioStreamChangeFormat(AudioStreamID               s,
+    static int  AudioStreamChangeFormat(AudioStreamID s,
                                  AudioStreamBasicDescription format);
 
     // TODO: Convert these to macros!
@@ -212,11 +215,11 @@ AudioOutputSettings* AudioOutputCA::GetOutputSettings(bool digital)
     {
         while (int rate = settings->GetNextRate())
         {
-	    for (auto entry : rates)
-	    {
-	        if (entry != rate)
-		    continue;
-		settings->AddSupportedRate(entry);
+            for (auto entry : rates)
+            {
+                if (entry != rate)
+                    continue;
+                settings->AddSupportedRate(entry);
             }
         }
     }
@@ -235,11 +238,11 @@ AudioOutputSettings* AudioOutputCA::GetOutputSettings(bool digital)
     {
         for (int i = CHANNELS_MIN; i <= CHANNELS_MAX; i++)
         {
-            if (channels[i])
+            if (channels[i-1])
             {
                 Debug(QString("Support %1 channels").arg(i));
                 // In case 8 channels are supported but not 6, fake 6
-                if (i == 8 && !channels[6])
+                if (i == 8 && !channels[6-1])
                     settings->AddSupportedChannels(6);
                 settings->AddSupportedChannels(i);
             }
@@ -556,10 +559,11 @@ AudioDeviceID CoreAudioData::GetDeviceWithName(const QString &deviceName)
     }
 
     UInt32 deviceCount = size / sizeof(AudioDeviceID);
-    auto* pDevices = new AudioDeviceID[deviceCount];
+    std::vector<AudioDeviceID> devices = {};
+    devices.resize(deviceCount);
 
     err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &pa,
-				     0, nullptr, &size, pDevices);
+                                    0, nullptr, &size, devices.data());
     if (err)
     {
         Warn(QString("GetDeviceWithName: Unable to retrieve the list of available devices. "
@@ -568,23 +572,22 @@ AudioDeviceID CoreAudioData::GetDeviceWithName(const QString &deviceName)
     }
     else
     {
-        for (UInt32 dev = 0; dev < deviceCount; dev++)
+        for (const auto & dev : devices)
         {
-            CoreAudioData device(nullptr, pDevices[dev]);
+            CoreAudioData device(nullptr, dev);
             if (device.GetTotalOutputChannels() == 0)
                 continue;
             QString *name = device.GetName();
             if (name && *name == deviceName)
             {
                 Debug(QString("GetDeviceWithName: Found: %1").arg(*name));
-                deviceID = pDevices[dev];
+                deviceID = dev;
                 delete name;
             }
             if (deviceID)
                 break;
         }
     }
-    delete[] pDevices;
     return deviceID;
 }
 
@@ -623,7 +626,7 @@ int CoreAudioData::GetTotalOutputChannels()
     AudioObjectPropertyAddress pa
     {
 	kAudioDevicePropertyStreamConfiguration,
-	kAudioObjectPropertyScopeGlobal,
+	kAudioDevicePropertyScopeOutput, // Scope needs to be set to output to find output streams
 	kAudioObjectPropertyElementMaster
     };
 
@@ -881,10 +884,11 @@ AudioStreamIDVec CoreAudioData::StreamsList(AudioDeviceID d)
               .arg(OSS_STATUS(err)));
         return {};
     }
-
     try
     {
-	vec.reserve(listSize / sizeof(AudioStreamID));
+        // Bugfix: vec.reserve will not change size of vector since contents are updated directly via memory copy
+        // In general all std::vector arrays have been changed from reserve to resize.
+        vec.resize(listSize / sizeof(AudioStreamID));
     }
     catch (...)
     {
@@ -912,9 +916,10 @@ AudioStreamRangedVec CoreAudioData::FormatsList(AudioStreamID s)
 
     AudioObjectPropertyAddress pa
     {
-	kAudioStreamPropertyPhysicalFormats,
-	kAudioObjectPropertyScopeGlobal,
-	kAudioObjectPropertyElementMaster
+        // Bugfix: kAudioStreamPropertyPhysicalFormats, is meant to only give array of AudioStreamBasicDescription
+        kAudioStreamPropertyAvailablePhysicalFormats, // gives array of AudioStreamRangedDescription
+        kAudioObjectPropertyScopeGlobal,
+        kAudioObjectPropertyElementMaster
     };
 
     // Retrieve all the stream formats supported by this output stream
@@ -928,7 +933,7 @@ AudioStreamRangedVec CoreAudioData::FormatsList(AudioStreamID s)
 
     try
     {
-	vec.reserve(listSize / sizeof(AudioStreamRangedDescription));
+        vec.resize(listSize / sizeof(AudioStreamRangedDescription));
     }
     catch (...)
     {
@@ -990,7 +995,7 @@ RatesVec CoreAudioData::RatesList(AudioDeviceID d)
 
     try
     {
-        ranges.reserve(listSize / sizeof(AudioValueRange));
+        ranges.resize(listSize / sizeof(AudioValueRange));
         finalvec.reserve(listSize / sizeof(AudioValueRange));
     }
     catch (...)
@@ -1059,10 +1064,19 @@ bool CoreAudioData::ChannelsList(AudioDeviceID /*d*/, bool passthru, ChannelsArr
             // Find a stream with a cac3 stream
             for (auto format : formats)
             {
+                Debug(QString("ChannelsList: (passthru) found format: %1")
+                    .arg(StreamDescriptionToString(format.mFormat)));
+                // Add supported number of channels
+                if (format.mFormat.mChannelsPerFrame <= CHANNELS_MAX)
+                    chans[format.mFormat.mChannelsPerFrame-1] = true;
+
                 if (format.mFormat.mFormatID == 'IAC3' ||
                     format.mFormat.mFormatID == kAudioFormat60958AC3)
                 {
-                    chans[format.mFormat.mChannelsPerFrame] = true;
+                    // By default AC3 has 6 (5.1) channels but CoreAudio seems to set mChannelsPerFrame to 2 
+                    // and considers it a "2 channel Encoded Digital Audio"
+                    chans[6-1] = true;
+                    //	chans[format.mFormat.mChannelsPerFrame-1] = true;
                     founddigital = true;
                 }
             }
@@ -1077,8 +1091,12 @@ bool CoreAudioData::ChannelsList(AudioDeviceID /*d*/, bool passthru, ChannelsArr
             if (formats.empty())
                 continue;
             for (auto format : formats)
+            {
+                Debug(QString("ChannelsList: (!founddigital) found format: %1")
+                    .arg(StreamDescriptionToString(format.mFormat)));
                 if (format.mFormat.mChannelsPerFrame <= CHANNELS_MAX)
-                    chans[format.mFormat.mChannelsPerFrame] = true;
+                    chans[format.mFormat.mChannelsPerFrame-1] = true;
+            }
         }
     }
     return true;
@@ -1641,7 +1659,7 @@ bool CoreAudioData::FindAC3Stream()
                 Debug("FindAC3Stream: found digital format");
                 return true;
             }
-	}
+        }
     }
 
     return false;
@@ -1726,6 +1744,7 @@ void CoreAudioData::ResetStream(AudioStreamID s)
         for (auto format : formats) {
             if (format.mFormat.mFormatID == kAudioFormatLinearPCM)
             {
+                Debug(QString("ResetStream: Resetting stream %1 to %2").arg(s).arg(StreamDescriptionToString(format.mFormat)));
                 err = AudioObjectSetPropertyData(s, &pa, 0, nullptr,
                                                  sizeof(format), &(format.mFormat));
                 if (err != noErr)
@@ -1735,9 +1754,9 @@ void CoreAudioData::ResetStream(AudioStreamID s)
                     continue;
                 }
                 
-		sleep(1);   // For the change to take effect
+                sleep(1);   // For the change to take effect
             }
-	}
+        }
     }
 }
 
@@ -1766,9 +1785,10 @@ QMap<QString, QString> *AudioOutputCA::GetDevices(const char */*type*/)
     }
 
     UInt32 deviceCount = size / sizeof(AudioDeviceID);
-    auto* pDevices = new AudioDeviceID[deviceCount];
+    std::vector<AudioDeviceID> devices = {};
+    devices.resize(deviceCount);
     err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &pa,
-				     0, nullptr, &size, pDevices);
+                                    0, nullptr, &size, devices.data());
     if (err)
     {
         VBAUDIO(QString("AudioOutputCA::GetDevices: Unable to retrieve the list of "
@@ -1779,9 +1799,9 @@ QMap<QString, QString> *AudioOutputCA::GetDevices(const char */*type*/)
     {
         VBAUDIO(QString("GetDevices: Number of devices: %1").arg(deviceCount));
 
-        for (UInt32 dev = 0; dev < deviceCount; dev++)
+        for (const auto & dev : devices)
         {
-            CoreAudioData device(nullptr, pDevices[dev]);
+            CoreAudioData device(nullptr, dev);
             if (device.GetTotalOutputChannels() == 0)
                 continue;
             QString *name = device.GetName();
