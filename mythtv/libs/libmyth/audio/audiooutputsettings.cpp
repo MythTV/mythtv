@@ -254,6 +254,7 @@ int AudioOutputSettings::BestSupportedChannels()
 {
     if (m_channels.empty())
         return 2;
+    SortSupportedChannels(); // ensure last element is the best supported channel
     return m_channels.back();
 }
 
