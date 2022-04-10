@@ -13,5 +13,5 @@ INSTALLS = target
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-HEADERS += commandlineparser.h controlrequesthandler.h
-SOURCES += main.cpp commandlineparser.cpp controlrequesthandler.cpp
+HEADERS += mythmediaserver_commandlineparser.h controlrequesthandler.h
+SOURCES += mythmediaserver.cpp mythmediaserver_commandlineparser.cpp controlrequesthandler.cpp

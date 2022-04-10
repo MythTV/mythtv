@@ -24,7 +24,7 @@ macx {
 # Input
 HEADERS += zmserver.h
 
-SOURCES += main.cpp zmserver.cpp
+SOURCES += mythzmserver.cpp zmserver.cpp
 
 # Clang needs this to link on Fedora
 contains(CC, clang)

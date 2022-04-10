@@ -28,7 +28,7 @@ HEADERS += archiveutil.h selectdestination.h
 HEADERS += mythburn.h themeselector.h editmetadata.h thumbfinder.h
 HEADERS += exportnative.h importnative.h
 
-SOURCES += main.cpp archivesettings.cpp logviewer.cpp
+SOURCES += mytharchive.cpp archivesettings.cpp logviewer.cpp
 SOURCES += fileselector.cpp recordingselector.cpp videoselector.cpp
 SOURCES += archivedbcheck.cpp archiveutil.cpp selectdestination.cpp
 SOURCES += mythburn.cpp themeselector.cpp editmetadata.cpp thumbfinder.cpp

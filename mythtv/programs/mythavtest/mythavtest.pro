@@ -13,9 +13,9 @@ INSTALLS = target
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-HEADERS += commandlineparser.h
+HEADERS += mythavtest_commandlineparser.h
 
-SOURCES += main.cpp commandlineparser.cpp
+SOURCES += mythavtest.cpp mythavtest_commandlineparser.cpp
 
 macx {
     mac_bundle {

@@ -23,12 +23,12 @@ config.files += config/*.conf
 INSTALLS += config
 
 # Input
-HEADERS += commandlineparser.h
+HEADERS += mythexternrecorder_commandlineparser.h
 HEADERS += MythExternControl.h
 HEADERS += MythExternRecApp.h
 
-SOURCES += commandlineparser.cpp
+SOURCES += mythexternrecorder_commandlineparser.cpp
 SOURCES += MythExternControl.cpp
 SOURCES += MythExternRecApp.cpp
-SOURCES += main.cpp
+SOURCES += mythexternrecorder.cpp
 

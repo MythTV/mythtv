@@ -20,7 +20,7 @@ INSTALLS += installimages
 # Input
 HEADERS += mythbrowser.h mythflashplayer.h webpage.h
 HEADERS += bookmarkmanager.h bookmarkeditor.h browserdbutil.h
-SOURCES += main.cpp mythbrowser.cpp mythflashplayer.cpp webpage.cpp
+SOURCES += libmythbrowser.cpp mythbrowser.cpp mythflashplayer.cpp webpage.cpp
 SOURCES += bookmarkmanager.cpp bookmarkeditor.cpp browserdbutil.cpp
 
 DEFINES += MPLUGIN_API

@@ -14,8 +14,8 @@ INSTALLS = target
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-HEADERS += welcomedialog.h welcomesettings.h commandlineparser.h
-SOURCES += main.cpp welcomedialog.cpp welcomesettings.cpp commandlineparser.cpp
+HEADERS += welcomedialog.h welcomesettings.h mythwelcome_commandlineparser.h
+SOURCES += mythwelcome.cpp welcomedialog.cpp welcomesettings.cpp mythwelcome_commandlineparser.cpp
 
 macx {
     mac_bundle {

@@ -9,7 +9,7 @@
 #include "programinfo.h"
 
 // Local includes
-#include "commandlineparser.h"
+#include "mythutil_commandlineparser.h"
 
 using UtilFunc = int (*)(const MythUtilCommandLineParser &cmdline);
 using UtilMap  = QMap<QString, UtilFunc>;

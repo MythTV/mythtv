@@ -28,11 +28,11 @@ using_backend {
 # Input
 HEADERS += backendsettings.h   channeleditor.h   checksetup.h
 HEADERS += exitprompt.h        importicons.h     startprompt.h
-HEADERS += expertsettingseditor.h commandlineparser.h
+HEADERS += expertsettingseditor.h mythtv-setup_commandlineparser.h
 
 SOURCES += backendsettings.cpp channeleditor.cpp checksetup.cpp
 SOURCES += exitprompt.cpp      importicons.cpp   startprompt.cpp
-SOURCES += main.cpp commandlineparser.cpp
+SOURCES += mythtv-setup.cpp mythtv-setup_commandlineparser.cpp
 
 macx {
     mac_bundle {

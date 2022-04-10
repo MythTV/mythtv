@@ -1,7 +1,7 @@
 # Makefile for mythzmserver 
 #
 
-mythzmserver_objects =  main.o zmserver.o
+mythzmserver_objects =  mythzmserver.o zmserver.o
 
 
 all : mythzmserver 
@@ -10,7 +10,7 @@ mythzmserver: $(mythzmserver_objects)
 	g++ -o mythzmserver $(mythzmserver_objects) $(shell mysql_config --libs)
 
 
-main: main.cpp
+mythzmserver.o: mythzmserver.cpp
 zmserver: zmserver.cpp
 
 clean:

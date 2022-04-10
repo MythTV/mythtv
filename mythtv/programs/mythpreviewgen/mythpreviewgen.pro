@@ -12,9 +12,9 @@ INSTALLS = target
 
 QMAKE_CLEAN += $(TARGET)
 
-HEADERS += commandlineparser.h
+HEADERS += mythpreviewgen_commandlineparser.h
 
-SOURCES += main.cpp commandlineparser.cpp
+SOURCES += mythpreviewgen.cpp mythpreviewgen_commandlineparser.cpp
 
 using_oss:DEFINES += USING_OSS
 

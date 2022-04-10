@@ -31,7 +31,7 @@ HEADERS += PrePostRollFlagger.h
 
 HEADERS += LogoDetectorBase.h SceneChangeDetectorBase.h
 HEADERS += SlotRelayer.h CustomEventRelayer.h
-HEADERS += commandlineparser.h
+HEADERS += mythcommflag_commandlineparser.h
 
 SOURCES += CommDetectorFactory.cpp CommDetectorBase.cpp
 SOURCES += ClassicLogoDetector.cpp
@@ -50,7 +50,7 @@ SOURCES += BlankFrameDetector.cpp
 SOURCES += SceneChangeDetector.cpp
 SOURCES += PrePostRollFlagger.cpp
 
-SOURCES += main.cpp commandlineparser.cpp
+SOURCES += mythcommflag.cpp mythcommflag_commandlineparser.cpp
 
 QT += xml sql network
 

@@ -12,7 +12,7 @@
 #include <QThread>
 #include <QTime>
 
-#include "commandlineparser.h"
+#include "mythfilerecorder_commandlineparser.h"
 #include "mythfilerecorder.h"
 
 #include "exitcodes.h"

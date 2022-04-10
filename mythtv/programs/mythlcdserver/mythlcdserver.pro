@@ -11,6 +11,6 @@ target.path = $${PREFIX}/bin
 
 INSTALLS += target
 
-HEADERS += lcdserver.h  lcdprocclient.h commandlineparser.h
+HEADERS += lcdserver.h  lcdprocclient.h mythlcdserver_commandlineparser.h
 
-SOURCES += main.cpp lcdserver.cpp lcdprocclient.cpp commandlineparser.cpp
+SOURCES += mythlcdserver.cpp lcdserver.cpp lcdprocclient.cpp mythlcdserver_commandlineparser.cpp

@@ -13,8 +13,8 @@ INSTALLS = target
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-HEADERS += commandlineparser.h screenwizard.h
+HEADERS += mythscreenwizard_commandlineparser.h screenwizard.h
 
-SOURCES += main.cpp commandlineparser.cpp screenwizard.cpp
+SOURCES += mythscreenwizard.cpp mythscreenwizard_commandlineparser.cpp screenwizard.cpp
 
 using_x11:DEFINES += USING_X11

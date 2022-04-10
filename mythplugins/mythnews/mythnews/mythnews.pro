@@ -26,7 +26,7 @@ HEADERS += newsdbutil.h   newsdbcheck.h
 SOURCES += mythnews.cpp   mythnewsconfig.cpp mythnewseditor.cpp
 SOURCES += newssite.cpp   newsarticle.cpp
 SOURCES += newsdbutil.cpp newsdbcheck.cpp
-SOURCES += main.cpp
+SOURCES += libmythnews.cpp
 
 DEFINES += MPLUGIN_API
 

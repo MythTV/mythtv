@@ -11,6 +11,6 @@ INSTALLS = target
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-HEADERS += commandlineparser.h
-SOURCES += commandlineparser.cpp main.cpp
+HEADERS += mythccextractor_commandlineparser.h
+SOURCES += mythccextractor_commandlineparser.cpp mythccextractor.cpp
 

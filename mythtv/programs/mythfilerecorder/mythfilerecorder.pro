@@ -15,10 +15,10 @@ QMAKE_CLEAN += $(TARGET)
 
 # Input
 HEADERS += mythfilerecorder.h
-HEADERS += commandlineparser.h
+HEADERS += mythfilerecorder_commandlineparser.h
 
 SOURCES += mythfilerecorder.cpp
-SOURCES += commandlineparser.cpp
+SOURCES += mythfilerecorder_commandlineparser.cpp
 
 QT += xml sql network
 

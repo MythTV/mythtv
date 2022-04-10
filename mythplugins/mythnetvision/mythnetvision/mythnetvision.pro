@@ -32,7 +32,7 @@ HEADERS += rsseditor.h searcheditor.h netcommon.h
 HEADERS += neteditorbase.h netsearch.h treeeditor.h nettree.h netbase.h
 
 SOURCES += rsseditor.cpp netsearch.cpp searcheditor.cpp netcommon.cpp
-SOURCES += neteditorbase.cpp treeeditor.cpp nettree.cpp main.cpp netbase.cpp
+SOURCES += neteditorbase.cpp treeeditor.cpp nettree.cpp mythnetvision.cpp netbase.cpp
 
 DEFINES += MPLUGIN_API
 

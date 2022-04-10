@@ -6,7 +6,7 @@ TEMPLATE = app
 CONFIG -= moc
 
 # Input
-SOURCES += main.cpp
+SOURCES += themestrings.cpp
 
 QT += xml
 QT += widgets
