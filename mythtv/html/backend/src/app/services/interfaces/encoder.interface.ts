@@ -1,3 +1,5 @@
+import { ScheduleOrProgram } from "./program.interface";
+
 // Definitions from libs/libmythtv/tv.h
 export enum TVState {
     kState_Error = -1,
@@ -30,7 +32,7 @@ export interface Encoder {
     Inputs:         EncoderInput[];
     Local:          boolean;
     LowOnFreeSpace: boolean;
-    Recording:      number;
+    Recording:      ScheduleOrProgram;
     SleepStatus:    number;
     State:          number;
 }
