@@ -4,7 +4,13 @@
         <div *ngFor="let encoder of encoders">
             <ul>
                 <!-- TODO: The details of the Capture Card need to be pulled from the /Capture API -->
-                <li>Encoder {{ encoder.Id }} is on host {{ encoder.HostName }}, State: {{ EncoderStatusText(encoder.State) }} </li>
+                <li>
+                    Encoder {{ encoder.Id }} is on host {{ encoder.HostName }}, State: {{ EncoderStatusText(encoder.State) }}
+                    <!-- TVState.kState_RecordingOnly = 7 -->
+                    <ng-container *ngIf="encoder.State == 7"> '{{ encoder.Recording.Title }}' on {{ encoder.Recording.Channel.CallSign }}.
+                        This recording is scheduled to end at {{ encoder.Recording.EndTime }}.
+                    </ng-container>
+                </li>
                 <div *ngFor="let input of encoder.Inputs">
                     <ul>
                         <li>Card: {{ input.CardId }}, Input: {{ input.Id }} is {{ input.InputName }}, displayname: {{ input.DisplayName }} </li>

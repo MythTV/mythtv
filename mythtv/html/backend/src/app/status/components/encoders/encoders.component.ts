@@ -31,6 +31,8 @@ export class EncodersComponent implements OnInit {
       case TVState.kState_WatchingBD:
         return "Watching BD";
       case TVState.kState_WatchingRecording:
+        return "Watching Recording";
+      case TVState.kState_RecordingOnly:
         return "Recording";
       case TVState.kState_ChangingState:
         return "Changing State";
