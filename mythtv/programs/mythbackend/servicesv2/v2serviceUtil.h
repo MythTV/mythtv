@@ -39,9 +39,11 @@ void V2FillGenreList( V2GenreList *pGenreList, int videoID);
 
 void V2FillProgramInfo( V2Program *pProgram,
                       ProgramInfo  *pInfo,
-                      bool          bIncChannel = true,
-                      bool          bDetails    = true,
-                      bool          bIncCast    = true);
+                      bool          bIncChannel   = true,
+                      bool          bDetails      = true,
+                      bool          bIncCast      = true,
+                      bool          bIncArtWork   = true,
+                      bool          bIncRecording = true);
 
 bool V2FillChannelInfo( V2ChannelInfo *pChannel,
                       uint              nChanID,

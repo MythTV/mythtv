@@ -86,7 +86,7 @@ class V2Dvr : public MythHTTPService
     static V2ProgramList* GetExpiringList(  int             StartIndex,
                                             int             Count      );
 
-    static V2ProgramList* GetRecordedList(  bool            Descending,
+    V2ProgramList* GetRecordedList(         bool            Descending,
                                             int             StartIndex,
                                             int             Count,
                                             const QString   &TitleRegEx,
@@ -95,7 +95,12 @@ class V2Dvr : public MythHTTPService
                                             const QString   &Category,
                                             const QString   &Sort,
                                             bool             IgnoreLiveTV,
-                                            bool             IgnoreDeleted);
+                                            bool             IgnoreDeleted,
+                                            bool             IncChannel,
+                                            bool             Details,
+                                            bool             IncCast,
+                                            bool             IncArtWork,
+                                            bool             IncRecording);
 
     static V2ProgramList* GetOldRecordedList( bool             Descending,
                                             int              StartIndex,

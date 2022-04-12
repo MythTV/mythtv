@@ -17,9 +17,11 @@
 
 void V2FillProgramInfo( V2Program *pProgram,
                       ProgramInfo  *pInfo,
-                      bool          bIncChannel /* = true */,
-                      bool          bDetails    /* = true */,
-                      bool          bIncCast    /* = true */)
+                      bool          bIncChannel   /* = true */,
+                      bool          bDetails      /* = true */,
+                      bool          bIncCast      /* = true */,
+                      bool          bIncArtwork   /* = true */,
+                      bool          bIncRecording /* = true */)
 {
     if ((pProgram == nullptr) || (pInfo == nullptr))
         return;
@@ -71,11 +73,11 @@ void V2FillProgramInfo( V2Program *pProgram,
     }
 
     if (bIncCast)
-    {
         V2FillCastMemberList( pProgram->Cast(), pInfo );
-    }
+    else
+        pProgram->enableCast(false);
 
-    if ( bIncChannel )
+    if (bIncChannel)
     {
         // Build Channel Child Element
         if (!V2FillChannelInfo( pProgram->Channel(), pInfo->GetChanID(), bDetails ))
@@ -86,10 +88,12 @@ void V2FillProgramInfo( V2Program *pProgram,
             pProgram->Channel()->setChanId(pInfo->GetChanID());
         }
     }
+    else
+        pProgram->enableChannel(false);
 
     // Build Recording Child Element
 
-    if ( pInfo->GetRecordingStatus() != RecStatus::Unknown )
+    if ( bIncRecording && pInfo->GetRecordingStatus() != RecStatus::Unknown )
     {
         V2RecordingInfo *pRecording = pProgram->Recording();
 
@@ -120,12 +124,13 @@ void V2FillProgramInfo( V2Program *pProgram,
             pRecording->setProfile     ( pRecInfo.GetProgramRecordingProfile() );
         }
     }
+    else
+        pProgram->enableRecording(false);
 
-    if (!pInfo->GetInetRef().isEmpty() )
-    {
-        V2FillArtworkInfoList( pProgram->Artwork(), pInfo->GetInetRef(),
-                             pInfo->GetSeason());
-    }
+    if ( bIncArtwork && !pInfo->GetInetRef().isEmpty() )
+        V2FillArtworkInfoList( pProgram->Artwork(), pInfo->GetInetRef(), pInfo->GetSeason());
+    else
+        pProgram->enableArtwork(false);
 }
 
 /////////////////////////////////////////////////////////////////////////////

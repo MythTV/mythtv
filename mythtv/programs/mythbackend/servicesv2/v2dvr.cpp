@@ -131,9 +131,29 @@ V2ProgramList* V2Dvr::GetRecordedList( bool           bDescending,
                                        const QString &sCategory,
                                        const QString &sSort,
                                        bool           bIgnoreLiveTV,
-                                       bool           bIgnoreDeleted
+                                       bool           bIgnoreDeleted,
+                                       bool           bIncChannel,
+                                       bool           bDetails,
+                                       bool           bIncCast,
+                                       bool           bIncArtWork,
+                                       bool           bIncRecording
                                      )
 {
+    if (!HAS_PARAM("IncChannel"))
+        bIncChannel = true;
+
+    if (!HAS_PARAM("Details"))
+        bDetails = true;
+
+    if (!HAS_PARAM("IncCast"))
+        bIncCast = true;
+
+    if (!HAS_PARAM("IncArtwork"))
+        bIncArtWork = true;
+
+    if (!HAS_PARAM("IncRecording"))
+        bIncRecording = true;
+
     QMap< QString, ProgramInfo* > recMap;
 
     if (gCoreContext->GetScheduler())
@@ -175,6 +195,7 @@ V2ProgramList* V2Dvr::GetRecordedList( bool           bDescending,
     // ----------------------------------------------------------------------
 
     auto *pPrograms = new V2ProgramList();
+
     int nAvailable = 0;
 
     int nMax      = (nCount > 0) ? nCount : progList.size();
@@ -205,8 +226,7 @@ V2ProgramList* V2Dvr::GetRecordedList( bool           bDescending,
         ++nCount;
 
         V2Program *pProgram = pPrograms->AddNewProgram();
-
-        V2FillProgramInfo( pProgram, pInfo, true );
+        V2FillProgramInfo( pProgram, pInfo, bIncChannel, bDetails, bIncCast, bIncArtWork, bIncRecording );
     }
 
     // ----------------------------------------------------------------------

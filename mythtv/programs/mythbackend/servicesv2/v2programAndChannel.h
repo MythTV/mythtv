@@ -143,10 +143,10 @@ class V2Program : public QObject
     Q_PROPERTY( QObject*    Cast         READ Cast        USER true)
 
 
-    SERVICE_PROPERTY_PTR( V2ChannelInfo    , Channel     )
-    SERVICE_PROPERTY_PTR( V2RecordingInfo  , Recording   )
-    SERVICE_PROPERTY_PTR( V2ArtworkInfoList, Artwork     )
-    SERVICE_PROPERTY_PTR( V2CastMemberList , Cast        )
+    SERVICE_PROPERTY_COND_PTR( V2ChannelInfo    , Channel     )
+    SERVICE_PROPERTY_COND_PTR( V2RecordingInfo  , Recording   )
+    SERVICE_PROPERTY_COND_PTR( V2ArtworkInfoList, Artwork     )
+    SERVICE_PROPERTY_COND_PTR( V2CastMemberList , Cast        )
 
     public:
 

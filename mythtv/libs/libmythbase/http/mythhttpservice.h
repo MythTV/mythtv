@@ -108,6 +108,21 @@ class MBASE_PUBLIC V2HttpRedirectException
         return m_##name;                \
     }
 
+#define SERVICE_PROPERTY_COND_PTR( type, name )   \
+    private: type* m_##name {nullptr};    /* NOLINT(bugprone-macro-parentheses) */ \
+             bool  m_b##name {true};    \
+    public:                             \
+    type* name()                          /* NOLINT(bugprone-macro-parentheses) */ \
+    {                                   \
+        if (m_##name == nullptr && m_b##name)     \
+            m_##name = new type( this );\
+        return m_##name;                \
+    } \
+    void enable##name(bool enabled)     \
+    {                                   \
+        m_b##name = enabled;            \
+    }
+
 template< class T >
 void CopyListContents( QObject *pParent, QVariantList &dst, const QVariantList &src )
 {
