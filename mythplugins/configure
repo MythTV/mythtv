@@ -682,16 +682,6 @@ if enabled music ; then
     if enabled cdio ; then
         if ! check_lib cdio/cdio.h cdio_open -lcdio ; then
             disable cdio
-        # cd paranoia moved to sib-directory on latest debian based releases
-        elif check_lib cdio/cdda.h cdio_cddap_open -lcdio_cdda && \
-             check_lib cdio/paranoia.h cdio_paranoia_init -lcdio_paranoia ; then
-            enable cdio; # nop
-        elif check_lib cdio/paranoia/cdda.h cdio_cddap_open -lcdio_cdda && \
-             check_lib cdio/paranoia/paranoia.h cdio_paranoia_init -lcdio_paranoia ; then
-            enable cdio; # nop
-            enable cdparanoia_subdir
-        else
-            disable cdio
 	fi
     fi
 
@@ -834,9 +824,6 @@ if enabled music ; then
 
     if enabled cdio ; then
       echo "#define HAVE_CDIO 1" >> ./mythmusic/mythmusic/config.h
-      if enabled cdparanoia_subdir ; then
-        echo "#define HAVE_CDPARANOIA_SUBDIR 1" >> ./mythmusic/mythmusic/config.h
-      fi
       echo "CONFIG += cdio" >> ./mythmusic/mythmusic/config.pro
       echo "        libcdio        support will be included in MythMusic"
     else

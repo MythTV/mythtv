@@ -1645,8 +1645,6 @@ HEADERS_LIST="
     altivec_h
     arpa_inet_h
     asm_types_h
-    cdio_paranoia_h
-    cdio_paranoia_paranoia_h
     d3d11_h
     dispatch_dispatch_h
     dev_bktr_ioctl_bt848_h
