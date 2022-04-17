@@ -1,4 +1,3 @@
-#include "config.h"
 #include "rom_metadata.h"
 
 #include <array>
