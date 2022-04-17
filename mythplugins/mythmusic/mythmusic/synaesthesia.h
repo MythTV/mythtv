@@ -5,7 +5,6 @@
 #include <visual.h>
 #include "polygon.h"
 #include "mainvisual.h"
-#include "config.h"
 
 class QImage;
 

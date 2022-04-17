@@ -7,8 +7,6 @@
 #ifndef INLINES_H
 #define INLINES_H
 
-#include "config.h"
-
 // *fast* convenience functions
 
 static inline void stereo16_from_stereopcm8(short *l,
