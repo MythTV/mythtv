@@ -199,7 +199,7 @@ ProgramInfoCache::UpdateStates ProgramInfoCache::Update(const ProgramInfo &pginf
     ProgramInfo& pg = **it;
     UpdateStates flags { PIC_NONE };
 
-    if (pginfo.GetBookmarkUpdate() != pg.GetBookmarkUpdate())
+    if (pginfo.GetBookmarkUpdate() != pg.m_previewUpdate)
         flags |= PIC_MARK_CHANGED;
 
     if (pginfo.GetRecordingGroup() != pg.GetRecordingGroup())
@@ -223,7 +223,7 @@ ProgramInfoCache::UpdateStates ProgramInfoCache::Update(const ProgramInfo &pginf
 }
 
 /** \brief Updates a ProgramInfo in the cache.
- *  \note This spawns a background thread as it contains multiple Db
+ *  \note This runs in a background thread as it contains multiple Db
  *   queries.
  */
 void ProgramInfoCache::UpdateFileSize(uint recordingID, uint64_t filesize,
@@ -250,6 +250,10 @@ void ProgramInfoCache::UpdateFileSize(uint recordingID, uint64_t filesize,
         if (pg->QueryIsInUse(byWhom) && byWhom.contains(QObject::tr("Playing")))
             flags &= ~PIC_MARK_CHANGED;
     }
+
+    // Time of preview picture generation request for next comparison
+    if (flags & PIC_MARK_CHANGED)
+        pg->m_previewUpdate = pg->GetBookmarkUpdate();
 
     QString mesg = QString("UPDATE_UI_ITEM %1 %2").arg(recordingID).arg(flags);
     QCoreApplication::postEvent(m_listener, new MythEvent(mesg));
