@@ -837,6 +837,7 @@ class MPUBLIC ProgramInfo
     uint8_t         m_availableStatus {asAvailable}; // only used for playbackbox.cpp
     int8_t          m_recordedPercent {-1};          // only used by UI
     int8_t          m_watchedPercent  {-1};          // only used by UI
+
   public:
     void SetAvailableStatus(AvailableStatusType status, const QString &where);
     AvailableStatusType GetAvailableStatus(void) const
@@ -853,6 +854,9 @@ class MPUBLIC ProgramInfo
     static QMutex              s_staticDataLock;
     static ProgramInfoUpdater *s_updater;
     static bool s_usingProgIDAuth;
+
+  public:
+    QDateTime       m_previewUpdate;
 };
 
 MPUBLIC bool LoadFromProgram(
