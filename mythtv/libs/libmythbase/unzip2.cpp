@@ -263,7 +263,7 @@ bool UnZip::zipWriteOneFile(const zipEntry& entry)
     return true;
 }
 
-bool UnZip::extractFile(QString outDirName)
+bool UnZip::extractFile(const QString& outDirName)
 {
     if (!isValid())
         return false;

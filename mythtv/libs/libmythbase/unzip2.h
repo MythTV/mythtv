@@ -44,7 +44,7 @@ class UnZip
   public:
     explicit UnZip(QString zipFile);
     ~UnZip();
-    bool extractFile(QString outDir);
+    bool extractFile(const QString& outDir);
 
   private:
     bool isValid() { return m_zip != nullptr; };

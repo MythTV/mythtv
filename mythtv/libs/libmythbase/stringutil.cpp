@@ -1,3 +1,4 @@
+#include <array>
 #include "stringutil.h"
 
 #if __has_include(<bit>) // C++20
@@ -16,7 +17,7 @@ static int countl_one(unsigned char x)
     if (x > 256)
         return 8; // works for our purposes even if not correct
 #endif
-    static constexpr int leading_ones[256] =
+    static constexpr std::array<int,256> leading_ones =
     {
 #define REPEAT_4(x) (x), (x), (x), (x)
 #define REPEAT_8(x)   REPEAT_4(x),  REPEAT_4(x)
@@ -38,7 +39,7 @@ static int countl_one(unsigned char x)
 
 bool StringUtil::isValidUTF8(const QByteArray& data)
 {
-    const unsigned char* p = (const unsigned char*)data.data();
+    const auto* p = (const unsigned char*)data.data();
     const unsigned char* const end = p + data.size();
     while (p < end)
     {
