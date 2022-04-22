@@ -87,8 +87,6 @@ static inline int qt_socket_socket(int domain, int type, int protocol)
 
 #include "msocketdevice.h"
 
-#include "qwindowdefs.h"
-
 #include <cerrno>
 #include <sys/types.h>
 

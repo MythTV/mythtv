@@ -43,7 +43,6 @@
 
 #include "msocketdevice.h"
 
-#include "qwindowdefs.h"
 #include <cstring>
 
 //#define MSOCKETDEVICE_DEBUG
