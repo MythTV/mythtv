@@ -100,7 +100,7 @@ void MythUIAnimation::IncrementCurrentTime(void)
         return;
 
     std::chrono::milliseconds current = MythDate::currentMSecsSinceEpochAsDuration();
-    std::chrono::milliseconds interval = std::min(current - m_lastUpdate, 50ms);
+    std::chrono::milliseconds interval = std::clamp(current - m_lastUpdate, 10ms, 50ms);
     m_lastUpdate = current;
 
     int offset = (direction() == Forward) ? interval.count() : -interval.count();
