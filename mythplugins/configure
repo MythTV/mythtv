@@ -682,6 +682,15 @@ if enabled music ; then
     if enabled cdio ; then
         if ! check_lib cdio/cdio.h cdio_open -lcdio ; then
             disable cdio
+        # cd paranoia moved to sub-directory on latest debian based releases
+        elif check_lib cdio/cdda.h cdio_cddap_open -lcdio_cdda && \
+             check_lib cdio/paranoia.h cdio_paranoia_init -lcdio_paranoia ; then
+            enable cdio; # nop
+        elif check_lib cdio/paranoia/cdda.h cdio_cddap_open -lcdio_cdda && \
+             check_lib cdio/paranoia/paranoia.h cdio_paranoia_init -lcdio_paranoia ; then
+            enable cdio; # nop
+        else
+            disable cdio
 	fi
     fi
 
