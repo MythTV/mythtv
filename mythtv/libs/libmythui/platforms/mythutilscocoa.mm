@@ -4,6 +4,11 @@
 // OSX
 #import <Cocoa/Cocoa.h>
 #import <IOKit/graphics/IOGraphicsLib.h>
+#include <AvailabilityMacros.h>
+
+#if !defined(MAC_OS_VERSION_12_0)
+#define kIOMainPortDefault kIOMasterPortDefault
+#endif
 
 CGDirectDisplayID GetOSXCocoaDisplay(void* View)
 {
@@ -39,7 +44,7 @@ QByteArray GetOSXEDID(CGDirectDisplayID Display)
     CFMutableDictionaryRef matching = IOServiceMatching("IODisplayConnect");
 
     io_iterator_t iter;
-    if (IOServiceGetMatchingServices(kIOMasterPortDefault, matching, &iter))
+    if (IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iter))
       return result;
 
     io_service_t service = 0;

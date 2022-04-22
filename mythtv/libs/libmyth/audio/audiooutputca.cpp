@@ -19,10 +19,15 @@
 #include <CoreAudio/CoreAudio.h>
 #include <AudioUnit/AudioUnit.h>
 #include <AudioToolbox/AudioFormat.h>
+#include <AvailabilityMacros.h>
 
 #include "mythcorecontext.h"
 #include "audiooutputca.h"
 #include "SoundTouch.h"
+
+#if !defined(MAC_OS_VERSION_12_0)
+#define kAudioObjectPropertyElementMain kAudioObjectPropertyElementMaster
+#endif
 
 #define LOC QString("CoreAudio: ")
 
@@ -545,7 +550,7 @@ AudioDeviceID CoreAudioData::GetDeviceWithName(const QString &deviceName)
     {
 	kAudioHardwarePropertyDevices,
 	kAudioObjectPropertyScopeGlobal,
-	kAudioObjectPropertyElementMaster
+	kAudioObjectPropertyElementMain
     };
 
     OSStatus err = AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &pa,
@@ -599,7 +604,7 @@ AudioDeviceID CoreAudioData::GetDefaultOutputDevice()
     {
 	kAudioHardwarePropertyDefaultOutputDevice,
 	kAudioObjectPropertyScopeGlobal,
-	kAudioObjectPropertyElementMaster
+	kAudioObjectPropertyElementMain
     };
 
     // Find the ID of the default Device
@@ -627,7 +632,7 @@ int CoreAudioData::GetTotalOutputChannels()
     {
 	kAudioDevicePropertyStreamConfiguration,
 	kAudioDevicePropertyScopeOutput, // Scope needs to be set to output to find output streams
-	kAudioObjectPropertyElementMaster
+	kAudioObjectPropertyElementMain
     };
 
     OSStatus err = AudioObjectGetPropertyDataSize(mDeviceID, &pa,
@@ -671,7 +676,7 @@ QString *CoreAudioData::GetName()
     {
 	kAudioObjectPropertyName,
 	kAudioObjectPropertyScopeGlobal,
-	kAudioObjectPropertyElementMaster
+	kAudioObjectPropertyElementMain
     };
 
     CFStringRef name;
@@ -699,7 +704,7 @@ bool CoreAudioData::GetAutoHogMode()
     {
 	kAudioHardwarePropertyHogModeIsAllowed,
 	kAudioObjectPropertyScopeGlobal,
-	kAudioObjectPropertyElementMaster
+	kAudioObjectPropertyElementMain
     };
 
     OSStatus err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &pa, 0, nullptr, &size, &val);
@@ -719,7 +724,7 @@ void CoreAudioData::SetAutoHogMode(bool enable)
     {
 	kAudioHardwarePropertyHogModeIsAllowed,
 	kAudioObjectPropertyScopeGlobal,
-	kAudioObjectPropertyElementMaster
+	kAudioObjectPropertyElementMain
     };
 
     OSStatus err = AudioObjectSetPropertyData(kAudioObjectSystemObject, &pa, 0, nullptr,
@@ -739,7 +744,7 @@ pid_t CoreAudioData::GetHogStatus()
     {
 	kAudioDevicePropertyHogMode,
 	kAudioObjectPropertyScopeGlobal,
-	kAudioObjectPropertyElementMaster
+	kAudioObjectPropertyElementMain
     };
 
     OSStatus err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &pa, 0, nullptr,
@@ -761,7 +766,7 @@ bool CoreAudioData::SetHogStatus(bool hog)
     {
 	kAudioDevicePropertyHogMode,
 	kAudioObjectPropertyScopeGlobal,
-	kAudioObjectPropertyElementMaster
+	kAudioObjectPropertyElementMain
     };
 
     // According to Jeff Moore (Core Audio, Apple), Setting kAudioDevicePropertyHogMode
@@ -825,7 +830,7 @@ bool CoreAudioData::SetMixingSupport(bool mix)
     {
 	kAudioDevicePropertySupportsMixing,
 	kAudioObjectPropertyScopeGlobal,
-	kAudioObjectPropertyElementMaster
+	kAudioObjectPropertyElementMain
     };
     OSStatus err = AudioObjectSetPropertyData(mDeviceID, &pa, 0, nullptr,
 					      sizeof(mixEnable), &mixEnable);
@@ -851,7 +856,7 @@ bool CoreAudioData::GetMixingSupport()
     {
 	kAudioDevicePropertySupportsMixing,
 	kAudioObjectPropertyScopeGlobal,
-	kAudioObjectPropertyElementMaster
+	kAudioObjectPropertyElementMain
     };
     OSStatus err = AudioObjectGetPropertyData(mDeviceID, &pa, 0, nullptr,
 					      &size, &val);
@@ -873,7 +878,7 @@ AudioStreamIDVec CoreAudioData::StreamsList(AudioDeviceID d)
     {
 	kAudioDevicePropertyStreams,
 	kAudioObjectPropertyScopeGlobal,
-	kAudioObjectPropertyElementMaster
+	kAudioObjectPropertyElementMain
     };
 
     err = AudioObjectGetPropertyDataSize(d, &pa,
@@ -919,7 +924,7 @@ AudioStreamRangedVec CoreAudioData::FormatsList(AudioStreamID s)
         // Bugfix: kAudioStreamPropertyPhysicalFormats, is meant to only give array of AudioStreamBasicDescription
         kAudioStreamPropertyAvailablePhysicalFormats, // gives array of AudioStreamRangedDescription
         kAudioObjectPropertyScopeGlobal,
-        kAudioObjectPropertyElementMaster
+        kAudioObjectPropertyElementMain
     };
 
     // Retrieve all the stream formats supported by this output stream
@@ -981,7 +986,7 @@ RatesVec CoreAudioData::RatesList(AudioDeviceID d)
     {
 	kAudioDevicePropertyAvailableNominalSampleRates,
 	kAudioObjectPropertyScopeGlobal,
-	kAudioObjectPropertyElementMaster
+	kAudioObjectPropertyElementMain
     };
 
     // retrieve size of rate list
@@ -1113,7 +1118,7 @@ int CoreAudioData::OpenAnalog()
     {
 	kAudioHardwarePropertyDevices,
 	kAudioObjectPropertyScopeGlobal,
-	kAudioObjectPropertyElementMaster
+	kAudioObjectPropertyElementMain
     };
 
     Debug("OpenAnalog: Entering");
@@ -1505,7 +1510,7 @@ bool CoreAudioData::OpenSPDIF()
 	{
 	    kAudioStreamPropertyPhysicalFormat,
 	    kAudioObjectPropertyScopeGlobal,
-	    kAudioObjectPropertyElementMaster
+	    kAudioObjectPropertyElementMain
 	};
 
         // Retrieve the original format of this stream first
@@ -1622,7 +1627,7 @@ int CoreAudioData::AudioStreamChangeFormat(AudioStreamID               s,
     {
 	kAudioStreamPropertyPhysicalFormat,
 	kAudioObjectPropertyScopeGlobal,
-	kAudioObjectPropertyElementMaster
+	kAudioObjectPropertyElementMain
     };
     OSStatus err = AudioObjectSetPropertyData(s, &pa, 0, nullptr,
 					      sizeof(format), &format);
@@ -1676,7 +1681,7 @@ void CoreAudioData::ResetAudioDevices()
     {
 	kAudioHardwarePropertyDevices,
 	kAudioObjectPropertyScopeGlobal,
-	kAudioObjectPropertyElementMaster
+	kAudioObjectPropertyElementMain
     };
 
     OSStatus err = AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &pa,
@@ -1722,7 +1727,7 @@ void CoreAudioData::ResetStream(AudioStreamID s)
     {
 	kAudioStreamPropertyPhysicalFormat,
 	kAudioObjectPropertyScopeGlobal,
-	kAudioObjectPropertyElementMaster
+	kAudioObjectPropertyElementMain
     };
 
 
@@ -1771,7 +1776,7 @@ QMap<QString, QString> *AudioOutputCA::GetDevices(const char */*type*/)
     {
 	kAudioHardwarePropertyDevices,
 	kAudioObjectPropertyScopeGlobal,
-	kAudioObjectPropertyElementMaster
+	kAudioObjectPropertyElementMain
     };
 
     OSStatus err = AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &pa,

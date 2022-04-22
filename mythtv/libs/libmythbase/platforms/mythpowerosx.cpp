@@ -6,6 +6,11 @@
 // OSX
 #include <IOKit/ps/IOPowerSources.h>
 #include <IOKit/ps/IOPSKeys.h>
+#include <AvailabilityMacros.h>
+
+#if !defined(MAC_OS_VERSION_12_0)
+#define kIOMainPortDefault kIOMasterPortDefault
+#endif
 
 #define LOC QString("PowerOSX: ")
 
@@ -60,7 +65,7 @@ void MythPowerOSX::Init(void)
 
     // Is there a battery?
     CFArrayRef batteryinfo = NULL;
-    if (IOPMCopyBatteryInfo(kIOMasterPortDefault, &batteryinfo) == kIOReturnSuccess)
+    if (IOPMCopyBatteryInfo(kIOMainPortDefault, &batteryinfo) == kIOReturnSuccess)
     {
         CFRelease(batteryinfo);
 

@@ -17,10 +17,15 @@
 #include <IOKit/hid/IOHIDKeys.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreServices/CoreServices.h>     // for Gestalt
+#include <AvailabilityMacros.h>
 
 #include <sstream>
 
 #include "mythlogging.h"
+
+#if !defined(MAC_OS_VERSION_12_0)
+#define kIOMainPortDefault kIOMasterPortDefault
+#endif
 
 AppleRemote*    AppleRemote::_instance = nullptr;
 
@@ -188,7 +193,7 @@ static io_object_t _findAppleRemoteDevice(const char *devName)
     hidMatchDictionary = IOServiceMatching(devName);
 
     // check for matching devices
-    ioReturnValue = IOServiceGetMatchingServices(kIOMasterPortDefault,
+    ioReturnValue = IOServiceGetMatchingServices(kIOMainPortDefault,
                                                  hidMatchDictionary,
                                                  &hidObjectIterator);
 
