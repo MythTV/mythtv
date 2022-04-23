@@ -6,7 +6,7 @@
 
 #include "mythbaseexp.h"
 
-MBASE_PUBLIC  bool extractZIP(QString zipFile, QString outDir);
+MBASE_PUBLIC  bool extractZIP(QString zipFile, const QString& outDir);
 
 MBASE_PUBLIC  bool gzipFile(const QString &inFilename, const QString &zipFilename);
 MBASE_PUBLIC  bool gunzipFile(const QString &zipFilename, const QString &outFilename);

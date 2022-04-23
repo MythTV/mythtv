@@ -10,10 +10,10 @@
 #include "mythlogging.h"
 #include "unzip2.h"
 
-bool extractZIP(QString zipFile, QString outDir)
+bool extractZIP(QString zipFile, const QString& outDir)
 {
     UnZip unzip(std::move(zipFile));
-    return unzip.extractFile(std::move(outDir));
+    return unzip.extractFile(outDir);
 }
 
 bool gzipFile(const QString &inFilename, const QString &gzipFilename)
