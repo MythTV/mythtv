@@ -3140,7 +3140,8 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
 
         m_popupMenu->AddItem(tr("Recording Options"), nullptr, createRecordingMenu());
 
-        if (m_groupList->GetItemPos(m_groupList->GetItemCurrent()) == 0)
+        if (m_groupList->GetItemPos(m_groupList->GetItemCurrent()) == 0 ||
+            m_groupList->GetItemCurrent()->GetData().toString() == m_watchGroupLabel)
         {
             m_popupMenu->AddItem(tr("List Recorded Episodes"),
                                  &PlaybackBox::ShowRecordedEpisodes);
@@ -3211,7 +3212,8 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
     m_popupMenu->AddItem(tr("Recording Options"), nullptr, createRecordingMenu());
     m_popupMenu->AddItem(tr("Job Options"), nullptr, createJobMenu());
 
-    if (m_groupList->GetItemPos(m_groupList->GetItemCurrent()) == 0)
+    if (m_groupList->GetItemPos(m_groupList->GetItemCurrent()) == 0 ||
+        m_groupList->GetItemCurrent()->GetData().toString() == m_watchGroupLabel)
     {
         m_popupMenu->AddItem(tr("List Recorded Episodes"),
                              &PlaybackBox::ShowRecordedEpisodes);
@@ -3863,7 +3865,8 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
         }
         else if (action == ACTION_LISTRECORDEDEPISODES)
         {
-            if (m_groupList->GetItemPos(m_groupList->GetItemCurrent()) == 0)
+            if (m_groupList->GetItemPos(m_groupList->GetItemCurrent()) == 0 ||
+                m_groupList->GetItemCurrent()->GetData().toString() == m_watchGroupLabel)
                 ShowRecordedEpisodes();
             else
                 ShowAllRecordings();
