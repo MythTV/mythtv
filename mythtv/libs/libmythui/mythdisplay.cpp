@@ -14,7 +14,7 @@
 #include "libmythbase/mythlogging.h"
 #include "mythuihelper.h"
 #include "mythdisplay.h"
-#include "mythegl.h"
+#include "opengl/mythegl.h"
 #include "mythmainwindow.h"
 
 #ifdef USING_DBUS

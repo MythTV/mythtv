@@ -18,7 +18,7 @@
 #include "mythrenderopenglshaders.h"
 #include "mythuitype.h"
 #ifdef USING_X11
-#include "mythxdisplay.h"
+#include "platforms/mythxdisplay.h"
 #endif
 
 #define LOC QString("OpenGL: ")
