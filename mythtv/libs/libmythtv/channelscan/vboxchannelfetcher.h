@@ -13,9 +13,9 @@
 
 // MythTV headers
 #include "libmythbase/mthread.h"
+#include "libmythtv/iptvtuningdata.h"
 
 #include "channelscantypes.h"
-#include "iptvtuningdata.h"
 
 class ScanMonitor;
 class VBoxChannelFetcher;

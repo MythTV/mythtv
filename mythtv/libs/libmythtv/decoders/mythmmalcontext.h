@@ -3,7 +3,7 @@
 
 // MythTV
 #include "mythcodeccontext.h"
-#include "mythmmalinterop.h"
+#include "opengl/mythmmalinterop.h"
 
 using MMALProfiles = QList<MythCodecContext::CodecProfile>;
 

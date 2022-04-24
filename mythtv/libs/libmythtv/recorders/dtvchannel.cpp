@@ -6,7 +6,7 @@
 #include "libmythbase/mythlogging.h"
 
 #include "cardutil.h"
-#include "mpegtables.h"
+#include "mpeg/mpegtables.h"
 #include "tv_rec.h"
 
 #define LOC QString("DTVChan[%1](%2): ").arg(m_inputId).arg(GetDevice())

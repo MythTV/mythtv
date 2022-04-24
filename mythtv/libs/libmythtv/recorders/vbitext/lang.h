@@ -1,8 +1,8 @@
 #ifndef LANG_H
 #define LANG_H
 
+#include "captions/vbilut.h"
 #include "vt.h"
-#include "vbilut.h"
 
 extern int isLatin1;
 

@@ -7,7 +7,7 @@
 #include "libmythbase/mythsystemlegacy.h"
 
 #include "cardutil.h"
-#include "scaninfo.h"
+#include "channelscan/scaninfo.h"
 #include "sourceutil.h"
 
 bool SourceUtil::HasDigitalChannel(uint sourceid)

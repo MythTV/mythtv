@@ -7,10 +7,11 @@
 
 // MythTV includes
 #include "libmythbase/mythlogging.h"
-#include "mpegtables.h"
-#include "tv_rec.h"
-#include "satiputils.h"
+
+#include "mpeg/mpegtables.h"
 #include "satipchannel.h"
+#include "satiputils.h"
+#include "tv_rec.h"
 
 #define LOC QString("SatIPChan[%1]: ").arg(m_inputId)
 

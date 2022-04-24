@@ -4,8 +4,9 @@
 
 // MythTV includes
 #include "libmythbase/mythlogging.h"
-#include "mpegtables.h"
+
 #include "ExternalChannel.h"
+#include "mpeg/mpegtables.h"
 #include "tv_rec.h"
 
 #define LOC  QString("ExternChan[%1](%2): ").arg(m_inputId).arg(m_loc)

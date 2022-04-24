@@ -21,7 +21,7 @@
 #include "filters.h"
 #include "goom_tools.h"
 #include "graphic.h"
-#include "goom/zoom_filters.h"
+#include "visualisations/goom/zoom_filters.h"
 
 #ifdef MMX
 #define USE_ASM

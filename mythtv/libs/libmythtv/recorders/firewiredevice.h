@@ -11,12 +11,12 @@
 #include <vector>
 
 // Qt headers
-#include <QString>
 #include <QMutex>
+#include <QString>
 
 // MythTV headers
-#include "streamlisteners.h"
-#include "avcinfo.h"
+#include "mpeg/streamlisteners.h"
+#include "recorders/avcinfo.h"
 
 class TSPacket;
 

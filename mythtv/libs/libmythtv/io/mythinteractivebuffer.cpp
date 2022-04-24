@@ -1,14 +1,15 @@
+// Std
+#include <cstdio>
+
 // Qt
 #include <QScopedPointer>
 #include <QWriteLocker>
 
 // Mythtv
 #include "libmythbase/mythlogging.h"
-#include "netstream.h"
-#include "io/mythinteractivebuffer.h"
 
-// Std
-#include <cstdio>
+#include "io/mythinteractivebuffer.h"
+#include "mheg/netstream.h"
 
 #define LOC QString("InteractiveBuf: ")
 

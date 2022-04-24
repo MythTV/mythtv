@@ -13,12 +13,12 @@
 #include <QFile>
 
 // MythTV headers
-#include "asistreamhandler.h"
 #include "asichannel.h"
-#include "dtvsignalmonitor.h"
-#include "streamlisteners.h"
-#include "mpegstreamdata.h"
+#include "asistreamhandler.h"
 #include "cardutil.h"
+#include "dtvsignalmonitor.h"
+#include "mpeg/mpegstreamdata.h"
+#include "mpeg/streamlisteners.h"
 
 // DVEO ASI headers
 #include <dveo/asi.h>

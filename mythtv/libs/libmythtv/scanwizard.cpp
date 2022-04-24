@@ -31,14 +31,13 @@
 
 #include <utility>
 
-#include "scanwizardconfig.h"
-#include "channelscanner_gui.h"
-#include "scanwizard.h"
-
 #include "libmythbase/mythlogging.h"
 
-#include "channelimporter.h"
-#include "scaninfo.h"
+#include "channelscan/channelimporter.h"
+#include "channelscan/channelscanner_gui.h"
+#include "channelscan/scaninfo.h"
+#include "channelscan/scanwizardconfig.h"
+#include "scanwizard.h"
 #include "sourceutil.h"
 #include "videosource.h"
 

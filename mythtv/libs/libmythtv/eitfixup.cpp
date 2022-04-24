@@ -8,8 +8,8 @@
 #include "libmythbase/mythlogging.h"
 
 #include "channelutil.h" // for GetDefaultAuthority()
-#include "dishdescriptors.h" // for dish_theme_type_to_string
 #include "eitfixup.h"
+#include "mpeg/dishdescriptors.h" // for dish_theme_type_to_string
 
 /*------------------------------------------------------------------------
  * Event Fix Up Scripts - Turned on by entry in dtv_privatetype table

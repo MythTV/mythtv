@@ -42,19 +42,19 @@
 #include "channelinfo.h"
 #include "channelutil.h"
 #include "diseqcsettings.h"
-#include "firewiredevice.h"
 #include "frequencies.h"
+#include "recorders/firewiredevice.h"
 #include "scanwizard.h"
 #include "sourceutil.h"
 #include "v4l2util.h"
 #include "videosource.h"
 
 #ifdef USING_DVB
-#include "dvbtypes.h"
+#include "recorders/dvbtypes.h"
 #endif
 
 #ifdef USING_VBOX
-#include "vboxutils.h"
+#include "recorders/vboxutils.h"
 #endif
 
 #ifdef USING_HDHOMERUN

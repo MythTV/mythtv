@@ -31,21 +31,21 @@
 #define SISCAN_H
 
 // Qt includes
-#include <QRunnable>
-#include <QString>
 #include <QList>
-#include <QPair>
 #include <QMap>
-#include <QSet>
 #include <QMutex>
+#include <QPair>
+#include <QRunnable>
+#include <QSet>
+#include <QString>
 
 // MythTV includes
+#include "dtvconfparserhelpers.h" // for DTVTunerType
 #include "frequencytables.h"
 #include "iptvchannelfetcher.h"
-#include "streamlisteners.h"
+#include "mpeg/streamlisteners.h"
 #include "scanmonitor.h"
 #include "signalmonitorlistener.h"
-#include "dtvconfparserhelpers.h" // for DTVTunerType
 
 class MThread;
 class MSqlQuery;

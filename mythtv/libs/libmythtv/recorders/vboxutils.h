@@ -9,7 +9,7 @@
 #include <QString>
 
 // MythTV headers
-#include "vboxchannelfetcher.h"
+#include "channelscan/vboxchannelfetcher.h"
 
 #define VBOX_MIN_API_VERSION  "VB.2.50"
 

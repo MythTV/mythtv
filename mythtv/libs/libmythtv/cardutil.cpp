@@ -21,13 +21,13 @@
 
 #include "cardutil.h"
 #include "diseqcsettings.h"
-#include "dvbchannel.h"
 #include "inputinfo.h"
+#include "recorders/dvbchannel.h"
 #include "sourceutil.h"
 #include "videosource.h"
 
 #ifdef USING_DVB
-#include "dvbtypes.h"
+#include "recorders/dvbtypes.h"
 #endif
 
 #ifdef USING_V4L2
@@ -40,11 +40,11 @@
 
 #ifdef USING_VBOX
 #include "libmythbase/mythmiscutil.h"
-#include "vboxutils.h"
+#include "recorders/vboxutils.h"
 #endif
 
 #ifdef USING_SATIP
-#include "satiputils.h"
+#include "recorders/satiputils.h"
 #endif
 
 #ifdef USING_ASI

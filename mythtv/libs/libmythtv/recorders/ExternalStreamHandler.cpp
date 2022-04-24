@@ -23,13 +23,13 @@
 // MythTV headers
 #include "libmythbase/exitcodes.h"
 
-#include "ExternalStreamHandler.h"
 #include "ExternalChannel.h"
+#include "ExternalStreamHandler.h"
 //#include "ThreadedFileWriter.h"
-#include "dtvsignalmonitor.h"
-#include "streamlisteners.h"
-#include "mpegstreamdata.h"
 #include "cardutil.h"
+#include "dtvsignalmonitor.h"
+#include "mpeg/mpegstreamdata.h"
+#include "mpeg/streamlisteners.h"
 
 #define LOC QString("ExternSH[%1](%2): ").arg(m_inputId).arg(m_loc)
 

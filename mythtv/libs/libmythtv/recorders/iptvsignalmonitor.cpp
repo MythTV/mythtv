@@ -5,7 +5,7 @@
 
 #include "iptvchannel.h"
 #include "iptvsignalmonitor.h"
-#include "mpegstreamdata.h"
+#include "mpeg/mpegstreamdata.h"
 
 #define LOC QString("IPTVSigMon[%1](%2): ") \
             .arg(m_inputid).arg(m_channel->GetDevice())

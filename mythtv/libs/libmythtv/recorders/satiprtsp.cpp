@@ -14,13 +14,14 @@
 // MythTV includes
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsocket.h"
-#include "rtcpdatapacket.h"
-#include "rtppacketbuffer.h"
-#include "rtptsdatapacket.h"
+
+#include "rtp/rtcpdatapacket.h"
+#include "rtp/rtppacketbuffer.h"
+#include "rtp/rtptsdatapacket.h"
+#include "rtp/udppacketbuffer.h"
 #include "satiprtcppacket.h"
 #include "satiprtsp.h"
 #include "satipstreamhandler.h"
-#include "udppacketbuffer.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,15,2)
 #define capturedView capturedRef

@@ -2,15 +2,15 @@
 #define DVBCAM_H
 
 // Qt
-#include <QWaitCondition>
-#include <QRunnable>
-#include <QString>
 #include <QMap>
 #include <QMutex>
+#include <QRunnable>
+#include <QString>
+#include <QWaitCondition>
 
 // MythTV
-#include "mpegtables.h"
 #include "dvbtypes.h"
+#include "mpeg/mpegtables.h"
 
 class ChannelBase;
 class cCiHandler;

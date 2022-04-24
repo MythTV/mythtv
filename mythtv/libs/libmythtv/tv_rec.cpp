@@ -20,28 +20,28 @@
 #include "libmythbase/mythrandom.h"
 #include "libmythbase/storagegroup.h"
 
-#include "../vboxutils.h"
-#include "atscstreamdata.h"
-#include "atsctables.h"
 #include "cardutil.h"
-#include "channelbase.h"
 #include "channelgroup.h"
-#include "dtvchannel.h"
-#include "dtvrecorder.h"
-#include "dtvsignalmonitor.h"
-#include "dvbstreamdata.h"
 #include "eitscanner.h"
 #include "io/mythmediabuffer.h"
 #include "jobqueue.h"
 #include "livetvchain.h"
+#include "mpeg/atscstreamdata.h"
+#include "mpeg/atsctables.h"
+#include "mpeg/dvbstreamdata.h"
 #include "mythsystemevent.h"
 #include "osd.h"
 #include "previewgeneratorqueue.h"
+#include "recorders/channelbase.h"
+#include "recorders/dtvchannel.h"
+#include "recorders/dtvrecorder.h"
+#include "recorders/dtvsignalmonitor.h"
+#include "recorders/v4lchannel.h"
+#include "recorders/vboxutils.h"
 #include "recordingprofile.h"
 #include "recordingrule.h"
 #include "tv_rec.h"
 #include "tvremoteutil.h"
-#include "v4lchannel.h"
 
 #define DEBUG_CHANNEL_PREFIX 0 /**< set to 1 to channel prefixing */
 
@@ -4778,7 +4778,7 @@ QString TuningRequest::toString(void) const
 }
 
 #ifdef USING_DVB
-#include "dvbchannel.h"
+#include "recorders/dvbchannel.h"
 static void apply_broken_dvb_driver_crc_hack(ChannelBase *c, MPEGStreamData *s)
 {
     // Some DVB devices munge the PMT and/or PAT so the CRC check fails.

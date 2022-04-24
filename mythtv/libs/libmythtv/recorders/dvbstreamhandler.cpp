@@ -1,10 +1,10 @@
 // -*- Mode: c++ -*-
 
 // POSIX headers
-#include <fcntl.h>
-#include <sys/select.h>
-#include <sys/ioctl.h>
 #include <chrono> // for milliseconds
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <sys/select.h>
 #include <thread> // for sleep_for
 
 // Qt headers
@@ -12,14 +12,15 @@
 
 // MythTV headers
 #include "libmythbase/mythlogging.h"
-#include "dvbstreamhandler.h"
-#include "dvbchannel.h"
-#include "dtvsignalmonitor.h"
-#include "streamlisteners.h"
-#include "mpegstreamdata.h"
+
 #include "cardutil.h"
-#include "dvbtypes.h" // for pid filtering
 #include "diseqc.h" // for rotor retune
+#include "dtvsignalmonitor.h"
+#include "dvbchannel.h"
+#include "dvbstreamhandler.h"
+#include "dvbtypes.h" // for pid filtering
+#include "mpeg/mpegstreamdata.h"
+#include "mpeg/streamlisteners.h"
 
 #define LOC      QString("DVBSH[%1](%2): ").arg(m_inputId).arg(m_device)
 

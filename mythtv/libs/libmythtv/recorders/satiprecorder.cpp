@@ -4,11 +4,12 @@
 
 // MythTV includes
 #include "libmythbase/mythlogging.h"
-#include "tsstreamdata.h"
-#include "satipstreamhandler.h"
-#include "satiprecorder.h"
-#include "satipchannel.h"
+
 #include "io/mythmediabuffer.h"
+#include "mpeg/tsstreamdata.h"
+#include "satipchannel.h"
+#include "satiprecorder.h"
+#include "satipstreamhandler.h"
 #include "tv_rec.h"
 
 #define LOC QString("SatIPRec[%1]: ").arg(m_inputId)

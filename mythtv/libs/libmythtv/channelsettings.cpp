@@ -13,7 +13,7 @@
 #include "cardutil.h"
 #include "channelsettings.h"
 #include "channelutil.h"
-#include "mpegtables.h"
+#include "mpeg/mpegtables.h"
 
 
 QString ChannelDBStorage::GetWhereClause(MSqlBindings &bindings) const

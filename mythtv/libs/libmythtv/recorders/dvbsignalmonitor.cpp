@@ -1,8 +1,8 @@
 // -*- Mode: c++ -*-
 
 #include <cerrno>
-#include <cstring>
 #include <cmath>
+#include <cstring>
 
 #include <unistd.h>
 
@@ -12,18 +12,18 @@
 // MythTV headers
 #include "libmyth/mythcontext.h"
 #include "libmythbase/mythdbcon.h"
-#include "dvbsignalmonitor.h"
-#include "dvbchannel.h"
-#include "dvbstreamdata.h"
-#include "atscstreamdata.h"
-#include "mpegtables.h"
-#include "atsctables.h"
-#include "cardutil.h"
 
-#include "dvbtypes.h"
+#include "cardutil.h"
+#include "dvbchannel.h"
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
+#include "dvbsignalmonitor.h"
 #include "dvbstreamhandler.h"
+#include "dvbtypes.h"
+#include "mpeg/atscstreamdata.h"
+#include "mpeg/atsctables.h"
+#include "mpeg/dvbstreamdata.h"
+#include "mpeg/mpegtables.h"
 
 #define LOC QString("DVBSigMon[%1](%2): ") \
             .arg(m_inputid).arg(m_channel->GetDevice())

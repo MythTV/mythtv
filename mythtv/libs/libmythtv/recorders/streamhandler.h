@@ -16,10 +16,11 @@
 #endif
 
 // MythTV headers
-#include "DeviceReadBuffer.h" // for ReaderPausedCB
-#include "mpegstreamdata.h" // for PIDPriority
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythdate.h"
+
+#include "DeviceReadBuffer.h" // for ReaderPausedCB
+#include "mpeg/mpegstreamdata.h" // for PIDPriority
 
 class ThreadedFileWriter;
 

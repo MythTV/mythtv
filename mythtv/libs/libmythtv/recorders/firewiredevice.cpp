@@ -13,12 +13,13 @@
 #include <QMap>
 
 // MythTV headers
+#include "libmythbase/mythlogging.h"
+
 #include "linuxfirewiredevice.h"
 #if USING_OSX_FIREWIRE
 #include "darwinfirewiredevice.h"
 #endif
-#include "libmythbase/mythlogging.h"
-#include "mpegtables.h"
+#include "mpeg/mpegtables.h"
 
 #define LOC      QString("FireDev(%1): ").arg(guid_to_string(m_guid))
 

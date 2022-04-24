@@ -5,10 +5,10 @@
 #include "libmythui/mythmainwindow.h"
 
 #include "decoders/avformatdecoder.h"
-#include "interactivescreen.h"
-#include "interactivetv.h"
 #include "io/mythinteractivebuffer.h"
 #include "livetvchain.h"
+#include "mheg/interactivescreen.h"
+#include "mheg/interactivetv.h"
 #include "mythplayerui.h"
 #include "mythsystemevent.h"
 #include "osd.h"

@@ -24,7 +24,8 @@
 #define AVCPARSER_H
 
 #include <array>
-#include <H2645Parser.h>
+
+#include "mpeg/H2645Parser.h"
 
 class AVCParser : public H2645Parser
 {

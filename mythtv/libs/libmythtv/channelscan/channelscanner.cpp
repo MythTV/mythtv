@@ -29,23 +29,23 @@
 
 #include <algorithm>
 
-#include "analogsignalmonitor.h"
-#include "iptvchannelfetcher.h"
-#include "dvbsignalmonitor.h"
-#include "scanwizardconfig.h"
+#include "cardutil.h"
 #include "channelscan_sm.h"
 #include "channelscanner.h"
-#include "hdhrchannel.h"
-#include "scanmonitor.h"
-#include "asichannel.h"
+#include "iptvchannelfetcher.h"
+#include "recorders/ExternalChannel.h"
+#include "recorders/analogsignalmonitor.h"
+#include "recorders/asichannel.h"
 #ifdef USING_DVB        // for bug in gcc 8.3
-#include "dvbchannel.h"
+#include "recorders/dvbchannel.h"
 #endif
-#include "v4lchannel.h"
-#include "iptvchannel.h"
-#include "ExternalChannel.h"
-#include "cardutil.h"
-#include "satipchannel.h"
+#include "recorders/dvbsignalmonitor.h"
+#include "recorders/hdhrchannel.h"
+#include "recorders/iptvchannel.h"
+#include "recorders/satipchannel.h"
+#include "recorders/v4lchannel.h"
+#include "scanmonitor.h"
+#include "scanwizardconfig.h"
 
 #define LOC QString("ChScan: ")
 

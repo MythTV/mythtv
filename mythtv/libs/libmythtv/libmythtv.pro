@@ -28,20 +28,8 @@ contains(INCLUDEPATH, /usr/X11R6/include) {
 }
 
 
-DEPENDPATH  += .
-DEPENDPATH  += ./mpeg ./channelscan ./mheg ./decoders ./opengl ./io ./captions
-DEPENDPATH  += ./visualisations ./visualisations/opengl ./visualisations/vulkan
-DEPENDPATH  += ./vulkan ./drm
-DEPENDPATH  += ./overlays
-DEPENDPATH  += ./recorders
-DEPENDPATH  += ./recorders/dvbdev
-DEPENDPATH  += ./recorders/rtp
-DEPENDPATH  += ./recorders/vbitext
-DEPENDPATH  += ./recorders/HLS
-
 INCLUDEPATH += .. ../.. # for avlib headers
 INCLUDEPATH += ../.. ../../external/FFmpeg
-INCLUDEPATH += $$DEPENDPATH
 
 !win32-msvc* {
     QMAKE_CXXFLAGS += $${FREETYPE_CFLAGS}
@@ -283,7 +271,7 @@ inc.files += mythavutil.h           mythframe.h
 
 INSTALLS += inc
 
-inc2.path = $${PREFIX}/include/mythtv/goom
+inc2.path = $${PREFIX}/include/mythtv/libmythtv/visualisations/goom
 inc2.files  = visualisations/goom/filters.h
 inc2.files += visualisations/goom/goomconfig.h
 inc2.files += visualisations/goom/goom_core.h

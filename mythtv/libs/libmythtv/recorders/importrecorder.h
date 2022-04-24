@@ -5,10 +5,10 @@
 
 #include <QMutex>
 
-#include "dtvrecorder.h"
-#include "tspacket.h"
-#include "mpegstreamdata.h"
 #include "DeviceReadBuffer.h"
+#include "dtvrecorder.h"
+#include "mpeg/mpegstreamdata.h"
+#include "mpeg/tspacket.h"
 
 struct AVFormatContext;
 struct AVPacket;

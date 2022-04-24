@@ -38,11 +38,13 @@
 #include <QMutexLocker>
 #include <QObject>
 
-// MythTV includes - General
+// MythTV includes - Other Libs
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
+
+// MythTV includes - General
 #include "cardutil.h"
 #include "channelscan_sm.h"
 #include "channelutil.h"
@@ -51,19 +53,19 @@
 #include "sourceutil.h"
 
 // MythTV includes - DTV
-#include "dtvsignalmonitor.h"
-#include "scanstreamdata.h"
+#include "mpeg/scanstreamdata.h"
+#include "recorders/dtvsignalmonitor.h"
 
 // MythTV includes - ATSC
-#include "atsctables.h"
+#include "mpeg/atsctables.h"
 
 // MythTV includes - DVB
-#include "dvbsignalmonitor.h"
-#include "dvbtables.h"
+#include "mpeg/dvbtables.h"
+#include "recorders/dvbsignalmonitor.h"
 
-#include "dvbchannel.h"
-#include "hdhrchannel.h"
-#include "v4lchannel.h"
+#include "recorders/dvbchannel.h"
+#include "recorders/hdhrchannel.h"
+#include "recorders/v4lchannel.h"
 
 /// SDT's should be sent every 2 seconds and NIT's every
 /// 10 seconds, so lets wait at least 30 seconds, in

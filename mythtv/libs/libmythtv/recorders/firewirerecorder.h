@@ -9,8 +9,8 @@
 
 // MythTV headers
 #include "dtvrecorder.h"
-#include "tspacket.h"
-#include "streamlisteners.h"
+#include "mpeg/streamlisteners.h"
+#include "mpeg/tspacket.h"
 
 class TVRec;
 class FirewireChannel;

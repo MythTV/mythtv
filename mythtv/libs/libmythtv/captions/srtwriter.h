@@ -2,24 +2,24 @@
 #ifndef SRTWRITER_H_
 #define SRTWRITER_H_
 
-#include <QStringList>
+// Qt
+#include <QHash>
 #include <QImage>
 #include <QPoint>
-#include <QHash>
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 #include <QStringConverter>
 #endif
+#include <QStringList>
 #include <QTime>
-
 #include <QtXml/QDomDocument>
 #include <QtXml/QDomElement>
 
-#include "avformatdecoder.h"
-#include "mythplayer.h"
+// MythTV
 #include "captions/teletextextractorreader.h"
+#include "decoders/avformatdecoder.h"
 #include "format.h"
-
 #include "mythccextractorplayer.h"
+#include "mythplayer.h"
 
 class OneSubtitle;
 

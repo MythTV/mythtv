@@ -1,28 +1,27 @@
 #include "scanwizardconfig.h"
 
-#include "videosource.h"
 #include "cardutil.h"
-#include "frequencytablesetting.h"
-#include "channelutil.h"
-
 #include "channelscanmiscsettings.h"
+#include "channelutil.h"
+#include "frequencytablesetting.h"
 #include "inputselectorsetting.h"
 #include "scanwizard.h"
+#include "videosource.h"
 
+#include "paneall.h"
+#include "paneanalog.h"
+#include "paneatsc.h"
+#include "panedvbc.h"
 #include "panedvbs.h"
 #include "panedvbs2.h"
-#include "panedvbc.h"
 #include "panedvbt.h"
 #include "panedvbt2.h"
-#include "paneatsc.h"
-#include "paneanalog.h"
-#include "panesingle.h"
-#include "paneall.h"
 #include "panedvbutilsimport.h"
 #include "paneexistingscanimport.h"
+#include "panesingle.h"
 
 #ifdef USING_SATIP
-#include "satiputils.h"
+#include "recorders/satiputils.h"
 #endif
 
 // Update default tuning parameters from reference transponder

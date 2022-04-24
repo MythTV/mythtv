@@ -3,19 +3,19 @@
 #include <algorithm>
 #include <cstdint>
 #include <set>
+#include <utility>
 
 #include <QFile>
 #include <QHash>
 #include <QImage>
 #include <QReadWriteLock>
-#include <utility>
 
 #include "libmythbase/mythdb.h"
 #include "libmythbase/stringutil.h"
 
-#include "HLSReader.h"
 #include "channelutil.h"
-#include "dvbtables.h"
+#include "mpeg/dvbtables.h"
+#include "recorders/HLS/HLSReader.h"
 
 #define LOC QString("ChanUtil: ")
 

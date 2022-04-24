@@ -10,12 +10,13 @@
 
 // MythTV includes
 #include "libmythbase/mythlogging.h"
-#include "hdhrstreamhandler.h"
-#include "atscstreamdata.h"
-#include "tsstreamdata.h"
-#include "hdhrrecorder.h"
+
 #include "hdhrchannel.h"
+#include "hdhrrecorder.h"
+#include "hdhrstreamhandler.h"
 #include "io/mythmediabuffer.h"
+#include "mpeg/atscstreamdata.h"
+#include "mpeg/tsstreamdata.h"
 #include "tv_rec.h"
 
 #define LOC QString("HDHRRec[%1]: ") \

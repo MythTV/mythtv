@@ -6,7 +6,7 @@
 #include "libmythbase/mythlogging.h"
 
 #include "DeviceReadBuffer.h"
-#include "tspacket.h"
+#include "mpeg/tspacket.h"
 
 #ifndef _WIN32
 #include <sys/poll.h>

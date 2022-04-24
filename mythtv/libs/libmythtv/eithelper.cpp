@@ -9,15 +9,15 @@
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
 
-#include "atsctables.h"
 #include "channelutil.h"
-#include "dishdescriptors.h"
-#include "dvbtables.h"
 #include "eitcache.h"
 #include "eitfixup.h"
 #include "eithelper.h"
-#include "premieredescriptors.h"
-#include "premieretables.h"
+#include "mpeg/atsctables.h"
+#include "mpeg/dishdescriptors.h"
+#include "mpeg/dvbtables.h"
+#include "mpeg/premieredescriptors.h"
+#include "mpeg/premieretables.h"
 #include "programdata.h"
 #include "scheduledrecording.h"  // for ScheduledRecording
 

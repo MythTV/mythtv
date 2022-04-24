@@ -11,7 +11,7 @@
 #include "decoders/avformatdecoder.h"
 #include "mythplayerui.h"
 #include "mythvaapicontext.h"
-#include "mythvaapiinterop.h"
+#include "opengl/mythvaapiinterop.h"
 #include "videobuffers.h"
 
 extern "C" {

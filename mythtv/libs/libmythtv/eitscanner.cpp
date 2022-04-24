@@ -16,10 +16,10 @@
 #include "libmythbase/mythrandom.h"
 #include "libmythbase/mythtimer.h"
 
-#include "channelbase.h"
 #include "channelutil.h"
 #include "eithelper.h"
 #include "eitscanner.h"
+#include "recorders/channelbase.h"
 #include "scheduledrecording.h"
 #include "tv_rec.h"
 

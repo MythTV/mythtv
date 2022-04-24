@@ -6,10 +6,11 @@
 
 // MythTV includes
 #include "libmythbase/mythlogging.h"
-#include "firewirerecorder.h"
+
 #include "firewirechannel.h"
-#include "mpegtables.h"
-#include "mpegstreamdata.h"
+#include "firewirerecorder.h"
+#include "mpeg/mpegstreamdata.h"
+#include "mpeg/mpegtables.h"
 #include "tv_rec.h"
 
 #define LOC QString("FireRecBase[%1](%2): ") \

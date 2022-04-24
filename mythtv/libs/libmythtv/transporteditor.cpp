@@ -37,7 +37,7 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 
-#include "satiputils.h"
+#include "recorders/satiputils.h"
 #include "sourceutil.h"
 #include "transporteditor.h"
 #include "videosource.h"

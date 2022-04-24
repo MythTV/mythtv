@@ -13,13 +13,13 @@
 // MythTV headers
 #include "libmythbase/mythlogging.h"
 
-#include "dtvsignalmonitor.h"
-#include "streamlisteners.h"
-#include "mpegstreamdata.h"
 #include "cardutil.h"
-#include "satiputils.h"
+#include "dtvsignalmonitor.h"
+#include "mpeg/mpegstreamdata.h"
+#include "mpeg/streamlisteners.h"
 #include "satipchannel.h"
 #include "satipstreamhandler.h"
+#include "satiputils.h"
 
 #define LOC QString("SatIPSH[%1]: ").arg(m_inputId)
 

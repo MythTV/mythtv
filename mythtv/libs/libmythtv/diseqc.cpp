@@ -25,7 +25,7 @@
 #include "dtvmultiplex.h"
 
 #ifdef USING_DVB
-#   include "dvbtypes.h"
+#   include "recorders/dvbtypes.h"
 #else
 #   define SEC_VOLTAGE_13  0
 #   define SEC_VOLTAGE_18  1

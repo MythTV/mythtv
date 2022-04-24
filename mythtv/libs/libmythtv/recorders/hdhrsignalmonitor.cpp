@@ -13,14 +13,13 @@
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
 
-#include "hdhrsignalmonitor.h"
-#include "atscstreamdata.h"
-#include "mpegtables.h"
-#include "atsctables.h"
-
 #include "hdhrchannel.h"
 #include "hdhrrecorder.h"
+#include "hdhrsignalmonitor.h"
 #include "hdhrstreamhandler.h"
+#include "mpeg/atscstreamdata.h"
+#include "mpeg/atsctables.h"
+#include "mpeg/mpegtables.h"
 
 #define LOC QString("HDHRSigMon[%1](%2): ") \
             .arg(m_inputid).arg(m_channel->GetDevice())

@@ -1,11 +1,12 @@
 // MythTV
 #include "libmythbase/mythlogging.h"
 #include "libmythui/mythmainwindow.h"
+
 #include "avformatdecoder.h"
-#include "mythnvdecinterop.h"
-#include "mythvideoout.h"
+#include "decoders/mythnvdeccontext.h"
 #include "mythplayerui.h"
-#include "mythnvdeccontext.h"
+#include "mythvideoout.h"
+#include "opengl/mythnvdecinterop.h"
 
 extern "C" {
 #include "libavutil/opt.h"

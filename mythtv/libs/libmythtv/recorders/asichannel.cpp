@@ -7,8 +7,9 @@
 
 // MythTV includes
 #include "libmythbase/mythlogging.h"
-#include "mpegtables.h"
+
 #include "asichannel.h"
+#include "mpeg/mpegtables.h"
 
 #define LOC     QString("ASIChan[%1](%2): ").arg(GetInputID()).arg(ASIChannel::GetDevice())
 

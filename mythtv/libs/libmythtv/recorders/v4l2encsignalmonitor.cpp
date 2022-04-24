@@ -12,9 +12,9 @@
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
 
-#include "atscstreamdata.h"
-#include "atsctables.h"
-#include "mpegtables.h"
+#include "mpeg/atscstreamdata.h"
+#include "mpeg/atsctables.h"
+#include "mpeg/mpegtables.h"
 
 #include "v4lchannel.h"
 #include "v4l2encrecorder.h"

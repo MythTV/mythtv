@@ -16,9 +16,9 @@
 #endif // USING_V4L2
 
 // vbitext headers
-#include "vt.h"
+#include "captions/vbilut.h"
 #include "vbi.h"
-#include "vbilut.h"
+#include "vt.h"
 
 #define FAC    (1<<16)         // factor for fix-point arithmetic
 

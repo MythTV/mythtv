@@ -3,13 +3,13 @@
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/opengl/mythrenderopengl.h"
 
+#include "avformatdecoder.h"
 #include "mythcodecid.h"
 #include "mythframe.h"
-#include "avformatdecoder.h"
-#include "videobuffers.h"
-#include "mythvtbinterop.h"
 #include "mythplayerui.h"
 #include "mythvtbcontext.h"
+#include "opengl/mythvtbinterop.h"
+#include "videobuffers.h"
 
 // FFmpeg
 extern "C" {

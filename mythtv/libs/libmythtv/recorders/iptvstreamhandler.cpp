@@ -20,12 +20,12 @@
 
 #include "cetonrtsp.h"
 #include "iptvstreamhandler.h"
-#include "rtcpdatapacket.h"
-#include "rtpdatapacket.h"
-#include "rtpfecpacket.h"
-#include "rtppacketbuffer.h"
-#include "rtptsdatapacket.h"
-#include "udppacketbuffer.h"
+#include "rtp/rtcpdatapacket.h"
+#include "rtp/rtpdatapacket.h"
+#include "rtp/rtpfecpacket.h"
+#include "rtp/rtppacketbuffer.h"
+#include "rtp/rtptsdatapacket.h"
+#include "rtp/udppacketbuffer.h"
 
 #define LOC QString("IPTVSH[%1](%2): ").arg(m_inputId).arg(m_device)
 

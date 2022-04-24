@@ -8,17 +8,18 @@
 #ifndef DVBCHANNEL_H
 #define DVBCHANNEL_H
 
+#include <QMap>
 #include <QObject>
 #include <QString>
-#include <QMap>
 
 #include "libmyth/mythcontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdbcon.h"
+
+#include "diseqc.h"
 #include "dtvchannel.h"
 #include "dtvconfparserhelpers.h" // for DTVTunerType
-#include "streamlisteners.h"
-#include "diseqc.h"
+#include "mpeg/streamlisteners.h"
 
 class TVRec;
 class DVBCam;

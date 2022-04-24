@@ -12,14 +12,14 @@
 
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
-#include "asisignalmonitor.h"
-#include "atscstreamdata.h"
-#include "mpegtables.h"
-#include "atsctables.h"
 
 #include "asichannel.h"
 #include "asirecorder.h"
+#include "asisignalmonitor.h"
 #include "asistreamhandler.h"
+#include "mpeg/atscstreamdata.h"
+#include "mpeg/atsctables.h"
+#include "mpeg/mpegtables.h"
 
 #define LOC QString("ASISigMon[%1](%2): ") \
     .arg(m_inputid).arg(m_channel->GetDevice())

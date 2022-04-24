@@ -5,7 +5,7 @@
 #include <QList>
 
 // MythTV
-#include "avformatdecoder.h"
+#include "decoders/avformatdecoder.h"
 
 #define INVALID_LBA 0xbfffffff
 

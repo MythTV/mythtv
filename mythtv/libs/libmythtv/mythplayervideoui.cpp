@@ -1,9 +1,10 @@
 // MythTV
 #include "libmythbase/mythlogging.h"
-#include "tv_play.h"
-#include "interactivetv.h"
-#include "mythvideooutgpu.h"
+
+#include "mheg/interactivetv.h"
 #include "mythplayervideoui.h"
+#include "mythvideooutgpu.h"
+#include "tv_play.h"
 
 #define LOC QString("PlayerVideo: ")
 

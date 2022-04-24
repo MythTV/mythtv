@@ -1,9 +1,8 @@
-#include "vbitext/vbi.h"
-
 #include <algorithm>
 
-#include "mythplayer.h"
 #include "captions/cc608reader.h"
+#include "mythplayer.h"
+#include "recorders/vbitext/vbi.h"
 
 CC608Reader::CC608Reader(MythPlayer *parent)
   : m_parent(parent)

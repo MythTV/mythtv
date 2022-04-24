@@ -8,7 +8,7 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythui/mythmainwindow.h"
 
-#include "mythcodeccontext.h"
+#include "decoders/mythcodeccontext.h"
 #include "mythvideoout.h"
 #include "mythvideoprofile.h"
 

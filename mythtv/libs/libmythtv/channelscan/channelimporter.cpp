@@ -20,8 +20,8 @@
 #include "libmythui/mythdialogbox.h"
 
 #include "channelimporter.h"
-#include "mpegstreamdata.h" // for kEncDecrypted
 #include "channelutil.h"
+#include "mpeg/mpegstreamdata.h" // for kEncDecrypted
 
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
   #define QT_ENDL endl

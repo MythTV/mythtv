@@ -34,25 +34,24 @@
 
 #include "DetectLetterbox.h"
 #include "audioplayer.h"
-#include "avformatdecoder.h"
 #include "cardutil.h"
+#include "decoders/avformatdecoder.h"
+#include "decoders/mythcodeccontext.h"
 #include "decoders/mythdecoderthread.h"
 #include "dummydecoder.h"
 #include "io/mythmediabuffer.h"
 #include "jitterometer.h"
 #include "livetvchain.h"
 #include "mythavutil.h"
-#include "mythcodeccontext.h"
 #include "mythplayer.h"
 #include "mythvideooutnull.h"
+#include "remoteencoder.h"
 #include "tv_actions.h"
 #include "tv_play.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
-
-#include "remoteencoder.h"
 
 static unsigned dbg_ident(const MythPlayer* /*player*/);
 

@@ -1,17 +1,18 @@
-// Qt
-#include <QDir>
-
-// MythTV
-#include "libmythbase/mythlogging.h"
-#include "mythiowrapper.h"
-#include "mythdvdinfo.h"
-
 // Std
 #include <fcntl.h>
 #include <zlib.h>
 
 #undef Z_NULL
 #define Z_NULL nullptr
+
+// Qt
+#include <QDir>
+
+// MythTV
+#include "libmythbase/mythlogging.h"
+
+#include "io/mythiowrapper.h"
+#include "mythdvdinfo.h"
 
 MythDVDInfo::MythDVDInfo(const QString &Filename)
 {

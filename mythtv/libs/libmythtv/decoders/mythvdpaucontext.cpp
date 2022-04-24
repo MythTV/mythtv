@@ -1,10 +1,12 @@
-// MythTV
+// MythTV other libs
 #include "libmythui/mythmainwindow.h"
+
+// MythTV
 #include "avformatdecoder.h"
-#include "mythvdpauinterop.h"
-#include "mythvdpauhelper.h"
-#include "mythvdpaucontext.h"
+#include "decoders/mythvdpaucontext.h"
+#include "decoders/mythvdpauhelper.h"
 #include "mythplayerui.h"
+#include "opengl/mythvdpauinterop.h"
 
 // FFmpeg
 extern "C" {

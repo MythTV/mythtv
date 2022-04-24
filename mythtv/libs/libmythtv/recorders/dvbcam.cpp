@@ -55,7 +55,7 @@
 #include "cardutil.h"
 #include "dvbcam.h"
 #include "dvbchannel.h"
-#include "dvbci.h"
+#include "dvbdev/dvbci.h"
 #include "dvbrecorder.h"
 #include "recorderbase.h"
 

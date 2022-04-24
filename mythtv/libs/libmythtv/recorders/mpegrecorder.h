@@ -3,10 +3,10 @@
 #ifndef MPEGRECORDER_H_
 #define MPEGRECORDER_H_
 
-#include "v4lrecorder.h"
-#include "tspacket.h"
-#include "mpegstreamdata.h"
 #include "DeviceReadBuffer.h"
+#include "mpeg/mpegstreamdata.h"
+#include "mpeg/tspacket.h"
+#include "v4lrecorder.h"
 
 struct AVFormatContext;
 struct AVPacket;

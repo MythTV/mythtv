@@ -1,15 +1,14 @@
-#include <unistd.h>
-
 #include <algorithm> // for lower_bound
+#include <unistd.h>
 
 #include "libmythbase/compat.h"
 
 #include "dtvchannel.h"
 #include "dtvsignalmonitor.h"
-#include "scanstreamdata.h"
-#include "mpegtables.h"
-#include "atsctables.h"
-#include "dvbtables.h"
+#include "mpeg/atsctables.h"
+#include "mpeg/dvbtables.h"
+#include "mpeg/mpegtables.h"
+#include "mpeg/scanstreamdata.h"
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_INFO, \

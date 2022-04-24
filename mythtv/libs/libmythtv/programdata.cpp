@@ -13,7 +13,7 @@
 #include "libmythbase/mythlogging.h"
 
 #include "channelutil.h"
-#include "dvbdescriptors.h"
+#include "mpeg/dvbdescriptors.h"
 #include "programdata.h"
 
 #define LOC      QString("ProgramData: ")

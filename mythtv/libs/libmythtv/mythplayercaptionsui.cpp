@@ -1,9 +1,9 @@
 // MythTV
-#include "livetvchain.h"
-#include "tv_play.h"
-#include "interactivetv.h"
 #include "captions/subtitlescreen.h"
+#include "livetvchain.h"
+#include "mheg/interactivetv.h"
 #include "mythplayercaptionsui.h"
+#include "tv_play.h"
 
 #define LOC QString("PlayerCaptions: ")
 

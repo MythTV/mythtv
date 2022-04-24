@@ -1,12 +1,14 @@
-// MythTV
+// MythTV other libs
 #include "libmythbase/mythlogging.h"
-#include "mythplayerui.h"
+
+// MythTV
 #include "Bluray/mythbdbuffer.h"
 #include "Bluray/mythbdoverlayscreen.h"
-#include "captions/teletextscreen.h"
 #include "captions/subtitlescreen.h"
-#include "interactivescreen.h"
+#include "captions/teletextscreen.h"
+#include "mheg/interactivescreen.h"
 #include "mythcaptionsoverlay.h"
+#include "mythplayerui.h"
 
 #define LOC QString("Captions: ")
 

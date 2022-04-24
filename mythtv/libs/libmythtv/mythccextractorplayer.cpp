@@ -28,10 +28,10 @@
 
 #include "libmythbase/iso639.h"
 
-#include "avformatdecoder.h"
 #include "captions/srtwriter.h"
 #include "captions/subtitlescreen.h"
 #include "captions/teletextextractorreader.h"
+#include "decoders/avformatdecoder.h"
 #include "mythccextractorplayer.h"
 
 SRTStuff::~SRTStuff()

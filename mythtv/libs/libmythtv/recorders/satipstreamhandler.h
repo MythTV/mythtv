@@ -14,11 +14,11 @@
 #include <QMap>
 
 // MythTV headers
-#include "mpegstreamdata.h"
-#include "streamhandler.h"
-#include "dtvmultiplex.h"
 #include "dtvconfparserhelpers.h"
+#include "dtvmultiplex.h"
+#include "mpeg/mpegstreamdata.h"
 #include "satiprtsp.h"
+#include "streamhandler.h"
 
 class SatIPStreamHandler;
 class DTVSignalMonitor;

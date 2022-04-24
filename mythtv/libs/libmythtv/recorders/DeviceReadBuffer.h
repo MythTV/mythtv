@@ -14,7 +14,7 @@
 #include "libmythbase/mythbaseutil.h"
 #include "libmythbase/mythtimer.h"
 
-#include "tspacket.h"
+#include "mpeg/tspacket.h"
 
 class DeviceReaderCB
 {

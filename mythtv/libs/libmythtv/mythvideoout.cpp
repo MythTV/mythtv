@@ -1,3 +1,7 @@
+// std
+#include <cmath>
+#include <cstdlib>
+
 // MythTV
 #include "libmythbase/mthreadpool.h"
 #include "libmythbase/mythcorecontext.h"
@@ -5,19 +9,15 @@
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythuihelper.h"
 
-#include "decoderbase.h"
+#include "decoders/decoderbase.h"
+#include "decoders/mythcodeccontext.h"
 #include "mythavutil.h"
-#include "mythcodeccontext.h"
 #include "mythplayer.h"
 #include "mythvideoout.h"
 #include "mythvideooutgpu.h"
 #include "mythvideooutnull.h"
 #include "mythvideoprofile.h"
 #include "osd.h"
-
-// std
-#include <cmath>
-#include <cstdlib>
 
 #define LOC QString("VideoOutput: ")
 

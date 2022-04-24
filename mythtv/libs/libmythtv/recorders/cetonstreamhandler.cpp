@@ -25,8 +25,8 @@
 #include "cardutil.h"
 #include "cetonchannel.h"
 #include "cetonstreamhandler.h"
-#include "mpegstreamdata.h"
-#include "streamlisteners.h"
+#include "mpeg/mpegstreamdata.h"
+#include "mpeg/streamlisteners.h"
 
 #define LOC QString("CetonSH[%1](%2): ").arg(m_inputId).arg(m_device)
 

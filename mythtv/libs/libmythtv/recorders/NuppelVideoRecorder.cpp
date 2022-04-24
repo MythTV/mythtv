@@ -1,13 +1,13 @@
+#include <cerrno>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
-#include <cerrno>
-#include <cmath>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <QStringList>
 #include <QtEndian>
@@ -23,11 +23,11 @@
 #include "fourcc.h"
 #include "mythavutil.h"
 #include "mythsystemevent.h"
+#include "recorders/vbitext/cc.h"
+#include "recorders/vbitext/vbi.h"
 #include "recordingprofile.h"
 #include "tv_play.h"
 #include "tv_rec.h"
-#include "vbitext/cc.h"
-#include "vbitext/vbi.h"
 
 #if HAVE_BIGENDIAN
 extern "C" {

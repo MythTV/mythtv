@@ -10,9 +10,9 @@
 #include <thread> // for sleep_for
 
 // MythTV headers
-#include "mpegstreamdata.h"
-#include "iptvrecorder.h"
 #include "iptvchannel.h"
+#include "iptvrecorder.h"
+#include "mpeg/mpegstreamdata.h"
 #include "tv_rec.h"
 
 #define LOC QString("IPTVRec: ")

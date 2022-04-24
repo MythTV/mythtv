@@ -1,3 +1,12 @@
+// Std
+#include <algorithm>
+#include <chrono>
+#include <cmath>
+#include <cstdarg>
+#include <cstdint>
+#include <cstdlib>
+#include <thread>
+
 // Qt
 #include <QApplication>
 #include <QDomDocument>
@@ -42,39 +51,30 @@
 #include "libmythui/mythuistatetracker.h"
 
 // libmythtv
-#include "DVD/mythdvdplayer.h"
+#include "Bluray/mythbdbuffer.h"
 #include "Bluray/mythbdplayer.h"
 #include "DVD/mythdvdbuffer.h"
-#include "Bluray/mythbdbuffer.h"
-#include "remoteencoder.h"
-#include "tvremoteutil.h"
-#include "mythplayerui.h"
-#include "jobqueue.h"
-#include "livetvchain.h"
-#include "playgroup.h"
-#include "sourceutil.h"
+#include "DVD/mythdvdplayer.h"
 #include "cardutil.h"
 #include "channelutil.h"
-#include "tv_play_win.h"
-#include "recordinginfo.h"
-#include "signalmonitorvalue.h"
-#include "recordingrule.h"
-#include "mythsystemevent.h"
-#include "videometadatautil.h"
-#include "playercontext.h"
+#include "decoders/mythcodeccontext.h"
 #include "io/mythmediabuffer.h"
+#include "jobqueue.h"
+#include "livetvchain.h"
+#include "mythplayerui.h"
+#include "mythsystemevent.h"
 #include "mythtvactionutils.h"
-#include "mythcodeccontext.h"
+#include "playercontext.h"
+#include "playgroup.h"
+#include "recordinginfo.h"
+#include "recordingrule.h"
+#include "remoteencoder.h"
+#include "signalmonitorvalue.h"
+#include "sourceutil.h"
 #include "tv_play.h"
-
-// Std
-#include <algorithm>
-#include <chrono>
-#include <cmath>
-#include <cstdarg>
-#include <cstdint>
-#include <cstdlib>
-#include <thread>
+#include "tv_play_win.h"
+#include "tvremoteutil.h"
+#include "videometadatautil.h"
 
 #define DEBUG_CHANNEL_PREFIX 0 /**< set to 1 to debug channel prefixing */
 #define DEBUG_ACTIONS        0 /**< set to 1 to debug actions           */

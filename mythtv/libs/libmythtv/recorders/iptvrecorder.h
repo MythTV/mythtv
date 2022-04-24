@@ -11,7 +11,7 @@
 
 // MythTV includes
 #include "dtvrecorder.h"
-#include "streamlisteners.h"
+#include "mpeg/streamlisteners.h"
 
 class IPTVChannel;
 

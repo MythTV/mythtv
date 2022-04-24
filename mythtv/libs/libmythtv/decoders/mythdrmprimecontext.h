@@ -3,11 +3,11 @@
 
 // MythTV
 #ifdef USING_EGL
-#include "mythdrmprimeinterop.h"
+#include "opengl/mythdrmprimeinterop.h"
 #else
-#include "mythopenglinterop.h"
+#include "opengl/mythopenglinterop.h"
 #endif
-#include "mythcodeccontext.h"
+#include "decoders/mythcodeccontext.h"
 
 class MythDRMPRIMEInterop;
 

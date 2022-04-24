@@ -1,4 +1,4 @@
-#include "goom/zoom_filters.h"
+#include "visualisations/goom/zoom_filters.h"
 
 #ifdef MMX
 #define BUFFPOINTNB 16

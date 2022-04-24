@@ -21,17 +21,16 @@
 #include "libmyth/programinfo.h"
 #include "libmythbase/mythlogging.h"
 
-#include "atscstreamdata.h"
 #include "dtvrecorder.h"
-#include "dvbstreamdata.h"
 #include "io/mythmediabuffer.h"
-#include "mpegstreamdata.h"
-#include "mpegtables.h"
+#include "mpeg/AVCParser.h"
+#include "mpeg/HEVCParser.h"
+#include "mpeg/atscstreamdata.h"
+#include "mpeg/dvbstreamdata.h"
+#include "mpeg/mpegstreamdata.h"
+#include "mpeg/mpegtables.h"
 #include "mythsystemevent.h"
 #include "tv_rec.h"
-
-#include "AVCParser.h"
-#include "HEVCParser.h"
 
 #define LOC ((m_tvrec) ? \
     QString("DTVRec[%1]: ").arg(m_tvrec->GetInputId()) : \

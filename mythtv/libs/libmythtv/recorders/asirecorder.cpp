@@ -22,11 +22,11 @@
 #include <QString>
 
 // MythTV includes
-#include "tsstreamdata.h"
-#include "asistreamhandler.h"
-#include "asirecorder.h"
 #include "asichannel.h"
+#include "asirecorder.h"
+#include "asistreamhandler.h"
 #include "io/mythmediabuffer.h"
+#include "mpeg/tsstreamdata.h"
 #include "tv_rec.h"
 
 #define LOC QString("ASIRec[%1](%2): ") \

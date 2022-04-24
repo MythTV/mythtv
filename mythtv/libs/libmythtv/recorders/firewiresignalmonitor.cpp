@@ -1,18 +1,19 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2006, Daniel Thor Kristjansson
 
+#include <chrono> // for milliseconds
 #include <fcntl.h>
 #include <sys/select.h>
-#include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 
 #include "libmythbase/mythdbcon.h"
-#include "atscstreamdata.h"
-#include "mpegtables.h"
-#include "atsctables.h"
+#include "libmythbase/mythlogging.h"
+
 #include "firewirechannel.h"
 #include "firewiresignalmonitor.h"
-#include "libmythbase/mythlogging.h"
+#include "mpeg/atscstreamdata.h"
+#include "mpeg/atsctables.h"
+#include "mpeg/mpegtables.h"
 
 #define LOC QString("FireSigMon[%1](%2): ") \
             .arg(m_inputid).arg(m_channel->GetDevice())

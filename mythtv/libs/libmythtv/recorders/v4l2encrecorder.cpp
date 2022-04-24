@@ -18,19 +18,19 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include <sys/ioctl.h>
 #include <chrono> // for milliseconds
+#include <sys/ioctl.h>
 #include <thread> // for sleep_for
 
 // Qt includes
 #include <QString>
 
 // MythTV includes
-#include "recordingprofile.h"
-#include "v4l2encstreamhandler.h"
-#include "v4l2encrecorder.h"
-#include "v4lchannel.h"
 #include "io/mythmediabuffer.h"
+#include "recorders/v4l2encrecorder.h"
+#include "recorders/v4l2encstreamhandler.h"
+#include "recorders/v4lchannel.h"
+#include "recordingprofile.h"
 #include "tv_rec.h"
 
 #define LOC QString("V4L2Rec[%1](%2): ") \

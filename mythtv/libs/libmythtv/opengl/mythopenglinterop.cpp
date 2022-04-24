@@ -13,7 +13,7 @@
 #include "mythvtbinterop.h"
 #endif
 #ifdef USING_MEDIACODEC
-#include "mythmediacodeccontext.h"
+#include "decoders/mythmediacodeccontext.h"
 #endif
 #ifdef USING_VDPAU
 #include "mythvdpauinterop.h"

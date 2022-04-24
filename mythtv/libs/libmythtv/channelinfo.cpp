@@ -18,7 +18,7 @@
 
 #include "channelgroup.h"
 #include "channelinfo.h"
-#include "mpegstreamdata.h" // for CryptStatus
+#include "mpeg/mpegstreamdata.h" // for CryptStatus
 #include "sourceutil.h"
 
 ////////////////////////////////////////////////////////////////////////////

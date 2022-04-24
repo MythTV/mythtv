@@ -13,10 +13,10 @@
 #include "libmyth/mythcontext.h"
 #include "libmythbase/mythlogging.h"
 
-#include "ExternalRecChannelFetcher.h"
 #include "cardutil.h"
 #include "channelutil.h"
 #include "externrecscanner.h"
+#include "recorders/ExternalRecChannelFetcher.h"
 #include "scanmonitor.h"
 
 #define LOC QString("ExternRecChanFetch: ")

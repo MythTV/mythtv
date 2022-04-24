@@ -4,9 +4,10 @@
 #include <cstdlib>
 
 #include "libmythbase/mythlogging.h"
-#include "decoderbase.h"
-#include "mythplayer.h"
+
 #include "captions/cc708reader.h"
+#include "decoders/decoderbase.h"
+#include "mythplayer.h"
 
 #define LOC QString("CC708Reader: ")
 #define CHECKENABLED if (!m_enabled) return
