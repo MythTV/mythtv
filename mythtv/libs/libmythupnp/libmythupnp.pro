@@ -65,7 +65,6 @@ using_qtscript: {
 }
 
 INCLUDEPATH += ..
-INCLUDEPATH += ./serializers
 
 LIBS      += -L../libmythbase -lmythbase-$$LIBVERSION
 LIBS      += -L../libmythservicecontracts -lmythservicecontracts-$$LIBVERSION

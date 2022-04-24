@@ -74,8 +74,6 @@ INCLUDEPATH += ..
 HEADERS += ../libmyth/programtypes.h ../libmyth/recordingtypes.h
 SOURCES += ../libmyth/programtypes.cpp ../libmyth/recordingtypes.cpp
 
-INCLUDEPATH += $$DEPENDPATH
-
 inc.path = $${PREFIX}/include/mythtv/libmythservicecontracts/
 inc.files = serviceexp.h service.h datacontracthelper.h
 
