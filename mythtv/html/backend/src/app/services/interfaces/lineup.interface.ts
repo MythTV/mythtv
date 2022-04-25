@@ -1,5 +1,3 @@
-import { LIVE_ANNOUNCER_DEFAULT_OPTIONS } from "@angular/cdk/a11y";
-
 export interface GetDDLineupListRequest {
     Source:             string;
     UserId:             string;
