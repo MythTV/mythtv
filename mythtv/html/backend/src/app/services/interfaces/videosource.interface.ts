@@ -1,4 +1,5 @@
 export interface VideoSource {
+    Id:             number;
     SourceName:     string;
     Grabber:        string;
     UserId:         string;
@@ -12,4 +13,11 @@ export interface VideoSource {
     RegionId:       number;
     ScanFrequency:  number;
     LCNOffset:      number;
+}
+
+export interface VideoSourceList {
+    AsOf:           string; // dateTime
+    Version:        string;
+    ProtoVer:       string;
+    VideoSources:   VideoSource[];
 }

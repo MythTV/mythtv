@@ -27,3 +27,65 @@ export interface Channel {
     Visible:            boolean;
     XMLTVID:            string;
 }
+
+export interface AddDBChannelRequest {
+    ATSCMajorChan:      number;
+    ATSCMinorChan:      number;
+    CallSign:           string;
+    ChannelID:          number;
+    ChannelNumber:      string; // number sent as string
+    ChannelName:        string;
+    DefaultAuthority:   string;
+    ExtendedVisible:    string;
+    Format:             string;
+    FrequencyID:        string; // null in sample data
+    Icon:               string;
+    MplexID:            number;
+    ServiceID:          number;
+    ServiceType:        number;
+    SourceID:           number;
+    UseEIT:             boolean;
+    Visible:            boolean;
+    XMLTVID:            string;
+}
+
+export interface FetchChannelsFromSourceRequest {
+    SourceId:           number;
+    CardId:             number;
+    WaitForFinish:      boolean;
+}
+
+export interface GetChannelInfoListRequest {
+    SourceID:           number;
+    ChannelGroupID:     number;
+    StartIndex:         number;
+    Count:              number;
+    OnlyVisible:        boolean;
+    Details:            boolean;
+    OrderByName:        boolean;
+    GroupByCallsign:    boolean;
+    OnlyTunable:        boolean;
+}
+
+export interface GetVideoMultiplexListRequest {
+    SourceID:           number;
+    StartIndex:         number;
+    Count:              number;
+}
+
+export interface UpdateVideoSourceRequest {
+    SourceID:           number;
+    SourceName:         string;
+    Grabber:            string;
+    UserId:             string;
+    FreqTable:          string;
+    LineupId:           string;
+    Password:           string;
+    UseEIT:             boolean;
+    ConfigPath:         string;
+    NITId:              number;
+    BouquetId:          number;
+    RegionId:           number;
+    ScanFrequency:      number;
+    LCNOffset:          number;
+}

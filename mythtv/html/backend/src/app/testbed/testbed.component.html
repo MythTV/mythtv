@@ -4,7 +4,7 @@
 </div>
 <div *ngIf="(m_timezone$ | async)?.TimeZoneInfo as timezone; else loading">
     <p>It is currently {{timezone.CurrentDateTime}} in timezone {{timezone.TimeZoneID}}, UTC offset
-        {{timezone.UTCOffset}} hours</p>
+        {{timezone.UTCOffset / 3600}} hours</p>
 </div>
 <div *ngIf="(m_connectionInfo$ | async)?.ConnectionInfo as info; else loadingOrError">
     <p>MythTV version is {{info.Version.Version}} from branch {{info.Version.Branch}} using protocol
@@ -17,6 +17,36 @@
 <div *ngIf="(m_databaseStatus$ | async)?.DatabaseStatus as dbstatus; else loading">
     <!-- <p>Database is "{{dbstatus.Connected ? Connected : Not Connected}}"</p> -->
 </div>
+
+<div *ngIf="(m_storageGroupList$ | async)?.RecStorageGroupList as StorageGroupDir; else loading">
+    <ul>
+        <ng-container *ngFor="let sg of StorageGroupDir">
+            <li>Storage Group: {{sg}}</li>
+        </ng-container>
+    </ul>
+</div>
+
+<div *ngIf="(m_storageGroupDirs$ | async)?.StorageGroupDirList as sgArray; else loading">
+    <ul>
+        <ng-container *ngFor="let sg of sgArray.StorageGroupDirs">
+            <li>SG: {{ sg.GroupName }}, Directory: {{ sg.DirName }}</li>
+        </ng-container>
+    </ul>
+</div>
+
+<div *ngIf="(m_iconUrl$ | async)?.urls as url; else loading">
+    <img src={{url}} height="57"/>
+</div>
+
+<div *ngIf="(m_downloadTest$ | async) as x; else loading">
+    <p>File Download {{x.bool}}</p>
+</div>
+
+<div *ngIf="(m_addStorageGroupDir$ | async) as x; else loading">
+    <p>Add group {{x.bool}}</p>
+</div>
+
+<ng-template #downloadFailed>Failed</ng-template>
 
 <ng-template #loadingOrError>
     <div *ngIf="errorRes else loading">
@@ -33,7 +63,8 @@
 
     
 <p-button class="p-2" (click)="setSecurityPin('1234')">Set PIN to 1234</p-button>
-<p-button (click)="setSecurityPin('0000')">Set PIN to 0000</p-button>
+<p-button class="p-2" (click)="setSecurityPin('0000')">Set PIN to 0000</p-button>
+<p-button class="p-2" (click)="addStorageGroup()">Add SG</p-button>
 
 <h4>Translation Test</h4>
 <div>{{ 'primeng.passwordPrompt' | translate }}</div> 

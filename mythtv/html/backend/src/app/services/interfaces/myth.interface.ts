@@ -1,3 +1,5 @@
+import { StorageGroupDirList } from "./storagegroup.interface";
+
 export interface MythHostName {
     String: string;  // That's what the service returns as the key
 }
@@ -62,6 +64,17 @@ export interface PutSettingRequest {
     Value:      string;
 }
 
-export interface PutSettingResponse {
-    bool:       boolean;
+export interface GetStorageGroupDirsRequest {
+    GroupName?: string;
+    HostName?:  string;
+}
+
+export interface GetStorageGroupDirsResponse {
+    StorageGroupDirList:  StorageGroupDirList;
+}
+
+export interface AddStorageGroupDirRequest {
+    GroupName:  string;
+    DirName:    string;
+    HostName:   string;
 }
