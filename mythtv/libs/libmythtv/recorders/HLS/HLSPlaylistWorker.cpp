@@ -48,7 +48,8 @@ void HLSPlaylistWorker::run(void)
             LOG(VB_RECORD, (waittime > 12s ? LOG_INFO : LOG_DEBUG), LOC +
                 QString("refreshing in %2ms")
                 .arg(waittime.count()));
-            m_waitcond.wait(&m_lock, waittime);
+            m_waitcond.wait(&m_lock, duration_cast<std::chrono::milliseconds>(
+                                waittime).count());
         }
         m_wokenup = false;
         m_lock.unlock();
