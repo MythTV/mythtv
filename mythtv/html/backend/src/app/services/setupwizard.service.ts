@@ -1,7 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, OnInit } from '@angular/core';
 import { ConfigService } from './config.service';
-import { Country, Language } from './interfaces/config.interface';
 import { WizardData } from './interfaces/wizarddata.interface';
 
 @Injectable({

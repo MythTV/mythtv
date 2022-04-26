@@ -1,4 +1,6 @@
-import { Country, Language, MythDatabaseStatus } from "./config.interface";
+import { MythDatabaseStatus } from "./config.interface";
+import { Language } from "./language.interface";
+import { Country } from "./country.interface";
 import { Database } from "./myth.interface";
 
 export interface WizardData {

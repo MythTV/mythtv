@@ -1,12 +1,11 @@
 import { Component, isDevMode, OnInit } from '@angular/core';
-import { Language, MythLanguageList } from 'src/app/services/interfaces/config.interface';
+import { Language, MythLanguageList } from "src/app/services/interfaces/language.interface";
 import { Theme } from 'src/app/services/interfaces/theme.interface';
 import { ThemeService } from '../../services/theme.service';
 import { ConfigService } from '../../services/config.service';
 import { TranslateService } from '@ngx-translate/core';
 import { PrimeNGConfig } from 'primeng/api';
 import { DataService } from 'src/app/services/data.service';
-import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-navbar',

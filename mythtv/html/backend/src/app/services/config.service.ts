@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Database } from './interfaces/myth.interface';
-import { MythDatabaseStatus, MythCountryList, MythLanguageList, Country, Language } from './interfaces/config.interface';
+import { MythDatabaseStatus } from './interfaces/config.interface';
+import { MythLanguageList } from "./interfaces/language.interface";
+import { MythCountryList } from "./interfaces/country.interface";
 
 @Injectable({
     providedIn: 'root'

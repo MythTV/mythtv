@@ -15,30 +15,3 @@ export interface MythDatabaseStatus {
         SchemaVersion: number;
     }
 }
-
-export interface Language {
-        Code: string;
-        Language: string;
-        NativeLanguage?: string;
-        Image?: string;
-}
-
-export interface MythLanguageList {
-    LanguageList: {
-        Languages: Language[]
-    }
-}
-
-export interface Country {
-    Code: string;
-    Country: string;
-    NativeCountry?: string;
-    Image?: string;
-}
-
-export interface MythCountryList {
-    CountryList: {
-        Countries: Country[]
-    }
-}
-
