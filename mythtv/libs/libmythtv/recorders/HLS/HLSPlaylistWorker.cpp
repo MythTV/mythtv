@@ -30,7 +30,7 @@ void HLSPlaylistWorker::Cancel(void)
 
 void HLSPlaylistWorker::run(void)
 {
-    std::chrono::seconds wakeup = 1s;
+    std::chrono::milliseconds wakeup = 1s;
     double      delay = 0;
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- begin");
@@ -44,11 +44,11 @@ void HLSPlaylistWorker::run(void)
         m_lock.lock();
         if (!m_wokenup)
         {
-            std::chrono::seconds waittime = std::min(1s, wakeup);
+            std::chrono::milliseconds waittime = std::max(1000ms, wakeup);
             LOG(VB_RECORD, (waittime > 12s ? LOG_INFO : LOG_DEBUG), LOC +
-                QString("refreshing in %2s")
+                QString("refreshing in %2ms")
                 .arg(waittime.count()));
-            m_waitcond.wait(&m_lock, duration_cast<std::chrono::milliseconds>(waittime).count());
+            m_waitcond.wait(&m_lock, waittime);
         }
         m_wokenup = false;
         m_lock.unlock();

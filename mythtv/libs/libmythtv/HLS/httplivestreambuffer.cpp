@@ -688,7 +688,7 @@ class HLSStream
 #endif
         segment->Unlock();
 
-        downloadduration = std::min(1us, downloadduration);
+        downloadduration = std::max(1us, downloadduration);
         bandwidth = segment->Size() * 8 * 1000000ULL / downloadduration.count(); /* bits / s */
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("downloaded segment %1 [id:%2] took %3ms for %4 bytes: bandwidth:%5kiB/s")
@@ -1317,7 +1317,7 @@ protected:
             Lock();
             if (!m_wokenup)
             {
-                std::chrono::milliseconds waittime = std::min(100ms, m_wakeup);
+                std::chrono::milliseconds waittime = std::max(100ms, m_wakeup);
                 LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
                     QString("PlayListWorker refreshing in %1s")
                     .arg(duration_cast<std::chrono::seconds>(waittime).count()));
@@ -1373,7 +1373,8 @@ protected:
             }
 
             /* determine next time to update playlist */
-            m_wakeup = duration_cast<std::chrono::seconds>(hls->TargetDuration() * wait * factor);
+            m_wakeup = duration_cast<std::chrono::milliseconds>(
+                hls->TargetDuration() * wait * factor);
         }
 
         RunEpilog();
