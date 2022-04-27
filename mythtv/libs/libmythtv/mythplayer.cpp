@@ -1448,7 +1448,7 @@ long long MythPlayer::CalcRWTime(long long rw) const
         return rw;
     }
 
-    auto seconds = secondsFromFloat((m_framesPlayed - rw) / m_videoFrameRate);
+    auto seconds = secondsFromFloat(((int64_t)m_framesPlayed - rw) / m_videoFrameRate);
     m_playerCtx->m_tvchain->JumpToNext(false, seconds);
 
     return -1;
