@@ -1117,7 +1117,7 @@ QPoint MythUIText::CursorPosition(int text_offset)
         return m_cursorPos;
     m_textCursor = text_offset;
 
-    QVector<QTextLayout *>::const_iterator Ipara = nullptr;
+    QVector<QTextLayout *>::const_iterator Ipara {};
     QPoint pos;
     int    x = 0;
     int    y = 0;
