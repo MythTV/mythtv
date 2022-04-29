@@ -12,7 +12,7 @@
 
 PacketBuffer::PacketBuffer(unsigned int bitrate) :
     m_bitrate(bitrate),
-    m_next_empty_packet_key(MythRandom() << 32)
+    m_next_empty_packet_key(static_cast<uint64_t>(MythRandom()) << 32)
 {
 }
 
