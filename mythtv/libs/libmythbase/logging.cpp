@@ -778,12 +778,11 @@ int syslogGetFacility(const QString& facility)
     return( -2 );
 #else
     const CODE *name = nullptr;
-    int i = 0;
     QByteArray ba = facility.toLocal8Bit();
     char *string = (char *)ba.constData();
 
-    for (i = 0, name = &facilitynames[0];
-         name->c_name && (strcmp(name->c_name, string) != 0); i++, name++);
+    for (name = &facilitynames[0];
+         name->c_name && (strcmp(name->c_name, string) != 0); name++);
 
     return( name->c_val );
 #endif
