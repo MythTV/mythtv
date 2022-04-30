@@ -504,9 +504,6 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
     std::vector<uint> types;
     std::vector<desc_list_t> pdesc;
 
-    uint video_cnt = 0;
-    uint audio_cnt = 0;
-
     std::vector<uint> videoPIDs;
     std::vector<uint> audioPIDs;
     std::vector<uint> dataPIDs;
@@ -527,7 +524,6 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
 
         if (is_audio)
         {
-            audio_cnt++;
             audioPIDs.push_back(pid);
         }
         else if (m_recordingType == "audio" )
@@ -544,7 +540,6 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
 
         if (is_video)
         {
-            video_cnt++;
             videoPIDs.push_back(pid);
         }
 
@@ -568,11 +563,11 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
         types.push_back(type);
     }
 
-    if (video_cnt < m_pmtSingleProgramNumVideo)
+    if (videoPIDs.size() < m_pmtSingleProgramNumVideo)
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
             QString("Only %1 video streams seen in PMT, but %2 are required.")
-                .arg(video_cnt).arg(m_pmtSingleProgramNumVideo));
+                .arg(videoPIDs.size()).arg(m_pmtSingleProgramNumVideo));
         return false;
     }
 
