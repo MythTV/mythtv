@@ -262,7 +262,6 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
                                      int &col_cnt, bool &wrapped)
 {
     MythUIGroup *buttonstate = nullptr;
-    int  left_cnt = 0;
     int  left_width = 0;
     int  right_width = 0;
     int  begin = 0;
@@ -504,7 +503,6 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
                     --first_item;
                     --col_idx;
                     ++col_cnt;
-                    ++left_cnt;
                     left_width += m_itemHorizSpacing + width;
                     int height = minButtonHeight(buttonstate->GetArea());
 
@@ -623,7 +621,6 @@ bool MythUIButtonList::DistributeCols(int &first_button, int &last_button,
 {
     int  col_cnt = 0;
     int  height = 0;
-    int  row_cnt = 1;
     int  end = 0;
     bool added = false;
 
@@ -664,7 +661,6 @@ bool MythUIButtonList::DistributeCols(int &first_button, int &last_button,
                 if (selected_row == -1 && selected_column != -1)
                     selected_row = row_heights.size();
 
-                ++row_cnt;
                 row_heights.push_back(height);
                 bottom_height += (height + m_itemVertSpacing);
                 added = true;
@@ -711,7 +707,6 @@ bool MythUIButtonList::DistributeCols(int &first_button, int &last_button,
                 else if (selected_row != -1)
                     ++selected_row;
 
-                ++row_cnt;
                 row_heights.push_front(height);
                 top_height += (height + m_itemVertSpacing);
                 added = true;
