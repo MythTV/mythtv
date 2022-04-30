@@ -2170,7 +2170,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             {
                 void *opaque = nullptr;
                 const AVCodec *p = av_codec_iterate(&opaque);
-                int      i = 1;
                 while (p)
                 {
                     QString msg;
@@ -2195,7 +2194,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         QString("Codec 0x%1 != 0x%2") .arg(p->id, 0, 16)
                             .arg(par->codec_id, 0, 16));
                     p = av_codec_iterate(&opaque);
-                    ++i;
                 }
             }
             if (codec)
