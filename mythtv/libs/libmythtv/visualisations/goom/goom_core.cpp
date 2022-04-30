@@ -138,7 +138,6 @@ void goom_set_resolution (guint32 resx, guint32 resy, int cinemascope) {
 
 guint32 * goom_update (GoomDualData& data, int forceMode) {
 	static int s_lockVar = 0;		// pour empecher de nouveaux changements
-	static int s_goomVar = 0;		// boucle des gooms
 	static int s_totalGoom = 0;		// nombre de gooms par seconds
 	static int s_aGoom = 0;			// un goom a eu lieu..
 	static int s_aBigGoom = 0;		// un big goom a eu lieu..
@@ -406,7 +405,6 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 		if ((s_accelVar > s_goomLimit) || (s_accelVar < -s_goomLimit)) {
 			static int s_rndn = 0;
 			static int s_blocker = 0;
-			s_goomVar++;
 
 			/* SELECTION OF THE GOOM STATE */
 			if ((!s_blocker)&&(iRAND(3))) {
@@ -580,7 +578,6 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 			s_zfd.vitesse = STOP_SPEED - 1;
 			s_zfd.pertedec = 8;
 			s_zfd.sqrtperte = 16;
-			s_goomVar = 1;
 			s_lockVar += 50;
 			s_switchIncr = SWITCHINCR;
 			s_switchMult = 1.0F;
@@ -595,7 +592,6 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 		s_zfd.vitesse += 3;
 		s_zfd.pertedec = 8;
 		s_zfd.sqrtperte = 16;
-		s_goomVar = 0;
 	}
 
 	/*
