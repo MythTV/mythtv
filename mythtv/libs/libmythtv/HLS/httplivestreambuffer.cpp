@@ -2667,13 +2667,11 @@ void HLSRingBuffer::WaitUntilBuffered(void)
         QString("pausing until we get sufficient data buffered"));
     m_streamworker->Wakeup();
     m_streamworker->Lock();
-    int retries = 0;
     while (!m_error && !m_interrupted &&
            (m_streamworker->CurrentPlaybackBuffer(false) < 2) &&
            (live || !m_streamworker->IsAtEnd()))
     {
         m_streamworker->WaitForSignal(1s);
-        retries++;
     }
     m_streamworker->Unlock();
 }
@@ -2907,7 +2905,6 @@ long long HLSRingBuffer::SeekInternal(long long pos, int whence)
     /* Wait for download to be finished and to buffer 3 segment */
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("seek to segment %1").arg(segnum));
-    int retries = 0;
 
     // see if we've already got the segment, and at least 2 buffered after
     // then no need to wait for streamworker
@@ -2917,7 +2914,6 @@ long long HLSRingBuffer::SeekInternal(long long pos, int whence)
             !m_streamworker->IsAtEnd()))
     {
         m_streamworker->WaitForSignal(1s);
-        retries++;
     }
     if (m_interrupted)
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("interrupted"));
