@@ -68,6 +68,10 @@ Checks: '-*,
         # Using function invokes a command interpreter. Should fix. ,
        -cert-env33-c,
 
+        # Calls to standard library functions where the return value
+        # isnt checked. These should all be fixed. ,
+        -cert-err33-c,
+
         # string-to-number conversion functions that do not verify the
         # validity of the conversion. Needs work. ,
        -cert-err34-c,
@@ -182,6 +186,9 @@ Checks: '-*,
 
         # Not investigated yet. ,
        -readability-function-size,
+
+        # Whats wrong with single character variable names? 65384 warnings. ,
+       -readability-identifier-length,
 
         # Wants to rewrite lots of implicit nullptr tests. ,
        -readability-implicit-bool-conversion,
