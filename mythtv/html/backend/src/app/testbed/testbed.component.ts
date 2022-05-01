@@ -52,16 +52,17 @@ export class TestbedComponent implements OnInit {
             tap(data => console.log(data)),
         )
 
-        this.m_connectionInfo$ = this.mythService.GetConnectionInfo().pipe(
-            catchError((err: HttpErrorResponse) => {
-                console.error("error getting connection info", err);
-                this.errorRes = err;
-                return throwError(err);
-            })
-        )
 
         this.m_setting$ = this.mythService.GetSetting({ HostName: this.m_hostName, Key: "SecurityPin" }).pipe(
-            tap(data => console.log(data))
+            tap(data => console.log(data)),
+            tap(data => {
+                this.m_connectionInfo$ = this.mythService.GetConnectionInfo(data.String).pipe(
+                catchError((err: HttpErrorResponse) => {
+                    console.error("error getting connection info", err);
+                    this.errorRes = err;
+                    return throwError(err);
+                }))}
+            )
         )
 
         this.m_storageGroupList$ = this.dvrService.GetRecStorageGroupList().pipe(

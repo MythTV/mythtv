@@ -30,8 +30,10 @@ export class MythService {
     return this.httpClient.get<MythTimeZone>('/Myth/GetTimeZone');
   }
 
-  public GetConnectionInfo() : Observable<MythConnectionInfo> {
-    return this.httpClient.get<MythConnectionInfo>('/Myth/GetConnectionInfo');
+  public GetConnectionInfo(Pin : string) : Observable<MythConnectionInfo> {
+    let params = new HttpParams()
+      .set("Pin", Pin);
+    return this.httpClient.get<MythConnectionInfo>('/Myth/GetConnectionInfo', {params});
    }
 
   public GetSetting(setting : GetSettingRequest) : Observable<GetSettingResponse> {

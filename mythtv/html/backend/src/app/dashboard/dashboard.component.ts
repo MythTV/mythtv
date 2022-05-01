@@ -33,7 +33,8 @@ export class DashboardComponent implements OnInit {
       tap(data => console.log(data)),
     )
 
-    this.m_connectionInfo$ = this.mythService.GetConnectionInfo().pipe(
+    // TODO: This call fails without a PIN set
+    this.m_connectionInfo$ = this.mythService.GetConnectionInfo("").pipe(
       catchError((err: HttpErrorResponse) => {
         console.error("error getting connection info", err);
         this.errorRes = err;
