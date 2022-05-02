@@ -35,6 +35,7 @@ HEADERS += mythrandom.h
 HEADERS += stringutil.h
 HEADERS += mythsystemlegacy.h mythtypes.h
 HEADERS += threadedfilewriter.h mythsingledownload.h
+HEADERS += ternarycompare.h
 HEADERS += mythsession.h
 HEADERS += ../../external/qjsonwrapper/qjsonwrapper/Json.h
 HEADERS += cleanupguard.h portchecker.h

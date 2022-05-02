@@ -65,4 +65,19 @@ MBASE_PUBLIC QString formatTime(std::chrono::milliseconds msecs,
 
 } // namespace MythDate
 
+/**
+\brief balanced ternary (three way) comparison
+This is equivalent to C++20's operator <=>. See also ternarycompare.h.
+
+Less than means earlier and greater than means later.
+
+Since Qt 5.14 invalid QDateTimes compare equal and are less than all valid QDateTimes.
+*/
+inline int ternary_compare(const QDateTime& a, const QDateTime& b)
+{
+    if (a < b) return -1;
+    if (a > b) return +1;
+    return 0; // a == b
+}
+
 #endif // MYTH_DATE_H
