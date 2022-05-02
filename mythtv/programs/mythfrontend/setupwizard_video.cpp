@@ -8,7 +8,7 @@
 #include "mythdbcon.h"
 #include "mythdirs.h"
 #include "mythprogressdialog.h"
-#include "mythcoreutil.h"
+#include "remoteutil.h"
 #include "videoutils.h"
 #include "remotefile.h"
 

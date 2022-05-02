@@ -1,5 +1,5 @@
-#ifndef MYTHRSSMANAGER_H
-#define MYTHRSSMANAGER_H
+#ifndef RSSMANAGER_H
+#define RSSMANAGER_H
 
 #include <vector>
 
@@ -16,12 +16,13 @@
 #include <QVariant>
 #include <QNetworkReply>
 
+#include "mythbaseexp.h"
 #include "rssparse.h"
 
 using namespace std::chrono_literals;
 
 class RSSSite;
-class MPUBLIC RSSSite : public QObject
+class MBASE_PUBLIC RSSSite : public QObject
 {
     Q_OBJECT
 
@@ -115,7 +116,7 @@ class MPUBLIC RSSSite : public QObject
 
 };
 
-class MPUBLIC RSSManager : public QObject
+class MBASE_PUBLIC RSSManager : public QObject
 {
     Q_OBJECT
 
@@ -146,4 +147,4 @@ class MPUBLIC RSSManager : public QObject
 
 Q_DECLARE_METATYPE(RSSSite*)
 
-#endif
+#endif // RSSMANAGER_H

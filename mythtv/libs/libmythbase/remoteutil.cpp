@@ -1,3 +1,5 @@
+#include "remoteutil.h"
+
 #include <unistd.h>
 
 #include <QFileInfo>
@@ -6,9 +8,10 @@
 #include <QList>
 
 #include "compat.h"
-#include "remoteutil.h"
+
 #include "programinfo.h"
 #include "mythcorecontext.h"
+#include "mythlogging.h"
 #include "storagegroup.h"
 #include "mythevent.h"
 #include "mythsocket.h"
@@ -576,6 +579,41 @@ bool RemoteGetActiveBackends(QStringList *list)
 
     list->removeFirst();
     return true;
+}
+
+static QString downloadRemoteFile(const QString &cmd, const QString &url,
+                                  const QString &storageGroup,
+                                  const QString &filename)
+{
+    QStringList strlist(cmd);
+    strlist << url;
+    strlist << storageGroup;
+    strlist << filename;
+
+    bool ok = gCoreContext->SendReceiveStringList(strlist);
+
+    if (!ok || strlist.size() < 2 || strlist[0] != "OK")
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "downloadRemoteFile(): " + cmd + " returned ERROR!");
+        return QString();
+    }
+
+    return strlist[1];
+}
+
+QString RemoteDownloadFile(const QString &url,
+                           const QString &storageGroup,
+                           const QString &filename)
+{
+    return downloadRemoteFile("DOWNLOAD_FILE", url, storageGroup, filename);
+}
+
+QString RemoteDownloadFileNow(const QString &url,
+                              const QString &storageGroup,
+                              const QString &filename)
+{
+    return downloadRemoteFile("DOWNLOAD_FILE_NOW", url, storageGroup, filename);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

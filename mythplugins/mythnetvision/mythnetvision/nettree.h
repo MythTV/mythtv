@@ -13,7 +13,7 @@
 #include <mythscreentype.h>
 #include <mythdialogbox.h>
 #include <netgrabbermanager.h>
-#include <mythrssmanager.h>
+#include <rssmanager.h>
 #include <mythdownloadmanager.h>
 #include <metadata/metadataimagedownload.h>
 

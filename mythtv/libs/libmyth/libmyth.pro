@@ -37,24 +37,11 @@ HEADERS += audio/audiosettings.h audio/audiooutputsettings.h audio/pink.h
 HEADERS += audio/volumebase.h audio/eldutils.h
 HEADERS += audio/audiooutputgraph.h
 HEADERS += backendselect.h dbsettings.h
-HEADERS += langsettings.h
 HEADERS +=
 HEADERS += mythaverror.h mythcontext.h
 HEADERS += mythexp.h mythmediamonitor.h
-HEADERS += schemawizard.h
 HEADERS += output.h
-HEADERS +=
-HEADERS += standardsettings.h
 HEADERS += visual.h
-HEADERS += storagegroupeditor.h
-HEADERS += mythterminal.h
-HEADERS += remoteutil.h
-HEADERS += rawsettingseditor.h
-HEADERS += programinfo.h          programinfoupdater.h
-HEADERS += programtypes.h         recordingtypes.h
-HEADERS += programtypeflags.h
-HEADERS += rssparse.h
-HEADERS += guistartup.h
 
 SOURCES += audio/audiooutput.cpp audio/audiooutputbase.cpp
 SOURCES += audio/spdifencoder.cpp audio/audiooutputdigitalencoder.cpp
@@ -65,29 +52,10 @@ SOURCES += audio/audiosettings.cpp audio/audiooutputsettings.cpp audio/pink.cpp
 SOURCES += audio/volumebase.cpp audio/eldutils.cpp
 SOURCES += audio/audiooutputgraph.cpp
 SOURCES += backendselect.cpp dbsettings.cpp
-SOURCES += langsettings.cpp
 SOURCES +=
 SOURCES += mythaverror.cpp mythcontext.cpp
 SOURCES += mythmediamonitor.cpp
-SOURCES += schemawizard.cpp
 SOURCES += output.cpp
-SOURCES +=
-SOURCES += standardsettings.cpp
-SOURCES += storagegroupeditor.cpp
-SOURCES += mythterminal.cpp
-SOURCES += remoteutil.cpp
-SOURCES += rawsettingseditor.cpp
-SOURCES += programinfo.cpp        programinfoupdater.cpp
-SOURCES += programtypes.cpp       recordingtypes.cpp
-SOURCES += rssparse.cpp
-SOURCES += guistartup.cpp
-
-# This stuff is not Qt5 compatible..
-# Really? It builds under Qt5, so lets let it
-HEADERS += mythrssmanager.h             netutils.h
-HEADERS += netgrabbermanager.h
-SOURCES += mythrssmanager.cpp           netutils.cpp
-SOURCES += netgrabbermanager.cpp
 
 INCLUDEPATH += ../libmythfreesurround
 INCLUDEPATH += ../libmythbase
@@ -132,21 +100,10 @@ inc.files += audio/audiooutput.h audio/audiosettings.h
 inc.files += audio/audiooutputsettings.h audio/audiooutpututil.h
 inc.files += audio/audioconvert.h
 inc.files += audio/volumebase.h audio/eldutils.h
-inc.files += inetcomms.h schemawizard.h
+inc.files += inetcomms.h
 inc.files += mythaverror.h mythmediamonitor.h
-inc.files += visual.h output.h langsettings.h
-inc.files += mythexp.h storagegroupeditor.h
-inc.files += mythterminal.h       remoteutil.h
-inc.files += programinfo.h
-inc.files += programtypes.h       recordingtypes.h
-inc.files += programtypeflags.h
-inc.files += rssparse.h
-inc.files += standardsettings.h
-
-# This stuff is not Qt5 compatible..
-# Really? It builds under Qt5, so lets let it
-inc.files += mythrssmanager.h     netutils.h
-inc.files += netgrabbermanager.h
+inc.files += visual.h output.h
+inc.files += mythexp.h
 
 # Allow both #include <blah.h> and #include <libmyth/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmyth

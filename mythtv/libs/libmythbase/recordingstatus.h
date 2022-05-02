@@ -5,10 +5,10 @@
 #include <QString>
 #include <QDateTime>
 
-#include "serviceexp.h"
+#include "mythbaseexp.h"
 #include "programtypes.h"
 
-class SERVICE_PUBLIC RecStatus : public QObject
+class MBASE_PUBLIC RecStatus : public QObject
 {
   Q_OBJECT
 
@@ -46,10 +46,10 @@ class SERVICE_PUBLIC RecStatus : public QObject
     }; // note stored in int8_t in ProgramInfo
     Q_ENUM(Type)
 
-    static QString toUIState(Type recstatus);
-    static QString toString(Type recstatus, uint id);
-    static QString toString(Type recstatus, const QString &name);
-    static QString toString(Type recstatus, RecordingType type = kNotRecording);
+    static QString toUIState(RecStatus::Type recstatus);
+    static QString toString(RecStatus::Type recstatus, uint id);
+    static QString toString(RecStatus::Type recstatus, const QString &name);
+    static QString toString(RecStatus::Type recstatus, RecordingType type = kNotRecording);
     static QString toDescription(Type recstatus, RecordingType rectype,
                                  const QDateTime &recstartts);
     public:

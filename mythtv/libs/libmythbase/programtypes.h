@@ -23,24 +23,24 @@
 #include <QtCore>
 
 // MythTV headers
-#include "mythexp.h" // for MPUBLIC
+#include "mythbaseexp.h" // for MBASE_PUBLIC
 #include "recordingtypes.h" // for RecordingType
 
 class QDateTime;
 class QMutex;
 
-MPUBLIC extern const QString kPlayerInUseID;
-MPUBLIC extern const QString kPIPPlayerInUseID;
-MPUBLIC extern const QString kPBPPlayerInUseID;
-MPUBLIC extern const QString kImportRecorderInUseID;
-MPUBLIC extern const QString kRecorderInUseID;
-MPUBLIC extern const QString kFileTransferInUseID;
-MPUBLIC extern const QString kTruncatingDeleteInUseID;
-MPUBLIC extern const QString kFlaggerInUseID;
-MPUBLIC extern const QString kTranscoderInUseID;
-MPUBLIC extern const QString kPreviewGeneratorInUseID;
-MPUBLIC extern const QString kJobQueueInUseID;
-MPUBLIC extern const QString kCCExtractorInUseID;
+MBASE_PUBLIC extern const QString kPlayerInUseID;
+MBASE_PUBLIC extern const QString kPIPPlayerInUseID;
+MBASE_PUBLIC extern const QString kPBPPlayerInUseID;
+MBASE_PUBLIC extern const QString kImportRecorderInUseID;
+MBASE_PUBLIC extern const QString kRecorderInUseID;
+MBASE_PUBLIC extern const QString kFileTransferInUseID;
+MBASE_PUBLIC extern const QString kTruncatingDeleteInUseID;
+MBASE_PUBLIC extern const QString kFlaggerInUseID;
+MBASE_PUBLIC extern const QString kTranscoderInUseID;
+MBASE_PUBLIC extern const QString kPreviewGeneratorInUseID;
+MBASE_PUBLIC extern const QString kJobQueueInUseID;
+MBASE_PUBLIC extern const QString kCCExtractorInUseID;
 
 /// Frame # -> File offset map
 using frm_pos_map_t = QMap<long long, long long>;
@@ -78,7 +78,7 @@ enum MarkTypes {
     MARK_UTIL_LASTPLAYPOS = 41,
 };
 
-MPUBLIC QString toString(MarkTypes type);
+MBASE_PUBLIC QString toString(MarkTypes type);
 
 using stringMarkMap = std::map<QString, MarkTypes>;
 static stringMarkMap MarkTypeStrings =
@@ -113,7 +113,7 @@ static stringMarkMap MarkTypeStrings =
     { "UTIL_LASTPLAYPOS", MARK_UTIL_LASTPLAYPOS }
 };
 
-MPUBLIC MarkTypes markTypeFromString(const QString & str);
+MBASE_PUBLIC MarkTypes markTypeFromString(const QString & str);
 
 /// Frame # -> Mark map
 using frm_dir_map_t = QMap<uint64_t, MarkTypes>;
@@ -152,8 +152,8 @@ enum SkipType {
                                    | COMM_DETECT_SCENE)
 };
 
-MPUBLIC QString SkipTypeToString(int flags);
-MPUBLIC std::deque<int> GetPreferredSkipTypeCombinations(void);
+MBASE_PUBLIC QString SkipTypeToString(int flags);
+MBASE_PUBLIC std::deque<int> GetPreferredSkipTypeCombinations(void);
 
 enum TranscodingStatus {
     TRANSCODING_NOT_TRANSCODED = 0,
@@ -182,7 +182,7 @@ enum AvailableStatusType {
     asZeroByte,
     asDeleted
 }; // note stored in uint8_t in ProgramInfo
-MPUBLIC QString toString(AvailableStatusType status);
+MBASE_PUBLIC QString toString(AvailableStatusType status);
 
 enum WatchListStatus {
     wlDeleted = -4,

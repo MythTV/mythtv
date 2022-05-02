@@ -14,7 +14,7 @@
 
 #include <QString>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 enum RecordingType
 {
@@ -31,13 +31,13 @@ enum RecordingType
     //kFindWeeklyRecord = 10, (Obsolete)
     kTemplateRecord = 11
 }; // note stored in uint8_t in ProgramInfo
-MPUBLIC QString toString(RecordingType rectype);
-MPUBLIC QString toDescription(RecordingType rectype);
-MPUBLIC QString toRawString(RecordingType rectype);
-MPUBLIC QChar   toQChar( RecordingType rectype);
-MPUBLIC RecordingType recTypeFromString(const QString& type);
+MBASE_PUBLIC QString toString(RecordingType rectype);
+MBASE_PUBLIC QString toDescription(RecordingType rectype);
+MBASE_PUBLIC QString toRawString(RecordingType rectype);
+MBASE_PUBLIC QChar   toQChar( RecordingType rectype);
+MBASE_PUBLIC RecordingType recTypeFromString(const QString& type);
 
-MPUBLIC int RecTypePrecedence(RecordingType rectype);
+MBASE_PUBLIC int RecTypePrecedence(RecordingType rectype);
 
 enum RecordingDupInType
 {
@@ -47,12 +47,12 @@ enum RecordingDupInType
     kDupsInAll          = 0x0F,
     kDupsNewEpi         = 0x10
 }; // note stored in uint8_t in ProgramInfo
-MPUBLIC QString toString(RecordingDupInType rectype);
-MPUBLIC QString toDescription(RecordingDupInType rectype);
-MPUBLIC QString toRawString(RecordingDupInType rectype);
-MPUBLIC bool newEpifromDupIn(RecordingDupInType recdupin);
-MPUBLIC RecordingDupInType dupInFromString(const QString& type);
-MPUBLIC RecordingDupInType dupInFromStringAndBool(const QString& type, bool newEpisodesOnly);
+MBASE_PUBLIC QString toString(RecordingDupInType rectype);
+MBASE_PUBLIC QString toDescription(RecordingDupInType rectype);
+MBASE_PUBLIC QString toRawString(RecordingDupInType rectype);
+MBASE_PUBLIC bool newEpifromDupIn(RecordingDupInType recdupin);
+MBASE_PUBLIC RecordingDupInType dupInFromString(const QString& type);
+MBASE_PUBLIC RecordingDupInType dupInFromStringAndBool(const QString& type, bool newEpisodesOnly);
 
 enum RecordingDupMethodType
 {
@@ -63,10 +63,10 @@ enum RecordingDupMethodType
     kDupCheckSubDesc  = 0x06,
     kDupCheckSubThenDesc = 0x08
 }; // note stored in uint8_t in ProgramInfo
-MPUBLIC QString toString(RecordingDupMethodType rectype);
-MPUBLIC QString toDescription(RecordingDupMethodType rectype);
-MPUBLIC QString toRawString(RecordingDupMethodType rectype);
-MPUBLIC RecordingDupMethodType dupMethodFromString(const QString& type);
+MBASE_PUBLIC QString toString(RecordingDupMethodType rectype);
+MBASE_PUBLIC QString toDescription(RecordingDupMethodType rectype);
+MBASE_PUBLIC QString toRawString(RecordingDupMethodType rectype);
+MBASE_PUBLIC RecordingDupMethodType dupMethodFromString(const QString& type);
 
 enum RecSearchType
 {
@@ -77,9 +77,9 @@ enum RecSearchType
     kPeopleSearch,
     kManualSearch
 };
-MPUBLIC QString toString(RecSearchType rectype);
-MPUBLIC QString toRawString(RecSearchType rectype);
-MPUBLIC RecSearchType searchTypeFromString(const QString& type);
+MBASE_PUBLIC QString toString(RecSearchType rectype);
+MBASE_PUBLIC QString toRawString(RecSearchType rectype);
+MBASE_PUBLIC RecSearchType searchTypeFromString(const QString& type);
 
 enum class AutoExtendType : uint8_t
 {
@@ -88,10 +88,10 @@ enum class AutoExtendType : uint8_t
     MLB,
     Last
 };
-MPUBLIC QString toString(AutoExtendType extType);
-MPUBLIC QString toDescription(AutoExtendType extType);
-MPUBLIC AutoExtendType autoExtendTypeFromString(const QString& type);
-MPUBLIC AutoExtendType autoExtendTypeFromInt(uint8_t type);
+MBASE_PUBLIC QString toString(AutoExtendType extType);
+MBASE_PUBLIC QString toDescription(AutoExtendType extType);
+MBASE_PUBLIC AutoExtendType autoExtendTypeFromString(const QString& type);
+MBASE_PUBLIC AutoExtendType autoExtendTypeFromInt(uint8_t type);
 
 #endif
 

@@ -1,3 +1,5 @@
+#include "rssparse.h"
+
 #include <QFile>
 #include <QDataStream>
 #include <QDomDocument>
@@ -7,8 +9,7 @@
 #include <QUrl>
 #include <QFileInfo>
 
-#include "rssparse.h"
-#include "mythcontext.h"
+#include "mythlogging.h"
 #include "mythdirs.h"
 #include "mythdate.h"
 #include "stringutil.h"

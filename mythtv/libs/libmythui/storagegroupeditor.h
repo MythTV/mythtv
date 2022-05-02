@@ -3,9 +3,9 @@
 
 #include "storagegroup.h"
 #include "standardsettings.h"
-#include "mythexp.h"
+#include "mythuiexp.h"
 
-class MPUBLIC StorageGroupEditor :
+class MUI_PUBLIC StorageGroupEditor :
     public GroupSetting
 {
     Q_OBJECT
@@ -26,7 +26,7 @@ class MPUBLIC StorageGroupEditor :
     QString         m_group;
 };
 
-class MPUBLIC StorageGroupListEditor :
+class MUI_PUBLIC StorageGroupListEditor :
     public GroupSetting
 {
     Q_OBJECT

@@ -16,7 +16,7 @@
 
 #include "serviceexp.h" 
 #include "datacontracthelper.h"
-#include "enums/recStatus.h"
+#include "recordingstatus.h"
 #include "programtypes.h"
 
 namespace DTC

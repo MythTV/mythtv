@@ -65,20 +65,10 @@ HEADERS += datacontracts/buildInfo.h             datacontracts/logInfo.h
 HEADERS += datacontracts/genre.h                 datacontracts/genreList.h
 HEADERS += datacontracts/musicMetadataInfo.h     datacontracts/musicMetadataInfoList.h
 
-HEADERS += enums/recStatus.h
-
 SOURCES += service.cpp
-SOURCES += enums/recStatus.cpp
 
-INCLUDEPATH += ./enums
 INCLUDEPATH += ./datacontracts
 INCLUDEPATH += ./services
-
-# Dirty hack to prevent cross dependencies.
-# needed only for enums in programtypes.h, recordingtypes.h
-INCLUDEPATH += ../libmyth
-HEADERS += ../libmyth/programtypes.h ../libmyth/recordingtypes.h
-SOURCES += ../libmyth/programtypes.cpp ../libmyth/recordingtypes.cpp
 
 INCLUDEPATH += $$DEPENDPATH
 
@@ -93,9 +83,6 @@ incServices.files += services/captureServices.h services/musicServices.h
 incServices.files += services/frontendServices.h
 incServices.files += services/imageServices.h
 incServices.files += services/rttiServices.h
-
-incEnums.path = $${PREFIX}/include/mythtv/libmythservicecontracts/enums/
-incEnums.files = enums/recStatus.h
 
 incDatacontracts.path = $${PREFIX}/include/mythtv/libmythservicecontracts/datacontracts/
 incDatacontracts.files  = datacontracts/connectionInfo.h      datacontracts/databaseInfo.h
@@ -129,7 +116,7 @@ incDatacontracts.files += datacontracts/cutting.h             datacontracts/cutL
 incDatacontracts.files += datacontracts/backendInfo.h         datacontracts/envInfo.h
 incDatacontracts.files += datacontracts/buildInfo.h           datacontracts/logInfo.h
 
-INSTALLS += inc incServices incDatacontracts incEnums
+INSTALLS += inc incServices incDatacontracts
 
 macx {
     QMAKE_LFLAGS_SHLIB += -flat_namespace

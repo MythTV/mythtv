@@ -15,7 +15,7 @@
 #include <QString>
 
 #include "libmythbase/http/mythhttpservice.h"
-#include "enums/recStatus.h"
+#include "recordingstatus.h"
 #include "programtypes.h"
 
 class V2RecordingInfo : public QObject

@@ -7,7 +7,7 @@
 #include <QMap>
 #include <QObject>
 
-#include "mythexp.h"
+#include "mythuiexp.h"
 #include "mythuibuttonlist.h"
 #include "mythdialogbox.h"
 #include "mythstorage.h"
@@ -26,7 +26,7 @@ class MythUIButtonListItemSetting : public QObject, public MythUIButtonListItem
     void ShouldUpdate(StandardSetting *setting);
 };
 
-class MPUBLIC StandardSetting : public QObject, public StorageUser
+class MUI_PUBLIC StandardSetting : public QObject, public StorageUser
 {
     Q_OBJECT
 
@@ -124,7 +124,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     QMap<QString, QList<StandardSetting *> > m_targets;
 };
 
-class MPUBLIC AutoIncrementSetting : public StandardSetting
+class MUI_PUBLIC AutoIncrementSetting : public StandardSetting
 {
   public:
     AutoIncrementSetting(QString _table, QString _column);
@@ -143,7 +143,7 @@ class MPUBLIC AutoIncrementSetting : public StandardSetting
 *******************************************************************************/
 
 
-class MPUBLIC MythUITextEditSetting : public StandardSetting
+class MUI_PUBLIC MythUITextEditSetting : public StandardSetting
 {
   public:
     void resultEdit(DialogCompletionEvent *dce) override; // StandardSetting
@@ -158,21 +158,21 @@ class MPUBLIC MythUITextEditSetting : public StandardSetting
 };
 
 
-class MPUBLIC TransTextEditSetting: public MythUITextEditSetting
+class MUI_PUBLIC TransTextEditSetting: public MythUITextEditSetting
 {
   public:
     TransTextEditSetting() = default;
 };
 
 
-class MPUBLIC HostTextEditSetting: public MythUITextEditSetting
+class MUI_PUBLIC HostTextEditSetting: public MythUITextEditSetting
 {
   public:
     explicit HostTextEditSetting(const QString &name) :
         MythUITextEditSetting(new HostDBStorage(this, name)) { }
 };
 
-class MPUBLIC GlobalTextEditSetting: public MythUITextEditSetting
+class MUI_PUBLIC GlobalTextEditSetting: public MythUITextEditSetting
 {
   public:
     explicit GlobalTextEditSetting(const QString &name) :
@@ -184,7 +184,7 @@ class MPUBLIC GlobalTextEditSetting: public MythUITextEditSetting
 *******************************************************************************/
 
 
-class MPUBLIC MythUIFileBrowserSetting : public StandardSetting
+class MUI_PUBLIC MythUIFileBrowserSetting : public StandardSetting
 {
   public:
     void resultEdit(DialogCompletionEvent *dce) override; // StandardSetting
@@ -203,7 +203,7 @@ class MPUBLIC MythUIFileBrowserSetting : public StandardSetting
 };
 
 
-class MPUBLIC HostFileBrowserSetting: public MythUIFileBrowserSetting
+class MUI_PUBLIC HostFileBrowserSetting: public MythUIFileBrowserSetting
 {
   public:
     explicit HostFileBrowserSetting(const QString &name) :
@@ -215,7 +215,7 @@ class MPUBLIC HostFileBrowserSetting: public MythUIFileBrowserSetting
 *                           ComboBox Setting                                   *
 *******************************************************************************/
 //TODO implement rw=true
-class MPUBLIC MythUIComboBoxSetting : public StandardSetting
+class MUI_PUBLIC MythUIComboBoxSetting : public StandardSetting
 {
   Q_OBJECT
   public:
@@ -254,7 +254,7 @@ class MPUBLIC MythUIComboBoxSetting : public StandardSetting
 
 };
 
-class MPUBLIC HostComboBoxSetting: public MythUIComboBoxSetting
+class MUI_PUBLIC HostComboBoxSetting: public MythUIComboBoxSetting
 {
   public:
     explicit HostComboBoxSetting(const QString &name, bool rw = false) :
@@ -262,21 +262,21 @@ class MPUBLIC HostComboBoxSetting: public MythUIComboBoxSetting
 };
 
 
-class MPUBLIC GlobalComboBoxSetting: public MythUIComboBoxSetting
+class MUI_PUBLIC GlobalComboBoxSetting: public MythUIComboBoxSetting
 {
   public:
     explicit GlobalComboBoxSetting(const QString &name, bool rw = false) :
         MythUIComboBoxSetting(new GlobalDBStorage(this, name), rw) { }
 };
 
-class MPUBLIC TransMythUIComboBoxSetting: public MythUIComboBoxSetting
+class MUI_PUBLIC TransMythUIComboBoxSetting: public MythUIComboBoxSetting
 {
   public:
     explicit TransMythUIComboBoxSetting(bool rw = false) :
         MythUIComboBoxSetting(nullptr, rw) { }
 };
 
-class MPUBLIC HostTimeBoxSetting : public HostComboBoxSetting
+class MUI_PUBLIC HostTimeBoxSetting : public HostComboBoxSetting
 {
   public:
     explicit HostTimeBoxSetting(const QString &name,
@@ -298,7 +298,7 @@ class MPUBLIC HostTimeBoxSetting : public HostComboBoxSetting
     }
 };
 
-class MPUBLIC GlobalTimeBoxSetting : public GlobalComboBoxSetting
+class MUI_PUBLIC GlobalTimeBoxSetting : public GlobalComboBoxSetting
 {
   public:
     explicit GlobalTimeBoxSetting(const QString &name,
@@ -325,7 +325,7 @@ class MPUBLIC GlobalTimeBoxSetting : public GlobalComboBoxSetting
 *******************************************************************************/
 
 
-class MPUBLIC MythUISpinBoxSetting : public StandardSetting
+class MUI_PUBLIC MythUISpinBoxSetting : public StandardSetting
 {
   public:
     //void setValue(int value);
@@ -350,7 +350,7 @@ class MPUBLIC MythUISpinBoxSetting : public StandardSetting
     QString m_specialValueText;
 };
 
-class MPUBLIC TransMythUISpinBoxSetting: public MythUISpinBoxSetting
+class MUI_PUBLIC TransMythUISpinBoxSetting: public MythUISpinBoxSetting
 {
   public:
     TransMythUISpinBoxSetting(int min, int max, int step,
@@ -361,7 +361,7 @@ class MPUBLIC TransMythUISpinBoxSetting: public MythUISpinBoxSetting
     { }
 };
 
-class MPUBLIC HostSpinBoxSetting: public MythUISpinBoxSetting
+class MUI_PUBLIC HostSpinBoxSetting: public MythUISpinBoxSetting
 {
   public:
     HostSpinBoxSetting(const QString &name, int min, int max, int step,
@@ -372,7 +372,7 @@ class MPUBLIC HostSpinBoxSetting: public MythUISpinBoxSetting
     { }
 };
 
-class MPUBLIC GlobalSpinBoxSetting: public MythUISpinBoxSetting
+class MUI_PUBLIC GlobalSpinBoxSetting: public MythUISpinBoxSetting
 {
   public:
     GlobalSpinBoxSetting(const QString &name, int min, int max, int step,
@@ -387,7 +387,7 @@ class MPUBLIC GlobalSpinBoxSetting: public MythUISpinBoxSetting
 *                           CheckBox Setting                                   *
 *******************************************************************************/
 
-class MPUBLIC MythUICheckBoxSetting : public StandardSetting
+class MUI_PUBLIC MythUICheckBoxSetting : public StandardSetting
 {
     Q_OBJECT
 
@@ -408,20 +408,20 @@ class MPUBLIC MythUICheckBoxSetting : public StandardSetting
 
 };
 
-class MPUBLIC TransMythUICheckBoxSetting: public MythUICheckBoxSetting
+class MUI_PUBLIC TransMythUICheckBoxSetting: public MythUICheckBoxSetting
 {
   public:
     TransMythUICheckBoxSetting() = default;
 };
 
-class MPUBLIC HostCheckBoxSetting: public MythUICheckBoxSetting
+class MUI_PUBLIC HostCheckBoxSetting: public MythUICheckBoxSetting
 {
   public:
     explicit HostCheckBoxSetting(const QString &name) :
         MythUICheckBoxSetting(new HostDBStorage(this, name)) { }
 };
 
-class MPUBLIC GlobalCheckBoxSetting: public MythUICheckBoxSetting
+class MUI_PUBLIC GlobalCheckBoxSetting: public MythUICheckBoxSetting
 {
   public:
     explicit GlobalCheckBoxSetting(const QString &name) :
@@ -432,7 +432,7 @@ class MPUBLIC GlobalCheckBoxSetting: public MythUICheckBoxSetting
 *                              Group Setting                                   *
 *******************************************************************************/
 
-class MPUBLIC GroupSetting : public StandardSetting
+class MUI_PUBLIC GroupSetting : public StandardSetting
 {
     Q_OBJECT
 
@@ -447,7 +447,7 @@ class MPUBLIC GroupSetting : public StandardSetting
     virtual void deleteEntry(void) {}
 };
 
-class MPUBLIC ButtonStandardSetting : public StandardSetting
+class MUI_PUBLIC ButtonStandardSetting : public StandardSetting
 {
     Q_OBJECT
 
@@ -465,7 +465,7 @@ class MPUBLIC ButtonStandardSetting : public StandardSetting
 *                            Standard Dialog Setting                           *
 *******************************************************************************/
 
-class MPUBLIC StandardSettingDialog : public MythScreenType
+class MUI_PUBLIC StandardSettingDialog : public MythScreenType
 {
     Q_OBJECT
 

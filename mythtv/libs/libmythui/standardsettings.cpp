@@ -4,7 +4,7 @@
 #include <QThread>
 #include <utility>
 
-#include <mythcontext.h>
+#include <mythdb.h>
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
 #include <mythuispinbox.h>
