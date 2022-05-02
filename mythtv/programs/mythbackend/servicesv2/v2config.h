@@ -36,6 +36,8 @@ class V2Config : public MythHTTPService
     static V2CountryList*    GetCountries              ( void );
     static V2LanguageList*   GetLanguages              ( void );
 
+    static QStringList       GetIPAddresses            ( const QString &Protocol );
+
   private:
     Q_DISABLE_COPY(V2Config)
 

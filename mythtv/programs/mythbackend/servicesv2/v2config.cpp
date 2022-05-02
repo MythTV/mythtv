@@ -1,6 +1,10 @@
 #include "v2config.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
 
+// qt
+#include <QHostAddress>
+#include <QNetworkInterface>
+
 #include "version.h"
 #include "mythcorecontext.h"
 #include "mythcontext.h"
@@ -171,4 +175,31 @@ V2LanguageList* V2Config::GetLanguages()
     return pList;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
 
+QStringList V2Config::GetIPAddresses( const QString &Protocol )
+{
+    QString protocol = Protocol;
+
+    if (protocol != "IPv4" && protocol != "IPv6")
+        protocol = "All";
+
+    QStringList oList;
+
+    QList<QHostAddress> list = QNetworkInterface::allAddresses();
+    QList<QHostAddress>::iterator it;
+
+    for (it = list.begin(); it != list.end(); ++it)
+    {
+        if (((*it).protocol() == QAbstractSocket::IPv4Protocol && protocol == "IPv4") ||
+            ((*it).protocol() == QAbstractSocket::IPv6Protocol && protocol == "IPv6") || protocol == "All")
+        {
+            it->setScopeId(QString());
+            oList.append((*it).toString());
+        }
+    }
+
+    return oList;
+}
