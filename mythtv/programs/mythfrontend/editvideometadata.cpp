@@ -206,7 +206,7 @@ namespace
     {
         bool operator()(const T &lhs, const T &rhs)
         {
-            return StringUtil::naturalCompare(lhs.second, rhs.second) < 0;
+            return StringUtil::naturalSortCompare(lhs.second, rhs.second);
         }
     };
 

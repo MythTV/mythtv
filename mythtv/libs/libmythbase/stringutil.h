@@ -47,6 +47,16 @@ MBASE_PUBLIC
 int naturalCompare(const QString &_a, const QString &_b,
                    Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
 
+/**
+naturalCompare as a std::sort compatible function (ignoring the third parameter,
+which is never used).
+*/
+inline bool naturalSortCompare(const QString &a, const QString &b,
+                   Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive)
+{
+    return naturalCompare(a, b, caseSensitivity) < 0;
+}
+
 } // namespace StringUtil
 
 #endif // STRINGUTIL_H_

@@ -166,20 +166,14 @@ void PrevRecordedList::Load(void)
     QCoreApplication::postEvent(this, slce);
 }
 
-static bool comp_sorttitle_lt(
-    const ProgramInfo *a, const ProgramInfo *b)
+static bool comp_sorttitle_lt(const ProgramInfo *a, const ProgramInfo *b)
 {
-    QString a_st = a->GetSortTitle();
-    QString b_st = b->GetSortTitle();
-    return StringUtil::naturalCompare(a_st,b_st) < 0;
+    return StringUtil::naturalSortCompare(a->GetSortTitle(), b->GetSortTitle());
 }
 
-static bool comp_sorttitle_lt_rev(
-    const ProgramInfo *a, const ProgramInfo *b)
+static bool comp_sorttitle_lt_rev(const ProgramInfo *a, const ProgramInfo *b)
 {
-    QString a_st = a->GetSortTitle();
-    QString b_st = b->GetSortTitle();
-    return StringUtil::naturalCompare(b_st, a_st) < 0;
+    return StringUtil::naturalSortCompare(b->GetSortTitle(), a->GetSortTitle());
 }
 
 static bool comp_sortdate_lt(

@@ -9,6 +9,7 @@
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/stringutil.h"
+#include "libmythbase/ternarycompare.h"
 #include "libmythtv/recordingrule.h"
 #include "libmythtv/scheduledrecording.h"
 #include "libmythui/mythdialogbox.h"
@@ -113,45 +114,20 @@ class TitleSort
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
     {
-        if (a->GetSortTitle() != b->GetSortTitle())
-        {
-            if (m_reverse)
-                return StringUtil::naturalCompare(b->GetSortTitle(), a->GetSortTitle()) < 0;
-            return StringUtil::naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
-        }
+        int cmp = StringUtil::naturalCompare(a->GetSortTitle(), b->GetSortTitle());
+        if (cmp == 0)
+            cmp = StringUtil::naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle());
+        // sort higher recording priority before
+        if (cmp == 0)
+            cmp = ternary_compare(b->GetRecordingPriority(), a->GetRecordingPriority());
+        // sort lower RecordingTypePrecedence before
+        if (cmp == 0)
+            cmp = ternary_compare(RecTypePrecedence(a->m_recType), RecTypePrecedence(b->m_recType));
+        // sort lower RecordingRuleID before
+        if (cmp == 0)
+            cmp = ternary_compare(a->GetRecordingRuleID(), b->GetRecordingRuleID());
 
-        if (a->GetSortSubtitle() != b->GetSortSubtitle())
-        {
-            if (m_reverse)
-                return StringUtil::naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle()) < 0;
-            return StringUtil::naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
-        }
-
-        int finalA = a->GetRecordingPriority();
-        int finalB = b->GetRecordingPriority();
-
-        if (finalA != finalB)
-        {
-            if (m_reverse)
-                return finalA < finalB;
-            return finalA > finalB;
-        }
-
-        int typeA = RecTypePrecedence(a->m_recType);
-        int typeB = RecTypePrecedence(b->m_recType);
-
-        if (typeA != typeB)
-        {
-            if (m_reverse)
-                return typeA > typeB;
-            return typeA < typeB;
-        }
-
-        if (m_reverse)
-            return (a->GetRecordingRuleID() >
-                    b->GetRecordingRuleID());
-        return (a->GetRecordingRuleID() <
-                b->GetRecordingRuleID());
+        return m_reverse ? cmp > 0 : cmp < 0;
     }
 
   private:
@@ -166,31 +142,16 @@ class ProgramRecPrioritySort
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
     {
-        int finalA = a->GetRecordingPriority();
-        int finalB = b->GetRecordingPriority();
+        // sort higher recording priority before
+        int cmp = ternary_compare(b->GetRecordingPriority(), a->GetRecordingPriority());
+        // sort lower RecTypePrecedence before
+        if (cmp == 0)
+            cmp = ternary_compare(RecTypePrecedence(a->m_recType), RecTypePrecedence(b->m_recType));
+        // sort lower RecordingRuleID before
+        if (cmp == 0)
+            cmp = ternary_compare(a->GetRecordingRuleID(), b->GetRecordingRuleID());
 
-        if (finalA != finalB)
-        {
-            if (m_reverse)
-                return finalA < finalB;
-            return finalA > finalB;
-        }
-
-        int typeA = RecTypePrecedence(a->m_recType);
-        int typeB = RecTypePrecedence(b->m_recType);
-
-        if (typeA != typeB)
-        {
-            if (m_reverse)
-                return typeA > typeB;
-            return typeA < typeB;
-        }
-
-        if (m_reverse)
-            return (a->GetRecordingRuleID() >
-                    b->GetRecordingRuleID());
-        return (a->GetRecordingRuleID() <
-                b->GetRecordingRuleID());
+        return m_reverse ? cmp > 0 : cmp < 0;
     }
 
   private:
@@ -205,31 +166,16 @@ class ProgramRecTypeSort
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
     {
-        int typeA = RecTypePrecedence(a->m_recType);
-        int typeB = RecTypePrecedence(b->m_recType);
+        // sort lower RecTypePrecedence before
+        int cmp = ternary_compare(RecTypePrecedence(a->m_recType), RecTypePrecedence(b->m_recType));
+        // sort higher recording priority before
+        if (cmp == 0)
+            cmp = ternary_compare(b->GetRecordingPriority(), a->GetRecordingPriority());;
+        // sort lower RecordingRuleID before
+        if (cmp == 0)
+            cmp = ternary_compare(a->GetRecordingRuleID(), b->GetRecordingRuleID());
 
-        if (typeA != typeB)
-        {
-            if (m_reverse)
-                return (typeA > typeB);
-            return (typeA < typeB);
-        }
-
-        int finalA = a->GetRecordingPriority();
-        int finalB = b->GetRecordingPriority();
-
-        if (finalA != finalB)
-        {
-            if (m_reverse)
-                return finalA < finalB;
-            return finalA > finalB;
-        }
-
-        if (m_reverse)
-            return (a->GetRecordingRuleID() >
-                    b->GetRecordingRuleID());
-        return (a->GetRecordingRuleID() <
-                b->GetRecordingRuleID());
+        return m_reverse ? cmp > 0 : cmp < 0;
     }
 
   private:
@@ -244,34 +190,17 @@ class ProgramCountSort
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
     {
-        int countA = a->m_matchCount;
-        int countB = b->m_matchCount;
-        int recCountA = a->m_recCount;
-        int recCountB = b->m_recCount;
+        // sort higher match count before
+        int cmp = ternary_compare(b->m_matchCount, a->m_matchCount);
+        // sort higher recCount before
+        if (cmp == 0)
+            cmp = ternary_compare(b->m_recCount, a->m_recCount);
+        if (cmp == 0)
+            cmp = StringUtil::naturalCompare(a->GetSortTitle(), b->GetSortTitle());
+        if (cmp == 0)
+            cmp = StringUtil::naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle());
 
-        if (countA != countB)
-        {
-            if (m_reverse)
-                return countA < countB;
-            return countA > countB;
-        }
-
-        if (recCountA != recCountB)
-        {
-            if (m_reverse)
-                return recCountA < recCountB;
-            return recCountA > recCountB;
-        }
-
-        if (m_reverse)
-        {
-            if (a->GetSortTitle() != b->GetSortTitle())
-                return StringUtil::naturalCompare(b->GetSortTitle(), a->GetSortTitle()) < 0;
-            return StringUtil::naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle()) < 0;
-        }
-        if (a->GetSortTitle() != b->GetSortTitle())
-            return StringUtil::naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
-        return StringUtil::naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
+        return m_reverse ? cmp > 0 : cmp < 0;
     }
 
   private:
@@ -286,34 +215,17 @@ class ProgramRecCountSort
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
     {
-        int countA = a->m_matchCount;
-        int countB = b->m_matchCount;
-        int recCountA = a->m_recCount;
-        int recCountB = b->m_recCount;
+        // sort higher recCount before
+        int cmp = ternary_compare(b->m_recCount, a->m_recCount);
+        // sort higher match count before
+        if (cmp == 0)
+            cmp = ternary_compare(b->m_matchCount, a->m_matchCount);
+        if (cmp == 0)
+            cmp = StringUtil::naturalCompare(a->GetSortTitle(), b->GetSortTitle());
+        if (cmp == 0)
+            cmp = StringUtil::naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle());
 
-        if (recCountA != recCountB)
-        {
-            if (m_reverse)
-                return recCountA < recCountB;
-            return recCountA > recCountB;
-        }
-
-        if (countA != countB)
-        {
-            if (m_reverse)
-                return countA < countB;
-            return countA > countB;
-        }
-
-        if (m_reverse)
-        {
-            if (a->GetSortTitle() != b->GetSortTitle())
-                return StringUtil::naturalCompare(b->GetSortTitle(), a->GetSortTitle()) < 0;
-            return StringUtil::naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle()) < 0;
-        }
-        if (a->GetSortTitle() != b->GetSortTitle())
-            return StringUtil::naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
-        return StringUtil::naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
+        return m_reverse ? cmp > 0 : cmp < 0;
     }
 
   private:
@@ -328,25 +240,14 @@ class ProgramLastRecordSort
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
     {
-        QDateTime lastRecA = a->m_last_record;
-        QDateTime lastRecB = b->m_last_record;
+        // sort later date time before
+        int cmp = ternary_compare(b->m_last_record, a->m_last_record);
+        if (cmp == 0)
+            cmp = StringUtil::naturalCompare(a->GetSortTitle(), b->GetSortTitle());
+        if (cmp == 0)
+            cmp = StringUtil::naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle());
 
-        if (lastRecA != lastRecB)
-        {
-            if (m_reverse)
-                return lastRecA < lastRecB;
-            return lastRecA > lastRecB;
-        }
-
-        if (m_reverse)
-        {
-            if (a->GetSortTitle() != b->GetSortTitle())
-                return StringUtil::naturalCompare(b->GetSortTitle(), a->GetSortTitle()) < 0;
-            return StringUtil::naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle()) < 0;
-        }
-        if (a->GetSortTitle() != b->GetSortTitle())
-            return StringUtil::naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
-        return StringUtil::naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
+        return m_reverse ? cmp > 0 : cmp < 0;
     }
 
   private:
@@ -361,25 +262,13 @@ class ProgramAvgDelaySort
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
     {
-        int avgA = a->m_avg_delay;
-        int avgB = b->m_avg_delay;
+        int cmp = ternary_compare(a->m_avg_delay, b->m_avg_delay);
+        if (cmp == 0)
+            cmp = StringUtil::naturalCompare(a->GetSortTitle(), b->GetSortTitle());
+        if (cmp == 0)
+            cmp = StringUtil::naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle());
 
-        if (avgA != avgB)
-        {
-            if (m_reverse)
-                return avgA > avgB;
-            return avgA < avgB;
-        }
-
-        if (m_reverse)
-        {
-            if (a->GetSortTitle() != b->GetSortTitle())
-                return StringUtil::naturalCompare(b->GetSortTitle(), a->GetSortTitle()) < 0;
-            return StringUtil::naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle()) < 0;
-        }
-        if (a->GetSortTitle() != b->GetSortTitle())
-            return StringUtil::naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
-        return StringUtil::naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
+        return m_reverse ? cmp > 0 : cmp < 0;
     }
 
   private:
