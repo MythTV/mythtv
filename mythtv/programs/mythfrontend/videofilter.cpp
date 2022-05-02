@@ -327,8 +327,7 @@ bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
         case kOrderByLength:                return lhs.GetLength()      < rhs.GetLength();
         case kOrderByID:                    return lhs.GetID()          < rhs.GetID();
         case kOrderByFilename:
-            return StringUtil::naturalCompare(lhs.GetSortFilename(),
-                                              rhs.GetSortFilename()) < 0;
+            return StringUtil::naturalSortCompare(lhs.GetSortFilename(), rhs.GetSortFilename());
         case kOrderBySeasonEp:
         {
             if ((lhs.GetSeason() == rhs.GetSeason())

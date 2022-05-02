@@ -150,7 +150,7 @@ class SingleValueImp
 
     virtual bool sort(const entry &lhs, const entry &rhs)
     {
-        return StringUtil::naturalCompare(lhs.second, rhs.second) < 0;
+        return StringUtil::naturalSortCompare(lhs.second, rhs.second);
     }
 
     void cleanup()
