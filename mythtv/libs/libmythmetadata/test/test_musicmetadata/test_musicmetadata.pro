@@ -8,6 +8,8 @@ TEMPLATE = app
 TARGET = test_musicmetadata
 INCLUDEPATH += ../../..
 
+DEFINES += TEST_SOURCE_DIR='\'"$${PWD}"'\'
+
 # Add all the necessary libraries
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION

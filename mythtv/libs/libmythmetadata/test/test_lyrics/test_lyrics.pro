@@ -8,6 +8,8 @@ TEMPLATE = app
 TARGET = test_lyrics
 INCLUDEPATH += ../../..
 
+DEFINES += TEST_SOURCE_DIR='\'"$${PWD}"'\'
+
 LIBS += ../../$(OBJECTS_DIR)lyricsdata.o
 
 # Add all the necessary libraries

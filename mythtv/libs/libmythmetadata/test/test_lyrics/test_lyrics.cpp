@@ -22,7 +22,6 @@
 
 void TestLyrics::initTestCase()
 {
-    QDir::setCurrent("libmythmetadata/test/test_lyrics");
 }
 
 void TestLyrics::dump(const LyricsLineMap* lyrics)
@@ -38,7 +37,7 @@ void TestLyrics::dump(const LyricsLineMap* lyrics)
 
 void TestLyrics::test_notimes(void)
 {
-    QFile file {"samples/DemoTrack1.xml"};
+    QFile file {QStringLiteral(TEST_SOURCE_DIR) + "/samples/DemoTrack1.xml"};
     QVERIFY(file.exists());
     QVERIFY(file.open(QIODevice::ReadOnly));
 
@@ -72,7 +71,7 @@ void TestLyrics::test_notimes(void)
 
 void TestLyrics::test_times(void)
 {
-    QFile file {"samples/DemoTrack2.xml"};
+    QFile file {QStringLiteral(TEST_SOURCE_DIR) + "/samples/DemoTrack2.xml"};
     QVERIFY(file.exists());
     QVERIFY(file.open(QIODevice::ReadOnly));
 
@@ -106,7 +105,7 @@ void TestLyrics::test_times(void)
 
 void TestLyrics::test_offset1(void)
 {
-    QFile file {"samples/DemoTrack3.xml"};
+    QFile file {QStringLiteral(TEST_SOURCE_DIR) + "/samples/DemoTrack3.xml"};
     QVERIFY(file.exists());
     QVERIFY(file.open(QIODevice::ReadOnly));
 
@@ -140,7 +139,7 @@ void TestLyrics::test_offset1(void)
 
 void TestLyrics::test_offset2(void)
 {
-    QFile file {"samples/DemoTrack4.xml"};
+    QFile file {QStringLiteral(TEST_SOURCE_DIR) + "/samples/DemoTrack4.xml"};
     QVERIFY(file.exists());
     QVERIFY(file.open(QIODevice::ReadOnly));
 

@@ -42,6 +42,8 @@ QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythupnp
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythservicecontracts
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythfreemheg
 
+DEFINES += TEST_SOURCE_DIR='\'"$${PWD}"'\'
+
 # Input
 HEADERS += test_xine_demux.h
 SOURCES += test_xine_demux.cpp

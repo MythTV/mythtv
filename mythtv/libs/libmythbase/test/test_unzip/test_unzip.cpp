@@ -26,8 +26,6 @@ QTemporaryDir *gTmpDir {nullptr};
 
 void TestUnzip::initTestCase()
 {
-    QDir::setCurrent("libmythbase/test/test_unzip");
-
     gTmpDir = new QTemporaryDir();
     QVERIFY(gTmpDir != nullptr);
     gTmpDir->setAutoRemove(true);
@@ -50,7 +48,8 @@ void TestUnzip::cleanupTestCase()
 
 void TestUnzip::test_text_file(void)
 {
-    QString filename { "zipfiles/ipsum_lorem.zip" };
+    QString filename { QStringLiteral(TEST_SOURCE_DIR) +
+        "/zipfiles/ipsum_lorem.zip" };
     bool result = extractZIP(filename, gTmpDir->path());
     QCOMPARE(result, true);
 
@@ -62,7 +61,8 @@ void TestUnzip::test_text_file(void)
     QCOMPARE(fi.lastModified(), actualDateTime);
 #endif
 
-    auto orig = QFile("data/ipsum_lorem_p1.txt");
+    auto orig = QFile(QStringLiteral(TEST_SOURCE_DIR) +
+                      "/data/ipsum_lorem_p1.txt");
     orig.open(QIODevice::ReadOnly);
     auto origData = orig.readAll();
 
@@ -74,7 +74,8 @@ void TestUnzip::test_text_file(void)
 
 void TestUnzip::test_theme_file(void)
 {
-    QString filename { "zipfiles/themes.zip" };
+    QString filename { QStringLiteral(TEST_SOURCE_DIR) +
+        "/zipfiles/themes.zip" };
     bool result = extractZIP(filename, gTmpDir->path());
     QCOMPARE(result, true);
 
@@ -86,7 +87,8 @@ void TestUnzip::test_theme_file(void)
     QCOMPARE(fi.lastModified(), actualDateTime);
 #endif
 
-    auto orig = QFile("data/willi_themeinfo.xml");
+    auto orig = QFile(QStringLiteral(TEST_SOURCE_DIR) +
+                      "/data/willi_themeinfo.xml");
     orig.open(QIODevice::ReadOnly);
     auto origData = orig.readAll();
 

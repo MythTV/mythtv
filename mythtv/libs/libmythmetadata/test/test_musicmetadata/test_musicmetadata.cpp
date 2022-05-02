@@ -18,12 +18,11 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 #include "test_musicmetadata.h"
+#include <iostream>
 
 void TestMusicMetadata::initTestCase()
 {
     gCoreContext = new MythCoreContext("test_mythmusicdata_1.0", nullptr);
-
-    QDir::setCurrent("libmythmetadata/test/test_musicmetadata");
 }
 
 void TestMusicMetadata::dump(MusicMetadata *data)
@@ -63,7 +62,8 @@ void TestMusicMetadata::dump(MusicMetadata *data)
 
 void TestMusicMetadata::test_flac(void)
 {
-    MusicMetadata *data = MetaIO::readMetadata("samples/silence.flac");
+    MusicMetadata *data = MetaIO::readMetadata(QStringLiteral(TEST_SOURCE_DIR) +
+                                               "/samples/silence.flac");
     QVERIFY(data != nullptr);
 //  dump(data);
     QCOMPARE(data->Length(), 5000ms);
@@ -78,7 +78,8 @@ void TestMusicMetadata::test_flac(void)
 
 void TestMusicMetadata::test_ogg(void)
 {
-    MusicMetadata *data = MetaIO::readMetadata("samples/silence.ogg");
+    MusicMetadata *data = MetaIO::readMetadata(QStringLiteral(TEST_SOURCE_DIR) +
+                                               "/samples/silence.ogg");
     QVERIFY(data != nullptr);
 //  dump(data);
     QCOMPARE(data->Length(), 5000ms);
@@ -94,7 +95,8 @@ void TestMusicMetadata::test_ogg(void)
 
 void TestMusicMetadata::test_mp4(void)
 {
-    MusicMetadata *data = MetaIO::readMetadata("samples/silence.m4a");
+    MusicMetadata *data = MetaIO::readMetadata(QStringLiteral(TEST_SOURCE_DIR) +
+                                               "/samples/silence.m4a");
     QVERIFY(data != nullptr);
 //  dump(data);
     QCOMPARE(data->Length(), 3165ms);
@@ -113,7 +115,8 @@ void TestMusicMetadata::test_mp4(void)
 
 void TestMusicMetadata::test_mp3(void)
 {
-    MusicMetadata *data = MetaIO::readMetadata("samples/silence.mp3");
+    MusicMetadata *data = MetaIO::readMetadata(QStringLiteral(TEST_SOURCE_DIR) +
+                                               "/samples/silence.mp3");
     QVERIFY(data != nullptr);
 //  dump(data);
     QCOMPARE(data->Length(), 5042ms);
@@ -128,7 +131,8 @@ void TestMusicMetadata::test_mp3(void)
 
 void TestMusicMetadata::test_wv(void)
 {
-    MusicMetadata *data = MetaIO::readMetadata("samples/silence.wv");
+    MusicMetadata *data = MetaIO::readMetadata(QStringLiteral(TEST_SOURCE_DIR) +
+                                               "/samples/silence.wv");
     QVERIFY(data != nullptr);
 //  dump(data);
     QCOMPARE(data->Length(), 3142ms);
@@ -145,7 +149,8 @@ void TestMusicMetadata::test_wv(void)
 // Exercises metaioavfcomment.cpp
 void TestMusicMetadata::test_aiff(void)
 {
-    MusicMetadata *data = MetaIO::readMetadata("samples/silence.aiff");
+    MusicMetadata *data = MetaIO::readMetadata(QStringLiteral(TEST_SOURCE_DIR) +
+                                               "/samples/silence.aiff");
     QVERIFY(data != nullptr);
 //  dump(data);
     QCOMPARE(data->Length(), 2000ms);

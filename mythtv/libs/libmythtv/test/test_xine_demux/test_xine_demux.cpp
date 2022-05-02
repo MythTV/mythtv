@@ -21,7 +21,6 @@
 
 void TestXineDemux::initTestCase()
 {
-    QDir::setCurrent("libmythtv/test/test_xine_demux");
 }
 
 
@@ -29,7 +28,7 @@ void TestXineDemux::open_file(const QString& filename,
                               demux_sputext_t& sub_data,
                               bool& loaded)
 {
-    QFile file(filename);
+    QFile file(QStringLiteral(TEST_SOURCE_DIR) + "/" + filename);
     QCOMPARE(file.exists(), true);
     QCOMPARE(file.open(QIODevice::ReadOnly | QIODevice::Text), true);
 

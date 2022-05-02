@@ -120,7 +120,7 @@ QUrl TestRecExtEspnDataSource::makeInfoUrl(const SportInfo& info, const QDateTim
         return RecExtEspnDataSource::makeInfoUrl(info, dt);
 
     QDateTime dt2 = getNow();
-    QString path = "file://" + QDir::currentPath() +
+    QString path = "file://" + QStringLiteral(TEST_SOURCE_DIR) +
         QString("/data/espn_%1_%2_%3xx.json")
         .arg(info.sport, info.league, dt2.toString("yyyyMM"));
     return QUrl(path);
@@ -129,7 +129,7 @@ QUrl TestRecExtEspnDataSource::makeInfoUrl(const SportInfo& info, const QDateTim
 QUrl TestRecExtEspnDataSource::makeGameUrl(const ActiveGame& game, const QString& str)
 {
     SportInfo info = game.getInfo();
-    QString path = "file://" + QDir::currentPath() +
+    QString path = "file://" + QStringLiteral(TEST_SOURCE_DIR) +
         QString("/data/espn_%1_%2_game_%3.json")
         .arg(info.sport, info.league, str);
     return QUrl(path);
@@ -163,13 +163,6 @@ void TestRecordingExtender::initTestCase()
             QString("Unable to initialize database, step %1.").arg(updateNum);
         QVERIFY2(performUpdateSeries("MythtTV", updates), qPrintable(error));
     }
-
-    // 'Make test' is usually run from the programs directory. Walk
-    // one directory at a time down to the test directory so that the
-    // 'make test' command also works in intermediate directories.
-    QDir::setCurrent("mythbackend");
-    QDir::setCurrent("test");
-    QDir::setCurrent(TESTNAME);
 }
 
 // After all test cases
@@ -572,7 +565,7 @@ void TestRecordingExtender::test_parseJson(void)
 
     SportInfo info {"MLB Baseball", AutoExtendType::MLB, "", ""};
     ActiveGame game(0, "MLB Baseball", info);
-    QString path = "file://" + QDir::currentPath() +
+    QString path = "file://" + QStringLiteral(TEST_SOURCE_DIR) +
         "/data/mlb_baseball_20210921_1720.json";
     game.setInfoUrl(path);
     game.setTeams("Washington Nationals", "Miami Marlins");
@@ -697,7 +690,8 @@ void TestRecordingExtender::test_parseEspn(void)
 
     SportInfo info {"MLB Baseball", AutoExtendType::ESPN, sport, league};
     ActiveGame game(0, "MLB Baseball", info);
-    QString path = "file://" + QDir::currentPath() + "/data/" + infoFile;
+    QString path = "file://" + QStringLiteral(TEST_SOURCE_DIR) +
+        "/data/" + infoFile;
     game.setInfoUrl(path);
 
     // Previous case tested parsing of team names.
@@ -795,7 +789,8 @@ void TestRecordingExtender::test_parseMlb(void)
 
     SportInfo info {"MLB Baseball", AutoExtendType::MLB, "sport", "league"};
     ActiveGame game(0, "MLB Baseball", info);
-    QString path = "file://" + QDir::currentPath() + "/data/" + infoFile;
+    QString path = "file://" + QStringLiteral(TEST_SOURCE_DIR) +
+        "/data/" + infoFile;
     game.setInfoUrl(path);
 
     // Previous case tested parsing of team names.
@@ -823,7 +818,7 @@ void TestRecordingExtender::test_parseMlb(void)
     QVERIFY(game.getGameUrl().url().endsWith(expectedGameURL));
 
     // Test loading games status page
-    path = "file://" + QDir::currentPath() + "/data/" + gameFile;
+    path = "file://" + QStringLiteral(TEST_SOURCE_DIR) + "/data/" + gameFile;
     game.setGameUrl(path);
     page = source->loadPage(game, game.getGameUrl());
     QCOMPARE(page != nullptr, true);

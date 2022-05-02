@@ -9,6 +9,8 @@ DEPENDPATH += . ../..
 INCLUDEPATH += . ../..
 LIBS += -L../.. -lmythbase-$$LIBVERSION
 
+DEFINES += TEST_SOURCE_DIR='\'"$${PWD}"\''
+
 # Input
 HEADERS += test_mythbinaryplist.h
 SOURCES += test_mythbinaryplist.cpp

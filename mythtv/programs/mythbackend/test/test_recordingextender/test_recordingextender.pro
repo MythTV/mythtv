@@ -54,6 +54,8 @@ QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../
     darwin: LIBS += -liconv -lz
 }
 
+DEFINES += TEST_SOURCE_DIR='\'"$${PWD}"'\'
+
 # Input
 HEADERS += test_recordingextender.h
 SOURCES += test_recordingextender.cpp dummyscheduler.cpp

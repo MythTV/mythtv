@@ -26,8 +26,6 @@ static QDateTime test_datetime;
 // called at the beginning of these sets of tests
 void TestMythBinaryPList::initTestCase(void)
 {
-    QDir::setCurrent("libmythbase/test/test_mythbinaryplist");
-
     auto date = QDate(2021, 4, 21);
     auto time = QTime(13, 26, 03);
     test_datetime = QDateTime(date, time, Qt::UTC);
@@ -51,7 +49,7 @@ void TestMythBinaryPList::cleanup(void)
 void TestMythBinaryPList::plist_read(void)
 {
     // Read the file
-    QFile file("info_mac_addl.bplist");
+    QFile file(QStringLiteral(TEST_SOURCE_DIR) + "/info_mac_addl.bplist");
     QCOMPARE(file.exists(), true);
     QCOMPARE(file.open(QIODevice::ReadOnly), true);
     QByteArray file_data = file.readAll();

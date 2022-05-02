@@ -10,6 +10,8 @@ INCLUDEPATH += . ../..
 LIBS += -L../.. -lmythbase-$$LIBVERSION
 LIBS += -Wl,$$_RPATH_$${PWD}/../..
 
+DEFINES += TEST_SOURCE_DIR='\'"$${PWD}"\''
+
 # Input
 HEADERS += test_unzip.h
 SOURCES += test_unzip.cpp
