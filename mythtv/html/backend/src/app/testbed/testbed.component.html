@@ -67,4 +67,10 @@
 <p-button class="p-2" (click)="addStorageGroup()">Add SG</p-button>
 
 <h4>Translation Test</h4>
-<div>{{ 'primeng.passwordPrompt' | translate }}</div> 
+<div>{{ 'primeng.passwordPrompt' | translate }}</div>
+
+<ng-container *ngFor="let sg of m_storageGroups">
+    <div>
+        Id: {{sg.Id}} GroupName: {{sg.GroupName}} HostName: {{sg.HostName}}
+    </div>
+</ng-container>

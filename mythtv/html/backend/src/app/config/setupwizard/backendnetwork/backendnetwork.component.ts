@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-// import { MythCountryList, MythLanguageList, Country, Language } from '../../../services/interfaces/config.interface';
+import { Setup } from 'src/app/services/interfaces/setup.interface';
+import { SetupService } from 'src/app/services/setup.service';
 import { ConfigService } from '../../../services/config.service';
 
 @Component({
@@ -10,12 +11,23 @@ import { ConfigService } from '../../../services/config.service';
 })
 export class BackendnetworkComponent implements OnInit {
 
+    m_setupData!: Setup;
     m_showHelp: boolean = false;
 
+    m_IPsAll!: string[];
+    m_IPsV4!: string[];
+    m_IPsV6!: string[];
+
     constructor(private router: Router,
-        private configService: ConfigService) { }
+                private configService: ConfigService,
+                private setupService: SetupService) {
+        configService.GetIPAddresses("All").subscribe(result => this.m_IPsAll = result.IPAddresses);
+        configService.GetIPAddresses("IPv4").subscribe(result => this.m_IPsV4 = result.IPAddresses);
+        configService.GetIPAddresses("IPv6").subscribe(result => this.m_IPsV6 = result.IPAddresses);
+    }
 
     ngOnInit(): void {
+        this.m_setupData = this.setupService.getSetupData();
     }
 
     previousPage() {
@@ -31,5 +43,9 @@ export class BackendnetworkComponent implements OnInit {
 
     showHelp() {
         this.m_showHelp = true;
+    }
+
+    saveForm() {
+        console.log("save form clicked");
     }
 }

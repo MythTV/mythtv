@@ -33,6 +33,18 @@ import { GuideComponent } from './guide/guide.component';
 import { ChannelIconComponent } from './guide/components/channelicon/channelicon.component';
 import { ProgramEntryComponent } from './guide/components/programentry/programentry.component';
 import { TimebarComponent } from './guide/components/timebar/timebar.component';
+import { SettingsComponent } from './config/settings/settings.component';
+import { HostAddressComponent } from './config/settings/general/host-address/host-address.component';
+import { LocaleComponent } from './config/settings/general/locale/locale.component';
+import { MiscSettingsComponent } from './config/settings/general/misc-settings/misc-settings.component';
+import { EitScannerComponent } from './config/settings/general/eit-scanner/eit-scanner.component';
+import { ShutdownWakeupComponent } from './config/settings/general/shutdown-wakeup/shutdown-wakeup.component';
+import { BackendWakeupComponent } from './config/settings/general/backend-wakeup/backend-wakeup.component';
+import { BackendControlComponent } from './config/settings/general/backend-control/backend-control.component';
+import { JobqueueBackendComponent } from './config/settings/general/jobqueue-backend/jobqueue-backend.component';
+import { JobqueueGlobalComponent } from './config/settings/general/jobqueue-global/jobqueue-global.component';
+import { JobqueueCommandsComponent } from './config/settings/general/jobqueue-commands/jobqueue-commands.component';
+import { EpgDownloadingComponent } from './config/settings/general/epg-downloading/epg-downloading.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -63,6 +75,18 @@ export function HttpLoaderFactory(http: HttpClient) {
     ChannelIconComponent,
     ProgramEntryComponent,
     TimebarComponent,
+    SettingsComponent,
+    HostAddressComponent,
+    LocaleComponent,
+    MiscSettingsComponent,
+    EitScannerComponent,
+    ShutdownWakeupComponent,
+    BackendWakeupComponent,
+    BackendControlComponent,
+    JobqueueBackendComponent,
+    JobqueueGlobalComponent,
+    JobqueueCommandsComponent,
+    EpgDownloadingComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Database } from './interfaces/myth.interface';
-import { MythDatabaseStatus } from './interfaces/config.interface';
-import { MythLanguageList } from "./interfaces/language.interface";
-import { MythCountryList } from "./interfaces/country.interface";
+import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+import { MythConnectionInfo, Database } from './interfaces/myth.interface';
+import { MythDatabaseStatus, IPAddressList } from './interfaces/config.interface';
+import { MythCountryList } from './interfaces/country.interface';
+import { MythLanguageList } from './interfaces/language.interface';
 
 @Injectable({
     providedIn: 'root'
@@ -26,6 +27,11 @@ export class ConfigService {
 
     public GetLanguages(): Observable<MythLanguageList> {
         return this.httpClient.get<MythLanguageList>('/Config/GetLanguages')
+    }
+
+    public GetIPAddresses(protocol: string): Observable<IPAddressList> {
+        let params = new HttpParams().set("Protocol", protocol);
+        return this.httpClient.get<IPAddressList>('/Config/GetIPAddresses', {params})
     }
 }
 

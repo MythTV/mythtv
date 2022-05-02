@@ -1,0 +1,50 @@
+<form class="ml-3 mr-3" name="locale" #locale="ngForm" (ngSubmit)="saveForm()">
+    <p-card class="m-5" [style]="{'width':'100%'}">
+        <ng-template pTemplate="title">
+            Locale Settings
+        </ng-template>
+        <ng-template pTemplate="subtitle">
+            These set some country specific default settings
+        </ng-template>
+        <ng-template pTemplate="TV Formats">
+            <div class="grid">
+                <p-fieldset class="mb-4 w-full" legend="TV Formats">
+                    <div class="form-group field">
+                        <label for="tvformat" class="label block">TV Format</label>
+                        <p-dropdown [options]="m_TVFormats" [(ngModel)]="m_setupData.General.Locale.TVFormat"
+                            class="w-full mb-2" name="tvformat" aria-describedby="tvformat-help">
+                        </p-dropdown>
+                        <small class="block mt-2" id="tvformat-help">The TV standard to use for viewing TV.</small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="vbiformat" class="label block">VBI Format</label>
+                        <p-dropdown [options]="m_vbiFormats" [(ngModel)]="m_setupData.General.Locale.VbiFormat"
+                            class="mb-5  w-full" name="vbiformat" aria-describedby="vbiformat-help">
+                        </p-dropdown>
+                        <small class="block mt-2" id="vbiformat-help">The VBI (Vertical Blanking Interval) is used to carry Teletext or Closed Captions data.</small>
+                    </div>
+                </p-fieldset>
+
+                <p-fieldset class="mb-4 w-full" legend="Frequency Tables">
+                    <div class="form-group field">
+                        <label for="freqtable" class="label block">Channel Frequency Table</label>
+                        <p-dropdown [options]="m_FreqTables" [(ngModel)]="m_setupData.General.Locale.FreqTable"
+                            class="mb-2 w-full" name="freqtable">
+                        </p-dropdown>
+                        <small class="block pt-2" id="freqtable-help">Select the appropriate frequency table for your system. If you have an aerial, use a '-bcast frequency.</small>
+                    </div>
+                </p-fieldset>
+            </div>
+            </ng-template>
+
+        <ng-template pTemplate="footer">
+            <div class="p-grid p-nogutter p-justify-end">
+                <p-button class="pr-1" label="Save"  icon="pi pi-save" iconPos="left" (onClick)="saveForm()"></p-button>
+                <p-button class="help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()" icon="pi pi-info-circle" styleClass="p-button-info" ></p-button>
+            </div>
+        </ng-template>
+    </p-card>
+
+</form>
+

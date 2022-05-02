@@ -15,3 +15,7 @@ export interface MythDatabaseStatus {
         SchemaVersion: number;
     }
 }
+
+export interface IPAddressList {
+    IPAddresses: string[];
+}

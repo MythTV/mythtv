@@ -18,29 +18,31 @@ export class SetupWizardComponent implements OnInit {
     wizardItems: MenuItem[] = [];
     
     ngOnInit(): void {
-        this.wizardItems = [{
-            label: this.translate.instant('setupwizard.chooseLanguage'),
-            routerLink: 'selectlanguage'
-        },
-        {
-            label: this.translate.instant('setupwizard.setupDatabase'),
-            routerLink: 'dbsetup'
-        },
-        {
-            label: this.translate.instant('setupwizard.setupNetwork'),
-            routerLink: 'backendnetwork'
-        },
-        {
-            label: this.translate.instant('setupwizard.setupStorageGroups'),
-            routerLink: 'sgsetup'
-        },
-        {
-            label: this.translate.instant('setupwizard.done'),
-            routerLink: 'restart'
-        }
-    ];
+        this.translate.get('setupwizard.chooseLanguage').subscribe(
+            (translated: string) => {
+                this.wizardItems = [{
+                    label: this.translate.instant('setupwizard.chooseLanguage'),
+                    routerLink: 'selectlanguage'
+                },
+                {
+                    label: this.translate.instant('setupwizard.setupDatabase'),
+                    routerLink: 'dbsetup'
+                },
+                {
+                    label: this.translate.instant('setupwizard.setupNetwork'),
+                    routerLink: 'backendnetwork'
+                },
+                {
+                    label: this.translate.instant('setupwizard.setupStorageGroups'),
+                    routerLink: 'sgsetup'
+                },
+                {
+                    label: this.translate.instant('setupwizard.done'),
+                    routerLink: 'restart'
+                }
+                ]
+            })
         
-    this.router.navigate(['settings/selectlanguage']);
-
+        this.router.navigate(['settings/selectlanguage']);
     }
 }

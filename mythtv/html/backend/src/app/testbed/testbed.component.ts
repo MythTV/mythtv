@@ -8,12 +8,13 @@ import { ConfigService } from '../services/config.service';
 import { DvrService } from '../services/dvr.service';
 import { ContentService } from '../services/content.service';
 
-import { MythHostName, MythTimeZone, MythConnectionInfo, GetSettingResponse, GetStorageGroupDirsResponse } from '../services/interfaces/myth.interface';
+import { MythHostName, MythTimeZone, MythConnectionInfo, GetSettingResponse, GetStorageGroupDirsResponse, StorageGroupDir } from '../services/interfaces/myth.interface';
 import { MythDatabaseStatus } from '../services/interfaces/config.interface';
 import { GetRecStorageGroupListResponse } from '../services/interfaces/dvr.interface';
 import { BoolResponse } from '../services/interfaces/common.interface';
 import { IconlookupService } from '../services/external/iconlookup.service';
 import { CallsignLookupResponse } from '../services/interfaces/iconlookup.interface';
+
 @Component({
     selector: 'app-testbed',
     templateUrl: './testbed.component.html',
@@ -35,6 +36,8 @@ export class TestbedComponent implements OnInit {
     m_hostName: string = "";
     m_securityPin: string = "";
 
+    m_storageGroups!: StorageGroupDir[];
+
     public errorRes!: HttpErrorResponse;
 
     constructor(private mythService: MythService,
@@ -51,7 +54,6 @@ export class TestbedComponent implements OnInit {
         this.m_timezone$ = this.mythService.GetTimeZone().pipe(
             tap(data => console.log(data)),
         )
-
 
         this.m_setting$ = this.mythService.GetSetting({ HostName: this.m_hostName, Key: "SecurityPin" }).pipe(
             tap(data => console.log(data)),

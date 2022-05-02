@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { WizardData } from 'src/app/services/interfaces/wizarddata.interface';
+import { SetupWizardService } from 'src/app/services/setupwizard.service';
 
 @Component({
   selector: 'app-restart',
@@ -8,9 +10,13 @@ import { Router } from '@angular/router';
 })
 export class RestartComponent implements OnInit {
 
-  constructor(private router: Router) { }
+  m_wizardData!: WizardData;
+
+  constructor(private router: Router,
+              private wizardService: SetupWizardService) { }
 
   ngOnInit(): void {
+    this.m_wizardData = this.wizardService.getWizardData();
   }
 
   previousPage() {

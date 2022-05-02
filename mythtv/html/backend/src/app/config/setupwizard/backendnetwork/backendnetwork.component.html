@@ -4,25 +4,152 @@
 </p-dialog>
 
 <div class="wizard-content">
-    <p-card>
-        <ng-template pTemplate="title">
-            Backend Network Setup
-        </ng-template>
-        <ng-template pTemplate="subtitle">
-            Enter the network details for this backend
-        </ng-template>
-        <ng-template pTemplate="content">
-            <div class="p-fluid">
-                <p>TODO add backend server network details.</p> 
-            </div>
-        </ng-template>
-        <ng-template pTemplate="footer">
-            <div class="p-grid p-nogutter p-justify-end">
-                <p-button class="pr-1" label="{{ 'common.back' | translate }}" (onClick)="previousPage()" icon="pi pi-angle-left" iconPos="left"></p-button>
-                <p-button label="{{'common.next' | translate}}" (onClick)="nextPage()" icon="pi pi-angle-right" iconPos="right"></p-button>
-            </div>
-            <p-button class="help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()" icon="pi pi-info-circle" styleClass="p-button-info" ></p-button>
-        </ng-template>
-    </p-card>
-</div>
 
+    <form class="ml-3 mr-3" name="hostaddress2" #hostaddress="ngForm" (ngSubmit)="saveForm()">
+        <p-card class="m-5">
+            <ng-template pTemplate="title">
+                Host Address Backend Setup
+            </ng-template>
+            <ng-template pTemplate="subtitle">
+                These settings tell the backend which IP addresses and ports to listen on and whether it is a master backend.
+            </ng-template>
+            <ng-template pTemplate="content">
+                <div class="grid">
+                    <p-fieldset class="mb-4 w-full" legend="Ports">
+                        <div class="form-group field">
+                            <label for="backendserverport" class="label block">Port</label>
+                            <input pInputText id="backendserverport" type="number"
+                                [(ngModel)]="m_setupData.General.HostAddress.BackendServerPort" name="backendserverport"
+                                #backendserverport="ngModel" class="mb-2 form-control w-10rem"
+                                [ngClass]="{'is-invalid': backendserverport.invalid }" placeholder="Ex. 6543" required min="0" max="65536" />
+                            <small class="block" id="backendserverport-help">The port the backend listens on for connections (Unless you have a good reason don't change this).</small>
+                            <div *ngIf="backendserverport.invalid && (backendserverport.dirty || backendserverport.touched)">
+                                <small class="p-error block">{{ 'setupwizard.portRequired' | translate }}</small>
+                            </div>
+                        </div>
+
+                        <div class="form-group field">
+                            <label for="backendstatusport" class="label block">Status Port</label>
+                            <input pInputText id="backendstatusport" type="number"
+                                [(ngModel)]="m_setupData.General.HostAddress.BackendStatusPort" name="backendstatusport"
+                                #backendstatusport="ngModel" class="mb-2 form-control w-10rem"
+                                [ngClass]="{'is-invalid': backendstatusport.invalid }" placeholder="Ex. 6544" required min="0" max="65536" />
+                            <small class="block" id="backendstatusport-help">The port on which the server will listen on for HTTP requests, including backend status and MythXML requests.</small>
+                            <div *ngIf="backendstatusport.invalid && (backendstatusport.dirty || backendstatusport.touched)">
+                                <small class="p-error block">{{ 'setupwizard.portRequired' | translate }}</small>
+                            </div>
+                        </div>
+                    </p-fieldset>
+
+                    <p-fieldset class="mb-4 w-full" legend="Security PIN">
+                        <div class="form-group field">
+                            <label for="securitypin" class="label block">Security PIN (required)</label>
+                            <input pInputText id="securitypin" type="text"
+                                [(ngModel)]="m_setupData.General.HostAddress.SecurityPin" name="securitypin"
+                                #securitypin="ngModel" class="mb-2 form-control w-10rem" placeholder="Ex. 1234" required />
+                            <small class="block" id="securitypin-help">The PIN code required for a frontend to connect to the backend. Blank prevents all connections; 0000 allows any client.</small>
+                            <div *ngIf="securitypin.invalid && (securitypin.dirty || securitypin.touched)">
+                                <small  class="p-error block">Security PIN is required</small>
+                            </div>
+                        </div>
+                    </p-fieldset>
+
+                    <p-fieldset class="mb-4 w-full" legend="Allowed Connections">
+                        <div class="form-group field">
+                            <p-checkbox inputId="AllowConnFromAll" [(ngModel)]="m_setupData.General.HostAddress.AllowConnFromAll"
+                                name="AllowConnFromAll" #AllowConnFromAll="ngModel" class="mb-2 w-full" [binary]="true"
+                                label="Allow Connections from all Subnets">
+                            </p-checkbox>
+                            <small class="block" id="securitypin-help">Allow this backend to receive connections from any IP address on the internet. <strong>NOT recommended for most users.</strong> Use this only if you have secure IPv4 and IPv6 firewalls.</small>
+                        </div>
+                    </p-fieldset>
+
+                    <p-fieldset class="mb-4 w-full" legend="IP Addresses to listen on">
+                        <div class="form-group field">
+                            <p-checkbox inputId="ListenOnAllIps" [(ngModel)]="m_setupData.General.HostAddress.ListenOnAllIps"
+                                name="ListenOnAllIps" #ListenOnAllIps="ngModel" class="mb-2 w-full" [binary]="true"
+                                label="Listen on all IP Addresses">
+                            </p-checkbox>
+                            <small class="block" id="ListenOnAllIps-help">Allow this backend to receive connections on any IP Address assigned to it. Recommended for most users for ease and reliability .</small>
+                        </div>
+                        <div *ngIf="!m_setupData.General.HostAddress.ListenOnAllIps">
+                            <div class="form-group field">
+                                <label for="BackendServerIP" class="label block">IPv4 Address</label>
+                                <p-dropdown [options]="m_IPsV4 " [(ngModel)]="m_setupData.General.HostAddress.BackendServerIP"
+                                        class="block w-15rem mb-2" name="BackendServerIP" #BackendServerIP="ngModel" aria-describedby="BackendServerIP-help">
+                                </p-dropdown>
+                                <small class="block" id="BackendServerIP-help">Enter the IP address of this machine. Use an externally accessible address (ie, not 127.0.0.1) if you are going to be running a frontend on a different machine that this one. Note, in IPv6 setups, this is still required for certain extra such as UPnP.</small>
+                                <div *ngIf="BackendServerIP.invalid && (BackendServerIP.dirty || BackendServerIP.touched)">
+                                    <small id="LocalServerIP-help" class="p-error block">IPv4 address</small>
+                                </div>
+                            </div>
+
+                            <div class=" form-group field">
+                                <label for="BackendServerIP6" class="label block">IPv6 Address</label>
+                                <p-dropdown [options]="m_IPsV6 " [(ngModel)]="m_setupData.General.HostAddress.BackendServerIP6"
+                                        class="block w-15rem mb-2" name="BackendServerIP6" #BackendServerIP6="ngModel" aria-describedby="BackendServerIP6-help">
+                                </p-dropdown>
+                                <small class="block" id="BackendServerIP6-help">Enter the IPv6 address of this machine. Use an externally accessible address (ie, not ::1) if you are going to be running a frontend on a different machine that this one.</small>
+                                <div *ngIf="BackendServerIP6.invalid && (BackendServerIP6.dirty || BackendServerIP6.touched)">
+                                    <small class="p-error block">IPv6 address</small>
+                                </div>
+                            </div>
+
+                            <div class="form-group field">
+                                <p-checkbox inputId="AllowLinkLocal" [(ngModel)]="m_setupData.General.HostAddress.AllowLinkLocal"
+                                    name="AllowLinkLocal" #AllowLinkLocal="ngModel" class="mb-2 w-full" [binary]="true"
+                                    label="Listen on Link-Local addresses">
+                                </p-checkbox>
+                                <small class="block" id="AllowLinkLocal-help">Enable servers on this machine to listen on link-local addresses. These are auto-configured addresses and not accessible outside the local network. This must be enabled for anything requiring Bonjour to work.</small>
+                            </div>
+                        </div>
+                    </p-fieldset>
+
+                    <p-fieldset class="mb-4 w-full" legend="Primary Address">
+                        <div class="form-group field">
+                            <div class="form-group field">
+                                <label for="BackendServerAddr" class="label block w-full">Primary IP address / DNS name</label>
+                                <p-dropdown [options]="m_IPsAll " [(ngModel)]="m_setupData.General.HostAddress.BackendServerAddr"
+                                    class="block w-15rem mb-2" name="BackendServerAddr" #BackendServerAddr="ngModel" aria-describedby="BackendServerAddr-help">
+                                </p-dropdown>
+                                <small class="block w-full" id="BackendServerAddr-help">The primary IP address of this backend server. You can select an IP address from the list or type a DNS name or host name. Other systems will contact this server using this address. If you use a hostname make sure it is assigned an IP address other than 127.0.0.1 in the hosts file.</small>
+                            </div>
+
+                            <div *ngIf="BackendServerAddr.invalid && (BackendServerAddr.dirty || BackendServerAddr.touched)">
+                                <small class="p-error block">Primary IP address / DNS name is required</small>
+                            </div>
+                        </div>
+                    </p-fieldset>
+
+                    <p-fieldset class="mb-4 w-full" legend="Master Backend">
+                        <div class="form-group field">
+                            <p-checkbox inputId="IsMasterBackend" [(ngModel)]="m_setupData.General.HostAddress.IsMasterBackend"
+                                name="IsMasterBackend" #IsMasterBackend="ngModel" class="mb-2 w-full" [binary]="true"
+                                label="This server is the Master Backend">
+                            </p-checkbox>
+                            <small class="block" id="IsMasterBackend-help">Enable this if this is the only backend or is the master backend server. If enabled, all frontend and non-master backend machines will connect to this server. To change to a new master backend, run setup on that server and select it as master backend.</small>
+                        </div>
+                        <div class="form-group field">
+                            <label for="MasterServerName" class="label block">Master Backend Name</label>
+                            <input pInputText id="MasterServerName" type="text"
+                                [(ngModel)]="m_setupData.General.HostAddress.MasterServerName" name="MasterServerName"
+                                #MasterServerName="ngModel" class="p-inputtext-lg read-only mb-2 form-control w-15rem" placeholder="Ex. masterbe" disabled />
+                            <small class="block" id="MasterServerName-help">Host name of the Master Backend. <strong>Read only Setting</strong>This is set by selecting "<i>This server is the Master Backend</i>" on that server.</small>
+                            <div *ngIf="MasterServerName.invalid && (MasterServerName.dirty || MasterServerName.touched)">
+                                <small id="MasterServerName-help" class="p-error block">Hostname of master backend is required</small>
+                            </div>
+                        </div>
+                    </p-fieldset>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+                <div class="p-grid p-nogutter p-justify-end">
+                    <p-button class="pr-1" label="{{ 'common.back' | translate }}" (onClick)="previousPage()" icon="pi pi-angle-left" iconPos="left"></p-button>
+                    <p-button label="{{'common.next' | translate}}" (onClick)="nextPage()" icon="pi pi-angle-right" iconPos="right"></p-button>
+                    <p-button class="help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()" icon="pi pi-info-circle" styleClass="p-button-info" ></p-button>
+                </div>
+            </ng-template>
+        </p-card>
+    </form>
+</div>

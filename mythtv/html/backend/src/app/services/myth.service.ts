@@ -50,7 +50,7 @@ export class MythService {
   }
 
   public SetConnectionInfo(data: Database) : Observable<BoolResponse> {
-    console.log("SetConnectionInfo :-" + data.Name);  
+    console.log("SetConnectionInfo :-" + data.Name);
     return this.httpClient.post<BoolResponse>('/Myth/SetConnectionInfo', data)
   }
 
@@ -66,4 +66,13 @@ export class MythService {
   public AddStorageGroupDir(request: AddStorageGroupDirRequest) : Observable<BoolResponse> {
     return this.httpClient.post<BoolResponse>('/Myth/AddStorageGroupDir', request);
   }
+
+  // public RemoveStorageGroupDir(data: StorageGroupRequest) : Observable<BoolResponse> {
+  //   console.log(data);
+  //   let params = new HttpParams()
+  //     .set("HostName", data.HostName)
+  //     .set("GroupName", data.GroupName)
+  //     .set("DirName", data.DirName);
+  //   return this.httpClient.post<BoolResponse>('/Myth/RemoveStorageGroupDir', {params})
+  // }
 }

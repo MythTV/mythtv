@@ -1,0 +1,72 @@
+<div class="block card w-full">
+    <h3>General Backend Settings</h3>
+<p-accordion class="col-12 w-full">
+    <p-accordionTab header="Host Address Backend Setup">
+        <ng-template pTemplate="content">
+            <app-host-address></app-host-address>
+        </ng-template>
+    </p-accordionTab>
+
+    <p-accordionTab header="Locale Settings">
+        <ng-template pTemplate="content">
+            <app-locale></app-locale>
+        </ng-template>
+    </p-accordionTab>
+
+    <p-accordionTab header="Miscellaneous Settings">
+        <ng-template pTemplate="content">
+            <app-misc-settings></app-misc-settings>
+        </ng-template>
+    </p-accordionTab>
+
+    <p-accordionTab header="EIT Scanner Options">
+        <ng-template pTemplate="content">
+            <app-eit-scanner></app-eit-scanner>
+        </ng-template>
+    </p-accordionTab>
+
+    <p-accordionTab header="Shutdown/Wakeup Options">
+        <ng-template pTemplate="content">
+            <app-shutdown-wakeup></app-shutdown-wakeup>
+        </ng-template>
+    </p-accordionTab>
+
+    <p-accordionTab header="Backend Wakeup Settings">
+        <ng-template pTemplate="content">
+            <app-backend-wakeup></app-backend-wakeup>
+        </ng-template>
+    </p-accordionTab>
+
+    <p-accordionTab header="Backend Control">
+        <ng-template pTemplate="content">
+            <app-backend-control></app-backend-control>
+        </ng-template>
+    </p-accordionTab>
+
+    <p-accordionTab header="Job Queue (Backend-Specific)">
+        <ng-template pTemplate="content">
+            <app-jobqueue-backend></app-jobqueue-backend>
+        </ng-template>
+    </p-accordionTab>
+
+    <p-accordionTab header="Job Queue (Global)">
+        <ng-template pTemplate="content">
+            <app-jobqueue-global></app-jobqueue-global>
+        </ng-template>
+    </p-accordionTab>
+
+    <p-accordionTab header="Job Queue (Job Commands)">
+        <ng-template pTemplate="content">
+            <app-jobqueue-commands></app-jobqueue-commands>
+        </ng-template>
+    </p-accordionTab>
+
+    <p-accordionTab header="Programme Schedule Downloading Options">
+        <ng-template pTemplate="content">
+            <app-epg-downloading></app-epg-downloading>
+        </ng-template>
+    </p-accordionTab>
+
+</p-accordion>
+</div>
+
