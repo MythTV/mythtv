@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Backend } from 'src/app/services/interfaces/status.interface';
+import { Backend } from 'src/app/services/interfaces/backend.interface';
 
 @Component({
   selector: 'app-status-backends',

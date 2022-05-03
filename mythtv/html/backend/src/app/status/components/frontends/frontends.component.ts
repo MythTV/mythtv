@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Frontend } from 'src/app/services/interfaces/status.interface';
+import { Frontend } from "src/app/services/interfaces/frontend.interface";
 
 @Component({
   selector: 'app-status-frontends',

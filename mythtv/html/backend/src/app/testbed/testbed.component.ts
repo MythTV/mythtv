@@ -8,12 +8,13 @@ import { ConfigService } from '../services/config.service';
 import { DvrService } from '../services/dvr.service';
 import { ContentService } from '../services/content.service';
 
-import { MythHostName, MythTimeZone, MythConnectionInfo, GetSettingResponse, GetStorageGroupDirsResponse, StorageGroupDir } from '../services/interfaces/myth.interface';
+import { MythHostName, MythTimeZone, MythConnectionInfo, GetSettingResponse, GetStorageGroupDirsResponse } from '../services/interfaces/myth.interface';
 import { MythDatabaseStatus } from '../services/interfaces/config.interface';
 import { GetRecStorageGroupListResponse } from '../services/interfaces/dvr.interface';
 import { BoolResponse } from '../services/interfaces/common.interface';
 import { IconlookupService } from '../services/external/iconlookup.service';
 import { CallsignLookupResponse } from '../services/interfaces/iconlookup.interface';
+import { StorageGroupDir } from '../services/interfaces/storagegroup.interface';
 
 @Component({
     selector: 'app-testbed',

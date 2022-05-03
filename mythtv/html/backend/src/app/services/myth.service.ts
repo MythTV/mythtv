@@ -14,6 +14,8 @@ import {
   AddStorageGroupDirRequest,
 } from './interfaces/myth.interface';
 import { BoolResponse } from './interfaces/common.interface';
+import { BackendInfo } from './interfaces/backend.interface';
+import { FrontendList } from './interfaces/frontend.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -22,19 +24,49 @@ export class MythService {
 
   constructor(private httpClient: HttpClient) { }
 
-  public GetHostName() : Observable<MythHostName> {
-    return this.httpClient.get<MythHostName>('/Myth/GetHostName');
+  public AddStorageGroupDir(request: AddStorageGroupDirRequest) : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Myth/AddStorageGroupDir', request);
   }
 
-  public GetTimeZone() : Observable<MythTimeZone> {
-    return this.httpClient.get<MythTimeZone>('/Myth/GetTimeZone');
+  public BackupDatabase() : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Myth/BackupDatabase', {body: undefined});
+  }
+
+  public CheckDatabase(Repair : boolean) : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Myth/CheckDatabase', Repair);
+  }
+
+  public DelayShutdown() : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('Myth/DelayShutdown', {body: undefined});
+  }
+
+  public GetBackendInfo() : Observable<BackendInfo> {
+    return this.httpClient.get<BackendInfo>('/Myth/GetBackendInfo');
   }
 
   public GetConnectionInfo(Pin : string) : Observable<MythConnectionInfo> {
     let params = new HttpParams()
       .set("Pin", Pin);
     return this.httpClient.get<MythConnectionInfo>('/Myth/GetConnectionInfo', {params});
-   }
+  }
+
+  public GetFrontends(OnLine : boolean) : Observable<FrontendList> {
+    let params = new HttpParams()
+      .set("OnLine", OnLine);
+    return this.httpClient.get<FrontendList>('/Myth/GetFrontends', {params});
+  }
+
+  public GetHostName() : Observable<MythHostName> {
+    return this.httpClient.get<MythHostName>('/Myth/GetHostName');
+  }
+
+  public GetHosts() : Observable<String[]> {
+    return this.httpClient.get<String[]>('/Myth/GetHosts');
+  }
+
+  public GetKeys() : Observable<String[]> {
+    return this.httpClient.get<String[]>('/Myth/GetKeys');
+  }
 
   public GetSetting(setting : GetSettingRequest) : Observable<GetSettingResponse> {
     let params = new HttpParams()
@@ -42,6 +74,10 @@ export class MythService {
       .set("Key", setting.Key)
       .set("Default", (setting.Default) ? setting.Default : "");
     return this.httpClient.get<GetSettingResponse>('/Myth/GetSetting', {params})
+  }
+
+  public GetTimeZone() : Observable<MythTimeZone> {
+    return this.httpClient.get<MythTimeZone>('/Myth/GetTimeZone');
   }
 
   public PutSetting(setting: PutSettingRequest) : Observable<BoolResponse> {
@@ -61,10 +97,6 @@ export class MythService {
     } else {
       return this.httpClient.get<GetStorageGroupDirsResponse>('/Myth/GetStorageGroupDirs');
     }
-  }
-
-  public AddStorageGroupDir(request: AddStorageGroupDirRequest) : Observable<BoolResponse> {
-    return this.httpClient.post<BoolResponse>('/Myth/AddStorageGroupDir', request);
   }
 
   // public RemoveStorageGroupDir(data: StorageGroupRequest) : Observable<BoolResponse> {

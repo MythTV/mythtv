@@ -2,19 +2,8 @@ import { Encoder } from "./encoder.interface";
 import { JobQueueJob } from "./jobqueue.interface";
 import { ScheduleOrProgram } from "./program.interface";
 import { StorageGroup } from "./storagegroup.interface";
-
-export interface Backend {
-    IP:             string;
-    Name:           string;
-    Type:           string;
-}
-
-export interface Frontend {
-    IP:             string;
-    Name:           string;
-    OnLine:         boolean;
-    Port:           number;
-}
+import { Backend } from "./backend.interface";
+import { Frontend } from "./frontend.interface";
 
 export interface MachineInfo {
     GuideDays:      number;
