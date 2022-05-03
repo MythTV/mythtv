@@ -18,21 +18,39 @@
     <!-- <p>Database is "{{dbstatus.Connected ? Connected : Not Connected}}"</p> -->
 </div>
 
-<div *ngIf="(m_storageGroupList$ | async)?.RecStorageGroupList as StorageGroupDir; else loading">
-    <ul>
-        <ng-container *ngFor="let sg of StorageGroupDir">
-            <li>Storage Group: {{sg}}</li>
-        </ng-container>
-    </ul>
-</div>
+<p-accordion class="col-12 w-full">
+    <ng-container *ngIf="(m_storageGroupList$ | async)?.RecStorageGroupList as StorageGroupDir; else loading">
+        <p-accordionTab header="Storage Groups">
+            <ul>
+                <ng-container *ngFor="let sg of StorageGroupDir">
+                    <li>Storage Group: {{sg}}</li>
+                </ng-container>
+            </ul>
+        </p-accordionTab>
+    </ng-container>
 
-<div *ngIf="(m_storageGroupDirs$ | async)?.StorageGroupDirList as sgArray; else loading">
-    <ul>
-        <ng-container *ngFor="let sg of sgArray.StorageGroupDirs">
-            <li>SG: {{ sg.GroupName }}, Directory: {{ sg.DirName }}</li>
-        </ng-container>
-    </ul>
-</div>
+    <ng-container *ngIf="(m_storageGroupDirs$ | async)?.StorageGroupDirList as sgArray; else loading">
+        <p-accordionTab header="Storage Group Dir List">
+            <ul>
+                <ng-container *ngFor="let sg of sgArray.StorageGroupDirs">
+                    <li>SG: {{ sg.GroupName }}, Directory: {{ sg.DirName }}</li>
+                </ng-container>
+            </ul>
+        </p-accordionTab>
+    </ng-container>
+
+    <ng-container *ngIf="(m_settingsList$ | async) as s_list; else loading">
+        <p-accordionTab header="Settings List on host {{ s_list.SettingList.HostName }}">
+            <ng-template pTemplate="content">
+                <ul>
+                    <ng-container *ngFor="let setting of (s_list.SettingList.Settings| keyvalue)">
+                        <li>{{ setting.key }}: {{ setting.value }}</li>
+                    </ng-container>
+                </ul>
+            </ng-template>
+        </p-accordionTab>
+    </ng-container>
+</p-accordion>
 
 <div *ngIf="(m_iconUrl$ | async)?.urls as url; else loading">
     <img src={{url}} height="57"/>

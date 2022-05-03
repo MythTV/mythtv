@@ -8,7 +8,7 @@ import { ConfigService } from '../services/config.service';
 import { DvrService } from '../services/dvr.service';
 import { ContentService } from '../services/content.service';
 
-import { MythHostName, MythTimeZone, MythConnectionInfo, GetSettingResponse, GetStorageGroupDirsResponse } from '../services/interfaces/myth.interface';
+import { MythHostName, MythTimeZone, MythConnectionInfo, GetSettingResponse, GetStorageGroupDirsResponse, SettingList } from '../services/interfaces/myth.interface';
 import { MythDatabaseStatus } from '../services/interfaces/config.interface';
 import { GetRecStorageGroupListResponse } from '../services/interfaces/dvr.interface';
 import { BoolResponse } from '../services/interfaces/common.interface';
@@ -33,6 +33,7 @@ export class TestbedComponent implements OnInit {
     m_downloadTest$!: Observable<BoolResponse>;
     m_addStorageGroupDir$!: Observable<BoolResponse>;
     m_iconUrl$!: Observable<CallsignLookupResponse>;
+    m_settingsList$! : Observable<SettingList>;
 
     m_hostName: string = "";
     m_securityPin: string = "";
@@ -49,7 +50,12 @@ export class TestbedComponent implements OnInit {
 
     ngOnInit(): void {
         this.m_hostname$ = this.mythService.GetHostName().pipe(
-            tap(data => { console.log(data); this.m_hostName = data.String;})
+            tap(data => { console.log(data); this.m_hostName = data.String;}),
+            tap(data => {
+                this.m_settingsList$ = this.mythService.GetSettingList(this.m_hostName).pipe(
+                    tap(data => console.log(data)),
+                );
+            })
         )
 
         this.m_timezone$ = this.mythService.GetTimeZone().pipe(

@@ -87,6 +87,8 @@ export interface MapOfString {
 }
 
 export interface SettingList {
-    HostName:       string;
-    Settings:       MapOfString;
+    SettingList: {
+        HostName:       string;
+        Settings:       MapOfString;
+    }
 }

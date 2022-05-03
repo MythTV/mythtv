@@ -12,6 +12,7 @@ import {
   GetStorageGroupDirsRequest,
   GetStorageGroupDirsResponse,
   AddStorageGroupDirRequest,
+  SettingList,
 } from './interfaces/myth.interface';
 import { BoolResponse } from './interfaces/common.interface';
 import { BackendInfo } from './interfaces/backend.interface';
@@ -74,6 +75,12 @@ export class MythService {
       .set("Key", setting.Key)
       .set("Default", (setting.Default) ? setting.Default : "");
     return this.httpClient.get<GetSettingResponse>('/Myth/GetSetting', {params})
+  }
+
+  public GetSettingList(hostname : string) : Observable<SettingList> {
+    let params = new HttpParams()
+      .set("HostName", hostname);
+    return this.httpClient.get<SettingList>('/Myth/GetSettingList', {params})
   }
 
   public GetTimeZone() : Observable<MythTimeZone> {
