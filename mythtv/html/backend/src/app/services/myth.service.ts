@@ -13,6 +13,10 @@ import {
   GetStorageGroupDirsResponse,
   AddStorageGroupDirRequest,
   SettingList,
+  ManageDigestUserRequest,
+  ManageUrlProtectionRequest,
+  RemoveStorageGroupRequest,
+  TestDBSettingsRequest
 } from './interfaces/myth.interface';
 import { BoolResponse } from './interfaces/common.interface';
 import { BackendInfo } from './interfaces/backend.interface';
@@ -83,20 +87,6 @@ export class MythService {
     return this.httpClient.get<SettingList>('/Myth/GetSettingList', {params})
   }
 
-  public GetTimeZone() : Observable<MythTimeZone> {
-    return this.httpClient.get<MythTimeZone>('/Myth/GetTimeZone');
-  }
-
-  public PutSetting(setting: PutSettingRequest) : Observable<BoolResponse> {
-    console.log(setting);
-    return this.httpClient.post<BoolResponse>('/Myth/PutSetting', setting)
-  }
-
-  public SetConnectionInfo(data: Database) : Observable<BoolResponse> {
-    console.log("SetConnectionInfo :-" + data.Name);
-    return this.httpClient.post<BoolResponse>('/Myth/SetConnectionInfo', data)
-  }
-
   public GetStorageGroupDirs(request? : GetStorageGroupDirsRequest) : Observable<GetStorageGroupDirsResponse> {
     if ((typeof request !== 'undefined') &&
        ((typeof request.GroupName !== 'undefined') || (typeof request.HostName !== 'undefined'))){
@@ -106,12 +96,54 @@ export class MythService {
     }
   }
 
-  // public RemoveStorageGroupDir(data: StorageGroupRequest) : Observable<BoolResponse> {
-  //   console.log(data);
-  //   let params = new HttpParams()
-  //     .set("HostName", data.HostName)
-  //     .set("GroupName", data.GroupName)
-  //     .set("DirName", data.DirName);
-  //   return this.httpClient.post<BoolResponse>('/Myth/RemoveStorageGroupDir', {params})
-  // }
+  public GetTimeZone() : Observable<MythTimeZone> {
+    return this.httpClient.get<MythTimeZone>('/Myth/GetTimeZone');
+  }
+
+  public ManageDigestUser(request : ManageDigestUserRequest) : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Myth/ManageDigestUser', request);
+  }
+
+  public ManageUrlProtection(request : ManageUrlProtectionRequest) : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Myth/ManageUrlProtection', request);
+  }
+
+  public ProfileDelete() : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Myth/ProfileDelete', {body : undefined});
+  }
+
+  public ProfileSubmit() : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Myth/ProfileSubmit', {body : undefined});
+  }
+
+  public ProfileText() : Observable<string> {
+    return this.httpClient.get<string>('/Myth/ProfileText');
+  }
+
+  public ProfileURL() : Observable<string> {
+    return this.httpClient.get<string>('/Myth/ProfileURL');
+  }
+
+  public ProfileUpdated() : Observable<string> {
+    return this.httpClient.get<string>('/Myth/ProfileUpdated');
+  }
+
+  public PutSetting(setting: PutSettingRequest) : Observable<BoolResponse> {
+    console.log(setting);
+    return this.httpClient.post<BoolResponse>('/Myth/PutSetting', setting)
+  }
+
+  public RemoveStorageGroupDir(request: RemoveStorageGroupRequest) : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Myth/RemoveStorageGroupDir', request);
+  }
+
+  public SetConnectionInfo(data: Database) : Observable<BoolResponse> {
+    console.log("SetConnectionInfo :-" + data.Name);
+    return this.httpClient.post<BoolResponse>('/Myth/SetConnectionInfo', data)
+  }
+
+  public TestDBSettings(request : TestDBSettingsRequest) : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Myth/TestDBSettings', request);
+  }
+
 }

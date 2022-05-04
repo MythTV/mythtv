@@ -92,3 +92,30 @@ export interface SettingList {
         Settings:       MapOfString;
     }
 }
+
+export interface ManageDigestUserRequest {
+    Action:         string; // Must be: Add, Remove, or ChangePassword
+    UserName:       string;
+    Password:       string;
+    NewPassword?:   string; // Required on ChangePassword
+    AdminPassword?: string; // Required on Add
+}
+
+export interface ManageUrlProtectionRequest {
+    Services:       string;
+    AdminPassword:  string;
+}
+
+export interface RemoveStorageGroupRequest {
+    GroupName:      string;
+    DirName:        string;
+    HostName:       string;
+}
+
+export interface TestDBSettingsRequest {
+    HostName:       string;
+    UserName:       string;
+    Password:       string;
+    DBName:         string;
+    dbPort:         number;
+}
