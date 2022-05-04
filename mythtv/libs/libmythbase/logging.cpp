@@ -128,8 +128,10 @@ LoggingItem::LoggingItem(const char *_file, const char *_function,
         ReferenceCounter("LoggingItem", false),
         m_threadId((uint64_t)(QThread::currentThreadId())),
         m_line(_line), m_type(_type), m_level(_level),
-        m_file(_file), m_function(_function)
+        m_function(_function)
 {
+    const char *slash = std::strrchr(_file, '/');
+    m_file = (slash != nullptr) ? slash+1 : _file;
     m_epoch = nowAsDuration<std::chrono::microseconds>();
     setThreadTid();
 }
