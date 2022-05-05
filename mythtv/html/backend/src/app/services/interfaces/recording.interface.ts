@@ -19,3 +19,18 @@ export interface Recording {
     Status:         number;
     StorageGroup:   string;
 }
+
+export interface RecRuleFilter {
+    Id:             number;
+    Description:    string;
+}
+
+export interface RecRuleFilterList {
+    StartIndex:     number;
+    Count:          number;
+    TotalAvailable: number;
+    AsOf:           string; // dateTime
+    Version:        string;
+    ProtoVer:       string;
+    RecRuleFilters: RecRuleFilter[];
+}

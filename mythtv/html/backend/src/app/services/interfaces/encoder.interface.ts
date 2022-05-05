@@ -36,3 +36,7 @@ export interface Encoder {
     SleepStatus:    number;
     State:          number;
 }
+
+export interface EncoderList {
+    Encoders:       Encoder[];
+}
