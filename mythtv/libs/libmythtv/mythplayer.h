@@ -22,10 +22,10 @@
 
 // MythTV
 #include "libmyth/audio/volumebase.h"
-#include "libmyth/programtypes.h"
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythtypes.h"
+#include "libmythbase/programtypes.h"
 #include "libmythtv/audioplayer.h"
 #include "libmythtv/captions/cc608reader.h"
 #include "libmythtv/captions/cc708reader.h"

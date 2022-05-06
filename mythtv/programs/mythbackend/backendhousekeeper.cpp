@@ -12,8 +12,6 @@
 #include <QStringList>
 
 // MythTV headers
-#include "libmyth/programtypes.h"
-#include "libmyth/recordingtypes.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
@@ -21,9 +19,11 @@
 #include "libmythbase/mythdownloadmanager.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/mythversion.h"
+#include "libmythbase/programtypes.h"
+#include "libmythbase/recordingstatus.h"
+#include "libmythbase/recordingtypes.h"
 #include "libmythbase/unziputil.h"
 #include "libmythmetadata/musicmetadata.h"
-#include "libmythservicecontracts/enums/recStatus.h"
 #include "libmythtv/jobqueue.h"
 
 // MythBackend

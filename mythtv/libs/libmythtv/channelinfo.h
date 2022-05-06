@@ -13,8 +13,8 @@
 #include <QDateTime>
 
 // MythTV headers
-#include "libmyth/programtypes.h"
 #include "libmythbase/mythtypes.h"
+#include "libmythbase/programtypes.h"
 #include "libmythtv/mythtvexp.h"
 
 enum ChannelVisibleType

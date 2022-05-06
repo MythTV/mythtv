@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QMap>
 
-#include "libmyth/programtypes.h"
+#include "libmythbase/programtypes.h"
 
 #define MAX_BLANK_FRAMES 180
 

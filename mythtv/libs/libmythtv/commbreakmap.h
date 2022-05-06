@@ -14,8 +14,8 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "libmyth/programtypes.h"
 #include "libmythbase/compat.h"
+#include "libmythbase/programtypes.h"
 #include "libmythtv/tv.h"
 #include "libmythtv/playercontext.h"
 

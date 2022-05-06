@@ -7,10 +7,10 @@
 #include <QString>
 
 // MythTV
-#include "libmyth/programtypes.h"
-#include "libmyth/recordingtypes.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythtypes.h"
+#include "libmythbase/programtypes.h"
+#include "libmythbase/recordingtypes.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythmetadata/mythuiimageresults.h"
 #include "libmythmetadata/mythuimetadataresults.h"

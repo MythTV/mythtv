@@ -45,7 +45,7 @@ bool ProgramInfo::s_usingProgIDAuth = true;
 const static uint kInvalidDateTime = UINT_MAX;
 
 #define DEFINE_FLAGS_NAMES
-#include "programtypeflags.h"
+#include "libmythbase/programtypeflags.h"
 #undef DEFINE_FLAGS_NAMES
 
 const QString ProgramInfo::kFromRecordedQuery =

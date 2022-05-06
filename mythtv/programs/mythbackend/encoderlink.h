@@ -10,7 +10,7 @@
 #include <QMutex>                       // for QMutex
 #include <QString>                      // for QString
 
-#include "libmythservicecontracts/enums/recStatus.h"
+#include "libmythbase/recordingstatus.h"
 #include "libmythtv/tv.h"               // for SleepStatus, etc
 #include "libmythtv/videoouttypes.h"    // for PictureAttribute
 

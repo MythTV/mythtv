@@ -6,7 +6,7 @@
 #include <QString>
 
 #include "libmyth/programinfo.h"
-#include "libmythservicecontracts/enums/recStatus.h"
+#include "libmythbase/recordingstatus.h"
 #include "libmythtv/mythtvexp.h"
 #include "libmythtv/recordingfile.h"
 

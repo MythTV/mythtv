@@ -12,8 +12,8 @@
 #include <QMutex>
 #include <QMap>
 
-#include "libmyth/programtypes.h" // for MarkTypes, frm_pos_map_t
 #include "libmythbase/mythtimer.h"
+#include "libmythbase/programtypes.h" // for MarkTypes, frm_pos_map_t
 
 #include "libmythtv/mythtvexp.h"
 #include "libmythtv/recordingfile.h"

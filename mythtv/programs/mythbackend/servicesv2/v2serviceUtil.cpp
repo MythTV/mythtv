@@ -1,7 +1,7 @@
 // MythTV
 #include "libmyth/programinfo.h"
-#include "libmyth/recordingtypes.h"
 #include "libmythbase/mythscheduler.h"
+#include "libmythbase/recordingtypes.h"
 #include "libmythmetadata/videoutils.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/channelgroup.h"

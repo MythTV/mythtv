@@ -10,8 +10,8 @@
 
 // MythTV
 #include "libmyth/programinfo.h"
-#include "libmyth/programtypes.h"
-#include "libmyth/recordingtypes.h"
+#include "libmythbase/programtypes.h"
+#include "libmythbase/recordingtypes.h"
 #include "libmythtv/mythtvexp.h"
 #include "libmythtv/recordinginfo.h"
 

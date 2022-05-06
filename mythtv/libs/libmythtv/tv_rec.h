@@ -20,11 +20,11 @@
 #include <QHash>                        // for QHash
 
 // MythTV headers
-#include "libmyth/programtypes.h"       // for RecStatus, RecStatus::Type, etc
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythdeque.h"
 #include "libmythbase/mythtimer.h"
+#include "libmythbase/programtypes.h"   // for RecStatus, RecStatus::Type, etc
 
 #include "inputinfo.h"
 #include "mythtvexp.h"                  // for MTV_PUBLIC

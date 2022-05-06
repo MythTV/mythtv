@@ -9,7 +9,7 @@
 #include <QSize>
 
 #include "libmyth/programinfo.h"  // ProgramInfo
-#include "libmyth/programtypes.h" // RecStatus::Type
+#include "libmythbase/programtypes.h" // RecStatus::Type
 #include "libmythbase/referencecounter.h"
 #include "libmythtv/inputinfo.h"
 
