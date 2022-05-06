@@ -3,11 +3,11 @@
 
 // MythTV
 #include "libmyth/programinfo.h"
-#include "libmyth/recordingtypes.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/recordingtypes.h"
 #include "libmythtv/channelinfo.h"
 #include "libmythtv/channelutil.h"
 #include "libmythtv/recordingrule.h"

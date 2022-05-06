@@ -12,8 +12,6 @@
 
 // MythTV
 #include "libmyth/programinfo.h"
-#include "libmyth/programtypes.h"               // for AudioProps, SubtitleTypes, etc
-#include "libmyth/recordingtypes.h"
 #ifdef _MSC_VER
 #  include "libmythbase/compat.h"               // for random
 #endif
@@ -25,6 +23,8 @@
 #include "libmythbase/mythevent.h"              // for MythEvent, etc
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
+#include "libmythbase/programtypes.h"           // for AudioProps, SubtitleTypes, etc
+#include "libmythbase/recordingtypes.h"
 #include "libmythbase/stringutil.h"
 #include "libmythmetadata/mythuimetadataresults.h"
 #include "libmythtv/playgroup.h"

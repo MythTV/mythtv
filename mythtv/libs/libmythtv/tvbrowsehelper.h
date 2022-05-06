@@ -8,8 +8,8 @@
 #include <QWaitCondition>
 
 // MythTV
-#include "libmyth/programtypes.h"
 #include "libmythbase/mthread.h"
+#include "libmythbase/programtypes.h"
 #include "channelinfo.h"
 #include "tv.h"
 

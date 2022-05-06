@@ -11,9 +11,9 @@
 #include <QString>
 
 // MythTV headers
-#include "libmyth/programtypes.h"
 #include "libmythbase/mythtimer.h"
 #include "libmythbase/mythtypes.h"
+#include "libmythbase/programtypes.h"
 #include "libmythtv/mythtvexp.h"
 #include "libmythtv/tv.h"
 #include "libmythtv/videoouttypes.h"

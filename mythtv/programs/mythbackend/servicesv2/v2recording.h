@@ -16,9 +16,9 @@
 #include <QString>
 
 // MythTV
-#include "libmyth/programtypes.h"
 #include "libmythbase/http/mythhttpservice.h"
-#include "libmythservicecontracts/enums/recStatus.h"
+#include "libmythbase/programtypes.h"
+#include "libmythbase/recordingstatus.h"
 
 class V2RecordingInfo : public QObject
 {

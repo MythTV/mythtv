@@ -13,13 +13,13 @@
 
 // MythTV headers
 #include "libmyth/mythexp.h"
-#include "libmyth/programtypes.h"
-#include "libmyth/recordingtypes.h"
 #include "libmythbase/autodeletedeque.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythtypes.h"
-#include "libmythservicecontracts/enums/recStatus.h"
+#include "libmythbase/programtypes.h"
+#include "libmythbase/recordingstatus.h"
+#include "libmythbase/recordingtypes.h"
 
 /* If NUMPROGRAMLINES gets updated, then MYTH_PROTO_VERSION and MYTH_PROTO_TOKEN
    in mythversion.h need to be bumped, and also follow the instructions in

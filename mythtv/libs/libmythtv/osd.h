@@ -2,8 +2,8 @@
 #define OSD_H
 
 // MythTV
-#include "libmyth/programtypes.h"
 #include "libmythbase/mythtypes.h"
+#include "libmythbase/programtypes.h"
 #include "libmythtv/mythmediaoverlay.h"
 #include "libmythtv/mythplayerstate.h"
 #include "libmythui/mythscreentype.h"

@@ -10,8 +10,6 @@
 
 // MythTV
 #include "libmyth/programinfo.h"
-#include "libmyth/programtypes.h"           // for RecStatus, etc
-#include "libmyth/recordingtypes.h"         // for toString, etc
 #include "libmyth/remoteutil.h"
 #include "libmythbase/autodeletedeque.h"    // for AutoDeleteDeque, etc
 #include "libmythbase/mythcorecontext.h"
@@ -20,6 +18,8 @@
 #include "libmythbase/mythevent.h"          // for MythEvent, etc
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtypes.h"          // for InfoMap
+#include "libmythbase/programtypes.h"       // for RecStatus, etc
+#include "libmythbase/recordingtypes.h"     // for toString, etc
 #include "libmythtv/cardutil.h"
 #include "libmythtv/channelinfo.h"
 #include "libmythtv/channelutil.h"
