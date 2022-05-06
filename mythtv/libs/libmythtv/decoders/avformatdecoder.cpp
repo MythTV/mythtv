@@ -373,8 +373,7 @@ AvFormatDecoder::~AvFormatDecoder()
     while (!m_storedPackets.isEmpty())
     {
         AVPacket *pkt = m_storedPackets.takeFirst();
-        av_packet_unref(pkt);
-        delete pkt;
+        av_packet_free(&pkt);
     }
 
     CloseContext();
@@ -759,8 +758,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         while (!m_storedPackets.isEmpty())
         {
             AVPacket *pkt = m_storedPackets.takeFirst();
-            av_packet_unref(pkt);
-            delete pkt;
+            av_packet_free(&pkt);
         }
 
         m_prevGopPos = 0;
