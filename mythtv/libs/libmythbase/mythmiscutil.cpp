@@ -47,7 +47,6 @@
 #include <QDir>
 #include <QUrl>
 #include <QHostAddress>
-#include <QDataStream>
 #include <QRegularExpression>
 #include <QRegularExpressionMatchIterator>
 
@@ -704,10 +703,7 @@ void myth_yield(void)
                             defined(__x86_64__) || defined(__ia64__) )
 
 #include <cstdio>
-#include <cstdlib>
-#include <cerrno>
 #include <getopt.h>
-#include <unistd.h>
 #include <sys/ptrace.h>
 #include <asm/unistd.h>
 

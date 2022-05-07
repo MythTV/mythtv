@@ -39,7 +39,6 @@
 #include <cstring>
 #include <iostream>
 #include <fcntl.h>
-#include <cctype>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>

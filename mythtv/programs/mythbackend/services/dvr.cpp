@@ -54,7 +54,6 @@
 #include "dvr.h"
 #include "encoderlink.h"
 #include "scheduler.h"
-#include "scheduler.h"
 #include "serviceUtil.h"
 
 /////////////////////////////////////////////////////////////////////////////

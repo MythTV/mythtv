@@ -16,7 +16,6 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtimezone.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/mythversion.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythbase/version.h"
 

@@ -10,7 +10,6 @@
 #include <QEvent>
 #include <QKeyEvent>
 #include <QInputMethodEvent>
-#include <QDomDocument>
 
 // XML headers
 #include "xmlparsebase.h"
@@ -38,7 +37,6 @@
 #include "mythuiprogressbar.h"
 #include "mythuispinbox.h"
 #include "mythuigroup.h"
-#include "mythgesture.h"
 
 #define LOC      QString("MythUIType: ")
 

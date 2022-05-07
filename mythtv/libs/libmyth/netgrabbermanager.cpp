@@ -10,7 +10,6 @@
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystemlegacy.h"
-#include "libmythbase/mythsystemlegacy.h"
 
 #include "mythcontext.h"
 #include "netgrabbermanager.h"

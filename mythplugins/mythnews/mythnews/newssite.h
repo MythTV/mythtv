@@ -9,7 +9,6 @@
 #include <QDateTime>
 #include <QDomDocument>
 #include <QObject>
-#include <QObject>
 #include <QString>
 #include <QUrl>
 #include <QVariant>

@@ -12,7 +12,6 @@
 // MythTV headers
 #include "mpegstreamdata.h"
 #include "mpegtables.h"
-#include "mpegtables.h"
 
 #include "atscstreamdata.h"
 #include "atsctables.h"

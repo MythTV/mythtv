@@ -63,7 +63,6 @@ extern "C" {
 
 // MythTV headers
 #include "libmyth/audio/audiooutput.h"
-#include "libmyth/audio/audiooutput.h"
 #include "libmyth/audio/audiooutpututil.h"
 #include "libmythbase/iso639.h"
 #include "libmythbase/lcddevice.h"

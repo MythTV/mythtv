@@ -39,7 +39,6 @@
 #endif
 
 #ifdef USING_VBOX
-#include "libmythbase/mythmiscutil.h"
 #include "recorders/vboxutils.h"
 #endif
 

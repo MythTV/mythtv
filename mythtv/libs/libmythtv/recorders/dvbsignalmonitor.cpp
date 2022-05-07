@@ -15,7 +15,6 @@
 
 #include "cardutil.h"
 #include "dvbchannel.h"
-#include "dvbchannel.h"
 #include "dvbrecorder.h"
 #include "dvbsignalmonitor.h"
 #include "dvbstreamhandler.h"

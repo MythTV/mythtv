@@ -18,7 +18,6 @@
 #include "libmythbase/http/mythhttpservice.h"
 #include "v2programAndChannel.h"
 #include "v2encoder.h"
-#include "v2programAndChannel.h"
 #include "v2frontend.h"
 
 class V2Backend : public QObject

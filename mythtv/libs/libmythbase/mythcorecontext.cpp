@@ -8,7 +8,6 @@
 #include <QMutex>
 #include <QRunnable>
 #include <QWaitCondition>
-#include <QNetworkInterface>
 #include <QAbstractSocket>
 #include <QHostAddress>
 #include <QHostInfo>
@@ -17,7 +16,6 @@
 #include <QLocale>
 #include <QPair>
 #include <QDateTime>
-#include <QRunnable>
 
 // Std
 #include <algorithm>

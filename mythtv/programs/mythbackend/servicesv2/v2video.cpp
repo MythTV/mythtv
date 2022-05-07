@@ -16,7 +16,6 @@
 
 // MythBackend
 #include "v2artworkInfoList.h"
-#include "v2artworkInfoList.h"
 #include "v2castMemberList.h"
 #include "v2genreList.h"
 #include "v2serviceUtil.h"

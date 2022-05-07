@@ -12,7 +12,6 @@
 // mythtv
 #include "libmyth/mythcontext.h"
 #include "libmythbase/mythdate.h"
-#include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythdownloadmanager.h"

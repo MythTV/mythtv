@@ -33,7 +33,6 @@
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
-#include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythsystemlegacy.h"

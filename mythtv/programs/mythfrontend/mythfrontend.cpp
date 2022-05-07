@@ -89,7 +89,6 @@
 #include "setupwizard_general.h"
 #include "statusbox.h"
 #include "themechooser.h"
-#include "themechooser.h"
 #include "viewscheduled.h"
 
 // Video

@@ -3,7 +3,6 @@
 #include <iostream>
 #include <sys/wait.h>  // for WIFEXITED and WEXITSTATUS
 #include <unistd.h>
-#include <unistd.h>
 
 // qt
 #include <QApplication>
