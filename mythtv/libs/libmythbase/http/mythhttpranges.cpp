@@ -281,7 +281,7 @@ MythHTTPStatus MythHTTPRanges::ParseRanges(const QString& Request, int64_t Total
     }
 
     // Sum the expected number of bytes to be sent
-    PartialSize = std::accumulate(ranges.cbegin(), ranges.cend(), 0, sumrange);
+    PartialSize = std::accumulate(ranges.cbegin(), ranges.cend(), static_cast<uint64_t>(0), sumrange);
     Ranges = ranges;
 
     if (VERBOSE_LEVEL_CHECK(VB_HTTP, LOG_INFO))
