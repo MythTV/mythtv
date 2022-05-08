@@ -88,6 +88,7 @@ extern "C" {
 #include "mpeg/atscdescriptors.h"
 #include "mpeg/dvbdescriptors.h"
 #include "mpeg/mpegtables.h"
+#include "bytereader.h"
 #include "mythavutil.h"
 #include "mythframe.h"
 #include "mythhdrvideometadata.h"
@@ -3144,7 +3145,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
     while (bufptr < bufend)
     {
-        bufptr = avpriv_find_start_code(bufptr, bufend, &m_startCodeState);
+        bufptr = ByteReader::find_start_code_truncated(bufptr, bufend, &m_startCodeState);
 
         float aspect_override = -1.0F;
         if (m_ringBuffer->IsDVD())
