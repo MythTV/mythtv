@@ -9,7 +9,7 @@ import {
   GetVideoMultiplexListRequest,
   UpdateVideoSourceRequest } from './interfaces/channel.interface';
 import { ChannelInfoList } from './interfaces/channelinfolist.interface';
-import { BoolResponse } from './interfaces/common.interface';
+import { BoolResponse, StringListResponse } from './interfaces/common.interface';
 import { GetDDLineupListRequest, LineupList } from './interfaces/lineup.interface';
 import { VideoMultiplex, VideoMultiplexList } from './interfaces/multiplex.interface';
 import { VideoSource, VideoSourceList } from './interfaces/videosource.interface';
@@ -89,10 +89,10 @@ export class ChannelService {
     return this.httpClient.get<VideoSourceList>('/Channel/GetVideoSourceList');
   }
 
-  public GetXMLTVIdList(sourceid : number) : Observable<String[]> {
+  public GetXMLTVIdList(sourceid : number) : Observable<StringListResponse> {
     let params = new HttpParams()
       .set("SourceID", sourceid);
-    return this.httpClient.get<String[]>('/Channel/GetXMLTVIdList', {params});
+    return this.httpClient.get<StringListResponse>('/Channel/GetXMLTVIdList', {params});
   }
 
   public RemoveDBChannel(channelid : number) : Observable<BoolResponse> {
