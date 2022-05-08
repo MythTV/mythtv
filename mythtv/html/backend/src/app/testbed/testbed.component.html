@@ -50,6 +50,14 @@
             </ng-template>
         </p-accordionTab>
     </ng-container>
+
+    <ng-container *ngIf="(m_hashTest$ | async) as file; else loading">
+        <p-accordionTab header="File Hash">
+            <ng-template pTemplate="content">
+                File Hash is {{ file.Hash }}
+            </ng-template>
+        </p-accordionTab>
+    </ng-container>
 </p-accordion>
 
 <div *ngIf="(m_iconUrl$ | async)?.urls as url; else loading">

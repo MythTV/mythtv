@@ -15,6 +15,7 @@ import { BoolResponse } from '../services/interfaces/common.interface';
 import { IconlookupService } from '../services/external/iconlookup.service';
 import { CallsignLookupResponse } from '../services/interfaces/iconlookup.interface';
 import { StorageGroupDir } from '../services/interfaces/storagegroup.interface';
+import { GetHashResponse } from '../services/interfaces/content.interface';
 
 @Component({
     selector: 'app-testbed',
@@ -34,6 +35,7 @@ export class TestbedComponent implements OnInit {
     m_addStorageGroupDir$!: Observable<BoolResponse>;
     m_iconUrl$!: Observable<CallsignLookupResponse>;
     m_settingsList$! : Observable<SettingList>;
+    m_hashTest$! : Observable<GetHashResponse>;
 
     m_hostName: string = "";
     m_securityPin: string = "";
@@ -89,6 +91,10 @@ export class TestbedComponent implements OnInit {
 
         this.m_iconUrl$ = this.lookupService.lookupByCallsign('BBC One').pipe(
             tap(data => { console.log("Found URL for BBC One Icon = " + data.urls)})
+        )
+
+        this.m_hashTest$ = this.contentService.GetHash({StorageGroup: "Default", FileName: "readme.txt"}).pipe(
+            tap(data => console.log("File Hash: " + data))
         )
     }
 
