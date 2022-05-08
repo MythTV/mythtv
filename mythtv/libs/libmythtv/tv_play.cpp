@@ -3966,7 +3966,7 @@ bool TV::FFRewHandleAction(const QStringList &Actions)
     {
         for (int i = 0; i < Actions.size() && !handled; i++)
         {
-            QString action = Actions[i];
+            const QString& action = Actions[i];
             bool ok = false;
             int val = action.toInt(&ok);
 

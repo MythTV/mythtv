@@ -1081,14 +1081,14 @@ void PlaybackBox::HandlePreviewEvent(const QStringList &list)
         return;
     }
 
-    uint          recordingID  = list[0].toUInt();
-    const QString previewFile  = list[1];
-    const QString message      = list[2];
+    uint           recordingID  = list[0].toUInt();
+    const QString& previewFile  = list[1];
+    const QString& message      = list[2];
 
     bool found = false;
     for (uint i = 4; i < (uint) list.size(); i++)
     {
-        QString token = list[i];
+        const QString& token = list[i];
         QSet<QString>::iterator it = m_previewTokens.find(token);
         if (it != m_previewTokens.end())
         {

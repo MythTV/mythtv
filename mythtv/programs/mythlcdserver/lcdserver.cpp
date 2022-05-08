@@ -400,8 +400,8 @@ void LCDServer::switchToGeneric(const QStringList &tokens, QTcpSocket *socket)
             return;
         }
 
-        QString text = tokens[x + 2];
-        QString screen = tokens[x + 3];
+        const QString& text = tokens[x + 2];
+        const QString& screen = tokens[x + 3];
         bool scrollable = false;
         if (tokens[x + 4] == "TRUE")
             scrollable = true;
@@ -494,7 +494,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
         return;
     }
 
-    QString appName = tokens[1];
+    const QString& appName = tokens[1];
 
     bool bPopup = false;
     if (tokens[2] == "TRUE")
@@ -514,7 +514,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
 
     for (int x = 3; x < tokens.count(); x += 5)
     {
-        QString text = tokens[x];
+        const QString& text = tokens[x];
 
         CHECKED_STATE checked = CHECKED;
         if (tokens[x + 1] == "CHECKED")

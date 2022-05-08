@@ -1687,7 +1687,7 @@ void MainServer::customEvent(QEvent *e)
 void MainServer::HandleVersion(MythSocket *socket, const QStringList &slist)
 {
     QStringList retlist;
-    QString version = slist[1];
+    const QString& version = slist[1];
     if (version != MYTH_PROTO_VERSION)
     {
         LOG(VB_GENERAL, LOG_CRIT, LOC +
@@ -1710,7 +1710,7 @@ void MainServer::HandleVersion(MythSocket *socket, const QStringList &slist)
         return;
     }
 
-    QString token = slist[2];
+    const QString& token = slist[2];
     if (token != QString::fromUtf8(MYTH_PROTO_TOKEN))
     {
         LOG(VB_GENERAL, LOG_CRIT, LOC +
@@ -5098,7 +5098,7 @@ void MainServer::HandleIsActiveBackendQuery(const QStringList &slist,
                                             PlaybackSock *pbs)
 {
     QStringList retlist;
-    QString queryhostname = slist[1];
+    const QString& queryhostname = slist[1];
 
     if (gCoreContext->GetHostName() != queryhostname)
     {
@@ -5772,8 +5772,8 @@ void MainServer::HandleSettingQuery(const QStringList &tokens, PlaybackSock *pbs
     if (pbs)
         pbssock = pbs->getSocket();
 
-    QString hostname = tokens[1];
-    QString setting = tokens[2];
+    const QString& hostname = tokens[1];
+    const QString& setting = tokens[2];
     QStringList retlist;
 
     QString retvalue = gCoreContext->GetSettingOnHost(setting, hostname, "-1");
@@ -5787,8 +5787,8 @@ void MainServer::HandleDownloadFile(const QStringList &command,
                                     PlaybackSock *pbs)
 {
     bool synchronous = (command[0] == "DOWNLOAD_FILE_NOW");
-    QString srcURL = command[1];
-    QString storageGroup = command[2];
+    const QString& srcURL = command[1];
+    const QString& storageGroup = command[2];
     QString filename = command[3];
     StorageGroup sgroup(storageGroup, gCoreContext->GetHostName(), false);
     QString outDir = sgroup.FindNextDirMostFree();
@@ -5865,9 +5865,9 @@ void MainServer::HandleSetSetting(const QStringList &tokens,
     if (pbs)
         pbssock = pbs->getSocket();
 
-    QString hostname = tokens[1];
-    QString setting = tokens[2];
-    QString svalue = tokens[3];
+    const QString& hostname = tokens[1];
+    const QString& setting = tokens[2];
+    const QString& svalue = tokens[3];
     QStringList retlist;
 
     if (gCoreContext->SaveSettingOnHost(setting, svalue, hostname))
@@ -5976,7 +5976,7 @@ void MainServer::HandleMusicTagUpdateVolatile(const QStringList &slist, Playback
 
     MythSocket *pbssock = pbs->getSocket();
 
-    QString hostname = slist[1];
+    const QString& hostname = slist[1];
 
     if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
@@ -6036,7 +6036,7 @@ void MainServer::HandleMusicCalcTrackLen(const QStringList &slist, PlaybackSock 
 
     MythSocket *pbssock = pbs->getSocket();
 
-    QString hostname = slist[1];
+    const QString& hostname = slist[1];
 
     if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
@@ -6094,7 +6094,7 @@ void MainServer::HandleMusicTagUpdateMetadata(const QStringList &slist, Playback
 
     MythSocket *pbssock = pbs->getSocket();
 
-    QString hostname = slist[1];
+    const QString& hostname = slist[1];
 
     if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
@@ -6180,7 +6180,7 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
 
     MythSocket *pbssock = pbs->getSocket();
 
-    QString hostname = slist[1];
+    const QString& hostname = slist[1];
 
     if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
@@ -6332,9 +6332,9 @@ void MainServer::HandleMusicTagGetImage(const QStringList &slist, PlaybackSock *
 
     MythSocket *pbssock = pbs->getSocket();
 
-    QString hostname = slist[1];
-    QString songid = slist[2];
-    QString imagetype = slist[3];
+    const QString& hostname = slist[1];
+    const QString& songid = slist[2];
+    const QString& imagetype = slist[3];
 
     if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
@@ -6386,7 +6386,7 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
 
     MythSocket *pbssock = pbs->getSocket();
 
-    QString hostname = slist[1];
+    const QString& hostname = slist[1];
 
     if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
@@ -6553,7 +6553,7 @@ void MainServer::HandleMusicTagAddImage(const QStringList& slist, PlaybackSock* 
 
     MythSocket *pbssock = pbs->getSocket();
 
-    QString hostname = slist[1];
+    const QString& hostname = slist[1];
 
     if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
@@ -6587,7 +6587,7 @@ void MainServer::HandleMusicTagAddImage(const QStringList& slist, PlaybackSock* 
 
     // load the metadata from the database
     int songID = slist[2].toInt();
-    QString filename = slist[3];
+    const QString& filename = slist[3];
     auto imageType = (ImageType) slist[4].toInt();
 
     MusicMetadata *mdata = MusicMetadata::createFromID(songID);
@@ -6708,7 +6708,7 @@ void MainServer::HandleMusicTagRemoveImage(const QStringList& slist, PlaybackSoc
 
     MythSocket *pbssock = pbs->getSocket();
 
-    QString hostname = slist[1];
+    const QString& hostname = slist[1];
 
     if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
@@ -6835,9 +6835,9 @@ void MainServer::HandleMusicFindLyrics(const QStringList &slist, PlaybackSock *p
 
     MythSocket *pbssock = pbs->getSocket();
 
-    QString hostname = slist[1];
-    QString songid = slist[2];
-    QString grabberName = slist[3];
+    const QString& hostname = slist[1];
+    const QString& songid = slist[2];
+    const QString& grabberName = slist[3];
     QString artist = "";
     QString album = "";
     QString title = "";
@@ -7009,7 +7009,7 @@ void MainServer::HandleMusicSaveLyrics(const QStringList& slist, PlaybackSock* p
 
     MythSocket *pbssock = pbs->getSocket();
 
-    QString hostname = slist[1];
+    const QString& hostname = slist[1];
     int songID = slist[2].toInt();
 
     if (m_ismaster && !gCoreContext->IsThisHost(hostname))
@@ -7287,7 +7287,7 @@ void MainServer::HandleSetVerbose(const QStringList &slist, PlaybackSock *pbs)
     MythSocket *pbssock = pbs->getSocket();
     QStringList retlist;
 
-    QString newverbose = slist[1];
+    const QString& newverbose = slist[1];
     int len = newverbose.length();
     if (len > 12)
     {
@@ -7313,7 +7313,7 @@ void MainServer::HandleSetLogLevel(const QStringList &slist, PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
     QStringList retlist;
-    QString newstring = slist[1];
+    const QString& newstring = slist[1];
     LogLevel_t newlevel = LOG_UNKNOWN;
 
     int len = newstring.length();

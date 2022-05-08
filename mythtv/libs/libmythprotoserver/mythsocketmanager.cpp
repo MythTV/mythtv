@@ -333,7 +333,7 @@ void MythSocketManager::HandleVersion(MythSocket *socket,
                                       const QStringList &slist)
 {
     QStringList retlist;
-    QString version = slist[1];
+    const QString& version = slist[1];
     if (version != MYTH_PROTO_VERSION)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -355,7 +355,7 @@ void MythSocketManager::HandleVersion(MythSocket *socket,
         return;
     }
 
-    QString token = slist[2];
+    const QString& token = slist[2];
     if (token != QString::fromUtf8(MYTH_PROTO_TOKEN))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
