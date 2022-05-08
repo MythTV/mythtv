@@ -678,9 +678,7 @@ void MythTextInputDialog::sendResult()
 MythSpinBoxDialog::MythSpinBoxDialog(MythScreenStack *parent,
                                      QString message)
     : MythScreenType(parent, "mythspinboxpopup"),
-      m_spinBox(nullptr),
       m_message(std::move(message)),
-      m_retObject(nullptr),
       m_id("")
 {
 }
@@ -914,8 +912,7 @@ MythTimeInputDialog::MythTimeInputDialog(MythScreenStack *parent,
                                          int rangeLimit)
     : MythScreenType(parent, "timepopup"),
         m_message(std::move(message)), m_startTime(std::move(startTime)),
-        m_resolution(resolutionFlags), m_rangeLimit(rangeLimit),
-        m_dateList(nullptr), m_timeList(nullptr), m_retObject(nullptr)
+        m_resolution(resolutionFlags), m_rangeLimit(rangeLimit)
 {
 }
 

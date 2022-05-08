@@ -18,9 +18,9 @@ class VideoVisualGoom : public VideoVisual
     QString Name(void) override { return m_hd ? GOOMHD_NAME : GOOM_NAME; }
 
   private:
-    unsigned int*  m_buffer;
-    MythGLTexture* m_glSurface;
-    bool           m_hd;
+    unsigned int*  m_buffer    { nullptr };
+    MythGLTexture* m_glSurface { nullptr };
+    bool           m_hd        { false   };
 };
 
 #endif

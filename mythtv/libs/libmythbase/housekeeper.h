@@ -102,7 +102,7 @@ class MBASE_PUBLIC PeriodicHouseKeeperTask : public HouseKeeperTask
     std::chrono::seconds        m_retry;
     QPair<float,float>          m_windowPercent;
     QPair<std::chrono::seconds,std::chrono::seconds> m_windowElapsed;
-    double                      m_currentProb;
+    double                      m_currentProb { 1.0 };
 };
 
 class MBASE_PUBLIC DailyHouseKeeperTask : public PeriodicHouseKeeperTask
@@ -129,8 +129,7 @@ class HouseKeepingThread : public MThread
 {
   public:
     explicit HouseKeepingThread(HouseKeeper *p) :
-        MThread("HouseKeeping"), m_idle(true), m_keepRunning(true),
-        m_parent(p) {}
+        MThread("HouseKeeping"), m_parent(p) {}
    ~HouseKeepingThread() override = default;
     void run(void) override; // MThread
     void Discard(void)                  { m_keepRunning = false;        }
@@ -140,9 +139,9 @@ class HouseKeepingThread : public MThread
     void Terminate(void);
 
   private:
-    bool                m_idle;
-    bool                m_keepRunning;
-    HouseKeeper        *m_parent;
+    bool                m_idle        { true };
+    bool                m_keepRunning { true };
+    HouseKeeper        *m_parent      { nullptr };
     QMutex              m_waitMutex;
     QWaitCondition      m_waitCondition;
 };

@@ -175,7 +175,7 @@ class FreeSpaceUpdater : public QRunnable
 {
   public:
     explicit FreeSpaceUpdater(MainServer &parent) :
-        m_parent(parent), m_dorun(true), m_running(true)
+        m_parent(parent)
     {
         m_lastRequest.start();
     }
@@ -230,8 +230,8 @@ class FreeSpaceUpdater : public QRunnable
 
     MainServer &m_parent;
     QMutex m_lock;
-    bool m_dorun;
-    bool m_running;
+    bool m_dorun   { true };
+    bool m_running { true };
     MythTimer m_lastRequest;
     QWaitCondition m_wait;
     static constexpr std::chrono::milliseconds kRequeryTimeout { 15s };

@@ -69,9 +69,9 @@ class MythCoreContextPrivate : public QObject
     bool WaitForWOL(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
 
   public:
-    MythCoreContext *m_parent;
-    QObject         *m_guiContext;
-    QObject         *m_guiObject;
+    MythCoreContext *m_parent     { nullptr };
+    QObject         *m_guiContext { nullptr };
+    QObject         *m_guiObject  { nullptr };
     QString          m_appBinaryVersion;
 
     QMutex  m_localHostLock;        ///< Locking for m_localHostname
@@ -82,48 +82,48 @@ class MythCoreContextPrivate : public QObject
     QMap<QString, QString> m_scopes;///< Scope Id cache for Link-Local addresses
 
     QMutex      m_sockLock;         ///< protects both m_serverSock and m_eventSock
-    MythSocket *m_serverSock;       ///< socket for sending MythProto requests
-    MythSocket *m_eventSock;        ///< socket events arrive on
+    MythSocket *m_serverSock { nullptr }; ///< socket for sending MythProto requests
+    MythSocket *m_eventSock  { nullptr }; ///< socket events arrive on
 
     QMutex         m_wolInProgressLock;
     QWaitCondition m_wolInProgressWaitCondition;
-    bool           m_wolInProgress;
-    bool           m_isWOLAllowed;
+    bool           m_wolInProgress { false };
+    bool           m_isWOLAllowed  { true };
 
-    bool m_backend;
-    bool m_frontend;
+    bool m_backend  { false };
+    bool m_frontend { false };
 
-    MythDB *m_database;
+    MythDB *m_database { nullptr };
 
-    QThread *m_uiThread;
+    QThread *m_uiThread { nullptr };
 
-    MythLocale *m_locale;
+    MythLocale *m_locale { nullptr };
     QString m_language;
 
-    MythScheduler *m_scheduler;
+    MythScheduler *m_scheduler { nullptr };
 
-    bool m_blockingClient;
+    bool m_blockingClient { true };
 
     QMap<QObject *, MythCoreContext::PlaybackStartCb> m_playbackClients;
     QMutex m_playbackLock;
-    bool m_inwanting;
-    bool m_intvwanting;
+    bool m_inwanting   { false };
+    bool m_intvwanting { false };
 
-    bool m_announcedProtocol;
+    bool m_announcedProtocol { false };
 
-    MythPluginManager *m_pluginmanager;
+    MythPluginManager *m_pluginmanager { nullptr };
 
-    bool m_isexiting;
+    bool m_isexiting { false };
 
     QMap<QString, QPair<int64_t, uint64_t> >  m_fileswritten;
     QMutex m_fileslock;
 
-    MythSessionManager *m_sessionManager;
+    MythSessionManager *m_sessionManager { nullptr };
 
     QList<QHostAddress> m_approvedIps;
     QList<QHostAddress> m_deniedIps;
 
-    MythPower *m_power;
+    MythPower *m_power { nullptr };
 };
 
 MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
@@ -131,26 +131,9 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
                                                QObject *guicontext)
     : m_parent(lparent),
       m_guiContext(guicontext),
-      m_guiObject(nullptr),
       m_appBinaryVersion(std::move(binversion)),
-      m_serverSock(nullptr),
-      m_eventSock(nullptr),
-      m_wolInProgress(false),
-      m_isWOLAllowed(true),
-      m_backend(false),
-      m_frontend(false),
       m_database(GetMythDB()),
-      m_uiThread(QThread::currentThread()),
-      m_locale(nullptr),
-      m_scheduler(nullptr),
-      m_blockingClient(true),
-      m_inwanting(false),
-      m_intvwanting(false),
-      m_announcedProtocol(false),
-      m_pluginmanager(nullptr),
-      m_isexiting(false),
-      m_sessionManager(nullptr),
-      m_power(nullptr)
+      m_uiThread(QThread::currentThread())
 {
     MThread::ThreadSetup("CoreContext");
 }

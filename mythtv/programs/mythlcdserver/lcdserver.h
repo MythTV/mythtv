@@ -63,9 +63,9 @@ class LCDServer : public QObject
 
   private:
 
-    LCDProcClient   *m_lcd;
-    ServerPool      *m_serverPool;
-    QTcpSocket      *m_lastSocket;  // last socket we received data from
+    LCDProcClient   *m_lcd        { nullptr };
+    ServerPool      *m_serverPool { nullptr };
+    QTcpSocket      *m_lastSocket { nullptr };  // last socket we received data from
 
 };
 

@@ -87,12 +87,12 @@ class ScreenSetup : public MythScreenType
     void deleteScreen(void);
 
   private:
-    SourceManager *m_sourceManager;
-    bool m_createdSrcMan;
-    MythUIText *m_helpText;
-    MythUIButtonList *m_activeList;
-    MythUIButtonList *m_inactiveList;
-    MythUIButton *m_finishButton;
+    SourceManager    *m_sourceManager { nullptr };
+    bool              m_createdSrcMan { false   };
+    MythUIText       *m_helpText      { nullptr };
+    MythUIButtonList *m_activeList    { nullptr };
+    MythUIButtonList *m_inactiveList  { nullptr };
+    MythUIButton     *m_finishButton  { nullptr };
 };
 
 class SourceSetup : public MythScreenType
@@ -100,7 +100,8 @@ class SourceSetup : public MythScreenType
     Q_OBJECT
 
   public:
-    SourceSetup(MythScreenStack *parent, const QString &name);
+    SourceSetup(MythScreenStack *parent, const QString &name)
+      : MythScreenType(parent, name) {};
     ~SourceSetup() override;
 
     bool Create(void) override; // MythScreenType
@@ -117,11 +118,11 @@ class SourceSetup : public MythScreenType
     void saveData(void);
 
   private:
-    MythUISpinBox *m_updateSpinbox;
-    MythUISpinBox *m_retrieveSpinbox;
-    MythUIButtonList *m_sourceList;
-    MythUIButton *m_finishButton;
-    MythUIText *m_sourceText;
+    MythUISpinBox    *m_updateSpinbox   { nullptr };
+    MythUISpinBox    *m_retrieveSpinbox { nullptr };
+    MythUIButtonList *m_sourceList      { nullptr };
+    MythUIButton     *m_finishButton    { nullptr };
+    MythUIText       *m_sourceText      { nullptr };
 };
 
 struct ResultListInfo
@@ -157,16 +158,16 @@ class LocationDialog : public MythScreenType
   private:
     CacheMap m_cache;
     QStringList m_types;
-    ScreenListInfo *m_screenListInfo;
-    SourceManager *m_sourceManager;
+    ScreenListInfo   *m_screenListInfo { nullptr };
+    SourceManager    *m_sourceManager  { nullptr };
 
-    MythScreenType *m_retScreen;
+    MythScreenType   *m_retScreen      { nullptr };
 
-    MythUIButtonList *m_locationList;
-    MythUITextEdit *m_locationEdit;
-    MythUIButton *m_searchButton;
-    MythUIText *m_resultsText;
-    MythUIText *m_sourceText;
+    MythUIButtonList *m_locationList   { nullptr };
+    MythUITextEdit   *m_locationEdit   { nullptr };
+    MythUIButton     *m_searchButton   { nullptr };
+    MythUIText       *m_resultsText    { nullptr };
+    MythUIText       *m_sourceText     { nullptr };
 };
 
 #endif /* WEATHER_SETUP_H */

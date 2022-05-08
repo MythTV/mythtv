@@ -371,10 +371,10 @@ class MUI_PUBLIC MythSpinBoxDialog : public MythScreenType
      void haveResult(QString);
 
   protected:
-    MythUISpinBox *m_spinBox;
+    MythUISpinBox *m_spinBox { nullptr };
     QString m_message;
     QString m_defaultValue;
-    QObject *m_retObject;
+    QObject *m_retObject     { nullptr };
     QString m_id;
 
   protected slots:
@@ -486,10 +486,10 @@ class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
     QStringList       m_list;
     QString           m_currentValue;
 
-    MythUIButtonList *m_dateList;
-    MythUIButtonList *m_timeList;
+    MythUIButtonList *m_dateList  { nullptr };
+    MythUIButtonList *m_timeList  { nullptr };
 
-    QObject          *m_retObject;
+    QObject          *m_retObject { nullptr };
     QString           m_id;
 };
 

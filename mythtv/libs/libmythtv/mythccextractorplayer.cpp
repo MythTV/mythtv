@@ -51,8 +51,6 @@ MythCCExtractorPlayer::MythCCExtractorPlayer(PlayerContext *Context, PlayerFlags
                                              QString fileName,
                                              const QString &destdir) :
     MythPlayer(Context, flags),
-    m_curTime(0ms),
-    m_myFramesPlayed(0),
     m_showProgress(showProgress),
     m_fileName(std::move(fileName))
 {

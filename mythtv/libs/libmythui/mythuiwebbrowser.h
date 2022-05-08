@@ -49,9 +49,9 @@ class BrowserApi : public QObject
   private:
     void customEvent(QEvent *e) override; // QObject
 
-    QWebFrame *m_frame;
+    QWebFrame *m_frame     { nullptr };
 
-    bool       m_gotAnswer;
+    bool       m_gotAnswer { false   };
     QString    m_answer;
 };
 
@@ -217,34 +217,34 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     void CopyFrom(MythUIType *base) override; // MythUIType
     void CreateCopy(MythUIType *parent) override; // MythUIType
 
-    MythScreenType *m_parentScreen;
+    MythScreenType *m_parentScreen         { nullptr };
 
-    MythWebView *m_browser;
+    MythWebView *m_browser                 { nullptr };
     MythRect     m_browserArea;
     MythRect     m_actualBrowserArea;
 
-    MythImage   *m_image;
+    MythImage   *m_image                   { nullptr };
 
-    bool         m_active;
-    bool         m_wasActive;
-    bool         m_initialized;
+    bool         m_active                  { false   };
+    bool         m_wasActive               { false   };
+    bool         m_initialized             { false   };
     QElapsedTimer m_lastUpdateTime;
-    int          m_updateInterval;
+    int          m_updateInterval          { 0       };
 
-    float        m_zoom;
+    float        m_zoom                    { 1.0     };
     QColor       m_bgColor;
     QUrl         m_widgetUrl;
     QString      m_userCssFile;
     QString      m_defaultSaveDir;
     QString      m_defaultSaveFilename;
 
-    bool         m_inputToggled;
+    bool         m_inputToggled            { false   };
     QString      m_lastMouseAction;
-    int          m_mouseKeyCount;
+    int          m_mouseKeyCount           { 0       };
     QElapsedTimer m_lastMouseActionTime;
 
-    MythUIScrollBar *m_horizontalScrollbar;
-    MythUIScrollBar *m_verticalScrollbar;
+    MythUIScrollBar *m_horizontalScrollbar { nullptr };
+    MythUIScrollBar *m_verticalScrollbar   { nullptr };
     MythUIAnimation  m_scrollAnimation;
     QPoint           m_destinationScrollPos;
 };

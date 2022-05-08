@@ -64,8 +64,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *_tvList,
     m_priorityTable("powerpriority"),
     m_specSched(master_sched),
     m_tvList(_tvList),
-    m_doRun(runthread),
-    m_openEnd(openEndNever)
+    m_doRun(runthread)
 {
     debugConflicts = qEnvironmentVariableIsSet("DEBUG_CONFLICTS");
 

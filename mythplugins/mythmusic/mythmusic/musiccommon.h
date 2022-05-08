@@ -137,7 +137,7 @@ class MPLUGIN_PUBLIC MusicCommon : public MythScreenType
     bool restorePosition(int trackID);
 
     MythScreenType        *m_parentScreen       {nullptr};
-    MusicView              m_currentView;
+    MusicView              m_currentView        {};
 
     // visualiser stuff
     MainVisual            *m_mainvisual         {nullptr};

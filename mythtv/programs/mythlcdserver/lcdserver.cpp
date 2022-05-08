@@ -81,8 +81,7 @@ int debug_level = 0;
 
 LCDServer::LCDServer(int port, QString message, std::chrono::seconds messageTime)
     : m_lcd(new LCDProcClient(this)),
-     m_serverPool(new ServerPool()),
-     m_lastSocket(nullptr)
+     m_serverPool(new ServerPool())
 {
     if (!m_lcd->SetupLCD())
     {

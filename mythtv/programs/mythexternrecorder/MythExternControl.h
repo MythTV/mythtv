@@ -77,8 +77,7 @@ class Commands : public QObject
 
   public:
     explicit Commands(MythExternControl * parent)
-        : m_parent(parent)
-        , m_apiVersion(-1) {}
+        : m_parent(parent) {}
     ~Commands(void) override = default;
     void Start(void) {
         m_thread = std::thread(&Commands::Run, this);
@@ -113,8 +112,8 @@ class Commands : public QObject
   private:
     std::thread m_thread;
 
-    MythExternControl* m_parent;
-    int m_apiVersion;
+    MythExternControl* m_parent { nullptr };
+    int m_apiVersion { -1 };
 };
 
 class MythExternControl : public QObject

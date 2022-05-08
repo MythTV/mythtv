@@ -44,8 +44,7 @@
 MusicCommon::MusicCommon(MythScreenStack *parent, MythScreenType *parentScreen,
                          const QString &name)
             : MythScreenType(parent, name),
-    m_parentScreen(parentScreen),
-    m_currentView()
+    m_parentScreen(parentScreen)
 {
     m_cycleVisualizer = gCoreContext->GetBoolSetting("VisualCycleOnSongChange", false);
 

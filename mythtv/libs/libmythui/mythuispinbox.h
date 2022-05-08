@@ -84,15 +84,15 @@ class MUI_PUBLIC SpinBoxEntryDialog : public MythScreenType
   protected:
     MythUIButtonList  *m_parentList;
     QString            m_searchText;
-    MythUITextEdit    *m_entryEdit;
-    MythUIButton      *m_cancelButton;
-    MythUIButton      *m_okButton;
-    MythUIText        *m_rulesText;
+    MythUITextEdit    *m_entryEdit    { nullptr };
+    MythUIButton      *m_cancelButton { nullptr };
+    MythUIButton      *m_okButton     { nullptr };
+    MythUIText        *m_rulesText    { nullptr };
     int                m_selection;
-    bool               m_okClicked;
-    int m_low;
-    int m_high;
-    int m_step;
+    bool               m_okClicked    { false   };
+    int                m_low;
+    int                m_high;
+    int                m_step;
 
 
 };

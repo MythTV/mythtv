@@ -93,9 +93,9 @@ class MHTokenGroup : public MHPresentable
 // which only work on visibles.
 class MHListItem {
   public:
-    explicit MHListItem(MHRoot *pVis): m_pVisible(pVis), m_fSelected(false) {}
-    MHRoot *m_pVisible;
-    bool   m_fSelected;
+    explicit MHListItem(MHRoot *pVis): m_pVisible(pVis) {}
+    MHRoot *m_pVisible { nullptr };
+    bool   m_fSelected { false   };
 };
 
 class MHListGroup : public MHTokenGroup  

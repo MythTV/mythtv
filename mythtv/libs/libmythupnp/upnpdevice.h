@@ -227,7 +227,7 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
             delete m_pDeviceDesc;
         }
 
-        UPnpDeviceDesc *m_pDeviceDesc;  // We take ownership of this pointer.
+        UPnpDeviceDesc *m_pDeviceDesc { nullptr };  // We take ownership of this pointer.
 
     public:
 
@@ -246,7 +246,6 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
                         QString sLocation,
                         TaskTime       ttExpires ) : ReferenceCounter(
                                                          "DeviceLocation"     ),
-                                                     m_pDeviceDesc( nullptr   ),
                                                      m_sURI       (std::move( sURI      )),
                                                      m_sUSN       (std::move( sUSN      )),
                                                      m_sLocation  (std::move( sLocation )),

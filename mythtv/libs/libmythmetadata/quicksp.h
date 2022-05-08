@@ -99,7 +99,7 @@ class simple_ref_ptr
     class ref : public Locker
     {
       public:
-        explicit ref(T *ptr) : m_count(1), m_type(ptr) {}
+        explicit ref(T *ptr) : m_type(ptr) {}
 
         ~ref()
         {
@@ -133,7 +133,7 @@ class simple_ref_ptr
         }
 
       private:
-        unsigned int m_count;
+        unsigned int m_count {1};
         T *m_type;
     };
 

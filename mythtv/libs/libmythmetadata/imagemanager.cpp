@@ -35,7 +35,7 @@ class Device
 public:
     Device(QString name, QString mount,
            MythMediaDevice *media = nullptr, QTemporaryDir *import = nullptr)
-        : m_present(true), m_name(std::move(name)), m_mount(std::move(mount)),
+        : m_name(std::move(name)), m_mount(std::move(mount)),
           m_media(media), m_dir(import)
     {
         // Path relative to TEMP storage group
@@ -107,12 +107,12 @@ public:
     void setPresent(MythMediaDevice *media)  { m_present = true; m_media = media; }
 
     //! True when gallery UI is running & device is useable. Always true for imports
-    bool             m_present;
+    bool             m_present { true };
     QString          m_name;   //!< Device model/volume/id
     QString          m_mount;  //!< Mountpoint
     QString          m_thumbs; //!< Dir sub-path of device thumbnails
-    MythMediaDevice *m_media;  //!< Set for MediaMonitor devices only
-    QTemporaryDir   *m_dir;    //!< Dir path of images: import devices only
+    MythMediaDevice *m_media { nullptr }; //!< Set for MediaMonitor devices only
+    QTemporaryDir   *m_dir   { nullptr }; //!< Dir path of images: import devices only
 };
 
 

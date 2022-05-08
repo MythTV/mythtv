@@ -72,13 +72,12 @@ public:
     NetStreamRequest(int id, const QNetworkRequest &req) :
         QEvent(kType),
         m_id(id),
-        m_req(req),
-        m_bCancelled(false)
+        m_req(req)
     { }
 
     const int m_id;
     const QNetworkRequest m_req;
-    volatile bool m_bCancelled;
+    volatile bool m_bCancelled { false };
 };
 
 class NetStreamAbort : public QEvent

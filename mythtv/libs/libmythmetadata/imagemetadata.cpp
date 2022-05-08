@@ -495,9 +495,9 @@ public:
 protected:
     QString GetTag(const QString &key, bool *exists = nullptr);
 
-    AVFormatContext *m_context;
+    AVFormatContext *m_context { nullptr };
     //! FFmpeg tag dictionary
-    AVDictionary    *m_dict;
+    AVDictionary    *m_dict    { nullptr };
 };
 
 
@@ -506,7 +506,7 @@ protected:
    \param filePath Absolute video path
  */
 VideoMetaData::VideoMetaData(const QString &filePath)
-    : ImageMetaData(filePath), m_context(nullptr), m_dict(nullptr)
+    : ImageMetaData(filePath)
 {
     AVInputFormat* p_inputformat = nullptr;
 

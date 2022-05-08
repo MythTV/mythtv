@@ -61,11 +61,11 @@ class DVBStreamHandler : public StreamHandler
 
   private:
     QString           m_dvrDevPath;
-    volatile bool     m_allowRetune;
+    volatile bool     m_allowRetune { false   };
 
-    DTVSignalMonitor *m_sigMon;
-    DVBChannel       *m_dvbChannel;
-    DeviceReadBuffer *m_drb;
+    DTVSignalMonitor *m_sigMon      { nullptr };
+    DVBChannel       *m_dvbChannel  { nullptr };
+    DeviceReadBuffer *m_drb         { nullptr };
 
     // for caching TS monitoring supported value.
     static QMutex             s_rec_supportsTsMonitoringLock;

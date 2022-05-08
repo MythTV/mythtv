@@ -76,17 +76,17 @@ class UPNP_PUBLIC HttpServerExtension : public QObject
 
         QString     m_sName;
         QString     m_sSharePath;
-        int         m_nSocketTimeout; // Extension may wish to adjust the default e.g. UPnP
+        int         m_nSocketTimeout { -1 }; // Extension may wish to adjust the default e.g. UPnP
 
-        uint        m_nSupportedMethods; // Bit flags - HTTP::RequestType
+        // HTTP::RequestType. Defaults, extensions may extend the list
+        uint        m_nSupportedMethods
+	  {RequestTypeGet | RequestTypePost |
+	   RequestTypeHead | RequestTypeOptions};
         
     public:
 
         HttpServerExtension( QString sName, QString sSharePath)
-           : m_sName(std::move( sName )), m_sSharePath(std::move( sSharePath )),
-             m_nSocketTimeout(-1),
-             m_nSupportedMethods((RequestTypeGet | RequestTypePost | // Defaults, extensions may extend the list
-                                  RequestTypeHead | RequestTypeOptions)) {};
+           : m_sName(std::move( sName )), m_sSharePath(std::move( sSharePath )) {};
 
         ~HttpServerExtension() override = default;
 

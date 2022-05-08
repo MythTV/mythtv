@@ -21,8 +21,7 @@
 }
 
 MythNVDECInterop::MythNVDECInterop(MythPlayerUI* Player, MythRenderOpenGL* Context)
-  : MythOpenGLInterop(Context, GL_NVDEC, Player),
-    m_cudaContext()
+  : MythOpenGLInterop(Context, GL_NVDEC, Player)
 {
     InitialiseCuda();
 }

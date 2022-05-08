@@ -35,7 +35,7 @@ class PBHEventHandler : public QObject
 {
   public:
     explicit PBHEventHandler(PlaybackBoxHelper &pbh) :
-        m_pbh(pbh), m_freeSpaceTimerId(0), m_checkAvailabilityTimerId(0)
+        m_pbh(pbh)
     {
         StorageGroup::ClearGroupToUseCache();
     }
@@ -51,8 +51,8 @@ class PBHEventHandler : public QObject
     void UpdateFreeSpaceEvent(void);
     AvailableStatusType CheckAvailability(const QStringList &slist);
     PlaybackBoxHelper &m_pbh;
-    int m_freeSpaceTimerId;
-    int m_checkAvailabilityTimerId;
+    int m_freeSpaceTimerId         { 0 };
+    int m_checkAvailabilityTimerId { 0 };
     static constexpr std::chrono::milliseconds kUpdateFreeSpaceInterval { 15s };
     QMap<QString, QStringList> m_fileListCache;
     QHash<uint, QStringList> m_checkAvailability;

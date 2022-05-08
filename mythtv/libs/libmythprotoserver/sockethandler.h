@@ -37,12 +37,12 @@ class PROTOSERVER_PUBLIC SocketHandler : public ReferenceCounter
     void AllowSystemEvents(bool allow)  { m_systemEvents = allow; }
 
   private:
-    bool                m_blockShutdown;
-    bool                m_standardEvents;
-    bool                m_systemEvents;
+    bool                m_blockShutdown  { false    };
+    bool                m_standardEvents { false    };
+    bool                m_systemEvents   { false    };
 
-    MythSocket         *m_socket;
-    MythSocketManager  *m_parent;
+    MythSocket         *m_socket         { nullptr };
+    MythSocketManager  *m_parent         { nullptr };
 
     QString             m_hostname;
 };

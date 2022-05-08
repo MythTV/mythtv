@@ -321,7 +321,7 @@ class MHSwitchButton : public MHPushButton
 class MHSetColour: public MHElemAction
 {
   public:
-    explicit MHSetColour(const char *name): MHElemAction(name), m_colourType(CT_None) { }
+    explicit MHSetColour(const char *name): MHElemAction(name) { }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
@@ -329,7 +329,7 @@ class MHSetColour: public MHElemAction
     virtual void SetColour(const MHColour &colour, MHEngine *engine) = 0;
     // The colour can be specified as either an index or an absolute colour.
     // It's optional for the fill colour.
-    enum { CT_None, CT_Indexed, CT_Absolute } m_colourType;
+    enum { CT_None, CT_Indexed, CT_Absolute } m_colourType { CT_None };
     MHGenericInteger m_indexed;
     MHGenericOctetString m_absolute;
 };

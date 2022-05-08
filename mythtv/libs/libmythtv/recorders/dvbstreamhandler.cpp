@@ -101,10 +101,6 @@ void DVBStreamHandler::Return(DVBStreamHandler * & ref, int inputid)
 DVBStreamHandler::DVBStreamHandler(const QString &dvb_device, int inputid)
     : StreamHandler(dvb_device, inputid)
     , m_dvrDevPath(CardUtil::GetDeviceName(DVB_DEV_DVR, m_device))
-    , m_allowRetune(false)
-    , m_sigMon(nullptr)
-    , m_dvbChannel(nullptr)
-    , m_drb(nullptr)
 {
     setObjectName("DVBRead");
 }

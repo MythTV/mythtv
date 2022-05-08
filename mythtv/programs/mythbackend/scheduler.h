@@ -284,7 +284,7 @@ class Scheduler : public MThread, public MythScheduler
     // Delay shutdown util this time (ms since epoch);
     std::chrono::milliseconds m_delayShutdownTime        {0ms};
 
-    OpenEndType m_openEnd;
+    OpenEndType m_openEnd { openEndNever };
 
     // cache IsSameProgram()
     using IsSameKey = std::pair<const RecordingInfo*,const RecordingInfo*>;

@@ -325,7 +325,7 @@ PeriodicHouseKeeperTask::PeriodicHouseKeeperTask(const QString &dbTag,
             std::chrono::seconds period, float min, float max, std::chrono::seconds retry,
             HouseKeeperScope scope, HouseKeeperStartup startup) :
     HouseKeeperTask(dbTag, scope, startup), m_period(period), m_retry(retry),
-    m_windowPercent(min, max), m_currentProb(1.0)
+    m_windowPercent(min, max)
 {
     PeriodicHouseKeeperTask::CalculateWindow();
     if (m_retry == 0s)

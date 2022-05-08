@@ -287,11 +287,6 @@ SpinBoxEntryDialog::SpinBoxEntryDialog(MythScreenStack *parent, const char *name
     : MythScreenType(parent, name, false),
         m_parentList(parentList),
         m_searchText(std::move(searchText)),
-        m_entryEdit(nullptr),
-        m_cancelButton(nullptr),
-        m_okButton(nullptr),
-        m_rulesText(nullptr),
-        m_okClicked(false),
         m_low(low),
         m_high(high),
         m_step(step)
