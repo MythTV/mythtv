@@ -15,6 +15,8 @@ extern "C" {
 #include <cmath>
 #include <strings.h>
 
+#include "bytereader.h"
+
 /*
   Most of the comments below were cut&paste from ITU-T Rec. H.264
   as found here:  http://www.itu.int/rec/T-REC-H.264/e
@@ -298,11 +300,10 @@ uint32_t AVCParser::addBytes(const uint8_t  *bytes,
 
     while (startP < bytes + byte_count && !m_onFrame)
     {
-        const uint8_t *endP = avpriv_find_start_code(startP,
-                                                     bytes + byte_count,
-                                                     &m_syncAccumulator);
+        const uint8_t *endP =
+            ByteReader::find_start_code_truncated(startP, bytes + byte_count, &m_syncAccumulator);
 
-        bool found_start_code = ((m_syncAccumulator & 0xffffff00) == 0x00000100);
+        bool found_start_code = ByteReader::start_code_is_valid(m_syncAccumulator);
 
         /* Between startP and endP we potentially have some more
          * bytes of a NAL that we've been parsing (plus some bytes of

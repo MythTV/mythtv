@@ -16,6 +16,7 @@ extern "C" {
 #include <strings.h>
 
 static const QString LOC { QStringLiteral("HEVCParser ") };
+#include "bytereader.h"
 
 /*
   References:
@@ -158,12 +159,10 @@ uint32_t HEVCParser::addBytes(const uint8_t  *bytes,
 
     while (!m_onFrame && (startP < bytes + byte_count))
     {
-        const uint8_t *endP = avpriv_find_start_code(startP,
-                                                     bytes + byte_count,
-                                                     &m_syncAccumulator);
+        const uint8_t *endP =
+            ByteReader::find_start_code_truncated(startP, bytes + byte_count, &m_syncAccumulator);
 
-        // start_code_prefix_one_3bytes
-        bool found_start_code = ((m_syncAccumulator & 0xffffff00) == 0x00000100);
+        bool found_start_code = ByteReader::start_code_is_valid(m_syncAccumulator);
 
         /* Between startP and endP we potentially have some more
          * bytes of a NAL that we've been parsing (plus some bytes of
