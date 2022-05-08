@@ -14,7 +14,10 @@ import {
   GetRecordingRequest,
   GetRecordingArtworkRequest,
   GetRecordingArtworkListRequest,
-  GetVideoArtworkRequest
+  GetVideoArtworkRequest,
+  GetDirListResponse,
+  GetFileListResponse,
+  GetHashResponse
 } from './interfaces/content.interface';
 
 @Injectable({
@@ -37,10 +40,10 @@ export class ContentService {
   }
 
   // Gets list of directories in the SG
-  public GetDirList(request : StorageGroupRequest) : Observable<String[]> {
+  public GetDirList(request : StorageGroupRequest) : Observable<GetDirListResponse> {
     let params = new HttpParams()
       .set("StorageGroup", request.StorageGroup);
-    return this.httpClient.get<String[]>('/Content/GetDirList', {params});
+    return this.httpClient.get<GetDirListResponse>('/Content/GetDirList', {params});
   }
 
   public GetFile(request : StorageGroupFileNameRequest) : Observable<string> {
@@ -50,17 +53,17 @@ export class ContentService {
     return this.httpClient.get<string>('/Content/GetFile', {params});
   }
 
-  public GetFileList(request : StorageGroupRequest) : Observable<String[]> {
+  public GetFileList(request : StorageGroupRequest) : Observable<GetFileListResponse> {
     let params = new HttpParams()
       .set("StorageGroup", request.StorageGroup)
-    return this.httpClient.get<String[]>('/Content/GetFileList');
+    return this.httpClient.get<GetFileListResponse>('/Content/GetFileList');
   }
 
-  public GetHash(request : StorageGroupFileNameRequest) : Observable<string> {
+  public GetHash(request : StorageGroupFileNameRequest) : Observable<GetHashResponse> {
     let params = new HttpParams()
       .set("StorageGroup", request.StorageGroup)
       .set("FileName", request.FileName);
-    return this.httpClient.get<string>('/Content/GetHash', {params});
+    return this.httpClient.get<GetHashResponse>('/Content/GetHash', {params});
   }
 
   public GetImageFile(request : GetImageFileRequest) : Observable<string> {

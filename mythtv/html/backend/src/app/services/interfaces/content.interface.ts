@@ -66,3 +66,14 @@ export interface GetVideoArtworkRequest {
     Width:          number;
     Height:         number;
 }
+export interface GetDirListResponse {
+    DirList:        String[];
+}
+
+export interface GetFileListResponse {
+    FileList:       String[];
+}
+
+export interface GetHashResponse {
+    Hash:           string;
+}
