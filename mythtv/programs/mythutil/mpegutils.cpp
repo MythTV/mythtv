@@ -30,6 +30,8 @@
 #include "libmythtv/mpeg/scanstreamdata.h"
 #include "libmythtv/mpeg/sctetables.h"
 #include "libmythtv/mpeg/streamlisteners.h"
+#include "libmythtv/bytereader.h"
+
 
 // Application local headers
 #include "mpegutils.h"
@@ -359,9 +361,9 @@ bool PTSListener::ProcessTSPacket(const TSPacket &tspacket)
 
     while (bufptr < bufend)
     {
-        bufptr = avpriv_find_start_code(bufptr, bufend, &m_startCode);
+        bufptr = ByteReader::find_start_code_truncated(bufptr, bufend, &m_startCode);
         int bytes_left = bufend - bufptr;
-        if ((m_startCode & 0xffffff00) == 0x00000100)
+        if (ByteReader::start_code_is_valid(m_startCode))
         {
             // At this point we have seen the start code 0 0 1
             // the next byte will be the PES packet stream id.
