@@ -1,6 +1,8 @@
 #ifndef MYTH_DATE_H
 #define MYTH_DATE_H
 
+#include <cstdint>
+
 #include <QDateTime>
 #include <QString>
 
@@ -43,7 +45,7 @@ MBASE_PUBLIC QDateTime as_utc(const QDateTime &dt);
 MBASE_PUBLIC QDateTime fromString(const QString &dtstr);
 /// Converts dy in format to QDateTime
 MBASE_PUBLIC QDateTime fromString(const QString &dt, const QString &format);
-MBASE_PUBLIC QDateTime fromSecsSinceEpoch(uint seconds);
+MBASE_PUBLIC QDateTime fromSecsSinceEpoch(int64_t seconds);
 /// Returns formatted string representing the time.
 MBASE_PUBLIC QString toString(
     const QDateTime &datetime, uint format = MythDate::kDateTimeFull);
