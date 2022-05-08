@@ -134,7 +134,7 @@ void FirewireRecorder::AddData(const unsigned char *data, uint len)
     while (sync_at + TSPacket::kSize < bufsz)
     {
         ProcessTSPacket(*(reinterpret_cast<const TSPacket*>(
-                              &m_buffer[0] + sync_at)));
+                              (m_buffer).data() + sync_at)));
 
         sync_at += TSPacket::kSize;
     }

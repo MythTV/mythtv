@@ -138,7 +138,7 @@ int FileTransfer::RequestBlock(int size)
         m_readsUnlockedCond.wait(&m_lock, 100 /*ms*/);
 
     m_requestBuffer.resize(std::max((size_t)std::max(size,0) + 128, m_requestBuffer.size()));
-    char *buf = &m_requestBuffer[0];
+    char *buf = (m_requestBuffer).data();
     while (tot < size && !m_rbuffer->GetStopReads() && m_readthreadlive)
     {
         int request = size - tot;
@@ -176,7 +176,7 @@ int FileTransfer::WriteBlock(int size)
     QMutexLocker locker(&m_lock);
 
     m_requestBuffer.resize(std::max((size_t)std::max(size,0) + 128, m_requestBuffer.size()));
-    char *buf = &m_requestBuffer[0];
+    char *buf = (m_requestBuffer).data();
     int attempts = 0;
 
     while (tot < size)

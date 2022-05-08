@@ -475,7 +475,7 @@ void ThreadedFileWriter::DiskLoop(void)
 
         //////////////////////////////////////////
 
-        const void *data = &(buf->data[0]);
+        const void *data = (buf->data).data();
         uint sz = buf->data.size();
 
         bool write_ok = true;

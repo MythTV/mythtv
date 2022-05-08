@@ -36,7 +36,7 @@
 // checking with c++17 arrays.
 #define WPOS (&m_audioBuffer[org_waud])
 #define RPOS (&m_audioBuffer[m_raud])
-#define ABUF (&m_audioBuffer[0])
+#define ABUF (m_audioBuffer.data())
 #define STST soundtouch::SAMPLETYPE
 #define AOALIGN(x) (((long)&(x) + 15) & ~0xf);
 

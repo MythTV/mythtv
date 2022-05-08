@@ -191,7 +191,7 @@ private:
     // handle the output buffering for overlapped calls of block_decode
     void add_output(InputBufs input1, InputBufs input2, float center_width, float dimension, float adaption_rate, bool /*result*/=false) {
         // add the windowed data to the last 1/2 of the output buffer
-        OutputBufs out {&m_outbuf[0][0],&m_outbuf[1][0],&m_outbuf[2][0],&m_outbuf[3][0],&m_outbuf[4][0],&m_outbuf[5][0]};
+        OutputBufs out {m_outbuf[0].data(),m_outbuf[1].data(),m_outbuf[2].data(),m_outbuf[3].data(),m_outbuf[4].data(),m_outbuf[5].data()};
         block_decode(input1,input2,out,center_width,dimension,adaption_rate);
     }
 
@@ -329,12 +329,12 @@ private:
         }
 
         // 4. distribute the unfiltered reference signals over the channels
-        apply_filter(&m_frontL[0], &m_filter[0][0],&output[0][0]);  // front left
-        apply_filter(&m_avg[0],    &m_filter[1][0],&output[1][0]);  // front center
-        apply_filter(&m_frontR[0], &m_filter[2][0],&output[2][0]);  // front right
-        apply_filter(&m_surL[0],   &m_filter[3][0],&output[3][0]);  // surround left
-        apply_filter(&m_surR[0],   &m_filter[4][0],&output[4][0]);  // surround right
-        apply_filter(&m_trueavg[0],&m_filter[5][0],&output[5][0]);  // lfe
+        apply_filter((m_frontL).data(), m_filter[0].data(),&output[0][0]);  // front left
+        apply_filter((m_avg).data(),    m_filter[1].data(),&output[1][0]);  // front center
+        apply_filter((m_frontR).data(), m_filter[2].data(),&output[2][0]);  // front right
+        apply_filter((m_surL).data(),   m_filter[3].data(),&output[3][0]);  // surround left
+        apply_filter((m_surR).data(),   m_filter[4].data(),&output[4][0]);  // surround right
+        apply_filter((m_trueavg).data(),m_filter[5].data(),&output[5][0]);  // lfe
     }
 
 #define FASTER_CALC

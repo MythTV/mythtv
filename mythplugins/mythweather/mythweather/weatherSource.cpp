@@ -116,7 +116,7 @@ bool WeatherSource::ProbeTimeouts(const QString&  workingDirectory,
     }
 
     std::array<bool,2> isOK {};
-    uint ut = temp[0].toUInt(&isOK[0]);
+    uint ut = temp[0].toUInt(isOK.data());
     uint st = temp[1].toUInt(&isOK[1]);
     if (!isOK[0] || !isOK[1])
     {

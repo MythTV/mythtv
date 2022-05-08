@@ -167,7 +167,7 @@ QString Jitterometer::GetCPUStat(void)
             if (sscanf(line.constData(),
                        "cpu%30d %30llu %30llu %30llu %30llu %30llu "
                        "%30llu %30llu %30llu %30llu %*5000s\n",
-                       &num, &stats[0], &stats[1], &stats[2], &stats[3],
+                       &num, stats.data(), &stats[1], &stats[2], &stats[3],
                        &stats[4], &stats[5], &stats[6], &stats[7], &stats[8]) >= 4)
             {
                 float load  = stats[0] + stats[1] + stats[2] + stats[4] +

@@ -311,7 +311,7 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket, bool insert)
         if (!m_payloadBuffer.empty())
         {
             if (m_ringBuffer)
-                m_ringBuffer->Write(&m_payloadBuffer[0], m_payloadBuffer.size());
+                m_ringBuffer->Write((m_payloadBuffer).data(), m_payloadBuffer.size());
             m_payloadBuffer.clear();
         }
     }
@@ -1222,7 +1222,7 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
                 if (m_ringBuffer)
                 {
                     m_ringBuffer->Write(
-                        &m_payloadBuffer[0], m_payloadBuffer.size());
+                        (m_payloadBuffer).data(), m_payloadBuffer.size());
                 }
                 m_payloadBuffer.clear();
             }
@@ -1571,7 +1571,7 @@ bool DTVRecorder::ProcessVideoTSPacket(const TSPacket &tspacket)
         {
             // Flush the buffer
             if (m_ringBuffer)
-                m_ringBuffer->Write(&m_payloadBuffer[0], m_payloadBuffer.size());
+                m_ringBuffer->Write((m_payloadBuffer).data(), m_payloadBuffer.size());
             m_payloadBuffer.clear();
         }
 
@@ -1603,7 +1603,7 @@ bool DTVRecorder::ProcessAudioTSPacket(const TSPacket &tspacket)
         {
             // Flush the buffer
             if (m_ringBuffer)
-                m_ringBuffer->Write(&m_payloadBuffer[0], m_payloadBuffer.size());
+                m_ringBuffer->Write((m_payloadBuffer).data(), m_payloadBuffer.size());
             m_payloadBuffer.clear();
         }
 

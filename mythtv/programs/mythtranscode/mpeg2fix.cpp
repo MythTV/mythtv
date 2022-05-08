@@ -1946,7 +1946,7 @@ void MPEG2fixup::AddRangeList(const QStringList& rangelist, int type)
 
         std::array<bool,2> ok { false, false };
 
-        long long start = tmp[0].toLongLong(&ok[0]);
+        long long start = tmp[0].toLongLong(ok.data());
         long long end   = tmp[1].toLongLong(&ok[1]);
     
         if (ok[0] && ok[1])
