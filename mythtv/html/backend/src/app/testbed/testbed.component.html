@@ -58,6 +58,18 @@
             </ng-template>
         </p-accordionTab>
     </ng-container>
+
+    <ng-container *ngIf="(m_categoryList$ | async) as categoryList; else loading">
+        <p-accordionTab header="Category List">
+            <ng-template pTemplate="content">
+                <ul>
+                    <ng-container *ngFor="let category of categoryList.CategoryList">
+                        <li>{{category}}</li>
+                    </ng-container>
+                </ul>
+            </ng-template>
+        </p-accordionTab>
+    </ng-container>
 </p-accordion>
 
 <div *ngIf="(m_iconUrl$ | async)?.urls as url; else loading">
