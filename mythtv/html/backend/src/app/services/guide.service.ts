@@ -3,7 +3,17 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { ProgramGuide } from './interfaces/programguide.interface';
-import { GetProgramGuideRequest } from './interfaces/guide.interface';
+import {
+  ChannelGroupRequest,
+  GetCategoryListResponse,
+  GetChannelIconRequest,
+  GetProgramDetailsRequest,
+  GetProgramGuideRequest,
+  GetProgramListRequest,
+  GetStoredSearchesResponse } from './interfaces/guide.interface';
+import { BoolResponse } from './interfaces/common.interface';
+import { ChannelGroupList } from './interfaces/channelgroup.interface';
+import { ProgramList, ScheduleOrProgram } from './interfaces/program.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +46,35 @@ export class GuideService {
     this.startDate = new Date;
   }
 
+  public AddToChannelGroup(request : ChannelGroupRequest) : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Guide/AddToChannelGroup', request);
+  }
+
+  public GetCategoryList() : Observable<GetCategoryListResponse> {
+    return this.httpClient.get<GetCategoryListResponse>('/Guide/GetCategoryList');
+  }
+
+  public GetChannelGroupList(IncludeEmpty : boolean) : Observable<ChannelGroupList> {
+    let params = new HttpParams()
+      .set("IncludeEmpty", IncludeEmpty);
+    return this.httpClient.get<ChannelGroupList>('/Guide/GetChannelGroupList', {params});
+  }
+
+  public GetChannelIcon(request : GetChannelIconRequest) : Observable<string> {
+    let params = new HttpParams()
+      .set("ChanId", request.ChanId)
+      .set("Width", request.Width)
+      .set("Height", request.Height)
+    return this.httpClient.get<string>('/Guide/GetChannelIcon', {params});
+  }
+
+  public GetProgramDetails(request : GetProgramDetailsRequest) : Observable<ScheduleOrProgram> {
+    let params = new HttpParams()
+      .set("ChanId", request.ChanId)
+      .set("StartTime", request.StartTime);
+    return this.httpClient.get<ScheduleOrProgram>('/Guide/GetProgramDetails', {params});
+  }
+
   public GetProgramGuide(reqDate?: Date) : Observable<ProgramGuide> {
     if (typeof reqDate !== 'undefined') {
       this.startDate = reqDate;
@@ -47,5 +86,37 @@ export class GuideService {
       "Details": "true",
     };
     return this.httpClient.post<ProgramGuide>('/Guide/GetProgramGuide', params);
+  }
+
+  public GetProgramList(request : GetProgramListRequest) : Observable<ProgramList> {
+    let params = new HttpParams()
+      .set("StartIndex", request.StartIndex)
+      .set("Count", request.Count)
+      .set("StartTime", request.StartTime)
+      .set("EndTime", request.EndTime)
+      .set("ChanId", request.ChanId);
+    if (typeof request.Descending !== 'undefined')
+      params = params.set("Descending", request.Descending);
+    if (typeof request.Details !== 'undefined')
+      params = params.set("Details", request.Details);
+    if (typeof request.KeywordFilter !== 'undefined')
+      params = params.set("KeywordFilter", request.KeywordFilter);
+    if (typeof request.OnlyNew !== 'undefined')
+      params = params.set("OnlyNew", request.OnlyNew);
+    if (typeof request.PersonFilter !== 'undefined')
+      params = params.set("PersonFilter", request.PersonFilter);
+    if (typeof request.Sort !== 'undefined')
+      params = params.set("Sort", request.Sort);
+    return this.httpClient.get<ProgramList>('/Guide/GetProgramList', {params});
+  }
+
+  public GetStoredSearches(searchType : string) : Observable<GetStoredSearchesResponse> {
+    let params = new HttpParams()
+      .set("Type", searchType);
+    return this.httpClient.get<GetStoredSearchesResponse>('/Guide/GetStoredSearches', {params});
+  }
+
+  public RemoveFromChannelGroup(request : ChannelGroupRequest) : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Guide/RemoveFromChannelGroup', request);
   }
 }
