@@ -4131,7 +4131,7 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint TrackNo)
 
     int av_index = m_tracks[type][TrackNo].m_av_stream_index;
     AVStream *stream { nullptr };
-    if (av_index >= 0 && av_index < m_ic->nb_streams)
+    if (av_index >= 0 && av_index < (int)m_ic->nb_streams)
         stream = m_ic->streams[av_index];
     AVDictionaryEntry *entry =
         stream ? av_dict_get(stream->metadata, "title", NULL, 0) : nullptr;
