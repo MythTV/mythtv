@@ -1248,20 +1248,20 @@ static bool is_dishnet_eit(uint inputid)
     return false;
 }
 
-// Number of capturecard instances including multirec instances
-static int num_inputs(void)
+// Highest capturecard instance number including multirec instances
+static int get_highest_input(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
     QString str =
-        "SELECT COUNT(cardid) "
+        "SELECT MAX(cardid) "
         "FROM capturecard ";
 
     query.prepare(str);
 
     if (!query.exec() || !query.isActive())
     {
-        MythDB::DBError("num_inputs", query);
+        MythDB::DBError("highest_input", query);
         return -1;
     }
     if (query.next())
@@ -1278,11 +1278,11 @@ static std::chrono::seconds eit_start_rand(uint inputId, std::chrono::seconds ei
     auto timeout = std::chrono::seconds(MythRandom(0, eitTransportTimeout.count() / 3));
 #endif
 
-    // Get the number of inputs and the position of the current input
+    // Use the highest input number and the current input number
     // to distribute the scan start evenly over eitTransportTimeout
-    int no_inputs = num_inputs();
-    if (no_inputs > 0)
-        timeout += eitTransportTimeout * inputId / no_inputs;
+    int highest_input = get_highest_input();
+    if (highest_input > 0)
+        timeout += eitTransportTimeout * inputId / highest_input;
 
     return timeout;
 }
