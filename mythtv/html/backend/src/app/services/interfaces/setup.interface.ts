@@ -18,6 +18,18 @@ export interface Locale {
     FreqTable:      string;
 }
 
+export interface Miscellaneous {
+    MasterBackendOverride:  boolean;
+    DeletesFollowLinks:  boolean;
+    TruncateDeletesSlowly:  boolean;
+    HDRingbufferSize: number;
+    StorageScheduler: string;
+    UPNPWmpSource: string;
+    MiscStatusScript: string;
+    DisableAutomaticBackup: boolean;
+    DisableFirewireReset: boolean;
+}
+
 export interface Setup {
     General: {
         HostAddress: HostAddress;

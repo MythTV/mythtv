@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { subscribeOn, tap } from 'rxjs/operators';
-import { Setup } from './interfaces/setup.interface';
+import { Setup, Miscellaneous } from './interfaces/setup.interface';
 import { MythService } from './myth.service';
 
 @Injectable({
@@ -29,10 +29,13 @@ export class SetupService {
                 TVFormat: 'PAL',
                 VbiFormat: 'None',
                 FreqTable: 'us-bcast'
-            }
+            },
         }
     }
 
+
+    // TODO: Move the initialization to a called function so you don't have to initialize these
+    // if you are not using the Host Address Backend Setup or Locale tab
     constructor(private mythService: MythService) {
         this.mythService.GetHostName().subscribe(data => {
             this.m_hostName = data.String;
@@ -60,6 +63,40 @@ export class SetupService {
 
     getSetupData(): Setup {
         return this.m_setupData;
+    }
+
+    m_miscellaneousData: Miscellaneous = {
+        MasterBackendOverride:  false,
+        DeletesFollowLinks:     false,
+        TruncateDeletesSlowly:  false,
+        HDRingbufferSize:       9400,
+        StorageScheduler:       "BalancedFreeSpace",
+        UPNPWmpSource:          "0",
+        MiscStatusScript:       "",
+        DisableAutomaticBackup: false,
+        DisableFirewireReset:   false,
+    }
+
+    getMiscellaneousData () : Miscellaneous  {
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "MasterBackendOverride" })
+            .subscribe(data => this.m_miscellaneousData.MasterBackendOverride = (data.String == "1"));
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "DeletesFollowLinks" })
+            .subscribe(data => this.m_miscellaneousData.DeletesFollowLinks = (data.String == "1"));
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "TruncateDeletesSlowly" })
+            .subscribe(data => this.m_miscellaneousData.TruncateDeletesSlowly = (data.String == "1"));
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "HDRingbufferSize" })
+            .subscribe(data => this.m_miscellaneousData.HDRingbufferSize = Number(data.String));
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "StorageScheduler" })
+            .subscribe(data => this.m_miscellaneousData.StorageScheduler = data.String);
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "UPNPWmpSource" })
+            .subscribe(data => this.m_miscellaneousData.UPNPWmpSource = data.String);
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "MiscStatusScript" })
+            .subscribe(data => this.m_miscellaneousData.MiscStatusScript = data.String);
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "DisableAutomaticBackup" })
+            .subscribe(data => this.m_miscellaneousData.DisableAutomaticBackup = (data.String == "1"));
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "DisableFirewireReset" })
+            .subscribe(data => this.m_miscellaneousData.DisableFirewireReset = (data.String == "1"));
+            return this.m_miscellaneousData;
     }
 
     saveHostAddressSettings() {

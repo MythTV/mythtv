@@ -1,1 +1,140 @@
-<p>misc-settings works!</p>
+<form class="ml-3 mr-3" name="hostaddress" #hostaddress="ngForm" (ngSubmit)="saveForm()">
+    <p-card class="m-5">
+        <ng-template pTemplate="title">
+            Miscellaneous Settings
+        </ng-template>
+        <ng-template pTemplate="subtitle">
+            General Backend Settings
+        </ng-template>
+        <ng-template pTemplate="content">
+            <div class="grid">
+
+                <!-- File Management Panel -->
+                <p-fieldset class="mb-4 w-full" legend="File Management" [toggleable]="true" [collapsed]="true">
+
+                    <div class="form-group field">
+                        <p-checkbox inputId="MasterBackendOverride" [(ngModel)]="miscData.MasterBackendOverride"
+                            name="MasterBackendOverride" #MasterBackendOverride="ngModel" class="mb-2 w-full" [binary]="true"
+                            label="Master Backend Override">
+                        </p-checkbox>
+                        <small class="block">If enabled, the master backend will stream and
+                            delete files if it finds them in a storage directory.
+                           Useful if you are using a central storage location, like
+                           a NFS share, and your slave backend isn't running.</small>
+                    </div>
+
+                    <div class="form-group field">
+                        <p-checkbox inputId="DeletesFollowLinks" [(ngModel)]="miscData.DeletesFollowLinks"
+                            name="DeletesFollowLinks" #DeletesFollowLinks="ngModel" class="mb-2 w-full" [binary]="true"
+                            label="Follow Symbolic Links When Deleting Files">
+                        </p-checkbox>
+                        <small class="block">If enabled, MythTV will follow symlinks
+                            when recordings and related files are deleted, instead
+                            of deleting the symlink and leaving the actual file.</small>
+                    </div>
+
+                    <div class="form-group field">
+                        <p-checkbox inputId="TruncateDeletesSlowly" [(ngModel)]="miscData.TruncateDeletesSlowly"
+                            name="TruncateDeletesSlowly" #TruncateDeletesSlowly="ngModel" class="mb-2 w-full" [binary]="true"
+                            label="Delete Files Slowly">
+                        </p-checkbox>
+                        <small class="block">Some filesystems use a lot of resources when
+                            deleting large files. If enabled, this option makes
+                            MythTV delete files slowly on this backend to lessen the
+                            impact.</small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="HDRingbufferSize" class="block" >HD Ringbuffer Size (kB)</label>
+                        <p-inputNumber [(ngModel)]="miscData.HDRingbufferSize" name="HDRingbufferSize" id="HDRingbufferSize" [showButtons]="true"
+                            [min]="4700" [max]="94000" [step]="4700"></p-inputNumber>
+                        <small class="block">The HD device ringbuffer allows the
+                            backend to weather moments of stress.
+                            The larger the ringbuffer (in kilobytes), the longer
+                            the moments of stress can be. However,
+                            setting the size too large can cause
+                            swapping, which is detrimental.</small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="StorageScheduler" class="block">Storage Group Disk Scheduler</label>
+                        <p-dropdown [options]="soptions " [(ngModel)]="miscData.StorageScheduler"  optionLabel="name"  optionValue="code"
+                            class="block w-15rem mb-2"
+                            name="StorageScheduler" #StorageScheduler="ngModel"   >
+                        </p-dropdown>
+                        <small class="block" >
+                            This setting controls how the Storage Group
+                            scheduling code will balance new recordings across
+                            directories. 'Balanced Free Space' is the recommended
+                            method for most users.
+                        </small>
+                    </div>
+                </p-fieldset>
+
+                <!-- UPnP Section -->
+                <p-fieldset class="mb-4 w-full" legend="UPnP Server" [toggleable]="true" [collapsed]="true">
+                    <div class="form-group field">
+                        <label for="UPNPWmpSource" class="block">Video content to show a WMP client</label>
+                        <p-dropdown [options]="uoptions" [(ngModel)]="miscData.UPNPWmpSource"  optionLabel="name"  optionValue="code"
+                            class="block w-15rem mb-2"
+                            name="UPNPWmpSource" #UPNPWmpSource="ngModel" >
+                        </p-dropdown>
+                        <small class="block" >
+                            Which tree to show a Windows Media Player
+                            client when it requests a list of videos.
+                        </small>
+                    </div>
+                </p-fieldset>
+
+                <div class="form-group field">
+                    <label for="MiscStatusScript" class="block">Miscellaneous Status Application</label>
+                    <input pInputText id="MiscStatusScript"
+                        [(ngModel)]="miscData.MiscStatusScript" name="MiscStatusScript"
+                        #MiscStatusScript="ngModel" class="mb-2 form-control w-full" />
+                    <small class="block" id="backendserverport-help">
+                        External application or script that outputs
+                                extra information for inclusion in the
+                                backend status page. See
+                                <a href="http://www.mythtv.org/wiki/Miscellaneous_Status_Information">
+                                    Miscellaneous Status Information
+                                </a> in the wiki.
+                    </small>
+                </div>
+
+                <div class="form-group field">
+                    <p-checkbox inputId="DisableAutomaticBackup" [(ngModel)]="miscData.DisableAutomaticBackup"
+                        name="DisableAutomaticBackup" #DisableAutomaticBackup="ngModel" class="mb-2 w-full" [binary]="true"
+                        label="Disable automatic database backup">
+                    </p-checkbox>
+                    <small class="block">
+                        If enabled, MythTV will not backup the
+                        database before upgrades. You should
+                        therefore have your own database backup
+                        strategy in place.
+                    </small>
+                </div>
+
+                <div class="form-group field">
+                    <p-checkbox inputId="DisableFirewireReset" [(ngModel)]="miscData.DisableFirewireReset"
+                        name="DisableFirewireReset" #DisableFirewireReset="ngModel" class="mb-2 w-full" [binary]="true"
+                        label="Disable FireWire reset">
+                    </p-checkbox>
+                    <small class="block">
+                        By default, MythTV resets the FireWire bus when a
+                        FireWire recorder stops responding to commands. If
+                        this causes problems, you can disable this behavior
+                        here.
+                    </small>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+            <div class="p-grid p-nogutter p-justify-end">
+                <p-button class="pr-1" label="Save" icon="pi pi-save" iconPos="left"></p-button>
+                <p-button class="help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()"
+                    icon="pi pi-info-circle" styleClass="p-button-info"></p-button>
+            </div>
+        </ng-template>
+    </p-card>
+</form>
