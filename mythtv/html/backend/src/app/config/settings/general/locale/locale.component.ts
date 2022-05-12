@@ -17,7 +17,7 @@ export class LocaleComponent implements OnInit {
     // from frequencies.cpp line 2215
     m_FreqTables: string[];
 
-    // from 
+    // from
     m_TVFormats: string[];
 
     constructor(private setupService: SetupService) {
@@ -80,7 +80,6 @@ export class LocaleComponent implements OnInit {
     }
 
     saveForm() {
-        console.log("save form clicked");
         this.setupService.saveLocaleSettings();
     }
 }

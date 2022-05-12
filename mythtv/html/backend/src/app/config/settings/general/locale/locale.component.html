@@ -40,7 +40,9 @@
 
         <ng-template pTemplate="footer">
             <div class="p-grid p-nogutter p-justify-end">
-                <p-button class="pr-1" label="Save"  icon="pi pi-save" iconPos="left" (onClick)="saveForm()"></p-button>
+                <p-button class="pr-1" label="Save"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); locale.form.markAsPristine()"
+                                 [disabled]="(!locale.dirty || false)">
+                </p-button>
                 <p-button class="help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()" icon="pi pi-info-circle" styleClass="p-button-info" ></p-button>
             </div>
         </ng-template>
