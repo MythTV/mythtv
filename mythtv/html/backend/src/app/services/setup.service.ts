@@ -96,6 +96,7 @@ export class SetupService {
             .subscribe(data => this.m_miscellaneousData.DisableAutomaticBackup = (data.String == "1"));
         this.mythService.GetSetting({ HostName: this.m_hostName, Key: "DisableFirewireReset" })
             .subscribe(data => this.m_miscellaneousData.DisableFirewireReset = (data.String == "1"));
+
             return this.m_miscellaneousData;
     }
 
@@ -118,5 +119,26 @@ export class SetupService {
         this.mythService.PutSetting({ HostName: "_GLOBAL_", Key: "TVFormat", Value: this.m_setupData.General.Locale.TVFormat }).subscribe(result => { console.log("TVFormat: ", result.bool); });
         this.mythService.PutSetting({ HostName: "_GLOBAL_", Key: "VbiFormat", Value: this.m_setupData.General.Locale.VbiFormat }).subscribe(result => { console.log("VBIFormat: ", result.bool); });
         this.mythService.PutSetting({ HostName: "_GLOBAL_", Key: "FreqTable", Value: this.m_setupData.General.Locale.FreqTable }).subscribe(result => { console.log("FreqTable: ", result.bool); });
+    }
+
+    saveMiscellaneousSettings() {
+        this.mythService.PutSetting({ HostName: '_GLOBAL_', Key: "MasterBackendOverride",
+            Value: this.m_miscellaneousData.MasterBackendOverride ? "1" : "0"}).subscribe();
+        this.mythService.PutSetting({ HostName: '_GLOBAL_', Key: "DeletesFollowLinks",
+            Value: this.m_miscellaneousData.DeletesFollowLinks ? "1" : "0"}).subscribe();
+        this.mythService.PutSetting({ HostName: this.m_hostName, Key: "TruncateDeletesSlowly",
+            Value: this.m_miscellaneousData.TruncateDeletesSlowly ? "1" : "0"}).subscribe();
+        this.mythService.PutSetting({ HostName: '_GLOBAL_', Key: "HDRingbufferSize",
+            Value: String(this.m_miscellaneousData.HDRingbufferSize)}).subscribe();
+        this.mythService.PutSetting({ HostName: '_GLOBAL_', Key: "StorageScheduler",
+            Value: this.m_miscellaneousData.StorageScheduler}).subscribe();
+        this.mythService.PutSetting({ HostName: '_GLOBAL_', Key: "UPNPWmpSource",
+            Value: this.m_miscellaneousData.UPNPWmpSource}).subscribe();
+        this.mythService.PutSetting({ HostName: this.m_hostName, Key: "MiscStatusScript",
+            Value: this.m_miscellaneousData.MiscStatusScript}).subscribe();
+        this.mythService.PutSetting({ HostName: '_GLOBAL_', Key: "DisableAutomaticBackup",
+            Value: this.m_miscellaneousData.DisableAutomaticBackup ? "1" : "0"}).subscribe();
+        this.mythService.PutSetting({ HostName: this.m_hostName, Key: "DisableFirewireReset",
+            Value: this.m_miscellaneousData.DisableFirewireReset ? "1" : "0"}).subscribe();
     }
 }

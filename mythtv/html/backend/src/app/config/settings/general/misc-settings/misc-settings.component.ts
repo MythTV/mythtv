@@ -39,13 +39,13 @@ export class MiscSettingsComponent implements OnInit {
   ngOnInit(): void {
   }
 
-showHelp() {
-    console.log("show help clicked");
-    console.log(this);
-}
+  showHelp() {
+      console.log("show help clicked");
+      console.log(this);
+  }
 
-saveForm() {
-    console.log("save form clicked");
-}
-
+  saveForm() {
+      console.log("save form clicked");
+      this.setupService.saveMiscellaneousSettings();
+  }
 }
