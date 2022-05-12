@@ -550,9 +550,9 @@ class DBDataRef( list ):
         if data is None:
             with self._db as cursor:
                 cursor.execute("""SELECT %s FROM %s WHERE %s""" % \
-                            (','.join(self._datfields),
+                            (','.join(['`%s`' %x for x in self._datfields]),
                              self._table,
-                             ' AND '.join(['%s=?' % f for f in self._ref])),
+                             ' AND '.join(['`%s`=?' % f for f in self._ref])),
                          self._refdat)
                 for row in cursor:
                     list.append(self, self.SubData(zip(self._datfields, row)))
@@ -607,9 +607,9 @@ class DBDataRef( list ):
                 wf = []
                 for i,v in enumerate(data):
                     if v is None:
-                        wf.append('%s IS ?' % fields[i])
+                        wf.append('`%s` IS ?' % fields[i])
                     else:
-                        wf.append('%s=?' % fields[i])
+                        wf.append('`%s`=?' % fields[i])
                 cursor.execute("""DELETE FROM %s WHERE %s""" % \
                                    (self._table, ' AND '.join(wf)), data)
 
@@ -621,7 +621,7 @@ class DBDataRef( list ):
             if len(data) > 0:
                 cursor.executemany("""INSERT INTO %s (%s) VALUES(%s)""" % \
                                     (self._table,
-                                     ','.join(fields),
+                                     ','.join(['`%s`' %x for x in fields]),
                                      ','.join(['?' for a in fields])), data)
         self._origdata = self.deepcopy()
 
@@ -705,18 +705,18 @@ class DBDataCRef( DBDataRef ):
         if self._populated and (not force):
             return
         datfields = self._datfields
-        reffield = '%s.%s' % (self._table[1],self._cref[-1])
+        reffield = '`%s`.`%s`' % (self._table[1],self._cref[-1])
 
         if data is None:
             with self._db as cursor:
                 cursor.execute("""SELECT %s FROM %s JOIN %s ON %s WHERE %s""" % \
-                          (','.join(datfields+[reffield]),
+                          (','.join(['`%s`' %x for x in datfields]+[reffield]),
                              self._table[0],
                              self._table[1],
-                             '%s.%s=%s.%s' % \
+                             '`%s`.`%s`=`%s`.`%s`' % \
                                     (self._table[0], self._cref[0],
                                      self._table[1], self._cref[-1]),
-                             ' AND '.join(['%s=?' % f for f in self._ref])),
+                             ' AND '.join(['`%s`=?' % f for f in self._ref])),
                         self._refdat)
 
                 for row in cursor:
@@ -748,7 +748,7 @@ class DBDataCRef( DBDataRef ):
                 fields = self._crdatfields
                 cursor.execute("""SELECT %s FROM %s WHERE %s""" % \
                             (self._cref[-1], self._table[1],
-                             ' AND '.join(['%s=?' % f for f in fields])),
+                             ' AND '.join(['`%s`=?' % f for f in fields])),
                         data)
                 res = cursor.fetchone()
                 if res is not None:
@@ -758,7 +758,7 @@ class DBDataCRef( DBDataRef ):
                 else:
                     cursor.execute("""INSERT INTO %s (%s) VALUES(%s)""" % \
                             (self._table[1],
-                             ','.join(self._crdatfields),
+                             ','.join(['`%s`' %x for x in self._crdatfields]),
                              ','.join(['?' for a in data])),
                         data)
                     d._cref = cursor.lastrowid
@@ -768,7 +768,7 @@ class DBDataCRef( DBDataRef ):
                 fields = self._rdatfields+self._cref[:1]+self._ref
                 cursor.execute("""INSERT INTO %s (%s) VALUES(%s)""" % \
                         (self._table[0],
-                         ','.join(fields),
+                         ','.join(['`%s`' %x for x in fields]),
                          ','.join(['?' for a in data])),
                     data)
 
@@ -780,14 +780,14 @@ class DBDataCRef( DBDataRef ):
                 fields = self._rdatfields+self._cref[:1]+self._ref
                 cursor.execute("""DELETE FROM %s WHERE %s""" % \
                         (self._table[0],
-                         ' AND '.join(['%s=?' % f for f in fields])),
+                         ' AND '.join(['`%s`=?' % f for f in fields])),
                     data)
             # remove unused cross-references
             for cr in crefs:
-                cursor.execute("""SELECT COUNT(1) FROM %s WHERE %s=?""" % \
+                cursor.execute("""SELECT COUNT(1) FROM %s WHERE `%s`=?""" % \
                         (self._table[0], self._cref[0]), [cr])
                 if cursor.fetchone()[0] == 0:
-                    cursor.execute("""DELETE FROM %s WHERE %s=?""" % \
+                    cursor.execute("""DELETE FROM %s WHERE `%s`=?""" % \
                             (self._table[1], self._cref[-1]), [cr])
                 cursor.nextset()
 
