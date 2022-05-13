@@ -21,20 +21,19 @@ export class BackendnetworkComponent implements OnInit {
     constructor(private router: Router,
                 private configService: ConfigService,
                 private setupService: SetupService) {
-        configService.GetIPAddresses("All").subscribe(result => this.m_IPsAll = result.IPAddresses);
-        configService.GetIPAddresses("IPv4").subscribe(result => this.m_IPsV4 = result.IPAddresses);
-        configService.GetIPAddresses("IPv6").subscribe(result => this.m_IPsV6 = result.IPAddresses);
     }
 
     ngOnInit(): void {
         this.m_setupData = this.setupService.getSetupData();
+        this.configService.GetIPAddresses("All").subscribe(result => this.m_IPsAll = result.IPAddresses);
+        this.configService.GetIPAddresses("IPv4").subscribe(result => this.m_IPsV4 = result.IPAddresses);
+        this.configService.GetIPAddresses("IPv6").subscribe(result => this.m_IPsV6 = result.IPAddresses);
     }
 
     previousPage() {
         this.router.navigate(['settings/dbsetup']);
         return;
     }
-
 
     nextPage() {
         this.router.navigate(['settings/sgsetup']);
