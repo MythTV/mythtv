@@ -100,41 +100,50 @@
                                 </a> in the wiki.
                     </small>
                 </div>
+                <div class="mb-4 w-full">
+                    <div class="form-group field">
+                        <p-checkbox inputId="DisableAutomaticBackup" [(ngModel)]="miscData.DisableAutomaticBackup"
+                            name="DisableAutomaticBackup" #DisableAutomaticBackup="ngModel" class="mb-2 w-full" [binary]="true"
+                            label="Disable automatic database backup">
+                        </p-checkbox>
+                        <small class="block">
+                            If enabled, MythTV will not backup the
+                            database before upgrades. You should
+                            therefore have your own database backup
+                            strategy in place.
+                        </small>
+                    </div>
 
-                <div class="form-group field">
-                    <p-checkbox inputId="DisableAutomaticBackup" [(ngModel)]="miscData.DisableAutomaticBackup"
-                        name="DisableAutomaticBackup" #DisableAutomaticBackup="ngModel" class="mb-2 w-full" [binary]="true"
-                        label="Disable automatic database backup">
-                    </p-checkbox>
-                    <small class="block">
-                        If enabled, MythTV will not backup the
-                        database before upgrades. You should
-                        therefore have your own database backup
-                        strategy in place.
-                    </small>
-                </div>
-
-                <div class="form-group field">
-                    <p-checkbox inputId="DisableFirewireReset" [(ngModel)]="miscData.DisableFirewireReset"
-                        name="DisableFirewireReset" #DisableFirewireReset="ngModel" class="mb-2 w-full" [binary]="true"
-                        label="Disable FireWire reset">
-                    </p-checkbox>
-                    <small class="block">
-                        By default, MythTV resets the FireWire bus when a
-                        FireWire recorder stops responding to commands. If
-                        this causes problems, you can disable this behavior
-                        here.
-                    </small>
+                    <div class="form-group field">
+                        <p-checkbox inputId="DisableFirewireReset" [(ngModel)]="miscData.DisableFirewireReset"
+                            name="DisableFirewireReset" #DisableFirewireReset="ngModel" class="mb-2 w-full" [binary]="true"
+                            label="Disable FireWire reset">
+                        </p-checkbox>
+                        <small class="block">
+                            By default, MythTV resets the FireWire bus when a
+                            FireWire recorder stops responding to commands. If
+                            this causes problems, you can disable this behavior
+                            here.
+                        </small>
+                    </div>
                 </div>
             </div>
         </ng-template>
 
         <ng-template pTemplate="footer">
-            <div class="p-grid p-nogutter p-justify-end">
-                <p-button class="pr-1" label="Save"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); hostaddress.form.markAsPristine()"
+            <div class="grid nogutter">
+                <p-button class="col-1 pr-1" label="Save"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); hostaddress.form.markAsPristine()"
                                  [disabled]="(!hostaddress.dirty || false)">
                 </p-button>
-                <p-button class="help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()"
+                <div *ngIf="this.miscData.successCount > 0 && this.miscData.errorCount == 0" class="col text-5xl text-center">
+                    {{this.miscData.successCount}} items saved successfully.
+                </div>
+                <div *ngIf="this.miscData.errorCount > 0" class="col text-red-600 font-bold  text-5xl text-center">
+                    Save failed
+                </div>
+                <div *ngIf="this.miscData.successCount == 0 && this.miscData.errorCount == 0" class="col text-5xl text-center">
+                </div>
+                <p-button class="col-1 help-button justify-content-end" label="{{'common.help' | translate}}" (onClick)="showHelp()"
                     icon="pi pi-info-circle" styleClass="p-button-info"></p-button>
             </div>
         </ng-template>

@@ -19,15 +19,17 @@ export interface Locale {
 }
 
 export interface Miscellaneous {
+    successCount:           number;
+    errorCount:             number,
     MasterBackendOverride:  boolean;
-    DeletesFollowLinks:  boolean;
+    DeletesFollowLinks:     boolean;
     TruncateDeletesSlowly:  boolean;
-    HDRingbufferSize: number;
-    StorageScheduler: string;
-    UPNPWmpSource: string;
-    MiscStatusScript: string;
+    HDRingbufferSize:       number;
+    StorageScheduler:       string;
+    UPNPWmpSource:          string;
+    MiscStatusScript:       string;
     DisableAutomaticBackup: boolean;
-    DisableFirewireReset: boolean;
+    DisableFirewireReset:   boolean;
 }
 
 export interface Setup {
