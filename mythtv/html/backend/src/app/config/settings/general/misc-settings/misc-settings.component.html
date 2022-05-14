@@ -138,8 +138,10 @@
                 <div *ngIf="this.miscData.successCount > 0 && this.miscData.errorCount == 0" class="col text-5xl text-center">
                     {{this.miscData.successCount}} items saved successfully.
                 </div>
-                <div *ngIf="this.miscData.errorCount > 0" class="col text-red-600 font-bold  text-5xl text-center">
-                    Save failed
+                <!-- NOTE: class text-red-600 does not work here to set red text -->
+                <div *ngIf="this.miscData.errorCount > 0" style="color:red;"
+                        class="col font-bold  text-5xl text-center">
+                    ERROR: Backend Network Failure
                 </div>
                 <div *ngIf="this.miscData.successCount == 0 && this.miscData.errorCount == 0" class="col text-5xl text-center">
                 </div>
