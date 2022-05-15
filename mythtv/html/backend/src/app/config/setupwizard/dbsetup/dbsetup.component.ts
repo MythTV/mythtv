@@ -37,9 +37,9 @@ export class DbsetupComponent implements OnInit {
         private wizardService: SetupWizardService,
         private formBuilder: FormBuilder,
         private messageService: MessageService) { }
-        
+
     ngOnInit(): void {
-        //this.wizardService.initDatabaseStatus();
+        this.wizardService.initDatabaseStatus();
         this.m_wizardData = this.wizardService.getWizardData();
         //
 
@@ -49,7 +49,7 @@ export class DbsetupComponent implements OnInit {
         //     user: [this.m_wizardData.DatabaseStatus.DatabaseStatus.UserName, Validators.required],
         //     password: [this.m_wizardData.DatabaseStatus.DatabaseStatus.Password, Validators.required],
         //     dbname: [this.m_wizardData.DatabaseStatus.DatabaseStatus.Name, Validators.required]
-        // });  
+        // });
     }
 
     previousPage() {
@@ -71,7 +71,7 @@ export class DbsetupComponent implements OnInit {
 
     saveForm() {
         console.log("save form clicked");
-    }   
+    }
 
     testConnection() {
         console.log(this.m_wizardData.Database);
@@ -85,10 +85,10 @@ export class DbsetupComponent implements OnInit {
             (err: HttpErrorResponse) => {
                 // we got an error return code
                 console.log("Failed to set creditals", err.statusText);
-                
+
                 this.m_wizardData.DatabaseStatus.DatabaseStatus.Connected = false;
                 this.m_wizardData.DatabaseStatus.DatabaseStatus.HaveDatabase = false;
-                this.m_wizardData.DatabaseStatus.DatabaseStatus.SchemaVersion = 0;    
+                this.m_wizardData.DatabaseStatus.DatabaseStatus.SchemaVersion = 0;
                 this.messageService.add({severity:'error', life: 5000, summary:'Test Database Connection', detail:'Connection to database failed'});
             }
         );

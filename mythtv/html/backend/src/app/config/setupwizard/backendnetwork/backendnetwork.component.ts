@@ -24,6 +24,7 @@ export class BackendnetworkComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.setupService.Init();
         this.m_setupData = this.setupService.getSetupData();
         this.configService.GetIPAddresses("All").subscribe(result => this.m_IPsAll = result.IPAddresses);
         this.configService.GetIPAddresses("IPv4").subscribe(result => this.m_IPsV4 = result.IPAddresses);
