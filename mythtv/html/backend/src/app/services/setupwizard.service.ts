@@ -12,6 +12,7 @@ import { MythService } from './myth.service';
 })
 export class SetupWizardService implements OnInit {
 
+    m_initialized: boolean = false;
     m_wizardData: WizardData = {
         Country: {
             Code: '', Country:'', NativeCountry: '', Image: ''
@@ -56,11 +57,19 @@ export class SetupWizardService implements OnInit {
 
     ngOnInit(): void {
         console.log("**** SetupWizard ngOnInit called ****");
+        this.Init();
+    }
+
+    Init() : void {
         this.initDatabaseStatus();
         this.initLanguages();
+        this.m_initialized = true;
     }
 
     getWizardData() {
+        if (!this.m_initialized) {
+            this.Init();
+        }
         return this.m_wizardData;
     }
 

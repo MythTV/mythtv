@@ -8,6 +8,7 @@ import { MythService } from './myth.service';
 export class SetupService {
 
     m_hostName: string = ""; // hostname of the backend server
+    m_initialized: boolean = false;
 
     m_setupData: Setup = {
         General: {
@@ -40,6 +41,7 @@ export class SetupService {
 
     Init(): void {
         this.loadSettings();
+        this.m_initialized = true;
     }
 
     loadSettings() {
@@ -63,6 +65,9 @@ export class SetupService {
     }
 
     getSetupData(): Setup {
+        if (!this.m_initialized) {
+            this.Init();
+        }
         return this.m_setupData;
     }
 
