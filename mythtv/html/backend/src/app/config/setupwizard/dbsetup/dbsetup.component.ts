@@ -19,17 +19,6 @@ export class DbsetupComponent implements OnInit {
 
     m_wizardData!: WizardData;
     m_showHelp: boolean = false;
-    
-
-    //databaseSettings: any;
-
-    // databaseSettings = this.formBuilder.group({
-    //     ipaddress: [this.m_wizardData.DatabaseStatus.DatabaseStatus.Host, Validators.required],
-    //     port: [this.m_wizardData.DatabaseStatus.DatabaseStatus.Port, [Validators.required, Validators.min(0), Validators.max(65536)]],
-    //     user: [this.m_wizardData.DatabaseStatus.DatabaseStatus.UserName, Validators.required],
-    //     password: [this.m_wizardData.DatabaseStatus.DatabaseStatus.Password, Validators.required],
-    //     dbname: [this.m_wizardData.DatabaseStatus.DatabaseStatus.Name, Validators.required]
-    // });  
 
     constructor(private router: Router,
         private configService: ConfigService,
@@ -41,27 +30,15 @@ export class DbsetupComponent implements OnInit {
     ngOnInit(): void {
         this.wizardService.initDatabaseStatus();
         this.m_wizardData = this.wizardService.getWizardData();
-        //
-
-        // this.databaseSettings = this.formBuilder.group({
-        //     ipaddress: [this.m_wizardData.DatabaseStatus.DatabaseStatus.Host, Validators.required],
-        //     port: [this.m_wizardData.DatabaseStatus.DatabaseStatus.Port, [Validators.required, Validators.min(0), Validators.max(65536)]],
-        //     user: [this.m_wizardData.DatabaseStatus.DatabaseStatus.UserName, Validators.required],
-        //     password: [this.m_wizardData.DatabaseStatus.DatabaseStatus.Password, Validators.required],
-        //     dbname: [this.m_wizardData.DatabaseStatus.DatabaseStatus.Name, Validators.required]
-        // });
     }
 
     previousPage() {
         this.router.navigate(['settings/selectlanguage']);
-
         return;
     }
 
-
     nextPage() {
         this.router.navigate(['settings/backendnetwork']);
-
         return;
     }
 
