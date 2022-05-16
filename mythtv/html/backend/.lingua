@@ -1,0 +1,128 @@
+{
+  "translationFiles": [
+    {
+      "lang": "en_US",
+      "uri": "../assets/i18n/en_US.json"
+    },
+    {
+      "lang": "en_GB",
+      "uri": "../assets/i18n/en_GB.json"
+    },
+    {
+      "lang": "fi",
+      "uri": "../assets/i18n/fi.json"
+    },
+    {
+      "lang": "bg",
+      "uri": "../assets/i18n/bg.json"
+    },
+    {
+      "lang": "ca",
+      "uri": "../assets/i18n/ca.json"
+    },
+    {
+      "lang": "cd",
+      "uri": "../assets/i18n/cd.json"
+    },
+    {
+      "lang": "da",
+      "uri": "../assets/i18n/da.json"
+    },
+    {
+      "lang": "de",
+      "uri": "../assets/i18n/de.json"
+    },
+    {
+      "lang": "el",
+      "uri": "../assets/i18n/el.json"
+    },
+    {
+      "lang": "en_CA",
+      "uri": "../assets/i18n/en_CA.json"
+    },
+    {
+      "lang": "es_ES",
+      "uri": "../assets/i18n/es_ES.json"
+    },
+    {
+      "lang": "es",
+      "uri": "../assets/i18n/es.json"
+    },
+    {
+      "lang": "et",
+      "uri": "../assets/i18n/et.json"
+    },
+    {
+      "lang": "fr",
+      "uri": "../assets/i18n/fr.json"
+    },
+    {
+      "lang": "he",
+      "uri": "../assets/i18n/he.json"
+    },
+    {
+      "lang": "hr",
+      "uri": "../assets/i18n/hr.json"
+    },
+    {
+      "lang": "hu",
+      "uri": "../assets/i18n/hu.json"
+    },
+    {
+      "lang": "is",
+      "uri": "../assets/i18n/is.json"
+    },
+    {
+      "lang": "it",
+      "uri": "../assets/i18n/it.json"
+    },
+    {
+      "lang": "ja",
+      "uri": "../assets/i18n/ja.json"
+    },
+    {
+      "lang": "nb",
+      "uri": "../assets/i18n/nb.json"
+    },
+    {
+      "lang": "nl",
+      "uri": "../assets/i18n/nl.json"
+    },
+    {
+      "lang": "pl",
+      "uri": "../assets/i18n/pl.json"
+    },
+    {
+      "lang": "pt_BR",
+      "uri": "../assets/i18n/pt_BR.json"
+    },
+    {
+      "lang": "pt",
+      "uri": "../assets/i18n/pt.json"
+    },
+    {
+      "lang": "ru",
+      "uri": "../assets/i18n/ru.json"
+    },
+    {
+      "lang": "sl",
+      "uri": "../assets/i18n/sl.json"
+    },
+    {
+      "lang": "sv",
+      "uri": "../assets/i18n/sv.json"
+    },
+    {
+      "lang": "tr",
+      "uri": "../assets/i18n/tr.json"
+    },
+    {
+      "lang": "zh_CN",
+      "uri": "../assets/i18n/zh_CN.json"
+    },
+    {
+      "lang": "zh_HK",
+      "uri": "../assets/i18n/zh_HK.json"
+    }
+  ]
+}
