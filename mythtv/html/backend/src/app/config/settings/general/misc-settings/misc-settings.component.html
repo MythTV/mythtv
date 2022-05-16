@@ -1,10 +1,10 @@
 <form class="ml-3 mr-3" name="hostaddress" #hostaddress="ngForm" (ngSubmit)="saveForm()">
     <p-card class="m-5">
         <ng-template pTemplate="title">
-            Miscellaneous Settings
+            {{ 'settings.misc.title' | translate }}
         </ng-template>
         <ng-template pTemplate="subtitle">
-            General Backend Settings
+            {{ 'settings.misc.subtitle' | translate }}
         </ng-template>
         <ng-template pTemplate="content">
             <div class="grid">

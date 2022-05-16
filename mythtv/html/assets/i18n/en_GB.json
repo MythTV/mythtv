@@ -150,5 +150,11 @@
     "testbed": {
         "title": "This is a testbed area ",
         "welcome": "Welcome to MythTV Backend running on host"
+    },
+    "settings": {
+        "misc": {
+            "title": "Miscellaneous Settings",
+            "subtitle": "General Backend Settings"
+        }
     }
 }
