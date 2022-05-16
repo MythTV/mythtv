@@ -48,6 +48,14 @@
 
 #define LOC QString("ChannelBase[%1]: ").arg(m_inputId)
 
+ChannelBase::ChannelBase(TVRec *parent) : m_pParent(parent)
+{
+    if (m_pParent)
+    {
+        m_inputId = m_pParent->GetInputId();
+    }
+}
+
 ChannelBase::~ChannelBase(void)
 {
     QMutexLocker locker(&m_systemLock);
