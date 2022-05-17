@@ -6,7 +6,7 @@
                     [(ngModel)]="m_startDate"
                     [showTime]="true"
                     [stepMinute]="30"
-                    [dateFormat]="m_dateFormat"
+                    [dateFormat]=(m_dateFormat)
                     (onClose)="onDatePickerClose()">
                 </p-calendar>
             </div>

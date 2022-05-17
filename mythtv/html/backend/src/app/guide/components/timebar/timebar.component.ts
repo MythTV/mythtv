@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-guide-timebar',
@@ -8,7 +9,7 @@ import { Component, OnInit, Input } from '@angular/core';
 export class TimebarComponent implements OnInit {
   @Input() startTime! : string;
 
-  constructor() { }
+  constructor(private translate : TranslateService) { }
 
   ngOnInit(): void {
   }
