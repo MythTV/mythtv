@@ -3,7 +3,10 @@
         "back": "Back",
         "help": "Help",
         "loading": "Loading",
-        "next": "Next"
+        "next": "Next",
+        "save": "Save",
+        "savesuccess": "Saved Successfully",
+        "networkfail": "ERROR: Backend Network Failure"
     },
     "dashboard": {
         "warning": "Please note this is a work in progress and some features are not fully working!"
@@ -153,8 +156,30 @@
     },
     "settings": {
         "misc": {
-            "title": "Miscellaneuos Settings",
-            "subtitle": "General Backend Settings"
-        }
+            "title": "Miscellaneous Settings",
+            "subtitle": "General Backend Settings",
+            "mbo_label": "Master Backend Override",
+            "mbo_desc": "If enabled, the master backend will stream and delete files if it finds them in a storage directory. Useful if you are using a central storage location, like a NFS share, and your slave backend isn't running.",
+            "follow_label": "Follow Symbolic Links When Deleting Files",
+            "follow_desc": "If enabled, MythTV will follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.",
+            "slowly_label": "Delete Files Slowly",
+            "slowly_desc": "Some filesystems use a lot of resources when deleting large files. If enabled, this option makes MythTV delete files slowly on this backend to lessen the impact.",
+            "ringbuf_label": "HD Ringbuffer Size (kB)",
+            "ringbuf_desc": "The HD device ringbuffer allows the backend to weather moments of stress. The larger the ringbuffer (in kilobytes), the longer the moments of stress can be. However, setting the size too large can cause swapping, which is detrimental.",
+            "sg_label": "Storage Group Disk Scheduler",
+            "sg_desc": "This setting controls how the Storage Group scheduling code will balance new recordings across directories. 'Balanced Free Space' is the recommended method for most users.",
+            "upnp_label": "Video content to show a WMP client",
+            "upnp_desc": "Which tree to show a Windows Media Player client when it requests a list of videos.",
+            "statapp_label": "Miscellaneous Status Application",
+            "statapp_desc": "External application or script that outputs extra information for inclusion in the backend status page. See <a href=\"http://www.mythtv.org/wiki/Miscellaneous_Status_Information\">Miscellaneous Status Information</a> in the wiki.",
+            "disback_label": "Disable automatic database backup",
+            "disback_desc": "If enabled, MythTV will not backup the database before upgrades. You should therefore have your own database backup strategy in place.",
+            "disfwr_label": "Disable FireWire reset",
+            "disfwr_desc": "By default, MythTV resets the FireWire bus when a FireWire recorder stops responding to commands. If this causes problems, you can disable this behavior here.",
+            "savesuccess": "Saved successfully.",
+            "panel_filemgmt": "File Management",
+            "panel_upnp": "UPnP Server"
+        },
+        "networkfail": "ERROR: Backend Network Failure"
     }
 }
