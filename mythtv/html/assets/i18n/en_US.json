@@ -180,6 +180,14 @@
             "panel_filemgmt": "File Management",
             "panel_upnp": "UPnP Server"
         },
-        "networkfail": "ERROR: Backend Network Failure"
+        "networkfail": "ERROR: Backend Network Failure",
+        "eit": {
+            "title": "EIT Scanner Options",
+            "timeout_label": "EIT transport timeout (mins)",
+            "timeout_desc": "Maximum time to spend waiting (in minutes) for listings data on one digital TV channel before checking for new listings data on the next channel.",
+            "crawl_label": "Backend idle before EIT crawl (secs)",
+            "crawl_desc": "The minimum number of seconds after a recorder becomes idle to wait before MythTV begins collecting EIT listings data.",
+            "subtitle": "If you are using listings transmitted by the station, these options define how MythTV searches for them."
+        }
     }
 }

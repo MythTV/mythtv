@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Setup, Miscellaneous } from './interfaces/setup.interface';
+import { Setup, Miscellaneous, EITScanner } from './interfaces/setup.interface';
 import { MythService } from './myth.service';
 
 @Injectable({
@@ -184,5 +184,47 @@ export class SetupService {
         this.mythService.PutSetting({ HostName: this.m_hostName, Key: "DisableFirewireReset",
             Value: this.m_miscellaneousData.DisableFirewireReset ? "1" : "0"})
             .subscribe(this.miscObserver);
+    }
+
+    m_EITScanner!: EITScanner;
+
+    getEITScanner(): EITScanner {
+        this.m_EITScanner = {
+            successCount: 0,
+            errorCount: 0,
+            EITTransportTimeout: 5,
+            EITCrawIdleStart: 60
+        }
+
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "EITTransportTimeout", Default : "5" })
+            .subscribe({next: data => this.m_EITScanner.EITTransportTimeout = Number(data.String),
+                error: () => this.m_EITScanner.errorCount++});
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "EITCrawIdleStart", Default: "60" })
+            .subscribe({next: data => this.m_EITScanner.EITCrawIdleStart = Number(data.String),
+                error: () => this.m_EITScanner.errorCount++});
+
+        return this.m_EITScanner;
+    }
+
+    eitObserver = {
+        next: (x: any) => {
+            if (x.bool)
+                this.m_EITScanner.successCount++;
+            else
+                this.m_EITScanner.errorCount;
+        },
+        error: (err: any) => {
+            console.error(err);
+            this.m_EITScanner.errorCount++
+        },
+    };
+
+    saveEITScanner() {
+        this.m_EITScanner.successCount = 0;
+        this.m_EITScanner.errorCount = 0;
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "EITTransportTimeout",
+            Value: String(this.m_EITScanner.EITTransportTimeout)}).subscribe(this.eitObserver);
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "EITCrawIdleStart",
+            Value: String(this.m_EITScanner.EITCrawIdleStart)}).subscribe(this.eitObserver);
     }
 }

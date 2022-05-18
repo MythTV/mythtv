@@ -20,7 +20,7 @@ export interface Locale {
 
 export interface Miscellaneous {
     successCount:           number;
-    errorCount:             number,
+    errorCount:             number;
     MasterBackendOverride:  boolean;
     DeletesFollowLinks:     boolean;
     TruncateDeletesSlowly:  boolean;
@@ -30,6 +30,13 @@ export interface Miscellaneous {
     MiscStatusScript:       string;
     DisableAutomaticBackup: boolean;
     DisableFirewireReset:   boolean;
+}
+
+export interface EITScanner {
+    successCount:           number;
+    errorCount:             number;
+    EITTransportTimeout:    number;
+    EITCrawIdleStart:       number;
 }
 
 export interface Setup {
