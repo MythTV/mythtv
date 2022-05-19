@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Setup, Miscellaneous, EITScanner } from './interfaces/setup.interface';
+import { Setup, Miscellaneous, EITScanner, ShutWake  } from './interfaces/setup.interface';
 import { MythService } from './myth.service';
 
 @Injectable({
@@ -227,4 +227,107 @@ export class SetupService {
         this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "EITCrawIdleStart",
             Value: String(this.m_EITScanner.EITCrawIdleStart)}).subscribe(this.eitObserver);
     }
+
+    m_ShutWake!: ShutWake;
+
+    getShutWake(): ShutWake {
+        this.m_ShutWake = {
+            successCount: 0,
+            errorCount: 0,
+            startupCommand:             "",
+            blockSDWUwithoutClient:     true,
+            idleTimeoutSecs:            0,
+            idleWaitForRecordingTime:   15,
+            StartupSecsBeforeRecording: 120,
+            WakeupTimeFormat:           "hh:mm yyyy-MM-dd",
+            SetWakeuptimeCommand:       "",
+            ServerHaltCommand:          "sudo /sbin/halt -p",
+            preSDWUCheckCommand:        ""
+        }
+
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "startupCommand", Default: "" })
+            .subscribe({
+                next: data => this.m_ShutWake.startupCommand = data.String,
+                error: () => this.m_EITScanner.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "blockSDWUwithoutClient", Default: "1" })
+            .subscribe({
+                next: data => this.m_ShutWake.blockSDWUwithoutClient = (data.String == '1'),
+                error: () => this.m_EITScanner.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "idleTimeoutSecs", Default: "0" })
+            .subscribe({
+                next: data => this.m_ShutWake.idleTimeoutSecs = Number(data.String),
+                error: () => this.m_EITScanner.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "idleWaitForRecordingTime", Default: "" })
+            .subscribe({
+                next: data => this.m_ShutWake.idleWaitForRecordingTime = Number(data.String),
+                error: () => this.m_EITScanner.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "StartupSecsBeforeRecording", Default: "120" })
+            .subscribe({
+                next: data => this.m_ShutWake.StartupSecsBeforeRecording = Number(data.String),
+                error: () => this.m_EITScanner.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "WakeupTimeFormat", Default: "hh:mm yyyy-MM-dd" })
+            .subscribe({
+                next: data => this.m_ShutWake.WakeupTimeFormat = data.String,
+                error: () => this.m_EITScanner.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "SetWakeuptimeCommand", Default: "" })
+            .subscribe({
+                next: data => this.m_ShutWake.SetWakeuptimeCommand = data.String,
+                error: () => this.m_EITScanner.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "ServerHaltCommand", Default: "sudo /sbin/halt -p" })
+            .subscribe({
+                next: data => this.m_ShutWake.ServerHaltCommand = data.String,
+                error: () => this.m_EITScanner.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "preSDWUCheckCommand", Default: "" })
+            .subscribe({
+                next: data => this.m_ShutWake.preSDWUCheckCommand = data.String,
+                error: () => this.m_EITScanner.errorCount++
+            });
+
+        return this.m_ShutWake;
+    }
+
+    swObserver = {
+        next: (x: any) => {
+            if (x.bool)
+                this.m_ShutWake.successCount++;
+            else
+                this.m_ShutWake.errorCount;
+        },
+        error: (err: any) => {
+            console.error(err);
+            this.m_ShutWake.errorCount++
+        },
+    };
+
+    saveShutWake() {
+        this.m_ShutWake.successCount = 0;
+        this.m_ShutWake.errorCount = 0;
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "startupCommand",
+            Value: this.m_ShutWake.startupCommand}).subscribe(this.swObserver);
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "blockSDWUwithoutClient",
+            Value: this.m_ShutWake.blockSDWUwithoutClient ? "1" : "0"}).subscribe(this.swObserver);
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "idleTimeoutSecs",
+            Value: String(this.m_ShutWake.idleTimeoutSecs)}).subscribe(this.swObserver);
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "idleWaitForRecordingTime",
+            Value: String(this.m_ShutWake.idleWaitForRecordingTime)}).subscribe(this.swObserver);
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "StartupSecsBeforeRecording",
+            Value: String(this.m_ShutWake.StartupSecsBeforeRecording)}).subscribe(this.swObserver);
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "WakeupTimeFormat",
+            Value: this.m_ShutWake.WakeupTimeFormat}).subscribe(this.swObserver);
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "SetWakeuptimeCommand",
+            Value: this.m_ShutWake.SetWakeuptimeCommand}).subscribe(this.swObserver);
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "ServerHaltCommand",
+            Value: this.m_ShutWake.ServerHaltCommand}).subscribe(this.swObserver);
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "preSDWUCheckCommand",
+            Value: this.m_ShutWake.preSDWUCheckCommand}).subscribe(this.swObserver);
+    }
+
 }

@@ -1,1 +1,122 @@
-<p>shutdown-wakeup works!</p>
+<form class="ml-3 mr-3" name="shutwakeopt" #shutwakeopt="ngForm">
+    <p-card class="m-5">
+        <ng-template pTemplate="title">
+            {{ 'settings.shutwake.title' | translate }}
+        </ng-template>
+        <ng-template pTemplate="subtitle">
+            {{ 'settings.shutwake.subtitle' | translate }}
+        </ng-template>
+        <ng-template pTemplate="content">
+            <div class="grid">
+                <div class="mb-4 w-full">
+
+                    <div class="form-group field">
+                        <label for="startupCommand" class="block">{{ 'settings.shutwake.startcmd_label' | translate }}</label>
+                        <input pInputText id="startupCommand"
+                            [(ngModel)]="shutwakeData.startupCommand" name="startupCommand"
+                            #startupCommand="ngModel" class="mb-2 form-control w-full" />
+                        <small class="block">
+                            {{ 'settings.shutwake.startcmd_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <p-checkbox inputId="blockSDWUwithoutClient" [(ngModel)]="shutwakeData.blockSDWUwithoutClient"
+                            name="blockSDWUwithoutClient" #blockSDWUwithoutClient="ngModel" class="mb-2 w-full" [binary]="true"
+                            label="{{ 'settings.shutwake.block_label' | translate }}">
+                        </p-checkbox>
+                        <small class="block">
+                            {{ 'settings.shutwake.block_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="idleTimeoutSecs" class="block" >{{ 'settings.shutwake.idletime_label' | translate }}}</label>
+                        <p-inputNumber [(ngModel)]="shutwakeData.idleTimeoutSecs" name="idleTimeoutSecs" id="idleTimeoutSecs"
+                            [showButtons]="true" [min]="0" [max]="1200" [step]="5"></p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.shutwake.idletime_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="idleWaitForRecordingTime" class="block" >{{ 'settings.shutwake.maxwait_label' | translate }}</label>
+                        <p-inputNumber [(ngModel)]="shutwakeData.idleWaitForRecordingTime" name="idleWaitForRecordingTime"
+                            id="idleWaitForRecordingTime"
+                            [showButtons]="true" [min]="0" [max]="300" [step]="1"></p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.shutwake.maxwait_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="StartupSecsBeforeRecording" class="block" >{{ 'settings.shutwake.startbefore_label' | translate }}</label>
+                        <p-inputNumber [(ngModel)]="shutwakeData.StartupSecsBeforeRecording" name="StartupSecsBeforeRecording"
+                            id="StartupSecsBeforeRecording"
+                            [showButtons]="true" [min]="0" [max]="300" [step]="1"></p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.shutwake.startbefore_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="WakeupTimeFormat" class="block">{{ 'settings.shutwake.timeformat_label' | translate }}</label>
+                        <input pInputText id="WakeupTimeFormat"
+                            [(ngModel)]="shutwakeData.WakeupTimeFormat" name="WakeupTimeFormat"
+                            #WakeupTimeFormat="ngModel" class="mb-2 form-control w-full" />
+                        <small class="block">
+                            {{ 'settings.shutwake.timeformat_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="SetWakeuptimeCommand" class="block">{{ 'settings.shutwake.timecmd_label' | translate }}</label>
+                        <input pInputText id="SetWakeuptimeCommand"
+                            [(ngModel)]="shutwakeData.SetWakeuptimeCommand" name="SetWakeuptimeCommand"
+                            #WakeupTimeFormat="ngModel" class="mb-2 form-control w-full" />
+                        <small class="block">
+                            {{ 'settings.shutwake.timecmd_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="ServerHaltCommand" class="block">{{ 'settings.shutwake.serverhalt_label' | translate }}</label>
+                        <input pInputText id="ServerHaltCommand"
+                            [(ngModel)]="shutwakeData.ServerHaltCommand" name="ServerHaltCommand"
+                            #WakeupTimeFormat="ngModel" class="mb-2 form-control w-full" />
+                        <small class="block">
+                            {{ 'settings.shutwake.serverhalt_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="preSDWUCheckCommand" class="block">{{ 'settings.shutwake.preshut_label' | translate }}</label>
+                        <input pInputText id="preSDWUCheckCommand"
+                            [(ngModel)]="shutwakeData.preSDWUCheckCommand" name="preSDWUCheckCommand"
+                            #WakeupTimeFormat="ngModel" class="mb-2 form-control w-full" />
+                        <small class="block">
+                            {{ 'settings.shutwake.preshut_desc' | translate }}
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+            <div class="grid nogutter">
+                <div class="col-12">
+                    <p-message *ngIf="this.shutwakeData.successCount > 0 && this.shutwakeData.errorCount == 0 && !shutwakeopt.dirty"
+                        severity="success" text="{{ 'common.savesuccess' | translate }}" ></p-message>
+                    <p-message *ngIf="this.shutwakeData.errorCount > 0 && !shutwakeopt.dirty"
+                        severity="error" text="{{ 'common.networkfail' | translate }}" ></p-message>
+                </div>
+                <p-button class="col pr-1" label="{{'common.save' | translate}}"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); shutwakeopt.form.markAsPristine()"
+                                 [disabled]="(!shutwakeopt.dirty || false)"></p-button>
+                <p-button class="col-2 help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()"
+                    icon="pi pi-info-circle" styleClass="p-button-info"></p-button>
+            </div>
+        </ng-template>
+    </p-card>
+</form>

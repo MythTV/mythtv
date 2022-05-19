@@ -188,6 +188,28 @@
             "crawl_label": "Backend idle before EIT crawl (secs)",
             "crawl_desc": "The minimum number of seconds after a recorder becomes idle to wait before MythTV begins collecting EIT listings data.",
             "subtitle": "If you are using listings transmitted by the station, these options define how MythTV searches for them."
+        },
+        "shutwake": {
+            "title": "Shutdown/Wakeup Options",
+            "subtitle": "If you want to allow MythTV to shut down the backend when it is idle, these settings define parameters to enable that.",
+            "startcmd_label": "Startup command",
+            "startcmd_desc": "This command is executed right after starting the BE. As a parameter '$status' is replaced by either 'auto' if the machine was started automatically or 'user' if a user switched it on.",
+            "block_label": "Block shutdown before client connected",
+            "block_desc": "If enabled, the automatic shutdown routine will be disabled until a client connects.",
+            "idletime_label": "Idle shutdown timeout (secs)",
+            "idletime_desc": "The number of seconds the master backend idles before it shuts down all other backends. Set to 0 to disable automatic shutdown.",
+            "maxwait_label": "Maximum wait for recording (mins)",
+            "maxwait_desc": "The number of minutes the master backend waits for a recording. If the backend is idle but a recording starts within this time period, it won't shut down.",
+            "startbefore_label": "Startup before recording (secs)",
+            "startbefore_desc": "The number of seconds the master backend will be woken up before a recording starts.",
+            "timeformat_label": "Wakeup time format",
+            "timeformat_desc": "The format of the time string passed to the Command to set wakeup time as $time. See QT::QDateTime.toString() for details. Set to time_t for seconds since epoch.",
+            "timecmd_label": "Command to set wakeup time",
+            "timecmd_desc": "The command used to set the wakeup time (passed as $time) for the Master Backend",
+            "serverhalt_label": "Server halt command",
+            "serverhalt_desc": "The command used to halt the backends.",
+            "preshut_label": "Pre-shutdown-check command",
+            "preshut_desc": "A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idling, 2 - reset the backend to wait for a frontend."
         }
     }
 }

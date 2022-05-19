@@ -39,6 +39,20 @@ export interface EITScanner {
     EITCrawIdleStart:       number;
 }
 
+export interface ShutWake {
+    successCount:               number;
+    errorCount:                 number;
+    startupCommand:             string,
+    blockSDWUwithoutClient:     boolean,
+    idleTimeoutSecs:            number,
+    idleWaitForRecordingTime:   number,
+    StartupSecsBeforeRecording: number,
+    WakeupTimeFormat:           string,
+    SetWakeuptimeCommand:       string,
+    ServerHaltCommand:          string,
+    preSDWUCheckCommand:        string
+}
+
 export interface Setup {
     General: {
         HostAddress: HostAddress;
