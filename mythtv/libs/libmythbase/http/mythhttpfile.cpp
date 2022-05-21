@@ -60,14 +60,25 @@ HTTPResponse MythHTTPFile::ProcessFile(const HTTPRequest2& Request)
         Request->m_status = HTTPNotFound;
         return MythHTTPResponse::ErrorResponse(Request);
     }
+
+    // Extensions that should not be cached
+    static const std::vector<const char *> s_exts = { ".json", ".js", ".html", ".css" };
+
+    if (std::any_of(s_exts.cbegin(), s_exts.cend(),
+            [&](const char * value) { return file.endsWith(value); }))
+        httpfile->m_cacheType = HTTPNoCache;
+    else
+        httpfile->m_cacheType = HTTPLastModified | HTTPLongLife;
+
     httpfile->m_lastModified = QFileInfo(file).lastModified();
-    httpfile->m_cacheType = HTTPLastModified | HTTPLongLife;
 
     LOG(VB_HTTP, LOG_DEBUG, LOC + QString("Last modified: %2")
         .arg(MythDate::toString(httpfile->m_lastModified, MythDate::kOverrideUTC | MythDate::kRFC822)));
 
     // Create our response
     response = MythHTTPResponse::FileResponse(Request, httpfile);
+    QString mime = httpfile->m_mimeType.Name();
+    LOG(VB_HTTP, LOG_INFO, LOC + QString("mimetype '%1'").arg(mime));
     // Assume static content
     return response;
 }
