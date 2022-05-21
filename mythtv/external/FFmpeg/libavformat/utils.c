@@ -3668,6 +3668,10 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
     int eof_reached = 0;
     int *missing_streams = av_opt_ptr(ic->iformat->priv_class, ic->priv_data, "missing_streams");
 
+    int hasaudio        = 0;
+    int hasvideo        = 0;
+    int read_packets    = 0;
+
     flush_codecs = probesize > 0;
 
     av_opt_set(ic, "skip_clear", "1", AV_OPT_SEARCH_CHILDREN);
@@ -3683,10 +3687,6 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
         if (!strcmp(ic->iformat->name, "mpeg") || !strcmp(ic->iformat->name, "mpegts"))
             max_stream_analyze_duration = 7*AV_TIME_BASE;
     }
-
-    int hasaudio        = 0;
-    int hasvideo        = 0;
-    int read_packets    = 0;
 
     if (ic->pb)
         av_log(ic, AV_LOG_DEBUG, "Before avformat_find_stream_info() pos: %"PRId64" bytes read:%"PRId64" seeks:%d nb_streams:%d\n",
