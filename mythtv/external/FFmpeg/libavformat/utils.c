@@ -1866,7 +1866,7 @@ return_packet:
 }
 
 /* XXX: suppress the packet queue */
-void flush_packet_queue(AVFormatContext *s)
+static void flush_packet_queue(AVFormatContext *s)
 {
     if (!s->internal)
         return;
@@ -5949,4 +5949,10 @@ FF_ENABLE_DEPRECATION_WARNINGS
 void av_estimate_timings(AVFormatContext *ic, int64_t old_offset)
 {
     return estimate_timings(ic, old_offset);
+}
+
+// temporary export for mpegts-mythtv.c; FFmpeg 5.0 exports it as ff_flush_packet_queue
+void mythtv_flush_packet_queue(AVFormatContext *s)
+{
+    flush_packet_queue(s);
 }
