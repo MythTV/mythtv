@@ -2958,7 +2958,7 @@ static const char *duration_estimate_name(enum AVDurationEstimationMethod method
     return duration_name[method];
 }
 
-void estimate_timings(AVFormatContext *ic, int64_t old_offset)
+static void estimate_timings(AVFormatContext *ic, int64_t old_offset)
 {
     int64_t file_size;
 
@@ -5944,4 +5944,9 @@ FF_DISABLE_DEPRECATION_WARNINGS
     av_strlcpy(s->filename, url, sizeof(s->filename));
 FF_ENABLE_DEPRECATION_WARNINGS
 #endif
+}
+
+void av_estimate_timings(AVFormatContext *ic, int64_t old_offset)
+{
+    return estimate_timings(ic, old_offset);
 }

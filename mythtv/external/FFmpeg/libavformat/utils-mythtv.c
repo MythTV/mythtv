@@ -155,8 +155,3 @@ void av_remove_stream(AVFormatContext *s, int id, int remove_ts) {
             s->streams[i]->index=i;
     }
 }
-
-void av_estimate_timings(AVFormatContext *ic, int64_t old_offset)
-{
-    return estimate_timings(ic, old_offset);
-}
