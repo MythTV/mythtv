@@ -44,10 +44,12 @@ void av_remove_stream(AVFormatContext *s, int id, int remove_ts) {
 #if FF_API_LAVF_AVCTX
 FF_DISABLE_DEPRECATION_WARNINGS
         /* close codec context */
+        {
         AVCodecContext *codec_ctx = s->streams[i]->codec;
         if (codec_ctx->codec) {
             avcodec_close(codec_ctx);
             av_free(codec_ctx);
+        }
         }
 FF_ENABLE_DEPRECATION_WARNINGS
 #endif
@@ -67,9 +69,9 @@ FF_ENABLE_DEPRECATION_WARNINGS
          */
         if (remove_ts && s->iformat && s->priv_data &&
             (0 == strncmp(s->iformat->name, "mpegts", 6))) {
+            MpegTSContext *context = (MpegTSContext*) s->priv_data;
             av_log(NULL, AV_LOG_DEBUG,
                    "av_remove_stream: mpegts_remove_stream\n");
-            MpegTSContext *context = (MpegTSContext*) s->priv_data;
             mpegts_remove_stream(context, id);
         }
         changes = 1;
