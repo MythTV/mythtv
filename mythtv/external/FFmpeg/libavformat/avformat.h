@@ -3025,7 +3025,6 @@ AVRational av_stream_get_codec_timebase(const AVStream *st);
 
 /* MythTV changes */
 void av_estimate_timings(AVFormatContext *ic, int64_t old_offset);
-AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id);
 void av_remove_stream(AVFormatContext *s, int id, int remove_ts);
 void flush_packet_queue(AVFormatContext *s);
 /* End MythTV changes */
