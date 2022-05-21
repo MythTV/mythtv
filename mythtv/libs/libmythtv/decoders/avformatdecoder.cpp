@@ -1475,9 +1475,8 @@ int AvFormatDecoder::GetMaxReferenceFrames(AVCodecContext *Context)
         case AV_CODEC_ID_H265: return 16;
         case AV_CODEC_ID_VP9:  return 8;
         case AV_CODEC_ID_VP8:  return 3;
-        default: break;
+        default:               return 2;
     }
-    return 2;
 }
 
 void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
