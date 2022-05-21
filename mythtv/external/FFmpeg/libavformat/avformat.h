@@ -3024,9 +3024,6 @@ int avformat_transfer_internal_stream_timing_info(const AVOutputFormat *ofmt,
 AVRational av_stream_get_codec_timebase(const AVStream *st);
 
 /* MythTV changes */
-
-#define MAX_STREAMS 100
-
 void estimate_timings(AVFormatContext *ic, int64_t old_offset);
 void av_estimate_timings(AVFormatContext *ic, int64_t old_offset);
 AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id);
