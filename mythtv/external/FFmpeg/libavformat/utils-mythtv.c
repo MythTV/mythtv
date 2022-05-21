@@ -41,14 +41,16 @@ void av_remove_stream(AVFormatContext *s, int id, int remove_ts) {
             continue;
 
         av_log(NULL, AV_LOG_DEBUG, "av_remove_stream 0x%x\n", id);
-
+#if FF_API_LAVF_AVCTX
+FF_DISABLE_DEPRECATION_WARNINGS
         /* close codec context */
         AVCodecContext *codec_ctx = s->streams[i]->codec;
         if (codec_ctx->codec) {
             avcodec_close(codec_ctx);
             av_free(codec_ctx);
         }
-
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
         av_log(NULL, AV_LOG_DEBUG, "av_remove_stream: removing... "
                "s->nb_streams=%d i=%d\n", s->nb_streams, i);
         /* actually remove av stream */
