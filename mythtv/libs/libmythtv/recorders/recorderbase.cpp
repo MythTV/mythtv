@@ -859,14 +859,19 @@ RecorderBase *RecorderBase::CreateRecorder(
         return nullptr;
 
     RecorderBase *recorder = nullptr;
-    if (genOpt.m_inputType == "MPEG")
-    { // NOLINTNEXTLINE(bugprone-branch-clone)
-#ifdef USING_V4L2
-        recorder = new MpegRecorder(tvrec);
-#endif // USING_V4L2
+    if (genOpt.m_inputType == "IMPORT")
+    {
+        recorder = new ImportRecorder(tvrec);
+    }
+    else if (genOpt.m_inputType == "EXTERNAL")
+    {
+        if (dynamic_cast<ExternalChannel*>(channel))
+            recorder = new ExternalRecorder(tvrec, dynamic_cast<ExternalChannel*>(channel));
     }
 #ifdef USING_V4L2
-    else if (genOpt.m_inputType == "HDPVR")
+    else if ((genOpt.m_inputType == "MPEG") ||
+	     (genOpt.m_inputType == "HDPVR") ||
+	     (genOpt.m_inputType == "DEMO"))
     {
         recorder = new MpegRecorder(tvrec);
     }
@@ -874,6 +879,11 @@ RecorderBase *RecorderBase::CreateRecorder(
     {
         if (dynamic_cast<V4LChannel*>(channel))
             recorder = new V4L2encRecorder(tvrec, dynamic_cast<V4LChannel*>(channel));
+    }
+#else
+    else if (genOpt.m_inputType == "DEMO")
+    {
+        recorder = new ImportRecorder(tvrec);
     }
 #endif // USING_V4L2
 #ifdef USING_FIREWIRE
@@ -947,18 +957,6 @@ RecorderBase *RecorderBase::CreateRecorder(
         }
     }
 #endif // USING_ASI
-    else if (genOpt.m_inputType == "IMPORT")
-    {
-        recorder = new ImportRecorder(tvrec);
-    }
-    else if (genOpt.m_inputType == "DEMO")
-    {
-#ifdef USING_V4L2
-        recorder = new MpegRecorder(tvrec);
-#else
-        recorder = new ImportRecorder(tvrec);
-#endif
-    }
 #if CONFIG_LIBMP3LAME && defined(USING_V4L2)
     else if (CardUtil::IsV4L(genOpt.m_inputType))
     {
@@ -967,11 +965,6 @@ RecorderBase *RecorderBase::CreateRecorder(
         recorder->SetBoolOption("skipbtaudio", genOpt.m_skipBtAudio);
     }
 #endif // USING_V4L2
-    else if (genOpt.m_inputType == "EXTERNAL")
-    {
-        if (dynamic_cast<ExternalChannel*>(channel))
-            recorder = new ExternalRecorder(tvrec, dynamic_cast<ExternalChannel*>(channel));
-    }
 
     if (recorder)
     {
