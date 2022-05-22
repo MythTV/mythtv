@@ -29,10 +29,6 @@
 
 #include <stdint.h>
 
-/* MythTV: Prevent "ISO C++17 does not allow ‘register’ storage class
- * specifier" warning. */
-#define register
-
 #include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/log.h"
@@ -150,11 +146,7 @@ static inline unsigned int show_bits(GetBitContext *s, int n);
 #define BITS_AVAILABLE(name, gb) name ## _index < name ## _size_plus8
 #endif
 
-// Added the void use of the cache to defeat compiler warnings with newer gcc
-// (warning: variable 're_cache" set but not used)
-#   define CLOSE_READER(name, gb) \
-    (gb)->index = name##_index;   \
-    (void)name##_cache
+#define CLOSE_READER(name, gb) (gb)->index = name ## _index
 
 # ifdef LONG_BITSTREAM_READER
 
@@ -351,8 +343,8 @@ static inline int get_xbits(GetBitContext *s, int n)
 #if !CACHED_BITSTREAM_READER
 static inline int get_xbits_le(GetBitContext *s, int n)
 {
-    int sign;
-    int32_t cache;
+    register int sign;
+    register int32_t cache;
     OPEN_READER(re, s);
     av_assert2(n>0 && n<=25);
     UPDATE_CACHE_LE(re, s);
@@ -408,9 +400,6 @@ static inline unsigned int get_bits(GetBitContext *s, int n)
 #else
     OPEN_READER(re, s);
     av_assert2(n>0 && n<=25);
-    /* MythTV: clang-tidy warns "Access to field 'l' results in a
-     * dereference of a null pointer".  No plans to investigate.
-     * NOLINTNEXTLINE(clang-analyzer-core.NullDereference) */
     UPDATE_CACHE(re, s);
     tmp = SHOW_UBITS(re, s, n);
     LAST_SKIP_BITS(re, s, n);
@@ -654,9 +643,6 @@ static inline int init_get_bits_xe(GetBitContext *s, const uint8_t *buffer,
     s->cache              = 0;
     s->bits_left          = 0;
     refill_64(s, is_le);
-#else
-    /* MythTV: Fix unused parameter warning. */
-    (void)is_le;
 #endif
 
     return ret;
