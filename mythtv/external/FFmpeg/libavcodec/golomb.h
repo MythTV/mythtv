@@ -77,9 +77,6 @@ static inline int get_ue_golomb(GetBitContext *gb)
     }
 #else
     OPEN_READER(re, gb);
-    /* MythTV: clang-tidy warns "Access to field 'l' results in a
-     * dereference of a null pointer".  No plans to investigate.
-     * NOLINTNEXTLINE(clang-analyzer-core.NullDereference) */
     UPDATE_CACHE(re, gb);
     buf = GET_CACHE(re, gb);
 
@@ -484,7 +481,7 @@ static inline int get_ur_golomb_jpegls(GetBitContext *gb, int k, int limit,
     } else {
         int i;
         for (i = 0; i + MIN_CACHE_BITS <= limit && SHOW_UBITS(re, gb, MIN_CACHE_BITS) == 0; i += MIN_CACHE_BITS) {
-            if (gb->size_in_bits <= (int)re_index) {
+            if (gb->size_in_bits <= re_index) {
                 CLOSE_READER(re, gb);
                 return -1;
             }
