@@ -4180,11 +4180,6 @@ int av_lockmgr_register(int (*cb)(void **mutex, enum AVLockOp op));
  */
 int avcodec_is_open(AVCodecContext *s);
 
-
-/* MythTV */
-const uint8_t *avpriv_find_start_code(const uint8_t *p, const uint8_t *end, uint32_t *state);
-
-
 /**
  * Allocate a CPB properties structure and initialize its fields to default
  * values.
