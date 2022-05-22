@@ -210,6 +210,26 @@
             "serverhalt_desc": "The command used to halt the backends.",
             "preshut_label": "Pre-shutdown-check command",
             "preshut_desc": "A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idling, 2 - reset the backend to wait for a frontend."
+        },
+        "backendwake": {
+            "title": "Backend Wakeup Settings",
+            "subtitle": "These control wakeup of the master backend by the frontend and wakeup of slave backends by the master backend",
+            "master": {
+                "title": "Master Backend",
+                "delay_label": "Delay between wake attempts (secs)",
+                "delay_desc": "Length of time the frontend waits between tries to wake up the master backend. This should be the time your master backend needs to startup. Set to 0 to disable.",
+                "attempts_label": "Wake attempts",
+                "attempts_desc": "Number of times the frontend will try to wake up the master backend.",
+                "cmd_label": "Wake command",
+                "cmd_desc": "The command used to wake up your master backend server (e.g. wakeonlan 00:00:00:00:00:00)."
+            },
+            "slave": {
+                "title": "Slave Backends",
+                "sleep_label": "Sleep Command",
+                "sleep_desc": "The command used to put this slave to sleep. If set, the master backend will use this command to put this slave to sleep when it is not needed for recording.",
+                "wake_label": "Wake Command",
+                "wake_desc": "The command used to wake up this slave from sleep. This setting is not used on the master backend."
+            }
         }
     }
 }

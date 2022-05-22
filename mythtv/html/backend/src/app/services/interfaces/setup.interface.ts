@@ -53,6 +53,16 @@ export interface ShutWake {
     preSDWUCheckCommand:        string
 }
 
+export interface BackendWake {
+    successCount:                   number;
+    errorCount:                     number;
+    WOLbackendReconnectWaitTime:    number;
+    WOLbackendConnectRetry:         number;
+    WOLbackendCommand:              string;
+    SleepCommand:                   string;
+    WakeUpCommand:                  string;
+}
+
 export interface Setup {
     General: {
         HostAddress: HostAddress;

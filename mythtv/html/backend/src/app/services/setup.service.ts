@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Setup, Miscellaneous, EITScanner, ShutWake  } from './interfaces/setup.interface';
+import { Setup, Miscellaneous, EITScanner, ShutWake, BackendWake } from './interfaces/setup.interface';
 import { MythService } from './myth.service';
 
 @Injectable({
@@ -248,47 +248,47 @@ export class SetupService {
         this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "startupCommand", Default: "" })
             .subscribe({
                 next: data => this.m_ShutWake.startupCommand = data.String,
-                error: () => this.m_EITScanner.errorCount++
+                error: () => this.m_ShutWake.errorCount++
             });
         this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "blockSDWUwithoutClient", Default: "1" })
             .subscribe({
                 next: data => this.m_ShutWake.blockSDWUwithoutClient = (data.String == '1'),
-                error: () => this.m_EITScanner.errorCount++
+                error: () => this.m_ShutWake.errorCount++
             });
         this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "idleTimeoutSecs", Default: "0" })
             .subscribe({
                 next: data => this.m_ShutWake.idleTimeoutSecs = Number(data.String),
-                error: () => this.m_EITScanner.errorCount++
+                error: () => this.m_ShutWake.errorCount++
             });
         this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "idleWaitForRecordingTime", Default: "" })
             .subscribe({
                 next: data => this.m_ShutWake.idleWaitForRecordingTime = Number(data.String),
-                error: () => this.m_EITScanner.errorCount++
+                error: () => this.m_ShutWake.errorCount++
             });
         this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "StartupSecsBeforeRecording", Default: "120" })
             .subscribe({
                 next: data => this.m_ShutWake.StartupSecsBeforeRecording = Number(data.String),
-                error: () => this.m_EITScanner.errorCount++
+                error: () => this.m_ShutWake.errorCount++
             });
         this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "WakeupTimeFormat", Default: "hh:mm yyyy-MM-dd" })
             .subscribe({
                 next: data => this.m_ShutWake.WakeupTimeFormat = data.String,
-                error: () => this.m_EITScanner.errorCount++
+                error: () => this.m_ShutWake.errorCount++
             });
         this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "SetWakeuptimeCommand", Default: "" })
             .subscribe({
                 next: data => this.m_ShutWake.SetWakeuptimeCommand = data.String,
-                error: () => this.m_EITScanner.errorCount++
+                error: () => this.m_ShutWake.errorCount++
             });
         this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "ServerHaltCommand", Default: "sudo /sbin/halt -p" })
             .subscribe({
                 next: data => this.m_ShutWake.ServerHaltCommand = data.String,
-                error: () => this.m_EITScanner.errorCount++
+                error: () => this.m_ShutWake.errorCount++
             });
         this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "preSDWUCheckCommand", Default: "" })
             .subscribe({
                 next: data => this.m_ShutWake.preSDWUCheckCommand = data.String,
-                error: () => this.m_EITScanner.errorCount++
+                error: () => this.m_ShutWake.errorCount++
             });
 
         return this.m_ShutWake;
@@ -328,6 +328,76 @@ export class SetupService {
             Value: this.m_ShutWake.ServerHaltCommand}).subscribe(this.swObserver);
         this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "preSDWUCheckCommand",
             Value: this.m_ShutWake.preSDWUCheckCommand}).subscribe(this.swObserver);
+    }
+
+    m_BackendWake!: BackendWake;
+
+    getBackendWake(): BackendWake {
+        this.m_BackendWake = {
+            successCount: 0,
+            errorCount: 0,
+            WOLbackendReconnectWaitTime:    0,
+            WOLbackendConnectRetry:         5,
+            WOLbackendCommand:              "",
+            SleepCommand:                   "",
+            WakeUpCommand:                  ""
+        }
+
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "WOLbackendReconnectWaitTime", Default: "0" })
+            .subscribe({
+                next: data => this.m_BackendWake.WOLbackendReconnectWaitTime = Number(data.String),
+                error: () => this.m_BackendWake.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "WOLbackendConnectRetry", Default: "5" })
+            .subscribe({
+                next: data => this.m_BackendWake.WOLbackendConnectRetry = Number(data.String),
+                error: () => this.m_BackendWake.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "WOLbackendCommand", Default: "" })
+            .subscribe({
+                next: data => this.m_BackendWake.WOLbackendCommand = data.String,
+                error: () => this.m_BackendWake.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "SleepCommand", Default: "" })
+            .subscribe({
+                next: data => this.m_BackendWake.SleepCommand = data.String,
+                error: () => this.m_BackendWake.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "WakeUpCommand", Default: "" })
+            .subscribe({
+                next: data => this.m_BackendWake.WakeUpCommand = data.String,
+                error: () => this.m_BackendWake.errorCount++
+            });
+
+        return this.m_BackendWake;
+    }
+
+    bewObserver = {
+        next: (x: any) => {
+            if (x.bool)
+                this.m_BackendWake.successCount++;
+            else
+                this.m_BackendWake.errorCount;
+        },
+        error: (err: any) => {
+            console.error(err);
+            this.m_BackendWake.errorCount++
+        },
+    };
+
+    saveBackendWake() {
+        this.m_BackendWake.successCount = 0;
+        this.m_BackendWake.errorCount = 0;
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "WOLbackendReconnectWaitTime",
+            Value: String(this.m_BackendWake.WOLbackendReconnectWaitTime)}).subscribe(this.bewObserver);
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "WOLbackendConnectRetry",
+            Value: String(this.m_BackendWake.WOLbackendConnectRetry)}).subscribe(this.bewObserver);
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "WOLbackendCommand",
+            Value: this.m_BackendWake.WOLbackendCommand}).subscribe(this.bewObserver);
+        this.mythService.PutSetting({HostName: this.m_hostName, Key: "SleepCommand",
+            Value: this.m_BackendWake.SleepCommand}).subscribe(this.bewObserver);
+        this.mythService.PutSetting({HostName: this.m_hostName, Key: "WakeUpCommand",
+            Value: this.m_BackendWake.WakeUpCommand}).subscribe(this.bewObserver);
     }
 
 }
