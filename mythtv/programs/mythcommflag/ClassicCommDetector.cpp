@@ -2261,10 +2261,10 @@ void ClassicCommDetector::DumpMap(frm_dir_map_t &map) const
         long long frame = it.key();
         int flag = *it;
         int my_fps = (int)ceil(m_fps);
-        int hour = (frame / my_fps) / 60 / 60;
-        int min = (frame / my_fps) / 60 - (hour * 60);
-        int sec = (frame / my_fps) - (min * 60) - (hour * 60 * 60);
-        int frm = frame - ((sec * my_fps) + (min * 60 * my_fps) +
+        long long hour = (frame / my_fps) / 60 / 60;
+        long long min = (frame / my_fps) / 60 - (hour * 60);
+        long long sec = (frame / my_fps) - (min * 60) - (hour * 60 * 60);
+        long long frm = frame - ((sec * my_fps) + (min * 60 * my_fps) +
                            (hour * 60 * 60 * my_fps));
         int my_sec = (int)(frame / my_fps);
         msg = QString("%1 : %2 (%3:%4:%5.%6) (%7)")
