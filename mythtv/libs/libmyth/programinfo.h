@@ -805,7 +805,8 @@ class MPUBLIC ProgramInfo
     float           m_stars             {0.0F}; ///< Rating, range [0..1]
     QDate           m_originalAirDate;
     QDateTime       m_lastModified      {m_startTs};
-    QDateTime       m_lastInUseTime     {m_startTs.addSecs(-4 * 60 * 60)};
+    static constexpr int64_t kLastInUseOffset {4LL * 60 * 60};
+    QDateTime       m_lastInUseTime     {m_startTs.addSecs(-kLastInUseOffset)};
 
     int32_t         m_recPriority2      {0};
 

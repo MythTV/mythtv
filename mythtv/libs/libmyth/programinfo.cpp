@@ -42,7 +42,8 @@ ProgramInfoUpdater *ProgramInfo::s_updater;
 int force_init = pginfo_init_statics();
 bool ProgramInfo::s_usingProgIDAuth = true;
 
-const static uint kInvalidDateTime = UINT_MAX;
+static constexpr uint    kInvalidDateTime  { UINT_MAX  };
+static constexpr int64_t kLastUpdateOffset { 61LL * 60 };
 
 #define DEFINE_FLAGS_NAMES
 #include "libmythbase/programtypeflags.h"
@@ -189,7 +190,7 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
 
     m_originalAirDate(other.m_originalAirDate),
     m_lastModified(other.m_lastModified),
-    m_lastInUseTime(MythDate::current().addSecs(-4 * 60 * 60)),
+    m_lastInUseTime(MythDate::current().addSecs(-kLastInUseOffset)),
 
     m_recPriority2(other.m_recPriority2),
     m_recordId(other.m_recordId),
@@ -379,7 +380,7 @@ ProgramInfo::ProgramInfo(
 
     m_originalAirDate(_originalAirDate),
     m_lastModified(std::move(_lastmodified)),
-    m_lastInUseTime(MythDate::current().addSecs(-4 * 60 * 60)),
+    m_lastInUseTime(MythDate::current().addSecs(-kLastInUseOffset)),
 
     m_recordId(_recordid),
     m_findId(_findid),
@@ -467,7 +468,7 @@ ProgramInfo::ProgramInfo(
     m_recEndTs(std::move(_recendts)),
 
     m_lastModified(m_startTs),
-    m_lastInUseTime(MythDate::current().addSecs(-4 * 60 * 60)),
+    m_lastInUseTime(MythDate::current().addSecs(-kLastInUseOffset)),
 
     m_recordId(_recordid),
     m_findId(_findid),
@@ -562,7 +563,7 @@ ProgramInfo::ProgramInfo(
 
     m_originalAirDate(_originalAirDate),
     m_lastModified(m_startTs),
-    m_lastInUseTime(m_startTs.addSecs(-4 * 60 * 60)),
+    m_lastInUseTime(m_startTs.addSecs(-kLastInUseOffset)),
 
     m_recordId(_recordid),
     m_findId(_findid),
@@ -687,7 +688,7 @@ ProgramInfo::ProgramInfo(
     m_recEndTs(std::move(_recendts)),
 
     m_lastModified(MythDate::current()),
-    m_lastInUseTime(m_lastModified.addSecs(-4 * 60 * 60)),
+    m_lastInUseTime(m_lastModified.addSecs(-kLastInUseOffset)),
 
     m_inputName(std::move(_inputname))
 {
@@ -717,7 +718,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname)
     ProgramInfo::clear();
 
     QDateTime cur = MythDate::current();
-    m_recStartTs = m_startTs = cur.addSecs(-4 * 60 * 60 - 1);
+    m_recStartTs = m_startTs = cur.addSecs(-kLastInUseOffset - 1);
     m_recEndTs   = m_endTs   = cur.addSecs(-1);
 
     QString basename = _pathname.section('/', -1);
@@ -892,7 +893,7 @@ void ProgramInfo::clone(const ProgramInfo &other,
 
     m_originalAirDate = other.m_originalAirDate;
     m_lastModified = other.m_lastModified;
-    m_lastInUseTime = MythDate::current().addSecs(-4 * 60 * 60);
+    m_lastInUseTime = MythDate::current().addSecs(-kLastInUseOffset);
 
     m_recStatus = other.m_recStatus;
 
@@ -978,7 +979,7 @@ void ProgramInfo::clear(void)
 
     m_originalAirDate = QDate();
     m_lastModified = m_startTs;
-    m_lastInUseTime = m_startTs.addSecs(-4 * 60 * 60);
+    m_lastInUseTime = m_startTs.addSecs(-kLastInUseOffset);
 
     m_recStatus = RecStatus::Unknown;
 
@@ -2020,7 +2021,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
         // These items are not initialized below so they need to be cleared
         // if we're loading in a different program into this ProgramInfo
         m_catType = kCategoryNone;
-        m_lastInUseTime = MythDate::current().addSecs(-4 * 60 * 60);
+        m_lastInUseTime = MythDate::current().addSecs(-kLastInUseOffset);
         m_recType = kNotRecording;
         m_recPriority2 = 0;
         m_parentId = 0;
@@ -3187,7 +3188,7 @@ bool ProgramInfo::QueryIsInUse(QStringList &byWho) const
     if (!IsRecording())
         return false;
 
-    QDateTime oneHourAgo = MythDate::current().addSecs(-61 * 60);
+    QDateTime oneHourAgo = MythDate::current().addSecs(-kLastUpdateOffset);
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT hostname, recusage FROM inuseprograms "
@@ -5156,7 +5157,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, const QString& usedFor)
             MythDB::DBError("MarkAsInUse -- delete", query);
 
         m_inUseForWhat.clear();
-        m_lastInUseTime = MythDate::current(true).addSecs(-4 * 60 * 60);
+        m_lastInUseTime = MythDate::current(true).addSecs(-kLastInUseOffset);
         SendUpdateEvent();
         return;
     }
@@ -5234,7 +5235,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, const QString& usedFor)
         return;
 
     // Let others know we changed status
-    QDateTime oneHourAgo = MythDate::current().addSecs(-61 * 60);
+    QDateTime oneHourAgo = MythDate::current().addSecs(-kLastUpdateOffset);
     query.prepare("SELECT DISTINCT recusage "
                   "FROM inuseprograms "
                   "WHERE lastupdatetime >= :ONEHOURAGO AND "
@@ -5441,7 +5442,7 @@ void ProgramInfo::SubstituteMatches(QString &str)
 QMap<QString,uint32_t> ProgramInfo::QueryInUseMap(void)
 {
     QMap<QString, uint32_t> inUseMap;
-    QDateTime oneHourAgo = MythDate::current().addSecs(-61 * 60);
+    QDateTime oneHourAgo = MythDate::current().addSecs(-kLastUpdateOffset);
 
     MSqlQuery query(MSqlQuery::InitCon());
 
