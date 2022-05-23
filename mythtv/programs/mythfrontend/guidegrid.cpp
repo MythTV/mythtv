@@ -55,6 +55,11 @@ QWaitCondition epgIsVisibleCond;
 const QString kUnknownTitle = "";
 //const QString kUnknownCategory = QObject::tr("Unknown");
 static constexpr std::chrono::milliseconds kUpdateMS { 60s }; // Grid update interval
+static constexpr int64_t kFourMinutes   {       4LL * 60 };
+static constexpr int64_t kFiveMinutes   {       5LL * 60 };
+static constexpr int64_t kThirtyMinutes {      30LL * 60 };
+static constexpr int64_t kEightHours    {  8 * 60LL * 60 };
+static constexpr int64_t kOneDay        { 24 * 60LL * 60 };
 static bool SelectionIsTunable(const ChannelInfoList &selection);
 
 JumpToChannel::JumpToChannel(
@@ -492,7 +497,7 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
 
     m_originalStartTime = MythDate::current();
     if (startTime.isValid() &&
-        startTime > m_originalStartTime.addSecs(-8 * 3600))
+        startTime > m_originalStartTime.addSecs(-kEightHours))
         m_originalStartTime = startTime;
 
     int secsoffset = -((m_originalStartTime.time().minute() % 30) * 60 +
@@ -559,7 +564,7 @@ bool GuideGrid::Create()
     m_timeCount = m_guideGrid->getTimeCount() * 6;
     m_verticalLayout = m_guideGrid->isVerticalLayout();
 
-    m_currentEndTime = m_currentStartTime.addSecs(m_timeCount * 60 * 5);
+    m_currentEndTime = m_currentStartTime.addSecs(m_timeCount * kFiveMinutes);
 
     LoadInBackground();
     return true;
@@ -1476,7 +1481,7 @@ void GuideGrid::fillTimeInfos()
     QDateTime starttime = m_currentStartTime;
 
     m_firstTime = m_currentStartTime;
-    m_lastTime = m_firstTime.addSecs(m_timeCount * 60 * 4);
+    m_lastTime = m_firstTime.addSecs(m_timeCount * kFourMinutes);
 
     for (int x = 0; x < m_timeCount; ++x)
     {
@@ -1489,7 +1494,7 @@ void GuideGrid::fillTimeInfos()
             InfoMap infomap;
             infomap["starttime"] = timeStr;
 
-            QDateTime endtime = starttime.addSecs(60 * 30);
+            QDateTime endtime = starttime.addSecs(kThirtyMinutes);
 
             infomap["endtime"] = MythDate::toString(endtime, MythDate::kTime);
 
@@ -1498,7 +1503,7 @@ void GuideGrid::fillTimeInfos()
             item->SetTextFromMap(infomap);
         }
 
-        starttime = starttime.addSecs(5 * 60);
+        starttime = starttime.addSecs(kFiveMinutes);
     }
     m_currentEndTime = starttime;
 }
@@ -1647,14 +1652,14 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
                 if (proginfo)
                 {
                     proginfo->m_spread++;
-                    proginfo->SetScheduledEndTime(proginfo->GetScheduledEndTime().addSecs(5 * 60));
+                    proginfo->SetScheduledEndTime(proginfo->GetScheduledEndTime().addSecs(kFiveMinutes));
                 }
             }
             else
             {
                 proginfo = new ProgramInfo(kUnknownTitle,
                                            GuideGrid::tr("Unknown", "Unknown program title"),
-                                           ts, ts.addSecs(5*60));
+                                           ts, ts.addSecs(kFiveMinutes));
                 unknownlist.push_back(proginfo);
                 proginfo->m_startCol = x;
                 proginfo->m_spread = 1;
@@ -1679,7 +1684,7 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
             }
         }
         m_programInfos[row][x] = proginfo;
-        ts = ts.addSecs(5 * 60);
+        ts = ts.addSecs(kFiveMinutes);
     }
 
     // AutoDeleteDeque doesn't work with std::back_inserter
@@ -2409,22 +2414,22 @@ void GuideGrid::moveLeftRight(MoveVector movement)
     switch (movement)
     {
         case kScrollLeft :
-            m_currentStartTime = m_currentStartTime.addSecs(-30 * 60);
+            m_currentStartTime = m_currentStartTime.addSecs(-kThirtyMinutes);
             break;
         case kScrollRight :
-            m_currentStartTime = m_currentStartTime.addSecs(30 * 60);
+            m_currentStartTime = m_currentStartTime.addSecs(kThirtyMinutes);
             break;
         case kPageLeft :
-            m_currentStartTime = m_currentStartTime.addSecs(-5 * 60 * m_timeCount);
+            m_currentStartTime = m_currentStartTime.addSecs(-kFiveMinutes * m_timeCount);
             break;
         case kPageRight :
-            m_currentStartTime = m_currentStartTime.addSecs(5 * 60 * m_timeCount);
+            m_currentStartTime = m_currentStartTime.addSecs(kFiveMinutes * m_timeCount);
             break;
         case kDayLeft :
-            m_currentStartTime = m_currentStartTime.addSecs(-24 * 60 * 60);
+            m_currentStartTime = m_currentStartTime.addSecs(-kOneDay);
             break;
         case kDayRight :
-            m_currentStartTime = m_currentStartTime.addSecs(24 * 60 * 60);
+            m_currentStartTime = m_currentStartTime.addSecs(kOneDay);
             break;
         default :
             break;

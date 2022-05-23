@@ -379,7 +379,7 @@ void VideoFilterSettings::setTextFilter(const QString& val)
     match = kReDate.match(m_textFilter);
     if (match.hasMatch())
     {
-        int modnr = match.capturedView(1).toInt();
+        int64_t modnr = match.capturedView(1).toInt();
         QDate testdate = MythDate::current().date();
         switch(match.capturedView(2).at(0).toLatin1())
         {

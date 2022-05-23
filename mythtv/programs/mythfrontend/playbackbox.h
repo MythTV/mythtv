@@ -52,7 +52,7 @@ using ProgramMap = QMap<QString,ProgramList>;
 using Str2StrMap = QMap<QString,QString>;
 using PlaybackBoxCb = void (PlaybackBox::*)();
 
-static constexpr int kMaxJobs {7};
+static constexpr size_t kMaxJobs {7};
 
 enum {
     kArtworkFanTimeout    = 300,

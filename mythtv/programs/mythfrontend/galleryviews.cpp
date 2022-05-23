@@ -26,7 +26,7 @@ const double TRAILING_BETA_SHAPE = 0.31;
 const double DEFAULT_WEIGHT = std::pow(0.5, TRAILING_BETA_SHAPE - 1) *
                               std::pow(0.5, LEADING_BETA_SHAPE - 1);
 //! The edges of the distribution get clipped to avoid a singularity.
-const qint64 BETA_CLIP = 60 * 60 * 24;
+static constexpr qint64 BETA_CLIP { 24LL * 60 * 60 };
 
 void MarkedFiles::Add(const ImageIdList& newIds)
 {

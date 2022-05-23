@@ -1084,7 +1084,7 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
         const QString pro =
                 tail.arg(it.key()).arg((int)((float)(*it) / 1024.0F));
 
-        long long bytesPerMin = ((*it) >> 1) * 15;
+        long long bytesPerMin = ((*it) >> 1) * 15LL;
         uint minLeft = ((free<<5)/bytesPerMin)<<5;
         minLeft = (minLeft/15)*15;
         uint hoursLeft = minLeft/60;
