@@ -1,1 +1,52 @@
-<p>backend-control works!</p>
+<form class="ml-3 mr-3" name="backendcontrol" #backendcontrol="ngForm">
+    <p-card class="m-5">
+        <ng-template pTemplate="title">
+            {{ 'settings.backendctrl.title' | translate }}
+        </ng-template>
+        <ng-template pTemplate="subtitle">
+            {{ 'settings.backendctrl.subtitle' | translate }}
+        </ng-template>
+        <ng-template pTemplate="content">
+            <div class="grid">
+
+                <div class="mb-4 w-full">
+
+                    <div class="form-group field">
+                        <label for="BackendStopCommand" class="block">{{ 'settings.backendctrl.stop_label' | translate }}</label>
+                        <input pInputText id="BackendStopCommand" [(ngModel)]="beCtrlData.BackendStopCommand" name="BackendStopCommand"
+                            #MiscStatusScript="ngModel" class="mb-2 form-control w-full" />
+                        <small class="block">
+                            {{ 'settings.backendctrl.stop_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="BackendStartCommand" class="block">{{ 'settings.backendctrl.start_label' | translate }}</label>
+                        <input pInputText id="BackendStartCommand" [(ngModel)]="beCtrlData.BackendStartCommand" name="BackendStartCommand"
+                            #MiscStatusScript="ngModel" class="mb-2 form-control w-full" />
+                        <small class="block">
+                            {{ 'settings.backendctrl.start_desc' | translate }}
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+            <div class="grid nogutter">
+                <div class="col-12">
+                    <p-message *ngIf="this.beCtrlData.successCount > 0 && this.beCtrlData.errorCount == 0 && !backendcontrol.dirty"
+                        severity="success" text="{{ 'common.savesuccess' | translate }}" ></p-message>
+                    <p-message *ngIf="this.beCtrlData.errorCount > 0 && !backendcontrol.dirty"
+                        severity="error" text="{{ 'common.networkfail' | translate }}" ></p-message>
+                </div>
+                <p-button class="col pr-1" label="{{'common.save' | translate}}"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); backendcontrol.form.markAsPristine()"
+                                 [disabled]="(!backendcontrol.dirty || false)"></p-button>
+                <p-button class="col-2 help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()"
+                    icon="pi pi-info-circle" styleClass="p-button-info"></p-button>
+            </div>
+        </ng-template>
+    </p-card>
+</form>

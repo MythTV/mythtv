@@ -230,6 +230,14 @@
                 "wake_label": "Wake Command",
                 "wake_desc": "The command used to wake up this slave from sleep. This setting is not used on the master backend."
             }
+        },
+        "backendctrl": {
+            "title": "Backend Control",
+            "subtitle": "Commands to Start and Stop the Master Backend",
+            "stop_label": "Backend Stop Command",
+            "stop_desc": "The command used to stop the backend when running on the master backend server (e.g. sudo /etc/init.d/mythtv-backend stop)",
+            "start_label": "Backend Start Command",
+            "start_desc": "The command used to start the backend when running on the master backend server (e.g. sudo /etc/init.d/mythtv-backend start)."
         }
     }
 }

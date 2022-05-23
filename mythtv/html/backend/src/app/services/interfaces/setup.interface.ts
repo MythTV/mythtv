@@ -63,6 +63,13 @@ export interface BackendWake {
     WakeUpCommand:                  string;
 }
 
+export interface BackendControl {
+    successCount:                   number;
+    errorCount:                     number;
+    BackendStopCommand:             string;
+    BackendStartCommand:            string;
+}
+
 export interface Setup {
     General: {
         HostAddress: HostAddress;
