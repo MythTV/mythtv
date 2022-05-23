@@ -113,7 +113,7 @@ bool getUptime(std::chrono::seconds &uptime)
 bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
 {
 #ifdef __linux__
-    const size_t MB = (1024*1024);
+    static constexpr size_t MB { 1024LL * 1024 };
     struct sysinfo sinfo {};
     if (sysinfo(&sinfo) == -1)
     {

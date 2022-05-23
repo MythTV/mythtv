@@ -333,7 +333,7 @@ void MythPower::DidWakeUp(void)
     m_scheduledFeature = FeatureNone;
     m_isSpontaneous = false;
     m_featureTimer.stop();
-    static const qint64 kSecsInDay = 60 * 60 * 24;
+    static constexpr qint64 kSecsInDay { 24LL * 60 * 60 };
     QDateTime now = QDateTime::currentDateTime();
     qint64 secs  = m_sleepTime.secsTo(now);
     qint64 days  = secs / kSecsInDay;
