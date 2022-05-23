@@ -723,7 +723,7 @@ bool DTVRecorder::FindAudioKeyframes(const TSPacket* /*tspacket*/)
     if (!m_ringBuffer || (GetStreamData()->VideoPIDSingleProgram() <= 0x1fff))
         return hasKeyFrame;
 
-    static constexpr uint64_t kMsecPerDay = 24 * 60 * 60 * 1000ULL;
+    static constexpr uint64_t kMsecPerDay { 24ULL * 60 * 60 * 1000 };
     const double frame_interval = (1000.0 / m_videoFrameRate);
     uint64_t elapsed = 0;
     if (m_audioTimer.isValid())

@@ -44,6 +44,9 @@
 
 #define LOC     QString("JobQueue: ")
 
+// Consider anything less than 4 hours as a "recent" job.
+static constexpr int64_t kRecentInterval {4LL * 60 * 60};
+
 JobQueue::JobQueue(bool master) :
     m_hostname(gCoreContext->GetHostName()),
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
@@ -164,7 +167,7 @@ void JobQueue::run(void)
     RecoverQueue();
 
     m_queueThreadCondLock.lock();
-    m_queueThreadCond.wait(&m_queueThreadCondLock, 10 * 1000);
+    m_queueThreadCond.wait(&m_queueThreadCondLock, 10 * 1000UL);
     m_queueThreadCondLock.unlock();
 
     ProcessQueue();
@@ -1282,7 +1285,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
 {
     JobQueueEntry thisJob;
     MSqlQuery query(MSqlQuery::InitCon());
-    QDateTime recentDate = MythDate::current().addSecs(-4 * 3600);
+    QDateTime recentDate = MythDate::current().addSecs(-kRecentInterval);
     QString logInfo;
     int jobCount = 0;
     bool commflagWhileRecording =

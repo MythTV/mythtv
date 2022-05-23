@@ -411,7 +411,7 @@ bool PreviewGenerator::RemotePreviewRun(void)
     // wait up to 35 seconds for the preview to complete
     // The backend waits 30s for creation
     if (!m_gotReply)
-        m_previewWaitCondition.wait(&m_previewLock, 35 * 1000);
+        m_previewWaitCondition.wait(&m_previewLock, 35UL * 1000);
 
     if (!m_gotReply)
         LOG(VB_GENERAL, LOG_NOTICE, LOC + "RemotePreviewRun() -- no reply..");
@@ -811,7 +811,7 @@ char *PreviewGenerator::GetScreenGrab(
     if (filename.startsWith("/"))
     {
         QFileInfo info(filename);
-        bool invalid = (!info.exists() || !info.isReadable() || (info.isFile() && (info.size() < 8*1024)));
+        bool invalid = (!info.exists() || !info.isReadable() || (info.isFile() && (info.size() < 8LL*1024)));
         if (invalid)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("Previewer file '%1' is not valid.")

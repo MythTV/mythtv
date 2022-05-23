@@ -332,11 +332,11 @@ RecordingInfo::RecordingInfo(
         QTime(m_endTs.time().hour(),
               m_endTs.time().minute() / kUnknownProgramLength
               * kUnknownProgramLength), Qt::UTC);
-    m_endTs = m_endTs.addSecs(kUnknownProgramLength * 60);
+    m_endTs = m_endTs.addSecs(kUnknownProgramLength * 60LL);
 
     // if under a minute, bump it up to the next half hour
     if (m_startTs.secsTo(m_endTs) < 60)
-        m_endTs = m_endTs.addSecs(kUnknownProgramLength * 60);
+        m_endTs = m_endTs.addSecs(kUnknownProgramLength * 60LL);
 
     m_recEndTs = m_endTs;
 

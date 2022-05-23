@@ -356,7 +356,8 @@ void TVBrowseHelper::GetNextProgramDB(BrowseDirection direction, InfoMap& Infoma
     Infomap["channum"] = m_dbChanidToChannum[chanid];
 
     QDateTime nowtime = MythDate::current();
-    QDateTime latesttime = nowtime.addSecs(6*60*60);
+    static constexpr int64_t kSixHours {6LL * 60 * 60};
+    QDateTime latesttime = nowtime.addSecs(kSixHours);
     QDateTime browsetime = MythDate::fromString(Infomap["dbstarttime"]);
 
     MSqlBindings bindings;
