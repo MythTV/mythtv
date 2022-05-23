@@ -29,6 +29,8 @@
 // MythBackend
 #include "backendhousekeeper.h"
 
+static constexpr int64_t kFourHours {4LL * 60 * 60};
+
 #if QT_VERSION < QT_VERSION_CHECK(5,15,2)
 #define capturedView capturedRef
 #endif
@@ -36,7 +38,7 @@
 bool LogCleanerTask::DoRun(void)
 {
     int numdays = 14;
-    uint64_t maxrows = 10000 * numdays;  // likely high enough to keep numdays
+    uint64_t maxrows = 10000ULL * numdays;  // likely high enough to keep numdays
     bool res = true;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -139,7 +141,7 @@ void CleanupTask::CleanupOldRecordings(void)
 
 void CleanupTask::CleanupInUsePrograms(void)
 {
-    QDateTime fourHoursAgo = MythDate::current().addSecs(-4 * 60 * 60);
+    QDateTime fourHoursAgo = MythDate::current().addSecs(-kFourHours);
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("DELETE FROM inuseprograms "
@@ -151,7 +153,7 @@ void CleanupTask::CleanupInUsePrograms(void)
 
 void CleanupTask::CleanupOrphanedLiveTV(void)
 {
-    QDateTime fourHoursAgo = MythDate::current().addSecs(-4 * 60 * 60);
+    QDateTime fourHoursAgo = MythDate::current().addSecs(-kFourHours);
     MSqlQuery query(MSqlQuery::InitCon());
     MSqlQuery deleteQuery(MSqlQuery::InitCon());
 

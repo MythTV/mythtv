@@ -36,6 +36,10 @@
 
 #define LOC QString("RecExt: ")
 
+/// Does the specified time fall within -3/+1 hour from now?
+static constexpr int64_t kLookBackTime    { 3LL * 60 * 60 };
+static constexpr int64_t kLookForwardTime { 1LL * 60 * 60 };
+
 static constexpr std::chrono::minutes extensionTime {10};
 static constexpr int extensionTimeInSec {
     (duration_cast<std::chrono::seconds>(extensionTime).count()) };
@@ -127,8 +131,8 @@ bool ActiveGame::teamsMatch(const QStringList& names, const QStringList& abbrevs
 bool RecExtDataPage::timeIsClose(const QDateTime& eventStart)
 {
     QDateTime now    = getNow();
-    QDateTime past   = now.addSecs(-3*60*60); // Three hours ago
-    QDateTime future = now.addSecs( 1*60*60); // One hour from now
+    QDateTime past   = now.addSecs(-kLookBackTime);
+    QDateTime future = now.addSecs( kLookForwardTime);
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("past:       %1.").arg(past.toString(Qt::ISODate)));
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("eventStart: %1.").arg(eventStart.toString(Qt::ISODate)));

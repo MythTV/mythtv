@@ -45,10 +45,14 @@
 #define LOC     QString("AutoExpire: ")
 #define LOC_ERR QString("AutoExpire Error: ")
 
-/** If calculated desired space for 10 min freq is > SPACE_TOO_BIG_KB
+/** If calculated desired space for 10 min freq is > kSpaceTooBigKB
  *  then we use 5 min expire frequency.
  */
-#define SPACE_TOO_BIG_KB (3*1024*1024)
+static constexpr uint64_t kSpaceTooBigKB { 3ULL * 1024 * 1024 };
+
+// Consider recordings within the last two hours to be too recent to
+// add to the autoexpire list.
+static constexpr int64_t kRecentInterval { 2LL * 60 * 60 };
 
 /// \brief This calls AutoExpire::RunExpirer() from within a new thread.
 void ExpireThread::run(void)
@@ -231,7 +235,7 @@ void AutoExpire::CalcParams()
     uint expireFreq = 15;
     if (maxKBperMin > 0)
     {
-        expireFreq = SPACE_TOO_BIG_KB / (maxKBperMin + maxKBperMin/3);
+        expireFreq = kSpaceTooBigKB / (maxKBperMin + maxKBperMin/3);
         expireFreq = std::max(3U, std::min(expireFreq, 15U));
     }
 
@@ -311,7 +315,7 @@ void AutoExpire::RunExpirer(void)
         {
             LOG(VB_FILE, LOG_INFO, LOC + "Running now!");
             next_expire =
-                MythDate::current().addSecs(m_desiredFreq * 60);
+                MythDate::current().addSecs(m_desiredFreq * 60LL);
 
             ExpireLiveTV(emNormalLiveTVPrograms);
 
@@ -1083,7 +1087,7 @@ void AutoExpire::UpdateDontExpireSet(void)
         QDateTime recstartts = MythDate::as_utc(query.value(1).toDateTime());
         QDateTime lastupdate = MythDate::as_utc(query.value(2).toDateTime());
 
-        if (lastupdate.secsTo(curTime) < 2 * 60 * 60)
+        if (lastupdate.secsTo(curTime) < kRecentInterval)
         {
             QString key = QString("%1_%2")
                 .arg(chanid).arg(recstartts.toString(Qt::ISODate));

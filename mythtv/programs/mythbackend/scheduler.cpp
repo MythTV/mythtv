@@ -55,6 +55,8 @@
 #define LOC_WARN QString("Scheduler, Warning: ")
 #define LOC_ERR QString("Scheduler, Error: ")
 
+static constexpr int64_t kProgramInUseInterval {61LL * 60};
+
 bool debugConflicts = false;
 
 Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *_tvList,
@@ -3378,7 +3380,7 @@ void Scheduler::ShutdownServer(std::chrono::seconds prerollseconds,
     {
         int add = gCoreContext->GetNumSetting("StartupSecsBeforeRecording", 240);
         if (add)
-            restarttime = restarttime.addSecs((-1) * add);
+            restarttime = restarttime.addSecs((-1LL) * add);
 
         QString wakeup_timeformat = gCoreContext->GetSetting("WakeupTimeFormat",
                                                          "hh:mm yyyy-MM-dd");
@@ -3526,7 +3528,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
     }
 
     LOG(VB_SCHEDULE, LOG_DEBUG, "  Checking inuseprograms table:");
-    QDateTime oneHourAgo = MythDate::current().addSecs(-61 * 60);
+    QDateTime oneHourAgo = MythDate::current().addSecs(-kProgramInUseInterval);
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT DISTINCT hostname, recusage FROM inuseprograms "
                     "WHERE lastupdatetime > :ONEHOURAGO ;");
@@ -4810,8 +4812,8 @@ void Scheduler::AddNotListed(void) {
         QDateTime endts(
             result.value(18).toDate(), result.value(19).toTime(), Qt::UTC);
 
-        QDateTime recstartts = startts.addSecs(result.value(25).toInt() * -60);
-        QDateTime recendts   = endts.addSecs(  result.value(26).toInt() * +60);
+        QDateTime recstartts = startts.addSecs(result.value(25).toInt() * -60LL);
+        QDateTime recendts   = endts.addSecs(  result.value(26).toInt() * +60LL);
 
         if (recstartts >= recendts)
         {
