@@ -657,7 +657,8 @@ void MusicFileScanner::SearchDirs(const QStringList &dirList)
             QDateTime dtLastRun = QDateTime::fromString(lastRun, Qt::ISODate);
             if (dtLastRun.isValid())
             {
-                if (MythDate::current() > dtLastRun.addSecs(60*60))
+                static constexpr int64_t kOneHour {60LL * 60};
+                if (MythDate::current() > dtLastRun.addSecs(kOneHour))
                 {
                     LOG(VB_GENERAL, LOG_INFO, "Music file scanner has been running for more than 60 minutes. Lets reset and try again");
                     gCoreContext->SendMessage(QString("MUSIC_SCANNER_ERROR %1 %2").arg(host, "Stalled"));
