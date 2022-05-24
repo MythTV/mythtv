@@ -13,7 +13,7 @@
 
 // zm
 #include "zmdefines.h"
-#define MAX_IMAGE_SIZE  (2048*1536*3)
+static constexpr size_t MAX_IMAGE_SIZE { 2048ULL * 1536 * 3 };
 using FrameData = std::array<uint8_t,MAX_IMAGE_SIZE>;
 
 class MPLUGIN_PUBLIC ZMClient : public QObject
