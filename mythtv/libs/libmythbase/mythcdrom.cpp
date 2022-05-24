@@ -178,7 +178,7 @@ static int def_read(udfread_block_input *p_gen, uint32_t lba, void *buf, uint32_
     int result = -1;
     auto *p = (blockInput_t *)p_gen;
 
-    if (p && p->m_file && (p->m_file->Seek(lba * UDF_BLOCK_SIZE, SEEK_SET) != -1))
+    if (p && p->m_file && (p->m_file->Seek(static_cast<long long>(lba) * UDF_BLOCK_SIZE, SEEK_SET) != -1))
         result = p->m_file->Read(buf, nblocks * UDF_BLOCK_SIZE) / UDF_BLOCK_SIZE;
 
     return result;
