@@ -267,7 +267,7 @@ int AudioOutputDigitalEncoder::Encode(void *input, int len, AudioFormat format)
         AudioOutputUtil::DeinterleaveSamples(
             MYTH_SAMPLE_FORMAT, channels,
             m_framebuf,
-            m_inbuf + i * size_channel * channels,
+            m_inbuf + static_cast<ptrdiff_t>(i) * size_channel * channels,
             size_channel * channels);
 
         //  SUGGESTION
@@ -336,7 +336,7 @@ int AudioOutputDigitalEncoder::Encode(void *input, int len, AudioFormat format)
         m_inlen  -= m_samplesPerFrame * AudioOutputSettings::SampleSize(MYTH_SAMPLE_FORMAT);
     }
 
-    memmove(m_inbuf, m_inbuf + i * m_samplesPerFrame* AudioOutputSettings::SampleSize(MYTH_SAMPLE_FORMAT), m_inlen);
+    memmove(m_inbuf, m_inbuf + static_cast<ptrdiff_t>(i) * m_samplesPerFrame * AudioOutputSettings::SampleSize(MYTH_SAMPLE_FORMAT), m_inlen);
     return m_outlen;
 }
 

@@ -1227,7 +1227,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
     int len   = CheckFreeSpace(frames);
     int bdiff = kAudioRingBufferSize - org_waud;
     int bpf   = m_bytesPerFrame;
-    int off   = 0;
+    ptrdiff_t off = 0;
 
     if (!m_needsUpmix)
     {
@@ -1617,7 +1617,7 @@ void AudioOutputBase::Status()
         ct = 0ms;
 
     if (m_sourceBitRate == -1)
-        m_sourceBitRate = m_sourceSampleRate * m_sourceChannels *
+        m_sourceBitRate = static_cast<long>(m_sourceSampleRate) * m_sourceChannels *
                          AudioOutputSettings::FormatToBits(m_format);
 
     if (duration_cast<std::chrono::seconds>(ct) != m_currentSeconds)

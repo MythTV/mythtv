@@ -118,7 +118,7 @@ class AudioOutputGraph::Buffer : public QByteArray
     const int16_t* Data16(Range Available) const
     {
         auto start = MS2Samples(Available.first - m_tcFirst);
-        return reinterpret_cast<const int16_t*>(constData() + (static_cast<uint>(start) * BytesPerSample()));
+        return reinterpret_cast<const int16_t*>(constData() + (static_cast<ptrdiff_t>(start) * BytesPerSample()));
     }
 
   protected:
@@ -275,7 +275,7 @@ MythImage* AudioOutputGraph::GetImage(std::chrono::milliseconds Timecode) const
     if (data >= max)
         return nullptr;
 
-    if ((data + (channels * width)) >= max)
+    if ((data + (channels * static_cast<ptrdiff_t>(width))) >= max)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Buffer overflow. Clipping samples.");
         width = static_cast<int>(max - data) / channels;

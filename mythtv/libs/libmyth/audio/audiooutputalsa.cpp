@@ -572,7 +572,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
                         .arg(lw * m_outputBytesPerFrame));
 
             frames -= lw;
-            tmpbuf += lw * m_outputBytesPerFrame; // bytes
+            tmpbuf += static_cast<ptrdiff_t>(lw) * m_outputBytesPerFrame; // bytes
             continue;
         }
 
