@@ -72,7 +72,6 @@ struct ArchiveItem
     QList<ThumbImage*> thumbList;
 };
 
-QString formatSize(int64_t sizeKB, int prec = 2);
 QString getTempDirectory(bool showError = false);
 void checkTempDirectory();
 bool extractDetailsFromFilename(const QString &inFile,

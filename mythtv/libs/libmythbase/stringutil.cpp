@@ -1,4 +1,5 @@
 #include <array>
+#include <QObject>
 #include "stringutil.h"
 
 #if __has_include(<bit>) // C++20
@@ -336,4 +337,43 @@ int StringUtil::naturalCompare(const QString &_a, const QString &_b, Qt::CaseSen
     }
 
     return currA->isNull() ? -1 : + 1;
+}
+
+static constexpr int64_t kOneTerabyte { 1024 * 1024LL * 1024};
+static constexpr int64_t kOneGigabyte {        1024LL * 1024};
+static constexpr int64_t kOneMegabyte {                 1024};
+
+/** \fn formatKBytes(int64_t, int)
+ *  \brief Returns a short string describing an amount of space, choosing
+ *         one of a number of useful units, "TB", "GB", "MB", or "KB".
+ *  \param sizeKB Number of kilobytes.
+ *  \param precision Precision to use if we have less than ten of whatever
+ *                   unit is chosen.
+ */
+QString StringUtil::formatKBytes(int64_t sizeKB, int precision)
+{
+    if (sizeKB > kOneTerabyte)
+    {
+        double sizeTB = sizeKB/(1.0 * kOneTerabyte);
+        return QObject::tr("%1 TB").arg(sizeTB, 0, 'f', (sizeTB>10)?0:precision);
+    }
+    if (sizeKB > kOneGigabyte)
+    {
+        double sizeGB = sizeKB/(1.0 * kOneGigabyte);
+        return QObject::tr("%1 GB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:precision);
+    }
+    if (sizeKB > kOneMegabyte)
+    {
+        double sizeMB = sizeKB/(1.0 * kOneMegabyte);
+        return QObject::tr("%1 MB").arg(sizeMB, 0, 'f', (sizeMB>10)?0:precision);
+    }
+    // Kilobytes
+    return QObject::tr("%1 KB").arg(sizeKB);
+}
+
+QString StringUtil::formatBytes(int64_t sizeB, int precision)
+{
+    if (sizeB > 1024)
+        return formatKBytes(sizeB / 1024, precision);
+    return QString("%1 B").arg(sizeB);
 }

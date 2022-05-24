@@ -20,6 +20,7 @@
 #include <libmythbase/mythdirs.h>
 #include <libmythbase/mythmiscutil.h>
 #include <libmythbase/mythsystemlegacy.h>
+#include <libmythbase/stringutil.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythprogressdialog.h>
 #include <libmythui/mythuibutton.h>
@@ -429,7 +430,7 @@ void MythBurn::updateArchiveList(void)
             item->SetData(QVariant::fromValue(a));
             item->SetText(a->subtitle, "subtitle");
             item->SetText(a->startDate + " " + a->startTime, "date");
-            item->SetText(formatSize(a->newsize / 1024, 2), "size");
+            item->SetText(StringUtil::formatKBytes(a->newsize / 1024, 2), "size");
             if (a->hasCutlist)
             {
                 if (a->useCutlist)
@@ -886,7 +887,7 @@ void MythBurn::profileChanged(int profileNo)
     archiveItem->encoderProfile = profile;
 
     item->SetText(profile->name, "profile");
-    item->SetText(formatSize(archiveItem->newsize / 1024, 2), "size");
+    item->SetText(StringUtil::formatKBytes(archiveItem->newsize / 1024, 2), "size");
 
     updateSizeBar();
 }
@@ -1038,7 +1039,7 @@ bool ProfileDialog::Create()
     m_profileBtnList->MoveToNamedPosition(m_archiveItem->encoderProfile->name);
 
     m_captionText->SetText(m_archiveItem->title);
-    m_oldSizeText->SetText(formatSize(m_archiveItem->size / 1024, 2));
+    m_oldSizeText->SetText(StringUtil::formatKBytes(m_archiveItem->size / 1024, 2));
 
     connect(m_okButton, &MythUIButton::Clicked, this, &ProfileDialog::save);
 
@@ -1065,7 +1066,7 @@ void ProfileDialog::profileChanged(MythUIButtonListItem *item)
     // calc new size
     recalcItemSize(m_archiveItem);
 
-    m_newSizeText->SetText(formatSize(m_archiveItem->newsize / 1024, 2));
+    m_newSizeText->SetText(StringUtil::formatKBytes(m_archiveItem->newsize / 1024, 2));
 }
 
 

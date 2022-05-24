@@ -57,6 +57,9 @@ inline bool naturalSortCompare(const QString &a, const QString &b,
     return naturalCompare(a, b, caseSensitivity) < 0;
 }
 
+MBASE_PUBLIC QString formatKBytes(int64_t sizeKB, int prec=1);
+MBASE_PUBLIC QString formatBytes(int64_t sizeB, int prec=1);
+
 } // namespace StringUtil
 
 #endif // STRINGUTIL_H_

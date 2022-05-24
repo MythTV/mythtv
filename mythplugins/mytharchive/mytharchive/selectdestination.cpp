@@ -9,6 +9,7 @@
 // myth
 #include <libmyth/mythcontext.h>
 #include <libmythbase/mythcoreutil.h>
+#include <libmythbase/stringutil.h>
 #include <libmythui/mythmainwindow.h>
 #include <libmythui/mythuibutton.h>
 #include <libmythui/mythuibuttonlist.h>
@@ -253,7 +254,7 @@ void SelectDestination::setDestination(MythUIButtonListItem* item)
     // update free space
     if (ArchiveDestinations[itemNo].freeSpace != -1)
     {
-        m_freespaceText->SetText(formatSize(ArchiveDestinations[itemNo].freeSpace, 2));
+        m_freespaceText->SetText(StringUtil::formatKBytes(ArchiveDestinations[itemNo].freeSpace, 2));
         m_freeSpace = ArchiveDestinations[itemNo].freeSpace / 1024;
     }
     else
@@ -309,7 +310,7 @@ void SelectDestination::filenameEditLostFocus()
 
     if (m_archiveDestination.freeSpace != -1)
     {
-        m_freespaceText->SetText(formatSize(m_archiveDestination.freeSpace, 2));
+        m_freespaceText->SetText(StringUtil::formatKBytes(m_archiveDestination.freeSpace, 2));
         m_freeSpace = m_archiveDestination.freeSpace;
     }
     else

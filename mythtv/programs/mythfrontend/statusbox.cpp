@@ -12,6 +12,7 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythversion.h"
+#include "libmythbase/stringutil.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/decoders/mythcodeccontext.h"
 #include "libmythtv/jobqueue.h"
@@ -1019,34 +1020,6 @@ void StatusBox::doJobQueueStatus()
 
 // Some helper routines for doMachineStatus() that format the output strings
 
-/** \fn sm_str(long long, int)
- *  \brief Returns a short string describing an amount of space, choosing
- *         one of a number of useful units, "TB", "GB", "MB", or "KB".
- *  \param sizeKB Number of kilobytes.
- *  \param prec   Precision to use if we have less than ten of whatever
- *                unit is chosen.
- */
-static QString sm_str(long long sizeKB, int prec=1)
-{
-    if (sizeKB>1024*1024*1024) // Terabytes
-    {
-        double sizeGB = sizeKB/(1024*1024*1024.0);
-        return QObject::tr("%1 TB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
-    }
-    if (sizeKB>1024*1024) // Gigabytes
-    {
-        double sizeGB = sizeKB/(1024*1024.0);
-        return QObject::tr("%1 GB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
-    }
-    if (sizeKB>1024) // Megabytes
-    {
-        double sizeMB = sizeKB/1024.0;
-        return QObject::tr("%1 MB").arg(sizeMB, 0, 'f', (sizeMB>10)?0:prec);
-    }
-    // Kilobytes
-    return QObject::tr("%1 KB").arg(sizeKB);
-}
-
 static QString usage_str_kb(long long total,
                                   long long used,
                                   long long free)
@@ -1056,8 +1029,10 @@ static QString usage_str_kb(long long total,
     {
         double percent = (100.0*free)/total;
         ret = StatusBox::tr("%1 total, %2 used, %3 (or %4%) free.")
-            .arg(sm_str(total), sm_str(used),
-                 sm_str(free)).arg(percent, 0, 'f', (percent >= 10.0) ? 0 : 2);
+            .arg(StringUtil::formatKBytes(total),
+                 StringUtil::formatKBytes(used),
+                 StringUtil::formatKBytes(free))
+            .arg(percent, 0, 'f', (percent >= 10.0) ? 0 : 2);
     }
     return ret;
 }
@@ -1636,17 +1611,17 @@ void StatusBox::doAutoExpireList(bool updateExpList)
     }
 
     staticInfo = tr("%n recording(s) consuming %1 (is) allowed to expire\n", "",
-                     m_expList.size()).arg(sm_str(totalSize / 1024));
+                     m_expList.size()).arg(StringUtil::formatKBytes(totalSize / 1024));
 
     if (liveTVCount)
         staticInfo += tr("%n (is) LiveTV and consume(s) %1\n", "", liveTVCount)
-                            .arg(sm_str(liveTVSize / 1024));
+                            .arg(StringUtil::formatKBytes(liveTVSize / 1024));
 
     if (deletedGroupCount)
     {
         staticInfo += tr("%n (is) Deleted and consume(s) %1\n", "",
                         deletedGroupCount)
-                        .arg(sm_str(deletedGroupSize / 1024));
+                        .arg(StringUtil::formatKBytes(deletedGroupSize / 1024));
     }
 
     for (it = m_expList.begin(); it != m_expList.end(); ++it)
@@ -1662,7 +1637,7 @@ void StatusBox::doAutoExpireList(bool updateExpList)
             "(" + ProgramInfo::i18n(pginfo->GetRecordingGroup()) + ") ";
 
         contentLine += pginfo->GetTitle() +
-            " (" + sm_str(pginfo->GetFilesize() / 1024) + ")";
+            " (" + StringUtil::formatKBytes(pginfo->GetFilesize() / 1024) + ")";
 
         detailInfo =
             MythDate::toString(
@@ -1671,7 +1646,7 @@ void StatusBox::doAutoExpireList(bool updateExpList)
             MythDate::toString(
                 endtime, MythDate::kDateTimeFull | MythDate::kSimplify);
 
-        detailInfo += " (" + sm_str(pginfo->GetFilesize() / 1024) + ")";
+        detailInfo += " (" + StringUtil::formatKBytes(pginfo->GetFilesize() / 1024) + ")";
 
         detailInfo += " (" + ProgramInfo::i18n(pginfo->GetRecordingGroup()) + ")";
 

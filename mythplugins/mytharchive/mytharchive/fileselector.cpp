@@ -9,6 +9,7 @@
 // Myth
 #include <libmyth/mythcontext.h>
 #include <libmythbase/mythdb.h>
+#include <libmythbase/stringutil.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>
 #include <libmythui/mythuibutton.h>
@@ -407,7 +408,7 @@ void FileSelector::updateFileList()
                 // add a row to the UIListBtnArea
                 auto* item = 
                      new MythUIButtonListItem(m_fileButtonList, data->filename);
-                item->SetText(formatSize(data->size / 1024, 2), "size");
+                item->SetText(StringUtil::formatKBytes(data->size / 1024, 2), "size");
 
                 if (m_selectorType == FSTYPE_FILELIST)
                 {

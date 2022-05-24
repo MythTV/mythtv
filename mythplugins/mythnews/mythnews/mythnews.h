@@ -37,7 +37,6 @@ class MythNews : public MythScreenType
     void processAndShowNews(NewsSite *site);
     static QString cleanText(const QString &text);
 
-    static QString formatSize(long long bytes, int prec);
     static void playVideo(const NewsArticle &article);
 
     // menu stuff

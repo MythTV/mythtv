@@ -15,35 +15,10 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystem.h"
 #include "libmythbase/remotefile.h"
+#include "libmythbase/stringutil.h"
 
 // Local includes
 #include "recordingutils.h"
-
-static QString formatSize(int64_t size, int prec)
-{
-    if (size>int64_t(1024)*1024*1024*1024) // Terabytes
-    {
-        double sizeTB = size/(1024*1024*1024*1024.0);
-        return QString("%1 TB").arg(sizeTB, 0, 'f', (sizeTB>10)?0:prec);
-    }
-    if (size>1024*1024*1024) // Gigabytes
-    {
-        double sizeGB = size/(1024*1024*1024.0);
-        return QString("%1 GB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
-    }
-    if (size>1024*1024) // Megabytes
-    {
-        double sizeMB = size/(1024*1024.0);
-        return QString("%1 MB").arg(sizeMB, 0, 'f', (sizeMB>10)?0:prec);
-    }
-    if (size>1024) // kilobytes
-    {
-        double sizekB = size/1024.0;
-        return QString("%1 kB").arg(sizekB, 0, 'f', (sizekB>10)?0:prec);
-    }
-    // Bytes
-    return QString("%1 B").arg(size);
-}
 
 static QString CreateProgramInfoString(const ProgramInfo &pginfo)
 {
@@ -213,7 +188,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
         {
             std::cout << qPrintable(CreateProgramInfoString(*p)) << std::endl;
             std::cout << qPrintable(p->GetPlaybackURL()) << std::endl;
-            std::cout << "File size is " << qPrintable(formatSize(p->GetFilesize(), 2)) << std::endl;
+            std::cout << "File size is " << qPrintable(StringUtil::formatBytes(p->GetFilesize(), 2)) << std::endl;
             std::cout << "-------------------------------------------------------------------" << std::endl;
         }
     }

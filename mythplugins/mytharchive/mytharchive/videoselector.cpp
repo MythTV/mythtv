@@ -11,6 +11,7 @@
 #include <libmyth/mythcontext.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/remotefile.h>
+#include <libmythbase/stringutil.h>
 #include <libmythmetadata/videoutils.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>
@@ -233,7 +234,7 @@ void VideoSelector::titleChanged(MythUIButtonListItem *item)
             }
         }
 
-        m_filesizeText->SetText(formatSize(v->size / 1024));
+        m_filesizeText->SetText(StringUtil::formatKBytes(v->size / 1024));
     }
 }
 

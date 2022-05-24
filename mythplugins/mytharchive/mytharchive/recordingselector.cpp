@@ -253,7 +253,7 @@ void RecordingSelector::titleChanged(MythUIButtonListItem *item)
 
     if (m_filesizeText)
     {
-        m_filesizeText->SetText(formatSize(p->GetFilesize() / 1024));
+        m_filesizeText->SetText(StringUtil::formatKBytes(p->GetFilesize() / 1024));
     }
 
     if (m_cutlistImage)
@@ -423,7 +423,7 @@ void RecordingSelector::updateRecordingList(void)
 
                 item->SetText(timedate, "timedate");
                 item->SetText(p->GetDescription(), "description");
-                item->SetText(formatSize(p->GetFilesize() / 1024),
+                item->SetText(StringUtil::formatKBytes(p->GetFilesize() / 1024),
                               "filesize_str");
 
                 item->SetText(QString::number(season), "season");

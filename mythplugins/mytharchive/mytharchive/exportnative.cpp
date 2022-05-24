@@ -16,6 +16,7 @@
 #include <libmythbase/exitcodes.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythsystemlegacy.h>
+#include <libmythbase/stringutil.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>
 #include <libmythui/mythuibutton.h>
@@ -187,7 +188,7 @@ void ExportNative::titleChanged(MythUIButtonListItem *item)
     m_descriptionText->SetText(
                 (a->subtitle != "" ? a->subtitle + "\n" : "") + a->description);
 
-    m_filesizeText->SetText(formatSize(a->size / 1024, 2));
+    m_filesizeText->SetText(StringUtil::formatKBytes(a->size / 1024, 2));
 }
 
 void ExportNative::handleNextPage()
