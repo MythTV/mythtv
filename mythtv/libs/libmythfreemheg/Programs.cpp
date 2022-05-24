@@ -279,7 +279,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             {
                 int date = GetInt(args.GetAt(0), engine); // Date as produced in GCD
                 // Convert to a Unix date (secs since 1st Jan 1970) but adjusted for time zone.
-                time_t timet = (date - 40587) * (24 * 60 * 60);
+                time_t timet = (date - 40587) * static_cast<time_t>(24 * 60 * 60);
                 struct tm *timeStr = gmtime(&timet);
                 // 0 => Sunday, 1 => Monday etc.
                 engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(timeStr->tm_wday);
