@@ -32,6 +32,14 @@
 #include "exitcodes.h"
 #include "mythlogging.h"
 
+#if !defined(__syscall_slong_t)
+using __syscall_slong_t = long int;
+#endif
+// Run the IO handler ~100x per second (every 10ms), for ~3MBps throughput
+static constexpr __syscall_slong_t kIOHandlerInterval {static_cast<__syscall_slong_t>(10)*1000*1000};
+// Run the Signal handler ~20x per second (every 50ms).
+static constexpr __syscall_slong_t kSignalHandlerInterval {static_cast<__syscall_slong_t>(50)*1000*1000};
+
 #define CLOSE(x) \
 if( (x) >= 0 ) { \
     close((x)); \
@@ -94,8 +102,8 @@ void MythSystemLegacyIOHandler::run(void)
 
         while( run_system )
         {
-            struct timespec ts { 0, 10*1000*1000};  // 10ms
-            nanosleep(&ts, nullptr); // ~100x per second, for ~3MBps throughput
+            struct timespec ts { 0, kIOHandlerInterval };
+            nanosleep(&ts, nullptr);
             m_pLock.lock();
             if( m_pMap.isEmpty() )
             {
@@ -517,8 +525,8 @@ void MythSystemLegacySignalManager::run(void)
     LOG(VB_GENERAL, LOG_INFO, "Starting process signal handler");
     while (run_system)
     {
-        struct timespec ts {0, 50 * 1000 * 1000}; // 50ms
-        nanosleep(&ts, nullptr); // sleep 50ms
+        struct timespec ts {0, kSignalHandlerInterval};
+        nanosleep(&ts, nullptr);
 
         while (run_system)
         {
