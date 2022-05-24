@@ -441,13 +441,13 @@ static int setScheduledWakeupTime()
     {
         int m_preRollSeconds = gCoreContext->GetNumSetting("RecordPreRoll");
         QDateTime restarttime = nextRecordingStart
-            .addSecs((-1) * m_preRollSeconds);
+            .addSecs((-1LL) * m_preRollSeconds);
 
         int add = gCoreContext->GetNumSetting(
             "StartupSecsBeforeRecording", 240);
 
         if (add)
-            restarttime = restarttime.addSecs((-1) * add);
+            restarttime = restarttime.addSecs((-1LL) * add);
 
         setWakeupTime(restarttime);
 

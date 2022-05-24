@@ -680,7 +680,7 @@ void WelcomeDialog::shutdownNow(void)
 
         int add = gCoreContext->GetNumSetting("StartupSecsBeforeRecording", 240);
         if (add)
-            restarttime = restarttime.addSecs((-1) * add);
+            restarttime = restarttime.addSecs((-1LL) * add);
 
         QString wakeup_timeformat = gCoreContext->GetSetting("WakeupTimeFormat",
                                                             "yyyy-MM-ddThh:mm");
