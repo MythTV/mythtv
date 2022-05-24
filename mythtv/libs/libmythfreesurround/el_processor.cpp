@@ -421,8 +421,8 @@ private:
         }
     }
 
-    unsigned int m_n;                    // the block size
-    unsigned int m_halfN;                // half block size precalculated
+    size_t m_n;                          // the block size
+    size_t m_halfN;                      // half block size precalculated
     FFTContext *m_fftContextForward {nullptr};
     FFTContext *m_fftContextReverse {nullptr};
     // FFTs are computed in-place in these buffers on copies of the input

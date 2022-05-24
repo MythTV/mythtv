@@ -410,7 +410,9 @@ long long FreeSurround::getLatency()
     // returns in usec
     if (m_latencyFrames == 0)
         return 0;
-    return m_decoder ? ((long long)(m_latencyFrames + m_inCount)*1000000)/(2*m_srate) : 0;
+    if (m_decoder == nullptr)
+        return 0;
+    return ((m_latencyFrames + m_inCount) * 1000000LL) / (2LL * m_srate);
 }
 
 void FreeSurround::flush()
