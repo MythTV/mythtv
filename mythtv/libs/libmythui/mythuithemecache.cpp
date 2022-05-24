@@ -25,7 +25,7 @@
 MythUIThemeCache::MythUIThemeCache()
   : m_imageThreadPool(new MThreadPool("MythUIHelper"))
 {
-    m_maxCacheSize.fetchAndStoreRelease(GetMythDB()->GetNumSetting("UIImageCacheSize", 30) * 1024 * 1024);
+    m_maxCacheSize.fetchAndStoreRelease(GetMythDB()->GetNumSetting("UIImageCacheSize", 30) * 1024LL * 1024);
     LOG(VB_GUI, LOG_INFO, LOC + QString("MythUI Image Cache size set to %1 bytes")
         .arg(m_maxCacheSize.fetchAndAddRelease(0)));
 }

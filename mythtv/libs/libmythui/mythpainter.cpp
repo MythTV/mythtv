@@ -369,7 +369,7 @@ MythImage *MythPainter::GetImageFromString(const QString &msg,
         DrawTextPriv(im, msg, flags, r, font);
 
         im->IncrRef();
-        m_softwareCacheSize += im->bytesPerLine() * im->height();
+        m_softwareCacheSize += im->GetSize();
         m_stringToImageMap[incoming] = im;
         m_stringExpireList.push_back(incoming);
         ExpireImages(m_maxSoftwareCacheSize);
@@ -461,7 +461,7 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
         im->Assign(pm.copy(0, 0, dest.width(), dest.height()));
 
         im->IncrRef();
-        m_softwareCacheSize += im->bytesPerLine() * im->height();
+        m_softwareCacheSize += im->GetSize();
         m_stringToImageMap[incoming] = im;
         m_stringExpireList.push_back(incoming);
         ExpireImages(m_maxSoftwareCacheSize);
@@ -529,7 +529,7 @@ MythImage* MythPainter::GetImageFromRect(const QRect area, int radius,
         DrawRectPriv(im, area, radius, ellipse, fillBrush, linePen);
 
         im->IncrRef();
-        m_softwareCacheSize += (im->bytesPerLine() * im->height());
+        m_softwareCacheSize += im->GetSize();
         m_stringToImageMap[incoming] = im;
         m_stringExpireList.push_back(incoming);
         ExpireImages(m_maxSoftwareCacheSize);
@@ -586,7 +586,7 @@ void MythPainter::ExpireImages(int64_t max)
 
         if (oldim)
         {
-            m_softwareCacheSize -= oldim->bytesPerLine() * oldim->height();
+            m_softwareCacheSize -= oldim->GetSize();
             if (m_softwareCacheSize < 0)
             {
                 m_softwareCacheSize = 0;
@@ -599,7 +599,7 @@ void MythPainter::ExpireImages(int64_t max)
     {
         m_softwareCacheSize = 0;
         for (auto *img : qAsConst(m_stringToImageMap))
-            m_softwareCacheSize += img->bytesPerLine() * img->height();
+            m_softwareCacheSize += img->GetSize();
     }
 }
 

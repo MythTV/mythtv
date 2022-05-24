@@ -39,6 +39,15 @@
 
 #define LOC      QString("LIRC: ")
 
+#if !defined(__suseconds_t)
+#ifdef Q_OS_MACOS
+using __suseconds_t = __darwin_suseconds_t;
+#else
+using __suseconds_t = long int;
+#endif
+#endif
+static constexpr __suseconds_t k100Milliseconds {static_cast<__suseconds_t>(100 * 1000)};
+
 class LIRCPriv
 {
   public:
@@ -446,7 +455,7 @@ void LIRC::run(void)
         FD_SET(d->m_lircState->lirc_lircd, &readfds);
 
         // the maximum time select() should wait
-        struct timeval timeout {1, 100 * 1000}; // 1 second, 100 ms
+        struct timeval timeout {1, k100Milliseconds}; // 1 second, 100 ms
 
         int ret = select(d->m_lircState->lirc_lircd + 1, &readfds, nullptr, nullptr,
                          &timeout);
