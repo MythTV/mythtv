@@ -93,7 +93,7 @@ void Streamer::SendBytes(void)
         int read_sz = m_blockSize.loadAcquire();
         if (!m_startTime.isValid())
             m_startTime = MythDate::current();
-        int delta = m_startTime.secsTo(MythDate::current()) + 1;
+        qint64 delta = m_startTime.secsTo(MythDate::current()) + 1;
         int rate  = (delta * m_dataRate) - m_dataRead;
 
         read_sz = std::min(rate, read_sz);
