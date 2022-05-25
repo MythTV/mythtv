@@ -1,19 +1,14 @@
 import { Component, OnInit } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
 import { Miscellaneous } from 'src/app/services/interfaces/setup.interface';
 import { SetupService } from 'src/app/services/setup.service';
 
 
-interface Scheduler {
+interface ddParam {
   name: string,
   code: string
 }
-
-interface UpnpSource {
-  name: string,
-  code: string
-}
-
 
 @Component({
   selector: 'app-misc-settings',
@@ -23,18 +18,25 @@ interface UpnpSource {
 
 export class MiscSettingsComponent implements OnInit {
   miscData: Miscellaneous = this.setupService.getMiscellaneousData();
-  soptions: Scheduler[] = [
-    {name: "Balanced free space", code: "BalancedFreeSpace" },
-    {name: "Balanced percent free space", code: "BalancedPercFreeSpace"},
-    {name: "Balanced disk I/O", code: "BalancedDiskIO"},
-    {name: "Combination", code: "Combination"}
+  soptions: ddParam[] = [
+    {name: 'settings.misc.sg_balfree', code: "BalancedFreeSpace" },
+    {name: 'settings.misc.sg_balpercent', code: "BalancedPercFreeSpace"},
+    {name: 'settings.misc.bal_io', code: "BalancedDiskIO"},
+    {name: 'settings.misc.sg_combination', code: "Combination"}
   ];
-  uoptions: UpnpSource [] = [
-    {name: "Recordings", code: "0" },
-    {name: "Videos", code: "1"},
+  uoptions: ddParam [] = [
+    {name: 'settings.misc.upnp_recs', code: "0" },
+    {name: 'settings.misc.upnp_videos', code: "1"},
   ];
 
-  constructor(private setupService: SetupService) { }
+  constructor(private setupService: SetupService, private translate: TranslateService) {
+    translate.get(this.soptions[0].name).subscribe(data => this.soptions[0].name = data);
+    translate.get(this.soptions[1].name).subscribe(data => this.soptions[1].name = data);
+    translate.get(this.soptions[2].name).subscribe(data => this.soptions[2].name = data);
+    translate.get(this.soptions[3].name).subscribe(data => this.soptions[3].name = data);
+    translate.get(this.uoptions[0].name).subscribe(data => this.uoptions[0].name = data);
+    translate.get(this.uoptions[1].name).subscribe(data => this.uoptions[1].name = data);
+  }
 
   ngOnInit(): void {
   }

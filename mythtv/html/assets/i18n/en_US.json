@@ -178,7 +178,13 @@
             "disfwr_desc": "By default, MythTV resets the FireWire bus when a FireWire recorder stops responding to commands. If this causes problems, you can disable this behavior here.",
             "savesuccess": "Saved successfully.",
             "panel_filemgmt": "File Management",
-            "panel_upnp": "UPnP Server"
+            "panel_upnp": "UPnP Server",
+            "sg_balfree": "Balanced free space",
+            "sg_balpercent": "Balanced percent free space",
+            "bal_io": "Balanced disk I/O",
+            "sg_combination": "Combination",
+            "upnp_recs": "Recordings",
+            "upnp_videos": "Videos"
         },
         "networkfail": "ERROR: Backend Network Failure",
         "eit": {
