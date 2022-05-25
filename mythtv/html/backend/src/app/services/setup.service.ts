@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Setup, Miscellaneous, EITScanner, ShutWake, BackendWake, BackendControl } from './interfaces/setup.interface';
+import { Observable } from 'rxjs';
+import { GetSettingResponse } from './interfaces/myth.interface';
+import { Setup, Miscellaneous, EITScanner, ShutWake, BackendWake, BackendControl,
+    JobQBackend, JobQCommands }
+    from './interfaces/setup.interface';
 import { MythService } from './myth.service';
 
 @Injectable({
@@ -446,7 +450,204 @@ export class SetupService {
             Value: this.m_BackendControl.BackendStartCommand}).subscribe(this.becObserver);
     }
 
+    m_JobQBackend!: JobQBackend;
 
 
+    parseTime(date: Date, string: String) {
+        let parts = string.split(':');
+        date.setHours(Number(parts[0]));
+        date.setMinutes(Number(parts[1]));
+    }
+
+    formatTime(date: Date) : string{
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        let string = "";
+        if (hours < 10) {
+            string += "0"
+        }
+        string += String(hours);
+        string += ":";
+        if (minutes < 10) {
+            string += "0"
+        }
+        string += String(minutes);
+        return string;
+    }
+
+    getJobQBackend(): JobQBackend {
+        this.m_JobQBackend = {
+            successCount: 0,
+            errorCount: 0,
+            JobQueueMaxSimultaneousJobs:    1,
+            JobQueueCheckFrequency:         60,
+            JobQueueWindowStart:            new Date(0),
+            JobQueueWindowStartObs:         new Observable<GetSettingResponse>(),
+            JobQueueWindowEnd:              new Date(0),
+            JobQueueWindowEndObs:           new Observable<GetSettingResponse>(),
+            JobQueueCPU:                    "0",
+            JobAllowMetadata:               true,
+            JobAllowCommFlag:               true,
+            JobAllowTranscode:              true,
+            JobAllowPreview:                true,
+            JobAllowUserJob1:               false,
+            JobAllowUserJob2:               false,
+            JobAllowUserJob3:               false,
+            JobAllowUserJob4:               false,
+        }
+        this.parseTime(this.m_JobQBackend.JobQueueWindowStart,"00:00");
+        this.parseTime(this.m_JobQBackend.JobQueueWindowEnd,"23:59");
+
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "JobQueueMaxSimultaneousJobs", Default: "1" })
+            .subscribe({
+                next: data => this.m_JobQBackend.JobQueueMaxSimultaneousJobs = Number(data.String),
+                error: () => this.m_JobQBackend.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "JobQueueCheckFrequency", Default: "60" })
+            .subscribe({
+                next: data => this.m_JobQBackend.JobQueueCheckFrequency = Number(data.String),
+                error: () => this.m_JobQBackend.errorCount++
+            });
+        this.m_JobQBackend.JobQueueWindowStartObs = this.mythService.GetSetting({
+             HostName: this.m_hostName, Key: "JobQueueWindowStart", Default: "00:00" });
+        this.m_JobQBackend.JobQueueWindowStartObs
+            .subscribe({
+                next: data => this.parseTime(this.m_JobQBackend.JobQueueWindowStart, data.String),
+                error: () => this.m_JobQBackend.errorCount++
+            });
+        this.m_JobQBackend.JobQueueWindowEndObs = this.mythService.GetSetting({
+            HostName: this.m_hostName, Key: "JobQueueWindowEnd", Default: "23:59" });
+        this.m_JobQBackend.JobQueueWindowEndObs
+            .subscribe({
+                next: data => this.parseTime(this.m_JobQBackend.JobQueueWindowEnd, data.String),
+                error: () => this.m_JobQBackend.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "JobQueueCPU", Default: "0" })
+            .subscribe({
+                next: data => this.m_JobQBackend.JobQueueCPU =  data.String,
+                error: () => this.m_JobQBackend.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "JobAllowMetadata", Default: "1" })
+            .subscribe({
+                next: data => this.m_JobQBackend.JobAllowMetadata =  (data.String == '1'),
+                error: () => this.m_JobQBackend.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "JobAllowCommFlag", Default: "1" })
+            .subscribe({
+                next: data => this.m_JobQBackend.JobAllowCommFlag =  (data.String == '1'),
+                error: () => this.m_JobQBackend.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "JobAllowTranscode", Default: "1" })
+            .subscribe({
+                next: data => this.m_JobQBackend.JobAllowTranscode =  (data.String == '1'),
+                error: () => this.m_JobQBackend.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "JobAllowPreview", Default: "1" })
+            .subscribe({
+                next: data => this.m_JobQBackend.JobAllowPreview =  (data.String == '1'),
+                error: () => this.m_JobQBackend.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "JobAllowUserJob1", Default: "0" })
+            .subscribe({
+                next: data => this.m_JobQBackend.JobAllowUserJob1 =  (data.String == '1'),
+                error: () => this.m_JobQBackend.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "JobAllowUserJob2", Default: "0" })
+            .subscribe({
+                next: data => this.m_JobQBackend.JobAllowUserJob2 =  (data.String == '1'),
+                error: () => this.m_JobQBackend.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "JobAllowUserJob3", Default: "0" })
+            .subscribe({
+                next: data => this.m_JobQBackend.JobAllowUserJob3 =  (data.String == '1'),
+                error: () => this.m_JobQBackend.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "JobAllowUserJob4", Default: "0" })
+            .subscribe({
+                next: data => this.m_JobQBackend.JobAllowUserJob4 =  (data.String == '1'),
+                error: () => this.m_JobQBackend.errorCount++
+            });
+        return this.m_JobQBackend;
+    }
+
+    jqbObserver = {
+        next: (x: any) => {
+            if (x.bool)
+                this.m_JobQBackend.successCount++;
+            else
+                this.m_JobQBackend.errorCount;
+        },
+        error: (err: any) => {
+            console.error(err);
+            this.m_JobQBackend.errorCount++
+        },
+    };
+
+    saveJobQBackend() {
+        this.m_JobQBackend.successCount = 0;
+        this.m_JobQBackend.errorCount = 0;
+        this.mythService.PutSetting({HostName: this.m_hostName, Key: "JobQueueMaxSimultaneousJobs",
+            Value: String(this.m_JobQBackend.JobQueueMaxSimultaneousJobs)}).subscribe(this.jqbObserver);
+        this.mythService.PutSetting({HostName: this.m_hostName, Key: "JobQueueCheckFrequency",
+            Value: String(this.m_JobQBackend.JobQueueCheckFrequency)}).subscribe(this.jqbObserver);
+        this.mythService.PutSetting({HostName: this.m_hostName, Key: "JobQueueWindowStart",
+            Value: this.formatTime(this.m_JobQBackend.JobQueueWindowStart)}).subscribe(this.jqbObserver);
+        this.mythService.PutSetting({HostName: this.m_hostName, Key: "JobQueueWindowEnd",
+            Value: this.formatTime(this.m_JobQBackend.JobQueueWindowEnd)}).subscribe(this.jqbObserver);
+        this.mythService.PutSetting({HostName: this.m_hostName, Key: "JobQueueCPU",
+            Value: this.m_JobQBackend.JobQueueCPU}).subscribe(this.jqbObserver);
+        this.mythService.PutSetting({HostName: this.m_hostName, Key: "JobAllowMetadata",
+            Value: this.m_JobQBackend.JobAllowMetadata ? "1" : "0"}).subscribe(this.jqbObserver);
+        this.mythService.PutSetting({HostName: this.m_hostName, Key: "JobAllowCommFlag",
+            Value: this.m_JobQBackend.JobAllowCommFlag ? "1" : "0"}).subscribe(this.jqbObserver);
+        this.mythService.PutSetting({HostName: this.m_hostName, Key: "JobAllowTranscode",
+            Value: this.m_JobQBackend.JobAllowTranscode ? "1" : "0"}).subscribe(this.jqbObserver);
+        this.mythService.PutSetting({HostName: this.m_hostName, Key: "JobAllowPreview",
+            Value: this.m_JobQBackend.JobAllowPreview ? "1" : "0"}).subscribe(this.jqbObserver);
+        this.mythService.PutSetting({HostName: this.m_hostName, Key: "JobAllowUserJob1",
+            Value: this.m_JobQBackend.JobAllowUserJob1 ? "1" : "0"}).subscribe(this.jqbObserver);
+        this.mythService.PutSetting({HostName: this.m_hostName, Key: "JobAllowUserJob2",
+            Value: this.m_JobQBackend.JobAllowUserJob2 ? "1" : "0"}).subscribe(this.jqbObserver);
+        this.mythService.PutSetting({HostName: this.m_hostName, Key: "JobAllowUserJob3",
+            Value: this.m_JobQBackend.JobAllowUserJob3 ? "1" : "0"}).subscribe(this.jqbObserver);
+        this.mythService.PutSetting({HostName: this.m_hostName, Key: "JobAllowUserJob4",
+            Value: this.m_JobQBackend.JobAllowUserJob4 ? "1" : "0"}).subscribe(this.jqbObserver);
+
+        }
+
+    m_JobQCommands!: JobQCommands;
+
+    getJobQCommands(): JobQCommands {
+        this.m_JobQCommands = {
+            successCount: 0,
+            errorCount: 0,
+            UserJobDesc1:                   "User Job #1",
+            UserJobDesc2:                   "User Job #2",
+            UserJobDesc3:                   "User Job #3",
+            UserJobDesc4:                   "User Job #4"
+        }
+
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "UserJobDesc1", Default: "User Job #1" })
+            .subscribe({
+                next: data => this.m_JobQCommands.UserJobDesc1 =  data.String,
+                error: () => this.m_JobQBackend.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "UserJobDesc2", Default: "User Job #2" })
+            .subscribe({
+                next: data => this.m_JobQCommands.UserJobDesc2 =  data.String,
+                error: () => this.m_JobQCommands.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "UserJobDesc3", Default: "User Job #3" })
+            .subscribe({
+                next: data => this.m_JobQCommands.UserJobDesc3 =  data.String,
+                error: () => this.m_JobQCommands.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "UserJobDesc4", Default: "User Job #4" })
+            .subscribe({
+                next: data => this.m_JobQCommands.UserJobDesc4 =  data.String,
+                error: () => this.m_JobQCommands.errorCount++
+            });
+        return this.m_JobQCommands;
+    }
 
 }

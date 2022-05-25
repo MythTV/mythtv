@@ -238,6 +238,27 @@
             "stop_desc": "The command used to stop the backend when running on the master backend server (e.g. sudo /etc/init.d/mythtv-backend stop)",
             "start_label": "Backend Start Command",
             "start_desc": "The command used to start the backend when running on the master backend server (e.g. sudo /etc/init.d/mythtv-backend start)."
+        },
+        "jobqbackend": {
+            "title": "Job Queue (Backend-Specific)",
+            "subtitle": "Job Queue Controls Specific to This Backend",
+            "maxjobs_title": "Maximum Simultaneous Jobs on this Backend",
+            "maxjobs_desc": "The Job Queue will be limited to running this many simultaneous jobs on this backend.",
+            "freq_title": "Job Queue Check Frequency (secs)",
+            "freq_desc": "When looking for new jobs to process, the Job Queue will wait this many seconds between checks.",
+            "start_title": "Job Queue Start Time",
+            "start_desc": "This setting controls the start of the Job Queue time window, which determines when new jobs will be started.",
+            "end_title": "Job Queue End Time",
+            "end_desc": "This setting controls the end of the Job Queue time window, which determines when new jobs will be started.",
+            "cpu_title": "CPU Usage",
+            "cpu_desc": "This setting controls approximately how much CPU jobs in the queue may consume. On 'High', all available CPU time may be used, which could cause problems on slower systems.",
+            "meta_title": "Allow Metadata Lookup Jobs",
+            "allow_desc": "If enabled, allow jobs of this type to run on this backend.",
+            "comm_title": "Allow Commercial Detection Jobs",
+            "preview_title": "Allow Preview Jobs",
+            "cpu_low": "Low",
+            "cpu_med": "Medium",
+            "cpu_high": "High"
         }
     }
 }

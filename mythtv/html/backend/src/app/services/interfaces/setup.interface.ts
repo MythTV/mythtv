@@ -1,3 +1,6 @@
+import { Observable } from "rxjs";
+import { GetSettingResponse } from "./myth.interface";
+
 export interface HostAddress {
     BackendServerPort:     number;
     BackendStatusPort:     number;
@@ -69,6 +72,36 @@ export interface BackendControl {
     BackendStopCommand:             string;
     BackendStartCommand:            string;
 }
+
+export interface JobQBackend {
+    successCount:                   number;
+    errorCount:                     number;
+    JobQueueMaxSimultaneousJobs:    number;
+    JobQueueCheckFrequency:         number;
+    JobQueueWindowStart:            Date;
+    JobQueueWindowStartObs:         Observable<GetSettingResponse>;
+    JobQueueWindowEnd:              Date;
+    JobQueueWindowEndObs:           Observable<GetSettingResponse>;
+    JobQueueCPU:                    string;
+    JobAllowMetadata:               boolean;
+    JobAllowCommFlag:               boolean;
+    JobAllowTranscode:              boolean;
+    JobAllowPreview:                boolean;
+    JobAllowUserJob1:               boolean;
+    JobAllowUserJob2:               boolean;
+    JobAllowUserJob3:               boolean;
+    JobAllowUserJob4:               boolean;
+}
+
+export interface JobQCommands {
+    successCount:                   number;
+    errorCount:                     number;
+    UserJobDesc1:                   string;
+    UserJobDesc2:                   string;
+    UserJobDesc3:                   string;
+    UserJobDesc4:                   string;
+}
+
 
 export interface Setup {
     General: {
