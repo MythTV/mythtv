@@ -4316,7 +4316,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
                     if (m_playerContext.m_ffRewState)
                         SetFFRew(static_cast<int>(index));
                 }
-                else if (0.48F <= tmpSpeed && tmpSpeed <= 2.0F)
+                else if (0.125F <= tmpSpeed && tmpSpeed <= 2.0F)
                 {
                     StopFFRew();
                     m_playerContext.m_tsNormal = tmpSpeed;   // alter speed before display
@@ -6913,7 +6913,7 @@ void TV::ToggleTimeStretch()
 
 void TV::ChangeTimeStretch(int Dir, bool AllowEdit)
 {
-    const float kTimeStretchMin = 0.5;
+    const float kTimeStretchMin = 0.125;
     const float kTimeStretchMax = 2.0;
     const float kTimeStretchStep = 0.05F;
     float new_ts_normal = m_playerContext.m_tsNormal + (kTimeStretchStep * Dir);
