@@ -912,8 +912,17 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
 
     if (!message.isEmpty())
     {
-        MythEvent me(message);
-        gCoreContext->dispatch(me);
+        // Don't broadcast this event as the TV object will see it
+        // twice: once directly from the Qt event system, and once
+        // because its filtering all events before they are sent to
+        // the main window.  Its much easier to get a pointer to the
+        // MainWindow object than is is to a pointer to the TV object,
+        // so send the event directly there.  The TV object will get
+        // it anyway because because of the filter hook.  (The last
+        // third of this function requires you to be in playback mode
+        // so the TV object is guaranteed to exist.)
+        auto *me = new MythEvent(message);
+        qApp->postEvent(GetMythMainWindow(), me);
     }
 
     return result;

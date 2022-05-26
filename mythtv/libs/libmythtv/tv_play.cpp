@@ -2905,11 +2905,12 @@ void TV::HandleSpeedChangeTimerEvent()
 /// 2021, this filter is only used to redirect some events from the
 /// MythMainWindow object to the TV object.
 ///
-/// \warning If an event will be received by both the MythMainWindow object
-/// and the TV object, block it instead of redirecting it. Redirecting it
-/// just causes the event to be handled twice, once in the direct call from
-/// Qt to TV::event and once in the call from Qt to this function to
-/// TV::event.
+/// \warning Be careful if an event is broadcast to all objects
+/// instead of being set directly to a specific object.  For a
+/// broadcast event, Qt will: 1) call TV::customEvent, and 2) call
+/// this function to find out whether it should call
+/// MythMainWindow::customEvent. If this function calls
+/// TV::customEvent, then the same event gets processed twice.
 ///
 /// \param  Object The QObject whose events are being filtered.
 /// \param  Event  The QEvent that is about to be passed to Object->event().
@@ -2944,8 +2945,7 @@ bool TV::eventFilter(QObject* Object, QEvent* Event)
         Event->type() == MythEvent::kUpdateTvProgressEventType ||
         Event->type() == MythMediaEvent::kEventType)
     {
-        // DO NOT call TV::customEvent here!
-        // customEvent(Event);
+        customEvent(Event);
         return true;
     }
 
