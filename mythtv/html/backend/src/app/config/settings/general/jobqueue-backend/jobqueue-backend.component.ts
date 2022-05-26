@@ -50,9 +50,9 @@ export class JobqueueBackendComponent implements OnInit {
     if (typeof this.JobQCmds == 'undefined')
       this.JobQCmds = this.setupService.getJobQCommands();
 
-      translate.get(this.cpuOptions[0].name).subscribe(data => this.cpuOptions[0].name = data);
-      translate.get(this.cpuOptions[1].name).subscribe(data => this.cpuOptions[1].name = data);
-      translate.get(this.cpuOptions[2].name).subscribe(data => this.cpuOptions[2].name = data);
+    translate.get(this.cpuOptions[0].name).subscribe(data => this.cpuOptions[0].name = data);
+    translate.get(this.cpuOptions[1].name).subscribe(data => this.cpuOptions[1].name = data);
+    translate.get(this.cpuOptions[2].name).subscribe(data => this.cpuOptions[2].name = data);
   }
 
   ngOnInit(): void {
