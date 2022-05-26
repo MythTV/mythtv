@@ -28,7 +28,7 @@ export class GuideComponent implements OnInit {
     this.translate.onLangChange.subscribe((event : TranslationChangeEvent) => {
       console.log("Event: language change, new language (" + event.lang + ")");
       this.switchLanguage(event.lang);
-      this.loadData();
+      this.fetchData();
     })
   }
 
@@ -48,16 +48,16 @@ export class GuideComponent implements OnInit {
 
   fetchData(reqDate?: Date) : void {
     this.m_guideData$ = this.guideService.GetProgramGuide(reqDate).pipe(
-      tap(data => console.log(data)),
-      tap(data => this.m_startDate = new Date(data.ProgramGuide.StartTime)),
-      tap(data => this.m_endDate = new Date(data.ProgramGuide.EndTime)),
-      tap(data => this.m_channelData = data.ProgramGuide.Channels),
-      tap(data => this.m_channelTotal = data.ProgramGuide.TotalAvailable),
+      tap(data =>
+        {
+          console.log(data);
+          this.m_startDate = new Date(data.ProgramGuide.StartTime);
+          this.m_endDate = new Date(data.ProgramGuide.EndTime);
+          this.m_channelData = data.ProgramGuide.Channels;
+          this.m_channelTotal = data.ProgramGuide.TotalAvailable;
+        }
+      )
     )
-  }
-
-  loadData(): void {
-    this.fetchData();
   }
 
   inDisplayWindow(startTime : string, endTime : string) : boolean {
