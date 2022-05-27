@@ -11,7 +11,7 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="JobQueueMaxSimultaneousJobs" class="block" >{{ 'settings.jobqbackend.maxjobs_title' | translate }}</label>
+                        <label for="JobQueueMaxSimultaneousJobs" class="block" >{{ 'settings.jobqbackend.maxjobs_label' | translate }}</label>
                         <p-inputNumber [(ngModel)]="JobQBData.JobQueueMaxSimultaneousJobs" name="JobQueueMaxSimultaneousJobs" id="JobQueueMaxSimultaneousJobs"
                             [showButtons]="true" [min]="1" [max]="10" [step]="1"></p-inputNumber>
                         <small class="block">
@@ -20,7 +20,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="JobQueueCheckFrequency" class="block" >{{ 'settings.jobqbackend.freq_title' | translate }}</label>
+                        <label for="JobQueueCheckFrequency" class="block" >{{ 'settings.jobqbackend.freq_label' | translate }}</label>
                         <p-inputNumber [(ngModel)]="JobQBData.JobQueueCheckFrequency" name="JobQueueCheckFrequency" id="JobQueueCheckFrequency"
                             [showButtons]="true" [min]="5" [max]="300" [step]="5"></p-inputNumber>
                         <small class="block">
@@ -29,7 +29,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="JobQueueWindowStart" class="block" >{{ 'settings.jobqbackend.start_title' | translate }}</label>
+                        <label for="JobQueueWindowStart" class="block" >{{ 'settings.jobqbackend.start_label' | translate }}</label>
                         <p-calendar #JobQueueWindowStart [(ngModel)]="JobQBData.JobQueueWindowStart" name="JobQueueWindowStart" id="JobQueueWindowStart"
                             [timeOnly]="true" [readonlyInput]="true" ngControl="JobQueueWindowStart"></p-calendar>
                         <small class="block">
@@ -38,7 +38,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="JobQueueWindowEnd" class="block" >{{ 'settings.jobqbackend.end_title' | translate }}</label>
+                        <label for="JobQueueWindowEnd" class="block" >{{ 'settings.jobqbackend.end_label' | translate }}</label>
                         <p-calendar #JobQueueWindowEnd [(ngModel)]="JobQBData.JobQueueWindowEnd" name="JobQueueWindowEnd" id="JobQueueWindowEnd"
                             [timeOnly]="true" [readonlyInput]="true" ngControl="JobQueueWindowEnd"></p-calendar>
                         <small class="block">
@@ -47,7 +47,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="JobQueueCPU" class="block">{{ 'settings.jobqbackend.cpu_title' | translate }}</label>
+                        <label for="JobQueueCPU" class="block">{{ 'settings.jobqbackend.cpu_label' | translate }}</label>
                         <p-dropdown [options]="cpuOptions " [(ngModel)]="JobQBData.JobQueueCPU"  optionLabel="name"  optionValue="code"
                             class="block w-15rem mb-2"
                             name="JobQueueCPU" #JobQueueCPU="ngModel"   >
@@ -60,7 +60,7 @@
                     <div class="form-group field">
                         <p-checkbox inputId="JobAllowMetadata" [(ngModel)]="JobQBData.JobAllowMetadata"
                             name="JobAllowMetadata" #JobAllowMetadata="ngModel" class="mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.jobqbackend.meta_title' | translate }}">
+                            label="{{ 'settings.jobqbackend.meta_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
                             {{ 'settings.jobqbackend.allow_desc' | translate }}
@@ -70,7 +70,7 @@
                     <div class="form-group field">
                         <p-checkbox inputId="JobAllowCommFlag" [(ngModel)]="JobQBData.JobAllowCommFlag"
                             name="JobAllowCommFlag" #JobAllowCommFlag="ngModel" class="mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.jobqbackend.comm_title' | translate }}">
+                            label="{{ 'settings.jobqbackend.comm_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
                             {{ 'settings.jobqbackend.allow_desc' | translate }}
@@ -90,7 +90,7 @@
                     <div class="form-group field">
                         <p-checkbox inputId="JobAllowPreview" [(ngModel)]="JobQBData.JobAllowPreview"
                             name="JobAllowPreview" #JobAllowPreview="ngModel" class="mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.jobqbackend.preview_title' | translate }}">
+                            label="{{ 'settings.jobqbackend.preview_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
                             {{ 'settings.jobqbackend.allow_desc' | translate }}

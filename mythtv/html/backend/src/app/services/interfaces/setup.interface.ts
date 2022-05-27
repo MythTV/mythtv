@@ -102,6 +102,17 @@ export interface JobQCommands {
     UserJobDesc4:                   string;
 }
 
+export interface JobQGlobal {
+    successCount:                   number;
+    errorCount:                     number;
+    JobsRunOnRecordHost:            boolean;
+    AutoCommflagWhileRecording:     boolean;
+    JobQueueCommFlagCommand:        string;
+    JobQueueTranscodeCommand:       string;
+    AutoTranscodeBeforeAutoCommflag:boolean;
+    SaveTranscoding:                boolean;
+}
+
 
 export interface Setup {
     General: {

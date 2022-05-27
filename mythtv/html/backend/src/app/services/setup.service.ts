@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { GetSettingResponse } from './interfaces/myth.interface';
 import { Setup, Miscellaneous, EITScanner, ShutWake, BackendWake, BackendControl,
-    JobQBackend, JobQCommands }
+    JobQBackend, JobQCommands, JobQGlobal }
     from './interfaces/setup.interface';
 import { MythService } from './myth.service';
 
@@ -452,7 +452,6 @@ export class SetupService {
 
     m_JobQBackend!: JobQBackend;
 
-
     parseTime(date: Date, string: String) {
         let parts = string.split(':');
         date.setHours(Number(parts[0]));
@@ -648,6 +647,84 @@ export class SetupService {
                 error: () => this.m_JobQCommands.errorCount++
             });
         return this.m_JobQCommands;
+    }
+
+    m_JobQGlobal!: JobQGlobal;
+
+    getJobQGlobal(): JobQGlobal {
+        this.m_JobQGlobal = {
+            successCount: 0,
+            errorCount: 0,
+            JobsRunOnRecordHost:            false,
+            AutoCommflagWhileRecording:     false,
+            JobQueueCommFlagCommand:        "mythcommflag",
+            JobQueueTranscodeCommand:       "mythtranscode",
+            AutoTranscodeBeforeAutoCommflag:false,
+            SaveTranscoding:                false,
+        }
+
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "JobsRunOnRecordHost", Default: "0" })
+            .subscribe({
+                next: data => this.m_JobQGlobal.JobsRunOnRecordHost =  (data.String == '1'),
+                error: () => this.m_JobQGlobal.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "AutoCommflagWhileRecording", Default: "0" })
+            .subscribe({
+                next: data => this.m_JobQGlobal.AutoCommflagWhileRecording =  (data.String == '1'),
+                error: () => this.m_JobQGlobal.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "JobQueueCommFlagCommand", Default: "mythcommflag" })
+            .subscribe({
+                next: data => this.m_JobQGlobal.JobQueueCommFlagCommand = data.String,
+                error: () => this.m_JobQGlobal.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "JobQueueTranscodeCommand", Default: "mythtranscode" })
+            .subscribe({
+                next: data => this.m_JobQGlobal.JobQueueTranscodeCommand = data.String,
+                error: () => this.m_JobQGlobal.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "AutoTranscodeBeforeAutoCommflag", Default: "0" })
+            .subscribe({
+                next: data => this.m_JobQGlobal.AutoTranscodeBeforeAutoCommflag =  (data.String == '1'),
+                error: () => this.m_JobQGlobal.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "SaveTranscoding", Default: "0" })
+            .subscribe({
+                next: data => this.m_JobQGlobal.SaveTranscoding =  (data.String == '1'),
+                error: () => this.m_JobQGlobal.errorCount++
+            });
+        return this.m_JobQGlobal;
+    }
+
+
+    JobQGlobal$ = {
+        next: (x: any) => {
+            if (x.bool)
+                this.m_JobQGlobal.successCount++;
+            else
+                this.m_JobQGlobal.errorCount;
+        },
+        error: (err: any) => {
+            console.error(err);
+            this.m_JobQGlobal.errorCount++
+        },
+    };
+
+    saveJobQGlobal() {
+        this.m_JobQGlobal.successCount = 0;
+        this.m_JobQGlobal.errorCount = 0;
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "JobsRunOnRecordHost",
+            Value: this.m_JobQGlobal.JobsRunOnRecordHost ? "1" : "0"}).subscribe(this.JobQGlobal$);
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "AutoCommflagWhileRecording",
+            Value: this.m_JobQGlobal.AutoCommflagWhileRecording ? "1" : "0"}).subscribe(this.JobQGlobal$);
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "JobQueueCommFlagCommand",
+            Value: this.m_JobQGlobal.JobQueueCommFlagCommand}).subscribe(this.JobQGlobal$);
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "JobQueueTranscodeCommand",
+            Value: this.m_JobQGlobal.JobQueueTranscodeCommand}).subscribe(this.JobQGlobal$);
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "AutoTranscodeBeforeAutoCommflag",
+            Value: this.m_JobQGlobal.AutoTranscodeBeforeAutoCommflag ? "1" : "0"}).subscribe(this.JobQGlobal$);
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "SaveTranscoding",
+            Value: this.m_JobQGlobal.SaveTranscoding ? "1" : "0"}).subscribe(this.JobQGlobal$);
     }
 
 }

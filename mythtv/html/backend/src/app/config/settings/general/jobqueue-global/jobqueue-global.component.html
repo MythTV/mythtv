@@ -1,1 +1,92 @@
-<p>jobqueue-global works!</p>
+<form class="ml-3 mr-3" name="jobqglobal" #jobqglobal="ngForm">
+    <p-card class="m-5">
+        <ng-template pTemplate="title">
+            {{ 'settings.jobqglobal.title' | translate }}
+        </ng-template>
+        <ng-template pTemplate="subtitle">
+        </ng-template>
+        <ng-template pTemplate="content">
+            <div class="grid">
+                <div class="mb-4 w-full">
+
+                    <div class="form-group field">
+                        <p-checkbox inputId="JobsRunOnRecordHost" [(ngModel)]="JobQGlobalData.JobsRunOnRecordHost"
+                            name="JobsRunOnRecordHost" #JobsRunOnRecordHost="ngModel" class="mb-2 w-full" [binary]="true"
+                            label="{{ 'settings.jobqglobal.runonrechost_label' | translate }}">
+                        </p-checkbox>
+                        <small class="block">
+                            {{ 'settings.jobqglobal.runonrechost_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <p-checkbox inputId="AutoCommflagWhileRecording" [(ngModel)]="JobQGlobalData.AutoCommflagWhileRecording"
+                            name="AutoCommflagWhileRecording" #AutoCommflagWhileRecording="ngModel" class="mb-2 w-full" [binary]="true"
+                            label="{{ 'settings.jobqglobal.startcomm_label' | translate }}">
+                        </p-checkbox>
+                        <small class="block">
+                            {{ 'settings.jobqglobal.startcomm_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="JobQueueCommFlagCommand" class="block">{{ 'settings.jobqglobal.commcmd_label' | translate }}</label>
+                        <input pInputText id="JobQueueCommFlagCommand"
+                            [(ngModel)]="JobQGlobalData.JobQueueCommFlagCommand" name="JobQueueCommFlagCommand"
+                            #JobQueueCommFlagCommand="ngModel" class="mb-2 form-control w-full" />
+                        <small class="block">
+                            {{ 'settings.jobqglobal.commcmd_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="JobQueueTranscodeCommand" class="block">{{ 'settings.jobqglobal.transcmd_label' | translate }}</label>
+                        <input pInputText id="JobQueueTranscodeCommand"
+                            [(ngModel)]="JobQGlobalData.JobQueueTranscodeCommand" name="JobQueueTranscodeCommand"
+                            #JobQueueTranscodeCommand="ngModel" class="mb-2 form-control w-full" />
+                        <small class="block">
+                            {{ 'settings.jobqglobal.transcmd_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <p-checkbox inputId="AutoTranscodeBeforeAutoCommflag" [(ngModel)]="JobQGlobalData.AutoTranscodeBeforeAutoCommflag"
+                            name="AutoTranscodeBeforeAutoCommflag" #AutoTranscodeBeforeAutoCommflag="ngModel" class="mb-2 w-full" [binary]="true"
+                            label="{{ 'settings.jobqglobal.transfirst_label' | translate }}">
+                        </p-checkbox>
+                        <small class="block">
+                            {{ 'settings.jobqglobal.transfirst_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <p-checkbox inputId="SaveTranscoding" [(ngModel)]="JobQGlobalData.SaveTranscoding"
+                            name="SaveTranscoding" #SaveTranscoding="ngModel" class="mb-2 w-full" [binary]="true"
+                            label="{{ 'settings.jobqglobal.transsave_label' | translate }}">
+                        </p-checkbox>
+                        <small class="block">
+                            {{ 'settings.jobqglobal.transsave_desc' | translate }}
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+            <div class="grid nogutter">
+                <div class="col-12">
+                    <p-message *ngIf="this.JobQGlobalData.successCount > 0 && this.JobQGlobalData.errorCount == 0 && !jobqglobal.dirty"
+                        severity="success" text="{{ 'common.savesuccess' | translate }}" ></p-message>
+                    <p-message *ngIf="this.JobQGlobalData.errorCount > 0 && !jobqglobal.dirty"
+                        severity="error" text="{{ 'common.networkfail' | translate }}" ></p-message>
+                </div>
+                <p-button class="col pr-1" label="{{'common.save' | translate}}"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); jobqglobal.form.markAsPristine()"
+                                 [disabled]="(!jobqglobal.dirty || false)"></p-button>
+                <p-button class="col-2 help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()"
+                    icon="pi pi-info-circle" styleClass="p-button-info"></p-button>
+            </div>
+        </ng-template>
+    </p-card>
+</form>
