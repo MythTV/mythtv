@@ -79,9 +79,9 @@ export interface JobQBackend {
     JobQueueMaxSimultaneousJobs:    number;
     JobQueueCheckFrequency:         number;
     JobQueueWindowStart:            Date;
-    JobQueueWindowStartObs:         Observable<GetSettingResponse>;
+    JobQueueWindowStart$:           Observable<GetSettingResponse>;
     JobQueueWindowEnd:              Date;
-    JobQueueWindowEndObs:           Observable<GetSettingResponse>;
+    JobQueueWindowEnd$:             Observable<GetSettingResponse>;
     JobQueueCPU:                    string;
     JobAllowMetadata:               boolean;
     JobAllowCommFlag:               boolean;

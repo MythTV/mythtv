@@ -39,9 +39,9 @@ export class JobqueueBackendComponent implements OnInit {
     // These two calls are a work-around for the bug that
     // the time-picker does not update when the backend value
     // is filled into the Date backing field.
-    this.JobQBData.JobQueueWindowStartObs.subscribe
+    this.JobQBData.JobQueueWindowStart$.subscribe
       (data => this.JobQueueWindowStart.updateInputfield());
-    this.JobQBData.JobQueueWindowEndObs.subscribe
+    this.JobQBData.JobQueueWindowEnd$.subscribe
       (data => this.JobQueueWindowEnd.updateInputfield());
 
     // Only initializing this if undefined, in case there

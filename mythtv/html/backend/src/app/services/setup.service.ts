@@ -481,9 +481,9 @@ export class SetupService {
             JobQueueMaxSimultaneousJobs:    1,
             JobQueueCheckFrequency:         60,
             JobQueueWindowStart:            new Date(0),
-            JobQueueWindowStartObs:         new Observable<GetSettingResponse>(),
+            JobQueueWindowStart$:           new Observable<GetSettingResponse>(),
             JobQueueWindowEnd:              new Date(0),
-            JobQueueWindowEndObs:           new Observable<GetSettingResponse>(),
+            JobQueueWindowEnd$:             new Observable<GetSettingResponse>(),
             JobQueueCPU:                    "0",
             JobAllowMetadata:               true,
             JobAllowCommFlag:               true,
@@ -507,16 +507,16 @@ export class SetupService {
                 next: data => this.m_JobQBackend.JobQueueCheckFrequency = Number(data.String),
                 error: () => this.m_JobQBackend.errorCount++
             });
-        this.m_JobQBackend.JobQueueWindowStartObs = this.mythService.GetSetting({
+        this.m_JobQBackend.JobQueueWindowStart$ = this.mythService.GetSetting({
              HostName: this.m_hostName, Key: "JobQueueWindowStart", Default: "00:00" });
-        this.m_JobQBackend.JobQueueWindowStartObs
+        this.m_JobQBackend.JobQueueWindowStart$
             .subscribe({
                 next: data => this.parseTime(this.m_JobQBackend.JobQueueWindowStart, data.String),
                 error: () => this.m_JobQBackend.errorCount++
             });
-        this.m_JobQBackend.JobQueueWindowEndObs = this.mythService.GetSetting({
+        this.m_JobQBackend.JobQueueWindowEnd$ = this.mythService.GetSetting({
             HostName: this.m_hostName, Key: "JobQueueWindowEnd", Default: "23:59" });
-        this.m_JobQBackend.JobQueueWindowEndObs
+        this.m_JobQBackend.JobQueueWindowEnd$
             .subscribe({
                 next: data => this.parseTime(this.m_JobQBackend.JobQueueWindowEnd, data.String),
                 error: () => this.m_JobQBackend.errorCount++
@@ -697,7 +697,7 @@ export class SetupService {
     }
 
 
-    JobQGlobal$ = {
+    JobQGlobalObs = {
         next: (x: any) => {
             if (x.bool)
                 this.m_JobQGlobal.successCount++;
@@ -714,17 +714,17 @@ export class SetupService {
         this.m_JobQGlobal.successCount = 0;
         this.m_JobQGlobal.errorCount = 0;
         this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "JobsRunOnRecordHost",
-            Value: this.m_JobQGlobal.JobsRunOnRecordHost ? "1" : "0"}).subscribe(this.JobQGlobal$);
+            Value: this.m_JobQGlobal.JobsRunOnRecordHost ? "1" : "0"}).subscribe(this.JobQGlobalObs);
         this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "AutoCommflagWhileRecording",
-            Value: this.m_JobQGlobal.AutoCommflagWhileRecording ? "1" : "0"}).subscribe(this.JobQGlobal$);
+            Value: this.m_JobQGlobal.AutoCommflagWhileRecording ? "1" : "0"}).subscribe(this.JobQGlobalObs);
         this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "JobQueueCommFlagCommand",
-            Value: this.m_JobQGlobal.JobQueueCommFlagCommand}).subscribe(this.JobQGlobal$);
+            Value: this.m_JobQGlobal.JobQueueCommFlagCommand}).subscribe(this.JobQGlobalObs);
         this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "JobQueueTranscodeCommand",
-            Value: this.m_JobQGlobal.JobQueueTranscodeCommand}).subscribe(this.JobQGlobal$);
+            Value: this.m_JobQGlobal.JobQueueTranscodeCommand}).subscribe(this.JobQGlobalObs);
         this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "AutoTranscodeBeforeAutoCommflag",
-            Value: this.m_JobQGlobal.AutoTranscodeBeforeAutoCommflag ? "1" : "0"}).subscribe(this.JobQGlobal$);
+            Value: this.m_JobQGlobal.AutoTranscodeBeforeAutoCommflag ? "1" : "0"}).subscribe(this.JobQGlobalObs);
         this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "SaveTranscoding",
-            Value: this.m_JobQGlobal.SaveTranscoding ? "1" : "0"}).subscribe(this.JobQGlobal$);
+            Value: this.m_JobQGlobal.SaveTranscoding ? "1" : "0"}).subscribe(this.JobQGlobalObs);
     }
 
 }
