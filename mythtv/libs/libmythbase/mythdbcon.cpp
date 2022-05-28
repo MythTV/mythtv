@@ -882,6 +882,18 @@ bool MSqlQuery::testDBConnection()
 
 void MSqlQuery::bindValue(const QString &placeholder, const QVariant &val)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    auto type = static_cast<QMetaType::Type>(val.type());
+#else
+    auto type = val.typeId();
+#endif
+    if (type == QMetaType::QDateTime)
+    {
+        QSqlQuery::bindValue(placeholder,
+                             MythDate::toString(val.toDateTime(), MythDate::kDatabase),
+                             QSql::In);
+        return;
+    }
     QSqlQuery::bindValue(placeholder, val, QSql::In);
 }
 
@@ -895,6 +907,13 @@ void MSqlQuery::bindValueNoNull(const QString &placeholder, const QVariant &val)
     if (type == QMetaType::QString && val.toString().isNull())
     {
         QSqlQuery::bindValue(placeholder, QString(""), QSql::In);
+        return;
+    }
+    if (type == QMetaType::QDateTime)
+    {
+        QSqlQuery::bindValue(placeholder,
+                             MythDate::toString(val.toDateTime(), MythDate::kDatabase),
+                             QSql::In);
         return;
     }
     QSqlQuery::bindValue(placeholder, val, QSql::In);
