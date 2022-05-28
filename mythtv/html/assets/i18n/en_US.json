@@ -291,6 +291,11 @@
         },
         "services": {
             "job_default": "User Job #{{num}}"
+        },
+        "epgdownload": {
+            "title": "Program Schedule Downloading Options",
+            "enabled_label": "Automatically update program listings",
+            "enabled_desc": "If enabled, the guide data program will be run automatically."
         }
     }
 }

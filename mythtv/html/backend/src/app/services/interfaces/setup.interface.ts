@@ -111,6 +111,12 @@ export interface JobQGlobal {
     SaveTranscoding:                boolean;
 }
 
+export interface EpgDownload {
+    successCount:                   number;
+    errorCount:                     number;
+    MythFillEnabled:                boolean;
+}
+
 
 export interface Setup {
     General: {

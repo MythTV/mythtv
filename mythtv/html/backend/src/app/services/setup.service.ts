@@ -4,7 +4,7 @@ import {TranslateService} from '@ngx-translate/core';
 
 import { GetSettingResponse } from './interfaces/myth.interface';
 import { Setup, Miscellaneous, EITScanner, ShutWake, BackendWake, BackendControl,
-    JobQBackend, JobQCommands, JobQGlobal }
+    JobQBackend, JobQCommands, JobQGlobal, EpgDownload }
     from './interfaces/setup.interface';
 import { MythService } from './myth.service';
 
@@ -754,4 +754,39 @@ export class SetupService {
             Value: this.m_JobQGlobal.SaveTranscoding ? "1" : "0"}).subscribe(this.JobQGlobalObs);
     }
 
+    m_EpgDownload!: EpgDownload;
+
+    getEpgDownload(): EpgDownload {
+        this.m_EpgDownload = {
+            successCount: 0,
+            errorCount: 0,
+            MythFillEnabled: true
+        }
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "MythFillEnabled", Default: "1" })
+            .subscribe({
+                next: data => this.m_EpgDownload.MythFillEnabled =  (data.String == '1'),
+                error: () => this.m_EpgDownload.errorCount++
+            });
+        return this.m_EpgDownload;
+    }
+
+    EpgDownloadObs = {
+        next: (x: any) => {
+            if (x.bool)
+                this.m_EpgDownload.successCount++;
+            else
+                this.m_EpgDownload.errorCount;
+        },
+        error: (err: any) => {
+            console.error(err);
+            this.m_EpgDownload.errorCount++
+        },
+    };
+
+    saveEpgDownload() {
+        this.m_EpgDownload.successCount = 0;
+        this.m_EpgDownload.errorCount = 0;
+        this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "MythFillEnabled",
+            Value: this.m_EpgDownload.MythFillEnabled ? "1" : "0"}).subscribe(this.EpgDownloadObs);
+    }
 }
