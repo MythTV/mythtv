@@ -7,16 +7,16 @@
 
 // MythTV
 #include <libmyth/mythcontext.h>
-#include <libmyth/netgrabbermanager.h>
-#include <libmyth/netutils.h>
-#include <libmyth/rssparse.h>
 #include <libmythbase/mythcoreutil.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythbase/mythdirs.h>
 #include <libmythbase/mythsorthelper.h>
 #include <libmythbase/mythsystemlegacy.h>
+#include <libmythbase/netgrabbermanager.h>
+#include <libmythbase/netutils.h>
 #include <libmythbase/remotefile.h>
+#include <libmythbase/rssparse.h>
 #include <libmythbase/storagegroup.h>
 #include <libmythmetadata/metadataimagedownload.h>
 #include <libmythmetadata/videoutils.h>

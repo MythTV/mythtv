@@ -14,7 +14,7 @@
 #include <QVariant>
 #include <sys/types.h>
 
-#include "libmyth/mythexp.h"
+#include "libmythbase/mythbaseexp.h"
 #include "libmythbase/mythtypes.h"
 
 enum ArticleType {
@@ -106,7 +106,7 @@ struct MRSSEntry
     QList<MRSSScene> Scenes;
 };
 
-class MPUBLIC ResultItem
+class MBASE_PUBLIC ResultItem
 {
 
   public:
@@ -185,7 +185,7 @@ class MPUBLIC ResultItem
     bool         m_customhtml   {false};
 };
 
-class MPUBLIC Parse : public QObject
+class MBASE_PUBLIC Parse : public QObject
 {
     Q_OBJECT
     friend class MRSSParser;
@@ -228,4 +228,4 @@ class MPUBLIC Parse : public QObject
 
 Q_DECLARE_METATYPE(ResultItem*)
 
-#endif
+#endif // RSSPARSE_H
