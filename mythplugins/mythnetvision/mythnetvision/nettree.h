@@ -4,9 +4,9 @@
 #include "netbase.h"
 
 // MythTV
-#include <libmyth/mythrssmanager.h>
-#include <libmyth/netgrabbermanager.h>
 #include <libmythbase/mythdownloadmanager.h>
+#include <libmythbase/netgrabbermanager.h>
+#include <libmythbase/rssmanager.h>
 #include <libmythmetadata/metadataimagedownload.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythgenerictree.h>

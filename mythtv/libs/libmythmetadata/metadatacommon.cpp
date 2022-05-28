@@ -6,12 +6,12 @@
 #include <QLocale>
 #include <QMetaType>
 
-#include "libmyth/rssparse.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlocale.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/programinfo.h"
+#include "libmythbase/rssparse.h"
 
 #include "metadatacommon.h"
 

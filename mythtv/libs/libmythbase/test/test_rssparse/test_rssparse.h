@@ -21,7 +21,7 @@
 #include <QtTest/QtTest>
 #include <iostream>
 
-#include "libmyth/rssparse.h"
+#include "libmythbase/rssparse.h"
 
 class TestRSSParse : public QObject
 {

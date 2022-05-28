@@ -5,13 +5,13 @@
 
 // MythTV headers
 #include <libmyth/mythcontext.h>
-#include <libmyth/netutils.h>
-#include <libmyth/rssparse.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythbase/mythdirs.h>
 #include <libmythbase/mythdownloadmanager.h>
 #include <libmythbase/mythsorthelper.h>
+#include <libmythbase/netutils.h>
+#include <libmythbase/rssparse.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>
 #include <libmythui/mythuibutton.h>

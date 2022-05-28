@@ -5,7 +5,7 @@
 #include <QString>
 #include <QUrl>
 
-#include <libmyth/netutils.h>
+#include <libmythbase/netutils.h>
 #include <libmythui/mythscreentype.h>
 
 // Generic Data Formatting

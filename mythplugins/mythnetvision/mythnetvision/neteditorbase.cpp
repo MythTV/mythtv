@@ -2,9 +2,9 @@
 
 // MythTV headers
 #include <libmyth/mythcontext.h>
-#include <libmyth/netutils.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythbase/mythdirs.h>
+#include <libmythbase/netutils.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>
 #include <libmythui/mythuibuttonlist.h>

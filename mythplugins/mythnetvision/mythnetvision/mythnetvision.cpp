@@ -6,11 +6,11 @@
 
 // MythTV headers
 #include <libmyth/mythcontext.h>
-#include <libmyth/mythrssmanager.h>
-#include <libmyth/netgrabbermanager.h>
 #include <libmythbase/mythplugin.h>
 #include <libmythbase/mythpluginapi.h>
 #include <libmythbase/mythversion.h>
+#include <libmythbase/netgrabbermanager.h>
+#include <libmythbase/rssmanager.h>
 #include <libmythui/mythmainwindow.h>
 
 // MythNetVision headers

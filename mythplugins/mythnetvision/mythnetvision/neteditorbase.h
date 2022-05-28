@@ -9,7 +9,7 @@
 #include <QString>
 
 // MythTV headers
-#include <libmyth/netgrabbermanager.h>
+#include <libmythbase/netgrabbermanager.h>
 #include <libmythui/mythprogressdialog.h>
 #include <libmythui/mythscreentype.h>
 

@@ -5,15 +5,15 @@
 
 // MythTV
 #include <libmyth/mythcontext.h>
-#include <libmyth/mythrssmanager.h>
-#include <libmyth/netgrabbermanager.h>
-#include <libmyth/netutils.h>
-#include <libmyth/rssparse.h>
 #include <libmythbase/mythcoreutil.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythdirs.h>
 #include <libmythbase/mythsorthelper.h>
 #include <libmythbase/mythsystemlegacy.h>
+#include <libmythbase/netgrabbermanager.h>
+#include <libmythbase/netutils.h>
+#include <libmythbase/rssmanager.h>
+#include <libmythbase/rssparse.h>
 #include <libmythmetadata/videoutils.h>
 #include <libmythui/mythmainwindow.h>
 #include <libmythui/mythprogressdialog.h>

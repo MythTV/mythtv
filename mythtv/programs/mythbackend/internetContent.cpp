@@ -16,12 +16,12 @@
 #include <QTextStream>
 
 // MythTV
-#include "libmyth/netgrabbermanager.h"
-#include "libmyth/rssparse.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/netgrabbermanager.h"
+#include "libmythbase/rssparse.h"
 
 // MythBackend
 #include "internetContent.h"
