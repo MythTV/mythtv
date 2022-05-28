@@ -96,10 +96,8 @@ export interface JobQBackend {
 export interface JobQCommands {
     successCount:                   number;
     errorCount:                     number;
-    UserJobDesc1:                   string;
-    UserJobDesc2:                   string;
-    UserJobDesc3:                   string;
-    UserJobDesc4:                   string;
+    UserJobDesc:                    string [];
+    UserJob:                        string [];
 }
 
 export interface JobQGlobal {

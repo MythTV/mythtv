@@ -40,15 +40,11 @@ export class JobqueueBackendComponent implements OnInit {
     // the time-picker does not update when the backend value
     // is filled into the Date backing field.
     this.JobQBData.JobQueueWindowStart$.subscribe
-      (data => this.JobQueueWindowStart.updateInputfield());
+      ({complete: () => this.JobQueueWindowStart.updateInputfield()});
     this.JobQBData.JobQueueWindowEnd$.subscribe
-      (data => this.JobQueueWindowEnd.updateInputfield());
+      ({complete: () => this.JobQueueWindowEnd.updateInputfield()});
 
-    // Only initializing this if undefined, in case there
-    // are unsaved changes from the Job Queue Commands page.
-    // We don't want to clobber unsaved changes.
-    if (typeof this.JobQCmds == 'undefined')
-      this.JobQCmds = this.setupService.getJobQCommands();
+    this.JobQCmds = this.setupService.getJobQCommands();
 
     translate.get(this.cpuOptions[0].name).subscribe(data => this.cpuOptions[0].name = data);
     translate.get(this.cpuOptions[1].name).subscribe(data => this.cpuOptions[1].name = data);

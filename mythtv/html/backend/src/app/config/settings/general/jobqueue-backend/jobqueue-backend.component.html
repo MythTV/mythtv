@@ -100,7 +100,7 @@
                     <div class="form-group field">
                         <p-checkbox inputId="JobAllowUserJob1" [(ngModel)]="JobQBData.JobAllowUserJob1"
                             name="JobAllowUserJob1" #JobAllowUserJob1="ngModel" class="mb-2 w-full" [binary]="true"
-                            label="{{JobQCmds.UserJobDesc1}}">
+                            label="{{JobQCmds.UserJobDesc[0]}}">
                         </p-checkbox>
                         <small class="block">
                             {{ 'settings.jobqbackend.allow_desc' | translate }}
@@ -110,7 +110,7 @@
                     <div class="form-group field">
                         <p-checkbox inputId="JobAllowUserJob2" [(ngModel)]="JobQBData.JobAllowUserJob2"
                             name="JobAllowUserJob2" #JobAllowUserJob2="ngModel" class="mb-2 w-full" [binary]="true"
-                            label="{{JobQCmds.UserJobDesc2}}">
+                            label="{{JobQCmds.UserJobDesc[1]}}">
                         </p-checkbox>
                         <small class="block">
                             {{ 'settings.jobqbackend.allow_desc' | translate }}
@@ -119,7 +119,7 @@
                     <div class="form-group field">
                         <p-checkbox inputId="JobAllowUserJob3" [(ngModel)]="JobQBData.JobAllowUserJob3"
                             name="JobAllowUserJob3" #JobAllowUserJob3="ngModel" class="mb-2 w-full" [binary]="true"
-                            label="{{JobQCmds.UserJobDesc3}}">
+                            label="{{JobQCmds.UserJobDesc[2]}}">
                         </p-checkbox>
                         <small class="block">
                             {{ 'settings.jobqbackend.allow_desc' | translate }}
@@ -128,7 +128,7 @@
                     <div class="form-group field">
                         <p-checkbox inputId="JobAllowUserJob4" [(ngModel)]="JobQBData.JobAllowUserJob4"
                             name="JobAllowUserJob4" #JobAllowUserJob4="ngModel" class="mb-2 w-full" [binary]="true"
-                            label="{{JobQCmds.UserJobDesc4}}">
+                            label="{{JobQCmds.UserJobDesc[3]}}">
                         </p-checkbox>
                         <small class="block">
                             {{ 'settings.jobqbackend.allow_desc' | translate }}

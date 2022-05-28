@@ -280,6 +280,17 @@
             "transfirst_desc": "If enabled, and if both auto-transcode and commercial detection are turned ON for a recording, transcoding will run first; otherwise, commercial detection runs first.",
             "transsave_label": "Save Original Files After Transcoding (Globally)",
             "transsave_desc": "If enabled and the transcoder is active, the original files will be renamed to .old once the transcoding is complete."
+        },
+        "jobqcommands": {
+            "title": "Job Queue (Job Commands)",
+            "subtitle": "Set up Names for your custom user jobs and commands that will execute them.",
+            "job_label": "User Job {{num}} Description",
+            "job_desc": "The description for this User Job.",
+            "command_label": "User Job {{num}} Command",
+            "command_desc": "The command to run whenever this User Job number is scheduled."
+        },
+        "services": {
+            "job_default": "User Job #{{num}}"
         }
     }
 }

@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import {TranslateService} from '@ngx-translate/core';
+
 import { GetSettingResponse } from './interfaces/myth.interface';
 import { Setup, Miscellaneous, EITScanner, ShutWake, BackendWake, BackendControl,
     JobQBackend, JobQCommands, JobQGlobal }
@@ -37,7 +39,7 @@ export class SetupService {
         }
     }
 
-    constructor(private mythService: MythService) {
+    constructor(private mythService: MythService, private translate: TranslateService) {
         this.mythService.GetHostName().subscribe(data => {
             this.m_hostName = data.String;
         });
@@ -617,36 +619,61 @@ export class SetupService {
     m_JobQCommands!: JobQCommands;
 
     getJobQCommands(): JobQCommands {
+        // if already loaded, simply retrun the existing object.
+        // This is different from others since it is used by more than one tab
+        // and must not be reloaded for the other tab, as that may overwrite
+        // unsaved changes.
+        if ( typeof this.m_JobQCommands == 'object')
+            return this.m_JobQCommands;
+
         this.m_JobQCommands = {
             successCount: 0,
             errorCount: 0,
-            UserJobDesc1:                   "User Job #1",
-            UserJobDesc2:                   "User Job #2",
-            UserJobDesc3:                   "User Job #3",
-            UserJobDesc4:                   "User Job #4"
+            UserJobDesc:    [],
+            UserJob:        []
         }
-
-        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "UserJobDesc1", Default: "User Job #1" })
-            .subscribe({
-                next: data => this.m_JobQCommands.UserJobDesc1 =  data.String,
-                error: () => this.m_JobQBackend.errorCount++
-            });
-        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "UserJobDesc2", Default: "User Job #2" })
-            .subscribe({
-                next: data => this.m_JobQCommands.UserJobDesc2 =  data.String,
-                error: () => this.m_JobQCommands.errorCount++
-            });
-        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "UserJobDesc3", Default: "User Job #3" })
-            .subscribe({
-                next: data => this.m_JobQCommands.UserJobDesc3 =  data.String,
-                error: () => this.m_JobQCommands.errorCount++
-            });
-        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "UserJobDesc4", Default: "User Job #4" })
-            .subscribe({
-                next: data => this.m_JobQCommands.UserJobDesc4 =  data.String,
-                error: () => this.m_JobQCommands.errorCount++
-            });
+        for (let ix = 0; ix < 4; ix++) {
+            let num=ix+1;
+            let defaultName;
+            this.translate.get('settings.services.job_default',{num:num})
+                .subscribe(data => this.m_JobQCommands.UserJobDesc[ix] = data);
+            this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "UserJobDesc"+num, Default: defaultName})
+                .subscribe({
+                    next: data => this.m_JobQCommands.UserJobDesc[ix] =  data.String,
+                    error: () => this.m_JobQBackend.errorCount++
+                });
+            this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "UserJob"+num, Default: ""})
+                .subscribe({
+                    next: data => this.m_JobQCommands.UserJob[ix] =  data.String,
+                    error: () => this.m_JobQBackend.errorCount++
+                });
+        }
         return this.m_JobQCommands;
+    }
+
+    JobQCommandsObs = {
+        next: (x: any) => {
+            if (x.bool)
+                this.m_JobQCommands.successCount++;
+            else
+                this.m_JobQCommands.errorCount;
+        },
+        error: (err: any) => {
+            console.error(err);
+            this.m_JobQCommands.errorCount++
+        },
+    };
+
+    saveJobQCommands() {
+        this.m_JobQCommands.successCount = 0;
+        this.m_JobQCommands.errorCount = 0;
+        for (let ix = 0; ix < 4; ix++) {
+            let num=ix+1;
+            this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "UserJobDesc"+num,
+                Value: this.m_JobQCommands.UserJobDesc[ix]}).subscribe(this.JobQCommandsObs);
+            this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "UserJob"+num,
+                Value: this.m_JobQCommands.UserJob[ix]}).subscribe(this.JobQCommandsObs);
+        }
     }
 
     m_JobQGlobal!: JobQGlobal;
