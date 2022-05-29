@@ -340,14 +340,14 @@ static void ifopalette(const char * filename,
     fu32 pgc = offset * 0x800 + get_uint32_be(xxfread(fh, buf, 4));
     /* seek to palette */
     xfseek0(fh, pgc + 0xa4);
-    xxfread(fh, buf, 16 * 4);
+    xxfread(fh, buf, (size_t)(16 * 4));
     fclose(fh);
     for (int i = 0; i < 16; i++)
     {
         eu8 r = 0;
         eu8 g = 0;
         eu8 b = 0;
-        eu8 * p = buf + i * 4 + 1;
+        eu8 * p = buf + (ptrdiff_t)(i) * 4 + 1;
         yuvpalette[i][0] =p[0]; yuvpalette[i][1] =p[1]; yuvpalette[i][2] =p[2];
         yuv2rgb(p[0], p[1], p[2], &r, &g, &b);
         rgbpalette[i][0] = r; rgbpalette[i][1] = g; rgbpalette[i][2] = b; 
@@ -601,10 +601,10 @@ static void makebitmap(eu8 * data, int w, int h, int top, int bot,
 
 static char * pts2ts(fu32 pts, char * rvbuf, bool is_png_filename) 
 {
-    int h = pts / (3600 * 90000);
-    int m = pts / (60 * 90000) % 60;
-    int s = pts / 90000 % 60;
-    int hs = (pts + 450) / 900 % 100;
+    uint32_t h = pts / (3600 * 90000UL);
+    uint32_t m = pts / (60 * 90000UL) % 60;
+    uint32_t s = pts / 90000 % 60;
+    uint32_t hs = (pts + 450) / 900 % 100;
 
     if (is_png_filename)
         sprintf(rvbuf, "%02d+%02d+%02d.%02d.png", h, m, s, hs);

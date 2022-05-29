@@ -388,7 +388,7 @@ void ThumbFinder::updateThumb(void)
     item->SetImage(imageFile, "", true);
 
     // update the image grid item
-    int64_t pos = (int) ((m_currentPTS - m_startPTS) / m_frameTime);
+    int64_t pos = (m_currentPTS - m_startPTS) / m_frameTime;
     thumb->frame = pos - m_offset;
     if (itemNo != 0)
     {
