@@ -123,7 +123,7 @@ void Synaesthesia::resize(const QSize &newsize)
         return;
     }
 
-    for (int i = 0; i < 256; i++)
+    for (size_t i = 0; i < 256; i++)
         m_outputImage->setColor(i, qRgba(m_palette[i * 3], m_palette[i * 3 + 1], 
                                       m_palette[i * 3 + 2], 255));
 
@@ -224,7 +224,8 @@ void Synaesthesia::addPixel(int x, int y, int br1, int br2) const
     if (x < 0 || x > m_outWidth || y < 0 || y >= m_outHeight)
         return;
 
-    unsigned char *p = output + x * 2 + y * m_outWidth * 2;
+    unsigned char *p = output + static_cast<ptrdiff_t>(x) * 2 +
+        static_cast<ptrdiff_t>(y) * m_outWidth * 2;
     if (p[0] + br1 < 255)
         p[0] += br1;
     else
@@ -258,7 +259,7 @@ unsigned char Synaesthesia::getPixel(int x, int y, int where) const
 void Synaesthesia::fadeFade(void) const
 {
     auto *ptr = (uint32_t *)output;
-    int i = m_outWidth * m_outHeight * 2 / sizeof(uint32_t);
+    int i = static_cast<ptrdiff_t>(m_outWidth) * m_outHeight * 2 / sizeof(uint32_t);
     do {
         uint32_t x = *ptr;
         if (x)
@@ -554,7 +555,8 @@ bool Synaesthesia::process(VisualNode *node)
                 }
                 else
                 {
-                    unsigned char *p = output + px * 2 + py * m_outWidth * 2;
+                    unsigned char *p = output + static_cast<ptrdiff_t>(px) * 2 +
+                        static_cast<ptrdiff_t>(py) * m_outWidth * 2;
                     unsigned char *p1 = p;
                     unsigned char *p2 = p;
                     unsigned char *p3 = p;
@@ -567,9 +569,9 @@ bool Synaesthesia::process(VisualNode *node)
                         addPixelFast(p1, br1, br2);
                         p2 -= 2;
                         addPixelFast(p2, br1, br2);
-                        p3 += m_outWidth * 2;
+                        p3 += static_cast<ptrdiff_t>(m_outWidth) * 2;
                         addPixelFast(p3, br1, br2);
-                        p4 -= m_outWidth*2;
+                        p4 -= static_cast<ptrdiff_t>(m_outWidth) * 2;
                         addPixelFast(p4, br1, br2);
                     }
                 }

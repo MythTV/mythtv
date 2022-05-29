@@ -72,9 +72,10 @@
 #endif
 
 #include "encoder.h"
+#include "libmythbase/sizetliteral.h"
 
-#define MAX_SAMPLES (588 * 4)
-#define NUM_CHANNELS 2
+static constexpr size_t MAX_SAMPLES  { 588_UZ * 4 };
+static constexpr int8_t NUM_CHANNELS { 2          };
 
 class MusicMetadata;
 class QString;

@@ -23,6 +23,7 @@
 #include <libmyth/mythcontext.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythbase/remotefile.h>
+#include <libmythbase/sizetliteral.h>
 #include <libmythmetadata/musicmetadata.h>
 #include <libmythui/mythmainwindow.h>
 #include <libmythui/mythuihelper.h>
@@ -168,7 +169,7 @@ void StereoScope::resize( const QSize &newsize )
     m_size = newsize;
 
     auto os = m_magnitudes.size();
-    m_magnitudes.resize( m_size.width() * 2 );
+    m_magnitudes.resize( m_size.width() * 2_UZ );
     for ( ; os < m_magnitudes.size(); os++ )
         m_magnitudes[os] = 0.0;
 }

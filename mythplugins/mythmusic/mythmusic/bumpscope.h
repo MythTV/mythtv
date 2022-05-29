@@ -20,7 +20,7 @@ public:
         {(void) action;}
 
 private:
-    static void blur_8(unsigned char *ptr, int w, int h, int bpl);
+    static void blur_8(unsigned char *ptr, int w, int h, ptrdiff_t bpl);
 
     void generate_cmap(unsigned int color);
     void generate_phongdat(void);
@@ -49,7 +49,7 @@ private:
     bool           m_movingLight    {true};
     //bool         m_diamond        {true};
 
-    int            m_bpl            {0};
+    ptrdiff_t      m_bpl            {0};
 
     std::vector<std::vector<unsigned char> > m_phongDat {};
     unsigned char *m_rgbBuf         {nullptr};
