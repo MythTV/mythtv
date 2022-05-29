@@ -11,7 +11,7 @@
                 <p-fieldset class="mb-4 w-full" legend="TV Formats">
                     <div class="form-group field">
                         <label for="tvformat" class="label block">TV Format</label>
-                        <p-dropdown [options]="m_TVFormats" [(ngModel)]="m_setupData.General.Locale.TVFormat"
+                        <p-dropdown [options]="m_TVFormats" [(ngModel)]="m_LocaleData.TVFormat"
                             class="w-full mb-2" name="tvformat" aria-describedby="tvformat-help">
                         </p-dropdown>
                         <small class="block mt-2" id="tvformat-help">The TV standard to use for viewing TV.</small>
@@ -19,7 +19,7 @@
 
                     <div class="form-group field">
                         <label for="vbiformat" class="label block">VBI Format</label>
-                        <p-dropdown [options]="m_vbiFormats" [(ngModel)]="m_setupData.General.Locale.VbiFormat"
+                        <p-dropdown [options]="m_vbiFormats" [(ngModel)]="m_LocaleData.VbiFormat"
                             class="mb-5  w-full" name="vbiformat" aria-describedby="vbiformat-help">
                         </p-dropdown>
                         <small class="block mt-2" id="vbiformat-help">The VBI (Vertical Blanking Interval) is used to carry Teletext or Closed Captions data.</small>
@@ -29,7 +29,7 @@
                 <p-fieldset class="mb-4 w-full" legend="Frequency Tables">
                     <div class="form-group field">
                         <label for="freqtable" class="label block">Channel Frequency Table</label>
-                        <p-dropdown [options]="m_FreqTables" [(ngModel)]="m_setupData.General.Locale.FreqTable"
+                        <p-dropdown [options]="m_FreqTables" [(ngModel)]="m_LocaleData.FreqTable"
                             class="mb-2 w-full" name="freqtable">
                         </p-dropdown>
                         <small class="block pt-2" id="freqtable-help">Select the appropriate frequency table for your system. If you have an aerial, use a '-bcast frequency.</small>
@@ -38,14 +38,21 @@
             </div>
             </ng-template>
 
-        <ng-template pTemplate="footer">
-            <div class="p-grid p-nogutter p-justify-end">
-                <p-button class="pr-1" label="Save"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); locale.form.markAsPristine()"
-                                 [disabled]="(!locale.dirty || false)">
-                </p-button>
-                <p-button class="help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()" icon="pi pi-info-circle" styleClass="p-button-info" ></p-button>
-            </div>
-        </ng-template>
+            <ng-template pTemplate="footer">
+                <div class="grid nogutter">
+                    <div class="col-12">
+                        <p-message *ngIf="this.m_LocaleData.successCount > 0 && this.m_LocaleData.errorCount == 0 && !locale.dirty"
+                            severity="success" text="{{ 'common.savesuccess' | translate }}" ></p-message>
+                        <p-message *ngIf="this.m_LocaleData.errorCount > 0 && !locale.dirty"
+                            severity="error" text="{{ 'common.networkfail' | translate }}" ></p-message>
+                    </div>
+                    <p-button class="col pr-1" label="{{'common.save' | translate}}"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); locale.form.markAsPristine()"
+                                     [disabled]="(!locale.dirty || false)"></p-button>
+                    <p-button class="col-2 help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()"
+                        icon="pi pi-info-circle" styleClass="p-button-info"></p-button>
+                </div>
+            </ng-template>
+
     </p-card>
 
 </form>

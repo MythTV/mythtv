@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Setup } from 'src/app/services/interfaces/setup.interface';
+import { Locale } from 'src/app/services/interfaces/setup.interface';
 import { SetupService } from 'src/app/services/setup.service';
 
 @Component({
@@ -9,7 +9,7 @@ import { SetupService } from 'src/app/services/setup.service';
 })
 
 export class LocaleComponent implements OnInit {
-    m_setupData!: Setup;
+    m_LocaleData!: Locale;
     m_showHelp: boolean = false;
 
     m_vbiFormats: string[];
@@ -69,10 +69,11 @@ export class LocaleComponent implements OnInit {
             "israel-hot-matav",
             "try-all"
             ];
+
+        this.m_LocaleData = this.setupService.getLocaleData();
     }
 
     ngOnInit(): void {
-        this.m_setupData = this.setupService.getSetupData();
     }
 
     showHelp() {
@@ -80,6 +81,6 @@ export class LocaleComponent implements OnInit {
     }
 
     saveForm() {
-        this.setupService.saveLocaleSettings();
+        this.setupService.saveLocaleData();
     }
 }

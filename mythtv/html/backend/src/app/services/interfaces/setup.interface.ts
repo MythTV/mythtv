@@ -2,6 +2,9 @@ import { Observable } from "rxjs";
 import { GetSettingResponse } from "./myth.interface";
 
 export interface HostAddress {
+    successCount:          number;
+    errorCount:            number;
+    thisHostName:          string;
     BackendServerPort:     number;
     BackendStatusPort:     number;
     SecurityPin:           string;
@@ -11,11 +14,15 @@ export interface HostAddress {
     BackendServerIP6:      string;
     AllowLinkLocal:        boolean; 
     BackendServerAddr:     string;
+    // Note : IsMasterBackend is not stored on the DB
+    // It is used internally to derive MasterServerName
     IsMasterBackend:       boolean;
     MasterServerName:      string;
 }
 
 export interface Locale {
+    successCount:   number;
+    errorCount:     number;
     TVFormat:       string;
     VbiFormat:      string;
     FreqTable:      string;
