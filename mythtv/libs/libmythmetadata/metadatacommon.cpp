@@ -1349,19 +1349,25 @@ ArtworkMap ParseArtwork(const QDomElement& artwork)
 int editDistance( const QString& s, const QString& t )
 {
 #define D( i, j ) d[(i) * n + (j)]
-    int m = s.length() + 1;
-    int n = t.length() + 1;
+    size_t m = s.length() + 1;
+    size_t n = t.length() + 1;
     int *d = new int[m * n];
 
-    for ( int i = 0; i < m; i++ )
+    for ( size_t i = 0; i < m; i++ )
       D( i, 0 ) = i;
-    for ( int j = 0; j < n; j++ )
+    for ( size_t j = 0; j < n; j++ )
       D( 0, j ) = j;
-    for ( int i = 1; i < m; i++ )
+    for ( size_t i = 1; i < m; i++ )
     {
-        for ( int j = 1; j < n; j++ )
+        for ( size_t j = 1; j < n; j++ )
         {
-            if ( s[i - 1] == t[j - 1] )
+            if (
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                s[static_cast<int>(i) - 1] == t[static_cast<int>(j) - 1]
+#else
+                s[i - 1] == t[j - 1]
+#endif
+                )
                 D( i, j ) = D( i - 1, j - 1 );
             else
             {
