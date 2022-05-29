@@ -1,38 +1,44 @@
 <form class="ml-3 mr-3" name="locale" #locale="ngForm" (ngSubmit)="saveForm()">
     <p-card class="m-5" [style]="{'width':'100%'}">
         <ng-template pTemplate="title">
-            Locale Settings
+            {{ 'settings.locale.title' | translate }}
         </ng-template>
         <ng-template pTemplate="subtitle">
-            These set some country specific default settings
+            {{ 'settings.locale.subtitle' | translate }}
         </ng-template>
         <ng-template pTemplate="TV Formats">
             <div class="grid">
-                <p-fieldset class="mb-4 w-full" legend="TV Formats">
+                <p-fieldset class="mb-4 w-full" legend="{{ 'settings.locale.tvformat_label' | translate }}">
                     <div class="form-group field">
                         <label for="tvformat" class="label block">TV Format</label>
                         <p-dropdown [options]="m_TVFormats" [(ngModel)]="m_LocaleData.TVFormat"
                             class="w-full mb-2" name="tvformat" aria-describedby="tvformat-help">
                         </p-dropdown>
-                        <small class="block mt-2" id="tvformat-help">The TV standard to use for viewing TV.</small>
+                        <small class="block mt-2" id="tvformat-help">
+                            {{ 'settings.locale.tvformat_desc' | translate }}
+                        </small>
                     </div>
 
                     <div class="form-group field">
-                        <label for="vbiformat" class="label block">VBI Format</label>
+                        <label for="vbiformat" class="label block">{{ 'settings.locale.vbiformat_label' | translate }}</label>
                         <p-dropdown [options]="m_vbiFormats" [(ngModel)]="m_LocaleData.VbiFormat"
                             class="mb-5  w-full" name="vbiformat" aria-describedby="vbiformat-help">
                         </p-dropdown>
-                        <small class="block mt-2" id="vbiformat-help">The VBI (Vertical Blanking Interval) is used to carry Teletext or Closed Captions data.</small>
+                        <small class="block mt-2" id="vbiformat-help">
+                            {{ 'settings.locale.vbiformat_desc' | translate }}
+                        </small>
                     </div>
                 </p-fieldset>
 
                 <p-fieldset class="mb-4 w-full" legend="Frequency Tables">
                     <div class="form-group field">
-                        <label for="freqtable" class="label block">Channel Frequency Table</label>
+                        <label for="freqtable" class="label block">{{ 'settings.locale.channfreq_label' | translate }}</label>
                         <p-dropdown [options]="m_FreqTables" [(ngModel)]="m_LocaleData.FreqTable"
                             class="mb-2 w-full" name="freqtable">
                         </p-dropdown>
-                        <small class="block pt-2" id="freqtable-help">Select the appropriate frequency table for your system. If you have an aerial, use a '-bcast frequency.</small>
+                        <small class="block pt-2" id="freqtable-help">
+                            {{ 'settings.locale.channfreq_desc' | translate }}
+                        </small>
                     </div>
                 </p-fieldset>
             </div>

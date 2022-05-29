@@ -186,7 +186,6 @@
             "upnp_recs": "Recordings",
             "upnp_videos": "Videos"
         },
-        "networkfail": "ERROR: Backend Network Failure",
         "eit": {
             "title": "EIT Scanner Options",
             "timeout_label": "EIT transport timeout (mins)",
@@ -332,7 +331,19 @@
             "ismaster_hint": "To change Master Backend you have to run setup from that backend.",
             "master_label": "Master Backend Name",
             "master_desc": "Host name of the Master Backend. <strong>Read only Setting</strong> This is set by selecting \"<i>This server is the Master Backend</i>\" on that server."
+        },
+        "locale": {
+            "title": "Locale Settings",
+            "subtitle": "These set some country specific default settings",
+            "tvformat_label": "TV Formats",
+            "tvformat_desc": "The TV standard to use for viewing TV.",
+            "vbiformat_label": "VBI Format",
+            "vbiformat_desc": "The VBI (Vertical Blanking Interval) is used to carry Teletext or Closed Captions data.",
+            "channfreq_label": "Channel Frequency Table",
+            "channfreq_desc": "Select the appropriate frequency table for your system. If you have an aerial, use a '-bcast frequency."
+        },
+        "general": {
+            "title": "General Backend Settings"
         }
-    },
-    "Primary IP address": "settings.hostaddress.primaryip_label"
+    }
 }

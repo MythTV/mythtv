@@ -1,67 +1,67 @@
 <div class="block card w-full">
-    <h3>General Backend Settings</h3>
+    <h3>{{ 'settings.general.title' | translate }}</h3>
 <p-accordion class="col-12 w-full">
-    <p-accordionTab header="Host Address Backend Setup">
+    <p-accordionTab header="{{ 'settings.hostaddress.title' | translate }}">
         <ng-template pTemplate="content">
             <app-host-address></app-host-address>
         </ng-template>
     </p-accordionTab>
 
-    <p-accordionTab header="Locale Settings">
+    <p-accordionTab header="{{ 'settings.locale.title' | translate }}">
         <ng-template pTemplate="content">
             <app-locale></app-locale>
         </ng-template>
     </p-accordionTab>
 
-    <p-accordionTab header="Miscellaneous Settings">
+    <p-accordionTab header="{{ 'settings.misc.title' | translate }}">
         <ng-template pTemplate="content">
             <app-misc-settings></app-misc-settings>
         </ng-template>
     </p-accordionTab>
 
-    <p-accordionTab header="EIT Scanner Options">
+    <p-accordionTab header="{{ 'settings.eit.title' | translate }}">
         <ng-template pTemplate="content">
             <app-eit-scanner></app-eit-scanner>
         </ng-template>
     </p-accordionTab>
 
-    <p-accordionTab header="Shutdown/Wakeup Options">
+    <p-accordionTab header="{{ 'settings.shutwake.title' | translate }}">
         <ng-template pTemplate="content">
             <app-shutdown-wakeup></app-shutdown-wakeup>
         </ng-template>
     </p-accordionTab>
 
-    <p-accordionTab header="Backend Wakeup Settings">
+    <p-accordionTab header="{{ 'settings.backendwake.title' | translate }}">
         <ng-template pTemplate="content">
             <app-backend-wakeup></app-backend-wakeup>
         </ng-template>
     </p-accordionTab>
 
-    <p-accordionTab header="Backend Control">
+    <p-accordionTab header="{{ 'settings.backendctrl.title' | translate }}">
         <ng-template pTemplate="content">
             <app-backend-control></app-backend-control>
         </ng-template>
     </p-accordionTab>
 
-    <p-accordionTab header="Job Queue (Backend-Specific)">
+    <p-accordionTab header="{{ 'settings.jobqbackend.title' | translate }}">
         <ng-template pTemplate="content">
             <app-jobqueue-backend></app-jobqueue-backend>
         </ng-template>
     </p-accordionTab>
 
-    <p-accordionTab header="Job Queue (Global)">
+    <p-accordionTab header="{{ 'settings.jobqglobal.title' | translate }}">
         <ng-template pTemplate="content">
             <app-jobqueue-global></app-jobqueue-global>
         </ng-template>
     </p-accordionTab>
 
-    <p-accordionTab header="Job Queue (Job Commands)">
+    <p-accordionTab header="{{ 'settings.jobqcommands.title' | translate }}">
         <ng-template pTemplate="content">
             <app-jobqueue-commands></app-jobqueue-commands>
         </ng-template>
     </p-accordionTab>
 
-    <p-accordionTab header="Programme Schedule Downloading Options">
+    <p-accordionTab header="{{ 'settings.epgdownload.title' | translate }}">
         <ng-template pTemplate="content">
             <app-epg-downloading></app-epg-downloading>
         </ng-template>
