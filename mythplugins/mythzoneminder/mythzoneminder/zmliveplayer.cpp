@@ -19,6 +19,7 @@
 
 // MythTV
 #include <libmyth/mythcontext.h>
+#include <libmythbase/sizetliteral.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>
 #include <libmythui/mythuihelper.h>
@@ -26,9 +27,6 @@
 // zoneminder
 #include "zmliveplayer.h"
 #include "zmclient.h"
-
-// the maximum image size we are ever likely to get from ZM
-#define MAX_IMAGE_SIZE  (2048*1536*3)
 
 static constexpr std::chrono::milliseconds FRAME_UPDATE_TIME { 100ms };  // try to update the frame 10 times a second
 
@@ -473,7 +471,7 @@ void Player::setMonitor(const Monitor *mon)
     if (m_rgba)
         free(m_rgba);
 
-    m_rgba = (uchar *) malloc(m_monitor.width * m_monitor.height * 4);
+    m_rgba = (uchar *) malloc(4_UZ * m_monitor.width * m_monitor.height);
 }
 
 void Player::setWidgets(MythUIImage *image, MythUIText *status, MythUIText  *camera)

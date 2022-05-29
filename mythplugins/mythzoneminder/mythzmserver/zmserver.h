@@ -29,7 +29,7 @@ using Clock = std::chrono::system_clock;
 using TimePoint = std::chrono::time_point<Clock>;
 
 // the maximum image size we are ever likely to get from ZM
-#define MAX_IMAGE_SIZE  (2048*1536*3)
+static constexpr size_t MAX_IMAGE_SIZE { static_cast<size_t>(2048) * 1536 * 3 };
 using FrameData = std::array<uint8_t,MAX_IMAGE_SIZE>;
 
 extern bool checkVersion(int major, int minor, int revision);

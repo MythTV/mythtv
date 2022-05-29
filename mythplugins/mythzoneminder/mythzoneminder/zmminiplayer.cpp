@@ -16,9 +16,6 @@
 // mythzoneminder
 #include "zmclient.h"
 
-// the maximum image size we are ever likely to get from ZM
-#define MAX_IMAGE_SIZE  (2048*1536*3)
-
 static constexpr std::chrono::milliseconds FRAME_UPDATE_TIME { 100ms };  // try to update the frame 10 times a second
 
 ZMMiniPlayer::ZMMiniPlayer(MythScreenStack *parent)

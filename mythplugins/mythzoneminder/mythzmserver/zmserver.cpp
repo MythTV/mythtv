@@ -229,7 +229,7 @@ void kickDatabase(bool debug)
 void MONITOR::initMonitor(bool debug, const std::string &mmapPath, int shmKey)
 {
     size_t shared_data_size = 0;
-    int frame_size = m_width * m_height * m_bytesPerPixel;
+    size_t frame_size = static_cast<size_t>(m_width) * m_height * m_bytesPerPixel;
 
     if (!m_enabled)
         return;
@@ -1815,7 +1815,8 @@ int ZMServer::getFrame(FrameData &buffer, MONITOR *monitor)
     // just copy the data to our buffer for now
 
     // fixup the colours if necessary we aim to always send RGB24 images
-    unsigned char *data = monitor->m_sharedImages + monitor->getFrameSize() * monitor->m_lastRead;
+    unsigned char *data = monitor->m_sharedImages +
+        static_cast<ptrdiff_t>(monitor->getFrameSize()) * monitor->m_lastRead;
     unsigned int rpos = 0;
     unsigned int wpos = 0;
 
