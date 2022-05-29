@@ -3,7 +3,6 @@
 #include <libmyth/mythcontext.h>
 #include <libmythbase/mythcoreutil.h>
 #include <libmythbase/mythdate.h>
-#include <libmythbase/mythdate.h>
 #include <libmythbase/mythdirs.h>
 #include <libmythbase/remotefile.h>
 #include <libmythmetadata/metadataimagedownload.h>
