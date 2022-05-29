@@ -296,6 +296,43 @@
             "title": "Program Schedule Downloading Options",
             "enabled_label": "Automatically update program listings",
             "enabled_desc": "If enabled, the guide data program will be run automatically."
+        },
+        "hostaddress": {
+            "title": "Host Address Backend Setup",
+            "subtitle": "These settings tell the backend which IP addresse(s) and ports to listen on and whether it is a master backend.",
+            "backendport_label": "Port",
+            "backendport_desc": "The port the backend listens on for connections (Unless you have a good reason don't change this).",
+            "statusport_label": "Status Port",
+            "statusport_desc": "The port on which the server will listen on for HTTP requests, including backend status and MythXML requests.",
+            "pin_label": "Security PIN (required)",
+            "pin_desc": "The PIN code required for a frontend to connect to the backend. Blank prevents all connections; 0000 allows any client.",
+            "pin_reqd": "Security PIN is required",
+            "allowconn_label": "Allow Connections from all Subnets",
+            "allowconn_desc": "Allow this backend to receive connections from any IP address on the internet. <strong>NOT recommended for most users.</strong> Use this only if you have secure IPv4 and IPv6 firewalls.",
+            "panel": {
+                "ports": "Ports",
+                "pin": "Security PIN",
+                "allowconn": "Allowed Connections",
+                "iplisten": "IP Addresses to listen on",
+                "primaryadd": "Primary Address",
+                "masterbe": "Master Backend"
+            },
+            "listenall_label": "Listen on all IP Addresses",
+            "listenall_desc": "Allow this backend to receive connections on any IP Address assigned to it. Recommended for most users for ease and reliability.",
+            "ipv4_label": "IPv4 Address",
+            "ipv4_desc": "Enter the IP address of this machine. Use an externally accessible address (ie, not 127.0.0.1) if you are going to be running a frontend on a different machine that this one. Note, in IPv6 setups, this is still required for certain extra such as UPnP.",
+            "ipv6_label": "IPv6 Address",
+            "ipv6_desc": "Enter the IPv6 address of this machine. Use an externally accessible address (ie, not ::1) if you are going to be running a frontend on a different machine that this one.",
+            "listenlinklocal_label": "Listen on Link-Local addresses",
+            "listenlinklocal_desc": "Enable servers on this machine to listen on link-local addresses. These are auto-configured addresses and not accessible outside the local network. This must be enabled for anything requiring Bonjour to work.",
+            "primaryip_label": "Primary IP address / DNS name",
+            "primaryip_desc": "The primary IP address of this backend server. You can select an IP address from the list or type a DNS name or host name. Other systems will contact this server using this address. If you use a hostname make sure it is assigned an IP address other than 127.0.0.1 in the hosts file.",
+            "ismaster_label": "This server is the Master Backend",
+            "ismaster_desc": "Enable this if this is the only backend or is the master backend server. If enabled, all frontend and non-master backend machines will connect to this server. To change to a new master backend, run setup on that server and select it as master backend.",
+            "ismaster_hint": "To change Master Backend you have to run setup from that backend.",
+            "master_label": "Master Backend Name",
+            "master_desc": "Host name of the Master Backend. <strong>Read only Setting</strong> This is set by selecting \"<i>This server is the Master Backend</i>\" on that server."
         }
-    }
+    },
+    "Primary IP address": "settings.hostaddress.primaryip_label"
 }
