@@ -190,7 +190,7 @@ void MythVideoFrame::CopyPlane(uint8_t *To, int ToPitch, const uint8_t *From, in
 {
     if ((ToPitch == PlaneWidth) && (FromPitch == PlaneWidth))
     {
-        memcpy(To, From, static_cast<size_t>(PlaneWidth * PlaneHeight));
+        memcpy(To, From, static_cast<size_t>(PlaneWidth) * PlaneHeight);
         return;
     }
 
@@ -218,14 +218,14 @@ void MythVideoFrame::ClearBufferToBlank()
     int uv = (1 << (ColorDepth(m_type) - 1)) - 1;
     if (FMT_YV12 == m_type || FMT_YUV422P == m_type || FMT_YUV444P == m_type)
     {
-        memset(m_buffer + m_offsets[0], 0, static_cast<size_t>(m_pitches[0] * m_height));
-        memset(m_buffer + m_offsets[1], uv & 0xff, static_cast<size_t>(m_pitches[1] * uv_height));
-        memset(m_buffer + m_offsets[2], uv & 0xff, static_cast<size_t>(m_pitches[2] * uv_height));
+        memset(m_buffer + m_offsets[0], 0, static_cast<size_t>(m_pitches[0]) * m_height);
+        memset(m_buffer + m_offsets[1], uv & 0xff, static_cast<size_t>(m_pitches[1]) * uv_height);
+        memset(m_buffer + m_offsets[2], uv & 0xff, static_cast<size_t>(m_pitches[2]) * uv_height);
     }
     else if ((FormatIs420(m_type) || FormatIs422(m_type) || FormatIs444(m_type)) &&
              (m_pitches[1] == m_pitches[2]))
     {
-        memset(m_buffer + m_offsets[0], 0, static_cast<size_t>(m_pitches[0] * m_height));
+        memset(m_buffer + m_offsets[0], 0, static_cast<size_t>(m_pitches[0]) * m_height);
         unsigned char uv1 = (uv & 0xff00) >> 8;
         unsigned char uv2 = (uv & 0x00ff);
         unsigned char* buf1 = m_buffer + m_offsets[1];
@@ -243,12 +243,12 @@ void MythVideoFrame::ClearBufferToBlank()
     }
     else if (FMT_NV12 == m_type)
     {
-        memset(m_buffer + m_offsets[0], 0, static_cast<size_t>(m_pitches[0] * m_height));
-        memset(m_buffer + m_offsets[1], uv & 0xff, static_cast<size_t>(m_pitches[1] * uv_height));
+        memset(m_buffer + m_offsets[0], 0, static_cast<size_t>(m_pitches[0]) * m_height);
+        memset(m_buffer + m_offsets[1], uv & 0xff, static_cast<size_t>(m_pitches[1]) * uv_height);
     }
     else if (FormatIsNV12(m_type))
     {
-        memset(m_buffer + m_offsets[0], 0, static_cast<size_t>(m_pitches[0] * m_height));
+        memset(m_buffer + m_offsets[0], 0, static_cast<size_t>(m_pitches[0]) * m_height);
         unsigned char uv1 = (uv & 0xff00) >> 8;
         unsigned char uv2 = (uv & 0x00ff);
         unsigned char* buf3 = m_buffer + m_offsets[1];

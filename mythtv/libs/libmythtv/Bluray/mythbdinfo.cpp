@@ -76,7 +76,7 @@ MythBDInfo::MythBDInfo(const QString &Filename)
                     [](void *Handle, void *Buf, int LBA, int NumBlocks) {
                     if (MythFileSeek(*(static_cast<int*>(Handle)), LBA * 2048LL, SEEK_SET) != -1)
                         return static_cast<int>(MythFileRead(*(static_cast<int*>(Handle)), Buf,
-                                                             static_cast<size_t>(NumBlocks * 2048)) / 2048);
+                                                             static_cast<size_t>(NumBlocks) * 2048) / 2048);
                     return -1;
                 });
             }

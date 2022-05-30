@@ -1575,7 +1575,7 @@ bool MythDVDBuffer::DecodeSubtitles(AVSubtitle *Subtitle, int *GotSubtitles,
                     Subtitle->num_rects = 0;
                 }
 
-                auto *bitmap = static_cast<uint8_t*>(av_malloc(static_cast<size_t>(width * height)));
+                auto *bitmap = static_cast<uint8_t*>(av_malloc(static_cast<size_t>(width) * height));
                 Subtitle->num_rects = (NumMenuButtons() > 0) ? 2 : 1;
                 Subtitle->rects = static_cast<AVSubtitleRect**>(av_mallocz(sizeof(AVSubtitleRect*) * Subtitle->num_rects));
                 for (uint i = 0; i < Subtitle->num_rects; i++)
@@ -2128,7 +2128,7 @@ int MythDVDBuffer::FindSmallestBoundingRectangle(AVSubtitle *Subtitle)
 
     int width = right - left + 1;
     int height = top - bottom + 1;
-    auto *bitmap = static_cast<uint8_t*>(av_malloc(static_cast<size_t>(width * height)));
+    auto *bitmap = static_cast<uint8_t*>(av_malloc(static_cast<size_t>(width) * height));
     if (!bitmap)
         return 1;
 

@@ -40,8 +40,6 @@ Checks: '-*,
 
     bugprone-*,
 
-       -bugprone-misplaced-widening-cast,
-
         # Renamed/replaced by cppcoreguidelines-narrowing-conversions. ,
        -bugprone-narrowing-conversions,
 

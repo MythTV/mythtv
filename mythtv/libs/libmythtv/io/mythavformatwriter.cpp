@@ -629,8 +629,8 @@ bool MythAVFormatWriter::OpenAudio(void)
         return false;
     }
 
-    auto size = static_cast<size_t>(m_audioFrameSize * m_audioChannels *
-                                    av_get_bytes_per_sample(context->sample_fmt));
+    auto size = static_cast<size_t>(m_audioFrameSize) * m_audioChannels *
+                av_get_bytes_per_sample(context->sample_fmt);
     if (av_get_packed_sample_fmt(context->sample_fmt) == AV_SAMPLE_FMT_FLT)
     {
         // allocate buffer to convert from S16 to float
