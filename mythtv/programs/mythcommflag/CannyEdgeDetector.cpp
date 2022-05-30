@@ -3,6 +3,7 @@
 
 // MythTV headers
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/sizetliteral.h"
 #include "libmythtv/mythframe.h"          // VideoFrame
 #include "libmythtv/mythplayer.h"
 
@@ -114,8 +115,8 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
         goto free_convolved;
     }
 
-    m_sgm = new unsigned int[padded_width * padded_height];
-    m_sgmSorted = new unsigned int[newwidth * newheight];
+    m_sgm = new unsigned int[1_UZ * padded_width * padded_height];
+    m_sgmSorted = new unsigned int[1_UZ * newwidth * newheight];
 
     m_ewidth = newwidth;
     m_eheight = newheight;

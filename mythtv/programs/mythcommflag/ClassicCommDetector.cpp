@@ -12,6 +12,7 @@
 #include "libmyth/mythcontext.h"
 #include "libmyth/programinfo.h"
 #include "libmythbase/mythmiscutil.h"
+#include "libmythbase/sizetliteral.h"
 #include "libmythtv/mythcommflagplayer.h"
 
 // Commercial Flagging headers
@@ -1884,9 +1885,9 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
     if (m_blankFrameMap.count() == 0)
         return;
 
-    auto *bframes = new long long[m_blankFrameMap.count()*2];
-    auto *c_start = new long long[m_blankFrameMap.count()];
-    auto *c_end   = new long long[m_blankFrameMap.count()];
+    auto *bframes = new long long[2_UZ * m_blankFrameMap.count()];
+    auto *c_start = new long long[1_UZ * m_blankFrameMap.count()];
+    auto *c_end   = new long long[1_UZ * m_blankFrameMap.count()];
     int frames = 0;
     int commercials = 0;
 

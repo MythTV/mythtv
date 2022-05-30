@@ -32,7 +32,7 @@ sgm_init_exclude(unsigned int *sgm, const AVFrame *src, int srcheight,
      * Intuitively, the SGM of a pixel is a measure of the "edge intensity" of
      * that pixel: how much it differs from its neighbors.
      */
-    const int       srcwidth = src->linesize[0];
+    const size_t    srcwidth = src->linesize[0];
 
     memset(sgm, 0, srcwidth * srcheight * sizeof(*sgm));
     int rr2 = srcheight - 1;

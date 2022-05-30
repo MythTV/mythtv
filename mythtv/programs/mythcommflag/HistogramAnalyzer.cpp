@@ -5,6 +5,7 @@
 // MythTV headers
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/sizetliteral.h"
 #include "libmythtv/mythplayer.h"
 
 // Commercial Flagging headers
@@ -354,7 +355,7 @@ HistogramAnalyzer::analyzeFrame(const MythVideoFrame *frame, long long frameno)
             unsigned char val = pgm->data[0][rroffset + cc];
             *pp++ = val;
             sumval += val;
-            sumsquares += val * val;
+            sumsquares += 1ULL * val * val;
             livepixels++;
             m_histVal[val]++;
         }
@@ -375,8 +376,8 @@ HistogramAnalyzer::analyzeFrame(const MythVideoFrame *frame, long long frameno)
          * area.
          */
         bordercolor = (sumval + livepixels - 1) / livepixels;
-        sumval += borderpixels * bordercolor;
-        sumsquares += borderpixels * bordercolor * bordercolor;
+        sumval     += 1ULL * borderpixels * bordercolor;
+        sumsquares += 1ULL * borderpixels * bordercolor * bordercolor;
     }
 
     memset(m_buf, bordercolor, borderpixels * sizeof(*m_buf));

@@ -72,8 +72,8 @@ private:
     long long       m_endFrame         {0};       /* end of logo detection */
     long long       m_nextFrame        {0};       /* next desired frame */
 
-    int             m_width            {-1};      /* dimensions of frames */
-    int             m_height           {-1};      /* dimensions of frames */
+    ssize_t         m_width            {-1};      /* dimensions of frames */
+    ssize_t         m_height           {-1};      /* dimensions of frames */
     unsigned int   *m_scores           {nullptr}; /* pixel "edge" scores */
 
     int             m_minContentRow    {INT_MAX}; /* limits of content area of images */

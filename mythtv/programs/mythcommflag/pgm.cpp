@@ -62,7 +62,7 @@ int pgm_read(unsigned char *buf, int width, int height, const char *filename)
         goto error;
     }
 
-    for (int rr = 0; rr < height; rr++)
+    for (ptrdiff_t rr = 0; rr < height; rr++)
     {
         if (fread(buf + rr * width, 1, width, fp) != (size_t)width)
         {
@@ -94,7 +94,7 @@ int pgm_write(const unsigned char *buf, int width, int height,
     }
 
     (void)fprintf(fp, "P5\n%d %d\n%d\n", width, height, UCHAR_MAX);
-    for (int rr = 0; rr < height; rr++)
+    for (ptrdiff_t rr = 0; rr < height; rr++)
     {
         if (fwrite(buf + rr * width, 1, width, fp) != (size_t)width)
         {
@@ -122,7 +122,7 @@ static int pgm_expand(AVFrame *dst, const AVFrame *src, int srcheight,
     const int           newheight = srcheight + extratop + extrabottom;
 
     /* Copy the image. */
-    for (int rr = 0; rr < srcheight; rr++)
+    for (ptrdiff_t rr = 0; rr < srcheight; rr++)
     {
         memcpy(dst->data[0] + (rr + extratop) * newwidth + extraleft,
                 src->data[0] + rr * srcwidth,
@@ -131,16 +131,16 @@ static int pgm_expand(AVFrame *dst, const AVFrame *src, int srcheight,
 
     /* Pad the top. */
     const uchar *srcdata = src->data[0];
-    for (int rr = 0; rr < extratop; rr++)
+    for (ptrdiff_t rr = 0; rr < extratop; rr++)
         memcpy(dst->data[0] + rr * newwidth + extraleft, srcdata, srcwidth);
 
     /* Pad the bottom. */
-    srcdata = src->data[0] + (srcheight - 1) * srcwidth;
-    for (int rr = extratop + srcheight; rr < newheight; rr++)
+    srcdata = src->data[0] + static_cast<ptrdiff_t>(srcheight - 1) * srcwidth;
+    for (ptrdiff_t rr = extratop + srcheight; rr < newheight; rr++)
         memcpy(dst->data[0] + rr * newwidth + extraleft, srcdata, srcwidth);
 
     /* Pad the left. */
-    for (int rr = 0; rr < newheight; rr++)
+    for (ptrdiff_t rr = 0; rr < newheight; rr++)
     {
         memset(dst->data[0] + rr * newwidth,
                 dst->data[0][rr * newwidth + extraleft],
@@ -148,7 +148,7 @@ static int pgm_expand(AVFrame *dst, const AVFrame *src, int srcheight,
     }
 
     /* Pad the right. */
-    for (int rr = 0; rr < newheight; rr++)
+    for (ptrdiff_t rr = 0; rr < newheight; rr++)
     {
         memset(dst->data[0] + rr * newwidth + extraleft + srcwidth,
                 dst->data[0][rr * newwidth + extraleft + srcwidth - 1],
@@ -177,7 +177,7 @@ int pgm_crop(AVFrame *dst, const AVFrame *src, int srcheight,
         return -1;
     }
 
-    for (int rr = 0; rr < cropheight; rr++)
+    for (ptrdiff_t rr = 0; rr < cropheight; rr++)
     {
         memcpy(dst->data[0] + rr * cropwidth,
                 src->data[0] + (srcrow + rr) * srcwidth + srccol,
@@ -211,7 +211,7 @@ int pgm_overlay(AVFrame *dst, const AVFrame *s1, int s1height,
         AV_PIX_FMT_GRAY8, s1width, s1height);
 
     /* Overwrite overlay area of "dst" with "s2". */
-    for (int rr = 0; rr < s2height; rr++)
+    for (ptrdiff_t rr = 0; rr < s2height; rr++)
     {
         memcpy(dst->data[0] + (s1row + rr) * s1width + s1col,
                 s2->data[0] + rr * s2width,

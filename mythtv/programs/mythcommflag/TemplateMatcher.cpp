@@ -592,10 +592,10 @@ TemplateMatcher::templateCoverage(long long nframes, bool final) const
      *
      * Expect 20%-45% of total length to be commercials.
      */
-    const int       MINBREAKS = nframes * 20 / 100;
-    const int       MAXBREAKS = nframes * 45 / 100;
+    static const int64_t MINBREAKS { nframes * 20 / 100 };
+    static const int64_t MAXBREAKS { nframes * 45 / 100 };
 
-    const long long brklen = frameAnalyzerMapSum(&m_breakMap);
+    const int64_t brklen = frameAnalyzerMapSum(&m_breakMap);
     const bool good = brklen >= MINBREAKS && brklen <= MAXBREAKS;
 
     if (m_debugLevel >= 1)

@@ -39,7 +39,7 @@ unsigned int Histogram::getAverageIntensity(void) const
 
     long value = 0;
 
-    for(int i = 0; i < 256; i++)
+    for(long i = 0; i < 256; i++)
     {
         value += m_data[i]*i;
     }
