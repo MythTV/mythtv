@@ -20,7 +20,7 @@ class Frontend : public FrontendServices
   public:
     DTC::FrontendStatus* GetStatus(void) override; // FrontendServices
     bool                 SendMessage(const QString &Message,
-                                     uint _Timeout) override; // FrontendServices
+                                     uint TimeoutInt) override; // FrontendServices
     bool                 SendNotification(bool  Error,
                                           const QString &Type,
                                           const QString &Message,

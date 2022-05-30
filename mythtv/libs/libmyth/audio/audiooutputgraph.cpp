@@ -72,7 +72,7 @@ class AudioOutputGraph::Buffer : public QByteArray
         resize(0);
     }
 
-    void Append(const void * _Buffer, unsigned long Length, std::chrono::milliseconds Timecode,
+    void Append(const void * Buffer, unsigned long Length, std::chrono::milliseconds Timecode,
                 int Channels, int Bits)
     {
         if (m_bits != Bits || m_channels != Channels)
@@ -88,7 +88,7 @@ class AudioOutputGraph::Buffer : public QByteArray
 
         if (qAbs((Timecode - m_tcNext).count()) <= 1)
         {
-            Append(_Buffer, Length, Bits);
+            Append(Buffer, Length, Bits);
             m_tcNext = tcNext;
         }
         else if (Timecode >= m_tcFirst && tcNext <= m_tcNext)
@@ -102,7 +102,7 @@ class AudioOutputGraph::Buffer : public QByteArray
                 .arg(m_tcNext.count()).arg(Timecode.count()));
 
             Resize(Channels, Bits);
-            Append(_Buffer, Length, Bits);
+            Append(Buffer, Length, Bits);
             m_tcFirst = Timecode;
             m_tcNext = tcNext;
         }
@@ -142,7 +142,7 @@ class AudioOutputGraph::Buffer : public QByteArray
         return Msecs > 0ms ? static_cast<int>((Msecs.count() * m_sampleRate) / 1000) : 0; // NB round down
     }
 
-    void Append(const void * _Buffer, unsigned long Length, int Bits)
+    void Append(const void * Buffer, unsigned long Length, int Bits)
     {
         switch (Bits)
         {
@@ -152,14 +152,14 @@ class AudioOutputGraph::Buffer : public QByteArray
                 auto count = Length;
                 auto n = size();
                 resize(n + static_cast<int>(sizeof(int16_t) * count));
-                const auto * src = reinterpret_cast<const uchar*>(_Buffer);
+                const auto * src = reinterpret_cast<const uchar*>(Buffer);
                 auto * dst = reinterpret_cast<int16_t*>(data() + n);
                 while (count--)
                     *dst++ = static_cast<int16_t>((static_cast<int16_t>(*src++) - CHAR_MAX) << (16 - CHAR_BIT));
             }
             break;
           case 16:
-            append(reinterpret_cast<const char*>(_Buffer), static_cast<int>(Length));
+            append(reinterpret_cast<const char*>(Buffer), static_cast<int>(Length));
             break;
           case 32:
             // 32bit float to 16bit signed
@@ -168,14 +168,14 @@ class AudioOutputGraph::Buffer : public QByteArray
                 auto n = size();
                 resize(n + static_cast<int>(sizeof(int16_t) * count));
                 const float f((1 << 15) - 1);
-                const auto * src = reinterpret_cast<const float*>(_Buffer);
+                const auto * src = reinterpret_cast<const float*>(Buffer);
                 auto * dst = reinterpret_cast<int16_t*>(data() + n);
                 while (count--)
                     *dst++ = static_cast<int16_t>(f * (*src++));
             }
             break;
           default:
-            append(reinterpret_cast<const char*>(_Buffer), static_cast<int>(Length));
+            append(reinterpret_cast<const char*>(Buffer), static_cast<int>(Length));
             break;
         }
     }
@@ -233,11 +233,11 @@ void AudioOutputGraph::prepare()
 {
 }
 
-void AudioOutputGraph::add(const void * _Buffer, unsigned long Length,
+void AudioOutputGraph::add(const void * Buffer, unsigned long Length,
                            std::chrono::milliseconds Timecode, int Channnels, int Bits)
 {
     QMutexLocker lock(&m_mutex);
-    m_buffer->Append(_Buffer, Length, Timecode, Channnels, Bits);
+    m_buffer->Append(Buffer, Length, Timecode, Channnels, Bits);
 }
 
 void AudioOutputGraph::Reset()

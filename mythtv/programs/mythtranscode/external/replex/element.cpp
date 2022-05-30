@@ -35,7 +35,7 @@
 
 #include "libmythbase/mythlogging.h"
 
-std::array<unsigned int,4> _slots {12, 144, 0, 0};
+std::array<unsigned int,4> slotsPerLayer {12, 144, 0, 0};
 std::array<std::array<unsigned int,16>,3> bitrates {{
  {0,32,64,96,128,160,192,224,256,288,320,352,384,416,448,0},
  {0,32,48,56,64,80,96,112,128,160,192,224,256,320,384,0},
@@ -524,7 +524,7 @@ int get_audio_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 	af->set = 1;
 
 	af->frametime = ((samples [3-af->layer] * 27000000ULL) / af->frequency);
-    af->framesize = af->bit_rate *_slots [3-af->layer]/ af->frequency;
+	af->framesize = af->bit_rate * slotsPerLayer[3-af->layer]/ af->frequency;
 	LOG(VB_GENERAL, LOG_INFO, QString(" frame size: %1").arg(af->framesize));
 	printpts(af->frametime);
 

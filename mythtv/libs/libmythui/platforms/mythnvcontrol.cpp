@@ -175,9 +175,9 @@ NVControl MythNVControl::Create()
 /*! \class MythNVControl
  * \brief A simple wrapper around libXNVCtrl - which is dynamically loaded on demand.
 */
-MythNVControl::MythNVControl(const QString &Path, MythXDisplay* _Display)
+MythNVControl::MythNVControl(const QString &Path, MythXDisplay* MDisplay)
   : m_lib(Path),
-    m_display(_Display),
+    m_display(MDisplay),
     m_queryBinary(reinterpret_cast<QueryTargetBinary>(m_lib.resolve("XNVCTRLQueryTargetBinaryData"))),
     m_queryScreen(reinterpret_cast<QueryScreenAttrib>(m_lib.resolve("XNVCTRLQueryAttribute"))),
     m_queryTarget(reinterpret_cast<QueryTargetAttrib>(m_lib.resolve("XNVCTRLQueryTargetAttribute"))),

@@ -44,7 +44,7 @@ class MythNVControl
     int GetDisplayID() const;
 
   protected:
-    MythNVControl(const QString& Path, MythXDisplay* _Display);
+    MythNVControl(const QString& Path, MythXDisplay* MDisplay);
     QLibrary m_lib;
 
   public:

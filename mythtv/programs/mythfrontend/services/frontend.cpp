@@ -44,13 +44,13 @@ DTC::FrontendStatus* Frontend::GetStatus(void)
     return status;
 }
 
-bool Frontend::SendMessage(const QString &Message, uint _Timeout)
+bool Frontend::SendMessage(const QString &Message, uint TimeoutInt)
 {
     if (Message.isEmpty())
         return false;
 
     QStringList data;
-    auto Timeout = std::chrono::seconds(_Timeout);
+    auto Timeout = std::chrono::seconds(TimeoutInt);
     if (Timeout > 0s && Timeout < 1000s)
         data << QString::number(Timeout.count());
     qApp->postEvent(GetMythMainWindow(),

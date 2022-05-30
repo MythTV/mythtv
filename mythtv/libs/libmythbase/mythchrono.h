@@ -1,5 +1,5 @@
-#ifndef __MYTHCHRONO_H__
-#define __MYTHCHRONO_H__
+#ifndef MYTHCHRONO_H
+#define MYTHCHRONO_H
 
 #include <cmath>
 #include <sys/time.h> // For gettimeofday
@@ -207,4 +207,4 @@ static constexpr T chronodivide(T duration, double f)
     return T(std::llround(duration.count() / f));
 }
 
-#endif // __MYTHCHRONO_H__
+#endif // MYTHCHRONO_H

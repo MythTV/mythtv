@@ -49,9 +49,9 @@ struct hdr_output_metadata {
 
 #define LOC QString("HDR: ")
 
-MythHDRPtr MythDRMHDR::Create(MythDisplay* _Display, const MythHDRDesc& Desc)
+MythHDRPtr MythDRMHDR::Create(MythDisplay* MDisplay, const MythHDRDesc& Desc)
 {
-    auto * display = dynamic_cast<MythDisplayDRM*>(_Display);
+    auto * display = dynamic_cast<MythDisplayDRM*>(MDisplay);
     if (!display)
         return nullptr;
 

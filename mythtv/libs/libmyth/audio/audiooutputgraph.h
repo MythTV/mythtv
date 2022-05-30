@@ -28,7 +28,7 @@ class MPUBLIC AudioOutputGraph : public MythTV::Visual
     void Reset();
 
   public:
-    void add(const void * _Buffer, unsigned long Length, std::chrono::milliseconds Timecode,
+    void add(const void * Buffer, unsigned long Length, std::chrono::milliseconds Timecode,
              int Channnels, int Bits) override;
     void prepare() override;
 

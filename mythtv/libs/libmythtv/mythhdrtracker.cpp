@@ -15,13 +15,13 @@
  * the instance is capable of signalling the HDR metadata to the display (which
  * is currently limited to DRM on linux - with no X11 or Wayland).
 */
-HDRTracker MythHDRTracker::Create(MythDisplay* _Display)
+HDRTracker MythHDRTracker::Create(MythDisplay* MDisplay)
 {
-    if (!_Display)
+    if (!MDisplay)
         return nullptr;
 
     // Check for HDR support
-    auto hdr = _Display->GetHDRState();
+    auto hdr = MDisplay->GetHDRState();
     if (!hdr.get())
         return nullptr;
 

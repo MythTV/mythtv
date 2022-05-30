@@ -43,22 +43,12 @@ Checks: '-*,
         # Renamed/replaced by cppcoreguidelines-narrowing-conversions. ,
        -bugprone-narrowing-conversions,
 
-        # Doesn''t distinguish between identifiers in the code and
-        # those supplied on the command line with "-X_FOO=BAR". The
-        # only remaining positives are those passed on the command
-        # line. New in clang11. ,
-       -bugprone-reserved-identifier,
-
         # New in clang13. 4533 warnings. ,
        -bugprone-easily-swappable-parameters,
         # New in clang13. 979 warnings. ,
        -bugprone-implicit-widening-of-multiplication-result,
 
     cert-*,
-
-	# Aliases for bugprone-reserved-identifier,
-       -cert-dcl37-c,
-       -cert-dcl51-cpp,
 
         # Dont declare c-style varardic functions. ,
        -cert-dcl50-cpp,

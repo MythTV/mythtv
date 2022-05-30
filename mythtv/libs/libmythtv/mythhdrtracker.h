@@ -12,7 +12,7 @@ using HDRTracker = std::shared_ptr<class MythHDRTracker>;
 class MythHDRTracker
 {
   public:
-    static HDRTracker Create(class MythDisplay* _Display);
+    static HDRTracker Create(class MythDisplay* MDisplay);
     ~MythHDRTracker();
     void     Update(class MythVideoFrame* Frame);
 

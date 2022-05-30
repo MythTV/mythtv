@@ -8,7 +8,7 @@
 class MythDRMHDR : public MythHDR
 {
   public:
-    static MythHDRPtr Create(class MythDisplay* _Display, const MythHDRDesc& Desc);
+    static MythHDRPtr Create(class MythDisplay* MDisplay, const MythHDRDesc& Desc);
    ~MythDRMHDR() override;
     void SetHDRMetadata(HDRType Type, const MythHDRMetaPtr& Metadata) override;
 
