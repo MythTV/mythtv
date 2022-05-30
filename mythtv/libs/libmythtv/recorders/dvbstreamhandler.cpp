@@ -31,6 +31,16 @@ QMap<QString,DVBStreamHandler*> DVBStreamHandler::s_handlers;
 QMap<QString,uint>              DVBStreamHandler::s_handlersRefCnt;
 QMutex                          DVBStreamHandler::s_handlersLock;
 
+#if !defined(__suseconds_t)
+#ifdef Q_OS_MACOS
+using __suseconds_t = __darwin_suseconds_t;
+#else
+using __suseconds_t = long int;
+#endif
+#endif
+static constexpr __suseconds_t k50Milliseconds {static_cast<__suseconds_t>(50 * 1000)};
+
+
 DVBStreamHandler *DVBStreamHandler::Get(const QString &devname,
                                         int inputid)
 {
@@ -224,7 +234,7 @@ void DVBStreamHandler::RunTS(void)
         else
         {
             // timeout gets reset by select, so we need to create new one
-            struct timeval timeout = { 0, 50 /* ms */ * 1000 /* -> usec */ };
+            struct timeval timeout = { 0, k50Milliseconds };
             int ret = select(dvr_fd+1, &fd_select_set, nullptr, nullptr, &timeout);
             if (ret == -1 && errno != EINTR)
             {

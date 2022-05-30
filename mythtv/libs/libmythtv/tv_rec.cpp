@@ -869,7 +869,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     {
         QMutexLocker locker(&s_finRecLock);
         QDateTime now = MythDate::current();
-        QDateTime expired = now.addSecs(-60*5);
+        QDateTime expired = now.addSecs(-5LL * 60);
         QHash<QString,QDateTime>::iterator it = s_finRecMap.begin();
         while (it != s_finRecMap.end())
         {

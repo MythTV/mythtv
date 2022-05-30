@@ -207,7 +207,7 @@ void HLSReader::Throttle(bool val)
     m_throttleLock.unlock();
 }
 
-int HLSReader::Read(uint8_t* buffer, int maxlen)
+qint64 HLSReader::Read(uint8_t* buffer, qint64 maxlen)
 {
     if (!m_curstream)
     {
@@ -222,7 +222,7 @@ int HLSReader::Read(uint8_t* buffer, int maxlen)
 
     QMutexLocker lock(&m_bufLock);
 
-    int len = m_buffer.size() < maxlen ? m_buffer.size() : maxlen;
+    qint64 len = m_buffer.size() < maxlen ? m_buffer.size() : maxlen;
     LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Reading %1 of %2 bytes")
         .arg(len).arg(m_buffer.size()));
 
@@ -999,7 +999,7 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
         downloadduration = 1ms;
 
     /* bits/sec */
-    bandwidth = segment_len * 8 * 1000ULL / downloadduration.count();
+    bandwidth = 8 * 1000ULL * segment_len / downloadduration.count();
     hls->AverageBandwidth(bandwidth);
     hls->SetCurrentByteRate(static_cast<uint64_t>
                             ((static_cast<double>(segment_len) /

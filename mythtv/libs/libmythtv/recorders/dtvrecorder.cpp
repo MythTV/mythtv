@@ -20,6 +20,7 @@
 
 #include "libmyth/programinfo.h"
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/sizetliteral.h"
 
 #include "dtvrecorder.h"
 #include "io/mythmediabuffer.h"
@@ -51,7 +52,7 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     m_h2645Parser(reinterpret_cast<H2645Parser *>(new AVCParser))
 {
     SetPositionMapType(MARK_GOP_BYFRAME);
-    m_payloadBuffer.reserve(TSPacket::kSize * (50 + 1));
+    m_payloadBuffer.reserve(TSPacket::kSize * (50_UZ + 1));
 
     DTVRecorder::ResetForNewFile();
 
@@ -522,7 +523,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
                 HandleTimestamps(stream_id, pts, dts);
                 // Detect music choice program (very slow frame rate and audio)
                 if (m_firstKeyframe < 0
-                    &&  m_tsLast[stream_id] - m_tsFirst[stream_id] > 3*90000)
+                    &&  m_tsLast[stream_id] - m_tsFirst[stream_id] > 3*90000LL)
                 {
                     hasKeyFrame = true;
                     m_musicChoice = true;
@@ -623,18 +624,18 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
     if (m_usePts)
     {
         ts = dts;
-        gap_threshold = 2*90000; // two seconds, compensate for GOP ordering
+        gap_threshold = 2*90000LL; // two seconds, compensate for GOP ordering
     }
 
     if (m_musicChoice)
-        gap_threshold = 8*90000; // music choice uses frames every 6 seconds
+        gap_threshold = 8*90000LL; // music choice uses frames every 6 seconds
 
     if (m_tsLast[stream_id] >= 0)
     {
         int64_t diff = ts - m_tsLast[stream_id];
 
         // time jumped back more then 10 seconds, handle it as 33bit overflow
-        if (diff < (10 * -90000))
+        if (diff < (10 * -90000LL))
             // MAX_PTS is 33bits all 1
             diff += 0x1ffffffffLL;
 

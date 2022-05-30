@@ -16,8 +16,8 @@
 #define LOC QString("HLSSH[%1](%2): ").arg(m_inputId).arg(m_device)
 
 // BUFFER_SIZE is a multiple of TS_SIZE
-#define TS_SIZE     188
-#define BUFFER_SIZE (512 * TS_SIZE)
+static constexpr qint64 TS_SIZE     { 188           };
+static constexpr qint64 BUFFER_SIZE { 512 * TS_SIZE };
 
 QMap<QString,HLSStreamHandler*>  HLSStreamHandler::s_hlshandlers;
 QMap<QString,uint>               HLSStreamHandler::s_hlshandlers_refcnt;
@@ -130,7 +130,7 @@ void HLSStreamHandler::run(void)
         return;
     m_hls->Throttle(false);
 
-    int remainder = 0;
+    qint64 remainder = 0;
     while (m_runningDesired)
     {
         if (!m_hls->IsOpen(url))
@@ -149,8 +149,8 @@ void HLSStreamHandler::run(void)
             m_throttle = false;
         }
 
-        int size = m_hls->Read(&m_readbuffer[remainder],
-                               BUFFER_SIZE - remainder);
+        qint64 size = m_hls->Read(&m_readbuffer[remainder],
+                                  BUFFER_SIZE - remainder);
 
         size += remainder;
 

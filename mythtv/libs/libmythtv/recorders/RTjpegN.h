@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 #define RTJPEG_H
 
 #include "mythtvexp.h"
+#include "libmythbase/sizetliteral.h"
 #include <cstdint>
 
 /*
@@ -97,7 +98,7 @@ private:
 #endif
     
     alignas(32) RTjpegData16   m_block {0};
-    alignas(32) std::array<int32_t,64*4> m_ws    {0};
+    alignas(32) std::array<int32_t,64_UZ * 4> m_ws    {0};
     alignas(32) RTjpegData32   m_lqt   {0};
     alignas(32) RTjpegData32   m_cqt   {0};
     alignas(32) RTjpegData32   m_liqt  {0};

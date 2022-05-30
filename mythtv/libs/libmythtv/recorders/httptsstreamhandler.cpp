@@ -8,8 +8,8 @@
 #define LOC QString("HTTPTSSH[%1](%2): ").arg(m_inputId).arg(m_device)
 
 // BUFFER_SIZE is a multiple of TS_SIZE
-#define TS_SIZE     188
-#define BUFFER_SIZE (512 * TS_SIZE)
+static constexpr qint64 TS_SIZE     { 188 };
+static constexpr qint64 BUFFER_SIZE { TS_SIZE * 512 };
 
 QMap<QString, HTTPTSStreamHandler*> HTTPTSStreamHandler::s_httphandlers;
 QMap<QString, uint>                 HTTPTSStreamHandler::s_httphandlers_refcnt;

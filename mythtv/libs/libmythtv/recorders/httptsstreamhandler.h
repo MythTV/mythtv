@@ -64,7 +64,7 @@ class MTV_PUBLIC HTTPReader : public QObject
     QMutex                  m_bufferlock;
     uint8_t                *m_buffer     {nullptr};
     bool                    m_ok         {true};
-    int                     m_size       {0};
+    qint64                  m_size       {0};
 };
 
 #endif // HTTPTSSTREAMHANDLER_H

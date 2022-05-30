@@ -6,10 +6,11 @@
 
 // ANSI C++ headers
 #include <cmath>
+#include <cstdarg>
+#include <cstddef>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <cstdio>
-#include <cstdarg>
 
 #ifdef USING_V4L2
 #include <linux/videodev2.h>
@@ -259,7 +260,7 @@ vt_line(struct vbi *vbi, unsigned char *p)
                return 4;
 
            std::array<unsigned int,13> t {};
-           for (int i = 0; i < 13; ++i)
+           for (ptrdiff_t i = 0; i < 13; ++i)
                t[i] = hamm24(p + 1 + 3*i, &err);
            if (err & 0xf000)
                return 4;
@@ -281,7 +282,7 @@ vt_line(struct vbi *vbi, unsigned char *p)
            if (b1 != 0 || !(b2 & 8))
                return 0;
 
-           for (int i = 0; i < 6; ++i)
+           for (ptrdiff_t i = 0; i < 6; ++i)
            {
                err = 0;
                b1 = hamm16(p+1+6*i, &err);

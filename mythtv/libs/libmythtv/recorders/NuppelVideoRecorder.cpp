@@ -726,10 +726,10 @@ void NuppelVideoRecorder::InitBuffers(void)
     else
         videomegs = 12;
 
-    m_videoBufferCount = (videomegs * 1000 * 1000) / m_videoBufferSize;
+    m_videoBufferCount = (videomegs * 1000 * 1000) / static_cast<int>(m_videoBufferSize);
 
     if (m_audioBufferSize != 0)
-        m_audioBufferCount = (audiomegs * 1000 * 1000) / m_audioBufferSize;
+        m_audioBufferCount = (audiomegs * 1000 * 1000) / static_cast<int>(m_audioBufferSize);
     else
         m_audioBufferCount = 0;
 

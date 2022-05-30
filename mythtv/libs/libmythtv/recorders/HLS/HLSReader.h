@@ -45,7 +45,7 @@ class MTV_PUBLIC  HLSReader
 
     bool Open(const QString & m3u, int bitrate_index = 0);
     void Close(bool quiet = false);
-    int Read(uint8_t* buffer, int len);
+    qint64 Read(uint8_t* buffer, qint64 len);
     void Throttle(bool val);
     bool IsThrottled(void) const { return m_throttle; }
     bool IsOpen(const QString& url) const

@@ -276,10 +276,10 @@ void V4LRecorder::RunVBIDevice(void)
             if ((ptr_end - ptr) == 0)
             {
                 unsigned char *line21_field1 =
-                    buf + ((21 - m_ntscVbiStartLine) * m_ntscVbiWidth);
+                    buf + ((21 - m_ntscVbiStartLine) * static_cast<size_t>(m_ntscVbiWidth));
                 unsigned char *line21_field2 =
                     buf + ((m_ntscVbiLineCount + 21 - m_ntscVbiStartLine)
-                           * m_ntscVbiWidth);
+                           * static_cast<size_t>(m_ntscVbiWidth));
                 bool cc1 = m_vbi608->ExtractCC12(line21_field1, m_ntscVbiWidth);
                 bool cc2 = m_vbi608->ExtractCC34(line21_field2, m_ntscVbiWidth);
                 if (cc1 || cc2)

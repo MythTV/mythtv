@@ -2730,7 +2730,7 @@ int RTjpeg::SetSize(const int *w, const int *h)
             fprintf(stderr, "RTjpeg: Could not allocate memory\n");
             return -1;
         }
-        memset(m_old, 0, ((4*m_width*m_height)));
+        memset(m_old, 0, (4_UZ * m_width * m_height));
     }
     return 0;
 }
@@ -2772,7 +2772,7 @@ int RTjpeg::SetIntra(int *key, int *lm, int *cm)
          fprintf(stderr, "RTjpeg: Could not allocate memory\n");
          return -1;
     }
-    memset(m_old, 0, ((4*m_width*m_height)));
+    memset(m_old, 0, (4_UZ * m_width * m_height));
 
     return 0;
 }
@@ -3296,7 +3296,7 @@ int RTjpeg::Compress(int8_t *sp, uint8_t **planes)
   fh->key = 0;
  } else {
   if (m_keyCount == 0)
-   memset(m_old, 0, ((4 * m_width * m_height)));
+   memset(m_old, 0, (4_UZ * m_width * m_height));
   switch(m_f)
   {
    case RTJ_YUV420: ds = mcompressYUV420((int8_t*)&(fh->data), planes); break;

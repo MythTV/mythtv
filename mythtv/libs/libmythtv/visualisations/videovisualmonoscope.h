@@ -4,7 +4,7 @@
 // MythTV
 #include "videovisual.h"
 
-#define NUM_SAMPLES 256
+static constexpr size_t NUM_SAMPLES { 256 };
 #define FADE_NAME   QString("FadeScope")
 #define SIMPLE_NAME QString("SimpleScope")
 

@@ -93,7 +93,7 @@ using F_PT = float;
 
 #define FIX 12
 #define UNIT   ( 1<<FIX )
-#define MAX_SIMI  6
+static constexpr size_t MAX_SIMI { 6 };
 
 #define MAX_DEPTH_2  10
 #define MAX_DEPTH_3  6
@@ -130,7 +130,7 @@ using SimiData = std::array<SIMI,5 * MAX_SIMI>;
 struct Fractal_Struct
 {
 
-	int     m_nbSimi;
+	size_t   m_nbSimi;
 	SimiData m_components;
 	int     m_depth, m_col;
 	int     m_count, m_speed;
