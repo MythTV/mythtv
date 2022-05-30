@@ -69,9 +69,6 @@ Checks: '-*,
         # all appear to be within Qt code that cant be fixed by us. ,
        -cert-err58-cpp,
 
-        # Similar to bugprone-signed-char-misuse but not quite the same. ,
-       -cert-str34-c,
-
     clang-analyzer-*,
         # The "safe" versions functions were optional in the standard
         # and were never implemented by GCC or Clang.  There has been

@@ -307,7 +307,7 @@ class HLSSegment
         /* Decrypt data using AES-128 */
         int aeslen = m_data.size() & ~0xf;
         aesiv_array iv {};
-        char *decrypted_data = new char[m_data.size()];
+        auto *decrypted_data = new uint8_t[m_data.size()];
         if (!iv_valid)
         {
             /*
@@ -327,13 +327,12 @@ class HLSSegment
             std::copy(IV.cbegin(), IV.cend(), iv.begin());
         }
         AES_cbc_encrypt((unsigned char*)m_data.constData(),
-                        (unsigned char*)decrypted_data, aeslen,
+                        decrypted_data, aeslen,
                         &m_aeskey, iv.data(), AES_DECRYPT);
         memcpy(decrypted_data + aeslen, m_data.constData() + aeslen,
                m_data.size() - aeslen);
 
         // remove the PKCS#7 padding from the buffer
-        // NOLINTNEXTLINE(bugprone-signed-char-misuse)
         int pad = decrypted_data[m_data.size()-1];
         if (pad <= 0 || pad > AES_BLOCK_SIZE)
         {
@@ -343,7 +342,7 @@ class HLSSegment
             return RET_ERROR;
         }
         aeslen = m_data.size() - pad;
-        m_data = QByteArray(decrypted_data, aeslen);
+        m_data = QByteArray(reinterpret_cast<char*>(decrypted_data), aeslen);
         delete[] decrypted_data;
 
         return RET_OK;

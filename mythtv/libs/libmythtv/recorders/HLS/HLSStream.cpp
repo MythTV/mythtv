@@ -90,7 +90,7 @@ bool HLSRecStream::DecodeData(MythSingleDownload& downloader,
     /* Decrypt data using AES-128 */
     int aeslen = data.size() & ~0xf;
     std::array<uint8_t,AES_BLOCK_SIZE> iv {};
-    char *decrypted_data = new char[data.size()];
+    auto *decrypted_data = new uint8_t[data.size()];
     if (IV.isEmpty())
     {
         /*
@@ -111,12 +111,11 @@ bool HLSRecStream::DecodeData(MythSingleDownload& downloader,
         std::copy(IV.cbegin(), IV.cend(), iv.data());
     }
     AES_cbc_encrypt((unsigned char*)data.constData(),
-                    (unsigned char*)decrypted_data, aeslen,
+                    decrypted_data, aeslen,
                     *Ikey, iv.data(), AES_DECRYPT);
     std::copy(data.cbegin() + aeslen, data.cend(), decrypted_data + aeslen);
 
     // remove the PKCS#7 padding from the buffer
-    // NOLINTNEXTLINE(bugprone-signed-char-misuse)
     int pad = decrypted_data[data.size()-1];
     if (pad <= 0 || pad > AES_BLOCK_SIZE)
     {
@@ -127,7 +126,7 @@ bool HLSRecStream::DecodeData(MythSingleDownload& downloader,
         return false;
     }
     aeslen = data.size() - pad;
-    data = QByteArray(decrypted_data, aeslen);
+    data = QByteArray(reinterpret_cast<char*>(decrypted_data), aeslen);
     delete[] decrypted_data;
 
     return true;
