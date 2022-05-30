@@ -1,6 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/sizetliteral.h"
 #include "pespacket.h"
 #include "mpegtables.h"
 
@@ -256,11 +257,11 @@ static unsigned char* get_188_block()
 {
     if (free188.empty())
     {
-        mem188.push_back((unsigned char*) malloc(188 * BLOCKS188));
+        mem188.push_back((unsigned char*) malloc(188_UZ * BLOCKS188));
         free188.reserve(BLOCKS188);
         unsigned char* block_start = mem188.back();
         for (uint i = 0; i < BLOCKS188; ++i)
-            free188.push_back(i*188 + block_start);
+            free188.push_back(i * 188_UZ + block_start);
     }
 
     unsigned char *ptr = free188.back();
@@ -298,11 +299,11 @@ static unsigned char* get_4096_block()
 {
     if (free4096.empty())
     {
-        mem4096.push_back((unsigned char*) malloc(4096 * BLOCKS4096));
+        mem4096.push_back((unsigned char*) malloc(4096_UZ * BLOCKS4096));
         free4096.reserve(BLOCKS4096);
         unsigned char* block_start = mem4096.back();
         for (uint i = 0; i < BLOCKS4096; ++i)
-            free4096.push_back(i*4096 + block_start);
+            free4096.push_back(i * 4096_UZ + block_start);
     }
 
     unsigned char *ptr = free4096.back();

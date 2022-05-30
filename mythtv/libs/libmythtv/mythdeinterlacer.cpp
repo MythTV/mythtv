@@ -474,12 +474,12 @@ static inline void BlendC4x4(unsigned char *Src, int Width, int FirstRow, int La
     int dstpitch = DstPitch << 1;
     int maxrows  = LastRow - 3;
 
-    unsigned char *above   = Src + ((FirstRow - 1) * Pitch);
-    unsigned char *dest1   = Dst + (FirstRow * DstPitch);
+    unsigned char *above   = Src + ((FirstRow - 1) * static_cast<ptrdiff_t>(Pitch));
+    unsigned char *dest1   = Dst + (FirstRow * static_cast<ptrdiff_t>(DstPitch));
     unsigned char *middle  = above + srcpitch;
     unsigned char *dest2   = dest1 + dstpitch;
     unsigned char *below   = middle + srcpitch;
-    unsigned char *dstcpy1 = Dst + ((FirstRow - 1) * DstPitch);
+    unsigned char *dstcpy1 = Dst + ((FirstRow - 1) * static_cast<ptrdiff_t>(DstPitch));
     unsigned char *dstcpy2 = dstcpy1 + dstpitch;
 
     srcpitch <<= 1;
@@ -520,12 +520,12 @@ static inline void BlendSIMD16x4(unsigned char *Src, int Width, int FirstRow, in
     int dstpitch = DstPitch << 1;
     int maxrows  = LastRow - 3;
 
-    unsigned char *above   = Src + ((FirstRow - 1) * Pitch);
-    unsigned char *dest1   = Dst + (FirstRow * DstPitch);
+    unsigned char *above   = Src + ((FirstRow - 1) * static_cast<ptrdiff_t>(Pitch));
+    unsigned char *dest1   = Dst + (FirstRow * static_cast<ptrdiff_t>(DstPitch));
     unsigned char *middle  = above + srcpitch;
     unsigned char *dest2   = dest1 + dstpitch;
     unsigned char *below   = middle + srcpitch;
-    unsigned char *dstcpy1 = Dst + ((FirstRow - 1) * DstPitch);
+    unsigned char *dstcpy1 = Dst + ((FirstRow - 1) * static_cast<ptrdiff_t>(DstPitch));
     unsigned char *dstcpy2 = dstcpy1 + dstpitch;
 
     srcpitch <<= 1;
@@ -575,12 +575,12 @@ static inline void BlendSIMD8x4(unsigned char *Src, int Width, int FirstRow, int
     int dstpitch = DstPitch << 1;
     int maxrows  = LastRow - 3;
 
-    unsigned char *above   = Src + ((FirstRow - 1) * Pitch);
-    unsigned char *dest1   = Dst + (FirstRow * DstPitch);
+    unsigned char *above   = Src + ((FirstRow - 1) * static_cast<ptrdiff_t>(Pitch));
+    unsigned char *dest1   = Dst + (FirstRow * static_cast<ptrdiff_t>(DstPitch));
     unsigned char *middle  = above + srcpitch;
     unsigned char *dest2   = dest1 + dstpitch;
     unsigned char *below   = middle + srcpitch;
-    unsigned char *dstcpy1 = Dst + ((FirstRow - 1) * DstPitch);
+    unsigned char *dstcpy1 = Dst + ((FirstRow - 1) * static_cast<ptrdiff_t>(DstPitch));
     unsigned char *dstcpy2 = dstcpy1 + dstpitch;
 
     srcpitch <<= 1;

@@ -688,7 +688,7 @@ class HLSStream
         segment->Unlock();
 
         downloadduration = std::max(1us, downloadduration);
-        bandwidth = segment->Size() * 8 * 1000000ULL / downloadduration.count(); /* bits / s */
+        bandwidth = segment->Size() * 8ULL * 1000000ULL / downloadduration.count(); /* bits / s */
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("downloaded segment %1 [id:%2] took %3ms for %4 bytes: bandwidth:%5kiB/s")
             .arg(segnum)

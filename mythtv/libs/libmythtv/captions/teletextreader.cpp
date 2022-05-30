@@ -449,7 +449,7 @@ void TeletextReader::AddTeletextData(int magazine, int row,
             if (b1 != 0 || !(b2 & 8))
                 return;
 
-            for (int i = 0; i < 6; ++i)
+            for (ptrdiff_t i = 0; i < 6; ++i)
             {
                 err = 0;
                 switch (vbimode)

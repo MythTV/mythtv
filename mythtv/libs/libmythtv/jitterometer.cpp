@@ -10,7 +10,7 @@
 #include <utility>
 
 #define UNIX_PROC_STAT "/proc/stat"
-#define MAX_CORES 8
+static constexpr size_t MAX_CORES { 8 };
 
 #ifdef Q_OS_MACOS
 #include <mach/mach_init.h>
@@ -157,7 +157,7 @@ QString Jitterometer::GetCPUStat(void)
             return result;
 
         result = "";
-        int cores = 0;
+        size_t cores = 0;
         int ptr   = 0;
         line = m_cpuStat->readLine(256);
         while (!line.isEmpty() && cores < MAX_CORES)

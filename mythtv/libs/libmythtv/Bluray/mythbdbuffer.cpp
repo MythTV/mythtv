@@ -16,6 +16,7 @@
 #include "libmythbase/mythlocale.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/stringutil.h"
+#include "libmythbase/sizetliteral.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythuiactions.h"
 
@@ -1483,7 +1484,7 @@ void MythBDBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const Overlay)
                 int32_t dstOffset = (Overlay->y * osd->m_image.bytesPerLine()) + (Overlay->x * 4);
                 for (uint16_t y = 0; y < Overlay->h; y++)
                 {
-                    memcpy(&data[dstOffset], &Overlay->argb[srcOffset], Overlay->w * 4);
+                    memcpy(&data[dstOffset], &Overlay->argb[srcOffset], Overlay->w * 4_UZ);
                     dstOffset += osd->m_image.bytesPerLine();
                     srcOffset += Overlay->stride;
                 }

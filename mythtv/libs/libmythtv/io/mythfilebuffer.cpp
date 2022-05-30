@@ -254,7 +254,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds
                                 QString("OpenFile(): fadvise sequential "
                                         "failed: ") + ENO);
                         }
-                        if (posix_fadvise(m_fd2, 0, 128*1024, POSIX_FADV_WILLNEED) != 0)
+                        if (posix_fadvise(m_fd2, 0, static_cast<off_t>(128)*1024, POSIX_FADV_WILLNEED) != 0)
                         {
                             LOG(VB_FILE, LOG_DEBUG, LOC +
                                 QString("OpenFile(): fadvise willneed "
@@ -664,7 +664,7 @@ long long MythFileBuffer::SeekInternal(long long Position, int Whence)
                 {
                     ret = lseek64(m_fd2, m_internalReadPos, SEEK_SET);
 #ifndef _MSC_VER
-                    if (posix_fadvise(m_fd2, m_internalReadPos, 128*1024, POSIX_FADV_WILLNEED) != 0)
+                    if (posix_fadvise(m_fd2, m_internalReadPos, static_cast<off_t>(128)*1024, POSIX_FADV_WILLNEED) != 0)
                         LOG(VB_FILE, LOG_DEBUG, LOC + QString("Seek(): fadvise willneed failed: ") + ENO);
 #endif
                 }

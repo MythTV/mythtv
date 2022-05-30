@@ -1080,7 +1080,7 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
         // not impact performance as in the vast majority of cases the scan is completed
         // within a second or two (seconds in this case referring to stream duration - not the time
         // it takes to complete the scan).
-        m_ic->max_analyze_duration = 60 * AV_TIME_BASE;
+        m_ic->max_analyze_duration = 60LL * AV_TIME_BASE;
 
         m_avfRingBuffer->SetInInit(m_livetv);
         err = FindStreamInfo();
@@ -2032,7 +2032,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 // Trying to read a 20Mbs stream with a 16KB chunk size does not work:)
                 if (par->bit_rate == 0)
                 {
-                    static const int s_baseBitrate = 1000000;
+                    static constexpr int64_t s_baseBitrate { 1000000LL };
                     int multiplier = 1;
                     if (par->width && par->height)
                     {

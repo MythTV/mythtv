@@ -171,7 +171,7 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
     if (new_rows < m_true_row_count || new_columns < m_true_column_count)
     {
       delete [] m_text;
-      m_text = new CC708Character [new_rows * new_columns];
+      m_text = new CC708Character [static_cast<size_t>(new_rows) * new_columns];
       m_true_row_count = new_rows;
       m_true_column_count = new_columns;
       m_pen.m_row = 0;
@@ -194,7 +194,7 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
 
         // Expand the array if the new size exceeds the current capacity
         // in either dimension.
-        auto *new_text = new CC708Character[new_rows * new_columns];
+        auto *new_text = new CC708Character[static_cast<size_t>(new_rows) * new_columns];
         m_pen.m_column = 0;
         m_pen.m_row = 0;
         uint i = 0;

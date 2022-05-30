@@ -267,12 +267,12 @@ bool VBI608Extractor::ExtractCC(const MythVideoFrame *picframe, uint max_lines)
     for (uint i = 0; i < max_lines; i++)
     {
         const unsigned char *y = picframe->m_buffer +
-            picframe->m_offsets[0] + (i * ypitch);
+            picframe->m_offsets[0] + (i * static_cast<ptrdiff_t>(ypitch));
         if (FindClocks(y, ywidth))
         {
             uint maxv = 0;
             for (uint j = 0; j < m_start + 8 * m_rate; j++)
-                maxv = std::max(uint((y+(i * ypitch))[j]), maxv);
+                maxv = std::max(uint((y+(i * static_cast<ptrdiff_t>(ypitch)))[j]), maxv);
             uint avgv = maxv / 2;
 
             if (y[uint(m_start + (0+7) * m_rate)] > avgv ||

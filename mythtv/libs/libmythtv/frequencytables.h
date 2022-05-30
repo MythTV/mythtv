@@ -43,7 +43,7 @@ class FrequencyTable
                    int                     _name_offset,
                    uint64_t                _frequencyStart,
                    uint64_t                _frequencyEnd,
-                   uint                    _frequencyStep,
+                   uint64_t                _frequencyStep,
                    DTVModulation::Types    _modulation)
         : m_nameFormat(std::move(_name_format)), m_nameOffset(_name_offset),
           m_frequencyStart(_frequencyStart), m_frequencyEnd(_frequencyEnd),
@@ -52,7 +52,7 @@ class FrequencyTable
     // DVB-T/T2 -- OFDM
     FrequencyTable(uint64_t                _frequencyStart,
                    uint64_t                _frequencyEnd,
-                   uint                    _frequencyStep,
+                   uint64_t                _frequencyStep,
                    QString                 _name_format,
                    int                     _name_offset,
                    DTVInversion::Types     _inversion,
@@ -78,7 +78,7 @@ class FrequencyTable
     // DVB-C -- QAM
     FrequencyTable(uint64_t                _frequencyStart,
                    uint64_t                _frequencyEnd,
-                   uint                    _frequencyStep,
+                   uint64_t                _frequencyStep,
                    QString                 _name_format,
                    int                     _name_offset,
                    DTVCodeRate::Types      _fec_inner,
@@ -99,7 +99,7 @@ class FrequencyTable
     int               m_nameOffset;     // Offset to add to the pretty name
     uint64_t          m_frequencyStart; // Starting centre frequency
     uint64_t          m_frequencyEnd;   // Ending centre frequency
-    uint              m_frequencyStep;  // Frequency step
+    uint64_t          m_frequencyStep;  // Frequency step
     DTVModulation     m_modulation;
     int               m_offset1 {0};    // First offset from the centre frequency
     int               m_offset2 {0};    // Second offset from the centre frequency

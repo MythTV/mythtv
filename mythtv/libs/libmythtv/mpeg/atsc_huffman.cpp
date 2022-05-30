@@ -2195,7 +2195,7 @@ const std::array<const huff2_parts,2> huff2_tables
 
 
 /* returns the root for character input from table Table[] */
-static inline int huffman1_get_root(uint input, const atsc_table_vec &table)
+static inline int huffman1_get_root(size_t input, const atsc_table_vec &table)
 {
     if (input > 127)
         return -1;
