@@ -389,7 +389,7 @@ class DiSEqCDevSCR : public DiSEqCDevDevice
     // Commands
     void Reset(void) override; // DiSEqCDevDevice
     bool Execute(const DiSEqCDevSettings &settings, const DTVMultiplex &tuning) override; // DiSEqCDevDevice
-    bool         PowerOff(void) const;
+    bool PowerOff(void) const;
     bool Load(void) override; // DiSEqCDevDevice
     bool Store(void) const override; // DiSEqCDevDevice
 
@@ -435,7 +435,7 @@ class DiSEqCDevSCR : public DiSEqCDevDevice
 
   private:
     uint             m_scrUserband   {0};    /* 0-7 */
-    uint             m_scrFrequency  {1400};
+    uint             m_scrFrequency  {1210};
     int              m_scrPin        {-1};   /* 0-255, -1=disabled */
 
     DiSEqCDevDevice *m_child         {nullptr};
