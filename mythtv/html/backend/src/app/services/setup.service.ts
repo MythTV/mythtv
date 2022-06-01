@@ -7,7 +7,7 @@ import {  HostAddress, Locale,  Setup, Miscellaneous, EITScanner, ShutWake, Back
     JobQBackend, JobQCommands, JobQGlobal, EpgDownload }
     from './interfaces/setup.interface';
 import { MythService } from './myth.service';
-import { throwIfEmpty } from 'rxjs/operators';
+import { NgForm } from '@angular/forms';
 
 @Injectable({
     providedIn: 'root'
@@ -924,4 +924,15 @@ export class SetupService {
         this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "MythFillEnabled",
             Value: this.m_EpgDownload.MythFillEnabled ? "1" : "0"}).subscribe(this.EpgDownloadObs);
     }
+
+    currentForm! : NgForm;
+
+    getCurrentForm() : NgForm {
+        return this.currentForm;
+    }
+
+    setCurrentForm(form : NgForm) {
+        this.currentForm = form;
+    }
+
 }

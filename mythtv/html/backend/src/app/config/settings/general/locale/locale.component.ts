@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { Locale } from 'src/app/services/interfaces/setup.interface';
 import { SetupService } from 'src/app/services/setup.service';
 
@@ -8,9 +9,12 @@ import { SetupService } from 'src/app/services/setup.service';
     styleUrls: ['./locale.component.css']
 })
 
-export class LocaleComponent implements OnInit {
+export class LocaleComponent implements OnInit, AfterViewInit {
     m_LocaleData!: Locale;
     m_showHelp: boolean = false;
+
+    @ViewChild("locale")
+    currentForm!: NgForm;
 
     m_vbiFormats: string[];
 
@@ -74,6 +78,10 @@ export class LocaleComponent implements OnInit {
     }
 
     ngOnInit(): void {
+    }
+
+    ngAfterViewInit() {
+        this.setupService.setCurrentForm(this.currentForm);
     }
 
     showHelp() {

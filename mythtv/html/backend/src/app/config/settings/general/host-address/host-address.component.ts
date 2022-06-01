@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { ConfigService } from 'src/app/services/config.service';
 
 import { HostAddress } from 'src/app/services/interfaces/setup.interface';
@@ -9,7 +10,7 @@ import { SetupService } from 'src/app/services/setup.service';
     templateUrl: './host-address.component.html',
     styleUrls: ['./host-address.component.css']
 })
-export class HostAddressComponent implements OnInit {
+export class HostAddressComponent implements OnInit,  AfterViewInit {
     m_HostAddressData!: HostAddress;
     m_showHelp: boolean = false;
 
@@ -17,6 +18,9 @@ export class HostAddressComponent implements OnInit {
     m_IPsV4!: string[];
     m_IPsV6!: string[];
     m_IsMasterBackend: boolean = false;
+
+    @ViewChild("hostaddress")
+    currentForm!: NgForm;
 
     constructor(private setupService: SetupService,
                 private configService: ConfigService) {
@@ -28,6 +32,10 @@ export class HostAddressComponent implements OnInit {
     }
 
     ngOnInit(): void {
+    }
+
+    ngAfterViewInit() {
+        this.setupService.setCurrentForm(this.currentForm);
     }
 
     m_savedMaster!: string;

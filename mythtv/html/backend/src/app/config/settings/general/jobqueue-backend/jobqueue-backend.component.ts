@@ -1,9 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Calendar } from 'primeng/calendar';
 import {TranslateService} from '@ngx-translate/core';
 
 import { JobQBackend, JobQCommands } from 'src/app/services/interfaces/setup.interface';
 import { SetupService } from 'src/app/services/setup.service';
+import { NgForm } from '@angular/forms';
 
 interface ddParm {
   name: string,
@@ -16,7 +17,7 @@ interface ddParm {
   styleUrls: ['./jobqueue-backend.component.css']
 })
 
-export class JobqueueBackendComponent implements OnInit {
+export class JobqueueBackendComponent implements OnInit, AfterViewInit {
 
   JobQBData: JobQBackend;
   JobQCmds!: JobQCommands;
@@ -26,6 +27,9 @@ export class JobqueueBackendComponent implements OnInit {
 
   @ViewChild("JobQueueWindowEnd")
   JobQueueWindowEnd! : Calendar;
+
+  @ViewChild("jobqbackend")
+  currentForm!: NgForm;
 
 
   cpuOptions: ddParm[] = [
@@ -52,6 +56,10 @@ export class JobqueueBackendComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  ngAfterViewInit() {
+    this.setupService.setCurrentForm(this.currentForm);
   }
 
   showHelp() {
