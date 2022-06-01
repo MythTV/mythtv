@@ -635,12 +635,13 @@ void MythWebSocket::PingReceived(DataPayload Payload)
 void MythWebSocket::PongReceived(const DataPayload& Payload)
 {
     // Validate against the last known ping payload and warn on error
-    auto sizein = Payload.get() ? Payload->size() : 0;
+    auto sizein = Payload.get() ? Payload.get()->size() : 0;
     auto sizeout = m_lastPingPayload.size();
     if ((sizein == sizeout) && sizeout > 0)
-        if (Payload.get() == m_lastPingPayload)
+        if (*Payload.get() == m_lastPingPayload)
             return;
-    LOG(VB_GENERAL, LOG_INFO, LOC + "Unexpected pong payload (this may not be an error)");
+    LOG(VB_HTTP, LOG_DEBUG, LOC + "Unexpected pong payload (this may not be an error)");
+    LOG(VB_HTTP, LOG_DEBUG, LOC + QString("Last Payload is (%1), Pong Payload is (%2)").arg(m_lastPingPayload.constData()).arg(Payload.get()->constData()));
 }
 
 void MythWebSocket::SendPing()
