@@ -19,7 +19,7 @@ extern "C" {
 #include "libavformat/avio.h"
 #include "libavformat/internal.h"
 #include "libswscale/swscale.h"
-#include "libavformat/isom.h"
+#include "libavutil/stereo3d.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/display.h"
 }
