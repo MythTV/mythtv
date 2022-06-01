@@ -17,7 +17,6 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 #include "libavformat/avio.h"
-#include "libavformat/internal.h"
 #include "libswscale/swscale.h"
 #include "libavutil/stereo3d.h"
 #include "libavutil/imgutils.h"
@@ -200,6 +199,7 @@ int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags);
     return false;                                   \
 } while (false)
 
+// This is a slightly modified static int has_codec_parameters() from libavformat/utils.c
 static bool StreamHasRequiredParameters(AVCodecContext *Context, AVStream *Stream)
 {
     switch (Stream->codecpar->codec_type)
@@ -725,7 +725,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         m_ptsDetected = false;
         m_reorderedPtsDetected = false;
 
-        ff_read_frame_flush(m_ic);
+        avformat_flush(m_ic);
 
         // Only reset the internal state if we're using our seeking,
         // not when using libavformat's seeking
