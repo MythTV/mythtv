@@ -1,6 +1,11 @@
-// MythTV
 #include "io/mythavformatbuffer.h"
-#include "libmythbase/mythcorecontext.h"
+
+#include <QtGlobal>
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+#include <QMutex>
+#else
+#include <QRecursiveMutex>
+#endif
 
 URLProtocol MythAVFormatBuffer::s_avfrURL;
 
