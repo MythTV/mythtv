@@ -345,6 +345,7 @@
         "general": {
             "title": "General Backend Settings"
         },
-        "unsaved": "(Unsaved Changes)"
+        "unsaved": "(Unsaved Changes)",
+        "warning": "If you continue you may lose your changes."
     }
 }

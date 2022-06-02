@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import { Observable, of } from 'rxjs';
+import { CanComponentDeactivate } from 'src/app/can-deactivate-guard.service';
 
 import { SetupService } from 'src/app/services/setup.service';
 
@@ -9,7 +11,7 @@ import { SetupService } from 'src/app/services/setup.service';
     templateUrl: './settings.component.html',
     styleUrls: ['./settings.component.css']
 })
-export class SettingsComponent implements OnInit {
+export class SettingsComponent implements OnInit, CanComponentDeactivate {
 
     m_showHelp: boolean = false;
     currentTab: number= -1;
@@ -17,9 +19,11 @@ export class SettingsComponent implements OnInit {
     dirtyMessages : string[] = ["","","","","","","","","","","","","","","",""];
     forms : any [] = [,,,,,,,,,,,,,,,,];
     dirtyText = 'settings.unsaved';
+    warningText = 'settings.warning';
 
     constructor(private setupService: SetupService,  private translate: TranslateService) {
         translate.get(this.dirtyText).subscribe(data => this.dirtyText = data);
+        translate.get(this.warningText).subscribe(data => this.warningText = data);
     }
 
     ngOnInit(): void {
@@ -60,10 +64,26 @@ export class SettingsComponent implements OnInit {
         this.m_showHelp = true;
     }
 
-    saveForm() {
-        console.log("save form clicked");
-    }
-    testConnection() {
+    confirm(message?: string): Observable<boolean> {
+        const confirmation = window.confirm(message);
+            return of(confirmation);
+    };
 
+    canDeactivate(): Observable<boolean> | boolean {
+        if ((<NgForm>this.forms[this.currentTab]).dirty
+            || this.dirtyMessages.find(element => element.length > 0)) {
+            return this.confirm(this.warningText);
+        }
+        return true;
     }
+
+    @HostListener('window:beforeunload', ['$event'])
+    onWindowClose(event: any): void {
+        if ((<NgForm>this.forms[this.currentTab]).dirty
+            || this.dirtyMessages.find(element => element.length > 0)) {
+            event.preventDefault();
+            event.returnValue = false;
+        }
+    }
+
 }
