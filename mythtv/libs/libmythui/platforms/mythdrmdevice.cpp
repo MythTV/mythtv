@@ -131,7 +131,7 @@ MythDRMPtr MythDRMDevice::FindDevice(bool NeedPlanes)
         devices.append(s_mythDRMDevice);
     }
 
-    for (const auto & dev : devices)
+    for (const auto & dev : qAsConst(devices))
         if (auto device = MythDRMDevice::Create(nullptr, root + dev, NeedPlanes); device && device->Authenticated())
             return device;
 
