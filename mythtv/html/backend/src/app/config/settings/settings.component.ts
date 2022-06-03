@@ -70,7 +70,7 @@ export class SettingsComponent implements OnInit, CanComponentDeactivate {
     };
 
     canDeactivate(): Observable<boolean> | boolean {
-        if ((<NgForm>this.forms[this.currentTab]).dirty
+        if (this.forms[this.currentTab] && (<NgForm>this.forms[this.currentTab]).dirty
             || this.dirtyMessages.find(element => element.length > 0)) {
             return this.confirm(this.warningText);
         }
@@ -79,7 +79,7 @@ export class SettingsComponent implements OnInit, CanComponentDeactivate {
 
     @HostListener('window:beforeunload', ['$event'])
     onWindowClose(event: any): void {
-        if ((<NgForm>this.forms[this.currentTab]).dirty
+        if (this.forms[this.currentTab] && (<NgForm>this.forms[this.currentTab]).dirty
             || this.dirtyMessages.find(element => element.length > 0)) {
             event.preventDefault();
             event.returnValue = false;
