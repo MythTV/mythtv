@@ -221,7 +221,7 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
                     "it looks like not all environment variables have been set.");
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Minimum required: %1 and/or %2 for plane index and %3 for alpha blending")
-                    .arg(s_kmsPlaneIndex).arg(s_kmsPlaneCRTCS).arg(s_kmsConfigFile));
+                    .arg(s_kmsPlaneIndex, s_kmsPlaneCRTCS, s_kmsConfigFile));
             }
             else
             {
@@ -287,21 +287,21 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
 
     // Note: mode is not sanitised
     const auto *wrote = qPrintable(s_json.arg(drmGetDeviceNameFromFd2(device->GetFD()))
-        .arg(device->m_connector->m_name).arg(MythDRMPlane::FormatToString(format).toLower())
-        .arg(s_mythDRMVideoMode.isEmpty() ? "current" : s_mythDRMVideoMode));
+        .arg(device->m_connector->m_name, MythDRMPlane::FormatToString(format).toLower(),
+             s_mythDRMVideoMode.isEmpty() ? "current" : s_mythDRMVideoMode));
 
     if (file.write(wrote))
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Wrote %1:\r\n%2").arg(filename).arg(wrote));
-        LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsConfigFile).arg(filename));
+        LOG(VB_GENERAL, LOG_INFO, QString("Wrote %1:\r\n%2").arg(filename, wrote));
+        LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsConfigFile, filename));
         setenv(s_kmsConfigFile, qPrintable(filename), 1);
     }
     file.close();
 
     auto planeindex = QString::number(guiplane->m_index);
     auto crtcplane  = QString("%1,%2").arg(device->m_crtc->m_id).arg(guiplane->m_id);
-    LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsPlaneIndex).arg(planeindex));
-    LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsPlaneCRTCS).arg(crtcplane));
+    LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsPlaneIndex, planeindex));
+    LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsPlaneCRTCS, crtcplane));
     setenv(s_kmsPlaneIndex, qPrintable(planeindex), 1);
     setenv(s_kmsPlaneCRTCS, qPrintable(crtcplane), 1);
 
@@ -311,7 +311,7 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
         if (auto *range = dynamic_cast<MythDRMRangeProperty*>(zposp.get()); range)
         {
             auto val = QString::number(std::min(range->m_min + 1, range->m_max));
-            LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsPlaneZpos).arg(val));
+            LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsPlaneZpos, val));
             setenv(s_kmsPlaneZpos, qPrintable(val), 1);
         }
     }

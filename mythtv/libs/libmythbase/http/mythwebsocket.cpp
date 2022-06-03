@@ -641,7 +641,8 @@ void MythWebSocket::PongReceived(const DataPayload& Payload)
         if (*Payload.get() == m_lastPingPayload)
             return;
     LOG(VB_HTTP, LOG_DEBUG, LOC + "Unexpected pong payload (this may not be an error)");
-    LOG(VB_HTTP, LOG_DEBUG, LOC + QString("Last Payload is (%1), Pong Payload is (%2)").arg(m_lastPingPayload.constData()).arg(Payload.get()->constData()));
+    LOG(VB_HTTP, LOG_DEBUG, LOC + QString("Last Payload is (%1), Pong Payload is (%2)")
+        .arg(m_lastPingPayload.constData(), Payload.get()->constData()));
 }
 
 void MythWebSocket::SendPing()

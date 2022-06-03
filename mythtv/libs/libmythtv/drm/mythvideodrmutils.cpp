@@ -28,7 +28,7 @@ uint64_t MythVideoDRMUtils::FFmpegColorRangeToDRM(const DRMProp& Property, int R
         if (name.contains(searchstring, Qt::CaseInsensitive))
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using '%1' as color range for '%2'")
-                .arg(name).arg(av_color_range_name(static_cast<AVColorRange>(Range))));
+                .arg(name, av_color_range_name(static_cast<AVColorRange>(Range))));
             return value;
         }
     }
@@ -65,7 +65,7 @@ uint64_t MythVideoDRMUtils::FFmpegColorEncodingToDRM(const DRMProp& Property, in
         if (name.contains(searchstring, Qt::CaseInsensitive))
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using '%1' as color encoding for '%2'")
-                .arg(name).arg(av_color_space_name(static_cast<AVColorSpace>(Encoding))));
+                .arg(name, av_color_space_name(static_cast<AVColorSpace>(Encoding))));
             return value;
         }
     }
