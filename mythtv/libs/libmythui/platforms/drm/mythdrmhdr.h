@@ -13,7 +13,7 @@ class MythDRMHDR : public MythHDR
     void SetHDRMetadata(HDRType Type, const MythHDRMetaPtr& Metadata) override;
 
   protected:
-    MythDRMHDR(const MythDRMPtr& Device, DRMProp HDRProp, MythHDRDesc Desc);
+    MythDRMHDR(const MythDRMPtr& Device, DRMProp HDRProp, const MythHDRDesc& Desc);
 
   private:
     void Cleanup();

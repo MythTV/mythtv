@@ -69,7 +69,7 @@ MythHDRPtr MythDRMHDR::Create(MythDisplay* MDisplay, const MythHDRDesc& Desc)
     return nullptr;
 }
 
-MythDRMHDR::MythDRMHDR(const MythDRMPtr& Device, DRMProp HDRProp, MythHDRDesc Desc)
+MythDRMHDR::MythDRMHDR(const MythDRMPtr& Device, DRMProp HDRProp, const MythHDRDesc& Desc)
   : MythHDR(Desc),
     m_device(Device),
     m_connector(Device->GetConnector()),
