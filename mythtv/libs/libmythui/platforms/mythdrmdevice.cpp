@@ -286,11 +286,11 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
         "}\n";
 
     // Note: mode is not sanitised
-    const auto *wrote = qPrintable(s_json.arg(drmGetDeviceNameFromFd2(device->GetFD()))
+    QString wrote = s_json.arg(drmGetDeviceNameFromFd2(device->GetFD()))
         .arg(device->m_connector->m_name, MythDRMPlane::FormatToString(format).toLower(),
-             s_mythDRMVideoMode.isEmpty() ? "current" : s_mythDRMVideoMode));
+             s_mythDRMVideoMode.isEmpty() ? "current" : s_mythDRMVideoMode);
 
-    if (file.write(wrote))
+    if (file.write(qPrintable(wrote)))
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Wrote %1:\r\n%2").arg(filename, wrote));
         LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsConfigFile, filename));
