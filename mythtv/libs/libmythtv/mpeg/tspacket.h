@@ -94,7 +94,7 @@ class MTV_PUBLIC TSHeader
     bool Scrambled(void) const { return bool(m_tsData[3]&0x80); }
     bool HasAdaptationField(void) const { return bool(m_tsData[3] & 0x20); }
     size_t AdaptationFieldSize(void) const
-    { return (HasAdaptationField() ? static_cast<size_t>(m_tsData[4]) : 0); }
+    { return (HasAdaptationField() ? static_cast<size_t>(data()[4]) : 0); }
     bool HasPayload(void) const { return bool(m_tsData[3] & 0x10); }
 
     bool GetDiscontinuityIndicator(void) const
