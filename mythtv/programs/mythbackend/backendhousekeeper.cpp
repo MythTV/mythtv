@@ -420,9 +420,9 @@ bool ThemeUpdateTask::DoRun(void)
     }
     else
     {
-
+        static const QRegularExpression kVersionDateRE { "\\.[0-9]{8,}.*" };
         MythVersion = MYTH_BINARY_VERSION; // Example: 29.20161017-1
-        MythVersion.remove(QRegularExpression("\\.[0-9]{8,}.*"));
+        MythVersion.remove(kVersionDateRE);
         LOG(VB_GENERAL, LOG_INFO,
             QString("Loading themes for %1").arg(MythVersion));
         result |= LoadVersion(MythVersion, LOG_ERR);

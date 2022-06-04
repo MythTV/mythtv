@@ -777,7 +777,8 @@ int Transcode::TranscodeFile(const QString &inputname,
                     QString("Forcing Recorder option '%1' to '%2'")
                         .arg(key, value));
 
-                if (value.contains(QRegularExpression("\\D")))
+                static const QRegularExpression kNonDigitRE { "\\D" };
+                if (value.contains(kNonDigitRE))
                     m_nvr->SetOption(key, value);
                 else
                     m_nvr->SetOption(key, value.toInt());

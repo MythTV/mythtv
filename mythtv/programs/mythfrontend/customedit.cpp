@@ -626,7 +626,8 @@ void CustomEdit::clauseClicked(MythUIButtonListItem *item)
     QString clause;
     QString desc = m_descriptionEdit->GetText();
 
-    if (desc.contains(QRegularExpression("\\S")))
+    static const QRegularExpression kNonWhitespaceRE { "\\S" };
+    if (desc.contains(kNonWhitespaceRE))
         clause = "AND ";
     clause += (m_evaluate) ? evaluate(rule.description) : rule.description;
 

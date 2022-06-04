@@ -487,7 +487,7 @@ bool ImportIconsWizard::doLoad()
 
 QString ImportIconsWizard::escape_csv(const QString& str)
 {
-    QRegularExpression rxDblForEscape("\"");
+    static const QRegularExpression rxDblForEscape("\"");
     QString str2 = str;
     str2.replace(rxDblForEscape,"\\\"");
     return "\""+str2+"\"";

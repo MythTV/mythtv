@@ -1151,7 +1151,7 @@ bool RecordingExtender::findKnownSport(const QString& _title,
                                        AutoExtendType type,
                                        SportInfoList& infoList)
 {
-    QRegularExpression year {R"(\d{4})"};
+    static const QRegularExpression year {R"(\d{4})"};
     QRegularExpressionMatch match;
     QString title = _title;
     if (title.contains(year, &match))
