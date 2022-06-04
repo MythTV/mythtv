@@ -4220,11 +4220,12 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
     {
         if (StateIsLiveTV(GetState()))
         {
+            static const QRegularExpression kChannelNumRE { R"(^[-\.\d_#]+$)" };
             if (tokens[2] == "UP")
                 ChangeChannel(CHANNEL_DIRECTION_UP);
             else if (tokens[2] == "DOWN")
                 ChangeChannel(CHANNEL_DIRECTION_DOWN);
-            else if (tokens[2].contains(QRegularExpression(R"(^[-\.\d_#]+$)")))
+            else if (tokens[2].contains(kChannelNumRE))
                 ChangeChannel(0, tokens[2]);
         }
     }
@@ -4249,17 +4250,18 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
         }
         else
         {
+            static const QRegularExpression kSpeedRE { R"(^\-*(\d*\.)?\d+x$)" };
             float tmpSpeed = 1.0F;
             bool ok = false;
 
-            if (tokens[2].contains(QRegularExpression(R"(^\-*(\d*\.)?\d+x$)")))
+            if (tokens[2].contains(kSpeedRE))
             {
                 QString speed = tokens[2].left(tokens[2].length()-1);
                 tmpSpeed = speed.toFloat(&ok);
             }
             else
             {
-                QRegularExpression re { R"(^(\-*\d+)\/(\d+)x$)" };
+                static const QRegularExpression re { R"(^(\-*\d+)\/(\d+)x$)" };
                 auto match = re.match(tokens[2]);
                 if (match.hasMatch())
                 {
@@ -4343,6 +4345,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
     }
     else if (tokens.size() >= 3 && tokens[1] == "SEEK" && m_playerContext.HasPlayer())
     {
+        static const QRegularExpression kDigitsRE { "^\\d+$" };
         if (m_playerContext.m_buffer && m_playerContext.m_buffer->IsInDiscMenuOrStillFrame())
             return;
 
@@ -4361,7 +4364,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
         else if ((tokens[2] == "POSITION" ||
                   tokens[2] == "POSITIONWITHCUTLIST") &&
                  (tokens.size() == 4) &&
-                 (tokens[3].contains(QRegularExpression("^\\d+$"))))
+                 (tokens[3].contains(kDigitsRE)))
         {
             DoSeekAbsolute(tokens[3].toInt(), tokens[2] == "POSITIONWITHCUTLIST");
         }
@@ -4444,7 +4447,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
     }
     else if (tokens.size() >= 3 && tokens[1] == "VOLUME")
     {
-        QRegularExpression re { "(\\d+)%?" };
+        static const QRegularExpression re { "(\\d+)%?" };
         auto match = re.match(tokens[2]);
         if (match.hasMatch())
         {
@@ -4478,7 +4481,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
             }
             else
             {
-                QRegularExpression re { "Play (.*)x" };
+                static const QRegularExpression re { "Play (.*)x" };
                 auto match = re.match(m_playerContext.GetPlayMessage());
                 if (match.hasMatch())
                 {

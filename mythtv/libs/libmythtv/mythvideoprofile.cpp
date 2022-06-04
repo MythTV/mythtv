@@ -86,7 +86,7 @@ bool MythVideoProfileItem::CheckRange(const QString& Key,
             }
             if (IValue > 0)
             {
-                QRegularExpression regex("^([0-9.]*)([^0-9.]*)([0-9.]*)$");
+                static const QRegularExpression regex("^([0-9.]*)([^0-9.]*)([0-9.]*)$");
                 QRegularExpressionMatch rmatch = regex.match(expr);
 
                 int value1 = 0;

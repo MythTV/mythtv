@@ -313,9 +313,9 @@ bool SatIPRTSP::sendMessage(const QUrl& url, const QString& msg, QStringList *ad
     QString request = headers.join("\r\n");
     ctrl_socket.write(request.toLatin1());
 
-    QRegularExpression firstLineRE { "^RTSP/1.0 (\\d+) ([^\r\n]+)" };
-    QRegularExpression headerRE    { R"(^([^:]+):\s*([^\r\n]+))"   };
-    QRegularExpression blankLineRE { R"(^[\r\n]*$)"                };
+    static const QRegularExpression kFirstLineRE { "^RTSP/1.0 (\\d+) ([^\r\n]+)" };
+    static const QRegularExpression kHeaderRE    { R"(^([^:]+):\s*([^\r\n]+))"   };
+    static const QRegularExpression kBlankLineRE { R"(^[\r\n]*$)"                };
 
     bool firstLine = true;
     while (true)
@@ -338,7 +338,7 @@ bool SatIPRTSP::sendMessage(const QUrl& url, const QString& msg, QStringList *ad
         QRegularExpressionMatch match;
         if (firstLine)
         {
-            match = firstLineRE.match(line);
+            match = kFirstLineRE.match(line);
             if (!match.hasMatch())
             {
                 return false;
@@ -359,10 +359,10 @@ bool SatIPRTSP::sendMessage(const QUrl& url, const QString& msg, QStringList *ad
             continue;
         }
 
-        match = blankLineRE.match(line);
+        match = kBlankLineRE.match(line);
         if (match.hasMatch()) break;
 
-        match = headerRE.match(line);
+        match = kHeaderRE.match(line);
         if (!match.hasMatch())
         {
             return false;

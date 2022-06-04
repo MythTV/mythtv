@@ -123,9 +123,9 @@ bool CetonRTSP::ProcessRequest(
     if (!waitforanswer)
         return true;
 
-    QRegularExpression firstLineRE {  "^RTSP/1.0 (\\d+) ([^\r\n]+)" };
-    QRegularExpression headerRE    { R"(^([^:]+):\s*([^\r\n]+))"    };
-    QRegularExpression blankLineRE { R"(^[\r\n]*$)"                 };
+    static const QRegularExpression kFirstLineRE {  "^RTSP/1.0 (\\d+) ([^\r\n]+)" };
+    static const QRegularExpression kHeaderRE    { R"(^([^:]+):\s*([^\r\n]+))"    };
+    static const QRegularExpression kBlankLineRE { R"(^[\r\n]*$)"                 };
 
     bool firstLine = true;
     while (true)
@@ -147,7 +147,7 @@ bool CetonRTSP::ProcessRequest(
         QRegularExpressionMatch match;
         if (firstLine)
         {
-            match = firstLineRE.match(line);
+            match = kFirstLineRE.match(line);
             if (!match.hasMatch())
             {
                 m_responseCode = -1;
@@ -172,10 +172,10 @@ bool CetonRTSP::ProcessRequest(
             continue;
         }
 
-        match = blankLineRE.match(line);
+        match = kBlankLineRE.match(line);
         if (match.hasMatch()) break;
 
-        match = headerRE.match(line);
+        match = kHeaderRE.match(line);
         if (!match.hasMatch())
         {
             m_responseCode = -1;
@@ -241,7 +241,8 @@ bool CetonRTSP::GetOptions(QStringList &options)
 {
     if (ProcessRequest("OPTIONS"))
     {
-        options = m_responseHeaders.value("Public").split(QRegularExpression(",\\s*"));
+        static const QRegularExpression kSeparatorRE { ",\\s*" };
+        options = m_responseHeaders.value("Public").split(kSeparatorRE);
         m_canGetParameter = options.contains("GET_PARAMETER");
 
         return true;

@@ -1445,8 +1445,9 @@ static bool chanid_available(uint chanid)
 int ChannelUtil::CreateChanID(uint sourceid, const QString &chan_num)
 {
     // first try to base it on the channel number for human readability
+    static const QRegularExpression kNonDigitRE { R"(\D)" };
     uint chanid = 0;
-    int chansep = chan_num.indexOf(QRegularExpression(R"(\D)"));
+    int chansep = chan_num.indexOf(kNonDigitRE);
     if (chansep > 0)
     {
         chanid =

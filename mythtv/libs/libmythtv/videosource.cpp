@@ -2135,7 +2135,7 @@ void CetonDeviceID::Load(void)
 
 void CetonDeviceID::UpdateValues(void)
 {
-    QRegularExpression newstyle { R"(^([0-9.]+)-(\d|RTP)\.(\d)$)" };
+    static const QRegularExpression newstyle { R"(^([0-9.]+)-(\d|RTP)\.(\d)$)" };
     auto match = newstyle.match(getValue());
     if (match.hasMatch())
     {

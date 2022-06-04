@@ -2260,8 +2260,9 @@ bool CardUtil::GetV4LInfo(
     }
 #endif // USING_V4L2
 
+    static const QRegularExpression kBracketedDigitRE { R"(\[[0-9]\]$)" };
     if (!driver.isEmpty())
-        driver.remove( QRegularExpression(R"(\[[0-9]\]$)") );
+        driver.remove( kBracketedDigitRE );
 
     return !input.isEmpty();
 }

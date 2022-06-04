@@ -1161,7 +1161,8 @@ static QString extract_cc608(QString &text, int &color,
 
     // Copy the string into the result, up to the next control
     // character.
-    int nextControl = text.indexOf(QRegularExpression("[\\x{7000}-\\x{7fff}]"));
+    static const QRegularExpression kControlCharsRE { "[\\x{7000}-\\x{7fff}]" };
+    int nextControl = text.indexOf(kControlCharsRE);
     if (nextControl < 0)
     {
         result = text;

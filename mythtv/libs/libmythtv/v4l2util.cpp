@@ -68,8 +68,9 @@ bool V4L2util::Open(const QString& dev_name, const QString& vbi_dev_name)
         return false;
     }
 
+    static const QRegularExpression kDigitsRE { R"(\[[0-9]\]$)" };
     if (!m_driverName.isEmpty())
-        m_driverName.remove( QRegularExpression(R"(\[[0-9]\]$)") );
+        m_driverName.remove( kDigitsRE );
 
     OpenVBI(vbi_dev_name);
 
@@ -196,7 +197,8 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
     qmenu.id = queryctrl.id;
 
     // Replace non-printable with _
-    nameStr.replace(QRegularExpression("[^a-zA-Z\\d\\s]"), "_");
+    static const QRegularExpression kNonPrintableRE { "[^a-zA-Z\\d\\s]" };
+    nameStr.replace(kNonPrintableRE, "_");
 
     drv_opt.m_name          = nameStr;
     drv_opt.m_minimum       = queryctrl.minimum;

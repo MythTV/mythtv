@@ -99,11 +99,11 @@ QString SourceUtil::GetChannelSeparator(uint sourceid)
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         QMap<QString,uint> counts;
-        const QRegularExpression sepExpr(R"((_|-|#|\.))");
+        static const QRegularExpression kSeparatorRE { R"((_|-|#|\.))" };
         while (query.next())
         {
             const QString channum = query.value(0).toString();
-            const int where = channum.indexOf(sepExpr);
+            const int where = channum.indexOf(kSeparatorRE);
             if (channum.right(2).startsWith("0"))
                 counts["0"]++;
             else
