@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SettingsComponent } from './settings.component';
+import { SettingsComponent } from './general-settings.component';
 
 describe('SettingsComponent', () => {
   let component: SettingsComponent;

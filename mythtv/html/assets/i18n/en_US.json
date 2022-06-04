@@ -347,5 +347,18 @@
         },
         "unsaved": "(Unsaved Changes)",
         "warning": "If you continue you may lose your changes."
+    },
+    "sidenav": {
+        "settingsmenu": {
+            "title": "MythTV Setup",
+            "1_general": "1. General",
+            "2_capture_cards": "2. Capture Cards",
+            "3_recording_profiles": "3. Recording Profiles",
+            "4_video_sources": "4. Video Sources",
+            "5_input_connections": "5. Input Connections",
+            "6_channel_editor": "6. Channel Editor",
+            "7_storage_directories": "7. Storage Directories",
+            "8_system_events": "8. System Events"
+        }
     }
 }

@@ -7,6 +7,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { PrimeNGModule } from './primeng.module';
+import { MenuModule } from 'primeng/menu';
 
 import { AppRoutingModule } from './app-routing.module';
 
@@ -33,7 +34,7 @@ import { GuideComponent } from './guide/guide.component';
 import { ChannelIconComponent } from './guide/components/channelicon/channelicon.component';
 import { ProgramEntryComponent } from './guide/components/programentry/programentry.component';
 import { TimebarComponent } from './guide/components/timebar/timebar.component';
-import { SettingsComponent } from './config/settings/settings.component';
+import { SettingsComponent } from './config/settings/general/general-settings.component';
 import { HostAddressComponent } from './config/settings/general/host-address/host-address.component';
 import { LocaleComponent } from './config/settings/general/locale/locale.component';
 import { MiscSettingsComponent } from './config/settings/general/misc-settings/misc-settings.component';
@@ -95,6 +96,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
+    MenuModule,
     TranslateModule.forRoot({
       defaultLanguage: 'en_US',
       loader: {

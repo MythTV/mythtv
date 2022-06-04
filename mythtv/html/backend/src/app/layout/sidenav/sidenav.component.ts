@@ -1,6 +1,9 @@
-import { Component, isDevMode, OnInit } from '@angular/core';
+import { Component, isDevMode, OnInit, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/services/data.service';
+import { MenuItem } from 'primeng/api';
+import { TranslateService } from '@ngx-translate/core';
+import { Menu } from 'primeng/menu';
 
 @Component({
     selector: 'app-sidenav',
@@ -16,9 +19,35 @@ export class SidenavComponent implements OnInit {
     m_devMode: boolean = isDevMode();
     m_haveDatabase: boolean = true;
 
-    constructor(private dataService: DataService) { }
+    m_setupMenu: MenuItem[]  = [ {
+        label: "",
+        items: [
+            {routerLink: 'settings/general'},
+            { routerLink: ''},
+            { routerLink: ''},
+            { routerLink: ''},
+            { routerLink: ''},
+            { routerLink: ''},
+            { routerLink: ''},
+            { routerLink: ''},
+        ]
+    }];
+
+    @ViewChild("menu")
+    menu!: Menu;
+
+    constructor(private dataService: DataService, private translate: TranslateService) { }
 
     ngOnInit(): void {
         this.m_showSidebarSub = this.dataService.showSideBar.subscribe(data => this.m_showSidebar = data)
+        this.translate.get('sidenav.settingsmenu.title').subscribe(data => this.m_setupMenu[0].label = data);
+        this.translate.get('sidenav.settingsmenu.1_general').subscribe(data => this.m_setupMenu[0].items![0].label = data);
+        this.translate.get('sidenav.settingsmenu.2_capture_cards').subscribe(data => this.m_setupMenu[0].items![1].label = data);
+        this.translate.get('sidenav.settingsmenu.3_recording_profiles').subscribe(data => this.m_setupMenu[0].items![2].label = data);
+        this.translate.get('sidenav.settingsmenu.4_video_sources').subscribe(data => this.m_setupMenu[0].items![3].label = data);
+        this.translate.get('sidenav.settingsmenu.5_input_connections').subscribe(data => this.m_setupMenu[0].items![4].label = data);
+        this.translate.get('sidenav.settingsmenu.6_channel_editor').subscribe(data => this.m_setupMenu[0].items![5].label = data);
+        this.translate.get('sidenav.settingsmenu.7_storage_directories').subscribe(data => this.m_setupMenu[0].items![6].label = data);
+        this.translate.get('sidenav.settingsmenu.8_system_events').subscribe(data => this.m_setupMenu[0].items![7].label = data);
     }
 }

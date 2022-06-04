@@ -7,9 +7,9 @@ import { CanComponentDeactivate } from 'src/app/can-deactivate-guard.service';
 import { SetupService } from 'src/app/services/setup.service';
 
 @Component({
-    selector: 'app-settings',
-    templateUrl: './settings.component.html',
-    styleUrls: ['./settings.component.css']
+    selector: 'app-general-settings',
+    templateUrl: './general-settings.component.html',
+    styleUrls: ['./general-settings.component.css']
 })
 export class SettingsComponent implements OnInit, CanComponentDeactivate {
 
