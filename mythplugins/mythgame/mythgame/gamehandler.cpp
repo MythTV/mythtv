@@ -848,7 +848,7 @@ void GameHandler::Launchgame(RomInfo *romdata, const QString& systemname)
 
             if (handler->SpanDisks())
             {
-                QRegularExpression rxp { "%d[0-4]" };
+                static const QRegularExpression rxp { "%d[0-4]" };
 
                 if (exec.contains(rxp))
                 {

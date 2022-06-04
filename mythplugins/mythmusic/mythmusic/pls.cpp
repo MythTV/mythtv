@@ -108,7 +108,8 @@ int PlayListFile::parseM3U(PlayListFile *pls, const QString &filename)
 
     QTextStream stream(&f);
     QString data = stream.readAll();
-    QStringList lines = data.split(QRegularExpression("\\R")); // Any unicode newline
+    static const QRegularExpression kNewlineRE { "\\R" }; // Any unicode newline
+    QStringList lines = data.split(kNewlineRE);
 
     QStringList::iterator it;
     for (it = lines.begin(); it != lines.end(); ++it)

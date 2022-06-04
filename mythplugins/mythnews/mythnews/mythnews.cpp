@@ -685,29 +685,40 @@ QString MythNews::cleanText(const QString &text)
     result.replace("&#39;", "'");    // Apostrophe
 
     // Replace paragraph and break HTML with newlines
-    if( result.contains(QRegularExpression("</(p|P)>")) )
+    static const QRegularExpression kHtmlParaStartRE
+        { "<p>", QRegularExpression::CaseInsensitiveOption };
+    static const QRegularExpression kHtmlParaEndRE
+        { "</p>", QRegularExpression::CaseInsensitiveOption };
+    static const QRegularExpression kHtmlBreak1RE
+        { "<(br|)>", QRegularExpression::CaseInsensitiveOption };
+    static const QRegularExpression kHtmlBreak2RE
+        { "<(br|)/>", QRegularExpression::CaseInsensitiveOption };
+    if( result.contains(kHtmlParaEndRE) )
     {
-        result.replace( QRegularExpression("<(p|P)>"), "");
-        result.replace( QRegularExpression("</(p|P)>"), "\n\n");
+        result.replace( kHtmlParaStartRE, "");
+        result.replace( kHtmlParaEndRE, "\n\n");
     }
     else
     {
-        result.replace( QRegularExpression("<(p|P)>"), "\n\n");
-        result.replace( QRegularExpression("</(p|P)>"), "");
+        result.replace( kHtmlParaStartRE, "\n\n");
+        result.replace( kHtmlParaEndRE, "");
     }
-    result.replace( QRegularExpression("<(br|BR|)/>"), "\n");
-    result.replace( QRegularExpression("<(br|BR|)>"), "\n");
+    result.replace( kHtmlBreak2RE, "\n");
+    result.replace( kHtmlBreak1RE, "\n");
     // These are done instead of simplifyWhitespace
     // because that function also strips out newlines
     // Replace tab characters with nothing
-    result.replace( QRegularExpression("\t"), "");
+    static const QRegularExpression kTabRE { "\t" };
+    result.replace( kTabRE, "");
     // Replace double space with single
-    result.replace( QRegularExpression("  "), "");
+    static const QRegularExpression kTwoSpaceRE { "  " };
+    result.replace( kTwoSpaceRE, "");
     // Replace whitespace at beginning of lines with newline
-    result.replace( QRegularExpression("\n "), "\n");
+    static const QRegularExpression kStartingSpaceRE { "\n " };
+    result.replace( kStartingSpaceRE, "\n");
     // Remove any remaining HTML tags
-    QRegularExpression removeHTML(QRegularExpression("</?.+>"));
-    result.remove((const QRegularExpression&) removeHTML);
+    static const QRegularExpression kRemoveHtmlRE(QRegularExpression("</?.+>"));
+    result.remove((const QRegularExpression&) kRemoveHtmlRE);
     result = result.trimmed();
 
     return result;
