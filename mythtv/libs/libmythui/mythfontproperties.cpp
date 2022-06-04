@@ -447,9 +447,10 @@ MythFontProperties *MythFontProperties::ParseFromXml(
 
     newFont->Unfreeze();
 
+    static const QRegularExpression re { "\\[.*]" };
     QFontInfo fi(newFont->m_face);
     QString fi_family =
-        fi.family().remove(QRegularExpression("\\[.*]")).trimmed();
+        fi.family().remove(re).trimmed();
     if (newFont->m_face.family() != fi_family)
     {
         VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,

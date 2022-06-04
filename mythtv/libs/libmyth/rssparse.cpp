@@ -1029,6 +1029,8 @@ QDateTime Parse::GetDCDateTime(const QDomElement& parent)
 
 QDateTime Parse::RFC822TimeToQDateTime(const QString& t)
 {
+    static const QRegularExpression kNonDigitRE { R"(\D)" };
+
     if (t.size() < 20)
         return QDateTime();
 
@@ -1039,7 +1041,7 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t)
     QStringList tmp = time.split(' ');
     if (tmp.isEmpty())
         return QDateTime();
-    if (tmp.at(0).contains(QRegularExpression(R"(\D)")))
+    if (tmp.at(0).contains(kNonDigitRE))
         tmp.removeFirst();
     if (tmp.size() != 5)
         return QDateTime();
@@ -1170,8 +1172,8 @@ QString Parse::UnescapeHTML(const QString& escaped)
     result.replace("&#x201D;", QChar(0x201d));
     result.replace("<p>", "\n");
 
-    QRegularExpression stripHTML {"<.*?>"};
-    result.remove(stripHTML);
+    static const QRegularExpression kStripHtmlRE {"<.*?>"};
+    result.remove(kStripHtmlRE);
 
     return result;
 }

@@ -1145,9 +1145,12 @@ QString VideoMetadata::FilenameToMeta(const QString &file_name, int position)
     //          3 returns episode, 4 returns subtitle
 
     QString cleanFilename = file_name.left(file_name.lastIndexOf('.'));
-    cleanFilename.replace(QRegularExpression("%20"), " ");
-    cleanFilename.replace(QRegularExpression("_"), " ");
-    cleanFilename.replace(QRegularExpression("\\."), " ");
+    static const QRegularExpression kSpaceRE      { "%20" };
+    static const QRegularExpression kUnderscoreRE { "_"   };
+    static const QRegularExpression kDotRE        { "\\." };
+    cleanFilename.replace(kSpaceRE,      " ");
+    cleanFilename.replace(kUnderscoreRE, " ");
+    cleanFilename.replace(kDotRE,        " ");
 
     /*: Word(s) which should be recognized as "season" when parsing a video
      * file name. To list more than one word, separate them with a '|'.

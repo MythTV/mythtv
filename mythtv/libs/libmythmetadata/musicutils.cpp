@@ -70,7 +70,8 @@ QString fixFileToken_sl(QString token)
 {
     // this version doesn't remove fwd-slashes so we can
     // pick them up later and create directories as required
-    token.replace(QRegularExpression(R"((\\|:|'|"|\?|\|))"), QString("_"));
+    static const QRegularExpression kBadFilenameCharRE { R"((\\|:|'|"|\?|\|))" };
+    token.replace(kBadFilenameCharRE, QString("_"));
     return token;
 }
 
@@ -80,8 +81,8 @@ QString filenameFromMetadata(MusicMetadata *track)
     QString fntempl = gCoreContext->GetSetting("FilenameTemplate");
     bool no_ws = gCoreContext->GetBoolSetting("NoWhitespace", false);
 
-    QRegularExpression rx_ws("\\s{1,}");
-    QRegularExpression rx("^(.*?)(GENRE|ARTIST|ALBUM|TRACK|TITLE|YEAR)");
+    static const QRegularExpression rx_ws("\\s{1,}");
+    static const QRegularExpression rx("^(.*?)(GENRE|ARTIST|ALBUM|TRACK|TITLE|YEAR)");
     auto match = rx.match(fntempl);
     while (match.hasMatch())
     {

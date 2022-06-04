@@ -571,7 +571,7 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     // -=>TODO: This DOES NOT handle ('s or other complex expressions
     // ----------------------------------------------------------------------
 
-    QRegularExpression re {"\\b(or|and)\\b", QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression re {"\\b(or|and)\\b", QRegularExpression::CaseInsensitiveOption};
 
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     request.m_sSearchList  = request.m_sSearchCriteria.split(

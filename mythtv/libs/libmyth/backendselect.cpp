@@ -288,7 +288,8 @@ bool BackendSelection::TryDBfromURL(const QString &error, const QString& URL)
     if (ShowOkPopup(error + tr("Shall I attempt to connect to this"
                     " host with default database parameters?")))
     {
-        QRegularExpression re {"http[s]?://([^:/]+)", QRegularExpression::CaseInsensitiveOption};
+        static const QRegularExpression re {"http[s]?://([^:/]+)",
+            QRegularExpression::CaseInsensitiveOption};
         QRegularExpressionMatch match = re.match(URL);
         if (match.hasMatch())
         {

@@ -982,7 +982,7 @@ void MSqlEscapeAsAQuery(QString &query, const MSqlBindings &bindings)
 {
     MSqlQuery result(MSqlQuery::InitCon());
 
-    QRegularExpression rx { "('[^']+'|:\\w+)",
+    static const QRegularExpression rx { "('[^']+'|:\\w+)",
         QRegularExpression::UseUnicodePropertiesOption};
 
     QVector<Holder> holders;

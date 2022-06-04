@@ -3746,7 +3746,7 @@ void MythUIButtonListItem::DoButtonLookupText (MythUIText *text,
 
     QString newText = text->GetTemplateText();
 
-    QRegularExpression re {R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+?))?%)",
+    static const QRegularExpression re {R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+?))?%)",
         QRegularExpression::DotMatchesEverythingOption};
 
     if (!newText.isEmpty() && newText.contains(re))

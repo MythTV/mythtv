@@ -686,12 +686,11 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
         if (pos == -1)
             return false;
         dev = dev.mid(pos+kSuperOptDev.size());
+        static const QRegularExpression kSeparatorRE { "[, ]" };
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList parts = dev.split(QRegularExpression("[, ]"),
-                                      QString::SkipEmptyParts);
+        QStringList parts = dev.split(kSeparatorRE, QString::SkipEmptyParts);
 #else
-        QStringList parts = dev.split(QRegularExpression("[, ]"),
-                                      Qt::SkipEmptyParts);
+        QStringList parts = dev.split(kSeparatorRE, Qt::SkipEmptyParts);
 #endif
         if (parts[0].isEmpty())
             return false;

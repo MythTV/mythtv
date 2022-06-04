@@ -959,12 +959,11 @@ int verboseArgParse(const QString& arg)
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
+    static const QRegularExpression kSeparatorRE { "[^\\w:]+" };
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList verboseOpts = arg.split(QRegularExpression("[^\\w:]+"),
-                                        QString::SkipEmptyParts);
+    QStringList verboseOpts = arg.split(kSeparatorRE, QString::SkipEmptyParts);
 #else
-    QStringList verboseOpts = arg.split(QRegularExpression("[^\\w:]+"),
-                                        Qt::SkipEmptyParts);
+    QStringList verboseOpts = arg.split(kSeparatorRE, Qt::SkipEmptyParts);
 #endif
     for (const auto& opt : qAsConst(verboseOpts))
     {

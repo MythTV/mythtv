@@ -39,8 +39,8 @@ QRect MythUIScreenBounds::GetGeometryOverride()
  */
 void MythUIScreenBounds::ParseGeometryOverride(const QString& Geometry)
 {
-    QRegularExpression sre("^(\\d+)x(\\d+)$");
-    QRegularExpression lre(R"(^(\d+)x(\d+)([+-]\d+)([+-]\d+)$)");
+    static const QRegularExpression sre("^(\\d+)x(\\d+)$");
+    static const QRegularExpression lre(R"(^(\d+)x(\d+)([+-]\d+)([+-]\d+)$)");
     QStringList geometry;
     bool longform = false;
 
