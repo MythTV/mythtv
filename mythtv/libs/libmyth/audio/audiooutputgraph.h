@@ -38,8 +38,8 @@ class MPUBLIC AudioOutputGraph : public MythTV::Visual
     int          m_dBquiet   { -60 };
     int          m_dBLoud    { -12 };
     int          m_dbMax     { -6  };
-    class Buffer;
-    Buffer* const m_buffer   { nullptr };
+    class AOBuffer;
+    AOBuffer* const m_buffer { nullptr };
     QMutex mutable m_mutex;
 };
 

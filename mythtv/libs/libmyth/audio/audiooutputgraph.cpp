@@ -24,10 +24,10 @@ using namespace std::chrono_literals;
 
 const int kBufferMilliSecs = 500;
 
-class AudioOutputGraph::Buffer : public QByteArray
+class AudioOutputGraph::AOBuffer : public QByteArray
 {
   public:
-    Buffer() = default;
+    AOBuffer() = default;
 
     void SetMaxSamples(uint16_t Samples)    { m_maxSamples = Samples; }
     void SetSampleRate(uint16_t SampleRate) { m_sampleRate = SampleRate; }
@@ -200,7 +200,7 @@ class AudioOutputGraph::Buffer : public QByteArray
 };
 
 AudioOutputGraph::AudioOutputGraph() :
-    m_buffer(new AudioOutputGraph::Buffer())
+    m_buffer(new AudioOutputGraph::AOBuffer())
 {
 }
 
@@ -250,7 +250,7 @@ void AudioOutputGraph::Reset()
 MythImage* AudioOutputGraph::GetImage(std::chrono::milliseconds Timecode) const
 {
     QMutexLocker lock(&m_mutex);
-    Buffer::Range avail = m_buffer->Avail(Timecode);
+    AOBuffer::Range avail = m_buffer->Avail(Timecode);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("GetImage for timecode %1 using [%2..%3] available [%4..%5]")
@@ -261,7 +261,7 @@ MythImage* AudioOutputGraph::GetImage(std::chrono::milliseconds Timecode) const
     if (width <= 0)
         return nullptr;
 
-    const unsigned range = 1U << AudioOutputGraph::Buffer::BitsPerChannel();
+    const unsigned range = 1U << AudioOutputGraph::AOBuffer::BitsPerChannel();
     const auto threshold = 20 * log10(1.0 / range); // 16bit=-96.3296dB => ~6dB/bit
     auto height = static_cast<int>(-ceil(threshold)); // 96
     if (height <= 0)
