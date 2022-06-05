@@ -13,14 +13,17 @@ import {
   GetPlayGroupListResponse,
   GetProgramCategoriesResponse,
   GetRecGroupListResponse,
+  GetRecordedRequest,
+  GetRecordScheduleListRequest,
+  GetRecordScheduleRequest,
   GetRecStorageGroupListResponse,
   GetUpcomingListResponse
 } from './interfaces/dvr.interface';
 import { BoolResponse } from './interfaces/common.interface';
-import { ProgramList } from './interfaces/program.interface';
+import { ProgramList, ScheduleOrProgram } from './interfaces/program.interface';
 import { EncoderList } from './interfaces/encoder.interface';
 import { InputList } from './interfaces/input.interface';
-import { RecRuleFilterList } from './interfaces/recording.interface';
+import { RecRule, RecRuleFilterList, RecRuleList } from './interfaces/recording.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -153,7 +156,34 @@ export class DvrService {
     return this.httpClient.get<GetRecStorageGroupListResponse>('/Dvr/GetRecStorageGroupList');
   }
 
-  // TODO: GetRecordSchedule and onwards
+  public GetRecordSchedule(request : GetRecordScheduleRequest) : Observable<RecRule> {
+    let params = new HttpParams()
+      .set("RecordId", request.RecordId)
+      .set("Template", request.Template)
+      .set("RecordedId", request.RecordedId)
+      .set("ChanId", request.ChanId)
+      .set("StartTime", request.StartTime)
+      .set("MakeOverride", request.MakeOverride);
+    return this.httpClient.get<RecRule>('/Dvr/GetRecordSchedule', {params});
+  }
+
+  public GetRecordScheduleList(request : GetRecordScheduleListRequest) : Observable<RecRuleList> {
+    let params = new HttpParams()
+      .set("StartIndex", request.StartIndex)
+      .set("Count", request.Count)
+      .set("Sort", request.Sort)
+      .set("Descending", request.Descending);
+    return this.httpClient.get<RecRuleList>('/Dvr/GetRecordScheduleList', {params});
+  }
+
+  public GetRecorded(request : GetRecordedRequest) : Observable<ScheduleOrProgram> {
+    let params = new HttpParams()
+      .set("RecordedId", request.RecordedId)
+      .set("ChanId", request.ChanId)
+      .set("StartTime", request.StartTime);
+    return this.httpClient.get<ScheduleOrProgram>('/Dvr/GetRecorded', {params});
+  }
+  // TODO: from here
 
   public GetUpcomingList() : Observable<GetUpcomingListResponse> {
     return this.httpClient.get<GetUpcomingListResponse>('/Dvr/GetUpcomingList');

@@ -34,3 +34,63 @@ export interface RecRuleFilterList {
     ProtoVer:       string;
     RecRuleFilters: RecRuleFilter[];
 }
+
+export interface RecRule {
+    Id:             number;
+    ParentId:       number;
+    Inactive:       boolean;
+    Title:          string;
+    SubTitle:       string;
+    Description:    string;
+    Season:         number;
+    Episode:        number;
+    Category:       string;
+    StartTime:      string; // dateTime
+    EndTime:        string; // dateTime
+    SeriesId:       string;
+    ProgramId:      string;
+    InetRef:        string;
+    ChanId:         number;
+    CallSign:       string;
+    FindDay:        number;
+    FindTime:       string; // time
+    Type:           string;
+    SearchType:     string;
+    RecPriority:    number;
+    PreferredInput: number;
+    StartOffset:    number;
+    EndOffset:      number;
+    DupMethod:      string;
+    DupIn:          string;
+    NewEpisOnly:    boolean;
+    Filter:         number;
+    RecProfile:     string;
+    RecGroup:       string;
+    StorageGroup:   string;
+    PlayGroup:      string;
+    AutoExpire:     boolean;
+    MaxEpisodes:    number;
+    MaxNewest:      boolean;
+    AutoCommflag:   boolean;
+    AutoTranscode:  boolean;
+    AutoMetaLookup: boolean;
+    AutoUserJob1:   boolean;
+    AutoUserJob2:   boolean;
+    AutoUserJob3:   boolean;
+    AutoUserJob4:   boolean;
+    Transcoder:     number;
+    NextRecording:  string; // dateTime
+    LastRecorded:   string; // dateTime
+    LastDeleted:    string; // dateTime
+    AverageDelay:   number;
+}
+
+export interface RecRuleList {
+    StartIndex:     number;
+    Count:          number;
+    TotalAvailable: number;
+    AsOf:           string; // dateTime
+    Version:        string;
+    ProtoVer:       string;
+    RecRules:       RecRule[];
+}

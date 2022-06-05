@@ -114,3 +114,25 @@ export interface GetRecStorageGroupListResponse {
 export interface GetUpcomingListResponse {
     ProgramList:            ProgramList;
 }
+
+export interface GetRecordScheduleRequest {
+    RecordId:               number;
+    Template:               string;
+    RecordedId:             number;
+    ChanId:                 number;
+    StartTime:              string; // dateTime
+    MakeOverride:           boolean;
+}
+
+export interface GetRecordScheduleListRequest {
+    StartIndex:             number;
+    Count:                  number;
+    Sort:                   string;
+    Descending:             boolean;
+}
+
+export interface GetRecordedRequest {
+    RecordedId:             number;
+    ChanId:                 number;
+    StartTime:              string; // dateTime
+}
