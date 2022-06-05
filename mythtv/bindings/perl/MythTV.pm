@@ -8,7 +8,7 @@
 #
 
 # Version
-    $VERSION = 'v33git';
+    $VERSION = '33.0';
 
 # Load sub libraries
     use IO::Socket::INET::MythTV;
