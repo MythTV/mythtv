@@ -674,15 +674,10 @@ class VideoDialogPrivate
   private:
     using parental_level_map = std::list<std::pair<QString, ParentalLevel::Level> >;
 
-    struct rating_to_pl_less :
-        public std::binary_function<parental_level_map::value_type,
-                                    parental_level_map::value_type, bool>
+    static bool rating_to_pl_greater(const parental_level_map::value_type &lhs,
+                                     const parental_level_map::value_type &rhs)
     {
-        bool operator()(const parental_level_map::value_type &lhs,
-                    const parental_level_map::value_type &rhs) const
-        {
-            return lhs.first.length() < rhs.first.length();
-        }
+        return lhs.first.length() >= rhs.first.length();
     };
 
     using VideoListPtr = VideoDialog::VideoListPtr;
@@ -712,7 +707,7 @@ class VideoDialogPrivate
                 std::transform(ratings.cbegin(), ratings.cend(),
                                std::back_inserter(m_ratingToPl), to_pl);
             }
-            m_ratingToPl.sort(std::binary_negate(rating_to_pl_less()));
+            m_ratingToPl.sort(rating_to_pl_greater);
         }
 
         m_rememberPosition =
