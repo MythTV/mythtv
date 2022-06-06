@@ -49,10 +49,10 @@ class CDEjectorThread: public MThread
 
 struct RipTrack
 {
-    MusicMetadata *metadata;
-    bool           active;
-    std::chrono::milliseconds length;
-    bool           isNew;
+    MusicMetadata             *metadata { nullptr };
+    bool                       active   { false   };
+    std::chrono::milliseconds  length   { 0       };
+    bool                       isNew    { false   };
 };
 
 Q_DECLARE_METATYPE(RipTrack *)
