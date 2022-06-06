@@ -215,12 +215,12 @@ void PlaylistContainer::copyToActive(int index)
     copy_from->copyTracks(m_activePlaylist, true);
 }
 
-void PlaylistContainer::renamePlaylist(int index, QString new_name)
+void PlaylistContainer::renamePlaylist(int index, const QString& new_name)
 {
     Playlist *list_to_rename = getPlaylist(index);
     if (list_to_rename)
     {
-        list_to_rename->setName(std::move(new_name));
+        list_to_rename->setName(new_name);
         list_to_rename->changed();
     }
 }
