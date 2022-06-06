@@ -778,8 +778,9 @@ static void handleCDMedia(MythMediaDevice *cd)
     }
 }
 #else
-static void handleCDMedia(MythMediaDevice *)
+static void handleCDMedia(MythMediaDevice *cd)
 {
+    Q_UNUSED(cd);
     LOG(VB_GENERAL, LOG_NOTICE, "MythMusic got a media changed event"
                                 "but cdio support is not compiled in");
 }
