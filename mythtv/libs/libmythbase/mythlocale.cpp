@@ -206,7 +206,7 @@ QString MythLocale::GetLocaleSetting(const QString &key)
 {
     if (!m_defaultsLoaded &&
         !LoadDefaultsFromXML())
-        return QString();
+        return {};
 
     QString value = m_globalSettings.value(key);
     if (m_hostSettings.contains(key))

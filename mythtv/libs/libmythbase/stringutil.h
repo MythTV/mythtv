@@ -32,7 +32,7 @@ inline QString intToPaddedString(int n, int width = 2)
 
 inline QString indentSpaces(unsigned int level, unsigned int size = 4)
 {
-    return QString(level * size, QChar(' '));
+    return {static_cast<int>(level * size), QChar(' ')};
 }
 
 /**

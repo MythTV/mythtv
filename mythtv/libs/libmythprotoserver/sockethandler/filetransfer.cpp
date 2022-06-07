@@ -255,7 +255,7 @@ uint64_t FileTransfer::GetFileSize(void)
 QString FileTransfer::GetFileName(void)
 {
     if (!m_rbuffer)
-        return QString();
+        return {};
 
     return m_rbuffer->GetFilename();
 }

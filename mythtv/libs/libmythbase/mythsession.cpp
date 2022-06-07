@@ -177,13 +177,13 @@ MythUserSession MythSessionManager::GetSession(const QString& sessionToken)
     if (!gCoreContext->IsMasterBackend())
     {
         // TODO: Connect to master and do checking there
-        return MythUserSession();
+        return {};
     }
 
     if (IsValidSession(sessionToken))
         return m_sessionList[sessionToken];
 
-    return MythUserSession();
+    return {};
 }
 
 /**
@@ -195,7 +195,7 @@ MythUserSession MythSessionManager::GetSession(const QString &username,
     if (!gCoreContext->IsMasterBackend())
     {
         // TODO: Connect to master and do checking there
-        return MythUserSession();
+        return {};
     }
 
     QMap<QString, MythUserSession>::iterator it;
@@ -215,7 +215,7 @@ MythUserSession MythSessionManager::GetSession(const QString &username,
         }
     }
 
-    return MythUserSession();
+    return {};
 }
 
 /**
@@ -233,7 +233,7 @@ QString MythSessionManager::GetPasswordDigest(const QString& username)
     if (query.next())
         return query.value(0).toString();
 
-    return QString();
+    return {};
 }
 
 /**
@@ -285,12 +285,12 @@ MythUserSession MythSessionManager::LoginUser(const QString &username,
 {
     if (username.isEmpty() || digest.isEmpty() || digest.length() < 32 ||
         digest.length() > 32)
-        return MythUserSession();
+        return {};
 
     if (!gCoreContext->IsMasterBackend())
     {
         // TODO: Connect to master and do checking there
-        return MythUserSession();
+        return {};
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -301,12 +301,12 @@ MythUserSession MythSessionManager::LoginUser(const QString &username,
     query.bindValue(":PWDIGEST", QString(digest));
 
     if (!query.exec())
-        return MythUserSession();
+        return {};
 
     if (query.size() > 1)
     {
         LOG(VB_GENERAL, LOG_CRIT, "LoginUser: Warning, multiple matching user records found.");
-        return MythUserSession();
+        return {};
     }
 
     if (query.next())
@@ -330,7 +330,7 @@ MythUserSession MythSessionManager::LoginUser(const QString &username,
     LOG(VB_GENERAL, LOG_WARNING, QString("LoginUser: Failed login attempt for "
                                          "user %1").arg(username));
 
-    return MythUserSession();
+    return {};
 }
 
 /**

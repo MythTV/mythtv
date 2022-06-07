@@ -975,7 +975,7 @@ QString MythXSD::ReadPropertyMetadata( QObject *pObject, const QString& sPropNam
             return (*it).mid( sFullKey.length() );
     }
 
-    return QString();
+    return {};
 }
 
 HTTPResponse MythXSD::Error(const HTTPRequest2& pRequest, const QString &msg)

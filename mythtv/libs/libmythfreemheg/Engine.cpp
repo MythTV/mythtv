@@ -523,7 +523,7 @@ void MHEngine::SetInputRegister(int nReg)
 QString MHEngine::GetPathName(const MHOctetString &str)
 {
     if (str.Size() == 0)
-        return QString();
+        return {};
 
     QString csPath = QString::fromUtf8((const char *)str.Bytes(), str.Size());
     switch (PathProtocol(csPath))

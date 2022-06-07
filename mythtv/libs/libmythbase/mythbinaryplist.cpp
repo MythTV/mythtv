@@ -112,13 +112,13 @@ QVariant MythBinaryPList::GetValue(const QString& Key)
 #endif
 
     if (type != QMetaType::QVariantMap)
-        return QVariant();
+        return {};
 
     QVariantMap map = m_result.toMap();
     for (auto it = map.cbegin(); it != map.cend(); ++it)
         if (Key == it.key())
             return it.value();
-    return QVariant();
+    return {};
 }
 
 QString MythBinaryPList::ToString()
@@ -127,8 +127,8 @@ QString MythBinaryPList::ToString()
     QBuffer buf(&res);
     buf.open(QBuffer::WriteOnly);
     if (!ToXML(&buf))
-        return QString("");
-    return QString(res.data());
+        return {""};
+    return {res.data()};
 }
 
 bool MythBinaryPList::ToXML(QIODevice* Device)
@@ -266,7 +266,7 @@ QVariant MythBinaryPList::ParseBinaryNode(uint64_t Num)
 {
     uint8_t* data = GetBinaryObject(Num);
     if (!data)
-        return QVariant();
+        return {};
 
     quint16 type = (*data) & 0xf0;
     uint64_t size = (*data) & 0x0f;
@@ -286,17 +286,17 @@ QVariant MythBinaryPList::ParseBinaryNode(uint64_t Num)
         {
             switch (size)
             {
-                case BPLIST_TRUE:  return QVariant(true);
-                case BPLIST_FALSE: return QVariant(false);
+                case BPLIST_TRUE:  return {true};
+                case BPLIST_FALSE: return {false};
                 case BPLIST_NULL:
-                default:           return QVariant();
+                default:           return {};
             }
         }
         case BPLIST_UID: // FIXME
         default: break;
     }
 
-    return QVariant();
+    return {};
 }
 
 uint64_t MythBinaryPList::GetBinaryUInt(uint8_t *Data, uint64_t Size)
@@ -381,7 +381,7 @@ QVariant MythBinaryPList::ParseBinaryUInt(uint8_t** Data)
 {
     uint64_t result = 0;
     if (((**Data) & 0xf0) != BPLIST_UINT)
-        return QVariant(static_cast<quint64>(result));
+        return {static_cast<quint64>(result)};
 
     uint64_t size = 1 << ((**Data) & 0x0f);
     (*Data)++;
@@ -389,7 +389,7 @@ QVariant MythBinaryPList::ParseBinaryUInt(uint8_t** Data)
     (*Data) += size;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("UInt: %1").arg(result));
-    return QVariant(static_cast<quint64>(result));
+    return {static_cast<quint64>(result)};
 }
 
 QVariant MythBinaryPList::ParseBinaryString(uint8_t* Data)
@@ -428,7 +428,7 @@ QVariant MythBinaryPList::ParseBinaryReal(uint8_t* Data)
     }
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Real: %1").arg(result, 0, 'f', 6));
-    return QVariant(result);
+    return {result};
 }
 
 QVariant MythBinaryPList::ParseBinaryDate(uint8_t* Data)

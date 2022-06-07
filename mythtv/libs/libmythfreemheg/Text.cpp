@@ -881,7 +881,7 @@ QRegion MHText::GetOpaqueArea()
 {
     if (! m_fRunning || (GetColour(m_bgColour)).alpha() != 255)
     {
-        return QRegion();
+        return {};
     }
     return QRegion(QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight));
 }

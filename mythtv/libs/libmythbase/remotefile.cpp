@@ -570,7 +570,7 @@ QString RemoteFile::GetFileHash(const QString &url)
         filename = filename.right(filename.length()-1);
 
     if (filename.isEmpty() || sgroup.isEmpty())
-        return QString();
+        return {};
 
     QStringList strlist("QUERY_FILE_HASH");
     strlist << filename;
@@ -1289,7 +1289,7 @@ QString RemoteFile::FindFile(const QString& filename, const QString& host,
     if (!files.isEmpty())
         return files[0];
 
-    return QString();
+    return {};
 }
 
 /**
@@ -1311,7 +1311,7 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
                                    .arg(useRegex).arg(allowFallback));
 
     if (filename.isEmpty() || storageGroup.isEmpty())
-        return QStringList();
+        return {};
 
     QStringList strList;
     QString hostName = host;
@@ -1379,7 +1379,7 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
         }
     }
 
-    return QStringList();
+    return {};
 }
 
 /**

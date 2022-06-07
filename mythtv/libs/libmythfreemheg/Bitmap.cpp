@@ -217,7 +217,7 @@ QRegion MHBitmap::GetVisibleArea()
 {
     if (! m_fRunning || m_pContent == nullptr)
     {
-        return QRegion();
+        return {};
     }
 
     // The visible area is the intersection of the containing box with the, possibly offset,
@@ -236,7 +236,7 @@ QRegion MHBitmap::GetOpaqueArea()
     // and it's not a BBC MPEG I-frame background
     if (! m_fRunning || m_nContentHook == 5 || m_pContent == nullptr || ! m_pContent->IsOpaque())
     {
-        return QRegion();
+        return {};
     }
     return GetVisibleArea();
 }

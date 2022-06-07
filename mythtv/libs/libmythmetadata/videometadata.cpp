@@ -1019,7 +1019,7 @@ QString VideoMetadataImp::GetImage(const QString& name) const
         return GetImage("coverart");
     }
 
-    return QString();
+    return {};
 }
 
 ////////////////////////////////////////
@@ -1221,9 +1221,9 @@ QString VideoMetadata::FilenameToMeta(const QString &file_name, int position)
         return title.trimmed();
     }
     else if (position == 2 || position == 3)
-        return QString("0");
+        return {"0"};
 
-    return QString();
+    return {};
 }
 
 VideoMetadata::VideoMetadata(const QString &filename, const QString &sortFilename,
@@ -1423,7 +1423,7 @@ QString VideoMetadata::GetText(const QString& name) const
         return GetDisplayProcessed(GetProcessed());
     if (name == QStringLiteral(u"category"))
         return GetCategory();
-    return QString();
+    return {};
 }
 
 void VideoMetadata::GetStateMap(InfoMap &stateMap) const
@@ -1447,7 +1447,7 @@ QString VideoMetadata::GetState(const QString& name) const
         return WatchedToState(GetWatched());
     if (name == QStringLiteral(u"videolevel"))
         return ParentalLevelToState(GetShowLevel());
-    return QString();
+    return {};
 }
 
 void VideoMetadata::GetImageMap(InfoMap &imageMap)
@@ -1507,7 +1507,7 @@ void ClearMap(InfoMap &metadataMap)
 QString VideoMetadata::MetadataGetTextCb(const QString& name, void *data)
 {
     if (data == nullptr)
-        return QString();
+        return {};
     auto *metadata = static_cast<VideoMetadata *>(data);
     QString result = metadata->GetText(name);
     if (!result.isEmpty())
@@ -1521,7 +1521,7 @@ QString VideoMetadata::MetadataGetTextCb(const QString& name, void *data)
 QString VideoMetadata::MetadataGetImageCb(const QString& name, void *data)
 {
     if (data == nullptr)
-        return QString();
+        return {};
     auto *metadata = static_cast<VideoMetadata *>(data);
     return metadata->GetImage(name);
 }
@@ -1529,7 +1529,7 @@ QString VideoMetadata::MetadataGetImageCb(const QString& name, void *data)
 QString VideoMetadata::MetadataGetStateCb(const QString& name, void *data)
 {
     if (data == nullptr)
-        return QString();
+        return {};
     auto *metadata = static_cast<VideoMetadata *>(data);
     return metadata->GetState(name);
 }

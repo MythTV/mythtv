@@ -82,7 +82,7 @@ static QString downloadRemoteFile(const QString &cmd, const QString &url,
     {
         LOG(VB_GENERAL, LOG_ERR,
             "downloadRemoteFile(): " + cmd + " returned ERROR!");
-        return QString();
+        return {};
     }
 
     return strlist[1];

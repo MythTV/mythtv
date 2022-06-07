@@ -1412,7 +1412,7 @@ QString nearestName(const QString& actual, const QStringList& candidates)
     if ( numBest == 1 && deltaBest <= tolerance &&
        actual.length() + best.length() >= 5 )
         return best;
-    return QString();
+    return {};
 }
 
 QDateTime RFC822TimeToQDateTime(const QString& t)
@@ -1420,7 +1420,7 @@ QDateTime RFC822TimeToQDateTime(const QString& t)
     QMap<QString, int> TimezoneOffsets;
 
     if (t.size() < 20)
-        return QDateTime();
+        return {};
 
     QString time = t.simplified();
     short int hoursShift = 0;
@@ -1428,12 +1428,12 @@ QDateTime RFC822TimeToQDateTime(const QString& t)
 
     QStringList tmp = time.split(' ');
     if (tmp.isEmpty())
-        return QDateTime();
+        return {};
     static const QRegularExpression kNonDigitRE { "\\D" };
     if (tmp.at(0).contains(kNonDigitRE))
         tmp.removeFirst();
     if (tmp.size() != 5)
-        return QDateTime();
+        return {};
     QString ltimezone = tmp.takeAt(tmp.size() -1);
     if (ltimezone.size() == 5)
     {
@@ -1460,7 +1460,7 @@ QDateTime RFC822TimeToQDateTime(const QString& t)
     else
         result = QLocale::c().toDateTime(time, "dd MMM yy hh:mm:ss");
     if (result.isNull() || !result.isValid())
-        return QDateTime();
+        return {};
     result = result.addSecs(hoursShift * 3600 * (-1) + minutesShift *60 * (-1));
     result.setTimeSpec(Qt::UTC);
     return result;

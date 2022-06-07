@@ -62,7 +62,7 @@ class MHVisible : public MHPresentable
     virtual QRegion GetVisibleArea();
     // Get the opaque area.  This is the area that this visible completely obscures and
     // is empty if the visible is drawn in a transparent or semi-transparent colour.
-    virtual QRegion GetOpaqueArea() { return QRegion(); }
+    virtual QRegion GetOpaqueArea() { return {}; }
 
     // Reset the position - used by ListGroup.
     void ResetPosition() override // MHRoot

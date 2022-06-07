@@ -646,7 +646,7 @@ QString VideoMetaData::GetTag(const QString &key, bool *exists)
     }
     if (exists)
         *exists = false;
-    return QString();
+    return {};
 }
 
 
@@ -686,7 +686,7 @@ QString VideoMetaData::GetComment(bool *exists)
 {
     if (exists)
         *exists = false;
-    return QString();
+    return {};
 }
 
 

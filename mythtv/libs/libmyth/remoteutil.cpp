@@ -218,7 +218,7 @@ QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo)
     pginfo->ToStringList(strlist);
 
     if (!gCoreContext->SendReceiveStringList(strlist))
-        return QDateTime();
+        return {};
 
     if (!strlist.isEmpty() && !strlist[0].isEmpty() && (strlist[0] != "BAD"))
     {
@@ -226,7 +226,7 @@ QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo)
         return MythDate::fromSecsSinceEpoch(timet);
     }
 
-    return QDateTime();
+    return {};
 }
 
 /// Download preview & get timestamp if newer than cachefile's
@@ -253,7 +253,7 @@ QDateTime RemoteGetPreviewIfModified(
         LOG(VB_GENERAL, LOG_ERR, loc + "Remote error" +
             ((strlist.size() >= 2) ? (":\n\t\t\t" + strlist[1]) : ""));
 
-        return QDateTime();
+        return {};
     }
 
     if (strlist[0] == "WARNING")
@@ -261,7 +261,7 @@ QDateTime RemoteGetPreviewIfModified(
         LOG(VB_NETWORK, LOG_WARNING, loc + "Remote warning" +
                  ((strlist.size() >= 2) ? (":\n\t\t\t" + strlist[1]) : ""));
 
-        return QDateTime();
+        return {};
     }
 
     QDateTime retdatetime;
@@ -284,7 +284,7 @@ QDateTime RemoteGetPreviewIfModified(
         LOG(VB_GENERAL, LOG_ERR, loc +
             QString("Preview size check failed %1 < %2")
                 .arg(data.size()).arg(length));
-        return QDateTime();
+        return {};
     }
     data.resize(length);
 
@@ -296,7 +296,7 @@ QDateTime RemoteGetPreviewIfModified(
     if (checksum16 != calculated)
     {
         LOG(VB_GENERAL, LOG_ERR, loc + "Preview checksum failed");
-        return QDateTime();
+        return {};
     }
 
     QString pdir(cachefile.section("/", 0, -2));
@@ -307,7 +307,7 @@ QDateTime RemoteGetPreviewIfModified(
             QString("Unable to create remote cache directory '%1'")
                 .arg(pdir));
 
-        return QDateTime();
+        return {};
     }
 
     QFile file(cachefile);
@@ -317,7 +317,7 @@ QDateTime RemoteGetPreviewIfModified(
             QString("Unable to open cached preview file for writing '%1'")
                 .arg(cachefile));
 
-        return QDateTime();
+        return {};
     }
 
     off_t offset = 0;
@@ -346,7 +346,7 @@ QDateTime RemoteGetPreviewIfModified(
 
         file.resize(0); // in case unlink fails..
         file.remove();  // closes fd
-        return QDateTime();
+        return {};
     }
 
     file.close();

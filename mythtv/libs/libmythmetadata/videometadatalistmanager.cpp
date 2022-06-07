@@ -43,7 +43,7 @@ class VideoMetadataListManagerImp
         {
             return *(p->second);
         }
-        return VideoMetadataPtr();
+        return {};
     }
 
     VideoMetadataPtr byID(unsigned int db_id) const
@@ -54,7 +54,7 @@ class VideoMetadataListManagerImp
         {
             return *(p->second);
         }
-        return VideoMetadataPtr();
+        return {};
     }
 
     bool purgeByFilename(const QString &file_name)
@@ -118,7 +118,7 @@ VideoMetadataListManager::loadOneFromDatabase(uint id)
         return item.front();
     }
 
-    return VideoMetadataPtr(new VideoMetadata());
+    return {new VideoMetadata()};
 }
 
 /// Load videometadata database into memory
@@ -366,7 +366,7 @@ smart_dir_node meta_dir_node::getSubDir(const QString &subdir,
         return node;
     }
 
-    return smart_dir_node();
+    return {};
 }
 
 void meta_dir_node::addEntry(const smart_meta_node &entry)

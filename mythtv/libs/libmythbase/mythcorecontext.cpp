@@ -1248,7 +1248,7 @@ QString MythCoreContext::resolveAddress(const QString &host, ResolveType type,
     }
     else if (host.isEmpty())
     {
-        return QString();
+        return {};
     }
 
     if (!keepscope)

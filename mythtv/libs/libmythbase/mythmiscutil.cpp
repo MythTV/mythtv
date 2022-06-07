@@ -558,7 +558,7 @@ QString FileHash(const QString& filename)
     quint64 hash = 0;
 
     if (initialsize == 0)
-        return QString("NULL");
+        return {"NULL"};
 
     if (file.open(QIODevice::ReadOnly))
         hash = initialsize;
@@ -566,7 +566,7 @@ QString FileHash(const QString& filename)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "Error: Unable to open selected file, missing read permissions?");
-        return QString("NULL");
+        return {"NULL"};
     }
 
     file.seek(0);

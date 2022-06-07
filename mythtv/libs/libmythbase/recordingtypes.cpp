@@ -78,23 +78,23 @@ QString toRawString(RecordingType rectype)
     switch (rectype)
     {
         case kSingleRecord:
-            return QString("Single Record");
+            return {"Single Record"};
         case kAllRecord:
-            return QString("Record All");
+            return {"Record All"};
         case kOneRecord:
-            return QString("Record One");
+            return {"Record One"};
         case kDailyRecord:
-            return QString("Record Daily");
+            return {"Record Daily"};
         case kWeeklyRecord:
-            return QString("Record Weekly");
+            return {"Record Weekly"};
         case kOverrideRecord:
-            return QString("Override Recording");
+            return {"Override Recording"};
         case kDontRecord:
-            return QString("Do not Record");
+            return {"Do not Record"};
         case kTemplateRecord:
-            return QString("Recording Template");
+            return {"Recording Template"};
         default:
-            return QString("Not Recording");
+            return {"Not Recording"};
     }
 }
 
@@ -166,7 +166,7 @@ QString toString(RecordingDupInType recdupin)
         case kDupsNewEpi:
             return QObject::tr("New Episodes Only");
         default:
-            return QString();
+            return {};
     }
 }
 
@@ -186,7 +186,7 @@ QString toDescription(RecordingDupInType recdupin)
         case kDupsNewEpi:
             return QObject::tr("Record new episodes only");
         default:
-            return QString();
+            return {};
     }
 }
 
@@ -197,13 +197,13 @@ QString toRawString(RecordingDupInType recdupin)
     switch (recdupin)
     {
         case kDupsInRecorded:
-            return QString("Current Recordings");
+            return {"Current Recordings"};
         case kDupsInOldRecorded:
-            return QString("Previous Recordings");
+            return {"Previous Recordings"};
         case kDupsInAll:
-            return QString("All Recordings");
+            return {"All Recordings"};
         default:
-            return QString("Unknown");
+            return {"Unknown"};
     }
 }
 
@@ -248,7 +248,7 @@ QString toString(RecordingDupMethodType duptype)
         case kDupCheckSubThenDesc:
             return QObject::tr("Subtitle then Description");
         default:
-            return QString();
+            return {};
     }
 }
 
@@ -267,7 +267,7 @@ QString toDescription(RecordingDupMethodType duptype)
         case kDupCheckSubThenDesc:
             return QObject::tr("Match duplicates using subtitle then description");
         default:
-            return QString();
+            return {};
     }
 }
 
@@ -276,17 +276,17 @@ QString toRawString(RecordingDupMethodType duptype)
     switch (duptype)
     {
         case kDupCheckNone:
-            return QString("None");
+            return {"None"};
         case kDupCheckSub:
-            return QString("Subtitle");
+            return {"Subtitle"};
         case kDupCheckDesc:
-            return QString("Description");
+            return {"Description"};
         case kDupCheckSubDesc:
-            return QString("Subtitle and Description");
+            return {"Subtitle and Description"};
         case kDupCheckSubThenDesc:
-            return QString("Subtitle then Description");
+            return {"Subtitle then Description"};
         default:
-            return QString("Unknown");
+            return {"Unknown"};
     }
 }
 
@@ -310,19 +310,19 @@ QString toRawString(RecSearchType searchtype)
     switch (searchtype)
     {
         case kNoSearch:
-            return QString("None");
+            return {"None"};
         case kPowerSearch:
-            return QString("Power Search");
+            return {"Power Search"};
         case kTitleSearch:
-            return QString("Title Search");
+            return {"Title Search"};
         case kKeywordSearch:
-            return QString("Keyword Search");
+            return {"Keyword Search"};
         case kPeopleSearch:
-            return QString("People Search");
+            return {"People Search"};
         case kManualSearch:
-            return QString("Manual Search");
+            return {"Manual Search"};
         default:
-            return QString("Unknown");
+            return {"Unknown"};
     }
 }
 
@@ -348,7 +348,7 @@ QString toString(AutoExtendType extType)
     switch (extType)
     {
         default:
-            return QString();
+            return {};
         case AutoExtendType::None:
             return QStringLiteral(u"None");
         case AutoExtendType::ESPN:
@@ -363,7 +363,7 @@ QString toDescription(AutoExtendType extType)
     switch (extType)
     {
         default:
-            return QString();
+            return {};
         case AutoExtendType::None:
             return QObject::tr("Do not automatically extend recording");
         case AutoExtendType::ESPN:

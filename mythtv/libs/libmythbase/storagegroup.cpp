@@ -189,7 +189,7 @@ void StorageGroup::Init(const QString &group, const QString &hostname,
 QString StorageGroup::GetFirstDir(bool appendSlash) const
 {
     if (m_dirlist.isEmpty())
-        return QString();
+        return {};
 
     QString tmp = m_dirlist[0];
 

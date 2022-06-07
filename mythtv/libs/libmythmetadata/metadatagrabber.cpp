@@ -65,7 +65,7 @@ GrabberList MetaGrabberScript::GetList(const QString &type, bool refresh)
     QString tmptype = type.toLower();
     if (!grabberTypeStrings.contains(tmptype))
         // unknown type, return empty list
-        return GrabberList();
+        return {};
 
     return MetaGrabberScript::GetList(grabberTypeStrings[tmptype], refresh);
 }
@@ -157,7 +157,7 @@ MetaGrabberScript MetaGrabberScript::GetType(const QString &type)
     QString tmptype = type.toLower();
     if (!grabberTypeStrings.contains(tmptype))
         // unknown type, return empty grabber
-        return MetaGrabberScript();
+        return {};
 
     return MetaGrabberScript::GetType(grabberTypeStrings[tmptype]);
 }
@@ -193,7 +193,7 @@ MetaGrabberScript MetaGrabberScript::GetType(const GrabberType type)
         return script;
     }
 
-    return MetaGrabberScript();
+    return {};
 }
 
 MetaGrabberScript MetaGrabberScript::FromTag(const QString &tag,
@@ -223,7 +223,7 @@ MetaGrabberScript MetaGrabberScript::FromTag(const QString &tag,
     }
 
     // no working match. return a blank
-    return MetaGrabberScript();
+    return {};
 }
 
 MetaGrabberScript MetaGrabberScript::FromInetref(const QString &inetref,
@@ -244,7 +244,7 @@ MetaGrabberScript MetaGrabberScript::FromInetref(const QString &inetref,
     }
 
     // no working match, return a blank
-    return MetaGrabberScript();
+    return {};
 }
 
 QString MetaGrabberScript::CleanedInetref(const QString &inetref)
@@ -414,7 +414,7 @@ QString MetaGrabberScript::GetRelPath(void) const
     if (m_fullcommand.startsWith(share))
         return m_fullcommand.right(m_fullcommand.size() - share.size());
 
-    return QString();
+    return {};
 }
 
 void MetaGrabberScript::toMap(InfoMap &metadataMap) const

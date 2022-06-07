@@ -238,7 +238,7 @@ MythMimeType MythHTTPEncoding::GetMimeType(HTTPVariant Content)
     auto * data = std::get_if<HTTPData>(&Content);
     auto * file = std::get_if<HTTPFile>(&Content);
     if (!(data || file))
-        return MythMimeType();
+        return {};
 
     QString filename = data ? (*data)->m_fileName : file ? (*file)->m_fileName : "";
 

@@ -544,16 +544,16 @@ bool MetaIOFLACVorbis::TagExists(const QString &filename)
 QString MetaIOFLACVorbis::getExtFromMimeType(const QString &mimeType)
 {
     if (mimeType == "image/png")
-        return QString(".png");
+        return {".png"};
     if (mimeType == "image/jpeg" || mimeType == "image/jpg")
-        return QString(".jpg");
+        return {".jpg"};
     if (mimeType == "image/gif")
-        return QString(".gif");
+        return {".gif"};
     if (mimeType == "image/bmp")
-        return QString(".bmp");
+        return {".bmp"};
 
     LOG(VB_GENERAL, LOG_ERR,
         "Music Scanner - Unknown image mimetype found - " + mimeType);
 
-    return QString();
+    return {};
 }

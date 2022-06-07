@@ -204,7 +204,7 @@ void* MythHTTPMetaMethod::CreateParameter(void* Parameter, int Type, const QStri
 QVariant MythHTTPMetaMethod::CreateReturnValue(int Type, void* Value)
 {
     if (!(ValidReturnType(Type)))
-        return QVariant();
+        return {};
 
     // This assumes any user type will be derived from QObject...
     // (Exception for QFileInfo)
@@ -224,7 +224,7 @@ QVariant MythHTTPMetaMethod::CreateReturnValue(int Type, void* Value)
     }
 
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-    return QVariant(Type, Value);
+    return {Type, Value};
 #else
     return QVariant(QMetaType(Type), Value);
 #endif

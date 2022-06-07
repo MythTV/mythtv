@@ -2780,7 +2780,7 @@ QString MythCommandLineParser::GetLogFilePath(void)
         LOG(VB_GENERAL, LOG_ERR,
             QString("%1 is not a directory, disabling logfiles")
             .arg(logfile));
-        return QString();
+        return {};
     }
 
     QString logdir  = finfo.filePath();

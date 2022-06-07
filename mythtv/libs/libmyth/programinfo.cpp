@@ -2536,7 +2536,7 @@ QString ProgramInfo::QueryBasename(void) const
                      .arg(m_recordedId));
     }
 
-    return QString();
+    return {};
 }
 
 /** \brief Returns filename or URL to be used to play back this recording.

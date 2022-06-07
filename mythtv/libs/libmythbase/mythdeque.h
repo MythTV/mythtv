@@ -14,9 +14,9 @@ inline int myth_deque_init(const int * /*unused*/) { return 0; }
 template<>
 inline uint myth_deque_init(const uint * /*unused*/) { return 0; }
 template<>
-inline QString myth_deque_init(const QString * /*unused*/) { return QString(); }
+inline QString myth_deque_init(const QString * /*unused*/) { return {}; }
 template<>
-inline QStringList myth_deque_init(const QStringList * /*unused*/) { return QStringList(); }
+inline QStringList myth_deque_init(const QStringList * /*unused*/) { return {}; }
 
 /** \class MythDeque
  *  \brief MythDeque is similar to QPtrQueue, while being based off

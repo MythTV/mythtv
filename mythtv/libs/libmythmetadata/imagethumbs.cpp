@@ -241,7 +241,7 @@ QString ThumbThread<DBFS>::CreateThumbnail(ImagePtrK im, int thumbPriority)
     {
         LOG(VB_FILE, LOG_DEBUG,  QString("[%3] %2 already exists")
             .arg(im->m_thumbPath).arg(thumbPriority));
-        return QString(); // Notify anyway
+        return {}; // Notify anyway
     }
 
     // Local filenames are always absolute
@@ -310,7 +310,7 @@ QString ThumbThread<DBFS>::CreateThumbnail(ImagePtrK im, int thumbPriority)
 
     LOG(VB_FILE, LOG_INFO,  QString("[%2] Created %1")
         .arg(im->m_thumbPath).arg(thumbPriority));
-    return QString();
+    return {};
 }
 
 

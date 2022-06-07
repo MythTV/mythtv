@@ -827,7 +827,7 @@ QString logLevelGetName(LogLevel_t level)
     LoglevelMap::iterator it = loglevelMap.find((int)level);
 
     if ( it == loglevelMap.end() )
-        return QString("unknown");
+        return {"unknown"};
 
     return (*it)->name;
 }

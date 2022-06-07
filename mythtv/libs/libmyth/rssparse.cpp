@@ -384,7 +384,7 @@ private:
         QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::kMediaRSS,
             "player");
         if (elems.empty())
-            return QString();
+            return {};
 
         return elems.at(0).toElement().attribute("url");
     }
@@ -395,7 +395,7 @@ private:
             "title");
 
         if (elems.empty())
-            return QString();
+            return {};
 
         QDomElement telem = elems.at(0).toElement();
         return Parse::UnescapeHTML(telem.text());
@@ -407,7 +407,7 @@ private:
             "description");
 
         if (elems.empty())
-            return QString();
+            return {};
 
         QDomElement telem = elems.at(0).toElement();
         return Parse::UnescapeHTML(telem.text());
@@ -419,7 +419,7 @@ private:
             "keywords");
 
         if (elems.empty())
-            return QString();
+            return {};
 
         QDomElement telem = elems.at(0).toElement();
         return telem.text();
@@ -1023,7 +1023,7 @@ QDateTime Parse::GetDCDateTime(const QDomElement& parent)
 {
     QDomNodeList dates = parent.elementsByTagNameNS(kDC, "date");
     if (!dates.size())
-        return QDateTime();
+        return {};
     return FromRFC3339(dates.at(0).toElement().text());
 }
 
@@ -1032,7 +1032,7 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t)
     static const QRegularExpression kNonDigitRE { R"(\D)" };
 
     if (t.size() < 20)
-        return QDateTime();
+        return {};
 
     QString time = t.simplified();
     short int hoursShift = 0;
@@ -1040,11 +1040,11 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t)
 
     QStringList tmp = time.split(' ');
     if (tmp.isEmpty())
-        return QDateTime();
+        return {};
     if (tmp.at(0).contains(kNonDigitRE))
         tmp.removeFirst();
     if (tmp.size() != 5)
-        return QDateTime();
+        return {};
     QString tmpTimezone = tmp.takeAt(tmp.size() -1);
     if (tmpTimezone.size() == 5)
     {
@@ -1071,7 +1071,7 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t)
     else
         result = QLocale::c().toDateTime(time, "dd MMM yy hh:mm:ss");
     if (result.isNull() || !result.isValid())
-        return QDateTime();
+        return {};
     result = result.addSecs(hoursShift * 3600 * (-1) + minutesShift *60 * (-1));
     result.setTimeSpec(Qt::UTC);
     return result;
@@ -1080,7 +1080,7 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t)
 QDateTime Parse::FromRFC3339(const QString& t)
 {
     if (t.size() < 19)
-        return QDateTime();
+        return {};
     QDateTime result = MythDate::fromString(t.left(19).toUpper());
     static const QRegularExpression fractionalSeconds { R"(\.(\d+))" };
     auto match = fractionalSeconds.match(t);

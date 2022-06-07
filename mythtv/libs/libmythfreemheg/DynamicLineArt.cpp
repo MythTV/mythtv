@@ -73,7 +73,7 @@ QRegion MHDynamicLineArt::GetOpaqueArea()
     {
         return GetVisibleArea();
     }
-    return QRegion();
+    return {};
 }
 
 // Reset the picture.

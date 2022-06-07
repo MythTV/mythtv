@@ -915,7 +915,7 @@ QStringList ImageDb<FS>::RemoveFromDB(const ImageList &imList) const
         if (!query.exec())
         {
             MythDB::DBError(DBLOC, query);
-            return QStringList();
+            return {};
         }
     }
     return ids;

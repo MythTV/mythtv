@@ -71,7 +71,7 @@ class META_PUBLIC MetaIO
     virtual AlbumArtList getAlbumArtList(const QString &filename)
     {
         (void)filename;
-        return AlbumArtList();
+        return {};
     }
 
     virtual bool writeAlbumArt(const QString &filename,

@@ -453,7 +453,7 @@ QRegion MHVideo::GetVisibleArea()
 {
     if (! m_fRunning)
     {
-        return QRegion();
+        return {};
     }
 
     // The visible area is the intersection of the containing box with the, possibly offset,

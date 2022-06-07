@@ -89,7 +89,7 @@ bool gunzipFile(const QString &gzipFilename, const QString &outFilename)
 QByteArray gzipCompress(const QByteArray& data)
 {
     if (data.length() == 0)
-        return QByteArray();
+        return {};
 
     std::array <char,1024> out {};
 
@@ -109,7 +109,7 @@ QByteArray gzipCompress(const QByteArray& data)
                            8,
                            Z_DEFAULT_STRATEGY ); // gzip encoding
     if (ret != Z_OK)
-        return QByteArray();
+        return {};
 
     QByteArray result;
 
@@ -129,7 +129,7 @@ QByteArray gzipCompress(const QByteArray& data)
             case Z_DATA_ERROR:
             case Z_MEM_ERROR:
                 (void)deflateEnd(&strm);
-                return QByteArray();
+                return {};
         }
 
         result.append(out.data(), out.size() - strm.avail_out);
@@ -146,7 +146,7 @@ QByteArray gzipCompress(const QByteArray& data)
 QByteArray gzipUncompress(const QByteArray &data)
 {
     if (data.length() == 0)
-        return QByteArray();
+        return {};
 
     std::array<char,1024> out {};
 
@@ -163,7 +163,7 @@ QByteArray gzipUncompress(const QByteArray &data)
     int ret = inflateInit2(&strm, 15 + 16);
 
     if (ret != Z_OK)
-        return QByteArray();
+        return {};
 
     QByteArray result;
 
@@ -181,7 +181,7 @@ QByteArray gzipUncompress(const QByteArray &data)
             case Z_DATA_ERROR:
             case Z_MEM_ERROR:
                 (void) deflateEnd(&strm);
-                return QByteArray();
+                return {};
         }
 
         result.append(out.data(), out.size() - strm.avail_out);

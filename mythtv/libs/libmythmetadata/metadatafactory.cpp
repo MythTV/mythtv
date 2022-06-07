@@ -239,7 +239,7 @@ META_PUBLIC MetadataLookupList MetadataFactory::SynchronousLookup(const QString&
 MetadataLookupList MetadataFactory::SynchronousLookup(MetadataLookup *lookup)
 {
     if (!lookup)
-        return MetadataLookupList();
+        return {};
 
     m_sync = true;
 

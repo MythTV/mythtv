@@ -63,7 +63,7 @@ QString findIcon(const QString &type, const QString &name, bool ignoreCache)
 
     LOG(VB_FILE, LOG_INFO, QString("findicon: not found type: %1, name: %2").arg(type, name));
 
-    return QString();
+    return {};
 }
 
 QString fixFileToken_sl(QString token)
