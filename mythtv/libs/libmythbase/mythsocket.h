@@ -103,7 +103,7 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
     int             m_peerPort         {-1};      // protected by m_lock
     MythSocketCBs  *m_callback         {nullptr}; // only set in ctor
     bool            m_useSharedThread;            // only set in ctor
-    QAtomicInt      m_disableReadyReadCallback {false};
+    QAtomicInt      m_disableReadyReadCallback {0};
     bool            m_connected        {false};   // protected by m_lock
     /// This is used internally as a hint that there might be
     /// data available for reading.

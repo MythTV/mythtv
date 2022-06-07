@@ -62,7 +62,7 @@ class Commands : public QObject
     Commands(void);
     ~Commands(void) override = default;
     bool Run(const QString & filename, int data_rate, bool loopinput);
-    void setEoF(void) { m_eof = true; }
+    void setEoF(void) { m_eof = 1; }
 
   protected:
     bool send_status(const QString & status) const;
