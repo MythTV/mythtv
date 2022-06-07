@@ -260,7 +260,7 @@ QString LogViewer::getSetting(const QString &key)
                 .arg(key));
     }
 
-    return QString("");
+    return {""};
 }
 
 bool LogViewer::loadFile(const QString& filename, QStringList &list, int startline)

@@ -216,7 +216,7 @@ ScriptInfo *SourceManager::getSourceByName(const QString &name)
 QStringList SourceManager::getLocationList(ScriptInfo *si, const QString &str)
 {
     if (!m_scripts.contains(si))
-        return QStringList();
+        return {};
     auto *ws = new WeatherSource(si);
 
     QStringList locationList(ws->getLocationList(str));

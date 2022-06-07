@@ -393,7 +393,7 @@ QStringList WeatherSource::getLocationList(const QString &str)
     if (ms.Wait() != GENERIC_EXIT_OK)
     {
         LOG(VB_GENERAL, LOG_ERR, loc + "Cannot run script");
-        return QStringList();
+        return {};
     }
 
     QStringList locs;

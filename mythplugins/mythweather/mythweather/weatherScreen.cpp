@@ -175,7 +175,7 @@ QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
         key.startsWith("high"))
     {
        if ((value == "NA") || (value == "N/A"))
-          return QString();
+          return {};
        return value + getTemperatureUnit();
     }
 
@@ -223,7 +223,7 @@ QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
     }
 
     if (key == "copyrightlogo" && value == "none")
-        return QString();
+        return {};
 
     return value;
 }

@@ -165,7 +165,7 @@ QString getCriteriaSQL(const QString& fieldName, const QString &operatorName,
     const SmartPLOperator *Operator = lookupOperator(operatorName);
     if (!Operator)
     {
-        return QString();
+        return {};
     }
 
     // convert boolean and date values
@@ -240,7 +240,7 @@ QString getCriteriaSQL(const QString& fieldName, const QString &operatorName,
 QString getOrderBySQL(const QString& orderByFields)
 {
     if (orderByFields.isEmpty())
-        return QString();
+        return {};
 
     QStringList list = orderByFields.split(",");
     QString fieldName;
@@ -290,7 +290,7 @@ QString getSQLFieldName(const QString &fieldName)
 QString SmartPLCriteriaRow::getSQL(void) const
 {
     if (m_field.isEmpty())
-        return QString();
+        return {};
 
     QString result;
 
@@ -345,7 +345,7 @@ QString SmartPLCriteriaRow::toString(void) const
         return result;
     }
 
-    return QString();
+    return {};
 }
 
 /*
@@ -979,7 +979,7 @@ QString SmartPlaylistEditor::getOrderByClause(void)
 QString SmartPlaylistEditor::getWhereClause(void)
 {
     if (m_criteriaRows.empty())
-        return QString();
+        return {};
 
     bool bFirst = true;
     QString sql = "WHERE ";
