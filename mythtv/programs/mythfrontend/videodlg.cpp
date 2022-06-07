@@ -1408,7 +1408,7 @@ QString VideoDialog::RemoteImageCheck(const QString& host, const QString& filena
 QString VideoDialog::GetCoverImage(MythGenericTree *node)
 {
     if (!node)
-        return QString();
+        return {};
 
     int nodeInt = node->getInt();
 
@@ -1649,7 +1649,7 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, const QString& type,
                                    const QString& gpnode, int levels)
 {
     if (!node || type.isEmpty())
-        return QString();
+        return {};
 
     QString icon_file;
 
@@ -1815,7 +1815,7 @@ QString VideoDialog::GetBanner(MythGenericTree *node)
     const int nodeInt = node->getInt();
 
     if (nodeInt == kSubFolder || nodeInt == kUpFolder)
-        return QString();
+        return {};
 
     QString icon_file;
     const VideoMetadata *metadata = GetMetadataPtrFromNode(node);
@@ -1850,7 +1850,7 @@ QString VideoDialog::GetFanart(MythGenericTree *node)
     const int nodeInt = node->getInt();
 
     if (nodeInt  == kSubFolder || nodeInt == kUpFolder)  // subdirectory
-        return QString();
+        return {};
 
     QString icon_file;
     const VideoMetadata *metadata = GetMetadataPtrFromNode(node);

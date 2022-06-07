@@ -100,7 +100,7 @@ static QString toStringFrameFormats(int format, bool verbose)
 
 QString FrameInfoEntry::GetHeader(void)
 {
-    return QString("  frame     min/max/avg scene aspect format flags");
+    return {"  frame     min/max/avg scene aspect format flags"};
 }
 
 QString FrameInfoEntry::toString(uint64_t frame, bool verbose) const

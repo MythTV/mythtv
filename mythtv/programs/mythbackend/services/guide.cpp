@@ -387,7 +387,7 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
         LOG(VB_UPNP, LOG_ERR,
             QString("GetImageFile - ChanId %1 doesn't exist or isn't visible")
                     .arg(nChanId));
-        return QFileInfo();
+        return {};
     }
 
     // ------------------------------------------------------------------
@@ -402,7 +402,7 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
         LOG(VB_UPNP, LOG_ERR,
             QString("GetImageFile - Unable to find %1.").arg(sFileName));
 
-        return QFileInfo();
+        return {};
     }
 
     // ----------------------------------------------------------------------
@@ -419,7 +419,7 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
         LOG(VB_UPNP, LOG_ERR,
             QString("GetImageFile - File Does not exist %1.").arg(sFullFileName));
 
-        return QFileInfo();
+        return {};
     }
     // -------------------------------------------------------------------
 
@@ -445,7 +445,7 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
     {
         LOG(VB_UPNP, LOG_ERR, QString("GetImageFile - no write access to: %1")
             .arg( sChannelsDirectory ));
-        return QFileInfo();
+        return {};
     }
 
     auto *pImage = new QImage( sFullFileName );
@@ -454,7 +454,7 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
     {
         LOG(VB_UPNP, LOG_ERR, QString("GetImageFile - can't create image: %1")
             .arg( sFullFileName ));
-        return QFileInfo();
+        return {};
     }
 
     float fAspect = (float)(pImage->width()) / pImage->height();
@@ -462,7 +462,7 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
     {
         LOG(VB_UPNP, LOG_ERR, QString("GetImageFile - zero aspect"));
         delete pImage;
-        return QFileInfo();
+        return {};
     }
 
     if ( nWidth == 0 )
@@ -479,7 +479,7 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
         LOG(VB_UPNP, LOG_ERR, QString("SaveImageFile - unable to scale. "
             "See if %1 is really an image.").arg( sFullFileName ));
         delete pImage;
-        return QFileInfo();
+        return {};
     }
 
     if (!img.save( sNewFileName, "PNG" ))
@@ -487,7 +487,7 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
         LOG(VB_UPNP, LOG_ERR, QString("SaveImageFile - failed, %1")
             .arg( sNewFileName ));
         delete pImage;
-        return QFileInfo();
+        return {};
     }
 
     delete pImage;

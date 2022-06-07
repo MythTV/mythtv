@@ -164,7 +164,7 @@ ImagePtrK FlatView::HasNext(int inc) const
 ImagePtrK FlatView::Next(int inc)
 {
     if (m_sequence.isEmpty())
-        return ImagePtrK();
+        return {};
 
     // Preserve index as it may be reset when wrapping
     int next = m_active + inc;
@@ -172,7 +172,7 @@ ImagePtrK FlatView::Next(int inc)
     // Regenerate unordered views when wrapping
     if (next >= m_sequence.size() && m_order != kOrdered && !LoadFromDb(m_parentId))
         // Images have disappeared
-        return ImagePtrK();
+        return {};
 
     m_active = next % m_sequence.size();
     return m_images.value(m_sequence.at(m_active));
@@ -197,7 +197,7 @@ ImagePtrK FlatView::HasPrev(int inc) const
 ImagePtrK FlatView::Prev(int inc)
 {
     if (m_sequence.isEmpty())
-        return ImagePtrK();
+        return {};
 
     // Wrap avoiding modulo of negative uncertainty
     m_active -= inc % m_sequence.size();

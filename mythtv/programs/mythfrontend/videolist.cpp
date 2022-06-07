@@ -133,21 +133,21 @@ QString TreeNodeData::GetPath(void) const
 {
     if (m_d)
         return m_d->GetPath();
-    return QString();
+    return {};
 }
 
 QString TreeNodeData::GetHost(void) const
 {
     if (m_d)
         return m_d->GetHost();
-    return QString();
+    return {};
 }
 
 QString TreeNodeData::GetPrefix(void) const
 {
     if (m_d)
         return m_d->GetPrefix();
-    return QString();
+    return {};
 }
 
 /// metadata sort function

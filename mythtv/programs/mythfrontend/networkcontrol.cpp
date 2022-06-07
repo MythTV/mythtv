@@ -494,7 +494,7 @@ QString NetworkControl::processKey(NetworkCommand *nc)
     if (GetMythMainWindow())
         keyDest = GetMythMainWindow();
     else
-        return QString("ERROR: Application has no main window!\n");
+        return {"ERROR: Application has no main window!\n"};
 
     int curToken = 1;
     while (curToken < nc->getArgCount())
@@ -616,7 +616,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             qApp->postEvent(GetMythMainWindow(), me);
         }
         else
-            return QString("Unable to change to main menu to start playback!");
+            return {"Unable to change to main menu to start playback!"};
     }
     else if ((nc->getArgCount() >= 4) &&
              (is_abbrev("program", nc->getArg(1))) &&
@@ -768,7 +768,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
                 return "unknown";
             }
             else
-                return QString("ERROR: Invalid 'play music' command");
+                return {"ERROR: Invalid 'play music' command"};
         }
         else if (nc->getArgCount() > 3)
         {
@@ -794,11 +794,11 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             }
             else
             {
-                return QString("ERROR: Invalid 'play music' command");
+                return {"ERROR: Invalid 'play music' command"};
             }
         }
         else
-            return QString("ERROR: Invalid 'play music' command");
+            return {"ERROR: Invalid 'play music' command"};
     }
     // Everything below here requires us to be in playback mode so check to
     // see if we are
@@ -1107,7 +1107,7 @@ QString NetworkControl::processSet(NetworkCommand *nc)
     if (nc->getArg(1) == "verbose")
     {
         if (nc->getArgCount() < 3)
-            return QString("ERROR: Missing filter name.");
+            return {"ERROR: Missing filter name."};
 
         if (nc->getArgCount() > 3)
         {
@@ -1230,7 +1230,7 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
         }
 
         if (!topScreen)
-            return QString("ERROR: no top screen found!");
+            return {"ERROR: no top screen found!"};
 
         MythUIType *currType = topScreen;
 
@@ -1258,7 +1258,7 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
     if (nc->getArg(1) == "getarea")
     {
         if (nc->getArgCount() < 3)
-            return QString("ERROR: Missing widget name.");
+            return {"ERROR: Missing widget name."};
 
         QString widgetName = nc->getArg(2);
         QStringList path = widgetName.split('/');
@@ -1273,7 +1273,7 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
         }
 
         if (!topScreen)
-            return QString("ERROR: no top screen found!");
+            return {"ERROR: no top screen found!"};
 
         MythUIType *currType = topScreen;
 
@@ -1299,10 +1299,10 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
     if (nc->getArg(1) == "setarea")
     {
         if (nc->getArgCount() < 3)
-            return QString("ERROR: Missing widget name.");
+            return {"ERROR: Missing widget name."};
 
         if (nc->getArgCount() < 7)
-            return QString("ERROR: Missing X, Y, Width or Height.");
+            return {"ERROR: Missing X, Y, Width or Height."};
 
         QString widgetName = nc->getArg(2);
         QStringList path = widgetName.split('/');
@@ -1322,7 +1322,7 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
 
         MythUIType *currType = topScreen;
         if (!topScreen)
-            return QString("ERROR: no top screen found!");
+            return {"ERROR: no top screen found!"};
 
         while (path.count() > 1)
         {
@@ -1541,7 +1541,7 @@ QString NetworkControl::processMessage(NetworkCommand *nc)
     MythMainWindow *window = GetMythMainWindow();
     auto* me = new MythEvent(MythEvent::MythUserMessage, message);
     qApp->postEvent(window, me);
-    return QString("OK");
+    return {"OK"};
 }
 
 QString NetworkControl::processNotification(NetworkCommand *nc)
@@ -1553,7 +1553,7 @@ QString NetworkControl::processNotification(NetworkCommand *nc)
     QString message = nc->getCommand().remove(0, 12).trimmed();
     MythNotification n(message, tr("Network Control"));
     GetNotificationCenter()->Queue(n);
-    return QString("OK");
+    return {"OK"};
 }
 
 void NetworkControl::notifyDataAvailable(void)

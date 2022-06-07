@@ -672,7 +672,7 @@ QUrl RecExtEspnDataSource::findInfoUrl(ActiveGame& game, SportInfo& info)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Couldn't load %1").arg(game.getInfoUrl().url()));
-        return QUrl();
+        return {};
     }
     if (page->findGameInfo(game))
     {
@@ -691,7 +691,7 @@ QUrl RecExtEspnDataSource::findInfoUrl(ActiveGame& game, SportInfo& info)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Couldn't load %1").arg(game.getInfoUrl().url()));
-        return QUrl();
+        return {};
     }
     if (page->findGameInfo(game))
     {
@@ -710,7 +710,7 @@ QUrl RecExtEspnDataSource::findInfoUrl(ActiveGame& game, SportInfo& info)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Couldn't load %1").arg(game.getInfoUrl().url()));
-        return QUrl();
+        return {};
     }
     if (page->findGameInfo(game))
     {
@@ -719,7 +719,7 @@ QUrl RecExtEspnDataSource::findInfoUrl(ActiveGame& game, SportInfo& info)
             .arg(game.getTeam1(), game.getTeam2(), game.getStartTimeAsString()));
         return game.getInfoUrl();
     }
-    return QUrl();
+    return {};
 }
 
 //////////////////////////////////////////////////
@@ -1040,14 +1040,14 @@ QUrl RecExtMlbDataSource::findInfoUrl(ActiveGame& game, SportInfo& info)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Couldn't load %1").arg(game.getInfoUrl().url()));
-        return QUrl();
+        return {};
     }
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Loaded page %1").arg(game.getInfoUrl().url()));
     if (page->findGameInfo(game))
         return game.getGameUrl();
 
-    return QUrl();
+    return {};
 }
 
 //////////////////////////////////////////////////

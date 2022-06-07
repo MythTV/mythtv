@@ -62,7 +62,7 @@ QString Image::GetImageInfo( int /*id*/, const QString &/*tag*/ )
 //        return tags[tag].first;
 
 //    LOG(VB_FILE, LOG_DEBUG, LOC + QString("Tag %1 not found for %2").arg(tag).arg(id));
-    return QString();
+    return {};
 }
 
 

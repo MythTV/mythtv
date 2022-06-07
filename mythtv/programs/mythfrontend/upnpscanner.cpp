@@ -29,7 +29,7 @@ QString MediaServerItem::NextUnbrowsed(void)
 {
     // items don't need scanning
     if (!m_url.isEmpty())
-        return QString();
+        return {};
 
     // scan this container
     if (!m_scanned)
@@ -45,7 +45,7 @@ QString MediaServerItem::NextUnbrowsed(void)
             return result;
     }
 
-    return QString();
+    return {};
 }
 
 MediaServerItem* MediaServerItem::Find(QString &id)

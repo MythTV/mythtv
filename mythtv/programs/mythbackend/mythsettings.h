@@ -14,7 +14,7 @@ class MythSettingBase
   public:
     MythSettingBase() = default;
     virtual ~MythSettingBase() = default;
-    virtual QString ToHTML(uint /*depth*/) const { return QString(); }
+    virtual QString ToHTML(uint /*depth*/) const { return {}; }
 };
 using MythSettingList = QList<MythSettingBase*>;
 

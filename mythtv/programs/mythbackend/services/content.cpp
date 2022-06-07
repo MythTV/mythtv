@@ -89,7 +89,7 @@ QFileInfo Content::GetFile( const QString &sStorageGroup,
         LOG(VB_UPNP, LOG_ERR,
             QString("GetFile - Unable to find %1.").arg(sFileName));
 
-        return QFileInfo();
+        return {};
     }
 
     // ----------------------------------------------------------------------
@@ -104,7 +104,7 @@ QFileInfo Content::GetFile( const QString &sStorageGroup,
     LOG(VB_UPNP, LOG_ERR,
         QString("GetFile - File Does not exist %1.").arg(sFullFileName));
 
-    return QFileInfo();
+    return {};
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -146,7 +146,7 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
         LOG(VB_UPNP, LOG_WARNING,
             QString("GetImageFile - Unable to find %1.").arg(sFileName));
 
-        return QFileInfo();
+        return {};
     }
 
     // ----------------------------------------------------------------------
@@ -157,7 +157,7 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
     {
         LOG(VB_UPNP, LOG_WARNING,
             QString("GetImageFile - File Does not exist %1.").arg(sFullFileName));
-        return QFileInfo();
+        return {};
     }
 
     // ----------------------------------------------------------------------
@@ -188,7 +188,7 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
     auto *pImage = new QImage( sFullFileName );
 
     if (!pImage || pImage->isNull())
-        return QFileInfo();
+        return {};
 
     float fAspect = (float)(pImage->width()) / pImage->height();
 
@@ -262,7 +262,7 @@ QFileInfo Content::GetRecordingArtwork ( const QString   &sType,
     ArtworkMap map = GetArtwork(sInetref, nSeason);
 
     if (map.isEmpty())
-        return QFileInfo();
+        return {};
 
     VideoArtworkType type = kArtworkCoverart;
     QString sgroup;
@@ -284,13 +284,13 @@ QFileInfo Content::GetRecordingArtwork ( const QString   &sType,
     }
 
     if (!map.contains(type))
-        return QFileInfo();
+        return {};
 
     QUrl url(map.value(type).url);
     QString sFileName = url.path();
 
     if (sFileName.isEmpty())
-        return QFileInfo();
+        return {};
 
     return GetImageFile( sgroup, sFileName, nWidth, nHeight);
 }
@@ -376,12 +376,12 @@ QFileInfo Content::GetVideoArtwork( const QString &sType,
         MythDB::DBError("GetVideoArtwork ", query);
 
     if (!query.next())
-        return QFileInfo();
+        return {};
 
     QString sFileName = query.value(0).toString();
 
     if (sFileName.isEmpty())
-        return QFileInfo();
+        return {};
 
     return GetImageFile( sgroup, sFileName, nWidth, nHeight );
 }
@@ -399,7 +399,7 @@ QFileInfo Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
     MusicMetadata *metadata = MusicMetadata::createFromID(nTrackId);
 
     if (!metadata)
-        return QFileInfo();
+        return {};
 
     QString sFullFileName = metadata->getAlbumArtFile();
     LOG(VB_GENERAL, LOG_DEBUG, QString("GetAlbumArt: %1").arg(sFullFileName));
@@ -407,7 +407,7 @@ QFileInfo Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
     delete metadata;
 
     if (!RemoteFile::Exists(sFullFileName))
-        return QFileInfo();
+        return {};
 
     QString sNewFileName = QString( "/tmp/%1.%2x%3.jpg" )
                               .arg( QFileInfo(sFullFileName).fileName() )
@@ -439,7 +439,7 @@ QFileInfo Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
         img.load(sFullFileName);
 
     if (img.isNull())
-        return QFileInfo();
+        return {};
 
     // We don't need to scale if no height and width were specified
     // but still need to save as jpg if it's in another format
@@ -478,7 +478,7 @@ QFileInfo Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
     // Use JPG not PNG for compatibility with the most uPnP devices and
     // faster loading (smaller file to send over network)
     if (!img.save( fname, "JPG" ))
-        return QFileInfo();
+        return {};
 
     return QFileInfo( sNewFileName );
 }
@@ -521,7 +521,7 @@ QFileInfo Content::GetPreviewImage(        int        nRecordedId,
         LOG(VB_GENERAL, LOG_ERR,
             QString("GetPreviewImage: No recording for '%1'")
             .arg(nRecordedId));
-        return QFileInfo();
+        return {};
     }
 
     if (pginfo.GetHostname().toLower() != gCoreContext->GetHostName().toLower()
@@ -569,7 +569,7 @@ QFileInfo Content::GetPreviewImage(        int        nRecordedId,
             pginfo.SetPathname(sFileName);
 
         if (!pginfo.IsLocal())
-            return QFileInfo();
+            return {};
 
         auto *previewgen = new PreviewGenerator( &pginfo, QString(),
                                                  PreviewGenerator::kLocal);
@@ -581,7 +581,7 @@ QFileInfo Content::GetPreviewImage(        int        nRecordedId,
         previewgen->deleteLater();
 
         if (!ok)
-            return QFileInfo();
+            return {};
     }
 
     bool bDefaultPixmap = (nWidth == 0) && (nHeight == 0);
@@ -613,7 +613,7 @@ QFileInfo Content::GetPreviewImage(        int        nRecordedId,
         QImage image = QImage(sPreviewFileName);
 
         if (image.isNull())
-            return QFileInfo();
+            return {};
 
         // We can just re-scale the default (full-size version) to avoid
         // a preview generator run
@@ -652,7 +652,7 @@ QFileInfo Content::GetPreviewImage(        int        nRecordedId,
     previewgen->deleteLater();
 
     if (!ok)
-        return QFileInfo();
+        return {};
 
     return QFileInfo( sNewFileName );
 }
@@ -685,7 +685,7 @@ QFileInfo Content::GetRecording( int              nRecordedId,
         LOG(VB_UPNP, LOG_ERR, QString("GetRecording - for '%1' failed")
             .arg(nRecordedId));
 
-        return QFileInfo();
+        return {};
     }
 
     if (pginfo.GetHostname().toLower() != gCoreContext->GetHostName().toLower()
@@ -712,7 +712,7 @@ QFileInfo Content::GetRecording( int              nRecordedId,
     if (QFile::exists( sFileName ))
         return QFileInfo( sFileName );
 
-    return QFileInfo();
+    return {};
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -743,7 +743,7 @@ QFileInfo Content::GetMusic( int nId )
         if (!query.exec())
         {
             MythDB::DBError("GetMusic()", query);
-            return QFileInfo();
+            return {};
         }
 
         if (query.next())
@@ -753,7 +753,7 @@ QFileInfo Content::GetMusic( int nId )
     }
 
     if (sFileName.isEmpty())
-        return QFileInfo();
+        return {};
 
     return GetFile( "Music", sFileName );
 }
@@ -780,7 +780,7 @@ QFileInfo Content::GetVideo( int nId )
         if (!query.exec())
         {
             MythDB::DBError("GetVideo()", query);
-            return QFileInfo();
+            return {};
         }
 
         if (query.next())
@@ -788,7 +788,7 @@ QFileInfo Content::GetVideo( int nId )
     }
 
     if (sFileName.isEmpty())
-        return QFileInfo();
+        return {};
 
     if (!QFile::exists( sFileName ))
         return GetFile( "Videos", sFileName );
@@ -810,7 +810,7 @@ QString Content::GetHash( const QString &sStorageGroup,
         LOG(VB_GENERAL, LOG_ERR,
             QString("ERROR checking for file, filename '%1' "
                     "fails sanity checks").arg(sFileName));
-        return QString();
+        return {};
     }
 
     QString storageGroup = "Default";
@@ -824,7 +824,7 @@ QString Content::GetHash( const QString &sStorageGroup,
     QString hash = FileHash(fullname);
 
     if (hash == "NULL")
-        return QString();
+        return {};
 
     return hash;
 }

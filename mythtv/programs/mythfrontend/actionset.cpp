@@ -223,13 +223,13 @@ QString ActionSet::GetKeyString(const ActionID &id) const
 {
     ContextMap::const_iterator cit = m_contexts.find(id.GetContext());
     if (cit == m_contexts.end())
-        return QString();
+        return {};
 
     ActionContext::const_iterator it = (*cit).find(id.GetAction());
     if (it != (*cit).end())
         return (*it)->GetKeyString();
 
-    return QString();
+    return {};
 }
 
 /** \fn ActionSet::GetKeys(const ActionID&) const
@@ -283,13 +283,13 @@ QString ActionSet::GetDescription(const ActionID &id) const
 {
     ContextMap::const_iterator cit = m_contexts.find(id.GetContext());
     if (cit == m_contexts.end())
-        return QString();
+        return {};
 
     ActionContext::const_iterator it = (*cit).find(id.GetAction());
     if (it != (*cit).end())
         return (*it)->GetDescription();
 
-    return QString();
+    return {};
 }
 
 /** \fn ActionSet::GetAction(const ActionID&)

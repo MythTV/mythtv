@@ -780,7 +780,7 @@ QString EncoderLink::GetInput(void) const
         return m_tv->GetInput();
 
     LOG(VB_GENERAL, LOG_ERR, "Should be local only query: GetInput");
-    return QString();
+    return {};
 }
 
 /** \fn EncoderLink::SetInput(QString)
@@ -799,7 +799,7 @@ QString EncoderLink::SetInput(QString input)
         return m_tv->SetInput(std::move(input));
 
     LOG(VB_GENERAL, LOG_ERR, "Should be local only query: SetInput");
-    return QString();
+    return {};
 }
 
 /**

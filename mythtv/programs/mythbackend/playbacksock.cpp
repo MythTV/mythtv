@@ -328,7 +328,7 @@ QDateTime PlaybackSock::PixmapLastModified(const ProgramInfo *pginfo)
         return MythDate::fromSecsSinceEpoch(strlist[0].toLongLong());
     }
 
-    return QDateTime();
+    return {};
 }
 
 bool PlaybackSock::CheckFile(ProgramInfo *pginfo)
@@ -540,7 +540,7 @@ QStringList PlaybackSock::ForwardRequest(const QStringList &slist)
     if (SendReceiveStringList(strlist))
         return strlist;
 
-    return QStringList();
+    return {};
 }
 
 /** \brief Tells a slave to add a child input.

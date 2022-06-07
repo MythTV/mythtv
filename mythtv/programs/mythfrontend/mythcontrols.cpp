@@ -362,12 +362,12 @@ QString MythControls::GetCurrentContext(void)
         return m_leftList->GetItemCurrent()->GetText();
 
     if (GetFocusWidget() == m_leftList)
-        return QString();
+        return {};
 
     QString desc = m_rightList->GetItemCurrent()->GetText();
     int loc = desc.indexOf(" => ");
     if (loc == -1)
-        return QString(); // Should not happen
+        return {}; // Should not happen
 
     if (m_rightListType == kContextList)
         return desc.left(loc);
@@ -390,14 +390,14 @@ QString MythControls::GetCurrentAction(void)
         {
             return m_leftList->GetItemCurrent()->GetText();
         }
-        return QString();
+        return {};
     }
 
     if (GetFocusWidget() == m_leftList)
-        return QString();
+        return {};
 
     if (!m_rightList || !m_rightList->GetItemCurrent())
-        return QString();
+        return {};
 
     QString desc = m_rightList->GetItemCurrent()->GetText();
     if (kContextList == m_leftListType &&
@@ -408,14 +408,14 @@ QString MythControls::GetCurrentAction(void)
 
     int loc = desc.indexOf(" => ");
     if (loc == -1)
-        return QString(); // should not happen..
+        return {}; // should not happen..
 
     if (m_rightListType == kActionList)
         return desc.left(loc);
 
     QString rv = desc.mid(loc+4);
     if (rv == "<none>")
-        return QString();
+        return {};
 
     return rv;
 }
@@ -454,7 +454,7 @@ QString MythControls::GetCurrentKey(void)
     }
 
     if (GetFocusWidget() == m_leftList)
-        return QString();
+        return {};
 
     if ((m_leftListType == kContextList) && (m_rightListType == kActionList))
     {
@@ -466,7 +466,7 @@ QString MythControls::GetCurrentKey(void)
         if (b < (uint)keys.count())
             return keys[b];
 
-        return QString();
+        return {};
     }
 
     currentButton = m_rightList->GetItemCurrent();
@@ -476,7 +476,7 @@ QString MythControls::GetCurrentKey(void)
 
     int loc = desc.indexOf(" => ");
     if (loc == -1)
-        return QString(); // Should not happen
+        return {}; // Should not happen
 
 
     if (m_rightListType == kKeyList)

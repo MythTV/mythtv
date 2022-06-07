@@ -337,7 +337,7 @@ class VideoPlayerCommandPrivate
     {
         if (!m_playerProcs.empty())
             return m_playerProcs.front()->GetCommandDisplayName();
-        return QString();
+        return {};
     }
 
   private:

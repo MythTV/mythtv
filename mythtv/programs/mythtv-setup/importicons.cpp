@@ -553,7 +553,7 @@ QString ImportIconsWizard::wget(QUrl& url, const QString& strParam )
         return QString(data);
     }
 
-    return QString();
+    return {};
 }
 
 #include <QTemporaryFile>
