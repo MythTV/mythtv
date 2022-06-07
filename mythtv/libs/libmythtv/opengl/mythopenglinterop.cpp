@@ -132,7 +132,7 @@ MythOpenGLInterop::Acquire(MythRenderOpenGL* /*Context*/,
                            MythVideoColourSpace* /*ColourSpace*/,
                            MythVideoFrame* /*Frame*/, FrameScanType /*Scan*/)
 {
-    return std::vector<MythVideoTextureOpenGL*>();
+    return {};
 }
 
 void MythOpenGLInterop::DeleteTextures()

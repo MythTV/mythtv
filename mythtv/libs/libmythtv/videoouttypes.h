@@ -212,11 +212,11 @@ inline QString ScanTypeToString(FrameScanType Scan)
 {
     switch (Scan)
     {
-        case kScan_Ignore:      return QString("Ignore Scan");
-        case kScan_Detect:      return QString("Detect Scan");
-        case kScan_Interlaced:  return QString("Interlaced Scan");
-        case kScan_Progressive: return QString("Progressive Scan");
-        default:                return QString("Unknown Scan");
+        case kScan_Ignore:      return {"Ignore Scan"};
+        case kScan_Detect:      return {"Detect Scan"};
+        case kScan_Interlaced:  return {"Interlaced Scan"};
+        case kScan_Progressive: return {"Progressive Scan"};
+        default:                return {"Unknown Scan"};
     }
 }
 

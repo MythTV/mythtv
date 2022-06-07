@@ -24,7 +24,7 @@ QString VideoMetaDataUtil::GetArtPath(const QString &pathname,
         LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "Programmer Error: Cannot determine art path\n\t\t\t"
                 "until the ProgramInfo pathname has been fully resolved.");
-        return QString();
+        return {};
     }
 
     art_path_map_lock.lockForRead();

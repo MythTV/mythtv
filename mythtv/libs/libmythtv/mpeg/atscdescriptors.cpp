@@ -13,14 +13,14 @@ QString MultipleStringStructure::CompressionTypeString(uint i, uint j) const
 {
     uint ct = CompressionType(i, j);
     if (0 == ct)
-        return QString("no compression");
+        return {"no compression"};
     if (1 == ct)
-        return QString("Huffman Coding using C.4, C.5");
+        return {"Huffman Coding using C.4, C.5"};
     if (2 == ct)
-        return QString("Huffman Coding using C.6, C.7");
+        return {"Huffman Coding using C.6, C.7"};
     if (ct < 0xaf)
-        return QString("reserved");
-    return QString("compression not used by ATSC in North America, unknown");
+        return {"reserved"};
+    return {"compression not used by ATSC in North America, unknown"};
 }
 
 QString MultipleStringStructure::toString() const
@@ -92,7 +92,7 @@ QString MultipleStringStructure::GetBestMatch(QMap<uint,uint> &langPrefs) const
 {
     if (StringCount())
         return GetFullString(GetIndexOfBestMatch(langPrefs));
-    return QString();
+    return {};
 }
 
 QString MultipleStringStructure::GetSegment(uint i, uint j) const
@@ -263,7 +263,7 @@ QString AC3AudioStreamDescriptor::BitRateCodeString(void) const
         return QString::fromStdString(s_ebr[BitRateCode()]);
     if ((BitRateCode() >= 32) && (BitRateCode() <= 50))
         return QString::fromStdString(s_ubr[BitRateCode()-32]);
-    return QString("Unknown Bit Rate Code");
+    return {"Unknown Bit Rate Code"};
 }
 
 QString AC3AudioStreamDescriptor::SurroundModeString(void) const

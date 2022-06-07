@@ -66,7 +66,7 @@ QString MythUIThemeHelper::FindThemeDir(const QString& ThemeName, bool Fallback)
     }
 
     if (!Fallback)
-        return QString();
+        return {};
 
     testdir = GetThemesParentDir() + DEFAULT_UI_THEME;
     dir.setPath(testdir);
@@ -92,7 +92,7 @@ QString MythUIThemeHelper::FindThemeDir(const QString& ThemeName, bool Fallback)
     }
 
     LOG(VB_GENERAL, LOG_ERR, LOC + QString("No fallback GUI theme dir: '%1'").arg(dir.absolutePath()));
-    return QString();
+    return {};
 }
 
 /**
@@ -130,7 +130,7 @@ QString MythUIThemeHelper::FindMenuThemeDir(const QString& MenuName)
 
     LOG(VB_GENERAL, LOG_ERR, LOC + QString("Could not find menu theme: %1 - Fallback to default failed.")
         .arg(MenuName));
-    return QString();
+    return {};
 }
 
 QString MythUIThemeHelper::GetMenuThemeDir()

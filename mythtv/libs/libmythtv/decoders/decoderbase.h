@@ -205,7 +205,7 @@ class DecoderBase
     void SetFramesPlayed(long long newValue) {m_framesPlayed = newValue;}
 
     virtual QString GetCodecDecoderName(void) const = 0;
-    virtual QString GetRawEncodingType(void) { return QString(); }
+    virtual QString GetRawEncodingType(void) { return {}; }
     virtual MythCodecID GetVideoCodecID(void) const = 0;
 
     virtual void ResetPosMap(void);
@@ -246,8 +246,8 @@ class DecoderBase
 
     virtual int  GetTeletextDecoderType(void) const { return -1; }
 
-    virtual QString GetXDS(const QString &/*key*/) const { return QString(); }
-    virtual QByteArray GetSubHeader(uint /*trackNo*/) { return QByteArray(); }
+    virtual QString GetXDS(const QString &/*key*/) const { return {}; }
+    virtual QByteArray GetSubHeader(uint /*trackNo*/) { return {}; }
     virtual void GetAttachmentData(uint /*trackNo*/, QByteArray &/*filename*/,
                                    QByteArray &/*data*/) {}
 

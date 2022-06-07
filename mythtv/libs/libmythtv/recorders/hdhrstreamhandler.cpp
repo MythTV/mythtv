@@ -423,7 +423,7 @@ QString HDHRStreamHandler::TunerGet(
     if (!m_hdhomerunDevice)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Get request failed (not connected)");
-        return QString();
+        return {};
     }
 
     QString valname = QString("/tuner%1/%2").arg(m_tuner).arg(name);
@@ -435,7 +435,7 @@ QString HDHRStreamHandler::TunerGet(
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Get %1 request failed").arg(valname) + ENO);
-        return QString();
+        return {};
     }
 
     if (report_error_return && error)
@@ -446,10 +446,10 @@ QString HDHRStreamHandler::TunerGet(
                     .arg(name, error));
         }
 
-        return QString();
+        return {};
     }
 
-    return QString(value);
+    return {value};
 }
 
 QString HDHRStreamHandler::TunerSet(
@@ -461,7 +461,7 @@ QString HDHRStreamHandler::TunerSet(
     if (!m_hdhomerunDevice)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Set request failed (not connected)");
-        return QString();
+        return {};
     }
 
 
@@ -480,7 +480,7 @@ QString HDHRStreamHandler::TunerSet(
             QString("Set %1 to '%2' request failed").arg(valname, val) +
             ENO);
 
-        return QString();
+        return {};
     }
 
     if (report_error_return && error)
@@ -495,10 +495,10 @@ QString HDHRStreamHandler::TunerSet(
             }
         }
 
-        return QString();
+        return {};
     }
 
-    return QString(value);
+    return {value};
 }
 
 void HDHRStreamHandler::GetTunerStatus(struct hdhomerun_tuner_status_t *status)

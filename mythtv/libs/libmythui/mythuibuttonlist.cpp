@@ -1610,7 +1610,7 @@ QString MythUIButtonList::GetValue() const
     if (item)
         return item->GetText();
 
-    return QString();
+    return {};
 }
 
 QVariant MythUIButtonList::GetDataValue() const
@@ -1620,7 +1620,7 @@ QVariant MythUIButtonList::GetDataValue() const
     if (item)
         return item->GetData();
 
-    return QVariant();
+    return {};
 }
 
 MythRect MythUIButtonList::GetButtonArea(void) const
@@ -3324,7 +3324,7 @@ QString MythUIButtonListItem::GetText(const QString &name) const
     }
     if (m_strings.contains(name))
         return m_strings[name].text;
-    return QString();
+    return {};
 }
 
 TextProperties MythUIButtonListItem::GetTextProp(const QString &name) const
@@ -3537,7 +3537,7 @@ QString MythUIButtonListItem::GetImageFilename(const QString &name) const
     if (it != m_imageFilenames.end())
         return *it;
 
-    return QString();
+    return {};
 }
 
 void MythUIButtonListItem::SetProgress1(int start, int total, int used)
@@ -3599,7 +3599,7 @@ void MythUIButtonListItem::SetStateCb(muibCbFn fn, void *data)
 QString MythUIButtonListItem::GetState(const QString &name)
 {
     if (name.isEmpty())
-        return QString();
+        return {};
     if (m_stateCb.fn != nullptr)
     {
         QString result = m_stateCb.fn(name, m_textCb.data);
@@ -3608,7 +3608,7 @@ QString MythUIButtonListItem::GetState(const QString &name)
     }
     if (m_states.contains(name))
         return m_states[name];
-    return QString();
+    return {};
 }
 
 bool MythUIButtonListItem::checkable() const

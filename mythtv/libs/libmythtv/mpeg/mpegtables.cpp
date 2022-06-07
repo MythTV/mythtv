@@ -1111,12 +1111,12 @@ QString StreamID::GetDescription(uint stream_id)
         case StreamID::MPEG2IPMP2:
             return "13818-10 IPMP2";
 
-        case AnyMask:  return QString();
+        case AnyMask:  return {};
         case AnyVideo: return "video";
         case AnyAudio: return "audio";
     }
 
-    return QString();
+    return {};
 }
 
 QString ProgramMapTable::GetLanguage(uint i) const
@@ -1127,7 +1127,7 @@ QString ProgramMapTable::GetLanguage(uint i) const
         list, DescriptorID::iso_639_language);
 
     if (!lang_desc)
-        return QString();
+        return {};
 
     ISO639LanguageDescriptor iso_lang(lang_desc);
     if (!iso_lang.IsValid())
@@ -1213,7 +1213,7 @@ QString ConditionalAccessTable::toStringXML(uint indent_level) const
 QString SpliceTimeView::toString(int64_t first, int64_t last) const
 {
     if (!IsTimeSpecified())
-        return QString("splice_time(N/A)");
+        return {"splice_time(N/A)"};
 
     int64_t abs_pts_time = PTSTime();
     if ((first > 0) && (last > 0))

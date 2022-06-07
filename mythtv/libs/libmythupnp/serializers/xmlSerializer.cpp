@@ -374,5 +374,5 @@ QString XmlSerializer::FindOptionValue( const QStringList &sOptions, const QStri
     if (it != sOptions.cend())
         return (*it).mid( sKey.length() );
 
-    return QString();
+    return {};
 }

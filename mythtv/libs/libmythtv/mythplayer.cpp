@@ -1726,7 +1726,7 @@ QString MythPlayer::GetEncodingType(void) const
 {
     if (m_decoder)
         return get_encoding_type(m_decoder->GetVideoCodecID());
-    return QString();
+    return {};
 }
 
 bool MythPlayer::GetRawAudioState(void) const
@@ -1739,7 +1739,7 @@ bool MythPlayer::GetRawAudioState(void) const
 QString MythPlayer::GetXDS(const QString &key) const
 {
     if (!m_decoder)
-        return QString();
+        return {};
     return m_decoder->GetXDS(key);
 }
 

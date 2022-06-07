@@ -335,7 +335,7 @@ class ServiceID : public MythUISpinBoxSetting
     QString getValue(void) const override // StandardSetting
     {
         if (StandardSetting::getValue().toInt() == -1)
-            return QString();
+            return {};
         return StandardSetting::getValue();
     }
 };

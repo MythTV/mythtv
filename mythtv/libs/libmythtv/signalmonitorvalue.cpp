@@ -83,7 +83,7 @@ SignalMonitorValue::SignalMonitorValue(QString _name,
 QString SignalMonitorValue::GetName(void) const
 {
     if (m_name.isNull())
-        return QString();
+        return {};
 
     return m_name;
 }
@@ -91,7 +91,7 @@ QString SignalMonitorValue::GetName(void) const
 QString SignalMonitorValue::GetShortName(void) const
 {
     if (m_noSpaceName.isNull())
-        return QString();
+        return {};
 
     return m_noSpaceName;
 }

@@ -60,7 +60,7 @@ QStringList SatIP::doUPNPsearch(bool loginfo)
     if (!satipservers)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "No UPnP Sat>IP servers found");
-        return QStringList();
+        return {};
     }
 
     int count = satipservers->Count();

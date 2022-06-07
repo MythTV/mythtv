@@ -169,7 +169,7 @@ static QString LocalSubtitleFilename(QFileInfo &FileInfo)
             return file.absoluteFilePath();
     }
 
-    return QString();
+    return {};
 }
 
 bool MythFileBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds Retry)

@@ -759,7 +759,7 @@ QString MythThemedMenu::findMenuFile(const QString &menuname)
         return testdir;
     LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
-    return QString();
+    return {};
 }
 
 /** \brief Handle a MythTV action for the Menus.

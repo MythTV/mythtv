@@ -336,7 +336,7 @@ QDateTime dvbdate2qt(const unsigned char *buf)
     QTime time(byteBCD2int(buf[2]), byteBCD2int(buf[3]),
                byteBCD2int(buf[4]));
 
-    return QDateTime(date, time, Qt::UTC);
+    return {date, time, Qt::UTC};
 }
 
 /** \fn dvbdate2unix(const unsigned char*)

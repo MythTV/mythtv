@@ -830,7 +830,7 @@ bool MythDRMDevice::Initialise()
 QString MythDRMDevice::FindBestDevice()
 {
     if (!m_screen)
-        return QString();
+        return {};
 
     auto [root, devices] = GetDeviceList();
     if (devices.isEmpty())
@@ -845,7 +845,7 @@ QString MythDRMDevice::FindBestDevice()
     if (serial.isEmpty())
     {
         LOG(VB_GENERAL, m_verbose, LOC + "No serial number to search for");
-        return QString();
+        return {};
     }
 
     for (const auto& dev : qAsConst(devices))
@@ -860,7 +860,7 @@ QString MythDRMDevice::FindBestDevice()
         if (drmdevice.GetSerialNumber() == serial)
             return device;
     }
-    return QString();
+    return {};
 }
 
 bool MythDRMDevice::ConfirmDevice(const QString& Device)

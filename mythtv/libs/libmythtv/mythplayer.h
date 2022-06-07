@@ -221,12 +221,12 @@ class MTV_PUBLIC MythPlayer : public QObject
     virtual int GetNumTitles(void) const { return 0; }
     virtual int GetCurrentTitle(void) const { return 0; }
     virtual std::chrono::seconds GetTitleDuration(int /*title*/) const { return 0s; }
-    virtual QString GetTitleName(int /*title*/) const { return QString(); }
+    virtual QString GetTitleName(int /*title*/) const { return {}; }
 
     // Angle public stuff
     virtual int GetNumAngles(void) const { return 0; }
     virtual int GetCurrentAngle(void) const { return 0; }
-    virtual QString GetAngleName(int /*title*/) const { return QString(); }
+    virtual QString GetAngleName(int /*title*/) const { return {}; }
 
     // DVD public stuff
     virtual bool IsInStillFrame() const         { return false;     }

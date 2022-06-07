@@ -62,5 +62,5 @@ QDateTime PremiereContentTransmissionDescriptor::StartTimeUTC(uint index) const
     QTime time(byteBCD2int(buf[2]), byteBCD2int(buf[3]),
                byteBCD2int(buf[4]));
 
-    return QDateTime(date, time, Qt::UTC);
+    return {date, time, Qt::UTC};
 }

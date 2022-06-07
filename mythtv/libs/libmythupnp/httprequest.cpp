@@ -156,7 +156,7 @@ QString HTTPRequest::GetLastHeader( const QString &sType ) const
     QStringList values = m_mapHeaders.values( sType );
     if (!values.isEmpty())
         return values.last();
-    return QString();
+    return {};
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -863,7 +863,7 @@ QString HTTPRequest::GetResponseProtocol()
 //     else if (m_nMajor == 2)
 //         QString("HTTP/2.0");
 
-    return QString("HTTP/1.1");
+    return {"HTTP/1.1"};
 }
 
 /////////////////////////////////////////////////////////////////////////////

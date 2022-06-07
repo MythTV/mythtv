@@ -150,13 +150,13 @@ QDomNode MythTVMenu::GetNodeFromPath(const QString& path) const
 {
     QStringList pathList = path.split('/');
     if (pathList.isEmpty())
-        return QDomNode();
+        return {};
 
     // Root node is special
     QDomElement result = GetRoot();
     QString name = pathList.takeFirst();
     if ((result.tagName() != "menu") || (result.attribute("text") != name))
-        return QDomNode();
+        return {};
 
     // Start walking children
     while (!pathList.isEmpty())
@@ -180,7 +180,7 @@ QDomNode MythTVMenu::GetNodeFromPath(const QString& path) const
         if (!found)
         {
             // Oops. Have name but no matching child.
-            return QDomNode();
+            return {};
         }
     }
     return result;

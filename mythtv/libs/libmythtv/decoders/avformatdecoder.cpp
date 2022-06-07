@@ -4191,7 +4191,7 @@ QByteArray AvFormatDecoder::GetSubHeader(uint TrackNo)
 {
     QMutexLocker locker(&m_trackLock);
     if (TrackNo >= m_tracks[kTrackTypeSubtitle].size())
-        return QByteArray();
+        return {};
 
     int index = m_tracks[kTrackTypeSubtitle][TrackNo].m_av_stream_index;
     AVCodecContext *ctx = m_codecMap.GetCodecContext(m_ic->streams[index]);
@@ -5187,7 +5187,7 @@ QString AvFormatDecoder::GetRawEncodingType(void)
 {
     int stream = m_selectedTrack[kTrackTypeVideo].m_av_stream_index;
     if (stream < 0 || !m_ic)
-        return QString();
+        return {};
     return ff_codec_id_string(m_ic->streams[stream]->codecpar->codec_id);
 }
 

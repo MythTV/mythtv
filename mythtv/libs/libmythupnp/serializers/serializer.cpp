@@ -172,7 +172,7 @@ QString Serializer::ReadPropertyMetadata( const QObject *pObject,
         }
     }
 
-    return QString();
+    return {};
 }
 
 

@@ -2606,7 +2606,7 @@ QString CaptureCard::GetRawCardType(void) const
 {
     int cardid = getCardID();
     if (cardid <= 0)
-        return QString();
+        return {};
     return CardUtil::GetRawInputType(cardid);
 }
 

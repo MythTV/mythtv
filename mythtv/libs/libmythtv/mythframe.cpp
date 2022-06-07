@@ -530,7 +530,7 @@ QString MythVideoFrame::DeinterlacerName(MythDeintType Deint, bool DoubleRate, V
 QString MythVideoFrame::DeinterlacerPref(MythDeintType Deint)
 {
     if (DEINT_NONE == Deint)
-        return QString("None");
+        return {"None"};
     QString result;
     if (Deint & DEINT_BASIC)       result = "Basic";
     else if (Deint & DEINT_MEDIUM) result = "Medium";

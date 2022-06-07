@@ -316,7 +316,7 @@ QStringList MythPlayerCaptionsUI::GetTracks(uint Type)
 {
     if (m_decoder)
         return m_decoder->GetTracks(Type);
-    return QStringList();
+    return {};
 }
 
 uint MythPlayerCaptionsUI::GetTrackCount(uint Type)

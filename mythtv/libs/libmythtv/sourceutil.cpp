@@ -54,11 +54,11 @@ QString SourceUtil::GetSourceName(uint sourceid)
     if (!query.exec())
     {
         MythDB::DBError("SourceUtil::GetSourceName()", query);
-        return QString();
+        return {};
     }
     if (!query.next())
     {
-        return QString();
+        return {};
     }
 
     return query.value(0).toString();

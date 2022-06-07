@@ -668,7 +668,7 @@ QString MythDVDPlayer::GetAngleName(int Angle) const
         QString name = tr("Angle %1").arg(Angle);
         return name;
     }
-    return QString();
+    return {};
 }
 
 bool MythDVDPlayer::SwitchAngle(int Angle)

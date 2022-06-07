@@ -57,7 +57,7 @@ QString LookupUDN( const QString &sDeviceType )
     { 
         LOG(VB_GENERAL, LOG_ERR, sLoc + "- bad device type '" +
                                  sDeviceType + "', not enough tokens"); 
-        return QString();
+        return {};
     }
 
     sList.removeLast();

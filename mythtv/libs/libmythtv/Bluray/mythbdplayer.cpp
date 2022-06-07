@@ -246,14 +246,14 @@ QString MythBDPlayer::GetTitleName(int Title) const
         QString name = QString("%1 (%2)").arg(Title+1).arg(timestr);
         return name;
     }
-    return QString();
+    return {};
 }
 
 QString MythBDPlayer::GetAngleName(int Angle) const
 {
     if (Angle >= 1 && Angle <= GetNumAngles())
         return tr("Angle %1").arg(Angle);
-    return QString();
+    return {};
 }
 
 bool MythBDPlayer::SwitchTitle(int Title)

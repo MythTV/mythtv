@@ -1845,7 +1845,7 @@ class ParentalRatingDescriptor : public MPEGDescriptor
     {
         int o = 2 + i*4;
         if (i >= Count())
-            return QString("");
+            return {""};
         std::array<QChar,3> code
             { QChar(m_data[o]), QChar(m_data[o+1]), QChar(m_data[o+2]) };
         return QString(code.data(), 3);

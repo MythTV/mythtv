@@ -58,7 +58,7 @@ QString XMLParseBase::getFirstText(QDomElement &element)
         if (!t.isNull())
             return t.data();
     }
-    return QString();
+    return {};
 }
 
 bool XMLParseBase::parseBool(const QString &text)

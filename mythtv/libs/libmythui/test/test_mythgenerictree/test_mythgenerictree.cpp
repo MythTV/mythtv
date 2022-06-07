@@ -105,7 +105,7 @@ static QString test_cb_fn(const QString &name, void *data)
         return QStringLiteral("dos");
     if (name == QStringLiteral("three"))
         return QStringLiteral("tres");
-    return QString();
+    return {};
 }
 
 void TestMythGenericTree::test_text_cb(void)

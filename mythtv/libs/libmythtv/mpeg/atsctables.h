@@ -228,7 +228,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
     QString ShortChannelName(uint i) const
     {
         if (i >= ChannelCount())
-            return QString();
+            return {};
 
         QString str;
         const auto* ustr = reinterpret_cast<const unsigned short*>(m_ptrs[i]);

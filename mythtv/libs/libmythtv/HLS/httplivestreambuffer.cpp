@@ -1747,7 +1747,7 @@ QString HLSRingBuffer::ParseAttributes(const QString &line, const char *attr)
 {
     int p = line.indexOf(QLatin1String(":"));
     if (p < 0)
-        return QString();
+        return {};
 
     QStringList list = line.mid(p+1).split(',');
     for (const auto& it : qAsConst(list))
@@ -1761,7 +1761,7 @@ QString HLSRingBuffer::ParseAttributes(const QString &line, const char *attr)
             return arg.mid(pos+1);
         }
     }
-    return QString();
+    return {};
 }
 
 /**

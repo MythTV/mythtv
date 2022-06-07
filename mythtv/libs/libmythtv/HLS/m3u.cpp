@@ -28,7 +28,7 @@ namespace M3U
     {
         int p = line.indexOf(QLatin1String(":"));
         if (p < 0)
-            return QString();
+            return {};
 
         QStringList list = line.mid(p + 1).split(',');
         for (const auto & it : qAsConst(list))
@@ -42,7 +42,7 @@ namespace M3U
                 return arg.mid(pos+1);
             }
         }
-        return QString();
+        return {};
     }
 
     /**

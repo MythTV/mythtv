@@ -236,7 +236,7 @@ QString BrowserApi::GetMetadata(void)
     if (m_gotAnswer)
         return m_answer;
 
-    return QString("unknown");
+    return {"unknown"};
 }
 
 void BrowserApi::customEvent(QEvent *e)
@@ -729,14 +729,14 @@ void MythWebView::showDownloadMenu(void)
 QString MythWebView::getExtensionForMimetype(const QString &mimetype)
 {
     if (mimetype.isEmpty())
-        return QString("");
+        return {""};
 
     auto it = std::find_if(SupportedMimeTypes.cbegin(), SupportedMimeTypes.cend(),
                            [mimetype] (const MimeType& entry) -> bool
                                { return mimetype == entry.m_mimeType; });
     if (it != SupportedMimeTypes.cend())
         return it->m_extension;
-    return QString("");
+    return {""};
 }
 
 bool MythWebView::isMusicFile(const QString &extension, const QString &mimetype)
@@ -772,7 +772,7 @@ bool MythWebView::isVideoFile(const QString &extension, const QString &mimetype)
 QString MythWebView::getReplyMimetype(void)
 {
     if (!m_downloadReply)
-        return QString();
+        return {};
 
     QString mimeType;
     QVariant header = m_downloadReply->header(QNetworkRequest::ContentTypeHeader);
@@ -1274,7 +1274,7 @@ QIcon MythUIWebBrowser::GetIcon(void)
     {
         return QWebSettings::iconForUrl(m_browser->url());
     }
-    return QIcon();
+    return {};
 }
 
 /** \fn MythUIWebBrowser::GetUrl(void)
@@ -1287,7 +1287,7 @@ QUrl MythUIWebBrowser::GetUrl(void)
     {
         return m_browser->url();
     }
-    return QUrl();
+    return {};
 }
 
 /** \fn MythUIWebBrowser::GetTitle(void)
@@ -1298,7 +1298,7 @@ QString MythUIWebBrowser::GetTitle(void)
 {
     if (m_browser)
         return m_browser->title();
-    return QString("");
+    return {""};
 }
 
 /** \fn MythUIWebBrowser::evaluateJavaScript(const QString& scriptSource)
@@ -1312,7 +1312,7 @@ QVariant MythUIWebBrowser::evaluateJavaScript(const QString &scriptSource)
         QWebFrame *frame = m_browser->page()->currentFrame();
         return frame->evaluateJavaScript(scriptSource);
     }
-    return QVariant();
+    return {};
 }
 
 void MythUIWebBrowser::Scroll(int dx, int dy)

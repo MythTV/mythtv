@@ -341,7 +341,7 @@ bool HTTPLiveStream::AddSegment(void)
 QString HTTPLiveStream::GetHTMLPageName(void) const
 {
     if (m_streamid == -1)
-        return QString();
+        return {};
 
     QString outFile = m_outDir + "/" + m_outBase + ".html";
     return outFile;
@@ -385,7 +385,7 @@ bool HTTPLiveStream::WriteHTML(void)
 QString HTTPLiveStream::GetMetaPlaylistName(void) const
 {
     if (m_streamid == -1)
-        return QString();
+        return {};
 
     QString outFile = m_outDir + "/" + m_outBase + ".m3u8";
     return outFile;
@@ -432,10 +432,10 @@ bool HTTPLiveStream::WriteMetaPlaylist(void)
 QString HTTPLiveStream::GetPlaylistName(bool audioOnly) const
 {
     if (m_streamid == -1)
-        return QString();
+        return {};
 
     if (audioOnly && m_audioOutFile.isEmpty())
-        return QString();
+        return {};
 
     QString base = audioOnly ? m_audioOutFile : m_outFile;
     QString outFile = m_outDir + "/" + base + ".m3u8";
@@ -667,17 +667,17 @@ bool HTTPLiveStream::UpdatePercentComplete(int percent)
 QString HTTPLiveStream::StatusToString(HTTPLiveStreamStatus status)
 {
     switch (status) {
-        case kHLSStatusUndefined : return QString("Undefined");
-        case kHLSStatusQueued    : return QString("Queued");
-        case kHLSStatusStarting  : return QString("Starting");
-        case kHLSStatusRunning   : return QString("Running");
-        case kHLSStatusCompleted : return QString("Completed");
-        case kHLSStatusErrored   : return QString("Errored");
-        case kHLSStatusStopping  : return QString("Stopping");
-        case kHLSStatusStopped   : return QString("Stopped");
+        case kHLSStatusUndefined : return {"Undefined"};
+        case kHLSStatusQueued    : return {"Queued"};
+        case kHLSStatusStarting  : return {"Starting"};
+        case kHLSStatusRunning   : return {"Running"};
+        case kHLSStatusCompleted : return {"Completed"};
+        case kHLSStatusErrored   : return {"Errored"};
+        case kHLSStatusStopping  : return {"Stopping"};
+        case kHLSStatusStopped   : return {"Stopped"};
     };
 
-    return QString("Unknown status value");
+    return {"Unknown status value"};
 }
 
 bool HTTPLiveStream::LoadFromDB(void)

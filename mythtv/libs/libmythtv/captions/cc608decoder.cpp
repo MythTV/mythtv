@@ -1100,7 +1100,7 @@ QString CC608Decoder::GetXDS(const QString &key) const
     if (key == "tsid")
         return QString::number(m_xdsTsid);
 
-    return QString();
+    return {};
 }
 
 static std::array<const int,16> b1_to_service

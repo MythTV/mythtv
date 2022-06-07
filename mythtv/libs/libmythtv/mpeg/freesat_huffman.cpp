@@ -9,7 +9,7 @@ QString freesat_huffman_to_string(const unsigned char *compressed, uint size)
     const unsigned char *src = compressed;
 
     if ((src[1] != 1) && (src[1] != 2))
-        return QString("");
+        return {""};
 
     const std::vector<fsattab> &fsat_table = (src[1] == 1) ? fsat_table_1 : fsat_table_2;
     const std::vector<uint16_t> &fsat_index = (src[1] == 1) ? fsat_index_1 : fsat_index_2;

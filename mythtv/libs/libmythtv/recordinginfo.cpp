@@ -1664,7 +1664,7 @@ QString RecordingInfo::GetRecgroupString(uint recGroupID)
     if (!query.exec() || !query.next())
     {
         MythDB::DBError("GetRecgroupString()", query);
-        return QString();
+        return {};
     }
     return query.value(0).toString();
 }

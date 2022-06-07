@@ -95,7 +95,7 @@ QString DiSEqCDevDevice::TableToString(uint type, const TypeTableVec &table)
     for (const auto &item : table)
         if (type == item.value)
             return item.name;
-    return QString();
+    return {};
 }
 
 uint DiSEqCDevDevice::TableFromString(const QString   &type,

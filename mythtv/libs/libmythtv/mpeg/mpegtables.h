@@ -1138,13 +1138,13 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
 
     // if (splice_command_type == 0x04) splice_schedule()
     SpliceScheduleView SpliceSchedule(void) const
-        { return SpliceScheduleView(m_ptrs0, m_ptrs1); }
+        { return {m_ptrs0, m_ptrs1}; }
 
     //////////// SPLICE INSERT ////////////
 
     // if (splice_command_type == 0x05) splice_insert()
     SpliceInsertView SpliceInsert(void) const
-        { return SpliceInsertView(m_ptrs0, m_ptrs1); }
+        { return {m_ptrs0, m_ptrs1}; }
 
     //////////// TIME SIGNAL ////////////
 

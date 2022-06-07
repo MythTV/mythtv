@@ -379,7 +379,7 @@ QString MythScreenStack::GetLocation(bool fullPath) const
     if (m_topScreen)
         return m_topScreen->objectName();
 
-    return QString();
+    return {};
 }
 
 MythPainter* MythScreenStack::GetPainter(void)

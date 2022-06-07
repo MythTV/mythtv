@@ -15,5 +15,5 @@ bool MythRender::IsShared() const
 
 QStringList MythRender::GetDescription()
 {
-    return QStringList();
+    return {};
 }

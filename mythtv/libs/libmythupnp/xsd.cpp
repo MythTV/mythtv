@@ -939,5 +939,5 @@ QString Xsd::ReadPropertyMetadata( QObject *pObject, const QString& sPropName, c
         }
     }
 
-    return QString();
+    return {};
 }

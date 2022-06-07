@@ -44,7 +44,7 @@ class UPNP_PUBLIC HtmlServerExtension : public HttpServerExtension
         // processes the request.  
 
         QStringList GetBasePaths() override // HttpServerExtension
-            { return QStringList(); }
+            { return {}; }
 
         bool ProcessRequest( HTTPRequest *pRequest ) override; // HttpServerExtension
 

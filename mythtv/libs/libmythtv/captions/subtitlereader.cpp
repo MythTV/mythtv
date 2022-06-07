@@ -112,7 +112,7 @@ QStringList SubtitleReader::GetRawTextSubtitles(std::chrono::milliseconds &durat
 {
     QMutexLocker lock(&m_rawTextSubtitles.m_lock);
     if (m_rawTextSubtitles.m_buffers.empty())
-        return QStringList();
+        return {};
 
     duration = m_rawTextSubtitles.m_duration;
     QStringList result = m_rawTextSubtitles.m_buffers;

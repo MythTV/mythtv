@@ -25,7 +25,7 @@ QString DTVParamHelper::toString(const DTVParamStringVec &strings, int index)
         LOG(VB_GENERAL, LOG_ERR,
             "DTVParamHelper::toString() index out of bounds");
 
-        return QString();
+        return {};
     }
 
     return QString::fromStdString(strings[index]);

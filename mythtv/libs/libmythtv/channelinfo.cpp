@@ -199,7 +199,7 @@ QString ChannelInfo::GetFormatted(ChannelFormat format) const
 
 
     if (tmp.isEmpty())
-        return QString();
+        return {};
 
     tmp.replace("<num>",  m_chanNum);
     tmp.replace("<sign>", m_callSign);
@@ -523,15 +523,15 @@ QString toRawString(ChannelVisibleType type)
     switch (type)
     {
         case kChannelAlwaysVisible:
-            return QString("Always Visible");
+            return {"Always Visible"};
         case kChannelVisible:
-            return QString("Visible");
+            return {"Visible"};
         case kChannelNotVisible:
-            return QString("Not Visible");
+            return {"Not Visible"};
         case kChannelNeverVisible:
-            return QString("Never Visible");
+            return {"Never Visible"};
         default:
-            return QString("Unknown");
+            return {"Unknown"};
     }
 }
 

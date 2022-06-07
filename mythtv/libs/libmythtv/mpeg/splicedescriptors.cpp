@@ -106,11 +106,11 @@ QString SpliceDescriptor::DescriptorTagString(void) const
     switch (DescriptorTag())
     {
         case SpliceDescriptorID::avail:
-            return QString("Avail");
+            return {"Avail"};
         case SpliceDescriptorID::dtmf:
-            return QString("DTMF");
+            return {"DTMF"};
         case SpliceDescriptorID::segmentation:
-            return QString("Segmentation");
+            return {"Segmentation"};
         default:
             return QString("Unknown(%1)").arg(DescriptorTag());
     }

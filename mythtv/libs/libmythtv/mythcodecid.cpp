@@ -705,10 +705,10 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_MMAL_END:
         case kCodec_MMAL_DEC_END:
         case kCodec_DRMPRIME_END:
-            return QString();
+            return {};
     }
 
-    return QString();
+    return {};
 }
 
 QString get_decoder_name(MythCodecID codec_id)

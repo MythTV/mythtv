@@ -302,7 +302,7 @@ class AC3AudioStreamDescriptor : public MPEGDescriptor
             return str;
         }
 #endif
-        return QString("TODO");
+        return {"TODO"};
     }
     // for(i=0; i<N; i++) {
     //   additional_info[i] Nx8 bslbf

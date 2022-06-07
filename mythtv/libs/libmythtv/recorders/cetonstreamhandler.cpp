@@ -483,7 +483,7 @@ QString CetonStreamHandler::GetVar(
     {
         LOG(VB_GENERAL, LOG_ERR, loc +
             QString("HttpRequest failed - %1").arg(response));
-        return QString();
+        return {};
     }
 
     static const QRegularExpression regex { "^\\{ \"?result\"?: \"(.*)\" \\}$"};
@@ -492,7 +492,7 @@ QString CetonStreamHandler::GetVar(
     {
         LOG(VB_GENERAL, LOG_ERR, loc +
             QString("unexpected http response: -->%1<--").arg(response));
-        return QString();
+        return {};
     }
 
     QString result = match.captured(1);
@@ -514,7 +514,7 @@ QStringList CetonStreamHandler::GetProgramList()
     {
         LOG(VB_GENERAL, LOG_ERR,
             loc + QString("HttpRequest failed - %1").arg(response));
-        return QStringList();
+        return {};
     }
 
     static const QRegularExpression regex(
@@ -526,7 +526,7 @@ QStringList CetonStreamHandler::GetProgramList()
         LOG(VB_GENERAL, LOG_ERR,
             loc + QString("returned unexpected output: -->%1<--")
             .arg(response));
-        return QStringList();
+        return {};
     }
 
     LOG(VB_RECORD, LOG_DEBUG, loc + QString("got: -->%1<--")

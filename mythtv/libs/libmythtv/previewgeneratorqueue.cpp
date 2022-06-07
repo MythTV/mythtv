@@ -442,7 +442,7 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
     {
         SendEvent(pginfo, "PREVIEW_FAILED", key, token,
                   "Pending Delete", QDateTime());
-        return QString();
+        return {};
     }
 
     // keep in sync with default filename in PreviewGenerator::RunReal

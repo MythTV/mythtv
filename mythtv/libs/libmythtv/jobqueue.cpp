@@ -1503,7 +1503,7 @@ QString JobQueue::GetJobArgs(int jobID)
         MythDB::DBError("Error in JobQueue::GetJobArgs()", query);
     }
 
-    return QString("");
+    return {""};
 }
 
 enum JobFlags JobQueue::GetJobFlags(int jobID)

@@ -13,7 +13,7 @@ QString MythUILocation::RemoveCurrentLocation()
 {
     QWriteLocker locker(&m_locationLock);
     if (m_currentLocation.isEmpty())
-        return QString("UNKNOWN");
+        return {"UNKNOWN"};
     return m_currentLocation.takeLast();
 }
 

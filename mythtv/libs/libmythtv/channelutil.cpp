@@ -754,7 +754,7 @@ bool ChannelUtil::GetTuningParams(uint      mplexid,
 QString ChannelUtil::GetChannelStringField(int chan_id, const QString &field)
 {
     if (chan_id < 0)
-        return QString();
+        return {};
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(QString("SELECT %1 FROM channel "
@@ -763,11 +763,11 @@ QString ChannelUtil::GetChannelStringField(int chan_id, const QString &field)
     if (!query.exec())
     {
         MythDB::DBError("Selecting channel/dtv_multiplex 1", query);
-        return QString();
+        return {};
     }
 
     if (!query.next())
-        return QString();
+        return {};
 
     return query.value(0).toString();
 }
@@ -1094,7 +1094,7 @@ QStringList ChannelUtil::GetValidRecorderList(
         return get_valid_recorder_list(chanid);
     if (!channum.isEmpty())
         return get_valid_recorder_list(channum);
-    return QStringList();
+    return {};
 }
 
 
@@ -1989,7 +1989,7 @@ IPTVTuningData ChannelUtil::GetIPTVTuningData(uint chanid)
     if (!query.exec())
     {
         MythDB::DBError("GetChannelData -- iptv", query);
-        return IPTVTuningData();
+        return {};
     }
 
     QString data_url;

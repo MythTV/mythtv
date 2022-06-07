@@ -147,7 +147,7 @@ class MTV_PUBLIC IPTVTuningData
             return GetFECURL0();
         if (2 == i)
             return GetFECURL1();
-        return QUrl();
+        return {};
     }
     uint GetBitrate(uint i) const { return m_bitrate[i]; }
 
@@ -159,12 +159,12 @@ class MTV_PUBLIC IPTVTuningData
             return "data";
         switch (m_fecType)
         {
-            case kNone: return QString();
+            case kNone: return {};
             case kRFC2733: return QString("rfc2733-%1").arg(i);
             case kRFC5109: return QString("rfc5109-%1").arg(i);
             case kSMPTE2022: return QString("smpte2022-%1").arg(i);
         }
-        return QString();
+        return {};
     }
 
     static uint GetURLCount(void) { return 3; }

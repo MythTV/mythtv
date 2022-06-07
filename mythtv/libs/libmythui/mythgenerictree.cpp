@@ -568,7 +568,7 @@ QString MythGenericTree::GetText(const QString &name) const
 
     if (m_strings.contains(name))
         return m_strings[name].text;
-    return QString();
+    return {};
 }
 
 void MythGenericTree::SetImage(const QString &filename, const QString &name)
@@ -592,7 +592,7 @@ void MythGenericTree::SetImageCb(mgtCbFn fn, void *data)
 QString MythGenericTree::GetImage(const QString &name) const
 {
     if (name.isEmpty())
-        return QString();
+        return {};
 
     if (m_imageCb.fn != nullptr)
     {
@@ -605,7 +605,7 @@ QString MythGenericTree::GetImage(const QString &name) const
     if (it != m_imageFilenames.end())
         return *it;
 
-    return QString();
+    return {};
 }
 
 void MythGenericTree::DisplayStateFromMap(const InfoMap &infoMap)
@@ -629,7 +629,7 @@ void MythGenericTree::DisplayState(const QString &state, const QString &name)
 QString MythGenericTree::GetState(const QString &name) const
 {
     if (name.isEmpty())
-        return QString();
+        return {};
 
     if (m_stateCb.fn != nullptr)
     {
@@ -642,5 +642,5 @@ QString MythGenericTree::GetState(const QString &name) const
     if (it != m_states.end())
         return *it;
 
-    return QString();
+    return {};
 }

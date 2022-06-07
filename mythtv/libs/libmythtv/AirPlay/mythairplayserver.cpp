@@ -266,7 +266,7 @@ class APHTTPRequest
     QByteArray GetLine(void)
     {
         int next = m_data.indexOf("\r\n", m_readPos);
-        if (next < 0) return QByteArray();
+        if (next < 0) return {};
         QByteArray line = m_data.mid(m_readPos, next - m_readPos);
         m_readPos = next + 2;
         return line;

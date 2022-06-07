@@ -1380,7 +1380,7 @@ QDateTime MythNotificationCenter::ScreenExpiryTime(const MythScreenType *screen)
 {
     const auto *s = qobject_cast<const MythNotificationScreen*>(screen);
     if (!s)
-        return QDateTime();
+        return {};
     return s->m_expiry;
 }
 
