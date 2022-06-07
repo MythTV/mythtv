@@ -132,7 +132,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     QSize   GetVideoSize(void) const          { return m_videoDispDim; }
     float   GetVideoAspect(void) const        { return m_videoAspect; }
     float   GetFrameRate(void) const          { return m_videoFrameRate; }
-    bool    IsAudioNeeded(void) { return ((FlagIsSet(kVideoIsNull)) == 0); }
+    bool    IsAudioNeeded(void)               { return !FlagIsSet(kVideoIsNull); }
     int     GetFreeVideoFrames(void) const;
 
     int     GetFFRewSkip(void) const          { return m_ffrewSkip; }
@@ -317,7 +317,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     bool GetEditMode(void) const { return m_deleteMap.IsEditing(); }
     bool IsInDelete(uint64_t frame);
 
-    bool FlagIsSet(PlayerFlags arg) { return m_playerFlags & arg; }
+    bool FlagIsSet(PlayerFlags arg) { return (m_playerFlags & arg) != 0; }
 
   protected:
     // Private Sets
@@ -496,7 +496,7 @@ class MTV_PUBLIC MythPlayer : public QObject
         {microsecondsFromFloat(1000000.0F / 30)};///< always adjusted for play_speed
     int        m_fpsMultiplier            {1}; ///< used to detect changes
     int        m_ffrewSkip                {1};
-    int        m_ffrewUseRenderOne        {false}; // mediacode work around
+    bool       m_ffrewUseRenderOne        {false}; // mediacode work around
     int        m_ffrewAdjust              {0}; ///< offset after last skip
     float      m_ffrewScale               {1.0F}; ///< scale skip for large gops
     bool       m_fileChanged              {false};
