@@ -1,6 +1,8 @@
 // Qt
 #include <QDateTime>
 #include <QFileInfo>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 // MythTV
 #include "mythlogging.h"
@@ -196,6 +198,22 @@ void* MythHTTPMetaMethod::CreateParameter(void* Parameter, int Type, const QStri
             *(static_cast<QDateTime*>(Parameter)) = dt;
             break;
         }
+        case QMetaType::QJsonObject :
+        {
+            QJsonDocument doc = QJsonDocument::fromJson(Value.toUtf8());
+            // check validity of the document
+            if(!doc.isNull())
+            {
+                if(doc.isObject())
+                    *(static_cast<QJsonObject *>(Parameter)) = doc.object();
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Invalid JSON: %1").arg(Value));
+                *(static_cast<QJsonObject *>(Parameter)) = QJsonObject();
+            }
+            break;
+        }
         default: break;
     }
     return Parameter;
@@ -229,4 +247,3 @@ QVariant MythHTTPMetaMethod::CreateReturnValue(int Type, void* Value)
     return QVariant(QMetaType(Type), Value);
 #endif
 }
-
