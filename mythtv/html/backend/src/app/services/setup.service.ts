@@ -925,14 +925,15 @@ export class SetupService {
             Value: this.m_EpgDownload.MythFillEnabled ? "1" : "0"}).subscribe(this.EpgDownloadObs);
     }
 
-    currentForm! : NgForm;
+    currentForm! : NgForm | null;
 
-    getCurrentForm() : NgForm {
+    getCurrentForm() : NgForm | null{
         return this.currentForm;
     }
 
-    setCurrentForm(form : NgForm) {
+    setCurrentForm(form : NgForm | null) {
         this.currentForm = form;
+
     }
 
 }

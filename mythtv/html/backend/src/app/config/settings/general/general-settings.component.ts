@@ -47,8 +47,6 @@ export class SettingsComponent implements OnInit, CanComponentDeactivate {
 
     onTabClose(e: any) {
         this.showDirty();
-        console.log("onTabClose");
-        console.log(e);
     }
 
     showDirty() {

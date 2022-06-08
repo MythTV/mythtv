@@ -7,12 +7,15 @@ import { StatusComponent } from './status/status.component';
 import { TestbedComponent } from './testbed/testbed.component';
 import { SettingsComponent } from './config/settings/general/general-settings.component';
 import { CanDeactivateGuardService } from './can-deactivate-guard.service';
+import { CaptureCardsComponent } from './config/settings/capture-cards/capture-cards.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
   { path: 'status', component: StatusComponent },
   { path: 'setupwizard', component: SetupWizardComponent },
   { path: 'settings/general', component: SettingsComponent,
+      canDeactivate: [CanDeactivateGuardService] },
+  { path: 'settings/capture-cards', component: CaptureCardsComponent,
       canDeactivate: [CanDeactivateGuardService] },
   { path: 'testbed', component: TestbedComponent },
   { path: 'guide', component: GuideComponent },

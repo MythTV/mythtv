@@ -46,6 +46,8 @@ import { JobqueueBackendComponent } from './config/settings/general/jobqueue-bac
 import { JobqueueGlobalComponent } from './config/settings/general/jobqueue-global/jobqueue-global.component';
 import { JobqueueCommandsComponent } from './config/settings/general/jobqueue-commands/jobqueue-commands.component';
 import { EpgDownloadingComponent } from './config/settings/general/epg-downloading/epg-downloading.component';
+import { CaptureCardsComponent } from './config/settings/capture-cards/capture-cards.component';
+import { CetonComponent } from './config/settings/capture-cards/ceton/ceton.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -88,6 +90,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     JobqueueGlobalComponent,
     JobqueueCommandsComponent,
     EpgDownloadingComponent,
+    CaptureCardsComponent,
+    CetonComponent,
   ],
   imports: [
     BrowserModule,

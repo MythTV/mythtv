@@ -23,7 +23,7 @@ export class SidenavComponent implements OnInit {
         label: "",
         items: [
             {routerLink: 'settings/general'},
-            { routerLink: ''},
+            { routerLink: 'settings/capture-cards'},
             { routerLink: ''},
             { routerLink: ''},
             { routerLink: ''},

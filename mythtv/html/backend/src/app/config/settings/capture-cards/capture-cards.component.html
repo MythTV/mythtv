@@ -1,0 +1,20 @@
+<div  class="block card w-full">
+    <h3>{{ 'settings.capture.title' | translate }}</h3>
+
+    <p-accordion class="col-12 w-full" (onClose)="onTabClose($event)" (onOpen)="onTabOpen($event)">
+        <p-accordionTab
+                *ngFor="let card of m_CaptureCardsFiltered; index as i; first as isFirst">
+            <ng-template pTemplate="header">
+                {{m_CaptureCardsFiltered[i].CardType}}
+                {{m_CaptureCardsFiltered[i].VideoDevice}}
+                ({{m_CaptureCardsFiltered[i].DisplayName}})
+                <b>&nbsp;{{ dirtyMessages[i] }}</b>
+            </ng-template>
+            <ng-template pTemplate="content">
+                <app-ceton *ngIf="m_CaptureCardsFiltered[i].CardType == 'CETON'"
+                    [card]="m_CaptureCardsFiltered[i]" [cardList]="m_CaptureCardList"></app-ceton>
+            </ng-template>
+        </p-accordionTab>
+
+    </p-accordion>
+</div>

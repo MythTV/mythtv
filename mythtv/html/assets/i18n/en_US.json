@@ -346,7 +346,23 @@
             "title": "General Backend Settings"
         },
         "unsaved": "(Unsaved Changes)",
-        "warning": "If you continue you may lose your changes."
+        "warning": "If you continue you may lose your changes.",
+        "capture": {
+            "title": "Capture Cards",
+            "ceton": {
+                "title": "Ceton Cablecard Tuner",
+                "ipaddress_label": "IP Address",
+                "ipaddress_desc": "IP Address of the Ceton device (192.168.200.1 by default)",
+                "tuner_label": "Tuner",
+                "tuner_desc": "Number of the tuner on the Ceton device (first tuner is number 0)",
+                "deviceid_label": "Device Id",
+                "deviceid_desc": "Device ID of the Ceton tuner (Read only, derived from IP address and tuner)"
+            },
+            "sigtimeout_label": "Signal timeout (ms)",
+            "sigtimeout_desc": "Maximum time (in milliseconds) MythTV waits for a signal when scanning for channels.",
+            "tunetimeout_label": "Tuning timeout (ms)",
+            "tunetimeout_desc": "Maximum time (in milliseconds) MythTV waits for a channel lock.  For recordings, if this time is exceeded, the recording will be marked as failed."
+        }
     },
     "sidenav": {
         "settingsmenu": {
