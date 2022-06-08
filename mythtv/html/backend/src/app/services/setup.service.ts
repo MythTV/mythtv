@@ -108,7 +108,7 @@ export class SetupService {
             if (x.bool)
                 this.m_HostAddressData.successCount ++;
             else
-                this.m_HostAddressData.errorCount;
+                this.m_HostAddressData.errorCount++;
         },
         error: (err: any) => {
             console.error(err);
@@ -193,7 +193,7 @@ export class SetupService {
             if (x.bool)
                 this.m_LocaleData.successCount ++;
             else
-                this.m_LocaleData.errorCount;
+                this.m_LocaleData.errorCount++;
         },
         error: (err: any) => {
             console.error(err);
@@ -287,7 +287,7 @@ export class SetupService {
             if (x.bool)
                 this.m_miscellaneousData.successCount ++;
             else
-                this.m_miscellaneousData.errorCount;
+                this.m_miscellaneousData.errorCount++;
         },
         error: (err: any) => {
             console.error(err);
@@ -352,7 +352,7 @@ export class SetupService {
             if (x.bool)
                 this.m_EITScanner.successCount++;
             else
-                this.m_EITScanner.errorCount;
+                this.m_EITScanner.errorCount++;
         },
         error: (err: any) => {
             console.error(err);
@@ -440,7 +440,7 @@ export class SetupService {
             if (x.bool)
                 this.m_ShutWake.successCount++;
             else
-                this.m_ShutWake.errorCount;
+                this.m_ShutWake.errorCount++;
         },
         error: (err: any) => {
             console.error(err);
@@ -518,7 +518,7 @@ export class SetupService {
             if (x.bool)
                 this.m_BackendWake.successCount++;
             else
-                this.m_BackendWake.errorCount;
+                this.m_BackendWake.errorCount++;
         },
         error: (err: any) => {
             console.error(err);
@@ -570,7 +570,7 @@ export class SetupService {
             if (x.bool)
                 this.m_BackendControl.successCount++;
             else
-                this.m_BackendControl.errorCount;
+                this.m_BackendControl.errorCount++;
         },
         error: (err: any) => {
             console.error(err);
@@ -711,7 +711,7 @@ export class SetupService {
             if (x.bool)
                 this.m_JobQBackend.successCount++;
             else
-                this.m_JobQBackend.errorCount;
+                this.m_JobQBackend.errorCount++;
         },
         error: (err: any) => {
             console.error(err);
@@ -791,7 +791,7 @@ export class SetupService {
             if (x.bool)
                 this.m_JobQCommands.successCount++;
             else
-                this.m_JobQCommands.errorCount;
+                this.m_JobQCommands.errorCount++;
         },
         error: (err: any) => {
             console.error(err);
@@ -864,7 +864,7 @@ export class SetupService {
             if (x.bool)
                 this.m_JobQGlobal.successCount++;
             else
-                this.m_JobQGlobal.errorCount;
+                this.m_JobQGlobal.errorCount++;
         },
         error: (err: any) => {
             console.error(err);
@@ -910,7 +910,7 @@ export class SetupService {
             if (x.bool)
                 this.m_EpgDownload.successCount++;
             else
-                this.m_EpgDownload.errorCount;
+                this.m_EpgDownload.errorCount++;
         },
         error: (err: any) => {
             console.error(err);
