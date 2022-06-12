@@ -58,7 +58,7 @@ class CC608Decoder
     ~CC608Decoder();
 
     void FormatCC(std::chrono::milliseconds tc, int code1, int code2);
-    void FormatCCField(std::chrono::milliseconds tc, int field, int data);
+    void FormatCCField(std::chrono::milliseconds tc, size_t field, int data);
     bool FalseDup(std::chrono::milliseconds tc, int field, int data);
 
     void DecodeVPS(const unsigned char *buf);
@@ -80,9 +80,9 @@ class CC608Decoder
 
   private:
     QChar CharCC(int code) const { return m_stdChar[code]; }
-    void ResetCC(int mode);
-    void BufferCC(int mode, int len, int clr);
-    int NewRowCC(int mode, int len);
+    void ResetCC(size_t mode);
+    void BufferCC(size_t mode, int len, int clr);
+    int NewRowCC(size_t mode, int len);
 
     QString XDSDecodeString(const std::vector<unsigned char>&buf,
                             uint start, uint end) const;

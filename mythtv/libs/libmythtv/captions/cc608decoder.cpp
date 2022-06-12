@@ -98,10 +98,10 @@ static const std::array<const QChar,32> extendedchar3 =
     QChar(0x250C),     QChar(0x2510),     QChar(0x2514),     QChar(0x2518)      // ┌┐└┘
 };
 
-void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, int field, int data)
+void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, size_t field, int data)
 {
-    int len = 0;
-    int mode = 0;
+    size_t len = 0;
+    size_t mode = 0;
 
     if (data == -1)              // invalid data. flush buffers to be safe.
     {
@@ -147,14 +147,14 @@ void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, int field, int da
         mode = field << 2 |
             (m_txtMode[field*2 + m_ccMode[field]] << 1) |
             m_ccMode[field];
-        if (mode >= 0)
+        if (mode != std::numeric_limits<std::size_t>::max())
             len = m_ccBuf[mode].length();
         else
             len = 0;
     }
     else
     {
-        mode = -1;
+        mode = std::numeric_limits<std::size_t>::max();
         len = 0;
     }
 
@@ -172,7 +172,7 @@ void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, int field, int da
         // 0x20 <= b1 <= 0x7F
         // text codes
     {
-        if (mode >= 0)
+        if (mode != std::numeric_limits<std::size_t>::max())
         {
             m_lastCodeTc[field] += 33ms;
             m_timeCode[mode] = tc;
@@ -606,7 +606,7 @@ bool CC608Decoder::FalseDup(std::chrono::milliseconds tc, int field, int data)
     return false;
 }
 
-void CC608Decoder::ResetCC(int mode)
+void CC608Decoder::ResetCC(size_t mode)
 {
 //    m_lastRow[mode] = 0;
 //    m_newRow[mode] = 0;
@@ -661,7 +661,7 @@ QString CC608Decoder::ToASCII(const QString &cc608str, bool suppress_unknown)
     return ret;
 }
 
-void CC608Decoder::BufferCC(int mode, int len, int clr)
+void CC608Decoder::BufferCC(size_t mode, int len, int clr)
 {
     QByteArray tmpbuf;
     if (len)
@@ -723,7 +723,7 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
         m_lastClr[mode] = 0ms;
 }
 
-int CC608Decoder::NewRowCC(int mode, int len)
+int CC608Decoder::NewRowCC(size_t mode, int len)
 {
     if (m_style[mode] == CC_STYLE_ROLLUP)
     {
