@@ -5405,13 +5405,13 @@ void ProgramInfo::SubstituteMatches(QString &str)
     }
 
     str.replace(QString("%FILE%"), GetBasename());
-    str.replace(QString("%TITLE%"), m_title);
-    str.replace(QString("%SUBTITLE%"), m_subtitle);
+    str.replace(QString("%TITLE%"), m_title.replace("\"", "ʺ"));
+    str.replace(QString("%SUBTITLE%"), m_subtitle.replace("\"", "ʺ"));
     str.replace(QString("%SEASON%"), QString::number(m_season));
     str.replace(QString("%EPISODE%"), QString::number(m_episode));
     str.replace(QString("%TOTALEPISODES%"), QString::number(m_totalEpisodes));
     str.replace(QString("%SYNDICATEDEPISODE%"), m_syndicatedEpisode);
-    str.replace(QString("%DESCRIPTION%"), m_description);
+    str.replace(QString("%DESCRIPTION%"), m_description.replace("\"", "ʺ"));
     str.replace(QString("%HOSTNAME%"), m_hostname);
     str.replace(QString("%CATEGORY%"), m_category);
     str.replace(QString("%RECGROUP%"), m_recGroup);
