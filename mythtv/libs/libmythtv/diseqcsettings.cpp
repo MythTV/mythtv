@@ -584,10 +584,12 @@ class SCRUserBandSetting : public TransMythUISpinBoxSetting
 {
   public:
     explicit SCRUserBandSetting(DiSEqCDevSCR &scr) :
-        TransMythUISpinBoxSetting(0, 8, 1), m_scr(scr)
+        TransMythUISpinBoxSetting(0, 7, 1), m_scr(scr)
     {
         setLabel(DeviceTree::tr("Userband"));
-        setHelpText(DeviceTree::tr("Unicable userband ID (0-7) or sometimes (1-8)"));
+        setHelpText(DeviceTree::tr(
+            "Unicable userband ID (0-7). The Unicable userband channels "
+            "are often numbered starting at 1 but MythTV starts at 0."));
     }
 
     void Load(void) override // StandardSetting

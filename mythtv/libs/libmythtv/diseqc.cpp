@@ -796,7 +796,6 @@ void DiSEqCDevTree::Open(int fd_frontend, bool is_SCR)
 
 bool DiSEqCDevTree::SetVoltage(uint voltage)
 {
-
     if (voltage == m_lastVoltage)
         return true;
 
@@ -1429,9 +1428,6 @@ bool DiSEqCDevSwitch::ExecuteLegacy(const DiSEqCDevSettings &settings,
 #ifdef USING_DVB
 static bool set_tone(int fd, fe_sec_tone_mode tone)
 {
-    (void) fd;
-    (void) tone;
-
     bool success = false;
 
     for (uint retry = 0; !success && (retry < TIMEOUT_RETRIES); retry++)
@@ -1454,9 +1450,6 @@ static bool set_tone(int fd, fe_sec_tone_mode tone)
 #ifdef USING_DVB
 static bool set_voltage(int fd, fe_sec_voltage volt)
 {
-    (void) fd;
-    (void) volt;
-
     bool success = false;
 
     for (uint retry = 0; !success && (retry < TIMEOUT_RETRIES); retry++)
@@ -1479,9 +1472,6 @@ static bool set_voltage(int fd, fe_sec_voltage volt)
 #ifdef USING_DVB
 static bool mini_diseqc(int fd, fe_sec_mini_cmd cmd)
 {
-    (void) fd;
-    (void) cmd;
-
     bool success = false;
 
     for (uint retry = 0; !success && (retry < TIMEOUT_RETRIES); retry++)
@@ -1723,7 +1713,7 @@ bool DiSEqCDevRotor::Execute(const DiSEqCDevSettings &settings,
         m_lastPosition = position;
         m_reset = false;
         if (success)
-            // prevent tuning paramaters overiding rotor parameters
+            // prevent tuning parameters overriding rotor parameters
             usleep(DISEQC_LONG_WAIT);
     }
 
@@ -1789,7 +1779,7 @@ bool DiSEqCDevRotor::IsMoving(const DiSEqCDevSettings &settings) const
 }
 
 uint DiSEqCDevRotor::GetVoltage(const DiSEqCDevSettings &settings,
-                                const DTVMultiplex         &tuning) const
+                                const DTVMultiplex      &tuning) const
 {
     // override voltage if the last position is known and the rotor is moving
     if (IsMoving(settings))
@@ -2139,15 +2129,16 @@ bool DiSEqCDevSCR::Execute(const DiSEqCDevSettings &settings, const DTVMultiplex
     auto scr_position = (dvbdev_pos_t)int(settings.GetValue(GetDeviceID()));
 
     // check parameters
-    if (m_scrUserband > 8)
+    if (m_scrUserband > 7)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("SCR: Userband ID=%1 is out of standard range!")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("SCR: Userband ID=%1 is out of range (0-7)!")
         .arg(m_scrUserband));
+        return false;
     }
 
     if (t >= 1024)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "SCR: T out of range!");
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("SCR: T=%1 is out of range!").arg(t));
         return false;
     }
 
@@ -2184,10 +2175,11 @@ bool DiSEqCDevSCR::Execute(const DiSEqCDevSettings &settings, const DTVMultiplex
 bool DiSEqCDevSCR::PowerOff(void) const
 {
     // check parameters
-    if (m_scrUserband > 8)
+    if (m_scrUserband > 7)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("SCR: Userband ID=%1 is out of standard range!")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("SCR: Userband ID=%1 is out of range (0-7)!")
         .arg(m_scrUserband));
+        return false;
     }
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("SCR: Power off UB=%1%7")
