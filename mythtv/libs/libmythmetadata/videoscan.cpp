@@ -210,7 +210,6 @@ void VideoScannerThread::run()
 
         QStringList slist;
 
-        QList<int>::const_iterator i;
         for (int id : qAsConst(m_addList))
             slist << QString("added::%1").arg(id);
         for (int id : qAsConst(m_movList))
