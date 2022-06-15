@@ -26,7 +26,7 @@ signals:
 
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 private slots:
-    void ImageSizeChanged();
+    static void ImageSizeChanged();
 #endif
 
 public:
