@@ -53,7 +53,7 @@ class MenuSubjects
 {
 public:
     MenuSubjects() = default;
-    MenuSubjects(const ImagePtrK& selection, int childCount,
+    MenuSubjects(const ImagePtrK& selection, ssize_t childCount,
                  MarkedFiles &marked, MarkedFiles &prevMarked,
                  bool hiddenMarked, bool unhiddenMarked)
         : m_selected(selection),
@@ -67,7 +67,7 @@ public:
     bool        m_selectedMarked {false};   //!< Is selected item marked ?
     ImageIdList m_markedId;                 //!< Ids of all marked items
     ImageIdList m_prevMarkedId;             //!< Ids of marked items in previous dir
-    int         m_childCount     {0};       //!< Number of images & dirs excl parent
+    ssize_t     m_childCount     {0};       //!< Number of images & dirs excl parent
     bool        m_hiddenMarked   {false};   //!< Is any marked item hidden ?
     bool        m_unhiddenMarked {false};   //!< Is any marked item unhidden ?
 };
