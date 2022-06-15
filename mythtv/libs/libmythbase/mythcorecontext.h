@@ -18,25 +18,25 @@
 
 class Configuration;
 
-#define MYTH_APPNAME_MYTHBACKEND "mythbackend"
-#define MYTH_APPNAME_MYTHJOBQUEUE "mythjobqueue"
-#define MYTH_APPNAME_MYTHFRONTEND "mythfrontend"
-#define MYTH_APPNAME_MYTHTV_SETUP "mythtv-setup"
-#define MYTH_APPNAME_MYTHFILLDATABASE "mythfilldatabase"
-#define MYTH_APPNAME_MYTHCOMMFLAG "mythcommflag"
-#define MYTH_APPNAME_MYTHCCEXTRACTOR "mythccextractor"
-#define MYTH_APPNAME_MYTHPREVIEWGEN "mythpreviewgen"
-#define MYTH_APPNAME_MYTHTRANSCODE "mythtranscode"
-#define MYTH_APPNAME_MYTHWELCOME "mythwelcome"
-#define MYTH_APPNAME_MYTHSHUTDOWN "mythshutdown"
-#define MYTH_APPNAME_MYTHLCDSERVER "mythlcdserver"
-#define MYTH_APPNAME_MYTHAVTEST "mythavtest"
-#define MYTH_APPNAME_MYTHMEDIASERVER "mythmediaserver"
-#define MYTH_APPNAME_MYTHMETADATALOOKUP "mythmetadatalookup"
-#define MYTH_APPNAME_MYTHUTIL "mythutil"
-#define MYTH_APPNAME_MYTHSCREENWIZARD "mythscreenwizard"
-#define MYTH_APPNAME_MYTHFFPROBE "mythffprobe"
-#define MYTH_APPNAME_MYTHEXTERNRECORDER "mythexternrecorder"
+static constexpr const char * MYTH_APPNAME_MYTHBACKEND { "mythbackend" };
+static constexpr const char * MYTH_APPNAME_MYTHJOBQUEUE { "mythjobqueue" };
+static constexpr const char * MYTH_APPNAME_MYTHFRONTEND { "mythfrontend" };
+static constexpr const char * MYTH_APPNAME_MYTHTV_SETUP { "mythtv-setup" };
+static constexpr const char * MYTH_APPNAME_MYTHFILLDATABASE { "mythfilldatabase" };
+static constexpr const char * MYTH_APPNAME_MYTHCOMMFLAG { "mythcommflag" };
+static constexpr const char * MYTH_APPNAME_MYTHCCEXTRACTOR { "mythccextractor" };
+static constexpr const char * MYTH_APPNAME_MYTHPREVIEWGEN { "mythpreviewgen" };
+static constexpr const char * MYTH_APPNAME_MYTHTRANSCODE { "mythtranscode" };
+static constexpr const char * MYTH_APPNAME_MYTHWELCOME { "mythwelcome" };
+static constexpr const char * MYTH_APPNAME_MYTHSHUTDOWN { "mythshutdown" };
+static constexpr const char * MYTH_APPNAME_MYTHLCDSERVER { "mythlcdserver" };
+static constexpr const char * MYTH_APPNAME_MYTHAVTEST { "mythavtest" };
+static constexpr const char * MYTH_APPNAME_MYTHMEDIASERVER { "mythmediaserver" };
+static constexpr const char * MYTH_APPNAME_MYTHMETADATALOOKUP { "mythmetadatalookup" };
+static constexpr const char * MYTH_APPNAME_MYTHUTIL { "mythutil" };
+static constexpr const char * MYTH_APPNAME_MYTHSCREENWIZARD { "mythscreenwizard" };
+static constexpr const char * MYTH_APPNAME_MYTHFFPROBE { "mythffprobe" };
+static constexpr const char * MYTH_APPNAME_MYTHEXTERNRECORDER { "mythexternrecorder" };
 
 class MDBManager;
 class MythCoreContextPrivate;
