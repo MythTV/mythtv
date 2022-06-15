@@ -579,8 +579,10 @@ void MythHTTPSocket::Write(int64_t Written)
         m_totalWritten += wrote;
         available -= wrote;
 
+#if 0
         LOG(VB_HTTP, LOG_DEBUG, LOC + QString("Sent %1 bytes (cum: %2 of %3)")
             .arg(wrote).arg(m_totalWritten).arg(m_totalToSend));
+#endif
 
         // Move on to the next buffer?
         if (written >= itemsize)
