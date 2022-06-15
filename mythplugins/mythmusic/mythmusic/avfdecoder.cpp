@@ -218,7 +218,7 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
             .arg(reinterpret_cast<size_t>(avc),QT_POINTER_SIZE,8,QChar('0'));
     }
 
-    s_fullLine += QString::asprintf(fmt, vl);
+    s_fullLine += QString::vasprintf(fmt, vl);
     if (s_fullLine.endsWith("\n"))
     {
         LOG(verbose_mask, verbose_level, s_fullLine.trimmed());

@@ -71,7 +71,7 @@ static void my_av_print(void *ptr, int level, const char* fmt, va_list vl)
     if (level > AV_LOG_INFO)
         return;
 
-    s_fullLine += QString::asprintf(fmt, vl);
+    s_fullLine += QString::vasprintf(fmt, vl);
     if (s_fullLine.endsWith("\n"))
     {
         s_fullLine.chop(1);
