@@ -1900,7 +1900,7 @@ bool PlaybackBox::UpdateUILists(void)
 
         if ((m_viewMask & VIEW_WATCHLIST) && !recidWatchListProgram.empty())
         {
-            for (auto *p : recidWatchListProgram)
+            for (auto *p : qAsConst(recidWatchListProgram))
             {
                 m_progLists[m_watchGroupLabel].push_back(p);
             }
