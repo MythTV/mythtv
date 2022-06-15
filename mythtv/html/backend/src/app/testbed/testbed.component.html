@@ -14,6 +14,10 @@
     <p>Setting "SecurityPin" is currently set to "{{setting}}"</p>
 </div>
 
+<div>
+    <p>Latest websocket message: {{ m_websocketMsg }}</p>
+</div>
+
 <div *ngIf="(m_databaseStatus$ | async)?.DatabaseStatus as dbstatus; else loading">
     <!-- <p>Database is "{{dbstatus.Connected ? Connected : Not Connected}}"</p> -->
 </div>
@@ -99,7 +103,6 @@
     <p>{{ 'common.loading' | translate }} ...</p>
 </ng-template>
 
-    
 <p-button class="p-2" (click)="setSecurityPin('1234')">Set PIN to 1234</p-button>
 <p-button class="p-2" (click)="setSecurityPin('0000')">Set PIN to 0000</p-button>
 <p-button class="p-2" (click)="addStorageGroup()">Add SG</p-button>

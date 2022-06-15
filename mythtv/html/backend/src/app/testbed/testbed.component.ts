@@ -18,6 +18,7 @@ import { StorageGroupDir } from '../services/interfaces/storagegroup.interface';
 import { GetHashResponse } from '../services/interfaces/content.interface';
 import { GetCategoryListResponse } from '../services/interfaces/guide.interface';
 import { GuideService } from '../services/guide.service';
+import { WebsocketService } from '../services/websocket.service';
 
 @Component({
     selector: 'app-testbed',
@@ -39,6 +40,8 @@ export class TestbedComponent implements OnInit {
     m_settingsList$! : Observable<SettingList>;
     m_hashTest$! : Observable<GetHashResponse>;
     m_categoryList$! : Observable<GetCategoryListResponse>;
+    m_websocket$! : Observable<String>;
+    m_websocketMsg : String = '';
 
     m_hostName: string = "";
     m_securityPin: string = "";
@@ -52,7 +55,8 @@ export class TestbedComponent implements OnInit {
                 private contentService: ContentService,
                 private dvrService: DvrService,
                 private lookupService: IconlookupService,
-                private guideService: GuideService) { }
+                private guideService: GuideService,
+                private websocketService : WebsocketService) { }
 
     ngOnInit(): void {
         this.m_hostname$ = this.mythService.GetHostName().pipe(
@@ -98,12 +102,20 @@ export class TestbedComponent implements OnInit {
         )
 
         this.m_hashTest$ = this.contentService.GetHash({StorageGroup: "Default", FileName: "readme.txt"}).pipe(
-            tap(data => console.log("File Hash: " + data))
+            tap(data => console.log("File Hash: " + data.Hash))
         )
 
         this.m_categoryList$ = this.guideService.GetCategoryList().pipe(
             tap(data => console.log(data))
         )
+
+        this.websocketService.getData()
+            .subscribe(data => {
+                console.log(data);
+                this.m_websocketMsg = data;
+            })
+        this.websocketService.enableMessages();
+        this.websocketService.setEventFilter("ALL");
     }
 
     getSecurityPin() {
