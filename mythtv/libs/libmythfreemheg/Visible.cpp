@@ -200,7 +200,7 @@ QRegion MHVisible::GetVisibleArea()
     {
         return {};    // Not visible at all.
     }
-    return QRegion(QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight));
+    return {QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight)};
 }
 
 // MHEG actions.
@@ -446,15 +446,15 @@ QRegion MHRectangle::GetOpaqueArea()
 
     if (lineColour.alpha() == 255 || m_nLineWidth == 0)
     {
-        return QRegion(QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight));
+        return {QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight)};
     }
 
     if (m_nBoxWidth <= 2 * m_nLineWidth || m_nBoxHeight <= 2 * m_nLineWidth)
     {
         return {};
     }
-    return QRegion(QRect(m_nPosX + m_nLineWidth, m_nPosY + m_nLineWidth,
-                         m_nBoxWidth - m_nLineWidth * 2, m_nBoxHeight - m_nLineWidth * 2));
+    return {QRect(m_nPosX + m_nLineWidth, m_nPosY + m_nLineWidth,
+                  m_nBoxWidth - m_nLineWidth * 2, m_nBoxHeight - m_nLineWidth * 2)};
 }
 
 void MHRectangle::Display(MHEngine *engine)

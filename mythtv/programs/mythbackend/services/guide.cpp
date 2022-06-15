@@ -40,6 +40,14 @@
 #include "scheduler.h"
 #include "guide.h"
 
+// Qt6 has made the QFileInfo::QFileInfo(QString) constructor
+// explicit, which means that it is no longer possible to use an
+// initializer list to construct a QFileInfo. Disable that clang-tidy
+// check for this file so it can still be run on the rest of the file
+// in the project.
+//
+// NOLINTBEGIN(modernize-return-braced-init-list)
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -395,7 +403,7 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
     // ------------------------------------------------------------------
 
     StorageGroup storage( "ChannelIcons" );
-    QString sFullFileName = storage.FindFile( sFileName );
+    const QString sFullFileName = storage.FindFile( sFileName );
 
     if (sFullFileName.isEmpty())
     {
@@ -603,3 +611,5 @@ bool Guide::RemoveFromChannelGroup ( int nChannelGroupId,
 
     return bResult;
 }
+
+// NOLINTEND(modernize-return-braced-init-list)

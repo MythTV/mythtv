@@ -831,9 +831,9 @@ MenuSubjects DirectoryView::GetMenuSubjects()
             break;
     }
 
-    return MenuSubjects(GetSelected(), m_sequence.size() - 1,
-                        m_marked,      m_prevMarked,
-                        hiddenMarked,  unhiddenMarked);
+    return {GetSelected(), m_sequence.size() - 1,
+            m_marked,      m_prevMarked,
+            hiddenMarked,  unhiddenMarked};
 }
 
 

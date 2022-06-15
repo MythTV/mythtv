@@ -33,16 +33,16 @@ QScriptValue formatStr(QScriptContext *context, QScriptEngine *interpreter)
     unsigned int count = context->argumentCount();
 
     if (count == 0)
-        return QScriptValue(interpreter, QString());
+        return {interpreter, QString()};
  
     if (count == 1)
-        return QScriptValue(interpreter, context->argument(0).toString());
+        return {interpreter, context->argument(0).toString()};
 
     QString result = context->argument(0).toString();
     for (unsigned int i = 1; i < count; i++)
         result.replace(QString("%%1").arg(i), context->argument(i).toString());
 
-    return QScriptValue(interpreter, result);
+    return {interpreter, result};
 }
 
 //////////////////////////////////////////////////////////////////////////////

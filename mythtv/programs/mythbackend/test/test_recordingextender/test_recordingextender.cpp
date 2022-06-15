@@ -123,7 +123,7 @@ QUrl TestRecExtEspnDataSource::makeInfoUrl(const SportInfo& info, const QDateTim
     QString path = "file://" + QStringLiteral(TEST_SOURCE_DIR) +
         QString("/data/espn_%1_%2_%3xx.json")
         .arg(info.sport, info.league, dt2.toString("yyyyMM"));
-    return QUrl(path);
+    return {path};
 }
 
 QUrl TestRecExtEspnDataSource::makeGameUrl(const ActiveGame& game, const QString& str)
@@ -132,7 +132,7 @@ QUrl TestRecExtEspnDataSource::makeGameUrl(const ActiveGame& game, const QString
     QString path = "file://" + QStringLiteral(TEST_SOURCE_DIR) +
         QString("/data/espn_%1_%2_game_%3.json")
         .arg(info.sport, info.league, str);
-    return QUrl(path);
+    return {path};
 }
 
 RecExtDataPage* TestRecExtMlbDataSource::newPage(const QJsonDocument& doc)

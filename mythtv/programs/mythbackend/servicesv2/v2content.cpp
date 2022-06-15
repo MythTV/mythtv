@@ -51,6 +51,14 @@
 #include "v2content.h"
 #include "v2serviceUtil.h"
 
+// Qt6 has made the QFileInfo::QFileInfo(QString) constructor
+// explicit, which means that it is no longer possible to use an
+// initializer list to construct a QFileInfo. Disable that clang-tidy
+// check for this file so it can still be run on the rest of the file
+// in the project.
+//
+// NOLINTBEGIN(modernize-return-braced-init-list)
+
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
     (CONTENT_HANDLE, V2Content::staticMetaObject, &V2Content::RegisterCustomTypes))
@@ -1139,3 +1147,5 @@ bool V2Content::DownloadFile( const QString &sURL, const QString &sStorageGroup 
 //                           metadata->GetHost(), nMaxSegments, nWidth,
 //                           nHeight, nBitrate, nAudioBitrate, nSampleRate );
 // }
+
+// NOLINTEND(modernize-return-braced-init-list)

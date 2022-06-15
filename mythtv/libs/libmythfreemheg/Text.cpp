@@ -883,7 +883,7 @@ QRegion MHText::GetOpaqueArea()
     {
         return {};
     }
-    return QRegion(QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight));
+    return {QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight)};
 }
 
 

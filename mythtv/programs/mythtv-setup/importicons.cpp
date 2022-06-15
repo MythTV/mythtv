@@ -550,7 +550,7 @@ QString ImportIconsWizard::wget(QUrl& url, const QString& strParam )
     if (GetMythDownloadManager()->post(req, &data))
     {
         LOG(VB_CHANNEL, LOG_DEBUG, QString("ImportIconsWizard: result: %1").arg(QString(data)));
-        return QString(data);
+        return {data};
     }
 
     return {};

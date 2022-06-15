@@ -43,6 +43,14 @@
 #include "v2castMemberList.h"
 #include "v2guide.h"
 
+// Qt6 has made the QFileInfo::QFileInfo(QString) constructor
+// explicit, which means that it is no longer possible to use an
+// initializer list to construct a QFileInfo. Disable that clang-tidy
+// check for this file so it can still be run on the rest of the file
+// in the project.
+//
+// NOLINTBEGIN(modernize-return-braced-init-list)
+
 extern AutoExpire  *expirer;
 extern Scheduler   *sched;
 
@@ -632,3 +640,5 @@ bool V2Guide::RemoveFromChannelGroup ( int nChannelGroupId,
 
     return bResult;
 }
+
+// NOLINTEND(modernize-return-braced-init-list)

@@ -1053,7 +1053,7 @@ IDToken UPnpCDSExtension::GetCurrentToken(const QString& Id)
     QString key = current.section('=', 0, 0).toLower();
     QString value = current.section('=', 1, 1);
 
-    return IDToken(key, value);
+    return {key, value};
 }
 
 QString UPnpCDSExtension::CreateIDString(const QString &requestId,

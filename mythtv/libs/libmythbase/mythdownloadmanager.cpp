@@ -1747,7 +1747,7 @@ QString MythDownloadManager::getHeader(const QNetworkCacheMetaData &cacheData,
     auto headers = cacheData.rawHeaders();
     for (const auto& rh : qAsConst(headers))
         if (QString(rh.first) == header)
-            return QString(rh.second);
+            return {rh.second};
     return {};
 }
 

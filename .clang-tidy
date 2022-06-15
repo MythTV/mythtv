@@ -58,7 +58,7 @@ Checks: '-*,
 
         # Calls to standard library functions where the return value
         # isnt checked. These should all be fixed. ,
-        -cert-err33-c,
+       -cert-err33-c,
 
         # string-to-number conversion functions that do not verify the
         # validity of the conversion. Needs work. ,
@@ -135,7 +135,7 @@ Checks: '-*,
 
     misc-*,
 
-        # Cases exist. Need to add getters/setters to classes. ,
+        # Complains about every public or protected variable in a class. ,
        -misc-non-private-member-variables-in-classes,
 
         # The Q_DECLARE_METATYPE macro triggers a warning from
@@ -155,14 +155,11 @@ Checks: '-*,
         # Disable newer C++14/17 tests for now. ,
        -modernize-use-nodiscard,
 
-        # New in clang13. 2571 warnings. ,
-       -modernize-return-braced-init-list,
-
     performance-*,
 
         # The Q_DECLARE_METATYPE macro triggers a warning from this
         # new clang12 checker. ,
-        -performance-no-int-to-ptr,
+       -performance-no-int-to-ptr,
 
     readability-*,
 

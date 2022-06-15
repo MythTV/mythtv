@@ -143,7 +143,7 @@ class DTMFDescriptor : public SpliceDescriptor
     QString DTMFString(void) const
     {
         QByteArray ba(reinterpret_cast<const char*>(m_data+8), DTMFCount());
-        return QString(ba);
+        return {ba};
     }
 
     static bool IsParsible(const unsigned char *data, uint safe_bytes);
@@ -245,7 +245,7 @@ class SegmentationDescriptor : public SpliceDescriptor
     {
         QByteArray ba(reinterpret_cast<const char*>(_ptrs[1]+2),
                       SegmentationUPIDLength());
-        return QString(ba);
+        return {ba};
     }
 
     enum

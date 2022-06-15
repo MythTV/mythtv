@@ -404,7 +404,7 @@ QVariant MythBinaryPList::ParseBinaryString(uint8_t* Data)
 
     result = QString::fromLatin1(reinterpret_cast<const char*>(Data), static_cast<int>(count));
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("ASCII String: %1").arg(result));
-    return QVariant(result);
+    return {result};
 }
 
 QVariant MythBinaryPList::ParseBinaryReal(uint8_t* Data)
@@ -445,7 +445,7 @@ QVariant MythBinaryPList::ParseBinaryDate(uint8_t* Data)
     result = QDateTime::fromSecsSinceEpoch(CORE_DATA_EPOCH + sec, Qt::UTC);
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Date: %1").arg(result.toString(Qt::ISODate)));
-    return QVariant(result);
+    return {result};
 }
 
 QVariant MythBinaryPList::ParseBinaryData(uint8_t* Data)
@@ -461,7 +461,7 @@ QVariant MythBinaryPList::ParseBinaryData(uint8_t* Data)
     result = QByteArray(reinterpret_cast<const char*>(Data), static_cast<int>(count));
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Data: Size %1 (count %2)")
         .arg(result.size()).arg(count));
-    return QVariant(result);
+    return {result};
 }
 
 QVariant MythBinaryPList::ParseBinaryUnicode(uint8_t* Data)
@@ -484,7 +484,7 @@ QVariant MythBinaryPList::ParseBinaryUnicode(uint8_t* Data)
     }
     result = QString::fromUtf16(reinterpret_cast<const char16_t*>(tmp.data()), static_cast<int>(count));
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Unicode: %1").arg(result));
-    return QVariant(result);
+    return {result};
 }
 
 uint64_t MythBinaryPList::GetBinaryCount(uint8_t** Data)
