@@ -34,7 +34,7 @@ class MBASE_PUBLIC MythHTTPRequest
 
   private:
     Q_DISABLE_COPY(MythHTTPRequest)
-    static HTTPQueries ParseQuery(HTTPQueries & queries, const QString& Query);
+    static HTTPQueries ParseQuery(const QString& Query);
 };
 
 #endif

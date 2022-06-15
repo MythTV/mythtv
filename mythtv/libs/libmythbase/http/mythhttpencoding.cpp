@@ -75,10 +75,10 @@ QStringList MythHTTPEncoding::GetMimeTypes(const QString &Accept)
 
 /*! \brief Parse the incoming Content-Type header for POST/PUT content
 */
-QString MythHTTPEncoding::GetContentType(MythHTTPRequest* Request)
+void MythHTTPEncoding::GetContentType(MythHTTPRequest* Request)
 {
     if (!Request || !Request->m_content.get())
-        return QString();
+        return;
 
     auto contenttype = MythHTTP::GetHeader(Request->m_headers, "content-type");
 
@@ -90,7 +90,7 @@ QString MythHTTPEncoding::GetContentType(MythHTTPRequest* Request)
 #endif
 
     if (types.isEmpty())
-        return QString();
+        return;
 
     // Note: This can produce an invalid mime type but there is no sensible fallback
     if (auto mime = MythMimeDatabase::MimeTypeForName(types[0].trimmed().toLower()); mime.IsValid())
@@ -104,14 +104,11 @@ QString MythHTTPEncoding::GetContentType(MythHTTPRequest* Request)
         else if (mime.Name() == "application/json")
             GetJSONEncodedParameters(Request);
         else
-            LOG(VB_HTTP, LOG_ERR,
-                QString("Don't know how to get the parameters for MIME type: '%1'")
-                .arg(mime.Name()));
-        return mime.Name();
+            LOG(VB_HTTP, LOG_ERR, QString("Don't know how to get the parameters for MIME type: '%1'").arg(mime.Name()));
     }
+    else
+        LOG(VB_HTTP, LOG_ERR, QString("Unknown MIME type: '%1'").arg(types[0]));
 
-    LOG(VB_HTTP, LOG_ERR, QString("Unknown MIME type: '%1'").arg(types[0]));
-    return QString();
 }
 
 void MythHTTPEncoding::GetURLEncodedParameters(MythHTTPRequest* Request)
@@ -221,8 +218,17 @@ void MythHTTPEncoding::GetJSONEncodedParameters(MythHTTPRequest* Request)
         return;
     }
 
-    QString jsonStr = doc.toJson(QJsonDocument::Compact);
-    Request->m_queries.insert("json", jsonStr);
+    QJsonObject json = doc.object();
+    foreach(const QString& key, json.keys())
+    {
+        if (!key.isEmpty())
+        {
+            QString value = json.value(key).toVariant().toString();
+
+            Request->m_queries.insert(key.trimmed().toLower(), value);
+            LOG(VB_HTTP, LOG_DEBUG, QString("Found URL param (%1=%2)").arg(key, value));
+        }
+    }
 }
 
 /*! \brief Return a QMimeType that represents Content.

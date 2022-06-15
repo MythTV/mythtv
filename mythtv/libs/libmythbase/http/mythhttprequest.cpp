@@ -139,22 +139,19 @@ MythHTTPRequest::MythHTTPRequest(const MythHTTPConfig& Config, QString Method,
         m_connection = HTTPConnectionClose;
 
     // Parse the content type if present - and pull out any form data
-    m_queries.clear();
-    QString mime_name;
     if (m_content.get() && !m_content->isEmpty() && ((m_type == HTTPPut) || (m_type == HTTPPost)))
-        mime_name = MythHTTPEncoding::GetContentType(this);
+        MythHTTPEncoding::GetContentType(this);
 
     // Only parse queries if we do not have form data
-    if ((m_queries.isEmpty() && m_url.hasQuery()) ||
-        mime_name == "application/json")
-        m_queries = ParseQuery(m_queries, m_url.query());
+    if (m_queries.isEmpty() && m_url.hasQuery())
+        m_queries = ParseQuery(m_url.query());
 
     m_status = HTTPOK;
 }
 
-HTTPQueries MythHTTPRequest::ParseQuery(HTTPQueries & queries,
-                                        const QString &Query)
+HTTPQueries MythHTTPRequest::ParseQuery(const QString &Query)
 {
+    HTTPQueries result;
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList params = Query.split('&', QString::SkipEmptyParts);
 #else
@@ -168,7 +165,7 @@ HTTPQueries MythHTTPRequest::ParseQuery(HTTPQueries & queries,
         value = QUrl::fromPercentEncoding(rawvalue);
         value.replace("+", " ");
         if (!key.isEmpty())
-            queries.insert(key.trimmed().toLower(), value);
+            result.insert(key.trimmed().toLower(), value);
     }
-    return queries;
+    return result;
 }
