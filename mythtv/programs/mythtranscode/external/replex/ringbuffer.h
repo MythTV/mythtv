@@ -64,14 +64,14 @@ using peek_poke_vec = std::vector<uint8_t>;
 	int ring_read_file(ringbuffer *rbuf, int fd, int count);
 	int ring_peek(ringbuffer *rbuf, uint8_t *data, unsigned int count,
                       uint32_t off);
-	int ring_peek(ringbuffer *rbuf, peek_poke_vec data, unsigned int count,
+	int ring_peek(ringbuffer *rbuf, peek_poke_vec& data, unsigned int count,
                       uint32_t off);
-	int ring_peek(ringbuffer *rbuf, peek_poke_vec data, uint32_t off);
+	int ring_peek(ringbuffer *rbuf, peek_poke_vec& data, uint32_t off);
 	int ring_poke(ringbuffer *rbuf, uint8_t *data, unsigned int count,
                       uint32_t off);
-	int ring_poke(ringbuffer *rbuf, peek_poke_vec data, unsigned int count,
+	int ring_poke(ringbuffer *rbuf, peek_poke_vec& data, unsigned int count,
                       uint32_t off);
-	int ring_poke(ringbuffer *rbuf, peek_poke_vec data, uint32_t off);
+	int ring_poke(ringbuffer *rbuf, peek_poke_vec& data, uint32_t off);
 	int ring_skip(ringbuffer *rbuf, int count);
 
 	static inline int ring_wpos(ringbuffer *rbuf)

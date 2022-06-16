@@ -148,12 +148,12 @@ int ring_peek(ringbuffer *rbuf, uint8_t *data, unsigned int count, uint32_t off)
 	return count;
 }
 
-int ring_peek(ringbuffer *rbuf, peek_poke_vec data, unsigned int count, uint32_t off)
+int ring_peek(ringbuffer *rbuf, peek_poke_vec& data, unsigned int count, uint32_t off)
 {
     return ring_peek(rbuf, data.data(), count, off);
 }
 
-int ring_peek(ringbuffer *rbuf, peek_poke_vec data, uint32_t off)
+int ring_peek(ringbuffer *rbuf, peek_poke_vec& data, uint32_t off)
 {
     return ring_peek(rbuf, data.data(), data.size(), off);
 }
@@ -187,12 +187,12 @@ int ring_poke(ringbuffer *rbuf, uint8_t *data, unsigned int count, uint32_t off)
 	return count;
 }
 
-int ring_poke(ringbuffer *rbuf, peek_poke_vec data, unsigned int count, uint32_t off)
+int ring_poke(ringbuffer *rbuf, peek_poke_vec& data, unsigned int count, uint32_t off)
 {
     return ring_poke(rbuf, data.data(), count, off);
 }
 
-int ring_poke(ringbuffer *rbuf, peek_poke_vec data, uint32_t off)
+int ring_poke(ringbuffer *rbuf, peek_poke_vec& data, uint32_t off)
 {
     return ring_poke(rbuf, data.data(), data.size(), off);
 }
