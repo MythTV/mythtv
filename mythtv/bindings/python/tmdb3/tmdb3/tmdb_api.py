@@ -21,7 +21,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__ = "v0.7.1"
+__version__ = "v0.7.3"
 # 0.1.0  Initial development
 # 0.2.0  Add caching mechanism for API queries
 # 0.2.1  Temporary work around for broken search paging
@@ -64,6 +64,7 @@ __version__ = "v0.7.1"
 # 0.7.0.a  Added compatibility to python3, tested with python 3.6 and 2.7
 # 0.7.1 Changes to support TV series lookup.
 # 0.7.2 Removed support for python2.
+# 0.7.3 Added API for release dates
 
 
 from .request import set_key, Request
@@ -75,13 +76,14 @@ from .tmdb_exceptions import *
 
 import json
 import datetime
+from enum import IntEnum
 
 DEBUG = False
 
 
 def process_date(datestr):
     try:
-        return datetime.date(*[int(x) for x in datestr.split('-')])
+        return datetime.date(*[int(x) for x in datestr.split("T")[0].split('-')])
     except (TypeError, ValueError):
         import sys
         import warnings
@@ -314,6 +316,41 @@ class AlternateTitle(Element):
 
     def __repr__(self):
         return "<{0.__class__.__name__} '{0.title}' ({0.country})>".format(self)
+
+
+class ReleaseType(IntEnum):
+    """
+    Release dates support for different types.
+    Proposed sort order for release dates: 2, 3, 1, min (4 ,5, 6)
+    """
+    Premiere            = 1
+    Theatrical_limited  = 2
+    Theatrical          = 3
+    Digital             = 4
+    Physical            = 5
+    TV                  = 6
+
+
+class CertReleaseItem(Element):
+    certification = Datapoint("certification")
+    language = Datapoint("iso_639_1")
+    releasedate = Datapoint("release_date", handler=process_date)
+    releasetype = Datapoint("type")
+
+    def __repr__(self):
+        return (
+            f"<{self.__class__.__name__} "
+            f"'{self.certification}', "
+            f"'{ReleaseType(self.releasetype).name}', "
+            f"{self.releasedate}>"
+        )
+
+class CertRelease(Element):
+    country = Datapoint("iso_3166_1")
+    cert_release_dates = Datalist("release_dates", handler=CertReleaseItem)
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__} '{self.country}'>"
 
 
 class Person(Element):
@@ -622,6 +659,9 @@ class Movie(Element):
     def _populate_releases(self):
         return Request('movie/{0}/releases'.format(self.id))
 
+    def _populate_cert_releases(self):
+        return Request(f"movie/{self.id}/release_dates")
+
     def _populate_trailers(self):
         return Request('movie/{0}/trailers'.format(self.id),
                             language=self._locale.language)
@@ -645,6 +685,8 @@ class Movie(Element):
                         poller=_populate_keywords)
     releases = Datadict('countries', handler=Release,
                         poller=_populate_releases, attr='country')
+    cert_releases = Datadict("results", handler=CertRelease,
+                             poller=_populate_cert_releases, attr="country")
     youtube_trailers = Datalist('youtube', handler=YoutubeTrailer,
                                 poller=_populate_trailers)
     apple_trailers = Datalist('quicktime', handler=AppleTrailer,

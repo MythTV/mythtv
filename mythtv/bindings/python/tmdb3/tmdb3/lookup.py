@@ -12,7 +12,7 @@
 #-----------------------
 __title__ = "TheMovieDB.org V3"
 __author__ = "Raymond Wagner, Roland Ernst"
-__version__ = "0.3.9"
+__version__ = "0.3.10"
 # 0.1.0 Initial version
 # 0.2.0 Add language support, move cache to home directory
 # 0.3.0 Enable version detection to allow use in MythTV
@@ -30,6 +30,7 @@ __version__ = "0.3.9"
 # 0.3.7.a : Added compatibiliy to python3, tested with python 3.6 and 2.7
 # 0.3.8 Sort posters by system language or 'en', if not found for given language
 # 0.3.9 Support TV lookup
+# 0.3.10 Use new API for release dates for movies
 
 # ~ from optparse import OptionParser
 import sys
@@ -45,7 +46,7 @@ def timeouthandler(signal, frame):
 
 def buildSingle(inetref, opts):
     from MythTV.tmdb3.tmdb_exceptions import TMDBRequestInvalid
-    from MythTV.tmdb3 import Movie, get_locale
+    from MythTV.tmdb3 import Movie, ReleaseType, get_locale
     from MythTV import VideoMetadata
     from lxml import etree
 
@@ -75,12 +76,11 @@ def buildSingle(inetref, opts):
     if movie.title:
         m.title = movie.title
 
-    releases = list(movie.releases.items())
+    if movie.releasedate:
+        m.releasedate = movie.releasedate
 
-# get the release date for the wanted country
-# TODO if that is not part of the reply use the primary release date (Primary=true)
-# if that is not part of the reply use whatever release date is first in list
-# if there is not a single release date in the reply, then leave it empty
+    releases = list(movie.cert_releases.items())
+
     if len(releases) > 0:
         if opts.country:
             # resort releases with selected country at top to ensure it
@@ -89,17 +89,34 @@ def buildSingle(inetref, opts):
             if opts.country in r[0]:
                 index = r[0].index(opts.country)
                 releases.insert(0, releases.pop(index))
-
-        m.releasedate = releases[0][1].releasedate
+                r_dates_country = releases[0][1].cert_release_dates
+                r_types_country = [x.releasetype for x in r_dates_country]
+                # from the mailing list: 
+                # https://www.themoviedb.org/talk/585ad032925141724d0514f4
+                # sort order for release dates: 2, 3, 1, min (4 ,5, 6)
+                sorted_dates = []
+                for rt in [ ReleaseType.Theatrical_limited,    # 2
+                            ReleaseType.Theatrical,            # 3
+                            ReleaseType.Premiere,              # 1
+                            ReleaseType.Digital,               # 4
+                            ReleaseType.Physical,              # 5
+                            ReleaseType.TV] :                  # 6
+                    if rt in r_types_country:
+                        r_index = r_types_country.index(rt)
+                        sorted_dates.append(r_dates_country[r_index].releasedate)
+                        if rt < ReleaseType.Digital:
+                            break
+                if len(sorted_dates) > 0:
+                    m.releasedate = min(sorted_dates)
 
     m.inetref = str(movie.id)
     if movie.collection:
         m.collectionref = str(movie.collection.id)
     if m.releasedate:
         m.year = m.releasedate.year
-    for country, release in releases:
-        if release.certification:
-            m.certifications[country] = release.certification
+    for country, releaseitem in releases:
+        if releaseitem.cert_release_dates[0].certification:
+            m.certifications[country] = releaseitem.cert_release_dates[0].certification
     for genre in movie.genres:
         m.categories.append(genre.name)
     for studio in movie.studios:
@@ -126,10 +143,14 @@ def buildSingle(inetref, opts):
     # if no poster of given language was found,
     # try to sort by system language and then by language "en"
     system_language = py_locale.getdefaultlocale()[0].split("_")[0]
+    system_country = py_locale.getdefaultlocale()[0].split("_")[1]
     locale_language = get_locale().language
+    locale_country = get_locale().country
     if opts.debug:
         print("system_language : ", system_language)
         print("locale_language : ", locale_language)
+        print("system_country  : ", system_country)
+        print("locale_country  : ", locale_country)
 
     loc_posters = movie.posters
     if len(loc_posters) and loc_posters[0].language != locale_language \
