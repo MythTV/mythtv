@@ -51,10 +51,15 @@ export class CetonComponent implements OnInit, AfterViewInit {
     console.log(this);
   }
 
+  // good response to add: {"int": 19}
   saveObserver = {
     next: (x: any) => {
-        if (x.bool)
+        if (this.card.CardId && x.bool)
             this.work.successCount++;
+        else if (!this.card.CardId && x.int) {
+          this.work.successCount++;
+          this.card.CardId = x.int;
+        }
         else {
             this.work.errorCount++;
             this.currentForm.form.markAsDirty();
@@ -71,18 +76,22 @@ export class CetonComponent implements OnInit, AfterViewInit {
     console.log("save form clicked");
     this.work.successCount = 0;
     this.work.errorCount = 0;
-    // Update device and child devices
-    this.cardList.CaptureCardList.CaptureCards.forEach(card => {
-      if (card.CardId == this.card.CardId || card.ParentId == this.card.CardId) {
-        this.captureCardService.UpdateCaptureCard(card.CardId, 'videodevice', this.card.VideoDevice)
-            .subscribe(this.saveObserver);
-        this.captureCardService.UpdateCaptureCard(card.CardId, 'signal_timeout', String(this.card.SignalTimeout))
-            .subscribe(this.saveObserver);
-        this.captureCardService.UpdateCaptureCard(card.CardId, 'channel_timeout', String(this.card.ChannelTimeout))
-            .subscribe(this.saveObserver);
-
-      }
-    });
+    if (this.card.CardId) {
+      // Update device and child devices
+      this.cardList.CaptureCardList.CaptureCards.forEach(card => {
+        if (card.CardId == this.card.CardId || card.ParentId == this.card.CardId) {
+          this.captureCardService.UpdateCaptureCard(card.CardId, 'videodevice', this.card.VideoDevice)
+              .subscribe(this.saveObserver);
+          this.captureCardService.UpdateCaptureCard(card.CardId, 'signal_timeout', String(this.card.SignalTimeout))
+              .subscribe(this.saveObserver);
+          this.captureCardService.UpdateCaptureCard(card.CardId, 'channel_timeout', String(this.card.ChannelTimeout))
+              .subscribe(this.saveObserver);
+        }
+      });
+    }
+    else {
+      this.captureCardService.AddCaptureCard(this.card).subscribe(this.saveObserver);
+    }
   }
 
 }

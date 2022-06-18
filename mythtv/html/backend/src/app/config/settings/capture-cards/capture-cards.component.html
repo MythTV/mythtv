@@ -1,18 +1,102 @@
-<div  class="block card w-full">
+<div class="block card w-full">
     <h3>{{ 'settings.capture.title' | translate }}</h3>
 
+    <p-button label="{{ 'settings.capture.new_capture_card' | translate }}" (onClick)="displayModal = true" icon="pi pi-plus-circle"
+        styleClass="p-button-plain"></p-button>
+    <p-dialog header="{{ 'settings.capture.new_capture_card' | translate }}" [(visible)]="displayModal" [modal]="true" [style]="{width: '50vw'}"
+        [draggable]="false" [resizable]="false">
+        <p>Select capure card type</p>
+        <p-listbox [options]="cardTypes" [(ngModel)]="selectedCardType" optionLabel="name"
+            (onDblClick)="newCard();"></p-listbox>
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-times-circle" (onClick)="displayModal=false" label="{{ 'common.cancel' | translate }}"
+                styleClass="p-button-plain">
+            </p-button>
+            <p-button icon="pi pi-check-circle" (onClick)="newCard();" label="{{ 'common.ok' | translate }}" styleClass="p-button-plain"
+                [disabled]="selectedCardType.code == ''"></p-button>
+        </ng-template>
+    </p-dialog>
+    &nbsp;
+    <p-button styleClass="p-button-warning"
+        label="{{ 'settings.capture.delete_on_host' | translate: {host: m_hostName} }}"
+        (click)="displayDeleteAllonHost=true" icon="pi pi-trash">
+    </p-button>
+    <p-dialog header="{{ 'settings.capture.delete_on_host' | translate: {host: m_hostName} }}"
+        [(visible)]="displayDeleteAllonHost" [modal]="true"
+        [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
+        <h2>Are you sure ?</h2>
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-times-circle" (click)="displayDeleteAllonHost=false;" label="{{ 'common.no' | translate }}"
+                styleClass="p-button-plain">
+            </p-button>
+            <p-button icon="pi pi-check-circle" (click)="deleteAllOnHost();" label="{{ 'common.yes' | translate }}"
+                styleClass="p-button-plain"></p-button>
+        </ng-template>
+    </p-dialog>
+    &nbsp;
+    <p-button styleClass="p-button-danger" label="{{ 'settings.capture.delete_all' | translate }}" (click)="displayDeleteAll=true"
+        icon="pi pi-trash" iconPos="left">
+    </p-button>
+    <p-dialog header="{{ 'settings.capture.delete_all_all' | translate }}" [(visible)]="displayDeleteAll" [modal]="true"
+        [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
+        <h2>Are you sure ?</h2>
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-times-circle" (click)="displayDeleteAll=false" label="{{ 'common.no' | translate }}" styleClass="p-button-plain">
+            </p-button>
+            <p-button icon="pi pi-check-circle" (click)="deleteAllOnAllHosts()" label="{{ 'common.yes' | translate }}"
+                styleClass="p-button-plain"></p-button>
+        </ng-template>
+    </p-dialog>
+    <br>
+    <div class="grid nogutter">
+        <div class="col-12" *ngIf="this.expectedCount && this.successCount == this.expectedCount">
+            <br>
+            <p-message severity="success" text="{{ 'settings.common.successful_delete' | translate }}">
+            </p-message>
+            <br>
+        </div>
+        <div class="col-12" *ngIf="this.errorCount > 0">
+            <br>
+            <p-message severity="error" text="{{ 'common.networkfail' | translate }}">
+            </p-message>
+            <br>
+        </div>
+    </div>
     <p-accordion class="col-12 w-full" (onClose)="onTabClose($event)" (onOpen)="onTabOpen($event)">
-        <p-accordionTab
-                *ngFor="let card of m_CaptureCardsFiltered; index as i; first as isFirst">
+        <p-accordionTab *ngFor="let card of m_CaptureCardsFiltered; index as ix; first as isFirst"
+            [disabled]="disabledTab[ix]" [(selected)]="activeTab[ix]">
             <ng-template pTemplate="header">
-                {{m_CaptureCardsFiltered[i].CardType}}
-                {{m_CaptureCardsFiltered[i].VideoDevice}}
-                ({{m_CaptureCardsFiltered[i].DisplayName}})
-                <b>&nbsp;{{ dirtyMessages[i] }}</b>
+                <div class="grid  w-full">
+                    <div class="col-9 pr-1">
+                        {{m_CaptureCardsFiltered[ix].CardType}}
+                        {{m_CaptureCardsFiltered[ix].VideoDevice}}
+                        ({{m_CaptureCardsFiltered[ix].DisplayName}})
+                        <b>&nbsp;{{ dirtyMessages[ix] }}</b>
+                    </div>
+                </div>
             </ng-template>
             <ng-template pTemplate="content">
-                <app-ceton *ngIf="m_CaptureCardsFiltered[i].CardType == 'CETON'"
-                    [card]="m_CaptureCardsFiltered[i]" [cardList]="m_CaptureCardList"></app-ceton>
+                <p-button styleClass="p-button-warning" label="{{ 'settings.capture.delete_this' | translate }}" icon="pi pi-trash"
+                    (onClick)="displayDeleteThis[ix]=true" [disabled]="(!this.m_CaptureCardsFiltered[ix].CardId)">
+                </p-button>
+                <p-dialog header="{{ 'settings.capture.delete_this' | translate }}" [(visible)]="displayDeleteThis[ix]" [modal]="true"
+                    [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
+                    <h2>Are you sure ?</h2>
+                    <p>This will delete
+                        {{m_CaptureCardsFiltered[ix].CardType}}
+                        {{m_CaptureCardsFiltered[ix].VideoDevice}}
+                        ({{m_CaptureCardsFiltered[ix].DisplayName}})
+                    </p>
+                    <ng-template pTemplate="footer">
+                        <p-button icon="pi pi-times-circle" (click)="displayDeleteThis[ix]=false" label="{{ 'common.no' | translate }}"
+                            styleClass="p-button-plain">
+                        </p-button>
+                        <p-button icon="pi pi-check-circle" (click)="deleteThis(ix)" label="{{ 'common.yes' | translate }}"
+                            styleClass="p-button-plain"></p-button>
+                    </ng-template>
+                </p-dialog>
+                <app-ceton *ngIf="m_CaptureCardsFiltered[ix].CardType == 'CETON'" [card]="m_CaptureCardsFiltered[ix]"
+                    [cardList]="m_CaptureCardList"></app-ceton>
             </ng-template>
         </p-accordionTab>
 
