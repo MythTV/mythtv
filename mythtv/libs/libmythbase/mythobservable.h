@@ -4,6 +4,7 @@
 #include <QSet>
 #include "mythevent.h"
 #include "mythbaseexp.h"
+#include "qtuplift.h"
 
 class QObject;
 class QMutex;
@@ -23,7 +24,7 @@ class MBASE_PUBLIC MythObservable
     bool hasListeners(void) { return !m_listeners.isEmpty(); }
 
   private:
-    Q_DISABLE_COPY(MythObservable)
+    Q_DISABLE_COPY_MOVE(MythObservable)
 
   protected:
     QMutex         *m_lock {nullptr};

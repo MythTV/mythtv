@@ -18,6 +18,10 @@ class MBASE_PUBLIC MythUserSession
   public :
     MythUserSession() = default;
    ~MythUserSession() { m_sessionToken.fill('0'); m_sessionToken.clear(); }
+   MythUserSession(const MythUserSession &) = default;
+   MythUserSession(MythUserSession&& other) = default;
+   MythUserSession &operator=(const MythUserSession &) = default;
+   MythUserSession& operator=(MythUserSession&& other) = default;
 
     /**
      * \brief Check if this session object appears properly constructed, it
@@ -99,7 +103,6 @@ class MBASE_PUBLIC MythSessionManager
 {
   public :
     MythSessionManager();
-   ~MythSessionManager() = default;
 
     /**
      * \brief Check if the given user exists but not whether there is a valid

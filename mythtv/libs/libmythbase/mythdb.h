@@ -7,6 +7,7 @@
 #include "mythbaseexp.h"
 #include "mythdbcon.h"
 #include "mythdbparams.h"
+#include "qtuplift.h"
 
 class MythDBPrivate;
 class MDBManager;
@@ -16,9 +17,6 @@ class MBASE_PUBLIC MythDB
     friend class MSqlQuery;
   public:
     MDBManager *GetDBManager(void);
-
-    MythDB(const MythDB &) = delete;            // not copyable
-    MythDB &operator=(const MythDB &) = delete; // not copyable
 
     static QString GetError(const QString &where, const MSqlQuery &query);
     static void DBError(const QString &where, const MSqlQuery &query);
@@ -94,6 +92,7 @@ class MBASE_PUBLIC MythDB
    ~MythDB();
 
   private:
+    Q_DISABLE_COPY_MOVE(MythDB);
     MythDBPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
 };
 

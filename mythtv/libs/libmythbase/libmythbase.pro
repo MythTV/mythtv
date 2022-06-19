@@ -48,6 +48,7 @@ HEADERS += recordingstatus.h
 HEADERS += recordingtypes.h
 HEADERS += unziputil.h
 HEADERS += sizetliteral.h
+HEADERS += qtuplift.h
 
 SOURCES += mthread.cpp mthreadpool.cpp
 SOURCES += mythsocket.cpp
@@ -194,6 +195,7 @@ inc.files += recordingtypes.h
 inc.files += stringutil.h
 inc.files += unziputil.h
 inc.files += sizetliteral.h
+inc.files += qtuplift.h
 
 inc2.path = $${PREFIX}/include/mythtv
 inc2.files += mythconfig.h mythconfig.mak

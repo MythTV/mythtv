@@ -15,6 +15,7 @@
 #include "mythlogging.h"
 #include "mythlocale.h"
 #include "mythsession.h"
+#include "qtuplift.h"
 
 class Configuration;
 
@@ -316,7 +317,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void TVPlaybackPlaying(void);
 
   private:
-    Q_DISABLE_COPY(MythCoreContext)
+    Q_DISABLE_COPY_MOVE(MythCoreContext)
     MythCoreContextPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
 
     void connected(MythSocket *sock) override { (void)sock; } //MythSocketCBs
