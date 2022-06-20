@@ -15,6 +15,7 @@
 #include <libmythmetadata/musicmetadata.h>
 
 // mythmusic
+#include "config.h"
 #include "decoder.h"
 #include "constants.h"
 #include "musicplayer.h"

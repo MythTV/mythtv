@@ -20,6 +20,7 @@
 #include <libmythui/mythuihelper.h>
 
 // mythmusic
+#include "config.h"
 #include "constants.h"
 #include "decoder.h"
 #include "decoderhandler.h"
