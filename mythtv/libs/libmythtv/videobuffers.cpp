@@ -20,8 +20,8 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-#define TRY_LOCK_SPINS                 2000
-#define TRY_LOCK_SPINS_BEFORE_WARNING  9999
+static constexpr uint16_t TRY_LOCK_SPINS                 { 2000 };
+static constexpr uint16_t TRY_LOCK_SPINS_BEFORE_WARNING  { 9999 };
 static constexpr std::chrono::milliseconds TRY_LOCK_SPIN_WAIT { 1ms };
 
 int next_dbg_str = 0;
@@ -1062,7 +1062,7 @@ QString VideoBuffers::GetStatus(uint Num) const
  ** Debugging functions below **
  *******************************/
 
-#define DBG_STR_ARR_SIZE 40
+static constexpr size_t DBG_STR_ARR_SIZE { 40 };
 const std::array<const QString,DBG_STR_ARR_SIZE> dbg_str_arr
 {
     "A       ",    " B      ",    "  C     ",    "   D    ",

@@ -65,13 +65,13 @@ static inline const char * fourcc_str(int i)
 /* These should probably all be defined by */
 /*  MAKEFOURCC(), MKTAG() or v4l2_fourcc() */
 
-#define GUID_I420_PLANAR 0x30323449
-#define GUID_IYUV_PLANAR 0x56555949 /**< bit equivalent to I420 */
-#define GUID_YV12_PLANAR 0x32315659
-#define GUID_IA44_PACKED 0x34344941
-#define GUID_AI44_PACKED 0x34344149
-#define GUID_YUY2_PACKED 0x32595559 /* same as YUYV */
-#define GUID_UYVY_PACKED 0x59565955
+static constexpr uint32_t GUID_I420_PLANAR { 0x30323449 };
+static constexpr uint32_t GUID_IYUV_PLANAR { 0x56555949 }; /**< bit equivalent to I420 */
+static constexpr uint32_t GUID_YV12_PLANAR { 0x32315659 };
+static constexpr uint32_t GUID_IA44_PACKED { 0x34344941 };
+static constexpr uint32_t GUID_AI44_PACKED { 0x34344149 };
+static constexpr uint32_t GUID_YUY2_PACKED { 0x32595559 }; /* same as YUYV */
+static constexpr uint32_t GUID_UYVY_PACKED { 0x59565955 };
 
 
 /******************************************************************************

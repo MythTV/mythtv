@@ -18,29 +18,29 @@
 #include "libmyth/mythcontext.h"
 #include "libmythtv/mythtvexp.h"
 
-#define DEINT_QUALITY_NONE   QString("none")
-#define DEINT_QUALITY_LOW    QString("low")
-#define DEINT_QUALITY_MEDIUM QString("medium")
-#define DEINT_QUALITY_HIGH   QString("high")
-#define DEINT_QUALITY_SHADER QString("shader")
-#define DEINT_QUALITY_DRIVER QString("driver")
-#define UPSCALE_DEFAULT QString("bilinear")
-#define UPSCALE_HQ1     QString("bicubic")
+static constexpr const char* DEINT_QUALITY_NONE   { "none"     };
+static constexpr const char* DEINT_QUALITY_LOW    { "low"      };
+static constexpr const char* DEINT_QUALITY_MEDIUM { "medium"   };
+static constexpr const char* DEINT_QUALITY_HIGH   { "high"     };
+static constexpr const char* DEINT_QUALITY_SHADER { "shader"   };
+static constexpr const char* DEINT_QUALITY_DRIVER { "driver"   };
+static constexpr const char* UPSCALE_DEFAULT      { "bilinear" };
+static constexpr const char* UPSCALE_HQ1          { "bicubic"  };
 
-#define COND_WIDTH    "cond_width"
-#define COND_HEIGHT   "cond_height"
-#define COND_RATE     "cond_framerate"
-#define COND_CODECS   "cond_codecs"
-#define PREF_DEC      "pref_decoder"
-#define PREF_CPUS     "pref_max_cpus"
-#define PREF_LOOP     "pref_skiploop"
-#define PREF_RENDER   "pref_videorenderer"
-#define PREF_DEINT1X  "pref_deint0"
-#define PREF_DEINT2X  "pref_deint1"
-#define PREF_PRIORITY "pref_priority"
-#define PREF_UPSCALE  "pref_upscale"
+static constexpr const char* COND_WIDTH    { "cond_width"         };
+static constexpr const char* COND_HEIGHT   { "cond_height"        };
+static constexpr const char* COND_RATE     { "cond_framerate"     };
+static constexpr const char* COND_CODECS   { "cond_codecs"        };
+static constexpr const char* PREF_DEC      { "pref_decoder"       };
+static constexpr const char* PREF_CPUS     { "pref_max_cpus"      };
+static constexpr const char* PREF_LOOP     { "pref_skiploop"      };
+static constexpr const char* PREF_RENDER   { "pref_videorenderer" };
+static constexpr const char* PREF_DEINT1X  { "pref_deint0"        };
+static constexpr const char* PREF_DEINT2X  { "pref_deint1"        };
+static constexpr const char* PREF_PRIORITY { "pref_priority"      };
+static constexpr const char* PREF_UPSCALE  { "pref_upscale"       };
 
-#define VIDEO_MAX_CPUS (16U)
+static constexpr uint VIDEO_MAX_CPUS { 16 };
 
 struct RenderOptions
 {

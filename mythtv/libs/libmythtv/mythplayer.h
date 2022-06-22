@@ -59,7 +59,7 @@ enum TCTypes
     TC_SUB,
     TC_CC
 };
-#define TCTYPESMAX 4
+static constexpr size_t TCTYPESMAX { 4 };
 using tctype_arr = std::array<std::chrono::milliseconds,TCTYPESMAX>;
 
 enum PlayerFlags

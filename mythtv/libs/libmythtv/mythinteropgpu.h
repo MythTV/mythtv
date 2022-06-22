@@ -15,7 +15,7 @@
 class MythRender;
 class MythPlayerUI;
 using FreeAVHWDeviceContext = void (*)(struct AVHWDeviceContext*);
-#define DUMMY_INTEROP_ID 1
+static constexpr uint64_t DUMMY_INTEROP_ID { 1 };
 
 class MythInteropGPU : public QObject, public ReferenceCounter
 {

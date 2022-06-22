@@ -4,10 +4,10 @@
 // MythTV
 #include "mythmediaoverlay.h"
 
-#define OSD_WIN_TELETEXT  "aa_OSD_TELETEXT"
-#define OSD_WIN_SUBTITLE  "aa_OSD_SUBTITLES"
-#define OSD_WIN_INTERACT  "bb_OSD_INTERACTIVE"
-#define OSD_WIN_BDOVERLAY "bb_OSD_BDOVERLAY"
+static constexpr const char* OSD_WIN_TELETEXT  { "aa_OSD_TELETEXT"    };
+static constexpr const char* OSD_WIN_SUBTITLE  { "aa_OSD_SUBTITLES"   };
+static constexpr const char* OSD_WIN_INTERACT  { "bb_OSD_INTERACTIVE" };
+static constexpr const char* OSD_WIN_BDOVERLAY { "bb_OSD_BDOVERLAY"   };
 
 class TeletextScreen;
 class SubtitleScreen;

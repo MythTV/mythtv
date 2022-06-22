@@ -118,9 +118,12 @@ static void delete_in_db(uint endtime)
 }
 
 
-#define EITDATA      0
-#define CHANNEL_LOCK 1
-#define STATISTIC    2
+enum channel_status
+{
+    EITDATA      = 0,
+    CHANNEL_LOCK = 1,
+    STATISTIC    = 2
+};
 
 static bool lock_channel(uint chanid, uint endtime)
 {

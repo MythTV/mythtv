@@ -9,8 +9,12 @@
 #include <cstdlib>
 #include <utility>
 
-#define UNIX_PROC_STAT "/proc/stat"
+#if defined(__linux__) || defined(Q_OS_ANDROID)
+static constexpr const char* UNIX_PROC_STAT { "/proc/stat" };
+#endif
+#if defined(__linux__) || defined(Q_OS_ANDROID) || defined(Q_OS_MACOS)
 static constexpr size_t MAX_CORES { 8 };
+#endif
 
 #ifdef Q_OS_MACOS
 #include <mach/mach_init.h>

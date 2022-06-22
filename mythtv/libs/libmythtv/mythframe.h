@@ -14,8 +14,8 @@
 #include <vector>
 #include <memory>
 
-#define MYTH_WIDTH_ALIGNMENT 64
-#define MYTH_HEIGHT_ALIGNMENT 16
+static constexpr uint8_t MYTH_WIDTH_ALIGNMENT  { 64 };
+static constexpr uint8_t MYTH_HEIGHT_ALIGNMENT { 16 };
 
 enum VideoFrameType
 {

@@ -13,26 +13,26 @@
 // (e.g. osd_window) whose names are hard coded into existing themes.
 
 // menu dialogs should always be on top
-#define OSD_DLG_VIDEOEXIT "xx_OSD_VIDEO_EXIT"
-#define OSD_DLG_MENU      "xx_OSD_MENU"
-#define OSD_DLG_SLEEP     "xx_OSD_SLEEP"
-#define OSD_DLG_IDLE      "xx_OSD_IDLE"
-#define OSD_DLG_INFO      "xx_OSD_INFO"
-#define OSD_DLG_EDITING   "xx_OSD_EDITING"
-#define OSD_DLG_ASKALLOW  "xx_OSD_ASKALLOW"
-#define OSD_DLG_EDITOR    "xx_OSD_EDITOR"
-#define OSD_DLG_CUTPOINT  "xx_OSD_CUTPOINT"
-#define OSD_DLG_DELETE    "xx_OSD_DELETE"
-#define OSD_DLG_NAVIGATE  "xx_OSD_NAVIGATE"
-#define OSD_DLG_CONFIRM   "mythconfirmpopup"
+static constexpr const char* OSD_DLG_VIDEOEXIT { "xx_OSD_VIDEO_EXIT" };
+static constexpr const char* OSD_DLG_MENU      { "xx_OSD_MENU"       };
+static constexpr const char* OSD_DLG_SLEEP     { "xx_OSD_SLEEP"      };
+static constexpr const char* OSD_DLG_IDLE      { "xx_OSD_IDLE"       };
+static constexpr const char* OSD_DLG_INFO      { "xx_OSD_INFO"       };
+static constexpr const char* OSD_DLG_EDITING   { "xx_OSD_EDITING"    };
+static constexpr const char* OSD_DLG_ASKALLOW  { "xx_OSD_ASKALLOW"   };
+static constexpr const char* OSD_DLG_EDITOR    { "xx_OSD_EDITOR"     };
+static constexpr const char* OSD_DLG_CUTPOINT  { "xx_OSD_CUTPOINT"   };
+static constexpr const char* OSD_DLG_DELETE    { "xx_OSD_DELETE"     };
+static constexpr const char* OSD_DLG_NAVIGATE  { "xx_OSD_NAVIGATE"   };
+static constexpr const char* OSD_DLG_CONFIRM   { "mythconfirmpopup"  };
 
-#define OSD_WIN_MESSAGE  "osd_message"
-#define OSD_WIN_INPUT    "osd_input"
-#define OSD_WIN_PROGINFO "program_info"
-#define OSD_WIN_STATUS   "osd_status"
-#define OSD_WIN_DEBUG    "osd_debug"
-#define OSD_WIN_BROWSE   "browse_info"
-#define OSD_WIN_PROGEDIT "osd_program_editor"
+static constexpr const char* OSD_WIN_MESSAGE  { "osd_message"        };
+static constexpr const char* OSD_WIN_INPUT    { "osd_input"          };
+static constexpr const char* OSD_WIN_PROGINFO { "program_info"       };
+static constexpr const char* OSD_WIN_STATUS   { "osd_status"         };
+static constexpr const char* OSD_WIN_DEBUG    { "osd_debug"          };
+static constexpr const char* OSD_WIN_BROWSE   { "browse_info"        };
+static constexpr const char* OSD_WIN_PROGEDIT { "osd_program_editor" };
 
 static constexpr std::chrono::milliseconds kOSDFadeTime { 1s };
 

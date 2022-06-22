@@ -4,9 +4,9 @@
 
 #define LOC QString("DetectLetterbox: ")
 
-#define NUMBER_OF_DETECTION_LINES 3 // How many lines are we looking at
-#define THRESHOLD 5                 // Y component has to not vary more than this in the bars
-#define HORIZONTAL_THRESHOLD 4      // How tolerant are we that the image has horizontal edges
+static constexpr int8_t NUMBER_OF_DETECTION_LINES { 3 }; // How many lines are we looking at
+static constexpr int8_t THRESHOLD                 { 5 }; // Y component has to not vary more than this in the bars
+static constexpr int8_t HORIZONTAL_THRESHOLD      { 4 }; // How tolerant are we that the image has horizontal edges
 
 DetectLetterbox::DetectLetterbox()
 {

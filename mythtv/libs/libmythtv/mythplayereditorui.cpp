@@ -146,6 +146,7 @@ bool MythPlayerEditorUI::HandleProgramEditorActions(QStringList& Actions)
 
     for (int i = 0; i < Actions.size() && !handled; i++)
     {
+        static constexpr float FFREW_MULTICOUNT { 10.0F };
         QString action = Actions[i];
         handled = true;
         float seekamount = m_deleteMap.GetSeekAmount();
@@ -207,7 +208,6 @@ bool MythPlayerEditorUI::HandleProgramEditorActions(QStringList& Actions)
             HandleArbSeek(true);
             m_deleteMap.SetSeekAmount(old_seekamount);
         }
-#define FFREW_MULTICOUNT 10.0F
         else if (action == ACTION_BIGJUMPREW)
         {
             if (seekzero)
