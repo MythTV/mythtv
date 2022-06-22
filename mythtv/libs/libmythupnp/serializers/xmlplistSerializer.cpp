@@ -22,7 +22,7 @@
 
 #include "xmlplistSerializer.h"
 
-#define XMLPLIST_SERIALIZER_VERSION "1.0"
+static constexpr const char* XMLPLIST_SERIALIZER_VERSION { "1.0" };
 
 void XmlPListSerializer::BeginSerialize(QString &/*sName*/)
 {

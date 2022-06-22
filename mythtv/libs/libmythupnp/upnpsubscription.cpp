@@ -24,7 +24,7 @@ QObject::customEvent to receive event notifications for subscribed services.
 #include "bufferedsocketdevice.h"
 
 // default requested time for subscription (actual is dictated by server)
-#define SUBSCRIPTION_TIME 1800
+static constexpr uint16_t SUBSCRIPTION_TIME { 1800 };
 // maximum time to wait for responses to subscription requests (UPnP spec. 30s)
 static constexpr std::chrono::milliseconds MAX_WAIT { 30s };
 

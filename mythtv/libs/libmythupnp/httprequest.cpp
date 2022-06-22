@@ -593,7 +593,7 @@ qint64 HTTPRequest::SendResponseFile( const QString& sFileName )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#define SENDFILE_BUFFER_SIZE 65536
+static constexpr size_t SENDFILE_BUFFER_SIZE { 65536 };
 
 qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes )
 {

@@ -26,9 +26,9 @@
 #include "ssdpcache.h"
 #include "upnptasknotify.h"
 
-#define SSDP_GROUP      "239.255.255.250"
-#define SSDP_PORT       1900
-#define SSDP_SEARCHPORT 6549
+static constexpr const char* SSDP_GROUP { "239.255.255.250" };
+static constexpr uint16_t SSDP_PORT       { 1900 };
+static constexpr uint16_t SSDP_SEARCHPORT { 6549 };
 
 enum SSDPMethod
 {
@@ -53,9 +53,12 @@ enum SSDPRequestType
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-#define SocketIdx_Search     0
-#define SocketIdx_Multicast  1
-#define SocketIdx_Broadcast  2
+enum SocketIdxType
+{
+    SocketIdx_Search     = 0,
+    SocketIdx_Multicast  = 1,
+    SocketIdx_Broadcast  = 2
+};
 
 class UPNP_PUBLIC SSDP : public MThread
 {
