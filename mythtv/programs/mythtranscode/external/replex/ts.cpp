@@ -186,7 +186,7 @@ static unsigned int crc32_04c11db7 (const unsigned char *d, int len, unsigned in
    return crc;
 }
 
-static int write_ts_header(int pid, int payload_start, int count,
+static int write_ts_header(uint16_t pid, int payload_start, int count,
 		    int64_t SCR, uint8_t *obuf, int stuff)
 {
 	int c = 0;
@@ -380,7 +380,7 @@ int write_ac3_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 
 void write_ts_patpmt(extdata_t *ext, int extcnt, uint8_t prog_num, uint8_t *buf)
 {
-#define PMTPID 0x20
+	static constexpr uint8_t PMTPID { 0x20 };
 	static int s_count = 0;
 	int pmtpos = 13;
 	//PMT Program number = 1

@@ -4,7 +4,7 @@
 #include "libmyth/audio/audiooutput.h"
 #include "libmythbase/mythconfig.h"
 
-#define ABLOCK_SIZE   8192
+static constexpr size_t ABLOCK_SIZE { 8192 };
 
 class AudioBuffer
 {
@@ -18,8 +18,8 @@ class AudioBuffer
     int   size(void) const { return m_size; }
 
     uint8_t    *m_buffer   {nullptr};
-    int         m_size     {0};
-    int         m_realsize {ABLOCK_SIZE};
+    size_t      m_size     {0};
+    size_t      m_realsize {ABLOCK_SIZE};
     int         m_frames   {0};
     std::chrono::milliseconds   m_time     {-1ms};
 };

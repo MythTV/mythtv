@@ -348,7 +348,8 @@ MPEG2fixup::~MPEG2fixup()
 }
 
 //#define MPEG2trans_DEBUG
-#define MATCH_HEADER(ptr) (((ptr)[0] == 0x00) && ((ptr)[1] == 0x00) && ((ptr)[2] == 0x01))
+static constexpr bool MATCH_HEADER(const uint8_t *ptr)
+    { return (ptr[0] == 0x00) && (ptr[1] == 0x00) && (ptr[2] == 0x01); };
 
 static void SETBITS(unsigned char *ptr, long value, int num)
 {
@@ -1349,7 +1350,7 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, const QString& fname)
     return false;
 }
 
-#define MAX_FRAMES 20000
+static constexpr int MAX_FRAMES { 20000 };
 MPEG2frame *MPEG2fixup::GetPoolFrame(AVPacket *pkt)
 {
     MPEG2frame *f = nullptr;

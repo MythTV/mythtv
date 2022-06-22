@@ -30,37 +30,37 @@
 #include "ringbuffer.h"
 #include "mpg_common.h"
 
-#define TS_SIZE        188
-#define TRANS_ERROR    0x80
-#define PAY_START      0x40
-#define TRANS_PRIO     0x20
-#define PID_MASK_HI    0x1F
+static constexpr ssize_t  TS_SIZE        {  188 };
+static constexpr uint8_t  TRANS_ERROR    { 0x80 };
+static constexpr uint8_t  PAY_START      { 0x40 };
+static constexpr uint8_t  TRANS_PRIO     { 0x20 };
+static constexpr uint8_t  PID_MASK_HI    { 0x1F };
 
 //flags
-#define TRANS_SCRMBL1  0x80
-#define TRANS_SCRMBL2  0x40
-#define ADAPT_FIELD    0x20
-#define PAYLOAD        0x10
-#define COUNT_MASK     0x0F
+static constexpr uint8_t  TRANS_SCRMBL1  { 0x80 };
+static constexpr uint8_t  TRANS_SCRMBL2  { 0x40 };
+static constexpr uint8_t  ADAPT_FIELD    { 0x20 };
+static constexpr uint8_t  PAYLOAD        { 0x10 };
+static constexpr uint8_t  COUNT_MASK     { 0x0F };
 
 // adaptation flags
-#define DISCON_IND     0x80
-#define RAND_ACC_IND   0x40
-#define ES_PRI_IND     0x20
-#define PCR_FLAG       0x10
-#define OPCR_FLAG      0x08
-#define SPLICE_FLAG    0x04
-#define TRANS_PRIV     0x02
-#define ADAP_EXT_FLAG  0x01
+static constexpr uint8_t  DISCON_IND     { 0x80 };
+static constexpr uint8_t  RAND_ACC_IND   { 0x40 };
+static constexpr uint8_t  ES_PRI_IND     { 0x20 };
+static constexpr uint8_t  PCR_FLAG       { 0x10 };
+static constexpr uint8_t  OPCR_FLAG      { 0x08 };
+static constexpr uint8_t  SPLICE_FLAG    { 0x04 };
+static constexpr uint8_t  TRANS_PRIV     { 0x02 };
+static constexpr uint8_t  ADAP_EXT_FLAG  { 0x01 };
 
 // adaptation extension flags
-#define LTW_FLAG       0x80
-#define PIECE_RATE     0x40
-#define SEAM_SPLICE    0x20
+static constexpr uint8_t  LTW_FLAG       { 0x80 };
+static constexpr uint8_t  PIECE_RATE     { 0x40 };
+static constexpr uint8_t  SEAM_SPLICE    { 0x20 };
 
-#define TS_VIDPID      4101
-#define TS_MP2PID      4201
-#define TS_AC3PID      4301
+static constexpr uint16_t TS_VIDPID      { 4101 };
+static constexpr uint16_t TS_MP2PID      { 4201 };
+static constexpr uint16_t TS_AC3PID      { 4301 };
 uint16_t get_pid(const uint8_t *pid);
 int find_pids(uint16_t *vpid, uint16_t *apid, uint16_t *ac3pid,uint8_t *buf, int len);
 int find_pids_pos(uint16_t *vpid, uint16_t *apid, uint16_t *ac3pid,uint8_t *buf, int len, int *vpos, int *apos, int *ac3pos);
