@@ -42,40 +42,6 @@
 
 #include "ifs.h"
 #include "goom_core.h"
-
-#define MODE_ifs
-
-#define PROGCLASS "IFS"
-
-#define HACK_INIT init_ifs
-#define HACK_DRAW draw_ifs
-
-#define ifs_opts xlockmore_opts
-
-#define DEFAULTS "*delay: 20000 \n" \
- "*ncolors: 100 \n"
-
-#define SMOOTH_COLORS
-
-//#include "xlockmore.h"                /* in xscreensaver distribution */
-//#else /* STANDALONE */
-//#include "xlock.h"            /* in xlockmore distribution */
-//#endif /* STANDALONE */
-
-//#ifdef MODE_ifs
-
-//ModeSpecOpt ifs_opts =
-//{0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
-
-//#ifdef USE_MODULES
-//ModStruct   ifs_description =
-//{"ifs", "init_ifs", "draw_ifs", "release_ifs",
-// "init_ifs", "init_ifs", (char *) NULL, &ifs_opts,
-// 1000, 1, 1, 1, 64, 1.0, "",
-// "Shows a modified iterated function system", 0, NULL};
-
-//#endif
-
 #include "goom_tools.h"
 
 
@@ -533,5 +499,3 @@ release_ifs ()
 		Root = (FRACTAL *) nullptr;
 	}
 }
-
-//#endif /* MODE_ifs */
