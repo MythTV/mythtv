@@ -14,7 +14,7 @@
 #define DBLOC QString("ImageDb(%1): ").arg(m_table)
 
 // Must be empty as it's prepended to path
-#define STORAGE_GROUP_MOUNT  ""
+static constexpr const char* STORAGE_GROUP_MOUNT { "" };
 
 #define DB_TABLE "gallery_files"
 

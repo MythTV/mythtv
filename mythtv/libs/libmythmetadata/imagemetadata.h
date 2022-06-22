@@ -22,24 +22,24 @@
 
 
 // Exif 2.3 standard tag names, see http://www.exiv2.org/tags.html
-#define EXIF_TAG_ORIENTATION      "Exif.Image.Orientation"
-#define EXIF_TAG_DATETIME         "Exif.Image.DateTime"
-#define EXIF_TAG_DATE_FORMAT      "yyyy:MM:dd hh:mm:ss"
-#define EXIF_TAG_IMAGEDESCRIPTION "Exif.Image.ImageDescription"
-#define EXIF_TAG_USERCOMMENT      "Exif.Photo.UserComment"
-#define EXIF_PRINT_IMAGE_MATCHING 0xc4a5
+static constexpr const char* EXIF_TAG_ORIENTATION      { "Exif.Image.Orientation" };
+static constexpr const char* EXIF_TAG_DATETIME         { "Exif.Image.DateTime" };
+static constexpr const char* EXIF_TAG_DATE_FORMAT      { "yyyy:MM:dd hh:mm:ss" };
+static constexpr const char* EXIF_TAG_IMAGEDESCRIPTION { "Exif.Image.ImageDescription" };
+static constexpr const char* EXIF_TAG_USERCOMMENT      { "Exif.Photo.UserComment" };
+static constexpr uint16_t EXIF_PRINT_IMAGE_MATCHING    { 0xc4a5 };
 
 // ffmpeg video tags
-#define FFMPEG_TAG_ORIENTATION    "rotate"
-#define FFMPEG_TAG_DATETIME       "creation_time"
-#define FFMPEG_TAG_DATE_FORMAT    "yyyy-MM-dd hh:mm:ss"
+static constexpr const char* FFMPEG_TAG_ORIENTATION    { "rotate" };
+static constexpr const char* FFMPEG_TAG_DATETIME       { "creation_time" };
+static constexpr const char* FFMPEG_TAG_DATE_FORMAT    { "yyyy-MM-dd hh:mm:ss" };
 
 // Pseudo keys for passing Myth data as metadata tags.
-#define EXIF_MYTH_HOST   "Myth.host"
-#define EXIF_MYTH_PATH   "Myth.path"
-#define EXIF_MYTH_NAME   "Myth.name"
-#define EXIF_MYTH_SIZE   "Myth.size"
-#define EXIF_MYTH_ORIENT "Myth.orient"
+static constexpr const char* EXIF_MYTH_HOST   { "Myth.host" };
+static constexpr const char* EXIF_MYTH_PATH   { "Myth.path" };
+static constexpr const char* EXIF_MYTH_NAME   { "Myth.name" };
+static constexpr const char* EXIF_MYTH_SIZE   { "Myth.size" };
+static constexpr const char* EXIF_MYTH_ORIENT { "Myth.orient" };
 
 
 //! Image transformations

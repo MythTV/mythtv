@@ -12,7 +12,7 @@
 // libmythmetadata
 #include "musicmetadata.h"
 
-#define MYTH_MUSICBRAINZ_ALBUMARTIST_UUID "89ad4ac3-39f7-470e-963a-56509c546377"
+static constexpr const char* MYTH_MUSICBRAINZ_ALBUMARTIST_UUID { "89ad4ac3-39f7-470e-963a-56509c546377" };
 
 class META_PUBLIC MetaIO
 {

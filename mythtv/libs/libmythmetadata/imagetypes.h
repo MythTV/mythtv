@@ -24,9 +24,9 @@
 #endif
 
 // Id of the (virtual) Gallery root node
-#define GALLERY_DB_ID 0
+static constexpr int GALLERY_DB_ID { 0 };
 // Id of the Storage Group (Photographs) node
-#define PHOTO_DB_ID 1
+static constexpr int PHOTO_DB_ID { 1 };
 
 
 //! Type of image node
