@@ -159,14 +159,14 @@ class LCDProcClient : public QObject
     QString             m_prioLow;
     QString             m_prioOff;
 
-    unsigned int        m_lcdWidth              {5};
-    unsigned int        m_lcdHeight             {1};
-    unsigned int        m_cellWidth             {1};
-    unsigned int        m_cellHeight            {1};
+    uint8_t             m_lcdWidth              {5};
+    uint8_t             m_lcdHeight             {1};
+    uint8_t             m_cellWidth             {1};
+    uint8_t             m_cellHeight            {1};
 
     QString             m_serverVersion;
     QString             m_protocolVersion;
-    int                 m_pVersion              {0};
+    uint8_t             m_pVersion              {0};
 
     float               m_progress              {0.0};
     QString             m_channelTime;

@@ -8,7 +8,7 @@
 
 #include "libmythbase/programtypes.h"
 
-#define MAX_BLANK_FRAMES 180
+static constexpr int64_t MAX_BLANK_FRAMES { 180 };
 
 enum CommMapValue {
     MARK_START   = 0,

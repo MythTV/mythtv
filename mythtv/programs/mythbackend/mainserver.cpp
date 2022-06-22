@@ -93,7 +93,7 @@
  */
 static constexpr std::chrono::milliseconds PRT_TIMEOUT { 10ms };
 /** Number of threads in process request thread pool at startup. */
-#define PRT_STARTUP_THREAD_COUNT 5
+static constexpr int PRT_STARTUP_THREAD_COUNT { 5 };
 
 #define LOC      QString("MainServer: ")
 #define LOC_WARN QString("MainServer, Warning: ")

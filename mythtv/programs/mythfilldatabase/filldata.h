@@ -14,7 +14,7 @@
 #include "channeldata.h"
 #include "xmltvparser.h"
 
-#define REFRESH_MAX 21
+static constexpr int8_t REFRESH_MAX { 21 };
 
 // helper functions to update mfdb status fields in settings
 bool updateLastRunEnd();

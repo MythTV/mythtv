@@ -16,8 +16,8 @@
 // MythScreenWizard
 #include "screenwizard.h"
 
-#define kMinWidth 160
-#define kMinHeight 160
+static constexpr int kMinWidth  { 160 };
+static constexpr int kMinHeight { 160 };
 
 ScreenWizard::ScreenWizard(MythScreenStack *parent, const char *name) :
     MythScreenType(parent, name),

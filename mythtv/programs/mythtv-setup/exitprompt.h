@@ -1,9 +1,11 @@
 #include <QObject>
 
-#define NO_EXIT  0
-#define QUIT     1
-#define HALT     2
-#define REBOOT   3
+enum exit_actions {
+    NO_EXIT  = 0,
+    QUIT     = 1,
+    HALT     = 2,
+    REBOOT   = 3
+};
 
 class ExitPrompter : public QObject
 {

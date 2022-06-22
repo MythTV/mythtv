@@ -23,8 +23,8 @@
 #include "mythfilerecorder.h"
 #include "mythfilerecorder_commandlineparser.h"
 
-#define API_VERSION 1
-#define VERSION "1.0.0"
+static constexpr int API_VERSION { 1 };
+static constexpr const char* VERSION { "1.0.0" };
 #define LOC QString("File(%1): ").arg(m_fileName)
 
 Streamer::Streamer(Commands *parent, QString fname,
