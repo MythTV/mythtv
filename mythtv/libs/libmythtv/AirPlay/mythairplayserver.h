@@ -19,8 +19,8 @@ class QTimer;
 class MThread;
 class BonjourRegister;
 
-#define AIRPLAY_PORT_RANGE 100
-#define AIRPLAY_HARDWARE_ID_SIZE 6
+static constexpr int AIRPLAY_PORT_RANGE { 100 };
+static constexpr size_t AIRPLAY_HARDWARE_ID_SIZE { 6 };
 QString     AirPlayHardwareId(void);
 QString     GenerateNonce(void);
 QByteArray  DigestMd5Response(const QString& response, const QString& option,

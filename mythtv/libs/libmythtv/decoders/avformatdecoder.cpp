@@ -45,10 +45,12 @@ extern "C" {
  */
 
 /* Line type IDs */
-#define V4L2_MPEG_VBI_IVTV_TELETEXT_B     (1) ///< Teletext (uses lines 6-22 for PAL, 10-21 for NTSC)
-#define V4L2_MPEG_VBI_IVTV_CAPTION_525    (4) ///< Closed Captions (line 21 NTSC, line 22 PAL)
-#define V4L2_MPEG_VBI_IVTV_WSS_625        (5) ///< Wide Screen Signal (line 20 NTSC, line 23 PAL)
-#define V4L2_MPEG_VBI_IVTV_VPS            (7) ///< Video Programming System (PAL) (line 16)
+enum V4L2_MPEG_LINE_TYPES {
+    V4L2_MPEG_VBI_IVTV_TELETEXT_B     = 1, ///< Teletext (uses lines 6-22 for PAL, 10-21 for NTSC)
+    V4L2_MPEG_VBI_IVTV_CAPTION_525    = 4, ///< Closed Captions (line 21 NTSC, line 22 PAL)
+    V4L2_MPEG_VBI_IVTV_WSS_625        = 5, ///< Wide Screen Signal (line 20 NTSC, line 23 PAL)
+    V4L2_MPEG_VBI_IVTV_VPS            = 7, ///< Video Programming System (PAL) (line 16)
+};
 // comments for each ID from ivtv_myth.h
 
 #include <QFileInfo>
@@ -116,9 +118,13 @@ __inline AVRational GetAVTimeBaseQ()
 // is probably best removed as it is treating the symptoms and not the cause.
 // See also comment in MythCodecMap::freeCodecContext re trying to free an
 // active hardware context when it is errored.
-#define SEQ_PKT_ERR_MAX 50
+static constexpr int SEQ_PKT_ERR_MAX { 50 };
 
-static const int max_video_queue_size = 220;
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+static constexpr int16_t kMaxVideoQueueSize = 220;
+#else
+static constexpr ssize_t kMaxVideoQueueSize = 220;
+#endif
 
 static bool silence_ffmpeg_logging = false;
 
@@ -3109,12 +3115,12 @@ void AvFormatDecoder::HandleGopStart(
     }
 }
 
-#define SEQ_START     0x000001b3
-#define GOP_START     0x000001b8
-#define PICTURE_START 0x00000100
-#define SLICE_MIN     0x00000101
-#define SLICE_MAX     0x000001af
-#define SEQ_END_CODE  0x000001b7
+static constexpr uint32_t SEQ_START       { 0x000001b3 };
+static constexpr uint32_t GOP_START       { 0x000001b8 };
+//static constexpr uint32_t PICTURE_START { 0x00000100 };
+static constexpr uint32_t SLICE_MIN       { 0x00000101 };
+static constexpr uint32_t SLICE_MAX       { 0x000001af };
+//static constexpr uint32_t SEQ_END_CODE  { 0x000001b7 };
 
 void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 {
@@ -4891,7 +4897,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                 m_allowedQuit = true;
             }
             else if ((decodetype & kDecodeAV) == kDecodeAV &&
-                     (m_storedPackets.count() < max_video_queue_size) &&
+                     (m_storedPackets.count() < kMaxVideoQueueSize) &&
                      // buffer audio to prevent audio buffer
                      // underruns in case you are setting negative values
                      // in Adjust Audio Sync.
@@ -4902,7 +4908,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
             }
             else if (decodetype & kDecodeVideo)
             {
-                if (m_storedPackets.count() >= max_video_queue_size)
+                if (m_storedPackets.count() >= kMaxVideoQueueSize)
                 {
                     LOG(VB_GENERAL, LOG_WARNING, LOC +
                         QString("Audio %1 ms behind video but already %2 "

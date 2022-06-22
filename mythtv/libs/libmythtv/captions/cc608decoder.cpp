@@ -847,15 +847,15 @@ static int OddParity(unsigned char c)
 // // // // // // // // // // //  VPS  // // // // // // // // // // //
 // // // // // // // // // // // // // // // // // // // // // // // //
 
+static constexpr int PIL_TIME(int day, int mon, int hour, int min)
+{ return (day << 15) + (mon << 11) + (hour << 6) + min; }
+
 static void DumpPIL(int pil)
 {
     int day  = (pil >> 15);
     int mon  = (pil >> 11) & 0xF;
     int hour = (pil >> 6 ) & 0x1F;
     int min  = (pil      ) & 0x3F;
-
-#define PIL_TIME(day, mon, hour, min) \
-  (((day) << 15) + ((mon) << 11) + ((hour) << 6) + ((min) << 0))
 
     if (pil == PIL_TIME(0, 15, 31, 63))
         LOG(VB_VBI, LOG_INFO, " PDC: Timer-control (no PDC)");

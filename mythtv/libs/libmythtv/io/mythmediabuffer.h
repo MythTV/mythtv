@@ -20,15 +20,15 @@ extern "C" {
 }
 
 // Size of PNG header plus one empty chunk
-#define kReadTestSize 20
+static constexpr qint64 kReadTestSize { 20 };
 
 // about one second at 35Mb
-#define BUFFER_SIZE_MINIMUM (4 * 1024 * 1024)
-#define BUFFER_FACTOR_NETWORK  2
-#define BUFFER_FACTOR_BITRATE  2
-#define BUFFER_FACTOR_MATROSKA 2
+static constexpr uint32_t BUFFER_SIZE_MINIMUM    { 4 * 1024 * 1024 };
+static constexpr uint8_t  BUFFER_FACTOR_NETWORK  { 2 };
+static constexpr uint8_t  BUFFER_FACTOR_BITRATE  { 2 };
+static constexpr uint8_t  BUFFER_FACTOR_MATROSKA { 2 };
 
-#define DEFAULT_CHUNK_SIZE 32768
+static constexpr int32_t  DEFAULT_CHUNK_SIZE     { 32768 };
 
 class ThreadedFileWriter;
 class MythDVDBuffer;

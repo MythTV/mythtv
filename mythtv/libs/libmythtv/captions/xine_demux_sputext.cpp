@@ -47,14 +47,8 @@
 
 #include "captions/xine_demux_sputext.h"
 
-#define LOG_MODULE "demux_sputext"
-#define LOG_VERBOSE
-/*
-#define LOG
-*/
-
 #define ERR           ((void *)-1)
-#define LINE_LEN      1000
+static constexpr ssize_t LINE_LEN { 1000 };
 #define LINE_LEN_QUOT "1000"
 
 #ifdef _WIN32

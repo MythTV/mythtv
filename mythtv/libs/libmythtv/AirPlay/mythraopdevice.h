@@ -15,7 +15,7 @@ class MThread;
 class BonjourRegister;
 class MythRAOPConnection;
 
-#define RAOP_PORT_RANGE 100
+static constexpr int RAOP_PORT_RANGE { 100 };
 
 class MTV_PUBLIC MythRAOPDevice : public ServerPool
 {

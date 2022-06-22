@@ -8,7 +8,7 @@
 #include "tv_actions.h"
 #include "libmythbase/mythlogging.h"
 
-#define MAGAZINE(page) ((page) / 256)
+static inline int MAGAZINE(int page) { return page / 256; };
 
 TeletextReader::TeletextReader()
 {

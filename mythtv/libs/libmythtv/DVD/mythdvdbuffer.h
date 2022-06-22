@@ -27,7 +27,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-#define DVD_MENU_MAX 7
+static constexpr int32_t DVD_MENU_MAX { 7 };
 
 class MythDVDPlayer;
 

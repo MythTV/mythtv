@@ -11,7 +11,7 @@
 #include "libmythtv/Bluray/mythbdoverlay.h"
 #include "libmythtv/io/mythopticalbuffer.h"
 
-#define BD_BLOCK_SIZE 6144LL
+static constexpr int32_t BD_BLOCK_SIZE { 6144 };
 
 /** \class MythBDBuffer
  *   A class to allow a MythMediaBuffer to read from BDs.

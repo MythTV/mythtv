@@ -24,14 +24,14 @@ enum TTColor
     kTTColorTransparent = 8,
 };
 
-#define TP_SUPPRESS_HEADER  0x01
-#define TP_UPDATE_INDICATOR 0x02
-#define TP_INTERRUPTED_SEQ  0x04
-#define TP_INHIBIT_DISPLAY  0x08
-#define TP_MAGAZINE_SERIAL  0x10
-#define TP_ERASE_PAGE       0x20
-#define TP_NEWSFLASH        0x40
-#define TP_SUBTITLE         0x80
+static constexpr uint8_t TP_SUPPRESS_HEADER  { 0x01 };
+static constexpr uint8_t TP_UPDATE_INDICATOR { 0x02 };
+static constexpr uint8_t TP_INTERRUPTED_SEQ  { 0x04 };
+static constexpr uint8_t TP_INHIBIT_DISPLAY  { 0x08 };
+static constexpr uint8_t TP_MAGAZINE_SERIAL  { 0x10 };
+static constexpr uint8_t TP_ERASE_PAGE       { 0x20 };
+static constexpr uint8_t TP_NEWSFLASH        { 0x40 };
+static constexpr uint8_t TP_SUBTITLE         { 0x80 };
 
 using tt_line_array = std::array<uint8_t,40>;
 

@@ -26,20 +26,20 @@
 #include "libmythui/mythmainwindow.h"
 
 #define LOC QString("RAOP Conn: ")
-#define MAX_PACKET_SIZE  2048
+static constexpr size_t MAX_PACKET_SIZE { 2048 };
 
 RSA *MythRAOPConnection::g_rsa = nullptr;
 QString MythRAOPConnection::g_rsaLastError;
 
 // RAOP RTP packet type
-#define TIMING_REQUEST   0x52
-#define TIMING_RESPONSE  0x53
-#define SYNC             0x54
-#define FIRSTSYNC        (0x54 | 0x80)
-#define RANGE_RESEND     0x55
-#define AUDIO_RESEND     0x56
-#define AUDIO_DATA       0x60
-#define FIRSTAUDIO_DATA  (0x60 | 0x80)
+static constexpr uint8_t TIMING_REQUEST   { 0x52 };
+static constexpr uint8_t TIMING_RESPONSE  { 0x53 };
+static constexpr uint8_t SYNC             { 0x54 };
+static constexpr uint8_t FIRSTSYNC        { 0x54 | 0x80 };
+static constexpr uint8_t RANGE_RESEND     { 0x55 };
+static constexpr uint8_t AUDIO_RESEND     { 0x56 };
+static constexpr uint8_t AUDIO_DATA       { 0x60 };
+static constexpr uint8_t FIRSTAUDIO_DATA  { 0x60 | 0x80 };
 
 // Size (in ms) of audio buffered in audio card
 static constexpr std::chrono::milliseconds AUDIOCARD_BUFFER { 500ms };

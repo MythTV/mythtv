@@ -61,9 +61,9 @@ QEvent::Type ScannerEvent::SetStatusChannelTuned =
     (QEvent::Type) QEvent::registerEventType();
 
 /// Percentage to set to after the transports have been scanned
-#define TRANSPORT_PCT 6
+static constexpr int8_t TRANSPORT_PCT  { 6 };
 /// Percentage to set to after the first tune
-#define TUNED_PCT     3
+//static constexpr int8_t TUNED_PCT    { 3 };
 
 void post_event(QObject *dest, QEvent::Type type, int val)
 {

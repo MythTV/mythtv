@@ -23,7 +23,7 @@
 #define LOC QString("DVDRB: ")
 
 #define IncrementButtonVersion if (++m_buttonVersion > 1024) m_buttonVersion = 1;
-#define DVD_DRIVE_SPEED 1
+static constexpr int8_t DVD_DRIVE_SPEED { 1 };
 
 static const std::array<const std::string,8> DVDMenuTable
 {

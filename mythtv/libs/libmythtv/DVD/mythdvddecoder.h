@@ -7,7 +7,7 @@
 // MythTV
 #include "decoders/avformatdecoder.h"
 
-#define INVALID_LBA 0xbfffffff
+static constexpr uint32_t INVALID_LBA { 0xbfffffff };
 
 class MythDVDContext;
 

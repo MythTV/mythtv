@@ -55,10 +55,10 @@ using aesiv_array = std::array<uint8_t,AES_BLOCK_SIZE>;
 #define LOC QString("HLSBuffer: ")
 
 // Constants
-#define PLAYBACK_MINBUFFER 2    // number of segments to prefetch before playback starts
-#define PLAYBACK_READAHEAD 6    // number of segments download queue ahead of playback
-#define PLAYLIST_FAILURE   6    // number of consecutive failures after which
-                                // playback will abort
+static constexpr int    PLAYBACK_MINBUFFER { 2 }; // number of segments to prefetch before playback starts
+static constexpr int8_t PLAYBACK_READAHEAD { 6 }; // number of segments download queue ahead of playback
+static constexpr int8_t PLAYLIST_FAILURE   { 6 }; // number of consecutive failures after which
+                                                  // playback will abort
 enum
 {
     RET_ERROR = -1,

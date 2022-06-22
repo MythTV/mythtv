@@ -135,7 +135,7 @@ QString AirPlayHardwareId()
     if (size != 12)
     {
         QByteArray ba;
-        for (int i = 0; i < AIRPLAY_HARDWARE_ID_SIZE; i++)
+        for (size_t i = 0; i < AIRPLAY_HARDWARE_ID_SIZE; i++)
         {
             ba.append(MythRandom(33, 33 + 80 - 1));
         }
