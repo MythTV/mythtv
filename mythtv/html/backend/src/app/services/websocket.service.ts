@@ -25,7 +25,7 @@ export class WebsocketService {
         url: this.ws_url,
         binaryType: 'arraybuffer',
         serializer: v => v as ArrayBuffer,
-        deserializer: ({data}) => data,
+        deserializer: v => v.data,
         openObserver: {
           next: () => {
               console.log('websocket connection opened');
