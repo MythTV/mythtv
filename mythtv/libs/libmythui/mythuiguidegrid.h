@@ -16,19 +16,20 @@
 #include "mythuitype.h"
 #include "mythuiimage.h"
 
-#define ARROWIMAGESIZE 4
-#define RECSTATUSSIZE  8
+static constexpr size_t ARROWIMAGESIZE { 4 };
+static constexpr size_t RECSTATUSSIZE  { 8 };
 
 
 // max number of channels to display in the guide grid
-#define MAX_DISPLAY_CHANS 40
+static constexpr int MAX_DISPLAY_CHANS { 40 };
 
 // max number of 5 minute time slots to show in guide grid (48 = 4hrs)
-#define MAX_DISPLAY_TIMES 48
+static constexpr int MAX_DISPLAY_TIMES { 48 };
 
-#define GridTimeNormal       0
-#define GridTimeStartsBefore 1
-#define GridTimeEndsAfter    2
+// bitmask
+static constexpr uint8_t GridTimeNormal       { 0 };
+static constexpr uint8_t GridTimeStartsBefore { 1 };
+static constexpr uint8_t GridTimeEndsAfter    { 2 };
 
 class MythFontProperties;
 

@@ -29,7 +29,7 @@
 
 #define LOC QString("NotificationCenter: ")
 
-#define HGAP 5
+static constexpr int8_t HGAP { 5 };
 static constexpr std::chrono::milliseconds DEFAULT_DURATION { 5s };
 
 //// MythNotificationCenterEvent

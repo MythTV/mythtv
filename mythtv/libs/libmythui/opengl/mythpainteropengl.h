@@ -23,7 +23,7 @@ class QOpenGLBuffer;
 class QOpenGLFramebufferObject;
 class QOpenGLShaderProgram;
 
-#define MAX_BUFFER_POOL 70
+static constexpr size_t MAX_BUFFER_POOL { 70 };
 
 class MUI_PUBLIC MythOpenGLPainter : public MythPainterGPU
 {

@@ -55,7 +55,7 @@ enum GLFeatures
     kGLGeometryShaders = 0x0100
 };
 
-#define TEX_OFFSET 8
+static constexpr size_t TEX_OFFSET { 8 };
 
 class MUI_PUBLIC MythGLTexture
 {
@@ -130,7 +130,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     QFunctionPointer GetProcAddress(const QString &Proc) const;
     uint64_t GetSwapCount();
 
-    static const GLuint kVertexSize;
+    static constexpr GLuint kVertexSize { 16 * sizeof(GLfloat) };
     QOpenGLBuffer* CreateVBO(int Size, bool Release = true);
 
     MythGLTexture* CreateTextureFromQImage(QImage *Image);

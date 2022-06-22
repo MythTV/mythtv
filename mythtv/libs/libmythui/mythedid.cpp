@@ -8,19 +8,19 @@
 // Std
 #include <cmath>
 
-#define DESCRIPTOR_ALPHANUMERIC_STRING 0xFE
-#define DESCRIPTOR_PRODUCT_NAME 0xFC
-#define DESCRIPTOR_RANGE_LIMITS 0xFD
-#define DESCRIPTOR_SERIAL_NUMBER 0xFF
-#define DATA_BLOCK_OFFSET 0x36
-#define SERIAL_OFFSET     0x0C
-#define VERSION_OFFSET    0x12
-#define DISPLAY_OFFSET    0x14
-#define WIDTH_OFFSET      0x15
-#define HEIGHT_OFFSET     0x16
-#define GAMMA_OFFSET      0x17
-#define FEATURES_OFFSET   0x18
-#define EXTENSIONS_OFFSET 0x7E
+//static constexpr uint8_t DESCRIPTOR_ALPHANUMERIC_STRING { 0xFE };
+static constexpr uint8_t DESCRIPTOR_PRODUCT_NAME          { 0xFC };
+static constexpr uint8_t DESCRIPTOR_RANGE_LIMITS          { 0xFD };
+static constexpr uint8_t DESCRIPTOR_SERIAL_NUMBER         { 0xFF };
+static constexpr size_t DATA_BLOCK_OFFSET                 { 0x36 };
+static constexpr size_t SERIAL_OFFSET                     { 0x0C };
+static constexpr size_t VERSION_OFFSET                    { 0x12 };
+//static constexpr size_t DISPLAY_OFFSET                  { 0x14 };
+static constexpr size_t WIDTH_OFFSET                      { 0x15 };
+static constexpr size_t HEIGHT_OFFSET                     { 0x16 };
+static constexpr size_t GAMMA_OFFSET                      { 0x17 };
+static constexpr size_t FEATURES_OFFSET                   { 0x18 };
+static constexpr size_t EXTENSIONS_OFFSET                 { 0x7E };
 
 #define LOC QString("EDID: ")
 

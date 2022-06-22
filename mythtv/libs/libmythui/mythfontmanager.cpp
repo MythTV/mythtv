@@ -11,7 +11,7 @@
 static MythFontManager *gFontManager = nullptr;
 
 #define LOC      QString("MythFontManager: ")
-#define MAX_DIRS 100
+static constexpr int8_t MAX_DIRS { 100 };
 
 /**
  *  \brief Loads the fonts in font files within the given directory structure

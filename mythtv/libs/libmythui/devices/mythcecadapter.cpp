@@ -18,7 +18,7 @@
 // libcec
 #include <libcec/cecloader.h>
 
-#define MAX_CEC_DEVICES 10
+static constexpr uint8_t MAX_CEC_DEVICES { 10 };
 #define LOC QString("CECAdapter: ")
 
 #if CEC_LIB_VERSION_MAJOR <= 3

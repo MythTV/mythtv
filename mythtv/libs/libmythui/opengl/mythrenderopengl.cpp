@@ -28,17 +28,16 @@
 #include <QWindow>
 #endif
 
-#define VERTEX_INDEX  0
-#define COLOR_INDEX   1
-#define TEXTURE_INDEX 2
-#define VERTEX_SIZE   2
-#define TEXTURE_SIZE  2
+static constexpr GLuint VERTEX_INDEX  { 0 };
+static constexpr GLuint COLOR_INDEX   { 1 };
+static constexpr GLuint TEXTURE_INDEX { 2 };
+static constexpr GLint  VERTEX_SIZE   { 2 };
+static constexpr GLint  TEXTURE_SIZE  { 2 };
 
-static const GLuint kVertexOffset  = 0;
-static const GLuint kTextureOffset = 8 * sizeof(GLfloat);
-const GLuint MythRenderOpenGL::kVertexSize = 16 * sizeof(GLfloat);
+static constexpr GLuint kVertexOffset  { 0 };
+static constexpr GLuint kTextureOffset { 8 * sizeof(GLfloat) };
 
-#define MAX_VERTEX_CACHE 500
+static constexpr int MAX_VERTEX_CACHE { 500 };
 
 MythGLTexture::MythGLTexture(QOpenGLTexture *Texture)
   : m_texture(Texture)
@@ -392,7 +391,10 @@ bool MythRenderOpenGL::Init(void)
     return true;
 }
 
-#define GLYesNo(arg) ((arg) ? "Yes" : "No")
+static constexpr QLatin1String GLYesNo (bool v)
+{
+    return v ? QLatin1String("Yes") : QLatin1String("No");
+}
 
 void MythRenderOpenGL::DebugFeatures(void)
 {

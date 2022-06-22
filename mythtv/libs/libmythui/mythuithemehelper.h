@@ -4,8 +4,8 @@
 // MythTV
 #include "themeinfo.h"
 
-#define DEFAULT_UI_THEME "MythCenter"
-#define FALLBACK_UI_THEME "Terra"
+static constexpr const char* DEFAULT_UI_THEME  { "MythCenter" };
+static constexpr const char* FALLBACK_UI_THEME { "Terra"      };
 
 class MUI_PUBLIC MythUIThemeHelper
 {

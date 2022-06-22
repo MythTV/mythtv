@@ -11,7 +11,7 @@
 #include "libmythui/mythuitype.h"
 #include "libmythui/mythmainwindow.h" // for MythMainWindow::drawRefresh
 
-#define DEFAULT_REFRESH_RATE 70 // Hz
+static constexpr uint8_t DEFAULT_REFRESH_RATE { 70 }; // Hz
 
 class MythFontProperties;
 

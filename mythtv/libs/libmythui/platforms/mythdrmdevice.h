@@ -19,7 +19,7 @@ using MythDRMPtr  = std::shared_ptr<class MythDRMDevice>;
 using MythAtomic  = std::tuple<uint32_t,uint32_t,uint64_t>;
 using MythAtomics = std::vector<MythAtomic>;
 
-#define DRM_QUIET "Shush"
+static constexpr const char* DRM_QUIET { "Shush" };
 
 class MUI_PUBLIC MythDRMDevice
 {

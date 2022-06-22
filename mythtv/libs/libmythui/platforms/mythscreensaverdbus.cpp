@@ -19,7 +19,7 @@ const std::string kApp         = "MythTV";
 const std::string kReason      = "Watching TV";
 const std::string kDbusInhibit = "Inhibit";
 
-#define NUM_DBUS_METHODS 4
+static constexpr size_t NUM_DBUS_METHODS { 4 };
 // Thanks to vlc for the set of dbus services to use.
 const std::array<const QString,NUM_DBUS_METHODS> kDbusService {
     "org.freedesktop.ScreenSaver", /**< KDE >= 4 and GNOME >= 3.10 */
@@ -138,7 +138,7 @@ MythScreenSaverDBus::MythScreenSaverDBus(QObject *Parent)
     m_bus(QDBusConnection::sessionBus())
 {
     // service, path, interface, bus - note that interface = service, hence it is used twice
-    for (uint i=0; i < NUM_DBUS_METHODS; i++)
+    for (size_t i=0; i < NUM_DBUS_METHODS; i++)
     {
         auto *ssdbp = new ScreenSaverDBusPrivate(kDbusService[i], kDbusPath[i], kDbusService[i], &m_bus);
         if (!ssdbp->isValid())

@@ -744,9 +744,9 @@ void MythMainWindow::Init(bool MayReInit)
     // Redraw the window now to avoid race conditions in EGLFS (Qt5.4) if a
     // 2nd window (e.g. TVPlayback) is created before this is redrawn.
 #ifdef Q_OS_ANDROID
-#   define EARLY_SHOW_PLATFORM_NAME_CHECK "android"
+    static const QLatin1String EARLY_SHOW_PLATFORM_NAME_CHECK { "android" };
 #else
-#   define EARLY_SHOW_PLATFORM_NAME_CHECK "egl"
+    static const QLatin1String EARLY_SHOW_PLATFORM_NAME_CHECK { "egl" };
 #endif
     if (QGuiApplication::platformName().contains(EARLY_SHOW_PLATFORM_NAME_CHECK))
         QCoreApplication::processEvents();
