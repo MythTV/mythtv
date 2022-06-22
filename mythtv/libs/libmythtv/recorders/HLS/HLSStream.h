@@ -4,7 +4,6 @@
 #ifdef USING_LIBCRYPTO
 // encryption related stuff
 #include <openssl/aes.h>
-#define AES_BLOCK_SIZE 16       // HLS only support AES-128
 #endif // USING_LIBCRYPTO
 
 #include <QMap>
