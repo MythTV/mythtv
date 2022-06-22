@@ -8,6 +8,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <array>
+
 #include <QRegularExpression>
 
 #define v4l2_ioctl(_FD_, _REQUEST_, _DATA_) ioctl(_FD_, _REQUEST_, _DATA_)
