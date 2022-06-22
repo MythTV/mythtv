@@ -648,13 +648,13 @@ int MusicMetadata::getGenreId()
     return m_genreId;
 }
 
-void MusicMetadata::setUrl(const QString& url, uint index)
+void MusicMetadata::setUrl(const QString& url, size_t index)
 {
     if (index < STREAMURLCOUNT)
         m_urls[index] = url;
 }
 
-QString MusicMetadata::Url(uint index)
+QString MusicMetadata::Url(size_t index)
 {
     if (index < STREAMURLCOUNT)
         return m_urls[index];
@@ -1766,7 +1766,7 @@ void AllStream::loadStreams(void)
         while (query.next())
         {
             UrlList urls;
-            for (int x = 0; x < STREAMURLCOUNT; x++)
+            for (size_t x = 0; x < STREAMURLCOUNT; x++)
                 urls[x] = query.value(4 + x).toString();
 
             auto *mdata = new MusicMetadata(

@@ -1115,7 +1115,7 @@ void SearchStream::doUpdateStreams(void)
         mdata.setDescription(query.value(2).toString());
         mdata.setGenre(query.value(3).toString());
 
-        for (int x = 0; x < STREAMURLCOUNT; x++)
+        for (size_t x = 0; x < STREAMURLCOUNT; x++)
             mdata.setUrl(query.value(4 + x).toString(), x);
 
         mdata.setLogoUrl(query.value(9).toString());
