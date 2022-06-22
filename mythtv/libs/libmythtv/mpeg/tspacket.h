@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <chrono>
 #include <cstdlib>
 
@@ -23,6 +24,18 @@ using TSHeaderArray = std::array<uint8_t,4>;
  *  \brief Used to access header of a TSPacket.
  *
  *  This class is also used to determine which PID a PESPacket arrived on.
+ *
+ *  \warning Be very, very careful when modifying this data structure.
+ *  This class is used in the core of the recived video data path, and
+ *  for performanve reasons overlaid on the buffer of bytes received
+ *  from the network. It therefore can only contain (per-instance)
+ *  variables that directly correspond to the data bytes received from
+ *  the broadcaster.  There may be static variables in this class, but
+ *  absolutely no per-instance variables that are not part of the
+ *  overlaid byte stream.  There also must not be any virtual
+ *  functions in this class, as the vtable is implemented as a
+ *  per-instance variable in the class structure, and would mess up
+ *  the overlaying of this structure on the received byte stream.
  *
  *  \sa TSPacket, PESPacket, HDTVRecorder
  */
@@ -163,8 +176,27 @@ class MTV_PUBLIC TSHeader
     TSHeaderArray m_tsData {};
 };
 
+static_assert(sizeof(TSHeader) == 4,
+              "The TSHeader class must be 4 bytes in size.  It must "
+              "have only one non-static variable (m_tsData) of 4 "
+              "bytes, and it must not have any virtual functions.");
+
+
+
 /** \class TSPacket
  *  \brief Used to access the data of a Transport Stream packet.
+ *
+ *  \warning Be very, very careful when modifying this data structure.
+ *  This class is used in the core of the recived video data path, and
+ *  for performanve reasons overlaid on the buffer of bytes received
+ *  from the network. It therefore can only contain (per-instance)
+ *  variables that directly correspond to the data bytes received from
+ *  the broadcaster.  There may be static variables in this class, but
+ *  absolutely no per-instance variables that are not part of the
+ *  overlaid byte stream.  There also must not be any virtual
+ *  functions in this class, as the vtable is implemented as a
+ *  per-instance variable in the class structure, and would mess up
+ *  the overlaying of this structure on the received byte stream.
  *
  *  \sa TSHeader, PESPacket, HDTVRecorder
  */
@@ -231,6 +263,13 @@ class MTV_PUBLIC TSPacket : public TSHeader
   private:
     std::array<uint8_t,184> m_tsPayload {};
 };
+
+static_assert(sizeof(TSPacket) == 188,
+              "The TSPacket class must be 188 bytes in size.  It must "
+              "have only one non-static variable (m_tsPayload) of 184 "
+              "bytes, and it must not have any virtual functions.");
+
+
 
 #if 0 /* not used yet */
 /** \class TSDVBEmissionPacket
