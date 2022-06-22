@@ -16,8 +16,6 @@
 //  MythFrontend
 #include "progdetails.h"
 
-#define LASTPAGE 2
-
 bool ProgDetails::Create(void)
 {
     // Load the theme for this screen

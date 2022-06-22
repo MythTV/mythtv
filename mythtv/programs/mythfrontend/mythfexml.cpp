@@ -199,8 +199,10 @@ void MythFEXML::GetActionListTest(HTTPRequest *pRequest)
 
 }
 
-#define BUTTON(action,desc) \
-  QString("      <input class=\"bigb\" type=\"button\" value=\"%1\" onClick=\"postaction('%2');\"></input>\r\n").arg(action, desc)
+static inline QString BUTTON(const char *action, const char *desc)
+{
+    return QString("      <input class=\"bigb\" type=\"button\" value=\"%1\" onClick=\"postaction('%2');\"></input>\r\n").arg(action, desc);
+};
 
 void MythFEXML::GetRemote(HTTPRequest *pRequest)
 {

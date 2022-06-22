@@ -53,8 +53,8 @@
 #define LOC QString("NetworkControl: ")
 #define LOC_ERR QString("NetworkControl Error: ")
 
-#define FE_SHORT_TO 2000
-#define FE_LONG_TO  10000
+static constexpr qint64 FE_SHORT_TO {  2000 }; //  2 seconds
+static constexpr qint64 FE_LONG_TO  { 10000 }; // 10 seconds
 
 static QEvent::Type kNetworkControlDataReadyEvent =
     (QEvent::Type) QEvent::registerEventType();

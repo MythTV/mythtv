@@ -22,8 +22,7 @@
 #define LOC QString("UPnPScan: ")
 #define ERR QString("UPnPScan error: ")
 
-#define MAX_ATTEMPTS 5
-#define MAX_REQUESTS 1
+static constexpr uint8_t MAX_ATTEMPTS { 5 };
 
 QString MediaServerItem::NextUnbrowsed(void)
 {
@@ -113,11 +112,11 @@ class UpnpMediaServer : public MediaServerItem
     }
 
     QUrl    m_serverURL;
-    int     m_connectionAttempts {0};
     QUrl    m_controlURL;
     QUrl    m_eventSubURL;
     QString m_eventSubPath;
     QString m_friendlyName;
+    uint8_t m_connectionAttempts {0};
     bool    m_subscribed         {false};
     int     m_renewalTimerId     {0};
     int     m_systemUpdateID     {-1};

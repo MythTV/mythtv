@@ -4,6 +4,7 @@
 
 // MythTV
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/sizetliteral.h"
 #include "libmythmetadata/imagemetadata.h"
 #include "libmythui/mythmainwindow.h"
 
@@ -21,7 +22,7 @@
 // If too small, rapid browsing will result in skipping slides rather than flicking
 // quickly through them.
 // Minimum is 4: 3 for displaying a transition, 1 to handle load requests
-#define SLIDE_BUFFER_SIZE 9
+static constexpr size_t SLIDE_BUFFER_SIZE { 9 };
 
 
 /*!
@@ -593,7 +594,7 @@ void SlideBuffer::Initialise(MythUIImage &image)
 {
     // Require at least 4 slides: 2 for transitions, 1 to handle further requests
     // and 1 to prevent solitary slide from being used whilst it is loading
-    int size = std::max(SLIDE_BUFFER_SIZE, 4);
+    size_t size = std::max(SLIDE_BUFFER_SIZE, 4_UZ);
 
     // Fill buffer with slides cloned from the XML image widget
 
@@ -607,7 +608,7 @@ void SlideBuffer::Initialise(MythUIImage &image)
     m_queue.enqueue(slide);
 
     // Rest are simple clones of first
-    for (int i = 1; i < size; ++i)
+    for (size_t i = 1; i < size; ++i)
     {
         slide = new Slide(&image, QString("slide%1").arg(i), slide);
 
