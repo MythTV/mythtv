@@ -19,7 +19,7 @@ extern "C" {
 }
 
 #define LOC QString("GLVid: ")
-#define MAX_VIDEO_TEXTURES 10 // YV12 Kernel deinterlacer + 1
+// static constexpr int8_t MAX_VIDEO_TEXTURES { 10 }; // YV12 Kernel deinterlacer + 1
 
 /**
  * \class MythOpenGLVideo

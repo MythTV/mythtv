@@ -10,8 +10,8 @@
 
 #include "dsmcccache.h"
 
-#define BIOP_OBJ_OFFSET 11
-#define BIOP_TAG_OFFSET 17
+static constexpr uint8_t BIOP_OBJ_OFFSET { 11 };
+static constexpr uint8_t BIOP_TAG_OFFSET { 17 };
 
 class DSMCCCacheModuleData;
 class Dsmcc;

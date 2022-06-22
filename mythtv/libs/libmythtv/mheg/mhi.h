@@ -42,7 +42,7 @@ class MThread;
 class QByteArray;
 
 // Special value for the NetworkBootInfo version.  Real values are a byte.
-#define NBI_VERSION_UNSET       257
+static constexpr uint16_t NBI_VERSION_UNSET { 257 };
 
 /** \class MHIContext
  *  \brief Contains various utility functions for interactive television.

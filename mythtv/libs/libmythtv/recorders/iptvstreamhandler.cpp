@@ -166,7 +166,7 @@ void IPTVStreamHandler::run(void)
     bool error = false;
 
     int start_port = 0;
-    for (uint i = 0; i < IPTV_SOCKET_COUNT; i++)
+    for (size_t i = 0; i < IPTV_SOCKET_COUNT; i++)
     {
         QUrl url = tuning.GetURL(i);
         if (url.port() < 0)
@@ -307,7 +307,7 @@ void IPTVStreamHandler::run(void)
     }
 
     // Clean up
-    for (uint i = 0; i < IPTV_SOCKET_COUNT; i++)
+    for (size_t i = 0; i < IPTV_SOCKET_COUNT; i++)
     {
         if (m_sockets[i])
         {

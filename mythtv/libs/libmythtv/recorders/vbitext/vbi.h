@@ -6,7 +6,7 @@
 #include "lang.h"
 //#include "cache.h"
 
-#define PLL_ADJUST     4
+static constexpr int8_t PLL_ADJUST { 4 };
 
 struct raw_page
 {

@@ -17,7 +17,7 @@
 #include "channelutil.h"
 #include "streamhandler.h"
 
-#define IPTV_SOCKET_COUNT   3
+static constexpr size_t IPTV_SOCKET_COUNT   { 3 };
 static constexpr std::chrono::milliseconds RTCP_TIMER { 10s };
 
 class IPTVStreamHandler;

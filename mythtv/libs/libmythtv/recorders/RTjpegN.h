@@ -32,8 +32,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  * Macros and definitions used internally to RTjpeg
  */
 
-#define RTJPEG_FILE_VERSION 0
-#define RTJPEG_HEADER_SIZE 12
+static constexpr uint8_t RTJPEG_FILE_VERSION {  0 };
+static constexpr uint8_t RTJPEG_HEADER_SIZE  { 12 };
 
 using RTjpegData16 = std::array<int16_t,64>;
 using RTjpegData32 = std::array<int32_t,64>;
@@ -44,9 +44,11 @@ using RTjpegData32 = std::array<int32_t,64>;
 
 /* Format definitions */
 
-#define RTJ_YUV420 0
-#define RTJ_YUV422 1
-#define RTJ_RGB8   2
+enum RTJFormat {
+    RTJ_YUV420 = 0,
+    RTJ_YUV422 = 1,
+    RTJ_RGB8   = 2
+};
 
 class RTjpeg
 {

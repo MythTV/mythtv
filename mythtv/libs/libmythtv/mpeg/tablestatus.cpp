@@ -3,7 +3,7 @@
 
 #include "tablestatus.h"
 
-#define BIT_SEL(x) (1 << (x))
+static inline uint8_t BIT_SEL(uint8_t x) { return 1 << x; }
 
 const std::array<const uint8_t,8> TableStatus::kInitBits = {0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0x00};
 

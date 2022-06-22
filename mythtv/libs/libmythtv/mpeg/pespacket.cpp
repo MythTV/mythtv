@@ -252,7 +252,7 @@ static std::vector<unsigned char*> mem4096;
 static std::vector<unsigned char*> free4096;
 static std::map<unsigned char*, bool> alloc4096;
 
-#define BLOCKS188 512
+static constexpr size_t BLOCKS188 { 512 };
 static unsigned char* get_188_block()
 {
     if (free188.empty())
@@ -260,7 +260,7 @@ static unsigned char* get_188_block()
         mem188.push_back((unsigned char*) malloc(188_UZ * BLOCKS188));
         free188.reserve(BLOCKS188);
         unsigned char* block_start = mem188.back();
-        for (uint i = 0; i < BLOCKS188; ++i)
+        for (size_t i = 0; i < BLOCKS188; ++i)
             free188.push_back(i * 188_UZ + block_start);
     }
 
@@ -269,7 +269,6 @@ static unsigned char* get_188_block()
     alloc188[ptr] = true;
     return ptr;
 }
-#undef BLOCKS188
 
 static bool is_188_block(unsigned char* ptr)
 {
@@ -294,7 +293,7 @@ static void return_188_block(unsigned char* ptr)
     }
 }
 
-#define BLOCKS4096 128
+static constexpr size_t BLOCKS4096 { 128 };
 static unsigned char* get_4096_block()
 {
     if (free4096.empty())
@@ -302,7 +301,7 @@ static unsigned char* get_4096_block()
         mem4096.push_back((unsigned char*) malloc(4096_UZ * BLOCKS4096));
         free4096.reserve(BLOCKS4096);
         unsigned char* block_start = mem4096.back();
-        for (uint i = 0; i < BLOCKS4096; ++i)
+        for (size_t i = 0; i < BLOCKS4096; ++i)
             free4096.push_back(i * 4096_UZ + block_start);
     }
 
@@ -311,7 +310,6 @@ static unsigned char* get_4096_block()
     alloc4096[ptr] = true;
     return ptr;
 }
-#undef BLOCKS4096
 
 static bool is_4096_block(unsigned char* ptr)
 {

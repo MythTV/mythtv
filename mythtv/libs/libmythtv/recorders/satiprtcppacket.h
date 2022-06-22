@@ -9,7 +9,7 @@
 // MythTV includes
 #include "libmythbase/mythlogging.h"
 
-#define RTCP_TYPE_APP  204
+static constexpr uint8_t RTCP_TYPE_APP { 204 };
 
 class SatIPRTCPPacket
 {

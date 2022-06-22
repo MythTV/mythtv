@@ -15,13 +15,15 @@
 
 #define LOC QString("VBox: ")
 
-#define QUERY_BOARDINFO "http://{URL}/cgi-bin/HttpControl/HttpControlApp?OPTION=1&Method=QueryBoardInfo"
-#define QUERY_CHANNELS  "http://{URL}/cgi-bin/HttpControl/HttpControlApp?OPTION=1&Method=GetXmltvChannelsList"\
-                        "&FromChIndex=FirstChannel&ToChIndex=LastChannel&FilterBy=All"
+static constexpr const char* QUERY_BOARDINFO
+{ "http://{URL}/cgi-bin/HttpControl/HttpControlApp?OPTION=1&Method=QueryBoardInfo" };
+static constexpr const char* QUERY_CHANNELS
+{ "http://{URL}/cgi-bin/HttpControl/HttpControlApp?OPTION=1&Method=GetXmltvChannelsList" \
+  "&FromChIndex=FirstChannel&ToChIndex=LastChannel&FilterBy=All" };
 
 static constexpr std::chrono::milliseconds SEARCH_TIME { 3s };
-#define VBOX_URI "urn:schemas-upnp-org:device:MediaServer:1"
-#define VBOX_UDN "uuid:b7531642-0123-3210"
+static constexpr const char* VBOX_URI { "urn:schemas-upnp-org:device:MediaServer:1" };
+static constexpr const char* VBOX_UDN { "uuid:b7531642-0123-3210" };
 
 // static method
 QStringList VBox::probeDevices(void)

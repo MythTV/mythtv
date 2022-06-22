@@ -114,9 +114,9 @@ vbi_send_page(struct vbi *vbi, struct raw_page *rvtp, int page)
 // it collects parity and hamming errors and moves the sampling point
 // a 10th of a bitlength left or right.
 
-#define PLL_SAMPLES    4       // number of err vals to collect
-#define PLL_ERROR      4       // if this err val is crossed, readjust
-//#define PLL_ADJUST   4       // max/min adjust (10th of bitlength)
+static constexpr int8_t PLL_SAMPLES  { 4 };  // number of err vals to collect
+static constexpr int8_t PLL_ERROR    { 4 };  // if this err val is crossed, readjust
+//static constexpr int8_t PLL_ADJUST { 4 };  // max/min adjust (10th of bitlength)
 
 static void
 pll_add(struct vbi *vbi, int n, int err)

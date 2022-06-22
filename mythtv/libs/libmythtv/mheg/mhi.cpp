@@ -45,9 +45,9 @@ extern "C" {
 static bool       ft_loaded = false;
 static FT_Library ft_library;
 
-#define FONT_WIDTHRES   54
-#define FONT_HEIGHTRES  72 // 1 pixel per point
-#define FONT_TO_USE "FreeSans.ttf" // Tiresias Screenfont.ttf is mandated
+static constexpr uint8_t FONT_WIDTHRES   { 54 };
+static constexpr uint8_t FONT_HEIGHTRES  { 72 }; // 1 pixel per point
+static constexpr const char * FONT_TO_USE { "FreeSans.ttf" }; // Tiresias Screenfont.ttf is mandated
 
 
 // LifecycleExtension tuneinfo:

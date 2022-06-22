@@ -14,9 +14,9 @@
 
 // n.b. these PID relationships are only a recommendation from ATSC,
 // but seem to be universal
-#define VIDEO_PID(bp) ((bp)+1)
-#define AUDIO_PID(bp) ((bp)+4)
-#define SYNC_BYTE     0x0047
+//static constexpr uint16_t VIDEO_PID(uint16_t bp) { return bp+1; };
+//static constexpr uint16_t AUDIO_PID(uint16_t bp) { return bp+4; };
+static constexpr uint8_t SYNC_BYTE { 0x47 };
 
 using TSHeaderArray = std::array<uint8_t,4>;
 

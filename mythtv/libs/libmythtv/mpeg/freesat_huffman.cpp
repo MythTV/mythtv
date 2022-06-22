@@ -1,8 +1,8 @@
 #include "freesat_huffman.h"
 
-#define START   '\0'
-#define STOP    '\0'
-#define ESCAPE  '\1'
+static constexpr uint8_t START   { '\0' };
+static constexpr uint8_t STOP    { '\0' };
+static constexpr uint8_t ESCAPE  { '\1' };
 
 QString freesat_huffman_to_string(const unsigned char *compressed, uint size)
 {

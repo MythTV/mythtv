@@ -1032,7 +1032,7 @@ bool NuppelVideoRecorder::SetFormatV4L2(void) { return false; }
 #endif // !USING_V4L2
 
 #ifdef USING_V4L2
-#define MAX_VIDEO_BUFFERS 5
+static constexpr size_t MAX_VIDEO_BUFFERS { 5 };
 void NuppelVideoRecorder::DoV4L2(void)
 {
     struct v4l2_buffer     vbuf {};
@@ -2275,7 +2275,7 @@ void NuppelVideoRecorder::WriteVideo(MythVideoFrame *frame, bool skipsync,
                                      bool forcekey)
 {
     int tmp = 0;
-    lzo_uint out_len = OUT_LEN;
+    lzo_uint out_len = kOutLen;
     struct rtframeheader frameheader {};
     int raw = 0;
     int compressthis = m_compression;

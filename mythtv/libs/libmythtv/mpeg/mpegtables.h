@@ -28,10 +28,10 @@
 /** Seconds between start of GPS time and the start of UNIX time.
  *  i.e. from Jan 1st, 1970 UTC to Jan 6th, 1980 UTC
  */
-#define GPS_EPOCH 315964800
+static constexpr qint64 GPS_EPOCH { 315964800 };
 
 /** Leap seconds as of June 30th, 2012. */
-#define GPS_LEAP_SECONDS 16
+static constexpr uint8_t GPS_LEAP_SECONDS { 16 };
 // Note: You can obtain this number by adding one
 // for every leap second added to UTC since Jan 6th, 1980
 // and subtracting one for every leap second removed.

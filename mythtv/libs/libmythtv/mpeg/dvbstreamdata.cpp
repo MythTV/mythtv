@@ -10,7 +10,7 @@
 #include "premieretables.h"
 #include "eithelper.h"
 
-#define MCA_EIT_TSID 136
+static constexpr uint8_t MCA_EIT_TSID { 136 };
 
 #define LOC QString("DVBStream[%1]: ").arg(m_cardId)
 
