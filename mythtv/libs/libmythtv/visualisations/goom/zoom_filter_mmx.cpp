@@ -1,17 +1,19 @@
+#include <cstdint>
+
 #include "visualisations/goom/zoom_filters.h"
 
 #ifdef MMX
-#define BUFFPOINTNB 16
-#define BUFFPOINTMASK 0xffff
-#define BUFFINCR 0xff
+static   constexpr uint8_t  BUFFPOINTNB   { 16     };
+//static constexpr uint16_t BUFFPOINTMASK { 0xffff };
+//static constexpr uint8_t  BUFFINCR      { 0xff   };
 
 #include "mmx.h"
 
-#define sqrtperte 16
+//static constexpr uint8_t sqrtperte { 16 };
 // faire : a % sqrtperte <=> a & pertemask
-#define PERTEMASK 0xf
+static constexpr uint8_t PERTEMASK { 0xf };
 // faire : a / sqrtperte <=> a >> PERTEDEC
-#define PERTEDEC 4
+static constexpr uint8_t PERTEDEC { 4 };
 
 extern "C" {
 #include "libavutil/cpu.h"

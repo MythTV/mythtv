@@ -2,11 +2,11 @@
 #define GOOMTOOLS_H
 
 #if !defined( M_PI ) 
- #define M_PI 3.14159265358979323846 
+static constexpr double M_PI    {  3.14159265358979323846  };
 #endif
-#define M_PI_F ((float)M_PI)
+static constexpr float  M_PI_F  { static_cast<float>(M_PI) };
 
-#define NB_RAND 0x10000
+static constexpr size_t NB_RAND { 0x10000 };
 
 /* in graphic.c */
 extern int *rand_tab;

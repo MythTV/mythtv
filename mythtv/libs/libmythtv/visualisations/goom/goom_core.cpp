@@ -20,9 +20,8 @@
 
 //#define VERBOSE
 
-#define STOP_SPEED 128
-
-#define TIME_BTW_CHG 300
+static constexpr gint32  STOP_SPEED   { 128 };
+static constexpr int16_t TIME_BTW_CHG { 300 };
 
 /**-----------------------------------------------------**
  **  SHARED DATA                                        **
@@ -44,8 +43,8 @@ struct GoomState {
 	int m_rangeMax;
 };
 
-#define STATES_NB 8
-#define STATES_RANGEMAX 510
+static constexpr size_t   STATES_NB       {   8 };
+static constexpr uint16_t STATES_RANGEMAX { 510 };
 const std::array<const GoomState,STATES_NB> kStates {{
 	{1,0,0,1,4, 000, 100},
 	{1,0,0,1,1, 101, 140}, // turned on drawScope
@@ -88,7 +87,7 @@ void goom_init (guint32 resx, guint32 resy, int cinemascope) {
 	//RAND_INIT ();
 	srand ((uintptr_t) pixel);
 	if (!rand_tab) rand_tab = (int *) malloc (NB_RAND * sizeof(int)) ;
-	for (int i = 0; i < NB_RAND; i++)
+	for (size_t i = 0; i < NB_RAND; i++)
 		rand_tab[i] = goom_rand();
 	rand_pos = 0;
                 
@@ -144,7 +143,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 	static int s_speedVar = 0;		// vitesse des particules
 
 	// duree de la transition entre afficher les lignes ou pas
-#define DRAWLINES 80
+	static constexpr int DRAWLINES { 80 };
 	static int s_lineMode = DRAWLINES;	// l'effet lineaire a dessiner
 	static int s_nombreCddc = 0;		// nombre de Cycle Depuis Dernier Changement
 	static int s_accelVar=0;		// acceleration des particules
@@ -155,8 +154,8 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 	static int s_decayIfs = 0;		// disparition de l'ifs
 	static int s_recayIfs = 0;		// dédisparition de l'ifs
 
-#define SWITCHMULT (29.0F/30.0F)
-#define SWITCHINCR 0x7f
+	static constexpr float SWITCHMULT { 29.0F/30.0F };
+	static constexpr int   SWITCHINCR { 0x7f };
 	static float s_switchMult = 1.0F;
 	static int s_switchIncr = SWITCHINCR;
 

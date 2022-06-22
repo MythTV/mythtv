@@ -17,10 +17,12 @@ void ifs_update (guint32 * data, const guint32 * back, int width, int height,
 	static std::array<int,4> s_v { 2, 4, 3, 2 };
 	static std::array<int,4> s_col { 2, 4, 3, 2 };
 
-#define MOD_MER 0
-#define MOD_FEU 1
-#define MOD_MERVER 2
-	static int s_mode = MOD_MERVER;
+        enum MODE {
+            MOD_MER    = 0,
+            MOD_FEU    = 1,
+            MOD_MERVER = 2
+        };
+	static MODE s_mode = MOD_MERVER;
 	static int s_justChanged = 0;
 	static int s_cycle = 0;
 	int     cycle10 = 0;

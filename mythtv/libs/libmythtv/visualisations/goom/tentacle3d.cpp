@@ -7,11 +7,11 @@
 #include "goomconfig.h"
 #include "tentacle3d.h"
 
-#define D 256.0F
+static constexpr float  D { 256.0F };
 
-#define nbgrid 6
-#define definitionx 15
-#define definitionz 45
+static constexpr size_t nbgrid      {  6 };
+static constexpr int8_t definitionx { 15 };
+static constexpr int8_t definitionz { 45 };
 
 static float cycle = 0.0F;
 static std::array<grid3d *,nbgrid> grille;
