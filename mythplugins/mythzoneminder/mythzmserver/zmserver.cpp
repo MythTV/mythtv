@@ -44,38 +44,40 @@
 #endif
 
 #ifdef __APPLE__
-#define MSG_NOSIGNAL 0  // Apple also has SO_NOSIGPIPE?
+static constexpr int MSG_NOSIGNAL { 0 };  // Apple also has SO_NOSIGPIPE?
 #endif
 
 #include "zmserver.h"
 
 // the version of the protocol we understand
-#define ZM_PROTOCOL_VERSION "11"
+static constexpr const char* ZM_PROTOCOL_VERSION { "11" };
 
 #define ADD_STR(list,s)  list += (s); (list) += "[]:[]";
 #define ADD_INT(list,n)  (list) += std::to_string(n); (list) += "[]:[]";
 
 // error messages
-#define ERROR_TOKEN_COUNT      "Invalid token count"
-#define ERROR_MYSQL_QUERY      "Mysql Query Error"
-#define ERROR_MYSQL_ROW        "Mysql Get Row Error"
-#define ERROR_FILE_OPEN        "Cannot open event file"
-#define ERROR_INVALID_MONITOR  "Invalid Monitor"
-#define ERROR_INVALID_POINTERS "Cannot get shared memory pointers"
-#define ERROR_INVALID_MONITOR_FUNCTION  "Invalid Monitor Function"
-#define ERROR_INVALID_MONITOR_ENABLE_VALUE "Invalid Monitor Enable Value"
-#define ERROR_NO_FRAMES         "No frames found for event"
+static constexpr const char* ERROR_TOKEN_COUNT      { "Invalid token count" };
+static constexpr const char* ERROR_MYSQL_QUERY      { "Mysql Query Error" };
+static constexpr const char* ERROR_MYSQL_ROW        { "Mysql Get Row Error" };
+static constexpr const char* ERROR_FILE_OPEN        { "Cannot open event file" };
+static constexpr const char* ERROR_INVALID_MONITOR  { "Invalid Monitor" };
+static constexpr const char* ERROR_INVALID_POINTERS { "Cannot get shared memory pointers" };
+static constexpr const char* ERROR_INVALID_MONITOR_FUNCTION  { "Invalid Monitor Function" };
+static constexpr const char* ERROR_INVALID_MONITOR_ENABLE_VALUE { "Invalid Monitor Enable Value" };
+static constexpr const char* ERROR_NO_FRAMES         { "No frames found for event" };
 
 // Subpixel ordering (from zm_rgb.h)
 // Based on byte order naming. For example, for ARGB (on both little endian or big endian)
 // byte+0 should be alpha, byte+1 should be red, and so on.
-#define ZM_SUBPIX_ORDER_NONE 2
-#define ZM_SUBPIX_ORDER_RGB 6
-#define ZM_SUBPIX_ORDER_BGR 5
-#define ZM_SUBPIX_ORDER_BGRA 7
-#define ZM_SUBPIX_ORDER_RGBA 8
-#define ZM_SUBPIX_ORDER_ABGR 9
-#define ZM_SUBPIX_ORDER_ARGB 10
+enum ZM_SUBPIX_ORDER {
+    ZM_SUBPIX_ORDER_NONE =  2,
+    ZM_SUBPIX_ORDER_RGB  =  6,
+    ZM_SUBPIX_ORDER_BGR  =  5,
+    ZM_SUBPIX_ORDER_BGRA =  7,
+    ZM_SUBPIX_ORDER_RGBA =  8,
+    ZM_SUBPIX_ORDER_ABGR =  9,
+    ZM_SUBPIX_ORDER_ARGB = 10,
+};
 
 MYSQL   g_dbConn;
 std::string  g_zmversion;

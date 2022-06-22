@@ -909,8 +909,8 @@ Piano::Piano()
 
     LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Being Initialised"));
 
-    m_pianoData = (piano_key_data *) malloc(sizeof(piano_key_data) * PIANO_N);
-    m_audioData = (piano_audio *) malloc(sizeof(piano_audio) * PIANO_AUDIO_SIZE);
+    m_pianoData = (piano_key_data *) malloc(sizeof(piano_key_data) * kPianoNumKeys);
+    m_audioData = (piano_audio *) malloc(sizeof(piano_audio) * kPianoAudioSize);
 
     double sample_rate = 44100.0;  // TODO : This should be obtained from gPlayer (likely candidate...)
 
@@ -923,7 +923,7 @@ Piano::Piano()
     double bottom_A = concert_A / 2.0 / 2.0 / 2.0 / 2.0;
 
     double current_freq = bottom_A;
-    for (uint key = 0; key < PIANO_N; key++)
+    for (uint key = 0; key < kPianoNumKeys; key++)
     {
         // This is constant through time
         m_pianoData[key].coeff = (goertzel_data)(2.0 * cos(2.0 * M_PI * current_freq / sample_rate));
@@ -958,14 +958,14 @@ Piano::~Piano()
 
 void Piano::zero_analysis(void)
 {
-    for (uint key = 0; key < PIANO_N; key++)
+    for (uint key = 0; key < kPianoNumKeys; key++)
     {
         // These get updated continously, and must be stored between chunks of audio data
         m_pianoData[key].q2 = 0.0F;
         m_pianoData[key].q1 = 0.0F;
         m_pianoData[key].magnitude = 0.0F;
         m_pianoData[key].max_magnitude_seen =
-            (goertzel_data)(PIANO_RMS_NEGLIGIBLE*PIANO_RMS_NEGLIGIBLE); // This is a guess - will be quickly overwritten
+            (goertzel_data)(kPianoRmsNegligible * kPianoRmsNegligible); // This is a guess - will be quickly overwritten
 
         m_pianoData[key].samples_processed = 0;
     }
@@ -1003,9 +1003,9 @@ void Piano::resize(const QSize &newsize)
     double left =  (double)m_size.width() / 2.0 - (4.0*7.0 + 3.5) * key_unit_size; // The extra 3.5 centers 'F' inthe middle of the screen
     double top_of_keys = (double)m_size.height() / 2.0 - key_unit_size * white_height_pct / 2.0; // Vertically center keys
 
-    m_rects.resize(PIANO_N);
+    m_rects.resize(kPianoNumKeys);
 
-    for (uint key = 0; key < PIANO_N; key++)
+    for (uint key = 0; key < kPianoNumKeys; key++)
     {
         int note = ((int)key - 3 + 12) % 12;  // This means that C=0, C#=1, D=2, etc (since lowest note is bottom A)
         if (note == 0) // If we're on a 'C', move the left 'cursor' over an octave
@@ -1047,7 +1047,7 @@ void Piano::resize(const QSize &newsize)
         );
     }
 
-    m_magnitude.resize(PIANO_N);
+    m_magnitude.resize(kPianoNumKeys);
     for (double & key : m_magnitude)
         key = 0.0;
 }
@@ -1059,7 +1059,7 @@ unsigned long Piano::getDesiredSamples(void)
     //   12.5 chunks of data per second from 44100Hz signal : Sampled at 50Hz, lots of 4, see :
     //   mythtv/libs/libmyth/audio/audiooutputbase.cpp :: AudioOutputBase::AddData
     //   See : mythtv/mythplugins/mythmusic/mythmusic/avfdecoder.cpp "20ms worth"
-    return (unsigned long) PIANO_AUDIO_SIZE;  // Maximum we can be given
+    return (unsigned long) kPianoAudioSize;  // Maximum we can be given
 }
 
 bool Piano::processUndisplayed(VisualNode *node)
@@ -1125,7 +1125,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
         return allZero; // Nothing to see here - the server can stop if it wants to
     }
 
-    for (uint key = 0; key < PIANO_N; key++)
+    for (uint key = 0; key < kPianoNumKeys; key++)
     {
         goertzel_data coeff = m_pianoData[key].coeff;
         goertzel_data q2 = m_pianoData[key].q2;
@@ -1167,9 +1167,9 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
             }
             else
             {
-                magnitude_av = PIANO_MIN_VOL;
+                magnitude_av = kPianoMinVol;
             }
-            magnitude_av -= PIANO_MIN_VOL;
+            magnitude_av -= kPianoMinVol;
 
             if (magnitude_av < 0.0F)
             {
@@ -1225,7 +1225,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
     QRect *rectsp = (m_rects).data();
     double *magnitudep = (m_magnitude).data();
 
-    unsigned int n = PIANO_N;
+    unsigned int n = kPianoNumKeys;
 
     p->fillRect(0, 0, m_size.width(), m_size.height(), back);
 
@@ -1234,7 +1234,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
         n = (uint)m_rects.size();
 
     // Sweep up across the keys, making sure the max_magnitude_seen is at minimum X% of its neighbours
-    double mag = PIANO_RMS_NEGLIGIBLE;
+    double mag = kPianoRmsNegligible;
     for (uint key = 0; key < n; key++)
     {
         if (m_pianoData[key].max_magnitude_seen < static_cast<float>(mag))
@@ -1247,11 +1247,11 @@ bool Piano::draw(QPainter *p, const QColor &back)
             // This key has seen better peaks, use this for the next one
             mag = m_pianoData[key].max_magnitude_seen;
         }
-        mag *= PIANO_SPECTRUM_SMOOTHING;
+        mag *= kPianoSpectrumSmoothing;
     }
 
     // Similarly, down, making sure the max_magnitude_seen is at minimum X% of its neighbours
-    mag = PIANO_RMS_NEGLIGIBLE;
+    mag = kPianoRmsNegligible;
     for (int key_i = n - 1; key_i >= 0; key_i--)
     {
         uint key = key_i; // Wow, this is to avoid a zany error for ((unsigned)0)--
@@ -1265,12 +1265,12 @@ bool Piano::draw(QPainter *p, const QColor &back)
             // This key has seen better peaks, use this for the next one
             mag = m_pianoData[key].max_magnitude_seen;
         }
-        mag *= PIANO_SPECTRUM_SMOOTHING;
+        mag *= kPianoSpectrumSmoothing;
     }
 
     // Now find the key that has been hit the hardest relative to its experience, and renormalize...
     // Set a minimum, to prevent divide-by-zero (and also all-pressed when music very quiet)
-    double magnitude_max = PIANO_RMS_NEGLIGIBLE;
+    double magnitude_max = kPianoRmsNegligible;
     for (uint key = 0; key < n; key++)
     {
         mag = m_pianoData[key].magnitude / m_pianoData[key].max_magnitude_seen;
@@ -1289,7 +1289,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
         double per = magnitudep[key] / magnitude_max;
         per = clamp(per, 1.0, 0.0);        // By construction, this should be unnecessary
 
-        if (per < PIANO_KEYPRESS_TOO_LIGHT)
+        if (per < kPianoKeypressTooLight)
             per = 0.0; // Clamp to zero for lightly detected keys
         LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Display key %1, magnitude=%2, seen=%3")
                 .arg(key).arg(per*100.0).arg(m_pianoData[key].max_magnitude_seen));
@@ -1310,7 +1310,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
         double per = magnitudep[key]/magnitude_max;
         per = clamp(per, 1.0, 0.0);        // By construction, this should be unnecessary
 
-        if (per < PIANO_KEYPRESS_TOO_LIGHT)
+        if (per < kPianoKeypressTooLight)
             per = 0.0; // Clamp to zero for lightly detected keys
 
         double r = m_blackStartColor.red() + (m_blackTargetColor.red() - m_blackStartColor.red()) * per;
@@ -1442,7 +1442,7 @@ void AlbumArt::handleKeyPress(const QString &action)
 }
 
 /// this is the time an image is shown in the albumart visualizer
-#define ALBUMARTCYCLETIME 10
+static constexpr qint64 ALBUMARTCYCLETIME { 10 };
 
 bool AlbumArt::needsUpdate()
 {

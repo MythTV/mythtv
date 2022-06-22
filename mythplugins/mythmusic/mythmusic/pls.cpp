@@ -97,8 +97,8 @@ int PlayListFile::parsePLS(PlayListFile *pls, const QString &filename)
     return pls->size();
 }
 
-#define M3U_HEADER  "#EXTM3U"
-#define M3U_INFO    "#EXTINF"
+static constexpr const char* M3U_HEADER { "#EXTM3U" };
+static constexpr const char* M3U_INFO   { "#EXTINF" };
 
 int PlayListFile::parseM3U(PlayListFile *pls, const QString &filename)
 {

@@ -15,8 +15,8 @@
 // MythTV headers
 #include <libmyth/mythcontext.h>
 
-#define SI_UNITS 0
-#define ENG_UNITS 1
+static constexpr uint8_t SI_UNITS  { 0 };
+static constexpr uint8_t ENG_UNITS { 1 };
 static constexpr std::chrono::minutes DEFAULT_UPDATE_TIMEOUT { 5min };
 static constexpr std::chrono::seconds DEFAULT_SCRIPT_TIMEOUT { 60s };
 

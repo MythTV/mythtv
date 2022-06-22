@@ -67,7 +67,7 @@ extern "C" {
 #include "thumbfinder.h"
 
 // the amount to seek before the required frame
-#define PRE_SEEK_AMOUNT 50
+static constexpr int8_t PRE_SEEK_AMOUNT { 50 };
 
 static const std::array<const SeekAmount,9> kSeekAmounts
 {{

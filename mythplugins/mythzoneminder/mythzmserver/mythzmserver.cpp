@@ -32,13 +32,13 @@
 #include "zmserver.h"
 
 // default port to listen on
-#define PORT 6548
+static constexpr uint16_t PORT { 6548 };
 
 // default location of zoneminders default config file
-#define ZM_CONFIG "/etc/zm/zm.conf"
+static constexpr const char* ZM_CONFIG { "/etc/zm/zm.conf" };
 
 // default location of zoneminders override config file
-#define ZM_OVERRIDECONFIG "/etc/zm/conf.d/01-system-paths.conf"
+static constexpr const char* ZM_OVERRIDECONFIG { "/etc/zm/conf.d/01-system-paths.conf" };
 
 // Care should be taken to keep these in sync with the exit codes in
 // libmythbase/exitcodes.h (which is not included here to keep this code 

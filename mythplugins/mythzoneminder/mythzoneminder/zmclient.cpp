@@ -20,9 +20,7 @@
 #include "zmminiplayer.h"
 
 // the protocol version we understand
-#define ZM_PROTOCOL_VERSION "11"
-
-#define BUFFER_SIZE  (2048*1536*3)
+static constexpr const char* ZM_PROTOCOL_VERSION { "11" };
 
 ZMClient::ZMClient()
     : QObject(nullptr),

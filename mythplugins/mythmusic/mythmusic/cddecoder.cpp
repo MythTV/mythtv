@@ -28,8 +28,8 @@ extern "C" {
 // MythMusic
 #include "constants.h"
 
-#define CDEXT ".cda"
-const unsigned kSamplesPerSec = 44100;
+static constexpr const char* CDEXT { ".cda" };
+static constexpr long kSamplesPerSec { 44100 };
 
 // Handle cdio log output
 static void logger(cdio_log_level_t level, const char *message)
@@ -521,7 +521,7 @@ MusicMetadata *CdDecoder::getMetadata()
     else
     {
         tracknum = m_setTrackNum;
-        setURL(QString("%1" CDEXT).arg(tracknum));
+        setURL(QString("%1%2").arg(tracknum).arg(CDEXT));
     }
 
     QMutexLocker lock(&getCdioMutex());

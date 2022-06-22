@@ -13,10 +13,6 @@
 #include "weatherSetup.h"
 #include "weatherSource.h"
 
-#define GLBL_SCREEN 0
-#define SCREEN_SETUP_SCREEN 1
-#define SRC_SCREEN 2
-
 bool GlobalSetup::Create()
 {
     // Load the theme for this screen

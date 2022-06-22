@@ -5,8 +5,6 @@
 
 #include <vector>
 
-#define MAX_PHONGRES 1024
-
 class BumpScope : public VisualBase
 {
 public:

@@ -33,7 +33,7 @@ extern "C" {
     #include <libavcodec/avfft.h>
 }
 
-#define SAMPLES_DEFAULT_SIZE 512
+static constexpr uint16_t SAMPLES_DEFAULT_SIZE { 512 };
 
 class MainVisual;
 
@@ -218,16 +218,16 @@ class Piano : public VisualBase
     // based on the magnitudes at piano pitch
     // frequencies in the audio data.
 
-#define PIANO_AUDIO_SIZE 4096
-#define PIANO_N 88
+    static constexpr unsigned long kPianoAudioSize { 4096 };
+    static constexpr unsigned int  kPianoNumKeys   { 88   };
 
 #define piano_audio float
 #define goertzel_data float
 
-#define PIANO_RMS_NEGLIGIBLE .001
-#define PIANO_SPECTRUM_SMOOTHING 0.95
-#define PIANO_MIN_VOL (-10)
-#define PIANO_KEYPRESS_TOO_LIGHT .2
+    static constexpr double        kPianoRmsNegligible     { .001 };
+    static constexpr double        kPianoSpectrumSmoothing { 0.95 };
+    static constexpr goertzel_data kPianoMinVol            { -10  };
+    static constexpr double        kPianoKeypressTooLight  { .2   };
 
 struct piano_key_data {
     goertzel_data q1, q2, coeff, magnitude;

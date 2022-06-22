@@ -8,8 +8,8 @@
 #include <libmythbase/mthread.h>
 
 
-#define DEFAULT_PLAYLIST_NAME     "default_playlist_storage"
-#define DEFAULT_STREAMLIST_NAME   "stream_playlist"
+static constexpr const char* DEFAULT_PLAYLIST_NAME     { "default_playlist_storage" };
+static constexpr const char* DEFAULT_STREAMLIST_NAME   { "stream_playlist" };
 
 class PlaylistContainer;
 class Playlist;
