@@ -8,8 +8,8 @@ extern "C" {
 #include "spdifencoder.h"
 #include "audiooutputsettings.h"
 
-#define INBUFSIZE 131072
-#define OUTBUFSIZE INBUFSIZE
+static constexpr ssize_t INBUFSIZE  {    131072 };
+static constexpr ssize_t OUTBUFSIZE { INBUFSIZE };
 
 class AudioOutputDigitalEncoder
 {
@@ -28,16 +28,16 @@ class AudioOutputDigitalEncoder
 
   private:
     void   Reset(void);
-    static void *realloc(void *ptr, int old_size, int new_size);
+    static void *realloc(void *ptr, size_t old_size, size_t new_size);
 
     AVCodecContext *m_avContext         {nullptr};
     uint8_t        *m_outbuf            {nullptr};
-    int             m_outSize           {0};
+    ssize_t         m_outSize           {0};
     // m_inbuf  = 6 channel data converted to S32 or FLT samples interleaved
     uint8_t        *m_inbuf             {nullptr};
     // m_framebuf = 1 frame, deinterleaved into planar format
     uint8_t        *m_framebuf          {nullptr};
-    int             m_inSize            {0};
+    ssize_t         m_inSize            {0};
     int             m_outlen            {0};
     // m_inlen = number of bytes available in m_inbuf
     int             m_inlen             {0};

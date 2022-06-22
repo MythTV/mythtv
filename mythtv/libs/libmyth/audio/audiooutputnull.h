@@ -3,7 +3,7 @@
 
 #include "audiooutputbase.h"
 
-#define NULLAUDIO_OUTPUT_BUFFER_SIZE 32768
+static constexpr int32_t NULLAUDIO_OUTPUT_BUFFER_SIZE { 32768 };
 
 /*
 

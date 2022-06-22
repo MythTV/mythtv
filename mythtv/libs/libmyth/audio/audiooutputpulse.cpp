@@ -27,7 +27,7 @@
 
 #define LOC     QString("PulseAudio: ")
 
-#define PULSE_MAX_CHANNELS 8
+static constexpr int8_t PULSE_MAX_CHANNELS { 8 };
 
 AudioOutputPulseAudio::AudioOutputPulseAudio(const AudioSettings &settings) :
     AudioOutputBase(settings)

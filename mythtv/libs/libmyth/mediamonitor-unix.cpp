@@ -48,42 +48,42 @@ extern "C" {
 #endif
 
 
+#ifndef Q_OS_ANDROID
 #ifndef MNTTYPE_ISO9660
 #   ifdef __linux__
-#       define MNTTYPE_ISO9660 "iso9660"
+    static constexpr const char* MNTTYPE_ISO9660 { "iso9660" };
 #   elif defined(__FreeBSD__) || defined(Q_OS_DARWIN) || defined(__OpenBSD__)
-#       define MNTTYPE_ISO9660 "cd9660"
+    static constexpr const char* MNTTYPE_ISO9660 { "cd9660" };
 #   endif
 #endif
 
 #ifndef MNTTYPE_UDF
-#define MNTTYPE_UDF "udf"
+static constexpr const char* MNTTYPE_UDF { "udf" };
 #endif
 
 #ifndef MNTTYPE_AUTO
-#define MNTTYPE_AUTO "auto"
+static constexpr const char* MNTTYPE_AUTO { "auto" };
 #endif
 
 #ifndef MNTTYPE_SUPERMOUNT
-#define MNTTYPE_SUPERMOUNT "supermount"
+static constexpr const char* MNTTYPE_SUPERMOUNT { "supermount" };
 #endif
 static const std::string kSuperOptDev { "dev=" };
+#endif // !Q_OS_ANDROID
 
 #if CONFIG_QTDBUS
 // DBus UDisk service - http://hal.freedesktop.org/docs/udisks/
-#define UDISKS_SVC      "org.freedesktop.UDisks"
-#define UDISKS_PATH     "/org/freedesktop/UDisks"
-#define UDISKS_IFACE    "org.freedesktop.UDisks"
-#define UDISKS_DEVADD   "DeviceAdded"
-#define UDISKS_DEVRMV   "DeviceRemoved"
-#define UDISKS_DEVSIG   "o" // OBJECT_PATH
+static constexpr const char* UDISKS_SVC      { "org.freedesktop.UDisks" };
+static constexpr const char* UDISKS_PATH     { "/org/freedesktop/UDisks" };
+static constexpr const char* UDISKS_IFACE    { "org.freedesktop.UDisks" };
+static constexpr const char* UDISKS_DEVADD   { "DeviceAdded" };
+static constexpr const char* UDISKS_DEVRMV   { "DeviceRemoved" };
+static constexpr const char* UDISKS_DEVSIG   { "o" }; // OBJECT_PATH
 // DBus UDisks2 service - https://udisks.freedesktop.org/
-#define UDISKS2_SVC     "org.freedesktop.UDisks2"
-#define UDISKS2_PATH    "/org/freedesktop/UDisks2"
-#define UDISKS2_IFACE   "org.freedesktop.UDisks2.Drive"
+static constexpr const char* UDISKS2_SVC     { "org.freedesktop.UDisks2" };
+static constexpr const char* UDISKS2_PATH    { "/org/freedesktop/UDisks2" };
+static constexpr const char* UDISKS2_IFACE   { "org.freedesktop.UDisks2.Drive" };
 #endif
-
-const char * MediaMonitorUnix::kUDEV_FIFO = "/tmp/mythtv_media";
 
 
 // Some helpers for debugging:
@@ -173,7 +173,7 @@ static QVariant DeviceProperty(const QDBusObjectPath& o, const std::string& kszP
 {
     QVariant v;
 
-    QDBusInterface iface(UDISKS_SVC, o.path(), UDISKS_IFACE".Device",
+    QDBusInterface iface(UDISKS_SVC, o.path(), QString(UDISKS_IFACE) + ".Device",
         QDBusConnection::systemBus() );
     if (iface.isValid())
         v = iface.property(kszProperty.c_str());

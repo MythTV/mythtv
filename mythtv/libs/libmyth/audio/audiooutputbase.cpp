@@ -41,8 +41,9 @@
 #define AOALIGN(x) (((long)&(x) + 15) & ~0xf);
 
 // 1,2,5 and 7 channels are currently valid for upmixing if required
-#define UPMIX_CHANNEL_MASK ((1<<1)|(1<<2)|(1<<5)|1<<7)
-#define IS_VALID_UPMIX_CHANNEL(ch) ((1 << (ch)) & UPMIX_CHANNEL_MASK)
+static constexpr int UPMIX_CHANNEL_MASK { (1<<1)|(1<<2)|(1<<5)|(1<<7) };
+static constexpr bool IS_VALID_UPMIX_CHANNEL(int ch)
+{ return ((1 << ch) & UPMIX_CHANNEL_MASK) != 0; }
 
 const char *AudioOutputBase::quality_string(int q)
 {

@@ -16,8 +16,8 @@
 #include "libmythbase/mythlogging.h"
 #include "audiooutputnull.h"
 
-#define CHANNELS_MIN 1
-#define CHANNELS_MAX 8
+static constexpr uint8_t CHANNELS_MIN { 1 };
+static constexpr uint8_t CHANNELS_MAX { 8 };
 
 AudioOutputNULL::AudioOutputNULL(const AudioSettings &settings) :
     AudioOutputBase(settings)

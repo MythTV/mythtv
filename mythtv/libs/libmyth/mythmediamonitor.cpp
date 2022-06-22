@@ -79,7 +79,7 @@ void MonitorThread::run(void)
 ////////////////////////////////////////////////////////////////////////
 // MediaMonitor
 
-#define MONITOR_INTERVAL 5000
+static constexpr unsigned long MONITOR_INTERVAL { 5000 };
 
 MediaMonitor* MediaMonitor::GetMediaMonitor(void)
 {

@@ -52,7 +52,8 @@ class MediaMonitorUnix : public MediaMonitor
 
   protected:
     int                          m_fifo {-1};
-    static const char           *kUDEV_FIFO;
+    static constexpr const char *kUDEV_FIFO { "/tmp/mythtv_media" };
+;
 };
 
 #endif // MYTH_MEDIA_MONITOR_H

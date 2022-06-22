@@ -27,12 +27,12 @@
 #include <QString>
 #include "libmyth/mythexp.h"
 
-#define ELD_FIXED_BYTES    20
-#define ELD_MAX_SAD        16
+static constexpr uint8_t ELD_FIXED_BYTES    { 20 };
+static constexpr size_t  ELD_MAX_SAD        { 16 };
 
-#define PRINT_RATES_ADVISED_BUFSIZE              80
-#define PRINT_BITS_ADVISED_BUFSIZE               16
-#define PRINT_CHANNEL_ALLOCATION_ADVISED_BUFSIZE 80
+static constexpr uint8_t PRINT_RATES_ADVISED_BUFSIZE              { 80 };
+static constexpr uint8_t PRINT_BITS_ADVISED_BUFSIZE               { 16 };
+static constexpr uint8_t PRINT_CHANNEL_ALLOCATION_ADVISED_BUFSIZE { 80 };
 
 class MPUBLIC eld
 {

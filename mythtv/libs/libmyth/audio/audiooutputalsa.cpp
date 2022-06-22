@@ -15,13 +15,13 @@
 #undef assert
 #define assert(x)
 
-#define CHANNELS_MIN 1
-#define CHANNELS_MAX 8
+static constexpr uint8_t CHANNELS_MIN { 1 };
+static constexpr uint8_t CHANNELS_MAX { 8 };
 
-#define OPEN_FLAGS (SND_PCM_NO_AUTO_RESAMPLE|SND_PCM_NO_AUTO_FORMAT|    \
-                    SND_PCM_NO_AUTO_CHANNELS)
+static constexpr int OPEN_FLAGS
+    { SND_PCM_NO_AUTO_RESAMPLE | SND_PCM_NO_AUTO_FORMAT | SND_PCM_NO_AUTO_CHANNELS };
 
-#define FILTER_FLAGS ~(SND_PCM_NO_AUTO_FORMAT)
+static constexpr int FILTER_FLAGS { ~(SND_PCM_NO_AUTO_FORMAT) };
 
 #define AERROR(str)   VBERROR((str) + QString(": %1").arg(snd_strerror(err)))
 #define CHECKERR(str) { if (err < 0) { AERROR(str); return err; } }

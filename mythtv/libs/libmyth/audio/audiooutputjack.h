@@ -10,8 +10,8 @@
 #include "audiooutputsettings.h"
 
 //! maximum number of channels supported, avoids lots of mallocs
-#define JACK_CHANNELS_MIN 2
-#define JACK_CHANNELS_MAX 8
+static constexpr int8_t JACK_CHANNELS_MIN { 2 };
+static constexpr int8_t JACK_CHANNELS_MAX { 8 };
 
 using jack_port_array = std::array<jack_port_t*,JACK_CHANNELS_MAX>;
 using jack_vol_array  = std::array<int,JACK_CHANNELS_MAX>;

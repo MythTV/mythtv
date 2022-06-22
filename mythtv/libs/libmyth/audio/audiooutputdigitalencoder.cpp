@@ -67,7 +67,7 @@ void AudioOutputDigitalEncoder::Reset(void)
 }
 
 void *AudioOutputDigitalEncoder::realloc(void *ptr,
-                                         int old_size, int new_size)
+                                         size_t old_size, size_t new_size)
 {
     if (!ptr)
         return ptr;
@@ -89,13 +89,13 @@ void *AudioOutputDigitalEncoder::realloc(void *ptr,
 
 #define AC3_FIXED 0
 #if AC3_FIXED
-#define CODECNAME "ac3_fixed"
-#define FFMPEG_SAMPLE_FORMAT AV_SAMPLE_FMT_S32P
-#define MYTH_SAMPLE_FORMAT FORMAT_S32
+static constexpr const char* CODECNAME { "ac3_fixed" };
+static constexpr AVSampleFormat FFMPEG_SAMPLE_FORMAT { AV_SAMPLE_FMT_S32P };
+static constexpr AudioFormat MYTH_SAMPLE_FORMAT { FORMAT_S32 };
 #else
-#define CODECNAME "ac3"
-#define FFMPEG_SAMPLE_FORMAT AV_SAMPLE_FMT_FLTP
-#define MYTH_SAMPLE_FORMAT FORMAT_FLT
+static constexpr const char* CODECNAME { "ac3" };
+static constexpr AVSampleFormat FFMPEG_SAMPLE_FORMAT { AV_SAMPLE_FMT_FLTP };
+static constexpr AudioFormat MYTH_SAMPLE_FORMAT { FORMAT_FLT };
 #define MYTH_USE_FLOAT 1
 #endif
 
@@ -174,7 +174,7 @@ int AudioOutputDigitalEncoder::Encode(void *input, int len, AudioFormat format)
     }
 
     // Check if there is enough space in incoming buffer
-    int required_len = m_inlen +
+    ssize_t required_len = m_inlen +
         len * AudioOutputSettings::SampleSize(MYTH_SAMPLE_FORMAT) / sampleSize;
 
     if (required_len > m_inSize)
