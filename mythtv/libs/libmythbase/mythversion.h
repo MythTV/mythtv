@@ -12,7 +12,7 @@
 /// Update this whenever the plug-in ABI changes.
 /// Including changes in the libmythbase, libmyth, libmythtv, libmythav* and
 /// libmythui class methods in exported headers.
-#define MYTH_BINARY_VERSION "33.20220201-1"
+static constexpr const char* MYTH_BINARY_VERSION { "33.20220201-1" };
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *   Note that the token currently cannot contain spaces.
@@ -44,8 +44,8 @@
  *       http://www.mythtv.org/wiki/Category:Myth_Protocol_Commands
  *       http://www.mythtv.org/wiki/Category:Myth_Protocol
  */
-#define MYTH_PROTO_VERSION "91"
-#define MYTH_PROTO_TOKEN "BuzzOff"
+static constexpr const char* MYTH_PROTO_VERSION { "91" };
+static constexpr const char* MYTH_PROTO_TOKEN { "BuzzOff" };
 /*
  *  Protocol cleanups needed:
  *
@@ -74,7 +74,7 @@
  *      mythtv/bindings/php/MythBackend.php
  */
 
-#define MYTH_DATABASE_VERSION "1376"
+static constexpr const char* MYTH_DATABASE_VERSION { "1376" };
 
 MBASE_PUBLIC  const char *GetMythSourceVersion();
 MBASE_PUBLIC  const char *GetMythSourcePath();

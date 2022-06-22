@@ -23,7 +23,7 @@ bool MythSingleDownload::DownloadURL(const QUrl &url, QByteArray *buffer,
     // the HTTP request
     QNetworkRequest req(url);
     req.setRawHeader("User-Agent",
-                     "MythTV v" MYTH_BINARY_VERSION " MythSingleDownload");
+                     "MythTV v" + QByteArray(MYTH_BINARY_VERSION) + " MythSingleDownload");
     m_replylock.lock();
     m_reply = m_mgr.get(req);
     m_replylock.unlock();

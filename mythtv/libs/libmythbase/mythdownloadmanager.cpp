@@ -727,7 +727,7 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
     if (!request.hasRawHeader("User-Agent"))
     {
         request.setRawHeader("User-Agent",
-                             "MythTV v" MYTH_BINARY_VERSION
+                             QByteArray("MythTV v") + MYTH_BINARY_VERSION +
                              " MythDownloadManager");
     }
 
@@ -942,7 +942,8 @@ bool MythDownloadManager::downloadNowLinkLocal(MythDownloadInfo *dlInfo, bool de
         if (dlInfo->m_headers)
             headers = *dlInfo->m_headers;
         if (!headers.contains("User-Agent"))
-            headers.insert("User-Agent", "MythDownloadManager v" MYTH_BINARY_VERSION);
+            headers.insert("User-Agent", QByteArray("MythDownloadManager v") +
+                           MYTH_BINARY_VERSION);
         headers.insert("Connection", "close");
         headers.insert("Accept-Encoding", "identity");
         if (!buffer->isEmpty())
@@ -1264,7 +1265,8 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
         }
 
         request.setRawHeader("User-Agent",
-                             "MythDownloadManager v" MYTH_BINARY_VERSION);
+                             "MythDownloadManager v" +
+                             QByteArray(MYTH_BINARY_VERSION));
 
         switch (dlInfo->m_requestType)
         {
