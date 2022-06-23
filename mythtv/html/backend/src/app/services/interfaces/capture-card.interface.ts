@@ -52,3 +52,14 @@ export interface CaptureCardList {
         CaptureCards:           CardAndInput[];
     }
 }
+
+export interface CardType {
+    CardType:       string;
+    Description:    string;
+}
+
+export interface CardTypeList {
+    CardTypeList : {
+        CardTypes: CardType []
+    }
+}

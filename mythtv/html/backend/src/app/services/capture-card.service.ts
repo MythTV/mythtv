@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CaptureCard, CaptureCardList } from './interfaces/capture-card.interface';
+import { CaptureCard, CaptureCardList, CardTypeList } from './interfaces/capture-card.interface';
 import { BoolResponse } from './interfaces/common.interface';
 
 @Injectable({
@@ -18,6 +18,10 @@ export class CaptureCardService {
       .set("HostName", HostName)
       .set("CardType", CardType);
     return this.httpClient.get<CaptureCardList>('/Capture/GetCaptureCardList', { params });
+  }
+
+  public GetCardTypeList() : Observable<CardTypeList> {
+    return this.httpClient.get<CardTypeList>('/Capture/GetCardTypeList', { });
   }
 
   public UpdateCaptureCard(Cardid: number, Setting: string, Value: string): Observable<BoolResponse> {

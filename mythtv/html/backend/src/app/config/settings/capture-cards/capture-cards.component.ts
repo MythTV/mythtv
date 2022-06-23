@@ -3,14 +3,10 @@ import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
-import { CaptureCardList, CardAndInput } from 'src/app/services/interfaces/capture-card.interface';
+import { CaptureCardList, CardAndInput, CardType, CardTypeList } from 'src/app/services/interfaces/capture-card.interface';
 import { MythService } from 'src/app/services/myth.service';
 import { SetupService } from 'src/app/services/setup.service';
 
-interface ddParam {
-  name: string,
-  code: string
-}
 
 @Component({
   selector: 'app-capture-cards',
@@ -36,7 +32,7 @@ export class CaptureCardsComponent implements OnInit {
   m_CaptureCardsFiltered!: CardAndInput[];
   m_CaptureCardList$!: Observable<CaptureCardList>;
   displayModal: boolean = false;
-  selectedCardType: ddParam = { name: "", code: "" };
+  selectedCardType: CardType = { CardType: "", Description: "" };
   displayDeleteAllonHost: boolean = false;
   displayDeleteAll: boolean = false;
   successCount: number = 0;
@@ -44,27 +40,8 @@ export class CaptureCardsComponent implements OnInit {
   errorCount: number = 0;
   deleteAll: boolean = false;
 
-  // TODO: Get this list from backend via a new service to be written
-  // Because this list should not contain items excluded from build.
-  cardTypes: ddParam[] = [
-    { name: "DVB-T/S/C, ATSC or ISDB-T tuner card", code: "DVB" },
-    { name: "V4L2 encoder", code: "V4L2ENC" },
-    { name: "HD-PVR H.264 encoder", code: "HDPVR" },
-    { name: "HDHomeRun networked tuner", code: "HDHOMERUN" },
-    { name: "Sat>IP networked tuner", code: "SATIP" },
-    { name: "V@Box TV Gateway networked tuner", code: "VBOX" },
-    { name: "FireWire cable box", code: "FIREWIRE" },
-    { name: "Ceton Cablecard tuner", code: "CETON" },
-    { name: "IPTV recorder", code: "FREEBOX" },
-    { name: "Analog to MPEG-2 encoder card (PVR-150/250/350, etc)", code: "MPEG" },
-    { name: "Analog to MJPEG encoder card (Matrox G200, DC10, etc)", code: "MJPEG" },
-    { name: "Analog to MPEG-4 encoder (Plextor ConvertX USB, etc)", code: "GO7007" },
-    { name: "Analog capture card", code: "V4L" },
-    { name: "DVEO ASI recorder", code: "ASI" },
-    { name: "Import test recorder", code: "IMPORT" },
-    { name: "Demo test recorder", code: "DEMO" },
-    { name: "External (black box) recorder", code: "EXTERNAL" },
-  ];
+
+  cardTypes!: CardType [];
 
   constructor(private mythService: MythService,
     private captureCardService: CaptureCardService, private setupService: SetupService,
@@ -77,6 +54,7 @@ export class CaptureCardsComponent implements OnInit {
       translate.get(this.deletedText).subscribe(data => this.deletedText = data);
       translate.get(this.newText).subscribe(data => this.newText = data);
     });
+    this.captureCardService.GetCardTypeList().subscribe(data => this.cardTypes = data.CardTypeList.CardTypes);
   }
 
   loadCards(doFilter: boolean) {
@@ -153,7 +131,7 @@ export class CaptureCardsComponent implements OnInit {
   newCard() {
     this.displayModal = false;
     let x: CardAndInput = <CardAndInput>{
-      CardType: this.selectedCardType.code,
+      CardType: this.selectedCardType.CardType,
       HostName: this.m_hostName,
       ChannelTimeout: 3000,
       SignalTimeout: 1000
@@ -166,7 +144,7 @@ export class CaptureCardsComponent implements OnInit {
     this.activeTab.push(true);
     this.displayDeleteThis.push(false);
     this.m_CaptureCardsFiltered.push(x);
-    this.selectedCardType = { name: "", code: "" };
+    this.selectedCardType = { CardType: "", Description: "" };
   }
 
   delObserver = {
