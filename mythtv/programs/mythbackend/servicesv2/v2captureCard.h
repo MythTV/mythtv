@@ -127,4 +127,32 @@ class V2CaptureCard : public QObject
 
 Q_DECLARE_METATYPE(V2CaptureCard*)
 
+class V2CardType : public QObject
+{
+    Q_OBJECT
+    Q_CLASSINFO( "Version"    , "1.0" );
+
+    SERVICE_PROPERTY2( QString    ,     CardType       )
+    SERVICE_PROPERTY2( QString    ,     Description       )
+
+    public:
+
+        Q_INVOKABLE V2CardType(QObject *parent = nullptr)
+            : QObject          ( parent )
+        {
+        }
+
+        void Copy( const V2CardType *src )
+        {
+            m_CardType             = src->m_CardType;
+            m_Description          = src->m_Description;
+        }
+
+    private:
+        Q_DISABLE_COPY(V2CardType);
+
+};
+
+Q_DECLARE_METATYPE(V2CardType*)
+
 #endif

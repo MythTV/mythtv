@@ -48,6 +48,8 @@ void V2Capture::RegisterCustomTypes()
 {
     qRegisterMetaType<V2CaptureCardList*>("V2CaptureCardList");
     qRegisterMetaType<V2CaptureCard*>("V2CaptureCard");
+    qRegisterMetaType<V2CardTypeList*>("V2CardTypeList");
+    qRegisterMetaType<V2CardType*>("V2CardType");
 }
 
 V2Capture::V2Capture()
@@ -372,4 +374,74 @@ bool V2Capture::UpdateCardInput    ( int              nCardInputId,
         throw( QString( "Input ID, Setting Name, and Value are required." ));
 
     return set_on_input(sSetting, nCardInputId, sValue);
+}
+
+V2CardTypeList*  V2Capture::GetCardTypeList ( )
+{
+    auto* pCardTypeList = new V2CardTypeList();
+
+#ifdef USING_DVB
+    pCardTypeList->AddCardType(
+        QObject::tr("DVB-T/S/C, ATSC or ISDB-T tuner card"), "DVB");
+#endif // USING_DVB
+
+#ifdef USING_V4L2
+    pCardTypeList->AddCardType(
+        QObject::tr("V4L2 encoder"), "V4L2ENC");
+    pCardTypeList->AddCardType(
+        QObject::tr("HD-PVR H.264 encoder"), "HDPVR");
+#endif // USING_V4L2
+
+#ifdef USING_HDHOMERUN
+    pCardTypeList->AddCardType(
+        QObject::tr("HDHomeRun networked tuner"), "HDHOMERUN");
+#endif // USING_HDHOMERUN
+
+#ifdef USING_SATIP
+    pCardTypeList->AddCardType(
+        QObject::tr("Sat>IP networked tuner"), "SATIP");
+#endif // USING_SATIP
+
+#ifdef USING_VBOX
+    pCardTypeList->AddCardType(
+        QObject::tr("V@Box TV Gateway networked tuner"), "VBOX");
+#endif // USING_VBOX
+
+#ifdef USING_FIREWIRE
+    pCardTypeList->AddCardType(
+        QObject::tr("FireWire cable box"), "FIREWIRE");
+#endif // USING_FIREWIRE
+
+#ifdef USING_CETON
+    pCardTypeList->AddCardType(
+        QObject::tr("Ceton Cablecard tuner"), "CETON");
+#endif // USING_CETON
+
+#ifdef USING_IPTV
+    pCardTypeList->AddCardType(QObject::tr("IPTV recorder"), "FREEBOX");
+#endif // USING_IPTV
+
+#ifdef USING_V4L2
+    pCardTypeList->AddCardType(
+        QObject::tr("Analog to MPEG-2 encoder card (PVR-150/250/350, etc)"), "MPEG");
+    pCardTypeList->AddCardType(
+        QObject::tr("Analog to MJPEG encoder card (Matrox G200, DC10, etc)"), "MJPEG");
+    pCardTypeList->AddCardType(
+        QObject::tr("Analog to MPEG-4 encoder (Plextor ConvertX USB, etc)"),
+        "GO7007");
+    pCardTypeList->AddCardType(
+        QObject::tr("Analog capture card"), "V4L");
+#endif // USING_V4L2
+
+#ifdef USING_ASI
+    pCardTypeList->AddCardType(QObject::tr("DVEO ASI recorder"), "ASI");
+#endif
+
+    pCardTypeList->AddCardType(QObject::tr("Import test recorder"), "IMPORT");
+    pCardTypeList->AddCardType(QObject::tr("Demo test recorder"),   "DEMO");
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+    pCardTypeList->AddCardType(QObject::tr("External (black box) recorder"),
+                          "EXTERNAL");
+#endif
+    return pCardTypeList;
 }

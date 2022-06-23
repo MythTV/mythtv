@@ -55,4 +55,43 @@ class V2CaptureCardList : public QObject
 
 Q_DECLARE_METATYPE(V2CaptureCardList*)
 
+class V2CardTypeList : public QObject
+{
+    Q_OBJECT
+    Q_CLASSINFO( "Version", "1.0" );
+    Q_CLASSINFO( "CardTypes", "type=V2CardType");
+
+    SERVICE_PROPERTY2( QVariantList, CardTypes );
+
+    public:
+
+        Q_INVOKABLE V2CardTypeList(QObject *parent = nullptr)
+            : QObject( parent )
+        {
+        }
+
+        void Copy( const V2CardTypeList *src )
+        {
+            CopyListContents< V2CardTypeList >( this, m_CardTypes, src->m_CardTypes );
+        }
+
+        V2CardType *AddCardType(const QString &description, const QString &cardType)
+        {
+            // We must make sure the object added to the QVariantList has
+            // a parent of 'this'
+
+            auto *pObject = new V2CardType( this );
+            pObject->setCardType(cardType);
+            pObject->setDescription(description);
+            m_CardTypes.append( QVariant::fromValue<QObject *>( pObject ));
+
+            return pObject;
+        }
+
+    private:
+        Q_DISABLE_COPY(V2CardTypeList);
+};
+
+Q_DECLARE_METATYPE(V2CardTypeList*)
+
 #endif

@@ -54,6 +54,8 @@ class V2Capture : public MythHTTPService
 
     static V2CaptureCard*       GetCaptureCard     ( int              CardId     );
 
+    static V2CardTypeList*      GetCardTypeList     ( );
+
     static bool                 RemoveCaptureCard  ( int              CardId     );
 
     static int                  AddCaptureCard     ( const QString    &VideoDevice,
