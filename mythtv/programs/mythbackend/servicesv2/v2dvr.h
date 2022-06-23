@@ -117,7 +117,7 @@ class V2Dvr : public MythHTTPService
                                             const QDateTime &StartTime  );
 
     static bool       AddRecordedCredits  ( int RecordedId,
-                                            const QJsonObject & json);
+                                            const QString & json);
 
     static int        AddRecordedProgram  ( const QJsonObject & json);
 

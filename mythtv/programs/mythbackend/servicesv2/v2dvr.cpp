@@ -389,15 +389,16 @@ V2Program* V2Dvr::GetRecorded(int RecordedId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool V2Dvr::AddRecordedCredits(int RecordedId, const QJsonObject &jsonObj)
+bool V2Dvr::AddRecordedCredits(int RecordedId, const QString &jsonString)
 {
+    QJsonDocument jsonDoc = QJsonDocument().fromJson(jsonString.toLatin1());
     // Verify the corresponding recording exists
     RecordingInfo ri(RecordedId);
     if (!ri.HasPathname())
         throw QString("AddRecordedCredits: recordedid %1 does "
                       "not exist.").arg(RecordedId);
 
-    DBCredits* credits = V2jsonCastToCredits(jsonObj);
+    DBCredits* credits = V2jsonCastToCredits(jsonDoc.object());
     if (credits == nullptr)
         throw QString("AddRecordedCredits: Failed to parse cast from json.");
 
