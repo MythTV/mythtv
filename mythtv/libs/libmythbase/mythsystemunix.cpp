@@ -774,7 +774,6 @@ void MythSystemLegacyUnix::Signal( int sig )
     kill(m_pid, sig);
 }
 
-#define MAX_BUFLEN 1024
 void MythSystemLegacyUnix::Fork(std::chrono::seconds timeout)
 {
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(GetLogCmd());

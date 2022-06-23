@@ -47,17 +47,24 @@
 
 #define LOC QString("PList: ")
 
-#define MAGIC   QByteArray("bplist")
-#define VERSION QByteArray("00")
-#define MAGIC_SIZE   6
-#define VERSION_SIZE 2
-#define TRAILER_SIZE 26
-#define MIN_SIZE (MAGIC_SIZE + VERSION_SIZE + TRAILER_SIZE)
-#define TRAILER_OFFSIZE_INDEX  0
-#define TRAILER_PARMSIZE_INDEX 1
-#define TRAILER_NUMOBJ_INDEX   2
-#define TRAILER_ROOTOBJ_INDEX  10
-#define TRAILER_OFFTAB_INDEX   18
+static const QByteArray  MAGIC                  { "bplist" };
+static const QByteArray  VERSION                { "00"     };
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+static constexpr int8_t  MAGIC_SIZE             { 6 };
+static constexpr int8_t  VERSION_SIZE           { 2 };
+static constexpr int8_t  TRAILER_SIZE           { 26 };
+static constexpr int8_t  MIN_SIZE     { MAGIC_SIZE + VERSION_SIZE + TRAILER_SIZE};
+#else
+static constexpr ssize_t MAGIC_SIZE             { 6 };
+static constexpr ssize_t VERSION_SIZE           { 2 };
+static constexpr ssize_t TRAILER_SIZE           { 26 };
+static constexpr ssize_t MIN_SIZE     { MAGIC_SIZE + VERSION_SIZE + TRAILER_SIZE};
+#endif
+static constexpr uint8_t TRAILER_OFFSIZE_INDEX  { 0 };
+static constexpr uint8_t TRAILER_PARMSIZE_INDEX { 1 };
+static constexpr uint8_t TRAILER_NUMOBJ_INDEX   { 2 };
+static constexpr uint8_t TRAILER_ROOTOBJ_INDEX  { 10 };
+static constexpr uint8_t TRAILER_OFFTAB_INDEX   { 18 };
 
 // Apple's Core Data epoch starts 1/1/2001
 static constexpr uint64_t CORE_DATA_EPOCH { 978307200 };
@@ -220,7 +227,7 @@ void MythBinaryPList::ParseBinaryPList(const QByteArray& Data)
     m_result = QVariant();
 
     // check minimum size
-    auto size = static_cast<quint32>(Data.size());
+    auto size = Data.size();
     if (size < MIN_SIZE)
         return;
 

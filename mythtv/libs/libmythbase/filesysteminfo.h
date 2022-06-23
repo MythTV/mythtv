@@ -1,6 +1,6 @@
 #ifndef DISKINFO_H_
 #define DISKINFO_H_
-#define NUMDISKINFOLINES 8
+static constexpr int8_t NUMDISKINFOLINES { 8 };
 
 #include <cstdint>
 

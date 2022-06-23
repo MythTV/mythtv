@@ -10,7 +10,7 @@
 #include "http/mythmimedatabase.h"
 
 #define LOC QString("MimeDB: ")
-#define PEEK_SIZE 100
+static constexpr qint64 PEEK_SIZE { 100 };
 
 /*! \class MythMimeDatabasePriv
  * \brief A private, internal class that holds custom mime types.

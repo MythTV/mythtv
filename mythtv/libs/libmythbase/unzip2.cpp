@@ -24,16 +24,16 @@
 #include "mythdate.h"
 #include "mythlogging.h"
 
-#define ZIP_ATTR_FILE_TYPE_MASK      0xFE000000
-#define ZIP_ATTR_FILE_TYPE_SYMLINK   0xA0000000
-#define ZIP_ATTR_FILE_TYPE_NORMAL    0x80000000
+static constexpr uint32_t   ZIP_ATTR_FILE_TYPE_MASK      { 0xFE000000 };
+static constexpr uint32_t   ZIP_ATTR_FILE_TYPE_SYMLINK   { 0xA0000000 };
+//static constexpr uint32_t ZIP_ATTR_FILE_TYPE_NORMAL    { 0x80000000 };
 
-#define ZIP_ATTR_USER_PERM_MASK      0x01C00000
-#define ZIP_ATTR_GROUP_PERM_MASK     0x03800000
-#define ZIP_ATTR_OTHER_PERM_MASK     0x00700000
-#define ZIP_ATTR_USER_PERM_SHIFT     22
-#define ZIP_ATTR_GROUP_PERM_SHIFT    19
-#define ZIP_ATTR_OTHER_PERM_SHIFT    16
+static constexpr uint32_t   ZIP_ATTR_USER_PERM_MASK      { 0x01C00000 };
+static constexpr uint32_t   ZIP_ATTR_GROUP_PERM_MASK     { 0x03800000 };
+static constexpr uint32_t   ZIP_ATTR_OTHER_PERM_MASK     { 0x00700000 };
+static constexpr uint8_t    ZIP_ATTR_USER_PERM_SHIFT     { 22 };
+static constexpr uint8_t    ZIP_ATTR_GROUP_PERM_SHIFT    { 19 };
+static constexpr uint8_t    ZIP_ATTR_OTHER_PERM_SHIFT    { 16 };
 
 UnZip::UnZip(QString zipFileName)
     : m_zipFileName(std::move(zipFileName))

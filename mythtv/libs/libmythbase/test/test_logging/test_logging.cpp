@@ -299,7 +299,7 @@ void TestLogging::test_logPropagateCalc_data (void)
                              << "--verbose general --loglevel info --syslog daemon";
 #if CONFIG_SYSTEMD_JOURNAL
     QTest::newRow("systemd") << "general"
-                             << static_cast<int>(0) << static_cast<int>(SYSTEMD_JOURNAL_FACILITY)
+                             << static_cast<int>(0) << SYSTEMD_JOURNAL_FACILITY
                              << false << false
                              << "--verbose general --loglevel info --systemd-journal";
 #endif

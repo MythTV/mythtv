@@ -32,7 +32,7 @@
 #include "portchecker.h"
 
 #define LOC      QString("DownloadManager: ")
-#define CACHE_REDIRECTION_LIMIT     10
+static constexpr int CACHE_REDIRECTION_LIMIT { 10 };
 
 MythDownloadManager *downloadManager = nullptr;
 QMutex               dmCreateLock;

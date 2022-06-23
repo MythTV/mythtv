@@ -16,8 +16,6 @@
 #include "verbosedefs.h"
 #include "mthread.h"
 
-#define LOGLINE_MAX (2048-120)
-
 class QString;
 class MSqlQuery;
 class LoggingItem;
@@ -154,7 +152,12 @@ MBASE_PUBLIC void logForwardMessage(const QList<QByteArray> &msg);
 
 
 class QWaitCondition;
-#define MAX_QUEUE_LEN 1000
+
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+static constexpr int MAX_QUEUE_LEN { 1000 };
+#else
+static constexpr ssize_t MAX_QUEUE_LEN { 1000 };
+#endif
 
 /// \brief Thread that manages the queueing of logging inserts for the database.
 ///        The database logging gets throttled if it gets overwhelmed, and also

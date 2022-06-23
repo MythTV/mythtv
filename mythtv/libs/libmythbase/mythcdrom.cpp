@@ -29,15 +29,15 @@
 // DVDs use the UDF filesystem, NOT ISO9660. Fix your /etc/fstab.
 
 // This allows a warning for the above mentioned OS setup fault
-#define PATHTO_BAD_DVD_MOUNT "/video_ts"
+static constexpr const char* PATHTO_BAD_DVD_MOUNT { "/video_ts"   };
 
-#define PATHTO_DVD_DETECT "/VIDEO_TS"
-#define PATHTO_BD_DETECT "/BDMV"
-#define PATHTO_VCD_DETECT "/vcd"
-#define PATHTO_SVCD_DETECT "/svcd"
+static constexpr const char* PATHTO_DVD_DETECT    { "/VIDEO_TS"   };
+static constexpr const char* PATHTO_BD_DETECT     { "/BDMV"       };
+static constexpr const char* PATHTO_VCD_DETECT    { "/vcd"        };
+static constexpr const char* PATHTO_SVCD_DETECT   { "/svcd"       };
 
 // Mac OS X mounts audio CDs ready to use
-#define PATHTO_AUDIO_DETECT "/.TOC.plist"
+static constexpr const char* PATHTO_AUDIO_DETECT  { "/.TOC.plist" };
 
 
 MythCDROM* MythCDROM::get(QObject* par, const QString& devicePath,

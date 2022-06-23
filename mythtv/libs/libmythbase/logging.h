@@ -23,10 +23,8 @@
 #endif
 
 #if CONFIG_SYSTEMD_JOURNAL
-#define SYSTEMD_JOURNAL_FACILITY (-99)
+static constexpr int SYSTEMD_JOURNAL_FACILITY { -99 };
 #endif
-
-#define LOGLINE_MAX (2048-120)
 
 class QString;
 class MSqlQuery;
