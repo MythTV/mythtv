@@ -99,7 +99,7 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     ~MythAirplayServer(void) override;
     void Teardown(void);
     void HandleResponse(APHTTPRequest *req, QTcpSocket *socket);
-    static QByteArray StatusToString(int status);
+    static QByteArray StatusToString(uint16_t status);
     static QString eventToString(AirplayEvent event);
     static void GetPlayerStatus(bool &playing, float &speed,
                                 double &position, double &duration,
@@ -107,7 +107,7 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     static QString GetMacAddress();
     bool SendReverseEvent(QByteArray &session, AirplayEvent event);
     void SendResponse(QTcpSocket *socket,
-                      int status, const QByteArray& header,
+                      uint16_t status, const QByteArray& header,
                       const QByteArray& content_type, const QString& body);
 
     void deleteConnection(QTcpSocket *socket);

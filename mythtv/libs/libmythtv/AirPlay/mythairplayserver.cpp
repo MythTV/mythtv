@@ -42,14 +42,14 @@ QRecursiveMutex*   MythAirplayServer::gMythAirplayServerMutex = new QRecursiveMu
 
 #define LOC QString("AirPlay: ")
 
-#define HTTP_STATUS_OK                  200
-#define HTTP_STATUS_SWITCHING_PROTOCOLS 101
-#define HTTP_STATUS_NOT_IMPLEMENTED     501
-#define HTTP_STATUS_UNAUTHORIZED        401
-#define HTTP_STATUS_NOT_FOUND           404
+static constexpr uint16_t HTTP_STATUS_OK                  { 200 };
+static constexpr uint16_t HTTP_STATUS_SWITCHING_PROTOCOLS { 101 };
+static constexpr uint16_t HTTP_STATUS_NOT_IMPLEMENTED     { 501 };
+static constexpr uint16_t HTTP_STATUS_UNAUTHORIZED        { 401 };
+static constexpr uint16_t HTTP_STATUS_NOT_FOUND           { 404 };
 
-#define AIRPLAY_SERVER_VERSION_STR "115.2"
-#define SERVER_INFO  QString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"\
+static constexpr const char* AIRPLAY_SERVER_VERSION_STR { "115.2" };
+static const QString SERVER_INFO { "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" \
 "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\r\n"\
 "<plist version=\"1.0\">\r\n"\
 "<dict>\r\n"\
@@ -62,11 +62,11 @@ QRecursiveMutex*   MythAirplayServer::gMythAirplayServerMutex = new QRecursiveMu
 "<key>protovers</key>\r\n"\
 "<string>1.0</string>\r\n"\
 "<key>srcvers</key>\r\n"\
-"<string>" AIRPLAY_SERVER_VERSION_STR "</string>\r\n"\
+"<string>%1</string>\r\n"\
 "</dict>\r\n"\
-"</plist>\r\n")
+"</plist>\r\n" };
 
-#define EVENT_INFO QString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\r\n"\
+static const QString EVENT_INFO { "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\r\n" \
 "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n\r\n"\
 "<plist version=\"1.0\">\r\n"\
 "<dict>\r\n"\
@@ -75,9 +75,9 @@ QRecursiveMutex*   MythAirplayServer::gMythAirplayServerMutex = new QRecursiveMu
 "<key>state</key>\r\n"\
 "<string>%1</string>\r\n"\
 "</dict>\r\n"\
-"</plist>\r\n")
+"</plist>\r\n" };
 
-#define PLAYBACK_INFO  QString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"\
+static const QString PLAYBACK_INFO { "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" \
 "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\r\n"\
 "<plist version=\"1.0\">\r\n"\
 "<dict>\r\n"\
@@ -114,16 +114,16 @@ QRecursiveMutex*   MythAirplayServer::gMythAirplayServerMutex = new QRecursiveMu
 "\t\t</dict>\r\n"\
 "</array>\r\n"\
 "</dict>\r\n"\
-"</plist>\r\n")
+"</plist>\r\n" };
 
-#define NOT_READY  QString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"\
+static const QString NOT_READY { "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" \
 "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\r\n"\
 "<plist version=\"1.0\">\r\n"\
 "<dict>\r\n"\
 "<key>readyToPlay</key>\r\n"\
 "<false/>\r\n"\
 "</dict>\r\n"\
-"</plist>\r\n")
+"</plist>\r\n" };
 
 QString AirPlayHardwareId()
 {
@@ -496,7 +496,7 @@ void MythAirplayServer::Start(void)
         // 9: Audio, 10: ? (but important without it it fails) 11: Audio redundant
         txt.append(13); txt.append("features=0xF7");
         txt.append(14); txt.append("model=MythTV,1");
-        txt.append(13); txt.append("srcvers=" AIRPLAY_SERVER_VERSION_STR);
+        txt.append(13); txt.append("srcvers=").append(AIRPLAY_SERVER_VERSION_STR);
 
         if (!m_bonjour->Register(m_setupPort, type, name, txt))
         {
@@ -633,7 +633,7 @@ void MythAirplayServer::read(void)
     }
 }
 
-QByteArray MythAirplayServer::StatusToString(int status)
+QByteArray MythAirplayServer::StatusToString(uint16_t status)
 {
     switch (status)
     {
@@ -655,7 +655,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     QByteArray session;
     QByteArray header;
     QString    body;
-    int status = HTTP_STATUS_OK;
+    uint16_t status = HTTP_STATUS_OK;
     QByteArray content_type;
 
     if (req->GetURI() != "/playback-info")
@@ -801,7 +801,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     if (req->GetURI() == "/server-info")
     {
         content_type = "text/x-apple-plist+xml\r\n";
-        body = SERVER_INFO;
+        body = SERVER_INFO.arg(AIRPLAY_SERVER_VERSION_STR);
         body.replace("%1", GetMacAddress());
         LOG(VB_GENERAL, LOG_INFO, body);
     }
@@ -981,7 +981,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
 }
 
 void MythAirplayServer::SendResponse(QTcpSocket *socket,
-                                     int status, const QByteArray& header,
+                                     uint16_t status, const QByteArray& header,
                                      const QByteArray& content_type, const QString& body)
 {
     if (!socket || !m_incoming.contains(socket) ||
