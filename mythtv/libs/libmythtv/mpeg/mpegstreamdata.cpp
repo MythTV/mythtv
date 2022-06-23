@@ -1018,6 +1018,26 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
     if (tspacket.Scrambled())
         return true;
 
+    // Discard broken packets with invalid adaptation field length
+    // See ISO/IEC 13818-1 : 2000 (E). 2.4.3.5 Semantic definition of fields in adaptation field
+    if (tspacket.HasAdaptationField())
+    {
+        size_t afsize = tspacket.AdaptationFieldSize();
+        bool validsize = (tspacket.HasPayload())
+            ? afsize <= 182
+            : afsize == 183;
+        if (!validsize)
+        {
+            if (VERBOSE_LEVEL_CHECK(VB_RECORD, LOG_DEBUG))
+            {
+                LOG(VB_RECORD, LOG_DEBUG, QString("Invalid adaptation field, type %3, size %4")
+                    .arg(tspacket.AdaptationFieldControl()).arg(afsize) + "\n" +
+                    tspacket.toString());
+            }
+            return false;
+        }
+    }
+
     if (VERBOSE_LEVEL_CHECK(VB_RECORD, LOG_DEBUG))
     {
         if (m_pmtSingleProgram && tspacket.PID() ==
