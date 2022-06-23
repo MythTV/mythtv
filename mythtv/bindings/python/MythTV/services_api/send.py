@@ -238,11 +238,9 @@ class Send(object):
         ##############################################################
 
         try:
-            if self.postdata:
+            if self.postdata or self.jsondata:
                 response = self.session.post(url, data=self.postdata,
-                                             timeout=self.opts['timeout'])
-            elif self.jsondata:
-                response = self.session.post(url, json=self.jsondata,
+                                             json=self.jsondata,
                                              timeout=self.opts['timeout'])
             else:
                 response = self.session.get(url, timeout=self.opts['timeout'])

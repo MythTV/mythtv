@@ -117,7 +117,7 @@ HTTPResponse MythHTTPService::HTTPRequest(const HTTPRequest2& Request)
         auto * newparam = QMetaType(type).create();
 #endif
         param[count] = handler->CreateParameter(newparam, type, value);
-        count++;
+        ++count;
     }
 
     HTTPResponse result = nullptr;

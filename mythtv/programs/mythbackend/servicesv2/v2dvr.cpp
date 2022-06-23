@@ -366,7 +366,7 @@ V2ProgramList* V2Dvr::GetOldRecordedList( bool             bDescending,
 /////////////////////////////////////////////////////////////////////////////
 
 V2Program* V2Dvr::GetRecorded(int RecordedId,
-                               int chanid, const QDateTime &StartTime)
+                              int chanid, const QDateTime &StartTime)
 {
     if ((RecordedId <= 0) &&
         (chanid <= 0 || !StartTime.isValid()))
@@ -389,9 +389,9 @@ V2Program* V2Dvr::GetRecorded(int RecordedId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool V2Dvr::AddRecordedCredits(int RecordedId, const QString &jsonString)
+bool V2Dvr::AddRecordedCredits(int RecordedId, const QString & Cast)
 {
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonString.toLatin1());
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(Cast.toUtf8());
     // Verify the corresponding recording exists
     RecordingInfo ri(RecordedId);
     if (!ri.HasPathname())
@@ -418,16 +418,17 @@ bool V2Dvr::AddRecordedCredits(int RecordedId, const QString &jsonString)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int V2Dvr::AddRecordedProgram(const QJsonObject &jsonObj)
+int V2Dvr::AddRecordedProgram(const QString &Program)
 {
-    QJsonObject root      = jsonObj;
-    QJsonObject program   = root["Program"].toObject();
+    QJsonDocument doc     = QJsonDocument::fromJson(Program.toUtf8());
+    QJsonObject program   = doc.object();
     QJsonObject channel   = program["Channel"].toObject();
     QJsonObject recording = program["Recording"].toObject();
     QJsonObject cast      = program["Cast"].toObject();
 
     auto     *pi = new ProgInfo();
-    int       chanid = channel.value("ChanId").toString("0").toUInt();
+    int       chanid = channel.value("ChanId").toVariant().toString().toUInt();
+
     QString   hostname = program["HostName"].toString("");
 
     if (ChannelUtil::GetChanNum(chanid).isEmpty())
@@ -454,7 +455,7 @@ int V2Dvr::AddRecordedProgram(const QJsonObject &jsonObj)
                           (program.value("AudioPropNames").toString(""));
     pi->m_videoProps    = ProgramInfo::VideoPropertiesFromNames
                           (program.value("VideoPropNames").toString(""));
-    pi->m_stars         = program.value("Stars").toString("0.0").toFloat();
+    pi->m_stars         = program.value("Stars").toVariant().toString().toFloat();
     pi->m_categoryType  = string_to_myth_category_type(program.value("CatType").toString(""));
     pi->m_seriesId      = program.value("SeriesId").toString("");
     pi->m_programId     = program.value("ProgramId").toString("");
@@ -463,9 +464,12 @@ int V2Dvr::AddRecordedProgram(const QJsonObject &jsonObj)
     pi->m_listingsource = 0;
 //    pi->m_ratings =
 //    pi->m_genres =
-    pi->m_season        = program.value("Season").toString("0").toUInt();
-    pi->m_episode       = program.value("Episode").toString("0").toUInt();
-    pi->m_totalepisodes = program.value("TotalEpisodes").toString("0").toUInt();
+    pi->m_season        = program.value("Season").toVariant()
+                                 .toString().toUInt();
+    pi->m_episode       = program.value("Episode").toVariant()
+                                 .toString().toUInt();
+    pi->m_totalepisodes = program.value("TotalEpisodes").toVariant()
+                          .toString().toUInt();
 
     pi->m_channel        = channel.value("ChannelName").toString("");
 
@@ -522,17 +526,17 @@ int V2Dvr::AddRecordedProgram(const QJsonObject &jsonObj)
                      pi->m_stars,
                      pi->m_originalairdate,
                      program.value("Repeat").toString("false").toLower() == "true",
-                     static_cast<RecStatus::Type>(recording.value("Status").toString("-3").toInt()),
+                     static_cast<RecStatus::Type>(recording.value("Status").toInt()),
                      false, // reactivate
                      recording.value("RecordedId").toString("0").toInt(),
                      0, // parentid
-                     static_cast<RecordingType>(recording.value("RecType").toString("0").toInt()),
-                     static_cast<RecordingDupInType>(recording.value("DupInType").toString("0").toInt()),
-                     static_cast<RecordingDupMethodType>(recording.value("DupMethod").toString("0").toInt()),
-                     channel.value("SourceId").toString("0").toUInt(),
-                     channel.value("InputId").toString("0").toUInt(),
+                     static_cast<RecordingType>(recording.value("RecType").toInt()),
+                     static_cast<RecordingDupInType>(recording.value("DupInType").toInt()),
+                     static_cast<RecordingDupMethodType>(recording.value("DupMethod").toInt()),
+                     channel.value("SourceId").toVariant().toString().toUInt(),
+                     channel.value("InputId").toVariant().toString().toUInt(),
                      0, // findid
-                     channel.value("CommFree").toString("false").toLower() == "true",
+                     channel.value("CommFree").toBool(),
                      pi->m_subtitleType,
                      pi->m_videoProps,
                      pi->m_audioProps,
@@ -1058,7 +1062,7 @@ V2MarkupList* V2Dvr::GetRecordedMarkup ( int RecordedId )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool V2Dvr::SetRecordedMarkup (int RecordedId, const QJsonObject &jsonObj)
+bool V2Dvr::SetRecordedMarkup(int RecordedId, const QString &MarkupList)
 {
     RecordingInfo ri;
     ri = RecordingInfo(RecordedId);
@@ -1069,7 +1073,8 @@ bool V2Dvr::SetRecordedMarkup (int RecordedId, const QJsonObject &jsonObj)
     QVector<ProgramInfo::MarkupEntry> mapMark;
     QVector<ProgramInfo::MarkupEntry> mapSeek;
 
-    QJsonObject markuplist = jsonObj["MarkupList"].toObject();
+    QJsonDocument doc        = QJsonDocument::fromJson(MarkupList.toUtf8());
+    QJsonObject   markuplist = doc.object();
 
     QJsonArray  marks = markuplist["Mark"].toArray();
     for (const auto & m : marks)
@@ -1079,7 +1084,8 @@ bool V2Dvr::SetRecordedMarkup (int RecordedId, const QJsonObject &jsonObj)
 
         QString typestr = markup.value("Type").toString("");
         entry.type  = markTypeFromString(typestr);
-        entry.frame = markup.value("Frame").toString("-1").toLongLong();
+        entry.frame = markup.value("Frame").toVariant()
+                            .toString().toLongLong();
         QString data  = markup.value("Data").toString("NULL");
         entry.isDataNull = (data == "NULL");
         if (!entry.isDataNull)
@@ -1096,7 +1102,7 @@ bool V2Dvr::SetRecordedMarkup (int RecordedId, const QJsonObject &jsonObj)
 
         QString typestr = markup.value("Type").toString("");
         entry.type  = markTypeFromString(typestr);
-        entry.frame = markup.value("Frame").toString("-1").toLongLong();
+        entry.frame = markup.value("Frame").toVariant().toString().toLongLong();
         QString data  = markup.value("Data").toString("NULL");
         entry.isDataNull = (data == "NULL");
         if (!entry.isDataNull)

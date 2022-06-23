@@ -209,11 +209,13 @@ void MythHTTPEncoding::GetJSONEncodedParameters(MythHTTPRequest* Request)
     if (!Request || !Request->m_content.get())
         return;
 
+    QByteArray jstr = static_cast<QByteArray>(Request->m_content->constData());
     QJsonParseError parseError {};
-    QJsonDocument doc = QJsonDocument::fromJson(static_cast<QByteArray>(Request->m_content->constData()), &parseError);
+    QJsonDocument doc = QJsonDocument::fromJson(jstr, &parseError);
     if (parseError.error != QJsonParseError::NoError)
     {
-        LOG(VB_HTTP, LOG_WARNING, QString("Unable to parse JSON request body - Error at position %1, msg: %2")
+        LOG(VB_HTTP, LOG_WARNING,
+            QString("Unable to parse JSON request body - Error at position %1, msg: %2")
             .arg(parseError.offset).arg(parseError.errorString()));
         return;
     }
@@ -223,10 +225,27 @@ void MythHTTPEncoding::GetJSONEncodedParameters(MythHTTPRequest* Request)
     {
         if (!key.isEmpty())
         {
-            QString value = json.value(key).toVariant().toString();
+            QString value;
+            if (json.value(key).isObject())
+            {
+                QJsonDocument vd(json.value(key).toObject());
+                value = vd.toJson(QJsonDocument::Compact);
+            }
+            else
+            {
+                value = json.value(key).toVariant().toString();
+
+                if (value.isEmpty())
+                {
+                    LOG(VB_HTTP, LOG_WARNING,
+                        QString("Failed to parse value for key '%1' from %2")
+                        .arg(key).arg(QString(jstr)));
+                }
+            }
 
             Request->m_queries.insert(key.trimmed().toLower(), value);
-            LOG(VB_HTTP, LOG_DEBUG, QString("Found URL param (%1=%2)").arg(key, value));
+            LOG(VB_HTTP, LOG_DEBUG,
+                QString("Found URL param (%1=%2)").arg(key).arg(value));
         }
     }
 }

@@ -229,4 +229,3 @@ QVariant MythHTTPMetaMethod::CreateReturnValue(int Type, void* Value)
     return QVariant(QMetaType(Type), Value);
 #endif
 }
-

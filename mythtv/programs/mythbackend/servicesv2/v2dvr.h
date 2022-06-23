@@ -117,9 +117,9 @@ class V2Dvr : public MythHTTPService
                                             const QDateTime &StartTime  );
 
     static bool       AddRecordedCredits  ( int RecordedId,
-                                            const QString & json);
+                                            const QString & Cast);
 
-    static int        AddRecordedProgram  ( const QJsonObject & json);
+    static int        AddRecordedProgram  ( const QString & Program);
 
     static bool       RemoveRecorded      ( int              RecordedId,
                                             int              ChanId,
@@ -192,7 +192,7 @@ class V2Dvr : public MythHTTPService
     static V2MarkupList* GetRecordedMarkup( int              RecordedId );
 
     static bool    SetRecordedMarkup      ( int              RecordedId,
-                                            const QJsonObject & json );
+                                            const QString   &MarkupList);
 
     static V2ProgramList* GetConflictList ( int              StartIndex,
                                             int              Count,
