@@ -13,9 +13,12 @@
 
 #define LOC QString("Pulse: ")
 
-#define IS_READY(arg) ((PA_CONTEXT_READY      == (arg)) || \
-                       (PA_CONTEXT_FAILED     == (arg)) || \
-                       (PA_CONTEXT_TERMINATED == (arg)))
+static inline bool IS_READY(pa_context_state arg)
+{
+    return ((PA_CONTEXT_READY      == arg) ||
+            (PA_CONTEXT_FAILED     == arg) ||
+            (PA_CONTEXT_TERMINATED == arg));
+}
 
 static QString state_to_string(pa_context_state state)
 {
