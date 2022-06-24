@@ -274,7 +274,7 @@ bool MythEDID::ParseBaseBlock(const quint8* Data)
                  qFuzzyCompare(m_gamma + 1.0F, 2.20F + 1.0F);
 
     // Parse blocks
-    for (uint i = 0; i < 5; ++i)
+    for (uint i = 0; i < 4; ++i)
     {
         uint offset = DATA_BLOCK_OFFSET + i * 18;
         if (Data[offset] == 0 || Data[offset + 1] == 0 || Data[offset + 2] == 0)
