@@ -1,12 +1,7 @@
 #include "../config.h"
-#ifdef HAVE_STDINT_H
-#include <cstdint>
-#endif
 
 #include <algorithm>
-#include <cinttypes>
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <random>
 

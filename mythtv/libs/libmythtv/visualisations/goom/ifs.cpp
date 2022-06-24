@@ -45,8 +45,8 @@
 #include "goom_tools.h"
 
 
-#define LRAND()                    ((long) (RAND() & 0x7fffffff))
-#define NRAND(n)           ((int) (LRAND() % (n)))
+static inline long LRAND()      { return static_cast<long>( RAND() & 0x7fffffff); }
+static inline int  NRAND(int n) { return static_cast<int>( LRAND() % n ); }
 static constexpr double MAXRAND { 2147483648.0 }; /* unsigned 1<<31 as a * * * * float */
 
 /*****************************************************/
@@ -56,26 +56,17 @@ using F_PT = float;
 
 /*****************************************************/
 
-#define FIX 12
-#define UNIT   ( 1<<FIX )
-static constexpr size_t MAX_SIMI { 6 };
+static constexpr uint8_t  FIX      { 12     };
+static constexpr uint16_t UNIT     { 1<<FIX };
+static constexpr size_t   MAX_SIMI { 6      };
 
-#define MAX_DEPTH_2  10
-#define MAX_DEPTH_3  6
-#define MAX_DEPTH_4  4
-#define MAX_DEPTH_5  2
+static constexpr int8_t   MAX_DEPTH_2  { 10 };
+static constexpr int8_t   MAX_DEPTH_3  {  6 };
+static constexpr int8_t   MAX_DEPTH_4  {  4 };
+static constexpr int8_t   MAX_DEPTH_5  {  2 };
 
-/* PREVIOUS VALUE 
-#define MAX_SIMI  6
-
-* settings for a PC 120Mhz... *
-#define MAX_DEPTH_2  10
-#define MAX_DEPTH_3  6
-#define MAX_DEPTH_4  4
-#define MAX_DEPTH_5  3
-*/
-
-#define DBL_To_F_PT(x)  (F_PT)( (DBL)(UNIT)*(x) )
+static inline F_PT DBL_To_F_PT(DBL x)
+{ return static_cast<F_PT>( static_cast<DBL>(UNIT) * x ); };
 
 using SIMI = struct Similitude_Struct;
 using FRACTAL = struct Fractal_Struct;

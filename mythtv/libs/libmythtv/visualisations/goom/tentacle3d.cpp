@@ -66,7 +66,7 @@ lightencolor (int *col, float power)
 }
 
 // retourne x>>s , en testant le signe de x
-#define ShiftRight(_x,_s) (((_x)<0) ? -(-(_x)>>(_s)) : ((_x)>>(_s)))
+static inline int ShiftRight(int x,int s) {return (x<0) ? -((-x)>>s) : (x>>s); }
 
 static
 int evolutecolor (unsigned int src,unsigned int dest, unsigned int mask, unsigned int incr) {

@@ -139,7 +139,7 @@ static int *firedec = nullptr;
 
 
 // retourne x>>s , en testant le signe de x
-#define ShiftRight(_x,_s) (((_x)<0) ? -(-(_x)>>(_s)) : ((_x)>>(_s)))
+static inline int ShiftRight(int x,int s) {return (x<0) ? -((-x)>>s) : (x>>s); }
 
 /** modif d'optim by Jeko : precalcul des 4 coefs résultant des 2 pos */
 GoomCoefficients precalCoef = {};
@@ -248,8 +248,7 @@ calculatePXandPY (int x, int y, int *px, int *py)
 		if (waveEffect) {
 			fvitesse *=
 				1024 +
-				ShiftRight (sintable
-										[(unsigned short) (dist * 0xffff + EFFECT_DISTORS)], 6);
+				ShiftRight (sintable[(unsigned short) (dist * 0xffff + EFFECT_DISTORS)], 6);
 			fvitesse /= 1024;
 		}
 
@@ -266,8 +265,7 @@ calculatePXandPY (int x, int y, int *px, int *py)
 		case WAVE_MODE:
 			fvitesse *=
 				1024 +
-				ShiftRight (sintable
-										[(unsigned short) (dist * 0xffff * EFFECT_DISTORS)], 6);
+				ShiftRight (sintable[(unsigned short) (dist * 0xffff * EFFECT_DISTORS)], 6);
 			fvitesse>>=10;///=1024;
 			break;
 		case CRYSTAL_BALL_MODE:
