@@ -585,7 +585,8 @@ MusicMetadata *CdDecoder::getMetadata()
 
     bool isCompilation = false;
 
-#define CDTEXT 0 // Disabled - cd-text access on discs without it is S L O W
+// Disabled - cd-text access on discs without it is S L O W
+#define CDTEXT 0 // NOLINT(cppcoreguidelines-macro-usage)
 #if CDTEXT
     static int s_iCdtext;
     if (isDiscChanged)

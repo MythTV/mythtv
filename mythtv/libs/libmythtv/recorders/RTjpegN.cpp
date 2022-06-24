@@ -51,8 +51,8 @@ static mmx_t RTjpeg_C2pC6;
 static mmx_t RTjpeg_zero;
 #endif
 
-//#define SHOWBLOCK 1
-#define BETTERCOMPRESSION 1
+//#define SHOWBLOCK 1       // NOLINT(cppcoreguidelines-macro-usage)
+#define BETTERCOMPRESSION 1 // NOLINT(cppcoreguidelines-macro-usage)
 
 static const std::array<const uint8_t,64> RTjpeg_ZZ {
 0,

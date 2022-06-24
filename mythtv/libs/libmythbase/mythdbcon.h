@@ -14,7 +14,7 @@
 #include "mythdbparams.h"
 #include "qtuplift.h"
 
-#define REUSE_CONNECTION 1
+#define REUSE_CONNECTION 1 // NOLINT(cppcoreguidelines-macro-usage)
 
 MBASE_PUBLIC bool TestDatabase(const QString& dbHostName,
                                const QString& dbUserName,

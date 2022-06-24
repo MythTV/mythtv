@@ -24,7 +24,7 @@
 
 // On a mixed-mode disc (audio+data), set this to 0 to mount the data portion:
 #ifndef ASSUME_WANT_AUDIO
-#define ASSUME_WANT_AUDIO 1
+#define ASSUME_WANT_AUDIO 1 // NOLINT(cppcoreguidelines-macro-usage)
 #endif
 
 

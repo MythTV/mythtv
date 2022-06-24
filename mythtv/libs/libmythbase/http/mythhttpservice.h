@@ -48,6 +48,8 @@ class MBASE_PUBLIC V2HttpRedirectException
         ~V2HttpRedirectException() = default;
 };
 
+//NOLINTBEGIN(cppcoreguidelines-macro-usage)
+
 /// @def SERVICE_PROPERTY(Type, Name)
 ///
 /// Define a variable and its accessor functions. The variable will be
@@ -122,6 +124,8 @@ class MBASE_PUBLIC V2HttpRedirectException
     {                                   \
         m_b##name = enabled;            \
     }
+
+//NOLINTEND(cppcoreguidelines-macro-usage)
 
 template< class T >
 void CopyListContents( QObject *pParent, QVariantList &dst, const QVariantList &src )

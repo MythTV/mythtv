@@ -31,14 +31,14 @@ class MusicMetadata;
 class Encoder;
 
 #ifdef MMX
-#define LAME_WORKAROUND 1
+#define LAME_WORKAROUND 1 // NOLINT(cppcoreguidelines-macro-usage)
 #undef MMX
 #endif
 
 #include <lame/lame.h>
 
 #ifdef LAME_WORKAROUND
-#define MMX 1
+#define MMX 1 // NOLINT(cppcoreguidelines-macro-usage)
 #endif
 
 #include "encoder.h"

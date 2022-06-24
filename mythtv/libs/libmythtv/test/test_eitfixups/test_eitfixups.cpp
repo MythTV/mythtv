@@ -30,7 +30,7 @@
 
 
 // Make this non-zero to enable dumping event details to stdout
-#define DUMP_EVENTS 0
+#define DUMP_EVENTS 0 // NOLINT(cppcoreguidelines-macro-usage)
 
 #if DUMP_EVENTS
     #define PRINT_EVENT(a) printEvent(a)

@@ -69,7 +69,8 @@ std::chrono::milliseconds DVBChannel::s_lastTuning = MythDate::currentMSecsSince
 
 #define LOC QString("DVBChan[%1](%2): ").arg(m_inputId).arg(DVBChannel::GetDevice())
 
-#define DTV_STAT_FULL_DEBUG 0       // All DTV_STAT_xxx values
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define DTV_STAT_FULL_DEBUG 0 // All DTV_STAT_xxx values
 
 /** \class DVBChannel
  *  \brief Provides interface to the tuning hardware when using DVB drivers

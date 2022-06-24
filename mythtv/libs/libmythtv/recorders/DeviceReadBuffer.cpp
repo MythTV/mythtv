@@ -14,7 +14,7 @@
 #endif
 
 /// Set this to 1 to report on statistics
-#define REPORT_RING_STATS 0
+#define REPORT_RING_STATS 0  // NOLINT(cppcoreguidelines-macro-usage)
 
 #define LOC QString("DevRdB(%1): ").arg(m_videoDevice)
 

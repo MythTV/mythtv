@@ -103,8 +103,8 @@ class VisFactory
     VisFactory*        m_pNextVisFactory {nullptr};
 };
 
-#define RUBBERBAND false
-#define TWOCOLOUR 0
+#define RUBBERBAND 0 // NOLINT(cppcoreguidelines-macro-usage)
+#define TWOCOLOUR 0 // NOLINT(cppcoreguidelines-macro-usage)
 
 class StereoScope : public VisualBase
 {

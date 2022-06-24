@@ -20,7 +20,7 @@
 
 #define LOC      QString("MythFontProperties: ")
 
-#define KEEP_OLD_NAMES 1
+#define KEEP_OLD_NAMES 1 // NOLINT(cppcoreguidelines-macro-usage)
 
 QMutex MythFontProperties::s_zoomLock;
 uint MythFontProperties::s_zoomPercent = 0;

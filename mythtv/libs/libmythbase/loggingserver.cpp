@@ -26,7 +26,7 @@
 #ifndef _WIN32
 #include "mythsyslog.h"
 #if CONFIG_SYSTEMD_JOURNAL
-#define SD_JOURNAL_SUPPRESS_LOCATION 1
+#define SD_JOURNAL_SUPPRESS_LOCATION 1 // NOLINT(cppcoreguidelines-macro-usage)
 #include <systemd/sd-journal.h>
 #endif
 #endif

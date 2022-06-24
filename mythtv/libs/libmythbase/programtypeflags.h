@@ -10,6 +10,7 @@
 #undef FLAGS_POSTAMBLE
 #undef FLAGS_DATA
 
+//NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #ifdef DEFINE_FLAGS_ENUM
 #define FLAGS_PREAMBLE(NAME, TYPE) \
     enum NAME {
@@ -28,6 +29,7 @@
 #define FLAGS_DATA(PREFIX, NAME, VALUE) \
     { VALUE, #NAME },
 #endif
+//NOLINTEND(cppcoreguidelines-macro-usage)
 
 
 /// If you change these please update:

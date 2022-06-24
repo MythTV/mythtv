@@ -87,7 +87,7 @@ void *AudioOutputDigitalEncoder::realloc(void *ptr,
 // Encode can use either ac3 (floating point) or ac3_fixed (fixed point)
 // To use ac3_fixed define AC3_FIXED 1
 
-#define AC3_FIXED 0
+#define AC3_FIXED 0 // NOLINT(cppcoreguidelines-macro-usage)
 #if AC3_FIXED
 static constexpr const char* CODECNAME { "ac3_fixed" };
 static constexpr AVSampleFormat FFMPEG_SAMPLE_FORMAT { AV_SAMPLE_FMT_S32P };
@@ -96,7 +96,7 @@ static constexpr AudioFormat MYTH_SAMPLE_FORMAT { FORMAT_S32 };
 static constexpr const char* CODECNAME { "ac3" };
 static constexpr AVSampleFormat FFMPEG_SAMPLE_FORMAT { AV_SAMPLE_FMT_FLTP };
 static constexpr AudioFormat MYTH_SAMPLE_FORMAT { FORMAT_FLT };
-#define MYTH_USE_FLOAT 1
+#define MYTH_USE_FLOAT 1 // NOLINT(cppcoreguidelines-macro-usage)
 #endif
 
 bool AudioOutputDigitalEncoder::Init(

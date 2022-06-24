@@ -13,7 +13,7 @@
 #include <linux/videodev2.h>
 #endif
 
-#define FAKE_VIDEO 0
+#define FAKE_VIDEO 0 // NOLINT(cppcoreguidelines-macro-usage)
 
 class TVRec;
 
