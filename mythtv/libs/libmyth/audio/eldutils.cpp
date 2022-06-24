@@ -134,10 +134,9 @@ static const std::array<const int,8> cea_sampling_frequencies {
     SNDRV_PCM_RATE_192000,   /* 7: 192000Hz */
 };
 
-#define GRAB_BITS(buf, byte, lowbit, bits)            \
-(                                                    \
-    ((buf)[byte] >> (lowbit)) & ((1 << (bits)) - 1)  \
-)
+static inline int
+GRAB_BITS(const char* buf, size_t byte, uint8_t lowbit, uint8_t bits)
+    { return (buf[byte] >> lowbit) & ((1 << bits) - 1); };
 
 eld::eld(const char *buf, int size)
 {
