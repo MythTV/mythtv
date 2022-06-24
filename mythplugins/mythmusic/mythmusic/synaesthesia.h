@@ -13,16 +13,18 @@
 
 class QImage;
 
-#define LogSize 10
-#define Brightness 150
-#define NumSamples (1<<LogSize)
+static constexpr size_t  LogSize    {         10 };
+static constexpr size_t  NumSamples { 1<<LogSize };
+static constexpr uint8_t Brightness {        150 };
 
 using samp_dbl_array = std::array<double,NumSamples>;
 using samp_int_array = std::array<int,NumSamples>;
 
-#define Flame 0
-#define Wave 1
-#define Stars 2
+enum Mode {
+    Flame = 0,
+    Wave  = 1,
+    Stars = 2
+};
 
 class Synaesthesia : public VisualBase
 {

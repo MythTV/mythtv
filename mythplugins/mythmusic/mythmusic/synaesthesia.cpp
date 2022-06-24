@@ -40,15 +40,17 @@ Synaesthesia::~Synaesthesia()
     delete m_outputImage;
 }
 
+//static constexpr uint8_t sBOUND(int x)
+//    { return std::clamp(x, 0, 255); };
+//static constexpr uint8_t sPEAKIFY(int x)
+//    {return sBOUND(x - x*(255-x)/255/2); };
+
 void Synaesthesia::setupPalette(void)
 {
-#define sBOUND(x) ((x) > 255 ? 255 : (x))
-#define sPEAKIFY(x) int(sBOUND((x) - (x)*(255-(x))/255/2))
-#define sMAX(x,y) ((x) > (y) ? (x) : (y))
     double fgRed = m_fgRedSlider;
     double fgGreen = m_fgGreenSlider;
-    double fgBlue = 1.0 - sMAX(m_fgRedSlider,m_fgGreenSlider);
-    //double scale = sMAX(sMAX(fgRed,fgGreen),fgBlue);
+    double fgBlue = 1.0 - std::max(m_fgRedSlider,m_fgGreenSlider);
+    //double scale = std::max({fgRed,fgGreen,fgBlue});
     double scale = (fgRed + fgGreen + fgBlue) / 2.0;
     fgRed /= scale;
     fgGreen /= scale;
@@ -56,8 +58,8 @@ void Synaesthesia::setupPalette(void)
   
     double bgRed = m_bgRedSlider;
     double bgGreen = m_bgGreenSlider;
-    double bgBlue = 1.0 - sMAX(m_bgRedSlider,m_bgGreenSlider);
-    //scale = sMAX(sMAX(bgRed,bgGreen),bgBlue);
+    double bgBlue = 1.0 - std::max(m_bgRedSlider,m_bgGreenSlider);
+    //scale = std::max({bgRed,bgGreen,bgBlue});
     scale = (bgRed + bgGreen + bgBlue) / 2.0;
     bgRed /= scale;
     bgGreen /= scale;
@@ -66,9 +68,9 @@ void Synaesthesia::setupPalette(void)
     for (int i = 0; i < 256; i++) {
         int f = i & 15;
         int b = i / 16;
-        //palette[i * 3 + 0] = sPEAKIFY(b*bgRed*16+f*fgRed*16);
-        //palette[i * 3 + 1] = sPEAKIFY(b*bgGreen*16+f*fgGreen*16);
-        //palette[i * 3 + 2] = sPEAKIFY(b*bgBlue*16+f*fgBlue*16);
+        //m_palette[i * 3 + 0] = sPEAKIFY(b*bgRed*16+f*fgRed*16);
+        //m_palette[i * 3 + 1] = sPEAKIFY(b*bgGreen*16+f*fgGreen*16);
+        //m_palette[i * 3 + 2] = sPEAKIFY(b*bgBlue*16+f*fgBlue*16);
 
         double red = b * bgRed * 16 + f * fgRed * 16;
         double green = b * bgGreen * 16 + f * fgGreen * 16;
@@ -93,9 +95,9 @@ void Synaesthesia::setupPalette(void)
         green *= scale2;
         blue *= scale2;
 
-        m_palette[i * 3 + 0] = sBOUND(int(red));
-        m_palette[i * 3 + 1] = sBOUND(int(green));
-        m_palette[i * 3 + 2] = sBOUND(int(blue));
+        m_palette[i * 3 + 0] = std::clamp(int(red), 0, 255);
+        m_palette[i * 3 + 1] = std::clamp(int(green), 0, 255);
+        m_palette[i * 3 + 2] = std::clamp(int(blue), 0, 255);
     }
 }
 
@@ -152,7 +154,7 @@ void Synaesthesia::resize(const QSize &newsize)
 int Synaesthesia::bitReverser(int i)
 {
     int sum = 0;
-    for (int j = 0; j < LogSize; j++)
+    for (size_t j = 0; j < LogSize; j++)
     {
         sum = (i & 1) + sum * 2;
         i >>= 1;
@@ -163,18 +165,18 @@ int Synaesthesia::bitReverser(int i)
 
 void Synaesthesia::fft(double *x, double *y)
 {
-    int n2 = NumSamples;
-    for (int twoToTheK = 1; twoToTheK < NumSamples; twoToTheK *= 2)
+    size_t n2 = NumSamples;
+    for (size_t twoToTheK = 1; twoToTheK < NumSamples; twoToTheK *= 2)
     {
-        int n1 = n2;
+        size_t n1 = n2;
         n2 /= 2;
-        for (int j = 0; j < n2; j++)
+        for (size_t j = 0; j < n2; j++)
         {
             double c = m_cosTable[j * twoToTheK & (NumSamples - 1)];
             double s = m_negSinTable[j * twoToTheK & (NumSamples - 1)];
-            for (int i = j; i < NumSamples; i += n1)
+            for (size_t i = j; i < NumSamples; i += n1)
             {
-                int l = i + n2;
+                size_t l = i + n2;
                 double xt = x[i] - x[l];
                 x[i] = (x[i] + x[l]);
                 double yt = y[i] - y[l];
@@ -207,7 +209,7 @@ void Synaesthesia::setStarSize(double lsize)
 
 void Synaesthesia::coreInit(void)
 {
-    for (int i = 0; i < NumSamples; i++)
+    for (size_t i = 0; i < NumSamples; i++)
     {
         m_negSinTable[i] = -sin(3.141592 * 2.0 / NumSamples * i);
         m_cosTable[i] = cos(3.141592 * 2.0 / NumSamples * i);
@@ -452,11 +454,11 @@ bool Synaesthesia::process(VisualNode *node)
 
     int brightFactor = int(Brightness * m_brightnessTwiddler / (m_starSize + 0.01));
 
-    int numSamps = NumSamples;
+    size_t numSamps = NumSamples;
     if (node->m_length < NumSamples)
         numSamps = node->m_length;
 
-    for (int i = 0; i < numSamps; i++)
+    for (size_t i = 0; i < numSamps; i++)
     {
         x[i] = node->m_left[i];
         if (node->m_right)
@@ -469,7 +471,7 @@ bool Synaesthesia::process(VisualNode *node)
 
     double energy = 0.0;
 
-    for (int i = 0 + 1; i < NumSamples / 2; i++)
+    for (size_t i = 0 + 1; i < NumSamples / 2; i++)
     {
         double x1 = x[m_bitReverse[i]];
         double y1 = y[m_bitReverse[i]];
@@ -505,7 +507,7 @@ bool Synaesthesia::process(VisualNode *node)
     if (m_energyAvg > 0.0)
         brightFactor2 *= 80.0 / (m_energyAvg + 5.0);
 
-    for (int i = 1; i < NumSamples / 2; i++)
+    for (size_t i = 1; i < NumSamples / 2; i++)
     {
         if (a[i] > 0 || b[i] > 0)
         {
