@@ -9,7 +9,13 @@
 
 #include "quickselect.h"
 
-#define ELEM_SWAP(a,b) { unsigned char t=(a);(a)=(b);(b)=t; }
+template <typename T>
+void ELEM_SWAP(T& a, T& b)
+{
+    T t = a;
+    a = b;
+    b = t;
+}
 
 unsigned char
 quick_select(unsigned char *arr, int nelems, int select)
@@ -60,15 +66,11 @@ quick_select(unsigned char *arr, int nelems, int select)
     }
 }
 
-#undef ELEM_SWAP
-
 unsigned char
 quick_select_median(unsigned char *arr, int nelems)
 {
     return quick_select(arr, nelems, (nelems - 1) / 2);
 }
-
-#define ELEM_SWAP(a,b) { unsigned short t=(a);(a)=(b);(b)=t; }
 
 unsigned short
 quick_select_ushort(unsigned short *arr, int nelems, int select)
@@ -119,15 +121,11 @@ quick_select_ushort(unsigned short *arr, int nelems, int select)
     }
 }
 
-#undef ELEM_SWAP
-
 unsigned short
 quick_select_median_ushort(unsigned short *arr, int nelems)
 {
     return quick_select_ushort(arr, nelems, (nelems - 1) / 2);
 }
-
-#define ELEM_SWAP(a,b) { float t=(a);(a)=(b);(b)=t; }
 
 float
 quick_select_float(float *arr, int nelems, int select)
@@ -183,7 +181,5 @@ quick_select_median_float(float *arr, int nelems)
 {
     return quick_select_float(arr, nelems, (nelems - 1) / 2);
 }
-
-#undef ELEM_SWAP
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
