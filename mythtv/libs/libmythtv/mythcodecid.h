@@ -290,63 +290,86 @@ enum MythCodecID
 };
 
 // MythCodecID convenience functions
-#define codec_is_std(id)      ((id) < kCodec_NORMAL_END)
-#define codec_is_std_mpeg(id) ((id) == kCodec_MPEG1 || (id) == kCodec_MPEG2)
+static inline bool codec_is_std(MythCodecID id)
+    { return (id < kCodec_NORMAL_END); }
+static inline bool codec_is_std_mpeg(MythCodecID id)
+    { return ((id == kCodec_MPEG1) || (id == kCodec_MPEG2)); };
 
-#define codec_is_drmprime(id) (((id) > kCodec_DRMPRIME_BEGIN) && \
-                               ((id) < kCodec_DRMPRIME_END))
-#define codec_is_vdpau(id)    (((id) > kCodec_VDPAU_BEGIN) && \
-                               ((id) < kCodec_VDPAU_END))
-#define codec_is_vdpau_hw(id) ((codec_is_vdpau(id) && \
-                                ((id) != kCodec_H263_VDPAU) && \
-                                ((id) != kCodec_VP8_VDPAU) && \
-                                ((id) != kCodec_VP9_VDPAU)))
-#define codec_is_vdpau_dec(id)(((id) > kCodec_VDPAU_DEC_BEGIN) && \
-                               ((id) < kCodec_VDPAU_DEC_END))
-#define codec_is_vdpau_dechw(id) ((codec_is_vdpau_dec(id) && \
-                                  ((id) != kCodec_H263_VDPAU_DEC) && \
-                                  ((id) != kCodec_VP8_VDPAU_DEC) && \
-                                  ((id) != kCodec_VP9_VDPAU)))
+static inline bool codec_is_drmprime(MythCodecID id)
+    { return ((id > kCodec_DRMPRIME_BEGIN) &&
+              (id < kCodec_DRMPRIME_END)); };
+static inline bool codec_is_vdpau(MythCodecID id)
+    { return ((id > kCodec_VDPAU_BEGIN) &&
+              (id < kCodec_VDPAU_END)); };
+static inline bool codec_is_vdpau_hw(MythCodecID id)
+    { return ((codec_is_vdpau(id) &&
+               (id != kCodec_H263_VDPAU) &&
+               (id != kCodec_VP8_VDPAU) &&
+               (id != kCodec_VP9_VDPAU))); };
+static inline bool codec_is_vdpau_dec(MythCodecID id)
+    { return ((id > kCodec_VDPAU_DEC_BEGIN) &&
+              (id < kCodec_VDPAU_DEC_END)); };
+static inline bool codec_is_vdpau_dechw(MythCodecID id)
+    { return (codec_is_vdpau_dec(id) &&
+              (id != kCodec_H263_VDPAU_DEC) &&
+              (id != kCodec_VP8_VDPAU_DEC) &&
+              (id != kCodec_VP9_VDPAU)); };
 
-#define codec_is_vaapi(id)    (((id) > kCodec_VAAPI_BEGIN) && \
-                               ((id) < kCodec_VAAPI_END))
-#define codec_is_vaapi_dec(id)(((id) > kCodec_VAAPI_DEC_BEGIN) && \
-                               ((id) < kCodec_VAAPI_DEC_END))
+static inline bool codec_is_vaapi(MythCodecID id)
+    { return ((id > kCodec_VAAPI_BEGIN) &&
+              (id < kCodec_VAAPI_END)); };
+static inline bool codec_is_vaapi_dec(MythCodecID id)
+    { return ((id > kCodec_VAAPI_DEC_BEGIN) &&
+              (id < kCodec_VAAPI_DEC_END)); };
 
-#define codec_is_dxva2(id)    (((id) > kCodec_DXVA2_BEGIN) && \
-                               ((id) < kCodec_DXVA2_END))
-#define codec_is_dxva2_hw(id) (codec_is_dxva2(id) && \
-                               (((id) == kCodec_H264_DXVA2)  || \
-                                ((id) == kCodec_MPEG2_DXVA2) || \
-                                ((id) == kCodec_VC1_DXVA2)))
+static inline bool codec_is_dxva2(MythCodecID id)
+    { return ((id > kCodec_DXVA2_BEGIN) &&
+              (id < kCodec_DXVA2_END)); };
+static inline bool codec_is_dxva2_hw(MythCodecID id)
+    { return (codec_is_dxva2(id) &&
+              ((id == kCodec_H264_DXVA2)  ||
+               (id == kCodec_MPEG2_DXVA2) ||
+               (id == kCodec_VC1_DXVA2))); };
 
-#define codec_is_mediacodec(id)(((id) > kCodec_MEDIACODEC_BEGIN) && \
-                               ((id) < kCodec_MEDIACODEC_END))
-#define codec_is_mediacodec_dec(id) (((id) > kCodec_MEDIACODEC_DEC_BEGIN) && \
-                               ((id) < kCodec_MEDIACODEC_DEC_END))
+static inline bool codec_is_mediacodec(MythCodecID id)
+    { return ((id > kCodec_MEDIACODEC_BEGIN) &&
+              (id < kCodec_MEDIACODEC_END)); };
+static inline bool codec_is_mediacodec_dec(MythCodecID id)
+    { return ((id > kCodec_MEDIACODEC_DEC_BEGIN) &&
+              (id < kCodec_MEDIACODEC_DEC_END)); };
 
-#define codec_is_nvdec(id)    (((id) > kCodec_NVDEC_BEGIN) && \
-                               ((id) < kCodec_NVDEC_END))
-#define codec_is_nvdec_dec(id)(((id) > kCodec_NVDEC_DEC_BEGIN) && \
-                               ((id) < kCodec_NVDEC_DEC_END))
+static inline bool codec_is_nvdec(MythCodecID id)
+    { return ((id > kCodec_NVDEC_BEGIN) &&
+              (id < kCodec_NVDEC_END)); };
+static inline bool codec_is_nvdec_dec(MythCodecID id)
+    { return ((id > kCodec_NVDEC_DEC_BEGIN) &&
+              (id < kCodec_NVDEC_DEC_END)); };
 
-#define codec_is_vtb(id)      (((id) > kCodec_VTB_BEGIN) && \
-                               ((id) < kCodec_VTB_END))
-#define codec_is_vtb_dec(id)  (((id) > kCodec_VTB_DEC_BEGIN) && \
-                               ((id) < kCodec_VTB_DEC_END))
+static inline bool codec_is_vtb(MythCodecID id)
+    { return ((id > kCodec_VTB_BEGIN) &&
+              (id < kCodec_VTB_END)); };
+static inline bool codec_is_vtb_dec(MythCodecID id)
+    { return ((id > kCodec_VTB_DEC_BEGIN) &&
+              (id < kCodec_VTB_DEC_END)); };
 
-#define codec_is_v4l2(id)     (((id) > kCodec_V4L2_BEGIN) && ((id) < kCodec_V4L2_END))
-#define codec_is_v4l2_dec(id) (((id) > kCodec_V4L2_DEC_BEGIN) && ((id) < kCodec_V4L2_DEC_END))
+static inline bool codec_is_v4l2(MythCodecID id)
+    { return ((id > kCodec_V4L2_BEGIN) && (id < kCodec_V4L2_END)); };
+static inline bool codec_is_v4l2_dec(MythCodecID id)
+    { return ((id > kCodec_V4L2_DEC_BEGIN) && (id < kCodec_V4L2_DEC_END)); };
 
-#define codec_is_mmal(id)     (((id) > kCodec_MMAL_BEGIN) && ((id) < kCodec_MMAL_END))
-#define codec_is_mmal_dec(id) (((id) > kCodec_MMAL_DEC_BEGIN) && ((id) < kCodec_MMAL_DEC_END))
+static inline bool codec_is_mmal(MythCodecID id)
+    { return ((id > kCodec_MMAL_BEGIN) && (id < kCodec_MMAL_END)); };
+static inline bool codec_is_mmal_dec(MythCodecID id)
+    { return ((id > kCodec_MMAL_DEC_BEGIN) && (id < kCodec_MMAL_DEC_END)); };
 
-#define codec_is_copyback(id) (codec_is_mediacodec_dec(id) || \
-                               codec_is_vaapi_dec(id) || codec_is_nvdec_dec(id) || \
-                               codec_is_vtb_dec(id) || codec_is_vdpau_dec(id) || \
-                               codec_is_v4l2_dec(id) || codec_is_mmal_dec(id))
+static inline bool codec_is_copyback(MythCodecID id)
+    { return (codec_is_mediacodec_dec(id) ||
+              codec_is_vaapi_dec(id) || codec_is_nvdec_dec(id) ||
+              codec_is_vtb_dec(id) || codec_is_vdpau_dec(id) ||
+              codec_is_v4l2_dec(id) || codec_is_mmal_dec(id)); };
 
-#define codec_sw_copy(id)     (codec_is_std(id) || codec_is_copyback(id))
+static inline bool codec_sw_copy(MythCodecID id)
+    { return codec_is_std(id) || codec_is_copyback(id); };
 
 QString get_encoding_type(MythCodecID codecid);
 QString get_decoder_name(MythCodecID codec_id);
@@ -354,32 +377,41 @@ QString toString(MythCodecID codecid);
 AVCodecID myth2av_codecid(MythCodecID codec_id);
 
 // AV codec id convenience functions
-uint mpeg_version(int codec_id);
-#define CODEC_IS_H264(id)     (mpeg_version(id) == 5)
-#define CODEC_IS_MPEG(id)     (mpeg_version(id) && mpeg_version(id) <= 2)
-#define CODEC_IS_FFMPEG_MPEG(id) (CODEC_IS_MPEG(id))
+uint mpeg_version(AVCodecID codec_id);
+static inline bool CODEC_IS_H264(AVCodecID id)
+    { return mpeg_version(id) == 5; };
+static inline bool CODEC_IS_MPEG(AVCodecID id)
+    { return (mpeg_version(id) != 0) && (mpeg_version(id) <= 2); };
 #ifdef USING_VDPAU
-#define CODEC_IS_VDPAU(codec, enc) ((codec) && ((enc)->pix_fmt == AV_PIX_FMT_VDPAU))
+static inline bool CODEC_IS_VDPAU(const struct AVCodec *codec, const AVCodecContext *enc)
+    { return (codec != nullptr) && (enc->pix_fmt == AV_PIX_FMT_VDPAU); };
 #else
-#define CODEC_IS_VDPAU(codec) (0)
+static inline bool CODEC_IS_VDPAU(const struct AVCodec */*codec*/)
+    { return false; };
 #endif
 
 #ifdef USING_VAAPI
-#define CODEC_IS_VAAPI(codec, enc) ((codec) && ((enc)->pix_fmt == AV_PIX_FMT_VAAPI))
+static inline bool CODEC_IS_VAAPI(const struct AVCodec *codec, const AVCodecContext *enc)
+    { return (codec != nullptr) && (enc->pix_fmt == AV_PIX_FMT_VAAPI); };
 #else
-#define CODEC_IS_VAAPI(codec, enc) (0)
+static inline bool CODEC_IS_VAAPI(const struct AVCodec */*codec*/, const AVCodecContext */*enc*/)
+    { return false; };
 #endif
 
 #ifdef USING_DXVA2
-#define CODEC_IS_DXVA2(codec, enc) (codec && (enc->pix_fmt == AV_PIX_FMT_DXVA2_VLD))
+static inline bool CODEC_IS_DXVA2(const struct AVCodec *codec, const AVCodecContext *enc)
+    { return (codec  != nullptr) && (enc->pix_fmt == AV_PIX_FMT_DXVA2_VLD); };
 #else
-#define CODEC_IS_DXVA2(codec, enc) (0)
+static inline bool CODEC_IS_DXVA2(const struct AVCodec */*codec*/, const AVCodecContext */*enc*/)
+    { return false; };
 #endif
 
 #ifdef USING_MEDIACODEC
-#define CODEC_IS_MEDIACODEC(codec) (codec && (QString("mediacodec") == codec->wrapper_name))
+static inline bool CODEC_IS_MEDIACODEC(const struct AVCodec *codec)
+    { return (codec != nullptr) && (QString("mediacodec") == codec->wrapper_name); };
 #else
-#define CODEC_IS_MEDIACODEC(codec) (0)
+static inline bool CODEC_IS_MEDIACODEC(const struct AVCodec */*codec*/)
+    { return false; };
 #endif
 
 #endif // MYTH_CODEC_ID_H

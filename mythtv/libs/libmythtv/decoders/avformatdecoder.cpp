@@ -3335,7 +3335,7 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     AVCodecContext *context = m_codecMap.GetCodecContext(curstream);
     int num_frames = 1;
 
-    if (CODEC_IS_FFMPEG_MPEG(context->codec_id))
+    if (CODEC_IS_MPEG(context->codec_id))
     {
         MpegPreProcessPkt(curstream, pkt);
     }
