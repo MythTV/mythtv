@@ -1028,12 +1028,9 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
             : afsize == 183;
         if (!validsize)
         {
-            if (VERBOSE_LEVEL_CHECK(VB_RECORD, LOG_DEBUG))
-            {
-                LOG(VB_RECORD, LOG_DEBUG, QString("Invalid adaptation field, type %3, size %4")
-                    .arg(tspacket.AdaptationFieldControl()).arg(afsize) + "\n" +
-                    tspacket.toString());
-            }
+            LOG(VB_RECORD, LOG_DEBUG, QString("Invalid adaptation field, type %3, size %4")
+                .arg(tspacket.AdaptationFieldControl()).arg(afsize) + "\n" +
+                tspacket.toString());
             return false;
         }
     }
