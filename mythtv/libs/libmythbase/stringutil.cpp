@@ -20,21 +20,25 @@ static int countl_one(unsigned char x)
     if (x > 256)
         return 8; // works for our purposes even if not correct
 #endif
-    static constexpr std::array<int,256> leading_ones =
+    static constexpr std::array<uint8_t,256> leading_ones =
     {
-#define REPEAT_4(x) (x), (x), (x), (x)
-#define REPEAT_8(x)   REPEAT_4(x),  REPEAT_4(x)
-#define REPEAT_16(x)  REPEAT_8(x),  REPEAT_8(x)
-#define REPEAT_32(x)  REPEAT_16(x), REPEAT_16(x)
-#define REPEAT_64(x)  REPEAT_32(x), REPEAT_32(x)
-#define REPEAT_128(x) REPEAT_64(x), REPEAT_64(x)
-        REPEAT_128(0), REPEAT_64(1), REPEAT_32(2), REPEAT_16(3), REPEAT_8(4), REPEAT_4(5), 6, 6, 7, 8
-#undef REPEAT_4
-#undef REPEAT_8
-#undef REPEAT_16
-#undef REPEAT_32
-#undef REPEAT_64
-#undef REPEAT_128
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+        4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 7, 8,
     };
     return leading_ones[x];
 }
