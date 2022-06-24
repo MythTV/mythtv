@@ -241,7 +241,7 @@ void ImageScanThread<DBFS>::SyncSubTree(const QFileInfo &dirInfo, int parentId,
                                   int devId, const QString &base)
 {
     // Ignore excluded dirs
-    if (MATCHES(m_exclusions, dirInfo.fileName()))
+    if (m_exclusions.match(dirInfo.fileName()).hasMatch())
     {
         LOG(VB_FILE, LOG_INFO,
             QString("Excluding dir %1").arg(dirInfo.absoluteFilePath()));
@@ -446,7 +446,7 @@ void ImageScanThread<DBFS>::SyncFile(const QFileInfo &fileInfo, int devId,
                                const QString &base, int parentId)
 {
     // Ignore excluded files
-    if (MATCHES(m_exclusions, fileInfo.fileName()))
+    if (m_exclusions.match(fileInfo.fileName()).hasMatch())
     {
         LOG(VB_FILE, LOG_INFO,
             QString("Excluding file %1").arg(fileInfo.absoluteFilePath()));
@@ -544,7 +544,7 @@ void ImageScanThread<DBFS>::CountTree(QDir &dir)
     for (const auto & fileInfo : qAsConst(entries))
     {
         // Ignore excluded dirs/files
-        if (MATCHES(m_exclusions, fileInfo.fileName()))
+        if (m_exclusions.match(fileInfo.fileName()).hasMatch())
             continue;
 
         if (fileInfo.isFile())
@@ -578,7 +578,7 @@ void ImageScanThread<DBFS>::CountFiles(const QStringList &paths)
     excPattern.replace(",", "|");   // Convert list to OR's
 
     QString pattern = QString("^(%1)$").arg(excPattern);
-    m_exclusions = REGEXP(pattern);
+    m_exclusions = QRegularExpression(pattern);
 
     LOG(VB_FILE, LOG_DEBUG, QString("Exclude regexp is \"%1\"").arg(pattern));
 

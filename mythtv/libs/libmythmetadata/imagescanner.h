@@ -15,10 +15,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QElapsedTimer>
-
 #include <QRegularExpression>
-#define REGEXP QRegularExpression
-#define MATCHES(RE, SUBJECT) RE.match(SUBJECT).hasMatch()
 
 #include "imagethumbs.h"
 
@@ -86,7 +83,7 @@ private:
     //! Global working dir for file detection
     QDir m_dir;
     //! Pattern of dir names to ignore whilst scanning
-    REGEXP m_exclusions;
+    QRegularExpression m_exclusions;
 };
 
 #endif // IMAGESCANNER_H
