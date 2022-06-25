@@ -1891,7 +1891,7 @@ void LCDProcClient::dostdclock()
         aString += time + "\"";
         if ( m_timeFlash )
         {
-            aString = aString.remove(":");
+            aString = aString.replace(':', ' ');
             m_timeFlash = false;
         }
         else
