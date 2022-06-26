@@ -6375,23 +6375,21 @@ uint64_t ProgramInfo::GetFilesize(void) const
 
 void ProgramInfo::CalculateRecordedProgress()
 {
+    m_recordedPercent = -1;
     if (m_recStatus != RecStatus::Recording)
-    {
-        m_recordedPercent = -1;
         return;
-    }
 
     QDateTime startTime = m_recStartTs;
     QDateTime now = MythDate::current();
     if (now < startTime)
-    {
-        m_recordedPercent = -1;
         return;
-    }
 
     QDateTime endTime = m_recEndTs;
     int current = startTime.secsTo(now);
     int duration = startTime.secsTo(endTime);
+    if (duration < 1)
+        return;
+
     m_recordedPercent = std::clamp(current * 100 / duration, 0, 100);
     LOG(VB_GUI, LOG_DEBUG, QString("%1 recorded percent %2/%3 = %4%")
         .arg(m_title).arg(current).arg(duration).arg(m_recordedPercent));
