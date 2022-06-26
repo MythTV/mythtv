@@ -545,10 +545,10 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
 
         QProcess p;
         QStringList args { grabber.m_filename,
-                           QString(R"(--artist="%1")").arg(artist),
-                           QString(R"(--album="%1")").arg(album),
-                           QString(R"(--title="%1")").arg(title),
-                           QString(R"(--filename="%1")").arg(filename) };
+                           QString("--artist=%1").arg(artist),
+                           QString("--album=%1").arg(album),
+                           QString("--title=%1").arg(title),
+                           QString("--filename=%1").arg(filename) };
         p.start(PYTHON_EXE, args);
         p.waitForFinished(-1);
         QString result = p.readAllStandardOutput();
