@@ -391,7 +391,7 @@ V2Program* V2Dvr::GetRecorded(int RecordedId,
 
 bool V2Dvr::AddRecordedCredits(int RecordedId, const QString &jsonString)
 {
-    QJsonDocument jsonDoc = QJsonDocument().fromJson(jsonString.toLatin1());
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonString.toLatin1());
     // Verify the corresponding recording exists
     RecordingInfo ri(RecordedId);
     if (!ri.HasPathname())
