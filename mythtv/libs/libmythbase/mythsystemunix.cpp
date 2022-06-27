@@ -40,16 +40,6 @@ static constexpr __syscall_slong_t kIOHandlerInterval {static_cast<__syscall_slo
 // Run the Signal handler ~20x per second (every 50ms).
 static constexpr __syscall_slong_t kSignalHandlerInterval {static_cast<__syscall_slong_t>(50)*1000*1000};
 
-#define CLOSE(x) \
-if( (x) >= 0 ) { \
-    close((x)); \
-    fdLock.lock(); \
-    delete fdMap.value((x)); \
-    fdMap.remove((x)); \
-    fdLock.unlock(); \
-    (x) = -1; \
-}
-
 struct FDType_t
 {
     MythSystemLegacyUnix *m_ms;
@@ -69,6 +59,18 @@ static MSList_t                 msList;
 static QMutex                   listLock;
 static FDMap_t                  fdMap;
 static QMutex                   fdLock;
+
+static inline void CLOSE(int& fd)
+{
+    if( fd < 0 )
+        return;
+    close(fd);
+    fdLock.lock();
+    delete fdMap.value(fd);
+    fdMap.remove(fd);
+    fdLock.unlock();
+    fd = -1;
+}
 
 void ShutdownMythSystemLegacy(void)
 {
