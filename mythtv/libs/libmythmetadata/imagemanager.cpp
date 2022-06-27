@@ -16,7 +16,7 @@
 // Must be empty as it's prepended to path
 static constexpr const char* STORAGE_GROUP_MOUNT { "" };
 
-#define DB_TABLE "gallery_files"
+static constexpr const char* DB_TABLE { "gallery_files" };
 
 #define RESULT_ERR(ERR, MESG) \
 {   LOG(VB_GENERAL, LOG_ERR, LOC + (MESG)); \
@@ -26,7 +26,7 @@ static constexpr const char* STORAGE_GROUP_MOUNT { "" };
 {   LOG(VB_FILE, LOG_DEBUG, LOC + (MESG)); \
     return QStringList("OK"); }
 
-#define IMPORTDIR "Import"
+static constexpr const char* IMPORTDIR { "Import" };
 
 
 //! A device containing images (ie. USB stick, CD, storage group etc)
@@ -95,7 +95,8 @@ public:
     void RemoveThumbs(void) const
     {
         // Remove thumbnails
-        QString dir = QString("%1/" TEMP_SUBDIR "/%2").arg(GetConfDir(), m_thumbs);
+        QString dirFmt = QString("%1/") % TEMP_SUBDIR % "/%2";
+        QString dir = dirFmt.arg(GetConfDir(), m_thumbs);
         LOG(VB_FILE, LOG_INFO, LOC + QString("Removing thumbnails in %1").arg(dir));
         RemoveDirContents(dir);
         QDir::root().rmpath(dir);
@@ -1110,7 +1111,7 @@ bool ImageDbLocal::CreateTable()
     MSqlQuery query(MSqlQuery::InitCon());
 
     // Create temporary table
-    query.prepare(QString("CREATE TABLE %1 LIKE " DB_TABLE ";").arg(m_table));
+    query.prepare(QString("CREATE TABLE %1 LIKE %2;").arg(m_table, DB_TABLE));
     if (query.exec())
     {
         // Store it in memory only
@@ -2517,7 +2518,7 @@ void ImageManagerFe::DeviceEvent(MythMediaEvent *event)
 
 QString ImageManagerFe::CreateImport()
 {
-    auto *tmp = new QTemporaryDir(QDir::tempPath() % "/" IMPORTDIR "-XXXXXX");
+    auto *tmp = new QTemporaryDir(QDir::tempPath() % "/" % IMPORTDIR % "-XXXXXX");
     if (!tmp->isValid())
     {
         delete tmp;
