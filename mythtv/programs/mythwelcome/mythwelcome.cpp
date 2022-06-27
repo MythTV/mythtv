@@ -22,10 +22,9 @@
 
 #if CONFIG_SYSTEMD_NOTIFY
 #include <systemd/sd-daemon.h>
-#define mw_sd_notify(x) \
-    (void)sd_notify(0, x);
+static inline void mw_sd_notify(const char *str) { sd_notify(0, str); };
 #else
-#define mw_sd_notify(x)
+static inline void mw_sd_notify(const char */*str*/) {};
 #endif
 
 static void initKeys(void)
@@ -113,7 +112,7 @@ int main(int argc, char **argv)
 
     initKeys();
     // Provide systemd ready notification (for type=notify units)
-    mw_sd_notify("READY=1")
+    mw_sd_notify("READY=1");
 
     MythScreenStack *mainStack = mainWindow->GetMainStack();
 
@@ -141,7 +140,7 @@ int main(int argc, char **argv)
         block.exec();
     }
 
-    mw_sd_notify("STOPPING=1\nSTATUS=Exiting")
+    mw_sd_notify("STOPPING=1\nSTATUS=Exiting");
     DestroyMythMainWindow();
 
     delete gContext;

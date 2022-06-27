@@ -119,10 +119,9 @@
 #endif
 #if CONFIG_SYSTEMD_NOTIFY
 #include <systemd/sd-daemon.h>
-#define fe_sd_notify(x) \
-    (void)sd_notify(0, x);
+static inline void fe_sd_notify(const char *str) { sd_notify(0, str); };
 #else
-#define fe_sd_notify(x)
+static inline void fe_sd_notify(const char */*str*/) {};
 #endif
 
 #include "libmythbase/http/mythhttproot.h"
@@ -2189,8 +2188,8 @@ int main(int argc, char **argv)
     }
 
     // Provide systemd ready notification (for type=notify units)
-    fe_sd_notify("STATUS=")
-    fe_sd_notify("READY=1")
+    fe_sd_notify("STATUS=");
+    fe_sd_notify("READY=1");
 
 
     int ret = 0;
@@ -2201,7 +2200,7 @@ int main(int argc, char **argv)
         ret = QCoreApplication::exec();
     }
 
-    fe_sd_notify("STOPPING=1\nSTATUS=Exiting")
+    fe_sd_notify("STOPPING=1\nSTATUS=Exiting");
     if (ret==0)
         gContext-> saveSettingsCache();
 

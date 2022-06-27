@@ -35,10 +35,9 @@
 
 #if CONFIG_SYSTEMD_NOTIFY
 #include <systemd/sd-daemon.h>
-#define ms_sd_notify(x) \
-    (void)sd_notify(0, x);
+static inline void ms_sd_notify(const char *str) { sd_notify(0, str); };
 #else
-#define ms_sd_notify(x)
+static inline void ms_sd_notify(const char */*str*/) {};
 #endif
 
 #define LOC      QString("MythMediaServer: ")

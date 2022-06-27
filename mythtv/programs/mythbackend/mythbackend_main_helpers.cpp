@@ -1,10 +1,9 @@
 #include "libmythbase/mythconfig.h"
 #if CONFIG_SYSTEMD_NOTIFY
-    #include <systemd/sd-daemon.h>
-    #define be_sd_notify(x) \
-        (void)sd_notify(0, x);
+#include <systemd/sd-daemon.h>
+static inline void be_sd_notify(const char *str) { sd_notify(0, str); };
 #else
-    #define be_sd_notify(x)
+static inline void be_sd_notify(const char */*str*/) {};
 #endif
 
 // C++ headers
