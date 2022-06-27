@@ -12,7 +12,6 @@
 
 #include <QRegularExpression>
 
-#define v4l2_ioctl(_FD_, _REQUEST_, _DATA_) ioctl(_FD_, _REQUEST_, _DATA_)
 #define LOC      QString("V4L2(%1): ").arg(m_deviceName)
 
 V4L2util::V4L2util(const QString& dev_name)
@@ -49,7 +48,7 @@ bool V4L2util::Open(const QString& dev_name, const QString& vbi_dev_name)
 
     struct v4l2_query_ext_ctrl qc {};
     qc.id = V4L2_CTRL_FLAG_NEXT_CTRL | V4L2_CTRL_FLAG_NEXT_COMPOUND;
-    m_haveQueryExtCtrl = (v4l2_ioctl(m_fd, VIDIOC_QUERY_EXT_CTRL, &qc) == 0);
+    m_haveQueryExtCtrl = (ioctl(m_fd, VIDIOC_QUERY_EXT_CTRL, &qc) == 0);
 
     m_cardName.clear();
     m_driverName.clear();
@@ -333,7 +332,7 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
         for (int idx = queryctrl.minimum; idx <= queryctrl.maximum; ++idx)
         {
             qmenu.index = idx;
-            if (v4l2_ioctl(m_fd, VIDIOC_QUERYMENU, &qmenu))
+            if (ioctl(m_fd, VIDIOC_QUERYMENU, &qmenu))
                 continue;
 
             drv_opt.m_menu[idx] = QString((char *)qmenu.name);
@@ -398,7 +397,7 @@ bool V4L2util::log_control(struct v4l2_queryctrl& qctrl, DriverOption& drv_opt,
             ext_ctrl.string = (char *)malloc(ext_ctrl.size);
             ext_ctrl.string[0] = 0;
         }
-        if (v4l2_ioctl(m_fd, VIDIOC_G_EXT_CTRLS, &ctrls))
+        if (ioctl(m_fd, VIDIOC_G_EXT_CTRLS, &ctrls))
         {
             LOG(VB_CHANNEL, LOG_WARNING, LOC +
                 QString("Failed to get ext_ctr %1: ")
@@ -408,7 +407,7 @@ bool V4L2util::log_control(struct v4l2_queryctrl& qctrl, DriverOption& drv_opt,
     }
     else {
         ctrl.id = qctrl.id;
-        if (v4l2_ioctl(m_fd, VIDIOC_G_CTRL, &ctrl))
+        if (ioctl(m_fd, VIDIOC_G_CTRL, &ctrl))
         {
             LOG(VB_CHANNEL, LOG_WARNING, LOC +
                 QString("Failed to get ctrl %1: ")
