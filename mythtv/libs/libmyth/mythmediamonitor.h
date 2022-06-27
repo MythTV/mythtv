@@ -140,7 +140,16 @@ class MPUBLIC MediaMonitor : public QObject
     static MediaMonitor         *s_monitor;
 };
 
-#define REG_MEDIA_HANDLER(a, b, c, d, e) \
-    MediaMonitor::GetMediaMonitor()->RegisterMediaHandler(a, b, c, d, e)
+static inline void
+REG_MEDIA_HANDLER (const QString&  destination,
+                   const QString&  description,
+                   void          (*callback)(MythMediaDevice*),
+                   int             mediaType,
+                   const QString&  extensions)
+{
+    MediaMonitor::GetMediaMonitor()->RegisterMediaHandler(destination,  description,
+                                                          callback, mediaType, extensions);
+}
+
 
 #endif // MYTH_MEDIA_MONITOR_H
