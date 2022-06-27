@@ -21,6 +21,7 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/sizetliteral.h"
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythmainwindow.h"
 
@@ -675,8 +676,7 @@ void AudioTestThread::run()
 
     if (m_audioOutput)
     {
-        char *frames_in = new char[static_cast<unsigned long>(m_channels) * 1024 * sizeof(int32_t) + 15];
-        char *frames = reinterpret_cast<char *>(reinterpret_cast<long>(frames_in + 15) & ~0xf);
+        char *frames = new (std::align_val_t(16)) char[m_channels * 1024_UZ * sizeof(int32_t)];
 
         m_audioOutput->Pause(false);
 
@@ -768,7 +768,7 @@ void AudioTestThread::run()
         }
         m_audioOutput->Pause(true);
 
-        delete[] frames_in;
+        delete[] frames;
     }
     RunEpilog();
 }
