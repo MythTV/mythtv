@@ -122,6 +122,7 @@ bool AudioOutputOSS::OpenDevice()
             }
             VBERRENO(QString("Error opening audio device (%1)")
                          .arg(m_mainDevice));
+            return false;
         }
         if (m_audioFd < 0)
             usleep(50us);

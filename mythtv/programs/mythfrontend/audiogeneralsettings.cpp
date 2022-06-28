@@ -674,7 +674,7 @@ void AudioTestThread::run()
         { 0, 2, 1, 7, 5, 4, 6, 3 },     //7.1
     }};
 
-    if (m_audioOutput)
+    if (m_audioOutput && (m_audioOutput->GetError().isEmpty()))
     {
         char *frames = new (std::align_val_t(16)) char[m_channels * 1024_UZ * sizeof(int32_t)];
 
