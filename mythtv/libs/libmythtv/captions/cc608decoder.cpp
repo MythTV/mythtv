@@ -704,7 +704,7 @@ void CC608Decoder::BufferCC(size_t mode, int len, int clr)
     }
 
     m_reader->AddTextData(m_rbuf, len, m_timeCode[mode], 'C');
-    int ccmode = m_rbuf[3] & CC_MODE_MASK;
+    uint8_t ccmode = m_rbuf[3] & CC_MODE_MASK;
     int stream = -1;
     switch (ccmode)
     {

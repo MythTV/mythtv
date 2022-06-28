@@ -191,22 +191,26 @@ struct ccsubtitle
 };
 
 // resumedirect codes
-#define CC_STYLE_POPUP   0x00
-#define CC_STYLE_PAINT   0x01
-#define CC_STYLE_ROLLUP  0x02
+enum CC_STYLE {
+    CC_STYLE_POPUP  = 0x00,
+    CC_STYLE_PAINT  = 0x01,
+    CC_STYLE_ROLLUP = 0x02,
+};
 
 // resumetext special codes
-#define CC_LINE_CONT  0x02
-#define CC_MODE_MASK  0xf0
-#define CC_TXT_MASK   0x20
-#define CC_CC1        0x00
-#define CC_CC2        0x10
-#define CC_TXT1       0x20
-#define CC_TXT2       0x30
-#define CC_CC3        0x40
-#define CC_CC4        0x50
-#define CC_TXT3       0x60
-#define CC_TXT4       0x70
+static constexpr uint8_t CC_LINE_CONT  { 0x02 };
+static constexpr uint8_t CC_MODE_MASK  { 0xf0 };
+static constexpr uint8_t CC_TXT_MASK   { 0x20 };
+enum CC_MODE {
+    CC_CC1  = 0x00,
+    CC_CC2  = 0x10,
+    CC_TXT1 = 0x20,
+    CC_TXT2 = 0x30,
+    CC_CC3  = 0x40,
+    CC_CC4  = 0x50,
+    CC_TXT3 = 0x60,
+    CC_TXT4 = 0x70,
+};
 
 // end of kernel structures.
 };
