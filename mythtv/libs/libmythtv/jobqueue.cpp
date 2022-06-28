@@ -30,14 +30,6 @@
 #include "recordinginfo.h"
 #include "recordingprofile.h"
 
-#ifndef O_STREAMING
-#define O_STREAMING 0
-#endif
-
-#ifndef O_LARGEFILE
-#define O_LARGEFILE 0
-#endif
-
 #define LOC     QString("JobQueue: ")
 
 // Consider anything less than 4 hours as a "recent" job.

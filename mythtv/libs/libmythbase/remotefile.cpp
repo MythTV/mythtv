@@ -11,16 +11,8 @@
 
 #include "mythconfig.h"
 
-#ifndef O_STREAMING
-#define O_STREAMING 0
-#endif
-
 #ifndef O_LARGEFILE
-#define O_LARGEFILE 0
-#endif
-
-#ifndef O_BINARY
-#define O_BINARY 0
+static constexpr int8_t O_LARGEFILE { 0 };
 #endif
 
 #include "mythdb.h"

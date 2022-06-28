@@ -334,7 +334,7 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 
 
 #ifndef O_NONBLOCK
-#   define O_NONBLOCK    04000
+#   define O_NONBLOCK    04000 /* NOLINT(cppcoreguidelines-macro-usage) */
 #endif
 
 #endif // COMPAT_H
