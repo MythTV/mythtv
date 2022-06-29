@@ -27,64 +27,68 @@
 #ifdef USING_DVB
 #   include "recorders/dvbtypes.h"
 #else
-#   define SEC_VOLTAGE_13  0
-#   define SEC_VOLTAGE_18  1
-#   define SEC_VOLTAGE_OFF 2
-#   define SEC_MINI_A      0
-#   define SEC_MINI_B      1
+static constexpr uint8_t SEC_VOLTAGE_13  { 0 };
+static constexpr uint8_t SEC_VOLTAGE_18  { 1 };
+static constexpr uint8_t SEC_VOLTAGE_OFF { 2 };
 #endif
 
 // DiSEqC sleep intervals per eutelsat spec
-#define DISEQC_SHORT_WAIT     (15 * 1000)
-#define DISEQC_LONG_WAIT      (100 * 1000)
-#define DISEQC_POWER_OFF_WAIT ((1000 * 1000) - 1)
-#define DISEQC_POWER_ON_WAIT  (500 * 1000)
+static constexpr useconds_t DISEQC_SHORT_WAIT     {  15 * 1000 };
+static constexpr useconds_t DISEQC_LONG_WAIT      { 100 * 1000 };
+static constexpr useconds_t DISEQC_POWER_ON_WAIT  { 500 * 1000 };
+static constexpr useconds_t DISEQC_POWER_OFF_WAIT { (1000 * 1000) - 1 };
 
+#ifdef USING_DVB
 // Number of times to retry ioctls after receiving ETIMEDOUT before giving up
-#define TIMEOUT_RETRIES       10
-#define TIMEOUT_WAIT          (250 * 1000)
+static constexpr uint8_t    TIMEOUT_RETRIES       { 10 };
+static constexpr useconds_t TIMEOUT_WAIT          { 250 * 1000 };
 
 // Framing byte
-#define DISEQC_FRM            0xe0
-#define DISEQC_FRM_REPEAT     (1 << 0)
-#define DISEQC_FRM_REPLY_REQ  (1 << 1)
+static constexpr uint8_t    DISEQC_FRM            { 0xe0 };
+static constexpr uint8_t    DISEQC_FRM_REPEAT     {1 << 0};
+//static constexpr uint8_t  DISEQC_FRM_REPLY_REQ  {1 << 1};
+#endif
 
 // Address byte
-#define DISEQC_ADR_ALL        0x00
-#define DISEQC_ADR_SW_ALL     0x10
-#define DISEQC_ADR_LNB        0x11
-#define DISEQC_ADR_LNB_SW     0x12
-#define DISEQC_ADR_SW_BLK     0x14
-#define DISEQC_ADR_SW         0x15
-#define DISEQC_ADR_SMATV      0x18
-#define DISEQC_ADR_POL_ALL    0x20
-#define DISEQC_ADR_POL_LIN    0x21
-#define DISEQC_ADR_POS_ALL    0x30
-#define DISEQC_ADR_POS_AZ     0x31
-#define DISEQC_ADR_POS_EL     0x32
+enum DISEQC_ADRS {
+    DISEQC_ADR_ALL          = 0x00,
+    DISEQC_ADR_SW_ALL       = 0x10,
+    DISEQC_ADR_LNB          = 0x11,
+    DISEQC_ADR_LNB_SW       = 0x12,
+    DISEQC_ADR_SW_BLK       = 0x14,
+    DISEQC_ADR_SW           = 0x15,
+    DISEQC_ADR_SMATV        = 0x18,
+    DISEQC_ADR_POL_ALL      = 0x20,
+    DISEQC_ADR_POL_LIN      = 0x21,
+    DISEQC_ADR_POS_ALL      = 0x30,
+    DISEQC_ADR_POS_AZ       = 0x31,
+    DISEQC_ADR_POS_EL       = 0x32,
+};
 
 // Command byte
-#define DISEQC_CMD_RESET      0x00
-#define DISEQC_CMD_CLR_RESET  0x01
-#define DISEQC_CMD_WRITE_N0   0x38
-#define DISEQC_CMD_WRITE_N1   0x39
-#define DISEQC_CMD_WRITE_FREQ 0x58
-#define DISEQC_CMD_ODU        0x5A
-#define DISEQC_CMD_ODU_MDU    0x5C
-#define DISEQC_CMD_HALT       0x60
-#define DISEQC_CMD_LMT_OFF    0x63
-#define DISEQC_CMD_LMT_E      0x66
-#define DISEQC_CMD_LMT_W      0x67
-#define DISEQC_CMD_DRIVE_E    0x68
-#define DISEQC_CMD_DRIVE_W    0x69
-#define DISEQC_CMD_STORE_POS  0x6a
-#define DISEQC_CMD_GOTO_POS   0x6b
-#define DISEQC_CMD_GOTO_X     0x6e
+enum DISEQC_CMDS {
+    DISEQC_CMD_RESET        = 0x00,
+    DISEQC_CMD_CLR_RESET    = 0x01,
+    DISEQC_CMD_WRITE_N0     = 0x38,
+    DISEQC_CMD_WRITE_N1     = 0x39,
+    DISEQC_CMD_WRITE_FREQ   = 0x58,
+    DISEQC_CMD_ODU          = 0x5A,
+    DISEQC_CMD_ODU_MDU      = 0x5C,
+    DISEQC_CMD_HALT         = 0x60,
+    DISEQC_CMD_LMT_OFF      = 0x63,
+    DISEQC_CMD_LMT_E        = 0x66,
+    DISEQC_CMD_LMT_W        = 0x67,
+    DISEQC_CMD_DRIVE_E      = 0x68,
+    DISEQC_CMD_DRIVE_W      = 0x69,
+    DISEQC_CMD_STORE_POS    = 0x6a,
+    DISEQC_CMD_GOTO_POS     = 0x6b,
+    DISEQC_CMD_GOTO_X       = 0x6e,
+};
 
-#define TO_RADS (M_PI / 180.0)
-#define TO_DEC  (180.0 / M_PI)
+static constexpr double TO_RADS { M_PI / 180.0 };
+static constexpr double TO_DEC  { 180.0 / M_PI };
 
-#define EPS     1E-4
+static constexpr double EPS     { 1E-4 };
 
 #define LOC      QString("DiSEqCDevTree: ")
 
