@@ -15,7 +15,7 @@ extern "C" {
 #include <cmath>
 #include <strings.h>
 
-#define LOC "HEVCParser "
+static const QString LOC { QStringLiteral("HEVCParser ") };
 
 /*
   References:

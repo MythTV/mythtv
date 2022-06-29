@@ -42,7 +42,7 @@
 /*
  * Constants
  */
-#define LOC "[netstream] "
+static const QString LOC { QStringLiteral("[netstream] ") };
 
 
 /*
@@ -758,7 +758,7 @@ NAMThread::~NAMThread()
 // virtual
 void NAMThread::run()
 {
-    LOG(VB_FILE, LOG_INFO, LOC "NAMThread starting");
+    LOG(VB_FILE, LOG_INFO, LOC + "NAMThread starting");
 
     m_nam = new QNetworkAccessManager();
     m_nam->setObjectName("NetStream NAM");
@@ -787,7 +787,7 @@ void NAMThread::run()
             QNetworkProxy::NoProxy;
         if (QNetworkProxy::NoProxy != type)
         {
-            LOG(VB_GENERAL, LOG_INFO, LOC "Using proxy: " + proxy);
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Using proxy: " + proxy);
             m_nam->setProxy(QNetworkProxy(
                 type, url.host(), url.port(), url.userName(), url.password() ));
         }
@@ -831,7 +831,7 @@ void NAMThread::run()
     delete m_nam;
     m_nam = nullptr;
 
-    LOG(VB_FILE, LOG_INFO, LOC "NAMThread stopped");
+    LOG(VB_FILE, LOG_INFO, LOC + "NAMThread stopped");
 }
 
 // slot
@@ -868,7 +868,7 @@ bool NAMThread::StartRequest(NetStreamRequest *p)
 {
     if (!p)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC "Invalid NetStreamRequest");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid NetStreamRequest");
         return false;
     }
 
@@ -888,7 +888,7 @@ bool NAMThread::AbortRequest(NetStreamAbort *p)
 {
     if (!p)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC "Invalid NetStreamAbort");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid NetStreamAbort");
         return false;
     }
 
