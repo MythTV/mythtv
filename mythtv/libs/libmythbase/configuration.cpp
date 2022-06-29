@@ -21,16 +21,7 @@
 #include "configuration.h"
 #include "mythlogging.h"
 #include "mythdb.h"
-#include "mythdirs.h"
 #include "compat.h"
-
-XmlConfiguration::XmlConfiguration( const QString &sFileName )
-{
-    m_sPath     = GetConfDir();
-    m_sFileName = sFileName;
-    
-    XmlConfiguration::Load();
-}
 
 bool XmlConfiguration::Load( void )
 {

@@ -13,10 +13,13 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
+#include <utility>
+
 #include <QDomDocument>
 #include <QStringList>
 #include "libmythbase/mythbaseexp.h"
 #include "libmythbase/mythchrono.h"
+#include "libmythbase/mythdirs.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -32,8 +35,8 @@ class MBASE_PUBLIC XmlConfiguration
 {
     protected:
 
-        QString      m_sPath;
-        QString      m_sFileName;
+        QString      m_sPath     {GetConfDir()};
+        QString      m_sFileName {k_default_filename};
 
         QDomDocument m_config;
         QDomNode     m_rootNode;
@@ -42,8 +45,14 @@ class MBASE_PUBLIC XmlConfiguration
         QDomNode FindNode( QStringList &sParts, QDomNode &curNode, bool bCreate = false );
 
     public:
+        static constexpr auto k_default_filename = "config.xml";
 
-        explicit XmlConfiguration( const QString &sFileName );
+        XmlConfiguration() { Load(); }
+        explicit XmlConfiguration(QString fileName)
+            : m_sFileName(std::move(fileName))
+        {
+            Load();
+        }
 
         bool    Load();
         bool    Save();
