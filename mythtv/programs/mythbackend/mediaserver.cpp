@@ -19,8 +19,8 @@
 #ifdef USING_LIBDNS_SD
 #include "libmythbase/bonjourregister.h"
 #endif
-#include "libmythbase/configuration.h"
 #include "libmythbase/mythconfig.h"
+#include "libmythbase/mythdb.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythupnp/htmlserver.h"
 
@@ -57,29 +57,16 @@
 MediaServer::MediaServer(void) :
     m_sSharePath(GetShareDir())
 {
-    LOG(VB_UPNP, LOG_INFO, "MediaServer(): Begin");
-
-    // ----------------------------------------------------------------------
-    // Initialize Configuration class (Database for Servers)
-    // ----------------------------------------------------------------------
-
-    MythCoreContext::SetConfiguration( new DBConfiguration() );
-
-    // ----------------------------------------------------------------------
-    // Create mini HTTP Server
-    // ----------------------------------------------------------------------
-
-    LOG(VB_UPNP, LOG_INFO, "MediaServer(): End");
+    LOG(VB_UPNP, LOG_INFO, "MediaServer()");
 }
 
 void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 {
     LOG(VB_UPNP, LOG_INFO, "MediaServer::Init(): Begin");
 
-    Configuration *pConfig = MythCoreContext::GetConfiguration();
-    int     nPort     = pConfig->GetValue( "BackendStatusPort", 6544 );
-    int     nSSLPort  = pConfig->GetValue( "BackendSSLPort", (nPort + 10) );
-    int     nWSPort   = (pConfig->GetValue( "BackendStatusPort", 6544 ) + 5);
+    int nPort     = GetMythDB()->GetNumSetting("BackendStatusPort", 6544);
+    int nSSLPort  = GetMythDB()->GetNumSetting("BackendSSLPort", nPort + 10);
+    int nWSPort   = nPort + 5;
 
     auto *pHttpServer = new HttpServer();
 
@@ -114,7 +101,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
         }
     }
 
-    QString sFileName = pConfig->GetValue( "upnpDescXmlPath", m_sSharePath );
+    QString sFileName = GetMythDB()->GetSetting("upnpDescXmlPath", m_sSharePath);
 
     if ( bIsMaster )
         sFileName  += "devicemaster.xml";

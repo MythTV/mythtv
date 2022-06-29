@@ -61,7 +61,7 @@ QString LookupUDN( const QString &sDeviceType )
     }
 
     sList.removeLast();
-    Configuration *pConfig = MythCoreContext::GetConfiguration();
+    XmlConfiguration *pConfig = MythCoreContext::GetConfiguration();
     QString sName = "UPnP/UDN/" + sList.last();
     QString sUDN  = pConfig->GetValue( sName, "" );
 

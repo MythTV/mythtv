@@ -16,7 +16,7 @@
 
 BackendSelection::BackendSelection(
     MythScreenStack *parent, DatabaseParams *params,
-    Configuration *pConfig, bool exitOnFinish) :
+    XmlConfiguration *pConfig, bool exitOnFinish) :
     MythScreenType(parent, "BackEnd Selection"),
     m_dbParams(params), m_pConfig(pConfig), m_exitOnFinish(exitOnFinish)
 {
@@ -46,7 +46,7 @@ BackendSelection::~BackendSelection()
 }
 
 BackendSelection::Decision BackendSelection::Prompt(
-    DatabaseParams *dbParams, Configuration  *pConfig)
+    DatabaseParams *dbParams, XmlConfiguration  *pConfig)
 {
     Decision ret = kCancelConfigure;
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();

@@ -45,10 +45,10 @@ class BackendSelection : public MythScreenType
         kAcceptConfigure = +1,
     };
     static Decision Prompt(
-        DatabaseParams *dbParams, Configuration *pConfig);
+        DatabaseParams *dbParams, XmlConfiguration *pConfig);
 
     BackendSelection(MythScreenStack *parent, DatabaseParams *params,
-                     Configuration *pConfig, bool exitOnFinish = false);
+                     XmlConfiguration *pConfig, bool exitOnFinish = false);
     ~BackendSelection() override;
 
     bool Create(void) override; // MythScreenType
@@ -72,7 +72,7 @@ class BackendSelection : public MythScreenType
     void CloseWithDecision(Decision d);
 
     DatabaseParams   *m_dbParams        {nullptr};
-    Configuration    *m_pConfig         {nullptr};
+    XmlConfiguration *m_pConfig         {nullptr};
     bool              m_exitOnFinish;
     ItemMap           m_devices;
 

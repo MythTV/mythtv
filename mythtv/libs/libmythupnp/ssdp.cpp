@@ -78,7 +78,7 @@ SSDP::SSDP() :
 {
     LOG(VB_UPNP, LOG_NOTICE, "Starting up SSDP Thread..." );
 
-    Configuration *pConfig = MythCoreContext::GetConfiguration();
+    XmlConfiguration *pConfig = MythCoreContext::GetConfiguration();
 
     m_nPort       = pConfig->GetValue("UPnP/SSDP/Port"      , SSDP_PORT      );
     m_nSearchPort = pConfig->GetValue("UPnP/SSDP/SearchPort", SSDP_SEARCHPORT);

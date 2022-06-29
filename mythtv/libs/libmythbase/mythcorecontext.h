@@ -17,7 +17,7 @@
 #include "mythsession.h"
 #include "qtuplift.h"
 
-class Configuration;
+class XmlConfiguration;
 
 static constexpr const char * MYTH_APPNAME_MYTHBACKEND { "mythbackend" };
 static constexpr const char * MYTH_APPNAME_MYTHJOBQUEUE { "mythjobqueue" };
@@ -242,9 +242,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void ResetLanguage(void);
     void ResetSockets(void);
 
-    static void           SetConfiguration( Configuration *pConfig );
-    static Configuration* GetConfiguration();
-    static Configuration   *g_pConfig;
+    static XmlConfiguration* GetConfiguration();
 
     using PlaybackStartCb = void (QObject::*)(void);
 
