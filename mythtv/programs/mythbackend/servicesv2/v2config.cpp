@@ -82,7 +82,7 @@ bool V2Config::SetDatabaseCredentials(const QString &Host, const QString &UserNa
 /////////////////////////////////////////////////////////////////////////////
 V2DatabaseStatus* V2Config::GetDatabaseStatus()
 {
-    const DatabaseParams params = gCoreContext->GetDatabaseParams();
+    const DatabaseParams params = GetMythDB()->GetDatabaseParams();
 
     auto *pInfo = new V2DatabaseStatus();
 

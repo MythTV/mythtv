@@ -22,6 +22,7 @@ class MBASE_PUBLIC MythDB
     static void DBError(const QString &where, const MSqlQuery &query);
     static QString DBErrorMessage(const QSqlError &err);
 
+    QString GetDatabaseName() const;
     DatabaseParams GetDatabaseParams(void) const;
     void SetDatabaseParams(const DatabaseParams &params);
 

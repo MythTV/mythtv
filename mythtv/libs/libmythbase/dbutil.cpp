@@ -567,7 +567,7 @@ bool DBUtil::CreateTemporaryDBConf(
 bool DBUtil::DoBackup(const QString &backupScript, QString &filename,
                       bool disableRotation)
 {
-    DatabaseParams dbParams = gCoreContext->GetDatabaseParams();
+    DatabaseParams dbParams = GetMythDB()->GetDatabaseParams();
     QString     dbSchemaVer = gCoreContext->GetSetting("DBSchemaVer");
     QString backupDirectory = GetBackupDirectory();
     QString  backupFilename = CreateBackupFilename(dbParams.m_dbName + "-" +
@@ -663,7 +663,7 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename,
  */
 bool DBUtil::DoBackup(QString &filename)
 {
-    DatabaseParams dbParams = gCoreContext->GetDatabaseParams();
+    DatabaseParams dbParams = GetMythDB()->GetDatabaseParams();
     QString     dbSchemaVer = gCoreContext->GetSetting("DBSchemaVer");
     QString backupDirectory = GetBackupDirectory();
 
@@ -822,7 +822,7 @@ int DBUtil::CountClients(void)
 
     QSqlRecord record = query.record();
     int db_index = record.indexOf("db");
-    QString dbName = gCoreContext->GetDatabaseParams().m_dbName;
+    QString dbName = GetMythDB()->GetDatabaseName();
     QString inUseDB;
 
     while (query.next())

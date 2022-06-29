@@ -51,7 +51,6 @@ class MPUBLIC MythContext
               bool disableAutoDiscovery = false,
               bool ignoreDB = false);
 
-    DatabaseParams GetDatabaseParams(void);
     bool SaveDatabaseParams(const DatabaseParams &params);
     bool saveSettingsCache(void);
 

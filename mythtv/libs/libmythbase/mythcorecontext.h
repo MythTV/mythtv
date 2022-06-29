@@ -146,8 +146,6 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     MythScheduler *GetScheduler(void);
 
     bool IsDatabaseIgnored(void) const;
-    DatabaseParams GetDatabaseParams(void)
-        { return GetDB()->GetDatabaseParams(); }
 
     void SaveSetting(const QString &key, int newValue);
     void SaveSetting(const QString &key, const QString &newValue);

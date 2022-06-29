@@ -682,7 +682,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         DBUpdates updates
         {
             qPrintable(QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
-                       .arg(gContext->GetDatabaseParams().m_dbName)),
+                       .arg(GetMythDB()->GetDatabaseName())),
             // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "ALTER TABLE music_albumart"
             "  MODIFY filename varbinary(255) NOT NULL default '';",
@@ -732,7 +732,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         DBUpdates updates
         {
             qPrintable(QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
-                    .arg(gContext->GetDatabaseParams().m_dbName)),
+                    .arg(GetMythDB()->GetDatabaseName())),
             // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "ALTER TABLE music_albumart"
             "  DEFAULT CHARACTER SET utf8,"

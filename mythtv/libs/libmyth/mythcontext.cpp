@@ -735,7 +735,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
     }
     else
     {
-        DatabaseParams params = m_parent->GetDatabaseParams();
+        DatabaseParams params = m_dbParams;
         QString        response;
         std::this_thread::sleep_for(1s);
         // give user chance to skip config
@@ -1694,11 +1694,6 @@ MythContext::~MythContext()
 void MythContext::SetDisableEventPopup(bool check)
 {
     d->m_disableeventpopup = check;
-}
-
-DatabaseParams MythContext::GetDatabaseParams(void)
-{
-    return d->m_dbParams;
 }
 
 bool MythContext::SaveDatabaseParams(const DatabaseParams &params)

@@ -244,6 +244,11 @@ QString MythDB::DBErrorMessage(const QSqlError& err)
              err.databaseText());
 }
 
+QString MythDB::GetDatabaseName() const
+{
+    return d->m_dbParams.m_dbName;
+}
+
 DatabaseParams MythDB::GetDatabaseParams(void) const
 {
     return d->m_dbParams;
