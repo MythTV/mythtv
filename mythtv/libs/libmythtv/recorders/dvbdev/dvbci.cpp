@@ -48,10 +48,6 @@
 
 #include "libmythbase/mythlogging.h"
 
-#ifndef MALLOC
-#define MALLOC(type, size)  (type *)malloc(sizeof(type) * (size))
-#endif
-
 #define esyslog(a...) LOG(VB_GENERAL, LOG_ERR, QString::asprintf(a))
 #define isyslog(a...) LOG(VB_DVBCAM, LOG_INFO, QString::asprintf(a))
 #define dsyslog(a...) LOG(VB_DVBCAM, LOG_DEBUG, QString::asprintf(a))
@@ -67,19 +63,19 @@ static bool sConnected = false;
 
 #define dbgprotocol(a...) if (sDebugProtocol) LOG(VB_DVBCAM, LOG_DEBUG, QString::asprintf(a))
 
-#define OK       0
-#define TIMEOUT (-1)
-#define ERROR   (-2)
+static constexpr int OK       {  0 };
+static constexpr int TIMEOUT  { -1 };
+static constexpr int ERROR    { -2 };
 
 // --- Workarounds -----------------------------------------------------------
 
 // The Irdeto AllCAM 4.7 (and maybe others, too) does not react on AOT_ENTER_MENU
 // during the first few seconds of a newly established connection
-#define WRKRND_TIME_BEFORE_ENTER_MENU  15 // seconds
+static constexpr time_t WRKRND_TIME_BEFORE_ENTER_MENU { 15 }; // seconds
 
 // --- Helper functions ------------------------------------------------------
 
-#define SIZE_INDICATOR 0x80
+static constexpr int SIZE_INDICATOR { 0x80 };
 
 static ssize_t safe_read(int filedes, void *buffer, size_t size)
 {
@@ -170,7 +166,7 @@ static char *CopyString(int Length, const uint8_t *Data)
 ///< \param Data A pointer to current location for reading data.
 ///< \return Returns a pointer to a newly allocated string.
 {
-  char *s = MALLOC(char, Length + 1);
+  char *s = (char *)malloc(Length + 1);
   strncpy(s, (char *)Data, Length);
   s[Length] = 0;
   return s;
@@ -243,26 +239,28 @@ bool cMutexLock::Lock(cMutex *Mutex)
 
 // --- cTPDU -----------------------------------------------------------------
 
-#define MAX_TPDU_SIZE  2048
-#define MAX_TPDU_DATA  (MAX_TPDU_SIZE - 4)
+static constexpr size_t  MAX_TPDU_SIZE  { 2048 };
+static constexpr int     MAX_TPDU_DATA  { MAX_TPDU_SIZE - 4 };
 
-#define DATA_INDICATOR 0x80
+static constexpr uint8_t DATA_INDICATOR { 0x80 };
 
-#define T_SB           0x80
-#define T_RCV          0x81
-#define T_CREATE_TC    0x82
-#define T_CTC_REPLY    0x83
-#define T_DELETE_TC    0x84
-#define T_DTC_REPLY    0x85
-#define T_REQUEST_TC   0x86
-#define T_NEW_TC       0x87
-#define T_TC_ERROR     0x88
-#define T_DATA_LAST    0xA0
-#define T_DATA_MORE    0xA1
+enum T_VALUES {
+    T_SB             = 0x80,
+    T_RCV            = 0x81,
+    T_CREATE_TC      = 0x82,
+    T_CTC_REPLY      = 0x83,
+    T_DELETE_TC      = 0x84,
+    T_DTC_REPLY      = 0x85,
+    T_REQUEST_TC     = 0x86,
+    T_NEW_TC         = 0x87,
+    T_TC_ERROR       = 0x88,
+    T_DATA_LAST      = 0xA0,
+    T_DATA_MORE      = 0xA1,
+};
 
 class cTPDU {
 private:
-  int     m_size {0};
+  ssize_t m_size {0};
   std::array<uint8_t,MAX_TPDU_SIZE>  m_data {0};
   const uint8_t *GetData(const uint8_t *Data, int &Length) const;
 public:
@@ -347,7 +345,7 @@ int cTPDU::Read(int fd)
 void cTPDU::Dump(bool Outgoing)
 {
   if (sDumpTPDUDataTransfer) {
-#define MAX_DUMP 256
+     static constexpr ssize_t MAX_DUMP { 256 };
      QString msg = QString("%1 ").arg(Outgoing ? "-->" : "<--");
      for (int i = 0; i < m_size && i < MAX_DUMP; i++)
          msg += QString("%1 ").arg((short int)m_data[i], 2, 16, QChar('0'));
@@ -450,7 +448,7 @@ int cCiTransportConnection::SendTPDU(uint8_t Tag, int Length, const uint8_t *Dat
   return TPDU.Write(m_fd);
 }
 
-#define CAM_READ_TIMEOUT  5000 // ms
+static constexpr int CAM_READ_TIMEOUT { 5000 }; // ms
 
 int cCiTransportConnection::RecvTPDU(void)
 {
@@ -539,7 +537,7 @@ const uint8_t *cCiTransportConnection::Data(int &Length)
   return m_tpdu->Data(Length);
 }
 
-#define MAX_CONNECT_RETRIES  25
+static constexpr int8_t MAX_CONNECT_RETRIES { 25 };
 
 int cCiTransportConnection::CreateConnection(void)
 {
@@ -590,7 +588,7 @@ int cCiTransportConnection::Poll(void)
 
 // --- cCiTransportLayer -----------------------------------------------------
 
-#define MAX_CI_CONNECT  16 // maximum possible value is 254
+static constexpr size_t MAX_CI_CONNECT { 16 }; // maximum possible value is 254
 
 class cCiTransportLayer {
 private:
@@ -615,9 +613,9 @@ cCiTransportLayer::cCiTransportLayer(int Fd, int NumSlots)
 
 cCiTransportConnection *cCiTransportLayer::NewConnection(int Slot)
 {
-  for (int i = 0; i < MAX_CI_CONNECT; i++) {
+  for (size_t i = 0; i < MAX_CI_CONNECT; i++) {
       if (m_tc[i].State() == stIDLE) {
-         dbgprotocol("Creating connection: slot %d, tcid %d\n", Slot, i + 1);
+         dbgprotocol("Creating connection: slot %d, tcid %zd\n", Slot, i + 1);
          m_tc[i].Init(m_fd, Slot, i + 1);
          if (m_tc[i].CreateConnection() == OK)
             return &m_tc[i];
@@ -692,78 +690,86 @@ cCiTransportConnection *cCiTransportLayer::Process(int Slot)
 
 // Session Tags:
 
-#define ST_SESSION_NUMBER           0x90
-#define ST_OPEN_SESSION_REQUEST     0x91
-#define ST_OPEN_SESSION_RESPONSE    0x92
-#define ST_CREATE_SESSION           0x93
-#define ST_CREATE_SESSION_RESPONSE  0x94
-#define ST_CLOSE_SESSION_REQUEST    0x95
-#define ST_CLOSE_SESSION_RESPONSE   0x96
+enum SESSION_TAGS {
+    ST_SESSION_NUMBER             = 0x90,
+    ST_OPEN_SESSION_REQUEST       = 0x91,
+    ST_OPEN_SESSION_RESPONSE      = 0x92,
+    ST_CREATE_SESSION             = 0x93,
+    ST_CREATE_SESSION_RESPONSE    = 0x94,
+    ST_CLOSE_SESSION_REQUEST      = 0x95,
+    ST_CLOSE_SESSION_RESPONSE     = 0x96,
+};
 
 // Session Status:
 
-#define SS_OK             0x00
-#define SS_NOT_ALLOCATED  0xF0
+enum SESSION_STATUS {
+    SS_OK               = 0x00,
+    SS_NOT_ALLOCATED    = 0xF0,
+};
 
 // Resource Identifiers:
 
-#define RI_RESOURCE_MANAGER            0x00010041
-#define RI_APPLICATION_INFORMATION     0x00020041
-#define RI_CONDITIONAL_ACCESS_SUPPORT  0x00030041
-#define RI_HOST_CONTROL                0x00200041
-#define RI_DATE_TIME                   0x00240041
-#define RI_MMI                         0x00400041
+enum IDENTIFIERS {
+    RI_RESOURCE_MANAGER              = 0x00010041,
+    RI_APPLICATION_INFORMATION       = 0x00020041,
+    RI_CONDITIONAL_ACCESS_SUPPORT    = 0x00030041,
+    RI_HOST_CONTROL                  = 0x00200041,
+    RI_DATE_TIME                     = 0x00240041,
+    RI_MMI                           = 0x00400041,
+};
 
 // Application Object Tags:
 
-#define AOT_NONE                    0x000000
-#define AOT_PROFILE_ENQ             0x9F8010
-#define AOT_PROFILE                 0x9F8011
-#define AOT_PROFILE_CHANGE          0x9F8012
-#define AOT_APPLICATION_INFO_ENQ    0x9F8020
-#define AOT_APPLICATION_INFO        0x9F8021
-#define AOT_ENTER_MENU              0x9F8022
-#define AOT_CA_INFO_ENQ             0x9F8030
-#define AOT_CA_INFO                 0x9F8031
-#define AOT_CA_PMT                  0x9F8032
-#define AOT_CA_PMT_REPLY            0x9F8033
-#define AOT_TUNE                    0x9F8400
-#define AOT_REPLACE                 0x9F8401
-#define AOT_CLEAR_REPLACE           0x9F8402
-#define AOT_ASK_RELEASE             0x9F8403
-#define AOT_DATE_TIME_ENQ           0x9F8440
-#define AOT_DATE_TIME               0x9F8441
-#define AOT_CLOSE_MMI               0x9F8800
-#define AOT_DISPLAY_CONTROL         0x9F8801
-#define AOT_DISPLAY_REPLY           0x9F8802
-#define AOT_TEXT_LAST               0x9F8803
-#define AOT_TEXT_MORE               0x9F8804
-#define AOT_KEYPAD_CONTROL          0x9F8805
-#define AOT_KEYPRESS                0x9F8806
-#define AOT_ENQ                     0x9F8807
-#define AOT_ANSW                    0x9F8808
-#define AOT_MENU_LAST               0x9F8809
-#define AOT_MENU_MORE               0x9F880A
-#define AOT_MENU_ANSW               0x9F880B
-#define AOT_LIST_LAST               0x9F880C
-#define AOT_LIST_MORE               0x9F880D
-#define AOT_SUBTITLE_SEGMENT_LAST   0x9F880E
-#define AOT_SUBTITLE_SEGMENT_MORE   0x9F880F
-#define AOT_DISPLAY_MESSAGE         0x9F8810
-#define AOT_SCENE_END_MARK          0x9F8811
-#define AOT_SCENE_DONE              0x9F8812
-#define AOT_SCENE_CONTROL           0x9F8813
-#define AOT_SUBTITLE_DOWNLOAD_LAST  0x9F8814
-#define AOT_SUBTITLE_DOWNLOAD_MORE  0x9F8815
-#define AOT_FLUSH_DOWNLOAD          0x9F8816
-#define AOT_DOWNLOAD_REPLY          0x9F8817
-#define AOT_COMMS_CMD               0x9F8C00
-#define AOT_CONNECTION_DESCRIPTOR   0x9F8C01
-#define AOT_COMMS_REPLY             0x9F8C02
-#define AOT_COMMS_SEND_LAST         0x9F8C03
-#define AOT_COMMS_SEND_MORE         0x9F8C04
-#define AOT_COMMS_RCV_LAST          0x9F8C05
-#define AOT_COMMS_RCV_MORE          0x9F8C06
+enum OBJECT_TAG {
+    AOT_NONE                      = 0x000000,
+    AOT_PROFILE_ENQ               = 0x9F8010,
+    AOT_PROFILE                   = 0x9F8011,
+    AOT_PROFILE_CHANGE            = 0x9F8012,
+    AOT_APPLICATION_INFO_ENQ      = 0x9F8020,
+    AOT_APPLICATION_INFO          = 0x9F8021,
+    AOT_ENTER_MENU                = 0x9F8022,
+    AOT_CA_INFO_ENQ               = 0x9F8030,
+    AOT_CA_INFO                   = 0x9F8031,
+    AOT_CA_PMT                    = 0x9F8032,
+    AOT_CA_PMT_REPLY              = 0x9F8033,
+    AOT_TUNE                      = 0x9F8400,
+    AOT_REPLACE                   = 0x9F8401,
+    AOT_CLEAR_REPLACE             = 0x9F8402,
+    AOT_ASK_RELEASE               = 0x9F8403,
+    AOT_DATE_TIME_ENQ             = 0x9F8440,
+    AOT_DATE_TIME                 = 0x9F8441,
+    AOT_CLOSE_MMI                 = 0x9F8800,
+    AOT_DISPLAY_CONTROL           = 0x9F8801,
+    AOT_DISPLAY_REPLY             = 0x9F8802,
+    AOT_TEXT_LAST                 = 0x9F8803,
+    AOT_TEXT_MORE                 = 0x9F8804,
+    AOT_KEYPAD_CONTROL            = 0x9F8805,
+    AOT_KEYPRESS                  = 0x9F8806,
+    AOT_ENQ                       = 0x9F8807,
+    AOT_ANSW                      = 0x9F8808,
+    AOT_MENU_LAST                 = 0x9F8809,
+    AOT_MENU_MORE                 = 0x9F880A,
+    AOT_MENU_ANSW                 = 0x9F880B,
+    AOT_LIST_LAST                 = 0x9F880C,
+    AOT_LIST_MORE                 = 0x9F880D,
+    AOT_SUBTITLE_SEGMENT_LAST     = 0x9F880E,
+    AOT_SUBTITLE_SEGMENT_MORE     = 0x9F880F,
+    AOT_DISPLAY_MESSAGE           = 0x9F8810,
+    AOT_SCENE_END_MARK            = 0x9F8811,
+    AOT_SCENE_DONE                = 0x9F8812,
+    AOT_SCENE_CONTROL             = 0x9F8813,
+    AOT_SUBTITLE_DOWNLOAD_LAST    = 0x9F8814,
+    AOT_SUBTITLE_DOWNLOAD_MORE    = 0x9F8815,
+    AOT_FLUSH_DOWNLOAD            = 0x9F8816,
+    AOT_DOWNLOAD_REPLY            = 0x9F8817,
+    AOT_COMMS_CMD                 = 0x9F8C00,
+    AOT_CONNECTION_DESCRIPTOR     = 0x9F8C01,
+    AOT_COMMS_REPLY               = 0x9F8C02,
+    AOT_COMMS_SEND_LAST           = 0x9F8C03,
+    AOT_COMMS_SEND_MORE           = 0x9F8C04,
+    AOT_COMMS_RCV_LAST            = 0x9F8C05,
+    AOT_COMMS_RCV_MORE            = 0x9F8C06,
+};
 
 class cCiSession {
 private:
@@ -1113,6 +1119,13 @@ void cCiDateTime::SetTimeOffset(double offset)
     dbgprotocol("New Time Offset: %i secs\n", m_timeOffset);
 }
 
+static constexpr uint8_t DEC2BCD(uint8_t d)
+    { return ((d / 10) << 4) + (d % 10); }
+static constexpr uint8_t BYTE0(uint16_t a)
+    { return static_cast<uint8_t>(a & 0xFF); }
+static constexpr uint8_t BYTE1(uint16_t a)
+    { return static_cast<uint8_t>((a >> 8) & 0xFF); }
+
 bool cCiDateTime::SendDateTime(void)
 {
   time_t t = time(nullptr);
@@ -1131,9 +1144,6 @@ bool cCiDateTime::SendDateTime(void)
      int D = tm_gmt.tm_mday;
      int L = (M == 1 || M == 2) ? 1 : 0;
      int MJD = 14956 + D + int((Y - L) * 365.25) + int((M + 1 + L * 12) * 30.6001);
-#define DEC2BCD(d) (uint8_t((((d) / 10) << 4) + ((d) % 10)))
-#define BYTE0(a) static_cast<uint8_t>((a) & 0xFF)
-#define BYTE1(a) static_cast<uint8_t>(((a) >> 8) & 0xFF)
      uint16_t mjd = htons(MJD);
      int16_t local_offset = htons(tm_loc.tm_gmtoff / 60);
      std::vector<uint8_t> T {
@@ -1185,42 +1195,52 @@ bool cCiDateTime::Process(int Length, const uint8_t *Data)
 
 // Close MMI Commands:
 
-#define CLOSE_MMI_IMMEDIATE                0x00
-#define CLOSE_MMI_DELAY                    0x01
+enum CLOSE_MMI {
+    CLOSE_MMI_IMMEDIATE                  = 0x00,
+    CLOSE_MMI_DELAY                      = 0x01,
+};
 
 // Display Control Commands:
 
-#define DCC_SET_MMI_MODE                          0x01
-#define DCC_DISPLAY_CHARACTER_TABLE_LIST          0x02
-#define DCC_INPUT_CHARACTER_TABLE_LIST            0x03
-#define DCC_OVERLAY_GRAPHICS_CHARACTERISTICS      0x04
-#define DCC_FULL_SCREEN_GRAPHICS_CHARACTERISTICS  0x05
+enum DISPLAY_CONTROL {
+    DCC_SET_MMI_MODE                            = 0x01,
+    DCC_DISPLAY_CHARACTER_TABLE_LIST            = 0x02,
+    DCC_INPUT_CHARACTER_TABLE_LIST              = 0x03,
+    DCC_OVERLAY_GRAPHICS_CHARACTERISTICS        = 0x04,
+    DCC_FULL_SCREEN_GRAPHICS_CHARACTERISTICS    = 0x05,
+};
 
 // MMI Modes:
 
-#define MM_HIGH_LEVEL                      0x01
-#define MM_LOW_LEVEL_OVERLAY_GRAPHICS      0x02
-#define MM_LOW_LEVEL_FULL_SCREEN_GRAPHICS  0x03
+enum MMI_MODES {
+    MM_HIGH_LEVEL                        = 0x01,
+    MM_LOW_LEVEL_OVERLAY_GRAPHICS        = 0x02,
+    MM_LOW_LEVEL_FULL_SCREEN_GRAPHICS    = 0x03,
+};
 
 // Display Reply IDs:
 
-#define DRI_MMI_MODE_ACK                              0x01
-#define DRI_LIST_DISPLAY_CHARACTER_TABLES             0x02
-#define DRI_LIST_INPUT_CHARACTER_TABLES               0x03
-#define DRI_LIST_GRAPHIC_OVERLAY_CHARACTERISTICS      0x04
-#define DRI_LIST_FULL_SCREEN_GRAPHIC_CHARACTERISTICS  0x05
-#define DRI_UNKNOWN_DISPLAY_CONTROL_CMD               0xF0
-#define DRI_UNKNOWN_MMI_MODE                          0xF1
-#define DRI_UNKNOWN_CHARACTER_TABLE                   0xF2
+enum DISPLAY_REPLY_IDS {
+    DRI_MMI_MODE_ACK                                = 0x01,
+    DRI_LIST_DISPLAY_CHARACTER_TABLES               = 0x02,
+    DRI_LIST_INPUT_CHARACTER_TABLES                 = 0x03,
+    DRI_LIST_GRAPHIC_OVERLAY_CHARACTERISTICS        = 0x04,
+    DRI_LIST_FULL_SCREEN_GRAPHIC_CHARACTERISTICS    = 0x05,
+    DRI_UNKNOWN_DISPLAY_CONTROL_CMD                 = 0xF0,
+    DRI_UNKNOWN_MMI_MODE                            = 0xF1,
+    DRI_UNKNOWN_CHARACTER_TABLE                     = 0xF2,
+};
 
 // Enquiry Flags:
 
-#define EF_BLIND  0x01
+static constexpr uint8_t EF_BLIND { 0x01 };
 
 // Answer IDs:
 
-#define AI_CANCEL  0x00
-#define AI_ANSWER  0x01
+enum ANSWER_IDS {
+    AI_CANCEL    = 0x00,
+    AI_ANSWER    = 0x01,
+};
 
 class cCiMMI : public cCiSession {
 private:
@@ -1468,10 +1488,12 @@ bool cCiEnquiry::Cancel(void)
 
 // Ca Pmt Cmd Ids:
 
-#define CPCI_OK_DESCRAMBLING  0x01
-#define CPCI_OK_MMI           0x02
-#define CPCI_QUERY            0x03
-#define CPCI_NOT_SELECTED     0x04
+enum CPCI_IDS {
+    CPCI_OK_DESCRAMBLING    = 0x01,
+    CPCI_OK_MMI             = 0x02,
+    CPCI_QUERY              = 0x03,
+    CPCI_NOT_SELECTED       = 0x04,
+};
 
 cCiCaPmt::cCiCaPmt(int ProgramNumber, uint8_t cplm)
 {
