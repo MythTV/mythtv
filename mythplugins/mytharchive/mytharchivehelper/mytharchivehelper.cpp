@@ -2205,7 +2205,7 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
 
 static int getDBParamters(const QString& outFile)
 {
-    DatabaseParams params = gContext->GetDatabaseParams();
+    DatabaseParams params = GetMythDB()->GetDatabaseParams();
 
     // save the db paramters to the file
     QFile f(outFile);

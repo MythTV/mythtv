@@ -497,7 +497,7 @@ static bool doUpgradeTVDatabaseSchema(void)
         MSqlQuery query(MSqlQuery::InitCon());
         if (!query.exec(QString("ALTER DATABASE %1 DEFAULT "
                                 "CHARACTER SET utf8 COLLATE utf8_general_ci;")
-                        .arg(gCoreContext->GetDatabaseParams().m_dbName)))
+                        .arg(GetMythDB()->GetDatabaseName())))
         {
             MythDB::DBError("UpgradeTVDatabaseSchema -- alter charset", query);
         }
@@ -3690,7 +3690,7 @@ static bool doUpgradeTVDatabaseSchema(void)
             "and table_name = 'recordedartwork' "
             "and seq_in_index = 1 "
             "and column_name = 'inetref'")
-            .arg(gCoreContext->GetDatabaseParams().m_dbName));
+            .arg(GetMythDB()->GetDatabaseName()));
 
         if (!select.exec())
         {

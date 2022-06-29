@@ -65,7 +65,7 @@ DTC::ConnectionInfo* Myth::GetConnectionInfo( const QString  &sPin )
         throw( QString( "Not Authorized" ));
         //SB: UPnPResult_ActionNotAuthorized );
 
-    DatabaseParams params = gCoreContext->GetDatabaseParams();
+    DatabaseParams params = GetMythDB()->GetDatabaseParams();
 
     // ----------------------------------------------------------------------
     // Check for DBHostName of "localhost" and change to public name or IP

@@ -99,7 +99,7 @@ bool InitializeDatabase()
     {
         DBUpdates updates {
             qPrintable(QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
-            .arg(gContext->GetDatabaseParams().m_dbName)),
+            .arg(GetMythDB()->GetDatabaseName())),
             "ALTER TABLE weatherdatalayout"
             "  MODIFY location varbinary(64) NOT NULL,"
             "  MODIFY dataitem varbinary(64) NOT NULL;",
@@ -126,7 +126,7 @@ bool InitializeDatabase()
     {
         DBUpdates updates {
             qPrintable(QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
-            .arg(gContext->GetDatabaseParams().m_dbName)),
+            .arg(GetMythDB()->GetDatabaseName())),
             "ALTER TABLE weatherdatalayout"
             "  DEFAULT CHARACTER SET utf8,"
             "  MODIFY location varchar(64) CHARACTER SET utf8 NOT NULL,"

@@ -69,7 +69,7 @@ bool UpgradeArchiveDatabaseSchema(void)
         DBUpdates updates
         {
             qPrintable(QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
-                       .arg(gContext->GetDatabaseParams().m_dbName)),
+                       .arg(GetMythDB()->GetDatabaseName())),
             "ALTER TABLE archiveitems"
             "  MODIFY title varbinary(128) default NULL,"
             "  MODIFY subtitle varbinary(128) default NULL,"
@@ -91,7 +91,7 @@ bool UpgradeArchiveDatabaseSchema(void)
         DBUpdates updates
         {
             qPrintable(QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
-                       .arg(gContext->GetDatabaseParams().m_dbName)),
+                       .arg(GetMythDB()->GetDatabaseName())),
             "ALTER TABLE archiveitems"
             "  DEFAULT CHARACTER SET utf8,"
             "  MODIFY title varchar(128) CHARACTER SET utf8 NULL,"

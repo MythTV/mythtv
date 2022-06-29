@@ -9,9 +9,9 @@
 #include "libmythbase/dbutil.h"
 #include "libmythbase/hardwareprofile.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythcoreutil.h"
 #include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtimezone.h"
@@ -75,7 +75,7 @@ V2ConnectionInfo* V2Myth::GetConnectionInfo( const QString  &sPin )
         throw( QString( "Not Authorized" ));
         //SB: UPnPResult_ActionNotAuthorized );
 
-    DatabaseParams params = gCoreContext->GetDatabaseParams();
+    DatabaseParams params = GetMythDB()->GetDatabaseParams();
 
     // ----------------------------------------------------------------------
     // Check for DBHostName of "localhost" and change to public name or IP
