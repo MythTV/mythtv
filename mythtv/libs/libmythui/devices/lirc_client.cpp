@@ -36,11 +36,11 @@
 // clazy:excludeall=raw-environment-function
 
 /* internal defines */
-#define MAX_INCLUDES 10
-#define LIRC_READ 255
-#define LIRC_PACKET_SIZE 255
+static constexpr int8_t MAX_INCLUDES     {  10 };
+static constexpr size_t LIRC_READ        { 255 };
+static constexpr size_t LIRC_PACKET_SIZE { 255 };
 /* three seconds */
-#define LIRC_TIMEOUT 3
+static constexpr int8_t LIRC_TIMEOUT     {   3 };
 
 /* internal data structures */
 struct filestack_t {
@@ -1748,7 +1748,7 @@ static int lirc_code2char_internal(const struct lirc_state *state,
 	return(0);
 }
 
-#define PACKET_SIZE 100
+static constexpr size_t PACKET_SIZE { 100 };
 
 #if 0
 char *lirc_nextir(struct lirc_state *state)
@@ -1771,8 +1771,8 @@ char *lirc_nextir(struct lirc_state *state)
 
 int lirc_nextcode(struct lirc_state *state, char **code)
 {
-	static int s_packetSize=PACKET_SIZE;
-	static int s_endLen=0;
+	static size_t s_packetSize=PACKET_SIZE;
+	static size_t s_endLen=0;
 	char *end = nullptr;
 
 	*code=nullptr;
@@ -1874,7 +1874,7 @@ const char *lirc_setmode(const struct lirc_state *state, struct lirc_config *con
 		if(snprintf(cmd.data(), LIRC_PACKET_SIZE, "SETMODE%s%s\n",
 			    mode ? " ":"",
 			    mode ? mode:"")
-		   >= LIRC_PACKET_SIZE)
+		   >= static_cast<int>(LIRC_PACKET_SIZE))
 		{
 			return nullptr;
 		}
