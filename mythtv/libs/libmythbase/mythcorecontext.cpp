@@ -53,7 +53,6 @@
 #define LOC      QString("MythCoreContext::%1(): ").arg(__func__)
 
 MythCoreContext *gCoreContext = nullptr;
-Configuration *MythCoreContext::g_pConfig {nullptr};
 
 class MythCoreContextPrivate : public QObject
 {
@@ -1806,21 +1805,11 @@ void MythCoreContext::ResetSockets(void)
     dispatch(MythEvent("BACKEND_SOCKETS_CLOSED"));
 }
 
-void MythCoreContext::SetConfiguration( Configuration *pConfig )
+XmlConfiguration *MythCoreContext::GetConfiguration()
 {
-    delete g_pConfig;
-    g_pConfig = pConfig;
-}
+    static auto config = XmlConfiguration("config.xml");
 
-Configuration *MythCoreContext::GetConfiguration()
-{
-    // If someone is asking for a config and it's nullptr, create a
-    // new XmlConfiguration since we don't have database info yet.
-
-    if (g_pConfig == nullptr)
-        g_pConfig = new XmlConfiguration( "config.xml" );
-
-    return g_pConfig;
+    return &config;
 }
 
 void MythCoreContext::InitPower(bool Create)

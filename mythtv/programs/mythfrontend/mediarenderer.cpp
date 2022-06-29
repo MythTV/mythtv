@@ -48,16 +48,6 @@ MediaRenderer::MediaRenderer()
 {
     LOG(VB_UPNP, LOG_INFO, "MediaRenderer(): Begin");
 
-    // ----------------------------------------------------------------------
-    // Initialize Configuration class (XML file for frontend)
-    // ----------------------------------------------------------------------
-
-    MythCoreContext::SetConfiguration( new XmlConfiguration( "config.xml" ));
-
-    // ----------------------------------------------------------------------
-    // Create mini HTTP Server
-    // ----------------------------------------------------------------------
-
     int nPort = MythCoreContext::GetConfiguration()->GetValue( "UPnP/MythFrontend/ServicePort", 6547 );
 
     auto *pHttpServer = new HttpServer();

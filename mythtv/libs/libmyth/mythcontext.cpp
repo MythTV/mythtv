@@ -116,7 +116,7 @@ class MythContextPrivate : public QObject
     DatabaseParams          m_dbParams;  ///< Current database host & WOL details
     QString                 m_dbHostCp;  ///< dbHostName backup
 
-    Configuration          *m_pConfig            {nullptr};
+    XmlConfiguration       *m_pConfig            {nullptr};
 
     bool                   m_disableeventpopup   {false};
 
