@@ -103,12 +103,12 @@ void TestLogging::test_verboseArgParse_kwd_data (void)
     QTest::addColumn<int>("expectedExit");
     QTest::addColumn<QString>("expectedOutput");
 
-    QTest::newRow("empty")     << ""          << GENERIC_EXIT_OK << "";
-    QTest::newRow("nextarg")   << "-x"        << GENERIC_EXIT_INVALID_CMDLINE << "Invalid or missing";
-    QTest::newRow("help")      << "help"      << GENERIC_EXIT_INVALID_CMDLINE << "Verbose debug levels";
-    QTest::newRow("important") << "important" << GENERIC_EXIT_OK << R"("important" log mask)";
-    QTest::newRow("extra")     << "extra"     << GENERIC_EXIT_OK << R"("extra" log mask)";
-    QTest::newRow("random")    << "random"    << GENERIC_EXIT_INVALID_CMDLINE << "Unknown argument";
+    QTest::newRow("empty")     << ""          << (int)GENERIC_EXIT_OK << "";
+    QTest::newRow("nextarg")   << "-x"        << (int)GENERIC_EXIT_INVALID_CMDLINE << "Invalid or missing";
+    QTest::newRow("help")      << "help"      << (int)GENERIC_EXIT_INVALID_CMDLINE << "Verbose debug levels";
+    QTest::newRow("important") << "important" << (int)GENERIC_EXIT_OK << R"("important" log mask)";
+    QTest::newRow("extra")     << "extra"     << (int)GENERIC_EXIT_OK << R"("extra" log mask)";
+    QTest::newRow("random")    << "random"    << (int)GENERIC_EXIT_INVALID_CMDLINE << "Unknown argument";
 }
 
 void TestLogging::test_verboseArgParse_kwd (void)
@@ -145,8 +145,8 @@ void TestLogging::test_verboseArgParse_twice (void)
     std::cerr.rdbuf(oldCoutBuffer);
 
     // Check results
-    QCOMPARE(GENERIC_EXIT_OK, actualExit1);
-    QCOMPARE(GENERIC_EXIT_INVALID_CMDLINE, actualExit2);
+    QCOMPARE((int)GENERIC_EXIT_OK, actualExit1);
+    QCOMPARE((int)GENERIC_EXIT_INVALID_CMDLINE, actualExit2);
     QString actualOutput = QString::fromStdString(buffer.str());
     QVERIFY(actualOutput.contains("-v general,system,socket"));
 }
@@ -191,7 +191,7 @@ void TestLogging::test_verboseArgParse_class (void)
     std::cerr.rdbuf(oldCoutBuffer);
 
     // Check results
-    QCOMPARE(GENERIC_EXIT_OK, actualExit);
+    QCOMPARE((int)GENERIC_EXIT_OK, actualExit);
     QString actualOutput = QString::fromStdString(buffer.str());
     QVERIFY(actualOutput.isEmpty());
     QCOMPARE(verboseMask, expectedVMask);
@@ -254,7 +254,7 @@ void TestLogging::test_verboseArgParse_level (void)
     std::cerr.rdbuf(oldCoutBuffer);
 
     // Check results
-    QCOMPARE(GENERIC_EXIT_OK, actualExit);
+    QCOMPARE((int)GENERIC_EXIT_OK, actualExit);
     QString actualOutput = QString::fromStdString(buffer.str());
     QVERIFY(actualOutput.isEmpty());
     QCOMPARE(verboseMask, expectedVMask);
@@ -336,7 +336,7 @@ void TestLogging::test_logPropagateCalc (void)
     std::cerr.rdbuf(oldCoutBuffer);
 
     // Check results
-    QCOMPARE(GENERIC_EXIT_OK, actualExit);
+    QCOMPARE((int)GENERIC_EXIT_OK, actualExit);
     QString actualOutput = QString::fromStdString(buffer.str());
     QVERIFY(actualOutput.isEmpty());
 
