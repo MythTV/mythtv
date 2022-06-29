@@ -117,10 +117,12 @@ class Dsmcc
     unsigned short m_startTag {0};
 };
 
-#define COMBINE32(data, idx) \
-    ((((unsigned)((data)[(idx) + 0])) << 24) |  \
-     (((unsigned)((data)[(idx) + 1])) << 16) |  \
-     (((unsigned)((data)[(idx) + 2])) << 8) |   \
-     (((unsigned)((data)[(idx) + 3]))))
+static constexpr uint32_t COMBINE32(const uint8_t *data, int idx)
+{
+    return (static_cast<uint32_t>(data[idx + 0]) << 24) |
+           (static_cast<uint32_t>(data[idx + 1]) << 16) |
+           (static_cast<uint32_t>(data[idx + 2]) <<  8) |
+           (static_cast<uint32_t>(data[idx + 3]));
+};
 
 #endif
