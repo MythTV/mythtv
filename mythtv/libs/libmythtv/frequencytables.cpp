@@ -314,6 +314,21 @@ int get_closest_freqid(
 }
 
 
+//NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define FREQ(A,B, C,D, E,F,G, H, I)               \
+    fmap[QString("atsc_%1_us%2").arg(A,B)] =      \
+        new FrequencyTable((C)+(D), E, F, G, H, I);
+
+// The maximum channel defined in the US frequency tables (standard, HRC, IRC)
+static constexpr uint8_t US_MAX_CHAN { 158 };
+// Equation for computing EIA-542 frequency of channels > 99
+static constexpr uint64_t EIA_542_FREQUENCY(uint64_t bandwidth,
+                                            uint64_t offset,
+                                            uint64_t channel)
+{ return (bandwidth * (8 + channel)) + offset;}
+static_assert(EIA_542_FREQUENCY(6000000, 3000000, US_MAX_CHAN) == 999000000);
+static_assert(EIA_542_FREQUENCY(6000300, 1750000, US_MAX_CHAN) == 997799800);
+
 static void init_freq_tables(freq_table_map_t &fmap)
 {
     // United Kingdom
@@ -594,16 +609,6 @@ static void init_freq_tables(freq_table_map_t &fmap)
                          DTVModulation::kModulationQAM64, };
     const std::array<const QString,4> desc {
         "ATSC ", "QAM-256 ", "QAM-128 ", "QAM-64 ", };
-
-#define FREQ(A,B, C,D, E,F,G, H, I) \
-    fmap[QString("atsc_%1_us%2").arg(A,B)] =      \
-        new FrequencyTable((C)+(D), E, F, G, H, I);
-
-// The maximum channel defined in the US frequency tables (standard, HRC, IRC)
-#define US_MAX_CHAN 158
-// Equation for computing EIA-542 frequency of channels > 99
-// A = bandwidth, B = offset, C = channel designation (number)
-#define EIA_542_FREQUENCY(A,B,C) ( ( (A) * ( 8 + (C) ) ) + (B) )
 
     for (uint i = 0; i < 4; i++)
     {
