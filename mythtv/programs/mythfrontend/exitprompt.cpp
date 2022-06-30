@@ -27,7 +27,7 @@ ExitPrompter::ExitPrompter()
 ExitPrompter::~ExitPrompter()
 {
     // Ensure additional actions are not processed after we are deleted
-    if (m_dialog)
+    if (m_dialog && GetMythMainWindow()->GetStack("popup stack")->GetTopScreen() == m_dialog)
         m_dialog->SetReturnEvent(nullptr, QString());
 
     if (m_power)
