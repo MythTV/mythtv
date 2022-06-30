@@ -528,7 +528,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     uint              m_vbimode {VBIMode::None};
     uint              m_switchToInputId {0};
 
-    /// True if the user told MythTV to stop plaback. If this is false
+    /// True if the user told MythTV to stop playback. If this is false
     /// when we exit the player, we display an error screen.
     mutable bool      m_wantsToQuit {true};
     bool              m_stretchAdjustment {false}; ///< True if time stretch is turned on
@@ -543,6 +543,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     bool              m_doSmartForward {false};
     bool              m_queuedTranscode {false};
     bool              m_savePosOnExit {false};  ///< False until first timer event
+    bool              m_clearPosOnExit {false}; ///< False unless requested by user on playback exit
     /// Picture attribute type to modify.
     PictureAdjustType m_adjustingPicture {kAdjustingPicture_None};
     /// Picture attribute to modify (on arrow left or right)
