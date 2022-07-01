@@ -526,14 +526,14 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     m_dbParams.LoadDefaults();
 
     m_dbParams.m_localHostName  = config.GetValue("LocalHostName", "");
-    m_dbParams.m_dbHostPing     = config.GetBoolValue(kDefaultDB + "PingHost", true);
+    m_dbParams.m_dbHostPing     = config.GetValue(kDefaultDB + "PingHost", true);
     m_dbParams.m_dbHostName     = config.GetValue(kDefaultDB + "Host", "");
     m_dbParams.m_dbUserName     = config.GetValue(kDefaultDB + "UserName", "");
     m_dbParams.m_dbPassword     = config.GetValue(kDefaultDB + "Password", "");
     m_dbParams.m_dbName         = config.GetValue(kDefaultDB + "DatabaseName", "");
     m_dbParams.m_dbPort         = config.GetValue(kDefaultDB + "Port", 0);
 
-    m_dbParams.m_wolEnabled     = config.GetBoolValue(kDefaultWOL + "Enabled", false);
+    m_dbParams.m_wolEnabled     = config.GetValue(kDefaultWOL + "Enabled", false);
     m_dbParams.m_wolReconnect   =
         config.GetDuration<std::chrono::seconds>(kDefaultWOL + "SQLReconnectWaitTime", 0s);
     m_dbParams.m_wolRetry       = config.GetValue(kDefaultWOL + "SQLConnectRetry", 5);
@@ -635,7 +635,7 @@ bool MythContextPrivate::SaveDatabaseParams(
 
         config.SetValue("LocalHostName", params.m_localHostName);
 
-        config.SetBoolValue(kDefaultDB + "PingHost", params.m_dbHostPing);
+        config.SetValue(kDefaultDB + "PingHost", params.m_dbHostPing);
 
         // If dbHostName is an IPV6 address with scope,
         // remove the scope. Unescaped % signs are an
@@ -653,7 +653,7 @@ bool MythContextPrivate::SaveDatabaseParams(
         config.SetValue(kDefaultDB + "DatabaseName", params.m_dbName);
         config.SetValue(kDefaultDB + "Port",     params.m_dbPort);
 
-        config.SetBoolValue(kDefaultWOL + "Enabled", params.m_wolEnabled);
+        config.SetValue(kDefaultWOL + "Enabled", params.m_wolEnabled);
         config.SetDuration(
             kDefaultWOL + "SQLReconnectWaitTime", params.m_wolReconnect);
         config.SetValue(kDefaultWOL + "SQLConnectRetry", params.m_wolRetry);
