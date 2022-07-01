@@ -103,34 +103,38 @@ bool XmlConfiguration::Save()
     fsync(file.handle());
     file.close();
 
-    bool ok = true;
+    bool success = true;
     if (QFile::exists(pathName))
     {
-        ok = QFile::rename(pathName, old);
+        if (QFile::exists(old) && !QFile::remove(old)) // if true, rename will fail
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to remove '%1', cannot backup current settings").arg(old));
+        }
+        success = QFile::rename(pathName, old); // backup old settings in case it fails
     }
 
-    if (ok)
+    if (success) // no settings to overwrite or settings backed up successfully
     {
-        ok = file.rename(pathName);
-        if (ok)
+        success = file.rename(pathName); // move new settings into target location
+        if (success)
         {
-            if (!QFile::remove(old))
+            if (QFile::exists(old) && !QFile::remove(old))
             {
                 LOG(VB_GENERAL, LOG_WARNING, QString("Failed to remove '%1'").arg(old));
             }
         }
-        else if (QFile::exists(old) && !QFile::rename(old, pathName))
+        else if (QFile::exists(old) && !QFile::rename(old, pathName)) // !success &&
         {
-            LOG(VB_GENERAL, LOG_WARNING, QString("Failed to rename '%1").arg(old));
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to rename (restore) '%1").arg(old));
         }
     }
 
-    if (!ok)
+    if (!success)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Could not save settings file %1").arg(pathName));
     }
 
-    return ok;
+    return success;
 }
 
 QDomNode XmlConfiguration::FindNode(const QString &setting, bool create)
@@ -172,59 +176,16 @@ QDomNode XmlConfiguration::FindNode(QStringList &path, QDomNode &current, bool c
     return FindNode(path, child, create);
 }
 
-int XmlConfiguration::GetValue(const QString &setting, int defaultValue)
+QString XmlConfiguration::GetValue(const QString &setting)
 {
     QDomNode node = FindNode(setting, false);
-
-    if (!node.isNull())
+    QDomText textNode;
+    // -=>TODO: This Always assumes firstChild is a Text Node... should change
+    if (!node.isNull() && !(textNode = node.firstChild().toText()).isNull())
     {
-        // -=>TODO: This Always assumes firstChild is a Text Node... should change
-        QDomText textNode = node.firstChild().toText();
-
-        if (!textNode.isNull())
-            return textNode.nodeValue().toInt();
+        return textNode.nodeValue();
     }
-
-    return defaultValue;
-}
-
-QString XmlConfiguration::GetValue(const QString &setting, const QString &defaultValue)
-{
-    QDomNode node = FindNode(setting, false);
-
-    if (!node.isNull())
-    {
-        // -=>TODO: This Always assumes firstChild is a Text Node... should change
-        QDomText textNode = node.firstChild().toText();
-
-        if (!textNode.isNull())
-            return textNode.nodeValue();
-    }
-
-    return defaultValue;
-}
-
-void XmlConfiguration::SetValue(const QString &setting, int value)
-{
-    QString  sValue = QString::number(value);
-    QDomNode node   = FindNode(setting, true);
-
-    if (!node.isNull())
-    {
-        QDomText textNode;
-
-        if (node.hasChildNodes())
-        {
-            // -=>TODO: This Always assumes only child is a Text Node... should change
-            textNode = node.firstChild().toText();
-            textNode.setNodeValue(sValue);
-        }
-        else
-        {
-            textNode = m_config.createTextNode(sValue);
-            node.appendChild(textNode);
-        }
-    }
+    return QString();
 }
 
 void XmlConfiguration::SetValue(const QString &setting, const QString& value)

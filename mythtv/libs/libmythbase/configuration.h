@@ -17,6 +17,8 @@
 
 #include <QDomDocument>
 #include <QStringList>
+#include <QVariant>
+
 #include "libmythbase/mythbaseexp.h"
 #include "libmythbase/mythchrono.h"
 #include "libmythbase/mythdirs.h"
@@ -44,6 +46,8 @@ class MBASE_PUBLIC XmlConfiguration
     QDomNode FindNode(const QString &name, bool create);
     QDomNode FindNode(QStringList &path, QDomNode &current, bool create);
 
+    QString GetValue(const QString &setting);
+
   public:
 
     static constexpr auto k_default_filename = "config.xml";
@@ -58,16 +62,48 @@ class MBASE_PUBLIC XmlConfiguration
     bool Load();
     bool Save();
 
-    int     GetValue(const QString &setting, int defaultValue);
-    QString GetValue(const QString &setting, const QString &defaultValue);
-    bool    GetBoolValue(const QString &setting, bool defaultValue)
-        {return static_cast<bool>(GetValue(setting, static_cast<int>(defaultValue)));}
+    bool GetValue(const QString &setting, const bool defaultValue)
+    {
+        QString value = GetValue(setting);
+        return (!value.isNull()) ? QVariant(value).toBool() : defaultValue;
+    }
+    int  GetValue(const QString &setting, const int defaultValue)
+    {
+        QString value = GetValue(setting);
+        return (!value.isNull()) ? QVariant(value).toInt()  : defaultValue;
+    }
+    QString GetValue(const QString &setting, const QString &defaultValue)
+    {
+        QString value = GetValue(setting);
+        return (!value.isNull()) ? value : defaultValue;
+    }
+    /** @brief get the string value stored as setting with a default C string.
+    This fixes overload resolution, making it choose this instead of the bool one.
+    */
+    QString GetValue(const QString &setting, const char* defaultValue)
+    {
+        QString value = GetValue(setting);
+        return (!value.isNull()) ? value : QString(defaultValue);
+    }
 
-    void    SetValue(const QString &setting, int value);
+    void SetValue(const QString &setting, bool value)
+    {
+        SetValue(setting, QVariant(value).toString());
+    }
+    void SetValue(const QString &setting, int  value)
+    {
+        SetValue(setting, QVariant(value).toString());
+    }
+    /** @brief set value to a C string; just in case, for overload resolution
+    @note: This should probably never be used since the C string should have already
+           been converted to a QString.
+    */
+    void SetValue(const QString &setting, const char* value)
+    {
+        SetValue(setting, QString(value));
+    }
     void    SetValue(const QString &setting, const QString &value);
     void    ClearValue(const QString &setting);
-    void    SetBoolValue(const QString &setting, bool value)
-        {SetValue(setting, static_cast<int>(value));}
 
     template <typename T>
     typename std::enable_if_t<std::chrono::__is_duration<T>::value, T>
