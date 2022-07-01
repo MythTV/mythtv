@@ -16,6 +16,8 @@
 #include <utility>
 
 #include <QDomDocument>
+#include <QDomNode>
+#include <QString>
 #include <QStringList>
 #include <QVariant>
 
