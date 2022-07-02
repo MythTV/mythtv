@@ -759,15 +759,12 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
     }
 
     bool frameFinished = false;
-    int frameCount = 0;
     bool gotKeyFrame = false;
 
     while (av_read_frame(m_inputFC, pkt) >= 0 && !frameFinished)
     {
         if (pkt->stream_index == m_videostream)
         {
-            frameCount++;
-
             int keyFrame = pkt->flags & AV_PKT_FLAG_KEY;
 
             if (m_startPTS == -1 && pkt->dts != AV_NOPTS_VALUE)
