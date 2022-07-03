@@ -48,21 +48,27 @@ inline QString dvb_decode_text(const unsigned char *src, uint length)
 
 QString dvb_decode_short_name(const unsigned char *src, uint raw_length);
 
-#define byteBCDH2int(i) ((i) >> 4)
-#define byteBCDL2int(i) ((i) & 0x0f)
-#define byteBCD2int(i) (byteBCDH2int(i) * 10 + byteBCDL2int(i))
-#define byte2BCD2int(i, j) \
-  (byteBCDH2int(i) * 1000     + byteBCDL2int(i) * 100       + \
-   byteBCDH2int(j) * 10       + byteBCDL2int(j))
-#define byte3BCD2int(i, j, k) \
-  (byteBCDH2int(i) * 100000   + byteBCDL2int(i) * 10000     + \
-   byteBCDH2int(j) * 1000     + byteBCDL2int(j) * 100       + \
-   byteBCDH2int(k) * 10       + byteBCDL2int(k))
-#define byte4BCD2int(i, j, k, l) \
-  (byteBCDH2int(i) * 10000000LL + byteBCDL2int(i) * 1000000 + \
-   byteBCDH2int(j) * 100000     + byteBCDL2int(j) * 10000   + \
-   byteBCDH2int(k) * 1000       + byteBCDL2int(k) * 100     + \
-   byteBCDH2int(l) * 10         + byteBCDL2int(l))
+static constexpr uint8_t byteBCDH2int(uint8_t i) { return i >> 4; };
+static constexpr uint8_t byteBCDL2int(uint8_t i) { return i & 0x0f; };
+static constexpr uint8_t byteBCD2int(uint8_t i)
+{ return (byteBCDH2int(i) * 10) + byteBCDL2int(i); };
+static constexpr uint16_t byte2BCD2int(uint8_t i, uint8_t j)
+{ return (byteBCDH2int(i) * 1000     + byteBCDL2int(i) * 100       +
+          byteBCDH2int(j) * 10       + byteBCDL2int(j)); };
+static constexpr uint32_t byte3BCD2int(uint8_t i, uint8_t j, uint8_t k)
+{ return (byteBCDH2int(i) * 100000   + byteBCDL2int(i) * 10000     +
+          byteBCDH2int(j) * 1000     + byteBCDL2int(j) * 100       +
+          byteBCDH2int(k) * 10       + byteBCDL2int(k)); };
+static constexpr uint32_t byte4BCD2int(uint8_t i, uint8_t j, uint8_t k, uint8_t l)
+{ return (byteBCDH2int(i) * 10000000LL + byteBCDL2int(i) * 1000000 +
+          byteBCDH2int(j) * 100000     + byteBCDL2int(j) * 10000   +
+          byteBCDH2int(k) * 1000       + byteBCDL2int(k) * 100     +
+          byteBCDH2int(l) * 10         + byteBCDL2int(l)); };
+
+static_assert( byteBCD2int(0x98) == 98);
+static_assert(byte2BCD2int(0x98, 0x76) == 9876);
+static_assert(byte3BCD2int(0x98, 0x76, 0x54) == 987654);
+static_assert(byte4BCD2int(0x98, 0x76, 0x54, 0x32) == 98765432);
 
 // DVB Bluebook A038 (Sept 2011) p 77
 class NetworkNameDescriptor : public MPEGDescriptor
