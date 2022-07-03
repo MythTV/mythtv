@@ -10,9 +10,6 @@ class ProgramInfo;
 class RecordingInfo;
 
 using RecList = std::deque<RecordingInfo*>;
-#define SORT_RECLIST(LIST, ORDER) \
-  do { std::stable_sort((LIST).begin(), (LIST).end(), ORDER); } while (false)
-
 using RecConstIter = RecList::const_iterator;
 using RecIter = RecList::iterator;
 
