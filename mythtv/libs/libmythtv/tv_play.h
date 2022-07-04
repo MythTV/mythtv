@@ -421,6 +421,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     void UpdateOSDSignal(const QStringList &List);
     void UpdateOSDTimeoutMessage();
     bool CalcPlayerSliderPosition(osdInfo &info, bool paddedFields = false) const;
+    void HideOSDWindow(const char *window);
 
     // Captions/subtitles
     bool SubtitleZoomHandleAction(const QStringList& Actions);

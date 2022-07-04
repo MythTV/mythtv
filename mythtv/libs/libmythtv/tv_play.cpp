@@ -81,12 +81,6 @@
 
 #define LOC      QString("TV::%1(): ").arg(__func__)
 
-#define HideOSDWindow(WINDOW) { \
-    OSD *osd = GetOSDL(); \
-    if (osd) \
-        osd->HideWindow(WINDOW); \
-    ReturnOSDLock(); }
-
 /**
  * \brief If any cards are configured, return the number.
  */
@@ -5703,7 +5697,7 @@ QString TV::GetQueuedChanNum() const
 void TV::ClearInputQueues(bool Hideosd)
 {
     if (Hideosd)
-        HideOSDWindow(OSD_WIN_INPUT)
+        HideOSDWindow(OSD_WIN_INPUT);
 
     m_queuedInput   = "";
     m_queuedChanNum = "";
@@ -5869,7 +5863,7 @@ bool TV::CommitQueuedInput()
             if (chanid)
                 BrowseChannel(channum);
 
-            HideOSDWindow(OSD_WIN_INPUT)
+            HideOSDWindow(OSD_WIN_INPUT);
         }
         else if (GetQueuedChanID() || !channum.isEmpty())
         {
@@ -5924,7 +5918,7 @@ void TV::ChangeChannel(ChannelChangeDirection Direction)
 
     if (ContextIsPaused(__FILE__, __LINE__))
     {
-        HideOSDWindow(OSD_WIN_STATUS)
+        HideOSDWindow(OSD_WIN_STATUS);
         MythMainWindow::DisableScreensaver();
     }
 
@@ -6087,7 +6081,7 @@ void TV::ChangeChannel(uint Chanid, const QString &Channum)
 
     if (ContextIsPaused(__FILE__, __LINE__))
     {
-        HideOSDWindow(OSD_WIN_STATUS)
+        HideOSDWindow(OSD_WIN_STATUS);
         MythMainWindow::DisableScreensaver();
     }
 
@@ -6126,7 +6120,7 @@ void TV::ChangeChannel(const ChannelInfoList &Options)
         if (chanid && !channum.isEmpty() && IsTunablePriv(chanid))
         {
             // hide the channel number, activated by certain signal monitors
-            HideOSDWindow(OSD_WIN_INPUT)
+            HideOSDWindow(OSD_WIN_INPUT);
             m_queuedInput   = channum;
             m_queuedChanNum = channum;
             m_queuedChanID  = chanid;
@@ -6173,7 +6167,7 @@ void TV::PopPreviousChannel(bool ImmediateChange)
     if (ImmediateChange)
     {
         // Turn off OSD Channel Num so the channel changes right away
-        HideOSDWindow(OSD_WIN_INPUT)
+        HideOSDWindow(OSD_WIN_INPUT);
     }
 }
 
@@ -6552,6 +6546,14 @@ bool TV::CalcPlayerSliderPosition(osdInfo &info, bool paddedFields) const
     }
     ReturnPlayerLock();
     return result;
+}
+
+void TV::HideOSDWindow(const char *window)
+{
+    OSD *osd = GetOSDL();
+    if (osd)
+        osd->HideWindow(window);
+    ReturnOSDLock();
 }
 
 void TV::UpdateLCD()
@@ -8184,7 +8186,7 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
 
                 // Turn off OSD Channel Num so the channel
                 // changes right away
-                HideOSDWindow(OSD_WIN_INPUT)
+                HideOSDWindow(OSD_WIN_INPUT);
             }
         }
     }
