@@ -10,7 +10,8 @@ extern "C" {
 #include "libavutil/mastering_display_metadata.h"
 }
 
-#define UINT16(X) static_cast<uint16_t>(std::round(X))
+static inline uint16_t UINT16(double x)
+{ return static_cast<uint16_t>(std::round(x)); }
 
 /*! \class MythHDRVideoMetadata
  *  \brief A wrapper around static HDR metadata.
