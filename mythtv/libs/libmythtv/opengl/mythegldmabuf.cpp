@@ -239,16 +239,23 @@ inline std::vector<MythVideoTextureOpenGL*> MythEGLDMABUF::CreateSeparate(AVDRMF
 }
 
 #ifndef DRM_FORMAT_R8
-#define MKTAG2(a,b,c,d) ((a) | ((b) << 8) | ((c) << 16) | (static_cast<unsigned>(d) << 24))
-#define DRM_FORMAT_R8     MKTAG2('R', '8', ' ', ' ')
-#define DRM_FORMAT_GR88   MKTAG2('G', 'R', '8', '8')
-#define DRM_FORMAT_R16    MKTAG2('R', '1', '6', ' ')
-#define DRM_FORMAT_GR32   MKTAG2('G', 'R', '3', '2')
-#define DRM_FORMAT_NV12	  MKTAG2('N', 'V', '1', '2')
-#define DRM_FORMAT_NV21   MKTAG2('N', 'V', '2', '1')
-#define DRM_FORMAT_YUV420 MKTAG2('Y', 'U', '1', '2')
-#define DRM_FORMAT_YVU420 MKTAG2('Y', 'V', '1', '2')
-#define DRM_FORMAT_P010   MKTAG2('P', '0', '1', '0')
+static constexpr uint32_t MKTAG2(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+{ return ((static_cast<uint32_t>(a)      ) |
+          (static_cast<uint32_t>(b) <<  8) |
+          (static_cast<uint32_t>(c) << 16) |
+          (static_cast<uint32_t>(d) << 24)); }
+static constexpr uint32_t DRM_FORMAT_R8     { MKTAG2('R', '8', ' ', ' ') };
+static constexpr uint32_t DRM_FORMAT_GR88   { MKTAG2('G', 'R', '8', '8') };
+static constexpr uint32_t DRM_FORMAT_R16    { MKTAG2('R', '1', '6', ' ') };
+static constexpr uint32_t DRM_FORMAT_GR32   { MKTAG2('G', 'R', '3', '2') };
+static constexpr uint32_t DRM_FORMAT_NV12   { MKTAG2('N', 'V', '1', '2') };
+static constexpr uint32_t DRM_FORMAT_NV21   { MKTAG2('N', 'V', '2', '1') };
+static constexpr uint32_t DRM_FORMAT_YUV420 { MKTAG2('Y', 'U', '1', '2') };
+static constexpr uint32_t DRM_FORMAT_YVU420 { MKTAG2('Y', 'V', '1', '2') };
+static constexpr uint32_t DRM_FORMAT_P010   { MKTAG2('P', '0', '1', '0') };
+static_assert(DRM_FORMAT_GR88   == 0x38385247);
+static_assert(DRM_FORMAT_YUV420 == 0x32315559);
+static_assert(DRM_FORMAT_YVU420 == 0x32315659);
 #endif
 
 /*! \brief Create multiple textures that represent the planes for the given AVDRMFrameDescriptor
