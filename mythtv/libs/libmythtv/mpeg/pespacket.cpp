@@ -121,7 +121,6 @@ bool PESPacket::AddTSPacket(const TSPacket* packet, int cardid, bool &broken)
  */
 void PESPacket::GetAsTSPackets(std::vector<TSPacket> &output, uint cc) const
 {
-#define INCR_CC(_CC_) do { (_CC_) = ((_CC_) + 1) & 0xf; } while (false)
     uint last_byte_of_pesdata = Length() + 4 - 1;
     uint size = last_byte_of_pesdata + m_pesData - m_fullBuffer;
 
@@ -148,7 +147,7 @@ void PESPacket::GetAsTSPackets(std::vector<TSPacket> &output, uint cc) const
     size -= TSPacket::kSize;
     while (size > 0)
     {
-        INCR_CC(cc);
+        cc = (cc + 1) & 0xF;
         header.SetContinuityCounter(cc);
         output.resize(output.size()+1);
         output[output.size()-1].InitHeader(header.data());
@@ -157,7 +156,6 @@ void PESPacket::GetAsTSPackets(std::vector<TSPacket> &output, uint cc) const
         data += write_size;
         size -= write_size;
     }
-#undef INCR_CC
 }
 
 uint PESPacket::CalcCRC(void) const
