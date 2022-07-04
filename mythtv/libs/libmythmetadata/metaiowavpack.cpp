@@ -1,5 +1,7 @@
 #include <cmath>
 
+#include <QtGlobal> // before taglib includes
+
 #include <apetag.h>
 #include <apeitem.h>
 
