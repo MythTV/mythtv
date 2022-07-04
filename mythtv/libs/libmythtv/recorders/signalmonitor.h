@@ -25,9 +25,6 @@
 #include "signalmonitorlistener.h"
 #include "signalmonitorvalue.h"
 
-#define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_DEBUG, \
-    QString("SM(%1)::%2: %3") .arg(channel->GetDevice()).arg(FUNC).arg(<(MSG)));
-
 inline QString sm_flags_to_string(uint64_t flags);
 
 class TVRec;

@@ -66,7 +66,6 @@ extern "C" {
 #include "ExternalSignalMonitor.h"
 #include "ExternalChannel.h"
 
-#undef DBG_SM
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_DEBUG, \
     QString("SigMon[%1](%2)::%3: %4").arg(m_inputid) \
                               .arg(m_channel->GetDevice(), FUNC, MSG))

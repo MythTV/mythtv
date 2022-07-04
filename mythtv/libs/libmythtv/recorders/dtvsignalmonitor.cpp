@@ -10,7 +10,6 @@
 #include "mpeg/mpegtables.h"
 #include "mpeg/scanstreamdata.h"
 
-#undef DBG_SM
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_INFO, \
     QString("DTVSigMon[%1]: %2 %3").arg(m_inputid).arg(FUNC, MSG))
 
