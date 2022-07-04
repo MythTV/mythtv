@@ -29,17 +29,7 @@
 #include "RTjpegN.h"
 
 #include <QtGlobal>
-#if (Q_BYTE_ORDER == Q_BIG_ENDIAN)
-#define RTJPEG_SWAP_WORD(a) ( ((a) << 24) | \
-			(((a) << 8) & 0x00ff0000) | \
-			(((a) >> 8) & 0x0000ff00) | \
-			((unsigned long)(a) >>24) )
-#define RTJPEG_SWAP_HALFWORD(a) ( (((a) << 8) & 0xff00) | \
-			(((a) >> 8) & 0x00ff) )
-#else
-#define RTJPEG_SWAP_WORD(a) (a)
-#define RTJPEG_SWAP_HALFWORD(a) (a)
-#endif
+#include <QtEndian>
 
 #ifdef MMX
 static mmx_t RTjpeg_ones;
@@ -3308,11 +3298,11 @@ int RTjpeg::Compress(int8_t *sp, uint8_t **planes)
    m_keyCount = 0;
  }
  ds += RTJPEG_HEADER_SIZE;
- fh->framesize = RTJPEG_SWAP_WORD(ds);
+ fh->framesize = qToLittleEndian<qint32>(ds);
  fh->headersize = RTJPEG_HEADER_SIZE;
  fh->version = RTJPEG_FILE_VERSION;
- fh->width = RTJPEG_SWAP_HALFWORD(m_width);
- fh->height = RTJPEG_SWAP_HALFWORD(m_height);
+ fh->width = qToLittleEndian<qint16>(m_width);
+ fh->height = qToLittleEndian<qint16>(m_height);
  fh->quality = m_q;
  return ds;
 }
@@ -3321,11 +3311,11 @@ void RTjpeg::Decompress(int8_t *sp, uint8_t **planes)
 {
  auto * fh = reinterpret_cast<RTjpeg_frameheader *>(sp);
 
- if ((RTJPEG_SWAP_HALFWORD(fh->width) != m_width)||
-    (RTJPEG_SWAP_HALFWORD(fh->height) != m_height))
+ if ((qFromLittleEndian<qint16>(fh->width) != m_width)||
+    (qFromLittleEndian<qint16>(fh->height) != m_height))
  {
-  int w = RTJPEG_SWAP_HALFWORD(fh->width);
-  int h = RTJPEG_SWAP_HALFWORD(fh->height);
+  int w = qFromLittleEndian<qint16>(fh->width);
+  int h = qFromLittleEndian<qint16>(fh->height);
   SetSize(&w, &h);
  }
  if (fh->quality != m_q)
