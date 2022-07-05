@@ -36,10 +36,11 @@
 
 #define LOC QString("VideoBounds: ")
 
-#define SCALED_RECT(SRC, SCALE) QRect{ static_cast<int>((SRC).left()   * (SCALE)), \
-                                       static_cast<int>((SRC).top()    * (SCALE)), \
-                                       static_cast<int>((SRC).width()  * (SCALE)), \
-                                       static_cast<int>((SRC).height() * (SCALE)) }
+static inline QRect SCALED_RECT(QRect src, qreal scale)
+{ return {static_cast<int>(src.left()   * scale),
+          static_cast<int>(src.top()    * scale),
+          static_cast<int>(src.width()  * scale),
+          static_cast<int>(src.height() * scale) }; }
 
 static float fix_aspect(float raw);
 static float snap(float value, float snapto, float diff);
