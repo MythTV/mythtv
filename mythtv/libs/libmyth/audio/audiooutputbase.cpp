@@ -38,7 +38,6 @@
 #define RPOS (&m_audioBuffer[m_raud])
 #define ABUF (m_audioBuffer.data())
 #define STST soundtouch::SAMPLETYPE
-#define AOALIGN(x) (((long)&(x) + 15) & ~0xf);
 
 // 1,2,5 and 7 channels are currently valid for upmixing if required
 static constexpr int UPMIX_CHANNEL_MASK { (1<<1)|(1<<2)|(1<<5)|(1<<7) };
@@ -1647,9 +1646,8 @@ void AudioOutputBase::GetBufferStatus(uint &fill, uint &total)
  */
 void AudioOutputBase::OutputAudioLoop(void)
 {
-    auto *zeros        = new uchar[m_fragmentSize];
-    auto *fragment_buf = new uchar[m_fragmentSize + 16];
-    auto *fragment     = (uchar *)AOALIGN(fragment_buf[0]);
+    auto *zeros        = new(std::align_val_t(16)) uchar[m_fragmentSize];
+    auto *fragment     = new(std::align_val_t(16)) uchar[m_fragmentSize];
     memset(zeros, 0, m_fragmentSize);
 
     // to reduce startup latency, write silence in 8ms chunks
@@ -1727,7 +1725,7 @@ void AudioOutputBase::OutputAudioLoop(void)
     }
 
     delete[] zeros;
-    delete[] fragment_buf;
+    delete[] fragment;
     VBAUDIO("OutputAudioLoop: Stop Event");
     OutputEvent e(OutputEvent::Stopped);
     dispatch(e);
