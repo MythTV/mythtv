@@ -4,6 +4,7 @@
 
 from os import fdopen
 
+from lxml import html
 from xml.etree import ElementTree
 import re
 import sys
@@ -258,7 +259,11 @@ class Send(object):
                 reason = (ElementTree.fromstring(response.text)
                           .find('errorDescription').text)
             except ElementTree.ParseError:
-                reason = 'N/A'
+                try:
+                    doc = html.fromstring(response.text)
+                    reason = doc.text_content()
+                except:
+                    reason = 'N/A'
             raise RuntimeError('Unexpected status returned: {}: Reason: "{}" '
                                'URL was: {}'
                                .format(response.status_code,
