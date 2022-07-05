@@ -35,7 +35,8 @@
 class V2Capture : public MythHTTPService
 {
     Q_OBJECT
-    Q_CLASSINFO("Version",      "1.4")
+    Q_CLASSINFO("Version",      "1.5")
+    Q_CLASSINFO("RemoveAllCaptureCards", "methods=POST;name=bool")
     Q_CLASSINFO("RemoveCaptureCard",  "methods=POST;name=bool")
     Q_CLASSINFO("AddCaptureCard",     "methods=POST;name=int")
     Q_CLASSINFO("UpdateCaptureCard",  "methods=POST;name=bool")
@@ -56,6 +57,8 @@ class V2Capture : public MythHTTPService
                                                         const QString    &CardType  );
 
     static V2CaptureCard*       GetCaptureCard     ( int              CardId     );
+
+    static bool                 RemoveAllCaptureCards ( void );
 
     static bool                 RemoveCaptureCard  ( int              CardId     );
 

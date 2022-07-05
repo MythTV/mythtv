@@ -258,6 +258,11 @@ V2CaptureCard* V2Capture::GetCaptureCard( int nCardId )
 //
 /////////////////////////////////////////////////////////////////////////////
 
+bool V2Capture::RemoveAllCaptureCards( void )
+{
+    return CardUtil::DeleteAllInputs();
+}
+
 bool V2Capture::RemoveCaptureCard( int nCardId )
 {
     if ( nCardId < 1 )
