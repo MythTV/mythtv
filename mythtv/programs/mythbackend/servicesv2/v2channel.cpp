@@ -564,6 +564,13 @@ int  V2Channel::AddVideoSource( const QString &sSourceName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+bool V2Channel::RemoveAllVideoSources( void )
+{
+    bool bResult = SourceUtil::DeleteAllSources();
+
+    return bResult;
+}
+
 bool V2Channel::RemoveVideoSource( uint nSourceID )
 {
     bool bResult = SourceUtil::DeleteSource( nSourceID );

@@ -559,7 +559,7 @@ bool SourceUtil::DeleteSource(uint sourceid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythDB::DBError("Deleting inputs", query);
+        MythDB::DBError("Disassociate source inputs", query);
         return false;
     }
 

@@ -39,12 +39,13 @@
 class V2Channel : public MythHTTPService
 {
     Q_OBJECT
-    Q_CLASSINFO("Version",      "1.10")
+    Q_CLASSINFO("Version",      "1.11")
     Q_CLASSINFO("UpdateDBChannel",        "methods=POST;name=bool")
     Q_CLASSINFO("AddDBChannel",           "methods=POST;name=bool")
     Q_CLASSINFO("RemoveDBChannel",        "methods=POST;name=bool")
     Q_CLASSINFO("UpdateVideoSource",      "methods=POST;name=bool")
     Q_CLASSINFO("AddVideoSource",         "methods=POST;name=int")
+    Q_CLASSINFO("RemoveAllVideoSources",  "methods=POST;name=bool")
     Q_CLASSINFO("RemoveVideoSource",      "methods=POST;name=bool")
     Q_CLASSINFO("FetchChannelsFromSource","methods=GET,POST;name=int")
     Q_CLASSINFO("GetXMLTVIdList",         "methods=GET,POST,HEAD;name=StringList")
@@ -145,6 +146,7 @@ class V2Channel : public MythHTTPService
                                                            uint          ScanFrequency,
                                                            uint          LCNOffset );
 
+        static bool               RemoveAllVideoSources  ( void );
         static bool               RemoveVideoSource      ( uint SourceID );
 
         static V2LineupList*      GetDDLineupList        ( const QString &Source,
