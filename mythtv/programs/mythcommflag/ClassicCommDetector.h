@@ -89,6 +89,27 @@ class ClassicCommDetector : public CommDetectorBase
             int score;
         };
 
+        template <typename T>
+        QString FormatMsg(T first, const FrameBlock *fbp)
+        {
+            QString msgformat("%1 %2:%3 %4 %5 %6 %7 %8 %9 %10 %11 %12 %13 %14 %15");
+            return msgformat.arg(first, 5)
+                .arg((int)(fbp->start / m_fps) / 60, 3)
+                .arg((int)((fbp->start / m_fps )) % 60, 2, 10, QChar('0'))
+                .arg(fbp->start, 6)
+                .arg(fbp->end, 6)
+                .arg(fbp->frames, 6)
+                .arg(fbp->length, 7, 'f', 2)
+                .arg(fbp->bfCount, 3)
+                .arg(fbp->logoCount, 6)
+                .arg(fbp->ratingCount, 6)
+                .arg(fbp->scCount, 6)
+                .arg(fbp->scRate, 5, 'f', 2)
+                .arg(fbp->formatMatch, 6)
+                .arg(fbp->aspectMatch, 6)
+                .arg(fbp->score, 5);
+        }
+
         void ClearAllMaps(void);
         void GetBlankCommMap(frm_dir_map_t &comms);
         void GetBlankCommBreakMap(frm_dir_map_t &comms);
