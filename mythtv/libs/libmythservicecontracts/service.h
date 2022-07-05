@@ -64,6 +64,7 @@ class SERVICE_PUBLIC Service : public QObject
 
     public:
 
+        bool HAS_PARAM(const QString& p) const { return m_parsedParams.contains(p); }
         QList<QString> m_parsedParams; // lowercased
 };
 

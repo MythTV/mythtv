@@ -52,8 +52,6 @@
     (bindvar)[QString(":").append(api_param)] = val; \
     }
 
-#define HAS_PARAM(p) m_parsedParams.contains(p)
-
 const QStringList KnownServices = { "Capture", "Channel", "Content", \
                                     "Dvr",     "Guide",   "Music",   \
                                     "Myth",    "Video" };

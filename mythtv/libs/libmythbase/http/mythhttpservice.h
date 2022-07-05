@@ -33,6 +33,8 @@ class MBASE_PUBLIC MythHTTPService : public QObject
     QString m_name;
     MythHTTPMetaService* m_staticMetaService { nullptr };
     HTTPRequest2 m_request{nullptr};
+    bool HAS_PARAMv2(const QString& p)
+        { return m_request->m_queries.contains(p.toLower()); }
 };
 
 class MBASE_PUBLIC V2HttpRedirectException
