@@ -256,6 +256,8 @@ HistogramAnalyzer::setLogoState(TemplateFinder *finder)
     m_logoFinder = finder;
 }
 
+static constexpr int ROUNDUP(int a, int b) { return (a + b - 1) / b * b; }
+
 enum FrameAnalyzer::analyzeFrameResult
 HistogramAnalyzer::analyzeFrame(const MythVideoFrame *frame, long long frameno)
 {
@@ -275,7 +277,6 @@ HistogramAnalyzer::analyzeFrame(const MythVideoFrame *frame, long long frameno)
      */
     static constexpr int kRInc = 4;
     static constexpr int kCInc = 4;
-#define ROUNDUP(a,b)    (((a) + (b) - 1) / (b) * (b))
 
     int                 pgmwidth = 0;
     int                 pgmheight = 0;
