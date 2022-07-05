@@ -22,6 +22,7 @@
 
 */
 
+#include <algorithm>
 #include <array>
 #include <cstdio>
 #include <cstdlib>
@@ -578,14 +579,14 @@ void RTjpeg::Quant(RTjpegData16 &_block, RTjpegData32 &qtbl)
  * Perform the forward DCT on one block of samples.
  */
 #ifndef MMX
-#define FIX_0_382683433  ((int32_t)   98)               /* FIX(0.382683433) */
-#define FIX_0_541196100  ((int32_t)  139)               /* FIX(0.541196100) */
-#define FIX_0_707106781  ((int32_t)  181)               /* FIX(0.707106781) */
-#define FIX_1_306562965  ((int32_t)  334)               /* FIX(1.306562965) */
+static constexpr int32_t FIX_0_382683433  {  98 };      /* FIX(0.382683433) */
+static constexpr int32_t FIX_0_541196100  { 139 };      /* FIX(0.541196100) */
+static constexpr int32_t FIX_0_707106781  { 181 };      /* FIX(0.707106781) */
+static constexpr int32_t FIX_1_306562965  { 334 };      /* FIX(1.306562965) */
 
-#define DESCALE10(x) (int16_t)( ((x)+128) >> 8)
-#define DESCALE20(x)  (int16_t)(((x)+32768) >> 16)
-#define D_MULTIPLY(var,const)  ((int32_t) ((var) * (const)))
+static constexpr int16_t DESCALE10(int32_t x) { return static_cast<int16_t>((x+128) >> 8); };
+static constexpr int16_t DESCALE20(int32_t x) { return static_cast<int16_t>((x+32768) >> 16); };
+static constexpr int32_t D_MULTIPLY(int32_t var, int32_t constant) { return var * constant; };
 #endif
 
 void RTjpeg::DctInit()
@@ -1497,17 +1498,18 @@ void RTjpeg::DctY(uint8_t *idata, int rskip)
 #endif
 }
 
-#define FIX_1_082392200  ((int32_t)  277)               /* FIX(1.082392200) */
-#define FIX_1_414213562  ((int32_t)  362)               /* FIX(1.414213562) */
-#define FIX_1_847759065  ((int32_t)  473)               /* FIX(1.847759065) */
-#define FIX_2_613125930  ((int32_t)  669)               /* FIX(2.613125930) */
+static constexpr int32_t FIX_1_082392200  { 277 };      /* FIX(1.082392200) */
+static constexpr int32_t FIX_1_414213562  { 362 };      /* FIX(1.414213562) */
+static constexpr int32_t FIX_1_847759065  { 473 };      /* FIX(1.847759065) */
+static constexpr int32_t FIX_2_613125930  { 669 };      /* FIX(2.613125930) */
 
-#define DESCALE(x) (int16_t)( ((x)+4) >> 3)
+static constexpr int16_t DESCALE(int32_t x) { return static_cast<int16_t>((x+4) >> 3); };
 
 /* clip yuv to 16..235 (should be 16..240 for cr/cb but ... */
 
-#define RL(x) ((x)>235) ? 235 : (((x)<16) ? 16 : (x))
-#define MULTIPLY(var,const)  (((int32_t) ((var) * (const)) + 128)>>8)
+static inline int16_t RL(int32_t x) { return std::clamp(x, 16, 235); };
+static constexpr int32_t MULTIPLY(int32_t var, int32_t constant)
+    { return ((var * constant) + 128) >> 8; };
 
 void RTjpeg::IdctInit(void)
 {
