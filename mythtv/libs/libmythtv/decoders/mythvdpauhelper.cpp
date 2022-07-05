@@ -264,9 +264,11 @@ MythVDPAUHelper::MythVDPAUHelper(void)
 
     INIT_ST
     m_vdpGetErrorString = &DummyGetError;
-    XLOCK(m_display, status = vdp_device_create_x11(m_display->GetDisplay(),
-                                                    m_display->GetScreen(),
-                                                    &m_device, &m_vdpGetProcAddress));
+    m_display->Lock();
+    status = vdp_device_create_x11(m_display->GetDisplay(),
+                                   m_display->GetScreen(),
+                                   &m_device, &m_vdpGetProcAddress);
+    m_display->Unlock();
     CHECK_ST
     if (!ok)
     {

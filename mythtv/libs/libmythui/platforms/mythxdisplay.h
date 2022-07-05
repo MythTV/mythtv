@@ -16,8 +16,6 @@
 // X11
 #include <X11/Xlib.h>
 
-#define XLOCK(dpy, arg) { (dpy)->Lock(); arg; (dpy)->Unlock(); }
-
 class MUI_PUBLIC MythXDisplay
 {
   public:

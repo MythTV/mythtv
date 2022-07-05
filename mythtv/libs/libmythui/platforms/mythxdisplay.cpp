@@ -119,5 +119,7 @@ QSize MythXDisplay::GetDisplayDimensions(void)
 
 void MythXDisplay::Sync(bool Flush)
 {
-    XLOCK(this, XSync(m_disp, Flush))
+    Lock();
+    XSync(m_disp, Flush);
+    Unlock();
 }
