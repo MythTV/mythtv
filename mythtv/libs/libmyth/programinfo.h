@@ -462,9 +462,7 @@ class MPUBLIC ProgramInfo
     uint    GetSourceID(void)             const { return m_sourceId;     }
     uint    GetInputID(void)              const { return m_inputId;      }
     QString GetInputName(void)            const { return m_inputName;    }
-    QString GetShortInputName(void) const
-        { return m_inputName.isRightToLeft() ?
-                 m_inputName.left(2) : m_inputName.right(2); }
+    QString GetShortInputName(void) const;
     void    ClearInputName(void)          { m_inputName.clear(); }
 
     uint    GetFindID(void)               const { return m_findId;       }

@@ -1822,13 +1822,25 @@ bool CardUtil::IsUniqueDisplayName(const QString &name, uint exclude_inputid)
     if (name.isEmpty())
         return false;
 
+    qsizetype idx;
+    QString   matching;
+    bool      two;
+    if ((idx = name.indexOf('/')) >= 0)
+    {
+        matching = name.right(name.size() - idx -1);
+        two = false;
+    }
+    else
+    {
+        matching = name.right(2);
+        two = true;
+    }
+
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardid "
+    query.prepare("SELECT cardid, displayname "
                   "FROM capturecard "
                   "WHERE parentid = 0 "
-                  "      AND cardid <> :INPUTID "
-                  "      AND right(displayname, 2) = :NAME");
-    query.bindValue(":NAME", name.right(2));
+                  "      AND cardid <> :INPUTID ");
     query.bindValue(":INPUTID", exclude_inputid);
 
     if (!query.exec())
@@ -1837,8 +1849,19 @@ bool CardUtil::IsUniqueDisplayName(const QString &name, uint exclude_inputid)
         return false;
     }
 
-    // Any result means it's not unique.
-    return !query.next();
+    while (query.next())
+    {
+        QString dn = query.value(1).toString();
+        if (!two && (idx = dn.indexOf('/')) >= 0)
+        {
+            if (dn.right(dn.size() - idx - 1) == matching)
+                return false;
+        }
+        else if (dn.right(2) == matching.right(2))
+            return false;
+    }
+
+    return true;
 }
 
 uint CardUtil::GetSourceID(uint inputid)

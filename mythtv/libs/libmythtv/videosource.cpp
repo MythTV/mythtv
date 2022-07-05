@@ -1566,7 +1566,7 @@ QString HDHomeRunConfigurationGroup::GetDeviceCheckBoxes(void)
 {
     // Return a string listing each HDHomeRun device with its checbox
     // turned on.
-    QStringList devstrs;    
+    QStringList devstrs;
     QMap<QString, HDHomeRunDevice>::iterator dit;
     for (dit = m_deviceList.begin(); dit != m_deviceList.end(); ++dit)
     {
@@ -2849,7 +2849,8 @@ class InputDisplayName : public MythUITextEditSetting
         setHelpText(QObject::tr(
                         "This name is displayed on screen when Live TV begins "
                         "and in various other places.  Make sure the last two "
-                        "characters are unique for each input."));
+                        "characters are unique for each input or use a "
+                        "slash ('/') to designate the unique portion."));
     };
     void Load(void) override {
         MythUITextEditSetting::Load();
