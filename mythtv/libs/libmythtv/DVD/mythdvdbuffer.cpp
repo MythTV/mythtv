@@ -4,6 +4,7 @@
 
 // Qt
 #include <QCoreApplication>
+#include <QtEndian>
 
 // MythTV
 #include "libmyth/mythcontext.h"
@@ -1454,8 +1455,6 @@ QRect MythDVDBuffer::GetButtonCoords(void)
 bool MythDVDBuffer::DecodeSubtitles(AVSubtitle *Subtitle, int *GotSubtitles,
                                     const uint8_t *SpuPkt, int BufSize, uint32_t StartTime)
 {
-    #define GETBE16(p) (((p)[0] << 8) | (p)[1])
-
     AlphaArray   alpha   {0, 0, 0, 0};
     PaletteArray palette {0, 0, 0, 0};
 
@@ -1471,13 +1470,13 @@ bool MythDVDBuffer::DecodeSubtitles(AVSubtitle *Subtitle, int *GotSubtitles,
     Subtitle->start_display_time = StartTime;
     Subtitle->end_display_time = StartTime;
 
-    int cmd_pos = GETBE16(SpuPkt + 2);
+    int cmd_pos = qFromBigEndian<qint16>(SpuPkt + 2);
     while ((cmd_pos + 4) < BufSize)
     {
         int offset1 = -1;
         int offset2 = -1;
-        int date = GETBE16(SpuPkt + cmd_pos);
-        int next_cmd_pos = GETBE16(SpuPkt + cmd_pos + 2);
+        int date = qFromBigEndian<qint16>(SpuPkt + cmd_pos);
+        int next_cmd_pos = qFromBigEndian<qint16>(SpuPkt + cmd_pos + 2);
         int pos = cmd_pos + 4;
         int x1 = 0;
         int x2 = 0;
@@ -1535,8 +1534,8 @@ bool MythDVDBuffer::DecodeSubtitles(AVSubtitle *Subtitle, int *GotSubtitles,
                     {
                         if ((BufSize - pos) < 4)
                             goto fail;
-                        offset1 = GETBE16(SpuPkt + pos);
-                        offset2 = GETBE16(SpuPkt + pos + 2);
+                        offset1 = qFromBigEndian<qint16>(SpuPkt + pos);
+                        offset2 = qFromBigEndian<qint16>(SpuPkt + pos + 2);
                         pos +=4;
                     }
                     break;
@@ -1545,7 +1544,7 @@ bool MythDVDBuffer::DecodeSubtitles(AVSubtitle *Subtitle, int *GotSubtitles,
                         if ((BufSize - pos) < 2)
                             goto fail;
 
-                        pos += GETBE16(SpuPkt + pos);
+                        pos += qFromBigEndian<qint16>(SpuPkt + pos);
                     }
                     break;
                 case 0xff:
