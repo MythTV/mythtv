@@ -150,9 +150,104 @@ class V2CardType : public QObject
 
     private:
         Q_DISABLE_COPY(V2CardType);
-
 };
 
 Q_DECLARE_METATYPE(V2CardType*)
+
+class V2CaptureDevice : public QObject
+{
+    Q_OBJECT
+    Q_CLASSINFO( "Version"    , "1.0" );
+
+    SERVICE_PROPERTY2( QString    ,     CardType       )
+    SERVICE_PROPERTY2( QString    ,     SubType       )
+    SERVICE_PROPERTY2( QString    ,     VideoDevice       )
+    SERVICE_PROPERTY2( QString    ,     FrontendName    )
+    SERVICE_PROPERTY2( QStringList,     InputNames       )
+    SERVICE_PROPERTY2( QString    ,     DefaultInputName )
+    SERVICE_PROPERTY2( uint       ,     SignalTimeout     )
+    SERVICE_PROPERTY2( uint       ,     ChannelTimeout    )
+    SERVICE_PROPERTY2( uint       ,     TuningDelay    )
+
+    public:
+
+        Q_INVOKABLE V2CaptureDevice(QObject *parent = nullptr)
+            : QObject          ( parent ),
+              m_SignalTimeout  ( 1000   ),
+              m_ChannelTimeout ( 3000   ),
+              m_TuningDelay    (     0  )
+        {
+        }
+
+        // Copy is not needed
+        // void Copy( const V2CaptureDevice *src )
+        // {
+        //     m_CardType             = src->m_CardType;
+        //     m_VideoDevice          = src->m_VideoDevice   ;
+        //     m_FrontendName         = src->m_FrontendName  ;
+        //     m_InputName            = src->m_InputName     ;
+        //     m_SignalTimeout        = src->m_SignalTimeout ;
+        //     m_ChannelTimeout       = src->m_ChannelTimeout;
+        // }
+
+    private:
+        Q_DISABLE_COPY(V2CaptureDevice);
+};
+
+Q_DECLARE_METATYPE(V2CaptureDevice*)
+
+class V2DiseqcTree : public QObject
+{
+    Q_OBJECT
+    Q_CLASSINFO( "Version"    , "1.0" );
+
+    SERVICE_PROPERTY2( uint         ,   DiseqcId )
+    SERVICE_PROPERTY2( uint         ,   ParentId )
+    SERVICE_PROPERTY2( uint         ,   Ordinal )
+    SERVICE_PROPERTY2( QString      ,   Type )
+    SERVICE_PROPERTY2( QString      ,   SubType )
+    SERVICE_PROPERTY2( QString      ,   Description )
+    SERVICE_PROPERTY2( uint         ,   SwitchPorts )
+    SERVICE_PROPERTY2( float        ,   RotorHiSpeed )
+    SERVICE_PROPERTY2( float        ,   RotorLoSpeed )
+    SERVICE_PROPERTY2( QString      ,   RotorPositions )
+    SERVICE_PROPERTY2( int          ,   LnbLofSwitch )
+    SERVICE_PROPERTY2( int          ,   LnbLofHi )
+    SERVICE_PROPERTY2( int          ,   LnbLofLo )
+    SERVICE_PROPERTY2( int          ,   CmdRepeat )
+    SERVICE_PROPERTY2( int          ,   LnbPolInv )
+    SERVICE_PROPERTY2( int          ,   Address )
+    SERVICE_PROPERTY2( uint         ,   ScrUserband )
+    SERVICE_PROPERTY2( uint         ,   ScrFrequency )
+    SERVICE_PROPERTY2( int          ,   ScrPin )
+
+    public:
+
+        Q_INVOKABLE V2DiseqcTree(QObject *parent = nullptr)
+            :   QObject               ( parent ),
+                m_DiseqcId            ( 0     ),
+                m_ParentId            ( 0     ),
+                m_Ordinal             ( 0     ),
+                m_SwitchPorts         ( 0     ),
+                m_RotorHiSpeed        ( 0     ),
+                m_RotorLoSpeed        ( 0     ),
+                m_LnbLofSwitch        ( 0     ),
+                m_LnbLofHi            ( 0     ),
+                m_LnbLofLo            ( 0     ),
+                m_CmdRepeat           ( 1     ),
+                m_LnbPolInv           ( 0     ),
+                m_Address             ( 0     ),
+                m_ScrUserband         ( 0     ),
+                m_ScrFrequency        ( 1400  ),
+                m_ScrPin              ( -1    )
+        {
+        }
+
+    private:
+        Q_DISABLE_COPY(V2DiseqcTree);
+
+};
+
+Q_DECLARE_METATYPE(V2DiseqcTree*)
 
 #endif

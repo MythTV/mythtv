@@ -94,4 +94,78 @@ class V2CardTypeList : public QObject
 
 Q_DECLARE_METATYPE(V2CardTypeList*)
 
+class V2CaptureDeviceList : public QObject
+{
+    Q_OBJECT
+    Q_CLASSINFO( "Version", "1.0" );
+    Q_CLASSINFO( "CaptureDevices", "type=V2CaptureDevice");
+
+    SERVICE_PROPERTY2( QVariantList, CaptureDevices );
+
+    public:
+
+        Q_INVOKABLE V2CaptureDeviceList(QObject *parent = nullptr)
+            : QObject( parent )
+        {
+        }
+
+        void Copy( const V2CaptureDeviceList *src )
+        {
+            CopyListContents< V2CaptureDeviceList >( this, m_CaptureDevices, src->m_CaptureDevices );
+        }
+
+        V2CaptureDevice *AddCaptureDevice()
+        {
+            // We must make sure the object added to the QVariantList has
+            // a parent of 'this'
+
+            auto *pObject = new V2CaptureDevice( this );
+            m_CaptureDevices.append( QVariant::fromValue<QObject *>( pObject ));
+            return pObject;
+        }
+
+    private:
+        Q_DISABLE_COPY(V2CaptureDeviceList);
+};
+
+Q_DECLARE_METATYPE(V2CaptureDeviceList*)
+
+class V2DiseqcTreeList : public QObject
+{
+    Q_OBJECT
+    Q_CLASSINFO( "Version", "1.0" );
+    Q_CLASSINFO( "DiseqcTrees", "type=V2DiseqcTree");
+
+    SERVICE_PROPERTY2( QVariantList, DiseqcTrees );
+
+    public:
+
+        Q_INVOKABLE V2DiseqcTreeList(QObject *parent = nullptr)
+            : QObject( parent )
+        {
+        }
+
+        void Copy( const V2DiseqcTreeList *src )
+        {
+            CopyListContents< V2DiseqcTreeList >( this, m_DiseqcTrees, src->m_DiseqcTrees );
+        }
+
+        V2DiseqcTree *AddDiseqcTree()
+        {
+            // We must make sure the object added to the QVariantList has
+            // a parent of 'this'
+
+            auto *pObject = new V2DiseqcTree( this );
+            m_DiseqcTrees.append( QVariant::fromValue<QObject *>( pObject ));
+            return pObject;
+        }
+
+    private:
+        Q_DISABLE_COPY(V2DiseqcTreeList);
+};
+
+Q_DECLARE_METATYPE(V2DiseqcTreeList*)
+
+
+
 #endif

@@ -2606,10 +2606,19 @@ int CardUtil::CreateCaptureCard(const QString &videodevice,
         ":HUE, :DISEQCID, :DVBEITSCAN ) ");
 
     query.bindValue(":VIDEODEVICE", videodevice);
-    query.bindValue(":AUDIODEVICE", audiodevice);
-    query.bindValue(":VBIDEVICE", vbidevice);
+    if (audiodevice.length() == 0) // Empty string is set to null
+        query.bindValue(":AUDIODEVICE", QVariant(QVariant::String));
+    else
+        query.bindValue(":AUDIODEVICE", audiodevice);
+    if (vbidevice.length() == 0) // Empty string is set to null
+        query.bindValue(":VBIDEVICE", QVariant(QVariant::String));
+    else
+        query.bindValue(":VBIDEVICE", vbidevice);
     query.bindValue(":INPUTTYPE", inputtype);
-    query.bindValue(":AUDIORATELIMIT", audioratelimit);
+    if (audioratelimit == 0) // Value 0 is set to null
+        query.bindValue(":AUDIORATELIMIT", QVariant(QVariant::UInt));
+    else
+        query.bindValue(":AUDIORATELIMIT", audioratelimit);
     query.bindValue(":HOSTNAME", hostname);
     query.bindValue(":DVBSWFILTER", dvb_swfilter);
     query.bindValue(":DVBSATTYPE", dvb_sat_type);
@@ -2618,7 +2627,10 @@ int CardUtil::CreateCaptureCard(const QString &videodevice,
     query.bindValue(":DVBONDEMAND", dvb_on_demand);
     query.bindValue(":DVBDISEQCTYPE", dvb_diseqc_type);
     query.bindValue(":FIREWIRESPEED", firewire_speed);
-    query.bindValue(":FIREWIREMODEL", firewire_model);
+    if (firewire_model.length() == 0) // Empty string is set to null
+        query.bindValue(":FIREWIREMODEL", QVariant(QVariant::String));
+    else
+        query.bindValue(":FIREWIREMODEL", firewire_model);
     query.bindValue(":FIREWIRECONNECTION", firewire_connection);
     query.bindValue(":SIGNALTIMEOUT", static_cast<qint64>(signal_timeout.count()));
     query.bindValue(":CHANNELTIMEOUT", static_cast<qint64>(channel_timeout.count()));
@@ -2627,7 +2639,10 @@ int CardUtil::CreateCaptureCard(const QString &videodevice,
     query.bindValue(":BRIGHTNESS", brightness);
     query.bindValue(":COLOUR", colour);
     query.bindValue(":HUE", hue);
-    query.bindValue(":DISEQCID", diseqcid);
+    if (diseqcid == 0) // Value 0 is set to null
+        query.bindValue(":DISEQCID", QVariant(QVariant::UInt));
+    else
+        query.bindValue(":DISEQCID", diseqcid);
     query.bindValue(":DVBEITSCAN", dvb_eitscan);
 
     if (!query.exec())
