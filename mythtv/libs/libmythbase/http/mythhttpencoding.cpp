@@ -239,13 +239,13 @@ void MythHTTPEncoding::GetJSONEncodedParameters(MythHTTPRequest* Request)
                 {
                     LOG(VB_HTTP, LOG_WARNING,
                         QString("Failed to parse value for key '%1' from %2")
-                        .arg(key).arg(QString(jstr)));
+                        .arg(key, QString(jstr)));
                 }
             }
 
             Request->m_queries.insert(key.trimmed().toLower(), value);
             LOG(VB_HTTP, LOG_DEBUG,
-                QString("Found URL param (%1=%2)").arg(key).arg(value));
+                QString("Found URL param (%1=%2)").arg(key, value));
         }
     }
 }
