@@ -47,10 +47,14 @@
 #include "libmythtv/recordinginfo.h"
 #include "libmythtv/recordingrule.h"
 
-#define ADD_SQL(settings_var, bindvar, col, api_param, val) { \
-    (settings_var) += QString("%1=:%2, ").arg(col, api_param); \
-    (bindvar)[QString(":").append(api_param)] = val; \
-    }
+template <typename T>
+static inline void
+ADD_SQL(QString& settings_var, MSqlBindings& bindvar,
+        const QString& col, const QString& api_param, const T& val)
+{
+    settings_var += QString("%1=:%2, ").arg(col, api_param);
+    bindvar[QString(":").append(api_param)] = val;
+}
 
 const QStringList KnownServices = { "Capture", "Channel", "Content", \
                                     "Dvr",     "Guide",   "Music",   \

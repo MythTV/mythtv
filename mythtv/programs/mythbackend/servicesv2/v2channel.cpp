@@ -464,48 +464,48 @@ bool V2Channel::UpdateVideoSource( uint          nSourceId,
     QString settings;
 
     if ( HAS_PARAMv2("SourceName") )
-        ADD_SQL(settings, bindings, "name", "SourceName", sSourceName)
+        ADD_SQL(settings, bindings, "name", "SourceName", sSourceName);
 
     if ( HAS_PARAMv2("Grabber") )
-        ADD_SQL(settings, bindings, "xmltvgrabber", "Grabber", sGrabber)
+        ADD_SQL(settings, bindings, "xmltvgrabber", "Grabber", sGrabber);
 
     if ( HAS_PARAMv2("UserId") )
-        ADD_SQL(settings, bindings, "userid", "UserId", sUserId)
+        ADD_SQL(settings, bindings, "userid", "UserId", sUserId);
 
     if ( HAS_PARAMv2("FreqTable") )
-        ADD_SQL(settings, bindings, "freqtable", "FreqTable", sFreqTable)
+        ADD_SQL(settings, bindings, "freqtable", "FreqTable", sFreqTable);
 
     if ( HAS_PARAMv2("LineupId") )
-        ADD_SQL(settings, bindings, "lineupid", "LineupId", sLineupId)
+        ADD_SQL(settings, bindings, "lineupid", "LineupId", sLineupId);
 
     if ( HAS_PARAMv2("Password") )
-        ADD_SQL(settings, bindings, "password", "Password", sPassword)
+        ADD_SQL(settings, bindings, "password", "Password", sPassword);
 
     if ( HAS_PARAMv2("UseEIT") )
-        ADD_SQL(settings, bindings, "useeit", "UseEIT", bUseEIT)
+        ADD_SQL(settings, bindings, "useeit", "UseEIT", bUseEIT);
 
     if (HAS_PARAMv2("ConfigPath"))
     {
         if (sConfigPath.isEmpty())
             settings += "configpath=NULL, "; // mythfilldatabase grabber requirement
         else
-            ADD_SQL(settings, bindings, "configpath", "ConfigPath", sConfigPath)
+            ADD_SQL(settings, bindings, "configpath", "ConfigPath", sConfigPath);
     }
 
     if ( HAS_PARAMv2("NITId") )
-        ADD_SQL(settings, bindings, "dvb_nit_id", "NITId", nNITId)
+        ADD_SQL(settings, bindings, "dvb_nit_id", "NITId", nNITId);
 
     if ( HAS_PARAMv2("BouquetId") )
-        ADD_SQL(settings, bindings, "bouquet_id", "BouquetId", nBouquetId)
+        ADD_SQL(settings, bindings, "bouquet_id", "BouquetId", nBouquetId);
 
     if ( HAS_PARAMv2("RegionId") )
-        ADD_SQL(settings, bindings, "region_id", "RegionId", nRegionId)
+        ADD_SQL(settings, bindings, "region_id", "RegionId", nRegionId);
 
     if ( HAS_PARAMv2("ScanFrequency") )
-        ADD_SQL(settings, bindings, "scanfrequency", "ScanFrequency", nScanFrequency)
+        ADD_SQL(settings, bindings, "scanfrequency", "ScanFrequency", nScanFrequency);
 
     if ( HAS_PARAMv2("LCNOffset") )
-        ADD_SQL(settings, bindings, "lcnoffset", "LCNOffset", nLCNOffset)
+        ADD_SQL(settings, bindings, "lcnoffset", "LCNOffset", nLCNOffset);
 
     if ( settings.isEmpty() )
     {
