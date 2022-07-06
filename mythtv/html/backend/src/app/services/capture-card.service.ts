@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CaptureCard, CaptureCardList, CardTypeList } from './interfaces/capture-card.interface';
+import { CaptureCard, CaptureCardList, CaptureDeviceList, CardTypeList, DiseqcTree, DiseqcTreeList } from './interfaces/capture-card.interface';
 import { BoolResponse } from './interfaces/common.interface';
 
 @Injectable({
@@ -37,6 +37,32 @@ export class CaptureCardService {
   public AddCaptureCard(card: CaptureCard): Observable<number> {
     return this.httpClient.post<number>('/Capture/AddCaptureCard',
       card);
+  }
+
+  public GetCaptureDeviceList(CardType: string): Observable<CaptureDeviceList> {
+    let params = new HttpParams()
+      .set("CardType", CardType);
+    return this.httpClient.get<CaptureDeviceList>('/Capture/GetCaptureDeviceList',
+       { params } );
+  }
+
+  public GetDiseqcTreeList(): Observable<DiseqcTreeList> {
+    return this.httpClient.get<DiseqcTreeList>('/Capture/GetDiseqcTreeList', { });
+  }
+
+  public AddDiseqcTree(tree: DiseqcTree): Observable<number> {
+    return this.httpClient.post<number>('/Capture/AddDiseqcTree',
+      tree);
+  }
+
+  public UpdateDiseqcTree(tree: DiseqcTree): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Capture/UpdateDiseqcTree',
+      tree);
+  }
+
+  public DeleteDiseqcTree(DiseqcId: number): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Capture/RemoveDiseqcTree',
+      { DiseqcId: DiseqcId });
   }
 
 

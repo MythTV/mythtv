@@ -1,0 +1,129 @@
+<form class="ml-3 mr-3" name="dvbform" #dvbform="ngForm">
+    <p-card class="m-5">
+        <ng-template pTemplate="title">
+            DVB-T/S/C, ATSC or ISDB-T tuner card
+        </ng-template>
+        <ng-template pTemplate="subtitle">
+        </ng-template>
+        <ng-template pTemplate="content">
+            <div class="grid">
+                <div class="mb-4 w-full">
+
+                    <div class="form-group field">
+                        <label for="VideoDevice" class="block">{{ 'settings.capture.dvb.device_label' | translate }}</label>
+                        <p-dropdown *ngIf="work.isReady" [options]="captureDeviceList.CaptureDeviceList.CaptureDevices"
+                            [(ngModel)]="currentDevice" [editable]="false" optionLabel="VideoDevice"
+                            (onChange)="updateDevice();" [maxlength]="0"
+                            [style]="{'minWidth':'80%'}" name="VideoDevice" #VideoDevice="ngModel">
+                        </p-dropdown>
+                        <div *ngIf="work.warningMessage">
+                            <small  class="p-error block">
+                                {{ work.warningMessage }}
+                            </small>
+                        </div>
+
+                        <small class="block">
+                            {{ 'settings.capture.dvb.device_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="FrontendName" class="block">{{ 'settings.capture.dvb.frontend_label' | translate }}</label>
+                        <input pInputText id="FrontendName" *ngIf="work.isReady"
+                            [(ngModel)]="this.currentDevice.FrontendName" name="FrontendName" disabled="true"
+                            #VideoDevice="ngModel" class="mb-2 form-control w-full" />
+                        <small class="block">
+                            {{ 'settings.capture.dvb.frontend_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="InputName" class="block">{{ 'settings.capture.dvb.inputname_label' | translate }}</label>
+                        <p-dropdown *ngIf="work.isReady" [options]="this.currentDevice.InputNames"
+                            [(ngModel)]="card.InputName"
+                            name="InputName" #InputName="ngModel">
+                        </p-dropdown>
+                        <small class="block">
+                            {{ 'settings.capture.dvb.inputname_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="SignalTimeout" class="block" >{{ 'settings.capture.sigtimeout_label' | translate }}</label>
+                        <p-inputNumber [(ngModel)]="card.SignalTimeout" name="SignalTimeout" id="SignalTimeout"
+                            [showButtons]="true" [min]="250" [max]="60000" [step]="250"></p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.capture.sigtimeout_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="ChannelTimeout" class="block" >{{ 'settings.capture.tunetimeout_label' | translate }}</label>
+                        <p-inputNumber [(ngModel)]="card.ChannelTimeout" name="ChannelTimeout" id="ChannelTimeout"
+                            [showButtons]="true" [min]="1750" [max]="65000" [step]="250"></p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.capture.tunetimeout_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <p-checkbox inputId="DVBWaitForSeqStart" [(ngModel)]="card.DVBWaitForSeqStart"
+                            name="{{ 'settings.capture.dvb.wait_label' | translate }}" #DVBWaitForSeqStart="ngModel" class="mb-2 w-full" [binary]="true"
+                            label="Wait for SEQ start header">
+                        </p-checkbox>
+                        <small class="block">
+                            {{ 'settings.capture.dvb.wait_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <p-checkbox inputId="DVBOnDemand" [(ngModel)]="card.DVBOnDemand"
+                            name="DVBOnDemand" #DVBOnDemand="ngModel" class="mb-2 w-full" [binary]="true"
+                            label="{{ 'settings.capture.dvb.ondemand_label' | translate }}">
+                        </p-checkbox>
+                        <small class="block">
+                            {{ 'settings.capture.dvb.ondemand_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <p-checkbox inputId="DVBEITScan" [(ngModel)]="card.DVBEITScan"
+                            name="DVBEITScan" #DVBEITScan="ngModel" class="mb-2 w-full" [binary]="true"
+                            label="{{ 'settings.capture.dvb.eitscan_label' | translate }}">
+                        </p-checkbox>
+                        <small class="block">
+                            {{ 'settings.capture.dvb.eitscan_ldesc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="DVBTuningDelay" class="block" >{{ 'settings.capture.dvb.tuningdelay_label' | translate }}</label>
+                        <p-inputNumber [(ngModel)]="card.DVBTuningDelay" name="DVBTuningDelay" id="DVBTuningDelay"
+                            [showButtons]="true" [min]="0" [max]="2000" [step]="25"></p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.capture.dvb.tuningdelay_desc' | translate }}
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+            <div class="grid nogutter">
+                <div class="col-12">
+                    <p-message *ngIf="this.work.successCount > 0 && this.work.errorCount == 0 && !dvbform.dirty"
+                        severity="success" text="{{ 'common.savesuccess' | translate }}" ></p-message>
+                    <p-message *ngIf="this.work.errorCount > 0"
+                        severity="error" text="{{ 'common.networkfail' | translate }}" ></p-message>
+                </div>
+                <p-button class="col pr-1" label="{{'common.save' | translate}}"  icon="pi pi-save" iconPos="left"
+                    (onClick)="saveForm(); dvbform.form.markAsPristine()"
+                                 [disabled]="(!dvbform.dirty || !card.VideoDevice)"></p-button>
+                <p-button class="col-2 help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()"
+                    icon="pi pi-info-circle" styleClass="p-button-info"></p-button>
+            </div>
+        </ng-template>
+    </p-card>
+</form>

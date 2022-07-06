@@ -100,8 +100,6 @@ export class CaptureCardsComponent implements OnInit {
       this.forms[e.index] = this.setupService.getCurrentForm();
     this.setupService.setCurrentForm(null);
     this.currentTab = e.index;
-    console.log("onTabOpen");
-    console.log(e);
     // This line removes "Unsaved Changes" from current tab header.
     this.dirtyMessages[this.currentTab] = "";
     // This line supports showing "Unsaved Changes" on current tab header,
@@ -130,7 +128,7 @@ export class CaptureCardsComponent implements OnInit {
 
   newCard() {
     this.displayModal = false;
-    let x: CardAndInput = <CardAndInput>{
+    let newOne: CardAndInput = <CardAndInput>{
       CardType: this.selectedCardType.CardType,
       HostName: this.m_hostName,
       ChannelTimeout: 3000,
@@ -143,7 +141,7 @@ export class CaptureCardsComponent implements OnInit {
     this.disabledTab.push(false);
     this.activeTab.push(true);
     this.displayDeleteThis.push(false);
-    this.m_CaptureCardsFiltered.push(x);
+    this.m_CaptureCardsFiltered.push(newOne);
     this.selectedCardType = { CardType: "", Description: "" };
   }
 

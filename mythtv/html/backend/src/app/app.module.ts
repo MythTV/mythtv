@@ -48,6 +48,7 @@ import { JobqueueCommandsComponent } from './config/settings/general/jobqueue-co
 import { EpgDownloadingComponent } from './config/settings/general/epg-downloading/epg-downloading.component';
 import { CaptureCardsComponent } from './config/settings/capture-cards/capture-cards.component';
 import { CetonComponent } from './config/settings/capture-cards/ceton/ceton.component';
+import { DvbComponent } from './config/settings/capture-cards/dvb/dvb.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -92,6 +93,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     EpgDownloadingComponent,
     CaptureCardsComponent,
     CetonComponent,
+    DvbComponent,
   ],
   imports: [
     BrowserModule,

@@ -49,7 +49,7 @@ export interface CardAndInput extends CaptureCard, CardInput {
 
 export interface CaptureCardList {
     CaptureCardList: {
-        CaptureCards:           CardAndInput[];
+        CaptureCards:  CardAndInput[];
     }
 }
 
@@ -60,6 +60,52 @@ export interface CardType {
 
 export interface CardTypeList {
     CardTypeList : {
-        CardTypes: CardType []
+        CardTypes: CardType [];
+    }
+}
+
+export interface CaptureDevice {
+    CardType:       string;
+    SubType:          string;
+    VideoDevice:      string;
+    FrontendName:     string;
+    InputNames:       string [];
+    DefaultInputName: string;
+    SignalTimeout:    number;
+    ChannelTimeout:   number;
+    TuningDelay:      number;
+}
+
+export interface CaptureDeviceList {
+    CaptureDeviceList : {
+        CaptureDevices: CaptureDevice [];
+    }
+}
+
+export interface DiseqcTree {
+    DiseqcId:            number;
+    ParentId:            number;
+    Ordinal:             number;
+    Type:                string;
+    SubType:             string;
+    Description:         string;
+    SwitchPorts:         number;
+    RotorHiSpeed:        number;
+    RotorLoSpeed:        number;
+    RotorPositions:      string;
+    LnbLofSwitch:        number;
+    LnbLofHi:            number;
+    LnbLofLo:            number;
+    CmdRepeat:           number;
+    LnbPolInv:           number;
+    Address:             number;
+    ScrUserband:         number;
+    ScrFrequency:        number;
+    ScrPin:              number;
+}
+
+export interface DiseqcTreeList {
+    DiseqcTreeList : {
+        DiseqcTrees: DiseqcTree [];
     }
 }

@@ -97,6 +97,8 @@
                 </p-dialog>
                 <app-ceton *ngIf="m_CaptureCardsFiltered[ix].CardType == 'CETON'" [card]="m_CaptureCardsFiltered[ix]"
                     [cardList]="m_CaptureCardList"></app-ceton>
+                <app-dvb *ngIf="m_CaptureCardsFiltered[ix].CardType == 'DVB'" [card]="m_CaptureCardsFiltered[ix]"
+                    [cardList]="m_CaptureCardList"></app-dvb>
             </ng-template>
         </p-accordionTab>
 

@@ -370,7 +370,27 @@
       "delete_on_host": "Delete All capture Cards on {{host}}",
       "delete_all": "Delete All capture Cards",
       "delete_all_all": "Delete All capture Cards on all hosts",
-      "delete_this": "Delete this Capture Card"
+      "delete_this": "Delete this Capture Card",
+      "dvb": {
+        "device_label": "DVB Device",
+        "device_desc": "When you change this setting, the text below should change to the name and type of your card. If the card cannot be opened, an error message will be displayed.",
+        "frontend_label": "Frontend ID",
+        "frontend_desc": "Identification string reported by the card. If the message \"Could not get card info...\" appears the card can be in use by another program.",
+        "inputname_label": "Delivery System",
+        "inputname_desc": "If your card supports more than one delivery system then you can select here the one that you want to use.",
+        "wait_label": "DVBWaitForSeqStart",
+        "wait_desc": "If enabled, drop packets from the start of a DVB recording until a sequence start header is seen.",
+        "ondemand_label": "Open DVB card on demand",
+        "ondemand_desc": "If enabled, only open the DVB card when required, leaving it free for other programs at other times.",
+        "eitscan_label": "Use DVB card for active EIT scan",
+        "eitscan_ldesc": "If enabled, activate active scanning for program data (EIT). When this option is enabled the DVB card is constantly in use.",
+        "tuningdelay_label": "DVB tuning delay (ms)",
+        "tuningdelay_desc": "Some Linux DVB drivers, in particular for the Hauppauge Nova-T, require that we slow down the tuning process by specifying a delay (in milliseconds).",
+        "devNotExist": "Device does not exist",
+        "unknownName": "Unknown",
+        "devInUse": "Warning: This device is already in use.",
+        "noDevSelected": "No Device Selected"
+      }
     },
     "common": {
       "successful_delete": "Successful delete",
