@@ -1749,7 +1749,7 @@ QString CardUtil::GetStartChannel(uint inputid)
         }
         else if (!query.next())
         {
-            LOG(VB_GENERAL, LOG_DEBUG,
+            LOG(VB_GENERAL, LOG_WARNING,
                 QString("CardUtil[%1]: ").arg(inputid) +
                 QString("Channel %1 on inputid %2 is invalid").arg(startchan).arg(inputid));
             startchan.clear();
@@ -1781,7 +1781,7 @@ QString CardUtil::GetStartChannel(uint inputid)
 
     if (startchan.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_DEBUG,
+        LOG(VB_GENERAL, LOG_WARNING,
             QString("CardUtil[%1]: ").arg(inputid) +
             QString("No start channel found on inputid %1").arg(inputid));
     }

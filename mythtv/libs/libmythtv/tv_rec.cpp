@@ -157,7 +157,11 @@ bool TVRec::Init(void)
     QMutexLocker lock(&m_stateChangeLock);
 
     if (!GetDevices(m_inputId, m_parentId, m_genOpt, m_dvbOpt, m_fwOpt))
+    {
+        LOG(VB_CHANNEL, LOG_ERR, QString("[%1] Failed to GetDevices")
+            .arg(m_inputId));
         return false;
+    }
 
     SetRecordingStatus(RecStatus::Unknown, __LINE__);
 
@@ -166,7 +170,13 @@ bool TVRec::Init(void)
     if (startchannel.isEmpty())
         return false;
     if (!CreateChannel(startchannel, true))
+    {
+        LOG(VB_CHANNEL, LOG_ERR, QString("[%1] Failed to create channel "
+                                         "instance for %2")
+            .arg(m_inputId)
+            .arg(startchannel));
         return false;
+    }
 
     m_transcodeFirst    =
         gCoreContext->GetBoolSetting("AutoTranscodeBeforeAutoCommflag", false);
