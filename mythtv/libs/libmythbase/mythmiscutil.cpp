@@ -701,31 +701,23 @@ void myth_yield(void)
 #include <cstdio>
 #include <getopt.h>
 #include <sys/ptrace.h>
-#include <asm/unistd.h>
-
-#if defined(__i386__)
-# define NR_ioprio_set  289
-# define NR_ioprio_get  290
-#elif defined(__ppc__)
-# define NR_ioprio_set  273
-# define NR_ioprio_get  274
-#elif defined(__x86_64__)
-# define NR_ioprio_set  251
-# define NR_ioprio_get  252
-#elif defined(__ia64__)
-# define NR_ioprio_set  1274
-# define NR_ioprio_get  1275
-#endif
-
-#define IOPRIO_BITS             (16)
-#define IOPRIO_CLASS_SHIFT      (13)
-#define IOPRIO_PRIO_MASK        ((1UL << IOPRIO_CLASS_SHIFT) - 1)
-#define IOPRIO_PRIO_CLASS(mask) ((mask) >> IOPRIO_CLASS_SHIFT)
-#define IOPRIO_PRIO_DATA(mask)  ((mask) & IOPRIO_PRIO_MASK)
-#define IOPRIO_PRIO_VALUE(class, data)  (((class) << IOPRIO_CLASS_SHIFT) | (data))
+#include <sys/syscall.h>
+#if __has_include(<linux/ioprio.h>)
+#include <linux/ioprio.h>
+#else
+static constexpr int8_t IOPRIO_BITS        { 16 };
+static constexpr int8_t IOPRIO_CLASS_SHIFT { 13 };
+static constexpr int    IOPRIO_PRIO_MASK   { (1UL << IOPRIO_CLASS_SHIFT) - 1 };
+static constexpr int IOPRIO_PRIO_CLASS(int mask)
+    { return mask >> IOPRIO_CLASS_SHIFT; };
+static constexpr int IOPRIO_PRIO_DATA(int mask)
+    { return mask & IOPRIO_PRIO_MASK; };
+static constexpr int IOPRIO_PRIO_VALUE(int pclass, int data)
+    { return (pclass << IOPRIO_CLASS_SHIFT) | data; };
 
 enum { IOPRIO_CLASS_NONE,IOPRIO_CLASS_RT,IOPRIO_CLASS_BE,IOPRIO_CLASS_IDLE, };
 enum { IOPRIO_WHO_PROCESS = 1, IOPRIO_WHO_PGRP, IOPRIO_WHO_USER, };
+#endif // has_include(<linux/ioprio.h>)
 
 bool myth_ioprio(int val)
 {
@@ -735,17 +727,17 @@ bool myth_ioprio(int val)
     int new_ioprio = IOPRIO_PRIO_VALUE(new_ioclass, new_iodata);
 
     int pid = getpid();
-    int old_ioprio = syscall(NR_ioprio_get, IOPRIO_WHO_PROCESS, pid);
+    int old_ioprio = syscall(SYS_ioprio_get, IOPRIO_WHO_PROCESS, pid);
     if (old_ioprio == new_ioprio)
         return true;
 
-    int ret = syscall(NR_ioprio_set, IOPRIO_WHO_PROCESS, pid, new_ioprio);
+    int ret = syscall(SYS_ioprio_set, IOPRIO_WHO_PROCESS, pid, new_ioprio);
 
     if (-1 == ret && EPERM == errno && IOPRIO_CLASS_BE != new_ioclass)
     {
         new_iodata = (new_ioclass == IOPRIO_CLASS_RT) ? 0 : 7;
         new_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, new_iodata);
-        ret = syscall(NR_ioprio_set, IOPRIO_WHO_PROCESS, pid, new_ioprio);
+        ret = syscall(SYS_ioprio_set, IOPRIO_WHO_PROCESS, pid, new_ioprio);
     }
 
     return 0 == ret;
