@@ -172,7 +172,7 @@ ShoutCastMetaMap ShoutCastMetaParser::parseMeta(const QString &mdata)
 
 static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
 {
-    if (VERBOSE_LEVEL_NONE)
+    if (VERBOSE_LEVEL_NONE())
         return;
 
     static QString   s_fullLine("");

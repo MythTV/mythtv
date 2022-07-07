@@ -9,27 +9,6 @@
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
 #include "verbosedefs.h"
 
-// Helper for checking verbose mask & level outside of LOG macro
-#define VERBOSE_LEVEL_NONE        (verboseMask == 0)
-#define VERBOSE_LEVEL_CHECK(_MASK_, _LEVEL_) \
-    (componentLogLevel.contains(_MASK_) ?                               \
-     (*(componentLogLevel.find(_MASK_)) >= (_LEVEL_)) :                   \
-     (((verboseMask & (_MASK_)) == (_MASK_)) && logLevel >= (_LEVEL_)))
-
-#define VERBOSE please_use_LOG_instead_of_VERBOSE
-
-// This doesn't lock the calling thread other than momentarily to put
-// the log message onto a queue.
-#define LOG(_MASK_, _LEVEL_, _QSTRING_)                                 \
-    do {                                                                \
-        if (VERBOSE_LEVEL_CHECK((_MASK_), (_LEVEL_)) && ((_LEVEL_)>=0)) \
-        {                                                               \
-            LogPrintLine(_MASK_, _LEVEL_,                               \
-                         __FILE__, __LINE__, __FUNCTION__,              \
-                         _QSTRING_);                                    \
-        }                                                               \
-    } while (false)
-
 /* Define the external prototype */
 MBASE_PUBLIC void LogPrintLine( uint64_t mask, LogLevel_t level,
                                 const char *file, int line,
@@ -44,6 +23,27 @@ extern MBASE_PUBLIC ComponentLogLevelMap componentLogLevel;
 extern MBASE_PUBLIC QStringList logPropagateArgList;
 extern MBASE_PUBLIC QString     logPropagateArgs;
 extern MBASE_PUBLIC QString     verboseString;
+
+// Helper for checking verbose mask & level outside of LOG macro
+static inline bool VERBOSE_LEVEL_NONE() { return verboseMask == 0; };
+static inline bool VERBOSE_LEVEL_CHECK(uint64_t mask, LogLevel_t level)
+{
+    if (componentLogLevel.contains(mask))
+        return *(componentLogLevel.find(mask)) >= level;
+    return (((verboseMask & mask) == mask) && (logLevel >= level));
+}
+
+// This doesn't lock the calling thread other than momentarily to put
+// the log message onto a queue.
+#define LOG(_MASK_, _LEVEL_, _QSTRING_)                                 \
+    do {                                                                \
+        if (VERBOSE_LEVEL_CHECK((_MASK_), (_LEVEL_)) && ((_LEVEL_)>=0)) \
+        {                                                               \
+            LogPrintLine(_MASK_, _LEVEL_,                               \
+                         __FILE__, __LINE__, __FUNCTION__,              \
+                         _QSTRING_);                                    \
+        }                                                               \
+    } while (false)
 
 MBASE_PUBLIC void resetLogging(void);
 
