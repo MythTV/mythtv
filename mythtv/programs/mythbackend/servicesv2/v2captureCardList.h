@@ -130,6 +130,50 @@ class V2CaptureDeviceList : public QObject
 
 Q_DECLARE_METATYPE(V2CaptureDeviceList*)
 
+
+class V2InputGroupList : public QObject
+{
+    Q_OBJECT
+    Q_CLASSINFO( "Version", "1.0" );
+    Q_CLASSINFO( "InputGroups", "type=V2InputGroup");
+
+    SERVICE_PROPERTY2( QVariantList, InputGroups );
+
+    public:
+
+        Q_INVOKABLE V2InputGroupList(QObject *parent = nullptr)
+            : QObject( parent )
+        {
+        }
+
+        void Copy( const V2InputGroupList *src )
+        {
+            CopyListContents< V2InputGroupList >( this, m_InputGroups,
+                                                  src->m_InputGroups );
+        }
+
+        V2InputGroup *AddInputGroup(uint cardInputId, uint inputGroupId,
+                                    const QString &inputGroupName)
+        {
+            // We must make sure the object added to the QVariantList has
+            // a parent of 'this'
+
+            auto *pObject = new V2InputGroup( this );
+            pObject->setCardInputId(cardInputId);
+            pObject->setInputGroupId(inputGroupId);
+            pObject->setInputGroupName(inputGroupName);
+            m_InputGroups.append( QVariant::fromValue<QObject *>( pObject ));
+
+            return pObject;
+        }
+
+    private:
+        Q_DISABLE_COPY(V2InputGroupList);
+};
+
+Q_DECLARE_METATYPE(V2InputGroupList*)
+
+
 class V2DiseqcTreeList : public QObject
 {
     Q_OBJECT

@@ -195,6 +195,43 @@ class V2CaptureDevice : public QObject
 
 Q_DECLARE_METATYPE(V2CaptureDevice*)
 
+
+class V2InputGroup : public QObject
+{
+    Q_OBJECT
+    Q_CLASSINFO( "Version"    , "1.0" );
+
+    SERVICE_PROPERTY2( uint       ,     CardInputId    )
+    SERVICE_PROPERTY2( uint       ,     InputGroupId   )
+    SERVICE_PROPERTY2( QString    ,     InputGroupName )
+
+    public:
+
+        Q_INVOKABLE V2InputGroup(QObject *parent = nullptr)
+          : QObject          ( parent )
+          , m_CardInputId    ( 0 )
+          , m_InputGroupId   ( 0 )
+          , m_InputGroupName ( "Unknown" )
+
+        {
+        }
+
+#if 0
+        void Copy( const V2InputGroup *src )
+        {
+            m_CardInputId          = src->m_CardInputId;
+            m_InputGroupId         = src->m_InputGroupId;
+            m_InputGroupName       = src->m_InputGroupName;
+        }
+#endif
+
+    private:
+        Q_DISABLE_COPY(V2InputGroup);
+};
+
+Q_DECLARE_METATYPE(V2InputGroup*)
+
+
 class V2DiseqcTree : public QObject
 {
     Q_OBJECT

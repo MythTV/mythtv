@@ -54,6 +54,7 @@ void V2Capture::RegisterCustomTypes()
     qRegisterMetaType<V2CaptureDevice*>("V2CaptureDevice");
     qRegisterMetaType<V2DiseqcTree*>("V2DiseqcTree");
     qRegisterMetaType<V2DiseqcTreeList*>("V2DiseqcTreeList");
+    qRegisterMetaType<V2InputGroupList*>("V2InputGroupList");
 }
 
 V2Capture::V2Capture()
@@ -454,6 +455,74 @@ V2CardTypeList*  V2Capture::GetCardTypeList ( )
 #endif
     return pCardTypeList;
 }
+
+V2InputGroupList*  V2Capture::GetUserInputGroupList ( void )
+{
+    auto* pInputGroupList = new V2InputGroupList();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!query.isConnected())
+        throw( QString("Database not open while trying to list "
+                       "Input Groups."));
+
+    QString q = "SELECT cardinputid,inputgroupid,inputgroupname "
+                "FROM inputgroup WHERE inputgroupname LIKE 'user:%' "
+                "ORDER BY inputgroupid, cardinputid";
+    query.prepare(q);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("GetUserInputGroupList", query);
+        return pInputGroupList;
+    }
+
+    while (query.next())
+    {
+        pInputGroupList->AddInputGroup(query.value(0).toUInt(),
+                                       query.value(1).toUInt(),
+                                       query.value(2).toString());
+    }
+
+    return pInputGroupList;
+}
+
+int V2Capture::AddUserInputGroup(const QString & Name)
+{
+    if (Name.isEmpty())
+        throw( QString( "Input group name cannot be empty." ) );
+
+    QString new_name = QString("user:") + Name;
+
+    uint inputgroupid = CardUtil::CreateInputGroup(new_name);
+
+    if (inputgroupid == 0)
+    {
+        throw( QString( "Failed to add or retrieve %1" ).arg(new_name) );
+    }
+
+    return inputgroupid;
+}
+
+bool V2Capture::LinkInputGroup(const uint InputId,
+                               const uint InputGroupId)
+{
+    if (!CardUtil::LinkInputGroup(InputId, InputGroupId))
+        throw( QString ( "Failed to link input %1 to group %2" )
+               .arg(InputId).arg(InputGroupId));
+    return true;
+}
+
+
+bool V2Capture::UnlinkInputGroup(const uint InputId,
+                                 const uint InputGroupId)
+{
+    if (!CardUtil::UnlinkInputGroup(InputId, InputGroupId))
+        throw( QString ( "Failed to unlink input %1 from group %2" )
+               .arg(InputId).arg(InputGroupId));
+    return true;
+}
+
 
 #ifdef USING_DVB
 static QString remove_chaff(const QString &name)

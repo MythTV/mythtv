@@ -35,7 +35,7 @@
 class V2Capture : public MythHTTPService
 {
     Q_OBJECT
-    Q_CLASSINFO("Version",      "1.5")
+    Q_CLASSINFO("Version",      "1.6")
     Q_CLASSINFO("RemoveAllCaptureCards", "methods=POST;name=bool")
     Q_CLASSINFO("RemoveCaptureCard",  "methods=POST;name=bool")
     Q_CLASSINFO("AddCaptureCard",     "methods=POST;name=int")
@@ -43,6 +43,10 @@ class V2Capture : public MythHTTPService
     Q_CLASSINFO("RemoveCardInput",    "methods=POST;name=bool")
     Q_CLASSINFO("AddCardInput",       "methods=POST;name=int")
     Q_CLASSINFO("UpdateCardInput",    "methods=POST;name=bool")
+    Q_CLASSINFO("AddUserInputGroup",  "methods=POST;name=int")
+    Q_CLASSINFO("LinkInputGroup",     "methods=POST;name=bool")
+    Q_CLASSINFO("UnlinkInputGroup",   "methods=POST;name=bool")
+    //    Q_CLASSINFO("GetUserInputGroupList", "methods=GET,POST,HEAD")
     Q_CLASSINFO("AddDiseqcTree",      "methods=POST")
     Q_CLASSINFO("UpdateDiseqcTree",   "methods=POST")
     Q_CLASSINFO("RemoveDiseqcTree",   "methods=POST")
@@ -115,11 +119,21 @@ class V2Capture : public MythHTTPService
                                                         const QString    &Setting,
                                                         const QString    &Value );
 
-    static V2CardTypeList*      GetCardTypeList     ( );
+    static V2InputGroupList*    GetUserInputGroupList ( void );
+
+    static int                  AddUserInputGroup  ( const QString & Name );
+
+    static bool                 LinkInputGroup     ( const uint InputId,
+                                                     const uint InputGroupId );
+
+    static bool                 UnlinkInputGroup   ( const uint InputId,
+                                                     const uint InputGroupId );
+
+    static V2CardTypeList*      GetCardTypeList     ( void );
 
     static V2CaptureDeviceList* GetCaptureDeviceList  ( const QString  &CardType );
 
-    static V2DiseqcTreeList*    GetDiseqcTreeList  (  );
+    static V2DiseqcTreeList*    GetDiseqcTreeList  ( void );
 
     static int                  AddDiseqcTree     ( uint           ParentId,
                                                     uint           Ordinal,
