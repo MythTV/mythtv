@@ -14,15 +14,7 @@
 // MythMusic
 #include "flacencoder.h"
 
-#include <FLAC/export.h>
-#if !defined(NEWFLAC)
-  /* FLAC 1.0.4 to 1.1.2 */
-  #include <FLAC/file_encoder.h>
-#else
-  /* FLAC 1.1.3 and up */
-  #include <FLAC/stream_encoder.h>
-#endif
-
+#include <FLAC/stream_encoder.h>
 #include <FLAC/assert.h>
 
 FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
@@ -44,31 +36,27 @@ FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
     int max_residual_partition_order = 3;
     int rice_parameter_search_dist = 0;
 
-    m_encoder = encoder_new();
-    encoder_setup(m_encoder, streamable_subset,
-                  do_mid_side, loose_mid_side,
-                  NUM_CHANNELS, bits_per_sample,
-                  sample_rate, blocksize,
-                  max_lpc_order, qlp_coeff_precision,
-                  qlp_coeff_prec_search, do_escape_coding,
-                  do_exhaustive_model_search,
-                  min_residual_partition_order,
-                  max_residual_partition_order,
-                  rice_parameter_search_dist);
+    m_encoder = FLAC__stream_encoder_new();
+    FLAC__stream_encoder_set_streamable_subset(m_encoder, streamable_subset);
+    FLAC__stream_encoder_set_do_mid_side_stereo(m_encoder, do_mid_side);
+    FLAC__stream_encoder_set_loose_mid_side_stereo(m_encoder, loose_mid_side);
+    FLAC__stream_encoder_set_channels(m_encoder, NUM_CHANNELS);
+    FLAC__stream_encoder_set_bits_per_sample(m_encoder, bits_per_sample);
+    FLAC__stream_encoder_set_sample_rate(m_encoder, sample_rate);
+    FLAC__stream_encoder_set_blocksize(m_encoder, blocksize);
+    FLAC__stream_encoder_set_max_lpc_order(m_encoder, max_lpc_order);
+    FLAC__stream_encoder_set_qlp_coeff_precision(m_encoder, qlp_coeff_precision);
+    FLAC__stream_encoder_set_do_qlp_coeff_prec_search(m_encoder, qlp_coeff_prec_search);
+    FLAC__stream_encoder_set_do_escape_coding(m_encoder, do_escape_coding);
+    FLAC__stream_encoder_set_do_exhaustive_model_search(m_encoder, do_exhaustive_model_search);
+    FLAC__stream_encoder_set_min_residual_partition_order(m_encoder, min_residual_partition_order);
+    FLAC__stream_encoder_set_max_residual_partition_order(m_encoder, max_residual_partition_order);
+    FLAC__stream_encoder_set_rice_parameter_search_dist(m_encoder, rice_parameter_search_dist);
 
     QByteArray ofile = outfile.toLocal8Bit();
-#if !defined(NEWFLAC)
-    /* FLAC 1.0.4 to 1.1.2 */
-    FLAC__file_encoder_set_filename(m_encoder, ofile.constData());
-
-    int ret = FLAC__file_encoder_init(m_encoder);
-    if (ret != FLAC__FILE_ENCODER_OK)
-#else
-    /* FLAC 1.1.3 and up */
     int ret = FLAC__stream_encoder_init_file(
         m_encoder, ofile.constData(), nullptr, nullptr);
     if (ret != FLAC__STREAM_ENCODER_INIT_STATUS_OK)
-#endif
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Error initializing FLAC encoder. Got return code: %1")
@@ -88,8 +76,8 @@ FlacEncoder::~FlacEncoder()
 
     if (m_encoder)
     {
-        encoder_finish(m_encoder);
-        encoder_delete(m_encoder);
+        FLAC__stream_encoder_finish(m_encoder);
+        FLAC__stream_encoder_delete(m_encoder);
     }
 
     if (m_metadata)
@@ -112,7 +100,7 @@ int FlacEncoder::addSamples(int16_t *bytes, unsigned int length)
 
         if(m_sampleIndex == MAX_SAMPLES || (length == 0 && m_sampleIndex > 0) ) 
         {
-            if (!encoder_process(m_encoder,
+            if (!FLAC__stream_encoder_process(m_encoder,
                                  (const FLAC__int32 * const *) m_input.data(),
                                  m_sampleIndex))
             {
