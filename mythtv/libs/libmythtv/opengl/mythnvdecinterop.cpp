@@ -10,6 +10,7 @@
 
 #define LOC QString("NVDECInterop: ")
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define CUDA_CHECK(CUDA_FUNCS, CUDA_CALL) \
 { \
     CUresult res = (CUDA_FUNCS)->CUDA_CALL;          \

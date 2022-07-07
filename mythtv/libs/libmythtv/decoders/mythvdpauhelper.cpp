@@ -13,6 +13,7 @@
 VdpStatus status; \
 bool ok = true;
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define CHECK_ST \
 ok &= (status == VDP_STATUS_OK); \
 if (!ok) \

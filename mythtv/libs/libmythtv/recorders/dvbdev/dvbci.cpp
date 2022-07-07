@@ -48,12 +48,14 @@
 
 #include "libmythbase/mythlogging.h"
 
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define esyslog(a...) LOG(VB_GENERAL, LOG_ERR, QString::asprintf(a))
 #define isyslog(a...) LOG(VB_DVBCAM, LOG_INFO, QString::asprintf(a))
 #define dsyslog(a...) LOG(VB_DVBCAM, LOG_DEBUG, QString::asprintf(a))
 
 #define LOG_ERROR         esyslog("ERROR (%s,%d): %m", __FILE__, __LINE__)
 #define LOG_ERROR_STR(s)  esyslog("ERROR: %s: %m", s)
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 
 // Set these to 'true' for debug output:
@@ -61,6 +63,7 @@ static bool sDumpTPDUDataTransfer = false;
 static bool sDebugProtocol = false;
 static bool sConnected = false;
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define dbgprotocol(a...) if (sDebugProtocol) LOG(VB_DVBCAM, LOG_DEBUG, QString::asprintf(a))
 
 static constexpr int OK       {  0 };

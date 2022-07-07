@@ -35,6 +35,7 @@ static inline bool VERBOSE_LEVEL_CHECK(uint64_t mask, LogLevel_t level)
 
 // This doesn't lock the calling thread other than momentarily to put
 // the log message onto a queue.
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define LOG(_MASK_, _LEVEL_, _QSTRING_)                                 \
     do {                                                                \
         if (VERBOSE_LEVEL_CHECK((_MASK_), (_LEVEL_)) && ((_LEVEL_)>=0)) \

@@ -23,8 +23,10 @@ static constexpr int OPEN_FLAGS
 
 static constexpr int FILTER_FLAGS { ~(SND_PCM_NO_AUTO_FORMAT) };
 
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define AERROR(str)   VBERROR((str) + QString(": %1").arg(snd_strerror(err)))
 #define CHECKERR(str) { if (err < 0) { AERROR(str); return err; } }
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     AudioOutputBase(settings)

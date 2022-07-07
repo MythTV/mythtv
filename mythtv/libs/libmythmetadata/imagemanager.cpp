@@ -18,6 +18,7 @@ static constexpr const char* STORAGE_GROUP_MOUNT { "" };
 
 static constexpr const char* DB_TABLE { "gallery_files" };
 
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define RESULT_ERR(ERR, MESG) \
 {   LOG(VB_GENERAL, LOG_ERR, LOC + (MESG)); \
     return QStringList("ERROR") << (ERR); }
@@ -25,6 +26,7 @@ static constexpr const char* DB_TABLE { "gallery_files" };
 #define RESULT_OK(MESG) \
 {   LOG(VB_FILE, LOG_DEBUG, LOC + (MESG)); \
     return QStringList("OK"); }
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 static constexpr const char* IMPORTDIR { "Import" };
 

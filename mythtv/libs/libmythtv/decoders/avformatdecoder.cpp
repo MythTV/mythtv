@@ -200,6 +200,7 @@ int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags);
 //    return 0;
 //}
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define FAIL(errmsg) do {                       \
     LOG(VB_PLAYBACK, LOG_INFO, LOC + (errmsg)); \
     return false;                                   \

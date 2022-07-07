@@ -16,6 +16,7 @@
 #include "audiooutput.h"
 #include "samplerate.h"
 
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define VBAUDIO(str)   LOG(VB_AUDIO, LOG_INFO, LOC + (str))
 #define VBAUDIOTS(str) LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + (str))
 #define VBGENERAL(str) LOG(VB_GENERAL, LOG_INFO, LOC + (str))
@@ -23,6 +24,7 @@
 #define VBWARN(str)    LOG(VB_GENERAL, LOG_WARNING, LOC + (str))
 #define VBERRENO(str)  Error(LOC + (str) + ": " + ENO)
 #define VBERRNOCONST(str)   LOG(VB_GENERAL, LOG_ERR, LOC + (str) + ": " + ENO)
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 namespace soundtouch {
 class SoundTouch;

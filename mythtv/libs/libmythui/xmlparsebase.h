@@ -11,6 +11,7 @@ class MythScreenType;
 class QDomElement;
 class QBrush;
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define VERBOSE_XML(type, level, filename, element, msg)                  \
     LOG(type, level, LOC + QString("%1\n\t\t\t"                           \
                              "Location: %2 @ %3\n\t\t\t"                  \
