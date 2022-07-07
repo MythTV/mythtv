@@ -3,9 +3,8 @@
 #include <algorithm>
 #include <cmath> // for qsrand
 #include <random>
-#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
+
 #include <QRandomGenerator>
-#endif
 
 #define LOC QString("Galleryviews: ")
 
@@ -247,25 +246,17 @@ void FlatView::Populate(ImageList &files)
         }
         else if (m_order == kRandom)
         {
-#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
             QVector<quint32> rands;
             rands.resize(files.size());
             QRandomGenerator::global()->fillRange(rands.data(), rands.size());
-#else
-            // cppcheck-suppress qsrandCalled
-            qsrand(QTime::currentTime().msec());
-#endif
+
             // An image is not a valid candidate for its successor
             int range = files.size() - 1;
             int index = range;
             for (int count = 0; count < files.size(); ++count)
             {
-#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
                 int rand = rands[count] % range;
-#else
-                // cppcheck-suppress qrandCalled
-                int rand = qrand() % range;
-#endif
+
                 // Avoid consecutive repeats
                 index = (rand < index) ? rand : rand + 1;
                 m_sequence.append(files.at(index)->m_id);
@@ -276,21 +267,12 @@ void FlatView::Populate(ImageList &files)
             WeightList weights   = CalculateSeasonalWeights(files);
             double     maxWeight = weights.last();
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
             auto *randgen = QRandomGenerator::global();
-#else
-            // cppcheck-suppress qsrandCalled
-            qsrand(QTime::currentTime().msec());
-#endif
+
             for (int count = 0; count < files.size(); ++count)
             {
-#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
                 // generateDouble() returns in the range [0, 1)
                 double randWeight = randgen->generateDouble() * maxWeight;
-#else
-                // cppcheck-suppress qrandCalled
-                double randWeight = qrand() * maxWeight / RAND_MAX;
-#endif
                 WeightList::iterator it =
                         std::upper_bound(weights.begin(), weights.end(), randWeight);
                 int    index      = std::distance(weights.begin(), it);

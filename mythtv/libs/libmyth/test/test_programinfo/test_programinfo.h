@@ -590,25 +590,6 @@ class TestProgramInfo : public QObject
 
     void checkMap (const InfoMap& actual, InfoMap expected)
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-        for (auto key : actual.keys())
-        {
-            auto actualValue = actual[key];
-            if (expected.contains(key))
-            {
-                QVERIFY2(actualValue == expected[key],
-                         qPrintable(QString("Key '%1': actual '%2' is not expected '%3'")
-                                    .arg(key).arg(actualValue).arg(expected[key])));
-                expected.remove(key);
-            }
-            else
-            {
-                QVERIFY2(actualValue == QString(""),
-                         qPrintable(QString("Key '%1': actual '%2' is not empty")
-                                    .arg(key).arg(actualValue)));
-            }
-        }
-#else
         for (auto it = actual.constKeyValueBegin(); it != actual.constKeyValueEnd(); it++)
         {
             auto [key, actualValue] = *it;
@@ -626,7 +607,6 @@ class TestProgramInfo : public QObject
                                     .arg(key, actualValue)));
             }
         }
-#endif
         QStringList missingKeys = expected.keys();
         QCOMPARE(QString(""), missingKeys.join('|'));
     }

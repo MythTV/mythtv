@@ -23,10 +23,6 @@
 #include "archiveutil.h"
 #include "fileselector.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-#define qEnvironmentVariable getenv
-#endif
-
 ////////////////////////////////////////////////////////////////
 
 FileSelector::~FileSelector()

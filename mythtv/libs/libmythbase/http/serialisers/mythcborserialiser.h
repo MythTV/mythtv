@@ -4,7 +4,6 @@
 // MythTV
 #include "http/serialisers/mythserialiser.h"
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,12,0)
 class QCborStreamWriter;
 
 class MythCBORSerialiser : public MythSerialiser
@@ -25,5 +24,4 @@ class MythCBORSerialiser : public MythSerialiser
     QCborStreamWriter* m_writer { nullptr };
 };
 
-#endif
 #endif

@@ -14,10 +14,6 @@
 #include "mythlogging.h"
 #include "mythdate.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-#define qEnvironmentVariable getenv
-#endif
-
 namespace MythTZ
 {
 

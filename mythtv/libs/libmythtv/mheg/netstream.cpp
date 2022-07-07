@@ -4,9 +4,6 @@
 #include "netstream.h"
 
 // C/C++ lib
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-#include <cstdlib>
-#endif
 #include <cstddef>
 #include <cstdio>
 #include <cinttypes>
@@ -41,10 +38,6 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythlogging.h"
-
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-#define qEnvironmentVariable std::getenv
-#endif
 
 /*
  * Constants

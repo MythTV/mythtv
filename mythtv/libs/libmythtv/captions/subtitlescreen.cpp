@@ -721,11 +721,7 @@ bool FormattedTextChunk::PreRender(bool isFirst, bool isLast,
     {
         ++count;
     }
-#if QT_VERSION < QT_VERSION_CHECK(5,11,0)
-    int x_adjust = count * font.width(" ");
-#else
     int x_adjust = count * font.horizontalAdvance(" ");
-#endif
     int leftPadding = 0;
     int rightPadding = 0;
     CalcPadding(isFirst, isLast, leftPadding, rightPadding);
@@ -1650,11 +1646,7 @@ QSize SubtitleScreen::CalcTextSize(const QString &text,
     MythFontProperties *mythfont = GetFont(format);
     QFont *font = mythfont->GetFace();
     QFontMetrics fm(*font);
-#if QT_VERSION < QT_VERSION_CHECK(5,11,0)
-    int width = fm.width(text);
-#else
     int width = fm.horizontalAdvance(text);
-#endif
     int height = fm.height() * (1 + PAD_HEIGHT);
     if (layoutSpacing > 0 && !text.trimmed().isEmpty())
         height = std::max(height, (int)(font->pixelSize() * layoutSpacing));

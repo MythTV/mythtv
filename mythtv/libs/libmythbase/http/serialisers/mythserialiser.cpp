@@ -7,9 +7,7 @@
 #include "http/serialisers/mythxmlserialiser.h"
 #include "http/serialisers/mythxmlplistserialiser.h"
 #include "http/serialisers/mythjsonserialiser.h"
-#if QT_VERSION >= QT_VERSION_CHECK(5,12,0)
 #include "http/serialisers/mythcborserialiser.h"
-#endif
 #include "http/serialisers/mythserialiser.h"
 
 MythSerialiser::MythSerialiser()
@@ -126,11 +124,9 @@ HTTPData MythSerialiser::Serialise(const QString &Name, const QVariant& Value, c
             if (MythXMLPListSerialiser plist(Name, Value); plist.Result() != nullptr)
                 return WrapData(plist.Result(), s_xmlPList, s_xmlPList.Aliases().at(alias));
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,12,0)
         if (const auto & alias = s_cbor.Aliases().indexOf(mime); alias >= 0)
             if (MythCBORSerialiser cbor(Name, Value); cbor.Result() != nullptr)
                 return WrapData(cbor.Result(), s_cbor, s_cbor.Aliases().at(alias));
-#endif
     }
 
     // Default to XML

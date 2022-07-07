@@ -28,7 +28,7 @@ class MythWaylandDevice;
 // received by the window
 //#define DEBUG_PAINTERWIN_EVENTS
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5,12,0)) && (QT_VERSION < QT_VERSION_CHECK(5,15,0))
+#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
 #define USING_WAYLAND_EXPOSE_HACK 1
 #endif
 

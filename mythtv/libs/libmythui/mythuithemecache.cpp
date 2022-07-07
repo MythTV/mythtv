@@ -426,13 +426,7 @@ MythImage *MythUIThemeCache::CacheImage(const QString& URL, MythImage* Image, bo
     // delete the oldest cached images until we fall below threshold.
     QMutexLocker locker(&m_cacheLock);
 
-    while ((m_cacheSize.fetchAndAddOrdered(0) +
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-       Image->byteCount()
-#else
-       Image->sizeInBytes()
-#endif
-        ) >=
+    while ((m_cacheSize.fetchAndAddOrdered(0) + Image->sizeInBytes()) >=
            m_maxCacheSize.fetchAndAddOrdered(0) && !m_imageCache.empty())
     {
         QMap<QString, MythImage *>::iterator it = m_imageCache.begin();
@@ -459,13 +453,7 @@ MythImage *MythUIThemeCache::CacheImage(const QString& URL, MythImage* Image, bo
         if (count > 0)
         {
             LOG(VB_GUI | VB_FILE, LOG_INFO, LOC + QString("Cache too big (%1), removing :%2:")
-                .arg(m_cacheSize.fetchAndAddOrdered(0) +
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-             Image->byteCount()
-#else
-             Image->sizeInBytes()
-#endif
-             )
+                .arg(m_cacheSize.fetchAndAddOrdered(0) + Image->sizeInBytes())
                 .arg(oldestKey));
 
             m_imageCache[oldestKey]->SetIsInCache(false);
@@ -490,12 +478,7 @@ MythImage *MythUIThemeCache::CacheImage(const QString& URL, MythImage* Image, bo
         Image->SetIsInCache(true);
         LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
             QString("NOT IN RAM CACHE, Adding, and adding to size :%1: :%2:").arg(URL)
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-        .arg(Image->byteCount())
-#else
-        .arg(Image->sizeInBytes())
-#endif
-        );
+        .arg(Image->sizeInBytes()));
     }
 
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC + QString("MythUIHelper::CacheImage : Cache Count = :%1: size :%2:")
@@ -575,25 +558,13 @@ bool MythUIThemeCache::IsImageInCache(const QString& URL)
 void MythUIThemeCache::IncludeInCacheSize(MythImage* Image)
 {
     if (Image)
-    {
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-        m_cacheSize.fetchAndAddOrdered(Image->byteCount());
-#else
         m_cacheSize.fetchAndAddOrdered(Image->sizeInBytes());
-#endif
-    }
 }
 
 void MythUIThemeCache::ExcludeFromCacheSize(MythImage* Image)
 {
     if (Image)
-    {
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-        m_cacheSize.fetchAndAddOrdered(-Image->byteCount());
-#else
         m_cacheSize.fetchAndAddOrdered(-Image->sizeInBytes());
-#endif
-    }
 }
 
 MThreadPool* MythUIThemeCache::GetImageThreadPool()

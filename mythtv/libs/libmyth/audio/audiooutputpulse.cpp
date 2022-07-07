@@ -478,11 +478,7 @@ QString AudioOutputPulseAudio::ChooseHost(void)
 
     if (pulse_host.isEmpty() && host != "default")
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-        QString env_pulse_host = qgetenv("PULSE_SERVER");
-#else
         QString env_pulse_host = qEnvironmentVariable("PULSE_SERVER");
-#endif
         if (!env_pulse_host.isEmpty())
             pulse_host = env_pulse_host;
     }

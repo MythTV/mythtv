@@ -30,12 +30,7 @@ MythTextureVulkan::MythTextureVulkan(MythVulkanObject *Vulkan,
 
     // retrieve and check Image data
     auto datasize = static_cast<VkDeviceSize>((Image->width() * Image->height() * Image->depth()) >> 3);
-    auto datasize2 =
-#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
-                     Image->sizeInBytes();
-#else
-                     Image->byteCount();
-#endif
+    auto datasize2 = Image->sizeInBytes();
     if (datasize != static_cast<VkDeviceSize>(datasize2))
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Inconsistent image data size");
 

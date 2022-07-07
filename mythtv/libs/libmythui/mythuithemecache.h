@@ -57,13 +57,8 @@ class MUI_PUBLIC MythUIThemeCache
 #else
     QRecursiveMutex m_cacheLock;
 #endif
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-    QAtomicInt m_cacheSize                { 0 };
-    QAtomicInt m_maxCacheSize             { 30 * 1024 * 1024 };
-#else
     QAtomicInteger<qint64> m_cacheSize    { 0 };
     QAtomicInteger<qint64> m_maxCacheSize { 30LL * 1024 * 1024 };
-#endif
     QString m_themecachedir;
     QSize   m_cacheScreenSize;
     MThreadPool* m_imageThreadPool        { nullptr };

@@ -52,10 +52,6 @@
 
 #define LOC      QString("MythCoreContext::%1(): ").arg(__func__)
 
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-#define qEnvironmentVariable getenv
-#endif
-
 MythCoreContext *gCoreContext = nullptr;
 Configuration *MythCoreContext::g_pConfig {nullptr};
 

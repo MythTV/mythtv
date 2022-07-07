@@ -38,10 +38,6 @@
 #define O_LARGEFILE 0
 #endif
 
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-#define qEnvironmentVariable getenv
-#endif
-
 #define LOC     QString("JobQueue: ")
 
 // Consider anything less than 4 hours as a "recent" job.

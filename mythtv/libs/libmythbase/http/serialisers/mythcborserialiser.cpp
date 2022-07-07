@@ -6,7 +6,6 @@
 #include "mythdate.h"
 #include "http/serialisers/mythcborserialiser.h"
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,12,0)
 #include <QCborStreamWriter>
 MythCBORSerialiser::MythCBORSerialiser(const QString& Name, const QVariant& Value)
 {
@@ -162,5 +161,3 @@ void MythCBORSerialiser::AddMap(const QVariantMap& Map)
     }
     m_writer->endMap();
 }
-
-#endif

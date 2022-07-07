@@ -97,11 +97,7 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
 
     uint GetCacheSize(void) const
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-        return (m_cached) ? byteCount() : 0;
-#else
         return (m_cached) ? sizeInBytes() : 0;
-#endif
     }
 
   protected:

@@ -104,11 +104,7 @@ bool MythWaylandDevice::IsAvailable()
     if (!s_checked)
     {
         s_checked = true;
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-        auto waylanddisplay = QString(qgetenv("WAYLAND_DISPLAY"));
-#else
         auto waylanddisplay = qEnvironmentVariable("WAYLAND_DISPLAY");
-#endif
         const auto *name = waylanddisplay.isEmpty() ? nullptr : waylanddisplay.toLocal8Bit().constData();
         if (auto *display = wl_display_connect(name); display)
         {

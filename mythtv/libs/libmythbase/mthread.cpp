@@ -221,9 +221,6 @@ void MThread::RunEpilog(void)
 void MThread::ThreadSetup(const QString &name)
 {
     loggingRegisterThread(name);
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-    qsrand(MythDate::current().toSecsSinceEpoch() ^ QTime::currentTime().msec());
-#endif
 }
 
 void MThread::ThreadCleanup(void)

@@ -40,11 +40,7 @@ int EITFixUp::parseRoman (QString roman)
         int v2 = r2v[roman.at(i+1)];
         result += (v1 >= v2) ? v1 : -v1;
     }
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-    return result + r2v[roman.at(roman.size() - 1)];
-#else
     return result + r2v[roman.back()];
-#endif
 }
 
 

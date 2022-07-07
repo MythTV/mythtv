@@ -130,22 +130,6 @@ void MythSystemLegacyIOHandler::run(void)
             }
             else if( retval > 0 )
             {
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-                PMap_t::iterator i;
-                PMap_t::iterator next;
-                for( i = m_pMap.begin(); i != m_pMap.end(); i = next )
-                {
-                    next = i+1;
-                    int fd = i.key();
-                    if( FD_ISSET(fd, &fds) )
-                    {
-                        if( m_read )
-                            HandleRead(i.key(), i.value());
-                        else
-                            HandleWrite(i.key(), i.value());
-                    }
-                }
-#else
                 auto it = m_pMap.keyValueBegin();
                 while (it != m_pMap.keyValueEnd())
                 {
@@ -159,7 +143,6 @@ void MythSystemLegacyIOHandler::run(void)
                             HandleWrite(fd, buffer);
                     }
                 }
-#endif
             }
             m_pLock.unlock();
         }
@@ -402,21 +385,11 @@ void MythSystemLegacyManager::run(void)
 
         m_mapLock.lock();
         m_jumpLock.lock();
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-        for( i = m_pMap.begin(); i != m_pMap.end(); i = next )
-#else
         auto it = m_pMap.keyValueBegin();
         while (it != m_pMap.keyValueEnd())
-#endif
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-            next = i + 1;
-            auto pid2  = i.key();
-            MythSystemLegacyUnix *ms = i.value();
-#else
             auto [pid2, ms] = *it;
             ++it;
-#endif
             if (!ms)
                 continue;
 
@@ -750,11 +723,7 @@ bool MythSystemLegacyUnix::ParseShell(const QString &cmd, QString &abscmd,
     if (!abscmd.startsWith('/'))
     {
         // search for absolute path
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-        QStringList path = QString(getenv("PATH")).split(':');
-#else
         QStringList path = qEnvironmentVariable("PATH").split(':');
-#endif
         for (const auto& pit : qAsConst(path))
         {
             QFile file(QString("%1/%2").arg(pit, abscmd));

@@ -28,10 +28,6 @@
 #include "v2versionInfo.h"
 #include "v2wolInfo.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-#define qEnvironmentVariable getenv
-#endif
-
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
     (MYTH_HANDLE, V2Myth::staticMetaObject, &V2Myth::RegisterCustomTypes))

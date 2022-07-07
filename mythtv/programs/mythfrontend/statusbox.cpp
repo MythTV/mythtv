@@ -1209,12 +1209,8 @@ void StatusBox::doMachineStatus()
         if ((f & QNetworkInterface::IsLoopBack) != 0U)
             continue;
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
         QNetworkInterface::InterfaceType type = iface.type();
         QString name = type == QNetworkInterface::Wifi ? tr("WiFi") : tr("Ethernet");
-#else
-        QString name = tr("Network");
-#endif
         AddLogLine("   " + name + QString(" (%1): ").arg(iface.humanReadableName()));
         AddLogLine("        " + tr("MAC Address") + ": " + iface.hardwareAddress());
         QList addresses = iface.addressEntries();

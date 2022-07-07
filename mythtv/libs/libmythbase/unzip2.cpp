@@ -147,7 +147,6 @@ QFileDevice::Permissions UnZip::zipToQtPerms(const zipEntry& entry)
 
 void UnZip::zipSetFileAttributes(const zipEntry& entry, QFile& outfile)
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
     // Set times
     auto dateTime = MythDate::fromSecsSinceEpoch(entry.m_stats.mtime);
 
@@ -155,7 +154,6 @@ void UnZip::zipSetFileAttributes(const zipEntry& entry, QFile& outfile)
     outfile.setFileTime(dateTime, QFileDevice::FileBirthTime);
     outfile.setFileTime(dateTime, QFileDevice::FileMetadataChangeTime);
     outfile.setFileTime(dateTime, QFileDevice::FileModificationTime);
-#endif
 
     if (entry.m_attributes == 0)
         return;

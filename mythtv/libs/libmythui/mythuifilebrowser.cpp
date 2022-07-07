@@ -23,10 +23,6 @@
 #include "mythuitext.h"
 #include "mythuiutils.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-#define qEnvironmentVariable getenv
-#endif
-
 /////////////////////////////////////////////////////////////////////
 MFileInfo::MFileInfo(const QString& fileName, QString sgDir, bool isDir, qint64 size)
 {

@@ -52,10 +52,6 @@
 
 #define LOC      QString("MythContext: ")
 
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-#define qEnvironmentVariable getenv
-#endif
-
 MythContext *gContext = nullptr;
 
 static const QString sLocation = "MythContext";

@@ -56,10 +56,8 @@ void TestUnzip::test_text_file(void)
     auto fi = QFileInfo(gTmpDir->path() + "/ipsum_lorem_p1.txt");
     QCOMPARE(fi.exists(), true);
     QCOMPARE(fi.size(), 755);
-#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
     auto actualDateTime = QDateTime(QDate(2021,6,24),QTime(9,55,16));
     QCOMPARE(fi.lastModified(), actualDateTime);
-#endif
 
     auto orig = QFile(QStringLiteral(TEST_SOURCE_DIR) +
                       "/data/ipsum_lorem_p1.txt");
@@ -82,10 +80,8 @@ void TestUnzip::test_theme_file(void)
     auto fi = QFileInfo(gTmpDir->path() + "/trunk/Willi/themeinfo.xml");
     QCOMPARE(fi.exists(), true);
     QCOMPARE(fi.size(), 1461);
-#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
     auto actualDateTime = QDateTime(QDate(2013,7,14),QTime(16,00,56));
     QCOMPARE(fi.lastModified(), actualDateTime);
-#endif
 
     auto orig = QFile(QStringLiteral(TEST_SOURCE_DIR) +
                       "/data/willi_themeinfo.xml");
