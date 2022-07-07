@@ -13,7 +13,7 @@
 VdpStatus status; \
 bool ok = true;
 
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define CHECK_ST \
 ok &= (status == VDP_STATUS_OK); \
 if (!ok) \
@@ -25,6 +25,7 @@ if (!ok) \
 
 #define GET_PROC(FUNC_ID, PROC) \
 status = m_vdpGetProcAddress(m_device, FUNC_ID, reinterpret_cast<void **>(&(PROC))); CHECK_ST
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 VDPAUCodec::VDPAUCodec(MythCodecContext::CodecProfile Profile, QSize Size, uint32_t Macroblocks, uint32_t Level)
   : m_maxSize(Size),

@@ -9,6 +9,7 @@ void InputInfo::Clear(void)
     *this = blank;
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define NEXT() do { ++it; if (it == end) return false; } while (false)
 bool InputInfo::FromStringList(QStringList::const_iterator &it,
                                const QStringList::const_iterator& end)

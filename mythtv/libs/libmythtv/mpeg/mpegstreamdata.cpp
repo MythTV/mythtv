@@ -854,6 +854,7 @@ void MPEGStreamData::UpdateTimeOffset(uint64_t _si_utc_time)
 
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define DONE_WITH_PSIP_PACKET() { delete psip; \
     if (morePSIPTables) goto HAS_ANOTHER_PSIP; else return; }
 

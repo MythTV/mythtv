@@ -81,6 +81,7 @@ inline Service::Service(QObject *parent) : QObject(parent)
 //
 //////////////////////////////////////////////////////////////////////////////
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define SCRIPT_CATCH_EXCEPTION( default, code ) \
             try                      \
             {                        \
@@ -108,6 +109,7 @@ inline Service::Service(QObject *parent) : QObject(parent)
 // first parameter.
 //////////////////////////////////////////////////////////////////////////////
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV(T, _Arg1) \
 template<> inline QScriptValue qscriptQMetaObjectConstructor<T>(QScriptContext *ctx, QScriptEngine *eng, T *) /* NOLINT(bugprone-macro-parentheses) */ \
 { \

@@ -40,6 +40,7 @@
 #include "dtvconfparser.h"
 #include "channelutil.h"
 
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define PARSE_SKIP(VAR) do { \
     if (it == tokens.end()) return false; \
     ++it; } while(false)
@@ -58,6 +59,7 @@
 #define PARSE_UINT_1000(VAR) do { \
     if (it != tokens.end()) \
          (VAR) = (*it++).toUInt() * 1000ULL; else return false; } while(false)
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 
 QString DTVChannelInfo::toString() const
