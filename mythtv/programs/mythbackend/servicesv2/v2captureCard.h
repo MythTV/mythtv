@@ -174,8 +174,7 @@ class V2CaptureDevice : public QObject
         Q_INVOKABLE V2CaptureDevice(QObject *parent = nullptr)
             : QObject          ( parent ),
               m_SignalTimeout  ( 1000   ),
-              m_ChannelTimeout ( 3000   ),
-              m_TuningDelay    (     0  )
+              m_ChannelTimeout ( 3000   )
         {
         }
 
@@ -225,19 +224,7 @@ class V2DiseqcTree : public QObject
 
         Q_INVOKABLE V2DiseqcTree(QObject *parent = nullptr)
             :   QObject               ( parent ),
-                m_DiseqcId            ( 0     ),
-                m_ParentId            ( 0     ),
-                m_Ordinal             ( 0     ),
-                m_SwitchPorts         ( 0     ),
-                m_RotorHiSpeed        ( 0     ),
-                m_RotorLoSpeed        ( 0     ),
-                m_LnbLofSwitch        ( 0     ),
-                m_LnbLofHi            ( 0     ),
-                m_LnbLofLo            ( 0     ),
                 m_CmdRepeat           ( 1     ),
-                m_LnbPolInv           ( 0     ),
-                m_Address             ( 0     ),
-                m_ScrUserband         ( 0     ),
                 m_ScrFrequency        ( 1400  ),
                 m_ScrPin              ( -1    )
         {

@@ -1927,9 +1927,7 @@ uint64_t ProgramInfo::QueryLastFrameInPosMap(void) const
 
 QString ProgramInfo::GetShortInputName(void) const
 {
-    qsizetype idx;
-
-    if ((idx = m_inputName.indexOf('/')) >= 0)
+    if (qsizetype idx = m_inputName.indexOf('/'); idx >= 0)
     {
         return m_inputName.isRightToLeft() ?
                m_inputName.left(idx) : m_inputName.right(idx);
