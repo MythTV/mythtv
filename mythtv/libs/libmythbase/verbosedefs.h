@@ -37,6 +37,8 @@
 #undef LOGLEVEL_POSTAMBLE
 #undef LOGLEVEL_MAP
 
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
+
 #ifdef MYTH_IMPLEMENT_VERBOSE
 
 // This is used to actually implement the mask in mythlogging.cpp
@@ -78,6 +80,8 @@
     name = (value),
 
 #endif
+
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 VERBOSE_PREAMBLE
 VERBOSE_MAP(VB_ALL,       ~0ULL, false,

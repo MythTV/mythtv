@@ -1127,11 +1127,13 @@ QString JobQueue::JobText(int jobType)
     return tr("Unknown Job");
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define JOBSTATUS_STATUSTEXT(A,B,C) case A: return C;
+
 QString JobQueue::StatusText(int status)
 {
     switch (status)
     {
-#define JOBSTATUS_STATUSTEXT(A,B,C) case A: return C;
         JOBSTATUS_MAP(JOBSTATUS_STATUSTEXT)
         default: break;
     }

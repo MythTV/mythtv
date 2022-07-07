@@ -21,6 +21,8 @@ class MThread;
 class ProgramInfo;
 class RecordingInfo;
 
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
+
 // Strings are used by JobQueue::StatusText()
 #define JOBSTATUS_MAP(F) \
     F(JOB_UNKNOWN,      0x0000, JobQueue::tr("Unknown")) \
@@ -43,10 +45,12 @@ class RecordingInfo;
     F(JOB_ERRORED,      0x0130, JobQueue::tr("Errored")) \
     F(JOB_CANCELLED,    0x0140, JobQueue::tr("Cancelled")) \
 
-enum JobStatus {
 #define JOBSTATUS_ENUM(A,B,C)   A = (B) ,
+enum JobStatus {
     JOBSTATUS_MAP(JOBSTATUS_ENUM)
 };
+
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 enum JobCmds {
     JOB_RUN          = 0x0000,
