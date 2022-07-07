@@ -744,7 +744,13 @@ int  V2Capture::AddDiseqcTree ( uint           ParentId,
             ":SCR_PIN ) " );
 
     if (ParentId == 0) // Value 0 is set to null
+    {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         query.bindValue(":PARENTID", QVariant(QVariant::UInt));
+#else
+        query.bindValue(":PARENTID", QVariant(QMetaType(QMetaType::UInt)));
+#endif
+    }
     else
         query.bindValue(":PARENTID", ParentId);
     query.bindValue(":ORDINAL", Ordinal);
@@ -820,7 +826,13 @@ bool V2Capture::UpdateDiseqcTree  ( uint           DiseqcId,
 
     query.bindValue(":DISEQCID", DiseqcId);
     if (ParentId == 0) // Value 0 is set to null
+    {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         query.bindValue(":PARENTID", QVariant(QVariant::UInt));
+#else
+        query.bindValue(":PARENTID", QVariant(QMetaType(QMetaType::UInt)));
+#endif
+    }
     else
         query.bindValue(":PARENTID", ParentId);
     query.bindValue(":ORDINAL", Ordinal);
