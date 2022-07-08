@@ -32,7 +32,7 @@ export class JobqueueGlobalComponent implements OnInit, AfterViewInit {
 
   saveForm() {
     console.log("save form clicked");
-    this.setupService.saveJobQGlobal();
+    this.setupService.saveJobQGlobal(this.currentForm);
   }
 
 }

@@ -30,7 +30,7 @@ export class BackendControlComponent implements OnInit, AfterViewInit {
 
   saveForm() {
     console.log("save form clicked");
-    this.setupService.saveBackendControl();
+    this.setupService.saveBackendControl(this.currentForm);
   }
 
 }

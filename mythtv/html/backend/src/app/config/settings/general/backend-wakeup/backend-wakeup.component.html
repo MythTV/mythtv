@@ -72,7 +72,7 @@
                 <div class="col-12">
                     <p-message *ngIf="this.beWakeData.successCount > 0 && this.beWakeData.errorCount == 0 && !backendwakeup.dirty"
                         severity="success" text="{{ 'common.savesuccess' | translate }}" ></p-message>
-                    <p-message *ngIf="this.beWakeData.errorCount > 0 && !backendwakeup.dirty"
+                    <p-message *ngIf="this.beWakeData.errorCount > 0"
                         severity="error" text="{{ 'common.networkfail' | translate }}" ></p-message>
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); backendwakeup.form.markAsPristine()"

@@ -16,6 +16,8 @@ export class SetupService {
 
     m_hostName: string = ""; // hostname of the backend server
     m_initialized: boolean = false;
+    requesterForm : NgForm | null = null;
+
 
     constructor(private mythService: MythService, private translate: TranslateService) {
         this.mythService.GetHostName().subscribe(data => {
@@ -25,6 +27,10 @@ export class SetupService {
 
     Init(): void {
         this.m_initialized = true;
+    }
+
+    getHostName() : string {
+        return this.m_hostName;
     }
 
     m_HostAddressData!: HostAddress;
@@ -107,16 +113,24 @@ export class SetupService {
         next: (x: any) => {
             if (x.bool)
                 this.m_HostAddressData.successCount ++;
-            else
+            else {
                 this.m_HostAddressData.errorCount++;
+                if (this.requesterForm)
+                    this.requesterForm.form.markAsDirty();
+            }
         },
         error: (err: any) => {
             console.error(err);
             this.m_HostAddressData.errorCount ++
-        }
+            if (this.requesterForm)
+                this.requesterForm.form.markAsDirty();
+}
     };
 
-    saveHostAddressData() {
+    saveHostAddressData(requesterForm: NgForm|null) {
+        this.requesterForm = requesterForm;
+        this.m_HostAddressData.successCount = 0;
+        this.m_HostAddressData.errorCount = 0;
         this.mythService.PutSetting({
             HostName: this.m_hostName, Key: "BackendServerPort",
             Value: String(this.m_HostAddressData.BackendServerPort)
@@ -192,17 +206,26 @@ export class SetupService {
         next: (x: any) => {
             if (x.bool)
                 this.m_LocaleData.successCount ++;
-            else
+            else {
                 this.m_LocaleData.errorCount++;
+                if (this.requesterForm)
+                    this.requesterForm.form.markAsDirty();
+            }
         },
         error: (err: any) => {
             console.error(err);
             this.m_LocaleData.errorCount ++
+            if (this.requesterForm)
+                this.requesterForm.form.markAsDirty();
         }
     };
 
 
-    saveLocaleData() {
+    saveLocaleData(requesterForm: NgForm|null) {
+        this.requesterForm = requesterForm;
+        this.m_LocaleData.successCount = 0;
+        this.m_LocaleData.errorCount = 0;
+
         this.mythService.PutSetting({
             HostName: "_GLOBAL_", Key: "TVFormat",
             Value: this.m_LocaleData.TVFormat
@@ -286,16 +309,22 @@ export class SetupService {
         next: (x: any) => {
             if (x.bool)
                 this.m_miscellaneousData.successCount ++;
-            else
+            else {
                 this.m_miscellaneousData.errorCount++;
+                if (this.requesterForm)
+                    this.requesterForm.form.markAsDirty();
+            }
         },
         error: (err: any) => {
             console.error(err);
             this.m_miscellaneousData.errorCount ++
+            if (this.requesterForm)
+                this.requesterForm.form.markAsDirty();
         }
     };
 
-    saveMiscellaneousSettings () {
+    saveMiscellaneousSettings (requesterForm: NgForm|null) {
+        this.requesterForm = requesterForm;
         this.m_miscellaneousData.successCount = 0;
         this.m_miscellaneousData.errorCount = 0;
         this.mythService.PutSetting({ HostName: '_GLOBAL_', Key: "MasterBackendOverride",
@@ -351,16 +380,22 @@ export class SetupService {
         next: (x: any) => {
             if (x.bool)
                 this.m_EITScanner.successCount++;
-            else
+            else {
                 this.m_EITScanner.errorCount++;
+                if (this.requesterForm)
+                    this.requesterForm.form.markAsDirty();
+            }
         },
         error: (err: any) => {
             console.error(err);
-            this.m_EITScanner.errorCount++
-        },
+            this.m_EITScanner.errorCount++;
+            if (this.requesterForm)
+                this.requesterForm.form.markAsDirty();
+},
     };
 
-    saveEITScanner() {
+    saveEITScanner(requesterForm: NgForm|null) {
+        this.requesterForm = requesterForm;
         this.m_EITScanner.successCount = 0;
         this.m_EITScanner.errorCount = 0;
         this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "EITTransportTimeout",
@@ -439,16 +474,22 @@ export class SetupService {
         next: (x: any) => {
             if (x.bool)
                 this.m_ShutWake.successCount++;
-            else
+            else {
                 this.m_ShutWake.errorCount++;
+                if (this.requesterForm)
+                    this.requesterForm.form.markAsDirty();
+            }
         },
         error: (err: any) => {
             console.error(err);
-            this.m_ShutWake.errorCount++
+            this.m_ShutWake.errorCount++;
+            if (this.requesterForm)
+                this.requesterForm.form.markAsDirty();
         },
     };
 
-    saveShutWake() {
+    saveShutWake(requesterForm: NgForm|null) {
+        this.requesterForm = requesterForm;
         this.m_ShutWake.successCount = 0;
         this.m_ShutWake.errorCount = 0;
         this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "startupCommand",
@@ -517,16 +558,22 @@ export class SetupService {
         next: (x: any) => {
             if (x.bool)
                 this.m_BackendWake.successCount++;
-            else
+            else {
                 this.m_BackendWake.errorCount++;
+                if (this.requesterForm)
+                    this.requesterForm.form.markAsDirty();
+            }
         },
         error: (err: any) => {
             console.error(err);
-            this.m_BackendWake.errorCount++
+            this.m_BackendWake.errorCount++;
+            if (this.requesterForm)
+                this.requesterForm.form.markAsDirty();
         },
     };
 
-    saveBackendWake() {
+    saveBackendWake(requesterForm: NgForm|null) {
+        this.requesterForm = requesterForm;
         this.m_BackendWake.successCount = 0;
         this.m_BackendWake.errorCount = 0;
         this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "WOLbackendReconnectWaitTime",
@@ -569,16 +616,22 @@ export class SetupService {
         next: (x: any) => {
             if (x.bool)
                 this.m_BackendControl.successCount++;
-            else
+            else {
                 this.m_BackendControl.errorCount++;
+                if (this.requesterForm)
+                    this.requesterForm.form.markAsDirty();
+            }
         },
         error: (err: any) => {
             console.error(err);
-            this.m_BackendControl.errorCount++
+            this.m_BackendControl.errorCount++;
+            if (this.requesterForm)
+                this.requesterForm.form.markAsDirty();
         },
     };
 
-    saveBackendControl() {
+    saveBackendControl(requesterForm: NgForm|null) {
+        this.requesterForm = requesterForm;
         this.m_BackendControl.successCount = 0;
         this.m_BackendControl.errorCount = 0;
         this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "BackendStopCommand",
@@ -710,16 +763,22 @@ export class SetupService {
         next: (x: any) => {
             if (x.bool)
                 this.m_JobQBackend.successCount++;
-            else
+            else {
                 this.m_JobQBackend.errorCount++;
+                if (this.requesterForm)
+                    this.requesterForm.form.markAsDirty();
+            }
         },
         error: (err: any) => {
             console.error(err);
-            this.m_JobQBackend.errorCount++
+            this.m_JobQBackend.errorCount++;
+            if (this.requesterForm)
+                this.requesterForm.form.markAsDirty();
         },
     };
 
-    saveJobQBackend() {
+    saveJobQBackend(requesterForm: NgForm|null) {
+        this.requesterForm = requesterForm;
         this.m_JobQBackend.successCount = 0;
         this.m_JobQBackend.errorCount = 0;
         this.mythService.PutSetting({HostName: this.m_hostName, Key: "JobQueueMaxSimultaneousJobs",
@@ -790,16 +849,22 @@ export class SetupService {
         next: (x: any) => {
             if (x.bool)
                 this.m_JobQCommands.successCount++;
-            else
+            else {
                 this.m_JobQCommands.errorCount++;
+                if (this.requesterForm)
+                    this.requesterForm.form.markAsDirty();
+            }
         },
         error: (err: any) => {
             console.error(err);
-            this.m_JobQCommands.errorCount++
+            this.m_JobQCommands.errorCount++;
+            if (this.requesterForm)
+                this.requesterForm.form.markAsDirty();
         },
     };
 
-    saveJobQCommands() {
+    saveJobQCommands(requesterForm: NgForm|null) {
+        this.requesterForm = requesterForm;
         this.m_JobQCommands.successCount = 0;
         this.m_JobQCommands.errorCount = 0;
         for (let ix = 0; ix < 4; ix++) {
@@ -863,16 +928,22 @@ export class SetupService {
         next: (x: any) => {
             if (x.bool)
                 this.m_JobQGlobal.successCount++;
-            else
+            else {
                 this.m_JobQGlobal.errorCount++;
+                if (this.requesterForm)
+                    this.requesterForm.form.markAsDirty();
+            }
         },
         error: (err: any) => {
             console.error(err);
-            this.m_JobQGlobal.errorCount++
+            this.m_JobQGlobal.errorCount++;
+            if (this.requesterForm)
+                this.requesterForm.form.markAsDirty();
         },
     };
 
-    saveJobQGlobal() {
+    saveJobQGlobal(requesterForm: NgForm|null) {
+        this.requesterForm = requesterForm;
         this.m_JobQGlobal.successCount = 0;
         this.m_JobQGlobal.errorCount = 0;
         this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "JobsRunOnRecordHost",
@@ -909,23 +980,29 @@ export class SetupService {
         next: (x: any) => {
             if (x.bool)
                 this.m_EpgDownload.successCount++;
-            else
+            else {
                 this.m_EpgDownload.errorCount++;
+                if (this.requesterForm)
+                    this.requesterForm.form.markAsDirty();
+            }
         },
         error: (err: any) => {
             console.error(err);
             this.m_EpgDownload.errorCount++
+            if (this.requesterForm)
+                this.requesterForm.form.markAsDirty();
         },
     };
 
-    saveEpgDownload() {
+    saveEpgDownload(requesterForm: NgForm|null) {
+        this.requesterForm = requesterForm;
         this.m_EpgDownload.successCount = 0;
         this.m_EpgDownload.errorCount = 0;
         this.mythService.PutSetting({HostName: '_GLOBAL_', Key: "MythFillEnabled",
             Value: this.m_EpgDownload.MythFillEnabled ? "1" : "0"}).subscribe(this.EpgDownloadObs);
     }
 
-    currentForm! : NgForm | null;
+    currentForm : NgForm | null = null;
 
     getCurrentForm() : NgForm | null{
         return this.currentForm;

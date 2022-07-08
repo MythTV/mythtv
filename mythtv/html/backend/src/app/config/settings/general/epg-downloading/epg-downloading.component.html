@@ -29,7 +29,7 @@
                 <div class="col-12">
                     <p-message *ngIf="this.EpgDownloadData.successCount > 0 && this.EpgDownloadData.errorCount == 0 && !epgdownload.dirty"
                         severity="success" text="{{ 'common.savesuccess' | translate }}" ></p-message>
-                    <p-message *ngIf="this.EpgDownloadData.errorCount > 0 && !epgdownload.dirty"
+                    <p-message *ngIf="this.EpgDownloadData.errorCount > 0"
                         severity="error" text="{{ 'common.networkfail' | translate }}" ></p-message>
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); epgdownload.form.markAsPristine()"

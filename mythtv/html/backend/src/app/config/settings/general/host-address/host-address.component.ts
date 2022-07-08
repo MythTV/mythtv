@@ -64,6 +64,6 @@ export class HostAddressComponent implements OnInit,  AfterViewInit {
 
     saveForm() {
         console.log("save form clicked");
-        this.setupService.saveHostAddressData();
+        this.setupService.saveHostAddressData(this.currentForm);
     }
 }

@@ -89,6 +89,6 @@ export class LocaleComponent implements OnInit, AfterViewInit {
     }
 
     saveForm() {
-        this.setupService.saveLocaleData();
+        this.setupService.saveLocaleData(this.currentForm);
     }
 }

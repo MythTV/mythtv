@@ -33,7 +33,7 @@ export class EpgDownloadingComponent implements OnInit, AfterViewInit {
 
   saveForm() {
     console.log("save form clicked");
-    this.setupService.saveEpgDownload();
+    this.setupService.saveEpgDownload(this.currentForm);
   }
 
 }

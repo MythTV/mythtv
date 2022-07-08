@@ -31,7 +31,7 @@ export class EitScannerComponent implements OnInit,AfterViewInit {
 
   saveForm() {
     console.log("save form clicked");
-    this.setupService.saveEITScanner();
+    this.setupService.saveEITScanner(this.currentForm);
   }
 
 }

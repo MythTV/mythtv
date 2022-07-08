@@ -31,7 +31,7 @@ export class BackendWakeupComponent implements OnInit, AfterViewInit {
 
   saveForm() {
     console.log("save form clicked");
-    this.setupService.saveBackendWake();
+    this.setupService.saveBackendWake(this.currentForm);
   }
 
 

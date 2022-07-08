@@ -39,70 +39,6 @@
 
                     </div>
 
-
-
-
-<!--
-                    <div class="form-group field">
-                        <p-checkbox inputId="JobsRunOnRecordHost" [(ngModel)]="JobQCommandsData.JobsRunOnRecordHost"
-                            name="JobsRunOnRecordHost" #JobsRunOnRecordHost="ngModel" class="mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.jobqcommands.runonrechost_label' | translate }}">
-                        </p-checkbox>
-                        <small class="block">
-                            {{ 'settings.jobqcommands.runonrechost_desc' | translate }}
-                        </small>
-                    </div>
-
-                    <div class="form-group field">
-                        <p-checkbox inputId="AutoCommflagWhileRecording" [(ngModel)]="JobQCommandsData.AutoCommflagWhileRecording"
-                            name="AutoCommflagWhileRecording" #AutoCommflagWhileRecording="ngModel" class="mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.jobqcommands.startcomm_label' | translate }}">
-                        </p-checkbox>
-                        <small class="block">
-                            {{ 'settings.jobqcommands.startcomm_desc' | translate }}
-                        </small>
-                    </div>
-
-                    <div class="form-group field">
-                        <label for="JobQueueCommFlagCommand" class="block">{{ 'settings.jobqcommands.commcmd_label' | translate }}</label>
-                        <input pInputText id="JobQueueCommFlagCommand"
-                            [(ngModel)]="JobQCommandsData.JobQueueCommFlagCommand" name="JobQueueCommFlagCommand"
-                            #JobQueueCommFlagCommand="ngModel" class="mb-2 form-control w-full" />
-                        <small class="block">
-                            {{ 'settings.jobqcommands.commcmd_desc' | translate }}
-                        </small>
-                    </div>
-
-                    <div class="form-group field">
-                        <label for="JobQueueTranscodeCommand" class="block">{{ 'settings.jobqcommands.transcmd_label' | translate }}</label>
-                        <input pInputText id="JobQueueTranscodeCommand"
-                            [(ngModel)]="JobQCommandsData.JobQueueTranscodeCommand" name="JobQueueTranscodeCommand"
-                            #JobQueueTranscodeCommand="ngModel" class="mb-2 form-control w-full" />
-                        <small class="block">
-                            {{ 'settings.jobqcommands.transcmd_desc' | translate }}
-                        </small>
-                    </div>
-
-                    <div class="form-group field">
-                        <p-checkbox inputId="AutoTranscodeBeforeAutoCommflag" [(ngModel)]="JobQCommandsData.AutoTranscodeBeforeAutoCommflag"
-                            name="AutoTranscodeBeforeAutoCommflag" #AutoTranscodeBeforeAutoCommflag="ngModel" class="mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.jobqcommands.transfirst_label' | translate }}">
-                        </p-checkbox>
-                        <small class="block">
-                            {{ 'settings.jobqcommands.transfirst_desc' | translate }}
-                        </small>
-                    </div>
-
-                    <div class="form-group field">
-                        <p-checkbox inputId="SaveTranscoding" [(ngModel)]="JobQCommandsData.SaveTranscoding"
-                            name="SaveTranscoding" #SaveTranscoding="ngModel" class="mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.jobqcommands.transsave_label' | translate }}">
-                        </p-checkbox>
-                        <small class="block">
-                            {{ 'settings.jobqcommands.transsave_desc' | translate }}
-                        </small>
-                    </div>
- -->
                 </div>
 
             </div>
@@ -113,7 +49,7 @@
                 <div class="col-12">
                     <p-message *ngIf="this.JobQCommandsData.successCount > 0 && this.JobQCommandsData.errorCount == 0 && !jobqcommands.dirty"
                         severity="success" text="{{ 'common.savesuccess' | translate }}" ></p-message>
-                    <p-message *ngIf="this.JobQCommandsData.errorCount > 0 && !jobqcommands.dirty"
+                    <p-message *ngIf="this.JobQCommandsData.errorCount > 0"
                         severity="error" text="{{ 'common.networkfail' | translate }}" ></p-message>
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); jobqcommands.form.markAsPristine()"

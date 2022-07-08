@@ -56,6 +56,6 @@ constructor(private setupService: SetupService, private translate: TranslateServ
 
   saveForm() {
       console.log("save form clicked");
-      this.setupService.saveMiscellaneousSettings();
+      this.setupService.saveMiscellaneousSettings(this.currentForm);
   }
 }

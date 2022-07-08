@@ -69,7 +69,7 @@ export class JobqueueBackendComponent implements OnInit, AfterViewInit {
 
   saveForm() {
     console.log("save form clicked");
-    this.setupService.saveJobQBackend();
+    this.setupService.saveJobQBackend(this.currentForm);
   }
 
 }

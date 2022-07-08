@@ -79,7 +79,7 @@
                 <div class="col-12">
                     <p-message *ngIf="this.JobQGlobalData.successCount > 0 && this.JobQGlobalData.errorCount == 0 && !jobqglobal.dirty"
                         severity="success" text="{{ 'common.savesuccess' | translate }}" ></p-message>
-                    <p-message *ngIf="this.JobQGlobalData.errorCount > 0 && !jobqglobal.dirty"
+                    <p-message *ngIf="this.JobQGlobalData.errorCount > 0"
                         severity="error" text="{{ 'common.networkfail' | translate }}" ></p-message>
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); jobqglobal.form.markAsPristine()"
