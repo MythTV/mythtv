@@ -2035,7 +2035,7 @@ bool CardUtil::LinkInputGroup(uint inputid, uint inputgroupid)
 
     if (!query.exec())
     {
-        MythDB::DBError("CardUtil::CreateInputGroup() 1", query);
+        MythDB::DBError("CardUtil::LinkInputGroup() 1", query);
         return false;
     }
 
@@ -2055,9 +2055,12 @@ bool CardUtil::LinkInputGroup(uint inputid, uint inputgroupid)
 
     if (!query.exec())
     {
-        MythDB::DBError("CardUtil::CreateInputGroup() 2", query);
+        MythDB::DBError("CardUtil::LinkInputGroup() 2", query);
         return false;
     }
+
+    // Now that there is a proper linkage, unlink temporary cardid 0
+    UnlinkInputGroup(0, inputgroupid);
 
     return true;
 }
