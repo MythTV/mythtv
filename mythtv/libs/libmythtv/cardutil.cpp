@@ -1518,6 +1518,43 @@ uint CardUtil::CloneCard(uint src_inputid, uint orig_dst_inputid)
     return dst_inputid;
 }
 
+
+bool CardUtil::InputSetMaxRecordings(uint parentid, uint max_recordings)
+{
+    if (max_recordings < 1)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "InputSetMaxRecording: max must be greater than zero.");
+        return false;
+    }
+
+    std::vector<uint> cardids = CardUtil::GetChildInputIDs(parentid);
+
+    // Delete old clone cards as required.
+    for (size_t i = cardids.size() + 1;
+         (i > max_recordings) && !cardids.empty(); --i)
+    {
+        CardUtil::DeleteInput(cardids.back());
+        cardids.pop_back();
+    }
+
+    // Clone this config to existing clone cards.
+    for (uint id : cardids)
+        CardUtil::CloneCard(parentid, id);
+
+    // Create new clone cards as required.
+    for (size_t i = cardids.size() + 1; i < max_recordings; ++i)
+    {
+        CardUtil::CloneCard(parentid, 0);
+    }
+
+    // Delete any unused input groups
+    CardUtil::UnlinkInputGroup(0,0);
+
+    return true;
+}
+
+
 uint CardUtil::AddChildInput(uint parentid)
 {
     uint inputid = CloneCard(parentid, 0);

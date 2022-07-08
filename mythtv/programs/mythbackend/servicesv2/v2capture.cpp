@@ -67,7 +67,7 @@ V2Capture::V2Capture()
 /////////////////////////////////////////////////////////////////////////////
 
 V2CaptureCardList* V2Capture::GetCaptureCardList( const QString &sHostName,
-                                                   const QString &sCardType )
+                                                  const QString &sCardType )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -521,6 +521,12 @@ bool V2Capture::UnlinkInputGroup(const uint InputId,
         throw( QString ( "Failed to unlink input %1 from group %2" )
                .arg(InputId).arg(InputGroupId));
     return true;
+}
+
+bool V2Capture::SetInputMaxRecordings( const uint InputId,
+                                       const uint Max )
+{
+    return CardUtil::InputSetMaxRecordings(InputId, Max);
 }
 
 

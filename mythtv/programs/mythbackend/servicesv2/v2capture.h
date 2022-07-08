@@ -46,7 +46,7 @@ class V2Capture : public MythHTTPService
     Q_CLASSINFO("AddUserInputGroup",  "methods=POST;name=int")
     Q_CLASSINFO("LinkInputGroup",     "methods=POST;name=bool")
     Q_CLASSINFO("UnlinkInputGroup",   "methods=POST;name=bool")
-    //    Q_CLASSINFO("GetUserInputGroupList", "methods=GET,POST,HEAD")
+    Q_CLASSINFO("SetInputMaxRecordings", "methods=POST;name=bool")
     Q_CLASSINFO("AddDiseqcTree",      "methods=POST")
     Q_CLASSINFO("UpdateDiseqcTree",   "methods=POST")
     Q_CLASSINFO("RemoveDiseqcTree",   "methods=POST")
@@ -128,6 +128,9 @@ class V2Capture : public MythHTTPService
 
     static bool                 UnlinkInputGroup   ( const uint InputId,
                                                      const uint InputGroupId );
+
+    static bool                 SetInputMaxRecordings ( const uint InputId,
+                                                        const uint Max );
 
     static V2CardTypeList*      GetCardTypeList     ( void );
 

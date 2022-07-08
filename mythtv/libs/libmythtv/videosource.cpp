@@ -3508,28 +3508,8 @@ void CardInput::Save(void)
     uint icount = 1;
     if (m_instanceCount)
         icount = m_instanceCount->getValue().toUInt();
-    std::vector<uint> cardids = CardUtil::GetChildInputIDs(cardid);
 
-    // Delete old clone cards as required.
-    for (size_t i = cardids.size() + 1;
-         (i > icount) && !cardids.empty(); --i)
-    {
-        CardUtil::DeleteInput(cardids.back());
-        cardids.pop_back();
-    }
-
-    // Clone this config to existing clone cards.
-    for (uint id : cardids)
-        CardUtil::CloneCard(cardid, id);
-
-    // Create new clone cards as required.
-    for (size_t i = cardids.size() + 1; i < icount; i++)
-    {
-        CardUtil::CloneCard(cardid, 0);
-    }
-
-    // Delete any unused input groups
-    CardUtil::UnlinkInputGroup(0,0);
+    CardUtil::InputSetMaxRecordings(cardid, icount);
 }
 
 int CardInputDBStorage::getInputID(void) const
