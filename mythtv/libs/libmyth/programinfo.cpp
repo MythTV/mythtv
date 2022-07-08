@@ -1252,22 +1252,11 @@ bool ProgramInfo::QueryRecordedIdFromPathname(const QString &pathname,
     return false;
 }
 
-#define INT_TO_LIST(x)       do { list << QString::number(x); } while (false)
-
-#define DATETIME_TO_LIST(x)  do {                                         \
-                                 if ((x).isValid()) {                     \
-                                     INT_TO_LIST((x).toSecsSinceEpoch()); \
-                                 } else {                                 \
-                                     INT_TO_LIST(kInvalidDateTime);       \
-                                 }                                        \
-                             } while (false)
-
-#define LONGLONG_TO_LIST(x)  do { list << QString::number(x); } while (false)
-
-#define STR_TO_LIST(x)       do { list << (x); } while (false)
-#define DATE_TO_LIST(x)      do { list << (x).toString(Qt::ISODate); } while (false)
-
-#define FLOAT_TO_LIST(x)     do { list << QString("%1").arg(x); } while (false)
+static inline QString DateTimeToListInt(const QDateTime& x) {
+    if (x.isValid())
+        return QString::number(x.toSecsSinceEpoch());
+    return QString::number(kInvalidDateTime);
+}
 
 /** \fn ProgramInfo::ToStringList(QStringList&) const
  *  \brief Serializes ProgramInfo into a QStringList which can be passed
@@ -1277,68 +1266,69 @@ bool ProgramInfo::QueryRecordedIdFromPathname(const QString &pathname,
  */
 void ProgramInfo::ToStringList(QStringList &list) const
 {
-    STR_TO_LIST(m_title);        // 0
-    STR_TO_LIST(m_subtitle);     // 1
-    STR_TO_LIST(m_description);  // 2
-    INT_TO_LIST(m_season);       // 3
-    INT_TO_LIST(m_episode);      // 4
-    INT_TO_LIST(m_totalEpisodes); // 5
-    STR_TO_LIST(m_syndicatedEpisode); // 6
-    STR_TO_LIST(m_category);     // 7
-    INT_TO_LIST(m_chanId);       // 8
-    STR_TO_LIST(m_chanStr);      // 9
-    STR_TO_LIST(m_chanSign);     // 10
-    STR_TO_LIST(m_chanName);     // 11
-    STR_TO_LIST(m_pathname);     // 12
-    INT_TO_LIST(m_fileSize);     // 13
+    list << m_title;                          // 0
+    list << m_subtitle;                       // 1
+    list << m_description;                    // 2
+    list << QString::number(m_season );       // 3
+    list << QString::number(m_episode );      // 4
+    list << QString::number(m_totalEpisodes); // 5
+    list << m_syndicatedEpisode;              // 6
+    list << m_category;                       // 7
+    list << QString::number(m_chanId);        // 8
+    list << m_chanStr;                        // 9
+    list << m_chanSign;                       // 10
+    list << m_chanName;                       // 11
+    list << m_pathname;                       // 12
+    list << QString::number(m_fileSize);      // 13
 
-    DATETIME_TO_LIST(m_startTs); // 14
-    DATETIME_TO_LIST(m_endTs);   // 15
-    INT_TO_LIST(m_findId);       // 16
-    STR_TO_LIST(m_hostname);     // 17
-    INT_TO_LIST(m_sourceId);     // 18
-    INT_TO_LIST(m_inputId);      // 19 (m_formerly cardid)
-    INT_TO_LIST(m_inputId);      // 20
-    INT_TO_LIST(m_recPriority);  // 21
-    INT_TO_LIST(m_recStatus);    // 22
-    INT_TO_LIST(m_recordId);     // 23
+    list << DateTimeToListInt(m_startTs);     // 14
+    list << DateTimeToListInt(m_endTs);       // 15
+    list << QString::number(m_findId);        // 16
+    list << m_hostname;                       // 17
+    list << QString::number(m_sourceId);      // 18
+    list << QString::number(m_inputId);       // 19 (m_formerly cardid)
+    list << QString::number(m_inputId);       // 20
+    list << QString::number(m_recPriority);   // 21
+    list << QString::number(m_recStatus);     // 22
+    list << QString::number(m_recordId);      // 23
 
-    INT_TO_LIST(m_recType);      // 24
-    INT_TO_LIST(m_dupIn);        // 25
-    INT_TO_LIST(m_dupMethod);    // 26
-    DATETIME_TO_LIST(m_recStartTs);//27
-    DATETIME_TO_LIST(m_recEndTs);// 28
-    INT_TO_LIST(m_programFlags); // 29
-    STR_TO_LIST(!m_recGroup.isEmpty() ? m_recGroup : "Default"); // 30
-    STR_TO_LIST(m_chanPlaybackFilters); // 31
-    STR_TO_LIST(m_seriesId);     // 32
-    STR_TO_LIST(m_programId);    // 33
-    STR_TO_LIST(m_inetRef);      // 34
+    list << QString::number(m_recType);       // 24
+    list << QString::number(m_dupIn);         // 25
+    list << QString::number(m_dupMethod);     // 26
+    list << DateTimeToListInt(m_recStartTs);  // 27
+    list << DateTimeToListInt(m_recEndTs);    // 28
+    list << QString::number(m_programFlags);  // 29
+    list << (!m_recGroup.isEmpty() ? m_recGroup : "Default"); // 30
+    list << m_chanPlaybackFilters;            // 31
+    list << m_seriesId;                       // 32
+    list << m_programId;                      // 33
+    list << m_inetRef;                        // 34
 
-    DATETIME_TO_LIST(m_lastModified); // 35
-    FLOAT_TO_LIST(m_stars);           // 36
-    DATE_TO_LIST(m_originalAirDate);  // 37
-    STR_TO_LIST((!m_playGroup.isEmpty()) ? m_playGroup : "Default"); // 38
-    INT_TO_LIST(m_recPriority2);      // 39
-    INT_TO_LIST(m_parentId);          // 40
-    STR_TO_LIST((!m_storageGroup.isEmpty()) ? m_storageGroup : "Default"); // 41
-    INT_TO_LIST(m_audioProperties);    // 42
-    INT_TO_LIST(m_videoProperties);    // 43
-    INT_TO_LIST(m_subtitleProperties); // 44
+    list << DateTimeToListInt(m_lastModified);       // 35
+    list << QString("%1").arg(m_stars);              // 36
+    list << m_originalAirDate.toString(Qt::ISODate); // 37
+    list << (!m_playGroup.isEmpty() ? m_playGroup : "Default"); // 38
+    list << QString::number(m_recPriority2);         // 39
+    list << QString::number(m_parentId);             // 40
+    list << (!m_storageGroup.isEmpty() ? m_storageGroup : "Default"); // 41
+    list << QString::number(m_audioProperties);      // 42
+    list << QString::number(m_videoProperties);      // 43
+    list << QString::number(m_subtitleProperties);   // 44
 
-    INT_TO_LIST(m_year);              // 45
-    INT_TO_LIST(m_partNumber);   // 46
-    INT_TO_LIST(m_partTotal);    // 47
-    INT_TO_LIST(m_catType);      // 48
+    list << QString::number(m_year);                 // 45
+    list << QString::number(m_partNumber);           // 46
+    list << QString::number(m_partTotal);            // 47
+    list << QString::number(m_catType);              // 48
 
-    INT_TO_LIST(m_recordedId);          // 49
-    STR_TO_LIST(m_inputName);           // 50
-    DATETIME_TO_LIST(m_bookmarkUpdate); // 51
+    list << QString::number(m_recordedId);           // 49
+    list << m_inputName;                             // 50
+    list << DateTimeToListInt(m_bookmarkUpdate);     // 51
 /* do not forget to update the NUMPROGRAMLINES defines! */
 }
 
 // QStringList::const_iterator it = list.begin()+offset;
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define NEXT_STR()        do { if (it == listend)                    \
                                {                                     \
                                    LOG(VB_GENERAL, LOG_ERR, listerror); \
@@ -1347,25 +1337,20 @@ void ProgramInfo::ToStringList(QStringList &list) const
                                }                                     \
                                ts = *it++; } while (false)
 
-#define INT_FROM_LIST(x)     do { NEXT_STR(); (x) = ts.toLongLong(); } while (false)
-#define ENUM_FROM_LIST(x, y) do { NEXT_STR(); (x) = ((y)ts.toInt()); } while (false)
+static inline QDateTime DateTimeFromListItem(const QString& str)
+{
+    if (str.isEmpty() or (str.toUInt() == kInvalidDateTime))
+        return {};
+    return MythDate::fromSecsSinceEpoch(str.toLongLong());
+}
 
-#define DATETIME_FROM_LIST(x) \
-    do { NEXT_STR();                                                    \
-         if (ts.isEmpty() or (ts.toUInt() == kInvalidDateTime)) {       \
-              (x) = QDateTime();                                        \
-         } else {                                                       \
-              (x) = MythDate::fromSecsSinceEpoch(ts.toLongLong());      \
-         }                                                              \
-    } while (false)
-#define DATE_FROM_LIST(x) \
-    do { NEXT_STR(); (x) = ((ts.isEmpty()) || (ts == "0000-00-00")) ? \
-                         QDate() : QDate::fromString(ts, Qt::ISODate); \
-    } while (false)
+static inline QDate DateFromListItem(const QString& str)
+{
+     if (str.isEmpty() || (str == "0000-00-00"))
+         return {};
+     return QDate::fromString(str, Qt::ISODate);
+}
 
-#define STR_FROM_LIST(x)     do { NEXT_STR(); (x) = ts; } while (false)
-
-#define FLOAT_FROM_LIST(x)   do { NEXT_STR(); (x) = ts.toFloat(); } while (false)
 
 /** \fn ProgramInfo::FromStringList(QStringList::const_iterator&,
                                     QStringList::const_iterator)
@@ -1387,63 +1372,63 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     uint      origChanid     = m_chanId;
     QDateTime origRecstartts = m_recStartTs;
 
-    STR_FROM_LIST(m_title);            // 0
-    STR_FROM_LIST(m_subtitle);         // 1
-    STR_FROM_LIST(m_description);      // 2
-    INT_FROM_LIST(m_season);           // 3
-    INT_FROM_LIST(m_episode);          // 4
-    INT_FROM_LIST(m_totalEpisodes);    // 5
-    STR_FROM_LIST(m_syndicatedEpisode); // 6
-    STR_FROM_LIST(m_category);         // 7
-    INT_FROM_LIST(m_chanId);           // 8
-    STR_FROM_LIST(m_chanStr);          // 9
-    STR_FROM_LIST(m_chanSign);         // 10
-    STR_FROM_LIST(m_chanName);         // 11
-    STR_FROM_LIST(m_pathname);         // 12
-    INT_FROM_LIST(m_fileSize);         // 13
+    NEXT_STR(); m_title = ts;                                // 0
+    NEXT_STR(); m_subtitle = ts;                             // 1
+    NEXT_STR(); m_description = ts;                          // 2
+    NEXT_STR(); m_season = ts.toLongLong();                  // 3
+    NEXT_STR(); m_episode = ts.toLongLong();                 // 4
+    NEXT_STR(); m_totalEpisodes = ts.toLongLong();           // 5
+    NEXT_STR(); m_syndicatedEpisode = ts;                    // 6
+    NEXT_STR(); m_category = ts;                             // 7
+    NEXT_STR(); m_chanId = ts.toLongLong();                  // 8
+    NEXT_STR(); m_chanStr = ts;                              // 9
+    NEXT_STR(); m_chanSign = ts;                             // 10
+    NEXT_STR(); m_chanName = ts;                             // 11
+    NEXT_STR(); m_pathname = ts;                             // 12
+    NEXT_STR(); m_fileSize = ts.toLongLong();                // 13
+                                                             
+    NEXT_STR(); m_startTs = DateTimeFromListItem(ts);        // 14
+    NEXT_STR(); m_endTs = DateTimeFromListItem(ts);          // 15
+    NEXT_STR(); m_findId = ts.toLongLong();                  // 16
+    NEXT_STR(); m_hostname = ts;                             // 17
+    NEXT_STR(); m_sourceId = ts.toLongLong();                // 18
+    NEXT_STR();                                              // 19 (formerly cardid)
+    NEXT_STR(); m_inputId = ts.toLongLong();                 // 20
+    NEXT_STR(); m_recPriority = ts.toLongLong();             // 21
+    NEXT_STR(); m_recStatus = (RecStatus::Type)ts.toInt();   // 22
+    NEXT_STR(); m_recordId = ts.toLongLong();                // 23
 
-    DATETIME_FROM_LIST(m_startTs);     // 14
-    DATETIME_FROM_LIST(m_endTs);       // 15
-    INT_FROM_LIST(m_findId);           // 16
-    STR_FROM_LIST(m_hostname);         // 17
-    INT_FROM_LIST(m_sourceId);         // 18
-    NEXT_STR();                      // 19 (formerly cardid)
-    INT_FROM_LIST(m_inputId);          // 20
-    INT_FROM_LIST(m_recPriority);      // 21
-    ENUM_FROM_LIST(m_recStatus, RecStatus::Type); // 22
-    INT_FROM_LIST(m_recordId);         // 23
+    NEXT_STR(); m_recType = (RecordingType)ts.toInt();       // 24
+    NEXT_STR(); m_dupIn = (RecordingDupInType)ts.toInt();    // 25
+    NEXT_STR(); m_dupMethod = (RecordingDupMethodType)ts.toInt(); // 26
+    NEXT_STR(); m_recStartTs = DateTimeFromListItem(ts);     // 27
+    NEXT_STR(); m_recEndTs = DateTimeFromListItem(ts);       // 28
+    NEXT_STR(); m_programFlags = ts.toLongLong();            // 29
+    NEXT_STR(); m_recGroup = ts;                             // 30
+    NEXT_STR(); m_chanPlaybackFilters = ts;                  // 31
+    NEXT_STR(); m_seriesId = ts;                             // 32
+    NEXT_STR(); m_programId = ts;                            // 33
+    NEXT_STR(); m_inetRef = ts;                              // 34
 
-    ENUM_FROM_LIST(m_recType, RecordingType);            // 24
-    ENUM_FROM_LIST(m_dupIn, RecordingDupInType);         // 25
-    ENUM_FROM_LIST(m_dupMethod, RecordingDupMethodType); // 26
-    DATETIME_FROM_LIST(m_recStartTs);   // 27
-    DATETIME_FROM_LIST(m_recEndTs);     // 28
-    INT_FROM_LIST(m_programFlags);      // 29
-    STR_FROM_LIST(m_recGroup);          // 30
-    STR_FROM_LIST(m_chanPlaybackFilters);//31
-    STR_FROM_LIST(m_seriesId);          // 32
-    STR_FROM_LIST(m_programId);         // 33
-    STR_FROM_LIST(m_inetRef);           // 34
+    NEXT_STR(); m_lastModified = DateTimeFromListItem(ts);   // 35
+    NEXT_STR(); (m_stars) = ts.toFloat();                    // 36
+    NEXT_STR(); m_originalAirDate = DateFromListItem(ts);    // 37
+    NEXT_STR(); m_playGroup = ts;                            // 38
+    NEXT_STR(); m_recPriority2 = ts.toLongLong();            // 39
+    NEXT_STR(); m_parentId = ts.toLongLong();                // 40
+    NEXT_STR(); m_storageGroup = ts;                         // 41
+    NEXT_STR(); m_audioProperties = ts.toLongLong();         // 42
+    NEXT_STR(); m_videoProperties = ts.toLongLong();         // 43
+    NEXT_STR(); m_subtitleProperties = ts.toLongLong();      // 44
 
-    DATETIME_FROM_LIST(m_lastModified); // 35
-    FLOAT_FROM_LIST(m_stars);           // 36
-    DATE_FROM_LIST(m_originalAirDate);; // 37
-    STR_FROM_LIST(m_playGroup);         // 38
-    INT_FROM_LIST(m_recPriority2);      // 39
-    INT_FROM_LIST(m_parentId);          // 40
-    STR_FROM_LIST(m_storageGroup);      // 41
-    INT_FROM_LIST(m_audioProperties);   // 42
-    INT_FROM_LIST(m_videoProperties);   // 43
-    INT_FROM_LIST(m_subtitleProperties);// 44
+    NEXT_STR(); m_year = ts.toLongLong();                    // 45
+    NEXT_STR(); m_partNumber = ts.toLongLong();              // 46
+    NEXT_STR(); m_partTotal = ts.toLongLong();               // 47
+    NEXT_STR(); m_catType = (CategoryType)ts.toInt();        // 48
 
-    INT_FROM_LIST(m_year);              // 45
-    INT_FROM_LIST(m_partNumber);        // 46
-    INT_FROM_LIST(m_partTotal);         // 47
-    ENUM_FROM_LIST(m_catType, CategoryType); // 48
-
-    INT_FROM_LIST(m_recordedId);          // 49
-    STR_FROM_LIST(m_inputName);           // 50
-    DATETIME_FROM_LIST(m_bookmarkUpdate); // 51
+    NEXT_STR(); m_recordedId = ts.toLongLong();              // 49
+    NEXT_STR(); m_inputName = ts;                            // 50
+    NEXT_STR(); m_bookmarkUpdate = DateTimeFromListItem(ts); // 51
 
     if (!origChanid || !origRecstartts.isValid() ||
         (origChanid != m_chanId) || (origRecstartts != m_recStartTs))
