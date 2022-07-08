@@ -239,7 +239,7 @@ class Send(object):
         ##############################################################
 
         try:
-            if type(self.postdata) is dict or self.jsondata:
+            if self.postdata is not None or self.jsondata is not None:
                 response = self.session.post(url, data=self.postdata,
                                              json=self.jsondata,
                                              timeout=self.opts['timeout'])
