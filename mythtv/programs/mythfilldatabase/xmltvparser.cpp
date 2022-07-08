@@ -174,7 +174,7 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
     timestr = MythDate::toString(dt, MythDate::kFilename);
 }
 
-static int readNextWithErrorCheck(QXmlStreamReader &xml)
+static bool readNextWithErrorCheck(QXmlStreamReader &xml)
 {
     xml.readNext();
     if (xml.hasError())
