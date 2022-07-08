@@ -515,12 +515,12 @@ QString ImageAdapterSg::GetAbsFilePath(const ImagePtrK &im) const
 
 
 // Database fields used by several image queries
-#define DB_COLUMNS \
-"file_id, filename, name, dir_id, type, modtime, size, " \
+static constexpr const char* kDBColumns {
+"file_id, filename, name, dir_id, type, modtime, size, "
 "extension, date, hidden, orientation, angle, path, zoom"
 // Id, filepath, basename, parentId, type, modtime, size,
 // extension, image date, hidden, orientation, cover id, comment, device id
-
+};
 
 /*!
 \brief Create image from Db query data
@@ -532,7 +532,7 @@ ImageItem *ImageDb<FS>::CreateImage(const MSqlQuery &query) const
 {
     auto *im = new ImageItem(FS::ImageId(query.value(0).toInt()));
 
-    // Ordered as per DB_COLUMNS
+    // Ordered as per kDBColumns
     im->m_filePath      = query.value(1).toString();
     im->m_baseName      = query.value(2).toString();
     im->m_parentId      = FS::ImageId(query.value(3).toInt());
@@ -614,9 +614,9 @@ int ImageDb<FS>::GetDirectory(int id, ImagePtr &parent,
                               const QString &refine) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(QString("SELECT " DB_COLUMNS " FROM %1 "
+    query.prepare(QString("SELECT %1 FROM %2 "
                           "WHERE (dir_id = :ID1 OR file_id = :ID2) "
-                          "%2;").arg(m_table, refine));
+                          "%3;").arg(kDBColumns, m_table, refine));
 
     // Qt < 5.4 won't bind multiple occurrences
     int dbId = FS::DbId(id);
@@ -662,11 +662,11 @@ bool ImageDb<FS>::GetDescendants(const QString &ids,
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString sql =
-            QString("SELECT " DB_COLUMNS
+            QString("SELECT %1"
                     ", LENGTH(filename) - LENGTH(REPLACE(filename, '/', ''))"
                     " AS depth "
-                    "FROM %1 WHERE filename LIKE :PREFIX "
-                    "ORDER BY depth;").arg(m_table);
+                    "FROM %2 WHERE filename LIKE :PREFIX "
+                    "ORDER BY depth;").arg(kDBColumns,m_table);
 
     for (const auto& im1 : qAsConst(dirs))
     {
@@ -723,7 +723,7 @@ template <class FS>
 bool ImageDb<FS>::ReadAllImages(ImageHash &files, ImageHash &dirs) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(QString("SELECT " DB_COLUMNS " FROM %1").arg(m_table));
+    query.prepare(QString("SELECT %1 FROM %2").arg(kDBColumns, m_table));
 
     if (!query.exec())
     {
@@ -812,10 +812,10 @@ int ImageDb<FS>::InsertDbImage(ImageItemK &im, bool checkForDuplicate) const
         }
     }
 
-    query.prepare(QString("INSERT INTO %1 (" DB_COLUMNS ") VALUES (0, "
+    query.prepare(QString("INSERT INTO %1 (%2) VALUES (0, "
                           ":FILEPATH, :NAME,      :PARENT, :TYPE,   :MODTIME, "
                           ":SIZE,     :EXTENSION, :DATE,   :HIDDEN, :ORIENT, "
-                          ":COVER,    :COMMENT,   :FS);").arg(m_table));
+                          ":COVER,    :COMMENT,   :FS);").arg(m_table, kDBColumns));
 
     query.bindValue(":FILEPATH",  im.m_filePath);
     query.bindValue(":NAME",      FS::BaseNameOf(im.m_filePath));
@@ -998,8 +998,8 @@ int ImageDb<FS>::ReadImages(ImageList &dirs, ImageList &files,
                             const QString &selector) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(QString("SELECT " DB_COLUMNS " FROM %1 WHERE %2")
-                  .arg(m_table, selector));
+    query.prepare(QString("SELECT %1 FROM %2 WHERE %3")
+                  .arg(kDBColumns, m_table, selector));
     if (!query.exec())
     {
         MythDB::DBError(DBLOC, query);
