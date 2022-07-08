@@ -173,7 +173,7 @@ class MTV_PUBLIC TSHeader
     static constexpr unsigned int kHeaderSize {4};
     static const TSHeaderArray kPayloadOnlyHeader;
   private:
-    TSHeaderArray m_tsData {};
+    TSHeaderArray m_tsData;         // Intentionally no initialization
 };
 
 static_assert(sizeof(TSHeader) == 4,
@@ -261,7 +261,7 @@ class MTV_PUBLIC TSPacket : public TSHeader
     static constexpr unsigned int k8VSBEmissionSize {208};
     static const TSPacket    *kNullPacket;
   private:
-    std::array<uint8_t,184> m_tsPayload {};
+    std::array<uint8_t,184> m_tsPayload;    // Intentionally no initialization
 };
 
 static_assert(sizeof(TSPacket) == 188,
