@@ -26,8 +26,8 @@ using TSHeaderArray = std::array<uint8_t,4>;
  *  This class is also used to determine which PID a PESPacket arrived on.
  *
  *  \warning Be very, very careful when modifying this data structure.
- *  This class is used in the core of the recived video data path, and
- *  for performanve reasons overlaid on the buffer of bytes received
+ *  This class is used in the core of the received video data path, and
+ *  for performance reasons overlaid on the buffer of bytes received
  *  from the network. It therefore can only contain (per-instance)
  *  variables that directly correspond to the data bytes received from
  *  the broadcaster.  There may be static variables in this class, but
@@ -187,8 +187,8 @@ static_assert(sizeof(TSHeader) == 4,
  *  \brief Used to access the data of a Transport Stream packet.
  *
  *  \warning Be very, very careful when modifying this data structure.
- *  This class is used in the core of the recived video data path, and
- *  for performanve reasons overlaid on the buffer of bytes received
+ *  This class is used in the core of the received video data path, and
+ *  for performance reasons overlaid on the buffer of bytes received
  *  from the network. It therefore can only contain (per-instance)
  *  variables that directly correspond to the data bytes received from
  *  the broadcaster.  There may be static variables in this class, but
