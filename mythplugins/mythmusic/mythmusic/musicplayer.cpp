@@ -613,7 +613,7 @@ void MusicPlayer::customEvent(QEvent *event)
                     pause();
                 else if (list[2] == "SET_VOLUME")
                 {
-                    if (list.size() >= 3)
+                    if (list.size() > 3)
                     {
                         int volume = list[3].toInt();
                         if (volume >= 0 && volume <= 100)
