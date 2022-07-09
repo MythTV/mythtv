@@ -28,12 +28,11 @@ MusicGenericTree::MusicGenericTree(MusicGenericTree *parent,
                                    const QString &name, const QString &action,
                                    MythUIButtonListItem::CheckState check,
                                    bool showArrow)
-                 : MythGenericTree(name)
+                 : MythGenericTree(name),
+                   m_action(action),
+                   m_check(check),
+                   m_showArrow(showArrow)
 {
-    m_check = check;
-    m_action = action;
-    m_showArrow = showArrow;
-
     if (!action.isEmpty())
         setSelectable(true);
 
@@ -732,6 +731,7 @@ MythMenu* PlaylistEditorView::createSmartPlaylistMenu(void)
     return menu;
 }
 
+// NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks)
 void PlaylistEditorView::createRootNode(void )
 {
     if (!m_rootNode)
@@ -800,6 +800,7 @@ void PlaylistEditorView::createRootNode(void )
     node = new MusicGenericTree(m_rootNode, tr("Smart Playlists"), "smartplaylists");
     node->setDrawArrow(true);
 }
+// NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 
 void PlaylistEditorView::treeItemClicked(MythUIButtonListItem *item)
 {
