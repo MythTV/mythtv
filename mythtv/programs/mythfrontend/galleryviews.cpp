@@ -1,10 +1,11 @@
 #include "galleryviews.h"
 
-#include <algorithm>
-#include <cmath> // for qsrand
+#include <algorithm> // std::shuffle, upper_bound
+#include <cmath>     // std::pow
+#include <iterator>  // std::distance
 #include <random>
 
-#include <QRandomGenerator>
+#include "libmythbase/mythrandom.h"
 
 #define LOC QString("Galleryviews: ")
 
@@ -246,20 +247,25 @@ void FlatView::Populate(ImageList &files)
         }
         else if (m_order == kRandom)
         {
-            QVector<quint32> rands;
-            rands.resize(files.size());
-            QRandomGenerator::global()->fillRange(rands.data(), rands.size());
-
             // An image is not a valid candidate for its successor
+            // add files.size() elements from files in a random order
+            // to m_sequence allowing non-consecutive repetition
+            int size  = files.size();
             int range = files.size() - 1;
-            int index = range;
-            for (int count = 0; count < files.size(); ++count)
+            int last  = size; // outside of the random interval [0, size)
+            int count = 0;
+            while (count < size)
             {
-                int rand = rands[count] % range;
+                int rand = MythRandom(0, range);
 
                 // Avoid consecutive repeats
-                index = (rand < index) ? rand : rand + 1;
-                m_sequence.append(files.at(index)->m_id);
+                if (last == rand)
+                {
+                    continue;
+                }
+                last = rand;
+                m_sequence.append(files.at(rand)->m_id);
+                count++;
             }
         }
         else if (m_order == kSeasonal)
@@ -267,12 +273,14 @@ void FlatView::Populate(ImageList &files)
             WeightList weights   = CalculateSeasonalWeights(files);
             double     maxWeight = weights.last();
 
-            auto *randgen = QRandomGenerator::global();
+            static std::random_device rd;
+            static auto generator = MythRandomGenerator_32(rd());
+            auto distrib = std::uniform_real_distribution(0.0, maxWeight);
+            // TODO use fixed not floating point
 
             for (int count = 0; count < files.size(); ++count)
             {
-                // generateDouble() returns in the range [0, 1)
-                double randWeight = randgen->generateDouble() * maxWeight;
+                double randWeight = distrib(generator);
                 WeightList::iterator it =
                         std::upper_bound(weights.begin(), weights.end(), randWeight);
                 int    index      = std::distance(weights.begin(), it);

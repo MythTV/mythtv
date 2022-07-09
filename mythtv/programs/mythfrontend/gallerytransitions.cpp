@@ -3,8 +3,7 @@
 #include <utility>
 
 #include "libmythbase/mythcorecontext.h"
-
-#include <QRandomGenerator>
+#include "libmythbase/mythrandom.h"
 
 #define LOC QString("Transition: ")
 
@@ -406,7 +405,7 @@ void TransitionSpin::Finalise()
 void TransitionRandom::Start(Slide &from, Slide &to, bool forwards, float speed)
 {
     // Select a random peer.
-    int rand = QRandomGenerator::global()->bounded(m_peers.size());
+    int rand = MythRandom(0, m_peers.size() - 1);
     m_current = m_peers[rand];
     // Invoke peer
     connect(m_current, &Transition::finished, this, &TransitionRandom::Finished);
