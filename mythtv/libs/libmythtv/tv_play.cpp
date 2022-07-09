@@ -1909,10 +1909,12 @@ bool TV::StateIsLiveTV(TVState State)
     return (State == kState_WatchingLiveTV);
 }
 
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define TRANSITION(ASTATE,BSTATE) ((ctxState == (ASTATE)) && (desiredNextState == (BSTATE)))
 
 #define SET_NEXT() do { nextState = desiredNextState; changed = true; } while(false)
 #define SET_LAST() do { nextState = ctxState; changed = true; } while(false)
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 static QString tv_i18n(const QString &msg)
 {
@@ -8332,12 +8334,14 @@ void TV::HandleOSDInfo(const QString& Action)
         m_lockTimerOn = false;
 }
 
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define BUTTON(action, text) \
     result = Context.AddButton(Menu, active, (action), (text), "", false, "")
 #define BUTTON2(action, textActive, textInactive) \
     result = Context.AddButton(Menu, active, (action), (textActive), (textInactive), false, "")
 #define BUTTON3(action, textActive, textInactive, isMenu) \
     result = Context.AddButton(Menu, active, (action), (textActive), (textInactive), (isMenu), "")
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 bool TV::MenuItemDisplay(const MythTVMenuItemContext& Context, MythOSDDialogData *Menu)
 {
