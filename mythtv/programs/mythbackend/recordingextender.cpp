@@ -40,11 +40,11 @@
 static constexpr int64_t kLookBackTime    { 3LL * 60 * 60 };
 static constexpr int64_t kLookForwardTime { 1LL * 60 * 60 };
 
-static constexpr std::chrono::minutes extensionTime {10};
-static constexpr int extensionTimeInSec {
-    (duration_cast<std::chrono::seconds>(extensionTime).count()) };
-static const QRegularExpression versusPattern {R"(\s(at|@|vs\.?)\s)"};
-static const QRegularExpression sentencePattern {R"(:|\.+\s)"};
+static constexpr std::chrono::minutes kExtensionTime {10};
+static constexpr int kExtensionTimeInSec {
+    (duration_cast<std::chrono::seconds>(kExtensionTime).count()) };
+static const QRegularExpression kVersusPattern {R"(\s(at|@|vs\.?)\s)"};
+static const QRegularExpression kSentencePattern {R"(:|\.+\s)"};
 
 /// Does this recording status indicate that the recording is still ongoing.
 ///
@@ -454,8 +454,8 @@ bool RecExtEspnDataPage::findGameInfo(ActiveGame& game)
                 QString("malformed json document, step %1.").arg(3));
             continue;
         }
-        QStringList teamNames   = gameTitle.split(versusPattern);
-        QStringList teamAbbrevs = gameShortTitle.split(versusPattern);
+        QStringList teamNames   = gameTitle.split(kVersusPattern);
+        QStringList teamAbbrevs = gameShortTitle.split(kVersusPattern);
         if ((teamNames.size() != 2) || (teamAbbrevs.size() != 2))
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
@@ -1213,10 +1213,10 @@ static bool parseProgramString (const QString& string, int limit,
                                 QString& team1, QString& team2)
 {
     QString lString = string;
-    QStringList parts = lString.replace("vs.", "vs").split(sentencePattern);
+    QStringList parts = lString.replace("vs.", "vs").split(kSentencePattern);
     for (int i = 0; i < std::min(limit,static_cast<int>(parts.size())); i++)
     {
-        QStringList words = parts[i].split(versusPattern);
+        QStringList words = parts[i].split(kVersusPattern);
         if (words.size() == 2)
         {
             team1 = words[0].simplified();
@@ -1398,9 +1398,9 @@ void RecordingExtender::extendRecording(
     // Update the recording end time.  The m_endOffset field is the
     // one that is used by the scheduler for timing.  The others are
     // only updated for consistency.
-    rr->m_endOffset += extensionTime.count();
+    rr->m_endOffset += kExtensionTime.count();
     QDateTime oldDt = ri->GetRecordingEndTime();
-    QDateTime newDt = oldDt.addSecs(extensionTimeInSec);
+    QDateTime newDt = oldDt.addSecs(kExtensionTimeInSec);
     rr->m_enddate = newDt.date();
     rr->m_endtime = newDt.time();
 
@@ -1630,7 +1630,7 @@ void RecordingExtender::processActiveRecordings ()
             continue;
         }
         if (ri->GetScheduledEndTime() <
-            MythDate::current().addSecs(extensionTimeInSec))
+            MythDate::current().addSecs(kExtensionTimeInSec))
         {
             extendRecording(ri.get(), rr, game);
             it++;
@@ -1672,7 +1672,7 @@ void RecordingExtender::run()
 
     while (m_running)
     {
-        usleep(extensionTime);
+        usleep(kExtensionTime);
 
         clearDownloadedInfo();
         processNewRecordings();
