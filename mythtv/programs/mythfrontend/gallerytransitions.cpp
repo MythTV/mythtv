@@ -176,8 +176,7 @@ void GroupTransition::Start(Slide &from, Slide &to,
     Transition::Start(from, to, forwards, speed);
 
     // Start group
-    if (m_animation)
-        m_animation->Start(forwards, speed);
+    m_animation->Start(forwards, speed);
 }
 
 
