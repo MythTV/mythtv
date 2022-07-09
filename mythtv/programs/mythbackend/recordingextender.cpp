@@ -1672,7 +1672,7 @@ void RecordingExtender::run()
 
     while (m_running)
     {
-        usleep(kExtensionTime);
+        usleep(kExtensionTime); // cppcheck-suppress usleepCalled
 
         clearDownloadedInfo();
         processNewRecordings();
