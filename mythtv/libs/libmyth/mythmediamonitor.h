@@ -33,7 +33,9 @@ class MediaMonitor;
 class MonitorThread : public MThread
 {
   public:
-    MonitorThread(MediaMonitor* pMon,  unsigned long interval);
+    MonitorThread(MediaMonitor* pMon,  unsigned long interval) :
+        MThread("Monitor"), m_monitor(pMon), m_interval(interval),
+        m_lastCheckTime(QDateTime::currentDateTimeUtc()) {}
     ~MonitorThread() override { wait(); m_monitor = nullptr; }
     void setMonitor(MediaMonitor* pMon) { m_monitor = pMon; }
     void run(void) override; // MThread

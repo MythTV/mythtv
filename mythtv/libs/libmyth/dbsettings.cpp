@@ -10,10 +10,9 @@
 #include "dbsettings.h"
 #include "mythcontext.h"
 
-DatabaseSettings::DatabaseSettings(const QString &DBhostOverride)
+DatabaseSettings::DatabaseSettings(QString DBhostOverride) :
+    m_dbHostOverride(std::move(DBhostOverride))
 {
-    m_dbHostOverride = DBhostOverride;
-
     setLabel(DatabaseSettings::tr("Database Configuration"));
 
     MSqlQuery query(MSqlQuery::InitCon());

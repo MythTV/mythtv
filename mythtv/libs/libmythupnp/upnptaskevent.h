@@ -40,9 +40,14 @@ class UPnpEventTask : public Task
 
     public:
 
-        UPnpEventTask( QHostAddress peerAddress,
+        UPnpEventTask( const QHostAddress& peerAddress,
                        int          nPeerPort,  
-                       QByteArray  *m_pPayload );
+                       QByteArray  *pPayload ) :
+            Task("UPnpEventTask"),
+            m_peerAddress(peerAddress),
+            m_nPeerPort(nPeerPort),
+            m_pPayload(pPayload)  // We take ownership of this pointer.
+        {}
 
         QString Name() override { return( "Event" ); } // Task
         void Execute( TaskQueue *pQueue ) override; // Task

@@ -37,15 +37,6 @@ static const QString sLocation = QObject::tr("Media Monitor");
 
 MediaMonitor *MediaMonitor::s_monitor = nullptr;
 
-// MonitorThread
-MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval) :
-    MThread("Monitor")
-{
-    m_monitor = pMon;
-    m_interval = interval;
-    m_lastCheckTime = QDateTime::currentDateTimeUtc();
-}
-
 // Nice and simple, as long as our monitor is valid and active,
 // loop and check it's devices.
 void MonitorThread::run(void)

@@ -79,7 +79,7 @@ class UPNP_PUBLIC ServiceHost : public HttpServerExtension
 
                  ServiceHost( const QMetaObject &metaObject,
                               const QString     &sExtensionName,
-                              const QString     &sBaseUrl,
+                                    QString      sBaseUrl,
                               const QString     &sSharePath );
         ~ServiceHost() override = default;
 

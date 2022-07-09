@@ -27,7 +27,6 @@
 PlayerContext::PlayerContext(QString inUseID) :
     m_recUsage(std::move(inUseID))
 {
-    m_playingRecStart = QDateTime();
     m_lastSignalMsgTime.start();
     m_lastSignalMsgTime.addMSecs(-2 * kSMExitTimeout);
 }

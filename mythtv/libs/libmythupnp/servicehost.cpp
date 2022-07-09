@@ -206,13 +206,12 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
 
 ServiceHost::ServiceHost(const QMetaObject &metaObject,
                          const QString     &sExtensionName,
-                         const QString     &sBaseUrl,
+                               QString      sBaseUrl,
                          const QString     &sSharePath )
-            : HttpServerExtension ( sExtensionName,   sSharePath )
+            : HttpServerExtension ( sExtensionName,   sSharePath ),
+              m_sBaseUrl(std::move(sBaseUrl)),
+              m_oMetaObject(metaObject)
 {
-    m_oMetaObject = metaObject;
-    m_sBaseUrl    = sBaseUrl;
-
     // ----------------------------------------------------------------------
     // Create an instance of the service so custom types get registered.
     // ----------------------------------------------------------------------

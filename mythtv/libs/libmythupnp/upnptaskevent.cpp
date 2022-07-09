@@ -28,20 +28,6 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpEventTask::UPnpEventTask( QHostAddress peerAddress,
-                              int          nPeerPort,  
-                              QByteArray  *pPayload ) :
-    Task("UPnpEventTask")
-{
-    m_peerAddress = std::move(peerAddress);
-    m_nPeerPort   = nPeerPort;
-    m_pPayload    = pPayload;  // We take ownership of this pointer.
-} 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 UPnpEventTask::~UPnpEventTask()  
 { 
     delete m_pPayload;

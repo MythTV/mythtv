@@ -252,12 +252,10 @@ class UPNP_PUBLIC UPnpCDSExtension
 
         UPnpCDSExtension( QString sName,
                           QString sExtensionId, 
-                          QString sClass )
-        {
-            m_sName        = std::move(sName);
-            m_sExtensionId = std::move(sExtensionId);
-            m_sClass       = std::move(sClass);
-        }
+                          QString sClass ) :
+            m_sExtensionId(std::move(sExtensionId)),
+            m_sName(std::move(sName)),
+            m_sClass(std::move(sClass)) {}
 
         virtual CDSObject *GetRoot ( );
 
