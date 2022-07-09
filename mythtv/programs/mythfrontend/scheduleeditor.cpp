@@ -39,8 +39,6 @@
 #include "scheduleeditor.h"
 #include "viewschedulediff.h"
 
-#define ENUM_TO_QVARIANT(a) QVariant::fromValue(static_cast<int>(a))
-
 //static const QString _Location = QObject::tr("Schedule Editor");
 
 // Define the strings inserted into the recordfilter table in the
@@ -256,23 +254,23 @@ void ScheduleEditor::Load()
             {
                 new MythUIButtonListItem(m_rulesList,
                                      tr("Delete this recording rule template"),
-                                         ENUM_TO_QVARIANT(kNotRecording));
+                                         toVariant(kNotRecording));
             }
             new MythUIButtonListItem(m_rulesList,
                                      toDescription(kTemplateRecord),
-                                     ENUM_TO_QVARIANT(kTemplateRecord));
+                                     toVariant(kTemplateRecord));
         }
         else if (m_recordingRule->m_isOverride)
         {
             new MythUIButtonListItem(m_rulesList,
                                      tr("Record this showing with normal options"),
-                                     ENUM_TO_QVARIANT(kNotRecording));
+                                     toVariant(kNotRecording));
             new MythUIButtonListItem(m_rulesList,
                                      toDescription(kOverrideRecord),
-                                     ENUM_TO_QVARIANT(kOverrideRecord));
+                                     toVariant(kOverrideRecord));
             new MythUIButtonListItem(m_rulesList,
                                      toDescription(kDontRecord),
-                                     ENUM_TO_QVARIANT(kDontRecord));
+                                     toVariant(kDontRecord));
         }
         else
         {
@@ -281,39 +279,39 @@ void ScheduleEditor::Load()
 
             new MythUIButtonListItem(m_rulesList,
                                      toDescription(kNotRecording),
-                                     ENUM_TO_QVARIANT(kNotRecording));
+                                     toVariant(kNotRecording));
             if (hasChannel)
             {
                 new MythUIButtonListItem(m_rulesList,
                                          toDescription(kSingleRecord),
-                                         ENUM_TO_QVARIANT(kSingleRecord));
+                                         toVariant(kSingleRecord));
             }
             if (!isManual)
             {
                 new MythUIButtonListItem(m_rulesList,
                                          toDescription(kOneRecord),
-                                         ENUM_TO_QVARIANT(kOneRecord));
+                                         toVariant(kOneRecord));
             }
             if (!hasChannel || isManual)
             {
                 new MythUIButtonListItem(m_rulesList,
                                          toDescription(kWeeklyRecord),
-                                         ENUM_TO_QVARIANT(kWeeklyRecord));
+                                         toVariant(kWeeklyRecord));
                 new MythUIButtonListItem(m_rulesList,
                                          toDescription(kDailyRecord),
-                                         ENUM_TO_QVARIANT(kDailyRecord));
+                                         toVariant(kDailyRecord));
             }
             if (!isManual)
             {
                 new MythUIButtonListItem(m_rulesList,
                                          toDescription(kAllRecord),
-                                         ENUM_TO_QVARIANT(kAllRecord));
+                                         toVariant(kAllRecord));
             }
         }
 
         m_recordingRule->m_type = type;
     }
-    m_rulesList->SetValueByData(ENUM_TO_QVARIANT(m_recordingRule->m_type));
+    m_rulesList->SetValueByData(toVariant(m_recordingRule->m_type));
 
     InfoMap progMap;
 
@@ -2007,23 +2005,23 @@ void SchedOptMixin::Load(void)
 
             new MythUIButtonListItem(m_dupmethodList,
                                      toDescription(kDupCheckSubDesc),
-                                     ENUM_TO_QVARIANT(kDupCheckSubDesc));
+                                     toVariant(kDupCheckSubDesc));
             new MythUIButtonListItem(m_dupmethodList,
                                      toDescription(kDupCheckSubThenDesc),
-                                     ENUM_TO_QVARIANT(kDupCheckSubThenDesc));
+                                     toVariant(kDupCheckSubThenDesc));
             new MythUIButtonListItem(m_dupmethodList,
                                      toDescription(kDupCheckSub),
-                                     ENUM_TO_QVARIANT(kDupCheckSub));
+                                     toVariant(kDupCheckSub));
             new MythUIButtonListItem(m_dupmethodList,
                                      toDescription(kDupCheckDesc),
-                                     ENUM_TO_QVARIANT(kDupCheckDesc));
+                                     toVariant(kDupCheckDesc));
             new MythUIButtonListItem(m_dupmethodList,
                                      toDescription(kDupCheckNone),
-                                     ENUM_TO_QVARIANT(kDupCheckNone));
+                                     toVariant(kDupCheckNone));
 
             m_rule->m_dupMethod = dupMethod;
         }
-        m_dupmethodList->SetValueByData(ENUM_TO_QVARIANT(m_rule->m_dupMethod));
+        m_dupmethodList->SetValueByData(toVariant(m_rule->m_dupMethod));
     }
 
     // Duplicate Matching Scope
@@ -2033,22 +2031,23 @@ void SchedOptMixin::Load(void)
         {
             new MythUIButtonListItem(m_dupscopeList,
                                      toDescription(kDupsInAll),
-                                     ENUM_TO_QVARIANT(kDupsInAll));
+                                     toVariant(kDupsInAll));
             new MythUIButtonListItem(m_dupscopeList,
                                      toDescription(kDupsInRecorded),
-                                     ENUM_TO_QVARIANT(kDupsInRecorded));
+                                     toVariant(kDupsInRecorded));
             new MythUIButtonListItem(m_dupscopeList,
                                      toDescription(kDupsInOldRecorded),
-                                     ENUM_TO_QVARIANT(kDupsInOldRecorded));
+                                     toVariant(kDupsInOldRecorded));
             if (m_haveRepeats && !m_newrepeatList &&
                 (!m_other || !m_other->m_newrepeatList))
             {
+                int value = static_cast<int>(kDupsNewEpi|kDupsInAll);
                 new MythUIButtonListItem(m_dupscopeList,
                                  toDescription(kDupsNewEpi),
-                                 ENUM_TO_QVARIANT(kDupsNewEpi|kDupsInAll));
+                                 QVariant::fromValue(value));
             }
         }
-        m_dupscopeList->SetValueByData(ENUM_TO_QVARIANT(m_rule->m_dupIn));
+        m_dupscopeList->SetValueByData(toVariant(m_rule->m_dupIn));
     }
 
     // Auto Extend Services
@@ -2058,15 +2057,15 @@ void SchedOptMixin::Load(void)
         {
             new MythUIButtonListItem(m_autoExtendList,
                                      toDescription(AutoExtendType::None),
-                                     ENUM_TO_QVARIANT(AutoExtendType::None));
+                                     toVariant(AutoExtendType::None));
             new MythUIButtonListItem(m_autoExtendList,
                                      toDescription(AutoExtendType::ESPN),
-                                     ENUM_TO_QVARIANT(AutoExtendType::ESPN));
+                                     toVariant(AutoExtendType::ESPN));
             new MythUIButtonListItem(m_autoExtendList,
                                      toDescription(AutoExtendType::MLB),
-                                     ENUM_TO_QVARIANT(AutoExtendType::MLB));
+                                     toVariant(AutoExtendType::MLB));
         }
-        m_autoExtendList->SetValueByData(ENUM_TO_QVARIANT(m_rule->m_autoExtend));
+        m_autoExtendList->SetValueByData(toVariant(m_rule->m_autoExtend));
     }
 
     // Preferred Input
@@ -2102,13 +2101,14 @@ void SchedOptMixin::Load(void)
         {
             new MythUIButtonListItem(m_newrepeatList,
                                      QObject::tr("Record new and repeat "
-                                         "episodes"), ENUM_TO_QVARIANT(0));
+                                         "episodes"), toVariant(kDupsUnset));
             new MythUIButtonListItem(m_newrepeatList,
                                      QObject::tr("Record new episodes only"),
-                                     ENUM_TO_QVARIANT(kDupsNewEpi));
+                                     toVariant(kDupsNewEpi));
         }
-        m_newrepeatList->SetValueByData(ENUM_TO_QVARIANT
-                                        (m_rule->m_dupIn & kDupsNewEpi));
+        RecordingDupInType value =
+            (m_rule->m_dupIn & kDupsNewEpi)?kDupsNewEpi:kDupsUnset;
+        m_newrepeatList->SetValueByData(toVariant(value));
     }
 
     m_loaded = true;

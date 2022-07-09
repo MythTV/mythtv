@@ -13,6 +13,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include <QString>
+#include <QVariant>
 
 #include "mythbaseexp.h"
 
@@ -36,6 +37,8 @@ MBASE_PUBLIC QString toDescription(RecordingType rectype);
 MBASE_PUBLIC QString toRawString(RecordingType rectype);
 MBASE_PUBLIC QChar   toQChar( RecordingType rectype);
 MBASE_PUBLIC RecordingType recTypeFromString(const QString& type);
+static inline  QVariant toVariant(RecordingType rectype)
+    {return QVariant::fromValue(static_cast<int>(rectype)); }
 
 MBASE_PUBLIC int RecTypePrecedence(RecordingType rectype);
 
@@ -53,6 +56,8 @@ MBASE_PUBLIC QString toRawString(RecordingDupInType rectype);
 MBASE_PUBLIC bool newEpifromDupIn(RecordingDupInType recdupin);
 MBASE_PUBLIC RecordingDupInType dupInFromString(const QString& type);
 MBASE_PUBLIC RecordingDupInType dupInFromStringAndBool(const QString& type, bool newEpisodesOnly);
+static inline  QVariant toVariant(RecordingDupInType recdupin)
+    {return QVariant::fromValue(static_cast<int>(recdupin)); }
 
 enum RecordingDupMethodType
 {
@@ -67,6 +72,8 @@ MBASE_PUBLIC QString toString(RecordingDupMethodType rectype);
 MBASE_PUBLIC QString toDescription(RecordingDupMethodType rectype);
 MBASE_PUBLIC QString toRawString(RecordingDupMethodType rectype);
 MBASE_PUBLIC RecordingDupMethodType dupMethodFromString(const QString& type);
+static inline  QVariant toVariant(RecordingDupMethodType recdupmeth)
+    {return QVariant::fromValue(static_cast<int>(recdupmeth)); }
 
 enum RecSearchType
 {
@@ -80,6 +87,8 @@ enum RecSearchType
 MBASE_PUBLIC QString toString(RecSearchType rectype);
 MBASE_PUBLIC QString toRawString(RecSearchType rectype);
 MBASE_PUBLIC RecSearchType searchTypeFromString(const QString& type);
+static inline  QVariant toVariant(RecSearchType recsearch)
+    {return QVariant::fromValue(static_cast<int>(recsearch)); }
 
 enum class AutoExtendType : uint8_t
 {
@@ -92,6 +101,8 @@ MBASE_PUBLIC QString toString(AutoExtendType extType);
 MBASE_PUBLIC QString toDescription(AutoExtendType extType);
 MBASE_PUBLIC AutoExtendType autoExtendTypeFromString(const QString& type);
 MBASE_PUBLIC AutoExtendType autoExtendTypeFromInt(uint8_t type);
+static inline  QVariant toVariant(AutoExtendType extType)
+    {return QVariant::fromValue(static_cast<int>(extType)); }
 
 #endif
 
