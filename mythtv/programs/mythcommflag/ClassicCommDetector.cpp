@@ -1737,8 +1737,8 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                 }
             }
         }
-        else if ((thisScore > 0) &&
-                 (lastScore < 0) &&
+        // thisScore > 0
+        else if ((lastScore < 0) &&
                  (breakStart != -1))
         {
             if (((fbp->start - breakStart) >
