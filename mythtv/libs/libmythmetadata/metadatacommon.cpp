@@ -522,17 +522,14 @@ void CreateMetadataXMLItem(MetadataLookup *lookup,
         item.appendChild(status);
         status.appendChild(docroot.createTextNode(lookup->GetStatus()));
     }
-    // Season
+    // Season and Episode
     if (lookup->GetSeason() > 0 || lookup->GetEpisode() > 0)
     {
         QDomElement season = docroot.createElement("season");
         item.appendChild(season);
         season.appendChild(docroot.createTextNode(
                            QString::number(lookup->GetSeason())));
-    }
-    // Episode
-    if (lookup->GetSeason() > 0 || lookup->GetEpisode() > 0)
-    {
+
         QDomElement episode = docroot.createElement("episode");
         item.appendChild(episode);
         episode.appendChild(docroot.createTextNode(
