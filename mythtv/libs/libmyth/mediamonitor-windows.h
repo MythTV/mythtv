@@ -13,6 +13,6 @@ class MediaMonitorWindows : public MediaMonitor
 
     bool AddDevice(MythMediaDevice* pDevice) override; // MediaMonitor
 
-    QStringList GetCDROMBlockDevices(void);
+    QStringList GetCDROMBlockDevices(void) override; // MediaMonitor
 };
 #endif // MYTH_MEDIA_MONITOR_WINDOWS_H
