@@ -14,7 +14,7 @@ class MythPlayerEditorUI : public MythPlayerVisualiserUI
   public:
     MythPlayerEditorUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
 
-    bool    HandleProgramEditorActions(QStringList& Actions);
+    bool    HandleProgramEditorActions(const QStringList& Actions);
 
   protected slots:
     void    InitialiseState() override;
