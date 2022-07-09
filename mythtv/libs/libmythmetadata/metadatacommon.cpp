@@ -467,9 +467,10 @@ QDomDocument CreateMetadataXML(ProgramInfo *pginfo)
 
     MetadataLookup *lookup = LookupFromProgramInfo(pginfo);
     if (lookup)
+    {
         doc = CreateMetadataXML(lookup);
-
-    lookup->DecrRef();
+        lookup->DecrRef();
+    }
     lookup = nullptr;
 
     return doc;
