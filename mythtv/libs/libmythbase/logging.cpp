@@ -414,7 +414,7 @@ bool LoggerThread::logConsole(LoggingItem *item) const
 #endif
     }
 
-    (void)write(1, line.data(), line.size());
+    std::cout << line;
 
 #else // Q_OS_ANDROID
 
