@@ -687,6 +687,7 @@ void StatusBox::doScheduleStatus()
         }
     }
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define ADD_STATUS_LOG_LINE(rtype, fstate)                      \
     do {                                                        \
         if (statusMatch[rtype] > 0)                             \

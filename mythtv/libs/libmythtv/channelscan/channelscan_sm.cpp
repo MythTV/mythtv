@@ -1160,6 +1160,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     return false;
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define PCM_INFO_INIT(SISTD) \
     ChannelInsertInfo &info = pnum_to_dbchan[pnum]; \
     info.m_dbMplexId    = mplexid; info.m_sourceId   = m_sourceID;  \

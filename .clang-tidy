@@ -93,10 +93,6 @@ Checks: '-*,
         # About 20,000 of warnings. ,
        -cppcoreguidelines-avoid-non-const-global-variables,
 
-        # Tons of warnings.  Most complaining that #define should
-        # become a constexpr. ,
-       -cppcoreguidelines-macro-usage,
-
         # Bunch of warnings.... ,
        -cppcoreguidelines-narrowing-conversions,
        -cppcoreguidelines-no-malloc,

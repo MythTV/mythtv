@@ -49,7 +49,7 @@
 
 #define ERR           ((void *)-1)
 static constexpr ssize_t LINE_LEN { 1000 };
-#define LINE_LEN_QUOT "1000"
+#define LINE_LEN_QUOT "1000" // NOLINT(cppcoreguidelines-macro-usage)
 
 #ifdef _WIN32
     #include <stdlib.h>
