@@ -203,7 +203,7 @@ class MTV_PUBLIC StreamID
 /** \class PID
  *  \brief Contains Packet Identifier numeric values.
  */
-class MTV_PUBLIC PID
+class PID
 {
   public:
     enum
