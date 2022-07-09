@@ -396,7 +396,6 @@ bool ClassicCommDetector::go()
     }
 
 
-    float flagFPS { 0.0 };
     float aspect = m_player->GetVideoAspect();
     int prevpercent = -1;
 
@@ -492,6 +491,7 @@ bool ClassicCommDetector::go()
             ((m_showProgress || m_stillRecording) &&
              ((currentFrameNumber % 100) == 0)))
         {
+            float flagFPS { 0.0 };
             float elapsed = flagTime.elapsed() / 1000.0;
 
             if (elapsed != 0.0F)

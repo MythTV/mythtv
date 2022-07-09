@@ -45,7 +45,6 @@ MythMediaType FindMediaType(io_service_t service)
     io_iterator_t  iter;
     MythMediaType  mediaType = MEDIATYPE_UNKNOWN;
     QString        msg = QString("FindMediaType() - ");
-    bool           isWholeMedia = false;
 
     // Create an iterator across all parents of the service object passed in.
     kernResult = IORegistryEntryCreateIterator(service,
@@ -73,7 +72,7 @@ MythMediaType FindMediaType(io_service_t service)
 
         do
         {
-            isWholeMedia = false;
+            bool isWholeMedia = false;
             if (IOObjectConformsTo(service, kIOMediaClass))
             {
                 CFTypeRef wholeMedia;
