@@ -503,6 +503,7 @@ void MythDVDBuffer::WaitForPlayer(void)
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Waiting for player's buffers to drain");
         m_playerWait = true;
         int count = 0;
+        // cppcheck-suppress knownConditionTrueFalse
         while (m_playerWait && count++ < 200)
         {
             m_rwLock.unlock();
@@ -510,6 +511,7 @@ void MythDVDBuffer::WaitForPlayer(void)
             m_rwLock.lockForWrite();
         }
 
+        // cppcheck-suppress knownConditionTrueFalse
         if (m_playerWait)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Player wait state was not cleared");
@@ -646,6 +648,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                     // wait unless it is a transition from one normal video cell to
                     // another or the same menu id
                     if ((m_title != m_lastTitle) &&
+                        // cppcheck-suppress knownConditionTrueFalse
                         !((m_title == 0 && m_lastTitle == 0) && (m_part == m_lastPart)))
                     {
                         WaitForPlayer();

@@ -80,6 +80,7 @@ MythVideoFrame *VideoDecodeBuffer::GetFrame(int &DidFF, bool &Key)
             return nullptr;
 
         m_frameWaitCond.wait(locker.mutex());
+        // cppcheck-suppress knownConditionTrueFalse
         if (m_frameList.isEmpty())
             return nullptr;
     }

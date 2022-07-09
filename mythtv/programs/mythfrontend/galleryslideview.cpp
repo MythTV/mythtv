@@ -624,6 +624,7 @@ void GallerySlideView::TransitionComplete()
     m_slides.ReleaseCurrent();
 
     // No further actions when skipping
+    // cppcheck-suppress knownConditionTrueFalse
     if (m_transitioning)
         return;
 

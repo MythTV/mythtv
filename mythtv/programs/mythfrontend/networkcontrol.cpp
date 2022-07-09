@@ -283,8 +283,10 @@ void NetworkControl::run(void)
     QMutexLocker locker(&m_ncLock);
     while (!m_stopCommandThread)
     {
+        // cppcheck-suppress knownConditionTrueFalse
         while (m_networkControlCommands.empty() && !m_stopCommandThread)
             m_ncCond.wait(&m_ncLock);
+        // cppcheck-suppress knownConditionTrueFalse
         if (!m_stopCommandThread)
         {
             NetworkCommand *nc = m_networkControlCommands.front();

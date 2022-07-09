@@ -1182,6 +1182,7 @@ QString ChannelUtil::GetDefaultAuthority(uint chanid)
     {
         s_channelDefaultAuthorityMapLock.unlock();
         s_channelDefaultAuthorityMapLock.lockForWrite();
+        // cppcheck-suppress knownConditionTrueFalse
         if (s_channelDefaultAuthority_runInit)
         {
             MSqlQuery query(MSqlQuery::InitCon());

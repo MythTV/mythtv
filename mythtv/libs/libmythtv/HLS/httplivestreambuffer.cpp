@@ -2746,7 +2746,7 @@ int HLSRingBuffer::SafeRead(void *data, uint sz)
         i_read  -= len;
         segment->Unlock();
     }
-    while (i_read > 0 && !m_interrupted);
+    while (i_read > 0 && !m_interrupted); // cppcheck-suppress knownConditionTrueFalse
 
     if (m_interrupted)
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("interrupted"));
