@@ -20,6 +20,8 @@ static constexpr uint8_t SYNC_BYTE { 0x47 };
 
 using TSHeaderArray = std::array<uint8_t,4>;
 
+// NOLINTBEGIN(cppcoreguidelines-pro-type-member-init)
+
 /** \class TSHeader
  *  \brief Used to access header of a TSPacket.
  *
@@ -269,7 +271,7 @@ static_assert(sizeof(TSPacket) == 188,
               "have only one non-static variable (m_tsPayload) of 184 "
               "bytes, and it must not have any virtual functions.");
 
-
+// NOLINTEND(cppcoreguidelines-pro-type-member-init)
 
 #if 0 /* not used yet */
 /** \class TSDVBEmissionPacket
