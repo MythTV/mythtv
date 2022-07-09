@@ -150,7 +150,7 @@ static int toFloat8(float* out, const uint8_t* in, int len)
  The SSE code processes 16 bytes at a time and leaves any remainder for the C
  - there is no remainder in practice */
 
-static inline uint8_t clip_uint8(int a)
+static inline uint8_t clip_uint8(long a)
 {
     if (a&(~0xFF))
         return (-a)>>31;
@@ -264,7 +264,7 @@ static int toFloat16(float* out, const short* in, int len)
     return len << 2;
 }
 
-static inline short clip_short(int a)
+static inline short clip_short(long a)
 {
     if ((a+0x8000) & ~0xFFFF)
         return (a>>31) ^ 0x7FFF;
