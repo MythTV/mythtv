@@ -1763,6 +1763,7 @@ static HostComboBoxSetting *PlaybackExitPrompt()
     gc->setLabel(PlaybackSettings::tr("Action on playback exit"));
 
     gc->addSelection(PlaybackSettings::tr("Just exit"), "0");
+    gc->addSelection(PlaybackSettings::tr("Clear last played position and exit"), "16");
     gc->addSelection(PlaybackSettings::tr("Always prompt (excluding Live TV)"),
                      "1");
     gc->addSelection(PlaybackSettings::tr("Always prompt (including Live TV)"),
