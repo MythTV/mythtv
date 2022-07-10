@@ -278,18 +278,18 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
     //   access_controlled      1  25.2
     bool IsAccessControlled(uint i) const
     {
-        return bool(m_ptrs[i][26] & 0x20);
+        return ( m_ptrs[i][26] & 0x20 ) != 0;
     }
     //   hidden                 1  25.3
     bool IsHidden(uint i) const
     {
-        return bool(m_ptrs[i][26] & 0x10);
+        return ( m_ptrs[i][26] & 0x10 ) != 0;
     }
     //   reserved               2  25.4          3
     //   hide_guide             1  25.6
     bool IsHiddenInGuide(uint i) const
     {
-        return bool(m_ptrs[i][26] & 0x2);
+        return ( m_ptrs[i][26] & 0x02 ) != 0;
     }
     //   reserved               6  25.7       0x3f
     //   service_type           6  26.2
@@ -492,12 +492,12 @@ class MTV_PUBLIC CableVirtualChannelTable : public VirtualChannelTable
     //   path_select            1  26.4
     bool IsPathSelect(uint i) const
     {
-        return bool(m_ptrs[i][26] & 0x8);
+        return ( m_ptrs[i][26] & 0x08 ) != 0;
     }
     //   out_of_band            1  26.5
     bool IsOutOfBand(uint i) const
     {
-        return bool(m_ptrs[i][26] & 0x4);
+        return ( m_ptrs[i][26] & 0x04 ) != 0;
     }
     //   hide_guide             1  26.6
     //   reserved               3  26.7          7

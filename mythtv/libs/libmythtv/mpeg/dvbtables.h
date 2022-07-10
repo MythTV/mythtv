@@ -150,14 +150,14 @@ class MTV_PUBLIC ServiceDescriptionTable : public PSIPTable
     uint ServiceID(uint i) const { return (m_ptrs[i][0]<<8) | (m_ptrs[i][1]); }
     //   reserved_future_use    6  2.0+p
     //   EIT_schedule_flag      1  2.6+p
-    bool HasEITSchedule(uint i) const { return bool(m_ptrs[i][2] & 0x2); }
+    bool HasEITSchedule(uint i) const { return ( m_ptrs[i][2] & 0x02 ) != 0; }
     //   EIT_present_following  1  2.7+p
     bool HasEITPresentFollowing(uint i) const
-        { return bool(m_ptrs[i][2] & 0x1); }
+        { return ( m_ptrs[i][2] & 0x01 ) != 0; }
     ///   running_status        3  3.0+p
     uint RunningStatus(uint i) const { return (m_ptrs[i][3] & 0xE0) >> 5; }
     ///  free_CA_mode           1  3.3+p
-    bool IsEncrypted(uint i) const { return bool(m_ptrs[i][3] & 0x10); }
+    bool IsEncrypted(uint i) const { return ( m_ptrs[i][3] & 0x10 ) != 0; }
     ///  desc_loop_length      12  3.4+p
     uint ServiceDescriptorsLength(uint i) const
         { return ((m_ptrs[i][3]<<8) | (m_ptrs[i][4])) & 0xfff; }
@@ -358,7 +358,7 @@ class MTV_PUBLIC DVBEventInformationTable : public PSIPTable
     //   running_status         3  10.0+x
     uint RunningStatus(uint i) const { return m_ptrs[i][10] >> 5; }
     //   free_CA_mode           1  10.3+x
-    bool IsScrambled(uint i) const { return bool(m_ptrs[i][10] & 0x10); }
+    bool IsScrambled(uint i) const { return ( m_ptrs[i][10] & 0x10 ) != 0; }
     //   descriptors_loop_len  12  10.4+x
     uint DescriptorsLength(uint i) const
         { return ((m_ptrs[i][10]<<8) | (m_ptrs[i][11])) & 0xfff; }

@@ -1228,20 +1228,20 @@ class MTV_PUBLIC AdaptationFieldControl
      */
     bool Discontinuity(void) const      { return ( m_data[1] & 0x80 ) != 0; }
     // random_access_indicator (?)           1   1.1
-    bool RandomAccess(void) const       { return bool(m_data[1] & 0x40); }
+    bool RandomAccess(void) const       { return ( m_data[1] & 0x40 ) != 0; }
     // elementary_stream_priority_indicator  1   1.2
-    bool Priority(void) const           { return bool(m_data[1] & 0x20); }
+    bool Priority(void) const           { return ( m_data[1] & 0x20 ) != 0; }
 
 // Each of the following extends the adaptation header.  In order:
 
     /** PCR flag (we have PCR data)          1   1.3
      *  (adds 6 bytes after adaptation header)
      */
-    bool PCR(void) const                { return bool(m_data[1] & 0x10); }
+    bool PCR(void) const                { return ( m_data[1] & 0x10 ) != 0; }
     /** OPCR flag (we have OPCR data)        1   1.4
      *  (adds 6 bytes) ((Original) Program Clock Reference; used to time output)
      */
-    bool OPCR(void) const               { return bool(m_data[1] & 0x08); }
+    bool OPCR(void) const               { return ( m_data[1] & 0x08 ) != 0; }
     /** splicing_point_flag                  1   1.5
      *  (adds 1 byte) (we have splice point data)
      *  Splice data is packets until a good splice point for
@@ -1249,21 +1249,21 @@ class MTV_PUBLIC AdaptationFieldControl
      *  might be a good way to recognize potential commercials
      *  for flagging.
      */
-    bool SplicingPoint(void) const      { return bool(m_data[1] & 0x04); }
+    bool SplicingPoint(void) const      { return ( m_data[1] & 0x04 ) != 0; }
     //  transport_private_data_flag          1   1.6
     // (adds 1 byte)
-    bool PrivateTransportData(void) const { return bool(m_data[1] & 0x02); }
+    bool PrivateTransportData(void) const { return ( m_data[1] & 0x02 ) != 0; }
     // adaptation_field_extension_flag       1   1.7
-    bool FieldExtension(void) const     { return bool(m_data[1] & 0x1); }
+    bool FieldExtension(void) const     { return ( m_data[1] & 0x01 ) != 0; }
     // extension length                      8   2.0
     uint ExtensionLength(void) const    { return m_data[2]; }
     // ltw flag                              1   3.0
     // (adds 2 bytes)
-    bool LTW(void) const                { return bool(m_data[3] & 0x80); }
+    bool LTW(void) const                { return ( m_data[3] & 0x80 ) != 0; }
     // piecewise_rate_flag (adds 3 bytes)    1   3.1
-    bool PiecewiseRate(void) const      { return bool(m_data[3] & 0x40); }
+    bool PiecewiseRate(void) const      { return ( m_data[3] & 0x40 ) != 0; }
     // seamless_splice_flag (adds 5 bytes)   1   3.2
-    bool SeamlessSplice(void) const     { return bool(m_data[3] & 0x20); }
+    bool SeamlessSplice(void) const     { return ( m_data[3] & 0x20 ) != 0; }
     // unused flags                          5   3.3
 
   private:
