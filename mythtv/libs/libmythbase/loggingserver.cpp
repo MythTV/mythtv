@@ -131,7 +131,7 @@ FileLogger *FileLogger::create(const QString& filename, QMutex *mutex)
     QByteArray ba = filename.toLocal8Bit();
     const char *file = ba.constData();
     auto *logger =
-        qobject_cast<FileLogger *>(loggerMap.value(filename, nullptr));
+        dynamic_cast<FileLogger *>(loggerMap.value(filename, nullptr));
 
     if (logger)
         return logger;
@@ -227,7 +227,7 @@ SyslogLogger::~SyslogLogger()
 
 SyslogLogger *SyslogLogger::create(QMutex *mutex, bool open)
 {
-    auto *logger = qobject_cast<SyslogLogger *>(loggerMap.value("", nullptr));
+    auto *logger = dynamic_cast<SyslogLogger *>(loggerMap.value("", nullptr));
     if (logger)
         return logger;
 
@@ -273,7 +273,7 @@ JournalLogger::~JournalLogger()
 
 JournalLogger *JournalLogger::create(QMutex *mutex)
 {
-    auto *logger = qobject_cast<JournalLogger *>(loggerMap.value("", nullptr));
+    auto *logger = dynamic_cast<JournalLogger *>(loggerMap.value("", nullptr));
     if (logger)
         return logger;
 
