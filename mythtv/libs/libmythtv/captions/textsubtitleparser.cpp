@@ -179,9 +179,8 @@ bool TextSubtitles::HasSubtitleChanged(uint64_t timecode) const
  */
 QStringList TextSubtitles::GetSubtitles(uint64_t timecode)
 {
-    QStringList list;
     if (!m_isInProgress && m_subtitles.empty())
-        return list;
+        return {};
 
     text_subtitle_t searchTarget(timecode, timecode);
 
@@ -246,7 +245,7 @@ QStringList TextSubtitles::GetSubtitles(uint64_t timecode)
     text_subtitle_t blankSub(startCode, endCode);
     m_lastReturnedSubtitle = blankSub;
 
-    return list;
+    return {};
 }
 
 void TextSubtitles::AddSubtitle(const text_subtitle_t &newSub)
