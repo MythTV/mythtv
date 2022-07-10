@@ -209,8 +209,6 @@ class V2InputGroup : public QObject
 
         Q_INVOKABLE V2InputGroup(QObject *parent = nullptr)
           : QObject          ( parent )
-          , m_CardInputId    ( 0 )
-          , m_InputGroupId   ( 0 )
           , m_InputGroupName ( "Unknown" )
 
         {

@@ -123,14 +123,14 @@ class V2Capture : public MythHTTPService
 
     static int                  AddUserInputGroup  ( const QString & Name );
 
-    static bool                 LinkInputGroup     ( const uint InputId,
-                                                     const uint InputGroupId );
+    static bool                 LinkInputGroup     ( uint InputId,
+                                                     uint InputGroupId );
 
-    static bool                 UnlinkInputGroup   ( const uint InputId,
-                                                     const uint InputGroupId );
+    static bool                 UnlinkInputGroup   ( uint InputId,
+                                                     uint InputGroupId );
 
-    static bool                 SetInputMaxRecordings ( const uint InputId,
-                                                        const uint Max );
+    static bool                 SetInputMaxRecordings ( uint InputId,
+                                                        uint Max );
 
     static V2CardTypeList*      GetCardTypeList     ( void );
 

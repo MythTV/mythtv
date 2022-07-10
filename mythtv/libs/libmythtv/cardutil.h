@@ -374,7 +374,7 @@ class MTV_PUBLIC CardUtil
     // Other
     static uint         CloneCard(uint src_inputid, uint dst_inputid);
     static bool         InputSetMaxRecordings(uint parentid,
-                                              uint max_recodings);
+                                              uint max_recordings);
     static uint         AddChildInput(uint parentid);
     static QString      GetFirewireChangerNode(uint inputid);
     static QString      GetFirewireChangerModel(uint inputid);
