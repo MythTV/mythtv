@@ -453,7 +453,7 @@ void AudioPlayer::AddAudioData(char *buffer, int len,
     if (!m_audioOutput || m_noAudioOut)
         return;
 
-    if (m_parent->PrepareAudioSample(timecode) && !m_noAudioOut)
+    if (m_parent->PrepareAudioSample(timecode))
         m_audioOutput->Drain();
     int samplesize = m_audioOutput->GetBytesPerFrame();
 
