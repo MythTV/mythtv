@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <cstdlib>
+#include <string>
 
 #include "mythconfig.h"
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
@@ -114,6 +115,9 @@ class LoggingItem: public QObject, public ReferenceCounter
     void setAppName(const QString &val)     { m_appName = val; };
     void setLogFile(const QString &val)     { m_logFile = val; };
     void setMessage(const QString &val)     { m_message = val; };
+
+    std::string toString(); ///< @brief Long format to string
+    std::string toStringShort(); ///< @brief short console format
 
   protected:
     int                 m_pid        {-1};

@@ -212,6 +212,34 @@ char LoggingItem::getLevelChar (void)
     return '-';
 }
 
+std::string LoggingItem::toString()
+{
+    QString ptid = QString::number(pid()); // pid, add tid if non-zero
+    if(tid())
+    {
+        ptid.append("/").append(QString::number(tid()));
+    }
+    return qPrintable(QString("%1 %2 [%3] %4 %5:%6:%7  %8\n")
+                          .arg(getTimestampUs(),
+                               QString(QChar(getLevelChar())),
+                               ptid,
+                               threadName(),
+                               file(),
+                               QString::number(line()),
+                               function(),
+                               message()
+                              ));
+}
+
+std::string LoggingItem::toStringShort()
+{
+    return qPrintable(QString("%1 %2  %3\n")
+                          .arg(getTimestampUs(),
+                               QString(QChar(getLevelChar())),
+                               message()
+                              ));
+}
+
 /// \brief LoggerThread constructor.  Enables debugging of thread registration
 ///        and deregistration if the VERBOSE_THREADS environment variable is
 ///        set.
@@ -380,37 +408,10 @@ bool LoggerThread::logConsole(LoggingItem *item) const
     }
     else
     {
-        QString timestamp = item->getTimestampUs();
-        char shortname = item->getLevelChar();
-
 #ifndef NDEBUG
-        if (item->tid())
-        {
-            line = qPrintable(QString("%1 %2 [%3/%4] %5 %6:%7:%8  %9\n")
-                .arg(timestamp, QString(shortname),
-                     QString::number(item->pid()),
-                     QString::number(item->tid()),
-                     item->threadName(),
-                     item->m_file,
-                     QString::number(item->m_line),
-                     item->m_function,
-                     item->m_message));
-        }
-        else
-        {
-            line = qPrintable(QString("%1 %2 [%3] %4 %5:%6:%7  %8\n")
-                .arg(timestamp, QString(shortname),
-                     QString::number(item->pid()),
-                     item->threadName(),
-                     item->m_file,
-                     QString::number(item->m_line),
-                     item->m_function,
-                     item->m_message));
-        }
+        line = item->toString();
 #else
-        line = qPrintable(QString("%1 %2  %3\n")
-                          .arg(timestamp, QString(shortname),
-                               item->m_message));
+        line = item->toStringShort();
 #endif
     }
 
