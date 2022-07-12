@@ -161,31 +161,7 @@ bool FileLogger::logmsg(LoggingItem *item)
     if (!m_ofstream.is_open())
         return false;
 
-    QString timestamp = item->getTimestampUs();
-    QChar shortname = item->getLevelChar();
-
-    std::string line;
-    if( item->tid() )
-    {
-        line = qPrintable(QString("%1 %2 [%3/%4] %5 %6:%7 (%8) - %9\n")
-                          .arg(timestamp, shortname,
-                               QString::number(item->pid()),
-                               QString::number(item->tid()),
-                               item->threadName(), item->file(),
-                               QString::number(item->line()),
-                               item->function(),
-                               item->message()));
-    }
-    else
-    {
-        line = qPrintable(QString("%1 %2 [%3] %5 %6:%7 (%8) - %9\n")
-                          .arg(timestamp, shortname,
-                               QString::number(item->pid()),
-                               item->threadName(), item->file(),
-                               QString::number(item->line()),
-                               item->function(),
-                               item->message()));
-    }
+    std::string line = item->toString();
 
     m_ofstream << line;
 
