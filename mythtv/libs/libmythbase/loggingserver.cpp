@@ -1,3 +1,5 @@
+#include <fstream>
+
 #include <QtGlobal>
 #include <QAtomicInt>
 #include <QMutex>
@@ -105,9 +107,8 @@ LoggerBase::~LoggerBase()
 /// \param filename Filename of the logfile.
 FileLogger::FileLogger(const char *filename) :
         LoggerBase(filename),
-        m_fd(open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664))
+        m_ofstream(filename, std::ios::app)
 {
-    m_opened = (m_fd != -1);
     LOG(VB_GENERAL, LOG_INFO, QString("Added logging to %1")
              .arg(filename));
 }
@@ -116,13 +117,11 @@ FileLogger::FileLogger(const char *filename) :
 /// \brief FileLogger deconstructor - close the logfile
 FileLogger::~FileLogger()
 {
-    if( m_opened )
+    if(m_ofstream.is_open())
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Removed logging to %1")
             .arg(m_handle));
-        close(m_fd);
-        m_fd = -1;
-        m_opened = false;
+        m_ofstream.close();
     }
 }
 
@@ -149,10 +148,9 @@ FileLogger *FileLogger::create(const QString& filename, QMutex *mutex)
 ///        This allows for logrollers to be used.
 void FileLogger::reopen(void)
 {
-    close(m_fd);
+    m_ofstream.close();
 
-    m_fd = open(qPrintable(m_handle), O_WRONLY|O_CREAT|O_APPEND, 0664);
-    m_opened = (m_fd != -1);
+    m_ofstream.open(qPrintable(m_handle), std::ios::app);
     LOG(VB_GENERAL, LOG_INFO, QString("Rolled logging on %1") .arg(m_handle));
 }
 
@@ -160,7 +158,7 @@ void FileLogger::reopen(void)
 /// \param item LoggingItem containing the log message to process
 bool FileLogger::logmsg(LoggingItem *item)
 {
-    if (!m_opened)
+    if (!m_ofstream.is_open())
         return false;
 
     QString timestamp = item->getTimestampUs();
@@ -189,14 +187,13 @@ bool FileLogger::logmsg(LoggingItem *item)
                                item->message()));
     }
 
-    int result = write(m_fd, line.data(), line.size());
+    m_ofstream << line;
 
-    if( result == -1 )
+    if (m_ofstream.bad())
     {
         LOG(VB_GENERAL, LOG_ERR,
-                 QString("Closed Log output on fd %1 due to errors").arg(m_fd));
-        m_opened = false;
-        close( m_fd );
+            QString("Closed Log output to %1 due to unrecoverable error(s).").arg(m_handle));
+        m_ofstream.close();
         return false;
     }
     return true;
