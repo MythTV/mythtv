@@ -1921,6 +1921,7 @@ MYTHTV_CONFIG_LIST='
     systemd_notify
     systemd_journal
     drm
+    force_loglong
 '
 
 MYTHTV_HAVE_LIST='
