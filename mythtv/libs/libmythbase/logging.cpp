@@ -435,7 +435,7 @@ bool LoggerThread::logConsole(LoggingItem *item) const
     }
     else
     {
-#ifndef NDEBUG
+#if !defined(NDEBUG) || CONFIG_FORCE_LOGLONG
         if (true)
 #else
         if (m_loglong)
