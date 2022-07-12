@@ -152,7 +152,7 @@ class LoggerThread : public QObject, public MThread
     friend MBASE_PUBLIC void LogPrintLine(uint64_t mask, LogLevel_t level, const char *file, int line,
                              const char *function, QString message);
   public:
-    LoggerThread(QString filename, bool progress, bool quiet, int facility);
+    LoggerThread(QString filename, bool progress, bool quiet, int facility, bool loglong);
     ~LoggerThread() override;
     void run(void) override; // MThread
     void stop(void);
@@ -174,6 +174,7 @@ class LoggerThread : public QObject, public MThread
     QString m_filename;    ///< Filename of debug logfile
     bool    m_progress;    ///< show only LOG_ERR and more important (console only)
     bool    m_quiet;       ///< silence the console (console only)
+    bool    m_loglong;     ///< use long log format (console only)
     QString m_appname {QCoreApplication::applicationName()};
                            ///< Cached application name
     int     m_facility;    ///< Cached syslog facility (or -1 to disable)
