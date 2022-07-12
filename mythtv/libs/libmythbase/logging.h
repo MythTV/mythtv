@@ -159,7 +159,7 @@ class LoggerThread : public QObject, public MThread
                              const char *function, QString message);
   public:
     LoggerThread(QString filename, bool progress, bool quiet, QString table,
-                 int facility);
+                 int facility, bool loglong);
     ~LoggerThread() override;
     void run(void) override; // MThread
     void stop(void);
@@ -181,6 +181,7 @@ class LoggerThread : public QObject, public MThread
     QString m_filename;    ///< Filename of debug logfile
     bool    m_progress;    ///< show only LOG_ERR and more important (console only)
     bool    m_quiet;       ///< silence the console (console only)
+    bool    m_loglong;     ///< use long log format (console only)
     QString m_appname {QCoreApplication::applicationName()};
                            ///< Cached application name
     QString m_tablename;   ///< Cached table name for db logging

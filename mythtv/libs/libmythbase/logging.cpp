@@ -80,9 +80,10 @@ struct LogPropagateOpts {
     int     m_facility;
     bool    m_dblog;
     QString m_path;
+    bool    m_loglong;
 };
 
-LogPropagateOpts        logPropagateOpts {false, 0, 0, true, ""};
+LogPropagateOpts        logPropagateOpts {false, 0, 0, true, "", false};
 QString                 logPropagateArgs;
 QStringList             logPropagateArgList;
 
@@ -259,11 +260,12 @@ std::string LoggingItem::toStringShort()
 ///        and deregistration if the VERBOSE_THREADS environment variable is
 ///        set.
 LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
-                           QString table, int facility) :
+                           QString table, int facility, bool loglong) :
     MThread("Logger"),
     m_waitNotEmpty(new QWaitCondition()),
     m_waitEmpty(new QWaitCondition()),
     m_filename(std::move(filename)), m_progress(progress), m_quiet(quiet),
+    m_loglong(loglong),
     m_tablename(std::move(table)), m_facility(facility), m_pid(getpid())
 {
     if (qEnvironmentVariableIsSet("VERBOSE_THREADS"))
@@ -434,10 +436,17 @@ bool LoggerThread::logConsole(LoggingItem *item) const
     else
     {
 #ifndef NDEBUG
-        line = item->toString();
+        if (true)
 #else
-        line = item->toStringShort();
+        if (m_loglong)
 #endif
+        {
+            line = item->toString();
+        }
+        else
+        {
+            line = item->toStringShort();
+        }
     }
 
     std::cout << line;
@@ -638,6 +647,12 @@ void logPropagateCalc(void)
         logPropagateArgList << "--enable-dblog";
     }
 
+    if (logPropagateOpts.m_loglong)
+    {
+        logPropagateArgs += " --loglong";
+        logPropagateArgList << "--loglong";
+    }
+
 #if !defined(_WIN32) && !defined(Q_OS_ANDROID)
     if (logPropagateOpts.m_facility >= 0)
     {
@@ -681,7 +696,7 @@ bool logPropagateQuiet(void)
 /// \param  testHarness Should always be false. Set to true when
 ///                     invoked by the testing code.
 void logStart(const QString& logfile, bool progress, int quiet, int facility,
-              LogLevel_t level, bool dblog, bool propagate, bool testHarness)
+              LogLevel_t level, bool dblog, bool propagate, bool loglong, bool testHarness)
 {
     if (logThread && logThread->isRunning())
         return;
@@ -694,6 +709,7 @@ void logStart(const QString& logfile, bool progress, int quiet, int facility,
     logPropagateOpts.m_quiet = quiet;
     logPropagateOpts.m_facility = facility;
     logPropagateOpts.m_dblog = dblog;
+    logPropagateOpts.m_loglong = loglong;
 
     if (propagate)
     {
@@ -709,7 +725,7 @@ void logStart(const QString& logfile, bool progress, int quiet, int facility,
     QString table = dblog ? QString("logging") : QString("");
 
     if (!logThread)
-        logThread = new LoggerThread(logfile, progress, quiet, table, facility);
+        logThread = new LoggerThread(logfile, progress, quiet, table, facility, loglong);
 
     logThread->start();
 }

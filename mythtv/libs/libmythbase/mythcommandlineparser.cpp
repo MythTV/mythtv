@@ -2678,6 +2678,9 @@ void MythCommandLineParser::addLogging(
     add(QStringList{"-q", "--quiet"}, "quiet", 0,
         "Don't log to the console (-q).  Don't log anywhere (-q -q)", "")
                 ->SetGroup("Logging");
+    add("--loglong", "loglong", 0,
+        "Use long log format for the console, i.e. show file, line number, etc. in the console log.", "")
+                ->SetGroup("Logging");
     add("--loglevel", "loglevel", logLevelStr,
         QString(
             "Set the logging level.  All log messages at lower levels will be "
@@ -2885,6 +2888,8 @@ int MythCommandLineParser::ConfigureLogging(const QString& mask, bool progress)
         verboseArgParse("none");
     }
 
+    int loglong = toInt("loglong");
+
     int facility = GetSyslogFacility();
 #if CONFIG_SYSTEMD_JOURNAL
     bool journal = toBool("systemd-journal");
@@ -2917,7 +2922,7 @@ int MythCommandLineParser::ConfigureLogging(const QString& mask, bool progress)
     if (toBool("daemon"))
         quiet = std::max(quiet, 1);
 
-    logStart(logfile, progress, quiet, facility, level, dblog, propagate);
+    logStart(logfile, progress, quiet, facility, level, dblog, propagate, loglong);
     qInstallMessageHandler([](QtMsgType /*unused*/, const QMessageLogContext& /*unused*/, const QString &Msg)
         { LOG(VB_GENERAL, LOG_INFO, "Qt: " + Msg); });
 
