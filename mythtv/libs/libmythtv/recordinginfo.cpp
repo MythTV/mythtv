@@ -586,6 +586,54 @@ void RecordingInfo::ApplyRecordStateChange(RecordingType newstate, bool save)
     }
 }
 
+/** \fn RecordingInfo::ApplyStarsChange(float stars)
+ *  \brief Sets the stars value in the database.
+ *  \param newstarsvalue.
+ */
+void RecordingInfo::ApplyStarsChange(float newstarsvalue)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("UPDATE recorded"
+                  " SET stars = :STARS"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :START ;");
+    query.bindValue(":STARS", newstarsvalue);
+    query.bindValue(":START", m_recStartTs);
+    query.bindValue(":CHANID", m_chanId);
+
+    if (!query.exec())
+        MythDB::DBError("Stars update", query);
+
+    m_stars = newstarsvalue;
+
+    SendUpdateEvent();
+}
+
+/** \fn RecordingInfo::ApplyOriginalAirDateCharge(QDate &newoadvalue)
+ *  \brief Sets the originalairdate value in the database.
+ *  \param originalairdate.
+ */
+void RecordingInfo::ApplyOriginalAirDateChange(const QDate &newoadvalue)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("UPDATE recorded"
+                  " SET originalairdate = :ORIGINALAIRDATE"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :START ;");
+    query.bindValue(":ORIGINALAIRDATE", newoadvalue);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":START", m_recStartTs);
+
+    if (!query.exec())
+        MythDB::DBError("OriginalAirDate update", query);
+
+    m_originalAirDate = newoadvalue;
+
+    SendUpdateEvent();
+}
+
 /** \fn RecordingInfo::ApplyRecordRecPriorityChange(int)
  *  \brief Sets recording priority of "record", creating "record" if it
  *         does not exist.
