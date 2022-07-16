@@ -740,6 +740,8 @@ bool V2Dvr::UpdateRecordedWatchedStatus ( int RecordedId,
                                         const QDateTime &StartTime,
                                         bool  watched)
 {
+    LOG(VB_GENERAL, LOG_WARNING, "Deprecated, use Dvr/UpdateRecordedMetadata.");
+
     if ((RecordedId <= 0) &&
         (chanid <= 0 || !StartTime.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
@@ -854,6 +856,8 @@ bool V2Dvr::SetSavedBookmark( int RecordedId,
                             const QString &offsettype,
                             long Offset )
 {
+    LOG(VB_GENERAL, LOG_WARNING, "Deprecated, use Dvr/UpdateRecordedMetadata.");
+
     if ((RecordedId <= 0) &&
         (chanid <= 0 || !StartTime.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
@@ -2065,4 +2069,142 @@ int V2Dvr::ManageJobQueue( const QString   &sAction,
 
     return JobQueue::GetJobID(jobType, ri.GetChanID(),
                               ri.GetRecordingStartTime());
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool V2Dvr::UpdateRecordedMetadata ( uint             RecordedId,
+                                     bool             AutoExpire,
+                                     long             BookmarkOffset,
+                                     const QString    BookmarkOffsetType,
+                                     bool             Damaged,
+                                     const QString   &Description,
+                                     uint             Episode,
+                                     const QString   &Inetref,
+                                     const QDate     &OriginalAirDate,
+                                     bool             Preserve,
+                                     uint             Season,
+                                     uint             Stars,
+                                     const QString   &SubTitle,
+                                     const QString   &Title,
+                                     bool             Watched )
+
+{
+    if (m_request->m_queries.size() < 2 || !HAS_PARAMv2("RecordedId"))
+    {
+        LOG(VB_GENERAL, LOG_ERR, "No RecordedId, or no parameters to change.");
+        return false;
+    }
+
+    auto pi = ProgramInfo(RecordedId);
+    auto ri = RecordingInfo(RecordedId);
+
+    if (!ri.GetChanID())
+        return false;
+
+    if (HAS_PARAMv2("AutoExpire"))
+        pi.SaveAutoExpire(AutoExpire ? kNormalAutoExpire :
+                                        kDisableAutoExpire, false);
+
+    if (HAS_PARAMv2("BookmarkOffset"))
+    {
+        uint64_t position;
+
+        if (BookmarkOffsetType.toLower() == "position")
+        {
+            if (!ri.QueryPositionKeyFrame(&position, BookmarkOffset, true))
+                return false;
+        }
+        else if (BookmarkOffsetType.toLower() == "duration")
+        {
+            if (!ri.QueryDurationKeyFrame(&position, BookmarkOffset, true))
+                return false;
+        }
+        else
+            position = BookmarkOffset;
+
+        ri.SaveBookmark(position);
+    }
+
+    if (HAS_PARAMv2("Damaged"))
+        pi.SaveVideoProperties(VID_DAMAGED, Damaged ?  VID_DAMAGED : 0);
+
+    if (HAS_PARAMv2("Description") ||
+        HAS_PARAMv2("SubTitle")    ||
+        HAS_PARAMv2("Title"))
+    {
+
+        QString tmp_description;
+        QString tmp_subtitle;
+        QString tmp_title;
+
+        if (HAS_PARAMv2("Description"))
+            tmp_description = Description;
+        else
+            tmp_description = ri.GetDescription();
+
+        if (HAS_PARAMv2("SubTitle"))
+            tmp_subtitle = SubTitle;
+        else
+            tmp_subtitle = ri.GetSubtitle();
+
+        if (HAS_PARAMv2("Title"))
+            tmp_title = Title;
+        else
+            tmp_title = ri.GetTitle();
+
+        ri.ApplyRecordRecTitleChange(tmp_title, tmp_subtitle, tmp_description);
+    }
+
+    if (HAS_PARAMv2("Episode") ||
+        HAS_PARAMv2("Season"))
+    {
+        int tmp_episode;
+        int tmp_season;
+
+        if (HAS_PARAMv2("Episode"))
+            tmp_episode = Episode;
+        else
+            tmp_episode = ri.GetEpisode();
+
+        if (HAS_PARAMv2("Season"))
+            tmp_season = Season;
+        else
+            tmp_season = ri.GetSeason();
+
+        pi.SaveSeasonEpisode(tmp_season, tmp_episode);
+    }
+
+    if (HAS_PARAMv2("Inetref"))
+        pi.SaveInetRef(Inetref);
+
+    if (HAS_PARAMv2("OriginalAirDate"))
+    {
+        if (!OriginalAirDate.isValid())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Need valid OriginalAirDate yyyy-mm-dd.");
+            return false;
+        }
+        ri.ApplyOriginalAirDateChange(OriginalAirDate);
+    }
+
+    if (HAS_PARAMv2("Preserve"))
+        pi.SavePreserve(Preserve);
+
+    if (HAS_PARAMv2("Stars"))
+    {
+        if (Stars > 10)
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Recording stars can be 0 to 10.");
+            return false;
+        }
+        ri.ApplyStarsChange(Stars * 0.1);
+    }
+
+    if (HAS_PARAMv2("Watched"))
+        pi.SaveWatched(Watched);
+
+    return true;
 }

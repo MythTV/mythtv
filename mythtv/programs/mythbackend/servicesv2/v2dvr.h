@@ -42,7 +42,7 @@
 class V2Dvr : public MythHTTPService
 {
     Q_OBJECT
-    Q_CLASSINFO("Version",      "7.0")
+    Q_CLASSINFO("Version",      "7.1")
     Q_CLASSINFO("AddRecordedCredits",  "methods=POST;name=bool")
     Q_CLASSINFO("AddRecordedProgram",  "methods=POST;name=int")
     Q_CLASSINFO("RemoveRecorded",      "methods=POST;name=bool")
@@ -75,6 +75,7 @@ class V2Dvr : public MythHTTPService
     Q_CLASSINFO("DupInToString",        "methods=GET,POST,HEAD;name=String")
     Q_CLASSINFO("DupInToDescription",   "methods=GET,POST,HEAD;name=String")
     Q_CLASSINFO("ManageJobQueue",       "methods=POST;name=int")
+    Q_CLASSINFO("UpdateRecordedMetadata", "methods=POST")
 
   public:
     V2Dvr();
@@ -364,7 +365,21 @@ class V2Dvr : public MythHTTPService
                                              QString          RemoteHost,
                                              QString          JobArgs   );
 
-
+    bool              UpdateRecordedMetadata ( uint             RecordedId,
+                                               bool             AutoExpire,
+                                               long             BookmarkOffset,
+                                               const QString    BookmarkOffsetType,
+                                               bool             Damaged,
+                                               const QString   &Description,
+                                               uint             Episode,
+                                               const QString   &Inetref,
+                                               const QDate     &OriginalAirDate,
+                                               bool             Preserve,
+                                               uint             Season,
+                                               uint             Stars,
+                                               const QString   &SubTitle,
+                                               const QString   &Title,
+                                               bool             Watched );
 
   private:
     Q_DISABLE_COPY(V2Dvr)
