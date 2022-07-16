@@ -5404,6 +5404,10 @@ void ProgramInfo::SubstituteMatches(QString &str)
         str.replace(QString("%DIR%"), dirInfo.path());
     }
 
+    // N.B. Contents of %MATCH% string variables get parsed into a single
+    // QStringLists. Quotes in strings will cause lost/truncated output.
+    // Replace QUOTATION MARK (U+0022)j with MODIFIER LETTER DOUBLE PRIME (U+02BA).
+
     str.replace(QString("%FILE%"), GetBasename());
     str.replace(QString("%TITLE%"), m_title.replace("\"", "ʺ"));
     str.replace(QString("%SUBTITLE%"), m_subtitle.replace("\"", "ʺ"));
