@@ -368,7 +368,7 @@ class V2Dvr : public MythHTTPService
     bool              UpdateRecordedMetadata ( uint             RecordedId,
                                                bool             AutoExpire,
                                                long             BookmarkOffset,
-                                               const QString    BookmarkOffsetType,
+                                               const QString   &BookmarkOffsetType,
                                                bool             Damaged,
                                                const QString   &Description,
                                                uint             Episode,

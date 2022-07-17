@@ -270,7 +270,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     void ApplyTranscoderProfileChange(const QString &profile) const;//pi
     void ApplyTranscoderProfileChangeById(int id);
     void ApplyNeverRecord(void);
-    void ApplyStarsChange(float);
+    void ApplyStarsChange(float newstarsvalue);
     void ApplyOriginalAirDateChange(const QDate &originalairdate);
 
     // Temporary while we transition from string to integer

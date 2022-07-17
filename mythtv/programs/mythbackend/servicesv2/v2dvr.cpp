@@ -2078,7 +2078,7 @@ int V2Dvr::ManageJobQueue( const QString   &sAction,
 bool V2Dvr::UpdateRecordedMetadata ( uint             RecordedId,
                                      bool             AutoExpire,
                                      long             BookmarkOffset,
-                                     const QString    BookmarkOffsetType,
+                                     const QString   &BookmarkOffsetType,
                                      bool             Damaged,
                                      const QString   &Description,
                                      uint             Episode,
@@ -2110,7 +2110,7 @@ bool V2Dvr::UpdateRecordedMetadata ( uint             RecordedId,
 
     if (HAS_PARAMv2("BookmarkOffset"))
     {
-        uint64_t position;
+        uint64_t position =0;
 
         if (BookmarkOffsetType.toLower() == "position")
         {
@@ -2161,8 +2161,8 @@ bool V2Dvr::UpdateRecordedMetadata ( uint             RecordedId,
     if (HAS_PARAMv2("Episode") ||
         HAS_PARAMv2("Season"))
     {
-        int tmp_episode;
-        int tmp_season;
+        int tmp_episode = 0;
+        int tmp_season = 0;
 
         if (HAS_PARAMv2("Episode"))
             tmp_episode = Episode;

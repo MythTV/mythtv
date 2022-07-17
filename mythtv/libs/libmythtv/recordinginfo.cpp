@@ -610,11 +610,12 @@ void RecordingInfo::ApplyStarsChange(float newstarsvalue)
     SendUpdateEvent();
 }
 
-/** \fn RecordingInfo::ApplyOriginalAirDateCharge(QDate &newoadvalue)
+/** \fn RecordingInfo::ApplyOriginalAirDateCharge(QDate &originalairdate)
  *  \brief Sets the originalairdate value in the database.
  *  \param originalairdate.
  */
-void RecordingInfo::ApplyOriginalAirDateChange(const QDate &newoadvalue)
+
+void RecordingInfo::ApplyOriginalAirDateChange(const QDate &originalairdate)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -622,14 +623,14 @@ void RecordingInfo::ApplyOriginalAirDateChange(const QDate &newoadvalue)
                   " SET originalairdate = :ORIGINALAIRDATE"
                   " WHERE chanid = :CHANID"
                   " AND starttime = :START ;");
-    query.bindValue(":ORIGINALAIRDATE", newoadvalue);
+    query.bindValue(":ORIGINALAIRDATE", originalairdate);
     query.bindValue(":CHANID", m_chanId);
     query.bindValue(":START", m_recStartTs);
 
     if (!query.exec())
         MythDB::DBError("OriginalAirDate update", query);
 
-    m_originalAirDate = newoadvalue;
+    m_originalAirDate = originalairdate;
 
     SendUpdateEvent();
 }
