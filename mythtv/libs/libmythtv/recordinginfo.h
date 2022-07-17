@@ -271,7 +271,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     void ApplyTranscoderProfileChangeById(int id);
     void ApplyNeverRecord(void);
     void ApplyStarsChange(float newstarsvalue);
-    void ApplyOriginalAirDateChange(const QDate &originalairdate);
+    void ApplyOriginalAirDateChange(QDate originalairdate);
 
     // Temporary while we transition from string to integer
     static QString GetRecgroupString(uint recGroupID);

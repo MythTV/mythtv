@@ -373,7 +373,7 @@ class V2Dvr : public MythHTTPService
                                                const QString   &Description,
                                                uint             Episode,
                                                const QString   &Inetref,
-                                               const QDate     &OriginalAirDate,
+                                                     QDate      OriginalAirDate,
                                                bool             Preserve,
                                                uint             Season,
                                                uint             Stars,

@@ -610,12 +610,12 @@ void RecordingInfo::ApplyStarsChange(float newstarsvalue)
     SendUpdateEvent();
 }
 
-/** \fn RecordingInfo::ApplyOriginalAirDateCharge(QDate &originalairdate)
+/** \fn RecordingInfo::ApplyOriginalAirDateCharge(QDate originalairdate)
  *  \brief Sets the originalairdate value in the database.
  *  \param originalairdate.
  */
 
-void RecordingInfo::ApplyOriginalAirDateChange(const QDate &originalairdate)
+void RecordingInfo::ApplyOriginalAirDateChange(QDate originalairdate)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
