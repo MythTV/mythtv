@@ -378,7 +378,7 @@
         "frontend_desc": "Identification string reported by the card. If the message \"Could not get card info...\" appears the card can be in use by another program.",
         "inputname_label": "Delivery System",
         "inputname_desc": "If your card supports more than one delivery system then you can select here the one that you want to use.",
-        "wait_label": "DVBWaitForSeqStart",
+        "wait_label": "Wait for SEQ start header",
         "wait_desc": "If enabled, drop packets from the start of a DVB recording until a sequence start header is seen.",
         "ondemand_label": "Open DVB card on demand",
         "ondemand_desc": "If enabled, only open the DVB card when required, leaving it free for other programs at other times.",
@@ -389,14 +389,50 @@
         "devNotExist": "Device does not exist",
         "unknownName": "Unknown",
         "devInUse": "Warning: This device is already in use.",
-        "noDevSelected": "No Device Selected"
-      }
+        "noDevSelected": "No Device Selected",
+        "newsatellite_button": "New Satellite Device",
+        "newsatellite_heading": "New Satellite Setting",
+        "newsatellite_devtype": "Select device type",
+        "satellite_heading": "Satellite Settings",
+        "satellite_delete_desc": "This will delete the Satellite device and all downstream devices.",
+        "satellite_delete_header": "Delete Satellite Devices"
+      },
+      "diseqc": {
+        "subtype_legacy": "Legacy (Fixed)",
+        "subtype_standard": "Standard (Voltage)",
+        "subtype_universal": "Universal (Voltage & Tone)",
+        "subtype_backstacked": "Bandstacked",
+        "lnbpreset_universal": "Universal (Europe)",
+        "lnbpreset_single": "Single (Europe)",
+        "lnbpreset_circular": "Circular (N. America)",
+        "lnbpreset_Linear": "Linear (N. America)",
+        "lnbpreset_cband": "C Band",
+        "lnbpreset_dishpro": "DishPro Bandstacked",
+        "lnbpreset_custom": "Custom",
+        "lnb": {
+          "title": "Satellite Receiver (LNB)",
+          "preset_label": "LNB Preset",
+          "preset_desc": "Select the LNB preset from the list, or choose 'Custom' and set the advanced settings below.",
+          "type_label": "LNB Type",
+          "type_desc": "Select the type of LNB from the list.",
+          "lofswitch_label": "LNB LOF Switch (MHz)",
+          "lofswitch_desc": "This defines at what frequency the LNB will do a switch from high to low setting, and vice versa.",
+          "loflow_label": "LNB LOF Low (MHz)",
+          "loflow_desc": "This defines the offset the frequency coming from the LNB will be in low setting. For bandstacked LNBs this is the vertical/right polarization band.",
+          "lofhigh_label": "LNB LOF High (MHz)",
+          "lofhigh_desc": "This defines the offset the frequency coming from the LNB will be in high setting. For bandstacked LNBs this is the horizontal/left polarization band.",
+          "reversed_label": "LNB Reversed",
+          "reversed_desc": "This defines whether the signal reaching the LNB is reversed from normal polarization. This happens to circular signals bouncing twice on a toroidal dish."
+        }
+      },
+      "delete_details": "This will delete {{CardType}} Device:{{VideoDevice}} Name:{{DisplayName}}"
     },
     "common": {
       "successful_delete": "Successful delete",
       "deleted": "(Deleted)",
       "new": "(New)"
-    }
+    },
+    "ru_sure": "Are you sure ?"
   },
   "sidenav": {
     "settingsmenu": {

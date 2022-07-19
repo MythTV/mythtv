@@ -2,8 +2,15 @@ import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/cor
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
-import { CaptureCardList, CaptureDevice, CaptureDeviceList, CardAndInput } from 'src/app/services/interfaces/capture-card.interface';
+import { CaptureCardList, CaptureDevice, CaptureDeviceList, CardAndInput, DiseqcTree, DiseqcTreeList } from 'src/app/services/interfaces/capture-card.interface';
 import { SetupService } from 'src/app/services/setup.service';
+import { DiseqcSettingBase } from './diseqc-setting-base';
+
+interface diseqcParm {
+  description: string,
+  type: string,
+  inactive: boolean
+}
 
 @Component({
   selector: 'app-dvb',
@@ -17,6 +24,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
 
   @ViewChild("dvbform")
   currentForm!: NgForm;
+  diseqcComponent!: DiseqcSettingBase;
 
   work = {
     InputName: '',
@@ -24,7 +32,9 @@ export class DvbComponent implements OnInit, AfterViewInit {
     errorCount: 0,
     inputNames: [''],
     isReady: false,
-    warningMessage: ''
+    warningMessage: '',
+    displayNewDiseqc: false,
+    displayDeleteDiseqc: false,
   };
 
   captureDeviceList: CaptureDeviceList = {
@@ -32,6 +42,21 @@ export class DvbComponent implements OnInit, AfterViewInit {
       CaptureDevices: [],
     }
   };
+
+  diseqcTreeList: DiseqcTreeList = {
+    DiseqcTreeList: {
+      DiseqcTrees: [],
+    }
+  }
+
+  diseqcTree: DiseqcTree | undefined = undefined;
+
+  diseqcTypes: diseqcParm[] = [
+    { description: "Switch", type: "switch", inactive: false },
+    { description: "Rotor", type: "rotor", inactive: false },
+    { description: "Unicable", type: "scr", inactive: false },
+    { description: "LNB", type: "lnb", inactive: false }
+  ];
 
   messages = {
     devNotExist: 'settings.capture.dvb.devNotExist',
@@ -41,6 +66,8 @@ export class DvbComponent implements OnInit, AfterViewInit {
   };
 
   currentDevice: CaptureDevice = <CaptureDevice>{ FrontendName: "Unknown", InputNames: [''] };
+
+  selectedDiseqcType: diseqcParm = { description: "", type: "", inactive: true };
 
   constructor(private captureCardService: CaptureCardService, private setupService: SetupService,
     private translate: TranslateService) {
@@ -62,19 +89,89 @@ export class DvbComponent implements OnInit, AfterViewInit {
       this.card.CardId = 0;
     if (this.card.VideoDevice == undefined)
       this.card.VideoDevice = '';
-    // Get list of devices for dropdown liat
+    if (this.card.DiSEqCId == undefined)
+      this.card.DiSEqCId = 0;
+    // Get list of devices for dropdown list
     this.captureCardService.GetCaptureDeviceList('DVB')
       .subscribe({
         next: data => {
           this.captureDeviceList = data;
           this.setupDevice();
         },
-        error: () => this.work.errorCount++
+        error: (err: any) => {
+          console.log("GetCaptureDeviceList",err);
+          this.work.errorCount++;
+        }
       });
+    // Get DiseqcTree list
+    this.captureCardService.GetDiseqcTreeList()
+      .subscribe({
+        next: data => {
+          this.diseqcTreeList = data;
+          this.setupDiseqc();
+        },
+        error: (err: any) => {
+          console.log("GetDiseqcTreeList",err);
+          this.work.errorCount++;
+        }
+      })
   }
 
   ngAfterViewInit(): void {
     this.setupService.setCurrentForm(this.currentForm);
+  }
+
+  setupDiseqc(): void {
+    this.diseqcTree = this.diseqcTreeList.DiseqcTreeList.DiseqcTrees.find
+      (x => x.DiseqcId == this.card.DiSEqCId);
+  }
+
+  newDiseqc(): void {
+    this.work.displayNewDiseqc = false;
+    this.diseqcTree = <DiseqcTree>{
+      Type: this.selectedDiseqcType.type,
+      Description: this.selectedDiseqcType.description,
+    };
+  }
+
+  deleteDiseqc(): void {
+    this.work.displayDeleteDiseqc = false;
+    this.work.successCount = 0;
+    this.work.errorCount = 0;
+    if (this.diseqcTree && this.diseqcTree.DiseqcId) {
+      this.captureCardService.DeleteDiseqcTree(this.diseqcTree.DiseqcId)
+        .subscribe({
+          next: (x: any) => {
+            if (x.bool)
+              this.work.successCount++;
+            else {
+              this.work.errorCount++;
+              console.log("DeleteDiseqcTree", x)
+            }
+          },
+          error: (err: any) => {
+            console.log("DeleteDiseqcTree", err);
+            this.work.errorCount++;
+          }
+        });
+      this.card.DiSEqCId = 0;
+      if (this.card.CardId) {
+        // Update device and child devices
+        this.cardList.CaptureCardList.CaptureCards.forEach(card => {
+          if (card.CardId == this.card.CardId || card.ParentId == this.card.CardId) {
+            this.captureCardService.UpdateCaptureCard(card.CardId, 'diseqcid',
+              String(this.card.DiSEqCId))
+              .subscribe(this.saveObserver);
+          }
+        });
+      }
+    }
+    this.diseqcTree = undefined;
+  }
+
+
+  setDiseqcObject(base: DiseqcSettingBase): void {
+    this.diseqcComponent = base;
   }
 
   // After load of devices, make sure the current record is selected in list
@@ -145,15 +242,21 @@ export class DvbComponent implements OnInit, AfterViewInit {
         if (!this.card.CardId) {
           this.card.CardId = x.int;
           this.cardList.CaptureCardList.CaptureCards.push(this.card);
+          // Due to an omission in the AddCaptureCard service, inputname is not added
+          // at add time, so update it here.
+          this.captureCardService.UpdateCaptureCard(this.card.CardId, 'inputname',
+            this.card.InputName)
+            .subscribe(this.saveObserver);
         }
       }
       else {
+        console.log("saveObserver",x);
         this.work.errorCount++;
         this.currentForm.form.markAsDirty();
       }
     },
     error: (err: any) => {
-      console.error(err);
+      console.log("saveObserver", err);
       this.work.errorCount++;
       this.currentForm.form.markAsDirty();
     },
@@ -161,14 +264,47 @@ export class DvbComponent implements OnInit, AfterViewInit {
 
 
   saveForm() {
-    console.log("save form clicked");
     this.work.successCount = 0;
     this.work.errorCount = 0;
+    //  Save diseqcTree
+    if (this.diseqcTree && this.diseqcComponent) {
+      this.diseqcComponent.saveForm().subscribe({
+        next: (x: any) => {
+          if (this.card.DiSEqCId && x.bool
+            && this.card.DiSEqCId == this.diseqcTree?.DiseqcId) {
+            this.work.successCount++;
+            this.saveCard();
+          }
+          else if (!this.card.DiSEqCId && x.int && this.diseqcTree) {
+            this.card.DiSEqCId = x.int;
+            this.diseqcTree.DiseqcId = x.int;
+            this.diseqcTreeList.DiseqcTreeList.DiseqcTrees.push(this.diseqcTree);
+            this.saveCard();
+          }
+          else {
+            console.log("saveForm", x);
+            this.work.errorCount++;
+            this.currentForm.form.markAsDirty();
+          }
+        },
+        error: (err: any) => {
+          console.log("saveForm", err);
+          this.work.errorCount++;
+          this.currentForm.form.markAsDirty();
+        }
+      });
+    }
+    else
+      this.saveCard();
+  }
+
+  saveCard() {
     if (this.card.CardId) {
       // Update device and child devices
       this.cardList.CaptureCardList.CaptureCards.forEach(card => {
         if (card.CardId == this.card.CardId || card.ParentId == this.card.CardId) {
-          this.captureCardService.UpdateCaptureCard(card.CardId, 'videodevice', this.card.VideoDevice)
+          this.captureCardService.UpdateCaptureCard(card.CardId, 'videodevice',
+            this.card.VideoDevice)
             .subscribe(this.saveObserver);
           this.captureCardService.UpdateCaptureCard(card.CardId, 'dvb_wait_for_seqstart',
             this.card.DVBWaitForSeqStart ? '1' : '0')
@@ -189,7 +325,10 @@ export class DvbComponent implements OnInit, AfterViewInit {
             String(this.card.DVBEITScan ? '1' : '0'))
             .subscribe(this.saveObserver);
           this.captureCardService.UpdateCaptureCard(card.CardId, 'inputname',
-            String(this.card.InputName))
+            this.card.InputName)
+            .subscribe(this.saveObserver);
+          this.captureCardService.UpdateCaptureCard(card.CardId, 'diseqcid',
+            String(this.card.DiSEqCId))
             .subscribe(this.saveObserver);
         }
       });

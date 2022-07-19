@@ -49,6 +49,10 @@ import { EpgDownloadingComponent } from './config/settings/general/epg-downloadi
 import { CaptureCardsComponent } from './config/settings/capture-cards/capture-cards.component';
 import { CetonComponent } from './config/settings/capture-cards/ceton/ceton.component';
 import { DvbComponent } from './config/settings/capture-cards/dvb/dvb.component';
+import { LnbComponent } from './config/settings/capture-cards/dvb/lnb/lnb.component';
+import { SwitchComponent } from './config/settings/capture-cards/dvb/switch/switch.component';
+import { RotorComponent } from './config/settings/capture-cards/dvb/rotor/rotor.component';
+import { UnicableComponent } from './config/settings/capture-cards/dvb/unicable/unicable.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -94,6 +98,10 @@ export function HttpLoaderFactory(http: HttpClient) {
     CaptureCardsComponent,
     CetonComponent,
     DvbComponent,
+    LnbComponent,
+    SwitchComponent,
+    RotorComponent,
+    UnicableComponent,
   ],
   imports: [
     BrowserModule,

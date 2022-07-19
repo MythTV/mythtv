@@ -81,12 +81,11 @@
                 </p-button>
                 <p-dialog header="{{ 'settings.capture.delete_this' | translate }}" [(visible)]="displayDeleteThis[ix]" [modal]="true"
                     [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
-                    <h2>Are you sure ?</h2>
-                    <p>This will delete
-                        {{m_CaptureCardsFiltered[ix].CardType}}
-                        {{m_CaptureCardsFiltered[ix].VideoDevice}}
-                        ({{m_CaptureCardsFiltered[ix].DisplayName}})
-                    </p>
+                    <h2>{{ 'settings.ru_sure' | translate }}</h2>
+                    <p>{{ 'settings.capture.delete_details' | 
+                        translate: {CardType: m_CaptureCardsFiltered[ix].CardType,
+                            VideoDevice: m_CaptureCardsFiltered[ix].VideoDevice,
+                            DisplayName: m_CaptureCardsFiltered[ix].DisplayName} }}</p>
                     <ng-template pTemplate="footer">
                         <p-button icon="pi pi-times-circle" (click)="displayDeleteThis[ix]=false" label="{{ 'common.no' | translate }}"
                             styleClass="p-button-plain">

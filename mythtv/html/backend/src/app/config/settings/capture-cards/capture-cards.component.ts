@@ -3,7 +3,7 @@ import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
-import { CaptureCardList, CardAndInput, CardType, CardTypeList } from 'src/app/services/interfaces/capture-card.interface';
+import { CaptureCardList, CardAndInput, CardType, CardTypeList, DiseqcTreeList } from 'src/app/services/interfaces/capture-card.interface';
 import { MythService } from 'src/app/services/myth.service';
 import { SetupService } from 'src/app/services/setup.service';
 
@@ -41,7 +41,7 @@ export class CaptureCardsComponent implements OnInit {
   deleteAll: boolean = false;
 
 
-  cardTypes!: CardType [];
+  cardTypes!: CardType[];
 
   constructor(private mythService: MythService,
     private captureCardService: CaptureCardService, private setupService: SetupService,
@@ -198,12 +198,35 @@ export class CaptureCardsComponent implements OnInit {
           .subscribe(this.delObserver);
       }
     });
+    // Delete any diseqc tree attached to the card
+    this.deleteDiseqc(this.m_CaptureCardsFiltered[index].DiSEqCId);
+    this.m_CaptureCardsFiltered[index].DiSEqCId = 0;
     // Delete this card. Needs to be separate in case this card was added
     // during this session, then it would not be in the m_CaptureCardList.
     console.log("DeleteThis:", cardId);
     this.expectedCount++;
     this.captureCardService.DeleteCaptureCard(cardId)
       .subscribe(this.delObserver);
+  }
+
+  deleteDiseqc(id: number) {
+    if (id) {
+      // Delete this entry
+      this.expectedCount++;
+      this.captureCardService.DeleteDiseqcTree(id)
+        .subscribe({
+          next: (x: any) => {
+            if (x.bool)
+              this.successCount++;
+            else
+              this.errorCount++;
+          },
+          error: (err: any) => {
+            console.error(err);
+            this.errorCount++;
+          }
+        })
+    }
   }
 
   deleteAllOnHost() {
@@ -232,6 +255,9 @@ export class CaptureCardsComponent implements OnInit {
     // delete on others
     this.m_CaptureCardList.CaptureCardList.CaptureCards.forEach(card => {
       if (card.HostName != this.m_hostName) {
+        // Delete any diseqc tree attached to the card
+        this.deleteDiseqc(card.DiSEqCId);
+        card.DiSEqCId = 0;
         console.log("DeleteThis (other host):", card.CardId);
         this.expectedCount++;
         this.captureCardService.DeleteCaptureCard(card.CardId)

@@ -97,7 +97,7 @@ export interface DiseqcTree {
     LnbLofHi:            number;
     LnbLofLo:            number;
     CmdRepeat:           number;
-    LnbPolInv:           number;
+    LnbPolInv:           boolean;
     Address:             number;
     ScrUserband:         number;
     ScrFrequency:        number;

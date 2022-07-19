@@ -1,0 +1,82 @@
+<form class="ml-3 mr-3" name="lnbform" #lnbform="ngForm">
+    <p-card class="m-5">
+        <ng-template pTemplate="title">
+            {{ 'settings.capture.diseqc.lnb.title' | translate }}
+        </ng-template>
+        <ng-template pTemplate="subtitle">
+        </ng-template>
+        <ng-template pTemplate="content">
+            <div class="grid">
+                <div class="mb-4 w-full">
+                    <div class="form-group field">
+                        <label for="LnbPreset" class="block">{{ 'settings.capture.diseqc.lnb.preset_label' | translate }}</label>
+                        <p-dropdown [options]="lnbPresetList" [(ngModel)]="currentPreset" [editable]="false" optionLabel="Name"
+                            (onChange)="updatePreset();" [maxlength]="0" [style]="{'minWidth':'80%'}" name="LnbPreset"
+                            #LnbPreset="ngModel" [scrollHeight]="'400px'">
+                        </p-dropdown>
+                        <small class="block">
+                            {{ 'settings.capture.diseqc.lnb.preset_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="SubType" class="block">{{ 'settings.capture.diseqc.lnb.type_label' | translate }}</label>
+                        <p-dropdown [options]="lnbSubTypes" [(ngModel)]="currentSubType" [editable]="false" optionLabel="Name"
+                            (onChange)="updateSubType();" [maxlength]="0" [style]="{'minWidth':'80%'}" name="SubType"
+                            #SubType="ngModel" [disabled]="currentPreset.SubType != 'custom'">
+                        </p-dropdown>
+                        <small class="block">
+                            {{ 'settings.capture.diseqc.lnb.type_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="LnbLofSwitch" class="block">{{ 'settings.capture.diseqc.lnb.lofswitch_label' | translate }}</label>
+                        <p-inputNumber [(ngModel)]="work.LnbLofSwitch" name="LnbLofSwitch" id="LnbLofSwitch"
+                            mode="decimal" inputId="withoutgrouping" [useGrouping]="false"
+                            [disabled]="currentPreset.SubType != 'custom' || diseqcTree.SubType != 'voltage_tone' ">
+                            </p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.capture.diseqc.lnb.lofswitch_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="LnbLofLo" class="block">{{ 'settings.capture.diseqc.lnb.loflow_label' | translate }}</label>
+                        <p-inputNumber [(ngModel)]="work.LnbLofLo" name="LnbLofLo" id="LnbLofLo"
+                            mode="decimal" inputId="withoutgrouping" [useGrouping]="false"
+                            [disabled]="currentPreset.SubType != 'custom'">
+                            </p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.capture.diseqc.lnb.loflow_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="LnbLofHi" class="block">{{ 'settings.capture.diseqc.lnb.lofhigh_label' | translate }}</label>
+                        <p-inputNumber [(ngModel)]="work.LnbLofHi" name="LnbLofHi" id="LnbLofHi"
+                            mode="decimal" inputId="withoutgrouping" [useGrouping]="false"
+                            [disabled]="currentPreset.SubType != 'custom'
+                                || ! (diseqcTree.SubType == 'voltage_tone' || diseqcTree.SubType == 'bandstacked') ">
+                            </p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.capture.diseqc.lnb.lofhigh_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <p-checkbox inputId="LnbPolInv" [(ngModel)]="diseqcTree.LnbPolInv"
+                            name="LnbPolInv" #LnbPolInv="ngModel"
+                            class="mb-2 w-full" [binary]="true" label="{{ 'settings.capture.diseqc.lnb.reversed_label' | translate }}"
+                            [disabled]="currentPreset.SubType != 'custom'">
+                        </p-checkbox>
+                        <small class="block">
+                            {{ 'settings.capture.diseqc.lnb.reversed_desc' | translate }}
+                        </small>
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+    </p-card>
+</form>
