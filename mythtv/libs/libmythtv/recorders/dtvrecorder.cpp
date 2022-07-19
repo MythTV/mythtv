@@ -445,7 +445,13 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
             // the next byte will be the PES packet stream id.
             const int stream_id = m_startCode & 0x000000ff;
             if (PESStreamID::PictureStartCode == stream_id)
-                hasFrame = true;
+            {
+                if (m_progressiveSequence)
+                {
+                    hasFrame = true;
+                }
+                // else deterimine hasFrame from the following picture_coding_extension()
+            }
             else if (PESStreamID::GOPStartCode == stream_id)
             {
                 m_lastGopSeen   = m_framesSeenCount;
@@ -481,10 +487,47 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
                     case 0x8: /* picture coding extension */
                         if (bytes_left >= 5)
                         {
-                            //int picture_structure = bufptr[2]&3;
+                            int picture_structure  = bufptr[2] & 3;
                             int top_field_first = bufptr[3] & (1 << 7);
                             int repeat_first_field = bufptr[3] & (1 << 1);
                             int progressive_frame = bufptr[4] & (1 << 7);
+#if 0
+                            LOG(VB_RECORD, LOG_DEBUG, LOC +
+                                QString("picture_coding_extension(): (m_progressiveSequence: %1) picture_structure: %2 top_field_first: %3 repeat_first_field: %4 progressive_frame: %5")
+                                    .arg(QString::number(m_progressiveSequence , 2),
+                                         QString::number(picture_structure , 2),
+                                         QString::number(top_field_first , 2),
+                                         QString::number(repeat_first_field , 2),
+                                         QString::number(progressive_frame , 2)
+                                        )
+                               );
+#endif
+                            if (!m_progressiveSequence)
+                            {
+                                if (picture_structure == 0b00)
+                                {
+                                    ; // reserved
+                                }
+                                else if (picture_structure == 0b11)
+                                {
+                                    // frame picture (either interleaved interlaced or progressive)
+                                    hasFrame = true;
+                                }
+                                else if (picture_structure < 0b11)
+                                {
+                                    // field picture
+                                    // Only add a frame for the first presented field.
+                                    // Do not add a frame for each field picture.
+                                    if (top_field_first != 0)
+                                    {
+                                        hasFrame = (picture_structure == 0b01); // Top Field
+                                    }
+                                    else // top_field_first == 0
+                                    {
+                                        hasFrame = (picture_structure == 0b10); // Bottom Field
+                                    }
+                                }
+                            }
 
                             /* check if we must repeat the frame */
                             m_repeatPict = 1;
