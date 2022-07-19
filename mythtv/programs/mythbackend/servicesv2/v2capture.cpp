@@ -747,7 +747,7 @@ V2DiseqcTreeList* V2Capture::GetDiseqcTreeList  (  )
         pRec->setLnbLofHi           ( query.value( 11 ).toInt() );
         pRec->setLnbLofLo           ( query.value( 12 ).toInt() );
         pRec->setCmdRepeat          ( query.value( 13 ).toInt() );
-        pRec->setLnbPolInv          ( query.value( 14 ).toInt() );
+        pRec->setLnbPolInv          ( query.value( 14 ).toBool() );
         pRec->setAddress            ( query.value( 15 ).toInt() );
         pRec->setScrUserband        ( query.value( 16 ).toUInt() );
         pRec->setScrFrequency       ( query.value( 17 ).toUInt() );
@@ -770,7 +770,7 @@ int  V2Capture::AddDiseqcTree ( uint           ParentId,
                                 int            LnbLofHi,
                                 int            LnbLofLo,
                                 int            CmdRepeat,
-                                int            LnbPolInv,
+                                bool           LnbPolInv,
                                 int            Address,
                                 uint           ScrUserband,
                                 uint           ScrFrequency,
@@ -869,7 +869,7 @@ bool V2Capture::UpdateDiseqcTree  ( uint           DiseqcId,
                                     int            LnbLofHi,
                                     int            LnbLofLo,
                                     int            CmdRepeat,
-                                    int            LnbPolInv,
+                                    bool           LnbPolInv,
                                     int            Address,
                                     uint           ScrUserband,
                                     uint           ScrFrequency,
@@ -930,7 +930,7 @@ bool V2Capture::UpdateDiseqcTree  ( uint           DiseqcId,
 
     if (!query.exec())
     {
-        MythDB::DBError("MythAPI::AddDiseqcTree()", query);
+        MythDB::DBError("MythAPI::UpdateDiseqcTree()", query);
         throw( QString( "Database Error executing query." ));
     }
     int numrows = query.numRowsAffected();
@@ -950,10 +950,11 @@ bool  V2Capture::RemoveDiseqcTree  ( uint DiseqcId)
         throw( QString( "Database Error executing query." ));
     }
 
+    bool childOK = true;
     while (query.next())
     {
         uint child = query.value(  0 ).toUInt();
-        RemoveDiseqcTree(child);
+        childOK = RemoveDiseqcTree(child) && childOK;
     }
     // remove this row
     MSqlQuery query2(MSqlQuery::InitCon());
@@ -965,5 +966,5 @@ bool  V2Capture::RemoveDiseqcTree  ( uint DiseqcId)
         throw( QString( "Database Error executing query." ));
     }
     int numrows = query2.numRowsAffected();
-    return numrows > 0;
+    return numrows > 0 && childOK;
 }

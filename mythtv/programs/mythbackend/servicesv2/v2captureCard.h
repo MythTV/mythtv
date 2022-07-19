@@ -249,7 +249,7 @@ class V2DiseqcTree : public QObject
     SERVICE_PROPERTY2( int          ,   LnbLofHi )
     SERVICE_PROPERTY2( int          ,   LnbLofLo )
     SERVICE_PROPERTY2( int          ,   CmdRepeat )
-    SERVICE_PROPERTY2( int          ,   LnbPolInv )
+    SERVICE_PROPERTY2( bool         ,   LnbPolInv )
     SERVICE_PROPERTY2( int          ,   Address )
     SERVICE_PROPERTY2( uint         ,   ScrUserband )
     SERVICE_PROPERTY2( uint         ,   ScrFrequency )
