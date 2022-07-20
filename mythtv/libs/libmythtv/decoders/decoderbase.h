@@ -9,6 +9,7 @@
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/programinfo.h"
 #include "libmythtv/io/mythmediabuffer.h"
+#include "libmythtv/mythavrational.h"
 #include "libmythtv/mythavutil.h"
 #include "libmythtv/mythcodecid.h"
 #include "libmythtv/mythvideoprofile.h"
@@ -109,13 +110,6 @@ class StreamInfo
     }
 };
 using sinfo_vec_t = std::vector<StreamInfo>;
-
-inline AVRational AVRationalInit(int num, int den = 1) {
-    AVRational result;
-    result.num = num;
-    result.den = den;
-    return result;
-}
 
 class DecoderBase
 {
@@ -256,7 +250,7 @@ class DecoderBase
     virtual bool SetVideoByComponentTag(int /*tag*/) { return false; }
 
     void SaveTotalDuration(void);
-    void ResetTotalDuration(void) { m_totalDuration = AVRationalInit(0); }
+    void ResetTotalDuration(void) { m_totalDuration = MythAVRational(0); }
     void SaveTotalFrames(void);
     void TrackTotalDuration(bool track) { m_trackTotalDuration = track; }
     int GetfpsMultiplier(void) const { return m_fpsMultiplier; }
@@ -300,7 +294,7 @@ class DecoderBase
     long long            m_framesPlayed            {0};
     long long            m_framesRead              {0};
     uint64_t             m_frameCounter            {0};
-    AVRational           m_totalDuration;
+    MythAVRational       m_totalDuration           {0};
     int                  m_keyframeDist            {-1};
     long long            m_lastKey                 {0};
     long long            m_indexOffset             {0};
