@@ -199,8 +199,8 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
                         m_bufs->m_lfe[ic] = m_bufs->m_c[ic] = (lt+rt) * m3db;
                         m_bufs->m_r[ic]   = rt;
                         // surround channels receive out-of-phase
-                        m_bufs->m_ls[ic]  = (rt-lt) * 0.5;
-                        m_bufs->m_rs[ic]  = (lt-rt) * 0.5;
+                        m_bufs->m_ls[ic]  = (rt-lt) * 0.5F;
+                        m_bufs->m_rs[ic]  = (lt-rt) * 0.5F;
                     }
                     process = false;
                     break;
