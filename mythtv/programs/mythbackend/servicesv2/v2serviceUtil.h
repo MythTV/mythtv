@@ -22,8 +22,8 @@
 
 template <typename T>
 static inline void
-ADD_SQL(QString& settings_var, MSqlBindings& bindvar,
-        const QString& col, const QString& api_param, const T& val)
+ADD_SQLv2(QString& settings_var, MSqlBindings& bindvar,
+          const QString& col, const QString& api_param, const T& val)
 {
     settings_var += QString("%1=:%2, ").arg(col, api_param);
     bindvar[QString(":").append(api_param)] = val;
