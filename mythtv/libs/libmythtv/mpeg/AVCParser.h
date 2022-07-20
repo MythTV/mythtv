@@ -115,7 +115,7 @@ class AVCParser : public H2645Parser
     uint pictureHeightCropped(void) const override;
 
     double frameRate(void) const;
-    void getFrameRate(FrameRate &result) const override;
+    MythAVRational getFrameRate() const override;
 
     void set_AU_pending(void)
         {
