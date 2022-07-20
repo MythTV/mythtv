@@ -30,11 +30,11 @@
 #include "libmythbase/compat.h" // for uint on Darwin, MinGW
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythtv/recorders/recorderbase.h" // for ScanType
+
+#include "libmythtv/scantype.h"
 
 class BitReader;
 class FrameRate;
-enum class SCAN_t : uint8_t;
 
 class H2645Parser {
   public:
