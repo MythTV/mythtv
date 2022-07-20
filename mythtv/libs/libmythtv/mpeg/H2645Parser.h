@@ -31,10 +31,10 @@
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 
+#include "libmythtv/mythavrational.h"
 #include "libmythtv/scantype.h"
 
 class BitReader;
-class FrameRate;
 
 class H2645Parser {
   public:
@@ -70,7 +70,7 @@ class H2645Parser {
     /** \brief Computes aspect ratio from picture size and sample aspect ratio
      */
     uint aspectRatio(void) const;
-    virtual void getFrameRate(FrameRate &result) const = 0;
+    virtual MythAVRational getFrameRate() const = 0;
     virtual field_type getFieldType(void) const = 0;
 
     uint64_t frameAUstreamOffset(void) const {return m_frameStartOffset;}

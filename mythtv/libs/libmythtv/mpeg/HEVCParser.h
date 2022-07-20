@@ -252,7 +252,7 @@ class HEVCParser : public H2645Parser
     uint pictureHeightCropped(void) const override;
 
     field_type getFieldType(void) const override { return FRAME; }
-    void getFrameRate(FrameRate &result) const override;
+    MythAVRational getFrameRate() const override;
 
   protected:
     bool newAU(void);

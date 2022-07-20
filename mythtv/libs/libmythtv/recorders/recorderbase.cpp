@@ -371,7 +371,7 @@ bool RecorderBase::CheckForRingBufferSwitch(void)
         ResetForNewFile();
 
         m_videoAspect = m_videoWidth = m_videoHeight = 0;
-        m_frameRate = FrameRate(0);
+        m_frameRate = MythAVRational(0);
 
         SetRingBuffer(m_nextRingBuffer);
         SetRecording(m_nextRecording);

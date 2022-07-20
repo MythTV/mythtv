@@ -199,7 +199,7 @@ class DTVRecorder :
     // m_td_base + (m_td_tick_count * m_td_tick_framerate / 2)
     double                   m_tdBase                     {0.0};
     uint64_t                 m_tdTickCount                {0};
-    FrameRate                m_tdTickFramerate            {0};
+    MythAVRational           m_tdTickFramerate            {0};
     SCAN_t                   m_scanType                   {SCAN_t::UNKNOWN_SCAN};
 
     // Music Choice

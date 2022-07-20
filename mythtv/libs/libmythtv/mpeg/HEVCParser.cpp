@@ -2067,8 +2067,8 @@ uint HEVCParser::pictureHeightCropped(void) const
                            m_frameCropBottomOffset) * crop_unit_y);
 }
 
-void HEVCParser::getFrameRate(FrameRate &result) const
+MythAVRational HEVCParser::getFrameRate() const
 {
-    result = (m_unitsInTick == 0) ? FrameRate(0) :
-             FrameRate(m_timeScale, m_unitsInTick);
+    return (m_unitsInTick == 0) ? MythAVRational(0) :
+             MythAVRational(m_timeScale, m_unitsInTick);
 }

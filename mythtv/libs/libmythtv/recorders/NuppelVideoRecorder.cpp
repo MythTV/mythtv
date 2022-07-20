@@ -591,7 +591,7 @@ void NuppelVideoRecorder::UpdateResolutions(void)
                    break;
     }
 
-    FrameRate frameRate(den, num);
+    auto frameRate = MythAVRational(den, num);
     if (frameRate.isNonzero() && frameRate != m_frameRate)
     {
         m_frameRate = frameRate;
