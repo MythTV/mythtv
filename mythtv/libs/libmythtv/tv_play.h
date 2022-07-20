@@ -358,8 +358,8 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 
     // Seek, skip, jump, speed
     void DoSeek(float Time, const QString &Msg, bool TimeIsOffset, bool HonorCutlist);
-    void DoSeek(std::chrono::seconds Time, const QString &Msg, bool TimeIsOffset, bool HonorCutlist) {
-        DoSeek(Time.count(), Msg, TimeIsOffset, HonorCutlist); };
+    void DoSeek(std::chrono::seconds TimeInSec, const QString &Msg, bool TimeIsOffset, bool HonorCutlist) {
+        DoSeek(TimeInSec.count(), Msg, TimeIsOffset, HonorCutlist); };
     bool DoPlayerSeek(float Time);
     bool DoPlayerSeekToFrame(uint64_t FrameNum);
     enum ArbSeekWhence { ARBSEEK_SET = 0, ARBSEEK_REWIND, ARBSEEK_FORWARD, ARBSEEK_END };
