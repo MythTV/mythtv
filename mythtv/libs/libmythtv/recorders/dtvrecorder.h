@@ -194,10 +194,16 @@ class DTVRecorder :
     mutable QAtomicInt       m_continuityErrorCount       {0};
     unsigned long long       m_framesSeenCount            {0};
     unsigned long long       m_framesWrittenCount         {0};
-    double                   m_totalDuration              {0.0}; // usec
-    // Calculate m_total_duration as
-    // m_td_base + (m_td_tick_count * m_td_tick_framerate / 2)
+    /// @brief Total milliseconds that have passed since the start of the recording.
+    double                   m_totalDuration              {0.0};
+    /// @brief Milliseconds from the start to m_tdTickCount = 0.
     double                   m_tdBase                     {0.0};
+    /** @brief Count of the number of equivalent interlaced fields that have passed
+               since m_tdBase.
+
+    @note This needs to be divied by 2 to get the number of @e frames corresponding to
+          m_tdTickFramerate.
+    */
     uint64_t                 m_tdTickCount                {0};
     MythAVRational           m_tdTickFramerate            {0};
     SCAN_t                   m_scanType                   {SCAN_t::UNKNOWN_SCAN};
