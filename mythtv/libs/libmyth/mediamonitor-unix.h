@@ -61,8 +61,9 @@ class MediaMonitorUnix : public MediaMonitor
 #if CONFIG_QTDBUS
     enum MythUdisksDevice
     {
-        UDisks2DVD = 0,
-        UDisks2HDD = 1,
+        UDisks2INVALID = 0, 
+        UDisks2DVD     = 1,
+        UDisks2HDD     = 2,
     };
 #endif
 #endif // MYTH_MEDIA_MONITOR_H
