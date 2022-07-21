@@ -243,7 +243,7 @@ static bool DetectDevice(const QDBusObjectPath& entry, MythUdisksDevice& device,
                 device = UDisks2DVD;
                 return true;
             }
-            else if (isfsmountable)
+            if (isfsmountable)
             {
                 device = UDisks2HDD;
                 return true;
@@ -324,16 +324,12 @@ bool MediaMonitorUnix::CheckMountable(void)
             "CheckMountable: Start listening on UDisks2 DBus");
 
         // Listen on DBus for UDisk add/remove device messages
-        (void)QDBusConnection::systemBus().connect(
-            "org.freedesktop.UDisks2", "/org/freedesktop/UDisks2",
+        (void)QDBusConnection::systemBus().connect(UDISKS2_SVC, UDISKS2_PATH,
             "org.freedesktop.DBus.ObjectManager", "InterfacesAdded",
-            this, SLOT(deviceAdded(const QDBusObjectPath &,
-                                   const QMap<QString, QVariant> &)) );
-        (void)QDBusConnection::systemBus().connect(
-            "org.freedesktop.UDisks2", "/org/freedesktop/UDisks2",
+            this, SLOT(deviceAdded(QDBusObjectPath,QMap<QString,QVariant>)) );
+        (void)QDBusConnection::systemBus().connect(UDISKS2_SVC, UDISKS2_PATH,
             "org.freedesktop.DBus.ObjectManager", "InterfacesRemoved",
-            this, SLOT(deviceRemoved(const QDBusObjectPath &,
-                                     const QStringList &)) );
+            this, SLOT(deviceRemoved(QDBusObjectPath,QStringList)) );
 
         // Parse the returned device array
         const QDBusObjectPathList& list(reply.value());
@@ -341,7 +337,7 @@ bool MediaMonitorUnix::CheckMountable(void)
         {
             // Create the MythMediaDevice
             MythMediaDevice* pDevice = nullptr;
-            MythUdisksDevice mythdevice;
+            MythUdisksDevice mythdevice = UDisks2INVALID;
             QString description;
             QString path;
 
@@ -557,8 +553,9 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
 #endif
             if (!name.isEmpty())
             {
-                QDBusObjectPath entry {"/org/freedesktop/UDisks2/block_devices/" + name};
-                MythUdisksDevice mythdevice;
+                QString sbdevices = QString::fromUtf8(UDISKS2_PATH_BLOCK_DEVICES);
+                QDBusObjectPath entry {sbdevices + "/" + name};
+                MythUdisksDevice mythdevice = UDisks2INVALID;
                 QString description;
                 QString dev;
 
@@ -841,7 +838,7 @@ void MediaMonitorUnix::deviceAdded( const QDBusObjectPath& o,
 
     // Create the MythMediaDevice
     MythMediaDevice* pDevice = nullptr;
-    MythUdisksDevice mythdevice;
+    MythUdisksDevice mythdevice = UDisks2INVALID;
     QString description;
     QString path;
 
