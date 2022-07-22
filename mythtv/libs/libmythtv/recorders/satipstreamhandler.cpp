@@ -171,9 +171,11 @@ void SatIPStreamHandler::run(void)
                     m_setupinvoked = false;
                 }
 
-                m_rtsp->Setup(m_tuningurl);
-                m_setupinvoked = true;
-                m_oldtuningurl = m_tuningurl;
+                if (m_rtsp->Setup(m_tuningurl))
+                {
+                    m_oldtuningurl = m_tuningurl;
+                    m_setupinvoked = true;
+                }
 
                 last_update.restart();
             }
@@ -287,6 +289,9 @@ bool SatIPStreamHandler::Tune(const DTVMultiplex &tuning)
         if (rval)
         {
             rval = m_rtsp->Setup(m_tuningurl);
+        }
+        if (rval)
+        {
             m_oldtuningurl = m_tuningurl;
             m_setupinvoked = true;
         }
