@@ -909,7 +909,7 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
     if (tspacket->Scrambled())
     { // scrambled! ATSC, DVB require tables not to be scrambled
         LOG(VB_RECORD, LOG_ERR, LOC +
-            "PSIP packet is scrambled, not ATSC/DVB compiant");
+            "PSIP packet is scrambled, not ATSC/DVB compliant");
         DONE_WITH_PSIP_PACKET();
     }
 
