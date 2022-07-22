@@ -1122,10 +1122,13 @@ class T2DeliverySystemDescriptor : public MPEGDescriptor
         const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::extension)
     {
-        if (DescriptorTagExtension() != DescriptorID::t2_delivery_system)
-            m_data = nullptr;
-        else
-            Parse();
+        if (IsValid())
+        {
+            if (DescriptorTagExtension() != DescriptorID::t2_delivery_system)
+                m_data = nullptr;
+            else
+                Parse();
+        }
     }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x7f      extension
