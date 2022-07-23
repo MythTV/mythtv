@@ -106,8 +106,6 @@ void ChannelScanner::Teardown(void)
     }
 }
 
-// full scan of existing transports broken
-// existing transport scan broken
 void ChannelScanner::Scan(
     int            scantype,
     uint           cardid,
