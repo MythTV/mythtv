@@ -1398,6 +1398,9 @@ static void init_fixup(FixupMap &fix)
     fix[ 57LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
     fix[ 58LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
     fix[ 59LL << 32 | 1LL << 16 ] = EITFixUp::kEFixForceISO8859_1;
+
+    // Eutelsat Satellite System at 7°E
+    fix[ 126U << 16 ] = EITFixUp::kEFixForceISO8859_9;
 }
 
 /** \fn EITHelper::RescheduleRecordings(void)
