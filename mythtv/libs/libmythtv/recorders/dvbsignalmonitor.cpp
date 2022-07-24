@@ -90,27 +90,60 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     // in practice, however this is correct for the 4.0 DVB API
     m_signalStrength.SetRange(0, 65535);
 
+    // Determine the signal monitoring capabilities from the card and
+    // do not use the capabilities that are not present.
     uint64_t rmflags = 0;
 
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define DVB_IO(FLAG, METHOD, MSG) \
-  do { if (HasFlags(FLAG)) { bool mok; _channel->METHOD(&mok); \
-          if (!mok) { \
-              LOG(VB_GENERAL, LOG_WARNING, LOC+"Cannot "+(MSG)+ENO); \
-              rmflags |= (FLAG); } \
-          else { \
-              LOG(VB_CHANNEL, LOG_INFO, LOC + "Can " + (MSG)); } } } while (false)
+    auto log_message = [](bool ok, QString loc, QString msg)
+    { 
+        if (ok)
+            LOG(VB_CHANNEL, LOG_INFO, loc + "Can " + msg);
+        else
+            LOG(VB_GENERAL, LOG_WARNING, loc + "Cannot " + msg + ENO);
+    };
 
-    DVB_IO(kSigMon_WaitForSig, GetSignalStrength,
-           "measure Signal Strength");
-    DVB_IO(kDVBSigMon_WaitForSNR, GetSNR,
-           "measure S/N");
-    DVB_IO(kDVBSigMon_WaitForBER, GetBitErrorRate,
-           "measure Bit Error Rate");
-    DVB_IO(kDVBSigMon_WaitForUB, GetUncorrectedBlockCount,
-           "count Uncorrected Blocks");
+    auto update_rmflags = [&](bool ok, uint64_t flag)
+    {
+        if (!ok)
+            rmflags |= flag;
+    };
 
-#undef DVB_IO
+    // Signal strength
+    auto flag = kSigMon_WaitForSig;
+    bool mok;
+    if (HasFlags(flag))
+    {
+        _channel->GetSignalStrength(&mok);
+        update_rmflags(mok, flag);
+        log_message(mok, LOC, "measure Signal Strength");
+    }
+
+    // Signal/Noise ratio
+    flag = kDVBSigMon_WaitForSNR;
+    if (HasFlags(flag))
+    {
+        _channel->GetSNR(&mok);
+        update_rmflags(mok, flag);
+        log_message(mok, LOC, "measure S/N");
+    }
+
+    // Bit error rate
+    flag = kDVBSigMon_WaitForBER;
+    if (HasFlags(flag))
+    {
+        _channel->GetBitErrorRate(&mok);
+        update_rmflags(mok, flag);
+        log_message(mok, LOC, "measure Bit Error Rate");
+    }
+
+    // Uncorrected block count
+    flag = kDVBSigMon_WaitForUB;
+    if (HasFlags(flag))
+    {
+        _channel->GetUncorrectedBlockCount(&mok);
+        update_rmflags(mok, flag);
+        log_message(mok, LOC, "count Uncorrected Blocks");
+    }
 
     RemoveFlags(rmflags);
 
