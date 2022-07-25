@@ -1966,7 +1966,7 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
 #else
                 QStringList param = QString::fromStdString(buf).split(',', Qt::SkipEmptyParts);
 #endif
-                QString codec = param[0].remove("Video:", Qt::CaseInsensitive);
+                QString codec = param[0].remove("Video:", Qt::CaseInsensitive).remove(QChar::Null);
                 QDomElement stream = doc.createElement("video");
                 stream.setAttribute("streamindex", i);
                 stream.setAttribute("ffmpegindex", ffmpegIndex++);
@@ -2097,7 +2097,7 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
 #else
                 QStringList param = QString::fromStdString(buf).split(',', Qt::SkipEmptyParts);
 #endif
-                QString codec = param[0].remove("Audio:", Qt::CaseInsensitive);
+                QString codec = param[0].remove("Audio:", Qt::CaseInsensitive).remove(QChar::Null);
 
                 QDomElement stream = doc.createElement("audio");
                 stream.setAttribute("streamindex", i);
@@ -2171,7 +2171,7 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
             {
                 QDomElement stream = doc.createElement("data");
                 stream.setAttribute("streamindex", i);
-                stream.setAttribute("codec", QString::fromStdString(buf));
+                stream.setAttribute("codec", QString::fromStdString(buf).remove(QChar::Null));
                 streams.appendChild(stream);
 
                 break;
