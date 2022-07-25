@@ -624,6 +624,7 @@ bool ProgramMapTable::IsStillPicture(const QString& sistandard) const
         if (IsVideo(i, sistandard))
         {
             return StreamInfoLength(i) > 2 &&
+                   (StreamInfo(i)[0] == DescriptorID::video_stream) &&
                    ((StreamInfo(i)[2] & kStillPictureFlag) != 0);
         }
     }
