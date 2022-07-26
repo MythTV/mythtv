@@ -250,20 +250,20 @@
                         <state name="marked"></state>
                     </statetype>
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,2,618,28</area>
+                        <area>32,2,608,28</area>
                         <align>vcenter</align>
                     </textarea>
                     <textarea name="watchedpercent" from="buttontext">
-                        <area>650,2,60,28</area>
+                        <area>640,2,60,28</area>
                         <align>right,vcenter</align>
                         <template>%|watchedpercent|%%</template>
                      </textarea>
                     <textarea name="shortstartdate" from="buttontext">
-                        <area>710,2,70,28</area>
+                        <area>700,2,70,28</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <textarea name="starttime" from="buttontext">
-                        <area>780,2,94,28</area>
+                        <area>770,2,104,28</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <statetype name="watched">
@@ -305,19 +305,19 @@
                         <align>vcenter</align>
                     </textarea>
                     <textarea name="titlesubtitle" from="fonts">
-                        <area>32,2,618,28</area>
+                        <area>32,2,608,28</area>
                     </textarea>
                     <textarea name="watchedpercent" from="fonts">
-                        <area>650,2,60,28</area>
+                        <area>640,2,60,28</area>
                         <align>right,vcenter</align>
                         <template>%|watchedpercent|%%</template>
                      </textarea>
                     <textarea name="shortstartdate" from="fonts">
-                        <area>710,2,70,28</area>
+                        <area>700,2,70,28</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <textarea name="starttime" from="fonts">
-                        <area>780,2,94,28</area>
+                        <area>770,2,104,28</area>
                         <align>right,vcenter</align>
                     </textarea>
                 </state>
