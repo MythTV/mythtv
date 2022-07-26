@@ -115,10 +115,8 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
     // protocol_version         8   8.0       0x00 for now
 
     // tables_defined          16   9.0, 6-370 valid OTA, 2-370 valid w/Cable
-    uint TableCount() const
-    {
-         return (pesdata()[9]<<8) | pesdata()[10];
-    }
+    uint TableCount()    const { return (pesdata()[9]<<8) | pesdata()[10]; }
+    uint TableCountRaw() const { return (pesdata()[9]<<8) | pesdata()[10]; }
     // for (i=0; i<tableCount(); i++) {
     //   table_type                    16  0.0
     uint TableType(uint i) const
@@ -223,6 +221,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
 
     // num_channels_in_section  8   9.0
     uint ChannelCount()      const { return pesdata()[9]; }
+    uint ChannelCountRaw()   const { return pesdata()[9]; }
 
     // for(i=0; i<num_channels_in_section; i++) {
     //   short_name          7*16   0.0 (7 UCS-2 chars padded by 0x0000)
@@ -553,7 +552,8 @@ class MTV_PUBLIC EventInformationTable : public PSIPTable
     uint SourceID() const { return TableIDExtension(); }
 
     // num_events_in_section    8   9.0
-    uint EventCount() const { return psipdata()[1]; }
+    uint EventCount()    const { return psipdata()[1]; }
+    uint EventCountRaw() const { return psipdata()[1]; }
     // for (j = 0; j< num_events_in_section;j++)
     // {
     //   reserved               2   0.0    3

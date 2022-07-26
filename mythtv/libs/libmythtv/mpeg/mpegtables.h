@@ -524,6 +524,8 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     // adds 3 to the total section length to account for 3 bytes
     // before the end of the section length field.
     uint SectionLength(void) const { return Length() + 3; }
+    uint SectionLengthRaw(void) const
+        { return ((pesdata()[1]<<8) | pesdata()[2]) & 0x0fff; }
 
     ////////////////////////////////////////////////////////////
     // Things below this line may not apply to SCTE/DVB tables.

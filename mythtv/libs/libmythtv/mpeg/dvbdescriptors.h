@@ -46,7 +46,7 @@ inline QString dvb_decode_text(const unsigned char *src, uint length)
     return dvb_decode_text(src, length, {} );
 }
 
-QString dvb_decode_short_name(const unsigned char *src, uint raw_length);
+MTV_PUBLIC QString dvb_decode_short_name(const unsigned char *src, uint raw_length);
 
 static constexpr uint8_t byteBCDH2int(uint8_t i) { return i >> 4; };
 static constexpr uint8_t byteBCDL2int(uint8_t i) { return i & 0x0f; };

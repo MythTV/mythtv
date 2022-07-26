@@ -13,7 +13,7 @@
 
 using IntToBuf = QMap<int, const unsigned char*>;
 
-class MultipleStringStructure
+class MTV_PUBLIC MultipleStringStructure
 {
   public:
     explicit MultipleStringStructure(const unsigned char *data) : m_data(data)
