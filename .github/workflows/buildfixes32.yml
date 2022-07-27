@@ -11,7 +11,7 @@ jobs:
     name: build
     strategy:
       matrix:
-        os: ['ubuntu-18.04', 'ubuntu-20.04', 'macos-10.15', 'macos-11']
+        os: ['ubuntu-18.04', 'ubuntu-20.04', 'ubuntu-22.04', 'macos-10.15', 'macos-11']
         cc: ['gcc', 'clang']
         include:
           - cc: 'gcc'
@@ -79,9 +79,17 @@ jobs:
       if: runner.os == 'Linux'
 
     - name: Install plugin dependencies (linux)
-      run: sudo apt install libvorbis-dev libflac++-dev libminizip-dev libcdio-dev libcdio-paranoia-dev python3-oauth python3-pycurl
+      run: sudo apt install libvorbis-dev libflac++-dev libminizip-dev libcdio-dev libcdio-paranoia-dev python3-pycurl
            libxml-xpath-perl libdate-manip-perl libdatetime-format-iso8601-perl libsoap-lite-perl libjson-perl libimage-size-perl
       if: runner.os == 'Linux'
+
+    - name: Install plugin dependencies (ubuntu-18.04 and ubuntu-20.04)
+      run: sudo apt install python3-oauth
+      if: matrix.os == 'ubuntu-18.04' || matrix.os == 'ubuntu-20.04'
+
+    - name: Install plugin dependencies (ubuntu-22.04)
+      run: sudo apt install python3-oauthlib
+      if: matrix.os == 'ubuntu-22.04'
 
     - name: Install plugin dependencies (macOS)
       run: brew install minizip flac libvorbis libcdio
