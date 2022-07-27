@@ -3400,6 +3400,24 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .props     = AV_CODEC_PROP_TEXT_SUB,
         .profiles  = NULL_IF_CONFIG_SMALL(ff_arib_caption_profiles),
     },
+    {
+        .id        = AV_CODEC_ID_MPEG2VBI,
+        .type      = AVMEDIA_TYPE_DATA,
+        .name      = "mpeg2vbi",
+        .long_name = NULL_IF_CONFIG_SMALL("ivtv proprietary embedded VBI captions"),
+    },
+    {
+        .id        = AV_CODEC_ID_DVB_VBI,
+        .type      = AVMEDIA_TYPE_DATA,
+        .name      = "dvb_vbi",
+        .long_name = NULL_IF_CONFIG_SMALL("dvb teletext"),
+    },
+    {
+        .id        = AV_CODEC_ID_DSMCC_B,
+        .type      = AVMEDIA_TYPE_DATA,
+        .name      = "dsmcc_b",
+        .long_name = NULL_IF_CONFIG_SMALL("DSMCC B"),
+    },
 
     /* other kind of codecs and pseudo-codecs */
     {
@@ -3460,24 +3478,6 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_DATA,
         .name      = "dvd_nav_packet",
         .long_name = NULL_IF_CONFIG_SMALL("DVD Nav packet"),
-    },
-    {
-        .id        = AV_CODEC_ID_MPEG2VBI,
-        .type      = AVMEDIA_TYPE_DATA,
-        .name      = "mpeg2vbi",
-        .long_name = NULL_IF_CONFIG_SMALL("ivtv proprietary embedded VBI captions"),
-    },
-    {
-        .id        = AV_CODEC_ID_DVB_VBI,
-        .type      = AVMEDIA_TYPE_DATA,
-        .name      = "dvb_vbi",
-        .long_name = NULL_IF_CONFIG_SMALL("dvb teletext"),
-    },
-    {
-        .id        = AV_CODEC_ID_DSMCC_B,
-        .type      = AVMEDIA_TYPE_DATA,
-        .name      = "dsmcc_b",
-        .long_name = NULL_IF_CONFIG_SMALL("DSMCC B"),
     },
     {
         .id        = AV_CODEC_ID_TIMED_ID3,
