@@ -40,12 +40,20 @@ class TestMPEGTables: public QObject
     // ATSC Tables
     static void atsc_mgt_test1a(void);
     static void atsc_mgt_test1b(void);
+    static void atsc_mgt_test1c(void);
+    static void atsc_mgt_test1d(void);
+    static void atsc_mgt_test1e(void);
     static void atsc_mgt_test2(void);
     static void atsc_mgt_test3(void);
     static void atsc_tvct_test1a(void);
+    static void atsc_tvct_test1b(void);
+    static void atsc_tvct_test1c(void);
+    static void atsc_tvct_test1d(void);
     static void atsc_cvct_test1(void);
     static void atsc_cvct_test2(void);
     static void atsc_eit_test1a(void);
+    static void atsc_eit_test1b(void);
+    static void atsc_eit_test1c(void);
     static void atsc_ett_test(void);
     static void atsc_rrt_test(void);
     static void atsc_stt_test(void);

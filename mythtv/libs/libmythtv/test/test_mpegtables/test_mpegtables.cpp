@@ -21,6 +21,7 @@
 #include "test_mpegtables.h"
 
 #include <iconv.h>
+#include <iostream>
 
 #include "libmythtv/mpeg/atsc_huffman.h"
 #include "libmythtv/mpeg/atsctables.h"
@@ -30,6 +31,30 @@
 extern "C" {
 #include "libavutil/crc.h"
 #include "libavutil/bswap.h"
+}
+
+template <typename T>
+void atsc_test_throw(const PSIPTable& si_table,
+                     PsipParseException::Code error_code)
+{
+    try
+    {
+        T table(si_table);
+        QFAIL(qPrintable(QStringLiteral("This test should throw an AtscParseException.")));
+    }
+    catch (const AtscParseException& e)
+    {
+        QCOMPARE(e.what(), "Atsc Parse Error");
+        QCOMPARE(e.m_error, error_code);
+    }
+    catch (const PsipParseException& e)
+    {
+        QFAIL("Expected a AtscParseException error, received a PsipParseException");
+    }
+    catch (const std::runtime_error& e)
+    {
+        QFAIL("Expected a AtscParseException error, received a runtime_error");
+    }
 }
 
 void TestMPEGTables::update_crc(std::vector<uint8_t> &data)
@@ -703,6 +728,60 @@ void TestMPEGTables::atsc_mgt_test1b(void)
     QCOMPARE(end, end2);
 }
 
+void TestMPEGTables::atsc_mgt_test1c(void)
+{
+    // This is the packet from the test 1a modified to state there are
+    // 14 tables present when there are only 10. The CRC on this
+    // packet is valid.
+    std::vector<uint8_t> si_data = wbal_mgt_data;
+    si_data[10] = 0x0E;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 124U);
+
+    atsc_test_throw<MasterGuideTable>(si_table, PsipParseException::MgtTableCount);
+}
+
+void TestMPEGTables::atsc_mgt_test1d(void)
+{
+    // This is the packet from the test 1a modified so that the second
+    // table entry says it has 81 descriptor bytes. The CRC on this
+    // packet is valid.
+    std::vector<uint8_t> si_data = wbal_mgt_data;
+    si_data[43] = 0x51;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 124U);
+
+    atsc_test_throw<MasterGuideTable>(si_table, PsipParseException::MgtTableDescriptors);
+}
+
+void TestMPEGTables::atsc_mgt_test1e(void)
+{
+    // This is the packet from the test 1a modified so that the global
+    // desriptor count says it has 100 bytes. The CRC on this packet is
+    // valid.
+    std::vector<uint8_t> si_data = wbal_mgt_data;
+    si_data[122] = 0x4A;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 124U);
+
+    atsc_test_throw<MasterGuideTable>(si_table, PsipParseException::MgtGlobalDescriptors);
+}
+
 void TestMPEGTables::atsc_mgt_test2(void)
 {
     PSIPTable si_table(wjz_mgt_data);
@@ -987,6 +1066,60 @@ void TestMPEGTables::atsc_tvct_test1a(void)
     QCOMPARE(tvct.Find(4,4), 3);
     QCOMPARE(tvct.Find(44,2), 5);
     QCOMPARE(tvct.Find(1,1), -1);
+}
+
+void TestMPEGTables::atsc_tvct_test1b(void)
+{
+    // This is the packet from the test 1a modified to state there are
+    // 14 tables present when there are only 6. The CRC on this
+    // packet is valid.
+    std::vector<uint8_t> si_data = wrc_tvct_data;
+    si_data[9] = 0x0E;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(),             404U);
+
+    atsc_test_throw<TerrestrialVirtualChannelTable>(si_table, PsipParseException::VctChannelCount);
+}
+
+void TestMPEGTables::atsc_tvct_test1c(void)
+{
+    // This is the packet from the test 1a modified so that the second
+    // channel entry says it has 256 descriptor bytes. The CRC on this
+    // packet is valid.
+    std::vector<uint8_t> si_data = wrc_tvct_data;
+    si_data[129] = 0xFF;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(),                  404U);
+
+    atsc_test_throw<TerrestrialVirtualChannelTable>(si_table, PsipParseException::VctChannelDescriptors);
+}
+
+void TestMPEGTables::atsc_tvct_test1d(void)
+{
+    // This is the packet from the test 1a modified so that the global
+    // desriptor count says it has 100 bytes. The CRC on this packet is
+    // valid.
+    std::vector<uint8_t> si_data = wrc_tvct_data;
+    si_data[402] = 0x4A;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(),                  404U);
+
+    atsc_test_throw<TerrestrialVirtualChannelTable>(si_table, PsipParseException::VctGlobalDescriptors);
 }
 
 //
@@ -1344,6 +1477,44 @@ void TestMPEGTables::atsc_eit_test1a(void)
         QCOMPARE (mss.GetFullString(0),  "11 News at 6pm");
     }
     QCOMPARE (eit.DescriptorsLength(2),            33U);
+}
+
+void TestMPEGTables::atsc_eit_test1b(void)
+{
+    // This is the packet from the test 1a modified to state there are
+    // 100 events present when there are only 6. The CRC on this packet
+    // is valid.
+    std::vector<uint8_t> si_data = wbal_eit_data;
+    si_data[9] = 0x64;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+//    std::cerr << qPrintable(QString("%1").arg(si_table.CalcCRC(),8,16,QChar('0'))) << std::endl;
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 507U);
+
+    atsc_test_throw<EventInformationTable>(si_table, PsipParseException::EitEventCount);
+}
+
+void TestMPEGTables::atsc_eit_test1c(void)
+{
+    // This is the packet from the test 1a modified so that the second
+    // channel entry says it has 511 descriptor bytes. The CRC on this
+    // packet is valid.
+    std::vector<uint8_t> si_data = wbal_eit_data;
+    si_data[140] = 0xF1;
+    si_data[141] = 0x55;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 507U);
+
+    atsc_test_throw<EventInformationTable>(si_table, PsipParseException::EitEventDescriptors);
 }
 
 //

@@ -402,6 +402,73 @@ class MTV_PUBLIC TableID
     };
 };
 
+/*
+ *  Class PsipParseException
+ */
+class PsipParseException : public std::runtime_error {
+  public:
+    enum Code
+    {
+        Unknown = 0,
+
+        // MPEG Tables
+        PmtLength,
+        PmtProgramDescriptors,
+        PmtStreamDescriptors,
+
+        // SCTE Tables
+        SitLength,
+        SitBandwidth,
+        SitTimeSignal,
+        SitSpliceSchedInfo1,
+        SitSpliceSchedInfo2,
+        SitSpliceInsertInfo1,
+        SitSpliceInsertInfo2,
+        SitSpliceInsertInfo3,
+        SitSpliceInsertInfo4,
+
+        // ATSC Tables
+        MgtLength,
+        MgtTableCount,
+        MgtTableDescriptors,
+        MgtGlobalDescriptors,
+        MgtBadParse,
+
+        VctLength,
+        VctChannelCount,
+        VctChannelDescriptors,
+        VctGlobalDescriptors,
+        VctBadParse,
+
+        EitLength,
+        EitEventCount,
+        EitEventDescriptors,
+        EitBadParse,
+
+        // DVB Tables
+        NitLength,
+        NitNetworkDescriptorsLength,
+        NitTransportDescriptors,
+
+        SdtLength,
+        SdtDescriptors,
+
+        Max
+    };
+
+    PsipParseException(Code code)
+        : std::runtime_error("PSIP Parse Error"),
+          m_error(code)
+        { }
+    PsipParseException(const char* text, Code code)
+        : std::runtime_error(text),
+          m_error(code)
+        { }
+
+    Code m_error;
+};
+
+
 /** \class PSIPTable
  *  \brief A PSIP table is a variant of a PES packet containing an
  *         MPEG, ATSC or DVB table.
@@ -594,6 +661,13 @@ class MTV_PUBLIC PSIPTable : public PESPacket
 
   protected:
     QString XMLValues(uint indent_level) const;
+};
+
+class MpegParseException : public PsipParseException {
+public:
+    MpegParseException(Code code)
+      : PsipParseException("Mpeg Parse Error", code)
+        { }
 };
 
 /** \class ProgramAssociationTable

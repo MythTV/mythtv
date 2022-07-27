@@ -11,8 +11,6 @@
 
 // MythTV headers
 #include "mpegstreamdata.h"
-#include "mpegtables.h"
-
 #include "atscstreamdata.h"
 #include "atsctables.h"
 
@@ -119,6 +117,8 @@ void MPEGStreamData::SetEITRate(float rate)
 
 void MPEGStreamData::Reset(int desiredProgram)
 {
+    DumpErrors();
+
     m_desiredProgram      = desiredProgram;
     m_recordingType       = "all";
     m_stripPmtDescriptors = false;
@@ -161,6 +161,8 @@ void MPEGStreamData::Reset(int desiredProgram)
             DeleteCachedTable(cached);
         m_cachedCats.clear();
     }
+
+    m_parseErrors.fill(0);
 
     ResetDecryptionMonitoringState();
 
@@ -1986,4 +1988,8 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
 
     for (size_t i = 0; i < pnum_del_list.size(); i++)
         RemoveEncryptionTestPIDs(pnums[i]);
+}
+
+void MPEGStreamData::DumpErrors() const
+{
 }
