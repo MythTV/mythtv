@@ -1542,32 +1542,30 @@ skip:
 
 static PESContext *add_pes_stream(MpegTSContext *ts, int pid, int pcr_pid)
 {
-    MpegTSFilter *tss = ts->pids[pid];
-    PESContext *pes = 0;
-    if (tss) { /* filter already exists */
-        if (tss->type == MPEGTS_PES)
-            pes = (PESContext*) tss->u.pes_filter.opaque;
-        /* otherwise, kill it, and start a new stream */
+    MpegTSFilter *tss;
+    PESContext *pes;
+
+    // MythTV
+    if (tss = ts->pids[pid]) { /* filter already exists */
+        /* kill it, and start a new stream */
         mpegts_close_filter(ts, tss);
     }
+    // end MythTV
 
-    /* create a PES context */
-    if (!(pes=av_mallocz(sizeof(PESContext)))) {
-        av_log(NULL, AV_LOG_ERROR, "Error: av_mallocz() failed in add_pes_stream");
+    /* if no pid found, then add a pid context */
+    pes = av_mallocz(sizeof(PESContext));
+    if (!pes)
         return 0;
-    }
-    pes->ts = ts;
-    pes->stream = ts->stream;
-    pes->pid = pid;
+    pes->ts      = ts;
+    pes->stream  = ts->stream;
+    pes->pid     = pid;
     pes->pcr_pid = pcr_pid;
-    pes->state = MPEGTS_SKIP;
-    pes->pts = AV_NOPTS_VALUE;
-    pes->dts = AV_NOPTS_VALUE;
-    tss = mpegts_open_pes_filter(ts, pid, mpegts_push_data, pes);
+    pes->state   = MPEGTS_SKIP;
+    pes->pts     = AV_NOPTS_VALUE;
+    pes->dts     = AV_NOPTS_VALUE;
+    tss          = mpegts_open_pes_filter(ts, pid, mpegts_push_data, pes);
     if (!tss) {
         av_free(pes);
-        av_log(NULL, AV_LOG_ERROR, "Error: unable to open "
-               "mpegts PES filter in add_pes_stream");
         return 0;
     }
     return pes;
