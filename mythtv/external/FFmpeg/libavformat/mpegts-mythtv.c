@@ -88,7 +88,6 @@ typedef struct SectionContext {
     AVStream *st;
 } SectionContext;
 
-static SectionContext *add_section_stream(MpegTSContext *ts, int pid, int stream_type);
 static void mpegts_cleanup_streams(MpegTSContext *ts);
 static int find_in_list(const int *pids, int pid);
 
@@ -850,55 +849,6 @@ static int parse_section_header(SectionHeader *h,
     return 0;
 }
 
-/* mpegts_push_section: return one or more tables.  The tables may not completely fill
-   the packet and there may be stuffing bytes at the end.
-   This is complicated because a single TS packet may result in several tables being
-   produced.  We may have a "start" bit indicating, in effect, the end of a table but
-   the rest of the TS packet after the start may be filled with one or more small tables.
-*/
-static void mpegts_push_section(MpegTSFilter *filter, const uint8_t *section, int section_len)
-{
-    SectionContext *sect = filter->u.section_filter.opaque;
-    MpegTSContext *ts = sect->ts;
-    SectionHeader header;
-    AVPacket *pkt = ts->pkt;
-    const uint8_t *p = section, *p_end = section + section_len - 4;
-
-    if (parse_section_header(&header, &p, p_end) < 0)
-    {
-        av_log(NULL, AV_LOG_DEBUG, "Unable to parse header\n");
-        return;
-    }
-
-    if (sect->new_packet && pkt && sect->st && pkt->size == 0) {
-        int pktLen = section_len + 184; /* Add enough for a complete TS payload. */
-        sect->new_packet = 0;
-        av_free_packet(pkt);
-        if (av_new_packet(pkt, pktLen) == 0) {
-            memcpy(pkt->data, section, section_len);
-            memset(pkt->data+section_len, 0xff, pktLen-section_len);
-            pkt->stream_index = sect->st->index;
-            ts->stop_parse = 1;
-        }
-    } else if (pkt->data) { /* We've already added at least one table. */
-        uint8_t *data = pkt->data;
-        int space = pkt->size;
-        int table_size = 0;
-        while (space > 3 + table_size) {
-            table_size = (((data[1] & 0xf) << 8) | data[2]) + 3;
-            if (table_size < space) {
-                space -= table_size;
-                data += table_size;
-            } /* Otherwise we've got filler. */
-        }
-        if (space < section_len) {
-            av_log(NULL, AV_LOG_DEBUG, "Insufficient space for additional packet\n");
-            return;
-        }
-        memcpy(data, section, section_len);
-   }
-}
-
 typedef struct {
     uint32_t stream_type;
     enum AVMediaType codec_type;
@@ -983,18 +933,6 @@ static void mpegts_find_stream_type(AVStream *st,
             st->codecpar->codec_type = types->codec_type;
             st->codecpar->codec_id   = types->codec_id;
             st->internal->request_probe        = 0;
-            return;
-        }
-    }
-}
-
-static void mpegts_find_stream_type_pmt(pmt_entry_t *st,
-                                    uint32_t stream_type, const StreamType *types)
-{
-    for (; types->stream_type; types++) {
-        if (stream_type == types->stream_type) {
-            st->codec_type = types->codec_type;
-            st->codec_id   = types->codec_id;
             return;
         }
     }
@@ -1664,6 +1602,18 @@ static void m4sl_cb(MpegTSFilter *filter, const uint8_t *section, int section_le
 }
 #endif // 0
 
+static void mpegts_find_stream_type_pmt(pmt_entry_t *st,
+                                    uint32_t stream_type, const StreamType *types)
+{
+    for (; types->stream_type; types++) {
+        if (stream_type == types->stream_type) {
+            st->codec_type = types->codec_type;
+            st->codec_id   = types->codec_id;
+            return;
+        }
+    }
+}
+
 int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream_type,
                               const uint8_t **pp, const uint8_t *desc_list_end,
                               Mp4Descr *mp4_descr, int mp4_descr_count, int pid,
@@ -2274,6 +2224,89 @@ fail: /*for the CHECKED_ALLOCZ macro*/
     return NULL;
 }
 
+/* mpegts_push_section: return one or more tables.  The tables may not completely fill
+   the packet and there may be stuffing bytes at the end.
+   This is complicated because a single TS packet may result in several tables being
+   produced.  We may have a "start" bit indicating, in effect, the end of a table but
+   the rest of the TS packet after the start may be filled with one or more small tables.
+*/
+static void mpegts_push_section(MpegTSFilter *filter, const uint8_t *section, int section_len)
+{
+    SectionContext *sect = filter->u.section_filter.opaque;
+    MpegTSContext *ts = sect->ts;
+    SectionHeader header;
+    AVPacket *pkt = ts->pkt;
+    const uint8_t *p = section, *p_end = section + section_len - 4;
+
+    if (parse_section_header(&header, &p, p_end) < 0)
+    {
+        av_log(NULL, AV_LOG_DEBUG, "Unable to parse header\n");
+        return;
+    }
+
+    if (sect->new_packet && pkt && sect->st && pkt->size == 0) {
+        int pktLen = section_len + 184; /* Add enough for a complete TS payload. */
+        sect->new_packet = 0;
+        av_free_packet(pkt);
+        if (av_new_packet(pkt, pktLen) == 0) {
+            memcpy(pkt->data, section, section_len);
+            memset(pkt->data+section_len, 0xff, pktLen-section_len);
+            pkt->stream_index = sect->st->index;
+            ts->stop_parse = 1;
+        }
+    } else if (pkt->data) { /* We've already added at least one table. */
+        uint8_t *data = pkt->data;
+        int space = pkt->size;
+        int table_size = 0;
+        while (space > 3 + table_size) {
+            table_size = (((data[1] & 0xf) << 8) | data[2]) + 3;
+            if (table_size < space) {
+                space -= table_size;
+                data += table_size;
+            } /* Otherwise we've got filler. */
+        }
+        if (space < section_len) {
+            av_log(NULL, AV_LOG_DEBUG, "Insufficient space for additional packet\n");
+            return;
+        }
+        memcpy(data, section, section_len);
+   }
+}
+
+static SectionContext *add_section_stream(MpegTSContext *ts, int pid, int stream_type)
+{
+    MpegTSFilter *tss = ts->pids[pid];
+    SectionContext *sect = 0;
+    if (tss) { /* filter already exists */
+        if (tss->type == MPEGTS_SECTION)
+            sect = (SectionContext*) tss->u.section_filter.opaque;
+
+        if (sect && (sect->stream_type == stream_type))
+            return sect; /* if it's the same stream type, just return ok */
+
+        /* otherwise, kill it, and start a new stream */
+        mpegts_close_filter(ts, tss);
+    }
+
+    /* create a SECTION context */
+    if (!(sect=av_mallocz(sizeof(SectionContext)))) {
+        av_log(NULL, AV_LOG_ERROR, "Error: av_mallocz() failed in add_section_stream");
+        return 0;
+    }
+    sect->ts = ts;
+    sect->stream = ts->stream;
+    sect->pid = pid;
+    sect->stream_type = stream_type;
+    tss = mpegts_open_section_filter(ts, pid, mpegts_push_section, sect, 1);
+    if (!tss) {
+        av_free(sect);
+        av_log(NULL, AV_LOG_ERROR, "Error: unable to open mpegts Section filter in add_section_stream");
+        return 0;
+    }
+
+    return sect;
+}
+
 static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
                               uint32_t prog_reg_desc, int pcr_pid)
 {
@@ -2618,40 +2651,6 @@ static void sdt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         }
         p = desc_list_end;
     }
-}
-
-static SectionContext *add_section_stream(MpegTSContext *ts, int pid, int stream_type)
-{
-    MpegTSFilter *tss = ts->pids[pid];
-    SectionContext *sect = 0;
-    if (tss) { /* filter already exists */
-        if (tss->type == MPEGTS_SECTION)
-            sect = (SectionContext*) tss->u.section_filter.opaque;
-
-        if (sect && (sect->stream_type == stream_type))
-            return sect; /* if it's the same stream type, just return ok */
-
-        /* otherwise, kill it, and start a new stream */
-        mpegts_close_filter(ts, tss);
-    }
-
-    /* create a SECTION context */
-    if (!(sect=av_mallocz(sizeof(SectionContext)))) {
-        av_log(NULL, AV_LOG_ERROR, "Error: av_mallocz() failed in add_section_stream");
-        return 0;
-    }
-    sect->ts = ts;
-    sect->stream = ts->stream;
-    sect->pid = pid;
-    sect->stream_type = stream_type;
-    tss = mpegts_open_section_filter(ts, pid, mpegts_push_section, sect, 1);
-    if (!tss) {
-        av_free(sect);
-        av_log(NULL, AV_LOG_ERROR, "Error: unable to open mpegts Section filter in add_section_stream");
-        return 0;
-    }
-
-    return sect;
 }
 
 /* handle one TS packet */
