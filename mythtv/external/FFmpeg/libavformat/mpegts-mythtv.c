@@ -3071,9 +3071,8 @@ static int mpegts_probe(const AVProbeData *p)
 }
 
 /* return the 90kHz PCR and the extension for the 27MHz PCR. return
-   (-1) if not available */
-static int parse_pcr(int64_t *ppcr_high, int *ppcr_low,
-                     const uint8_t *packet)
+ * (-1) if not available */
+static int parse_pcr(int64_t *ppcr_high, int *ppcr_low, const uint8_t *packet)
 {
     int afc, len, flags;
     const uint8_t *p;
@@ -3081,21 +3080,21 @@ static int parse_pcr(int64_t *ppcr_high, int *ppcr_low,
 
     afc = (packet[3] >> 4) & 3;
     if (afc <= 1)
-        return -1;
-    p = packet + 4;
+        return AVERROR_INVALIDDATA;
+    p   = packet + 4;
     len = p[0];
     p++;
     if (len == 0)
-        return -1;
+        return AVERROR_INVALIDDATA;
     flags = *p++;
     len--;
     if (!(flags & 0x10))
-        return -1;
+        return AVERROR_INVALIDDATA;
     if (len < 6)
-        return -1;
-    v = AV_RB32(p);
-    *ppcr_high = ((int64_t)v << 1) | (p[4] >> 7);
-    *ppcr_low = ((p[4] & 1) << 8) | p[5];
+        return AVERROR_INVALIDDATA;
+    v          = AV_RB32(p);
+    *ppcr_high = ((int64_t) v << 1) | (p[4] >> 7);
+    *ppcr_low  = ((p[4] & 1) << 8) | p[5];
     return 0;
 }
 
