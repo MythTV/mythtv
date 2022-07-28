@@ -765,6 +765,17 @@ typedef struct SectionHeader {
     uint8_t last_sec_num;
 } SectionHeader;
 
+static int skip_identical(const SectionHeader *h, MpegTSSectionFilter *tssf)
+{
+    if (h->version == tssf->last_ver && tssf->last_crc == tssf->crc)
+        return 1;
+
+    tssf->last_ver = h->version;
+    tssf->last_crc = tssf->crc;
+
+    return 0;
+}
+
 static inline int get8(const uint8_t **pp, const uint8_t *p_end)
 {
     const uint8_t *p;
@@ -772,8 +783,8 @@ static inline int get8(const uint8_t **pp, const uint8_t *p_end)
 
     p = *pp;
     if (p >= p_end)
-        return -1;
-    c = *p++;
+        return AVERROR_INVALIDDATA;
+    c   = *p++;
     *pp = p;
     return c;
 }
@@ -784,10 +795,10 @@ static inline int get16(const uint8_t **pp, const uint8_t *p_end)
     int c;
 
     p = *pp;
-    if ((p + 1) >= p_end)
-        return -1;
-    c = AV_RB16(p);
-    p += 2;
+    if (1 >= p_end - p)
+        return AVERROR_INVALIDDATA;
+    c   = AV_RB16(p);
+    p  += 2;
     *pp = p;
     return c;
 }
@@ -799,18 +810,63 @@ static char *getstr8(const uint8_t **pp, const uint8_t *p_end)
     const uint8_t *p;
     char *str;
 
-    p = *pp;
+    p   = *pp;
     len = get8(&p, p_end);
     if (len < 0)
         return NULL;
-    if ((p + len) > p_end)
+    if (len > p_end - p)
         return NULL;
+#if CONFIG_ICONV
+    if (len) {
+        const char *encodings[] = {
+            "ISO6937", "ISO-8859-5", "ISO-8859-6", "ISO-8859-7",
+            "ISO-8859-8", "ISO-8859-9", "ISO-8859-10", "ISO-8859-11",
+            "", "ISO-8859-13", "ISO-8859-14", "ISO-8859-15", "", "", "", "",
+            "", "UCS-2BE", "KSC_5601", "GB2312", "UCS-2BE", "UTF-8", "", "",
+            "", "", "", "", "", "", "", ""
+        };
+        iconv_t cd;
+        char *in, *out;
+        size_t inlen = len, outlen = inlen * 6 + 1;
+        if (len >= 3 && p[0] == 0x10 && !p[1] && p[2] && p[2] <= 0xf && p[2] != 0xc) {
+            char iso8859[12];
+            snprintf(iso8859, sizeof(iso8859), "ISO-8859-%d", p[2]);
+            inlen -= 3;
+            in = (char *)p + 3;
+            cd = iconv_open("UTF-8", iso8859);
+        } else if (p[0] < 0x20) {
+            inlen -= 1;
+            in = (char *)p + 1;
+            cd = iconv_open("UTF-8", encodings[*p]);
+        } else {
+            in = (char *)p;
+            cd = iconv_open("UTF-8", encodings[0]);
+        }
+        if (cd == (iconv_t)-1)
+            goto no_iconv;
+        str = out = av_malloc(outlen);
+        if (!str) {
+            iconv_close(cd);
+            return NULL;
+        }
+        if (iconv(cd, &in, &inlen, &out, &outlen) == -1) {
+            iconv_close(cd);
+            av_freep(&str);
+            goto no_iconv;
+        }
+        iconv_close(cd);
+        *out = 0;
+        *pp = p + len;
+        return str;
+    }
+no_iconv:
+#endif
     str = av_malloc(len + 1);
     if (!str)
         return NULL;
     memcpy(str, p, len);
     str[len] = '\0';
-    p += len;
+    p  += len;
     *pp = p;
     return str;
 }
@@ -822,30 +878,25 @@ static int parse_section_header(SectionHeader *h,
 
     val = get8(pp, p_end);
     if (val < 0)
-        return -1;
+        return val;
     h->tid = val;
     *pp += 2;
-    val = get16(pp, p_end);
+    val  = get16(pp, p_end);
     if (val < 0)
-        return -1;
+        return val;
     h->id = val;
     val = get8(pp, p_end);
     if (val < 0)
-        return -1;
+        return val;
     h->version = (val >> 1) & 0x1f;
     val = get8(pp, p_end);
     if (val < 0)
-        return -1;
+        return val;
     h->sec_num = val;
     val = get8(pp, p_end);
     if (val < 0)
-        return -1;
+        return val;
     h->last_sec_num = val;
-
-#ifdef DEBUG
-    av_log(NULL, AV_LOG_DEBUG, "sid=0x%x sec_num=%d/%d\n",
-           h->id, h->sec_num, h->last_sec_num);
-#endif
     return 0;
 }
 
