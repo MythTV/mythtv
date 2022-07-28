@@ -107,13 +107,21 @@ class BitReader
 
     /**
      * Read an unsigned Exp-Golomb code in the range 0 to UINT32_MAX-1.
+     *
+     * @returns the read value or UINT32_MAX on error.
      */
-    unsigned get_ue_golomb_long()
+    uint32_t get_ue_golomb_long()
     {
-        unsigned buf    = show_bits(32);
+        uint32_t buf    = show_bits(32);
         unsigned lz     = clz(buf);
         unsigned length = lz + 1;
         skip_bits(lz);
+
+        if (length > 32)
+        {
+            skip_bits(length);
+            return UINT32_MAX;
+        }
 
         return get_bits(length) - 1;
     }
@@ -179,11 +187,18 @@ class BitReader
 
     static constexpr uint64_t mask_upper(unsigned bits)
     {
+        // protect against undefined behavior
+        if (bits ==  0) return  UINT64_C(0);
+        if (bits >  64) return ~UINT64_C(0);
         return ~((UINT64_C(1) << (64 - bits)) - 1);
     }
 
     static constexpr uint64_t get_upper_bits(uint64_t val, unsigned bits)
     {
+        if ((bits == 0) || (bits > 64))
+        {
+            return val; // protect against undefined behavior
+        }
         return (val & mask_upper(bits)) >> (64 - bits);
     }
 
@@ -205,23 +220,23 @@ class BitReader
 };
 
 /**
-Valid for max_length < 16.
+Valid for max_length <= 16.
 */
 inline int BitReader::get_ue_golomb(unsigned max_length)
 {
-    unsigned buf    = show_bits(32);
+    uint32_t buf    = show_bits(32);
     unsigned lz     = clz(buf);
     unsigned length = lz + 1;
     unsigned size   = lz + length; // total length
 
-    buf >>= (CHAR_BIT * sizeof(buf)) - size; // remove irrelevant trailing bits
-
     skip_bits(size);
 
-    if (length > max_length)
+    if (length > max_length || length > 16)
     {
         return -1;
     }
+
+    buf >>= 32 - size; // remove irrelevant trailing bits
 
     return buf - 1; // offset for storing 0
 }
