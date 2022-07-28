@@ -900,7 +900,7 @@ static int parse_section_header(SectionHeader *h,
     return 0;
 }
 
-typedef struct {
+typedef struct StreamType {
     uint32_t stream_type;
     enum AVMediaType codec_type;
     enum AVCodecID codec_id;
@@ -909,59 +909,86 @@ typedef struct {
 static const StreamType ISO_types[] = {
     { 0x01, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_MPEG2VIDEO },
     { 0x02, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_MPEG2VIDEO },
-    { 0x03, AVMEDIA_TYPE_AUDIO,        AV_CODEC_ID_MP3 },
-    { 0x04, AVMEDIA_TYPE_AUDIO,        AV_CODEC_ID_MP3 },
+    { 0x03, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_MP3        },
+    { 0x04, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_MP3        },
     { 0x0b, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DSMCC_B }, /* DVB_CAROUSEL_ID */
-    { 0x0f, AVMEDIA_TYPE_AUDIO,        AV_CODEC_ID_AAC },
-    { 0x10, AVMEDIA_TYPE_VIDEO,      AV_CODEC_ID_MPEG4 },
-    { 0x11, AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_AAC_LATM }, /* LATM syntax */
-    { 0x1b, AVMEDIA_TYPE_VIDEO,       AV_CODEC_ID_H264 },
-    { 0x24, AVMEDIA_TYPE_VIDEO,       AV_CODEC_ID_HEVC },
-    { 0xd1, AVMEDIA_TYPE_VIDEO,      AV_CODEC_ID_DIRAC },
-    { 0xea, AVMEDIA_TYPE_VIDEO,        AV_CODEC_ID_VC1 },
+    { 0x0f, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_AAC        },
+    { 0x10, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_MPEG4      },
+    /* Makito encoder sets stream type 0x11 for AAC,
+     * so auto-detect LOAS/LATM instead of hardcoding it. */
+#if !CONFIG_LOAS_DEMUXER
+    { 0x11, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_AAC_LATM   }, /* LATM syntax */
+#endif
+    { 0x1b, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_H264       },
+    { 0x1c, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_AAC        },
+    { 0x20, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_H264       },
+    { 0x21, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_JPEG2000   },
+    { 0x24, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_HEVC       },
+    { 0x42, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_CAVS       },
+    { 0xd1, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_DIRAC      },
+    { 0xd2, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_AVS2       },
+    { 0xea, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_VC1        },
     { 0 },
 };
 
 static const StreamType HDMV_types[] = {
-    { 0x80, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_PCM_BLURAY },
-    { 0x81, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_AC3 },
-    { 0x82, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_DTS },
-    { 0x83, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_TRUEHD },
-    { 0x84, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_EAC3 },
-    { 0x85, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_DTS }, /* DTS HD */
-    { 0x86, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_DTS }, /* DTS HD MASTER*/
-    { 0xa1, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_EAC3 }, /* E-AC3 Secondary Audio */
-    { 0xa2, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_DTS },  /* DTS Express Secondary Audio */
+    { 0x80, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_PCM_BLURAY        },
+    { 0x81, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_AC3               },
+    { 0x82, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_DTS               },
+    { 0x83, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_TRUEHD            },
+    { 0x84, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_EAC3              },
+    { 0x85, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_DTS               }, /* DTS HD */
+    { 0x86, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_DTS               }, /* DTS HD MASTER*/
+    { 0xa1, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_EAC3              }, /* E-AC3 Secondary Audio */
+    { 0xa2, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_DTS               }, /* DTS Express Secondary Audio */
     { 0x90, AVMEDIA_TYPE_SUBTITLE, AV_CODEC_ID_HDMV_PGS_SUBTITLE },
+    { 0x92, AVMEDIA_TYPE_SUBTITLE, AV_CODEC_ID_HDMV_TEXT_SUBTITLE },
+    { 0 },
+};
+
+/* SCTE types */
+static const StreamType SCTE_types[] = {
+    { 0x86, AVMEDIA_TYPE_DATA,  AV_CODEC_ID_SCTE_35    },
     { 0 },
 };
 
 /* ATSC ? */
 static const StreamType MISC_types[] = {
-    { 0x81, AVMEDIA_TYPE_AUDIO,     AV_CODEC_ID_AC3 },
+    { 0x81, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_AC3 },
     { 0x87, AVMEDIA_TYPE_AUDIO,     AV_CODEC_ID_EAC3 },
-    { 0x8a, AVMEDIA_TYPE_AUDIO,     AV_CODEC_ID_DTS },
+    { 0x8a, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_DTS },
     { 0x100, AVMEDIA_TYPE_SUBTITLE, AV_CODEC_ID_DVB_SUBTITLE },
     { 0x101, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DVB_VBI },
     { 0 },
 };
 
 static const StreamType REGD_types[] = {
-    { MKTAG('d','r','a','c'), AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_DIRAC },
-    { MKTAG('A','C','-','3'), AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_AC3 },
-    { MKTAG('B','S','S','D'), AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_S302M },
-    { MKTAG('D','T','S','1'), AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_DTS },
-    { MKTAG('D','T','S','2'), AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_DTS },
-    { MKTAG('D','T','S','3'), AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_DTS },
-    { MKTAG('V','C','-','1'), AVMEDIA_TYPE_VIDEO,   AV_CODEC_ID_VC1 },
+    { MKTAG('d', 'r', 'a', 'c'), AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_DIRAC },
+    { MKTAG('A', 'C', '-', '3'), AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_AC3   },
+    { MKTAG('B', 'S', 'S', 'D'), AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_S302M },
+    { MKTAG('D', 'T', 'S', '1'), AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_DTS   },
+    { MKTAG('D', 'T', 'S', '2'), AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_DTS   },
+    { MKTAG('D', 'T', 'S', '3'), AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_DTS   },
+    { MKTAG('E', 'A', 'C', '3'), AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_EAC3  },
+    { MKTAG('H', 'E', 'V', 'C'), AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_HEVC  },
+    { MKTAG('K', 'L', 'V', 'A'), AVMEDIA_TYPE_DATA,  AV_CODEC_ID_SMPTE_KLV },
+    { MKTAG('I', 'D', '3', ' '), AVMEDIA_TYPE_DATA,  AV_CODEC_ID_TIMED_ID3 },
+    { MKTAG('V', 'C', '-', '1'), AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_VC1   },
+    { MKTAG('O', 'p', 'u', 's'), AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_OPUS  },
+    { 0 },
+};
+
+static const StreamType METADATA_types[] = {
+    { MKTAG('K','L','V','A'), AVMEDIA_TYPE_DATA, AV_CODEC_ID_SMPTE_KLV },
+    { MKTAG('I','D','3',' '), AVMEDIA_TYPE_DATA, AV_CODEC_ID_TIMED_ID3 },
     { 0 },
 };
 
 /* descriptor present */
 static const StreamType DESC_types[] = {
-    { 0x6a, AVMEDIA_TYPE_AUDIO,             AV_CODEC_ID_AC3 }, /* AC-3 descriptor */
-    { 0x7a, AVMEDIA_TYPE_AUDIO,            AV_CODEC_ID_EAC3 }, /* E-AC-3 descriptor */
-    { 0x7b, AVMEDIA_TYPE_AUDIO,             AV_CODEC_ID_DTS },
+    { 0x6a, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_AC3          }, /* AC-3 descriptor */
+    { 0x7a, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_EAC3         }, /* E-AC-3 descriptor */
+    { 0x7b, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_DTS          },
     { 0x13, AVMEDIA_TYPE_DATA,          AV_CODEC_ID_DSMCC_B }, /* DVB_CAROUSEL_ID */
     { 0x45, AVMEDIA_TYPE_DATA,          AV_CODEC_ID_DVB_VBI }, /* DVB_VBI_DATA_ID */
     { 0x46, AVMEDIA_TYPE_DATA,          AV_CODEC_ID_DVB_VBI }, /* DVB_VBI_TELETEXT_ID */ //FixMe type subtilte
