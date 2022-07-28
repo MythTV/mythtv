@@ -93,29 +93,29 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     // Determine the signal monitoring capabilities from the card and
     // do not use the capabilities that are not present.
     uint64_t rmflags = 0;
+    bool mok = false;
 
-    auto log_message = [](bool ok, QString loc, QString msg)
+    auto log_message = [mok](const QString& loc, const QString& msg)
     { 
-        if (ok)
+        if (mok)
             LOG(VB_CHANNEL, LOG_INFO, loc + "Can " + msg);
         else
             LOG(VB_GENERAL, LOG_WARNING, loc + "Cannot " + msg + ENO);
     };
 
-    auto update_rmflags = [&](bool ok, uint64_t flag)
+    auto update_rmflags = [mok, &rmflags](uint64_t flag)
     {
-        if (!ok)
+        if (!mok)
             rmflags |= flag;
     };
 
     // Signal strength
     auto flag = kSigMon_WaitForSig;
-    bool mok;
     if (HasFlags(flag))
     {
         _channel->GetSignalStrength(&mok);
-        update_rmflags(mok, flag);
-        log_message(mok, LOC, "measure Signal Strength");
+        update_rmflags(flag);
+        log_message(LOC, "measure Signal Strength");
     }
 
     // Signal/Noise ratio
@@ -123,8 +123,8 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     if (HasFlags(flag))
     {
         _channel->GetSNR(&mok);
-        update_rmflags(mok, flag);
-        log_message(mok, LOC, "measure S/N");
+        update_rmflags(flag);
+        log_message(LOC, "measure S/N");
     }
 
     // Bit error rate
@@ -132,8 +132,8 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     if (HasFlags(flag))
     {
         _channel->GetBitErrorRate(&mok);
-        update_rmflags(mok, flag);
-        log_message(mok, LOC, "measure Bit Error Rate");
+        update_rmflags(flag);
+        log_message(LOC, "measure Bit Error Rate");
     }
 
     // Uncorrected block count
@@ -141,8 +141,8 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     if (HasFlags(flag))
     {
         _channel->GetUncorrectedBlockCount(&mok);
-        update_rmflags(mok, flag);
-        log_message(mok, LOC, "count Uncorrected Blocks");
+        update_rmflags(flag);
+        log_message(LOC, "count Uncorrected Blocks");
     }
 
     RemoveFlags(rmflags);
