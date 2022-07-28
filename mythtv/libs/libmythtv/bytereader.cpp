@@ -51,20 +51,16 @@ const uint8_t* ByteReader::find_start_code(const uint8_t * p,
      */
     while (p < end)
     {
-        // UU UU UU
-        if      (p[-1]  > 1)
-        {
-            p += 3;
-            // start check over with 3 new bytes
-        }
-        else if (p[-1] == 0)
+        if      (/* UU UU UU */ p[-1]  < 1) // equivalently p[-1] == 0
         {
             p++;
             // could be in a start code, so check next byte
         }
-        else if (/* UU UU 01 */ p[-2] != 0 ||
+        else if (/* UU UU UN */ p[-1]  > 1 ||
+                 /* UU UU 01 */ p[-2] != 0 ||
                  /* UU 00 01 */ p[-3] != 0)
         {
+            // start check over with 3 new bytes
             p += 3;
         }
         else /* 00 00 01 */
