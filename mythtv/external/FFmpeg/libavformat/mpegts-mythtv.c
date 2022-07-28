@@ -1004,38 +1004,51 @@ static const StreamType COMPONENT_TAG_types[] = {
 };
 
 static void mpegts_find_stream_type(AVStream *st,
-                                    uint32_t stream_type, const StreamType *types)
+                                    uint32_t stream_type,
+                                    const StreamType *types)
 {
-    for (; types->stream_type; types++) {
+    for (; types->stream_type; types++)
         if (stream_type == types->stream_type) {
-            st->codecpar->codec_type = types->codec_type;
-            st->codecpar->codec_id   = types->codec_id;
+            if (st->codecpar->codec_type != types->codec_type ||
+                st->codecpar->codec_id   != types->codec_id) {
+                st->codecpar->codec_type = types->codec_type;
+                st->codecpar->codec_id   = types->codec_id;
+                st->internal->need_context_update = 1;
+            }
             st->internal->request_probe        = 0;
             return;
         }
-    }
 }
 
 static int mpegts_set_stream_info(AVStream *st, PESContext *pes,
                                   uint32_t stream_type, uint32_t prog_reg_desc)
 {
-    int old_codec_type= st->codecpar->codec_type;
-    int old_codec_id  = st->codecpar->codec_id;
+    int old_codec_type = st->codecpar->codec_type;
+    int old_codec_id   = st->codecpar->codec_id;
+    int old_codec_tag  = st->codecpar->codec_tag;
+
+    if (avcodec_is_open(st->internal->avctx)) {
+        av_log(pes->stream, AV_LOG_DEBUG, "cannot set stream info, internal codec is open\n");
+        return 0;
+    }
+
     avpriv_set_pts_info(st, 33, 1, 90000);
-    st->priv_data = pes;
+    st->priv_data         = pes;
     st->codecpar->codec_type = AVMEDIA_TYPE_DATA;
     st->codecpar->codec_id   = AV_CODEC_ID_NONE;
-    st->need_parsing = AVSTREAM_PARSE_FULL;
-    pes->st = st;
+    st->need_parsing      = AVSTREAM_PARSE_FULL;
+    pes->st          = st;
     pes->stream_type = stream_type;
 
     av_log(pes->stream, AV_LOG_DEBUG,
            "stream=%d stream_type=%x pid=%x prog_reg_desc=%.4s\n",
-           st->index, pes->stream_type, pes->pid, (char*)&prog_reg_desc);
+           st->index, pes->stream_type, pes->pid, (char *)&prog_reg_desc);
 
     st->codecpar->codec_tag = pes->stream_type;
 
     mpegts_find_stream_type(st, pes->stream_type, ISO_types);
+    if (pes->stream_type == 4 || pes->stream_type == 0x0f)
+        st->internal->request_probe = 50;
     if ((prog_reg_desc == AV_RL32("HDMV") ||
          prog_reg_desc == AV_RL32("HDPR")) &&
         st->codecpar->codec_id == AV_CODEC_ID_NONE) {
@@ -1058,19 +1071,33 @@ static int mpegts_set_stream_info(AVStream *st, PESContext *pes,
 
             sub_st->id = pes->pid;
             avpriv_set_pts_info(sub_st, 33, 1, 90000);
-            sub_st->priv_data = sub_pes;
+            sub_st->priv_data         = sub_pes;
             sub_st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
             sub_st->codecpar->codec_id   = AV_CODEC_ID_AC3;
-            sub_st->need_parsing = AVSTREAM_PARSE_FULL;
-            sub_pes->sub_st = pes->sub_st = sub_st;
+            sub_st->need_parsing      = AVSTREAM_PARSE_FULL;
+            sub_pes->sub_st           = pes->sub_st = sub_st;
         }
     }
     if (st->codecpar->codec_id == AV_CODEC_ID_NONE)
         mpegts_find_stream_type(st, pes->stream_type, MISC_types);
-    if (st->codecpar->codec_id == AV_CODEC_ID_NONE){
+    if (st->codecpar->codec_id == AV_CODEC_ID_NONE) {
         st->codecpar->codec_id  = old_codec_id;
-        st->codecpar->codec_type= old_codec_type;
+        st->codecpar->codec_type = old_codec_type;
     }
+    if ((st->codecpar->codec_id == AV_CODEC_ID_NONE ||
+            (st->internal->request_probe > 0 && st->internal->request_probe < AVPROBE_SCORE_STREAM_RETRY / 5)) &&
+        st->probe_packets > 0 &&
+        stream_type == STREAM_TYPE_PRIVATE_DATA) {
+        st->codecpar->codec_type = AVMEDIA_TYPE_DATA;
+        st->codecpar->codec_id   = AV_CODEC_ID_BIN_DATA;
+        st->internal->request_probe = AVPROBE_SCORE_STREAM_RETRY / 5;
+    }
+
+    /* queue a context update if properties changed */
+    if (old_codec_type != st->codecpar->codec_type ||
+        old_codec_id   != st->codecpar->codec_id   ||
+        old_codec_tag  != st->codecpar->codec_tag)
+        st->internal->need_context_update = 1;
 
     return 0;
 }
