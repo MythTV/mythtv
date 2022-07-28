@@ -27,6 +27,7 @@
 #ifndef BIT_READER_H
 #define BIT_READER_H
 
+#include <array>
 #include <cstdint>
 #include <climits> // for CHAR_BIT
 
@@ -39,31 +40,31 @@ class BitReader
   public:
     BitReader(const uint8_t* buffer, uint64_t size) :
         m_buffer(buffer),
-        m_buffer_end(buffer + size)
+        m_bufferEnd(buffer + size)
     {
     }
     ~BitReader() = default;
 
     void skip_bits(unsigned n = 1)
     {
-        if (m_cache_size >= n)
+        if (m_cacheSize >= n)
         {
             m_cache <<= n;
-            m_cache_size -= n;
+            m_cacheSize -= n;
         }
         else
         {
-            m_cache_size = 0;
-            m_bit_index += n;
-            int quotient = m_bit_index / CHAR_BIT;
-            m_bit_index %= CHAR_BIT;
+            m_cacheSize = 0;
+            m_bitIndex += n;
+            int quotient = m_bitIndex / CHAR_BIT;
+            m_bitIndex %= CHAR_BIT;
             m_buffer    += quotient;
         }
     }
     uint32_t show_bits(unsigned n)
     {
         //assert(n <= 32);
-        if (m_cache_size < n)
+        if (m_cacheSize < n)
         {
             refill_cache(32);
         }
@@ -72,7 +73,7 @@ class BitReader
     uint32_t show_bits64(unsigned n)
     {
         //assert(n <= 64);
-        if (m_cache_size < n)
+        if (m_cacheSize < n)
         {
             refill_cache(64);
         }
@@ -144,12 +145,12 @@ class BitReader
 
     int64_t get_bits_left()
     {
-        return m_cache_size + CHAR_BIT * int64_t(m_buffer_end - m_buffer) - m_bit_index;
+        return m_cacheSize + CHAR_BIT * int64_t(m_bufferEnd - m_buffer) - m_bitIndex;
     }
 
   private:
     int get_ue_golomb(unsigned max_length);
-    unsigned clz(uint32_t v)
+    static unsigned clz(uint32_t v)
     {
 #if defined(__cpp_lib_bitops) && __cpp_lib_bitops >= 201907L // C++20 <bit>
         return std::countl_zero(v);
@@ -160,7 +161,7 @@ class BitReader
         {
             return 32;
         }
-        static constexpr int MultiplyDeBruijnBitPosition[32] = 
+        static constexpr std::array<int,32> MultiplyDeBruijnBitPosition =
         {
              0,  9,  1, 10, 13, 21,  2, 29, 11, 14, 16, 18, 22, 25,  3, 30,
              8, 12, 20, 28, 15, 17, 24,  7, 19, 27, 23,  6, 26,  5,  4, 31
@@ -189,8 +190,8 @@ class BitReader
     void refill_cache(unsigned min_bits);
 
     const uint8_t *m_buffer; ///< next memory location to read from
-    const uint8_t * const m_buffer_end; ///< past the end pointer
-    unsigned m_bit_index {0}; ///< index for next bit read from the MSB
+    const uint8_t * const m_bufferEnd; ///< past the end pointer
+    unsigned m_bitIndex {0}; ///< index for next bit read from the MSB
 
     /** @brief cache for reads.
 
@@ -199,7 +200,7 @@ class BitReader
 
     */
     uint64_t m_cache {0};
-    unsigned m_cache_size {0};
+    unsigned m_cacheSize {0};
 
 };
 
@@ -227,21 +228,21 @@ inline int BitReader::get_ue_golomb(unsigned max_length)
 
 inline void BitReader::refill_cache(unsigned min_bits)
 {
-    while (m_cache_size < min_bits && m_buffer < m_buffer_end)
+    while (m_cacheSize < min_bits && m_buffer < m_bufferEnd)
     {
-        int shift = 64 - m_cache_size;
-        int bits = CHAR_BIT - m_bit_index;
+        int shift = 64 - m_cacheSize;
+        int bits = CHAR_BIT - m_bitIndex;
         m_cache |= int64_t(*m_buffer & ((1 << bits) - 1)) << (shift - bits);
         if (shift > bits)
         {
-            m_bit_index   = 0;
+            m_bitIndex   = 0;
             m_buffer++;
-            m_cache_size += bits;
+            m_cacheSize += bits;
         }
         else
         {
-            m_bit_index  += shift;
-            m_cache_size += shift;
+            m_bitIndex  += shift;
+            m_cacheSize += shift;
         }
 
     }

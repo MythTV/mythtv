@@ -123,9 +123,9 @@ class MTV_PUBLIC MythAVBufferRef {
     /**
     @param buf The AVBufferRef* to reference, must be non-NULL.
     */
-    explicit MythAVBufferRef(AVBufferRef* buf) : buffer(av_buffer_ref(buf))
+    explicit MythAVBufferRef(AVBufferRef* buf) : m_buffer(av_buffer_ref(buf))
     {
-        if (!buffer)
+        if (!m_buffer)
         {
             LOG(VB_GENERAL, LOG_ERR, "av_buffer_ref() failed to allocate memory.");
         }
@@ -134,16 +134,16 @@ class MTV_PUBLIC MythAVBufferRef {
     {
         if (has_buffer())
         {
-            av_buffer_unref(&buffer);
+            av_buffer_unref(&m_buffer);
         }
     }
 
-    bool has_buffer()       { return buffer != nullptr; }
+    bool has_buffer()       { return m_buffer != nullptr; }
 
-    const uint8_t*  data()  { return buffer->data; }
-    size_t          size()  { return buffer->size; }
+    const uint8_t*  data()  { return m_buffer->data; }
+    size_t          size()  { return m_buffer->size; }
   private:
-    AVBufferRef* buffer {nullptr};
+    AVBufferRef* m_buffer {nullptr};
 };
 
 

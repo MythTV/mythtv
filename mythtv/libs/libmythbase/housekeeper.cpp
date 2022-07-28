@@ -115,7 +115,7 @@ bool HouseKeeperTask::CheckRun(const QDateTime& now)
         m_confirm = true;
     }
     LOG(VB_GENERAL, LOG_DEBUG, QString("%1 Running? %2/In window? %3.")
-        .arg(GetTag()).arg(m_running ? "Yes" : "No").arg(check ? "Yes" : "No"));
+        .arg(GetTag(), m_running ? "Yes" : "No", check ? "Yes" : "No"));
     return check;
 }
 
@@ -256,7 +256,7 @@ QDateTime HouseKeeperTask::UpdateLastRun(const QDateTime& last, bool successful)
             query.numRowsAffected() > 0)
         {
             LOG(VB_GENERAL, LOG_DEBUG, QString("%1: UPDATEd %2 run time.")
-                .arg(m_dbTag).arg(m_scope == kHKGlobal ? "global" : "local"));
+                .arg(m_dbTag, m_scope == kHKGlobal ? "global" : "local"));
         }
 
         if (query.numRowsAffected() == 0)
@@ -284,7 +284,7 @@ QDateTime HouseKeeperTask::UpdateLastRun(const QDateTime& last, bool successful)
                 MythDB::DBError("HouseKeeperTask::updateLastRun INSERT", query);
 
             LOG(VB_GENERAL, LOG_DEBUG, QString("%1: INSERTed %2 run time.")
-                .arg(m_dbTag).arg(m_scope == kHKGlobal ? "global" : "local"));
+                .arg(m_dbTag, m_scope == kHKGlobal ? "global" : "local"));
         }
     }
 

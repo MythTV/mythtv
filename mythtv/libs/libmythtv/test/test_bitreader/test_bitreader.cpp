@@ -23,7 +23,7 @@
 
 void TestBitReader::get_bits()
 {
-    constexpr uint8_t array[] =
+    constexpr std::array<uint8_t,4> array =
     {
         0b0111'0100,
         0b0001'0100,
@@ -31,7 +31,7 @@ void TestBitReader::get_bits()
         0b1111'1111,
     };
 
-    auto br = BitReader(array, sizeof(array));
+    auto br = BitReader(array.data(), array.size());
 
     QVERIFY(!br.next_bit());
     QCOMPARE(br.get_bits_left(), INT64_C(31));
@@ -61,12 +61,12 @@ void TestBitReader::get_bits()
 
 void TestBitReader::get_ue_golomb_long()
 {
-    constexpr uint8_t array2[] =
+    constexpr std::array<uint8_t,8> array2 =
     {
         0b1000'0000, 0b0000'0000, 0b0000'0000, 0b0000'0000,
         0xDE, 0xAD, 0xBE, 0xEF, // 3735928558 + 1
     };
-    auto br2 = BitReader(array2, sizeof(array2));
+    auto br2 = BitReader(array2.data(), array2.size());
     br2.skip_bits(); // skip first bit for 31 zeroes
     QCOMPARE(br2.get_ue_golomb_long(), 3735928558U);
     QCOMPARE(br2.get_bits_left(), INT64_C(0));
@@ -74,14 +74,14 @@ void TestBitReader::get_ue_golomb_long()
 
 void TestBitReader::get_se_golomb1()
 {
-    constexpr uint8_t array3[] =
+    constexpr std::array<uint8_t,16> array3 =
     {
         0b1000'0000, 0b0000'0000, 0b0000'0000, 0b0000'0000,
         0xDE, 0xAD, 0xBE, 0xEF, // (-2 * -1867964279) + 1
         0b1000'0000, 0b0000'0000, 0b0000'0000, 0b0000'0000,
         0xDE, 0xAD, 0xBE, 0xEE, // ((2 * 1867964279) - 1) + 1
     };
-    auto br3 = BitReader(array3, sizeof(array3));
+    auto br3 = BitReader(array3.data(), array3.size());
     br3.skip_bits(); // skip first bit for 31 zeroes
     QCOMPARE(br3.get_se_golomb(), -1867964279);
     QCOMPARE(br3.get_bits_left(), INT64_C(64));
@@ -92,14 +92,14 @@ void TestBitReader::get_se_golomb1()
 
 void TestBitReader::get_se_golomb2()
 {
-    constexpr uint8_t array4[] =
+    constexpr std::array<uint8_t,8> array4 =
     {
         0b1000'0000, 0b0000'0000,
         0xDE, 0xAD, // (-2 * -28502) + 1
         0b1000'0000, 0b0000'0000,
         0xDE, 0xAC, // ((2 * 28502) - 1) + 1
     };
-    auto br4 = BitReader(array4, sizeof(array4));
+    auto br4 = BitReader(array4.data(), array4.size());
     br4.skip_bits(); // skip first bit for 15 zeroes
     QCOMPARE(br4.get_se_golomb(), -28502);
     QCOMPARE(br4.get_bits_left(), INT64_C(32));

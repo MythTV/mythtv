@@ -1342,7 +1342,7 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
     rates.emplace_back(30000.0 / 1001.0);
 
     auto invalid_fps = [](double rate) { return rate < 3.0 || rate > 121.0; };
-    rates.erase(std::remove_if(rates.begin(), rates.end(), invalid_fps));
+    rates.erase(std::remove_if(rates.begin(), rates.end(), invalid_fps), rates.end());
 
     auto FuzzyEquals = [](double First, double Second) { return std::abs(First - Second) < 0.03; };
 
@@ -4112,7 +4112,7 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint TrackNo)
     if (av_index >= 0 && av_index < (int)m_ic->nb_streams)
         stream = m_ic->streams[av_index];
     AVDictionaryEntry *entry =
-        stream ? av_dict_get(stream->metadata, "title", NULL, 0) : nullptr;
+        stream ? av_dict_get(stream->metadata, "title", nullptr, 0) : nullptr;
     QString user_title = entry ? QString(R"( "%1")").arg(entry->value) : "";
 
     if (kTrackTypeAudio == type)
