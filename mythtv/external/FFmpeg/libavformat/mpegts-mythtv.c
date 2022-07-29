@@ -2452,27 +2452,6 @@ static int is_desired_stream(enum AVMediaType codec_type, enum AVCodecID codec_i
     return val;
 }
 
-static AVStream *new_section_av_stream(SectionContext *sect, enum AVMediaType type,
-                                       enum AVCodecID id)
-{
-    sect->st = avformat_new_stream(sect->stream, NULL);
-    if (!(sect->st)) {
-        av_log(sect->ts, AV_LOG_ERROR, "Cannot allocate memory.\n");
-        return NULL;
-    }
-
-    sect->st->id = sect->pid;
-
-    avpriv_set_pts_info(sect->st, 33, 1, 90000);
-
-    sect->st->codecpar->codec_type = type;
-    sect->st->codecpar->codec_id   = id;
-    sect->st->priv_data = sect;
-    sect->st->need_parsing = AVSTREAM_PARSE_NONE;
-
-    return sect->st;
-}
-
 static SectionContext *add_section_stream(MpegTSContext *ts, int pid, int stream_type)
 {
     MpegTSFilter *tss = ts->pids[pid];
@@ -2784,6 +2763,8 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         if (stream_type == STREAM_TYPE_DSMCC_B)
         {
             SectionContext *sect = NULL;
+            int idx = -1;
+
             sect = add_section_stream(ts, pid, stream_type);
             if (!sect)
             {
@@ -2793,14 +2774,29 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
                 goto out;
             }
 
-            st = new_section_av_stream(sect, AVMEDIA_TYPE_DATA, AV_CODEC_ID_DSMCC_B); // values from ISO_types
-            if (!st)
-            {
-                av_log(ts, AV_LOG_ERROR, "mpegts_add_stream: "
-                       "error creating A/V stream for pid 0x%x with type %i\n",
-                       pid, stream_type);
+            idx = ff_find_stream_index(ts->stream, pid);
+            if (idx >= 0) {
+                st = ts->stream->streams[idx];
+                av_log(ts, AV_LOG_DEBUG, "mpegts_add_stream: "
+                   "reusing stream #%d, has id 0x%x and codec %s, type %s at 0x%p\n",
+                   st->index, st->id, avcodec_get_name(st->codecpar->codec_id),
+                   av_get_media_type_string(st->codecpar->codec_type), st);
+            }
+            if (!st) {
+                st = avformat_new_stream(sect->stream, NULL);
+            }
+            if (!st) {
                 goto out;
             }
+            sect->st = st;
+            sect->st->id = sect->pid;
+
+            avpriv_set_pts_info(sect->st, 33, 1, 90000);
+
+            sect->st->codecpar->codec_type = AVMEDIA_TYPE_DATA;
+            sect->st->codecpar->codec_id   = AV_CODEC_ID_DSMCC_B;
+            sect->st->priv_data = sect;
+            sect->st->need_parsing = AVSTREAM_PARSE_NONE;
 
             av_log(ts, AV_LOG_DEBUG, "mpegts_add_stream: "
                    "stream #%d, has id 0x%x and codec %s, type %s at 0x%p\n",
