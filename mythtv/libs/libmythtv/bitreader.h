@@ -195,9 +195,14 @@ class BitReader
 
     static constexpr uint64_t get_upper_bits(uint64_t val, unsigned bits)
     {
-        if ((bits == 0) || (bits > 64))
+        // protect against undefined behavior
+        if (bits == 0)
         {
-            return val; // protect against undefined behavior
+            return UINT64_C(0);
+        }
+        else if (bits > 64)
+        {
+            return val;
         }
         return (val & mask_upper(bits)) >> (64 - bits);
     }
