@@ -2478,13 +2478,7 @@ static SectionContext *add_section_stream(MpegTSContext *ts, int pid, int stream
     MpegTSFilter *tss = ts->pids[pid];
     SectionContext *sect = 0;
     if (tss) { /* filter already exists */
-        if (tss->type == MPEGTS_SECTION)
-            sect = (SectionContext*) tss->u.section_filter.opaque;
-
-        if (sect && (sect->stream_type == stream_type))
-            return sect; /* if it's the same stream type, just return ok */
-
-        /* otherwise, kill it, and start a new stream */
+        /* kill it, and start a new stream */
         mpegts_close_filter(ts, tss);
     }
 
