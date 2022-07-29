@@ -3527,30 +3527,33 @@ static int mpegts_raw_read_packet(AVFormatContext *s, AVPacket *pkt)
     return 0;
 }
 
-static int mpegts_read_packet(AVFormatContext *s,
-                              AVPacket *pkt)
+static int mpegts_read_packet(AVFormatContext *s, AVPacket *pkt)
 {
     MpegTSContext *ts = s->priv_data;
     int ret, i;
 
+    //pkt->size = -1; // this breaks MHEG
     ts->pkt = pkt;
     ret = handle_packets(ts, 0);
     if (ret < 0) {
-        av_free_packet(ts->pkt);
+        av_packet_unref(ts->pkt);
         /* flush pes data left */
-        for (i = 0; i < NB_PID_MAX; i++) {
+        for (i = 0; i < NB_PID_MAX; i++)
             if (ts->pids[i] && ts->pids[i]->type == MPEGTS_PES) {
                 PESContext *pes = ts->pids[i]->u.pes_filter.opaque;
                 if (pes->state == MPEGTS_PAYLOAD && pes->data_index > 0) {
-                    new_pes_packet(pes, pkt);
+                    ret = new_pes_packet(pes, pkt);
+                    if (ret < 0)
+                        return ret;
                     pes->state = MPEGTS_SKIP;
                     ret = 0;
                     break;
                 }
             }
-        }
     }
 
+    if (!ret && pkt->size < 0)
+        ret = AVERROR_INVALIDDATA;
     return ret;
 }
 
