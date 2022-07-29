@@ -2492,7 +2492,7 @@ static void mpegts_push_section(MpegTSFilter *filter, const uint8_t *section, in
         return;
     }
 
-    if (sect->new_packet && pkt && sect->st && pkt->size == 0) {
+    if (sect->new_packet && pkt && sect->st && pkt->size == -1) {
         int pktLen = section_len + 184; /* Add enough for a complete TS payload. */
         sect->new_packet = 0;
         av_free_packet(pkt);
@@ -3567,7 +3567,7 @@ static int mpegts_read_packet(AVFormatContext *s, AVPacket *pkt)
     MpegTSContext *ts = s->priv_data;
     int ret, i;
 
-    //pkt->size = -1; // this breaks MHEG
+    pkt->size = -1;
     ts->pkt = pkt;
     ret = handle_packets(ts, 0);
     if (ret < 0) {
