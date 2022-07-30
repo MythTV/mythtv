@@ -3888,6 +3888,8 @@ static void mpegts_free(MpegTSContext *ts)
     for (i = 0; i < NB_PID_MAX; i++)
         if (ts->pids[i])
             mpegts_close_filter(ts, ts->pids[i]);
+
+    av_buffer_unref(&ts->stream->pmt_section); // MythTV
 }
 
 static int mpegts_read_close(AVFormatContext *s)
