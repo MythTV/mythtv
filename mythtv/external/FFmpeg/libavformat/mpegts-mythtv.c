@@ -479,11 +479,9 @@ static void mpegts_push_section(MpegTSFilter *filter, const uint8_t *section, in
 static void write_section_data(MpegTSContext *ts, MpegTSFilter *tss1,
                                const uint8_t *buf, int buf_size, int is_start)
 {
-    AVFormatContext *s = ts->stream;
     MpegTSSectionFilter *tss = &tss1->u.section_filter;
-    int len;
-
-    assert(tss->section_buf);
+    uint8_t *cur_section_buf = NULL;
+    int len, offset;
 
     if (is_start) {
         memcpy(tss->section_buf, buf, buf_size);
@@ -493,29 +491,61 @@ static void write_section_data(MpegTSContext *ts, MpegTSFilter *tss1,
     } else {
         if (tss->end_of_section_reached)
             return;
-        len = 4096 - tss->section_index;
+        len = MAX_SECTION_SIZE - tss->section_index;
         if (buf_size < len)
             len = buf_size;
         memcpy(tss->section_buf + tss->section_index, buf, len);
         tss->section_index += len;
     }
 
+    // MythTV
     if (tss->section_cb == mpegts_push_section) {
         SectionContext *sect = tss->opaque;
         sect->new_packet = 1;
     }
-    while (!tss->end_of_section_reached) {
+    // end MythTV
+
+    offset = 0;
+    cur_section_buf = tss->section_buf;
+    while (cur_section_buf - tss->section_buf < MAX_SECTION_SIZE && cur_section_buf[0] != 0xff) {
         /* compute section length if possible */
-        if (tss->section_h_size == -1 && tss->section_index >= 3) {
-            len = (AV_RB16(tss->section_buf + 1) & 0xfff) + 3;
-            if (len > 4096)
+        if (tss->section_h_size == -1 && tss->section_index - offset >= 3) {
+            len = (AV_RB16(cur_section_buf + 1) & 0xfff) + 3;
+            if (len > MAX_SECTION_SIZE)
                 return;
             tss->section_h_size = len;
         }
 
-        if (tss->section_h_size == -1 ||
-            tss->section_index < tss->section_h_size)
-        {
+        if (tss->section_h_size != -1 &&
+            tss->section_index >= offset + tss->section_h_size) {
+            int crc_valid = 1;
+            tss->end_of_section_reached = 1;
+
+            if (tss->check_crc) {
+                crc_valid = !av_crc(av_crc_get_table(AV_CRC_32_IEEE), -1, cur_section_buf, tss->section_h_size);
+                if (tss->section_h_size >= 4)
+                    tss->crc = AV_RB32(cur_section_buf + tss->section_h_size - 4);
+
+                if (crc_valid) {
+                    ts->crc_validity[ tss1->pid ] = 100;
+                }else if (ts->crc_validity[ tss1->pid ] > -10) {
+                    ts->crc_validity[ tss1->pid ]--;
+                }else
+                    crc_valid = 2;
+            }
+            if (crc_valid) {
+                tss->section_cb(tss1, cur_section_buf, tss->section_h_size);
+                if (crc_valid != 1)
+                    tss->last_ver = -1;
+            }
+
+            cur_section_buf += tss->section_h_size;
+            offset += tss->section_h_size;
+            tss->section_h_size = -1;
+        } else {
+            // MythTV if; originally from: Deal with incomplete PMT streams in BBC iPlayer IPTV
+            // https://github.com/MythTV/mythtv/commit/c11ee69c81198dc221c874e8132f1f30a385fa63
+            // references https://code.mythtv.org/trac/ticket/9926 issue not in upstream!
             if (tss1->pmt_chop_at_ts && tss->section_buf[0] == PMT_TID)
             {
                 /* HACK!  To allow BBC IPTV streams with incomplete PMTs (they
@@ -526,25 +556,11 @@ static void write_section_data(MpegTSContext *ts, MpegTSFilter *tss1,
                  */
                 tss->section_h_size = tss->section_index;
             }
-            else
-                break;
-        }
-
-        if (!tss->check_crc ||
-            av_crc(av_crc_get_table(AV_CRC_32_IEEE), -1,
-                   tss->section_buf, tss->section_h_size) == 0)
-            tss->section_cb(tss1, tss->section_buf, tss->section_h_size);
-        else
-            av_log(s, AV_LOG_WARNING, "write_section_data: PID %#x CRC error\n", tss1->pid);
-
-        if (tss->section_index > tss->section_h_size) {
-            int left = tss->section_index - tss->section_h_size;
-            memmove(tss->section_buf, tss->section_buf+tss->section_h_size,
-                    left);
-            tss->section_index = left;
+            else { // upstream follows:
             tss->section_h_size = -1;
-        } else {
-            tss->end_of_section_reached = 1;
+            tss->end_of_section_reached = 0;
+            break;
+            } // end MythTV if
         }
     }
 }
