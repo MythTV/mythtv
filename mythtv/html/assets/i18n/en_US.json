@@ -425,7 +425,12 @@
           "reversed_desc": "This defines whether the signal reaching the LNB is reversed from normal polarization. This happens to circular signals bouncing twice on a toroidal dish."
         }
       },
-      "delete_details": "This will delete {{CardType}} Device:{{VideoDevice}} Name:{{DisplayName}}"
+      "delete_details": "This will delete {{CardType}} Device:{{VideoDevice}} Name:{{DisplayName}}",
+      "external": {
+        "title": "External (Black Box) Recorder",
+        "command_label": "Command path",
+        "command_desc": "A black box application controlled via stdin, status on stderr and TransportStream read from stdout. Use absolute path of executable filename followed by a space and any required parameters. Please ensure the file is a valid executable residing on the backend server."
+      }
     },
     "common": {
       "successful_delete": "Successful delete",
@@ -446,5 +451,6 @@
       "7_storage_directories": "7. Storage Directories",
       "8_system_events": "8. System Events"
     }
-  }
+  },
+  "A": "settings.capture.external.command_desc"
 }

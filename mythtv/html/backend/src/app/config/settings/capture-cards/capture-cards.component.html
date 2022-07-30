@@ -100,6 +100,8 @@
                     [cardList]="m_CaptureCardList"></app-ceton>
                 <app-dvb *ngIf="m_CaptureCardsFiltered[ix].CardType == 'DVB'" [card]="m_CaptureCardsFiltered[ix]"
                     [cardList]="m_CaptureCardList"></app-dvb>
+                <app-external *ngIf="m_CaptureCardsFiltered[ix].CardType == 'EXTERNAL'" [card]="m_CaptureCardsFiltered[ix]"
+                    [cardList]="m_CaptureCardList"></app-external>
             </ng-template>
         </p-accordionTab>
     </p-accordion>

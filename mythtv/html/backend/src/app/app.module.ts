@@ -53,6 +53,7 @@ import { LnbComponent } from './config/settings/capture-cards/dvb/lnb/lnb.compon
 import { SwitchComponent } from './config/settings/capture-cards/dvb/switch/switch.component';
 import { RotorComponent } from './config/settings/capture-cards/dvb/rotor/rotor.component';
 import { UnicableComponent } from './config/settings/capture-cards/dvb/unicable/unicable.component';
+import { ExternalComponent } from './config/settings/capture-cards/external/external.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -102,6 +103,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     SwitchComponent,
     RotorComponent,
     UnicableComponent,
+    ExternalComponent,
   ],
   imports: [
     BrowserModule,
