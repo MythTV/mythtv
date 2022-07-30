@@ -2781,7 +2781,14 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
             SectionContext *sect = NULL;
             int idx = -1;
 
-            sect = add_section_stream(ts, pid, stream_type);
+            if (ts->pids[pid] && ts->pids[pid]->type == MPEGTS_SECTION &&
+                ts->pids[pid]->u.section_filter.section_cb == mpegts_push_section) {
+                // u.section_filter.opaque may be the MpegTSContext, so test the section_cb
+                sect = (SectionContext*) ts->pids[pid]->u.section_filter.opaque;
+            }
+            if (!sect) {
+                sect = add_section_stream(ts, pid, stream_type);
+            }
             if (!sect)
             {
                 av_log(ts, AV_LOG_ERROR, "mpegts_add_stream: "
