@@ -200,7 +200,7 @@ class BitReader
         {
             return UINT64_C(0);
         }
-        else if (bits > 64)
+        if (bits > 64)
         {
             return val;
         }
