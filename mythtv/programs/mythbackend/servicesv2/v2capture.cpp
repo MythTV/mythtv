@@ -588,6 +588,7 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &sCardTyp
         pDev->setCardType (sCardType);
         pDev->setVideoDevice (it);
 #ifdef USING_DVB
+        // From DVBConfigurationGroup::probeCard in Videosource.cpp
         if (sCardType == "DVB")
         {
             QString frontendName = CardUtil::ProbeDVBFrontendName(it);
@@ -682,6 +683,13 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &sCardTyp
             pDev->setTuningDelay ( tuningDelay );
         } // endif (sCardType == "DVB")
 #endif // USING_DVB
+#ifdef USING_HDHOMERUN
+        else if (sCardType == "HDHOMERUN")
+        {
+            pDev->setSignalTimeout ( 3000 );
+            pDev->setChannelTimeout ( 6000 );
+        }
+#endif //USING_HDHOMERUN
     } // endfor (const auto & it : qAsConst(sdevs))
     return pList;
 }
