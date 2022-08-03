@@ -4894,7 +4894,6 @@ void ChannelGroupSetting::deleteEntry(void)
         MythDB::DBError("ChannelGroupSetting::Close", query);
 }
 
-
 ChannelGroupsSetting::ChannelGroupsSetting()
 {
     setLabel(tr("Channel Groups"));
@@ -4908,33 +4907,21 @@ void ChannelGroupsSetting::Load()
             this, &ChannelGroupsSetting::ShowNewGroupDialog);
     addChild(newGroup);
 
-    addChild(new ChannelGroupSetting(tr("Favorites"), 1));
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    QString qstr = "SELECT grpid, name FROM channelgroupnames "
-                        " WHERE grpid <> 1 "
-                        " ORDER BY name ; ";
-
-    query.prepare(qstr);
-
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("ChannelGroupsSetting::Load", query);
-    else
+    ChannelGroupList list = ChannelGroup::GetManualChannelGroups();
+    for (auto it = list.begin(); it < list.end(); ++it)
     {
-        while(query.next())
-        {
-            addChild(new ChannelGroupSetting(query.value(1).toString(),
-                                             query.value(0).toUInt()));
-        }
+        QString name =
+            (it->m_name == "Favorites"        ) ? tr("Favorites"        ) :
+            (it->m_name == "Priority Channels") ? tr("Priority Channels") : it->m_name;
+        addChild(new ChannelGroupSetting(name, it->m_grpId));
     }
 
-    //Load all the groups
+    // Load all the groups
     GroupSetting::Load();
-    //TODO select the new one or the edited one
+
+    // TODO select the new one or the edited one
     emit settingsChanged(nullptr);
 }
-
 
 void ChannelGroupsSetting::ShowNewGroupDialog() const
 {

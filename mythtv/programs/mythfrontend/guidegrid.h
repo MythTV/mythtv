@@ -280,6 +280,7 @@ private:
 
     int               m_changrpid {-1};
     ChannelGroupList  m_changrplist;
+    ChannelGroupList  m_channelGroupListManual;
 
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QMutex            m_jumpToChannelLock {QMutex::Recursive};

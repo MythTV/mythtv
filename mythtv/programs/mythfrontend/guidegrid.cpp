@@ -420,6 +420,17 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
     // check there are some channels setup
     ChannelInfoList channels = ChannelUtil::GetChannels(
         0, true, "", (changrpid<0) ? 0 : changrpid);
+
+    // Fallback to All Programs if the selected group does not exist or is empty
+    if (channels.empty() && changrpid != -1)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Channelgroup '%1' is empty, changing to 'All Programs'")
+                .arg(ChannelGroup::GetChannelGroupName(changrpid)));
+        changrpid = -1;
+        channels = ChannelUtil::GetChannels(0, true, "", 0);
+    }
+
     if (channels.empty())
     {
         QString message;
@@ -488,7 +499,8 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_updateTimer(new QTimer(this)),
     m_threadPool("GuideGridHelperPool"),
     m_changrpid(changrpid),
-    m_changrplist(ChannelGroup::GetChannelGroups(false))
+    m_changrplist(ChannelGroup::GetChannelGroups(false)),
+    m_channelGroupListManual(ChannelGroup::GetManualChannelGroups(true))
 {
     connect(m_updateTimer, &QTimer::timeout, this, &GuideGrid::updateTimeout);
 
@@ -1082,10 +1094,10 @@ void GuideGrid::ShowMenu(void)
         {
             menuPopup->AddButton(tr("Choose Channel Group"));
 
-            if (m_changrpid == -1)
+            if (ChannelGroup::NotInChannelGroupList(m_channelGroupListManual, m_changrpid))
                 menuPopup->AddButton(tr("Add To Channel Group"), nullptr, true);
             else
-                menuPopup->AddButton(tr("Remove from Channel Group"), nullptr, true);
+                menuPopup->AddButton(tr("Remove from Channel Group"));
         }
 
         popupStack->AddScreen(menuPopup);
@@ -1908,8 +1920,8 @@ void GuideGrid::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Add To Channel Group"))
             {
-                if (m_changrpid == -1)
-                    ChannelGroupMenu(0);
+                if (ChannelGroup::NotInChannelGroupList(m_channelGroupListManual, m_changrpid))
+                    ChannelGroupMenu(2);
             }
             else if (resulttext == tr("Remove from Channel Group"))
             {
@@ -2234,9 +2246,16 @@ void GuideGrid::generateListings()
     fillProgramInfos();
 }
 
+// mode 0   Include empty channel groups
+// mode 1   Exclude empty channel groups
+// mode 2   Only Manual channel groups
 void GuideGrid::ChannelGroupMenu(int mode)
 {
-    ChannelGroupList channels = ChannelGroup::GetChannelGroups(mode == 0);
+    ChannelGroupList channels;
+    if (mode == 2)
+        channels = ChannelGroup::GetManualChannelGroups(true);
+    else
+        channels = ChannelGroup::GetChannelGroups(mode == 0);
 
     if (channels.empty())
     {
@@ -2260,7 +2279,7 @@ void GuideGrid::ChannelGroupMenu(int mode)
 
     if (menuPopup->Create())
     {
-        if (mode == 0)
+        if (mode == 0 || mode == 2)
         {
             // add channel to group menu
             menuPopup->SetReturnEvent(this, "channelgrouptogglemenu");
@@ -2308,7 +2327,8 @@ void GuideGrid::toggleChannelFavorite(int grpid)
     ChannelInfo *ch = GetChannelInfo(chanNum);
     uint chanid = ch->m_chanId;
 
-    if (m_changrpid == -1)
+    // All Channels plus all automatic channel groups
+    if (ChannelGroup::NotInChannelGroupList(m_channelGroupListManual, m_changrpid))
     {
         // If currently viewing all channels, allow to add only not delete
         ChannelGroup::ToggleChannel(chanid, grpid, false);
@@ -2319,11 +2339,11 @@ void GuideGrid::toggleChannelFavorite(int grpid)
         ChannelGroup::ToggleChannel(chanid, grpid, true);
     }
 
-    //regenerate the list of non empty group in case it did change
+    // Regenerate the list of non empty groups in case it did change
     m_changrplist = ChannelGroup::GetChannelGroups(false);
 
-    // If viewing favorites, refresh because a channel was removed
-    if (m_changrpid != -1)
+    // If viewing a manual group such as Favorites, refresh because a channel was removed
+    if (ChannelGroup::InChannelGroupList(m_channelGroupListManual, m_changrpid))
     {
         generateListings();
         updateChannels();

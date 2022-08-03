@@ -37,6 +37,7 @@
 #include "libmythtv/mythsystemevent.h"
 #include "libmythtv/profilegroup.h"
 #include "libmythtv/videosource.h"
+#include "libmythtv/channelgroup.h"
 #include "libmythui/mythdisplay.h"
 #include "libmythui/myththemedmenu.h"
 #include "libmythui/mythuihelper.h"
@@ -594,6 +595,8 @@ int main(int argc, char *argv[])
     }
 
     QCoreApplication::exec();
+
+    ChannelGroup::UpdateChannelGroups();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
