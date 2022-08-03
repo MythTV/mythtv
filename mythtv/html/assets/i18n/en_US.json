@@ -430,6 +430,12 @@
         "title": "External (Black Box) Recorder",
         "command_label": "Command path",
         "command_desc": "A black box application controlled via stdin, status on stderr and TransportStream read from stdout. Use absolute path of executable filename followed by a space and any required parameters. Please ensure the file is a valid executable residing on the backend server."
+      },
+      "hdhomerun": {
+        "title": "HDHomeRun Networked Tuner",
+        "eitscan_label": "Use HDHomeRun for active EIT scan",
+        "device_label": "Select HD HomeRun Devices",
+        "device_desc": "Use tuners from selected HDHomeRun devices."
       }
     },
     "common": {
