@@ -95,7 +95,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     uint64_t rmflags = 0;
     bool mok = false;
 
-    auto log_message = [mok](const QString& loc, const QString& msg)
+    auto log_message = [&mok](const QString& loc, const QString& msg)
     { 
         if (mok)
             LOG(VB_CHANNEL, LOG_INFO, loc + "Can " + msg);
@@ -103,7 +103,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
             LOG(VB_GENERAL, LOG_WARNING, loc + "Cannot " + msg + ENO);
     };
 
-    auto update_rmflags = [mok, &rmflags](uint64_t flag)
+    auto update_rmflags = [&mok, &rmflags](uint64_t flag)
     {
         if (!mok)
             rmflags |= flag;
