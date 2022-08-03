@@ -4911,8 +4911,8 @@ void ChannelGroupsSetting::Load()
     for (auto it = list.begin(); it < list.end(); ++it)
     {
         QString name =
-            (it->m_name == "Favorites"        ) ? tr("Favorites"        ) :
-            (it->m_name == "Priority Channels") ? tr("Priority Channels") : it->m_name;
+            (it->m_name == "Favorites") ? tr("Favorites") :
+            (it->m_name == "Priority" ) ? tr("Priority" ) : it->m_name;
         addChild(new ChannelGroupSetting(name, it->m_grpId));
     }
 
