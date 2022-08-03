@@ -18,9 +18,7 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include "zlib.h"
-#undef Z_NULL
-#define Z_NULL nullptr
+// libzip
 #include "zip.h"
 
 // Qt headers

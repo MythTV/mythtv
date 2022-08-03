@@ -2,6 +2,10 @@
 
 #include <array>
 
+#include "zlib.h"
+#undef Z_NULL
+#define Z_NULL nullptr
+
 // Qt headers
 #include <QByteArray>
 #include <QFile>
