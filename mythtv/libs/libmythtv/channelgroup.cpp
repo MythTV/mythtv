@@ -194,12 +194,16 @@ ChannelGroupList ChannelGroup::GetManualChannelGroups(bool includeEmpty)
 
     // Always the Favorites with group id 1
     if (includeEmpty)
-        qstr = "SELECT grpid, name FROM channelgroupnames "
-               "  WHERE grpid = 1 ";
+    {
+        qstr = "SELECT grpid, name FROM channelgroupnames"
+               "  WHERE grpid = 1";
+    }
     else
-        qstr = "SELECT DISTINCT t1.grpid, name FROM channelgroupnames t1, channelgroup t2 "
-               "  WHERE t1.grpid = t2.grpid "
+    {
+        qstr = "SELECT DISTINCT t1.grpid, name FROM channelgroupnames t1, channelgroup t2"
+               "  WHERE t1.grpid = t2.grpid"
                "  AND t1.grpid = 1";
+    }
     query.prepare(qstr);
     if (!query.exec())
         MythDB::DBError("ChannelGroup::GetChannelGroups Favorites", query);
@@ -215,17 +219,22 @@ ChannelGroupList ChannelGroup::GetManualChannelGroups(bool includeEmpty)
 
     // Then the channel groups that are manually created
     if (includeEmpty)
-        qstr = "SELECT grpid, name FROM channelgroupnames "
-               "  WHERE name NOT IN (SELECT name FROM videosource) "
+    {
+        qstr = "SELECT grpid, name FROM channelgroupnames"
+               "  WHERE name NOT IN (SELECT name FROM videosource)"
                "  AND name <> 'Priority' "
-               "  AND grpid <> 1";
+               "  AND grpid <> 1"
+               "  ORDER BY NAME";
+    }
     else
-        qstr = "SELECT DISTINCT t1.grpid, name FROM channelgroupnames t1, channelgroup t2 "
-               "  WHERE t1.grpid = t2.grpid "
+    {
+        qstr = "SELECT DISTINCT t1.grpid, name FROM channelgroupnames t1, channelgroup t2"
+               "  WHERE t1.grpid = t2.grpid"
                "  AND name NOT IN (SELECT name FROM videosource)"
                "  AND name <> 'Priority' "
-               "  AND t1.grpid <> 1";
-    qstr += " ORDER BY NAME";
+               "  AND t1.grpid <> 1"
+               "  ORDER BY NAME";
+    }
     query.prepare(qstr);
     if (!query.exec())
         MythDB::DBError("ChannelGroup::GetChannelGroups manual", query);
@@ -256,12 +265,16 @@ ChannelGroupList ChannelGroup::GetAutomaticChannelGroups(bool includeEmpty)
 
     // The Priority channel group if it exists
     if (includeEmpty)
-        qstr = "SELECT grpid, name FROM channelgroupnames "
-                "  WHERE name = 'Priority' ";
+    {
+        qstr = "SELECT grpid, name FROM channelgroupnames"
+                "  WHERE name = 'Priority'";
+    }
     else
-        qstr = "SELECT DISTINCT t1.grpid, name FROM channelgroupnames t1, channelgroup t2 "
+    {
+        qstr = "SELECT DISTINCT t1.grpid, name FROM channelgroupnames t1, channelgroup t2"
                "  WHERE t1.grpid = t2.grpid "
-               "  AND name = 'Priority' ";
+               "  AND name = 'Priority'";
+    }
     query.prepare(qstr);
     if (!query.exec())
         MythDB::DBError("ChannelGroup::GetChannelGroups Priority", query);
@@ -277,13 +290,18 @@ ChannelGroupList ChannelGroup::GetAutomaticChannelGroups(bool includeEmpty)
 
     // The channel groups that are automatically created from videosources
     if (includeEmpty)
-        qstr = "SELECT grpid, name FROM channelgroupnames "
-               "  WHERE name IN (SELECT name FROM videosource) ";
+    {
+        qstr = "SELECT grpid, name FROM channelgroupnames"
+               "  WHERE name IN (SELECT name FROM videosource)"
+               "  ORDER BY NAME";
+    }
     else
-        qstr = "SELECT DISTINCT t1.grpid, name FROM channelgroupnames t1, channelgroup t2 "
-               "  WHERE t1.grpid = t2.grpid "
-               "  AND name IN (SELECT name FROM videosource)";
-    qstr += " ORDER BY NAME";
+    {
+        qstr = "SELECT DISTINCT t1.grpid, name FROM channelgroupnames t1, channelgroup t2"
+               "  WHERE t1.grpid = t2.grpid"
+               "  AND name IN (SELECT name FROM videosource)"
+               "  ORDER BY NAME";
+    }
     query.prepare(qstr);
     if (!query.exec())
         MythDB::DBError("ChannelGroup::GetChannelGroups videosources", query);
@@ -423,8 +441,9 @@ void ChannelGroup::UpdateChannelGroups(void)
 
     // Split all video sources into a list of video sources that are connected to one
     // or more capture cards and a list of video sources that are not connected.
-    for (auto sourceId : allSources.keys())
+    for (auto it = allSources.cbegin(); it != allSources.cend(); ++it)
     {
+        uint sourceId = it.key();
         int count = SourceUtil::GetConnectionCount(sourceId);
         if (count > 0)
             connectedSources[sourceId] = allSources[sourceId];
@@ -433,7 +452,7 @@ void ChannelGroup::UpdateChannelGroups(void)
     }
 
     // Remove channelgroup channels and the channelgroupname for disconnected video sources.
-    for (auto sourceName : disconnectedSources)
+    for (auto &sourceName : qAsConst(disconnectedSources))
     {
         int groupId = ChannelGroup::GetChannelGroupId(sourceName);
         if (groupId > 0)
@@ -462,7 +481,7 @@ void ChannelGroup::UpdateChannelGroups(void)
     }
 
     // Add channelgroupname entry if it does not exist yet
-    for (auto sourceName : connectedSources)
+    for (auto &sourceName : qAsConst(connectedSources))
     {
         int groupId = ChannelGroup::GetChannelGroupId(sourceName);
         if (groupId == 0)
@@ -480,8 +499,8 @@ void ChannelGroup::UpdateChannelGroups(void)
         }
     }
 
-    // Remove all channels from channelgroup that do not exist anymore or that are not visible.
-    // This includes the channels in the non-automatic groups such as Favorites.
+    // Remove all channels that do not exist anymore or that are not visible.
+    // This is done only for the automatic channel groups.
     {
         ChannelGroupList list = GetAutomaticChannelGroups(false);
         MSqlQuery query(MSqlQuery::InitCon());
@@ -503,25 +522,12 @@ void ChannelGroup::UpdateChannelGroups(void)
                     .arg(query.numRowsAffected()).arg(chgrp.m_grpId));
             }
         }
-
-        // query.prepare(
-        //     "DELETE from channelgroup WHERE chanid NOT IN "
-        //     "(SELECT chanid FROM channel WHERE deleted IS NULL AND visible > 0)");
-        // if (!query.exec())
-        // {
-        //     MythDB::DBError("ChannelGroup::UpdateChannelGroups", query);
-        //     return;
-        // }
-        // if (query.numRowsAffected() > 0)
-        // {
-        //     LOG(VB_GENERAL, LOG_INFO, QString("Removed %1 channels from channelgroup")
-        //         .arg(query.numRowsAffected()));
-        // }
     }
 
     // Add all visible channels to the channelgroups
-    for (auto sourceId : connectedSources.keys())
+    for (auto it = connectedSources.cbegin(); it != connectedSources.cend(); ++it)
     {
+        uint sourceId = it.key();
         QString sourceName = connectedSources[sourceId];
         int groupId = ChannelGroup::GetChannelGroupId(sourceName);
 
@@ -592,8 +598,9 @@ void ChannelGroup::UpdateChannelGroups(void)
             }
 
             // Add all channels from all connected video groups if they have priority
-            for (auto sourceId : connectedSources.keys())
+            for (auto it = connectedSources.cbegin(); it != connectedSources.cend(); ++it)
             {
+                uint sourceId = it.key();
                 query.prepare(
                     "SELECT chanid FROM channel "
                     "WHERE deleted IS NULL "
