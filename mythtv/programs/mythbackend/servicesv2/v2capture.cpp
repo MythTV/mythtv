@@ -684,7 +684,7 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &sCardTyp
         } // endif (sCardType == "DVB")
 #endif // USING_DVB
 #ifdef USING_HDHOMERUN
-        else if (sCardType == "HDHOMERUN")
+        if (sCardType == "HDHOMERUN")
         {
             pDev->setSignalTimeout ( 3000 );
             pDev->setChannelTimeout ( 6000 );
