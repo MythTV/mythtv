@@ -11,6 +11,6 @@ html.files += 3rdParty xslt video debug apps assets
 
 # This solves a problem with refresh or bookmark of http://localhost:6744/settings/xxxxx
 # where xxxxx can be any of several angular settings URLs
-html.extra = ln -sf $(INSTALL_ROOT)/usr/share/mythtv/html $(INSTALL_ROOT)/usr/share/mythtv/html/settings
+html.extra = mkdir -p $(INSTALL_ROOT)/usr/share/mythtv/html ; ln -sf $(INSTALL_ROOT)/usr/share/mythtv/html $(INSTALL_ROOT)/usr/share/mythtv/html/settings
 
 INSTALLS += html
