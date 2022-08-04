@@ -55,6 +55,7 @@ import { RotorComponent } from './config/settings/capture-cards/dvb/rotor/rotor.
 import { UnicableComponent } from './config/settings/capture-cards/dvb/unicable/unicable.component';
 import { ExternalComponent } from './config/settings/capture-cards/external/external.component';
 import { HdhomerunComponent } from './config/settings/capture-cards/hdhomerun/hdhomerun.component';
+import { IptvComponent } from './config/settings/capture-cards/iptv/iptv.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -106,6 +107,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     UnicableComponent,
     ExternalComponent,
     HdhomerunComponent,
+    IptvComponent,
   ],
   imports: [
     BrowserModule,

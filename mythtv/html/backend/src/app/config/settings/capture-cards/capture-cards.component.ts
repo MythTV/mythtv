@@ -134,6 +134,23 @@ export class CaptureCardsComponent implements OnInit {
       ChannelTimeout: 3000,
       SignalTimeout: 1000
     };
+    // Update non-standard defaults on some card types.
+    switch (newOne.CardType) {
+      case "DVB":
+        newOne.SignalTimeout = 500;
+        break;
+      case "HDHOMERUN":
+        newOne.SignalTimeout = 3000;
+        newOne.ChannelTimeout = 6000;
+        break;
+      case "EXTERNAL":
+        newOne.ChannelTimeout = 20000;
+        break;
+      case "FREEBOX":
+        newOne.VideoDevice = "http://mafreebox.freebox.fr/freeboxtv/playlist.m3u"
+        newOne.ChannelTimeout = 30000;
+        break;
+    }
     for (let i = 0; i < this.activeTab.length; i++)
       this.activeTab[i] = false;
     this.dirtyMessages.push(this.newText);

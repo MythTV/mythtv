@@ -5,16 +5,15 @@ import { CaptureCardList, CardAndInput } from 'src/app/services/interfaces/captu
 import { SetupService } from 'src/app/services/setup.service';
 
 @Component({
-  selector: 'app-external',
-  templateUrl: './external.component.html',
-  styleUrls: ['./external.component.css']
+  selector: 'app-iptv',
+  templateUrl: './iptv.component.html',
+  styleUrls: ['./iptv.component.css']
 })
-export class ExternalComponent implements OnInit, AfterViewInit  {
-
+export class IptvComponent implements OnInit, AfterViewInit {
   @Input() card!: CardAndInput;
   @Input() cardList!: CaptureCardList;
 
-  @ViewChild("externalform")
+  @ViewChild("iptvform")
   currentForm!: NgForm;
 
   work = {
@@ -76,6 +75,5 @@ export class ExternalComponent implements OnInit, AfterViewInit  {
       this.captureCardService.AddCaptureCard(this.card).subscribe(this.saveObserver);
     }
   }
-
 
 }

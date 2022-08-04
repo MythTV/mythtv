@@ -104,6 +104,8 @@
                     [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList"></app-external>
                 <app-hdhomerun *ngIf="m_CaptureCardsFiltered[ix].CardType == 'HDHOMERUN'"
                     [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList"></app-hdhomerun>
+                <app-iptv *ngIf="m_CaptureCardsFiltered[ix].CardType == 'FREEBOX'"
+                    [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList"></app-iptv>
             </ng-template>
         </p-accordionTab>
     </p-accordion>

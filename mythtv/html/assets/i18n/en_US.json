@@ -436,6 +436,11 @@
         "eitscan_label": "Use HDHomeRun for active EIT scan",
         "device_label": "Select HD HomeRun Devices",
         "device_desc": "Use tuners from selected HDHomeRun devices."
+      },
+      "iptv": {
+        "title": "IPTV Recorder",
+        "url_label": "M3U URL",
+        "url_desc": "URL of M3U containing RTSP/RTP/UDP channel URLs."
       }
     },
     "common": {
@@ -457,6 +462,5 @@
       "7_storage_directories": "7. Storage Directories",
       "8_system_events": "8. System Events"
     }
-  },
-  "A": "settings.capture.external.command_desc"
+  }
 }
