@@ -76,6 +76,9 @@ const double MythPlayer::kInaccuracyEditor = 0.5;
 // keyframe that is closest to the target.
 const double MythPlayer::kInaccuracyFull = -1.0;
 
+// How close we can seek to the end of a recording.
+const double MythPlayer::kSeekToEndOffset = 1.0;
+
 MythPlayer::MythPlayer(PlayerContext* Context, PlayerFlags Flags)
   : m_playerCtx(Context),
     m_playerFlags(Flags),
@@ -726,115 +729,104 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
     if (!m_videoOutput)
         return false;
 
+    if (!min_buffers
+        && (FlagIsSet(kMusicChoice)
+            || abs(m_ffrewSkip) > 1
+            || GetEof() != kEofStateNone))
+        min_buffers = 1;
+
     auto wait = false;
     if (min_buffers)
         wait = m_videoOutput->ValidVideoFrames() < min_buffers;
-    else if (GetEof() != kEofStateNone)
-        wait = false;
-    else if (abs(m_ffrewSkip) > 1)
-        wait = !m_videoOutput->ValidVideoFrames();
     else
         wait = !m_videoOutput->EnoughDecodedFrames();
 
-    if (wait)
+    if (!wait)
     {
-        SetBuffering(true);
-
-        // This piece of code is to address the problem, when starting
-        // Live TV, of jerking and stuttering. Without this code
-        // that could go on forever, but is cured by a pause and play.
-        // This code inserts a brief pause and play when the potential
-        // for the jerking is detected.
-
-        if ((m_liveTV || IsWatchingInprogress())
-            && !FlagIsSet(kMusicChoice)
-            && m_ffrewSkip == 1)
-        {
-            uint64_t frameCount = GetCurrentFrameCount();
-            uint64_t framesLeft = frameCount - m_framesPlayed;
-            auto margin = static_cast<uint64_t>(m_videoFrameRate * 3.0);
-            if (framesLeft < margin)
-            {
-                if (m_avSync.ResetAVSyncForLiveTV(&m_audio))
-                {
-                    LOG(VB_PLAYBACK, LOG_NOTICE, LOC + "Pause to allow live tv catch up");
-                    LOG(VB_PLAYBACK, LOG_NOTICE, LOC + QString("Played: %1 Avail: %2 Buffered: %3 Margin: %4")
-                        .arg(m_framesPlayed).arg(frameCount)
-                        .arg(m_videoOutput->ValidVideoFrames()).arg(margin));
-                }
-            }
-        }
-
-        std::this_thread::sleep_for(m_frameInterval / 8);
-        auto waited_for = std::chrono::milliseconds(m_bufferingStart.msecsTo(QTime::currentTime()));
-        auto last_msg = std::chrono::milliseconds(m_bufferingLastMsg.msecsTo(QTime::currentTime()));
-        if (last_msg > 100ms && !FlagIsSet(kMusicChoice))
-        {
-            if (++m_bufferingCounter == 10)
-                LOG(VB_GENERAL, LOG_NOTICE, LOC +
-                    "To see more buffering messages use -v playback");
-            if (m_bufferingCounter >= 10)
-            {
-                LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
-                    QString("Waited %1ms for video buffers %2")
-                    .arg(waited_for.count()).arg(m_videoOutput->GetFrameStatus()));
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_NOTICE, LOC +
-                    QString("Waited %1ms for video buffers %2")
-                    .arg(waited_for.count()).arg(m_videoOutput->GetFrameStatus()));
-            }
-            m_bufferingLastMsg = QTime::currentTime();
-            if (m_audio.IsBufferAlmostFull() && m_framesPlayed < 5
-                && gCoreContext->GetBoolSetting("MusicChoiceEnabled", false))
-            {
-                m_playerFlags = static_cast<PlayerFlags>(m_playerFlags | kMusicChoice);
-                LOG(VB_GENERAL, LOG_NOTICE, LOC + "Music Choice program detected - disabling AV Sync.");
-                m_avSync.SetAVSyncMusicChoice(&m_audio);
-            }
-            if (waited_for > 7s && m_audio.IsBufferAlmostFull()
-                && !FlagIsSet(kMusicChoice))
-            {
-                // We are likely to enter this condition
-                // if the audio buffer was too full during GetFrame in AVFD
-                LOG(VB_GENERAL, LOG_NOTICE, LOC + "Resetting audio buffer");
-                m_audio.Reset();
-            }
-            // Finish audio pause for sync after 1 second
-            // in case of infrequent video frames (e.g. music choice)
-            if (m_avSync.GetAVSyncAudioPause() && waited_for > 1s)
-                m_avSync.SetAVSyncMusicChoice(&m_audio);
-        }
-        std::chrono::milliseconds msecs { 500ms };
-        if (preBufferDebug)
-            msecs = 30min;
-        if ((waited_for > msecs) && !m_videoOutput->EnoughFreeFrames())
-        {
-            LOG(VB_GENERAL, LOG_NOTICE, LOC +
-                "Timed out waiting for frames, and"
-                "\n\t\t\tthere are not enough free frames. "
-                "Discarding buffered frames.");
-            // This call will result in some ugly frames, but allows us
-            // to recover from serious problems if frames get leaked.
-            DiscardVideoFrames(true, true);
-        }
-        msecs = 30s;
-        if (preBufferDebug)
-            msecs = 30min;
-        if (waited_for > msecs) // 30 seconds for internet streamed media
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Waited too long for decoder to fill video buffers. Exiting..");
-            SetErrored(tr("Video frame buffering failed too many times."));
-        }
-        return false;
+        if (!m_avSync.GetAVSyncAudioPause() && m_audio.IsPaused())
+            m_audio.Pause(false);
+        SetBuffering(false);
+        return m_videoOutput->ValidVideoFrames();
     }
 
-    if (!m_avSync.GetAVSyncAudioPause())
-        m_audio.Pause(false);
-    SetBuffering(false);
-    return m_videoOutput->ValidVideoFrames();
+    SetBuffering(true);
+
+    // This piece of code is to address the problem, when starting
+    // Live TV, of jerking and stuttering. Without this code
+    // that could go on forever, but is cured by a pause and play.
+    // This code inserts a brief pause and play when the potential
+    // for the jerking is detected.
+    if ((m_liveTV || IsWatchingInprogress())
+        && !FlagIsSet(kMusicChoice)
+        && m_ffrewSkip == 1
+        && m_avSync.GetAVSyncAudioPause() != kAVSyncAudioPausedLiveTV)
+    {
+        auto behind = (GetCurrentFrameCount() - m_framesPlayed) /
+            m_videoFrameRate;
+        if (behind < 3.0)
+        {
+            LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
+                "Pause to allow live tv catch up");
+            m_avSync.ResetAVSyncForLiveTV(&m_audio);
+        }
+    }
+
+    std::this_thread::sleep_for(m_frameInterval / 8);
+    auto waited_for = std::chrono::milliseconds(m_bufferingStart.msecsTo(QTime::currentTime()));
+    auto last_msg = std::chrono::milliseconds(m_bufferingLastMsg.msecsTo(QTime::currentTime()));
+    if (last_msg > 100ms && !FlagIsSet(kMusicChoice))
+    {
+        if (++m_bufferingCounter == 10)
+            LOG(VB_GENERAL, LOG_NOTICE, LOC +
+                "To see more buffering messages use -v playback");
+        LOG(m_bufferingCounter >= 10 ? VB_PLAYBACK : VB_GENERAL,
+            LOG_NOTICE, LOC +
+            QString("Waited %1ms for video buffers %2")
+            .arg(waited_for.count()).arg(m_videoOutput->GetFrameStatus()));
+        m_bufferingLastMsg = QTime::currentTime();
+        if (waited_for > 7s && m_audio.IsBufferAlmostFull()
+            && m_framesPlayed < 5
+            && gCoreContext->GetBoolSetting("MusicChoiceEnabled", false))
+        {
+            m_playerFlags = static_cast<PlayerFlags>(m_playerFlags | kMusicChoice);
+            LOG(VB_GENERAL, LOG_NOTICE, LOC + "Music Choice program detected - disabling AV Sync.");
+            m_avSync.SetAVSyncMusicChoice(&m_audio);
+        }
+        if (waited_for > 7s && m_audio.IsBufferAlmostFull()
+            && !FlagIsSet(kMusicChoice))
+        {
+            // We are likely to enter this condition
+            // if the audio buffer was too full during GetFrame in AVFD
+            LOG(VB_GENERAL, LOG_NOTICE, LOC + "Resetting audio buffer");
+            m_audio.Reset();
+        }
+    }
+
+    std::chrono::milliseconds msecs { 500ms };
+    if (preBufferDebug)
+        msecs = 30min;
+    if ((waited_for > msecs) && !m_videoOutput->EnoughFreeFrames())
+    {
+        LOG(VB_GENERAL, LOG_NOTICE, LOC +
+            "Timed out waiting for frames, and"
+            "\n\t\t\tthere are not enough free frames. "
+            "Discarding buffered frames.");
+        // This call will result in some ugly frames, but allows us
+        // to recover from serious problems if frames get leaked.
+        DiscardVideoFrames(true, true);
+    }
+
+    msecs = 30s;
+    if (preBufferDebug)
+        msecs = 30min;
+    if (waited_for > msecs) // 30 seconds for internet streamed media
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Waited too long for decoder to fill video buffers. Exiting..");
+        SetErrored(tr("Video frame buffering failed too many times."));
+    }
+
+    return false;
 }
 
 void MythPlayer::VideoEnd(void)
@@ -866,8 +858,8 @@ bool MythPlayer::FastForward(float seconds)
             int64_t pos = TranslatePositionMsToFrame(msec, false);
             if (CalcMaxFFTime(pos) < 0)
                 return true;
-            // Reach end of recording, go to 1 or 3s before the end
-            dest = (m_liveTV || IsWatchingInprogress()) ? -3.0 : -1.0;
+            // Reach end of recording, go to offset before the end
+            dest = -kSeekToEndOffset;
         }
         uint64_t target = FindFrame(dest, true);
         m_ffTime = target - m_framesPlayed;
@@ -1458,12 +1450,9 @@ long long MythPlayer::CalcRWTime(long long rw) const
  */
 long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump) const
 {
-    float maxtime = 1.0;
+    float maxtime = kSeekToEndOffset;
     bool islivetvcur = (m_liveTV && m_playerCtx->m_tvchain &&
                         !m_playerCtx->m_tvchain->HasNext());
-
-    if (m_liveTV || IsWatchingInprogress())
-        maxtime = 3.0;
 
     long long ret       = ffframes;
     float ff            = ComputeSecs(ffframes, true);

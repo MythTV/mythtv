@@ -243,6 +243,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     static const double kInaccuracyDefault;
     static const double kInaccuracyEditor;
     static const double kInaccuracyFull;
+    static const double kSeekToEndOffset;
 
     void SaveTotalFrames(void);
     void SetErrored(const QString &reason);

@@ -33,38 +33,16 @@ void MythPlayerAVSync::WaitForFrame(std::chrono::microseconds FrameDue)
         QThread::usleep(delay.count());
 }
 
-std::chrono::milliseconds& MythPlayerAVSync::DisplayTimecode()
+void MythPlayerAVSync::ResetAVSyncForLiveTV(AudioPlayer* Audio)
 {
-    return m_dispTimecode;
-}
-
-void MythPlayerAVSync::ResetAVSyncClockBase()
-{
-    m_rtcBase = 0us;
-}
-
-bool MythPlayerAVSync::GetAVSyncAudioPause() const
-{
-    return m_avsyncAudioPaused;
-}
-
-void MythPlayerAVSync::SetAVSyncAudioPause(bool Pause)
-{
-    m_avsyncAudioPaused = Pause;
-}
-
-bool MythPlayerAVSync::ResetAVSyncForLiveTV(AudioPlayer* Audio)
-{
-    bool result = m_rtcBase != 0us;
+    m_avsyncAudioPaused = kAVSyncAudioPausedLiveTV;
     Audio->Pause(true);
-    m_avsyncAudioPaused = true;
     m_rtcBase = 0us;
-    return result;
 }
 
 void MythPlayerAVSync::SetAVSyncMusicChoice(AudioPlayer* Audio)
 {
-    m_avsyncAudioPaused = false;
+    m_avsyncAudioPaused = kAVSyncAudioNotPaused;
     Audio->Pause(false);
 }
 
@@ -108,6 +86,9 @@ std::chrono::microseconds MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideo
     static float const s_av_control_gain = 0.4F;
     // time weighted exponential filter coefficient
     static float const s_sync_fc = 0.9F;
+
+    if (m_avsyncAudioPaused == kAVSyncAudioPausedLiveTV)
+        m_rtcBase = 0us;
 
     while (framedue == 0us)
     {
@@ -177,7 +158,8 @@ std::chrono::microseconds MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideo
             // Get video in sync with audio
             audio_adjustment = m_priorAudioTimecode - m_priorVideoTimecode;
             // If there is excess audio - throw it away.
-            if (audio_adjustment < -200ms)
+            if (audio_adjustment < -200ms
+                && m_avsyncAudioPaused != kAVSyncAudioPausedLiveTV)
             {
                 Audio->Reset();
                 audio_adjustment = 0ms;
@@ -217,12 +199,19 @@ std::chrono::microseconds MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideo
 
     if (!pause_audio && m_avsyncAudioPaused)
     {
-        m_avsyncAudioPaused = false;
-        Audio->Pause(false);
+        // If the audio was paused due to playing too close to live,
+        // don't unpause it until the video catches up.  This helps to
+        // quickly achieve smooth playback.
+        if (m_avsyncAudioPaused != kAVSyncAudioPausedLiveTV
+            || audio_adjustment < 0ms)
+        {
+            m_avsyncAudioPaused = kAVSyncAudioNotPaused;
+            Audio->Pause(false);
+        }
     }
     else if (pause_audio && !m_avsyncAudioPaused)
     {
-        m_avsyncAudioPaused = true;
+        m_avsyncAudioPaused = kAVSyncAudioPaused;
         Audio->Pause(true);
     }
 

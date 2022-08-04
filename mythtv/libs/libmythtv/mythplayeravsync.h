@@ -10,6 +10,13 @@
 
 class AudioPlayer;
 
+enum AVSyncAudioPausedType
+{
+    kAVSyncAudioNotPaused    = 0,
+    kAVSyncAudioPaused       = 1,
+    kAVSyncAudioPausedLiveTV = 2
+};
+
 class MythPlayerAVSync
 {
   public:
@@ -21,19 +28,23 @@ class MythPlayerAVSync
                                       std::chrono::microseconds FrameInterval,
                                       float PlaySpeed, bool HaveVideo, bool Force);
     void     WaitForFrame        (std::chrono::microseconds FrameDue);
-    std::chrono::milliseconds& DisplayTimecode     ();
-    void     ResetAVSyncClockBase();
+    std::chrono::milliseconds& DisplayTimecode()
+        { return m_dispTimecode; }
+    void     ResetAVSyncClockBase()
+        { m_rtcBase = 0us; }
     void     GetAVSyncData       (InfoMap& Map) const;
-    bool     GetAVSyncAudioPause () const;
-    void     SetAVSyncAudioPause (bool Pause);
-    bool     ResetAVSyncForLiveTV(AudioPlayer* Audio);
+    AVSyncAudioPausedType GetAVSyncAudioPause () const
+        { return m_avsyncAudioPaused; }
+    void     SetAVSyncAudioPause (AVSyncAudioPausedType Pause)
+        { m_avsyncAudioPaused = Pause; }
+    void     ResetAVSyncForLiveTV(AudioPlayer* Audio);
     void     SetAVSyncMusicChoice(AudioPlayer* Audio); // remove
     void     SetRefreshInterval(std::chrono::microseconds interval)
         { m_refreshInterval = interval; }
 
   private:
     QElapsedTimer m_avTimer;
-    bool       m_avsyncAudioPaused  { false };
+    AVSyncAudioPausedType     m_avsyncAudioPaused  { kAVSyncAudioNotPaused };
     int        m_avsyncAvg          { 0 };
     std::chrono::milliseconds m_dispTimecode       { 0ms };
     std::chrono::microseconds m_rtcBase { 0us }; // real time clock base for presentation time
