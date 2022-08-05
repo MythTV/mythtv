@@ -56,6 +56,8 @@ import { UnicableComponent } from './config/settings/capture-cards/dvb/unicable/
 import { ExternalComponent } from './config/settings/capture-cards/external/external.component';
 import { HdhomerunComponent } from './config/settings/capture-cards/hdhomerun/hdhomerun.component';
 import { IptvComponent } from './config/settings/capture-cards/iptv/iptv.component';
+import { ImportComponent } from './config/settings/capture-cards/import/import.component';
+import { DemoComponent } from './config/settings/capture-cards/demo/demo.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -108,6 +110,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     ExternalComponent,
     HdhomerunComponent,
     IptvComponent,
+    ImportComponent,
+    DemoComponent,
   ],
   imports: [
     BrowserModule,

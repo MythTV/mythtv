@@ -1,7 +1,7 @@
-<form class="ml-3 mr-3" name="externalform" #externalform="ngForm">
+<form class="ml-3 mr-3" name="demoform" #demoform="ngForm">
     <p-card class="m-5">
         <ng-template pTemplate="title">
-            {{ 'settings.capture.external.title' | translate }}
+            {{ 'settings.capture.demo.title' | translate }}
         </ng-template>
         <ng-template pTemplate="subtitle">
         </ng-template>
@@ -10,22 +10,12 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="VideoDevice" class="block">{{ 'settings.capture.external.command_label' | translate
+                        <label for="VideoDevice" class="block">{{ 'settings.capture.import.file_label' | translate
                             }}</label>
                         <input pInputText id="VideoDevice" [(ngModel)]="card.VideoDevice" name="VideoDevice"
                             #VideoDevice="ngModel" class="mb-2 form-control w-full" />
                         <small class="block">
-                            {{ 'settings.capture.external.command_desc' | translate }}
-                        </small>
-                    </div>
-
-                    <div class="form-group field">
-                        <label for="ChannelTimeout" class="block">{{ 'settings.capture.tunetimeout_label' | translate
-                            }}</label>
-                        <p-inputNumber [(ngModel)]="card.ChannelTimeout" name="ChannelTimeout" id="ChannelTimeout"
-                            [showButtons]="true" [min]="1750" [max]="65000" [step]="250"></p-inputNumber>
-                        <small class="block">
-                            {{ 'settings.capture.tunetimeout_desc' | translate }}
+                            {{ 'settings.capture.demo.file_desc' | translate }}
                         </small>
                     </div>
 
@@ -37,14 +27,14 @@
         <ng-template pTemplate="footer">
             <div class="grid nogutter">
                 <div class="col-12">
-                    <p-message *ngIf="this.work.successCount > 0 && this.work.errorCount == 0 && !externalform.dirty"
+                    <p-message *ngIf="this.work.successCount > 0 && this.work.errorCount == 0 && !demoform.dirty"
                         severity="success" text="{{ 'common.savesuccess' | translate }}"></p-message>
                     <p-message *ngIf="this.work.errorCount > 0" severity="error"
                         text="{{ 'common.networkfail' | translate }}"></p-message>
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
-                    (onClick)="saveForm(); externalform.form.markAsPristine()"
-                    [disabled]="(!externalform.dirty || !card.VideoDevice)"></p-button>
+                    (onClick)="saveForm(); demoform.form.markAsPristine()"
+                    [disabled]="(!demoform.dirty || !card.VideoDevice)"></p-button>
                 <p-button class="col-2 help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()"
                     icon="pi pi-info-circle" styleClass="p-button-info"></p-button>
             </div>

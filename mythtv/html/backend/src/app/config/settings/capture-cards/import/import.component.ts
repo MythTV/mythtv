@@ -5,15 +5,15 @@ import { CaptureCardList, CardAndInput } from 'src/app/services/interfaces/captu
 import { SetupService } from 'src/app/services/setup.service';
 
 @Component({
-  selector: 'app-iptv',
-  templateUrl: './iptv.component.html',
-  styleUrls: ['./iptv.component.css']
+  selector: 'app-import',
+  templateUrl: './import.component.html',
+  styleUrls: ['./import.component.css']
 })
-export class IptvComponent implements OnInit, AfterViewInit {
+export class ImportComponent implements OnInit, AfterViewInit {
   @Input() card!: CardAndInput;
   @Input() cardList!: CaptureCardList;
 
-  @ViewChild("iptvform")
+  @ViewChild("importform")
   currentForm!: NgForm;
 
   work = {
@@ -28,11 +28,7 @@ export class IptvComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.setupService.setCurrentForm(this.currentForm);
-    // Mark new card as dirty so it can be saved with default input value
-    if (!this.card.CardId)
-      this.currentForm.form.markAsDirty();
   }
-
   showHelp() {
     console.log("show help clicked");
     console.log(this);
@@ -69,8 +65,6 @@ export class IptvComponent implements OnInit, AfterViewInit {
         if (card.CardId == this.card.CardId || card.ParentId == this.card.CardId) {
           this.captureCardService.UpdateCaptureCard(card.CardId, 'videodevice', this.card.VideoDevice)
             .subscribe(this.saveObserver);
-          this.captureCardService.UpdateCaptureCard(card.CardId, 'channel_timeout', String(this.card.ChannelTimeout))
-            .subscribe(this.saveObserver);
         }
       });
     }
@@ -78,5 +72,6 @@ export class IptvComponent implements OnInit, AfterViewInit {
       this.captureCardService.AddCaptureCard(this.card).subscribe(this.saveObserver);
     }
   }
+
 
 }

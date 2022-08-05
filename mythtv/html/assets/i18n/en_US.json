@@ -383,7 +383,7 @@
         "ondemand_label": "Open DVB card on demand",
         "ondemand_desc": "If enabled, only open the DVB card when required, leaving it free for other programs at other times.",
         "eitscan_label": "Use DVB card for active EIT scan",
-        "eitscan_ldesc": "If enabled, activate active scanning for program data (EIT). When this option is enabled the DVB card is constantly in use.",
+        "eitscan_desc": "If enabled, activate active scanning for program data (EIT). When this option is enabled the DVB card is constantly in use.",
         "tuningdelay_label": "DVB tuning delay (ms)",
         "tuningdelay_desc": "Some Linux DVB drivers, in particular for the Hauppauge Nova-T, require that we slow down the tuning process by specifying a delay (in milliseconds).",
         "devNotExist": "Device does not exist",
@@ -441,6 +441,15 @@
         "title": "IPTV Recorder",
         "url_label": "M3U URL",
         "url_desc": "URL of M3U containing RTSP/RTP/UDP channel URLs."
+      },
+      "import": {
+        "title": "Import Test Recorder",
+        "file_label": "File Path",
+        "file_desc": "A local file used to simulate a recording. Set to '/' to use MythEvents to trigger an external program to import recording files."
+      },
+      "demo": {
+        "title": "Demo Test Recorder",
+        "file_desc": "A local MPEG file used to simulate a recording."
       }
     },
     "common": {
