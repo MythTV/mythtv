@@ -54,9 +54,15 @@ class TestMPEGTables: public QObject
     static void scte35_sit_test1(void);
 
     //DVB Tables
-    static void dvb_nit_test(void);
-    static void dvb_sdt_test(void);
-    static void dvb_tdt_test(void);
+    static void dvb_nit_test1(void);
+    static void dvb_nit_test2(void);
+    static void dvb_sdt_test1(void);
+    static void dvb_sdt_test2a(void);
+    static void dvb_sdt_test2o(void);
+    static void dvb_eit_test1(void);
+    static void dvb_tdt_test1(void);
+    static void dvb_tdt_test2(void);
+    static void dvb_tot_test2(void);
 
     static void dvbdate(void);
 
