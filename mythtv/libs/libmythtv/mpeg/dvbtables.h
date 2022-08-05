@@ -10,8 +10,6 @@
 #include "libmythtv/mpeg/mpegtables.h"
 #include "libmythtv/mythtvexp.h"
 
-MTV_PUBLIC QDateTime dvbdate2qt(const unsigned char *buf);
-MTV_PUBLIC time_t dvbdate2unix(const unsigned char *buf);
 uint32_t dvbdate2key(const unsigned char *buf);
 
 static inline QDateTime dvbdate2qt(const std::array<uint8_t,5> buf)
@@ -401,6 +399,41 @@ class MTV_PUBLIC TimeDateTable : public PSIPTable
 
     QDateTime UTC(void)  const { return dvbdate2qt(UTCdata());   }
     time_t UTCUnix(void) const { return dvbdate2unix(UTCdata()); }
+};
+
+/** \class TimeOffsetTable
+ *  \brief This table gives the current DVB stream time, plus descriptors
+ */
+class MTV_PUBLIC TimeOffsetTable : public PSIPTable
+{
+  public:
+    explicit TimeOffsetTable(const PSIPTable& table)
+        : PSIPTable(table)
+    {
+        assert(TableID::TOT == TableID());
+    }
+    ~TimeOffsetTable() override { ; }
+
+    // table_id                 8   0.0       0x70
+    // section_syntax_indicator 1   1.0          0
+    // reserved_future_use      1   1.1          1
+    // reserved                 2   1.2          3
+    // section_length          12   1.4         40
+    // UTC_time                40   3.0          0
+    const unsigned char *UTCdata(void) const
+        { return pesdata() + 3; }
+
+    QDateTime UTC(void)  const { return dvbdate2qt(UTCdata());   }
+    time_t UTCUnix(void) const { return dvbdate2unix(UTCdata()); }
+
+    // Reserved                 4   8.0       0x0F
+    // Descriptors Length      12   8.4          0
+    uint DescriptorsLength(void) const
+        { return ((pesdata()[8]<<8) | pesdata()[9]) & 0x0fff; }
+    // for (i=0;i<N;i++)
+    // Descriptor();
+    const unsigned char* Descriptors(void) const
+        { return pesdata() + 10; }
 };
 
 #endif // DVB_TABLES_H
