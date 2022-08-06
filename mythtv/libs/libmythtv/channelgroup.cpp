@@ -452,7 +452,7 @@ void ChannelGroup::UpdateChannelGroups(void)
     }
 
     // Remove channelgroup channels and the channelgroupname for disconnected video sources.
-    for (auto &sourceName : qAsConst(disconnectedSources))
+    for (const auto &sourceName : qAsConst(disconnectedSources))
     {
         int groupId = ChannelGroup::GetChannelGroupId(sourceName);
         if (groupId > 0)
@@ -481,7 +481,7 @@ void ChannelGroup::UpdateChannelGroups(void)
     }
 
     // Add channelgroupname entry if it does not exist yet
-    for (auto &sourceName : qAsConst(connectedSources))
+    for (const auto &sourceName : qAsConst(connectedSources))
     {
         int groupId = ChannelGroup::GetChannelGroupId(sourceName);
         if (groupId == 0)
@@ -504,7 +504,7 @@ void ChannelGroup::UpdateChannelGroups(void)
     {
         ChannelGroupList list = GetAutomaticChannelGroups(false);
         MSqlQuery query(MSqlQuery::InitCon());
-        for (auto chgrp : list)
+        for (const auto &chgrp : list)
         {
             query.prepare(
                 "DELETE from channelgroup WHERE grpid = :GRPID"
