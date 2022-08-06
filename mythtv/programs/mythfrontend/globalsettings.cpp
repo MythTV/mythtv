@@ -4830,16 +4830,13 @@ void ChannelGroupSetting::Save()
 void ChannelGroupSetting::Load()
 {
     clearSettings();
-    //We can not rename the Favorite group
-    //if (m_groupId!=1)
-    //{
-        m_groupName = new TransTextEditSetting();
-        m_groupName->setLabel(tr("Group name"));
-//        if (m_groupId > -1)
-        m_groupName->setValue(getLabel());
-        m_groupName->setEnabled(m_groupId != 1);
-        addChild(m_groupName);
-    //}
+
+    // We cannot rename the Favorite group, make it readonly
+    m_groupName = new TransTextEditSetting();
+    m_groupName->setLabel(tr("Group name"));
+    m_groupName->setValue(getLabel());
+    m_groupName->setReadOnly(m_groupId == 1);
+    addChild(m_groupName);
 
     MSqlQuery query(MSqlQuery::InitCon());
 
