@@ -413,6 +413,51 @@ int ChannelGroup::GetChannelGroupId(const QString& changroupname)
     return 0;
 }
 
+static void AddChannelGroup(const QString &groupName)
+{
+    int groupId = ChannelGroup::GetChannelGroupId(groupName);
+    if (groupId == 0)
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString("Add channelgroup %1").arg(groupName));
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("INSERT INTO channelgroupnames (name) VALUE (:NEWNAME);");
+        query.bindValue(":NEWNAME", groupName);
+
+        if (!query.exec())
+            MythDB::DBError("AddChannelGroup", query);
+    }
+}
+
+static void RemoveChannelGroup(const QString &groupName)
+{
+    int groupId = ChannelGroup::GetChannelGroupId(groupName);
+    if (groupId > 0)
+    {
+        // Yes, channelgroup does exist. Remove all existing channels.
+        LOG(VB_GENERAL, LOG_INFO, QString("Remove channels of channelgroup %1").arg(groupName));
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("DELETE FROM channelgroup WHERE grpid = :GRPID;");
+        query.bindValue(":GRPID", groupId);
+
+        if (!query.exec())
+            MythDB::DBError("RemoveChannelGroup 1", query);
+
+        // And also the channelgroupname
+        LOG(VB_GENERAL, LOG_INFO, QString("Remove channelgroup %1").arg(groupName));
+        query.prepare("DELETE FROM channelgroupnames WHERE grpid = :GRPID;");
+        query.bindValue(":GRPID", groupId);
+
+        if (!query.exec())
+            MythDB::DBError("RemoveChannelGroup 2", query);
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Channelgroup %1 not found").arg(groupName));
+    }
+}
+
 // UpdateChannelGroups
 //
 // Create and maintain a channel group for each connected video source
@@ -451,52 +496,20 @@ void ChannelGroup::UpdateChannelGroups(void)
             disconnectedSources[sourceId] = allSources[sourceId];
     }
 
-    // Remove channelgroup channels and the channelgroupname for disconnected video sources.
-    for (const auto &sourceName : qAsConst(disconnectedSources))
+    // If there is only one connected video source then we do not need a special
+    // channel group for that video source; it is then the same as "All Channels".
+    QMap<int, QString> removeSources = disconnectedSources;
+    if (connectedSources.size() == 1)
     {
-        int groupId = ChannelGroup::GetChannelGroupId(sourceName);
-        if (groupId > 0)
-        {
-            // Yes, channelgroup does exist. Remove all existing channels.
-            LOG(VB_GENERAL, LOG_INFO, QString("Remove channels of channelgroup %1").arg(sourceName));
-            MSqlQuery query(MSqlQuery::InitCon());
-            QString qstr =
-                "DELETE FROM channelgroup WHERE grpid = :GRPID;";
-            query.prepare(qstr);
-            query.bindValue(":GRPID", groupId);
-
-            if (!query.exec())
-                MythDB::DBError("UpdateChannelGroups channelgroup 1", query);
-
-            // And also the channelgroupname
-            LOG(VB_GENERAL, LOG_INFO, QString("Remove channelgroup %1").arg(sourceName));
-            qstr =
-                "DELETE FROM channelgroupnames WHERE grpid = :GRPID;";
-            query.prepare(qstr);
-            query.bindValue(":GRPID", groupId);
-
-            if (!query.exec())
-                MythDB::DBError("UpdateChannelGroups channelgroupnames 1", query);
-        }
+        auto it = connectedSources.cbegin();
+        uint sourceid = it.key();
+        removeSources[sourceid] = *it;
     }
 
-    // Add channelgroupname entry if it does not exist yet
-    for (const auto &sourceName : qAsConst(connectedSources))
+    // Remove channelgroup channels and the channelgroupname for disconnected video sources.
+    for (const auto &sourceName : qAsConst(removeSources))
     {
-        int groupId = ChannelGroup::GetChannelGroupId(sourceName);
-        if (groupId == 0)
-        {
-            LOG(VB_GENERAL, LOG_INFO, QString("Add channelgroup %1").arg(sourceName));
-
-            MSqlQuery query(MSqlQuery::InitCon());
-            QString qstr =
-                "INSERT INTO channelgroupnames (name) VALUE (:NEWNAME);";
-            query.prepare(qstr);
-            query.bindValue(":NEWNAME", sourceName);
-
-            if (!query.exec())
-                MythDB::DBError("UpdateChannelGroups channelgroupnames 2", query);
-        }
+        RemoveChannelGroup(sourceName);
     }
 
     // Remove all channels that do not exist anymore or that are not visible.
@@ -524,58 +537,83 @@ void ChannelGroup::UpdateChannelGroups(void)
         }
     }
 
-    // Add all visible channels to the channelgroups
-    for (auto it = connectedSources.cbegin(); it != connectedSources.cend(); ++it)
+    // Create a channel group for each connected video source only if there is
+    // more than one video source configured with a capture card.
+    if (connectedSources.size() > 1)
     {
-        uint sourceId = it.key();
-        QString sourceName = connectedSources[sourceId];
-        int groupId = ChannelGroup::GetChannelGroupId(sourceName);
-
-        if (groupId > 0)
+        // Add channelgroupname entry if it does not exist yet
+        for (const auto &sourceName : qAsConst(connectedSources))
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("Update channelgroup %1").arg(sourceName));
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare(
-                "SELECT chanid FROM channel "
-                "WHERE deleted IS NULL "
-                "AND visible > 0 "
-                "AND sourceid = :SOURCEID");
-            query.bindValue(":SOURCEID", sourceId);
-            if (!query.exec())
-            {
-                MythDB::DBError("ChannelGroup::UpdateChannelGroups", query);
-                return;
-            }
+            AddChannelGroup(sourceName);
+        }
 
-            while (query.next())
+        // Add all visible channels to the channelgroups
+        for (auto it = connectedSources.cbegin(); it != connectedSources.cend(); ++it)
+        {
+            uint sourceId = it.key();
+            QString sourceName = connectedSources[sourceId];
+            int groupId = ChannelGroup::GetChannelGroupId(sourceName);
+
+            if (groupId > 0)
             {
-                uint chanId = query.value(0).toUInt();
-                ChannelGroup::AddChannel(chanId, groupId);
+                LOG(VB_GENERAL, LOG_INFO, QString("Update channelgroup %1").arg(sourceName));
+                MSqlQuery query(MSqlQuery::InitCon());
+                query.prepare(
+                    "SELECT chanid FROM channel "
+                    "WHERE sourceid = :SOURCEID "
+                    "AND deleted IS NULL "
+                    "AND visible > 0 ");
+                query.bindValue(":SOURCEID", sourceId);
+                if (!query.exec())
+                {
+                    MythDB::DBError("ChannelGroup::UpdateChannelGroups", query);
+                    return;
+                }
+                while (query.next())
+                {
+                    uint chanId = query.value(0).toUInt();
+                    ChannelGroup::AddChannel(chanId, groupId);
+                }
             }
         }
     }
 
     // Channelgroup Priority
+
+    // Find the number of priority channels in all connected video sources
+    uint numPrioChannels = 0;
+    for (auto it = connectedSources.cbegin(); it != connectedSources.cend(); ++it)
+    {
+        uint sourceId = it.key();
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(
+            "SELECT count(*) FROM channel "
+            "WHERE sourceid = :SOURCEID "
+            "AND deleted IS NULL "
+            "AND visible > 0 "
+            "AND recpriority > 0");
+        query.bindValue(":SOURCEID", sourceId);
+        if (!query.exec())
+        {
+            MythDB::DBError("UpdateChannelGroups Priority select channels", query);
+            return;
+        }
+        if (query.next())
+        {
+            numPrioChannels += query.value(0).toUInt();
+        }
+    }
+    LOG(VB_GENERAL, LOG_INFO, QString("Found %1 priority channels").arg(numPrioChannels));
+
+    if (numPrioChannels > 0)
     {
         // Add channel group for Priority channels
-        QString sourceName = "Priority";
-        int groupId = ChannelGroup::GetChannelGroupId(sourceName);
-        if (groupId == 0)
-        {
-            LOG(VB_GENERAL, LOG_INFO, QString("Add channelgroup %1").arg(sourceName));
-            MSqlQuery query(MSqlQuery::InitCon());
-            QString qstr =
-                "INSERT INTO channelgroupnames (name) VALUE (:NEWNAME);";
-            query.prepare(qstr);
-            query.bindValue(":NEWNAME", sourceName);
-
-            if (!query.exec())
-                MythDB::DBError("UpdateChannelGroups Priority channelgroup", query);
-        }
-        LOG(VB_GENERAL, LOG_INFO, QString("Update channelgroup %1").arg(sourceName));
+        QString groupName = "Priority";
+        AddChannelGroup(groupName);
+        LOG(VB_GENERAL, LOG_INFO, QString("Update channelgroup %1").arg(groupName));
 
         // Update all channels in channel group Priority
-        groupId = ChannelGroup::GetChannelGroupId(sourceName);
+        int groupId = ChannelGroup::GetChannelGroupId(groupName);
         if (groupId > 0)
         {
             // Remove all channels from channelgroup Priority that do not have priority anymore.
@@ -583,8 +621,10 @@ void ChannelGroup::UpdateChannelGroups(void)
             query.prepare(
                 "DELETE from channelgroup WHERE grpid = :GRPID "
                 "  AND chanid NOT IN "
-                "  (SELECT chanid FROM channel WHERE deleted IS NULL "
-                "    AND visible > 0 AND recpriority > 0)");
+                "  (SELECT chanid FROM channel "
+                "   WHERE deleted IS NULL "
+                "   AND visible > 0 "
+                "   AND recpriority > 0)");
             query.bindValue(":GRPID", groupId);
             if (!query.exec())
             {
@@ -603,9 +643,9 @@ void ChannelGroup::UpdateChannelGroups(void)
                 uint sourceId = it.key();
                 query.prepare(
                     "SELECT chanid FROM channel "
-                    "WHERE deleted IS NULL "
+                    "WHERE sourceid = :SOURCEID "
+                    "AND deleted IS NULL "
                     "AND visible > 0 "
-                    "AND sourceid = :SOURCEID "
                     "AND recpriority > 0");
                 query.bindValue(":SOURCEID", sourceId);
                 if (!query.exec())
@@ -620,9 +660,10 @@ void ChannelGroup::UpdateChannelGroups(void)
                 }
             }
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_INFO, QString("Channelgroup Priority not present"));
-        }
+    }
+    else
+    {
+        // No priority channels in connected video sources, so no Priority channel group
+        RemoveChannelGroup("Priority");
     }
 }
