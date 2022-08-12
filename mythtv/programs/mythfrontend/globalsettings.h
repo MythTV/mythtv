@@ -311,9 +311,15 @@ class ChannelGroupSetting : public GroupSetting
     bool canDelete(void) override; // GroupSetting
     void deleteEntry(void) override; // GroupSetting
 
+ public slots:
+    void LoadChannelGroup(void);
+    void LoadChannelGroupChannels(void);
+
   private:
     int                   m_groupId   {-1};
     TransTextEditSetting *m_groupName {nullptr};
+    HostComboBoxSetting  *m_groupSelection {nullptr};
+    std::map<std::pair<int,uint>, TransMythUICheckBoxSetting *> m_boxMap;
 };
 
 class ChannelGroupsSetting : public GroupSetting
