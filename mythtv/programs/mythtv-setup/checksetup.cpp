@@ -167,7 +167,7 @@ bool checkImageStoragePaths(QStringList &probs)
             LOG(VB_GENERAL, LOG_ERR, trMesg);
             problemFound = true;
         }
-    }            
+    }
 
     return problemFound;
 }

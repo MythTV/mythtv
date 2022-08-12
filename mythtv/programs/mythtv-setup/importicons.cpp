@@ -413,7 +413,7 @@ bool ImportIconsWizard::initialLoad(const QString& name)
         if (!m_missingEntries.empty())
         {
             message.append("\n");
-            message.append(tr("Could not find %n icon(s).", "", 
+            message.append(tr("Could not find %n icon(s).", "",
                               m_missingEntries.size()));
         }
 

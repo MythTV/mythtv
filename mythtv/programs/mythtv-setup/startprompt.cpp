@@ -39,7 +39,7 @@ void StartPrompter::handleStart()
     if (MythCoreContext::BackendIsRunning() && gCoreContext->IsMasterHost())
     {
         backendRunningPrompt();
-    }    
+    }
 }
 
 void StartPrompter::leaveBackendRunning()
@@ -69,7 +69,7 @@ void StartPrompter::backendRunningPrompt(void)
     {
         backendIsRecording = RemoteGetRecordingStatus(nullptr, false);
     }
-    
+
     QString warning = tr("WARNING: The backend is currently running.")+"\n\n"+
                       tr("Changing existing card inputs, deleting anything, "
                      "or scanning for channels may not work.")+"\n\n";

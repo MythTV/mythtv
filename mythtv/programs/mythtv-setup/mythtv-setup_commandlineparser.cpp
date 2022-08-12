@@ -42,7 +42,7 @@ void MythTVSetupCommandLineParser::LoadArguments(void)
             "line channel scanner");
     add("--region", "region", "us", "",
            "Specify the region for the frequency standard to be used with command "
-           "line channel scanner"); 
+           "line channel scanner");
 
     add("--input-name", "inputname", "", "",
             "Specify which input to scan for, if specified card "

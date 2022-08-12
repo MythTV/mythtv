@@ -97,11 +97,11 @@ void ExitPrompter::handleExit()
         }
 
         dia->SetReturnEvent(this, "problemprompt");
-        
+
         dia->AddButton(tr("Yes please"));
         dia->AddButton(tr("No, I know what I am doing"),
                        &ExitPrompter::masterPromptExit);
-                
+
         m_d->m_stk->AddScreen(dia);
     }
     else
@@ -116,7 +116,7 @@ void ExitPrompter::customEvent(QEvent *event)
 
         QString resultid= dce->GetId();
         int buttonnum = dce->GetResult();
-        
+
         if (resultid == "mythfillprompt")
         {
             quit();

@@ -666,7 +666,7 @@ void ChannelEditor::scan(void)
     // Check that we have a videosource and a connected capture card
     if (!check_cardsource(m_sourceFilter, m_sourceFilterName))
         return;
- 
+
     // Create the dialog now that we have a video source and a capture card
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     auto *ssd = new StandardSettingDialog(mainStack, "scanwizard",
@@ -706,7 +706,7 @@ void ChannelEditor::transportEditor(void)
     // Check that we have a videosource and a connected capture card
     if (!check_cardsource(m_sourceFilter, m_sourceFilterName))
         return;
- 
+
     // Create the dialog now that we have a video source and a capture card
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     auto *ssd = new StandardSettingDialog(mainStack, "transporteditor",
