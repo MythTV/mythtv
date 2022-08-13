@@ -90,18 +90,13 @@ AudioOutputBase::~AudioOutputBase()
                 "~AudioOutputBase called, but KillAudio has not been called!");
 
     // We got this from a subclass, delete it
-    // These all seem to be the same pointer, avoid freeing multiple times
-    VBAUDIO(QString("m_outputSettings != m_outputSettingsDigital : %1").arg(m_outputSettings != m_outputSettingsDigital));
-    if (m_outputSettingsDigital != m_outputSettings)
-    {
-        if (m_outputSettingsDigitalRaw != m_outputSettingsDigital && m_outputSettingsDigitalRaw != m_outputSettings)
-            delete m_outputSettingsDigitalRaw;
-        delete m_outputSettingsDigital;
-    }
-    VBAUDIO(QString("m_outputSettingsRaw != m_outputSettings %1").arg(m_outputSettingsRaw != m_outputSettings));
-    if (m_outputSettingsRaw != m_outputSettings)
-        delete m_outputSettingsRaw;
     delete m_outputSettings;
+    delete m_outputSettingsRaw;
+    if (m_outputSettings != m_outputSettingsDigital)
+    {
+        delete m_outputSettingsDigital;
+        delete m_outputSettingsDigitalRaw;
+    }
 
     if (m_kAudioSRCOutputSize > 0)
         delete[] m_srcOut;
@@ -195,9 +190,9 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsUsers(bool digital)
     else if (m_outputSettingsDigital)
         return m_outputSettingsDigital;
 
-    //bugfix: don't allocate as GetOutputSettings will do it
-    //auto* aosettings = new AudioOutputSettings;
-    AudioOutputSettings* aosettings = GetOutputSettingsCleaned(digital);
+    auto* aosettings = new AudioOutputSettings;
+
+    *aosettings = *GetOutputSettingsCleaned(digital);
     aosettings->GetUsers();
 
     if (digital)
