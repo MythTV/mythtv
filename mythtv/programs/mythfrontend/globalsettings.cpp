@@ -4854,8 +4854,9 @@ void ChannelGroupSetting::LoadChannelGroup()
     {
         QString group = m_groupSelection->getValue();
         int groupId = ChannelGroup::GetChannelGroupId(group);
-        LOG(VB_GENERAL, LOG_INFO, QString("ChannelGroupSetting::%1  value:%2  groupId:%3")
-            .arg(__func__).arg(group).arg(groupId));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("ChannelGroupSetting::LoadChannelGroup group:%1 groupId:%2")
+                .arg(group).arg(groupId));
     }
 
     // Set the old checkboxes from the previously selected channel group invisible
