@@ -1824,7 +1824,7 @@ bool HEVCParser::parseSPS(BitReader& br)
 */
 bool HEVCParser::parseVPS(BitReader& br)
 {
-    uint i = 0;
+    int i = 0;
 
     uint8_t vps_id = br.get_bits(4);  // vps_video_parameter_set_id u(4)
     br.get_bits(1);    // vps_base_layer_internal_flag u(1)
@@ -1872,13 +1872,19 @@ bool HEVCParser::parseVPS(BitReader& br)
 #endif
 
     uint8_t vps_max_layer_id = br.get_bits(6); // u(6)
-    uint vps_num_layer_sets_minus1 = br.get_ue_golomb(); // ue(v)
+    int vps_num_layer_sets_minus1 = br.get_ue_golomb(); // ue(v)
     for (i = 1; i <= vps_num_layer_sets_minus1; ++i)
     {
         for (int j = 0; j <= vps_max_layer_id; ++j)
         {
             br.get_bits(1); // layer_id_included_flag[i][j] u(1)
         }
+    }
+    if (vps_num_layer_sets_minus1 < 0)
+    {
+        LOG(VB_RECORD, LOG_WARNING, LOC +
+            QString("vps_num_layer_sets_minus1 %1 < 0")
+                .arg(vps_num_layer_sets_minus1));
     }
 
     if (br.get_bits(1)) // vps_timing_info_present_flag u(1)
