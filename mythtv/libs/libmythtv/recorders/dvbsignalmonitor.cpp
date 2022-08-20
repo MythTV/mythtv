@@ -103,6 +103,14 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
             LOG(VB_GENERAL, LOG_WARNING, loc + "Cannot " + msg + ENO);
     };
 
+    auto log_message_channel = [&mok](const QString& loc, const QString& msg)
+    {
+        if (mok)
+            LOG(VB_CHANNEL, LOG_INFO, loc + "Can " + msg);
+        else
+            LOG(VB_CHANNEL, LOG_WARNING, loc + "Cannot " + msg + ENO);
+    };
+
     auto update_rmflags = [&mok, &rmflags](uint64_t flag)
     {
         if (!mok)
@@ -133,7 +141,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     {
         _channel->GetBitErrorRate(&mok);
         update_rmflags(flag);
-        log_message(LOC, "measure Bit Error Rate");
+        log_message_channel(LOC, "measure Bit Error Rate");
     }
 
     // Uncorrected block count
@@ -142,7 +150,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     {
         _channel->GetUncorrectedBlockCount(&mok);
         update_rmflags(flag);
-        log_message(LOC, "count Uncorrected Blocks");
+        log_message_channel(LOC, "count Uncorrected Blocks");
     }
 
     RemoveFlags(rmflags);
