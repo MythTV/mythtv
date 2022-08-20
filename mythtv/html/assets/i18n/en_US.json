@@ -395,7 +395,8 @@
         "newsatellite_devtype": "Select device type",
         "satellite_heading": "Satellite Settings",
         "satellite_delete_desc": "This will delete the Satellite device and all downstream devices.",
-        "satellite_delete_header": "Delete Satellite Devices"
+        "satellite_delete_header": "Delete Satellite Devices",
+        "title": "DVB-T/S/C, ATSC or ISDB-T tuner card"
       },
       "diseqc": {
         "subtype_legacy": "Legacy (Fixed)",
@@ -423,7 +424,26 @@
           "lofhigh_desc": "This defines the offset the frequency coming from the LNB will be in high setting. For bandstacked LNBs this is the horizontal/left polarization band.",
           "reversed_label": "LNB Reversed",
           "reversed_desc": "This defines whether the signal reaching the LNB is reversed from normal polarization. This happens to circular signals bouncing twice on a toroidal dish."
-        }
+        },
+        "rotor": {
+          "title": "Rotor Configuration",
+          "cmdrepeat_label": "Repeat Count",
+          "cmdrepeat_desc": "Number of repeat (command with repeat flag ON) or resend (the same command) DiSEqC commands.<br>If value is higher than 10, command will be resend N-10 times.<br>If value is lower than 10, command will be repeated N times.<br>Repeat useful for unreliable DiSEqC equipment; resend useful when unreliable DiSEqC equipment has broken/unsupported repeat flag support.",
+          "type_label": "Rotor Type",
+          "type_desc": "Select the type of rotor from the list.",
+          "positions_label": "Positions",
+          "positions_desc": "Rotor position setup. Negative values indicate West, positive values indicate East.",
+          "lospeed_label": "Rotor Low Speed (deg/sec)",
+          "hispeed_label": "Rotor High Speed (deg/sec)",
+          "lospeed_desc": "To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 13V.",
+          "hispeed_desc": "To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 18V.",
+          "latitude_label": "Latitude",
+          "latitude_desc": "The Cartesian latitude for your location. Use negative numbers for southern coordinates.",
+          "longitude_label": "Longitude",
+          "longitude_desc": "The Cartesian longitude for your location. Use negative numbers for western coordinates."
+        },
+        "subtype_diseqc_1_2": "DiSEqC 1.2",
+        "subtype_diseqc_1_3": "DiSEqC 1.3 (GotoX/USALS)"
       },
       "delete_details": "This will delete {{CardType}} Device:{{VideoDevice}} Name:{{DisplayName}}",
       "external": {

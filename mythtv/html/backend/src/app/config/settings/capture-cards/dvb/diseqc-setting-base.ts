@@ -1,7 +1,7 @@
 import { NgForm } from "@angular/forms";
-import { Observable } from "rxjs";
+import { PartialObserver } from "rxjs";
 
 export interface DiseqcSettingBase {
     currentForm: NgForm;
-    saveForm() : Observable<any>;
+    saveForm(parent: number, observer: PartialObserver<any>) : void;
 }

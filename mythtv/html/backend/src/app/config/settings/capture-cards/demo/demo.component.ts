@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { CaptureCardList, CardAndInput } from 'src/app/services/interfaces/capture-card.interface';
@@ -13,8 +13,8 @@ export class DemoComponent implements OnInit, AfterViewInit {
   @Input() card!: CardAndInput;
   @Input() cardList!: CaptureCardList;
 
-  @ViewChild("demoform")
-  currentForm!: NgForm;
+  @ViewChild("demoform") currentForm!: NgForm;
+  @ViewChild("top") topElement!: ElementRef;
 
   work = {
     successCount: 0,
@@ -28,7 +28,9 @@ export class DemoComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.setupService.setCurrentForm(this.currentForm);
+    this.topElement.nativeElement.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+
   showHelp() {
     console.log("show help clicked");
     console.log(this);

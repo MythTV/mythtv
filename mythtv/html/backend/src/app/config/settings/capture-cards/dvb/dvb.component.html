@@ -1,7 +1,8 @@
 <form class="ml-3 mr-3" name="dvbform" #dvbform="ngForm">
+    <span #top></span>
     <p-card class="m-5">
         <ng-template pTemplate="title">
-            DVB-T/S/C, ATSC or ISDB-T tuner card
+            {{ 'settings.capture.dvb.title' | translate }}
         </ng-template>
         <ng-template pTemplate="subtitle">
         </ng-template>
@@ -72,8 +73,8 @@
 
                     <div class="form-group field">
                         <p-checkbox inputId="DVBWaitForSeqStart" [(ngModel)]="card.DVBWaitForSeqStart"
-                            name="DVBWaitForSeqStart" #DVBWaitForSeqStart="ngModel"
-                            class="mb-2 w-full" [binary]="true" label="{{ 'settings.capture.dvb.wait_label' | translate }}">
+                            name="DVBWaitForSeqStart" #DVBWaitForSeqStart="ngModel" class="mb-2 w-full" [binary]="true"
+                            label="{{ 'settings.capture.dvb.wait_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
                             {{ 'settings.capture.dvb.wait_desc' | translate }}
@@ -112,14 +113,18 @@
 
                 </div>
                 <!-- Satellite Panel -->
-                <p-fieldset class="mb-4 w-full" legend="{{ 'settings.capture.dvb.satellite_heading' | translate }}" [toggleable]="true" [collapsed]="true">
-                    <p-button label="{{ 'settings.capture.dvb.newsatellite_button' | translate }}" *ngIf="!diseqcTree" (onClick)="work.displayNewDiseqc = true"
-                        icon="pi pi-plus-circle" styleClass="p-button-plain"></p-button>
-                    <p-dialog header="{{ 'settings.capture.dvb.newsatellite_heading' | translate }}" [(visible)]="work.displayNewDiseqc" [modal]="true"
-                        [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
+                <p-fieldset class="mb-4 w-full" legend="{{ 'settings.capture.dvb.satellite_heading' | translate }}"
+                    [toggleable]="true" [collapsed]="true">
+                    <p-button label="{{ 'settings.capture.dvb.newsatellite_button' | translate }}" *ngIf="!diseqcTree"
+                        (onClick)="work.displayNewDiseqc = true" icon="pi pi-plus-circle" styleClass="p-button-plain">
+                    </p-button>
+                    <p-dialog header="{{ 'settings.capture.dvb.newsatellite_heading' | translate }}"
+                        [(visible)]="work.displayNewDiseqc" [modal]="true" [style]="{width: '50vw'}" [draggable]="false"
+                        [resizable]="false">
                         <p>{{ 'settings.capture.dvb.newsatellite_devtype' | translate }}</p>
-                        <p-listbox [options]="diseqcTypes" [(ngModel)]="selectedDiseqcType" optionLabel="description"
-                            name="disenqcTypes" optionDisabled="inactive" (onDblClick)="newDiseqc();"></p-listbox>
+                        <p-listbox [options]="captureCardService.diseqcTypes" [(ngModel)]="selectedDiseqcType"
+                            optionLabel="description" name="disenqcTypes" optionDisabled="inactive"
+                            (onDblClick)="newDiseqc();"></p-listbox>
                         <ng-template pTemplate="footer">
                             <p-button icon="pi pi-times-circle" (onClick)="work.displayNewDiseqc=false"
                                 label="{{ 'common.cancel' | translate }}" styleClass="p-button-plain">
@@ -134,8 +139,9 @@
                     <p-button styleClass="p-button-warning" *ngIf="diseqcTree" label="Delete Satellite Devices"
                         icon="pi pi-trash" (onClick)="work.displayDeleteDiseqc=true" [disabled]="!diseqcTree">
                     </p-button>
-                    <p-dialog header="{{ 'settings.capture.dvb.satellite_delete_header' | translate }}" [(visible)]="work.displayDeleteDiseqc" [modal]="true"
-                        [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
+                    <p-dialog header="{{ 'settings.capture.dvb.satellite_delete_header' | translate }}"
+                        [(visible)]="work.displayDeleteDiseqc" [modal]="true" [style]="{width: '50vw'}"
+                        [draggable]="false" [resizable]="false">
                         <h2>{{ 'settings.ru_sure' | translate }}</h2>
                         <p>{{ 'settings.capture.dvb.satellite_delete_desc' | translate }}</p>
                         <ng-template pTemplate="footer">
@@ -148,9 +154,11 @@
                     </p-dialog>
 
                     <app-lnb *ngIf="this.diseqcTree && this.diseqcTree.Type == 'lnb'" [diseqcTree]="diseqcTree"
-                        [diseqcTreeList]="diseqcTreeList" (baseEvent)="setDiseqcObject($event)"
-                        [dvbComponent]="this"></app-lnb>
-                    <app-rotor *ngIf="this.diseqcTree && this.diseqcTree.Type == 'rotor'"></app-rotor>
+                        [diseqcTreeList]="diseqcTreeList" (baseEvent)="setDiseqcObject($event)" [dvbComponent]="this">
+                    </app-lnb>
+                    <app-rotor *ngIf="this.diseqcTree && this.diseqcTree.Type == 'rotor'" [diseqcTree]="diseqcTree"
+                        [diseqcTreeList]="diseqcTreeList" (baseEvent)="setDiseqcObject($event)" [dvbComponent]="this">
+                    </app-rotor>
                     <app-switch *ngIf="this.diseqcTree && this.diseqcTree.Type == 'switch'"></app-switch>
                     <app-unicable *ngIf="this.diseqcTree && this.diseqcTree.Type == 'scr'"></app-unicable>
 

@@ -1,13 +1,20 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CaptureCard, CaptureCardList, CaptureDeviceList, CardTypeList, DiseqcTree, DiseqcTreeList } from './interfaces/capture-card.interface';
+import { CaptureCard, CaptureCardList, CaptureDeviceList, CardTypeList, DiseqcParm, DiseqcTree, DiseqcTreeList } from './interfaces/capture-card.interface';
 import { BoolResponse } from './interfaces/common.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CaptureCardService {
+
+  diseqcTypes: DiseqcParm[] = [
+    { description: "Switch", type: "switch", inactive: false },
+    { description: "Rotor", type: "rotor", inactive: false },
+    { description: "Unicable", type: "scr", inactive: false },
+    { description: "LNB", type: "lnb", inactive: false }
+  ];
 
   constructor(private httpClient: HttpClient) {
 
@@ -20,8 +27,8 @@ export class CaptureCardService {
     return this.httpClient.get<CaptureCardList>('/Capture/GetCaptureCardList', { params });
   }
 
-  public GetCardTypeList() : Observable<CardTypeList> {
-    return this.httpClient.get<CardTypeList>('/Capture/GetCardTypeList', { });
+  public GetCardTypeList(): Observable<CardTypeList> {
+    return this.httpClient.get<CardTypeList>('/Capture/GetCardTypeList', {});
   }
 
   public UpdateCaptureCard(Cardid: number, Setting: string, Value: string): Observable<BoolResponse> {
@@ -43,11 +50,11 @@ export class CaptureCardService {
     let params = new HttpParams()
       .set("CardType", CardType);
     return this.httpClient.get<CaptureDeviceList>('/Capture/GetCaptureDeviceList',
-       { params } );
+      { params });
   }
 
   public GetDiseqcTreeList(): Observable<DiseqcTreeList> {
-    return this.httpClient.get<DiseqcTreeList>('/Capture/GetDiseqcTreeList', { });
+    return this.httpClient.get<DiseqcTreeList>('/Capture/GetDiseqcTreeList', {});
   }
 
   public AddDiseqcTree(tree: DiseqcTree): Observable<number> {

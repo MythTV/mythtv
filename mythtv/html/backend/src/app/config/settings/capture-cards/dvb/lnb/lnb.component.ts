@@ -7,7 +7,7 @@ import { SetupService } from 'src/app/services/setup.service';
 import { DiseqcSettingBase } from '../diseqc-setting-base';
 import { DvbComponent } from '../dvb.component';
 import { delay } from 'rxjs/operators';
-import { Observable, Subscriber } from 'rxjs';
+import { Observable, Observer, Subscriber } from 'rxjs';
 
 interface LnbPreset {
   Name: string;
@@ -37,16 +37,14 @@ export class LnbComponent implements OnInit, AfterViewInit, DiseqcSettingBase {
   @ViewChild("lnbform")
   currentForm!: NgForm;
 
-  // @Output() formEvent = new EventEmitter<NgForm>();
   @Output() baseEvent = new EventEmitter<DiseqcSettingBase>();
-  // @Output() baseEvent = new EventEmitter<string>();
 
   work = {
     // These are needed to hold the values in mHz
     // The database values are in kHz
-    LnbLofSwitch : 0,
-    LnbLofLo : 0,
-    LnbLofHi : 0,
+    LnbLofSwitch: 0,
+    LnbLofLo: 0,
+    LnbLofHi: 0,
   }
 
   lnbSubTypes: LnbSubType[] = [
@@ -93,20 +91,16 @@ export class LnbComponent implements OnInit, AfterViewInit, DiseqcSettingBase {
 
   constructor(private captureCardService: CaptureCardService, private setupService: SetupService,
     private translate: TranslateService) {
-      this.lnbSubTypes.forEach(x => translate.get(x.Name).subscribe(data => x.Name = data));
-      this.lnbPresetList.forEach(x => translate.get(x.Name).subscribe(data => x.Name = data));
+    this.lnbSubTypes.forEach(x => translate.get(x.Name).subscribe(data => x.Name = data));
+    this.lnbPresetList.forEach(x => translate.get(x.Name).subscribe(data => x.Name = data));
   }
 
   ngOnInit(): void {
-    // initialize these in case of an "add card" request
-    // if (this.diseqcTree.ScrPin == undefined) {
-    //   this.diseqcTree.ScrPin = -1;
-    // }
     if (this.diseqcTree.DiseqcId) {
       // For presentation divide by 1000 to convert to Mhz
       this.work.LnbLofSwitch = this.diseqcTree.LnbLofSwitch / 1000;
-      this.work.LnbLofLo     = this.diseqcTree.LnbLofLo / 1000;
-      this.work.LnbLofHi     = this.diseqcTree.LnbLofHi / 1000;
+      this.work.LnbLofLo = this.diseqcTree.LnbLofLo / 1000;
+      this.work.LnbLofHi = this.diseqcTree.LnbLofHi / 1000;
       let result: LnbPreset | undefined;
       result = this.lnbPresetList.find
         (x => x.SubType == this.diseqcTree.SubType
@@ -142,7 +136,7 @@ export class LnbComponent implements OnInit, AfterViewInit, DiseqcSettingBase {
       setTimeout(() => {
         x.next(1);
         x.complete();
-      },100)
+      }, 100)
     })
     obs.subscribe(x => {
       this.currentForm.form.markAsPristine();
@@ -168,16 +162,33 @@ export class LnbComponent implements OnInit, AfterViewInit, DiseqcSettingBase {
     this.diseqcTree.SubType = this.currentSubType.SubType;
   }
 
-  saveForm(): Observable<any> {
+  saveForm(parent: number, observer: Observer<any>): void {
+    this.diseqcTree.ParentId = parent;
     // Convert values to mHz for saving
-    this.diseqcTree.LnbLofSwitch  = this.work.LnbLofSwitch * 1000;
-    this.diseqcTree.LnbLofLo      = this.work.LnbLofLo     * 1000;
-    this.diseqcTree.LnbLofHi      = this.work.LnbLofHi     * 1000;
+    this.diseqcTree.LnbLofSwitch = this.work.LnbLofSwitch * 1000;
+    this.diseqcTree.LnbLofLo = this.work.LnbLofLo * 1000;
+    this.diseqcTree.LnbLofHi = this.work.LnbLofHi * 1000;
 
     if (this.diseqcTree.DiseqcId)
-      return this.captureCardService.UpdateDiseqcTree(this.diseqcTree);
-    else
-      return this.captureCardService.AddDiseqcTree(this.diseqcTree);
+      this.captureCardService.UpdateDiseqcTree(this.diseqcTree).subscribe(observer);
+    else {
+      this.captureCardService.AddDiseqcTree(this.diseqcTree).subscribe({
+        next: (x: any) => {
+          if (x.int && x.int > 0) {
+            this.diseqcTree.DiseqcId = x.int;
+            observer.next(x);
+          }
+          else {
+            console.log("UpdateDiseqcTree", x)
+            observer.error(x);
+          }
+        },
+        error: (err: any) => {
+          console.log("UpdateDiseqcTree", err);
+          observer.error(err);
+        }
+      });
+    }
   }
 
 }

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { CaptureCardList, CaptureDevice, CaptureDeviceList, CardAndInput } from 'src/app/services/interfaces/capture-card.interface';
@@ -13,8 +13,8 @@ export class HdhomerunComponent implements OnInit, AfterViewInit {
 
   @Input() card!: CardAndInput;
   @Input() cardList!: CaptureCardList;
-  @ViewChild("hdhomerunform")
-  currentForm!: NgForm;
+  @ViewChild("hdhomerunform") currentForm!: NgForm;
+  @ViewChild("top") topElement!: ElementRef;
 
   work = {
     isReady: false,
@@ -49,6 +49,7 @@ export class HdhomerunComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.setupService.setCurrentForm(this.currentForm);
+    this.topElement.nativeElement.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
 

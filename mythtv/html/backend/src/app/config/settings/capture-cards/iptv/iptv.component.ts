@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { CaptureCardList, CardAndInput } from 'src/app/services/interfaces/capture-card.interface';
@@ -13,8 +13,8 @@ export class IptvComponent implements OnInit, AfterViewInit {
   @Input() card!: CardAndInput;
   @Input() cardList!: CaptureCardList;
 
-  @ViewChild("iptvform")
-  currentForm!: NgForm;
+  @ViewChild("iptvform") currentForm!: NgForm;
+  @ViewChild("top") topElement!: ElementRef;
 
   work = {
     successCount: 0,
@@ -31,6 +31,7 @@ export class IptvComponent implements OnInit, AfterViewInit {
     // Mark new card as dirty so it can be saved with default input value
     if (!this.card.CardId)
       this.currentForm.form.markAsDirty();
+    this.topElement.nativeElement.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   showHelp() {

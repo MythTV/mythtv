@@ -2,6 +2,7 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
+import { CanComponentDeactivate } from 'src/app/can-deactivate-guard.service';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { CaptureCardList, CardAndInput, CardType, CardTypeList, DiseqcTreeList } from 'src/app/services/interfaces/capture-card.interface';
 import { MythService } from 'src/app/services/myth.service';
@@ -13,7 +14,7 @@ import { SetupService } from 'src/app/services/setup.service';
   templateUrl: './capture-cards.component.html',
   styleUrls: ['./capture-cards.component.css']
 })
-export class CaptureCardsComponent implements OnInit {
+export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
 
   currentTab: number = -1;
   deletedTab = -1;
@@ -289,8 +290,10 @@ export class CaptureCardsComponent implements OnInit {
   };
 
   canDeactivate(): Observable<boolean> | boolean {
+    let currentForm = this.setupService.getCurrentForm();
     if (this.forms[this.currentTab] && (<NgForm>this.forms[this.currentTab]).dirty
-      || this.dirtyMessages.find(element => element == this.dirtyText)) {
+      || this.dirtyMessages.find(element => element == this.dirtyText)
+      || currentForm && currentForm.dirty) {
       return this.confirm(this.warningText);
     }
     return true;
@@ -298,8 +301,10 @@ export class CaptureCardsComponent implements OnInit {
 
   @HostListener('window:beforeunload', ['$event'])
   onWindowClose(event: any): void {
+    let currentForm = this.setupService.getCurrentForm();
     if (this.forms[this.currentTab] && (<NgForm>this.forms[this.currentTab]).dirty
-      || this.dirtyMessages.find(element => element == this.dirtyText)) {
+      || this.dirtyMessages.find(element => element == this.dirtyText)
+      || currentForm && currentForm.dirty) {
       event.preventDefault();
       event.returnValue = false;
     }

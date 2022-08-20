@@ -109,3 +109,9 @@ export interface DiseqcTreeList {
         DiseqcTrees: DiseqcTree [];
     }
 }
+
+export interface DiseqcParm {
+    description: string,
+    type: string,
+    inactive: boolean
+  }

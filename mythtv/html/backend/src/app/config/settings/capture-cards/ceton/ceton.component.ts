@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { delay } from 'rxjs/operators';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
@@ -15,17 +15,17 @@ export class CetonComponent implements OnInit, AfterViewInit {
 
   @Input() card!: CardAndInput;
   @Input() cardList!: CaptureCardList;
-  @ViewChild("cetonform")
-  currentForm!: NgForm;
+  @ViewChild("cetonform") currentForm!: NgForm;
+  @ViewChild("top") topElement!: ElementRef;
 
   work = {
-    ipAddress : '',
+    ipAddress: '',
     tuner: '',
     successCount: 0,
-    errorCount:   0,
+    errorCount: 0,
   };
 
-  constructor(private captureCardService : CaptureCardService, private setupService: SetupService) {
+  constructor(private captureCardService: CaptureCardService, private setupService: SetupService) {
   }
 
   ngOnInit(): void {
@@ -44,6 +44,7 @@ export class CetonComponent implements OnInit, AfterViewInit {
     this.currentForm.valueChanges!.pipe(delay(50)).subscribe(
       () => this.card.VideoDevice = this.work.ipAddress + '-RTP.' + this.work.tuner);
     this.setupService.setCurrentForm(this.currentForm);
+    this.topElement.nativeElement.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   showHelp() {
@@ -54,22 +55,22 @@ export class CetonComponent implements OnInit, AfterViewInit {
   // good response to add: {"int": 19}
   saveObserver = {
     next: (x: any) => {
-        if (this.card.CardId && x.bool)
-            this.work.successCount++;
-        else if (!this.card.CardId && x.int) {
-          this.work.successCount++;
-          this.card.CardId = x.int;
-        }
-        else {
-            this.work.errorCount++;
-            this.currentForm.form.markAsDirty();
-        }
-    },
-    error: (err: any) => {
-        console.error(err);
+      if (this.card.CardId && x.bool)
+        this.work.successCount++;
+      else if (!this.card.CardId && x.int) {
+        this.work.successCount++;
+        this.card.CardId = x.int;
+      }
+      else {
         this.work.errorCount++;
         this.currentForm.form.markAsDirty();
-      },
+      }
+    },
+    error: (err: any) => {
+      console.error(err);
+      this.work.errorCount++;
+      this.currentForm.form.markAsDirty();
+    },
   };
 
   saveForm() {
@@ -81,11 +82,11 @@ export class CetonComponent implements OnInit, AfterViewInit {
       this.cardList.CaptureCardList.CaptureCards.forEach(card => {
         if (card.CardId == this.card.CardId || card.ParentId == this.card.CardId) {
           this.captureCardService.UpdateCaptureCard(card.CardId, 'videodevice', this.card.VideoDevice)
-              .subscribe(this.saveObserver);
+            .subscribe(this.saveObserver);
           this.captureCardService.UpdateCaptureCard(card.CardId, 'signal_timeout', String(this.card.SignalTimeout))
-              .subscribe(this.saveObserver);
+            .subscribe(this.saveObserver);
           this.captureCardService.UpdateCaptureCard(card.CardId, 'channel_timeout', String(this.card.ChannelTimeout))
-              .subscribe(this.saveObserver);
+            .subscribe(this.saveObserver);
         }
       });
     }

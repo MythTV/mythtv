@@ -1,16 +1,17 @@
-import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import { Observer, PartialObserver } from 'rxjs';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
-import { CaptureCardList, CaptureDevice, CaptureDeviceList, CardAndInput, DiseqcTree, DiseqcTreeList } from 'src/app/services/interfaces/capture-card.interface';
+import { CaptureCardList, CaptureDevice, CaptureDeviceList, CardAndInput, DiseqcParm, DiseqcTree, DiseqcTreeList } from 'src/app/services/interfaces/capture-card.interface';
 import { SetupService } from 'src/app/services/setup.service';
 import { DiseqcSettingBase } from './diseqc-setting-base';
 
-interface diseqcParm {
-  description: string,
-  type: string,
-  inactive: boolean
-}
+// interface diseqcParm {
+//   description: string,
+//   type: string,
+//   inactive: boolean
+// }
 
 @Component({
   selector: 'app-dvb',
@@ -22,8 +23,9 @@ export class DvbComponent implements OnInit, AfterViewInit {
   @Input() card!: CardAndInput;
   @Input() cardList!: CaptureCardList;
 
-  @ViewChild("dvbform")
-  currentForm!: NgForm;
+  @ViewChild("dvbform") currentForm!: NgForm;
+  @ViewChild("top") topElement!: ElementRef;
+
   diseqcComponent!: DiseqcSettingBase;
 
   work = {
@@ -51,12 +53,12 @@ export class DvbComponent implements OnInit, AfterViewInit {
 
   diseqcTree: DiseqcTree | undefined = undefined;
 
-  diseqcTypes: diseqcParm[] = [
-    { description: "Switch", type: "switch", inactive: false },
-    { description: "Rotor", type: "rotor", inactive: false },
-    { description: "Unicable", type: "scr", inactive: false },
-    { description: "LNB", type: "lnb", inactive: false }
-  ];
+  // diseqcTypes: diseqcParm[] = [
+  //   { description: "Switch", type: "switch", inactive: false },
+  //   { description: "Rotor", type: "rotor", inactive: false },
+  //   { description: "Unicable", type: "scr", inactive: false },
+  //   { description: "LNB", type: "lnb", inactive: false }
+  // ];
 
   messages = {
     devNotExist: 'settings.capture.dvb.devNotExist',
@@ -67,9 +69,9 @@ export class DvbComponent implements OnInit, AfterViewInit {
 
   currentDevice: CaptureDevice = <CaptureDevice>{ FrontendName: "Unknown", InputNames: [''] };
 
-  selectedDiseqcType: diseqcParm = { description: "", type: "", inactive: true };
+  selectedDiseqcType: DiseqcParm = { description: "", type: "", inactive: true };
 
-  constructor(private captureCardService: CaptureCardService, private setupService: SetupService,
+  constructor(public captureCardService: CaptureCardService, private setupService: SetupService,
     private translate: TranslateService) {
     translate.get(this.messages.devNotExist).subscribe(data => this.messages.devNotExist = data);
     translate.get(this.messages.unknownName).subscribe(data => this.messages.unknownName = data);
@@ -119,6 +121,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.setupService.setCurrentForm(this.currentForm);
+    this.topElement.nativeElement.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   setupDiseqc(): void {
@@ -220,7 +223,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
     // Check if already in use
     let match = this.cardList.CaptureCardList.CaptureCards.find
       (x => x.VideoDevice == this.currentDevice.VideoDevice
-        && x.CardId != this.card.CardId && x.ParentId != this.card.CardId);
+        && x.CardId != this.card.CardId);
     if (match)
       this.work.warningMessage = this.messages.devInUse;
     else
@@ -233,11 +236,14 @@ export class DvbComponent implements OnInit, AfterViewInit {
   }
 
   // good response to add: {"int": 19}
-  saveObserver = {
+  saveObserver : PartialObserver<any> = {
     next: (x: any) => {
-      if (this.card.CardId && x.bool)
+      if (x.bool) {
+        console.log("saveObserver success",x);
         this.work.successCount++;
+      }
       else if (!this.card.CardId && x.int) {
+        console.log("saveObserver success",x);
         this.work.successCount++;
         if (!this.card.CardId) {
           this.card.CardId = x.int;
@@ -250,16 +256,16 @@ export class DvbComponent implements OnInit, AfterViewInit {
         }
       }
       else {
-        console.log("saveObserver",x);
+        console.log("saveObserver error",x);
         this.work.errorCount++;
         this.currentForm.form.markAsDirty();
       }
     },
     error: (err: any) => {
-      console.log("saveObserver", err);
+      console.log("saveObserver error", err);
       this.work.errorCount++;
       this.currentForm.form.markAsDirty();
-    },
+    }
   };
 
 
@@ -268,7 +274,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
     this.work.errorCount = 0;
     //  Save diseqcTree
     if (this.diseqcTree && this.diseqcComponent) {
-      this.diseqcComponent.saveForm().subscribe({
+      this.diseqcComponent.saveForm(0,{
         next: (x: any) => {
           if (this.card.DiSEqCId && x.bool
             && this.card.DiSEqCId == this.diseqcTree?.DiseqcId) {
@@ -291,7 +297,8 @@ export class DvbComponent implements OnInit, AfterViewInit {
           console.log("saveForm", err);
           this.work.errorCount++;
           this.currentForm.form.markAsDirty();
-        }
+        },
+        complete : () => {}
       });
     }
     else

@@ -1,1 +1,177 @@
-<p>rotor setup is not yet implemented</p>
+<form class="ml-3 mr-3" name="rotorform" #rotorform="ngForm">
+    <p-card class="m-5">
+        <ng-template pTemplate="title">
+            {{ 'settings.capture.diseqc.rotor.title' | translate }}
+        </ng-template>
+        <ng-template pTemplate="subtitle">
+        </ng-template>
+        <ng-template pTemplate="content">
+            <div class="grid">
+                <div class="mb-4 w-full">
+
+                    <div class="form-group field">
+                        <label for="CmdRepeat" class="block">{{ 'settings.capture.diseqc.rotor.cmdrepeat_label' |
+                            translate
+                            }}</label>
+                        <p-inputNumber [(ngModel)]="diseqcTree.CmdRepeat" name="CmdRepeat" id="CmdRepeat"
+                            [showButtons]="true" [min]="0" [max]="15" [step]="1"></p-inputNumber>
+                        <small class="block">
+                            <div [innerHTML]="'settings.capture.diseqc.rotor.cmdrepeat_desc' | translate"></div>
+                        </small>
+                    </div>
+
+                    <div class="form-group field" [style]="{'width':'25rem'}">
+                        <label for="SubType" class="block">{{ 'settings.capture.diseqc.rotor.type_label' | translate
+                            }}</label>
+                        <p-dropdown [options]="rotorSubTypes" [(ngModel)]="currentSubType" [editable]="false"
+                            optionLabel="Name" (onChange)="updateSubType();" [maxlength]="0"
+                            [style]="{'minWidth':'80%'}" name="SubType" #SubType="ngModel">
+                        </p-dropdown>
+                        <small class="block">
+                            {{ 'settings.capture.diseqc.rotor.type_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field" *ngIf="diseqcTree.SubType == 'diseqc_1_2'">
+                        <label for="RotorPositions" class="block">{{ 'settings.capture.diseqc.rotor.positions_label' |
+                            translate }}</label>
+                        <div [style]="{'width':'25rem'}">
+                            <p-table [value]="rotorPositions" dataKey="Num" responsiveLayout="scroll"
+                                name="RotorPositions" styleClass="p-datatable-gridlines" [scrollable]="true"
+                                scrollHeight="20rem">
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th>Position #</th>
+                                        <th>Angle (Degrees)</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-position>
+                                    <tr>
+                                        <td>
+                                            {{position.Num}}
+                                        </td>
+                                        <td pEditableColumn>
+                                            <p-cellEditor>
+                                                <ng-template pTemplate="input">
+                                                    <p-inputNumber [(ngModel)]="position.Angle" name="Angle"
+                                                        [min]="-180" [max]="180" [maxFractionDigits]="5" >
+                                                    </p-inputNumber>
+                                                </ng-template>
+                                                <ng-template pTemplate="output">
+                                                    <div *ngIf="position.Angle < 0">{{position.Angle}} (W)</div>
+                                                    <div *ngIf="position.Angle!=null && position.Angle >= 0">
+                                                        {{position.Angle}} (E)</div>
+                                                </ng-template>
+                                            </p-cellEditor>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                        <small class="block">
+                            {{ 'settings.capture.diseqc.rotor.positions_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="RotorLoSpeed" class="block">{{ 'settings.capture.diseqc.rotor.lospeed_label' |
+                            translate }}</label>
+                        <p-inputNumber [(ngModel)]="diseqcTree.RotorLoSpeed" name="RotorLoSpeed" id="RotorLoSpeed"
+                            mode="decimal" [maxFractionDigits]="5">
+                        </p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.capture.diseqc.rotor.lospeed_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="RotorHiSpeed" class="block">{{ 'settings.capture.diseqc.rotor.hispeed_label' |
+                            translate }}</label>
+                        <p-inputNumber [(ngModel)]="diseqcTree.RotorHiSpeed" name="RotorHiSpeed" id="RotorHiSpeed"
+                            mode="decimal" [maxFractionDigits]="5">
+                        </p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.capture.diseqc.rotor.hispeed_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="Latitude" class="block">{{ 'settings.capture.diseqc.rotor.latitude_label' |
+                            translate }}</label>
+                        <p-inputNumber [(ngModel)]="fields.Latitude" name="Latitude" id="Latitude" mode="decimal" [maxFractionDigits]="5">
+                        </p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.capture.diseqc.rotor.latitude_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="Longitude" class="block">{{ 'settings.capture.diseqc.rotor.longitude_label' |
+                            translate }}</label>
+                        <p-inputNumber [(ngModel)]="fields.Longitude" name="Longitude" id="Longitude" mode="decimal" [maxFractionDigits]="5">
+                        </p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.capture.diseqc.rotor.longitude_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <!-- Next Device Panel -->
+                    <p-fieldset class="mb-4 w-full" legend="{{ 'settings.capture.dvb.satellite_heading' | translate }}"
+                        [toggleable]="true" [collapsed]="true">
+                        <p-button label="{{ 'settings.capture.dvb.newsatellite_button' | translate }}"
+                            *ngIf="!diseqcSubTree" (onClick)="work.displayNewDiseqc = true" icon="pi pi-plus-circle"
+                            styleClass="p-button-plain">
+                        </p-button>
+                        <p-dialog header="{{ 'settings.capture.dvb.newsatellite_heading' | translate }}"
+                            [(visible)]="work.displayNewDiseqc" [modal]="true" [style]="{width: '50vw'}"
+                            [draggable]="false" [resizable]="false">
+                            <p>{{ 'settings.capture.dvb.newsatellite_devtype' | translate }}</p>
+                            <p-listbox [options]="captureCardService.diseqcTypes" [(ngModel)]="selectedDiseqcType"
+                                optionLabel="description" name="disenqcTypes" optionDisabled="inactive"
+                                (onDblClick)="newDiseqc();"></p-listbox>
+                            <ng-template pTemplate="footer">
+                                <p-button icon="pi pi-times-circle" (onClick)="work.displayNewDiseqc=false"
+                                    label="{{ 'common.cancel' | translate }}" styleClass="p-button-plain">
+                                </p-button>
+                                <p-button icon="pi pi-check-circle" (onClick)="newDiseqc();"
+                                    label="{{ 'common.ok' | translate }}" styleClass="p-button-plain"
+                                    [disabled]="selectedDiseqcType.inactive">
+                                </p-button>
+                            </ng-template>
+                        </p-dialog>
+
+                        <p-button styleClass="p-button-warning" *ngIf="diseqcSubTree" label="Delete Satellite Devices"
+                            icon="pi pi-trash" (onClick)="work.displayDeleteDiseqc=true" [disabled]="!diseqcSubTree">
+                        </p-button>
+                        <p-dialog header="{{ 'settings.capture.dvb.satellite_delete_header' | translate }}"
+                            [(visible)]="work.displayDeleteDiseqc" [modal]="true" [style]="{width: '50vw'}"
+                            [draggable]="false" [resizable]="false">
+                            <h2>{{ 'settings.ru_sure' | translate }}</h2>
+                            <p>{{ 'settings.capture.dvb.satellite_delete_desc' | translate }}</p>
+                            <ng-template pTemplate="footer">
+                                <p-button icon="pi pi-times-circle" (click)="work.displayDeleteDiseqc=false"
+                                    label="{{ 'common.no' | translate }}" styleClass="p-button-plain">
+                                </p-button>
+                                <p-button icon="pi pi-check-circle" (click)="deleteDiseqc()"
+                                    label="{{ 'common.yes' | translate }}" styleClass="p-button-plain"></p-button>
+                            </ng-template>
+                        </p-dialog>
+
+                        <app-lnb *ngIf="this.diseqcSubTree && this.diseqcSubTree.Type == 'lnb'"
+                            [diseqcTree]="diseqcSubTree" [diseqcTreeList]="diseqcTreeList"
+                            (baseEvent)="setDiseqcObject($event)" [dvbComponent]="dvbComponent">
+                        </app-lnb>
+                        <app-rotor *ngIf="this.diseqcSubTree && this.diseqcSubTree.Type == 'rotor'"
+                            [diseqcTree]="diseqcSubTree" [diseqcTreeList]="diseqcTreeList"
+                            (baseEvent)="setDiseqcObject($event)" [dvbComponent]="dvbComponent">
+                        </app-rotor>
+                        <app-switch *ngIf="this.diseqcSubTree && this.diseqcSubTree.Type == 'switch'"></app-switch>
+                        <app-unicable *ngIf="this.diseqcSubTree && this.diseqcSubTree.Type == 'scr'"></app-unicable>
+
+                    </p-fieldset>
+
+                </div>
+            </div>
+        </ng-template>
+    </p-card>
+</form>
