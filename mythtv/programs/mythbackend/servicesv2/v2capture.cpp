@@ -941,8 +941,7 @@ bool V2Capture::UpdateDiseqcTree  ( uint           DiseqcId,
         MythDB::DBError("MythAPI::UpdateDiseqcTree()", query);
         throw( QString( "Database Error executing query." ));
     }
-    int numrows = query.numRowsAffected();
-    return numrows > 0;
+    return true;
 }
 
 bool  V2Capture::RemoveDiseqcTree  ( uint DiseqcId)
