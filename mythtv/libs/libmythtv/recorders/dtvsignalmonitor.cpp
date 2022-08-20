@@ -373,6 +373,12 @@ void DTVSignalMonitor::HandlePMT(uint /*program_num*/, const ProgramMapTable *pm
         }
         return; // Not the PMT we are looking for...
     }
+    else
+    {
+        LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+            QString("Found PMT; pmt->ProgramNumber(%1)")
+            .arg(pmt->ProgramNumber()));
+    }
 
     LOG(VB_CHANNEL, LOG_DEBUG, LOC +
         QString("Found PMT; pmt->ProgramNumber(%1)")
