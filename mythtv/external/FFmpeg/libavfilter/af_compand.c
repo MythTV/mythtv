@@ -100,36 +100,6 @@ static av_cold void uninit(AVFilterContext *ctx)
     av_frame_free(&s->delay_frame);
 }
 
-static int query_formats(AVFilterContext *ctx)
-{
-    AVFilterChannelLayouts *layouts;
-    AVFilterFormats *formats;
-    static const enum AVSampleFormat sample_fmts[] = {
-        AV_SAMPLE_FMT_DBLP,
-        AV_SAMPLE_FMT_NONE
-    };
-    int ret;
-
-    layouts = ff_all_channel_counts();
-    if (!layouts)
-        return AVERROR(ENOMEM);
-    ret = ff_set_common_channel_layouts(ctx, layouts);
-    if (ret < 0)
-        return ret;
-
-    formats = ff_make_format_list(sample_fmts);
-    if (!formats)
-        return AVERROR(ENOMEM);
-    ret = ff_set_common_formats(ctx, formats);
-    if (ret < 0)
-        return ret;
-
-    formats = ff_all_samplerates();
-    if (!formats)
-        return AVERROR(ENOMEM);
-    return ff_set_common_samplerates(ctx, formats);
-}
-
 static void count_items(char *item_str, int *nb_items)
 {
     char *p;
@@ -176,7 +146,7 @@ static int compand_nodelay(AVFilterContext *ctx, AVFrame *frame)
 {
     CompandContext *s    = ctx->priv;
     AVFilterLink *inlink = ctx->inputs[0];
-    const int channels   = inlink->channels;
+    const int channels   = inlink->ch_layout.nb_channels;
     const int nb_samples = frame->nb_samples;
     AVFrame *out_frame;
     int chan, i;
@@ -222,7 +192,7 @@ static int compand_delay(AVFilterContext *ctx, AVFrame *frame)
 {
     CompandContext *s    = ctx->priv;
     AVFilterLink *inlink = ctx->inputs[0];
-    const int channels = inlink->channels;
+    const int channels = inlink->ch_layout.nb_channels;
     const int nb_samples = frame->nb_samples;
     int chan, i, av_uninit(dindex), oindex, av_uninit(count);
     AVFrame *out_frame   = NULL;
@@ -294,7 +264,7 @@ static int compand_drain(AVFilterLink *outlink)
 {
     AVFilterContext *ctx = outlink->src;
     CompandContext *s    = ctx->priv;
-    const int channels   = outlink->channels;
+    const int channels   = outlink->ch_layout.nb_channels;
     AVFrame *frame       = NULL;
     int chan, i, dindex;
 
@@ -332,7 +302,7 @@ static int config_output(AVFilterLink *outlink)
     const int sample_rate = outlink->sample_rate;
     double radius         = s->curve_dB * M_LN10 / 20.0;
     char *p, *saveptr     = NULL;
-    const int channels    = outlink->channels;
+    const int channels    = outlink->ch_layout.nb_channels;
     int nb_attacks, nb_decays, nb_points;
     int new_nb_items, num;
     int i;
@@ -357,9 +327,9 @@ static int config_output(AVFilterLink *outlink)
 
     uninit(ctx);
 
-    s->channels = av_mallocz_array(channels, sizeof(*s->channels));
+    s->channels = av_calloc(channels, sizeof(*s->channels));
     s->nb_segments = (nb_points + 4) * 2;
-    s->segments = av_mallocz_array(s->nb_segments, sizeof(*s->segments));
+    s->segments = av_calloc(s->nb_segments, sizeof(*s->segments));
 
     if (!s->channels || !s->segments) {
         uninit(ctx);
@@ -533,7 +503,13 @@ static int config_output(AVFilterLink *outlink)
 
     s->delay_frame->format         = outlink->format;
     s->delay_frame->nb_samples     = s->delay_samples;
+#if FF_API_OLD_CHANNEL_LAYOUT
+FF_DISABLE_DEPRECATION_WARNINGS
     s->delay_frame->channel_layout = outlink->channel_layout;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+    if ((err = av_channel_layout_copy(&s->delay_frame->ch_layout, &outlink->ch_layout)) < 0)
+        return err;
 
     err = av_frame_get_buffer(s->delay_frame, 0);
     if (err)
@@ -571,7 +547,6 @@ static const AVFilterPad compand_inputs[] = {
         .type         = AVMEDIA_TYPE_AUDIO,
         .filter_frame = filter_frame,
     },
-    { NULL }
 };
 
 static const AVFilterPad compand_outputs[] = {
@@ -581,19 +556,18 @@ static const AVFilterPad compand_outputs[] = {
         .config_props  = config_output,
         .type          = AVMEDIA_TYPE_AUDIO,
     },
-    { NULL }
 };
 
 
-AVFilter ff_af_compand = {
+const AVFilter ff_af_compand = {
     .name           = "compand",
     .description    = NULL_IF_CONFIG_SMALL(
             "Compress or expand audio dynamic range."),
-    .query_formats  = query_formats,
     .priv_size      = sizeof(CompandContext),
     .priv_class     = &compand_class,
     .init           = init,
     .uninit         = uninit,
-    .inputs         = compand_inputs,
-    .outputs        = compand_outputs,
+    FILTER_INPUTS(compand_inputs),
+    FILTER_OUTPUTS(compand_outputs),
+    FILTER_SINGLE_SAMPLEFMT(AV_SAMPLE_FMT_DBLP),
 };

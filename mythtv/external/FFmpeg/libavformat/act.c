@@ -18,10 +18,12 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
+#include "libavutil/intreadwrite.h"
 #include "avformat.h"
+#include "avio_internal.h"
 #include "riff.h"
 #include "internal.h"
-#include "libavcodec/get_bits.h"
 
 #define CHUNK_SIZE 512
 #define RIFF_TAG MKTAG('R','I','F','F')
@@ -66,6 +68,7 @@ static int read_header(AVFormatContext *s)
     AVIOContext *pb = s->pb;
     int size;
     AVStream* st;
+    int ret;
 
     int min,sec,msec;
 
@@ -75,7 +78,9 @@ static int read_header(AVFormatContext *s)
 
     avio_skip(pb, 16);
     size=avio_rl32(pb);
-    ff_get_wav_header(s, pb, st->codecpar, size, 0);
+    ret = ff_get_wav_header(s, pb, st->codecpar, size, 0);
+    if (ret < 0)
+        return ret;
 
     /*
       8000Hz (Fine-rec) file format has 10 bytes long
@@ -87,7 +92,7 @@ static int read_header(AVFormatContext *s)
     }
 
     st->codecpar->frame_size=80;
-    st->codecpar->channels=1;
+    st->codecpar->ch_layout.nb_channels = 1;
     avpriv_set_pts_info(st, 64, 1, 100);
 
     st->codecpar->codec_id=AV_CODEC_ID_G729;
@@ -126,12 +131,10 @@ static int read_packet(AVFormatContext *s,
 
     if(s->streams[0]->codecpar->sample_rate==4400 && !ctx->second_packet)
     {
-        ret = avio_read(pb, ctx->audio_buffer, frame_size);
+        ret = ffio_read_size(pb, ctx->audio_buffer, frame_size);
 
         if(ret<0)
             return ret;
-        if(ret!=frame_size)
-            return AVERROR(EIO);
 
         pkt->data[0]=ctx->audio_buffer[11];
         pkt->data[1]=ctx->audio_buffer[0];
@@ -165,12 +168,10 @@ static int read_packet(AVFormatContext *s,
     }
     else // 8000 Hz
     {
-        ret = avio_read(pb, ctx->audio_buffer, frame_size);
+        ret = ffio_read_size(pb, ctx->audio_buffer, frame_size);
 
         if(ret<0)
             return ret;
-        if(ret!=frame_size)
-            return AVERROR(EIO);
 
         pkt->data[0]=ctx->audio_buffer[5];
         pkt->data[1]=ctx->audio_buffer[0];
@@ -197,7 +198,7 @@ static int read_packet(AVFormatContext *s,
     return ret;
 }
 
-AVInputFormat ff_act_demuxer = {
+const AVInputFormat ff_act_demuxer = {
     .name           = "act",
     .long_name      = "ACT Voice file format",
     .priv_data_size = sizeof(ACTContext),

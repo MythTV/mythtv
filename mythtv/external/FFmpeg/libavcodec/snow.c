@@ -23,6 +23,7 @@
 #include "libavutil/opt.h"
 #include "libavutil/thread.h"
 #include "avcodec.h"
+#include "encode.h"
 #include "me_cmp.h"
 #include "snow_dwt.h"
 #include "internal.h"
@@ -31,7 +32,6 @@
 
 #include "rangecoder.h"
 #include "mathops.h"
-#include "h263.h"
 
 
 void ff_snow_inner_add_yblock(const uint8_t *obmc, const int obmc_stride, uint8_t * * block, int b_w, int b_h,
@@ -77,8 +77,11 @@ int ff_snow_get_buffer(SnowContext *s, AVFrame *frame)
     if (edges_needed) {
         frame->width  += 2 * EDGE_WIDTH;
         frame->height += 2 * EDGE_WIDTH;
-    }
-    if ((ret = ff_get_buffer(s->avctx, frame, AV_GET_BUFFER_FLAG_REF)) < 0)
+
+        ret = ff_encode_alloc_frame(s->avctx, frame);
+    } else
+        ret = ff_get_buffer(s->avctx, frame, AV_GET_BUFFER_FLAG_REF);
+    if (ret < 0)
         return ret;
     if (edges_needed) {
         for (i = 0; frame->data[i]; i++) {
@@ -116,22 +119,13 @@ int ff_snow_alloc_blocks(SnowContext *s){
     s->b_height= h;
 
     av_free(s->block);
-    s->block= av_mallocz_array(w * h,  sizeof(BlockNode) << (s->block_max_depth*2));
+    s->block = av_calloc(w * h,  sizeof(*s->block) << (s->block_max_depth*2));
     if (!s->block)
         return AVERROR(ENOMEM);
 
     return 0;
 }
 
-static av_cold void init_qexp(void){
-    int i;
-    double v=128;
-
-    for(i=0; i<QROOT; i++){
-        ff_qexp[i]= lrintf(v);
-        v *= pow(2, 1.0 / QROOT);
-    }
-}
 static void mc_block(Plane *p, uint8_t *dst, const uint8_t *src, int stride, int b_w, int b_h, int dx, int dy){
     static const uint8_t weight[64]={
     8,7,6,5,4,3,2,1,
@@ -433,7 +427,6 @@ static av_cold void snow_static_init(void)
     for (int i = 0; i < MAX_REF_FRAMES; i++)
         for (int j = 0; j < MAX_REF_FRAMES; j++)
             ff_scale_mv_ref[i][j] = 256 * (i + 1) / (j + 1);
-    init_qexp();
 }
 
 av_cold int ff_snow_common_init(AVCodecContext *avctx){
@@ -524,16 +517,20 @@ int ff_snow_common_init_after_header(AVCodecContext *avctx) {
     int ret, emu_buf_size;
 
     if(!s->scratchbuf) {
-        if ((ret = ff_get_buffer(s->avctx, s->mconly_picture,
-                                 AV_GET_BUFFER_FLAG_REF)) < 0)
-            return ret;
+        if (av_codec_is_decoder(avctx->codec)) {
+            if ((ret = ff_get_buffer(s->avctx, s->mconly_picture,
+                                     AV_GET_BUFFER_FLAG_REF)) < 0)
+                return ret;
+        }
+
         emu_buf_size = FFMAX(s->mconly_picture->linesize[0], 2*avctx->width+256) * (2 * MB_SIZE + HTAPS_MAX - 1);
         if (!FF_ALLOCZ_TYPED_ARRAY(s->scratchbuf,      FFMAX(s->mconly_picture->linesize[0], 2*avctx->width+256) * 7 * MB_SIZE) ||
             !FF_ALLOCZ_TYPED_ARRAY(s->emu_edge_buffer, emu_buf_size))
             return AVERROR(ENOMEM);
     }
 
-    if(s->mconly_picture->format != avctx->pix_fmt) {
+    if (av_codec_is_decoder(avctx->codec) &&
+        s->mconly_picture->format != avctx->pix_fmt) {
         av_log(avctx, AV_LOG_ERROR, "pixel format changed\n");
         return AVERROR_INVALIDDATA;
     }
@@ -577,7 +574,8 @@ int ff_snow_common_init_after_header(AVCodecContext *avctx) {
                     b->parent= &s->plane[plane_index].band[level-1][orientation];
                 //FIXME avoid this realloc
                 av_freep(&b->x_coeff);
-                b->x_coeff=av_mallocz_array(((b->width+1) * b->height+1), sizeof(x_and_coeff));
+                b->x_coeff = av_calloc((b->width + 1) * b->height + 1,
+                                       sizeof(*b->x_coeff));
                 if (!b->x_coeff)
                     return AVERROR(ENOMEM);
             }

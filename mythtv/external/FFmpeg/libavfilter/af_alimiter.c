@@ -24,15 +24,20 @@
  * Lookahead limiter filter
  */
 
-#include "libavutil/avassert.h"
 #include "libavutil/channel_layout.h"
 #include "libavutil/common.h"
+#include "libavutil/fifo.h"
 #include "libavutil/opt.h"
 
 #include "audio.h"
 #include "avfilter.h"
 #include "formats.h"
 #include "internal.h"
+
+typedef struct MetaItem {
+    int64_t pts;
+    int nb_samples;
+} MetaItem;
 
 typedef struct AudioLimiterContext {
     const AVClass *class;
@@ -56,6 +61,14 @@ typedef struct AudioLimiterContext {
     int *nextpos;
     double *nextdelta;
 
+    int in_trim;
+    int out_pad;
+    int64_t next_in_pts;
+    int64_t next_out_pts;
+    int latency;
+
+    AVFifo *fifo;
+
     double delta;
     int nextiter;
     int nextlen;
@@ -63,18 +76,18 @@ typedef struct AudioLimiterContext {
 } AudioLimiterContext;
 
 #define OFFSET(x) offsetof(AudioLimiterContext, x)
-#define A AV_OPT_FLAG_AUDIO_PARAM
-#define F AV_OPT_FLAG_FILTERING_PARAM
+#define AF AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_FILTERING_PARAM | AV_OPT_FLAG_RUNTIME_PARAM
 
 static const AVOption alimiter_options[] = {
-    { "level_in",  "set input level",  OFFSET(level_in),     AV_OPT_TYPE_DOUBLE, {.dbl=1},.015625,   64, A|F },
-    { "level_out", "set output level", OFFSET(level_out),    AV_OPT_TYPE_DOUBLE, {.dbl=1},.015625,   64, A|F },
-    { "limit",     "set limit",        OFFSET(limit),        AV_OPT_TYPE_DOUBLE, {.dbl=1}, 0.0625,    1, A|F },
-    { "attack",    "set attack",       OFFSET(attack),       AV_OPT_TYPE_DOUBLE, {.dbl=5},    0.1,   80, A|F },
-    { "release",   "set release",      OFFSET(release),      AV_OPT_TYPE_DOUBLE, {.dbl=50},     1, 8000, A|F },
-    { "asc",       "enable asc",       OFFSET(auto_release), AV_OPT_TYPE_BOOL,   {.i64=0},      0,    1, A|F },
-    { "asc_level", "set asc level",    OFFSET(asc_coeff),    AV_OPT_TYPE_DOUBLE, {.dbl=0.5},    0,    1, A|F },
-    { "level",     "auto level",       OFFSET(auto_level),   AV_OPT_TYPE_BOOL,   {.i64=1},      0,    1, A|F },
+    { "level_in",  "set input level",  OFFSET(level_in),     AV_OPT_TYPE_DOUBLE, {.dbl=1},.015625,   64, AF },
+    { "level_out", "set output level", OFFSET(level_out),    AV_OPT_TYPE_DOUBLE, {.dbl=1},.015625,   64, AF },
+    { "limit",     "set limit",        OFFSET(limit),        AV_OPT_TYPE_DOUBLE, {.dbl=1}, 0.0625,    1, AF },
+    { "attack",    "set attack",       OFFSET(attack),       AV_OPT_TYPE_DOUBLE, {.dbl=5},    0.1,   80, AF },
+    { "release",   "set release",      OFFSET(release),      AV_OPT_TYPE_DOUBLE, {.dbl=50},     1, 8000, AF },
+    { "asc",       "enable asc",       OFFSET(auto_release), AV_OPT_TYPE_BOOL,   {.i64=0},      0,    1, AF },
+    { "asc_level", "set asc level",    OFFSET(asc_coeff),    AV_OPT_TYPE_DOUBLE, {.dbl=0.5},    0,    1, AF },
+    { "level",     "auto level",       OFFSET(auto_level),   AV_OPT_TYPE_BOOL,   {.i64=1},      0,    1, AF },
+    { "latency",   "compensate delay", OFFSET(latency),      AV_OPT_TYPE_BOOL,   {.i64=0},      0,    1, AF },
     { NULL }
 };
 
@@ -118,7 +131,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     AudioLimiterContext *s = ctx->priv;
     AVFilterLink *outlink = ctx->outputs[0];
     const double *src = (const double *)in->data[0];
-    const int channels = inlink->channels;
+    const int channels = inlink->ch_layout.nb_channels;
     const int buffer_size = s->buffer_size;
     double *dst, *buffer = s->buffer;
     const double release = s->release;
@@ -131,6 +144,11 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     AVFrame *out;
     double *buf;
     int n, c, i;
+    int new_out_samples;
+    int64_t out_duration;
+    int64_t in_duration;
+    int64_t in_pts;
+    MetaItem meta;
 
     if (av_frame_is_writable(in)) {
         out = in;
@@ -271,40 +289,67 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
         dst += channels;
     }
 
+    in_duration = av_rescale_q(in->nb_samples,  inlink->time_base, av_make_q(1,  in->sample_rate));
+    in_pts = in->pts;
+    meta = (MetaItem){ in->pts, in->nb_samples };
+    av_fifo_write(s->fifo, &meta, 1);
     if (in != out)
         av_frame_free(&in);
+
+    new_out_samples = out->nb_samples;
+    if (s->in_trim > 0) {
+        int trim = FFMIN(new_out_samples, s->in_trim);
+        new_out_samples -= trim;
+        s->in_trim -= trim;
+    }
+
+    if (new_out_samples <= 0) {
+        av_frame_free(&out);
+        return 0;
+    } else if (new_out_samples < out->nb_samples) {
+        int offset = out->nb_samples - new_out_samples;
+        memmove(out->extended_data[0], out->extended_data[0] + sizeof(double) * offset * out->ch_layout.nb_channels,
+                sizeof(double) * new_out_samples * out->ch_layout.nb_channels);
+        out->nb_samples = new_out_samples;
+        s->in_trim = 0;
+    }
+
+    av_fifo_read(s->fifo, &meta, 1);
+
+    out_duration = av_rescale_q(out->nb_samples, inlink->time_base, av_make_q(1, out->sample_rate));
+    in_duration  = av_rescale_q(meta.nb_samples, inlink->time_base, av_make_q(1, out->sample_rate));
+    in_pts       = meta.pts;
+
+    if (s->next_out_pts != AV_NOPTS_VALUE && out->pts != s->next_out_pts &&
+        s->next_in_pts  != AV_NOPTS_VALUE && in_pts   == s->next_in_pts) {
+        out->pts = s->next_out_pts;
+    } else {
+        out->pts = in_pts;
+    }
+    s->next_in_pts  = in_pts   + in_duration;
+    s->next_out_pts = out->pts + out_duration;
 
     return ff_filter_frame(outlink, out);
 }
 
-static int query_formats(AVFilterContext *ctx)
+static int request_frame(AVFilterLink* outlink)
 {
-    AVFilterFormats *formats;
-    AVFilterChannelLayouts *layouts;
-    static const enum AVSampleFormat sample_fmts[] = {
-        AV_SAMPLE_FMT_DBL,
-        AV_SAMPLE_FMT_NONE
-    };
+    AVFilterContext *ctx = outlink->src;
+    AudioLimiterContext *s = (AudioLimiterContext*)ctx->priv;
     int ret;
 
-    layouts = ff_all_channel_counts();
-    if (!layouts)
-        return AVERROR(ENOMEM);
-    ret = ff_set_common_channel_layouts(ctx, layouts);
-    if (ret < 0)
-        return ret;
+    ret = ff_request_frame(ctx->inputs[0]);
 
-    formats = ff_make_format_list(sample_fmts);
-    if (!formats)
-        return AVERROR(ENOMEM);
-    ret = ff_set_common_formats(ctx, formats);
-    if (ret < 0)
-        return ret;
+    if (ret == AVERROR_EOF && s->out_pad > 0) {
+        AVFrame *frame = ff_get_audio_buffer(outlink, FFMIN(1024, s->out_pad));
+        if (!frame)
+            return AVERROR(ENOMEM);
 
-    formats = ff_all_samplerates();
-    if (!formats)
-        return AVERROR(ENOMEM);
-    return ff_set_common_samplerates(ctx, formats);
+        s->out_pad -= frame->nb_samples;
+        frame->pts = s->next_in_pts;
+        return filter_frame(ctx->inputs[0], frame);
+    }
+    return ret;
 }
 
 static int config_input(AVFilterLink *inlink)
@@ -313,8 +358,8 @@ static int config_input(AVFilterLink *inlink)
     AudioLimiterContext *s = ctx->priv;
     int obuffer_size;
 
-    obuffer_size = inlink->sample_rate * inlink->channels * 100 / 1000. + inlink->channels;
-    if (obuffer_size < inlink->channels)
+    obuffer_size = inlink->sample_rate * inlink->ch_layout.nb_channels * 100 / 1000. + inlink->ch_layout.nb_channels;
+    if (obuffer_size < inlink->ch_layout.nb_channels)
         return AVERROR(EINVAL);
 
     s->buffer = av_calloc(obuffer_size, sizeof(*s->buffer));
@@ -324,8 +369,17 @@ static int config_input(AVFilterLink *inlink)
         return AVERROR(ENOMEM);
 
     memset(s->nextpos, -1, obuffer_size * sizeof(*s->nextpos));
-    s->buffer_size = inlink->sample_rate * s->attack * inlink->channels;
-    s->buffer_size -= s->buffer_size % inlink->channels;
+    s->buffer_size = inlink->sample_rate * s->attack * inlink->ch_layout.nb_channels;
+    s->buffer_size -= s->buffer_size % inlink->ch_layout.nb_channels;
+    if (s->latency)
+        s->in_trim = s->out_pad = s->buffer_size / inlink->ch_layout.nb_channels - 1;
+    s->next_out_pts = AV_NOPTS_VALUE;
+    s->next_in_pts  = AV_NOPTS_VALUE;
+
+    s->fifo = av_fifo_alloc2(8, sizeof(MetaItem), AV_FIFO_FLAG_AUTO_GROW);
+    if (!s->fifo) {
+        return AVERROR(ENOMEM);
+    }
 
     if (s->buffer_size <= 0) {
         av_log(ctx, AV_LOG_ERROR, "Attack is too small.\n");
@@ -342,6 +396,8 @@ static av_cold void uninit(AVFilterContext *ctx)
     av_freep(&s->buffer);
     av_freep(&s->nextdelta);
     av_freep(&s->nextpos);
+
+    av_fifo_freep2(&s->fifo);
 }
 
 static const AVFilterPad alimiter_inputs[] = {
@@ -351,25 +407,26 @@ static const AVFilterPad alimiter_inputs[] = {
         .filter_frame = filter_frame,
         .config_props = config_input,
     },
-    { NULL }
 };
 
 static const AVFilterPad alimiter_outputs[] = {
     {
         .name = "default",
         .type = AVMEDIA_TYPE_AUDIO,
+        .request_frame = request_frame,
     },
-    { NULL }
 };
 
-AVFilter ff_af_alimiter = {
+const AVFilter ff_af_alimiter = {
     .name           = "alimiter",
     .description    = NULL_IF_CONFIG_SMALL("Audio lookahead limiter."),
     .priv_size      = sizeof(AudioLimiterContext),
     .priv_class     = &alimiter_class,
     .init           = init,
     .uninit         = uninit,
-    .query_formats  = query_formats,
-    .inputs         = alimiter_inputs,
-    .outputs        = alimiter_outputs,
+    FILTER_INPUTS(alimiter_inputs),
+    FILTER_OUTPUTS(alimiter_outputs),
+    FILTER_SINGLE_SAMPLEFMT(AV_SAMPLE_FMT_DBL),
+    .process_command = ff_filter_process_command,
+    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
 };

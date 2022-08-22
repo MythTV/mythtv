@@ -18,7 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/mem.h"
 #include "libavutil/mem_internal.h"
 
 #include "dcadsp.h"
@@ -486,6 +485,7 @@ av_cold void ff_dcadsp_init(DCADSPContext *s)
     s->lbr_bank = lbr_bank_c;
     s->lfe_iir = lfe_iir_c;
 
-    if (ARCH_X86)
-        ff_dcadsp_init_x86(s);
+#if ARCH_X86
+    ff_dcadsp_init_x86(s);
+#endif
 }

@@ -32,12 +32,13 @@
 #include "avcodec.h"
 #include "get_bits.h"
 #include "bytestream.h"
+#include "codec_internal.h"
 #include "internal.h"
 #include "golomb.h"
 #include "dirac_arith.h"
 #include "dirac_vlc.h"
 #include "mpeg12data.h"
-#include "libavcodec/mpegvideo.h"
+#include "mpegpicture.h"
 #include "mpegvideoencdsp.h"
 #include "dirac_dwt.h"
 #include "dirac.h"
@@ -304,7 +305,7 @@ static int alloc_sequence_buffers(DiracContext *s)
         w = FFALIGN(CALC_PADDING(w, MAX_DWT_LEVELS), 8); /* FIXME: Should this be 16 for SSE??? */
         h = top_padding + CALC_PADDING(h, MAX_DWT_LEVELS) + max_yblen/2;
 
-        s->plane[i].idwt.buf_base = av_mallocz_array((w+max_xblen), h * (2 << s->pshift));
+        s->plane[i].idwt.buf_base = av_calloc(w + max_xblen, h * (2 << s->pshift));
         s->plane[i].idwt.tmp      = av_malloc_array((w+16), 2 << s->pshift);
         s->plane[i].idwt.buf      = s->plane[i].idwt.buf_base + (top_padding*w)*(2 << s->pshift);
         if (!s->plane[i].idwt.buf_base || !s->plane[i].idwt.tmp)
@@ -1432,8 +1433,8 @@ static void global_mv(DiracContext *s, DiracBlock *block, int x, int y, int ref)
     int *c      = s->globalmc[ref].perspective;
 
     int64_t m   = (1<<ep) - (c[0]*(int64_t)x + c[1]*(int64_t)y);
-    int64_t mx  = m * (int64_t)((A[0][0] * (int64_t)x + A[0][1]*(int64_t)y) + (1LL<<ez) * b[0]);
-    int64_t my  = m * (int64_t)((A[1][0] * (int64_t)x + A[1][1]*(int64_t)y) + (1LL<<ez) * b[1]);
+    int64_t mx  = m * (uint64_t)((A[0][0] * (int64_t)x + A[0][1]*(int64_t)y) + (1LL<<ez) * b[0]);
+    int64_t my  = m * (uint64_t)((A[1][0] * (int64_t)x + A[1][1]*(int64_t)y) + (1LL<<ez) * b[1]);
 
     block->u.mv[ref][0] = (mx + (1<<(ez+ep))) >> (ez+ep);
     block->u.mv[ref][1] = (my + (1<<(ez+ep))) >> (ez+ep);
@@ -2259,11 +2260,11 @@ static int dirac_decode_data_unit(AVCodecContext *avctx, const uint8_t *buf, int
     return 0;
 }
 
-static int dirac_decode_frame(AVCodecContext *avctx, void *data, int *got_frame, AVPacket *pkt)
+static int dirac_decode_frame(AVCodecContext *avctx, AVFrame *picture,
+                              int *got_frame, AVPacket *pkt)
 {
     DiracContext *s     = avctx->priv_data;
-    AVFrame *picture    = data;
-    uint8_t *buf        = pkt->data;
+    const uint8_t *buf  = pkt->data;
     int buf_size        = pkt->size;
     int i, buf_idx      = 0;
     int ret;
@@ -2281,7 +2282,7 @@ static int dirac_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 
     /* end of stream, so flush delayed pics */
     if (buf_size == 0)
-        return get_delayed_pic(s, (AVFrame *)data, got_frame);
+        return get_delayed_pic(s, picture, got_frame);
 
     for (;;) {
         /*[DIRAC_STD] Here starts the code from parse_info() defined in 9.6
@@ -2338,13 +2339,13 @@ static int dirac_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 
         if (delayed_frame) {
             delayed_frame->reference ^= DELAYED_PIC_REF;
-            if((ret=av_frame_ref(data, delayed_frame->avframe)) < 0)
+            if((ret = av_frame_ref(picture, delayed_frame->avframe)) < 0)
                 return ret;
             *got_frame = 1;
         }
     } else if (s->current_picture->avframe->display_picture_number == s->frame_number) {
         /* The right frame at the right time :-) */
-        if((ret=av_frame_ref(data, s->current_picture->avframe)) < 0)
+        if((ret = av_frame_ref(picture, s->current_picture->avframe)) < 0)
             return ret;
         *got_frame = 1;
     }
@@ -2355,16 +2356,16 @@ static int dirac_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     return buf_idx;
 }
 
-AVCodec ff_dirac_decoder = {
-    .name           = "dirac",
-    .long_name      = NULL_IF_CONFIG_SMALL("BBC Dirac VC-2"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_DIRAC,
+const FFCodec ff_dirac_decoder = {
+    .p.name         = "dirac",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("BBC Dirac VC-2"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_DIRAC,
     .priv_data_size = sizeof(DiracContext),
     .init           = dirac_decode_init,
     .close          = dirac_decode_end,
-    .decode         = dirac_decode_frame,
-    .capabilities   = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_SLICE_THREADS | AV_CODEC_CAP_DR1,
+    FF_CODEC_DECODE_CB(dirac_decode_frame),
+    .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_SLICE_THREADS | AV_CODEC_CAP_DR1,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
     .flush          = dirac_decode_flush,
 };

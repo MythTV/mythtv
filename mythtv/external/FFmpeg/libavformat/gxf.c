@@ -24,9 +24,9 @@
 #include "libavutil/channel_layout.h"
 #include "libavutil/common.h"
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 #include "gxf.h"
-#include "libavcodec/mpeg12data.h"
 
 struct gxf_stream_info {
     int64_t first_field;
@@ -104,12 +104,14 @@ static int gxf_probe(const AVProbeData *p) {
 static int get_sindex(AVFormatContext *s, int id, int format) {
     int i;
     AVStream *st = NULL;
+    FFStream *sti;
     i = ff_find_stream_index(s, id);
     if (i >= 0)
         return i;
     st = avformat_new_stream(s, NULL);
     if (!st)
         return AVERROR(ENOMEM);
+    sti = ffstream(st);
     st->id = id;
     switch (format) {
         case 3:
@@ -130,19 +132,18 @@ static int get_sindex(AVFormatContext *s, int id, int format) {
         case 20:
             st->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
             st->codecpar->codec_id = AV_CODEC_ID_MPEG2VIDEO;
-            st->need_parsing = AVSTREAM_PARSE_HEADERS; //get keyframe flag etc.
+            sti->need_parsing = AVSTREAM_PARSE_HEADERS; //get keyframe flag etc.
             break;
         case 22:
         case 23:
             st->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
             st->codecpar->codec_id = AV_CODEC_ID_MPEG1VIDEO;
-            st->need_parsing = AVSTREAM_PARSE_HEADERS; //get keyframe flag etc.
+            sti->need_parsing = AVSTREAM_PARSE_HEADERS; //get keyframe flag etc.
             break;
         case 9:
             st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
             st->codecpar->codec_id = AV_CODEC_ID_PCM_S24LE;
-            st->codecpar->channels = 1;
-            st->codecpar->channel_layout = AV_CH_LAYOUT_MONO;
+            st->codecpar->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
             st->codecpar->sample_rate = 48000;
             st->codecpar->bit_rate = 3 * 1 * 48000 * 8;
             st->codecpar->block_align = 3 * 1;
@@ -151,8 +152,7 @@ static int get_sindex(AVFormatContext *s, int id, int format) {
         case 10:
             st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
             st->codecpar->codec_id = AV_CODEC_ID_PCM_S16LE;
-            st->codecpar->channels = 1;
-            st->codecpar->channel_layout = AV_CH_LAYOUT_MONO;
+            st->codecpar->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
             st->codecpar->sample_rate = 48000;
             st->codecpar->bit_rate = 2 * 1 * 48000 * 8;
             st->codecpar->block_align = 2 * 1;
@@ -161,15 +161,14 @@ static int get_sindex(AVFormatContext *s, int id, int format) {
         case 17:
             st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
             st->codecpar->codec_id = AV_CODEC_ID_AC3;
-            st->codecpar->channels = 2;
-            st->codecpar->channel_layout = AV_CH_LAYOUT_STEREO;
+            st->codecpar->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO;
             st->codecpar->sample_rate = 48000;
             break;
         case 26: /* AVCi50 / AVCi100 (AVC Intra) */
         case 29: /* AVCHD */
             st->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
             st->codecpar->codec_id = AV_CODEC_ID_H264;
-            st->need_parsing = AVSTREAM_PARSE_HEADERS;
+            sti->need_parsing = AVSTREAM_PARSE_HEADERS;
             break;
         // timecode tracks:
         case 7:
@@ -567,6 +566,7 @@ static int gxf_seek(AVFormatContext *s, int stream_index, int64_t timestamp, int
     uint64_t pos;
     uint64_t maxlen = 100 * 1024 * 1024;
     AVStream *st = s->streams[0];
+    FFStream *const sti = ffstream(st);
     int64_t start_time = s->streams[stream_index]->start_time;
     int64_t found;
     int idx;
@@ -575,9 +575,9 @@ static int gxf_seek(AVFormatContext *s, int stream_index, int64_t timestamp, int
                                     AVSEEK_FLAG_ANY | AVSEEK_FLAG_BACKWARD);
     if (idx < 0)
         return -1;
-    pos = st->index_entries[idx].pos;
-    if (idx < st->nb_index_entries - 2)
-        maxlen = st->index_entries[idx + 2].pos - pos;
+    pos = sti->index_entries[idx].pos;
+    if (idx < sti->nb_index_entries - 2)
+        maxlen = sti->index_entries[idx + 2].pos - pos;
     maxlen = FFMAX(maxlen, 200 * 1024);
     res = avio_seek(s->pb, pos, SEEK_SET);
     if (res < 0)
@@ -599,7 +599,7 @@ static int64_t gxf_read_timestamp(AVFormatContext *s, int stream_index,
     return res;
 }
 
-AVInputFormat ff_gxf_demuxer = {
+const AVInputFormat ff_gxf_demuxer = {
     .name           = "gxf",
     .long_name      = NULL_IF_CONFIG_SMALL("GXF (General eXchange Format)"),
     .priv_data_size = sizeof(struct gxf_stream_info),

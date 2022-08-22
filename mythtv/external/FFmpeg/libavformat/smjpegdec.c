@@ -94,7 +94,7 @@ static int smjpeg_read_header(AVFormatContext *s)
             ast->codecpar->codec_type  = AVMEDIA_TYPE_AUDIO;
             ast->codecpar->sample_rate = avio_rb16(pb);
             ast->codecpar->bits_per_coded_sample = avio_r8(pb);
-            ast->codecpar->channels    = avio_r8(pb);
+            ast->codecpar->ch_layout.nb_channels = avio_r8(pb);
             ast->codecpar->codec_tag   = avio_rl32(pb);
             ast->codecpar->codec_id    = ff_codec_get_id(ff_codec_smjpeg_audio_tags,
                                                          ast->codecpar->codec_tag);
@@ -180,7 +180,7 @@ static int smjpeg_read_packet(AVFormatContext *s, AVPacket *pkt)
     return ret;
 }
 
-AVInputFormat ff_smjpeg_demuxer = {
+const AVInputFormat ff_smjpeg_demuxer = {
     .name           = "smjpeg",
     .long_name      = NULL_IF_CONFIG_SMALL("Loki SDL MJPEG"),
     .priv_data_size = sizeof(SMJPEGContext),

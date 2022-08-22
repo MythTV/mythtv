@@ -20,7 +20,9 @@ HEADERS = adler32.h                                                     \
           common.h                                                      \
           cpu.h                                                         \
           crc.h                                                         \
+          csp.h                                                         \
           des.h                                                         \
+          detection_bbox.h                                              \
           dict.h                                                        \
           display.h                                                     \
           dovi_meta.h                                                   \
@@ -33,6 +35,7 @@ HEADERS = adler32.h                                                     \
           frame.h                                                       \
           hash.h                                                        \
           hdr_dynamic_metadata.h                                        \
+          hdr_dynamic_vivid_metadata.h                                  \
           hmac.h                                                        \
           hwcontext.h                                                   \
           hwcontext_cuda.h                                              \
@@ -51,6 +54,7 @@ HEADERS = adler32.h                                                     \
           intreadwrite.h                                                \
           lfg.h                                                         \
           log.h                                                         \
+          lzo.h                                                         \
           macros.h                                                      \
           mathematics.h                                                 \
           mastering_display_metadata.h                                  \
@@ -79,14 +83,13 @@ HEADERS = adler32.h                                                     \
           timestamp.h                                                   \
           tree.h                                                        \
           twofish.h                                                     \
+          uuid.h                                                        \
           version.h                                                     \
           video_enc_params.h                                            \
           xtea.h                                                        \
           tea.h                                                         \
           tx.h                                                          \
           film_grain_params.h                                           \
-
-HEADERS-$(CONFIG_LZO)                   += lzo.h
 
 ARCH_HEADERS = bswap.h                                                  \
                intmath.h                                                \
@@ -112,7 +115,9 @@ OBJS = adler32.o                                                        \
        color_utils.o                                                    \
        cpu.o                                                            \
        crc.o                                                            \
+       csp.o                                                            \
        des.o                                                            \
+       detection_bbox.o                                                 \
        dict.o                                                           \
        display.o                                                        \
        dovi_meta.o                                                      \
@@ -128,6 +133,7 @@ OBJS = adler32.o                                                        \
        frame.o                                                          \
        hash.o                                                           \
        hdr_dynamic_metadata.o                                           \
+       hdr_dynamic_vivid_metadata.o                                     \
        hmac.o                                                           \
        hwcontext.o                                                      \
        imgutils.o                                                       \
@@ -137,6 +143,7 @@ OBJS = adler32.o                                                        \
        lls.o                                                            \
        log.o                                                            \
        log2_tab.o                                                       \
+       lzo.o                                                            \
        mathematics.o                                                    \
        mastering_display_metadata.o                                     \
        md5.o                                                            \
@@ -170,6 +177,8 @@ OBJS = adler32.o                                                        \
        tx_float.o                                                       \
        tx_double.o                                                      \
        tx_int32.o                                                       \
+       uuid.o                                                           \
+       version.o                                                        \
        video_enc_params.o                                               \
        film_grain_params.o                                              \
 
@@ -178,7 +187,7 @@ OBJS-$(CONFIG_CUDA)                     += hwcontext_cuda.o
 OBJS-$(CONFIG_D3D11VA)                  += hwcontext_d3d11va.o
 OBJS-$(CONFIG_DXVA2)                    += hwcontext_dxva2.o
 OBJS-$(CONFIG_LIBDRM)                   += hwcontext_drm.o
-OBJS-$(CONFIG_LZO)                      += lzo.o
+OBJS-$(CONFIG_MACOS_KPERF)              += macos_kperf.o
 OBJS-$(CONFIG_MEDIACODEC)               += hwcontext_mediacodec.o
 OBJS-$(CONFIG_OPENCL)                   += hwcontext_opencl.o
 OBJS-$(CONFIG_QSV)                      += hwcontext_qsv.o
@@ -187,11 +196,14 @@ OBJS-$(CONFIG_VIDEOTOOLBOX)             += hwcontext_videotoolbox.o
 OBJS-$(CONFIG_VDPAU)                    += hwcontext_vdpau.o
 OBJS-$(CONFIG_VULKAN)                   += hwcontext_vulkan.o
 
+OBJS-$(!CONFIG_VULKAN)                  += hwcontext_stub.o
+
 OBJS += $(COMPAT_OBJS:%=../compat/%)
 
 # Windows resource file
 SLIBOBJS-$(HAVE_GNU_WINDRES)            += avutilres.o
 
+SKIPHEADERS                            += objc.h
 SKIPHEADERS-$(HAVE_CUDA_H)             += hwcontext_cuda.h
 SKIPHEADERS-$(CONFIG_CUDA)             += hwcontext_cuda_internal.h     \
                                           cuda_check.h
@@ -202,7 +214,9 @@ SKIPHEADERS-$(CONFIG_OPENCL)           += hwcontext_opencl.h
 SKIPHEADERS-$(CONFIG_VAAPI)            += hwcontext_vaapi.h
 SKIPHEADERS-$(CONFIG_VIDEOTOOLBOX)     += hwcontext_videotoolbox.h
 SKIPHEADERS-$(CONFIG_VDPAU)            += hwcontext_vdpau.h
-SKIPHEADERS-$(CONFIG_VULKAN)           += hwcontext_vulkan.h
+SKIPHEADERS-$(CONFIG_VULKAN)           += hwcontext_vulkan.h vulkan.h   \
+                                          vulkan_functions.h            \
+                                          vulkan_loader.h
 
 TESTPROGS = adler32                                                     \
             aes                                                         \
@@ -214,6 +228,7 @@ TESTPROGS = adler32                                                     \
             bprint                                                      \
             cast5                                                       \
             camellia                                                    \
+            channel_layout                                              \
             color_utils                                                 \
             cpu                                                         \
             crc                                                         \
@@ -250,6 +265,7 @@ TESTPROGS = adler32                                                     \
             tree                                                        \
             twofish                                                     \
             utf8                                                        \
+            uuid                                                        \
             xtea                                                        \
             tea                                                         \
 
@@ -259,6 +275,6 @@ TESTPROGS-$(HAVE_LZO1X_999_COMPRESS) += lzo
 TOOLS = crypto_bench ffhash ffeval ffescape
 
 tools/crypto_bench$(EXESUF): ELIBS += $(if $(VERSUS),$(subst +, -l,+$(VERSUS)),)
-tools/crypto_bench$(EXESUF): CFLAGS += -DUSE_EXT_LIBS=0$(if $(VERSUS),$(subst +,+USE_,+$(VERSUS)),)
+tools/crypto_bench.o: CFLAGS += -DUSE_EXT_LIBS=0$(if $(VERSUS),$(subst +,+USE_,+$(VERSUS)),)
 
 $(SUBDIR)tests/lzo$(EXESUF): ELIBS = -llzo2

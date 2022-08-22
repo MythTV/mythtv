@@ -22,6 +22,7 @@
 #include "libavutil/channel_layout.h"
 
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 #include "apetag.h"
 #include "id3v1.h"
@@ -95,8 +96,7 @@ static int mpc_read_header(AVFormatContext *s)
 
     st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
     st->codecpar->codec_id = AV_CODEC_ID_MUSEPACK7;
-    st->codecpar->channels = 2;
-    st->codecpar->channel_layout = AV_CH_LAYOUT_STEREO;
+    st->codecpar->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO;
     st->codecpar->bits_per_coded_sample = 16;
 
     if ((ret = ff_get_extradata(s, st->codecpar, s->pb, 16)) < 0)
@@ -187,6 +187,7 @@ static int mpc_read_packet(AVFormatContext *s, AVPacket *pkt)
 static int mpc_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp, int flags)
 {
     AVStream *st = s->streams[stream_index];
+    FFStream *const sti = ffstream(st);
     MPCContext *c = s->priv_data;
     AVPacket pkt1, *pkt = &pkt1;
     int ret;
@@ -194,8 +195,8 @@ static int mpc_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp
     uint32_t lastframe;
 
     /* if found, seek there */
-    if (index >= 0 && st->index_entries[st->nb_index_entries-1].timestamp >= timestamp - DELAY_FRAMES){
-        c->curframe = st->index_entries[index].pos;
+    if (index >= 0 && sti->index_entries[sti->nb_index_entries-1].timestamp >= timestamp - DELAY_FRAMES) {
+        c->curframe = sti->index_entries[index].pos;
         return 0;
     }
     /* if timestamp is out of bounds, return error */
@@ -218,7 +219,7 @@ static int mpc_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp
 }
 
 
-AVInputFormat ff_mpc_demuxer = {
+const AVInputFormat ff_mpc_demuxer = {
     .name           = "mpc",
     .long_name      = NULL_IF_CONFIG_SMALL("Musepack"),
     .priv_data_size = sizeof(MPCContext),

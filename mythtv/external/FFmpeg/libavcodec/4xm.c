@@ -31,10 +31,12 @@
 #include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/mem_internal.h"
+#include "libavutil/thread.h"
 #include "avcodec.h"
 #include "blockdsp.h"
 #include "bswapdsp.h"
 #include "bytestream.h"
+#include "codec_internal.h"
 #include "get_bits.h"
 #include "internal.h"
 
@@ -246,9 +248,9 @@ static void idct(int16_t block[64])
     }
 }
 
-static av_cold void init_vlcs(FourXContext *f)
+static av_cold void init_vlcs(void)
 {
-    static VLC_TYPE table[2][4][32][2];
+    static VLCElem table[2][4][32];
     int i, j;
 
     for (i = 0; i < 2; i++) {
@@ -832,13 +834,12 @@ static int decode_i_frame(FourXContext *f, const uint8_t *buf, int length)
     return 0;
 }
 
-static int decode_frame(AVCodecContext *avctx, void *data,
+static int decode_frame(AVCodecContext *avctx, AVFrame *picture,
                         int *got_frame, AVPacket *avpkt)
 {
     const uint8_t *buf    = avpkt->data;
     int buf_size          = avpkt->size;
     FourXContext *const f = avctx->priv_data;
-    AVFrame *picture      = data;
     int i, frame_4cc, frame_size, ret;
 
     if (buf_size < 20)
@@ -988,6 +989,7 @@ static av_cold int decode_end(AVCodecContext *avctx)
 
 static av_cold int decode_init(AVCodecContext *avctx)
 {
+    static AVOnce init_static_once = AV_ONCE_INIT;
     FourXContext * const f = avctx->priv_data;
     int ret;
 
@@ -1006,33 +1008,33 @@ static av_cold int decode_init(AVCodecContext *avctx)
 
     f->frame_buffer      = av_mallocz(avctx->width * avctx->height * 2);
     f->last_frame_buffer = av_mallocz(avctx->width * avctx->height * 2);
-    if (!f->frame_buffer || !f->last_frame_buffer) {
-        decode_end(avctx);
+    if (!f->frame_buffer || !f->last_frame_buffer)
         return AVERROR(ENOMEM);
-    }
 
     f->version = AV_RL32(avctx->extradata) >> 16;
     ff_blockdsp_init(&f->bdsp, avctx);
     ff_bswapdsp_init(&f->bbdsp);
     f->avctx = avctx;
-    init_vlcs(f);
 
     if (f->version > 2)
         avctx->pix_fmt = AV_PIX_FMT_RGB565;
     else
         avctx->pix_fmt = AV_PIX_FMT_BGR555;
 
+    ff_thread_once(&init_static_once, init_vlcs);
+
     return 0;
 }
 
-AVCodec ff_fourxm_decoder = {
-    .name           = "4xm",
-    .long_name      = NULL_IF_CONFIG_SMALL("4X Movie"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_4XM,
+const FFCodec ff_fourxm_decoder = {
+    .p.name         = "4xm",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("4X Movie"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_4XM,
     .priv_data_size = sizeof(FourXContext),
     .init           = decode_init,
     .close          = decode_end,
-    .decode         = decode_frame,
-    .capabilities   = AV_CODEC_CAP_DR1,
+    FF_CODEC_DECODE_CB(decode_frame),
+    .p.capabilities = AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
 };

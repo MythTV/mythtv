@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/channel_layout.h"
 #include "libavutil/opt.h"
 #include "libavutil/eval.h"
 #include "libavutil/avassert.h"
@@ -177,36 +178,6 @@ static av_cold void uninit(AVFilterContext *ctx)
     common_uninit(s);
     av_freep(&s->gain_cmd);
     av_freep(&s->gain_entry_cmd);
-}
-
-static int query_formats(AVFilterContext *ctx)
-{
-    AVFilterChannelLayouts *layouts;
-    AVFilterFormats *formats;
-    static const enum AVSampleFormat sample_fmts[] = {
-        AV_SAMPLE_FMT_FLTP,
-        AV_SAMPLE_FMT_NONE
-    };
-    int ret;
-
-    layouts = ff_all_channel_counts();
-    if (!layouts)
-        return AVERROR(ENOMEM);
-    ret = ff_set_common_channel_layouts(ctx, layouts);
-    if (ret < 0)
-        return ret;
-
-    formats = ff_make_format_list(sample_fmts);
-    if (!formats)
-        return AVERROR(ENOMEM);
-    ret = ff_set_common_formats(ctx, formats);
-    if (ret < 0)
-        return ret;
-
-    formats = ff_all_samplerates();
-    if (!formats)
-        return AVERROR(ENOMEM);
-    return ff_set_common_samplerates(ctx, formats);
 }
 
 static void fast_convolute(FIREqualizerContext *av_restrict s, const float *av_restrict kernel_buf, float *av_restrict conv_buf,
@@ -633,17 +604,18 @@ static int generate_kernel(AVFilterContext *ctx, const char *gain, const char *g
     if (ret < 0)
         return ret;
 
-    if (s->dumpfile && (!s->dump_buf || !s->analysis_rdft || !(dump_fp = fopen(s->dumpfile, "w"))))
+    if (s->dumpfile && (!s->dump_buf || !s->analysis_rdft || !(dump_fp = avpriv_fopen_utf8(s->dumpfile, "w"))))
         av_log(ctx, AV_LOG_WARNING, "dumping failed.\n");
 
-    vars[VAR_CHS] = inlink->channels;
-    vars[VAR_CHLAYOUT] = inlink->channel_layout;
+    vars[VAR_CHS] = inlink->ch_layout.nb_channels;
+    vars[VAR_CHLAYOUT] = inlink->ch_layout.order == AV_CHANNEL_ORDER_NATIVE ?
+                         inlink->ch_layout.u.mask : 0;
     vars[VAR_SR] = inlink->sample_rate;
-    for (ch = 0; ch < inlink->channels; ch++) {
+    for (ch = 0; ch < inlink->ch_layout.nb_channels; ch++) {
         float *rdft_buf = s->kernel_tmp_buf + ch * s->rdft_len;
         double result;
         vars[VAR_CH] = ch;
-        vars[VAR_CHID] = av_channel_layout_extract_channel(inlink->channel_layout, ch);
+        vars[VAR_CHID] = av_channel_layout_channel_from_index(&inlink->ch_layout, ch);
         vars[VAR_F] = 0.0;
         if (xlog)
             vars[VAR_F] = log2(0.05 * vars[VAR_F]);
@@ -744,7 +716,7 @@ static int generate_kernel(AVFilterContext *ctx, const char *gain, const char *g
             break;
     }
 
-    memcpy(s->kernel_buf, s->kernel_tmp_buf, (s->multi ? inlink->channels : 1) * s->rdft_len * sizeof(*s->kernel_buf));
+    memcpy(s->kernel_buf, s->kernel_tmp_buf, (s->multi ? inlink->ch_layout.nb_channels : 1) * s->rdft_len * sizeof(*s->kernel_buf));
     av_expr_free(gain_expr);
     if (dump_fp)
         fclose(dump_fp);
@@ -783,7 +755,7 @@ static int config_input(AVFilterLink *inlink)
     if (!(s->rdft = av_rdft_init(rdft_bits, DFT_R2C)) || !(s->irdft = av_rdft_init(rdft_bits, IDFT_C2R)))
         return AVERROR(ENOMEM);
 
-    if (s->fft2 && !s->multi && inlink->channels > 1 && !(s->fft_ctx = av_fft_init(rdft_bits, 0)))
+    if (s->fft2 && !s->multi && inlink->ch_layout.nb_channels > 1 && !(s->fft_ctx = av_fft_init(rdft_bits, 0)))
         return AVERROR(ENOMEM);
 
     if (s->min_phase) {
@@ -825,18 +797,18 @@ static int config_input(AVFilterLink *inlink)
     }
 
     s->analysis_buf = av_malloc_array(s->analysis_rdft_len, sizeof(*s->analysis_buf));
-    s->kernel_tmp_buf = av_malloc_array(s->rdft_len * (s->multi ? inlink->channels : 1), sizeof(*s->kernel_tmp_buf));
-    s->kernel_buf = av_malloc_array(s->rdft_len * (s->multi ? inlink->channels : 1), sizeof(*s->kernel_buf));
-    s->conv_buf   = av_calloc(2 * s->rdft_len * inlink->channels, sizeof(*s->conv_buf));
-    s->conv_idx   = av_calloc(inlink->channels, sizeof(*s->conv_idx));
+    s->kernel_tmp_buf = av_malloc_array(s->rdft_len * (s->multi ? inlink->ch_layout.nb_channels : 1), sizeof(*s->kernel_tmp_buf));
+    s->kernel_buf = av_malloc_array(s->rdft_len * (s->multi ? inlink->ch_layout.nb_channels : 1), sizeof(*s->kernel_buf));
+    s->conv_buf   = av_calloc(2 * s->rdft_len * inlink->ch_layout.nb_channels, sizeof(*s->conv_buf));
+    s->conv_idx   = av_calloc(inlink->ch_layout.nb_channels, sizeof(*s->conv_idx));
     if (!s->analysis_buf || !s->kernel_tmp_buf || !s->kernel_buf || !s->conv_buf || !s->conv_idx)
         return AVERROR(ENOMEM);
 
     av_log(ctx, AV_LOG_DEBUG, "sample_rate = %d, channels = %d, analysis_rdft_len = %d, rdft_len = %d, fir_len = %d, nsamples_max = %d.\n",
-           inlink->sample_rate, inlink->channels, s->analysis_rdft_len, s->rdft_len, s->fir_len, s->nsamples_max);
+           inlink->sample_rate, inlink->ch_layout.nb_channels, s->analysis_rdft_len, s->rdft_len, s->fir_len, s->nsamples_max);
 
     if (s->fixed)
-        inlink->min_samples = inlink->max_samples = inlink->partial_buf_size = s->nsamples_max;
+        inlink->min_samples = inlink->max_samples = s->nsamples_max;
 
     return generate_kernel(ctx, SELECT_GAIN(s), SELECT_GAIN_ENTRY(s));
 }
@@ -848,19 +820,19 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
     int ch;
 
     if (!s->min_phase) {
-        for (ch = 0; ch + 1 < inlink->channels && s->fft_ctx; ch += 2) {
+        for (ch = 0; ch + 1 < inlink->ch_layout.nb_channels && s->fft_ctx; ch += 2) {
             fast_convolute2(s, s->kernel_buf, (FFTComplex *)(s->conv_buf + 2 * ch * s->rdft_len),
                             s->conv_idx + ch, (float *) frame->extended_data[ch],
                             (float *) frame->extended_data[ch+1], frame->nb_samples);
         }
 
-        for ( ; ch < inlink->channels; ch++) {
+        for ( ; ch < inlink->ch_layout.nb_channels; ch++) {
             fast_convolute(s, s->kernel_buf + (s->multi ? ch * s->rdft_len : 0),
                         s->conv_buf + 2 * ch * s->rdft_len, s->conv_idx + ch,
                         (float *) frame->extended_data[ch], frame->nb_samples);
         }
     } else {
-        for (ch = 0; ch < inlink->channels; ch++) {
+        for (ch = 0; ch < inlink->ch_layout.nb_channels; ch++) {
             fast_convolute_nonlinear(s, s->kernel_buf + (s->multi ? ch * s->rdft_len : 0),
                                      s->conv_buf + 2 * ch * s->rdft_len, s->conv_idx + ch,
                                      (float *) frame->extended_data[ch], frame->nb_samples);
@@ -890,7 +862,7 @@ static int request_frame(AVFilterLink *outlink)
         if (!frame)
             return AVERROR(ENOMEM);
 
-        av_samples_set_silence(frame->extended_data, 0, frame->nb_samples, outlink->channels, frame->format);
+        av_samples_set_silence(frame->extended_data, 0, frame->nb_samples, outlink->ch_layout.nb_channels, frame->format);
         frame->pts = s->next_pts;
         s->remaining -= frame->nb_samples;
         ret = filter_frame(ctx->inputs[0], frame);
@@ -951,12 +923,11 @@ static int process_command(AVFilterContext *ctx, const char *cmd, const char *ar
 static const AVFilterPad firequalizer_inputs[] = {
     {
         .name           = "default",
+        .flags          = AVFILTERPAD_FLAG_NEEDS_WRITABLE,
         .config_props   = config_input,
         .filter_frame   = filter_frame,
         .type           = AVMEDIA_TYPE_AUDIO,
-        .needs_writable = 1,
     },
-    { NULL }
 };
 
 static const AVFilterPad firequalizer_outputs[] = {
@@ -965,17 +936,16 @@ static const AVFilterPad firequalizer_outputs[] = {
         .request_frame  = request_frame,
         .type           = AVMEDIA_TYPE_AUDIO,
     },
-    { NULL }
 };
 
-AVFilter ff_af_firequalizer = {
+const AVFilter ff_af_firequalizer = {
     .name               = "firequalizer",
     .description        = NULL_IF_CONFIG_SMALL("Finite Impulse Response Equalizer."),
     .uninit             = uninit,
-    .query_formats      = query_formats,
     .process_command    = process_command,
     .priv_size          = sizeof(FIREqualizerContext),
-    .inputs             = firequalizer_inputs,
-    .outputs            = firequalizer_outputs,
+    FILTER_INPUTS(firequalizer_inputs),
+    FILTER_OUTPUTS(firequalizer_outputs),
+    FILTER_SINGLE_SAMPLEFMT(AV_SAMPLE_FMT_FLTP),
     .priv_class         = &firequalizer_class,
 };

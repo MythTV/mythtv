@@ -55,8 +55,13 @@ struct AVAESCTR;
 
 typedef struct MOVStts {
     unsigned int count;
-    int duration;
+    unsigned int duration;
 } MOVStts;
+
+typedef struct MOVCtts {
+    unsigned int count;
+    int duration;
+} MOVCtts;
 
 typedef struct MOVStsc {
     int first;
@@ -168,7 +173,7 @@ typedef struct MOVStreamContext {
     uint8_t *sdtp_data;
     unsigned int ctts_count;
     unsigned int ctts_allocated_size;
-    MOVStts *ctts_data;
+    MOVCtts *ctts_data;
     unsigned int stsc_count;
     MOVStsc *stsc_data;
     unsigned int stsc_index;
@@ -209,10 +214,20 @@ typedef struct MOVStreamContext {
     int has_palette;
     int64_t data_size;
     uint32_t tmcd_flags;  ///< tmcd track flags
+    uint8_t tmcd_nb_frames;  ///< tmcd number of frames per tick / second
     int64_t track_end;    ///< used for dts generation in fragmented movie files
     int start_pad;        ///< amount of samples to skip due to enc-dec delay
     unsigned int rap_group_count;
     MOVSbgp *rap_group;
+    unsigned int sync_group_count;
+    MOVSbgp *sync_group;
+    uint8_t *sgpd_sync;
+    uint32_t sgpd_sync_count;
+    int32_t *sample_offsets;
+    int sample_offsets_count;
+    int *open_key_samples;
+    int open_key_samples_count;
+    uint32_t min_sample_duration;
 
     int nb_frames_for_fps;
     int64_t duration_for_fps;
@@ -237,6 +252,8 @@ typedef struct MOVStreamContext {
     int has_sidx;  // If there is an sidx entry for this stream.
     struct {
         struct AVAESCTR* aes_ctr;
+        struct AVAES *aes_ctx;
+        unsigned int frag_index_entry_base;
         unsigned int per_sample_iv_size;  // Either 0, 8, or 16.
         AVEncryptionInfo *default_encrypted_sample;
         MOVEncryptionIndex *encryption_index;
@@ -277,6 +294,7 @@ typedef struct MOVContext {
     int moov_retry;
     int use_mfra_for;
     int has_looked_for_mfra;
+    int use_tfdt;
     MOVFragmentIndex frag_index;
     int atom_depth;
     unsigned int aax_mode;  ///< 'aax' file has been detected
@@ -297,6 +315,9 @@ typedef struct MOVContext {
     int32_t movie_display_matrix[3][3]; ///< display matrix from mvhd
     int have_read_mfra_size;
     uint32_t mfra_size;
+    uint32_t max_stts_delta;
+    int is_still_picture_avif;
+    int primary_item_id;
 } MOVContext;
 
 int ff_mp4_read_descr_len(AVIOContext *pb);
@@ -385,5 +406,20 @@ static inline enum AVCodecID ff_mov_get_lpcm_codec_id(int bps, int flags)
      */
     return ff_get_pcm_codec_id(bps, flags & 1, flags & 2, flags & 4 ? -1 : 0);
 }
+
+#define MOV_ISMV_TTML_TAG MKTAG('d', 'f', 'x', 'p')
+#define MOV_MP4_TTML_TAG  MKTAG('s', 't', 'p', 'p')
+
+struct MP4TrackKindValueMapping {
+    int         disposition;
+    const char *value;
+};
+
+struct MP4TrackKindMapping {
+    const char   *scheme_uri;
+    const struct  MP4TrackKindValueMapping *value_maps;
+};
+
+extern const struct MP4TrackKindMapping ff_mov_track_kind_table[];
 
 #endif /* AVFORMAT_ISOM_H */

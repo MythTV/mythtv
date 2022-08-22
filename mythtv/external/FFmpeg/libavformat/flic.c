@@ -157,10 +157,9 @@ static int flic_read_header(AVFormatContext *s)
         ast->codecpar->codec_id = AV_CODEC_ID_PCM_U8;
         ast->codecpar->codec_tag = 0;
         ast->codecpar->sample_rate = FLIC_TFTD_SAMPLE_RATE;
-        ast->codecpar->channels = 1;
         ast->codecpar->bit_rate = st->codecpar->sample_rate * 8;
         ast->codecpar->bits_per_coded_sample = 8;
-        ast->codecpar->channel_layout = AV_CH_LAYOUT_MONO;
+        ast->codecpar->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
         ast->codecpar->extradata_size = 0;
 
         /* Since the header information is incorrect we have to figure out the
@@ -265,10 +264,11 @@ static int flic_read_seek(AVFormatContext *s, int stream_index,
 {
     FlicDemuxContext *flic = s->priv_data;
     AVStream *st = s->streams[stream_index];
+    FFStream *const sti = ffstream(st);
     int64_t pos, ts;
     int index;
 
-    if (!st->index_entries || stream_index != flic->video_stream_index)
+    if (!sti->index_entries || stream_index != flic->video_stream_index)
         return -1;
 
     index = av_index_search_timestamp(st, pts, flags);
@@ -278,14 +278,14 @@ static int flic_read_seek(AVFormatContext *s, int stream_index,
     if (index < 0)
         return -1;
 
-    pos = st->index_entries[index].pos;
-    ts  = st->index_entries[index].timestamp;
+    pos = sti->index_entries[index].pos;
+    ts  = sti->index_entries[index].timestamp;
     flic->frame_number = ts;
     avio_seek(s->pb, pos, SEEK_SET);
     return 0;
 }
 
-AVInputFormat ff_flic_demuxer = {
+const AVInputFormat ff_flic_demuxer = {
     .name           = "flic",
     .long_name      = NULL_IF_CONFIG_SMALL("FLI/FLC/FLX animation"),
     .priv_data_size = sizeof(FlicDemuxContext),

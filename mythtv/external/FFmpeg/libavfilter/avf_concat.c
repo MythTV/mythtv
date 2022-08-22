@@ -23,7 +23,6 @@
  * concat audio-video filter
  */
 
-#include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
 #include "libavutil/channel_layout.h"
 #include "libavutil/opt.h"
@@ -264,7 +263,7 @@ static int send_silence(AVFilterContext *ctx, unsigned in_no, unsigned out_no,
         if (!buf)
             return AVERROR(ENOMEM);
         av_samples_set_silence(buf->extended_data, 0, frame_nb_samples,
-                               outlink->channels, outlink->format);
+                               outlink->ch_layout.nb_channels, outlink->format);
         buf->pts = base_pts + av_rescale_q(sent, rate_tb, outlink->time_base);
         ret = ff_filter_frame(outlink, buf);
         if (ret < 0)
@@ -314,14 +313,14 @@ static av_cold int init(AVFilterContext *ctx)
             for (str = 0; str < cat->nb_streams[type]; str++) {
                 AVFilterPad pad = {
                     .type             = type,
-                    .get_video_buffer = get_video_buffer,
-                    .get_audio_buffer = get_audio_buffer,
                 };
+                if (type == AVMEDIA_TYPE_VIDEO)
+                    pad.get_buffer.video = get_video_buffer;
+                else
+                    pad.get_buffer.audio = get_audio_buffer;
                 pad.name = av_asprintf("in%d:%c%d", seg, "va"[type], str);
-                if ((ret = ff_insert_inpad(ctx, ctx->nb_inputs, &pad)) < 0) {
-                    av_freep(&pad.name);
+                if ((ret = ff_append_inpad_free_name(ctx, &pad)) < 0)
                     return ret;
-                }
             }
         }
     }
@@ -333,10 +332,8 @@ static av_cold int init(AVFilterContext *ctx)
                 .config_props  = config_output,
             };
             pad.name = av_asprintf("out:%c%d", "va"[type], str);
-            if ((ret = ff_insert_outpad(ctx, ctx->nb_outputs, &pad)) < 0) {
-                av_freep(&pad.name);
+            if ((ret = ff_append_outpad_free_name(ctx, &pad)) < 0)
                 return ret;
-            }
         }
     }
 
@@ -350,12 +347,7 @@ static av_cold int init(AVFilterContext *ctx)
 static av_cold void uninit(AVFilterContext *ctx)
 {
     ConcatContext *cat = ctx->priv;
-    unsigned i;
 
-    for (i = 0; i < ctx->nb_inputs; i++)
-        av_freep(&ctx->input_pads[i].name);
-    for (i = 0; i < ctx->nb_outputs; i++)
-        av_freep(&ctx->output_pads[i].name);
     av_freep(&cat->in);
 }
 
@@ -398,12 +390,17 @@ static int activate(AVFilterContext *ctx)
     /* Forward status change */
     if (cat->cur_idx < ctx->nb_inputs) {
         for (i = 0; i < ctx->nb_outputs; i++) {
-            ret = ff_inlink_acknowledge_status(ctx->inputs[cat->cur_idx + i], &status, &pts);
+            AVFilterLink *inlink = ctx->inputs[cat->cur_idx + i];
+
+            ret = ff_inlink_acknowledge_status(inlink, &status, &pts);
             /* TODO use pts */
             if (ret > 0) {
                 close_input(ctx, cat->cur_idx + i);
                 if (cat->cur_idx + ctx->nb_outputs >= ctx->nb_inputs) {
-                    ff_outlink_set_status(ctx->outputs[i], status, pts);
+                    int64_t eof_pts = cat->delta_ts;
+
+                    eof_pts += av_rescale_q(pts, inlink->time_base, ctx->outputs[i]->time_base);
+                    ff_outlink_set_status(ctx->outputs[i], status, eof_pts);
                 }
                 if (!cat->nb_in_active) {
                     ret = flush_segment(ctx);
@@ -447,17 +444,17 @@ static int process_command(AVFilterContext *ctx, const char *cmd, const char *ar
     return ret;
 }
 
-AVFilter ff_avf_concat = {
+const AVFilter ff_avf_concat = {
     .name          = "concat",
     .description   = NULL_IF_CONFIG_SMALL("Concatenate audio and video streams."),
     .init          = init,
     .uninit        = uninit,
-    .query_formats = query_formats,
     .activate      = activate,
     .priv_size     = sizeof(ConcatContext),
     .inputs        = NULL,
     .outputs       = NULL,
     .priv_class    = &concat_class,
     .flags         = AVFILTER_FLAG_DYNAMIC_INPUTS | AVFILTER_FLAG_DYNAMIC_OUTPUTS,
+    FILTER_QUERY_FUNC(query_formats),
     .process_command = process_command,
 };

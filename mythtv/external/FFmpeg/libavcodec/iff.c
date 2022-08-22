@@ -32,6 +32,7 @@
 
 #include "bytestream.h"
 #include "avcodec.h"
+#include "codec_internal.h"
 #include "internal.h"
 #include "mathops.h"
 
@@ -299,14 +300,13 @@ static int extract_header(AVCodecContext *const avctx,
                 avctx->pix_fmt = AV_PIX_FMT_RGB32;
                 av_freep(&s->mask_buf);
                 av_freep(&s->mask_palbuf);
+                if (s->bpp > 16) {
+                    av_log(avctx, AV_LOG_ERROR, "bpp %d too large for palette\n", s->bpp);
+                    return AVERROR(ENOMEM);
+                }
                 s->mask_buf = av_malloc((s->planesize * 32) + AV_INPUT_BUFFER_PADDING_SIZE);
                 if (!s->mask_buf)
                     return AVERROR(ENOMEM);
-                if (s->bpp > 16) {
-                    av_log(avctx, AV_LOG_ERROR, "bpp %d too large for palette\n", s->bpp);
-                    av_freep(&s->mask_buf);
-                    return AVERROR(ENOMEM);
-                }
                 s->mask_palbuf = av_malloc((2 << s->bpp) * sizeof(uint32_t) + AV_INPUT_BUFFER_PADDING_SIZE);
                 if (!s->mask_palbuf) {
                     av_freep(&s->mask_buf);
@@ -1457,6 +1457,7 @@ static void decode_delta_l(uint8_t *dst,
     int planepitch_byte = (w + 7) / 8;
     int planepitch = ((w + 15) / 16) * 2;
     int pitch = planepitch * bpp;
+    int count = 0;
 
     if (buf_end - buf <= 64)
         return;
@@ -1488,6 +1489,8 @@ static void decode_delta_l(uint8_t *dst,
             int16_t cnt = bytestream2_get_be16(&ogb);
             uint16_t data;
 
+            if (count > dst_size)
+                break;
             offset = ((2 * offset) / planepitch_byte) * pitch + ((2 * offset) % planepitch_byte) + k * planepitch;
             if (cnt < 0) {
                 if (bytestream2_get_bytes_left(&dgb) < 2)
@@ -1495,6 +1498,7 @@ static void decode_delta_l(uint8_t *dst,
                 bytestream2_seek_p(&pb, offset, SEEK_SET);
                 cnt = -cnt;
                 data = bytestream2_get_be16(&dgb);
+                count += cnt;
                 for (i = 0; i < cnt; i++) {
                     bytestream2_put_be16(&pb, data);
                     bytestream2_skip_p(&pb, dstpitch - 2);
@@ -1503,6 +1507,7 @@ static void decode_delta_l(uint8_t *dst,
                 if (bytestream2_get_bytes_left(&dgb) < 2*cnt)
                     break;
                 bytestream2_seek_p(&pb, offset, SEEK_SET);
+                count += cnt;
                 for (i = 0; i < cnt; i++) {
                     data = bytestream2_get_be16(&dgb);
                     bytestream2_put_be16(&pb, data);
@@ -1520,12 +1525,10 @@ static int unsupported(AVCodecContext *avctx)
     return AVERROR_INVALIDDATA;
 }
 
-static int decode_frame(AVCodecContext *avctx,
-                        void *data, int *got_frame,
-                        AVPacket *avpkt)
+static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
+                        int *got_frame, AVPacket *avpkt)
 {
     IffContext *s          = avctx->priv_data;
-    AVFrame *frame         = data;
     const uint8_t *buf     = avpkt->data;
     int buf_size           = avpkt->size;
     const uint8_t *buf_end = buf + buf_size;
@@ -1903,17 +1906,15 @@ static int decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-#if CONFIG_IFF_ILBM_DECODER
-AVCodec ff_iff_ilbm_decoder = {
-    .name           = "iff",
-    .long_name      = NULL_IF_CONFIG_SMALL("IFF ACBM/ANIM/DEEP/ILBM/PBM/RGB8/RGBN"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_IFF_ILBM,
+const FFCodec ff_iff_ilbm_decoder = {
+    .p.name         = "iff",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("IFF ACBM/ANIM/DEEP/ILBM/PBM/RGB8/RGBN"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_IFF_ILBM,
     .priv_data_size = sizeof(IffContext),
     .init           = decode_init,
     .close          = decode_end,
-    .decode         = decode_frame,
-    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
-    .capabilities   = AV_CODEC_CAP_DR1,
+    FF_CODEC_DECODE_CB(decode_frame),
+    .p.capabilities = AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
 };
-#endif

@@ -43,6 +43,8 @@
 
 #include "avcodec.h"
 #include "bytestream.h"
+#include "codec_internal.h"
+#include "decode.h"
 #include "internal.h"
 
 #define TILE_SIZE 8
@@ -146,13 +148,12 @@ static av_cold int rscc_close(AVCodecContext *avctx)
     return 0;
 }
 
-static int rscc_decode_frame(AVCodecContext *avctx, void *data,
-                                     int *got_frame, AVPacket *avpkt)
+static int rscc_decode_frame(AVCodecContext *avctx, AVFrame *frame,
+                             int *got_frame, AVPacket *avpkt)
 {
     RsccContext *ctx = avctx->priv_data;
     GetByteContext *gbc = &ctx->gbc;
     GetByteContext tiles_gbc;
-    AVFrame *frame = data;
     const uint8_t *pixels, *raw;
     uint8_t *inflated_tiles = NULL;
     int tiles_nb, packed_size, pixel_size = 0;
@@ -346,17 +347,8 @@ static int rscc_decode_frame(AVCodecContext *avctx, void *data,
 
     /* Palette handling */
     if (avctx->pix_fmt == AV_PIX_FMT_PAL8) {
-        buffer_size_t size;
-        const uint8_t *palette = av_packet_get_side_data(avpkt,
-                                                         AV_PKT_DATA_PALETTE,
-                                                         &size);
-        if (palette && size == AVPALETTE_SIZE) {
-            frame->palette_has_changed = 1;
-            memcpy(ctx->palette, palette, AVPALETTE_SIZE);
-        } else if (palette) {
-            av_log(avctx, AV_LOG_ERROR, "Palette size %d is wrong\n", size);
-        }
-        memcpy (frame->data[1], ctx->palette, AVPALETTE_SIZE);
+        frame->palette_has_changed = ff_copy_palette(ctx->palette, avpkt, avctx);
+        memcpy(frame->data[1], ctx->palette, AVPALETTE_SIZE);
     }
     // We only return a picture when enough of it is undamaged, this avoids copying nearly broken frames around
     if (ctx->valid_pixels < ctx->inflated_size)
@@ -370,16 +362,16 @@ end:
     return ret;
 }
 
-AVCodec ff_rscc_decoder = {
-    .name           = "rscc",
-    .long_name      = NULL_IF_CONFIG_SMALL("innoHeim/Rsupport Screen Capture Codec"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_RSCC,
+const FFCodec ff_rscc_decoder = {
+    .p.name         = "rscc",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("innoHeim/Rsupport Screen Capture Codec"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_RSCC,
     .init           = rscc_init,
-    .decode         = rscc_decode_frame,
+    FF_CODEC_DECODE_CB(rscc_decode_frame),
     .close          = rscc_close,
     .priv_data_size = sizeof(RsccContext),
-    .capabilities   = AV_CODEC_CAP_DR1,
+    .p.capabilities = AV_CODEC_CAP_DR1,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE |
                       FF_CODEC_CAP_INIT_CLEANUP,
 };

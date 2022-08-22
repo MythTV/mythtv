@@ -28,6 +28,7 @@
 #ifndef AVCODEC_AACENCTAB_H
 #define AVCODEC_AACENCTAB_H
 
+#include "libavutil/channel_layout.h"
 #include "aac.h"
 
 /** Total number of usable codebooks **/
@@ -44,14 +45,14 @@ extern const uint8_t *const ff_aac_swb_size_128[];
 extern const int      ff_aac_swb_size_128_len;
 
 /* Supported layouts without using a PCE */
-static const int64_t aac_normal_chan_layouts[7] = {
-    AV_CH_LAYOUT_MONO,
-    AV_CH_LAYOUT_STEREO,
-    AV_CH_LAYOUT_SURROUND,
-    AV_CH_LAYOUT_4POINT0,
-    AV_CH_LAYOUT_5POINT0_BACK,
-    AV_CH_LAYOUT_5POINT1_BACK,
-    AV_CH_LAYOUT_7POINT1,
+static const AVChannelLayout aac_normal_chan_layouts[7] = {
+    AV_CHANNEL_LAYOUT_MONO,
+    AV_CHANNEL_LAYOUT_STEREO,
+    AV_CHANNEL_LAYOUT_SURROUND,
+    AV_CHANNEL_LAYOUT_4POINT0,
+    AV_CHANNEL_LAYOUT_5POINT0_BACK,
+    AV_CHANNEL_LAYOUT_5POINT1_BACK,
+    AV_CHANNEL_LAYOUT_7POINT1,
 };
 
 /** default channel configurations */
@@ -78,13 +79,6 @@ static const uint8_t aac_chan_maps[AAC_MAX_CHANNELS][AAC_MAX_CHANNELS] = {
     { 2, 0, 1, 4, 5, 3 },
     { 0 },
     { 2, 0, 1, 6, 7, 4, 5, 3 },
-};
-
-/* duplicated from avpriv_mpeg4audio_sample_rates to avoid shared build
- * failures */
-static const int mpeg4audio_sample_rates[16] = {
-    96000, 88200, 64000, 48000, 44100, 32000,
-    24000, 22050, 16000, 12000, 11025, 8000, 7350
 };
 
 /** bits needed to code codebook run value for long windows */

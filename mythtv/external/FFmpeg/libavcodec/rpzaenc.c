@@ -28,7 +28,8 @@
 #include "libavutil/opt.h"
 
 #include "avcodec.h"
-#include "internal.h"
+#include "codec_internal.h"
+#include "encode.h"
 #include "put_bits.h"
 
 typedef struct RpzaContext {
@@ -776,9 +777,9 @@ static int rpza_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     RpzaContext *s = avctx->priv_data;
     const AVFrame *pict = frame;
     uint8_t *buf;
-    int ret;
+    int ret = ff_alloc_packet(avctx, pkt, 6LL * avctx->height * avctx->width);
 
-    if ((ret = ff_alloc_packet2(avctx, pkt, 6LL * avctx->height * avctx->width, 0)) < 0)
+    if (ret < 0)
         return ret;
 
     init_put_bits(&s->pb, pkt->data, pkt->size);
@@ -802,7 +803,7 @@ static int rpza_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
 
     flush_put_bits(&s->pb);
 
-    av_shrink_packet(pkt, put_bits_count(&s->pb) >> 3);
+    av_shrink_packet(pkt, put_bytes_output(&s->pb));
     buf = pkt->data;
 
     // write header opcode
@@ -842,17 +843,17 @@ static const AVClass rpza_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-AVCodec ff_rpza_encoder = {
-    .name           = "rpza",
-    .long_name      = NULL_IF_CONFIG_SMALL("QuickTime video (RPZA)"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_RPZA,
+const FFCodec ff_rpza_encoder = {
+    .p.name         = "rpza",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("QuickTime video (RPZA)"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_RPZA,
     .priv_data_size = sizeof(RpzaContext),
-    .priv_class     = &rpza_class,
+    .p.priv_class   = &rpza_class,
     .init           = rpza_encode_init,
-    .encode2        = rpza_encode_frame,
+    FF_CODEC_ENCODE_CB(rpza_encode_frame),
     .close          = rpza_encode_end,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
-    .pix_fmts       = (const enum AVPixelFormat[]) { AV_PIX_FMT_RGB555,
+    .p.pix_fmts     = (const enum AVPixelFormat[]) { AV_PIX_FMT_RGB555,
                                                      AV_PIX_FMT_NONE},
 };

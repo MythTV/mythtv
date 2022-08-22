@@ -23,7 +23,10 @@
 #ifndef AVDEVICE_DECKLINK_COMMON_C_H
 #define AVDEVICE_DECKLINK_COMMON_C_H
 
+#include <stdint.h>
 #include <DeckLinkAPIVersion.h>
+
+#include "libavutil/log.h"
 
 typedef enum DecklinkPtsSource {
     PTS_SRC_AUDIO     = 1,
@@ -48,6 +51,9 @@ struct decklink_cctx {
     int audio_channels;
     int audio_depth;
     int duplex_mode;
+    int link;
+    int sqd;
+    int level_a;
     DecklinkPtsSource audio_pts_source;
     DecklinkPtsSource video_pts_source;
     int audio_input;

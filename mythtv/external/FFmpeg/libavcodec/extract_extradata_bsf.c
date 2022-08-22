@@ -18,8 +18,6 @@
 
 #include <stdint.h>
 
-#include "libavutil/common.h"
-#include "libavutil/intreadwrite.h"
 #include "libavutil/log.h"
 #include "libavutil/opt.h"
 
@@ -31,6 +29,7 @@
 #include "h2645_parse.h"
 #include "h264.h"
 #include "hevc.h"
+#include "startcode.h"
 #include "vc1_common.h"
 
 typedef struct ExtractExtradataContext {
@@ -328,6 +327,7 @@ static const struct {
 } extract_tab[] = {
     { AV_CODEC_ID_AV1,        extract_extradata_av1     },
     { AV_CODEC_ID_AVS2,       extract_extradata_mpeg4   },
+    { AV_CODEC_ID_AVS3,       extract_extradata_mpeg4   },
     { AV_CODEC_ID_CAVS,       extract_extradata_mpeg4   },
     { AV_CODEC_ID_H264,       extract_extradata_h2645   },
     { AV_CODEC_ID_HEVC,       extract_extradata_h2645   },
@@ -396,6 +396,7 @@ static void extract_extradata_close(AVBSFContext *ctx)
 static const enum AVCodecID codec_ids[] = {
     AV_CODEC_ID_AV1,
     AV_CODEC_ID_AVS2,
+    AV_CODEC_ID_AVS3,
     AV_CODEC_ID_CAVS,
     AV_CODEC_ID_H264,
     AV_CODEC_ID_HEVC,
@@ -421,11 +422,11 @@ static const AVClass extract_extradata_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-const AVBitStreamFilter ff_extract_extradata_bsf = {
-    .name           = "extract_extradata",
-    .codec_ids      = codec_ids,
+const FFBitStreamFilter ff_extract_extradata_bsf = {
+    .p.name         = "extract_extradata",
+    .p.codec_ids    = codec_ids,
+    .p.priv_class   = &extract_extradata_class,
     .priv_data_size = sizeof(ExtractExtradataContext),
-    .priv_class     = &extract_extradata_class,
     .init           = extract_extradata_init,
     .filter         = extract_extradata_filter,
     .close          = extract_extradata_close,

@@ -24,6 +24,7 @@
 #include "libavutil/intreadwrite.h"
 #include "libavcodec/bytestream.h"
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 
 #define LXF_MAX_PACKET_HEADER_SIZE 256
@@ -262,7 +263,7 @@ static int lxf_read_header(AVFormatContext *s)
     st->codecpar->bit_rate   = 1000000 * ((video_params >> 14) & 0xFF);
     st->codecpar->codec_tag  = video_params & 0xF;
     st->codecpar->codec_id   = ff_codec_get_id(lxf_tags, st->codecpar->codec_tag);
-    st->need_parsing         = AVSTREAM_PARSE_HEADERS;
+    ffstream(st)->need_parsing = AVSTREAM_PARSE_HEADERS;
 
     av_log(s, AV_LOG_DEBUG, "record: %x = %i-%02i-%02i\n",
            record_date, 1900 + (record_date & 0x7F), (record_date >> 7) & 0xF,
@@ -281,7 +282,7 @@ static int lxf_read_header(AVFormatContext *s)
 
         st->codecpar->codec_type  = AVMEDIA_TYPE_AUDIO;
         st->codecpar->sample_rate = LXF_SAMPLERATE;
-        st->codecpar->channels    = lxf->channels;
+        st->codecpar->ch_layout.nb_channels = lxf->channels;
 
         avpriv_set_pts_info(st, 64, 1, st->codecpar->sample_rate);
     }
@@ -334,7 +335,7 @@ static int lxf_read_packet(AVFormatContext *s, AVPacket *pkt)
     return ret;
 }
 
-AVInputFormat ff_lxf_demuxer = {
+const AVInputFormat ff_lxf_demuxer = {
     .name           = "lxf",
     .long_name      = NULL_IF_CONFIG_SMALL("VR native stream (LXF)"),
     .priv_data_size = sizeof(LXFDemuxContext),

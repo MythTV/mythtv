@@ -71,7 +71,6 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
         av_frame_copy_props(out, in);
     }
 
-
     for (n = 0; n < in->nb_samples; n++) {
         double integer, decimal;
         decimal = modf(s->depth * s->wave_table[s->wave_table_index], &integer);
@@ -80,7 +79,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
         if (s->wave_table_index >= s->wave_table_size)
             s->wave_table_index -= s->wave_table_size;
 
-        for (c = 0; c < inlink->channels; c++) {
+        for (c = 0; c < inlink->ch_layout.nb_channels; c++) {
             int samp1_index, samp2_index;
             double *buf;
             double this_samp;
@@ -111,36 +110,6 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     return ff_filter_frame(outlink, out);
 }
 
-static int query_formats(AVFilterContext *ctx)
-{
-    AVFilterFormats *formats;
-    AVFilterChannelLayouts *layouts;
-    static const enum AVSampleFormat sample_fmts[] = {
-        AV_SAMPLE_FMT_DBLP,
-        AV_SAMPLE_FMT_NONE
-    };
-    int ret;
-
-    layouts = ff_all_channel_counts();
-    if (!layouts)
-        return AVERROR(ENOMEM);
-    ret = ff_set_common_channel_layouts(ctx, layouts);
-    if (ret < 0)
-        return ret;
-
-    formats = ff_make_format_list(sample_fmts);
-    if (!formats)
-        return AVERROR(ENOMEM);
-    ret = ff_set_common_formats(ctx, formats);
-    if (ret < 0)
-        return ret;
-
-    formats = ff_all_samplerates();
-    if (!formats)
-        return AVERROR(ENOMEM);
-    return ff_set_common_samplerates(ctx, formats);
-}
-
 static av_cold void uninit(AVFilterContext *ctx)
 {
     VibratoContext *s = ctx->priv;
@@ -157,11 +126,11 @@ static int config_input(AVFilterLink *inlink)
     int c;
     AVFilterContext *ctx = inlink->dst;
     VibratoContext *s = ctx->priv;
-    s->channels = inlink->channels;
 
-    s->buf = av_calloc(inlink->channels, sizeof(*s->buf));
+    s->buf = av_calloc(inlink->ch_layout.nb_channels, sizeof(*s->buf));
     if (!s->buf)
         return AVERROR(ENOMEM);
+    s->channels = inlink->ch_layout.nb_channels;
     s->buf_size = lrint(inlink->sample_rate * 0.005 + 0.5);
     for (c = 0; c < s->channels; c++) {
         s->buf[c] = av_malloc_array(s->buf_size, sizeof(*s->buf[c]));
@@ -187,7 +156,6 @@ static const AVFilterPad avfilter_af_vibrato_inputs[] = {
         .config_props = config_input,
         .filter_frame = filter_frame,
     },
-    { NULL }
 };
 
 static const AVFilterPad avfilter_af_vibrato_outputs[] = {
@@ -195,16 +163,16 @@ static const AVFilterPad avfilter_af_vibrato_outputs[] = {
         .name = "default",
         .type = AVMEDIA_TYPE_AUDIO,
     },
-    { NULL }
 };
 
-AVFilter ff_af_vibrato = {
+const AVFilter ff_af_vibrato = {
     .name          = "vibrato",
     .description   = NULL_IF_CONFIG_SMALL("Apply vibrato effect."),
     .priv_size     = sizeof(VibratoContext),
     .priv_class    = &vibrato_class,
     .uninit        = uninit,
-    .query_formats = query_formats,
-    .inputs        = avfilter_af_vibrato_inputs,
-    .outputs       = avfilter_af_vibrato_outputs,
+    FILTER_INPUTS(avfilter_af_vibrato_inputs),
+    FILTER_OUTPUTS(avfilter_af_vibrato_outputs),
+    FILTER_SINGLE_SAMPLEFMT(AV_SAMPLE_FMT_DBLP),
+    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
 };

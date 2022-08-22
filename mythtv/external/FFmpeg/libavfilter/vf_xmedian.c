@@ -18,6 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "config_components.h"
+
 #include "libavutil/avstring.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
@@ -36,18 +38,22 @@ typedef struct XMedianContext {
     const AVPixFmtDescriptor *desc;
     int nb_inputs;
     int nb_frames;
+    int nb_threads;
     int planes;
     float percentile;
 
-    int tmedian;
+    int xmedian;
     int radius;
     int index;
     int depth;
     int max;
     int nb_planes;
-    int linesize[4];
+    int linesizes[4];
     int width[4];
     int height[4];
+
+    uint8_t **data;
+    int *linesize;
 
     AVFrame **frames;
     FFFrameSync fs;
@@ -55,55 +61,42 @@ typedef struct XMedianContext {
     int (*median_frames)(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs);
 } XMedianContext;
 
-static int query_formats(AVFilterContext *ctx)
-{
-    static const enum AVPixelFormat pixel_fmts[] = {
-        AV_PIX_FMT_GRAY8,
-        AV_PIX_FMT_GRAY9,
-        AV_PIX_FMT_GRAY10,
-        AV_PIX_FMT_GRAY12,
-        AV_PIX_FMT_GRAY14,
-        AV_PIX_FMT_GRAY16,
-        AV_PIX_FMT_YUV410P, AV_PIX_FMT_YUV411P,
-        AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV422P,
-        AV_PIX_FMT_YUV440P, AV_PIX_FMT_YUV444P,
-        AV_PIX_FMT_YUVJ420P, AV_PIX_FMT_YUVJ422P,
-        AV_PIX_FMT_YUVJ440P, AV_PIX_FMT_YUVJ444P,
-        AV_PIX_FMT_YUVJ411P,
-        AV_PIX_FMT_YUV420P9, AV_PIX_FMT_YUV422P9, AV_PIX_FMT_YUV444P9,
-        AV_PIX_FMT_YUV420P10, AV_PIX_FMT_YUV422P10, AV_PIX_FMT_YUV444P10,
-        AV_PIX_FMT_YUV440P10,
-        AV_PIX_FMT_YUV444P12, AV_PIX_FMT_YUV422P12, AV_PIX_FMT_YUV420P12,
-        AV_PIX_FMT_YUV440P12,
-        AV_PIX_FMT_YUV444P14, AV_PIX_FMT_YUV422P14, AV_PIX_FMT_YUV420P14,
-        AV_PIX_FMT_YUV420P16, AV_PIX_FMT_YUV422P16, AV_PIX_FMT_YUV444P16,
-        AV_PIX_FMT_GBRP, AV_PIX_FMT_GBRP9, AV_PIX_FMT_GBRP10,
-        AV_PIX_FMT_GBRP12, AV_PIX_FMT_GBRP14, AV_PIX_FMT_GBRP16,
-        AV_PIX_FMT_YUVA420P,  AV_PIX_FMT_YUVA422P,   AV_PIX_FMT_YUVA444P,
-        AV_PIX_FMT_YUVA444P9, AV_PIX_FMT_YUVA444P10, AV_PIX_FMT_YUVA444P12, AV_PIX_FMT_YUVA444P16,
-        AV_PIX_FMT_YUVA422P9, AV_PIX_FMT_YUVA422P10, AV_PIX_FMT_YUVA422P12, AV_PIX_FMT_YUVA422P16,
-        AV_PIX_FMT_YUVA420P9, AV_PIX_FMT_YUVA420P10, AV_PIX_FMT_YUVA420P16,
-        AV_PIX_FMT_GBRAP,     AV_PIX_FMT_GBRAP10,    AV_PIX_FMT_GBRAP12,    AV_PIX_FMT_GBRAP16,
-        AV_PIX_FMT_NONE
-    };
-    AVFilterFormats *formats = ff_make_format_list(pixel_fmts);
-    if (!formats)
-        return AVERROR(ENOMEM);
-    return ff_set_common_formats(ctx, formats);
-}
+static const enum AVPixelFormat pixel_fmts[] = {
+    AV_PIX_FMT_GRAY8,
+    AV_PIX_FMT_GRAY9,
+    AV_PIX_FMT_GRAY10,
+    AV_PIX_FMT_GRAY12,
+    AV_PIX_FMT_GRAY14,
+    AV_PIX_FMT_GRAY16,
+    AV_PIX_FMT_YUV410P, AV_PIX_FMT_YUV411P,
+    AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV422P,
+    AV_PIX_FMT_YUV440P, AV_PIX_FMT_YUV444P,
+    AV_PIX_FMT_YUVJ420P, AV_PIX_FMT_YUVJ422P,
+    AV_PIX_FMT_YUVJ440P, AV_PIX_FMT_YUVJ444P,
+    AV_PIX_FMT_YUVJ411P,
+    AV_PIX_FMT_YUV420P9, AV_PIX_FMT_YUV422P9, AV_PIX_FMT_YUV444P9,
+    AV_PIX_FMT_YUV420P10, AV_PIX_FMT_YUV422P10, AV_PIX_FMT_YUV444P10,
+    AV_PIX_FMT_YUV440P10,
+    AV_PIX_FMT_YUV444P12, AV_PIX_FMT_YUV422P12, AV_PIX_FMT_YUV420P12,
+    AV_PIX_FMT_YUV440P12,
+    AV_PIX_FMT_YUV444P14, AV_PIX_FMT_YUV422P14, AV_PIX_FMT_YUV420P14,
+    AV_PIX_FMT_YUV420P16, AV_PIX_FMT_YUV422P16, AV_PIX_FMT_YUV444P16,
+    AV_PIX_FMT_GBRP, AV_PIX_FMT_GBRP9, AV_PIX_FMT_GBRP10,
+    AV_PIX_FMT_GBRP12, AV_PIX_FMT_GBRP14, AV_PIX_FMT_GBRP16,
+    AV_PIX_FMT_YUVA420P,  AV_PIX_FMT_YUVA422P,   AV_PIX_FMT_YUVA444P,
+    AV_PIX_FMT_YUVA444P9, AV_PIX_FMT_YUVA444P10, AV_PIX_FMT_YUVA444P12, AV_PIX_FMT_YUVA444P16,
+    AV_PIX_FMT_YUVA422P9, AV_PIX_FMT_YUVA422P10, AV_PIX_FMT_YUVA422P12, AV_PIX_FMT_YUVA422P16,
+    AV_PIX_FMT_YUVA420P9, AV_PIX_FMT_YUVA420P10, AV_PIX_FMT_YUVA420P16,
+    AV_PIX_FMT_GBRAP,     AV_PIX_FMT_GBRAP10,    AV_PIX_FMT_GBRAP12,    AV_PIX_FMT_GBRAP16,
+    AV_PIX_FMT_NONE
+};
 
 static av_cold int init(AVFilterContext *ctx)
 {
     XMedianContext *s = ctx->priv;
-    int ret;
 
-    s->tmedian = !strcmp(ctx->filter->name, "tmedian");
-
-    if (!s->tmedian) {
-        s->radius = s->nb_inputs / 2;
-    } else {
+    if (!s->xmedian)
         s->nb_inputs = s->radius * 2 + 1;
-    }
 
     if (s->nb_inputs & 1)
         s->index = s->radius * 2.f * s->percentile;
@@ -113,20 +106,6 @@ static av_cold int init(AVFilterContext *ctx)
     if (!s->frames)
         return AVERROR(ENOMEM);
 
-    for (int i = 0; i < s->nb_inputs && !s->tmedian; i++) {
-        AVFilterPad pad = { 0 };
-
-        pad.type = AVMEDIA_TYPE_VIDEO;
-        pad.name = av_asprintf("input%d", i);
-        if (!pad.name)
-            return AVERROR(ENOMEM);
-
-        if ((ret = ff_insert_inpad(ctx, i, &pad)) < 0) {
-            av_freep(&pad.name);
-            return ret;
-        }
-    }
-
     return 0;
 }
 
@@ -134,99 +113,87 @@ typedef struct ThreadData {
     AVFrame **in, *out;
 } ThreadData;
 
-static int comparei(const void *p1, const void *p2)
+static int compare8(const void *p1, const void *p2)
 {
-    int left  = *(const int *)p1;
-    int right = *(const int *)p2;
+    int left  = *(const uint8_t *)p1;
+    int right = *(const uint8_t *)p2;
     return FFDIFFSIGN(left, right);
 }
 
-static int median_frames16(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
+static int compare16(const void *p1, const void *p2)
 {
-    XMedianContext *s = ctx->priv;
-    ThreadData *td = arg;
-    AVFrame **in = td->in;
-    AVFrame *out = td->out;
-    const int nb_inputs = s->nb_inputs;
-    const int radius = s->radius;
-    const int index = s->index;
-    int values[256];
-
-    for (int p = 0; p < s->nb_planes; p++) {
-        const int slice_start = (s->height[p] * jobnr) / nb_jobs;
-        const int slice_end = (s->height[p] * (jobnr+1)) / nb_jobs;
-        uint16_t *dst = (uint16_t *)(out->data[p] + slice_start * out->linesize[p]);
-
-        if (!((1 << p) & s->planes)) {
-            av_image_copy_plane((uint8_t *)dst, out->linesize[p],
-                                in[radius]->data[p] + slice_start * in[radius]->linesize[p],
-                                in[radius]->linesize[p],
-                                s->linesize[p], slice_end - slice_start);
-            continue;
-        }
-
-        for (int y = slice_start; y < slice_end; y++) {
-            for (int x = 0; x < s->width[p]; x++) {
-                for (int i = 0; i < nb_inputs; i++) {
-                    const uint16_t *src = (const uint16_t *)(in[i]->data[p] + y * in[i]->linesize[p]);
-                    values[i] = src[x];
-                }
-
-                AV_QSORT(values, nb_inputs, int, comparei);
-                if (nb_inputs & 1)
-                    dst[x] = values[index];
-                else
-                    dst[x] = (values[index] + values[index - 1]) >> 1;
-            }
-
-            dst += out->linesize[p] / 2;
-        }
-    }
-
-    return 0;
+    int left  = *(const uint16_t *)p1;
+    int right = *(const uint16_t *)p2;
+    return FFDIFFSIGN(left, right);
 }
 
-static int median_frames8(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
+#define MEDIAN_SLICE(name, type, comparei)                                                      \
+static int median_frames ## name(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)       \
+{                                                                                               \
+    XMedianContext *s = ctx->priv;                                                              \
+    ThreadData *td = arg;                                                                       \
+    AVFrame **in = td->in;                                                                      \
+    AVFrame *out = td->out;                                                                     \
+    const int nb_inputs = s->nb_inputs;                                                         \
+    uint8_t **srcf = s->data + jobnr * nb_inputs;                                               \
+    int *linesize = s->linesize + jobnr * nb_inputs;                                            \
+    const int radius = s->radius;                                                               \
+    const int index = s->index;                                                                 \
+    type values[256];                                                                           \
+                                                                                                \
+    for (int p = 0; p < s->nb_planes; p++) {                                                    \
+        const int slice_start = (s->height[p] * jobnr) / nb_jobs;                               \
+        const int slice_end = (s->height[p] * (jobnr+1)) / nb_jobs;                             \
+        const int width = s->width[p];                                                          \
+        type *dst = (type *)(out->data[p] + slice_start * out->linesize[p]);                    \
+        ptrdiff_t dst_linesize = out->linesize[p] / sizeof(type);                               \
+                                                                                                \
+        if (!((1 << p) & s->planes)) {                                                          \
+            av_image_copy_plane((uint8_t *)dst, out->linesize[p],                               \
+                                in[radius]->data[p] + slice_start * in[radius]->linesize[p],    \
+                                in[radius]->linesize[p],                                        \
+                                s->linesizes[p], slice_end - slice_start);                      \
+            continue;                                                                           \
+        }                                                                                       \
+                                                                                                \
+        for (int i = 0; i < nb_inputs; i++)                                                     \
+            linesize[i] = in[i]->linesize[p];                                                   \
+                                                                                                \
+        for (int i = 0; i < nb_inputs; i++)                                                     \
+            srcf[i] = in[i]->data[p] + slice_start * linesize[i];                               \
+                                                                                                \
+        for (int y = slice_start; y < slice_end; y++) {                                         \
+            for (int x = 0; x < width; x++) {                                                   \
+                for (int i = 0; i < nb_inputs; i++) {                                           \
+                    const type *src = (const type *)srcf[i];                                    \
+                    values[i] = src[x];                                                         \
+                }                                                                               \
+                                                                                                \
+                AV_QSORT(values, nb_inputs, type, comparei);                                    \
+                if (nb_inputs & 1)                                                              \
+                    dst[x] = values[index];                                                     \
+                else                                                                            \
+                    dst[x] = (values[index] + values[index - 1]) >> 1;                          \
+            }                                                                                   \
+                                                                                                \
+            dst += dst_linesize;                                                                \
+            for (int i = 0; i < nb_inputs; i++)                                                 \
+                srcf[i] += linesize[i];                                                         \
+        }                                                                                       \
+    }                                                                                           \
+                                                                                                \
+    return 0;                                                                                   \
+}
+
+MEDIAN_SLICE(8, uint8_t, compare8)
+MEDIAN_SLICE(16, uint16_t, compare16)
+
+static void update_index(XMedianContext *s)
 {
-    XMedianContext *s = ctx->priv;
-    ThreadData *td = arg;
-    AVFrame **in = td->in;
-    AVFrame *out = td->out;
-    const int nb_inputs = s->nb_inputs;
-    const int radius = s->radius;
-    const int index = s->index;
-    int values[256];
-
-    for (int p = 0; p < s->nb_planes; p++) {
-        const int slice_start = (s->height[p] * jobnr) / nb_jobs;
-        const int slice_end = (s->height[p] * (jobnr+1)) / nb_jobs;
-        uint8_t *dst = out->data[p] + slice_start * out->linesize[p];
-
-        if (!((1 << p) & s->planes)) {
-            av_image_copy_plane(dst, out->linesize[p],
-                                in[radius]->data[p] + slice_start * in[radius]->linesize[p],
-                                in[radius]->linesize[p],
-                                s->linesize[p], slice_end - slice_start);
-            continue;
-        }
-
-        for (int y = slice_start; y < slice_end; y++) {
-            for (int x = 0; x < s->width[p]; x++) {
-                for (int i = 0; i < nb_inputs; i++)
-                    values[i] = in[i]->data[p][y * in[i]->linesize[p] + x];
-
-                AV_QSORT(values, nb_inputs, int, comparei);
-                if (nb_inputs & 1)
-                    dst[x] = values[index];
-                else
-                    dst[x] = (values[index] + values[index - 1]) >> 1;
-            }
-
-            dst += out->linesize[p];
-        }
-    }
-
-    return 0;
+    if (s->nb_inputs & 1)
+        s->index = s->radius * 2.f * s->percentile;
+    else
+        s->index = av_clip(s->radius * 2.f * s->percentile, 1, s->nb_inputs - 1);
 }
 
 static int process_frame(FFFrameSync *fs)
@@ -238,6 +205,8 @@ static int process_frame(FFFrameSync *fs)
     AVFrame *out;
     ThreadData td;
     int i, ret;
+
+    update_index(s);
 
     for (i = 0; i < s->nb_inputs; i++) {
         if ((ret = ff_framesync_get_frame(&s->fs, i, &in[i], 0)) < 0)
@@ -256,7 +225,8 @@ static int process_frame(FFFrameSync *fs)
     if (!ctx->is_disabled) {
         td.in = in;
         td.out = out;
-        ctx->internal->execute(ctx, s->median_frames, &td, NULL, FFMIN(s->height[1], ff_filter_get_nb_threads(ctx)));
+        ff_filter_execute(ctx, s->median_frames, &td, NULL,
+                          FFMIN(s->height[1], s->nb_threads));
     }
 
     return ff_filter_frame(outlink, out);
@@ -274,7 +244,7 @@ static int config_output(AVFilterLink *outlink)
     FFFrameSyncIn *in;
     int i, ret;
 
-    for (int i = 1; i < s->nb_inputs && !s->tmedian; i++) {
+    for (int i = 1; i < s->nb_inputs && s->xmedian; i++) {
         if (ctx->inputs[i]->h != height || ctx->inputs[i]->w != width) {
             av_log(ctx, AV_LOG_ERROR, "Input %d size (%dx%d) does not match input %d size (%dx%d).\n", i, ctx->inputs[i]->w, ctx->inputs[i]->h, 0, width, height);
             return AVERROR(EINVAL);
@@ -287,13 +257,14 @@ static int config_output(AVFilterLink *outlink)
     s->nb_planes = av_pix_fmt_count_planes(outlink->format);
     s->depth = s->desc->comp[0].depth;
     s->max = (1 << s->depth) - 1;
+    s->nb_threads = ff_filter_get_nb_threads(ctx);
 
     if (s->depth <= 8)
         s->median_frames = median_frames8;
     else
         s->median_frames = median_frames16;
 
-    if ((ret = av_image_fill_linesizes(s->linesize, inlink->format, inlink->w)) < 0)
+    if ((ret = av_image_fill_linesizes(s->linesizes, inlink->format, inlink->w)) < 0)
         return ret;
 
     s->width[1] = s->width[2] = AV_CEIL_RSHIFT(inlink->w, s->desc->log2_chroma_w);
@@ -301,7 +272,15 @@ static int config_output(AVFilterLink *outlink)
     s->height[1] = s->height[2] = AV_CEIL_RSHIFT(inlink->h, s->desc->log2_chroma_h);
     s->height[0] = s->height[3] = inlink->h;
 
-    if (s->tmedian)
+    s->data = av_calloc(s->nb_threads * s->nb_inputs, sizeof(*s->data));
+    if (!s->data)
+        return AVERROR(ENOMEM);
+
+    s->linesize = av_calloc(s->nb_threads * s->nb_inputs, sizeof(*s->linesize));
+    if (!s->linesize)
+        return AVERROR(ENOMEM);
+
+    if (!s->xmedian)
         return 0;
 
     outlink->w          = width;
@@ -337,11 +316,11 @@ static av_cold void uninit(AVFilterContext *ctx)
 
     ff_framesync_uninit(&s->fs);
 
-    for (int i = 0; i < ctx->nb_inputs && !s->tmedian; i++)
-        av_freep(&ctx->input_pads[i].name);
-    for (int i = 0; i < s->nb_frames && s->frames && s->tmedian; i++)
+    for (int i = 0; i < s->nb_frames && s->frames && !s->xmedian; i++)
         av_frame_free(&s->frames[i]);
     av_freep(&s->frames);
+    av_freep(&s->data);
+    av_freep(&s->linesize);
 }
 
 static int activate(AVFilterContext *ctx)
@@ -350,22 +329,29 @@ static int activate(AVFilterContext *ctx)
     return ff_framesync_activate(&s->fs);
 }
 
-static int process_command(AVFilterContext *ctx, const char *cmd, const char *args,
-                           char *res, int res_len, int flags)
+#if CONFIG_XMEDIAN_FILTER
+static av_cold int xmedian_init(AVFilterContext *ctx)
 {
     XMedianContext *s = ctx->priv;
     int ret;
 
-    ret = ff_filter_process_command(ctx, cmd, args, res, res_len, flags);
-    if (ret < 0)
-        return ret;
+    s->xmedian = 1;
 
-    if (s->nb_inputs & 1)
-        s->index = s->radius * 2.f * s->percentile;
-    else
-        s->index = av_clip(s->radius * 2.f * s->percentile, 1, s->nb_inputs - 1);
+    s->radius = s->nb_inputs / 2;
 
-    return 0;
+    for (int i = 0; i < s->nb_inputs; i++) {
+        AVFilterPad pad = { 0 };
+
+        pad.type = AVMEDIA_TYPE_VIDEO;
+        pad.name = av_asprintf("input%d", i);
+        if (!pad.name)
+            return AVERROR(ENOMEM);
+
+        if ((ret = ff_append_inpad_free_name(ctx, &pad)) < 0)
+            return ret;
+    }
+
+    return init(ctx);
 }
 
 #define OFFSET(x) offsetof(XMedianContext, x)
@@ -385,26 +371,24 @@ static const AVFilterPad outputs[] = {
         .type          = AVMEDIA_TYPE_VIDEO,
         .config_props  = config_output,
     },
-    { NULL }
 };
 
-#if CONFIG_XMEDIAN_FILTER
 FRAMESYNC_DEFINE_CLASS(xmedian, XMedianContext, fs);
 
-AVFilter ff_vf_xmedian = {
+const AVFilter ff_vf_xmedian = {
     .name          = "xmedian",
     .description   = NULL_IF_CONFIG_SMALL("Pick median pixels from several video inputs."),
     .priv_size     = sizeof(XMedianContext),
     .priv_class    = &xmedian_class,
-    .query_formats = query_formats,
-    .outputs       = outputs,
+    FILTER_OUTPUTS(outputs),
+    FILTER_PIXFMTS_ARRAY(pixel_fmts),
     .preinit       = xmedian_framesync_preinit,
-    .init          = init,
+    .init          = xmedian_init,
     .uninit        = uninit,
     .activate      = activate,
     .flags         = AVFILTER_FLAG_DYNAMIC_INPUTS | AVFILTER_FLAG_SLICE_THREADS |
                      AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
-    .process_command = process_command,
+    .process_command = ff_filter_process_command,
 };
 
 #endif /* CONFIG_XMEDIAN_FILTER */
@@ -417,6 +401,8 @@ static int tmedian_filter_frame(AVFilterLink *inlink, AVFrame *in)
     XMedianContext *s = ctx->priv;
     ThreadData td;
     AVFrame *out;
+
+    update_index(s);
 
     if (s->nb_frames < s->nb_inputs) {
         s->frames[s->nb_frames] = in;
@@ -443,7 +429,8 @@ static int tmedian_filter_frame(AVFilterLink *inlink, AVFrame *in)
 
     td.out = out;
     td.in = s->frames;
-    ctx->internal->execute(ctx, s->median_frames, &td, NULL, FFMIN(s->height[0], ff_filter_get_nb_threads(ctx)));
+    ff_filter_execute(ctx, s->median_frames, &td, NULL,
+                      FFMIN(s->height[1], s->nb_threads));
 
     return ff_filter_frame(outlink, out);
 }
@@ -461,7 +448,6 @@ static const AVFilterPad tmedian_inputs[] = {
         .type          = AVMEDIA_TYPE_VIDEO,
         .filter_frame  = tmedian_filter_frame,
     },
-    { NULL }
 };
 
 static const AVFilterPad tmedian_outputs[] = {
@@ -470,23 +456,22 @@ static const AVFilterPad tmedian_outputs[] = {
         .type          = AVMEDIA_TYPE_VIDEO,
         .config_props  = config_output,
     },
-    { NULL }
 };
 
 AVFILTER_DEFINE_CLASS(tmedian);
 
-AVFilter ff_vf_tmedian = {
+const AVFilter ff_vf_tmedian = {
     .name          = "tmedian",
     .description   = NULL_IF_CONFIG_SMALL("Pick median pixels from successive frames."),
     .priv_size     = sizeof(XMedianContext),
     .priv_class    = &tmedian_class,
-    .query_formats = query_formats,
-    .inputs        = tmedian_inputs,
-    .outputs       = tmedian_outputs,
+    FILTER_INPUTS(tmedian_inputs),
+    FILTER_OUTPUTS(tmedian_outputs),
+    FILTER_PIXFMTS_ARRAY(pixel_fmts),
     .init          = init,
     .uninit        = uninit,
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL | AVFILTER_FLAG_SLICE_THREADS,
-    .process_command = process_command,
+    .process_command = ff_filter_process_command,
 };
 
 #endif /* CONFIG_TMEDIAN_FILTER */

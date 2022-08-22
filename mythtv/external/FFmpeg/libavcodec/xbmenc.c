@@ -20,8 +20,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/reverse.h"
 #include "avcodec.h"
-#include "internal.h"
+#include "codec_internal.h"
+#include "encode.h"
 #include "mathops.h"
 
 #define ANSI_MIN_READLINE 509
@@ -43,7 +45,7 @@ static int xbm_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     }
 
     size     = rowsout * (lineout * 6 + 1) + 106;
-    if ((ret = ff_alloc_packet2(avctx, pkt, size, 0)) < 0)
+    if ((ret = ff_alloc_packet(avctx, pkt, size)) < 0)
         return ret;
 
     buf = pkt->data;
@@ -70,17 +72,16 @@ static int xbm_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     buf += snprintf(buf, 5, " };\n");
 
     pkt->size   = buf - pkt->data;
-    pkt->flags |= AV_PKT_FLAG_KEY;
     *got_packet = 1;
     return 0;
 }
 
-AVCodec ff_xbm_encoder = {
-    .name         = "xbm",
-    .long_name    = NULL_IF_CONFIG_SMALL("XBM (X BitMap) image"),
-    .type         = AVMEDIA_TYPE_VIDEO,
-    .id           = AV_CODEC_ID_XBM,
-    .encode2      = xbm_encode_frame,
-    .pix_fmts     = (const enum AVPixelFormat[]) { AV_PIX_FMT_MONOWHITE,
+const FFCodec ff_xbm_encoder = {
+    .p.name       = "xbm",
+    .p.long_name  = NULL_IF_CONFIG_SMALL("XBM (X BitMap) image"),
+    .p.type       = AVMEDIA_TYPE_VIDEO,
+    .p.id         = AV_CODEC_ID_XBM,
+    FF_CODEC_ENCODE_CB(xbm_encode_frame),
+    .p.pix_fmts   = (const enum AVPixelFormat[]) { AV_PIX_FMT_MONOWHITE,
                                                    AV_PIX_FMT_NONE },
 };

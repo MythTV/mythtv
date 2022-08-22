@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/opt.h"
 #include "audio.h"
 #include "avfilter.h"
 #include "internal.h"
@@ -26,41 +27,6 @@ typedef struct ADerivativeContext {
     void (*filter)(void **dst, void **prv, const void **src,
                    int nb_samples, int channels);
 } ADerivativeContext;
-
-static int query_formats(AVFilterContext *ctx)
-{
-    AVFilterFormats *formats = NULL;
-    AVFilterChannelLayouts *layouts = NULL;
-    static const enum AVSampleFormat derivative_sample_fmts[] = {
-        AV_SAMPLE_FMT_S16P, AV_SAMPLE_FMT_FLTP,
-        AV_SAMPLE_FMT_S32P, AV_SAMPLE_FMT_DBLP,
-        AV_SAMPLE_FMT_NONE
-    };
-    static const enum AVSampleFormat integral_sample_fmts[] = {
-        AV_SAMPLE_FMT_FLTP, AV_SAMPLE_FMT_DBLP,
-        AV_SAMPLE_FMT_NONE
-    };
-    int ret;
-
-    formats = ff_make_format_list(strcmp(ctx->filter->name, "aintegral") ?
-                                  derivative_sample_fmts : integral_sample_fmts);
-    if (!formats)
-        return AVERROR(ENOMEM);
-    ret = ff_set_common_formats(ctx, formats);
-    if (ret < 0)
-        return ret;
-
-    layouts = ff_all_channel_counts();
-    if (!layouts)
-        return AVERROR(ENOMEM);
-
-    ret = ff_set_common_channel_layouts(ctx, layouts);
-    if (ret < 0)
-        return ret;
-
-    formats = ff_all_samplerates();
-    return ff_set_common_samplerates(ctx, formats);
-}
 
 #define DERIVATIVE(name, type)                                          \
 static void aderivative_## name ##p(void **d, void **p, const void **s, \
@@ -138,8 +104,18 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     AVFilterContext *ctx = inlink->dst;
     ADerivativeContext *s = ctx->priv;
     AVFilterLink *outlink = ctx->outputs[0];
-    AVFrame *out = ff_get_audio_buffer(outlink, in->nb_samples);
+    AVFrame *out;
 
+    if (ctx->is_disabled) {
+        if (s->prev)
+            av_samples_set_silence(s->prev->extended_data, 0, 1,
+                                   s->prev->ch_layout.nb_channels,
+                                   s->prev->format);
+
+        return ff_filter_frame(outlink, in);
+    }
+
+    out = ff_get_audio_buffer(outlink, in->nb_samples);
     if (!out) {
         av_frame_free(&in);
         return AVERROR(ENOMEM);
@@ -155,7 +131,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     }
 
     s->filter((void **)out->extended_data, (void **)s->prev->extended_data, (const void **)in->extended_data,
-              in->nb_samples, in->channels);
+              in->nb_samples, in->ch_layout.nb_channels);
 
     av_frame_free(&in);
     return ff_filter_frame(outlink, out);
@@ -175,7 +151,6 @@ static const AVFilterPad aderivative_inputs[] = {
         .filter_frame = filter_frame,
         .config_props = config_input,
     },
-    { NULL }
 };
 
 static const AVFilterPad aderivative_outputs[] = {
@@ -183,25 +158,35 @@ static const AVFilterPad aderivative_outputs[] = {
         .name = "default",
         .type = AVMEDIA_TYPE_AUDIO,
     },
+};
+
+static const AVOption aderivative_options[] = {
     { NULL }
 };
 
-AVFilter ff_af_aderivative = {
+AVFILTER_DEFINE_CLASS_EXT(aderivative, "aderivative/aintegral", aderivative_options);
+
+const AVFilter ff_af_aderivative = {
     .name          = "aderivative",
     .description   = NULL_IF_CONFIG_SMALL("Compute derivative of input audio."),
-    .query_formats = query_formats,
     .priv_size     = sizeof(ADerivativeContext),
+    .priv_class    = &aderivative_class,
     .uninit        = uninit,
-    .inputs        = aderivative_inputs,
-    .outputs       = aderivative_outputs,
+    FILTER_INPUTS(aderivative_inputs),
+    FILTER_OUTPUTS(aderivative_outputs),
+    FILTER_SAMPLEFMTS(AV_SAMPLE_FMT_S16P, AV_SAMPLE_FMT_FLTP,
+                      AV_SAMPLE_FMT_S32P, AV_SAMPLE_FMT_DBLP),
+    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
 };
 
-AVFilter ff_af_aintegral = {
+const AVFilter ff_af_aintegral = {
     .name          = "aintegral",
     .description   = NULL_IF_CONFIG_SMALL("Compute integral of input audio."),
-    .query_formats = query_formats,
     .priv_size     = sizeof(ADerivativeContext),
+    .priv_class    = &aderivative_class,
     .uninit        = uninit,
-    .inputs        = aderivative_inputs,
-    .outputs       = aderivative_outputs,
+    FILTER_INPUTS(aderivative_inputs),
+    FILTER_OUTPUTS(aderivative_outputs),
+    FILTER_SAMPLEFMTS(AV_SAMPLE_FMT_FLTP, AV_SAMPLE_FMT_DBLP),
+    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
 };

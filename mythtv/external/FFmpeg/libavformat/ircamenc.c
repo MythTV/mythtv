@@ -44,13 +44,13 @@ static int ircam_write_header(AVFormatContext *s)
 
     avio_wl32(s->pb, 0x0001A364);
     avio_wl32(s->pb, av_q2intfloat((AVRational){par->sample_rate, 1}));
-    avio_wl32(s->pb, par->channels);
+    avio_wl32(s->pb, par->ch_layout.nb_channels);
     avio_wl32(s->pb, tag);
     ffio_fill(s->pb, 0, 1008);
     return 0;
 }
 
-AVOutputFormat ff_ircam_muxer = {
+const AVOutputFormat ff_ircam_muxer = {
     .name           = "ircam",
     .extensions     = "sf,ircam",
     .long_name      = NULL_IF_CONFIG_SMALL("Berkeley/IRCAM/CARL Sound Format"),

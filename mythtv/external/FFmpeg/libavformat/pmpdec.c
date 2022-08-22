@@ -119,7 +119,7 @@ static int pmp_header(AVFormatContext *s)
             return AVERROR(ENOMEM);
         ast->codecpar->codec_type  = AVMEDIA_TYPE_AUDIO;
         ast->codecpar->codec_id    = audio_codec_id;
-        ast->codecpar->channels    = channels;
+        ast->codecpar->ch_layout.nb_channels = channels;
         ast->codecpar->sample_rate = srate;
         avpriv_set_pts_info(ast, 32, 1, srate);
     }
@@ -183,7 +183,7 @@ static int pmp_close(AVFormatContext *s)
     return 0;
 }
 
-AVInputFormat ff_pmp_demuxer = {
+const AVInputFormat ff_pmp_demuxer = {
     .name           = "pmp",
     .long_name      = NULL_IF_CONFIG_SMALL("Playstation Portable PMP"),
     .priv_data_size = sizeof(PMPContext),

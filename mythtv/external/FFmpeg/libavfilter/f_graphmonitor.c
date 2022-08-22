@@ -18,6 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "config_components.h"
+
 #include "float.h"
 
 #include "libavutil/pixdesc.h"
@@ -31,6 +33,10 @@
 #include "formats.h"
 #include "internal.h"
 #include "video.h"
+
+typedef struct CacheItem {
+    int64_t previous_pts_us;
+} CacheItem;
 
 typedef struct GraphMonitorContext {
     const AVClass *class;
@@ -49,6 +55,10 @@ typedef struct GraphMonitorContext {
     uint8_t green[4];
     uint8_t blue[4];
     uint8_t bg[4];
+
+    CacheItem *cache;
+    unsigned int cache_size;
+    unsigned int cache_index;
 } GraphMonitorContext;
 
 enum {
@@ -62,6 +72,12 @@ enum {
     MODE_SIZE  = 1 << 7,
     MODE_RATE  = 1 << 8,
     MODE_EOF   = 1 << 9,
+    MODE_SCIN  = 1 << 10,
+    MODE_SCOUT = 1 << 11,
+    MODE_PTS_DELTA = 1 << 12,
+    MODE_TIME_DELTA = 1 << 13,
+    MODE_FC_DELTA = 1 << 14,
+    MODE_SC_DELTA = 1 << 15,
 };
 
 #define OFFSET(x) offsetof(GraphMonitorContext, x)
@@ -81,17 +97,35 @@ static const AVOption graphmonitor_options[] = {
         { "queue",            NULL, 0, AV_OPT_TYPE_CONST, {.i64=MODE_QUEUE},   0, 0, VF, "flags" },
         { "frame_count_in",   NULL, 0, AV_OPT_TYPE_CONST, {.i64=MODE_FCOUT},   0, 0, VF, "flags" },
         { "frame_count_out",  NULL, 0, AV_OPT_TYPE_CONST, {.i64=MODE_FCIN},    0, 0, VF, "flags" },
+        { "frame_count_delta",NULL, 0, AV_OPT_TYPE_CONST, {.i64=MODE_FC_DELTA},0, 0, VF, "flags" },
         { "pts",              NULL, 0, AV_OPT_TYPE_CONST, {.i64=MODE_PTS},     0, 0, VF, "flags" },
+        { "pts_delta",        NULL, 0, AV_OPT_TYPE_CONST, {.i64=MODE_PTS_DELTA},0,0, VF, "flags" },
         { "time",             NULL, 0, AV_OPT_TYPE_CONST, {.i64=MODE_TIME},    0, 0, VF, "flags" },
+        { "time_delta",       NULL, 0, AV_OPT_TYPE_CONST, {.i64=MODE_TIME_DELTA},0,0,VF, "flags" },
         { "timebase",         NULL, 0, AV_OPT_TYPE_CONST, {.i64=MODE_TB},      0, 0, VF, "flags" },
         { "format",           NULL, 0, AV_OPT_TYPE_CONST, {.i64=MODE_FMT},     0, 0, VF, "flags" },
         { "size",             NULL, 0, AV_OPT_TYPE_CONST, {.i64=MODE_SIZE},    0, 0, VF, "flags" },
         { "rate",             NULL, 0, AV_OPT_TYPE_CONST, {.i64=MODE_RATE},    0, 0, VF, "flags" },
         { "eof",              NULL, 0, AV_OPT_TYPE_CONST, {.i64=MODE_EOF},     0, 0, VF, "flags" },
+        { "sample_count_in",  NULL, 0, AV_OPT_TYPE_CONST, {.i64=MODE_SCOUT},   0, 0, VF, "flags" },
+        { "sample_count_out", NULL, 0, AV_OPT_TYPE_CONST, {.i64=MODE_SCIN},    0, 0, VF, "flags" },
+        { "sample_count_delta",NULL,0, AV_OPT_TYPE_CONST, {.i64=MODE_SC_DELTA},0, 0, VF, "flags" },
     { "rate", "set video rate", OFFSET(frame_rate), AV_OPT_TYPE_VIDEO_RATE, {.str = "25"}, 0, INT_MAX, VF },
     { "r",    "set video rate", OFFSET(frame_rate), AV_OPT_TYPE_VIDEO_RATE, {.str = "25"}, 0, INT_MAX, VF },
     { NULL }
 };
+
+static av_cold int init(AVFilterContext *ctx)
+{
+    GraphMonitorContext *s = ctx->priv;
+
+    s->cache = av_fast_realloc(NULL, &s->cache_size,
+                               8192 * sizeof(*(s->cache)));
+    if (!s->cache)
+        return AVERROR(ENOMEM);
+
+    return 0;
+}
 
 static int query_formats(AVFilterContext *ctx)
 {
@@ -169,12 +203,14 @@ static int filter_have_queued(AVFilterContext *filter)
     return 0;
 }
 
-static void draw_items(AVFilterContext *ctx, AVFrame *out,
-                       int xpos, int ypos,
-                       AVFilterLink *l,
-                       size_t frames)
+static int draw_items(AVFilterContext *ctx, AVFrame *out,
+                      int xpos, int ypos,
+                      AVFilterLink *l,
+                      size_t frames)
 {
     GraphMonitorContext *s = ctx->priv;
+    int64_t previous_pts_us = s->cache[s->cache_index].previous_pts_us;
+    int64_t current_pts_us = l->current_pts_us;
     char buffer[1024] = { 0 };
 
     if (s->flags & MODE_FMT) {
@@ -192,7 +228,7 @@ static void draw_items(AVFilterContext *ctx, AVFrame *out,
         if (l->type == AVMEDIA_TYPE_VIDEO) {
             snprintf(buffer, sizeof(buffer)-1, " | size: %dx%d", l->w, l->h);
         } else if (l->type == AVMEDIA_TYPE_AUDIO) {
-            snprintf(buffer, sizeof(buffer)-1, " | channels: %d", l->channels);
+            snprintf(buffer, sizeof(buffer)-1, " | channels: %d", l->ch_layout.nb_channels);
         }
         drawtext(out, xpos, ypos, buffer, s->white);
         xpos += strlen(buffer) * 8;
@@ -229,13 +265,43 @@ static void draw_items(AVFilterContext *ctx, AVFrame *out,
         drawtext(out, xpos, ypos, buffer, s->white);
         xpos += strlen(buffer) * 8;
     }
+    if (s->flags & MODE_FC_DELTA) {
+        snprintf(buffer, sizeof(buffer)-1, " | delta: %"PRId64, l->frame_count_in - l->frame_count_out);
+        drawtext(out, xpos, ypos, buffer, s->white);
+        xpos += strlen(buffer) * 8;
+    }
+    if (s->flags & MODE_SCIN) {
+        snprintf(buffer, sizeof(buffer)-1, " | sin: %"PRId64, l->sample_count_in);
+        drawtext(out, xpos, ypos, buffer, s->white);
+        xpos += strlen(buffer) * 8;
+    }
+    if (s->flags & MODE_SCOUT) {
+        snprintf(buffer, sizeof(buffer)-1, " | sout: %"PRId64, l->sample_count_out);
+        drawtext(out, xpos, ypos, buffer, s->white);
+        xpos += strlen(buffer) * 8;
+    }
+    if (s->flags & MODE_SC_DELTA) {
+        snprintf(buffer, sizeof(buffer)-1, " | sdelta: %"PRId64, l->sample_count_in - l->sample_count_out);
+        drawtext(out, xpos, ypos, buffer, s->white);
+        xpos += strlen(buffer) * 8;
+    }
     if (s->flags & MODE_PTS) {
-        snprintf(buffer, sizeof(buffer)-1, " | pts: %s", av_ts2str(l->current_pts_us));
+        snprintf(buffer, sizeof(buffer)-1, " | pts: %s", av_ts2str(current_pts_us));
+        drawtext(out, xpos, ypos, buffer, s->white);
+        xpos += strlen(buffer) * 8;
+    }
+    if (s->flags & MODE_PTS_DELTA) {
+        snprintf(buffer, sizeof(buffer)-1, " | pts_delta: %s", av_ts2str(current_pts_us - previous_pts_us));
         drawtext(out, xpos, ypos, buffer, s->white);
         xpos += strlen(buffer) * 8;
     }
     if (s->flags & MODE_TIME) {
-        snprintf(buffer, sizeof(buffer)-1, " | time: %s", av_ts2timestr(l->current_pts_us, &AV_TIME_BASE_Q));
+        snprintf(buffer, sizeof(buffer)-1, " | time: %s", av_ts2timestr(current_pts_us, &AV_TIME_BASE_Q));
+        drawtext(out, xpos, ypos, buffer, s->white);
+        xpos += strlen(buffer) * 8;
+    }
+    if (s->flags & MODE_TIME_DELTA) {
+        snprintf(buffer, sizeof(buffer)-1, " | time_delta: %s", av_ts2timestr(current_pts_us - previous_pts_us, &AV_TIME_BASE_Q));
         drawtext(out, xpos, ypos, buffer, s->white);
         xpos += strlen(buffer) * 8;
     }
@@ -244,6 +310,19 @@ static void draw_items(AVFilterContext *ctx, AVFrame *out,
         drawtext(out, xpos, ypos, buffer, s->blue);
         xpos += strlen(buffer) * 8;
     }
+
+    s->cache[s->cache_index].previous_pts_us = l->current_pts_us;
+
+    if (s->cache_index + 1 >= s->cache_size / sizeof(*(s->cache))) {
+        void *ptr = av_fast_realloc(s->cache, &s->cache_size, s->cache_size * 2);
+
+        if (!ptr)
+            return AVERROR(ENOMEM);
+        s->cache = ptr;
+    }
+    s->cache_index++;
+
+    return 0;
 }
 
 static int create_frame(AVFilterContext *ctx, int64_t pts)
@@ -251,13 +330,15 @@ static int create_frame(AVFilterContext *ctx, int64_t pts)
     GraphMonitorContext *s = ctx->priv;
     AVFilterLink *outlink = ctx->outputs[0];
     AVFrame *out;
-    int xpos, ypos = 0;
+    int ret, xpos, ypos = 0;
 
     out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
     if (!out)
         return AVERROR(ENOMEM);
 
     clear_image(s, out, outlink);
+
+    s->cache_index = 0;
 
     for (int i = 0; i < ctx->graph->nb_filters; i++) {
         AVFilterContext *filter = ctx->graph->filters[i];
@@ -284,7 +365,9 @@ static int create_frame(AVFilterContext *ctx, int64_t pts)
             xpos += strlen(buffer) * 8;
             drawtext(out, xpos, ypos, l->src->name, s->white);
             xpos += strlen(l->src->name) * 8 + 10;
-            draw_items(ctx, out, xpos, ypos, l, frames);
+            ret = draw_items(ctx, out, xpos, ypos, l, frames);
+            if (ret < 0)
+                goto error;
             ypos += 10;
         }
 
@@ -302,7 +385,9 @@ static int create_frame(AVFilterContext *ctx, int64_t pts)
             xpos += strlen(buffer) * 8;
             drawtext(out, xpos, ypos, l->dst->name, s->white);
             xpos += strlen(l->dst->name) * 8 + 10;
-            draw_items(ctx, out, xpos, ypos, l, frames);
+            ret = draw_items(ctx, out, xpos, ypos, l, frames);
+            if (ret < 0)
+                goto error;
             ypos += 10;
         }
         ypos += 5;
@@ -311,6 +396,9 @@ static int create_frame(AVFilterContext *ctx, int64_t pts)
     out->pts = pts;
     s->pts = pts + 1;
     return ff_filter_frame(outlink, out);
+error:
+    av_frame_free(&out);
+    return ret;
 }
 
 static int activate(AVFilterContext *ctx)
@@ -372,16 +460,23 @@ static int config_output(AVFilterLink *outlink)
     return 0;
 }
 
-#if CONFIG_GRAPHMONITOR_FILTER
+static av_cold void uninit(AVFilterContext *ctx)
+{
+    GraphMonitorContext *s = ctx->priv;
 
-AVFILTER_DEFINE_CLASS(graphmonitor);
+    av_freep(&s->cache);
+    s->cache_size = s->cache_index = 0;
+}
+
+AVFILTER_DEFINE_CLASS_EXT(graphmonitor, "(a)graphmonitor", graphmonitor_options);
+
+#if CONFIG_GRAPHMONITOR_FILTER
 
 static const AVFilterPad graphmonitor_inputs[] = {
     {
         .name = "default",
         .type = AVMEDIA_TYPE_VIDEO,
     },
-    { NULL }
 };
 
 static const AVFilterPad graphmonitor_outputs[] = {
@@ -390,33 +485,30 @@ static const AVFilterPad graphmonitor_outputs[] = {
         .type         = AVMEDIA_TYPE_VIDEO,
         .config_props = config_output,
     },
-    { NULL }
 };
 
-AVFilter ff_vf_graphmonitor = {
+const AVFilter ff_vf_graphmonitor = {
     .name          = "graphmonitor",
     .description   = NULL_IF_CONFIG_SMALL("Show various filtergraph stats."),
     .priv_size     = sizeof(GraphMonitorContext),
     .priv_class    = &graphmonitor_class,
-    .query_formats = query_formats,
+    .init          = init,
+    .uninit        = uninit,
     .activate      = activate,
-    .inputs        = graphmonitor_inputs,
-    .outputs       = graphmonitor_outputs,
+    FILTER_INPUTS(graphmonitor_inputs),
+    FILTER_OUTPUTS(graphmonitor_outputs),
+    FILTER_QUERY_FUNC(query_formats),
 };
 
 #endif // CONFIG_GRAPHMONITOR_FILTER
 
 #if CONFIG_AGRAPHMONITOR_FILTER
 
-#define agraphmonitor_options graphmonitor_options
-AVFILTER_DEFINE_CLASS(agraphmonitor);
-
 static const AVFilterPad agraphmonitor_inputs[] = {
     {
         .name = "default",
         .type = AVMEDIA_TYPE_AUDIO,
     },
-    { NULL }
 };
 
 static const AVFilterPad agraphmonitor_outputs[] = {
@@ -425,17 +517,18 @@ static const AVFilterPad agraphmonitor_outputs[] = {
         .type         = AVMEDIA_TYPE_VIDEO,
         .config_props = config_output,
     },
-    { NULL }
 };
 
-AVFilter ff_avf_agraphmonitor = {
+const AVFilter ff_avf_agraphmonitor = {
     .name          = "agraphmonitor",
     .description   = NULL_IF_CONFIG_SMALL("Show various filtergraph stats."),
+    .priv_class    = &graphmonitor_class,
     .priv_size     = sizeof(GraphMonitorContext),
-    .priv_class    = &agraphmonitor_class,
-    .query_formats = query_formats,
+    .init          = init,
+    .uninit        = uninit,
     .activate      = activate,
-    .inputs        = agraphmonitor_inputs,
-    .outputs       = agraphmonitor_outputs,
+    FILTER_INPUTS(agraphmonitor_inputs),
+    FILTER_OUTPUTS(agraphmonitor_outputs),
+    FILTER_QUERY_FUNC(query_formats),
 };
 #endif // CONFIG_AGRAPHMONITOR_FILTER

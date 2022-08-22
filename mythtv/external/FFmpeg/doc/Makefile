@@ -27,6 +27,9 @@ HTMLPAGES   = $(AVPROGS-yes:%=doc/%.html) $(AVPROGS-yes:%=doc/%-all.html) $(COMP
               doc/mailing-list-faq.html                                 \
               doc/nut.html                                              \
               doc/platform.html                                         \
+              $(SRC_PATH)/doc/bootstrap.min.css                         \
+              $(SRC_PATH)/doc/style.min.css                             \
+              $(SRC_PATH)/doc/default.css                               \
 
 TXTPAGES    = doc/fate.txt                                              \
 
@@ -102,7 +105,7 @@ DOXY_INPUT_DEPS = $(addprefix $(SRC_PATH)/, $(DOXY_INPUT)) ffbuild/config.mak
 
 doc/doxy/html: TAG = DOXY
 doc/doxy/html: $(SRC_PATH)/doc/Doxyfile $(SRC_PATH)/doc/doxy-wrapper.sh $(DOXY_INPUT_DEPS)
-	$(M)OUT_DIR=$$PWD/doc/doxy; cd $(SRC_PATH); ./doc/doxy-wrapper.sh $$OUT_DIR $< $(DOXYGEN) $(DOXY_INPUT);
+	$(M)$(SRC_PATH)/doc/doxy-wrapper.sh $$PWD/doc/doxy $(SRC_PATH) doc/Doxyfile $(DOXYGEN) $(DOXY_INPUT);
 
 install-doc: install-html install-man
 

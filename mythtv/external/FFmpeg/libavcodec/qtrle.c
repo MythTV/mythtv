@@ -38,6 +38,7 @@
 #include "avcodec.h"
 #include "decode.h"
 #include "bytestream.h"
+#include "codec_internal.h"
 #include "internal.h"
 
 typedef struct QtrleContext {
@@ -445,9 +446,8 @@ static av_cold int qtrle_decode_init(AVCodecContext *avctx)
     return 0;
 }
 
-static int qtrle_decode_frame(AVCodecContext *avctx,
-                              void *data, int *got_frame,
-                              AVPacket *avpkt)
+static int qtrle_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
+                              int *got_frame, AVPacket *avpkt)
 {
     QtrleContext *s = avctx->priv_data;
     int header, start_line;
@@ -540,15 +540,7 @@ static int qtrle_decode_frame(AVCodecContext *avctx,
     }
 
     if(has_palette) {
-        buffer_size_t size;
-        const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE, &size);
-
-        if (pal && size == AVPALETTE_SIZE) {
-            s->frame->palette_has_changed = 1;
-            memcpy(s->pal, pal, AVPALETTE_SIZE);
-        } else if (pal) {
-            av_log(avctx, AV_LOG_ERROR, "Palette size %d is wrong\n", size);
-        }
+        s->frame->palette_has_changed = ff_copy_palette(s->pal, avpkt, avctx);
 
         /* make the palette available on the way out */
         memcpy(s->frame->data[1], s->pal, AVPALETTE_SIZE);
@@ -565,7 +557,7 @@ done:
             return ret;
     }
 
-    if ((ret = av_frame_ref(data, s->frame)) < 0)
+    if ((ret = av_frame_ref(rframe, s->frame)) < 0)
         return ret;
     *got_frame      = 1;
 
@@ -589,15 +581,16 @@ static av_cold int qtrle_decode_end(AVCodecContext *avctx)
     return 0;
 }
 
-AVCodec ff_qtrle_decoder = {
-    .name           = "qtrle",
-    .long_name      = NULL_IF_CONFIG_SMALL("QuickTime Animation (RLE) video"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_QTRLE,
+const FFCodec ff_qtrle_decoder = {
+    .p.name         = "qtrle",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("QuickTime Animation (RLE) video"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_QTRLE,
     .priv_data_size = sizeof(QtrleContext),
     .init           = qtrle_decode_init,
     .close          = qtrle_decode_end,
-    .decode         = qtrle_decode_frame,
+    FF_CODEC_DECODE_CB(qtrle_decode_frame),
     .flush          = qtrle_decode_flush,
-    .capabilities   = AV_CODEC_CAP_DR1,
+    .p.capabilities = AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

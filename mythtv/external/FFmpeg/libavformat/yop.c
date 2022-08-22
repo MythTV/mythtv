@@ -25,6 +25,7 @@
 #include "libavutil/channel_layout.h"
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 
 typedef struct yop_dec_context {
@@ -72,8 +73,7 @@ static int yop_read_header(AVFormatContext *s)
     audio_par                 = audio_stream->codecpar;
     audio_par->codec_type     = AVMEDIA_TYPE_AUDIO;
     audio_par->codec_id       = AV_CODEC_ID_ADPCM_IMA_APC;
-    audio_par->channels       = 1;
-    audio_par->channel_layout = AV_CH_LAYOUT_MONO;
+    audio_par->ch_layout      = (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
     audio_par->sample_rate    = 22050;
 
     // Video
@@ -187,7 +187,7 @@ static int yop_read_seek(AVFormatContext *s, int stream_index,
     if (!stream_index)
         return -1;
 
-    pos_min        = s->internal->data_offset;
+    pos_min        = ffformatcontext(s)->data_offset;
     pos_max        = avio_size(s->pb) - yop->frame_size;
     frame_count    = (pos_max - pos_min) / yop->frame_size;
 
@@ -204,7 +204,7 @@ static int yop_read_seek(AVFormatContext *s, int stream_index,
     return 0;
 }
 
-AVInputFormat ff_yop_demuxer = {
+const AVInputFormat ff_yop_demuxer = {
     .name           = "yop",
     .long_name      = NULL_IF_CONFIG_SMALL("Psygnosis YOP"),
     .priv_data_size = sizeof(YopDecContext),

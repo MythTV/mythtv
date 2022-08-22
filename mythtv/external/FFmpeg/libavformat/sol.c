@@ -113,9 +113,7 @@ static int sol_read_header(AVFormatContext *s)
     st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
     st->codecpar->codec_tag = id;
     st->codecpar->codec_id = codec;
-    st->codecpar->channels = channels;
-    st->codecpar->channel_layout = channels == 1 ? AV_CH_LAYOUT_MONO :
-                                                   AV_CH_LAYOUT_STEREO;
+    av_channel_layout_default(&st->codecpar->ch_layout,channels);
     st->codecpar->sample_rate = rate;
     avpriv_set_pts_info(st, 64, 1, rate);
     return 0;
@@ -138,7 +136,7 @@ static int sol_read_packet(AVFormatContext *s,
     return 0;
 }
 
-AVInputFormat ff_sol_demuxer = {
+const AVInputFormat ff_sol_demuxer = {
     .name           = "sol",
     .long_name      = NULL_IF_CONFIG_SMALL("Sierra SOL"),
     .read_probe     = sol_probe,

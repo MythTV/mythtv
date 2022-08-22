@@ -30,6 +30,7 @@
 #include "avcodec.h"
 #include "bswapdsp.h"
 #include "bytestream.h"
+#include "codec_internal.h"
 #include "internal.h"
 #include "get_bits.h"
 #include "unary.h"
@@ -102,7 +103,7 @@ typedef struct APEFilter {
     int16_t *historybuffer; ///< filter memory
     int16_t *delay;         ///< filtered values
 
-    int avg;
+    uint32_t avg;
 } APEFilter;
 
 typedef struct APERice {
@@ -233,13 +234,14 @@ static av_cold int ape_decode_close(AVCodecContext *avctx)
 static av_cold int ape_decode_init(AVCodecContext *avctx)
 {
     APEContext *s = avctx->priv_data;
+    int channels = avctx->ch_layout.nb_channels;
     int i;
 
     if (avctx->extradata_size != 6) {
         av_log(avctx, AV_LOG_ERROR, "Incorrect extradata\n");
         return AVERROR(EINVAL);
     }
-    if (avctx->channels > 2) {
+    if (channels > 2) {
         av_log(avctx, AV_LOG_ERROR, "Only mono and stereo is supported\n");
         return AVERROR(EINVAL);
     }
@@ -261,7 +263,7 @@ static av_cold int ape_decode_init(AVCodecContext *avctx)
         return AVERROR_PATCHWELCOME;
     }
     s->avctx             = avctx;
-    s->channels          = avctx->channels;
+    s->channels          = channels;
     s->fileversion       = AV_RL16(avctx->extradata);
     s->compression_level = AV_RL16(avctx->extradata + 2);
     s->flags             = AV_RL16(avctx->extradata + 4);
@@ -313,7 +315,9 @@ static av_cold int ape_decode_init(AVCodecContext *avctx)
 
     ff_bswapdsp_init(&s->bdsp);
     ff_llauddsp_init(&s->adsp);
-    avctx->channel_layout = (avctx->channels==2) ? AV_CH_LAYOUT_STEREO : AV_CH_LAYOUT_MONO;
+    av_channel_layout_uninit(&avctx->ch_layout);
+    avctx->ch_layout = (channels == 2) ? (AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO
+                                       : (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
 
     return 0;
 }
@@ -955,7 +959,7 @@ static void long_filter_high_3800(int32_t *buffer, int order, int shift, int len
             dotprod += delay[j] * (unsigned)coeffs[j];
             coeffs[j] += ((delay[j] >> 31) | 1) * sign;
         }
-        buffer[i] -= dotprod >> shift;
+        buffer[i] -= (unsigned)(dotprod >> shift);
         for (j = 0; j < order - 1; j++)
             delay[j] = delay[j + 1];
         delay[order - 1] = buffer[i];
@@ -1088,13 +1092,13 @@ static av_always_inline int predictor_update_3930(APEPredictor *p,
                                                   const int delayA)
 {
     int32_t predictionA, sign;
-    int32_t d0, d1, d2, d3;
+    uint32_t d0, d1, d2, d3;
 
     p->buf[delayA]     = p->lastA[filter];
     d0 = p->buf[delayA    ];
-    d1 = p->buf[delayA    ] - p->buf[delayA - 1];
-    d2 = p->buf[delayA - 1] - p->buf[delayA - 2];
-    d3 = p->buf[delayA - 2] - p->buf[delayA - 3];
+    d1 = p->buf[delayA    ] - (unsigned)p->buf[delayA - 1];
+    d2 = p->buf[delayA - 1] - (unsigned)p->buf[delayA - 2];
+    d3 = p->buf[delayA - 2] - (unsigned)p->buf[delayA - 3];
 
     predictionA = d0 * p->coeffsA[filter][0] +
                   d1 * p->coeffsA[filter][1] +
@@ -1105,10 +1109,10 @@ static av_always_inline int predictor_update_3930(APEPredictor *p,
     p->filterA[filter] = p->lastA[filter] + ((int)(p->filterA[filter] * 31U) >> 5);
 
     sign = APESIGN(decoded);
-    p->coeffsA[filter][0] += ((d0 < 0) * 2 - 1) * sign;
-    p->coeffsA[filter][1] += ((d1 < 0) * 2 - 1) * sign;
-    p->coeffsA[filter][2] += ((d2 < 0) * 2 - 1) * sign;
-    p->coeffsA[filter][3] += ((d3 < 0) * 2 - 1) * sign;
+    p->coeffsA[filter][0] += (((int32_t)d0 < 0) * 2 - 1) * sign;
+    p->coeffsA[filter][1] += (((int32_t)d1 < 0) * 2 - 1) * sign;
+    p->coeffsA[filter][2] += (((int32_t)d2 < 0) * 2 - 1) * sign;
+    p->coeffsA[filter][3] += (((int32_t)d3 < 0) * 2 - 1) * sign;
 
     return p->filterA[filter];
 }
@@ -1457,10 +1461,9 @@ static void ape_unpack_stereo(APEContext *ctx, int count)
     }
 }
 
-static int ape_decode_frame(AVCodecContext *avctx, void *data,
+static int ape_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                             int *got_frame_ptr, AVPacket *avpkt)
 {
-    AVFrame *frame     = data;
     const uint8_t *buf = avpkt->data;
     APEContext *s = avctx->priv_data;
     uint8_t *sample8;
@@ -1587,7 +1590,7 @@ static int ape_decode_frame(AVCodecContext *avctx, void *data,
         for (ch = 0; ch < s->channels; ch++) {
             sample8 = (uint8_t *)frame->data[ch];
             for (i = 0; i < blockstodecode; i++)
-                *sample8++ = (s->decoded[ch][i] + 0x80) & 0xff;
+                *sample8++ = (s->decoded[ch][i] + 0x80U) & 0xff;
         }
         break;
     case 16:
@@ -1655,22 +1658,22 @@ static const AVClass ape_decoder_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-AVCodec ff_ape_decoder = {
-    .name           = "ape",
-    .long_name      = NULL_IF_CONFIG_SMALL("Monkey's Audio"),
-    .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = AV_CODEC_ID_APE,
+const FFCodec ff_ape_decoder = {
+    .p.name         = "ape",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Monkey's Audio"),
+    .p.type         = AVMEDIA_TYPE_AUDIO,
+    .p.id           = AV_CODEC_ID_APE,
     .priv_data_size = sizeof(APEContext),
     .init           = ape_decode_init,
     .close          = ape_decode_close,
-    .decode         = ape_decode_frame,
-    .capabilities   = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DELAY |
+    FF_CODEC_DECODE_CB(ape_decode_frame),
+    .p.capabilities = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DELAY |
                       AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
     .flush          = ape_flush,
-    .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_U8P,
+    .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_U8P,
                                                       AV_SAMPLE_FMT_S16P,
                                                       AV_SAMPLE_FMT_S32P,
                                                       AV_SAMPLE_FMT_NONE },
-    .priv_class     = &ape_decoder_class,
+    .p.priv_class   = &ape_decoder_class,
 };

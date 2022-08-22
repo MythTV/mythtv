@@ -34,6 +34,7 @@
 #include "formats.h"
 #include "gblur.h"
 #include "internal.h"
+#include "vf_gblur_init.h"
 #include "video.h"
 
 #define OFFSET(x) offsetof(GBlurContext, x)
@@ -54,37 +55,6 @@ typedef struct ThreadData {
     int width;
 } ThreadData;
 
-static void postscale_c(float *buffer, int length,
-                        float postscale, float min, float max)
-{
-    for (int i = 0; i < length; i++) {
-        buffer[i] *= postscale;
-        buffer[i] = av_clipf(buffer[i], min, max);
-    }
-}
-
-static void horiz_slice_c(float *buffer, int width, int height, int steps,
-                          float nu, float bscale)
-{
-    int step, x, y;
-    float *ptr;
-    for (y = 0; y < height; y++) {
-        for (step = 0; step < steps; step++) {
-            ptr = buffer + width * y;
-            ptr[0] *= bscale;
-
-            /* Filter rightwards */
-            for (x = 1; x < width; x++)
-                ptr[x] += nu * ptr[x - 1];
-            ptr[x = width - 1] *= bscale;
-
-            /* Filter leftwards */
-            for (; x > 0; x--)
-                ptr[x - 1] += nu * ptr[x];
-        }
-    }
-}
-
 static int filter_horizontally(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
 {
     GBlurContext *s = ctx->priv;
@@ -97,45 +67,15 @@ static int filter_horizontally(AVFilterContext *ctx, void *arg, int jobnr, int n
     const int steps = s->steps;
     const float nu = s->nu;
     float *buffer = s->buffer;
+    float *localbuf = NULL;
+
+    if (s->localbuf)
+        localbuf = s->localbuf + s->stride * width * slice_start;
 
     s->horiz_slice(buffer + width * slice_start, width, slice_end - slice_start,
-                   steps, nu, boundaryscale);
+                   steps, nu, boundaryscale, localbuf);
     emms_c();
     return 0;
-}
-
-static void do_vertical_columns(float *buffer, int width, int height,
-                                int column_begin, int column_end, int steps,
-                                float nu, float boundaryscale, int column_step)
-{
-    const int numpixels = width * height;
-    int i, x, k, step;
-    float *ptr;
-    for (x = column_begin; x < column_end;) {
-        for (step = 0; step < steps; step++) {
-            ptr = buffer + x;
-            for (k = 0; k < column_step; k++) {
-                ptr[k] *= boundaryscale;
-            }
-            /* Filter downwards */
-            for (i = width; i < numpixels; i += width) {
-                for (k = 0; k < column_step; k++) {
-                    ptr[i + k] += nu * ptr[i - width + k];
-                }
-            }
-            i = numpixels - width;
-
-            for (k = 0; k < column_step; k++)
-                ptr[i + k] *= boundaryscale;
-
-            /* Filter upwards */
-            for (; i > 0; i -= width) {
-                for (k = 0; k < column_step; k++)
-                    ptr[i - width + k] += nu * ptr[i + k];
-            }
-        }
-        x += column_step;
-    }
 }
 
 static int filter_vertically(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
@@ -150,16 +90,10 @@ static int filter_vertically(AVFilterContext *ctx, void *arg, int jobnr, int nb_
     const int steps = s->steps;
     const float nu = s->nuV;
     float *buffer = s->buffer;
-    int aligned_end;
 
-    aligned_end = slice_start + (((slice_end - slice_start) >> 3) << 3);
-    /* Filter vertically along columns (process 8 columns in each step) */
-    do_vertical_columns(buffer, width, height, slice_start, aligned_end,
-                        steps, nu, boundaryscale, 8);
+    s->verti_slice(buffer, width, height, slice_start, slice_end,
+                   steps, nu, boundaryscale);
 
-    /* Filter un-aligned columns one by one */
-    do_vertical_columns(buffer, width, height, aligned_end, slice_end,
-                        steps, nu, boundaryscale, 1);
     return 0;
 }
 
@@ -196,52 +130,52 @@ static void gaussianiir2d(AVFilterContext *ctx, int plane)
 
     td.width = width;
     td.height = height;
-    ctx->internal->execute(ctx, filter_horizontally, &td, NULL, FFMIN(height, nb_threads));
-    ctx->internal->execute(ctx, filter_vertically, &td, NULL, FFMIN(width, nb_threads));
-    ctx->internal->execute(ctx, filter_postscale, &td, NULL, FFMIN(width * height, nb_threads));
+    ff_filter_execute(ctx, filter_horizontally, &td,
+                      NULL, FFMIN(height, nb_threads));
+    ff_filter_execute(ctx, filter_vertically, &td,
+                      NULL, FFMIN(width, nb_threads));
+    ff_filter_execute(ctx, filter_postscale, &td,
+                      NULL, FFMIN(width * height, nb_threads));
 }
 
-static int query_formats(AVFilterContext *ctx)
-{
-    static const enum AVPixelFormat pix_fmts[] = {
-        AV_PIX_FMT_YUVA444P, AV_PIX_FMT_YUV444P, AV_PIX_FMT_YUV440P,
-        AV_PIX_FMT_YUVJ444P, AV_PIX_FMT_YUVJ440P,
-        AV_PIX_FMT_YUVA422P, AV_PIX_FMT_YUV422P, AV_PIX_FMT_YUVA420P, AV_PIX_FMT_YUV420P,
-        AV_PIX_FMT_YUVJ422P, AV_PIX_FMT_YUVJ420P,
-        AV_PIX_FMT_YUVJ411P, AV_PIX_FMT_YUV411P, AV_PIX_FMT_YUV410P,
-        AV_PIX_FMT_YUV420P9, AV_PIX_FMT_YUV422P9, AV_PIX_FMT_YUV444P9,
-        AV_PIX_FMT_YUV420P10, AV_PIX_FMT_YUV422P10, AV_PIX_FMT_YUV444P10,
-        AV_PIX_FMT_YUV420P12, AV_PIX_FMT_YUV422P12, AV_PIX_FMT_YUV444P12, AV_PIX_FMT_YUV440P12,
-        AV_PIX_FMT_YUV420P14, AV_PIX_FMT_YUV422P14, AV_PIX_FMT_YUV444P14,
-        AV_PIX_FMT_YUV420P16, AV_PIX_FMT_YUV422P16, AV_PIX_FMT_YUV444P16,
-        AV_PIX_FMT_YUVA420P9, AV_PIX_FMT_YUVA422P9, AV_PIX_FMT_YUVA444P9,
-        AV_PIX_FMT_YUVA420P10, AV_PIX_FMT_YUVA422P10, AV_PIX_FMT_YUVA444P10,
-        AV_PIX_FMT_YUVA422P12, AV_PIX_FMT_YUVA444P12,
-        AV_PIX_FMT_YUVA420P16, AV_PIX_FMT_YUVA422P16, AV_PIX_FMT_YUVA444P16,
-        AV_PIX_FMT_GBRP, AV_PIX_FMT_GBRP9, AV_PIX_FMT_GBRP10,
-        AV_PIX_FMT_GBRP12, AV_PIX_FMT_GBRP14, AV_PIX_FMT_GBRP16,
-        AV_PIX_FMT_GBRAP, AV_PIX_FMT_GBRAP10, AV_PIX_FMT_GBRAP12, AV_PIX_FMT_GBRAP16,
-        AV_PIX_FMT_GRAY8, AV_PIX_FMT_GRAY9, AV_PIX_FMT_GRAY10, AV_PIX_FMT_GRAY12, AV_PIX_FMT_GRAY14, AV_PIX_FMT_GRAY16,
-        AV_PIX_FMT_GBRPF32, AV_PIX_FMT_GBRAPF32,
-        AV_PIX_FMT_GRAYF32,
-        AV_PIX_FMT_NONE
-    };
+static const enum AVPixelFormat pix_fmts[] = {
+    AV_PIX_FMT_YUVA444P, AV_PIX_FMT_YUV444P, AV_PIX_FMT_YUV440P,
+    AV_PIX_FMT_YUVJ444P, AV_PIX_FMT_YUVJ440P,
+    AV_PIX_FMT_YUVA422P, AV_PIX_FMT_YUV422P, AV_PIX_FMT_YUVA420P, AV_PIX_FMT_YUV420P,
+    AV_PIX_FMT_YUVJ422P, AV_PIX_FMT_YUVJ420P,
+    AV_PIX_FMT_YUVJ411P, AV_PIX_FMT_YUV411P, AV_PIX_FMT_YUV410P,
+    AV_PIX_FMT_YUV420P9, AV_PIX_FMT_YUV422P9, AV_PIX_FMT_YUV444P9,
+    AV_PIX_FMT_YUV420P10, AV_PIX_FMT_YUV422P10, AV_PIX_FMT_YUV444P10,
+    AV_PIX_FMT_YUV420P12, AV_PIX_FMT_YUV422P12, AV_PIX_FMT_YUV444P12, AV_PIX_FMT_YUV440P12,
+    AV_PIX_FMT_YUV420P14, AV_PIX_FMT_YUV422P14, AV_PIX_FMT_YUV444P14,
+    AV_PIX_FMT_YUV420P16, AV_PIX_FMT_YUV422P16, AV_PIX_FMT_YUV444P16,
+    AV_PIX_FMT_YUVA420P9, AV_PIX_FMT_YUVA422P9, AV_PIX_FMT_YUVA444P9,
+    AV_PIX_FMT_YUVA420P10, AV_PIX_FMT_YUVA422P10, AV_PIX_FMT_YUVA444P10,
+    AV_PIX_FMT_YUVA422P12, AV_PIX_FMT_YUVA444P12,
+    AV_PIX_FMT_YUVA420P16, AV_PIX_FMT_YUVA422P16, AV_PIX_FMT_YUVA444P16,
+    AV_PIX_FMT_GBRP, AV_PIX_FMT_GBRP9, AV_PIX_FMT_GBRP10,
+    AV_PIX_FMT_GBRP12, AV_PIX_FMT_GBRP14, AV_PIX_FMT_GBRP16,
+    AV_PIX_FMT_GBRAP, AV_PIX_FMT_GBRAP10, AV_PIX_FMT_GBRAP12, AV_PIX_FMT_GBRAP16,
+    AV_PIX_FMT_GRAY8, AV_PIX_FMT_GRAY9, AV_PIX_FMT_GRAY10, AV_PIX_FMT_GRAY12, AV_PIX_FMT_GRAY14, AV_PIX_FMT_GRAY16,
+    AV_PIX_FMT_GBRPF32, AV_PIX_FMT_GBRAPF32,
+    AV_PIX_FMT_GRAYF32,
+    AV_PIX_FMT_NONE
+};
 
-    return ff_set_common_formats(ctx, ff_make_format_list(pix_fmts));
-}
-
-void ff_gblur_init(GBlurContext *s)
+static av_cold void uninit(AVFilterContext *ctx)
 {
-    s->horiz_slice = horiz_slice_c;
-    s->postscale_slice = postscale_c;
-    if (ARCH_X86)
-        ff_gblur_init_x86(s);
+    GBlurContext *s = ctx->priv;
+
+    av_freep(&s->buffer);
+    av_freep(&s->localbuf);
 }
 
 static int config_input(AVFilterLink *inlink)
 {
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(inlink->format);
     GBlurContext *s = inlink->dst->priv;
+
+    uninit(inlink->dst);
 
     s->depth = desc->comp[0].depth;
     s->flt = !!(desc->flags & AV_PIX_FMT_FLAG_FLOAT);
@@ -346,17 +280,15 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
                                 width * sizeof(float), height);
         } else if (s->depth == 8) {
             for (y = 0; y < height; y++) {
-                for (x = 0; x < width; x++) {
-                    dst[x] = bptr[x];
-                }
+                for (x = 0; x < width; x++)
+                    dst[x] = lrintf(bptr[x]);
                 bptr += width;
                 dst += out->linesize[plane];
             }
         } else {
             for (y = 0; y < height; y++) {
-                for (x = 0; x < width; x++) {
-                    dst16[x] = bptr[x];
-                }
+                for (x = 0; x < width; x++)
+                    dst16[x] = lrintf(bptr[x]);
                 bptr += width;
                 dst16 += out->linesize[plane] / 2;
             }
@@ -368,13 +300,6 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     return ff_filter_frame(outlink, out);
 }
 
-static av_cold void uninit(AVFilterContext *ctx)
-{
-    GBlurContext *s = ctx->priv;
-
-    av_freep(&s->buffer);
-}
-
 static const AVFilterPad gblur_inputs[] = {
     {
         .name         = "default",
@@ -382,7 +307,6 @@ static const AVFilterPad gblur_inputs[] = {
         .config_props = config_input,
         .filter_frame = filter_frame,
     },
-    { NULL }
 };
 
 static const AVFilterPad gblur_outputs[] = {
@@ -390,18 +314,17 @@ static const AVFilterPad gblur_outputs[] = {
         .name = "default",
         .type = AVMEDIA_TYPE_VIDEO,
     },
-    { NULL }
 };
 
-AVFilter ff_vf_gblur = {
+const AVFilter ff_vf_gblur = {
     .name          = "gblur",
     .description   = NULL_IF_CONFIG_SMALL("Apply Gaussian Blur filter."),
     .priv_size     = sizeof(GBlurContext),
     .priv_class    = &gblur_class,
     .uninit        = uninit,
-    .query_formats = query_formats,
-    .inputs        = gblur_inputs,
-    .outputs       = gblur_outputs,
+    FILTER_INPUTS(gblur_inputs),
+    FILTER_OUTPUTS(gblur_outputs),
+    FILTER_PIXFMTS_ARRAY(pix_fmts),
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC | AVFILTER_FLAG_SLICE_THREADS,
     .process_command = ff_filter_process_command,
 };

@@ -37,6 +37,8 @@
 #include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
+#include "codec_internal.h"
+#include "decode.h"
 #include "internal.h"
 
 
@@ -52,10 +54,9 @@ typedef struct EightBpsContext {
     uint32_t pal[256];
 } EightBpsContext;
 
-static int decode_frame(AVCodecContext *avctx, void *data,
+static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
                         int *got_frame, AVPacket *avpkt)
 {
-    AVFrame *frame = data;
     const uint8_t *buf = avpkt->data;
     int buf_size       = avpkt->size;
     EightBpsContext * const c = avctx->priv_data;
@@ -122,16 +123,7 @@ static int decode_frame(AVCodecContext *avctx, void *data,
     }
 
     if (avctx->bits_per_coded_sample <= 8) {
-        buffer_size_t size;
-        const uint8_t *pal = av_packet_get_side_data(avpkt,
-                                                     AV_PKT_DATA_PALETTE,
-                                                     &size);
-        if (pal && size == AVPALETTE_SIZE) {
-            frame->palette_has_changed = 1;
-            memcpy(c->pal, pal, AVPALETTE_SIZE);
-        } else if (pal) {
-            av_log(avctx, AV_LOG_ERROR, "Palette size %d is wrong\n", size);
-        }
+        frame->palette_has_changed = ff_copy_palette(c->pal, avpkt, avctx);
 
         memcpy (frame->data[1], c->pal, AVPALETTE_SIZE);
     }
@@ -181,13 +173,14 @@ static av_cold int decode_init(AVCodecContext *avctx)
     return 0;
 }
 
-AVCodec ff_eightbps_decoder = {
-    .name           = "8bps",
-    .long_name      = NULL_IF_CONFIG_SMALL("QuickTime 8BPS video"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_8BPS,
+const FFCodec ff_eightbps_decoder = {
+    .p.name         = "8bps",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("QuickTime 8BPS video"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_8BPS,
     .priv_data_size = sizeof(EightBpsContext),
     .init           = decode_init,
-    .decode         = decode_frame,
-    .capabilities   = AV_CODEC_CAP_DR1,
+    FF_CODEC_DECODE_CB(decode_frame),
+    .p.capabilities = AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

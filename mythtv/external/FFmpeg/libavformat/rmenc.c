@@ -228,7 +228,7 @@ static int rv10_write_header(AVFormatContext *ctx,
             avio_wb32(s, 0); /* unknown */
             avio_wb16(s, stream->par->sample_rate); /* sample rate */
             avio_wb32(s, 0x10); /* unknown */
-            avio_wb16(s, stream->par->channels);
+            avio_wb16(s, stream->par->ch_layout.nb_channels);
             put_str8(s, "Int0"); /* codec name */
             if (stream->par->codec_tag) {
                 avio_w8(s, 4); /* tag length */
@@ -465,7 +465,7 @@ static int rm_write_trailer(AVFormatContext *s)
 }
 
 
-AVOutputFormat ff_rm_muxer = {
+const AVOutputFormat ff_rm_muxer = {
     .name              = "rm",
     .long_name         = NULL_IF_CONFIG_SMALL("RealMedia"),
     .mime_type         = "application/vnd.rn-realmedia",

@@ -22,12 +22,13 @@
 
 #include <inttypes.h>
 
-#include "libavutil/intreadwrite.h"
 #include "libavutil/dict.h"
 #include "avformat.h"
 #include "avio_internal.h"
 #include "apetag.h"
+#include "demux.h"
 #include "internal.h"
+#include "mux.h"
 
 #define APE_TAG_FLAG_CONTAINS_HEADER  (1U << 31)
 #define APE_TAG_FLAG_LACKS_FOOTER     (1 << 30)
@@ -79,22 +80,12 @@ static int ape_tag_read_field(AVFormatContext *s)
         av_dict_set(&st->metadata, key, filename, 0);
 
         if ((id = ff_guess_image2_codec(filename)) != AV_CODEC_ID_NONE) {
-            AVPacket pkt;
-            int ret;
-
-            ret = av_get_packet(s->pb, &pkt, size);
+            int ret = ff_add_attached_pic(s, st, s->pb, NULL, size);
             if (ret < 0) {
                 av_log(s, AV_LOG_ERROR, "Error reading cover art.\n");
                 return ret;
             }
-
-            st->disposition      |= AV_DISPOSITION_ATTACHED_PIC;
-            st->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
             st->codecpar->codec_id   = id;
-
-            st->attached_pic              = pkt;
-            st->attached_pic.stream_index = st->index;
-            st->attached_pic.flags       |= AV_PKT_FLAG_KEY;
         } else {
             if ((ret = ff_get_extradata(s, st->codecpar, s->pb, size)) < 0)
                 return ret;

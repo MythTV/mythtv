@@ -91,8 +91,7 @@ static void print_digraph(FILE *outfile, AVFilterGraph *graph)
                             link->time_base.num, link->time_base.den);
                 } else if (link->type == AVMEDIA_TYPE_AUDIO) {
                     char buf[255];
-                    av_get_channel_layout_string(buf, sizeof(buf), -1,
-                                                 link->channel_layout);
+                    av_channel_layout_describe(&link->ch_layout, buf, sizeof(buf));
                     fprintf(outfile,
                             "fmt:%s sr:%d cl:%s tb:%d/%d",
                             av_get_sample_fmt_name(link->format),
@@ -113,7 +112,7 @@ int main(int argc, char **argv)
     FILE *outfile           = NULL;
     FILE *infile            = NULL;
     char *graph_string      = NULL;
-    AVFilterGraph *graph = av_mallocz(sizeof(AVFilterGraph));
+    AVFilterGraph *graph    = NULL;
     char c;
 
     av_log_set_level(AV_LOG_DEBUG);
@@ -187,6 +186,12 @@ int main(int argc, char **argv)
             p += l;
         }
         *p = '\0';
+    }
+
+    graph = avfilter_graph_alloc();
+    if (!graph) {
+        fprintf(stderr, "Memory allocation failure\n");
+        return 1;
     }
 
     if (avfilter_graph_parse(graph, graph_string, NULL, NULL, NULL) < 0) {

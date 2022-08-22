@@ -49,6 +49,8 @@
 #include <string.h>
 
 #include "avcodec.h"
+#include "codec_internal.h"
+#include "decode.h"
 #include "internal.h"
 #include "libavutil/internal.h"
 
@@ -207,16 +209,12 @@ static int idcin_decode_vlcs(IdcinContext *s, AVFrame *frame)
     return 0;
 }
 
-static int idcin_decode_frame(AVCodecContext *avctx,
-                              void *data, int *got_frame,
-                              AVPacket *avpkt)
+static int idcin_decode_frame(AVCodecContext *avctx, AVFrame *frame,
+                              int *got_frame, AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
     IdcinContext *s = avctx->priv_data;
-    buffer_size_t pal_size;
-    const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE, &pal_size);
-    AVFrame *frame = data;
     int ret;
 
     s->buf = buf;
@@ -228,12 +226,7 @@ static int idcin_decode_frame(AVCodecContext *avctx,
     if (idcin_decode_vlcs(s, frame))
         return AVERROR_INVALIDDATA;
 
-    if (pal && pal_size == AVPALETTE_SIZE) {
-        frame->palette_has_changed = 1;
-        memcpy(s->pal, pal, AVPALETTE_SIZE);
-    } else if (pal) {
-        av_log(avctx, AV_LOG_ERROR, "Palette size %d is wrong\n", pal_size);
-    }
+    frame->palette_has_changed = ff_copy_palette(s->pal, avpkt, avctx);
     /* make the palette available on the way out */
     memcpy(frame->data[1], s->pal, AVPALETTE_SIZE);
 
@@ -243,20 +236,20 @@ static int idcin_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static const AVCodecDefault idcin_defaults[] = {
+static const FFCodecDefault idcin_defaults[] = {
     { "max_pixels", "320*240" },
     { NULL },
 };
 
-AVCodec ff_idcin_decoder = {
-    .name           = "idcinvideo",
-    .long_name      = NULL_IF_CONFIG_SMALL("id Quake II CIN video"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_IDCIN,
+const FFCodec ff_idcin_decoder = {
+    .p.name         = "idcinvideo",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("id Quake II CIN video"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_IDCIN,
     .priv_data_size = sizeof(IdcinContext),
     .init           = idcin_decode_init,
-    .decode         = idcin_decode_frame,
-    .capabilities   = AV_CODEC_CAP_DR1,
+    FF_CODEC_DECODE_CB(idcin_decode_frame),
+    .p.capabilities = AV_CODEC_CAP_DR1,
     .defaults       = idcin_defaults,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

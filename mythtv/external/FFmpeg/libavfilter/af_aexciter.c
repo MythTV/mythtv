@@ -195,7 +195,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 
     dst = (double *)out->data[0];
     for (int n = 0; n < in->nb_samples; n++) {
-        for (int c = 0; c < inlink->channels; c++) {
+        for (int c = 0; c < inlink->ch_layout.nb_channels; c++) {
             double sample = src[c] * level_in;
 
             sample = distortion_process(s, &s->cp[c], sample);
@@ -208,44 +208,14 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
                 dst[c] = sample;
         }
 
-        src += inlink->channels;
-        dst += inlink->channels;
+        src += inlink->ch_layout.nb_channels;
+        dst += inlink->ch_layout.nb_channels;
     }
 
     if (in != out)
         av_frame_free(&in);
 
     return ff_filter_frame(outlink, out);
-}
-
-static int query_formats(AVFilterContext *ctx)
-{
-    AVFilterFormats *formats;
-    AVFilterChannelLayouts *layouts;
-    static const enum AVSampleFormat sample_fmts[] = {
-        AV_SAMPLE_FMT_DBL,
-        AV_SAMPLE_FMT_NONE
-    };
-    int ret;
-
-    layouts = ff_all_channel_counts();
-    if (!layouts)
-        return AVERROR(ENOMEM);
-    ret = ff_set_common_channel_layouts(ctx, layouts);
-    if (ret < 0)
-        return ret;
-
-    formats = ff_make_format_list(sample_fmts);
-    if (!formats)
-        return AVERROR(ENOMEM);
-    ret = ff_set_common_formats(ctx, formats);
-    if (ret < 0)
-        return ret;
-
-    formats = ff_all_samplerates();
-    if (!formats)
-        return AVERROR(ENOMEM);
-    return ff_set_common_samplerates(ctx, formats);
 }
 
 static av_cold void uninit(AVFilterContext *ctx)
@@ -261,11 +231,11 @@ static int config_input(AVFilterLink *inlink)
     AExciterContext *s = ctx->priv;
 
     if (!s->cp)
-        s->cp = av_calloc(inlink->channels, sizeof(*s->cp));
+        s->cp = av_calloc(inlink->ch_layout.nb_channels, sizeof(*s->cp));
     if (!s->cp)
         return AVERROR(ENOMEM);
 
-    for (int i = 0; i < inlink->channels; i++)
+    for (int i = 0; i < inlink->ch_layout.nb_channels; i++)
         set_params(&s->cp[i], s->blend, s->drive, inlink->sample_rate,
                    s->freq, s->ceil);
 
@@ -292,7 +262,6 @@ static const AVFilterPad avfilter_af_aexciter_inputs[] = {
         .config_props = config_input,
         .filter_frame = filter_frame,
     },
-    { NULL }
 };
 
 static const AVFilterPad avfilter_af_aexciter_outputs[] = {
@@ -300,18 +269,17 @@ static const AVFilterPad avfilter_af_aexciter_outputs[] = {
         .name = "default",
         .type = AVMEDIA_TYPE_AUDIO,
     },
-    { NULL }
 };
 
-AVFilter ff_af_aexciter = {
+const AVFilter ff_af_aexciter = {
     .name          = "aexciter",
     .description   = NULL_IF_CONFIG_SMALL("Enhance high frequency part of audio."),
     .priv_size     = sizeof(AExciterContext),
     .priv_class    = &aexciter_class,
     .uninit        = uninit,
-    .query_formats = query_formats,
-    .inputs        = avfilter_af_aexciter_inputs,
-    .outputs       = avfilter_af_aexciter_outputs,
+    FILTER_INPUTS(avfilter_af_aexciter_inputs),
+    FILTER_OUTPUTS(avfilter_af_aexciter_outputs),
+    FILTER_SINGLE_SAMPLEFMT(AV_SAMPLE_FMT_DBL),
     .process_command = process_command,
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
 };

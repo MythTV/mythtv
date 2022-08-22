@@ -25,6 +25,8 @@
  * @author Kamil Nowosad
  */
 
+#include <string.h>
+
 #include "libavutil/avassert.h"
 #include "mqc.h"
 
@@ -102,7 +104,7 @@ void ff_mqc_encode(MqcState *mqc, uint8_t *cxstate, int d)
     }
 }
 
-int ff_mqc_flush(MqcState *mqc)
+static int mqc_flush(MqcState *mqc)
 {
     setbits(mqc);
     mqc->c = mqc->c << mqc->ct;
@@ -120,7 +122,7 @@ int ff_mqc_flush_to(MqcState *mqc, uint8_t *dst, int *dst_len)
     mqc2.bpstart=
     mqc2.bp = dst;
     *mqc2.bp = *mqc->bp;
-    ff_mqc_flush(&mqc2);
+    mqc_flush(&mqc2);
     *dst_len = mqc2.bp - dst;
     if (mqc->bp < mqc->bpstart) {
         av_assert1(mqc->bpstart - mqc->bp == 1);

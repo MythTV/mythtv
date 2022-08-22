@@ -73,7 +73,7 @@ int ff_dnn_execute_layer_avg_pool(DnnOperand *operands, const int32_t *input_ope
     DnnOperand *output_operand = &operands[output_operand_index];
 
     /**
-     * When padding_method = SAME, the tensorflow will only padding the hald number of 0 pxiels
+     * When padding_method = SAME, the tensorflow will only padding the hald number of 0 pixels
      * except the remainders.
      * Eg: assuming the input height = 1080, the strides = 11, so the remainders = 1080 % 11 = 2
      *     and if ksize = 5: it will fill (5 - 2) >> 1 = 1 line before the first line of input image,
@@ -109,12 +109,12 @@ int ff_dnn_execute_layer_avg_pool(DnnOperand *operands, const int32_t *input_ope
     output_operand->length = ff_calculate_operand_data_length(output_operand);
     if (output_operand->length <= 0) {
         av_log(ctx, AV_LOG_ERROR, "The output data length overflow\n");
-        return DNN_ERROR;
+        return AVERROR(EINVAL);
     }
     output_operand->data = av_realloc(output_operand->data, output_operand->length);
     if (!output_operand->data) {
         av_log(ctx, AV_LOG_ERROR, "Failed to reallocate memory for output\n");
-        return DNN_ERROR;
+        return AVERROR(ENOMEM);
     }
     output = output_operand->data;
 

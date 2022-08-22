@@ -57,9 +57,9 @@
 #include "libavutil/log.h"
 #include "libavutil/opt.h"
 #include "libavutil/avassert.h"
-#include "libavutil/avstring.h"
 #include "libavformat/avformat.h"
 #include "libavformat/internal.h"
+#include "libavformat/mux.h"
 #include "libavdevice/avdevice.h"
 #include "opengl_enc_shaders.h"
 
@@ -1297,7 +1297,7 @@ static const AVClass opengl_class = {
     .category   = AV_CLASS_CATEGORY_DEVICE_VIDEO_OUTPUT,
 };
 
-AVOutputFormat ff_opengl_muxer = {
+const AVOutputFormat ff_opengl_muxer = {
     .name           = "opengl",
     .long_name      = NULL_IF_CONFIG_SMALL("OpenGL output"),
     .priv_data_size = sizeof(OpenGLContext),

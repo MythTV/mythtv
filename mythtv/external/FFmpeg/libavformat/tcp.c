@@ -135,6 +135,9 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
         if (av_find_info_tag(buf, sizeof(buf), "listen_timeout", p)) {
             s->listen_timeout = strtol(buf, NULL, 10);
         }
+        if (av_find_info_tag(buf, sizeof(buf), "tcp_nodelay", p)) {
+            s->tcp_nodelay = strtol(buf, NULL, 10);
+        }
     }
     if (s->rw_timeout >= 0) {
         s->open_timeout =
@@ -172,7 +175,7 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
         while (cur_ai && fd < 0) {
             fd = ff_socket(cur_ai->ai_family,
                            cur_ai->ai_socktype,
-                           cur_ai->ai_protocol);
+                           cur_ai->ai_protocol, h);
             if (fd < 0) {
                 ret = ff_neterrno();
                 cur_ai = cur_ai->ai_next;
@@ -185,7 +188,7 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
 
     if (s->listen == 2) {
         // multi-client
-        if ((ret = ff_listen(fd, cur_ai->ai_addr, cur_ai->ai_addrlen)) < 0)
+        if ((ret = ff_listen(fd, cur_ai->ai_addr, cur_ai->ai_addrlen, h)) < 0)
             goto fail1;
     } else if (s->listen == 1) {
         // single client

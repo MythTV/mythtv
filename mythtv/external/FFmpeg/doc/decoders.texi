@@ -76,13 +76,19 @@ The following options are supported by the libdav1d wrapper.
 
 @item framethreads
 Set amount of frame threads to use during decoding. The default value is 0 (autodetect).
+This option is deprecated for libdav1d >= 1.0 and will be removed in the future. Use the
+global option @code{threads} instead.
 
 @item tilethreads
 Set amount of tile threads to use during decoding. The default value is 0 (autodetect).
+This option is deprecated for libdav1d >= 1.0 and will be removed in the future. Use the
+global option @code{threads} instead.
 
 @item filmgrain
 Apply film grain to the decoded video if present in the bitstream. Defaults to the
 internal default of the library.
+This option is deprecated and will be removed in the future. See the global option
+@code{export_side_data} to export Film Grain parameters instead of applying it.
 
 @item oppoint
 Select an operating point of a scalable AV1 bitstream (0 - 31). Defaults to the
@@ -117,6 +123,63 @@ The following option is supported by the libuavs3d wrapper.
 
 @item frame_threads
 Set amount of frame threads to use during decoding. The default value is 0 (autodetect).
+
+@end table
+
+@section QSV Decoders
+
+The family of Intel QuickSync Video decoders (VC1, MPEG-2, H.264, HEVC,
+JPEG/MJPEG, VP8, VP9, AV1).
+
+@subsection Common Options
+
+The following options are supported by all qsv decoders.
+
+@table @option
+
+@item @var{async_depth}
+Internal parallelization depth, the higher the value the higher the latency.
+
+@item @var{gpu_copy}
+A GPU-accelerated copy between video and system memory
+@table @samp
+@item default
+@item on
+@item off
+@end table
+
+@end table
+
+@subsection HEVC Options
+Extra options for hevc_qsv.
+
+@table @option
+
+@item @var{load_plugin}
+A user plugin to load in an internal session
+@table @samp
+@item none
+@item hevc_sw
+@item hevc_hw
+@end table
+
+@item @var{load_plugins}
+A :-separate list of hexadecimal plugin UIDs to load in an internal session
+
+@end table
+
+@section v210
+
+Uncompressed 4:2:2 10-bit decoder.
+
+@subsection Options
+
+@table @option
+
+@item custom_stride
+Set the line size of the v210 data in bytes. The default value is 0
+(autodetect). You can use the special -1 value for a strideless v210 as seen in
+BOXX files.
 
 @end table
 
@@ -293,6 +356,8 @@ Enabled by default.
 @table @option
 @item compute_clut
 @table @option
+@item -2
+Compute clut once if no matching CLUT is in the stream.
 @item -1
 Compute clut if no matching CLUT is in the stream.
 @item 0

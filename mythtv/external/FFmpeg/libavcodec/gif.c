@@ -35,7 +35,8 @@
 #include "libavutil/imgutils.h"
 #include "avcodec.h"
 #include "bytestream.h"
-#include "internal.h"
+#include "codec_internal.h"
+#include "encode.h"
 #include "lzw.h"
 #include "gif.h"
 
@@ -480,7 +481,7 @@ static int gif_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     const uint32_t *palette = NULL;
     int ret;
 
-    if ((ret = ff_alloc_packet2(avctx, pkt, avctx->width*avctx->height*7/5 + AV_INPUT_BUFFER_MIN_SIZE, 0)) < 0)
+    if ((ret = ff_alloc_packet(avctx, pkt, avctx->width*avctx->height*7/5 + AV_INPUT_BUFFER_MIN_SIZE)) < 0)
         return ret;
     outbuf_ptr = pkt->data;
     end        = pkt->data + pkt->size;
@@ -551,19 +552,19 @@ static const AVClass gif_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-AVCodec ff_gif_encoder = {
-    .name           = "gif",
-    .long_name      = NULL_IF_CONFIG_SMALL("GIF (Graphics Interchange Format)"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_GIF,
+const FFCodec ff_gif_encoder = {
+    .p.name         = "gif",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("GIF (Graphics Interchange Format)"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_GIF,
     .priv_data_size = sizeof(GIFContext),
     .init           = gif_encode_init,
-    .encode2        = gif_encode_frame,
+    FF_CODEC_ENCODE_CB(gif_encode_frame),
     .close          = gif_encode_close,
-    .pix_fmts       = (const enum AVPixelFormat[]){
+    .p.pix_fmts     = (const enum AVPixelFormat[]){
         AV_PIX_FMT_RGB8, AV_PIX_FMT_BGR8, AV_PIX_FMT_RGB4_BYTE, AV_PIX_FMT_BGR4_BYTE,
         AV_PIX_FMT_GRAY8, AV_PIX_FMT_PAL8, AV_PIX_FMT_NONE
     },
-    .priv_class     = &gif_class,
-    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
+    .p.priv_class   = &gif_class,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
 };

@@ -22,14 +22,13 @@
  */
 
 #include "avformat.h"
-#include "internal.h"
 #include "libavutil/avassert.h"
 #include "libavutil/crc.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/log.h"
 #include "libavutil/opt.h"
-#include "libavcodec/png.h"
 #include "libavcodec/apng.h"
+#include "libavcodec/png.h"
 
 typedef struct APNGMuxContext {
     AVClass *class;
@@ -49,10 +48,11 @@ typedef struct APNGMuxContext {
     int extra_data_size;
 } APNGMuxContext;
 
-static uint8_t *apng_find_chunk(uint32_t tag, uint8_t *buf, size_t length)
+static const uint8_t *apng_find_chunk(uint32_t tag, const uint8_t *buf,
+                                      size_t length)
 {
     size_t b;
-    for (b = 0; b < length; b += AV_RB32(buf + b) + 12)
+    for (b = 0; AV_RB32(buf + b) + 12ULL <= length - b; b += AV_RB32(buf + b) + 12ULL)
         if (AV_RB32(&buf[b + 4]) == tag)
             return &buf[b];
     return NULL;
@@ -91,9 +91,9 @@ static int apng_write_header(AVFormatContext *format_context)
         return AVERROR(EINVAL);
     }
 
-    if (apng->last_delay.num > USHRT_MAX || apng->last_delay.den > USHRT_MAX) {
+    if (apng->last_delay.num > UINT16_MAX || apng->last_delay.den > UINT16_MAX) {
         av_reduce(&apng->last_delay.num, &apng->last_delay.den,
-                  apng->last_delay.num, apng->last_delay.den, USHRT_MAX);
+                  apng->last_delay.num, apng->last_delay.den, UINT16_MAX);
         av_log(format_context, AV_LOG_WARNING,
                "Last frame delay is too precise. Reducing to %d/%d (%f).\n",
                apng->last_delay.num, apng->last_delay.den, (double)apng->last_delay.num / apng->last_delay.den);
@@ -119,7 +119,7 @@ static int flush_packet(AVFormatContext *format_context, AVPacket *packet)
     AVIOContext *io_context = format_context->pb;
     AVStream *codec_stream = format_context->streams[0];
     uint8_t *side_data = NULL;
-    buffer_size_t side_data_size;
+    size_t side_data_size;
 
     av_assert0(apng->prev_packet);
 
@@ -135,15 +135,15 @@ static int flush_packet(AVFormatContext *format_context, AVPacket *packet)
     }
 
     if (apng->frame_number == 0 && !packet) {
-        uint8_t *existing_acTL_chunk;
-        uint8_t *existing_fcTL_chunk;
+        const uint8_t *existing_acTL_chunk;
+        const uint8_t *existing_fcTL_chunk;
 
         av_log(format_context, AV_LOG_INFO, "Only a single frame so saving as a normal PNG.\n");
 
         // Write normal PNG headers without acTL chunk
         existing_acTL_chunk = apng_find_chunk(MKBETAG('a', 'c', 'T', 'L'), apng->extra_data, apng->extra_data_size);
         if (existing_acTL_chunk) {
-            uint8_t *chunk_after_acTL = existing_acTL_chunk + AV_RB32(existing_acTL_chunk) + 12;
+            const uint8_t *chunk_after_acTL = existing_acTL_chunk + AV_RB32(existing_acTL_chunk) + 12;
             avio_write(io_context, apng->extra_data, existing_acTL_chunk - apng->extra_data);
             avio_write(io_context, chunk_after_acTL, apng->extra_data + apng->extra_data_size - chunk_after_acTL);
         } else {
@@ -153,17 +153,18 @@ static int flush_packet(AVFormatContext *format_context, AVPacket *packet)
         // Write frame data without fcTL chunk
         existing_fcTL_chunk = apng_find_chunk(MKBETAG('f', 'c', 'T', 'L'), apng->prev_packet->data, apng->prev_packet->size);
         if (existing_fcTL_chunk) {
-            uint8_t *chunk_after_fcTL = existing_fcTL_chunk + AV_RB32(existing_fcTL_chunk) + 12;
+            const uint8_t *chunk_after_fcTL = existing_fcTL_chunk + AV_RB32(existing_fcTL_chunk) + 12;
             avio_write(io_context, apng->prev_packet->data, existing_fcTL_chunk - apng->prev_packet->data);
             avio_write(io_context, chunk_after_fcTL, apng->prev_packet->data + apng->prev_packet->size - chunk_after_fcTL);
         } else {
             avio_write(io_context, apng->prev_packet->data, apng->prev_packet->size);
         }
     } else {
-        uint8_t *existing_fcTL_chunk;
+        const uint8_t *data, *data_end;
+        const uint8_t *existing_fcTL_chunk;
 
         if (apng->frame_number == 0) {
-            uint8_t *existing_acTL_chunk;
+            const uint8_t *existing_acTL_chunk;
 
             // Write normal PNG headers
             avio_write(io_context, apng->extra_data, apng->extra_data_size);
@@ -179,19 +180,26 @@ static int flush_packet(AVFormatContext *format_context, AVPacket *packet)
             }
         }
 
+        data     = apng->prev_packet->data;
+        data_end = data + apng->prev_packet->size;
         existing_fcTL_chunk = apng_find_chunk(MKBETAG('f', 'c', 'T', 'L'), apng->prev_packet->data, apng->prev_packet->size);
         if (existing_fcTL_chunk) {
             AVRational delay;
+
+            if (AV_RB32(existing_fcTL_chunk) != APNG_FCTL_CHUNK_SIZE)
+                return AVERROR_INVALIDDATA;
 
             existing_fcTL_chunk += 8;
             delay.num = AV_RB16(existing_fcTL_chunk + 20);
             delay.den = AV_RB16(existing_fcTL_chunk + 22);
 
             if (delay.num == 0 && delay.den == 0) {
+                uint8_t new_fcTL_chunk[APNG_FCTL_CHUNK_SIZE];
+
                 if (packet) {
                     int64_t delay_num_raw = (packet->dts - apng->prev_packet->dts) * codec_stream->time_base.num;
                     int64_t delay_den_raw = codec_stream->time_base.den;
-                    if (!av_reduce(&delay.num, &delay.den, delay_num_raw, delay_den_raw, USHRT_MAX) &&
+                    if (!av_reduce(&delay.num, &delay.den, delay_num_raw, delay_den_raw, UINT16_MAX) &&
                         !apng->framerate_warned) {
                         av_log(format_context, AV_LOG_WARNING,
                                "Frame rate is too high or specified too precisely. Unable to copy losslessly.\n");
@@ -203,16 +211,20 @@ static int flush_packet(AVFormatContext *format_context, AVPacket *packet)
                     delay = apng->prev_delay;
                 }
 
+                avio_write(io_context, data, (existing_fcTL_chunk - 8) - data);
+                data = existing_fcTL_chunk + APNG_FCTL_CHUNK_SIZE + 4 /* CRC-32 */;
                 // Update frame control header with new delay
-                AV_WB16(existing_fcTL_chunk + 20, delay.num);
-                AV_WB16(existing_fcTL_chunk + 22, delay.den);
-                AV_WB32(existing_fcTL_chunk + 26, ~av_crc(av_crc_get_table(AV_CRC_32_IEEE_LE), ~0U, existing_fcTL_chunk - 4, 26 + 4));
+                memcpy(new_fcTL_chunk, existing_fcTL_chunk, sizeof(new_fcTL_chunk));
+                AV_WB16(new_fcTL_chunk + 20, delay.num);
+                AV_WB16(new_fcTL_chunk + 22, delay.den);
+                apng_write_chunk(io_context, MKBETAG('f', 'c', 'T', 'L'),
+                                 new_fcTL_chunk, sizeof(new_fcTL_chunk));
             }
             apng->prev_delay = delay;
         }
 
         // Write frame data
-        avio_write(io_context, apng->prev_packet->data, apng->prev_packet->size);
+        avio_write(io_context, data, data_end - data);
     }
     ++apng->frame_number;
 
@@ -281,9 +293,9 @@ static void apng_deinit(AVFormatContext *s)
 #define ENC AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
     { "plays", "Number of times to play the output: 0 - infinite loop, 1 - no loop", OFFSET(plays),
-      AV_OPT_TYPE_INT, { .i64 = 1 }, 0, UINT_MAX, ENC },
+      AV_OPT_TYPE_INT, { .i64 = 1 }, 0, UINT16_MAX, ENC },
     { "final_delay", "Force delay after the last frame", OFFSET(last_delay),
-      AV_OPT_TYPE_RATIONAL, { .dbl = 0 }, 0, USHRT_MAX, ENC },
+      AV_OPT_TYPE_RATIONAL, { .dbl = 0 }, 0, UINT16_MAX, ENC },
     { NULL },
 };
 
@@ -294,7 +306,7 @@ static const AVClass apng_muxer_class = {
     .option     = options,
 };
 
-AVOutputFormat ff_apng_muxer = {
+const AVOutputFormat ff_apng_muxer = {
     .name           = "apng",
     .long_name      = NULL_IF_CONFIG_SMALL("Animated Portable Network Graphics"),
     .mime_type      = "image/png",

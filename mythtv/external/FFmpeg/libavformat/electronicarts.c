@@ -503,7 +503,7 @@ static int init_video_stream(AVFormatContext *s, VideoProperties *video)
     st->codecpar->codec_id    = video->codec;
     // parsing is necessary to make FFmpeg generate correct timestamps
     if (st->codecpar->codec_id == AV_CODEC_ID_MPEG2VIDEO)
-        st->need_parsing = AVSTREAM_PARSE_HEADERS;
+        ffstream(st)->need_parsing = AVSTREAM_PARSE_HEADERS;
     st->codecpar->codec_tag   = 0; /* no fourcc */
     st->codecpar->width       = video->width;
     st->codecpar->height      = video->height;
@@ -551,13 +551,13 @@ static int ea_read_header(AVFormatContext *s)
         st->codecpar->codec_type            = AVMEDIA_TYPE_AUDIO;
         st->codecpar->codec_id              = ea->audio_codec;
         st->codecpar->codec_tag             = 0;   /* no tag */
-        st->codecpar->channels              = ea->num_channels;
+        st->codecpar->ch_layout.nb_channels = ea->num_channels;
         st->codecpar->sample_rate           = ea->sample_rate;
         st->codecpar->bits_per_coded_sample = ea->bytes * 8;
-        st->codecpar->bit_rate              = (int64_t)st->codecpar->channels *
+        st->codecpar->bit_rate              = (int64_t)ea->num_channels *
                                               st->codecpar->sample_rate *
                                               st->codecpar->bits_per_coded_sample / 4;
-        st->codecpar->block_align           = st->codecpar->channels *
+        st->codecpar->block_align           = ea->num_channels *
                                               st->codecpar->bits_per_coded_sample;
         ea->audio_stream_index           = st->index;
         st->start_time                   = 0;
@@ -752,7 +752,7 @@ get_video_packet:
     return ret;
 }
 
-AVInputFormat ff_ea_demuxer = {
+const AVInputFormat ff_ea_demuxer = {
     .name           = "ea",
     .long_name      = NULL_IF_CONFIG_SMALL("Electronic Arts Multimedia"),
     .priv_data_size = sizeof(EaDemuxContext),

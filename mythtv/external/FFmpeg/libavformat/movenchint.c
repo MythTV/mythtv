@@ -21,7 +21,7 @@
 
 #include "movenc.h"
 #include "libavutil/intreadwrite.h"
-#include "internal.h"
+#include "mux.h"
 #include "rtpenc_chain.h"
 #include "avio_internal.h"
 #include "rtp.h"
@@ -96,7 +96,7 @@ static void sample_queue_free(HintSampleQueue *queue)
  * not copied. sample_queue_retain should be called before pkt->data
  * is reused/freed.
  */
-static void sample_queue_push(HintSampleQueue *queue, uint8_t *data, int size,
+static void sample_queue_push(HintSampleQueue *queue, const uint8_t *data, int size,
                               int sample)
 {
     /* No need to keep track of smaller samples, since describing them
@@ -260,8 +260,7 @@ static void output_immediate(const uint8_t *data, int size,
         data += len;
         size -= len;
 
-        for (; len < 14; len++)
-            avio_w8(out, 0);
+        ffio_fill(out, 0, 14 - len);
 
         (*entries)++;
     }

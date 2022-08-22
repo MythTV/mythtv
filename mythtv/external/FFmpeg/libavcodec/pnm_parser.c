@@ -111,6 +111,8 @@ retry:
     } else {
         int ret = av_image_get_buffer_size(avctx->pix_fmt, avctx->width, avctx->height, 1);
         next = pnmctx.bytestream - pnmctx.bytestream_start + skip;
+        if (ret > 0 && pnmctx.half)
+            ret >>= 1;
         if (ret >= 0 && next + (uint64_t)ret <= INT_MAX)
             next += ret;
     }
@@ -131,9 +133,10 @@ end:
     return next;
 }
 
-AVCodecParser ff_pnm_parser = {
+const AVCodecParser ff_pnm_parser = {
     .codec_ids      = { AV_CODEC_ID_PGM, AV_CODEC_ID_PGMYUV, AV_CODEC_ID_PPM,
-                        AV_CODEC_ID_PBM, AV_CODEC_ID_PAM },
+                        AV_CODEC_ID_PBM, AV_CODEC_ID_PAM, AV_CODEC_ID_PFM,
+                        AV_CODEC_ID_PHM },
     .priv_data_size = sizeof(PNMParseContext),
     .parser_parse   = pnm_parse,
     .parser_close   = ff_parse_close,

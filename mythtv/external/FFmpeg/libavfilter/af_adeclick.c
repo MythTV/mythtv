@@ -113,35 +113,6 @@ static const AVOption adeclick_options[] = {
 
 AVFILTER_DEFINE_CLASS(adeclick);
 
-static int query_formats(AVFilterContext *ctx)
-{
-    AVFilterFormats *formats = NULL;
-    AVFilterChannelLayouts *layouts = NULL;
-    static const enum AVSampleFormat sample_fmts[] = {
-        AV_SAMPLE_FMT_DBLP,
-        AV_SAMPLE_FMT_NONE
-    };
-    int ret;
-
-    formats = ff_make_format_list(sample_fmts);
-    if (!formats)
-        return AVERROR(ENOMEM);
-    ret = ff_set_common_formats(ctx, formats);
-    if (ret < 0)
-        return ret;
-
-    layouts = ff_all_channel_counts();
-    if (!layouts)
-        return AVERROR(ENOMEM);
-
-    ret = ff_set_common_channel_layouts(ctx, layouts);
-    if (ret < 0)
-        return ret;
-
-    formats = ff_all_samplerates();
-    return ff_set_common_samplerates(ctx, formats);
-}
-
 static int config_input(AVFilterLink *inlink)
 {
     AVFilterContext *ctx = inlink->dst;
@@ -180,7 +151,7 @@ static int config_input(AVFilterLink *inlink)
     s->efifo = av_audio_fifo_alloc(inlink->format, 1, s->window_size);
     if (!s->efifo)
         return AVERROR(ENOMEM);
-    s->fifo = av_audio_fifo_alloc(inlink->format, inlink->channels, s->window_size);
+    s->fifo = av_audio_fifo_alloc(inlink->format, inlink->ch_layout.nb_channels, s->window_size);
     if (!s->fifo)
         return AVERROR(ENOMEM);
     s->overlap_skip = s->method ? (s->window_size - s->hop_size) / 2 : 0;
@@ -189,12 +160,12 @@ static int config_input(AVFilterLink *inlink)
                             s->overlap_skip);
     }
 
-    s->nb_channels = inlink->channels;
-    s->chan = av_calloc(inlink->channels, sizeof(*s->chan));
+    s->nb_channels = inlink->ch_layout.nb_channels;
+    s->chan = av_calloc(inlink->ch_layout.nb_channels, sizeof(*s->chan));
     if (!s->chan)
         return AVERROR(ENOMEM);
 
-    for (i = 0; i < inlink->channels; i++) {
+    for (i = 0; i < inlink->ch_layout.nb_channels; i++) {
         DeclickChannel *c = &s->chan[i];
 
         c->detection = av_calloc(s->window_size, sizeof(*c->detection));
@@ -586,11 +557,11 @@ static int filter_frame(AVFilterLink *inlink)
         goto fail;
 
     td.out = out;
-    ret = ctx->internal->execute(ctx, filter_channel, &td, NULL, inlink->channels);
+    ret = ff_filter_execute(ctx, filter_channel, &td, NULL, inlink->ch_layout.nb_channels);
     if (ret < 0)
         goto fail;
 
-    for (ch = 0; ch < s->in->channels; ch++) {
+    for (ch = 0; ch < s->in->ch_layout.nb_channels; ch++) {
         double *is = (double *)s->is->extended_data[ch];
 
         for (j = 0; j < s->hop_size; j++) {
@@ -609,7 +580,7 @@ static int filter_frame(AVFilterLink *inlink)
     s->pts += av_rescale_q(s->hop_size, (AVRational){1, outlink->sample_rate}, outlink->time_base);
 
     s->detected_errors += detected_errors;
-    s->nb_samples += out->nb_samples * inlink->channels;
+    s->nb_samples += out->nb_samples * inlink->ch_layout.nb_channels;
 
     ret = ff_filter_frame(outlink, out);
     if (ret < 0)
@@ -751,7 +722,6 @@ static const AVFilterPad inputs[] = {
         .type         = AVMEDIA_TYPE_AUDIO,
         .config_props = config_input,
     },
-    { NULL }
 };
 
 static const AVFilterPad outputs[] = {
@@ -759,20 +729,19 @@ static const AVFilterPad outputs[] = {
         .name          = "default",
         .type          = AVMEDIA_TYPE_AUDIO,
     },
-    { NULL }
 };
 
-AVFilter ff_af_adeclick = {
+const AVFilter ff_af_adeclick = {
     .name          = "adeclick",
     .description   = NULL_IF_CONFIG_SMALL("Remove impulsive noise from input audio."),
-    .query_formats = query_formats,
     .priv_size     = sizeof(AudioDeclickContext),
     .priv_class    = &adeclick_class,
     .init          = init,
     .activate      = activate,
     .uninit        = uninit,
-    .inputs        = inputs,
-    .outputs       = outputs,
+    FILTER_INPUTS(inputs),
+    FILTER_OUTPUTS(outputs),
+    FILTER_SINGLE_SAMPLEFMT(AV_SAMPLE_FMT_DBLP),
     .flags         = AVFILTER_FLAG_SLICE_THREADS | AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
 };
 
@@ -798,16 +767,16 @@ static const AVOption adeclip_options[] = {
 
 AVFILTER_DEFINE_CLASS(adeclip);
 
-AVFilter ff_af_adeclip = {
+const AVFilter ff_af_adeclip = {
     .name          = "adeclip",
     .description   = NULL_IF_CONFIG_SMALL("Remove clipping from input audio."),
-    .query_formats = query_formats,
     .priv_size     = sizeof(AudioDeclickContext),
     .priv_class    = &adeclip_class,
     .init          = init,
     .activate      = activate,
     .uninit        = uninit,
-    .inputs        = inputs,
-    .outputs       = outputs,
+    FILTER_INPUTS(inputs),
+    FILTER_OUTPUTS(outputs),
+    FILTER_SINGLE_SAMPLEFMT(AV_SAMPLE_FMT_DBLP),
     .flags         = AVFILTER_FLAG_SLICE_THREADS | AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
 };

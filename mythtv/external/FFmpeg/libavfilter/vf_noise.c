@@ -272,7 +272,8 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *inpicref)
     }
 
     td.in = inpicref; td.out = out;
-    ctx->internal->execute(ctx, filter_slice, &td, NULL, FFMIN(n->height[0], ff_filter_get_nb_threads(ctx)));
+    ff_filter_execute(ctx, filter_slice, &td, NULL,
+                      FFMIN(n->height[0], ff_filter_get_nb_threads(ctx)));
     emms_c();
 
     if (inpicref != out)
@@ -304,8 +305,9 @@ static av_cold int init(AVFilterContext *ctx)
     n->line_noise     = ff_line_noise_c;
     n->line_noise_avg = ff_line_noise_avg_c;
 
-    if (ARCH_X86)
-        ff_noise_init_x86(n);
+#if ARCH_X86
+    ff_noise_init_x86(n);
+#endif
 
     return 0;
 }
@@ -326,7 +328,6 @@ static const AVFilterPad noise_inputs[] = {
         .filter_frame = filter_frame,
         .config_props = config_input,
     },
-    { NULL }
 };
 
 static const AVFilterPad noise_outputs[] = {
@@ -334,18 +335,17 @@ static const AVFilterPad noise_outputs[] = {
         .name = "default",
         .type = AVMEDIA_TYPE_VIDEO,
     },
-    { NULL }
 };
 
-AVFilter ff_vf_noise = {
+const AVFilter ff_vf_noise = {
     .name          = "noise",
     .description   = NULL_IF_CONFIG_SMALL("Add noise."),
     .priv_size     = sizeof(NoiseContext),
     .init          = init,
     .uninit        = uninit,
-    .query_formats = query_formats,
-    .inputs        = noise_inputs,
-    .outputs       = noise_outputs,
+    FILTER_INPUTS(noise_inputs),
+    FILTER_OUTPUTS(noise_outputs),
+    FILTER_QUERY_FUNC(query_formats),
     .priv_class    = &noise_class,
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC | AVFILTER_FLAG_SLICE_THREADS,
 };

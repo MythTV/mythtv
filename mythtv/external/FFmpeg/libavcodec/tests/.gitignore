@@ -1,3 +1,4 @@
+/avcodec
 /avfft
 /avpacket
 /cabac
@@ -11,7 +12,6 @@
 /h265_levels
 /htmlsubtitles
 /iirfilter
-/imgconvert
 /jpeg2000dwt
 /mathops
 /mjpegenc_huffman
@@ -19,4 +19,3 @@
 /mpeg12framerate
 /rangecoder
 /snowenc
-/utils

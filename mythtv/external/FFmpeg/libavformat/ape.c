@@ -42,8 +42,8 @@
 
 typedef struct APEFrame {
     int64_t pos;
+    int64_t size;
     int nblocks;
-    int size;
     int skip;
     int64_t pts;
 } APEFrame;
@@ -78,8 +78,6 @@ typedef struct APEContext {
     uint16_t channels;
     uint32_t samplerate;
 } APEContext;
-
-static int ape_read_close(AVFormatContext * s);
 
 static int ape_probe(const AVProbeData * p)
 {
@@ -130,7 +128,7 @@ static void ape_dumpinfo(AVFormatContext * s, APEContext * ape_ctx)
 
     av_log(s, AV_LOG_DEBUG, "\nFrames\n\n");
     for (i = 0; i < ape_ctx->totalframes; i++)
-        av_log(s, AV_LOG_DEBUG, "%8d   %8"PRId64" %8d (%d samples)\n", i,
+        av_log(s, AV_LOG_DEBUG, "%8d   %8"PRId64" %8"PRId64" (%d samples)\n", i,
                ape_ctx->frames[i].pos, ape_ctx->frames[i].size,
                ape_ctx->frames[i].nblocks);
 
@@ -148,7 +146,8 @@ static int ape_read_header(AVFormatContext * s)
     AVStream *st;
     uint32_t tag;
     int i, ret;
-    int total_blocks, final_size = 0;
+    int total_blocks;
+    int64_t final_size = 0;
     int64_t pts, file_size;
 
     /* Skip any leading junk such as id3v2 tags */
@@ -276,8 +275,7 @@ static int ape_read_header(AVFormatContext * s)
 
         if (pb->eof_reached) {
             av_log(s, AV_LOG_ERROR, "seektable truncated\n");
-            ret = AVERROR_INVALIDDATA;
-            goto fail;
+            return AVERROR_INVALIDDATA;
         }
         ff_dlog(s, "seektable: %8d   %"PRIu32"\n", i, seektable_entry);
     }
@@ -313,8 +311,7 @@ static int ape_read_header(AVFormatContext * s)
             ff_dlog(s, "bittable: %2d\n", bits);
             if (pb->eof_reached) {
                 av_log(s, AV_LOG_ERROR, "bittable truncated\n");
-                ret = AVERROR_INVALIDDATA;
-                goto fail;
+                return AVERROR_INVALIDDATA;
             }
         }
     }
@@ -327,17 +324,15 @@ static int ape_read_header(AVFormatContext * s)
 
     /* now we are ready: build format streams */
     st = avformat_new_stream(s, NULL);
-    if (!st) {
-        ret = AVERROR(ENOMEM);
-        goto fail;
-    }
+    if (!st)
+        return AVERROR(ENOMEM);
 
     total_blocks = (ape->totalframes == 0) ? 0 : ((ape->totalframes - 1) * ape->blocksperframe) + ape->finalframeblocks;
 
     st->codecpar->codec_type      = AVMEDIA_TYPE_AUDIO;
     st->codecpar->codec_id        = AV_CODEC_ID_APE;
     st->codecpar->codec_tag       = MKTAG('A', 'P', 'E', ' ');
-    st->codecpar->channels        = ape->channels;
+    st->codecpar->ch_layout.nb_channels = ape->channels;
     st->codecpar->sample_rate     = ape->samplerate;
     st->codecpar->bits_per_coded_sample = ape->bps;
 
@@ -347,7 +342,7 @@ static int ape_read_header(AVFormatContext * s)
     avpriv_set_pts_info(st, 64, 1, ape->samplerate);
 
     if ((ret = ff_alloc_extradata(st->codecpar, APE_EXTRADATA_SIZE)) < 0)
-        goto fail;
+        return ret;
     AV_WL16(st->codecpar->extradata + 0, ape->fileversion);
     AV_WL16(st->codecpar->extradata + 2, ape->compressiontype);
     AV_WL16(st->codecpar->extradata + 4, ape->formatflags);
@@ -366,10 +361,6 @@ static int ape_read_header(AVFormatContext * s)
     }
 
     return 0;
-fail:
-    ape_read_close(s);
-
-    return ret;
 }
 
 static int ape_read_packet(AVFormatContext * s, AVPacket * pkt)
@@ -397,7 +388,7 @@ static int ape_read_packet(AVFormatContext * s, AVPacket * pkt)
 
     if (ape->frames[ape->currentframe].size <= 0 ||
         ape->frames[ape->currentframe].size > INT_MAX - extra_size) {
-        av_log(s, AV_LOG_ERROR, "invalid packet size: %d\n",
+        av_log(s, AV_LOG_ERROR, "invalid packet size: %8"PRId64"\n",
                ape->frames[ape->currentframe].size);
         ape->currentframe++;
         return AVERROR(EIO);
@@ -444,16 +435,17 @@ static int ape_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp
     if (index < 0)
         return -1;
 
-    if ((ret = avio_seek(s->pb, st->index_entries[index].pos, SEEK_SET)) < 0)
+    if ((ret = avio_seek(s->pb, ffstream(st)->index_entries[index].pos, SEEK_SET)) < 0)
         return ret;
     ape->currentframe = index;
     return 0;
 }
 
-AVInputFormat ff_ape_demuxer = {
+const AVInputFormat ff_ape_demuxer = {
     .name           = "ape",
     .long_name      = NULL_IF_CONFIG_SMALL("Monkey's Audio"),
     .priv_data_size = sizeof(APEContext),
+    .flags_internal = FF_FMT_INIT_CLEANUP,
     .read_probe     = ape_probe,
     .read_header    = ape_read_header,
     .read_packet    = ape_read_packet,

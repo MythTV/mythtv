@@ -24,6 +24,8 @@
  * RV30/40 parser
  */
 
+#include "config_components.h"
+
 #include "parser.h"
 #include "libavutil/intreadwrite.h"
 
@@ -77,7 +79,7 @@ static int rv34_parse(AVCodecParserContext *s,
 }
 
 #if CONFIG_RV30_PARSER
-AVCodecParser ff_rv30_parser = {
+const AVCodecParser ff_rv30_parser = {
     .codec_ids      = { AV_CODEC_ID_RV30 },
     .priv_data_size = sizeof(RV34ParseContext),
     .parser_parse   = rv34_parse,
@@ -85,7 +87,7 @@ AVCodecParser ff_rv30_parser = {
 #endif
 
 #if CONFIG_RV40_PARSER
-AVCodecParser ff_rv40_parser = {
+const AVCodecParser ff_rv40_parser = {
     .codec_ids      = { AV_CODEC_ID_RV40 },
     .priv_data_size = sizeof(RV34ParseContext),
     .parser_parse   = rv34_parse,

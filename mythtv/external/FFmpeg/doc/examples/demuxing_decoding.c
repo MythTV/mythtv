@@ -32,6 +32,7 @@
 #include <libavutil/imgutils.h>
 #include <libavutil/samplefmt.h>
 #include <libavutil/timestamp.h>
+#include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 
 static AVFormatContext *fmt_ctx = NULL;
@@ -149,8 +150,7 @@ static int open_codec_context(int *stream_idx,
 {
     int ret, stream_index;
     AVStream *st;
-    AVCodec *dec = NULL;
-    AVDictionary *opts = NULL;
+    const AVCodec *dec = NULL;
 
     ret = av_find_best_stream(fmt_ctx, type, -1, -1, NULL, 0);
     if (ret < 0) {
@@ -185,7 +185,7 @@ static int open_codec_context(int *stream_idx,
         }
 
         /* Init the decoders */
-        if ((ret = avcodec_open2(*dec_ctx, dec, &opts)) < 0) {
+        if ((ret = avcodec_open2(*dec_ctx, dec, NULL)) < 0) {
             fprintf(stderr, "Failed to open %s codec\n",
                     av_get_media_type_string(type));
             return ret;
@@ -345,7 +345,7 @@ int main (int argc, char **argv)
 
     if (audio_stream) {
         enum AVSampleFormat sfmt = audio_dec_ctx->sample_fmt;
-        int n_channels = audio_dec_ctx->channels;
+        int n_channels = audio_dec_ctx->ch_layout.nb_channels;
         const char *fmt;
 
         if (av_sample_fmt_is_planar(sfmt)) {

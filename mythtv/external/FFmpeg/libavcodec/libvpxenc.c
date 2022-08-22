@@ -23,12 +23,16 @@
  * VP8/9 encoder support via libvpx
  */
 
+#include "config_components.h"
+
 #define VPX_DISABLE_CTRL_TYPECHECKS 1
 #define VPX_CODEC_DISABLE_COMPAT    1
 #include <vpx/vpx_encoder.h>
 #include <vpx/vp8cx.h>
 
 #include "avcodec.h"
+#include "codec_internal.h"
+#include "encode.h"
 #include "internal.h"
 #include "libavutil/avassert.h"
 #include "libvpx.h"
@@ -37,6 +41,8 @@
 #include "libavutil/avstring.h"
 #include "libavutil/base64.h"
 #include "libavutil/common.h"
+#include "libavutil/cpu.h"
+#include "libavutil/fifo.h"
 #include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/mathematics.h"
@@ -62,6 +68,11 @@ struct FrameListData {
     uint64_t frame_number;
     struct FrameListData *next;
 };
+
+typedef struct FrameHDR10Plus {
+    int64_t pts;
+    AVBufferRef *hdr10_plus;
+} FrameHDR10Plus;
 
 typedef struct VPxEncoderContext {
     AVClass *class;
@@ -120,6 +131,7 @@ typedef struct VPxEncoderContext {
     int tune_content;
     int corpus_complexity;
     int tpl_model;
+    AVFifo *hdr10_plus_fifo;
     /**
      * If the driver does not support ROI then warn the first time we
      * encounter a frame with ROI side data.
@@ -189,10 +201,10 @@ static av_cold void log_encoder_error(AVCodecContext *avctx, const char *desc)
 }
 
 static av_cold void dump_enc_cfg(AVCodecContext *avctx,
-                                 const struct vpx_codec_enc_cfg *cfg)
+                                 const struct vpx_codec_enc_cfg *cfg,
+                                 int level)
 {
     int width = -30;
-    int level = AV_LOG_DEBUG;
     int i;
 
     av_log(avctx, level, "vpx_codec_enc_cfg\n");
@@ -315,6 +327,35 @@ static av_cold void free_frame_list(struct FrameListData *list)
     }
 }
 
+static av_cold void free_hdr10_plus_fifo(AVFifo **fifo)
+{
+    FrameHDR10Plus frame_hdr10_plus;
+    while (av_fifo_read(*fifo, &frame_hdr10_plus, 1) >= 0)
+        av_buffer_unref(&frame_hdr10_plus.hdr10_plus);
+    av_fifo_freep2(fifo);
+}
+
+static int copy_hdr10_plus_to_pkt(AVFifo *fifo, AVPacket *pkt)
+{
+    FrameHDR10Plus frame_hdr10_plus;
+    uint8_t *data;
+    if (!pkt || av_fifo_peek(fifo, &frame_hdr10_plus, 1, 0) < 0)
+        return 0;
+    if (!frame_hdr10_plus.hdr10_plus || frame_hdr10_plus.pts != pkt->pts)
+        return 0;
+    av_fifo_drain2(fifo, 1);
+
+    data = av_packet_new_side_data(pkt, AV_PKT_DATA_DYNAMIC_HDR10_PLUS, frame_hdr10_plus.hdr10_plus->size);
+    if (!data) {
+        av_buffer_unref(&frame_hdr10_plus.hdr10_plus);
+        return AVERROR(ENOMEM);
+    }
+
+    memcpy(data, frame_hdr10_plus.hdr10_plus->data, frame_hdr10_plus.hdr10_plus->size);
+    av_buffer_unref(&frame_hdr10_plus.hdr10_plus);
+    return 0;
+}
+
 static av_cold int codecctl_int(AVCodecContext *avctx,
                                 enum vp8e_enc_control_id id, int val)
 {
@@ -331,9 +372,20 @@ static av_cold int codecctl_int(AVCodecContext *avctx,
         snprintf(buf, sizeof(buf), "Failed to set %s codec control",
                  ctlidstr[id]);
         log_encoder_error(avctx, buf);
+        return AVERROR(EINVAL);
     }
 
-    return res == VPX_CODEC_OK ? 0 : AVERROR(EINVAL);
+    if (ctx->is_alpha) {
+        int res_alpha = vpx_codec_control(&ctx->encoder_alpha, id, val);
+        if (res_alpha != VPX_CODEC_OK) {
+            snprintf(buf, sizeof(buf), "Failed to set %s alpha codec control",
+                     ctlidstr[id]);
+            log_encoder_error(avctx, buf);
+            return AVERROR(EINVAL);
+        }
+    }
+
+    return 0;
 }
 
 #if VPX_ENCODER_ABI_VERSION >= 12
@@ -353,9 +405,20 @@ static av_cold int codecctl_intp(AVCodecContext *avctx,
         snprintf(buf, sizeof(buf), "Failed to set %s codec control",
                  ctlidstr[id]);
         log_encoder_error(avctx, buf);
+        return AVERROR(EINVAL);
     }
 
-    return res == VPX_CODEC_OK ? 0 : AVERROR(EINVAL);
+    if (ctx->is_alpha) {
+        int res_alpha = vpx_codec_control(&ctx->encoder_alpha, id, val);
+        if (res_alpha != VPX_CODEC_OK) {
+            snprintf(buf, sizeof(buf), "Failed to set %s alpha codec control",
+                     ctlidstr[id]);
+            log_encoder_error(avctx, buf);
+            return AVERROR(EINVAL);
+        }
+    }
+
+    return 0;
 }
 #endif
 
@@ -383,6 +446,8 @@ static av_cold int vpx_free(AVCodecContext *avctx)
     av_freep(&ctx->twopass_stats.buf);
     av_freep(&avctx->stats_out);
     free_frame_list(ctx->coded_frame_list);
+    if (ctx->hdr10_plus_fifo)
+        free_hdr10_plus_fifo(&ctx->hdr10_plus_fifo);
     return 0;
 }
 
@@ -850,6 +915,14 @@ static av_cold int vpx_init(AVCodecContext *avctx,
     if (avctx->codec_id == AV_CODEC_ID_VP9) {
         if (set_pix_fmt(avctx, codec_caps, &enccfg, &flags, &img_fmt))
             return AVERROR(EINVAL);
+        // Keep HDR10+ if it has bit depth higher than 8 and
+        // it has PQ trc (SMPTE2084).
+        if (enccfg.g_bit_depth > 8 && avctx->color_trc == AVCOL_TRC_SMPTE2084) {
+            ctx->hdr10_plus_fifo = av_fifo_alloc2(1, sizeof(FrameHDR10Plus),
+                                                  AV_FIFO_FLAG_AUTO_GROW);
+            if (!ctx->hdr10_plus_fifo)
+                return AVERROR(ENOMEM);
+        }
     }
 #endif
 
@@ -859,7 +932,7 @@ static av_cold int vpx_init(AVCodecContext *avctx,
             return AVERROR(EINVAL);
         }
 
-    dump_enc_cfg(avctx, &enccfg);
+    dump_enc_cfg(avctx, &enccfg, AV_LOG_DEBUG);
 
     enccfg.g_w            = avctx->width;
     enccfg.g_h            = avctx->height;
@@ -921,12 +994,6 @@ static av_cold int vpx_init(AVCodecContext *avctx,
         }
     }
 
-#if FF_API_PRIVATE_OPT
-FF_DISABLE_DEPRECATION_WARNINGS
-    if (avctx->frame_skip_threshold)
-        ctx->drop_threshold = avctx->frame_skip_threshold;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
     enccfg.rc_dropframe_thresh = ctx->drop_threshold;
 
     //0-100 (0 => CBR, 100 => VBR)
@@ -1009,13 +1076,15 @@ FF_ENABLE_DEPRECATION_WARNINGS
                    en->key, en->value);
     }
 
-    dump_enc_cfg(avctx, &enccfg);
     /* Construct Encoder Context */
     res = vpx_codec_enc_init(&ctx->encoder, iface, &enccfg, flags);
     if (res != VPX_CODEC_OK) {
+        dump_enc_cfg(avctx, &enccfg, AV_LOG_WARNING);
         log_encoder_error(avctx, "Failed to initialize encoder");
         return AVERROR(EINVAL);
     }
+    dump_enc_cfg(avctx, &enccfg, AV_LOG_DEBUG);
+
 #if CONFIG_LIBVPX_VP9_ENCODER
     if (avctx->codec_id == AV_CODEC_ID_VP9 && enccfg.ts_number_layers > 1) {
         memset(&svc_params, 0, sizeof(svc_params));
@@ -1066,12 +1135,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
         codecctl_int(avctx, VP8E_SET_SHARPNESS, ctx->sharpness);
 
     if (CONFIG_LIBVPX_VP8_ENCODER && avctx->codec_id == AV_CODEC_ID_VP8) {
-#if FF_API_PRIVATE_OPT
-FF_DISABLE_DEPRECATION_WARNINGS
-        if (avctx->noise_reduction)
-            ctx->noise_sensitivity = avctx->noise_reduction;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
         codecctl_int(avctx, VP8E_SET_NOISE_SENSITIVITY, ctx->noise_sensitivity);
         codecctl_int(avctx, VP8E_SET_TOKEN_PARTITIONS,  av_log2(avctx->slices));
     }
@@ -1185,69 +1248,56 @@ static inline void cx_pktcpy(struct FrameListData *dst,
 static int storeframe(AVCodecContext *avctx, struct FrameListData *cx_frame,
                       AVPacket *pkt)
 {
-    int ret = ff_alloc_packet2(avctx, pkt, cx_frame->sz, 0);
+    VPxContext *ctx = avctx->priv_data;
+    int ret = ff_get_encode_buffer(avctx, pkt, cx_frame->sz, 0);
     uint8_t *side_data;
-    if (ret >= 0) {
-        int pict_type;
-        memcpy(pkt->data, cx_frame->buf, pkt->size);
-        pkt->pts = pkt->dts = cx_frame->pts;
-#if FF_API_CODED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-        avctx->coded_frame->pts       = cx_frame->pts;
-        avctx->coded_frame->key_frame = !!(cx_frame->flags & VPX_FRAME_IS_KEY);
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
+    int pict_type;
+    int quality;
 
-        if (!!(cx_frame->flags & VPX_FRAME_IS_KEY)) {
-            pict_type = AV_PICTURE_TYPE_I;
-#if FF_API_CODED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-            avctx->coded_frame->pict_type = pict_type;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-            pkt->flags |= AV_PKT_FLAG_KEY;
-        } else {
-            pict_type = AV_PICTURE_TYPE_P;
-#if FF_API_CODED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-            avctx->coded_frame->pict_type = pict_type;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-        }
-
-        ff_side_data_set_encoder_stats(pkt, 0, cx_frame->sse + 1,
-                                       cx_frame->have_sse ? 3 : 0, pict_type);
-
-        if (cx_frame->have_sse) {
-            int i;
-            /* Beware of the Y/U/V/all order! */
-#if FF_API_CODED_FRAME && FF_API_ERROR_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-            avctx->coded_frame->error[0] = cx_frame->sse[1];
-            avctx->coded_frame->error[1] = cx_frame->sse[2];
-            avctx->coded_frame->error[2] = cx_frame->sse[3];
-            avctx->coded_frame->error[3] = 0;    // alpha
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-            for (i = 0; i < 3; ++i) {
-                avctx->error[i] += cx_frame->sse[i + 1];
-            }
-            cx_frame->have_sse = 0;
-        }
-        if (cx_frame->sz_alpha > 0) {
-            side_data = av_packet_new_side_data(pkt,
-                                                AV_PKT_DATA_MATROSKA_BLOCKADDITIONAL,
-                                                cx_frame->sz_alpha + 8);
-            if(!side_data) {
-                av_packet_unref(pkt);
-                return AVERROR(ENOMEM);
-            }
-            AV_WB64(side_data, 1);
-            memcpy(side_data + 8, cx_frame->buf_alpha, cx_frame->sz_alpha);
-        }
-    } else {
+    if (ret < 0)
         return ret;
+
+    memcpy(pkt->data, cx_frame->buf, pkt->size);
+    pkt->pts = pkt->dts = cx_frame->pts;
+
+    if (!!(cx_frame->flags & VPX_FRAME_IS_KEY)) {
+        pict_type = AV_PICTURE_TYPE_I;
+        pkt->flags |= AV_PKT_FLAG_KEY;
+    } else {
+        pict_type = AV_PICTURE_TYPE_P;
     }
+
+    ret = vpx_codec_control(&ctx->encoder, VP8E_GET_LAST_QUANTIZER_64, &quality);
+    if (ret != VPX_CODEC_OK)
+        quality = 0;
+    ff_side_data_set_encoder_stats(pkt, quality * FF_QP2LAMBDA, cx_frame->sse + 1,
+                                   cx_frame->have_sse ? 3 : 0, pict_type);
+
+    if (cx_frame->have_sse) {
+        /* Beware of the Y/U/V/all order! */
+        for (int i = 0; i < 3; ++i)
+            avctx->error[i] += cx_frame->sse[i + 1];
+        cx_frame->have_sse = 0;
+    }
+    if (cx_frame->sz_alpha > 0) {
+        side_data = av_packet_new_side_data(pkt,
+                                            AV_PKT_DATA_MATROSKA_BLOCKADDITIONAL,
+                                            cx_frame->sz_alpha + 8);
+        if (!side_data) {
+            av_packet_unref(pkt);
+            return AVERROR(ENOMEM);
+        }
+        AV_WB64(side_data, 1);
+        memcpy(side_data + 8, cx_frame->buf_alpha, cx_frame->sz_alpha);
+    }
+    if (cx_frame->frame_number != -1) {
+        if (ctx->hdr10_plus_fifo) {
+            int err = copy_hdr10_plus_to_pkt(ctx->hdr10_plus_fifo, pkt);
+            if (err < 0)
+                return err;
+        }
+    }
+
     return pkt->size;
 }
 
@@ -1432,7 +1482,7 @@ static int set_roi_map(AVCodecContext *avctx, const AVFrameSideData *sd, int fra
 
     roi_map->rows = (frame_height + block_size - 1) / block_size;
     roi_map->cols = (frame_width  + block_size - 1) / block_size;
-    roi_map->roi_map = av_mallocz_array(roi_map->rows * roi_map->cols, sizeof(*roi_map->roi_map));
+    roi_map->roi_map = av_calloc(roi_map->rows * roi_map->cols, sizeof(*roi_map->roi_map));
     if (!roi_map->roi_map) {
         av_log(avctx, AV_LOG_ERROR, "roi_map alloc failed.\n");
         return AVERROR(ENOMEM);
@@ -1580,6 +1630,16 @@ static int vpx_encode(AVCodecContext *avctx, AVPacket *pkt,
     vpx_svc_layer_id_t layer_id;
     int layer_id_valid = 0;
 
+    if (avctx->qmax >= 0 && enccfg->rc_max_quantizer != avctx->qmax) {
+        struct vpx_codec_enc_cfg cfg = *enccfg;
+        cfg.rc_max_quantizer = avctx->qmax;
+        res = vpx_codec_enc_config_set(&ctx->encoder, &cfg);
+        if (res != VPX_CODEC_OK) {
+            log_encoder_error(avctx, "Error reconfiguring encoder");
+            return AVERROR_INVALIDDATA;
+        }
+    }
+
     if (frame) {
         const AVFrameSideData *sd = av_frame_get_side_data(frame, AV_FRAME_DATA_REGIONS_OF_INTEREST);
         rawimg                      = &ctx->rawimg;
@@ -1653,6 +1713,25 @@ static int vpx_encode(AVCodecContext *avctx, AVPacket *pkt,
                 vp8_encode_set_roi(avctx, frame->width, frame->height, sd);
             } else {
                 vp9_encode_set_roi(avctx, frame->width, frame->height, sd);
+            }
+        }
+
+        if (ctx->hdr10_plus_fifo) {
+            AVFrameSideData *hdr10_plus_metadata;
+            // Add HDR10+ metadata to queue.
+            hdr10_plus_metadata = av_frame_get_side_data(frame, AV_FRAME_DATA_DYNAMIC_HDR_PLUS);
+            if (hdr10_plus_metadata) {
+                int err;
+                struct FrameHDR10Plus data;
+                data.pts = frame->pts;
+                data.hdr10_plus = av_buffer_ref(hdr10_plus_metadata->buf);
+                if (!data.hdr10_plus)
+                    return AVERROR(ENOMEM);
+                err = av_fifo_write(ctx->hdr10_plus_fifo, &data, 1);
+                if (err < 0) {
+                    av_buffer_unref(&data.hdr10_plus);
+                    return err;
+                }
             }
         }
     }
@@ -1839,7 +1918,7 @@ static const AVOption vp9_options[] = {
 #undef COMMON_OPTIONS
 #undef LEGACY_OPTIONS
 
-static const AVCodecDefault defaults[] = {
+static const FFCodecDefault defaults[] = {
     { "b",                 "0" },
     { "qmin",             "-1" },
     { "qmax",             "-1" },
@@ -1861,21 +1940,22 @@ static const AVClass class_vp8 = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-AVCodec ff_libvpx_vp8_encoder = {
-    .name           = "libvpx",
-    .long_name      = NULL_IF_CONFIG_SMALL("libvpx VP8"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_VP8,
+const FFCodec ff_libvpx_vp8_encoder = {
+    .p.name         = "libvpx",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("libvpx VP8"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_VP8,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY |
+                      AV_CODEC_CAP_OTHER_THREADS,
     .priv_data_size = sizeof(VPxContext),
     .init           = vp8_init,
-    .encode2        = vpx_encode,
+    FF_CODEC_ENCODE_CB(vpx_encode),
     .close          = vpx_free,
-    .capabilities   = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_OTHER_THREADS,
     .caps_internal  = FF_CODEC_CAP_AUTO_THREADS,
-    .pix_fmts       = (const enum AVPixelFormat[]){ AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUVA420P, AV_PIX_FMT_NONE },
-    .priv_class     = &class_vp8,
+    .p.pix_fmts     = (const enum AVPixelFormat[]){ AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUVA420P, AV_PIX_FMT_NONE },
+    .p.priv_class   = &class_vp8,
     .defaults       = defaults,
-    .wrapper_name   = "libvpx",
+    .p.wrapper_name = "libvpx",
 };
 #endif /* CONFIG_LIBVPX_VP8_ENCODER */
 
@@ -1892,21 +1972,22 @@ static const AVClass class_vp9 = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-AVCodec ff_libvpx_vp9_encoder = {
-    .name           = "libvpx-vp9",
-    .long_name      = NULL_IF_CONFIG_SMALL("libvpx VP9"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_VP9,
+FFCodec ff_libvpx_vp9_encoder = {
+    .p.name         = "libvpx-vp9",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("libvpx VP9"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_VP9,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY |
+                      AV_CODEC_CAP_OTHER_THREADS,
+    .p.profiles     = NULL_IF_CONFIG_SMALL(ff_vp9_profiles),
+    .p.priv_class   = &class_vp9,
+    .p.wrapper_name = "libvpx",
     .priv_data_size = sizeof(VPxContext),
     .init           = vp9_init,
-    .encode2        = vpx_encode,
+    FF_CODEC_ENCODE_CB(vpx_encode),
     .close          = vpx_free,
-    .capabilities   = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_OTHER_THREADS,
     .caps_internal  = FF_CODEC_CAP_AUTO_THREADS,
-    .profiles       = NULL_IF_CONFIG_SMALL(ff_vp9_profiles),
-    .priv_class     = &class_vp9,
     .defaults       = defaults,
     .init_static_data = ff_vp9_init_static,
-    .wrapper_name   = "libvpx",
 };
 #endif /* CONFIG_LIBVPX_VP9_ENCODER */

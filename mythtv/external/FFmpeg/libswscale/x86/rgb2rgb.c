@@ -85,20 +85,11 @@ DECLARE_ALIGNED(8, extern const uint64_t, ff_bgr2UVOffset);
 
 // Note: We have C, MMX, MMXEXT, 3DNOW versions, there is no 3DNOW + MMXEXT one.
 
-#define COMPILE_TEMPLATE_MMXEXT 0
-#define COMPILE_TEMPLATE_AMD3DNOW 0
 #define COMPILE_TEMPLATE_SSE2 0
 #define COMPILE_TEMPLATE_AVX 0
 
-//MMX versions
-#undef RENAME
-#define RENAME(a) a ## _mmx
-#include "rgb2rgb_template.c"
-
 // MMXEXT versions
 #undef RENAME
-#undef COMPILE_TEMPLATE_MMXEXT
-#define COMPILE_TEMPLATE_MMXEXT 1
 #define RENAME(a) a ## _mmxext
 #include "rgb2rgb_template.c"
 
@@ -114,19 +105,6 @@ DECLARE_ALIGNED(8, extern const uint64_t, ff_bgr2UVOffset);
 #undef COMPILE_TEMPLATE_AVX
 #define COMPILE_TEMPLATE_AVX 1
 #define RENAME(a) a ## _avx
-#include "rgb2rgb_template.c"
-
-//3DNOW versions
-#undef RENAME
-#undef COMPILE_TEMPLATE_MMXEXT
-#undef COMPILE_TEMPLATE_SSE2
-#undef COMPILE_TEMPLATE_AVX
-#undef COMPILE_TEMPLATE_AMD3DNOW
-#define COMPILE_TEMPLATE_MMXEXT 0
-#define COMPILE_TEMPLATE_SSE2 0
-#define COMPILE_TEMPLATE_AVX 0
-#define COMPILE_TEMPLATE_AMD3DNOW 1
-#define RENAME(a) a ## _3dnow
 #include "rgb2rgb_template.c"
 
 /*
@@ -146,6 +124,12 @@ void ff_shuffle_bytes_3012_ssse3(const uint8_t *src, uint8_t *dst, int src_size)
 void ff_shuffle_bytes_3210_ssse3(const uint8_t *src, uint8_t *dst, int src_size);
 
 #if ARCH_X86_64
+void ff_shuffle_bytes_2103_avx2(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_0321_avx2(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_1230_avx2(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_3012_avx2(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_3210_avx2(const uint8_t *src, uint8_t *dst, int src_size);
+
 void ff_uyvytoyuv422_sse2(uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
                           const uint8_t *src, int width, int height,
                           int lumStride, int chromStride, int srcStride);
@@ -159,10 +143,6 @@ av_cold void rgb2rgb_init_x86(void)
     int cpu_flags = av_get_cpu_flags();
 
 #if HAVE_INLINE_ASM
-    if (INLINE_MMX(cpu_flags))
-        rgb2rgb_init_mmx();
-    if (INLINE_AMD3DNOW(cpu_flags))
-        rgb2rgb_init_3dnow();
     if (INLINE_MMXEXT(cpu_flags))
         rgb2rgb_init_mmxext();
     if (INLINE_SSE2(cpu_flags))
@@ -186,9 +166,16 @@ av_cold void rgb2rgb_init_x86(void)
         shuffle_bytes_3012 = ff_shuffle_bytes_3012_ssse3;
         shuffle_bytes_3210 = ff_shuffle_bytes_3210_ssse3;
     }
-    if (EXTERNAL_AVX(cpu_flags)) {
 #if ARCH_X86_64
-        uyvytoyuv422 = ff_uyvytoyuv422_avx;
-#endif
+    if (EXTERNAL_AVX2_FAST(cpu_flags)) {
+        shuffle_bytes_0321 = ff_shuffle_bytes_0321_avx2;
+        shuffle_bytes_2103 = ff_shuffle_bytes_2103_avx2;
+        shuffle_bytes_1230 = ff_shuffle_bytes_1230_avx2;
+        shuffle_bytes_3012 = ff_shuffle_bytes_3012_avx2;
+        shuffle_bytes_3210 = ff_shuffle_bytes_3210_avx2;
     }
+    if (EXTERNAL_AVX(cpu_flags)) {
+        uyvytoyuv422 = ff_uyvytoyuv422_avx;
+    }
+#endif
 }

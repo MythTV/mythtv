@@ -32,7 +32,6 @@
 #include <fcntl.h>
 #include <poll.h>
 #include "libavcodec/avcodec.h"
-#include "libavcodec/internal.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/hwcontext.h"
 #include "v4l2_context.h"

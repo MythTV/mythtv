@@ -18,12 +18,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/channel_layout.h"
 #include "dcaadpcm.h"
 #include "dcadec.h"
 #include "dcadata.h"
 #include "dcahuff.h"
 #include "dcamath.h"
 #include "dca_syncwords.h"
+#include "internal.h"
 
 #if ARCH_ARM
 #include "arm/dca.h"
@@ -128,7 +130,7 @@ static int parse_frame_header(DCACoreDecoder *s)
     s->npcmblocks           = h.npcmblocks;
     s->frame_size           = h.frame_size;
     s->audio_mode           = h.audio_mode;
-    s->sample_rate          = avpriv_dca_sample_rates[h.sr_code];
+    s->sample_rate          = ff_dca_sample_rates[h.sr_code];
     s->bit_rate             = ff_dca_bit_rates[h.br_code];
     s->drc_present          = h.drc_present;
     s->ts_present           = h.ts_present;
@@ -1795,7 +1797,7 @@ static int parse_optional_info(DCACoreDecoder *s)
     return 0;
 }
 
-int ff_dca_core_parse(DCACoreDecoder *s, uint8_t *data, int size)
+int ff_dca_core_parse(DCACoreDecoder *s, const uint8_t *data, int size)
 {
     int ret;
 
@@ -1828,7 +1830,7 @@ int ff_dca_core_parse(DCACoreDecoder *s, uint8_t *data, int size)
     return 0;
 }
 
-int ff_dca_core_parse_exss(DCACoreDecoder *s, uint8_t *data, DCAExssAsset *asset)
+int ff_dca_core_parse_exss(DCACoreDecoder *s, const uint8_t *data, DCAExssAsset *asset)
 {
     AVCodecContext *avctx = s->avctx;
     DCAContext *dca = avctx->priv_data;
@@ -2147,7 +2149,7 @@ static int filter_frame_fixed(DCACoreDecoder *s, AVFrame *frame)
                                        nsamples, s->ch_mask);
     }
 
-    for (i = 0; i < avctx->channels; i++) {
+    for (i = 0; i < avctx->ch_layout.nb_channels; i++) {
         int32_t *samples = s->output_samples[s->ch_remap[i]];
         int32_t *plane = (int32_t *)frame->extended_data[i];
         for (n = 0; n < nsamples; n++)
@@ -2179,11 +2181,11 @@ static int filter_frame_float(DCACoreDecoder *s, AVFrame *frame)
         return ret;
 
     // Build reverse speaker to channel mapping
-    for (i = 0; i < avctx->channels; i++)
+    for (i = 0; i < avctx->ch_layout.nb_channels; i++)
         output_samples[s->ch_remap[i]] = (float *)frame->extended_data[i];
 
     // Allocate space for extra channels
-    nchannels = av_popcount(s->ch_mask) - avctx->channels;
+    nchannels = av_popcount(s->ch_mask) - avctx->ch_layout.nb_channels;
     if (nchannels > 0) {
         av_fast_malloc(&s->output_buffer, &s->output_size,
                        nsamples * nchannels * sizeof(float));

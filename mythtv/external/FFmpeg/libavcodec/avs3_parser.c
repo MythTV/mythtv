@@ -71,9 +71,9 @@ static void parse_avs3_nal_units(AVCodecParserContext *s, const uint8_t *buf,
     if (buf[0] == 0x0 && buf[1] == 0x0 && buf[2] == 0x1) {
         if (buf[3] == AVS3_SEQ_START_CODE) {
             GetBitContext gb;
-            int profile, ratecode;
+            int profile, ratecode, low_delay;
 
-            init_get_bits(&gb, buf + 4, buf_size - 4);
+            init_get_bits8(&gb, buf + 4, buf_size - 4);
 
             s->key_frame = 1;
             s->pict_type = AV_PICTURE_TYPE_I;
@@ -114,7 +114,8 @@ static void parse_avs3_nal_units(AVCodecParserContext *s, const uint8_t *buf,
             //            bitrate_high(12)
             skip_bits(&gb, 32);
 
-            avctx->has_b_frames = !get_bits(&gb, 1);
+            low_delay = get_bits(&gb, 1);
+            avctx->has_b_frames = FFMAX(avctx->has_b_frames, !low_delay);
 
             avctx->framerate.num = avctx->time_base.den = ff_avs3_frame_rate_tab[ratecode].num;
             avctx->framerate.den = avctx->time_base.num = ff_avs3_frame_rate_tab[ratecode].den;
@@ -170,10 +171,9 @@ static int avs3_parse(AVCodecParserContext *s, AVCodecContext *avctx,
     return next;
 }
 
-AVCodecParser ff_avs3_parser = {
+const AVCodecParser ff_avs3_parser = {
     .codec_ids      = { AV_CODEC_ID_AVS3 },
     .priv_data_size = sizeof(ParseContext),
     .parser_parse   = avs3_parse,
     .parser_close   = ff_parse_close,
-    .split          = ff_mpeg4video_split,
 };

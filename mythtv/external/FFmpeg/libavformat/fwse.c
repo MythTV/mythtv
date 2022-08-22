@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/channel_layout.h"
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"
 #include "internal.h"
@@ -39,6 +40,7 @@ static int fwse_probe(const AVProbeData *p)
 static int fwse_read_header(AVFormatContext *s)
 {
     unsigned start_offset, version;
+    int channels;
     AVIOContext *pb = s->pb;
     AVCodecParameters *par;
     AVStream *st;
@@ -58,13 +60,10 @@ static int fwse_read_header(AVFormatContext *s)
     par->codec_type  = AVMEDIA_TYPE_AUDIO;
     par->codec_id    = AV_CODEC_ID_ADPCM_IMA_MTF;
     par->format      = AV_SAMPLE_FMT_S16;
-    par->channels    = avio_rl32(pb);
-    if (par->channels != 1 && par->channels != 2)
+    channels         = avio_rl32(pb);
+    if (channels != 1 && channels != 2)
         return AVERROR_INVALIDDATA;
-    if (par->channels == 1)
-        par->channel_layout = AV_CH_LAYOUT_MONO;
-    else if (par->channels == 2)
-        par->channel_layout = AV_CH_LAYOUT_STEREO;
+    av_channel_layout_default(&par->ch_layout, channels);
     st->duration = avio_rl32(pb);
     par->sample_rate = avio_rl32(pb);
     if (par->sample_rate <= 0 || par->sample_rate > INT_MAX)
@@ -78,7 +77,7 @@ static int fwse_read_header(AVFormatContext *s)
     return 0;
 }
 
-AVInputFormat ff_fwse_demuxer = {
+const AVInputFormat ff_fwse_demuxer = {
     .name           = "fwse",
     .long_name      = NULL_IF_CONFIG_SMALL("Capcom's MT Framework sound"),
     .read_probe     = fwse_probe,

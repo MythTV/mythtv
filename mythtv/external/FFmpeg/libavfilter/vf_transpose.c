@@ -55,10 +55,10 @@ typedef struct TransContext {
 static int query_formats(AVFilterContext *ctx)
 {
     AVFilterFormats *pix_fmts = NULL;
+    const AVPixFmtDescriptor *desc;
     int fmt, ret;
 
-    for (fmt = 0; av_pix_fmt_desc_get(fmt); fmt++) {
-        const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(fmt);
+    for (fmt = 0; desc = av_pix_fmt_desc_get(fmt); fmt++) {
         if (!(desc->flags & AV_PIX_FMT_FLAG_PAL ||
               desc->flags & AV_PIX_FMT_FLAG_HWACCEL ||
               desc->flags & AV_PIX_FMT_FLAG_BITSTREAM ||
@@ -235,13 +235,13 @@ static int config_props_output(AVFilterLink *outlink)
         }
     }
 
-    if (ARCH_X86) {
-        for (int i = 0; i < 4; i++) {
-            TransVtable *v = &s->vtables[i];
+#if ARCH_X86
+    for (int i = 0; i < 4; i++) {
+        TransVtable *v = &s->vtables[i];
 
-            ff_transpose_init_x86(v, s->pixsteps[i]);
-        }
+        ff_transpose_init_x86(v, s->pixsteps[i]);
     }
+#endif
 
     av_log(ctx, AV_LOG_VERBOSE,
            "w:%d h:%d dir:%d -> w:%d h:%d rotation:%s vflip:%d\n",
@@ -328,6 +328,7 @@ static int filter_slice(AVFilterContext *ctx, void *arg, int jobnr,
 
 static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 {
+    int err = 0;
     AVFilterContext *ctx = inlink->dst;
     TransContext *s = ctx->priv;
     AVFilterLink *outlink = ctx->outputs[0];
@@ -339,10 +340,13 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 
     out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
     if (!out) {
-        av_frame_free(&in);
-        return AVERROR(ENOMEM);
+        err = AVERROR(ENOMEM);
+        goto fail;
     }
-    av_frame_copy_props(out, in);
+
+    err = av_frame_copy_props(out, in);
+    if (err < 0)
+        goto fail;
 
     if (in->sample_aspect_ratio.num == 0) {
         out->sample_aspect_ratio = in->sample_aspect_ratio;
@@ -352,9 +356,15 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     }
 
     td.in = in, td.out = out;
-    ctx->internal->execute(ctx, filter_slice, &td, NULL, FFMIN(outlink->h, ff_filter_get_nb_threads(ctx)));
+    ff_filter_execute(ctx, filter_slice, &td, NULL,
+                      FFMIN(outlink->h, ff_filter_get_nb_threads(ctx)));
     av_frame_free(&in);
     return ff_filter_frame(outlink, out);
+
+fail:
+    av_frame_free(&in);
+    av_frame_free(&out);
+    return err;
 }
 
 #define OFFSET(x) offsetof(TransContext, x)
@@ -382,10 +392,9 @@ static const AVFilterPad avfilter_vf_transpose_inputs[] = {
     {
         .name         = "default",
         .type         = AVMEDIA_TYPE_VIDEO,
-        .get_video_buffer = get_video_buffer,
+        .get_buffer.video = get_video_buffer,
         .filter_frame = filter_frame,
     },
-    { NULL }
 };
 
 static const AVFilterPad avfilter_vf_transpose_outputs[] = {
@@ -394,16 +403,15 @@ static const AVFilterPad avfilter_vf_transpose_outputs[] = {
         .config_props = config_props_output,
         .type         = AVMEDIA_TYPE_VIDEO,
     },
-    { NULL }
 };
 
-AVFilter ff_vf_transpose = {
+const AVFilter ff_vf_transpose = {
     .name          = "transpose",
     .description   = NULL_IF_CONFIG_SMALL("Transpose input video."),
     .priv_size     = sizeof(TransContext),
     .priv_class    = &transpose_class,
-    .query_formats = query_formats,
-    .inputs        = avfilter_vf_transpose_inputs,
-    .outputs       = avfilter_vf_transpose_outputs,
+    FILTER_INPUTS(avfilter_vf_transpose_inputs),
+    FILTER_OUTPUTS(avfilter_vf_transpose_outputs),
+    FILTER_QUERY_FUNC(query_formats),
     .flags         = AVFILTER_FLAG_SLICE_THREADS,
 };

@@ -26,11 +26,12 @@
 #include "libavutil/pixfmt.h"
 
 #include "avcodec.h"
-#include "internal.h"
+#include "codec_internal.h"
 #include "vaapi_encode.h"
 
 #define VP9_MAX_QUANT 255
 
+#define VP9_MAX_TILE_WIDTH 4096
 
 typedef struct VAAPIEncodeVP9Picture {
     int slot;
@@ -82,9 +83,16 @@ static int vaapi_encode_vp9_init_picture_params(AVCodecContext *avctx,
     VAAPIEncodeVP9Picture          *hpic = pic->priv_data;
     VAEncPictureParameterBufferVP9 *vpic = pic->codec_picture_params;
     int i;
+    int num_tile_columns;
 
     vpic->reconstructed_frame = pic->recon_surface;
     vpic->coded_buf = pic->output_buffer;
+
+    // Maximum width of a tile in units of superblocks is MAX_TILE_WIDTH_B64(64)
+    // So the number of tile columns is related to the width of the picture.
+    // We set the minimum possible number for num_tile_columns as default value.
+    num_tile_columns = (vpic->frame_width_src + VP9_MAX_TILE_WIDTH - 1) / VP9_MAX_TILE_WIDTH;
+    vpic->log2_tile_columns = num_tile_columns == 1 ? 0 : av_log2(num_tile_columns - 1) + 1;
 
     switch (pic->type) {
     case PICTURE_TYPE_IDR:
@@ -176,6 +184,17 @@ static int vaapi_encode_vp9_init_picture_params(AVCodecContext *avctx,
     return 0;
 }
 
+static av_cold int vaapi_encode_vp9_get_encoder_caps(AVCodecContext *avctx)
+{
+    VAAPIEncodeContext *ctx = avctx->priv_data;
+
+    // Surfaces must be aligned to 64x64 superblock boundaries.
+    ctx->surface_width  = FFALIGN(avctx->width,  64);
+    ctx->surface_height = FFALIGN(avctx->height, 64);
+
+    return 0;
+}
+
 static av_cold int vaapi_encode_vp9_configure(AVCodecContext *avctx)
 {
     VAAPIEncodeContext     *ctx = avctx->priv_data;
@@ -223,6 +242,7 @@ static const VAAPIEncodeType vaapi_encode_type_vp9 = {
 
     .picture_priv_data_size = sizeof(VAAPIEncodeVP9Picture),
 
+    .get_encoder_caps      = &vaapi_encode_vp9_get_encoder_caps,
     .configure             = &vaapi_encode_vp9_configure,
 
     .sequence_params_size  = sizeof(VAEncSequenceParameterBufferVP9),
@@ -243,10 +263,6 @@ static av_cold int vaapi_encode_vp9_init(AVCodecContext *avctx)
     // can write its own headers and there is no metadata to include.
     ctx->desired_packed_headers = 0;
 
-    // Surfaces must be aligned to superblock boundaries.
-    ctx->surface_width  = FFALIGN(avctx->width,  64);
-    ctx->surface_height = FFALIGN(avctx->height, 64);
-
     return ff_vaapi_encode_init(avctx);
 }
 
@@ -263,7 +279,7 @@ static const AVOption vaapi_encode_vp9_options[] = {
     { NULL },
 };
 
-static const AVCodecDefault vaapi_encode_vp9_defaults[] = {
+static const FFCodecDefault vaapi_encode_vp9_defaults[] = {
     { "b",              "0"   },
     { "bf",             "0"   },
     { "g",              "250" },
@@ -279,24 +295,24 @@ static const AVClass vaapi_encode_vp9_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-AVCodec ff_vp9_vaapi_encoder = {
-    .name           = "vp9_vaapi",
-    .long_name      = NULL_IF_CONFIG_SMALL("VP9 (VAAPI)"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_VP9,
+const FFCodec ff_vp9_vaapi_encoder = {
+    .p.name         = "vp9_vaapi",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("VP9 (VAAPI)"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_VP9,
     .priv_data_size = sizeof(VAAPIEncodeVP9Context),
     .init           = &vaapi_encode_vp9_init,
-    .receive_packet = &ff_vaapi_encode_receive_packet,
+    FF_CODEC_RECEIVE_PACKET_CB(&ff_vaapi_encode_receive_packet),
     .close          = &ff_vaapi_encode_close,
-    .priv_class     = &vaapi_encode_vp9_class,
-    .capabilities   = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_HARDWARE |
+    .p.priv_class   = &vaapi_encode_vp9_class,
+    .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_HARDWARE |
                       AV_CODEC_CAP_DR1,
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .defaults       = vaapi_encode_vp9_defaults,
-    .pix_fmts = (const enum AVPixelFormat[]) {
+    .p.pix_fmts = (const enum AVPixelFormat[]) {
         AV_PIX_FMT_VAAPI,
         AV_PIX_FMT_NONE,
     },
     .hw_configs     = ff_vaapi_encode_hw_configs,
-    .wrapper_name   = "vaapi",
+    .p.wrapper_name = "vaapi",
 };

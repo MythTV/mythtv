@@ -33,6 +33,8 @@
 #include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
+#include "codec_internal.h"
+#include "decode.h"
 #include "internal.h"
 
 #define PALETTE_COUNT 256
@@ -292,9 +294,8 @@ static void msvideo1_decode_16bit(Msvideo1Context *s)
     }
 }
 
-static int msvideo1_decode_frame(AVCodecContext *avctx,
-                                void *data, int *got_frame,
-                                AVPacket *avpkt)
+static int msvideo1_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
+                                 int *got_frame, AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
@@ -314,15 +315,7 @@ static int msvideo1_decode_frame(AVCodecContext *avctx,
         return ret;
 
     if (s->mode_8bit) {
-        buffer_size_t size;
-        const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE, &size);
-
-        if (pal && size == AVPALETTE_SIZE) {
-            memcpy(s->pal, pal, AVPALETTE_SIZE);
-            s->frame->palette_has_changed = 1;
-        } else if (pal) {
-            av_log(avctx, AV_LOG_ERROR, "Palette size %d is wrong\n", size);
-        }
+        s->frame->palette_has_changed = ff_copy_palette(s->pal, avpkt, avctx);
     }
 
     if (s->mode_8bit)
@@ -330,7 +323,7 @@ static int msvideo1_decode_frame(AVCodecContext *avctx,
     else
         msvideo1_decode_16bit(s);
 
-    if ((ret = av_frame_ref(data, s->frame)) < 0)
+    if ((ret = av_frame_ref(rframe, s->frame)) < 0)
         return ret;
 
     *got_frame      = 1;
@@ -348,14 +341,15 @@ static av_cold int msvideo1_decode_end(AVCodecContext *avctx)
     return 0;
 }
 
-AVCodec ff_msvideo1_decoder = {
-    .name           = "msvideo1",
-    .long_name      = NULL_IF_CONFIG_SMALL("Microsoft Video 1"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_MSVIDEO1,
+const FFCodec ff_msvideo1_decoder = {
+    .p.name         = "msvideo1",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Microsoft Video 1"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_MSVIDEO1,
     .priv_data_size = sizeof(Msvideo1Context),
     .init           = msvideo1_decode_init,
     .close          = msvideo1_decode_end,
-    .decode         = msvideo1_decode_frame,
-    .capabilities   = AV_CODEC_CAP_DR1,
+    FF_CODEC_DECODE_CB(msvideo1_decode_frame),
+    .p.capabilities = AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

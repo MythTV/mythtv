@@ -57,15 +57,6 @@
 #define MMREG_WIDTH "8"
 #define MM "%%mm"
 #define MOVQ "movq"
-#if COMPILE_TEMPLATE_MMXEXT
-#define SPREADW(a) "pshufw $0, "a", "a" \n\t"
-#define PMAXW(a,b) "pmaxsw "a", "b"     \n\t"
-#define PMAX(a,b) \
-            "pshufw $0x0E, "a", "b"     \n\t"\
-            PMAXW(b, a)\
-            "pshufw $0x01, "a", "b"     \n\t"\
-            PMAXW(b, a)
-#else
 #define SPREADW(a) \
             "punpcklwd "a", "a"         \n\t"\
             "punpcklwd "a", "a"         \n\t"
@@ -80,7 +71,6 @@
             "psrlq $16, "a"             \n\t"\
             PMAXW(b, a)
 
-#endif
 #endif
 
 #if COMPILE_TEMPLATE_SSSE3
@@ -109,7 +99,7 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
     const uint16_t *qmat, *bias;
     LOCAL_ALIGNED_16(int16_t, temp_block, [64]);
 
-    av_assert2((7&(int)(&temp_block[0])) == 0); //did gcc align it correctly?
+    av_assert2((7&(uintptr_t)(&temp_block[0])) == 0); //did gcc align it correctly?
 
     //s->fdct (block);
     RENAME_FDCT(ff_fdct)(block); // cannot be anything else ...

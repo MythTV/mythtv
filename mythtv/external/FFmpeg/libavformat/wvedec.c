@@ -43,16 +43,17 @@ static int wve_read_header(AVFormatContext *s)
     st->codecpar->codec_type  = AVMEDIA_TYPE_AUDIO;
     st->codecpar->codec_id    = AV_CODEC_ID_PCM_ALAW;
     st->codecpar->sample_rate = 8000;
-    st->codecpar->channels    = 1;
+    st->codecpar->ch_layout.nb_channels = 1;
     st->codecpar->bits_per_coded_sample = av_get_bits_per_sample(st->codecpar->codec_id);
-    st->codecpar->block_align = st->codecpar->bits_per_coded_sample * st->codecpar->channels / 8;
+    st->codecpar->block_align = st->codecpar->bits_per_coded_sample *
+                                st->codecpar->ch_layout.nb_channels / 8;
     avpriv_set_pts_info(st, 64, 1, st->codecpar->sample_rate);
     avio_skip(s->pb, 10);
 
     return 0;
 }
 
-AVInputFormat ff_wve_demuxer = {
+const AVInputFormat ff_wve_demuxer = {
     .name           = "wve",
     .long_name      = NULL_IF_CONFIG_SMALL("Psion 3 audio"),
     .read_probe     = wve_probe,

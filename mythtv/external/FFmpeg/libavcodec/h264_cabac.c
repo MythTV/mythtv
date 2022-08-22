@@ -34,8 +34,6 @@
 #include "config.h"
 #include "cabac.h"
 #include "cabac_functions.h"
-#include "internal.h"
-#include "avcodec.h"
 #include "h264dec.h"
 #include "h264data.h"
 #include "h264_mvpred.h"
@@ -43,6 +41,8 @@
 
 #if ARCH_X86
 #include "x86/h264_cabac.c"
+#elif ARCH_LOONGARCH64
+#include "loongarch/h264_cabac.c"
 #endif
 
 /* Cabac pre state table */
@@ -1278,6 +1278,15 @@ void ff_h264_init_cabac_states(const H264Context *h, H264SliceContext *sl)
 
         sl->cabac_state[i] =  pre;
     }
+}
+
+static av_always_inline uint16_t pack8to16(unsigned a, unsigned b)
+{
+#if HAVE_BIGENDIAN
+    return (b & 0xFF) + (a << 8);
+#else
+    return (a & 0xFF) + (b << 8);
+#endif
 }
 
 static int decode_cabac_field_decoding_flag(const H264Context *h, H264SliceContext *sl)

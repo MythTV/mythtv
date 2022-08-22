@@ -34,10 +34,10 @@
 #endif
 
 #include "libavutil/log.h"
-#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 
 #include "libavformat/avformat.h"
+#include "libavformat/demux.h"
 #include "libavformat/internal.h"
 
 typedef struct CDIOContext {
@@ -91,13 +91,14 @@ static av_cold int read_header(AVFormatContext *ctx)
     else
         st->codecpar->codec_id    = AV_CODEC_ID_PCM_S16LE;
     st->codecpar->sample_rate     = 44100;
-    st->codecpar->channels        = 2;
+    st->codecpar->ch_layout       = (AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO;
     if (s->drive->audio_last_sector != CDIO_INVALID_LSN &&
         s->drive->audio_first_sector != CDIO_INVALID_LSN)
         st->duration           = s->drive->audio_last_sector - s->drive->audio_first_sector;
     else if (s->drive->tracks)
         st->duration = s->drive->disc_toc[s->drive->tracks].dwStartSector;
-    avpriv_set_pts_info(st, 64, CDIO_CD_FRAMESIZE_RAW, 2 * st->codecpar->channels * st->codecpar->sample_rate);
+    avpriv_set_pts_info(st, 64, CDIO_CD_FRAMESIZE_RAW,
+                        2 * st->codecpar->ch_layout.nb_channels * st->codecpar->sample_rate);
 
     for (i = 0; i < s->drive->tracks; i++) {
         char title[16];
@@ -117,9 +118,6 @@ static int read_packet(AVFormatContext *ctx, AVPacket *pkt)
     int ret;
     uint16_t *buf;
     char *err = NULL;
-
-    if (ctx->streams[0]->cur_dts > s->last_sector)
-        return AVERROR_EOF;
 
     buf = cdio_paranoia_read(s->paranoia, NULL);
     if (!buf)
@@ -157,7 +155,7 @@ static int read_seek(AVFormatContext *ctx, int stream_index, int64_t timestamp,
     AVStream *st = ctx->streams[0];
 
     cdio_paranoia_seek(s->paranoia, timestamp, SEEK_SET);
-    st->cur_dts = timestamp;
+    avpriv_update_cur_dts(ctx, st, timestamp);
     return 0;
 }
 
@@ -182,7 +180,7 @@ static const AVClass libcdio_class = {
     .category   = AV_CLASS_CATEGORY_DEVICE_AUDIO_INPUT,
 };
 
-AVInputFormat ff_libcdio_demuxer = {
+const AVInputFormat ff_libcdio_demuxer = {
     .name           = "libcdio",
     .read_header    = read_header,
     .read_packet    = read_packet,

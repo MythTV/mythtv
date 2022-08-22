@@ -20,6 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "config_components.h"
+
 #include "libavutil/avassert.h"
 #include "libavutil/pixdesc.h"
 
@@ -72,7 +74,7 @@ static int fill_picture_parameters(const AVCodecContext *avctx, AVDXVAContext *c
     pp->max_width  = seq->max_frame_width_minus_1 + 1;
     pp->max_height = seq->max_frame_height_minus_1 + 1;
 
-    pp->CurrPicTextureIndex = ff_dxva2_get_surface_index(avctx, ctx, h->cur_frame.tf.f);
+    pp->CurrPicTextureIndex = ff_dxva2_get_surface_index(avctx, ctx, h->cur_frame.f);
     pp->superres_denom      = frame_header->use_superres ? frame_header->coded_denom + AV1_SUPERRES_DENOM_MIN : AV1_SUPERRES_NUM;
     pp->bitdepth            = get_bit_depth_from_seq(seq);
     pp->seq_profile         = seq->seq_profile;
@@ -132,21 +134,21 @@ static int fill_picture_parameters(const AVCodecContext *avctx, AVDXVAContext *c
     memset(pp->RefFrameMapTextureIndex, 0xFF, sizeof(pp->RefFrameMapTextureIndex));
     for (i = 0; i < AV1_REFS_PER_FRAME; i++) {
         int8_t ref_idx = frame_header->ref_frame_idx[i];
-        AVFrame *ref_frame = h->ref[ref_idx].tf.f;
+        AVFrame *ref_frame = h->ref[ref_idx].f;
 
         pp->frame_refs[i].width  = ref_frame->width;
         pp->frame_refs[i].height = ref_frame->height;
         pp->frame_refs[i].Index  = ref_frame->buf[0] ? ref_idx : 0xFF;
 
         /* Global Motion */
-        pp->frame_refs[i].wminvalid = (h->cur_frame.gm_type[AV1_REF_FRAME_LAST + i] == AV1_WARP_MODEL_IDENTITY);
+        pp->frame_refs[i].wminvalid = h->cur_frame.gm_invalid[AV1_REF_FRAME_LAST + i];
         pp->frame_refs[i].wmtype    = h->cur_frame.gm_type[AV1_REF_FRAME_LAST + i];
         for (j = 0; j < 6; ++j) {
              pp->frame_refs[i].wmmat[j] = h->cur_frame.gm_params[AV1_REF_FRAME_LAST + i][j];
         }
     }
     for (i = 0; i < AV1_NUM_REF_FRAMES; i++) {
-        AVFrame *ref_frame = h->ref[i].tf.f;
+        AVFrame *ref_frame = h->ref[i].f;
         if (ref_frame->buf[0])
             pp->RefFrameMapTextureIndex[i] = ff_dxva2_get_surface_index(avctx, ctx, ref_frame);
     }
@@ -436,7 +438,7 @@ static int dxva2_av1_end_frame(AVCodecContext *avctx)
     if (ctx_pic->bitstream_size <= 0)
         return -1;
 
-    ret = ff_dxva2_common_end_frame(avctx, h->cur_frame.tf.f,
+    ret = ff_dxva2_common_end_frame(avctx, h->cur_frame.f,
                                     &ctx_pic->pp, sizeof(ctx_pic->pp),
                                     NULL, 0,
                                     commit_bitstream_and_slice_buffer);

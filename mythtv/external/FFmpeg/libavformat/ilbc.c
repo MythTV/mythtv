@@ -19,6 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "config_components.h"
+
 #include "avformat.h"
 #include "internal.h"
 #include "rawenc.h"
@@ -75,7 +77,7 @@ static int ilbc_read_header(AVFormatContext *s)
         return AVERROR(ENOMEM);
     st->codecpar->codec_id = AV_CODEC_ID_ILBC;
     st->codecpar->sample_rate = 8000;
-    st->codecpar->channels = 1;
+    st->codecpar->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
     st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
     st->start_time = 0;
     avpriv_set_pts_info(st, 64, 1, st->codecpar->sample_rate);
@@ -99,20 +101,16 @@ static int ilbc_read_packet(AVFormatContext *s,
     AVCodecParameters *par = s->streams[0]->codecpar;
     int ret;
 
-    if ((ret = av_new_packet(pkt, par->block_align)) < 0)
-        return ret;
+    if ((ret = av_get_packet(s->pb, pkt, par->block_align)) != par->block_align)
+        return ret < 0 ? ret : AVERROR_INVALIDDATA;
 
     pkt->stream_index = 0;
-    pkt->pos = avio_tell(s->pb);
     pkt->duration = par->block_align == 38 ? 160 : 240;
-    if ((ret = avio_read(s->pb, pkt->data, par->block_align)) != par->block_align) {
-        return ret < 0 ? ret : AVERROR(EIO);
-    }
 
     return 0;
 }
 
-AVInputFormat ff_ilbc_demuxer = {
+const AVInputFormat ff_ilbc_demuxer = {
     .name         = "ilbc",
     .long_name    = NULL_IF_CONFIG_SMALL("iLBC storage"),
     .read_probe   = ilbc_probe,
@@ -122,7 +120,7 @@ AVInputFormat ff_ilbc_demuxer = {
 };
 
 #if CONFIG_ILBC_MUXER
-AVOutputFormat ff_ilbc_muxer = {
+const AVOutputFormat ff_ilbc_muxer = {
     .name         = "ilbc",
     .long_name    = NULL_IF_CONFIG_SMALL("iLBC storage"),
     .mime_type    = "audio/iLBC",

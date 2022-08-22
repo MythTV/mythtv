@@ -18,12 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavcodec/cabac_functions.h"
 #include "libavcodec/cabac.c"
 
 #define SIZE 10240
 
 #include "libavutil/lfg.h"
-#include "libavcodec/avcodec.h"
 #include "libavcodec/put_bits.h"
 
 typedef struct CABACTestContext {
@@ -120,7 +120,7 @@ static int put_cabac_terminate(CABACTestContext *c, int bit)
         flush_put_bits(&c->pb); //FIXME FIXME FIXME XXX wrong
     }
 
-    return (put_bits_count(&c->pb)+7)>>3;
+    return put_bytes_count(&c->pb, 1);
 }
 
 /**

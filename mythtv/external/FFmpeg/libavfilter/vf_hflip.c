@@ -31,6 +31,7 @@
 #include "formats.h"
 #include "hflip.h"
 #include "internal.h"
+#include "vf_hflip_init.h"
 #include "video.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/internal.h"
@@ -46,10 +47,10 @@ AVFILTER_DEFINE_CLASS(hflip);
 static int query_formats(AVFilterContext *ctx)
 {
     AVFilterFormats *pix_fmts = NULL;
+    const AVPixFmtDescriptor *desc;
     int fmt, ret;
 
-    for (fmt = 0; av_pix_fmt_desc_get(fmt); fmt++) {
-        const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(fmt);
+    for (fmt = 0; desc = av_pix_fmt_desc_get(fmt); fmt++) {
         if (!(desc->flags & AV_PIX_FMT_FLAG_HWACCEL ||
               desc->flags & AV_PIX_FMT_FLAG_BITSTREAM ||
               (desc->log2_chroma_w != desc->log2_chroma_h &&
@@ -59,70 +60,6 @@ static int query_formats(AVFilterContext *ctx)
     }
 
     return ff_set_common_formats(ctx, pix_fmts);
-}
-
-static void hflip_byte_c(const uint8_t *src, uint8_t *dst, int w)
-{
-    int j;
-
-    for (j = 0; j < w; j++)
-        dst[j] = src[-j];
-}
-
-static void hflip_short_c(const uint8_t *ssrc, uint8_t *ddst, int w)
-{
-    const uint16_t *src = (const uint16_t *)ssrc;
-    uint16_t *dst = (uint16_t *)ddst;
-    int j;
-
-    for (j = 0; j < w; j++)
-        dst[j] = src[-j];
-}
-
-static void hflip_dword_c(const uint8_t *ssrc, uint8_t *ddst, int w)
-{
-    const uint32_t *src = (const uint32_t *)ssrc;
-    uint32_t *dst = (uint32_t *)ddst;
-    int j;
-
-    for (j = 0; j < w; j++)
-        dst[j] = src[-j];
-}
-
-static void hflip_b24_c(const uint8_t *src, uint8_t *dst, int w)
-{
-    const uint8_t *in  = src;
-    uint8_t *out = dst;
-    int j;
-
-    for (j = 0; j < w; j++, out += 3, in -= 3) {
-        int32_t v = AV_RB24(in);
-
-        AV_WB24(out, v);
-    }
-}
-
-static void hflip_b48_c(const uint8_t *src, uint8_t *dst, int w)
-{
-    const uint8_t *in  = src;
-    uint8_t *out = dst;
-    int j;
-
-    for (j = 0; j < w; j++, out += 6, in -= 6) {
-        int64_t v = AV_RB48(in);
-
-        AV_WB48(out, v);
-    }
-}
-
-static void hflip_qword_c(const uint8_t *ssrc, uint8_t *ddst, int w)
-{
-    const uint64_t *src = (const uint64_t *)ssrc;
-    uint64_t *dst = (uint64_t *)ddst;
-    int j;
-
-    for (j = 0; j < w; j++)
-        dst[j] = src[-j];
 }
 
 static int config_props(AVFilterLink *inlink)
@@ -143,29 +80,6 @@ static int config_props(AVFilterLink *inlink)
     nb_planes = av_pix_fmt_count_planes(inlink->format);
 
     return ff_hflip_init(s, s->max_step, nb_planes);
-}
-
-int ff_hflip_init(FlipContext *s, int step[4], int nb_planes)
-{
-    int i;
-
-    for (i = 0; i < nb_planes; i++) {
-        step[i] *= s->bayer_plus1;
-        switch (step[i]) {
-        case 1: s->flip_line[i] = hflip_byte_c;  break;
-        case 2: s->flip_line[i] = hflip_short_c; break;
-        case 3: s->flip_line[i] = hflip_b24_c;   break;
-        case 4: s->flip_line[i] = hflip_dword_c; break;
-        case 6: s->flip_line[i] = hflip_b48_c;   break;
-        case 8: s->flip_line[i] = hflip_qword_c; break;
-        default:
-            return AVERROR_BUG;
-        }
-    }
-    if (ARCH_X86)
-        ff_hflip_init_x86(s, step, nb_planes);
-
-    return 0;
 }
 
 typedef struct ThreadData {
@@ -221,7 +135,8 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
         memcpy(out->data[1], in->data[1], AVPALETTE_SIZE);
 
     td.in = in, td.out = out;
-    ctx->internal->execute(ctx, filter_slice, &td, NULL, FFMIN(outlink->h, ff_filter_get_nb_threads(ctx)));
+    ff_filter_execute(ctx, filter_slice, &td, NULL,
+                      FFMIN(outlink->h, ff_filter_get_nb_threads(ctx)));
 
     av_frame_free(&in);
     return ff_filter_frame(outlink, out);
@@ -234,7 +149,6 @@ static const AVFilterPad avfilter_vf_hflip_inputs[] = {
         .filter_frame = filter_frame,
         .config_props = config_props,
     },
-    { NULL }
 };
 
 static const AVFilterPad avfilter_vf_hflip_outputs[] = {
@@ -242,16 +156,15 @@ static const AVFilterPad avfilter_vf_hflip_outputs[] = {
         .name = "default",
         .type = AVMEDIA_TYPE_VIDEO,
     },
-    { NULL }
 };
 
-AVFilter ff_vf_hflip = {
+const AVFilter ff_vf_hflip = {
     .name          = "hflip",
     .description   = NULL_IF_CONFIG_SMALL("Horizontally flip the input video."),
     .priv_size     = sizeof(FlipContext),
     .priv_class    = &hflip_class,
-    .query_formats = query_formats,
-    .inputs        = avfilter_vf_hflip_inputs,
-    .outputs       = avfilter_vf_hflip_outputs,
+    FILTER_INPUTS(avfilter_vf_hflip_inputs),
+    FILTER_OUTPUTS(avfilter_vf_hflip_outputs),
+    FILTER_QUERY_FUNC(query_formats),
     .flags         = AVFILTER_FLAG_SLICE_THREADS | AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
 };

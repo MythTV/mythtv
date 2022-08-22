@@ -35,6 +35,7 @@
 #include "error_resilience.h"
 #include "mpegutils.h"
 #include "mpegvideo.h"
+#include "mpegvideodec.h"
 #include "golomb.h"
 #include "internal.h"
 #include "mathops.h"
@@ -42,6 +43,7 @@
 #include "qpeldsp.h"
 #include "rectangle.h"
 #include "thread.h"
+#include "threadframe.h"
 
 #include "rv34vlc.h"
 #include "rv34data.h"
@@ -79,7 +81,7 @@ static int rv34_decode_mv(RV34DecContext *r, int block_type);
  * @{
  */
 
-static VLC_TYPE table_data[117592][2];
+static VLCElem table_data[117592];
 
 /**
  * Generate VLC from codeword lengths.
@@ -1503,15 +1505,6 @@ av_cold int ff_rv34_decode_init(AVCodecContext *avctx)
 
     ff_h264_pred_init(&r->h, AV_CODEC_ID_RV40, 8, 1);
 
-#if CONFIG_RV30_DECODER
-    if (avctx->codec_id == AV_CODEC_ID_RV30)
-        ff_rv30dsp_init(&r->rdsp);
-#endif
-#if CONFIG_RV40_DECODER
-    if (avctx->codec_id == AV_CODEC_ID_RV40)
-        ff_rv40dsp_init(&r->rdsp);
-#endif
-
     if ((ret = rv34_decoder_alloc(r)) < 0) {
         ff_mpv_common_end(&r->s);
         return ret;
@@ -1580,13 +1573,13 @@ static int finish_frame(AVCodecContext *avctx, AVFrame *pict)
         if ((ret = av_frame_ref(pict, s->current_picture_ptr->f)) < 0)
             return ret;
         ff_print_debug_info(s, s->current_picture_ptr, pict);
-        ff_mpv_export_qp_table(s, pict, s->current_picture_ptr, FF_QSCALE_TYPE_MPEG1);
+        ff_mpv_export_qp_table(s, pict, s->current_picture_ptr, FF_MPV_QSCALE_TYPE_MPEG1);
         got_picture = 1;
     } else if (s->last_picture_ptr) {
         if ((ret = av_frame_ref(pict, s->last_picture_ptr->f)) < 0)
             return ret;
         ff_print_debug_info(s, s->last_picture_ptr, pict);
-        ff_mpv_export_qp_table(s, pict, s->last_picture_ptr, FF_QSCALE_TYPE_MPEG1);
+        ff_mpv_export_qp_table(s, pict, s->last_picture_ptr, FF_MPV_QSCALE_TYPE_MPEG1);
         got_picture = 1;
     }
 
@@ -1603,15 +1596,13 @@ static AVRational update_sar(int old_w, int old_h, AVRational sar, int new_w, in
     return sar;
 }
 
-int ff_rv34_decode_frame(AVCodecContext *avctx,
-                            void *data, int *got_picture_ptr,
-                            AVPacket *avpkt)
+int ff_rv34_decode_frame(AVCodecContext *avctx, AVFrame *pict,
+                         int *got_picture_ptr, AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
     RV34DecContext *r = avctx->priv_data;
     MpegEncContext *s = &r->s;
-    AVFrame *pict = data;
     SliceInfo si;
     int i, ret;
     int slice_count;

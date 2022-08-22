@@ -37,6 +37,7 @@
 #include "libavutil/intreadwrite.h"
 #include "libavutil/mathematics.h"
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 
 #define EXTRADATA1_SIZE (6 + 256 * 3) ///< video base, clr, palette
@@ -147,12 +148,12 @@ static av_cold int rl2_read_header(AVFormatContext *s)
         st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
         st->codecpar->codec_id = AV_CODEC_ID_PCM_U8;
         st->codecpar->codec_tag = 1;
-        st->codecpar->channels = channels;
+        st->codecpar->ch_layout.nb_channels = channels;
         st->codecpar->bits_per_coded_sample = 8;
         st->codecpar->sample_rate = rate;
-        st->codecpar->bit_rate = st->codecpar->channels * st->codecpar->sample_rate *
+        st->codecpar->bit_rate = channels * st->codecpar->sample_rate *
             st->codecpar->bits_per_coded_sample;
-        st->codecpar->block_align = st->codecpar->channels *
+        st->codecpar->block_align = channels *
             st->codecpar->bits_per_coded_sample / 8;
         avpriv_set_pts_info(st,32,1,rate);
     }
@@ -237,9 +238,10 @@ static int rl2_read_packet(AVFormatContext *s,
 
     /** check if there is a valid video or audio entry that can be used */
     for(i=0; i<s->nb_streams; i++){
-        if(rl2->index_pos[i] < s->streams[i]->nb_index_entries
-              && s->streams[i]->index_entries[ rl2->index_pos[i] ].pos < pos){
-            sample = &s->streams[i]->index_entries[ rl2->index_pos[i] ];
+        const FFStream *const sti = ffstream(s->streams[i]);
+        if (rl2->index_pos[i] < sti->nb_index_entries
+              && sti->index_entries[ rl2->index_pos[i] ].pos < pos) {
+            sample = &sti->index_entries[ rl2->index_pos[i] ];
             pos= sample->pos;
             stream_id= i;
         }
@@ -283,7 +285,7 @@ static int rl2_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp
         return -1;
 
     rl2->index_pos[stream_index] = index;
-    timestamp = st->index_entries[index].timestamp;
+    timestamp = ffstream(st)->index_entries[index].timestamp;
 
     for(i=0; i < s->nb_streams; i++){
         AVStream *st2 = s->streams[i];
@@ -300,7 +302,7 @@ static int rl2_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp
     return 0;
 }
 
-AVInputFormat ff_rl2_demuxer = {
+const AVInputFormat ff_rl2_demuxer = {
     .name           = "rl2",
     .long_name      = NULL_IF_CONFIG_SMALL("RL2"),
     .priv_data_size = sizeof(Rl2DemuxContext),

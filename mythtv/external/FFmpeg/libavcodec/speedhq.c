@@ -27,15 +27,19 @@
 #define BITSTREAM_READER_LE
 
 #include "config.h"
+#include "config_components.h"
 #include "libavutil/attributes.h"
 #include "libavutil/mem_internal.h"
 
 #include "avcodec.h"
+#include "blockdsp.h"
+#include "codec_internal.h"
 #include "get_bits.h"
+#include "idctdsp.h"
 #include "internal.h"
 #include "libavutil/thread.h"
 #include "mathops.h"
-#include "mpeg12.h"
+#include "mpeg12dec.h"
 #include "mpeg12data.h"
 #include "mpeg12vlc.h"
 
@@ -154,8 +158,6 @@ static const uint8_t unscaled_quant_matrix[64] = {
     26, 27, 29, 34, 38, 46, 56, 69,
     27, 29, 35, 38, 46, 56, 69, 83
 };
-
-static uint8_t speedhq_static_rl_table_store[2][2*MAX_RUN + MAX_LEVEL + 3];
 
 static VLC dc_lum_vlc_le;
 static VLC dc_chroma_vlc_le;
@@ -297,7 +299,8 @@ static int decode_speedhq_border(const SHQContext *s, GetBitContext *gb, AVFrame
         if (s->subsampling == SHQ_SUBSAMPLING_420) {
             dest_cb = frame->data[1] + frame->linesize[1] * (y/2 + field_number) + x / 2;
             dest_cr = frame->data[2] + frame->linesize[2] * (y/2 + field_number) + x / 2;
-        } else if (s->subsampling == SHQ_SUBSAMPLING_422) {
+        } else {
+            av_assert2(s->subsampling == SHQ_SUBSAMPLING_422);
             dest_cb = frame->data[1] + frame->linesize[1] * (y + field_number) + x / 2;
             dest_cr = frame->data[2] + frame->linesize[2] * (y + field_number) + x / 2;
         }
@@ -486,14 +489,12 @@ static void compute_quant_matrix(int *output, int qscale)
     for (i = 0; i < 64; i++) output[i] = unscaled_quant_matrix[ff_zigzag_direct[i]] * qscale;
 }
 
-static int speedhq_decode_frame(AVCodecContext *avctx,
-                                void *data, int *got_frame,
-                                AVPacket *avpkt)
+static int speedhq_decode_frame(AVCodecContext *avctx, AVFrame *frame,
+                                int *got_frame, AVPacket *avpkt)
 {
     SHQContext * const s = avctx->priv_data;
     const uint8_t *buf   = avpkt->data;
     int buf_size         = avpkt->size;
-    AVFrame *frame       = data;
     uint8_t quality;
     uint32_t second_field_offset;
     int ret;
@@ -648,7 +649,6 @@ static av_cold void speedhq_static_init(void)
                            ff_mpeg12_vlc_dc_chroma_code, 2, 2,
                            INIT_VLC_OUTPUT_LE, 514);
 
-    ff_rl_init(&ff_rl_speedhq, speedhq_static_rl_table_store);
     INIT_2D_VLC_RL(ff_rl_speedhq, 674, INIT_VLC_LE);
 
     compute_alpha_vlcs();
@@ -724,14 +724,15 @@ static av_cold int speedhq_decode_init(AVCodecContext *avctx)
     return 0;
 }
 
-AVCodec ff_speedhq_decoder = {
-    .name           = "speedhq",
-    .long_name      = NULL_IF_CONFIG_SMALL("NewTek SpeedHQ"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_SPEEDHQ,
+const FFCodec ff_speedhq_decoder = {
+    .p.name         = "speedhq",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("NewTek SpeedHQ"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_SPEEDHQ,
     .priv_data_size = sizeof(SHQContext),
     .init           = speedhq_decode_init,
-    .decode         = speedhq_decode_frame,
-    .capabilities   = AV_CODEC_CAP_DR1,
+    FF_CODEC_DECODE_CB(speedhq_decode_frame),
+    .p.capabilities = AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };
 #endif /* CONFIG_SPEEDHQ_DECODER */

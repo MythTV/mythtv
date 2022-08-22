@@ -27,6 +27,7 @@
 #include "libavutil/intreadwrite.h"
 #include "libavutil/time.h"
 #include "internal.h"
+#include "mux.h"
 #include "network.h"
 #include "os_support.h"
 #include "rtpenc_chain.h"
@@ -133,7 +134,7 @@ static int sap_write_header(AVFormatContext *s)
         freeaddrinfo(ai);
     }
 
-    contexts = av_mallocz_array(s->nb_streams, sizeof(AVFormatContext*));
+    contexts = av_calloc(s->nb_streams, sizeof(*contexts));
     if (!contexts) {
         ret = AVERROR(ENOMEM);
         goto fail;
@@ -267,7 +268,7 @@ static int sap_write_packet(AVFormatContext *s, AVPacket *pkt)
     return ff_write_chained(rtpctx, 0, pkt, s, 0);
 }
 
-AVOutputFormat ff_sap_muxer = {
+const AVOutputFormat ff_sap_muxer = {
     .name              = "sap",
     .long_name         = NULL_IF_CONFIG_SMALL("SAP output"),
     .priv_data_size    = sizeof(struct SAPState),
