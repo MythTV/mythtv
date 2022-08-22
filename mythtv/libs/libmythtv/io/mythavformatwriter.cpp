@@ -61,7 +61,7 @@ MythAVFormatWriter::~MythAVFormatWriter()
 
 bool MythAVFormatWriter::Init(void)
 {
-    AVOutputFormat *fmt = av_guess_format(m_container.toLatin1().constData(), nullptr, nullptr);
+    const AVOutputFormat *fmt = av_guess_format(m_container.toLatin1().constData(), nullptr, nullptr);
     if (!fmt)
     {
         LOG(VB_RECORD, LOG_ERR, LOC + QString("Init(): Unable to guess AVOutputFormat from container %1")
@@ -411,7 +411,7 @@ AVStream* MythAVFormatWriter::AddVideoStream(void)
     stream->r_frame_rate.num = 0;
     stream->r_frame_rate.den = 0;
 
-    AVCodec *codec = avcodec_find_encoder(m_ctx->oformat->video_codec);
+    const AVCodec *codec = avcodec_find_encoder(m_ctx->oformat->video_codec);
     if (!codec)
     {
         LOG(VB_RECORD, LOG_ERR, LOC + "AddVideoStream(): avcodec_find_encoder() failed");
@@ -580,7 +580,7 @@ AVStream* MythAVFormatWriter::AddAudioStream(void)
     return stream;
 }
 
-bool MythAVFormatWriter::FindAudioFormat(AVCodecContext *Ctx, AVCodec *Codec, AVSampleFormat Format)
+bool MythAVFormatWriter::FindAudioFormat(AVCodecContext *Ctx, const AVCodec *Codec, AVSampleFormat Format)
 {
     if (Codec->sample_fmts)
     {
@@ -601,7 +601,7 @@ bool MythAVFormatWriter::OpenAudio(void)
     AVCodecContext *context = m_codecMap.GetCodecContext(m_audioStream);
     context->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
 
-    AVCodec *codec = avcodec_find_encoder(context->codec_id);
+    const AVCodec *codec = avcodec_find_encoder(context->codec_id);
     if (!codec)
     {
         LOG(VB_RECORD, LOG_ERR, LOC + "OpenAudio(): avcodec_find_encoder() failed");
