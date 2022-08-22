@@ -210,7 +210,7 @@ class MPEG2fixup
     {
         if (id >= m_inputFC->nb_streams)
             return nullptr;
-        return m_inputFC->streams[id]->parser;
+        return av_stream_get_parser(m_inputFC->streams[id]);
     }
 
     static void dumpList(FrameList *list);
