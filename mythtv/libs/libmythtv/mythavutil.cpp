@@ -327,7 +327,7 @@ void MythCodecMap::FreeAllContexts()
 MythStreamInfoList::MythStreamInfoList(const QString& filename)
 {
     const int probeBufferSize = 8 * 1024;
-    AVInputFormat *fmt      = nullptr;
+    const AVInputFormat *fmt      = nullptr;
     AVProbeData probe;
     memset(&probe, 0, sizeof(AVProbeData));
     probe.filename = "";
