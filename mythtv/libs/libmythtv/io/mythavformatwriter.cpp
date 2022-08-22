@@ -217,18 +217,34 @@ int MythAVFormatWriter::WriteVideoFrame(MythVideoFrame *Frame)
         return AVERROR(ENOMEM);
     }
 
-    int got_pkt = 0;
     AVCodecContext *avctx = m_codecMap.GetCodecContext(m_videoStream);
-    int ret = avcodec_encode_video2(avctx, pkt, m_picture, &got_pkt);
+
+    //  SUGGESTION
+    //  Now that avcodec_encode_video2 is removed and replaced
+    //  by 2 calls, this could be optimized
+    //  into separate routines or separate threads.
+    bool got_packet = false;
+    int ret = avcodec_receive_packet(avctx, pkt);
+    if (ret == 0)
+        got_packet = true;
+    if (ret == AVERROR(EAGAIN))
+        ret = 0;
+    if (ret == 0)
+        ret = avcodec_send_frame(avctx, m_picture);
+    // if ret from avcodec_send_frame is AVERROR(EAGAIN) then
+    // there are 2 packets to be received while only 1 frame to be
+    // sent. The code does not cater for this. Hopefully it will not happen.
 
     if (ret < 0)
     {
-        LOG(VB_RECORD, LOG_ERR, "avcodec_encode_video2() failed");
+        std::string error;
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("video encode error: %1 (%2)")
+            .arg(av_make_error_stdstring(error, ret)).arg(got_packet));
         av_packet_free(&pkt);
         return ret;
     }
 
-    if (!got_pkt)
+    if (!got_packet)
     {
         av_packet_free(&pkt);
         return ret;
