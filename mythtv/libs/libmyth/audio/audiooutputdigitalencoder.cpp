@@ -117,7 +117,7 @@ bool AudioOutputDigitalEncoder::Init(
     Reset();
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using codec %1 to encode audio").arg(CODECNAME));
-    AVCodec *codec = avcodec_find_encoder_by_name(CODECNAME);
+    const AVCodec *codec = avcodec_find_encoder_by_name(CODECNAME);
     if (!codec)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not find codec");
