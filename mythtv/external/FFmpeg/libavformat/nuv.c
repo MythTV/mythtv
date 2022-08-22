@@ -24,6 +24,8 @@
 #include "libavutil/intreadwrite.h"
 #include "libavutil/intfloat.h"
 #include "avformat.h"
+#include "avio_internal.h"
+#include "demux.h"
 #include "internal.h"
 #include "riff.h"
 
@@ -115,10 +117,11 @@ static int get_codec_data(AVFormatContext *s, AVIOContext *pb, AVStream *vst,
                     return AVERROR_INVALIDDATA;
                 }
                 ast->codecpar->bits_per_coded_sample = avio_rl32(pb);
-                ast->codecpar->channels              = avio_rl32(pb);
-                ast->codecpar->channel_layout        = 0;
-                if (ast->codecpar->channels <= 0) {
-                    av_log(s, AV_LOG_ERROR, "Invalid channels %d\n", ast->codecpar->channels);
+                av_channel_layout_uninit(&ast->codecpar->ch_layout);
+                ast->codecpar->ch_layout.order       = AV_CHANNEL_ORDER_UNSPEC;
+                ast->codecpar->ch_layout.nb_channels = avio_rl32(pb);
+                if (ast->codecpar->ch_layout.nb_channels <= 0) {
+                    av_log(s, AV_LOG_ERROR, "Invalid channels %d\n", ast->codecpar->ch_layout.nb_channels);
                     return AVERROR_INVALIDDATA;
                 }
 
@@ -132,7 +135,7 @@ static int get_codec_data(AVFormatContext *s, AVIOContext *pb, AVStream *vst,
                 }
                 ast->codecpar->codec_id = id;
 
-                ast->need_parsing = AVSTREAM_PARSE_FULL;
+                ffstream(ast)->need_parsing = AVSTREAM_PARSE_FULL;
             } else
                 avio_skip(pb, 4 * 4);
 
@@ -226,8 +229,7 @@ static int nuv_header(AVFormatContext *s)
 
         ast->codecpar->codec_type            = AVMEDIA_TYPE_AUDIO;
         ast->codecpar->codec_id              = AV_CODEC_ID_PCM_S16LE;
-        ast->codecpar->channels              = 2;
-        ast->codecpar->channel_layout        = AV_CH_LAYOUT_STEREO;
+        ast->codecpar->ch_layout             = (AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO;
         ast->codecpar->sample_rate           = 44100;
         ast->codecpar->bit_rate              = 2 * 2 * 44100 * 8;
         ast->codecpar->block_align           = 2 * 2;
@@ -258,9 +260,9 @@ static int nuv_packet(AVFormatContext *s, AVPacket *pkt)
         int copyhdrsize = ctx->rtjpg_video ? HDRSIZE : 0;
         uint64_t pos    = avio_tell(pb);
 
-        ret = avio_read(pb, hdr, HDRSIZE);
-        if (ret < HDRSIZE)
-            return ret < 0 ? ret : AVERROR(EIO);
+        ret = ffio_read_size(pb, hdr, HDRSIZE);
+        if (ret < 0)
+            return ret;
 
         frametype = hdr[0];
         size      = PKTSIZE(AV_RL32(&hdr[8]));
@@ -394,7 +396,7 @@ static int64_t nuv_read_dts(AVFormatContext *s, int stream_index,
 }
 
 
-AVInputFormat ff_nuv_demuxer = {
+const AVInputFormat ff_nuv_demuxer = {
     .name           = "nuv",
     .long_name      = NULL_IF_CONFIG_SMALL("NuppelVideo"),
     .priv_data_size = sizeof(NUVContext),

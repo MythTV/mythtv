@@ -37,7 +37,7 @@
 #include "libavutil/timestamp.h"
 #include "libavutil/samplefmt.h"
 
-#include "libavcodec/avcodec.h"
+#include "libavcodec/defs.h"
 
 #include "audio.h"
 #include "avfilter.h"
@@ -170,16 +170,20 @@ static void dump_audio_service_type(AVFilterContext *ctx, AVFrameSideData *sd)
 
 static void dump_unknown(AVFilterContext *ctx, AVFrameSideData *sd)
 {
-    av_log(ctx, AV_LOG_INFO, "unknown side data type: %d, size %d bytes", sd->type, sd->size);
+    av_log(ctx, AV_LOG_INFO, "unknown side data type: %d, size "
+           "%"SIZE_SPECIFIER" bytes", sd->type, sd->size);
 }
 
 static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
 {
     AVFilterContext *ctx = inlink->dst;
     AShowInfoContext *s  = ctx->priv;
+#if FF_API_OLD_CHANNEL_LAYOUT
+    AVChannelLayout layout = { 0 };
+#endif
     char chlayout_str[128];
     uint32_t checksum = 0;
-    int channels    = inlink->channels;
+    int channels    = inlink->ch_layout.nb_channels;
     int planar      = av_sample_fmt_is_planar(buf->format);
     int block_align = av_get_bytes_per_sample(buf->format) * (planar ? 1 : channels);
     int data_size   = buf->nb_samples * block_align;
@@ -199,8 +203,14 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
                        s->plane_checksums[0];
     }
 
-    av_get_channel_layout_string(chlayout_str, sizeof(chlayout_str), buf->channels,
-                                 buf->channel_layout);
+#if FF_API_OLD_CHANNEL_LAYOUT
+FF_DISABLE_DEPRECATION_WARNINGS
+    if (av_channel_layout_from_mask(&layout, buf->channel_layout)) {
+        av_channel_layout_describe(&layout, chlayout_str, sizeof(chlayout_str));
+FF_ENABLE_DEPRECATION_WARNINGS
+    } else if (buf->ch_layout.nb_channels)
+#endif
+    av_channel_layout_describe(&buf->ch_layout, chlayout_str, sizeof(chlayout_str));
 
     av_log(ctx, AV_LOG_INFO,
            "n:%"PRId64" pts:%s pts_time:%s pos:%"PRId64" "
@@ -209,7 +219,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
            inlink->frame_count_out,
            av_ts2str(buf->pts), av_ts2timestr(buf->pts, &inlink->time_base),
            buf->pkt_pos,
-           av_get_sample_fmt_name(buf->format), buf->channels, chlayout_str,
+           av_get_sample_fmt_name(buf->format), buf->ch_layout.nb_channels, chlayout_str,
            buf->sample_rate, buf->nb_samples,
            checksum);
 
@@ -242,7 +252,6 @@ static const AVFilterPad inputs[] = {
         .type         = AVMEDIA_TYPE_AUDIO,
         .filter_frame = filter_frame,
     },
-    { NULL }
 };
 
 static const AVFilterPad outputs[] = {
@@ -250,14 +259,14 @@ static const AVFilterPad outputs[] = {
         .name = "default",
         .type = AVMEDIA_TYPE_AUDIO,
     },
-    { NULL }
 };
 
-AVFilter ff_af_ashowinfo = {
+const AVFilter ff_af_ashowinfo = {
     .name        = "ashowinfo",
     .description = NULL_IF_CONFIG_SMALL("Show textual information for each audio frame."),
     .priv_size   = sizeof(AShowInfoContext),
     .uninit      = uninit,
-    .inputs      = inputs,
-    .outputs     = outputs,
+    .flags       = AVFILTER_FLAG_METADATA_ONLY,
+    FILTER_INPUTS(inputs),
+    FILTER_OUTPUTS(outputs),
 };

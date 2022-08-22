@@ -48,11 +48,11 @@ static int ads_read_header(AVFormatContext *s)
     st->codecpar->sample_rate = avio_rl32(s->pb);
     if (st->codecpar->sample_rate <= 0)
         return AVERROR_INVALIDDATA;
-    st->codecpar->channels    = avio_rl32(s->pb);
-    if (st->codecpar->channels <= 0)
+    st->codecpar->ch_layout.nb_channels = avio_rl32(s->pb);
+    if (st->codecpar->ch_layout.nb_channels <= 0)
         return AVERROR_INVALIDDATA;
     align                  = avio_rl32(s->pb);
-    if (align <= 0 || align > INT_MAX / st->codecpar->channels)
+    if (align <= 0 || align > INT_MAX / st->codecpar->ch_layout.nb_channels)
         return AVERROR_INVALIDDATA;
 
     if (codec == 1)
@@ -60,11 +60,11 @@ static int ads_read_header(AVFormatContext *s)
     else
         st->codecpar->codec_id = AV_CODEC_ID_ADPCM_PSX;
 
-    st->codecpar->block_align = st->codecpar->channels * align;
+    st->codecpar->block_align = st->codecpar->ch_layout.nb_channels * align;
     avio_skip(s->pb, 12);
     size = avio_rl32(s->pb);
     if (st->codecpar->codec_id == AV_CODEC_ID_ADPCM_PSX && size >= 0x40)
-        st->duration = (size - 0x40) / 16 / st->codecpar->channels * 28;
+        st->duration = (size - 0x40) / 16 / st->codecpar->ch_layout.nb_channels * 28;
     avpriv_set_pts_info(st, 64, 1, st->codecpar->sample_rate);
 
     return 0;
@@ -80,7 +80,7 @@ static int ads_read_packet(AVFormatContext *s, AVPacket *pkt)
     return ret;
 }
 
-AVInputFormat ff_ads_demuxer = {
+const AVInputFormat ff_ads_demuxer = {
     .name           = "ads",
     .long_name      = NULL_IF_CONFIG_SMALL("Sony PS2 ADS"),
     .read_probe     = ads_probe,

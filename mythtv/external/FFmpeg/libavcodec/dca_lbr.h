@@ -21,12 +21,10 @@
 #ifndef AVCODEC_DCA_LBR_H
 #define AVCODEC_DCA_LBR_H
 
-#include "libavutil/common.h"
 #include "libavutil/float_dsp.h"
 #include "libavutil/mem_internal.h"
 
 #include "avcodec.h"
-#include "internal.h"
 #include "get_bits.h"
 #include "dca.h"
 #include "dca_exss.h"
@@ -126,9 +124,10 @@ typedef struct DCALbrDecoder {
     DCADSPContext       *dcadsp;
 } DCALbrDecoder;
 
-int ff_dca_lbr_parse(DCALbrDecoder *s, uint8_t *data, DCAExssAsset *asset);
+int ff_dca_lbr_parse(DCALbrDecoder *s, const uint8_t *data, DCAExssAsset *asset);
 int ff_dca_lbr_filter_frame(DCALbrDecoder *s, AVFrame *frame);
 av_cold void ff_dca_lbr_flush(DCALbrDecoder *s);
+av_cold void ff_dca_lbr_init_tables(void);
 av_cold int ff_dca_lbr_init(DCALbrDecoder *s);
 av_cold void ff_dca_lbr_close(DCALbrDecoder *s);
 

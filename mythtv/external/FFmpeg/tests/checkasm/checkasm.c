@@ -21,6 +21,7 @@
  */
 
 #include "config.h"
+#include "config_components.h"
 
 #if CONFIG_LINUX_PERF
 # ifndef _GNU_SOURCE
@@ -116,20 +117,14 @@ static const struct {
     #if CONFIG_HEVC_DECODER
         { "hevc_add_res", checkasm_check_hevc_add_res },
         { "hevc_idct", checkasm_check_hevc_idct },
-        { "hevc_qpel", checkasm_check_hevc_qpel },
-        { "hevc_qpel_uni", checkasm_check_hevc_qpel_uni },
-        { "hevc_qpel_uni_w", checkasm_check_hevc_qpel_uni_w },
-        { "hevc_qpel_bi", checkasm_check_hevc_qpel_bi },
-        { "hevc_qpel_bi_w", checkasm_check_hevc_qpel_bi_w },
-        { "hevc_epel", checkasm_check_hevc_epel },
-        { "hevc_epel_uni", checkasm_check_hevc_epel_uni },
-        { "hevc_epel_uni_w", checkasm_check_hevc_epel_uni_w },
-        { "hevc_epel_bi", checkasm_check_hevc_epel_bi },
-        { "hevc_epel_bi_w", checkasm_check_hevc_epel_bi_w },
+        { "hevc_pel", checkasm_check_hevc_pel },
         { "hevc_sao", checkasm_check_hevc_sao },
     #endif
     #if CONFIG_HUFFYUV_DECODER
         { "huffyuvdsp", checkasm_check_huffyuvdsp },
+    #endif
+    #if CONFIG_IDCTDSP
+        { "idctdsp", checkasm_check_idctdsp },
     #endif
     #if CONFIG_JPEG2000_DECODER
         { "jpeg2000dsp", checkasm_check_jpeg2000dsp },
@@ -139,6 +134,9 @@ static const struct {
     #endif
     #if CONFIG_LLVIDENCDSP
         { "llviddspenc", checkasm_check_llviddspenc },
+    #endif
+    #if CONFIG_ME_CMP
+        { "motion", checkasm_check_motion },
     #endif
     #if CONFIG_OPUS_DECODER
         { "opusdsp", checkasm_check_opusdsp },
@@ -154,6 +152,9 @@ static const struct {
     #endif
     #if CONFIG_V210_ENCODER
         { "v210enc", checkasm_check_v210enc },
+    #endif
+    #if CONFIG_VC1DSP
+        { "vc1dsp", checkasm_check_vc1dsp },
     #endif
     #if CONFIG_VP8DSP
         { "vp8dsp", checkasm_check_vp8dsp },
@@ -192,12 +193,14 @@ static const struct {
     #endif
 #endif
 #if CONFIG_SWSCALE
+    { "sw_gbrp", checkasm_check_sw_gbrp },
     { "sw_rgb", checkasm_check_sw_rgb },
     { "sw_scale", checkasm_check_sw_scale },
 #endif
 #if CONFIG_AVUTIL
         { "fixed_dsp", checkasm_check_fixed_dsp },
         { "float_dsp", checkasm_check_float_dsp },
+        { "av_tx",     checkasm_check_av_tx },
 #endif
     { NULL }
 };
@@ -227,23 +230,27 @@ static const struct {
     { "MMI",      "mmi",      AV_CPU_FLAG_MMI },
     { "MSA",      "msa",      AV_CPU_FLAG_MSA },
 #elif ARCH_X86
-    { "MMX",      "mmx",      AV_CPU_FLAG_MMX|AV_CPU_FLAG_CMOV },
-    { "MMXEXT",   "mmxext",   AV_CPU_FLAG_MMXEXT },
-    { "3DNOW",    "3dnow",    AV_CPU_FLAG_3DNOW },
-    { "3DNOWEXT", "3dnowext", AV_CPU_FLAG_3DNOWEXT },
-    { "SSE",      "sse",      AV_CPU_FLAG_SSE },
-    { "SSE2",     "sse2",     AV_CPU_FLAG_SSE2|AV_CPU_FLAG_SSE2SLOW },
-    { "SSE3",     "sse3",     AV_CPU_FLAG_SSE3|AV_CPU_FLAG_SSE3SLOW },
-    { "SSSE3",    "ssse3",    AV_CPU_FLAG_SSSE3|AV_CPU_FLAG_ATOM },
-    { "SSE4.1",   "sse4",     AV_CPU_FLAG_SSE4 },
-    { "SSE4.2",   "sse42",    AV_CPU_FLAG_SSE42 },
-    { "AES-NI",   "aesni",    AV_CPU_FLAG_AESNI },
-    { "AVX",      "avx",      AV_CPU_FLAG_AVX },
-    { "XOP",      "xop",      AV_CPU_FLAG_XOP },
-    { "FMA3",     "fma3",     AV_CPU_FLAG_FMA3 },
-    { "FMA4",     "fma4",     AV_CPU_FLAG_FMA4 },
-    { "AVX2",     "avx2",     AV_CPU_FLAG_AVX2 },
-    { "AVX-512",  "avx512",   AV_CPU_FLAG_AVX512 },
+    { "MMX",        "mmx",       AV_CPU_FLAG_MMX|AV_CPU_FLAG_CMOV },
+    { "MMXEXT",     "mmxext",    AV_CPU_FLAG_MMXEXT },
+    { "3DNOW",      "3dnow",     AV_CPU_FLAG_3DNOW },
+    { "3DNOWEXT",   "3dnowext",  AV_CPU_FLAG_3DNOWEXT },
+    { "SSE",        "sse",       AV_CPU_FLAG_SSE },
+    { "SSE2",       "sse2",      AV_CPU_FLAG_SSE2|AV_CPU_FLAG_SSE2SLOW },
+    { "SSE3",       "sse3",      AV_CPU_FLAG_SSE3|AV_CPU_FLAG_SSE3SLOW },
+    { "SSSE3",      "ssse3",     AV_CPU_FLAG_SSSE3|AV_CPU_FLAG_ATOM },
+    { "SSE4.1",     "sse4",      AV_CPU_FLAG_SSE4 },
+    { "SSE4.2",     "sse42",     AV_CPU_FLAG_SSE42 },
+    { "AES-NI",     "aesni",     AV_CPU_FLAG_AESNI },
+    { "AVX",        "avx",       AV_CPU_FLAG_AVX },
+    { "XOP",        "xop",       AV_CPU_FLAG_XOP },
+    { "FMA3",       "fma3",      AV_CPU_FLAG_FMA3 },
+    { "FMA4",       "fma4",      AV_CPU_FLAG_FMA4 },
+    { "AVX2",       "avx2",      AV_CPU_FLAG_AVX2 },
+    { "AVX-512",    "avx512",    AV_CPU_FLAG_AVX512 },
+    { "AVX-512ICL", "avx512icl", AV_CPU_FLAG_AVX512ICL },
+#elif ARCH_LOONGARCH
+    { "LSX",      "lsx",      AV_CPU_FLAG_LSX },
+    { "LASX",     "lasx",     AV_CPU_FLAG_LASX },
 #endif
     { NULL }
 };
@@ -637,9 +644,13 @@ static int bench_init_linux(void)
     }
     return 0;
 }
-#endif
-
-#if !CONFIG_LINUX_PERF
+#elif CONFIG_MACOS_KPERF
+static int bench_init_kperf(void)
+{
+    ff_kperf_init();
+    return 0;
+}
+#else
 static int bench_init_ffmpeg(void)
 {
 #ifdef AV_READ_TIME
@@ -656,6 +667,8 @@ static int bench_init(void)
 {
 #if CONFIG_LINUX_PERF
     int ret = bench_init_linux();
+#elif CONFIG_MACOS_KPERF
+    int ret = bench_init_kperf();
 #else
     int ret = bench_init_ffmpeg();
 #endif

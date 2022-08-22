@@ -25,10 +25,10 @@
 #include "libavutil/intreadwrite.h"
 #include "libavutil/mem.h"
 
-#include "avcodec.h"
 #include "bsf.h"
 #include "bsf_internal.h"
 #include "bytestream.h"
+#include "defs.h"
 #include "h264.h"
 
 typedef struct H264BSFContext {
@@ -312,11 +312,11 @@ static const enum AVCodecID codec_ids[] = {
     AV_CODEC_ID_H264, AV_CODEC_ID_NONE,
 };
 
-const AVBitStreamFilter ff_h264_mp4toannexb_bsf = {
-    .name           = "h264_mp4toannexb",
+const FFBitStreamFilter ff_h264_mp4toannexb_bsf = {
+    .p.name         = "h264_mp4toannexb",
+    .p.codec_ids    = codec_ids,
     .priv_data_size = sizeof(H264BSFContext),
     .init           = h264_mp4toannexb_init,
     .filter         = h264_mp4toannexb_filter,
     .flush          = h264_mp4toannexb_flush,
-    .codec_ids      = codec_ids,
 };

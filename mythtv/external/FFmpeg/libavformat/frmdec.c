@@ -24,7 +24,6 @@
  * Megalux Frame demuxer
  */
 
-#include "libavcodec/raw.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"
@@ -103,7 +102,7 @@ static int frm_read_packet(AVFormatContext *avctx, AVPacket *pkt)
     return 0;
 }
 
-AVInputFormat ff_frm_demuxer = {
+const AVInputFormat ff_frm_demuxer = {
     .name           = "frm",
     .priv_data_size = sizeof(FrmContext),
     .long_name      = NULL_IF_CONFIG_SMALL("Megalux Frame"),

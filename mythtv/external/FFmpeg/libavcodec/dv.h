@@ -30,7 +30,6 @@
 #include "avcodec.h"
 #include "dv_profile.h"
 #include "me_cmp.h"
-#include "vlc.h"
 #include "idctdsp.h"
 
 typedef struct DVwork_chunk {
@@ -95,10 +94,6 @@ enum dv_pack_type {
  * maximum number of blocks per macroblock in any DV format
  */
 #define DV_MAX_BPM 8
-
-#define TEX_VLC_BITS 10
-
-extern RL_VLC_ELEM ff_dv_rl_vlc[1664];
 
 int ff_dv_init_dynamic_tables(DVVideoContext *s, const AVDVProfile *d);
 

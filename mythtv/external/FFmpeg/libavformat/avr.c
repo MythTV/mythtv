@@ -53,9 +53,9 @@ static int avr_read_header(AVFormatContext *s)
 
     chan = avio_rb16(s->pb);
     if (!chan) {
-        st->codecpar->channels = 1;
+        st->codecpar->ch_layout.nb_channels = 1;
     } else if (chan == 0xFFFFu) {
-        st->codecpar->channels = 2;
+        st->codecpar->ch_layout.nb_channels = 2;
     } else {
         avpriv_request_sample(s, "chan %d", chan);
         return AVERROR_PATCHWELCOME;
@@ -81,13 +81,13 @@ static int avr_read_header(AVFormatContext *s)
         return AVERROR_PATCHWELCOME;
     }
 
-    st->codecpar->block_align = bps * st->codecpar->channels / 8;
+    st->codecpar->block_align = bps * st->codecpar->ch_layout.nb_channels / 8;
 
     avpriv_set_pts_info(st, 64, 1, st->codecpar->sample_rate);
     return 0;
 }
 
-AVInputFormat ff_avr_demuxer = {
+const AVInputFormat ff_avr_demuxer = {
     .name           = "avr",
     .long_name      = NULL_IF_CONFIG_SMALL("AVR (Audio Visual Research)"),
     .read_probe     = avr_probe,

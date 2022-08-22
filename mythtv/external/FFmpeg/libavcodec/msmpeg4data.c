@@ -27,13 +27,12 @@
  * MSMPEG4 data tables.
  */
 
-#include "h263.h"
-#include "mpeg4video.h"
+#include "h263data.h"
+#include "mpeg4videodata.h"
 #include "msmpeg4data.h"
 
 uint32_t ff_v2_dc_lum_table[512][2];
 uint32_t ff_v2_dc_chroma_table[512][2];
-uint8_t  ff_static_rl_table_store[NB_RL_TABLES][2][2 * MAX_RUN + MAX_LEVEL + 3];
 
 VLC ff_msmp4_mb_i_vlc;
 VLC ff_msmp4_dc_luma_vlc[2];

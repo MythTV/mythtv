@@ -18,6 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/channel_layout.h"
+#include "avcodec.h"
 #include "dolby_e.h"
 #include "get_bits.h"
 #include "put_bits.h"
@@ -40,17 +42,20 @@ static int dolby_e_parse(AVCodecParserContext *s2, AVCodecContext *avctx,
     s2->duration = FRAME_SAMPLES;
     switch (s->metadata.nb_channels) {
     case 4:
-        avctx->channel_layout = AV_CH_LAYOUT_4POINT0;
+        avctx->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_4POINT0;
         break;
     case 6:
-        avctx->channel_layout = AV_CH_LAYOUT_5POINT1;
+        avctx->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_5POINT1;
         break;
     case 8:
-        avctx->channel_layout = AV_CH_LAYOUT_7POINT1;
+        avctx->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_7POINT1;
+        break;
+    default:
+        avctx->ch_layout.order       = AV_CHANNEL_ORDER_UNSPEC;
+        avctx->ch_layout.nb_channels = s->metadata.nb_channels;
         break;
     }
 
-    avctx->channels    = s->metadata.nb_channels;
     avctx->sample_rate = s->metadata.sample_rate;
     avctx->sample_fmt  = AV_SAMPLE_FMT_FLTP;
 
@@ -62,7 +67,7 @@ end:
     return buf_size;
 }
 
-AVCodecParser ff_dolby_e_parser = {
+const AVCodecParser ff_dolby_e_parser = {
     .codec_ids      = { AV_CODEC_ID_DOLBY_E },
     .priv_data_size = sizeof(DBEParseContext),
     .parser_parse   = dolby_e_parse,

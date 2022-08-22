@@ -114,6 +114,13 @@ enum {
     AV1_WARP_MODEL_TRANSLATION = 1,
     AV1_WARP_MODEL_ROTZOOM     = 2,
     AV1_WARP_MODEL_AFFINE      = 3,
+    AV1_WARP_PARAM_REDUCE_BITS = 6,
+
+    AV1_DIV_LUT_BITS      = 8,
+    AV1_DIV_LUT_PREC_BITS = 14,
+    AV1_DIV_LUT_NUM       = 257,
+
+    AV1_MAX_LOOP_FILTER = 63,
 };
 
 
@@ -167,5 +174,11 @@ enum {
     AV1_RESTORE_SGRPROJ    = 2,
     AV1_RESTORE_SWITCHABLE = 3,
 };
+
+// Sequence Headers are actually unbounded because one can use
+// an arbitrary number of leading zeroes when encoding via uvlc.
+// The following estimate is based around using the lowest number
+// of bits for uvlc encoding.
+#define AV1_SANE_SEQUENCE_HEADER_MAX_BITS           3138
 
 #endif /* AVCODEC_AV1_H */

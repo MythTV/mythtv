@@ -22,12 +22,26 @@
 #include <stdint.h>
 
 #include "libavutil/frame.h"
+#include "libavutil/video_enc_params.h"
 
 /**
  * Extract a libpostproc-compatible QP table - an 8-bit QP value per 16x16
  * macroblock, stored in raster order - from AVVideoEncParams side data.
  */
 int ff_qp_table_extract(AVFrame *frame, int8_t **table, int *table_w, int *table_h,
-                        int *qscale_type);
+                        enum AVVideoEncParamsType *qscale_type);
+
+/**
+ * Normalize the qscale factor
+ * FIXME Add support for other values of enum AVVideoEncParamsType
+ * besides AV_VIDEO_ENC_PARAMS_MPEG2.
+ */
+static inline int ff_norm_qscale(int qscale, enum AVVideoEncParamsType type)
+{
+    switch (type) {
+    case AV_VIDEO_ENC_PARAMS_MPEG2: return qscale >> 1;
+    }
+    return qscale;
+}
 
 #endif // AVFILTER_QP_TABLE_H

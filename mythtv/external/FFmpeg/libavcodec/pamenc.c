@@ -19,16 +19,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/avassert.h"
 #include "avcodec.h"
-#include "internal.h"
+#include "codec_internal.h"
+#include "encode.h"
 
 static int pam_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
                             const AVFrame *p, int *got_packet)
 {
-    uint8_t *bytestream_start, *bytestream, *bytestream_end;
-    int i, h, w, n, linesize, depth, maxval, ret;
+    int i, h, w, n, linesize, depth, maxval, ret, header_size;
+    uint8_t *bytestream, *ptr;
     const char *tuple_type;
-    uint8_t *ptr;
+    char header[100];
 
     h = avctx->height;
     w = avctx->width;
@@ -91,17 +93,17 @@ static int pam_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         return -1;
     }
 
-    if ((ret = ff_alloc_packet2(avctx, pkt, n*h + 200, 0)) < 0)
-        return ret;
-
-    bytestream_start =
-    bytestream       = pkt->data;
-    bytestream_end   = pkt->data + pkt->size;
-
-    snprintf(bytestream, bytestream_end - bytestream,
+    header_size = snprintf(header, sizeof(header),
              "P7\nWIDTH %d\nHEIGHT %d\nDEPTH %d\nMAXVAL %d\nTUPLTYPE %s\nENDHDR\n",
              w, h, depth, maxval, tuple_type);
-    bytestream += strlen(bytestream);
+    av_assert1(header_size < sizeof(header));
+
+    if ((ret = ff_get_encode_buffer(avctx, pkt, n*h + header_size, 0)) < 0)
+        return ret;
+
+    bytestream       = pkt->data;
+    memcpy(bytestream, header, header_size);
+    bytestream += header_size;
 
     ptr      = p->data[0];
     linesize = p->linesize[0];
@@ -121,36 +123,23 @@ static int pam_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         }
     }
 
-    pkt->size   = bytestream - bytestream_start;
-    pkt->flags |= AV_PKT_FLAG_KEY;
     *got_packet = 1;
     return 0;
 }
 
-static av_cold int pam_encode_init(AVCodecContext *avctx)
-{
-#if FF_API_CODED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-    avctx->coded_frame->pict_type = AV_PICTURE_TYPE_I;
-    avctx->coded_frame->key_frame = 1;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-
-    return 0;
-}
-
-AVCodec ff_pam_encoder = {
-    .name           = "pam",
-    .long_name      = NULL_IF_CONFIG_SMALL("PAM (Portable AnyMap) image"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_PAM,
-    .init           = pam_encode_init,
-    .encode2        = pam_encode_frame,
-    .pix_fmts       = (const enum AVPixelFormat[]){
+const FFCodec ff_pam_encoder = {
+    .p.name         = "pam",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("PAM (Portable AnyMap) image"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_PAM,
+    .p.capabilities = AV_CODEC_CAP_DR1,
+    FF_CODEC_ENCODE_CB(pam_encode_frame),
+    .p.pix_fmts     = (const enum AVPixelFormat[]){
         AV_PIX_FMT_RGB24, AV_PIX_FMT_RGBA,
         AV_PIX_FMT_RGB48BE, AV_PIX_FMT_RGBA64BE,
         AV_PIX_FMT_GRAY8, AV_PIX_FMT_GRAY8A,
         AV_PIX_FMT_GRAY16BE, AV_PIX_FMT_YA16BE,
         AV_PIX_FMT_MONOBLACK, AV_PIX_FMT_NONE
     },
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

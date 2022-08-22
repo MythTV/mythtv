@@ -18,6 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "config_components.h"
+
 #include "libavutil/avstring.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
@@ -35,6 +37,7 @@ typedef struct MixContext {
     const AVPixFmtDescriptor *desc;
     char *weights_str;
     int nb_inputs;
+    int nb_threads;
     int duration;
     float *weights;
     float scale;
@@ -45,9 +48,13 @@ typedef struct MixContext {
 
     int depth;
     int max;
+    int planes;
     int nb_planes;
-    int linesize[4];
+    int linesizes[4];
     int height[4];
+
+    uint8_t **data;
+    int *linesize;
 
     AVFrame **frames;
     FFFrameSync fs;
@@ -55,16 +62,17 @@ typedef struct MixContext {
 
 static int query_formats(AVFilterContext *ctx)
 {
-    AVFilterFormats *formats = NULL;
-    int ret;
+    unsigned reject_flags = AV_PIX_FMT_FLAG_BITSTREAM |
+                            AV_PIX_FMT_FLAG_HWACCEL   |
+                            AV_PIX_FMT_FLAG_PAL;
+    unsigned accept_flags = 0;
 
-    ret = ff_formats_pixdesc_filter(&formats, 0,
-                                    AV_PIX_FMT_FLAG_BITSTREAM |
-                                    AV_PIX_FMT_FLAG_PAL |
-                                    AV_PIX_FMT_FLAG_HWACCEL);
-    if (ret < 0)
-        return ret;
-    return ff_set_common_formats(ctx, formats);
+    if (!HAVE_BIGENDIAN)
+        reject_flags |= AV_PIX_FMT_FLAG_BE;
+    else
+        accept_flags |= AV_PIX_FMT_FLAG_BE;
+
+    return ff_set_common_formats(ctx, ff_formats_pixdesc_filter(accept_flags, reject_flags));
 }
 
 static int parse_weights(AVFilterContext *ctx)
@@ -125,10 +133,8 @@ static av_cold int init(AVFilterContext *ctx)
             if (!pad.name)
                 return AVERROR(ENOMEM);
 
-            if ((ret = ff_insert_inpad(ctx, i, &pad)) < 0) {
-                av_freep(&pad.name);
+            if ((ret = ff_append_inpad_free_name(ctx, &pad)) < 0)
                 return ret;
-            }
         }
     }
 
@@ -139,58 +145,68 @@ typedef struct ThreadData {
     AVFrame **in, *out;
 } ThreadData;
 
+#define MIX_SLICE(type, fun, clip)                                                              \
+    for (int p = 0; p < s->nb_planes; p++) {                                                    \
+        const int slice_start = (s->height[p] * jobnr) / nb_jobs;                               \
+        const int slice_end = (s->height[p] * (jobnr+1)) / nb_jobs;                             \
+        const int width = s->linesizes[p] / sizeof(type);                                       \
+        type *dst = (type *)(out->data[p] + slice_start * out->linesize[p]);                    \
+        ptrdiff_t dst_linesize = out->linesize[p] / sizeof(type);                               \
+                                                                                                \
+        if (!((1 << p) & s->planes)) {                                                          \
+            av_image_copy_plane((uint8_t *)dst, out->linesize[p],                               \
+                                in[0]->data[p] + slice_start * in[0]->linesize[p],              \
+                                in[0]->linesize[p],                                             \
+                                s->linesizes[p], slice_end - slice_start);                      \
+            continue;                                                                           \
+        }                                                                                       \
+                                                                                                \
+        for (int i = 0; i < s->nb_inputs; i++)                                                  \
+            linesize[i] = in[i]->linesize[p];                                                   \
+                                                                                                \
+        for (int i = 0; i < s->nb_inputs; i++)                                                  \
+            srcf[i] = in[i]->data[p] + slice_start * linesize[i];                               \
+                                                                                                \
+        for (int y = slice_start; y < slice_end; y++) {                                         \
+            for (int x = 0; x < width; x++) {                                                   \
+                float val = 0.f;                                                                \
+                                                                                                \
+                for (int i = 0; i < s->nb_inputs; i++) {                                        \
+                    float src = *(type *)(srcf[i] + x * sizeof(type));                          \
+                                                                                                \
+                    val += src * weights[i];                                                    \
+                }                                                                               \
+                                                                                                \
+                dst[x] = clip(fun(val * s->wfactor), 0, s->max);                                \
+            }                                                                                   \
+                                                                                                \
+            dst += dst_linesize;                                                                \
+            for (int i = 0; i < s->nb_inputs; i++)                                              \
+                srcf[i] += linesize[i];                                                         \
+        }                                                                                       \
+    }
+
+#define CLIP8(x, min, max) av_clip_uint8(x)
+#define CLIP16(x, min, max) av_clip(x, min, max)
+#define CLIPF(x, min, max) (x)
+#define NOP(x) (x)
+
 static int mix_frames(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
 {
     MixContext *s = ctx->priv;
     ThreadData *td = arg;
     AVFrame **in = td->in;
     AVFrame *out = td->out;
-    int i, p, x, y;
+    const float *weights = s->weights;
+    uint8_t **srcf = s->data + jobnr * s->nb_inputs;
+    int *linesize = s->linesize + jobnr * s->nb_inputs;
 
     if (s->depth <= 8) {
-        for (p = 0; p < s->nb_planes; p++) {
-            const int slice_start = (s->height[p] * jobnr) / nb_jobs;
-            const int slice_end = (s->height[p] * (jobnr+1)) / nb_jobs;
-            uint8_t *dst = out->data[p] + slice_start * out->linesize[p];
-
-            for (y = slice_start; y < slice_end; y++) {
-                for (x = 0; x < s->linesize[p]; x++) {
-                    int val = 0;
-
-                    for (i = 0; i < s->nb_inputs; i++) {
-                        uint8_t src = in[i]->data[p][y * in[i]->linesize[p] + x];
-
-                        val += src * s->weights[i];
-                    }
-
-                    dst[x] = av_clip_uint8(val * s->wfactor);
-                }
-
-                dst += out->linesize[p];
-            }
-        }
+        MIX_SLICE(uint8_t, lrintf, CLIP8)
+    } else if (s->depth <= 16) {
+        MIX_SLICE(uint16_t, lrintf, CLIP16)
     } else {
-        for (p = 0; p < s->nb_planes; p++) {
-            const int slice_start = (s->height[p] * jobnr) / nb_jobs;
-            const int slice_end = (s->height[p] * (jobnr+1)) / nb_jobs;
-            uint16_t *dst = (uint16_t *)(out->data[p] + slice_start * out->linesize[p]);
-
-            for (y = slice_start; y < slice_end; y++) {
-                for (x = 0; x < s->linesize[p] / 2; x++) {
-                    int val = 0;
-
-                    for (i = 0; i < s->nb_inputs; i++) {
-                        uint16_t src = AV_RN16(in[i]->data[p] + y * in[i]->linesize[p] + x * 2);
-
-                        val += src * s->weights[i];
-                    }
-
-                    dst[x] = av_clip(val * s->wfactor, 0, s->max);
-                }
-
-                dst += out->linesize[p] / 2;
-            }
-        }
+        MIX_SLICE(float, NOP, CLIPF)
     }
 
     return 0;
@@ -226,7 +242,8 @@ static int process_frame(FFFrameSync *fs)
 
     td.in = in;
     td.out = out;
-    ctx->internal->execute(ctx, mix_frames, &td, NULL, FFMIN(s->height[0], ff_filter_get_nb_threads(ctx)));
+    ff_filter_execute(ctx, mix_frames, &td, NULL,
+                      FFMIN(s->height[1], s->nb_threads));
 
     return ff_filter_frame(outlink, out);
 }
@@ -252,6 +269,7 @@ static int config_output(AVFilterLink *outlink)
         }
     }
 
+    s->nb_threads = ff_filter_get_nb_threads(ctx);
     s->desc = av_pix_fmt_desc_get(outlink->format);
     if (!s->desc)
         return AVERROR_BUG;
@@ -259,11 +277,19 @@ static int config_output(AVFilterLink *outlink)
     s->depth = s->desc->comp[0].depth;
     s->max = (1 << s->depth) - 1;
 
-    if ((ret = av_image_fill_linesizes(s->linesize, inlink->format, inlink->w)) < 0)
+    if ((ret = av_image_fill_linesizes(s->linesizes, inlink->format, inlink->w)) < 0)
         return ret;
 
     s->height[1] = s->height[2] = AV_CEIL_RSHIFT(inlink->h, s->desc->log2_chroma_h);
     s->height[0] = s->height[3] = inlink->h;
+
+    s->data = av_calloc(s->nb_threads * s->nb_inputs, sizeof(*s->data));
+    if (!s->data)
+        return AVERROR(ENOMEM);
+
+    s->linesize = av_calloc(s->nb_threads * s->nb_inputs, sizeof(*s->linesize));
+    if (!s->linesize)
+        return AVERROR(ENOMEM);
 
     if (s->tmix)
         return 0;
@@ -302,11 +328,10 @@ static av_cold void uninit(AVFilterContext *ctx)
 
     ff_framesync_uninit(&s->fs);
     av_freep(&s->weights);
+    av_freep(&s->data);
+    av_freep(&s->linesize);
 
-    if (!s->tmix) {
-        for (i = 0; i < ctx->nb_inputs; i++)
-            av_freep(&ctx->input_pads[i].name);
-    } else {
+    if (s->tmix) {
         for (i = 0; i < s->nb_frames && s->frames; i++)
             av_frame_free(&s->frames[i]);
     }
@@ -339,6 +364,7 @@ static const AVOption mix_options[] = {
     { "inputs", "set number of inputs", OFFSET(nb_inputs), AV_OPT_TYPE_INT, {.i64=2}, 2, INT16_MAX, .flags = FLAGS },
     { "weights", "set weight for each input", OFFSET(weights_str), AV_OPT_TYPE_STRING, {.str="1 1"}, 0, 0, .flags = TFLAGS },
     { "scale", "set scale", OFFSET(scale), AV_OPT_TYPE_FLOAT, {.dbl=0}, 0, INT16_MAX, .flags = TFLAGS },
+    { "planes", "set what planes to filter", OFFSET(planes),   AV_OPT_TYPE_FLAGS, {.i64=15}, 0, 15,  .flags = TFLAGS },
     { "duration", "how to determine end of stream", OFFSET(duration), AV_OPT_TYPE_INT, {.i64=0}, 0, 2, .flags = FLAGS, "duration" },
         { "longest",  "Duration of longest input",  0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, FLAGS, "duration" },
         { "shortest", "Duration of shortest input", 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, FLAGS, "duration" },
@@ -352,19 +378,18 @@ static const AVFilterPad outputs[] = {
         .type          = AVMEDIA_TYPE_VIDEO,
         .config_props  = config_output,
     },
-    { NULL }
 };
 
 #if CONFIG_MIX_FILTER
 AVFILTER_DEFINE_CLASS(mix);
 
-AVFilter ff_vf_mix = {
+const AVFilter ff_vf_mix = {
     .name          = "mix",
     .description   = NULL_IF_CONFIG_SMALL("Mix video inputs."),
     .priv_size     = sizeof(MixContext),
     .priv_class    = &mix_class,
-    .query_formats = query_formats,
-    .outputs       = outputs,
+    FILTER_OUTPUTS(outputs),
+    FILTER_QUERY_FUNC(query_formats),
     .init          = init,
     .uninit        = uninit,
     .activate      = activate,
@@ -390,8 +415,12 @@ static int tmix_filter_frame(AVFilterLink *inlink, AVFrame *in)
     if (s->nb_frames < s->nb_inputs) {
         s->frames[s->nb_frames] = in;
         s->nb_frames++;
-        if (s->nb_frames < s->nb_inputs)
-            return 0;
+        while (s->nb_frames < s->nb_inputs) {
+            s->frames[s->nb_frames] = av_frame_clone(s->frames[s->nb_frames - 1]);
+            if (!s->frames[s->nb_frames])
+                return AVERROR(ENOMEM);
+            s->nb_frames++;
+        }
     } else {
         av_frame_free(&s->frames[0]);
         memmove(&s->frames[0], &s->frames[1], sizeof(*s->frames) * (s->nb_inputs - 1));
@@ -408,19 +437,21 @@ static int tmix_filter_frame(AVFilterLink *inlink, AVFrame *in)
     out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
     if (!out)
         return AVERROR(ENOMEM);
-    out->pts = s->frames[0]->pts;
+    out->pts = s->frames[s->nb_frames - 1]->pts;
 
     td.out = out;
     td.in = s->frames;
-    ctx->internal->execute(ctx, mix_frames, &td, NULL, FFMIN(s->height[0], ff_filter_get_nb_threads(ctx)));
+    ff_filter_execute(ctx, mix_frames, &td, NULL,
+                      FFMIN(s->height[1], s->nb_threads));
 
     return ff_filter_frame(outlink, out);
 }
 
 static const AVOption tmix_options[] = {
-    { "frames", "set number of successive frames to mix", OFFSET(nb_inputs), AV_OPT_TYPE_INT, {.i64=3}, 1, 128, .flags = FLAGS },
+    { "frames", "set number of successive frames to mix", OFFSET(nb_inputs), AV_OPT_TYPE_INT, {.i64=3}, 1, 1024, .flags = FLAGS },
     { "weights", "set weight for each frame", OFFSET(weights_str), AV_OPT_TYPE_STRING, {.str="1 1 1"}, 0, 0, .flags = TFLAGS },
     { "scale", "set scale", OFFSET(scale), AV_OPT_TYPE_FLOAT, {.dbl=0}, 0, INT16_MAX, .flags = TFLAGS },
+    { "planes", "set what planes to filter", OFFSET(planes),   AV_OPT_TYPE_FLAGS, {.i64=15}, 0, 15,  .flags = TFLAGS },
     { NULL },
 };
 
@@ -430,19 +461,18 @@ static const AVFilterPad inputs[] = {
         .type          = AVMEDIA_TYPE_VIDEO,
         .filter_frame  = tmix_filter_frame,
     },
-    { NULL }
 };
 
 AVFILTER_DEFINE_CLASS(tmix);
 
-AVFilter ff_vf_tmix = {
+const AVFilter ff_vf_tmix = {
     .name          = "tmix",
     .description   = NULL_IF_CONFIG_SMALL("Mix successive video frames."),
     .priv_size     = sizeof(MixContext),
     .priv_class    = &tmix_class,
-    .query_formats = query_formats,
-    .outputs       = outputs,
-    .inputs        = inputs,
+    FILTER_OUTPUTS(outputs),
+    FILTER_INPUTS(inputs),
+    FILTER_QUERY_FUNC(query_formats),
     .init          = init,
     .uninit        = uninit,
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL | AVFILTER_FLAG_SLICE_THREADS,

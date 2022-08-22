@@ -21,7 +21,6 @@
 
 #include "avcodec.h"
 #include "ass.h"
-#include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
 #include "libavutil/bprint.h"
 #include "libavutil/common.h"
@@ -115,27 +114,51 @@ char *ff_ass_get_dialog(int readorder, int layer, const char *style,
                        speaker ? speaker : "", text);
 }
 
+int ff_ass_add_rect2(AVSubtitle *sub, const char *dialog,
+                    int readorder, int layer, const char *style,
+                    const char *speaker, unsigned *nb_rect_allocated)
+{
+    AVSubtitleRect **rects = sub->rects, *rect;
+    char *ass_str;
+    uint64_t new_nb = 0;
+
+    if (sub->num_rects >= UINT_MAX)
+        return AVERROR(ENOMEM);
+
+    if (nb_rect_allocated && *nb_rect_allocated <= sub->num_rects) {
+        if (sub->num_rects < UINT_MAX / 17 * 16) {
+            new_nb = sub->num_rects + sub->num_rects/16 + 1;
+        } else
+            new_nb = UINT_MAX;
+    } else if (!nb_rect_allocated)
+        new_nb = sub->num_rects + 1;
+
+    if (new_nb) {
+        rects = av_realloc_array(rects, new_nb, sizeof(*sub->rects));
+        if (!rects)
+            return AVERROR(ENOMEM);
+        if (nb_rect_allocated)
+            *nb_rect_allocated = new_nb;
+        sub->rects = rects;
+    }
+
+    rect       = av_mallocz(sizeof(*rect));
+    if (!rect)
+        return AVERROR(ENOMEM);
+    rects[sub->num_rects++] = rect;
+    rect->type = SUBTITLE_ASS;
+    ass_str = ff_ass_get_dialog(readorder, layer, style, speaker, dialog);
+    if (!ass_str)
+        return AVERROR(ENOMEM);
+    rect->ass = ass_str;
+    return 0;
+}
+
 int ff_ass_add_rect(AVSubtitle *sub, const char *dialog,
                     int readorder, int layer, const char *style,
                     const char *speaker)
 {
-    char *ass_str;
-    AVSubtitleRect **rects;
-
-    rects = av_realloc_array(sub->rects, sub->num_rects+1, sizeof(*sub->rects));
-    if (!rects)
-        return AVERROR(ENOMEM);
-    sub->rects = rects;
-    rects[sub->num_rects]       = av_mallocz(sizeof(*rects[0]));
-    if (!rects[sub->num_rects])
-        return AVERROR(ENOMEM);
-    rects[sub->num_rects]->type = SUBTITLE_ASS;
-    ass_str = ff_ass_get_dialog(readorder, layer, style, speaker, dialog);
-    if (!ass_str)
-        return AVERROR(ENOMEM);
-    rects[sub->num_rects]->ass = ass_str;
-    sub->num_rects++;
-    return 0;
+    return ff_ass_add_rect2(sub, dialog, readorder, layer, style, speaker, NULL);
 }
 
 void ff_ass_decoder_flush(AVCodecContext *avctx)

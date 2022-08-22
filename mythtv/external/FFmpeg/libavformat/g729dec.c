@@ -43,7 +43,7 @@ static int g729_read_header(AVFormatContext *s)
     st->codecpar->codec_type  = AVMEDIA_TYPE_AUDIO;
     st->codecpar->codec_id    = AV_CODEC_ID_G729;
     st->codecpar->sample_rate = 8000;
-    st->codecpar->channels    = 1;
+    st->codecpar->ch_layout   = (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
 
     if (s1 && s1->bit_rate)
         s->bit_rate = s1->bit_rate;
@@ -93,7 +93,7 @@ static const AVClass g729_demuxer_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-AVInputFormat ff_g729_demuxer = {
+const AVInputFormat ff_g729_demuxer = {
     .name           = "g729",
     .long_name      = NULL_IF_CONFIG_SMALL("G.729 raw format demuxer"),
     .priv_data_size = sizeof(G729DemuxerContext),

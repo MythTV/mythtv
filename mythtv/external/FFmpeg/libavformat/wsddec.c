@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/channel_layout.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/timecode.h"
 #include "avformat.h"
@@ -127,18 +128,21 @@ static int wsd_read_header(AVFormatContext *s)
     st->codecpar->codec_id    = s->iformat->raw_codec_id;
     st->codecpar->sample_rate = avio_rb32(pb) / 8;
     avio_skip(pb, 4);
-    st->codecpar->channels    = avio_r8(pb) & 0xF;
-    st->codecpar->bit_rate    = (int64_t)st->codecpar->channels * st->codecpar->sample_rate * 8LL;
-    if (!st->codecpar->channels)
+    st->codecpar->ch_layout.nb_channels = avio_r8(pb) & 0xF;
+    st->codecpar->bit_rate    = (int64_t)st->codecpar->ch_layout.nb_channels *
+                                st->codecpar->sample_rate * 8LL;
+    if (!st->codecpar->ch_layout.nb_channels)
         return AVERROR_INVALIDDATA;
 
     avio_skip(pb, 3);
     channel_assign         = avio_rb32(pb);
     if (!(channel_assign & 1)) {
+        uint64_t ch_mask = 0;
         int i;
         for (i = 1; i < 32; i++)
             if ((channel_assign >> i) & 1)
-                st->codecpar->channel_layout |= wsd_to_av_channel_layoyt(s, i);
+                ch_mask |= wsd_to_av_channel_layoyt(s, i);
+        av_channel_layout_from_mask(&st->codecpar->ch_layout, ch_mask);
     }
 
     avio_skip(pb, 16);
@@ -161,8 +165,7 @@ static int wsd_read_header(AVFormatContext *s)
     return avio_seek(pb, data_offset, SEEK_SET);
 }
 
-FF_RAW_DEMUXER_CLASS(wsd)
-AVInputFormat ff_wsd_demuxer = {
+const AVInputFormat ff_wsd_demuxer = {
     .name         = "wsd",
     .long_name    = NULL_IF_CONFIG_SMALL("Wideband Single-bit Data (WSD)"),
     .read_probe   = wsd_probe,
@@ -172,5 +175,5 @@ AVInputFormat ff_wsd_demuxer = {
     .flags        = AVFMT_GENERIC_INDEX | AVFMT_NO_BYTE_SEEK,
     .raw_codec_id = AV_CODEC_ID_DSD_MSBF,
     .priv_data_size = sizeof(FFRawDemuxerContext),
-    .priv_class     = &wsd_demuxer_class,
+    .priv_class     = &ff_raw_demuxer_class,
 };

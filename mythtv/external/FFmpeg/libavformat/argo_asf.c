@@ -19,8 +19,13 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
+#include "config_components.h"
+
+#include "libavutil/avstring.h"
 #include "avformat.h"
 #include "internal.h"
+#include "libavutil/channel_layout.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/avassert.h"
 #include "libavutil/opt.h"
@@ -50,8 +55,8 @@ void ff_argo_asf_parse_file_header(ArgoASFFileHeader *hdr, const uint8_t *buf)
     hdr->version_minor  = AV_RL16(buf + 6);
     hdr->num_chunks     = AV_RL32(buf + 8);
     hdr->chunk_offset   = AV_RL32(buf + 12);
-    for (int i = 0; i < FF_ARRAY_ELEMS(hdr->name); i++)
-        hdr->name[i]    = AV_RL8(buf + 16 + i);
+    memcpy(hdr->name, buf + 16, ASF_NAME_SIZE);
+    hdr->name[ASF_NAME_SIZE] = '\0';
 }
 
 int ff_argo_asf_validate_file_header(AVFormatContext *s, const ArgoASFFileHeader *hdr)
@@ -94,11 +99,9 @@ int ff_argo_asf_fill_stream(AVFormatContext *s, AVStream *st, const ArgoASFFileH
     st->codecpar->format                    = AV_SAMPLE_FMT_S16P;
 
     if (ckhdr->flags & ASF_CF_STEREO) {
-        st->codecpar->channel_layout        = AV_CH_LAYOUT_STEREO;
-        st->codecpar->channels              = 2;
+        st->codecpar->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO;
     } else {
-        st->codecpar->channel_layout        = AV_CH_LAYOUT_MONO;
-        st->codecpar->channels              = 1;
+        st->codecpar->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
     }
 
     /* v1.1 files (FX Fighter) are all marked as 44100, but are actually 22050. */
@@ -109,12 +112,7 @@ int ff_argo_asf_fill_stream(AVFormatContext *s, AVStream *st, const ArgoASFFileH
 
     st->codecpar->bits_per_coded_sample     = 4;
 
-    if (ckhdr->flags & ASF_CF_BITS_PER_SAMPLE)
-        st->codecpar->bits_per_raw_sample   = 16;
-    else
-        st->codecpar->bits_per_raw_sample   = 8;
-
-    if (st->codecpar->bits_per_raw_sample != 16) {
+    if (!(ckhdr->flags & ASF_CF_BITS_PER_SAMPLE)) {
         /* The header allows for these, but I've never seen any files with them. */
         avpriv_request_sample(s, "Non 16-bit samples");
         return AVERROR_PATCHWELCOME;
@@ -124,11 +122,11 @@ int ff_argo_asf_fill_stream(AVFormatContext *s, AVStream *st, const ArgoASFFileH
      * (nchannel control bytes) + ((bytes_per_channel) * nchannel)
      * For mono, this is 17. For stereo, this is 34.
      */
-    st->codecpar->block_align           = st->codecpar->channels +
+    st->codecpar->block_align           = st->codecpar->ch_layout.nb_channels +
                                           (ckhdr->num_samples / 2) *
-                                          st->codecpar->channels;
+                                          st->codecpar->ch_layout.nb_channels;
 
-    st->codecpar->bit_rate              = st->codecpar->channels *
+    st->codecpar->bit_rate              = st->codecpar->ch_layout.nb_channels *
                                           st->codecpar->sample_rate *
                                           st->codecpar->bits_per_coded_sample;
 
@@ -212,6 +210,8 @@ static int argo_asf_read_header(AVFormatContext *s)
 
     ff_argo_asf_parse_chunk_header(&asf->ckhdr, buf);
 
+    av_dict_set(&s->metadata, "title", asf->fhdr.name, 0);
+
     return ff_argo_asf_fill_stream(s, st, &asf->fhdr, &asf->ckhdr);
 }
 
@@ -271,7 +271,7 @@ static int argo_asf_seek(AVFormatContext *s, int stream_index,
  * - Argonaut Sound File?
  * - Audio Stream File?
  */
-AVInputFormat ff_argo_asf_demuxer = {
+const AVInputFormat ff_argo_asf_demuxer = {
     .name           = "argo_asf",
     .long_name      = NULL_IF_CONFIG_SMALL("Argonaut Games ASF"),
     .priv_data_size = sizeof(ArgoASFDemuxContext),
@@ -306,12 +306,12 @@ static int argo_asf_write_init(AVFormatContext *s)
         return AVERROR(EINVAL);
     }
 
-    if (par->channels > 2) {
+    if (par->ch_layout.nb_channels > 2) {
         av_log(s, AV_LOG_ERROR, "ASF files only support up to 2 channels\n");
         return AVERROR(EINVAL);
     }
 
-    if (par->block_align != 17 * par->channels)
+    if (par->block_align != 17 * par->ch_layout.nb_channels)
         return AVERROR(EINVAL);
 
     if (par->sample_rate > UINT16_MAX) {
@@ -334,7 +334,7 @@ static void argo_asf_write_file_header(const ArgoASFFileHeader *fhdr, AVIOContex
     avio_wl16( pb, fhdr->version_minor);
     avio_wl32( pb, fhdr->num_chunks);
     avio_wl32( pb, fhdr->chunk_offset);
-    avio_write(pb, fhdr->name, sizeof(fhdr->name));
+    avio_write(pb, fhdr->name, ASF_NAME_SIZE);
 }
 
 static void argo_asf_write_chunk_header(const ArgoASFChunkHeader *ckhdr, AVIOContext *pb)
@@ -359,25 +359,27 @@ static int argo_asf_write_header(AVFormatContext *s)
         .num_chunks    = 1,
         .chunk_offset  = ASF_FILE_HEADER_SIZE
     };
+    AVDictionaryEntry *t;
+    const char *name, *end;
+    size_t len;
 
     /*
-     * If the user specified a name, use it as is. Otherwise take the
-     * basename and lop off the extension (if any).
+     * If the user specified a name, use it as is. Otherwise,
+     * try to use metadata (if present), then fall back to the
+     * filename (minus extension).
      */
     if (ctx->name) {
-        strncpy(fhdr.name, ctx->name, sizeof(fhdr.name));
+        name = ctx->name;
+        len  = strlen(ctx->name);
+    } else if ((t = av_dict_get(s->metadata, "title", NULL, 0))) {
+        name = t->value;
+        len  = strlen(t->value);
+    } else if (!(end = strrchr((name = av_basename(s->url)), '.'))) {
+        len = strlen(name);
     } else {
-        const char *start = av_basename(s->url);
-        const char *end   = strrchr(start, '.');
-        size_t      len;
-
-        if (end)
-            len = end - start;
-        else
-            len = strlen(start);
-
-        memcpy(fhdr.name, start, FFMIN(len, sizeof(fhdr.name)));
+        len = end - name;
     }
+    memcpy(fhdr.name, name, FFMIN(len, ASF_NAME_SIZE));
 
     chdr.num_blocks    = 0;
     chdr.num_samples   = ASF_SAMPLE_COUNT;
@@ -391,7 +393,7 @@ static int argo_asf_write_header(AVFormatContext *s)
     chdr.unk2          = ~0;
     chdr.flags         = ASF_CF_BITS_PER_SAMPLE | ASF_CF_ALWAYS1;
 
-    if (par->channels == 2)
+    if (par->ch_layout.nb_channels == 2)
         chdr.flags |= ASF_CF_STEREO;
 
     argo_asf_write_file_header(&fhdr, s->pb);
@@ -422,7 +424,7 @@ static int argo_asf_write_trailer(AVFormatContext *s)
     ArgoASFMuxContext *ctx = s->priv_data;
     int64_t ret;
 
-    if ((ret = avio_seek(s->pb, ASF_FILE_HEADER_SIZE, SEEK_SET) < 0))
+    if ((ret = avio_seek(s->pb, ASF_FILE_HEADER_SIZE, SEEK_SET)) < 0)
         return ret;
 
     avio_wl32(s->pb, (uint32_t)ctx->nb_blocks);
@@ -468,7 +470,7 @@ static const AVClass argo_asf_muxer_class = {
     .version    = LIBAVUTIL_VERSION_INT
 };
 
-AVOutputFormat ff_argo_asf_muxer = {
+const AVOutputFormat ff_argo_asf_muxer = {
     .name           = "argo_asf",
     .long_name      = NULL_IF_CONFIG_SMALL("Argonaut Games ASF"),
     /*

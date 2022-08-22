@@ -51,10 +51,12 @@
 #include "libavutil/opt.h"
 #include "libavutil/random_seed.h"
 #include "libavutil/parseutils.h"
+#include "libavutil/time.h"
 #include "libavutil/timecode.h"
 #include "libavutil/time_internal.h"
 #include "libavutil/tree.h"
 #include "libavutil/lfg.h"
+#include "libavutil/detection_bbox.h"
 #include "avfilter.h"
 #include "drawutils.h"
 #include "formats.h"
@@ -197,8 +199,10 @@ typedef struct DrawTextContext {
     AVRational  tc_rate;            ///< frame rate for timecode
     AVTimecode  tc;                 ///< timecode context
     int tc24hmax;                   ///< 1 if timecode is wrapped to 24 hours, 0 otherwise
-    int reload;                     ///< reload text file for each frame
+    int reload;                     ///< reload text file at specified frame interval
     int start_number;               ///< starting frame number for n/frame_num var
+    char *text_source_string;       ///< the string to specify text data source
+    enum AVFrameSideDataType text_source;
 #if CONFIG_LIBFRIBIDI
     int text_shaping;               ///< 1 to shape the text before drawing it
 #endif
@@ -242,10 +246,11 @@ static const AVOption drawtext_options[]= {
     {"timecode_rate",   "set rate (timecode only)",         OFFSET(tc_rate),       AV_OPT_TYPE_RATIONAL, {.dbl=0},           0,  INT_MAX, FLAGS},
     {"r",               "set rate (timecode only)",         OFFSET(tc_rate),       AV_OPT_TYPE_RATIONAL, {.dbl=0},           0,  INT_MAX, FLAGS},
     {"rate",            "set rate (timecode only)",         OFFSET(tc_rate),       AV_OPT_TYPE_RATIONAL, {.dbl=0},           0,  INT_MAX, FLAGS},
-    {"reload",     "reload text file for each frame",                       OFFSET(reload),     AV_OPT_TYPE_BOOL, {.i64=0}, 0, 1, FLAGS},
+    {"reload",     "reload text file at specified frame interval", OFFSET(reload),     AV_OPT_TYPE_INT, {.i64=0}, 0, INT_MAX, FLAGS},
     { "alpha",       "apply alpha while rendering", OFFSET(a_expr),      AV_OPT_TYPE_STRING, { .str = "1"     },          .flags = FLAGS },
     {"fix_bounds", "check and fix text coords to avoid clipping", OFFSET(fix_bounds), AV_OPT_TYPE_BOOL, {.i64=0}, 0, 1, FLAGS},
     {"start_number", "start frame number for n/frame_num variable", OFFSET(start_number), AV_OPT_TYPE_INT, {.i64=0}, 0, INT_MAX, FLAGS},
+    {"text_source", "the source of text", OFFSET(text_source_string), AV_OPT_TYPE_STRING, {.str=NULL}, 0, 1, FLAGS },
 
 #if CONFIG_LIBFRIBIDI
     {"text_shaping", "attempt to shape text before drawing", OFFSET(text_shaping), AV_OPT_TYPE_BOOL, {.i64=1}, 0, 1, FLAGS},
@@ -690,6 +695,16 @@ out:
 }
 #endif
 
+static enum AVFrameSideDataType text_source_string_parse(const char *text_source_string)
+{
+    av_assert0(text_source_string);
+    if (!strcmp(text_source_string, "side_data_detection_bboxes")) {
+        return AV_FRAME_DATA_DETECTION_BBOXES;
+    } else {
+        return AVERROR(EINVAL);
+    }
+}
+
 static av_cold int init(AVFilterContext *ctx)
 {
     int err;
@@ -731,9 +746,28 @@ static av_cold int init(AVFilterContext *ctx)
             s->text = av_strdup("");
     }
 
+    if (s->text_source_string) {
+        s->text_source = text_source_string_parse(s->text_source_string);
+        if ((int)s->text_source < 0) {
+            av_log(ctx, AV_LOG_ERROR, "Error text source: %s\n", s->text_source_string);
+            return AVERROR(EINVAL);
+        }
+    }
+
+    if (s->text_source == AV_FRAME_DATA_DETECTION_BBOXES) {
+        if (s->text) {
+            av_log(ctx, AV_LOG_WARNING, "Multiple texts provided, will use text_source only\n");
+            av_free(s->text);
+        }
+        s->text = av_mallocz(AV_DETECTION_BBOX_LABEL_NAME_MAX_SIZE *
+                             (AV_NUM_DETECTION_BBOX_CLASSIFY + 1));
+        if (!s->text)
+            return AVERROR(ENOMEM);
+    }
+
     if (!s->text) {
         av_log(ctx, AV_LOG_ERROR,
-               "Either text, a valid file or a timecode must be provided\n");
+               "Either text, a valid file, a timecode or text source must be provided\n");
         return AVERROR(EINVAL);
     }
 
@@ -1012,15 +1046,78 @@ static int func_strftime(AVFilterContext *ctx, AVBPrint *bp,
                          char *fct, unsigned argc, char **argv, int tag)
 {
     const char *fmt = argc ? argv[0] : "%Y-%m-%d %H:%M:%S";
+    const char *fmt_begin = fmt;
+    int64_t unow;
     time_t now;
     struct tm tm;
+    const char *begin;
+    const char *tmp;
+    int len;
+    int div;
+    AVBPrint fmt_bp;
 
-    time(&now);
-    if (tag == 'L')
+    av_bprint_init(&fmt_bp, 0, AV_BPRINT_SIZE_UNLIMITED);
+
+    unow = av_gettime();
+    now  = unow / 1000000;
+    if (tag == 'L' || tag == 'm')
         localtime_r(&now, &tm);
     else
         tm = *gmtime_r(&now, &tm);
-    av_bprint_strftime(bp, fmt, &tm);
+
+    // manually parse format for %N (fractional seconds)
+    begin = fmt;
+    while ((begin = strchr(begin, '%'))) {
+        tmp = begin + 1;
+        len = 0;
+
+        // skip escaped "%%"
+        if (*tmp == '%') {
+            begin = tmp + 1;
+            continue;
+        }
+
+        // count digits between % and possible N
+        while (*tmp != '\0' && av_isdigit((int)*tmp)) {
+            len++;
+            tmp++;
+        }
+
+        // N encountered, insert time
+        if (*tmp == 'N') {
+            int num_digits = 3; // default show millisecond [1,6]
+
+            // if digit given, expect [1,6], warn & clamp otherwise
+            if (len == 1) {
+                num_digits = av_clip(*(begin + 1) - '0', 1, 6);
+            } else if (len > 1) {
+                av_log(ctx, AV_LOG_WARNING, "Invalid number of decimals for %%N, using default of %i\n", num_digits);
+            }
+
+            len += 2; // add % and N to get length of string part
+
+            div = pow(10, 6 - num_digits);
+
+            av_bprintf(&fmt_bp, "%.*s%0*d", (int)(begin - fmt_begin), fmt_begin, num_digits, (int)(unow % 1000000) / div);
+
+            begin += len;
+            fmt_begin = begin;
+
+            continue;
+        }
+
+        begin = tmp;
+    }
+
+    av_bprintf(&fmt_bp, "%s", fmt_begin);
+    if (!av_bprint_is_complete(&fmt_bp)) {
+        av_log(ctx, AV_LOG_WARNING, "Format string truncated at %u/%u.", fmt_bp.size, fmt_bp.len);
+    }
+
+    av_bprint_strftime(bp, fmt_bp.str, &tm);
+
+    av_bprint_finalize(&fmt_bp, NULL);
+
     return 0;
 }
 
@@ -1440,10 +1537,15 @@ continue_on_invalid2:
 
     s->var_values[VAR_LINE_H] = s->var_values[VAR_LH] = s->max_glyph_h;
 
-    s->x = s->var_values[VAR_X] = av_expr_eval(s->x_pexpr, s->var_values, &s->prng);
-    s->y = s->var_values[VAR_Y] = av_expr_eval(s->y_pexpr, s->var_values, &s->prng);
-    /* It is necessary if x is expressed from y  */
-    s->x = s->var_values[VAR_X] = av_expr_eval(s->x_pexpr, s->var_values, &s->prng);
+    if (s->text_source == AV_FRAME_DATA_DETECTION_BBOXES) {
+        s->var_values[VAR_X] = s->x;
+        s->var_values[VAR_Y] = s->y;
+    } else {
+        s->x = s->var_values[VAR_X] = av_expr_eval(s->x_pexpr, s->var_values, &s->prng);
+        s->y = s->var_values[VAR_Y] = av_expr_eval(s->y_pexpr, s->var_values, &s->prng);
+        /* It is necessary if x is expressed from y  */
+        s->x = s->var_values[VAR_X] = av_expr_eval(s->x_pexpr, s->var_values, &s->prng);
+    }
 
     update_alpha(s);
     update_color_with_alpha(s, &fontcolor  , s->fontcolor  );
@@ -1511,8 +1613,23 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
     AVFilterLink *outlink = ctx->outputs[0];
     DrawTextContext *s = ctx->priv;
     int ret;
+    const AVDetectionBBoxHeader *header = NULL;
+    const AVDetectionBBox *bbox;
+    AVFrameSideData *sd;
+    int loop = 1;
 
-    if (s->reload) {
+    if (s->text_source == AV_FRAME_DATA_DETECTION_BBOXES) {
+        sd = av_frame_get_side_data(frame, AV_FRAME_DATA_DETECTION_BBOXES);
+        if (sd) {
+            header = (AVDetectionBBoxHeader *)sd->data;
+            loop = header->nb_bboxes;
+        } else {
+            av_log(s, AV_LOG_WARNING, "No detection bboxes.\n");
+            return ff_filter_frame(outlink, frame);
+        }
+    }
+
+    if (s->reload && !(inlink->frame_count_out % s->reload)) {
         if ((ret = load_textfile(ctx)) < 0) {
             av_frame_free(&frame);
             return ret;
@@ -1536,7 +1653,19 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
     s->var_values[VAR_PKT_SIZE] = frame->pkt_size;
     s->metadata = frame->metadata;
 
-    draw_text(ctx, frame, frame->width, frame->height);
+    for (int i = 0; i < loop; i++) {
+        if (header) {
+            bbox = av_get_detection_bbox(header, i);
+            strcpy(s->text, bbox->detect_label);
+            for (int j = 0; j < bbox->classify_count; j++) {
+                strcat(s->text, ", ");
+                strcat(s->text, bbox->classify_labels[j]);
+            }
+            s->x = bbox->x;
+            s->y = bbox->y - s->fontsize;
+        }
+        draw_text(ctx, frame, frame->width, frame->height);
+    }
 
     av_log(ctx, AV_LOG_DEBUG, "n:%d t:%f text_w:%d text_h:%d x:%d y:%d\n",
            (int)s->var_values[VAR_N], s->var_values[VAR_T],
@@ -1550,11 +1679,10 @@ static const AVFilterPad avfilter_vf_drawtext_inputs[] = {
     {
         .name           = "default",
         .type           = AVMEDIA_TYPE_VIDEO,
+        .flags          = AVFILTERPAD_FLAG_NEEDS_WRITABLE,
         .filter_frame   = filter_frame,
         .config_props   = config_input,
-        .needs_writable = 1,
     },
-    { NULL }
 };
 
 static const AVFilterPad avfilter_vf_drawtext_outputs[] = {
@@ -1562,19 +1690,18 @@ static const AVFilterPad avfilter_vf_drawtext_outputs[] = {
         .name = "default",
         .type = AVMEDIA_TYPE_VIDEO,
     },
-    { NULL }
 };
 
-AVFilter ff_vf_drawtext = {
+const AVFilter ff_vf_drawtext = {
     .name          = "drawtext",
     .description   = NULL_IF_CONFIG_SMALL("Draw text on top of video frames using libfreetype library."),
     .priv_size     = sizeof(DrawTextContext),
     .priv_class    = &drawtext_class,
     .init          = init,
     .uninit        = uninit,
-    .query_formats = query_formats,
-    .inputs        = avfilter_vf_drawtext_inputs,
-    .outputs       = avfilter_vf_drawtext_outputs,
+    FILTER_INPUTS(avfilter_vf_drawtext_inputs),
+    FILTER_OUTPUTS(avfilter_vf_drawtext_outputs),
+    FILTER_QUERY_FUNC(query_formats),
     .process_command = command,
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
 };

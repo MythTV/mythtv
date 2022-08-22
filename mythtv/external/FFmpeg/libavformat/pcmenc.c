@@ -19,12 +19,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "config_components.h"
+
 #include "avformat.h"
 #include "rawenc.h"
 
 #define PCMDEF_0(name_, long_name_, ext, codec)
 #define PCMDEF_1(name_, long_name_, ext, codec)             \
-AVOutputFormat ff_pcm_ ## name_ ## _muxer = {               \
+const AVOutputFormat ff_pcm_ ## name_ ## _muxer = {         \
     .name         = #name_,                                 \
     .long_name    = NULL_IF_CONFIG_SMALL(long_name_),       \
     .extensions   = ext,                                    \

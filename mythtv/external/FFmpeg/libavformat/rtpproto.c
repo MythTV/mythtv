@@ -61,13 +61,14 @@ typedef struct RTPContext {
     char *block;
     char *fec_options_str;
     int64_t rw_timeout;
+    char *localaddr;
 } RTPContext;
 
 #define OFFSET(x) offsetof(RTPContext, x)
 #define D AV_OPT_FLAG_DECODING_PARAM
 #define E AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
-    { "ttl",                "Time to live (in milliseconds, multicast only)",                   OFFSET(ttl),             AV_OPT_TYPE_INT,    { .i64 = -1 },    -1, INT_MAX, .flags = D|E },
+    { "ttl",                "Time to live (multicast only)",                                    OFFSET(ttl),             AV_OPT_TYPE_INT,    { .i64 = -1 },    -1, 255,     .flags = D|E },
     { "buffer_size",        "Send/Receive buffer size (in bytes)",                              OFFSET(buffer_size),     AV_OPT_TYPE_INT,    { .i64 = -1 },    -1, INT_MAX, .flags = D|E },
     { "rtcp_port",          "Custom rtcp port",                                                 OFFSET(rtcp_port),       AV_OPT_TYPE_INT,    { .i64 = -1 },    -1, INT_MAX, .flags = D|E },
     { "local_rtpport",      "Local rtp port",                                                   OFFSET(local_rtpport),   AV_OPT_TYPE_INT,    { .i64 = -1 },    -1, INT_MAX, .flags = D|E },
@@ -80,6 +81,7 @@ static const AVOption options[] = {
     { "sources",            "Source list",                                                      OFFSET(sources),         AV_OPT_TYPE_STRING, { .str = NULL },               .flags = D|E },
     { "block",              "Block list",                                                       OFFSET(block),           AV_OPT_TYPE_STRING, { .str = NULL },               .flags = D|E },
     { "fec",                "FEC",                                                              OFFSET(fec_options_str), AV_OPT_TYPE_STRING, { .str = NULL },               .flags = E },
+    { "localaddr",          "Local address",                                                    OFFSET(localaddr),       AV_OPT_TYPE_STRING, { .str = NULL },               .flags = D|E },
     { NULL }
 };
 
@@ -173,6 +175,7 @@ static av_printf_format(3, 4) void url_add_option(char *buf, int buf_size, const
 static void build_udp_url(RTPContext *s,
                           char *buf, int buf_size,
                           const char *hostname,
+                          const char *localaddr,
                           int port, int local_port,
                           const char *include_sources,
                           const char *exclude_sources)
@@ -195,6 +198,8 @@ static void build_udp_url(RTPContext *s,
         url_add_option(buf, buf_size, "sources=%s", include_sources);
     if (exclude_sources && exclude_sources[0])
         url_add_option(buf, buf_size, "block=%s", exclude_sources);
+    if (localaddr && localaddr[0])
+        url_add_option(buf, buf_size, "localaddr=%s", localaddr);
 }
 
 /**
@@ -284,6 +289,12 @@ static int rtp_open(URLContext *h, const char *uri, int flags)
             ff_ip_parse_blocks(h, s->block, &s->filters);
             block = s->block;
         }
+        if (av_find_info_tag(buf, sizeof(buf), "localaddr", p)) {
+            av_freep(&s->localaddr);
+            s->localaddr = av_strdup(buf);
+            if (!s->localaddr)
+                goto fail;
+        }
     }
     if (s->rw_timeout >= 0)
         h->rw_timeout = s->rw_timeout;
@@ -314,7 +325,7 @@ static int rtp_open(URLContext *h, const char *uri, int flags)
 
     for (i = 0; i < max_retry_count; i++) {
         build_udp_url(s, buf, sizeof(buf),
-                      hostname, rtp_port, s->local_rtpport,
+                      hostname, s->localaddr, rtp_port, s->local_rtpport,
                       sources, block);
         if (ffurl_open_whitelist(&s->rtp_hd, buf, flags, &h->interrupt_callback,
                                  NULL, h->protocol_whitelist, h->protocol_blacklist, h) < 0)
@@ -328,7 +339,7 @@ static int rtp_open(URLContext *h, const char *uri, int flags)
         if (s->local_rtcpport < 0) {
             s->local_rtcpport = s->local_rtpport + 1;
             build_udp_url(s, buf, sizeof(buf),
-                          hostname, s->rtcp_port, s->local_rtcpport,
+                          hostname, s->localaddr, s->rtcp_port, s->local_rtcpport,
                           sources, block);
             if (ffurl_open_whitelist(&s->rtcp_hd, buf, rtcpflags,
                                      &h->interrupt_callback, NULL,
@@ -339,7 +350,7 @@ static int rtp_open(URLContext *h, const char *uri, int flags)
             break;
         }
         build_udp_url(s, buf, sizeof(buf),
-                      hostname, s->rtcp_port, s->local_rtcpport,
+                      hostname, s->localaddr, s->rtcp_port, s->local_rtcpport,
                       sources, block);
         if (ffurl_open_whitelist(&s->rtcp_hd, buf, rtcpflags, &h->interrupt_callback,
                                  NULL, h->protocol_whitelist, h->protocol_blacklist, h) < 0)

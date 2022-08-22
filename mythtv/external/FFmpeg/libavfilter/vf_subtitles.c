@@ -30,6 +30,7 @@
 #include <ass/ass.h>
 
 #include "config.h"
+#include "config_components.h"
 #if CONFIG_SUBTITLES_FILTER
 # include "libavcodec/avcodec.h"
 # include "libavformat/avformat.h"
@@ -111,6 +112,7 @@ static av_cold int init(AVFilterContext *ctx)
     ass_set_message_cb(ass->library, ass_log, ctx);
 
     ass_set_fonts_dir(ass->library, ass->fontsdir);
+    ass_set_extract_fonts(ass->library, 1);
 
     ass->renderer = ass_renderer_init(ass->library);
     if (!ass->renderer) {
@@ -145,9 +147,13 @@ static int config_input(AVFilterLink *inlink)
     ff_draw_init(&ass->draw, inlink->format, ass->alpha ? FF_DRAW_PROCESS_ALPHA : 0);
 
     ass_set_frame_size  (ass->renderer, inlink->w, inlink->h);
-    if (ass->original_w && ass->original_h)
-        ass_set_aspect_ratio(ass->renderer, (double)inlink->w / inlink->h,
-                             (double)ass->original_w / ass->original_h);
+    if (ass->original_w && ass->original_h) {
+        ass_set_pixel_aspect(ass->renderer, (double)inlink->w / inlink->h /
+                             ((double)ass->original_w / ass->original_h));
+        ass_set_storage_size(ass->renderer, ass->original_w, ass->original_h);
+    } else
+        ass_set_storage_size(ass->renderer, inlink->w, inlink->h);
+
     if (ass->shaping != -1)
         ass_set_shaper(ass->renderer, ass->shaping);
 
@@ -197,11 +203,10 @@ static const AVFilterPad ass_inputs[] = {
     {
         .name             = "default",
         .type             = AVMEDIA_TYPE_VIDEO,
+        .flags            = AVFILTERPAD_FLAG_NEEDS_WRITABLE,
         .filter_frame     = filter_frame,
         .config_props     = config_input,
-        .needs_writable   = 1,
     },
-    { NULL }
 };
 
 static const AVFilterPad ass_outputs[] = {
@@ -209,7 +214,6 @@ static const AVFilterPad ass_outputs[] = {
         .name = "default",
         .type = AVMEDIA_TYPE_VIDEO,
     },
-    { NULL }
 };
 
 #if CONFIG_ASS_FILTER
@@ -246,15 +250,15 @@ static av_cold int init_ass(AVFilterContext *ctx)
     return 0;
 }
 
-AVFilter ff_vf_ass = {
+const AVFilter ff_vf_ass = {
     .name          = "ass",
     .description   = NULL_IF_CONFIG_SMALL("Render ASS subtitles onto input video using the libass library."),
     .priv_size     = sizeof(AssContext),
     .init          = init_ass,
     .uninit        = uninit,
-    .query_formats = query_formats,
-    .inputs        = ass_inputs,
-    .outputs       = ass_outputs,
+    FILTER_INPUTS(ass_inputs),
+    FILTER_OUTPUTS(ass_outputs),
+    FILTER_QUERY_FUNC(query_formats),
     .priv_class    = &ass_class,
 };
 #endif
@@ -271,6 +275,13 @@ static const AVOption subtitles_options[] = {
 };
 
 static const char * const font_mimetypes[] = {
+    "font/ttf",
+    "font/otf",
+    "font/sfnt",
+    "font/woff",
+    "font/woff2",
+    "application/font-sfnt",
+    "application/font-woff",
     "application/x-truetype-font",
     "application/vnd.ms-opentype",
     "application/x-font-ttf",
@@ -396,7 +407,6 @@ static av_cold int init_subtitles(AVFilterContext *ctx)
     }
     if (ass->charenc)
         av_dict_set(&codec_opts, "sub_charenc", ass->charenc, 0);
-    av_dict_set(&codec_opts, "sub_text_format", "ass", 0);
 
     dec_ctx = avcodec_alloc_context3(dec);
     if (!dec_ctx) {
@@ -480,15 +490,15 @@ end:
     return ret;
 }
 
-AVFilter ff_vf_subtitles = {
+const AVFilter ff_vf_subtitles = {
     .name          = "subtitles",
     .description   = NULL_IF_CONFIG_SMALL("Render text subtitles onto input video using the libass library."),
     .priv_size     = sizeof(AssContext),
     .init          = init_subtitles,
     .uninit        = uninit,
-    .query_formats = query_formats,
-    .inputs        = ass_inputs,
-    .outputs       = ass_outputs,
+    FILTER_INPUTS(ass_inputs),
+    FILTER_OUTPUTS(ass_outputs),
+    FILTER_QUERY_FUNC(query_formats),
     .priv_class    = &subtitles_class,
 };
 #endif

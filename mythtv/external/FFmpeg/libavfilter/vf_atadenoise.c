@@ -52,6 +52,7 @@ typedef struct ATADenoiseContext {
     int nb_planes;
     int planewidth[4];
     int planeheight[4];
+    int linesizes[4];
 
     struct FFBufQueue q;
     void *data[4][SIZE];
@@ -89,42 +90,35 @@ static const AVOption atadenoise_options[] = {
 
 AVFILTER_DEFINE_CLASS(atadenoise);
 
-static int query_formats(AVFilterContext *ctx)
-{
-    static const enum AVPixelFormat pixel_fmts[] = {
-        AV_PIX_FMT_GRAY8,
-        AV_PIX_FMT_GRAY9,
-        AV_PIX_FMT_GRAY10,
-        AV_PIX_FMT_GRAY12,
-        AV_PIX_FMT_GRAY14,
-        AV_PIX_FMT_GRAY16,
-        AV_PIX_FMT_YUV410P, AV_PIX_FMT_YUV411P,
-        AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV422P,
-        AV_PIX_FMT_YUV440P, AV_PIX_FMT_YUV444P,
-        AV_PIX_FMT_YUVJ420P, AV_PIX_FMT_YUVJ422P,
-        AV_PIX_FMT_YUVJ440P, AV_PIX_FMT_YUVJ444P,
-        AV_PIX_FMT_YUVJ411P,
-        AV_PIX_FMT_YUV420P9, AV_PIX_FMT_YUV422P9, AV_PIX_FMT_YUV444P9,
-        AV_PIX_FMT_YUV420P10, AV_PIX_FMT_YUV422P10, AV_PIX_FMT_YUV444P10,
-        AV_PIX_FMT_YUV440P10,
-        AV_PIX_FMT_YUV444P12, AV_PIX_FMT_YUV422P12, AV_PIX_FMT_YUV420P12,
-        AV_PIX_FMT_YUV440P12,
-        AV_PIX_FMT_YUV444P14, AV_PIX_FMT_YUV422P14, AV_PIX_FMT_YUV420P14,
-        AV_PIX_FMT_YUV420P16, AV_PIX_FMT_YUV422P16, AV_PIX_FMT_YUV444P16,
-        AV_PIX_FMT_GBRP, AV_PIX_FMT_GBRP9, AV_PIX_FMT_GBRP10,
-        AV_PIX_FMT_GBRP12, AV_PIX_FMT_GBRP14, AV_PIX_FMT_GBRP16,
-        AV_PIX_FMT_YUVA420P,  AV_PIX_FMT_YUVA422P,   AV_PIX_FMT_YUVA444P,
-        AV_PIX_FMT_YUVA444P9, AV_PIX_FMT_YUVA444P10, AV_PIX_FMT_YUVA444P12, AV_PIX_FMT_YUVA444P16,
-        AV_PIX_FMT_YUVA422P9, AV_PIX_FMT_YUVA422P10, AV_PIX_FMT_YUVA422P12, AV_PIX_FMT_YUVA422P16,
-        AV_PIX_FMT_YUVA420P9, AV_PIX_FMT_YUVA420P10, AV_PIX_FMT_YUVA420P16,
-        AV_PIX_FMT_GBRAP,     AV_PIX_FMT_GBRAP10,    AV_PIX_FMT_GBRAP12,    AV_PIX_FMT_GBRAP16,
-        AV_PIX_FMT_NONE
-    };
-    AVFilterFormats *formats = ff_make_format_list(pixel_fmts);
-    if (!formats)
-        return AVERROR(ENOMEM);
-    return ff_set_common_formats(ctx, formats);
-}
+static const enum AVPixelFormat pixel_fmts[] = {
+    AV_PIX_FMT_GRAY8,
+    AV_PIX_FMT_GRAY9,
+    AV_PIX_FMT_GRAY10,
+    AV_PIX_FMT_GRAY12,
+    AV_PIX_FMT_GRAY14,
+    AV_PIX_FMT_GRAY16,
+    AV_PIX_FMT_YUV410P, AV_PIX_FMT_YUV411P,
+    AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV422P,
+    AV_PIX_FMT_YUV440P, AV_PIX_FMT_YUV444P,
+    AV_PIX_FMT_YUVJ420P, AV_PIX_FMT_YUVJ422P,
+    AV_PIX_FMT_YUVJ440P, AV_PIX_FMT_YUVJ444P,
+    AV_PIX_FMT_YUVJ411P,
+    AV_PIX_FMT_YUV420P9, AV_PIX_FMT_YUV422P9, AV_PIX_FMT_YUV444P9,
+    AV_PIX_FMT_YUV420P10, AV_PIX_FMT_YUV422P10, AV_PIX_FMT_YUV444P10,
+    AV_PIX_FMT_YUV440P10,
+    AV_PIX_FMT_YUV444P12, AV_PIX_FMT_YUV422P12, AV_PIX_FMT_YUV420P12,
+    AV_PIX_FMT_YUV440P12,
+    AV_PIX_FMT_YUV444P14, AV_PIX_FMT_YUV422P14, AV_PIX_FMT_YUV420P14,
+    AV_PIX_FMT_YUV420P16, AV_PIX_FMT_YUV422P16, AV_PIX_FMT_YUV444P16,
+    AV_PIX_FMT_GBRP, AV_PIX_FMT_GBRP9, AV_PIX_FMT_GBRP10,
+    AV_PIX_FMT_GBRP12, AV_PIX_FMT_GBRP14, AV_PIX_FMT_GBRP16,
+    AV_PIX_FMT_YUVA420P,  AV_PIX_FMT_YUVA422P,   AV_PIX_FMT_YUVA444P,
+    AV_PIX_FMT_YUVA444P9, AV_PIX_FMT_YUVA444P10, AV_PIX_FMT_YUVA444P12, AV_PIX_FMT_YUVA444P16,
+    AV_PIX_FMT_YUVA422P9, AV_PIX_FMT_YUVA422P10, AV_PIX_FMT_YUVA422P12, AV_PIX_FMT_YUVA422P16,
+    AV_PIX_FMT_YUVA420P9, AV_PIX_FMT_YUVA420P10, AV_PIX_FMT_YUVA420P16,
+    AV_PIX_FMT_GBRAP,     AV_PIX_FMT_GBRAP10,    AV_PIX_FMT_GBRAP12,    AV_PIX_FMT_GBRAP16,
+    AV_PIX_FMT_NONE
+};
 
 static av_cold int init(AVFilterContext *ctx)
 {
@@ -160,7 +154,6 @@ static void fweight_row##name(const uint8_t *ssrc, uint8_t *ddst,           \
        unsigned ldiff, rdiff;                                               \
        float sum = srcx;                                                    \
        float wsum = 1.f;                                                    \
-       int l = 0, r = 0;                                                    \
        int srcjx, srcix;                                                    \
                                                                             \
        for (int j = mid - 1, i = mid + 1; j >= 0 && i < size; j--, i++) {   \
@@ -171,7 +164,6 @@ static void fweight_row##name(const uint8_t *ssrc, uint8_t *ddst,           \
            if (ldiff > thra ||                                              \
                lsumdiff > thrb)                                             \
                break;                                                       \
-           l++;                                                             \
            sum += srcjx * weights[j];                                       \
            wsum += weights[j];                                              \
                                                                             \
@@ -182,7 +174,6 @@ static void fweight_row##name(const uint8_t *ssrc, uint8_t *ddst,           \
            if (rdiff > thra ||                                              \
                rsumdiff > thrb)                                             \
                break;                                                       \
-           r++;                                                             \
            sum += srcix * weights[i];                                       \
            wsum += weights[i];                                              \
        }                                                                    \
@@ -211,7 +202,6 @@ static void fweight_row##name##_serial(const uint8_t *ssrc, uint8_t *ddst,  \
        unsigned ldiff, rdiff;                                               \
        float sum = srcx;                                                    \
        float wsum = 1.f;                                                    \
-       int l = 0, r = 0;                                                    \
        int srcjx, srcix;                                                    \
                                                                             \
        for (int j = mid - 1; j >= 0; j--) {                                 \
@@ -222,7 +212,6 @@ static void fweight_row##name##_serial(const uint8_t *ssrc, uint8_t *ddst,  \
            if (ldiff > thra ||                                              \
                lsumdiff > thrb)                                             \
                break;                                                       \
-           l++;                                                             \
            sum += srcjx * weights[j];                                       \
            wsum += weights[j];                                              \
        }                                                                    \
@@ -235,7 +224,6 @@ static void fweight_row##name##_serial(const uint8_t *ssrc, uint8_t *ddst,  \
            if (rdiff > thra ||                                              \
                rsumdiff > thrb)                                             \
                break;                                                       \
-           r++;                                                             \
            sum += srcix * weights[i];                                       \
            wsum += weights[i];                                              \
        }                                                                    \
@@ -370,7 +358,7 @@ static int filter_slice(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
 
         if (!((1 << p) & s->planes)) {
             av_image_copy_plane(dst, out->linesize[p], src, in->linesize[p],
-                                w, slice_end - slice_start);
+                                s->linesizes[p], slice_end - slice_start);
             continue;
         }
 
@@ -396,7 +384,7 @@ static int config_input(AVFilterLink *inlink)
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(inlink->format);
     AVFilterContext *ctx = inlink->dst;
     ATADenoiseContext *s = ctx->priv;
-    int depth;
+    int depth, ret;
 
     s->nb_planes = desc->nb_components;
 
@@ -407,6 +395,9 @@ static int config_input(AVFilterLink *inlink)
 
     depth = desc->comp[0].depth;
     s->filter_slice = filter_slice;
+
+    if ((ret = av_image_fill_linesizes(s->linesizes, inlink->format, inlink->w)) < 0)
+        return ret;
 
     for (int p = 0; p < s->nb_planes; p++) {
         if (depth == 8 && s->sigma[p] == INT16_MAX)
@@ -436,8 +427,9 @@ static int config_input(AVFilterLink *inlink)
         }
     }
 
-    if (ARCH_X86)
-        ff_atadenoise_init_x86(&s->dsp, depth, s->algorithm, s->sigma);
+#if ARCH_X86
+    ff_atadenoise_init_x86(&s->dsp, depth, s->algorithm, s->sigma);
+#endif
 
     return 0;
 }
@@ -491,7 +483,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
         }
 
         td.in = in; td.out = out;
-        ctx->internal->execute(ctx, s->filter_slice, &td, NULL,
+        ff_filter_execute(ctx, s->filter_slice, &td, NULL,
                                FFMIN3(s->planeheight[1],
                                       s->planeheight[2],
                                       ff_filter_get_nb_threads(ctx)));
@@ -560,7 +552,6 @@ static const AVFilterPad inputs[] = {
         .filter_frame = filter_frame,
         .config_props = config_input,
     },
-    { NULL }
 };
 
 static const AVFilterPad outputs[] = {
@@ -569,19 +560,18 @@ static const AVFilterPad outputs[] = {
         .type          = AVMEDIA_TYPE_VIDEO,
         .request_frame = request_frame,
     },
-    { NULL }
 };
 
-AVFilter ff_vf_atadenoise = {
+const AVFilter ff_vf_atadenoise = {
     .name          = "atadenoise",
     .description   = NULL_IF_CONFIG_SMALL("Apply an Adaptive Temporal Averaging Denoiser."),
     .priv_size     = sizeof(ATADenoiseContext),
     .priv_class    = &atadenoise_class,
     .init          = init,
     .uninit        = uninit,
-    .query_formats = query_formats,
-    .inputs        = inputs,
-    .outputs       = outputs,
+    FILTER_INPUTS(inputs),
+    FILTER_OUTPUTS(outputs),
+    FILTER_PIXFMTS_ARRAY(pixel_fmts),
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL | AVFILTER_FLAG_SLICE_THREADS,
     .process_command = process_command,
 };

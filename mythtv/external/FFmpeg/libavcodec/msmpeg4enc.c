@@ -32,15 +32,18 @@
 
 #include "libavutil/attributes.h"
 #include "libavutil/avutil.h"
+#include "libavutil/thread.h"
+#include "codec_internal.h"
 #include "mpegvideo.h"
+#include "mpegvideoenc.h"
 #include "h263.h"
-#include "internal.h"
+#include "h263data.h"
 #include "mpeg4video.h"
 #include "msmpeg4.h"
 #include "msmpeg4data.h"
+#include "msmpeg4enc.h"
 #include "put_bits.h"
 #include "rl.h"
-#include "vc1data.h"
 
 static uint8_t rl_length[NB_RL_TABLES][MAX_LEVEL+1][MAX_RUN+1][2];
 
@@ -72,7 +75,9 @@ void ff_msmpeg4_code012(PutBitContext *pb, int n)
     }
 }
 
-static int get_size_of_code(MpegEncContext * s, RLTable *rl, int last, int run, int level, int intra){
+static int get_size_of_code(const RLTable *rl, int last, int run,
+                            int level, int intra)
+{
     int size=0;
     int code;
     int run_diff= intra ? 0 : 1;
@@ -113,44 +118,40 @@ static int get_size_of_code(MpegEncContext * s, RLTable *rl, int last, int run, 
     return size;
 }
 
-av_cold void ff_msmpeg4_encode_init(MpegEncContext *s)
+static av_cold void msmpeg4_encode_init_static(void)
 {
-    static int init_done=0;
-    int i;
+    static uint16_t mv_index_tables[2][4096];
+    init_mv_table(&ff_mv_tables[0], mv_index_tables[0]);
+    init_mv_table(&ff_mv_tables[1], mv_index_tables[1]);
 
-    ff_msmpeg4_common_init(s);
-    if(s->msmpeg4_version>=4){
-        s->min_qcoeff= -255;
-        s->max_qcoeff=  255;
-    }
-
-    if (!init_done) {
-        static uint16_t mv_index_tables[2][4096];
-        /* init various encoding tables */
-        init_done = 1;
-        init_mv_table(&ff_mv_tables[0], mv_index_tables[0]);
-        init_mv_table(&ff_mv_tables[1], mv_index_tables[1]);
-
-        for(i=0;i<NB_RL_TABLES;i++)
-            ff_rl_init(&ff_rl_table[i], ff_static_rl_table_store[i]);
-
-        for(i=0; i<NB_RL_TABLES; i++){
-            int level;
-            for (level = 1; level <= MAX_LEVEL; level++) {
-                int run;
-                for(run=0; run<=MAX_RUN; run++){
-                    int last;
-                    for(last=0; last<2; last++){
-                        rl_length[i][level][run][last]= get_size_of_code(s, &ff_rl_table[  i], last, run, level, 0);
-                    }
+    for (int i = 0; i < NB_RL_TABLES; i++) {
+        for (int level = 1; level <= MAX_LEVEL; level++) {
+            for (int run = 0; run <= MAX_RUN; run++) {
+                for (int last = 0; last < 2; last++) {
+                    rl_length[i][level][run][last] = get_size_of_code(&ff_rl_table[i], last, run, level, 0);
                 }
             }
         }
     }
 }
 
-static void find_best_tables(MpegEncContext * s)
+av_cold void ff_msmpeg4_encode_init(MpegEncContext *s)
 {
+    static AVOnce init_static_once = AV_ONCE_INIT;
+
+    ff_msmpeg4_common_init(s);
+    if (s->msmpeg4_version >= 4) {
+        s->min_qcoeff = -255;
+        s->max_qcoeff =  255;
+    }
+
+    /* init various encoding tables */
+    ff_thread_once(&init_static_once, msmpeg4_encode_init_static);
+}
+
+static void find_best_tables(MSMPEG4EncContext *ms)
+{
+    MpegEncContext *const s = &ms->s;
     int i;
     int best        = 0, best_size        = INT_MAX;
     int chroma_best = 0, best_chroma_size = INT_MAX;
@@ -170,9 +171,9 @@ static void find_best_tables(MpegEncContext * s)
                 int last;
                 const int last_size= size + chroma_size;
                 for(last=0; last<2; last++){
-                    int inter_count       = s->ac_stats[0][0][level][run][last] + s->ac_stats[0][1][level][run][last];
-                    int intra_luma_count  = s->ac_stats[1][0][level][run][last];
-                    int intra_chroma_count= s->ac_stats[1][1][level][run][last];
+                    int inter_count       = ms->ac_stats[0][0][level][run][last] + ms->ac_stats[0][1][level][run][last];
+                    int intra_luma_count  = ms->ac_stats[1][0][level][run][last];
+                    int intra_chroma_count= ms->ac_stats[1][1][level][run][last];
 
                     if(s->pict_type==AV_PICTURE_TYPE_I){
                         size       += intra_luma_count  *rl_length[i  ][level][run][last];
@@ -198,7 +199,7 @@ static void find_best_tables(MpegEncContext * s)
 
     if(s->pict_type==AV_PICTURE_TYPE_P) chroma_best= best;
 
-    memset(s->ac_stats, 0, sizeof(int)*(MAX_LEVEL+1)*(MAX_RUN+1)*2*2*2);
+    memset(ms->ac_stats, 0, sizeof(ms->ac_stats));
 
     s->rl_table_index       =        best;
     s->rl_chroma_table_index= chroma_best;
@@ -216,7 +217,9 @@ static void find_best_tables(MpegEncContext * s)
 /* write MSMPEG4 compatible frame header */
 void ff_msmpeg4_encode_picture_header(MpegEncContext * s, int picture_number)
 {
-    find_best_tables(s);
+    MSMPEG4EncContext *const ms = (MSMPEG4EncContext*)s;
+
+    find_best_tables(ms);
 
     align_put_bits(&s->pb);
     put_bits(&s->pb, 2, s->pict_type - 1);
@@ -492,8 +495,7 @@ void ff_msmpeg4_encode_mb(MpegEncContext * s,
 static void msmpeg4_encode_dc(MpegEncContext * s, int level, int n, int *dir_ptr)
 {
     int sign, code;
-    int pred, av_uninit(extquant);
-    int extrabits = 0;
+    int pred;
 
     int16_t *dc_val;
     pred = ff_msmpeg4_pred_dc(s, n, &dc_val, dir_ptr);
@@ -527,15 +529,6 @@ static void msmpeg4_encode_dc(MpegEncContext * s, int level, int n, int *dir_ptr
         code = level;
         if (code > DC_MAX)
             code = DC_MAX;
-        else if( s->msmpeg4_version>=6 ) {
-            if( s->qscale == 1 ) {
-                extquant = (level + 3) & 0x3;
-                code  = ((level+3)>>2);
-            } else if( s->qscale == 2 ) {
-                extquant = (level + 1) & 0x1;
-                code  = ((level+1)>>1);
-            }
-        }
 
         if (s->dc_table_index == 0) {
             if (n < 4) {
@@ -551,13 +544,8 @@ static void msmpeg4_encode_dc(MpegEncContext * s, int level, int n, int *dir_ptr
             }
         }
 
-        if(s->msmpeg4_version>=6 && s->qscale<=2)
-            extrabits = 3 - s->qscale;
-
         if (code == DC_MAX)
-            put_bits(&s->pb, 8 + extrabits, level);
-        else if(extrabits > 0)//== VC1 && s->qscale<=2
-            put_bits(&s->pb, extrabits, extquant);
+            put_bits(&s->pb, 8, level);
 
         if (level != 0) {
             put_bits(&s->pb, 1, sign);
@@ -569,6 +557,7 @@ static void msmpeg4_encode_dc(MpegEncContext * s, int level, int n, int *dir_ptr
  * escape coding (same as H.263) and more VLC tables. */
 void ff_msmpeg4_encode_block(MpegEncContext * s, int16_t * block, int n)
 {
+    MSMPEG4EncContext *const ms = (MSMPEG4EncContext*)s;
     int level, run, last, i, j, last_index;
     int last_non_zero, sign, slevel;
     int code, run_diff, dc_pred_dir;
@@ -596,7 +585,7 @@ void ff_msmpeg4_encode_block(MpegEncContext * s, int16_t * block, int n)
     }
 
     /* recalculate block_last_index for M$ wmv1 */
-    if(s->msmpeg4_version>=4 && s->msmpeg4_version<6 && s->block_last_index[n]>0){
+    if (s->msmpeg4_version >= 4 && s->block_last_index[n] > 0) {
         for(last_index=63; last_index>=0; last_index--){
             if(block[scantable[last_index]]) break;
         }
@@ -619,10 +608,10 @@ void ff_msmpeg4_encode_block(MpegEncContext * s, int16_t * block, int n)
             }
 
             if(level<=MAX_LEVEL && run<=MAX_RUN){
-                s->ac_stats[s->mb_intra][n>3][level][run][last]++;
+                ms->ac_stats[s->mb_intra][n>3][level][run][last]++;
             }
 
-            s->ac_stats[s->mb_intra][n > 3][40][63][0]++; //esc3 like
+            ms->ac_stats[s->mb_intra][n > 3][40][63][0]++; //esc3 like
 
             code = get_rl_index(rl, last, run, level);
             put_bits(&s->pb, rl->table_vlc[code][1], rl->table_vlc[code][0]);
@@ -656,7 +645,7 @@ void ff_msmpeg4_encode_block(MpegEncContext * s, int16_t * block, int n)
                                 s->esc3_run_length= 6;
                                 //ESCLVLSZ + ESCRUNSZ
                                 if(s->qscale<8)
-                                    put_bits(&s->pb, 6 + (s->msmpeg4_version>=6), 3);
+                                    put_bits(&s->pb, 6, 3);
                                 else
                                     put_bits(&s->pb, 8, 3);
                             }
@@ -686,3 +675,45 @@ void ff_msmpeg4_encode_block(MpegEncContext * s, int16_t * block, int n)
         }
     }
 }
+
+const FFCodec ff_msmpeg4v2_encoder = {
+    .p.name         = "msmpeg4v2",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("MPEG-4 part 2 Microsoft variant version 2"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_MSMPEG4V2,
+    .p.pix_fmts     = (const enum AVPixelFormat[]){ AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE },
+    .p.priv_class   = &ff_mpv_enc_class,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .priv_data_size = sizeof(MSMPEG4EncContext),
+    .init           = ff_mpv_encode_init,
+    FF_CODEC_ENCODE_CB(ff_mpv_encode_picture),
+    .close          = ff_mpv_encode_end,
+};
+
+const FFCodec ff_msmpeg4v3_encoder = {
+    .p.name         = "msmpeg4",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("MPEG-4 part 2 Microsoft variant version 3"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_MSMPEG4V3,
+    .p.pix_fmts     = (const enum AVPixelFormat[]){ AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE },
+    .p.priv_class   = &ff_mpv_enc_class,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .priv_data_size = sizeof(MSMPEG4EncContext),
+    .init           = ff_mpv_encode_init,
+    FF_CODEC_ENCODE_CB(ff_mpv_encode_picture),
+    .close          = ff_mpv_encode_end,
+};
+
+const FFCodec ff_wmv1_encoder = {
+    .p.name         = "wmv1",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Windows Media Video 7"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_WMV1,
+    .p.pix_fmts     = (const enum AVPixelFormat[]){ AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE },
+    .p.priv_class   = &ff_mpv_enc_class,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .priv_data_size = sizeof(MSMPEG4EncContext),
+    .init           = ff_mpv_encode_init,
+    FF_CODEC_ENCODE_CB(ff_mpv_encode_picture),
+    .close          = ff_mpv_encode_end,
+};

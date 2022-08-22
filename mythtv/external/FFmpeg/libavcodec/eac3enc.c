@@ -28,6 +28,7 @@
 
 #include "libavutil/attributes.h"
 #include "ac3enc.h"
+#include "codec_internal.h"
 #include "eac3enc.h"
 #include "eac3_data.h"
 
@@ -193,8 +194,8 @@ void ff_eac3_output_frame_header(AC3EncodeContext *s)
 
     /* frame header */
     if (s->num_blocks == 6) {
-    put_bits(&s->pb, 1, !s->use_frame_exp_strategy);/* exponent strategy syntax */
-    put_bits(&s->pb, 1, 0);                         /* aht enabled = no */
+        put_bits(&s->pb, 1, !s->use_frame_exp_strategy); /* exponent strategy syntax */
+        put_bits(&s->pb, 1, 0);                     /* aht enabled = no */
     }
     put_bits(&s->pb, 2, 0);                         /* snr offset strategy = 1 */
     put_bits(&s->pb, 1, 0);                         /* transient pre-noise processing enabled = no */
@@ -232,12 +233,12 @@ void ff_eac3_output_frame_header(AC3EncodeContext *s)
     if (s->num_blocks != 6) {
         put_bits(&s->pb, 1, 0);
     } else {
-    for (ch = 1; ch <= s->fbw_channels; ch++) {
-        if (s->use_frame_exp_strategy)
-            put_bits(&s->pb, 5, s->frame_exp_strategy[ch]);
-        else
-            put_bits(&s->pb, 5, 0);
-    }
+        for (ch = 1; ch <= s->fbw_channels; ch++) {
+            if (s->use_frame_exp_strategy)
+                put_bits(&s->pb, 5, s->frame_exp_strategy[ch]);
+            else
+                put_bits(&s->pb, 5, 0);
+        }
     }
     /* snr offsets */
     put_bits(&s->pb, 6, s->coarse_snr_offset);
@@ -248,20 +249,26 @@ void ff_eac3_output_frame_header(AC3EncodeContext *s)
 }
 
 
-AVCodec ff_eac3_encoder = {
-    .name            = "eac3",
-    .long_name       = NULL_IF_CONFIG_SMALL("ATSC A/52 E-AC-3"),
-    .type            = AVMEDIA_TYPE_AUDIO,
-    .id              = AV_CODEC_ID_EAC3,
+FF_DISABLE_DEPRECATION_WARNINGS
+const FFCodec ff_eac3_encoder = {
+    .p.name          = "eac3",
+    .p.long_name     = NULL_IF_CONFIG_SMALL("ATSC A/52 E-AC-3"),
+    .p.type          = AVMEDIA_TYPE_AUDIO,
+    .p.id            = AV_CODEC_ID_EAC3,
+    .p.capabilities  = AV_CODEC_CAP_DR1,
     .priv_data_size  = sizeof(AC3EncodeContext),
     .init            = ff_ac3_float_encode_init,
-    .encode2         = ff_ac3_float_encode_frame,
+    FF_CODEC_ENCODE_CB(ff_ac3_float_encode_frame),
     .close           = ff_ac3_encode_close,
-    .sample_fmts     = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_FLTP,
+    .p.sample_fmts   = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_FLTP,
                                                       AV_SAMPLE_FMT_NONE },
-    .priv_class      = &eac3enc_class,
-    .supported_samplerates = ff_ac3_sample_rate_tab,
-    .channel_layouts = ff_ac3_channel_layouts,
+    .p.priv_class    = &eac3enc_class,
+    .p.supported_samplerates = ff_ac3_sample_rate_tab,
+#if FF_API_OLD_CHANNEL_LAYOUT
+    .p.channel_layouts = ff_ac3_channel_layouts,
+#endif
+    .p.ch_layouts    = ff_ac3_ch_layouts,
     .defaults        = ff_ac3_enc_defaults,
     .caps_internal   = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
 };
+FF_ENABLE_DEPRECATION_WARNINGS

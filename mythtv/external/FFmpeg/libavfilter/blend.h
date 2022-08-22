@@ -59,6 +59,13 @@ enum BlendMode {
     BLEND_HEAT,
     BLEND_FREEZE,
     BLEND_EXTREMITY,
+    BLEND_SOFTDIFFERENCE,
+    BLEND_GEOMETRIC,
+    BLEND_HARMONIC,
+    BLEND_BLEACH,
+    BLEND_STAIN,
+    BLEND_INTERPOLATE,
+    BLEND_HARDOVERLAY,
     BLEND_NB
 };
 
@@ -74,7 +81,6 @@ typedef struct FilterParams {
                   struct FilterParams *param, double *values, int starty);
 } FilterParams;
 
-void ff_blend_init(FilterParams *param, int depth);
 void ff_blend_init_x86(FilterParams *param, int depth);
 
 #endif /* AVFILTER_BLEND_H */

@@ -20,8 +20,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "config_components.h"
+
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
+#include "codec_internal.h"
+#include "encode.h"
 #include "internal.h"
 
 static av_cold int v408_encode_init(AVCodecContext *avctx)
@@ -39,7 +43,8 @@ static int v408_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     uint8_t *y, *u, *v, *a;
     int i, j, ret;
 
-    if ((ret = ff_alloc_packet2(avctx, pkt, avctx->width * avctx->height * 4, 0)) < 0)
+    ret = ff_get_encode_buffer(avctx, pkt, avctx->width * avctx->height * 4, 0);
+    if (ret < 0)
         return ret;
     dst = pkt->data;
 
@@ -68,30 +73,35 @@ static int v408_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         a += pic->linesize[3];
     }
 
-    pkt->flags |= AV_PKT_FLAG_KEY;
     *got_packet = 1;
     return 0;
 }
 
+static const enum AVPixelFormat pix_fmt[] = { AV_PIX_FMT_YUVA444P, AV_PIX_FMT_NONE };
+
 #if CONFIG_AYUV_ENCODER
-AVCodec ff_ayuv_encoder = {
-    .name         = "ayuv",
-    .long_name    = NULL_IF_CONFIG_SMALL("Uncompressed packed MS 4:4:4:4"),
-    .type         = AVMEDIA_TYPE_VIDEO,
-    .id           = AV_CODEC_ID_AYUV,
+const FFCodec ff_ayuv_encoder = {
+    .p.name       = "ayuv",
+    .p.long_name  = NULL_IF_CONFIG_SMALL("Uncompressed packed MS 4:4:4:4"),
+    .p.type       = AVMEDIA_TYPE_VIDEO,
+    .p.id         = AV_CODEC_ID_AYUV,
+    .p.capabilities = AV_CODEC_CAP_DR1,
     .init         = v408_encode_init,
-    .encode2      = v408_encode_frame,
-    .pix_fmts     = (const enum AVPixelFormat[]){ AV_PIX_FMT_YUVA444P, AV_PIX_FMT_NONE },
+    FF_CODEC_ENCODE_CB(v408_encode_frame),
+    .p.pix_fmts   = pix_fmt,
+    .caps_internal = FF_CODEC_CAP_INIT_THREADSAFE,
 };
 #endif
 #if CONFIG_V408_ENCODER
-AVCodec ff_v408_encoder = {
-    .name         = "v408",
-    .long_name    = NULL_IF_CONFIG_SMALL("Uncompressed packed QT 4:4:4:4"),
-    .type         = AVMEDIA_TYPE_VIDEO,
-    .id           = AV_CODEC_ID_V408,
+const FFCodec ff_v408_encoder = {
+    .p.name       = "v408",
+    .p.long_name  = NULL_IF_CONFIG_SMALL("Uncompressed packed QT 4:4:4:4"),
+    .p.type       = AVMEDIA_TYPE_VIDEO,
+    .p.id         = AV_CODEC_ID_V408,
+    .p.capabilities = AV_CODEC_CAP_DR1,
     .init         = v408_encode_init,
-    .encode2      = v408_encode_frame,
-    .pix_fmts     = (const enum AVPixelFormat[]){ AV_PIX_FMT_YUVA444P, AV_PIX_FMT_NONE },
+    FF_CODEC_ENCODE_CB(v408_encode_frame),
+    .p.pix_fmts   = pix_fmt,
+    .caps_internal = FF_CODEC_CAP_INIT_THREADSAFE,
 };
 #endif

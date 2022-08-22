@@ -30,6 +30,7 @@
 #include "libavutil/pixdesc.h"
 #include "libavutil/opt.h"
 #include "libavcodec/avcodec.h"
+#include "codec_internal.h"
 #include "libavcodec/decode.h"
 #include "libavcodec/internal.h"
 #include "libavcodec/hwconfig.h"
@@ -146,8 +147,12 @@ static int v4l2_receive_frame(AVCodecContext *avctx, AVFrame *frame)
 
     if (!s->buf_pkt.size) {
         ret = ff_decode_get_packet(avctx, &s->buf_pkt);
-        if (ret < 0 && ret != AVERROR_EOF)
-            return ret;
+        if (ret < 0) {
+            if (ret == AVERROR(EAGAIN))
+                return ff_v4l2_context_dequeue_frame(capture, frame, 0);
+            else if (ret != AVERROR_EOF)
+                return ret;
+        }
     }
 
     if (s->draining)
@@ -282,25 +287,25 @@ static const AVCodecHWConfigInternal *v4l2_m2m_hw_configs[] = {
 
 #define M2MDEC(NAME, LONGNAME, CODEC, bsf_name) \
     M2MDEC_CLASS(NAME) \
-    AVCodec ff_ ## NAME ## _v4l2m2m_decoder = { \
-        .name           = #NAME "_v4l2m2m" , \
-        .long_name      = NULL_IF_CONFIG_SMALL("V4L2 mem2mem " LONGNAME " decoder wrapper"), \
-        .type           = AVMEDIA_TYPE_VIDEO, \
-        .id             = CODEC , \
+    const FFCodec ff_ ## NAME ## _v4l2m2m_decoder = { \
+        .p.name         = #NAME "_v4l2m2m" , \
+        .p.long_name    = NULL_IF_CONFIG_SMALL("V4L2 mem2mem " LONGNAME " decoder wrapper"), \
+        .p.type         = AVMEDIA_TYPE_VIDEO, \
+        .p.id           = CODEC , \
         .priv_data_size = sizeof(V4L2m2mPriv), \
-        .priv_class     = &v4l2_m2m_ ## NAME ## _dec_class, \
+        .p.priv_class   = &v4l2_m2m_ ## NAME ## _dec_class, \
         .init           = v4l2_decode_init, \
-        .receive_frame  = v4l2_receive_frame, \
-        .close          = v4l2_decode_close,\
+        FF_CODEC_RECEIVE_FRAME_CB(v4l2_receive_frame), \
+        .close          = v4l2_decode_close, \
         .flush          = v4l2_flush, \
-        .pix_fmts       = (const enum AVPixelFormat[]) { AV_PIX_FMT_DRM_PRIME, \
+        .p.pix_fmts       = (const enum AVPixelFormat[]) { AV_PIX_FMT_DRM_PRIME, \
                                                          AV_PIX_FMT_NV12, \
                                                          AV_PIX_FMT_NONE}, \
         .bsfs           = bsf_name, \
         .hw_configs     = v4l2_m2m_hw_configs, \
-        .capabilities   = AV_CODEC_CAP_HARDWARE | AV_CODEC_CAP_DELAY | AV_CODEC_CAP_AVOID_PROBING, \
+        .p.capabilities = AV_CODEC_CAP_HARDWARE | AV_CODEC_CAP_DELAY | AV_CODEC_CAP_AVOID_PROBING, \
         .caps_internal  = FF_CODEC_CAP_SETS_PKT_DTS | FF_CODEC_CAP_INIT_CLEANUP, \
-        .wrapper_name   = "v4l2m2m", \
+        .p.wrapper_name = "v4l2m2m", \
     }
 
 M2MDEC(h264,  "H.264", AV_CODEC_ID_H264,       "h264_mp4toannexb");

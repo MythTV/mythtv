@@ -43,8 +43,6 @@
 #include "libavutil/threadmessage.h"
 #include "libavutil/time.h"
 
-#include "version.h"
-
 /* This image format is available on all Android devices
  * supporting the Camera2 API */
 #define IMAGE_FORMAT_ANDROID AIMAGE_FORMAT_YUV_420_888
@@ -859,7 +857,7 @@ static const AVClass android_camera_class = {
     .category   = AV_CLASS_CATEGORY_DEVICE_VIDEO_INPUT,
 };
 
-AVInputFormat ff_android_camera_demuxer = {
+const AVInputFormat ff_android_camera_demuxer = {
     .name           = "android_camera",
     .long_name      = NULL_IF_CONFIG_SMALL("Android camera input device"),
     .priv_data_size = sizeof(AndroidCameraCtx),

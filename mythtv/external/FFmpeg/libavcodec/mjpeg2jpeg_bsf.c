@@ -65,15 +65,15 @@ static uint8_t *append(uint8_t *buf, const uint8_t *src, int size)
 static uint8_t *append_dht_segment(uint8_t *buf)
 {
     buf = append(buf, dht_segment_head, sizeof(dht_segment_head));
-    buf = append(buf, avpriv_mjpeg_bits_dc_luminance + 1, 16);
+    buf = append(buf, ff_mjpeg_bits_dc_luminance + 1, 16);
     buf = append(buf, dht_segment_frag, sizeof(dht_segment_frag));
-    buf = append(buf, avpriv_mjpeg_val_dc, 12);
+    buf = append(buf, ff_mjpeg_val_dc, 12);
     *(buf++) = 0x10;
-    buf = append(buf, avpriv_mjpeg_bits_ac_luminance + 1, 16);
-    buf = append(buf, avpriv_mjpeg_val_ac_luminance, 162);
+    buf = append(buf, ff_mjpeg_bits_ac_luminance + 1, 16);
+    buf = append(buf, ff_mjpeg_val_ac_luminance, 162);
     *(buf++) = 0x11;
-    buf = append(buf, avpriv_mjpeg_bits_ac_chrominance + 1, 16);
-    buf = append(buf, avpriv_mjpeg_val_ac_chrominance, 162);
+    buf = append(buf, ff_mjpeg_bits_ac_chrominance + 1, 16);
+    buf = append(buf, ff_mjpeg_val_ac_chrominance, 162);
     return buf;
 }
 
@@ -135,8 +135,8 @@ static const enum AVCodecID codec_ids[] = {
     AV_CODEC_ID_MJPEG, AV_CODEC_ID_NONE,
 };
 
-const AVBitStreamFilter ff_mjpeg2jpeg_bsf = {
-    .name           = "mjpeg2jpeg",
+const FFBitStreamFilter ff_mjpeg2jpeg_bsf = {
+    .p.name         = "mjpeg2jpeg",
+    .p.codec_ids    = codec_ids,
     .filter         = mjpeg2jpeg_filter,
-    .codec_ids      = codec_ids,
 };

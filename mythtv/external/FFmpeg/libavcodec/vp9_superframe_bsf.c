@@ -108,6 +108,15 @@ static int vp9_superframe_filter(AVBSFContext *ctx, AVPacket *pkt)
     if (res < 0)
         return res;
 
+    if (!pkt->size) {
+        /* In case the cache is empty we can pass side-data-only packets
+         * through unchanged. Otherwise, such a packet makes no sense. */
+        if (!s->n_cache)
+            return 0;
+        res = AVERROR_INVALIDDATA;
+        goto done;
+    }
+
     marker = pkt->data[pkt->size - 1];
     if ((marker & 0xe0) == 0xc0) {
         int nbytes = 1 + ((marker >> 3) & 0x3);
@@ -211,12 +220,12 @@ static const enum AVCodecID codec_ids[] = {
     AV_CODEC_ID_VP9, AV_CODEC_ID_NONE,
 };
 
-const AVBitStreamFilter ff_vp9_superframe_bsf = {
-    .name           = "vp9_superframe",
+const FFBitStreamFilter ff_vp9_superframe_bsf = {
+    .p.name         = "vp9_superframe",
+    .p.codec_ids    = codec_ids,
     .priv_data_size = sizeof(VP9BSFContext),
     .filter         = vp9_superframe_filter,
     .init           = vp9_superframe_init,
     .flush          = vp9_superframe_flush,
     .close          = vp9_superframe_close,
-    .codec_ids      = codec_ids,
 };

@@ -33,7 +33,8 @@
 #include "libavutil/pixdesc.h"
 #include "avcodec.h"
 #include "bytestream.h"
-#include "internal.h"
+#include "codec_internal.h"
+#include "encode.h"
 #include "float2half.h"
 
 enum ExrCompr {
@@ -53,8 +54,10 @@ enum ExrPixelType {
 
 static const char abgr_chlist[4] = { 'A', 'B', 'G', 'R' };
 static const char bgr_chlist[4] = { 'B', 'G', 'R', 'A' };
+static const char y_chlist[4] = { 'Y' };
 static const uint8_t gbra_order[4] = { 3, 1, 0, 2 };
 static const uint8_t gbr_order[4] = { 1, 0, 2, 0 };
+static const uint8_t y_order[4] = { 0 };
 
 typedef struct EXRScanlineData {
     uint8_t *compressed_data;
@@ -88,7 +91,7 @@ typedef struct EXRContext {
     uint8_t shifttable[512];
 } EXRContext;
 
-static int encode_init(AVCodecContext *avctx)
+static av_cold int encode_init(AVCodecContext *avctx)
 {
     EXRContext *s = avctx->priv_data;
 
@@ -104,6 +107,11 @@ static int encode_init(AVCodecContext *avctx)
         s->planes = 4;
         s->ch_names = abgr_chlist;
         s->ch_order = gbra_order;
+        break;
+    case AV_PIX_FMT_GRAYF32:
+        s->planes = 1;
+        s->ch_names = y_chlist;
+        s->ch_order = y_order;
         break;
     default:
         av_assert0(0);
@@ -131,7 +139,7 @@ static int encode_init(AVCodecContext *avctx)
     return 0;
 }
 
-static int encode_close(AVCodecContext *avctx)
+static av_cold int encode_close(AVCodecContext *avctx)
 {
     EXRContext *s = avctx->priv_data;
 
@@ -352,7 +360,7 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
                                                avctx->width,
                                                avctx->height, 64) * 3LL / 2;
 
-    if ((ret = ff_alloc_packet2(avctx, pkt, out_size, out_size)) < 0)
+    if ((ret = ff_get_encode_buffer(avctx, pkt, out_size, 0)) < 0)
         return ret;
 
     bytestream2_init_writer(pb, pkt->data, pkt->size);
@@ -506,7 +514,6 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
 
     av_shrink_packet(pkt, bytestream2_tell_p(pb));
 
-    pkt->flags |= AV_PKT_FLAG_KEY;
     *got_packet = 1;
 
     return 0;
@@ -534,19 +541,21 @@ static const AVClass exr_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-AVCodec ff_exr_encoder = {
-    .name           = "exr",
-    .long_name      = NULL_IF_CONFIG_SMALL("OpenEXR image"),
+const FFCodec ff_exr_encoder = {
+    .p.name         = "exr",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("OpenEXR image"),
     .priv_data_size = sizeof(EXRContext),
-    .priv_class     = &exr_class,
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_EXR,
+    .p.priv_class   = &exr_class,
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_EXR,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,
     .init           = encode_init,
-    .encode2        = encode_frame,
+    FF_CODEC_ENCODE_CB(encode_frame),
     .close          = encode_close,
-    .capabilities   = AV_CODEC_CAP_FRAME_THREADS,
-    .pix_fmts       = (const enum AVPixelFormat[]) {
+    .p.pix_fmts     = (const enum AVPixelFormat[]) {
+                                                 AV_PIX_FMT_GRAYF32,
                                                  AV_PIX_FMT_GBRPF32,
                                                  AV_PIX_FMT_GBRAPF32,
                                                  AV_PIX_FMT_NONE },
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

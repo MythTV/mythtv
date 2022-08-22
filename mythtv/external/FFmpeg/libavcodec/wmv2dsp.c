@@ -16,11 +16,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "config.h"
 #include "libavutil/attributes.h"
 #include "libavutil/common.h"
-#include "avcodec.h"
 #include "idctdsp.h"
 #include "mathops.h"
+#include "qpeldsp.h"
 #include "wmv2dsp.h"
 
 #define W0 2048
@@ -263,6 +264,7 @@ av_cold void ff_wmv2dsp_init(WMV2DSPContext *c)
     c->put_mspel_pixels_tab[6] = put_mspel8_mc22_c;
     c->put_mspel_pixels_tab[7] = put_mspel8_mc32_c;
 
-    if (ARCH_MIPS)
-        ff_wmv2dsp_init_mips(c);
+#if ARCH_MIPS
+    ff_wmv2dsp_init_mips(c);
+#endif
 }

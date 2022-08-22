@@ -30,9 +30,12 @@
 
 #include "avcodec.h"
 #include "blockdsp.h"
+#include "codec_internal.h"
+#include "encode.h"
 #include "fdctdsp.h"
-#include "internal.h"
+#include "mathops.h"
 #include "mpegvideo.h"
+#include "mpegvideoenc.h"
 #include "pixblockdsp.h"
 #include "packet_internal.h"
 #include "profiles.h"
@@ -362,10 +365,6 @@ static av_cold int dnxhd_encode_init(AVCodecContext *avctx)
     case AV_PIX_FMT_GBRP10:
         ctx->bit_depth = 10;
         break;
-    default:
-        av_log(avctx, AV_LOG_ERROR,
-               "pixel format is incompatible with DNxHD\n");
-        return AVERROR(EINVAL);
     }
 
     if ((ctx->profile == FF_PROFILE_DNXHR_444 && (avctx->pix_fmt != AV_PIX_FMT_YUV444P10 &&
@@ -446,8 +445,9 @@ static av_cold int dnxhd_encode_init(AVCodecContext *avctx)
         ctx->block_width_l2     = 3;
     }
 
-    if (ARCH_X86)
-        ff_dnxhdenc_init_x86(ctx);
+#if ARCH_X86
+    ff_dnxhdenc_init_x86(ctx);
+#endif
 
     ctx->m.mb_height = (avctx->height + 15) / 16;
     ctx->m.mb_width  = (avctx->width  + 15) / 16;
@@ -466,7 +466,7 @@ static av_cold int dnxhd_encode_init(AVCodecContext *avctx)
     ctx->m.mb_num = ctx->m.mb_height * ctx->m.mb_width;
 
     if (ctx->cid_table->frame_size == DNXHD_VARIABLE) {
-        ctx->frame_size = avpriv_dnxhd_get_hr_frame_size(ctx->cid,
+        ctx->frame_size = ff_dnxhd_get_hr_frame_size(ctx->cid,
                                                      avctx->width, avctx->height);
         av_assert0(ctx->frame_size >= 0);
         ctx->coding_unit_size = ctx->frame_size;
@@ -499,12 +499,6 @@ static av_cold int dnxhd_encode_init(AVCodecContext *avctx)
         !FF_ALLOCZ_TYPED_ARRAY(ctx->mb_bits,    ctx->m.mb_num)    ||
         !FF_ALLOCZ_TYPED_ARRAY(ctx->mb_qscale,  ctx->m.mb_num))
         return AVERROR(ENOMEM);
-#if FF_API_CODED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-    avctx->coded_frame->key_frame = 1;
-    avctx->coded_frame->pict_type = AV_PICTURE_TYPE_I;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
     if (avctx->active_thread_type == FF_THREAD_SLICE) {
         if (avctx->thread_count > MAX_THREADS) {
@@ -521,10 +515,9 @@ FF_ENABLE_DEPRECATION_WARNINGS
     ctx->thread[0] = ctx;
     if (avctx->active_thread_type == FF_THREAD_SLICE) {
         for (i = 1; i < avctx->thread_count; i++) {
-            ctx->thread[i] = av_malloc(sizeof(DNXHDEncContext));
+            ctx->thread[i] = av_memdup(ctx, sizeof(DNXHDEncContext));
             if (!ctx->thread[i])
                 return AVERROR(ENOMEM);
-            memcpy(ctx->thread[i], ctx, sizeof(DNXHDEncContext));
         }
     }
 
@@ -918,6 +911,7 @@ static int dnxhd_encode_thread(AVCodecContext *avctx, void *arg,
     if (put_bits_count(&ctx->m.pb) & 31)
         put_bits(&ctx->m.pb, 32 - (put_bits_count(&ctx->m.pb) & 31), 0);
     flush_put_bits(&ctx->m.pb);
+    memset(put_bits_ptr(&ctx->m.pb), 0, put_bytes_left(&ctx->m.pb, 0));
     return 0;
 }
 
@@ -933,7 +927,7 @@ static void dnxhd_setup_threads_slices(DNXHDEncContext *ctx)
             unsigned mb = mb_y * ctx->m.mb_width + mb_x;
             ctx->slice_size[mb_y] += ctx->mb_bits[mb];
         }
-        ctx->slice_size[mb_y]   = (ctx->slice_size[mb_y] + 31) & ~31;
+        ctx->slice_size[mb_y]   = (ctx->slice_size[mb_y] + 31U) & ~31U;
         ctx->slice_size[mb_y] >>= 3;
         thread_size = ctx->slice_size[mb_y];
         offset += thread_size;
@@ -1229,14 +1223,19 @@ static int dnxhd_encode_fast(AVCodecContext *avctx, DNXHDEncContext *ctx)
             avctx->execute2(avctx, dnxhd_mb_var_thread,
                             NULL, NULL, ctx->m.mb_height);
         radix_sort(ctx->mb_cmp, ctx->mb_cmp_tmp, ctx->m.mb_num);
+retry:
         for (x = 0; x < ctx->m.mb_num && max_bits > ctx->frame_bits; x++) {
             int mb = ctx->mb_cmp[x].mb;
             int rc = (ctx->qscale * ctx->m.mb_num ) + mb;
             max_bits -= ctx->mb_rc[rc].bits -
                         ctx->mb_rc[rc + ctx->m.mb_num].bits;
-            ctx->mb_qscale[mb] = ctx->qscale + 1;
+            if (ctx->mb_qscale[mb] < 255)
+                ctx->mb_qscale[mb]++;
             ctx->mb_bits[mb]   = ctx->mb_rc[rc + ctx->m.mb_num].bits;
         }
+
+        if (max_bits > ctx->frame_bits)
+            goto retry;
     }
     return 0;
 }
@@ -1252,11 +1251,6 @@ static void dnxhd_load_picture(DNXHDEncContext *ctx, const AVFrame *frame)
         ctx->thread[i]->dct_uv_offset = ctx->m.uvlinesize*8;
     }
 
-#if FF_API_CODED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-    ctx->m.avctx->coded_frame->interlaced_frame = frame->interlaced_frame;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
     ctx->cur_field = frame->interlaced_frame && !frame->top_field_first;
 }
 
@@ -1268,7 +1262,7 @@ static int dnxhd_encode_picture(AVCodecContext *avctx, AVPacket *pkt,
     int offset, i, ret;
     uint8_t *buf;
 
-    if ((ret = ff_alloc_packet2(avctx, pkt, ctx->frame_size, 0)) < 0)
+    if ((ret = ff_get_encode_buffer(avctx, pkt, ctx->frame_size, 0)) < 0)
         return ret;
     buf = pkt->data;
 
@@ -1317,15 +1311,8 @@ encode_coding_unit:
         goto encode_coding_unit;
     }
 
-#if FF_API_CODED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-    avctx->coded_frame->quality = ctx->qscale * FF_QP2LAMBDA;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-
     ff_side_data_set_encoder_stats(pkt, ctx->qscale * FF_QP2LAMBDA, NULL, 0, AV_PICTURE_TYPE_I);
 
-    pkt->flags |= AV_PKT_FLAG_KEY;
     *got_packet = 1;
     return 0;
 }
@@ -1353,7 +1340,7 @@ static av_cold int dnxhd_encode_end(AVCodecContext *avctx)
     av_freep(&ctx->qmatrix_c16);
     av_freep(&ctx->qmatrix_l16);
 
-    if (avctx->active_thread_type == FF_THREAD_SLICE) {
+    if (ctx->thread[1]) {
         for (i = 1; i < avctx->thread_count; i++)
             av_freep(&ctx->thread[i]);
     }
@@ -1361,30 +1348,31 @@ static av_cold int dnxhd_encode_end(AVCodecContext *avctx)
     return 0;
 }
 
-static const AVCodecDefault dnxhd_defaults[] = {
+static const FFCodecDefault dnxhd_defaults[] = {
     { "qmax", "1024" }, /* Maximum quantization scale factor allowed for VC-3 */
     { NULL },
 };
 
-AVCodec ff_dnxhd_encoder = {
-    .name           = "dnxhd",
-    .long_name      = NULL_IF_CONFIG_SMALL("VC3/DNxHD"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_DNXHD,
+const FFCodec ff_dnxhd_encoder = {
+    .p.name         = "dnxhd",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("VC3/DNxHD"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_DNXHD,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS |
+                      AV_CODEC_CAP_SLICE_THREADS,
     .priv_data_size = sizeof(DNXHDEncContext),
     .init           = dnxhd_encode_init,
-    .encode2        = dnxhd_encode_picture,
+    FF_CODEC_ENCODE_CB(dnxhd_encode_picture),
     .close          = dnxhd_encode_end,
-    .capabilities   = AV_CODEC_CAP_SLICE_THREADS | AV_CODEC_CAP_FRAME_THREADS,
-    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
-    .pix_fmts       = (const enum AVPixelFormat[]) {
+    .p.pix_fmts     = (const enum AVPixelFormat[]) {
         AV_PIX_FMT_YUV422P,
         AV_PIX_FMT_YUV422P10,
         AV_PIX_FMT_YUV444P10,
         AV_PIX_FMT_GBRP10,
         AV_PIX_FMT_NONE
     },
-    .priv_class     = &dnxhd_class,
+    .p.priv_class   = &dnxhd_class,
     .defaults       = dnxhd_defaults,
-    .profiles       = NULL_IF_CONFIG_SMALL(ff_dnxhd_profiles),
+    .p.profiles     = NULL_IF_CONFIG_SMALL(ff_dnxhd_profiles),
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
 };

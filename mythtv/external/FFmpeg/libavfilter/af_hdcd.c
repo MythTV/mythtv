@@ -43,6 +43,7 @@
  * HDCD decoding filter
  */
 
+#include "libavutil/channel_layout.h"
 #include "libavutil/opt.h"
 #include "libavutil/avassert.h"
 #include "avfilter.h"
@@ -1553,27 +1554,27 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     switch (inlink->format) {
         case AV_SAMPLE_FMT_S16P:
             for (n = 0; n < in->nb_samples; n++)
-                for (c = 0; c < in->channels; c++) {
+                for (c = 0; c < in->ch_layout.nb_channels; c++) {
                     in_data = (int16_t*)in->extended_data[c];
-                    out_data[(n * in->channels) + c] = in_data[n];
+                    out_data[(n * in->ch_layout.nb_channels) + c] = in_data[n];
                 }
             break;
         case AV_SAMPLE_FMT_S16:
             in_data  = (int16_t*)in->data[0];
-            for (n = 0; n < in->nb_samples * in->channels; n++)
+            for (n = 0; n < in->nb_samples * in->ch_layout.nb_channels; n++)
                 out_data[n] = in_data[n];
             break;
 
         case AV_SAMPLE_FMT_S32P:
             for (n = 0; n < in->nb_samples; n++)
-                for (c = 0; c < in->channels; c++) {
+                for (c = 0; c < in->ch_layout.nb_channels; c++) {
                     in_data32 = (int32_t*)in->extended_data[c];
-                    out_data[(n * in->channels) + c] = in_data32[n] >> a;
+                    out_data[(n * in->ch_layout.nb_channels) + c] = in_data32[n] >> a;
                 }
             break;
         case AV_SAMPLE_FMT_S32:
             in_data32  = (int32_t*)in->data[0];
-            for (n = 0; n < in->nb_samples * in->channels; n++)
+            for (n = 0; n < in->nb_samples * in->ch_layout.nb_channels; n++)
                 out_data[n] = in_data32[n] >> a;
             break;
     }
@@ -1586,14 +1587,14 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
         hdcd_detect_end(&s->detect, 2);
     } else {
         hdcd_detect_start(&s->detect);
-        for (c = 0; c < in->channels; c++) {
-            hdcd_process(s, &s->state[c], out_data + c, in->nb_samples, in->channels);
+        for (c = 0; c < in->ch_layout.nb_channels; c++) {
+            hdcd_process(s, &s->state[c], out_data + c, in->nb_samples, in->ch_layout.nb_channels);
             hdcd_detect_onech(&s->state[c], &s->detect);
         }
-        hdcd_detect_end(&s->detect, in->channels);
+        hdcd_detect_end(&s->detect, in->ch_layout.nb_channels);
     }
 
-    s->sample_count += in->nb_samples * in->channels;
+    s->sample_count += in->nb_samples * in->ch_layout.nb_channels;
 
     av_frame_free(&in);
     return ff_filter_frame(outlink, out);
@@ -1626,10 +1627,10 @@ static int query_formats(AVFilterContext *ctx)
     };
     int ret;
 
-    ret = ff_add_channel_layout(&layouts, AV_CH_LAYOUT_MONO);
+    ret = ff_add_channel_layout(&layouts, &(AVChannelLayout)AV_CHANNEL_LAYOUT_MONO);
     if (ret < 0)
         return ret;
-    ret = ff_add_channel_layout(&layouts, AV_CH_LAYOUT_STEREO);
+    ret = ff_add_channel_layout(&layouts, &(AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO);
     if (ret < 0)
         return ret;
 
@@ -1647,8 +1648,7 @@ static int query_formats(AVFilterContext *ctx)
     if (ret < 0)
         return ret;
 
-    return
-        ff_set_common_samplerates(ctx, ff_make_format_list(sample_rates) );
+    return ff_set_common_samplerates_from_list(ctx, sample_rates);
 }
 
 static av_cold void uninit(AVFilterContext *ctx)
@@ -1739,8 +1739,8 @@ static int config_input(AVFilterLink *inlink) {
     av_log(ctx, AV_LOG_VERBOSE, "CDT period: %dms (%u samples @44100Hz)\n",
         s->cdt_ms, s->state[0].sustain_reset );
 
-    if (inlink->channels != 2 && s->process_stereo) {
-        av_log(ctx, AV_LOG_WARNING, "process_stereo disabled (channels = %d)\n", inlink->channels);
+    if (inlink->ch_layout.nb_channels != 2 && s->process_stereo) {
+        av_log(ctx, AV_LOG_WARNING, "process_stereo disabled (channels = %d)\n", inlink->ch_layout.nb_channels);
         s->process_stereo = 0;
     }
     av_log(ctx, AV_LOG_VERBOSE, "Process mode: %s\n",
@@ -1761,7 +1761,6 @@ static const AVFilterPad avfilter_af_hdcd_inputs[] = {
         .filter_frame = filter_frame,
         .config_props = config_input,
     },
-    { NULL }
 };
 
 static const AVFilterPad avfilter_af_hdcd_outputs[] = {
@@ -1769,17 +1768,16 @@ static const AVFilterPad avfilter_af_hdcd_outputs[] = {
         .name = "default",
         .type = AVMEDIA_TYPE_AUDIO,
     },
-    { NULL }
 };
 
-AVFilter ff_af_hdcd = {
+const AVFilter ff_af_hdcd = {
     .name          = "hdcd",
     .description   = NULL_IF_CONFIG_SMALL("Apply High Definition Compatible Digital (HDCD) decoding."),
     .priv_size     = sizeof(HDCDContext),
     .priv_class    = &hdcd_class,
     .init          = init,
     .uninit        = uninit,
-    .query_formats = query_formats,
-    .inputs        = avfilter_af_hdcd_inputs,
-    .outputs       = avfilter_af_hdcd_outputs,
+    FILTER_INPUTS(avfilter_af_hdcd_inputs),
+    FILTER_OUTPUTS(avfilter_af_hdcd_outputs),
+    FILTER_QUERY_FUNC(query_formats),
 };

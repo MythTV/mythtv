@@ -25,12 +25,12 @@
  * @author Zhentan Feng <spyfeng at gmail dot com>
  */
 
-#include "libavutil/intreadwrite.h"
 #include "libavutil/avassert.h"
 #include "avformat.h"
 #include "avio_internal.h"
 #include "internal.h"
 #include "mpegts.h"
+#include "mux.h"
 #include "wtv.h"
 
 #define WTV_BIGSECTOR_SIZE (1 << WTV_BIGSECTOR_BITS)
@@ -829,7 +829,7 @@ static int write_trailer(AVFormatContext *s)
     return 0;
 }
 
-AVOutputFormat ff_wtv_muxer = {
+const AVOutputFormat ff_wtv_muxer = {
     .name           = "wtv",
     .long_name      = NULL_IF_CONFIG_SMALL("Windows Television (WTV)"),
     .extensions     = "wtv",

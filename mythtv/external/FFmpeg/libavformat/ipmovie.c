@@ -35,6 +35,7 @@
 #include "libavutil/channel_layout.h"
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 
 #define CHUNK_PREAMBLE_SIZE 4
@@ -47,6 +48,7 @@
 #define CHUNK_SHUTDOWN     0x0004
 #define CHUNK_END          0x0005
 /* these last types are used internally */
+#define CHUNK_HAVE_PACKET  0xFFFB
 #define CHUNK_DONE         0xFFFC
 #define CHUNK_NOMEM        0xFFFD
 #define CHUNK_EOF          0xFFFE
@@ -154,7 +156,7 @@ static int load_ipmovie_packet(IPMVEContext *s, AVIOContext *pb,
         av_log(s->avf, AV_LOG_TRACE, "sending audio frame with pts %"PRId64" (%d audio frames)\n",
                 pkt->pts, s->audio_frame_count);
 
-        chunk_type = CHUNK_VIDEO;
+        chunk_type = CHUNK_HAVE_PACKET;
 
     } else if (s->frame_format) {
 
@@ -194,7 +196,6 @@ static int load_ipmovie_packet(IPMVEContext *s, AVIOContext *pb,
 
         if (avio_read(pb, pkt->data + 8, s->video_chunk_size) !=
             s->video_chunk_size) {
-            av_packet_unref(pkt);
             return CHUNK_EOF;
         }
 
@@ -205,7 +206,6 @@ static int load_ipmovie_packet(IPMVEContext *s, AVIOContext *pb,
 
             if (avio_read(pb, pkt->data + 8 + s->video_chunk_size,
                 s->decode_map_chunk_size) != s->decode_map_chunk_size) {
-                av_packet_unref(pkt);
                 return CHUNK_EOF;
             }
         }
@@ -217,7 +217,6 @@ static int load_ipmovie_packet(IPMVEContext *s, AVIOContext *pb,
 
             if (avio_read(pb, pkt->data + 8 + s->video_chunk_size + s->decode_map_chunk_size,
                 s->skip_map_chunk_size) != s->skip_map_chunk_size) {
-                av_packet_unref(pkt);
                 return CHUNK_EOF;
             }
         }
@@ -233,7 +232,7 @@ static int load_ipmovie_packet(IPMVEContext *s, AVIOContext *pb,
 
         s->video_pts += s->frame_pts_inc;
 
-        chunk_type = CHUNK_VIDEO;
+        chunk_type = CHUNK_HAVE_PACKET;
 
     } else {
 
@@ -256,16 +255,14 @@ static int init_audio(AVFormatContext *s)
     st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
     st->codecpar->codec_id = ipmovie->audio_type;
     st->codecpar->codec_tag = 0;  /* no tag */
-    st->codecpar->channels = ipmovie->audio_channels;
-    st->codecpar->channel_layout = st->codecpar->channels == 1 ? AV_CH_LAYOUT_MONO :
-                                                            AV_CH_LAYOUT_STEREO;
+    av_channel_layout_default(&st->codecpar->ch_layout, ipmovie->audio_channels);
     st->codecpar->sample_rate = ipmovie->audio_sample_rate;
     st->codecpar->bits_per_coded_sample = ipmovie->audio_bits;
-    st->codecpar->bit_rate = st->codecpar->channels * st->codecpar->sample_rate *
+    st->codecpar->bit_rate = ipmovie->audio_channels * st->codecpar->sample_rate *
         st->codecpar->bits_per_coded_sample;
     if (st->codecpar->codec_id == AV_CODEC_ID_INTERPLAY_DPCM)
         st->codecpar->bit_rate /= 2;
-    st->codecpar->block_align = st->codecpar->channels * st->codecpar->bits_per_coded_sample;
+    st->codecpar->block_align = ipmovie->audio_channels * st->codecpar->bits_per_coded_sample;
 
     return 0;
 }
@@ -562,28 +559,11 @@ static int process_ipmovie_chunk(IPMVEContext *s, AVIOContext *pb,
             break;
 
         case OPCODE_VIDEO_DATA_06:
-            av_log(s->avf, AV_LOG_TRACE, "set video data format 0x06\n");
-            s->frame_format = 0x06;
-
-            /* log position and move on for now */
-            s->video_chunk_offset = avio_tell(pb);
-            s->video_chunk_size = opcode_size;
-            avio_skip(pb, opcode_size);
-            break;
-
         case OPCODE_VIDEO_DATA_10:
-            av_log(s->avf, AV_LOG_TRACE, "set video data format 0x10\n");
-            s->frame_format = 0x10;
-
-            /* log position and move on for now */
-            s->video_chunk_offset = avio_tell(pb);
-            s->video_chunk_size = opcode_size;
-            avio_skip(pb, opcode_size);
-            break;
-
         case OPCODE_VIDEO_DATA_11:
-            av_log(s->avf, AV_LOG_TRACE, "set video data format 0x11\n");
-            s->frame_format = 0x11;
+            s->frame_format = opcode_type;
+            av_log(s->avf, AV_LOG_TRACE, "set video data format 0x%02X\n",
+                   opcode_type);
 
             /* log position and move on for now */
             s->video_chunk_offset = avio_tell(pb);
@@ -604,10 +584,6 @@ static int process_ipmovie_chunk(IPMVEContext *s, AVIOContext *pb,
 
     /* make a note of where the stream is sitting */
     s->next_chunk_offset = avio_tell(pb);
-
-    /* dispatch the first of any pending packets */
-    if ((chunk_type == CHUNK_VIDEO) || (chunk_type == CHUNK_AUDIO_ONLY))
-        chunk_type = load_ipmovie_packet(s, pb, pkt);
 
     return chunk_type;
 }
@@ -631,7 +607,6 @@ static int ipmovie_read_header(AVFormatContext *s)
 {
     IPMVEContext *ipmovie = s->priv_data;
     AVIOContext *pb = s->pb;
-    AVPacket pkt;
     AVStream *st;
     unsigned char chunk_preamble[CHUNK_PREAMBLE_SIZE];
     int chunk_type, i;
@@ -646,13 +621,6 @@ static int ipmovie_read_header(AVFormatContext *s)
         if (avio_feof(pb))
             return AVERROR_EOF;
     }
-    /* initialize private context members */
-    ipmovie->video_pts = ipmovie->audio_frame_count = 0;
-    ipmovie->audio_chunk_offset = ipmovie->video_chunk_offset =
-    ipmovie->decode_map_chunk_offset = ipmovie->skip_map_chunk_offset = 0;
-    ipmovie->decode_map_chunk_size = ipmovie->video_chunk_size =
-    ipmovie->skip_map_chunk_size = 0;
-    ipmovie->send_buffer = ipmovie->frame_format = 0;
 
     /* on the first read, this will position the stream at the first chunk */
     ipmovie->next_chunk_offset = avio_tell(pb) + 4;
@@ -661,8 +629,7 @@ static int ipmovie_read_header(AVFormatContext *s)
         ipmovie->palette[i] = 0xFFU << 24;
 
     /* process the first chunk which should be CHUNK_INIT_VIDEO */
-    if (process_ipmovie_chunk(ipmovie, pb, &pkt) != CHUNK_INIT_VIDEO) {
-        av_packet_unref(&pkt);
+    if (process_ipmovie_chunk(ipmovie, pb, NULL) != CHUNK_INIT_VIDEO) {
         return AVERROR_INVALIDDATA;
     }
 
@@ -676,8 +643,7 @@ static int ipmovie_read_header(AVFormatContext *s)
 
     if (chunk_type == CHUNK_VIDEO)
         ipmovie->audio_type = AV_CODEC_ID_NONE;  /* no audio */
-    else if (process_ipmovie_chunk(ipmovie, pb, &pkt) != CHUNK_INIT_AUDIO) {
-        av_packet_unref(&pkt);
+    else if (process_ipmovie_chunk(ipmovie, pb, ffformatcontext(s)->parse_pkt) != CHUNK_INIT_AUDIO) {
         return AVERROR_INVALIDDATA;
     }
 
@@ -710,27 +676,31 @@ static int ipmovie_read_packet(AVFormatContext *s,
     int ret;
 
     for (;;) {
-    ret = process_ipmovie_chunk(ipmovie, pb, pkt);
-    if (ret == CHUNK_BAD)
-        ret = AVERROR_INVALIDDATA;
-    else if (ret == CHUNK_EOF)
-        ret = AVERROR(EIO);
-    else if (ret == CHUNK_NOMEM)
-        ret = AVERROR(ENOMEM);
-    else if (ret == CHUNK_END || ret == CHUNK_SHUTDOWN)
-        ret = AVERROR_EOF;
-    else if (ret == CHUNK_VIDEO)
-        ret = 0;
-    else if (ret == CHUNK_INIT_VIDEO || ret == CHUNK_INIT_AUDIO)
-        continue;
-    else
-        continue;
+        ret = process_ipmovie_chunk(ipmovie, pb, pkt);
+        /* dispatch the first of any pending packets */
+        if ((ret == CHUNK_VIDEO) || (ret == CHUNK_AUDIO_ONLY))
+            ret = load_ipmovie_packet(ipmovie, pb, pkt);
 
-    return ret;
+        if (ret == CHUNK_BAD)
+            ret = AVERROR_INVALIDDATA;
+        else if (ret == CHUNK_EOF)
+            ret = AVERROR(EIO);
+        else if (ret == CHUNK_NOMEM)
+            ret = AVERROR(ENOMEM);
+        else if (ret == CHUNK_END || ret == CHUNK_SHUTDOWN)
+            ret = AVERROR_EOF;
+        else if (ret == CHUNK_HAVE_PACKET)
+            ret = 0;
+        else if (ret == CHUNK_INIT_VIDEO || ret == CHUNK_INIT_AUDIO)
+            continue;
+        else
+            continue;
+
+        return ret;
     }
 }
 
-AVInputFormat ff_ipmovie_demuxer = {
+const AVInputFormat ff_ipmovie_demuxer = {
     .name           = "ipmovie",
     .long_name      = NULL_IF_CONFIG_SMALL("Interplay MVE"),
     .priv_data_size = sizeof(IPMVEContext),

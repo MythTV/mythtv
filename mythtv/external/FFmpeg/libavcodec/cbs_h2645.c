@@ -25,10 +25,8 @@
 #include "cbs_h264.h"
 #include "cbs_h265.h"
 #include "h264.h"
-#include "h264_sei.h"
 #include "h2645_parse.h"
 #include "hevc.h"
-#include "hevc_sei.h"
 
 
 static int cbs_read_ue_golomb(CodedBitstreamContext *ctx, GetBitContext *gbc,
@@ -493,7 +491,7 @@ static int cbs_h2645_fragment_add_nals(CodedBitstreamContext *ctx,
         ref = (nal->data == nal->raw_data) ? frag->data_ref
                                            : packet->rbsp.rbsp_buffer_ref;
 
-        err = ff_cbs_insert_unit_data(frag, -1, nal->type,
+        err = ff_cbs_append_unit_data(frag, nal->type,
                             (uint8_t*)nal->data, size, ref);
         if (err < 0)
             return err;
@@ -1571,6 +1569,12 @@ static const SEIMessageTypeDescriptor cbs_sei_h264_types[] = {
         SEI_MESSAGE_RW(h264, sei_recovery_point),
     },
     {
+        SEI_TYPE_FILM_GRAIN_CHARACTERISTICS,
+        1, 0,
+        sizeof(H264RawFilmGrainCharacteristics),
+        SEI_MESSAGE_RW(h264, film_grain_characteristics),
+    },
+    {
         SEI_TYPE_DISPLAY_ORIENTATION,
         1, 0,
         sizeof(H264RawSEIDisplayOrientation),
@@ -1603,6 +1607,12 @@ static const SEIMessageTypeDescriptor cbs_sei_h265_types[] = {
         1, 0,
         sizeof(H265RawSEIRecoveryPoint),
         SEI_MESSAGE_RW(h265, sei_recovery_point),
+    },
+    {
+        SEI_TYPE_FILM_GRAIN_CHARACTERISTICS,
+        1, 0,
+        sizeof(H265RawFilmGrainCharacteristics),
+        SEI_MESSAGE_RW(h265, film_grain_characteristics),
     },
     {
         SEI_TYPE_DISPLAY_ORIENTATION,

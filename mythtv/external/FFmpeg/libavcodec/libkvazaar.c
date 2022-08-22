@@ -36,7 +36,8 @@
 #include "libavutil/opt.h"
 
 #include "avcodec.h"
-#include "internal.h"
+#include "codec_internal.h"
+#include "encode.h"
 #include "packet_internal.h"
 
 typedef struct LibkvazaarContext {
@@ -156,9 +157,6 @@ static av_cold int libkvazaar_close(AVCodecContext *avctx)
         ctx->api->config_destroy(ctx->config);
     }
 
-    if (avctx->extradata)
-        av_freep(&avctx->extradata);
-
     return 0;
 }
 
@@ -210,13 +208,19 @@ static int libkvazaar_encode(AVCodecContext *avctx,
 
         // Copy pixels from frame to input_pic.
         {
+            uint8_t *dst[4] = {
+                input_pic->data[0],
+                input_pic->data[1],
+                input_pic->data[2],
+                NULL,
+            };
             int dst_linesizes[4] = {
               frame->width,
               frame->width / 2,
               frame->width / 2,
               0
             };
-            av_image_copy(input_pic->data, dst_linesizes,
+            av_image_copy(dst, dst_linesizes,
                           (const uint8_t **)frame->data, frame->linesize,
                           frame->format, frame->width, frame->height);
         }
@@ -240,7 +244,7 @@ static int libkvazaar_encode(AVCodecContext *avctx,
         kvz_data_chunk *chunk = NULL;
         uint64_t written = 0;
 
-        retval = ff_alloc_packet2(avctx, avpkt, len_out, len_out);
+        retval = ff_get_encode_buffer(avctx, avpkt, len_out, 0);
         if (retval < 0) {
             av_log(avctx, AV_LOG_ERROR, "Failed to allocate output packet.\n");
             goto done;
@@ -276,19 +280,8 @@ static int libkvazaar_encode(AVCodecContext *avctx,
             av_log(avctx, AV_LOG_ERROR, "Unknown picture type encountered.\n");
             return AVERROR_EXTERNAL;
         }
-#if FF_API_CODED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-        avctx->coded_frame->pict_type = pict_type;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
         ff_side_data_set_encoder_stats(avpkt, frame_info.qp * FF_QP2LAMBDA, NULL, 0, pict_type);
-
-#if FF_API_CODED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-        avctx->coded_frame->quality = frame_info.qp * FF_QP2LAMBDA;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
         *got_packet_ptr = 1;
     }
@@ -320,29 +313,30 @@ static const AVClass class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-static const AVCodecDefault defaults[] = {
+static const FFCodecDefault defaults[] = {
     { "b", "0" },
     { NULL },
 };
 
-AVCodec ff_libkvazaar_encoder = {
-    .name             = "libkvazaar",
-    .long_name        = NULL_IF_CONFIG_SMALL("libkvazaar H.265 / HEVC"),
-    .type             = AVMEDIA_TYPE_VIDEO,
-    .id               = AV_CODEC_ID_HEVC,
-    .capabilities     = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_OTHER_THREADS,
-    .pix_fmts         = pix_fmts,
+const FFCodec ff_libkvazaar_encoder = {
+    .p.name           = "libkvazaar",
+    .p.long_name      = NULL_IF_CONFIG_SMALL("libkvazaar H.265 / HEVC"),
+    .p.type           = AVMEDIA_TYPE_VIDEO,
+    .p.id             = AV_CODEC_ID_HEVC,
+    .p.capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY |
+                        AV_CODEC_CAP_OTHER_THREADS,
+    .p.pix_fmts       = pix_fmts,
 
-    .priv_class       = &class,
+    .p.priv_class     = &class,
     .priv_data_size   = sizeof(LibkvazaarContext),
     .defaults         = defaults,
 
     .init             = libkvazaar_init,
-    .encode2          = libkvazaar_encode,
+    FF_CODEC_ENCODE_CB(libkvazaar_encode),
     .close            = libkvazaar_close,
 
     .caps_internal    = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP |
                         FF_CODEC_CAP_AUTO_THREADS,
 
-    .wrapper_name     = "libkvazaar",
+    .p.wrapper_name   = "libkvazaar",
 };

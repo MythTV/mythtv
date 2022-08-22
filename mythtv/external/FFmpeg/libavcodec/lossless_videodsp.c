@@ -17,7 +17,8 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#include "avcodec.h"
+
+#include "config.h"
 #include "lossless_videodsp.h"
 #include "libavcodec/mathops.h"
 
@@ -118,8 +119,9 @@ void ff_llviddsp_init(LLVidDSPContext *c)
     c->add_left_pred_int16        = add_left_pred_int16_c;
     c->add_gradient_pred          = add_gradient_pred_c;
 
-    if (ARCH_PPC)
-        ff_llviddsp_init_ppc(c);
-    if (ARCH_X86)
-        ff_llviddsp_init_x86(c);
+#if ARCH_PPC
+    ff_llviddsp_init_ppc(c);
+#elif ARCH_X86
+    ff_llviddsp_init_x86(c);
+#endif
 }

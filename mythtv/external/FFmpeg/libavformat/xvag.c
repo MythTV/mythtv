@@ -52,7 +52,7 @@ static int xvag_read_header(AVFormatContext *s)
         offset                 = av_bswap32(offset);
         avio_skip(s->pb, 28);
         codec                  = avio_rb32(s->pb);
-        st->codecpar->channels = avio_rb32(s->pb);
+        st->codecpar->ch_layout.nb_channels = avio_rb32(s->pb);
         avio_skip(s->pb, 4);
         st->duration           = avio_rb32(s->pb);
         avio_skip(s->pb, 8);
@@ -60,7 +60,7 @@ static int xvag_read_header(AVFormatContext *s)
     } else {
         avio_skip(s->pb, 28);
         codec                  = avio_rl32(s->pb);
-        st->codecpar->channels = avio_rl32(s->pb);
+        st->codecpar->ch_layout.nb_channels = avio_rl32(s->pb);
         avio_skip(s->pb, 4);
         st->duration           = avio_rl32(s->pb);
         avio_skip(s->pb, 8);
@@ -69,13 +69,14 @@ static int xvag_read_header(AVFormatContext *s)
 
     if (st->codecpar->sample_rate <= 0)
         return AVERROR_INVALIDDATA;
-    if (st->codecpar->channels <= 0 || st->codecpar->channels > FF_SANE_NB_CHANNELS)
+    if (st->codecpar->ch_layout.nb_channels <= 0 ||
+        st->codecpar->ch_layout.nb_channels > FF_SANE_NB_CHANNELS)
         return AVERROR_INVALIDDATA;
 
     switch (codec) {
     case 0x1c:
         st->codecpar->codec_id    = AV_CODEC_ID_ADPCM_PSX;
-        st->codecpar->block_align = 16 * st->codecpar->channels;
+        st->codecpar->block_align = 16 * st->codecpar->ch_layout.nb_channels;
         break;
     default:
         avpriv_request_sample(s, "codec %X", codec);
@@ -87,7 +88,7 @@ static int xvag_read_header(AVFormatContext *s)
     if (avio_rb16(s->pb) == 0xFFFB) {
         st->codecpar->codec_id    = AV_CODEC_ID_MP3;
         st->codecpar->block_align = 0x1000;
-        st->need_parsing       = AVSTREAM_PARSE_FULL_RAW;
+        ffstream(st)->need_parsing = AVSTREAM_PARSE_FULL_RAW;
     }
 
     avio_skip(s->pb, -2);
@@ -103,7 +104,7 @@ static int xvag_read_packet(AVFormatContext *s, AVPacket *pkt)
     return av_get_packet(s->pb, pkt, par->block_align);
 }
 
-AVInputFormat ff_xvag_demuxer = {
+const AVInputFormat ff_xvag_demuxer = {
     .name           = "xvag",
     .long_name      = NULL_IF_CONFIG_SMALL("Sony PS3 XVAG"),
     .read_probe     = xvag_probe,

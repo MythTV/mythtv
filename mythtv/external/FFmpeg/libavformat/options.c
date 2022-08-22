@@ -19,10 +19,15 @@
  */
 #include "avformat.h"
 #include "avio_internal.h"
+#include "demux.h"
 #include "internal.h"
+
+#include "libavcodec/avcodec.h"
+#include "libavcodec/codec_par.h"
 
 #include "libavutil/avassert.h"
 #include "libavutil/internal.h"
+#include "libavutil/intmath.h"
 #include "libavutil/opt.h"
 
 /**
@@ -53,41 +58,6 @@ static void *format_child_next(void *obj, void *prev)
         return s->pb;
     return NULL;
 }
-
-#if FF_API_CHILD_CLASS_NEXT
-static const AVClass *format_child_class_next(const AVClass *prev)
-{
-    const AVInputFormat *ifmt = NULL;
-    const AVOutputFormat *ofmt = NULL;
-    void *ifmt_iter = NULL, *ofmt_iter = NULL;
-
-    if (!prev)
-        return &ff_avio_class;
-
-    while ((ifmt = av_demuxer_iterate(&ifmt_iter)))
-        if (ifmt->priv_class == prev)
-            break;
-
-    if (!ifmt) {
-        ifmt_iter = NULL;
-        while ((ofmt = av_muxer_iterate(&ofmt_iter)))
-            if (ofmt->priv_class == prev)
-                break;
-    }
-    if (!ofmt) {
-        ofmt_iter = NULL;
-        while ((ifmt = av_demuxer_iterate(&ifmt_iter)))
-            if (ifmt->priv_class)
-                return ifmt->priv_class;
-    }
-
-    while ((ofmt = av_muxer_iterate(&ofmt_iter)))
-        if (ofmt->priv_class)
-            return ofmt->priv_class;
-
-    return NULL;
-}
-#endif
 
 enum {
     CHILD_CLASS_ITER_AVIO = 0,
@@ -158,9 +128,6 @@ static const AVClass av_format_context_class = {
     .option         = avformat_options,
     .version        = LIBAVUTIL_VERSION_INT,
     .child_next     = format_child_next,
-#if FF_API_CHILD_CLASS_NEXT
-    .child_class_next = format_child_class_next,
-#endif
     .child_class_iterate = format_child_class_iterate,
     .category       = AV_CLASS_CATEGORY_MUXER,
     .get_category   = get_category,
@@ -181,61 +148,45 @@ static int io_open_default(AVFormatContext *s, AVIOContext **pb,
 
     av_log(s, loglevel, "Opening \'%s\' for %s\n", url, flags & AVIO_FLAG_WRITE ? "writing" : "reading");
 
-#if FF_API_OLD_OPEN_CALLBACKS
-FF_DISABLE_DEPRECATION_WARNINGS
-    if (s->open_cb)
-        return s->open_cb(s, pb, url, flags, &s->interrupt_callback, options);
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-
     return ffio_open_whitelist(pb, url, flags, &s->interrupt_callback, options, s->protocol_whitelist, s->protocol_blacklist);
 }
 
-static void io_close_default(AVFormatContext *s, AVIOContext *pb)
+void ff_format_io_close_default(AVFormatContext *s, AVIOContext *pb)
 {
     avio_close(pb);
 }
 
-static void avformat_get_context_defaults(AVFormatContext *s)
+static int io_close2_default(AVFormatContext *s, AVIOContext *pb)
 {
-    memset(s, 0, sizeof(AVFormatContext));
-
-    s->av_class = &av_format_context_class;
-
-    s->io_open  = io_open_default;
-    s->io_close = io_close_default;
-
-    av_opt_set_defaults(s);
+    return avio_close(pb);
 }
 
 AVFormatContext *avformat_alloc_context(void)
 {
-    AVFormatContext *ic;
-    AVFormatInternal *internal;
-    ic = av_malloc(sizeof(AVFormatContext));
-    if (!ic) return ic;
+    FFFormatContext *const si = av_mallocz(sizeof(*si));
+    AVFormatContext *s;
 
-    internal = av_mallocz(sizeof(*internal));
-    if (!internal) {
-        av_free(ic);
+    if (!si)
+        return NULL;
+
+    s = &si->pub;
+    s->av_class = &av_format_context_class;
+    s->io_open  = io_open_default;
+    s->io_close = ff_format_io_close_default;
+    s->io_close2= io_close2_default;
+
+    av_opt_set_defaults(s);
+
+    si->pkt = av_packet_alloc();
+    si->parse_pkt = av_packet_alloc();
+    if (!si->pkt || !si->parse_pkt) {
+        avformat_free_context(s);
         return NULL;
     }
-    internal->pkt = av_packet_alloc();
-    internal->parse_pkt = av_packet_alloc();
-    if (!internal->pkt || !internal->parse_pkt) {
-        av_packet_free(&internal->pkt);
-        av_packet_free(&internal->parse_pkt);
-        av_free(internal);
-        av_free(ic);
-        return NULL;
-    }
-    avformat_get_context_defaults(ic);
-    ic->internal = internal;
-    ic->internal->offset = AV_NOPTS_VALUE;
-    ic->internal->raw_packet_buffer_remaining_size = RAW_PACKET_BUFFER_SIZE;
-    ic->internal->shortest_end = AV_NOPTS_VALUE;
 
-    return ic;
+    si->shortest_end = AV_NOPTS_VALUE;
+
+    return s;
 }
 
 enum AVDurationEstimationMethod av_fmt_ctx_get_duration_estimation_method(const AVFormatContext* ctx)
@@ -246,4 +197,151 @@ enum AVDurationEstimationMethod av_fmt_ctx_get_duration_estimation_method(const 
 const AVClass *avformat_get_class(void)
 {
     return &av_format_context_class;
+}
+
+static const AVOption stream_options[] = {
+    { "disposition", NULL, offsetof(AVStream, disposition), AV_OPT_TYPE_FLAGS, { .i64 = 0 },
+        .flags = AV_OPT_FLAG_ENCODING_PARAM, .unit = "disposition" },
+        { "default",            .type = AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_DEFAULT           },    .unit = "disposition" },
+        { "dub",                .type = AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_DUB               },    .unit = "disposition" },
+        { "original",           .type = AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_ORIGINAL          },    .unit = "disposition" },
+        { "comment",            .type = AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_COMMENT           },    .unit = "disposition" },
+        { "lyrics",             .type = AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_LYRICS            },    .unit = "disposition" },
+        { "karaoke",            .type = AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_KARAOKE           },    .unit = "disposition" },
+        { "forced",             .type = AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_FORCED            },    .unit = "disposition" },
+        { "hearing_impaired",   .type = AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_HEARING_IMPAIRED  },    .unit = "disposition" },
+        { "visual_impaired",    .type = AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_VISUAL_IMPAIRED   },    .unit = "disposition" },
+        { "clean_effects",      .type = AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_CLEAN_EFFECTS     },    .unit = "disposition" },
+        { "attached_pic",       .type = AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_ATTACHED_PIC      },    .unit = "disposition" },
+        { "timed_thumbnails",   .type = AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_TIMED_THUMBNAILS  },    .unit = "disposition" },
+        { "captions",           .type = AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_CAPTIONS          },    .unit = "disposition" },
+        { "descriptions",       .type = AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_DESCRIPTIONS      },    .unit = "disposition" },
+        { "metadata",           .type = AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_METADATA          },    .unit = "disposition" },
+        { "dependent",          .type = AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_DEPENDENT         },    .unit = "disposition" },
+        { "still_image",        .type = AV_OPT_TYPE_CONST, { .i64 = AV_DISPOSITION_STILL_IMAGE       },    .unit = "disposition" },
+    { NULL }
+};
+
+static const AVClass stream_class = {
+    .class_name     = "AVStream",
+    .item_name      = av_default_item_name,
+    .version        = LIBAVUTIL_VERSION_INT,
+    .option         = stream_options,
+};
+
+const AVClass *av_stream_get_class(void)
+{
+    return &stream_class;
+}
+
+AVStream *avformat_new_stream(AVFormatContext *s, const AVCodec *c)
+{
+    FFFormatContext *const si = ffformatcontext(s);
+    FFStream *sti;
+    AVStream *st;
+    AVStream **streams;
+
+    if (s->nb_streams >= s->max_streams) {
+        av_log(s, AV_LOG_ERROR, "Number of streams exceeds max_streams parameter"
+               " (%d), see the documentation if you wish to increase it\n",
+               s->max_streams);
+        return NULL;
+    }
+    streams = av_realloc_array(s->streams, s->nb_streams + 1, sizeof(*streams));
+    if (!streams)
+        return NULL;
+    s->streams = streams;
+
+    sti = av_mallocz(sizeof(*sti));
+    if (!sti)
+        return NULL;
+    st = &sti->pub;
+
+#if FF_API_AVSTREAM_CLASS
+    st->av_class = &stream_class;
+#endif
+
+    st->codecpar = avcodec_parameters_alloc();
+    if (!st->codecpar)
+        goto fail;
+
+    sti->avctx = avcodec_alloc_context3(NULL);
+    if (!sti->avctx)
+        goto fail;
+
+    if (s->iformat) {
+        sti->info = av_mallocz(sizeof(*sti->info));
+        if (!sti->info)
+            goto fail;
+
+#if FF_API_R_FRAME_RATE
+        sti->info->last_dts      = AV_NOPTS_VALUE;
+#endif
+        sti->info->fps_first_dts = AV_NOPTS_VALUE;
+        sti->info->fps_last_dts  = AV_NOPTS_VALUE;
+
+        /* default pts setting is MPEG-like */
+        avpriv_set_pts_info(st, 33, 1, 90000);
+        /* we set the current DTS to 0 so that formats without any timestamps
+         * but durations get some timestamps, formats with some unknown
+         * timestamps have their first few packets buffered and the
+         * timestamps corrected before they are returned to the user */
+        sti->cur_dts = RELATIVE_TS_BASE;
+    } else {
+        sti->cur_dts = AV_NOPTS_VALUE;
+    }
+
+    st->index      = s->nb_streams;
+    st->start_time = AV_NOPTS_VALUE;
+    st->duration   = AV_NOPTS_VALUE;
+    sti->first_dts     = AV_NOPTS_VALUE;
+    sti->probe_packets = s->max_probe_packets;
+    sti->pts_wrap_reference = AV_NOPTS_VALUE;
+    sti->pts_wrap_behavior  = AV_PTS_WRAP_IGNORE;
+
+    sti->last_IP_pts = AV_NOPTS_VALUE;
+    sti->last_dts_for_order_check = AV_NOPTS_VALUE;
+    for (int i = 0; i < MAX_REORDER_DELAY + 1; i++)
+        sti->pts_buffer[i] = AV_NOPTS_VALUE;
+
+    st->sample_aspect_ratio = (AVRational) { 0, 1 };
+
+    sti->inject_global_side_data = si->inject_global_side_data;
+
+    sti->need_context_update = 1;
+
+    s->streams[s->nb_streams++] = st;
+    return st;
+fail:
+    ff_free_stream(&st);
+    return NULL;
+}
+
+static int option_is_disposition(const AVOption *opt)
+{
+    return opt->type == AV_OPT_TYPE_CONST &&
+           opt->unit && !strcmp(opt->unit, "disposition");
+}
+
+int av_disposition_from_string(const char *disp)
+{
+    for (const AVOption *opt = stream_options; opt->name; opt++)
+        if (option_is_disposition(opt) && !strcmp(disp, opt->name))
+            return opt->default_val.i64;
+    return AVERROR(EINVAL);
+}
+
+const char *av_disposition_to_string(int disposition)
+{
+    int val;
+
+    if (disposition <= 0)
+        return NULL;
+
+    val = 1 << ff_ctz(disposition);
+    for (const AVOption *opt = stream_options; opt->name; opt++)
+        if (option_is_disposition(opt) && opt->default_val.i64 == val)
+            return opt->name;
+
+    return NULL;
 }

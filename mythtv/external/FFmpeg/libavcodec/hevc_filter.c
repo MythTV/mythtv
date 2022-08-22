@@ -25,10 +25,8 @@
 #include "libavutil/common.h"
 #include "libavutil/internal.h"
 
-#include "cabac_functions.h"
 #include "hevcdec.h"
-
-#include "bit_depth_template.c"
+#include "threadframe.h"
 
 #define LUMA 0
 #define CB 1
@@ -141,14 +139,25 @@ static int get_qPy(HEVCContext *s, int xC, int yC)
 static void copy_CTB(uint8_t *dst, const uint8_t *src, int width, int height,
                      ptrdiff_t stride_dst, ptrdiff_t stride_src)
 {
-int i, j;
+    int i, j;
 
     if (((intptr_t)dst | (intptr_t)src | stride_dst | stride_src) & 15) {
         for (i = 0; i < height; i++) {
-            for (j = 0; j < width; j+=8)
+            for (j = 0; j < width - 7; j+=8)
                 AV_COPY64U(dst+j, src+j);
             dst += stride_dst;
             src += stride_src;
+        }
+        if (width&7) {
+            dst += ((width>>3)<<3) - stride_dst * height;
+            src += ((width>>3)<<3) - stride_src * height;
+            width &= 7;
+            for (i = 0; i < height; i++) {
+                for (j = 0; j < width; j++)
+                    dst[j] = src[j];
+                dst += stride_dst;
+                src += stride_src;
+            }
         }
     } else {
         for (i = 0; i < height; i++) {
@@ -322,18 +331,18 @@ static void sao_filter_CTB(HEVCContext *s, int x, int y)
                            x_ctb, y_ctb);
             if (s->ps.pps->transquant_bypass_enable_flag ||
                 (s->ps.sps->pcm.loop_filter_disable_flag && s->ps.sps->pcm_enabled_flag)) {
-            dst = lc->edge_emu_buffer;
-            stride_dst = 2*MAX_PB_SIZE;
-            copy_CTB(dst, src, width << s->ps.sps->pixel_shift, height, stride_dst, stride_src);
-            s->hevcdsp.sao_band_filter[tab](src, dst, stride_src, stride_dst,
-                                            sao->offset_val[c_idx], sao->band_position[c_idx],
-                                            width, height);
-            restore_tqb_pixels(s, src, dst, stride_src, stride_dst,
-                               x, y, width, height, c_idx);
+                dst = lc->edge_emu_buffer;
+                stride_dst = 2*MAX_PB_SIZE;
+                copy_CTB(dst, src, width << s->ps.sps->pixel_shift, height, stride_dst, stride_src);
+                s->hevcdsp.sao_band_filter[tab](src, dst, stride_src, stride_dst,
+                                                sao->offset_val[c_idx], sao->band_position[c_idx],
+                                                width, height);
+                restore_tqb_pixels(s, src, dst, stride_src, stride_dst,
+                                   x, y, width, height, c_idx);
             } else {
-            s->hevcdsp.sao_band_filter[tab](src, src, stride_src, stride_src,
-                                            sao->offset_val[c_idx], sao->band_position[c_idx],
-                                            width, height);
+                s->hevcdsp.sao_band_filter[tab](src, src, stride_src, stride_src,
+                                                sao->offset_val[c_idx], sao->band_position[c_idx],
+                                                width, height);
             }
             sao->type_idx[c_idx] = SAO_APPLIED;
             break;
@@ -647,8 +656,8 @@ static void deblocking_filter_CTB(HEVCContext *s, int x0, int y0)
     }
 }
 
-static int boundary_strength(HEVCContext *s, MvField *curr, MvField *neigh,
-                             RefPicList *neigh_refPicList)
+static int boundary_strength(const HEVCContext *s, const MvField *curr, const MvField *neigh,
+                             const RefPicList *neigh_refPicList)
 {
     if (curr->pred_flag == PF_BI &&  neigh->pred_flag == PF_BI) {
         // same L0 and L1
@@ -736,9 +745,9 @@ void ff_hevc_deblocking_boundary_strengths(HEVCContext *s, int x0, int y0,
         boundary_upper = 0;
 
     if (boundary_upper) {
-        RefPicList *rpl_top = (lc->boundary_flags & BOUNDARY_UPPER_SLICE) ?
-                              ff_hevc_get_ref_list(s, s->ref, x0, y0 - 1) :
-                              s->ref->refPicList;
+        const RefPicList *rpl_top = (lc->boundary_flags & BOUNDARY_UPPER_SLICE) ?
+                                    ff_hevc_get_ref_list(s, s->ref, x0, y0 - 1) :
+                                    s->ref->refPicList;
         int yp_pu = (y0 - 1) >> log2_min_pu_size;
         int yq_pu =  y0      >> log2_min_pu_size;
         int yp_tu = (y0 - 1) >> log2_min_tu_size;
@@ -774,9 +783,9 @@ void ff_hevc_deblocking_boundary_strengths(HEVCContext *s, int x0, int y0,
         boundary_left = 0;
 
     if (boundary_left) {
-        RefPicList *rpl_left = (lc->boundary_flags & BOUNDARY_LEFT_SLICE) ?
-                               ff_hevc_get_ref_list(s, s->ref, x0 - 1, y0) :
-                               s->ref->refPicList;
+        const RefPicList *rpl_left = (lc->boundary_flags & BOUNDARY_LEFT_SLICE) ?
+                                     ff_hevc_get_ref_list(s, s->ref, x0 - 1, y0) :
+                                     s->ref->refPicList;
         int xp_pu = (x0 - 1) >> log2_min_pu_size;
         int xq_pu =  x0      >> log2_min_pu_size;
         int xp_tu = (x0 - 1) >> log2_min_tu_size;

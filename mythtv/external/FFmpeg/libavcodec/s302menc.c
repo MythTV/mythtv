@@ -20,8 +20,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/channel_layout.h"
+#include "libavutil/reverse.h"
 #include "avcodec.h"
-#include "internal.h"
+#include "codec_internal.h"
+#include "encode.h"
 #include "mathops.h"
 #include "put_bits.h"
 
@@ -35,10 +38,10 @@ static av_cold int s302m_encode_init(AVCodecContext *avctx)
 {
     S302MEncContext *s = avctx->priv_data;
 
-    if (avctx->channels & 1 || avctx->channels > 8) {
+    if (avctx->ch_layout.nb_channels & 1 || avctx->ch_layout.nb_channels > 8) {
         av_log(avctx, AV_LOG_ERROR,
                "Encoding %d channel(s) is not allowed. Only 2, 4, 6 and 8 channels are supported.\n",
-               avctx->channels);
+               avctx->ch_layout.nb_channels);
         return AVERROR(EINVAL);
     }
 
@@ -59,7 +62,7 @@ static av_cold int s302m_encode_init(AVCodecContext *avctx)
     }
 
     avctx->frame_size = 0;
-    avctx->bit_rate   = 48000 * avctx->channels *
+    avctx->bit_rate   = 48000 * avctx->ch_layout.nb_channels *
                        (avctx->bits_per_raw_sample + 4);
     s->framing_index  = 0;
 
@@ -70,9 +73,9 @@ static int s302m_encode2_frame(AVCodecContext *avctx, AVPacket *avpkt,
                                const AVFrame *frame, int *got_packet_ptr)
 {
     S302MEncContext *s = avctx->priv_data;
+    const int nb_channels = avctx->ch_layout.nb_channels;
     const int buf_size = AES3_HEADER_LEN +
-                        (frame->nb_samples *
-                         avctx->channels *
+                        (frame->nb_samples * nb_channels *
                         (avctx->bits_per_raw_sample + 4)) / 8;
     int ret, c, channels;
     uint8_t *o;
@@ -83,13 +86,13 @@ static int s302m_encode2_frame(AVCodecContext *avctx, AVPacket *avpkt,
         return AVERROR(EINVAL);
     }
 
-    if ((ret = ff_alloc_packet2(avctx, avpkt, buf_size, 0)) < 0)
+    if ((ret = ff_get_encode_buffer(avctx, avpkt, buf_size, 0)) < 0)
         return ret;
 
     o = avpkt->data;
     init_put_bits(&pb, o, buf_size);
     put_bits(&pb, 16, buf_size - AES3_HEADER_LEN);
-    put_bits(&pb, 2, (avctx->channels - 2) >> 1);   // number of channels
+    put_bits(&pb, 2, (nb_channels - 2) >> 1);   // number of channels
     put_bits(&pb, 8, 0);                            // channel ID
     put_bits(&pb, 2, (avctx->bits_per_raw_sample - 16) / 4); // bits per samples (0 = 16bit, 1 = 20bit, 2 = 24bit)
     put_bits(&pb, 4, 0);                            // alignments
@@ -102,7 +105,7 @@ static int s302m_encode2_frame(AVCodecContext *avctx, AVPacket *avpkt,
         for (c = 0; c < frame->nb_samples; c++) {
             uint8_t vucf = s->framing_index == 0 ? 0x10: 0;
 
-            for (channels = 0; channels < avctx->channels; channels += 2) {
+            for (channels = 0; channels < nb_channels; channels += 2) {
                 o[0] = ff_reverse[(samples[0] & 0x0000FF00) >> 8];
                 o[1] = ff_reverse[(samples[0] & 0x00FF0000) >> 16];
                 o[2] = ff_reverse[(samples[0] & 0xFF000000) >> 24];
@@ -124,7 +127,7 @@ static int s302m_encode2_frame(AVCodecContext *avctx, AVPacket *avpkt,
         for (c = 0; c < frame->nb_samples; c++) {
             uint8_t vucf = s->framing_index == 0 ? 0x80: 0;
 
-            for (channels = 0; channels < avctx->channels; channels += 2) {
+            for (channels = 0; channels < nb_channels; channels += 2) {
                 o[0] = ff_reverse[ (samples[0] & 0x000FF000) >> 12];
                 o[1] = ff_reverse[ (samples[0] & 0x0FF00000) >> 20];
                 o[2] = ff_reverse[((samples[0] & 0xF0000000) >> 28) | vucf];
@@ -145,7 +148,7 @@ static int s302m_encode2_frame(AVCodecContext *avctx, AVPacket *avpkt,
         for (c = 0; c < frame->nb_samples; c++) {
             uint8_t vucf = s->framing_index == 0 ? 0x10 : 0;
 
-            for (channels = 0; channels < avctx->channels; channels += 2) {
+            for (channels = 0; channels < nb_channels; channels += 2) {
                 o[0] = ff_reverse[ samples[0] & 0xFF];
                 o[1] = ff_reverse[(samples[0] & 0xFF00) >>  8];
                 o[2] = ff_reverse[(samples[1] & 0x0F)   <<  4] | vucf;
@@ -167,22 +170,24 @@ static int s302m_encode2_frame(AVCodecContext *avctx, AVPacket *avpkt,
     return 0;
 }
 
-AVCodec ff_s302m_encoder = {
-    .name                  = "s302m",
-    .long_name             = NULL_IF_CONFIG_SMALL("SMPTE 302M"),
-    .type                  = AVMEDIA_TYPE_AUDIO,
-    .id                    = AV_CODEC_ID_S302M,
+const FFCodec ff_s302m_encoder = {
+    .p.name                = "s302m",
+    .p.long_name           = NULL_IF_CONFIG_SMALL("SMPTE 302M"),
+    .p.type                = AVMEDIA_TYPE_AUDIO,
+    .p.id                  = AV_CODEC_ID_S302M,
+    .p.capabilities        = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_EXPERIMENTAL |
+                             AV_CODEC_CAP_VARIABLE_FRAME_SIZE,
     .priv_data_size        = sizeof(S302MEncContext),
     .init                  = s302m_encode_init,
-    .encode2               = s302m_encode2_frame,
-    .sample_fmts           = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S32,
+    FF_CODEC_ENCODE_CB(s302m_encode2_frame),
+    .p.sample_fmts         = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S32,
                                                             AV_SAMPLE_FMT_S16,
                                                             AV_SAMPLE_FMT_NONE },
-    .capabilities          = AV_CODEC_CAP_VARIABLE_FRAME_SIZE | AV_CODEC_CAP_EXPERIMENTAL,
-    .supported_samplerates = (const int[]) { 48000, 0 },
- /* .channel_layouts       = (const uint64_t[]) { AV_CH_LAYOUT_STEREO,
+    .p.supported_samplerates = (const int[]) { 48000, 0 },
+ /* .p.channel_layouts     = (const uint64_t[]) { AV_CH_LAYOUT_STEREO,
                                                   AV_CH_LAYOUT_QUAD,
                                                   AV_CH_LAYOUT_5POINT1_BACK,
                                                   AV_CH_LAYOUT_5POINT1_BACK | AV_CH_LAYOUT_STEREO_DOWNMIX,
                                                   0 }, */
+    .caps_internal         = FF_CODEC_CAP_INIT_THREADSAFE,
 };

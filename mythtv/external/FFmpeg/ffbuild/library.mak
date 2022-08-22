@@ -14,10 +14,26 @@ INSTHEADERS := $(INSTHEADERS) $(HEADERS:%=$(SUBDIR)%)
 all-$(CONFIG_STATIC): $(SUBDIR)$(LIBNAME)  $(SUBDIR)lib$(FULLNAME).pc
 all-$(CONFIG_SHARED): $(SUBDIR)$(SLIBNAME) $(SUBDIR)lib$(FULLNAME).pc
 
-LIBOBJS := $(OBJS) $(SUBDIR)%.h.o $(TESTOBJS)
+LIBOBJS := $(OBJS) $(SHLIBOBJS) $(STLIBOBJS) $(SUBDIR)%.h.o $(TESTOBJS)
 $(LIBOBJS) $(LIBOBJS:.o=.s) $(LIBOBJS:.o=.i):   CPPFLAGS += -DHAVE_AV_CONFIG_H
 
-$(SUBDIR)$(LIBNAME): $(OBJS)
+ifdef CONFIG_SHARED
+# In case both shared libs and static libs are enabled, it can happen
+# that a user might want to link e.g. libavformat statically, but
+# libavcodec and the other libs dynamically. In this case
+# libavformat won't be able to access libavcodec's internal symbols,
+# so that they have to be duplicated into the archive just like
+# for purely shared builds.
+# Test programs are always statically linked against their library
+# to be able to access their library's internals, even with shared builds.
+# Yet linking against dependend libraries still uses dynamic linking.
+# This means that we are in the scenario described above.
+# In case only static libs are used, the linker will only use
+# one of these copies; this depends on the duplicated object files
+# containing exactly the same symbols.
+OBJS += $(SHLIBOBJS)
+endif
+$(SUBDIR)$(LIBNAME): $(OBJS) $(STLIBOBJS)
 	$(RM) $@
 	$(AR) $(ARFLAGS) $(AR_O) $^
 	$(RANLIB) $@
@@ -37,8 +53,8 @@ $(LIBOBJS): CPPFLAGS += -DBUILDING_$(NAME)
 $(TESTPROGS) $(TOOLS): %$(EXESUF): %.o
 	$$(LD) $(LDFLAGS) $(LDEXEFLAGS) $$(LD_O) $$(filter %.o,$$^) $$(THISLIB) $(FFEXTRALIBS) $$(EXTRALIBS-$$(*F)) $$(ELIBS)
 
-$(SUBDIR)lib$(NAME).version: $(SUBDIR)version.h | $(SUBDIR)
-	$$(M) $$(SRC_PATH)/ffbuild/libversion.sh $(NAME) $$< > $$@
+$(SUBDIR)lib$(NAME).version: $(SUBDIR)version.h $(SUBDIR)version_major.h | $(SUBDIR)
+	$$(M) $$(SRC_PATH)/ffbuild/libversion.sh $(NAME) $$^ > $$@
 
 $(SUBDIR)lib$(FULLNAME).pc: $(SUBDIR)version.h ffbuild/config.sh | $(SUBDIR)
 	$$(M) $$(SRC_PATH)/ffbuild/pkgconfig_generate.sh $(NAME) "$(DESC)"
@@ -49,7 +65,7 @@ $(SUBDIR)lib$(NAME).ver: $(SUBDIR)lib$(NAME).v $(OBJS)
 $(SUBDIR)$(SLIBNAME): $(SUBDIR)$(SLIBNAME_WITH_MAJOR)
 	$(Q)cd ./$(SUBDIR) && $(LN_S) $(SLIBNAME_WITH_MAJOR) $(SLIBNAME)
 
-$(SUBDIR)$(SLIBNAME_WITH_MAJOR): $(OBJS) $(SLIBOBJS) $(SUBDIR)lib$(NAME).ver
+$(SUBDIR)$(SLIBNAME_WITH_MAJOR): $(OBJS) $(SHLIBOBJS) $(SLIBOBJS) $(SUBDIR)lib$(NAME).ver
 	$(SLIB_CREATE_DEF_CMD)
 	$$(LD) $(SHFLAGS) $(LDFLAGS) $(LDSOFLAGS) $$(LD_O) $$(filter %.o,$$^) $(FFEXTRALIBS)
 	$(SLIB_EXTRA_CMD)

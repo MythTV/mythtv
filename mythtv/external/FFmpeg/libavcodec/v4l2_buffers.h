@@ -25,10 +25,13 @@
 #define AVCODEC_V4L2_BUFFERS_H
 
 #include <stdatomic.h>
+#include <stddef.h>
 #include <linux/videodev2.h>
 
 #include "libavutil/hwcontext_drm.h"
-#include "avcodec.h"
+#include "libavutil/buffer.h"
+#include "libavutil/frame.h"
+#include "packet.h"
 
 enum V4L2Buffer_status {
     V4L2BUF_AVAILABLE,

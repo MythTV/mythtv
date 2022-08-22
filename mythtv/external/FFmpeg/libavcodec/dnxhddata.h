@@ -24,8 +24,9 @@
 
 #include <stdint.h>
 #include "avcodec.h"
-#include "libavutil/internal.h"
+#include "libavutil/attributes.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/rational.h"
 
 /** Additional profile info flags */
 #define DNXHD_INTERLACED   (1<<0)
@@ -88,8 +89,7 @@ static av_always_inline uint64_t ff_dnxhd_parse_header_prefix(const uint8_t *buf
     return ff_dnxhd_check_header_prefix(prefix);
 }
 
-int avpriv_dnxhd_get_frame_size(int cid);
-int avpriv_dnxhd_get_hr_frame_size(int cid, int w, int h);
-int avpriv_dnxhd_get_interlaced(int cid);
+int ff_dnxhd_get_frame_size(int cid);
+int ff_dnxhd_get_hr_frame_size(int cid, int w, int h);
 
 #endif /* AVCODEC_DNXHDDATA_H */

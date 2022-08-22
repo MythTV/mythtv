@@ -65,7 +65,7 @@ static void decorrelate_sf(int32_t *p1, int32_t *p2, int length, int dshift, int
     for (i = 0; i < length; i++) {
         int32_t a = p1[i];
         int32_t b = p2[i];
-        b         = (unsigned)(dfactor * (b >> dshift) + 128 >> 8) << dshift;
+        b         = (unsigned)((int)(dfactor * (unsigned)(b >> dshift) + 128) >> 8) << dshift;
         p1[i]     = b - a;
     }
 }
@@ -77,6 +77,7 @@ av_cold void ff_takdsp_init(TAKDSPContext *c)
     c->decorrelate_sm = decorrelate_sm;
     c->decorrelate_sf = decorrelate_sf;
 
-    if (ARCH_X86)
-        ff_takdsp_init_x86(c);
+#if ARCH_X86
+    ff_takdsp_init_x86(c);
+#endif
 }

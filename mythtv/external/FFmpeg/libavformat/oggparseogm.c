@@ -39,6 +39,7 @@ ogm_header(AVFormatContext *s, int idx)
     struct ogg *ogg = s->priv_data;
     struct ogg_stream *os = ogg->streams + idx;
     AVStream *st = s->streams[idx];
+    FFStream *const sti = ffstream(st);
     GetByteContext p;
     uint64_t time_unit;
     uint64_t spu;
@@ -60,7 +61,7 @@ ogm_header(AVFormatContext *s, int idx)
             st->codecpar->codec_id = ff_codec_get_id(ff_codec_bmp_tags, tag);
             st->codecpar->codec_tag = tag;
             if (st->codecpar->codec_id == AV_CODEC_ID_MPEG4)
-                st->need_parsing = AVSTREAM_PARSE_HEADERS;
+                sti->need_parsing = AVSTREAM_PARSE_HEADERS;
         } else if (bytestream2_peek_byte(&p) == 't') {
             st->codecpar->codec_type = AVMEDIA_TYPE_SUBTITLE;
             st->codecpar->codec_id = AV_CODEC_ID_TEXT;
@@ -76,7 +77,7 @@ ogm_header(AVFormatContext *s, int idx)
             st->codecpar->codec_id = ff_codec_get_id(ff_codec_wav_tags, cid);
             // our parser completely breaks AAC in Ogg
             if (st->codecpar->codec_id != AV_CODEC_ID_AAC)
-                st->need_parsing = AVSTREAM_PARSE_FULL;
+                sti->need_parsing = AVSTREAM_PARSE_FULL;
         }
 
         size        = bytestream2_get_le32(&p);
@@ -96,7 +97,7 @@ ogm_header(AVFormatContext *s, int idx)
             st->codecpar->height = bytestream2_get_le32(&p);
             avpriv_set_pts_info(st, 64, time_unit, spu * 10000000);
         } else {
-            st->codecpar->channels = bytestream2_get_le16(&p);
+            st->codecpar->ch_layout.nb_channels = bytestream2_get_le16(&p);
             bytestream2_skip(&p, 2); /* block_align */
             st->codecpar->bit_rate = bytestream2_get_le32(&p) * 8;
             st->codecpar->sample_rate = spu * 10000000 / time_unit;
@@ -116,7 +117,7 @@ ogm_header(AVFormatContext *s, int idx)
         }
 
         // Update internal avctx with changes to codecpar above.
-        st->internal->need_context_update = 1;
+        sti->need_context_update = 1;
     } else if (bytestream2_peek_byte(&p) == 3) {
         bytestream2_skip(&p, 7);
         if (bytestream2_get_bytes_left(&p) > 1)
@@ -159,7 +160,7 @@ ogm_dshow_header(AVFormatContext *s, int idx)
 
         st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
         st->codecpar->codec_id = ff_codec_get_id(ff_codec_wav_tags, AV_RL16(p + 124));
-        st->codecpar->channels = AV_RL16(p + 126);
+        st->codecpar->ch_layout.nb_channels = AV_RL16(p + 126);
         st->codecpar->sample_rate = AV_RL32(p + 128);
         st->codecpar->bit_rate = AV_RL32(p + 132) * 8;
     }

@@ -18,7 +18,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "avcodec.h"
+#include "config.h"
+#include "libavutil/attributes.h"
+#include "libavutil/common.h"
 #include "diracdsp.h"
 
 #define FILTER(src, stride)                                     \
@@ -245,6 +247,7 @@ av_cold void ff_diracdsp_init(DiracDSPContext *c)
     PIXFUNC(avg, 16);
     PIXFUNC(avg, 32);
 
-    if (ARCH_X86)
-        ff_diracdsp_init_x86(c);
+#if ARCH_X86
+    ff_diracdsp_init_x86(c);
+#endif
 }

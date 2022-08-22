@@ -21,10 +21,12 @@
  */
 
 #include <inttypes.h>
+#include <stddef.h>
 
+#include "config.h"
 #include "libavutil/avassert.h"
 #include "libavutil/common.h"
-#include "avcodec.h"
+#include "libavutil/log.h"
 #include "acelp_filters.h"
 
 const int16_t ff_acelp_interp_filter[61] = { /* (0.15) */
@@ -150,6 +152,7 @@ void ff_acelp_filter_init(ACELPFContext *c)
     c->acelp_interpolatef                      = ff_acelp_interpolatef;
     c->acelp_apply_order_2_transfer_function   = ff_acelp_apply_order_2_transfer_function;
 
-    if(HAVE_MIPSFPU)
-        ff_acelp_filter_init_mips(c);
+#if HAVE_MIPSFPU
+    ff_acelp_filter_init_mips(c);
+#endif
 }

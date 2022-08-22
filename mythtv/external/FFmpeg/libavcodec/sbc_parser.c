@@ -41,7 +41,9 @@ static int sbc_parse_header(AVCodecParserContext *s, AVCodecContext *avctx,
         return -1;
 
     if (data[0] == MSBC_SYNCWORD && data[1] == 0 && data[2] == 0) {
-        avctx->channels = 1;
+        av_channel_layout_uninit(&avctx->ch_layout);
+        avctx->ch_layout.order       = AV_CHANNEL_ORDER_UNSPEC;
+        avctx->ch_layout.nb_channels = 1;
         avctx->sample_rate = 16000;
         avctx->frame_size = 120;
         s->duration = avctx->frame_size;
@@ -64,7 +66,9 @@ static int sbc_parse_header(AVCodecParserContext *s, AVCodecContext *avctx,
              + ((((mode == SBC_MODE_DUAL_CHANNEL) + 1) * blocks * bitpool
                  + (joint * subbands)) + 7) / 8;
 
-    avctx->channels = channels;
+    av_channel_layout_uninit(&avctx->ch_layout);
+    avctx->ch_layout.order       = AV_CHANNEL_ORDER_UNSPEC;
+    avctx->ch_layout.nb_channels = channels;
     avctx->sample_rate = sample_rates[sr];
     avctx->frame_size = subbands * blocks;
     s->duration = avctx->frame_size;
@@ -112,7 +116,7 @@ static int sbc_parse(AVCodecParserContext *s, AVCodecContext *avctx,
     return next;
 }
 
-AVCodecParser ff_sbc_parser = {
+const AVCodecParser ff_sbc_parser = {
     .codec_ids      = { AV_CODEC_ID_SBC },
     .priv_data_size = sizeof(SBCParseContext),
     .parser_parse   = sbc_parse,

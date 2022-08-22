@@ -12,7 +12,7 @@
 
 @chapter Synopsis
 
-ffprobe [@var{options}] [@file{input_url}]
+ffprobe [@var{options}] @file{input_url}
 
 @chapter Description
 @c man begin DESCRIPTION
@@ -27,6 +27,9 @@ contained in it.
 If a url is specified in input, ffprobe will try to open and
 probe the url content. If the url cannot be opened or recognized as
 a multimedia file, a positive exit code is returned.
+
+If no output is specified as output with @option{o} ffprobe will write
+to stdout.
 
 ffprobe may be employed both as a standalone application or in
 combination with a textual filter, which may perform more
@@ -335,12 +338,22 @@ Show information about all pixel formats supported by FFmpeg.
 Pixel format information for each format is printed within a section
 with name "PIXEL_FORMAT".
 
+@item -show_optional_fields @var{value}
+Some writers viz. JSON and XML, omit the printing of fields with invalid or non-applicable values,
+while other writers always print them. This option enables one to control this behaviour.
+Valid values are @code{always}/@code{1}, @code{never}/@code{0} and @code{auto}/@code{-1}.
+Default is @var{auto}.
+
 @item -bitexact
 Force bitexact output, useful to produce output which is not dependent
 on the specific build.
 
 @item -i @var{input_url}
 Read @var{input_url}.
+
+@item -o @var{output_url}
+Write output to @var{output_url}. If not specified, the output is sent
+to stdout.
 
 @end table
 @c man end

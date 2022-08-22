@@ -29,7 +29,7 @@ typedef struct CrystalizerContext {
     float mult;
     int clip;
     AVFrame *prev;
-    int (*filter)(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs);
+    int (*filter[2][2])(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs);
 } CrystalizerContext;
 
 #define OFFSET(x) offsetof(CrystalizerContext, x)
@@ -43,36 +43,6 @@ static const AVOption crystalizer_options[] = {
 
 AVFILTER_DEFINE_CLASS(crystalizer);
 
-static int query_formats(AVFilterContext *ctx)
-{
-    AVFilterFormats *formats = NULL;
-    AVFilterChannelLayouts *layouts = NULL;
-    static const enum AVSampleFormat sample_fmts[] = {
-        AV_SAMPLE_FMT_FLT, AV_SAMPLE_FMT_FLTP,
-        AV_SAMPLE_FMT_DBL, AV_SAMPLE_FMT_DBLP,
-        AV_SAMPLE_FMT_NONE
-    };
-    int ret;
-
-    formats = ff_make_format_list(sample_fmts);
-    if (!formats)
-        return AVERROR(ENOMEM);
-    ret = ff_set_common_formats(ctx, formats);
-    if (ret < 0)
-        return ret;
-
-    layouts = ff_all_channel_counts();
-    if (!layouts)
-        return AVERROR(ENOMEM);
-
-    ret = ff_set_common_channel_layouts(ctx, layouts);
-    if (ret < 0)
-        return ret;
-
-    formats = ff_all_samplerates();
-    return ff_set_common_samplerates(ctx, formats);
-}
-
 typedef struct ThreadData {
     void **d;
     void **p;
@@ -80,286 +50,93 @@ typedef struct ThreadData {
     int nb_samples;
     int channels;
     float mult;
-    int clip;
 } ThreadData;
 
-static int filter_flt(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
-{
-    ThreadData *td = arg;
-    void **d = td->d;
-    void **p = td->p;
-    const void **s = td->s;
-    const int nb_samples = td->nb_samples;
-    const int channels = td->channels;
-    const float mult = td->mult;
-    const int clip = td->clip;
-    const int start = (channels * jobnr) / nb_jobs;
-    const int end = (channels * (jobnr+1)) / nb_jobs;
-    float *prv = p[0];
-    int n, c;
-
-    for (c = start; c < end; c++) {
-        const float *src = s[0];
-        float *dst = d[0];
-
-        for (n = 0; n < nb_samples; n++) {
-            float current = src[c];
-            dst[c] = current + (current - prv[c]) * mult;
-            prv[c] = current;
-            if (clip) {
-                dst[c] = av_clipf(dst[c], -1, 1);
-            }
-
-            dst += channels;
-            src += channels;
-        }
-    }
-
-    return 0;
+#define filters(fmt, type, inverse, clp, inverset, clip, one, clip_fn, packed)  \
+static int filter_## inverse ##_## fmt ##_## clp(AVFilterContext *ctx, \
+                                                  void *arg, int jobnr,\
+                                                  int nb_jobs)         \
+{                                                                      \
+    ThreadData *td = arg;                                              \
+    void **d = td->d;                                                  \
+    void **p = td->p;                                                  \
+    const void **s = td->s;                                            \
+    const int nb_samples = td->nb_samples;                             \
+    const int channels = td->channels;                                 \
+    const type mult = td->mult;                                        \
+    const type scale = one / (-mult + one);                            \
+    const int start = (channels * jobnr) / nb_jobs;                    \
+    const int end = (channels * (jobnr+1)) / nb_jobs;                  \
+                                                                       \
+    if (packed) {                                                      \
+        type *prv = p[0];                                              \
+        for (int c = start; c < end; c++) {                            \
+            const type *src = s[0];                                    \
+            type *dst = d[0];                                          \
+                                                                       \
+            for (int n = 0; n < nb_samples; n++) {                     \
+                type current = src[c];                                 \
+                                                                       \
+                if (inverset) {                                        \
+                    dst[c] = (current - prv[c] * mult) * scale;        \
+                    prv[c] = dst[c];                                   \
+                } else {                                               \
+                    dst[c] = current + (current - prv[c]) * mult;      \
+                    prv[c] = current;                                  \
+                }                                                      \
+                if (clip) {                                            \
+                    dst[c] = clip_fn(dst[c], -one, one);               \
+                }                                                      \
+                                                                       \
+                dst += channels;                                       \
+                src += channels;                                       \
+            }                                                          \
+        }                                                              \
+    } else {                                                           \
+        for (int c = start; c < end; c++) {                            \
+            const type *src = s[c];                                    \
+            type *dst = d[c];                                          \
+            type *prv = p[c];                                          \
+                                                                       \
+            for (int n = 0; n < nb_samples; n++) {                     \
+                type current = src[n];                                 \
+                                                                       \
+                if (inverset) {                                        \
+                    dst[n] = (current - prv[0] * mult) * scale;        \
+                    prv[0] = dst[n];                                   \
+                } else {                                               \
+                    dst[n] = current + (current - prv[0]) * mult;      \
+                    prv[0] = current;                                  \
+                }                                                      \
+                if (clip) {                                            \
+                    dst[n] = clip_fn(dst[n], -one, one);               \
+                }                                                      \
+            }                                                          \
+        }                                                              \
+    }                                                                  \
+                                                                       \
+    return 0;                                                          \
 }
 
-static int filter_dbl(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
-{
-    ThreadData *td = arg;
-    void **d = td->d;
-    void **p = td->p;
-    const void **s = td->s;
-    const int nb_samples = td->nb_samples;
-    const int channels = td->channels;
-    double mult = td->mult;
-    const int clip = td->clip;
-    const int start = (channels * jobnr) / nb_jobs;
-    const int end = (channels * (jobnr+1)) / nb_jobs;
-    double *prv = p[0];
-    int n, c;
+filters(flt, float, inverse, noclip, 1, 0, 1.f, av_clipf, 1)
+filters(flt, float, inverse, clip, 1, 1, 1.f, av_clipf, 1)
+filters(flt, float, noinverse, noclip, 0, 0, 1.f, av_clipf, 1)
+filters(flt, float, noinverse, clip, 0, 1, 1.f, av_clipf, 1)
 
-    for (c = start; c < end; c++) {
-        const double *src = s[0];
-        double *dst = d[0];
+filters(fltp, float, inverse, noclip, 1, 0, 1.f, av_clipf, 0)
+filters(fltp, float, inverse, clip, 1, 1, 1.f, av_clipf, 0)
+filters(fltp, float, noinverse, noclip, 0, 0, 1.f, av_clipf, 0)
+filters(fltp, float, noinverse, clip, 0, 1, 1.f, av_clipf, 0)
 
-        for (n = 0; n < nb_samples; n++) {
-            double current = src[c];
+filters(dbl, double, inverse, noclip, 1, 0, 1.0, av_clipd, 1)
+filters(dbl, double, inverse, clip, 1, 1, 1.0, av_clipd, 1)
+filters(dbl, double, noinverse, noclip, 0, 0, 1.0, av_clipd, 1)
+filters(dbl, double, noinverse, clip, 0, 1, 1.0, av_clipd, 1)
 
-            dst[c] = current + (current - prv[c]) * mult;
-            prv[c] = current;
-            if (clip) {
-                dst[c] = av_clipd(dst[c], -1, 1);
-            }
-
-            dst += channels;
-            src += channels;
-        }
-    }
-
-    return 0;
-}
-
-static int filter_fltp(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
-{
-    ThreadData *td = arg;
-    void **d = td->d;
-    void **p = td->p;
-    const void **s = td->s;
-    const int nb_samples = td->nb_samples;
-    const int channels = td->channels;
-    float mult = td->mult;
-    const int clip = td->clip;
-    const int start = (channels * jobnr) / nb_jobs;
-    const int end = (channels * (jobnr+1)) / nb_jobs;
-    int n, c;
-
-    for (c = start; c < end; c++) {
-        const float *src = s[c];
-        float *dst = d[c];
-        float *prv = p[c];
-
-        for (n = 0; n < nb_samples; n++) {
-            float current = src[n];
-
-            dst[n] = current + (current - prv[0]) * mult;
-            prv[0] = current;
-            if (clip) {
-                dst[n] = av_clipf(dst[n], -1, 1);
-            }
-        }
-    }
-
-    return 0;
-}
-
-static int filter_dblp(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
-{
-    ThreadData *td = arg;
-    void **d = td->d;
-    void **p = td->p;
-    const void **s = td->s;
-    const int nb_samples = td->nb_samples;
-    const int channels = td->channels;
-    const double mult = td->mult;
-    const int clip = td->clip;
-    const int start = (channels * jobnr) / nb_jobs;
-    const int end = (channels * (jobnr+1)) / nb_jobs;
-    int n, c;
-
-    for (c = start; c < end; c++) {
-        const double *src = s[c];
-        double *dst = d[c];
-        double *prv = p[c];
-
-        for (n = 0; n < nb_samples; n++) {
-            double current = src[n];
-
-            dst[n] = current + (current - prv[0]) * mult;
-            prv[0] = current;
-            if (clip) {
-                dst[n] = av_clipd(dst[n], -1, 1);
-            }
-        }
-    }
-
-    return 0;
-}
-
-static int ifilter_flt(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
-{
-    ThreadData *td = arg;
-    void **d = td->d;
-    void **p = td->p;
-    const void **s = td->s;
-    const int nb_samples = td->nb_samples;
-    const int channels = td->channels;
-    const float mult = -td->mult;
-    const float div = -td->mult + 1.f;
-    const int clip = td->clip;
-    const int start = (channels * jobnr) / nb_jobs;
-    const int end = (channels * (jobnr+1)) / nb_jobs;
-    float *prv = p[0];
-    int n, c;
-
-    for (c = start; c < end; c++) {
-        const float *src = s[0];
-        float *dst = d[0];
-
-        for (n = 0; n < nb_samples; n++) {
-            float current = src[c];
-            dst[c] = (current + prv[c] * mult) / div;
-            prv[c] = dst[c];
-            if (clip) {
-                dst[c] = av_clipf(dst[c], -1, 1);
-            }
-
-            dst += channels;
-            src += channels;
-        }
-    }
-
-    return 0;
-}
-
-static int ifilter_dbl(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
-{
-    ThreadData *td = arg;
-    void **d = td->d;
-    void **p = td->p;
-    const void **s = td->s;
-    const int nb_samples = td->nb_samples;
-    const int channels = td->channels;
-    const double mult = -td->mult;
-    const double div = -td->mult + 1.f;
-    const int clip = td->clip;
-    const int start = (channels * jobnr) / nb_jobs;
-    const int end = (channels * (jobnr+1)) / nb_jobs;
-    double *prv = p[0];
-    int n, c;
-
-    for (c = start; c < end; c++) {
-        const double *src = s[0];
-        double *dst = d[0];
-
-        for (n = 0; n < nb_samples; n++) {
-            double current = src[c];
-
-            dst[c] = (current + prv[c] * mult) / div;
-            prv[c] = dst[c];
-            if (clip) {
-                dst[c] = av_clipd(dst[c], -1, 1);
-            }
-
-            dst += channels;
-            src += channels;
-        }
-    }
-
-    return 0;
-}
-
-static int ifilter_fltp(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
-{
-    ThreadData *td = arg;
-    void **d = td->d;
-    void **p = td->p;
-    const void **s = td->s;
-    const int nb_samples = td->nb_samples;
-    const int channels = td->channels;
-    const float mult = -td->mult;
-    const float div = -td->mult + 1.f;
-    const int clip = td->clip;
-    const int start = (channels * jobnr) / nb_jobs;
-    const int end = (channels * (jobnr+1)) / nb_jobs;
-    int n, c;
-
-    for (c = start; c < end; c++) {
-        const float *src = s[c];
-        float *dst = d[c];
-        float *prv = p[c];
-
-        for (n = 0; n < nb_samples; n++) {
-            float current = src[n];
-
-            dst[n] = (current + prv[0] * mult) / div;
-            prv[0] = dst[n];
-            if (clip) {
-                dst[n] = av_clipf(dst[n], -1, 1);
-            }
-        }
-    }
-
-    return 0;
-}
-
-static int ifilter_dblp(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
-{
-    ThreadData *td = arg;
-    void **d = td->d;
-    void **p = td->p;
-    const void **s = td->s;
-    const int nb_samples = td->nb_samples;
-    const int channels = td->channels;
-    const double mult = -td->mult;
-    const double div = -td->mult + 1.f;
-    const int clip = td->clip;
-    const int start = (channels * jobnr) / nb_jobs;
-    const int end = (channels * (jobnr+1)) / nb_jobs;
-    int n, c;
-
-    for (c = start; c < end; c++) {
-        const double *src = s[c];
-        double *dst = d[c];
-        double *prv = p[c];
-
-        for (n = 0; n < nb_samples; n++) {
-            double current = src[n];
-
-            dst[n] = (current + prv[0] * mult) / div;
-            prv[0] = dst[n];
-            if (clip) {
-                dst[n] = av_clipd(dst[n], -1, 1);
-            }
-        }
-    }
-
-    return 0;
-}
+filters(dblp, double, inverse, noclip, 1, 0, 1.0, av_clipd, 0)
+filters(dblp, double, inverse, clip, 1, 1, 1.0, av_clipd, 0)
+filters(dblp, double, noinverse, noclip, 0, 0, 1.0, av_clipd, 0)
+filters(dblp, double, noinverse, clip, 0, 1, 1.0, av_clipd, 0)
 
 static int config_input(AVFilterLink *inlink)
 {
@@ -367,10 +144,32 @@ static int config_input(AVFilterLink *inlink)
     CrystalizerContext *s = ctx->priv;
 
     switch (inlink->format) {
-    case AV_SAMPLE_FMT_FLT:  s->filter = s->mult >= 0.f ? filter_flt  : ifilter_flt;  break;
-    case AV_SAMPLE_FMT_DBL:  s->filter = s->mult >= 0.f ? filter_dbl  : ifilter_dbl;  break;
-    case AV_SAMPLE_FMT_FLTP: s->filter = s->mult >= 0.f ? filter_fltp : ifilter_fltp; break;
-    case AV_SAMPLE_FMT_DBLP: s->filter = s->mult >= 0.f ? filter_dblp : ifilter_dblp; break;
+    case AV_SAMPLE_FMT_FLT:
+        s->filter[0][0] = filter_inverse_flt_noclip;
+        s->filter[1][0] = filter_noinverse_flt_noclip;
+        s->filter[0][1] = filter_inverse_flt_clip;
+        s->filter[1][1] = filter_noinverse_flt_clip;
+        break;
+    case AV_SAMPLE_FMT_FLTP:
+        s->filter[0][0] = filter_inverse_fltp_noclip;
+        s->filter[1][0] = filter_noinverse_fltp_noclip;
+        s->filter[0][1] = filter_inverse_fltp_clip;
+        s->filter[1][1] = filter_noinverse_fltp_clip;
+        break;
+    case AV_SAMPLE_FMT_DBL:
+        s->filter[0][0] = filter_inverse_dbl_noclip;
+        s->filter[1][0] = filter_noinverse_dbl_noclip;
+        s->filter[0][1] = filter_inverse_dbl_clip;
+        s->filter[1][1] = filter_noinverse_dbl_clip;
+        break;
+    case AV_SAMPLE_FMT_DBLP:
+        s->filter[0][0] = filter_inverse_dblp_noclip;
+        s->filter[1][0] = filter_noinverse_dblp_noclip;
+        s->filter[0][1] = filter_inverse_dblp_clip;
+        s->filter[1][1] = filter_noinverse_dblp_clip;
+        break;
+    default:
+        return AVERROR_BUG;
     }
 
     return 0;
@@ -407,11 +206,10 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     td.s = (const void **)in->extended_data;
     td.p = (void **)s->prev->extended_data;
     td.nb_samples = in->nb_samples;
-    td.channels = in->channels;
+    td.channels = in->ch_layout.nb_channels;
     td.mult = ctx->is_disabled ? 0.f : s->mult;
-    td.clip = s->clip;
-    ctx->internal->execute(ctx, s->filter, &td, NULL, FFMIN(inlink->channels,
-                                                            ff_filter_get_nb_threads(ctx)));
+    ff_filter_execute(ctx, s->filter[td.mult >= 0.f][s->clip], &td, NULL,
+                      FFMIN(inlink->ch_layout.nb_channels, ff_filter_get_nb_threads(ctx)));
 
     if (out != in)
         av_frame_free(&in);
@@ -426,18 +224,6 @@ static av_cold void uninit(AVFilterContext *ctx)
     av_frame_free(&s->prev);
 }
 
-static int process_command(AVFilterContext *ctx, const char *cmd, const char *args,
-                           char *res, int res_len, int flags)
-{
-    int ret;
-
-    ret = ff_filter_process_command(ctx, cmd, args, res, res_len, flags);
-    if (ret < 0)
-        return ret;
-
-    return config_input(ctx->inputs[0]);
-}
-
 static const AVFilterPad inputs[] = {
     {
         .name         = "default",
@@ -445,7 +231,6 @@ static const AVFilterPad inputs[] = {
         .filter_frame = filter_frame,
         .config_props = config_input,
     },
-    { NULL }
 };
 
 static const AVFilterPad outputs[] = {
@@ -453,19 +238,19 @@ static const AVFilterPad outputs[] = {
         .name = "default",
         .type = AVMEDIA_TYPE_AUDIO,
     },
-    { NULL }
 };
 
-AVFilter ff_af_crystalizer = {
+const AVFilter ff_af_crystalizer = {
     .name           = "crystalizer",
     .description    = NULL_IF_CONFIG_SMALL("Simple audio noise sharpening filter."),
-    .query_formats  = query_formats,
     .priv_size      = sizeof(CrystalizerContext),
     .priv_class     = &crystalizer_class,
     .uninit         = uninit,
-    .inputs         = inputs,
-    .outputs        = outputs,
-    .process_command = process_command,
+    FILTER_INPUTS(inputs),
+    FILTER_OUTPUTS(outputs),
+    FILTER_SAMPLEFMTS(AV_SAMPLE_FMT_FLT, AV_SAMPLE_FMT_FLTP,
+                      AV_SAMPLE_FMT_DBL, AV_SAMPLE_FMT_DBLP),
+    .process_command = ff_filter_process_command,
     .flags          = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL |
                       AVFILTER_FLAG_SLICE_THREADS,
 };

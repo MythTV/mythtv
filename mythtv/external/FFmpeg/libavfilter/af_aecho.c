@@ -152,37 +152,6 @@ static av_cold int init(AVFilterContext *ctx)
     return 0;
 }
 
-static int query_formats(AVFilterContext *ctx)
-{
-    AVFilterChannelLayouts *layouts;
-    AVFilterFormats *formats;
-    static const enum AVSampleFormat sample_fmts[] = {
-        AV_SAMPLE_FMT_S16P, AV_SAMPLE_FMT_S32P,
-        AV_SAMPLE_FMT_FLTP, AV_SAMPLE_FMT_DBLP,
-        AV_SAMPLE_FMT_NONE
-    };
-    int ret;
-
-    layouts = ff_all_channel_counts();
-    if (!layouts)
-        return AVERROR(ENOMEM);
-    ret = ff_set_common_channel_layouts(ctx, layouts);
-    if (ret < 0)
-        return ret;
-
-    formats = ff_make_format_list(sample_fmts);
-    if (!formats)
-        return AVERROR(ENOMEM);
-    ret = ff_set_common_formats(ctx, formats);
-    if (ret < 0)
-        return ret;
-
-    formats = ff_all_samplerates();
-    if (!formats)
-        return AVERROR(ENOMEM);
-    return ff_set_common_samplerates(ctx, formats);
-}
-
 #define MOD(a, b) (((a) >= (b)) ? (a) - (b) : (a))
 
 #define ECHO(name, type, min, max)                                          \
@@ -267,7 +236,7 @@ static int config_output(AVFilterLink *outlink)
     av_freep(&s->delayptrs);
 
     return av_samples_alloc_array_and_samples(&s->delayptrs, NULL,
-                                              outlink->channels,
+                                              outlink->ch_layout.nb_channels,
                                               s->max_samples,
                                               outlink->format, 0);
 }
@@ -290,7 +259,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
     }
 
     s->echo_samples(s, s->delayptrs, frame->extended_data, out_frame->extended_data,
-                    frame->nb_samples, inlink->channels);
+                    frame->nb_samples, inlink->ch_layout.nb_channels);
 
     s->next_pts = frame->pts + av_rescale_q(frame->nb_samples, (AVRational){1, inlink->sample_rate}, inlink->time_base);
 
@@ -313,11 +282,11 @@ static int request_frame(AVFilterLink *outlink)
 
     av_samples_set_silence(frame->extended_data, 0,
                            frame->nb_samples,
-                           outlink->channels,
+                           outlink->ch_layout.nb_channels,
                            frame->format);
 
     s->echo_samples(s, s->delayptrs, frame->extended_data, frame->extended_data,
-                    frame->nb_samples, outlink->channels);
+                    frame->nb_samples, outlink->ch_layout.nb_channels);
 
     frame->pts = s->next_pts;
     if (s->next_pts != AV_NOPTS_VALUE)
@@ -364,7 +333,6 @@ static const AVFilterPad aecho_inputs[] = {
         .name         = "default",
         .type         = AVMEDIA_TYPE_AUDIO,
     },
-    { NULL }
 };
 
 static const AVFilterPad aecho_outputs[] = {
@@ -373,18 +341,18 @@ static const AVFilterPad aecho_outputs[] = {
         .config_props  = config_output,
         .type          = AVMEDIA_TYPE_AUDIO,
     },
-    { NULL }
 };
 
-AVFilter ff_af_aecho = {
+const AVFilter ff_af_aecho = {
     .name          = "aecho",
     .description   = NULL_IF_CONFIG_SMALL("Add echoing to the audio."),
-    .query_formats = query_formats,
     .priv_size     = sizeof(AudioEchoContext),
     .priv_class    = &aecho_class,
     .init          = init,
     .activate      = activate,
     .uninit        = uninit,
-    .inputs        = aecho_inputs,
-    .outputs       = aecho_outputs,
+    FILTER_INPUTS(aecho_inputs),
+    FILTER_OUTPUTS(aecho_outputs),
+    FILTER_SAMPLEFMTS(AV_SAMPLE_FMT_S16P, AV_SAMPLE_FMT_S32P,
+                      AV_SAMPLE_FMT_FLTP, AV_SAMPLE_FMT_DBLP),
 };

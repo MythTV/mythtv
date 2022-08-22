@@ -483,16 +483,16 @@ static void avpacket_queue_init(AVFormatContext *avctx, AVPacketQueue *q)
 
 static void avpacket_queue_flush(AVPacketQueue *q)
 {
-    PacketList *pkt, *pkt1;
+    PacketListEntry *pkt, *pkt1;
 
     pthread_mutex_lock(&q->mutex);
-    for (pkt = q->first_pkt; pkt != NULL; pkt = pkt1) {
+    for (pkt = q->pkt_list.head; pkt != NULL; pkt = pkt1) {
         pkt1 = pkt->next;
         av_packet_unref(&pkt->pkt);
         av_freep(&pkt);
     }
-    q->last_pkt   = NULL;
-    q->first_pkt  = NULL;
+    q->pkt_list.head = NULL;
+    q->pkt_list.tail = NULL;
     q->nb_packets = 0;
     q->size       = 0;
     pthread_mutex_unlock(&q->mutex);
@@ -516,7 +516,7 @@ static unsigned long long avpacket_queue_size(AVPacketQueue *q)
 
 static int avpacket_queue_put(AVPacketQueue *q, AVPacket *pkt)
 {
-    PacketList *pkt1;
+    PacketListEntry *pkt1;
 
     // Drop Packet if queue size is > maximum queue size
     if (avpacket_queue_size(q) > (uint64_t)q->max_q_size) {
@@ -530,7 +530,7 @@ static int avpacket_queue_put(AVPacketQueue *q, AVPacket *pkt)
         return -1;
     }
 
-    pkt1 = (PacketList *)av_malloc(sizeof(PacketList));
+    pkt1 = (PacketListEntry *)av_malloc(sizeof(*pkt1));
     if (!pkt1) {
         av_packet_unref(pkt);
         return -1;
@@ -540,13 +540,13 @@ static int avpacket_queue_put(AVPacketQueue *q, AVPacket *pkt)
 
     pthread_mutex_lock(&q->mutex);
 
-    if (!q->last_pkt) {
-        q->first_pkt = pkt1;
+    if (!q->pkt_list.tail) {
+        q->pkt_list.head = pkt1;
     } else {
-        q->last_pkt->next = pkt1;
+        q->pkt_list.tail->next = pkt1;
     }
 
-    q->last_pkt = pkt1;
+    q->pkt_list.tail = pkt1;
     q->nb_packets++;
     q->size += pkt1->pkt.size + sizeof(*pkt1);
 
@@ -558,17 +558,16 @@ static int avpacket_queue_put(AVPacketQueue *q, AVPacket *pkt)
 
 static int avpacket_queue_get(AVPacketQueue *q, AVPacket *pkt, int block)
 {
-    PacketList *pkt1;
     int ret;
 
     pthread_mutex_lock(&q->mutex);
 
     for (;; ) {
-        pkt1 = q->first_pkt;
+        PacketListEntry *pkt1 = q->pkt_list.head;
         if (pkt1) {
-            q->first_pkt = pkt1->next;
-            if (!q->first_pkt) {
-                q->last_pkt = NULL;
+            q->pkt_list.head = pkt1->next;
+            if (!q->pkt_list.head) {
+                q->pkt_list.tail = NULL;
             }
             q->nb_packets--;
             q->size -= pkt1->pkt.size + sizeof(*pkt1);
@@ -936,7 +935,7 @@ HRESULT decklink_input_callback::VideoInputFrameArrived(
                         }
 
                         if (av_dict_set(&metadata_dict, "timecode", tc, 0) >= 0) {
-                            buffer_size_t metadata_len;
+                            size_t metadata_len;
                             packed_metadata = av_packet_pack_dictionary(metadata_dict, &metadata_len);
                             av_dict_free(&metadata_dict);
                             if (packed_metadata) {
@@ -1061,7 +1060,7 @@ HRESULT decklink_input_callback::VideoInputFrameArrived(
         BMDTimeValue audio_pts;
 
         //hack among hacks
-        pkt.size = audioFrame->GetSampleFrameCount() * ctx->audio_st->codecpar->channels * (ctx->audio_depth / 8);
+        pkt.size = audioFrame->GetSampleFrameCount() * ctx->audio_st->codecpar->ch_layout.nb_channels * (ctx->audio_depth / 8);
         audioFrame->GetBytes(&audioFrameBytes);
         audioFrame->GetPacketTime(&audio_pts, ctx->audio_st->time_base.den);
         pkt.pts = get_pkt_pts(videoFrame, audioFrame, wallclock, abs_wallclock, ctx->audio_pts_source, ctx->audio_st->time_base, &initial_audio_pts, cctx->copyts);
@@ -1297,7 +1296,7 @@ av_cold int ff_decklink_read_header(AVFormatContext *avctx)
     st->codecpar->codec_type  = AVMEDIA_TYPE_AUDIO;
     st->codecpar->codec_id    = cctx->audio_depth == 32 ? AV_CODEC_ID_PCM_S32LE : AV_CODEC_ID_PCM_S16LE;
     st->codecpar->sample_rate = bmdAudioSampleRate48kHz;
-    st->codecpar->channels    = cctx->audio_channels;
+    st->codecpar->ch_layout.nb_channels = cctx->audio_channels;
     avpriv_set_pts_info(st, 64, 1, 1000000);  /* 64 bits pts in us */
     ctx->audio_st=st;
 
@@ -1393,8 +1392,8 @@ av_cold int ff_decklink_read_header(AVFormatContext *avctx)
         ctx->teletext_st = st;
     }
 
-    av_log(avctx, AV_LOG_VERBOSE, "Using %d input audio channels\n", ctx->audio_st->codecpar->channels);
-    result = ctx->dli->EnableAudioInput(bmdAudioSampleRate48kHz, cctx->audio_depth == 32 ? bmdAudioSampleType32bitInteger : bmdAudioSampleType16bitInteger, ctx->audio_st->codecpar->channels);
+    av_log(avctx, AV_LOG_VERBOSE, "Using %d input audio channels\n", ctx->audio_st->codecpar->ch_layout.nb_channels);
+    result = ctx->dli->EnableAudioInput(bmdAudioSampleRate48kHz, cctx->audio_depth == 32 ? bmdAudioSampleType32bitInteger : bmdAudioSampleType16bitInteger, ctx->audio_st->codecpar->ch_layout.nb_channels);
 
     if (result != S_OK) {
         av_log(avctx, AV_LOG_ERROR, "Cannot enable audio input\n");
@@ -1435,7 +1434,7 @@ int ff_decklink_read_packet(AVFormatContext *avctx, AVPacket *pkt)
     avpacket_queue_get(&ctx->queue, pkt, 1);
 
     if (ctx->tc_format && !(av_dict_get(ctx->video_st->metadata, "timecode", NULL, 0))) {
-        buffer_size_t size;
+        size_t size;
         const uint8_t *side_metadata = av_packet_get_side_data(pkt, AV_PKT_DATA_STRINGS_METADATA, &size);
         if (side_metadata) {
            if (av_packet_unpack_dictionary(side_metadata, size, &ctx->video_st->metadata) < 0)

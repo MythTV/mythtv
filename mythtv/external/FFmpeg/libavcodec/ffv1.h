@@ -28,18 +28,13 @@
  * FF Video Codec 1 (a lossless codec)
  */
 
-#include "libavutil/avassert.h"
-#include "libavutil/crc.h"
-#include "libavutil/opt.h"
 #include "libavutil/imgutils.h"
-#include "libavutil/pixdesc.h"
 #include "avcodec.h"
 #include "get_bits.h"
-#include "internal.h"
 #include "mathops.h"
 #include "put_bits.h"
 #include "rangecoder.h"
-#include "thread.h"
+#include "threadframe.h"
 
 #ifdef __INTEL_COMPILER
 #undef av_flatten
@@ -140,11 +135,11 @@ typedef struct FFV1Context {
 } FFV1Context;
 
 int ff_ffv1_common_init(AVCodecContext *avctx);
-int ff_ffv1_init_slice_state(FFV1Context *f, FFV1Context *fs);
+int ff_ffv1_init_slice_state(const FFV1Context *f, FFV1Context *fs);
 int ff_ffv1_init_slices_state(FFV1Context *f);
 int ff_ffv1_init_slice_contexts(FFV1Context *f);
 int ff_ffv1_allocate_initial_states(FFV1Context *f);
-void ff_ffv1_clear_slice_state(FFV1Context *f, FFV1Context *fs);
+void ff_ffv1_clear_slice_state(const FFV1Context *f, FFV1Context *fs);
 int ff_ffv1_close(AVCodecContext *avctx);
 
 static av_always_inline int fold(int diff, int bits)

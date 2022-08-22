@@ -222,7 +222,7 @@ static int apng_read_header(AVFormatContext *s)
                                     ctx->num_frames, ctx->num_play);
             break;
         case MKTAG('f', 'c', 'T', 'L'):
-            if (!acTL_found || len != 26) {
+            if (!acTL_found || len != APNG_FCTL_CHUNK_SIZE) {
                 return AVERROR_INVALIDDATA;
             }
             if ((ret = avio_seek(pb, -8, SEEK_CUR)) < 0)
@@ -336,7 +336,7 @@ static int apng_read_packet(AVFormatContext *s, AVPacket *pkt)
 
     switch (tag) {
     case MKTAG('f', 'c', 'T', 'L'):
-        if (len != 26)
+        if (len != APNG_FCTL_CHUNK_SIZE)
             return AVERROR_INVALIDDATA;
 
         if ((ret = decode_fctl_chunk(s, ctx, pkt)) < 0)
@@ -421,7 +421,7 @@ static const AVClass demuxer_class = {
     .category   = AV_CLASS_CATEGORY_DEMUXER,
 };
 
-AVInputFormat ff_apng_demuxer = {
+const AVInputFormat ff_apng_demuxer = {
     .name           = "apng",
     .long_name      = NULL_IF_CONFIG_SMALL("Animated Portable Network Graphics"),
     .priv_data_size = sizeof(APNGDemuxContext),

@@ -47,6 +47,7 @@ typedef struct DHAVContext {
 } DHAVContext;
 
 typedef struct DHAVStream {
+    int64_t last_frame_number;
     int64_t last_timestamp;
     int64_t last_time;
     int64_t pts;
@@ -77,10 +78,11 @@ static const uint32_t sample_rates[] = {
 static int parse_ext(AVFormatContext *s, int length)
 {
     DHAVContext *dhav = s->priv_data;
-    int index, ret = 0;
+    int64_t ret = 0;
 
     while (length > 0) {
         int type = avio_r8(s->pb);
+        int index;
 
         switch (type) {
         case 0x80:
@@ -167,8 +169,7 @@ static int read_chunk(AVFormatContext *s)
 {
     DHAVContext *dhav = s->priv_data;
     int frame_length, ext_length;
-    int64_t start, end;
-    int ret;
+    int64_t start, end, ret;
 
     if (avio_feof(s->pb))
         return AVERROR_EOF;
@@ -233,21 +234,24 @@ static int64_t get_duration(AVFormatContext *s)
     int64_t start_pos = avio_tell(s->pb);
     int64_t start = 0, end = 0;
     struct tm timeinfo;
+    int max_interations = 100000;
 
     if (!s->pb->seekable)
         return 0;
 
     avio_seek(s->pb, avio_size(s->pb) - 8, SEEK_SET);
-    if (avio_rl32(s->pb) == MKTAG('d','h','a','v')) {
-        int seek_back = avio_rl32(s->pb);
+    while (avio_tell(s->pb) > 12 && max_interations--) {
+        if (avio_rl32(s->pb) == MKTAG('d','h','a','v')) {
+            int seek_back = avio_rl32(s->pb);
 
-        avio_seek(s->pb, -seek_back, SEEK_CUR);
-        read_chunk(s);
-        get_timeinfo(dhav->date, &timeinfo);
-        end = av_timegm(&timeinfo) * 1000LL;
-    } else {
-        avio_seek(s->pb, start_pos, SEEK_SET);
-        return 0;
+            avio_seek(s->pb, -seek_back, SEEK_CUR);
+            read_chunk(s);
+            get_timeinfo(dhav->date, &timeinfo);
+            end = av_timegm(&timeinfo) * 1000LL;
+            break;
+        } else {
+            avio_seek(s->pb, -12, SEEK_CUR);
+        }
     }
 
     avio_seek(s->pb, start_pos, SEEK_SET);
@@ -314,6 +318,8 @@ static int64_t get_pts(AVFormatContext *s, int stream_index)
 
         if (diff < 0)
             diff += 65535;
+        if (diff == 0 && dhav->frame_rate)
+            diff = av_rescale(dhav->frame_number - dst->last_frame_number, 1000, dhav->frame_rate);
         dst->pts += diff;
     } else {
         dst->pts = t * 1000LL;
@@ -321,6 +327,7 @@ static int64_t get_pts(AVFormatContext *s, int stream_index)
 
     dst->last_time = t;
     dst->last_timestamp = dhav->timestamp;
+    dst->last_frame_number = dhav->frame_number;
 
     return dst->pts;
 }
@@ -388,7 +395,7 @@ retry:
         default: avpriv_request_sample(s, "Unknown audio codec %X", dhav->audio_codec);
         }
         st->duration              = dhav->duration;
-        st->codecpar->channels    = dhav->audio_channels;
+        st->codecpar->ch_layout.nb_channels = dhav->audio_channels;
         st->codecpar->sample_rate = dhav->sample_rate;
         st->priv_data = dst = av_mallocz(sizeof(DHAVStream));
         if (!st->priv_data)
@@ -429,15 +436,17 @@ static int dhav_read_seek(AVFormatContext *s, int stream_index,
 {
     DHAVContext *dhav = s->priv_data;
     AVStream *st = s->streams[stream_index];
+    FFStream *const sti = ffstream(st);
     int index = av_index_search_timestamp(st, timestamp, flags);
     int64_t pts;
 
     if (index < 0)
         return -1;
-    if (avio_seek(s->pb, st->index_entries[index].pos, SEEK_SET) < 0)
+    pts = sti->index_entries[index].timestamp;
+    if (pts < timestamp)
+        return AVERROR(EAGAIN);
+    if (avio_seek(s->pb, sti->index_entries[index].pos, SEEK_SET) < 0)
         return -1;
-
-    pts = st->index_entries[index].timestamp;
 
     for (int n = 0; n < s->nb_streams; n++) {
         AVStream *st = s->streams[n];
@@ -451,7 +460,7 @@ static int dhav_read_seek(AVFormatContext *s, int stream_index,
     return 0;
 }
 
-AVInputFormat ff_dhav_demuxer = {
+const AVInputFormat ff_dhav_demuxer = {
     .name           = "dhav",
     .long_name      = NULL_IF_CONFIG_SMALL("Video DAV"),
     .priv_data_size = sizeof(DHAVContext),
@@ -460,5 +469,5 @@ AVInputFormat ff_dhav_demuxer = {
     .read_packet    = dhav_read_packet,
     .read_seek      = dhav_read_seek,
     .extensions     = "dav",
-    .flags          = AVFMT_GENERIC_INDEX | AVFMT_NO_BYTE_SEEK | AVFMT_TS_DISCONT | AVFMT_TS_NONSTRICT,
+    .flags          = AVFMT_GENERIC_INDEX | AVFMT_NO_BYTE_SEEK | AVFMT_TS_DISCONT | AVFMT_TS_NONSTRICT | AVFMT_SEEK_TO_PTS,
 };

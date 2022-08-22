@@ -27,7 +27,7 @@
 
 static int sup_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
-    uint8_t *data = pkt->data;
+    const uint8_t *data = pkt->data;
     size_t size = pkt->size;
     uint32_t pts = 0, dts = 0;
 
@@ -84,7 +84,7 @@ static int sup_write_header(AVFormatContext *s)
     return 0;
 }
 
-AVOutputFormat ff_sup_muxer = {
+const AVOutputFormat ff_sup_muxer = {
     .name           = "sup",
     .long_name      = NULL_IF_CONFIG_SMALL("raw HDMV Presentation Graphic Stream subtitles"),
     .extensions     = "sup",

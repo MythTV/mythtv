@@ -20,6 +20,7 @@
 #include "libavutil/opt.h"
 
 #include "bsf.h"
+#include "bsf_internal.h"
 #include "cbs.h"
 #include "cbs_bsf.h"
 #include "cbs_av1.h"
@@ -194,7 +195,7 @@ static const AVOption av1_metadata_options[] = {
     { "colocated", "Top-left chroma sample position", 0, AV_OPT_TYPE_CONST,
         { .i64 = AV1_CSP_COLOCATED }, .flags = FLAGS, .unit = "csp" },
 
-    { "tick_rate", "Set display tick rate (num_units_in_display_tick / time_scale)",
+    { "tick_rate", "Set display tick rate (time_scale / num_units_in_display_tick)",
         OFFSET(tick_rate), AV_OPT_TYPE_RATIONAL,
         { .dbl = 0.0 }, 0, UINT_MAX, FLAGS },
     { "num_ticks_per_picture", "Set display ticks per picture for CFR streams",
@@ -219,12 +220,12 @@ static const enum AVCodecID av1_metadata_codec_ids[] = {
     AV_CODEC_ID_AV1, AV_CODEC_ID_NONE,
 };
 
-const AVBitStreamFilter ff_av1_metadata_bsf = {
-    .name           = "av1_metadata",
+const FFBitStreamFilter ff_av1_metadata_bsf = {
+    .p.name         = "av1_metadata",
+    .p.codec_ids    = av1_metadata_codec_ids,
+    .p.priv_class   = &av1_metadata_class,
     .priv_data_size = sizeof(AV1MetadataContext),
-    .priv_class     = &av1_metadata_class,
     .init           = &av1_metadata_init,
     .close          = &ff_cbs_bsf_generic_close,
     .filter         = &ff_cbs_bsf_generic_filter,
-    .codec_ids      = av1_metadata_codec_ids,
 };
