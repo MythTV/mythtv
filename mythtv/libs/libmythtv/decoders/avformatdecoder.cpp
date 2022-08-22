@@ -2187,9 +2187,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     else
                         msg = QString("Codec %1, null name,").arg(strm);
 
-                    if (p->decode == nullptr)
-                        msg += "decoder is null";
-
                     LOG(VB_LIBAV, LOG_INFO, LOC + msg);
 
                     if (p->id == par->codec_id)
