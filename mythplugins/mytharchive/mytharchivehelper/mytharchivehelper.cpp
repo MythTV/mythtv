@@ -1608,7 +1608,7 @@ static int grabThumbnail(const QString& inFile, const QString& thumbList, const 
     AVCodecContext *codecCtx = codecmap.GetCodecContext(inputFC->streams[videostream]);
 
     // get decoder for video stream
-    AVCodec * codec = avcodec_find_decoder(codecCtx->codec_id);
+    const AVCodec * codec = avcodec_find_decoder(codecCtx->codec_id);
 
     if (codec == nullptr)
     {
