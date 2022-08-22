@@ -52,7 +52,7 @@ bool MythV4L2M2MContext::DecoderWillResetOnFlush()
 }
 
 MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext **Context,
-                                                  AVCodec **Codec,
+                                                  const AVCodec **Codec,
                                                   const QString &Decoder,
                                                   AVStream *Stream,
                                                   uint StreamType)
@@ -187,7 +187,7 @@ bool MythV4L2M2MContext::RetrieveFrame(AVCodecContext *Context, MythVideoFrame *
  * Testing on Pi 3, the default of 20 is too high and leads to memory allocation
  * failures in the the kernel driver.
 */
-void MythV4L2M2MContext::SetDecoderOptions(AVCodecContext* Context, AVCodec* Codec)
+void MythV4L2M2MContext::SetDecoderOptions(AVCodecContext* Context, const AVCodec* Codec)
 {
     if (m_request)
         return;

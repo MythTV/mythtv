@@ -244,7 +244,7 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts, bool Reinit /*=false*/)
 }
 
 MythCodecID MythCodecContext::FindDecoder(const QString &Decoder, AVStream *Stream,
-                                          AVCodecContext **Context, AVCodec **Codec)
+                                          AVCodecContext **Context, const AVCodec **Codec)
 {
     MythCodecID result = kCodec_NONE;
     uint streamtype = mpeg_version((*Context)->codec_id);

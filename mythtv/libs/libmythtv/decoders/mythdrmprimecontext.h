@@ -18,7 +18,7 @@ class MythDRMPRIMEContext : public MythCodecContext
    ~MythDRMPRIMEContext() override;
 
     static MythCodecID GetSupportedCodec (AVCodecContext **Context,
-                                          AVCodec       **Codec,
+                                          const AVCodec **Codec,
                                           const QString  &Decoder,
                                           AVStream       *Stream,
                                           uint            StreamType);
@@ -32,7 +32,7 @@ class MythDRMPRIMEContext : public MythCodecContext
 
   protected:
     static MythCodecID GetPrimeCodec     (AVCodecContext **Context,
-                                          AVCodec       **Codec,
+                                          const AVCodec **Codec,
                                           AVStream       *Stream,
                                           MythCodecID     Successs, // Xlib conflict
                                           MythCodecID     Failure,

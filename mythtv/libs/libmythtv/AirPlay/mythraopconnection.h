@@ -143,7 +143,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     static QString  g_rsaLastError;
     // audio out
     AudioOutput    *m_audio               {nullptr};
-    AVCodec        *m_codec               {nullptr};
+    const AVCodec  *m_codec               {nullptr};
     AVCodecContext *m_codecContext        {nullptr};
     QList<int>      m_audioFormat;
     int             m_channels            {2};

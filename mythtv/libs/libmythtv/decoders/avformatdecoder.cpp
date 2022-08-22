@@ -1001,7 +1001,7 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
     delete m_avfRingBuffer;
     m_avfRingBuffer = new MythAVFormatBuffer(Buffer);
 
-    AVInputFormat *fmt      = nullptr;
+    const AVInputFormat *fmt = nullptr;
     QString        fnames   = m_ringBuffer->GetFilename();
     QByteArray     fnamea   = fnames.toLatin1();
     const char    *filename = fnamea.constData();
@@ -1026,7 +1026,7 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
     if (strcmp(fmt->name, "mpegts") == 0 &&
         gCoreContext->GetBoolSetting("FFMPEGTS", false))
     {
-        AVInputFormat *fmt2 = av_find_input_format("mpegts-ffmpeg");
+        const AVInputFormat *fmt2 = av_find_input_format("mpegts-ffmpeg");
         if (fmt2)
         {
             fmt = fmt2;
@@ -1147,8 +1147,6 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
 
     m_ic->streams_changed = HandleStreamChange;
     m_ic->stream_change_data = this;
-
-    fmt->flags &= ~AVFMT_NOFILE;
 
     if (!m_livetv && !m_ringBuffer->IsDisc())
     {
@@ -2308,7 +2306,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     {
         for(;;)
         {
-            AVCodec *codec = nullptr;
+            const AVCodec *codec = nullptr;
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Trying to select best video track");
 
             /*

@@ -1884,7 +1884,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
     m_image = QImage();
 
     // Find the mpeg2 video decoder.
-    AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_MPEG2VIDEO);
+    const AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_MPEG2VIDEO);
     if (!codec)
         return;
     if (!picture)

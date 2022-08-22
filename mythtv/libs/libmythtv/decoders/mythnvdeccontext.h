@@ -35,7 +35,7 @@ class MythNVDECContext : public MythCodecContext
     bool IsDeinterlacing                 (bool &DoubleRate, bool StreamChange = false) override;
     bool DecoderWillResetOnFlush         (void) override;
     static MythCodecID GetSupportedCodec (AVCodecContext **CodecContext,
-                                          AVCodec       **Codec,
+                                          const AVCodec **Codec,
                                           const QString  &Decoder,
                                           AVStream       *Stream,
                                           uint            StreamType);

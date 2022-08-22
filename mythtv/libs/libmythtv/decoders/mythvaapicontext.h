@@ -34,7 +34,7 @@ class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
     bool   DecoderWillResetOnFlush       () override;
     bool   DecoderWillResetOnAspect      () override;
 
-    static MythCodecID GetSupportedCodec (AVCodecContext** Context, AVCodec** Codec,
+    static MythCodecID GetSupportedCodec (AVCodecContext** Context, const AVCodec** Codec,
                                           const QString&   Decoder, uint StreamType);
     static enum AVPixelFormat GetFormat  (AVCodecContext* Context, const AVPixelFormat* PixFmt);
     static enum AVPixelFormat GetFormat2 (AVCodecContext* Context, const AVPixelFormat* PixFmt);
