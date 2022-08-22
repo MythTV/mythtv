@@ -330,7 +330,7 @@ bool avfDecoder::initialize()
 
     // let FFmpeg finds the best audio stream (should only be one), also catter
     // should the file/stream not be an audio one
-    AVCodec *codec = nullptr;
+    const AVCodec *codec = nullptr;
     int selTrack = av_find_best_stream(m_inputContext->getContext(), AVMEDIA_TYPE_AUDIO,
                                        -1, -1, &codec, 0);
 

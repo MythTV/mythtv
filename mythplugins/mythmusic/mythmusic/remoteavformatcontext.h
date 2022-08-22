@@ -73,7 +73,7 @@ class RemoteAVFormatContext
             probe_data.buf_size = m_rf->Read(m_buffer, BUFFER_SIZE);
             probe_data.buf = m_buffer;
 
-            AVInputFormat *fmt = av_probe_input_format(&probe_data, 1);
+            const AVInputFormat *fmt = av_probe_input_format(&probe_data, 1);
             if (!fmt)
             {
                 LOG(VB_GENERAL, LOG_ERR,  QString("RemoteAVFormatContext::Open: Failed to probe file: %1").arg(filename));

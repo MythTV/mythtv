@@ -51,7 +51,7 @@ class avfDecoder : public QObject, public Decoder
 
     QString m_devicename;
 
-    AVInputFormat *m_inputFormat          {nullptr};
+    const AVInputFormat *m_inputFormat    {nullptr};
     RemoteAVFormatContext *m_inputContext {nullptr};
     AVCodecContext *m_audioDec            {nullptr};
     MythCodecMap m_codecMap               {};

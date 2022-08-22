@@ -79,7 +79,7 @@ class ThumbFinder : public MythScreenType
     RemoteAVFormatContext m_inputFC      {nullptr};
     AVCodecContext  *m_codecCtx          {nullptr};
     MythCodecMap     m_codecMap          {};
-    AVCodec         *m_codec             {nullptr};
+    const AVCodec   *m_codec             {nullptr};
     MythAVFrame      m_frame;
     MythAVCopy       m_copy;
 
