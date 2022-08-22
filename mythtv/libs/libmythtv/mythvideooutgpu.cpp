@@ -511,7 +511,7 @@ bool MythVideoOutputGPU::ProcessInputChange()
         // to be inconsistent.
         SourceChanged(m_newVideoDim, m_newVideoDispDim, m_newAspect);
         AVCodecID avCodecId = myth2av_codecid(m_newCodecId);
-        AVCodec* codec = avcodec_find_decoder(avCodecId);
+        const AVCodec* codec = avcodec_find_decoder(avCodecId);
         QString codecName;
         if (codec)
             codecName = codec->name;
