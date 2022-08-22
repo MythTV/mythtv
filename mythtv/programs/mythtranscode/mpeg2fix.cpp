@@ -794,7 +794,7 @@ bool MPEG2fixup::InitAV(const QString& inputfile, const char *type, int64_t offs
     QByteArray ifarray = inputfile.toLocal8Bit();
     const char *ifname = ifarray.constData();
 
-    AVInputFormat *fmt = nullptr;
+    const AVInputFormat *fmt = nullptr;
 
     if (type)
         fmt = av_find_input_format(type);
@@ -1243,7 +1243,7 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, const QString& fname)
     m_picture->interlaced_frame = ((info->display_picture->flags &
                                     PIC_FLAG_PROGRESSIVE_FRAME) != 0) ? 0 : 1;
 
-    AVCodec *out_codec = avcodec_find_encoder(AV_CODEC_ID_MPEG2VIDEO);
+    const AVCodec *out_codec = avcodec_find_encoder(AV_CODEC_ID_MPEG2VIDEO);
     if (!out_codec)
     {
         LOG(VB_GENERAL, LOG_ERR, "Couldn't find MPEG2 encoder");
