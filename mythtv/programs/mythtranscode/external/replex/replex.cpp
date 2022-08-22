@@ -187,7 +187,7 @@ static int avcodec_encode_audio(AVCodecContext *avctx,
 
 static int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
 {
-	AVCodec *codec;
+	const AVCodec *codec;
 	AVCodecContext *c= nullptr;
 	int frame_size, j, out_size;
 	short *samples;
