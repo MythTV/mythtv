@@ -207,7 +207,11 @@ int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags);
     return false;                                   \
 } while (false)
 
-// This is a slightly modified static int has_codec_parameters() from libavformat/utils.c
+/** @brief Determine if we have enough live TV data to initialize hardware decoders.
+
+This was based on what is now the static int has_codec_parameters() from libavformat/demux.c
+
+*/
 static bool StreamHasRequiredParameters(AVCodecContext *Context, AVStream *Stream)
 {
     switch (Stream->codecpar->codec_type)
@@ -221,9 +225,11 @@ static bool StreamHasRequiredParameters(AVCodecContext *Context, AVStream *Strea
                 FAIL("Unspecified video size");
             if (Stream->codecpar->format == AV_PIX_FMT_NONE)
                 FAIL("Unspecified video pixel format");
-            if (Context->codec_id == AV_CODEC_ID_RV30 || Context->codec_id == AV_CODEC_ID_RV40)
-                if (!Stream->sample_aspect_ratio.num && !Context->sample_aspect_ratio.num && !Stream->codec_info_nb_frames)
-                    FAIL("No frame in rv30/40 and no sar");
+            // The proprietary RealVideo codecs are not used for TV broadcast
+            // and codec_info_nb_frames was moved to FFStream as it is an internal, private value.
+            //if (Context->codec_id == AV_CODEC_ID_RV30 || Context->codec_id == AV_CODEC_ID_RV40)
+            //    if (!Stream->sample_aspect_ratio.num && !Context->sample_aspect_ratio.num && !Stream->codec_info_nb_frames)
+            //        FAIL("No frame in rv30/40 and no sar");
             break;
         case AVMEDIA_TYPE_AUDIO:
             if (!Context)
