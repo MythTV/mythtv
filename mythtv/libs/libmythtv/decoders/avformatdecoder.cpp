@@ -452,14 +452,10 @@ void AvFormatDecoder::CloseContext()
     {
         CloseCodecs();
 
-        AVInputFormat *fmt = m_ic->iformat;
-        m_ic->iformat->flags |= AVFMT_NOFILE;
-
         av_free(m_ic->pb->buffer);
         av_free(m_ic->pb);
         avformat_close_input(&m_ic);
         m_ic = nullptr;
-        fmt->flags &= ~AVFMT_NOFILE;
     }
     m_avcParser->Reset();
 }
