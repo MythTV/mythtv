@@ -16,7 +16,7 @@ class MythVDPAUContext : public MythCodecContext
     bool   DecoderNeedsReset             (AVCodecContext *Context) override;
 
     static MythCodecID GetSupportedCodec (AVCodecContext **CodecContext,
-                                          AVCodec       **Codec,
+                                          const AVCodec **Codec,
                                           const QString  &Decoder,
                                           uint            StreamType);
     static enum AVPixelFormat GetFormat  (AVCodecContext *Context,

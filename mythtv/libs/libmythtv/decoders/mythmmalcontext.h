@@ -13,7 +13,7 @@ class MythMMALContext : public MythCodecContext
     MythMMALContext(DecoderBase *Parent, MythCodecID Codec);
    ~MythMMALContext() override;
     static MythCodecID GetSupportedCodec(AVCodecContext **Context,
-                                         AVCodec **Codec,
+                                         const AVCodec **Codec,
                                          const QString &Decoder,
                                          AVStream *Stream,
                                          uint StreamType);

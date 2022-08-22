@@ -23,7 +23,7 @@ class MythMediaCodecContext : public MythCodecContext
     bool RetrieveFrame(AVCodecContext *Context, MythVideoFrame *Frame, AVFrame *AvFrame) override;
 
     static MythCodecID GetBestSupportedCodec(AVCodecContext **Context,
-                                             AVCodec       **Codec,
+                                             const AVCodec **Codec,
                                              const QString  &Decoder,
                                              AVStream       *Stream,
                                              uint            StreamType);

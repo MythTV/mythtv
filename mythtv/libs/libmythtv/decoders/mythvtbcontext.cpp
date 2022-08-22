@@ -74,7 +74,7 @@ int MythVTBContext::HwDecoderInit(AVCodecContext *Context)
 }
 
 MythCodecID MythVTBContext::GetSupportedCodec(AVCodecContext **Context,
-                                              AVCodec ** Codec,
+                                              const AVCodec ** Codec,
                                               const QString &Decoder,
                                               uint StreamType)
 {

@@ -43,7 +43,7 @@ MythDRMPRIMEContext::~MythDRMPRIMEContext()
 }
 
 MythCodecID MythDRMPRIMEContext::GetPrimeCodec(AVCodecContext **Context,
-                                               AVCodec        **Codec,
+                                               const AVCodec  **Codec,
                                                AVStream        *Stream,
                                                MythCodecID      Successs,
                                                MythCodecID      Failure,
@@ -54,7 +54,7 @@ MythCodecID MythDRMPRIMEContext::GetPrimeCodec(AVCodecContext **Context,
     QString name = QString((*Codec)->name) + "_" + CodecName;
     if (name.startsWith("mpeg2video"))
         name = "mpeg2_" + CodecName;
-    AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
+    const AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
     auto *decoder = dynamic_cast<AvFormatDecoder*>(reinterpret_cast<DecoderBase*>((*Context)->opaque));
     if (!codec || !decoder)
     {
@@ -72,7 +72,7 @@ MythCodecID MythDRMPRIMEContext::GetPrimeCodec(AVCodecContext **Context,
 }
 
 MythCodecID MythDRMPRIMEContext::GetSupportedCodec(AVCodecContext **Context,
-                                                   AVCodec **Codec,
+                                                   const AVCodec **Codec,
                                                    const QString &Decoder,
                                                    AVStream *Stream,
                                                    uint StreamType)

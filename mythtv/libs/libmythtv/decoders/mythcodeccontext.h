@@ -130,7 +130,7 @@ class MTV_PUBLIC MythCodecContext
     static void GetDecoders                (RenderOptions &Opts, bool Reinit = false);
     static QStringList GetDecoderDescription(void);
     static MythCodecID FindDecoder         (const QString &Decoder, AVStream *Stream,
-                                            AVCodecContext **Context, AVCodec **Codec);
+                                            AVCodecContext **Context, const AVCodec **Codec);
     static int  GetBuffer                  (struct AVCodecContext *Context, AVFrame *Frame, int Flags);
     static bool GetBuffer2                 (struct AVCodecContext *Context, MythVideoFrame *Frame,
                                             AVFrame *AvFrame, int Flags);
@@ -156,7 +156,7 @@ class MTV_PUBLIC MythCodecContext
     virtual void   SetDeinterlacing        (AVCodecContext */*Context*/, MythVideoProfile */*Profile*/, bool /*DoubleRate*/) {}
     virtual void   PostProcessFrame        (AVCodecContext */*Context*/, MythVideoFrame */*Frame*/) {}
     virtual bool   IsDeinterlacing         (bool &/*DoubleRate*/, bool /*StreamChange*/ = false) { return false; }
-    virtual void   SetDecoderOptions       (AVCodecContext */*Context*/, AVCodec */*Codec*/) { }
+    virtual void   SetDecoderOptions       (AVCodecContext */*Context*/, const AVCodec */*Codec*/) { }
     virtual bool   DecoderWillResetOnFlush (void) { return false; }
     virtual bool   DecoderWillResetOnAspect(void) { return false; }
     virtual bool   DecoderNeedsReset       (AVCodecContext */*Context*/) { return m_resetRequired; }

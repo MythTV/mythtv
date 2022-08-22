@@ -118,7 +118,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
 }
 
 MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context,
-                                                AVCodec ** /*Codec*/,
+                                                const AVCodec ** /*Codec*/,
                                                 const QString &Decoder,
                                                 uint StreamType)
 {

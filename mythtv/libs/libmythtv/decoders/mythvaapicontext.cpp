@@ -130,7 +130,7 @@ inline AVPixelFormat MythVAAPIContext::FramesFormat(AVPixelFormat Format)
 /*! \brief Confirm whether VAAPI support is available given Decoder and Context
 */
 MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext** Context,
-                                                AVCodec** /*Codec*/,
+                                                const AVCodec** /*Codec*/,
                                                 const QString& Decoder,
                                                 uint StreamType)
 {

@@ -38,7 +38,7 @@ bool MythMMALContext::CheckCodecSize(int Width, int Height, MythCodecContext::Co
 }
 
 MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,
-                                               AVCodec **Codec,
+                                               const AVCodec **Codec,
                                                const QString &Decoder,
                                                AVStream *Stream,
                                                uint StreamType)
@@ -87,7 +87,7 @@ MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,
     QString name = QString((*Codec)->name) + "_mmal";
     if (name == "mpeg2video_mmal")
         name = "mpeg2_mmal";
-    AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
+    const AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
     AvFormatDecoder *decoder = dynamic_cast<AvFormatDecoder*>(reinterpret_cast<DecoderBase*>((*Context)->opaque));
     if (!codec || !decoder)
     {

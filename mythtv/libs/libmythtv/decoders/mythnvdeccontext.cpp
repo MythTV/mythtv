@@ -31,7 +31,7 @@ MythNVDECContext::~MythNVDECContext()
  * to another decoder as soon as possible if necessary.
 */
 MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
-                                                AVCodec       **Codec,
+                                                const AVCodec **Codec,
                                                 const QString  &Decoder,
                                                 AVStream       *Stream,
                                                 uint            StreamType)
@@ -114,7 +114,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
         if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) &&
             (config->device_type == AV_HWDEVICE_TYPE_CUDA))
         {
-            AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
+            const AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
             if (codec)
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("NVDEC supports decoding %1").arg(desc));

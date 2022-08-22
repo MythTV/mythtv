@@ -245,7 +245,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     
     bool                m_useAvCodec             {false};
 
-    AVCodec            *m_mpaVidCodec            {nullptr};
+    const AVCodec      *m_mpaVidCodec            {nullptr};
     AVCodecContext     *m_mpaVidCtx              {nullptr};
 
     int                 m_targetBitRate          {2200};

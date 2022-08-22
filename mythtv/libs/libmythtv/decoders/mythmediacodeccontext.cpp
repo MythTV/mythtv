@@ -209,7 +209,7 @@ int MythMediaCodecContext::InitialiseDecoder(AVCodecContext *Context)
 }
 
 MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext **Context,
-                                                         AVCodec       **Codec,
+                                                         const AVCodec **Codec,
                                                          const QString  &Decoder,
                                                          AVStream       *Stream,
                                                          uint            StreamType)
@@ -250,7 +250,7 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext **Contex
         QString decodername = QString((*Codec)->name) + "_mediacodec";
         if (decodername == "mpeg2video_mediacodec")
             decodername = "mpeg2_mediacodec";
-        AVCodec *newCodec = avcodec_find_decoder_by_name (decodername.toLocal8Bit());
+        const AVCodec *newCodec = avcodec_find_decoder_by_name (decodername.toLocal8Bit());
         if (newCodec)
         {
             *Codec = newCodec;
