@@ -658,6 +658,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
 
     int normalframes = 0;
 
+#if 0
     if (st && st->cur_dts != AV_NOPTS_VALUE)
     {
 
@@ -698,6 +699,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
         m_noDtsHack = false;
     }
     else
+#endif
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "No DTS Seeking Hack!");
         m_noDtsHack = true;
