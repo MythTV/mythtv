@@ -191,7 +191,7 @@ bool MythVideoOutput::InputChanged(const QSize VideoDim, const QSize VideoDispDi
     SourceChanged(VideoDim, VideoDispDim, VideoAspect);
     m_maxReferenceFrames = ReferenceFrames;
     AVCodecID avCodecId = myth2av_codecid(CodecID);
-    AVCodec* codec = avcodec_find_decoder(avCodecId);
+    const AVCodec* codec = avcodec_find_decoder(avCodecId);
     QString codecName;
     if (codec)
         codecName = codec->name;
