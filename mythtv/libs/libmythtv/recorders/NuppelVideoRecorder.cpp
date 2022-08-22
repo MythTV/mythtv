@@ -477,7 +477,9 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
     av_dict_set(&opts, "rc_init_cplx", "0", 0);
     m_mpaVidCtx->dct_algo = FF_DCT_AUTO;
     m_mpaVidCtx->idct_algo = FF_IDCT_AUTO;
+#if FF_API_PRIVATE_OPT
     av_dict_set_int(&opts, "pred", FF_PRED_LEFT, 0);
+#endif
     if (m_videocodec.toLower() == "huffyuv" || m_videocodec.toLower() == "mjpeg")
         m_mpaVidCtx->strict_std_compliance = FF_COMPLIANCE_UNOFFICIAL;
     m_mpaVidCtx->thread_count = m_encodingThreadCount;
@@ -2358,16 +2360,33 @@ void NuppelVideoRecorder::WriteVideo(MythVideoFrame *frame, bool skipsync,
             packet->data = (uint8_t *)m_strm;
             packet->size = frame->m_bufferSize;
 
-            int got_packet = 0;
-            tmp = avcodec_encode_video2(m_mpaVidCtx, packet, mpa_picture, &got_packet);
+            bool got_packet = false;
+            int ret = avcodec_receive_packet(m_mpaVidCtx, packet);
+            if (ret == 0)
+                got_packet = true;
+            if (ret == AVERROR(EAGAIN))
+                ret = 0;
+            if (ret == 0)
+                ret = avcodec_send_frame(m_mpaVidCtx, mpa_picture);
+            // if ret from avcodec_send_frame is AVERROR(EAGAIN) then
+            // there are 2 packets to be received while only 1 frame to be
+            // sent. The code does not cater for this. Hopefully it will not happen.
 
-            if (tmp < 0 || !got_packet)
+            if (ret < 0)
             {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    "WriteVideo : avcodec_encode_video() failed");
+                std::string error;
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("video encode error: %1 (%2)")
+                    .arg(av_make_error_stdstring(error, ret)).arg(got_packet));
                 av_packet_free(&packet);
                 return;
             }
+
+            if (!got_packet)
+            {
+                av_packet_free(&packet);
+                return;
+            }
+
 
             tmp = packet->size;
             av_packet_free(&packet);
