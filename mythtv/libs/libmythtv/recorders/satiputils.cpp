@@ -49,7 +49,7 @@ QStringList SatIP::probeDevices(void)
     }
 
     return SatIP::doUPNPsearch(true);
-};
+}
 
 QStringList SatIP::doUPNPsearch(bool loginfo)
 {
@@ -132,7 +132,7 @@ QStringList SatIP::doUPNPsearch(bool loginfo)
     satipservers = nullptr;
 
     return result;
-};
+}
 
 QStringList SatIP::findServers(void)
 {

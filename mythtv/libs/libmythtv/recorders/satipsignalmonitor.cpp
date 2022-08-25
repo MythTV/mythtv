@@ -19,9 +19,27 @@ SatIPSignalMonitor::SatIPSignalMonitor(int db_cardnum,
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 
+    // Tuning timeout time for channel lock from database.
+    std::chrono::milliseconds wait = 3s;             // Minimum timeout time 3 seconds
+    std::chrono::milliseconds signal_timeout = 0ms;  // Not used here
+    std::chrono::milliseconds tuning_timeout = 0ms;  // Maximum time for channel lock
+    CardUtil::GetTimeouts(db_cardnum, signal_timeout, tuning_timeout);
+    if (tuning_timeout < wait)
+    {
+        LOG(VB_CHANNEL, LOG_INFO, LOC +
+            QString("Tuning timeout from database: %1 ms is too small, using %2 ms")
+                .arg(tuning_timeout.count()).arg(wait.count()));
+    }
+    else
+    {
+        wait = tuning_timeout;              // Use value from database
+        LOG(VB_CHANNEL, LOG_INFO, LOC +
+            QString("Tuning timeout: %1 ms").arg(wait.count()));
+    }
+
     m_signalStrength.SetThreshold(0);
     m_signalStrength.SetRange(0, 255);
-    m_signalStrength.SetTimeout(3s);  // TODO Use value from database
+    m_signalStrength.SetTimeout(wait);
 
     AddFlags(kSigMon_WaitForSig);
 
@@ -74,7 +92,7 @@ void SatIPSignalMonitor::UpdateValues(void)
         }
 
         // Update signal status
-        int signalStrength = m_streamHandler->m_rtsp->GetSignalStrength();
+        int signalStrength = m_streamHandler->GetSignalStrength();
         m_signalStrength.SetValue(signalStrength);
 
         m_updateDone = true;
@@ -86,8 +104,8 @@ void SatIPSignalMonitor::UpdateValues(void)
     bool isLocked = false;
     {
         QMutexLocker locker(&m_statusLock);
-        int signalStrength = m_streamHandler->m_rtsp->GetSignalStrength();
-        bool hasLock = m_streamHandler->m_rtsp->HasLock();
+        int signalStrength = m_streamHandler->GetSignalStrength();
+        bool hasLock = m_streamHandler->HasLock();
         m_signalStrength.SetValue(signalStrength);
         wasLocked = m_signalLock.IsGood();
         m_signalLock.SetValue(hasLock);

@@ -3,6 +3,7 @@
 
 // Qt headers
 #include <QString>
+#include <QStringList>
 
 // MythTV headers
 #include "dtvconfparserhelpers.h"

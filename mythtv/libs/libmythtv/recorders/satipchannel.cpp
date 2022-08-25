@@ -98,7 +98,7 @@ bool SatIPChannel::IsOpen(void) const
 {
     QMutexLocker locker(&m_streamLock);
     bool result = m_streamHandler != nullptr;
-    LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("< %1 IsOpen:%2").arg(__func__).arg(result));
+    LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("IsOpen:%1").arg(result));
     return result;
 }
 
