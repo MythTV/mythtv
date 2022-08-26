@@ -1593,11 +1593,11 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
         "    visible         = :VISIBLE,   service_type    = :SERVICETYPE "
         "WHERE chanid=:CHANID")
         .arg((!set_channum)       ? "" : "channum  = :CHANNUM,  ",
-             (freqid.isEmpty())   ? "" : "freqid   = :FREQID,   ",
-             (icon.isEmpty())     ? "" : "icon     = :ICON,     ",
-             (tvformat.isEmpty()) ? "" : "tvformat = :TVFORMAT, ",
-             (xmltvid.isEmpty())  ? "" : "xmltvid  = :XMLTVID,  ",
-             (default_authority.isEmpty()) ?
+             (freqid.isNull())    ? "" : "freqid   = :FREQID,   ",
+             (icon.isNull())      ? "" : "icon     = :ICON,     ",
+             (tvformat.isNull())  ? "" : "tvformat = :TVFORMAT, ",
+             (xmltvid.isNull())   ? "" : "xmltvid  = :XMLTVID,  ",
+             (default_authority.isNull()) ?
              "" : "default_authority = :AUTHORITY,");
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1620,17 +1620,15 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
     query.bindValue(":VISIBLE",     visible);
     query.bindValue(":SERVICETYPE", service_type);
 
-    if (!freqid.isEmpty())
+    if (!freqid.isNull())
         query.bindValue(":FREQID",    freqid);
-
-    if (!tvformat.isEmpty())
+    if (!tvformat.isNull())
         query.bindValue(":TVFORMAT",  tvformat);
-
-    if (!icon.isEmpty())
+    if (!icon.isNull())
         query.bindValue(":ICON",      icon);
-    if (!xmltvid.isEmpty())
+    if (!xmltvid.isNull())
         query.bindValue(":XMLTVID",   xmltvid);
-    if (!default_authority.isEmpty())
+    if (!default_authority.isNull())
         query.bindValue(":AUTHORITY",   default_authority);
 
     if (!query.exec())
