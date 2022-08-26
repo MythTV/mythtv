@@ -540,6 +540,10 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     {
         SET_STRING(DefaultAuthorityDescriptor);
     }
+    else if (DescriptorID::s2_satellite_delivery_system == DescriptorTag())
+    {
+        SET_STRING(S2SatelliteDeliverySystemDescriptor);
+    }
     //
     // Extension descriptors for extension 0x7F
     else if (DescriptorTag() == DescriptorID::extension &&

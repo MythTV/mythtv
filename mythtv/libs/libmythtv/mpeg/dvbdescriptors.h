@@ -2948,6 +2948,51 @@ class DefaultAuthorityDescriptor : public MPEGDescriptor
     }
 };
 
+// Draft ETSI EN 300 468 V1.16.1 (2019-05)
+// DVB Bluebook A038 (Feb 2019) p 59
+// Table 42: S2 satellite delivery system descriptor
+// 0x79
+class S2SatelliteDeliverySystemDescriptor : public MPEGDescriptor
+{
+  public:
+    explicit S2SatelliteDeliverySystemDescriptor(
+        const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::s2_satellite_delivery_system) { }
+    //       Name                     bits  loc     expected value
+    // descriptor_tag                   8   0.0     0x79
+    // descriptor_length                8   1.0
+    // scrambling_sequence_selector     1   2.0
+    uint ScramblingSequenceSelector() const
+        { return (m_data[2] >> 7) & 0x01; }
+
+    // multiple_input_stream_flag       1   2.1
+    uint MultipleInputStreamFlag() const
+        { return (m_data[2] >> 6) & 0x01; }
+
+    // reserved_zero_future_use         1   2.2
+    // not_timeslice_flag               1   2.3
+    uint NotTimesliceFlag() const
+        { return (m_data[2] >> 4) & 0x01; }
+
+    // reserved_future_use              2   2.4
+    // TS_GS_mode                       2   2.6
+    uint TSGSMode() const
+        { return m_data[2] & 0x03; }
+
+    // if (scrambling_sequence_selector == 1){
+    //   reserved_future_use            6   3.0
+    //   scrambling_sequence_index     18   3.6
+    // }
+    // if (multiple_input_stream_flag == 1){
+    //   input_stream_identifier        8   6.0
+    // }
+    // if (not_timeslice_flag == 0){
+    //   timeslice_number               8   7.0
+    // }
+
+    QString toString(void) const override; // MPEGDescriptor
+};
+
 /*
  * private UPC Cablecom (Austria) episode descriptor for Horizon middleware
  */

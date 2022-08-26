@@ -666,6 +666,25 @@ QString TerrestrialDeliverySystemDescriptor::toString() const
     return str;
 }
 
+// 0x79
+QString S2SatelliteDeliverySystemDescriptor::toString() const
+{
+    QString str = QString("S2SatelliteDeliverySystemDescriptor ");
+    str += QString("tag(0x%1) ").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString("length(%1) ").arg(DescriptorLength());
+
+    str.append(QString("\n      ScramblingSequenceSelector(%1)").arg(ScramblingSequenceSelector()));
+    str.append(QString(" MultipleInputStreamFlag(%1)").arg(MultipleInputStreamFlag()));
+    str.append(QString("\n      NotTimesliceFlag(%1)").arg(NotTimesliceFlag()));
+    str.append(QString(" TSGSMode(%1)").arg(TSGSMode()));
+    //
+    // TBD
+    //
+    str.append(" Dumping\n");
+    str.append(hexdump());
+    return str;
+}
+
 // 0x7F 0x00
 QString ImageIconDescriptor::toString() const
 {

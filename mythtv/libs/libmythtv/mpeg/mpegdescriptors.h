@@ -129,7 +129,7 @@ class DescriptorID
         dvb_content_identifier         = 0x76, /* partial */
         time_slice_fec_identifier      = 0x77,
         ecm_repetition_rate            = 0x78,
-        s2_satellite_delivery_system   = 0x79,
+        s2_satellite_delivery_system   = 0x79, /* partial */
         eac3                           = 0x7A,
         dts                            = 0x7B,
         aac                            = 0x7C,
