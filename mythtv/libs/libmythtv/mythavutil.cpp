@@ -425,7 +425,7 @@ MythStreamInfoList::MythStreamInfoList(const QString& filename)
                     / static_cast<float>(stream->avg_frame_rate.den);
             }
             if (info.m_codecType == 'A')
-                info.m_channels = codecpar->channels;
+                info.m_channels = codecpar->ch_layout.nb_channels;
             m_streamInfoList.append(info);
         }
     }

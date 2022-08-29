@@ -23,7 +23,7 @@ class AudioOutputDigitalEncoder
     int GetFrames(void *ptr, int maxlen);
     int    Buffered(void) const
     // assume 32 bit samples = 4 byte
-    { return m_inlen / 4 / m_avContext->channels; }
+    { return m_inlen / 4 / m_avContext->ch_layout.nb_channels; }
     void    clear();
 
   private:

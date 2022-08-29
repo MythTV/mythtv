@@ -581,21 +581,26 @@ public:
     AudioConvertInternal(AVSampleFormat in, AVSampleFormat out) :
     m_in(in), m_out(out)
     {
-        m_swr = swr_alloc_set_opts(nullptr,
-                                   av_get_default_channel_layout(1),
+        AVChannelLayout channel_layout;
+        av_channel_layout_default(&channel_layout, 1);
+        int ret = swr_alloc_set_opts2(&m_swr,
+                                   &channel_layout,
                                    m_out,
                                    48000,
-                                   av_get_default_channel_layout(1),
+                                   &channel_layout,
                                    m_in,
                                    48000,
                                    0, nullptr);
-        if (!m_swr)
+        if (!m_swr || ret < 0)
         {
-            LOG(VB_AUDIO, LOG_ERR, LOC + "error allocating resampler context");
+            std::string error;
+            LOG(VB_AUDIO, LOG_ERR, LOC +
+                QString("error allocating resampler context (%1)")
+                .arg(av_make_error_stdstring(error, ret)));
             return;
         }
         /* initialize the resampling context */
-        int ret = swr_init(m_swr);
+        ret = swr_init(m_swr);
         if (ret < 0)
         {
             std::string error;

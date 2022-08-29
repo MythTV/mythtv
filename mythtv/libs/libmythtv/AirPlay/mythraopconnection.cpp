@@ -672,7 +672,7 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
         if (data_size)
         {
             int num_samples = data_size /
-                (ctx->channels * av_get_bytes_per_sample(ctx->sample_fmt));
+                (ctx->ch_layout.nb_channels * av_get_bytes_per_sample(ctx->sample_fmt));
 
             frames_added += num_samples;
             AudioData block {samples, data_size, num_samples};
@@ -1650,7 +1650,7 @@ bool MythRAOPConnection::CreateDecoder(void)
         }
         m_codecContext->extradata = extradata;
         m_codecContext->extradata_size = 36;
-        m_codecContext->channels = m_channels;
+        m_codecContext->ch_layout.nb_channels = m_channels;
         if (avcodec_open2(m_codecContext, m_codec, nullptr) < 0)
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
