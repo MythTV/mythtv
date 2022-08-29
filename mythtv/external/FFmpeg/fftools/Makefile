@@ -5,7 +5,7 @@ AVPROGS-$(CONFIG_FFPROBE)  += ffprobe
 AVPROGS     := $(AVPROGS-yes:%=%$(PROGSSUF)$(EXESUF))
 PROGS       += $(AVPROGS)
 MYTHPROGS   = $(addprefix myth, ${PROGS})
-MYTHFFLIBS  = -lmythavfilter -lmythavformat -lmythavcodec -lmythavresample \
+MYTHFFLIBS  = -lmythavfilter -lmythavformat -lmythavcodec \
 -lmythpostproc -lmythswresample -lmythswscale
 
 AVBASENAMES  = ffmpeg ffplay ffprobe
