@@ -647,7 +647,7 @@ int AudioOutput::DecodeAudio(AVCodecContext *ctx,
     AudioFormat fmt =
         AudioOutputSettings::AVSampleFormatToFormat(format, ctx->bits_per_raw_sample);
 
-    data_size = m_frame->nb_samples * m_frame->channels * av_get_bytes_per_sample(format);
+    data_size = m_frame->nb_samples * m_frame->ch_layout.nb_channels * av_get_bytes_per_sample(format);
 
     // May need to convert audio to S16
     AudioConvert converter(fmt, CanProcess(fmt) ? fmt : FORMAT_S16);
@@ -656,7 +656,7 @@ int AudioOutput::DecodeAudio(AVCodecContext *ctx,
     if (av_sample_fmt_is_planar(format))
     {
         src = buffer;
-        converter.InterleaveSamples(m_frame->channels,
+        converter.InterleaveSamples(m_frame->ch_layout.nb_channels,
                                     src,
                                     (const uint8_t **)m_frame->extended_data,
                                     data_size);

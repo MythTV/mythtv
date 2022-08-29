@@ -128,8 +128,7 @@ bool AudioOutputDigitalEncoder::Init(
 
     m_avContext->bit_rate       = bitrate;
     m_avContext->sample_rate    = samplerate;
-    m_avContext->channels       = channels;
-    m_avContext->channel_layout = av_get_default_channel_layout(channels);
+    av_channel_layout_default(&(m_avContext->ch_layout), channels);
     m_avContext->sample_fmt     = FFMPEG_SAMPLE_FORMAT;
 
     // open it
@@ -149,7 +148,7 @@ bool AudioOutputDigitalEncoder::Init(
         return false;
     }
 
-    m_samplesPerFrame  = m_avContext->frame_size * m_avContext->channels;
+    m_samplesPerFrame  = m_avContext->frame_size * m_avContext->ch_layout.nb_channels;
 
     LOG(VB_AUDIO, LOG_INFO, QString("DigitalEncoder::Init fs=%1, spf=%2")
             .arg(m_avContext->frame_size) .arg(m_samplesPerFrame));
@@ -220,7 +219,7 @@ int AudioOutputDigitalEncoder::Encode(void *input, int len, AudioFormat format)
 
     int frames           = m_inlen / AudioOutputSettings::SampleSize(MYTH_SAMPLE_FORMAT) / m_samplesPerFrame;
     int i                = 0;
-    int channels         = m_avContext->channels;
+    int channels         = m_avContext->ch_layout.nb_channels;
     int size_channel     = m_avContext->frame_size *
         AudioOutputSettings::SampleSize(MYTH_SAMPLE_FORMAT);
     if (!m_frame)
@@ -241,9 +240,8 @@ int AudioOutputDigitalEncoder::Encode(void *input, int len, AudioFormat format)
     m_frame->nb_samples = m_avContext->frame_size;
     m_frame->pts        = AV_NOPTS_VALUE;
     m_frame->format         = m_avContext->sample_fmt;
-    m_frame->channel_layout = m_avContext->channel_layout;
+    av_channel_layout_copy(&(m_frame->ch_layout), &(m_avContext->ch_layout));
     m_frame->sample_rate = m_avContext->sample_rate;
-    m_frame->channels = m_avContext->channels;
 
     if (frames > 0)
     {

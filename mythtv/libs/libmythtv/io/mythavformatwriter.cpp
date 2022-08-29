@@ -579,8 +579,7 @@ AVStream* MythAVFormatWriter::AddAudioStream(void)
     context->codec_type   = AVMEDIA_TYPE_AUDIO;
     context->bit_rate     = m_audioBitrate;
     context->sample_rate  = m_audioFrameRate;
-    context->channels     = m_audioChannels;
-    context->channel_layout = static_cast<uint64_t>(av_get_default_channel_layout(m_audioChannels));
+    av_channel_layout_default(&(context->ch_layout), m_audioChannels);
 
     // c->flags |= CODEC_FLAG_QSCALE; // VBR
     // c->global_quality = blah;

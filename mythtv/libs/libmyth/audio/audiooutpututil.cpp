@@ -283,12 +283,12 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
 
     auto format = (AVSampleFormat)frame->format;
 
-    data_size = frame->nb_samples * frame->channels * av_get_bytes_per_sample(format);
+    data_size = frame->nb_samples * frame->ch_layout.nb_channels * av_get_bytes_per_sample(format);
 
     if (av_sample_fmt_is_planar(format))
     {
         InterleaveSamples(AudioOutputSettings::AVSampleFormatToFormat(format, ctx->bits_per_raw_sample),
-                          frame->channels, buffer, (const uint8_t **)frame->extended_data,
+                          frame->ch_layout.nb_channels, buffer, (const uint8_t **)frame->extended_data,
                           data_size);
     }
     else

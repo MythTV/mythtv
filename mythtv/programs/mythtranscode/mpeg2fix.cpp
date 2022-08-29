@@ -865,7 +865,7 @@ bool MPEG2fixup::InitAV(const QString& inputfile, const char *type, int64_t offs
 
             case AVMEDIA_TYPE_AUDIO:
                 if (!m_allAudio && m_extCount > 0 &&
-                    m_inputFC->streams[i]->codecpar->channels < 2 &&
+                    m_inputFC->streams[i]->codecpar->ch_layout.nb_channels < 2 &&
                     m_inputFC->streams[i]->codecpar->sample_rate < 100000)
                 {
                     LOG(VB_GENERAL, LOG_ERR,

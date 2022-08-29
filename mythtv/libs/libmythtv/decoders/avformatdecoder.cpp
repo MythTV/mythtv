@@ -2091,7 +2091,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 LOG(VB_GENERAL, LOG_INFO, LOC +
                     QString("codec %1 has %2 channels")
                         .arg(avcodec_get_name(par->codec_id))
-                        .arg(par->channels));
+                        .arg(par->ch_layout.nb_channels));
 
                 m_bitrate += par->bit_rate;
                 break;
@@ -2255,7 +2255,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         {
             int lang = GetAudioLanguage(audioStreamCount, strm);
             AudioTrackType type = GetAudioTrackType(strm);
-            int channels  = par->channels;
+            int channels  = par->ch_layout.nb_channels;
             uint lang_indx = lang_aud_cnt[lang]++;
             audioStreamCount++;
 
@@ -2295,7 +2295,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 QString("Audio Track #%1, of type (%2) is A/V stream #%3 (id=0x%4) "
                         "and has %5 channels in the %6 language(%7).")
                     .arg(m_tracks[kTrackTypeAudio].size()).arg(toString(type))
-                    .arg(strm).arg(m_ic->streams[strm]->id,0,16).arg(enc->channels)
+                    .arg(strm).arg(m_ic->streams[strm]->id,0,16).arg(enc->ch_layout.nb_channels)
                     .arg(iso639_key_toName(lang)).arg(lang));
         }
     }
@@ -4149,7 +4149,7 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint TrackNo)
                         msg += user_title;
 
                     int channels = 0;
-                    if (m_ringBuffer->IsDVD() || par->channels)
+                    if (m_ringBuffer->IsDVD() || par->ch_layout.nb_channels)
                         channels = m_tracks[kTrackTypeAudio][TrackNo].m_orig_num_channels;
 
                     if (channels == 0)
@@ -4310,7 +4310,7 @@ int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
         const int stream_index = tracks[f].m_av_stream_index;
         AVCodecParameters *par = ic->streams[stream_index]->codecpar;
         if ((codecId == AV_CODEC_ID_NONE || codecId == par->codec_id) &&
-            (max_seen < par->channels))
+            (max_seen < par->ch_layout.nb_channels))
         {
             if (codecId == AV_CODEC_ID_DTS && profile > 0)
             {
@@ -4319,7 +4319,7 @@ int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
                     continue;
             }
             selectedTrack = f;
-            max_seen = par->channels;
+            max_seen = par->ch_layout.nb_channels;
         }
     }
 
@@ -4653,7 +4653,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         // detect channels on streams that need
         // to be decoded before we can know this
         bool already_decoded = false;
-        if (!ctx->channels)
+        if (!ctx->ch_layout.nb_channels)
         {
             m_avCodecLock.lock();
             if (DoPassThrough(curstream->codecpar, false) || !DecoderWillDownmix(ctx))
@@ -4662,19 +4662,21 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 // let the decoder set the number of channels. For other codecs
                 // we downmix if necessary in audiooutputbase
                 ctx->request_channel_layout = 0;
+                // TODO replace request_channel_layout with "downmix" codec private option
             }
             else // No passthru, the decoder will downmix
             {
                 ctx->request_channel_layout =
                     av_get_default_channel_layout(m_audio->GetMaxChannels());
+                // TODO replace request_channel_layout with "downmix" codec private option
                 if (ctx->codec_id == AV_CODEC_ID_AC3)
-                    ctx->channels = m_audio->GetMaxChannels();
+                    ctx->ch_layout.nb_channels = m_audio->GetMaxChannels();
             }
 
             ret = m_audio->DecodeAudio(ctx, m_audioSamples, data_size, tmp_pkt);
             decoded_size = data_size;
             already_decoded = true;
-            reselectAudioTrack |= ctx->channels;
+            reselectAudioTrack |= ctx->ch_layout.nb_channels;
             m_avCodecLock.unlock();
         }
 
@@ -4722,15 +4724,15 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         // Check if the number of channels or sampling rate have changed
         if (ctx->sample_rate != m_audioOut.m_sampleRate ||
-            ctx->channels    != m_audioOut.m_channels ||
+            ctx->ch_layout.nb_channels    != m_audioOut.m_channels ||
             AudioOutputSettings::AVSampleFormatToFormat(ctx->sample_fmt,
                                                         ctx->bits_per_raw_sample) != m_audioOut.format)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "Audio stream changed");
-            if (ctx->channels != m_audioOut.m_channels)
+            if (ctx->ch_layout.nb_channels != m_audioOut.m_channels)
             {
                 LOG(VB_GENERAL, LOG_INFO, LOC + QString("Number of audio channels changed from %1 to %2")
-                    .arg(m_audioOut.m_channels).arg(ctx->channels));
+                    .arg(m_audioOut.m_channels).arg(ctx->ch_layout.nb_channels));
             }
             QMutexLocker locker(&m_trackLock);
             m_currentTrack[kTrackTypeAudio] = -1;
@@ -4764,11 +4766,13 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             {
                 if (DecoderWillDownmix(ctx))
                 {
+                    // TODO replace request_channel_layout with "downmix" codec private option
                     ctx->request_channel_layout =
                         av_get_default_channel_layout(m_audio->GetMaxChannels());
                 }
                 else
                 {
+                    // TODO replace request_channel_layout with "downmix" codec private option
                     ctx->request_channel_layout = 0;
                 }
 
@@ -4799,8 +4803,8 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                                  (char *)m_audioSamples, data_size);
 
         int samplesize = AudioOutputSettings::SampleSize(m_audio->GetFormat());
-        int frames = (ctx->channels <= 0 || decoded_size < 0 || !samplesize) ? -1 :
-            decoded_size / (ctx->channels * samplesize);
+        int frames = (ctx->ch_layout.nb_channels <= 0 || decoded_size < 0 || !samplesize) ? -1 :
+            decoded_size / (ctx->ch_layout.nb_channels * samplesize);
         m_audio->AddAudioData((char *)m_audioSamples, data_size, temppts, frames);
         if (m_audioOut.m_doPassthru && !m_audio->NeedDecodingBeforePassthrough())
         {
@@ -5261,12 +5265,12 @@ bool AvFormatDecoder::DoPassThrough(const AVCodecParameters *par, bool withProfi
     // of its profile. We do so, so we can bitstream DTS-HD as DTS core
     if (!withProfile && par->codec_id == AV_CODEC_ID_DTS && !m_audio->CanDTSHD())
     {
-        passthru = m_audio->CanPassthrough(par->sample_rate, par->channels,
+        passthru = m_audio->CanPassthrough(par->sample_rate, par->ch_layout.nb_channels,
                                            par->codec_id, FF_PROFILE_DTS);
     }
     else
     {
-        passthru = m_audio->CanPassthrough(par->sample_rate, par->channels,
+        passthru = m_audio->CanPassthrough(par->sample_rate, par->ch_layout.nb_channels,
                                            par->codec_id, par->profile);
     }
 
@@ -5317,25 +5321,27 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
         bool using_passthru = DoPassThrough(curstream->codecpar, false);
 
-        requested_channels = ctx->channels;
+        requested_channels = ctx->ch_layout.nb_channels;
         ctx->request_channel_layout =
             av_get_default_channel_layout(requested_channels);
 
         if (!using_passthru &&
-            ctx->channels > (int)m_audio->GetMaxChannels() &&
+            ctx->ch_layout.nb_channels > (int)m_audio->GetMaxChannels() &&
             DecoderWillDownmix(ctx))
         {
             requested_channels = m_audio->GetMaxChannels();
+            // TODO replace request_channel_layout with "downmix" codec private option
             ctx->request_channel_layout =
                 av_get_default_channel_layout(requested_channels);
         }
         else
         {
+            // TODO replace request_channel_layout with "downmix" codec private option
             ctx->request_channel_layout = 0;
         }
 
         info = AudioInfo(ctx->codec_id, fmt, ctx->sample_rate,
-                         requested_channels, using_passthru, ctx->channels,
+                         requested_channels, using_passthru, ctx->ch_layout.nb_channels,
                          ctx->codec_id == AV_CODEC_ID_DTS ? ctx->profile : 0);
     }
 
@@ -5358,7 +5364,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
         QString("\n\t\t\tfrom %1 to %2")
             .arg(old_in.toString(), m_audioOut.toString()));
 
-    m_audio->SetAudioParams(m_audioOut.format, ctx->channels,
+    m_audio->SetAudioParams(m_audioOut.format, ctx->ch_layout.nb_channels,
                             requested_channels,
                             m_audioOut.m_codecId, m_audioOut.m_sampleRate,
                             m_audioOut.m_doPassthru, m_audioOut.m_codecProfile);
