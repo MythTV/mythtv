@@ -1434,7 +1434,6 @@ LIBRARY_LIST="
     avdevice
     avfilter
     avformat
-    avresample
     avutil
     postproc
     swresample
@@ -2531,7 +2530,6 @@ pp_filter_deps="gpl postproc"
 pullup_filter_deps="gpl"
 removelogo_filter_deps="avcodec avformat swscale"
 repeatfields_filter_deps="gpl"
-resample_filter_deps="avresample"
 sab_filter_deps="gpl swscale"
 scale2ref_filter_deps="swscale"
 scale_filter_deps="swscale"
@@ -2592,7 +2590,6 @@ avdevice_deps="avformat avcodec avutil"
 avfilter_deps="avutil"
 avformat_deps="avcodec avutil"
 avformat_suggest="network"
-avresample_deps="avutil"
 postproc_deps="avutil gpl"
 swresample_deps="avutil"
 swscale_deps="avutil"
@@ -2723,7 +2720,7 @@ intrinsics="none"
 
 # configurable options
 enable $PROGRAM_LIST
-enable $(filter_out avresample $LIBRARY_LIST)
+enable $LIBRARY_LIST
 enable stripping
 
 enable asm
@@ -6287,7 +6284,7 @@ fi
 
 # add some linker flags
 check_ldflags -Wl,--warn-common
-check_ldflags '-Wl,-rpath-link,\$\${SRC_PATH_BARE}/external/FFmpeg/libpostproc:\$\${SRC_PATH_BARE}/external/FFmpeg/libswresample:\$\${SRC_PATH_BARE}/external/FFmpeg/libswscale:\$\${SRC_PATH_BARE}/external/FFmpeg/libavfilter:\$\${SRC_PATH_BARE}/external/FFmpeg/libavdevice:\$\${SRC_PATH_BARE}/external/FFmpeg/libavformat:\$\${SRC_PATH_BARE}/external/FFmpeg/libavcodec:\$\${SRC_PATH_BARE}/external/FFmpeg/libavutil:\$\${SRC_PATH_BARE}/external/FFmpeg/libavresample'
+check_ldflags '-Wl,-rpath-link,\$\${SRC_PATH_BARE}/external/FFmpeg/libpostproc:\$\${SRC_PATH_BARE}/external/FFmpeg/libswresample:\$\${SRC_PATH_BARE}/external/FFmpeg/libswscale:\$\${SRC_PATH_BARE}/external/FFmpeg/libavfilter:\$\${SRC_PATH_BARE}/external/FFmpeg/libavdevice:\$\${SRC_PATH_BARE}/external/FFmpeg/libavformat:\$\${SRC_PATH_BARE}/external/FFmpeg/libavcodec:\$\${SRC_PATH_BARE}/external/FFmpeg/libavutil'
 enabled rpath && add_ldexeflags -Wl,-rpath,$libdir
 enabled rpath && add_ldlibflags -Wl,-rpath,$libdir
 test_ldflags -Wl,-Bsymbolic && append SHFLAGS -Wl,-Bsymbolic
@@ -6307,8 +6304,7 @@ enabled neon_clobber_test &&
                   -Wl,--wrap,avcodec_receive_packet     \
                   -Wl,--wrap,avcodec_send_frame         \
                   -Wl,--wrap,avcodec_receive_frame      \
-                  -Wl,--wrap,swr_convert                \
-                  -Wl,--wrap,avresample_convert ||
+                  -Wl,--wrap,swr_convert        ||
     disable neon_clobber_test
 
 enabled xmm_clobber_test &&
@@ -6324,7 +6320,6 @@ enabled xmm_clobber_test &&
                   -Wl,--wrap,avcodec_send_frame         \
                   -Wl,--wrap,avcodec_receive_frame      \
                   -Wl,--wrap,swr_convert                \
-                  -Wl,--wrap,avresample_convert         \
                   -Wl,--wrap,sws_scale ||
     disable xmm_clobber_test
 
@@ -7166,7 +7161,6 @@ enabled movie_filter    && prepend avfilter_deps "avformat avcodec"
 enabled pan_filter          && prepend avfilter_deps "swresample"
 enabled pp_filter           && prepend avfilter_deps "postproc"
 enabled removelogo_filter   && prepend avfilter_deps "avformat avcodec swscale"
-enabled resample_filter && prepend avfilter_deps "avresample"
 enabled sab_filter          && prepend avfilter_deps "swscale"
 enabled scale_filter    && prepend avfilter_deps "swscale"
 enabled scale2ref_filter    && prepend avfilter_deps "swscale"
