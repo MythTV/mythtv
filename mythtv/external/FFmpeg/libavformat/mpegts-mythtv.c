@@ -3680,6 +3680,7 @@ static int mpegts_read_header(AVFormatContext *s)
         for (int i = 0; ((i < ts->nb_prg) &&
                      (ts->pmt_scan_state == PMT_NOT_YET_FOUND)); i++)
         {
+            int sid = ts->req_sid;
             av_log(ts->stream, AV_LOG_TRACE, "Tuning to pnum: 0x%x\n",
                    ts->prg[i].id);
 
@@ -3692,14 +3693,14 @@ static int mpegts_read_header(AVFormatContext *s)
 
             /* fallback code to deal with broken streams from
              * DBOX2/Firewire cable boxes. */
-            if (ts->pids[ts->req_sid] &&
+            if (ts->pids[sid] &&
                 (ts->pmt_scan_state == PMT_NOT_YET_FOUND))
             {
                 av_log(ts->stream, AV_LOG_ERROR,
                        "Tuning to pnum: 0x%x without CRC check on PMT\n",
                        ts->prg[i].id);
                 /* turn off crc checking */
-                ts->pids[ts->req_sid]->u.section_filter.check_crc = 0;
+                ts->pids[sid]->u.section_filter.check_crc = 0;
                 /* try again */
                 avio_seek(pb, pos, SEEK_SET);
                 ts->req_sid = ts->prg[i].id;
@@ -3708,13 +3709,13 @@ static int mpegts_read_header(AVFormatContext *s)
 
             /* fallback code to deal with streams that are not complete PMT
              * streams (BBC iPlayer IPTV as an example) */
-            if (ts->pids[ts->req_sid] &&
+            if (ts->pids[sid] &&
                 (ts->pmt_scan_state == PMT_NOT_YET_FOUND))
             {
                 av_log(ts->stream, AV_LOG_ERROR,
                        "Overriding PMT data length, using "
                        "contents of first TS packet only!\n");
-                ts->pids[ts->req_sid]->pmt_chop_at_ts = 1;
+                ts->pids[sid]->pmt_chop_at_ts = 1;
                 /* try again */
                 avio_seek(pb, pos, SEEK_SET);
                 ts->req_sid = ts->prg[i].id;
