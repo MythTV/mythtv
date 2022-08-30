@@ -7740,9 +7740,16 @@ JAVA_ARCH=$java_arch
 JAVA_CODE_VERSION=$java_code_version
 EOF
 
+# Parse the FFmpeg version headers for linking to the correct shared object file
 get_version(){
     lcname=lib${1}
     name=$(toupper $lcname)
+    # FFmpeg split its version.h into version_major.h and version.h.
+    # Of note, libavutil's version_major.h is empty, so we need to parse both
+    # version.h AND version_major.h regardless of whether or not we only need
+    # the major version number.
+    # So, to keep the prior behavior of parsing the entire version number,
+    # pass both files to awk, which will test each file line by line.
     file=$source_path/external/FFmpeg/$lcname/version.h
     file_major=$source_path/external/FFmpeg/$lcname/version_major.h
     eval $(awk "/#define ${name}_VERSION_M/ { print \$2 \"=\" \$3 }" "$file_major" "$file")
