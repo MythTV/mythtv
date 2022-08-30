@@ -406,6 +406,10 @@ class Myth4TTVDBv4(object):
             m.season = check_item(m, ("season", epi_x.seasonNumber), ignore=False)
             m.episode = check_item(m, ("episode", epi_x.number), ignore=False)
             m.runtime = check_item(m, ("runtime", epi_x.runtime), ignore=True)
+            if epi_x.aired:
+                # convert string to 'date' object, assuming ISO naming 
+                m.releasedate = convert_date(epi_x.aired[:10])
+
         desc = strip_tags(desc).replace("\r\n", "").replace("\n", "")
         m.description = check_item(m, ("description", desc))
 
