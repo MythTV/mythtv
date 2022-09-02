@@ -2060,16 +2060,38 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
     MSqlQuery query(MSqlQuery::InitCon());
 
     QString qstr = QString(
+        "SELECT videosource.sourceid, GROUP_CONCAT(capturecard.cardid) "
+        "FROM videosource "
+        "%1 JOIN capturecard ON capturecard.sourceid = videosource.sourceid "
+        "GROUP BY videosource.sourceid")
+        .arg((include_disconnected) ? "LEFT" : "");
+
+    query.prepare(qstr);
+    if (!query.exec())
+    {
+        MythDB::DBError("ChannelUtil::GetChannels()", query);
+        return list;
+    }
+
+    QMap<uint, QList<uint>> inputIdLists;
+    while (query.next())
+    {
+        uint qSourceId = query.value(0).toUInt();
+        QList<uint> &inputIdList = inputIdLists[qSourceId];
+        QStringList inputIds = query.value(1).toString().split(",");
+        while (!inputIds.isEmpty())
+            inputIdList.append(inputIds.takeFirst().toUInt());
+    }
+
+    qstr = QString(
         "SELECT channum, callsign, channel.chanid, "
         "       atsc_major_chan, atsc_minor_chan, "
         "       name, icon, mplexid, visible, "
-        "       channel.sourceid, GROUP_CONCAT(DISTINCT capturecard.cardid), "
+        "       channel.sourceid, "
         "       GROUP_CONCAT(DISTINCT channelgroup.grpid), "
         "       xmltvid "
         "FROM channel "
-        "LEFT JOIN channelgroup ON channel.chanid       = channelgroup.chanid "
-        " %1  JOIN capturecard  ON capturecard.sourceid = channel.sourceid ")
-        .arg((include_disconnected) ? "LEFT" : "");
+        "LEFT JOIN channelgroup ON channel.chanid = channelgroup.chanid ");
 
     qstr += "WHERE deleted IS NULL ";
 
@@ -2100,6 +2122,7 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
         if (query.value(0).toString().isEmpty() || !query.value(2).toBool())
             continue; // skip if channum blank, or chanid empty
 
+        uint qSourceID = query.value(9).toUInt();
         ChannelInfo chan(
             query.value(0).toString(),                    /* channum    */
             query.value(1).toString(),                    /* callsign   */
@@ -2111,13 +2134,12 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
                                                           /* visible    */
             query.value(5).toString(),                    /* name       */
             query.value(6).toString(),                    /* icon       */
-            query.value(9).toUInt());                     /* sourceid   */
+            qSourceID);                                   /* sourceid   */
 
-        chan.m_xmltvId = query.value(12).toString();      /* xmltvid    */
+        chan.m_xmltvId = query.value(11).toString();      /* xmltvid    */
 
-        QStringList inputIDs = query.value(11).toString().split(",");
-        while (!inputIDs.isEmpty())
-                chan.AddInputId(inputIDs.takeFirst().toUInt());
+        for (auto inputId : inputIdLists[qSourceID])
+            chan.AddInputId(inputId);
 
         QStringList groupIDs = query.value(10).toString().split(",");
         while (!groupIDs.isEmpty())
