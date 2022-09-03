@@ -1,6 +1,7 @@
 #include "audiooutpututil.h"
 
 #include <cstdint>
+#include <limits> // workaround QTBUG-90395
 
 #include <QtGlobal>
 #include <QtEndian>

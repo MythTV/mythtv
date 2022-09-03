@@ -29,6 +29,11 @@
 // TODO
 // parse uid (and use QPair to differentiate?)
 
+// Std
+#include <array>
+#include <cmath>
+#include <limits> // workaround QTBUG-90395
+
 // Qt
 #include <QtGlobal>
 #include <QtEndian>
@@ -40,10 +45,6 @@
 // MythTV
 #include "mythlogging.h"
 #include "mythbinaryplist.h"
-
-// Std
-#include <array>
-#include <cmath>
 
 #define LOC QString("PList: ")
 

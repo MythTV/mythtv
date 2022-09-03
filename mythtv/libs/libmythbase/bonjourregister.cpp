@@ -1,6 +1,7 @@
 #include "bonjourregister.h"
 
 #include <cstdlib>
+#include <limits> // workaround QTBUG-90395
 
 #include <QSocketNotifier>
 #include <QtEndian>

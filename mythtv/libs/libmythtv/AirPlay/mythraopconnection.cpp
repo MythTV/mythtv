@@ -1,5 +1,6 @@
 #include <unistd.h> // for usleep()
 
+#include <limits> // workaround QTBUG-90395
 #include <utility>
 
 #include <QTcpSocket>

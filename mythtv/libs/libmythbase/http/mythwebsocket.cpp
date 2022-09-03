@@ -1,3 +1,8 @@
+// Std
+#include <chrono>
+using namespace std::chrono_literals;
+#include <limits> // workaround QTBUG-90395
+
 // Qt
 #include <QThread>
 #include <QtEndian>
@@ -7,10 +12,6 @@
 #include "mythlogging.h"
 #include "mythrandom.h"
 #include "http/mythwebsocket.h"
-
-// Std
-#include <chrono>
-using namespace std::chrono_literals;
 
 #define LOC QString("WS: ")
 #define MAX_FRAME_SIZE   (1048576) // 1MB

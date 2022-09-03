@@ -27,6 +27,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <limits> // workaround QTBUG-90395
 #include "RTjpegN.h"
 
 #include <QtGlobal>

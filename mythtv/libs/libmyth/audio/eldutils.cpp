@@ -25,6 +25,7 @@
 #include "eldutils.h"
 
 #include <cinttypes>
+#include <limits> // workaround QTBUG-90395
 #include <sys/types.h>
 
 #include <QString>

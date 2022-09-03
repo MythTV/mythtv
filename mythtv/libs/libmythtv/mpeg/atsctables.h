@@ -6,6 +6,8 @@
 #include "libmythbase/mythconfig.h"
 
 #include <cstdint>  // uint32_t
+#include <limits> // workaround QTBUG-90395
+
 #include <QString>
 #include <QtEndian>
 

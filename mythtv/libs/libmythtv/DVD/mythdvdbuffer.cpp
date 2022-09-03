@@ -1,6 +1,7 @@
 ﻿// Std
-#include <thread>
 #include <algorithm>
+#include <limits> // workaround QTBUG-90395
+#include <thread>
 
 // Qt
 #include <QCoreApplication>
