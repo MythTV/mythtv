@@ -15,6 +15,7 @@ extern "C" {
 #include "libavutil/error.h"
 #include "libavutil/intreadwrite.h" // for AV_RB32 and AV_RB24
 #include "libavutil/log.h"
+#include "libavutil/opt.h"
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 #include "libavformat/avio.h"
@@ -4661,14 +4662,14 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 // for passthru or codecs for which the decoder won't downmix
                 // let the decoder set the number of channels. For other codecs
                 // we downmix if necessary in audiooutputbase
-                ctx->request_channel_layout = 0;
-                // TODO replace request_channel_layout with "downmix" codec private option
+                ;
             }
             else // No passthru, the decoder will downmix
             {
-                ctx->request_channel_layout =
-                    av_get_default_channel_layout(m_audio->GetMaxChannels());
-                // TODO replace request_channel_layout with "downmix" codec private option
+                AVChannelLayout channel_layout;
+                av_channel_layout_default(&channel_layout, m_audio->GetMaxChannels());
+                av_opt_set_chlayout(ctx->priv_data, "downmix", &channel_layout, 0);
+
                 if (ctx->codec_id == AV_CODEC_ID_AC3)
                     ctx->ch_layout.nb_channels = m_audio->GetMaxChannels();
             }
@@ -4766,14 +4767,9 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             {
                 if (DecoderWillDownmix(ctx))
                 {
-                    // TODO replace request_channel_layout with "downmix" codec private option
-                    ctx->request_channel_layout =
-                        av_get_default_channel_layout(m_audio->GetMaxChannels());
-                }
-                else
-                {
-                    // TODO replace request_channel_layout with "downmix" codec private option
-                    ctx->request_channel_layout = 0;
+                    AVChannelLayout channel_layout;
+                    av_channel_layout_default(&channel_layout, m_audio->GetMaxChannels());
+                    av_opt_set_chlayout(ctx->priv_data, "downmix", &channel_layout, 0);
                 }
 
                 ret = m_audio->DecodeAudio(ctx, m_audioSamples, data_size, tmp_pkt);
@@ -5243,18 +5239,8 @@ inline bool AvFormatDecoder::DecoderWillDownmix(const AVCodecContext *ctx)
     // use Myth internal downmixer if machine has SSE2
     if (m_audio->CanDownmix() && AudioOutputUtil::has_optimized_SIMD())
         return false;
-    if (!m_audio->CanDownmix())
-        return true;
     // use ffmpeg only for dolby codecs if we have to
-    switch (ctx->codec_id)
-    {
-        case AV_CODEC_ID_AC3:
-        case AV_CODEC_ID_TRUEHD:
-        case AV_CODEC_ID_EAC3:
-            return true;
-        default:
-            return false;
-    }
+    return av_opt_find(ctx->priv_data, "downmix", nullptr, 0, 0);
 }
 
 bool AvFormatDecoder::DoPassThrough(const AVCodecParameters *par, bool withProfile)
@@ -5322,22 +5308,16 @@ bool AvFormatDecoder::SetupAudioStream(void)
         bool using_passthru = DoPassThrough(curstream->codecpar, false);
 
         requested_channels = ctx->ch_layout.nb_channels;
-        ctx->request_channel_layout =
-            av_get_default_channel_layout(requested_channels);
 
         if (!using_passthru &&
             ctx->ch_layout.nb_channels > (int)m_audio->GetMaxChannels() &&
             DecoderWillDownmix(ctx))
         {
             requested_channels = m_audio->GetMaxChannels();
-            // TODO replace request_channel_layout with "downmix" codec private option
-            ctx->request_channel_layout =
-                av_get_default_channel_layout(requested_channels);
-        }
-        else
-        {
-            // TODO replace request_channel_layout with "downmix" codec private option
-            ctx->request_channel_layout = 0;
+
+            AVChannelLayout channel_layout;
+            av_channel_layout_default(&channel_layout, requested_channels);
+            av_opt_set_chlayout(ctx->priv_data, "downmix", &channel_layout, 0);
         }
 
         info = AudioInfo(ctx->codec_id, fmt, ctx->sample_rate,
