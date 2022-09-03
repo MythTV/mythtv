@@ -20,6 +20,7 @@
 #include "io/mythavformatwriter.h"
 
 #include <QtGlobal>
+#include <limits>
 #include <QtEndian>
 
 // MythTV

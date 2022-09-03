@@ -6,6 +6,7 @@
 #ifndef RTP_DATA_PACKET_H
 #define RTP_DATA_PACKET_H
 
+#include <limits>
 #include <QtEndian>
 
 #include "libmythbase/mythlogging.h"

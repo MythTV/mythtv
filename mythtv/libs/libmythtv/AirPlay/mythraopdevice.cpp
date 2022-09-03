@@ -1,4 +1,5 @@
 #include <QTimer>
+#include <limits>
 #include <QtEndian>
 #include <QNetworkInterface>
 #include <QCoreApplication>

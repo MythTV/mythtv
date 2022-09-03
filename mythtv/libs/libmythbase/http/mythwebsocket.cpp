@@ -1,5 +1,6 @@
 // Qt
 #include <QThread>
+#include <limits>
 #include <QtEndian>
 #include <QTcpSocket>
 

@@ -28,6 +28,7 @@
 #include <sys/types.h>
 
 #include <QString>
+#include <limits>
 #include <QtEndian>
 
 #include "audiooutputbase.h"

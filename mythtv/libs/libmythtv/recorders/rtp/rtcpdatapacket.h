@@ -11,6 +11,7 @@
 
 #include <QHostAddress>
 #include <QByteArray>
+#include <limits>
 #include <QtEndian>
 
 #include "libmythbase/mythlogging.h"

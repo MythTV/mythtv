@@ -4,6 +4,7 @@
 
 // Qt
 #include <QCoreApplication>
+#include <limits>
 #include <QtEndian>
 
 // MythTV

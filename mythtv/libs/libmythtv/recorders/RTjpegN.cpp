@@ -30,6 +30,7 @@
 #include "RTjpegN.h"
 
 #include <QtGlobal>
+#include <limits>
 #include <QtEndian>
 
 #ifdef MMX

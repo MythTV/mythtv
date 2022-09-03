@@ -7,6 +7,7 @@
 
 #include <cstdint>  // uint32_t
 #include <QString>
+#include <limits>
 #include <QtEndian>
 
 #include "libmythbase/mythdate.h"

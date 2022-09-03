@@ -31,6 +31,7 @@
 
 // Qt
 #include <QtGlobal>
+#include <limits>
 #include <QtEndian>
 #include <QDateTime>
 #include <QSequentialIterable>

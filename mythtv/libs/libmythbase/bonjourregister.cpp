@@ -3,6 +3,7 @@
 #include <cstdlib>
 
 #include <QSocketNotifier>
+#include <limits>
 #include <QtEndian>
 
 #include "mythrandom.h"

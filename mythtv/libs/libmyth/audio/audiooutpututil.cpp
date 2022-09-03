@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include <QtGlobal>
+#include <limits>
 #include <QtEndian>
 
 #include "libmythbase/mythlogging.h"

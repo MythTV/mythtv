@@ -10,6 +10,7 @@
 #include <unistd.h>
 
 #include <QStringList>
+#include <limits>
 #include <QtEndian>
 
 #include "libmyth/mythcontext.h"
