@@ -477,9 +477,6 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
     av_dict_set(&opts, "rc_init_cplx", "0", 0);
     m_mpaVidCtx->dct_algo = FF_DCT_AUTO;
     m_mpaVidCtx->idct_algo = FF_IDCT_AUTO;
-#if FF_API_PRIVATE_OPT
-    av_dict_set_int(&opts, "pred", FF_PRED_LEFT, 0);
-#endif
     if (m_videocodec.toLower() == "huffyuv" || m_videocodec.toLower() == "mjpeg")
         m_mpaVidCtx->strict_std_compliance = FF_COMPLIANCE_UNOFFICIAL;
     m_mpaVidCtx->thread_count = m_encodingThreadCount;
