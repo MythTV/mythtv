@@ -488,10 +488,6 @@ AVStream* MythAVFormatWriter::AddVideoStream(void)
         }
 
         // AVCodecContext AVOptions:
-#if FF_API_CODER_TYPE
-        // c->coder_type            = 0;
-        av_opt_set_int(context, "coder", FF_CODER_TYPE_VLC, 0);
-#endif
         context->max_b_frames          = 0;
         context->slices                = 8;
         context->flags                |= AV_CODEC_FLAG_LOOP_FILTER;
