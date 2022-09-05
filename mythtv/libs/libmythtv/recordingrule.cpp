@@ -179,7 +179,8 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
             return false;
     }
     else
-        LoadTemplate(proginfo->GetCategory(), proginfo->GetCategoryTypeString());
+        LoadTemplate(proginfo->GetTitle(), proginfo->GetCategory(),
+                     proginfo->GetCategoryTypeString());
 
     if (m_type != kTemplateRecord &&
         (m_searchType == kNoSearch || m_searchType == kManualSearch))
@@ -270,22 +271,27 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, const QString& textname,
     return true;
 }
 
-bool RecordingRule::LoadTemplate(const QString& category, const QString& categoryType)
+bool RecordingRule::LoadTemplate(const QString& title,
+                                 const QString& category,
+                                 const QString& categoryType)
 {
     QString lcategory = category.isEmpty() ? "Default" : category;
     QString lcategoryType = categoryType.isEmpty() ? "Default" : categoryType;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT recordid, category, "
+                  "       (category = :TITLE1) AS titlematch, "
                   "       (category = :CAT1) AS catmatch, "
                   "       (category = :CATTYPE1) AS typematch "
                   "FROM record "
                   "WHERE type = :TEMPLATE AND "
-                  "      (category = :CAT2 OR category = :CATTYPE2 "
+                  "      (category IN (:TITLE2, :CAT2, :CATTYPE2) "
                   "       OR category = 'Default') "
-                  "ORDER BY catmatch DESC, typematch DESC"
+                  "ORDER BY titlematch DESC, catmatch DESC, typematch DESC"
                   );
     query.bindValue(":TEMPLATE", kTemplateRecord);
+    query.bindValue(":TITLE1", title);
+    query.bindValue(":TITLE2", title);
     query.bindValue(":CAT1", lcategory);
     query.bindValue(":CAT2", lcategory);
     query.bindValue(":CATTYPE1", lcategoryType);
