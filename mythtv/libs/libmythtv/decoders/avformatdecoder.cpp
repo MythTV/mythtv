@@ -5240,7 +5240,20 @@ inline bool AvFormatDecoder::DecoderWillDownmix(const AVCodecContext *ctx)
     if (m_audio->CanDownmix() && AudioOutputUtil::has_optimized_SIMD())
         return false;
     // use ffmpeg only for dolby codecs if we have to
-    return av_opt_find(ctx->priv_data, "downmix", nullptr, 0, 0);
+    //return av_opt_find(ctx->priv_data, "downmix", nullptr, 0, 0);
+    // av_opt_find was causing segmentation faults, so explicitly list the
+    // compatible decoders
+    switch (ctx->codec_id)
+    {
+        case AV_CODEC_ID_AC3:
+        case AV_CODEC_ID_TRUEHD:
+        case AV_CODEC_ID_EAC3:
+        case AV_CODEC_ID_MLP:
+        case AV_CODEC_ID_DTS:
+            return true;
+        default:
+           return false;
+    }
 }
 
 bool AvFormatDecoder::DoPassThrough(const AVCodecParameters *par, bool withProfile)
