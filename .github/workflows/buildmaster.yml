@@ -31,7 +31,7 @@ jobs:
         echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
 
     - name: Check ccache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.ccache
         key: ${{ matrix.os }}-${{ matrix.cc }}-ccache-${{ github.sha }}
