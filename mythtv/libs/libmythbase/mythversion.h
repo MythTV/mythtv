@@ -12,7 +12,7 @@
 /// Update this whenever the plug-in ABI changes.
 /// Including changes in the libmythbase, libmyth, libmythtv, libmythav* and
 /// libmythui class methods in exported headers.
-static constexpr const char* MYTH_BINARY_VERSION { "33.20220201-1" };
+static constexpr const char* MYTH_BINARY_VERSION { "33.20220913-1" };
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *   Note that the token currently cannot contain spaces.
