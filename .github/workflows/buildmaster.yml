@@ -30,6 +30,9 @@ jobs:
         echo "MYTHTV_CONFIG=--prefix=${{ github.workspace }}/build/install --cc=${{ matrix.cc }} --cxx=${{ matrix.cxx }}" >> $GITHUB_ENV
         echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
 
+    # GitHub caches are immutable, so to update a cache, use a unique key with a
+    # prefixed restore-key.  GitHub will rotate the caches within their 10 GB
+    # storage limit.  See https://github.com/actions/cache/blob/471fb0c87e5d7210f339d8ea2e01505ddafd793d/workarounds.md#update-a-cache
     - name: Check ccache
       uses: actions/cache@v3
       with:
