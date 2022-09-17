@@ -34,7 +34,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ~/.ccache
-        key: ${{ matrix.os }}-${{ matrix.cc }}-ccache-master
+        key: ${{ matrix.os }}-${{ matrix.cc }}-ccache-${{ github.sha }}
         restore-keys: ${{ matrix.os }}-${{ matrix.cc }}-ccache
 
     # N.B. These dependencies are for the master branch. Unlike the ansible playlists they do not include old dependencies that may
