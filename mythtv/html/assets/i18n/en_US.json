@@ -443,7 +443,9 @@
           "longitude_desc": "The Cartesian longitude for your location. Use negative numbers for western coordinates."
         },
         "subtype_diseqc_1_2": "DiSEqC 1.2",
-        "subtype_diseqc_1_3": "DiSEqC 1.3 (GotoX/USALS)"
+        "subtype_diseqc_1_3": "DiSEqC 1.3 (GotoX/USALS)",
+        "description_label": "Description",
+        "description_desc": "Optional descriptive name for this device, to make it easier to configure settings later."
       },
       "delete_details": "This will delete {{CardType}} Device:{{VideoDevice}} Name:{{DisplayName}}",
       "external": {

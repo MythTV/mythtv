@@ -10,6 +10,15 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
+                        <label for="Description" class="block">{{ 'settings.capture.diseqc.description_label' | translate }}</label>
+                        <input pInputText id="ip" [(ngModel)]="diseqcTree.Description" name="Description" #Description="ngModel"
+                            class="mb-2 form-control w-full" />
+                        <small class="block">
+                            {{ 'settings.capture.diseqc.description_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
                         <label for="CmdRepeat" class="block">{{ 'settings.capture.diseqc.rotor.cmdrepeat_label' |
                             translate
                             }}</label>

@@ -8,6 +8,16 @@
         <ng-template pTemplate="content">
             <div class="grid">
                 <div class="mb-4 w-full">
+
+                    <div class="form-group field">
+                        <label for="Description" class="block">{{ 'settings.capture.diseqc.description_label' | translate }}</label>
+                        <input pInputText id="ip" [(ngModel)]="diseqcTree.Description" name="Description" #Description="ngModel"
+                            class="mb-2 form-control w-full" />
+                        <small class="block">
+                            {{ 'settings.capture.diseqc.description_desc' | translate }}
+                        </small>
+                    </div>
+
                     <div class="form-group field">
                         <label for="LnbPreset" class="block">{{ 'settings.capture.diseqc.lnb.preset_label' | translate }}</label>
                         <p-dropdown [options]="lnbPresetList" [(ngModel)]="currentPreset" [editable]="false" optionLabel="Name"
