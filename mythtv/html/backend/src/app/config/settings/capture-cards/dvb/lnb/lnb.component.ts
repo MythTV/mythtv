@@ -176,7 +176,8 @@ export class LnbComponent implements OnInit, AfterViewInit, DiseqcSettingBase {
         next: (x: any) => {
           if (x.int && x.int > 0) {
             this.diseqcTree.DiseqcId = x.int;
-            observer.next(x);
+            if (observer.next)
+              observer.next(x);
           }
           else {
             console.log("UpdateDiseqcTree", x)

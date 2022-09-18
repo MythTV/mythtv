@@ -101,7 +101,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
           this.setupDevice();
         },
         error: (err: any) => {
-          console.log("GetCaptureDeviceList",err);
+          console.log("GetCaptureDeviceList", err);
           this.work.errorCount++;
         }
       });
@@ -113,7 +113,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
           this.setupDiseqc();
         },
         error: (err: any) => {
-          console.log("GetDiseqcTreeList",err);
+          console.log("GetDiseqcTreeList", err);
           this.work.errorCount++;
         }
       })
@@ -236,14 +236,14 @@ export class DvbComponent implements OnInit, AfterViewInit {
   }
 
   // good response to add: {"int": 19}
-  saveObserver : PartialObserver<any> = {
+  saveObserver: PartialObserver<any> = {
     next: (x: any) => {
       if (x.bool) {
-        console.log("saveObserver success",x);
+        console.log("saveObserver success", x);
         this.work.successCount++;
       }
       else if (!this.card.CardId && x.int) {
-        console.log("saveObserver success",x);
+        console.log("saveObserver success", x);
         this.work.successCount++;
         if (!this.card.CardId) {
           this.card.CardId = x.int;
@@ -256,7 +256,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
         }
       }
       else {
-        console.log("saveObserver error",x);
+        console.log("saveObserver error", x);
         this.work.errorCount++;
         this.currentForm.form.markAsDirty();
       }
@@ -281,7 +281,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
             this.work.successCount++;
             this.saveCard();
           }
-          else if (!this.card.DiSEqCId && x.int && this.diseqcTree) {
+          else if (x.int && this.diseqcTree) {
             this.card.DiSEqCId = x.int;
             this.diseqcTree.DiseqcId = x.int;
             this.diseqcTreeList.DiseqcTreeList.DiseqcTrees.push(this.diseqcTree);
@@ -298,7 +298,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
           this.work.errorCount++;
           this.currentForm.form.markAsDirty();
         },
-        complete : () => {}
+        complete: () => { }
       });
     }
     else

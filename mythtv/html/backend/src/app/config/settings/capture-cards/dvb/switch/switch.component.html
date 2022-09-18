@@ -1,1 +1,143 @@
-<p>switch setup is not yet implemented</p>
+<form class="ml-3 mr-3" name="switchform" #switchform="ngForm">
+    <p-card class="m-5">
+        <ng-template pTemplate="title">
+            {{ 'settings.capture.diseqc.switch.title' | translate }}
+        </ng-template>
+        <ng-template pTemplate="subtitle">
+        </ng-template>
+        <ng-template pTemplate="content">
+            <div class="grid">
+                <div class="mb-4 w-full">
+
+                    <div class="form-group field">
+                        <label for="Description" class="block">{{ 'settings.capture.diseqc.description_label' |
+                            translate }}</label>
+                        <input pInputText id="ip" [(ngModel)]="diseqcTree.Description" name="Description"
+                            #Description="ngModel" class="mb-2 form-control w-full" />
+                        <small class="block">
+                            {{ 'settings.capture.diseqc.description_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="CmdRepeat" class="block">{{ 'settings.capture.diseqc.cmdrepeat_label' |
+                            translate
+                            }}</label>
+                        <p-inputNumber [(ngModel)]="diseqcTree.CmdRepeat" name="CmdRepeat" id="CmdRepeat"
+                            [showButtons]="true" [min]="0" [max]="15" [step]="1"></p-inputNumber>
+                        <small class="block">
+                            <div [innerHTML]="'settings.capture.diseqc.cmdrepeat_desc' | translate"></div>
+                        </small>
+                    </div>
+
+                    <div class="form-group field" [style]="{'width':'25rem'}">
+                        <label for="SubType" class="block">{{ 'settings.capture.diseqc.switch.type_label' | translate
+                            }}</label>
+                        <p-dropdown [options]="switchSubTypes" [(ngModel)]="currentSubType" [editable]="false"
+                            optionLabel="Name" (onChange)="updateSubType();" [maxlength]="0"
+                            [style]="{'minWidth':'80%'}" name="SubType" #SubType="ngModel">
+                        </p-dropdown>
+                        <small class="block">
+                            {{ 'settings.capture.diseqc.switch.type_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="Address" class="block">{{ 'settings.capture.diseqc.address_label' | translate
+                            }}</label>
+                        <input pInputText id="Address" [(ngModel)]="work.addressText" name="Address" #Address="ngModel"
+                            class="mb-2 form-control w-full" [disabled]="!work.enableAddrAndPorts" />
+                        <small class="block">
+                            {{ 'settings.capture.diseqc.address_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="SwitchPorts" class="block">
+                            {{ 'settings.capture.diseqc.switchports_label' | translate }}
+                        </label>
+                        <p-inputNumber [(ngModel)]="diseqcTree.SwitchPorts" name="SwitchPorts" id="SwitchPorts"
+                            [showButtons]="true" [min]="0" [max]="255" [step]="1" [disabled]="!work.enableAddrAndPorts">
+                        </p-inputNumber>
+                        <small class="block">
+                            <div [innerHTML]="'settings.capture.diseqc.switchports_desc' | translate"></div>
+                        </small>
+                        <div *ngIf="diseqcSubTreeCount > diseqcTree.SwitchPorts">
+                            <small class="p-error block">{{ 'settings.capture.diseqc.switchports_error' | translate }}</small>
+                        </div>
+
+                    </div>
+
+                    <!-- Sub Device Panels -->
+                    <div *ngFor="let subtree of diseqcSubTree; index as ix">
+                        <p-fieldset class="mb-4 w-full"
+                            legend="{{ 'settings.capture.dvb.satellite_heading' | translate }}" [toggleable]="true"
+                            [collapsed]="true" *ngIf="subtree">
+                            <p-button styleClass="p-button-warning" *ngIf="subtree" label="Delete Satellite Devices"
+                                icon="pi pi-trash" (onClick)="displayDeleteThis[ix]=true" [disabled]="!subtree">
+                            </p-button>
+                            <p-dialog header="{{ 'settings.capture.dvb.satellite_delete_header' | translate }}"
+                                [(visible)]="displayDeleteThis[ix]" [modal]="true" [style]="{width: '50vw'}"
+                                [draggable]="false" [resizable]="false">
+                                <h2>{{ 'settings.ru_sure' | translate }}</h2>
+                                <p>{{ 'settings.capture.dvb.satellite_delete_desc' | translate }}</p>
+                                <ng-template pTemplate="footer">
+                                    <p-button icon="pi pi-times-circle" (click)="displayDeleteThis[ix]=false"
+                                        label="{{ 'common.no' | translate }}" styleClass="p-button-plain">
+                                    </p-button>
+                                    <p-button icon="pi pi-check-circle" (click)="deleteDiseqc(ix)"
+                                        label="{{ 'common.yes' | translate }}" styleClass="p-button-plain"></p-button>
+                                </ng-template>
+                            </p-dialog>
+
+                            <app-lnb *ngIf="subtree && subtree.Type == 'lnb'" [diseqcTree]="subtree"
+                                [diseqcTreeList]="diseqcTreeList" (baseEvent)="setDiseqcObject($event)"
+                                [dvbComponent]="dvbComponent">
+                            </app-lnb>
+                            <app-rotor *ngIf="subtree && subtree.Type == 'rotor'" [diseqcTree]="subtree"
+                                [diseqcTreeList]="diseqcTreeList" (baseEvent)="setDiseqcObject($event)"
+                                [dvbComponent]="dvbComponent">
+                            </app-rotor>
+                            <app-switch *ngIf="subtree && subtree.Type == 'switch'" [diseqcTree]="subtree"
+                                [diseqcTreeList]="diseqcTreeList" (baseEvent)="setDiseqcObject($event)"
+                                [dvbComponent]="dvbComponent">
+                            </app-switch>
+                            <app-unicable *ngIf="subtree && subtree.Type == 'scr'"></app-unicable>
+
+                        </p-fieldset>
+                    </div>
+
+                    <!-- New Device Panel -->
+                    <p-fieldset class="mb-4 w-full" legend="{{ 'settings.capture.dvb.satellite_heading' | translate }}"
+                        [toggleable]="true" [collapsed]="false" 
+                        *ngIf="diseqcSubTreeCount < diseqcTree.SwitchPorts">
+                        <p-button label="{{ 'settings.capture.dvb.newsatellite_button' | translate }}"
+                            (onClick)="work.displayNewDiseqc = true" icon="pi pi-plus-circle"
+                            styleClass="p-button-plain">
+                        </p-button>
+
+                        <p-dialog header="{{ 'settings.capture.dvb.newsatellite_heading' | translate }}"
+                            [(visible)]="work.displayNewDiseqc" [modal]="true" [style]="{width: '50vw'}"
+                            [draggable]="false" [resizable]="false">
+                            <p>{{ 'settings.capture.dvb.newsatellite_devtype' | translate }}</p>
+                            <p-listbox [options]="captureCardService.diseqcTypes" [(ngModel)]="selectedDiseqcType"
+                                optionLabel="description" name="disenqcTypes" optionDisabled="inactive"
+                                (onDblClick)="newDiseqc();"></p-listbox>
+                            <ng-template pTemplate="footer">
+                                <p-button icon="pi pi-times-circle" (onClick)="work.displayNewDiseqc=false"
+                                    label="{{ 'common.cancel' | translate }}" styleClass="p-button-plain">
+                                </p-button>
+                                <p-button icon="pi pi-check-circle" (onClick)="newDiseqc();"
+                                    label="{{ 'common.ok' | translate }}" styleClass="p-button-plain"
+                                    [disabled]="selectedDiseqcType.inactive">
+                                </p-button>
+                            </ng-template>
+                        </p-dialog>
+
+                    </p-fieldset>
+
+                </div>
+            </div>
+        </ng-template>
+    </p-card>
+</form>
