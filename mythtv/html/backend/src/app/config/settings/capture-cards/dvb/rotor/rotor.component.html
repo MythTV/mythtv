@@ -181,7 +181,10 @@
                             [diseqcTree]="diseqcSubTree" [diseqcTreeList]="diseqcTreeList"
                             (baseEvent)="setDiseqcObject($event)" [dvbComponent]="dvbComponent">
                         </app-switch>
-                        <app-unicable *ngIf="this.diseqcSubTree && this.diseqcSubTree.Type == 'scr'"></app-unicable>
+                        <app-unicable *ngIf="this.diseqcSubTree && this.diseqcSubTree.Type == 'scr'"
+                            [diseqcTree]="diseqcSubTree" [diseqcTreeList]="diseqcTreeList"
+                            (baseEvent)="setDiseqcObject($event)" [dvbComponent]="dvbComponent">
+                        </app-unicable>
 
                     </p-fieldset>
 

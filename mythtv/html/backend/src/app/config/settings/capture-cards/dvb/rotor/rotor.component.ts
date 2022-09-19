@@ -106,6 +106,7 @@ export class RotorComponent implements OnInit, AfterViewInit, DiseqcSettingBase 
       this.diseqcTree.RotorHiSpeed = 2.5;
       this.diseqcTree.RotorLoSpeed = 1.9;
       this.diseqcTree.SubType = 'diseqc_1_3'
+      this.diseqcTree.CmdRepeat = 1;
     }
     if (this.diseqcTree.SubType) {
       let subtype = this.rotorSubTypes.find(x => x.SubType == this.diseqcTree.SubType);
@@ -125,17 +126,22 @@ export class RotorComponent implements OnInit, AfterViewInit, DiseqcSettingBase 
         if (this.setupDone && this.currentForm.dirty)
           this.dvbComponent.currentForm.form.markAsDirty()
       });
-    // mark as pristne after 100 ms
-    let obs = new Observable(x => {
-      setTimeout(() => {
-        x.next(1);
-        x.complete();
-      }, 100)
-    })
-    obs.subscribe(x => {
-      this.currentForm.form.markAsPristine();
-      this.setupDone = true;
-    });
+    if (this.diseqcTree.DiseqcId) {
+      // mark as pristine after 100 ms
+      let obs = new Observable(x => {
+        setTimeout(() => {
+          x.next(1);
+          x.complete();
+        }, 100)
+      })
+      obs.subscribe(x => {
+        this.currentForm.form.markAsPristine();
+        this.setupDone = true;
+      });
+    } else {
+      this.currentForm.form.markAsDirty()
+      this.dvbComponent.currentForm.form.markAsDirty()
+    }
   }
 
   updateSubType(): void {
@@ -224,7 +230,7 @@ export class RotorComponent implements OnInit, AfterViewInit, DiseqcSettingBase 
             // save sub tree
             if (this.diseqcSubComponent)
               this.diseqcSubComponent.saveForm(this.diseqcTree.DiseqcId, {
-                next: (x: any) => {},
+                next: (x: any) => { },
                 error: (err: any) => {
                   observer.error(err);
                 }

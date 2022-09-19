@@ -162,7 +162,9 @@
                     <app-switch *ngIf="this.diseqcTree && this.diseqcTree.Type == 'switch'" [diseqcTree]="diseqcTree"
                         [diseqcTreeList]="diseqcTreeList" (baseEvent)="setDiseqcObject($event)" [dvbComponent]="this">
                     </app-switch>
-                    <app-unicable *ngIf="this.diseqcTree && this.diseqcTree.Type == 'scr'"></app-unicable>
+                    <app-unicable *ngIf="this.diseqcTree && this.diseqcTree.Type == 'scr'" [diseqcTree]="diseqcTree"
+                        [diseqcTreeList]="diseqcTreeList" (baseEvent)="setDiseqcObject($event)" [dvbComponent]="this">
+                    </app-unicable>
 
                 </p-fieldset>
 

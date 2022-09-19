@@ -463,7 +463,16 @@
         "address_desc": "The DiSEqC address of the switch in Hexadecimal notation (0xnn). If 0x is not in front of the string it will be assumed to be in decimal notation and will be converted.",
         "switchports_label": "Number of ports",
         "switchports_desc": "The number of ports this switch has.",
-        "switchports_error": "ERROR: You have too many devices for this number of ports."
+        "switchports_error": "ERROR: You have too many devices for this number of ports.",
+        "unicable": {
+          "title": "Unicable Configuration",
+          "frequency_label": "Frequency (MHz)",
+          "frequency_desc": "Unicable userband frequency (usually 1210, 1420, 1680 and 2040 MHz)",
+          "pin_label": "PIN code",
+          "pin_desc": "Unicable PIN code (-1 disabled, 0 - 255)",
+          "userband_label": "Userband"
+        },
+        "userband_desc": "Unicable userband ID (0-7). The Unicable userband channels are often numbered starting at 1 but MythTV starts at 0."
       },
       "delete_details": "This will delete {{CardType}} Device:{{VideoDevice}} Name:{{DisplayName}}",
       "external": {

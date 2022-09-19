@@ -63,7 +63,8 @@
                             <div [innerHTML]="'settings.capture.diseqc.switchports_desc' | translate"></div>
                         </small>
                         <div *ngIf="diseqcSubTreeCount > diseqcTree.SwitchPorts">
-                            <small class="p-error block">{{ 'settings.capture.diseqc.switchports_error' | translate }}</small>
+                            <small class="p-error block">{{ 'settings.capture.diseqc.switchports_error' | translate
+                                }}</small>
                         </div>
 
                     </div>
@@ -102,15 +103,17 @@
                                 [diseqcTreeList]="diseqcTreeList" (baseEvent)="setDiseqcObject($event)"
                                 [dvbComponent]="dvbComponent">
                             </app-switch>
-                            <app-unicable *ngIf="subtree && subtree.Type == 'scr'"></app-unicable>
+                            <app-unicable *ngIf="subtree && subtree.Type == 'scr'" [diseqcTree]="subtree"
+                                [diseqcTreeList]="diseqcTreeList" (baseEvent)="setDiseqcObject($event)"
+                                [dvbComponent]="dvbComponent">
+                            </app-unicable>
 
                         </p-fieldset>
                     </div>
 
                     <!-- New Device Panel -->
                     <p-fieldset class="mb-4 w-full" legend="{{ 'settings.capture.dvb.satellite_heading' | translate }}"
-                        [toggleable]="true" [collapsed]="false" 
-                        *ngIf="diseqcSubTreeCount < diseqcTree.SwitchPorts">
+                        [toggleable]="true" [collapsed]="false" *ngIf="diseqcSubTreeCount < diseqcTree.SwitchPorts">
                         <p-button label="{{ 'settings.capture.dvb.newsatellite_button' | translate }}"
                             (onClick)="work.displayNewDiseqc = true" icon="pi pi-plus-circle"
                             styleClass="p-button-plain">

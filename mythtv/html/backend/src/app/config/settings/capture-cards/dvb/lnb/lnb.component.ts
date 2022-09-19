@@ -131,17 +131,23 @@ export class LnbComponent implements OnInit, AfterViewInit, DiseqcSettingBase {
         if (this.setupDone && this.currentForm.dirty)
           this.dvbComponent.currentForm.form.markAsDirty()
       });
-    // mark as pristne after 100 ms
-    let obs = new Observable(x => {
-      setTimeout(() => {
-        x.next(1);
-        x.complete();
-      }, 100)
-    })
-    obs.subscribe(x => {
-      this.currentForm.form.markAsPristine();
-      this.setupDone = true;
-    });
+    if (this.diseqcTree.DiseqcId) {
+      // mark as pristine after 100 ms
+      let obs = new Observable(x => {
+        setTimeout(() => {
+          x.next(1);
+          x.complete();
+        }, 100)
+      })
+      obs.subscribe(x => {
+        this.currentForm.form.markAsPristine();
+        this.setupDone = true;
+      });
+    }
+    else {
+      this.currentForm.form.markAsDirty()
+      this.dvbComponent.currentForm.form.markAsDirty()
+    }
   }
 
   updatePreset(): void {

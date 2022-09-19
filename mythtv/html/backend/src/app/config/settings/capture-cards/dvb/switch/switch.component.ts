@@ -65,7 +65,8 @@ export class SwitchComponent implements OnInit, AfterViewInit, DiseqcSettingBase
       this.diseqcTree.Address = 16;
       this.work.addressText = "0x10";
       this.diseqcTree.SwitchPorts = 2;
-      this.diseqcTree.SubType = 'tone'
+      this.diseqcTree.SubType = 'tone';
+      this.diseqcTree.CmdRepeat = 1;
     }
     if (this.diseqcTree.SubType) {
       let subtype = this.switchSubTypes.find(x => x.SubType == this.diseqcTree.SubType);
@@ -93,17 +94,23 @@ export class SwitchComponent implements OnInit, AfterViewInit, DiseqcSettingBase
         if (this.setupDone && this.currentForm.dirty)
           this.dvbComponent.currentForm.form.markAsDirty()
       });
-    // mark as pristne after 100 ms
-    let obs = new Observable(x => {
-      setTimeout(() => {
-        x.next(1);
-        x.complete();
-      }, 100)
-    })
-    obs.subscribe(x => {
-      this.currentForm.form.markAsPristine();
-      this.setupDone = true;
-    });
+    if (this.diseqcTree.DiseqcId) {
+      // mark as pristine after 100 ms
+      let obs = new Observable(x => {
+        setTimeout(() => {
+          x.next(1);
+          x.complete();
+        }, 100)
+      })
+      obs.subscribe(x => {
+        this.currentForm.form.markAsPristine();
+        this.setupDone = true;
+      });
+    }
+    else {
+      this.currentForm.form.markAsDirty()
+      this.dvbComponent.currentForm.form.markAsDirty()
+    }
   }
 
   newDiseqc(): void {
