@@ -399,6 +399,8 @@
         "title": "DVB-T/S/C, ATSC or ISDB-T tuner card"
       },
       "diseqc": {
+        "cmdrepeat_label": "Repeat Count",
+        "cmdrepeat_desc": "Number of repeat (command with repeat flag ON) or resend (the same command) DiSEqC commands.<br>If value is higher than 10, command will be resend N-10 times.<br>If value is lower than 10, command will be repeated N times.<br>Repeat useful for unreliable DiSEqC equipment; resend useful when unreliable DiSEqC equipment has broken/unsupported repeat flag support.",
         "subtype_legacy": "Legacy (Fixed)",
         "subtype_standard": "Standard (Voltage)",
         "subtype_universal": "Universal (Voltage & Tone)",
@@ -427,8 +429,6 @@
         },
         "rotor": {
           "title": "Rotor Configuration",
-          "cmdrepeat_label": "Repeat Count",
-          "cmdrepeat_desc": "Number of repeat (command with repeat flag ON) or resend (the same command) DiSEqC commands.<br>If value is higher than 10, command will be resend N-10 times.<br>If value is lower than 10, command will be repeated N times.<br>Repeat useful for unreliable DiSEqC equipment; resend useful when unreliable DiSEqC equipment has broken/unsupported repeat flag support.",
           "type_label": "Rotor Type",
           "type_desc": "Select the type of rotor from the list.",
           "positions_label": "Positions",
@@ -445,7 +445,25 @@
         "subtype_diseqc_1_2": "DiSEqC 1.2",
         "subtype_diseqc_1_3": "DiSEqC 1.3 (GotoX/USALS)",
         "description_label": "Description",
-        "description_desc": "Optional descriptive name for this device, to make it easier to configure settings later."
+        "description_desc": "Optional descriptive name for this device, to make it easier to configure settings later.",
+        "switch": {
+          "legacy_sw21": "Legacy SW21",
+          "legacy_sw42": "Legacy SW42",
+          "legacy_sw64": "Legacy SW64",
+          "tone": "Tone",
+          "diseqc_uncom": "DiSEqC (Uncommitted)",
+          "voltage": "Voltage",
+          "mini_diseqc": "Mini DiSEqC",
+          "title": "Switch Configuration",
+          "type_label": "Switch Type",
+          "type_desc": "Select the type of switch from the list.",
+          "diseqc": "DiSEqC"
+        },
+        "address_label": "Address of switch",
+        "address_desc": "The DiSEqC address of the switch in Hexadecimal notation (0xnn). If 0x is not in front of the string it will be assumed to be in decimal notation and will be converted.",
+        "switchports_label": "Number of ports",
+        "switchports_desc": "The number of ports this switch has.",
+        "switchports_error": "ERROR: You have too many devices for this number of ports."
       },
       "delete_details": "This will delete {{CardType}} Device:{{VideoDevice}} Name:{{DisplayName}}",
       "external": {
