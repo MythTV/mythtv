@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Observer, PartialObserver } from 'rxjs';
+import { Observable, Observer, PartialObserver } from 'rxjs';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { DiseqcParm, DiseqcTree, DiseqcTreeList } from 'src/app/services/interfaces/capture-card.interface';
 import { DiseqcSettingBase } from '../diseqc-setting-base';
@@ -50,12 +50,29 @@ export class UnicableComponent implements OnInit, AfterViewInit, DiseqcSettingBa
 
   }
 
+  setupDone = false;
   ngAfterViewInit(): void {
     this.baseEvent.emit(this);
-    if (!this.diseqcTree.DiseqcId) {
-      this.currentForm.form.markAsDirty()
-      this.dvbComponent.currentForm.form.markAsDirty()
-    }
+    this.currentForm.valueChanges!.subscribe(
+      (x) => {
+        if (this.setupDone && this.currentForm.dirty)
+          this.dvbComponent.currentForm.form.markAsDirty()
+      });
+    let obs = new Observable(x => {
+      setTimeout(() => {
+        x.next(1);
+        x.complete();
+      }, 100)
+    })
+    obs.subscribe(x => {
+      this.setupDone = true;
+      if (this.diseqcTree.DiseqcId) {
+        this.currentForm.form.markAsPristine();
+      } else {
+        this.currentForm.form.markAsDirty()
+        this.dvbComponent.currentForm.form.markAsDirty()
+      }
+    });
   }
 
   newDiseqc(): void {

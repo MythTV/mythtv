@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Observable } from 'rxjs';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { CaptureCardList, CardAndInput } from 'src/app/services/interfaces/capture-card.interface';
 import { SetupService } from 'src/app/services/setup.service';
@@ -28,10 +29,19 @@ export class IptvComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.setupService.setCurrentForm(this.currentForm);
-    // Mark new card as dirty so it can be saved with default input value
-    if (!this.card.CardId)
-      this.currentForm.form.markAsDirty();
     this.topElement.nativeElement.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!this.card.CardId) {
+      let obs = new Observable(x => {
+        setTimeout(() => {
+          x.next(1);
+          x.complete();
+        }, 100)
+      })
+      obs.subscribe(x => {
+        // Mark new card as dirty so it can be saved with default input value
+        this.currentForm.form.markAsDirty()
+      });
+    }
   }
 
   showHelp() {

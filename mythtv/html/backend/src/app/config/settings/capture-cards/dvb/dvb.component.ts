@@ -274,7 +274,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
     this.work.errorCount = 0;
     //  Save diseqcTree
     if (this.diseqcTree && this.diseqcComponent) {
-      this.diseqcComponent.saveForm(0,{
+      this.diseqcComponent.saveForm(0, {
         next: (x: any) => {
           if (this.card.DiSEqCId && x.bool
             && this.card.DiSEqCId == this.diseqcTree?.DiseqcId) {

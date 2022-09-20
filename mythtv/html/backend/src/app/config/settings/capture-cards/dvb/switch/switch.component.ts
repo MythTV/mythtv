@@ -94,23 +94,21 @@ export class SwitchComponent implements OnInit, AfterViewInit, DiseqcSettingBase
         if (this.setupDone && this.currentForm.dirty)
           this.dvbComponent.currentForm.form.markAsDirty()
       });
-    if (this.diseqcTree.DiseqcId) {
-      // mark as pristine after 100 ms
-      let obs = new Observable(x => {
-        setTimeout(() => {
-          x.next(1);
-          x.complete();
-        }, 100)
-      })
-      obs.subscribe(x => {
+    let obs = new Observable(x => {
+      setTimeout(() => {
+        x.next(1);
+        x.complete();
+      }, 100)
+    })
+    obs.subscribe(x => {
+      this.setupDone = true;
+      if (this.diseqcTree.DiseqcId) {
         this.currentForm.form.markAsPristine();
-        this.setupDone = true;
-      });
-    }
-    else {
-      this.currentForm.form.markAsDirty()
-      this.dvbComponent.currentForm.form.markAsDirty()
-    }
+      } else {
+        this.currentForm.form.markAsDirty()
+        this.dvbComponent.currentForm.form.markAsDirty()
+      }
+    });
   }
 
   newDiseqc(): void {
