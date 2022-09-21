@@ -37,13 +37,19 @@ bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
                                    bool allow_forced)
 {
     bool enableforced = false;
-    if (!m_avSubtitlesEnabled && !subtitle.forced)
+    bool forced = false;
+    for (unsigned i = 0; i < subtitle.num_rects; i++)
+    {
+        forced = forced || static_cast<bool>(subtitle.rects[i]->flags & AV_SUBTITLE_FLAG_FORCED);
+    }
+
+    if (!m_avSubtitlesEnabled && !forced)
     {
         FreeAVSubtitle(subtitle);
         return enableforced;
     }
 
-    if (!m_avSubtitlesEnabled && subtitle.forced)
+    if (!m_avSubtitlesEnabled && forced)
     {
         if (!allow_forced)
         {
