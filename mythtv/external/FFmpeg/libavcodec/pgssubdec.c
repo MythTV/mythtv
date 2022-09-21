@@ -63,7 +63,6 @@ typedef struct PGSSubPresentation {
     int id_number;
     int palette_id;
     int object_count;
-    int object_forced;
     PGSSubObjectRef objects[MAX_OBJECT_REFS];
     int64_t pts;
 } PGSSubPresentation;
@@ -468,8 +467,6 @@ static int parse_presentation_segment(AVCodecContext *avctx,
             object->crop_h = bytestream_get_be16(&buf);
         }
 
-        ctx->presentation.object_forced = (ctx->presentation.objects[i].composition_flag & 0x40) >> 6;
-
         ff_dlog(avctx, "Subtitle Placement x=%d, y=%d\n",
                 object->x, object->y);
 
@@ -509,7 +506,6 @@ static int display_end_segment(AVCodecContext *avctx, AVSubtitle *sub,
     memset(sub, 0, sizeof(*sub));
     sub->pts = pts;
     ctx->presentation.pts = AV_NOPTS_VALUE;
-    sub->forced             = ctx->presentation.object_forced;
     sub->start_display_time = 0;
     // There is no explicit end time for PGS subtitles.  The end time
     // is defined by the start of the next sub which may contain no
