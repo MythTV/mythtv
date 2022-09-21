@@ -1911,7 +1911,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                 {
                     bbox = QRect(0, 0, rect->w, uh);
                     uh = DisplayScaledAVSubtitles(rect, bbox, true, display,
-                                                  subtitle.forced,
+                                                  rect->flags & AV_SUBTITLE_FLAG_FORCED,
                                                   QString("avsub%1t").arg(i),
                                                   displayuntil, late);
                 }
@@ -1922,7 +1922,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                 {
                     bbox = QRect(0, uh, rect->w, lh);
                     DisplayScaledAVSubtitles(rect, bbox, false, display,
-                                             subtitle.forced,
+                                             rect->flags & AV_SUBTITLE_FLAG_FORCED,
                                              QString("avsub%1b").arg(i),
                                              displayuntil, late);
                 }

@@ -1617,7 +1617,10 @@ bool MythDVDBuffer::DecodeSubtitles(AVSubtitle *Subtitle, int *GotSubtitles,
     {
         if (force_subtitle_display)
         {
-            Subtitle->forced = 1;
+            for (unsigned i = 0; i < Subtitle->num_rects; i++)
+            {
+                Subtitle->rects[i]->flags |= AV_SUBTITLE_FLAG_FORCED;
+            }
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Decoded forced subtitle");
         }
         return true;
