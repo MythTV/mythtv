@@ -5,10 +5,16 @@
 #include "libmythbase/mythlogging.h"
 #include "recorders/dtvrecorder.h" // for FrameRate
 
+
+extern "C" {
+#include "libavcodec/avcodec.h"
+#include "libavutil/internal.h"
+#include "libavcodec/golomb.h"
+}
+
 #include <cmath>
 #include <strings.h>
 
-#include "bitreader.h"
 #include "bytereader.h"
 
 /*
@@ -413,7 +419,9 @@ uint32_t AVCParser::addBytes(const uint8_t  *bytes,
 
 void AVCParser::processRBSP(bool rbsp_complete)
 {
-    auto br = BitReader(m_rbspBuffer, m_rbspIndex);
+    GetBitContext gb;
+
+    init_get_bits(&gb, m_rbspBuffer, 8 * m_rbspIndex);
 
     if (m_nalUnitType == SEI)
     {
@@ -426,7 +434,7 @@ void AVCParser::processRBSP(bool rbsp_complete)
 
         set_AU_pending();
 
-        decode_SEI(br);
+        decode_SEI(&gb);
     }
     else if (m_nalUnitType == SPS)
     {
@@ -439,7 +447,7 @@ void AVCParser::processRBSP(bool rbsp_complete)
         if (!m_seenSPS)
             m_spsOffset = m_pktOffset;
 
-        decode_SPS(br);
+        decode_SPS(&gb);
     }
     else if (m_nalUnitType == PPS)
     {
@@ -449,7 +457,7 @@ void AVCParser::processRBSP(bool rbsp_complete)
 
         set_AU_pending();
 
-        decode_PPS(br);
+        decode_PPS(&gb);
     }
     else
     {
@@ -458,7 +466,7 @@ void AVCParser::processRBSP(bool rbsp_complete)
         if (!rbsp_complete && m_rbspIndex < MAX_SLICE_HEADER_SIZE)
             return;
 
-        decode_Header(br);
+        decode_Header(&gb);
 
         if (new_AU())
             set_AU_pending();
@@ -490,7 +498,7 @@ void AVCParser::processRBSP(bool rbsp_complete)
 /*
   7.4.3 Slice header semantics
 */
-bool AVCParser::decode_Header(BitReader& br)
+bool AVCParser::decode_Header(GetBitContext *gb)
 {
     m_isKeyframe = false;
 
@@ -517,7 +525,7 @@ bool AVCParser::decode_Header(BitReader& br)
       that precedes the current slice in decoding order and has the
       same value of colour_plane_id.
      */
-    /* uint first_mb_in_slice = */ br.get_ue_golomb();
+    /* uint first_mb_in_slice = */ get_ue_golomb(gb);
 
     /*
       slice_type specifies the coding type of the slice according to
@@ -526,7 +534,7 @@ bool AVCParser::decode_Header(BitReader& br)
       When m_nalUnitType is equal to 5 (IDR picture), slice_type shall
       be equal to 2, 4, 7, or 9 (I or SI)
      */
-    m_sliceType = br.get_ue_golomb_31();
+    m_sliceType = get_ue_golomb_31(gb);
 
     /* s->pict_type = golomb_to_pict_type[slice_type % 5];
      */
@@ -536,7 +544,7 @@ bool AVCParser::decode_Header(BitReader& br)
       use. The value of m_picParameterSetId shall be in the range of
       0 to 255, inclusive.
      */
-    m_picParameterSetId = br.get_ue_golomb();
+    m_picParameterSetId = get_ue_golomb(gb);
 
     /*
       m_separateColourPlaneFlag equal to 1 specifies that the three
@@ -552,7 +560,7 @@ bool AVCParser::decode_Header(BitReader& br)
       colour_plane_id value.
      */
     if (m_separateColourPlaneFlag)
-        br.get_bits(2);  // colour_plane_id
+        get_bits(gb, 2);  // colour_plane_id
 
     /*
       frame_num is used as an identifier for pictures and shall be
@@ -564,7 +572,7 @@ bool AVCParser::decode_Header(BitReader& br)
       When m_maxNumRefFrames is equal to 0, slice_type shall be equal
           to 2, 4, 7, or 9.
     */
-    m_frameNum = br.get_bits(m_log2MaxFrameNum);
+    m_frameNum = get_bits(gb, m_log2MaxFrameNum);
 
     /*
       m_fieldPicFlag equal to 1 specifies that the slice is a slice of a
@@ -579,8 +587,8 @@ bool AVCParser::decode_Header(BitReader& br)
     */
     if (!m_frameMbsOnlyFlag)
     {
-        m_fieldPicFlag = br.get_bits(1);
-        m_bottomFieldFlag = m_fieldPicFlag ? br.get_bits(1) : 0;
+        m_fieldPicFlag = get_bits1(gb);
+        m_bottomFieldFlag = m_fieldPicFlag ? get_bits1(gb) : 0;
     }
     else
     {
@@ -599,7 +607,7 @@ bool AVCParser::decode_Header(BitReader& br)
      */
     if (m_nalUnitType == SLICE_IDR)
     {
-        m_idrPicId = br.get_ue_golomb();
+        m_idrPicId = get_ue_golomb(gb);
         m_isKeyframe = true;
     }
     else
@@ -619,10 +627,10 @@ bool AVCParser::decode_Header(BitReader& br)
     */
     if (m_picOrderCntType == 0)
     {
-        m_picOrderCntLsb = br.get_bits(m_log2MaxPicOrderCntLsb);
+        m_picOrderCntLsb = get_bits(gb, m_log2MaxPicOrderCntLsb);
 
         if ((m_picOrderPresentFlag == 1) && !m_fieldPicFlag)
-            m_deltaPicOrderCntBottom = br.get_se_golomb();
+            m_deltaPicOrderCntBottom = get_se_golomb(gb);
         else
             m_deltaPicOrderCntBottom = 0;
     }
@@ -661,10 +669,10 @@ bool AVCParser::decode_Header(BitReader& br)
           element is not present in the bitstream for the current
           slice, it shall be inferred to be equal to 0.
         */
-        m_deltaPicOrderCnt[0] = br.get_se_golomb();
+        m_deltaPicOrderCnt[0] = get_se_golomb(gb);
 
         if ((m_picOrderPresentFlag == 1) && !m_fieldPicFlag)
-            m_deltaPicOrderCnt[1] = br.get_se_golomb();
+            m_deltaPicOrderCnt[1] = get_se_golomb(gb);
         else
             m_deltaPicOrderCnt[1] = 0;
      }
@@ -678,7 +686,7 @@ bool AVCParser::decode_Header(BitReader& br)
       be equal to 0. The value of m_redundantPicCnt shall be in the
       range of 0 to 127, inclusive.
     */
-    m_redundantPicCnt = m_redundantPicCntPresentFlag ? br.get_ue_golomb() : 0;
+    m_redundantPicCnt = m_redundantPicCntPresentFlag ? get_ue_golomb(gb) : 0;
 
     return true;
 }
@@ -686,35 +694,35 @@ bool AVCParser::decode_Header(BitReader& br)
 /*
  * libavcodec used for example
  */
-void AVCParser::decode_SPS(BitReader& br)
+void AVCParser::decode_SPS(GetBitContext * gb)
 {
     m_seenSPS = true;
 
-    int profile_idc = br.get_bits(8);
-    br.get_bits(1);     // constraint_set0_flag
-    br.get_bits(1);     // constraint_set1_flag
-    br.get_bits(1);     // constraint_set2_flag
-    br.get_bits(1);     // constraint_set3_flag
-    br.get_bits(4);     // reserved
-    br.get_bits(8);     // level_idc
-    br.get_ue_golomb(); // sps_id
+    int profile_idc = get_bits(gb, 8);
+    get_bits1(gb);      // constraint_set0_flag
+    get_bits1(gb);      // constraint_set1_flag
+    get_bits1(gb);      // constraint_set2_flag
+    get_bits1(gb);      // constraint_set3_flag
+    get_bits(gb, 4);    // reserved
+    get_bits(gb, 8);    // level_idc
+    get_ue_golomb(gb);  // sps_id
 
     if (profile_idc == 100 || profile_idc == 110 || profile_idc == 122 ||
         profile_idc == 244 || profile_idc == 44  || profile_idc == 83  ||
         profile_idc == 86  || profile_idc == 118 || profile_idc == 128 )
     { // high profile
-        if ((m_chromaFormatIdc = br.get_ue_golomb()) == 3)
-            m_separateColourPlaneFlag = (br.get_bits(1) == 1);
+        if ((m_chromaFormatIdc = get_ue_golomb(gb)) == 3)
+            m_separateColourPlaneFlag = (get_bits1(gb) == 1);
 
-        br.get_ue_golomb();     // bit_depth_luma_minus8
-        br.get_ue_golomb();     // bit_depth_chroma_minus8
-        br.get_bits(1);         // qpprime_y_zero_transform_bypass_flag
+        get_ue_golomb(gb);     // bit_depth_luma_minus8
+        get_ue_golomb(gb);     // bit_depth_chroma_minus8
+        get_bits1(gb);         // qpprime_y_zero_transform_bypass_flag
 
-        if (br.get_bits(1))     // seq_scaling_matrix_present_flag
+        if (get_bits1(gb))     // seq_scaling_matrix_present_flag
         {
             for (int idx = 0; idx < ((m_chromaFormatIdc != 3) ? 8 : 12); ++idx)
             {
-                if (br.get_bits(1)) // Scaling list present
+                if (get_bits1(gb)) // Scaling list present
                 {
                     int lastScale = 8;
                     int nextScale = 8;
@@ -723,7 +731,7 @@ void AVCParser::decode_SPS(BitReader& br)
                     {
                         if (nextScale != 0)
                         {
-                            int deltaScale = br.get_se_golomb();
+                            int deltaScale = get_se_golomb(gb);
                             nextScale = (lastScale + deltaScale + 256) % 256;
                         }
                         lastScale = (nextScale == 0) ? lastScale : nextScale;
@@ -740,14 +748,14 @@ void AVCParser::decode_SPS(BitReader& br)
 
        MaxFrameNum = 2( m_log2MaxFrameNum_minus4 + 4 )
      */
-    m_log2MaxFrameNum = br.get_ue_golomb() + 4;
+    m_log2MaxFrameNum = get_ue_golomb(gb) + 4;
 
     /*
       m_picOrderCntType specifies the method to decode picture order
       count (as specified in subclause 8.2.1). The value of
       m_picOrderCntType shall be in the range of 0 to 2, inclusive.
      */
-    m_picOrderCntType = br.get_ue_golomb();
+    m_picOrderCntType = get_ue_golomb(gb);
     if (m_picOrderCntType == 0)
     {
         /*
@@ -761,7 +769,7 @@ void AVCParser::decode_SPS(BitReader& br)
           The value of m_log2MaxPicOrderCntLsbMinus4 shall be in
           the range of 0 to 12, inclusive.
          */
-        m_log2MaxPicOrderCntLsb = br.get_ue_golomb() + 4;
+        m_log2MaxPicOrderCntLsb = get_ue_golomb(gb) + 4;
     }
     else if (m_picOrderCntType == 1)
     {
@@ -772,7 +780,7 @@ void AVCParser::decode_SPS(BitReader& br)
           be inferred to be equal to
           0. m_deltaPicOrderAlwaysZeroFlag
          */
-        m_deltaPicOrderAlwaysZeroFlag = br.get_bits(1);
+        m_deltaPicOrderAlwaysZeroFlag = get_bits1(gb);
 
         /*
           offset_for_non_ref_pic is used to calculate the picture
@@ -780,7 +788,7 @@ void AVCParser::decode_SPS(BitReader& br)
           8.2.1. The value of offset_for_non_ref_pic shall be in the
           range of -231 to 231 - 1, inclusive.
          */
-        int offset_for_non_ref_pic = br.get_se_golomb();
+        int offset_for_non_ref_pic = get_se_golomb(gb);
         (void) offset_for_non_ref_pic; // suppress unused var warning
 
         /*
@@ -789,7 +797,7 @@ void AVCParser::decode_SPS(BitReader& br)
           subclause 8.2.1. The value of offset_for_top_to_bottom_field
           shall be in the range of -231 to 231 - 1, inclusive.
          */
-        int offset_for_top_to_bottom_field = br.get_se_golomb();
+        int offset_for_top_to_bottom_field = get_se_golomb(gb);
         (void) offset_for_top_to_bottom_field; // suppress unused var warning
 
         /*
@@ -799,9 +807,9 @@ void AVCParser::decode_SPS(BitReader& br)
           subclause 8.2.1. The value of offset_for_ref_frame[ i ]
           shall be in the range of -231 to 231 - 1, inclusive.
          */
-        uint tmp = br.get_ue_golomb();
+        uint tmp = get_ue_golomb(gb);
         for (uint idx = 0; idx < tmp; ++idx)
-            br.get_se_golomb();  // offset_for_ref_frame[i]
+            get_se_golomb(gb);  // offset_for_ref_frame[i]
     }
 
     /*
@@ -814,26 +822,26 @@ void AVCParser::decode_SPS(BitReader& br)
       m_numRefFrames shall be in the range of 0 to MaxDpbSize (as
       specified in subclause A.3.1 or A.3.2), inclusive.
      */
-    m_numRefFrames = br.get_ue_golomb();
+    m_numRefFrames = get_ue_golomb(gb);
     /*
       gaps_in_frame_num_value_allowed_flag specifies the allowed
       values of frame_num as specified in subclause 7.4.3 and the
       decoding process in case of an inferred gap between values of
       frame_num as specified in subclause 8.2.5.2.
      */
-    /* bool gaps_in_frame_num_allowed_flag = */ br.get_bits(1);
+    /* bool gaps_in_frame_num_allowed_flag = */ get_bits1(gb);
 
     /*
       pic_width_in_mbs_minus1 plus 1 specifies the width of each
       decoded picture in units of macroblocks.  16 macroblocks in a row
      */
-    m_picWidth = (br.get_ue_golomb() + 1) * 16;
+    m_picWidth = (get_ue_golomb(gb) + 1) * 16;
     /*
       pic_height_in_map_units_minus1 plus 1 specifies the height in
       slice group map units of a decoded frame or field.  16
       macroblocks in each column.
      */
-    m_picHeight = (br.get_ue_golomb() + 1) * 16;
+    m_picHeight = (get_ue_golomb(gb) + 1) * 16;
 
     /*
       m_frameMbsOnlyFlag equal to 0 specifies that coded pictures of
@@ -842,7 +850,7 @@ void AVCParser::decode_SPS(BitReader& br)
       coded picture of the coded video sequence is a coded frame
       containing only frame macroblocks.
      */
-    m_frameMbsOnlyFlag = br.get_bits(1);
+    m_frameMbsOnlyFlag = get_bits1(gb);
     if (!m_frameMbsOnlyFlag)
     {
         m_picHeight *= 2;
@@ -855,10 +863,10 @@ void AVCParser::decode_SPS(BitReader& br)
           macroblocks within frames. When mb_adaptive_frame_field_flag
           is not present, it shall be inferred to be equal to 0.
          */
-        br.get_bits(1); // mb_adaptive_frame_field_flag
+        get_bits1(gb); // mb_adaptive_frame_field_flag
     }
 
-    br.get_bits(1);     // direct_8x8_inference_flag
+    get_bits1(gb);     // direct_8x8_inference_flag
 
     /*
       frame_cropping_flag equal to 1 specifies that the frame cropping
@@ -866,12 +874,12 @@ void AVCParser::decode_SPS(BitReader& br)
       set. frame_cropping_flag equal to 0 specifies that the frame
       cropping offset parameters are not present.
      */
-    if (br.get_bits(1)) // frame_cropping_flag
+    if (get_bits1(gb)) // frame_cropping_flag
     {
-        m_frameCropLeftOffset   = br.get_ue_golomb();
-        m_frameCropRightOffset  = br.get_ue_golomb();
-        m_frameCropTopOffset    = br.get_ue_golomb();
-        m_frameCropBottomOffset = br.get_ue_golomb();
+        m_frameCropLeftOffset = get_ue_golomb(gb);
+        m_frameCropRightOffset = get_ue_golomb(gb);
+        m_frameCropTopOffset = get_ue_golomb(gb);
+        m_frameCropBottomOffset = get_ue_golomb(gb);
     }
 
     /*
@@ -881,20 +889,21 @@ void AVCParser::decode_SPS(BitReader& br)
       the vui_parameters( ) syntax structure as specified in Annex E
       is not present.
      */
-    if (br.get_bits(1)) // vui_parameters_present_flag
-        vui_parameters(br, false);
+    if (get_bits1(gb)) // vui_parameters_present_flag
+        vui_parameters(gb, false);
 }
 
 void AVCParser::parse_SPS(uint8_t *sps, uint32_t sps_size,
                            bool& interlaced, int32_t& max_ref_frames)
 {
-    auto br = BitReader(sps, sps_size);
-    decode_SPS(br);
+    GetBitContext gb;
+    init_get_bits(&gb, sps, sps_size << 3);
+    decode_SPS(&gb);
     interlaced = (m_frameMbsOnlyFlag == 0);
     max_ref_frames = m_numRefFrames;
 }
 
-void AVCParser::decode_PPS(BitReader& br)
+void AVCParser::decode_PPS(GetBitContext * gb)
 {
     /*
       m_picParameterSetId identifies the picture parameter set that
@@ -902,15 +911,15 @@ void AVCParser::decode_PPS(BitReader& br)
       m_picParameterSetId shall be in the range of 0 to 255,
       inclusive.
      */
-    m_picParameterSetId = br.get_ue_golomb();
+    m_picParameterSetId = get_ue_golomb(gb);
 
     /*
       m_seqParameterSetId refers to the active sequence parameter
       set. The value of m_seqParameterSetId shall be in the range of
       0 to 31, inclusive.
      */
-    m_seqParameterSetId = br.get_ue_golomb();
-    br.get_bits(1); // entropy_coding_mode_flag;
+    m_seqParameterSetId = get_ue_golomb(gb);
+    get_bits1(gb); // entropy_coding_mode_flag;
 
     /*
       m_picOrderPresentFlag equal to 1 specifies that the picture
@@ -919,60 +928,57 @@ void AVCParser::decode_PPS(BitReader& br)
       equal to 0 specifies that the picture order count related syntax
       elements are not present in the slice headers.
      */
-    m_picOrderPresentFlag = br.get_bits(1);
+    m_picOrderPresentFlag = get_bits1(gb);
 
 #if 0 // Rest not currently needed, and requires <math.h>
-    uint num_slice_groups = br.get_ue_golomb() + 1;
+    uint num_slice_groups = get_ue_golomb(gb) + 1;
     if (num_slice_groups > 1) // num_slice_groups (minus 1)
     {
         uint idx;
 
-        switch (br.get_ue_golomb()) // slice_group_map_type
+        switch (get_ue_golomb(gb)) // slice_group_map_type
         {
           case 0:
             for (idx = 0; idx < num_slice_groups; ++idx)
-                br.get_ue_golomb(); // run_length_minus1[idx]
+                get_ue_golomb(gb); // run_length_minus1[idx]
             break;
           case 1:
             for (idx = 0; idx < num_slice_groups; ++idx)
             {
-                br.get_ue_golomb(); // top_left[idx]
-                br.get_ue_golomb(); // bottom_right[idx]
+                get_ue_golomb(gb); // top_left[idx]
+                get_ue_golomb(gb); // bottom_right[idx]
             }
             break;
           case 3:
           case 4:
           case 5:
-            br.get_bits(1);     // slice_group_change_direction_flag
-            br.get_ue_golomb(); // slice_group_change_rate_minus1
+            get_bits1(gb);     // slice_group_change_direction_flag
+            get_ue_golomb(gb); // slice_group_change_rate_minus1
             break;
           case 6:
-            uint pic_size_in_map_units = br.get_ue_golomb() + 1;
-            // TODO bit hacks: combine https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
-            // with https://graphics.stanford.edu/~seander/bithacks.html#IntegerLogDeBruijn
-            // to replace floating point below
+            uint pic_size_in_map_units = get_ue_golomb(gb) + 1;
             uint num_bits = (int)ceil(log2(num_slice_groups));
             for (idx = 0; idx < pic_size_in_map_units; ++idx)
             {
-                br.get_bits(num_bits); //slice_group_id[idx]
+                get_bits(gb, num_bits); //slice_group_id[idx]
             }
         }
     }
 
-    br.get_ue_golomb(); // num_ref_idx_10_active_minus1
-    br.get_ue_golomb(); // num_ref_idx_11_active_minus1
-    br.get_bits(1);     // weighted_pred_flag;
-    br.get_bits(2);     // weighted_bipred_idc
-    br.get_se_golomb(); // pic_init_qp_minus26
-    br.get_se_golomb(); // pic_init_qs_minus26
-    br.get_se_golomb(); // chroma_qp_index_offset
-    br.get_bits(1);     // deblocking_filter_control_present_flag
-    br.get_bits(1);     // constrained_intra_pref_flag
-    m_redundantPicCntPresentFlag = br.get_bits(1);
+    get_ue_golomb(gb); // num_ref_idx_10_active_minus1
+    get_ue_golomb(gb); // num_ref_idx_11_active_minus1
+    get_bits1(gb);     // weighted_pred_flag;
+    get_bits(gb, 2);   // weighted_bipred_idc
+    get_se_golomb(gb); // pic_init_qp_minus26
+    get_se_golomb(gb); // pic_init_qs_minus26
+    get_se_golomb(gb); // chroma_qp_index_offset
+    get_bits1(gb);     // deblocking_filter_control_present_flag
+    get_bits1(gb);     // constrained_intra_pref_flag
+    m_redundantPicCntPresentFlag = get_bits1(gb);
 #endif
 }
 
-void AVCParser::decode_SEI(BitReader& br)
+void AVCParser::decode_SEI(GetBitContext *gb)
 {
     int   recovery_frame_cnt = -1;
 #if 0
@@ -987,32 +993,32 @@ void AVCParser::decode_SEI(BitReader& br)
     /* A message requires at least 2 bytes, and then
      * there's the stop bit plus alignment, so there
      * can be no message in less than 24 bits */
-    while (br.get_bits_left() >= 24)
+    while (get_bits_left(gb) >= 24)
     {
         do {
-            type += br.show_bits(8);
-        } while (br.get_bits(8) == 0xFF);
+            type += show_bits(gb, 8);
+        } while (get_bits(gb, 8) == 0xFF);
 
         do {
-            size += br.show_bits(8);
-        } while (br.get_bits(8) == 0xFF);
+            size += show_bits(gb, 8);
+        } while (get_bits(gb, 8) == 0xFF);
 
         switch (type)
         {
           case SEI_TYPE_RECOVERY_POINT:
-            recovery_frame_cnt = br.get_ue_golomb();
+            recovery_frame_cnt = get_ue_golomb(gb);
 #if 0
-            exact_match_flag = (br.get_bits(1) != 0U);
-            broken_link_flag = (br.get_bits(1) != 0U);
-            changing_group_slice_idc = br.get_bits(2);
+            exact_match_flag = (get_bits1(gb) != 0U);
+            broken_link_flag = (get_bits1(gb) != 0U);
+            changing_group_slice_idc = get_bits(gb, 2);
 #endif
             m_auContainsKeyframeMessage = (recovery_frame_cnt == 0);
             if ((size - 12) > 0)
-                br.skip_bits((size - 12) * 8);
+                skip_bits(gb, (size - 12) * 8);
             return;
 
           default:
-            br.skip_bits(size * 8);
+            skip_bits(gb, size * 8);
             break;
         }
     }
