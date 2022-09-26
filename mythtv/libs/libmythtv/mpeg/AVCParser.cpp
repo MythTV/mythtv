@@ -11,8 +11,10 @@ extern "C" {
 //#include "libavutil/internal.h"
 #define SUINT   unsigned
 
+#define register
 #include "libavcodec/get_bits.h"
 #include "libavcodec/golomb.h"
+#undef register
 }
 
 #include <cmath>
