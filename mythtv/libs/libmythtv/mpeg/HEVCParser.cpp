@@ -9,6 +9,7 @@
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavutil/internal.h"
+#include "libavcodec/get_bits.h"
 #include "libavcodec/golomb.h"
 }
 

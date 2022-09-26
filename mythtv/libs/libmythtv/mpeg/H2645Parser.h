@@ -23,15 +23,6 @@
 #ifndef H2645PARSER_H
 #define H2645PARSER_H
 
-// OMG this is a hack.  Buried several layers down in FFmpeg includes
-// is an include of unistd.h that using GCC will foricibly redefine
-// NULL back to the wrong value.  (Maybe just on ARM?)  Include
-// unistd.h up front so that the subsequent inclusions will be
-// skipped, and then define NULL to the right value.
-#include <unistd.h>
-#undef NULL
-#define NULL nullptr
-
 #include <QString>
 #include <cstdint>
 
@@ -40,12 +31,7 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythtv/recorders/recorderbase.h" // for ScanType
 
-extern "C" {
-// Grr. NULL keeps getting redefined back to 0
-#undef NULL
-#define NULL nullptr
-#include "libavcodec/get_bits.h"
-}
+struct GetBitContext; // "libavcodec/get_bits.h"
 
 class FrameRate;
 enum class SCAN_t : uint8_t;

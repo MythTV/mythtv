@@ -13,6 +13,7 @@
 extern "C" {
 #include "libavutil/avutil.h"
 #include "libavutil/error.h"
+#include "libavutil/intreadwrite.h" // for AV_RB24 and AV_RB32
 #include "libavutil/log.h"
 #include "libavutil/opt.h"
 #include "libavcodec/avcodec.h"
