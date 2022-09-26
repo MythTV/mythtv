@@ -19,7 +19,70 @@
  */
 #include "test_bitreader.h"
 
+#include <array>
 #include <cstdint>
+
+void TestBitReader::skip_bits_aligned()
+{
+    constexpr std::array<uint8_t, 16> array =
+    {
+        0b1000'0000, 0b0000'0000,
+        0b1000'0000, 0b0000'0000,
+        0b1000'0000, 0b0000'0000,
+        0b1000'0000, 0b0000'0000,
+        0b1000'0000, 0b0000'0000,
+        0xDE, 0xAD, // (-2 * -28502) + 1
+        0b1000'0000, 0b0000'0000,
+        0xDE, 0xAC, // ((2 * 28502) - 1) + 1
+    };
+    auto br = BitReader(array.data(), array.size());
+    QCOMPARE(br.get_bits(5), 0b1'0000U);
+    QCOMPARE(br.get_bits_left(), 123);
+    br.skip_bits(16);
+    QCOMPARE(br.get_bits_left(), 107);
+    br.skip_bits(16);
+    QCOMPARE(br.get_bits_left(), 91);
+    br.skip_bits(16);
+    QCOMPARE(br.get_bits_left(), 75);
+    br.skip_bits(11);
+    QCOMPARE(br.get_bits_left(), 64);
+    br.skip_bits(); // skip first bit for 15 zeroes
+    QCOMPARE(br.get_se_golomb(), -28502);
+    QCOMPARE(br.get_bits_left(), 32);
+    br.skip_bits(); // skip first bit for 15 zeroes
+    QCOMPARE(br.get_se_golomb(), +28502);
+    QCOMPARE(br.get_bits_left(),  0);
+}
+
+void TestBitReader::skip_bits_nonaligned()
+{
+    constexpr std::array<uint8_t, 16> array =
+    {
+        0b1000'0000, 0b0000'0000,
+        0b1000'0000, 0b0000'0000,
+        0b1000'0000, 0b0000'0000,
+        0b1000'0000, 0b0000'0000,
+        0b1000'0000, 0b0000'0000,
+        0xDE, 0xAD, // (-2 * -28502) + 1
+        0b1000'0000, 0b0000'0000,
+        0xDE, 0xAC, // ((2 * 28502) - 1) + 1
+    };
+    auto br = BitReader(array.data(), array.size());
+    QCOMPARE(br.get_bits(16), 1U << 15);
+    QCOMPARE(br.get_bits_left(), 112);
+    br.skip_bits(16);
+    QCOMPARE(br.get_bits_left(), 96);
+    br.skip_bits(16);
+    QCOMPARE(br.get_bits_left(), 80);
+    br.skip_bits(16);
+    QCOMPARE(br.get_bits_left(), 64);
+    br.skip_bits(); // skip first bit for 15 zeroes
+    QCOMPARE(br.get_se_golomb(), -28502);
+    QCOMPARE(br.get_bits_left(), 32);
+    br.skip_bits(); // skip first bit for 15 zeroes
+    QCOMPARE(br.get_se_golomb(), +28502);
+    QCOMPARE(br.get_bits_left(),  0);
+}
 
 void TestBitReader::get_bits()
 {
@@ -57,6 +120,38 @@ void TestBitReader::get_bits()
      // past the end
     QCOMPARE(br.get_ue_golomb_31(), -1);
     QCOMPARE(br.get_bits(4), 0U);
+}
+
+void TestBitReader::get_bits64()
+{
+    constexpr std::array<uint8_t, 17> array =
+    {
+        0x0D,
+        0xEA, 0xDB, 0xEE, 0xFD, 0xEA, 0xDB, 0xEE, 0xF3,
+        0x14, 0x15, 0x92, 0x65, 0x35, 0x89, 0x79, 0x32,
+    };
+
+    auto br = BitReader(array.data(), array.size());
+
+    br.skip_bits(4);
+    QCOMPARE(br.get_bits64(64), 0xDEAD'BEEF'DEAD'BEEFU);
+    QCOMPARE(br.get_bits_left(), 68);
+    QCOMPARE(br.get_bits64(64), 0x3141'5926'5358'9793U);
+    QCOMPARE(br.get_bits_left(), 4);
+}
+
+void TestBitReader::get_bits64_aligned()
+{
+    constexpr std::array<uint8_t, 8> array =
+    {
+        0xDE, 0xAD, 0xBE, 0xEF, 0xDE, 0xAD, 0xBE, 0xEF,
+    };
+
+    auto br = BitReader(array.data(), array.size());
+
+    QCOMPARE(br.get_bits64(64), 0xDEAD'BEEF'DEAD'BEEFU);
+    QCOMPARE(br.get_bits_left(), 0);
+
 }
 
 void TestBitReader::get_ue_golomb_long()
