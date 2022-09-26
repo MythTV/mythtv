@@ -47,14 +47,16 @@ class BitReader
 
     void skip_bits(unsigned n = 1)
     {
-        if (m_cacheSize >= n)
+        if (m_cacheSize > n)
         {
             m_cache <<= n;
             m_cacheSize -= n;
         }
         else
         {
+            n -= m_cacheSize;
             m_cacheSize = 0;
+            m_cache      = 0;
             m_bitIndex += n;
             int quotient = m_bitIndex / CHAR_BIT;
             m_bitIndex %= CHAR_BIT;
