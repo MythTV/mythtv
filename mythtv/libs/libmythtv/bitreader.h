@@ -45,7 +45,7 @@ class BitReader
     }
     ~BitReader() = default;
 
-    void skip_bits(unsigned n = 1)
+    void skip_bits(unsigned n)
     {
         if (m_cacheSize > n)
         {
@@ -83,7 +83,7 @@ class BitReader
     }
     bool next_bit() { return get_bits(1) == 1; }
     /// @brief Read 0-32 bits.
-    uint32_t get_bits(unsigned n = 1)
+    uint32_t get_bits(unsigned n)
     {
         uint32_t ret = show_bits(n);
         skip_bits(n);

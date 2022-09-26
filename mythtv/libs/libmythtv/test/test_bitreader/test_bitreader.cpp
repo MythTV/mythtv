@@ -46,10 +46,10 @@ void TestBitReader::skip_bits_aligned()
     QCOMPARE(br.get_bits_left(), 75);
     br.skip_bits(11);
     QCOMPARE(br.get_bits_left(), 64);
-    br.skip_bits(); // skip first bit for 15 zeroes
+    br.skip_bits(1); // skip first bit for 15 zeroes
     QCOMPARE(br.get_se_golomb(), -28502);
     QCOMPARE(br.get_bits_left(), 32);
-    br.skip_bits(); // skip first bit for 15 zeroes
+    br.skip_bits(1); // skip first bit for 15 zeroes
     QCOMPARE(br.get_se_golomb(), +28502);
     QCOMPARE(br.get_bits_left(),  0);
 }
@@ -76,10 +76,10 @@ void TestBitReader::skip_bits_nonaligned()
     QCOMPARE(br.get_bits_left(), 80);
     br.skip_bits(16);
     QCOMPARE(br.get_bits_left(), 64);
-    br.skip_bits(); // skip first bit for 15 zeroes
+    br.skip_bits(1); // skip first bit for 15 zeroes
     QCOMPARE(br.get_se_golomb(), -28502);
     QCOMPARE(br.get_bits_left(), 32);
-    br.skip_bits(); // skip first bit for 15 zeroes
+    br.skip_bits(1); // skip first bit for 15 zeroes
     QCOMPARE(br.get_se_golomb(), +28502);
     QCOMPARE(br.get_bits_left(),  0);
 }
@@ -107,7 +107,7 @@ void TestBitReader::get_bits()
     QCOMPARE(br.get_bits_left(), INT64_C(17));
 
     // start at byte index 2
-    br.skip_bits();
+    br.skip_bits(1);
     QCOMPARE(br.get_ue_golomb_31(), -1); // too big
     QCOMPARE(br.get_bits_left(), INT64_C(3));
     QCOMPARE(br.get_ue_golomb_31(), 0);
@@ -162,7 +162,7 @@ void TestBitReader::get_ue_golomb_long()
         0xDE, 0xAD, 0xBE, 0xEF, // 3735928558 + 1
     };
     auto br2 = BitReader(array2.data(), array2.size());
-    br2.skip_bits(); // skip first bit for 31 zeroes
+    br2.skip_bits(1); // skip first bit for 31 zeroes
     QCOMPARE(br2.get_ue_golomb_long(), 3735928558U);
     QCOMPARE(br2.get_bits_left(), INT64_C(0));
 }
@@ -177,10 +177,10 @@ void TestBitReader::get_se_golomb1()
         0xDE, 0xAD, 0xBE, 0xEE, // ((2 * 1867964279) - 1) + 1
     };
     auto br3 = BitReader(array3.data(), array3.size());
-    br3.skip_bits(); // skip first bit for 31 zeroes
+    br3.skip_bits(1); // skip first bit for 31 zeroes
     QCOMPARE(br3.get_se_golomb(), -1867964279);
     QCOMPARE(br3.get_bits_left(), INT64_C(64));
-    br3.skip_bits(); // skip first bit for 31 zeroes
+    br3.skip_bits(1); // skip first bit for 31 zeroes
     QCOMPARE(br3.get_se_golomb(), +1867964279);
     QCOMPARE(br3.get_bits_left(), INT64_C(0));
 }
@@ -195,10 +195,10 @@ void TestBitReader::get_se_golomb2()
         0xDE, 0xAC, // ((2 * 28502) - 1) + 1
     };
     auto br4 = BitReader(array4.data(), array4.size());
-    br4.skip_bits(); // skip first bit for 15 zeroes
+    br4.skip_bits(1); // skip first bit for 15 zeroes
     QCOMPARE(br4.get_se_golomb(), -28502);
     QCOMPARE(br4.get_bits_left(), INT64_C(32));
-    br4.skip_bits(); // skip first bit for 15 zeroes
+    br4.skip_bits(1); // skip first bit for 15 zeroes
     QCOMPARE(br4.get_se_golomb(), +28502);
     QCOMPARE(br4.get_bits_left(), INT64_C(0));
 }

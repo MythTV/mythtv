@@ -1295,7 +1295,7 @@ bool HEVCParser::parseSliceSegmentHeader(BitReader& br)
         br.get_ue_golomb(); // slice_type; // ue(v)
         if (pps->output_flag_present_flag)
         {
-            br.get_bits(); // pic_output_flag; // u(1)
+            br.get_bits(1); // pic_output_flag; // u(1)
         }
         if (sps->separate_colour_plane_flag)
         {
