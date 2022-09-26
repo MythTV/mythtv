@@ -72,7 +72,7 @@ class BitReader
         }
         return uint32_t(get_upper_bits(m_cache, n));
     }
-    uint32_t show_bits64(unsigned n)
+    uint64_t show_bits64(unsigned n)
     {
         //assert(n <= 64);
         if (m_cacheSize < n)
