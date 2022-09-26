@@ -187,14 +187,6 @@ class BitReader
 #endif
     }
 
-    static constexpr uint64_t mask_upper(unsigned bits)
-    {
-        // protect against undefined behavior
-        if (bits ==  0) return  UINT64_C(0);
-        if (bits >  64) return ~UINT64_C(0);
-        return ~((UINT64_C(1) << (64 - bits)) - 1);
-    }
-
     static constexpr uint64_t get_upper_bits(uint64_t val, unsigned bits)
     {
         // protect against undefined behavior
@@ -206,7 +198,7 @@ class BitReader
         {
             return val;
         }
-        return (val & mask_upper(bits)) >> (64 - bits);
+        return val >> (64 - bits);
     }
 
     void refill_cache(unsigned min_bits);
