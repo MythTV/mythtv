@@ -10,11 +10,27 @@ extern "C" {
 //#include "libavutil/internal.h"
 #define SUINT   unsigned
 
+#ifdef __clang__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunused-parameter"
+#   pragma clang diagnostic ignored "-Wsign-compare"
+#elif defined(__GNUC__)
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wunused-parameter"
+#   pragma GCC diagnostic ignored "-Wsign-compare"
+#endif
+
 #define CONFIG_SAFE_BITSTREAM_READER 0
 #define register
 #include "libavcodec/get_bits.h"
 #include "libavcodec/golomb.h"
 #undef register
+
+#ifdef __clang__
+#   pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#   pragma GCC diagnostic pop
+#endif
 }
 
 #include <cmath>
