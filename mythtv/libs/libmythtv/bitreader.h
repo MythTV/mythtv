@@ -254,15 +254,16 @@ inline void BitReader::refill_cache(unsigned min_bits)
     {
         int shift = 64 - m_cacheSize;
         int bits = CHAR_BIT - m_bitIndex;
-        m_cache |= int64_t(*m_buffer & ((1 << bits) - 1)) << (shift - bits);
         if (shift > bits)
         {
+            m_cache |= int64_t(*m_buffer & ((1 << bits) - 1)) << (shift - bits);
             m_bitIndex   = 0;
             m_buffer++;
             m_cacheSize += bits;
         }
         else
         {
+            m_cache |= int64_t(*m_buffer & ((1 << bits) - 1)) >> (bits - shift);
             m_bitIndex  += shift;
             m_cacheSize += shift;
         }
