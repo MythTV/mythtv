@@ -11,6 +11,7 @@ extern "C" {
 //#include "libavutil/internal.h"
 #define SUINT   unsigned
 
+#define CONFIG_SAFE_BITSTREAM_READER 0
 #define register
 #include "libavcodec/get_bits.h"
 #include "libavcodec/golomb.h"
