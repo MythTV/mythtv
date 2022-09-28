@@ -23,6 +23,7 @@ class V2EnvInfo : public QObject
     SERVICE_PROPERTY2( QString, LCALL       )
     SERVICE_PROPERTY2( QString, LCCTYPE     )
     SERVICE_PROPERTY2( QString, HOME        )
+    SERVICE_PROPERTY2( QString, USER        )
     SERVICE_PROPERTY2( QString, MYTHCONFDIR );
 
     public:
@@ -43,6 +44,7 @@ class V2EnvInfo : public QObject
             m_LCALL       = src->m_LCALL;
             m_LCCTYPE     = src->m_LCCTYPE;
             m_HOME        = src->m_HOME;
+            m_USER        = src->m_USER;
             m_MYTHCONFDIR = src->m_MYTHCONFDIR;
         }
 
