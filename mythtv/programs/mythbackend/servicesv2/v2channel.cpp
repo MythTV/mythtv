@@ -41,6 +41,8 @@
 #include "libmythtv/sourceutil.h"
 #include "libmythtv/cardutil.h"
 #include "libmythbase/mythdate.h"
+#include "libmythtv/frequencies.h"
+#include "libmythbase/mythsystemlegacy.h"
 
 // MythBackend
 #include "v2artworkInfoList.h"
@@ -49,6 +51,8 @@
 #include "v2programAndChannel.h"
 #include "v2recording.h"
 #include "v2serviceUtil.h"
+#include "v2grabber.h"
+#include "v2freqtable.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -73,6 +77,9 @@ void V2Channel::RegisterCustomTypes()
     qRegisterMetaType<V2ArtworkInfo*>("V2ArtworkInfo");
     qRegisterMetaType<V2CastMemberList*>("V2CastMemberList");
     qRegisterMetaType<V2CastMember*>("V2CastMember");
+    qRegisterMetaType<V2Grabber*>("V2Grabber");
+    qRegisterMetaType<V2GrabberList*>("V2GrabberList");
+    qRegisterMetaType<V2FreqTableList*>("V2FreqTableList");
 }
 
 V2Channel::V2Channel() : MythHTTPService(s_service)
@@ -832,4 +839,83 @@ QStringList V2Channel::GetXMLTVIdList( uint SourceID )
         throw(QString("SourceID (%1) not found").arg(SourceID));
 
     return idList;
+}
+
+// Prevent concurrent access to tv_find_grabbers
+static QMutex  lockGrabber;
+
+V2GrabberList* V2Channel::GetGrabberList  (  )
+{
+    // ----------------------------------------------------------------------
+    // Build Response
+    // ----------------------------------------------------------------------
+
+    QMutexLocker lock(&lockGrabber);
+
+    auto *pGrabberList = new V2GrabberList();
+
+    // Add default grabbers
+    V2Grabber *pGrabber = pGrabberList->AddNewGrabber();
+    pGrabber->setProgram("eitonly");
+    pGrabber->setDisplayName(QObject::tr("Transmitted guide only (EIT)"));
+    pGrabber = pGrabberList->AddNewGrabber();
+    pGrabber->setProgram("/bin/true");
+    pGrabber->setDisplayName(QObject::tr("No grabber"));
+
+    QStringList args;
+    args += "baseline";
+
+    MythSystemLegacy find_grabber_proc("tv_find_grabbers", args,
+                                        kMSStdOut | kMSRunShell);
+    find_grabber_proc.Run(25s);
+    LOG(VB_GENERAL, LOG_INFO,
+        "Running 'tv_find_grabbers " + args.join(" ") + "'.");
+    uint status = find_grabber_proc.Wait();
+
+    if (status == GENERIC_EXIT_OK)
+    {
+        QTextStream ostream(find_grabber_proc.ReadAll());
+        while (!ostream.atEnd())
+        {
+            QString grabber_list(ostream.readLine());
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+            QStringList grabber_split =
+                grabber_list.split("|", QString::SkipEmptyParts);
+#else
+            QStringList grabber_split =
+                grabber_list.split("|", Qt::SkipEmptyParts);
+#endif
+            QString grabber_name = grabber_split[1];
+            QFileInfo grabber_file(grabber_split[0]);
+            QString program = grabber_file.fileName();
+
+            if (!pGrabberList->containsProgram(program))
+            {
+                pGrabber = pGrabberList->AddNewGrabber();
+                pGrabber->setProgram(program);
+                pGrabber->setDisplayName(grabber_name);
+            }
+            LOG(VB_GENERAL, LOG_DEBUG, "Found " + grabber_split[0]);
+        }
+        LOG(VB_GENERAL, LOG_INFO, "Finished running tv_find_grabbers");
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Failed to run tv_find_grabbers");
+    }
+
+    return pGrabberList;
+}
+
+QStringList V2Channel::GetFreqTableList (  )
+{
+    // Channel Frequency Table
+    QStringList freqList;
+    freqList.append("default");
+    for (const auto & freqEntry : gChanLists)
+    {
+        freqList.append(freqEntry.name);
+    }
+    return freqList;
+
 }

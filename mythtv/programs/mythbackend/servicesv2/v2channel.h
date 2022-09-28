@@ -31,6 +31,7 @@
 #include "v2videoSourceList.h"
 #include "v2videoMultiplexList.h"
 #include "v2lineup.h"
+#include "v2grabber.h"
 
 #define CHANNEL_SERVICE QString("/Channel/")
 #define CHANNEL_HANDLE  QString("Channel")
@@ -167,6 +168,9 @@ class V2Channel : public MythHTTPService
 
         static QStringList        GetXMLTVIdList         ( uint SourceID );
 
+        static V2GrabberList*     GetGrabberList  (  );
+
+        static QStringList        GetFreqTableList         (  );
 
     private:
         Q_DISABLE_COPY(V2Channel)
