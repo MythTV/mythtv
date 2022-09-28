@@ -24,7 +24,7 @@
     <p-dialog header="{{ 'settings.capture.delete_on_host' | translate: {host: m_hostName} }}"
         [(visible)]="displayDeleteAllonHost" [modal]="true" [style]="{width: '50vw'}" [draggable]="false"
         [resizable]="false">
-        <h2>Are you sure ?</h2>
+        <h2>{{ 'settings.ru_sure' | translate }}</h2>
         <ng-template pTemplate="footer">
             <p-button icon="pi pi-times-circle" (click)="displayDeleteAllonHost=false;"
                 label="{{ 'common.no' | translate }}" styleClass="p-button-plain">
@@ -39,7 +39,7 @@
     </p-button>
     <p-dialog header="{{ 'settings.capture.delete_all_all' | translate }}" [(visible)]="displayDeleteAll" [modal]="true"
         [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
-        <h2>Are you sure ?</h2>
+        <h2>{{ 'settings.ru_sure' | translate }}</h2>
         <ng-template pTemplate="footer">
             <p-button icon="pi pi-times-circle" (click)="displayDeleteAll=false" label="{{ 'common.no' | translate }}"
                 styleClass="p-button-plain">
@@ -104,12 +104,12 @@
                     [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList"></app-external>
                 <app-hdhomerun *ngIf="m_CaptureCardsFiltered[ix].CardType == 'HDHOMERUN'"
                     [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList"></app-hdhomerun>
-                    <app-iptv *ngIf="m_CaptureCardsFiltered[ix].CardType == 'FREEBOX'"
-                    [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList"></app-iptv>
-                    <app-import *ngIf="m_CaptureCardsFiltered[ix].CardType == 'IMPORT'"
-                    [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList"></app-import>
-                    <app-demo *ngIf="m_CaptureCardsFiltered[ix].CardType == 'DEMO'"
-                    [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList"></app-demo>
+                <app-iptv *ngIf="m_CaptureCardsFiltered[ix].CardType == 'FREEBOX'" [card]="m_CaptureCardsFiltered[ix]"
+                    [cardList]="m_CaptureCardList"></app-iptv>
+                <app-import *ngIf="m_CaptureCardsFiltered[ix].CardType == 'IMPORT'" [card]="m_CaptureCardsFiltered[ix]"
+                    [cardList]="m_CaptureCardList"></app-import>
+                <app-demo *ngIf="m_CaptureCardsFiltered[ix].CardType == 'DEMO'" [card]="m_CaptureCardsFiltered[ix]"
+                    [cardList]="m_CaptureCardList"></app-demo>
             </ng-template>
         </p-accordionTab>
     </p-accordion>
