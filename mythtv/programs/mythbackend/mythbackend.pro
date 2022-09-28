@@ -79,6 +79,7 @@ HEADERS += servicesv2/v2databaseStatus.h
 HEADERS += servicesv2/v2dvr.h servicesv2/v2recording.h
 HEADERS += servicesv2/v2programAndChannel.h servicesv2/v2programList.h
 HEADERS += servicesv2/v2channelGroup.h servicesv2/v2channelGroupList.h
+HEADERS += servicesv2/v2grabber.h servicesv2/v2freqtable.h
 HEADERS += servicesv2/v2recRule.h
 HEADERS += servicesv2/v2cutting.h servicesv2/v2cutList.h
 HEADERS += servicesv2/v2markup.h servicesv2/v2markupList.h
