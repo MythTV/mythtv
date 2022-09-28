@@ -12,7 +12,7 @@ import { ChannelInfoList } from './interfaces/channelinfolist.interface';
 import { BoolResponse, StringListResponse } from './interfaces/common.interface';
 import { GetDDLineupListRequest, LineupList } from './interfaces/lineup.interface';
 import { VideoMultiplex, VideoMultiplexList } from './interfaces/multiplex.interface';
-import { VideoSource, VideoSourceList } from './interfaces/videosource.interface';
+import { FreqTableList, GrabberList, VideoSource, VideoSourceList } from './interfaces/videosource.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -100,10 +100,19 @@ export class ChannelService {
   }
 
   public RemoveVideoSource(sourceid : number) : Observable<BoolResponse> {
-    return this.httpClient.post<BoolResponse>('/Channel/RemoveVideoSource', sourceid);
+    return this.httpClient.post<BoolResponse>('/Channel/RemoveVideoSource', { SourceId: sourceid });
   }
 
   public UpdateVideoSource(request : UpdateVideoSourceRequest) : Observable<BoolResponse> {
     return this.httpClient.post<BoolResponse>('/Channel/UpdateVideoSource', request);
   }
+
+  public GetGrabberList() : Observable<GrabberList> {
+    return this.httpClient.get<GrabberList>('/Channel/GetGrabberList');
+  }
+
+  public GetFreqTableList() : Observable<FreqTableList> {
+    return this.httpClient.get<FreqTableList>('/Channel/GetFreqTableList');
+  }
+
 }

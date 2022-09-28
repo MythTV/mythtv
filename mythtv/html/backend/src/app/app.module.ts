@@ -58,6 +58,8 @@ import { HdhomerunComponent } from './config/settings/capture-cards/hdhomerun/hd
 import { IptvComponent } from './config/settings/capture-cards/iptv/iptv.component';
 import { ImportComponent } from './config/settings/capture-cards/import/import.component';
 import { DemoComponent } from './config/settings/capture-cards/demo/demo.component';
+import { VideoSourcesComponent } from './config/settings/video-sources/video-sources.component';
+import { VsourceComponent } from './config/settings/video-sources/vsource/vsource.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -112,6 +114,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     IptvComponent,
     ImportComponent,
     DemoComponent,
+    VideoSourcesComponent,
+    VsourceComponent,
   ],
   imports: [
     BrowserModule,

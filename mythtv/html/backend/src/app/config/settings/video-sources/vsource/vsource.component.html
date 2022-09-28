@@ -1,0 +1,162 @@
+<form class="ml-3 mr-3" name="vsourceform" #vsourceform="ngForm">
+    <span #top></span>
+    <p-card class="m-5">
+        <ng-template pTemplate="title">
+            {{ 'settings.vsource.item_title' | translate }}
+        </ng-template>
+        <ng-template pTemplate="subtitle">
+        </ng-template>
+        <ng-template pTemplate="content">
+            <div class="grid">
+                <div class="mb-4 w-full">
+
+                    <div class="form-group field">
+                        <label for="SourceName" class="block">{{ 'settings.vsource.source_label' | translate }}</label>
+                        <input pInputText id="SourceName" [(ngModel)]="videoSource.SourceName" name="SourceName"
+                            #SourceName="ngModel" class="mb-2 form-control w-full" [disabled]="videoSource.Id>0"
+                            (change)="checkName()" [maxlength]="50" />
+                        <div *ngIf="work.errorMessage">
+                            <small class="p-error block">
+                                {{ work.errorMessage }}
+                            </small>
+                        </div>
+                        <small class="block">
+                            {{ 'settings.vsource.source_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="Grabber" class="block">
+                            {{ 'settings.vsource.grabber_label' | translate }}
+                        </label>
+                        <p-dropdown *ngIf="grabberList.GrabberList.Grabbers.length > 0"
+                            [options]="grabberList.GrabberList.Grabbers" [(ngModel)]="videoSource.Grabber"
+                            [editable]="false" optionLabel="DisplayName" optionValue="Program"
+                            [style]="{'minWidth':'80%'}" name="Grabber" #Grabber="ngModel" (onChange)="checkName()">
+                        </p-dropdown>
+                        <small class="block">
+                            {{ 'settings.vsource.grabber_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field" *ngIf="configCommand.length>0">
+                        <label for="configure" class="block">
+                            {{ 'settings.vsource.grabberconfig_label' | translate }}
+                        </label>
+                        <p>
+                            {{ 'settings.vsource.grabberconfig_desc' | translate }}
+                        </p>
+                        <table>
+                            <tr>
+                                <td class="align-items-center bg-blue-100" style="font-family: monospace;">
+                                    {{ configCommand }}
+                                </td>
+                                <td class="align-items-center">
+                                    <button pButton pRipple type="button" icon="pi pi-copy" class="p-button-rounded p-button-text"
+                                    (click)="copyConfigure()" pTooltip="Copy to Clipboard"></button>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="form-group field">
+                        <p-checkbox inputId="UseEIT" [(ngModel)]="videoSource.UseEIT" name="UseEIT" #UseEIT="ngModel"
+                            class="mb-2 w-full" [binary]="true" label="{{ 'settings.vsource.eit_label' | translate }}">
+                        </p-checkbox>
+                        <small class="block">
+                            {{ 'settings.vsource.eit_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="FreqTable" class="block">
+                            {{ 'settings.vsource.freqtable_label' | translate }}
+                        </label>
+                        <p-dropdown *ngIf="freqTableList.FreqTableList.length > 0"
+                            [options]="freqTableList.FreqTableList" [(ngModel)]="videoSource.FreqTable"
+                            [editable]="false" [style]="{'minWidth':'80%'}" name="FreqTable" #FreqTable="ngModel">
+                        </p-dropdown>
+                        <small class="block">
+                            {{ 'settings.vsource.freqtable_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="ScanFrequency" class="block">
+                            {{ 'settings.vsource.scanfreq_label' | translate }}
+                        </label>
+                        <p-inputNumber [(ngModel)]="videoSource.ScanFrequency" name="ScanFrequency" id="ScanFrequency"
+                            [min]="0" [max]="999999" [useGrouping]="false">
+                        </p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.vsource.scanfreq_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="NITId" class="block">
+                            {{ 'settings.vsource.netid_label' | translate }}
+                        </label>
+                        <p-inputNumber [(ngModel)]="videoSource.NITId" name="NITId" id="NITId" [showButtons]="true"
+                            [min]="-1" [max]="65535" [step]="1" [useGrouping]="false"></p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.vsource.netid_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="BouquetId" class="block">
+                            {{ 'settings.vsource.bouquet_label' | translate }}
+                        </label>
+                        <p-inputNumber [(ngModel)]="videoSource.BouquetId" name="BouquetId" id="BouquetId"
+                            [showButtons]="true" [min]="0" [max]="65535" [step]="1" [useGrouping]="false">
+                        </p-inputNumber>
+                        <small class="block" [innerHTML]="'settings.vsource.bouquet_desc' | translate">
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="RegionId" class="block">
+                            {{ 'settings.vsource.region_label' | translate }}
+                        </label>
+                        <p-inputNumber [(ngModel)]="videoSource.RegionId" name="RegionId" id="RegionId"
+                            [showButtons]="true" [min]="0" [max]="100" [step]="1" [useGrouping]="false">
+                        </p-inputNumber>
+                        <small class="block" [innerHTML]="'settings.vsource.region_desc' | translate">
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="LCNOffset" class="block">
+                            {{ 'settings.vsource.lcnoffset_label' | translate }}
+                        </label>
+                        <p-inputNumber [(ngModel)]="videoSource.LCNOffset" name="LCNOffset" id="LCNOffset"
+                            [showButtons]="true" [min]="0" [max]="20000" [step]="100" [useGrouping]="false">
+                        </p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.vsource.lcnoffset_desc' | translate }}
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+            <div class="grid nogutter">
+                <div class="col-12">
+                    <p-message *ngIf="this.work.successCount > 0 && this.work.errorCount == 0 && !vsourceform.dirty"
+                        severity="success" text="{{ 'common.savesuccess' | translate }}"></p-message>
+                    <p-message *ngIf="this.work.errorCount > 0" severity="error"
+                        text="{{ 'common.networkfail' | translate }}"></p-message>
+                </div>
+                <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
+                    (onClick)="saveForm(); vsourceform.form.markAsPristine()"
+                    [disabled]="(!vsourceform.dirty || !videoSource.SourceName || this.work.validateError)"></p-button>
+                <p-button class="col-2 help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()"
+                    icon="pi pi-info-circle" styleClass="p-button-info"></p-button>
+            </div>
+        </ng-template>
+    </p-card>
+</form>
