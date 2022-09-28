@@ -9,6 +9,7 @@ export interface EnvInfo {
     LCALL:          string;
     LCCTYPE:        string;
     HOME:           string;
+    USER:           string;
     MYTHCONFDIR:    string;
 }
 
@@ -17,9 +18,11 @@ export interface LogInfo {
 }
 
 export interface BackendInfo {
-    Build:          BuildInfo;
-    Env:            EnvInfo;
-    Log:            LogInfo;
+    BackendInfo : {
+        Build:          BuildInfo;
+        Env:            EnvInfo;
+        Log:            LogInfo;
+    }
 }
 
 export interface Backend {

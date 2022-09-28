@@ -16,8 +16,25 @@ export interface VideoSource {
 }
 
 export interface VideoSourceList {
-    AsOf:           string; // dateTime
-    Version:        string;
-    ProtoVer:       string;
-    VideoSources:   VideoSource[];
+    VideoSourceList: {
+        AsOf:       string; // dateTime
+        Version:    string;
+        ProtoVer:   string;
+        VideoSources: VideoSource[];
+    }
+}
+
+export interface Grabber {
+Program:            string;
+    DisplayName:    string;
+}
+
+export interface GrabberList {
+    GrabberList: {
+        Grabbers:   Grabber[];
+    }
+}
+
+export interface FreqTableList {
+    FreqTableList: string[];
 }

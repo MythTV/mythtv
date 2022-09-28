@@ -1,0 +1,72 @@
+<div class="block card w-full">
+    <h3>{{ 'settings.vsource.title' | translate }}</h3>
+
+    <p-button label="{{ 'settings.vsource.new_video_source' | translate }}" (onClick)="newSource();"
+        icon="pi pi-plus-circle" styleClass="p-button-plain"></p-button>
+    &nbsp;
+    <p-button styleClass="p-button-danger" label="{{ 'settings.vsource.delete_all' | translate }}"
+        (click)="displayDeleteAll=true" icon="pi pi-trash" iconPos="left">
+    </p-button>
+    <p-dialog header="{{ 'settings.vsource.delete_all' | translate }}" [(visible)]="displayDeleteAll" [modal]="true"
+        [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
+        <h2>{{ 'settings.ru_sure' | translate }}</h2>
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-times-circle" (click)="displayDeleteAll=false" label="{{ 'common.no' | translate }}"
+                styleClass="p-button-plain">
+            </p-button>
+            <p-button icon="pi pi-check-circle" (click)="deleteAllSources()" label="{{ 'common.yes' | translate }}"
+                styleClass="p-button-plain"></p-button>
+        </ng-template>
+    </p-dialog>
+    <br>
+    <div class="grid nogutter">
+        <div class="col-12" *ngIf="this.expectedCount && this.successCount == this.expectedCount">
+            <br>
+            <p-message severity="success" text="{{ 'settings.common.successful_delete' | translate }}">
+            </p-message>
+            <br>
+        </div>
+        <div class="col-12" *ngIf="this.errorCount > 0">
+            <br>
+            <p-message severity="error" text="{{ 'common.networkfail' | translate }}">
+            </p-message>
+            <br>
+        </div>
+    </div>
+    <p-accordion class="col-12 w-full" (onClose)="onTabClose($event)" (onOpen)="onTabOpen($event)">
+        <p-accordionTab *ngFor="let source of videoSourceList.VideoSourceList.VideoSources; index as ix; first as isFirst"
+            [disabled]="disabledTab[ix]" [(selected)]="activeTab[ix]">
+            <ng-template pTemplate="header">
+                <div class="grid  w-full">
+                    <div class="col-9 pr-1">
+                        {{videoSourceList.VideoSourceList.VideoSources[ix].SourceName}}
+                        ({{videoSourceList.VideoSourceList.VideoSources[ix].Grabber}})
+                        <b>&nbsp;{{ dirtyMessages[ix] }}</b>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="content">
+                <p-button styleClass="p-button-warning" label="{{ 'settings.vsource.delete_this' | translate }}"
+                    icon="pi pi-trash" (onClick)="displayDeleteThis[ix]=true"
+                    [disabled]="(!this.videoSourceList.VideoSourceList.VideoSources[ix].Id)">
+                </p-button>
+                <p-dialog header="{{ 'settings.vsource.delete_this' | translate }}" [(visible)]="displayDeleteThis[ix]"
+                    [modal]="true" [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
+                    <h2>{{ 'settings.ru_sure' | translate }}</h2>
+                    <p>{{ 'settings.vsource.delete_details' |
+                        translate: {Grabber: videoSourceList.VideoSourceList.VideoSources[ix].Grabber,
+                        DisplayName: videoSourceList.VideoSourceList.VideoSources[ix].SourceName} }}</p>
+                    <ng-template pTemplate="footer">
+                        <p-button icon="pi pi-times-circle" (click)="displayDeleteThis[ix]=false"
+                            label="{{ 'common.no' | translate }}" styleClass="p-button-plain">
+                        </p-button>
+                        <p-button icon="pi pi-check-circle" (click)="deleteThis(ix)"
+                            label="{{ 'common.yes' | translate }}" styleClass="p-button-plain"></p-button>
+                    </ng-template>
+                </p-dialog>
+                <app-vsource [videoSource]="videoSourceList.VideoSourceList.VideoSources[ix]"
+                    [videoSourceList]="videoSourceList"></app-vsource>
+            </ng-template>
+        </p-accordionTab>
+    </p-accordion>
+</div>

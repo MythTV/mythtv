@@ -506,7 +506,37 @@
       "deleted": "(Deleted)",
       "new": "(New)"
     },
-    "ru_sure": "Are you sure ?"
+    "ru_sure": "Are you sure ?",
+    "vsource": {
+      "title": "Video Sources",
+      "new_video_source": "New Video Source",
+      "delete_all": "Delete All Video Sources",
+      "delete_this": "Delete this Video Source",
+      "delete_details": "This will delete {{DisplayName}} ({{Grabber}})",
+      "item_title": "Video Source",
+      "source_label": "Video Source Name",
+      "source_desc": "This name is used for the xmltv configuration file. This is a required field.",
+      "grabber_label": "Listings grabber",
+      "grabber_desc": "Select the listings source. Some sources require you to have a subscription.",
+      "freqtable_label": "Channel Frequency Table",
+      "freqtable_desc": "Use default unless this source uses a different frequency table than the system wide table defined in the General settings.",
+      "scanfreq_label": "Scan Frequency",
+      "scanfreq_desc": "The frequency to start scanning this video source. This is then default for 'Full Scan (Tuned)' channel scanning. Frequency value in Hz for DVB-T/T2/C, in kHz for DVB-S/S2. Leave at 0 if not known.",
+      "netid_label": "Network ID",
+      "netid_desc": "If your provider has asked you to configure a specific network identifier (Network_ID), enter it here. Leave it at -1 otherwise.",
+      "bouquet_label": "Bouquet ID",
+      "bouquet_desc": "Bouquet ID for Freesat or Sky on satellite Astra-2 28.2E. Leave this at 0 if you do not receive this satellite. This is needed to get the Freesat and Sky channel numbers. Value 272 selects Freesat bouquet 'England HD'. See the MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+      "region_label": "Region ID",
+      "region_desc": "Region ID for Freesat or Sky on satellite Astra-2 28.2E. Leave this at 0 you do not receive this satellite. This is needed to get the Freesat and Sky channel numbers. Value 1 selects region London. See the MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+      "lcnoffset_label": "Logical Channel Number Offset",
+      "lcnoffset_desc": "The offset is added to each logical channel number found during a scan of a DVB video source. This makes it possible to give different video sources a non-overlapping range of channel numbers. Leave at 0 if you have only one video source or if the video sources do not have DVB logical channel numbers.",
+      "nameInUse": "ERROR: This name is already in use.",
+      "nameRequired": "Name is required.",
+      "grabberconfig_label": "Configure Grabber",
+      "grabberconfig_desc": "Configure the grabber by running this command using ssh or terminal logged into the backend:",
+      "eit_label": "Perform EIT scan",
+      "eit_desc": "If enabled, program guide data for channels on this source will be updated with data provided by the channels themselves 'Over-the-Air'."
+    }
   },
   "sidenav": {
     "settingsmenu": {
