@@ -1077,6 +1077,9 @@ V2BackendInfo* V2Myth::GetBackendInfo( void )
     pEnv->setLCALL         ( qEnvironmentVariable("LC_ALL")      );
     pEnv->setLCCTYPE       ( qEnvironmentVariable("LC_CTYPE")    );
     pEnv->setHOME          ( qEnvironmentVariable("HOME")        );
+    // USER for Linux systems, USERNAME for Windows
+    pEnv->setUSER          ( qEnvironmentVariable("USER",
+                             qEnvironmentVariable("USERNAME"))   );
     pEnv->setMYTHCONFDIR   ( qEnvironmentVariable("MYTHCONFDIR") );
     pLog->setLogArgs       ( logPropagateArgs      );
 
