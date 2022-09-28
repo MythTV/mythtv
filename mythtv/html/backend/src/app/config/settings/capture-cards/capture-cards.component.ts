@@ -97,8 +97,9 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
       this.expectedCount = 0;
     }
     this.showDirty();
-    if (typeof this.forms[e.index] == 'undefined')
-      this.forms[e.index] = this.setupService.getCurrentForm();
+    let form = this.setupService.getCurrentForm();
+    if (form != null)
+      this.forms[e.index] = form;
     this.setupService.setCurrentForm(null);
     this.currentTab = e.index;
     // This line removes "Unsaved Changes" from current tab header.
@@ -155,9 +156,8 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
     for (let i = 0; i < this.activeTab.length; i++)
       this.activeTab[i] = false;
     this.dirtyMessages.push(this.newText);
-    this.forms.push();
     this.disabledTab.push(false);
-    this.activeTab.push(true);
+    this.activeTab.push(false);
     this.displayDeleteThis.push(false);
     this.m_CaptureCardsFiltered.push(newOne);
     this.selectedCardType = { CardType: "", Description: "" };
@@ -170,6 +170,7 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
         if (this.successCount == this.expectedCount) {
           if (this.deleteAll) {
             this.loadCards(true);
+            this.deleteAll = false;
           }
           else {
             if (this.deletedTab > -1) {
@@ -184,11 +185,13 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
       else {
         this.errorCount++;
         this.deletedTab = -1;
+        this.deleteAll = false;
       }
     },
     error: (err: any) => {
       console.error(err);
       this.errorCount++;
+      this.deleteAll = false;
     },
   };
 
