@@ -2,8 +2,10 @@
 
 #include <algorithm> // std::shuffle, upper_bound
 #include <cmath>     // std::pow
+#include <cstdint>
 #include <iterator>  // std::distance
 #include <random>
+#include <vector>
 
 #include "libmythbase/mythrandom.h"
 
@@ -270,18 +272,21 @@ void FlatView::Populate(ImageList &files)
         }
         else if (m_order == kSeasonal)
         {
-            WeightList weights   = CalculateSeasonalWeights(files);
-            double     maxWeight = weights.last();
-
-            static std::random_device rd;
-            static auto generator = MythRandomGenerator_32(rd());
-            auto distrib = std::uniform_real_distribution(0.0, maxWeight);
-            // TODO use fixed not floating point
+            WeightList cdf = CalculateSeasonalWeights(files); // not normalized to 1.0
+            std::vector<uint32_t> weights;
+            weights.reserve(cdf.size());
+            for (int i = 0; i < cdf.size(); i++)
+            {
+                weights.emplace_back(lround(cdf[i] / cdf.back() * UINT32_MAX));
+            }
+            // exclude the last value so the past the end iterator is not returned
+            // by std::upper_bound
+            uint32_t maxWeight = weights.back() - 1;
 
             for (int count = 0; count < files.size(); ++count)
             {
-                double randWeight = distrib(generator);
-                WeightList::iterator it =
+                uint32_t randWeight = MythRandom(0, maxWeight);
+                std::vector<uint32_t>::iterator it =
                         std::upper_bound(weights.begin(), weights.end(), randWeight);
                 int    index      = std::distance(weights.begin(), it);
                 m_sequence.append(files.at(index)->m_id);
