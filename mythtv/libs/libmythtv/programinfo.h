@@ -278,7 +278,7 @@ class MTV_PUBLIC ProgramInfo
                 uint year,
                 const QString &programid);
     /// Constructs a manual record ProgramInfo.
-    ProgramInfo(const QString &_title, uint _chanid,
+    ProgramInfo(const QString &_title, const QString &subtitle, uint _chanid,
                 const QDateTime &_startts, const QDateTime &_endts);
     /// Constructs a Dummy ProgramInfo (used by GuideGrid)
     ProgramInfo(QString _title,   QString _category,
