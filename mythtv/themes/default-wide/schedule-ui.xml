@@ -439,7 +439,7 @@
     <window name="manualschedule">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>40,40,1200,40</area>
+            <area>15,5,1200,40</area>
             <font>baselarge</font>
             <value>Manual Recording Schedule</value>
         </textarea>
