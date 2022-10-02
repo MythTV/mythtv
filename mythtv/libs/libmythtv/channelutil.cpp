@@ -2474,7 +2474,7 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
                   "serviceid, atsc_major_chan, atsc_minor_chan, last_record, "
                   "default_authority, commmethod, tmoffset, iptvid, "
                   "channel.chanid, "
-                  "GROUP_CONCAT(DISTINCT groups.groupids), " // Creates a CSV list of channel groupids for this channel
+                  "GROUP_CONCAT(DISTINCT `groups`.`groupids`), " // Creates a CSV list of channel groupids for this channel
                   "GROUP_CONCAT(DISTINCT capturecard.cardid "
                   "             ORDER BY livetvorder), " // Creates a CSV list of inputids for this channel
                   "MIN(livetvorder) livetvorder "
@@ -2488,8 +2488,8 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
     if (channelGroupID)
         sql +=    "    WHERE grpid = :CHANGROUPID ";
     sql +=        "    GROUP BY chanid "
-                  ") groups "
-                  "    ON channel.chanid = groups.chanid ";
+                  ") `groups` "
+                  "    ON channel.chanid = `groups`.`chanid` ";
     if (!ignoreUntunable && !liveTVOnly)
         sql +=    "LEFT ";
     sql +=        "JOIN capturecard "
