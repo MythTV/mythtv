@@ -25,8 +25,6 @@ static inline void be_sd_notify(const char */*str*/) {};
 
 // MythTV
 #include "libmyth/mythcontext.h"
-#include "libmyth/programinfo.h"
-#include "libmyth/remoteutil.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/dbutil.h"
 #include "libmythbase/exitcodes.h"
@@ -36,6 +34,8 @@ static inline void be_sd_notify(const char */*str*/) {};
 #include "libmythbase/mythtimezone.h"
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"
+#include "libmythbase/programinfo.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythbase/signalhandling.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythtv/dbcheck.h"

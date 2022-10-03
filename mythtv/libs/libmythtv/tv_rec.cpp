@@ -9,8 +9,6 @@
 
 // MythTV headers
 
-#include "libmyth/programinfo.h"
-#include "libmyth/remoteutil.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
@@ -18,6 +16,8 @@
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
+#include "libmythbase/programinfo.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythbase/storagegroup.h"
 
 #include "cardutil.h"

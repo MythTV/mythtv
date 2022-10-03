@@ -6,8 +6,8 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "libmyth/programinfo.h"
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/programinfo.h"
 #include "libmythtv/mythcommflagplayer.h"
 
 PrePostRollFlagger::PrePostRollFlagger(SkipType commDetectMethod,

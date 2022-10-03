@@ -10,11 +10,11 @@
 #include <QFileInfo>
 
 // MythTV headers
-#include "libmyth/programinfo.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/programinfo.h"
 #include "libmythtv/channelutil.h"
 #include "libmythtv/mythcommflagplayer.h"
 

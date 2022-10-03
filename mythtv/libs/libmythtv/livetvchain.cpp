@@ -1,8 +1,8 @@
 #include "libmyth/mythcontext.h"
-#include "libmyth/programinfo.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsocket.h"
+#include "libmythbase/programinfo.h"
 
 #include "livetvchain.h"
 #include "cardutil.h"

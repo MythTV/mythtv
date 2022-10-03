@@ -6,8 +6,6 @@
 #include <QRegularExpression>
 
 #include "libmyth/mythcontext.h"
-#include "libmyth/programinfo.h" // for format_season_and_episode
-#include "libmyth/remoteutil.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
@@ -15,6 +13,7 @@
 #include "libmythbase/mythmiscutil.h"// for FileHash
 #include "libmythbase/mythsorthelper.h"
 #include "libmythbase/remotefile.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythbase/stringutil.h"
 #include "libmythbase/ternarycompare.h"

@@ -41,11 +41,11 @@
 // myth
 #include <mythconfig.h>
 #include <libmyth/mythcontext.h>
-#include <libmyth/programinfo.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythbase/mythdirs.h>
 #include <libmythbase/mythmiscutil.h> // for MythFile::copy
+#include <libmythbase/programinfo.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythimage.h>
 #include <libmythui/mythmainwindow.h>

@@ -2,9 +2,9 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "libmyth/programinfo.h"
-#include "libmyth/remoteutil.h"
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/programinfo.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythtv/channelutil.h"
 #include "libmythtv/recordinginfo.h"
 #include "libmythtv/tvremoteutil.h"

@@ -13,9 +13,9 @@
 #include <QtEndian>
 
 #include "libmyth/mythcontext.h"
-#include "libmyth/programinfo.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
+#include "libmythbase/programinfo.h"
 
 #include "NuppelVideoRecorder.h"
 #include "audioinput.h"

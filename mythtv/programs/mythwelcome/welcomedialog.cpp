@@ -12,13 +12,13 @@
 
 // myth
 #include "libmyth/mythcontext.h"
-#include "libmyth/remoteutil.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/lcddevice.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythtv/tv.h"
 
 // mythwelcome

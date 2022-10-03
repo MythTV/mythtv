@@ -5,7 +5,7 @@
 #include <QRegularExpression>
 #include <QString>
 
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 #include "libmythbase/recordingstatus.h"
 #include "libmythtv/mythtvexp.h"
 #include "libmythtv/recordingfile.h"

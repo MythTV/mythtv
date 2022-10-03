@@ -51,7 +51,6 @@
 // MythTV headers
 #include <mythconfig.h>
 #include <libmyth/mythcontext.h>
-#include <libmyth/programinfo.h>
 #include <libmythbase/exitcodes.h>
 #include <libmythbase/mythcommandlineparser.h>
 #include <libmythbase/mythcoreutil.h>
@@ -63,6 +62,7 @@
 #include <libmythbase/mythpluginexport.h>
 #include <libmythbase/mythsystemlegacy.h>
 #include <libmythbase/mythversion.h>
+#include <libmythbase/programinfo.h>
 #include <libmythtv/mythavutil.h>
 
 extern "C" {

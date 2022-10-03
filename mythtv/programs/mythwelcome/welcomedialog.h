@@ -5,7 +5,7 @@
 #include <QDateTime>
 
 // myth
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 #include "libmythtv/tvremoteutil.h"
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythscreentype.h"

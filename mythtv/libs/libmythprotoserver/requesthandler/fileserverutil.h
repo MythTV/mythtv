@@ -8,7 +8,7 @@
 #include <QDateTime>
 #include <QString>
 
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 #include "libmythbase/referencecounter.h"
 #include "libmythprotoserver/mythprotoserverexp.h"
 

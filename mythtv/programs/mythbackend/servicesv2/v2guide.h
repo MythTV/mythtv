@@ -27,8 +27,8 @@
 #define V2GUIDE_H
 
 // MythTV
-#include "libmyth/programinfo.h"
 #include "libmythbase/http/mythhttpservice.h"
+#include "libmythbase/programinfo.h"
 
 // MythBackend
 #include "v2channelGroupList.h"

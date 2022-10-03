@@ -3,7 +3,6 @@
 #include <QNetworkInterface>
 
 // MythTV
-#include "libmyth/remoteutil.h"
 #include "libmythbase/filesysteminfo.h"
 #include "libmythbase/mythchrono.h"
 #include "libmythbase/mythcorecontext.h"
@@ -12,6 +11,7 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythversion.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythbase/stringutil.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/decoders/mythcodeccontext.h"

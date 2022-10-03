@@ -27,7 +27,7 @@
 #define SERVICEUTIL_H
 
 // MythTV
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 #include "libmythmetadata/musicmetadata.h"
 #include "libmythmetadata/videometadatalistmanager.h"
 #include "libmythservicecontracts/datacontracts/artworkInfoList.h"

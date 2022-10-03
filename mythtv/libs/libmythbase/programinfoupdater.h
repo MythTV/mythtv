@@ -13,7 +13,7 @@
 #include <QHash>
 
 // Myth
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 enum PIAction {
     kPIAdd,
@@ -22,7 +22,7 @@ enum PIAction {
     kPIUpdateFileSize,
 };
 
-class MPUBLIC PIKeyAction
+class MBASE_PUBLIC PIKeyAction
 {
   public:
     PIKeyAction(uint recordedid, PIAction a) :
@@ -37,7 +37,7 @@ class MPUBLIC PIKeyAction
     }
 };
 
-class MPUBLIC PIKeyData
+class MBASE_PUBLIC PIKeyData
 {
   public:
     PIKeyData(PIAction a, uint64_t f) : m_action(a), m_filesize(f) { }
@@ -45,7 +45,7 @@ class MPUBLIC PIKeyData
     uint64_t m_filesize;
 };
 
-class MPUBLIC ProgramInfoUpdater : public QRunnable
+class MBASE_PUBLIC ProgramInfoUpdater : public QRunnable
 {
   public:
     ProgramInfoUpdater() { setAutoDelete(false); }

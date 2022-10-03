@@ -10,9 +10,9 @@
 #include <QMap>
 #include <QSet>
 
-#include "libmyth/programinfo.h"
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythdate.h"
+#include "libmythbase/programinfo.h"
 
 #include "mythtvexp.h"
 

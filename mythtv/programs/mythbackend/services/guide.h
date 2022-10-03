@@ -32,7 +32,7 @@
 #endif
 
 // MythTV
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 #include "libmythservicecontracts/datacontracts/channelGroupList.h"
 #include "libmythservicecontracts/datacontracts/programAndChannel.h"
 #include "libmythservicecontracts/datacontracts/programList.h"

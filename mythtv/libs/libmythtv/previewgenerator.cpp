@@ -19,7 +19,6 @@
 #include <QUrl>
 
 // MythTV headers
-#include "libmyth/remoteutil.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythdate.h"
@@ -29,6 +28,7 @@
 #include "libmythbase/mythsocket.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/remotefile.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythbase/storagegroup.h"
 
 #include "io/mythmediabuffer.h"

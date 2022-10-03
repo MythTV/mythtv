@@ -5,9 +5,9 @@
 #include <QDateTime>
 
 // MythTV headers
-#include "libmyth/remoteutil.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythbase/stringutil.h"
 #include "libmythbase/ternarycompare.h"
 #include "libmythtv/recordingrule.h"

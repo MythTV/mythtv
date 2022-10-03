@@ -12,7 +12,6 @@
 
 // MythTV headers
 #include "libmyth/mythcontext.h"
-#include "libmyth/programinfo.h"
 #include "libmythbase/cleanupguard.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythdate.h"
@@ -21,6 +20,7 @@
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"
+#include "libmythbase/programinfo.h"
 #include "libmythbase/remotefile.h"
 #include "libmythbase/signalhandling.h"
 #include "libmythtv/HLS/httplivestream.h"

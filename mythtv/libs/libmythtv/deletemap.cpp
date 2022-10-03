@@ -3,11 +3,11 @@
 
 #include <cstdint>
 
-#include "libmyth/programinfo.h"
 #include "libmythbase/mythcorecontext.h" // for MythCoreContext, etc
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtypes.h"       // for InfoMap
+#include "libmythbase/programinfo.h"
 #include "libmythui/mythuiactions.h"     // for ACTION_DOWN, ACTION_UP
 #include "mythplayer.h"
 #include "osd.h"

@@ -17,7 +17,7 @@ extern "C" {
 #include "libmyth/audio/audiooutputsettings.h"
 #include "libmyth/audio/audiooutpututil.h"
 #include "libmyth/audio/spdifencoder.h"
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 
 #include "captions/vbilut.h"
 #include "decoderbase.h"

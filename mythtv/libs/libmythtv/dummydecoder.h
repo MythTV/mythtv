@@ -1,7 +1,7 @@
 #ifndef DUMMYDECODER_H_
 #define DUMMYDECODER_H_
 
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 
 #include "decoders/decoderbase.h"
 #include "format.h"

@@ -13,8 +13,8 @@
 #include <QEvent>
 
 // MythTV
-#include "libmyth/programinfo.h"
 #include "libmythbase/mthreadpool.h"
+#include "libmythbase/programinfo.h"
 #include "libmythtv/channelgroup.h"
 #include "libmythtv/channelutil.h"
 #include "libmythtv/tv_play.h"

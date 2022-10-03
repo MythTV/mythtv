@@ -7,10 +7,10 @@
 #include <QFileInfo>
 
 // MythTV
-#include "libmyth/programinfo.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsocket.h"
+#include "libmythbase/programinfo.h"
 #include "libmythtv/io/mythmediabuffer.h"
 
 // MythBackend

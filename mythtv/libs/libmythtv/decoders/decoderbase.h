@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "libmyth/mythcontext.h"
-#include "libmyth/programinfo.h"
 #include "libmythbase/mythdbcon.h"
+#include "libmythbase/programinfo.h"
 #include "libmythtv/io/mythmediabuffer.h"
 #include "libmythtv/mythavutil.h"
 #include "libmythtv/mythcodecid.h"

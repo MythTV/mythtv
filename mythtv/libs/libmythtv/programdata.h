@@ -16,7 +16,7 @@
 // MythTV headers
 #include "mythtvexp.h"
 #include "listingsources.h"
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 #include "eithelper.h" /* for FixupValue */
 
 class MSqlQuery;

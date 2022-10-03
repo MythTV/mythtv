@@ -2,9 +2,9 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "libmyth/programinfo.h"
 #include "libmyth/standardsettings.h"
 #include "libmythbase/mythdb.h"
+#include "libmythbase/programinfo.h"
 #include "playgroup.h"
 
 // A parameter associated with the profile itself

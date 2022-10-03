@@ -8,13 +8,13 @@
 #include <QWriteLocker>
 #include <utility>
 
-#include "libmyth/programinfo.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdownloadmanager.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythsocket.h"
+#include "libmythbase/programinfo.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythtv/io/mythmediabuffer.h"
 #include "libmythtv/recordinginfo.h"

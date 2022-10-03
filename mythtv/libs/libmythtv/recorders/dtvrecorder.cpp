@@ -18,8 +18,8 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include "libmyth/programinfo.h"
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/programinfo.h"
 #include "libmythbase/sizetliteral.h"
 
 #include "bytereader.h"

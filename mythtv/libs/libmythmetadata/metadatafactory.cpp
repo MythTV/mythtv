@@ -12,10 +12,10 @@
 
 // mythtv
 #include "libmyth/mythcontext.h"
-#include "libmyth/programinfo.h"
-#include "libmyth/remoteutil.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/programinfo.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythtv/recordingrule.h"
 
 // libmythmetadata

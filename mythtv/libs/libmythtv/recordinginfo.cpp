@@ -8,11 +8,11 @@
 #include <QMap>
 
 // MythTV headers
-#include "libmyth/programinfoupdater.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/programinfoupdater.h"
 
 #include "jobqueue.h"
 #include "recordinginfo.h"

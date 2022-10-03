@@ -1,7 +1,7 @@
 #ifndef CUSTOMEDIT_H_
 #define CUSTOMEDIT_H_
 
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 #include "libmythtv/mythplayer.h"
 #include "libmythui/mythscreentype.h"
 

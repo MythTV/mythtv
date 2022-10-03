@@ -3,10 +3,10 @@
 
 // MythTV
 #include "libmyth/mythcontext.h"
-#include "libmyth/remoteutil.h"
 #include "libmythbase/lcddevice.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythmetadata/dbaccess.h"
 #include "libmythmetadata/videometadata.h"
 #include "libmythmetadata/videoutils.h"

@@ -24,7 +24,7 @@
 
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/programtypes.h"
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 
 #define DEBUG 0
 
