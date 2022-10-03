@@ -1,10 +1,10 @@
 #include <QDir>
 
 #include <libmyth/mythcontext.h>
-#include <libmythbase/mythcoreutil.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdirs.h>
 #include <libmythbase/remotefile.h>
+#include <libmythbase/remoteutil.h>
 #include <libmythmetadata/metadataimagedownload.h>
 #include <libmythmetadata/videoutils.h>
 #include <libmythui/mythdialogbox.h>

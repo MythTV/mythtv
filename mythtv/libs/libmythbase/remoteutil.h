@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <QDateTime>
+#include <QString>
 #include <QStringList>
 
 #include "libmythbase/mythchrono.h"
@@ -52,6 +53,13 @@ MBASE_PUBLIC bool RemoteGetFileList(const QString& host, const QString& path, QS
                        QString sgroup, bool fileNamesOnly = false);
 MBASE_PUBLIC bool RemoteGetActiveBackends(QStringList *list);
 
-#endif
+MBASE_PUBLIC QString RemoteDownloadFile(const QString &url,
+                                   const QString &storageGroup,
+                                   const QString &filename = "");
+MBASE_PUBLIC QString RemoteDownloadFileNow(const QString &url,
+                                      const QString &storageGroup,
+                                      const QString &filename = "");
+
+#endif // REMOTEUTIL_H_
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

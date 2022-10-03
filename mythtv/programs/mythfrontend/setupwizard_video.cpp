@@ -5,10 +5,10 @@
 
 // MythTV
 #include "libmyth/mythcontext.h"
-#include "libmythbase/mythcoreutil.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/remotefile.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythmetadata/videoutils.h"
 #include "libmythui/mythprogressdialog.h"
 
