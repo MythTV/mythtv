@@ -7,8 +7,8 @@
 #include <QWidget>
 
 // MythTV headers
-#include "libmyth/programinfo.h" // for COMM_DETECT*, GetPreferredSkipTypeCombinations()
 #include "libmythbase/mythdirs.h"
+#include "libmythbase/programinfo.h" // for COMM_DETECT*, GetPreferredSkipTypeCombinations()
 
 #include "cardutil.h"
 #include "channelsettings.h"

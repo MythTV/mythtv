@@ -15,7 +15,6 @@
 // MythTV
 #include "libmyth/langsettings.h"
 #include "libmyth/mythcontext.h"
-#include "libmyth/remoteutil.h"
 #include "libmyth/storagegroupeditor.h"
 #include "libmythbase/cleanupguard.h"
 #include "libmythbase/dbutil.h"
@@ -27,6 +26,7 @@
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythbase/signalhandling.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/channelscan/channelimporter.h"

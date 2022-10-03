@@ -5,10 +5,10 @@ using std::cout;
 using std::endl;
 
 // MythTV
-#include "libmyth/remoteutil.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythmetadata/videometadata.h"
 #include "libmythtv/scheduledrecording.h"
 

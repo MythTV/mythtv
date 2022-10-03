@@ -28,8 +28,6 @@
 #include "libmyth/langsettings.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythmediamonitor.h"
-#include "libmyth/programinfo.h"
-#include "libmyth/remoteutil.h"
 #include "libmyth/standardsettings.h"
 #include "libmythbase/cleanupguard.h"
 #include "libmythbase/compat.h"  // For SIG* on MinGW
@@ -46,7 +44,9 @@
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"
+#include "libmythbase/programinfo.h"
 #include "libmythbase/referencecounter.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythbase/signalhandling.h"
 #include "libmythmetadata/cleanup.h"
 #include "libmythmetadata/globals.h"

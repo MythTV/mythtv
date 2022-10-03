@@ -47,7 +47,6 @@
 
 // MythTV
 #include "libmyth/mythcontext.h"
-#include "libmyth/programinfo.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/filesysteminfo.h"
 #include "libmythbase/mthread.h"
@@ -62,6 +61,7 @@
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/mythtimezone.h"
 #include "libmythbase/mythversion.h"
+#include "libmythbase/programinfo.h"
 #include "libmythbase/remotefile.h"
 #include "libmythbase/serverpool.h"
 #include "libmythbase/storagegroup.h"

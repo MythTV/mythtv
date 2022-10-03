@@ -1,7 +1,7 @@
 // MythTV
 #include "libmyth/mythcontext.h"
-#include "libmyth/programinfo.h"
 #include "libmythbase/mythdate.h"
+#include "libmythbase/programinfo.h"
 
 #include "commbreakmap.h"
 

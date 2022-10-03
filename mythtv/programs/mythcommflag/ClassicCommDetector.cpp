@@ -10,8 +10,8 @@
 
 // MythTV headers
 #include "libmyth/mythcontext.h"
-#include "libmyth/programinfo.h"
 #include "libmythbase/mythmiscutil.h"
+#include "libmythbase/programinfo.h"
 #include "libmythbase/sizetliteral.h"
 #include "libmythtv/mythcommflagplayer.h"
 

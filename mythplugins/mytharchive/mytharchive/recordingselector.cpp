@@ -11,13 +11,13 @@
 
 // mythtv
 #include <libmyth/mythcontext.h>
-#include <libmyth/programinfo.h>
-#include <libmyth/remoteutil.h>
 #include <libmythbase/mthread.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythlogging.h>
 #include <libmythbase/mythtimer.h>
+#include <libmythbase/programinfo.h>
+#include <libmythbase/remoteutil.h>
 #include <libmythbase/stringutil.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>

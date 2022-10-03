@@ -5,10 +5,10 @@
 #include <QStringList>
 
 // MythTV
-#include "libmyth/programinfo.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
+#include "libmythbase/programinfo.h"
 #include "libmythbase/referencecounter.h"
 #include "libmythtv/inputinfo.h"
 

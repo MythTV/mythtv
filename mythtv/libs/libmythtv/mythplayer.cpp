@@ -22,13 +22,13 @@
 
 // MythTV headers
 #include "libmyth/audio/audiooutput.h"
-#include "libmyth/programinfo.h"
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythtimer.h"
+#include "libmythbase/programinfo.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythuiactions.h"
 

@@ -2,7 +2,7 @@
 #define IDLESCREEN_H
 
 // MythTV
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 #include "libmythui/mythscreentype.h"
 
 class MythUIStateType;

@@ -4,7 +4,7 @@
 #include <QEvent>
 #include <QObject>
 
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 #include "libmyth/rawsettingseditor.h"
 #include "recordinginfo.h"
 

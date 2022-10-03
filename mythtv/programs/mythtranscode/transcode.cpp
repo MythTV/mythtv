@@ -18,11 +18,11 @@
 #include "libmythbase/mythconfig.h"
 
 #include "libmyth/audio/audiooutput.h"
-#include "libmyth/programinfo.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mthreadpool.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdbcon.h"
+#include "libmythbase/programinfo.h"
 #include "libmythtv/HLS/httplivestream.h"
 #include "libmythtv/deletemap.h"
 #include "libmythtv/io/mythavformatwriter.h"

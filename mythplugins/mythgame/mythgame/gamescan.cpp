@@ -10,9 +10,9 @@
 
 // MythTV
 #include <libmyth/mythcontext.h>
-#include <libmyth/remoteutil.h>
 #include <libmythbase/mythevent.h>
 #include <libmythbase/mythlogging.h>
+#include <libmythbase/remoteutil.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>
 #include <libmythui/mythprogressdialog.h>

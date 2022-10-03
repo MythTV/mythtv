@@ -12,10 +12,10 @@
 
 // MythTV headers
 #include "libmyth/mythcontext.h"
-#include "libmyth/programinfo.h"
 #include "libmythbase/cleanupguard.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythversion.h"
+#include "libmythbase/programinfo.h"
 #include "libmythbase/signalhandling.h"
 #include "libmythtv/io/mythmediabuffer.h"
 #include "libmythtv/mythccextractorplayer.h"

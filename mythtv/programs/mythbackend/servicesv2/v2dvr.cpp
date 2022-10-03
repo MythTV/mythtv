@@ -24,11 +24,11 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // MythTV
-#include "libmyth/programinfo.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythscheduler.h"
 #include "libmythbase/mythversion.h"
+#include "libmythbase/programinfo.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/channelutil.h"

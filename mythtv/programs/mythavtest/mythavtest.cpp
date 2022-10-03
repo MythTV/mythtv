@@ -11,13 +11,13 @@
 
 // libmyth*
 #include "libmyth/mythcontext.h"
-#include "libmyth/programinfo.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythversion.h"
+#include "libmythbase/programinfo.h"
 #include "libmythbase/signalhandling.h"
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/jitterometer.h"

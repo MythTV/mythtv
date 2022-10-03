@@ -11,7 +11,6 @@
 #include <QMap>
 
 // MythTV
-#include "libmyth/programinfo.h"
 #ifdef _MSC_VER
 #  include "libmythbase/compat.h"               // for random
 #endif
@@ -23,6 +22,7 @@
 #include "libmythbase/mythevent.h"              // for MythEvent, etc
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
+#include "libmythbase/programinfo.h"
 #include "libmythbase/programtypes.h"           // for AudioProps, SubtitleTypes, etc
 #include "libmythbase/recordingtypes.h"
 #include "libmythbase/stringutil.h"

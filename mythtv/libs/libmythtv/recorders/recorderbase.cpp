@@ -1,9 +1,9 @@
 #include <algorithm> // for min
 #include <cstdint>
 
-#include "libmyth/programinfo.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/programinfo.h"
 
 #include "firewirerecorder.h"
 #include "recordingprofile.h"

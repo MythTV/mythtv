@@ -1,5 +1,4 @@
 // MythTV
-#include "libmyth/programinfo.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
@@ -7,6 +6,7 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythversion.h"
+#include "libmythbase/programinfo.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythmetadata/bluraymetadata.h"
 #include "libmythmetadata/globals.h"

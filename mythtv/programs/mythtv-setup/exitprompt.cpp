@@ -2,10 +2,10 @@
 #include <QCoreApplication>
 
 // MythTV stuff
-#include "libmyth/remoteutil.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythscreenstack.h"

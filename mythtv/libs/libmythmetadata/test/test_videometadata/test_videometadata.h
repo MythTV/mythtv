@@ -20,7 +20,7 @@
 
 #include <QtTest/QtTest>
 
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 #include "libmythmetadata/metadatafactory.h"
 #include "libmythmetadata/videometadata.h"
 #include "libmythtv/recordinginfo.h"

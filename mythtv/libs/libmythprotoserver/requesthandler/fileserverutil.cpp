@@ -13,7 +13,7 @@
 #include <QFile>
 #include <QMap>
 
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 
 #include "requesthandler/fileserverutil.h"
 

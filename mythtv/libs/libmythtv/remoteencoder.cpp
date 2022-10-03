@@ -2,12 +2,12 @@
 
 #include <QStringList>
 
-#include "libmyth/programinfo.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsocket.h"
+#include "libmythbase/programinfo.h"
 
 #include "recorders/signalmonitor.h"
 #include "remoteencoder.h"

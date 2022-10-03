@@ -8,7 +8,7 @@
 #include <QMutex>
 #include <QSize>
 
-#include "libmyth/programinfo.h"  // ProgramInfo
+#include "libmythbase/programinfo.h"  // ProgramInfo
 #include "libmythbase/programtypes.h" // RecStatus::Type
 #include "libmythbase/referencecounter.h"
 #include "libmythtv/inputinfo.h"

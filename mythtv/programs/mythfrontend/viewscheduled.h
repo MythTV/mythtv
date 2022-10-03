@@ -7,7 +7,7 @@
 #include <QMap>
 
 // MythTV
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 #include "libmythui/mythscreentype.h"
 
 // MythFrontend

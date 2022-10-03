@@ -2,9 +2,9 @@
 #include <QMutexLocker>
 #include <utility>
 
-#include "libmyth/programinfo.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsocket.h"
+#include "libmythbase/programinfo.h"
 #include "libmythtv/io/mythmediabuffer.h"
 
 #include "filetransfer.h"

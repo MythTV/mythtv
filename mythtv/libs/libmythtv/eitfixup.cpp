@@ -3,8 +3,8 @@
 #include <array>
 
 // MythTV headers
-#include "libmyth/programinfo.h" // for CategoryType, subtitle types and audio and video properties
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/programinfo.h" // for CategoryType, subtitle types and audio and video properties
 
 #include "channelutil.h" // for GetDefaultAuthority()
 #include "eitfixup.h"

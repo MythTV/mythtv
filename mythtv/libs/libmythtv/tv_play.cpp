@@ -34,12 +34,10 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmedia.h"
 #include "libmythbase/mythmiscutil.h"
+#include "libmythbase/programinfo.h"
 #include "libmythbase/programtypes.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythbase/signalhandling.h"
-
-// libmyth
-#include "libmyth/programinfo.h"
-#include "libmyth/remoteutil.h"
 
 // libmythui
 #include "libmythui/mythdialogbox.h"

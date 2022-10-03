@@ -32,13 +32,13 @@
 #include <QImageWriter>
 
 // MythTV
-#include "libmyth/programinfo.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdownloadmanager.h"
 #include "libmythbase/mythmiscutil.h"
+#include "libmythbase/programinfo.h"
 #include "libmythbase/remotefile.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythmetadata/musicmetadata.h"

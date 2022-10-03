@@ -12,13 +12,13 @@
 #include <QRunnable>
 
 // MythTV
-#include "libmyth/programinfo.h"
-#include "libmyth/remoteutil.h"
 #include "libmythbase/mconcurrent.h"
 #include "libmythbase/mthreadpool.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythevent.h"
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/programinfo.h"
+#include "libmythbase/remoteutil.h"
 
 // MythFrontend
 #include "programinfocache.h"

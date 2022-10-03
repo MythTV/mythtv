@@ -11,8 +11,6 @@
 
 // MythTV
 #include "libmyth/mythcontext.h"
-#include "libmyth/programinfo.h"
-#include "libmyth/remoteutil.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythdate.h"
@@ -20,6 +18,8 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/mythversion.h"
+#include "libmythbase/programinfo.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythbase/signalhandling.h"
 #include "libmythtv/jobqueue.h"
 #include "libmythtv/tv.h"

@@ -12,7 +12,6 @@
 #include <QEvent>
 #include <QCoreApplication>
 
-#include "libmyth/programinfo.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mthread.h"
@@ -24,6 +23,7 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythsystemlegacy.h"
+#include "libmythbase/programinfo.h"
 
 #include "jobqueue.h"
 #include "previewgenerator.h"

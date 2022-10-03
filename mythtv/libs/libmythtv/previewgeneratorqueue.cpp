@@ -13,10 +13,10 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/remoteutil.h"
 
 // libmyth
 #include "libmyth/mythcontext.h"
-#include "libmyth/remoteutil.h"
 
 // libmythtv
 #include "previewgenerator.h"

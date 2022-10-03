@@ -21,7 +21,7 @@
 #define PREVRECLIST_H_
 
 // MythTV
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 
 // mythfrontend
 #include "schedulecommon.h"

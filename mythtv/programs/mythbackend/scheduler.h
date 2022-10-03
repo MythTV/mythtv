@@ -14,11 +14,11 @@
 #include <QSet>
 
 // MythTV headers
-#include "libmyth/remoteutil.h"
 #include "libmythbase/filesysteminfo.h"
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythdeque.h"
 #include "libmythbase/mythscheduler.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythtv/recordinginfo.h"
 #include "libmythtv/scheduledrecording.h"
 

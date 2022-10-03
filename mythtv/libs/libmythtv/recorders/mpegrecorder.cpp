@@ -22,9 +22,9 @@
 #include "libmythbase/mythconfig.h"
 
 // MythTV headers
-#include "libmyth/programinfo.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
+#include "libmythbase/programinfo.h"
 
 #include "cardutil.h"
 #include "io/mythmediabuffer.h"

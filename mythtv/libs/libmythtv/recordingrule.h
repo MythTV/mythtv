@@ -9,7 +9,7 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 #include "libmythbase/programtypes.h"
 #include "libmythbase/recordingtypes.h"
 #include "libmythtv/mythtvexp.h"

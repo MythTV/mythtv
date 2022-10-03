@@ -1,7 +1,7 @@
 #ifndef COMMDETECTOR_FACTORY_H
 #define COMMDETECTOR_FACTORY_H
 
-#include "libmyth/programinfo.h"
+#include "libmythbase/programinfo.h"
 
 class CommDetectorBase;
 class MythCommFlagPlayer;

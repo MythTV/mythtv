@@ -12,8 +12,8 @@
 #include <QDateTime>
 
 // MythTV headers
-#include "libmyth/mythexp.h"
 #include "libmythbase/autodeletedeque.h"
+#include "libmythbase/mythbaseexp.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythtypes.h"
@@ -64,7 +64,7 @@ class MSqlQuery;
 class ProgramInfoUpdater;
 class PMapDBReplacement;
 
-class MPUBLIC ProgramInfo
+class MBASE_PUBLIC ProgramInfo
 {
     friend int pginfo_init_statics(void);
     friend class TestRecordingExtender;
@@ -858,7 +858,7 @@ class MPUBLIC ProgramInfo
     QDateTime       m_previewUpdate;
 };
 
-MPUBLIC bool LoadFromProgram(
+MBASE_PUBLIC bool LoadFromProgram(
     ProgramList        &destination,
     const QString      &where,
     const QString      &groupBy,
@@ -866,13 +866,13 @@ MPUBLIC bool LoadFromProgram(
     const MSqlBindings &bindings,
     const ProgramList  &schedList);
 
-MPUBLIC bool LoadFromProgram(
+MBASE_PUBLIC bool LoadFromProgram(
     ProgramList        &destination,
     const QString      &sql,
     const MSqlBindings &bindings,
     const ProgramList  &schedList);
 
-MPUBLIC bool LoadFromProgram(
+MBASE_PUBLIC bool LoadFromProgram(
     ProgramList        &destination,
     const QString      &sql,
     const MSqlBindings &bindings,
@@ -881,15 +881,15 @@ MPUBLIC bool LoadFromProgram(
     uint               limit,
     uint               &count);
 
-MPUBLIC ProgramInfo*  LoadProgramFromProgram(
+MBASE_PUBLIC ProgramInfo*  LoadProgramFromProgram(
         uint chanid, const QDateTime &starttime);
 
-MPUBLIC bool LoadFromOldRecorded(
+MBASE_PUBLIC bool LoadFromOldRecorded(
     ProgramList        &destination,
     const QString      &sql,
     const MSqlBindings &bindings);
 
-MPUBLIC bool LoadFromOldRecorded(
+MBASE_PUBLIC bool LoadFromOldRecorded(
     ProgramList        &destination,
     const QString      &sql,
     const MSqlBindings &bindings,
@@ -897,7 +897,7 @@ MPUBLIC bool LoadFromOldRecorded(
     uint               limit,
     uint               &count);
 
-MPUBLIC bool LoadFromRecorded(
+MBASE_PUBLIC bool LoadFromRecorded(
     ProgramList        &destination,
     bool                possiblyInProgressRecordingsOnly,
     const QMap<QString,uint32_t> &inUseMap,
@@ -956,12 +956,12 @@ bool LoadFromScheduler(AutoDeleteDeque<T> &destination)
 
 // Moved from programdetails.cpp/h, used by MythWelcome/MythShutdown
 // could be factored out
-MPUBLIC bool GetNextRecordingList(QDateTime &nextRecordingStart,
+MBASE_PUBLIC bool GetNextRecordingList(QDateTime &nextRecordingStart,
                                   bool *hasConflicts = nullptr,
                                   std::vector<ProgramInfo> *list = nullptr);
 
 class QMutex;
-class MPUBLIC PMapDBReplacement
+class MBASE_PUBLIC PMapDBReplacement
 {
   public:
     PMapDBReplacement();
@@ -970,8 +970,8 @@ class MPUBLIC PMapDBReplacement
     QMap<MarkTypes,frm_pos_map_t> map;
 };
 
-MPUBLIC QString myth_category_type_to_string(ProgramInfo::CategoryType category_type);
-MPUBLIC ProgramInfo::CategoryType string_to_myth_category_type(const QString &type);
+MBASE_PUBLIC QString myth_category_type_to_string(ProgramInfo::CategoryType category_type);
+MBASE_PUBLIC ProgramInfo::CategoryType string_to_myth_category_type(const QString &type);
 
 Q_DECLARE_METATYPE(ProgramInfo*)
 Q_DECLARE_METATYPE(ProgramInfo::CategoryType)

@@ -11,14 +11,14 @@
 #include <QStringList>
 
 // MythTV
-#include "libmyth/programinfo.h"
-#include "libmyth/remoteutil.h"
 #include "libmythbase/filesysteminfo.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythevent.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
+#include "libmythbase/programinfo.h"
+#include "libmythbase/remoteutil.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythtv/metadataimagehelper.h"
 #include "libmythtv/previewgeneratorqueue.h"
