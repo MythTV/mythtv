@@ -591,7 +591,7 @@ void GuideGrid::Load(void)
     setStartChannel((int)(m_currentStartChannel) - (m_channelCount / 2));
     m_channelCount = std::min(m_channelCount, maxchannel + 1);
 
-    for (int y = 0; y < m_channelCount; ++y)
+    for (int y = 0; y < m_channelCount && y < static_cast<int>(m_channelInfos.size()); ++y)
     {
         int chanNum = y + m_currentStartChannel;
         if (chanNum >= (int) m_channelInfos.size())
