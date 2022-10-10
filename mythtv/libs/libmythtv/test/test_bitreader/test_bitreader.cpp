@@ -22,7 +22,7 @@
 #include <array>
 #include <cstdint>
 
-void TestBitReader::skip_bits_aligned()
+void TestBitReader::skip_bits_nonaligned()
 {
     constexpr std::array<uint8_t, 16> array =
     {
@@ -54,7 +54,7 @@ void TestBitReader::skip_bits_aligned()
     QCOMPARE(br.get_bits_left(),  0);
 }
 
-void TestBitReader::skip_bits_nonaligned()
+void TestBitReader::skip_bits_aligned()
 {
     constexpr std::array<uint8_t, 16> array =
     {
