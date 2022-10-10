@@ -134,9 +134,9 @@ void TestBitReader::get_bits64()
     auto br = BitReader(array.data(), array.size());
 
     br.skip_bits(4);
-    QCOMPARE(br.get_bits64(64), 0xDEAD'BEEF'DEAD'BEEFU);
+    QCOMPARE(br.get_bits64(64), UINT64_C(0xDEAD'BEEF'DEAD'BEEF));
     QCOMPARE(br.get_bits_left(), 68);
-    QCOMPARE(br.get_bits64(64), 0x3141'5926'5358'9793U);
+    QCOMPARE(br.get_bits64(64), UINT64_C(0x3141'5926'5358'9793));
     QCOMPARE(br.get_bits_left(), 4);
 }
 
@@ -149,7 +149,7 @@ void TestBitReader::get_bits64_aligned()
 
     auto br = BitReader(array.data(), array.size());
 
-    QCOMPARE(br.get_bits64(64), 0xDEAD'BEEF'DEAD'BEEFU);
+    QCOMPARE(br.get_bits64(64), UINT64_C(0xDEAD'BEEF'DEAD'BEEF));
     QCOMPARE(br.get_bits_left(), 0);
 
 }
