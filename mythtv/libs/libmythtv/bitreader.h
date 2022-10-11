@@ -45,16 +45,18 @@ class BitReader
     }
     ~BitReader() = default;
 
-    void skip_bits(unsigned n = 1)
+    void skip_bits(unsigned n)
     {
-        if (m_cacheSize >= n)
+        if (m_cacheSize > n)
         {
             m_cache <<= n;
             m_cacheSize -= n;
         }
         else
         {
+            n -= m_cacheSize;
             m_cacheSize = 0;
+            m_cache      = 0;
             m_bitIndex += n;
             int quotient = m_bitIndex / CHAR_BIT;
             m_bitIndex %= CHAR_BIT;
@@ -70,7 +72,7 @@ class BitReader
         }
         return uint32_t(get_upper_bits(m_cache, n));
     }
-    uint32_t show_bits64(unsigned n)
+    uint64_t show_bits64(unsigned n)
     {
         //assert(n <= 64);
         if (m_cacheSize < n)
@@ -81,7 +83,7 @@ class BitReader
     }
     bool next_bit() { return get_bits(1) == 1; }
     /// @brief Read 0-32 bits.
-    uint32_t get_bits(unsigned n = 1)
+    uint32_t get_bits(unsigned n)
     {
         uint32_t ret = show_bits(n);
         skip_bits(n);
@@ -185,14 +187,6 @@ class BitReader
 #endif
     }
 
-    static constexpr uint64_t mask_upper(unsigned bits)
-    {
-        // protect against undefined behavior
-        if (bits ==  0) return  UINT64_C(0);
-        if (bits >  64) return ~UINT64_C(0);
-        return ~((UINT64_C(1) << (64 - bits)) - 1);
-    }
-
     static constexpr uint64_t get_upper_bits(uint64_t val, unsigned bits)
     {
         // protect against undefined behavior
@@ -204,7 +198,7 @@ class BitReader
         {
             return val;
         }
-        return (val & mask_upper(bits)) >> (64 - bits);
+        return val >> (64 - bits);
     }
 
     void refill_cache(unsigned min_bits);
@@ -252,15 +246,16 @@ inline void BitReader::refill_cache(unsigned min_bits)
     {
         int shift = 64 - m_cacheSize;
         int bits = CHAR_BIT - m_bitIndex;
-        m_cache |= int64_t(*m_buffer & ((1 << bits) - 1)) << (shift - bits);
         if (shift > bits)
         {
+            m_cache |= int64_t(*m_buffer & ((1 << bits) - 1)) << (shift - bits);
             m_bitIndex   = 0;
             m_buffer++;
             m_cacheSize += bits;
         }
         else
         {
+            m_cache |= int64_t(*m_buffer & ((1 << bits) - 1)) >> (bits - shift);
             m_bitIndex  += shift;
             m_cacheSize += shift;
         }

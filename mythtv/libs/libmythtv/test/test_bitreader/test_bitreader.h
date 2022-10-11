@@ -29,7 +29,11 @@ class TestBitReader : public QObject
     Q_OBJECT
 
   private slots:
+    static void skip_bits_nonaligned();
+    static void skip_bits_aligned();
     static void get_bits();
+    static void get_bits64();
+    static void get_bits64_aligned();
     static void get_ue_golomb_long();
     static void get_se_golomb1();
     static void get_se_golomb2();
