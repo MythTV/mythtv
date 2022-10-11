@@ -817,17 +817,17 @@ int ImageDb<FS>::InsertDbImage(ImageItemK &im, bool checkForDuplicate) const
                           ":SIZE,     :EXTENSION, :DATE,   :HIDDEN, :ORIENT, "
                           ":COVER,    :COMMENT,   :FS);").arg(m_table, kDBColumns));
 
-    query.bindValue(":FILEPATH",  im.m_filePath);
-    query.bindValue(":NAME",      FS::BaseNameOf(im.m_filePath));
+    query.bindValueNoNull(":FILEPATH",  im.m_filePath);
+    query.bindValueNoNull(":NAME",      FS::BaseNameOf(im.m_filePath));
     query.bindValue(":FS",        im.m_device);
     query.bindValue(":PARENT",    FS::DbId(im.m_parentId));
     query.bindValue(":TYPE",      im.m_type);
     query.bindValue(":MODTIME",   static_cast<qint64>(im.m_modTime.count()));
     query.bindValue(":SIZE",      im.m_size);
-    query.bindValue(":EXTENSION", im.m_extension);
+    query.bindValueNoNull(":EXTENSION", im.m_extension);
     query.bindValue(":DATE",      static_cast<qint64>(im.m_date.count()));
     query.bindValue(":ORIENT",    im.m_orientation);
-    query.bindValueNoNull(":COMMENT", im.m_comment);
+    query.bindValueNoNull(":COMMENT",   im.m_comment);
     query.bindValue(":HIDDEN",    im.m_isHidden);
     query.bindValue(":COVER",     FS::DbId(im.m_userThumbnail));
 
