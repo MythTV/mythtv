@@ -5956,19 +5956,20 @@ static uint get_chanid(const PlayerContext *ctx,
 {
     uint chanid = 0;
     uint cur_sourceid = 0;
+
     // try to find channel on current input
     if (ctx && ctx->m_playingInfo && ctx->m_playingInfo->GetSourceID())
     {
         cur_sourceid = ctx->m_playingInfo->GetSourceID();
-        chanid = std::max(static_cast<uint>(ChannelUtil::GetChanID(cur_sourceid, channum)), 0U);
+        chanid = std::max(ChannelUtil::GetChanID(cur_sourceid, channum), 0);
         if (chanid)
             return chanid;
     }
-    // try to find channel on specified input
 
+    // try to find channel on specified input
     uint sourceid = CardUtil::GetSourceID(cardid);
     if (cur_sourceid != sourceid && sourceid)
-        chanid = std::max(static_cast<uint>(ChannelUtil::GetChanID(sourceid, channum)), 0U);
+        chanid = std::max(ChannelUtil::GetChanID(sourceid, channum), 0);
     return chanid;
 }
 
