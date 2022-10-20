@@ -640,9 +640,7 @@ SatIPControlReadHelper::SatIPControlReadHelper(SatIPStreamHandler *handler)
             this,     &SatIPControlReadHelper::ReadPending);
 }
 
-SatIPControlReadHelper::~SatIPControlReadHelper()
-{
-}
+SatIPControlReadHelper::~SatIPControlReadHelper() = default;
 
 // Process a RTCP packet received on m_socket
 void SatIPControlReadHelper::ReadPending()
