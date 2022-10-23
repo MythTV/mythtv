@@ -148,7 +148,7 @@ int MythMMALContext::HwDecoderInit(AVCodecContext *Context)
     return m_interop ? 0 : -1;
 }
 
-void MythMMALContext::SetDecoderOptions(AVCodecContext *Context, AVCodec *Codec)
+void MythMMALContext::SetDecoderOptions(AVCodecContext *Context, const AVCodec *Codec)
 {
     if (!(codec_is_mmal(m_codecID)))
         return;
