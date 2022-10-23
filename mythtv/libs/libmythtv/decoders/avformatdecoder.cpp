@@ -614,6 +614,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     bool oldrawstate = m_getRawFrames;
     m_getRawFrames = false;
 
+#if DTS_SEEKING_HACK
     AVStream *st = nullptr;
     for (uint i = 0; i < m_ic->nb_streams; i++)
     {
@@ -624,6 +625,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
             break;
         }
     }
+#endif
 
     int seekDelta = desiredFrame - m_framesPlayed;
 
@@ -659,7 +661,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
 
     int normalframes = 0;
 
-#if 0
+#if DTS_SEEKING_HACK
     if (st && st->cur_dts != AV_NOPTS_VALUE)
     {
 
