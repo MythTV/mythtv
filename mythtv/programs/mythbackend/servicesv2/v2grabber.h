@@ -79,13 +79,12 @@ class V2GrabberList : public QObject
 
         bool containsProgram(QString &program)
         {
-            for (const auto& entry : m_Grabbers)
+            auto matchProgram = [&program](const QVariant& entry)
             {
                 auto *grabber = entry.value<V2Grabber*>();
-                if (grabber->GetProgram() == program)
-                    return true;
-            }
-            return false;
+                return (grabber->GetProgram() == program);
+            };
+            return std::any_of(m_Grabbers.cbegin(), m_Grabbers.cend(), matchProgram);
         }
 
     private:
