@@ -81,7 +81,7 @@ class V2GrabberList : public QObject
         {
             for (const auto& entry : m_Grabbers)
             {
-                V2Grabber *grabber = entry.value<V2Grabber*>();
+                auto *grabber = entry.value<V2Grabber*>();
                 if (grabber->GetProgram() == program)
                     return true;
             }
