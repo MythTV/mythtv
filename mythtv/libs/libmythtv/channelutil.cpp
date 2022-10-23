@@ -2138,7 +2138,7 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
 
         chan.m_xmltvId = query.value(11).toString();      /* xmltvid    */
 
-        for (auto inputId : inputIdLists[qSourceID])
+        for (auto inputId : qAsConst(inputIdLists[qSourceID]))
             chan.AddInputId(inputId);
 
         QStringList groupIDs = query.value(10).toString().split(",");
@@ -2568,6 +2568,7 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
         return channelList;
     }
 
+    QList<uint> groupIdList;
     while (query.next())
     {
         ChannelInfo channelInfo;
@@ -2602,7 +2603,7 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
         channelInfo.m_chanId            = query.value(27).toUInt();
 
         QStringList groupIDs = query.value(28).toString().split(",");
-        QList<uint>groupIdList;
+        groupIdList.clear();
         while (!groupIDs.isEmpty())
                 groupIdList.push_back(groupIDs.takeFirst().toUInt());
         std::sort(groupIdList.begin(), groupIdList.end());
