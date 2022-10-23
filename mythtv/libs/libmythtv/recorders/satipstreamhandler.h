@@ -129,7 +129,7 @@ class SatIPControlReadHelper : public QObject
 
   public:
     explicit SatIPControlReadHelper(SatIPStreamHandler *handler);
-    ~SatIPControlReadHelper() override;
+    ~SatIPControlReadHelper() override = default;
 
   public slots:
     void ReadPending(void);
