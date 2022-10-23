@@ -378,10 +378,6 @@ void DTVSignalMonitor::HandlePMT(uint /*program_num*/, const ProgramMapTable *pm
         QString("Found PMT; pmt->ProgramNumber(%1)")
         .arg(pmt->ProgramNumber()));
 
-    LOG(VB_CHANNEL, LOG_DEBUG, LOC +
-        QString("Found PMT; pmt->ProgramNumber(%1)")
-        .arg(pmt->ProgramNumber()));
-
     if (pmt->IsEncrypted(GetDTVChannel()->GetSIStandard())) {
         LOG(VB_GENERAL, LOG_NOTICE, LOC +
             QString("PMT says program %1 is encrypted").arg(m_programNumber));
