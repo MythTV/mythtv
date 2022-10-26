@@ -8,6 +8,7 @@
 #include "v2videoLookupInfoList.h"
 #include "v2blurayInfo.h"
 #include "v2videoStreamInfoList.h"
+#include "v2cutList.h"
 
 #define VIDEO_SERVICE QString("/Video/")
 #define VIDEO_HANDLE  QString("Video")
@@ -105,7 +106,11 @@ class V2Video : public MythHTTPService
     static V2VideoStreamInfoList* GetStreamInfo ( const QString &StorageGroup,
                                                   const QString &FileName  );
 
+    static V2CutList* GetVideoCutList     ( int              Id,
+                                            const QString   &OffsetType );
 
+    static V2CutList* GetVideoCommBreak   ( int              Id,
+                                            const QString   &OffsetType );
 
   private:
     Q_DISABLE_COPY(V2Video)

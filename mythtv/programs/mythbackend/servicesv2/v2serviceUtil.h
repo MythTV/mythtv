@@ -72,9 +72,9 @@ void V2FillArtworkInfoList( V2ArtworkInfoList *pArtworkInfoList,
 
 DBCredits * V2jsonCastToCredits(const QJsonObject &cast);
 
-void V2FillCutList( V2CutList* pCutList, RecordingInfo* rInfo, int marktype);
+void V2FillCutList( V2CutList* pCutList, ProgramInfo* rInfo, int marktype);
 
-void V2FillCommBreak( V2CutList* pCutList, RecordingInfo* rInfo, int marktype);
+void V2FillCommBreak( V2CutList* pCutList, ProgramInfo* rInfo, int marktype);
 
 void V2FillSeek(V2CutList* pCutList, RecordingInfo* rInfo, MarkTypes marktype);
 

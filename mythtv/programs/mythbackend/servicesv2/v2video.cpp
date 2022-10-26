@@ -43,6 +43,8 @@ void V2Video::RegisterCustomTypes()
     qRegisterMetaType<V2VideoLookupList*>("V2VideoLookupList");
     qRegisterMetaType<V2VideoLookup*>("V2VideoLookup");
     qRegisterMetaType<V2ArtworkItem*>("V2ArtworkItem");
+    qRegisterMetaType<V2CutList*>("V2CutList");
+    qRegisterMetaType<V2Cutting*>("V2Cutting");
 }
 
 V2Video::V2Video()
@@ -999,4 +1001,126 @@ V2VideoStreamInfoList* V2Video::GetStreamInfo
 
     }
     return pVideoStreamInfos;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// October 26,2022
+// Support for Cut List for Videos
+/////////////////////////////////////////////////////////////////////////////
+
+V2CutList* V2Video::GetVideoCutList ( int Id,
+                                          const QString &offsettype )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT filename "
+                  "FROM videometadata "
+                  "WHERE intid = :ID ");
+    query.bindValue(":ID", Id);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Video::GetVideoCommBreak", query);
+        throw QString("Database Error.");
+    }
+
+    QString fileName;
+
+    if (query.next())
+        fileName = query.value(0).toString();
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("V2Video/GetVideoCommBreak Video id %1 Not found.").arg(Id));
+        throw QString("Video Not Found.");
+    }
+
+    ProgramInfo pi(fileName,
+                         nullptr, // _plot,
+                         nullptr, // _title,
+                         nullptr, // const QString &_sortTitle,
+                         nullptr, // const QString &_subtitle,
+                         nullptr, // const QString &_sortSubtitle,
+                         nullptr, // const QString &_director,
+                         0, // int _season,
+                         0, // int _episode,
+                         nullptr, // const QString &_inetref,
+                         0min, // uint _length_in_minutes,
+                         0, // uint _year,
+                         nullptr); //const QString &_programid);
+
+
+    int marktype = 0;
+
+    auto* pCutList = new V2CutList();
+    if (offsettype.toLower() == "position")
+        marktype = 1;
+    else if (offsettype.toLower() == "duration")
+        marktype = 2;
+    else
+        marktype = 0;
+
+    V2FillCutList(pCutList, &pi, marktype);
+
+    return pCutList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// October 26,2022
+// Support for Commercial Break List for Videos
+/////////////////////////////////////////////////////////////////////////////
+
+V2CutList* V2Video::GetVideoCommBreak ( int Id,
+                                          const QString &offsettype )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT filename "
+                  "FROM videometadata "
+                  "WHERE intid = :ID ");
+    query.bindValue(":ID", Id);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Video::GetVideoCommBreak", query);
+        throw QString("Database Error.");
+    }
+
+    QString fileName;
+
+    if (query.next())
+        fileName = query.value(0).toString();
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("V2Video/GetVideoCommBreak Video id %1 Not found.").arg(Id));
+        throw QString("Video Not Found.");
+    }
+
+    ProgramInfo pi(fileName,
+                         nullptr, // _plot,
+                         nullptr, // _title,
+                         nullptr, // const QString &_sortTitle,
+                         nullptr, // const QString &_subtitle,
+                         nullptr, // const QString &_sortSubtitle,
+                         nullptr, // const QString &_director,
+                         0, // int _season,
+                         0, // int _episode,
+                         nullptr, // const QString &_inetref,
+                         0min, // uint _length_in_minutes,
+                         0, // uint _year,
+                         nullptr); //const QString &_programid);
+
+
+    int marktype = 0;
+
+    auto* pCutList = new V2CutList();
+    if (offsettype.toLower() == "position")
+        marktype = 1;
+    else if (offsettype.toLower() == "duration")
+        marktype = 2;
+    else
+        marktype = 0;
+
+    V2FillCommBreak(pCutList, &pi, marktype);
+
+    return pCutList;
 }

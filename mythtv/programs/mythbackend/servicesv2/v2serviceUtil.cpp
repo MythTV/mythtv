@@ -574,7 +574,7 @@ void V2FillCastMemberList(V2CastMemberList* pCastMemberList,
 }
 
 
-void V2FillCutList(V2CutList* pCutList, RecordingInfo* rInfo, int marktype)
+void V2FillCutList(V2CutList* pCutList, ProgramInfo* rInfo, int marktype)
 {
     frm_dir_map_t markMap;
     frm_dir_map_t::const_iterator it;
@@ -616,12 +616,12 @@ void V2FillCutList(V2CutList* pCutList, RecordingInfo* rInfo, int marktype)
     }
 }
 
-void V2FillCommBreak(V2CutList* pCutList, RecordingInfo* rInfo, int marktype)
+void V2FillCommBreak(V2CutList* pCutList, ProgramInfo* rInfo, int marktype)
 {
     frm_dir_map_t markMap;
     frm_dir_map_t::const_iterator it;
 
-    if (rInfo && rInfo->GetChanID())
+    if (rInfo)
     {
         rInfo->QueryCommBreakList(markMap);
 
