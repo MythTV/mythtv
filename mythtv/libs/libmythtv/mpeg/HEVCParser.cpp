@@ -1110,6 +1110,7 @@ static bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
 
         for (int j = 0; j <= RefRPS->NumDeltaPocs; ++j)
         {
+            used_by_curr_pic_flag[j] = get_bits1(gb); // u(1)
             /*
               use_delta_flag[ j ] equal to 1 specifies that the
               j-th entry in the source candidate short-term RPS
@@ -1120,8 +1121,14 @@ static bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
               short-term RPS. When use_delta_flag[ j ] is not
               present, its value is inferred to be equal to 1.
             */
-            bool val = get_bits1(gb);
-            use_delta_flag[j] = used_by_curr_pic_flag[j] ? val : true;
+            if (!used_by_curr_pic_flag[j])
+            {
+                use_delta_flag[j] = get_bits1(gb); // u(1)
+            }
+            else
+            {
+                use_delta_flag[j] = true;
+            }
         }
 
 
