@@ -68,8 +68,7 @@ def get_show_art_lists(tvmaze_show_id):
 def buildList(tvtitle, opts):
     # option -M title
     from lxml import etree
-    from MythTV import VideoMetadata, datetime
-    from MythTV.utility import levenshtein
+    from MythTV import VideoMetadata
     from MythTV.tvmaze import tvmaze_api as tvmaze
     from MythTV.tvmaze import locales
 
@@ -354,10 +353,7 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
     # option -D inetref season episode
 
     from lxml import etree
-    from MythTV import VideoMetadata, datetime
-    from MythTV.utility import levenshtein
     from MythTV.tvmaze import tvmaze_api as tvmaze
-    from MythTV.tvmaze import locales
 
     if opts.debug:
         dstr = "Function 'buildSingle' called with arguments: " + \
@@ -507,8 +503,7 @@ def buildSingleItem(inetref, season, episode_id):
 def buildCollection(tvinetref, opts):
     # option -C inetref
     from lxml import etree
-    from MythTV import VideoMetadata, datetime
-    from MythTV.utility import levenshtein
+    from MythTV import VideoMetadata
     from MythTV.tvmaze import tvmaze_api as tvmaze
     from MythTV.tvmaze import locales
 
