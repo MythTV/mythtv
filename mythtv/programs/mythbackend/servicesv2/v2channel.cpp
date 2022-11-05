@@ -612,11 +612,13 @@ int V2Channel::FetchChannelsFromSource( const uint nSourceId,
 
     QString cardtype = CardUtil::GetRawInputType(nCardId);
 
-    if (!CardUtil::IsUnscanable(cardtype) &&
-        !CardUtil::IsEncoder(cardtype))
-    {
-        throw( QString("This device is incompatible with channel fetching.") );
-    }
+    // These tests commented because they prevent fetching channels for CETON
+    // cable card device, which is compatible with fetching and requires fetching.
+    // if (!CardUtil::IsUnscanable(cardtype) &&
+    //     !CardUtil::IsEncoder(cardtype))
+    // {
+    //     throw( QString("This device is incompatible with channel fetching.") );
+    // }
 
     SourceUtil::UpdateChannelsFromListings(nSourceId, cardtype, bWaitForFinish);
 

@@ -55,6 +55,7 @@ void V2Capture::RegisterCustomTypes()
     qRegisterMetaType<V2DiseqcTree*>("V2DiseqcTree");
     qRegisterMetaType<V2DiseqcTreeList*>("V2DiseqcTreeList");
     qRegisterMetaType<V2InputGroupList*>("V2InputGroupList");
+    qRegisterMetaType<V2InputGroup*>("V2InputGroup");
 }
 
 V2Capture::V2Capture()

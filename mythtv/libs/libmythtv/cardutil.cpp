@@ -2076,10 +2076,18 @@ bool CardUtil::LinkInputGroup(uint inputid, uint inputgroupid)
         return false;
     }
 
-    if (!query.next())
-        return false;
+    QString name;
+    while (query.next()) {
+        name = query.value(2).toString();
+        uint cardid = query.value(0).toUInt();
+        // Already linked
+        if (cardid == inputid)
+            return true;
+    }
 
-    const QString name = query.value(2).toString();
+    // Invalid group id
+    if (name.isEmpty())
+        return false;
 
     query.prepare(
         "INSERT INTO inputgroup "
