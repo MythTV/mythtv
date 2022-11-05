@@ -34,7 +34,7 @@
                             }}</label>
                         <input pInputText id="FrontendName" *ngIf="work.isReady"
                             [(ngModel)]="this.currentDevice.FrontendName" name="FrontendName" disabled="true"
-                            #VideoDevice="ngModel" class="mb-2 form-control w-full" />
+                            #FrontendName="ngModel" class="mb-2 form-control w-full" />
                         <small class="block">
                             {{ 'settings.capture.dvb.frontend_desc' | translate }}
                         </small>

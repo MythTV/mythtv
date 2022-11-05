@@ -23,24 +23,26 @@ export interface CaptureCard {
     Hue:                     number;
     DiSEqCId:                number;
     DVBEITScan:              boolean;
+    InputName:               string;
 }
 
 export interface CardInput {
     CardId:                number;
     SourceId:              number;
-    InputName:             string;
     ExternalCommand:       string;
     ChangerDevice:         string;
     ChangerModel:          string;
     HostName:              string;
     TuneChan:              string;
-    StartChan:             string;
+    StartChannel:          string;
     DisplayName:           string;
     DishnetEIT:            boolean;
     RecPriority:           number;
     Quicktune:             number;
     SchedOrder:            number;
     LiveTVOrder:           number;
+    RecLimit:              number;
+    SchedGroup:            boolean;
 }
 
 export interface CardAndInput extends CaptureCard, CardInput {
@@ -115,3 +117,15 @@ export interface DiseqcParm {
     type: string,
     inactive: boolean
   }
+
+  export interface InputGroup {
+    CardInputId:    number;
+    InputGroupId:   number;
+    InputGroupName: string;
+  }
+
+  export interface InputGroupList {
+    InputGroupList : {
+        InputGroups: InputGroup [];
+    }
+}

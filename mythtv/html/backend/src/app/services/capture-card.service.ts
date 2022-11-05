@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CaptureCard, CaptureCardList, CaptureDeviceList, CardTypeList, DiseqcParm, DiseqcTree, DiseqcTreeList } from './interfaces/capture-card.interface';
+import { CaptureCard, CaptureCardList, CaptureDeviceList, CardTypeList, DiseqcParm, DiseqcTree, DiseqcTreeList, InputGroupList } from './interfaces/capture-card.interface';
 import { BoolResponse } from './interfaces/common.interface';
 
 @Injectable({
@@ -72,5 +72,28 @@ export class CaptureCardService {
       { DiseqcId: DiseqcId });
   }
 
+  public GetInputGroupList(): Observable<InputGroupList> {
+    return this.httpClient.get<InputGroupList>('Capture/GetUserInputGroupList', {});
+  }
+
+  public SetInputMaxRecordings(InputId: number, Max: number): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('Capture/SetInputMaxRecordings',
+      {InputId: InputId, Max: Max});
+  }
+
+  public AddUserInputGroup(Name: string): Observable<number> {
+    return this.httpClient.post<number>('/Capture/AddUserInputGroup',
+      { Name: Name });
+  }
+
+  public LinkInputGroup(InputId: number, InputGroupId: number): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Capture/LinkInputGroup',
+      { InputId: InputId, InputGroupId: InputGroupId });
+  }
+
+  public UnlinkInputGroup(InputId: number, InputGroupId: number): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Capture/UnlinkInputGroup',
+      { InputId: InputId, InputGroupId: InputGroupId });
+  }
 
 }

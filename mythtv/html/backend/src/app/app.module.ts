@@ -60,6 +60,8 @@ import { ImportComponent } from './config/settings/capture-cards/import/import.c
 import { DemoComponent } from './config/settings/capture-cards/demo/demo.component';
 import { VideoSourcesComponent } from './config/settings/video-sources/video-sources.component';
 import { VsourceComponent } from './config/settings/video-sources/vsource/vsource.component';
+import { InputConnectionsComponent } from './config/settings/input-connections/input-connections.component';
+import { IconnectionComponent } from './config/settings/input-connections/iconnection/iconnection.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -116,6 +118,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     DemoComponent,
     VideoSourcesComponent,
     VsourceComponent,
+    InputConnectionsComponent,
+    IconnectionComponent,
   ],
   imports: [
     BrowserModule,

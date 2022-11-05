@@ -20,13 +20,14 @@ export class SidenavComponent implements OnInit {
     m_haveDatabase: boolean = true;
 
     m_setupMenu: MenuItem[]  = [ {
+        // See below for labels
         label: "",
         items: [
             {routerLink: 'settings/general'},
             { routerLink: 'settings/capture-cards'},
             { routerLink: ''},
             { routerLink: 'settings/video-sources'},
-            { routerLink: ''},
+            { routerLink: 'settings/input-connections'},
             { routerLink: ''},
             { routerLink: ''},
             { routerLink: ''},

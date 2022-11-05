@@ -50,11 +50,11 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
     this.mythService.GetHostName().subscribe(data => {
       this.m_hostName = data.String;
       this.loadCards(true);
-      translate.get(this.dirtyText).subscribe(data => this.dirtyText = data);
-      translate.get(this.warningText).subscribe(data => this.warningText = data);
-      translate.get(this.deletedText).subscribe(data => this.deletedText = data);
-      translate.get(this.newText).subscribe(data => this.newText = data);
     });
+    translate.get(this.dirtyText).subscribe(data => this.dirtyText = data);
+    translate.get(this.warningText).subscribe(data => this.warningText = data);
+    translate.get(this.deletedText).subscribe(data => this.deletedText = data);
+    translate.get(this.newText).subscribe(data => this.newText = data);
     this.captureCardService.GetCardTypeList().subscribe(data => this.cardTypes = data.CardTypeList.CardTypes);
   }
 
@@ -79,7 +79,6 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
     this.displayDeleteThis = [];
     for (let x = 0; x < this.m_CaptureCardsFiltered.length; x++) {
       this.dirtyMessages.push('');
-      this.forms.push();
       this.disabledTab.push(false);
       this.activeTab.push(false);
       this.displayDeleteThis.push(false);

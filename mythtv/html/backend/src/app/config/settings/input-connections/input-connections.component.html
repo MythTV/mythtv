@@ -1,0 +1,24 @@
+<div class="block card w-full">
+    <h3>Input Connections</h3>
+    <p-accordion class="col-12 w-full" (onClose)="onTabClose($event)" (onOpen)="onTabOpen($event)">
+        <p-accordionTab *ngFor="let card of m_CaptureCardsFiltered; index as ix; first as isFirst"
+            [(selected)]="activeTab[ix]">
+            <ng-template pTemplate="header">
+                <div class="grid  w-full" *ngIf="readyCount > 1">
+                    <div class="col-9 pr-1">
+                        {{m_CaptureCardsFiltered[ix].CardType}}
+                        {{m_CaptureCardsFiltered[ix].VideoDevice}}
+                        ({{m_CaptureCardsFiltered[ix].DisplayName}})
+                        =&gt; {{videoSourceLookup[m_CaptureCardsFiltered[ix].SourceId].SourceName}}
+                        <b>&nbsp;{{ dirtyMessages[ix] }}</b>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="content">
+                <app-iconnection  [card]="m_CaptureCardsFiltered[ix]"
+                    [cardList]="m_CaptureCardList" [videoSourceLookup]="videoSourceLookup"
+                    [videoSourceList]="videoSourceList" [parentComponent]="this"></app-iconnection>
+            </ng-template>
+        </p-accordionTab>
+    </p-accordion>
+</div>

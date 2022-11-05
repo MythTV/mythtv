@@ -536,6 +536,68 @@
       "grabberconfig_desc": "Configure the grabber by running this command using ssh or terminal logged into the backend:",
       "eit_label": "Perform EIT scan",
       "eit_desc": "If enabled, program guide data for channels on this source will be updated with data provided by the channels themselves 'Over-the-Air'."
+    },
+    "iconnection": {
+      "title": "Input Connection",
+      "inputname_label": "Delivery System",
+      "inputname_desc": "For DVB devices this shows the delivery system (modulation), for instance DVB-T2, that you have selected when you configured the capture card. This must be the same as the modulation used by the video source.",
+      "displayname_label": "Display Name",
+      "displayname_desc": "This name is displayed on screen when Live TV begins and in various other places.  Make sure the last two characters are unique for each input or use a slash ('/') to designate the unique portion.",
+      "sourceid_label": "Video Source",
+      "sourceid_desc": "Select the listings source that will be used with this input.",
+      "externalcmd_label": "External Channel Change Command",
+      "externalcmd_desc": "If specified, this command will be run to change the channel for inputs which have an external tuner device such as a cable box. The first argument will be the channel number.",
+      "tunechan_label": "Preset Tuner to Channel",
+      "tunechan_desc": "Leave this blank unless you have an external tuner that is connected to the tuner input of your card. If so, you will need to specify the preset channel for the signal (normally 3 or 4).",
+      "quicktune_label": "Use Quick tuning",
+      "quicktune": {
+        "never": "Never",
+        "livetv": "Live TV Only",
+        "always": "Always"
+      },
+      "quicktune_desc": "If enabled, MythTV will tune using only the MPEG program number. The program numbers change more often than DVB or ATSC tuning parameters, so this is slightly less reliable. This will also inhibit EIT gathering during Live TV and recording.",
+      "dishneteit_label": "Use DishNet Long-term EIT Data",
+      "dishneteit_desc": "If you point your satellite dish toward DishNet's birds, you may wish to enable this feature. For best results, enable general EIT collection as well.",
+      "fetch": {
+        "inprog": "Fetch in Progress",
+        "complete": "Fetch Complete. {{num}} Channels downloaded",
+        "failed": "Fetch Failed",
+        "incompatible": "This device is incompatible with channel fetching",
+        "label": "Fetch Channels from Listings Source",
+        "desc": "This uses the listings data source to provide the channels for this input. This can take a long time to run. Before running this you must select the video source, and save the page if any changes have not been saved.",
+        "warning": "Only fetch channels from the listing service if you cannot scan for channels."
+      },
+      "startchan": {
+        "label": "Starting Channel",
+        "desc": "This channel is shown when 'Watch TV' is selected on the main menu. It is updated on every Live TV channel change. When the value is not valid a suitable default will be chosen."
+      },
+      "maxrec": {
+        "label": "Max Recordings",
+        "desc": "Maximum number of simultaneous recordings MythTV will attempt using this device. If set to a value other than 1, MythTV can sometimes record multiple programs on the same multiplex or overlapping copies of the same program on a single channel."
+      },
+      "interact": {
+        "title": "Interactions Between Inputs"
+      },
+      "schedgrp": {
+        "label": "Schedule as Group",
+        "desc": "Schedule all virtual inputs on this device as a group. This is more efficient than scheduling each input individually. Additionally, virtual nputs will be automatically added as needed to fulfill the recording load."
+      },
+      "recpri": {
+        "label": "Input Priority",
+        "desc": "If the input priority is not equal for all inputs, the scheduler may choose to record a show at a later time so that it can record on an input with a higher value."
+      },
+      "schedorder": {
+        "label": "Schedule Order",
+        "ldesc": "If priorities and other factors are equal the scheduler will choose the available input with the lowest, non-zero value. Setting this value to zero will make the input unavailable to the scheduler."
+      },
+      "liveorder": {
+        "label": "Live TV Order",
+        "desc": "When entering Live TV, the available, local input with the lowest, non-zero value will be used. If no local inputs are available, the available, remote input with the lowest, non-zero value will be used. Setting this value to zero will make the input unavailable to live TV."
+      },
+      "inpgroup": {
+        "label": "Input Group",
+        "desc": "Input groups are only needed when two or more cards share the same resource such as a FireWire card and an analog card input controlling the same set top box. Leave blank unless this input is shared with another device. Only one of the inputs in an input group will be allowed to record at any given time."
+      }
     }
   },
   "sidenav": {
