@@ -216,7 +216,7 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
           }
           else if (this.work.successCount == this.work.expectedCount + 1) {
             // reload cards to get updated list from SetInputMaxRecordings
-            this.parentComponent.loadCards(true);
+            this.parentComponent.loadCards(false);
             this.work.recLimitUpd = false;
           }
         }
@@ -242,26 +242,32 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     this.work.successCount = 0;
     this.work.errorCount = 0;
     this.work.expectedCount = 0;
+    let inputGroupId = 0;
     // Changing input group - get the new group id
     if (this.work.inputGroupName != this.work.orgInputGroupName) {
-      this.captureCardService.AddUserInputGroup(this.work.inputGroupName)
-        .subscribe({
-          next: (x: any) => {
-            this.saveCard(x.int);
-          },
-          error: (err: any) => {
-            console.log("saveForm error", err);
-            this.work.errorCount++;
-            this.currentForm.form.markAsDirty();
-          }
-        });
+      if (this.work.inputGroupName) {
+        this.captureCardService.AddUserInputGroup(this.work.inputGroupName)
+          .subscribe({
+            next: (x: any) => {
+              this.saveCard(x.int);
+            },
+            error: (err: any) => {
+              console.log("saveForm error", err);
+              this.work.errorCount++;
+              this.currentForm.form.markAsDirty();
+            }
+          });
+      }
+      else
+        // Special value -1 to indicate existing group is being removed
+        this.saveCard(-1);
     }
     else
       this.saveCard(0);
   }
 
   saveCard(inputGroupId: number) {
-    if (inputGroupId)
+    if (inputGroupId != 0)
       this.work.reloadGroups = true;
     // Update device and child devices
     let counter = 0;
@@ -315,12 +321,14 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
 
         this.work.expectedCount += 9;
 
-        if (inputGroupId) {
+        if (inputGroupId != 0) {
           this.orgInputGroupIds.forEach(x => {
             this.captureCardService.UnlinkInputGroup(entry.CardId, x)
               .subscribe(this.saveObserver);
             this.work.expectedCount++;
           });
+        }
+        if (inputGroupId > 0) {
           this.captureCardService.LinkInputGroup(entry.CardId, inputGroupId)
             .subscribe(this.saveObserver);
           this.work.expectedCount++;
