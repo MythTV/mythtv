@@ -1,17 +1,12 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { Observer, PartialObserver } from 'rxjs';
+import { PartialObserver } from 'rxjs';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { CaptureCardList, CaptureDevice, CaptureDeviceList, CardAndInput, DiseqcParm, DiseqcTree, DiseqcTreeList } from 'src/app/services/interfaces/capture-card.interface';
 import { SetupService } from 'src/app/services/setup.service';
+import { CaptureCardsComponent } from '../capture-cards.component';
 import { DiseqcSettingBase } from './diseqc-setting-base';
-
-// interface diseqcParm {
-//   description: string,
-//   type: string,
-//   inactive: boolean
-// }
 
 @Component({
   selector: 'app-dvb',
@@ -22,6 +17,8 @@ export class DvbComponent implements OnInit, AfterViewInit {
 
   @Input() card!: CardAndInput;
   @Input() cardList!: CaptureCardList;
+  @Input() diseqcTreeList!: DiseqcTreeList;
+  @Input() parent!: CaptureCardsComponent;
 
   @ViewChild("dvbform") currentForm!: NgForm;
   @ViewChild("top") topElement!: ElementRef;
@@ -37,6 +34,10 @@ export class DvbComponent implements OnInit, AfterViewInit {
     warningMessage: '',
     displayNewDiseqc: false,
     displayDeleteDiseqc: false,
+    displayConnectDevice: false,
+    displayDisconnect: false,
+    selectedDiseqcTree: 0,
+    diseqcError: false,
   };
 
   captureDeviceList: CaptureDeviceList = {
@@ -45,20 +46,9 @@ export class DvbComponent implements OnInit, AfterViewInit {
     }
   };
 
-  diseqcTreeList: DiseqcTreeList = {
-    DiseqcTreeList: {
-      DiseqcTrees: [],
-    }
-  }
+  diseqcRootTrees: DiseqcTree[] = [];
 
   diseqcTree: DiseqcTree | undefined = undefined;
-
-  // diseqcTypes: diseqcParm[] = [
-  //   { description: "Switch", type: "switch", inactive: false },
-  //   { description: "Rotor", type: "rotor", inactive: false },
-  //   { description: "Unicable", type: "scr", inactive: false },
-  //   { description: "LNB", type: "lnb", inactive: false }
-  // ];
 
   messages = {
     devNotExist: 'settings.capture.dvb.devNotExist',
@@ -105,18 +95,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
           this.work.errorCount++;
         }
       });
-    // Get DiseqcTree list
-    this.captureCardService.GetDiseqcTreeList()
-      .subscribe({
-        next: data => {
-          this.diseqcTreeList = data;
-          this.setupDiseqc();
-        },
-        error: (err: any) => {
-          console.log("GetDiseqcTreeList", err);
-          this.work.errorCount++;
-        }
-      })
+    this.setupDiseqc();
   }
 
   ngAfterViewInit(): void {
@@ -127,14 +106,45 @@ export class DvbComponent implements OnInit, AfterViewInit {
   setupDiseqc(): void {
     this.diseqcTree = this.diseqcTreeList.DiseqcTreeList.DiseqcTrees.find
       (x => x.DiseqcId == this.card.DiSEqCId);
+    this.work.diseqcError = false;
   }
 
   newDiseqc(): void {
     this.work.displayNewDiseqc = false;
+    this.work.diseqcError = false;
     this.diseqcTree = <DiseqcTree>{
       Type: this.selectedDiseqcType.type,
       Description: this.selectedDiseqcType.description,
     };
+  }
+
+  setupRootTrees() {
+    this.diseqcRootTrees = this.diseqcTreeList.DiseqcTreeList.DiseqcTrees.filter(x => !x.ParentId)
+  }
+
+  selectDiseqc() {
+    this.work.displayConnectDevice = false;
+    this.work.diseqcError = false;
+    this.card.DiSEqCId = this.work.selectedDiseqcTree;
+    this.currentForm.form.markAsDirty();
+    this.setupDiseqc();
+  }
+
+  unSelectDiseqc() {
+    this.work.displayDisconnect = false;
+    this.work.diseqcError = false;
+    this.card.DiSEqCId = 0;
+    this.currentForm.form.markAsDirty();
+    this.diseqcTree = undefined;
+  }
+
+  canDeleteDiseqc() {
+    this.work.diseqcError = false;
+    const cards = this.cardList.CaptureCardList.CaptureCards.filter(x => x.DiSEqCId == this.card.DiSEqCId);
+    if (cards.length > 1)
+      this.work.diseqcError = true;
+    else
+      this.work.displayDeleteDiseqc = true
   }
 
   deleteDiseqc(): void {
@@ -151,6 +161,8 @@ export class DvbComponent implements OnInit, AfterViewInit {
               this.work.errorCount++;
               console.log("DeleteDiseqcTree", x)
             }
+            // reload lists
+            this.parent.loadDiseqc();
           },
           error: (err: any) => {
             console.log("DeleteDiseqcTree", err);
@@ -272,6 +284,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
   saveForm() {
     this.work.successCount = 0;
     this.work.errorCount = 0;
+    this.work.diseqcError = false;
     //  Save diseqcTree
     if (this.diseqcTree && this.diseqcComponent) {
       this.diseqcComponent.saveForm(0, {

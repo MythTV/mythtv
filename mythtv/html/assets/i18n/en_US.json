@@ -396,7 +396,13 @@
         "satellite_heading": "Satellite Settings",
         "satellite_delete_desc": "This will delete the Satellite device and all downstream devices.",
         "satellite_delete_header": "Delete Satellite Devices",
-        "title": "DVB-T/S/C, ATSC or ISDB-T tuner card"
+        "title": "DVB-T/S/C, ATSC or ISDB-T tuner card",
+        "satellite_connect": "Connect Satellite Device",
+        "satellite_connect_tooltip": "Connect an existing satellite configuration to this tuner",
+        "satellite_select": "Select Device Tree",
+        "satellite_disconnect": "Disconnect Satellite from this Tuner",
+        "satellite_disconnect_warning": "This will disconnect the satellite settings from this tuner. They can still be used with other tuners.",
+        "satellite_disconnect_error": "Satellite setting is in use on another tuner, cannot be deleted. Use Disconnect Instead."
       },
       "diseqc": {
         "cmdrepeat_label": "Repeat Count",

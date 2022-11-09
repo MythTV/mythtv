@@ -32,6 +32,7 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
   m_CaptureCardList!: CaptureCardList;
   m_CaptureCardsFiltered!: CardAndInput[];
   m_CaptureCardList$!: Observable<CaptureCardList>;
+  diseqcTreeList!: DiseqcTreeList;
   displayModal: boolean = false;
   selectedCardType: CardType = { CardType: "", Description: "" };
   displayDeleteAllonHost: boolean = false;
@@ -86,6 +87,21 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
   }
 
   ngOnInit(): void {
+    this.loadDiseqc();
+  }
+
+  loadDiseqc() {
+    // Get DiseqcTree list
+    this.captureCardService.GetDiseqcTreeList()
+      .subscribe({
+        next: data => {
+          this.diseqcTreeList = data;
+        },
+        error: (err: any) => {
+          console.log("GetDiseqcTreeList", err);
+          this.errorCount++;
+        }
+      })
   }
 
   onTabOpen(e: { index: number }) {
@@ -219,7 +235,7 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
       }
     });
     // Delete any diseqc tree attached to the card
-    this.deleteDiseqc(this.m_CaptureCardsFiltered[index].DiSEqCId);
+    // this.deleteDiseqc(this.m_CaptureCardsFiltered[index].DiSEqCId);
     this.m_CaptureCardsFiltered[index].DiSEqCId = 0;
     // Delete this card. Needs to be separate in case this card was added
     // during this session, then it would not be in the m_CaptureCardList.
@@ -229,27 +245,7 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
       .subscribe(this.delObserver);
   }
 
-  deleteDiseqc(id: number) {
-    if (id) {
-      // Delete this entry
-      this.expectedCount++;
-      this.captureCardService.DeleteDiseqcTree(id)
-        .subscribe({
-          next: (x: any) => {
-            if (x.bool)
-              this.successCount++;
-            else
-              this.errorCount++;
-          },
-          error: (err: any) => {
-            console.error(err);
-            this.errorCount++;
-          }
-        })
-    }
-  }
-
-  deleteAllOnHost() {
+    deleteAllOnHost() {
     // Check if prior is finished by checking counts
     if (this.successCount + this.errorCount < this.expectedCount)
       return;
@@ -276,7 +272,7 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
     this.m_CaptureCardList.CaptureCardList.CaptureCards.forEach(card => {
       if (card.HostName != this.m_hostName) {
         // Delete any diseqc tree attached to the card
-        this.deleteDiseqc(card.DiSEqCId);
+        // this.deleteDiseqc(card.DiSEqCId);
         card.DiSEqCId = 0;
         console.log("DeleteThis (other host):", card.CardId);
         this.expectedCount++;
