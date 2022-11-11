@@ -243,31 +243,43 @@ def buildNumbers(args, opts):
             early_match_list = []
             minTimeDelta = timedelta(minutes=60)
             for i, ep in enumerate(episodes):
-                epInTgtZone = datetime.fromIso(ep.timestamp, tz = posixtzinfo(show_tz))
-                durationDelta = timedelta(minutes=ep.duration)
+                if ep.timestamp:
+                    epInTgtZone = datetime.fromIso(ep.timestamp, tz = posixtzinfo(show_tz))
+                    if ep.duration:
+                        durationDelta = timedelta(minutes=ep.duration)
+                    else:
+                        durationDelta = timedelta(minutes=0)
 
-                # Consider it a match if the recording starts late, but within the duration of the show.
-                if epInTgtZone <= dtInTgtZone < epInTgtZone+durationDelta:
-                    # Recording start time is within the range of this episode
-                    if opts.debug:
-                        print('Recording in range of inetref %d, season %d, episode %d (%s ... %s)' \
+                    if epInTgtZone == dtInTgtZone:
+                        if opts.debug:
+                            print('Recording matches inetref %d, season %d, episode %d at %s' \
+                                % (inetref, ep.season, ep.number, epInTgtZone))
+                        time_match_list.append(i)
+                        minTimeDelta = timedelta(minutes=0)
+
+                    # Consider it a match if the recording starts late,
+                    # but within the duration of the show.
+                    elif epInTgtZone < dtInTgtZone < epInTgtZone+durationDelta:
+                        # Recording start time is within the range of this episode
+                        if opts.debug:
+                            print('Recording in range of inetref %d, season %d, episode %d (%s ... %s)' \
                                 % (inetref, ep.season, ep.number, epInTgtZone, epInTgtZone+durationDelta))
-                    time_match_list.append(i)
-                    minTimeDelta = timedelta(minutes=0)
-                # Consider it a match if the recording is a little bit early. This helps cases
-                # where you set up a rule to record, at say 9:00, and the broadcaster uses a
-                # slightly odd start time, like 9:05.
-                elif epInTgtZone-minTimeDelta <= dtInTgtZone < epInTgtZone:
-                    # Recording started earlier than this episode, so see if it's the closest match
-                    if epInTgtZone - dtInTgtZone == minTimeDelta:
-                        if opts.debug:
-                            print('adding episode to closest list', epInTgtZone - dtInTgtZone, '\n')
-                        early_match_list.append(i)
-                    elif epInTgtZone - dtInTgtZone < minTimeDelta:
-                        if opts.debug:
-                            print('this episode is new closest', epInTgtZone - dtInTgtZone, '\n')
-                        minTimeDelta = epInTgtZone - dtInTgtZone
-                        early_match_list = [i]
+                        time_match_list.append(i)
+                        minTimeDelta = timedelta(minutes=0)
+                    # Consider it a match if the recording is a little bit early. This helps cases
+                    # where you set up a rule to record, at say 9:00, and the broadcaster uses a
+                    # slightly odd start time, like 9:05.
+                    elif epInTgtZone-minTimeDelta <= dtInTgtZone < epInTgtZone:
+                        # Recording started earlier than this episode, so see if it's the closest match
+                        if epInTgtZone - dtInTgtZone == minTimeDelta:
+                            if opts.debug:
+                                print('adding episode to closest list', epInTgtZone - dtInTgtZone, '\n')
+                            early_match_list.append(i)
+                        elif epInTgtZone - dtInTgtZone < minTimeDelta:
+                            if opts.debug:
+                                print('this episode is new closest', epInTgtZone - dtInTgtZone, '\n')
+                            minTimeDelta = epInTgtZone - dtInTgtZone
+                            early_match_list = [i]
 
             if not time_match_list:
                 # No exact matches found, so use the list of the closest episode(s)
