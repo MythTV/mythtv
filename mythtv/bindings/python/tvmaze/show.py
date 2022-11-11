@@ -47,7 +47,10 @@ class Show(object):
         self.language = show.get('language')
         self.genres = show.get('genres')
         self.status = show.get('status')
-        self.num_episodes = show.get('runtime')
+        self.runtime = show.get('runtime')
+        # Sometimes runtime is empty, but averageRuntime is not
+        if self.runtime is None:
+            self.runtime = show.get('averageRuntime')
         self.seasons = {}
         self._episode_list = []
         self.specials = {}

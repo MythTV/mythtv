@@ -446,7 +446,8 @@ def buildSingleItem(inetref, season, episode_id):
     elif show_info.premiere_date:
         m.releasedate = check_item(m, ("releasedate", show_info.premiere_date))
         m.year = check_item(m, ("year", show_info.premiere_date.year))
-    m.runtime = check_item(m, ("runtime", int(ep_info.duration)))
+    if ep_info.duration:
+        m.runtime = check_item(m, ("runtime", int(ep_info.duration)))
 
     for actor in show_info.cast:
         try:
