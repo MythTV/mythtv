@@ -10,6 +10,7 @@ import { CanDeactivateGuardService } from './can-deactivate-guard.service';
 import { CaptureCardsComponent } from './config/settings/capture-cards/capture-cards.component';
 import { VideoSourcesComponent } from './config/settings/video-sources/video-sources.component';
 import { InputConnectionsComponent } from './config/settings/input-connections/input-connections.component';
+import { StorageGroupsComponent } from './config/settings/storage-groups/storage-groups.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
@@ -29,6 +30,10 @@ const routes: Routes = [
   },
   {
     path: 'settings/input-connections', component: InputConnectionsComponent,
+    canDeactivate: [CanDeactivateGuardService]
+  },
+  {
+    path: 'settings/storage-groups', component: StorageGroupsComponent,
     canDeactivate: [CanDeactivateGuardService]
   },
   { path: 'testbed', component: TestbedComponent },

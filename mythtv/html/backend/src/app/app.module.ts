@@ -62,6 +62,8 @@ import { VideoSourcesComponent } from './config/settings/video-sources/video-sou
 import { VsourceComponent } from './config/settings/video-sources/vsource/vsource.component';
 import { InputConnectionsComponent } from './config/settings/input-connections/input-connections.component';
 import { IconnectionComponent } from './config/settings/input-connections/iconnection/iconnection.component';
+import { StorageGroupsComponent } from './config/settings/storage-groups/storage-groups.component';
+import { SgroupComponent } from './config/settings/storage-groups/sgroup/sgroup.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -120,6 +122,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     VsourceComponent,
     InputConnectionsComponent,
     IconnectionComponent,
+    StorageGroupsComponent,
+    SgroupComponent,
   ],
   imports: [
     BrowserModule,

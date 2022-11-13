@@ -1,0 +1,44 @@
+<div class="block card w-full">
+    <h3>{{ 'settings.sgroups.title' | translate }}</h3>
+
+    <p-button label="New Storage Group" (onClick)="displayNewDlg = true" icon="pi pi-plus-circle"
+        styleClass="p-button-plain"></p-button>
+    <p-dialog header="New Storage Group" [(visible)]="displayNewDlg" [modal]="true" [style]="{width: '50vw'}"
+        [draggable]="false" [resizable]="false">
+        <p>{{ 'settings.sgroups.name_prompt' | translate }}</p>
+        <div class="form-group field">
+            <label for="GroupName" class="block">{{ 'settings.sgroups.name_label' | translate }}</label>
+            <input pInputText id="GroupName" [(ngModel)]="newGroupName" name="GroupName" #GroupName="ngModel"
+                class="mb-2 form-control w-full" />
+            <small class="block">
+            </small>
+        </div>
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-times-circle" (onClick)="displayNewDlg=false"
+                label="{{ 'common.cancel' | translate }}" styleClass="p-button-plain">
+            </p-button>
+            <p-button icon="pi pi-check-circle" (onClick)="newGroup();" label="{{ 'common.ok' | translate }}"
+                styleClass="p-button-plain" [disabled]="newGroupName == ''"></p-button>
+        </ng-template>
+    </p-dialog>
+    <br>
+    <p-accordion class="col-12 w-full" (onClose)="onTabClose($event)" (onOpen)="onTabOpen($event)">
+        <p-accordionTab *ngFor="let group of storageGroups; index as ix; first as isFirst" [(selected)]="activeTab[ix]">
+            <ng-template pTemplate="header">
+                <div class="grid  w-full">
+                    <div class="col-9 pr-1">
+
+                        <span *ngIf="storageGroups[ix].DirNames.length == 0; else onlyName"
+                            [translate]="'settings.sgroups.tab_create_title'"
+                            [translateParams]="{name: storageGroups[ix].LocalizedName}"></span>
+                        <ng-template #onlyName> {{storageGroups[ix].LocalizedName}} </ng-template>
+                        <b>&nbsp;{{ dirtyMessages[ix] }}</b>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="content">
+                <app-sgroup [sgroup]="storageGroups[ix]" [hostName]="hostName"></app-sgroup>
+            </ng-template>
+        </p-accordionTab>
+    </p-accordion>
+</div>

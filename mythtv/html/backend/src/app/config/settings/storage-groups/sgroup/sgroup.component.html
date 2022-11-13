@@ -1,0 +1,79 @@
+<form class="ml-3 mr-3" name="sgroupform" #sgroupform="ngForm">
+    <span #top></span>
+    <p-card class="m-5">
+        <ng-template pTemplate="title">
+            <span [translate]="'settings.sgroups.sgroup_title'" [translateParams]="{name: sgroup.LocalizedName}"></span>
+        </ng-template>
+        <ng-template pTemplate="subtitle">
+        </ng-template>
+        <ng-template pTemplate="content">
+            <div class="grid">
+                <div class="mb-4 w-full">
+                    <table>
+                        <tr *ngFor="let dirname of editDirs; index as ix">
+                            <td class="align-items-center bg-blue-100" style="font-family: monospace;">
+                                {{editDirs[ix]}}
+                            <td class="align-items-center">
+                                <button pButton pRipple type="button" icon="pi pi-pencil"
+                                    class="p-button-rounded p-button-text" [disabled]="!editDirs[ix]"
+                                    (click)="editDirectory(ix)" pTooltip="Edit"></button>
+                            </td>
+                            <td class="align-items-center">
+                                <button pButton pRipple type="button" icon="pi pi-trash"
+                                    class="p-button-rounded p-button-text" [disabled]="!editDirs[ix]"
+                                    (click)="deleteDirectory(ix)" pTooltip="Delete"></button>
+                            </td>
+                            <td>
+                                <div *ngIf="!editDirs[ix]">
+                                    <b>{{ 'settings.sgroups.deleted_label' | translate }}</b>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <p-dialog header="{{ 'settings.sgroups.seldir_title' | translate }}" [(visible)]="showEditDlg"
+                        [modal]="true" [draggable]="false" [resizable]="false" [style]="{width: '50vw'}">
+                        <div class="form-group field">
+                            <label for="DirName" class="block">{{ 'settings.sgroups.dirname_label' | translate
+                                }}</label>
+                            <input pInputText id="DirName" [(ngModel)]="editDirName" name="DirName" #DirName="ngModel"
+                                class="mb-2 form-control w-full" style="font-family: monospace;"
+                                (change)="textChange()" />
+                        </div>
+                        <p-listbox [options]="dirSelect" [(ngModel)]="selectedDir" name="ListDirs"
+                            (onClick)="selectDir();" #ListDirs="ngModel" [listStyle]="{'height':'50vh'}" >
+                        </p-listbox>
+                        <ng-template pTemplate="footer">
+                            <p-button icon="pi pi-times-circle" (onClick)="showEditDlg=false"
+                                label="{{ 'common.cancel' | translate }}" styleClass="p-button-plain">
+                            </p-button>
+                            <p-button icon="pi pi-check-circle"
+                                (onClick)="editDirs[editDlgNum]=editDirName;showEditDlg=false"
+                                label="{{ 'common.ok' | translate }}" styleClass="p-button-plain">
+                            </p-button>
+                        </ng-template>
+                    </p-dialog>
+                    <br>
+                    <p-button label="{{ 'settings.sgroups.adddir_button' | translate }}" (onClick)="addDirectory()"
+                        icon="pi pi-plus-circle" styleClass="p-button-plain"></p-button>
+
+
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+            <div class="grid nogutter">
+                <div class="col-12">
+                    <p-message *ngIf="this.successCount > 0 && this.errorCount == 0 && !sgroupform.dirty"
+                        severity="success" text="{{ 'common.savesuccess' | translate }}"></p-message>
+                    <p-message *ngIf="this.errorCount > 0" severity="error"
+                        text="{{ 'common.networkfail' | translate }}"></p-message>
+                </div>
+                <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
+                    (onClick)="saveForm(); sgroupform.form.markAsPristine()" [disabled]="(!sgroupform.dirty)">
+                </p-button>
+            </div>
+        </ng-template>
+    </p-card>
+</form>

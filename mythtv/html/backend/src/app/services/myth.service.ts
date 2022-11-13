@@ -96,6 +96,12 @@ export class MythService {
     }
   }
 
+  public GetDirListing(DirName : string) : Observable<{DirListing: String[]}> {
+    let params = new HttpParams()
+      .set("DirName", DirName);
+    return this.httpClient.get<{DirListing: String[]}>('/Myth/GetDirListing', {params});
+  }
+
   public GetTimeZone() : Observable<MythTimeZone> {
     return this.httpClient.get<MythTimeZone>('/Myth/GetTimeZone');
   }

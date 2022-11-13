@@ -505,7 +505,8 @@
       "demo": {
         "title": "Demo Test Recorder",
         "file_desc": "A local MPEG file used to simulate a recording."
-      }
+      },
+      "selet_type": "Select capure card type"
     },
     "common": {
       "successful_delete": "Successful delete",
@@ -604,7 +605,37 @@
         "label": "Input Group",
         "desc": "Input groups are only needed when two or more cards share the same resource such as a FireWire card and an analog card input controlling the same set top box. Leave blank unless this input is shared with another device. Only one of the inputs in an input group will be allowed to record at any given time."
       }
-    }
+    },
+    "sgroups": {
+      "special": {
+        "Default": "Default",
+        "LiveTV": "LiveTV",
+        "DB Backups": "DB Backups",
+        "Videos": "Videos",
+        "Trailers": "Trailers",
+        "Coverart": "Coverart",
+        "Fanart": "Fanart",
+        "Screenshots": "Screenshots",
+        "Banners": "Banners",
+        "Photographs": "Photographs",
+        "Music": "Music",
+        "MusicArt": "MusicArt"
+      },
+      "title": "Storage Groups",
+      "name_prompt": "Enter new Storage Group Name",
+      "name_label": "Storage Group Name",
+      "tab_create_title": "(Create {{name}} Group)",
+      "sgroup_title": "Storage Group {{name}}",
+      "deleted_label": "Deleted",
+      "dirname_label": "Directory Name",
+      "seldir_title": "Select Directory",
+      "adddir_button": "Add a Directory",
+      "updir": "UP 1 LEVEL"
+    },
+    "iconnections": {
+      "title": "Input Connections"
+    },
+    "clipbord_tooltip": "Copy to Clipboard"
   },
   "sidenav": {
     "settingsmenu": {
