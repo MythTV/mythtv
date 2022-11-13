@@ -2,11 +2,17 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
-#include <SoundTouch.h>
 
 // POSIX headers
 #include <unistd.h>
 #include <sys/time.h>
+
+// SoundTouch
+#if __has_include(<soundtouch/SoundTouch.h>)
+#include <soundtouch/SoundTouch.h>
+#else
+#include <SoundTouch.h>
+#endif
 
 // Qt headers
 #include <QtGlobal>
