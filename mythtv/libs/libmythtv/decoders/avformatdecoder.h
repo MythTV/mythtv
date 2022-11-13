@@ -274,7 +274,6 @@ class AvFormatDecoder : public DecoderBase
     struct SwsContext *m_swsCtx                       {nullptr};
     bool               m_directRendering              {false};
 
-    bool               m_noDtsHack                    {false};
     bool               m_doRewind                     {false};
 
     bool               m_gopSet                       {false};
