@@ -18,6 +18,8 @@
 #include <sys/wait.h>
 #include <sys/param.h>
 
+#include "libmythbase/mythconfig.h"
+
 // Qt headers
 #include <QtGlobal>
 #if CONFIG_QTDBUS
@@ -33,7 +35,6 @@
 // MythTV headers
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythcdrom.h"
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythhdd.h"
 #include "libmythbase/mythlogging.h"
