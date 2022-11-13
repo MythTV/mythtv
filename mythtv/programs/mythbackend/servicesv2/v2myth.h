@@ -69,6 +69,8 @@ class V2Myth : public MythHTTPService
 
     static QStringList  GetKeys             ( );
 
+    static QStringList  GetDirListing          ( const QString &DirName );
+
     static V2StorageGroupDirList*  GetStorageGroupDirs ( const QString   &GroupName,
                                                   const QString   &HostName );
 
