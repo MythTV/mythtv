@@ -2459,18 +2459,12 @@ find_things(){
     sed -n "s/^[^#]*$pattern.*([^,]*, *\([^,]*\)\(,.*\)*).*/\1_$thing/p" "$file"
 }
 
-FILTER_LIST=$(find_things   filter   FILTER   external/FFmpeg/libavfilter/allfilters.c)
-
 find_things_extern(){
     thing=$1
     pattern=$2
     file=$source_path/$3
     sed -n "s/^[^#]*extern.*$pattern *ff_\([^ ]*\)_$thing;/\1_$thing/p" "$file"
 }
-
-ALL_COMPONENTS="
-    $FILTER_LIST
-"
 
 for n in $COMPONENT_LIST; do
     v=$(toupper ${n%s})_LIST
@@ -6665,8 +6659,6 @@ merge_deps() {
     done
 }
 
-merge_deps libavfilter $FILTER_LIST
-
 map 'enabled $v && intrinsics=${v#intrinsics_}' $INTRINSICS_LIST
 
 for thread in $THREADS_LIST; do
@@ -6699,51 +6691,6 @@ for lib in $AUTODETECT_LIBS; do
 done
 
 enabled zlib && add_cppflags -DZLIB_CONST
-
-# conditional library dependencies, in linking order
-enabled afftfilt_filter     && prepend avfilter_deps "avcodec"
-enabled afir_filter         && prepend avfilter_deps "avcodec"
-enabled amovie_filter       && prepend avfilter_deps "avformat avcodec"
-enabled aresample_filter    && prepend avfilter_deps "swresample"
-enabled atempo_filter       && prepend avfilter_deps "avcodec"
-enabled cover_rect_filter   && prepend avfilter_deps "avformat avcodec"
-enabled ebur128_filter && enabled swresample && prepend avfilter_deps "swresample"
-enabled elbg_filter         && prepend avfilter_deps "avcodec"
-enabled fftfilt_filter      && prepend avfilter_deps "avcodec"
-enabled find_rect_filter    && prepend avfilter_deps "avformat avcodec"
-enabled firequalizer_filter && prepend avfilter_deps "avcodec"
-enabled mcdeint_filter      && prepend avfilter_deps "avcodec"
-enabled movie_filter    && prepend avfilter_deps "avformat avcodec"
-enabled pan_filter          && prepend avfilter_deps "swresample"
-enabled pp_filter           && prepend avfilter_deps "postproc"
-enabled removelogo_filter   && prepend avfilter_deps "avformat avcodec swscale"
-enabled sab_filter          && prepend avfilter_deps "swscale"
-enabled scale_filter    && prepend avfilter_deps "swscale"
-enabled scale2ref_filter    && prepend avfilter_deps "swscale"
-enabled showcqt_filter      && prepend avfilter_deps "avformat avcodec swscale"
-enabled showfreqs_filter    && prepend avfilter_deps "avcodec"
-enabled showspectrum_filter && prepend avfilter_deps "avcodec"
-enabled signature_filter    && prepend avfilter_deps "avcodec avformat"
-enabled smartblur_filter    && prepend avfilter_deps "swscale"
-enabled spectrumsynth_filter && prepend avfilter_deps "avcodec"
-enabled spp_filter          && prepend avfilter_deps "avcodec"
-enabled subtitles_filter    && prepend avfilter_deps "avformat avcodec"
-enabled uspp_filter         && prepend avfilter_deps "avcodec"
-enabled zoompan_filter      && prepend avfilter_deps "swscale"
-
-enabled lavfi_indev         && prepend avdevice_deps "avfilter"
-
-expand_deps(){
-    lib_deps=${1}_deps
-    eval "deps=\$$lib_deps"
-    append $lib_deps $(map 'eval echo \$${v}_deps' $deps)
-    unique $lib_deps
-}
-
-#we have to remove gpl from the deps here as some code assumes all lib deps are libs
-postproc_deps="$(filter_out 'gpl' $postproc_deps)"
-
-map 'expand_deps $v' $LIBRARY_LIST
 
 if enabled x86 && (disabled mmx && ! enabled disable_mmx_for_debugging); then
     die "ERROR: MMX disabled on x86, MythTV will be very slow.\n\tDisable this check with --enable-disable-mmx-for-debugging"
