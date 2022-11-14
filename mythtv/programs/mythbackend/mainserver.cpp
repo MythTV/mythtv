@@ -19,16 +19,6 @@
 #include <systemd/sd-daemon.h>
 #endif
 
-#include <sys/stat.h>
-#ifdef __linux__
-#  include <sys/vfs.h>
-#else // if !__linux__
-#  include <sys/param.h>
-#  ifndef _WIN32
-#    include <sys/mount.h>
-#  endif // _WIN32
-#endif // !__linux__
-
 // Qt
 #include <QtGlobal>
 #include <QCoreApplication>
@@ -51,7 +41,6 @@
 #include "libmythbase/filesysteminfo.h"
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythcorecontext.h"
-#include "libmythbase/mythcoreutil.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythdownloadmanager.h"
@@ -5154,8 +5143,6 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     int64_t totalKB = -1;
     int64_t usedKB = -1;
     QMap <QString, bool>foundDirs;
-    QString localStr = "1";
-    struct statfs statbuf {};
     QStringList groups(StorageGroup::kSpecialGroups);
     groups.removeAll("LiveTV");
     QString specialGroups = groups.join("', '");
@@ -5186,6 +5173,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
         QDir checkDir("");
         QString dirID;
         QString currentDir;
+        FileSystemInfo fsInfo;
         while (query.next())
         {
             dirID = query.value(0).toString();
@@ -5202,38 +5190,9 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
             {
                 if (checkDir.exists())
                 {
-                    QByteArray cdir = currentDir.toLatin1();
-                    getDiskSpace(cdir.constData(), totalKB, usedKB);
-                    memset(&statbuf, 0, sizeof(statbuf));
-                    localStr = "1"; // Assume local
-                    int bSize = 0;
+                    fsInfo = FileSystemInfo(gCoreContext->GetHostName(), currentDir, dirID.toInt());
 
-                    if (statfs(currentDir.toLocal8Bit().constData(), &statbuf) == 0)
-                    {
-#ifdef Q_OS_DARWIN
-                        char *fstypename = statbuf.f_fstypename;
-                        if ((!strcmp(fstypename, "nfs")) ||   // NFS|FTP
-                            (!strcmp(fstypename, "afpfs")) || // ApplShr
-                            (!strcmp(fstypename, "smbfs")))   // SMB
-                            localStr = "0";
-#elif defined(__linux__)
-                        long fstype = statbuf.f_type;
-                        if ((fstype == 0x6969) ||             // NFS
-                            (fstype == 0x517B) ||             // SMB
-                            (fstype == (long)0xFF534D42))     // CIFS
-                            localStr = "0";
-#endif
-                        bSize = statbuf.f_bsize;
-                    }
-
-                    strlist << gCoreContext->GetHostName();
-                    strlist << currentDir;
-                    strlist << localStr;
-                    strlist << "-1"; // Ignore fsID
-                    strlist << dirID;
-                    strlist << QString::number(bSize);
-                    strlist << QString::number(totalKB);
-                    strlist << QString::number(usedKB);
+                    strlist << fsInfo.ToStringList();
 
                     foundDirs[currentDir] = true;
                 }

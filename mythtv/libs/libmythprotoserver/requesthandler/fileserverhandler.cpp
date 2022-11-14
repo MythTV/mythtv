@@ -530,8 +530,7 @@ QList<FileSystemInfo> FileServerHandler::QueryFileSystems(void)
             {
                 if (checkDir.exists())
                 {
-                    disk.PopulateDiskSpace();
-                    disk.PopulateFSProp();
+                    disk.refresh();
                     disks << disk;
 
                     foundDirs[currentDir] = true;

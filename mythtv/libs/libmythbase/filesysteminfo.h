@@ -14,18 +14,42 @@ class MBASE_PUBLIC FileSystemInfo
 {
   public:
     FileSystemInfo() = default;
-    FileSystemInfo(const FileSystemInfo &other);
-    FileSystemInfo(QString hostname, QString path, bool local, int fsid,
-             int groupid, int blksize, int64_t total, int64_t used);
-    FileSystemInfo(QStringList::const_iterator &it,
-            const QStringList::const_iterator& end);
-    explicit FileSystemInfo(const QStringList &slist);
+    FileSystemInfo(QString hostname,
+                   QString path,
+                   int groupid = -1)
+                   :
+        m_hostname  (std::move(hostname)),
+        m_path      (std::move(path)),
+        m_grpid     (groupid)
+    {
+        refresh();
+    }
+    FileSystemInfo(QString hostname,
+                   QString path,
+                   bool local,
+                   int fsid,
+                   int groupid,
+                   int blksize,
+                   int64_t total,
+                   int64_t used)
+                   :
+        m_hostname  (std::move(hostname)),
+        m_path      (std::move(path)),
+        m_local     (local),
+        m_fsid      (fsid),
+        m_grpid     (groupid),
+        m_blksize   (blksize),
+        m_total     (total),
+        m_used      (used)
+    {
+    }
+    FileSystemInfo(QStringList::const_iterator &it, const QStringList::const_iterator& end)
+    {
+        FromStringList(it, end);
+    }
+    explicit FileSystemInfo(const QStringList &slist) { FromStringList(slist); }
 
-    virtual ~FileSystemInfo(void) = default;
-
-    FileSystemInfo &operator=(const FileSystemInfo &other);
-    virtual void clone(const FileSystemInfo &other);
-    void clear(void);
+    void clear() { *this = FileSystemInfo(); }
 
     // information gets
     QString     getHostname(void)     const { return m_hostname; }
@@ -58,8 +82,10 @@ class MBASE_PUBLIC FileSystemInfo
     static QList<FileSystemInfo> RemoteGetInfo(MythSocket *sock=nullptr);
     static void Consolidate(QList<FileSystemInfo> &disks, bool merge=true,
                             int64_t fuzz=14000);
-    void PopulateDiskSpace(void);
-    void PopulateFSProp(void);
+
+    /// @brief update statfs filesystem statistics by reading from the storage device
+    /// @returns If successful
+    bool refresh();
 
   private:
     bool        FromStringList(const QStringList &slist);
@@ -68,12 +94,15 @@ class MBASE_PUBLIC FileSystemInfo
 
     QString m_hostname;
     QString m_path;
-    bool m_local    {false};
-    int m_fsid      {-1};
-    int m_grpid     {-1};
+    bool    m_local {false}; ///< set based on statfs
+    int     m_fsid  {-1};    ///< set by Consolidate
+    int     m_grpid {-1};    ///< set by setGroupID
+    // cached from statfs
     int m_blksize   {4096};
     int64_t m_total {0};
     int64_t m_used  {0};
-    int m_weight    {0};
+
+    // not serialized
+    int     m_weight    {0}; ///< set by setWeight
 };
 #endif

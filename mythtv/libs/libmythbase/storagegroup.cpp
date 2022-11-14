@@ -6,7 +6,7 @@
 #include "mythcorecontext.h"
 #include "mythdb.h"
 #include "mythlogging.h"
-#include "mythcoreutil.h"
+#include "filesysteminfo.h"
 #include "mythdirs.h"
 
 #define LOC QString("SG(%1): ").arg(m_groupname)
@@ -663,9 +663,8 @@ QString StorageGroup::FindNextDirMostFree(void)
 {
     QString nextDir;
     int64_t nextDirFree = 0;
-    int64_t thisDirTotal = 0;
-    int64_t thisDirUsed = 0;
     int64_t thisDirFree = 0;
+    FileSystemInfo fsInfo;
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("FindNextDirMostFree: Starting"));
 
@@ -689,8 +688,8 @@ QString StorageGroup::FindNextDirMostFree(void)
             continue;
         }
 
-        thisDirFree = getDiskSpace(m_dirlist[curDir], thisDirTotal,
-                                   thisDirUsed);
+        fsInfo = FileSystemInfo(QString(), m_dirlist[curDir]);
+        thisDirFree = fsInfo.getFreeSpace();
         LOG(VB_FILE, LOG_DEBUG, LOC +
             QString("FindNextDirMostFree: '%1' has %2 KiB free")
                 .arg(m_dirlist[curDir], QString::number(thisDirFree)));
