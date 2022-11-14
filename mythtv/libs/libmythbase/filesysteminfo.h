@@ -1,6 +1,5 @@
 #ifndef DISKINFO_H_
 #define DISKINFO_H_
-static constexpr int8_t NUMDISKINFOLINES { 8 };
 
 #include <cstdint>
 
@@ -54,6 +53,7 @@ class MBASE_PUBLIC FileSystemInfo
     void setWeight(int weight)              { m_weight = weight; }
 
     bool        ToStringList(QStringList &slist) const;
+    QStringList ToStringList() const;
 
     static QList<FileSystemInfo> RemoteGetInfo(MythSocket *sock=nullptr);
     static void Consolidate(QList<FileSystemInfo> &disks, bool merge=true,
