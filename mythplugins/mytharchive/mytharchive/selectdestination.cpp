@@ -8,7 +8,7 @@
 
 // myth
 #include <libmyth/mythcontext.h>
-#include <libmythbase/mythcoreutil.h>
+#include <libmythbase/filesysteminfo.h>
 #include <libmythbase/stringutil.h>
 #include <libmythui/mythmainwindow.h>
 #include <libmythui/mythuibutton.h>
@@ -238,9 +238,8 @@ void SelectDestination::setDestination(MythUIButtonListItem* item)
             m_doBurnText->Show();
             break;
         case AD_FILE:
-            int64_t dummy = 0;
             ArchiveDestinations[itemNo].freeSpace = 
-                    getDiskSpace(m_filenameEdit->GetText(), dummy, dummy);
+                    FileSystemInfo(QString(), m_filenameEdit->GetText()).getFreeSpace();
 
             m_filenameEdit->Show();
             m_findButton->Show();
@@ -291,12 +290,11 @@ void SelectDestination::fileFinderClosed(const QString& filename)
 
 void SelectDestination::filenameEditLostFocus()
 {
-    int64_t dummy = 0;
-    m_archiveDestination.freeSpace = getDiskSpace(m_filenameEdit->GetText(), dummy, dummy);
+    auto fsInfo = FileSystemInfo(QString(), m_filenameEdit->GetText());
 
     // if we don't get a valid freespace value it probably means the file doesn't
     // exist yet so try looking up the freespace for the parent directory 
-    if (m_archiveDestination.freeSpace == -1)
+    if (!fsInfo.refresh())
     {
         QString dir = m_filenameEdit->GetText();
         int pos = dir.lastIndexOf('/');
@@ -305,16 +303,18 @@ void SelectDestination::filenameEditLostFocus()
         else
             dir = "/";
 
-        m_archiveDestination.freeSpace = getDiskSpace(dir, dummy, dummy);
+        fsInfo = FileSystemInfo(QString(), dir);
     }
 
-    if (m_archiveDestination.freeSpace != -1)
+    if (fsInfo.refresh())
     {
+        m_archiveDestination.freeSpace = fsInfo.getFreeSpace();
         m_freespaceText->SetText(StringUtil::formatKBytes(m_archiveDestination.freeSpace, 2));
         m_freeSpace = m_archiveDestination.freeSpace;
     }
     else
     {
+        m_archiveDestination.freeSpace = -1;
         m_freespaceText->SetText(tr("Unknown"));
         m_freeSpace = 0;
     }

@@ -53,7 +53,6 @@
 #include <libmyth/mythcontext.h>
 #include <libmythbase/exitcodes.h>
 #include <libmythbase/mythcommandlineparser.h>
-#include <libmythbase/mythcoreutil.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythdirs.h>
