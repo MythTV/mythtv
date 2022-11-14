@@ -31,8 +31,6 @@
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 
-static constexpr int k_lines = 8;
-
 QStringList FileSystemInfo::ToStringList() const
 {
     QStringList list;
@@ -97,11 +95,10 @@ bool FileSystemInfo::FromStringList(QStringList::const_iterator &it,
     return true;
 }
 
-// TODO don't use QList
 // default: sock = nullptr
-QList<FileSystemInfo> FileSystemInfo::RemoteGetInfo(MythSocket *sock)
+FileSystemInfoList FileSystemInfo::RemoteGetInfo(MythSocket *sock)
 {
-    QList<FileSystemInfo> fsInfos;
+    FileSystemInfoList fsInfos;
     QStringList strlist(QStringLiteral("QUERY_FREE_SPACE_LIST"));
 
     if ((sock != nullptr)
@@ -109,12 +106,7 @@ QList<FileSystemInfo> FileSystemInfo::RemoteGetInfo(MythSocket *sock)
         : gCoreContext->SendReceiveStringList(strlist)
        )
     {
-        QStringList::const_iterator it = strlist.cbegin();
-        while (it < strlist.cend())
-        {
-            //FromStringList(it, strlist.cend());
-            fsInfos.append(FileSystemInfo(it, strlist.cend()));
-        }
+        fsInfos = FileSystemInfoManager::FromStringList(strlist);
     }
 
     return fsInfos;
@@ -208,4 +200,29 @@ bool FileSystemInfo::refresh()
         return true;
     }
     return false;
+}
+
+
+FileSystemInfoList FileSystemInfoManager::FromStringList(const QStringList& list)
+{
+    FileSystemInfoList fsInfos;
+    fsInfos.reserve(list.size() / FileSystemInfo::k_lines + 1);
+
+    QStringList::const_iterator it = list.cbegin();
+    while (it < list.cend())
+    {
+        fsInfos.push_back(FileSystemInfo(it, list.cend()));
+    }
+
+    return fsInfos;
+}
+
+QStringList FileSystemInfoManager::ToStringList(const FileSystemInfoList& fsInfos)
+{
+    QStringList strlist;
+    for (const auto & fsInfo : fsInfos)
+    {
+        strlist << fsInfo.ToStringList();
+    }
+    return strlist;
 }

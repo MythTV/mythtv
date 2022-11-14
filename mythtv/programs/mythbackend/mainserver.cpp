@@ -5140,59 +5140,54 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                                        bool allHosts)
 {
     QString allHostList = gCoreContext->GetHostName();
-    int64_t totalKB = -1;
-    int64_t usedKB = -1;
-    QMap <QString, bool>foundDirs;
+
+    // TODO deduplicate mythbackend and libmythprotoserver code
+    // FileServerHandler::QueryFileSystems()
+    const QString localHostName = gCoreContext->GetHostName(); // cache this
     QStringList groups(StorageGroup::kSpecialGroups);
     groups.removeAll("LiveTV");
     QString specialGroups = groups.join("', '");
-    QString sql = QString("SELECT MIN(id),dirname "
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(QString("SELECT MIN(id),dirname "
                             "FROM storagegroup "
                            "WHERE hostname = :HOSTNAME "
                              "AND groupname NOT IN ( '%1' ) "
-                           "GROUP BY dirname;").arg(specialGroups);
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(sql);
-    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
+                           "GROUP BY dirname;").arg(specialGroups));
+    query.bindValue(":HOSTNAME", localHostName);
 
-    if (query.exec())
+    FileSystemInfoList fsInfos;
+    if (query.exec() && query.isActive())
     {
         // If we don't have any dirs of our own, fallback to list of Default
         // dirs since that is what StorageGroup::Init() does.
         if (!query.size())
         {
             query.prepare("SELECT MIN(id),dirname "
-                          "FROM storagegroup "
-                          "WHERE groupname = :GROUP "
-                          "GROUP BY dirname;");
+                            "FROM storagegroup "
+                           "WHERE groupname = :GROUP "
+                           "GROUP BY dirname;");
             query.bindValue(":GROUP", "Default");
             if (!query.exec())
-                MythDB::DBError("BackendQueryDiskSpace", query);
+                MythDB::DBError("BackendQueryFileSystems", query);
         }
 
-        QDir checkDir("");
-        QString dirID;
-        QString currentDir;
-        FileSystemInfo fsInfo;
+        QMap<QString, bool> foundDirs;
+
         while (query.next())
         {
-            dirID = query.value(0).toString();
             /* The storagegroup.dirname column uses utf8_bin collation, so Qt
              * uses QString::fromAscii() for toString(). Explicitly convert the
              * value using QString::fromUtf8() to prevent corruption. */
-            currentDir = QString::fromUtf8(query.value(1)
-                                           .toByteArray().constData());
+            QString currentDir {QString::fromUtf8(query.value(1).toByteArray().constData())};
             if (currentDir.endsWith("/"))
                 currentDir.remove(currentDir.length() - 1, 1);
 
-            checkDir.setPath(currentDir);
             if (!foundDirs.contains(currentDir))
             {
-                if (checkDir.exists())
+                if (QDir(currentDir).exists())
                 {
-                    fsInfo = FileSystemInfo(gCoreContext->GetHostName(), currentDir, dirID.toInt());
-
-                    strlist << fsInfo.ToStringList();
+                    fsInfos.push_back(FileSystemInfo(localHostName, currentDir, query.value(0).toInt()));
 
                     foundDirs[currentDir] = true;
                 }
@@ -5203,7 +5198,9 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
             }
         }
     }
+    // end FileServerHandler::QueryFileSystems()
 
+    QStringList tmplist;
     if (allHosts)
     {
         QMap <QString, bool> backendsCounted;
@@ -5228,31 +5225,19 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
         m_sockListLock.unlock();
 
         for (auto & pbs : localPlaybackList) {
-            pbs->GetDiskSpace(strlist);
+            pbs->GetDiskSpace(tmplist); // QUERY_FREE_SPACE
             pbs->DecrRef();
         }
     }
 
     if (!consolidated)
-        return;
-
-    QList<FileSystemInfo> fsInfos;
-    QStringList::const_iterator it = strlist.cbegin();
-    while (it != strlist.cend())
     {
-        FileSystemInfo fsInfo;
-
-        fsInfo.setHostname(*(it++));
-        fsInfo.setPath(*(it++));
-        fsInfo.setLocal((*(it++)).toInt() > 0);
-        fsInfo.setFSysID(-1);
-        ++it;   // Without this, the strlist gets out of whack
-        fsInfo.setGroupID((*(it++)).toInt());
-        fsInfo.setBlockSize((*(it++)).toInt());
-        fsInfo.setTotalSpace((*(it++)).toLongLong());
-        fsInfo.setUsedSpace((*(it++)).toLongLong());
-        fsInfos.push_back(fsInfo);
+        strlist << FileSystemInfoManager::ToStringList(fsInfos) << tmplist;
+        return;
     }
+
+    fsInfos.append(FileSystemInfoManager::FromStringList(tmplist));
+    tmplist.clear(); // not used after this point
     strlist.clear();
 
     // Consolidate hosts sharing storage
@@ -5297,8 +5282,8 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     }
 
     // Passed the cleaned list back
-    totalKB = 0;
-    usedKB  = 0;
+    int64_t totalKB = 0;
+    int64_t usedKB  = 0;
     for (const auto & fsInfo : std::as_const(fsInfos))
     {
         strlist << fsInfo.getHostname();
