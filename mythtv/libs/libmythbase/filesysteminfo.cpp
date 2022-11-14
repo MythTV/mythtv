@@ -25,66 +25,7 @@
 
 #include "filesysteminfo.h"
 #include "mythcorecontext.h"
-#include "mythcoreutil.h"
 #include "mythlogging.h"
-
-FileSystemInfo::FileSystemInfo(const FileSystemInfo &other)
-{
-    FileSystemInfo::clone(other);
-}
-
-FileSystemInfo::FileSystemInfo(QString hostname, QString path, bool local,
-        int fsid, int groupid, int blksize, int64_t total, int64_t used) :
-    m_hostname(std::move(hostname)), m_path(std::move(path)), m_local(local), m_fsid(fsid),
-    m_grpid(groupid), m_blksize(blksize), m_total(total), m_used(used)
-{
-}
-
-FileSystemInfo::FileSystemInfo(QStringList::const_iterator &it,
-                   const QStringList::const_iterator& end)
-{
-    FromStringList(it, end);
-}
-
-FileSystemInfo::FileSystemInfo(const QStringList &slist)
-{
-    FromStringList(slist);
-}
-
-void FileSystemInfo::clone(const FileSystemInfo &other)
-{
-    m_hostname = other.m_hostname;
-    m_path = other.m_path;
-    m_local = other.m_local;
-    m_fsid = other.m_fsid;
-    m_grpid = other.m_grpid;
-    m_blksize = other.m_blksize;
-    m_total = other.m_total;
-    m_used = other.m_used;
-    m_weight = other.m_weight;
-}
-
-FileSystemInfo &FileSystemInfo::operator=(const FileSystemInfo &other)
-{
-    if (this == &other)
-        return *this;
-
-    clone(other);
-    return *this;
-}
-
-void FileSystemInfo::clear(void)
-{
-    m_hostname  = "";
-    m_path      = "";
-    m_local     = false;
-    m_fsid      = -1;
-    m_grpid     = -1;
-    m_blksize   = 4096;
-    m_total     = 0;
-    m_used      = 0;
-    m_weight    = 0;
-}
 
 static constexpr int k_lines = 8;
 
@@ -230,34 +171,45 @@ void FileSystemInfo::Consolidate(QList<FileSystemInfo> &disks,
     }
 }
 
-void FileSystemInfo::PopulateDiskSpace(void)
-{
-    int64_t total = -1;
-    int64_t used = -1;
-    getDiskSpace(getPath().toLatin1().constData(), total, used);
-    setTotalSpace(total);
-    setUsedSpace(used);
-}
-
-void FileSystemInfo::PopulateFSProp(void)
+bool FileSystemInfo::refresh()
 {
     struct statfs statbuf {};
 
-    if (statfs(getPath().toLocal8Bit().constData(), &statbuf) == 0)
+    // there are cases where statfs will return 0 (good), but f_blocks and
+    // others are invalid and set to 0 (such as when an automounted directory
+    // is not mounted but still visible because --ghost was used),
+    // so check to make sure we can have a total size > 0
+    if ((statfs(getPath().toLocal8Bit().constData(), &statbuf) == 0) &&
+        (statbuf.f_blocks > 0) && (statbuf.f_bsize > 0)
+       )
     {
+        m_total = statbuf.f_blocks * statbuf.f_bsize;
+        //free  = statbuf.f_bavail * statbuf.f_bsize;
+        m_used  = m_total - statbuf.f_bavail * statbuf.f_bsize;
+        m_blksize = statbuf.f_bsize;
+
+        // TODO keep as B not KiB
+        m_total >>= 10;
+        m_used  >>= 10;
+
 #ifdef Q_OS_DARWIN
         char *fstypename = statbuf.f_fstypename;
-        if ((!strcmp(fstypename, "nfs")) ||     // NFS|FTP
-            (!strcmp(fstypename, "afpfs")) ||   // AppleShare
-            (!strcmp(fstypename, "smbfs")))     // SMB
-                setLocal(false);
+        m_local = !(
+                    (strcmp(fstypename, "nfs")   == 0) ||  // NFS|FTP
+                    (strcmp(fstypename, "afpfs") == 0) ||  // AppleShare
+                    (strcmp(fstypename, "smbfs") == 0)     // SMB
+                   );
 #elif defined(__linux__)
         long fstype = statbuf.f_type;
-        if ((fstype == 0x6969)  ||              // NFS
-            (fstype == 0x517B)  ||              // SMB
-            (fstype == (long)0xFF534D42))       // CIFS
-                setLocal(false);
+        m_local = !(
+                    (fstype == 0x6969)  ||   // NFS
+                    (fstype == 0x517B)  ||   // SMB
+                    (fstype == 0xFF534D42L)  // CIFS
+                   );
+#else
+        m_local = true; // for equivalent behavior
 #endif
-        setBlockSize(statbuf.f_bsize);
+        return true;
     }
+    return false;
 }
