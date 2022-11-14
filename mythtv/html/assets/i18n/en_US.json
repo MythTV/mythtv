@@ -506,7 +506,7 @@
         "title": "Demo Test Recorder",
         "file_desc": "A local MPEG file used to simulate a recording."
       },
-      "selet_type": "Select capure card type"
+      "select_type": "Select capture card type"
     },
     "common": {
       "successful_delete": "Successful delete",

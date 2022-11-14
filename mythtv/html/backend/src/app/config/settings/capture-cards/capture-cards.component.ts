@@ -8,6 +8,9 @@ import { CaptureCardList, CardAndInput, CardType, CardTypeList, DiseqcTreeList }
 import { MythService } from 'src/app/services/myth.service';
 import { SetupService } from 'src/app/services/setup.service';
 
+interface CardTypeExt extends CardType {
+  Inactive?: boolean;
+}
 
 @Component({
   selector: 'app-capture-cards',
@@ -15,6 +18,16 @@ import { SetupService } from 'src/app/services/setup.service';
   styleUrls: ['./capture-cards.component.css']
 })
 export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
+
+  static supportedCardTypes = [
+    'CETON',
+    'DVB',
+    'EXTERNAL',
+    'HDHOMERUN',
+    'FREEBOX',
+    'IMPORT',
+    'DEMO',
+  ];
 
   currentTab: number = -1;
   deletedTab = -1;
@@ -42,8 +55,7 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
   errorCount: number = 0;
   deleteAll: boolean = false;
 
-
-  cardTypes!: CardType[];
+  cardTypes!: CardTypeExt[];
 
   constructor(private mythService: MythService,
     private captureCardService: CaptureCardService, private setupService: SetupService,
@@ -56,7 +68,16 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
     translate.get(this.warningText).subscribe(data => this.warningText = data);
     translate.get(this.deletedText).subscribe(data => this.deletedText = data);
     translate.get(this.newText).subscribe(data => this.newText = data);
-    this.captureCardService.GetCardTypeList().subscribe(data => this.cardTypes = data.CardTypeList.CardTypes);
+
+    this.captureCardService.GetCardTypeList().subscribe(data => {
+      this.cardTypes = data.CardTypeList.CardTypes
+      this.cardTypes.forEach(entry => {
+        if (CaptureCardsComponent.supportedCardTypes.indexOf(entry.CardType) < 0)
+          entry.Inactive = true;
+        else
+          entry.Inactive = false;
+      });
+    });
   }
 
   loadCards(doFilter: boolean) {
@@ -245,7 +266,7 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
       .subscribe(this.delObserver);
   }
 
-    deleteAllOnHost() {
+  deleteAllOnHost() {
     // Check if prior is finished by checking counts
     if (this.successCount + this.errorCount < this.expectedCount)
       return;

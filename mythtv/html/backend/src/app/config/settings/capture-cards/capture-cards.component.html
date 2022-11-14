@@ -5,9 +5,9 @@
         icon="pi pi-plus-circle" styleClass="p-button-plain"></p-button>
     <p-dialog header="{{ 'settings.capture.new_capture_card' | translate }}" [(visible)]="displayModal" [modal]="true"
         [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
-        <p>{{ 'settings.capture.selet_type' | translate }}</p>
+        <p>{{ 'settings.capture.select_type' | translate }}</p>
         <p-listbox [options]="cardTypes" [(ngModel)]="selectedCardType" optionLabel="Description"
-            (onDblClick)="newCard();" [listStyle]="{'height':'50vh'}" ></p-listbox>
+            (onDblClick)="newCard();" [listStyle]="{'height':'50vh'}" optionDisabled="Inactive"></p-listbox>
         <ng-template pTemplate="footer">
             <p-button icon="pi pi-times-circle" (onClick)="displayModal=false" label="{{ 'common.cancel' | translate }}"
                 styleClass="p-button-plain">
@@ -96,20 +96,23 @@
                             label="{{ 'common.yes' | translate }}" styleClass="p-button-plain"></p-button>
                     </ng-template>
                 </p-dialog>
-                <app-ceton *ngIf="m_CaptureCardsFiltered[ix].CardType == 'CETON'" [card]="m_CaptureCardsFiltered[ix]"
-                    [cardList]="m_CaptureCardList"></app-ceton>
-                <app-dvb *ngIf="m_CaptureCardsFiltered[ix].CardType == 'DVB'" [card]="m_CaptureCardsFiltered[ix]"
-                    [cardList]="m_CaptureCardList" [diseqcTreeList]="diseqcTreeList" [parent]="this"></app-dvb>
-                <app-external *ngIf="m_CaptureCardsFiltered[ix].CardType == 'EXTERNAL'"
-                    [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList"></app-external>
-                <app-hdhomerun *ngIf="m_CaptureCardsFiltered[ix].CardType == 'HDHOMERUN'"
-                    [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList"></app-hdhomerun>
-                <app-iptv *ngIf="m_CaptureCardsFiltered[ix].CardType == 'FREEBOX'" [card]="m_CaptureCardsFiltered[ix]"
-                    [cardList]="m_CaptureCardList"></app-iptv>
-                <app-import *ngIf="m_CaptureCardsFiltered[ix].CardType == 'IMPORT'" [card]="m_CaptureCardsFiltered[ix]"
-                    [cardList]="m_CaptureCardList"></app-import>
-                <app-demo *ngIf="m_CaptureCardsFiltered[ix].CardType == 'DEMO'" [card]="m_CaptureCardsFiltered[ix]"
-                    [cardList]="m_CaptureCardList"></app-demo>
+                <div [ngSwitch]="m_CaptureCardsFiltered[ix].CardType">
+                    <app-ceton *ngSwitchCase="'CETON'" [card]="m_CaptureCardsFiltered[ix]"
+                        [cardList]="m_CaptureCardList"></app-ceton>
+                    <app-dvb *ngSwitchCase="'DVB'" [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList"
+                        [diseqcTreeList]="diseqcTreeList" [parent]="this"></app-dvb>
+                    <app-external *ngSwitchCase="'EXTERNAL'" [card]="m_CaptureCardsFiltered[ix]"
+                        [cardList]="m_CaptureCardList"></app-external>
+                    <app-hdhomerun *ngSwitchCase="'HDHOMERUN'" [card]="m_CaptureCardsFiltered[ix]"
+                        [cardList]="m_CaptureCardList"></app-hdhomerun>
+                    <app-iptv *ngSwitchCase="'FREEBOX'" [card]="m_CaptureCardsFiltered[ix]"
+                        [cardList]="m_CaptureCardList"></app-iptv>
+                    <app-import *ngSwitchCase="'IMPORT'" [card]="m_CaptureCardsFiltered[ix]"
+                        [cardList]="m_CaptureCardList"></app-import>
+                    <app-demo *ngSwitchCase="'DEMO'" [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList">
+                    </app-demo>
+                    <div *ngSwitchDefault><br>Not Supported </div>
+                </div>
             </ng-template>
         </p-accordionTab>
     </p-accordion>
