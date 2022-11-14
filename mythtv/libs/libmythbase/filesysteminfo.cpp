@@ -28,16 +28,6 @@
 #include "mythcoreutil.h"
 #include "mythlogging.h"
 
-// for deserialization
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define NEXT_STR()        do { if (it == listend)                    \
-                               {                                     \
-                                   LOG(VB_GENERAL, LOG_ALERT, listerror); \
-                                   clear();                          \
-                                   return false;                     \
-                               }                                     \
-                               ts = *it++; } while (false)
-
 FileSystemInfo::FileSystemInfo(const FileSystemInfo &other)
 {
     FileSystemInfo::clone(other);
@@ -96,8 +86,12 @@ void FileSystemInfo::clear(void)
     m_weight    = 0;
 }
 
-bool FileSystemInfo::ToStringList(QStringList &list) const
+static constexpr int k_lines = 8;
+
+QStringList FileSystemInfo::ToStringList() const
 {
+    QStringList list;
+    list.reserve(k_lines);
     list << m_hostname;
     list << m_path;
     list << QString::number(m_local);
@@ -107,29 +101,51 @@ bool FileSystemInfo::ToStringList(QStringList &list) const
     list << QString::number(m_total);
     list << QString::number(m_used);
 
+    return list;
+}
+
+bool FileSystemInfo::ToStringList(QStringList &list) const
+{
+    list << ToStringList();
+
     return true;
 }
 
 bool FileSystemInfo::FromStringList(const QStringList &slist)
 {
-    QStringList::const_iterator it = slist.constBegin();
-    return FromStringList(it, slist.constEnd());
+    QStringList::const_iterator it = slist.cbegin();
+    return FromStringList(it, slist.cend());
 }
 
+/**
+@brief Deserialize a FileSystemInfo.
+The FileSystemInfo will be in a default state if deserialization fails.
+@param [in,out] it iterator to the beginning of the FileSystemInfo to deserialize.
+                   It is incremented so this function can be called repeatedly in
+                   a while loop.  it will be set to listend when there aren't enough
+                   strings to deserialize a FileSystemInfo.
+@param [in] listend end of the string list referenced by both iterators
+@return Boolean, true if deserialized
+*/
 bool FileSystemInfo::FromStringList(QStringList::const_iterator &it,
-                             const QStringList::const_iterator& listend)
+                                    const QStringList::const_iterator& listend)
 {
-    QString listerror = "FileSystemInfo: FromStringList, not enough items in list.";
-    QString ts;
+    if (std::distance(it, listend) < k_lines)
+    {
+        LOG(VB_GENERAL, LOG_ALERT, QStringLiteral("FileSystemInfo::FromStringList, not enough items in list."));
+        clear();
+        it = listend;
+        return false;
+    }
 
-    NEXT_STR(); m_hostname = ts;
-    NEXT_STR(); m_path     = ts;
-    NEXT_STR(); m_local    = ts.toLongLong();
-    NEXT_STR(); m_fsid     = ts.toLongLong();
-    NEXT_STR(); m_grpid    = ts.toLongLong();
-    NEXT_STR(); m_blksize  = ts.toLongLong();
-    NEXT_STR(); m_total    = ts.toLongLong();
-    NEXT_STR(); m_used     = ts.toLongLong();
+    m_hostname  = *it; it++;
+    m_path      = *it; it++;
+    m_local     = (*it).toLongLong(); it++;
+    m_fsid      = (*it).toLongLong(); it++;
+    m_grpid     = (*it).toLongLong(); it++;
+    m_blksize   = (*it).toLongLong(); it++;
+    m_total     = (*it).toLongLong(); it++;
+    m_used      = (*it).toLongLong(); it++;
 
     m_weight = 0;
 
@@ -151,7 +167,7 @@ QList<FileSystemInfo> FileSystemInfo::RemoteGetInfo(MythSocket *sock)
 
     if (sent)
     {
-        int numdisks = strlist.size()/NUMDISKINFOLINES;
+        int numdisks = strlist.size() / k_lines;
 
         QStringList::const_iterator it = strlist.cbegin();
         for (int i = 0; i < numdisks; i++)
