@@ -411,7 +411,7 @@ bool FileServerHandler::HandleQueryFreeSpace(SocketHandler *socket)
 {
     QStringList res;
 
-    QList<FileSystemInfo> disks = QueryFileSystems();
+    FileSystemInfoList disks = QueryFileSystems();
     for (const auto & disk : std::as_const(disks))
         disk.ToStringList(res);
 
@@ -424,7 +424,7 @@ bool FileServerHandler::HandleQueryFreeSpaceList(SocketHandler *socket)
     QStringList res;
     QStringList hosts;
 
-    QList<FileSystemInfo> disks = QueryAllFileSystems();
+    FileSystemInfoList disks = QueryAllFileSystems();
     for (const auto & disk : std::as_const(disks))
         if (!hosts.contains(disk.getHostname()))
             hosts << disk.getHostname();
@@ -457,7 +457,7 @@ bool FileServerHandler::HandleQueryFreeSpaceList(SocketHandler *socket)
 bool FileServerHandler::HandleQueryFreeSpaceSummary(SocketHandler *socket)
 {
     QStringList res;
-    QList<FileSystemInfo> disks = QueryAllFileSystems();
+    FileSystemInfoList disks = QueryAllFileSystems();
     // TODO: get max bitrate from encoderlink
     FileSystemInfo::Consolidate(disks, true, 14000);
 
@@ -474,8 +474,9 @@ bool FileServerHandler::HandleQueryFreeSpaceSummary(SocketHandler *socket)
     return true;
 }
 
-QList<FileSystemInfo> FileServerHandler::QueryFileSystems(void)
+FileSystemInfoList FileServerHandler::QueryFileSystems(void)
 {
+    const QString localHostName = gCoreContext->GetHostName(); // cache this
     QStringList groups(StorageGroup::kSpecialGroups);
     groups.removeAll("LiveTV");
     QString specialGroups = groups.join("', '");
@@ -486,11 +487,13 @@ QList<FileSystemInfo> FileServerHandler::QueryFileSystems(void)
                            "WHERE hostname = :HOSTNAME "
                              "AND groupname NOT IN ( '%1' ) "
                            "GROUP BY dirname;").arg(specialGroups));
-    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
+    query.bindValue(":HOSTNAME", localHostName);
 
-    QList<FileSystemInfo> disks;
+    FileSystemInfoList fsInfos;
     if (query.exec() && query.isActive())
     {
+        // If we don't have any dirs of our own, fallback to list of Default
+        // dirs since that is what StorageGroup::Init() does.
         if (!query.size())
         {
             query.prepare("SELECT MIN(id),dirname "
@@ -502,36 +505,22 @@ QList<FileSystemInfo> FileServerHandler::QueryFileSystems(void)
                 MythDB::DBError("BackendQueryFileSystems", query);
         }
 
-        QDir checkDir("");
-        QString currentDir;
-        FileSystemInfo disk;
-        QMap <QString, bool>foundDirs;
+        QMap<QString, bool> foundDirs;
 
         while (query.next())
         {
-            disk.clear();
-            disk.setHostname(gCoreContext->GetHostName());
-            disk.setLocal();
-            disk.setBlockSize(0);
-            disk.setGroupID(query.value(0).toInt());
-
             /* The storagegroup.dirname column uses utf8_bin collation, so Qt
              * uses QString::fromAscii() for toString(). Explicitly convert the
              * value using QString::fromUtf8() to prevent corruption. */
-            currentDir = QString::fromUtf8(query.value(1)
-                                           .toByteArray().constData());
-            disk.setPath(currentDir);
-
+            QString currentDir {QString::fromUtf8(query.value(1).toByteArray().constData())};
             if (currentDir.endsWith("/"))
                 currentDir.remove(currentDir.length() - 1, 1);
 
-            checkDir.setPath(currentDir);
             if (!foundDirs.contains(currentDir))
             {
-                if (checkDir.exists())
+                if (QDir(currentDir).exists())
                 {
-                    disk.refresh();
-                    disks << disk;
+                    fsInfos.push_back(FileSystemInfo(localHostName, currentDir, query.value(0).toInt()));
 
                     foundDirs[currentDir] = true;
                 }
@@ -543,12 +532,12 @@ QList<FileSystemInfo> FileServerHandler::QueryFileSystems(void)
         }
     }
 
-    return disks;
+    return fsInfos;
 }
 
-QList<FileSystemInfo> FileServerHandler::QueryAllFileSystems(void)
+FileSystemInfoList FileServerHandler::QueryAllFileSystems(void)
 {
-    QList<FileSystemInfo> disks = QueryFileSystems();
+    FileSystemInfoList disks = QueryFileSystems();
 
     {
         QReadLocker rlock(&m_fsLock);

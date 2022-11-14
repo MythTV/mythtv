@@ -14,6 +14,8 @@
 class MBASE_PUBLIC FileSystemInfo
 {
   public:
+    static constexpr int k_lines = 8; ///< number of strings in the serialized stringlist
+
     FileSystemInfo() = default;
     FileSystemInfo(QString hostname,
                    QString path,
@@ -106,4 +108,13 @@ class MBASE_PUBLIC FileSystemInfo
     // not serialized
     int     m_weight    {0}; ///< set by setWeight
 };
+
+using FileSystemInfoList = QList<FileSystemInfo>; // TODO not a QList though
+namespace FileSystemInfoManager
+{
+MBASE_PUBLIC FileSystemInfoList FromStringList(const QStringList& list);
+
+MBASE_PUBLIC QStringList ToStringList(const FileSystemInfoList& fsInfos);
+} // namespace FileSystemInfoManager
+
 #endif
