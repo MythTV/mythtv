@@ -60,7 +60,7 @@ class ManualSchedule : public MythScreenType
     QString m_startString;
     QString m_chanidString;
 
-    static int last_manual_chan; /* Channel used in the last manual schedule */
+    inline static int s_lastChannelIndex = -1;
 };
 
 #endif
