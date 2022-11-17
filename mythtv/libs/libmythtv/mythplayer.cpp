@@ -1144,7 +1144,7 @@ void MythPlayer::DecoderLoop(bool pause)
         }
 
         bool obey_eof = (GetEof() != kEofStateNone) &&
-                        !(m_playerCtx->m_tvchain && !m_allPaused);
+                        (!m_playerCtx->m_tvchain || m_allPaused);
         if (m_isDummy || ((m_decoderPaused || m_ffrewSkip == 0 || obey_eof) &&
                           !m_decodeOneFrame))
         {
@@ -1383,7 +1383,7 @@ void MythPlayer::ChangeSpeed(void)
     if (skip_changed && m_videoOutput)
     {
         m_videoOutput->SetPrebuffering(m_ffrewSkip == 1);
-        if (m_playSpeed != 0.0F && !(last_speed == 0.0F && m_ffrewSkip == 1))
+        if (m_playSpeed != 0.0F && (last_speed != 0.0F || m_ffrewSkip != 1))
             DoJumpToFrame(m_framesPlayed + m_ffTime - m_rewindTime, kInaccuracyFull);
     }
 

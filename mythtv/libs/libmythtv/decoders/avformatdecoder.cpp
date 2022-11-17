@@ -4045,7 +4045,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 
 bool AvFormatDecoder::ProcessRawTextPacket(AVPacket* Packet)
 {
-    if (!(m_decodeAllSubtitles || m_selectedTrack[kTrackTypeRawText].m_av_stream_index == Packet->stream_index))
+    if (!m_decodeAllSubtitles && m_selectedTrack[kTrackTypeRawText].m_av_stream_index != Packet->stream_index)
         return false;
 
     auto id = static_cast<uint>(Packet->stream_index + 0x2000);

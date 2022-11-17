@@ -632,7 +632,7 @@ void HttpWorker::run(void)
     delete pRequest;
 
     if ((pSocket->error() != QAbstractSocket::UnknownSocketError) &&
-        !(bKeepAlive && pSocket->error() == QAbstractSocket::SocketTimeoutError)) // This 'error' isn't an error when keep-alive is active
+        (!bKeepAlive || pSocket->error() != QAbstractSocket::SocketTimeoutError)) // This 'error' isn't an error when keep-alive is active
     {
         LOG(VB_HTTP, LOG_WARNING, QString("HttpWorker(%1): Error %2 (%3)")
                                    .arg(m_socket)

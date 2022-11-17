@@ -827,7 +827,7 @@ int CC608Decoder::NewRowCC(size_t mode, int len)
 
 static bool IsPrintable(char c)
 {
-    return !(((c) & 0x7F) < 0x20 || ((c) & 0x7F) > 0x7E);
+    return ((c) & 0x7F) >= 0x20 && ((c) & 0x7F) <= 0x7E;
 }
 
 static char Printable(char c)

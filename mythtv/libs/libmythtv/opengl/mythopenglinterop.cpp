@@ -75,8 +75,8 @@ MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
     if (!(Context && Frame))
         return result;
 
-    if (!(Frame->m_priv[1] && MythVideoFrame::HardwareFormat(Frame->m_type) &&
-         (Frame->m_type == MythAVUtil::PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->m_pixFmt)))))
+    if (!Frame->m_priv[1] || !MythVideoFrame::HardwareFormat(Frame->m_type) ||
+         (Frame->m_type != MythAVUtil::PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->m_pixFmt))))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Not a valid hardware frame");
         return result;

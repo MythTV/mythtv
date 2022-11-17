@@ -144,7 +144,7 @@ void MythWebSocket::Read()
                 errormsg = QStringLiteral("Fragmentation error (no opening frame)");
             }
             // Only continuation frames or control frames are expected once in the middle of a message
-            else if (fragmented && !((code == WSOpContinuation) || control))
+            else if (fragmented && (code != WSOpContinuation) && !control)
             {
                 errormsg = QStringLiteral("Fragmentation error (bad frame)");
             }

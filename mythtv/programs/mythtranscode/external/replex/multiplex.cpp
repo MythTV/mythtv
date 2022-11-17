@@ -228,8 +228,8 @@ static void writeout_video(multiplex_t *mx)
 		dummy_add(&mx->vdbuf, uptsdiff(viu->dts+mx->video_delay,0)
 			  , viu->length);
 		if ( peek_next_video_unit(mx, &nviu)){
-			if (!(nviu.seq_header && nviu.gop && 
-			      nviu.frame == I_FRAME)){
+			if (!nviu.seq_header || !nviu.gop ||
+			      nviu.frame != I_FRAME){
 				get_next_video_unit(mx, viu);
                                 frame_len = viu->length;
 				length += viu->length; 

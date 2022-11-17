@@ -83,7 +83,7 @@ void MythPlayerCaptionsUI::ExternalSubtitlesUpdated()
 
 void MythPlayerCaptionsUI::AdjustSubtitleZoom(int Delta)
 {
-    if (!(OptionalCaptionEnabled(m_captionsState.m_textDisplayMode) && !(m_browsing || m_editing)))
+    if (!OptionalCaptionEnabled(m_captionsState.m_textDisplayMode) || (m_browsing || m_editing))
         return;
 
     if (auto * subs = m_captionsOverlay.InitSubtitles(); subs)
@@ -101,7 +101,7 @@ void MythPlayerCaptionsUI::AdjustSubtitleDelay(std::chrono::milliseconds Delta)
 {
     bool showing = (m_captionsState.m_textDisplayMode == kDisplayRawTextSubtitle) ||
                    (m_captionsState.m_textDisplayMode == kDisplayTextSubtitle);
-    if (!(showing && !(m_browsing || m_editing)))
+    if (!showing || (m_browsing || m_editing))
         return;
 
     if (auto * subs = m_captionsOverlay.InitSubtitles(); subs)
@@ -385,9 +385,9 @@ void MythPlayerCaptionsUI::ChangeCaptionTrack(int Direction)
     if (!m_decoder || (Direction < 0))
         return;
 
-    if (!((m_captionsState.m_textDisplayMode == kDisplayTextSubtitle) ||
-          (m_captionsState.m_textDisplayMode == kDisplayNUVTeletextCaptions) ||
-          (m_captionsState.m_textDisplayMode == kDisplayNone)))
+    if ((m_captionsState.m_textDisplayMode != kDisplayTextSubtitle) &&
+          (m_captionsState.m_textDisplayMode != kDisplayNUVTeletextCaptions) &&
+          (m_captionsState.m_textDisplayMode != kDisplayNone))
     {
         uint tracktype = toTrackType(m_captionsState.m_textDisplayMode);
         if (GetTrack(tracktype) < m_decoder->NextTrack(tracktype))

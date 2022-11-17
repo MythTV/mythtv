@@ -610,7 +610,7 @@ std::chrono::seconds MythBDBuffer::GetTitleDuration(int Title)
 {
     QMutexLocker locker(&m_infoLock);
     auto numTitles = GetNumTitles();
-    if (!(numTitles > 0 && Title >= 0 && Title < static_cast<int>(numTitles)))
+    if (numTitles <= 0 || Title < 0 || Title >= static_cast<int>(numTitles))
         return 0s;
 
     BLURAY_TITLE_INFO *info = GetTitleInfo(static_cast<uint32_t>(Title));

@@ -62,7 +62,7 @@ int MythMediaOverlay::GetFontStretch() const
 bool MythMediaOverlay::Init(QRect Rect, float FontAspect)
 {
     int newstretch = static_cast<int>(lroundf(FontAspect * 100));
-    if (!((Rect == m_rect) && (newstretch == m_fontStretch)))
+    if (!(Rect == m_rect) || (newstretch != m_fontStretch))
     {
         TearDown();
         m_rect = Rect;

@@ -970,7 +970,7 @@ DRMPlane MythDRMDevice::GetGUIPlane() const
 */
 void MythDRMDevice::AnalysePlanes()
 {
-    if (!(m_fd && m_crtc && m_crtc->m_index > -1))
+    if (!m_fd || !m_crtc || m_crtc->m_index <= -1)
         return;
 
     // Find our planes

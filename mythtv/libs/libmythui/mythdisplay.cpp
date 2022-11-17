@@ -589,7 +589,7 @@ void MythDisplay::Initialise()
         GetMythDB()->GetResolutionSetting("VidMode", iw, ih, iaspect, irate, i);
         GetMythDB()->GetResolutionSetting("TVVidMode", ow, oh, oaspect, orate, i);
 
-        if (!(iw || ih || !qFuzzyIsNull(irate)) || !(ih && ow && oh))
+        if ((!iw && !ih && qFuzzyIsNull(irate)) || !(ih && ow && oh))
             break;
 
         uint64_t key = MythDisplayMode::CalcKey(QSize(iw, ih), irate);

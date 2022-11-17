@@ -525,7 +525,7 @@ void MHParseText::NextSym()
                             // White space.  Remove everything up to the newline.
                             while (m_ch != '\n')
                             {
-                                if (!(m_ch == ' ' || m_ch == '\t' || m_ch == '\r'))
+                                if (m_ch != ' ' && m_ch != '\t' && m_ch != '\r')
                                 {
                                     Error("Malformed quoted printable string");
                                 }

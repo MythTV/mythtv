@@ -3192,9 +3192,9 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
     if ((pginfo.GetRecordingStatus() == RecStatus::Recording ||
          pginfo.GetRecordingStatus() == RecStatus::Tuning ||
          pginfo.GetRecordingStatus() == RecStatus::Failing) &&
-        (!(sameProgram &&
-           (tvstate == kState_WatchingLiveTV ||
-            tvstate == kState_WatchingRecording))))
+        (!sameProgram ||
+           (tvstate != kState_WatchingLiveTV &&
+            tvstate != kState_WatchingRecording)))
     {
         m_popupMenu->AddItem(tr("Stop Recording"), &PlaybackBox::askStop);
     }

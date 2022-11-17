@@ -428,10 +428,10 @@ void ScheduleCommon::EditRecording(bool may_watch_now)
                 recinfo.GetDuplicateCheckMethod();
             static const QRegularExpression kGenericEpisodeRE { "0000$" };
             if (recinfo.GetRecordingRuleType() != kOverrideRecord &&
-                !((recinfo.GetFindID() == 0 ||
-                   !IsFindApplicable(recinfo)) &&
-                  recinfo.GetCategoryType() == ProgramInfo::kCategorySeries &&
-                  recinfo.GetProgramID().contains(kGenericEpisodeRE)) &&
+                ((recinfo.GetFindID() != 0 &&
+                   IsFindApplicable(recinfo)) ||
+                  recinfo.GetCategoryType() != ProgramInfo::kCategorySeries ||
+                  !recinfo.GetProgramID().contains(kGenericEpisodeRE)) &&
                 ((((dupmethod & kDupCheckNone) == 0) &&
                   !recinfo.GetProgramID().isEmpty() &&
                   (recinfo.GetFindID() != 0 ||

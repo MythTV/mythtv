@@ -137,7 +137,7 @@ const MythDisplayModes& MythDisplayX11::GetVideoModes()
             auto mode = res->modes[j];
             if (mode.id != rrmode)
                 continue;
-            if (!(mode.dotClock > 1 && mode.vTotal > 1 && mode.hTotal > 1))
+            if (mode.dotClock <= 1 || mode.vTotal <= 1 || mode.hTotal <= 1)
                 continue;
             auto width = static_cast<int>(mode.width);
             auto height = static_cast<int>(mode.height);

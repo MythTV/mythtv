@@ -607,7 +607,7 @@ bool MythUIButtonTree::keyPressEvent(QKeyEvent *event)
             {
                 SwitchList(true);
             }
-            else if (action == "LEFT" && !(m_currentDepth == 0 && m_activeListID == 0))
+            else if (action == "LEFT" && (m_currentDepth != 0 || m_activeListID != 0))
             {
                 SwitchList(false);
             }

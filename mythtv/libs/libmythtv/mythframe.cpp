@@ -43,10 +43,10 @@ void MythVideoFrame::Init(VideoFrameType Type, int Width, int Height, const Vide
 {
     size_t   newsize   = 0;
     uint8_t* newbuffer = nullptr;
-    if ((Width > 0 && Height > 0) && !((Type == FMT_NONE) || HardwareFormat(Type)))
+    if ((Width > 0 && Height > 0) && (Type != FMT_NONE) && !HardwareFormat(Type))
     {
         newsize = GetBufferSize(Type, Width, Height);
-        bool reallocate = !((Width == m_width) && (Height == m_height) && (newsize == m_bufferSize) && (Type == m_type));
+        bool reallocate = (Width != m_width) || (Height != m_height) || (newsize != m_bufferSize) || (Type != m_type);
         newbuffer = reallocate ? GetAlignedBuffer(newsize) : m_buffer;
         newsize   = reallocate ? newsize : m_bufferSize;
     }
@@ -290,14 +290,14 @@ bool MythVideoFrame::CopyFrame(MythVideoFrame *From)
         return false;
     }
 
-    if (!((m_width > 0) && (m_height > 0) &&
-          (m_width == From->m_width) && (m_height == From->m_height)))
+    if ((m_width <= 0) || (m_height <= 0) ||
+          (m_width != From->m_width) || (m_height != From->m_height))
     {
         LOG(VB_GENERAL, LOG_ERR, "Invalid frame sizes");
         return false;
     }
 
-    if (!(m_buffer && From->m_buffer && (m_buffer != From->m_buffer)))
+    if (!m_buffer || !From->m_buffer || (m_buffer == From->m_buffer))
     {
         LOG(VB_GENERAL, LOG_ERR, "Invalid frames for copying");
         return false;

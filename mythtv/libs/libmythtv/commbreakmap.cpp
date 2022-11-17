@@ -167,12 +167,12 @@ bool CommBreakMap::AutoCommercialSkip(uint64_t &jumpToFrame,
     if (m_commBreakIter == m_commBreakMap.end())
         return false;
 
-    if (!((*m_commBreakIter == MARK_COMM_START) &&
-          (((kCommSkipOn == m_autocommercialskip) &&
-            (framesPlayed >= m_commBreakIter.key())) ||
-           ((kCommSkipNotify == m_autocommercialskip) &&
-            (framesPlayed + m_commnotifyamount.count() * video_frame_rate >=
-             m_commBreakIter.key())))))
+    if ((*m_commBreakIter != MARK_COMM_START) ||
+          (((kCommSkipOn != m_autocommercialskip) ||
+            (framesPlayed < m_commBreakIter.key())) &&
+           ((kCommSkipNotify != m_autocommercialskip) ||
+            (framesPlayed + m_commnotifyamount.count() * video_frame_rate <
+             m_commBreakIter.key()))))
     {
         return false;
     }

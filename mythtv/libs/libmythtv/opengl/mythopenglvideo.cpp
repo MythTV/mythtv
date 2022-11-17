@@ -823,7 +823,7 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
 
     // We don't need an extra stage prior to bicubic if the frame is already RGB (e.g. VDPAU, MediaCodec)
     // So bypass if we only set resize for bicubic.
-    bool needresize = resize && !(MythVideoFrame::FormatIsRGB(m_outputType) && (resize == Bicubic));
+    bool needresize = resize && (!MythVideoFrame::FormatIsRGB(m_outputType) || (resize != Bicubic));
 
     // set software frame filtering if resizing has changed
     if (!needresize && m_resizing)

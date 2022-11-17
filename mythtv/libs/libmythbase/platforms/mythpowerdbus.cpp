@@ -164,9 +164,9 @@ void MythPowerDBus::Init(void)
 
 bool MythPowerDBus::DoFeature(bool Delayed)
 {
-    if (!(m_logindInterface &&
-          ((m_features & m_scheduledFeature) != 0U) &&
-          (m_scheduledFeature != 0U)))
+    if (!m_logindInterface ||
+          ((m_features & m_scheduledFeature) == 0U) ||
+          (m_scheduledFeature == 0U))
         return false;
 
     if (!Delayed)

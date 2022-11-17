@@ -252,7 +252,7 @@ bool MSocketDevice::blocking() const
 
     int s = fcntl(m_fd, F_GETFL, 0);
 
-    return !(s >= 0 && ((s & O_NDELAY) != 0));
+    return s < 0 || ((s & O_NDELAY) == 0);
 }
 
 

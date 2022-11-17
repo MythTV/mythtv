@@ -80,7 +80,7 @@ void MythVideoVulkan::StartFrame()
 
 void MythVideoVulkan::PrepareFrame(MythVideoFrame* Frame, FrameScanType /*Scan*/)
 {
-    if (!(m_valid && IsValidVulkan() && (Frame->m_type == FMT_NONE)))
+    if (!m_valid || !IsValidVulkan() || (Frame->m_type != FMT_NONE))
         return;
 
     // No hardware frame support yet

@@ -11,7 +11,7 @@ MythVideoTextureVulkan::CreateTextures(MythVulkanObject* Vulkan,
                                        VideoFrameType Format,
                                        QSize Size)
 {
-    if (!(Vulkan && Vulkan->IsValidVulkan() && !Size.isEmpty()))
+    if (!Vulkan || !Vulkan->IsValidVulkan() || Size.isEmpty())
         return std::vector<MythVideoTextureVulkan*>{};
 
     if (MythVideoFrame::HardwareFormat(Type))

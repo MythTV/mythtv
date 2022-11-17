@@ -649,7 +649,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                     // another or the same menu id
                     if ((m_title != m_lastTitle) &&
                         // cppcheck-suppress knownConditionTrueFalse
-                        !((m_title == 0 && m_lastTitle == 0) && (m_part == m_lastPart)))
+                        (m_title != 0 || m_lastTitle != 0 || (m_part != m_lastPart)))
                     {
                         WaitForPlayer();
                     }

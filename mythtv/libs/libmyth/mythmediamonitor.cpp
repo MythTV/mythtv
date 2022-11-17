@@ -730,7 +730,7 @@ void MediaMonitor::mediaStatusChanged(MythMediaStatus oldStatus,
     // We now send events for all non-error statuses, so plugins get ejects
     if (stat != MEDIASTAT_ERROR && stat != MEDIASTAT_UNKNOWN &&
         // Don't send an event for a new device that's not mounted
-        !(oldStatus == MEDIASTAT_UNPLUGGED && stat == MEDIASTAT_NOTMOUNTED))
+        (oldStatus != MEDIASTAT_UNPLUGGED || stat != MEDIASTAT_NOTMOUNTED))
     {
         // Should we ValidateAndLock() first?
         QEvent *e = new MythMediaEvent(stat, pMedia);

@@ -1046,10 +1046,10 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
             if (m_completeOnly &&
                 channel.m_atscMajorChannel == 0 &&
                 channel.m_atscMinorChannel == 0 &&
-                !(channel.m_inPat &&
-                  channel.m_inPmt &&
-                  channel.m_inSdt &&
-                 (channel.m_patTsId ==
+                (!channel.m_inPat ||
+                 !channel.m_inPmt ||
+                 !channel.m_inSdt ||
+                 (channel.m_patTsId !=
                   channel.m_sdtTsId)))
             {
                 QString msg = FormatChannel(transport, channel);

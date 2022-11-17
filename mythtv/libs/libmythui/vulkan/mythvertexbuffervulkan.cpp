@@ -86,5 +86,5 @@ void MythVertexBufferVulkan::Update(const QRect Source, const QRect Dest,
 
 bool MythVertexBufferVulkan::NeedsUpdate(const QRect Source, const QRect Dest, int Alpha, int Rotation)
 {
-    return !((m_source == Source) && (m_dest == Dest) && (m_alpha == Alpha) && (m_rotation == Rotation));
+    return !(m_source == Source) || !(m_dest == Dest) || (m_alpha != Alpha) || (m_rotation != Rotation);
 }

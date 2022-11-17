@@ -357,7 +357,7 @@ void MythPlayerUI::EventLoop()
     {
         if (jumpto == m_totalFrames)
         {
-            if (!(m_endExitPrompt == 1 && m_playerCtx->GetState() == kState_WatchingPreRecorded))
+            if (m_endExitPrompt != 1 || m_playerCtx->GetState() != kState_WatchingPreRecorded)
                 SetEof(kEofStateDelayed);
         }
         else

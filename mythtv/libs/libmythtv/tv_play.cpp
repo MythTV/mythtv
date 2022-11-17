@@ -2771,8 +2771,8 @@ void TV::HandleEndOfPlaybackTimerEvent()
         }
         // If the end of playback is destined to pop up the end of
         // recording delete prompt, then don't exit the player here.
-        else if (!(GetState() == kState_WatchingPreRecorded &&
-                 m_dbEndOfRecExitPrompt && !m_inPlaylist && !m_underNetworkControl))
+        else if (GetState() != kState_WatchingPreRecorded ||
+                 !m_dbEndOfRecExitPrompt || m_inPlaylist || m_underNetworkControl)
         {
             ForceNextStateNone();
             m_endOfRecording = true;
@@ -8385,7 +8385,7 @@ bool TV::MenuItemDisplayCutlist(const MythTVMenuItemContext& Context, MythOSDDia
                 (m_editorState.m_frameInDelete && !m_editorState.m_isTempMark) ||
                 (!m_editorState.m_isTempMark && m_editorState.m_previousCut > 0))
             {
-                active = !(m_editorState.m_frameInDelete && !m_editorState.m_isTempMark);
+                active = !m_editorState.m_frameInDelete || m_editorState.m_isTempMark;
                 BUTTON2(actionName, tr("Move Previous Cut End Here"), tr("Move Start of Cut Here"));
             }
         }
@@ -8396,7 +8396,7 @@ bool TV::MenuItemDisplayCutlist(const MythTVMenuItemContext& Context, MythOSDDia
                 (m_editorState.m_frameInDelete && !m_editorState.m_isTempMark) ||
                 (!m_editorState.m_isTempMark && m_editorState.m_nextCut != m_editorState.m_totalFrames))
             {
-                active = !(m_editorState.m_frameInDelete && !m_editorState.m_isTempMark);
+                active = !m_editorState.m_frameInDelete || m_editorState.m_isTempMark;
                 BUTTON2(actionName, tr("Move Next Cut Start Here"), tr("Move End of Cut Here"));
             }
         }
