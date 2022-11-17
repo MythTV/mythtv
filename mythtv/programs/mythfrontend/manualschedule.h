@@ -60,9 +60,6 @@ class ManualSchedule : public MythScreenType
     QString m_startString;
     QString m_chanidString;
 
-    /// Index of channel used in the last Manual Schedule rule.
-    /** Special value -1 indicates there is no previous rule. */
-    inline static int s_lastChannelIndex = -1;
 };
 
 #endif
