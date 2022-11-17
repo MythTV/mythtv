@@ -47,6 +47,8 @@ Checks: '-*,
        -bugprone-easily-swappable-parameters,
         # New in clang13. 979 warnings. ,
        -bugprone-implicit-widening-of-multiplication-result,
+        # New in clang15. 168 warnings. ,
+       -bugprone-assignment-in-if-condition
 
     cert-*,
 
@@ -140,6 +142,9 @@ Checks: '-*,
         # ensure there are no problems. ,
        -misc-no-recursion,
 
+        # New in clang15. 18707 warnings. ,
+       -misc-const-correctness
+
     modernize-*,
 
         # Noisy!!!  foo(void) => foo()  ,
@@ -150,6 +155,9 @@ Checks: '-*,
 
         # Disable newer C++14/17 tests for now. ,
        -modernize-use-nodiscard,
+
+        # New in clang15. 4085 warnings. ,
+       -modernize-macro-to-enum
 
     performance-*,
 
