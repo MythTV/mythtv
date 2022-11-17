@@ -56,6 +56,8 @@ void V2Capture::RegisterCustomTypes()
     qRegisterMetaType<V2DiseqcTreeList*>("V2DiseqcTreeList");
     qRegisterMetaType<V2InputGroupList*>("V2InputGroupList");
     qRegisterMetaType<V2InputGroup*>("V2InputGroup");
+    qRegisterMetaType<V2DiseqcConfig*>("V2DiseqcConfig");
+    qRegisterMetaType<V2DiseqcConfigList*>("V2DiseqcConfigList");
 }
 
 V2Capture::V2Capture()
@@ -742,7 +744,7 @@ V2DiseqcTreeList* V2Capture::GetDiseqcTreeList  (  )
     while (query.next())
     {
         auto *pRec = pList->AddDiseqcTree();
-        pRec->setDiseqcId           ( query.value(  0 ).toUInt() );
+        pRec->setDiSEqCId           ( query.value(  0 ).toUInt() );
         pRec->setParentId           ( query.value(  1 ).toUInt() );
         pRec->setOrdinal            ( query.value(  2 ).toUInt() );
         pRec->setType               ( query.value(  3 ).toString() );
@@ -860,11 +862,11 @@ int  V2Capture::AddDiseqcTree ( uint           ParentId,
         MythDB::DBError("MythAPI::AddDiseqcTree()", query);
         throw( QString( "Database Error executing query." ));
     }
-    uint diseqcid  = query.lastInsertId().toInt();
-    return diseqcid;
+    uint DiSEqCId  = query.lastInsertId().toInt();
+    return DiSEqCId;
 }
 
-bool V2Capture::UpdateDiseqcTree  ( uint           DiseqcId,
+bool V2Capture::UpdateDiseqcTree  ( uint           DiSEqCId,
                                     uint           ParentId,
                                     uint           Ordinal,
                                     const QString& Type,
@@ -908,7 +910,7 @@ bool V2Capture::UpdateDiseqcTree  ( uint           DiseqcId,
             "scr_pin = :SCR_PIN "
             "WHERE diseqcid = :DISEQCID " );
 
-    query.bindValue(":DISEQCID", DiseqcId);
+    query.bindValue(":DISEQCID", DiSEqCId);
     if (ParentId == 0) // Value 0 is set to null
     {
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
@@ -945,12 +947,12 @@ bool V2Capture::UpdateDiseqcTree  ( uint           DiseqcId,
     return true;
 }
 
-bool  V2Capture::RemoveDiseqcTree  ( uint DiseqcId)
+bool  V2Capture::RemoveDiseqcTree  ( uint DiSEqCId)
 {
     // Find and remove children
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT diseqcid FROM diseqc_tree WHERE parentid = :PARENTID ");
-    query.bindValue(":PARENTID", DiseqcId);
+    query.bindValue(":PARENTID", DiSEqCId);
 
     if (!query.exec())
     {
@@ -967,7 +969,7 @@ bool  V2Capture::RemoveDiseqcTree  ( uint DiseqcId)
     // remove this row
     MSqlQuery query2(MSqlQuery::InitCon());
     query2.prepare("DELETE FROM diseqc_tree WHERE diseqcid = :DISEQCID ");
-    query2.bindValue(":DISEQCID", DiseqcId);
+    query2.bindValue(":DISEQCID", DiSEqCId);
     if (!query2.exec())
     {
         MythDB::DBError("MythAPI::RemoveDiseqcTree()", query2);
@@ -975,4 +977,86 @@ bool  V2Capture::RemoveDiseqcTree  ( uint DiseqcId)
     }
     int numrows = query2.numRowsAffected();
     return numrows > 0 && childOK;
+}
+
+
+V2DiseqcConfigList* V2Capture::GetDiseqcConfigList  ( void )
+{
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!query.isConnected())
+        throw( QString("Database not open while trying to list "
+                       "DiseqcConfigs."));
+
+    QString str =  "SELECT cardinputid, "
+                   "diseqcid, "
+                   "value "
+                   "FROM diseqc_config ORDER BY cardinputid, diseqcid";
+
+    query.prepare(str);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("MythAPI::GetDiseqcConfigList()", query);
+        throw( QString( "Database Error executing query." ));
+    }
+
+    // ----------------------------------------------------------------------
+    // return the results of the query
+    // ----------------------------------------------------------------------
+
+    auto* pList = new V2DiseqcConfigList();
+
+    while (query.next())
+    {
+        auto *pRec = pList->AddDiseqcConfig();
+        pRec->setCardId             ( query.value(  0 ).toUInt() );
+        pRec->setDiSEqCId           ( query.value(  1 ).toUInt() );
+        pRec->setValue              ( query.value(  2 ).toString() );
+    }
+    return pList;
+}
+
+bool V2Capture::AddDiseqcConfig  ( uint           CardId,
+                                   uint           DiSEqCId,
+                                   const QString& Value)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+             "INSERT INTO diseqc_config "
+            "(cardinputid, "
+            "diseqcid, "
+            "value) "
+            "VALUES "
+            "(:CARDID, "
+            ":DISEQCID, "
+            ":VALUE) ");
+
+    query.bindValue(":CARDID", CardId);
+    query.bindValue(":DISEQCID", DiSEqCId);
+    query.bindValue(":VALUE", Value);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("MythAPI::AddDiseqcConfig()", query);
+        throw( QString( "Database Error executing query." ));
+    }
+    return true;
+}
+
+
+bool V2Capture::RemoveDiseqcConfig  ( uint  CardId )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM diseqc_config WHERE cardinputid = :CARDID ");
+    query.bindValue(":CARDID", CardId);
+    if (!query.exec())
+    {
+        MythDB::DBError("MythAPI::RemoveDiseqcConfig()", query);
+        throw( QString( "Database Error executing query." ));
+    }
+    int numrows = query.numRowsAffected();
+    return numrows > 0;
 }

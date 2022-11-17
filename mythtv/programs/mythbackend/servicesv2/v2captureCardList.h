@@ -210,6 +210,42 @@ class V2DiseqcTreeList : public QObject
 
 Q_DECLARE_METATYPE(V2DiseqcTreeList*)
 
+class V2DiseqcConfigList : public QObject
+{
+    Q_OBJECT
+    Q_CLASSINFO( "Version", "1.0" );
+    Q_CLASSINFO( "DiseqcConfigs", "type=V2DiseqcConfig");
+
+    SERVICE_PROPERTY2( QVariantList, DiseqcConfigs );
+
+    public:
+
+        Q_INVOKABLE V2DiseqcConfigList(QObject *parent = nullptr)
+            : QObject( parent )
+        {
+        }
+
+        void Copy( const V2DiseqcConfigList *src )
+        {
+            CopyListContents< V2DiseqcConfigList >( this, m_DiseqcConfigs, src->m_DiseqcConfigs );
+        }
+
+        V2DiseqcConfig *AddDiseqcConfig()
+        {
+            // We must make sure the object added to the QVariantList has
+            // a parent of 'this'
+
+            auto *pObject = new V2DiseqcConfig( this );
+            m_DiseqcConfigs.append( QVariant::fromValue<QObject *>( pObject ));
+            return pObject;
+        }
+
+    private:
+        Q_DISABLE_COPY(V2DiseqcConfigList);
+};
+
+Q_DECLARE_METATYPE(V2DiseqcConfigList*)
+
 
 
 #endif

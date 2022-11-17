@@ -235,7 +235,7 @@ class V2DiseqcTree : public QObject
     Q_OBJECT
     Q_CLASSINFO( "Version"    , "1.0" );
 
-    SERVICE_PROPERTY2( uint         ,   DiseqcId )
+    SERVICE_PROPERTY2( uint         ,   DiSEqCId )
     SERVICE_PROPERTY2( uint         ,   ParentId )
     SERVICE_PROPERTY2( uint         ,   Ordinal )
     SERVICE_PROPERTY2( QString      ,   Type )
@@ -271,5 +271,32 @@ class V2DiseqcTree : public QObject
 };
 
 Q_DECLARE_METATYPE(V2DiseqcTree*)
+
+
+class V2DiseqcConfig : public QObject
+{
+    Q_OBJECT
+    Q_CLASSINFO( "Version"    , "1.0" );
+
+    SERVICE_PROPERTY2( uint         ,   CardId )
+    SERVICE_PROPERTY2( uint         ,   DiSEqCId )
+    SERVICE_PROPERTY2( QString      ,   Value )
+
+    public:
+
+        Q_INVOKABLE V2DiseqcConfig(QObject *parent = nullptr)
+            :   QObject               ( parent ),
+                m_CardId              ( 0      )
+        {
+        }
+
+    private:
+        Q_DISABLE_COPY(V2DiseqcConfig);
+
+};
+
+Q_DECLARE_METATYPE(V2DiseqcConfig*)
+
+
 
 #endif

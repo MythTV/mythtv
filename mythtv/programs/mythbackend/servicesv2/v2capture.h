@@ -50,6 +50,8 @@ class V2Capture : public MythHTTPService
     Q_CLASSINFO("AddDiseqcTree",      "methods=POST")
     Q_CLASSINFO("UpdateDiseqcTree",   "methods=POST")
     Q_CLASSINFO("RemoveDiseqcTree",   "methods=POST")
+    Q_CLASSINFO("AddDiseqcConfig",    "methods=POST")
+    Q_CLASSINFO("RemoveDiseqcConfig", "methods=POST")
 
   public:
     V2Capture();
@@ -157,7 +159,7 @@ class V2Capture : public MythHTTPService
                                                     uint           ScrFrequency,
                                                     int            ScrPin);
 
-    static bool                 UpdateDiseqcTree  ( uint           DiseqcId,
+    static bool                 UpdateDiseqcTree  ( uint           DiSEqCId,
                                                     uint           ParentId,
                                                     uint           Ordinal,
                                                     const QString& Type,
@@ -177,7 +179,15 @@ class V2Capture : public MythHTTPService
                                                     uint           ScrFrequency,
                                                     int            ScrPin);
 
-  static bool                 RemoveDiseqcTree  ( uint           DiseqcId) ;
+  static bool                 RemoveDiseqcTree  ( uint           DiSEqCId) ;
+
+  static V2DiseqcConfigList*  GetDiseqcConfigList  ( void );
+
+  static bool                 AddDiseqcConfig     ( uint           CardId,
+                                                    uint           DiSEqCId,
+                                                    const QString& Value);
+
+  static bool                 RemoveDiseqcConfig  ( uint           CardId);
 
   private:
     Q_DISABLE_COPY(V2Capture)
