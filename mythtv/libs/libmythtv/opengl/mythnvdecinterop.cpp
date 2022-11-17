@@ -164,8 +164,8 @@ MythNVDECInterop::Acquire(MythRenderOpenGL* Context,
     if (!m_openglTextures.contains(cudabuffer))
     {
         std::vector<QSize> sizes;
-        sizes.emplace_back(QSize(Frame->m_width, Frame->m_height));
-        sizes.emplace_back(QSize(Frame->m_width, Frame->m_height >> 1));
+        sizes.emplace_back(Frame->m_width, Frame->m_height);
+        sizes.emplace_back(Frame->m_width, Frame->m_height >> 1);
         std::vector<MythVideoTextureOpenGL*> textures =
             MythVideoTextureOpenGL::CreateTextures(m_openglContext, FMT_NVDEC, type, sizes);
         if (textures.empty())

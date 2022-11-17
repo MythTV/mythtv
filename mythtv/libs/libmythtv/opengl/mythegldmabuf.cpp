@@ -68,7 +68,7 @@ inline std::vector<MythVideoTextureOpenGL*> MythEGLDMABUF::CreateComposed(AVDRMF
     {
         std::vector<QSize> sizes;
         int frameheight = Scan == kScan_Progressive ? Frame->m_height : Frame->m_height >> 1;
-        sizes.emplace_back(QSize(Frame->m_width, frameheight));
+        sizes.emplace_back(Frame->m_width, frameheight);
         std::vector<MythVideoTextureOpenGL*> textures =
             MythVideoTextureOpenGL::CreateTextures(Context, Frame->m_type, FMT_RGBA32, sizes,
                                                    GL_TEXTURE_EXTERNAL_OES);
@@ -185,7 +185,7 @@ inline std::vector<MythVideoTextureOpenGL*> MythEGLDMABUF::CreateSeparate(AVDRMF
     {
         int width = Frame->m_width >> ((plane > 0) ? 1 : 0);
         int height = Frame->m_height >> ((plane > 0) ? 1 : 0);
-        sizes.emplace_back(QSize(width, height));
+        sizes.emplace_back(width, height);
     }
 
     VideoFrameType format = MythAVUtil::PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->m_swPixFmt));
@@ -283,7 +283,7 @@ inline std::vector<MythVideoTextureOpenGL*> MythEGLDMABUF::CreateSeparate2(AVDRM
     {
         int width = Frame->m_width >> ((plane > 0) ? 1 : 0);
         int height = Frame->m_height >> ((plane > 0) ? 1 : 0);
-        sizes.emplace_back(QSize(width, height));
+        sizes.emplace_back(width, height);
     }
 
     // TODO - the v4l2_m2m decoder is not setting the correct sw_fmt - so we

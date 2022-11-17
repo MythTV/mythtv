@@ -265,7 +265,7 @@ bool MythOpenGLVideo::AddDeinterlacer(const MythVideoFrame* Frame, FrameScanType
     if (refstocreate)
     {
         std::vector<QSize> sizes;
-        sizes.emplace_back(QSize(m_videoDim));
+        sizes.emplace_back(m_videoDim);
         m_prevTextures = MythVideoTextureOpenGL::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
         m_nextTextures = MythVideoTextureOpenGL::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
         // ensure we use GL_NEAREST if resizing is already active and needed

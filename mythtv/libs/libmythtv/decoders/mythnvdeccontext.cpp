@@ -616,17 +616,17 @@ const std::vector<MythNVDECContext::MythNVDECCaps> &MythNVDECContext::GetProfile
                             caps.bIsSupported)
                         {
                             s_profiles.emplace_back(
-                                    MythNVDECCaps(cudacodec, depth, cudaformat,
+                                    cudacodec, depth, cudaformat,
                                         QSize(caps.nMinWidth, caps.nMinHeight),
                                         QSize(static_cast<int>(caps.nMaxWidth), static_cast<int>(caps.nMaxHeight)),
-                                        caps.nMaxMBCount));
+                                        caps.nMaxMBCount);
                         }
                         else if (!cuvid->cuvidGetDecoderCaps)
                         {
                             // dummy - just support everything:)
-                            s_profiles.emplace_back(MythNVDECCaps(cudacodec, depth, cudaformat,
+                            s_profiles.emplace_back(cudacodec, depth, cudaformat,
                                                                   QSize(32, 32), QSize(8192, 8192),
-                                                                  (8192 * 8192) / 256));
+                                                                  (8192 * 8192) / 256);
                         }
                     }
                 }
