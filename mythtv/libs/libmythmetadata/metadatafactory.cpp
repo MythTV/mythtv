@@ -157,6 +157,10 @@ void MetadataFactory::Lookup(ProgramInfo *pginfo, bool automatic,
     lookup->SetSeason(pginfo->GetSeason());
     lookup->SetEpisode(pginfo->GetEpisode());
     lookup->SetInetref(pginfo->GetInetRef());
+    lookup->SetScheduledStartTime(pginfo->GetScheduledStartTime());
+    lookup->SetScheduledEndTime(pginfo->GetScheduledEndTime());
+    lookup->SetRecordingStartTime(pginfo->GetRecordingStartTime());
+    lookup->SetRecordingEndTime(pginfo->GetRecordingEndTime());
 
     if (m_lookupthread->isRunning())
         m_lookupthread->prependLookup(lookup);
@@ -654,6 +658,17 @@ LookupType GuessLookupType(ProgramInfo *pginfo)
     if (ret != kUnknownVideo)
         return ret;
 
+    // The recording type may indicate that it's a television show.
+    // There is GetRecordingRuleType() in pginfo, but since the
+    // recording operation is finished, it has been set to
+    // kNotRecording by this time. We'll get the actual
+    // recording type from the RECORD table in the database.
+    RecordingType rt = pginfo->QueryRecordRuleType();
+    if ((rt == kAllRecord) || (rt == kDailyRecord) || (rt == kWeeklyRecord))
+    {
+        return kProbableTelevision;
+    }
+
     ProgramInfo::CategoryType catType = pginfo->GetCategoryType();
     if (catType == ProgramInfo::kCategoryNone)
         catType = pginfo->QueryCategoryType();
@@ -675,7 +690,8 @@ LookupType GuessLookupType(ProgramInfo *pginfo)
         // and the rec doesn't have a subtitle, this is a
         // generic recording. If neither the rule nor the
         // recording have an inetref, season, episode, or
-        // subtitle, it's *probably* a movie.  If it's some
+        // subtitle, we'll use the length of the recording
+        // to help guess movie or TV show. If it's some
         // weird combination of both, we've got to try everything.
         auto *rule = new RecordingRule();
         rule->m_recordID = pginfo->GetRecordingRuleID();
@@ -685,7 +701,19 @@ LookupType GuessLookupType(ProgramInfo *pginfo)
 
         if (ruleepisode == 0 && pginfo->GetEpisode() == 0 &&
             pginfo->GetSubtitle().isEmpty())
-            ret = kProbableMovie;
+        {
+            auto recLength = std::chrono::seconds(pginfo->GetScheduledStartTime()
+                .secsTo(pginfo->GetScheduledEndTime()));
+
+            if (recLength < 90min)
+            {
+                ret = kProbableTelevision;
+            }
+            else
+            {
+                ret = kProbableMovie;
+            }
+        }
         else if (ruleepisode > 0 && pginfo->GetSubtitle().isEmpty())
             ret = kProbableGenericTelevision;
         else
