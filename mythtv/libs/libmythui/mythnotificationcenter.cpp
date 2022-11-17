@@ -598,26 +598,25 @@ void MythNotificationScreen::UpdatePlayback(float progress, const QString &text)
 void MythNotificationScreen::UpdateFrom(const MythNotificationScreen &s)
 {
     // check if anything has changed
-    m_refresh = !(
-                  m_id == s.m_id &&
-                  m_image == s.m_image &&
-                  m_imagePath == s.m_imagePath &&
-                  m_title == s.m_title &&
-                  m_origin == s.m_origin &&
-                  m_description == s.m_description &&
-                  m_extra == s.m_extra &&
-                  m_duration == s.m_duration &&
-                  m_progress == s.m_progress &&
-                  m_progresstext == s.m_progresstext &&
-                  m_content == s.m_content &&
-                  m_fullscreen == s.m_fullscreen &&
-                  m_expiry == s.m_expiry &&
-                  m_index == s.m_index &&
-                  m_style == s.m_style &&
-                  m_visibility == s.m_visibility &&
-                  m_priority == s.m_priority &&
-                  m_type == s.m_type
-                  );
+    m_refresh =   m_id != s.m_id ||
+                  m_image != s.m_image ||
+                  m_imagePath != s.m_imagePath ||
+                  m_title != s.m_title ||
+                  m_origin != s.m_origin ||
+                  m_description != s.m_description ||
+                  m_extra != s.m_extra ||
+                  m_duration != s.m_duration ||
+                  m_progress != s.m_progress ||
+                  m_progresstext != s.m_progresstext ||
+                  m_content != s.m_content ||
+                  m_fullscreen != s.m_fullscreen ||
+                  m_expiry != s.m_expiry ||
+                  m_index != s.m_index ||
+                  m_style != s.m_style ||
+                  m_visibility != s.m_visibility ||
+                  m_priority != s.m_priority ||
+                  m_type != s.m_type
+                  ;
 
     if (m_refresh)
     {
