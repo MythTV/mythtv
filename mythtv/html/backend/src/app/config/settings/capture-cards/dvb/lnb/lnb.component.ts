@@ -95,7 +95,7 @@ export class LnbComponent implements OnInit, AfterViewInit, DiseqcSettingBase {
   }
 
   ngOnInit(): void {
-    if (this.diseqcTree.DiseqcId) {
+    if (this.diseqcTree.DiSEqCId) {
       // For presentation divide by 1000 to convert to Mhz
       this.work.LnbLofSwitch = this.diseqcTree.LnbLofSwitch / 1000;
       this.work.LnbLofLo = this.diseqcTree.LnbLofLo / 1000;
@@ -138,7 +138,7 @@ export class LnbComponent implements OnInit, AfterViewInit, DiseqcSettingBase {
     })
     obs.subscribe(x => {
       this.setupDone = true;
-      if (this.diseqcTree.DiseqcId) {
+      if (this.diseqcTree.DiSEqCId) {
         this.currentForm.form.markAsPristine();
       } else {
         this.currentForm.form.markAsDirty()
@@ -172,13 +172,13 @@ export class LnbComponent implements OnInit, AfterViewInit, DiseqcSettingBase {
     this.diseqcTree.LnbLofLo = this.work.LnbLofLo * 1000;
     this.diseqcTree.LnbLofHi = this.work.LnbLofHi * 1000;
 
-    if (this.diseqcTree.DiseqcId)
+    if (this.diseqcTree.DiSEqCId)
       this.captureCardService.UpdateDiseqcTree(this.diseqcTree).subscribe(observer);
     else {
       this.captureCardService.AddDiseqcTree(this.diseqcTree).subscribe({
         next: (x: any) => {
           if (x.int && x.int > 0) {
-            this.diseqcTree.DiseqcId = x.int;
+            this.diseqcTree.DiSEqCId = x.int;
             if (observer.next)
               observer.next(x);
           }

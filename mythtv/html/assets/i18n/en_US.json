@@ -604,7 +604,17 @@
       "inpgroup": {
         "label": "Input Group",
         "desc": "Input groups are only needed when two or more cards share the same resource such as a FireWire card and an analog card input controlling the same set top box. Leave blank unless this input is shared with another device. Only one of the inputs in an input group will be allowed to record at any given time."
-      }
+      },
+      "switchport_label": "Satellite Switch Port",
+      "switchport_desc": "Choose a port to use for this switch.",
+      "longitude_label": "Satellite Longitude (Degrees)",
+      "longitude_east": "Eastern",
+      "longitude_west": "Western",
+      "longitude_desc": "Locates the satellite you wish to point to with the longitude along the Clarke Belt of the satellite [-180..180] and its hemisphere.",
+      "unicablepos_label": "Satellite Unicable Position",
+      "unicablepos_porta": "Port A",
+      "unicablepos_portb": "Port B",
+      "unicablepos_desc": "Unicable satellite position (A/B)"
     },
     "sgroups": {
       "special": {

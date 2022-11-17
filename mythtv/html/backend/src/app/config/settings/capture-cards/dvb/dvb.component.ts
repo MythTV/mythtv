@@ -105,7 +105,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
 
   setupDiseqc(): void {
     this.diseqcTree = this.diseqcTreeList.DiseqcTreeList.DiseqcTrees.find
-      (x => x.DiseqcId == this.card.DiSEqCId);
+      (x => x.DiSEqCId == this.card.DiSEqCId);
     this.work.diseqcError = false;
   }
 
@@ -136,6 +136,10 @@ export class DvbComponent implements OnInit, AfterViewInit {
     this.card.DiSEqCId = 0;
     this.currentForm.form.markAsDirty();
     this.diseqcTree = undefined;
+    // Do not check results of this - it may fail if diseqc config was never set
+    // up for this card.
+    this.captureCardService.DeleteDiseqcConfig(this.card.CardId)
+      .subscribe();
   }
 
   canDeleteDiseqc() {
@@ -151,8 +155,8 @@ export class DvbComponent implements OnInit, AfterViewInit {
     this.work.displayDeleteDiseqc = false;
     this.work.successCount = 0;
     this.work.errorCount = 0;
-    if (this.diseqcTree && this.diseqcTree.DiseqcId) {
-      this.captureCardService.DeleteDiseqcTree(this.diseqcTree.DiseqcId)
+    if (this.diseqcTree && this.diseqcTree.DiSEqCId) {
+      this.captureCardService.DeleteDiseqcTree(this.diseqcTree.DiSEqCId)
         .subscribe({
           next: (x: any) => {
             if (x.bool)
@@ -174,11 +178,15 @@ export class DvbComponent implements OnInit, AfterViewInit {
         // Update device and child devices
         this.cardList.CaptureCardList.CaptureCards.forEach(card => {
           if (card.CardId == this.card.CardId || card.ParentId == this.card.CardId) {
-            this.captureCardService.UpdateCaptureCard(card.CardId, 'diseqcid',
+            this.captureCardService.UpdateCaptureCard(card.CardId, 'DiSEqCId',
               String(this.card.DiSEqCId))
               .subscribe(this.saveObserver);
           }
         });
+        // Do not check results of this - it may fail if diseqc config was never set
+        // up for this card.
+        this.captureCardService.DeleteDiseqcConfig(this.card.CardId)
+          .subscribe();
       }
     }
     this.diseqcTree = undefined;
@@ -290,13 +298,13 @@ export class DvbComponent implements OnInit, AfterViewInit {
       this.diseqcComponent.saveForm(0, {
         next: (x: any) => {
           if (this.card.DiSEqCId && x.bool
-            && this.card.DiSEqCId == this.diseqcTree?.DiseqcId) {
+            && this.card.DiSEqCId == this.diseqcTree?.DiSEqCId) {
             this.work.successCount++;
             this.saveCard();
           }
           else if (x.int && this.diseqcTree) {
             this.card.DiSEqCId = x.int;
-            this.diseqcTree.DiseqcId = x.int;
+            this.diseqcTree.DiSEqCId = x.int;
             this.diseqcTreeList.DiseqcTreeList.DiseqcTrees.push(this.diseqcTree);
             this.saveCard();
           }
@@ -347,7 +355,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
           this.captureCardService.UpdateCaptureCard(card.CardId, 'inputname',
             this.card.InputName)
             .subscribe(this.saveObserver);
-          this.captureCardService.UpdateCaptureCard(card.CardId, 'diseqcid',
+          this.captureCardService.UpdateCaptureCard(card.CardId, 'DiSEqCId',
             String(this.card.DiSEqCId))
             .subscribe(this.saveObserver);
         }

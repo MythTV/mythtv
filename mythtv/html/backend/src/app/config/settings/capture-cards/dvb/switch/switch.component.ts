@@ -57,7 +57,7 @@ export class SwitchComponent implements OnInit, AfterViewInit, DiseqcSettingBase
   }
 
   ngOnInit(): void {
-    if (this.diseqcTree.DiseqcId) {
+    if (this.diseqcTree.DiSEqCId) {
       // convert address to hexadecimal
       this.work.addressText = "0x" + this.diseqcTree.Address.toString(16);
     } else {
@@ -78,7 +78,7 @@ export class SwitchComponent implements OnInit, AfterViewInit, DiseqcSettingBase
     this.displayDeleteThis = [];
     this.diseqcTreeList.DiseqcTreeList.DiseqcTrees.forEach
       (x => {
-        if (x.ParentId == this.diseqcTree.DiseqcId) {
+        if (x.ParentId == this.diseqcTree.DiSEqCId) {
           this.diseqcSubTree.push(x)
           this.displayDeleteThis.push(false);
           this.diseqcSubTreeCount++;
@@ -102,7 +102,7 @@ export class SwitchComponent implements OnInit, AfterViewInit, DiseqcSettingBase
     })
     obs.subscribe(x => {
       this.setupDone = true;
-      if (this.diseqcTree.DiseqcId) {
+      if (this.diseqcTree.DiSEqCId) {
         this.currentForm.form.markAsPristine();
       } else {
         this.currentForm.form.markAsDirty()
@@ -134,8 +134,8 @@ export class SwitchComponent implements OnInit, AfterViewInit, DiseqcSettingBase
     console.log("Delete", ix);
     if (this.diseqcSubTree[ix] == null)
       return;
-    if (this.diseqcSubTree[ix]!.DiseqcId) {
-      this.captureCardService.DeleteDiseqcTree(this.diseqcSubTree[ix]!.DiseqcId)
+    if (this.diseqcSubTree[ix]!.DiSEqCId) {
+      this.captureCardService.DeleteDiseqcTree(this.diseqcSubTree[ix]!.DiSEqCId)
         .subscribe({
           next: (x: any) => {
             if (!x.bool) {
@@ -190,12 +190,12 @@ export class SwitchComponent implements OnInit, AfterViewInit, DiseqcSettingBase
     // get address from hexadecimal text
     this.diseqcTree.Address = Number.parseInt(this.work.addressText);
 
-    if (this.diseqcTree.DiseqcId) {
+    if (this.diseqcTree.DiSEqCId) {
       this.captureCardService.UpdateDiseqcTree(this.diseqcTree).subscribe(observer);
       // save sub trees
       this.diseqcSubComponent.forEach(x => {
         if (x)
-          x.saveForm(this.diseqcTree.DiseqcId, {
+          x.saveForm(this.diseqcTree.DiSEqCId, {
             error: (err: any) => {
               observer.error(err);
             }
@@ -206,13 +206,13 @@ export class SwitchComponent implements OnInit, AfterViewInit, DiseqcSettingBase
       this.captureCardService.AddDiseqcTree(this.diseqcTree).subscribe({
         next: (x: any) => {
           if (x.int && x.int > 0) {
-            this.diseqcTree.DiseqcId = x.int;
+            this.diseqcTree.DiSEqCId = x.int;
             if (observer.next)
               observer.next(x);
             // save sub trees
             this.diseqcSubComponent.forEach(x => {
               if (x)
-                x.saveForm(this.diseqcTree.DiseqcId, {
+                x.saveForm(this.diseqcTree.DiSEqCId, {
                   next: (x: any) => { },
                   error: (err: any) => {
                     observer.error(err);

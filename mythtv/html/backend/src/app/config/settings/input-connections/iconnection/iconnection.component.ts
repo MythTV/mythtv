@@ -5,7 +5,7 @@ import { Observable, PartialObserver } from 'rxjs';
 import { startWith } from 'rxjs/operators';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { ChannelService } from 'src/app/services/channel.service';
-import { CardAndInput, CaptureCardList, InputGroup } from 'src/app/services/interfaces/capture-card.interface';
+import { CardAndInput, CaptureCardList, InputGroup, DiseqcTreeList, DiseqcTree, DiseqcConfig } from 'src/app/services/interfaces/capture-card.interface';
 import { Channel, FetchChannelsFromSourceRequest, GetChannelInfoListRequest } from 'src/app/services/interfaces/channel.interface';
 import { VideoSource, VideoSourceList } from 'src/app/services/interfaces/videosource.interface';
 import { SetupService } from 'src/app/services/setup.service';
@@ -36,6 +36,12 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
   inputGroups: InputGroup[] = [];
   selectGroups: InputGroup[] = [];
 
+  diseqcTreeList!: DiseqcTreeList;
+
+  diseqcTree!: DiseqcTree;
+
+  diseqcConfig!: DiseqcConfig;
+
   work = {
     successCount: 0,
     errorCount: 0,
@@ -55,6 +61,11 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     // 0 = not fetch, 1 = in progress, 2 = success, 3 = fail
     fetchStatus: 0,
     fetchCount: 0,
+    switchPort: 0,
+    rotorDegrees: 0,
+    scrPort: "",
+    // Eastern = 1, Western = -1
+    hemisphere: 1,
   };
 
   orgInputGroupIds: number[] = [];
@@ -150,12 +161,16 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     if (this.work.isEncoder || this.work.isUnscanable)
       if (this.work.hasTuner || this.card.CardType == "EXTERNAL")
         this.work.showPresetTuner = true;
+    if (this.card.CardType == "DVB") {
+      this.loadDiseqc();
+    }
+
     let obs = new Observable(x => {
       setTimeout(() => {
         x.next(1);
         x.complete();
       }, 100)
-    })
+    });
     obs.subscribe(x => {
       if (this.card.DisplayName)
         this.currentForm.form.markAsPristine();
@@ -166,9 +181,84 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     });
   }
 
+  loadDiseqc() {
+    // Get DiseqcTree list
+    this.captureCardService.GetDiseqcTreeList()
+      .subscribe({
+        next: data => {
+          this.diseqcTreeList = data;
+          this.setupDiseqc();
+        },
+        error: (err: any) => {
+          console.log("GetDiseqcTreeList", err);
+          this.work.errorCount++;
+        }
+      });
+  }
+
+  setupDiseqc(): void {
+    let tree = this.diseqcTreeList.DiseqcTreeList.DiseqcTrees.find
+      (x => x.DiSEqCId == this.card.DiSEqCId);
+    if (tree) {
+      this.diseqcTree = tree;
+      switch (this.diseqcTree.Type) {
+        case 'switch':
+        case 'rotor':
+        case 'scr':
+          this.captureCardService.GetDiseqcConfigList()
+            .subscribe({
+              next: data => {
+                let config = data.DiseqcConfigList.DiseqcConfigs
+                  .find(entry => entry.CardId == this.card.CardId
+                    && entry.DiSEqCId == this.card.DiSEqCId);
+                if (config)
+                  this.diseqcConfig = config;
+                else
+                  this.diseqcConfig = {
+                    CardId: this.card.CardId,
+                    DiSEqCId: this.card.DiSEqCId,
+                    Value: ''
+                  };
+                if (this.diseqcTree.Type == "switch") {
+                  this.work.switchPort = Number.parseInt(this.diseqcConfig.Value) - 1;
+                  if (Number.isNaN(this.work.switchPort))
+                    this.work.switchPort = 0;
+                }
+                else if (this.diseqcTree.Type == "rotor") {
+                  this.work.rotorDegrees = Number.parseFloat(this.diseqcConfig.Value);
+                  if (Number.isNaN(this.work.rotorDegrees))
+                    this.work.rotorDegrees = 0;
+                  if (this.work.rotorDegrees < 0) {
+                    this.work.hemisphere = -1;
+                    this.work.rotorDegrees = - this.work.rotorDegrees;
+                  }
+                  else
+                    this.work.hemisphere = 1;
+                }
+                else if (this.diseqcTree.Type == "scr") {
+                  switch (this.diseqcConfig.Value) {
+                    case '0':
+                      this.work.scrPort = 'A';
+                      break;
+                    case '1':
+                      this.work.scrPort = 'B';
+                      break;
+                    default:
+                      this.work.scrPort = '';
+                  }
+                }
+              },
+              error: (err: any) => {
+                console.log("GetDiseqcTreeList", err);
+                this.work.errorCount++;
+              }
+            });
+      }
+    }
+  }
+
   ngAfterViewInit(): void {
     this.setupService.setCurrentForm(this.currentForm);
-    // this.topElement.nativeElement.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   fillChannelList(): void {
@@ -339,6 +429,36 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     if (counter != this.card.RecLimit) {
       this.work.recLimitUpd = true;
     }
+    // Save diseqc config
+    if (this.diseqcConfig) {
+      let newValue = "";
+
+      if (this.diseqcTree.Type == "switch")
+        newValue = (this.work.switchPort - 1).toString();
+      else if (this.diseqcTree.Type == "rotor")
+        newValue = (this.work.rotorDegrees * this.work.hemisphere).toString();
+      else if (this.diseqcTree.Type == "scr") {
+        switch (this.work.scrPort) {
+          case 'A':
+            newValue = '0';
+            break;
+          case 'B':
+            newValue = '1';
+            break;
+          default:
+            newValue = '0';
+        }
+      }
+      if (newValue != this.diseqcConfig.Value) {
+        this.diseqcConfig.Value = newValue;
+        this.captureCardService.DeleteDiseqcConfig(this.card.CardId)
+          .subscribe(resp => {
+            this.captureCardService.AddDiseqcConfig(this.diseqcConfig)
+              .subscribe(this.saveObserver);
+          })
+      }
+    }
+
   }
 
   showHelp() {

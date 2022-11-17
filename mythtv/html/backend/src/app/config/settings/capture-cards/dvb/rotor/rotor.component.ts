@@ -90,7 +90,7 @@ export class RotorComponent implements OnInit, AfterViewInit, DiseqcSettingBase 
     for (let ix = 0; ix < 48; ix++) {
       this.rotorPositions.push({ Num: ix + 1, Angle: null });
     }
-    if (this.diseqcTree.DiseqcId) {
+    if (this.diseqcTree.DiSEqCId) {
       let entries = this.diseqcTree.RotorPositions.split(':');
       entries.forEach(x => {
         let fields = x.split('=');
@@ -115,7 +115,7 @@ export class RotorComponent implements OnInit, AfterViewInit, DiseqcSettingBase 
     }
     // Get sub component
     this.diseqcSubTree = this.diseqcTreeList.DiseqcTreeList.DiseqcTrees.find
-      (x => x.ParentId == this.diseqcTree.DiseqcId);
+      (x => x.ParentId == this.diseqcTree.DiSEqCId);
   }
 
   setupDone = false;
@@ -134,7 +134,7 @@ export class RotorComponent implements OnInit, AfterViewInit, DiseqcSettingBase 
     })
     obs.subscribe(x => {
       this.setupDone = true;
-      if (this.diseqcTree.DiseqcId) {
+      if (this.diseqcTree.DiSEqCId) {
         this.currentForm.form.markAsPristine();
       } else {
         this.currentForm.form.markAsDirty()
@@ -162,8 +162,8 @@ export class RotorComponent implements OnInit, AfterViewInit, DiseqcSettingBase 
   deleteDiseqc(): void {
     this.work.displayDeleteDiseqc = false;
     this.dvbComponent.work.errorCount = 0;
-    if (this.diseqcSubTree && this.diseqcSubTree.DiseqcId) {
-      this.captureCardService.DeleteDiseqcTree(this.diseqcSubTree.DiseqcId)
+    if (this.diseqcSubTree && this.diseqcSubTree.DiSEqCId) {
+      this.captureCardService.DeleteDiseqcTree(this.diseqcSubTree.DiSEqCId)
         .subscribe({
           next: (x: any) => {
             if (!x.bool) {
@@ -209,11 +209,11 @@ export class RotorComponent implements OnInit, AfterViewInit, DiseqcSettingBase 
       }
     })
 
-    if (this.diseqcTree.DiseqcId) {
+    if (this.diseqcTree.DiSEqCId) {
       this.captureCardService.UpdateDiseqcTree(this.diseqcTree).subscribe(observer);
       // save sub tree
       if (this.diseqcSubComponent) {
-        this.diseqcSubComponent.saveForm(this.diseqcTree.DiseqcId, {
+        this.diseqcSubComponent.saveForm(this.diseqcTree.DiSEqCId, {
           error: (err: any) => {
             observer.error(err);
           }
@@ -224,11 +224,11 @@ export class RotorComponent implements OnInit, AfterViewInit, DiseqcSettingBase 
       this.captureCardService.AddDiseqcTree(this.diseqcTree).subscribe({
         next: (x: any) => {
           if (x.int && x.int > 0) {
-            this.diseqcTree.DiseqcId = x.int;
+            this.diseqcTree.DiSEqCId = x.int;
             observer.next(x);
             // save sub tree
             if (this.diseqcSubComponent)
-              this.diseqcSubComponent.saveForm(this.diseqcTree.DiseqcId, {
+              this.diseqcSubComponent.saveForm(this.diseqcTree.DiSEqCId, {
                 next: (x: any) => { },
                 error: (err: any) => {
                   observer.error(err);

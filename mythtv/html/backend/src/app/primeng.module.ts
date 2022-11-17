@@ -26,6 +26,7 @@ import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
+import { RadioButtonModule } from 'primeng/radiobutton';
 
 
 @NgModule({
@@ -56,6 +57,7 @@ import { TooltipModule } from 'primeng/tooltip';
         ToastModule,
         ToolbarModule,
         TooltipModule,
+        RadioButtonModule
     ]
 })
 

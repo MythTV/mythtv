@@ -36,7 +36,7 @@ export class UnicableComponent implements OnInit, AfterViewInit, DiseqcSettingBa
 
   ngOnInit(): void {
 
-    if (!this.diseqcTree.DiseqcId) {
+    if (!this.diseqcTree.DiSEqCId) {
       // New unicable - set defaults
       this.diseqcTree.ScrUserband = 0;
       this.diseqcTree.ScrFrequency = 1210;
@@ -46,7 +46,7 @@ export class UnicableComponent implements OnInit, AfterViewInit, DiseqcSettingBa
 
     // Get sub component
     this.diseqcSubTree = this.diseqcTreeList.DiseqcTreeList.DiseqcTrees.find
-      (x => x.ParentId == this.diseqcTree.DiseqcId);
+      (x => x.ParentId == this.diseqcTree.DiSEqCId);
 
   }
 
@@ -66,7 +66,7 @@ export class UnicableComponent implements OnInit, AfterViewInit, DiseqcSettingBa
     })
     obs.subscribe(x => {
       this.setupDone = true;
-      if (this.diseqcTree.DiseqcId) {
+      if (this.diseqcTree.DiSEqCId) {
         this.currentForm.form.markAsPristine();
       } else {
         this.currentForm.form.markAsDirty()
@@ -90,8 +90,8 @@ export class UnicableComponent implements OnInit, AfterViewInit, DiseqcSettingBa
   deleteDiseqc(): void {
     this.work.displayDeleteDiseqc = false;
     this.dvbComponent.work.errorCount = 0;
-    if (this.diseqcSubTree && this.diseqcSubTree.DiseqcId) {
-      this.captureCardService.DeleteDiseqcTree(this.diseqcSubTree.DiseqcId)
+    if (this.diseqcSubTree && this.diseqcSubTree.DiSEqCId) {
+      this.captureCardService.DeleteDiseqcTree(this.diseqcSubTree.DiSEqCId)
         .subscribe({
           next: (x: any) => {
             if (!x.bool) {
@@ -113,11 +113,11 @@ export class UnicableComponent implements OnInit, AfterViewInit, DiseqcSettingBa
   saveForm(parent: number, observer: Observer<any>): void {
     this.diseqcTree.ParentId = parent;
 
-    if (this.diseqcTree.DiseqcId) {
+    if (this.diseqcTree.DiSEqCId) {
       this.captureCardService.UpdateDiseqcTree(this.diseqcTree).subscribe(observer);
       // save sub tree
       if (this.diseqcSubComponent) {
-        this.diseqcSubComponent.saveForm(this.diseqcTree.DiseqcId, {
+        this.diseqcSubComponent.saveForm(this.diseqcTree.DiSEqCId, {
           error: (err: any) => {
             observer.error(err);
           }
@@ -128,12 +128,12 @@ export class UnicableComponent implements OnInit, AfterViewInit, DiseqcSettingBa
       this.captureCardService.AddDiseqcTree(this.diseqcTree).subscribe({
         next: (x: any) => {
           if (x.int && x.int > 0) {
-            this.diseqcTree.DiseqcId = x.int;
+            this.diseqcTree.DiSEqCId = x.int;
             if (observer.next)
               observer.next(x);
             // save sub tree
             if (this.diseqcSubComponent)
-              this.diseqcSubComponent.saveForm(this.diseqcTree.DiseqcId, {
+              this.diseqcSubComponent.saveForm(this.diseqcTree.DiSEqCId, {
                 next: (x: any) => { },
                 error: (err: any) => {
                   observer.error(err);

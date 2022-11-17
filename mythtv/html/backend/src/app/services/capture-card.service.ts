@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CaptureCard, CaptureCardList, CaptureDeviceList, CardTypeList, DiseqcParm, DiseqcTree, DiseqcTreeList, InputGroupList } from './interfaces/capture-card.interface';
+import { CaptureCard, CaptureCardList, CaptureDeviceList, CardTypeList, DiseqcConfig, DiseqcConfigList, DiseqcParm, DiseqcTree, DiseqcTreeList, InputGroupList } from './interfaces/capture-card.interface';
 import { BoolResponse } from './interfaces/common.interface';
 
 @Injectable({
@@ -72,13 +72,28 @@ export class CaptureCardService {
       { DiseqcId: DiseqcId });
   }
 
+  public GetDiseqcConfigList(): Observable<DiseqcConfigList> {
+    return this.httpClient.get<DiseqcConfigList>('/Capture/GetDiseqcConfigList', {});
+  }
+
+  public AddDiseqcConfig(tree: DiseqcConfig): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Capture/AddDiseqcConfig',
+      tree);
+  }
+
+  public DeleteDiseqcConfig(CardId: number): Observable<BoolResponse> {
+    console.log(CardId)
+    return this.httpClient.post<BoolResponse>('/Capture/RemoveDiseqcConfig',
+      { CardId: CardId });
+  }
+
   public GetInputGroupList(): Observable<InputGroupList> {
-    return this.httpClient.get<InputGroupList>('Capture/GetUserInputGroupList', {});
+    return this.httpClient.get<InputGroupList>('/Capture/GetUserInputGroupList', {});
   }
 
   public SetInputMaxRecordings(InputId: number, Max: number): Observable<BoolResponse> {
-    return this.httpClient.post<BoolResponse>('Capture/SetInputMaxRecordings',
-      {InputId: InputId, Max: Max});
+    return this.httpClient.post<BoolResponse>('/Capture/SetInputMaxRecordings',
+      { InputId: InputId, Max: Max });
   }
 
   public AddUserInputGroup(Name: string): Observable<number> {

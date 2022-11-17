@@ -85,7 +85,7 @@ export interface CaptureDeviceList {
 }
 
 export interface DiseqcTree {
-    DiseqcId:            number;
+    DiSEqCId:            number;
     ParentId:            number;
     Ordinal:             number;
     Type:                string;
@@ -111,6 +111,19 @@ export interface DiseqcTreeList {
         DiseqcTrees: DiseqcTree [];
     }
 }
+
+export interface DiseqcConfig {
+    CardId:            number;
+    DiSEqCId:          number;
+    Value:             string;
+}
+
+export interface DiseqcConfigList {
+    DiseqcConfigList : {
+        DiseqcConfigs: DiseqcConfig [];
+    }
+}
+
 
 export interface DiseqcParm {
     description: string,

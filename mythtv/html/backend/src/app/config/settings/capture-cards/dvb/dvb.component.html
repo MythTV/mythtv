@@ -146,7 +146,7 @@
                         [resizable]="false">
                         <p>{{ 'settings.capture.dvb.satellite_select' | translate }}</p>
                         <p-listbox [options]="diseqcRootTrees" [(ngModel)]="work.selectedDiseqcTree"
-                            optionLabel="Description" name="diseqcRootTrees" optionValue="DiseqcId"
+                            optionLabel="Description" name="diseqcRootTrees" optionValue="DiSEqCId"
                             (onDblClick)="selectDiseqc();"></p-listbox>
                         <ng-template pTemplate="footer">
                             <p-button icon="pi pi-times-circle" (onClick)="work.displayConnectDevice=false"
