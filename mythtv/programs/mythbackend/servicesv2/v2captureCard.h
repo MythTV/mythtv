@@ -285,8 +285,7 @@ class V2DiseqcConfig : public QObject
     public:
 
         Q_INVOKABLE V2DiseqcConfig(QObject *parent = nullptr)
-            :   QObject               ( parent ),
-                m_CardId              ( 0      )
+            :   QObject               ( parent )
         {
         }
 
