@@ -140,25 +140,57 @@ void MythAVUtil::DeinterlaceAVFrame(AVFrame *Frame)
     if (VideoFrameType type = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->format));
         MythVideoFrame::YUVFormat(type))
     {
-        MythVideoFrame mythframe(type, Frame->data[0],
-                                 MythVideoFrame::GetBufferSize(type, Frame->width, Frame->height),
-                                 Frame->width, Frame->height);
-        mythframe.m_offsets[0] = 0;
-        mythframe.m_offsets[1] = static_cast<int>(Frame->data[1] - Frame->data[0]);
-        mythframe.m_offsets[2] = static_cast<int>(Frame->data[2] - Frame->data[0]);
-        mythframe.m_pitches[0] = Frame->linesize[0];
-        mythframe.m_pitches[1] = Frame->linesize[1];
-        mythframe.m_pitches[2] = Frame->linesize[2];
+        // AVFrame video data consists of 3 independent buffers.
+        // MythVideoFrame requires video data to be in one memory block.
+        // Create a copy of the frame with all video data in one memory block.
+        AVFrame tempFrame = *Frame;
+        AVFrame *tf = &tempFrame;
 
+        size_t b0 = tf->buf[0]->size;
+        size_t b1 = tf->buf[1]->size;
+        size_t b2 = tf->buf[2]->size;
+
+        // Extend size to a multiple of 16 bytes for MythVideoFrame alignment constraints
+        size_t b0a = ((b0 + 15) / 16) * 16;
+        size_t b1a = ((b1 + 15) / 16) * 16;
+        size_t b2a = ((b2 + 15) / 16) * 16;
+
+        // Allocate contiguous buffer with enough space for the three segments
+        uint8_t *tbuf{ new uint8_t[b0a + b1a + b2a]{} };
+
+        tf->data[0] = tbuf;
+        tf->data[1] = tbuf + b0a;
+        tf->data[2] = tbuf + b0a + b1a;
+        memcpy(tf->data[0], tf->buf[0]->data, b0);
+        memcpy(tf->data[1], tf->buf[1]->data, b1);
+        memcpy(tf->data[2], tf->buf[2]->data, b2);
+
+        // Create a MythVideoFrame from the temporary AVFrame
+        MythVideoFrame mythframe(type, tf->data[0],
+                                 MythVideoFrame::GetBufferSize(type, tf->width, tf->height),
+                                 tf->width, tf->height);
+        mythframe.m_offsets[0] = 0;
+        mythframe.m_offsets[1] = tf->data[1] - tf->data[0];
+        mythframe.m_offsets[2] = tf->data[2] - tf->data[0];
+        mythframe.m_pitches[0] = tf->linesize[0];
+        mythframe.m_pitches[1] = tf->linesize[1];
+        mythframe.m_pitches[2] = tf->linesize[2];
+
+        // Deinterlacing
         mythframe.m_deinterlaceSingle = DEINT_CPU | DEINT_MEDIUM;
         mythframe.m_deinterlaceAllowed = DEINT_ALL;
         MythDeinterlacer deinterlacer;
         deinterlacer.Filter(&mythframe, kScan_Interlaced, nullptr, true);
+
+        // Copy back our deinterlaced frame and free the video buffer of the temporary AVFrame
+        memcpy(Frame->data[0], tf->data[0], b0);
+        memcpy(Frame->data[1], tf->data[1], b1);
+        memcpy(Frame->data[2], tf->data[2], b2);
+        delete[] tbuf;
+
         // Must remove buffer before mythframe is deleted
         mythframe.m_buffer = nullptr;
     }
-
-
 }
 
 /// \brief Initialise AVFrame with content from MythVideoFrame
