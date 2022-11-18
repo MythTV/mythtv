@@ -1498,6 +1498,7 @@ void RTjpeg::DctY(uint8_t *idata, int rskip)
 #endif
 }
 
+#ifndef MMX
 static constexpr int32_t FIX_1_082392200  { 277 };      /* FIX(1.082392200) */
 static constexpr int32_t FIX_1_414213562  { 362 };      /* FIX(1.414213562) */
 static constexpr int32_t FIX_1_847759065  { 473 };      /* FIX(1.847759065) */
@@ -1510,6 +1511,7 @@ static constexpr int16_t DESCALE(int32_t x) { return static_cast<int16_t>((x+4) 
 static inline int16_t RL(int32_t x) { return std::clamp(x, 16, 235); };
 static constexpr int32_t MULTIPLY(int32_t var, int32_t constant)
     { return ((var * constant) + 128) >> 8; };
+#endif
 
 void RTjpeg::IdctInit(void)
 {
