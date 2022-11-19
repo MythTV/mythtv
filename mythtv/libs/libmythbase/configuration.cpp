@@ -76,7 +76,7 @@ bool XmlConfiguration::Save()
     }
 
     QString pathName = m_path + '/' + m_fileName;
-    QString old      = pathName + ".old";
+    QString backupName = pathName + ".old";
 
     LOG(VB_GENERAL, LOG_DEBUG, QString("Saving %1").arg(pathName));
 
@@ -110,11 +110,11 @@ bool XmlConfiguration::Save()
     bool success = true;
     if (QFile::exists(pathName))
     {
-        if (QFile::exists(old) && !QFile::remove(old)) // if true, rename will fail
+        if (QFile::exists(backupName) && !QFile::remove(backupName)) // if true, rename will fail
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to remove '%1', cannot backup current settings").arg(old));
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to remove '%1', cannot backup current settings").arg(backupName));
         }
-        success = QFile::rename(pathName, old); // backup old settings in case it fails
+        success = QFile::rename(pathName, backupName); // backup old settings in case it fails
     }
 
     if (success) // no settings to overwrite or settings backed up successfully
@@ -122,14 +122,14 @@ bool XmlConfiguration::Save()
         success = file.rename(pathName); // move new settings into target location
         if (success)
         {
-            if (QFile::exists(old) && !QFile::remove(old))
+            if (QFile::exists(backupName) && !QFile::remove(backupName))
             {
-                LOG(VB_GENERAL, LOG_WARNING, QString("Failed to remove '%1'").arg(old));
+                LOG(VB_GENERAL, LOG_WARNING, QString("Failed to remove '%1'").arg(backupName));
             }
         }
-        else if (QFile::exists(old) && !QFile::rename(old, pathName)) // !success &&
+        else if (QFile::exists(backupName) && !QFile::rename(backupName, pathName)) // !success &&
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to rename (restore) '%1").arg(old));
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to rename (restore) '%1").arg(backupName));
         }
     }
 
