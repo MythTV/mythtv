@@ -9,26 +9,6 @@
 
 class MythContextPrivate;
 
-class MythContextSlotHandler : public QObject
-{
-    friend class MythContextPrivate;
-    Q_OBJECT
-
-  public:
-    explicit MythContextSlotHandler(MythContextPrivate *x) : d(x) { }
-
-  private slots:
-    void VersionMismatchPopupClosed(void);
-
-  public slots:
-    void OnCloseDialog(void);
-
-  private:
-    ~MythContextSlotHandler() override = default;
-
-    MythContextPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
-};
-
 /** \class MythContext
  *  \brief Startup context for MythTV.
  *
