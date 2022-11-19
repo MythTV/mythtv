@@ -193,7 +193,7 @@ QString XmlConfiguration::GetValue(const QString &setting)
     }
 
     LOG(VB_GENERAL, LOG_DEBUG, QString("Using default for \"%1\"").arg(setting));
-    return QString();
+    return {};
 }
 
 void XmlConfiguration::SetValue(const QString &setting, const QString& value)
