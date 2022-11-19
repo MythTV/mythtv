@@ -96,7 +96,7 @@ class GUISettingsCache
 
 class MythContextPrivate : public QObject
 {
-    friend class MythContextSlotHandler;
+    Q_OBJECT;
 
   public:
     explicit MythContextPrivate(MythContext *lparent);
@@ -139,6 +139,7 @@ class MythContextPrivate : public QObject
 
   public slots:
     void OnCloseDialog();
+    void VersionMismatchPopupClosed();
 
   public:
     MythContext            *m_parent             {nullptr};
@@ -154,7 +155,6 @@ class MythContextPrivate : public QObject
     bool                   m_disableeventpopup   {false};
 
     MythUIHelper           *m_ui                 {nullptr};
-    MythContextSlotHandler *m_sh                 {nullptr};
     GUIStartup             *m_guiStartup         {nullptr};
     QEventLoop             *m_loop               {nullptr};
     bool                    m_needsBackend       {false};
@@ -270,7 +270,6 @@ static void eject_cb(void)
 
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
     : m_parent(lparent),
-      m_sh(new MythContextSlotHandler(this)),
       m_loop(new QEventLoop(this))
 {
     InitializeMythDirs();
@@ -287,8 +286,6 @@ MythContextPrivate::~MythContextPrivate()
 
     if (m_ui)
         DestroyMythUI();
-    if (m_sh)
-        m_sh->deleteLater();
 }
 
 /**
@@ -710,11 +707,12 @@ bool MythContextPrivate::SaveDatabaseParams(
     return success;
 }
 
-void MythContextSlotHandler::OnCloseDialog(void)
+void MythContextPrivate::OnCloseDialog(void)
 {
-    if (d && d->m_loop
-      && d->m_loop->isRunning())
-        d->m_loop->exit();
+    if (m_loop && m_loop->isRunning())
+    {
+        m_loop->exit();
+    }
 }
 
 
@@ -744,7 +742,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
         {
             mainStack->AddScreen(ssd);
             connect(dbsetting, &DatabaseSettings::isClosing,
-                m_sh, &MythContextSlotHandler::OnCloseDialog);
+                this, &MythContextPrivate::OnCloseDialog);
             if (!m_loop->isRunning())
                 m_loop->exec();
         }
@@ -1479,7 +1477,7 @@ void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
     if (HasMythMainWindow() && m_ui && m_ui->IsScreenSetup())
     {
         m_mbeVersionPopup = ShowOkPopup(
-            message, m_sh, &MythContextSlotHandler::VersionMismatchPopupClosed);
+            message, this, &MythContextPrivate::VersionMismatchPopupClosed);
     }
     else
     {
@@ -1573,9 +1571,9 @@ void GUISettingsCache::clearOverrides()
 
 } // anonymous namespace
 
-void MythContextSlotHandler::VersionMismatchPopupClosed(void)
+void MythContextPrivate::VersionMismatchPopupClosed()
 {
-    d->m_mbeVersionPopup = nullptr;
+    m_mbeVersionPopup = nullptr;
     qApp->exit(GENERIC_EXIT_SOCKET_ERROR);
 }
 
@@ -1746,5 +1744,8 @@ bool MythContext::saveSettingsCache(void)
     }
     return true;
 }
+
+/// Required for a QObject defined in a *.cpp file.
+#include "mythcontext.moc"
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
