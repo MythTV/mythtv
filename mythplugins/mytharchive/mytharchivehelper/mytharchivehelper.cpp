@@ -2367,7 +2367,7 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
 
 
 
-int main(int argc, char **argv)
+static int main_local(int argc, char **argv)
 {
     MythArchiveHelperCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -2571,4 +2571,9 @@ int main(int argc, char **argv)
     exit(res);
 }
 
-
+int main(int argc, char **argv)
+{
+    int result = main_local(argc, argv);
+    logStop();
+    return result;
+}
