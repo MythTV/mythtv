@@ -8,6 +8,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include "libmythbase/mythconfig.h"
+
 // Qt
 #include <QNetworkInterface>
 #include <QNetworkProxy>
@@ -19,7 +21,6 @@
 #ifdef USING_LIBDNS_SD
 #include "libmythbase/bonjourregister.h"
 #endif
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythupnp/htmlserver.h"
