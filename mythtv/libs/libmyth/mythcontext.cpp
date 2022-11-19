@@ -64,7 +64,7 @@ class GUISettingsCache
 {
   public:
     GUISettingsCache() = default;
-    GUISettingsCache(QString cache_filename, QString cache_path)
+    GUISettingsCache(const QString& cache_filename, QString cache_path)
         : m_cache_path(std::move(cache_path))
     {
         m_cache_filename = m_cache_path + '/' + cache_filename;
