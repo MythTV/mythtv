@@ -65,12 +65,12 @@ class GUISettingsCache
   public:
     GUISettingsCache() = default;
     GUISettingsCache(const QString& cache_filename, QString cache_path)
-        : m_cache_path(std::move(cache_path))
+        : m_cachePath(std::move(cache_path))
     {
-        m_cache_filename = m_cache_path + '/' + cache_filename;
-        if (m_cache_path.isEmpty() || cache_filename.isEmpty())
+        m_cacheFilename = m_cachePath + '/' + cache_filename;
+        if (m_cachePath.isEmpty() || cache_filename.isEmpty())
         {
-            m_cache_filename = m_cache_path = QString();
+            m_cacheFilename = m_cachePath = QString();
         }
     }
 
@@ -79,10 +79,10 @@ class GUISettingsCache
     static void clearOverrides();
 
   private:
-    QString m_cache_filename {"cache/contextcache.xml"};
-    QString m_cache_path     {"cache"};
+    QString m_cacheFilename {"cache/contextcache.xml"};
+    QString m_cachePath     {"cache"};
 
-    static const std::array<QString, 13> k_settings;
+    static const std::array<QString, 13> kSettings;
 };
 
 } // anonymous namespace
@@ -570,7 +570,7 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     m_dbParams.m_wolRetry       = config.GetValue(kDefaultWOL + "SQLConnectRetry", 5);
     m_dbParams.m_wolCommand     = config.GetValue(kDefaultWOL + "Command", "");
 
-    bool ok = m_dbParams.IsValid(XmlConfiguration::k_default_filename);
+    bool ok = m_dbParams.IsValid(XmlConfiguration::kDefaultFilename);
 
     if (!ok)
         m_dbParams.LoadDefaults();
@@ -1150,7 +1150,7 @@ BackendSelection::Decision MythContextPrivate::ChooseBackend(const QString &erro
     LOG(VB_GENERAL, LOG_INFO, "Putting up the UPnP backend chooser");
 
     BackendSelection::Decision ret =
-        BackendSelection::Prompt(&m_dbParams, XmlConfiguration::k_default_filename);
+        BackendSelection::Prompt(&m_dbParams, XmlConfiguration::kDefaultFilename);
     // TODO encapuslation: don't use a pointer
 
     EndTempWindow();
@@ -1231,7 +1231,7 @@ int MythContextPrivate::UPnPautoconf(const std::chrono::milliseconds milliSecond
 }
 
 /**
- * Get the default backend from XmlConfiguration::k_default_filename, use UPnP to find it.
+ * Get the default backend from XmlConfiguration::kDefaultFilename, use UPnP to find it.
  *
  * Sets a string if there any connection problems
  */
@@ -1255,7 +1255,7 @@ bool MythContextPrivate::DefaultUPnP(QString& Error)
     }
 
     LOG(VB_UPNP, LOG_INFO,
-        loc + QString(XmlConfiguration::k_default_filename) +
+        loc + QString(XmlConfiguration::kDefaultFilename) +
         QString(" has default PIN '%1' and host USN: %2").arg(pin, usn));
 
     // ----------------------------------------------------------------------
@@ -1478,10 +1478,10 @@ void MythContextPrivate::processEvents(void)
 
 namespace
 {
-// cache some settings in GUISettingsCache::m_cache_filename
+// cache some settings in GUISettingsCache::m_cacheFilename
 // only call this if the database is available.
 
-const std::array<QString, 13> GUISettingsCache::k_settings
+const std::array<QString, 13> GUISettingsCache::kSettings
 { "Theme", "Language", "Country", "GuiHeight",
   "GuiOffsetX", "GuiOffsetY", "GuiWidth", "RunFrontendInWindow",
   "AlwaysOnTop", "HideMouseCursor", "ThemePainter", "libCECEnabled",
@@ -1490,12 +1490,12 @@ const std::array<QString, 13> GUISettingsCache::k_settings
 
 bool GUISettingsCache::save()
 {
-    QString cacheDirName = GetConfDir() + '/' + m_cache_path;
+    QString cacheDirName = GetConfDir() + '/' + m_cachePath;
     QDir dir(cacheDirName);
     dir.mkpath(cacheDirName);
-    XmlConfiguration config = XmlConfiguration(m_cache_filename);
+    XmlConfiguration config = XmlConfiguration(m_cacheFilename);
     bool dirty = false;
-    for (const auto & setting : k_settings)
+    for (const auto & setting : kSettings)
     {
         QString cacheValue = config.GetValue("Settings/" + setting, QString());
         gCoreContext->ClearOverrideSettingForSession(setting);
@@ -1520,8 +1520,8 @@ bool GUISettingsCache::save()
 
 void GUISettingsCache::loadOverrides() const
 {
-    auto config = XmlConfiguration(m_cache_filename); // read only
-    for (const auto & setting : k_settings)
+    auto config = XmlConfiguration(m_cacheFilename); // read only
+    for (const auto & setting : kSettings)
     {
         if (!gCoreContext->GetSetting(setting, QString()).isEmpty())
             continue;
@@ -1538,7 +1538,7 @@ void GUISettingsCache::loadOverrides() const
 void GUISettingsCache::clearOverrides()
 {
     QString language = gCoreContext->GetSetting("Language", QString());
-    for (const auto & setting : k_settings)
+    for (const auto & setting : kSettings)
         gCoreContext->ClearOverrideSettingForSession(setting);
     // Restore power off TV setting
     gCoreContext->ClearOverrideSettingForSession("PowerOffTVAllowed");

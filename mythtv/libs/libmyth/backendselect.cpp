@@ -23,7 +23,7 @@ BackendSelection::BackendSelection(
     ) :
     MythScreenType(parent, "BackEnd Selection"),
     m_dbParams(params),
-    m_config_filename(std::move(config_filename)),
+    m_configFilename(std::move(config_filename)),
     m_exitOnFinish(exitOnFinish)
 {
     if (exitOnFinish)
@@ -116,7 +116,7 @@ void BackendSelection::Accept(MythUIButtonListItem *item)
     if (ConnectBackend(dev))
     {
         {
-            auto config = XmlConfiguration(m_config_filename);
+            auto config = XmlConfiguration(m_configFilename);
             if (!m_pinCode.isEmpty())
                 config.SetValue(kDefaultPIN, m_pinCode);
             config.SetValue(kDefaultUSN, m_usn);

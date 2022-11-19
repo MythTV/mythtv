@@ -40,19 +40,19 @@ class MBASE_PUBLIC XmlConfiguration
   protected:
 
     QString      m_path     {GetConfDir()};
-    QString      m_fileName {k_default_filename};
+    QString      m_fileName {kDefaultFilename};
 
     QDomDocument m_config;
     QDomNode     m_rootNode;
 
-    QDomNode FindNode(const QString &name, bool create);
+    QDomNode FindNode(const QString &setting, bool create);
     QDomNode FindNode(QStringList &path, QDomNode &current, bool create);
 
     QString GetValue(const QString &setting);
 
   public:
 
-    static constexpr auto k_default_filename = "config.xml";
+    static constexpr auto kDefaultFilename = "config.xml";
 
     XmlConfiguration() { Load(); }
     explicit XmlConfiguration(QString fileName)

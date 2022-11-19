@@ -71,7 +71,7 @@ class BackendSelection : public MythScreenType
     void CloseWithDecision(Decision d);
 
     DatabaseParams   *m_dbParams        {nullptr};
-    QString           m_config_filename;
+    QString           m_configFilename;
     bool              m_exitOnFinish;
     ItemMap           m_devices;
 
