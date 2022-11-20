@@ -27,7 +27,6 @@
 #include <QMap>
 
 // MythTV
-#include "libmyth/mythcontext.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythdate.h"

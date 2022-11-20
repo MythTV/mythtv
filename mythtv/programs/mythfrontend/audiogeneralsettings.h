@@ -10,7 +10,6 @@
 
 // MythTV headers
 #include "libmyth/audio/audiooutput.h"
-#include "libmyth/mythcontext.h"
 #include "libmythui/standardsettings.h"
 #include "libmythbase/mthread.h"
 #include "libmythui/mythdialogbox.h"

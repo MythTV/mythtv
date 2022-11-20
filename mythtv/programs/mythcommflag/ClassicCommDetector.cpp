@@ -9,7 +9,7 @@
 #include <QString>
 
 // MythTV headers
-#include "libmyth/mythcontext.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/programinfo.h"
 #include "libmythbase/sizetliteral.h"

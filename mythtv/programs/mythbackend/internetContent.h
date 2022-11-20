@@ -15,7 +15,6 @@
 #include <QMap>
 #include <QDateTime>
 
-#include "libmyth/mythcontext.h"
 #include "libmythupnp/httpserver.h"
 
 /////////////////////////////////////////////////////////////////////////////

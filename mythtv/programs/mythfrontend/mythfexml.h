@@ -8,7 +8,6 @@
 #ifndef MYTHFEXML_H_
 #define MYTHFEXML_H_
 
-#include "libmyth/mythcontext.h"
 #include "libmythupnp/eventing.h"
 #include "libmythupnp/upnp.h"
 

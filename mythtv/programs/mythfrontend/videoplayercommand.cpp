@@ -2,8 +2,8 @@
 #include <QDir>
 
 // MythTV
-#include "libmyth/mythcontext.h"
 #include "libmythbase/lcddevice.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/remoteutil.h"

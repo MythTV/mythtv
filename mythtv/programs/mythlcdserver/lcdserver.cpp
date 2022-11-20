@@ -66,9 +66,9 @@
 #include <QStringList>
 
 // mythtv
-#include "libmyth/mythcontext.h"
 #include "libmythbase/lcddevice.h"
 #include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
 
 // mythlcdserver
 #include "lcdserver.h"

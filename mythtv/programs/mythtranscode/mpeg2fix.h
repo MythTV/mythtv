@@ -4,8 +4,6 @@
 // C++
 #include <cstdlib>
 
-#include "libmythbase/mythconfig.h"
-
 extern "C"
 {
 //AVFormat/AVCodec
@@ -293,7 +291,6 @@ class MPEG2fixup
     #define GENERIC_EXIT_DEADLOCK             150
 #else
    #include "libmythbase/exitcodes.h"
-   #include "libmyth/mythcontext.h"
 #endif
 
 /*
