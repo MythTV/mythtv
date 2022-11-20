@@ -8,10 +8,10 @@
 #include <QtEndian>
 
 // MythTV
-#include "libmyth/mythcontext.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/iso639.h"
 #include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/sizetliteral.h"
 #include "libmythui/mediamonitor.h"

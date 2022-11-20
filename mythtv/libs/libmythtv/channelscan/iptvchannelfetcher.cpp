@@ -11,9 +11,9 @@
 #include <QTextStream>
 
 // MythTV headers
-#include "libmyth/mythcontext.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 
 #include "cardutil.h"

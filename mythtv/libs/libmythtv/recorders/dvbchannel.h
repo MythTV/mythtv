@@ -12,7 +12,6 @@
 #include <QObject>
 #include <QString>
 
-#include "libmyth/mythcontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdbcon.h"
 

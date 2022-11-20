@@ -24,6 +24,9 @@
 
 #include <cassert>
 
+#include <QDateTime>
+#include <QString>
+
 // MythTV
 #include "libmythbase/iso639.h"
 #include "libmythtv/mythtvexp.h"

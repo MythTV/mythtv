@@ -10,7 +10,6 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "libmyth/mythcontext.h"
 #include "libmythbase/mythdbcon.h"
 
 #include "cardutil.h"

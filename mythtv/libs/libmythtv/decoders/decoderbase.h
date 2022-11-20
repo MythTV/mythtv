@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <vector>
 
-#include "libmyth/mythcontext.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/programinfo.h"
 #include "libmythtv/io/mythmediabuffer.h"

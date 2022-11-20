@@ -3,7 +3,6 @@
 #include <QDir>
 
 // MythTV
-#include "libmyth/mythcontext.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"

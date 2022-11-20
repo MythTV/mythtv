@@ -3,6 +3,7 @@
 #include <QFontMetrics>
 #include <QRegularExpression>
 
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythui/mythfontproperties.h"
 #include "libmythui/mythpainter.h"

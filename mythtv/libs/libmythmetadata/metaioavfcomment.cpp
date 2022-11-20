@@ -8,10 +8,6 @@ extern "C" {
 #include "metaioavfcomment.h"
 #include "musicmetadata.h"
 
-// libmyth
-#include "libmyth/mythcontext.h"
-#include "libmythbase/mythconfig.h"
-
 /*!
  * \copydoc MetaIO::write()
  */

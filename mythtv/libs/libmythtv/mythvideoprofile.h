@@ -5,13 +5,13 @@
 #include <vector>
 
 // Qt
+#include <QObject>
 #include <QStringList>
 #include <QRecursiveMutex>
 #include <QSize>
 #include <QMap>
 
 // MythTV
-#include "libmyth/mythcontext.h"
 #include "libmythtv/mythtvexp.h"
 
 static constexpr const char* DEINT_QUALITY_NONE   { "none"     };

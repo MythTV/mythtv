@@ -12,6 +12,7 @@
 #include <QMutex>
 #include <QMap>
 #include <QRecursiveMutex>
+#include <QSet>
 
 // MythTV headers
 #include "libmythbase/mthread.h"

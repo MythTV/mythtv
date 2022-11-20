@@ -15,8 +15,8 @@
 #include "metaiowavpack.h"
 #include "metaioavfcomment.h"
 
-// Libmyth
-#include "libmyth/mythcontext.h"
+// libmythbase
+#include "libmythbase/mythcorecontext.h"
 
 const QString MetaIO::kValidFileExtensions(".mp3|.mp2|.ogg|.oga|.flac|.wma|.wav|.ac3|.oma|.omg|"
                                           ".atp|.ra|.dts|.aac|.m4a|.aa3|.tta|.mka|.aiff|.swa|.wv");
