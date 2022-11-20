@@ -5,8 +5,6 @@
 #include <apetag.h>
 #include <apeitem.h>
 
-#include "libmyth/mythcontext.h"
-
 // libmythmetadata
 #include "metaiowavpack.h"
 #include "musicmetadata.h"

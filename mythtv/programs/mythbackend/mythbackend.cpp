@@ -24,6 +24,7 @@
 #include <unistd.h>
 
 // MythTV
+#include "libmyth/mythcontext.h"
 #include "libmythbase/cleanupguard.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/configuration.h"

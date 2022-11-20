@@ -7,8 +7,8 @@
 #include <unistd.h>
 
 // MythTV headers
-#include "libmyth/mythcontext.h"
 #include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
 

@@ -7,7 +7,6 @@
 #include <QDomDocument>
 
 // mythtv
-#include "libmyth/mythcontext.h"
 #include "libmythbase/mythchrono.h"
 
 // libmythmetadata

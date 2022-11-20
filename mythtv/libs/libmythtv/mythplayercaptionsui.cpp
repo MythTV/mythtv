@@ -1,4 +1,6 @@
 // MythTV
+#include "libmythbase/mythcorecontext.h"
+
 #include "captions/subtitlescreen.h"
 #include "livetvchain.h"
 #include "mheg/interactivetv.h"

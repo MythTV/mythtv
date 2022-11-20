@@ -17,10 +17,10 @@
 #include <QReadLocker>
 
 // MythTV
-#include "libmyth/mythcontext.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/mythcdrom.h"
 #include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"

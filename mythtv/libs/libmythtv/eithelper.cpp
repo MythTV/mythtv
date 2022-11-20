@@ -5,6 +5,7 @@
 
 // MythTV includes
 #include "libmythbase/compat.h"  // for gmtime_r on windows.
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/programinfo.h" // for subtitle types and audio and video properties

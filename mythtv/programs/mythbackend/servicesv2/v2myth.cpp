@@ -7,9 +7,12 @@
 #include <QNetworkRequest>
 
 // MythTV
+#include "libmyth/mythcontext.h"
+
 #include "libmythbase/dbutil.h"
 #include "libmythbase/hardwareprofile.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythcoreutil.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
