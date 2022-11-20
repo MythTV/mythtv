@@ -1,7 +1,7 @@
 // Qt headers
 
 // MythTV headers
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcorecontext.h>
 
 // MythZoneMinder headers
 #include "alarmnotifythread.h"

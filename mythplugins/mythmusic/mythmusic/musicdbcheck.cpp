@@ -7,8 +7,8 @@
 #include <QSqlError>
 
 // MythTV
-#include <libmyth/mythcontext.h>
 #include <libmyth/schemawizard.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythdbcheck.h>
 #include <libmythmetadata/musicmetadata.h>

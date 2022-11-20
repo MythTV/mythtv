@@ -10,8 +10,8 @@
 #include <QDomDocument>
 
 // myth
-#include <libmyth/mythcontext.h>
 #include <libmythbase/exitcodes.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythsystemlegacy.h>
 #include <libmythbase/programinfo.h>

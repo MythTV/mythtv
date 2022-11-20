@@ -4,7 +4,7 @@
 #include <QTimer>
 
 // MythTV
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdirs.h>
 #include <libmythmetadata/mythuimetadataresults.h>
 #include <libmythui/mythdialogbox.h>

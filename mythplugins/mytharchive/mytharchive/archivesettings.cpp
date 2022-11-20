@@ -5,7 +5,6 @@
 #include <unistd.h>
 
 // myth
-#include <libmyth/mythcontext.h>
 #include <libmythbase/mythdirs.h>
 #include <libmythbase/mythdate.h>
 

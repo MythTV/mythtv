@@ -7,7 +7,7 @@
 #include <QKeyEvent>
 
 // myth
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythcoreutil.h>
 #include <libmythbase/stringutil.h>
 #include <libmythui/mythmainwindow.h>

@@ -6,7 +6,6 @@
 #include <QString>
 
 // MythTV
-#include <libmyth/mythcontext.h>
 #include <libmythbase/mythcoreutil.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythdbcon.h>

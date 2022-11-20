@@ -9,7 +9,7 @@
 #include <QUrl>
 
 // MythTV
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythevent.h>
 #include <libmythbase/mythlogging.h>
 #include <libmythbase/remoteutil.h>

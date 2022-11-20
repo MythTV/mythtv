@@ -9,7 +9,6 @@
 #include <QSqlField>
 
 // MythTV
-#include <libmyth/mythcontext.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdb.h>
 #include <libmythmetadata/musicmetadata.h>

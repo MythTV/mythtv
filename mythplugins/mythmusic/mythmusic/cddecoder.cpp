@@ -18,7 +18,6 @@
 
 // MythTV
 #include <libmyth/audio/audiooutput.h>
-#include <libmyth/mythcontext.h>
 #include <libmythmetadata/musicmetadata.h>
 
 extern "C" {

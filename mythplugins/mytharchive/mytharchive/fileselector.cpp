@@ -7,7 +7,6 @@
 #include <QVariant>
 
 // Myth
-#include <libmyth/mythcontext.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/stringutil.h>
 #include <libmythui/mythdialogbox.h>

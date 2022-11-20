@@ -1,6 +1,5 @@
 
 // MythTV headers
-#include <libmyth/mythcontext.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythui/mythdialogbox.h>
