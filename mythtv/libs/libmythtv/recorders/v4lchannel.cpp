@@ -18,6 +18,7 @@
 #include <linux/videodev2.h>
 
 // MythTV headers
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 
 #include "cardutil.h"

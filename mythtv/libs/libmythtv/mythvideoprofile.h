@@ -5,6 +5,7 @@
 #include <vector>
 
 // Qt
+#include <QObject>
 #include <QStringList>
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
 #include <QMutex>
@@ -15,7 +16,6 @@
 #include <QMap>
 
 // MythTV
-#include "libmyth/mythcontext.h"
 #include "libmythtv/mythtvexp.h"
 
 static constexpr const char* DEINT_QUALITY_NONE   { "none"     };

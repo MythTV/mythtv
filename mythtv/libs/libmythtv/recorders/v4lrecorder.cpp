@@ -9,7 +9,6 @@
 #include <unistd.h>         // for IO_NONBLOCK
 #include <fcntl.h>          // for IO_NONBLOCK
 
-#include "libmyth/mythcontext.h"
 #include "libmythbase/mythlogging.h"
 
 #include "captions/vbi608extractor.h"

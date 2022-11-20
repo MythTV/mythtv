@@ -3,7 +3,6 @@
 #include <QDir>
 #include <QUrl>
 
-#include "libmyth/mythcontext.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/remoteutil.h"

@@ -4,7 +4,6 @@
 #include <iostream>
 #include <algorithm>
 
-#include "libmyth/mythcontext.h"
 #include "libmythui/mythmainwindow.h"
 
 #include "fourcc.h"

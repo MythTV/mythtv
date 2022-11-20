@@ -7,7 +7,6 @@
 
 #include <QDateTime>
 
-#include "libmyth/mythcontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"

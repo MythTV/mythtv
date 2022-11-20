@@ -2,6 +2,7 @@
 #include <utility>
 
 // libmythbase
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 
 // libmythui

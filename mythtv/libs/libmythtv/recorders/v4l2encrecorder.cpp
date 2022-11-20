@@ -26,6 +26,9 @@
 #include <QString>
 
 // MythTV includes
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+
 #include "io/mythmediabuffer.h"
 #include "recorders/v4l2encrecorder.h"
 #include "recorders/v4l2encstreamhandler.h"

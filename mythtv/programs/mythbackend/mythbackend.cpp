@@ -22,6 +22,7 @@
 #endif
 
 // MythTV
+#include "libmyth/mythcontext.h"
 #include "libmythbase/cleanupguard.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/exitcodes.h"

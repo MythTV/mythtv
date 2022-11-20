@@ -1,5 +1,5 @@
 // MythTV
-#include "libmyth/mythcontext.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/programinfo.h"
 

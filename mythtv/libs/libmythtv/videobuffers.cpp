@@ -6,7 +6,6 @@
 #include <thread>
 
 // MythTV
-#include "libmyth/mythcontext.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"

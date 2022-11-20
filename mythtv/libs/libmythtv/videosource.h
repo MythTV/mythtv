@@ -5,9 +5,9 @@
 #include <vector>
 
 // MythTV headers
-#include "libmyth/mythcontext.h"
 #include "libmyth/standardsettings.h"
 #include "libmythbase/mthread.h"
+#include "libmythbase/mythcorecontext.h"
 
 #include "mythtvexp.h"
 

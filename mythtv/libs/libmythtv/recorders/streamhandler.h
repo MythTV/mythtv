@@ -14,6 +14,7 @@
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 #include <QRecursiveMutex>
 #endif
+#include <QSet>
 
 // MythTV headers
 #include "libmythbase/mthread.h"
