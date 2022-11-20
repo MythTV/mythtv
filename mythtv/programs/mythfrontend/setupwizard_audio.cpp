@@ -7,7 +7,7 @@
 
 // MythTV
 #include "libmyth/audio/audiooutpututil.h"
-#include "libmyth/mythcontext.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythui/mythprogressdialog.h"
