@@ -28,7 +28,7 @@ class MPUBLIC MythContext
               bool ignoreDB = false);
 
     bool SaveDatabaseParams(const DatabaseParams &params, bool force = false);
-    bool saveSettingsCache(void);
+    bool saveSettingsCache();
 
     void SetDisableEventPopup(bool check);
 
@@ -42,7 +42,7 @@ class MPUBLIC MythContext
     };
 
     void setWebOnly(WebOnlyStartup w) {m_webOnly = w;}
-    WebOnlyStartup getWebOnly(void) {return m_webOnly;}
+    WebOnlyStartup getWebOnly() {return m_webOnly;}
 
   private:
     Q_DISABLE_COPY(MythContext)

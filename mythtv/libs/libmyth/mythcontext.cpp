@@ -112,32 +112,32 @@ class MythContext::Impl : public QObject
     bool FindDatabase(bool prompt, bool noAutodetect);
 
     void TempMainWindow();
-    void EndTempWindow(void);
+    void EndTempWindow();
     void LanguagePrompt();
 
-    bool LoadDatabaseSettings(void);
+    bool LoadDatabaseSettings();
     bool SaveDatabaseParams(const DatabaseParams &params, bool force);
 
     bool    PromptForDatabaseParams(const QString &error);
     QString TestDBconnection(bool prompt=true);
-    void    SilenceDBerrors(void);
-    void    EnableDBerrors(void);
-    void    ResetDatabase(void) const;
+    void    SilenceDBerrors();
+    void    EnableDBerrors();
+    void    ResetDatabase() const;
 
     BackendSelection::Decision
             ChooseBackend(const QString &error);
     int     UPnPautoconf(std::chrono::milliseconds milliSeconds = 2s);
     bool    DefaultUPnP(QString& Error);
     bool    UPnPconnect(const DeviceLocation *backend, const QString &PIN);
-    void    ShowGuiStartup(void);
+    void    ShowGuiStartup();
     bool    checkPort(QString &host, int port, std::chrono::seconds timeLimit) const;
-    static void processEvents(void);
+    static void processEvents();
 
   protected:
     bool event(QEvent* /*e*/) override; // QObject
 
     void ShowConnectionFailurePopup(bool persistent);
-    void HideConnectionFailurePopup(void);
+    void HideConnectionFailurePopup();
 
     void ShowVersionMismatchPopup(uint remote_version);
 
@@ -265,7 +265,7 @@ static void plugin_cb(const QString &cmd)
     }
 }
 
-static void eject_cb(void)
+static void eject_cb()
 {
     MediaMonitor::ejectOpticalDisc();
 }
@@ -1734,7 +1734,7 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params, bool force)
     return m_impl->SaveDatabaseParams(params, force);
 }
 
-bool MythContext::saveSettingsCache(void)
+bool MythContext::saveSettingsCache()
 {
     /* this check is technically redundant since this is only called from
     MythContext::Init() and mythfrontend::main(); however, it is for safety
