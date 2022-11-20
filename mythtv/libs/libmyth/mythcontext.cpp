@@ -102,7 +102,7 @@ class MythContext::Impl : public QObject
     Q_OBJECT;
 
   public:
-    explicit Impl(MythContext *lparent);
+    explicit Impl();
    ~Impl() override;
 
     bool Init        (bool gui,
@@ -145,8 +145,6 @@ class MythContext::Impl : public QObject
     void VersionMismatchPopupClosed();
 
   public:
-    MythContext            *m_parent             {nullptr};
-
                             /// Should this context use GUI elements?
     bool                    m_gui                {false};
 
@@ -271,9 +269,8 @@ static void eject_cb(void)
     MediaMonitor::ejectOpticalDisc();
 }
 
-MythContext::Impl::Impl(MythContext *lparent)
-    : m_parent(lparent),
-      m_loop(new QEventLoop(this))
+MythContext::Impl::Impl()
+    : m_loop(new QEventLoop(this))
 {
     InitializeMythDirs();
 }
@@ -808,7 +805,7 @@ bool MythContext::Impl::PromptForDatabaseParams(const QString &error)
                                                 params.m_wolCommand);
         }
 
-        accepted = m_parent->SaveDatabaseParams(params);
+        accepted = SaveDatabaseParams(params, false);
     }
     return accepted;
 }
@@ -1581,7 +1578,7 @@ void MythContext::Impl::VersionMismatchPopupClosed()
 }
 
 MythContext::MythContext(QString binversion, bool needsBackend)
-    : m_impl(new MythContext::Impl(this)),
+    : m_impl(new MythContext::Impl()),
       m_appBinaryVersion(std::move(binversion))
 {
 #ifdef _WIN32
