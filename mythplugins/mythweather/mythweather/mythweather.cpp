@@ -2,8 +2,8 @@
 #include <unistd.h>
 
 // MythTV headers
-#include <libmyth/mythcontext.h>
 #include <libmythbase/lcddevice.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythplugin.h>
 #include <libmythbase/mythpluginapi.h>
 #include <libmythbase/mythversion.h>

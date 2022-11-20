@@ -7,7 +7,6 @@
 #include <QString>
 
 // MythTV
-#include <libmyth/mythcontext.h>
 #include <libmythmetadata/metaioflacvorbis.h>
 #include <libmythmetadata/musicmetadata.h>
 

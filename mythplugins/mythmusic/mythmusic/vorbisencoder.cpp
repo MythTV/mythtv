@@ -11,7 +11,6 @@
 #include <QString>
 
 // MythTV
-#include <libmyth/mythcontext.h>
 #include <libmythbase/mythrandom.h>
 #include <libmythmetadata/metaiooggvorbis.h>
 #include <libmythmetadata/musicmetadata.h>

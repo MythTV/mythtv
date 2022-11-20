@@ -3,7 +3,7 @@
 #include <QStringList>
 
 // MythTV headers
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythbase/mythdirs.h>
 #include <libmythui/mythmainwindow.h>

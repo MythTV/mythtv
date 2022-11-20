@@ -8,7 +8,7 @@
 #include <QTimer>
 
 // mythtv
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/remotefile.h>
 #include <libmythbase/stringutil.h>

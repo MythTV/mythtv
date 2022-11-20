@@ -4,9 +4,6 @@
 // Qt
 #include <QFile>
 
-// MythTV
-#include <libmyth/mythcontext.h>
-
 // MythGame
 #include "rom_metadata.h"
 

@@ -4,6 +4,7 @@
 #include <QVariant>
 
 // MythTV headers
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdb.h>
 #include <libmythui/mythprogressdialog.h>
 

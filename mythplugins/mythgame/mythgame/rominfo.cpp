@@ -2,8 +2,8 @@
 #include <QFile>
 
 // MythTV
-#include <libmyth/mythcontext.h>
 #include <libmythbase/mythdb.h>
+#include <libmythbase/mythlogging.h>
 
 // MythGame
 #include "romedit.h"

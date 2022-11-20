@@ -1,6 +1,6 @@
 #include <QDir>
 
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdirs.h>
 #include <libmythbase/remotefile.h>
 

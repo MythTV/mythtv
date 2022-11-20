@@ -3,7 +3,6 @@
 #include <QFile>
 
 // MythTV
-#include <libmyth/mythcontext.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythuibutton.h>
 #include <libmythui/mythuihelper.h>

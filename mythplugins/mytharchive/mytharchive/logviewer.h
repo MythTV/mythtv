@@ -5,7 +5,7 @@
 #include <QTimer>
 
 // myth
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythui/mythscreentype.h>
 
 static constexpr std::chrono::seconds DEFAULT_UPDATE_TIME { 5s };

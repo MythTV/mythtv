@@ -4,7 +4,6 @@
 #include <QImageReader>
 
 // MythTV headers
-#include <libmyth/mythcontext.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythbase/mythdirs.h>

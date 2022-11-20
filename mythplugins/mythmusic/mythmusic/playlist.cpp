@@ -12,9 +12,9 @@
 #include <QRegularExpression>
 
 // MythTV
-#include <libmyth/mythcontext.h>
 #include <libmythbase/compat.h>
 #include <libmythbase/exitcodes.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythmiscutil.h>
 #include <libmythbase/mythsystemlegacy.h>
