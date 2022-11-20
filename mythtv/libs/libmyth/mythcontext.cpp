@@ -97,13 +97,13 @@ class GUISettingsCache
 
 } // anonymous namespace
 
-class MythContextPrivate : public QObject
+class MythContext::Impl : public QObject
 {
     Q_OBJECT;
 
   public:
-    explicit MythContextPrivate(MythContext *lparent);
-   ~MythContextPrivate() override;
+    explicit Impl(MythContext *lparent);
+   ~Impl() override;
 
     bool Init        (bool gui,
                       bool promptForBackend,
@@ -271,14 +271,14 @@ static void eject_cb(void)
     MediaMonitor::ejectOpticalDisc();
 }
 
-MythContextPrivate::MythContextPrivate(MythContext *lparent)
+MythContext::Impl::Impl(MythContext *lparent)
     : m_parent(lparent),
       m_loop(new QEventLoop(this))
 {
     InitializeMythDirs();
 }
 
-MythContextPrivate::~MythContextPrivate()
+MythContext::Impl::~Impl()
 {
     if (GetNotificationCenter() && m_registration > 0)
     {
@@ -301,7 +301,7 @@ MythContextPrivate::~MythContextPrivate()
  *        seem to be used after the temp window is destroyed.
  *
  */
-void MythContextPrivate::TempMainWindow(bool languagePrompt)
+void MythContext::Impl::TempMainWindow(bool languagePrompt)
 {
     if (HasMythMainWindow())
         return;
@@ -324,7 +324,7 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
     }
 }
 
-void MythContextPrivate::EndTempWindow(void)
+void MythContext::Impl::EndTempWindow()
 {
     if (HasMythMainWindow())
     {
@@ -350,7 +350,7 @@ void MythContextPrivate::EndTempWindow(void)
  * \param timeLimit Limit in seconds for testing.
  */
 
-bool MythContextPrivate::checkPort(QString &host, int port, std::chrono::seconds timeLimit) const
+bool MythContext::Impl::checkPort(QString &host, int port, std::chrono::seconds timeLimit) const
 {
     PortChecker checker;
     if (m_guiStartup)
@@ -359,7 +359,7 @@ bool MythContextPrivate::checkPort(QString &host, int port, std::chrono::seconds
 }
 
 
-bool MythContextPrivate::Init(const bool gui,
+bool MythContext::Impl::Init(const bool gui,
                               const bool promptForBackend,
                               const bool disableAutoDiscovery,
                               const bool ignoreDB)
@@ -436,7 +436,7 @@ bool MythContextPrivate::Init(const bool gui,
  * Despite its name, the disable argument currently only disables the chooser.
  * If set, autoconfigure will still be attempted in some situations.
  */
-bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
+bool MythContext::Impl::FindDatabase(bool prompt, bool noAutodetect)
 {
     // We can only prompt if autodiscovery is enabled..
     bool manualSelect = prompt && !noAutodetect;
@@ -563,7 +563,7 @@ NoDBfound:
 /** Load database and host settings from XmlConfiguration::k_default_filename, or set some defaults.
  *  \return true if XmlConfiguration::k_default_filename was parsed
  */
-bool MythContextPrivate::LoadDatabaseSettings(void)
+bool MythContext::Impl::LoadDatabaseSettings()
 {
     auto config = XmlConfiguration(); // read-only
 
@@ -657,7 +657,7 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     return ok;
 }
 
-bool MythContextPrivate::SaveDatabaseParams(
+bool MythContext::Impl::SaveDatabaseParams(
     const DatabaseParams &params, bool force)
 {
     bool success = true;
@@ -710,7 +710,7 @@ bool MythContextPrivate::SaveDatabaseParams(
     return success;
 }
 
-void MythContextPrivate::OnCloseDialog(void)
+void MythContext::Impl::OnCloseDialog()
 {
     if (m_loop && m_loop->isRunning())
     {
@@ -723,7 +723,7 @@ void MythContextPrivate::OnCloseDialog(void)
 // web server to start so that the datbase can be
 // set up there
 
-bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
+bool MythContext::Impl::PromptForDatabaseParams(const QString &error)
 {
     bool accepted = false;
     if (m_gui)
@@ -745,7 +745,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
         {
             mainStack->AddScreen(ssd);
             connect(dbsetting, &DatabaseSettings::isClosing,
-                this, &MythContextPrivate::OnCloseDialog);
+                this, &MythContext::Impl::OnCloseDialog);
             if (!m_loop->isRunning())
                 m_loop->exec();
         }
@@ -818,7 +818,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
  *
  * \todo  Rationalise the WOL stuff. We should have one method to wake BEs
  */
-QString MythContextPrivate::TestDBconnection(bool prompt)
+QString MythContext::Impl::TestDBconnection(bool prompt)
 {
     QString err;
     QString host;
@@ -1078,7 +1078,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
 // Show the Gui Startup window.
 // This is called if there is a delay in startup for any reason
 // such as the database being unavailable
-void MythContextPrivate::ShowGuiStartup(void)
+void MythContext::Impl::ShowGuiStartup()
 {
     if (!m_gui)
         return;
@@ -1112,7 +1112,7 @@ void MythContextPrivate::ShowGuiStartup(void)
  *
  * It prevents hundreds of long TCP/IP timeouts or DB connect errors.
  */
-void MythContextPrivate::SilenceDBerrors(void)
+void MythContext::Impl::SilenceDBerrors()
 {
     // This silences any DB errors from Get*Setting(),
     // (which is the vast majority of them)
@@ -1127,7 +1127,7 @@ void MythContextPrivate::SilenceDBerrors(void)
     gCoreContext->GetDB()->SetDatabaseParams(m_dbParams);
 }
 
-void MythContextPrivate::EnableDBerrors(void)
+void MythContext::Impl::EnableDBerrors()
 {
     // Restore (possibly) blanked hostname
     if (m_dbParams.m_dbHostName.isNull() && !m_dbHostCp.isEmpty())
@@ -1151,7 +1151,7 @@ void MythContextPrivate::EnableDBerrors(void)
  * Any cached settings also need to be cleared,
  * so that they can be re-read from the new database
  */
-void MythContextPrivate::ResetDatabase(void) const
+void MythContext::Impl::ResetDatabase() const
 {
     gCoreContext->GetDBManager()->CloseDatabases();
     gCoreContext->GetDB()->SetDatabaseParams(m_dbParams);
@@ -1161,7 +1161,7 @@ void MythContextPrivate::ResetDatabase(void) const
 /**
  * Search for backends via UPnP, put up a UI for the user to choose one
  */
-BackendSelection::Decision MythContextPrivate::ChooseBackend(const QString &error)
+BackendSelection::Decision MythContext::Impl::ChooseBackend(const QString &error)
 {
     TempMainWindow();
 
@@ -1189,7 +1189,7 @@ BackendSelection::Decision MythContextPrivate::ChooseBackend(const QString &erro
  * This does <i>not</i> prompt for PIN entry. If the backend requires one,
  * it will fail, and the caller needs to put up a UI to ask for one.
  */
-int MythContextPrivate::UPnPautoconf(const std::chrono::milliseconds milliSeconds)
+int MythContext::Impl::UPnPautoconf(const std::chrono::milliseconds milliSeconds)
 {
     auto seconds = duration_cast<std::chrono::seconds>(milliSeconds);
     LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search %1 secs")
@@ -1260,7 +1260,7 @@ int MythContextPrivate::UPnPautoconf(const std::chrono::milliseconds milliSecond
  *
  * Sets a string if there any connection problems
  */
-bool MythContextPrivate::DefaultUPnP(QString& Error)
+bool MythContext::Impl::DefaultUPnP(QString& Error)
 {
     static const QString loc = "DefaultUPnP() - ";
 
@@ -1341,7 +1341,7 @@ bool MythContextPrivate::DefaultUPnP(QString& Error)
 /**
  * Query a backend via UPnP for its database connection parameters
  */
-bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
+bool MythContext::Impl::UPnPconnect(const DeviceLocation *backend,
                                      const QString        &PIN)
 {
     QString        error;
@@ -1384,7 +1384,7 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
     return true;
 }
 
-bool MythContextPrivate::event(QEvent *e)
+bool MythContext::Impl::event(QEvent *e)
 {
     if (e->type() == MythEvent::kMythEventMessage)
     {
@@ -1414,7 +1414,7 @@ bool MythContextPrivate::event(QEvent *e)
     return QObject::event(e);
 }
 
-void MythContextPrivate::ShowConnectionFailurePopup(bool persistent)
+void MythContext::Impl::ShowConnectionFailurePopup(bool persistent)
 {
     QDateTime now = MythDate::current();
 
@@ -1448,7 +1448,7 @@ void MythContextPrivate::ShowConnectionFailurePopup(bool persistent)
     GetNotificationCenter()->Queue(n);
 }
 
-void MythContextPrivate::HideConnectionFailurePopup(void)
+void MythContext::Impl::HideConnectionFailurePopup()
 {
     if (!GetNotificationCenter())
         return;
@@ -1464,7 +1464,7 @@ void MythContextPrivate::HideConnectionFailurePopup(void)
     m_lastCheck = QDateTime();
 }
 
-void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
+void MythContext::Impl::ShowVersionMismatchPopup(uint remote_version)
 {
     if (m_mbeVersionPopup)
         return;
@@ -1480,7 +1480,7 @@ void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
     if (HasMythMainWindow() && m_ui && m_ui->IsScreenSetup())
     {
         m_mbeVersionPopup = ShowOkPopup(
-            message, this, &MythContextPrivate::VersionMismatchPopupClosed);
+            message, this, &MythContext::Impl::VersionMismatchPopupClosed);
     }
     else
     {
@@ -1491,7 +1491,7 @@ void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
 
 // Process Events while waiting for connection
 // return true if progress is 100%
-void MythContextPrivate::processEvents(void)
+void MythContext::Impl::processEvents()
 {
 //    bool ret = false;
 //    if (m_guiStartup)
@@ -1574,14 +1574,14 @@ void GUISettingsCache::clearOverrides()
 
 } // anonymous namespace
 
-void MythContextPrivate::VersionMismatchPopupClosed()
+void MythContext::Impl::VersionMismatchPopupClosed()
 {
     m_mbeVersionPopup = nullptr;
     qApp->exit(GENERIC_EXIT_SOCKET_ERROR);
 }
 
 MythContext::MythContext(QString binversion, bool needsBackend)
-    : d(new MythContextPrivate(this)),
+    : m_impl(new MythContext::Impl(this)),
       m_appBinaryVersion(std::move(binversion))
 {
 #ifdef _WIN32
@@ -1595,9 +1595,9 @@ MythContext::MythContext(QString binversion, bool needsBackend)
     }
 #endif
 
-    d->m_needsBackend = needsBackend;
+    m_impl->m_needsBackend = needsBackend;
 
-    gCoreContext = new MythCoreContext(m_appBinaryVersion, d);
+    gCoreContext = new MythCoreContext(m_appBinaryVersion, m_impl);
 
     if (!gCoreContext || !gCoreContext->Init())
     {
@@ -1611,7 +1611,7 @@ bool MythContext::Init(const bool gui,
                        const bool disableAutoDiscovery,
                        const bool ignoreDB)
 {
-    if (!d)
+    if (!m_impl)
     {
         LOG(VB_GENERAL, LOG_EMERG, LOC + "Init() Out-of-memory");
         return false;
@@ -1625,7 +1625,7 @@ bool MythContext::Init(const bool gui,
 
     if (gui && QCoreApplication::applicationName() == MYTH_APPNAME_MYTHTV_SETUP)
     {
-        d->TempMainWindow(false);
+        m_impl->TempMainWindow(false);
         QString warning = QObject::tr("mythtv-setup is deprecated.\n"
                 "To set up MythTV, start mythbackend and use:\n"
                 "http://localhost:6544/setupwizard");
@@ -1644,7 +1644,7 @@ bool MythContext::Init(const bool gui,
             "with the installed MythTV libraries.");
         if (gui)
         {
-            d->TempMainWindow(false);
+            m_impl->TempMainWindow(false);
             WaitFor(ShowOkPopup(warning));
         }
         LOG(VB_GENERAL, LOG_WARNING, warning);
@@ -1679,7 +1679,7 @@ bool MythContext::Init(const bool gui,
                           " Please set the environment variable HOME";
         if (gui)
         {
-            d->TempMainWindow(false);
+            m_impl->TempMainWindow(false);
             WaitFor(ShowOkPopup(warning));
         }
         LOG(VB_GENERAL, LOG_WARNING, warning);
@@ -1687,14 +1687,14 @@ bool MythContext::Init(const bool gui,
         return false;
     }
 
-    if (!d->Init(gui, promptForBackend, disableAutoDiscovery, ignoreDB))
+    if (!m_impl->Init(gui, promptForBackend, disableAutoDiscovery, ignoreDB))
     {
         return false;
     }
 
     SetDisableEventPopup(false);
 
-    if (d->m_gui)
+    if (m_impl->m_gui)
     {
         saveSettingsCache();
     }
@@ -1722,17 +1722,17 @@ MythContext::~MythContext()
     delete gCoreContext;
     gCoreContext = nullptr;
 
-    delete d;
+    delete m_impl;
 }
 
 void MythContext::SetDisableEventPopup(bool check)
 {
-    d->m_disableeventpopup = check;
+    m_impl->m_disableeventpopup = check;
 }
 
 bool MythContext::SaveDatabaseParams(const DatabaseParams &params, bool force)
 {
-    return d->SaveDatabaseParams(params, force);
+    return m_impl->SaveDatabaseParams(params, force);
 }
 
 bool MythContext::saveSettingsCache(void)
@@ -1741,9 +1741,9 @@ bool MythContext::saveSettingsCache(void)
     MythContext::Init() and mythfrontend::main(); however, it is for safety
     and clarity until MythGUIContext is refactored out.
     */
-    if (d->m_gui)
+    if (m_impl->m_gui)
     {
-        return d->m_GUISettingsCache.save();
+        return m_impl->m_GUISettingsCache.save();
     }
     return true;
 }

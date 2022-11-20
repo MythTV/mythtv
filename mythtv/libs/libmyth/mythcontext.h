@@ -7,8 +7,6 @@
 #include "libmyth/mythexp.h"
 #include "libmythbase/mythdbparams.h"
 
-class MythContextPrivate;
-
 /** \class MythContext
  *  \brief Startup context for MythTV.
  *
@@ -48,7 +46,9 @@ class MPUBLIC MythContext
 
   private:
     Q_DISABLE_COPY(MythContext)
-    MythContextPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
+
+    class Impl;
+    Impl   *m_impl {nullptr}; ///< PIMPL idiom
     QString             m_appBinaryVersion;
     WebOnlyStartup      m_webOnly {kWebOnlyNone};
 };
