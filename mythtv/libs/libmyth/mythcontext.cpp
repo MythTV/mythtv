@@ -108,8 +108,9 @@ class MythContext::Impl : public QObject
                       bool ignoreDB);
     bool FindDatabase(bool prompt, bool noAutodetect);
 
-    void TempMainWindow(bool languagePrompt = true);
+    void TempMainWindow();
     void EndTempWindow(void);
+    void LanguagePrompt();
 
     bool LoadDatabaseSettings(void);
     bool SaveDatabaseParams(const DatabaseParams &params, bool force);
@@ -295,7 +296,7 @@ MythContext::Impl::~Impl()
  *        seem to be used after the temp window is destroyed.
  *
  */
-void MythContext::Impl::TempMainWindow(bool languagePrompt)
+void MythContext::Impl::TempMainWindow()
 {
     if (HasMythMainWindow())
         return;
@@ -309,13 +310,6 @@ void MythContext::Impl::TempMainWindow(bool languagePrompt)
     GetMythUI()->Init();
     MythMainWindow *mainWindow = MythMainWindow::getMainWindow(false);
     mainWindow->Init();
-
-    if (languagePrompt)
-    {
-        // ask user for language settings
-        LanguageSelection::prompt();
-        MythTranslation::load("mythfrontend");
-    }
 }
 
 void MythContext::Impl::EndTempWindow()
@@ -333,6 +327,13 @@ void MythContext::Impl::EndTempWindow()
         }
     }
     EnableDBerrors();
+}
+
+void MythContext::Impl::LanguagePrompt()
+{
+    // ask user for language settings
+    LanguageSelection::prompt();
+    MythTranslation::load("mythfrontend");
 }
 
 /**
@@ -386,9 +387,8 @@ bool MythContext::Impl::Init(const bool gui,
     // we didn't already do so.
     if (m_gui && !gCoreContext->GetDB()->HaveSchema())
     {
-        TempMainWindow(false);
-        LanguageSelection::prompt();
-        MythTranslation::load("mythfrontend");
+        TempMainWindow();
+        LanguagePrompt();
     }
     gCoreContext->InitLocale();
     gCoreContext->SaveLocaleDefaults();
@@ -723,6 +723,7 @@ bool MythContext::Impl::PromptForDatabaseParams(const QString &error)
     if (m_gui)
     {
         TempMainWindow();
+        LanguagePrompt();
 
         // Tell the user what went wrong:
         if (!error.isEmpty())
@@ -1076,7 +1077,7 @@ void MythContext::Impl::ShowGuiStartup()
 {
     if (!m_gui)
         return;
-    TempMainWindow(false);
+    TempMainWindow();
     MythMainWindow *mainWindow = GetMythMainWindow();
     MythScreenStack *mainStack = mainWindow->GetMainStack();
     if (mainStack)
@@ -1158,6 +1159,7 @@ void MythContext::Impl::ResetDatabase() const
 BackendSelection::Decision MythContext::Impl::ChooseBackend(const QString &error)
 {
     TempMainWindow();
+    LanguagePrompt();
 
     // Tell the user what went wrong:
     if (!error.isEmpty())
@@ -1619,7 +1621,7 @@ bool MythContext::Init(const bool gui,
 
     if (gui && QCoreApplication::applicationName() == MYTH_APPNAME_MYTHTV_SETUP)
     {
-        m_impl->TempMainWindow(false);
+        m_impl->TempMainWindow();
         QString warning = QObject::tr("mythtv-setup is deprecated.\n"
                 "To set up MythTV, start mythbackend and use:\n"
                 "http://localhost:6544/setupwizard");
@@ -1638,7 +1640,7 @@ bool MythContext::Init(const bool gui,
             "with the installed MythTV libraries.");
         if (gui)
         {
-            m_impl->TempMainWindow(false);
+            m_impl->TempMainWindow();
             WaitFor(ShowOkPopup(warning));
         }
         LOG(VB_GENERAL, LOG_WARNING, warning);
@@ -1673,7 +1675,7 @@ bool MythContext::Init(const bool gui,
                           " Please set the environment variable HOME";
         if (gui)
         {
-            m_impl->TempMainWindow(false);
+            m_impl->TempMainWindow();
             WaitFor(ShowOkPopup(warning));
         }
         LOG(VB_GENERAL, LOG_WARNING, warning);
