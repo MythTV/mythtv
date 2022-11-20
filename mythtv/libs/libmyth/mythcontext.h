@@ -30,7 +30,7 @@ class MPUBLIC MythContext
               bool ignoreDB = false);
 
     bool SaveDatabaseParams(const DatabaseParams &params);
-    bool saveSettingsCache(void);
+    bool saveSettingsCache();
 
     void SetDisableEventPopup(bool check);
 
