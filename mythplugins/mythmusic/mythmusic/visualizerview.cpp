@@ -7,7 +7,6 @@
 #include <QTimer>
 
 // myth
-#include <libmyth/mythcontext.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythui/mythmainwindow.h>
 #include <libmythui/mythuibuttonlist.h>

@@ -7,8 +7,8 @@
 #include <QDomDocument>
 
 // Myth
-#include <libmyth/mythcontext.h>
 #include <libmythbase/exitcodes.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythbase/mythsystemlegacy.h>

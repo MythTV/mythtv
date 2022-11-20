@@ -8,8 +8,8 @@
 #include <QTimer>
 
 // MythTV
-#include <libmyth/mythcontext.h>
 #include <libmythbase/lcddevice.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythui/mythmainwindow.h>
 #include <libmythui/mythuiimage.h>
 

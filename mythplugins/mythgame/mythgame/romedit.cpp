@@ -3,7 +3,7 @@
 #include <QApplication>
 
 // MythtTV
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdirs.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>

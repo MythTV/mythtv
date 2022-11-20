@@ -2,7 +2,7 @@
 #include <utility>
 
 // MythTV
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/compat.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythlogging.h>

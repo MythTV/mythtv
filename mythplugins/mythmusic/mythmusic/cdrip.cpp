@@ -23,9 +23,9 @@
 #include <utility>
 
 // MythTV includes
-#include <libmyth/mythcontext.h>
 #include <libmyth/mythmediamonitor.h>
 #include <libmythbase/lcddevice.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythdirs.h>
