@@ -46,7 +46,6 @@
 #include <QHostAddress>
 
 // MythTV
-#include "libmyth/mythcontext.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/filesysteminfo.h"
 #include "libmythbase/mthread.h"

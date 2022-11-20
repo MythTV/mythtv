@@ -19,6 +19,7 @@
 #include "libmythbase/compat.h"
 #include "libmythbase/configuration.h"
 #include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"
 #include "libmythupnp/htmlserver.h"
 #include "libmythupnp/upnpsubscription.h"
