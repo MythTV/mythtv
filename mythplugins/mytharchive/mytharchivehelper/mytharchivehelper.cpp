@@ -2147,7 +2147,7 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
 #else
                 QStringList param = QString::fromStdString(buf).split(',', Qt::SkipEmptyParts);
 #endif
-                QString codec = param[0].remove("Subtitle:", Qt::CaseInsensitive);
+                QString codec = param[0].remove("Subtitle:", Qt::CaseInsensitive).remove(QChar::Null);
 
                 QDomElement stream = doc.createElement("subtitle");
                 stream.setAttribute("streamindex", i);
