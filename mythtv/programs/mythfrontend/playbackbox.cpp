@@ -5307,7 +5307,7 @@ void RecMetadataEdit::QueryComplete(MetadataLookup *lookup)
     m_episodeSpin->SetValue(lookup->GetEpisode());
     if (!lookup->GetSubtitle().isEmpty())
     {
-        m_descriptionEdit->SetText(lookup->GetSubtitle());
+        m_subtitleEdit->SetText(lookup->GetSubtitle());
     }
     if (!lookup->GetDescription().isEmpty())
     {
