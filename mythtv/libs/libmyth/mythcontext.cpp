@@ -118,6 +118,8 @@ class MythContext::Impl : public QObject
     bool LoadDatabaseSettings();
     bool SaveDatabaseParams(const DatabaseParams &params, bool force);
 
+    static QString setLocalHostName(QString hostname);
+
     bool    PromptForDatabaseParams(const QString &error);
     QString TestDBconnection(bool prompt=true);
     void    SilenceDBerrors();
@@ -442,6 +444,8 @@ bool MythContext::Impl::FindDatabase(bool prompt, bool noAutodetect)
 
     // 1. Either load XmlConfiguration::k_default_filename or use sensible "localhost" defaults:
     bool loaded = LoadDatabaseSettings();
+    gCoreContext->GetDB()->SetDatabaseParams(m_dbParams);
+    setLocalHostName(m_dbParams.m_localHostName);
     DatabaseParams dbParamsFromFile = m_dbParams;
 
     // In addition to the UI chooser, we can also try to autoSelect later,
@@ -585,9 +589,14 @@ bool MythContext::Impl::LoadDatabaseSettings()
     if (!ok)
         m_dbParams.LoadDefaults();
 
-    gCoreContext->GetDB()->SetDatabaseParams(m_dbParams);
+    m_dbParams.m_localEnabled = !(m_dbParams.m_localHostName.isEmpty() ||
+        m_dbParams.m_localHostName == "my-unique-identifier-goes-here");
 
-    QString hostname = m_dbParams.m_localHostName;
+    return ok;
+}
+
+QString MythContext::Impl::setLocalHostName(QString hostname)
+{
     if (hostname.isEmpty() ||
         hostname == "my-unique-identifier-goes-here")
     {
@@ -641,17 +650,13 @@ bool MythContext::Impl::LoadDatabaseSettings()
 #endif
 
     }
-    else
-    {
-        m_dbParams.m_localEnabled = true;
-    }
 
     LOG(VB_GENERAL, LOG_INFO, QString("Using a profile name of: '%1' (Usually the "
                                       "same as this host's name.)")
                                       .arg(hostname));
     gCoreContext->SetLocalHostname(hostname);
 
-    return ok;
+    return hostname;
 }
 
 bool MythContext::Impl::SaveDatabaseParams(
