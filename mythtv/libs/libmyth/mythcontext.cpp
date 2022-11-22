@@ -112,7 +112,7 @@ class MythContext::Impl : public QObject
     QString TestDBconnection(bool prompt=true);
     void    SilenceDBerrors();
     void    EnableDBerrors();
-    void    ResetDatabase() const;
+    static void ResetDatabase(const DatabaseParams& dbParams);
 
     BackendSelection::Decision
             ChooseBackend(const QString &error);
@@ -533,7 +533,7 @@ DBfound:
                        !loaded || m_dbParams.m_forceSave ||
                        dbParamsFromFile != m_dbParams);
     EnableDBerrors();
-    ResetDatabase();
+    ResetDatabase(m_dbParams);
     return true;
 
 NoDBfound:
@@ -682,7 +682,7 @@ bool MythContext::Impl::SaveDatabaseParams(
         gCoreContext->GetDB()->SetDatabaseParams(m_dbParams);
 
         // If database has changed, force its use:
-        ResetDatabase();
+        ResetDatabase(m_dbParams);
     }
     return success;
 }
@@ -917,7 +917,7 @@ QString MythContext::Impl::TestDBconnection(bool prompt)
                     gCoreContext->GetDB()->SetDatabaseParams(m_dbParams);
                 }
                 EnableDBerrors();
-                ResetDatabase();
+                ResetDatabase(m_dbParams);
                 if (!MSqlQuery::testDBConnection())
                 {
                     for (std::chrono::seconds temp = 0s; temp < useTimeout * 2 ; temp++)
@@ -1041,7 +1041,7 @@ QString MythContext::Impl::TestDBconnection(bool prompt)
 
     // Current DB connection may have been silenced (invalid):
     EnableDBerrors();
-    ResetDatabase();
+    ResetDatabase(m_dbParams);
 
     return {};
 }
@@ -1122,11 +1122,12 @@ void MythContext::Impl::EnableDBerrors()
  * Any cached settings also need to be cleared,
  * so that they can be re-read from the new database
  */
-void MythContext::Impl::ResetDatabase() const
+void MythContext::Impl::ResetDatabase(const DatabaseParams& dbParams)
 {
-    gCoreContext->GetDBManager()->CloseDatabases();
-    gCoreContext->GetDB()->SetDatabaseParams(m_dbParams);
-    gCoreContext->ClearSettingsCache();
+    auto* db = GetMythDB();
+    db->GetDBManager()->CloseDatabases();
+    db->SetDatabaseParams(dbParams);
+    db->ClearSettingsCache();
 }
 
 /**
