@@ -704,7 +704,7 @@ bool MythContext::Impl::SaveDatabaseParams(
 
         // Use the new settings:
         m_dbParams = params;
-        gCoreContext->GetDB()->SetDatabaseParams(m_dbParams);
+        GetMythDB()->SetDatabaseParams(m_dbParams);
 
         // If database has changed, force its use:
         ResetDatabase(m_dbParams);
