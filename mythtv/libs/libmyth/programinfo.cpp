@@ -4939,22 +4939,6 @@ void ProgramInfo::SaveInetRef(const QString &inet)
     SendUpdateEvent();
 }
 
-// brief Query type from record rule
-RecordingType ProgramInfo::QueryRecordRuleType(void) const
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT type FROM record "
-                  "WHERE recordid = :RECORDID ");
-    query.bindValue(":RECORDID", m_recordId);
-
-    RecordingType rt = kNotRecording;
-
-    if (query.exec() && query.next())
-        rt = static_cast<RecordingType>(query.value(0).toUInt());
-
-    return rt;
-}
-
 /** \brief Attempts to ascertain if the main file for this ProgramInfo
  *         is readable.
  *  \note This method often initiates a QUERY_CHECKFILE MythProto

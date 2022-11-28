@@ -620,7 +620,6 @@ class MPUBLIC ProgramInfo
     bool        QueryMarkupFlag(MarkTypes type) const;
     uint        QueryTranscoderID(void) const;
     uint64_t    QueryLastFrameInPosMap(void) const;
-    RecordingType QueryRecordRuleType(void) const;
     bool        Reload(void);
 
     // Slow DB sets

@@ -273,10 +273,6 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     void SetIsCollection(bool collection) { m_isCollection = collection; };
     void SetPreferDVDOrdering(bool preferdvdorder)
                              { m_dvdOrder = preferdvdorder; };
-    void SetScheduledStartTime(const QDateTime &dt) { m_startTs = dt; };
-    void SetScheduledEndTime(const QDateTime &dt) { m_endTs = dt; };
-    void SetRecordingStartTime(const QDateTime &dt) { m_recStartTs = dt; };
-    void SetRecordingEndTime(const QDateTime &dt) { m_recEndTs = dt; };
 
     // General Sets - Music
     void SetAlbum(const QString &album) { m_album = album; };
@@ -414,10 +410,10 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     const QString m_seriesId;
     const QString m_programid;
     const QString m_storageGroup;
-    QDateTime m_startTs;
-    QDateTime m_endTs;
-    QDateTime m_recStartTs;
-    QDateTime m_recEndTs;
+    const QDateTime m_startTs;
+    const QDateTime m_endTs;
+    const QDateTime m_recStartTs;
+    const QDateTime m_recEndTs;
     uint m_programFlags     {0};
     uint m_audioProperties  {0};
     uint m_videoProperties  {0};
