@@ -63,28 +63,9 @@ using_bindings_python {
 
     INSTALLS += hardwareprofile_scripts metadata_scripts internetcontent_scripts
 
-    unix|macx|mingw:QMAKE_CLEAN += -r $${OBJECTS_DIR}/hardwareprofile/distros \
-                                      $${OBJECTS_DIR}/internetcontent/nv_python_libs \
-                                      $${OBJECTS_DIR}/metadata/Movie \
-                                      $${OBJECTS_DIR}/metadata/Music \
-                                      $${OBJECTS_DIR}/metadata/Television
-    unix|macx|mingw:QMAKE_DISTCLEAN += -r $${OBJECTS_DIR}/hardwareprofile \
-                                          $${OBJECTS_DIR}/internetcontent \
-                                          $${OBJECTS_DIR}/metadata
-    win32-msvc*:QMAKE_CLEAN += /s /f /q $${OBJECTS_DIR}/hardwareprofile/distros \
-                                        $${OBJECTS_DIR}/internetcontent/nv_python_libs \
-                                        $${OBJECTS_DIR}/metadata/Movie \
-                                        $${OBJECTS_DIR}/metadata/Music \
-                                        $${OBJECTS_DIR}/metadata/Television $$escape_expand(\n\t) \
-                               rd /s /q $${OBJECTS_DIR}/hardwareprofile/distros \
-                                        $${OBJECTS_DIR}/internetcontent/nv_python_libs \
-                                        $${OBJECTS_DIR}/metadata/Movie \
-                                        $${OBJECTS_DIR}/metadata/Music \
-                                        $${OBJECTS_DIR}/metadata/Television
+    unix|macx|mingw:QMAKE_DISTCLEAN += -r $${OBJECTS_DIR}
     win32-msvc*:QMAKE_DISTCLEAN += /s /f /q $${OBJECTS_DIR}/*.* $$escape_expand(\n\t) \
-                                   rd /s /q $${OBJECTS_DIR}/hardwareprofile \
-                                            $${OBJECTS_DIR}/internetcontent \
-                                            $${OBJECTS_DIR}/metadata
+                                   rd /s /q $${OBJECTS_DIR}
 
 } else {
 
@@ -128,11 +109,8 @@ using_bindings_python {
 
     }
 
-    unix|macx|mingw:QMAKE_CLEAN += -r $${OBJECTS_DIR}/metadata/Music/*
-    unix|macx|mingw:QMAKE_DISTCLEAN += -r $${OBJECTS_DIR}/metadata
-    win32-msvc*:QMAKE_CLEAN += /s /f /q $${OBJECTS_DIR}/metadata/Music/*.* $$escape_expand(\n\t) \
-                               rd /s /q $${OBJECTS_DIR}/metadata/Music/*.*
+    unix|macx|mingw:QMAKE_DISTCLEAN += -r $${OBJECTS_DIR}
     win32-msvc*:QMAKE_DISTCLEAN += /s /f /q $${OBJECTS_DIR}/metadata/*.* $$escape_expand(\n\t) \
-                                   rd /s /q $${OBJECTS_DIR}/metadata
+                                   rd /s /q $${OBJECTS_DIR}
 
 }
