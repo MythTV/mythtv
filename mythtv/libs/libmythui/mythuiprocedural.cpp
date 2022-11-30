@@ -97,7 +97,9 @@ void MythUIProcedural::Finalize(void)
     if (!m_fragmentSource)
         LOG(VB_GENERAL, LOG_WARNING, "Failed to retrieve fragment source code for procedural texture");
 
-    m_hash = QCryptographicHash::hash(*m_vertexSource + *m_fragmentSource, QCryptographicHash::Md5);
+    if (m_vertexSource && m_fragmentSource)
+        m_hash = QCryptographicHash::hash(*m_vertexSource + *m_fragmentSource,
+                                          QCryptographicHash::Md5);
 }
 
 ShaderSource MythUIProcedural::LoadShaderSource(const QString &filename)
