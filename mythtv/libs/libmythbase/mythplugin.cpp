@@ -108,6 +108,7 @@ MythPluginManager::MythPluginManager()
             LOG(VB_GENERAL, LOG_WARNING,
                     "No libraries in plugins directory " + filterDir.path());
 
+        // coverity[auto_causes_copy]
         for (auto library : qAsConst(libraries))
         {
             // pull out the base library name

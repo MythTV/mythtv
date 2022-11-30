@@ -1443,6 +1443,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
         test_files.append(filename + ".jpeg");
         test_files.append(filename + ".gif");
 
+        // coverity[auto_causes_copy]
         for (auto imagePath : qAsConst(test_files))
         {
 #if 0
