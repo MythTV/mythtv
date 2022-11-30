@@ -226,10 +226,19 @@ def buildNumbers(args, opts):
                 if show_network is None:
                     show_network = show_info.streaming_service
                 show_country = show_network.get('country')
-                show_tz = show_country.get('timezone')
+                # Some webChannels don't specify country or timezone
+                if show_country:
+                    show_tz = show_country.get('timezone')
+                else:
+                    show_tz = None
                 dtInTgtZone = dtInLocalZone.astimezone(posixtzinfo(show_tz))
+                # For at least one timezone, the following exception may be thrown.
+                # UnboundLocalError: local variable 'ttmfmt' referenced before assignment
+                # Example:  tvmaze.py --debug -N "The Masked Singer" "2022-11-24 19:00:00"
 
-            except (ValueError, AttributeError) as e:
+            except (ValueError, AttributeError, UnboundLocalError) as e:
+                if opts.debug:
+                    print('show_tz =%s, except = %s' % (show_tz, e))
                 dtInTgtZone = None
 
         if dtInTgtZone:
@@ -252,18 +261,16 @@ def buildNumbers(args, opts):
 
                     if epInTgtZone == dtInTgtZone:
                         if opts.debug:
-                            print('Recording matches inetref %d, season %d, episode %d at %s' \
-                                % (inetref, ep.season, ep.number, epInTgtZone))
+                            print('Recording matches \'%s\' at %s' % (ep, epInTgtZone))
                         time_match_list.append(i)
                         minTimeDelta = timedelta(minutes=0)
-
                     # Consider it a match if the recording starts late,
                     # but within the duration of the show.
                     elif epInTgtZone < dtInTgtZone < epInTgtZone+durationDelta:
                         # Recording start time is within the range of this episode
                         if opts.debug:
-                            print('Recording in range of inetref %d, season %d, episode %d (%s ... %s)' \
-                                % (inetref, ep.season, ep.number, epInTgtZone, epInTgtZone+durationDelta))
+                            print('Recording in range of \'%s\' (%s ... %s)' \
+                                % (ep, epInTgtZone, epInTgtZone+durationDelta))
                         time_match_list.append(i)
                         minTimeDelta = timedelta(minutes=0)
                     # Consider it a match if the recording is a little bit early. This helps cases
@@ -273,11 +280,13 @@ def buildNumbers(args, opts):
                         # Recording started earlier than this episode, so see if it's the closest match
                         if epInTgtZone - dtInTgtZone == minTimeDelta:
                             if opts.debug:
-                                print('adding episode to closest list', epInTgtZone - dtInTgtZone, '\n')
+                                print('Adding episode \'%s\' to closest list. Offset = %s' \
+                                    % (ep, epInTgtZone - dtInTgtZone))
                             early_match_list.append(i)
                         elif epInTgtZone - dtInTgtZone < minTimeDelta:
                             if opts.debug:
-                                print('this episode is new closest', epInTgtZone - dtInTgtZone, '\n')
+                                print('Episode \'%s\' is new closest. Offset = %s' \
+                                    % (ep, epInTgtZone - dtInTgtZone))
                             minTimeDelta = epInTgtZone - dtInTgtZone
                             early_match_list = [i]
 
