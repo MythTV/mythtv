@@ -1778,7 +1778,7 @@ static bool ApplyCachedPids(DTVSignalMonitor *dtvMon, const DTVChannel* channel)
     pid_cache_t pid_cache;
     channel->GetCachedPids(pid_cache);
     bool vctpid_cached = false;
-    for (auto pid : pid_cache)
+    for (const auto& pid : pid_cache)
     {
         if ((pid.GetTableID() == TableID::TVCT) ||
             (pid.GetTableID() == TableID::CVCT))

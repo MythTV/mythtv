@@ -1887,7 +1887,7 @@ void MythCoreContext::WaitUntilSignals(std::vector<CoreWaitInfo> & sigs) const
         return;
 
     QEventLoop eventLoop;
-    for (auto s : sigs)
+    for (const auto& s : sigs)
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("Waiting for signal %1")

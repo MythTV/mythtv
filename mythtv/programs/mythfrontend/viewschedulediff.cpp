@@ -274,7 +274,7 @@ void ViewScheduleDiff::fillList(void)
 
 void ViewScheduleDiff::updateUIList(void)
 {
-    for (auto s : m_recList)
+    for (const auto& s : m_recList)
     {
         class ProgramInfo *pginfo = s.m_after;
         if (!pginfo)

@@ -923,7 +923,7 @@ bool ChannelUtil::SaveCachedPids(uint chanid,
 
     bool ok = true;
     auto ito = old_cache.begin();
-    for (auto itn : pid_cache)
+    for (const auto& itn : pid_cache)
     {
         // if old pid smaller than current new pid, skip this old pid
         for (; ito != old_cache.end() && ito->GetPID() < itn.GetPID(); ++ito);

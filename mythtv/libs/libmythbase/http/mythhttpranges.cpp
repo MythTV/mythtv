@@ -100,7 +100,7 @@ HTTPMulti MythHTTPRanges::HandleRangeWrite(HTTPVariant Data, int64_t Available, 
     HTTPContents& headers = data ? (*data)->m_multipartHeaders : (*file)->m_multipartHeaders;
 
     uint64_t    oldsum = 0;
-    for (auto range : ranges)
+    for (const auto& range : ranges)
     {
         uint64_t newsum = sumrange(oldsum, range);
         if (oldsum <= written && written < newsum)

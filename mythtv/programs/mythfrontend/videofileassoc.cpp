@@ -292,7 +292,7 @@ class FileAssocDialogPrivate
         std::shuffle(tmp_fa.begin(), tmp_fa.end(),
                      std::mt19937(std::random_device()()));
 
-        for (auto fa : tmp_fa)
+        for (const auto& fa : tmp_fa)
         {
             m_fileAssociations.insert(FA_collection::value_type(fa.m_uid,
                             fa.m_fileAssoc));
