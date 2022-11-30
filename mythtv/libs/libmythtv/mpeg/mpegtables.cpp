@@ -1359,8 +1359,9 @@ bool SpliceInformationTable::Parse(void)
                         1 : 1 + SpliceTimeView(cur).size();
                 }
             }
-            m_ptrs1.push_back(cur);
-            m_ptrs1.push_back(cur + (duration ? 5 : 0));
+            m_ptrs1.push_back(cur);                      // Duration (if present)
+            m_ptrs1.push_back(cur + (duration ? 5 : 0)); // Unique and avails
+            m_epilog = m_ptrs1.back() + 4;
         }
     }
     else

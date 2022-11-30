@@ -1725,6 +1725,171 @@ void TestMPEGTables::scte35_sit_test1(void)
     QCOMPARE (sit.SpliceCommandType(), (uint)SpliceInformationTable::kSCTNull);
 }
 
+// A sample splict_insert packet created by the tstabcomp command
+// from https://tsduck.io/. This tests the splice_cancel section
+// of SpliceInformationTable::Parse insert processing.  These
+// values were picked randomly for testing and probably don't
+// match what would be in an actual packet.
+const std::vector<uint8_t> tsduck_sit_insert1 {
+    0xFC, 0x30, 0x2A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5A, 0x00, 0x00, 0xC0, 0x05, 0x05, 0x00, 0xBC,
+    0x61, 0x4E, 0xFF, 0x00, 0x14, 0x00, 0x08, 0x43, 0x55, 0x45, 0x49, 0x64, 0x75, 0x64, 0x65, 0x00,
+    0x08, 0x43, 0x55, 0x45, 0x4A, 0x64, 0x75, 0x64, 0x65, 0xA9, 0x3A, 0x69, 0xAE,
+};
+
+// A sample splict_insert packet created by the tstabcomp command
+// from https://tsduck.io/. This tests the program_slice section
+// of SpliceInformationTable::Parse insert processing.  These
+// values were picked randomly for testing and probably don't
+// match what would be in an actual packet.
+const std::vector<uint8_t> tsduck_sit_insert2 {
+    0xFC, 0x30, 0x39, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5A, 0x00, 0x00, 0xC0, 0x14, 0x05, 0x00, 0xBC,
+    0x61, 0x4E, 0x7F, 0x6F, 0xFE, 0x34, 0x3E, 0xFC, 0xEA, 0xFE, 0x00, 0x29, 0x32, 0xE0, 0x38, 0xA8,
+    0x03, 0x04, 0x00, 0x14, 0x00, 0x08, 0x43, 0x55, 0x45, 0x49, 0x64, 0x75, 0x64, 0x65, 0x00, 0x08,
+    0x43, 0x55, 0x45, 0x4A, 0x64, 0x75, 0x64, 0x65, 0x73, 0x4C, 0x98, 0x04,
+};
+
+// A sample splict_insert packet created by the tstabcomp command
+// from https://tsduck.io/. This tests the splice_immediate
+// section of SpliceInformationTable::Parse insert processing.
+// These values were picked randomly for testing and probably
+// don't match what would be in an actual packet.
+const std::vector<uint8_t> tsduck_sit_insert3 {
+    0xFC, 0x30, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5A, 0x00, 0x00, 0xC0, 0x1C, 0x05, 0x00, 0xBC,
+    0x61, 0x4E, 0x7F, 0x2F, 0x02, 0xD3, 0xFE, 0x34, 0x3E, 0xFC, 0xF4, 0xD5, 0xFE, 0x34, 0x3E, 0xFC,
+    0xF6, 0x7E, 0x00, 0x52, 0x65, 0xC0, 0x38, 0xA8, 0x05, 0x06, 0x00, 0x14, 0x00, 0x08, 0x43, 0x55,
+    0x45, 0x49, 0x64, 0x75, 0x64, 0x65, 0x00, 0x08, 0x43, 0x55, 0x45, 0x4A, 0x64, 0x75, 0x64, 0x65,
+    0xF6, 0x15, 0x88, 0x56,
+};
+
+void TestMPEGTables::scte35_sit_insert1(void)
+{
+    PSIPTable si_table(tsduck_sit_insert1);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(),                  42U);
+
+    // Splice specific fields
+    SpliceInformationTable sit(si_table);
+    QCOMPARE (sit.SectionSyntaxIndicator(),     false);
+    QCOMPARE (sit.PrivateIndicator(),           false);
+    QCOMPARE (sit.SectionLengthRaw(),             42U);
+    QCOMPARE (sit.SpliceProtocolVersion(),         0U);
+    QCOMPARE (sit.IsEncryptedPacket(),          false);
+    QCOMPARE (sit.EncryptionAlgorithm(), (uint)SpliceInformationTable::kNoEncryption);
+    QCOMPARE (sit.PTSAdjustment(),              90ULL);
+    QCOMPARE (sit.CodeWordIndex(),                 0U);
+    QCOMPARE (sit.Tier(),                         12U);
+
+    QCOMPARE (sit.SpliceCommandLength(),           5U);
+    QCOMPARE (sit.SpliceCommandType(), (uint)SpliceInformationTable::kSCTSpliceInsert);
+
+    SpliceInsertView insert = sit.SpliceInsert();
+    QCOMPARE (insert.SpliceEventID(),       12345678U);
+    QCOMPARE (insert.IsSpliceEventCancel(),      true);
+    QCOMPARE (insert.IsOutOfNetwork(),          false);
+    QCOMPARE (insert.IsProgramSplice(),         false);
+    QCOMPARE (insert.IsDuration(),              false);
+
+    QCOMPARE (sit.SpliceDescriptorsLength(),      20U);
+    QCOMPARE (sit.SpliceDescriptors(),  sit.data()+21);
+    QCOMPARE (sit.SpliceDescriptors()[2],       0x43U);
+}
+
+void TestMPEGTables::scte35_sit_insert2(void)
+{
+    PSIPTable si_table(tsduck_sit_insert2);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(),                  57U);
+
+    // Splice specific fields
+    SpliceInformationTable sit(si_table);
+    QCOMPARE (sit.SectionSyntaxIndicator(),     false);
+    QCOMPARE (sit.PrivateIndicator(),           false);
+    QCOMPARE (sit.SectionLengthRaw(),             57U);
+    QCOMPARE (sit.SpliceProtocolVersion(),         0U);
+    QCOMPARE (sit.IsEncryptedPacket(),          false);
+    QCOMPARE (sit.EncryptionAlgorithm(), (uint)SpliceInformationTable::kNoEncryption);
+    QCOMPARE (sit.PTSAdjustment(),              90ULL);
+    QCOMPARE (sit.CodeWordIndex(),                 0U);
+    QCOMPARE (sit.Tier(),                         12U);
+
+    QCOMPARE (sit.SpliceCommandLength(),          20U);
+    QCOMPARE (sit.SpliceCommandType(), (uint)SpliceInformationTable::kSCTSpliceInsert);
+
+    SpliceInsertView insert = sit.SpliceInsert();
+    QCOMPARE (insert.SpliceEventID(),       12345678U);
+    QCOMPARE (insert.IsSpliceEventCancel(),     false);
+    QCOMPARE (insert.IsOutOfNetwork(),          false);
+    QCOMPARE (insert.IsProgramSplice(),          true);
+    QCOMPARE (insert.IsDuration(),               true);
+    QCOMPARE (insert.IsSpliceImmediate(),       false);
+    QCOMPARE (insert.UniqueProgramID(),        14504U);
+    QCOMPARE (insert.AvailNum(),                   3U);
+    QCOMPARE (insert.AvailsExpected(),             4U);
+    QCOMPARE (insert.ComponentCount(),             0U);
+
+    SpliceTimeView time = insert.SpliceTime();
+    QCOMPARE (time.IsTimeSpecified(),            true);
+    QCOMPARE (time.PTSTime(),            0x0343EFCEAU);
+
+    QCOMPARE (sit.SpliceDescriptorsLength(),      20U);
+    QCOMPARE (sit.SpliceDescriptors(),  sit.data()+36);
+    QCOMPARE (sit.SpliceDescriptors()[2],       0x43U);
+}
+
+void TestMPEGTables::scte35_sit_insert3(void)
+{
+    PSIPTable si_table(tsduck_sit_insert3);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(),                  65U);
+
+    // Splice specific fields
+    SpliceInformationTable sit(si_table);
+    QCOMPARE (sit.SectionSyntaxIndicator(),     false);
+    QCOMPARE (sit.PrivateIndicator(),           false);
+    QCOMPARE (sit.SectionLengthRaw(),             65U);
+    QCOMPARE (sit.SpliceProtocolVersion(),         0U);
+    QCOMPARE (sit.IsEncryptedPacket(),          false);
+    QCOMPARE (sit.EncryptionAlgorithm(), (uint)SpliceInformationTable::kNoEncryption);
+    QCOMPARE (sit.PTSAdjustment(),              90ULL);
+    QCOMPARE (sit.CodeWordIndex(),                 0U);
+    QCOMPARE (sit.Tier(),                         12U);
+
+    QCOMPARE (sit.SpliceCommandLength(),          28U);
+    QCOMPARE (sit.SpliceCommandType(), (uint)SpliceInformationTable::kSCTSpliceInsert);
+
+    SpliceInsertView insert = sit.SpliceInsert();
+    QCOMPARE (insert.SpliceEventID(),       12345678U);
+    QCOMPARE (insert.IsSpliceEventCancel(),     false);
+    QCOMPARE (insert.IsOutOfNetwork(),          false);
+    QCOMPARE (insert.IsProgramSplice(),         false);
+    QCOMPARE (insert.IsDuration(),               true);
+    QCOMPARE (insert.IsSpliceImmediate(),       false);
+    QCOMPARE (insert.UniqueProgramID(),        14504U);
+    QCOMPARE (insert.AvailNum(),                   5U);
+    QCOMPARE (insert.AvailsExpected(),             6U);
+    QCOMPARE (insert.ComponentCount(),             2U);
+
+    QCOMPARE (insert.ComponentTag(0),            211U);
+    SpliceTimeView time = insert.ComponentSpliceTime(0);
+    QCOMPARE (time.IsTimeSpecified(),            true);
+    QCOMPARE (time.PTSTime(),            0x0343EFCF4U);
+
+    QCOMPARE (insert.ComponentTag(1),            213U);
+    time = insert.ComponentSpliceTime(1);
+    QCOMPARE (time.IsTimeSpecified(),            true);
+    QCOMPARE (time.PTSTime(),            0x0343EFCF6U);
+
+    QCOMPARE (sit.SpliceDescriptorsLength(),      20U);
+    QCOMPARE (sit.SpliceDescriptors(),  sit.data()+44);
+    QCOMPARE (sit.SpliceDescriptors()[2],       0x43U);
+}
+
 //
 // DVB NetworkInformationTable Tests
 //

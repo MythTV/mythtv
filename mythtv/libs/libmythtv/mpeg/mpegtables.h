@@ -985,7 +985,7 @@ class MTV_PUBLIC SpliceTimeView
     virtual QString toStringXML(
         uint indent_level, int64_t first, int64_t last) const;
 
-    uint size(void) const { return IsTimeSpecified() ? 1 : 5; }
+    uint size(void) const { return IsTimeSpecified() ? 5 : 1; }
   private:
     const unsigned char *m_data;
 };
@@ -1064,7 +1064,7 @@ class MTV_PUBLIC SpliceInsertView
     //     duration_flag        1    5.2 + m_ptrs1[0]
     bool IsDuration(void) const { return ( m_ptrs1[0][5] & 0x20 ) != 0; }
     //     splice_immediate_flag 1   5.3 + m_ptrs1[0]
-    bool IsSpliceImmediate(void) const { return ( m_ptrs1[0][5] & 0x20 ) != 0; }
+    bool IsSpliceImmediate(void) const { return ( m_ptrs1[0][5] & 0x10 ) != 0; }
     //     reserved             4    5.4 + m_ptrs1[0]
     //     if ((program_splice_flag == 1) && (splice_immediate_flag == ‘0’))
     //       splice_time()   8-38    6.0 + m_ptrs1[0]
@@ -1072,10 +1072,14 @@ class MTV_PUBLIC SpliceInsertView
         { return SpliceTimeView(m_ptrs1[0]+6); }
     //     if (program_splice_flag == 0) {
     //       component_count    8    6.0 + m_ptrs1[0]
+    uint ComponentCount() { return m_ptrs0.size(); }
     //       for (i = 0; i < component_count; i++) {
     //         component_tag    8    0.0 + m_ptrs0[i]
+    uint ComponentTag(uint i) { return m_ptrs0[i][0]; }
     //         if (splice_immediate_flag == ‘0’)
     //           splice_time() 8-38  1.0 + m_ptrs0[i]
+    SpliceTimeView ComponentSpliceTime(uint i)
+        { return SpliceTimeView(m_ptrs0[i]+1); }
     //       }
     //     }
     //     if (duration_flag == ‘1’)
@@ -1175,7 +1179,17 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     // cw_index (enc key)       8   9.0
     uint CodeWordIndex(void) const { return pesdata()[9]; }
     void SetCodeWordIndex(uint val) { pesdata()[9] = val; }
-    // reserved                12  10.0
+    // tier                    12  10.0
+    uint Tier(void) const
+    {
+        return ((pesdata()[10]) << 4) | ((pesdata()[11] & 0xF0) >> 4);
+    }
+    void SetTier(uint tier)
+    {
+        pesdata()[10] = (tier >> 4) & 0xff;
+        pesdata()[11] &= ~0xf0;
+        pesdata()[11] |= (tier & 0x0F) << 4;
+    }
     // splice_command_length   12  11.4
     uint SpliceCommandLength(void) const
     {
@@ -1245,16 +1259,16 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     // this comment with private or reserved commands.
 
     // descriptor_loop_length  16   0.0 + m_epilog
-    uint SpliceDescriptorsLength(uint /*i*/) const
+    uint SpliceDescriptorsLength() const
     {
-        return (m_epilog[0] << 8) | m_epilog[1];
+        return m_epilog ? (m_epilog[0] << 8) | m_epilog[1] : 0;
     }
 
     // for (i = 0; i < ? ; i++)
     //   splice_descriptor()   ??   ??.?
     const unsigned char *SpliceDescriptors(void) const
     {
-        return (m_epilog) ? m_epilog + 2 : nullptr;
+        return (SpliceDescriptorsLength() > 0) ? m_epilog + 2 : nullptr;
     }
     // for (i = 0; i < ?; i++)
     //   alignment_stuffing     8   ??.0
