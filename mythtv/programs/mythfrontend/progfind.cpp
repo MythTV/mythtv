@@ -723,7 +723,7 @@ const std::vector<QChar> JaProgFinder::kSearchChars
 
 void JaProgFinder::initAlphabetList()
 {
-    for (auto search_char : kSearchChars)
+    for (const auto& search_char : kSearchChars)
     {
         new MythUIButtonListItem(m_alphabetList, QString(search_char));
     }
@@ -834,7 +834,7 @@ const std::vector<QChar> HeProgFinder::kSearchChars
 
 void HeProgFinder::initAlphabetList()
 {
-    for (auto search_char : kSearchChars)
+    for (const auto& search_char : kSearchChars)
     {
         new MythUIButtonListItem(m_alphabetList, QString(search_char));
     }
@@ -937,7 +937,7 @@ const std::vector<QChar> RuProgFinder::kSearchChars
 
 void RuProgFinder::initAlphabetList()
 {
-    for (auto search_char : kSearchChars)
+    for (const auto& search_char : kSearchChars)
     {
         new MythUIButtonListItem(m_alphabetList, search_char);
     }

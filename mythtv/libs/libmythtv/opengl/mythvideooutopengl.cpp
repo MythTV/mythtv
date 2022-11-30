@@ -309,7 +309,7 @@ void MythVideoOutputOpenGL::RenderFrame(MythVideoFrame* Frame, FrameScanType Sca
             // in the vast majority of cases it is significantly quicker to just
             // clear the unused portions of the screen
             QRegion toclear = GetBoundingRegion();
-            for (auto rect : qAsConst(toclear))
+            for (const auto& rect : qAsConst(toclear))
                 m_openglRender->ClearRect(nullptr, rect, m_clearColor, m_clearAlpha);
         }
     }

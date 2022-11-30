@@ -1035,7 +1035,7 @@ V2MarkupList* V2Dvr::GetRecordedMarkup ( int RecordedId )
     ri.QueryMarkup(mapMark, mapSeek);
 
     auto* pMarkupList = new V2MarkupList();
-    for (auto entry : qAsConst(mapMark))
+    for (const auto& entry : qAsConst(mapMark))
     {
         V2Markup *pMarkup = pMarkupList->AddNewMarkup();
         QString typestr = toString(static_cast<MarkTypes>(entry.type));

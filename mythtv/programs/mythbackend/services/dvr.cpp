@@ -862,7 +862,7 @@ DTC::MarkupList* Dvr::GetRecordedMarkup ( int RecordedId )
     ri.QueryMarkup(mapMark, mapSeek);
 
     auto* pMarkupList = new DTC::MarkupList();
-    for (auto entry : qAsConst(mapMark))
+    for (const auto& entry : qAsConst(mapMark))
     {
         DTC::Markup *pMarkup = pMarkupList->AddNewMarkup();
         QString typestr = toString(static_cast<MarkTypes>(entry.type));

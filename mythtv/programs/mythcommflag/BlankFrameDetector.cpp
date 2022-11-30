@@ -239,7 +239,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
         long long iilen = *iiblank;
         long long start = brkb + iilen / 2;
 
-        for (auto type : kBreakType)
+        for (const auto& type : kBreakType)
         {
             /* Look for next blank frame that is an acceptable distance away. */
             FrameAnalyzer::FrameMap::const_iterator jjblank = iiblank;

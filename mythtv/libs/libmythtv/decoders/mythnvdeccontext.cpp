@@ -533,7 +533,7 @@ bool MythNVDECContext::HaveNVDEC(bool Reinit /*=false*/)
             {
                 s_available = true;
                 LOG(VB_GENERAL, LOG_INFO, LOC + "Supported/available NVDEC decoders:");
-                for (auto profile : profiles)
+                for (const auto& profile : profiles)
                 {
                     QString desc = MythCodecContext::GetProfileDescription(profile.m_profile,profile.m_maximum,
                                                                            profile.m_type, profile.m_depth + 8);
@@ -557,7 +557,7 @@ void MythNVDECContext::GetDecoderList(QStringList &Decoders)
     if (profiles.empty())
         return;
     Decoders.append("NVDEC:");
-    for (auto profile : profiles)
+    for (const auto& profile : profiles)
     {
         if (!(profile.m_depth % 2)) // Ignore 9/11bit etc
             Decoders.append(MythCodecContext::GetProfileDescription(profile.m_profile, profile.m_maximum,

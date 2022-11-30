@@ -244,7 +244,7 @@ void MythUITextEdit::InsertText(const QString &text)
     if (!m_text)
         return;
 
-    for (auto c : qAsConst(text))
+    for (const auto& c : qAsConst(text))
         InsertCharacter(c);
 
     emit valueChanged();

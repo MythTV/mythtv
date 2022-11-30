@@ -148,7 +148,7 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context,
                 MythCodecContext::FFmpegToMythProfile((*Context)->codec_id, (*Context)->profile);
         const VDPAUProfiles& profiles = MythVDPAUHelper::GetProfiles();
         vdpau = false;
-        for (auto vdpauprofile : profiles)
+        for (const auto& vdpauprofile : profiles)
         {
             bool match = vdpauprofile.first == mythprofile;
             if (match)

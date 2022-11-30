@@ -500,7 +500,7 @@ QStringList ImportIconsWizard::extract_csv(const QString &line)
     bool in_comment = false;
     bool in_escape = false;
     int comma_count = 0;
-    for (auto cur : qAsConst(line))
+    for (const auto& cur : qAsConst(line))
     {
         if (in_escape)
         {
@@ -762,7 +762,7 @@ bool ImportIconsWizard::findmissing(const QString& strParam)
 #else
     QStringList strSplit = str.split("\n", Qt::SkipEmptyParts);
 #endif
-    for (auto line : qAsConst(strSplit))
+    for (const auto& line : qAsConst(strSplit))
     {
         if (line[0] == QChar('#'))
             continue;
@@ -817,7 +817,7 @@ bool ImportIconsWizard::submit()
     unsigned callsign = 0;
     unsigned tv = 0;
     unsigned xmltvid = 0;
-    for (auto line : qAsConst(strSplit))
+    for (const auto& line : qAsConst(strSplit))
     {
         if (line[0] == QChar('#'))
             continue;

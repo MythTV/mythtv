@@ -1693,7 +1693,7 @@ void NuppelVideoRecorder::WriteKeyFrameAdjustTable(
     char *kfa_buf = new char[frameheader.packetlength];
     uint offset = 0;
 
-    for (auto kfa : kfa_table)
+    for (const auto& kfa : kfa_table)
     {
         memcpy(kfa_buf + offset, &kfa,
                sizeof(struct kfatable_entry));
