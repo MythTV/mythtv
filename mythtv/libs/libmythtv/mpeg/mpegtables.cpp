@@ -1302,6 +1302,11 @@ SpliceInformationTable *SpliceInformationTable::GetDecrypted(
 
 bool SpliceInformationTable::Parse(void)
 {
+    if (SectionLength() > TSSizeInBuffer())
+        throw MpegParseException(PsipParseException::SitLength);
+
+    const uint8_t *limit = pesdata() + SectionLength() - kMpegCRCSize;
+
     m_epilog = nullptr;
     m_ptrs0.clear();
     m_ptrs1.clear();
@@ -1319,14 +1324,20 @@ bool SpliceInformationTable::Parse(void)
     if (kSCTNull == type || kSCTBandwidthReservation == type)
     {
         m_epilog = pesdata() + 14;
+        if (m_epilog > limit)
+            throw MpegParseException(PsipParseException::SitBandwidth);
     }
     else if (kSCTTimeSignal == type)
     {
         m_epilog = pesdata() + 14 + TimeSignal().size();
+        if (m_epilog > limit)
+            throw MpegParseException(PsipParseException::SitTimeSignal);
     }
     else if (kSCTSpliceSchedule == type)
     {
         uint splice_count = pesdata()[14];
+        m_ptrs0.reserve(splice_count);
+        m_ptrs1.reserve(splice_count);
         const unsigned char *cur = pesdata() + 15;
         for (uint i = 0; i < splice_count; i++)
         {
@@ -1336,6 +1347,8 @@ bool SpliceInformationTable::Parse(void)
             {
                 m_ptrs1.push_back(nullptr);
                 cur += 5;
+                if (cur > limit)
+                    throw MpegParseException(PsipParseException::SitSpliceSchedInfo1);
                 continue;
             }
             bool program_slice = (cur[5] & 0x40) != 0;
@@ -1344,16 +1357,21 @@ bool SpliceInformationTable::Parse(void)
             m_ptrs1.push_back(cur);
             bool duration = (m_ptrs0.back()[5] & 0x2) != 0;
             cur += (duration) ? 9 : 4;
+            if (cur > limit)
+                throw MpegParseException(PsipParseException::SitSpliceSchedInfo2);
         }
         m_epilog = cur;
     }
     else if (kSCTSpliceInsert == type)
     {
+        m_ptrs1.reserve(3);
         m_ptrs1.push_back(pesdata() + 14);
         bool splice_cancel = (pesdata()[18] & 0x80) != 0;
         if (splice_cancel)
         {
             m_epilog = pesdata() + 19;
+            if (m_epilog > limit)
+                throw MpegParseException(PsipParseException::SitSpliceInsertInfo1);
         }
         else
         {
@@ -1364,21 +1382,28 @@ bool SpliceInformationTable::Parse(void)
             if (program_splice && !splice_immediate)
             {
                 cur += SpliceTimeView(cur).size();
+                if (cur > limit)
+                    throw MpegParseException(PsipParseException::SitSpliceInsertInfo2);
             }
             else if (!program_splice)
             {
                 uint component_count = pesdata()[20];
+                m_ptrs0.reserve(component_count);
                 cur = pesdata() + 21;
                 for (uint i = 0; i < component_count; i++)
                 {
                     m_ptrs0.push_back(cur);
                     cur += (splice_immediate) ?
                         1 : 1 + SpliceTimeView(cur).size();
+                    if (cur > limit)
+                        throw MpegParseException(PsipParseException::SitSpliceInsertInfo3);
                 }
             }
             m_ptrs1.push_back(cur);                      // Duration (if present)
             m_ptrs1.push_back(cur + (duration ? 5 : 0)); // Unique and avails
             m_epilog = m_ptrs1.back() + 4;
+            if (m_epilog > limit)
+                throw MpegParseException(PsipParseException::SitSpliceInsertInfo4);
         }
     }
     else

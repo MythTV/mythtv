@@ -60,10 +60,16 @@ class TestMPEGTables: public QObject
 
     // SCTE 35 Splice Points
     static void scte35_sit_test1(void);
-    static void scte35_sit_schedule(void);
-    static void scte35_sit_insert1(void);
-    static void scte35_sit_insert2(void);
-    static void scte35_sit_insert3(void);
+    static void scte35_sit_schedule_test1a(void);
+    static void scte35_sit_schedule_test1b(void);
+    static void scte35_sit_schedule_test1c(void);
+    static void scte35_sit_insert_test1a(void);
+    static void scte35_sit_insert_test1b(void);
+    static void scte35_sit_insert_test2a(void);
+    static void scte35_sit_insert_test2b(void);
+    static void scte35_sit_insert_test3a(void);
+    static void scte35_sit_insert_test3b(void);
+    static void scte35_sit_insert_test3c(void);
 
     //DVB Tables
     static void dvb_nit_test1(void);

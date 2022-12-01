@@ -34,6 +34,30 @@ extern "C" {
 }
 
 template <typename T>
+void mpeg_test_throw(const PSIPTable& si_table,
+                     PsipParseException::Code error_code)
+{
+    try
+    {
+        T table(si_table);
+        QFAIL(qPrintable(QStringLiteral("This test should throw a MpegParseException.")));
+    }
+    catch (const MpegParseException& e)
+    {
+        QCOMPARE(e.what(), "Mpeg Parse Error");
+        QCOMPARE(e.m_error, error_code);
+    }
+    catch (const PsipParseException& e)
+    {
+        QFAIL("Expected a MpegParseException error, received a PsipParseException");
+    }
+    catch (const std::runtime_error& e)
+    {
+        QFAIL("Expected a MpegParseException error, received a runtime_error");
+    }
+}
+
+template <typename T>
 void atsc_test_throw(const PSIPTable& si_table,
                      PsipParseException::Code error_code)
 {
@@ -1773,7 +1797,7 @@ const std::vector<uint8_t> tsduck_sit_insert3 {
     0xF6, 0x15, 0x88, 0x56,
 };
 
-void TestMPEGTables::scte35_sit_schedule(void)
+void TestMPEGTables::scte35_sit_schedule_test1a(void)
 {
     PSIPTable si_table(tsduck_sit_schedule);
     QVERIFY  (si_table.IsGood());
@@ -1836,7 +1860,47 @@ void TestMPEGTables::scte35_sit_schedule(void)
     QCOMPARE (sit.SpliceDescriptorsLength(),       0U);
 }
 
-void TestMPEGTables::scte35_sit_insert1(void)
+void TestMPEGTables::scte35_sit_schedule_test1b(void)
+{
+    // This is the packet from the test 1a modified so that the splice
+    // count is 16 instead of 3. Muck the first splice event identifier
+    // to ensure that the code sees the phantom 4th splice as a
+    // cancel. (The bit is in the checksum field).
+    std::vector<uint8_t> si_data = tsduck_sit_schedule;
+    si_data[14] = 0x4;
+    si_data[18] = 0x67;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 68U);
+
+    mpeg_test_throw<SpliceInformationTable>(si_table, PsipParseException::SitSpliceSchedInfo1);
+}
+
+void TestMPEGTables::scte35_sit_schedule_test1c(void)
+{
+    // This is the packet from the test 1a modified so that the splice
+    // count is 16 instead of 3. Muck the first splice event identifier
+    // to ensure that the code doesn't sees the phantom 4th splice as a
+    // cancel. (The bit is in the checksum field).
+    std::vector<uint8_t> si_data = tsduck_sit_schedule;
+    si_data[14] = 0x10;
+    si_data[18] = 0xC6;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 68U);
+
+    mpeg_test_throw<SpliceInformationTable>(si_table, PsipParseException::SitSpliceSchedInfo2);
+}
+
+void TestMPEGTables::scte35_sit_insert_test1a(void)
 {
     PSIPTable si_table(tsduck_sit_insert1);
     QVERIFY  (si_table.IsGood());
@@ -1871,7 +1935,26 @@ void TestMPEGTables::scte35_sit_insert1(void)
     QCOMPARE (sit.SpliceDescriptors()[2],       0x43U);
 }
 
-void TestMPEGTables::scte35_sit_insert2(void)
+void TestMPEGTables::scte35_sit_insert_test1b(void)
+{
+    // This is the packet from the test 1a truncated right after the
+    // byte containing the cancel indicator.
+    std::vector<uint8_t> si_data = tsduck_sit_insert1;
+    si_data.resize(19);
+    si_data[02] = 16;
+    si_data[14] = 0x67;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 16U);
+
+    mpeg_test_throw<SpliceInformationTable>(si_table, PsipParseException::SitSpliceInsertInfo1);
+}
+
+void TestMPEGTables::scte35_sit_insert_test2a(void)
 {
     PSIPTable si_table(tsduck_sit_insert2);
     QVERIFY  (si_table.IsGood());
@@ -1918,7 +2001,26 @@ void TestMPEGTables::scte35_sit_insert2(void)
     QCOMPARE (sit.SpliceDescriptors()[2],       0x43U);
 }
 
-void TestMPEGTables::scte35_sit_insert3(void)
+void TestMPEGTables::scte35_sit_insert_test2b(void)
+{
+    // This is the packet from the test 2a truncated right after the
+    // byte containing the program_splice and splice_immediate flags.
+    std::vector<uint8_t> si_data = tsduck_sit_insert2;
+    si_data.resize(25);
+    si_data[02] = 22;
+    si_data[20] = 0xFE;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 22U);
+
+    mpeg_test_throw<SpliceInformationTable>(si_table, PsipParseException::SitSpliceInsertInfo2);
+}
+
+void TestMPEGTables::scte35_sit_insert_test3a(void)
 {
     PSIPTable si_table(tsduck_sit_insert3);
     QVERIFY  (si_table.IsGood());
@@ -1969,6 +2071,41 @@ void TestMPEGTables::scte35_sit_insert3(void)
     QCOMPARE (sit.SpliceDescriptorsLength(),      20U);
     QCOMPARE (sit.SpliceDescriptors(),  sit.data()+44);
     QCOMPARE (sit.SpliceDescriptors()[2],       0x43U);
+}
+
+void TestMPEGTables::scte35_sit_insert_test3b(void)
+{
+    // This is the packet from the test 3a modified to say there are 100
+    // components.
+    std::vector<uint8_t> si_data = tsduck_sit_insert3;
+    si_data[20] = 0x64;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 65U);
+
+    mpeg_test_throw<SpliceInformationTable>(si_table, PsipParseException::SitSpliceInsertInfo3);
+}
+
+void TestMPEGTables::scte35_sit_insert_test3c(void)
+{
+    // This is the packet from the test 3a modified to truncate the packet
+    // just after the component tags.
+    std::vector<uint8_t> si_data = tsduck_sit_insert3;
+    si_data.resize(42);
+    si_data[2] = 0x27;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 39U);
+
+    mpeg_test_throw<SpliceInformationTable>(si_table, PsipParseException::SitSpliceInsertInfo4);
 }
 
 //

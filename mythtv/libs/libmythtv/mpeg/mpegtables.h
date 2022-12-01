@@ -1279,6 +1279,8 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
 
     //////////// SPLICE SCHEDULE ////////////
 
+    static constexpr uint8_t kSpliceScheduleMinSize { 5 }; // No descriptors
+
     // if (splice_command_type == 0x04) splice_schedule()
     SpliceScheduleView SpliceSchedule(void) const
         { return {m_ptrs0, m_ptrs1}; }

@@ -720,13 +720,19 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
         case TableID::SITscte:
         {
-            SpliceInformationTable sit(psip);
-            sit.setSCTEPID(pid);
+            try {
+                SpliceInformationTable sit(psip);
+                sit.setSCTEPID(pid);
 
-            m_listenerLock.lock();
-            for (auto & listener : m_mpegListeners)
-                listener->HandleSplice(&sit);
-            m_listenerLock.unlock();
+                m_listenerLock.lock();
+                for (auto & listener : m_mpegListeners)
+                    listener->HandleSplice(&sit);
+                m_listenerLock.unlock();
+            }
+            catch (const PsipParseException& e)
+            {
+                m_parseErrors[e.m_error]++;
+            }
 
             return true;
         }
@@ -1992,4 +1998,22 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
 
 void MPEGStreamData::DumpErrors() const
 {
+    if (m_parseErrors[PsipParseException::SitLength] ||
+        m_parseErrors[PsipParseException::SitBandwidth] ||
+        m_parseErrors[PsipParseException::SitTimeSignal] ||
+        m_parseErrors[PsipParseException::SitSpliceSchedInfo1] ||
+        m_parseErrors[PsipParseException::SitSpliceSchedInfo2] ||
+        m_parseErrors[PsipParseException::SitSpliceInsertInfo1] ||
+        m_parseErrors[PsipParseException::SitSpliceInsertInfo2] ||
+        m_parseErrors[PsipParseException::SitSpliceInsertInfo3] ||
+        m_parseErrors[PsipParseException::SitSpliceInsertInfo4])
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("SIT parsing error: %1/%2/%3/%4/%5/%6")
+            .arg(m_parseErrors[PsipParseException::SitLength])
+            .arg(m_parseErrors[PsipParseException::SitSpliceSchedInfo1])
+            .arg(m_parseErrors[PsipParseException::SitSpliceSchedInfo2])
+            .arg(m_parseErrors[PsipParseException::SitSpliceInsertInfo1])
+            .arg(m_parseErrors[PsipParseException::SitSpliceInsertInfo2])
+            .arg(m_parseErrors[PsipParseException::SitSpliceInsertInfo3]));
+    }
 }
