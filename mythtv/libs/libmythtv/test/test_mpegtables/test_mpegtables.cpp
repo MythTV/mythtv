@@ -1725,6 +1725,18 @@ void TestMPEGTables::scte35_sit_test1(void)
     QCOMPARE (sit.SpliceCommandType(), (uint)SpliceInformationTable::kSCTNull);
 }
 
+// A sample splict_scheule packet created by the tstabcomp command
+// from https://tsduck.io/.  These values were picked randomly for
+// testing and probably don't match what would be in an actual
+// packet.
+const std::vector<uint8_t> tsduck_sit_schedule {
+    0xFC, 0x30, 0x44, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5A, 0x00, 0x00, 0xC0, 0x33, 0x04, 0x03, 0x00,
+    0xBC, 0x61, 0x4E, 0xFF, 0x00, 0xBC, 0x61, 0x4F, 0x7F, 0xFF, 0x50, 0xB2, 0xBF, 0x22, 0x7E, 0x00,
+    0x29, 0x32, 0xE0, 0x38, 0xA8, 0x03, 0x04, 0x00, 0xBC, 0x61, 0x50, 0x7F, 0xBF, 0x02, 0x7B, 0x50,
+    0xB2, 0xC0, 0x4E, 0x7C, 0x50, 0xB2, 0xC1, 0x7A, 0xFE, 0x00, 0x52, 0x65, 0xC0, 0x38, 0xA9, 0x05,
+    0x06, 0x00, 0x00, 0xA8, 0xA5, 0xA9, 0x06,
+};
+
 // A sample splict_insert packet created by the tstabcomp command
 // from https://tsduck.io/. This tests the splice_cancel section
 // of SpliceInformationTable::Parse insert processing.  These
@@ -1760,6 +1772,63 @@ const std::vector<uint8_t> tsduck_sit_insert3 {
     0x45, 0x49, 0x64, 0x75, 0x64, 0x65, 0x00, 0x08, 0x43, 0x55, 0x45, 0x4A, 0x64, 0x75, 0x64, 0x65,
     0xF6, 0x15, 0x88, 0x56,
 };
+
+void TestMPEGTables::scte35_sit_schedule(void)
+{
+    PSIPTable si_table(tsduck_sit_schedule);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(),                  68U);
+
+    // Splice specific fields
+    SpliceInformationTable sit(si_table);
+    QCOMPARE (sit.SectionSyntaxIndicator(),     false);
+    QCOMPARE (sit.PrivateIndicator(),           false);
+    QCOMPARE (sit.SectionLengthRaw(),             68U);
+    QCOMPARE (sit.SpliceProtocolVersion(),         0U);
+    QCOMPARE (sit.IsEncryptedPacket(),          false);
+    QCOMPARE (sit.EncryptionAlgorithm(), (uint)SpliceInformationTable::kNoEncryption);
+    QCOMPARE (sit.PTSAdjustment(),              90ULL);
+    QCOMPARE (sit.CodeWordIndex(),                 0U);
+    QCOMPARE (sit.Tier(),                         12U);
+
+    QCOMPARE (sit.SpliceCommandLength(),          51U);
+    QCOMPARE (sit.SpliceCommandType(), (uint)SpliceInformationTable::kSCTSpliceSchedule);
+
+    SpliceScheduleView schedule = sit.SpliceSchedule();
+    QCOMPARE (schedule.SpliceCount(),              3U);
+    QCOMPARE (schedule.SpliceEventID(0),    12345678U);
+    QCOMPARE (schedule.IsSpliceEventCancel(0),   true);
+
+    QCOMPARE (schedule.SpliceEventID(1),    12345679U);
+    QCOMPARE (schedule.IsSpliceEventCancel(1),  false);
+    QCOMPARE (schedule.IsOutOfNetwork(1),        true);
+    QCOMPARE (schedule.IsProgramSplice(1),       true);
+    QCOMPARE (schedule.IsDuration(1),            true);
+    QCOMPARE (schedule.SpliceTime(1),     0x50B2BF22U);
+    QCOMPARE (schedule.UniqueProgramID(1),     14504U);
+    QCOMPARE (schedule.AvailNum(1),                3U);
+    QCOMPARE (schedule.AvailsExpected(1),          4U);
+
+    QCOMPARE (schedule.SpliceEventID(2),    12345680U);
+    QCOMPARE (schedule.IsSpliceEventCancel(2),  false);
+    QCOMPARE (schedule.IsOutOfNetwork(2),        true);
+    QCOMPARE (schedule.IsProgramSplice(2),      false);
+    QCOMPARE (schedule.IsDuration(2),            true);
+    QCOMPARE (schedule.ComponentCount(2),          2U);
+
+    QCOMPARE (schedule.ComponentTag(2,0),        123U);
+    QCOMPARE (schedule.ComponentSpliceTime(2,0), 0x50B2C04EU);
+    QCOMPARE (schedule.ComponentTag(2,1),        124U);
+    QCOMPARE (schedule.ComponentSpliceTime(2,1), 0x50B2C17AU);
+
+    QCOMPARE (schedule.UniqueProgramID(2),     14505U);
+    QCOMPARE (schedule.AvailNum(2),                5U);
+    QCOMPARE (schedule.AvailsExpected(2),          6U);
+
+    QCOMPARE (sit.SpliceDescriptorsLength(),       0U);
+}
 
 void TestMPEGTables::scte35_sit_insert1(void)
 {

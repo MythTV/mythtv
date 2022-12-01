@@ -1008,19 +1008,37 @@ class MTV_PUBLIC SpliceScheduleView
                 (m_ptrs0[i][2] <<  8) | (m_ptrs0[i][3]));
     }
     //   splice_event_cancel_indicator 1 4.0 + m_ptrs0[i]
+    bool IsSpliceEventCancel(uint i) const { return ( m_ptrs0[i][4] & 0x80 ) != 0; }
     //   reserved               7   4.1 + m_ptrs0[i]
     //   if (splice_event_cancel_indicator == ‘0’) {
     //     out_of_network_indicator 1 5.0 + m_ptrs0[i]
+    bool IsOutOfNetwork(uint i) const { return ( m_ptrs0[i][5] & 0x80 ) != 0; }
     //     program_splice_flag  1 5.1 + m_ptrs0[i]
+    bool IsProgramSplice(uint i) const { return ( m_ptrs0[i][5] & 0x40 ) != 0; }
     //     duration_flag        1 5.2 + m_ptrs0[i]
+    bool IsDuration(uint i) const { return ( m_ptrs0[i][5] & 0x20 ) != 0; }
     //     reserved             5 5.3 + m_ptrs0[i]
     //     if (program_splice_flag == ‘1’)
     //       utc_splice_time   32 6.0 + m_ptrs0[i]
+    uint64_t SpliceTime(uint i) const
+        { return ((uint64_t(m_ptrs0[i][6])       << 24) |
+                  (uint64_t(m_ptrs0[i][7])       << 16) |
+                  (uint64_t(m_ptrs0[i][8])       <<  8) |
+                  (uint64_t(m_ptrs0[i][9])));
+        }
     //     else {
     //       component_count    8 6.0 + m_ptrs0[i]
+    uint ComponentCount(uint i) const { return m_ptrs0[i][6]; }
     //       for(j = 0; j < component_count; j++) {
     //         component_tag    8 7.0 + m_ptrs0[i]+j*5
+    uint ComponentTag(uint i, uint j) const { return m_ptrs0[i][7+j*5]; }
     //         utc_splice_time 32 8.0 + m_ptrs0[i]+j*5
+    uint64_t ComponentSpliceTime(uint i, uint j) const
+        { return ((uint64_t(m_ptrs0[i][ 8+j*5])       << 24) |
+                  (uint64_t(m_ptrs0[i][ 9+j*5])       << 16) |
+                  (uint64_t(m_ptrs0[i][10+j*5])       <<  8) |
+                  (uint64_t(m_ptrs0[i][11+j*5])));
+        }
     //       }
     //     }
     //     if (duration_flag) {
@@ -1029,8 +1047,12 @@ class MTV_PUBLIC SpliceScheduleView
     //       duration          33 0.7 + m_ptrs1[i]
     //     }
     //     unique_program_id   16 0.0 + m_ptrs1[i] + (duration_flag)?5:0
+    uint UniqueProgramID(uint i) const
+        { return (m_ptrs1[i][IsDuration(i)?5:0]<<8) | m_ptrs1[i][IsDuration(i)?6:1]; }
     //     avail_num            8 2.0 + m_ptrs1[i] + (duration_flag)?5:0
+    uint AvailNum(uint i) const { return m_ptrs1[i][IsDuration(i)?7:2]; }
     //     avails_expected      8 3.0 + m_ptrs1[i] + (duration_flag)?5:0
+    uint AvailsExpected(uint i) const { return m_ptrs1[i][IsDuration(i)?8:3]; }
     //   }
 
   private:

@@ -1318,17 +1318,12 @@ bool SpliceInformationTable::Parse(void)
             }
             bool program_slice = (cur[5] & 0x40) != 0;
             uint component_count = cur[6];
-            m_ptrs1.push_back(cur + (program_slice ? 10 : 7 * component_count));
-        }
-        if (splice_count)
-        {
+            cur += program_slice ? 10 : 7 + 5 * component_count;
+            m_ptrs1.push_back(cur);
             bool duration = (m_ptrs0.back()[5] & 0x2) != 0;
-            m_epilog = m_ptrs1.back() + ((duration) ? 9 : 4);
+            cur += (duration) ? 9 : 4;
         }
-        else
-        {
-            m_epilog = cur;
-        }
+        m_epilog = cur;
     }
     else if (kSCTSpliceInsert == type)
     {
