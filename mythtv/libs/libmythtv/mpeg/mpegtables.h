@@ -961,6 +961,33 @@ class MTV_PUBLIC ConditionalAccessTable : public PSIPTable
     // CRC_32 32 rpchof
 };
 
+class MTV_PUBLIC BreakDurationView
+{
+  public:
+    explicit BreakDurationView(const unsigned char *data) : m_data(data) { }
+    //   time_specified_flag    1  0.0
+    bool IsAutoReturn(void) const { return ( m_data[0] & 0x80 ) != 0; }
+    //   if (time_specified_flag == 1)
+    //     reserved             6  0.1
+    //     pts_time            33  0.6
+    uint64_t PTSTime(void) const
+    {
+        return ((uint64_t(m_data[0] & 0x1) << 32) |
+                (uint64_t(m_data[1])       << 24) |
+                (uint64_t(m_data[2])       << 16) |
+                (uint64_t(m_data[3])       <<  8) |
+                (uint64_t(m_data[4])));
+    }
+    //   else
+    //     reserved             7  0.1
+    // }
+    virtual QString toString(void) const;
+    virtual QString toStringXML(uint indent_level) const;
+
+  private:
+    const unsigned char *m_data;
+};
+
 class MTV_PUBLIC SpliceTimeView
 {
   public:
@@ -1042,6 +1069,8 @@ class MTV_PUBLIC SpliceScheduleView
     //       }
     //     }
     //     if (duration_flag) {
+    BreakDurationView BreakDuration(uint i) const
+        { return BreakDurationView(m_ptrs1[i]); }
     //       auto_return        1 0.0 + m_ptrs1[i]
     //       reserved           6 0.1 + m_ptrs1[i]
     //       duration          33 0.7 + m_ptrs1[i]
@@ -1105,6 +1134,8 @@ class MTV_PUBLIC SpliceInsertView
     //       }
     //     }
     //     if (duration_flag == ‘1’)
+    BreakDurationView BreakDuration(void) const
+        { return BreakDurationView(m_ptrs1[1]); }
     //       auto_return        1    0.0 + m_ptrs1[1]
     //       reserved           6    0.1 + m_ptrs1[1]
     //       duration          33    0.7 + m_ptrs1[1]

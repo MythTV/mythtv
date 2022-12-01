@@ -1806,6 +1806,9 @@ void TestMPEGTables::scte35_sit_schedule(void)
     QCOMPARE (schedule.IsOutOfNetwork(1),        true);
     QCOMPARE (schedule.IsProgramSplice(1),       true);
     QCOMPARE (schedule.IsDuration(1),            true);
+    BreakDurationView bd = schedule.BreakDuration(1);
+    QCOMPARE (bd.IsAutoReturn(),                false);
+    QCOMPARE (bd.PTSTime(),              0x0002932E0U);
     QCOMPARE (schedule.SpliceTime(1),     0x50B2BF22U);
     QCOMPARE (schedule.UniqueProgramID(1),     14504U);
     QCOMPARE (schedule.AvailNum(1),                3U);
@@ -1816,6 +1819,9 @@ void TestMPEGTables::scte35_sit_schedule(void)
     QCOMPARE (schedule.IsOutOfNetwork(2),        true);
     QCOMPARE (schedule.IsProgramSplice(2),      false);
     QCOMPARE (schedule.IsDuration(2),            true);
+    bd = schedule.BreakDuration(2);
+    QCOMPARE (bd.IsAutoReturn(),                 true);
+    QCOMPARE (bd.PTSTime(),              0x0005265C0U);
     QCOMPARE (schedule.ComponentCount(2),          2U);
 
     QCOMPARE (schedule.ComponentTag(2,0),        123U);
@@ -1895,6 +1901,9 @@ void TestMPEGTables::scte35_sit_insert2(void)
     QCOMPARE (insert.IsProgramSplice(),          true);
     QCOMPARE (insert.IsDuration(),               true);
     QCOMPARE (insert.IsSpliceImmediate(),       false);
+    BreakDurationView bd = insert.BreakDuration();
+    QCOMPARE (bd.IsAutoReturn(),                 true);
+    QCOMPARE (bd.PTSTime(),              0x0002932E0U);
     QCOMPARE (insert.UniqueProgramID(),        14504U);
     QCOMPARE (insert.AvailNum(),                   3U);
     QCOMPARE (insert.AvailsExpected(),             4U);
@@ -1939,6 +1948,9 @@ void TestMPEGTables::scte35_sit_insert3(void)
     QCOMPARE (insert.IsProgramSplice(),         false);
     QCOMPARE (insert.IsDuration(),               true);
     QCOMPARE (insert.IsSpliceImmediate(),       false);
+    BreakDurationView bd = insert.BreakDuration();
+    QCOMPARE (bd.IsAutoReturn(),                false);
+    QCOMPARE (bd.PTSTime(),              0x0005265C0U);
     QCOMPARE (insert.UniqueProgramID(),        14504U);
     QCOMPARE (insert.AvailNum(),                   5U);
     QCOMPARE (insert.AvailsExpected(),             6U);

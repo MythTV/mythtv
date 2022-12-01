@@ -1211,6 +1211,28 @@ QString ConditionalAccessTable::toStringXML(uint indent_level) const
     return str;
 }
 
+QString BreakDurationView::toString() const
+{
+    uint64_t durationInPTS = PTSTime();
+    QTime duration = QTime(0,0,0,0).addMSecs(durationInPTS/90);
+
+    return QString("break_duration(pts=%1 abs=%2, return=%3)")
+        .arg(QString::number(durationInPTS),
+             duration.toString("hh:mm:ss.zzz"),
+             IsAutoReturn() ? "true" : "false");
+}
+
+QString BreakDurationView::toStringXML(uint indent_level) const
+{
+    QString indent = StringUtil::indentSpaces(indent_level);
+    uint64_t durationInPTS = PTSTime();
+    QTime duration = QTime(0,0,0,0).addMSecs(durationInPTS/90);
+
+    return QString(R"(%1<BreakDuration pts="%2" abs="%3" return="%4"/>)")
+        .arg(indent,QString::number(durationInPTS),duration.toString("hh:mm:ss.zzz"),
+             IsAutoReturn() ? "true" : "false");
+}
+
 QString SpliceTimeView::toString(int64_t first, int64_t last) const
 {
     if (!IsTimeSpecified())
