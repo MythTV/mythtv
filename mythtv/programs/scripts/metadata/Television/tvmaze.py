@@ -232,11 +232,8 @@ def buildNumbers(args, opts):
                 else:
                     show_tz = None
                 dtInTgtZone = dtInLocalZone.astimezone(posixtzinfo(show_tz))
-                # For at least one timezone, the following exception may be thrown.
-                # UnboundLocalError: local variable 'ttmfmt' referenced before assignment
-                # Example:  tvmaze.py --debug -N "The Masked Singer" "2022-11-24 19:00:00"
 
-            except (ValueError, AttributeError, UnboundLocalError) as e:
+            except (ValueError, AttributeError) as e:
                 if opts.debug:
                     print('show_tz =%s, except = %s' % (show_tz, e))
                 dtInTgtZone = None
