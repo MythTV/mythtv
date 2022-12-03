@@ -255,6 +255,7 @@ class ERRCODES( object ):
     TZ_INVALID_FILE         = 251
     TZ_INVALID_TRANSITION   = 252
     TZ_CONVERSION_ERROR     = 253
+    TZ_VERSION_ERROR        = 254
 
 class MythSchema( object ):
     _schema_value = 'DBSchemaVer'
