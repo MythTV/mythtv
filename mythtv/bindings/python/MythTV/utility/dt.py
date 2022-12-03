@@ -88,12 +88,12 @@ class basetzinfo( _pytzinfo ):
 
             offset = p.offset - n.offset
             rend = list(n.local[0:5])
-            rend[4] += offset/60
+            rend[4] += offset//60
             if (0 > rend[4]) or (rend[4] > 59):
-                rend[3] += rend[4]/60
+                rend[3] += rend[4]//60
                 rend[4] = rend[4]%60
             if (0 > rend[3]) or (rend[3] > 23):
-                rend[2] += rend[3]/24
+                rend[2] += rend[3]//24
                 rend[3] = rend[3]%24
 
             self._ranges.append((rstart, tuple(rend), i))
