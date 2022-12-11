@@ -89,6 +89,7 @@ class MythExternRecApp : public QObject
     bool config(void);
 
     bool                    m_fatal        { false };
+    QString                 m_fatalMsg;
 
     std::atomic<bool>       m_run          { true };
     std::condition_variable m_runCond;

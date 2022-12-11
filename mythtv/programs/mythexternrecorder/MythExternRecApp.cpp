@@ -80,11 +80,27 @@ QString MythExternRecApp::Desc(void) const
 
 bool MythExternRecApp::config(void)
 {
+    QFileInfo conf_info = QFileInfo(m_configIni);
+
+    if (!QFileInfo::exists(m_configIni))
+    {
+        m_fatalMsg = QString("ERR:Config file '%1' does not exist "
+                             "in '%2'")
+                     .arg(conf_info.fileName())
+                     .arg(conf_info.absolutePath());
+        LOG(VB_GENERAL, LOG_CRIT, m_fatalMsg);
+        m_fatal = true;
+        return false;
+    }
+
     QSettings settings(m_configIni, QSettings::IniFormat);
 
     if (!settings.contains("RECORDER/command"))
     {
-        LOG(VB_GENERAL, LOG_CRIT, "ini file missing [RECORDER]/command");
+        m_fatalMsg = QString("ERR:Config file %1 file missing "
+                             "[RECORDER]/command")
+                     .arg(conf_info.absolutePath());
+        LOG(VB_GENERAL, LOG_CRIT, m_fatalMsg);
         m_fatal = true;
         return false;
     }
@@ -118,8 +134,8 @@ bool MythExternRecApp::config(void)
         {
             // Assume the channels config is in the same directory as
             // main config
-            QDir conf_path = QFileInfo(m_configIni).absolutePath();
-            QFileInfo ini(conf_path, m_channelsIni);
+            QDir chan_path = QFileInfo(m_configIni).absolutePath();
+            QFileInfo ini(chan_path, m_channelsIni);
             m_channelsIni = ini.absoluteFilePath();
         }
     }
@@ -131,7 +147,7 @@ bool MythExternRecApp::Open(void)
 {
     if (m_fatal)
     {
-        emit SendMessage("Open", "0", "ERR:Already dead.");
+        emit SendMessage("Open", "0", m_fatalMsg);
         return false;
     }
 
