@@ -483,6 +483,15 @@ Q_SLOT void MythExternRecApp::NextChannel(const QString & serial)
 void MythExternRecApp::NewEpisodeStarting(const QString & channum)
 {
     QString cmd = m_newEpisodeCommand;
+    int     pos = cmd.lastIndexOf(QChar('&'));
+    bool    background = false;
+
+    if (pos > 0)
+    {
+        background = true;
+        cmd = cmd.left(pos);
+    }
+
     cmd.replace("%CHANNUM%", channum);
 
     QStringList args = MythCommandLineParser::MythSplitCommandString(cmd);
@@ -491,25 +500,33 @@ void MythExternRecApp::NewEpisodeStarting(const QString & channum)
     LOG(VB_RECORD, LOG_WARNING, LOC +
         QString(" New episode starting on current channel: '%1'").arg(cmd));
 
-    QProcess proc;
-    proc.start(cmd, args);
-    if (!proc.waitForStarted())
+    if (m_tuneProc.state() == QProcess::Running)
+        TerminateProcess(m_tuneProc, "Tune");
+
+    m_tuneProc.start(cmd, args);
+    if (!m_tuneProc.waitForStarted())
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
             " NewEpisodeStarting: Failed to start process: " + ENO);
         return;
     }
-    proc.waitForFinished(5000);
-    if (proc.state() == QProcess::NotRunning)
+    if (background)
     {
-        if (proc.exitStatus() != QProcess::NormalExit)
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            "NewEpisodeStarting: running in background.");
+        return;
+    }
+
+    m_tuneProc.waitForFinished(5000);
+    if (m_tuneProc.state() == QProcess::NotRunning)
+    {
+        if (m_tuneProc.exitStatus() != QProcess::NormalExit)
         {
             LOG(VB_RECORD, LOG_ERR, LOC +
                 " NewEpisodeStarting: process failed: " + ENO);
             return;
         }
     }
-
     LOG(VB_RECORD, LOG_INFO, LOC + "NewEpisodeStarting: finished.");
 }
 
@@ -529,7 +546,7 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
             NewEpisodeStarting(channum);
 
         LOG(VB_CHANNEL, LOG_INFO, LOC +
-            QString("TuneChanne: Already on %1").arg(channum));
+            QString("TuneChannel: Already on %1").arg(channum));
         emit SendMessage("TuneChannel", serial,
                          QString("OK:Tunned to %1").arg(channum));
         return;
