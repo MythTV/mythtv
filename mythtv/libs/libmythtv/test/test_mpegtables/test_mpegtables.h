@@ -33,6 +33,8 @@ class TestMPEGTables: public QObject
   private slots:
     static void pat_test(void);
     static void mpeg_pmt_test1(void);
+    static void mpeg_pmt_test1b(void);
+    static void mpeg_pmt_test1c(void);
     static void mpeg_pmt_test2(void);
     static void mpeg_pmt_test3(void);
     static void mpeg_pmt_test4(void);

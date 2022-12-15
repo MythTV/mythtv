@@ -308,6 +308,32 @@ void TestMPEGTables::mpeg_pmt_test1(void)
     QCOMPARE (pmt.FindUnusedPID(),                32U);
 }
 
+void TestMPEGTables::mpeg_pmt_test1b(void)
+{
+    // This is the packet from the test 1 modified to state that the
+    // program info length is 255 bytes. The CRC on this packet is
+    // valid.
+    std::vector<uint8_t> si_data = wbal_pmt_data;
+    si_data[11] = 0xFF;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    mpeg_test_throw<ProgramMapTable>(si_table, PsipParseException::PmtProgramDescriptors);
+}
+
+void TestMPEGTables::mpeg_pmt_test1c(void)
+{
+    // This is the packet from the test 1 modified to state that the
+    // length of the first stream descriptor is 255 bytes. The CRC on
+    // this packet is valid.
+    std::vector<uint8_t> si_data = wbal_pmt_data;
+    si_data[43] = 0xFF;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    mpeg_test_throw<ProgramMapTable>(si_table, PsipParseException::PmtStreamDescriptors);
+}
+
 void TestMPEGTables::mpeg_pmt_test2(void)
 {
     PSIPTable si_table(espn_pmt_data);

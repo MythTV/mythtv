@@ -469,7 +469,14 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
         LOG(VB_RECORD, LOG_ERR, LOC + "no PAT yet...");
         return false; // no way to properly rewrite pids without PAT
     }
-    pmt.Parse();
+    try {
+        pmt.Parse();
+    }
+    catch (const PsipParseException& e)
+    {
+        LOG(VB_RECORD, LOG_ERR, LOC + "can't parse PMT...");
+        return false;
+    }
 
     uint programNumber = 1; // MPEG Program Number
 
@@ -709,12 +716,18 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
             uint prog_num = psip.TableIDExtension();
             m_pmtStatus.SetSectionSeen(prog_num, version, psip.Section(), psip.LastSection());
 
-            ProgramMapTable pmt(psip);
+            try {
+                ProgramMapTable pmt(psip);
 
-            if (m_cacheTables)
-                CachePMT(&pmt);
+                if (m_cacheTables)
+                    CachePMT(&pmt);
 
-            ProcessPMT(&pmt);
+                ProcessPMT(&pmt);
+            }
+            catch (const PsipParseException& e)
+            {
+                m_parseErrors[e.m_error]++;
+            }
 
             return true;
         }

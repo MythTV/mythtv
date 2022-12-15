@@ -390,13 +390,13 @@ ProgramMapTable* ProgramMapTable::CreateBlank(bool smallPacket)
     {
         PSIPTable psip = PSIPTable::View(*tspacket);
         psip.SetLength(len_for_alloc[0]);
-        pmt = new ProgramMapTable(psip);
+        pmt = new ProgramMapTable(psip, false);
     }
     else
     {
         PSIPTable psip(*tspacket);
         psip.SetLength(len_for_alloc[1]);
-        pmt = new ProgramMapTable(psip);
+        pmt = new ProgramMapTable(psip, false);
     }
 
     pmt->SetTotalLength(DEFAULT_PMT_HEADER.size());
@@ -466,15 +466,45 @@ ProgramMapTable* ProgramMapTable::Create(
     return pmt;
 }
 
-void ProgramMapTable::Parse() const
+/*
+ * @brief Validate the data in a PMT table.
+ *
+ * @param validate Should normally be set to true. There is some code
+ * in MythTV that takes a received PMT table and generates a new PMT
+ * table that contains only a single entry.  This code ends up calling
+ * Parse on a partially created table (the lengths are bad) so the
+ * validation code can't be used.
+ */
+void ProgramMapTable::Parse(bool validate) const
 {
+    if (validate && (SectionLength() > TSSizeInBuffer()))
+        throw MpegParseException(PsipParseException::PmtLength);
+
+    // Assume minimim of one stream with no stream descriptors. What
+    // is the maxium possible size of the program info descriptors.
+    uint maxProgramInfoLength  =
+        SectionLength() - kPMTHeaderSize - kPMTMinTrailerSize - kPMTTableEntrySize;
+    uint programInfoLength = ProgramInfoLength();
+    if (validate && (programInfoLength > maxProgramInfoLength))
+        throw MpegParseException(PsipParseException::PmtProgramDescriptors);
+
+    // Assuming no stream descriptors, what is the maximum possible
+    // number of stream entries?
+    uint maxStreamsPossible =
+        (SectionLength() - kPMTHeaderSize - programInfoLength - kPMTMinTrailerSize) / kPMTTableEntrySize;
+
+    // Pre-allocate the entire vector
     m_ptrs.clear();
-    const unsigned char *cpos = psipdata() + kPmtHeaderMinOffset + ProgramInfoLength();
+    m_ptrs.reserve(maxStreamsPossible);
+
+    // Process tables
+    const unsigned char *cpos = psipdata() + kPmtHeaderMinOffset + programInfoLength;
+    const uint8_t *limit = pesdata() + SectionLength() - kPMTMinTrailerSize;
     auto *pos = const_cast<unsigned char*>(cpos);
-    for (uint i = 0; pos < psipdata() + Length() - 9; i++)
+    for (uint i = 0 ; (i < maxStreamsPossible) && (pos < limit); i++)
     {
         m_ptrs.push_back(pos);
-        pos += 5 + StreamInfoLength(i);
+        pos += kPMTTableEntrySize + StreamInfoLength(i);
 #if 0
         LOG(VB_SIPARSER, LOG_DEBUG, QString("Parsing PMT(0x%1) i(%2) len(%3)")
                 .arg((uint64_t)this, 0, 16) .arg(i) .arg(StreamInfoLength(i)));
@@ -485,6 +515,9 @@ void ProgramMapTable::Parse() const
     LOG(VB_SIPARSER, LOG_DEBUG, QString("Parsed PMT(0x%1)\n%2")
             .arg((uint64_t)this, 0, 16) .arg(toString()));
 #endif
+
+    if (validate && (pos > limit))
+        throw MpegParseException(PsipParseException::PmtStreamDescriptors);
 }
 
 void ProgramMapTable::AppendStream(

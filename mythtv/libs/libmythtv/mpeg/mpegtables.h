@@ -768,17 +768,20 @@ class MTV_PUBLIC ProgramAssociationTable : public PSIPTable
 class MTV_PUBLIC ProgramMapTable : public PSIPTable
 {
   public:
+    static constexpr uint8_t kPMTHeaderSize     { 12 }; // Incl Pgm Info Len
+    static constexpr uint8_t kPMTTableEntrySize {  5 }; // No table type descriptors
+    static constexpr uint8_t kPMTMinTrailerSize {  4 }; // Global descriptor count, CRC
 
-    ProgramMapTable(const ProgramMapTable& table) : PSIPTable(table)
+    ProgramMapTable(const ProgramMapTable& table, bool validate = true) : PSIPTable(table)
     {
         assert(TableID::PMT == TableID());
-        Parse();
+        Parse(validate);
     }
 
-    explicit ProgramMapTable(const PSIPTable& table) : PSIPTable(table)
+    explicit ProgramMapTable(const PSIPTable& table, bool validate = true) : PSIPTable(table)
     {
         assert(TableID::PMT == TableID());
-        Parse();
+        Parse(validate);
     }
 
     static ProgramMapTable ViewData(const unsigned char* pesdata)
@@ -887,7 +890,7 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
     }
     void AppendStream(uint pid, uint type, unsigned char* streamInfo = nullptr, uint infoLength = 0);
 
-    void Parse(void) const;
+    void Parse(bool validate = true) const;
     QString toString(void) const override; // PSIPTable
     QString toStringXML(uint indent_level) const override; // PSIPTable
     // unsafe sets
