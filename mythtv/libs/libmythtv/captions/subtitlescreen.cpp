@@ -1931,7 +1931,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
             else if (displaysub && rect->type == SUBTITLE_ASS)
             {
                 InitialiseAssTrack(m_player->GetDecoder()->GetTrack(kTrackTypeSubtitle));
-                AddAssEvent(rect->ass);
+                AddAssEvent(rect->ass, subtitle.start_display_time, subtitle.end_display_time);
             }
 #endif
         }
@@ -2472,10 +2472,10 @@ void SubtitleScreen::CleanupAssTrack(void)
     m_assTrack = nullptr;
 }
 
-void SubtitleScreen::AddAssEvent(char *event)
+void SubtitleScreen::AddAssEvent(char *event, uint32_t starttime, uint32_t endtime)
 {
     if (m_assTrack && event)
-        ass_process_data(m_assTrack, event, strlen(event));
+        ass_process_chunk(m_assTrack, event, strlen(event), starttime, endtime-starttime);
 }
 
 void SubtitleScreen::ResizeAssRenderer(void)

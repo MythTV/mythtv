@@ -265,7 +265,7 @@ private:
     void CleanupAssLibrary(void);
     void InitialiseAssTrack(int tracknum);
     void CleanupAssTrack(void);
-    void AddAssEvent(char *event);
+    void AddAssEvent(char *event, uint32_t starttime, uint32_t endtime);
     void ResizeAssRenderer(void);
     void RenderAssTrack(std::chrono::milliseconds timecode);
 
