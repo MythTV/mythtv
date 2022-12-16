@@ -81,6 +81,30 @@ void atsc_test_throw(const PSIPTable& si_table,
     }
 }
 
+template <typename T>
+void dvb_test_throw(const PSIPTable& si_table,
+                    PsipParseException::Code error_code)
+{
+    try
+    {
+        T table(si_table);
+        QFAIL(qPrintable(QStringLiteral("This test should throw a DvbParseException.")));
+    }
+    catch (const DvbParseException& e)
+    {
+        QCOMPARE(e.what(), "Dvb Parse Error");
+        QCOMPARE(e.m_error, error_code);
+    }
+    catch (const PsipParseException& e)
+    {
+        QFAIL("Expected a DvbParseException error, received a PsipParseException");
+    }
+    catch (const std::runtime_error& e)
+    {
+        QFAIL("Expected a DvbParseException error, received a runtime_error");
+    }
+}
+
 void TestMPEGTables::update_crc(std::vector<uint8_t> &data)
 {
     uint32_t crc = av_bswap32(av_crc(av_crc_get_table(AV_CRC_32_IEEE), UINT32_MAX,
@@ -2309,6 +2333,46 @@ void TestMPEGTables::dvb_nit_test2(void)
     QCOMPARE (nit.TransportDescriptors(6), nit.data()+831);
 }
 
+void TestMPEGTables::dvb_nit_test2b(void)
+{
+    // This is the packet from the test 2 modified to cnange the
+    // network descriptor length to 1024. The CRC on this packet is
+    // valid.
+    std::vector<uint8_t> si_data = nz_nit_data;
+    si_data[8] = 0xF4;
+    si_data[9] = 0x00;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    dvb_test_throw<NetworkInformationTable>(si_table, PsipParseException::NitNetworkDescriptorsLength);
+}
+
+void TestMPEGTables::dvb_nit_test2c(void)
+{
+    // This is the packet from the test 2 modified to increase the
+    // descriptor length on the last transport by one. The CRC on this
+    // packet is valid.
+    std::vector<uint8_t> si_data = nz_nit_data;
+    si_data[830] = 0x9C;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    dvb_test_throw<NetworkInformationTable>(si_table, PsipParseException::NitTransportDescriptors);
+}
+
+void TestMPEGTables::dvb_nit_test2d(void)
+{
+    // This is the packet from the test 2 modified to decrease the
+    // descriptor length on the last transport by one. The CRC on this
+    // packet is valid.
+    std::vector<uint8_t> si_data = nz_nit_data;
+    si_data[830] = 0x9A;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    dvb_test_throw<NetworkInformationTable>(si_table, PsipParseException::NitTransportDescriptors);
+}
+
 //
 // DVB ServiceDescriptionTable Tests
 //
@@ -2451,6 +2515,19 @@ void TestMPEGTables::dvb_sdt_test1(void)
         QCOMPARE (sd->ServiceNameLength(),           8U);
         QCOMPARE (sd->ServiceName(),         "10 SHAKE");
     }
+}
+
+void TestMPEGTables::dvb_sdt_test1b(void)
+{
+    // This is the packet from the test 1 modified to change the
+    // descriptor length on the last service to 255 bytes. The CRC on
+    // this packet is valid.
+    std::vector<uint8_t> si_data = au_sdt_data;
+    si_data[0x136] = 0x24;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    dvb_test_throw<ServiceDescriptionTable>(si_table, PsipParseException::SdtDescriptors);
 }
 
 void TestMPEGTables::dvb_sdt_test2a(void)

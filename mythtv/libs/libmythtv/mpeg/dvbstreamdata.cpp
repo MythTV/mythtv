@@ -214,15 +214,23 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         if ((psip.TableID() == TableID::NIT  && psip.TableIDExtension() != (uint)m_dvbRealNetworkId) ||
             (psip.TableID() == TableID::NITo && psip.TableIDExtension() == (uint)m_dvbRealNetworkId)  )
         {
-            auto *nit = new NetworkInformationTable(psip);
-            if (!nit->Mutate())
+            try
             {
+                auto *nit = new NetworkInformationTable(psip);
+                if (!nit->Mutate())
+                {
+                    delete nit;
+                    return true;
+                }
+                bool retval = HandleTables(pid, *nit);
                 delete nit;
+                return retval;
+            }
+            catch (const PsipParseException& e)
+            {
+                m_parseErrors[e.m_error]++;
                 return true;
             }
-            bool retval = HandleTables(pid, *nit);
-            delete nit;
-            return retval;
         }
     }
 
@@ -236,20 +244,27 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
             m_nitStatus.SetSectionSeen(psip.Version(), psip.Section(),
                                        psip.LastSection());
 
-            if (m_cacheTables)
+            try
             {
-                auto *nit = new NetworkInformationTable(psip);
-                CacheNIT(nit);
-                QMutexLocker locker(&m_listenerLock);
-                for (auto & listener : m_dvbMainListeners)
-                    listener->HandleNIT(nit);
+                if (m_cacheTables)
+                {
+                    auto *nit = new NetworkInformationTable(psip);
+                    CacheNIT(nit);
+                    QMutexLocker locker(&m_listenerLock);
+                    for (auto & listener : m_dvbMainListeners)
+                        listener->HandleNIT(nit);
+                }
+                else
+                {
+                    NetworkInformationTable nit(psip);
+                    QMutexLocker locker(&m_listenerLock);
+                    for (auto & listener : m_dvbMainListeners)
+                        listener->HandleNIT(&nit);
+                }
             }
-            else
+            catch (const PsipParseException& e)
             {
-                NetworkInformationTable nit(psip);
-                QMutexLocker locker(&m_listenerLock);
-                for (auto & listener : m_dvbMainListeners)
-                    listener->HandleNIT(&nit);
+                m_parseErrors[e.m_error]++;
             }
 
             return true;
@@ -260,16 +275,23 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
             m_sdtStatus.SetSectionSeen(tsid, psip.Version(), psip.Section(),
                                         psip.LastSection());
 
-            if (m_cacheTables)
+            try
             {
-                auto *sdt = new ServiceDescriptionTable(psip);
-                CacheSDT(sdt);
-                ProcessSDT(tsid, sdt);
+                if (m_cacheTables)
+                {
+                    auto *sdt = new ServiceDescriptionTable(psip);
+                    CacheSDT(sdt);
+                    ProcessSDT(tsid, sdt);
+                }
+                else
+                {
+                    ServiceDescriptionTable sdt(psip);
+                    ProcessSDT(tsid, &sdt);
+                }
             }
-            else
+            catch (const PsipParseException& e)
             {
-                ServiceDescriptionTable sdt(psip);
-                ProcessSDT(tsid, &sdt);
+                m_parseErrors[e.m_error]++;
             }
 
             return true;
@@ -290,11 +312,18 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             m_nitoStatus.SetSectionSeen(psip.Version(), psip.Section(),
                                         psip.LastSection());
-            NetworkInformationTable nit(psip);
+            try
+            {
+                NetworkInformationTable nit(psip);
 
-            QMutexLocker locker(&m_listenerLock);
-            for (auto & listener : m_dvbOtherListeners)
-                listener->HandleNITo(&nit);
+                QMutexLocker locker(&m_listenerLock);
+                for (auto & listener : m_dvbOtherListeners)
+                    listener->HandleNITo(&nit);
+            }
+            catch (const PsipParseException& e)
+            {
+                m_parseErrors[e.m_error]++;
+            }
 
             return true;
         }
@@ -303,35 +332,42 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
             uint tsid = psip.TableIDExtension();
             m_sdtoStatus.SetSectionSeen(tsid, psip.Version(), psip.Section(),
                                         psip.LastSection());
-            ServiceDescriptionTable sdt(psip);
-
-            // some providers send the SDT for the current multiplex as SDTo
-            // this routine changes the TableID to SDT and recalculates the CRC
-            if (m_desiredNetId == sdt.OriginalNetworkID() &&
-                m_desiredTsId  == tsid)
+            try
             {
-                auto *sdta = new ServiceDescriptionTable(psip);
-                if (!sdta->Mutate())
+                ServiceDescriptionTable sdt(psip);
+
+                // some providers send the SDT for the current multiplex as SDTo
+                // this routine changes the TableID to SDT and recalculates the CRC
+                if (m_desiredNetId == sdt.OriginalNetworkID() &&
+                    m_desiredTsId  == tsid)
                 {
-                    delete sdta;
+                    auto *sdta = new ServiceDescriptionTable(psip);
+                    if (!sdta->Mutate())
+                    {
+                        delete sdta;
+                        return true;
+                    }
+                    if (m_cacheTables)
+                    {
+                        CacheSDT(sdta);
+                        ProcessSDT(tsid, sdta);
+                    }
+                    else
+                    {
+                        ProcessSDT(tsid, sdta);
+                        delete sdta;
+                    }
                     return true;
                 }
-                if (m_cacheTables)
-                {
-                    CacheSDT(sdta);
-                    ProcessSDT(tsid, sdta);
-                }
-                else
-                {
-                    ProcessSDT(tsid, sdta);
-                    delete sdta;
-                }
-                return true;
-            }
 
-            QMutexLocker locker(&m_listenerLock);
-            for (auto & listener : m_dvbOtherListeners)
-                listener->HandleSDTo(tsid, &sdt);
+                QMutexLocker locker(&m_listenerLock);
+                for (auto & listener : m_dvbOtherListeners)
+                    listener->HandleSDTo(tsid, &sdt);
+            }
+            catch (const PsipParseException& e)
+            {
+                m_parseErrors[e.m_error]++;
+            }
 
             return true;
         }
@@ -1086,5 +1122,25 @@ void DVBStreamData::RemoveDVBEITListener(DVBEITStreamListener *val)
             m_dvbEitListeners.erase(it);
             return;
         }
+    }
+}
+
+void DVBStreamData::DumpErrors() const
+{
+    if (m_parseErrors[PsipParseException::NitLength] ||
+        m_parseErrors[PsipParseException::NitNetworkDescriptorsLength] ||
+        m_parseErrors[PsipParseException::NitTransportDescriptors])
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("NIT parsing error: %1/%2/%3")
+            .arg(m_parseErrors[PsipParseException::NitLength])
+            .arg(m_parseErrors[PsipParseException::NitNetworkDescriptorsLength])
+            .arg(m_parseErrors[PsipParseException::NitTransportDescriptors]));
+    }
+    if (m_parseErrors[PsipParseException::SdtLength] ||
+        m_parseErrors[PsipParseException::SdtDescriptors])
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("SDT parsing error: %1/%2")
+            .arg(m_parseErrors[PsipParseException::SdtLength])
+            .arg(m_parseErrors[PsipParseException::SdtDescriptors]));
     }
 }

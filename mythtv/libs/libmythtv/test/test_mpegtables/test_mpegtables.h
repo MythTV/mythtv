@@ -76,7 +76,11 @@ class TestMPEGTables: public QObject
     //DVB Tables
     static void dvb_nit_test1(void);
     static void dvb_nit_test2(void);
+    static void dvb_nit_test2b(void);
+    static void dvb_nit_test2c(void);
+    static void dvb_nit_test2d(void);
     static void dvb_sdt_test1(void);
+    static void dvb_sdt_test1b(void);
     static void dvb_sdt_test2a(void);
     static void dvb_sdt_test2o(void);
     static void dvb_eit_test1(void);
