@@ -86,8 +86,8 @@ bool MythExternRecApp::config(void)
     {
         m_fatalMsg = QString("ERR:Config file '%1' does not exist "
                              "in '%2'")
-                     .arg(conf_info.fileName())
-                     .arg(conf_info.absolutePath());
+                     .arg(conf_info.fileName(),
+                          conf_info.absolutePath());
         LOG(VB_GENERAL, LOG_CRIT, m_fatalMsg);
         m_fatal = true;
         return false;
