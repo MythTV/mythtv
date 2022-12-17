@@ -4053,6 +4053,24 @@ void DVBConfigurationGroup::Save(void)
 // SAT>IP configuration
 // -----------------------
 #ifdef USING_SATIP
+
+class DiSEqCPosition : public MythUISpinBoxSetting
+{
+  public:
+    explicit DiSEqCPosition(const CaptureCard &parent, int value, int min_val) :
+        MythUISpinBoxSetting(new CaptureCardDBStorage(this, parent, "dvb_diseqc_type"),
+                             min_val, 0xff, 1)
+    {
+       setLabel(QObject::tr("DiSEqC position"));
+       setHelpText(QObject::tr("Position of the LNB on the DiSEqC switch. "
+                               "Leave at 1 if there is no DiSEqC switch "
+                               "and the LNB is directly connected to the SatIP server. "
+                               "This value is used as signal source (attribute src) in "
+                               "the SatIP tune command."));
+       setValue(value);
+    };
+};
+
 SatIPConfigurationGroup::SatIPConfigurationGroup
         (CaptureCard& a_parent, CardType &a_cardtype) :
     m_parent(a_parent)
@@ -4077,6 +4095,7 @@ SatIPConfigurationGroup::SatIPConfigurationGroup
     a_cardtype.addTargetedChild("SATIP", new SignalTimeout(m_parent, 7s, 1s));
     a_cardtype.addTargetedChild("SATIP", new ChannelTimeout(m_parent, 10s, 2s));
     a_cardtype.addTargetedChild("SATIP", new DVBEITScan(m_parent));
+    a_cardtype.addTargetedChild("SATIP", new DiSEqCPosition(m_parent, 1, 1));
 
     connect(m_deviceIdList, &SatIPDeviceIDList::NewTuner,
             m_deviceId,     &SatIPDeviceID::SetTuner);

@@ -294,6 +294,8 @@ class MTV_PUBLIC CardUtil
         { return get_on_input("vbidevice", inputid); }
     static QString      GetDeliverySystemFromDB(uint inputid)
         { return get_on_input("inputname", inputid); }          // use capturecard/inputname for now
+    static QString      GetDiSEqCPosition(uint inputid)
+        { return get_on_input("dvb_diseqc_type", inputid); }    // use capturecard/dvb_diseqc_type for now
 
     static QString      GetHostname(uint inputid)
         { return get_on_input("hostname", inputid); }

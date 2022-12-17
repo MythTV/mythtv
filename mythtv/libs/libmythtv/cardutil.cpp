@@ -2030,7 +2030,7 @@ uint CardUtil::CreateDeviceInputGroup(uint inputid,
     QString name = host + '|' + device;
     if (type == "FREEBOX"   || type == "IMPORT"   ||
         type == "DEMO"      || type == "EXTERNAL" ||
-        type == "HDHOMERUN" || type == "SATIP")
+        type == "HDHOMERUN" )
         name += QString("|%1").arg(inputid);
     return CreateInputGroup(name);
 }

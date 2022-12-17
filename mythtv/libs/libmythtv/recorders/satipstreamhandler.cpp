@@ -373,6 +373,7 @@ bool SatIPStreamHandler::Tune(const DTVMultiplex &tuning)
     else if (m_tunerType == DTVTunerType::kTunerTypeDVBS1 || m_tunerType == DTVTunerType::kTunerTypeDVBS2)
     {
         qry.append(QString("fe=%1").arg(m_frontend+1));
+        qry.append(QString("src=%1").arg(m_satipsrc));
         qry.append(QString("freq=%1").arg(SatIP::freq(tuning.m_frequency*1000)));   // frequency in Hz
         qry.append(QString("pol=%1").arg(SatIP::pol(tuning.m_polarity)));
         qry.append(QString("ro=%1").arg(SatIP::ro(tuning.m_rolloff)));
@@ -427,7 +428,7 @@ bool SatIPStreamHandler::Tune(const DTVMultiplex &tuning)
         // PLAY command
         if (rval)
         {
-            m_rtsp->Play("none");
+            m_rtsp->Play("pids=none");
             m_oldpids = QStringList();
         }
         return rval;

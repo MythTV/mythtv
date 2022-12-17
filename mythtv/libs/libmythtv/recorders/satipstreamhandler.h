@@ -57,6 +57,7 @@ class SatIPStreamHandler : public StreamHandler
 
   public:
     int          m_inputId        {0};
+    int          m_satipsrc       {1};
 
   private:
     DTVTunerType m_tunerType;

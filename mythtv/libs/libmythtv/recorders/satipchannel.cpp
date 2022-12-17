@@ -104,8 +104,11 @@ bool SatIPChannel::IsOpen(void) const
 
 bool SatIPChannel::Tune(const DTVMultiplex &tuning)
 {
-    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Tune(frequency=%1)").arg(tuning.m_frequency));
+    uint satipsrc = CardUtil::GetDiSEqCPosition(GetInputID()).toUInt();
+    satipsrc = std::clamp(1U, satipsrc, 255U);
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Tune freq=%1,src=%2").arg(tuning.m_frequency).arg(satipsrc));
 
+    m_streamHandler->m_satipsrc = satipsrc;
     if (m_streamHandler->Tune(tuning))
     {
         SetSIStandard(tuning.m_sistandard);
