@@ -41,6 +41,7 @@ class MythExternRecApp : public QObject
     bool Open(void);
     void Run(void);
 
+    void ReplaceVariables(QString & cmd) const;
     QString Desc(void) const;
     void MythLog(const QString & msg)
     { emit SendMessage("", "0", QString("STATUS:%1").arg(msg)); }
@@ -108,6 +109,7 @@ class MythExternRecApp : public QObject
     QString                 m_recDesc;
 
     QMap<QString, QString>  m_appEnv;
+    QMap<QString, QString>  m_settingVars;
 
     QProcess                m_tuneProc;
     QProcess                m_finishTuneProc;
