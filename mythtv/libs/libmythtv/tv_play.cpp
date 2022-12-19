@@ -790,14 +790,14 @@ void TV::InitKeys()
             "Zoom mode - shift right"), "");
     REG_KEY("TV Playback", ACTION_ZOOMASPECTUP,
             QT_TRANSLATE_NOOP("MythControls",
-            "Zoom mode - increase aspect ratio"), "");
+            "Zoom mode - increase aspect ratio"), "3");
     REG_KEY("TV Playback", ACTION_ZOOMASPECTDOWN,
             QT_TRANSLATE_NOOP("MythControls",
-            "Zoom mode - decrease aspect ratio"), "");
+            "Zoom mode - decrease aspect ratio"), "7");
     REG_KEY("TV Playback", ACTION_ZOOMIN, QT_TRANSLATE_NOOP("MythControls",
-            "Zoom mode - zoom in"), "");
+            "Zoom mode - zoom in"), "9");
     REG_KEY("TV Playback", ACTION_ZOOMOUT, QT_TRANSLATE_NOOP("MythControls",
-            "Zoom mode - zoom out"), "");
+            "Zoom mode - zoom out"), "1");
     REG_KEY("TV Playback", ACTION_ZOOMVERTICALIN,
             QT_TRANSLATE_NOOP("MythControls",
                               "Zoom mode - vertical zoom in"), "8");
