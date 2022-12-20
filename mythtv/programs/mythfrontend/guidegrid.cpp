@@ -587,9 +587,9 @@ void GuideGrid::Load(void)
     LoadFromScheduler(m_recList);
     fillChannelInfos();
 
-    int maxchannel = std::max((int)GetChannelCount() - 1, 0);
     setStartChannel((int)(m_currentStartChannel) - (m_channelCount / 2));
-    m_channelCount = std::min(m_channelCount, maxchannel + 1);
+    int maxchannel = GetChannelCount();
+    m_channelCount = std::min(m_channelCount, maxchannel);
 
     for (int y = 0; y < m_channelCount; ++y)
     {
