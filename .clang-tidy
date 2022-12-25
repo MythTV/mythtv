@@ -43,32 +43,38 @@ Checks: '-*,
         # Renamed/replaced by cppcoreguidelines-narrowing-conversions. ,
        -bugprone-narrowing-conversions,
 
-        # New in clang13. 4533 warnings. ,
+        # As of 2022-12-19, there are 1014 unique warnings. ,
        -bugprone-easily-swappable-parameters,
-        # New in clang13. 979 warnings. ,
+
+        # As of 2022-12-19, there are 123 unique warnings. ,
        -bugprone-implicit-widening-of-multiplication-result,
-        # New in clang15. 168 warnings. ,
+
+        # As of 2022-12-19, there are 161 unique warnings. ,
        -bugprone-assignment-in-if-condition
 
     cert-*,
 
-        # Dont declare c-style varardic functions. ,
+        # Dont declare c-style varardic functions. As of 2022-12-19,
+        # there are 2 warnings: lirc_client.cpp and vbi.cpp. ,
        -cert-dcl50-cpp,
 
-        # Using function invokes a command interpreter. Should fix. ,
+        # Using function invokes a command interpreter. Should fix.
+        # As of 2022-12-19, there are 9 warnings. ,
        -cert-env33-c,
 
         # Calls to standard library functions where the return value
-        # isnt checked. These should all be fixed. ,
+        # isnt checked. These should all be fixed. As of 2022-12-19,
+        # there are 344 warnings. ,
        -cert-err33-c,
 
         # string-to-number conversion functions that do not verify the
-        # validity of the conversion. Needs work. ,
+        # validity of the conversion.  As of 2022-12-19, there are 85
+        # warnings. ,
        -cert-err34-c,
 
         # Lots of complaints about constructors of static objects
-        # possibly throwing exceptions that cant be caught.  These
-        # all appear to be within Qt code that cant be fixed by us. ,
+        # possibly throwing exceptions that cant be caught. As of
+        # 2022-12-19, there are 540 warnings. ,
        -cert-err58-cpp,
 
     clang-analyzer-*,
@@ -89,14 +95,16 @@ Checks: '-*,
         cppcoreguidelines-pro-type-member-init,
         cppcoreguidelines-pro-type-static-cast-downcast,
 
-        # Needs work. ,
+        # As of 2022-12-19, there are 142 unique warnings. ,
        -cppcoreguidelines-avoid-goto,
 
-        # About 20,000 of warnings. ,
+        # As of 2022-12-19, there are 1413 unique warnings. ,
        -cppcoreguidelines-avoid-non-const-global-variables,
 
-        # Bunch of warnings.... ,
+        # As of 2022-12-19, there are 2503 unique warnings. ,
        -cppcoreguidelines-narrowing-conversions,
+
+        # As of 2022-12-19, there are 213 unique warnings. ,
        -cppcoreguidelines-no-malloc,
 
         # No gsl. ,
@@ -110,13 +118,16 @@ Checks: '-*,
         # No gsl. Recommends gsl::at be used in 1611 places. ,
        -cppcoreguidelines-pro-bounds-constant-array-index,
 
-        # Bunch of warnings.... ,
+        # As of 2022-12-19, there are 4624 unique warnings. ,
        -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+
+        # As of 2022-12-19, there are 17 unique warnings. ,
        -cppcoreguidelines-pro-type-const-cast,
-        # Bunch of warnings.... ,
+
+        # As of 2022-12-19, there are 799 unique warnings. ,
        -cppcoreguidelines-pro-type-cstyle-cast,
 
-        # Haven''t checked recently. ,
+        # As of 2022-12-19, there are 563 unique warnings. ,
        -cppcoreguidelines-pro-type-reinterpret-cast,
 
         # Recommends using boost:: to access unions. ,
@@ -125,7 +136,10 @@ Checks: '-*,
         # Warns on every (*)printf, sscanf,open, ioctl, etc. ,
        -cppcoreguidelines-pro-type-vararg,
 
+        # As of 2022-12-19, there are 140 unique warnings. ,
        -cppcoreguidelines-slicing,
+
+        # As of 2022-12-19, there are 1283 unique warnings. ,
        -cppcoreguidelines-special-member-functions,
 
    -google-explicit-constructor,
@@ -133,17 +147,17 @@ Checks: '-*,
 
     misc-*,
 
+        # New in clang15. As of 2022-12-19, there are 16055 unique
+        # warnings. ,
+       -misc-const-correctness
+
         # Complains about every public or protected variable in a class. ,
        -misc-non-private-member-variables-in-classes,
 
-        # The Q_DECLARE_METATYPE macro triggers a warning from
-        # this checker. There are also a handful of places where
-        # MythTV uses recursion on purpose. These should be checked to
-        # ensure there are no problems. ,
+        # As of 2022-12-19, there are 420 unique warnings. 195 are
+        # related to the Q_DECLARE_METATYPE macro and the other 225
+        # are in MythTV. ,
        -misc-no-recursion,
-
-        # New in clang15. 18707 warnings. ,
-       -misc-const-correctness
 
     modernize-*,
 
@@ -156,13 +170,16 @@ Checks: '-*,
         # Disable newer C++14/17 tests for now. ,
        -modernize-use-nodiscard,
 
-        # New in clang15. 4085 warnings. ,
+        # New in clang15. As of 2022-12-19, the vast majority of these
+        # unique warnings (661 of 700) are from the config.h file. ,
        -modernize-macro-to-enum
 
     performance-*,
 
         # The Q_DECLARE_METATYPE macro triggers a warning from this
-        # new clang12 checker. ,
+        # new clang12 checker.  As of 2022-12-19, there vast majority
+        # of these (236 of 292) warnings are associated with this
+        # macro; the other 56 are in the MythTV code. ,
        -performance-no-int-to-ptr,
 
     readability-*,
@@ -173,13 +190,15 @@ Checks: '-*,
         # Not investigated yet. ,
        -readability-function-size,
 
-        # Whats wrong with single character variable names? 65384 warnings. ,
+        # Whats wrong with single character variable names? As of
+        # 2022-12-19, there are 9889 unique warnings. ,
        -readability-identifier-length,
 
-        # Wants to rewrite lots of implicit nullptr tests. ,
+        # Wants to rewrite lots of implicit nullptr tests. As of
+        # 2022-12-19, there are 426 unique warnings. ,
        -readability-implicit-bool-conversion,
 
-        # Lots of noise. Needs work. ,
+        # As of 2022-12-19, there are 16263 unique warnings. ,
        -readability-magic-numbers,
 
         # Doesn''t understand Qt signals/slots. ,
