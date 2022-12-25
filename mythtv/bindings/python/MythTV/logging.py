@@ -76,6 +76,7 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
  "  channelscan  "  -  Channel Scanning messages 
  "  extra        "  -  More detailed messages in selected levels 
  "  timestamp    "  -  Conditional data driven messages 
+ "  http         "  -  HTTP messages to/from MythTV's http server 
  "  none         "  -  NO debug output 
  
  The default for this program appears to be: '-v  "important,general" '

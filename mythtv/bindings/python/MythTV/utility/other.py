@@ -581,6 +581,15 @@ def resolve_ip(host, port):
     except:
         return (None, None)
 
+def eval_bool(x):
+    try:
+        return(bool(int(x)))
+    except:
+        if x.lower() == 'true':
+            return(True)
+        elif (x.lower() == 'false'):
+            return(False)
+
 def py3_str(value, ignore_errors=False):
     error_methods = ('strict', 'ignore')
     error_method  = error_methods[ignore_errors]

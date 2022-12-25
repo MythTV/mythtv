@@ -3,6 +3,7 @@
 
 from MythTV.exceptions import MythError
 from MythTV.utility import datetime
+from MythTV.utility import eval_bool
 
 from datetime import date
 import locale
@@ -78,22 +79,47 @@ class DictData( OrdDict ):
     """
     _field_order = None
     _field_type = None
+
     _trans = [  int,
                 locale.atof,
-                lambda x: bool(int(x)),
+                eval_bool,
                 lambda x: x,
                 lambda x: datetime.fromtimestamp(x if x != '4294967295' else '0', datetime.UTCTZ())\
                                   .astimezone(datetime.localTZ()),
                 lambda x: date(*[int(y) for y in x.split('-')]),
                 lambda x: datetime.fromRfc(x, datetime.UTCTZ())\
-                                  .astimezone(datetime.localTZ())]
+                                  .astimezone(datetime.localTZ()),
+                lambda x: datetime.fromIso(x).astimezone(datetime.localTZ()),
+                lambda x: datetime.strptime(x, "%H:%M:%S.%f").time(),
+                list,
+                dict
+             ]
+
     _inv_trans = [  str,
                     lambda x: locale.format_string("%0.6f", x),
                     lambda x: str(int(x)),
                     lambda x: x,
                     lambda x: str(int(x.timestamp())),
                     lambda x: x.isoformat(),
-                    lambda x: x.utcrfcformat()]
+                    lambda x: x.utcrfcformat(),
+                    lambda x: x.utcisoformat(),
+                    lambda x: x.strftime("%H:%M:%S.%f"),
+                    lambda x: x,
+                    lambda x: list(x.items())
+                 ]
+
+    _defaults = [  0,
+                   0.0,
+                   '0',                ### XXX 'False'
+                   '',                 ### XXX str
+                   '',                 ### XXX  fromtimestamp   fill me in!
+                   date(1900,1,1),     ### XXX  date
+                   '',                 ### XXX fromRFC          fill me in!
+                   datetime(1900,1,1, tzinfo=datetime.UTCTZ()),
+                   datetime(1900,1,1, tzinfo=datetime.UTCTZ()).time(),
+                   [],
+                   {}
+                ]
 
     def __setattr__(self, name, value):
         if name in self._localvars:
@@ -139,7 +165,7 @@ class DictData( OrdDict ):
                 raise MythError('Incorrect raw input length to DictData()')
             data = list(data)
             for i,v in enumerate(data):
-                if v == '':
+                if (v == '') or (v is None):
                     data[i] = None
                 else:
                     data[i] = self._trans[self._field_type[i]](v)
