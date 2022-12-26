@@ -31,7 +31,7 @@
 #include "serializers/serializer.h"
 
 static constexpr const char* SOAP_ENVELOPE_BEGIN
-{ "<s:Envelope xmlns:s=\"htstp://schemas.xmlsoap.org/soap/envelope/\" " \
+{ "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" " \
   "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"      \
   "<s:Body>" };
 static constexpr const char* SOAP_ENVELOPE_END { "</s:Body>\r\n</s:Envelope>" };
