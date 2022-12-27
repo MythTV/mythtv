@@ -30,7 +30,7 @@
 #include "upnputil.h"
 #include "serializers/serializer.h"
 
-#define SOAP_ENVELOPE_BEGIN  "<s:Envelope xmlns:s=\"htstp://schemas.xmlsoap.org/soap/envelope/\" " \
+#define SOAP_ENVELOPE_BEGIN  "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" " \
                              "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"     \
                              "<s:Body>"
 #define SOAP_ENVELOPE_END    "</s:Body>\r\n</s:Envelope>";
