@@ -2111,7 +2111,7 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
                 else
                     stream.setAttribute("codec", codec.trimmed());
 
-                stream.setAttribute("channels", par->channels);
+                stream.setAttribute("channels", par->ch_layout.nb_channels);
 
                 AVDictionaryEntry *metatag =
                     av_dict_get(st->metadata, "language", nullptr, 0);
