@@ -12,6 +12,9 @@
 #include "libmythtv/mythtvexp.h" // MTV_PUBLIC - Symbol Visibility
 #include "mpegdescriptors.h"
 
+MTV_PUBLIC QDateTime dvbdate2qt(const unsigned char *buf);
+MTV_PUBLIC time_t dvbdate2unix(const unsigned char *buf);
+
 /*
 // needed for scanning
         conditional_access          = 0x09, // maybe
@@ -46,7 +49,7 @@ inline QString dvb_decode_text(const unsigned char *src, uint length)
     return dvb_decode_text(src, length, {} );
 }
 
-QString dvb_decode_short_name(const unsigned char *src, uint raw_length);
+MTV_PUBLIC QString dvb_decode_short_name(const unsigned char *src, uint raw_length);
 
 static constexpr uint8_t byteBCDH2int(uint8_t i) { return i >> 4; };
 static constexpr uint8_t byteBCDL2int(uint8_t i) { return i & 0x0f; };
@@ -1649,7 +1652,7 @@ class FrequencyListDescriptor : public MPEGDescriptor
 
 // DVB Bluebook A038 (Sept 2011) p 70
 // ETSI EN 300 468 p 58
-class LocalTimeOffsetDescriptor : public MPEGDescriptor
+class MTV_PUBLIC LocalTimeOffsetDescriptor : public MPEGDescriptor
 {
   public:
     explicit LocalTimeOffsetDescriptor(const unsigned char *data, int len = 300) :
@@ -1682,14 +1685,21 @@ class LocalTimeOffsetDescriptor : public MPEGDescriptor
         { return (m_data[2 + i*13 + 3] & 0x01) != 0; }
     //   local_time_offset     16   4.0+p
     uint LocalTimeOffset(uint i) const
-        { return (m_data[2 + i*13 + 4] << 8) | m_data[2 + i*13 + 5]; }
+        { return byteBCD2int(m_data[2 + i*13 + 4]) * 60 +
+                 byteBCD2int(m_data[2 + i*13 + 5]); }
     int LocalTimeOffsetWithPolarity(uint i) const
         { return (LocalTimeOffsetPolarity(i) ? -1 : +1) * LocalTimeOffset(i); }
     //   time_of_change        40   6.0+p
-    // TODO decode this
+    const unsigned char *TimeOfChangeData(uint i) const
+        { return &m_data[2 + i*13 + 6]; }
+    QDateTime TimeOfChange(uint i)  const
+        { return dvbdate2qt(TimeOfChangeData(i));   }
+    time_t TimeOfChangeUnix(uint i) const
+        { return dvbdate2unix(TimeOfChangeData(i)); }
     //   next_time_offset      16  11.0+p
     uint NextTimeOffset(uint i) const
-        { return (m_data[2 + i*13 + 11]<<8) | m_data[2 + i*13 + 12]; }
+        { return byteBCD2int(m_data[2 + i*13 + 11]) * 60 +
+                 byteBCD2int(m_data[2 + i*13 + 12]); }
     // }                           13.0
     QString toString(void) const override; // MPEGDescriptor
 };

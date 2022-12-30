@@ -94,6 +94,7 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
     // section_syntax_indicator 1   1.0          1
     // private_indicator        1   1.1          1
     // reserved                 2   1.2          3
+    // section_length          12   1.4     0-4093
     // table_id_extension      16   3.0     0x0000
 
     /* Each Map ID corresponds to one set of channel mappings. Each STB
@@ -114,10 +115,8 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
     // protocol_version         8   8.0       0x00 for now
 
     // tables_defined          16   9.0, 6-370 valid OTA, 2-370 valid w/Cable
-    uint TableCount() const
-    {
-         return (pesdata()[9]<<8) | pesdata()[10];
-    }
+    uint TableCount()    const { return (pesdata()[9]<<8) | pesdata()[10]; }
+    uint TableCountRaw() const { return (pesdata()[9]<<8) | pesdata()[10]; }
     // for (i=0; i<tableCount(); i++) {
     //   table_type                    16  0.0
     uint TableType(uint i) const
@@ -222,6 +221,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
 
     // num_channels_in_section  8   9.0
     uint ChannelCount()      const { return pesdata()[9]; }
+    uint ChannelCountRaw()   const { return pesdata()[9]; }
 
     // for(i=0; i<num_channels_in_section; i++) {
     //   short_name          7*16   0.0 (7 UCS-2 chars padded by 0x0000)
@@ -552,7 +552,8 @@ class MTV_PUBLIC EventInformationTable : public PSIPTable
     uint SourceID() const { return TableIDExtension(); }
 
     // num_events_in_section    8   9.0
-    uint EventCount() const { return psipdata()[1]; }
+    uint EventCount()    const { return psipdata()[1]; }
+    uint EventCountRaw() const { return psipdata()[1]; }
     // for (j = 0; j< num_events_in_section;j++)
     // {
     //   reserved               2   0.0    3
@@ -638,7 +639,7 @@ class MTV_PUBLIC ExtendedTextTable : public PSIPTable
     // section_syntax_indicator 1   1.0          1
     // private_indicator        1   1.1          1
     // reserved                 2   1.2          3
-    // section_length          12   1.4
+    // section_length          12   1.4     0-4093
     // ETT_table_id_extension  16   3.0  unique per pid
     // reserved                 2   5.0          3
     // current_next_indicator   1   5.7          1
@@ -695,7 +696,7 @@ class MTV_PUBLIC SystemTimeTable : public PSIPTable
     // section_syntax_indicator 1   1.0          1
     // private_indicator        1   1.1          1
     // reserved                 2   1.2          3
-    // section_length          12   1.4
+    // section_length          12   1.4     0-4093
     // table_id_extension      16   3.0          0
     // reserved                 2   5.0          3
     // version_number           5   5.2          0
@@ -767,6 +768,56 @@ class MTV_PUBLIC DirectedChannelChangeTable : public PSIPTable
     {
         assert(TableID::DCCT == TableID());
     }
+
+    // Name                               bits  loc  expected value
+    // table_id                             8   0.0       0xD3
+    // section_syntax_indicator             1   1.0          1
+    // private_indicator                    1   1.1          1
+    // reserved                             2   1.2          3
+    // section_length                      12   1.4     0-4093
+    // dcc_subtype                          8   3.0
+    // dcc_id                               8   4.0
+    // reserved                             2   5.0          3
+    // version_number                       5   5.2       0-31
+    // current_next_indicator               1   5.7          1
+    // section_number                       8   6.0       0x00
+    // last_section_number                  8   7.0       0x00
+    // protocol_version                     8   8.0       0x00 for now
+
+    // dcc_test_count                       8   9.0
+    // for (i = 0; i < num_dcc_test_count; i++)
+    // {
+    //   dcc_context                        1   0.0
+    //   reserved                           3   0.1         7
+    //   dcc_from_major_channel_number     10   0.4
+    //   dcc_from_minor_channel_number     10   1.6
+    //   reserved                           4   3.0        15
+    //   dcc_to_major_channel_number       10   3.4
+    //   dcc_to_minor_channel_number       10   4.6
+    //   dcc_start_time                    32   5.0
+    //   dcc_end_time                      32   9.0
+    //   dcc_term_count                     8  10.0
+    //   for (j=0; j< dcc_term_count; j++) {
+    //     dcc_selection_type               8   0.0
+    //     dcc_selection_id                64   1.0
+    //     reserved                         6   9.0
+    //     dcc_term_descriptors_length     10   9.6
+    //     for (k=0; k<N; k++) {
+    //       dcc_term_descriptor()
+    //     }
+    //   }
+    //   reserved                           6
+    //   dcc_test_descriptors_length       10
+    //   for (j=0; j<N; j++) {
+    //     dcc_test_descriptor()
+    //   }
+    // Reserved                             6
+    // dcc_additional_descriptors_length   10
+    // for (i=0; i<N; i++) {
+    //   dcc_additional_descriptor()
+    // }
+    // CRC_32
+    // }
 };
 
 /** \class DirectedChannelChangeSelectionCodeTable
@@ -786,6 +837,51 @@ class MTV_PUBLIC DirectedChannelChangeSelectionCodeTable : public PSIPTable
     {
         assert(TableID::DCCSCT == TableID());
     }
+
+    // Name                                  bits  loc  expected value
+    // table_id                                8   0.0       0xD4
+    // section_syntax_indicator                1   1.0          1
+    // private_indicator                       1   1.1          1
+    // reserved                                2   1.2          3
+    // section_length                         12   1.4     0-4093
+    // dccsct_type                            16   3.0
+    // reserved                                2   5.0          3
+    // version_number                          5   5.2
+    // current_next_indicator                  1   5.7          1
+    // section_number                          8   6.0       0x00
+    // last_section_number                     8   7.0       0x00
+    // protocol_version                        8   8.0
+
+    // updates_defined                         8   9.0
+    // for (i=0; i< updates_defined; i++) {
+    //   update_type                           8   0.0
+    //   update_data_length                    8   1.0
+    //   if (update_type == new_genre_category) {
+    //     genre_category_code                 8
+    //     genre_category_name_text()         var
+    //   }
+    //   if (update_type == new_state) {
+    //     dcc_state_location_code             8
+    //     dcc_state_location_code_text()     var
+    //   }
+    //   if (update_type == new_county) {
+    //     state_code                          8   0.0
+    //     reserved                            6   1.0         31
+    //     dcc_county_location_code           10   1.6
+    //     dcc_county_location_code_text()    var
+    //   }
+    //   reserved                              6               31
+    //   dccsct_descriptors_length            10
+    //   for (j=0; j<N; j++) {
+    //     dccsct_descriptors()
+    //   }
+    // }
+    // reserved                                6               31
+    // dccsct_additional_descriptors_length   10
+    // for (i=0; i<N; i++) {
+    //   dccsct_additional_descriptors()
+    // }
+    // CRC_32                                 32
 };
 
 /// SCTE 65 & ATSC/81 0xD6
@@ -806,6 +902,45 @@ class MTV_PUBLIC AggregateEventInformationTable : public PSIPTable
         { return "AggregateEventInformationTable\n"; }
     QString toStringXML(uint /*indent_level*/) const override // PSIPTable
         { return "<AggregateEventInformationTable />"; }
+
+    // Name                                  bits  loc  expected value
+    // table_id                               8    0.0       0xD6
+    // section_syntax_indicator               1    1.0          1
+    // private_indicator                      1    1.1          1
+    // reserved                               2    1.2          3
+    // section_length                        12    1.4     0-4093
+    // AEIT_subtype                           8    3.0       0x00
+    // MGT_tag                                8    4.0      0-255
+    // reserved                               2    5.0          3
+    // version_number                         5    5.2       0-31
+    // current_next_indicator                 1    5.7          1
+    // section_number                         8    6.0       0x00
+    // last_section_number                    8    7.0       0x00
+
+    // if (AEIT_subtype == 0) {
+    //   num_sources_in_section               8    8.0
+    //   for (j = 0; j< num_sources_in_section;j++) {
+    //     source_id                         16    9.0
+    //     num_events                         8   11.0
+    //     for (j = 0; j< num_events;j++) {
+    //       off_air                          1    0.0        T/F
+    //       reserved                         1    0.1          1
+    //       event_id                        14    0.2
+    //       start_time                      32    2.0
+    //       reserved                         4    6.0         15
+    //       duration                        20    6.4
+    //       title_length                     8    9.0
+    //       title_text()                    var
+    //       reserved                         4                15
+    //       descriptors_length              12
+    //       for (i=0;i<N;i++) {
+    //         descriptor()
+    //       }
+    //     }
+    //   }
+    // else
+    //   reserved
+    // CRC_32                                32
 };
 
 /// SCTE 65 & ATSC/81 0xD7
@@ -826,6 +961,33 @@ class MTV_PUBLIC AggregateExtendedTextTable : public PSIPTable
         { return "AggregateExtendedTextTable\n"; }
     QString toStringXML(uint /*indent_level*/) const override // PSIPTable
         { return "<AggregateExtendedTextTable />"; }
+    // Name                                  bits  loc  expected value
+    // table_id                                8   0.0       0xD7
+    // section_syntax_indicator                1   1.0          1
+    // private_indicator                       1   1.1          1
+    // reserved                                2   1.2          3
+    // section_length                        12    1.4     0-4093
+    // AEIT_subtype                           8    3.0       0x00
+    // MGT_tag                                8    4.0      0-255
+    // reserved                               2    5.0          3
+    // version_number                         5    5.2       0-31
+    // current_next_indicator                 1    5.7          1
+    // section_number                         8    6.0       0x00
+    // last_section_number                    8    7.0       0x00
+
+    // if (AETT_subtype == 0) {
+    //   num_blocks_in_section                8    8.0
+    //   for (j = 0; j< num_blocks_in_section;j++) {
+    //     ETM_id                            32    0.0
+    //     reserved                           4    4.0         15
+    //     extended_text_length              12    4.4
+    //     extended_text_message()          var
+    //     }
+    //   }
+    // else
+    //   reserved
+    // CRC_32                                32
+
 };
 
 #endif // ATSC_TABLES_H

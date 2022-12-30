@@ -28,8 +28,41 @@ class TestMPEGTables: public QObject
 {
     Q_OBJECT
 
+    static void update_crc(std::vector<uint8_t> &data);
+
   private slots:
     static void pat_test(void);
+    static void mpeg_pmt_test1(void);
+    static void mpeg_pmt_test2(void);
+    static void mpeg_pmt_test3(void);
+    static void mpeg_pmt_test4(void);
+
+    // ATSC Tables
+    static void atsc_mgt_test1a(void);
+    static void atsc_mgt_test1b(void);
+    static void atsc_mgt_test2(void);
+    static void atsc_mgt_test3(void);
+    static void atsc_tvct_test1a(void);
+    static void atsc_cvct_test1(void);
+    static void atsc_cvct_test2(void);
+    static void atsc_eit_test1a(void);
+    static void atsc_ett_test(void);
+    static void atsc_rrt_test(void);
+    static void atsc_stt_test(void);
+
+    // SCTE 35 Splice Points
+    static void scte35_sit_test1(void);
+
+    //DVB Tables
+    static void dvb_nit_test1(void);
+    static void dvb_nit_test2(void);
+    static void dvb_sdt_test1(void);
+    static void dvb_sdt_test2a(void);
+    static void dvb_sdt_test2o(void);
+    static void dvb_eit_test1(void);
+    static void dvb_tdt_test1(void);
+    static void dvb_tdt_test2(void);
+    static void dvb_tot_test2(void);
 
     static void dvbdate(void);
 

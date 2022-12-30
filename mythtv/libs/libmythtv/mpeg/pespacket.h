@@ -230,6 +230,9 @@ class MTV_PUBLIC PESPacket
     // FIXME re-read the specs and follow all negations to find out the
     // initial value of the CRC function when its being returned
     static const uint kTheMagicNoCRCCRC = 0xFFFFFFFF;
+
+  public:
+    static constexpr uint kMpegCRCSize { 4 };
 };
 
 class SequenceHeader

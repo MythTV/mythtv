@@ -37,6 +37,9 @@ static const float PI = 3.141592654;
 static const float epsilon = 0.000001;
 static const float center_level = 0.5*sqrt(0.5);
 
+template <class T>
+T sqr(T x) { return x*x; }
+
 // private implementation of the surround decoder
 class fsurround_decoder::Impl {
 public:
@@ -70,7 +73,7 @@ public:
         // generate the window function (square root of hann, b/c it is applied before and after the transform)
         m_wnd.resize(m_n);
         for (unsigned k=0;k<m_n;k++)
-            m_wnd[k] = sqrt(0.5*(1-std::cos(2*PI*k/m_n))/m_n);
+            m_wnd[k] = sqrt(0.5F*(1-std::cos(2*PI*k/m_n))/m_n);
         m_currentBuf = 0;
         m_inbufs.fill(nullptr);
         m_outbufs.fill(nullptr);
@@ -183,7 +186,6 @@ private:
     static inline cfloat polar(float a, float p) { return {static_cast<float>(a*std::cos(p)),static_cast<float>(a*std::sin(p))}; }
     static inline float amplitude(FFTComplex z) { return std::hypot(z.re, z.im); }
     static inline float phase(FFTComplex z) { return std::atan2(z.im, z.re); }
-    static inline float sqr(float x) { return x*x; }
 
     /// Clamp the input to the interval [-1, 1], i.e. clamp the magnitude to the unit interval [0, 1]
     static inline float clamp_unit_mag(float x) { return std::clamp(x, -1.0F, 1.0F); }
@@ -340,7 +342,7 @@ private:
 #define FASTER_CALC
     // map from amplitude difference and phase difference to yfs
     static inline double get_yfs(double ampDiff, double phaseDiff) {
-        double x = 1-(((1-sqr(ampDiff))*phaseDiff)/PI*2);
+        double x = 1-(((1-sqr(ampDiff))*phaseDiff)/M_PI*2);
 #ifdef FASTER_CALC
         double tanX = tan(x);
         return 0.16468622925824683 + 0.5009268347818189*x - 0.06462757726992101*x*x

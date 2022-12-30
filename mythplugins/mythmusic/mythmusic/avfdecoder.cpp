@@ -357,7 +357,7 @@ bool avfDecoder::initialize()
     }
 
     m_freq = m_audioDec->sample_rate;
-    m_channels = m_audioDec->channels;
+    m_channels = m_audioDec->ch_layout.nb_channels;
 
     if (m_channels <= 0)
     {
@@ -379,7 +379,7 @@ bool avfDecoder::initialize()
         return false;
     }
 
-    const AudioSettings settings(format, m_audioDec->channels,
+    const AudioSettings settings(format, m_audioDec->ch_layout.nb_channels,
                                  m_audioDec->codec_id,
                                  m_audioDec->sample_rate, false);
 
