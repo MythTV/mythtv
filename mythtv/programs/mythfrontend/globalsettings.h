@@ -9,7 +9,6 @@
 #include <QStringList>
 
 // MythTV
-#include "libmyth/mythcontext.h"
 #include "libmyth/standardsettings.h"
 #include "libmythtv/mythvideoprofile.h"
 

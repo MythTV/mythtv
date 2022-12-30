@@ -22,7 +22,7 @@
 #include <QTimer>
 
 // MythTV
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythui/mythmainwindow.h>

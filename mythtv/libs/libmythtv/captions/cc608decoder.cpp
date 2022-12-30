@@ -10,7 +10,6 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "libmyth/mythcontext.h"
 #include "libmythbase/mythlogging.h"
 
 #include "format.h"

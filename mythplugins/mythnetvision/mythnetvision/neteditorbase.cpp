@@ -1,7 +1,6 @@
 #include <QDomDocument>
 
 // MythTV headers
-#include <libmyth/mythcontext.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythbase/mythdirs.h>
 #include <libmythbase/netutils.h>

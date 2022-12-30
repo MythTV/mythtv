@@ -1,6 +1,7 @@
 #include <chrono>
 
 // MythTV
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 
 #include "tv_play.h"

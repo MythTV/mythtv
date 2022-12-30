@@ -8,8 +8,10 @@
 #include <cassert>
 #include <chrono>
 #include <cstdlib>
+#include <cstring>
 
-#include "libmyth/mythcontext.h"
+#include <QString>
+
 #include "libmythtv/mythtvexp.h"
 
 // n.b. these PID relationships are only a recommendation from ATSC,

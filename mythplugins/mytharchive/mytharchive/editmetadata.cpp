@@ -1,6 +1,6 @@
 
 // myth
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythui/mythuibutton.h>
 #include <libmythui/mythuitext.h>
 #include <libmythui/mythuitextedit.h>

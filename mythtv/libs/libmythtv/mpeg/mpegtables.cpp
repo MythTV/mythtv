@@ -1,6 +1,11 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
 
+#include <QChar>
+#include <QMap>
+#include <QString>
+#include <QTime>
+
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/stringutil.h"
 

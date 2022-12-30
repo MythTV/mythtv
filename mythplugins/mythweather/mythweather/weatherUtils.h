@@ -13,7 +13,7 @@
 #include <QString>
 
 // MythTV headers
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythchrono.h>
 
 static constexpr uint8_t SI_UNITS  { 0 };
 static constexpr uint8_t ENG_UNITS { 1 };

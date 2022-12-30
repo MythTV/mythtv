@@ -10,7 +10,6 @@
 #include <QTimer>
 
 // mythtv
-#include <libmyth/mythcontext.h>
 #include <libmythbase/mthread.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdb.h>

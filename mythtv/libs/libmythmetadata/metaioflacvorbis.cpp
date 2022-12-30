@@ -1,6 +1,6 @@
 
-// Libmyth
-#include "libmyth/mythcontext.h"
+// libmythbase
+#include "libmythbase/mythcorecontext.h"
 
 // qt
 #include <QBuffer>

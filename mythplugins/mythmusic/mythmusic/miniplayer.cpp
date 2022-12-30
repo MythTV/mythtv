@@ -6,7 +6,6 @@
 #include <QTimer>
 
 // MythTV
-#include <libmyth/mythcontext.h>
 #include <libmythbase/lcddevice.h>
 #include <libmythui/mythmainwindow.h>
 

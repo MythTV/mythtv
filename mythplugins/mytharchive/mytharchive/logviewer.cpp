@@ -10,7 +10,7 @@
 #include <QTextStream>
 
 // mythtv
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>
