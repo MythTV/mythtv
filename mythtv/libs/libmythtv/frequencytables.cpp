@@ -47,9 +47,9 @@ TransportScanItem::TransportScanItem(uint           _sourceid,
     : m_mplexid(0),
       m_friendlyName(std::move(_name)),
       m_sourceID(_sourceid),
-      m_timeoutTune(_timeoutTune)
+      m_timeoutTune(_timeoutTune),
+      m_tuning(_tuning)
 {
-    m_tuning = _tuning;
 }
 
 TransportScanItem::TransportScanItem(uint                _sourceid,
@@ -60,10 +60,9 @@ TransportScanItem::TransportScanItem(uint                _sourceid,
     : m_mplexid(0),
       m_friendlyName(std::move(_name)),
       m_sourceID(_sourceid),
-      m_timeoutTune(_timeoutTune)
+      m_timeoutTune(_timeoutTune),
+      m_expectedChannels(_tuning.channels)
 {
-    m_expectedChannels = _tuning.channels;
-
     m_tuning.Clear();
 
     m_tuning.ParseTuningParams(

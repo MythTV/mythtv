@@ -20,24 +20,6 @@
 
 // ---------------------------------------------------
 
-GrabberScript::GrabberScript(const QString& title, const QString& image,
-              const ArticleType type, const QString& author,
-              const bool search, const bool tree,
-              const QString& description, const QString& commandline,
-              const double version) :
-    MThread("GrabberScript")
-{
-    m_title = title;
-    m_image = image;
-    m_type = type;
-    m_author = author;
-    m_search = search;
-    m_tree = tree;
-    m_description = description;
-    m_commandline = commandline;
-    m_version = version;
-}
-
 GrabberScript::~GrabberScript()
 {
     wait();
@@ -145,8 +127,8 @@ void GrabberScript::parseDBTree(const QString &feedtitle, const QString &path,
 }
 
 GrabberManager::GrabberManager()
+    : m_updateFreq(gCoreContext->GetDurSetting<std::chrono::hours>("netsite.updateFreq", 24h))
 {
-    m_updateFreq = gCoreContext->GetDurSetting<std::chrono::hours>("netsite.updateFreq", 24h);
     m_timer = new QTimer();
     connect( m_timer, &QTimer::timeout,
                       this, &GrabberManager::timeout);

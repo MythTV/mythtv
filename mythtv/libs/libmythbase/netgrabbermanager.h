@@ -23,15 +23,20 @@ class MBASE_PUBLIC GrabberScript : public QObject, public MThread
 
   public:
 
-    GrabberScript(const QString& title,
-                  const QString& image,
+    GrabberScript(QString title,
+                  QString image,
                   ArticleType type,
-                  const QString& author,
+                  QString author,
                   bool search,
                   bool tree,
-                  const QString& description,
-                  const QString& commandline,
-                  double version);
+                  QString description,
+                  QString commandline,
+                  double version)
+        : MThread("GrabberScript"),
+          m_title(std::move(title)), m_image(std::move(image)), m_type(type),
+          m_author(std::move(author)), m_search(search), m_tree(tree),
+          m_description(std::move(description)),
+          m_commandline(std::move(commandline)), m_version(version) {};
     ~GrabberScript() override;
 
     const QString& GetTitle() const { return m_title; }

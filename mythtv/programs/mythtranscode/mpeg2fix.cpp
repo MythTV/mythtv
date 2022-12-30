@@ -239,16 +239,12 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
                        const char *fmt, bool norp, bool fixPTS, int maxf,
                        bool showprog, int otype, void (*update_func)(float),
                        int (*check_func)())
+    : m_noRepeat(norp), m_fixPts(fixPTS), m_maxFrames(maxf),
+      m_infile(inf), m_format(fmt)
 {
-    m_infile = inf;
     m_rx.m_outfile = outf;
     m_rx.m_done = 0;
-    m_format = fmt;
-    m_noRepeat = norp;
-    m_fixPts = fixPTS;
-    m_maxFrames = maxf;
     m_rx.m_otype = otype;
-
     if (deleteMap && !deleteMap->isEmpty())
     {
         /* convert MythTV cutlist to mpeg2fix cutlist */

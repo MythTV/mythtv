@@ -35,10 +35,9 @@
 
 ExternIO::ExternIO(const QString & app,
                    const QStringList & args)
-    : m_status(&m_statusBuf, QIODevice::ReadWrite)
+    : m_app(QFileInfo(app)),
+      m_status(&m_statusBuf, QIODevice::ReadWrite)
 {
-    m_app  = QFileInfo(app);
-
     if (!m_app.exists())
     {
         m_error = QString("ExternIO: '%1' does not exist.").arg(app);

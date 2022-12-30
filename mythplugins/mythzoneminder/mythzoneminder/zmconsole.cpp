@@ -120,10 +120,10 @@ void FunctionDialog::setMonitorFunction(void)
 ZMConsole::ZMConsole(MythScreenStack *parent)
           :MythScreenType(parent, "zmconsole"),
            m_popupStack(GetMythMainWindow()->GetStack("popup stack")),
-           m_timeTimer(new QTimer(this)), m_updateTimer(new QTimer(this))
+           m_timeTimer(new QTimer(this)),
+           m_timeFormat(gCoreContext->GetSetting("TimeFormat", "h:mm AP")),
+           m_updateTimer(new QTimer(this))
 {
-    m_timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
-
     connect(m_timeTimer, &QTimer::timeout, this,
             &ZMConsole::updateTime);
 
