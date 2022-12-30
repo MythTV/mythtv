@@ -342,7 +342,7 @@ private:
 #define FASTER_CALC
     // map from amplitude difference and phase difference to yfs
     static inline double get_yfs(double ampDiff, double phaseDiff) {
-        double x = 1-(((1-sqr(ampDiff))*phaseDiff)/static_cast<double>(PI)*2);
+        double x = 1-(((1-sqr(ampDiff))*phaseDiff)/M_PI*2);
 #ifdef FASTER_CALC
         double tanX = tan(x);
         return 0.16468622925824683 + 0.5009268347818189*x - 0.06462757726992101*x*x
