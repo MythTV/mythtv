@@ -468,14 +468,13 @@ bool MythConfirmationDialog::Create(void)
         return false;
     }
 
-    if (m_showCancel)
-    {
+    if (cancelButton && m_showCancel)
         connect(cancelButton, &MythUIButton::Clicked, this, &MythConfirmationDialog::Cancel);
-    }
-    else
+    else if (cancelButton)
         cancelButton->SetVisible(false);
 
-    connect(okButton, &MythUIButton::Clicked, this, &MythConfirmationDialog::Confirm);
+    if (okButton)
+        connect(okButton, &MythUIButton::Clicked, this, &MythConfirmationDialog::Confirm);
 
     m_messageText->SetText(m_message);
 
@@ -639,13 +638,15 @@ bool MythTextInputDialog::Create(void)
 
     if (cancelButton)
         connect(cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
-    connect(okButton, &MythUIButton::Clicked, this, &MythTextInputDialog::sendResult);
+    if (okButton)
+        connect(okButton, &MythUIButton::Clicked, this, &MythTextInputDialog::sendResult);
 
     m_textEdit->SetFilter(m_filter);
     m_textEdit->SetText(m_defaultValue);
     m_textEdit->SetPassword(m_isPassword);
 
-    messageText->SetText(m_message);
+    if (messageText)
+        messageText->SetText(m_message);
 
     BuildFocusList();
 
@@ -706,9 +707,11 @@ bool MythSpinBoxDialog::Create(void)
 
     if (cancelButton)
         connect(cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
-    connect(okButton, &MythUIButton::Clicked, this, &MythSpinBoxDialog::sendResult);
+    if (okButton)
+        connect(okButton, &MythUIButton::Clicked, this, &MythSpinBoxDialog::sendResult);
 
-    messageText->SetText(m_message);
+    if (messageText)
+        messageText->SetText(m_message);
     BuildFocusList();
 
     return true;
@@ -1042,7 +1045,8 @@ bool MythTimeInputDialog::Create()
     if (messageText && !m_message.isEmpty())
         messageText->SetText(m_message);
 
-    connect(okButton, &MythUIButton::Clicked, this, &MythTimeInputDialog::okClicked);
+    if (okButton)
+        connect(okButton, &MythUIButton::Clicked, this, &MythTimeInputDialog::okClicked);
 
     BuildFocusList();
 
