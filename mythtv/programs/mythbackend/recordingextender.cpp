@@ -1142,7 +1142,7 @@ RecExtDataSource* RecordingExtender::createDataSource(AutoExtendType type)
 /// @return true if the title matches a known sport.
 bool RecordingExtender::findKnownSport(const QString& _title,
                                        AutoExtendType type,
-                                       SportInfoList& infoList)
+                                       SportInfoList& infoList) const
 {
     QRegularExpression year {R"(\d{4})"};
     QRegularExpressionMatch match;
@@ -1151,7 +1151,9 @@ bool RecordingExtender::findKnownSport(const QString& _title,
     {
         bool ok {false};
         int matchYear = match.captured().toInt(&ok);
-        int thisYear = QDateTime::currentDateTimeUtc().date().year();
+        int thisYear = m_forcedYearforTesting
+            ? m_forcedYearforTesting
+            : QDateTime::currentDateTimeUtc().date().year();
         // FIFA Qualifiers can be in the year before the tournament.
         if (!ok || ((matchYear != thisYear) && (matchYear != thisYear+1)))
             return false;
