@@ -45,7 +45,7 @@ class TestRecordingExtender : public RecordingExtender
 
     // Test cases
     static void test_findKnownSport_data(void);
-    static void test_findKnownSport(void);
+    void test_findKnownSport(void);
     static void test_nameCleanup_data(void);
     static void test_nameCleanup(void);
     static void test_parseProgramInfo_data(void);

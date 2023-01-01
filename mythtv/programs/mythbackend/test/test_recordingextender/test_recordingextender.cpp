@@ -257,7 +257,7 @@ void TestRecordingExtender::test_findKnownSport_data(void)
                                << "soccer" << 1 << QStringList("ger.2");
     QTest::newRow("soccer97")  << "FIFA World Cup Qualifying" << 1
                                << "soccer" << 1 << fifaQualLeagues;
-    QTest::newRow("soccer97")  << "FIFA World Cup 2022 Qualifying Soccer" << 1
+    QTest::newRow("soccer98")  << "FIFA World Cup 2022 Qualifying Soccer" << 1
                                << "soccer" << 1 << fifaQualLeagues;
     QTest::newRow("soccer99")  << "FIFA Eliminatorias Copa Mundial 2022" << 1
                                << "soccer" << 1 << fifaQualLeagues;
@@ -271,6 +271,9 @@ void TestRecordingExtender::test_findKnownSport(void)
     QFETCH(QString, expectedSport);
     QFETCH(int, expectedLeagueSize);
     QFETCH(QStringList, expectedLeagues);
+
+    // Force the year for testing purposes.
+    m_forcedYearforTesting = 2022;
 
     SportInfoList infoList;
     bool present = findKnownSport(title, autoExtendTypeFromInt(autoExtendType),
@@ -907,6 +910,8 @@ void TestRecordingExtender::test_processNewRecordings(void)
     ri->m_recStatus    = RecStatus::Recording;
     rr->m_autoExtend   = AutoExtendType::ESPN;
 
+    // Force a couple of items for testing purposes.
+    m_forcedYearforTesting = 2022;
     gForceLocalUrl = true;
 
     // Kick RecordingExtender and cross fingers.

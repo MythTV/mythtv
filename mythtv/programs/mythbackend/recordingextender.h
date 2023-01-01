@@ -321,9 +321,9 @@ class RecordingExtender : public QObject, public MThread
     void addNewRecording(int recordedID);
 
     // Get provider information from database.
-    static bool findKnownSport(const QString& _title,
-                               AutoExtendType type,
-                               SportInfoList& info);
+    bool findKnownSport(const QString& _title,
+                        AutoExtendType type,
+                        SportInfoList& info) const;
     static void clearDownloadedInfo();
 
     // Process recordings
@@ -361,6 +361,9 @@ class RecordingExtender : public QObject, public MThread
     QList<ActiveGame>  m_activeGames;
     /// Recordings that have had an override rule creates.
     QList<int>         m_overrideRules;
+
+    /// Testing data
+    uint               m_forcedYearforTesting {0};
 };
 
 #endif // RECORDING_EXTENDER_H_
