@@ -1830,6 +1830,7 @@ void TestMPEGTables::dvb_sdt_test1(void)
         QCOMPARE (sd->ServiceProviderShortName(), "SCA");
         QCOMPARE (sd->ServiceNameLength(),          11U);
         QCOMPARE (sd->ServiceName(),      "10 Canberra");
+        delete sd;
     }
 
     QCOMPARE (sdt.ServiceID(1),                    2087U);
@@ -1847,6 +1848,7 @@ void TestMPEGTables::dvb_sdt_test1(void)
         QCOMPARE (sd->ServiceProviderShortName(), "SCA");
         QCOMPARE (sd->ServiceNameLength(),           8U);
         QCOMPARE (sd->ServiceName(),         "10 Peach");
+        delete sd;
     }
 
     QCOMPARE (sdt.ServiceDescriptors(2),  sdt.data()+ 99);
@@ -1870,6 +1872,7 @@ void TestMPEGTables::dvb_sdt_test1(void)
         QCOMPARE (sd->ServiceProviderShortName(), "SCA");
         QCOMPARE (sd->ServiceNameLength(),           8U);
         QCOMPARE (sd->ServiceName(),         "10 SHAKE");
+        delete sd;
     }
 }
 
@@ -1911,6 +1914,7 @@ void TestMPEGTables::dvb_sdt_test2a(void)
         QCOMPARE (sd0->ServiceProviderShortName(), "Kordia");
         QCOMPARE (sd0->ServiceNameLength(),             16U);
         QCOMPARE (sd0->ServiceName(),    "Maori Television");
+        delete sd0;
     }
 
     QCOMPARE (sdt.ServiceID(1),                      1601U);
@@ -1928,6 +1932,7 @@ void TestMPEGTables::dvb_sdt_test2a(void)
         QCOMPARE (sd1->ServiceProviderShortName(), "Kordia");
         QCOMPARE (sd1->ServiceNameLength(),              6U);
         QCOMPARE (sd1->ServiceName(),              "Te Reo");
+        delete sd1;
     }
 
     QCOMPARE (sdt.ServiceID(2),                     16000U);
@@ -1945,6 +1950,7 @@ void TestMPEGTables::dvb_sdt_test2a(void)
         QCOMPARE (sd2->ServiceProviderShortName(), "Kordia");
         QCOMPARE (sd2->ServiceNameLength(),             14U);
         QCOMPARE (sd2->ServiceName(),      "Test Service 1");
+        delete sd2;
     }
 }
 
@@ -1986,6 +1992,7 @@ void TestMPEGTables::dvb_sdt_test2o(void)
         QCOMPARE (sd0->ServiceProviderShortName(), "TVNZ");
         QCOMPARE (sd0->ServiceNameLength(),            6U);
         QCOMPARE (sd0->ServiceName(),            "TVNZ 1");
+        delete sd0;
     }
 
     QCOMPARE (sdt.ServiceID(1),                    1201U);
@@ -2003,6 +2010,7 @@ void TestMPEGTables::dvb_sdt_test2o(void)
         QCOMPARE (sd1->ServiceProviderShortName(), "TVNZ");
         QCOMPARE (sd1->ServiceNameLength(),            6U);
         QCOMPARE (sd1->ServiceName(),            "TVNZ 2");
+        delete sd1;
     }
 
     QCOMPARE (sdt.ServiceDescriptors(2),  sdt.data()+ 94);
@@ -2025,6 +2033,7 @@ void TestMPEGTables::dvb_sdt_test2o(void)
         QCOMPARE (sd6->ServiceProviderShortName(), "TVNZ");
         QCOMPARE (sd6->ServiceNameLength(),           12U);
         QCOMPARE (sd6->ServiceName(),      "INFO CHANNEL");
+        delete sd6;
     }
 }
 
