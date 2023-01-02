@@ -338,7 +338,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        SourceList sourcelist;
+        DataSourceList sourcelist;
 
         MSqlQuery sourcequery(MSqlQuery::InitCon());
         QString where;
@@ -362,7 +362,7 @@ int main(int argc, char *argv[])
              {
                   while (sourcequery.next())
                   {
-                       Source newsource;
+                       DataSource newsource;
 
                        newsource.id = sourcequery.value(0).toInt();
                        newsource.name = sourcequery.value(1).toString();

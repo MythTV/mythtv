@@ -115,7 +115,7 @@ bool FillData::GrabDataFromFile(int id, const QString &filename)
     return true;
 }
 
-bool FillData::GrabData(const Source& source, int offset)
+bool FillData::GrabData(const DataSource& source, int offset)
 {
     QString xmltv_grabber = source.xmltvgrabber;
 
@@ -237,14 +237,14 @@ bool FillData::GrabData(const Source& source, int offset)
     return succeeded;
 }
 
-/** \fn FillData::Run(SourceList &sourcelist)
+/** \fn FillData::Run(DataSourceList &sourcelist)
  *  \brief Goes through the sourcelist and updates its channels with
  *         program info grabbed with the associated grabber.
  *  \return true if there were no failures
  */
-bool FillData::Run(SourceList &sourcelist)
+bool FillData::Run(DataSourceList &sourcelist)
 {
-    SourceList::iterator it;
+    DataSourceList::iterator it;
 
     QString status;
     QString querystr;
