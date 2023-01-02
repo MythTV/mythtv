@@ -30,6 +30,9 @@ bool DetectLetterbox::Detect(MythVideoFrame *Frame, float VideoAspect, AdjustFil
         return false;
 
     unsigned char *buf = Frame->m_buffer;
+    if (!buf)
+        return false;
+
     const FramePitches pitches = Frame->m_pitches;
     const FrameOffsets offsets = Frame->m_offsets;
     const int height = Frame->m_height;
