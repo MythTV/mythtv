@@ -464,7 +464,7 @@ vbi_add_handler(struct vbi *vbi, vbic_handler handler, void *data)
     // cl is not leaking, the first struct element has the same address
     // as the struct
     dl_insert_last(vbi->clients, cl->node);
-    return 0;
+    return 0; // cppcheck-suppress memleak
 }
 
 
