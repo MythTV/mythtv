@@ -1959,7 +1959,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         for (++it; it != slist.cend(); ++it)
             checkfiles += *it;
 
-        FileTransfer *ft = nullptr;
+        BEFileTransfer *ft = nullptr;
         bool writemode = false;
         bool usereadahead = true;
         std::chrono::milliseconds timeout_ms = 2s;
@@ -2054,14 +2054,14 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             QWriteLocker lock(&m_sockListLock);
             if (!m_controlSocketList.remove(socket))
                 return; // socket was disconnected
-            ft = new FileTransfer(filename, socket, writemode);
+            ft = new BEFileTransfer(filename, socket, writemode);
         }
         else
         {
             QWriteLocker lock(&m_sockListLock);
             if (!m_controlSocketList.remove(socket))
                 return; // socket was disconnected
-            ft = new FileTransfer(filename, socket, usereadahead, timeout_ms);
+            ft = new BEFileTransfer(filename, socket, usereadahead, timeout_ms);
         }
 
         if (!ft->isOpen())
@@ -2070,7 +2070,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                 QString("Can't open %1").arg(filename));
             errlist << "filetransfer_unable_to_open_file";
             socket->WriteStringList(errlist);
-            socket->IncrRef(); // FileTransfer took ownership of the socket, take it back
+            socket->IncrRef(); // BEFileTransfer took ownership of the socket, take it back
             ft->DecrRef();
             return;
         }
@@ -7084,13 +7084,13 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
     QStringList retlist;
 
     m_sockListLock.lockForRead();
-    FileTransfer *ft = GetFileTransferByID(recnum);
+    BEFileTransfer *ft = GetFileTransferByID(recnum);
     if (!ft)
     {
         if (command == "DONE")
         {
             // if there is an error opening the file, we may not have a
-            // FileTransfer instance for this connection.
+            // BEFileTransfer instance for this connection.
             retlist << "OK";
         }
         else
@@ -7924,7 +7924,7 @@ void MainServer::connectionClosed(MythSocket *socket)
         MythSocket *sock = (*ft)->getSocket();
         if (sock == socket)
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("FileTransfer sock(%1) disconnected")
+            LOG(VB_GENERAL, LOG_INFO, QString("BEFileTransfer sock(%1) disconnected")
                 .arg(quintptr(socket),0,16) );
             (*ft)->DecrRef();
             m_fileTransferList.erase(ft);
@@ -8007,7 +8007,7 @@ PlaybackSock *MainServer::GetPlaybackBySock(MythSocket *sock)
 }
 
 /// Warning you must hold a sockListLock lock before calling this
-FileTransfer *MainServer::GetFileTransferByID(int id)
+BEFileTransfer *MainServer::GetFileTransferByID(int id)
 {
     for (auto & ft : m_fileTransferList)
         if (id == ft->getSocket()->GetSocketDescriptor())
@@ -8016,7 +8016,7 @@ FileTransfer *MainServer::GetFileTransferByID(int id)
 }
 
 /// Warning you must hold a sockListLock lock before calling this
-FileTransfer *MainServer::GetFileTransferBySock(MythSocket *sock)
+BEFileTransfer *MainServer::GetFileTransferBySock(MythSocket *sock)
 {
     for (auto & ft : m_fileTransferList)
         if (sock == ft->getSocket())

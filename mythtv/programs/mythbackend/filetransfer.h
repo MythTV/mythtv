@@ -17,14 +17,14 @@ class MythMediaBuffer;
 class MythSocket;
 class QString;
 
-class FileTransfer : public ReferenceCounter
+class BEFileTransfer : public ReferenceCounter
 {
     friend class QObject; // quiet OSX gcc warning
 
   public:
-    FileTransfer(QString &filename, MythSocket *remote,
-                 bool usereadahead, std::chrono::milliseconds timeout);
-    FileTransfer(QString &filename, MythSocket *remote, bool write);
+    BEFileTransfer(QString &filename, MythSocket *remote,
+                   bool usereadahead, std::chrono::milliseconds timeout);
+    BEFileTransfer(QString &filename, MythSocket *remote, bool write);
 
     MythSocket *getSocket() { return m_sock; }
 
@@ -46,7 +46,7 @@ class FileTransfer : public ReferenceCounter
     void SetTimeout(bool fast);
 
   private:
-   ~FileTransfer() override;
+   ~BEFileTransfer() override;
 
     volatile bool   m_readthreadlive    {true};
     bool            m_readsLocked       {false};
