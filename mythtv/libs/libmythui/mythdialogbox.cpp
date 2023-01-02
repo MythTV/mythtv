@@ -835,7 +835,8 @@ bool MythUISearchDialog::Create(void)
     if (cancelButton)
         connect(cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
-    connect(okButton, &MythUIButton::Clicked, this, &MythUISearchDialog::slotSendResult);
+    if (okButton)
+        connect(okButton, &MythUIButton::Clicked, this, &MythUISearchDialog::slotSendResult);
 
     connect(m_itemList, &MythUIButtonList::itemClicked,
             this, &MythUISearchDialog::slotSendResult);
