@@ -1682,8 +1682,8 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
             }
 #endif
 
-            // NOLINTNEXTLINE(readability-qualified-auto) // qt6
-            for (auto it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
+            QVector<MythScreenStack *>::const_reverse_iterator it;
+            for (it = m_priv->m_stackList.rbegin(); it != m_priv->m_stackList.rend(); it++)
             {
                 if (auto * top = (*it)->GetTopScreen(); top)
                 {
@@ -1711,8 +1711,8 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
                     QCoreApplication::instance()->notify(widget, ie);
                 break;
             }
-            // NOLINTNEXTLINE(readability-qualified-auto) // qt6
-            for (auto it = m_priv->m_stackList.end()-1; it != m_priv->m_stackList.begin()-1; --it)
+            QVector<MythScreenStack *>::const_reverse_iterator it;
+            for (it = m_priv->m_stackList.rbegin(); it != m_priv->m_stackList.rend(); it++)
             {
                 MythScreenType *top = (*it)->GetTopScreen();
                 if (top == nullptr)
@@ -1768,8 +1768,8 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
                     if (!mouseevent)
                         return MythUIScreenBounds::eventFilter(Watched, Event);
 
-                    // NOLINTNEXTLINE(readability-qualified-auto) // qt6
-                    for (auto it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
+                    QVector<MythScreenStack *>::const_reverse_iterator it;
+                    for (it = m_priv->m_stackList.rbegin(); it != m_priv->m_stackList.rend(); it++)
                     {
                         auto * screen = (*it)->GetTopScreen();
                         if (!screen || !screen->ContainsPoint(point))
@@ -1799,8 +1799,8 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
                         return true;
                     }
                     
-                    // NOLINTNEXTLINE(readability-qualified-auto) // qt6
-                    for (auto it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
+                    QVector<MythScreenStack *>::const_reverse_iterator it;
+                    for (it = m_priv->m_stackList.rbegin(); it != m_priv->m_stackList.rend(); it++)
                     {
                         MythScreenType *screen = (*it)->GetTopScreen();
                         if (!screen || !screen->ContainsPoint(point))
