@@ -141,16 +141,16 @@ bool delete_file_immediately(const QString &filename,
 QMutex MainServer::s_truncate_and_close_lock;
 const std::chrono::milliseconds MainServer::kMasterServerReconnectTimeout { 1s };
 
-class ProcessRequestRunnable : public QRunnable
+class BEProcessRequestRunnable : public QRunnable
 {
   public:
-    ProcessRequestRunnable(MainServer &parent, MythSocket *sock) :
+    BEProcessRequestRunnable(MainServer &parent, MythSocket *sock) :
         m_parent(parent), m_sock(sock)
     {
         m_sock->IncrRef();
     }
 
-    ~ProcessRequestRunnable() override
+    ~BEProcessRequestRunnable() override
     {
         if (m_sock)
         {
@@ -446,7 +446,7 @@ void MainServer::NewConnection(qintptr socketDescriptor)
 void MainServer::readyRead(MythSocket *sock)
 {
     m_threadPool.startReserved(
-        new ProcessRequestRunnable(*this, sock),
+        new BEProcessRequestRunnable(*this, sock),
         "ProcessRequest", PRT_TIMEOUT);
 
     QCoreApplication::processEvents();
