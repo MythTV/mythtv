@@ -1559,7 +1559,7 @@ static int grabThumbnail(const QString& inFile, const QString& thumbList, const 
             .arg(inFile));
 
     MythCodecMap codecmap;
-    RemoteAVFormatContext inputFC(inFile);
+    ArchiveRemoteAVFormatContext inputFC(inFile);
     if (!inputFC.isOpen())
     {
         LOG(VB_JOBQUEUE, LOG_ERR, "grabThumbnail(): Couldn't open input file" +
@@ -1913,7 +1913,7 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
             .arg(inFile));
 
     MythCodecMap codecmap;
-    RemoteAVFormatContext inputFC(inFile);
+    ArchiveRemoteAVFormatContext inputFC(inFile);
     if (!inputFC.isOpen())
     {
         LOG(VB_JOBQUEUE, LOG_ERR, "getFileInfo(): Couldn't open input file" +

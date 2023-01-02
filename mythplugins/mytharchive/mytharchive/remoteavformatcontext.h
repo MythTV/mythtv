@@ -13,13 +13,13 @@ extern "C" {
 #include <libavformat/avio.h>
 }
 
-class RemoteAVFormatContext
+class ArchiveRemoteAVFormatContext
 {
   public:
-    explicit RemoteAVFormatContext(const QString &filename = "")
+    explicit ArchiveRemoteAVFormatContext(const QString &filename = "")
     { if (!filename.isEmpty()) Open(filename); }
 
-    ~RemoteAVFormatContext()
+    ~ArchiveRemoteAVFormatContext()
     {
         Close();
         if (m_buffer)
