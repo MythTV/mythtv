@@ -774,42 +774,6 @@ void MythSpinBoxDialog::sendResult()
 
 /////////////////////////////////////////////////////////////////////
 
-
-/** \fn MythUISearchDialog::MythUISearchDialog(MythScreenStack*,
-                                   const QString&,
-                                   const QStringList&,
-                                   bool  matchAnywhere,
-                                   const QString&)
- *  \brief the classes constructor
- *  \param parent the MythScreenStack this widget belongs to
- *  \param title  the text to show as the title
- *  \param list   the list of text strings to search
- *  \param matchAnywhere if true will match the input text anywhere in the string.
-                         if false will match only strings that start with the input text.
-                         Default is false.
- *  \param defaultValue  The initial value for the input text. Default is ""
- */
-MythUISearchDialog::MythUISearchDialog(MythScreenStack *parent,
-                                   const QString &title,
-                                   const QStringList &list,
-                                   bool  matchAnywhere,
-                                   const QString &defaultValue)
-                : MythScreenType(parent, "mythsearchdialogpopup")
-{
-    m_list = list;
-    m_matchAnywhere = matchAnywhere;
-    m_title = title;
-    m_defaultValue = defaultValue;
-
-    m_titleText = nullptr;
-    m_matchesText = nullptr;
-    m_textEdit = nullptr;
-    m_itemList = nullptr;
-
-    m_id = "";
-    m_retObject = nullptr;
-}
-
 bool MythUISearchDialog::Create(void)
 {
     if (!CopyWindowFromBase("MythSearchDialog", this))

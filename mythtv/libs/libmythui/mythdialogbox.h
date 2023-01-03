@@ -401,11 +401,26 @@ class MUI_PUBLIC MythUISearchDialog : public MythScreenType
   Q_OBJECT
 
   public:
+    /** \brief the classes constructor
+     *  \param parent the MythScreenStack this widget belongs to
+     *  \param title  the text to show as the title
+     *  \param list   the list of text strings to search
+     *  \param matchAnywhere if true will match the input text anywhere in the string.
+     *                       if false will match only strings that start with the input text.
+     *                       Default is false.
+     *  \param defaultValue  The initial value for the input text. Default is ""
+     */
     MythUISearchDialog(MythScreenStack *parent,
-                     const QString &title,
-                     const QStringList &list,
+                     QString title,
+                     QStringList list,
                      bool  matchAnywhere = false,
-                     const QString &defaultValue = "");
+                     QString defaultValue = "")
+        : MythScreenType(parent, "mythsearchdialogpopup"),
+          m_title(std::move(title)),
+          m_defaultValue(std::move(defaultValue)),
+          m_list(std::move(list)),
+          m_matchAnywhere(matchAnywhere),
+          m_id("") {};
 
     bool Create(void) override; // MythScreenType
     void SetReturnEvent(QObject *retobject, const QString &resultid);
@@ -414,17 +429,17 @@ class MUI_PUBLIC MythUISearchDialog : public MythScreenType
      void haveResult(QString);
 
   private:
-    MythUIButtonList *m_itemList;
-    MythUITextEdit   *m_textEdit;
-    MythUIText       *m_titleText;
-    MythUIText       *m_matchesText;
+    MythUIButtonList *m_itemList      { nullptr };
+    MythUITextEdit   *m_textEdit      { nullptr };
+    MythUIText       *m_titleText     { nullptr };
+    MythUIText       *m_matchesText   { nullptr };
 
     QString           m_title;
     QString           m_defaultValue;
     QStringList       m_list;
-    bool              m_matchAnywhere;
+    bool              m_matchAnywhere { false   };
 
-    QObject          *m_retObject;
+    QObject          *m_retObject     { nullptr };
     QString           m_id;
 
   private slots:
