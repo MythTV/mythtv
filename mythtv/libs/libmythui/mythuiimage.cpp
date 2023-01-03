@@ -60,6 +60,9 @@ ImageProperties::~ImageProperties()
         m_maskImage->DecrRef();
 }
 
+// The m_maskImage field is assigned in the call to SetMaskImage().
+//
+// cppcheck-suppress operatorEqVarError
 void ImageProperties::Copy(const ImageProperties &other)
 {
     m_filename = other.m_filename;
