@@ -110,6 +110,7 @@ ChannelInfo &ChannelInfo::operator=(const ChannelInfo &other)
     m_useOnAirGuide     = other.m_useOnAirGuide;
     m_mplexId           = (other.m_mplexId == 32767) ? 0 : other.m_mplexId;
     m_serviceId         = other.m_serviceId;
+    m_serviceType       = other.m_serviceType;
     m_atscMajorChan     = other.m_atscMajorChan;
     m_atscMinorChan     = other.m_atscMinorChan;
     m_lastRecord        = other.m_lastRecord;
