@@ -1097,9 +1097,9 @@ bool cCiConditionalAccessSupport::SendPMT(const cCiCaPmt &CaPmt)
 
 class cCiDateTime : public cCiSession {
 private:
-  int    m_interval;
-  time_t m_lastTime;
-  int    m_timeOffset;
+  int    m_interval   { 0 };
+  time_t m_lastTime   { 0 };
+  int    m_timeOffset { 0 };
   bool SendDateTime(void);
 public:
   cCiDateTime(int SessionId, cCiTransportConnection *Tc);
@@ -1110,9 +1110,6 @@ public:
 cCiDateTime::cCiDateTime(int SessionId, cCiTransportConnection *Tc)
 :cCiSession(SessionId, RI_DATE_TIME, Tc)
 {
-  m_interval = 0;
-  m_lastTime = 0;
-  m_timeOffset = 0;
   dbgprotocol("New Date Time (session id %d)\n", SessionId);
 }
 
