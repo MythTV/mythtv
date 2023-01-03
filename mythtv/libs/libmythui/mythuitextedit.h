@@ -88,29 +88,29 @@ class MUI_PUBLIC MythUITextEdit : public MythUIType, public StorageUser
     void PasteTextFromClipboard(QClipboard::Mode mode = QClipboard::Clipboard);
     bool UpdateTmpString(const QString &str);
 
-    bool m_initialized;
+    bool m_initialized                 { false };
 
-    int m_blinkInterval;
-    int m_cursorBlinkRate;
+    int m_blinkInterval                { 0 };
+    int m_cursorBlinkRate              { 40 };
     MythTimer m_lastKeyPress;
 
-    int m_maxLength;
+    int m_maxLength                    { 255 };
 
     QString m_message;
-    InputFilter m_filter;
-    int m_position;
+    InputFilter m_filter               { FilterNone };
+    int m_position                     { -1 };
 
-    bool m_isPassword;
+    bool m_isPassword                  { false };
 
-    PopupPosition m_keyboardPosition;
+    PopupPosition m_keyboardPosition   { VK_POSBELOWEDIT };
 
-    MythUIStateType *m_backgroundState;
-    MythUIImage *m_cursorImage;
-    MythUIText  *m_text;
+    MythUIStateType *m_backgroundState { nullptr };
+    MythUIImage *m_cursorImage         { nullptr };
+    MythUIText  *m_text                { nullptr };
 
-    int m_composeKey;
+    int m_composeKey                   { 0 };
 
-    bool m_isIMEinput;
+    bool m_isIMEinput                  { false };
     QString m_messageBak;
 };
 
