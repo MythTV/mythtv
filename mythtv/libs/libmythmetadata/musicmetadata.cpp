@@ -58,12 +58,12 @@ MusicMetadata::MusicMetadata(int lid, QString lbroadcaster, QString lchannel, QS
             m_broadcaster(std::move(lbroadcaster)),
             m_channel(std::move(lchannel)),
             m_description(std::move(ldescription)),
+            m_urls(lurls),
             m_logoUrl(std::move(llogourl)),
             m_metaFormat(std::move(lmetaformat)),
             m_country(std::move(lcountry)),
             m_language(std::move(llanguage))
 {
-    m_urls = lurls;
     setRepo(RT_Radio);
     ensureSortFields();
 }

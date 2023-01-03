@@ -24,10 +24,10 @@
 
 LanguageSelection::LanguageSelection(MythScreenStack *parent, bool exitOnFinish)
                  :MythScreenType(parent, "LanguageSelection"),
-                  m_exitOnFinish(exitOnFinish)
+                  m_exitOnFinish(exitOnFinish),
+                  m_language(gCoreContext->GetSetting("Language")),
+                  m_country(gCoreContext->GetSetting("Country"))
 {
-    m_language = gCoreContext->GetSetting("Language");
-    m_country = gCoreContext->GetSetting("Country");
     if (exitOnFinish)
     {
         m_loop = new QEventLoop();
