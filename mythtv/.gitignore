@@ -7,3 +7,4 @@ Makefile.*.debug
 version.cpp
 TMPMAK
 /src
+settings2.pro

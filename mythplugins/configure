@@ -269,6 +269,13 @@ check_lib_cxx(){
     check_header_cxx $header && check_func_cxx $func $header "$@"
 }
 
+cp_if_changed(){
+    cmp -s "$1" "$2" && { test "$quiet" != "yes" && echo "$2 is unchanged"; } && return
+    mkdir -p "$(dirname $2)"
+    cp -f "$1" "$2"
+    echo "Created $2"
+}
+
 #
 #    default parameters for all plugins
 #
@@ -513,6 +520,7 @@ tmpfile TMPSH .sh
 tmpfile TMPCXX .cpp
 tmpfile TMPASM .asm
 tmpfile TMPMAK .mak
+tmpfile TMPPRO .pro
 
 unset -f mktemp
 
@@ -576,6 +584,11 @@ WEBKIT=$(cat mythconfig.mak | grep -e "^CONFIG_QTWEBKIT=yes")
 
 EXTRALIBS=$(cat mythconfig.mak | grep -e "^EXTRALIBS=")
 EXTRALIBS=${EXTRALIBS#EXTRALIBS=}
+
+MYTHTV_VERSION_MAJMIN=$(cat mythconfig.mak | grep -e "^MYTHTV_VERSION_MAJMIN=")
+MYTHTV_VERSION_MAJMIN=${MYTHTV_VERSION_MAJMIN#MYTHTV_VERSION_MAJMIN=}
+MYTHTV_LIBVERSION=$(cat mythconfig.mak | grep -e "^MYTHTV_LIBVERSION=")
+MYTHTV_LIBVERSION=${MYTHTV_LIBVERSION#MYTHTV_LIBVERSION=}
 
 QT_MIN_VERSION=$(cat mythconfig.mak | grep -e "^QT_MIN_VERSION=")
 QT_MIN_VERSION=${QT_MIN_VERSION#QT_MIN_VERSION=}
@@ -713,6 +726,14 @@ if enabled zoneminder ; then
         disable zmserver
     fi
 fi
+
+echo "Creating settings2.pro"
+echo "MYTHTV_VERSION_MAJMIN: ${MYTHTV_VERSION_MAJMIN}"
+echo "MYTHTV_LIBVERSION: ${MYTHTV_LIBVERSION}"
+sed -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
+    -e "s/@MYTHTV_LIBVERSION@/${MYTHTV_LIBVERSION}/g" \
+    settings2.pro.in > $TMPPRO
+cp_if_changed $TMPPRO settings2.pro
 
 ###########################################################
 #                                                         #

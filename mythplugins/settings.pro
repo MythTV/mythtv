@@ -5,7 +5,7 @@ CONFIG += c++17
 QMAKE_DEFAULT_INCDIRS += $$[QT_INSTALL_HEADERS]
 INCLUDEPATH += $$[QT_INSTALL_HEADERS]
 
-LIBVERSION = 33
+include(settings2.pro)
 
 MY_INSTALL_INCLUDE = $${SYSROOT}$${PREFIX}/include
 !contains(MY_INSTALL_INCLUDE, /usr/include$) {
