@@ -2,7 +2,7 @@
 
 [metadata]
 name = MythTV
-version = 33.0
+version = @MYTHTV_VERSION_MAJMIN@
 description = MythTV Python bindings.
 long_description = Provides canned database and protocol access to the MythTV database, mythproto, mythxml, services_api and frontend remote control.
 url = https://mythtv.org

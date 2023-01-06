@@ -2,3 +2,4 @@ build/
 *.pyc
 *.swo
 MythTV.egg-info/
+setup.cfg
