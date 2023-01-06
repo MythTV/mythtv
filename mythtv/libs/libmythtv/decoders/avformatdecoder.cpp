@@ -1948,6 +1948,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         RemoveAudioStreams();
     }
 
+    if (m_ic == nullptr)
+        return -1;
+
     for (uint strm = 0; strm < m_ic->nb_streams; strm++)
     {
         AVCodecParameters *par = m_ic->streams[strm]->codecpar;
@@ -2237,7 +2240,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
     // Now find best video track to play
     m_resetHardwareDecoders = false;
-    if (!novideo && m_ic)
+    if (!novideo)
     {
         for(;;)
         {
@@ -2432,7 +2435,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         }
     }
 
-    if (m_ic && (static_cast<uint>(m_ic->bit_rate) > m_bitrate))
+    if (static_cast<uint>(m_ic->bit_rate) > m_bitrate)
         m_bitrate = static_cast<uint>(m_ic->bit_rate);
 
     if (m_bitrate > 0)
@@ -2446,7 +2449,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     if (m_ringBuffer)
     {
         m_ringBuffer->SetBufferSizeFactors(unknownbitrate,
-                        m_ic && QString(m_ic->iformat->name).contains("matroska"));
+                        QString(m_ic->iformat->name).contains("matroska"));
     }
 
     PostProcessTracks();
