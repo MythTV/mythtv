@@ -12,7 +12,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
         'NAME'          => 'MythTV',
-        'VERSION_FROM'  => 'MythTV.pm',
+        'VERSION_FROM'  => 'Version.pm',
         'AUTHOR'        => 'Chris Petersen <mythtv@forevermore.net>',
         'PREREQ_PM'     => {'Exporter'         => 0,
                             'Config'           => 0,

@@ -7,9 +7,6 @@
 # @author    $Author$
 #
 
-# Version
-    $VERSION = '33.0';
-
 # Load sub libraries
     use IO::Socket::INET::MythTV;
     use MythTV::Program;

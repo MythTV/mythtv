@@ -1,0 +1,2 @@
+# Version
+    $VERSION = '@MYTHTV_VERSION_MAJMIN@';

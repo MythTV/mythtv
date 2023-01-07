@@ -8048,6 +8048,11 @@ sed -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
     settings2.pro.in > $TMPPRO
 cp_if_changed $TMPPRO settings2.pro
 
+echo "Creating bindings/perl/Version.pm"
+sed -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
+    bindings/perl/Version.pm.in > $TMPPRO
+cp_if_changed $TMPPRO bindings/perl/Version.pm
+
 echo "Creating bindings/python/setup.cfg"
 sed -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
     bindings/python/setup.cfg.in > $TMPPRO
