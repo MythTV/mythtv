@@ -12,6 +12,8 @@
 #
 MYTHTV_VERSION_MAJMIN="33.0"
 MYTHTV_LIBVERSION="33"
+# See mythtv/libs/libmythbase/mythversion.h.in
+MYTHTV_BINARY_VERSION="33.20220913-1"
 # See bindings/python/MythTV/static.py.in
 MYTHTV_PYTHON_OWN_VERSION="(33,0,-1,0)"
 # See python/MythTV/services_api/send.py.in
@@ -8047,6 +8049,11 @@ sed -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
     -e "s/@MYTHTV_LIBVERSION@/${MYTHTV_LIBVERSION}/g" \
     settings2.pro.in > $TMPPRO
 cp_if_changed $TMPPRO settings2.pro
+
+echo "Creating libs/libmythbase/mythversion.h"
+sed -e "s/@MYTHTV_BINARY_VERSION@/${MYTHTV_BINARY_VERSION}/g" \
+    libs/libmythbase/mythversion.h.in > $TMPH
+cp_if_changed $TMPH libs/libmythbase/mythversion.h
 
 echo "Creating bindings/perl/Version.pm"
 sed -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
