@@ -541,6 +541,7 @@ def buildCollection(tvinetref, opts):
     m.imdb = check_item(m, ("imdb", str(show_info.external_ids['imdb'])))
     m.language = check_item(m, ("language", str(locales.Language.getstored(show_info.language))))
     m.userrating = check_item(m, ("userrating", show_info.rating['average']))
+    m.runtime = check_item(m, ("runtime", show_info.runtime))
     try:
         m.popularity = check_item(m, ("popularity", float(show_info.weight)), ignore=False)
     except (TypeError, ValueError):
