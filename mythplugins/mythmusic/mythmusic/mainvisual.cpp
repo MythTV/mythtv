@@ -218,7 +218,7 @@ void MainVisual::timeout()
                 break;
 
             if (m_vis)
-                m_vis->processUndisplayed(node);
+                m_vis->processUndisplayed(m_nodes.first());
 
             delete m_nodes.first();
             m_nodes.removeFirst();
