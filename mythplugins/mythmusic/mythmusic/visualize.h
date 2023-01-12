@@ -103,8 +103,9 @@ class VisFactory
     VisFactory*        m_pNextVisFactory {nullptr};
 };
 
+
 #define RUBBERBAND 0 // NOLINT(cppcoreguidelines-macro-usage)
-#define TWOCOLOUR 0 // NOLINT(cppcoreguidelines-macro-usage)
+#define TWOCOLOUR 1 // NOLINT(cppcoreguidelines-macro-usage)
 
 class StereoScope : public VisualBase
 {
@@ -119,7 +120,7 @@ class StereoScope : public VisualBase
         {(void) action;}
 
   protected:
-    QColor         m_startColor  {Qt::green};
+    QColor         m_startColor  {Qt::yellow};
     QColor         m_targetColor {Qt::red};
     std::vector<double> m_magnitudes  {};
     QSize          m_size;
@@ -135,6 +136,44 @@ class MonoScope : public StereoScope
 
     bool process( VisualNode *node ) override; // StereoScope
     bool draw( QPainter *p, const QColor &back ) override; // StereoScope
+};
+
+// WaveForm - see whole track - by twitham@sbcglobal.net, 2023/01
+
+#define WF_AUDIO_SIZE 4096     // maximum samples to process at a time
+#define WF_WIDTH 1920   // image cache size, will scale to any display
+#define WF_HEIGHT 1080
+
+class WaveForm : public MonoScope
+{
+public:
+    WaveForm() = default;
+    ~WaveForm() override;
+
+    unsigned long getDesiredSamples(void) override;
+    bool processUndisplayed(VisualNode *node) override;
+    bool process( VisualNode *node ) override;
+    bool draw( QPainter *p, const QColor &back ) override;
+    void handleKeyPress(const QString &action) override;
+
+protected:
+    bool process_all_types(VisualNode *node, bool displayed);
+    void saveload(MusicMetadata *meta);
+    unsigned long m_offset {0}; // pass from process to draw
+    short         *m_right {nullptr};
+    QFont         m_font;       // optional text overlay
+    bool          m_showtext {1};
+    QImage        m_image;      // picture of full track
+    MusicMetadata *m_currentMetadata {nullptr};
+    unsigned long m_duration {60000};
+    unsigned int  m_lastx    {0}; // pixel tracker
+    unsigned int  m_position {0}; // location inside pixel
+    short int     m_minl {0};     // left range
+    short int     m_maxl {0};
+    unsigned long m_sqrl {0};   // sum of squares, for RMS
+    short int     m_minr {0};   // right range
+    short int     m_maxr {0};
+    unsigned long m_sqrr {0};
 };
 
 class LogScale
