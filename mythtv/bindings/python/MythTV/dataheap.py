@@ -492,14 +492,24 @@ class Recorded( CMPRecord, DBDataWrite ):
                                         cast.job.lower().replace(' ','_'))))
 
         # pull images
+        founddict = { 'banner'  : False,
+                      'coverart': False,
+                      'fanart'  : False }
+
         for image in metadata.images:
             if not hasattr(self.artwork, image.type):
-                pass
-            if getattr(self.artwork, image.type, ''):
                 continue
-            setattr(self.artwork, image.type, image.filename)
+            # use only the first valid artwork when overwriting:
+            if (overwrite or not getattr(self.artwork, image.type, '')) \
+                    and not founddict[image.type]:
+                founddict[image.type] = True
+            else:
+                continue
+            filename = "%s_%s" % (self.inetref.replace('.', '_'), image.filename)
+            setattr(self.artwork, image.type, filename)
             getattr(self.artwork, image.type).downloadFrom(image.url)
 
+        self.artwork.update()
         self.update()
 
     def exportMetadata(self):
