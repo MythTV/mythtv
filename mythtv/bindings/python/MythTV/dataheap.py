@@ -15,18 +15,25 @@ from MythTV.utility import CMPRecord, CMPVideo, MARKUPLIST, datetime, ParseSet
 import re
 import locale
 import xml.etree.ElementTree as etree
+from collections import UserString
 from datetime import date, time
 
 _default_datetime = datetime(1900,1,1, tzinfo=datetime.UTCTZ())
 
 
-class Artwork( str ):
+class Artwork( UserString ):
+    """A mutable string implementation for Artwork."""
+
     _types = {'coverart':   'Coverart',
               'coverfile':  'Coverart',
               'fanart':     'Fanart',
               'banner':     'Banners',
               'screenshot': 'ScreenShots',
               'trailer':    'Trailers'}
+
+    # We inherit object.__hash__, so we must deny this explicitly
+    # to prevent the usage as key in dicts
+    __hash__ = None
 
     @property
     def data(self):
@@ -60,10 +67,7 @@ class Artwork( str ):
             # return a dumb string
             return str.__new__(str, attr)
         else:
-            try:
-                return super(Artwork, cls).__new__(cls, attr, parent, imagetype)
-            except TypeError:
-                return super(Artwork, cls).__new__(cls, attr)
+            return super(Artwork, cls).__new__(cls)
 
     def __init__(self, attr, parent=None, imagetype=None):
         self.attr = attr
@@ -88,6 +92,18 @@ class Artwork( str ):
 
     def __delete__(self, inst):
         inst[self.attr] = inst._defaults.get(self.attr, "")
+
+    def __setitem__(self, index, sub):
+        if index < 0:
+            index += len(self.data)
+        if index < 0 or index >= len(self.data): raise IndexError
+        self.data = self.data[:index] + sub + self.data[index+1:]
+
+    def __delitem__(self, index):
+        if index < 0:
+            index += len(self.data)
+        if index < 0 or index >= len(self.data): raise IndexError
+        self.data = self.data[:index] + self.data[index+1:]
 
     @property
     def exists(self):
