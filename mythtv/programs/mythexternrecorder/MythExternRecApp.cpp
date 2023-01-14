@@ -982,9 +982,10 @@ Q_SLOT void MythExternRecApp::ProcReadStandardError(void)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + QString(">>> %1")
             .arg(msg));
+#if 0 // Show even long messages in mythbackend log
         if (msg.size() > 79)
             msg = QString("Application message: see '%1'").arg(m_logFile);
-
+#endif
         MythLog(msg);
     }
 }
