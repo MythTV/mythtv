@@ -562,7 +562,7 @@ void WaveForm::saveload(MusicMetadata *meta)
         }
         filename = QString("%1/%2.png").arg(cache)
             .arg(stream ? 0 : m_currentMetadata->ID());
-        LOG(VB_GENERAL, LOG_INFO, QString("WF saving to %1").arg(filename));
+        // LOG(VB_GENERAL, LOG_INFO, QString("WF saving to %1").arg(filename));
         if (!m_image.save(filename))
         {
             LOG(VB_GENERAL, LOG_ERR,
@@ -573,7 +573,7 @@ void WaveForm::saveload(MusicMetadata *meta)
     if (meta)                   // load previous work from cache
     {
         filename = QString("%1/%2.png").arg(cache).arg(stream ? 0 : meta->ID());
-        LOG(VB_GENERAL, LOG_INFO, QString("WF loading from %1").arg(filename));
+        // LOG(VB_GENERAL, LOG_INFO, QString("WF loading from %1").arg(filename));
         if (!m_image.load(filename))
         {
             LOG(VB_GENERAL, LOG_WARNING,
@@ -675,8 +675,10 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
             int y = WF_HEIGHT / 4;  // left zero line
             int yr = WF_HEIGHT * 3 / 4; // right  zero line
             if (!m_right)
-            {
-                y = yr; // mono - drop full waveform below StereoScope now time
+            {           // mono - drop full waveform below StereoScope
+                y = yr;
+                // if we opted for commented MonoScope below, then we
+                // would set y = WF_HEIGHT / 2 here
             }
             // This "loop" runs only once except for short tracks or
             // low sample rates that need some of the virtual "pixels"
@@ -694,7 +696,7 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
                 painter.drawLine(x, 0, x, WF_HEIGHT);
 
                 // Audacity uses 50,50,200 and 100,100,220 - I'm going
-                // darker to better contrast the SteroScope overlay
+                // darker to better contrast the StereoScope overlay
                 painter.setPen(qRgb(25, 25, 150)); // peak-to-peak
                 painter.drawLine(x, y - h * m_maxl / 32768,
                                  x, y - h * m_minl / 32768);
@@ -724,7 +726,9 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
             m_lastx = xx;
         }
     }
-    // return m_right ? StereoScope::process(node) : MonoScope::process(node);
+    // return m_right
+    //     ? StereoScope::process(node)
+    //     : MonoScope::process(node);
     return StereoScope::process(node);
 }
 
