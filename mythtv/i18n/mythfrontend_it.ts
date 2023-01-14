@@ -2109,7 +2109,7 @@ Controlla se il video esiste</translation>
     <message>
         <location filename="../programs/mythcommflag/ClassicCommDetector.cpp" line="357"/>
         <source>Searching for Logo</source>
-        <translation>Ricerca logo</translation>
+        <translation>Cerco logo</translation>
     </message>
     <message>
         <location filename="../programs/mythcommflag/ClassicCommDetector.cpp" line="528"/>
@@ -4376,12 +4376,12 @@ Dispositivo supporta fino a %1</translation>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="157"/>
         <source>Modify priority for an input (Input priority)</source>
-        <translation>Modifica la priorità di un ingresso (priorità ingresso)</translation>
+        <translation>Mod. priorità di un ingresso (prior. ingresso)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="159"/>
         <source>Modify priority for every card on a host</source>
-        <translation>Modifica le priorità per ciascuna scheda dell&apos; host</translation>
+        <translation>Modifica priorità per ciascuna scheda dell&apos;host</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="161"/>
@@ -4411,7 +4411,7 @@ Dispositivo supporta fino a %1</translation>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="172"/>
         <source>Modify priority for a station on an input</source>
-        <translation>Modifica le priorità di una stazione su un ingresso</translation>
+        <translation>Mod. prior. di una stazione su un ingresso</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="174"/>
@@ -4501,7 +4501,7 @@ Dispositivo supporta fino a %1</translation>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="219"/>
         <source>Avoid poor signal quality (complete example)</source>
-        <translation>Evita segnale di bassa qualità (esempio completo)</translation>
+        <translation>Evita segnale bassa qualità (es. completo)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="367"/>
@@ -5364,12 +5364,12 @@ Dispositivo supporta fino a %1</translation>
     <message>
         <location filename="../programs/mythfrontend/editvideometadata.cpp" line="667"/>
         <source>Downloading selected artwork...</source>
-        <translation>Scaricamento degli artwork selezionati...</translation>
+        <translation>Scaricamento delle locandine selezionati...</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/editvideometadata.cpp" line="723"/>
         <source>Searching for available artwork...</source>
-        <translation>Ricerco gli artwork disponibili...</translation>
+        <translation>Cerco le locandine disponibili...</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/editvideometadata.cpp" line="1047"/>
@@ -6207,8 +6207,8 @@ Errore %1</translation>
 Scan storage group using menu,
 or insert/mount local media.
 </source>
-        <translation>Nessuna immagine trovata.
-Ricerca nel gruppo di archiviazione usando menù,
+        <translation>Non ho trovato nessuna immagine.
+Cerca nel gruppo di archiviazione tramite Menù,
 o inserisci/monta supporto locale.
 </translation>
     </message>
@@ -6885,17 +6885,17 @@ Attendere...</translation>
     <message>
         <location filename="../programs/mythfrontend/grabbersettings.cpp" line="43"/>
         <source>Select a source to use when searching for information and artwork about movies.</source>
-        <translation>Seleziona una sorgente da usare durante la ricerca di informazioni e artwork dei film.</translation>
+        <translation>Seleziona una sorgente da usare durante la ricerca di informazioni e locandine dei film.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/grabbersettings.cpp" line="45"/>
         <source>Select a source to use when searching for information and artwork about television.</source>
-        <translation>Seleziona una sorgente da usare durante la ricerca di informazioni e artwork della televisione.</translation>
+        <translation>Seleziona una sorgente da usare durante la ricerca di informazioni e locandine della televisione.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/grabbersettings.cpp" line="47"/>
         <source>Select a source to use when searching for information and artwork about video games.</source>
-        <translation>Seleziona una sorgente da usare durante la ricerca di informazioni e artwork dei video games.</translation>
+        <translation>Seleziona una sorgente da usare durante la ricerca di informazioni e locandine dei video games.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/grabbersettings.cpp" line="49"/>
@@ -6910,12 +6910,12 @@ Attendere...</translation>
     <message>
         <location filename="../programs/mythfrontend/grabbersettings.cpp" line="52"/>
         <source>If set, the backend will attempt to perform artwork updates for recordings daily. When new seasons begin to record, this will attempt to provide you with fresh, relevant artwork while preserving the artwork assigned to old recordings.</source>
-        <translation>Se impostato, il backend tenterà di eseguire l&apos;aggiornamento degli artwork per le registrazioni quotidiane. Quando inizierà la registrazione di nuove stagioni, esso cercherà di fornire nuovi artwork mentre preserverà gli artwork assegnati alle vecchie registrazioni.</translation>
+        <translation>Se attivato, il backend tenterà di eseguire giornalmente l&apos;aggiornamento delle locandine delle registrazioni. All&apos;avvio della registrazione di nuove stagioni ne cercherà le locandine preservando però quelle assegnate alle vecchie registrazioni.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/grabbersettings.cpp" line="63"/>
         <source>Searching for data sources...</source>
-        <translation>Ricerca sorgenti dati...</translation>
+        <translation>Cerco sorgenti dati...</translation>
     </message>
 </context>
 <context>
@@ -8912,7 +8912,7 @@ Attendere...</translation>
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="1127"/>
         <source>Look up Metadata</source>
-        <translation>Alla ricerca di metadati</translation>
+        <translation>Ricerco metadati</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="1137"/>
@@ -9005,7 +9005,7 @@ Attendere...</translation>
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="2240"/>
         <source>Metadata Lookup Complete.</source>
-        <translation>Ricerca dei metadati completa.</translation>
+        <translation>Ricerca metadati completata.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="2246"/>
@@ -9349,14 +9349,14 @@ Attendere...</translation>
     <message>
         <location filename="../libs/libmythmetadata/lyricsdata.cpp" line="62"/>
         <source>Searching...</source>
-        <translation>Ricerca...</translation>
+        <translation>In ricerca...</translation>
     </message>
     <message>
         <location filename="../libs/libmythmetadata/lyricsdata.cpp" line="74"/>
         <location filename="../libs/libmythmetadata/lyricsdata.cpp" line="90"/>
         <location filename="../libs/libmythmetadata/lyricsdata.cpp" line="226"/>
         <source>No lyrics found for this track</source>
-        <translation>Nessun testo trovato per questa traccia</translation>
+        <translation>Non ho trovato nessun testo per questa traccia</translation>
     </message>
 </context>
 <context>
@@ -9958,17 +9958,17 @@ Attendere...</translation>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="1412"/>
         <source>Downloading selected artwork...</source>
-        <translation>Scaricamento degli artwork selezionati...</translation>
+        <translation>Scaricamento delle locandine selezionate...</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="1560"/>
         <source>You must set a reference number on this rule to set artwork.  For items without a metadata source, you can set any unique value.</source>
-        <translation>Per impostare l&apos;artwork dai un numero di riferimento per questa regola. Puoi impostare un valore univoco per gli oggetti senza sorgenti.</translation>
+        <translation>Per impostare la locandina dai un numero di riferimento a questa regola. Puoi impostare un valore univoco per gli oggetti senza sorgenti.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="1613"/>
         <source>Searching for available artwork...</source>
-        <translation>Cerco gli artwork disponibili...</translation>
+        <translation>Cerco locandine disponibili...</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="1639"/>
@@ -10007,7 +10007,7 @@ Attendere...</translation>
     <message>
         <location filename="../programs/mythfrontend/videometadatasettings.cpp" line="82"/>
         <source>If set, this will enable a button called &quot;Watch With Trailers&quot; which will play a user-specified number of trailers before the movie.</source>
-        <translation>Se impostato, abilita il pulsante denominato &quot;guarda con trailer&quot; che consente di riprodurre prima del film il numero di trailer definiti dall&apos;utente.</translation>
+        <translation>Se abilitato il campo &quot;Trailer da riprodurre&quot; consente di definire il numero di trailer da riprodurre prima del film.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videometadatasettings.cpp" line="86"/>
@@ -10027,8 +10027,7 @@ Attendere...</translation>
     <message>
         <location filename="../programs/mythfrontend/videometadatasettings.cpp" line="96"/>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly speed up how long it takes to load the Video List tree.</source>
-        <translation>Se impostato insieme a Cerca file, questo farà sì che l&apos;elenco video carichi tutti i metadati conosciuti dei video dal
-database. Disabilitandolo si può velocizzare ulteriormente il caricamento dell&apos;elenco video.</translation>
+        <translation>Se abilitato insieme a Scorri File, l&apos;elenco dei video nel database conterrà ogni metadato conosciuto. Se disabilitato il caricamento dell&apos;elenco video viene ulteriormente velocizzato.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videometadatasettings.cpp" line="100"/>
@@ -11799,7 +11798,7 @@ database. Disabilitandolo si può velocizzare ulteriormente il caricamento dell&
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1607"/>
         <source>Play selected item in alternate player</source>
-        <translation>Riproduci oggetto selezionato in un lettore alternativo</translation>
+        <translation>Riproduci selezione in lettore alternativo</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1609"/>
@@ -12358,7 +12357,7 @@ database. Disabilitandolo si può velocizzare ulteriormente il caricamento dell&
     <message>
         <location filename="../libs/libmythtv/mythplayerui.cpp" line="30"/>
         <source>Searching</source>
-        <translation>In ricerca</translation>
+        <translation>Sto cercando</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythplayerui.cpp" line="204"/>
@@ -14011,7 +14010,7 @@ Vuo veramentei eliminare:</translation>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1350"/>
         <source>%1% used, %2 GB free</source>
         <comment>Diskspace</comment>
-        <translation>Usato il %1%, %2 GB liberi</translation>
+        <translation>Usato %1%, liberi %2 GB</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1800"/>
@@ -14825,7 +14824,7 @@ non può essere vuoto.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4385"/>
         <source>View Recordings</source>
-        <translation>Guardare le registrazioni</translation>
+        <translation>Vista registrazioni</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4394"/>
@@ -14998,7 +14997,7 @@ non può essere vuoto.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3469"/>
         <source>By recording priority</source>
-        <translation>Per priorità di registrazione</translation>
+        <translation>Per priorità registrazione</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3472"/>
@@ -24929,7 +24928,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="588"/>
         <source>Channel Recording Priorities</source>
-        <translation>Priorità di registrazione del canale</translation>
+        <translation>Priorità registrazione canale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1461"/>
@@ -26222,22 +26221,22 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="405"/>
         <source>Artwork Results</source>
-        <translation>Risultati Artwork</translation>
+        <translation>Risultati Locandine</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="408"/>
         <source>Artwork and Metadata</source>
-        <translation>Artwork e Metadati</translation>
+        <translation>Locandine e Metadati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="410"/>
         <source>Artwork selector</source>
-        <translation>Selettore Artwork</translation>
+        <translation>Selettore Locandina</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="411"/>
         <source>Artwork, Metadata Sources</source>
-        <translation>Artwork, Sorgenti Metadati</translation>
+        <translation>Locandine, Sorgenti Metadati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="412"/>
@@ -26712,7 +26711,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="612"/>
         <source>Choose which artwork you like most</source>
-        <translation>Scegli quale artwork ti piace di più</translation>
+        <translation>Scegli quale locandina ti piace di più</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="613"/>
@@ -27943,7 +27942,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1180"/>
         <source>Metadata settings</source>
-        <translation>Impostazioni metadati</translation>
+        <translation>Impostaz. metadati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1183"/>
@@ -28253,7 +28252,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1355"/>
         <source>Perform daily updates of recording artwork:</source>
-        <translation>Aggiorna giornalmente copertine delle registrazioni:</translation>
+        <translation>Aggiorna giornalmente locandine registrazioni:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1356"/>
@@ -30428,7 +30427,7 @@ Una volta completate le modifiche, premi il pulsante &quot;OK&quot;.</translatio
     <message>
         <location filename="../themes/themestrings.h" line="1642"/>
         <source>Screen Setup Wizards</source>
-        <translation>Impostaz. schermo guidata</translation>
+        <translation>Imp. guidata schermo</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="641"/>
@@ -30598,7 +30597,7 @@ Una volta completate le modifiche, premi il pulsante &quot;OK&quot;.</translatio
     <message>
         <location filename="../themes/themestrings.h" line="1757"/>
         <source>Set Channel Recording Priorities</source>
-        <translation>Priorità canale registrazione</translation>
+        <translation>Prior. canali registraz.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1772"/>
@@ -30818,7 +30817,7 @@ Una volta completate le modifiche, premi il pulsante &quot;OK&quot;.</translatio
     <message>
         <location filename="../themes/themestrings.h" line="1179"/>
         <source>Metadata Settings</source>
-        <translation>Impostazioni metadati</translation>
+        <translation>Impostaz. metadati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="987"/>
@@ -31037,12 +31036,12 @@ Una volta completate le modifiche, premi il pulsante &quot;OK&quot;.</translatio
     <message>
         <location filename="../themes/themestrings.h" line="842"/>
         <source>Enable Alternate Player:</source>
-        <translation>Abilita riproduttore multimediale alternativo:</translation>
+        <translation>Abilita riproduttore alternativo:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="390"/>
         <source>Alternate Player:</source>
-        <translation>Riproduttore multimediale alternativo:</translation>
+        <translation>Riproduttore alternativo:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2084"/>
@@ -31052,12 +31051,12 @@ Una volta completate le modifiche, premi il pulsante &quot;OK&quot;.</translatio
     <message>
         <location filename="../themes/themestrings.h" line="1357"/>
         <source>Perform metadata update after video scan</source>
-        <translation>Esegui l&apos;aggiornamento dei metadato dopo la scansione video</translation>
+        <translation>Aggiorna metadato dopo scansione video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="843"/>
         <source>Enable Random Trailer Playback</source>
-        <translation>Abilita la riproduzione trailer casuale</translation>
+        <translation>Abilita riproduz. casuale dei trailer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="791"/>
@@ -32090,7 +32089,7 @@ Regista: |DIRECTOR%</translation>
     <message>
         <location filename="../themes/themestrings.h" line="406"/>
         <source>Artwork Search Results</source>
-        <translation>Risultati ricerca artwork</translation>
+        <translation>Risultati ricerca locandina</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1662"/>
@@ -32289,7 +32288,7 @@ Per programmare una registrazione, esci da questa schermata e seleziona &quot;Gu
     <message>
         <location filename="../themes/themestrings.h" line="733"/>
         <source>Custom Recording Rules</source>
-        <translation>Regole registr. personalizzate</translation>
+        <translation>Regole registristrazioni personalizzate</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1909"/>
@@ -32390,7 +32389,7 @@ Se hai configurato una directory video, premi &quot;M&quot; (o il tasto MENÙ) e
     <message>
         <location filename="../themes/themestrings.h" line="409"/>
         <source>Artwork and Metadata Sources</source>
-        <translation>Sorgenti artwork e metadati</translation>
+        <translation>Sorgenti locandine e metadati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="218"/>
@@ -32435,7 +32434,7 @@ Se hai configurato una directory video, premi &quot;M&quot; (o il tasto MENÙ) e
     <message>
         <location filename="../themes/themestrings.h" line="1354"/>
         <source>Perform daily updates of recording artwork</source>
-        <translation>Esegui aggiornamento giornaliero degli artwork delle registrazioni</translation>
+        <translation>Aggiorna giornalm. locandine registrazioni</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1227"/>
@@ -33967,7 +33966,7 @@ Parti |PARTNUMBER| di %%PARTTOTAL%</translation>
     <message>
         <location filename="../themes/themestrings.h" line="749"/>
         <source>Data and Artwork Sources</source>
-        <translation>Sorgenti dati e artwork</translation>
+        <translation>Sorgenti dati e locandine</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1205"/>
@@ -34027,7 +34026,7 @@ Parti |PARTNUMBER| di %%PARTTOTAL%</translation>
     <message>
         <location filename="../themes/themestrings.h" line="1732"/>
         <source>Select artwork, and find recording information online.</source>
-        <translation>Seleziona l&apos;artwork e cerca online informazioni sulla registrazione.</translation>
+        <translation>Seleziona locandina e cerca online informazioni sulla registrazione.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1693"/>
@@ -35089,7 +35088,7 @@ Se si seleziona &quot;Usa riproduttore predefinito&quot; il riproduttore del let
     <message>
         <location filename="../themes/themestrings.h" line="730"/>
         <source>Custom Priority Rules</source>
-        <translation>Regole registr. personalizzate</translation>
+        <translation>Regole registrazioni personalizzate</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="872"/>
@@ -35114,7 +35113,7 @@ Se si seleziona &quot;Usa riproduttore predefinito&quot; il riproduttore del let
     <message>
         <location filename="../themes/themestrings.h" line="367"/>
         <source>Add Clause</source>
-        <translation>Aggiungi clausola</translation>
+        <translation>Agg. clausola</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="760"/>
@@ -35217,7 +35216,7 @@ Se si seleziona &quot;Usa riproduttore predefinito&quot; il riproduttore del let
     <message>
         <location filename="../themes/themestrings.h" line="1284"/>
         <source>Normal recording priority</source>
-        <translation>Priorità di registrazione normale</translation>
+        <translation>Priorità registrazione normale</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="1493"/>
@@ -35365,12 +35364,12 @@ Se si seleziona &quot;Usa riproduttore predefinito&quot; il riproduttore del let
     <message>
         <location filename="../themes/themestrings.h" line="407"/>
         <source>Artwork and Data Sources</source>
-        <translation>Grafiche/sorg.dati</translation>
+        <translation>Locandine/sorg.dati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="674"/>
         <source>Configure sources of artwork and metadata</source>
-        <translation>Configura origne artwork e metadati</translation>
+        <translation>Configura origne locandine e metadati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="665"/>
@@ -35390,7 +35389,7 @@ Se si seleziona &quot;Usa riproduttore predefinito&quot; il riproduttore del let
     <message>
         <location filename="../themes/themestrings.h" line="1236"/>
         <source>MythVideo File Associations</source>
-        <translation>Mythvideo: associazione file</translation>
+        <translation>Associazione file Mythvideo</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="826"/>
@@ -35695,7 +35694,7 @@ Se si seleziona &quot;Usa riproduttore predefinito&quot; il riproduttore del let
     <message>
         <location filename="../themes/themestrings.h" line="2038"/>
         <source>Use default player:</source>
-        <translation>Riprod.predefinito:</translation>
+        <translation>Usa riprod. predefinito:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1030"/>
@@ -36046,7 +36045,7 @@ Per programmare una registrazione, esci da questa schermata e seleziona &apos;Gu
     <message>
         <location filename="../themes/themestrings.h" line="732"/>
         <source>Custom Record Rules</source>
-        <translation>Regole registr. personalizzate</translation>
+        <translation>Regole registrazioni personalizzate</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="372"/>
@@ -36421,7 +36420,7 @@ Per programmare una registrazione, esci da questa schermata e seleziona &apos;Gu
     <message>
         <location filename="../themes/themestrings.h" line="971"/>
         <source>General Settings</source>
-        <translation>Impostazioni generali</translation>
+        <translation>Impostaz. generali</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1418"/>
@@ -36929,7 +36928,7 @@ Per programmare una registrazione, esci da questa schermata e seleziona &apos;Gu
     <message>
         <location filename="../programs/mythfrontend/videodlg.cpp" line="2461"/>
         <source>Metadata Settings</source>
-        <translation>Impostazioni metadati</translation>
+        <translation>Imposta metadati</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videodlg.cpp" line="2462"/>
@@ -37387,7 +37386,7 @@ Per programmare una registrazione, esci da questa schermata e seleziona &apos;Gu
     <message>
         <location filename="../programs/mythfrontend/videoglobalsettings.cpp" line="295"/>
         <source>General Settings</source>
-        <translation>Impostazioni generali</translation>
+        <translation>Impostaz. generali</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videoglobalsettings.cpp" line="308"/>
