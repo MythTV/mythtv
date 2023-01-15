@@ -75,7 +75,7 @@ class IPTVChannelFetcher : public QRunnable
     fbox_chan_map_t GetChannels(void);
 
     static QString DownloadPlaylist(const QString &url);
-    static fbox_chan_map_t ParsePlaylist(
+    MTV_PUBLIC static fbox_chan_map_t ParsePlaylist(
         const QString &rawdata, IPTVChannelFetcher *fetcher = nullptr);
 
   private:

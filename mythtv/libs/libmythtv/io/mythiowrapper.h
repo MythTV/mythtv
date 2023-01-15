@@ -34,7 +34,7 @@ MTV_PUBLIC ssize_t MythFileRead   (int FileID, void *Buffer, size_t Count);
 MTV_PUBLIC ssize_t MythFileWrite  (int FileID, void *Buffer, size_t Count);
 MTV_PUBLIC int     MythFileStat   (const char *Path, struct stat *Buf);
 MTV_PUBLIC int     MythFileStatFD (int FileID, struct stat *Buf);
-int                MythFileExists (const char *Path, const char *File);
+MTV_PUBLIC int     MythFileExists (const char *Path, const char *File);
 int                MythDirCheck   (int DirID);
 MTV_PUBLIC int     MythDirOpen    (const char *DirName);
 MTV_PUBLIC int     MythDirClose   (int DirID);
