@@ -311,6 +311,10 @@ class Recorded( CMPRecord, DBDataWrite ):
         _ref = ['chanid','starttime']
         _cref = ['person']
 
+    class _Role(DBDataWrite):
+        _table = 'roles'
+        _key = ['name']
+
     class _Seek( DBDataRef, MARKUP ):
         _table = 'recordedseek'
         _ref = ['chanid','starttime']
@@ -485,11 +489,48 @@ class Recorded( CMPRecord, DBDataWrite ):
                 self[tagt] = metadata[tagf]
 
         # pull cast
-        trans = {'Author':'writer'}
+        if overwrite:
+            self.cast.clean()
+
+        trans = {'Author': 'writer'}
+        prio = 0
         for cast in metadata.people:
-            self.cast.append(str(cast.name),
-                             str(trans.get(cast.job,
-                                        cast.job.lower().replace(' ','_'))))
+            # priority starts with '1', zero is reserved
+            prio += 1
+            # use or create an entry in the 'Roles' table if character is given:
+            if hasattr(cast, "character"):
+                try:
+                    char = self._Role(cast.character, self._db)
+                    roleid = char.roleid
+                except MythError:
+                    char = self._Role(db=self._db).create({'name': cast.character})
+                    char.update()
+                    roleid = char.roleid
+                priority = prio
+            else:
+                roleid = 0
+                priority = 0
+
+            role = str(trans.get(cast.job, cast.job.lower().replace(' ', '_')))
+            # this avoids unnecessary commits of the same data:
+            if not hasattr(CAST_ROLES, role.upper()):
+                role = ''
+
+            # check if cast exists, update it
+            cast_item = None
+            for item in [x for x in list(self.cast) if cast.name == x.name]:
+                # this supports actors playing multiple characters:
+                if item.role == role and item.roleid in [0, roleid]:
+                    cast_item = item
+                    break
+
+            # only overwrite if 'roleid' needs an update
+            if cast_item:
+                if cast_item.roleid != roleid:
+                    self.cast.delete(*cast_item.values())
+                else:
+                    continue
+            self.cast.append(str(cast.name), role, priority, roleid)
 
         # pull images
         founddict = { 'banner'  : False,

@@ -116,6 +116,20 @@ class SUBTITLE_TYPES( object ):
     SUB_ONSCREEN        = 0x04
     SUB_SIGNED          = 0x08
 
+class CAST_ROLES( object ):
+    UNKNOWN            = 0x0000
+    ACTOR              = 0x0001
+    DIRECTOR           = 0x0002
+    PRODUCER           = 0x0004
+    EXECUTIVE_PRODUCER = 0x0008
+    WRITER             = 0x0010
+    GUEST_STAR         = 0x0020
+    HOST               = 0x0040
+    ADAPTER            = 0x0080
+    PRESENTER          = 0x0100
+    COMMENTATOR        = 0x0200
+    GUEST              = 0x0400
+
 class JOBTYPE( object ):
     NONE         = 0x0000
     SYSTEMJOB    = 0x00ff
