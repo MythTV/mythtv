@@ -303,9 +303,11 @@ def buildTVList(query, opts):
                                     xml_declaration=True)
 
 #   for buildEpisode, args are one of the following
-#   - title subtitle         (-N command line)
-#   - inetref subtitle       (-N command line)
-#   - inetref season episode (-D command line)
+#   -N <title> <subtitle>            e.g. -N "The Blacklist" "Elizabeth Keen"
+#   -N <title> <date time>           e.g. -N "The Blacklist" "2021-01-29 19:00:00"
+#   -N <inetref> <subtitle>          e.g. -N 46952 "Elizabeth Keen"
+#   -N <inetref> <date time>         e.g. -N 46952 "2021-01-29 19:00:00"
+#   -D <inetref> <season> <episode>  e.g. -D 46952 8 4
 def buildEpisode(args, opts):
 
     query = args[0]
@@ -314,6 +316,7 @@ def buildEpisode(args, opts):
     from MythTV import VideoMetadata
     from lxml import etree
     from MythTV.tmdb3 import searchSeries
+    from MythTV import datetime
 
     if query.isnumeric():
         inetref = query
@@ -338,6 +341,17 @@ def buildEpisode(args, opts):
         sys.stdout.write('ERROR: Episode not found: ' + str(args))
         return 9
 
+    if subtitle:
+        # Check whether the 'subtitle' is really a timestamp.
+        try:
+            # The database provides air_date, but not air_time,
+            # so extract the date part of the timestamp.
+            timeStampDate = datetime.strptime(subtitle, "%Y-%m-%d %H:%M:%S").date()
+        except ValueError:
+            timeStampDate = None
+    else:
+        timeStampDate = None
+
     # process seasons backwards because it is more likely
     # that you have a recent one than an old one
     while season_number > 0:
@@ -347,6 +361,10 @@ def buildEpisode(args, opts):
             break
         for ep_num, ep in season.episodes.items():
             if ep.name == subtitle:
+                episode = ep
+                episode_number = int(ep_num)
+                break
+            if timeStampDate and (ep.air_date == timeStampDate):
                 episode = ep
                 episode_number = int(ep_num)
                 break
