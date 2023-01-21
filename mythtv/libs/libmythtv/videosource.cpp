@@ -2913,14 +2913,11 @@ class InputGroup : public TransMythUIComboBoxSetting
         uint inputid     = m_cardInput.getInputID();
         uint new_groupid = getValue().toUInt();
 
-        if (m_groupId)
+        if (m_groupId && (m_groupId != new_groupid))
             CardUtil::UnlinkInputGroup(inputid, m_groupId);
 
         if (new_groupid)
-        {
-            if (CardUtil::UnlinkInputGroup(inputid, new_groupid))
-                CardUtil::LinkInputGroup(inputid, new_groupid);
-        }
+            CardUtil::LinkInputGroup(inputid, new_groupid);
     }
 
     virtual void Save(const QString& /*destination*/) { Save(); }
@@ -3525,9 +3522,6 @@ void CardInput::Save(void)
     {
         CardUtil::CloneCard(cardid, 0);
     }
-
-    // Delete any unused input groups
-    CardUtil::UnlinkInputGroup(0,0);
 }
 
 int CardInputDBStorage::getInputID(void) const
