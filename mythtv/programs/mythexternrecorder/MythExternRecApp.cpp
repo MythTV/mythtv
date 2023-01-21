@@ -79,12 +79,12 @@ void MythExternRecApp::ReplaceVariables(QString & cmd) const
         if (cmd.indexOf(repl) >= 0)
         {
             LOG(VB_CHANNEL, LOG_DEBUG, QString("Replacing '%1' with '%2'")
-                .arg(repl).arg(Ivar.value()));
+                .arg(repl, Ivar.value()));
             cmd.replace(repl, Ivar.value());
         }
         else
             LOG(VB_CHANNEL, LOG_DEBUG, QString("Did not find '%1' in '%2'")
-                .arg(repl).arg(cmd));
+                .arg(repl, cmd));
     }
 }
 
@@ -123,11 +123,12 @@ bool MythExternRecApp::config(void)
         LOG(VB_CHANNEL, LOG_DEBUG, "Parsing variables");
         settings.beginGroup("VARIABLES");
 
-        for (QString var : settings.childKeys())
+        QStringList childKeys = settings.childKeys();
+        for (const QString & var : qAsConst(childKeys))
         {
             m_settingVars[var] = settings.value(var).toString();
             LOG(VB_CHANNEL, LOG_INFO, QString("%1=%2")
-                .arg(var).arg(settings.value(var).toString()));
+                .arg(var, settings.value(var).toString()));
         }
         settings.endGroup();
     }
