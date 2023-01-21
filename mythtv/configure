@@ -8071,7 +8071,7 @@ sed -e "s/@MYTHTV_PYTHON_OWN_VERSION@/${MYTHTV_PYTHON_OWN_VERSION}/g" \
 cp_if_changed $TMPPRO bindings/python/MythTV/static.py
 
 echo "Creating bindings/python/MythTV/services_api/mythversions.py"
-sed -e "s/@MYTHTV_VERSION_LIST@/${MYTHTV_PYTHON_VERSION_LIST}/g" \
+sed -e "s/@MYTHTV_PYTHON_VERSION_LIST@/${MYTHTV_PYTHON_VERSION_LIST}/g" \
     bindings/python/MythTV/services_api/mythversions.py.in > $TMPPRO
 cp_if_changed $TMPPRO bindings/python/MythTV/services_api/mythversions.py
 
