@@ -562,7 +562,7 @@ void WaveForm::saveload(MusicMetadata *meta)
         }
         filename = QString("%1/%2.png").arg(cache)
             .arg(stream ? 0 : m_currentMetadata->ID());
-        // LOG(VB_GENERAL, LOG_INFO, QString("WF saving to %1").arg(filename));
+        LOG(VB_PLAYBACK, LOG_INFO, QString("WF saving to %1").arg(filename));
         if (!m_image.save(filename))
         {
             LOG(VB_GENERAL, LOG_ERR,
@@ -573,7 +573,7 @@ void WaveForm::saveload(MusicMetadata *meta)
     if (meta)                   // load previous work from cache
     {
         filename = QString("%1/%2.png").arg(cache).arg(stream ? 0 : meta->ID());
-        // LOG(VB_GENERAL, LOG_INFO, QString("WF loading from %1").arg(filename));
+        LOG(VB_PLAYBACK, LOG_INFO, QString("WF loading from %1").arg(filename));
         if (!m_image.load(filename))
         {
             LOG(VB_GENERAL, LOG_WARNING,
@@ -621,13 +621,18 @@ bool WaveForm::processUndisplayed(VisualNode *node)
 
 bool WaveForm::process(VisualNode *node)
 {
-    // After 2023/01 bugfix above, processUndisplayed already
-    // processed this node too!  If that is ever changed in
+    // After 2023/01 bugfix above, processUndisplayed processes this
+    // node again after this process!  If that is ever changed in
     // mainvisual.cpp, then this might need adjusted.  To test,
-    // uncomment the following line and see --loglevel debug
+    // uncomment the following line and see:
 
+    // mythfrontend --loglevel debug -v playback
+
+    // this would double-process the displayed nodes:
     // return process_all_types(node, true);
-    return node ? false : false;
+
+    // StereoScope overlay must process only the displayed nodes
+    return StereoScope::process(node);
 }
 
 bool WaveForm::process_all_types(VisualNode *node, bool displayed)
@@ -642,7 +647,7 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
         m_offset = node->m_offset.count() % m_duration; // for ::draw below
         m_right = node->m_right;
         uint n = node->m_length;
-        LOG(VB_GENERAL, LOG_DEBUG,
+        LOG(VB_PLAYBACK, LOG_DEBUG,
             QString("WF process %1 samples at %2, display=%3").
             arg(n).arg(m_offset).arg(displayed));
 
@@ -665,7 +670,7 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
             m_position++;
         }
         uint xx = WF_WIDTH * m_offset / m_duration;
-        if (xx != m_lastx)   // draw one finished pixel of min/max/rms
+        if (xx != m_lastx)   // draw one finished line of min/max/rms
         {
             if (m_lastx > xx - 1) // right to left wrap
             {
@@ -677,19 +682,17 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
             if (!m_right)
             {           // mono - drop full waveform below StereoScope
                 y = yr;
-                // if we opted for commented MonoScope below, then we
-                // would set y = WF_HEIGHT / 2 here
             }
             // This "loop" runs only once except for short tracks or
-            // low sample rates that need some of the virtual "pixels"
-            // to be drawn wider with more actual pixels.  I'd rather
+            // low sample rates that need some of the virtual "lines"
+            // to be drawn wider with more actual lines.  I'd rather
             // duplicate the vertical lines than draw rectangles since
             // lines are the more common case. -twitham
 
             QPainter painter(&m_image);
             for (uint x = m_lastx + 1; x <= xx; x++)
             {
-                LOG(VB_GENERAL, LOG_DEBUG,
+                LOG(VB_PLAYBACK, LOG_DEBUG,
                     QString("WF painting at %1,%2/%3").arg(x).arg(y).arg(yr));
 
                 painter.setPen(qRgb(0, 0, 0)); // clear prior content
@@ -712,11 +715,11 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
                 {
                     int rmsr = sqrt(m_sqrr / m_position) * y / 32768;
                     painter.drawLine(x, yr - rmsr, x, yr + rmsr);
-                    painter.drawLine(x, WF_HEIGHT / 2,
+                    painter.drawLine(x, WF_HEIGHT / 2, // left/right delta
                                      x, WF_HEIGHT / 2 - rmsl + rmsr);
                 }
             }
-            m_minl = 0;                 // reset metrics for next pixel
+            m_minl = 0;                 // reset metrics for next line
             m_maxl = 0;
             m_sqrl = 0;
             m_minr = 0;
@@ -726,32 +729,26 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
             m_lastx = xx;
         }
     }
-    // return m_right
-    //     ? StereoScope::process(node)
-    //     : MonoScope::process(node);
-    return StereoScope::process(node);
+    return false;
 }
 
 bool WaveForm::draw( QPainter *p, const QColor &back )
 {
     p->fillRect(0, 0, 0, 0, back); // no clearing, here to suppress warning
     if (!m_image.isNull())
-    {
+    {			     // background, updated by ::process above
         p->drawImage(0, 0, m_image.scaled(m_size,
                                           Qt::IgnoreAspectRatio,
                                           Qt::SmoothTransformation));
     }
 
-    // m_right
-    //     ? StereoScope::draw(p, Qt::green)
-    //     : MonoScope::draw(p, Qt::green);
     StereoScope::draw(p, Qt::green); // green == no clearing!
 
     p->setPen(Qt::yellow);
     unsigned int x = m_size.width() * m_offset / m_duration;
     p->drawLine(x, 0, x, m_size.height());
 
-    if (m_showtext && m_size.width() > 500)
+    if (m_showtext && m_size.width() > 500) // metrics in corners
     {
         p->setPen(Qt::white);
         p->setFont(m_font);
@@ -776,7 +773,7 @@ bool WaveForm::draw( QPainter *p, const QColor &back )
 
 void WaveForm::handleKeyPress(const QString &action)
 {
-    LOG(VB_GENERAL, LOG_INFO, QString("WF keypress = %1").arg(action));
+    LOG(VB_PLAYBACK, LOG_INFO, QString("WF keypress = %1").arg(action));
 
     // I'd like to toggle overlay text upon certain key hit, but
     // mythfrontend doesn't appear to call this.  Bug?
