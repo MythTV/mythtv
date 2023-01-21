@@ -46,9 +46,9 @@ class MHEG;
 class MHStream;
 
 // Called to create a new instance of the module.
-extern MHEG *MHCreateEngine(MHContext *context);
+extern Q_DECL_EXPORT MHEG *MHCreateEngine(MHContext *context);
 // Set the logging stream and options.
-extern void MHSetLogging(FILE *logStream, unsigned int logLevel);
+extern Q_DECL_EXPORT void MHSetLogging(FILE *logStream, unsigned int logLevel);
 
 // This abstract class is implemented by the MHEG Engine.
 class MHEG
