@@ -1846,7 +1846,7 @@ static int revokeRoot (void)
 }
 
 
-int main(int argc, char **argv)
+Q_DECL_EXPORT int main(int argc, char **argv)
 {
     bool bPromptForBackend    = false;
     bool bBypassAutoDiscovery = false;
