@@ -910,7 +910,7 @@ DTVModulationSystem CardUtil::ProbeCurrentDeliverySystem(int fd_frontend)
             QString("FE_GET_PROPERTY ioctl failed (fd_frontend:%1)")
                 .arg(fd_frontend) + ENO);
         return delsys;
-        }
+    }
 
     delsys = prop.u.data;
 
@@ -1183,7 +1183,7 @@ int CardUtil::SetDeliverySystem(uint inputid, DTVModulationSystem delsys, int fd
             QString("[%1] FE_SET_PROPERTY ioctl failed")
                 .arg(inputid) + ENO);
         return ret;
-        }
+    }
 #else
     Q_UNUSED(inputid);
     Q_UNUSED(delsys);
