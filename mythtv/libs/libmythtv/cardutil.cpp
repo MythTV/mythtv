@@ -1548,9 +1548,6 @@ bool CardUtil::InputSetMaxRecordings(uint parentid, uint max_recordings)
         CardUtil::CloneCard(parentid, 0);
     }
 
-    // Delete any unused input groups
-    CardUtil::UnlinkInputGroup(0,0);
-
     return true;
 }
 
@@ -2837,7 +2834,7 @@ bool CardUtil::DeleteInput(uint inputid)
         }
     }
 
-    // delete any unused input groups
+    // Delete any unused input groups
     UnlinkInputGroup(0, 0);
 
     return true;
