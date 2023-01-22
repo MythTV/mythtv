@@ -8055,10 +8055,10 @@ sed -e "s/@MYTHTV_BINARY_VERSION@/${MYTHTV_BINARY_VERSION}/g" \
     libs/libmythbase/mythversion.h.in > $TMPH
 cp_if_changed $TMPH libs/libmythbase/mythversion.h
 
-echo "Creating bindings/perl/Version.pm"
+echo "Creating bindings/perl/MythTV/Version.pm"
 sed -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
-    bindings/perl/Version.pm.in > $TMPPRO
-cp_if_changed $TMPPRO bindings/perl/Version.pm
+    bindings/perl/MythTV/Version.pm.in > $TMPPRO
+cp_if_changed $TMPPRO bindings/perl/MythTV/Version.pm
 
 echo "Creating bindings/python/setup.cfg"
 sed -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \

@@ -12,7 +12,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
         'NAME'          => 'MythTV',
-        'VERSION_FROM'  => 'Version.pm',
+        'VERSION_FROM'  => 'MythTV/Version.pm',
         'AUTHOR'        => 'Chris Petersen <mythtv@forevermore.net>',
         'PREREQ_PM'     => {'Exporter'         => 0,
                             'Config'           => 0,
@@ -25,7 +25,14 @@ WriteMakefile(
                             'LWP::UserAgent'   => 0,
                             'Sys::Hostname'    => 0,
                            },
-        'PMLIBDIRS'     => [ 'MythTV', 'IO' ],
+        'PM'            => {'MythTV.pm'                => 'blib/lib/MythTV.pm',
+                            'MythTV/Channel.pm'        => 'blib/lib/MythTV/Channel.pm',
+                            'MythTV/Program.pm'        => 'blib/lib/MythTV/Program.pm',
+                            'MythTV/Recording.pm'      => 'blib/lib/MythTV/Recording.pm',
+                            'MythTV/StorageGroup.pm'   => 'blib/lib/MythTV/StorageGroup.pm',
+                            'MythTV/Version.pm'        => 'blib/lib/MythTV/Version.pm',
+                            'IO/Socket/INET/MythTV.pm' => 'blib/lib/IO/Socket/INET/MythTV.pm',
+                           },
         'NO_META'       => 1,
 );
 

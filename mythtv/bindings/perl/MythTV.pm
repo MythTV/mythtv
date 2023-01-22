@@ -7,6 +7,9 @@
 # @author    $Author$
 #
 
+# Version
+    use MythTV::Version;
+
 # Load sub libraries
     use IO::Socket::INET::MythTV;
     use MythTV::Program;
