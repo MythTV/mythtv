@@ -4995,8 +4995,9 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     }
     else if (command == "IS_BUSY")
     {
-        auto arg2 = std::chrono::seconds(slist[2].toInt());
-        std::chrono::seconds time_buffer = (slist.size() >= 3) ? arg2 : 5s;
+        std::chrono::seconds time_buffer = 5s;
+        if (slist.size() >= 3)
+            time_buffer = std::chrono::seconds(slist[2].toInt());
         InputInfo busy_input;
         retlist << QString::number((int)enc->IsBusy(&busy_input, time_buffer));
         busy_input.ToStringList(retlist);
