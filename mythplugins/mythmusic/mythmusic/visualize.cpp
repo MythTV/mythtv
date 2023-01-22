@@ -558,7 +558,7 @@ void WaveForm::saveload(MusicMetadata *meta)
         QDir dir(cache);
         if (!dir.exists())
         {
-            dir.mkdir(cache);
+            dir.mkpath(cache);
         }
         filename = QString("%1/%2.png").arg(cache)
             .arg(stream ? 0 : m_currentMetadata->ID());
