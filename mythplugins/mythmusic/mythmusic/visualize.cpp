@@ -301,11 +301,9 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
     for ( int i = 1; i < m_size.width(); i++ )
     {
 #if TWOCOLOUR
-    double r, g, b, per;
-
     // left
-    per = ( static_cast<double>(m_magnitudes[i]) * 2.0 ) /
-          ( static_cast<double>(m_size.height()) / 4.0 );
+    double per = ( static_cast<double>(m_magnitudes[i]) * 2.0 ) /
+                 ( static_cast<double>(m_size.height()) / 4.0 );
     if (per < 0.0)
         per = -per;
     if (per > 1.0)
@@ -313,12 +311,12 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
     else if (per < 0.0)
         per = 0.0;
 
-    r = m_startColor.red() + (m_targetColor.red() -
-                m_startColor.red()) * (per * per);
-    g = m_startColor.green() + (m_targetColor.green() -
-                  m_startColor.green()) * (per * per);
-    b = m_startColor.blue() + (m_targetColor.blue() -
-                 m_startColor.blue()) * (per * per);
+    double r = m_startColor.red() +
+        (m_targetColor.red() - m_startColor.red()) * (per * per);
+    double g = m_startColor.green() +
+        (m_targetColor.green() - m_startColor.green()) * (per * per);
+    double b = m_startColor.blue() +
+        (m_targetColor.blue() - m_startColor.blue()) * (per * per);
 
     if (r > 255.0)
         r = 255.0;
@@ -492,10 +490,8 @@ bool MonoScope::draw( QPainter *p, const QColor &back )
       p->fillRect( 0, 0, m_size.width(), m_size.height(), back );
     for ( int i = 1; i < m_size.width(); i++ ) {
 #if TWOCOLOUR
-        double r, g, b, per;
-
-        per = ( static_cast<double>(m_magnitudes[i]) * 2.0 ) /
-              ( static_cast<double>(m_size.height()) / 4.0 );
+        double per = ( static_cast<double>(m_magnitudes[i]) * 2.0 ) /
+                     ( static_cast<double>(m_size.height()) / 4.0 );
         if (per < 0.0)
             per = -per;
         if (per > 1.0)
@@ -503,12 +499,12 @@ bool MonoScope::draw( QPainter *p, const QColor &back )
         else if (per < 0.0)
             per = 0.0;
 
-        r = m_startColor.red() + (m_targetColor.red() -
-                                m_startColor.red()) * (per * per);
-        g = m_startColor.green() + (m_targetColor.green() -
-                                  m_startColor.green()) * (per * per);
-        b = m_startColor.blue() + (m_targetColor.blue() -
-                                 m_startColor.blue()) * (per * per);
+        double r = m_startColor.red() +
+            (m_targetColor.red() - m_startColor.red()) * (per * per);
+        double g = m_startColor.green() +
+            (m_targetColor.green() - m_startColor.green()) * (per * per);
+        double b = m_startColor.blue() +
+            (m_targetColor.blue() - m_startColor.blue()) * (per * per);
 
         if (r > 255.0)
             r = 255.0;
@@ -1343,14 +1339,14 @@ bool Piano::processUndisplayed(VisualNode *node)
     return process_all_types(node, false);
 }
 
-bool Piano::process(VisualNode *node)
+bool Piano::process(VisualNode */*node*/)
 {
     //LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Processing node for DISPLAY"));
 
     // See WaveForm::process* above
     // return process_all_types(node, true);
 
-    return node ? false : false;
+    return false;
 }
 
 bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)

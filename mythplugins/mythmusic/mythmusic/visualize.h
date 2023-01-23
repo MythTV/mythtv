@@ -144,7 +144,7 @@ class MonoScope : public StereoScope
 #define WF_WIDTH 1920   // image cache size, will scale to any display
 #define WF_HEIGHT 1080
 
-class WaveForm : public MonoScope
+class WaveForm : public StereoScope
 {
   public:
     WaveForm() = default;
@@ -162,7 +162,7 @@ class WaveForm : public MonoScope
     unsigned long m_offset {0}; // pass from process to draw
     short         *m_right {nullptr};
     QFont         m_font;       // optional text overlay
-    bool          m_showtext {1};
+    bool          m_showtext {true};
     QImage        m_image;      // picture of full track
     MusicMetadata *m_currentMetadata {nullptr};
     unsigned long m_duration {60000};
