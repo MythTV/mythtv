@@ -58,7 +58,7 @@ ClassicLogoDetector::ClassicLogoDetector(ClassicCommDetector* commdetector,
     m_commDetectLogoHeightRatio =
         gCoreContext->GetNumSetting("CommDetectLogoHeightRatio", 4);
     m_commDetectLogoMinPixels =
-        gCoreContext->GetNumSetting("CommDetectLogoMinPixels", 0);
+        gCoreContext->GetNumSetting("CommDetectLogoMinPixels", 50);
 }
 
 ClassicLogoDetector::~ClassicLogoDetector()
@@ -105,8 +105,7 @@ bool ClassicLogoDetector::searchForLogo(MythCommFlagPlayer *player)
     // I am using 1280x720 (for 720p) video as the baseline.
     // This should improve logo detection for SD video.
     int minPixelsInMask =
-        (m_commDetectLogoMinPixels ? m_commDetectLogoMinPixels : 50)
-        * (m_width*m_height) / (1280*720 / 16);
+        m_commDetectLogoMinPixels * (m_width*m_height) / (1280*720 / 16);
 
     for (uint edgediff : edgeDiffs)
     {
