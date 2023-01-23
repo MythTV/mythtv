@@ -964,6 +964,7 @@ using_backend {
 
         DEFINES += USING_HDHOMERUN
         DEFINES += HDHOMERUN_HEADERFILE=\\\"$${HDHOMERUN_PREFIX}hdhomerun.h\\\"
+        DEFINES += HDHOMERUN_VERSION=$${HDHOMERUN_VERSION}
     }
 
     # Support for Sat>IP

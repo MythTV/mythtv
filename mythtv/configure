@@ -5588,6 +5588,13 @@ if enabled hdhomerun; then
     else
         disable hdhomerun
     fi
+
+    # Figure out the API version
+    if check_lib libhdhomerun ${HDHOMERUN_PREFIX}hdhomerun.h hdhomerun_discover2_find_devices_broadcast -lhdhomerun; then
+        HDHOMERUN_VERSION=20221010
+    else
+        HDHOMERUN_VERSION=0
+    fi
 fi
 
 check_header stdint.h
@@ -7468,6 +7475,7 @@ EOF
 
 enabled hdhomerun && cat >> $TMPMAK <<EOF
 HDHOMERUN_PREFIX=$HDHOMERUN_PREFIX
+HDHOMERUN_VERSION=$HDHOMERUN_VERSION
 EOF
 
 #echo "endif # FFMPEG_CONFIG_MAK" >> $TMPMAK
