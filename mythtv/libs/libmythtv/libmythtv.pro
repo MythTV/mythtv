@@ -964,8 +964,6 @@ using_backend {
 
         DEFINES += USING_HDHOMERUN
         DEFINES += HDHOMERUN_HEADERFILE=\\\"$${HDHOMERUN_PREFIX}hdhomerun.h\\\"
-        contains(HDHOMERUN_V2, yes): DEFINES += HDHOMERUN_V2
-        contains(HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR, yes): DEFINES += NEED_HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR
     }
 
     # Support for Sat>IP

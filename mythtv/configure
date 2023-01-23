@@ -5588,21 +5588,6 @@ if enabled hdhomerun; then
     else
         disable hdhomerun
     fi
-
-    # The switch from v1 to v2 occurred between the 20150615 and 20150826 releases.
-    if check_lib libhdhomerun ${HDHOMERUN_PREFIX}hdhomerun.h hdhomerun_discover_find_devices -lhdhomerun; then
-        HDHOMERUN_V2=no
-    elif check_lib libhdhomerun ${HDHOMERUN_PREFIX}hdhomerun.h hdhomerun_discover_find_devices_v2 -lhdhomerun; then
-        HDHOMERUN_V2=yes
-    else
-        disable hdhomerun
-    fi
-
-    if check_lib libhdhomerun ${HDHOMERUN_PREFIX}hdhomerun.h hdhomerun_device_selector_load_from_str -lhdhomerun ; then
-        HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR=no
-    else
-        HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR=yes
-    fi
 fi
 
 check_header stdint.h
@@ -7483,8 +7468,6 @@ EOF
 
 enabled hdhomerun && cat >> $TMPMAK <<EOF
 HDHOMERUN_PREFIX=$HDHOMERUN_PREFIX
-HDHOMERUN_V2=$HDHOMERUN_V2
-HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR = $HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR
 EOF
 
 #echo "endif # FFMPEG_CONFIG_MAK" >> $TMPMAK

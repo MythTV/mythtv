@@ -20,10 +20,6 @@
 #include "mpeg/mpegstreamdata.h"
 #include "mpeg/streamlisteners.h"
 
-#ifdef NEED_HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR
-static int hdhomerun_device_selector_load_from_str(struct hdhomerun_device_selector_t *hds, char *device_str);
-#endif
-
 #define LOC      QString("HDHRSH[%1](%2): ").arg(m_inputId).arg(m_device)
 
 QMap<int,HDHRStreamHandler*>     HDHRStreamHandler::s_handlers;
@@ -564,98 +560,3 @@ bool HDHRStreamHandler::TuneVChannel(const QString &vchn)
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Tuning vchannel %1").arg(vchn));
     return !TunerSet("vchannel", vchn).isEmpty();
 }
-
-#ifdef NEED_HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR
-
-// Provide functions we need that are not included in some versions of
-// libhdhomerun.  These were taken
-// from version 20180817 and modified as needed.
-
-struct hdhomerun_device_selector_t {
-        struct hdhomerun_device_t **hd_list;
-        size_t hd_count;
-        struct hdhomerun_debug_t *dbg;
-};
-
-static int hdhomerun_device_selector_load_from_str_discover(struct hdhomerun_device_selector_t *hds, uint32_t target_ip, uint32_t device_id)
-{
-	struct hdhomerun_discover_device_t result;
-	int discover_count = hdhomerun_discover_find_devices_custom(target_ip, HDHOMERUN_DEVICE_TYPE_TUNER, device_id, &result, 1);
-	if (discover_count != 1) {
-		return 0;
-	}
-
-	int count = 0;
-	unsigned int tuner_index;
-	for (tuner_index = 0; tuner_index < result.tuner_count; tuner_index++) {
-		struct hdhomerun_device_t *hd = hdhomerun_device_create(result.device_id, result.ip_addr, tuner_index, hds->dbg);
-		if (!hd) {
-			continue;
-		}
-
-		hdhomerun_device_selector_add_device(hds, hd);
-		count++;
-	}
-
-	return count;
-}
-
-static int hdhomerun_device_selector_load_from_str(struct hdhomerun_device_selector_t *hds, char *device_str)
-{
-	/*
-	 * IP address based device_str.
-	 */
-	unsigned int a[4];
-	if (sscanf(device_str, "%u.%u.%u.%u", &a[0], &a[1], &a[2], &a[3]) == 4) {
-		uint32_t ip_addr = (uint32_t)((a[0] << 24) | (a[1] << 16) | (a[2] << 8) | (a[3] << 0));
-
-		/*
-		 * IP address + tuner number.
-		 */
-		unsigned int tuner;
-		if (sscanf(device_str, "%u.%u.%u.%u-%u", &a[0], &a[1], &a[2], &a[3], &tuner) == 5) {
-			struct hdhomerun_device_t *hd = hdhomerun_device_create(HDHOMERUN_DEVICE_ID_WILDCARD, ip_addr, tuner, hds->dbg);
-			if (!hd) {
-				return 0;
-			}
-
-			hdhomerun_device_selector_add_device(hds, hd);
-			return 1;
-		}
-
-		/*
-		 * IP address only - discover and add tuners.
-		 */
-		return hdhomerun_device_selector_load_from_str_discover(hds, ip_addr, HDHOMERUN_DEVICE_ID_WILDCARD);
-	}
-
-	/*
-	 * Device ID based device_str.
-	 */
-	char *end;
-	uint32_t device_id = (uint32_t)strtoul(device_str, &end, 16);
-	if ((end == device_str + 8) && hdhomerun_discover_validate_device_id(device_id)) {
-		/*
-		 * IP address + tuner number.
-		 */
-		if (*end == '-') {
-			unsigned int tuner = (unsigned int)strtoul(end + 1, NULL, 10);
-			struct hdhomerun_device_t *hd = hdhomerun_device_create(device_id, 0, tuner, hds->dbg);
-			if (!hd) {
-				return 0;
-			}
-
-			hdhomerun_device_selector_add_device(hds, hd);
-			return 1;
-		}
-
-		/*
-		 * Device ID only - discover and add tuners.
-		 */
-		return hdhomerun_device_selector_load_from_str_discover(hds, 0, device_id);
-	}
-
-        return 0;
-}
-
-#endif

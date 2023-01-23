@@ -492,13 +492,8 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
         const int max_count   = 50;
         std::array<hdhomerun_discover_device_t,max_count> result_list {};
 
-#ifdef HDHOMERUN_V2
         int result = hdhomerun_discover_find_devices_custom_v2(
             target_ip, device_type, device_id, result_list.data(), result_list.size());
-#else
-        int result = hdhomerun_discover_find_devices_custom(
-            target_ip, device_type, device_id, result_list.data(), result_list.size());
-#endif
 
         if (result == -1)
         {
