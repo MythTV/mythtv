@@ -4,4 +4,4 @@ blib/
 pm_to_blib
 MYMETA.json
 MYMETA.yml
-Version.pm
+Makefile.PL

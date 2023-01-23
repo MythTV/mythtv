@@ -7527,10 +7527,10 @@ sed -e "s/@MYTHTV_BINARY_VERSION@/${MYTHTV_BINARY_VERSION}/g" \
     libs/libmythbase/mythversion.h.in > $TMPH
 cp_if_changed $TMPH libs/libmythbase/mythversion.h
 
-echo "Creating bindings/perl/MythTV/Version.pm"
-sed -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
-    bindings/perl/MythTV/Version.pm.in > $TMPPRO
-cp_if_changed $TMPPRO bindings/perl/MythTV/Version.pm
+echo "Creating bindings/perl/Makefile.PL"
+sed -e "s/@@MYTHTV_VERSION_MAJMIN@@/${MYTHTV_VERSION_MAJMIN}/g" \
+    bindings/perl/Makefile.PL.in > $TMPPRO
+cp_if_changed $TMPPRO bindings/perl/Makefile.PL
 
 echo "Creating bindings/python/setup.cfg"
 sed -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
