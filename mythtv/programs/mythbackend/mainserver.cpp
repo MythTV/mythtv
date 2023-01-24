@@ -2659,6 +2659,35 @@ void MainServer::DoDeleteInDB(DeleteStruct *ds)
     }
 }
 
+bool MainServer::removeDir(const QString &dirname)
+{
+    QDir dir(dirname);
+
+    if (!dir.exists())
+        return false;
+
+    dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+    QFileInfoList list = dir.entryInfoList();
+    QFileInfoList::const_iterator it = list.begin();
+    const QFileInfo *fi;
+
+    while (it != list.end())
+    {
+        fi = &(*it++);
+        if (fi->isFile() && !fi->isSymLink())
+        {
+            QFile::remove(fi->absoluteFilePath());
+        }
+        else if (fi->isDir() && !fi->isSymLink())
+        {
+            if(!removeDir(fi->absoluteFilePath())) return false;
+        }
+    }
+
+    dir.rmdir(dirname);
+	return true;
+}
+
 /**
  *  \brief Deletes links and unlinks the main file and returns the descriptor.
  *
@@ -2710,7 +2739,7 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks,
             return -2; // valid result, not an error condition
     }
 
-    if (fd < 0)
+    if (fd < 0 && errno != EISDIR)
         LOG(VB_GENERAL, LOG_ERR, LOC + errmsg + ENO);
 
     return fd;
@@ -2733,11 +2762,21 @@ int MainServer::OpenAndUnlink(const QString &filename)
 
     if (fd == -1)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + msg + " could not open " + ENO);
-        return -1;
+        if (errno == EISDIR)
+        {
+            if(!removeDir(filename))
+            {
+                LOG(VB_GENERAL, LOG_ERR, msg + " could not delete directory " + ENO);
+                return -1;
+            }
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, msg + " could not open " + ENO);
+            return -1;
+        }
     }
-
-    if (unlink(fname.constData()))
+    else if (unlink(fname.constData()))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + msg + " could not unlink " + ENO);
         close(fd);
