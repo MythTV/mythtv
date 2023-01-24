@@ -7528,7 +7528,7 @@ sed -e "s/@MYTHTV_BINARY_VERSION@/${MYTHTV_BINARY_VERSION}/g" \
 cp_if_changed $TMPH libs/libmythbase/mythversion.h
 
 echo "Creating bindings/perl/Makefile.PL"
-sed -e "s/@@MYTHTV_VERSION_MAJMIN@@/${MYTHTV_VERSION_MAJMIN}/g" \
+sed -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
     bindings/perl/Makefile.PL.in > $TMPPRO
 cp_if_changed $TMPPRO bindings/perl/Makefile.PL
 

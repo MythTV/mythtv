@@ -8,7 +8,7 @@
 #
 
 # Version
-    $VERSION = '@MYTHTV_VERSION_MAJMIN@';
+    $VERSION = '%MYTHTV_VERSION_MAJMIN%';
 
 # Load sub libraries
     use IO::Socket::INET::MythTV;
