@@ -317,6 +317,7 @@ def buildEpisode(args, opts):
     from lxml import etree
     from MythTV.tmdb3 import searchSeries
     from MythTV import datetime
+    from datetime import timedelta
 
     if query.isnumeric():
         inetref = query
@@ -346,7 +347,15 @@ def buildEpisode(args, opts):
         try:
             # The database provides air_date, but not air_time,
             # so extract the date part of the timestamp.
-            timeStampDate = datetime.strptime(subtitle, "%Y-%m-%d %H:%M:%S").date()
+            dtInLocalZone = datetime.strptime(subtitle, "%Y-%m-%d %H:%M:%S")
+            # To ensure that the episode airdates are in line with
+            # the dates used by TV guides and listings worldwide,
+            # episodes that start airing at or after midnight but
+            # before 5:00am are considered part of the previous day.
+            if dtInLocalZone.hour < 5:
+                timeStampDate = (dtInLocalZone - timedelta(days=1)).date()
+            else:
+                timeStampDate = dtInLocalZone.date()
         except ValueError:
             timeStampDate = None
     else:
