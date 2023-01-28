@@ -27,7 +27,6 @@ class DeleteThread : public QObject, public MThread
     void Stop(void)         { m_run = false; }
 
   private:
-    bool removeDir(const QString &dirname);
     void ProcessNew(void);
     void ProcessOld(void);
 

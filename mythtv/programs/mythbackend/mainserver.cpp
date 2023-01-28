@@ -2659,35 +2659,6 @@ void MainServer::DoDeleteInDB(DeleteStruct *ds)
     }
 }
 
-bool MainServer::removeDir(const QString &dirname)
-{
-    QDir dir(dirname);
-
-    if (!dir.exists())
-        return false;
-
-    dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
-    QFileInfoList list = dir.entryInfoList();
-    QFileInfoList::const_iterator it = list.begin();
-    const QFileInfo *fi;
-
-    while (it != list.end())
-    {
-        fi = &(*it++);
-        if (fi->isFile() && !fi->isSymLink())
-        {
-            QFile::remove(fi->absoluteFilePath());
-        }
-        else if (fi->isDir() && !fi->isSymLink())
-        {
-            if(!removeDir(fi->absoluteFilePath())) return false;
-        }
-    }
-
-    dir.rmdir(dirname);
-	return true;
-}
-
 /**
  *  \brief Deletes links and unlinks the main file and returns the descriptor.
  *
@@ -2764,7 +2735,8 @@ int MainServer::OpenAndUnlink(const QString &filename)
     {
         if (errno == EISDIR)
         {
-            if(!removeDir(filename))
+            QDir dir(filename);
+            if(MythRemoveDirectory(dir))
             {
                 LOG(VB_GENERAL, LOG_ERR, msg + " could not delete directory " + ENO);
                 return -1;
