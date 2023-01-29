@@ -6621,7 +6621,7 @@ Station: %1 - Sender: %2</translation>
     <message>
         <location filename="../mythmusic/visualize.cpp" line="841"/>
         <source>WaveForm</source>
-        <translation type="unfinished"></translation>
+        <translation>WaveForm</translation>
     </message>
     <message>
         <location filename="../mythmusic/visualize.cpp" line="1072"/>

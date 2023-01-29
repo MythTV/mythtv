@@ -1070,17 +1070,17 @@
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="379"/>
         <source>Soap/Melodrama/Folkloric</source>
-        <translation type="unfinished"></translation>
+        <translation>Seifenoper/Melodrama/Folklore</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="394"/>
         <source>News/Weather Report</source>
-        <translation type="unfinished"></translation>
+        <translation>Nachrichten/Wetterbericht</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="396"/>
         <source>News Magazine</source>
-        <translation type="unfinished"></translation>
+        <translation>Nachrichtenmagazin</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="400"/>
@@ -1270,12 +1270,12 @@
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="489"/>
         <source>Social/Political/Economics</source>
-        <translation type="unfinished"></translation>
+        <translation>Soziales/Politik/Wirtschaft</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="500"/>
         <source>Nature/Animals/Environment</source>
-        <translation type="unfinished"></translation>
+        <translation>Natur/Tiere/Umwelt</translation>
     </message>
     <message>
         <source>Social/Policical/Economics</source>
@@ -2667,12 +2667,12 @@ Prüfen Sie, ob die Videodatei existiert</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4724"/>
         <source>Select from Channel Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Aus Sendergruppe wählen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4733"/>
         <source>Select the channel group to select channels from. &quot;All Channels&quot; lets you choose from all channels of all video sources. &quot;Priority&quot; lets you choose from all channels that have recording priority. The other values let you select a video source to choose channels from.</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswahl der Sendergruppe um Sender zu wählen. &quot;Alle Sender&quot; ermöglicht Auswahl aller Sender aus allen Videoquellen. &quot;Priorität&quot; ermöglicht Auswahl von allen Sendern mit Aufnahmepriorität. Andere Werte ermöglichen Auswahl von Sendern der jeweiligen Videoquelle.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1519"/>
@@ -4102,7 +4102,7 @@ Gerät unterstützt bis zu %1</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4764"/>
         <source>Favorites</source>
-        <translation type="unfinished">Favoriten</translation>
+        <translation>Favoriten</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4944"/>
@@ -5881,7 +5881,7 @@ Ein leeres Passwort schaltet den Schutz ab. Berechtigung besteht bis die Galerie
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="590"/>
         <source>Unicable userband ID (0-7). The Unicable userband channels are often numbered starting at 1 but MythTV starts at 0.</source>
-        <translation type="unfinished"></translation>
+        <translation>Unicable Userband-ID (0-7). Unicable Userband-Sender werden oft von 1 an nummeriert, MythTV jedoch beginnt mit 0.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="705"/>
@@ -16233,7 +16233,7 @@ name cannot be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1767"/>
         <source>Clear last played position and exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Letzte Abspielposition löschen und beenden</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1774"/>
@@ -23795,7 +23795,7 @@ Die meisten DVB-S Transponder senden mit einer Symbolrate von 27,5 Millionen.</t
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2849"/>
         <source>This name is displayed on screen when Live TV begins and in various other places.  Make sure the last two characters are unique for each input or use a slash (&apos;/&apos;) to designate the unique portion.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieser Name wird angezeigt wenn LiveTV startet sowie an verschiedenen anderen Stellen. Die letzten beiden Buchstaben müssen eindeutig für jeden Eingang sein, der eindeutige Teil kann durch einen Schrägstrich (&apos;/&apos;) markiert werden.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2946"/>
@@ -24659,12 +24659,12 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="4061"/>
         <source>DiSEqC position</source>
-        <translation type="unfinished"></translation>
+        <translation>DiSEqC-Position</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="4062"/>
         <source>Position of the LNB on the DiSEqC switch. Leave at 1 if there is no DiSEqC switch and the LNB is directly connected to the SatIP server. This value is used as signal source (attribute src) in the SatIP tune command.</source>
-        <translation type="unfinished"></translation>
+        <translation>Position des LNB auf dem DiSEqC-Switch. Auf 1 belassen wenn kein DiSEqC-Switch vorhanden und der LNB direkt mit dem SatIP-Server verbunden ist. Wird als Signalquelle (attribute src) im SatIP-Tune-Kommando verwendet.</translation>
     </message>
     <message>
         <source>This name is displayed on screen when Live TV begins and in various other places.  Make sure the last two characters are unique for each input.</source>
@@ -38343,7 +38343,7 @@ Regie: |DIRECTOR%</translation>
     <message>
         <location filename="../themes/themestrings.h" line="220"/>
         <source>%startdate%, %starttime%</source>
-        <translation type="unfinished"></translation>
+        <translation>%startdate%, %starttime%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="223"/>
