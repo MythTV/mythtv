@@ -215,9 +215,9 @@ void strings_null() {
     ThemeUI::tr("%shortstarttimedate% | %titlesubtitle%");
     ThemeUI::tr("%shortstarttimedate% | %titlesubtitle% | %channel%");
     ThemeUI::tr("%startdate%% - |00x00%\n%title%");
-    ThemeUI::tr("%startdate%%| startyear%, %starttime%");
     ThemeUI::tr("%startdate%%| year%");
     ThemeUI::tr("%startdate%%| year%, %starttime% - %endtime% (%lenmins%)");
+    ThemeUI::tr("%startdate%, %starttime%");
     ThemeUI::tr("%startdate|, %%starttime%");
     ThemeUI::tr("%startdate|, %%starttime%% - |endtime%");
     ThemeUI::tr("%station% - %channel%");
