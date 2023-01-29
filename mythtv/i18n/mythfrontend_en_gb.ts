@@ -874,17 +874,17 @@
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="379"/>
         <source>Soap/Melodrama/Folkloric</source>
-        <translation type="unfinished"></translation>
+        <translation>Soap/Melodrama/Folklore</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="394"/>
         <source>News/Weather Report</source>
-        <translation type="unfinished"></translation>
+        <translation>News/Weather Report</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="396"/>
         <source>News Magazine</source>
-        <translation type="unfinished"></translation>
+        <translation>News Magazine</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="400"/>
@@ -1074,12 +1074,12 @@
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="489"/>
         <source>Social/Political/Economics</source>
-        <translation type="unfinished"></translation>
+        <translation>Social/Political/Economics</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="500"/>
         <source>Nature/Animals/Environment</source>
-        <translation type="unfinished"></translation>
+        <translation>Nature/Animals/Environment</translation>
     </message>
     <message>
         <source>Social/Policical/Economics</source>
@@ -2354,12 +2354,12 @@ Check if the video exists</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4724"/>
         <source>Select from Channel Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Select from Channel Group</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4733"/>
         <source>Select the channel group to select channels from. &quot;All Channels&quot; lets you choose from all channels of all video sources. &quot;Priority&quot; lets you choose from all channels that have recording priority. The other values let you select a video source to choose channels from.</source>
-        <translation type="unfinished"></translation>
+        <translation>Select the channel group to select channels from. &quot;All Channels&quot; lets you choose from all channels of all video sources. &quot;Priority&quot; lets you choose from all channels that have recording priority. The other values let you select a video source to choose channels from.</translation>
     </message>
 </context>
 <context>
@@ -3375,7 +3375,7 @@ Device supports up to %1</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4764"/>
         <source>Favorites</source>
-        <translation type="unfinished">Favourites</translation>
+        <translation>Favourites</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4944"/>
@@ -4853,7 +4853,7 @@ Device supports up to %1</translation>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="590"/>
         <source>Unicable userband ID (0-7). The Unicable userband channels are often numbered starting at 1 but MythTV starts at 0.</source>
-        <translation type="unfinished"></translation>
+        <translation>Unicable userband ID (0-7). The Unicable userband channels are often numbered starting at 1 but MythTV starts at 0.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="705"/>
@@ -14243,7 +14243,7 @@ name cannot be blank.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1767"/>
         <source>Clear last played position and exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Clear last played position and exit</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1774"/>
@@ -17149,7 +17149,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2849"/>
         <source>This name is displayed on screen when Live TV begins and in various other places.  Make sure the last two characters are unique for each input or use a slash (&apos;/&apos;) to designate the unique portion.</source>
-        <translation type="unfinished"></translation>
+        <translation>This name is displayed on screen when Live TV begins and in various other places.  Make sure the last two characters are unique for each input or use a slash (&apos;/&apos;) to designate the unique portion.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2879"/>
@@ -18132,12 +18132,12 @@ Most DVB-S transponders transmit at 27.5 million symbols per second.</translatio
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="4061"/>
         <source>DiSEqC position</source>
-        <translation type="unfinished"></translation>
+        <translation>DiSEqC position</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="4062"/>
         <source>Position of the LNB on the DiSEqC switch. Leave at 1 if there is no DiSEqC switch and the LNB is directly connected to the SatIP server. This value is used as signal source (attribute src) in the SatIP tune command.</source>
-        <translation type="unfinished"></translation>
+        <translation>Position of the LNB on the DiSEqC switch. Leave at 1 if there is no DiSEqC switch and the LNB is directly connected to the SatIP server. This value is used as signal source (attribute src) in the SatIP tune command.</translation>
     </message>
     <message>
         <source>This name is displayed on screen when Live TV begins and in various other places.  Make sure the last two characters are unique for each input.</source>
@@ -24166,9 +24166,8 @@ Do you wish to continue watching?</translation>
         <translation>Select Time &amp; Date</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="218"/>
         <source>%startdate%%| startyear%, %starttime%</source>
-        <translation>%startdate%%| startyear%, %starttime%</translation>
+        <translation type="vanished">%startdate%%| startyear%, %starttime%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2212"/>
@@ -25769,14 +25768,19 @@ Do you wish to continue watching?</translation>
 %title%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="219"/>
+        <location filename="../themes/themestrings.h" line="218"/>
         <source>%startdate%%| year%</source>
         <translation>%startdate%%| year%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="220"/>
+        <location filename="../themes/themestrings.h" line="219"/>
         <source>%startdate%%| year%, %starttime% - %endtime% (%lenmins%)</source>
         <translation>%startdate%%| year%, %starttime% - %endtime% (%lenmins%)</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="220"/>
+        <source>%startdate%, %starttime%</source>
+        <translation>%startdate%, %starttime%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="223"/>
