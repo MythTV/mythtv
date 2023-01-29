@@ -4,7 +4,7 @@
 <context>
     <name>(ArchiveUtils)</name>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="74"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="52"/>
         <source>Cannot find the MythArchive work directory.
 Have you set the correct path in the settings?</source>
         <translation>Ne peut trouver le répertoire de travail de MythArchive.
@@ -14,19 +14,19 @@ Avez-vous placé un chemin correct dans les réglages ?</translation>
 <context>
     <name>(MythArchiveMain)</name>
     <message>
-        <location filename="../mytharchive/main.cpp" line="92"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="92"/>
         <source>Found a lock file but the owning process isn&apos;t running!
 Removing stale lock file.</source>
         <translation>Un fichier verrou a été trouvé mais le processus propriétaire n&apos;est pas en cours d&apos;exécution! 
 Suppression du fichier verrou.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="203"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="203"/>
         <source>Last run did not create a playable DVD.</source>
         <translation>La dernière exécution n&apos;a pas créée un DVD jouable.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="210"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="210"/>
         <source>Last run failed to create a DVD.</source>
         <translation>La dernière demande de création d&apos;un DVD a échouée.</translation>
     </message>
@@ -397,36 +397,36 @@ Suppression du fichier verrou.</translation>
 <context>
     <name>BurnMenu</name>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1093"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1092"/>
         <source>Cannot burn a DVD.
 The last run failed to create a DVD.</source>
         <translation>Ne peut graver un DVD.
 La dernière demande de création d&apos;un DVD a échouée.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1099"/>
-        <location filename="../mytharchive/mythburn.cpp" line="1111"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1098"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1110"/>
         <source>Burn DVD</source>
         <translation>Graver un DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1100"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1099"/>
         <source>
 Place a blank DVD in the drive and select an option below.</source>
         <translation>Placez un DVD vierge dans le lecteur et sélectionnez une option ci-dessous.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1112"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1111"/>
         <source>Burn DVD Rewritable</source>
         <translation>Graver un DVD réinscriptible</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1113"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1112"/>
         <source>Burn DVD Rewritable (Force Erase)</source>
         <translation>Graver un DVD réinscriptible (forcer l&apos;effacement)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1167"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1166"/>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
         <translation>Il n&apos;a pas été possible d&apos;exécuter &quot;mytharchivehelper&quot; pour graver le DVD.</translation>
     </message>
@@ -501,27 +501,27 @@ Place a blank DVD in the drive and select an option below.</source>
 <context>
     <name>ExportNative</name>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="197"/>
+        <location filename="../mytharchive/exportnative.cpp" line="198"/>
         <source>You need to add at least one item to archive!</source>
         <translation>Vous devez ajouter au moins un élément à l&apos;archive !</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="349"/>
+        <location filename="../mytharchive/exportnative.cpp" line="350"/>
         <source>Remove Item</source>
         <translation>Supprimer l&apos;élément</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="441"/>
+        <location filename="../mytharchive/exportnative.cpp" line="442"/>
         <source>It was not possible to create the DVD. An error occured when running the scripts</source>
         <translation>Il n&apos;a pas été possible de créer le DVD. Une erreur est survenue lors de l&apos;exécution des scripts</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="477"/>
+        <location filename="../mytharchive/exportnative.cpp" line="478"/>
         <source>You don&apos;t have any videos!</source>
         <translation>Vous n&apos;avez aucune vidéo !</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="342"/>
+        <location filename="../mytharchive/exportnative.cpp" line="343"/>
         <source>Menu</source>
         <translation>Menu</translation>
     </message>
@@ -529,22 +529,22 @@ Place a blank DVD in the drive and select an option below.</source>
 <context>
     <name>FileSelector</name>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="283"/>
+        <location filename="../mytharchive/fileselector.cpp" line="280"/>
         <source>The selected item is not a directory!</source>
         <translation>L&apos;élément sélectionné n&apos;est pas un répertoire !</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="64"/>
+        <location filename="../mytharchive/fileselector.cpp" line="61"/>
         <source>Find File</source>
         <translation>Rechercher un fichier</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="67"/>
+        <location filename="../mytharchive/fileselector.cpp" line="64"/>
         <source>Find Directory</source>
         <translation>Rechercher un répertoire</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="70"/>
+        <location filename="../mytharchive/fileselector.cpp" line="67"/>
         <source>Find Files</source>
         <translation>Rechercher des fichiers</translation>
     </message>
@@ -585,39 +585,39 @@ Place a blank DVD in the drive and select an option below.</source>
 <context>
     <name>LogViewer</name>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="349"/>
+        <location filename="../mytharchive/logviewer.cpp" line="340"/>
         <source>Show Progress Log</source>
         <translation>Afficher le journal de progression</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="350"/>
+        <location filename="../mytharchive/logviewer.cpp" line="341"/>
         <source>Show Full Log</source>
         <translation>Afficher le journal complet</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="345"/>
+        <location filename="../mytharchive/logviewer.cpp" line="336"/>
         <source>Don&apos;t Auto Update</source>
         <translation>Pas de mise à jour automatique</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="76"/>
+        <location filename="../mytharchive/logviewer.cpp" line="75"/>
         <source>Cannot find any logs to show!</source>
         <translation>Aucun journal à afficher !</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="198"/>
+        <location filename="../mytharchive/logviewer.cpp" line="189"/>
         <source>Background creation has been asked to stop.
 This may take a few minutes.</source>
         <translation>Une interruption de la tâche de création en arrière-plan a été demandée. 
 Veuillez patienter quelques minutes.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="347"/>
+        <location filename="../mytharchive/logviewer.cpp" line="338"/>
         <source>Auto Update</source>
         <translation>Mise à jour automatique</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="337"/>
+        <location filename="../mytharchive/logviewer.cpp" line="328"/>
         <source>Menu</source>
         <translation>Menu</translation>
     </message>
@@ -625,80 +625,80 @@ Veuillez patienter quelques minutes.</translation>
 <context>
     <name>MythBurn</name>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="330"/>
-        <location filename="../mytharchive/mythburn.cpp" line="450"/>
+        <location filename="../mytharchive/mythburn.cpp" line="329"/>
+        <location filename="../mytharchive/mythburn.cpp" line="449"/>
         <source>No Cut List</source>
         <translation>Pas de liste de coupes</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="341"/>
+        <location filename="../mytharchive/mythburn.cpp" line="340"/>
         <source>You need to add at least one item to archive!</source>
         <translation>Vous devez ajouter au moins un élément à l&apos;archive !</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="387"/>
+        <location filename="../mytharchive/mythburn.cpp" line="386"/>
         <source>Retrieving File Information. Please Wait...</source>
         <translation>Récupération des informations sur le fichier. Veuillez patienter...</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="453"/>
+        <location filename="../mytharchive/mythburn.cpp" line="452"/>
         <source>Encoder: </source>
         <translation>Encodeur : </translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="319"/>
-        <location filename="../mytharchive/mythburn.cpp" line="439"/>
+        <location filename="../mytharchive/mythburn.cpp" line="318"/>
+        <location filename="../mytharchive/mythburn.cpp" line="438"/>
         <source>Using Cut List</source>
         <translation>Utilise une liste de coupes</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="324"/>
-        <location filename="../mytharchive/mythburn.cpp" line="444"/>
+        <location filename="../mytharchive/mythburn.cpp" line="323"/>
+        <location filename="../mytharchive/mythburn.cpp" line="443"/>
         <source>Not Using Cut List</source>
         <translation>N&apos;utilise pas de liste de coupes</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="776"/>
+        <location filename="../mytharchive/mythburn.cpp" line="775"/>
         <source>Don&apos;t Use Cut List</source>
         <translation>Ne pas utiliser de liste de coupes</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="781"/>
+        <location filename="../mytharchive/mythburn.cpp" line="780"/>
         <source>Use Cut List</source>
         <translation>Utiliser une liste de coupes</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="786"/>
+        <location filename="../mytharchive/mythburn.cpp" line="785"/>
         <source>Remove Item</source>
         <translation>Supprimer l&apos;élément</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="787"/>
+        <location filename="../mytharchive/mythburn.cpp" line="786"/>
         <source>Edit Details</source>
         <translation>Éditer les détails</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="788"/>
+        <location filename="../mytharchive/mythburn.cpp" line="787"/>
         <source>Change Encoding Profile</source>
         <translation>Modifier le profil d&apos;encodage</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="789"/>
+        <location filename="../mytharchive/mythburn.cpp" line="788"/>
         <source>Edit Thumbnails</source>
         <translation>Éditer les miniatures</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="924"/>
+        <location filename="../mytharchive/mythburn.cpp" line="923"/>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
         <translation>Il n&apos;a pas été possible de créer le DVD.  Une erreur est apparue lors de l&apos;exécution des scripts</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="966"/>
+        <location filename="../mytharchive/mythburn.cpp" line="965"/>
         <source>You don&apos;t have any videos!</source>
         <translation>Vous n&apos;avez aucune vidéo !</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="765"/>
+        <location filename="../mytharchive/mythburn.cpp" line="764"/>
         <source>Menu</source>
         <translation>Menu</translation>
     </message>
@@ -706,37 +706,37 @@ Veuillez patienter quelques minutes.</translation>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mytharchive/main.cpp" line="323"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="323"/>
         <source>Toggle use cut list state for selected program</source>
         <translation>Utiliser la liste de coupure pour le programme sélectionné</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="326"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="326"/>
         <source>Create DVD</source>
         <translation>Créer un DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="328"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="328"/>
         <source>Create Archive</source>
         <translation>Créer une archive</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="330"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="330"/>
         <source>Import Archive</source>
         <translation>Importer une archive</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="332"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="332"/>
         <source>View Archive Log</source>
         <translation>Afficher le journal du menu archive</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="334"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="334"/>
         <source>Play Created DVD</source>
         <translation>Lire un DVD créé</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="336"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="336"/>
         <source>Burn DVD</source>
         <translation>Graver un DVD</translation>
     </message>
@@ -744,36 +744,36 @@ Veuillez patienter quelques minutes.</translation>
 <context>
     <name>RecordingSelector</name>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="109"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="110"/>
         <source>Retrieving Recording List.
 Please Wait...</source>
         <translation>Récupère la liste des enregistrements.
 Veuillez patienter...</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="188"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="189"/>
         <source>Clear All</source>
         <translation>Supprimer la sélection</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="189"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="190"/>
         <source>Select All</source>
         <translation>Tout sélectionner</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="88"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="373"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="478"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="89"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="374"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="479"/>
         <source>All Recordings</source>
         <translation>Tous les enregistrements</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="133"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="134"/>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
         <translation>Vous n&apos;avez aucun enregistrement ou aucun d&apos;eux n&apos;est disponible localement !</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="181"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="182"/>
         <source>Menu</source>
         <translation>Menu</translation>
     </message>
@@ -781,48 +781,48 @@ Veuillez patienter...</translation>
 <context>
     <name>SelectDestination</name>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="30"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="29"/>
         <source>Single Layer DVD</source>
         <translation>DVD simple couche</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="34"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="33"/>
         <source>Dual Layer DVD</source>
         <translation>DVD double couche</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="31"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="30"/>
         <source>Single Layer DVD (4,482 MB)</source>
         <translation>DVD simple couche (4 482 Mo)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="35"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="34"/>
         <source>Dual Layer DVD (8,964 MB)</source>
         <translation>DVD double couches (8 964 Mo)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="38"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="37"/>
         <source>DVD +/- RW</source>
         <translation>DVD RW+/-</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="39"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="38"/>
         <source>Rewritable DVD</source>
         <translation>DVD ré-inscriptible</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="42"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="41"/>
         <source>File</source>
         <translation>Fichier</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="43"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="42"/>
         <source>Any file accessable from your filesystem.</source>
         <translation>Aucun fichier accessible dans votre système de fichier.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/selectdestination.cpp" line="261"/>
-        <location filename="../mytharchive/selectdestination.cpp" line="317"/>
+        <location filename="../mytharchive/selectdestination.cpp" line="262"/>
+        <location filename="../mytharchive/selectdestination.cpp" line="318"/>
         <source>Unknown</source>
         <translation>Inconnu</translation>
     </message>
@@ -2302,17 +2302,17 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="863"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="860"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Sortir, sauvegarder les miniatures</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="864"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="861"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Sortir, ne pas sauvegarder les miniatures</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="856"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="853"/>
         <source>Menu</source>
         <translation>Menu</translation>
     </message>
@@ -2320,28 +2320,28 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
 <context>
     <name>VideoSelector</name>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="147"/>
+        <location filename="../mytharchive/videoselector.cpp" line="148"/>
         <source>Clear All</source>
         <translation>Supprimer la sélection</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="148"/>
+        <location filename="../mytharchive/videoselector.cpp" line="149"/>
         <source>Select All</source>
         <translation>Tout sélectionner</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="330"/>
-        <location filename="../mytharchive/videoselector.cpp" line="496"/>
+        <location filename="../mytharchive/videoselector.cpp" line="331"/>
+        <location filename="../mytharchive/videoselector.cpp" line="497"/>
         <source>All Videos</source>
         <translation>Toutes les vidéos</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="549"/>
+        <location filename="../mytharchive/videoselector.cpp" line="550"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>Vous devez entrer un mot de passe valide pour le contrôle parental</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="140"/>
+        <location filename="../mytharchive/videoselector.cpp" line="141"/>
         <source>Menu</source>
         <translation>Menu</translation>
     </message>

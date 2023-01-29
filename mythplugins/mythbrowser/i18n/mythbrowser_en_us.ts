@@ -181,27 +181,27 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</translation>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="109"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="109"/>
         <source>Move to next browser tab</source>
         <translation>Move to next browser tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="111"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="111"/>
         <source>Move to previous browser tab</source>
         <translation>Move to previous browser tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="114"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="114"/>
         <source>Show the bookmark manager</source>
         <translation>Show the bookmark manager</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="116"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="116"/>
         <source>Show the webbrowser homepage</source>
         <translation>Show the webbrowser homepage</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="119"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="119"/>
         <source>Internal Web Browser</source>
         <translation>Internal Web Browser</translation>
     </message>

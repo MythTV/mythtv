@@ -4,22 +4,22 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="69"/>
+        <location filename="../mythnetvision/mythnetvision.cpp" line="69"/>
         <source>Internet Television Client - Search</source>
         <translation type="unfinished">Cliente de Televisión por Internet - Buscar</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="71"/>
+        <location filename="../mythnetvision/mythnetvision.cpp" line="71"/>
         <source>Internet Television Client - Site/Tree View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="74"/>
+        <location filename="../mythnetvision/mythnetvision.cpp" line="74"/>
         <source>Previous Page</source>
         <translation type="unfinished">Página Anterior</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="76"/>
+        <location filename="../mythnetvision/mythnetvision.cpp" line="76"/>
         <source>Next Page</source>
         <translation type="unfinished">Página Siguiente</translation>
     </message>
@@ -27,28 +27,28 @@
 <context>
     <name>NetBase</name>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="55"/>
+        <location filename="../mythnetvision/netbase.cpp" line="54"/>
         <source>Downloading Video...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="148"/>
+        <location filename="../mythnetvision/netbase.cpp" line="147"/>
         <source>No browser command set! MythNetTree needs MythBrowser installed to display the video.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="185"/>
+        <location filename="../mythnetvision/netbase.cpp" line="184"/>
         <source>Are you sure you want to delete this file?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="246"/>
+        <location filename="../mythnetvision/netbase.cpp" line="245"/>
         <source>Downloading Video...
 (%1 of %2 MB)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="276"/>
+        <location filename="../mythnetvision/netbase.cpp" line="275"/>
         <source>Error downloading video to backend.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -275,7 +275,7 @@
 <context>
     <name>RSSEditor</name>
     <message>
-        <location filename="../mythnetvision/rsseditor.cpp" line="467"/>
+        <location filename="../mythnetvision/rsseditor.cpp" line="468"/>
         <source>Are you sure you want to unsubscribe from this feed?</source>
         <translation>¿Estás seguro que quieres desinscribirte de este canal?</translation>
     </message>

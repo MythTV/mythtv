@@ -181,27 +181,27 @@ Käytä &apos;Lisää kirjainmerkki&apos; valikosta lisätäksesi uusia kirjainm
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="109"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="109"/>
         <source>Move to next browser tab</source>
         <translation>Siirry selaimen seuraavaan välilehteen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="111"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="111"/>
         <source>Move to previous browser tab</source>
         <translation>Siirry selaimen edelliseen välilehteen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="114"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="114"/>
         <source>Show the bookmark manager</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="116"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="116"/>
         <source>Show the webbrowser homepage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="119"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="119"/>
         <source>Internal Web Browser</source>
         <translation>Sisäinen nettiselain</translation>
     </message>

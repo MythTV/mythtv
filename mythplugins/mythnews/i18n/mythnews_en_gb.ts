@@ -4,22 +4,22 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnews/main.cpp" line="42"/>
+        <location filename="../mythnews/libmythnews.cpp" line="42"/>
         <source>RSS News feed reader</source>
         <translation>RSS News feed reader</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="46"/>
+        <location filename="../mythnews/libmythnews.cpp" line="46"/>
         <source>Update news items</source>
         <translation>Update news items</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="48"/>
+        <location filename="../mythnews/libmythnews.cpp" line="48"/>
         <source>Force update news items</source>
         <translation>Force update news items</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="50"/>
+        <location filename="../mythnews/libmythnews.cpp" line="50"/>
         <source>Cancel news item updating</source>
         <translation>Cancel news item updating</translation>
     </message>
@@ -42,32 +42,32 @@
         <translation>Unknown</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="538"/>
+        <location filename="../mythnews/mythnews.cpp" line="515"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>No browser command set! MythNews needs MythBrowser to be installed.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="614"/>
+        <location filename="../mythnews/mythnews.cpp" line="591"/>
         <source>Options</source>
         <translation>Options</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="627"/>
+        <location filename="../mythnews/mythnews.cpp" line="604"/>
         <source>Manage Feeds</source>
         <translation>Manage Feeds</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="628"/>
+        <location filename="../mythnews/mythnews.cpp" line="605"/>
         <source>Add Feed</source>
         <translation>Add Feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="631"/>
+        <location filename="../mythnews/mythnews.cpp" line="608"/>
         <source>Edit Feed</source>
         <translation>Edit Feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="632"/>
+        <location filename="../mythnews/mythnews.cpp" line="609"/>
         <source>Delete Feed</source>
         <translation>Delete Feed</translation>
     </message>

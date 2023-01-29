@@ -4,23 +4,23 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="69"/>
+        <location filename="../mythnetvision/mythnetvision.cpp" line="69"/>
         <source>Internet Television Client - Search</source>
         <translation>Internet TV klient - Søg</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="71"/>
+        <location filename="../mythnetvision/mythnetvision.cpp" line="71"/>
         <source>Internet Television Client - Site/Tree View</source>
         <translatorcomment>&quot;Gennemse&quot; er valgt for at matche menupunkter</translatorcomment>
         <translation>Internet TV klient - Gennemse</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="74"/>
+        <location filename="../mythnetvision/mythnetvision.cpp" line="74"/>
         <source>Previous Page</source>
         <translation type="unfinished">Forrige side</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="76"/>
+        <location filename="../mythnetvision/mythnetvision.cpp" line="76"/>
         <source>Next Page</source>
         <translation type="unfinished">Næste side</translation>
     </message>
@@ -28,29 +28,29 @@
 <context>
     <name>NetBase</name>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="55"/>
+        <location filename="../mythnetvision/netbase.cpp" line="54"/>
         <source>Downloading Video...</source>
         <translation type="unfinished">Downloader video...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="148"/>
+        <location filename="../mythnetvision/netbase.cpp" line="147"/>
         <source>No browser command set! MythNetTree needs MythBrowser installed to display the video.</source>
         <translation type="unfinished">Ingen browser kommando indstillet! MythNetTree skal bruge MythBrowser for at vise videoen.</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="185"/>
+        <location filename="../mythnetvision/netbase.cpp" line="184"/>
         <source>Are you sure you want to delete this file?</source>
         <translation type="unfinished">Er du sikker på at du vil slette denne fil?</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="246"/>
+        <location filename="../mythnetvision/netbase.cpp" line="245"/>
         <source>Downloading Video...
 (%1 of %2 MB)</source>
         <translation type="unfinished">Downloader video...
 (%1 af %2 MB)</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="276"/>
+        <location filename="../mythnetvision/netbase.cpp" line="275"/>
         <source>Error downloading video to backend.</source>
         <translation type="unfinished">Fejl under download af video til backend.</translation>
     </message>
@@ -305,7 +305,7 @@
 <context>
     <name>RSSEditor</name>
     <message>
-        <location filename="../mythnetvision/rsseditor.cpp" line="467"/>
+        <location filename="../mythnetvision/rsseditor.cpp" line="468"/>
         <source>Are you sure you want to unsubscribe from this feed?</source>
         <translation>Er du sikker på at du vil afmelde denne feed?</translation>
     </message>

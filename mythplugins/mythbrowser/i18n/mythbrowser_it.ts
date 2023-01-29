@@ -181,27 +181,27 @@ Usa l&apos;opzione menù &quot;Aggiungi segnalibro&quot; per aggiungere nuovi se
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="109"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="109"/>
         <source>Move to next browser tab</source>
         <translation>Sposta alla successiva scheda del browser</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="111"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="111"/>
         <source>Move to previous browser tab</source>
         <translation>Sposta alla precedente scheda del browser</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="114"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="114"/>
         <source>Show the bookmark manager</source>
         <translation>Mostra Gestore segnalibri</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="116"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="116"/>
         <source>Show the webbrowser homepage</source>
         <translation>Mostra homepage browser web</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="119"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="119"/>
         <source>Internal Web Browser</source>
         <translation>Browser web interno</translation>
     </message>

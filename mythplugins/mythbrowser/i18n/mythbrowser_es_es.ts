@@ -181,27 +181,27 @@ Use la opción &quot;Añadir marcador&quot; del menú para añadir nuevos marcad
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="109"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="109"/>
         <source>Move to next browser tab</source>
         <translation>Ir a la siguiente pestaña</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="111"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="111"/>
         <source>Move to previous browser tab</source>
         <translation>Ir a la pestaña anterior</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="114"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="114"/>
         <source>Show the bookmark manager</source>
         <translation>Mostrar el gestor de favoritos</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="116"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="116"/>
         <source>Show the webbrowser homepage</source>
         <translation>Mostrar la página de inicio del navegador</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="119"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="119"/>
         <source>Internal Web Browser</source>
         <translation>Navegador web interno</translation>
     </message>
