@@ -5570,7 +5570,7 @@ enabled drm && check_cpp_condition drm_fourcc.h 'defined(DRM_FORMAT_MOD_LINEAR)'
 enabled drm && check_type drm_mode.h "struct hdr_metadata_infoframe"
 
 if enabled libmpeg2external; then
-    check_lib libmpeg2external mpeg2dec/mpeg2.h mpeg2_init -lmpeg2 || disable libmpeg2external
+    check_lib libmpeg2external "stdint.h mpeg2dec/mpeg2.h" mpeg2_init -lmpeg2 || disable libmpeg2external
     if disabled libmpeg2external; then
         die "Warning! No suitable external libmpeg2 found, use internal copy."
     fi
