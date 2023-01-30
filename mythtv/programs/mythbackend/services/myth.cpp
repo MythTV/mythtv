@@ -32,9 +32,9 @@
 
 // MythTV
 #include "libmythbase/dbutil.h"
+#include "libmythbase/filesysteminfo.h"
 #include "libmythbase/hardwareprofile.h"
 #include "libmythbase/mythcorecontext.h"
-#include "libmythbase/mythcoreutil.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
@@ -272,11 +272,7 @@ DTC::StorageGroupDirList *Myth::GetStorageGroupDirs( const QString &sGroupName,
     {
         DTC::StorageGroupDir *pStorageGroupDir = pList->AddNewStorageGroupDir();
         QFileInfo fi(query.value(3).toString());
-        int64_t free = 0;
-        int64_t total = 0;
-        int64_t used = 0;
-
-        free = getDiskSpace(query.value(3).toString(), total, used);
+        auto fsInfo = FileSystemInfo(QString(), query.value(3).toString());
 
         pStorageGroupDir->setId            ( query.value(0).toInt()       );
         pStorageGroupDir->setGroupName     ( query.value(1).toString()    );
@@ -284,7 +280,7 @@ DTC::StorageGroupDirList *Myth::GetStorageGroupDirs( const QString &sGroupName,
         pStorageGroupDir->setDirName       ( query.value(3).toString()    );
         pStorageGroupDir->setDirRead       ( fi.isReadable()              );
         pStorageGroupDir->setDirWrite      ( fi.isWritable()              );
-        pStorageGroupDir->setKiBFree       ( free                         );
+        pStorageGroupDir->setKiBFree       ( fsInfo.getFreeSpace()        );
     }
 
     return pList;

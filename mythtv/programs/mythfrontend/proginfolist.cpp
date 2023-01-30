@@ -1,6 +1,5 @@
 
  // MythTV
-#include "libmythbase/mythcoreutil.h"
 #include "libmythbase/mythdate.h"
 
 // MythFrontend

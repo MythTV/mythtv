@@ -5597,7 +5597,7 @@ int Scheduler::FillRecordingDir(
 
 void Scheduler::FillDirectoryInfoCache(void)
 {
-    QList<FileSystemInfo> fsInfos;
+    FileSystemInfoList fsInfos;
 
     m_fsInfoCache.clear();
 
@@ -5605,7 +5605,7 @@ void Scheduler::FillDirectoryInfoCache(void)
         m_mainServer->GetFilesystemInfos(fsInfos, true);
 
     QMap <int, bool> fsMap;
-    QList<FileSystemInfo>::iterator it1;
+    FileSystemInfoList::iterator it1;
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
     {
         fsMap[it1->getFSysID()] = true;
