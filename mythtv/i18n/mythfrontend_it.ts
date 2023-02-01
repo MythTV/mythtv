@@ -1791,7 +1791,7 @@
     <message>
         <location filename="../libs/libmythtv/recorders/signalmonitor.cpp" line="246"/>
         <source>Signal Power</source>
-        <translation>Int. segnale</translation>
+        <translation>Liv. segnale</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recorders/signalmonitor.cpp" line="248"/>
@@ -2590,12 +2590,12 @@ Controlla se il video esiste</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4724"/>
         <source>Select from Channel Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleziona dal Gruppo Canali</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4733"/>
         <source>Select the channel group to select channels from. &quot;All Channels&quot; lets you choose from all channels of all video sources. &quot;Priority&quot; lets you choose from all channels that have recording priority. The other values let you select a video source to choose channels from.</source>
-        <translation type="unfinished"></translation>
+        <translation>Scegli il Gruppo dal quale selezionare i Canali. &quot;Tutti i Canali&quot; ti permette di scegliere da tutti i canali di tutte le sorgenti video. &quot;Priorità&quot; ti permette di scegliere da tutti i canali che hanno priorità di registrazione. Gli altri valori ti consentono di selezionare una sorgente video da cui scegliere i canali.</translation>
     </message>
 </context>
 <context>
@@ -5156,7 +5156,7 @@ Dispositivo supporta fino a %1</translation>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="590"/>
         <source>Unicable userband ID (0-7). The Unicable userband channels are often numbered starting at 1 but MythTV starts at 0.</source>
-        <translation type="unfinished"></translation>
+        <translation>ID banda Unicable (0-7). Le bande utente dei canali Unicable sono spesso numerate partendo da 1 ma Mythtv parte da 0.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="705"/>
@@ -9964,27 +9964,27 @@ Attendere...</translation>
     <message>
         <location filename="../libs/libmyth/mythmediamonitor.cpp" line="892"/>
         <source>Select a CD drive</source>
-        <translation>Seleziona un lettore CD</translation>
+        <translation>Seleziona lettore CD</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythmediamonitor.cpp" line="901"/>
         <source>Select a VCD drive</source>
-        <translation>Seleziona un lettore VCD</translation>
+        <translation>Seleziona lettore VCD</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythmediamonitor.cpp" line="910"/>
         <source>Select a DVD drive</source>
-        <translation>Seleziona un lettore DVD</translation>
+        <translation>Seleziona lettore DVD</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythmediamonitor.cpp" line="931"/>
         <source>Select a DVD writer</source>
-        <translation>Seleziona un masterizzatore DVD</translation>
+        <translation>Seleziona masterizzatore DVD</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythmediamonitor.cpp" line="919"/>
         <source>Select a CD writer</source>
-        <translation>Seleziona un masterizzatore CD</translation>
+        <translation>Seleziona masterizzatore CD</translation>
     </message>
 </context>
 <context>
@@ -11068,7 +11068,7 @@ Attendere...</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="894"/>
         <source>Discard 3D Side by Side</source>
-        <translation>Abbandona 3D fianco a fianco</translation>
+        <translation>Scarta 3D Fianco a Fianco</translation>
     </message>
     <message>
         <source>3D Top and Bottom</source>
@@ -11077,7 +11077,7 @@ Attendere...</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="896"/>
         <source>Discard 3D Top and Bottom</source>
-        <translation>Abbandona 3D alto e basso</translation>
+        <translation>Scarta 3D Alto e Basso</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="819"/>
@@ -11093,7 +11093,7 @@ Attendere...</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="508"/>
         <source>Switch Recording Input view</source>
-        <translation>Commuta vista ingresso Registrazioni</translation>
+        <translation>Cambia visione Ingresso Registrazione</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="516"/>
@@ -11113,12 +11113,12 @@ Attendere...</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="581"/>
         <source>Fast Forward (Sticky) or Forward one second while paused</source>
-        <translation>Avanzamento veloce (permanente) o avanza un secondo quando in pausa</translation>
+        <translation>Avanzamento veloce (permanente) o avanza di un secondo se in pausa</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="583"/>
         <source>Rewind (Sticky) or Rewind one second while paused</source>
-        <translation>Riavvolgimento (permanente) o riavvolge un secondo quando in pausa</translation>
+        <translation>Riavvolgimento (permanente) o arretra di un secondo se in pausa</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="734"/>
@@ -14522,7 +14522,7 @@ Vuo veramentei eliminare:</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="138"/>
         <source>Use FFmpeg&apos;s original MPEG-TS demuxer</source>
-        <translation>Usa demultiplatore originale MPEG-TS di FFmpeg</translation>
+        <translation>Usa demuxer originale MPEG-TS di FFmpeg</translation>
     </message>
     <message>
         <source>Experimental: Enable this setting to use FFmpeg&apos;s native demuxer. Things will be broken.</source>
@@ -14823,7 +14823,7 @@ non può essere vuoto.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1767"/>
         <source>Clear last played position and exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Cancella l&apos;ultima posizione e esci.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1774"/>
@@ -17524,7 +17524,7 @@ La maggior parte delle schede ora può rilevarla automaticamente, per cui lascia
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2849"/>
         <source>This name is displayed on screen when Live TV begins and in various other places.  Make sure the last two characters are unique for each input or use a slash (&apos;/&apos;) to designate the unique portion.</source>
-        <translation type="unfinished"></translation>
+        <translation>Questo nome è visualizzato in DirettaTV e in altri posti. Assicurati che gli ultimi due caratteri di ogni ingresso siano univoci o usa una barra (/) per stabilire la parte univoca</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2879"/>
@@ -17549,12 +17549,12 @@ La maggior parte delle schede ora può rilevarla automaticamente, per cui lascia
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="4061"/>
         <source>DiSEqC position</source>
-        <translation type="unfinished"></translation>
+        <translation>Posizione DiSEqC</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="4062"/>
         <source>Position of the LNB on the DiSEqC switch. Leave at 1 if there is no DiSEqC switch and the LNB is directly connected to the SatIP server. This value is used as signal source (attribute src) in the SatIP tune command.</source>
-        <translation type="unfinished"></translation>
+        <translation>Posizione del LNB sullo switch DiSEqC. Lascia a 1 se non c&apos;è nessuno switch DiSEqC e il LNB è direttamente connesso al server SatIP. Questo valore è usato come sorgente del segnale (attributo SRC) nel comando sintonia del SatIP</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.h" line="886"/>
@@ -17786,22 +17786,22 @@ La maggior parte delle schede ora può rilevarla automaticamente, per cui lascia
     <message>
         <location filename="../libs/libmythbase/recordingtypes.cpp" line="30"/>
         <source>Single Record</source>
-        <translation>Registr.singola</translation>
+        <translation type="unfinished">Registr.Singola</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/recordingtypes.cpp" line="34"/>
         <source>Record One</source>
-        <translation>Registrane uno</translation>
+        <translation>Registra uno</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/recordingtypes.cpp" line="36"/>
         <source>Record Daily</source>
-        <translation>Registra quotidianamente</translation>
+        <translation>Registra ogni giorno</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/recordingtypes.cpp" line="38"/>
         <source>Record Weekly</source>
-        <translation>Registra settimanalmente</translation>
+        <translation>Registra ogni settimana</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/recordingtypes.cpp" line="43"/>
@@ -18753,7 +18753,7 @@ La maggior parte dei transponder DVB-S trasmette a 27,5 milioni di simboli al se
     <message>
         <location filename="../libs/libmythbase/recordingstatus.cpp" line="173"/>
         <source>Recorder Failed</source>
-        <translation>Il registratore ha fallito</translation>
+        <translation type="unfinished">Registraz.Fallita</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="366"/>
@@ -19481,7 +19481,7 @@ Il Grabber non fornisce i numeri dei canali, quindi devi impostarlo manualmente.
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="177"/>
         <source>Discard 3D Top and Bottom</source>
-        <translation>Scarta 3D Alto e Basso</translation>
+        <translation>Scarta 3D Superiore e Inferiore</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="202"/>
@@ -29473,7 +29473,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1818"/>
         <source>Signal Strength</source>
-        <translation>Int. segnale</translation>
+        <translation>Liv. segnale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1819"/>
@@ -30490,7 +30490,7 @@ Una volta completate le modifiche, premi il pulsante &quot;OK&quot;.</translatio
     <message>
         <location filename="../themes/themestrings.h" line="1642"/>
         <source>Screen Setup Wizards</source>
-        <translation>Imp. guidata schermo</translation>
+        <translation>Imp. schermo assist.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="641"/>
@@ -32012,7 +32012,7 @@ Regista: |DIRECTOR%</translation>
     <message>
         <location filename="../themes/themestrings.h" line="2176"/>
         <source>Watchlist</source>
-        <translation>Lista di controllo</translation>
+        <translation>Lista preferiti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2184"/>
@@ -32022,7 +32022,7 @@ Regista: |DIRECTOR%</translation>
     <message>
         <location filename="../themes/themestrings.h" line="1863"/>
         <source>Start surfing from your selected homepage</source>
-        <translation>Avvia la navigazione dall&apos;homepage selezionata</translation>
+        <translation>Inizia a navigare dalla pagina selezionata</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="494"/>
@@ -34555,7 +34555,7 @@ Se si seleziona &quot;Usa riproduttore predefinito&quot; il riproduttore del let
     <message>
         <location filename="../themes/themestrings.h" line="2154"/>
         <source>Watch List</source>
-        <translation>In evidenza</translation>
+        <translation>Lista Favoriti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2158"/>

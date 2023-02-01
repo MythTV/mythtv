@@ -4776,7 +4776,7 @@ Broadcaster:%1 - canale:%2</translation>
     <message>
         <location filename="../mythmusic/visualize.cpp" line="841"/>
         <source>WaveForm</source>
-        <translation type="unfinished"></translation>
+        <translation>Forma d&apos;onda</translation>
     </message>
     <message>
         <location filename="../mythmusic/visualize.cpp" line="1072"/>

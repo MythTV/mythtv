@@ -396,14 +396,14 @@ Rimuovo lo stato di blocco del file.</translation>
         <location filename="../mytharchive/mythburn.cpp" line="1092"/>
         <source>Cannot burn a DVD.
 The last run failed to create a DVD.</source>
-        <translation>Impossibile masterizzare un DVD.
-L&apos;ultima  creazione di un DVD è fallita.</translation>
+        <translation>Impossibile masterizzare il DVD.
+L&apos;ultimo tentativo di creare un DVD è fallito.</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="1098"/>
         <location filename="../mytharchive/mythburn.cpp" line="1110"/>
         <source>Burn DVD</source>
-        <translation>Masterizza DVD</translation>
+        <translation>Scrivi DVD</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="1099"/>
@@ -731,12 +731,12 @@ Questo può richiedere alcuni minuti.</translation>
     <message>
         <location filename="../mytharchive/mytharchive.cpp" line="334"/>
         <source>Play Created DVD</source>
-        <translation>Riproduci DVD creato</translation>
+        <translation>Leggi DVD creato</translation>
     </message>
     <message>
         <location filename="../mytharchive/mytharchive.cpp" line="336"/>
         <source>Burn DVD</source>
-        <translation>Masterizza DVD</translation>
+        <translation>Scrivi DVD</translation>
     </message>
 </context>
 <context>
@@ -1410,7 +1410,7 @@ Attendere...</translation>
     <message>
         <location filename="themestrings.h" line="50"/>
         <source>Burn Created DVD</source>
-        <translation>Masterizza DVD creato</translation>
+        <translation>Scrivi DVD creato</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
@@ -2074,7 +2074,7 @@ Quando l&apos;immagine di anteprima è selezionata, SU/GIÙ cambia l&apos;entit�
     <message>
         <location filename="themestrings.h" line="256"/>
         <source>Test created DVD</source>
-        <translation>Prova il DVD creato</translation>
+        <translation>Prova DVD creato</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="257"/>
@@ -2596,7 +2596,7 @@ Quando l&apos;immagine di anteprima è selezionata, SU/GIÙ cambia l&apos;entit�
     <message>
         <location filename="themestrings.h" line="193"/>
         <source>Play Created DVD</source>
-        <translation>Riproduci DVD creato</translation>
+        <translation>Vedi DVD creato</translation>
     </message>
     <message>
         <source>Burn DVD</source>
