@@ -27,6 +27,7 @@ void strings_null() {
     ThemeUI::tr("%TITLE%");
     ThemeUI::tr("%TITLE%  by  %ARTIST%");
     ThemeUI::tr("%TITLE% - %ARTIST% - %ALBUM%");
+    ThemeUI::tr("%TITLE% \ %ARTIST% \ %ALBUM%");
     ThemeUI::tr("%TITLE% by %ARTIST% on %ALBUM%");
     ThemeUI::tr("%TITLE% by %ARTIST% on %ALBUM% (%length%)");
     ThemeUI::tr("%TITLE% ~ %ARTIST%");
@@ -303,6 +304,7 @@ void strings_null() {
     ThemeUI::tr("Next Playing");
     ThemeUI::tr("Next new file");
     ThemeUI::tr("Next song:");
+    ThemeUI::tr("Next: %NEXTTITLE% \ %NEXTARTIST% \ %NEXTALBUM%");
     ThemeUI::tr("Next: %NEXTTITLE% by %NEXTARTIST%");
     ThemeUI::tr("No Album Art Found");
     ThemeUI::tr("No Album Art Found!");
@@ -311,6 +313,7 @@ void strings_null() {
     ThemeUI::tr("Not muted");
     ThemeUI::tr("Now Playing");
     ThemeUI::tr("Now Playing:");
+    ThemeUI::tr("Now Playing: %TITLE% \ %ARTIST% \ %ALBUM%");
     ThemeUI::tr("Now Playing: %TITLE% by %ARTIST% on %ALBUM%");
     ThemeUI::tr("Now playing");
     ThemeUI::tr("Number of songs found: %n", 0, 1);
