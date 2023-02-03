@@ -2547,13 +2547,13 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, std::chrono::seconds prerolls
     bool pendingEventSent = false;
     for (size_t i = 0; i < kSysEventSecs.size(); i++)
     {
-        if ((secsleft <= kSysEventSecs[i]) &&
+        if (((secsleft - prerollseconds) <= kSysEventSecs[i]) && (secsleft > 0s) &&
             (!m_sysEvents[i].contains(sysEventKey)))
         {
             if (!pendingEventSent)
             {
                 SendMythSystemRecEvent(
-                    QString("REC_PENDING SECS %1").arg(secsleft.count()), &ri);
+                    QString("REC_PENDING SECS %1").arg((secsleft - prerollseconds).count()), &ri);
             }
 
             m_sysEvents[i].insert(sysEventKey);
