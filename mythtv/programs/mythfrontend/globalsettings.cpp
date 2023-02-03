@@ -2941,6 +2941,19 @@ static GlobalTextEditSetting *SortPrefixExceptions()
     return gc;
 }
 
+static GlobalComboBoxSetting *ManualRecordStartChanType()
+{
+    auto *gc = new GlobalComboBoxSetting("ManualRecordStartChanType");
+
+    gc->setLabel(GeneralSettings::tr("Starting channel for Manual Record"));
+    gc->addSelection(GeneralSettings::tr("Guide Starting Channel"), "1", true);
+    gc->addSelection(GeneralSettings::tr("Last Manual Record Channel"), "2");
+    gc->setHelpText(GeneralSettings::tr(
+                        "When entering a new Manual Record Rule, "
+                        "the starting channel will default to this."));
+    return gc;
+}
+
 // General RecPriorities settings
 
 static GlobalComboBoxSetting *GRSchedOpenEnd()
@@ -4121,6 +4134,7 @@ MainGeneralSettings::MainGeneralSettings()
         general->addChild(stripPrefixes);
         stripPrefixes->addTargetedChild("1", SortPrefixExceptions());
     }
+    general->addChild(ManualRecordStartChanType());
     addChild(general);
 
     addChild(EnableMediaMon());
