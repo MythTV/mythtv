@@ -87,7 +87,7 @@ if ! echo "${SOURCE_VERSION}" | egrep -i "v[0-9]+.*"   ; then
 fi
 
 src_vn=`echo "${SOURCE_VERSION}" | sed "s/^[Vv]// ; s/-.*// ; s/\..*//"`
-MYTH_BINARY_VERSION=`grep "MYTH_BINARY_VERSION" libs/libmythbase/mythversion.h \
+MYTH_BINARY_VERSION=`grep -m 1 "MYTHTV_BINARY_VERSION" configure \
   | sed 's/.*"\(.*\)".*/\1/'`
 
 bin_vn=`echo $MYTH_BINARY_VERSION | sed 's/\..*//'`
