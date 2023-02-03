@@ -17786,7 +17786,7 @@ La maggior parte delle schede ora può rilevarla automaticamente, per cui lascia
     <message>
         <location filename="../libs/libmythbase/recordingtypes.cpp" line="30"/>
         <source>Single Record</source>
-        <translation type="unfinished">Registr.Singola</translation>
+        <translation>Registr.Singola</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/recordingtypes.cpp" line="34"/>
@@ -18753,7 +18753,7 @@ La maggior parte dei transponder DVB-S trasmette a 27,5 milioni di simboli al se
     <message>
         <location filename="../libs/libmythbase/recordingstatus.cpp" line="173"/>
         <source>Recorder Failed</source>
-        <translation type="unfinished">Registraz.Fallita</translation>
+        <translation>Reg.Fallita</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="366"/>
@@ -23169,13 +23169,13 @@ Nome Database: %2</translation>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1069"/>
         <source>%1 remaining</source>
         <comment>time</comment>
-        <translation>%1 rimanenti</translation>
+        <translation>%1 restanti</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1074"/>
         <source>%1 and %2 remaining</source>
         <comment>time</comment>
-        <translation>%1 e %2 rimanenti</translation>
+        <translation>%1 e %2 restanti</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1086"/>
@@ -25360,7 +25360,8 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="83"/>
         <source>%PLAYEDTIME| of% %TOTALTIME% %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</source>
-        <translation>%PLAYEDTIME| di% %TOTALTIME% %(|REMAININGTIME| rimanente)%%(|BEHINDTIME| fatto)%</translation>
+        <translatorcomment>From the possible translations for &quot;behind&quot; preferred &quot;differita&quot; (deferred as of timeshift) rather than &quot;ritardo&quot; which is a possible alternative.</translatorcomment>
+        <translation>%PLAYEDTIME| di% %TOTALTIME% %(|REMAININGTIME| restanti)%%(differita |BEHINDTIME|)%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="84"/>
@@ -31357,8 +31358,9 @@ gg MMMM aaaa</translation>
         <location filename="../themes/themestrings.h" line="82"/>
         <source>%PLAYEDTIME% of %TOTALTIME%
 %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</source>
+        <translatorcomment>From the possible translations for &quot;behind&quot; preferred &quot;differita&quot; (deferred as of timeshift) rather than &quot;ritardo&quot; which is a possible alternative.</translatorcomment>
         <translation>%PLAYEDTIME% di %TOTALTIME%
-%(|REMAININGTIME| rimanenti)%%(|BEHINDTIME| indietro)%</translation>
+%(|REMAININGTIME| restanti)%%(differita |BEHINDTIME|)%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2075"/>
@@ -33043,7 +33045,7 @@ dd MMM yyyy</translation>
     <message>
         <location filename="../themes/themestrings.h" line="80"/>
         <source>%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME| remaining)%</source>
-        <translation>%PLAYEDTIME% di %TOTALTIME% %(|REMAININGTIME| rimanente)%</translation>
+        <translation>%PLAYEDTIME% di %TOTALTIME% %(|REMAININGTIME| restanti)%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1119"/>
@@ -36095,7 +36097,8 @@ Per programmare una registrazione, esci da questa schermata e seleziona &apos;Gu
     <message>
         <location filename="../themes/themestrings.h" line="81"/>
         <source>%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</source>
-        <translation>%PLAYEDTIME% di %TOTALTIME% %(|REMAININGTIME| rimanente)%%(|BEHINDTIME| dietro)%</translation>
+        <translatorcomment>From the possible translations for &quot;behind&quot; preferred &quot;differita&quot; (deferred as of timeshift) rather than &quot;ritardo&quot; which is a possible alternative.</translatorcomment>
+        <translation>%PLAYEDTIME% di %TOTALTIME% %(|REMAININGTIME| restanti)%%(differita |BEHINDTIME|)%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="255"/>
