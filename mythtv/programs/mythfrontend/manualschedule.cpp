@@ -56,6 +56,8 @@ bool ManualSchedule::Create(void)
 
     QString startchan = gCoreContext->GetSetting("DefaultTVChannel", "");
     QString chanorder = gCoreContext->GetSetting("ChannelOrdering", "channum");
+    QString lastManualRecordChan = gCoreContext->GetSetting("LastManualRecordChan", startchan);
+    int manStartChanType = gCoreContext->GetNumSetting("ManualRecordStartChanType", 1);
     ChannelInfoList channels = ChannelUtil::GetChannels(0, true, "channum,callsign");
     ChannelUtil::SortChannels(channels, chanorder);
 
@@ -67,10 +69,23 @@ bool ManualSchedule::Create(void)
         InfoMap infomap;
         channels[i].ToMap(infomap);
         item->SetTextFromMap(infomap);
-        if (channels[i].m_chanNum == startchan)
+        if (manStartChanType == 1)
         {
-            m_channelList->SetItemCurrent(i);
-            startchan = "";
+            // Use DefaultTVChannel as starting channel
+            if (channels[i].m_chanNum == startchan)
+            {
+                m_channelList->SetItemCurrent(i);
+                startchan = "";
+            }
+        }
+        else
+        {
+            // Use LastManualRecordChan as starting channel
+            if (channels[i].m_chanNum == lastManualRecordChan)
+            {
+                m_channelList->SetItemCurrent(i);
+                lastManualRecordChan = "";
+            }
         }
         m_chanids.push_back(channels[i].m_chanId);
     }
@@ -207,6 +222,11 @@ void ManualSchedule::recordClicked(void)
     ProgramInfo p(m_titleEdit->GetText().trimmed(),
                   m_chanids[m_channelList->GetCurrentPos()],
                   m_startDateTime, endts);
+
+    // Save the channel because we might want to use it as the
+    // starting channel for the next Manual Record rule.
+    gCoreContext->SaveSetting("LastManualRecordChan",
+        ChannelUtil::GetChanNum(m_chanids[m_channelList->GetCurrentPos()]));
 
     auto *record = new RecordingRule();
     record->LoadByProgram(&p);
