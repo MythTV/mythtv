@@ -27,7 +27,7 @@ class V2Program;
 class V2ChannelInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "Version", "2.2" );
+    Q_CLASSINFO( "Version", "2.3" );
 
     // Q_CLASSINFO Used to augment Metadata for properties.
     // See datacontracthelper.h for details
@@ -58,6 +58,7 @@ class V2ChannelInfo : public QObject
     SERVICE_PROPERTY2( QString     , ChannelGroups  )
     SERVICE_PROPERTY2( QString     , Inputs         )
     SERVICE_PROPERTY2( uint        , ServiceType    )
+    SERVICE_PROPERTY2( int         , RecPriority    )
     SERVICE_PROPERTY2( QVariantList, Programs       )
 
     public:
@@ -83,6 +84,7 @@ class V2ChannelInfo : public QObject
             m_Visible       = src->m_Visible     ;
             m_ChannelGroups = src->m_ChannelGroups;
             m_Inputs        = src->m_Inputs;
+            m_RecPriority   = src->m_RecPriority;
 
             CopyListContents< V2Program >( this, m_Programs, src->m_Programs );
         }

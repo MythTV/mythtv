@@ -89,7 +89,8 @@ class V2Channel : public MythHTTPService
                                                      const QString &Format,
                                                      const QString &XMLTVID,
                                                      const QString &DefaultAuthority,
-                                                     uint          ServiceType );
+                                                     uint          ServiceType,
+                                                     int           RecPriority );
 
         bool                   AddDBChannel        ( uint          MplexID,
                                                      uint          SourceID,
@@ -108,7 +109,8 @@ class V2Channel : public MythHTTPService
                                                      const QString &Format,
                                                      const QString &XMLTVID,
                                                      const QString &DefaultAuthority,
-                                                     uint          ServiceType );
+                                                     uint          ServiceType,
+                                                     int           RecPriority );
 
         static bool            RemoveDBChannel     ( uint          ChannelID );
 
