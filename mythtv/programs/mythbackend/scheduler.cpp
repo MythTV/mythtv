@@ -2118,6 +2118,10 @@ void Scheduler::run(void)
                 idleWaitForRecordingTime =
                     gCoreContext->GetDurSetting<std::chrono::minutes>("idleWaitForRecordingTime", 15min);
 
+                // Wakeup slaves at least 2 minutes before recording starts.
+                // This allows also REC_PENDING events.
+                wakeThreshold = std::max(wakeThreshold, prerollseconds + 120s);
+
                 QElapsedTimer t; t.start();
                 if (HandleReschedule())
                 {
@@ -2169,6 +2173,31 @@ void Scheduler::run(void)
             }
         }
 
+        // Wake any slave backends that need waking
+        curtime = MythDate::current();
+        for (auto it = startIter; it != m_recList.end(); ++it)
+        {
+            auto secsleft = std::chrono::seconds(curtime.secsTo((*it)->GetRecordingStartTime()));
+            auto timeBeforePreroll = secsleft - prerollseconds;
+            if (timeBeforePreroll <= wakeThreshold)
+            {
+                HandleWakeSlave(**it, prerollseconds);
+
+                // Adjust wait time until REC_PENDING event
+                if (timeBeforePreroll > 0s)
+                {
+                    std::chrono::seconds waitpending;
+                    if (timeBeforePreroll > 120s)
+                        waitpending = timeBeforePreroll -120s;
+                    else
+                        waitpending = std::min(timeBeforePreroll, 30s);
+                    nextWakeTime = MythDate::current().addSecs(waitpending.count());
+                }
+            }
+            else
+                break;
+        }
+
         // Start any recordings that are due to be started
         // & call RecordPending for recordings due to start in 30 seconds
         // & handle RecStatus::Tuning updates
@@ -2185,17 +2214,6 @@ void Scheduler::run(void)
         // start over.
         if (m_recListChanged)
             continue;
-
-        /// Wake any slave backends that need waking
-        curtime = MythDate::current();
-        for (auto it = startIter; it != m_recList.end(); ++it)
-        {
-            auto secsleft = std::chrono::seconds(curtime.secsTo((*it)->GetRecordingStartTime()));
-            if ((secsleft - prerollseconds) <= wakeThreshold)
-                HandleWakeSlave(**it, prerollseconds);
-            else
-                break;
-        }
 
         if (statuschanged)
         {
@@ -2547,13 +2565,14 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, std::chrono::seconds prerolls
     bool pendingEventSent = false;
     for (size_t i = 0; i < kSysEventSecs.size(); i++)
     {
-        if (((secsleft - prerollseconds) <= kSysEventSecs[i]) && (secsleft > 0s) &&
+        auto pending_secs = std::max((secsleft - prerollseconds), 0s);
+        if ((pending_secs <= kSysEventSecs[i]) &&
             (!m_sysEvents[i].contains(sysEventKey)))
         {
             if (!pendingEventSent)
             {
                 SendMythSystemRecEvent(
-                    QString("REC_PENDING SECS %1").arg((secsleft - prerollseconds).count()), &ri);
+                    QString("REC_PENDING SECS %1").arg(pending_secs.count()), &ri);
             }
 
             m_sysEvents[i].insert(sysEventKey);
