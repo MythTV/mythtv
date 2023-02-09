@@ -193,6 +193,7 @@ bool V2FillChannelInfo( V2ChannelInfo *pChannel,
         pChannel->setXMLTVID(channelInfo.m_xmltvId);
         pChannel->setDefaultAuth(channelInfo.m_defaultAuthority);
         pChannel->setServiceType(channelInfo.m_serviceType);
+        pChannel->setRecPriority(channelInfo.m_recPriority);
 
         QList<uint> groupIds = channelInfo.GetGroupIds();
         QString sGroupIds;

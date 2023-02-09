@@ -200,7 +200,8 @@ bool V2Channel::UpdateDBChannel( uint          MplexID,
                                const QString &Format,
                                const QString &XMLTVID,
                                const QString &DefaultAuthority,
-                               uint          ServiceType )
+                               uint          ServiceType,
+                               int           RecPriority )
 {
     if (!HAS_PARAMv2("ChannelID"))
         throw QString("ChannelId is required");
@@ -258,6 +259,8 @@ bool V2Channel::UpdateDBChannel( uint          MplexID,
         channel.m_defaultAuthority = DefaultAuthority;
     if (HAS_PARAMv2("servicetype"))
         channel.m_serviceType = ServiceType;
+    if (HAS_PARAMv2("RecPriority"))
+        channel.m_recPriority = RecPriority;
 
     bool bResult = ChannelUtil::UpdateChannel(
         channel.m_mplexId, channel.m_sourceId, channel.m_chanId,
@@ -266,7 +269,8 @@ bool V2Channel::UpdateDBChannel( uint          MplexID,
         channel.m_atscMinorChan, channel.m_useOnAirGuide,
         channel.m_visible, channel.m_freqId,
         channel.m_icon, channel.m_tvFormat, channel.m_xmltvId,
-        channel.m_defaultAuthority, channel.m_serviceType );
+        channel.m_defaultAuthority, channel.m_serviceType,
+        channel.m_recPriority );
 
     return bResult;
 }
@@ -288,7 +292,8 @@ bool V2Channel::AddDBChannel( uint          MplexID,
                             const QString &Format,
                             const QString &XMLTVID,
                             const QString &DefaultAuthority,
-                            uint          ServiceType )
+                            uint          ServiceType,
+                            int           RecPriority )
 {
     ChannelVisibleType chan_visible = kChannelVisible;
     if (HAS_PARAMv2("ExtendedVisible"))
@@ -301,7 +306,7 @@ bool V2Channel::AddDBChannel( uint          MplexID,
                              ServiceID, ATSCMajorChannel, ATSCMinorChannel,
                              UseEIT, chan_visible, FrequencyID,
                              Icon, Format, XMLTVID, DefaultAuthority,
-                             ServiceType );
+                             ServiceType, RecPriority );
 
     return bResult;
 }
