@@ -178,9 +178,9 @@ QStringList MythDisplay::GetDescription()
         first = false;
         auto id = QString("(%1)").arg(screen->manufacturer());
         if (screen == current && !spanall)
-            result.append(tr("Current screen %1 %2:").arg(screen->name(), id));
+            result.append(tr("Current screen\t: %1 %2").arg(screen->name(), id));
         else
-            result.append(tr("Screen %1 %2:").arg(screen->name(), id));
+            result.append(tr("Screen\t\t: %1 %2").arg(screen->name(), id));
         result.append(tr("Size") + QString("\t\t: %1mmx%2mm")
                 .arg(screen->physicalSize().width()).arg(screen->physicalSize().height()));
         if (screen == current)
@@ -1147,7 +1147,7 @@ void MythDisplay::DebugModes() const
     }
 }
 
-/*! \brief Shared static initialistaion code for all MythTV GUI applications.
+/*! \brief Shared static initialisation code for all MythTV GUI applications.
  *
  * \note This function must be called before Qt/QPA is initialised i.e. before
  * any call to QApplication.
