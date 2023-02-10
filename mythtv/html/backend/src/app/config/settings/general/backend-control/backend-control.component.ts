@@ -19,6 +19,7 @@ export class BackendControlComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
   }
+  
   ngAfterViewInit() {
     this.setupService.setCurrentForm(this.currentForm);
   }

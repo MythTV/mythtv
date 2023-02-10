@@ -71,7 +71,7 @@ export class LocaleComponent implements OnInit, AfterViewInit {
             "malaysia",
             "israel-hot-matav",
             "try-all"
-            ];
+        ];
 
         this.m_LocaleData = this.setupService.getLocaleData();
     }

@@ -20,20 +20,20 @@ interface ddParam {
 export class MiscSettingsComponent implements OnInit, AfterViewInit {
   miscData: Miscellaneous = this.setupService.getMiscellaneousData();
   soptions: ddParam[] = [
-    {name: 'settings.misc.sg_balfree', code: "BalancedFreeSpace" },
-    {name: 'settings.misc.sg_balpercent', code: "BalancedPercFreeSpace"},
-    {name: 'settings.misc.bal_io', code: "BalancedDiskIO"},
-    {name: 'settings.misc.sg_combination', code: "Combination"}
+    { name: 'settings.misc.sg_balfree', code: "BalancedFreeSpace" },
+    { name: 'settings.misc.sg_balpercent', code: "BalancedPercFreeSpace" },
+    { name: 'settings.misc.bal_io', code: "BalancedDiskIO" },
+    { name: 'settings.misc.sg_combination', code: "Combination" }
   ];
-  uoptions: ddParam [] = [
-    {name: 'settings.misc.upnp_recs', code: "0" },
-    {name: 'settings.misc.upnp_videos', code: "1"},
+  uoptions: ddParam[] = [
+    { name: 'settings.misc.upnp_recs', code: "0" },
+    { name: 'settings.misc.upnp_videos', code: "1" },
   ];
 
   @ViewChild("miscsettings")
   currentForm!: NgForm;
 
-constructor(private setupService: SetupService, private translate: TranslateService) {
+  constructor(private setupService: SetupService, private translate: TranslateService) {
     translate.get(this.soptions[0].name).subscribe(data => this.soptions[0].name = data);
     translate.get(this.soptions[1].name).subscribe(data => this.soptions[1].name = data);
     translate.get(this.soptions[2].name).subscribe(data => this.soptions[2].name = data);
@@ -50,7 +50,7 @@ constructor(private setupService: SetupService, private translate: TranslateServ
   }
 
   saveForm() {
-      console.log("save form clicked");
-      this.setupService.saveMiscellaneousSettings(this.currentForm);
+    console.log("save form clicked");
+    this.setupService.saveMiscellaneousSettings(this.currentForm);
   }
 }

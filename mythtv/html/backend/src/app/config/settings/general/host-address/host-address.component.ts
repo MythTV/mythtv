@@ -10,7 +10,7 @@ import { SetupService } from 'src/app/services/setup.service';
     templateUrl: './host-address.component.html',
     styleUrls: ['./host-address.component.css']
 })
-export class HostAddressComponent implements OnInit,  AfterViewInit {
+export class HostAddressComponent implements OnInit, AfterViewInit {
     m_HostAddressData!: HostAddress;
 
     m_IPsAll!: string[];
@@ -22,7 +22,7 @@ export class HostAddressComponent implements OnInit,  AfterViewInit {
     currentForm!: NgForm;
 
     constructor(private setupService: SetupService,
-                private configService: ConfigService) {
+        private configService: ConfigService) {
 
         this.m_HostAddressData = this.setupService.getHostAddressData();
         configService.GetIPAddresses("All").subscribe(result => this.m_IPsAll = result.IPAddresses);

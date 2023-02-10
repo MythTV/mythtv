@@ -9,7 +9,7 @@ import { SetupService } from 'src/app/services/setup.service';
   templateUrl: './shutdown-wakeup.component.html',
   styleUrls: ['./shutdown-wakeup.component.css']
 })
-export class ShutdownWakeupComponent implements OnInit,AfterViewInit {
+export class ShutdownWakeupComponent implements OnInit, AfterViewInit {
 
   shutwakeData: ShutWake = this.setupService.getShutWake();
   @ViewChild("shutwakeopt")

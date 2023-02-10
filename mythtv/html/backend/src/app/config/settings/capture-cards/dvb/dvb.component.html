@@ -138,12 +138,13 @@
                     </p-dialog>
                     &nbsp;
                     <p-button label="{{ 'settings.capture.dvb.satellite_connect' | translate }}" *ngIf="!diseqcTree"
-                        (onClick)="setupRootTrees() ; work.displayConnectDevice = true" icon="pi pi-plus-circle" styleClass="p-button-plain"
+                        (onClick)="setupRootTrees() ; work.displayConnectDevice = true" icon="pi pi-plus-circle"
+                        styleClass="p-button-plain"
                         pTooltip="{{ 'settings.capture.dvb.satellite_connect_tooltip' | translate }}">
                     </p-button>
                     <p-dialog header="{{ 'settings.capture.dvb.satellite_connect' | translate }}"
-                        [(visible)]="work.displayConnectDevice" [modal]="true" [style]="{width: '50vw'}" [draggable]="false"
-                        [resizable]="false">
+                        [(visible)]="work.displayConnectDevice" [modal]="true" [style]="{width: '50vw'}"
+                        [draggable]="false" [resizable]="false">
                         <p>{{ 'settings.capture.dvb.satellite_select' | translate }}</p>
                         <p-listbox [options]="diseqcRootTrees" [(ngModel)]="work.selectedDiseqcTree"
                             optionLabel="Description" name="diseqcRootTrees" optionValue="DiSEqCId"
@@ -177,11 +178,12 @@
                     </p-dialog>
                     &nbsp;
                     <p-button label="{{ 'settings.capture.dvb.satellite_disconnect' | translate }}" *ngIf="diseqcTree"
-                        (onClick)="work.displayDisconnect = true" icon="pi pi-minus-circle" styleClass="p-button-warning">
+                        (onClick)="work.displayDisconnect = true" icon="pi pi-minus-circle"
+                        styleClass="p-button-warning">
                     </p-button>
                     <p-dialog header="{{ 'settings.capture.dvb.satellite_disconnect' | translate }}"
-                        [(visible)]="work.displayDisconnect" [modal]="true" [style]="{width: '50vw'}" [draggable]="false"
-                        [resizable]="false">
+                        [(visible)]="work.displayDisconnect" [modal]="true" [style]="{width: '50vw'}"
+                        [draggable]="false" [resizable]="false">
                         <h2>{{ 'settings.ru_sure' | translate }}</h2>
                         <p>{{ 'settings.capture.dvb.satellite_disconnect_warning' | translate }}</p>
                         <ng-template pTemplate="footer">

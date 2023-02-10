@@ -12,7 +12,8 @@
 
                     <div *ngIf="diseqcTree" [ngSwitch]="diseqcTree.Type">
                         <div class="form-group field" *ngSwitchCase="'switch'">
-                            <label for="Port" class="block">{{ 'settings.iconnection.switchport_label' | translate }}</label>
+                            <label for="Port" class="block">{{ 'settings.iconnection.switchport_label' | translate
+                                }}</label>
                             <p-inputNumber [(ngModel)]="work.switchPort" name="Port" id="Port" [showButtons]="true"
                                 [min]="1" [max]="diseqcTree.SwitchPorts" [step]="1"></p-inputNumber>
                             <small class="block">
@@ -21,7 +22,8 @@
                         </div>
                         <div *ngSwitchCase="'rotor'">
                             <div class="form-group field">
-                                <label for="Degrees" class="block">{{ 'settings.iconnection.longitude_label' | translate }}</label>
+                                <label for="Degrees" class="block">{{ 'settings.iconnection.longitude_label' | translate
+                                    }}</label>
                                 <p-inputNumber [(ngModel)]="work.rotorDegrees" name="Degrees" id="Degrees" [min]="0"
                                     [max]="180" [maxFractionDigits]="4"></p-inputNumber>
                                 <br><br>

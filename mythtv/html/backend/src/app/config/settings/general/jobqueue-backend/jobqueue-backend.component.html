@@ -11,48 +11,56 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="JobQueueMaxSimultaneousJobs" class="block" >{{ 'settings.jobqbackend.maxjobs_label' | translate }}</label>
-                        <p-inputNumber [(ngModel)]="JobQBData.JobQueueMaxSimultaneousJobs" name="JobQueueMaxSimultaneousJobs" id="JobQueueMaxSimultaneousJobs"
-                            [showButtons]="true" [min]="1" [max]="10" [step]="1"></p-inputNumber>
+                        <label for="JobQueueMaxSimultaneousJobs" class="block">{{ 'settings.jobqbackend.maxjobs_label' |
+                            translate }}</label>
+                        <p-inputNumber [(ngModel)]="JobQBData.JobQueueMaxSimultaneousJobs"
+                            name="JobQueueMaxSimultaneousJobs" id="JobQueueMaxSimultaneousJobs" [showButtons]="true"
+                            [min]="1" [max]="10" [step]="1"></p-inputNumber>
                         <small class="block">
                             {{ 'settings.jobqbackend.maxjobs_desc' | translate }}
                         </small>
                     </div>
 
                     <div class="form-group field">
-                        <label for="JobQueueCheckFrequency" class="block" >{{ 'settings.jobqbackend.freq_label' | translate }}</label>
-                        <p-inputNumber [(ngModel)]="JobQBData.JobQueueCheckFrequency" name="JobQueueCheckFrequency" id="JobQueueCheckFrequency"
-                            [showButtons]="true" [min]="5" [max]="300" [step]="5"></p-inputNumber>
+                        <label for="JobQueueCheckFrequency" class="block">{{ 'settings.jobqbackend.freq_label' |
+                            translate }}</label>
+                        <p-inputNumber [(ngModel)]="JobQBData.JobQueueCheckFrequency" name="JobQueueCheckFrequency"
+                            id="JobQueueCheckFrequency" [showButtons]="true" [min]="5" [max]="300"
+                            [step]="5"></p-inputNumber>
                         <small class="block">
                             {{ 'settings.jobqbackend.freq_desc' | translate }}
                         </small>
                     </div>
 
                     <div class="form-group field">
-                        <label for="JobQueueWindowStart" class="block" >{{ 'settings.jobqbackend.start_label' | translate }}</label>
-                        <p-calendar #JobQueueWindowStart [(ngModel)]="JobQBData.JobQueueWindowStart" name="JobQueueWindowStart" id="JobQueueWindowStart"
-                            [timeOnly]="true" [readonlyInput]="true" ngControl="JobQueueWindowStart"></p-calendar>
+                        <label for="JobQueueWindowStart" class="block">{{ 'settings.jobqbackend.start_label' | translate
+                            }}</label>
+                        <p-calendar #JobQueueWindowStart [(ngModel)]="JobQBData.JobQueueWindowStart"
+                            name="JobQueueWindowStart" id="JobQueueWindowStart" [timeOnly]="true" [readonlyInput]="true"
+                            ngControl="JobQueueWindowStart"></p-calendar>
                         <small class="block">
                             {{ 'settings.jobqbackend.start_desc' | translate }}
                         </small>
                     </div>
 
                     <div class="form-group field">
-                        <label for="JobQueueWindowEnd" class="block" >{{ 'settings.jobqbackend.end_label' | translate }}</label>
-                        <p-calendar #JobQueueWindowEnd [(ngModel)]="JobQBData.JobQueueWindowEnd" name="JobQueueWindowEnd" id="JobQueueWindowEnd"
-                            [timeOnly]="true" [readonlyInput]="true" ngControl="JobQueueWindowEnd"></p-calendar>
+                        <label for="JobQueueWindowEnd" class="block">{{ 'settings.jobqbackend.end_label' | translate
+                            }}</label>
+                        <p-calendar #JobQueueWindowEnd [(ngModel)]="JobQBData.JobQueueWindowEnd"
+                            name="JobQueueWindowEnd" id="JobQueueWindowEnd" [timeOnly]="true" [readonlyInput]="true"
+                            ngControl="JobQueueWindowEnd"></p-calendar>
                         <small class="block">
                             {{ 'settings.jobqbackend.end_desc' | translate }}
                         </small>
                     </div>
 
                     <div class="form-group field">
-                        <label for="JobQueueCPU" class="block">{{ 'settings.jobqbackend.cpu_label' | translate }}</label>
-                        <p-dropdown [options]="cpuOptions " [(ngModel)]="JobQBData.JobQueueCPU"  optionLabel="name"  optionValue="code"
-                            class="block w-15rem mb-2"
-                            name="JobQueueCPU" #JobQueueCPU="ngModel"   >
+                        <label for="JobQueueCPU" class="block">{{ 'settings.jobqbackend.cpu_label' | translate
+                            }}</label>
+                        <p-dropdown [options]="cpuOptions " [(ngModel)]="JobQBData.JobQueueCPU" optionLabel="name"
+                            optionValue="code" class="block w-15rem mb-2" name="JobQueueCPU" #JobQueueCPU="ngModel">
                         </p-dropdown>
-                        <small class="block" >
+                        <small class="block">
                             {{ 'settings.jobqbackend.cpu_desc' | translate }}
                         </small>
                     </div>
@@ -143,13 +151,15 @@
         <ng-template pTemplate="footer">
             <div class="grid nogutter">
                 <div class="col-12">
-                    <p-message *ngIf="this.JobQBData.successCount > 0 && this.JobQBData.errorCount == 0 && !jobqbackend.dirty"
-                        severity="success" text="{{ 'common.savesuccess' | translate }}" ></p-message>
-                    <p-message *ngIf="this.JobQBData.errorCount > 0"
-                        severity="error" text="{{ 'common.networkfail' | translate }}" ></p-message>
+                    <p-message
+                        *ngIf="this.JobQBData.successCount > 0 && this.JobQBData.errorCount == 0 && !jobqbackend.dirty"
+                        severity="success" text="{{ 'common.savesuccess' | translate }}"></p-message>
+                    <p-message *ngIf="this.JobQBData.errorCount > 0" severity="error"
+                        text="{{ 'common.networkfail' | translate }}"></p-message>
                 </div>
-                <p-button class="col pr-1" label="{{'common.save' | translate}}"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); jobqbackend.form.markAsPristine()"
-                                 [disabled]="(!jobqbackend.dirty || false)"></p-button>
+                <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
+                    (onClick)="saveForm(); jobqbackend.form.markAsPristine()"
+                    [disabled]="(!jobqbackend.dirty || false)"></p-button>
             </div>
         </ng-template>
     </p-card>

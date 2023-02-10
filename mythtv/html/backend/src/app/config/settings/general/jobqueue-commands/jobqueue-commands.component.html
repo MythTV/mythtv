@@ -14,11 +14,12 @@
 
                         <div class="form-group field">
                             <label for="UserJobDesc{{item}}" class="block">
-                                <div [translate]="'settings.jobqcommands.job_label'" [translateParams]="{num: (item+1)}"></div>
+                                <div [translate]="'settings.jobqcommands.job_label'"
+                                    [translateParams]="{num: (item+1)}"></div>
                             </label>
-                            <input pInputText id="UserJobDesc{{item}}"
-                                [(ngModel)]="JobQCommandsData.UserJobDesc[item]" name="UserJobDesc{{item}}"
-                                #UserJobDesc{{item}}="ngModel" class="mb-2 form-control w-full" />
+                            <input pInputText id="UserJobDesc{{item}}" [(ngModel)]="JobQCommandsData.UserJobDesc[item]"
+                                name="UserJobDesc{{item}}" #UserJobDesc{{item}}="ngModel"
+                                class="mb-2 form-control w-full" />
                             <small class="block">
                                 {{ 'settings.jobqcommands.job_desc' | translate }}
                             </small>
@@ -26,12 +27,12 @@
 
                         <div class="form-group field">
                             <label for="UserJob{{item}}" class="block">
-                                <div [translate]="'settings.jobqcommands.command_label'" [translateParams]="{num: (item+1)}"></div>
+                                <div [translate]="'settings.jobqcommands.command_label'"
+                                    [translateParams]="{num: (item+1)}"></div>
                                 <!-- {{ 'settings.jobqcommands.command_label' | translate }} -->
                             </label>
-                            <input pInputText id="UserJob{{item}}"
-                                [(ngModel)]="JobQCommandsData.UserJob[item]" name="UserJob{{item}}"
-                                #UserJob{{item}}="ngModel" class="mb-2 form-control w-full" />
+                            <input pInputText id="UserJob{{item}}" [(ngModel)]="JobQCommandsData.UserJob[item]"
+                                name="UserJob{{item}}" #UserJob{{item}}="ngModel" class="mb-2 form-control w-full" />
                             <small class="block">
                                 {{ 'settings.jobqcommands.command_desc' | translate }}
                             </small>
@@ -47,13 +48,15 @@
         <ng-template pTemplate="footer">
             <div class="grid nogutter">
                 <div class="col-12">
-                    <p-message *ngIf="this.JobQCommandsData.successCount > 0 && this.JobQCommandsData.errorCount == 0 && !jobqcommands.dirty"
-                        severity="success" text="{{ 'common.savesuccess' | translate }}" ></p-message>
-                    <p-message *ngIf="this.JobQCommandsData.errorCount > 0"
-                        severity="error" text="{{ 'common.networkfail' | translate }}" ></p-message>
+                    <p-message
+                        *ngIf="this.JobQCommandsData.successCount > 0 && this.JobQCommandsData.errorCount == 0 && !jobqcommands.dirty"
+                        severity="success" text="{{ 'common.savesuccess' | translate }}"></p-message>
+                    <p-message *ngIf="this.JobQCommandsData.errorCount > 0" severity="error"
+                        text="{{ 'common.networkfail' | translate }}"></p-message>
                 </div>
-                <p-button class="col pr-1" label="{{'common.save' | translate}}"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); jobqcommands.form.markAsPristine()"
-                                 [disabled]="(!jobqcommands.dirty || false)"></p-button>
+                <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
+                    (onClick)="saveForm(); jobqcommands.form.markAsPristine()"
+                    [disabled]="(!jobqcommands.dirty || false)"></p-button>
             </div>
         </ng-template>
     </p-card>

@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Calendar } from 'primeng/calendar';
-import {TranslateService} from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
 
 import { JobQBackend, JobQCommands } from 'src/app/services/interfaces/setup.interface';
 import { SetupService } from 'src/app/services/setup.service';
@@ -23,19 +23,19 @@ export class JobqueueBackendComponent implements OnInit, AfterViewInit {
   JobQCmds!: JobQCommands;
 
   @ViewChild("JobQueueWindowStart")
-  JobQueueWindowStart! : Calendar;
+  JobQueueWindowStart!: Calendar;
 
   @ViewChild("JobQueueWindowEnd")
-  JobQueueWindowEnd! : Calendar;
+  JobQueueWindowEnd!: Calendar;
 
   @ViewChild("jobqbackend")
   currentForm!: NgForm;
 
 
   cpuOptions: ddParm[] = [
-    {name: "settings.jobqbackend.cpu_low", code: "0"},
-    {name: "settings.jobqbackend.cpu_med", code: "1"},
-    {name: "settings.jobqbackend.cpu_high", code: "2"}
+    { name: "settings.jobqbackend.cpu_low", code: "0" },
+    { name: "settings.jobqbackend.cpu_med", code: "1" },
+    { name: "settings.jobqbackend.cpu_high", code: "2" }
   ];
 
   constructor(private setupService: SetupService, private translate: TranslateService) {
@@ -44,9 +44,9 @@ export class JobqueueBackendComponent implements OnInit, AfterViewInit {
     // the time-picker does not update when the backend value
     // is filled into the Date backing field.
     this.JobQBData.JobQueueWindowStart$.subscribe
-      ({complete: () => this.JobQueueWindowStart.updateInputfield()});
+      ({ complete: () => this.JobQueueWindowStart.updateInputfield() });
     this.JobQBData.JobQueueWindowEnd$.subscribe
-      ({complete: () => this.JobQueueWindowEnd.updateInputfield()});
+      ({ complete: () => this.JobQueueWindowEnd.updateInputfield() });
 
     this.JobQCmds = this.setupService.getJobQCommands();
 

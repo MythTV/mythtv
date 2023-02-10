@@ -1,83 +1,82 @@
 <div class="block card w-full">
     <h3>{{ 'settings.general.title' | translate }}</h3>
-<p-accordion class="col-12 w-full" (onClose)="onTabClose($event)" (onOpen)="onTabOpen($event)">
-    <p-accordionTab header="{{ 'settings.hostaddress.title' | translate }}">
-        <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[0] }}</b></ng-template>
-        <ng-template pTemplate="content">
-            <app-host-address></app-host-address>
-        </ng-template>
-    </p-accordionTab>
+    <p-accordion class="col-12 w-full" (onClose)="onTabClose($event)" (onOpen)="onTabOpen($event)">
+        <p-accordionTab header="{{ 'settings.hostaddress.title' | translate }}">
+            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[0] }}</b></ng-template>
+            <ng-template pTemplate="content">
+                <app-host-address></app-host-address>
+            </ng-template>
+        </p-accordionTab>
 
-    <p-accordionTab header="{{ 'settings.locale.title' | translate }}">
-        <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[1] }}</b></ng-template>
-        <ng-template pTemplate="content">
-            <app-locale></app-locale>
-        </ng-template>
-    </p-accordionTab>
+        <p-accordionTab header="{{ 'settings.locale.title' | translate }}">
+            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[1] }}</b></ng-template>
+            <ng-template pTemplate="content">
+                <app-locale></app-locale>
+            </ng-template>
+        </p-accordionTab>
 
-    <p-accordionTab header="{{ 'settings.misc.title' | translate }}">
-        <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[2] }}</b></ng-template>
-        <ng-template pTemplate="content">
-            <app-misc-settings></app-misc-settings>
-        </ng-template>
-    </p-accordionTab>
+        <p-accordionTab header="{{ 'settings.misc.title' | translate }}">
+            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[2] }}</b></ng-template>
+            <ng-template pTemplate="content">
+                <app-misc-settings></app-misc-settings>
+            </ng-template>
+        </p-accordionTab>
 
-    <p-accordionTab header="{{ 'settings.eit.title' | translate }}">
-        <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[3] }}</b></ng-template>
-        <ng-template pTemplate="content">
-            <app-eit-scanner></app-eit-scanner>
-        </ng-template>
-    </p-accordionTab>
+        <p-accordionTab header="{{ 'settings.eit.title' | translate }}">
+            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[3] }}</b></ng-template>
+            <ng-template pTemplate="content">
+                <app-eit-scanner></app-eit-scanner>
+            </ng-template>
+        </p-accordionTab>
 
-    <p-accordionTab header="{{ 'settings.shutwake.title' | translate }}">
-        <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[4] }}</b></ng-template>
-        <ng-template pTemplate="content">
-            <app-shutdown-wakeup></app-shutdown-wakeup>
-        </ng-template>
-    </p-accordionTab>
+        <p-accordionTab header="{{ 'settings.shutwake.title' | translate }}">
+            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[4] }}</b></ng-template>
+            <ng-template pTemplate="content">
+                <app-shutdown-wakeup></app-shutdown-wakeup>
+            </ng-template>
+        </p-accordionTab>
 
-    <p-accordionTab header="{{ 'settings.backendwake.title' | translate }}">
-        <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[5] }}</b></ng-template>
-        <ng-template pTemplate="content">
-            <app-backend-wakeup></app-backend-wakeup>
-        </ng-template>
-    </p-accordionTab>
+        <p-accordionTab header="{{ 'settings.backendwake.title' | translate }}">
+            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[5] }}</b></ng-template>
+            <ng-template pTemplate="content">
+                <app-backend-wakeup></app-backend-wakeup>
+            </ng-template>
+        </p-accordionTab>
 
-    <p-accordionTab header="{{ 'settings.backendctrl.title' | translate }}">
-        <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[6] }}</b></ng-template>
-        <ng-template pTemplate="content">
-            <app-backend-control></app-backend-control>
-        </ng-template>
-    </p-accordionTab>
+        <p-accordionTab header="{{ 'settings.backendctrl.title' | translate }}">
+            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[6] }}</b></ng-template>
+            <ng-template pTemplate="content">
+                <app-backend-control></app-backend-control>
+            </ng-template>
+        </p-accordionTab>
 
-    <p-accordionTab header="{{ 'settings.jobqbackend.title' | translate }}">
-        <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[7] }}</b></ng-template>
-        <ng-template pTemplate="content">
-            <app-jobqueue-backend></app-jobqueue-backend>
-        </ng-template>
-    </p-accordionTab>
+        <p-accordionTab header="{{ 'settings.jobqbackend.title' | translate }}">
+            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[7] }}</b></ng-template>
+            <ng-template pTemplate="content">
+                <app-jobqueue-backend></app-jobqueue-backend>
+            </ng-template>
+        </p-accordionTab>
 
-    <p-accordionTab header="{{ 'settings.jobqglobal.title' | translate }}">
-        <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[8] }}</b></ng-template>
-        <ng-template pTemplate="content">
-            <app-jobqueue-global></app-jobqueue-global>
-        </ng-template>
-    </p-accordionTab>
+        <p-accordionTab header="{{ 'settings.jobqglobal.title' | translate }}">
+            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[8] }}</b></ng-template>
+            <ng-template pTemplate="content">
+                <app-jobqueue-global></app-jobqueue-global>
+            </ng-template>
+        </p-accordionTab>
 
-    <p-accordionTab header="{{ 'settings.jobqcommands.title' | translate }}">
-        <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[9] }}</b></ng-template>
-        <ng-template pTemplate="content">
-            <app-jobqueue-commands></app-jobqueue-commands>
-        </ng-template>
-    </p-accordionTab>
+        <p-accordionTab header="{{ 'settings.jobqcommands.title' | translate }}">
+            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[9] }}</b></ng-template>
+            <ng-template pTemplate="content">
+                <app-jobqueue-commands></app-jobqueue-commands>
+            </ng-template>
+        </p-accordionTab>
 
-    <p-accordionTab header="{{ 'settings.epgdownload.title' | translate }}">
-        <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[10] }}</b></ng-template>
-        <ng-template pTemplate="content">
-            <app-epg-downloading></app-epg-downloading>
-        </ng-template>
-    </p-accordionTab>
+        <p-accordionTab header="{{ 'settings.epgdownload.title' | translate }}">
+            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[10] }}</b></ng-template>
+            <ng-template pTemplate="content">
+                <app-epg-downloading></app-epg-downloading>
+            </ng-template>
+        </p-accordionTab>
 
-</p-accordion>
+    </p-accordion>
 </div>
-
