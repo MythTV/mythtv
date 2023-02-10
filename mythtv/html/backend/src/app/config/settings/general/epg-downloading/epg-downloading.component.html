@@ -34,8 +34,6 @@
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); epgdownload.form.markAsPristine()"
                                  [disabled]="(!epgdownload.dirty || false)"></p-button>
-                <p-button class="col-2 help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()"
-                    icon="pi pi-info-circle" styleClass="p-button-info"></p-button>
             </div>
         </ng-template>
     </p-card>

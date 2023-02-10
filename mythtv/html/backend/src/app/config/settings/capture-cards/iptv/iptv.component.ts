@@ -44,11 +44,6 @@ export class IptvComponent implements OnInit, AfterViewInit {
     }
   }
 
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
-  }
-
   // good response to add: {"int": 19}
   saveObserver = {
     next: (x: any) => {

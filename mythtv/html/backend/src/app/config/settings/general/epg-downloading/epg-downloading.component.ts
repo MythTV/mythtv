@@ -26,11 +26,6 @@ export class EpgDownloadingComponent implements OnInit, AfterViewInit {
     this.setupService.setCurrentForm(this.currentForm);
   }
 
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
-  }
-
   saveForm() {
     console.log("save form clicked");
     this.setupService.saveEpgDownload(this.currentForm);

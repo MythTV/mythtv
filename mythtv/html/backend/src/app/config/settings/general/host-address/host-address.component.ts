@@ -12,7 +12,6 @@ import { SetupService } from 'src/app/services/setup.service';
 })
 export class HostAddressComponent implements OnInit,  AfterViewInit {
     m_HostAddressData!: HostAddress;
-    m_showHelp: boolean = false;
 
     m_IPsAll!: string[];
     m_IPsV4!: string[];
@@ -55,11 +54,6 @@ export class HostAddressComponent implements OnInit,  AfterViewInit {
             else
                 this.m_HostAddressData.MasterServerName = this.m_savedMaster;
         }
-    }
-
-    showHelp() {
-        this.m_showHelp = true;
-        console.log(this);
     }
 
     saveForm() {

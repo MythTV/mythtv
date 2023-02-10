@@ -75,10 +75,8 @@
                     <p-message *ngIf="this.beWakeData.errorCount > 0"
                         severity="error" text="{{ 'common.networkfail' | translate }}" ></p-message>
                 </div>
-                <p-button class="col pr-1" label="{{'common.save' | translate}}"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); backendwakeup.form.markAsPristine()"
-                                 [disabled]="(!backendwakeup.dirty || false)"></p-button>
-                <p-button class="col-2 help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()"
-                    icon="pi pi-info-circle" styleClass="p-button-info"></p-button>
+                <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
+                    (onClick)="saveForm(); backendwakeup.form.markAsPristine()" [disabled]="(!backendwakeup.dirty || false)"></p-button>
             </div>
         </ng-template>
     </p-card>

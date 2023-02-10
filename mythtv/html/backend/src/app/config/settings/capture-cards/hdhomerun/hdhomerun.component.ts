@@ -137,9 +137,4 @@ export class HdhomerunComponent implements OnInit, AfterViewInit {
     }
   }
 
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
-  }
-
 }

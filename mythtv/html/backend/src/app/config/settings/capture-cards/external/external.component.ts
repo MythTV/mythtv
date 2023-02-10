@@ -32,11 +32,6 @@ export class ExternalComponent implements OnInit, AfterViewInit {
     this.topElement.nativeElement.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
-  }
-
   // good response to add: {"int": 19}
   saveObserver = {
     next: (x: any) => {

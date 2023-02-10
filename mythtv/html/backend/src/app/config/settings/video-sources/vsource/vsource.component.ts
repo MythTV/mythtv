@@ -153,9 +153,4 @@ export class VsourceComponent implements OnInit, AfterViewInit {
     }
   }
 
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
-  }
-
 }

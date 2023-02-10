@@ -24,11 +24,6 @@ export class ShutdownWakeupComponent implements OnInit,AfterViewInit {
     this.setupService.setCurrentForm(this.currentForm);
   }
 
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
-  }
-
   saveForm() {
     console.log("save form clicked");
     this.setupService.saveShutWake(this.currentForm);

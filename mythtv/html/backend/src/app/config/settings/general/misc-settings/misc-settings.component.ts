@@ -49,11 +49,6 @@ constructor(private setupService: SetupService, private translate: TranslateServ
     this.setupService.setCurrentForm(this.currentForm);
   }
 
-  showHelp() {
-      console.log("show help clicked");
-      console.log(this);
-  }
-
   saveForm() {
       console.log("save form clicked");
       this.setupService.saveMiscellaneousSettings(this.currentForm);

@@ -461,9 +461,4 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
 
   }
 
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
-  }
-
 }

@@ -250,11 +250,6 @@ export class DvbComponent implements OnInit, AfterViewInit {
       this.work.warningMessage = "";
   }
 
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
-  }
-
   // good response to add: {"int": 19}
   saveObserver: PartialObserver<any> = {
     next: (x: any) => {
