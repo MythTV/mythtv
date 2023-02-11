@@ -1314,6 +1314,67 @@ class VideoGrabber( Grabber ):
             raise MythError('Invalid MythVideo grabber')
         self.append('-l',lang)
 
+
+class InetrefGrabber( Grabber ):
+    """
+    InetrefGrabber(inetref, lang='en', db=None) -> Grabber object
+            'inetref' holds the grabber name and the id
+    """
+    logmodule = 'Python Inetref Grabber'
+
+    cls = VideoMetadata
+
+    def __init__(self, inetref, season=None, episode=None, lang='en', db=None):
+        self.grabber = inetref.split('_')[0]
+        try:
+            self.iref = inetref.split('_')[1]
+        except IndexError as e:
+            raise MythError("MythTV interef error: '%s' !" % inetref)
+
+        self.season = season
+        self.episode = episode
+        relative_paths = ['share/mythtv/metadata/Movie',
+                          'share/mythtv/metadata/Television']
+        prefix = None
+        for path in relative_paths:
+            long_path = os.path.join(INSTALL_PREFIX, path)
+            grabber_path = os.path.join(long_path, self.grabber)
+            if os.path.isfile(grabber_path):
+                prefix = long_path
+                break
+        if not prefix:
+            raise MythError("Invalid MythTV grabber prefix!")
+        else:
+            try:
+                Grabber.__init__(self, setting=None, db=db, path=self.grabber, prefix=prefix)
+            except KeyError:
+                raise MythError('Invalid MythTV grabber')
+            self.append('-l', lang)
+
+    def grabMetadata(self, search_collection=False):
+        """
+        obj.grabMetadata(search_collection=False/True)  -> metadata object
+
+            Returns a direct search for a specific movie or episode based on
+            the 'inetref' entry.
+        """
+
+        if (self.season is not None) and (self.episode is not None):
+            args = (self.iref, self.season, self.episode)
+        else:
+            args = (self.iref,)
+
+        if search_collection:
+            mdata = next(self.command('-C', *args))
+        else:
+            mdata = next(self.command('-D', *args))
+
+        # extend inetref with the grabber prefix:
+        if mdata.get('inetref') and mdata.inetref:
+            mdata.inetref = "%s_%s" % (self.grabber, mdata.inetref)
+        return mdata
+
+
 #### MYTHNETVISION ####
 
 class InternetContent( DBData ):
