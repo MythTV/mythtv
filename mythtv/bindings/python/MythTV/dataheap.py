@@ -315,6 +315,10 @@ class Recorded( CMPRecord, DBDataWrite ):
         _table = 'roles'
         _key = ['name']
 
+    class _InverseRole(DBData):
+        _table = 'roles'
+        _key = ['roleid']
+
     class _Seek( DBDataRef, MARKUP ):
         _table = 'recordedseek'
         _ref = ['chanid','starttime']
@@ -576,11 +580,27 @@ class Recorded( CMPRecord, DBDataWrite ):
                 metadata[tagt] = self[tagf]
 
         # pull cast
-        for member in self.cast:
-            name = member.name
-            role = ' '.join([word.capitalize() for word in member.role.split('_')])
-            if role=='Writer': role = 'Author'
-            metadata.people.append(OrdDict((('name',name), ('job',role))))
+        # sort cast according given priority, add character if available
+        prio_list = []
+        tmp_list = [x for x in self.cast if x.priority > 0]
+        tmp_list.sort(key=lambda k: (k.role, k.priority))
+        prio_list.extend(tmp_list)
+        tmp_list = [x for x in self.cast if x.priority == 0]
+        tmp_list.sort(key=lambda k: (k.role, k.name))
+        prio_list.extend(tmp_list)
+
+        for pitem in prio_list:
+            character = None
+            name = pitem.name
+            if pitem.roleid:
+                character = self._InverseRole(pitem.roleid, self._db).name
+            role = ' '.join([word.capitalize() for word in pitem.role.split('_')])
+            if role == 'Writer': role = 'Author'
+            if character:
+                metadata.people.append(OrdDict((('name', name), ('job', role),
+                                                ('character', character))))
+            else:
+                metadata.people.append(OrdDict((('name', name), ('job', role))))
 
 #        for arttype in ['coverart', 'fanart', 'banner']:
 #            art = getattr(self.artwork, arttype)
