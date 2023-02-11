@@ -602,10 +602,15 @@ class Recorded( CMPRecord, DBDataWrite ):
             else:
                 metadata.people.append(OrdDict((('name', name), ('job', role))))
 
-#        for arttype in ['coverart', 'fanart', 'banner']:
-#            art = getattr(self.artwork, arttype)
-#            if art:
-#                metadata.images.append(OrdDict((('type',arttype), ('filename',art))))
+        # pull artworks
+        for arttype in ['coverart', 'fanart', 'banner']:
+            art = getattr(self.artwork, arttype)
+            if art:
+                # process URI (myth://<group>@<host>[:<port>]/<path/to/file>)
+                # should we use for hostname 'art.hostname' or 'localhost'?
+                url = "myth://%s@%s/%s" % (art.imagetype, art.hostname, str(art))
+                metadata.images.append \
+                    (OrdDict((('type', arttype), ('filename', str(art)), ('url', url))))
 
         return metadata
 
@@ -1235,10 +1240,14 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
             metadata.countries.append(country.country)
 
         # pull images
-#        for arttype in ['coverart', 'fanart', 'banner', 'screenshot']:
-#            art = getattr(self, arttype)
-#            if art:
-#                metadata.images.append(OrdDict((('type',arttype), ('filename',art))))
+        for arttype in ['coverart', 'fanart', 'banner', 'screenshot']:
+            art = getattr(self, arttype)
+            if art:
+                # process URI (myth://<group>@<host>[:<port>]/<path/to/file>)
+                # should we use for hostname 'art.hostname' or 'localhost'?
+                url = "myth://%s@%s/%s" % (art.imagetype, art.hostname, str(art))
+                metadata.images.append \
+                    (OrdDict((('type', arttype), ('filename', str(art)), ('url', url))))
 
         return metadata
 
