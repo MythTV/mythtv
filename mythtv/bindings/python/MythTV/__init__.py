@@ -15,7 +15,7 @@ __all_data__        = ['Record', 'Recorded', 'RecordedProgram', 'OldRecorded', \
                        'InternetContent', 'InternetContentArticles', \
                        'InternetSource', 'Song', 'Album', 'Artist', \
                        'MusicPlaylist', 'MusicDirectory', 'RecordedArtwork', \
-                       'RecordedFile']
+                       'RecordedFile', 'InetrefGrabber']
 
 __all_method__      = ['MythBE', 'BEEventMonitor', 'MythSystemEvent', \
                        'Frontend', 'MythDB', 'MythXML', 'MythMusic', \
