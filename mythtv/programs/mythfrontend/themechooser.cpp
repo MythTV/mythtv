@@ -215,7 +215,7 @@ void ThemeChooser::Load(void)
             }
             else
             {
-                LOG(VB_GENERAL, LOG_WARN, QString("Failed to match theme for %1").arg(GetMythSourceVersion()));
+                LOG(VB_GENERAL, LOG_WARNING, QString("Failed to match theme for %1").arg(GetMythSourceVersion()));
             }
 
             ResetBusyPopup();
@@ -229,7 +229,7 @@ void ThemeChooser::Load(void)
             MythVersion = "trunk";
             if (!LoadVersion(MythVersion, themesSeen, true))
             {
-                LOG(VB_GENERAL, LOG_WARN, QString("Failed to load themes for %1").arg(MythVersion));
+                LOG(VB_GENERAL, LOG_WARNING, QString("Failed to load themes for %1").arg(MythVersion));
             }
         }
     }
