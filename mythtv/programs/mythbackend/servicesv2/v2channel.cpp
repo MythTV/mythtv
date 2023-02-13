@@ -37,6 +37,7 @@
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythversion.h"
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/programtypes.h"
 #include "libmythtv/channelutil.h"
 #include "libmythtv/sourceutil.h"
 #include "libmythtv/cardutil.h"
@@ -80,6 +81,8 @@ void V2Channel::RegisterCustomTypes()
     qRegisterMetaType<V2Grabber*>("V2Grabber");
     qRegisterMetaType<V2GrabberList*>("V2GrabberList");
     qRegisterMetaType<V2FreqTableList*>("V2FreqTableList");
+    qRegisterMetaType<V2CommMethodList*>("V2CommMethodList");
+    qRegisterMetaType<V2CommMethod*>("V2CommMethod");
 }
 
 V2Channel::V2Channel() : MythHTTPService(s_service)
@@ -201,7 +204,9 @@ bool V2Channel::UpdateDBChannel( uint          MplexID,
                                const QString &XMLTVID,
                                const QString &DefaultAuthority,
                                uint          ServiceType,
-                               int           RecPriority )
+                               int           RecPriority,
+                               int           TimeOffset,
+                               int           CommMethod )
 {
     if (!HAS_PARAMv2("ChannelID"))
         throw QString("ChannelId is required");
@@ -261,7 +266,10 @@ bool V2Channel::UpdateDBChannel( uint          MplexID,
         channel.m_serviceType = ServiceType;
     if (HAS_PARAMv2("RecPriority"))
         channel.m_recPriority = RecPriority;
-
+    if (HAS_PARAMv2("TimeOffset"))
+        channel.m_tmOffset = TimeOffset;
+    if (HAS_PARAMv2("CommMethod"))
+        channel.m_commMethod = CommMethod;
     bool bResult = ChannelUtil::UpdateChannel(
         channel.m_mplexId, channel.m_sourceId, channel.m_chanId,
         channel.m_callSign, channel.m_name, channel.m_chanNum,
@@ -270,7 +278,7 @@ bool V2Channel::UpdateDBChannel( uint          MplexID,
         channel.m_visible, channel.m_freqId,
         channel.m_icon, channel.m_tvFormat, channel.m_xmltvId,
         channel.m_defaultAuthority, channel.m_serviceType,
-        channel.m_recPriority );
+        channel.m_recPriority, channel.m_tmOffset, channel.m_commMethod );
 
     return bResult;
 }
@@ -293,7 +301,9 @@ bool V2Channel::AddDBChannel( uint          MplexID,
                             const QString &XMLTVID,
                             const QString &DefaultAuthority,
                             uint          ServiceType,
-                            int           RecPriority )
+                            int           RecPriority,
+                            int           TimeOffset,
+                            int           CommMethod )
 {
     ChannelVisibleType chan_visible = kChannelVisible;
     if (HAS_PARAMv2("ExtendedVisible"))
@@ -306,7 +316,7 @@ bool V2Channel::AddDBChannel( uint          MplexID,
                              ServiceID, ATSCMajorChannel, ATSCMinorChannel,
                              UseEIT, chan_visible, FrequencyID,
                              Icon, Format, XMLTVID, DefaultAuthority,
-                             ServiceType, RecPriority );
+                             ServiceType, RecPriority, TimeOffset, CommMethod );
 
     return bResult;
 }
@@ -317,6 +327,25 @@ bool V2Channel::RemoveDBChannel( uint nChannelID )
 
     return bResult;
 }
+
+
+V2CommMethodList* V2Channel::GetCommMethodList  ( void )
+{
+    auto* pList = new V2CommMethodList();
+
+    std::deque<int> tmp = GetPreferredSkipTypeCombinations();
+    tmp.push_front(COMM_DETECT_UNINIT);
+    tmp.push_back(COMM_DETECT_COMMFREE);
+
+    for (int pref : tmp)
+    {
+        V2CommMethod* pCommMethod = pList->AddNewCommMethod();
+        pCommMethod->setCommMethod(pref);
+        pCommMethod->setLocalizedName(SkipTypeToString(pref));
+    }
+    return pList;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -1497,7 +1497,9 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
                                 const QString& xmltvid,
                                 const QString& default_authority,
                                 uint service_type,
-                                int  recpriority)
+                                int  recpriority,
+                                int  tmOffset,
+                                int  commMethod )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1514,7 +1516,8 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
         "   atsc_major_chan,           atsc_minor_chan,   "
         "   useonairguide, visible,    tvformat,          "
         "   icon,          xmltvid,    default_authority, "
-        "   service_type,  recpriority) "
+        "   service_type,  recpriority, tmoffset,         "
+        "   commmethod ) "
         "VALUES "
         "  (:CHANID,       :CHANNUM,   :SOURCEID,         "
         "   :CALLSIGN,     :NAME,      :SERVICEID,        ";
@@ -1524,7 +1527,8 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
         "   :MAJORCHAN,                :MINORCHAN,        "
         "   :USEOAG,       :VISIBLE,   :TVFORMAT,         "
         "   :ICON,         :XMLTVID,   :AUTHORITY,        "
-        "   :SERVICETYPE,  :RECPRIORITY )        ";
+        "   :SERVICETYPE, :RECPRIORITY, :TMOFFSET,        "
+        "   :COMMMETHOD ) ";
 
     query.prepare(qstr);
 
@@ -1553,6 +1557,8 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
     query.bindValueNoNull(":AUTHORITY",   default_authority);
     query.bindValue      (":SERVICETYPE", service_type);
     query.bindValue      (":RECPRIORITY", recpriority);
+    query.bindValue      (":TMOFFSET",    tmOffset);
+    query.bindValue      (":COMMMETHOD",  commMethod);
 
     if (!query.exec() || !query.isActive())
     {
@@ -1579,7 +1585,9 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
                                 const QString& xmltvid,
                                 const QString& default_authority,
                                 uint service_type,
-                                int  recpriority)
+                                int  recpriority,
+                                int  tmOffset,
+                                int  commMethod )
 {
     if (!channel_id)
         return false;
@@ -1588,7 +1596,7 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
     bool set_channum = !chan_num.isEmpty() && chan_num != "-1";
     QString qstr = QString(
         "UPDATE channel "
-        "SET %1 %2 %3 %4 %5 %6 %7"
+        "SET %1 %2 %3 %4 %5 %6 %7 %8 %9 "
         "    mplexid         = :MPLEXID,   serviceid       = :SERVICEID, "
         "    atsc_major_chan = :MAJORCHAN, atsc_minor_chan = :MINORCHAN, "
         "    callsign        = :CALLSIGN,  name            = :NAME,      "
@@ -1602,7 +1610,9 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
              (xmltvid.isNull())   ? "" : "xmltvid  = :XMLTVID,  ",
              (default_authority.isNull()) ?
              "" : "default_authority = :AUTHORITY,",
-             (recpriority == -9999) ? "" : "recpriority = :RECPRIORITY,");
+             (recpriority == INT_MIN) ? "" : "recpriority = :RECPRIORITY, ",
+             (tmOffset == INT_MIN) ? "" : "tmOffset = :TMOFFSET, ",
+             (commMethod == INT_MIN) ? "" : "commmethod = :COMMMETHOD, ");
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(qstr);
@@ -1634,8 +1644,12 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
         query.bindValue(":XMLTVID",   xmltvid);
     if (!default_authority.isNull())
         query.bindValue(":AUTHORITY",   default_authority);
-    if (recpriority != -9999)
+    if (recpriority != INT_MIN)
         query.bindValue(":RECPRIORITY", recpriority);
+    if (tmOffset != INT_MIN)
+        query.bindValue(":TMOFFSET", tmOffset);
+    if (commMethod != INT_MIN)
+        query.bindValue(":COMMMETHOD", commMethod);
 
     if (!query.exec())
     {

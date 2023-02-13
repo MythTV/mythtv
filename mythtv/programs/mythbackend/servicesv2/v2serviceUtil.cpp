@@ -1,6 +1,7 @@
 // MythTV
 #include "libmythbase/mythscheduler.h"
 #include "libmythbase/programinfo.h"
+#include "libmythbase/programtypes.h"
 #include "libmythbase/recordingtypes.h"
 #include "libmythmetadata/videoutils.h"
 #include "libmythtv/cardutil.h"
@@ -194,6 +195,8 @@ bool V2FillChannelInfo( V2ChannelInfo *pChannel,
         pChannel->setDefaultAuth(channelInfo.m_defaultAuthority);
         pChannel->setServiceType(channelInfo.m_serviceType);
         pChannel->setRecPriority(channelInfo.m_recPriority);
+        pChannel->setTimeOffset(channelInfo.m_tmOffset);
+        pChannel->setCommMethod(channelInfo.m_commMethod);
 
         QList<uint> groupIds = channelInfo.GetGroupIds();
         QString sGroupIds;
