@@ -91,6 +91,7 @@ HEADERS += servicesv2/v2recRuleList.h
 HEADERS += servicesv2/v2content.h
 HEADERS += servicesv2/v2guide.h servicesv2/v2programGuide.h
 HEADERS += servicesv2/v2channel.h
+HEADERS += servicesv2/v2commMethod.h
 HEADERS += servicesv2/v2channelInfoList.h servicesv2/v2lineup.h
 HEADERS += servicesv2/v2videoSource.h servicesv2/v2videoSourceList.h
 HEADERS += servicesv2/v2videoMultiplex.h servicesv2/v2videoMultiplexList.h
