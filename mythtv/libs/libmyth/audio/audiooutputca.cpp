@@ -26,7 +26,7 @@
 #include "libmythbase/mythcorecontext.h"
 #include "audiooutputca.h"
 
-#if !defined(MAC_OS_VERSION_12_0)
+#if (MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_VERSION_12_0)
 #define kAudioObjectPropertyElementMain kAudioObjectPropertyElementMaster
 #endif
 

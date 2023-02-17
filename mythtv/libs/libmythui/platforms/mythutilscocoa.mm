@@ -6,7 +6,7 @@
 #import <IOKit/graphics/IOGraphicsLib.h>
 #include <AvailabilityMacros.h>
 
-#if !defined(MAC_OS_VERSION_12_0)
+#if (MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_VERSION_12_0)
 #define kIOMainPortDefault kIOMasterPortDefault
 #endif
 
