@@ -8,9 +8,9 @@
 #include <IOKit/ps/IOPSKeys.h>
 #include <AvailabilityMacros.h>
 
-#if !defined(MAC_OS_VERSION_12_0)
-#define kIOMainPortDefault kIOMasterPortDefault
-#endif
+// kIOMainPortDefault was deprecated in OS_X 12
+// kIOMainPortDefault defaults to a main/master port value of 0
+static constexpr int8_t kMythIOMainPortDefault { 0 };
 
 #define LOC QString("PowerOSX: ")
 
@@ -65,7 +65,7 @@ void MythPowerOSX::Init(void)
 
     // Is there a battery?
     CFArrayRef batteryinfo = NULL;
-    if (IOPMCopyBatteryInfo(kIOMainPortDefault, &batteryinfo) == kIOReturnSuccess)
+    if (IOPMCopyBatteryInfo(kMythIOMainPortDefault, &batteryinfo) == kIOReturnSuccess)
     {
         CFRelease(batteryinfo);
 
