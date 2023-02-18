@@ -23,9 +23,9 @@
 
 #include "libmythbase/mythlogging.h"
 
-#if !defined(MAC_OS_VERSION_12_0)
-#define kIOMainPortDefault kIOMasterPortDefault
-#endif
+// kIOMainPortDefault was deprecated in OS_X 12
+// kIOMainPortDefault defaults to a main/master port value of 0
+static constexpr int8_t kMythIOMainPortDefault { 0 };
 
 AppleRemote*    AppleRemote::_instance = nullptr;
 
@@ -193,7 +193,7 @@ static io_object_t _findAppleRemoteDevice(const char *devName)
     hidMatchDictionary = IOServiceMatching(devName);
 
     // check for matching devices
-    ioReturnValue = IOServiceGetMatchingServices(kIOMainPortDefault,
+    ioReturnValue = IOServiceGetMatchingServices(kMythIOMainPortDefault,
                                                  hidMatchDictionary,
                                                  &hidObjectIterator);
 
