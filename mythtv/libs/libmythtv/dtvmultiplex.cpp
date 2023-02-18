@@ -470,12 +470,14 @@ bool DTVMultiplex::ParseTuningParams(
     const QString& _modulation,   const QString& _bandwidth,
     const QString& _mod_sys,      const QString& _rolloff)
 {
-    if (DTVTunerType::kTunerTypeDVBT == type)
+    if ((DTVTunerType::kTunerTypeDVBT  == type) ||
+        (DTVTunerType::kTunerTypeDVBT2 == type))
     {
-        return ParseDVB_T(
+        return ParseDVB_T2(
             _frequency,       _inversion,       _bandwidth,
             _hp_code_rate,    _lp_code_rate,    _ofdm_modulation,
-            _trans_mode,      _guard_interval,  _hierarchy);
+            _trans_mode,      _guard_interval,  _hierarchy,
+            _mod_sys);
     }
 
     if (DTVTunerType::kTunerTypeDVBC  == type)
@@ -501,14 +503,6 @@ bool DTVMultiplex::ParseTuningParams(
             _mod_sys,         _rolloff);
     }
 
-    if (DTVTunerType::kTunerTypeDVBT2 == type)
-    {
-        return ParseDVB_T2(
-            _frequency,       _inversion,       _bandwidth,
-            _hp_code_rate,    _lp_code_rate,    _ofdm_modulation,
-            _trans_mode,      _guard_interval,  _hierarchy,
-            _mod_sys);
-    }
 
     if (DTVTunerType::kTunerTypeATSC == type)
     {
