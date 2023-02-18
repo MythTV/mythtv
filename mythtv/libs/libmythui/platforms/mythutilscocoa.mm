@@ -6,9 +6,9 @@
 #import <IOKit/graphics/IOGraphicsLib.h>
 #include <AvailabilityMacros.h>
 
-#if !defined(MAC_OS_VERSION_12_0)
-#define kIOMainPortDefault kIOMasterPortDefault
-#endif
+// kIOMainPortDefault was depracated in OS_X 12
+// kIOMainPortDefault defaults to a main/master port value of 0
+static constexpr int8_t darwin_default_master_port { 0 };
 
 CGDirectDisplayID GetOSXCocoaDisplay(void* View)
 {
@@ -44,7 +44,7 @@ QByteArray GetOSXEDID(CGDirectDisplayID Display)
     CFMutableDictionaryRef matching = IOServiceMatching("IODisplayConnect");
 
     io_iterator_t iter;
-    if (IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iter))
+    if (IOServiceGetMatchingServices(darwin_default_master_port, matching, &iter))
       return result;
 
     io_service_t service = 0;
