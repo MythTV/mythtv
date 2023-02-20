@@ -27,7 +27,7 @@
 #include "audiooutputca.h"
 
 // kAudioObjectPropertyElementMaster was deprecated in OS_X 12
-// kAudioObjectPropertyElementMaster defaults to a main/master port value of 0
+// kAudioObjectPropertyElementMain defaults to a main/master port value of 0
 static constexpr int8_t kMythAudioObjectPropertyElementMain { 0 };
 
 #define LOC QString("CoreAudio: ")

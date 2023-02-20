@@ -6,7 +6,7 @@
 #import <IOKit/graphics/IOGraphicsLib.h>
 #include <AvailabilityMacros.h>
 
-// kIOMainPortDefault was deprecated in OS_X 12
+// kIOMasterPortDefault was deprecated in OS_X 12
 // kIOMainPortDefault defaults to a main/master port value of 0
 static constexpr int8_t kMythIOMainPortDefault { 0 };
 
