@@ -425,22 +425,6 @@ bool DTVMultiplex::ParseDVB_T2(
     m_modSys = DTVModulationSystem::kModulationSystem_UNDEFINED;
     m_modSys.Parse(_mod_sys);
 
-    // Accept 0 for DVB-T
-    if (_mod_sys == "0")
-    {
-        m_modSys = DTVModulationSystem::kModulationSystem_DVBT;
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Deprecated DVB-T modulation system " +
-                QString("parameter '%1', using %2.").arg(_mod_sys, m_modSys.toString()));
-    }
-
-    // Accept 1 for DVB-T2
-    if (_mod_sys == "1")
-    {
-        m_modSys = DTVModulationSystem::kModulationSystem_DVBT2;
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Deprecated DVB-T2 modulation system " +
-                QString("parameter '%1', using %2.").arg(_mod_sys, m_modSys.toString()));
-    }
-
     // We have a DVB-T2 tuner, change undefined modulation system to DVB-T2
     if (DTVModulationSystem::kModulationSystem_UNDEFINED == m_modSys)
     {
