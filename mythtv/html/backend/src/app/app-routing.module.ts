@@ -11,6 +11,7 @@ import { CaptureCardsComponent } from './config/settings/capture-cards/capture-c
 import { VideoSourcesComponent } from './config/settings/video-sources/video-sources.component';
 import { InputConnectionsComponent } from './config/settings/input-connections/input-connections.component';
 import { StorageGroupsComponent } from './config/settings/storage-groups/storage-groups.component';
+import { ChannelEditorComponent } from './config/settings/channel-editor/channel-editor.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
@@ -30,6 +31,10 @@ const routes: Routes = [
   },
   {
     path: 'settings/input-connections', component: InputConnectionsComponent,
+    canDeactivate: [CanDeactivateGuardService]
+  },
+  {
+    path: 'settings/channel-editor', component: ChannelEditorComponent,
     canDeactivate: [CanDeactivateGuardService]
   },
   {

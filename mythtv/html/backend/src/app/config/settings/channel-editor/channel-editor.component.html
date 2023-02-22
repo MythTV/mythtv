@@ -1,0 +1,243 @@
+<form class="ml-3 mr-3" name="chanform" #chanform="ngForm">
+
+    <div class="block card w-full" style="height: calc(100vh - 200px)">
+        <h3>{{ 'settings.chanedit.title' | translate }}</h3>
+        <p-table [value]="allChannels" scrollHeight="flex" [scrollable]="true"
+            styleClass="p-datatable-gridlines p-datatable-striped" [rowHover]="true">
+            <ng-template pTemplate="caption">
+                <button pButton pRipple label="{{ 'settings.chanedit.new_channel' | translate }}" icon="pi pi-plus"
+                    class="p-button-success mr-2" (click)="openNew()"></button>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="flex-grow: 4"></th>
+                    <th style="flex-grow: 4">Chan Num</th>
+                    <th style="flex-grow: 3">Freq Id</th>
+                    <th style="flex-grow: 5">Call Sign</th>
+                    <th style="flex-grow: 12">Name</th>
+                    <th style="flex-grow: 8">Source</th>
+                    <th style="flex-grow: 3">Priority</th>
+                    <th style="flex-grow: 5">Visibility</th>
+                    <th style="flex-grow: 3">Use EIT</th>
+                    <th style="flex-grow: 3">
+                        <!-- These are disabled buttons to ensure the spacing of the heading
+                         matches the spacing of the rows -->
+                        <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-success"
+                            disabled="true"></button>
+                        <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
+                            disabled="true"></button>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-channel>
+                <tr height="40" [ngClass]="{'line-through' : channel.ChanId < 0}">
+                    <td style="flex-grow: 4">
+                        <img src="{{channel.IconURL}}" height="32" width="42" *ngIf="channel.IconURL; else nullIcon"
+                            style="background-color:#000000" onerror="this.height='0'">
+                        <ng-template #nullIcon><img height="32" width="42"></ng-template>
+                    </td>
+                    <td style="flex-grow: 4">{{channel.ChanNum}}</td>
+                    <td style="flex-grow: 3">{{channel.FrequencyId}}</td>
+                    <td style="flex-grow: 5">{{channel.CallSign}}</td>
+                    <td style="flex-grow: 12">{{channel.ChannelName}}</td>
+                    <td style="flex-grow: 8">{{ getSource(channel) }}</td>
+                    <td style="flex-grow: 3">{{channel.RecPriority}}</td>
+                    <td style="flex-grow: 5">{{ getVisibility(channel) }}</td>
+                    <td style="flex-grow: 3">{{ channel.UseEIT ? 'Y' : 'N' }}</td>
+                    <td style="flex-grow: 3">
+                        <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-success"
+                            (click)="editChannel(channel)" [disabled]="channel.ChanId < 0"></button>
+                        <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
+                            (click)="deleteRequest(channel)" [disabled]="channel.ChanId < 0"></button>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+
+        <p-dialog header="{{ dialogHeader }}" [(visible)]="displayChannelDlg" [modal]="true"
+            [style]="{height: '75vw', width: '50vw'}" [closable]="false" [closeOnEscape]="false">
+
+            <div class="form-group field">
+                <label for="ChannelName" class="block">{{ 'settings.chanedit.channame' | translate }}</label>
+                <input pInputText id="ChannelName" [(ngModel)]="channel.ChannelName" name="ChannelName"
+                    #ChannelName="ngModel" class="mb-2 form-control w-full" />
+                <small class="block">
+                    {{ 'settings.chanedit.channame_desc' | translate }}
+                </small>
+            </div>
+
+            <div class="form-group field">
+                <label for="ChanNum" class="block">{{ 'settings.chanedit.channum' | translate }}</label>
+                <input pInputText id="ChanNum" [(ngModel)]="channel.ChanNum" name="ChanNum" #ChanNum="ngModel"
+                    class="mb-2 form-control w-full" />
+                <small class="block">
+                    {{ 'settings.chanedit.channum_desc' | translate }}
+                </small>
+            </div>
+
+            <div class="form-group field">
+                <label for="FrequencyId" class="block">{{ 'settings.chanedit.freqid' | translate }}</label>
+                <input pInputText id="FrequencyId" [(ngModel)]="channel.FrequencyId" name="FrequencyId"
+                    #FrequencyId="ngModel" class="mb-2 form-control w-full" />
+                <small class="block">
+                    {{ 'settings.chanedit.freqid_desc' | translate }}
+                </small>
+            </div>
+
+            <div class="form-group field">
+                <label for="CallSign" class="block">{{ 'settings.chanedit.callsign' | translate }}</label>
+                <input pInputText id="CallSign" [(ngModel)]="channel.CallSign" name="CallSign" #CallSign="ngModel"
+                    class="mb-2 form-control w-full" />
+                <small class="block">
+                    {{ 'settings.chanedit.callsign_desc' | translate }}
+                </small>
+            </div>
+
+            <div class="form-group field" *ngIf="transDone >= numTranslations">
+                <label for="ExtendedVisible" class="block">{{ 'settings.chanedit.visible_label' | translate
+                    }}</label>
+                <p-dropdown [options]="visibilities" [(ngModel)]="channel.ExtendedVisible" [editable]="false"
+                    optionLabel="prompt" optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}"
+                    name="ExtendedVisible" #ExtendedVisible="ngModel">
+                </p-dropdown>
+                <small class="block">
+                    {{ 'settings.chanedit.visible_desc' | translate }}
+                </small>
+            </div>
+
+            <div class="form-group field">
+                <label for="ServiceId" class="block">{{ 'settings.chanedit.serviceid_label' | translate
+                    }}</label>
+                <p-inputNumber [(ngModel)]="channel.ServiceId" name="ServiceId" id="ServiceId" [showButtons]="true"
+                    [min]="-1" [max]="65535" [step]="1"></p-inputNumber>
+                <small class="block">
+                    {{ 'settings.chanedit.serviceid_desc' | translate }}
+                </small>
+            </div>
+
+            <div class="form-group field">
+                <label for="SourceId" class="block">{{ 'settings.chanedit.source_label' | translate
+                    }}</label>
+                <p-dropdown [options]="videoSources" [(ngModel)]="channel.SourceId" [editable]="false"
+                    optionLabel="SourceName" optionValue="Id" [maxlength]="0" [style]="{'minWidth':'400px'}"
+                    name="SourceId" #SourceId="ngModel">
+                </p-dropdown>
+                <small class="block">
+                    {{ 'settings.chanedit.source_desc' | translate }}
+                </small>
+            </div>
+
+            <div class="form-group field" *ngIf="transDone >= numTranslations">
+                <label for="Format" class="block">{{ 'settings.chanedit.format_label' | translate
+                    }}</label>
+                <p-dropdown [options]="tvFormats" [(ngModel)]="channel.Format" [editable]="false" optionLabel="prompt"
+                    optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}" name="Format" #Format="ngModel">
+                </p-dropdown>
+                <small class="block">
+                    {{ 'settings.chanedit.format_desc' | translate }}
+                </small>
+            </div>
+
+            <div class="form-group field">
+                <label for="RecPriority" class="block">{{ 'settings.chanedit.priority_label' | translate
+                    }}</label>
+                <p-inputNumber [(ngModel)]="channel.RecPriority" name="RecPriority" id="RecPriority"
+                    [showButtons]="true" [min]="-99" [max]="99" [step]="1"></p-inputNumber>
+                <small class="block">
+                    {{ 'settings.chanedit.priority_desc' | translate }}
+                </small>
+            </div>
+
+            <div class="form-group field">
+                <p-checkbox inputId="UseEIT" [(ngModel)]="channel.UseEIT" name="UseEIT" #UseEIT="ngModel"
+                    class="mb-2 w-full" [binary]="true" label="{{ 'settings.chanedit.eit_label' | translate }}">
+                </p-checkbox>
+                <small class="block">
+                    {{ 'settings.chanedit.eit_desc' | translate }}
+                </small>
+            </div>
+
+            <div class="form-group field">
+                <label for="XMLTVID" class="block">{{ 'settings.chanedit.xmltvid_label' | translate }}</label>
+                <input pInputText id="XMLTVID" [(ngModel)]="channel.XMLTVID" name="XMLTVID" #XMLTVID="ngModel"
+                    class="mb-2 form-control w-full" />
+                <small class="block">
+                    {{ 'settings.chanedit.xmltvid_desc' | translate }}
+                </small>
+            </div>
+
+            <div class="form-group field">
+                <label for="TimeOffset" class="block">{{ 'settings.chanedit.timeoffset_label' | translate
+                    }}</label>
+                <p-inputNumber [(ngModel)]="channel.TimeOffset" name="TimeOffset" id="TimeOffset" [showButtons]="true"
+                    [min]="-1440" [max]="1440" [step]="30"></p-inputNumber>
+                <small class="block">
+                    {{ 'settings.chanedit.timeoffset_desc' | translate }}
+                </small>
+            </div>
+
+            <div class="form-group field">
+                <label for="CommMethod" class="block">{{ 'settings.chanedit.commmethod_label' | translate
+                    }}</label>
+                <p-dropdown [options]="commMethods" [(ngModel)]="channel.CommMethod" [editable]="false"
+                    optionLabel="LocalizedName" optionValue="CommMethod" [maxlength]="0" [style]="{'minWidth':'400px'}"
+                    name="CommMethod" #CommMethod="ngModel">
+                </p-dropdown>
+                <small class="block">
+                    {{ 'settings.chanedit.commmethod_desc' | translate }}
+                </small>
+            </div>
+
+            <!-- Blank space here is so that the dropdown box can fit, otherwise there can be an impossibe
+                 situation with the scroll bar and the drop box-->
+            <br><br><br><br><br><br><br><br>
+
+            <ng-template pTemplate="footer">
+                <div class="col-12" style="text-align: left;">
+                    <p-message *ngIf="successCount > 0 && errorCount == 0 && !chanform.dirty" severity="success"
+                        text="{{ 'common.savesuccess' | translate }}"></p-message>
+                    <p-message *ngIf="errorCount > 0" severity="error"
+                        text="{{ 'common.networkfail' | translate }}"></p-message>
+                </div>
+                <p-button icon="pi pi-times-circle" (onClick)="closeDialog()" label="{{ 'common.close' | translate }}"
+                    styleClass="p-button-warning">
+                </p-button>
+                <p-button icon="pi pi-check-circle" (onClick)="saveChannel();" label="{{ 'common.save' | translate }}"
+                    styleClass="p-button-success"
+                    [disabled]="!chanform.dirty || channel.ChannelName.trim() == '' || channel.ChanNum.trim() == '' || channel.CallSign.trim() == '' "></p-button>
+            </ng-template>
+        </p-dialog>
+        <p-dialog header="{{ 'common.unsaved_heading' | translate }}" [(visible)]="displayUnsaved" [modal]="true">
+            <p>{{ 'common.unsaved_message' | translate }}</p>
+            <ng-template pTemplate="footer">
+                <p-button icon="pi pi-times-circle" (onClick)="closeDialog()" label="{{ 'common.nosave' | translate }}"
+                    styleClass="p-button-danger">
+                </p-button>
+                <p-button icon="pi pi-check-circle" (onClick)="displayUnsaved=false"
+                    label="{{ 'common.continue' | translate }}" styleClass="p-button-success">
+                </p-button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog header="{{ 'settings.chanedit.delete_this' | translate }}" [(visible)]="displayDelete" [modal]="true"
+            [draggable]="false" [resizable]="false">
+            <h2>{{ 'settings.ru_sure' | translate }}</h2>
+            <p>{{ 'settings.chanedit.delete_details' |
+                translate: {ChanNum: channel.ChanNum,
+                ChannelName: channel.ChannelName,
+                Source: getSource(channel)} }}</p>
+            <ng-template pTemplate="footer">
+                <div class="col-12" style="text-align: left;">
+                    <p-message *ngIf="errorCount > 0" severity="error"
+                        text="{{ 'common.networkfail' | translate }}"></p-message>
+                </div>
+                <p-button icon="pi pi-times-circle" (click)="displayDelete=false"
+                    label="{{ 'common.close' | translate }}" styleClass="p-button-warning">
+                </p-button>
+                <p-button icon="pi pi-check-circle" (click)="deleteChannel(channel)"
+                    label="{{ 'common.delete' | translate }}" styleClass="p-button-danger"></p-button>
+            </ng-template>
+        </p-dialog>
+
+    </div>
+</form>

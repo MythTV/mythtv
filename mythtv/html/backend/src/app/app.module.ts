@@ -64,6 +64,7 @@ import { InputConnectionsComponent } from './config/settings/input-connections/i
 import { IconnectionComponent } from './config/settings/input-connections/iconnection/iconnection.component';
 import { StorageGroupsComponent } from './config/settings/storage-groups/storage-groups.component';
 import { SgroupComponent } from './config/settings/storage-groups/sgroup/sgroup.component';
+import { ChannelEditorComponent } from './config/settings/channel-editor/channel-editor.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -124,6 +125,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     IconnectionComponent,
     StorageGroupsComponent,
     SgroupComponent,
+    ChannelEditorComponent,
   ],
   imports: [
     BrowserModule,

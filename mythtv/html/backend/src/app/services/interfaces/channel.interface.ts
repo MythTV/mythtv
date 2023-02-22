@@ -10,6 +10,7 @@ export interface Channel {
     ChannelGroups:      string; // null in sample data
     ChannelName:        string;
     CommFree:           boolean;
+    CommMethod:         number;
     DefaultAuth:        string;
     ExtendedVisible:    string;
     FineTune:           number;
@@ -20,33 +21,49 @@ export interface Channel {
     Inputs:             string; // null in sample data
     MplexId:            number;
     Programs:           ScheduleOrProgram[];
+    RecPriority:        number;
     ServiceId:          number;
     ServiceType:        number;
     SourceId:           number;
+    TimeOffset:         number;
     UseEIT:             boolean;
     Visible:            boolean;
     XMLTVID:            string;
 }
 
-export interface AddDBChannelRequest {
-    ATSCMajorChan:      number;
-    ATSCMinorChan:      number;
-    CallSign:           string;
+export interface CommMethod {
+    CommMethod:         string;
+    LocalizedName:      string;
+}
+
+export interface CommMethodList {
+    CommMethodList: {
+        CommMethods: CommMethod[];
+    }
+}
+
+export interface DBChannelRequest {
+    ATSCMajorChan?:     number;
+    ATSCMinorChan?:     number;
+    CallSign?:          string;
     ChannelID:          number;
-    ChannelNumber:      string; // number sent as string
-    ChannelName:        string;
-    DefaultAuthority:   string;
-    ExtendedVisible:    string;
-    Format:             string;
-    FrequencyID:        string; // null in sample data
-    Icon:               string;
-    MplexID:            number;
-    ServiceID:          number;
-    ServiceType:        number;
-    SourceID:           number;
-    UseEIT:             boolean;
-    Visible:            boolean;
-    XMLTVID:            string;
+    ChannelNumber?:     string; // number sent as string
+    ChannelName?:       string;
+    CommMethod?:        number;
+    DefaultAuthority?:  string;
+    ExtendedVisible?:   string;
+    Format?:            string;
+    FrequencyID?:       string; // null in sample data
+    Icon?:              string;
+    MplexID?:           number;
+    RecPriority?:       number;
+    ServiceID?:         number;
+    ServiceType?:       number;
+    SourceID?:          number;
+    TimeOffset?:        number;
+    UseEIT?:            boolean;
+    Visible?:           boolean;
+    XMLTVID?:           string;
 }
 
 export interface FetchChannelsFromSourceRequest {
@@ -55,16 +72,17 @@ export interface FetchChannelsFromSourceRequest {
     WaitForFinish:      boolean;
 }
 
+// All parameters are optional.
 export interface GetChannelInfoListRequest {
-    SourceID:           number;
-    ChannelGroupID:     number;
-    StartIndex:         number;
-    Count:              number;
-    OnlyVisible:        boolean;
-    Details:            boolean;
-    OrderByName:        boolean;
-    GroupByCallsign:    boolean;
-    OnlyTunable:        boolean;
+    SourceID?:           number;
+    ChannelGroupID?:     number;
+    StartIndex?:         number;
+    Count?:              number;
+    OnlyVisible?:        boolean;
+    Details?:            boolean;
+    OrderByName?:        boolean;
+    GroupByCallsign?:    boolean;
+    OnlyTunable?:        boolean;
 }
 
 export interface GetVideoMultiplexListRequest {

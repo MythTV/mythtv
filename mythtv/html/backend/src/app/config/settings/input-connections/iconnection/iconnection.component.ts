@@ -109,15 +109,7 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
 
   loadChannels() {
     const channelRequest: GetChannelInfoListRequest = {
-      SourceID: 0,
-      ChannelGroupID: 0,
-      StartIndex: 0,
-      Count: 0,
-      OnlyVisible: false,
-      Details: true,
-      OrderByName: false,
-      GroupByCallsign: false,
-      OnlyTunable: false
+      Details: true
     };
     this.channelService.GetChannelInfoList(channelRequest).subscribe(data => {
       this.allChannels = data.ChannelInfoList.ChannelInfos;

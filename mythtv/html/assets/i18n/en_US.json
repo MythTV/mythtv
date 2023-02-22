@@ -8,9 +8,16 @@
     "savesuccess": "Saved Successfully",
     "networkfail": "ERROR: Backend Network Failure",
     "cancel": "Cancel",
+    "delete": "Delete",
     "ok": "Ok",
     "no": "No",
-    "yes": "Yes"
+    "yes": "Yes",
+    "default": "Default",
+    "close": "Close",
+    "continue": "Continue Editing",
+    "nosave": "Close without saving",
+    "unsaved_heading": "Unsaved Changes",
+    "unsaved_message": "There are unsaved changes."
   },
   "dashboard": {
     "warning": "Please note this is a work in progress and some features are not fully working!"
@@ -645,7 +652,43 @@
     "iconnections": {
       "title": "Input Connections"
     },
-    "clipbord_tooltip": "Copy to Clipboard"
+    "clipbord_tooltip": "Copy to Clipboard",
+    "chanedit": {
+      "title": "Channel Editor",
+      "always-visible": "Always Visible",
+      "visible": "Visible",
+      "not-visible": "Not Visible",
+      "never-visible": "Never Visible",
+      "new_channel": "New Channel",
+      "channame": "Channel Name",
+      "channame_desc": "Common name for the channel",
+      "channum": "Channel Number",
+      "channum_desc": "The number by which the channel is known to MythTV",
+      "freqid": "Frequency Id",
+      "freqid_desc": "Channel Number as understood by your tuners.",
+      "callsign": "Call Sign",
+      "callsign_desc": "Unique identifier for the transmitter.",
+      "visible_label": "Visibility",
+      "visible_desc": "If set to Always Visible or Visible, the channel will be visible in the EPG.  Set to Always Visible or Never Visible to prevent MythTV and other utilities from automatically managing the value for this channel..",
+      "serviceid_label": "Service ID",
+      "serviceid_desc": "Service ID (Program Number) of desired channel within the transport stream. If there is only one channel, then setting this to anything will still find it.",
+      "source_label": "Video Source",
+      "source_desc": "It is NOT a good idea to change this value as it only changes the sourceid in table channel but not in dtv_multiplex. The sourceid in dtv_multiplex cannot and should not be changed.",
+      "format_label": "TV Format",
+      "format_desc": "If this channel uses a format other than TV Format in the General Backend Setup screen, set it here.",
+      "priority_label": "Priority",
+      "priority_desc": "\"Number of priority points to be added to any recording on this channel during scheduling. Use a positive number as the priority if you want this to be a preferred channel, a negative one to deprecate this channel.",
+      "eit_label": "Use On Air Guide",
+      "eit_desc": "If enabled, guide information for this channel will be updated using 'Over-the-Air' program listings.",
+      "xmltvid_label": "XMLTV ID",
+      "xmltvid_desc": "ID used by listing services to get an exact correspondence between a channel in your line-up and a channel in their database. Normally this is set automatically when 'mythfilldatabase' is run.",
+      "timeoffset_label": "Listings Time Offset",
+      "timeoffset_desc": "Offset (in minutes) to apply to the program guide data during import.  This can be used when the listings for a particular channel are in a different time zone.",
+      "commmethod_label": "Commercial Detection Method",
+      "commmethod_desc": "Changes the method of commercial detection used for recordings on this channel or skips detection by marking the channel as Commercial Free.",
+      "delete_details": "This will delete Channel:{{ChanNum}}, Name:{{ChannelName}}, Source:{{Source}}",
+      "delete_this": "Delete Channel"
+    }
   },
   "sidenav": {
     "settingsmenu": {
