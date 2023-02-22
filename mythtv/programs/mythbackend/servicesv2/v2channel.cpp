@@ -283,6 +283,24 @@ bool V2Channel::UpdateDBChannel( uint          MplexID,
     return bResult;
 }
 
+
+uint V2Channel::GetAvailableChanid ( void ) {
+    uint chanId = 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT MAX(chanid) FROM channel");
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Channel::AddDBChannel", query);
+        throw( QString( "Database Error executing query." ));
+    }
+    if (query.next())
+        chanId = query.value(0).toUInt() + 1;
+    if (chanId < 1000)
+        chanId = 1000;
+    return chanId;
+}
+
 bool V2Channel::AddDBChannel( uint          MplexID,
                             uint          SourceID,
                             uint          ChannelID,

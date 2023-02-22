@@ -50,6 +50,7 @@ class V2Channel : public MythHTTPService
     Q_CLASSINFO("RemoveAllVideoSources",  "methods=POST;name=bool")
     Q_CLASSINFO("RemoveVideoSource",      "methods=POST;name=bool")
     Q_CLASSINFO("FetchChannelsFromSource","methods=GET,POST;name=int")
+    Q_CLASSINFO("GetAvailableChanid",     "methods=GET,POST;name=int")
     Q_CLASSINFO("GetXMLTVIdList",         "methods=GET,POST,HEAD;name=StringList")
 
     public:
@@ -118,6 +119,8 @@ class V2Channel : public MythHTTPService
                                                      int           CommMethod );
 
         static bool            RemoveDBChannel     ( uint          ChannelID );
+
+        static uint           GetAvailableChanid   ( void );
 
         static V2CommMethodList* GetCommMethodList  ( void );
 
