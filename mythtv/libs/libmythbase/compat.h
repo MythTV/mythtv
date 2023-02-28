@@ -70,6 +70,8 @@
 
 #    undef close
 
+#    undef CopyFile
+#    undef MoveFile
 
 #    define fsync(FD) 0
 //used in videodevice only - that code is not windows-compatible anyway
