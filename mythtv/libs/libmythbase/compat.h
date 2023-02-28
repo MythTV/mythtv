@@ -143,10 +143,12 @@
 
 #    define O_SYNC 0
 
+    // Success: mkfifo returns zero but CreateNamedPipeA returns a
+    // file handle.  Failure: both return -1.
     #define mkfifo(path, mode) \
-        (int)CreateNamedPipeA(path, PIPE_ACCESS_DUPLEX | WRITE_DAC, \
-                          PIPE_WAIT, PIPE_UNLIMITED_INSTANCES, \
-                          1024, 1024, 10000, nullptr)
+        (CreateNamedPipeA(path, PIPE_ACCESS_DUPLEX | WRITE_DAC, \
+                          PIPE_WAIT, PIPE_UNLIMITED_INSTANCES,  \
+                          1024, 1024, 10000, nullptr) == INVALID_HANDLE_VALUE ? -1 : 0)
 
 #    define RTLD_LAZY 0
 #    define dlopen(x, y) LoadLibraryA((x))
