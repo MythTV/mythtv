@@ -35,7 +35,7 @@ static inline wchar_t *get_module_filename(HMODULE module)
 
     do {
         path_size = path_size ? FFMIN(2 * path_size, INT16_MAX + 1) : MAX_PATH;
-        new_path = av_realloc_array(path, path_size, sizeof *path);
+        new_path = (wchar_t *)av_realloc_array(path, path_size, sizeof *path);
         if (!new_path) {
             av_free(path);
             return NULL;
