@@ -31,9 +31,9 @@ class MUI_PUBLIC MythD3D9Painter : public MythPainter
     void Begin(QPaintDevice *parent) override; // MythPainter
     void End() override; // MythPainter
 
-    void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
+    void DrawImage(QRect dest, MythImage *im, QRect src,
                    int alpha) override; // MythPainter
-    void DrawRect(const QRect &area, const QBrush &fillBrush,
+    void DrawRect(QRect area, const QBrush &fillBrush,
                   const QPen &linePen, int alpha) override; // MythPainter
 
   protected:

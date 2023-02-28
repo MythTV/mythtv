@@ -139,8 +139,8 @@ void MythD3D9Painter::DeleteBitmaps(void)
     }
 }
 
-void MythD3D9Painter::DrawImage(const QRect &r, MythImage *im,
-                                const QRect &src, int alpha)
+void MythD3D9Painter::DrawImage(const QRect r, MythImage *im,
+                                const QRect src, int alpha)
 {
     D3D9Image *image = GetImageFromCache(im);
     if (image)
@@ -150,7 +150,7 @@ void MythD3D9Painter::DrawImage(const QRect &r, MythImage *im,
     }
 }
 
-void MythD3D9Painter::DrawRect(const QRect &area, const QBrush &fillBrush,
+void MythD3D9Painter::DrawRect(const QRect area, const QBrush &fillBrush,
                                const QPen &linePen, int alpha)
 {
     int style = fillBrush.style();
