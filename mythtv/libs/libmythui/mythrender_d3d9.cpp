@@ -12,33 +12,6 @@
 
 #define DXVA2_E_NEW_VIDEO_DEVICE MAKE_HRESULT(1, 4, 4097)
 
-class MythD3DVertexBuffer
-{
-  public:
-    explicit MythD3DVertexBuffer(IDirect3DTexture9* tex = nullptr) :
-        m_dest(QRect(QPoint(0,0),QSize(0,0))),
-        m_src(QRect(QPoint(0,0),QSize(0,0))), m_texture(tex)
-    {
-    }
-
-    uint32_t           m_color {0xFFFFFFFF};
-    QRect              m_dest;
-    QRect              m_src;
-    IDirect3DTexture9 *m_texture;
-};
-
-class MythD3DSurface
-{
-  public:
-    MythD3DSurface(QSize size = QSize(0,0), D3DFORMAT fmt = D3DFMT_UNKNOWN) :
-        m_size(size), m_fmt(fmt)
-    {
-    }
-
-    QSize     m_size;
-    D3DFORMAT m_fmt;
-};
-
 struct TEXTUREVERTEX
 {
     FLOAT       x;
