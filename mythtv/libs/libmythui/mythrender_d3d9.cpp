@@ -176,7 +176,7 @@ IDirect3DDevice9* D3D9Locker::Acquire(void)
 
 void* MythRenderD3D9::ResolveAddress(const char* lib, const char* proc)
 {
-    return QLibrary::resolve(lib, proc);
+    return (void *)QLibrary::resolve(lib, proc);
 }
 
 MythRenderD3D9::~MythRenderD3D9(void)
