@@ -109,7 +109,7 @@ class MUI_PUBLIC MythRenderD3D9 : public MythRender
     void                    Init2DState(void);
     void                    EnableBlending(IDirect3DDevice9* dev, bool enable);
     void                    MultiTexturing(IDirect3DDevice9* dev, bool enable,
-                                           IDirect3DTexture9 *texture = nullptrptr);
+                                           IDirect3DTexture9 *texture = nullptr);
     void                    SetTextureVertices(IDirect3DDevice9* dev, bool enable);
 
   private:

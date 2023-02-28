@@ -134,7 +134,7 @@ void MythD3D9Painter::DeleteBitmaps(void)
     {
         D3D9Image *img = m_bitmapDeleteList.front();
         m_bitmapDeleteList.pop_front();
-        m_HardwareCacheSize -= img->GetDataSize();
+        m_hardwareCacheSize -= img->GetDataSize();
         delete img;
     }
 }
@@ -219,12 +219,12 @@ D3D9Image* MythD3D9Painter::GetImageFromCache(MythImage *im)
     if (newimage && newimage->IsValid())
     {
         CheckFormatImage(im);
-        m_HardwareCacheSize += newimage->GetDataSize();
+        m_hardwareCacheSize += newimage->GetDataSize();
         newimage->UpdateImage(im);
         m_ImageBitmapMap[im] = newimage;
         m_ImageExpireList.push_back(im);
 
-        while (m_HardwareCacheSize > m_MaxHardwareCacheSize)
+        while (m_hardwareCacheSize > m_maxHardwareCacheSize)
         {
             MythImage *expiredIm = m_ImageExpireList.front();
             m_ImageExpireList.pop_front();

@@ -925,7 +925,7 @@ uint8_t* MythRenderD3D9::GetBuffer(IDirect3DSurface9* surface, uint &pitch)
     {
         LOG(VB_GENERAL, LOG_ERR, D3DLOC + "Failed to lock picture surface.");
         m_lock.unlock();
-        return false;
+        return nullptr;
     }
 
     pitch = d3drect.Pitch;
@@ -951,7 +951,7 @@ IDirect3DVertexBuffer9* MythRenderD3D9::CreateVertexBuffer(IDirect3DTexture9* te
         return nullptr;
 
     if (texture && !m_textures.contains(texture))
-        return false;
+        return nullptr;
 
     IDirect3DVertexBuffer9* temp_vbuf = nullptr;
     HRESULT hr = dev->CreateVertexBuffer(
@@ -962,7 +962,7 @@ IDirect3DVertexBuffer9* MythRenderD3D9::CreateVertexBuffer(IDirect3DTexture9* te
     if (FAILED(hr))
     {
         LOG(VB_GENERAL, LOG_ERR, D3DLOC + "Failed to create vertex buffer");
-        return false;
+        return nullptr;
     }
 
     m_vertexbuffers[temp_vbuf] = MythD3DVertexBuffer(texture);
