@@ -1,17 +1,11 @@
 # -*- coding: utf-8 -*-
 
 """
-Contains any static and global variables for MythTV Python Bindings
+Contains static and global variables for MythTV Python Bindings.
+Version information is placed in '_versions.py'.
 """
 
-OWN_VERSION = @MYTHTV_PYTHON_OWN_VERSION@
-SCHEMA_VERSION = 1378
-NVSCHEMA_VERSION = 1007
-MUSICSCHEMA_VERSION = 1025
-PROTO_VERSION = '91'
-PROTO_TOKEN = 'BuzzOff'
-BACKEND_SEP = '[]:[]'
-INSTALL_PREFIX = '/usr/local'
+from MythTV._versions import *
 
 class MARKUP( object ):
     MARK_UNSET            = -10
