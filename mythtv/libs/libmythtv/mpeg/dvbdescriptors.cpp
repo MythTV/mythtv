@@ -1,3 +1,6 @@
+// For windows, force the second argument of `iconv' to non-const.
+#define WINICONV_CONST
+
 // C headers
 #include <iconv.h>
 #include <unistd.h>
