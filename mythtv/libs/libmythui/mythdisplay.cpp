@@ -297,6 +297,10 @@ double MythDisplay::GetPixelAspectRatio()
     if (m_physicalSize.isEmpty() || m_resolution.isEmpty())
         return 1.0;
 
+    // HD-Ready or better displays always have square pixels
+    if (m_resolution.height() >= 720)
+        return 1.0;
+
     return (m_physicalSize.width() / static_cast<double>(m_resolution.width())) /
            (m_physicalSize.height() / static_cast<double>(m_resolution.height()));
 }
