@@ -2149,6 +2149,7 @@ static HostComboBoxSetting *ScreenAspectRatio()
     gc->addSelection(AppearanceSettings::tr("32:10 (16:10 Side by side)"),    "3.2");
     gc->addSelection(AppearanceSettings::tr("16:20 (16:10 Above and below)"), "0.8");
     gc->setHelpText(AppearanceSettings::tr(
+            "This setting applies to video playback only, not to the GUI. "
             "Most modern displays have square pixels and the aspect ratio of the screen can be "
             "computed from the resolution (default). "
             "The aspect ratio can also be automatically detected from the connected display "
