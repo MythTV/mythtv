@@ -324,10 +324,7 @@ bool ThemeChooser::LoadVersion(const QString &version,
             }
             return false;
         }
-        else
-        {
-            LOG(VB_GUI, LOG_INFO, LOC + QString("Unzipped '%1' to '%2'").arg(remoteThemesFile, destdir));
-        }
+        LOG(VB_GUI, LOG_INFO, LOC + QString("Unzipped '%1' to '%2'").arg(remoteThemesFile, destdir));
     }
 
     QDir themes;
