@@ -25,7 +25,7 @@ export class SidenavComponent implements OnInit {
         items: [
             {routerLink: 'settings/general'},
             { routerLink: 'settings/capture-cards'},
-            { routerLink: ''},
+            { routerLink: 'settings/recording-profiles'},
             { routerLink: 'settings/video-sources'},
             { routerLink: 'settings/input-connections'},
             { routerLink: 'settings/channel-editor'},
