@@ -99,6 +99,7 @@ HEADERS += servicesv2/v2status.h
 HEADERS += servicesv2/preformat.h servicesv2/v2backendStatus.h
 HEADERS += servicesv2/v2capture.h
 HEADERS += servicesv2/v2captureCard.h servicesv2/v2captureCardList.h
+HEADERS += servicesv2/v2recordingProfile.h
 HEADERS += servicesv2/v2music.h
 HEADERS += servicesv2/v2musicMetadataInfo.h servicesv2/v2musicMetadataInfoList.h
 HEADERS += servicesv2/v2config.h

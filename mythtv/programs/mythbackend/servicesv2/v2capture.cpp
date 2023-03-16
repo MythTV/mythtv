@@ -29,12 +29,14 @@
 #include <QMutex>
 
 // MythTV
+#include "libmyth/standardsettings.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythversion.h"
 #include "libmythtv/cardutil.h"
+#include "libmythtv/recordingprofile.h"
 
 // MythBackend
 #include "v2capture.h"
@@ -58,6 +60,10 @@ void V2Capture::RegisterCustomTypes()
     qRegisterMetaType<V2InputGroup*>("V2InputGroup");
     qRegisterMetaType<V2DiseqcConfig*>("V2DiseqcConfig");
     qRegisterMetaType<V2DiseqcConfigList*>("V2DiseqcConfigList");
+    qRegisterMetaType<V2RecProfParam*>("V2RecProfParam");
+    qRegisterMetaType<V2RecProfile*>("V2RecProfile");
+    qRegisterMetaType<V2RecProfileGroup*>("V2RecProfileGroup");
+    qRegisterMetaType<V2RecProfileGroupList*>("V2RecProfileGroupList");
 }
 
 V2Capture::V2Capture()
@@ -1059,4 +1065,240 @@ bool V2Capture::RemoveDiseqcConfig  ( uint  CardId )
     }
     int numrows = query.numRowsAffected();
     return numrows > 0;
+}
+
+
+V2RecProfileGroupList* V2Capture::GetRecProfileGroupList ( uint GroupId, uint ProfileId, bool OnlyInUse ) {
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString str =
+        "SELECT profilegroups.id, profilegroups.name, cardtype, recordingprofiles.id, recordingprofiles.name, "
+        "videocodec, audiocodec, "
+        "codecparams.name, codecparams.value "
+        "FROM profilegroups  "
+        "INNER JOIN recordingprofiles on profilegroups.id = recordingprofiles.profilegroup "
+        "LEFT OUTER JOIN codecparams on codecparams.profile = recordingprofiles.id ";
+    QString where = "WHERE ";
+    if (OnlyInUse)
+    {
+        str.append(where).append("CARDTYPE = 'TRANSCODE' OR (cardtype in (SELECT cardtype FROM capturecard)) ");
+        where = "AND ";
+    }
+    if (GroupId > 0)
+    {
+        str.append(where).append("profilegroups.id = :GROUPID ");
+        where = "AND ";
+    }
+    if (ProfileId > 0)
+    {
+        str.append(where).append("recordingprofiles.id = :PROFILEID ");
+        where = "AND ";
+    }
+    str.append(
+        // Force TRANSCODE entry to be at the end
+        "ORDER BY IF(cardtype = 'TRANSCODE', 9999, profilegroups.id), recordingprofiles.id, codecparams.name ");
+
+    query.prepare(str);
+
+    if (GroupId > 0)
+        query.bindValue(":GROUPID", GroupId);
+    if (ProfileId > 0)
+        query.bindValue(":PROFILEID", ProfileId);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("MythAPI::GetRecProfileGroupList()", query);
+        throw( QString( "Database Error executing query." ));
+    }
+
+    // ----------------------------------------------------------------------
+    // return the results of the query
+    // ----------------------------------------------------------------------
+
+    auto* pList = new V2RecProfileGroupList();
+
+    int prevGroupId = -1;
+    int prevProfileId = -1;
+
+    V2RecProfileGroup * pGroup = nullptr;
+    V2RecProfile *pProfile = nullptr;
+
+    while (query.next())
+    {
+        int groupId = query.value(0).toInt();
+        if (groupId != prevGroupId)
+        {
+            pGroup = pList->AddProfileGroup();
+            pGroup->setId               ( groupId );
+            pGroup->setName             ( query.value(1).toString() );
+            pGroup->setCardType         ( query.value(2).toString() );
+            prevGroupId = groupId;
+        }
+        int profileId = query.value(3).toInt();
+        if (profileId != prevProfileId)
+        {
+            pProfile = pGroup->AddProfile();
+            pProfile->setId          ( profileId );
+            pProfile->setName        ( query.value(4).toString() );
+            pProfile->setVideoCodec  ( query.value(5).toString() );
+            pProfile->setAudioCodec  ( query.value(6).toString() );
+            prevProfileId = profileId;
+        }
+        if (!query.isNull(7))
+        {
+            auto *pParam = pProfile->AddParam();
+            pParam->setName  ( query.value(7).toString() );
+            pParam->setValue ( query.value(8).toString() );
+        }
+    }
+
+    return pList;
+}
+
+int V2Capture::AddRecProfile  ( uint GroupId, const QString& ProfileName,
+    const QString& VideoCodec, const QString& AudioCodec )
+{
+    if (GroupId == 0 || ProfileName.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString( "AddRecProfile: GroupId and ProfileName are required." ));
+        return false;
+    }
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    // Check if it already exists
+    query.prepare(
+        "SELECT id "
+            "FROM recordingprofiles "
+            "WHERE name = :NAME AND profilegroup = :PROFILEGROUP;");
+    query.bindValue(":NAME", ProfileName);
+    query.bindValue(":PROFILEGROUP", GroupId);
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Capture::AddRecProfile", query);
+        throw( QString( "Database Error executing SELECT." ));
+    }
+    int id;
+    if (query.next())
+    {
+        id = query.value(0).toInt();
+        LOG(VB_GENERAL, LOG_ERR,
+            QString( "Profile %1 already exists in group id %2 with id %3").arg(ProfileName).arg(GroupId).arg(id));
+        return false;
+    }
+
+    query.prepare(
+       "INSERT INTO recordingprofiles "
+           "(name, videocodec, audiocodec, profilegroup) "
+         "VALUES "
+           "(:NAME, :VIDEOCODEC, :AUDIOCODEC, :PROFILEGROUP);");
+    query.bindValue(":NAME", ProfileName);
+    query.bindValue(":VIDEOCODEC", VideoCodec);
+    query.bindValue(":AUDIOCODEC", AudioCodec);
+    query.bindValue(":PROFILEGROUP", GroupId);
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Capture::AddRecProfile", query);
+        throw( QString( "Database Error executing INSERT." ));
+    }
+    id = query.lastInsertId().toInt();
+    RecordingProfile profile(ProfileName);
+    profile.loadByID(id);
+    profile.setCodecTypes();
+    profile.Save();
+    return id;
+}
+
+bool V2Capture::UpdateRecProfile ( uint ProfileId,
+                                   const QString& VideoCodec,
+                                   const QString& AudioCodec )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT id from recordingprofiles "
+        "WHERE id = :ID; ");
+    query.bindValue(":ID", ProfileId);
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Capture::UpdateRecProfileParam", query);
+        throw( QString( "Database Error executing SELECT." ));
+    }
+    uint id = -1;
+    if (query.next())
+    {
+        id = query.value(0).toUInt();
+    }
+    if (id != ProfileId)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("UpdateRecProfile: Profile id %1 does not exist").arg(ProfileId));
+        return false;
+    }
+    query.prepare(
+        "UPDATE recordingprofiles "
+        "SET videocodec = :VIDEOCODEC, "
+        "audiocodec = :AUDIOCODEC "
+        "WHERE id = :ID; ");
+    query.bindValue(":VIDEOCODEC", VideoCodec);
+    query.bindValue(":AUDIOCODEC", AudioCodec);
+    query.bindValue(":ID", ProfileId);
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Capture::UpdateRecProfileParam", query);
+        throw( QString( "Database Error executing UPDATE." ));
+    }
+    RecordingProfile profile;
+    profile.loadByID(ProfileId);
+    profile.setCodecTypes();
+    profile.Save();
+    return true;
+}
+
+bool V2Capture::DeleteRecProfile ( uint ProfileId )
+{
+    // Delete profile parameters
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "DELETE from codecparams "
+        "WHERE profile = :ID; ");
+    query.bindValue(":ID", ProfileId);
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Capture::UpdateRecProfileParam", query);
+        throw( QString( "Database Error executing DELETE." ));
+    }
+    int rows = query.numRowsAffected();
+    query.prepare(
+        "DELETE from recordingprofiles "
+        "WHERE id = :ID; ");
+    query.bindValue(":ID", ProfileId);
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Capture::UpdateRecProfileParam", query);
+        throw( QString( "Database Error executing DELETE." ));
+    }
+    return (rows > 0);
+}
+
+
+
+bool V2Capture::UpdateRecProfileParam ( uint ProfileId, const QString  &Name, const QString &Value )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+       "REPLACE INTO codecparams "
+           "(profile, name, value) "
+         "VALUES "
+           "(:PROFILE, :NAME, :VALUE);");
+    query.bindValue(":PROFILE", ProfileId);
+    query.bindValue(":NAME", Name);
+    query.bindValue(":VALUE", Value);
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Capture::UpdateRecProfileParam", query);
+        throw( QString( "Database Error executing REPLACE." ));
+    }
+    return true;
 }
