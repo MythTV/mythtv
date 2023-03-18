@@ -6,7 +6,6 @@ else
 	ROOT_FLAGS = --root="/"
 endif
 
-REAL_PREFIX = $(PREFIX)
 ifneq ($(PREFIX:/=), /usr)
 	ifneq ($(PREFIX:/=), /usr/local)
 		PREFIX_FLAGS=--prefix="$(PREFIX)"
@@ -21,7 +20,7 @@ clean:
 distclean: clean
 
 python_build: setup.py
-	$(PYTHON) setup.py build --mythtv-prefix="$(REAL_PREFIX)"
+	$(PYTHON) setup.py build
 
 install: setup.py
 	$(PYTHON) setup.py install --skip-build $(ROOT_FLAGS) $(PREFIX_FLAGS)
