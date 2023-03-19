@@ -332,7 +332,7 @@ void TestLogging::test_logPropagateCalc (void)
     std::streambuf* oldCoutBuffer = std::cerr.rdbuf(buffer.rdbuf());
     resetLogging();
     int actualExit = verboseArgParse(argument);
-    logStart("/tmp/test", false, quiet, facility, LOG_INFO, dblog, propagate, true);
+    logStart("/tmp/test", false, quiet, facility, LOG_INFO, dblog, propagate, false, true);
     std::cerr.rdbuf(oldCoutBuffer);
 
     // Check results
