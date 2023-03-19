@@ -191,11 +191,7 @@ static bool DetectDevice(const QDBusObjectPath& entry, MythUdisksDevice& device,
 {
     QDBusInterface block(UDISKS2_SVC, entry.path(), UDISKS2_SVC_BLOCK,
                          QDBusConnection::systemBus() );
-#if 0
-    QString devraw = block.property("Device").toString();
-    LOG(VB_MEDIA, LOG_DEBUG, LOC +
-        "DetectDevice: Raw Device found: " + devraw);
-#endif
+
     if (!block.property("HintSystem").toBool() &&
         !block.property("HintIgnore").toBool())
     {
@@ -229,12 +225,6 @@ static bool DetectDevice(const QDBusObjectPath& entry, MythUdisksDevice& device,
             QString("DetectDevice: Found drive '%1'").arg(desc));
         const auto media = DriveProperty(drivePath, "MediaCompatibility").toStringList();
         const bool isOptical = !media.filter("optical", Qt::CaseInsensitive).isEmpty();
-#if 0
-        LOG(VB_MEDIA, LOG_DEBUG, LOC + QString("DetectDevice:Drive:Optical : %1")
-                .arg(DriveProperty(drivePath, "Optical").toString()));
-        LOG(VB_MEDIA, LOG_DEBUG, LOC + QString("DetectDevice:Drive:OpticalBlank : %1")
-                .arg(DriveProperty(drivePath, "OpticalBlank").toString()));
-#endif
 
         if (DriveProperty(drivePath, "Removable").toBool())
         {
