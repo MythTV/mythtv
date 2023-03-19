@@ -203,10 +203,6 @@ static bool DetectDevice(const QDBusObjectPath& entry, MythUdisksDevice& device,
         LOG(VB_MEDIA, LOG_DEBUG, LOC +
             "DetectDevice: Device found: " + dev);
 
-        bool readonly = block.property("ReadOnly").toBool();
-        LOG(VB_MEDIA, LOG_DEBUG, LOC +
-            QString("DetectDevice: Device:ReadOnly '%1'").arg(readonly));
-
         // ignore floppies, too slow
         if (dev.startsWith("/dev/fd"))
             return false;
@@ -242,7 +238,7 @@ static bool DetectDevice(const QDBusObjectPath& entry, MythUdisksDevice& device,
 
         if (DriveProperty(drivePath, "Removable").toBool())
         {
-            if (readonly && isOptical)
+            if (isOptical)
             {
                 device = UDisks2DVD;
                 return true;
