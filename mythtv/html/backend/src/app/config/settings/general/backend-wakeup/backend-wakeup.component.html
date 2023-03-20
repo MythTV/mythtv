@@ -16,7 +16,7 @@
                     <div class="form-group field">
                         <label for="WOLbackendReconnectWaitTime" class="block">{{
                             'settings.backendwake.master.delay_label' | translate }}</label>
-                        <p-inputNumber [(ngModel)]="beWakeData.WOLbackendReconnectWaitTime"
+                        <p-inputNumber [(ngModel)]="WOLbackendReconnectWaitTime"
                             name="WOLbackendReconnectWaitTime" id="WOLbackendReconnectWaitTime" [showButtons]="true"
                             [min]="0" [max]="1200" [step]="5"></p-inputNumber>
                         <small class="block">
@@ -27,7 +27,7 @@
                     <div class="form-group field">
                         <label for="WOLbackendConnectRetry" class="block">{{
                             'settings.backendwake.master.attempts_label' | translate }}</label>
-                        <p-inputNumber [(ngModel)]="beWakeData.WOLbackendConnectRetry" name="WOLbackendConnectRetry"
+                        <p-inputNumber [(ngModel)]="WOLbackendConnectRetry" name="WOLbackendConnectRetry"
                             id="WOLbackendConnectRetry" [showButtons]="true" [min]="1" [max]="60"
                             [step]="1"></p-inputNumber>
                         <small class="block">
@@ -38,8 +38,8 @@
                     <div class="form-group field">
                         <label for="WOLbackendCommand" class="block">{{ 'settings.backendwake.master.cmd_label' |
                             translate }}</label>
-                        <input pInputText id="WOLbackendCommand" [(ngModel)]="beWakeData.WOLbackendCommand"
-                            name="WOLbackendCommand" #MiscStatusScript="ngModel" class="mb-2 form-control w-full" />
+                        <input pInputText id="WOLbackendCommand" [(ngModel)]="WOLbackendCommand"
+                            name="WOLbackendCommand" class="mb-2 form-control w-full" />
                         <small class="block">
                             {{ 'settings.backendwake.master.cmd_desc' | translate }}
                         </small>
@@ -54,8 +54,8 @@
                     <div class="form-group field">
                         <label for="SleepCommand" class="block">{{ 'settings.backendwake.slave.sleep_label' | translate
                             }}</label>
-                        <input pInputText id="SleepCommand" [(ngModel)]="beWakeData.SleepCommand" name="SleepCommand"
-                            #MiscStatusScript="ngModel" class="mb-2 form-control w-full" />
+                        <input pInputText id="SleepCommand" [(ngModel)]="SleepCommand" name="SleepCommand"
+                            class="mb-2 form-control w-full" />
                         <small class="block">
                             {{ 'settings.backendwake.slave.sleep_desc' | translate }}
                         </small>
@@ -64,8 +64,8 @@
                     <div class="form-group field">
                         <label for="WakeUpCommand" class="block">{{ 'settings.backendwake.slave.wake_label' | translate
                             }}</label>
-                        <input pInputText id="WakeUpCommand" [(ngModel)]="beWakeData.WakeUpCommand" name="WakeUpCommand"
-                            #MiscStatusScript="ngModel" class="mb-2 form-control w-full" />
+                        <input pInputText id="WakeUpCommand" [(ngModel)]="WakeUpCommand" name="WakeUpCommand"
+                            class="mb-2 form-control w-full" />
                         <small class="block">
                             {{ 'settings.backendwake.slave.wake_desc' | translate }}
                         </small>
@@ -80,9 +80,9 @@
             <div class="grid nogutter">
                 <div class="col-12">
                     <p-message
-                        *ngIf="this.beWakeData.successCount > 0 && this.beWakeData.errorCount == 0 && !backendwakeup.dirty"
+                        *ngIf="this.successCount > 0 && this.errorCount == 0 && !backendwakeup.dirty"
                         severity="success" text="{{ 'common.savesuccess' | translate }}"></p-message>
-                    <p-message *ngIf="this.beWakeData.errorCount > 0" severity="error"
+                    <p-message *ngIf="this.errorCount > 0" severity="error"
                         text="{{ 'common.networkfail' | translate }}"></p-message>
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"

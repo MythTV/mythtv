@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams} from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import {
   MythHostName,
   MythTimeZone,
@@ -135,7 +135,6 @@ export class MythService {
   }
 
   public PutSetting(setting: PutSettingRequest) : Observable<BoolResponse> {
-    console.log(setting);
     return this.httpClient.post<BoolResponse>('/Myth/PutSetting', setting)
   }
 
@@ -144,7 +143,6 @@ export class MythService {
   }
 
   public SetConnectionInfo(data: Database) : Observable<BoolResponse> {
-    console.log("SetConnectionInfo :-" + data.Name);
     return this.httpClient.post<BoolResponse>('/Myth/SetConnectionInfo', data)
   }
 

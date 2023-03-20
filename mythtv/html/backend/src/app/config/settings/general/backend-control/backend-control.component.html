@@ -14,7 +14,7 @@
                     <div class="form-group field">
                         <label for="BackendStopCommand" class="block">{{ 'settings.backendctrl.stop_label' | translate
                             }}</label>
-                        <input pInputText id="BackendStopCommand" [(ngModel)]="beCtrlData.BackendStopCommand"
+                        <input pInputText id="BackendStopCommand" [(ngModel)]="BackendStopCommand"
                             name="BackendStopCommand" #MiscStatusScript="ngModel" class="mb-2 form-control w-full" />
                         <small class="block">
                             {{ 'settings.backendctrl.stop_desc' | translate }}
@@ -24,7 +24,7 @@
                     <div class="form-group field">
                         <label for="BackendStartCommand" class="block">{{ 'settings.backendctrl.start_label' | translate
                             }}</label>
-                        <input pInputText id="BackendStartCommand" [(ngModel)]="beCtrlData.BackendStartCommand"
+                        <input pInputText id="BackendStartCommand" [(ngModel)]="BackendStartCommand"
                             name="BackendStartCommand" #MiscStatusScript="ngModel" class="mb-2 form-control w-full" />
                         <small class="block">
                             {{ 'settings.backendctrl.start_desc' | translate }}
@@ -40,9 +40,9 @@
             <div class="grid nogutter">
                 <div class="col-12">
                     <p-message
-                        *ngIf="this.beCtrlData.successCount > 0 && this.beCtrlData.errorCount == 0 && !backendcontrol.dirty"
+                        *ngIf="this.successCount > 0 && this.errorCount == 0 && !backendcontrol.dirty"
                         severity="success" text="{{ 'common.savesuccess' | translate }}"></p-message>
-                    <p-message *ngIf="this.beCtrlData.errorCount > 0" severity="error"
+                    <p-message *ngIf="this.errorCount > 0" severity="error"
                         text="{{ 'common.networkfail' | translate }}"></p-message>
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"

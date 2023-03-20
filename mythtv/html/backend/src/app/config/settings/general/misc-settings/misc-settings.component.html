@@ -13,8 +13,7 @@
                     [toggleable]="true" [collapsed]="true">
 
                     <div class="form-group field">
-                        <p-checkbox inputId="MasterBackendOverride" [(ngModel)]="miscData.MasterBackendOverride"
-                            name="MasterBackendOverride" #MasterBackendOverride="ngModel" class="mb-2 w-full"
+                        <p-checkbox [(ngModel)]="MasterBackendOverride" name="MasterBackendOverride" class="mb-2 w-full"
                             [binary]="true" label="{{ 'settings.misc.mbo_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
@@ -23,9 +22,8 @@
                     </div>
 
                     <div class="form-group field">
-                        <p-checkbox inputId="DeletesFollowLinks" [(ngModel)]="miscData.DeletesFollowLinks"
-                            name="DeletesFollowLinks" #DeletesFollowLinks="ngModel" class="mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.misc.follow_label' | translate }}">
+                        <p-checkbox [(ngModel)]="DeletesFollowLinks" name="DeletesFollowLinks" class="mb-2 w-full"
+                            [binary]="true" label="{{ 'settings.misc.follow_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
                             {{ 'settings.misc.follow_desc' | translate }}
@@ -33,8 +31,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <p-checkbox inputId="TruncateDeletesSlowly" [(ngModel)]="miscData.TruncateDeletesSlowly"
-                            name="TruncateDeletesSlowly" #TruncateDeletesSlowly="ngModel" class="mb-2 w-full"
+                        <p-checkbox [(ngModel)]="TruncateDeletesSlowly" name="TruncateDeletesSlowly" class="mb-2 w-full"
                             [binary]="true" label="{{ 'settings.misc.slowly_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
@@ -45,9 +42,8 @@
                     <div class="form-group field">
                         <label for="HDRingbufferSize" class="block">{{ 'settings.misc.ringbuf_label' | translate
                             }}</label>
-                        <p-inputNumber [(ngModel)]="miscData.HDRingbufferSize" name="HDRingbufferSize"
-                            id="HDRingbufferSize" [showButtons]="true" [min]="4700" [max]="94000"
-                            [step]="4700"></p-inputNumber>
+                        <p-inputNumber [(ngModel)]="HDRingbufferSize" name="HDRingbufferSize" id="HDRingbufferSize"
+                            [showButtons]="true" [min]="4700" [max]="94000" [step]="4700"></p-inputNumber>
                         <small class="block">
                             {{ 'settings.misc.ringbuf_desc' | translate }}
                         </small>
@@ -55,9 +51,8 @@
 
                     <div class="form-group field">
                         <label for="StorageScheduler" class="block">{{ 'settings.misc.sg_label' | translate }}</label>
-                        <p-dropdown [options]="soptions " [(ngModel)]="miscData.StorageScheduler" optionLabel="name"
-                            optionValue="code" class="block w-15rem mb-2" name="StorageScheduler"
-                            #StorageScheduler="ngModel">
+                        <p-dropdown [options]="soptions " [(ngModel)]="StorageScheduler" optionLabel="name"
+                            optionValue="code" class="block w-15rem mb-2" name="StorageScheduler">
                         </p-dropdown>
                         <small class="block">
                             {{ 'settings.misc.sg_desc' | translate }}
@@ -70,8 +65,8 @@
                     [toggleable]="true" [collapsed]="true">
                     <div class="form-group field">
                         <label for="UPNPWmpSource" class="block">{{ 'settings.misc.upnp_label' | translate }}</label>
-                        <p-dropdown [options]="uoptions" [(ngModel)]="miscData.UPNPWmpSource" optionLabel="name"
-                            optionValue="code" class="block w-15rem mb-2" name="UPNPWmpSource" #UPNPWmpSource="ngModel">
+                        <p-dropdown [options]="uoptions" [(ngModel)]="UPNPWmpSource" optionLabel="name"
+                            optionValue="code" class="block w-15rem mb-2" name="UPNPWmpSource">
                         </p-dropdown>
                         <small class="block">
                             {{ 'settings.misc.upnp_desc' | translate }}
@@ -84,8 +79,8 @@
                     <div class="form-group field">
                         <label for="MiscStatusScript" class="block">{{ 'settings.misc.statapp_label' | translate
                             }}</label>
-                        <input pInputText id="MiscStatusScript" [(ngModel)]="miscData.MiscStatusScript"
-                            name="MiscStatusScript" #MiscStatusScript="ngModel" class="mb-2 form-control w-full" />
+                        <input pInputText id="MiscStatusScript" [(ngModel)]="MiscStatusScript" name="MiscStatusScript"
+                            class="mb-2 form-control w-full" />
                         <small class="block">
                             <!-- {{ 'settings.misc.statapp_desc' | translate }} -->
                             <div [innerHTML]="'settings.misc.statapp_desc' | translate"></div>
@@ -93,9 +88,8 @@
                     </div>
 
                     <div class="form-group field">
-                        <p-checkbox inputId="DisableAutomaticBackup" [(ngModel)]="miscData.DisableAutomaticBackup"
-                            name="DisableAutomaticBackup" #DisableAutomaticBackup="ngModel" class="mb-2 w-full"
-                            [binary]="true" label="{{ 'settings.misc.disback_label' | translate }}">
+                        <p-checkbox [(ngModel)]="DisableAutomaticBackup" name="DisableAutomaticBackup"
+                            class="mb-2 w-full" [binary]="true" label="{{ 'settings.misc.disback_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
                             {{ 'settings.misc.disback_desc' | translate }}
@@ -103,8 +97,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <p-checkbox inputId="DisableFirewireReset" [(ngModel)]="miscData.DisableFirewireReset"
-                            name="DisableFirewireReset" #DisableFirewireReset="ngModel" class="mb-2 w-full"
+                        <p-checkbox [(ngModel)]="DisableFirewireReset" name="DisableFirewireReset" class="mb-2 w-full"
                             [binary]="true" label="{{ 'settings.misc.disfwr_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
@@ -119,10 +112,9 @@
         <ng-template pTemplate="footer">
             <div class="grid nogutter">
                 <div class="col-12">
-                    <p-message
-                        *ngIf="this.miscData.successCount > 0 && this.miscData.errorCount == 0 && !miscsettings.dirty"
+                    <p-message *ngIf="this.successCount > 0 && this.errorCount == 0 && !miscsettings.dirty"
                         severity="success" text="{{ 'common.savesuccess' | translate }}"></p-message>
-                    <p-message *ngIf="this.miscData.errorCount > 0 && !miscsettings.dirty" severity="error"
+                    <p-message *ngIf="this.errorCount > 0 && !miscsettings.dirty" severity="error"
                         text="{{ 'common.networkfail' | translate }}"></p-message>
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"

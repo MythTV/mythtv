@@ -13,7 +13,7 @@
 
                     <div class="form-group field">
                         <label for="EITTransportTimeout" class="block" >{{ 'settings.eit.timeout_label' | translate }}</label>
-                        <p-inputNumber [(ngModel)]="eitData.EITTransportTimeout" name="EITTransportTimeout" id="EITTransportTimeout"
+                        <p-inputNumber [(ngModel)]="EITTransportTimeout" name="EITTransportTimeout" id="EITTransportTimeout"
                             [showButtons]="true" [min]="1" [max]="15" [step]="1"></p-inputNumber>
                         <small class="block">
                             {{ 'settings.eit.timeout_desc' | translate }}
@@ -23,7 +23,7 @@
 
                     <div class="form-group field">
                         <label for="EITCrawIdleStart" class="block" >{{ 'settings.eit.crawl_label' | translate }}</label>
-                        <p-inputNumber [(ngModel)]="eitData.EITCrawIdleStart" name="EITCrawIdleStart" id="EITCrawIdleStart"
+                        <p-inputNumber [(ngModel)]="EITCrawIdleStart" name="EITCrawIdleStart" id="EITCrawIdleStart"
                             [showButtons]="true" [min]="30" [max]="7200" [step]="30"></p-inputNumber>
                         <small class="block">
                             {{ 'settings.eit.crawl_desc' | translate }}
@@ -38,9 +38,9 @@
         <ng-template pTemplate="footer">
             <div class="grid nogutter">
                 <div class="col-12">
-                    <p-message *ngIf="this.eitData.successCount > 0 && this.eitData.errorCount == 0 && !eitscanopt.dirty"
+                    <p-message *ngIf="this.successCount > 0 && this.errorCount == 0 && !eitscanopt.dirty"
                         severity="success" text="{{ 'common.savesuccess' | translate }}" ></p-message>
-                    <p-message *ngIf="this.eitData.errorCount > 0"
+                    <p-message *ngIf="this.errorCount > 0"
                         severity="error" text="{{ 'common.networkfail' | translate }}" ></p-message>
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); eitscanopt.form.markAsPristine()"

@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Locale } from 'src/app/services/interfaces/setup.interface';
+import { MythService } from 'src/app/services/myth.service';
 import { SetupService } from 'src/app/services/setup.service';
 
 @Component({
@@ -10,7 +10,12 @@ import { SetupService } from 'src/app/services/setup.service';
 })
 
 export class LocaleComponent implements OnInit, AfterViewInit {
-    m_LocaleData!: Locale;
+
+    successCount = 0;
+    errorCount = 0;
+    TVFormat = 'PAL';
+    VbiFormat = 'None';
+    FreqTable = 'us-bcast';
 
     @ViewChild("locale")
     currentForm!: NgForm;
@@ -23,7 +28,7 @@ export class LocaleComponent implements OnInit, AfterViewInit {
     // from
     m_TVFormats: string[];
 
-    constructor(private setupService: SetupService) {
+    constructor(private setupService: SetupService, private mythService: MythService) {
 
         // TODO: add Service API calls to get these
         this.m_TVFormats = [
@@ -73,8 +78,27 @@ export class LocaleComponent implements OnInit, AfterViewInit {
             "try-all"
         ];
 
-        this.m_LocaleData = this.setupService.getLocaleData();
+        this.getLocaleData();
     }
+
+    getLocaleData() {
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "TVFormat" })
+            .subscribe({
+                next: data => this.TVFormat = data.String,
+                error: () => this.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "VbiFormat" })
+            .subscribe({
+                next: data => this.VbiFormat = data.String,
+                error: () => this.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "FreqTable" })
+            .subscribe({
+                next: data => this.FreqTable = data.String,
+                error: () => this.errorCount++
+            });
+    }
+
 
     ngOnInit(): void {
     }
@@ -83,7 +107,39 @@ export class LocaleComponent implements OnInit, AfterViewInit {
         this.setupService.setCurrentForm(this.currentForm);
     }
 
+    LocaleObs = {
+        next: (x: any) => {
+            if (x.bool)
+                this.successCount++;
+            else {
+                this.errorCount++;
+                if (this.currentForm)
+                    this.currentForm.form.markAsDirty();
+            }
+        },
+        error: (err: any) => {
+            console.error(err);
+            this.errorCount++
+            if (this.currentForm)
+                this.currentForm.form.markAsDirty();
+        }
+    };
+
     saveForm() {
-        this.setupService.saveLocaleData(this.currentForm);
+        this.successCount = 0;
+        this.errorCount = 0;
+
+        this.mythService.PutSetting({
+            HostName: "_GLOBAL_", Key: "TVFormat",
+            Value: this.TVFormat
+        }).subscribe(this.LocaleObs);
+        this.mythService.PutSetting({
+            HostName: "_GLOBAL_", Key: "VbiFormat",
+            Value: this.VbiFormat
+        }).subscribe(this.LocaleObs);
+        this.mythService.PutSetting({
+            HostName: "_GLOBAL_", Key: "FreqTable",
+            Value: this.FreqTable
+        }).subscribe(this.LocaleObs);
     }
 }

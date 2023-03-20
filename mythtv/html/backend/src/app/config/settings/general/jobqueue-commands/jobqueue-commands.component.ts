@@ -29,7 +29,6 @@ export class JobqueueCommandsComponent implements OnInit, AfterViewInit {
   }
 
   saveForm() {
-    console.log("save form clicked");
     this.setupService.saveJobQCommands(this.currentForm);
   }
 
