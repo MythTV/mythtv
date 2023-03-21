@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
-import { MythConnectionInfo, Database } from './interfaces/myth.interface';
-import { MythDatabaseStatus, IPAddressList } from './interfaces/config.interface';
+import { HttpClient,  HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Database } from './interfaces/myth.interface';
+import { MythDatabaseStatus, IPAddressList, SystemEventList } from './interfaces/config.interface';
 import { MythCountryList } from './interfaces/country.interface';
 import { MythLanguageList } from './interfaces/language.interface';
 
@@ -31,7 +30,14 @@ export class ConfigService {
 
     public GetIPAddresses(protocol: string): Observable<IPAddressList> {
         let params = new HttpParams().set("Protocol", protocol);
-        return this.httpClient.get<IPAddressList>('/Config/GetIPAddresses', {params})
+        return this.httpClient.get<IPAddressList>('/Config/GetIPAddresses', { params })
+    }
+
+    public GetSystemEvents(host?: string): Observable<SystemEventList> {
+        let params = new HttpParams();
+        if (host)
+            params.set("Host", host);
+        return this.httpClient.get<SystemEventList>('/Config/GetSystemEvents', { params })
     }
 }
 

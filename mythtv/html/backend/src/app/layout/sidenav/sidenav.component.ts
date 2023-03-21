@@ -30,7 +30,7 @@ export class SidenavComponent implements OnInit {
             { routerLink: 'settings/input-connections'},
             { routerLink: 'settings/channel-editor'},
             { routerLink: 'settings/storage-groups'},
-            { routerLink: ''},
+            { routerLink: 'settings/system-events'},
         ]
     }];
 

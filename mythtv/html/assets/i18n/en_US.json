@@ -763,6 +763,9 @@
       "mpeg2language_label": "SAP/Bilingual",
       "mpeg2language_desc": "Chooses the language(s) to record when two languages are broadcast. Only Layer II supports the recording of two languages (Dual). Requires ivtv 0.4.0 or later.",
       "mpeg2audvolume_desc": "Volume of the recording"
+    },
+    "sysevents": {
+      "title": "System Event Command Editor"
     }
   },
   "sidenav": {

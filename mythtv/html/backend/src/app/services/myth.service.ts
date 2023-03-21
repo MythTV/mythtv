@@ -138,6 +138,10 @@ export class MythService {
     return this.httpClient.post<BoolResponse>('/Myth/PutSetting', setting)
   }
 
+  public DeleteSetting(setting: {HostName: string, Key: string}) : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Myth/DeleteSetting', setting)
+  }
+
   public RemoveStorageGroupDir(request: RemoveStorageGroupRequest) : Observable<BoolResponse> {
     return this.httpClient.post<BoolResponse>('/Myth/RemoveStorageGroupDir', request);
   }
