@@ -776,6 +776,27 @@ bool V2Myth::PutSetting( const QString &sHostName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+bool V2Myth::DeleteSetting( const QString &sHostName,
+                         const QString &sKey)
+{
+    QString hostName = sHostName;
+
+    if (hostName == "_GLOBAL_")
+        hostName = "";
+
+    if (!sKey.isEmpty())
+    {
+        return gCoreContext->GetDB()->ClearSettingOnHost( sKey, hostName );
+    }
+
+    throw ( QString( "Key Required" ));
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 bool V2Myth::TestDBSettings( const QString &sHostName,
                              const QString &sUserName,
                              const QString &sPassword,

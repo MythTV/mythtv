@@ -393,89 +393,93 @@ MythSystemEventEditor::MythSystemEventEditor(MythScreenStack *parent,
   : RawSettingsEditor(parent, name)
 {
     m_title = tr("System Event Command Editor");
+    createSettingList(m_settings);
 
+}
+ void MythSystemEventEditor::createSettingList(QMap <QString, QString>  &settings)
+{
     // Event names are programmatically converted to settings names in
     // EventNameToSetting().  For convenience of searching the code
     // base, the event names are listed in comments.
-    m_settings["EventCmdRecPending"]           = // REC_PENDING
+    settings["EventCmdRecPending"]           = // REC_PENDING
         tr("Recording pending");
-    m_settings["EventCmdRecPreFail"]           = // REC_PREFAIL
+    settings["EventCmdRecPreFail"]           = // REC_PREFAIL
         tr("Recording about to fail");
-    m_settings["EventCmdRecFailing"]           = // REC_FAILING
+    settings["EventCmdRecFailing"]           = // REC_FAILING
         tr("Recording failing");
-    m_settings["EventCmdRecStarted"]           = // REC_STARTED
+    settings["EventCmdRecStarted"]           = // REC_STARTED
         tr("Recording started");
-    m_settings["EventCmdRecStartedWriting"]    = // REC_STARTED_WRITING
+    settings["EventCmdRecStartedWriting"]    = // REC_STARTED_WRITING
         tr("Recording started writing");
-    m_settings["EventCmdRecFinished"]          = // REC_FINISHED
+    settings["EventCmdRecFinished"]          = // REC_FINISHED
         tr("Recording finished");
-    m_settings["EventCmdRecDeleted"]           = // REC_DELETED
+    settings["EventCmdRecDeleted"]           = // REC_DELETED
         tr("Recording deleted");
-    m_settings["EventCmdRecExpired"]           = // REC_EXPIRED
+    settings["EventCmdRecExpired"]           = // REC_EXPIRED
         tr("Recording expired");
-    m_settings["EventCmdLivetvStarted"]        = // LIVETV_STARTED
+    settings["EventCmdLivetvStarted"]        = // LIVETV_STARTED
         tr("LiveTV started");
-    m_settings["EventCmdLivetvEnded"]          = // LIVETV_ENDED
+    settings["EventCmdLivetvEnded"]          = // LIVETV_ENDED
         tr("LiveTV ended");
-    m_settings["EventCmdPlayStarted"]          = // PLAY_STARTED
+    settings["EventCmdPlayStarted"]          = // PLAY_STARTED
         tr("Playback started");
-    m_settings["EventCmdPlayStopped"]          = // PLAY_STOPPED
+    settings["EventCmdPlayStopped"]          = // PLAY_STOPPED
         tr("Playback stopped");
-    m_settings["EventCmdPlayPaused"]           = // PLAY_PAUSED
+    settings["EventCmdPlayPaused"]           = // PLAY_PAUSED
         tr("Playback paused");
-    m_settings["EventCmdPlayUnpaused"]         = // PLAY_UNPAUSED
+    settings["EventCmdPlayUnpaused"]         = // PLAY_UNPAUSED
         tr("Playback unpaused");
-    m_settings["EventCmdPlayChanged"]          = // PLAY_CHANGED
+    settings["EventCmdPlayChanged"]          = // PLAY_CHANGED
         tr("Playback program changed");
-    m_settings["EventCmdTuningSignalTimeout"]  = // TUNING_SIGNAL_TIMEOUT
+    settings["EventCmdTuningSignalTimeout"]  = // TUNING_SIGNAL_TIMEOUT
         tr("Tuning signal waiting");
-    m_settings["EventCmdMasterStarted"]        = // MASTER_STARTED
+    settings["EventCmdMasterStarted"]        = // MASTER_STARTED
         tr("Master backend started");
-    m_settings["EventCmdMasterShutdown"]       = // MASTER_SHUTDOWN
+    settings["EventCmdMasterShutdown"]       = // MASTER_SHUTDOWN
         tr("Master backend shutdown");
-    m_settings["EventCmdClientConnected"]      = // CLIENT_CONNECTED
+    settings["EventCmdClientConnected"]      = // CLIENT_CONNECTED
         tr("Client connected to master backend");
-    m_settings["EventCmdClientDisconnected"]   = // CLIENT_DISCONNECTED
+    settings["EventCmdClientDisconnected"]   = // CLIENT_DISCONNECTED
         tr("Client disconnected from master backend");
-    m_settings["EventCmdSlaveConnected"]       = // SLAVE_CONNECTED
+    settings["EventCmdSlaveConnected"]       = // SLAVE_CONNECTED
         tr("Slave backend connected to master");
-    m_settings["EventCmdSlaveDisconnected"]    = // SLAVE_DISCONNECTED
+    settings["EventCmdSlaveDisconnected"]    = // SLAVE_DISCONNECTED
         tr("Slave backend disconnected from master");
-    m_settings["EventCmdNetCtrlConnected"]     = // NET_CTRL_CONNECTED
+    settings["EventCmdNetCtrlConnected"]     = // NET_CTRL_CONNECTED
         tr("Network Control client connected");
-    m_settings["EventCmdNetCtrlDisconnected"]  = // NET_CTRL_DISCONNECTED
+    settings["EventCmdNetCtrlDisconnected"]  = // NET_CTRL_DISCONNECTED
         tr("Network Control client disconnected");
-    m_settings["EventCmdMythfilldatabaseRan"]  = // MYTHFILLDATABASE_RAN
+    settings["EventCmdMythfilldatabaseRan"]  = // MYTHFILLDATABASE_RAN
         tr("mythfilldatabase ran");
-    m_settings["EventCmdSchedulerRan"]         = // SCHEDULER_RAN
+    settings["EventCmdSchedulerRan"]         = // SCHEDULER_RAN
         tr("Scheduler ran");
-    m_settings["EventCmdSettingsCacheCleared"] = // SETTINGS_CACHE_CLEARED
+    settings["EventCmdSettingsCacheCleared"] = // SETTINGS_CACHE_CLEARED
         tr("Settings cache cleared");
-    m_settings["EventCmdScreenType"]           = // SCREEN_TYPE
+    settings["EventCmdScreenType"]           = // SCREEN_TYPE
         tr("Screen created or destroyed");
-    m_settings["EventCmdKey01"]                = // KEY_%1
+    settings["EventCmdKey01"]                = // KEY_%1
         tr("Keystroke event #1");
-    m_settings["EventCmdKey02"]                = // KEY_%1
+    settings["EventCmdKey02"]                = // KEY_%1
         tr("Keystroke event #2");
-    m_settings["EventCmdKey03"]                = // KEY_%1
+    settings["EventCmdKey03"]                = // KEY_%1
         tr("Keystroke event #3");
-    m_settings["EventCmdKey04"]                = // KEY_%1
+    settings["EventCmdKey04"]                = // KEY_%1
         tr("Keystroke event #4");
-    m_settings["EventCmdKey05"]                = // KEY_%1
+    settings["EventCmdKey05"]                = // KEY_%1
         tr("Keystroke event #5");
-    m_settings["EventCmdKey06"]                = // KEY_%1
+    settings["EventCmdKey06"]                = // KEY_%1
         tr("Keystroke event #6");
-    m_settings["EventCmdKey07"]                = // KEY_%1
+    settings["EventCmdKey07"]                = // KEY_%1
         tr("Keystroke event #7");
-    m_settings["EventCmdKey08"]                = // KEY_%1
+    settings["EventCmdKey08"]                = // KEY_%1
         tr("Keystroke event #8");
-    m_settings["EventCmdKey09"]                = // KEY_%1
+    settings["EventCmdKey09"]                = // KEY_%1
         tr("Keystroke event #9");
-    m_settings["EventCmdKey10"]                = // KEY_%1
+    settings["EventCmdKey10"]                = // KEY_%1
         tr("Keystroke event #10");
-    m_settings["EventCmdCecCommandReceived"]   = // CEC_COMMAND_RECEIVED
+    settings["EventCmdCecCommandReceived"]   = // CEC_COMMAND_RECEIVED
         tr("CEC command received");
-    m_settings["EventCmdAll"]                  = // EventCmdAll
+    settings["EventCmdAll"]                  = // EventCmdAll
         tr("Any event");
 }
 

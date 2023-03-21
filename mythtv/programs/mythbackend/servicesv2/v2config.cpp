@@ -4,6 +4,7 @@
 
 // MythTV
 #include "libmyth/mythcontext.h"
+#include "libmythtv/mythsystemevent.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
 #include "libmythbase/iso3166.h"
 #include "libmythbase/iso639.h"
@@ -32,6 +33,8 @@ void V2Config::RegisterCustomTypes()
     qRegisterMetaType<V2LanguageList*>("V2LanguageList");
     qRegisterMetaType<V2Language*>("V2Language");
     qRegisterMetaType<V2DatabaseStatus*>("V2DatabaseStatus");
+    qRegisterMetaType<V2SystemEvent*>("V2SystemEvent");
+    qRegisterMetaType<V2SystemEventList*>("V2SystemEventList");
 }
 
 
@@ -203,4 +206,25 @@ QStringList V2Config::GetIPAddresses( const QString &Protocol )
     }
 
     return oList;
+}
+
+V2SystemEventList* V2Config::GetSystemEvents(const QString &Host)
+{
+    QString theHost;
+    if (Host.isEmpty())
+        theHost = gCoreContext->GetHostName();
+    else
+        theHost = Host;
+    auto* pList = new V2SystemEventList();
+    QMap <QString, QString> settings;
+    MythSystemEventEditor::createSettingList(settings);
+    QMap<QString, QString>::const_iterator it;
+    for (it = settings.constBegin(); it != settings.constEnd(); ++it)
+    {
+        V2SystemEvent *event = pList->AddNewSystemEvent();
+        event->setKey(it.key());
+        event->setLocalizedName(it.value());
+        event->setValue(gCoreContext->GetSettingOnHost(it.key(), theHost, QString()));
+    }
+    return pList;
 }
