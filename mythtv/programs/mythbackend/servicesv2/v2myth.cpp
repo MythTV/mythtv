@@ -1113,7 +1113,10 @@ V2BackendInfo* V2Myth::GetBackendInfo( void )
     pEnv->setUSER          ( qEnvironmentVariable("USER",
                              qEnvironmentVariable("USERNAME"))   );
     pEnv->setMYTHCONFDIR   ( qEnvironmentVariable("MYTHCONFDIR") );
-    pLog->setLogArgs       ( logPropagateArgs      );
+    // This needs to be first assigned to a new QString because setLogArgs
+    // uses a std_move which clears out the source variable while setting.
+    QString logArgs = logPropagateArgs;
+    pLog->setLogArgs       ( logArgs  );
 
     // ----------------------------------------------------------------------
     // Return the pointer... caller is responsible to delete it!!!
