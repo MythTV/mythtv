@@ -26,10 +26,18 @@
 
 #include "libmythui/mythmainwindow.h"
 
+// OpenSSL 3.0.0 release
+// 8 bits major, 8 bits minor 24 bits patch, 4 bits release flag.
+#if OPENSSL_VERSION_NUMBER < 0x030000000L
+#define EVP_PKEY_get_id EVP_PKEY_id
+#define EVP_PKEY_get_size EVP_PKEY_size
+#endif
+
 #define LOC QString("RAOP Conn: ")
 static constexpr size_t MAX_PACKET_SIZE { 2048 };
 
 RSA *MythRAOPConnection::g_rsa = nullptr;
+EVP_PKEY *MythRAOPConnection::g_devPrivKey = nullptr;
 QString MythRAOPConnection::g_rsaLastError;
 
 // RAOP RTP packet type
@@ -1506,14 +1514,25 @@ RSA *MythRAOPConnection::LoadKey(void)
         return nullptr;
     }
 
-    g_rsa = PEM_read_RSAPrivateKey(file, nullptr, nullptr, nullptr);
+    g_devPrivKey = PEM_read_PrivateKey(file, nullptr, nullptr, nullptr);
     fclose(file);
 
-    if (g_rsa)
+    if (g_devPrivKey)
     {
+        int id = EVP_PKEY_get_id(g_devPrivKey);
+        int type = EVP_PKEY_type(id);
+        if (type != EVP_PKEY_RSA)
+        {
+            g_rsaLastError = tr("Key is not a RSA private key.");
+            EVP_PKEY_free(g_devPrivKey);
+            g_devPrivKey = nullptr;
+            g_rsa = nullptr;
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + g_rsaLastError);
+            return nullptr;
+        }
         g_rsaLastError = "";
-        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-            QString("Loaded RSA private key (%1)").arg(RSA_check_key(g_rsa)));
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "Loaded RSA private key");
+        g_rsa = EVP_PKEY_get1_RSA(g_devPrivKey);
         return g_rsa;
     }
 
