@@ -999,7 +999,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         if (challenge_size != 16)
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                QString("Decoded challenge size %1, expected 16")
+                QString("Base64 decoded challenge size %1, expected 16")
                 .arg(challenge_size));
             if (challenge_size > 16)
                 challenge_size = 16;
@@ -1083,7 +1083,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                 QString key = line.mid(12).trimmed();
                 QByteArray decodedkey = QByteArray::fromBase64(key.toLatin1());
                 LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-                    QString("RSAAESKey: %1 (decoded size %2)")
+                    QString("RSAAESKey: %1 (base64 decoded size %2)")
                     .arg(key).arg(decodedkey.size()));
 
                 if (LoadKey())
@@ -1113,7 +1113,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                 QString aesiv = line.mid(8).trimmed();
                 m_aesIV = QByteArray::fromBase64(aesiv.toLatin1());
                 LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-                    QString("AESIV: %1 (decoded size %2)")
+                    QString("AESIV: %1 (base64 decoded size %2)")
                     .arg(aesiv).arg(m_aesIV.size()));
             }
             else if (line.startsWith("a=fmtp:"))
