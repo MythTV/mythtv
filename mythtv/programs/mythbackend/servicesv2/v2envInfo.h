@@ -25,6 +25,7 @@ class V2EnvInfo : public QObject
     SERVICE_PROPERTY2( QString, HOME        )
     SERVICE_PROPERTY2( QString, USER        )
     SERVICE_PROPERTY2( QString, MYTHCONFDIR );
+    SERVICE_PROPERTY2( bool,    SchedulingEnabled );
 
     public:
 
@@ -34,7 +35,8 @@ class V2EnvInfo : public QObject
               m_LCALL       ( ""     ),
               m_LCCTYPE     ( ""     ),
               m_HOME        ( ""     ),
-              m_MYTHCONFDIR ( ""     )
+              m_MYTHCONFDIR ( ""     ),
+              m_SchedulingEnabled (false)
         {
         }
 
@@ -46,6 +48,7 @@ class V2EnvInfo : public QObject
             m_HOME        = src->m_HOME;
             m_USER        = src->m_USER;
             m_MYTHCONFDIR = src->m_MYTHCONFDIR;
+            m_SchedulingEnabled = src->m_SchedulingEnabled;
         }
 
     private:

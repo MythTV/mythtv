@@ -1113,6 +1113,9 @@ V2BackendInfo* V2Myth::GetBackendInfo( void )
     pEnv->setUSER          ( qEnvironmentVariable("USER",
                              qEnvironmentVariable("USERNAME"))   );
     pEnv->setMYTHCONFDIR   ( qEnvironmentVariable("MYTHCONFDIR") );
+    auto *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
+    if (scheduler != nullptr)
+        pEnv->setSchedulingEnabled(scheduler->QueryScheduling());
     // This needs to be first assigned to a new QString because setLogArgs
     // uses a std_move which clears out the source variable while setting.
     QString logArgs = logPropagateArgs;
@@ -1218,4 +1221,32 @@ bool V2Myth::ManageUrlProtection( const QString &sServices,
 
     return gCoreContext->SaveSettingOnHost("HTTP/Protected/Urls",
                                            protectedURLs.join(';'), "");
+}
+
+bool V2Myth::ManageScheduler ( bool Enable, bool Disable )
+{
+    auto *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
+    if (scheduler == nullptr)
+        throw QString("Scheduler is null");
+    // onle and only one of enable and disable must be supplied
+    if (Enable == Disable)
+        return false;
+    if (Enable)
+        scheduler->EnableScheduling();
+    if (Disable)
+        scheduler->DisableScheduling();
+    return true;
+}
+
+bool V2Myth::Shutdown ( int Retcode, bool Restart )
+{
+    if (Retcode < 0 || Retcode > 255)
+        return false;
+    if (Restart)
+        // Retcode 258 is a special value to signal to mythbackend to restart
+        // This is designed so that if the execvp fails it will give return code of 2,
+        // indicating failure and maybe causing the service module to restart.
+        Retcode = 258;
+    QCoreApplication::exit(Retcode);
+    return true;
 }

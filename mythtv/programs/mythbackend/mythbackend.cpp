@@ -153,6 +153,16 @@ int main(int argc, char **argv)
 
     gCoreContext->SetAsBackend(true);
     retval = run_backend(cmdline);
+    // Retcode 256 is a special value to signal to mythbackend to restart
+    // This is used by the V2Myth/Shutdown?Restart=true API call
+    if (retval == 258) {
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Restarting mythbackend"));
+        usleep(50000);
+        int rc = execvp(argv[0], argv);
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("execvp failed prog %1 rc=%2 errno=%3").arg(argv[0]).arg(rc).arg(errno));
+    }
     return retval;
 }
 
