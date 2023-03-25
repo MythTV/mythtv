@@ -995,8 +995,9 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         *m_textStream << "Apple-Response: ";
         if (!LoadKey())
             return;
-        int tosize = RSA_size(LoadKey());
-        auto *to = new uint8_t[tosize];
+        size_t tosize = EVP_PKEY_size(g_devPrivKey);
+        std::vector<uint8_t>to;
+        to.resize(tosize);
 
         QByteArray challenge =
         QByteArray::fromBase64(tags["Apple-Challenge"].toLatin1());
@@ -1055,10 +1056,34 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             .arg(QByteArray((char *)from.data(), i).toBase64().constData())
             .arg(i));
 
-        RSA_private_encrypt(i, from.data(), to, LoadKey(), RSA_PKCS1_PADDING);
+        auto *pctx = EVP_PKEY_CTX_new(g_devPrivKey, nullptr);
+        if (nullptr == pctx)
+        {
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                QString("Cannot create ENV_PKEY_CTX from key. (%1)")
+                .arg(ERR_error_string(ERR_get_error(), nullptr)));
+        }
+        else if (EVP_PKEY_sign_init(pctx) <= 0)
+        {
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                QString("EVP_PKEY_sign_init failed. (%1)")
+                .arg(ERR_error_string(ERR_get_error(), nullptr)));
+        }
+        else if (EVP_PKEY_CTX_set_rsa_padding(pctx, RSA_PKCS1_PADDING) <= 0)
+        {
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                QString("Cannot set RSA_PKCS1_PADDING on context. (%1)")
+                .arg(ERR_error_string(ERR_get_error(), nullptr)));
+        }
+        else if (EVP_PKEY_sign(pctx, to.data(), &tosize,
+                          from.data(), i) <= 0)
+        {
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                QString("EVP_PKEY_sign failed. (%1)")
+                .arg(ERR_error_string(ERR_get_error(), nullptr)));
+        }
 
-        QByteArray base64 = QByteArray((const char *)to, tosize).toBase64();
-        delete[] to;
+        QByteArray base64 = QByteArray((const char *)to.data(), tosize).toBase64();
 
         for (int pos = base64.size() - 1; pos > 0; pos--)
         {
