@@ -1088,24 +1088,43 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
 
                 if (LoadKey())
                 {
-                    int size = sizeof(char) * RSA_size(LoadKey());
-                    char *decryptedkey = new char[size];
-                    if (RSA_private_decrypt(decodedkey.size(),
-                                            (const unsigned char *)decodedkey.constData(),
-                                            (unsigned char *)decryptedkey,
-                                            LoadKey(), RSA_PKCS1_OAEP_PADDING))
+                    size_t size = EVP_PKEY_get_size(g_devPrivKey);
+                    auto *pctx = EVP_PKEY_CTX_new(g_devPrivKey /* EVP_PKEY *pkey */,
+                                                  nullptr      /* ENGINE *e */);
+                    m_sessionKey.resize(size);
+                    size_t size_out {size};
+                    if (nullptr == pctx)
                     {
+                        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                            QString("Cannot create ENV_PKEY_CTX from key. (%1)")
+                            .arg(ERR_error_string(ERR_get_error(), nullptr)));
+                    }
+                    else if (EVP_PKEY_decrypt_init(pctx) <= 0)
+                    {
+                        LOG(VB_PLAYBACK, LOG_WARNING, LOC + QString("EVP_PKEY_decrypt_init failed. (%1)")
+                            .arg(ERR_error_string(ERR_get_error(), nullptr)));
+                    }
+                    else if (EVP_PKEY_CTX_set_rsa_padding(pctx, RSA_PKCS1_OAEP_PADDING) <= 0)
+                    {
+                        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                            QString("Cannot set RSA_PKCS1_OAEP_PADDING on context. (%1)")
+                            .arg(ERR_error_string(ERR_get_error(), nullptr)));
+                    }
+                    else if (EVP_PKEY_decrypt(pctx, m_sessionKey.data(), &size_out,
+                                              (const unsigned char *)decodedkey.constData(), decodedkey.size()) > 0)
+                    {
+                        // SUCCESS
                         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
                             "Successfully decrypted AES key from RSA.");
-                        AES_set_decrypt_key((const unsigned char *)decryptedkey,
+                        AES_set_decrypt_key(m_sessionKey.data(),
                                             128, &m_aesKey);
                     }
                     else
                     {
                         LOG(VB_PLAYBACK, LOG_WARNING, LOC +
-                            "Failed to decrypt AES key from RSA.");
+                            QString("Failed to decrypt AES key from RSA. (%1)")
+                            .arg(ERR_error_string(ERR_get_error(), nullptr)));
                     }
-                    delete [] decryptedkey;
                 }
             }
             else if (line.startsWith("a=aesiv:"))

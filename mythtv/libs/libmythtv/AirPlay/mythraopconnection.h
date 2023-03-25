@@ -10,6 +10,7 @@
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <openssl/aes.h>
+#include <openssl/err.h>
 
 #include "libmythtv/mythtvexp.h"
 
@@ -140,6 +141,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     QByteArray      m_aesIV;
     AES_KEY         m_aesKey              {};
     static EVP_PKEY      *g_devPrivKey;
+    std::vector<uint8_t>  m_sessionKey;
     static RSA     *g_rsa;
     static QString  g_rsaLastError;
     // audio out
