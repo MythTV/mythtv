@@ -166,7 +166,7 @@
                     <p-dialog header="{{ 'settings.capture.dvb.satellite_delete_header' | translate }}"
                         [(visible)]="work.displayDeleteDiseqc" [modal]="true" [style]="{width: '50vw'}"
                         [draggable]="false" [resizable]="false">
-                        <h2>{{ 'settings.ru_sure' | translate }}</h2>
+                        <h2>{{ 'settings.common.ru_sure' | translate }}</h2>
                         <p>{{ 'settings.capture.dvb.satellite_delete_desc' | translate }}</p>
                         <ng-template pTemplate="footer">
                             <p-button icon="pi pi-times-circle" (click)="work.displayDeleteDiseqc=false"
@@ -184,7 +184,7 @@
                     <p-dialog header="{{ 'settings.capture.dvb.satellite_disconnect' | translate }}"
                         [(visible)]="work.displayDisconnect" [modal]="true" [style]="{width: '50vw'}"
                         [draggable]="false" [resizable]="false">
-                        <h2>{{ 'settings.ru_sure' | translate }}</h2>
+                        <h2>{{ 'settings.common.ru_sure' | translate }}</h2>
                         <p>{{ 'settings.capture.dvb.satellite_disconnect_warning' | translate }}</p>
                         <ng-template pTemplate="footer">
                             <p-button icon="pi pi-times-circle" (click)="work.displayDisconnect=false"
@@ -225,7 +225,7 @@
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
                     (onClick)="saveForm(); dvbform.form.markAsPristine()"
-                    [disabled]="(!dvbform.dirty || !card.VideoDevice)"></p-button>
+                    [disabled]="!dvbform.dirty || !card.VideoDevice || setupService.schedulingEnabled"></p-button>
             </div>
         </ng-template>
     </p-card>

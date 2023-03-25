@@ -1,5 +1,6 @@
+<app-backend-warning></app-backend-warning>
 <div class="block card w-full">
-    <h3>{{ 'settings.capture.title' | translate }}</h3>
+    <h2>{{ 'settings.capture.title' | translate }}</h2>
 
     <p-button label="{{ 'settings.capture.new_capture_card' | translate }}" (onClick)="displayModal = true"
         icon="pi pi-plus-circle" styleClass="p-button-plain"></p-button>
@@ -19,12 +20,12 @@
     &nbsp;
     <p-button styleClass="p-button-warning"
         label="{{ 'settings.capture.delete_on_host' | translate: {host: m_hostName} }}"
-        (click)="displayDeleteAllonHost=true" icon="pi pi-trash">
+        (click)="displayDeleteAllonHost=true" icon="pi pi-trash" [disabled]="setupService.schedulingEnabled">
     </p-button>
     <p-dialog header="{{ 'settings.capture.delete_on_host' | translate: {host: m_hostName} }}"
         [(visible)]="displayDeleteAllonHost" [modal]="true" [style]="{width: '50vw'}" [draggable]="false"
         [resizable]="false">
-        <h2>{{ 'settings.ru_sure' | translate }}</h2>
+        <h2>{{ 'settings.common.ru_sure' | translate }}</h2>
         <ng-template pTemplate="footer">
             <p-button icon="pi pi-times-circle" (click)="displayDeleteAllonHost=false;"
                 label="{{ 'common.no' | translate }}" styleClass="p-button-plain">
@@ -35,11 +36,11 @@
     </p-dialog>
     &nbsp;
     <p-button styleClass="p-button-danger" label="{{ 'settings.capture.delete_all' | translate }}"
-        (click)="displayDeleteAll=true" icon="pi pi-trash" iconPos="left">
+        (click)="displayDeleteAll=true" icon="pi pi-trash" iconPos="left" [disabled]="setupService.schedulingEnabled">
     </p-button>
     <p-dialog header="{{ 'settings.capture.delete_all_all' | translate }}" [(visible)]="displayDeleteAll" [modal]="true"
         [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
-        <h2>{{ 'settings.ru_sure' | translate }}</h2>
+        <h2>{{ 'settings.common.ru_sure' | translate }}</h2>
         <ng-template pTemplate="footer">
             <p-button icon="pi pi-times-circle" (click)="displayDeleteAll=false" label="{{ 'common.no' | translate }}"
                 styleClass="p-button-plain">
@@ -79,11 +80,11 @@
             <ng-template pTemplate="content">
                 <p-button styleClass="p-button-warning" label="{{ 'settings.capture.delete_this' | translate }}"
                     icon="pi pi-trash" (onClick)="displayDeleteThis[ix]=true"
-                    [disabled]="(!this.m_CaptureCardsFiltered[ix].CardId)">
+                    [disabled]="!this.m_CaptureCardsFiltered[ix].CardId || setupService.schedulingEnabled">
                 </p-button>
                 <p-dialog header="{{ 'settings.capture.delete_this' | translate }}" [(visible)]="displayDeleteThis[ix]"
                     [modal]="true" [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
-                    <h2>{{ 'settings.ru_sure' | translate }}</h2>
+                    <h2>{{ 'settings.common.ru_sure' | translate }}</h2>
                     <p>{{ 'settings.capture.delete_details' |
                         translate: {CardType: m_CaptureCardsFiltered[ix].CardType,
                         VideoDevice: m_CaptureCardsFiltered[ix].VideoDevice,

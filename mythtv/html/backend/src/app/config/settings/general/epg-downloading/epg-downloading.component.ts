@@ -19,7 +19,7 @@ export class EpgDownloadingComponent implements OnInit, AfterViewInit {
   errorCount = 0;
   MythFillEnabled = true;
 
-  constructor(private setupService: SetupService, private mythService: MythService) {
+  constructor(public setupService: SetupService, private mythService: MythService) {
     this.getEpgDownload();
   }
 

@@ -55,7 +55,7 @@ export class JobqueueBackendComponent implements OnInit, AfterViewInit {
     { name: "settings.jobqbackend.cpu_high", code: "2" }
   ];
 
-  constructor(private setupService: SetupService, private translate: TranslateService,
+  constructor(public setupService: SetupService, private translate: TranslateService,
     private mythService: MythService) {
     this.getJobQBackend();
 

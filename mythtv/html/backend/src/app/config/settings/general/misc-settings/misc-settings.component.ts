@@ -41,7 +41,7 @@ export class MiscSettingsComponent implements OnInit, AfterViewInit {
     @ViewChild("miscsettings")
     currentForm!: NgForm;
 
-    constructor(private setupService: SetupService, private translate: TranslateService,
+    constructor(public setupService: SetupService, private translate: TranslateService,
         private mythService: MythService) {
         translate.get(this.soptions[0].name).subscribe(data => this.soptions[0].name = data);
         translate.get(this.soptions[1].name).subscribe(data => this.soptions[1].name = data);

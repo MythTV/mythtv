@@ -26,7 +26,7 @@ export class ShutdownWakeupComponent implements OnInit, AfterViewInit {
   ServerHaltCommand = "sudo /sbin/halt -p";
   preSDWUCheckCommand = "";
 
-  constructor(private setupService: SetupService, private mythService: MythService) {
+  constructor(public setupService: SetupService, private mythService: MythService) {
     this.getShutWake();
   }
 

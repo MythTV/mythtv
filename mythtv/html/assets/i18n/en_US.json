@@ -356,8 +356,6 @@
     "general": {
       "title": "General Backend Settings"
     },
-    "unsaved": "(Unsaved Changes)",
-    "warning": "If you continue you may lose your changes.",
     "capture": {
       "title": "Capture Cards",
       "ceton": {
@@ -518,9 +516,12 @@
     "common": {
       "successful_delete": "Successful delete",
       "deleted": "(Deleted)",
-      "new": "(New)"
+      "new": "(New)",
+      "unsaved": "(Unsaved Changes)",
+      "warning": "If you continue you may lose your changes.",
+      "ru_sure": "Are you sure ?",
+      "clipboard_tooltip": "Copy to Clipboard"
     },
-    "ru_sure": "Are you sure ?",
     "vsource": {
       "title": "Video Sources",
       "new_video_source": "New Video Source",
@@ -652,7 +653,6 @@
     "iconnections": {
       "title": "Input Connections"
     },
-    "clipbord_tooltip": "Copy to Clipboard",
     "chanedit": {
       "title": "Channel Editor",
       "always-visible": "Always Visible",
@@ -766,6 +766,18 @@
     },
     "sysevents": {
       "title": "System Event Command Editor"
+    },
+    "main": {
+      "title": "MythTV Setup",
+      "schedstatus": "Scheduler Status",
+      "schedenabled": "Enabled",
+      "scheddisabled": "Disabled",
+      "upcomingrec": "Next upcoming recording: {{Title}} at {{StartTime}}. Status: {{Status}}",
+      "noupcomingrec": "There are no upcoming recordings.",
+      "savedisabled_warning": "Saving and Deleting are disabled because the Scheduler is enabled.",
+      "savedisabled_desc": "You must disable the scheduler to enable saving and deleting. While the scheduler is disabled, any recordings that reach their start time will be canceled.",
+      "scheddisabled_warning": "The Scheduler is disabled. No recordings will take place.",
+      "scheddisabled_desc": "Please restart the backend after finishing your updates, otherwise the scheduler will remain disabled and nothing will record."
     }
   },
   "sidenav": {

@@ -1,4 +1,4 @@
-<form class="ml-3 mr-3" name="connform" #connform="ngForm">nnform
+<form class="ml-3 mr-3" name="connform" #connform="ngForm">
     <span #top></span>
     <p-card class="m-5">
         <ng-template pTemplate="title">
@@ -163,7 +163,7 @@
                     <p-dialog header="Fetch Channels" [(visible)]="work.fetchChannelsDialog" [modal]="true"
                         [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
                         <p>{{ 'settings.iconnection.fetch.warning' | translate }}</p>
-                        <p>{{ 'settings.ru_sure' | translate}}</p>
+                        <p>{{ 'settings.common.ru_sure' | translate}}</p>
                         <ng-template pTemplate="footer">
                             <p-button icon="pi pi-times-circle" (click)="work.fetchChannelsDialog=false"
                                 label="{{ 'common.no' | translate }}" styleClass="p-button-plain">
@@ -266,7 +266,7 @@
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
                     (onClick)="saveForm(); connform.form.markAsPristine()"
-                    [disabled]="(!connform.dirty || !card.VideoDevice)"></p-button>
+                    [disabled]="!connform.dirty || !card.VideoDevice || setupService.schedulingEnabled"></p-button>
             </div>
         </ng-template>
     </p-card>

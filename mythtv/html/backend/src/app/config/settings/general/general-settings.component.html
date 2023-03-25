@@ -1,5 +1,6 @@
+<app-backend-warning></app-backend-warning>
 <div class="block card w-full">
-    <h3>{{ 'settings.general.title' | translate }}</h3>
+    <h2>{{ 'settings.general.title' | translate }}</h2>
     <p-accordion class="col-12 w-full" (onClose)="onTabClose($event)" (onOpen)="onTabOpen($event)">
         <p-accordionTab header="{{ 'settings.hostaddress.title' | translate }}">
             <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[0] }}</b></ng-template>

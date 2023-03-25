@@ -30,7 +30,7 @@ export class HdhomerunComponent implements OnInit, AfterViewInit {
 
   selectedDevices: CaptureDevice[] = [];
 
-  constructor(private captureCardService: CaptureCardService, private setupService: SetupService) { }
+  constructor(private captureCardService: CaptureCardService, public setupService: SetupService) { }
 
   ngOnInit(): void {
     // Get list of devices for dropdown list

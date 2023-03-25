@@ -225,7 +225,7 @@ export class RecprofileComponent implements OnInit, AfterViewInit {
   ];
 
   constructor(private translate: TranslateService, private captureCardService: CaptureCardService,
-    private setupService: SetupService) {
+    public setupService: SetupService) {
     this.recordingtypeOptions.forEach(entry => {
       translate.get(entry.Name).subscribe(data => entry.Name = data);
     });

@@ -27,8 +27,8 @@ export class StorageGroupsComponent implements OnInit, CanComponentDeactivate {
   currentTab: number = -1;
   activeTab: boolean[] = [];
 
-  dirtyText = 'settings.unsaved';
-  warningText = 'settings.warning';
+  dirtyText = 'settings.common.unsaved';
+  warningText = 'settings.common.warning';
   deletedText = 'settings.common.deleted';
   newText = 'settings.common.new';
 
@@ -55,6 +55,7 @@ export class StorageGroupsComponent implements OnInit, CanComponentDeactivate {
 
   constructor(private setupService: SetupService, private translate: TranslateService,
     private mythService: MythService) {
+    this.setupService.setCurrentForm(null);
     this.mythService.GetHostName().subscribe(data => {
       this.hostName = data.String;
       this.loadGroups();

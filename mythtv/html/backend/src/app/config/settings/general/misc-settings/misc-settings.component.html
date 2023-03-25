@@ -119,7 +119,7 @@
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
                     (onClick)="saveForm(); miscsettings.form.markAsPristine()"
-                    [disabled]="(!miscsettings.dirty || false)"></p-button>
+                    [disabled]="!miscsettings.dirty || setupService.schedulingEnabled"></p-button>
             </div>
         </ng-template>
     </p-card>

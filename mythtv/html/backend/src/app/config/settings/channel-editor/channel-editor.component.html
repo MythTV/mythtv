@@ -1,7 +1,8 @@
+<app-backend-warning></app-backend-warning>
 <form class="ml-3 mr-3" name="chanform" #chanform="ngForm">
 
     <div class="block card w-full" style="height: calc(100vh - 200px)">
-        <h3>{{ 'settings.chanedit.title' | translate }}</h3>
+        <h2>{{ 'settings.chanedit.title' | translate }}</h2>
         <p-table [value]="allChannels" scrollHeight="flex" [scrollable]="true"
             styleClass="p-datatable-gridlines p-datatable-striped" [rowHover]="true">
             <ng-template pTemplate="caption">
@@ -48,7 +49,7 @@
                         <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-success"
                             (click)="editChannel(channel)" [disabled]="channel.ChanId < 0"></button>
                         <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
-                            (click)="deleteRequest(channel)" [disabled]="channel.ChanId < 0"></button>
+                            (click)="deleteRequest(channel)" [disabled]="channel.ChanId < 0 || setupService.schedulingEnabled"></button>
                     </td>
                 </tr>
             </ng-template>
@@ -204,7 +205,7 @@
                 </p-button>
                 <p-button icon="pi pi-check-circle" (onClick)="saveChannel();" label="{{ 'common.save' | translate }}"
                     styleClass="p-button-success"
-                    [disabled]="!chanform.dirty || channel.ChannelName.trim() == '' || channel.ChanNum.trim() == '' || channel.CallSign.trim() == '' "></p-button>
+                    [disabled]="!chanform.dirty || channel.ChannelName.trim() == '' || channel.ChanNum.trim() == '' || channel.CallSign.trim() == '' || setupService.schedulingEnabled"></p-button>
             </ng-template>
         </p-dialog>
         <p-dialog header="{{ 'common.unsaved_heading' | translate }}" [(visible)]="displayUnsaved" [modal]="true">
@@ -221,7 +222,7 @@
 
         <p-dialog header="{{ 'settings.chanedit.delete_this' | translate }}" [(visible)]="displayDelete" [modal]="true"
             [draggable]="false" [resizable]="false">
-            <h2>{{ 'settings.ru_sure' | translate }}</h2>
+            <h2>{{ 'settings.common.ru_sure' | translate }}</h2>
             <p>{{ 'settings.chanedit.delete_details' |
                 translate: {ChanNum: channel.ChanNum,
                 ChannelName: channel.ChannelName,

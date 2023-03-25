@@ -73,7 +73,7 @@
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
                     (onClick)="saveForm(); cetonform.form.markAsPristine()"
-                    [disabled]="(!cetonform.dirty || !card.VideoDevice)"></p-button>
+                    [disabled]="!cetonform.dirty || !card.VideoDevice || setupService.schedulingEnabled"></p-button>
             </div>
         </ng-template>
     </p-card>

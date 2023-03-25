@@ -19,7 +19,7 @@ export class EitScannerComponent implements OnInit, AfterViewInit {
   EITTransportTimeout = 5;
   EITCrawIdleStart = 60;
 
-  constructor(private setupService: SetupService, private mythService: MythService) {
+  constructor(public setupService: SetupService, private mythService: MythService) {
     this.getEITScanner();
   }
 

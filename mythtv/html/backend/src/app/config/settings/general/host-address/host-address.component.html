@@ -199,7 +199,7 @@
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
                     (onClick)="saveForm(); hostaddress.form.markAsPristine()"
-                    [disabled]="(!hostaddress.dirty || false)"></p-button>
+                    [disabled]="!hostaddress.dirty || setupService.schedulingEnabled"></p-button>
             </div>
         </ng-template>
 

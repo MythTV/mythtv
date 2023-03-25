@@ -69,6 +69,7 @@ import { RecordingProfilesComponent } from './config/settings/recording-profiles
 import { ProfileGroupComponent } from './config/settings/recording-profiles/profile-group/profile-group.component';
 import { RecprofileComponent } from './config/settings/recording-profiles/profile-group/recprofile/recprofile.component';
 import { SystemEventsComponent } from './config/settings/system-events/system-events.component';
+import { BackendWarningComponent } from './config/backend-warning/backend-warning.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -134,6 +135,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     ProfileGroupComponent,
     RecprofileComponent,
     SystemEventsComponent,
+    BackendWarningComponent,
   ],
   imports: [
     BrowserModule,

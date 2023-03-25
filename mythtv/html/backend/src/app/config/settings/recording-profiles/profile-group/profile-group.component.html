@@ -47,12 +47,12 @@
             </ng-template>
             <ng-template pTemplate="content">
                 <p-button styleClass="p-button-warning" label="{{ 'settings.rprofiles.delete_this' | translate }}"
-                    icon="pi pi-trash" (onClick)="displayDeleteThis[ix]=true" [disabled]="(!group.RecProfiles[ix].Id)">
+                    icon="pi pi-trash" (onClick)="displayDeleteThis[ix]=true" [disabled]="!group.RecProfiles[ix].Id || setupService.schedulingEnabled">
                 </p-button>
                 <p-dialog header="{{ 'settings.rprofiles.delete_this' | translate }}"
                     [(visible)]="displayDeleteThis[ix]" [modal]="true" [style]="{width: '50vw'}" [draggable]="false"
                     [resizable]="false">
-                    <h2>{{ 'settings.ru_sure' | translate }}</h2>
+                    <h2>{{ 'settings.common.ru_sure' | translate }}</h2>
                     <p>{{ 'settings.rprofiles.delete_details' |
                         translate: { ProfileName: group.RecProfiles[ix].Name,
                         GroupName: group.Name } }}</p>

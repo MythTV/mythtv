@@ -153,7 +153,7 @@
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
                     (onClick)="saveForm(); jobqbackend.form.markAsPristine()"
-                    [disabled]="(!jobqbackend.dirty || false)"></p-button>
+                    [disabled]="!jobqbackend.dirty || setupService.schedulingEnabled"></p-button>
             </div>
         </ng-template>
     </p-card>

@@ -28,7 +28,7 @@ export class LocaleComponent implements OnInit, AfterViewInit {
     // from
     m_TVFormats: string[];
 
-    constructor(private setupService: SetupService, private mythService: MythService) {
+    constructor(public setupService: SetupService, private mythService: MythService) {
 
         // TODO: add Service API calls to get these
         this.m_TVFormats = [

@@ -54,7 +54,7 @@
                                 <td class="align-items-center">
                                     <button pButton pRipple type="button" icon="pi pi-copy"
                                         class="p-button-rounded p-button-text" (click)="copyConfigure()"
-                                        pTooltip="{{ 'settings.clipbord_tooltip' | translate }}"></button>
+                                        pTooltip="{{ 'settings.common.clipboard_tooltip' | translate }}"></button>
                                 </td>
                             </tr>
                         </table>
@@ -154,7 +154,7 @@
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
                     (onClick)="saveForm(); vsourceform.form.markAsPristine()"
-                    [disabled]="(!vsourceform.dirty || !videoSource.SourceName || this.work.validateError)"></p-button>
+                    [disabled]="!vsourceform.dirty || !videoSource.SourceName || this.work.validateError || setupService.schedulingEnabled"></p-button>
             </div>
         </ng-template>
     </p-card>

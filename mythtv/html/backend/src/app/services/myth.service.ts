@@ -154,4 +154,12 @@ export class MythService {
     return this.httpClient.post<BoolResponse>('/Myth/TestDBSettings', request);
   }
 
+  public ManageScheduler(request: {Enable?: boolean, Disable?: boolean}) : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Myth/ManageScheduler', request);
+  }
+
+  public Shutdown(request: {Retcode?: number, Restart?: boolean}) : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Myth/Shutdown', request);
+  }
+
 }

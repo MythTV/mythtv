@@ -32,13 +32,13 @@ export class ProfileGroupComponent implements OnInit {
 
 
   displayDeleteThis: boolean[] = [];
-  dirtyText = 'settings.unsaved';
-  warningText = 'settings.warning';
+  dirtyText = 'settings.common.unsaved';
+  warningText = 'settings.common.warning';
   deletedText = 'settings.common.deleted';
   newText = 'settings.common.new';
 
   constructor(private captureCardService: CaptureCardService,
-    private setupService: SetupService, private translate: TranslateService) {
+    public setupService: SetupService, private translate: TranslateService) {
     translate.get(this.dirtyText).subscribe(data => this.dirtyText = data);
     translate.get(this.warningText).subscribe(data => this.warningText = data);
     translate.get(this.deletedText).subscribe(data => this.deletedText = data);

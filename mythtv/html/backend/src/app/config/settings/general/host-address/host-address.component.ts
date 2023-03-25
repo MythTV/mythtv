@@ -21,7 +21,7 @@ export class HostAddressComponent implements OnInit, AfterViewInit {
     @ViewChild("hostaddress")
     currentForm!: NgForm;
 
-    constructor(private setupService: SetupService,
+    constructor(public setupService: SetupService,
         private configService: ConfigService) {
 
         this.m_HostAddressData = this.setupService.getHostAddressData();

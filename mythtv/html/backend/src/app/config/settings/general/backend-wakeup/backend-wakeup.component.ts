@@ -22,7 +22,7 @@ export class BackendWakeupComponent implements OnInit, AfterViewInit {
   SleepCommand = "";
   WakeUpCommand = "";
 
-  constructor(private setupService: SetupService, private mythService: MythService) {
+  constructor(public setupService: SetupService, private mythService: MythService) {
 
   }
 

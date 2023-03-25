@@ -18,10 +18,11 @@ export class SettingsComponent implements OnInit, CanComponentDeactivate {
     // This allows for up to 16 tabs
     dirtyMessages: string[] = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""];
     forms: any[] = [, , , , , , , , , , , , , , , ,];
-    dirtyText = 'settings.unsaved';
-    warningText = 'settings.warning';
+    dirtyText = 'settings.common.unsaved';
+    warningText = 'settings.common.warning';
 
     constructor(private setupService: SetupService, private translate: TranslateService) {
+        this.setupService.setCurrentForm(null);
         translate.get(this.dirtyText).subscribe(data => this.dirtyText = data);
         translate.get(this.warningText).subscribe(data => this.warningText = data);
     }

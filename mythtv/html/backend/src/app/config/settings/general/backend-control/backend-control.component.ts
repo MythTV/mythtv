@@ -19,7 +19,7 @@ export class BackendControlComponent implements OnInit, AfterViewInit {
   BackendStopCommand = "killall mythbackend";
   BackendStartCommand = "mythbackend";
 
-  constructor(private setupService: SetupService, private mythService: MythService) { }
+  constructor(public setupService: SetupService, private mythService: MythService) { }
 
   ngOnInit(): void {
   }

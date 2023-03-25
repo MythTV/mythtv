@@ -98,7 +98,7 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
   ];
 
   constructor(private translate: TranslateService, private channelService: ChannelService,
-    private captureCardService: CaptureCardService, private setupService: SetupService) {
+    private captureCardService: CaptureCardService, public setupService: SetupService) {
 
     this.quickTuneValues.forEach(
       entry => translate.get(entry.prompt).subscribe(data => entry.prompt = data));

@@ -61,7 +61,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
 
   selectedDiseqcType: DiseqcParm = { description: "", type: "", inactive: true };
 
-  constructor(public captureCardService: CaptureCardService, private setupService: SetupService,
+  constructor(public captureCardService: CaptureCardService, public setupService: SetupService,
     private translate: TranslateService) {
     translate.get(this.messages.devNotExist).subscribe(data => this.messages.devNotExist = data);
     translate.get(this.messages.unknownName).subscribe(data => this.messages.unknownName = data);

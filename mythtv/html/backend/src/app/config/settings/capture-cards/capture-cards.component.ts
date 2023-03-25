@@ -36,8 +36,8 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
   disabledTab: boolean[] = [];
   activeTab: boolean[] = [];
   displayDeleteThis: boolean[] = [];
-  dirtyText = 'settings.unsaved';
-  warningText = 'settings.warning';
+  dirtyText = 'settings.common.unsaved';
+  warningText = 'settings.common.warning';
   deletedText = 'settings.common.deleted';
   newText = 'settings.common.new';
 
@@ -58,8 +58,9 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
   cardTypes!: CardTypeExt[];
 
   constructor(private mythService: MythService,
-    private captureCardService: CaptureCardService, private setupService: SetupService,
+    private captureCardService: CaptureCardService, public setupService: SetupService,
     private translate: TranslateService) {
+    this.setupService.setCurrentForm(null);
     this.mythService.GetHostName().subscribe(data => {
       this.m_hostName = data.String;
       this.loadCards(true);

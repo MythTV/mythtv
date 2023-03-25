@@ -23,7 +23,7 @@ export class JobqueueGlobalComponent implements OnInit, AfterViewInit {
     AutoTranscodeBeforeAutoCommflag = false;
     SaveTranscoding = false;
 
-    constructor(private setupService: SetupService, private mythService: MythService) {
+    constructor(public setupService: SetupService, private mythService: MythService) {
         this.getJobQGlobal();
     }
 

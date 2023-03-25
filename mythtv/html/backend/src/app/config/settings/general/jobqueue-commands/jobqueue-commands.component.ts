@@ -17,7 +17,7 @@ export class JobqueueCommandsComponent implements OnInit, AfterViewInit {
   JobQCommandsData!: JobQCommands;
   items: number[] = [0, 1, 2, 3];
 
-  constructor(private setupService: SetupService) {
+  constructor(public setupService: SetupService) {
     this.JobQCommandsData = this.setupService.getJobQCommands();
   }
 

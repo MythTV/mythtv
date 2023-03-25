@@ -44,7 +44,7 @@
                         severity="error" text="{{ 'common.networkfail' | translate }}" ></p-message>
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); eitscanopt.form.markAsPristine()"
-                                 [disabled]="(!eitscanopt.dirty || false)"></p-button>
+                                 [disabled]="!eitscanopt.dirty || setupService.schedulingEnabled"></p-button>
             </div>
         </ng-template>
     </p-card>

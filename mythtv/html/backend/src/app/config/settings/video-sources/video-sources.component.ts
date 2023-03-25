@@ -21,8 +21,8 @@ export class VideoSourcesComponent implements OnInit, CanComponentDeactivate {
   disabledTab: boolean[] = [];
   activeTab: boolean[] = [];
   displayDeleteThis: boolean[] = [];
-  dirtyText = 'settings.unsaved';
-  warningText = 'settings.warning';
+  dirtyText = 'settings.common.unsaved';
+  warningText = 'settings.common.warning';
   deletedText = 'settings.common.deleted';
   newText = 'settings.common.new';
   successCount: number = 0;
@@ -40,8 +40,9 @@ export class VideoSourcesComponent implements OnInit, CanComponentDeactivate {
     }
   };
 
-  constructor(private setupService: SetupService, private translate: TranslateService,
+  constructor(public setupService: SetupService, private translate: TranslateService,
     private channelService: ChannelService) {
+    this.setupService.setCurrentForm(null);
     this.loadSources();
     translate.get(this.dirtyText).subscribe(data => this.dirtyText = data);
     translate.get(this.warningText).subscribe(data => this.warningText = data);

@@ -1,15 +1,16 @@
+<app-backend-warning></app-backend-warning>
 <div class="block card w-full">
-    <h3>{{ 'settings.vsource.title' | translate }}</h3>
+    <h2>{{ 'settings.vsource.title' | translate }}</h2>
 
     <p-button label="{{ 'settings.vsource.new_video_source' | translate }}" (onClick)="newSource();"
         icon="pi pi-plus-circle" styleClass="p-button-plain"></p-button>
     &nbsp;
     <p-button styleClass="p-button-danger" label="{{ 'settings.vsource.delete_all' | translate }}"
-        (click)="displayDeleteAll=true" icon="pi pi-trash" iconPos="left">
+        (click)="displayDeleteAll=true" icon="pi pi-trash" iconPos="left" [disabled]="setupService.schedulingEnabled">
     </p-button>
     <p-dialog header="{{ 'settings.vsource.delete_all' | translate }}" [(visible)]="displayDeleteAll" [modal]="true"
         [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
-        <h2>{{ 'settings.ru_sure' | translate }}</h2>
+        <h2>{{ 'settings.common.ru_sure' | translate }}</h2>
         <ng-template pTemplate="footer">
             <p-button icon="pi pi-times-circle" (click)="displayDeleteAll=false" label="{{ 'common.no' | translate }}"
                 styleClass="p-button-plain">
@@ -48,11 +49,11 @@
             <ng-template pTemplate="content">
                 <p-button styleClass="p-button-warning" label="{{ 'settings.vsource.delete_this' | translate }}"
                     icon="pi pi-trash" (onClick)="displayDeleteThis[ix]=true"
-                    [disabled]="(!this.videoSourceList.VideoSourceList.VideoSources[ix].Id)">
+                    [disabled]="!this.videoSourceList.VideoSourceList.VideoSources[ix].Id || setupService.schedulingEnabled">
                 </p-button>
                 <p-dialog header="{{ 'settings.vsource.delete_this' | translate }}" [(visible)]="displayDeleteThis[ix]"
                     [modal]="true" [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
-                    <h2>{{ 'settings.ru_sure' | translate }}</h2>
+                    <h2>{{ 'settings.common.ru_sure' | translate }}</h2>
                     <p>{{ 'settings.vsource.delete_details' |
                         translate: {Grabber: videoSourceList.VideoSourceList.VideoSources[ix].Grabber,
                         DisplayName: videoSourceList.VideoSourceList.VideoSources[ix].SourceName} }}</p>

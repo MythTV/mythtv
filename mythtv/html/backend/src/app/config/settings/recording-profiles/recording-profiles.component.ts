@@ -22,13 +22,14 @@ export class RecordingProfilesComponent implements OnInit {
   readyCount = 0;
   profileGroups: ProfileGroupComponent[] = [];
 
-  dirtyText = 'settings.unsaved';
-  warningText = 'settings.warning';
+  dirtyText = 'settings.common.unsaved';
+  warningText = 'settings.common.warning';
 
   groups: RecProfileGroup[] = [];
 
   constructor(private captureCardService: CaptureCardService,
-    private translate: TranslateService) {
+    private translate: TranslateService, private setupService: SetupService) {
+    this.setupService.setCurrentForm(null);
     this.loadGroups();
     translate.get(this.dirtyText).subscribe(data => this.dirtyText = data);
     translate.get(this.warningText).subscribe(data => this.warningText = data);

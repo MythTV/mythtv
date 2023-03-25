@@ -35,7 +35,7 @@
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
                     (onClick)="saveForm(); demoform.form.markAsPristine()"
-                    [disabled]="(!demoform.dirty || !card.VideoDevice)"></p-button>
+                    [disabled]="!demoform.dirty || !card.VideoDevice || setupService.schedulingEnabled"></p-button>
             </div>
         </ng-template>
     </p-card>

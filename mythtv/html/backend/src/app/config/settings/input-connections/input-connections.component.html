@@ -1,5 +1,6 @@
+<app-backend-warning></app-backend-warning>
 <div class="block card w-full">
-    <h3>{{ 'settings.iconnections.title' | translate }}</h3>
+    <h2>{{ 'settings.iconnections.title' | translate }}</h2>
     <p-accordion class="col-12 w-full" (onClose)="onTabClose($event)" (onOpen)="onTabOpen($event)">
         <p-accordionTab *ngFor="let card of m_CaptureCardsFiltered; index as ix; first as isFirst"
             [(selected)]="activeTab[ix]">

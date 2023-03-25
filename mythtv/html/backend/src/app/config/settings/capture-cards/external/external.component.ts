@@ -22,7 +22,7 @@ export class ExternalComponent implements OnInit, AfterViewInit {
     errorCount: 0,
   };
 
-  constructor(private captureCardService: CaptureCardService, private setupService: SetupService) { }
+  constructor(private captureCardService: CaptureCardService, public setupService: SetupService) { }
 
   ngOnInit(): void {
   }

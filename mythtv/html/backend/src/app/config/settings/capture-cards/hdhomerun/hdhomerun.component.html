@@ -69,7 +69,7 @@
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
                     (onClick)="saveForm(); hdhomerunform.form.markAsPristine()"
-                    [disabled]="(!hdhomerunform.dirty || !card.VideoDevice)"></p-button>
+                    [disabled]="!hdhomerunform.dirty || !card.VideoDevice || setupService.schedulingEnabled"></p-button>
             </div>
         </ng-template>
     </p-card>

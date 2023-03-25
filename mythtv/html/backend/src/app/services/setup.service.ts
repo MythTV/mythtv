@@ -318,7 +318,9 @@ export class SetupService {
 
     setCurrentForm(form: NgForm | null) {
         this.currentForm = form;
-
     }
+
+    // This is here to be shared among tabs on an accordian
+    schedulingEnabled = true;
 
 }

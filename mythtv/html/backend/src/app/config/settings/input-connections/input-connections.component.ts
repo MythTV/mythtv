@@ -23,8 +23,8 @@ export class InputConnectionsComponent implements OnInit {
   activeTab: boolean[] = [];
   readyCount = 0;
 
-  dirtyText = 'settings.unsaved';
-  warningText = 'settings.warning';
+  dirtyText = 'settings.common.unsaved';
+  warningText = 'settings.common.warning';
 
   m_hostName: string = ""; // hostname of the backend server
   m_CaptureCardList!: CaptureCardList;
@@ -46,6 +46,7 @@ export class InputConnectionsComponent implements OnInit {
   constructor(private mythService: MythService,
     private captureCardService: CaptureCardService, private setupService: SetupService,
     private translate: TranslateService, private channelService: ChannelService) {
+    this.setupService.setCurrentForm(null);
     this.mythService.GetHostName().subscribe(data => {
       this.m_hostName = data.String;
       this.loadCards(true);

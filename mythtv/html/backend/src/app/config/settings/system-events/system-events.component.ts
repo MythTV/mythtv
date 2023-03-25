@@ -24,13 +24,13 @@ export class SystemEventsComponent implements OnInit {
   errorCount = 0;
   expectedCount = 0;
 
-  warningText = 'settings.warning';
+  warningText = 'settings.common.warning';
 
   // See mythdb.cpp. This value is used to delete a setting
   kClearSettingValue = "<clear_setting_value>";
 
   constructor(private configService: ConfigService, private translate: TranslateService,
-    private setupService: SetupService, private mythService: MythService) {
+    public setupService: SetupService, private mythService: MythService) {
     this.configService.GetSystemEvents().subscribe(data => {
       this.eventList = data;
       this.events = data.SystemEventList.SystemEvents;

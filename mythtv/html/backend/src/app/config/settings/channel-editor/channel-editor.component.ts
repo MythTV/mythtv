@@ -5,6 +5,7 @@ import { Observable, of, PartialObserver } from 'rxjs';
 import { ChannelService } from 'src/app/services/channel.service';
 import { Channel, CommMethod, DBChannelRequest } from 'src/app/services/interfaces/channel.interface';
 import { VideoSource } from 'src/app/services/interfaces/videosource.interface';
+import { SetupService } from 'src/app/services/setup.service';
 
 @Component({
   selector: 'app-channel-editor',
@@ -46,8 +47,8 @@ export class ChannelEditorComponent implements OnInit {
   ];
   headingNew = "settings.chanedit.new_channel";
   headingEdit = "settings.chanedit.title";
-  warningText = 'settings.warning';
-  deleteText = 'settings.ru_sure';
+  warningText = 'settings.common.warning';
+  deleteText = 'settings.common.ru_sure';
 
   transDone = 0;
   numTranslations = 8;
@@ -64,7 +65,8 @@ export class ChannelEditorComponent implements OnInit {
   // channelOperation -1 = delete, 0 = update, 1 = add
   channelOperation = 0;
 
-  constructor(private channelService: ChannelService, private translate: TranslateService) {
+  constructor(private channelService: ChannelService, private translate: TranslateService,
+    public setupService: SetupService) {
     this.loadLists();
     this.loadTranslations();
   }
