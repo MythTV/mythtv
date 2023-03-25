@@ -855,9 +855,14 @@ void MythRAOPConnection::readClient(void)
         return;
 
     QByteArray data = socket->readAll();
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("readClient(%1): ")
-        .arg(data.size()) + data.constData());
-
+    if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
+    {
+        QByteArray printable = data.left(32);
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("readClient(%1): %2%3")
+            .arg(data.size())
+            .arg(printable.toHex().toUpper().data(),
+                 data.size() > 32 ? "..." : ""));
+    }
     // For big content, we may be called several times for a single packet
     if (!m_incomingPartial)
     {
