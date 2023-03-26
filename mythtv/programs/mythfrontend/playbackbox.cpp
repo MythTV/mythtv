@@ -223,7 +223,7 @@ static QString construct_sort_title(
         return title;
 
     QString sTitle = sortTitle.isEmpty()
-        ? sTitle : sortTitle + " - " + title;
+        ? title : sortTitle + " - " + title;
 
     if (viewmask == PlaybackBox::VIEW_TITLES &&
             sortType == PlaybackBox::TitleSortRecPriority)
