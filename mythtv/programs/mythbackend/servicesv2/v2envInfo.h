@@ -35,8 +35,7 @@ class V2EnvInfo : public QObject
               m_LCALL       ( ""     ),
               m_LCCTYPE     ( ""     ),
               m_HOME        ( ""     ),
-              m_MYTHCONFDIR ( ""     ),
-              m_SchedulingEnabled (false)
+              m_MYTHCONFDIR ( ""     )
         {
         }
 
