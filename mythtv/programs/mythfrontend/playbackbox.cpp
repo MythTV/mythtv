@@ -216,7 +216,7 @@ static PlaybackBox::ViewMask m_viewMaskToggle(PlaybackBox::ViewMask mask,
 }
 
 static QString construct_sort_title(
-    QString title, QString sortTitle, PlaybackBox::ViewMask viewmask,
+    QString title, const QString& sortTitle, PlaybackBox::ViewMask viewmask,
     PlaybackBox::ViewTitleSort sortType, int recpriority)
 {
     if (title.isEmpty())
