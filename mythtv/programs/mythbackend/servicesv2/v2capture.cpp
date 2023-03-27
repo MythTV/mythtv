@@ -1189,10 +1189,9 @@ int V2Capture::AddRecProfile  ( uint GroupId, const QString& ProfileName,
         MythDB::DBError("V2Capture::AddRecProfile", query);
         throw( QString( "Database Error executing SELECT." ));
     }
-    int id;
     if (query.next())
     {
-        id = query.value(0).toInt();
+        int id = query.value(0).toInt();
         LOG(VB_GENERAL, LOG_ERR,
             QString( "Profile %1 already exists in group id %2 with id %3").arg(ProfileName).arg(GroupId).arg(id));
         return false;
@@ -1212,7 +1211,7 @@ int V2Capture::AddRecProfile  ( uint GroupId, const QString& ProfileName,
         MythDB::DBError("V2Capture::AddRecProfile", query);
         throw( QString( "Database Error executing INSERT." ));
     }
-    id = query.lastInsertId().toInt();
+    int id = query.lastInsertId().toInt();
     RecordingProfile profile(ProfileName);
     profile.loadByID(id);
     profile.setCodecTypes();
