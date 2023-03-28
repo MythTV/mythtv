@@ -1116,10 +1116,7 @@ V2BackendInfo* V2Myth::GetBackendInfo( void )
     auto *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
     if (scheduler != nullptr)
         pEnv->setSchedulingEnabled(scheduler->QueryScheduling());
-    // This needs to be first assigned to a new QString because setLogArgs
-    // uses a std_move which clears out the source variable while setting.
-    QString logArgs = logPropagateArgs;
-    pLog->setLogArgs       ( logArgs  );
+    pLog->setLogArgs       ( logPropagateArgs      );
 
     // ----------------------------------------------------------------------
     // Return the pointer... caller is responsible to delete it!!!
