@@ -28,7 +28,7 @@ void MythJSONSerialiser::AddObject(const QString& Name, const QVariant& Value)
     m_first.top() = false;
 }
 
-void MythJSONSerialiser::AddValue(const QVariant& Value)
+void MythJSONSerialiser::AddValue(const QVariant& Value, const QMetaProperty *MetaProperty)
 {
     if (Value.isNull() || !Value.isValid())
     {
@@ -46,6 +46,18 @@ void MythJSONSerialiser::AddValue(const QVariant& Value)
             return;
         }
         AddQObject(object);
+        return;
+    }
+
+    // Enum ?
+    if (MetaProperty && (MetaProperty->isEnumType() || MetaProperty->isFlagType()))
+    {
+        QMetaEnum metaEnum = MetaProperty->enumerator();
+        QString value = MetaProperty->isFlagType() ? metaEnum.valueToKeys(Value.toInt()).constData() :
+                                                     metaEnum.valueToKey(Value.toInt());
+        // If couldn't convert to enum name, return raw value
+        value = (value.isEmpty() ? Value.toString() : value);
+        m_writer << "\"" << Encode(value) << "\"";
         return;
     }
 
@@ -105,7 +117,7 @@ void MythJSONSerialiser::AddQObject(const QObject* Object)
                 continue;
             QVariant value(Object->property(rawname));
             m_writer << first << "\"" << name << "\": ";
-            AddValue(value);
+            AddValue(value, &metaProperty);
             first = ", ";
         }
     }
