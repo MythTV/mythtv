@@ -70,6 +70,8 @@ using  ClientMap = QMap<QString, LoggerListItem *>;
 using  ClientList = QList<QString>;
 using  RevClientMap = QHash<LoggerBase *, ClientList *>;
 
+// A mapping from client id to the logging objects that process
+// messages from that client.
 static QMutex                       logClientMapMutex;
 static ClientMap                    logClientMap;
 static QAtomicInt                   logClientCount;
@@ -77,6 +79,15 @@ static QAtomicInt                   logClientCount;
 static QMutex                       logRevClientMapMutex;
 static RevClientMap                 logRevClientMap;
 
+// This is a FIFO queue containing the incoming messages "sent" from a
+// client to this server. As each message arrives, it is queued here
+// for later retrieval by a different thread.  This used to be
+// populated by a thread that received messages from the network, and
+// drained by a different thread that logged the messages.  It is now
+// populated by the thread that generated the message, and drained by
+// a different thread that logs the messages.  Each message contains
+// two strings. The first is the client "name" and the second is the
+// message to be logged.
 static QMutex                       logMsgListMutex;
 static LogMessageList               logMsgList;
 static QWaitCondition               logMsgListNotEmpty;
@@ -741,6 +752,7 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
 #endif
 
     // First section is the client id
+    // logging.cpp always sets the client id to an empty string.
     QByteArray clientBa = msg->first();
     QString clientId = QString(clientBa.toHex());
 
@@ -762,6 +774,9 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
     }
     else
     {
+        // Create the LoggingItem from the json solely so we can pick
+        // out a couple of fields. It will be thrown away at the end
+        // of this else clause.
         LoggingItem *item = LoggingItem::create(json);
 
         logClientCount.ref();
@@ -837,21 +852,29 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
                 loggers->insert(0, logger);
         }
 
+        // Add the list of loggers for this client into the map.
         logItem = new LoggerListItem;
         logItem->m_itemEpoch = nowAsDuration<std::chrono::seconds>();
         logItem->m_itemList = loggers;
         logClientMap.insert(clientId, logItem);
 
+        // Throw away the created LoggingItem
         item->DecrRef();
     }
 
+    // Does this client have an entry in the loggers map, does that
+    // entry have a list of loggers, and does that list have anything
+    // in it.  I.E. is there anywhere to log this item.
     if (logItem && logItem->m_itemList && !logItem->m_itemList->isEmpty())
     {
+        // Create the LoggingItem (possibly for a second time)
         LoggingItem *item = LoggingItem::create(json);
         if (!item)
             return;
+        // Log this item on each of the loggers.
         for (auto *it : qAsConst(*logItem->m_itemList))
             it->logmsg(item);
+        // Throw the item away again.
         item->DecrRef();
     }
 }
