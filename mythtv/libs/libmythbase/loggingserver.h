@@ -121,8 +121,7 @@ class DatabaseLogger : public LoggerBase
     static constexpr std::chrono::milliseconds kMinDisabledTime {1s}; ///< Minimum time to disable DB logging
 };
 
-using LogMessage = QList<QByteArray>;
-using LogMessageList = QList<LogMessage *>;
+using LoggingItemList = QList<LoggingItem *>;
 
 /// \brief The logging thread that forwards received messages to the consuming
 ///        loggers via ZeroMQ
@@ -139,7 +138,7 @@ class LogForwardThread : public QObject, public MThread
   private:
     bool m_aborted {false};          ///< Flag to abort the thread.
 
-    static void forwardMessage(LogMessage *msg);
+    static void forwardMessage(LoggingItem *item);
   signals:
     void incomingSigHup(void);
   protected slots:
@@ -148,7 +147,7 @@ class LogForwardThread : public QObject, public MThread
 
 MBASE_PUBLIC bool logForwardStart(void);
 MBASE_PUBLIC void logForwardStop(void);
-MBASE_PUBLIC void logForwardMessage(const QList<QByteArray> &msg);
+MBASE_PUBLIC void logForwardMessage(LoggingItem *item);
 
 
 class QWaitCondition;

@@ -85,11 +85,9 @@ static RevClientMap                 logRevClientMap;
 // populated by a thread that received messages from the network, and
 // drained by a different thread that logged the messages.  It is now
 // populated by the thread that generated the message, and drained by
-// a different thread that logs the messages.  Each message contains
-// two strings. The first is the client "name" and the second is the
-// message to be logged.
+// a different thread that logs the messages.
 static QMutex                       logMsgListMutex;
-static LogMessageList               logMsgList;
+static LoggingItemList              logMsgList;
 static QWaitCondition               logMsgListNotEmpty;
 
 /// \brief LoggerBase class constructor.  Adds the new logger instance to the
@@ -687,10 +685,10 @@ void LogForwardThread::run(void)
             while (!logMsgList.isEmpty())
             {
                 processed++;
-                LogMessage *msg = logMsgList.takeFirst();
+                LoggingItem *item = logMsgList.takeFirst();
                 lock.unlock();
-                forwardMessage(msg);
-                delete msg;
+                forwardMessage(item);
+                item->DecrRef();
 
                 // Force a processEvents every 128 messages so a busy queue
                 // doesn't preclude timer notifications, etc.
@@ -738,47 +736,19 @@ void LogForwardThread::handleSigHup(void)
 #endif
 }
 
-void LogForwardThread::forwardMessage(LogMessage *msg)
+void LogForwardThread::forwardMessage(LoggingItem *item)
 {
-#ifdef DUMP_PACKET
-    int i = 0;
-    for (auto it = msg->begin(); it != msg->end(); ++it, i++)
-    {
-        QByteArray buf = *it;
-        std::cout << i << ":\t" << buf.size() << std::endl << "\t"
-             << buf.toHex().constData() << std::endl << "\t"
-             << buf.constData() << std::endl;
-    }
-#endif
-
-    // First section is the client id
-    // logging.cpp always sets the client id to an empty string.
-    QByteArray clientBa = msg->first();
-    QString clientId = QString(clientBa.toHex());
-
-    QByteArray json     = msg->at(1);
-
-    if (json.size() == 0)
-    {
-        // std::cout << "invalid msg, no json data " << qPrintable(clientId) << std::endl;
-        return;
-    }
+    QString clientId = "";
 
     QMutexLocker lock(&logClientMapMutex);
     LoggerListItem *logItem = logClientMap.value(clientId, nullptr);
 
-    // std::cout << "msg  " << clientId.toLocal8Bit().constData() << std::endl;
     if (logItem)
     {
         logItem->m_itemEpoch = nowAsDuration<std::chrono::seconds>();
     }
     else
     {
-        // Create the LoggingItem from the json solely so we can pick
-        // out a couple of fields. It will be thrown away at the end
-        // of this else clause.
-        LoggingItem *item = LoggingItem::create(json);
-
         logClientCount.ref();
         LOG(VB_FILE, LOG_DEBUG, QString("New Logging Client: ID: %1 (#%2)")
             .arg(clientId).arg(logClientCount.fetchAndAddOrdered(0)));
@@ -857,9 +827,6 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
         logItem->m_itemEpoch = nowAsDuration<std::chrono::seconds>();
         logItem->m_itemList = loggers;
         logClientMap.insert(clientId, logItem);
-
-        // Throw away the created LoggingItem
-        item->DecrRef();
     }
 
     // Does this client have an entry in the loggers map, does that
@@ -867,15 +834,9 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
     // in it.  I.E. is there anywhere to log this item.
     if (logItem && logItem->m_itemList && !logItem->m_itemList->isEmpty())
     {
-        // Create the LoggingItem (possibly for a second time)
-        LoggingItem *item = LoggingItem::create(json);
-        if (!item)
-            return;
         // Log this item on each of the loggers.
         for (auto *it : qAsConst(*logItem->m_itemList))
             it->logmsg(item);
-        // Throw the item away again.
-        item->DecrRef();
     }
 }
 
@@ -910,13 +871,15 @@ void logForwardStop(void)
     }
 }
 
-void logForwardMessage(const QList<QByteArray> &msg)
+// Take a logging item and queue it for the logging server thread to
+// process.
+void logForwardMessage(LoggingItem *item)
 {
-    auto *message = new LogMessage(msg);
     QMutexLocker lock(&logMsgListMutex);
 
     bool wasEmpty = logMsgList.isEmpty();
-    logMsgList.append(message);
+    item->IncrRef();
+    logMsgList.append(item);
 
     if (wasEmpty)
         logMsgListNotEmpty.wakeAll();

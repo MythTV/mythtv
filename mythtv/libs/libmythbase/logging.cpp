@@ -7,8 +7,6 @@
 #include <QQueue>
 #include <QHash>
 #include <QFileInfo>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QStringList>
 #include <QMap>
 #include <QRegularExpression>
@@ -32,7 +30,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <fcntl.h>
-#include <stdexcept>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <utility>
@@ -134,73 +131,6 @@ LoggingItem::LoggingItem(const char *_file, const char *_function,
     m_file = (slash != nullptr) ? slash+1 : _file;
     m_epoch = nowAsDuration<std::chrono::microseconds>();
     setThreadTid();
-}
-
-// Create the JSON description of this object using strings to work
-// around limitations in the QJsonValue class.  All numbers in that
-// class are held as an IEEE 754 double precision value.  That limits
-// them to 2^53 (-9007199254740992 to +9007199254740992), which isn't
-// enough to handle the 64-bit values in this class.  Format all the
-// numbers as strings for consistency.
-QByteArray LoggingItem::toByteArray(void)
-{
-    QJsonObject obj {
-        // numbers
-        { "pid"        , QString::number(m_pid) },
-        { "tid"        , QString::number(m_tid) },
-        { "threadId"   , QString::number(m_threadId) },
-        { "line"       , QString::number(m_line) },
-        { "type"       , QString::number(m_type) },
-        { "level"      , QString::number(m_level) },
-        { "facility"   , QString::number(m_facility) },
-        { "epoch"      , QString::number(m_epoch.count()) },
-        // strings
-        { "file"       , m_file },
-        { "function"   , m_function },
-        { "threadName" , m_threadName },
-        { "appName"    , m_appName },
-        { "table"      , m_table },
-        { "logFile"    , m_logFile },
-        { "message"    , m_message }
-    };
-    QJsonDocument doc(obj);
-    return doc.toJson();
-}
-
-// Validate the existence of and parse one string from a QJsonObject.
-// Throw an error if there is any problem.
-static inline QString obj2str(const QJsonObject& obj, const QString& key)
-{
-    if (obj.contains(key) && obj[key].isString())
-        return obj[key].toString();
-    throw std::runtime_error("Invalid or missing parameter");
-}
-
-// Create a LoggingItem object from a JSON string.  Throw an error if
-// there is any problem.
-LoggingItem::LoggingItem(const QJsonDocument& doc) :
-        ReferenceCounter("LoggingItem", false)
-{
-    if (!doc.isObject())
-        throw std::runtime_error("Invalid document");
-    QJsonObject obj = doc.object();
-
-    m_pid           = obj2str(obj, "pid").toInt();
-    m_tid           = obj2str(obj, "tid").toLongLong();
-    m_threadId      = obj2str(obj, "threadId").toULongLong();
-    m_line          = obj2str(obj, "line").toInt();
-    m_type          = static_cast<LoggingType>(obj2str(obj, "type").toInt());
-    m_level         = static_cast<LogLevel_t> (obj2str(obj, "level").toInt());
-    m_facility      = obj2str(obj, "facility").toInt();
-    m_epoch         = std::chrono::microseconds(obj2str(obj, "epoch").toLongLong());
-
-    m_file       = obj2str(obj, "file");
-    m_function   = obj2str(obj, "function");
-    m_threadName = obj2str(obj, "threadName");
-    m_appName    = obj2str(obj, "appName");
-    m_table      = obj2str(obj, "table");
-    m_logFile    = obj2str(obj, "logFile");
-    m_message    = obj2str(obj, "message");
 }
 
 /// \brief Get the name of the thread that produced the LoggingItem
@@ -427,17 +357,7 @@ void LoggerThread::handleItem(LoggingItem *item)
 
     if (!item->m_message.isEmpty())
     {
-        /// TODO: This converts the LoggingItem to json for sending to
-        /// the log server.  Now that the log server is gone, it just
-        /// passed the json to the logForwardThread, where it will
-        /// eventually be converted back to a LoggingItem.  It should
-        /// be possible to eliminate the double conversion now that
-        /// the log server is gone and all logging happens in one
-        /// process.
-        QList<QByteArray> list;
-        list.append(QByteArray());
-        list.append(item->toByteArray());
-        logForwardMessage(list);
+        logForwardMessage(item);
     }
 }
 
@@ -599,32 +519,6 @@ LoggingItem *LoggingItem::create(const char *_file,
 
     return item;
 }
-
-/// \brief  Create a new LoggingItem from a JSON string
-//
-//  The string provided to this function must have been created by the
-//  LoggingItem::toByteArray function.  If there is a problem with the
-//  string, this function will print an error to the console and
-//  return nullptr.
-LoggingItem *LoggingItem::create(QByteArray &buf)
-{
-    try
-    {
-        // Deserialize buffer
-        QJsonDocument doc = QJsonDocument::fromJson(buf);
-        return new LoggingItem(doc);
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << "Exception ("
-                  << e.what()
-                  << ") creating logging item for: "
-                  << buf.data()
-                  << std::endl;
-        return nullptr;
-    }
-}
-
 
 /// \brief  Format and send a log message into the queue.  This is called from
 ///         the LOG() macro.  The intention is minimal blocking of the caller.
