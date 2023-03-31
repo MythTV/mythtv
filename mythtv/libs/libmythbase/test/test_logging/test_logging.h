@@ -48,4 +48,9 @@ private slots:
     static void test_verboseArgParse_level(void);
     static void test_logPropagateCalc_data(void);
     static void test_logPropagateCalc(void);
+    static void test_itemToJson1(void);
+    static void test_jsonToItem1(void);
+    static void test_itemToJson2(void);
+    static void test_jsonToItem2(void);
+    static void test_jsonToItem3(void);
 };

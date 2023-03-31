@@ -343,6 +343,159 @@ void TestLogging::test_logPropagateCalc (void)
     QCOMPARE(logPropagateArgs.trimmed(), expectedArgs);
 }
 
-// logPropagateCalc
+static const char *test_json1 = R"(
+{
+    "appName": "test_logging",
+    "epoch": "9223372036854771565",
+    "facility": "2147483635",
+    "file": "test_logging.cpp",
+    "function": "json_test1",
+    "level": "6",
+    "line": "42",
+    "logFile": "what",
+    "message": "This is a test message.",
+    "pid": "2147483646",
+    "table": "n/a",
+    "threadId": "18446744073709551573",
+    "threadName": "mythread",
+    "tid": "9223372036854775805",
+    "type": "1"
+}
+)";
+
+void TestLogging::test_itemToJson1(void)
+{
+    LoggingItem *item =
+        LoggingItem::create(__FILE__, "json_test1", 42, LOG_INFO, kMessage);
+    item->m_pid = std::numeric_limits<int>::max() - 1;
+    item->m_tid = std::numeric_limits<long long>::max() - 2;
+    item->m_threadId = std::numeric_limits<unsigned long long>::max() - 42;
+    item->m_facility = std::numeric_limits<int>::max() - 12;
+    item->m_epoch = std::chrono::microseconds(std::numeric_limits<long long>::max() - 4242);
+
+    item->m_threadName = "mythread";
+    item->m_appName = "test_logging";
+    item->m_table = "n/a";
+    item->m_logFile = "what";
+    item->m_message = "This is a test message.";
+
+    QByteArray bytes = item->toByteArray().trimmed();
+    QByteArray expected = QByteArray(test_json1).trimmed();
+    QCOMPARE(bytes, expected);
+}
+
+#include <iostream>
+void TestLogging::test_jsonToItem1(void)
+{
+    QByteArray bytes = test_json1;
+    LoggingItem *item = LoggingItem::create(bytes);
+    QCOMPARE(item->m_pid, std::numeric_limits<int>::max() - 1);
+    QCOMPARE(item->m_tid, std::numeric_limits<long long>::max() - 2);
+    QCOMPARE(item->m_threadId, std::numeric_limits<unsigned long long>::max() - 42);
+    QCOMPARE(item->m_line, 42);
+    QCOMPARE(item->m_type, kMessage);
+    QCOMPARE(item->m_facility, std::numeric_limits<int>::max() - 12);
+    QCOMPARE(item->m_epoch, std::chrono::microseconds(std::numeric_limits<long long>::max() - 4242));
+
+    QCOMPARE(item->m_threadName, "mythread");
+    QCOMPARE(item->m_appName, "test_logging");
+    QCOMPARE(item->m_table, "n/a");
+    QCOMPARE(item->m_logFile, "what");
+    QCOMPARE(item->m_message, "This is a test message.");
+}
+
+static const char *test_json2 = R"(
+{
+    "appName": "test_logging",
+    "epoch": "-9223372036854771566",
+    "facility": "-2147483636",
+    "file": "test_logging.cpp",
+    "function": "json_test2",
+    "level": "6",
+    "line": "4242",
+    "logFile": "what",
+    "message": "This is a test message.",
+    "pid": "-2147483647",
+    "table": "n/a",
+    "threadId": "42",
+    "threadName": "mythread",
+    "tid": "-9223372036854775806",
+    "type": "1"
+}
+)";
+
+void TestLogging::test_itemToJson2(void)
+{
+    LoggingItem *item =
+        LoggingItem::create(__FILE__, "json_test2", 4242, LOG_INFO, kMessage);
+    item->m_pid = std::numeric_limits<int>::min() + 1;
+    item->m_tid = std::numeric_limits<long long>::min() + 2;
+    item->m_threadId = std::numeric_limits<unsigned long long>::min() + 42;
+    item->m_facility = std::numeric_limits<int>::min() + 12;
+    item->m_epoch = std::chrono::microseconds( std::numeric_limits<long long>::min() + 4242);
+
+    item->m_threadName = "mythread";
+    item->m_appName = "test_logging";
+    item->m_table = "n/a";
+    item->m_logFile = "what";
+    item->m_message = "This is a test message.";
+
+    QByteArray bytes = item->toByteArray().trimmed();
+    QByteArray expected = QByteArray(test_json2).trimmed();
+    QCOMPARE(bytes, expected);
+}
+
+void TestLogging::test_jsonToItem2(void)
+{
+    QByteArray bytes = test_json2;
+    LoggingItem *item = LoggingItem::create(bytes);
+    QCOMPARE(item->m_pid, std::numeric_limits<int>::min() + 1);
+    QCOMPARE(item->m_tid, std::numeric_limits<long long>::min() + 2);
+    QCOMPARE(item->m_threadId, std::numeric_limits<unsigned long long>::min() + 42);
+    QCOMPARE(item->m_line, 4242);
+    QCOMPARE(item->m_type, kMessage);
+    QCOMPARE(item->m_facility, std::numeric_limits<int>::min() + 12);
+    QCOMPARE(item->m_epoch, std::chrono::microseconds(std::numeric_limits<long long>::min() + 4242));
+    QCOMPARE(item->m_epoch, std::chrono::microseconds(std::numeric_limits<long long>::min() + 4242));
+
+    QCOMPARE(item->m_threadName, "mythread");
+    QCOMPARE(item->m_appName, "test_logging");
+    QCOMPARE(item->m_table, "n/a");
+    QCOMPARE(item->m_logFile, "what");
+    QCOMPARE(item->m_message, "This is a test message.");
+}
+
+static const char *test_json3 = R"(
+{
+    "appName": "test_logging",
+    "epoch": "-9223372036854771566",
+    "facility": "-2147483636",
+    "file": "test_logging.cpp",
+    "function": "json_test2",
+    "level": "6",
+    "line": "4242",
+    "logFile": "what",
+    "message": "This is a test message.",
+    "pid": "-2147483647",
+    "table": "n/a",
+    "threadId": "42",
+    "threadName": "mythread",
+    "type": "1"
+}
+)";
+
+void TestLogging::test_jsonToItem3(void)
+{
+    QByteArray bytes = test_json3;
+    QJsonDocument doc = QJsonDocument::fromJson(bytes);
+   try {
+        LoggingItem *item = new LoggingItem(doc);
+        Q_UNUSED(item);
+        QFAIL("This constructor should have thrown an error.");
+    }
+    catch(const std::exception& e)
+    {
+    }
+}
 
 QTEST_APPLESS_MAIN(TestLogging)

@@ -52,6 +52,8 @@ using tmType = struct tm;
 ///        console
 class LoggingItem: public QObject, public ReferenceCounter
 {
+    friend class TestLogging;
+
     Q_OBJECT
 
     Q_PROPERTY(int pid READ pid WRITE setPid)
@@ -78,10 +80,10 @@ class LoggingItem: public QObject, public ReferenceCounter
     QString getThreadName(void);
     int64_t getThreadTid(void);
     void setThreadTid(void);
-    static LoggingItem *create(const char *_file, const char *_function, int _line, LogLevel_t _level,
+    static MBASE_PUBLIC LoggingItem *create(const char *_file, const char *_function, int _line, LogLevel_t _level,
                                LoggingType _type);
-    static LoggingItem *create(QByteArray &buf);
-    QByteArray toByteArray(void);
+    static MBASE_PUBLIC LoggingItem *create(QByteArray &buf);
+    MBASE_PUBLIC QByteArray toByteArray(void);
     QString getTimestamp(const char *format = "yyyy-MM-dd HH:mm:ss") const;
     QString getTimestampUs(const char *format = "yyyy-MM-dd HH:mm:ss") const;
     char getLevelChar(void);
@@ -143,6 +145,10 @@ class LoggingItem: public QObject, public ReferenceCounter
     LoggingItem(const char *_file, const char *_function,
                 int _line, LogLevel_t _level, LoggingType _type);
     Q_DISABLE_COPY(LoggingItem);
+
+  protected:
+    // So it can be tested.
+    MBASE_PUBLIC LoggingItem(const QJsonDocument& doc);
 };
 
 /// \brief The logging thread that consumes the logging queue and dispatches

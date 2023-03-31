@@ -37,7 +37,6 @@ HEADERS += mythsystemlegacy.h mythtypes.h
 HEADERS += threadedfilewriter.h mythsingledownload.h
 HEADERS += ternarycompare.h
 HEADERS += mythsession.h
-HEADERS += ../../external/qjsonwrapper/qjsonwrapper/Json.h
 HEADERS += cleanupguard.h portchecker.h
 HEADERS += mythsorthelper.h mythdbcheck.h
 HEADERS += mythpower.h
@@ -77,7 +76,6 @@ SOURCES += mythrandom.cpp
 SOURCES += stringutil.cpp
 SOURCES += threadedfilewriter.cpp mythsingledownload.cpp
 SOURCES += mythsession.cpp
-SOURCES += ../../external/qjsonwrapper/qjsonwrapper/Json.cpp
 SOURCES += cleanupguard.cpp portchecker.cpp
 SOURCES += mythsorthelper.cpp dbcheckcommon.cpp
 SOURCES += mythpower.cpp
@@ -222,7 +220,7 @@ inc2.files += mythconfig.h mythconfig.mak
 
 INSTALLS += inc inc2
 
-INCLUDEPATH += ../../external/qjsonwrapper/ ..
+INCLUDEPATH += ..
 DEPENDPATH  +=  ../../external/libudfread
 
 DEFINES += RUNPREFIX=\\\"$${RUNPREFIX}\\\"
