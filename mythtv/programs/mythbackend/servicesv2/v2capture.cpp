@@ -76,7 +76,7 @@ V2Capture::V2Capture()
 /////////////////////////////////////////////////////////////////////////////
 
 V2CaptureCardList* V2Capture::GetCaptureCardList( const QString &sHostName,
-                                                  const QString &sCardType )
+                                                  const QString &CardType )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -99,18 +99,18 @@ V2CaptureCardList* V2Capture::GetCaptureCardList( const QString &sHostName,
 
     if (!sHostName.isEmpty())
         str += " WHERE hostname = :HOSTNAME";
-    else if (!sCardType.isEmpty())
+    else if (!CardType.isEmpty())
         str += " WHERE cardtype = :CARDTYPE";
 
-    if (!sHostName.isEmpty() && !sCardType.isEmpty())
+    if (!sHostName.isEmpty() && !CardType.isEmpty())
         str += " AND cardtype = :CARDTYPE";
 
     query.prepare(str);
 
     if (!sHostName.isEmpty())
         query.bindValue(":HOSTNAME", sHostName);
-    if (!sCardType.isEmpty())
-        query.bindValue(":CARDTYPE", sCardType);
+    if (!CardType.isEmpty())
+        query.bindValue(":CARDTYPE", CardType);
 
     if (!query.exec())
     {
@@ -290,7 +290,7 @@ bool V2Capture::RemoveCaptureCard( int nCardId )
 int V2Capture::AddCaptureCard     ( const QString    &sVideoDevice,
                                   const QString    &sAudioDevice,
                                   const QString    &sVBIDevice,
-                                  const QString    &sCardType,
+                                  const QString    &CardType,
                                   const uint       nAudioRateLimit,
                                   const QString    &sHostName,
                                   const uint       nDVBSWFilter,
@@ -312,12 +312,12 @@ int V2Capture::AddCaptureCard     ( const QString    &sVideoDevice,
                                   const uint       nDiSEqCId,
                                   bool             bDVBEITScan)
 {
-    if ( sVideoDevice.isEmpty() || sCardType.isEmpty() || sHostName.isEmpty() )
+    if ( sVideoDevice.isEmpty() || CardType.isEmpty() || sHostName.isEmpty() )
         throw( QString( "This API requires at least a video device node, a card type, "
                         "and a hostname." ));
 
     int nResult = CardUtil::CreateCaptureCard(sVideoDevice, sAudioDevice,
-                      sVBIDevice, sCardType, nAudioRateLimit,
+                      sVBIDevice, CardType, nAudioRateLimit,
                       sHostName, nDVBSWFilter, nDVBSatType, bDVBWaitForSeqStart,
                       bSkipBTAudio, bDVBOnDemand, nDVBDiSEqCType, nFirewireSpeed,
                       sFirewireModel, nFirewireConnection, std::chrono::milliseconds(nSignalTimeout),
@@ -584,21 +584,25 @@ static QString remove_chaff(const QString &name)
 
 
 
-V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &sCardType )
+V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType )
 {
-    auto* pList = new V2CaptureDeviceList();
 
+    if (CardType == "V4L2ENC") {
+        QRegularExpression drv { "^(?!ivtv|hdpvr|(saa7164(.*))).*$" };
+        return getV4l2List(drv, CardType);
+    }
     // Get devices from system
-    QStringList sdevs = CardUtil::ProbeVideoDevices(sCardType);
+    QStringList sdevs = CardUtil::ProbeVideoDevices(CardType);
 
+    auto* pList = new V2CaptureDeviceList();
     for (const auto & it : qAsConst(sdevs))
     {
         auto* pDev = pList->AddCaptureDevice();
-        pDev->setCardType (sCardType);
+        pDev->setCardType (CardType);
         pDev->setVideoDevice (it);
 #ifdef USING_DVB
         // From DVBConfigurationGroup::probeCard in Videosource.cpp
-        if (sCardType == "DVB")
+        if (CardType == "DVB")
         {
             QString frontendName = CardUtil::ProbeDVBFrontendName(it);
             pDev->setInputNames( CardUtil::ProbeDeliverySystems (it));
@@ -690,10 +694,10 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &sCardTyp
             pDev->setSignalTimeout ( signalTimeout );
             pDev->setChannelTimeout ( channelTimeout );
             pDev->setTuningDelay ( tuningDelay );
-        } // endif (sCardType == "DVB")
+        } // endif (CardType == "DVB")
 #endif // USING_DVB
 #ifdef USING_HDHOMERUN
-        if (sCardType == "HDHOMERUN")
+        if (CardType == "HDHOMERUN")
         {
             pDev->setSignalTimeout ( 3000 );
             pDev->setChannelTimeout ( 6000 );
@@ -702,6 +706,7 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &sCardTyp
     } // endfor (const auto & it : qAsConst(sdevs))
     return pList;
 }
+
 
 
 V2DiseqcTreeList* V2Capture::GetDiseqcTreeList  (  )

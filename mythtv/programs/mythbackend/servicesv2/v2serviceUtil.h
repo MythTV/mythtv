@@ -19,6 +19,7 @@
 #include "v2programList.h"
 #include "v2recRule.h"
 #include "v2videoMetadataInfo.h"
+#include "v2captureCardList.h"
 
 template <typename T>
 static inline void
@@ -92,5 +93,13 @@ int FillUpcomingList(QVariantList& list, QObject* parent,
                                         int  nRecStatus );
 
 void FillFrontendList(QVariantList &list, QObject* parent, bool OnLine);
+
+V2CaptureDeviceList* getV4l2List  ( const QRegularExpression &driver, const QString & cardType );
+
+uint fillSelectionsFromDir(const QDir& dir,
+                            uint minor_min, uint minor_max,
+                            const QString& card, const QRegularExpression& driver,
+                            bool allow_duplicates, V2CaptureDeviceList *pList,
+                            const QString & cardType);
 
 #endif //V2SERVICEUTIL_H
