@@ -730,14 +730,13 @@ void LogForwardThread::handleSigHup(void)
 void LogForwardThread::forwardMessage(LogMessage *msg)
 {
 #ifdef DUMP_PACKET
-    QList<QByteArray>::const_iterator it = msg->begin();
     int i = 0;
-    for (; it != msg->end(); ++it, i++)
+    for (auto it = msg->begin(); it != msg->end(); ++it, i++)
     {
         QByteArray buf = *it;
-        cout << i << ":\t" << buf.size() << endl << "\t"
-             << buf.toHex().constData() << endl << "\t"
-             << buf.constData() << endl;
+        std::cout << i << ":\t" << buf.size() << std::endl << "\t"
+             << buf.toHex().constData() << std::endl << "\t"
+             << buf.constData() << std::endl;
     }
 #endif
 
@@ -749,14 +748,14 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
 
     if (json.size() == 0)
     {
-        // cout << "invalid msg, no json data " << qPrintable(clientId) << endl;
+        // std::cout << "invalid msg, no json data " << qPrintable(clientId) << std::endl;
         return;
     }
 
     QMutexLocker lock(&logClientMapMutex);
     LoggerListItem *logItem = logClientMap.value(clientId, nullptr);
 
-    // cout << "msg  " << clientId.toLocal8Bit().constData() << endl;
+    // std::cout << "msg  " << clientId.toLocal8Bit().constData() << std::endl;
     if (logItem)
     {
         logItem->m_itemEpoch = nowAsDuration<std::chrono::seconds>();
