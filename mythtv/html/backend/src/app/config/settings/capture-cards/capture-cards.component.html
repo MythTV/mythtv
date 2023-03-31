@@ -112,6 +112,8 @@
                         [cardList]="m_CaptureCardList"></app-import>
                     <app-demo *ngSwitchCase="'DEMO'" [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList">
                     </app-demo>
+                    <app-v4l2 *ngSwitchCase="'V4L2ENC'" [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList">
+                    </app-v4l2>
                     <div *ngSwitchDefault><br>Not Supported </div>
                 </div>
             </ng-template>

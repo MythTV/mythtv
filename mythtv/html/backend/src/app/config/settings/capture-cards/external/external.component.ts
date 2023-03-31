@@ -54,7 +54,6 @@ export class ExternalComponent implements OnInit, AfterViewInit {
   };
 
   saveForm() {
-    console.log("save form clicked");
     this.work.successCount = 0;
     this.work.errorCount = 0;
     if (this.card.CardId) {

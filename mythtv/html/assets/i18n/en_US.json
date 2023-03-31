@@ -376,13 +376,13 @@
       "delete_all": "Delete All capture Cards",
       "delete_all_all": "Delete All capture Cards on all hosts",
       "delete_this": "Delete this Capture Card",
+      "device_desc": "When you change this setting, the text below should change to the name and type of your card. If the card cannot be opened, an error message will be displayed.",
+      "frontend_desc": "Identification string reported by the card. If the message \"Could not get card info...\" appears the card can be in use by another program.",
+      "inputname_desc": "If your card supports more than one delivery system then you can select here the one that you want to use.",
       "dvb": {
         "device_label": "DVB Device",
-        "device_desc": "When you change this setting, the text below should change to the name and type of your card. If the card cannot be opened, an error message will be displayed.",
         "frontend_label": "Frontend ID",
-        "frontend_desc": "Identification string reported by the card. If the message \"Could not get card info...\" appears the card can be in use by another program.",
         "inputname_label": "Delivery System",
-        "inputname_desc": "If your card supports more than one delivery system then you can select here the one that you want to use.",
         "wait_label": "Wait for SEQ start header",
         "wait_desc": "If enabled, drop packets from the start of a DVB recording until a sequence start header is seen.",
         "ondemand_label": "Open DVB card on demand",
@@ -511,7 +511,12 @@
         "title": "Demo Test Recorder",
         "file_desc": "A local MPEG file used to simulate a recording."
       },
-      "select_type": "Select capture card type"
+      "select_type": "Select capture card type",
+      "v4l2": {
+        "title": "V4L2 Encoder",
+        "device_label": "Video Device",
+        "frontend_label": "Probed Info"
+      }
     },
     "common": {
       "successful_delete": "Successful delete",
@@ -554,8 +559,8 @@
     },
     "iconnection": {
       "title": "Input Connection",
-      "inputname_label": "Delivery System",
-      "inputname_desc": "For DVB devices this shows the delivery system (modulation), for instance DVB-T2, that you have selected when you configured the capture card. This must be the same as the modulation used by the video source.",
+      "delivery_label": "Delivery System",
+      "delivery_desc": "For DVB devices this shows the delivery system (modulation), for instance DVB-T2, that you have selected when you configured the capture card. This must be the same as the modulation used by the video source.",
       "displayname_label": "Display Name",
       "displayname_desc": "This name is displayed on screen when Live TV begins and in various other places.  Make sure the last two characters are unique for each input or use a slash ('/') to designate the unique portion.",
       "sourceid_label": "Video Source",
@@ -622,7 +627,8 @@
       "unicablepos_label": "Satellite Unicable Position",
       "unicablepos_porta": "Port A",
       "unicablepos_portb": "Port B",
-      "unicablepos_desc": "Unicable satellite position (A/B)"
+      "unicablepos_desc": "Unicable satellite position (A/B)",
+      "input_label": "Input Name"
     },
     "sgroups": {
       "special": {

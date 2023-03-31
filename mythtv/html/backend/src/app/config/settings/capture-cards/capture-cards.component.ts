@@ -27,6 +27,7 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
     'FREEBOX',
     'IMPORT',
     'DEMO',
+    'V4L2ENC'
   ];
 
   currentTab: number = -1;
