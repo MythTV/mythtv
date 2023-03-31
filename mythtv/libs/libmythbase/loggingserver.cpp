@@ -86,9 +86,9 @@ static RevClientMap                 logRevClientMap;
 // drained by a different thread that logged the messages.  It is now
 // populated by the thread that generated the message, and drained by
 // a different thread that logs the messages.
-static QMutex                       logMsgListMutex;
-static LoggingItemList              logMsgList;
-static QWaitCondition               logMsgListNotEmpty;
+static QMutex                       gLogItemListMutex;
+static LoggingItemList              gLogItemList;
+static QWaitCondition               gLogItemListNotEmpty;
 
 /// \brief LoggerBase class constructor.  Adds the new logger instance to the
 ///        loggerMap.
@@ -674,18 +674,18 @@ void LogForwardThread::run(void)
         qApp->sendPostedEvents(nullptr, QEvent::DeferredDelete);
 
         {
-            QMutexLocker lock(&logMsgListMutex);
-            if (logMsgList.isEmpty() &&
-                !logMsgListNotEmpty.wait(lock.mutex(), 90))
+            QMutexLocker lock(&gLogItemListMutex);
+            if (gLogItemList.isEmpty() &&
+                !gLogItemListNotEmpty.wait(lock.mutex(), 90))
             {
                 continue;
             }
 
             int processed = 0;
-            while (!logMsgList.isEmpty())
+            while (!gLogItemList.isEmpty())
             {
                 processed++;
-                LoggingItem *item = logMsgList.takeFirst();
+                LoggingItem *item = gLogItemList.takeFirst();
                 lock.unlock();
                 forwardMessage(item);
                 item->DecrRef();
@@ -875,14 +875,14 @@ void logForwardStop(void)
 // process.
 void logForwardMessage(LoggingItem *item)
 {
-    QMutexLocker lock(&logMsgListMutex);
+    QMutexLocker lock(&gLogItemListMutex);
 
-    bool wasEmpty = logMsgList.isEmpty();
+    bool wasEmpty = gLogItemList.isEmpty();
     item->IncrRef();
-    logMsgList.append(item);
+    gLogItemList.append(item);
 
     if (wasEmpty)
-        logMsgListNotEmpty.wakeAll();
+        gLogItemListNotEmpty.wakeAll();
 }
 
 /*
