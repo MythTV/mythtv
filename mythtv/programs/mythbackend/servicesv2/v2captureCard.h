@@ -162,6 +162,7 @@ class V2CaptureDevice : public QObject
     SERVICE_PROPERTY2( QString    ,     CardType       )
     SERVICE_PROPERTY2( QString    ,     SubType       )
     SERVICE_PROPERTY2( QString    ,     VideoDevice       )
+    SERVICE_PROPERTY2( QStringList,     AudioDevices       )
     SERVICE_PROPERTY2( QString    ,     FrontendName    )
     SERVICE_PROPERTY2( QStringList,     InputNames       )
     SERVICE_PROPERTY2( QString    ,     DefaultInputName )

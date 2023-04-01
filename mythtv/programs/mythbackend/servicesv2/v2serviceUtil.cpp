@@ -974,8 +974,10 @@ uint fillSelectionsFromDir(const QDir& dir,
                     pDev->setVideoDevice (filepath);
                     pDev->setFrontendName(card_name);
                     QStringList inputs;
-                    CardUtil::GetDeviceInputNames(filepath, "V4L2ENC", inputs);
+                    CardUtil::GetDeviceInputNames(filepath, cardType, inputs);
                     pDev->setInputNames(inputs);
+                    inputs = CardUtil::ProbeAudioInputs(filepath);
+                    pDev->setAudioDevices(inputs);
                     cnt++;
                 }
             }

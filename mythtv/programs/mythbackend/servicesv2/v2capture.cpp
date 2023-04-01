@@ -591,6 +591,10 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
         QRegularExpression drv { "^(?!ivtv|hdpvr|(saa7164(.*))).*$" };
         return getV4l2List(drv, CardType);
     }
+    if (CardType == "HDPVR") {
+        QRegularExpression drv { "^hdpvr$" };
+        return getV4l2List(drv, CardType);
+    }
     // Get devices from system
     QStringList sdevs = CardUtil::ProbeVideoDevices(CardType);
 
