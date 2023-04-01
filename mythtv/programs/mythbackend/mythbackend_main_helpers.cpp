@@ -685,7 +685,6 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
         if (ismaster)
         {
-            gHousekeeping->RegisterTask(new LogCleanerTask());
             gHousekeeping->RegisterTask(new CleanupTask());
             gHousekeeping->RegisterTask(new ThemeUpdateTask());
             gHousekeeping->RegisterTask(new ArtworkTask());

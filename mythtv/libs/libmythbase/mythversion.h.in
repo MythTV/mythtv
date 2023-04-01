@@ -74,7 +74,7 @@ static constexpr const char* MYTH_PROTO_TOKEN { "BuzzOff" };
  *      mythtv/bindings/php/MythBackend.php
  */
 
-static constexpr const char* MYTH_DATABASE_VERSION { "1376" };
+static constexpr const char* MYTH_DATABASE_VERSION { "1377" };
 
 MBASE_PUBLIC  const char *GetMythSourceVersion();
 MBASE_PUBLIC  const char *GetMythSourcePath();

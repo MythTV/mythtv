@@ -75,11 +75,10 @@ struct LogPropagateOpts {
     bool    m_propagate;
     int     m_quiet;
     int     m_facility;
-    bool    m_dblog;
     QString m_path;
 };
 
-LogPropagateOpts        logPropagateOpts {false, 0, 0, true, ""};
+LogPropagateOpts        logPropagateOpts {false, 0, 0, ""};
 QString                 logPropagateArgs;
 QStringList             logPropagateArgList;
 
@@ -218,12 +217,12 @@ char LoggingItem::getLevelChar (void)
 ///        and deregistration if the VERBOSE_THREADS environment variable is
 ///        set.
 LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
-                           QString table, int facility) :
+                           int facility) :
     MThread("Logger"),
     m_waitNotEmpty(new QWaitCondition()),
     m_waitEmpty(new QWaitCondition()),
     m_filename(std::move(filename)), m_progress(progress), m_quiet(quiet),
-    m_tablename(std::move(table)), m_facility(facility), m_pid(getpid())
+    m_facility(facility), m_pid(getpid())
 {
     if (qEnvironmentVariableIsSet("VERBOSE_THREADS"))
     {
@@ -497,7 +496,6 @@ void LoggerThread::fillItem(LoggingItem *item)
     item->setPid(m_pid);
     item->setThreadName(item->getThreadName());
     item->setAppName(m_appname);
-    item->setTable(m_tablename);
     item->setLogFile(m_filename);
     item->setFacility(m_facility);
 }
@@ -596,12 +594,6 @@ void logPropagateCalc(void)
         logPropagateArgList << "--quiet";
     }
 
-    if (logPropagateOpts.m_dblog)
-    {
-        logPropagateArgs += " --enable-dblog";
-        logPropagateArgList << "--enable-dblog";
-    }
-
 #if !defined(_WIN32) && !defined(Q_OS_ANDROID)
     if (logPropagateOpts.m_facility >= 0)
     {
@@ -639,13 +631,12 @@ bool logPropagateQuiet(void)
 /// \param  quiet       quiet level requested (squelches all console output)
 /// \param  facility    Syslog facility to use.  -1 to disable syslog output
 /// \param  level       Minimum logging level to put into the logs
-/// \param  dblog       true if database logging is requested
 /// \param  propagate   true if the logfile path needs to be propagated to child
 ///                     processes.
 /// \param  testHarness Should always be false. Set to true when
 ///                     invoked by the testing code.
 void logStart(const QString& logfile, bool progress, int quiet, int facility,
-              LogLevel_t level, bool dblog, bool propagate, bool testHarness)
+              LogLevel_t level, bool propagate, bool testHarness)
 {
     if (logThread && logThread->isRunning())
         return;
@@ -657,7 +648,6 @@ void logStart(const QString& logfile, bool progress, int quiet, int facility,
     logPropagateOpts.m_propagate = propagate;
     logPropagateOpts.m_quiet = quiet;
     logPropagateOpts.m_facility = facility;
-    logPropagateOpts.m_dblog = dblog;
 
     if (propagate)
     {
@@ -670,10 +660,8 @@ void logStart(const QString& logfile, bool progress, int quiet, int facility,
     if (testHarness)
         return;
 
-    QString table = dblog ? QString("logging") : QString("");
-
     if (!logThread)
-        logThread = new LoggerThread(logfile, progress, quiet, table, facility);
+        logThread = new LoggerThread(logfile, progress, quiet, facility);
 
     logThread->start();
 }

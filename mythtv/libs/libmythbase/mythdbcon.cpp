@@ -696,43 +696,38 @@ bool MSqlQuery::exec()
     {
         QString str = lastQuery();
 
-        // Database logging will cause an infinite loop here if not filtered
-        // out
-        if (!str.startsWith("INSERT INTO logging "))
-        {
-            // Sadly, neither executedQuery() nor lastQuery() display
-            // the values in bound queries against a MySQL5 database.
-            // So, replace the named placeholders with their values.
+        // Sadly, neither executedQuery() nor lastQuery() display
+        // the values in bound queries against a MySQL5 database.
+        // So, replace the named placeholders with their values.
 
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-            QMapIterator<QString, QVariant> b = boundValues();
-            while (b.hasNext())
-            {
-                b.next();
-                str.replace(b.key(), '\'' + b.value().toString() + '\'');
-            }
+        QMapIterator<QString, QVariant> b = boundValues();
+        while (b.hasNext())
+        {
+            b.next();
+            str.replace(b.key(), '\'' + b.value().toString() + '\'');
+        }
 #else
-            QVariantList b = boundValues();
-            static const QRegularExpression placeholders { "(:\\w+)" };
-            auto match = placeholders.match(str);
-            while (match.hasMatch())
-            {
-                str.replace(match.capturedStart(), match.capturedLength(),
-                            b.isEmpty()
-                            ? "\'INVALID\'"
-                            : '\'' + b.takeFirst().toString() + '\'');
-                match = placeholders.match(str);
-            }
+        QVariantList b = boundValues();
+        static const QRegularExpression placeholders { "(:\\w+)" };
+        auto match = placeholders.match(str);
+        while (match.hasMatch())
+        {
+            str.replace(match.capturedStart(), match.capturedLength(),
+                        b.isEmpty()
+                        ? "\'INVALID\'"
+                        : '\'' + b.takeFirst().toString() + '\'');
+            match = placeholders.match(str);
+        }
 #endif
 
-            LOG(VB_DATABASE, LOG_INFO,
-                QString("MSqlQuery::exec(%1) %2%3%4")
-                        .arg(m_db->MSqlDatabase::GetConnectionName(), str,
-                             QString(" <<<< Took %1ms").arg(QString::number(elapsed)),
-                             isSelect()
-                             ? QString(", Returned %1 row(s)").arg(size())
-                             : QString()));
-        }
+        LOG(VB_DATABASE, LOG_INFO,
+            QString("MSqlQuery::exec(%1) %2%3%4")
+                    .arg(m_db->MSqlDatabase::GetConnectionName(), str,
+                         QString(" <<<< Took %1ms").arg(QString::number(elapsed)),
+                         isSelect()
+                         ? QString(", Returned %1 row(s)").arg(size())
+                         : QString()));
     }
 
     return result;
