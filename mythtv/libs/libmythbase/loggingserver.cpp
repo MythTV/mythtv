@@ -65,19 +65,10 @@ struct LoggerListItem {
     LoggerList *m_itemList;
     std::chrono::seconds m_itemEpoch;
 };
-using  ClientMap = QMap<QString, LoggerListItem *>;
 
-using  ClientList = QList<QString>;
-using  RevClientMap = QHash<LoggerBase *, ClientList *>;
-
-// A mapping from client id to the logging objects that process
-// messages from that client.
-static QMutex                       logClientMapMutex;
-static ClientMap                    logClientMap;
-static QAtomicInt                   logClientCount;
-
-static QMutex                       logRevClientMapMutex;
-static RevClientMap                 logRevClientMap;
+// A list of logging objects that process messages.
+static QMutex                       gLoggerListMutex;
+static LoggerListItem               *gLoggerList {nullptr};
 
 // This is a FIFO queue containing the incoming messages "sent" from a
 // client to this server. As each message arrives, it is queued here
@@ -151,8 +142,6 @@ FileLogger *FileLogger::create(const QString& filename, QMutex *mutex)
     logger = new FileLogger(file);
     mutex->lock();
 
-    auto *clients = new ClientList;
-    logRevClientMap.insert(logger, clients);
     return logger;
 }
 
@@ -248,8 +237,6 @@ SyslogLogger *SyslogLogger::create(QMutex *mutex, bool open)
     logger = new SyslogLogger(open);
     mutex->lock();
 
-    auto *clients = new ClientList;
-    logRevClientMap.insert(logger, clients);
     return logger;
 }
 
@@ -296,8 +283,6 @@ JournalLogger *JournalLogger::create(QMutex *mutex)
     logger = new JournalLogger();
     mutex->lock();
 
-    auto *clients = new ClientList;
-    logRevClientMap.insert(logger, clients);
     return logger;
 }
 
@@ -366,8 +351,6 @@ DatabaseLogger *DatabaseLogger::create(const QString& table, QMutex *mutex)
     logger = new DatabaseLogger(tble);
     mutex->lock();
 
-    auto *clients = new ClientList;
-    logRevClientMap.insert(logger, clients);
     return logger;
 }
 
@@ -738,10 +721,8 @@ void LogForwardThread::handleSigHup(void)
 
 void LogForwardThread::forwardMessage(LoggingItem *item)
 {
-    QString clientId = "";
-
-    QMutexLocker lock(&logClientMapMutex);
-    LoggerListItem *logItem = logClientMap.value(clientId, nullptr);
+    QMutexLocker lock(&gLoggerListMutex);
+    LoggerListItem *logItem = gLoggerList;
 
     if (logItem)
     {
@@ -749,12 +730,7 @@ void LogForwardThread::forwardMessage(LoggingItem *item)
     }
     else
     {
-        logClientCount.ref();
-        LOG(VB_FILE, LOG_DEBUG, QString("New Logging Client: ID: %1 (#%2)")
-            .arg(clientId).arg(logClientCount.fetchAndAddOrdered(0)));
-
         QMutexLocker lock2(&loggerMapMutex);
-        QMutexLocker lock3(&logRevClientMapMutex);
 
         // Need to find or create the loggers
         auto *loggers = new LoggerList;
@@ -764,11 +740,6 @@ void LogForwardThread::forwardMessage(LoggingItem *item)
         if (!logfile.isEmpty())
         {
             LoggerBase *logger = FileLogger::create(logfile, lock2.mutex());
-
-            ClientList *clients = logRevClientMap.value(logger);
-
-            if (clients)
-                clients->insert(0, clientId);
 
             if (logger && loggers)
                 loggers->insert(0, logger);
@@ -781,11 +752,6 @@ void LogForwardThread::forwardMessage(LoggingItem *item)
         {
             LoggerBase *logger = SyslogLogger::create(lock2.mutex());
 
-            ClientList *clients = logRevClientMap.value(logger);
-
-            if (clients)
-                clients->insert(0, clientId);
-
             if (logger && loggers)
                 loggers->insert(0, logger);
         }
@@ -795,11 +761,6 @@ void LogForwardThread::forwardMessage(LoggingItem *item)
         if (facility == SYSTEMD_JOURNAL_FACILITY)
         {
             LoggerBase *logger = JournalLogger::create(lock2.mutex());
-
-            ClientList *clients = logRevClientMap.value(logger);
-
-            if (clients)
-                clients->insert(0, clientId);
 
             if (logger && loggers)
                 loggers->insert(0, logger);
@@ -813,11 +774,6 @@ void LogForwardThread::forwardMessage(LoggingItem *item)
         {
             LoggerBase *logger = DatabaseLogger::create(table, lock2.mutex());
 
-            ClientList *clients = logRevClientMap.value(logger);
-
-            if (clients)
-                clients->insert(0, clientId);
-
             if (logger && loggers)
                 loggers->insert(0, logger);
         }
@@ -826,7 +782,7 @@ void LogForwardThread::forwardMessage(LoggingItem *item)
         logItem = new LoggerListItem;
         logItem->m_itemEpoch = nowAsDuration<std::chrono::seconds>();
         logItem->m_itemList = loggers;
-        logClientMap.insert(clientId, logItem);
+        gLoggerList = logItem;
     }
 
     // Does this client have an entry in the loggers map, does that
