@@ -1351,7 +1351,7 @@ V2ProgramList* V2Dvr::GetUpcomingList( int  nStartIndex,
     {
         // Handle enum name
         QMetaEnum meta = QMetaEnum::fromType<RecStatus::Type>();
-        bool ok;
+        bool ok {false};
         nRecStatus = meta.keyToValue(RecStatus.toLocal8Bit(), &ok);
         // if enum name not valid try for int nRecStatus
         if (!ok)
@@ -1922,7 +1922,7 @@ QString V2Dvr::RecStatusToString(const QString & RecStatus)
 {
     // Handle enum name
     QMetaEnum meta = QMetaEnum::fromType<RecStatus::Type>();
-    bool ok;
+    bool ok {false};
     int value = meta.keyToValue(RecStatus.toLocal8Bit(), &ok);
     // if enum name not valid try for int value
     if (!ok)
@@ -1939,7 +1939,7 @@ QString V2Dvr::RecStatusToDescription(const QString &  RecStatus, int recType,
 {
     // Handle enum name
     QMetaEnum meta = QMetaEnum::fromType<RecStatus::Type>();
-    bool ok;
+    bool ok {false};
     int value = meta.keyToValue(RecStatus.toLocal8Bit(), &ok);
     // if enum name not valid try for int value
     if (!ok)
