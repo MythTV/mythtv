@@ -70,6 +70,7 @@ export interface CaptureDevice {
     CardType:       string;
     SubType:          string;
     VideoDevice:      string;
+    AudioDevices:     string [];
     FrontendName:     string;
     InputNames:       string [];
     DefaultInputName: string;

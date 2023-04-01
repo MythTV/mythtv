@@ -71,6 +71,7 @@ import { RecprofileComponent } from './config/settings/recording-profiles/profil
 import { SystemEventsComponent } from './config/settings/system-events/system-events.component';
 import { BackendWarningComponent } from './config/backend-warning/backend-warning.component';
 import { V4l2Component } from './config/settings/capture-cards/v4l2/v4l2.component';
+import { HdpvrComponent } from './config/settings/capture-cards/hdpvr/hdpvr.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -138,6 +139,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     SystemEventsComponent,
     BackendWarningComponent,
     V4l2Component,
+    HdpvrComponent,
   ],
   imports: [
     BrowserModule,

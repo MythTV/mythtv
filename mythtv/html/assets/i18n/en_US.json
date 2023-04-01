@@ -516,6 +516,11 @@
         "title": "V4L2 Encoder",
         "device_label": "Video Device",
         "frontend_label": "Probed Info"
+      },
+      "hdpvr": {
+        "title": "HD-PVR H.264 Encoder",
+        "audiodevice_label": "Audio Input",
+        "audiodevice_desc": "If there is more than one audio input, select which one to use."
       }
     },
     "common": {

@@ -159,7 +159,7 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.work.isEncoder = (this.preEncodedTypes.indexOf(this.card.CardType) < 0);
     this.work.isUnscanable = (this.unscanableTypes.indexOf(this.card.CardType) >= 0);
-    this.work.hasTuner = (this.unscanableTypes.indexOf(this.card.CardType) >= 0);
+    this.work.hasTuner = (this.hasTunerTypes.indexOf(this.card.CardType) >= 0);
     if (this.work.isEncoder || this.work.isUnscanable)
       if (this.work.hasTuner || this.card.CardType == "EXTERNAL")
         this.work.showPresetTuner = true;
@@ -402,6 +402,9 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     this.work.recLimitUpd = false;
     this.cardList.CaptureCardList.CaptureCards.forEach(entry => {
       if (entry.CardId == this.card.CardId || entry.ParentId == this.card.CardId) {
+        this.captureCardService.UpdateCaptureCard(entry.CardId, 'inputname',
+          entry.InputName = this.card.InputName)
+          .subscribe(this.saveObserver);
         this.captureCardService.UpdateCaptureCard(entry.CardId, 'displayname',
           entry.DisplayName = this.card.DisplayName)
           .subscribe(this.saveObserver);
@@ -447,7 +450,7 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
           String(entry.SchedOrder))
           .subscribe(this.saveObserver);
 
-        this.work.expectedCount += 9;
+        this.work.expectedCount += 10;
 
         if (inputGroupId != 0) {
           this.orgInputGroupIds.forEach(x => {

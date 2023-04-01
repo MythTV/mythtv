@@ -4,19 +4,19 @@ import { TranslateService } from '@ngx-translate/core';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { CaptureCardList, CaptureDevice, CaptureDeviceList, CardAndInput } from 'src/app/services/interfaces/capture-card.interface';
 import { SetupService } from 'src/app/services/setup.service';
-import { CaptureCardsComponent } from '../capture-cards.component';
 
 @Component({
-  selector: 'app-v4l2',
-  templateUrl: './v4l2.component.html',
-  styleUrls: ['./v4l2.component.css']
+  selector: 'app-hdpvr',
+  templateUrl: './hdpvr.component.html',
+  styleUrls: ['./hdpvr.component.css']
 })
-export class V4l2Component implements OnInit {
+
+export class HdpvrComponent implements OnInit {
 
   @Input() card!: CardAndInput;
   @Input() cardList!: CaptureCardList;
 
-  @ViewChild("v4l2form") currentForm!: NgForm;
+  @ViewChild("hdpvrform") currentForm!: NgForm;
   @ViewChild("top") topElement!: ElementRef;
 
   messages = {
@@ -49,7 +49,7 @@ export class V4l2Component implements OnInit {
 
   ngOnInit(): void {
     // Get list of devices for dropdown list
-    this.captureCardService.GetCaptureDeviceList('V4L2ENC')
+    this.captureCardService.GetCaptureDeviceList('HDPVR')
       .subscribe({
         next: data => {
           this.captureDeviceList = data;
@@ -99,8 +99,7 @@ export class V4l2Component implements OnInit {
     // Update device-dependent fields
     this.card.VideoDevice = this.currentDevice.VideoDevice;
     this.card.InputName = this.currentDevice.DefaultInputName;
-    this.card.SignalTimeout = this.currentDevice.SignalTimeout;
-    this.card.ChannelTimeout = this.currentDevice.ChannelTimeout;
+    this.card.AudioDevice = "";
     this.checkInUse();
   }
 
@@ -145,6 +144,12 @@ export class V4l2Component implements OnInit {
       this.cardList.CaptureCardList.CaptureCards.forEach(card => {
         if (card.CardId == this.card.CardId || card.ParentId == this.card.CardId) {
           this.captureCardService.UpdateCaptureCard(card.CardId, 'videodevice', this.card.VideoDevice)
+            .subscribe(this.saveObserver);
+          this.captureCardService.UpdateCaptureCard(card.CardId, 'channel_timeout',
+            String(this.card.ChannelTimeout))
+            .subscribe(this.saveObserver);
+          this.captureCardService.UpdateCaptureCard(card.CardId, 'audiodevice',
+            String(this.card.AudioDevice))
             .subscribe(this.saveObserver);
         }
       });

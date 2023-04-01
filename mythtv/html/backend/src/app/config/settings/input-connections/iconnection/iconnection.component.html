@@ -72,7 +72,7 @@
                         </small>
                     </div>
 
-                    <div class="form-group field"  *ngIf="card.CardType != 'DVB'">
+                    <div class="form-group field" *ngIf="card.CardType != 'DVB'">
                         <label for="InputName" class="block">{{ 'settings.iconnection.input_label' | translate
                             }}</label>
                         <p-dropdown *ngIf="work.isReady" [options]="this.currentDevice.InputNames"
@@ -116,7 +116,7 @@
                         </small>
                     </div>
 
-                    <div class="form-group field" *ngIf="work.isEncoder || work.isUnscanable">
+                    <div class="form-group field" *ngIf="work.showPresetTuner">
                         <label for="TuneChan" class="block">{{ 'settings.iconnection.tunechan_label' | translate
                             }}</label>
                         <input pInputText id="TuneChan" [(ngModel)]="card.TuneChan" name="TuneChan" #TuneChan="ngModel"

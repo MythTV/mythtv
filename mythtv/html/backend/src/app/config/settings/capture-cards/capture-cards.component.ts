@@ -27,7 +27,8 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
     'FREEBOX',
     'IMPORT',
     'DEMO',
-    'V4L2ENC'
+    'V4L2ENC',
+    'HDPVR'
   ];
 
   currentTab: number = -1;
@@ -189,6 +190,9 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
       case "FREEBOX":
         newOne.VideoDevice = "http://mafreebox.freebox.fr/freeboxtv/playlist.m3u"
         newOne.ChannelTimeout = 30000;
+        break;
+      case "HDPVR":
+        newOne.ChannelTimeout = 15000;
         break;
     }
     for (let i = 0; i < this.activeTab.length; i++)

@@ -114,6 +114,8 @@
                     </app-demo>
                     <app-v4l2 *ngSwitchCase="'V4L2ENC'" [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList">
                     </app-v4l2>
+                    <app-hdpvr *ngSwitchCase="'HDPVR'" [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList">
+                    </app-hdpvr>
                     <div *ngSwitchDefault><br>Not Supported </div>
                 </div>
             </ng-template>
