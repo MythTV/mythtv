@@ -5571,7 +5571,8 @@ case $target_os in
         SLIBPREF="libmyth"
         SLIBSUF=".dll"
         SLIBNAME_WITH_VERSION='$(SLIBPREF)$(FULLNAME)-$(LIBVERSION)$(SLIBSUF)'
-        SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(FULLNAME)-$(LIBMAJOR)$(SLIBSUF)'
+        #SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(FULLNAME)-$(LIBMAJOR)$(SLIBSUF)'
+        SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(FULLNAME)$(SLIBSUF)'
         if test_cmd lib.exe -list; then
             SLIB_EXTRA_CMD=-'lib.exe -nologo -machine:$(LIBTARGET) -def:$$(@:$(SLIBSUF)=.def) -out:$(SUBDIR)$(SLIBNAME:$(SLIBSUF)=.lib)'
             if enabled x86_64; then
