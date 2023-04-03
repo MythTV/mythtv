@@ -978,6 +978,8 @@ uint fillSelectionsFromDir(const QDir& dir,
                     pDev->setInputNames(inputs);
                     inputs = CardUtil::ProbeAudioInputs(filepath);
                     pDev->setAudioDevices(inputs);
+                    if (cardType == "HDPVR")
+                        pDev->setChannelTimeout ( 15000 );
                     cnt++;
                 }
             }

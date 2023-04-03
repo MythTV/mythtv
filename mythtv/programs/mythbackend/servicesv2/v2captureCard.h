@@ -162,10 +162,15 @@ class V2CaptureDevice : public QObject
     SERVICE_PROPERTY2( QString    ,     CardType       )
     SERVICE_PROPERTY2( QString    ,     SubType       )
     SERVICE_PROPERTY2( QString    ,     VideoDevice       )
+    SERVICE_PROPERTY2( QString    ,     VideoDevicePrompt )
     SERVICE_PROPERTY2( QStringList,     AudioDevices       )
     SERVICE_PROPERTY2( QString    ,     FrontendName    )
     SERVICE_PROPERTY2( QStringList,     InputNames       )
     SERVICE_PROPERTY2( QString    ,     DefaultInputName )
+    SERVICE_PROPERTY2( QString    ,     FriendlyName )
+    SERVICE_PROPERTY2( QString    ,     IPAddress )
+    SERVICE_PROPERTY2( QString    ,     TunerType  )
+    SERVICE_PROPERTY2( uint       ,     TunerNumber  )
     SERVICE_PROPERTY2( uint       ,     SignalTimeout     )
     SERVICE_PROPERTY2( uint       ,     ChannelTimeout    )
     SERVICE_PROPERTY2( uint       ,     TuningDelay    )
@@ -174,8 +179,10 @@ class V2CaptureDevice : public QObject
 
         Q_INVOKABLE V2CaptureDevice(QObject *parent = nullptr)
             : QObject          ( parent ),
+              m_TunerNumber    ( 0      ),
               m_SignalTimeout  ( 1000   ),
-              m_ChannelTimeout ( 3000   )
+              m_ChannelTimeout ( 3000   ),
+              m_TuningDelay    ( 0 )
         {
         }
 

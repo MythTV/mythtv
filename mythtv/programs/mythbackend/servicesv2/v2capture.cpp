@@ -700,13 +700,30 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
             pDev->setTuningDelay ( tuningDelay );
         } // endif (CardType == "DVB")
 #endif // USING_DVB
-#ifdef USING_HDHOMERUN
         if (CardType == "HDHOMERUN")
         {
             pDev->setSignalTimeout ( 3000 );
             pDev->setChannelTimeout ( 6000 );
         }
-#endif //USING_HDHOMERUN
+#ifdef USING_SATIP
+        if (CardType == "SATIP")
+        {
+            pDev->setSignalTimeout ( 7000 );
+            pDev->setChannelTimeout ( 10000 );
+            // Split video device into its parts and populate the output
+            // "deviceid friendlyname ip tunerno tunertype"
+            auto word = it.split(' ');
+            // VideoDevice is set as deviceid:tunertype:tunerno
+            if (word.size() == 5) {
+                pDev->setVideoDevice(QString("%1:%2:%3").arg(word[0]).arg(word[4]).arg(word[3]));
+                pDev->setVideoDevicePrompt(QString("%1, %2, Tuner #%3").arg(word[0]).arg(word[4]).arg(word[3]));
+                pDev->setFriendlyName(word[1]);
+                pDev->setIPAddress(word[2]);
+                pDev->setTunerType(word[4]);
+                pDev->setTunerNumber(word[3].toUInt());
+            }
+        }
+#endif // USING_SATIP
     } // endfor (const auto & it : qAsConst(sdevs))
     return pList;
 }
@@ -1145,7 +1162,10 @@ V2RecProfileGroupList* V2Capture::GetRecProfileGroupList ( uint GroupId, uint Pr
             prevGroupId = groupId;
         }
         int profileId = query.value(3).toInt();
-        if (profileId != prevProfileId)
+        // the pGroup != nullptr check is to satisfy clang-tidy.
+        // pGroup should never be null unless the groupId on
+        // the database is -1, which should not happen.
+        if (profileId != prevProfileId && pGroup != nullptr)
         {
             pProfile = pGroup->AddProfile();
             pProfile->setId          ( profileId );
@@ -1154,7 +1174,10 @@ V2RecProfileGroupList* V2Capture::GetRecProfileGroupList ( uint GroupId, uint Pr
             pProfile->setAudioCodec  ( query.value(6).toString() );
             prevProfileId = profileId;
         }
-        if (!query.isNull(7))
+        // the pProfile != nullptr check is to satisfy clang-tidy.
+        // pProfile should never be null unless the profileId on
+        // the database is -1, which should not happen.
+        if (!query.isNull(7) && pProfile != nullptr)
         {
             auto *pParam = pProfile->AddParam();
             pParam->setName  ( query.value(7).toString() );
