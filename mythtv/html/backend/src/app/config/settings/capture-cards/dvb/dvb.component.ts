@@ -235,7 +235,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
     this.card.VideoDevice = this.currentDevice.VideoDevice;
     this.card.InputName = this.currentDevice.DefaultInputName;
     this.card.SignalTimeout = this.currentDevice.SignalTimeout;
-    this.card.SignalTimeout = this.currentDevice.SignalTimeout;
+    this.card.ChannelTimeout = this.currentDevice.ChannelTimeout;
     this.checkInUse();
   }
 

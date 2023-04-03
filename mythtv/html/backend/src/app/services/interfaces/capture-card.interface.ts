@@ -70,10 +70,14 @@ export interface CaptureDevice {
     CardType:       string;
     SubType:          string;
     VideoDevice:      string;
+    VideoDevicePrompt: string;
     AudioDevices:     string [];
     FrontendName:     string;
     InputNames:       string [];
     DefaultInputName: string;
+    FriendlyName:     string;
+    TunerType:        string;
+    TunerNumber:      number;
     SignalTimeout:    number;
     ChannelTimeout:   number;
     TuningDelay:      number;

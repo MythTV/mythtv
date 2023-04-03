@@ -6,17 +6,15 @@ import { CaptureCardList, CaptureDevice, CaptureDeviceList, CardAndInput } from 
 import { SetupService } from 'src/app/services/setup.service';
 
 @Component({
-  selector: 'app-hdpvr',
-  templateUrl: './hdpvr.component.html',
-  styleUrls: ['./hdpvr.component.css']
+  selector: 'app-satip',
+  templateUrl: './satip.component.html',
+  styleUrls: ['./satip.component.css']
 })
-
-export class HdpvrComponent implements OnInit {
-
+export class SatipComponent implements OnInit {
   @Input() card!: CardAndInput;
   @Input() cardList!: CaptureCardList;
 
-  @ViewChild("hdpvrform") currentForm!: NgForm;
+  @ViewChild("satipform") currentForm!: NgForm;
   @ViewChild("top") topElement!: ElementRef;
 
   messages = {
@@ -45,11 +43,12 @@ export class HdpvrComponent implements OnInit {
     translate.get(this.messages.unknownName).subscribe(data => this.messages.unknownName = data);
     translate.get(this.messages.devInUse).subscribe(data => this.messages.devInUse = data);
     translate.get(this.messages.noDevSelected).subscribe(data => this.messages.noDevSelected = data);
+
   }
 
   ngOnInit(): void {
     // Get list of devices for dropdown list
-    this.captureCardService.GetCaptureDeviceList('HDPVR')
+    this.captureCardService.GetCaptureDeviceList('SATIP')
       .subscribe({
         next: data => {
           this.captureDeviceList = data;
@@ -69,7 +68,7 @@ export class HdpvrComponent implements OnInit {
       let dummy = <CaptureDevice>{
         VideoDevice: '',
         FrontendName: this.messages.noDevSelected,
-        InputNames: ['']
+        InputNames: [''],
       }
       this.captureDeviceList.CaptureDeviceList.CaptureDevices.unshift(dummy);
     }
@@ -86,11 +85,6 @@ export class HdpvrComponent implements OnInit {
         this.captureDeviceList.CaptureDeviceList.CaptureDevices.push(this.currentDevice);
       }
     }
-    if (this.currentDevice && this.card.InputName) {
-      if (!this.currentDevice.InputNames.includes(this.card.InputName)) {
-        this.currentDevice.InputNames.push(this.card.InputName);
-      }
-    }
     this.isReady = true;
   }
 
@@ -98,9 +92,8 @@ export class HdpvrComponent implements OnInit {
   updateDevice(): void {
     // Update device-dependent fields
     this.card.VideoDevice = this.currentDevice.VideoDevice;
-    this.card.InputName = this.currentDevice.DefaultInputName;
-    this.card.AudioDevice = "";
     this.card.ChannelTimeout = this.currentDevice.ChannelTimeout;
+    this.card.SignalTimeout = this.currentDevice.SignalTimeout;
     this.checkInUse();
   }
 
@@ -124,6 +117,7 @@ export class HdpvrComponent implements OnInit {
       else if (!this.card.CardId && x.int) {
         this.successCount++;
         this.card.CardId = x.int;
+        this.cardList.CaptureCardList.CaptureCards.push(this.card);
       }
       else {
         this.errorCount++;
@@ -146,12 +140,19 @@ export class HdpvrComponent implements OnInit {
         if (card.CardId == this.card.CardId || card.ParentId == this.card.CardId) {
           this.captureCardService.UpdateCaptureCard(card.CardId, 'videodevice', this.card.VideoDevice)
             .subscribe(this.saveObserver);
+          this.captureCardService.UpdateCaptureCard(card.CardId, 'signal_timeout',
+            String(this.card.SignalTimeout))
+            .subscribe(this.saveObserver);
           this.captureCardService.UpdateCaptureCard(card.CardId, 'channel_timeout',
             String(this.card.ChannelTimeout))
             .subscribe(this.saveObserver);
-          this.captureCardService.UpdateCaptureCard(card.CardId, 'audiodevice',
-            String(this.card.AudioDevice))
+          this.captureCardService.UpdateCaptureCard(card.CardId, 'dvb_eitscan',
+            String(this.card.DVBEITScan ? '1' : '0'))
             .subscribe(this.saveObserver);
+          this.captureCardService.UpdateCaptureCard(card.CardId, 'dvb_diseqc_type',
+            String(this.card.DVBDiSEqCType))
+            .subscribe(this.saveObserver);
+
         }
       });
     }

@@ -72,6 +72,7 @@ import { SystemEventsComponent } from './config/settings/system-events/system-ev
 import { BackendWarningComponent } from './config/backend-warning/backend-warning.component';
 import { V4l2Component } from './config/settings/capture-cards/v4l2/v4l2.component';
 import { HdpvrComponent } from './config/settings/capture-cards/hdpvr/hdpvr.component';
+import { SatipComponent } from './config/settings/capture-cards/satip/satip.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -140,6 +141,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     BackendWarningComponent,
     V4l2Component,
     HdpvrComponent,
+    SatipComponent,
   ],
   imports: [
     BrowserModule,

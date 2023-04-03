@@ -78,6 +78,8 @@ export class HdhomerunComponent implements OnInit, AfterViewInit {
     this.selectedDevices.forEach(
       x => {
         videoDevices.push(x.VideoDevice.split(' ')[0]);
+        this.card.SignalTimeout = x.SignalTimeout;
+        this.card.ChannelTimeout = x.ChannelTimeout;
       }
     )
     videoDevices.sort();

@@ -116,6 +116,8 @@
                     </app-v4l2>
                     <app-hdpvr *ngSwitchCase="'HDPVR'" [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList">
                     </app-hdpvr>
+                    <app-satip *ngSwitchCase="'SATIP'" [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList">
+                    </app-satip>
                     <div *ngSwitchDefault><br>Not Supported </div>
                 </div>
             </ng-template>

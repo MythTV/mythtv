@@ -28,7 +28,8 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
     'IMPORT',
     'DEMO',
     'V4L2ENC',
-    'HDPVR'
+    'HDPVR',
+    'SATIP'
   ];
 
   currentTab: number = -1;
@@ -177,13 +178,6 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
     };
     // Update non-standard defaults on some card types.
     switch (newOne.CardType) {
-      case "DVB":
-        newOne.SignalTimeout = 500;
-        break;
-      case "HDHOMERUN":
-        newOne.SignalTimeout = 3000;
-        newOne.ChannelTimeout = 6000;
-        break;
       case "EXTERNAL":
         newOne.ChannelTimeout = 20000;
         break;
@@ -191,9 +185,8 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
         newOne.VideoDevice = "http://mafreebox.freebox.fr/freeboxtv/playlist.m3u"
         newOne.ChannelTimeout = 30000;
         break;
-      case "HDPVR":
-        newOne.ChannelTimeout = 15000;
-        break;
+      case "SATIP":
+        newOne.DVBDiSEqCType = 1;
     }
     for (let i = 0; i < this.activeTab.length; i++)
       this.activeTab[i] = false;
