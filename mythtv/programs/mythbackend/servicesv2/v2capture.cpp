@@ -711,9 +711,9 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
             pDev->setSignalTimeout ( 7000 );
             pDev->setChannelTimeout ( 10000 );
             // Split video device into its parts and populate the output
-            // "deviceid friendlyname ip tunerno tunertype"
+            // "deviceid friendlyname ip tunernum tunertype"
             auto word = it.split(' ');
-            // VideoDevice is set as deviceid:tunertype:tunerno
+            // VideoDevice is set as deviceid:tunertype:tunernum
             if (word.size() == 5) {
                 pDev->setVideoDevice(QString("%1:%2:%3").arg(word[0]).arg(word[4]).arg(word[3]));
                 pDev->setVideoDevicePrompt(QString("%1, %2, Tuner #%3").arg(word[0]).arg(word[4]).arg(word[3]));
@@ -724,6 +724,26 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
             }
         }
 #endif // USING_SATIP
+#ifdef USING_VBOX
+        if (CardType == "VBOX")
+        {
+            pDev->setSignalTimeout ( 7000 );
+            pDev->setChannelTimeout ( 10000 );
+            // Split video device into its parts and populate the output
+            // "deviceid ip tunernum tunertype"
+            auto word = it.split(" ");
+            if (word.size() == 4) {
+                QString device = QString("%1-%2-%3").arg(word[0]).arg(word[2]).arg(word[3]);
+                pDev->setVideoDevice(device);
+                pDev->setVideoDevicePrompt(device);
+                QString desc = CardUtil::GetVBoxdesc(word[0], word[1], word[2], word[3]);
+                pDev->setFriendlyName(desc);
+                pDev->setIPAddress(word[1]);
+                pDev->setTunerType(word[3]);
+                pDev->setTunerNumber(word[2].toUInt());
+            }
+        }
+#endif // USING_VBOX
     } // endfor (const auto & it : qAsConst(sdevs))
     return pList;
 }
