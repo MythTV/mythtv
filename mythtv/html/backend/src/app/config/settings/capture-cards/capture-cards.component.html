@@ -69,7 +69,7 @@
             [disabled]="disabledTab[ix]" [(selected)]="activeTab[ix]">
             <ng-template pTemplate="header">
                 <div class="grid  w-full">
-                    <div class="col-9 pr-1">
+                    <div class="col-11 pr-1">
                         {{m_CaptureCardsFiltered[ix].CardType}}
                         {{m_CaptureCardsFiltered[ix].VideoDevice}}
                         ({{m_CaptureCardsFiltered[ix].DisplayName}})
@@ -118,6 +118,8 @@
                     </app-hdpvr>
                     <app-satip *ngSwitchCase="'SATIP'" [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList">
                     </app-satip>
+                    <app-vbox *ngSwitchCase="'VBOX'" [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList">
+                    </app-vbox>
                     <div *ngSwitchDefault><br>Not Supported </div>
                 </div>
             </ng-template>

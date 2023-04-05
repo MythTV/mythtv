@@ -1,20 +1,22 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+import { delay } from 'rxjs/operators';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { CaptureCardList, CaptureDevice, CaptureDeviceList, CardAndInput } from 'src/app/services/interfaces/capture-card.interface';
 import { SetupService } from 'src/app/services/setup.service';
 
 @Component({
-  selector: 'app-satip',
-  templateUrl: './satip.component.html',
-  styleUrls: ['./satip.component.css']
+  selector: 'app-vbox',
+  templateUrl: './vbox.component.html',
+  styleUrls: ['./vbox.component.css']
 })
-export class SatipComponent implements OnInit , AfterViewInit {
+export class VboxComponent implements OnInit, AfterViewInit {
   @Input() card!: CardAndInput;
   @Input() cardList!: CaptureCardList;
 
-  @ViewChild("satipform") currentForm!: NgForm;
+  @ViewChild("vboxform") currentForm!: NgForm;
   @ViewChild("top") topElement!: ElementRef;
 
   messages = {
@@ -22,6 +24,7 @@ export class SatipComponent implements OnInit , AfterViewInit {
     unknownName: 'settings.capture.dvb.unknownName',
     devInUse: 'settings.capture.dvb.devInUse',
     noDevSelected: 'settings.capture.dvb.noDevSelected',
+    manuallyEnter: 'settings.capture.vbox.manuallyenter'
   };
 
   captureDeviceList: CaptureDeviceList = {
@@ -31,6 +34,8 @@ export class SatipComponent implements OnInit , AfterViewInit {
   };
 
   currentDevice: CaptureDevice = <CaptureDevice>{ FrontendName: "Unknown", InputNames: [''] };
+
+  manualDevice!: CaptureDevice;
 
   isReady = false;
   warningMessage = '';
@@ -43,12 +48,13 @@ export class SatipComponent implements OnInit , AfterViewInit {
     translate.get(this.messages.unknownName).subscribe(data => this.messages.unknownName = data);
     translate.get(this.messages.devInUse).subscribe(data => this.messages.devInUse = data);
     translate.get(this.messages.noDevSelected).subscribe(data => this.messages.noDevSelected = data);
+    translate.get(this.messages.manuallyEnter).subscribe(data => this.messages.manuallyEnter = data);
 
   }
 
   ngOnInit(): void {
     // Get list of devices for dropdown list
-    this.captureCardService.GetCaptureDeviceList('SATIP')
+    this.captureCardService.GetCaptureDeviceList('VBOX')
       .subscribe({
         next: data => {
           this.captureDeviceList = data;
@@ -59,6 +65,7 @@ export class SatipComponent implements OnInit , AfterViewInit {
           this.errorCount++;
         }
       });
+
   }
 
   ngAfterViewInit(): void {
@@ -68,13 +75,25 @@ export class SatipComponent implements OnInit , AfterViewInit {
 
   // After load of devices, make sure the current record is selected in list
   setupDevice(): void {
+    // Add "Manually Enter" option
+    this.manualDevice = <CaptureDevice>{
+      VideoDevicePrompt: this.messages.manuallyEnter,
+      VideoDevice: '',
+      FriendlyName: '',
+      IPAddress: '',
+      TunerNumber: 0,
+      SignalTimeout: 7000,
+      ChannelTimeout: 10000
+    }
+    this.captureDeviceList.CaptureDeviceList.CaptureDevices.unshift(this.manualDevice);
+
     // Add one blank entry at the start if it is a new card
     // This is to prevent the system automaitically selecting the first entry
     // in the list when you add a new card
     if (!this.card.VideoDevice) {
       let dummy = <CaptureDevice>{
         VideoDevice: '',
-        VideoDevicePrompt: this.messages.noDevSelected,
+        FrontendName: this.messages.noDevSelected,
       }
       this.captureDeviceList.CaptureDeviceList.CaptureDevices.unshift(dummy);
     }
@@ -85,7 +104,7 @@ export class SatipComponent implements OnInit , AfterViewInit {
       else {
         this.currentDevice = <CaptureDevice>{
           VideoDevice: this.card.VideoDevice,
-          FriendlyName: this.messages.devNotExist,
+          FrontendName: this.messages.devNotExist,
         };
         this.captureDeviceList.CaptureDeviceList.CaptureDevices.push(this.currentDevice);
       }
@@ -94,8 +113,19 @@ export class SatipComponent implements OnInit , AfterViewInit {
   }
 
   // After device update, update device-dependent fields
+  subscription?: Subscription;
   updateDevice(): void {
     // Update device-dependent fields
+    if (this.currentDevice === this.manualDevice) {
+      this.subscription = this.currentForm.valueChanges!.pipe(delay(50)).subscribe(
+        () => this.card.VideoDevice = this.manualDevice.IPAddress + '-' + this.manualDevice.TunerNumber);
+    } else {
+      if (this.subscription) {
+        this.subscription.unsubscribe();
+        this.subscription = undefined;
+      }
+    }
+
     this.card.VideoDevice = this.currentDevice.VideoDevice;
     this.card.ChannelTimeout = this.currentDevice.ChannelTimeout;
     this.card.SignalTimeout = this.currentDevice.SignalTimeout;
@@ -151,13 +181,6 @@ export class SatipComponent implements OnInit , AfterViewInit {
           this.captureCardService.UpdateCaptureCard(card.CardId, 'channel_timeout',
             String(this.card.ChannelTimeout))
             .subscribe(this.saveObserver);
-          this.captureCardService.UpdateCaptureCard(card.CardId, 'dvb_eitscan',
-            String(this.card.DVBEITScan ? '1' : '0'))
-            .subscribe(this.saveObserver);
-          this.captureCardService.UpdateCaptureCard(card.CardId, 'dvb_diseqc_type',
-            String(this.card.DVBDiSEqCType))
-            .subscribe(this.saveObserver);
-
         }
       });
     }

@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
@@ -11,7 +11,7 @@ import { CaptureCardsComponent } from '../capture-cards.component';
   templateUrl: './v4l2.component.html',
   styleUrls: ['./v4l2.component.css']
 })
-export class V4l2Component implements OnInit {
+export class V4l2Component implements OnInit, AfterViewInit {
 
   @Input() card!: CardAndInput;
   @Input() cardList!: CaptureCardList;
@@ -62,9 +62,16 @@ export class V4l2Component implements OnInit {
       });
   }
 
+  ngAfterViewInit(): void {
+    this.setupService.setCurrentForm(this.currentForm);
+    this.topElement.nativeElement.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   // After load of devices, make sure the current record is selected in list
   setupDevice(): void {
     // Add one blank entry at the start if it is a new card
+    // This is to prevent the system automaitically selecting the first entry
+    // in the list when you add a new card
     if (!this.card.VideoDevice) {
       let dummy = <CaptureDevice>{
         VideoDevice: '',

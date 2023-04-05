@@ -73,6 +73,7 @@ import { BackendWarningComponent } from './config/backend-warning/backend-warnin
 import { V4l2Component } from './config/settings/capture-cards/v4l2/v4l2.component';
 import { HdpvrComponent } from './config/settings/capture-cards/hdpvr/hdpvr.component';
 import { SatipComponent } from './config/settings/capture-cards/satip/satip.component';
+import { VboxComponent } from './config/settings/capture-cards/vbox/vbox.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -142,6 +143,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     V4l2Component,
     HdpvrComponent,
     SatipComponent,
+    VboxComponent,
   ],
   imports: [
     BrowserModule,

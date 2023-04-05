@@ -76,6 +76,7 @@ export interface CaptureDevice {
     InputNames:       string [];
     DefaultInputName: string;
     FriendlyName:     string;
+    IPAddress:        string;
     TunerType:        string;
     TunerNumber:      number;
     SignalTimeout:    number;

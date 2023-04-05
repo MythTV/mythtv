@@ -531,12 +531,20 @@
         "tunerindex_label": "Tuner Index",
         "deviceid_label": "Device ID",
         "diseqcpos_label": "DiSEqC position",
-        "diseqcpos_desc": "Position of the LNB on the DiSEqC switch. Leave at 1 if there is no DiSEqC switch and the LNB is directly connected to the SatIP server. This value is used as signal source (attribute src) in the SatIP tune command."
+        "diseqcpos_desc": "Position of the LNB on the DiSEqC switch. Leave at 1 if there is no DiSEqC switch and the LNB is directly connected to the SatIP server. This value is used as signal source (attribute src) in the SatIP tune command.",
+        "friendly_desc": "Friendly name of the Sat>IP server"
       },
-      "friendly_desc": "Friendly name of the Sat>IP server",
       "tunertype_desc": "Type of the selected tuner",
       "tunerindex_desc": "Index of the tuner on the Sat>IP server",
-      "deviceid_desc": "Device ID of the Sat>IP tuner."
+      "deviceid_desc": "Device ID of the Sat>IP tuner.",
+      "vbox": {
+        "manuallyenter": "Manually Enter IP Address",
+        "title": "V@Box TV Gateway networked tuner",
+        "device_desc": "Device IP or ID, tuner number and tuner type of available VBox devices.",
+        "deviceid_label": "Device ID",
+        "description_label": "Description",
+        "deviceid_desc": "Device ID of VBox device"
+      }
     },
     "common": {
       "successful_delete": "Successful delete",

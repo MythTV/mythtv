@@ -1,8 +1,8 @@
-<form class="ml-3 mr-3" name="satipform" #satipform="ngForm">
+<form class="ml-3 mr-3" name="vboxform" #vboxform="ngForm">
     <span #top></span>
     <p-card class="m-5">
         <ng-template pTemplate="title">
-            {{ 'settings.capture.satip.title' | translate }}
+            {{ 'settings.capture.vbox.title' | translate }}
         </ng-template>
         <ng-template pTemplate="subtitle">
         </ng-template>
@@ -11,12 +11,12 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="VideoDevice" class="block">{{ 'settings.capture.satip.device_label' | translate
+                        <label for="VideoDevicePrompt" class="block">{{ 'settings.capture.satip.device_label' | translate
                             }}</label>
                         <p-dropdown *ngIf="isReady" [options]="captureDeviceList.CaptureDeviceList.CaptureDevices"
                             [(ngModel)]="currentDevice" [editable]="false" optionLabel="VideoDevicePrompt"
-                            (onChange)="updateDevice();" [maxlength]="0" [style]="{'minWidth':'83%'}" name="VideoDevice"
-                            #VideoDevice="ngModel">
+                            (onChange)="updateDevice();" [maxlength]="0" [style]="{'minWidth':'83%'}" name="VideoDevicePrompt"
+                            #VideoDevicePrompt="ngModel">
                         </p-dropdown>
                         <div *ngIf="warningMessage">
                             <small class="p-error block">
@@ -24,51 +24,46 @@
                             </small>
                         </div>
                         <small class="block">
-                            {{ 'settings.capture.satip.device_desc' | translate }}
+                            {{ 'settings.capture.vbox.device_desc' | translate }}
                         </small>
                     </div>
 
                     <div class="form-group field">
-                        <label class="block">{{ 'settings.capture.satip.friendly_label' | translate
-                            }}</label>
-                        <div class="col-10 bg-blue-100">
-                            {{ currentDevice.FriendlyName}} &nbsp;
-                        </div>
-                        <small class="block">
-                            {{ 'settings.capture.satip.friendly_desc' | translate }}
-                        </small>
-                    </div>
-
-                    <div class="form-group field">
-                        <label class="block">{{ 'settings.capture.satip.tunertype_label' | translate
-                            }}</label>
-                        <div class="col-10 bg-blue-100">
-                            {{ currentDevice.TunerType}} &nbsp;
-                        </div>
-                        <small class="block">
-                            {{ 'settings.capture.tunertype_desc' | translate }}
-                        </small>
-                    </div>
-
-                    <div class="form-group field">
-                        <label class="block">{{ 'settings.capture.satip.tunerindex_label' | translate
-                            }}</label>
-                        <div class="col-10 bg-blue-100">
-                            {{ currentDevice.TunerNumber}} &nbsp;
-                        </div>
-                        <small class="block">
-                            {{ 'settings.capture.tunerindex_desc' | translate }}
-                        </small>
-                    </div>
-
-                    <div class="form-group field">
-                        <label class="block">{{ 'settings.capture.satip.deviceid_label' | translate
+                        <label class="block">{{ 'settings.capture.vbox.deviceid_label' | translate
                             }}</label>
                         <div class="col-10 bg-blue-100">
                             {{ card.VideoDevice}} &nbsp;
                         </div>
                         <small class="block">
-                            {{ 'settings.capture.deviceid_desc' | translate }}
+                            {{ 'settings.capture.vbox.deviceid_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label class="block">{{ 'settings.capture.vbox.description_label' | translate
+                            }}</label>
+                        <div class="col-10 bg-blue-100">
+                            {{ currentDevice.FriendlyName}} &nbsp;
+                        </div>
+                        <small class="block">
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="ip" class="block">{{ 'settings.capture.ceton.ipaddress_label' | translate }}</label>
+                        <input pInputText id="ip" [(ngModel)]="currentDevice.IPAddress" name="ip" #ipAddress="ngModel"
+                            class="mb-2 form-control w-full" [disabled]="currentDevice !== manualDevice"/>
+                        <small class="block">
+                            {{ 'settings.capture.ceton.ipaddress_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="tuner" class="block">{{ 'settings.capture.ceton.tuner_label' | translate }}</label>
+                        <input pInputText id="tuner" [(ngModel)]="currentDevice.TunerNumber" name="tuner" #ipAddress="ngModel"
+                            class="mb-2 form-control w-full" [disabled]="currentDevice !== manualDevice"/>
+                        <small class="block">
+                            {{ 'settings.capture.ceton.tuner_desc' | translate }}
                         </small>
                     </div>
 
@@ -92,26 +87,6 @@
                         </small>
                     </div>
 
-                    <div class="form-group field">
-                        <p-checkbox inputId="DVBEITScan" [(ngModel)]="card.DVBEITScan" name="DVBEITScan"
-                            #DVBEITScan="ngModel" class="mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.capture.dvb.eitscan_label' | translate }}">
-                        </p-checkbox>
-                        <small class="block">
-                            {{ 'settings.capture.dvb.eitscan_desc' | translate }}
-                        </small>
-                    </div>
-
-                    <div class="form-group field">
-                        <label for="DVBDiSEqCType" class="block">{{ 'settings.capture.satip.diseqcpos_label' | translate
-                            }}</label>
-                        <p-inputNumber [(ngModel)]="card.DVBDiSEqCType" name="DVBDiSEqCType" id="DVBDiSEqCType"
-                            [showButtons]="true" [min]="1" [max]="255" [step]="1"></p-inputNumber>
-                        <small class="block">
-                            {{ 'settings.capture.satip.diseqcpos_desc' | translate }}
-                        </small>
-                    </div>
-
                 </div>
             </div>
         </ng-template>
@@ -119,17 +94,16 @@
         <ng-template pTemplate="footer">
             <div class="grid nogutter">
                 <div class="col-12">
-                    <p-message *ngIf="this.successCount > 0 && this.errorCount == 0 && !satipform.dirty"
+                    <p-message *ngIf="this.successCount > 0 && this.errorCount == 0 && !vboxform.dirty"
                         severity="success" text="{{ 'common.savesuccess' | translate }}"></p-message>
                     <p-message *ngIf="this.errorCount > 0" severity="error"
                         text="{{ 'common.networkfail' | translate }}"></p-message>
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
-                    (onClick)="saveForm(); satipform.form.markAsPristine()"
-                    [disabled]="!satipform.dirty || !card.VideoDevice || setupService.schedulingEnabled"></p-button>
+                    (onClick)="saveForm(); vboxform.form.markAsPristine()"
+                    [disabled]="!vboxform.dirty || !card.VideoDevice || setupService.schedulingEnabled"></p-button>
             </div>
         </ng-template>
-
 
     </p-card>
 </form>

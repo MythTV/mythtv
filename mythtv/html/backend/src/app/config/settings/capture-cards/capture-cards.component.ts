@@ -29,7 +29,8 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
     'DEMO',
     'V4L2ENC',
     'HDPVR',
-    'SATIP'
+    'SATIP',
+    'VBOX'
   ];
 
   currentTab: number = -1;

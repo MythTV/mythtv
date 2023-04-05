@@ -213,6 +213,9 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
       if (!this.currentDevice.InputNames.includes(this.card.InputName)) {
         this.currentDevice.InputNames.push(this.card.InputName);
       }
+      if (!this.currentDevice.InputNames.includes('MPEG2TS')) {
+        this.currentDevice.InputNames.push('MPEG2TS');
+      }
     }
     this.work.isReady = true;
   }
