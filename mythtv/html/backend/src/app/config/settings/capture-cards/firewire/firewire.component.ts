@@ -1,22 +1,20 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
-import { delay } from 'rxjs/operators';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { CaptureCardList, CaptureDevice, CaptureDeviceList, CardAndInput } from 'src/app/services/interfaces/capture-card.interface';
 import { SetupService } from 'src/app/services/setup.service';
 
 @Component({
-  selector: 'app-vbox',
-  templateUrl: './vbox.component.html',
-  styleUrls: ['./vbox.component.css']
+  selector: 'app-firewire',
+  templateUrl: './firewire.component.html',
+  styleUrls: ['./firewire.component.css']
 })
-export class VboxComponent implements OnInit, AfterViewInit {
+export class FirewireComponent implements OnInit, AfterViewInit {
   @Input() card!: CardAndInput;
   @Input() cardList!: CaptureCardList;
 
-  @ViewChild("vboxform") currentForm!: NgForm;
+  @ViewChild("firewireform") currentForm!: NgForm;
   @ViewChild("top") topElement!: ElementRef;
 
   messages = {
@@ -27,6 +25,38 @@ export class VboxComponent implements OnInit, AfterViewInit {
     manuallyEnter: 'settings.capture.vbox.manuallyenter'
   };
 
+  models = [
+    { name: 'settings.capture.firewire.motogeneric', value: 'MOTO GENERIC' },
+    { name: 'settings.capture.firewire.sageneric', value: 'SA GENERIC' },
+    { name: 'DCH-3200', value: 'DCH-3200' },
+    { name: 'DCX-3200', value: 'DCX-3200' },
+    { name: 'DCT-3412', value: 'DCT-3412' },
+    { name: 'DCT-3416', value: 'DCT-3416' },
+    { name: 'DCT-6200', value: 'DCT-6200' },
+    { name: 'DCT-6212', value: 'DCT-6212' },
+    { name: 'DCT-6216', value: 'DCT-6216' },
+    { name: 'QIP-6200', value: 'QIP-6200' },
+    { name: 'QIP-7100', value: 'QIP-7100' },
+    { name: 'PACE-550', value: 'PACE-550' },
+    { name: 'PACE-779', value: 'PACE-779' },
+    { name: 'SA3250HD', value: 'SA3250HD' },
+    { name: 'SA4200HD', value: 'SA4200HD' },
+    { name: 'SA4250HDC', value: 'SA4250HDC' },
+    { name: 'SA8300HD', value: 'SA8300HD' },
+  ];
+
+  connectionTypes = [
+    { name: 'settings.capture.firewire.pointtopoint', value: 0 },
+    { name: 'settings.capture.firewire.broadcast', value: 1 }
+  ];
+
+  speeds = [
+    { name: '100Mbps', value: 0 },
+    { name: '200Mbps', value: 1 },
+    { name: '400Mbps', value: 2 },
+    { name: '800Mbps', value: 3 },
+  ];
+
   captureDeviceList: CaptureDeviceList = {
     CaptureDeviceList: {
       CaptureDevices: [],
@@ -34,8 +64,6 @@ export class VboxComponent implements OnInit, AfterViewInit {
   };
 
   currentDevice: CaptureDevice = <CaptureDevice>{ FrontendName: "Unknown", InputNames: [''] };
-
-  manualDevice!: CaptureDevice;
 
   isReady = false;
   warningMessage = '';
@@ -49,14 +77,17 @@ export class VboxComponent implements OnInit, AfterViewInit {
     translate.get(this.messages.devInUse).subscribe(data => this.messages.devInUse = data);
     translate.get(this.messages.noDevSelected).subscribe(data => this.messages.noDevSelected = data);
     translate.get(this.messages.manuallyEnter).subscribe(data => this.messages.manuallyEnter = data);
-
+    translate.get(this.models[0].name).subscribe(data => this.models[0].name = data);
+    translate.get(this.models[1].name).subscribe(data => this.models[1].name = data);
+    translate.get(this.connectionTypes[0].name).subscribe(data => this.connectionTypes[0].name = data);
+    translate.get(this.connectionTypes[1].name).subscribe(data => this.connectionTypes[1].name = data);
   }
 
   ngOnInit(): void {
     // Get list of devices for dropdown list
-    this.captureCardService.GetCaptureDeviceList('VBOX')
+    this.captureCardService.GetCaptureDeviceList('FIREWIRE')
       .subscribe({
-        next: data => {
+        next: (data: CaptureDeviceList) => {
           this.captureDeviceList = data;
           this.setupDevice();
         },
@@ -75,18 +106,6 @@ export class VboxComponent implements OnInit, AfterViewInit {
 
   // After load of devices, make sure the current record is selected in list
   setupDevice(): void {
-    // Add "Manually Enter" option
-    this.manualDevice = <CaptureDevice>{
-      VideoDevicePrompt: this.messages.manuallyEnter,
-      VideoDevice: '',
-      Description: '',
-      IPAddress: '',
-      TunerNumber: 0,
-      SignalTimeout: 7000,
-      ChannelTimeout: 10000
-    }
-    this.captureDeviceList.CaptureDeviceList.CaptureDevices.unshift(this.manualDevice);
-
     // Add one blank entry at the start if it is a new card
     // This is to prevent the system automaitically selecting the first entry
     // in the list when you add a new card
@@ -113,22 +132,13 @@ export class VboxComponent implements OnInit, AfterViewInit {
   }
 
   // After device update, update device-dependent fields
-  subscription?: Subscription;
   updateDevice(): void {
     // Update device-dependent fields
-    if (this.currentDevice === this.manualDevice) {
-      this.subscription = this.currentForm.valueChanges!.pipe(delay(50)).subscribe(
-        () => this.card.VideoDevice = this.manualDevice.IPAddress + '-' + this.manualDevice.TunerNumber);
-    } else {
-      if (this.subscription) {
-        this.subscription.unsubscribe();
-        this.subscription = undefined;
-      }
-    }
 
     this.card.VideoDevice = this.currentDevice.VideoDevice;
     this.card.ChannelTimeout = this.currentDevice.ChannelTimeout;
     this.card.SignalTimeout = this.currentDevice.SignalTimeout;
+    this.card.FirewireModel = this.currentDevice.FirewireModel;
     this.checkInUse();
   }
 
@@ -174,6 +184,14 @@ export class VboxComponent implements OnInit, AfterViewInit {
       this.cardList.CaptureCardList.CaptureCards.forEach(card => {
         if (card.CardId == this.card.CardId || card.ParentId == this.card.CardId) {
           this.captureCardService.UpdateCaptureCard(card.CardId, 'videodevice', this.card.VideoDevice)
+            .subscribe(this.saveObserver);
+          this.captureCardService.UpdateCaptureCard(card.CardId, 'firewire_model', this.card.FirewireModel)
+            .subscribe(this.saveObserver);
+          this.captureCardService.UpdateCaptureCard(card.CardId, 'firewire_connection',
+            String(this.card.FirewireConnection))
+            .subscribe(this.saveObserver);
+          this.captureCardService.UpdateCaptureCard(card.CardId, 'firewire_speed',
+            String(this.card.FirewireSpeed))
             .subscribe(this.saveObserver);
           this.captureCardService.UpdateCaptureCard(card.CardId, 'signal_timeout',
             String(this.card.SignalTimeout))

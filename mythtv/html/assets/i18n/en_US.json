@@ -544,6 +544,18 @@
         "deviceid_label": "Device ID",
         "description_label": "Description",
         "deviceid_desc": "Device ID of VBox device"
+      },
+      "firewire": {
+        "title": "FireWire Cable Box",
+        "device_label": "GUID",
+        "model_label": "Cable Box Model",
+        "model_desc": "Choose the model that most closely resembles your set top box. Depending on firmware revision SA4200HD may work better for a SA3250HD box.",
+        "connection_label": "Connection Type",
+        "speed_label": "Speed",
+        "motogeneric": "Motorola Generic",
+        "sageneric": "SA/Cisco Generic",
+        "pointtopoint": "Point to Point",
+        "broadcast": "Broadcast"
       }
     },
     "common": {

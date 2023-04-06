@@ -10,7 +10,7 @@ import { SetupService } from 'src/app/services/setup.service';
   templateUrl: './satip.component.html',
   styleUrls: ['./satip.component.css']
 })
-export class SatipComponent implements OnInit , AfterViewInit {
+export class SatipComponent implements OnInit, AfterViewInit {
   @Input() card!: CardAndInput;
   @Input() cardList!: CaptureCardList;
 
@@ -85,7 +85,7 @@ export class SatipComponent implements OnInit , AfterViewInit {
       else {
         this.currentDevice = <CaptureDevice>{
           VideoDevice: this.card.VideoDevice,
-          FriendlyName: this.messages.devNotExist,
+          Description: this.messages.devNotExist,
         };
         this.captureDeviceList.CaptureDeviceList.CaptureDevices.push(this.currentDevice);
       }

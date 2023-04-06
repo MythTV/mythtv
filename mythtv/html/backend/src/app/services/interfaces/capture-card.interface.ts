@@ -75,7 +75,8 @@ export interface CaptureDevice {
     FrontendName:     string;
     InputNames:       string [];
     DefaultInputName: string;
-    FriendlyName:     string;
+    Description:      string;
+    FirewireModel:    string;
     IPAddress:        string;
     TunerType:        string;
     TunerNumber:      number;

@@ -1,23 +1,22 @@
-<form class="ml-3 mr-3" name="vboxform" #vboxform="ngForm">
+<form class="ml-3 mr-3" name="firewireform" #firewireform="ngForm">
     <span #top></span>
     <p-card class="m-5">
         <ng-template pTemplate="title">
-            {{ 'settings.capture.vbox.title' | translate }}
+            {{ 'settings.capture.firewire.title' | translate }}
         </ng-template>
         <ng-template pTemplate="subtitle">
         </ng-template>
         <ng-template pTemplate="content">
             <div class="grid">
-                <div class="mb-4 w-full"u>
+                <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="VideoDevicePrompt" class="block">{{ 'settings.capture.satip.device_label' |
-                            translate
+                        <label for="VideoDevice" class="block">{{ 'settings.capture.firewire.device_label' | translate
                             }}</label>
                         <p-dropdown *ngIf="isReady" [options]="captureDeviceList.CaptureDeviceList.CaptureDevices"
-                            [(ngModel)]="currentDevice" [editable]="false" optionLabel="VideoDevicePrompt"
-                            (onChange)="updateDevice();" [maxlength]="0" [style]="{'minWidth':'83%'}"
-                            name="VideoDevicePrompt" #VideoDevicePrompt="ngModel">
+                            [(ngModel)]="currentDevice" [editable]="false" optionLabel="VideoDevice"
+                            (onChange)="updateDevice();" [maxlength]="0" [style]="{'minWidth':'83%'}" name="VideoDevice"
+                            #VideoDevice="ngModel">
                         </p-dropdown>
                         <div *ngIf="warningMessage">
                             <small class="p-error block">
@@ -25,18 +24,6 @@
                             </small>
                         </div>
                         <small class="block">
-                            {{ 'settings.capture.vbox.device_desc' | translate }}
-                        </small>
-                    </div>
-
-                    <div class="form-group field">
-                        <label class="block">{{ 'settings.capture.vbox.deviceid_label' | translate
-                            }}</label>
-                        <div class="col-10 bg-blue-100">
-                            {{ card.VideoDevice}} &nbsp;
-                        </div>
-                        <small class="block">
-                            {{ 'settings.capture.vbox.deviceid_desc' | translate }}
                         </small>
                     </div>
 
@@ -51,21 +38,38 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="ip" class="block">{{ 'settings.capture.ceton.ipaddress_label' | translate }}</label>
-                        <input pInputText id="ip" [(ngModel)]="currentDevice.IPAddress" name="ip" #ipAddress="ngModel"
-                            class="mb-2 form-control w-full" [disabled]="currentDevice !== manualDevice" />
+                        <label for="FirewireModel" class="block">{{ 'settings.capture.firewire.model_label' | translate
+                            }}</label>
+                        <p-dropdown [options]="models" [(ngModel)]="card.FirewireModel" [editable]="false"
+                            optionLabel="name" optionValue="value" [maxlength]="0" [style]="{'minWidth':'83%'}"
+                            name="FirewireModel" #FirewireModel="ngModel">
+                        </p-dropdown>
                         <small class="block">
-                            {{ 'settings.capture.ceton.ipaddress_desc' | translate }}
+                            {{ 'settings.capture.firewire.model_desc' | translate }}
                         </small>
                     </div>
 
                     <div class="form-group field">
-                        <label for="tuner" class="block">{{ 'settings.capture.ceton.tuner_label' | translate }}</label>
-                        <input pInputText id="tuner" [(ngModel)]="currentDevice.TunerNumber" name="tuner"
-                            #ipAddress="ngModel" class="mb-2 form-control w-full"
-                            [disabled]="currentDevice !== manualDevice" />
+                        <label for="FirewireConnection" class="block">{{ 'settings.capture.firewire.connection_label' |
+                            translate
+                            }}</label>
+                        <p-dropdown [options]="connectionTypes" [(ngModel)]="card.FirewireConnection" [editable]="false"
+                            optionLabel="name" optionValue="value" [maxlength]="0" [style]="{'minWidth':'83%'}"
+                            name="FirewireConnection" #FirewireConnection="ngModel">
+                        </p-dropdown>
                         <small class="block">
-                            {{ 'settings.capture.ceton.tuner_desc' | translate }}
+                        </small>
+                    </div>
+
+
+                    <div class="form-group field">
+                        <label for="FirewireSpeed" class="block">{{ 'settings.capture.firewire.speed_label' | translate
+                            }}</label>
+                        <p-dropdown [options]="speeds" [(ngModel)]="card.FirewireSpeed" [editable]="false"
+                            optionLabel="name" optionValue="value" [maxlength]="0" [style]="{'minWidth':'83%'}"
+                            name="FirewireSpeed" #FirewireSpeed="ngModel">
+                        </p-dropdown>
+                        <small class="block">
                         </small>
                     </div>
 
@@ -96,14 +100,14 @@
         <ng-template pTemplate="footer">
             <div class="grid nogutter">
                 <div class="col-12">
-                    <p-message *ngIf="this.successCount > 0 && this.errorCount == 0 && !vboxform.dirty"
+                    <p-message *ngIf="this.successCount > 0 && this.errorCount == 0 && !firewireform.dirty"
                         severity="success" text="{{ 'common.savesuccess' | translate }}"></p-message>
                     <p-message *ngIf="this.errorCount > 0" severity="error"
                         text="{{ 'common.networkfail' | translate }}"></p-message>
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
-                    (onClick)="saveForm(); vboxform.form.markAsPristine()"
-                    [disabled]="!vboxform.dirty || !card.VideoDevice || setupService.schedulingEnabled"></p-button>
+                    (onClick)="saveForm(); firewireform.form.markAsPristine()"
+                    [disabled]="!firewireform.dirty || !card.VideoDevice || setupService.schedulingEnabled"></p-button>
             </div>
         </ng-template>
 

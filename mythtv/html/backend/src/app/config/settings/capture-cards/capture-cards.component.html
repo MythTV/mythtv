@@ -112,14 +112,20 @@
                         [cardList]="m_CaptureCardList"></app-import>
                     <app-demo *ngSwitchCase="'DEMO'" [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList">
                     </app-demo>
-                    <app-v4l2 *ngSwitchCase="'V4L2ENC'" [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList">
+                    <app-v4l2 *ngSwitchCase="'V4L2ENC'" [card]="m_CaptureCardsFiltered[ix]"
+                        [cardList]="m_CaptureCardList">
                     </app-v4l2>
-                    <app-hdpvr *ngSwitchCase="'HDPVR'" [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList">
+                    <app-hdpvr *ngSwitchCase="'HDPVR'" [card]="m_CaptureCardsFiltered[ix]"
+                        [cardList]="m_CaptureCardList">
                     </app-hdpvr>
-                    <app-satip *ngSwitchCase="'SATIP'" [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList">
+                    <app-satip *ngSwitchCase="'SATIP'" [card]="m_CaptureCardsFiltered[ix]"
+                        [cardList]="m_CaptureCardList">
                     </app-satip>
                     <app-vbox *ngSwitchCase="'VBOX'" [card]="m_CaptureCardsFiltered[ix]" [cardList]="m_CaptureCardList">
                     </app-vbox>
+                    <app-firewire *ngSwitchCase="'FIREWIRE'" [card]="m_CaptureCardsFiltered[ix]"
+                        [cardList]="m_CaptureCardList">
+                    </app-firewire>
                     <div *ngSwitchDefault><br>Not Supported </div>
                 </div>
             </ng-template>

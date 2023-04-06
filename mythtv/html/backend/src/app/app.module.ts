@@ -74,6 +74,7 @@ import { V4l2Component } from './config/settings/capture-cards/v4l2/v4l2.compone
 import { HdpvrComponent } from './config/settings/capture-cards/hdpvr/hdpvr.component';
 import { SatipComponent } from './config/settings/capture-cards/satip/satip.component';
 import { VboxComponent } from './config/settings/capture-cards/vbox/vbox.component';
+import { FirewireComponent } from './config/settings/capture-cards/firewire/firewire.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -144,6 +145,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     HdpvrComponent,
     SatipComponent,
     VboxComponent,
+    FirewireComponent,
   ],
   imports: [
     BrowserModule,
