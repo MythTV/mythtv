@@ -102,4 +102,6 @@ uint fillSelectionsFromDir(const QDir& dir,
                             bool allow_duplicates, V2CaptureDeviceList *pList,
                             const QString & cardType);
 
+V2CaptureDeviceList* getFirewireList (const QString & cardType);
+
 #endif //V2SERVICEUTIL_H

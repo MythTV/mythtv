@@ -18,6 +18,7 @@
 #include "libmythtv/channelgroup.h"
 #include "libmythtv/channelinfo.h"
 #include "libmythtv/channelutil.h"
+#include "libmythtv/recorders/firewiredevice.h"
 #include "libmythtv/recordinginfo.h"
 #include "libmythtv/tv_rec.h"
 
@@ -990,4 +991,26 @@ uint fillSelectionsFromDir(const QDir& dir,
     }
 
     return cnt;
+}
+
+V2CaptureDeviceList* getFirewireList (const QString & cardType)
+{
+    auto* pList = new V2CaptureDeviceList();
+
+#ifdef USING_FIREWIRE
+    std::vector<AVCInfo> list = FirewireDevice::GetSTBList();
+    for (auto & info : list)
+    {
+        auto* pDev = pList->AddCaptureDevice();
+        pDev->setCardType (cardType);
+        QString guid = info.GetGUIDString();
+        pDev->setVideoDevice (guid);
+        QString model = FirewireDevice::GetModelName(info.m_vendorid, info.m_modelid);
+        pDev->setFirewireModel(model);
+        pDev->setDescription(info.m_product_name);
+        pDev->setSignalTimeout ( 2000 );
+        pDev->setChannelTimeout ( 9000 );
+    }
+#endif // USING_FIREWIRE
+    return pList;
 }

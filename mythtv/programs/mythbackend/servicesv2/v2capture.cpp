@@ -595,6 +595,10 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
         QRegularExpression drv { "^hdpvr$" };
         return getV4l2List(drv, CardType);
     }
+    if (CardType == "FIREWIRE") {
+        return getFirewireList(CardType);
+    }
+
     // Get devices from system
     QStringList sdevs = CardUtil::ProbeVideoDevices(CardType);
 
@@ -717,7 +721,7 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
             if (word.size() == 5) {
                 pDev->setVideoDevice(QString("%1:%2:%3").arg(word[0]).arg(word[4]).arg(word[3]));
                 pDev->setVideoDevicePrompt(QString("%1, %2, Tuner #%3").arg(word[0]).arg(word[4]).arg(word[3]));
-                pDev->setFriendlyName(word[1]);
+                pDev->setDescription(word[1]);
                 pDev->setIPAddress(word[2]);
                 pDev->setTunerType(word[4]);
                 pDev->setTunerNumber(word[3].toUInt());
@@ -737,7 +741,7 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
                 pDev->setVideoDevice(device);
                 pDev->setVideoDevicePrompt(device);
                 QString desc = CardUtil::GetVBoxdesc(word[0], word[1], word[2], word[3]);
-                pDev->setFriendlyName(desc);
+                pDev->setDescription(desc);
                 pDev->setIPAddress(word[1]);
                 pDev->setTunerType(word[3]);
                 pDev->setTunerNumber(word[2].toUInt());
