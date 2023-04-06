@@ -370,23 +370,23 @@ std::vector<AVCInfo> FirewireDevice::GetSTBList(void)
     list = DarwinFirewireDevice::GetSTBList();
 #endif
 
-//#define DEBUG_AVC_INFO
+// #define DEBUG_AVC_INFO
 #ifdef DEBUG_AVC_INFO
     AVCInfo info;
-    info.guid     = 0x0016928a7b600001ULL;
-    info.specid   = 0x0;
-    info.vendorid = 0x000014f8;
-    info.modelid  = 0x00001072;
-    info.firmware_revision = 0x0;
-    info.product_name = "Explorer 4200 HD";
+    info.m_guid     = 0x0016928a7b600001ULL;
+    info.m_specid   = 0x0;
+    info.m_vendorid = 0x000014f8;
+    info.m_modelid  = 0x00001072;
+    info.m_firmware_revision = 0x0;
+    info.m_product_name = "Explorer 4200 HD";
     list.push_back(info);
 
-    info.guid     = 0xff2145a850e39810ULL;
-    info.specid   = 0x0;
-    info.vendorid = 0x000014f8;
-    info.modelid  = 0x00000be0;
-    info.firmware_revision = 0x0;
-    info.product_name = "Explorer 3250 HD";
+    info.m_guid     = 0xff2145a850e39810ULL;
+    info.m_specid   = 0x0;
+    info.m_vendorid = 0x000014f8;
+    info.m_modelid  = 0x00000be0;
+    info.m_firmware_revision = 0x0;
+    info.m_product_name = "Explorer 3250 HD";
     list.push_back(info);
 #endif // DEBUG_AVC_INFO
 

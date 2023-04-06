@@ -15,12 +15,12 @@
 #include <QString>
 
 // MythTV headers
-#include "mpeg/streamlisteners.h"
-#include "recorders/avcinfo.h"
+#include "libmythtv/mpeg/streamlisteners.h"
+#include "libmythtv/recorders/avcinfo.h"
 
 class TSPacket;
 
-class FirewireDevice
+class MTV_PUBLIC FirewireDevice
 {
   public:
 
