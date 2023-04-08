@@ -2622,6 +2622,19 @@ static HostCheckBoxSetting *AlwaysOnTop()
     return gc;
 }
 
+static HostCheckBoxSetting *SmoothTransitions()
+{
+    auto *gc = new HostCheckBoxSetting("SmoothTransitions");
+
+    gc->setLabel(AppearanceSettings::tr("Smooth Transitions"));
+
+    gc->setValue(true);
+
+    gc->setHelpText(AppearanceSettings::tr("Enable smooth transitions with fade-in and fade-out of menu pages. "
+                                           "Disabling this can make the GUI respond faster."));
+    return gc;
+}
+
 static HostSpinBoxSetting *StartupScreenDelay()
 {
     auto *gs = new HostSpinBoxSetting("StartupScreenDelay", -1, 60, 1, 1,
@@ -4699,6 +4712,7 @@ AppearanceSettings::AppearanceSettings()
         screen->addChild(RunInWindow());
         screen->addChild(AlwaysOnTop());
     }
+    screen->addChild(SmoothTransitions());
     screen->addChild(StartupScreenDelay());
     screen->addChild(GUIFontZoom());
 #ifdef USING_AIRPLAY

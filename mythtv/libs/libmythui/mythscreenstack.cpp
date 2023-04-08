@@ -1,4 +1,5 @@
 #include "libmythbase/mythevent.h"
+#include "libmythbase/mythcorecontext.h"
 
 #include "mythscreenstack.h"
 #include "mythmainwindow.h"
@@ -38,8 +39,9 @@ MythScreenStack::~MythScreenStack()
 
 void MythScreenStack::EnableEffects(void)
 {
-    m_doTransitions = (GetPainter()->SupportsAlpha() &&
-                       GetPainter()->SupportsAnimation());
+    m_doTransitions = GetMythDB()->GetBoolSetting("SmoothTransitions", true) &&
+                      GetPainter()->SupportsAlpha() &&
+                      GetPainter()->SupportsAnimation();
 }
 
 int MythScreenStack::TotalScreens(void) const
