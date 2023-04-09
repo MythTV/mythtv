@@ -40,7 +40,7 @@ void InitializeMythDirs(void)
 
 #ifdef _WIN32
 
-    if (installprefix.length() == 0)
+    if (installprefix.isEmpty())
         installprefix = QDir( qApp->applicationDirPath() )
                             .absolutePath();
 
@@ -52,7 +52,7 @@ void InitializeMythDirs(void)
     QDir sDir(qgetenv("ProgramData") + "\\mythtv\\");
     sharedir = sDir.canonicalPath() + "/";
 
-    if (confdir.length() == 0)
+    if (confdir.isEmpty())
         confdir  = qgetenv( "LOCALAPPDATA" ) + "\\mythtv";
 
   #if 0
@@ -70,7 +70,7 @@ void InitializeMythDirs(void)
 
     // Remove AppName from end of path
 
-    if (lstPaths.length() > 0)
+    if (!lstPaths.isEmpty())
     {
         QString sAppName = qApp->applicationName();
 
@@ -80,7 +80,7 @@ void InitializeMythDirs(void)
             sharedir = sharedir.left( sharedir.length() - sAppName.length());
 
         // Only use if user didn't override with env variable.
-        if (confdir.length() == 0)
+        if (confdir.isEmpty())
         {
             confdir = lstPaths.first();
 
@@ -91,7 +91,7 @@ void InitializeMythDirs(void)
 
   #endif
 
-    if (sharedir.length() == 0)
+    if (sharedir.isEmpty())
         sharedir = confdir;
 
 #elif defined(Q_OS_ANDROID)
@@ -152,7 +152,7 @@ void InitializeMythDirs(void)
 
 #else
 
-    if (installprefix.length() == 0)
+    if (installprefix.isEmpty())
         installprefix = QString(RUNPREFIX);
 
     QDir prefixDir = qApp->applicationDirPath();
@@ -181,7 +181,7 @@ void InitializeMythDirs(void)
 
 #endif
 
-    if (confdir.length() == 0)
+    if (confdir.isEmpty())
         confdir = QDir::homePath() + "/.mythtv";
     cachedir = confdir + "/cache";
     remotecachedir = cachedir + "/remotecache";
