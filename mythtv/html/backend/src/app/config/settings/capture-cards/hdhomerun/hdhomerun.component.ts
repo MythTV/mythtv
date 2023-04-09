@@ -30,7 +30,7 @@ export class HdhomerunComponent implements OnInit, AfterViewInit {
 
   selectedDevices: CaptureDevice[] = [];
 
-  constructor(private captureCardService: CaptureCardService, private setupService: SetupService) { }
+  constructor(private captureCardService: CaptureCardService, public setupService: SetupService) { }
 
   ngOnInit(): void {
     // Get list of devices for dropdown list
@@ -78,6 +78,8 @@ export class HdhomerunComponent implements OnInit, AfterViewInit {
     this.selectedDevices.forEach(
       x => {
         videoDevices.push(x.VideoDevice.split(' ')[0]);
+        this.card.SignalTimeout = x.SignalTimeout;
+        this.card.ChannelTimeout = x.ChannelTimeout;
       }
     )
     videoDevices.sort();
@@ -135,11 +137,6 @@ export class HdhomerunComponent implements OnInit, AfterViewInit {
     else {
       this.captureCardService.AddCaptureCard(this.card).subscribe(this.saveObserver);
     }
-  }
-
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
   }
 
 }

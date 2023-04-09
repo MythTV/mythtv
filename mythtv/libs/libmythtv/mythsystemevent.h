@@ -53,6 +53,7 @@ class MTV_PUBLIC MythSystemEventEditor : public RawSettingsEditor
 
   public:
     explicit MythSystemEventEditor(MythScreenStack *parent, const char *name = nullptr);
+    static void createSettingList(QMap <QString, QString>  &settings);
 };
 
 #endif

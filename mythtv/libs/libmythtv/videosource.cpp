@@ -298,7 +298,7 @@ class XMLTVGrabber : public MythUIComboBoxSetting
             args += "baseline";
 
             MythSystemLegacy find_grabber_proc("tv_find_grabbers", args,
-                                                kMSStdOut | kMSRunShell);
+                                                kMSStdOut | kMSRunShell | kMSDontDisableDrawing);
             find_grabber_proc.Run(25s);
             LOG(VB_GENERAL, LOG_INFO,
                 loc + "Running 'tv_find_grabbers " + args.join(" ") + "'.");

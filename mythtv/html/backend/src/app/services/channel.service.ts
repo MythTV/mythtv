@@ -2,8 +2,9 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
-  AddDBChannelRequest,
   Channel,
+  CommMethodList,
+  DBChannelRequest,
   FetchChannelsFromSourceRequest,
   GetChannelInfoListRequest,
   GetVideoMultiplexListRequest,
@@ -21,8 +22,12 @@ export class ChannelService {
 
   constructor(private httpClient: HttpClient) { }
 
-  public AddDBChannel(request : AddDBChannelRequest) : Observable<BoolResponse> {
+  public AddDBChannel(request : DBChannelRequest) : Observable<BoolResponse> {
     return this.httpClient.post<BoolResponse>('/Channel/AddDBChannel', request);
+  }
+
+  public UpdateDBChannel(request : DBChannelRequest) : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Channel/UpdateDBChannel', request);
   }
 
   public AddVideoSource(videosource : VideoSource) : Observable<number> {
@@ -43,18 +48,27 @@ export class ChannelService {
     return this.httpClient.get<Channel>('/Channel/GetChannelInfo', {params});
   }
 
-  public GetChannelInfoList(request : GetChannelInfoListRequest) : Observable<ChannelInfoList> {
+  public GetChannelInfoList(request: GetChannelInfoListRequest): Observable<ChannelInfoList> {
     let params = new HttpParams()
-      .set("SourceID", request.SourceID)
-      .set("ChannelGroupID", request.ChannelGroupID)
-      .set("StartIndex", request.StartIndex)
-      .set("Count", request.Count)
-      .set("OnlyVisible", request.OnlyVisible)
-      .set("Details", request.Details)
-      .set("OrderByName", request.OrderByName)
-      .set("GroupByCallsign", request.GroupByCallsign)
-      .set("OnlyTunable", request.OnlyTunable);
-    return this.httpClient.get<ChannelInfoList>('/Channel/GetChannelInfoList', {params});
+    if (request.SourceID !== undefined)
+      params = params.set("SourceID", request.SourceID);
+    if (request.ChannelGroupID !== undefined)
+      params = params.set("ChannelGroupID", request.ChannelGroupID);
+    if (request.StartIndex !== undefined)
+      params = params.set("StartIndex", request.StartIndex);
+    if (request.Count !== undefined)
+      params = params.set("Count", request.Count);
+    if (request.OnlyVisible !== undefined)
+      params = params.set("OnlyVisible", request.OnlyVisible);
+    if (request.Details !== undefined)
+      params = params.set("Details", request.Details);
+    if (request.OrderByName !== undefined)
+      params = params.set("OrderByName", request.OrderByName);
+    if (request.GroupByCallsign !== undefined)
+      params = params.set("GroupByCallsign", request.GroupByCallsign);
+    if (request.OnlyTunable !== undefined)
+      params = params.set("OnlyTunable", request.OnlyTunable);
+    return this.httpClient.get<ChannelInfoList>('/Channel/GetChannelInfoList', { params });
   }
 
   public GetDDLineupList(request : GetDDLineupListRequest) : Observable<LineupList> {
@@ -95,8 +109,12 @@ export class ChannelService {
     return this.httpClient.get<StringListResponse>('/Channel/GetXMLTVIdList', {params});
   }
 
+  public GetAvailableChanid(): Observable<{int: number}> {
+    return this.httpClient.get<{int: number}>('/Channel/GetAvailableChanid', {});
+  }
+
   public RemoveDBChannel(channelid : number) : Observable<BoolResponse> {
-    return this.httpClient.post<BoolResponse>('/Channel/RemoveDBChannel', channelid);
+    return this.httpClient.post<BoolResponse>('/Channel/RemoveDBChannel', {ChannelID: channelid});
   }
 
   public RemoveVideoSource(sourceid : number) : Observable<BoolResponse> {
@@ -114,5 +132,10 @@ export class ChannelService {
   public GetFreqTableList() : Observable<FreqTableList> {
     return this.httpClient.get<FreqTableList>('/Channel/GetFreqTableList');
   }
+
+  public GetCommMethodList() : Observable<CommMethodList> {
+    return this.httpClient.get<CommMethodList>('/Channel/GetCommMethodList');
+  }
+
 
 }

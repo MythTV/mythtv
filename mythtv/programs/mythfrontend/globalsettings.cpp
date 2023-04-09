@@ -2149,6 +2149,7 @@ static HostComboBoxSetting *ScreenAspectRatio()
     gc->addSelection(AppearanceSettings::tr("32:10 (16:10 Side by side)"),    "3.2");
     gc->addSelection(AppearanceSettings::tr("16:20 (16:10 Above and below)"), "0.8");
     gc->setHelpText(AppearanceSettings::tr(
+            "This setting applies to video playback only, not to the GUI. "
             "Most modern displays have square pixels and the aspect ratio of the screen can be "
             "computed from the resolution (default). "
             "The aspect ratio can also be automatically detected from the connected display "
@@ -2618,6 +2619,19 @@ static HostCheckBoxSetting *AlwaysOnTop()
 
     gc->setHelpText(AppearanceSettings::tr("If enabled, MythTV will always be "
                                            "on top"));
+    return gc;
+}
+
+static HostCheckBoxSetting *SmoothTransitions()
+{
+    auto *gc = new HostCheckBoxSetting("SmoothTransitions");
+
+    gc->setLabel(AppearanceSettings::tr("Smooth Transitions"));
+
+    gc->setValue(true);
+
+    gc->setHelpText(AppearanceSettings::tr("Enable smooth transitions with fade-in and fade-out of menu pages. "
+                                           "Disabling this can make the GUI respond faster."));
     return gc;
 }
 
@@ -4698,6 +4712,7 @@ AppearanceSettings::AppearanceSettings()
         screen->addChild(RunInWindow());
         screen->addChild(AlwaysOnTop());
     }
+    screen->addChild(SmoothTransitions());
     screen->addChild(StartupScreenDelay());
     screen->addChild(GUIFontZoom());
 #ifdef USING_AIRPLAY

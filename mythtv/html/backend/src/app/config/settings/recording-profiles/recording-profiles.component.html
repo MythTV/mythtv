@@ -1,0 +1,22 @@
+<app-backend-warning></app-backend-warning>
+<div class="block card w-full">
+    <h2>{{ 'settings.rprofiles.title' | translate }}</h2>
+
+    <p-accordion class="col-12 w-full" (onOpen)="onTabOpen($event)" (onClose)="onTabClose($event)" >
+        <!-- (onClose)="onTabClose($event)" c -->
+        <p-accordionTab *ngFor="let group of groups; index as ix; first as isFirst" [(selected)]="activeTab[ix]">
+            <ng-template pTemplate="header">
+                <div class="grid  w-full" *ngIf="readyCount > 0">
+                    <div class="col-9 pr-1">
+                        {{group.Name}}
+                        <b>&nbsp;{{ dirtyMessages[ix] }}</b>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="content">
+                <app-profile-group [group]="group"
+                    [parentComponent]="this"></app-profile-group>
+            </ng-template>
+        </p-accordionTab>
+    </p-accordion>
+</div>

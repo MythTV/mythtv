@@ -11,6 +11,7 @@ export interface EnvInfo {
     HOME:           string;
     USER:           string;
     MYTHCONFDIR:    string;
+    SchedulingEnabled: boolean;
 }
 
 export interface LogInfo {

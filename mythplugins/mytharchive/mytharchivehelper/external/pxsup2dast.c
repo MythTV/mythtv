@@ -44,6 +44,9 @@ typedef unsigned char			bool8;
 #include <ctype.h>
 #include <setjmp.h>
 #include <zlib.h>
+#if _WIN32
+#include <dirent.h>
+#endif
 
 #if 1
 /* this is all speed, not so much portability -- using C99 features... */
@@ -255,8 +258,14 @@ static void xfseek0(FILE * stream, long offset)
 
 static void xmkdir(const char * path, int mode) 
 {
+#ifdef _WIN32
+    (void)mode;
+    if (mkdir(path) < 0)
+        exc_throw(MiscError, "mkdir(%s%o) failure:", path);
+#else
     if (mkdir(path, mode) < 0)
         exc_throw(MiscError, "mkdir(%s, 0%o) failure:", path, mode);
+#endif
 }
 
 

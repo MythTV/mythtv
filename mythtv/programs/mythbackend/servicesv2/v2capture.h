@@ -28,6 +28,7 @@
 
 #include "libmythbase/http/mythhttpservice.h"
 #include "v2captureCardList.h"
+#include "v2recordingProfile.h"
 
 #define CAPTURE_SERVICE QString("/Capture/")
 #define CAPTURE_HANDLE  QString("Capture")
@@ -52,6 +53,10 @@ class V2Capture : public MythHTTPService
     Q_CLASSINFO("RemoveDiseqcTree",   "methods=POST")
     Q_CLASSINFO("AddDiseqcConfig",    "methods=POST")
     Q_CLASSINFO("RemoveDiseqcConfig", "methods=POST")
+    Q_CLASSINFO("AddRecProfile",      "methods=POST")
+    Q_CLASSINFO("DeleteRecProfile",   "methods=POST")
+    Q_CLASSINFO("UpdateRecProfile",   "methods=POST")
+    Q_CLASSINFO("UpdateRecProfileParam", "methods=POST")
 
   public:
     V2Capture();
@@ -188,6 +193,25 @@ class V2Capture : public MythHTTPService
                                                     const QString& Value);
 
   static bool                 RemoveDiseqcConfig  ( uint           CardId);
+
+  static V2RecProfileGroupList* GetRecProfileGroupList ( uint    GroupId,
+                                                         uint    ProfileId,
+                                                         bool    OnlyInUse );
+
+  static int                  AddRecProfile      ( uint GroupId,
+                                                  const QString& ProfileName,
+                                                  const QString& VideoCodec,
+                                                  const QString& AudioCodec );
+
+  static bool                 DeleteRecProfile   (uint ProfileId);
+
+  static bool                 UpdateRecProfile      ( uint ProfileId,
+                                                      const QString& VideoCodec,
+                                                      const QString& AudioCodec );
+
+  static bool                 UpdateRecProfileParam ( uint ProfileId,
+                                                    const QString& Name,
+                                                    const QString& Value);
 
   private:
     Q_DISABLE_COPY(V2Capture)

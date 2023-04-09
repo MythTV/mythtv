@@ -179,7 +179,8 @@ static QVariant DriveProperty(const QDBusObjectPath& o, const std::string& kszPr
     {
         v = iface.property(kszProperty.c_str());
         LOG(VB_MEDIA, LOG_DEBUG, LOC +
-            "Udisks2:Drive:" + kszProperty.c_str() + " : " + v.toString() );
+            "Udisks2:Drive:" + kszProperty.c_str() + " : " + 
+            (v.canConvert<QStringList>() ? v.toStringList().join(", ") : v.toString()) );
     }
     return v;
 }
@@ -190,21 +191,13 @@ static bool DetectDevice(const QDBusObjectPath& entry, MythUdisksDevice& device,
 {
     QDBusInterface block(UDISKS2_SVC, entry.path(), UDISKS2_SVC_BLOCK,
                          QDBusConnection::systemBus() );
-#if 0
-    QString devraw = block.property("Device").toString();
-    LOG(VB_MEDIA, LOG_DEBUG, LOC +
-        "CheckMountable: Raw Device found: " + devraw);
-#endif
+
     if (!block.property("HintSystem").toBool() &&
         !block.property("HintIgnore").toBool())
     {
         dev = block.property("Device").toString();
         LOG(VB_MEDIA, LOG_DEBUG, LOC +
-            "CheckMountable: Device found: " + dev);
-
-        bool readonly = block.property("ReadOnly").toBool();
-        LOG(VB_MEDIA, LOG_DEBUG, LOC +
-            QString("CheckMountable: Device:ReadOnly '%1'").arg(readonly));
+            "DetectDevice: Device found: " + dev);
 
         // ignore floppies, too slow
         if (dev.startsWith("/dev/fd"))
@@ -219,7 +212,7 @@ static bool DetectDevice(const QDBusObjectPath& entry, MythUdisksDevice& device,
         bool isfsmountable = (properties.lastError().type() == QDBusError::NoError);
 
         LOG(VB_MEDIA, LOG_DEBUG, LOC +
-            QString("     CheckMountable:Entry:isfsmountable : %1").arg(isfsmountable));
+            QString("     DetectDevice:Entry:isfsmountable : %1").arg(isfsmountable));
 
         // Get properties of the corresponding drive
         // Note: the properties 'Optical' and 'OpticalBlank' needs a medium inserted
@@ -229,17 +222,13 @@ static bool DetectDevice(const QDBusObjectPath& entry, MythUdisksDevice& device,
             desc += " ";
         desc += DriveProperty(drivePath, "Model").toString();
         LOG(VB_MEDIA, LOG_DEBUG, LOC +
-            QString("CheckMountable: Found drive '%1'").arg(desc));
-#if 0
-        LOG(VB_MEDIA, LOG_DEBUG, LOC + QString("CheckMountable:Drive:Optical : %1")
-                .arg(DriveProperty(drivePath, "Optical").toString()));
-        LOG(VB_MEDIA, LOG_DEBUG, LOC + QString("CheckMountable:Drive:OpticalBlank : %1")
-                .arg(DriveProperty(drivePath, "OpticalBlank").toString()));
-#endif
+            QString("DetectDevice: Found drive '%1'").arg(desc));
+        const auto media = DriveProperty(drivePath, "MediaCompatibility").toStringList();
+        const bool isOptical = !media.filter("optical", Qt::CaseInsensitive).isEmpty();
 
         if (DriveProperty(drivePath, "Removable").toBool())
         {
-            if (readonly && !isfsmountable)
+            if (isOptical)
             {
                 device = UDisks2DVD;
                 return true;

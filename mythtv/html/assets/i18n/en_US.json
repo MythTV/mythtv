@@ -8,9 +8,16 @@
     "savesuccess": "Saved Successfully",
     "networkfail": "ERROR: Backend Network Failure",
     "cancel": "Cancel",
+    "delete": "Delete",
     "ok": "Ok",
     "no": "No",
-    "yes": "Yes"
+    "yes": "Yes",
+    "default": "Default",
+    "close": "Close",
+    "continue": "Continue Editing",
+    "nosave": "Close without saving",
+    "unsaved_heading": "Unsaved Changes",
+    "unsaved_message": "There are unsaved changes."
   },
   "dashboard": {
     "warning": "Please note this is a work in progress and some features are not fully working!"
@@ -349,8 +356,6 @@
     "general": {
       "title": "General Backend Settings"
     },
-    "unsaved": "(Unsaved Changes)",
-    "warning": "If you continue you may lose your changes.",
     "capture": {
       "title": "Capture Cards",
       "ceton": {
@@ -371,13 +376,13 @@
       "delete_all": "Delete All capture Cards",
       "delete_all_all": "Delete All capture Cards on all hosts",
       "delete_this": "Delete this Capture Card",
+      "device_desc": "When you change this setting, the text below should change to the name and type of your card. If the card cannot be opened, an error message will be displayed.",
+      "frontend_desc": "Identification string reported by the card. If the message \"Could not get card info...\" appears the card can be in use by another program.",
+      "inputname_desc": "If your card supports more than one delivery system then you can select here the one that you want to use.",
       "dvb": {
         "device_label": "DVB Device",
-        "device_desc": "When you change this setting, the text below should change to the name and type of your card. If the card cannot be opened, an error message will be displayed.",
         "frontend_label": "Frontend ID",
-        "frontend_desc": "Identification string reported by the card. If the message \"Could not get card info...\" appears the card can be in use by another program.",
         "inputname_label": "Delivery System",
-        "inputname_desc": "If your card supports more than one delivery system then you can select here the one that you want to use.",
         "wait_label": "Wait for SEQ start header",
         "wait_desc": "If enabled, drop packets from the start of a DVB recording until a sequence start header is seen.",
         "ondemand_label": "Open DVB card on demand",
@@ -506,14 +511,62 @@
         "title": "Demo Test Recorder",
         "file_desc": "A local MPEG file used to simulate a recording."
       },
-      "select_type": "Select capture card type"
+      "select_type": "Select capture card type",
+      "v4l2": {
+        "title": "V4L2 Encoder",
+        "device_label": "Video Device",
+        "frontend_label": "Probed Info"
+      },
+      "hdpvr": {
+        "title": "HD-PVR H.264 Encoder",
+        "audiodevice_label": "Audio Input",
+        "audiodevice_desc": "If there is more than one audio input, select which one to use."
+      },
+      "satip": {
+        "title": "Sat>IP Networked Tuner",
+        "device_label": "Available Devices",
+        "device_desc": "Device IP or ID, tuner number and tuner type of available Sat>IP device.",
+        "friendly_label": "Friendly Name",
+        "tunertype_label": "Tuner Type",
+        "tunerindex_label": "Tuner Index",
+        "deviceid_label": "Device ID",
+        "diseqcpos_label": "DiSEqC position",
+        "diseqcpos_desc": "Position of the LNB on the DiSEqC switch. Leave at 1 if there is no DiSEqC switch and the LNB is directly connected to the SatIP server. This value is used as signal source (attribute src) in the SatIP tune command.",
+        "friendly_desc": "Friendly name of the Sat>IP server"
+      },
+      "tunertype_desc": "Type of the selected tuner",
+      "tunerindex_desc": "Index of the tuner on the Sat>IP server",
+      "deviceid_desc": "Device ID of the Sat>IP tuner.",
+      "vbox": {
+        "manuallyenter": "Manually Enter IP Address",
+        "title": "V@Box TV Gateway networked tuner",
+        "device_desc": "Device IP or ID, tuner number and tuner type of available VBox devices.",
+        "deviceid_label": "Device ID",
+        "description_label": "Description",
+        "deviceid_desc": "Device ID of VBox device"
+      },
+      "firewire": {
+        "title": "FireWire Cable Box",
+        "device_label": "GUID",
+        "model_label": "Cable Box Model",
+        "model_desc": "Choose the model that most closely resembles your set top box. Depending on firmware revision SA4200HD may work better for a SA3250HD box.",
+        "connection_label": "Connection Type",
+        "speed_label": "Speed",
+        "motogeneric": "Motorola Generic",
+        "sageneric": "SA/Cisco Generic",
+        "pointtopoint": "Point to Point",
+        "broadcast": "Broadcast"
+      }
     },
     "common": {
       "successful_delete": "Successful delete",
       "deleted": "(Deleted)",
-      "new": "(New)"
+      "new": "(New)",
+      "unsaved": "(Unsaved Changes)",
+      "warning": "If you continue you may lose your changes.",
+      "ru_sure": "Are you sure ?",
+      "clipboard_tooltip": "Copy to Clipboard"
     },
-    "ru_sure": "Are you sure ?",
     "vsource": {
       "title": "Video Sources",
       "new_video_source": "New Video Source",
@@ -546,8 +599,8 @@
     },
     "iconnection": {
       "title": "Input Connection",
-      "inputname_label": "Delivery System",
-      "inputname_desc": "For DVB devices this shows the delivery system (modulation), for instance DVB-T2, that you have selected when you configured the capture card. This must be the same as the modulation used by the video source.",
+      "delivery_label": "Delivery System",
+      "delivery_desc": "For DVB devices this shows the delivery system (modulation), for instance DVB-T2, that you have selected when you configured the capture card. This must be the same as the modulation used by the video source.",
       "displayname_label": "Display Name",
       "displayname_desc": "This name is displayed on screen when Live TV begins and in various other places.  Make sure the last two characters are unique for each input or use a slash ('/') to designate the unique portion.",
       "sourceid_label": "Video Source",
@@ -614,7 +667,8 @@
       "unicablepos_label": "Satellite Unicable Position",
       "unicablepos_porta": "Port A",
       "unicablepos_portb": "Port B",
-      "unicablepos_desc": "Unicable satellite position (A/B)"
+      "unicablepos_desc": "Unicable satellite position (A/B)",
+      "input_label": "Input Name"
     },
     "sgroups": {
       "special": {
@@ -645,7 +699,132 @@
     "iconnections": {
       "title": "Input Connections"
     },
-    "clipbord_tooltip": "Copy to Clipboard"
+    "chanedit": {
+      "title": "Channel Editor",
+      "always-visible": "Always Visible",
+      "visible": "Visible",
+      "not-visible": "Not Visible",
+      "never-visible": "Never Visible",
+      "new_channel": "New Channel",
+      "channame": "Channel Name",
+      "channame_desc": "Common name for the channel",
+      "channum": "Channel Number",
+      "channum_desc": "The number by which the channel is known to MythTV",
+      "freqid": "Frequency Id",
+      "freqid_desc": "Channel Number as understood by your tuners.",
+      "callsign": "Call Sign",
+      "callsign_desc": "Unique identifier for the transmitter.",
+      "visible_label": "Visibility",
+      "visible_desc": "If set to Always Visible or Visible, the channel will be visible in the EPG.  Set to Always Visible or Never Visible to prevent MythTV and other utilities from automatically managing the value for this channel..",
+      "serviceid_label": "Service ID",
+      "serviceid_desc": "Service ID (Program Number) of desired channel within the transport stream. If there is only one channel, then setting this to anything will still find it.",
+      "source_label": "Video Source",
+      "source_desc": "It is NOT a good idea to change this value as it only changes the sourceid in table channel but not in dtv_multiplex. The sourceid in dtv_multiplex cannot and should not be changed.",
+      "format_label": "TV Format",
+      "format_desc": "If this channel uses a format other than TV Format in the General Backend Setup screen, set it here.",
+      "priority_label": "Priority",
+      "priority_desc": "\"Number of priority points to be added to any recording on this channel during scheduling. Use a positive number as the priority if you want this to be a preferred channel, a negative one to deprecate this channel.",
+      "eit_label": "Use On Air Guide",
+      "eit_desc": "If enabled, guide information for this channel will be updated using 'Over-the-Air' program listings.",
+      "xmltvid_label": "XMLTV ID",
+      "xmltvid_desc": "ID used by listing services to get an exact correspondence between a channel in your line-up and a channel in their database. Normally this is set automatically when 'mythfilldatabase' is run.",
+      "timeoffset_label": "Listings Time Offset",
+      "timeoffset_desc": "Offset (in minutes) to apply to the program guide data during import.  This can be used when the listings for a particular channel are in a different time zone.",
+      "commmethod_label": "Commercial Detection Method",
+      "commmethod_desc": "Changes the method of commercial detection used for recordings on this channel or skips detection by marking the channel as Commercial Free.",
+      "delete_details": "This will delete Channel:{{ChanNum}}, Name:{{ChannelName}}, Source:{{Source}}",
+      "delete_this": "Delete Channel"
+    },
+    "rprofiles": {
+      "title": "Recording Profiles",
+      "grouptitle": "Profile Group",
+      "proftitle": "Recording Profile:",
+      "autotranscode_label": "Enable Auto-transcode After Recording",
+      "autotranscode_desc": "Automatically transcode when a recording is made using this profile and the recording's schedule is configured to allow transcoding.",
+      "height_label": "Image Height",
+      "height_desc": "Height to use for encoding. Note: PVR-x50 cards may produce ghosting if this is not set to 480 or 576 for NTSC and PAL, respectively.",
+      "width_label": "Image Width",
+      "width_desc": "Width to use for encoding. Note: PVR-x50 cards may produce ghosting if this is not set to 720 or 768 for NTSC and PAL, respectively.",
+      "rectype_normal": "Normal",
+      "rectype_tv": "TV Only",
+      "rectype_audio": "Audio Only",
+      "recordingtype_label": "Recording Type",
+      "recordingtype_desc": "This option allows you to filter out unwanted streams. 'Normal' will record all relevant streams including interactive television data. 'TV Only' will record only audio, video and subtitle streams. ",
+      "recordmpts_label": "Record Full TS",
+      "recordmpts_desc": "If set, extra files will be created for each recording with the name of the recording followed by '.ts.raw'. These extra files represent the full contents of the transport stream used to generate the recording. (For debugging purposes)",
+      "video_label": "Video Compression",
+      "videocodec_label": "Video Codec",
+      "rtjpegquality_label": "RTjpeg Quality",
+      "rtjpegquality_desc": "Higher is better quality.",
+      "rtjpeglumafilter_label": "Luma Filter",
+      "rtjpegfilter_desc": "Lower is better.",
+      "rtjpegchromafilter_label": "Chroma Filter",
+      "mpeg4bitrate_label": "Bitrate (kb/s)",
+      "mpeg4bitrate_desc": "Bitrate in kilobits/second. As a guide, 2200 kb/s is approximately 1 GB/hr.",
+      "mpeg4maxquality_label": "Maximum quality",
+      "mpeg4quality_desc": "Modifying the default may have severe consequences.",
+      "mpeg4minquality_label": "Minimum quality",
+      "mpeg4qualdiff_label": "Max Quality Difference Between Frames",
+      "scalebitrate_label": "Scale bitrate for frame size",
+      "scalebitrate_desc": "If set, the bitrate specified will be used for 640x480. If other resolutions are used, the bitrate will be scaled appropriately.",
+      "mpeg4optionvhq_label": "Enable High-quality Encoding",
+      "mpeg4optionvhq_desc": "If set, the MPEG4 encoder will use 'high-quality' encoding options. This requires much more processing, but can result in better video.",
+      "mpeg4option4mv_label": "Enable 4MV Encoding",
+      "mpeg4option4mv_desc": "If set, the MPEG4 encoder will use '4MV' motion-vector encoding.  This requires much more processing, but can result in better video. It is highly recommended that the HQ option is enabled if 4MV is enabled.",
+      "mpeg4optionidct_label": "Enable Interlaced DCT Encoding",
+      "mpeg4optionidct_desc": "If set, the MPEG4 encoder will use interlaced DCT encoding. You may want this when encoding interlaced video; however, this is experimental and may cause damaged video.",
+      "mpeg4optionime_label": "Enable Interlaced Motion Estimation",
+      "mpeg4optionime_desc": "If set, the MPEG4 encoder will use interlaced motion estimation. You may want this when encoding interlaced video; however, this is experimental and may cause damaged video.",
+      "encodingthreadcount_label": "Number of Threads",
+      "encodingthreadcount_desc": "Set to a value less than or equal to the number of processors on the backend that will be doing the encoding.",
+      "audio_label": "Audio Quality",
+      "audiocodec_label": "Audio Codec",
+      "samplerate_label": "Sampling Rate",
+      "samplerate_desc": "Sets the audio sampling rate for your DSP. Ensure that you choose a sampling rate appropriate for your device.  btaudio may only allow 32000.",
+      "mp3quality_label": "MP3 Quality",
+      "mp3quality_desc": "The higher the slider number, the lower the quality of the audio. Better quality audio (lower numbers) requires more CPU.",
+      "volume_label": "Volume (%)",
+      "volume_desc": "Recording volume of the capture card.",
+      "new_profile": "New Profile",
+      "enter_profile_name": "Enter New Profile Name",
+      "delete_this": "Delete this Recording Profile",
+      "delete_details": "This will delete Profile {{ProfileName}} in group {{GroupName}}.",
+      "mpeg2bitrate_label": "Avg. Bitrate (kb/s)",
+      "mpeg2bitrate_desc": "Average bitrate in kilobits/second. As a guide, 2200 kb/s is approximately 1 GB/hour.",
+      "hardwaremjpegquality_label": "Quality",
+      "hardwaremjpeghdecimation_label": "Horizontal Decimation",
+      "hardwaremjpegvdecimation_label": "Vertical Decimation",
+      "mpeg2streamtype_label": "Stream Type",
+      "mpeg2streamtype_desc": "Sets the type of stream generated by your PVR.",
+      "mpeg2aspectratio_label": "Aspect Ratio",
+      "mpeg2aspectratio_desc": "Sets the aspect ratio of stream generated by your PVR.",
+      "mpeg2maxbitrate_label": "Max. Bitrate (kb/s)",
+      "mpeg2maxbitrate_desc": "Maximum bitrate in kilobits/second. As a guide, 2200 kb/s is approximately 1 GB/hour.",
+      "lowres_label": "Low Resolution",
+      "medres_label": "Medium Resolution",
+      "highres_label": "High Resolution",
+      "lang_main": "Main Language",
+      "lang_sap": "SAP Language",
+      "lang_dual": "Dual Language",
+      "mpeg2language_label": "SAP/Bilingual",
+      "mpeg2language_desc": "Chooses the language(s) to record when two languages are broadcast. Only Layer II supports the recording of two languages (Dual). Requires ivtv 0.4.0 or later.",
+      "mpeg2audvolume_desc": "Volume of the recording"
+    },
+    "sysevents": {
+      "title": "System Event Command Editor"
+    },
+    "main": {
+      "title": "MythTV Setup",
+      "schedstatus": "Scheduler Status",
+      "schedenabled": "Enabled",
+      "scheddisabled": "Disabled",
+      "upcomingrec": "Next upcoming recording: {{Title}} at {{StartTime}}. Status: {{Status}}",
+      "noupcomingrec": "There are no upcoming recordings.",
+      "savedisabled_warning": "Saving and Deleting are disabled because the Scheduler is enabled.",
+      "savedisabled_desc": "You must disable the scheduler to enable saving and deleting. While the scheduler is disabled, any recordings that reach their start time will be canceled.",
+      "scheddisabled_warning": "The Scheduler is disabled. No recordings will take place.",
+      "scheddisabled_desc": "Please restart the backend after finishing your updates, otherwise the scheduler will remain disabled and nothing will record."
+    }
   },
   "sidenav": {
     "settingsmenu": {
@@ -659,5 +838,6 @@
       "7_storage_directories": "7. Storage Directories",
       "8_system_events": "8. System Events"
     }
-  }
+  },
+  "Stream Type": "settings.rprofiles.mpeg2streamtype_label"
 }

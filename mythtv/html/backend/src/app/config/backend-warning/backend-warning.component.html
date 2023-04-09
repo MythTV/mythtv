@@ -1,0 +1,42 @@
+<div class="block card w-full">
+    <div class="block">
+        <h1 style="text-align: center;">{{ 'settings.main.title' | translate }}</h1>
+        <div *ngIf="retryCount == 0">
+            <p>{{ 'settings.main.schedstatus' | translate }}:
+                <b *ngIf="setupService.schedulingEnabled">{{ 'settings.main.schedenabled' | translate }}</b>
+                <b *ngIf="!setupService.schedulingEnabled">{{ 'settings.main.scheddisabled' | translate }}</b>
+            </p>
+            <p *ngIf="upComing.length > 0">
+                {{ 'settings.main.upcomingrec' |
+                translate: { Title: upComing[0].Title, StartTime: recStartTime, Status: recStatusDesc } }}
+            </p>
+            <p *ngIf="upComing.length == 0 && ready">
+                {{ 'settings.main.noupcomingrec' | translate }}
+            </p>
+            <div *ngIf="setupService.schedulingEnabled">
+                <p-message severity="warn"
+                    text="{{ 'settings.main.savedisabled_warning' | translate }}"></p-message>
+                <p>
+                    {{ 'settings.main.savedisabled_desc' | translate }}
+                </p>
+            </div>
+            <div *ngIf="!setupService.schedulingEnabled">
+                <p-message severity="warn" text="{{ 'settings.main.scheddisabled_warning' | translate }}"></p-message>
+                <p>
+                    {{ 'settings.main.scheddisabled_desc' | translate }}
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="block">
+        <p-button class="col pr-1" label="Disable Scheduler" icon="pi pi-save" iconPos="left"
+            (onClick)="disableSched();" [disabled]="!setupService.schedulingEnabled || retryCount > 0"></p-button>
+        <p-button class="col pr-1" label="Restart Backend" icon="pi pi-save" iconPos="left" (onClick)="restart();"
+            [disabled]="setupService.schedulingEnabled || retryCount > 0"></p-button>
+        <p-progressSpinner *ngIf="retryCount > 0"></p-progressSpinner>
+        <p>
+            <p-message *ngIf="this.errorCount > 0 && retryCount == 0" severity="error"
+                text="{{ 'common.networkfail' | translate }}"></p-message>
+        </p>
+    </div>
+</div>

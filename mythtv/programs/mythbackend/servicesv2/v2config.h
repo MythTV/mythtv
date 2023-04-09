@@ -6,6 +6,7 @@
 #include "v2databaseStatus.h"
 #include "v2languageList.h"
 #include "v2countryList.h"
+#include "v2systemEventList.h"
 
 #define CONFIG_SERVICE QString("/Config/")
 #define CONFIG_HANDLE  QString("Config")
@@ -35,8 +36,11 @@ class V2Config : public MythHTTPService
 
     static V2CountryList*    GetCountries              ( void );
     static V2LanguageList*   GetLanguages              ( void );
+    static V2SystemEventList* GetSystemEvents          ( const QString &Host );
 
     static QStringList       GetIPAddresses            ( const QString &Protocol );
+
+
 
   private:
     Q_DISABLE_COPY(V2Config)

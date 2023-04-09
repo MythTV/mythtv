@@ -19,3 +19,15 @@ export interface MythDatabaseStatus {
 export interface IPAddressList {
     IPAddresses: string[];
 }
+
+export interface SystemEvent {
+    Key: string;
+    LocalizedName: string;
+    Value: string;
+}
+
+export interface SystemEventList {
+    SystemEventList: {
+        SystemEvents: SystemEvent[];
+    }
+}

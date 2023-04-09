@@ -699,14 +699,14 @@ int AudioConvert::Process(void* out, const void* in, int bytes, bool noclip)
             if (left >= 65536)
             {
                 s       = toFloat(m_in, buffer.data(), in, buffer.size());
-                in      = (void*)((long)in + s);
-                out     = (void*)((long)out + fromFloat(m_out, out, buffer.data(), s));
+                in      = static_cast<const uint8_t *>(in) + s;
+                out     = static_cast<uint8_t *>(out) + fromFloat(m_out, out, buffer.data(), s);
                 left   -= buffer.size();
                 continue;
             }
             s       = toFloat(m_in, buffer.data(), in, left);
-            in      = (void*)((long)in + s);
-            out     = (void*)((long)out + fromFloat(m_out, out, buffer.data(), s));
+            in      = static_cast<const uint8_t *>(in) + s;
+            out     = static_cast<uint8_t *>(out) + fromFloat(m_out, out, buffer.data(), s);
             left    = 0;
         }
         return bytes * AudioOutputSettings::SampleSize(m_out) / AudioOutputSettings::SampleSize(m_in);

@@ -5,3 +5,7 @@ export interface BoolResponse {
 export interface StringListResponse {
     StringList:     String[];
 }
+
+export interface StringResponse {
+    String:         string;
+}

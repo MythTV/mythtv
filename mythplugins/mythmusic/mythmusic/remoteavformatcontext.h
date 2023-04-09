@@ -136,7 +136,9 @@ class RemoteAVFormatContext
     static int ReadFunc(void *opaque, uint8_t *buf, int buf_size)
     {
         auto *rf = reinterpret_cast< RemoteFile* >(opaque);
-        return rf->Read(buf, buf_size);
+        int len = rf->Read(buf, buf_size);
+        int ret = ((len == 0) && (buf_size > 0)) ? AVERROR_EOF : len;
+        return ret;
     }
 
     static int WriteFunc(void */*opaque*/, uint8_t */*buf*/, int/*buf_size*/)

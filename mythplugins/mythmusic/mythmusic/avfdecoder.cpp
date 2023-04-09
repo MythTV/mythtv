@@ -511,7 +511,8 @@ void avfDecoder::run()
                 if (buffered < 1s)
                     break;
                 // wait
-                const struct timespec ns {0, (buffered.count() - 1000) * 1000000};
+                long count = buffered.count();
+                const struct timespec ns {0, (count - 1000) * 1000000};
                 nanosleep(&ns, nullptr);
             }
         }

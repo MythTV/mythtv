@@ -1892,6 +1892,12 @@ Q_DECL_EXPORT int main(int argc, char **argv)
     SignalHandler::SetHandler(SIGUSR2, handleSIGUSR2);
 #endif
 
+#if defined(Q_OS_ANDROID)
+    auto config = QSslConfiguration::defaultConfiguration();
+    config.setCaCertificates(QSslConfiguration::systemCaCertificates());
+    QSslConfiguration::setDefaultConfiguration(config);
+#endif
+
     int retval = cmdline.ConfigureLogging();
     if (retval != GENERIC_EXIT_OK)
         return retval;

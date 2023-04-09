@@ -237,6 +237,9 @@ QString formatTime(std::chrono::milliseconds msecs, QString fmt)
     static const QRegularExpression sRe("s+");
     static const QRegularExpression zRe("z+");
 
+    bool negativeTime = msecs < 0ms;
+    msecs = std::chrono::milliseconds(std::abs(msecs.count()));
+
     QRegularExpressionMatch match = hRe.match(fmt);
     if (match.hasMatch())
     {
@@ -272,6 +275,10 @@ QString formatTime(std::chrono::milliseconds msecs, QString fmt)
         QString text = StringUtil::intToPaddedString(value, width);
         fmt.replace(match.capturedStart(), match.capturedLength(), text);
     }
+
+    if (negativeTime)
+        fmt.prepend("-");
+
     return fmt;
 }
 

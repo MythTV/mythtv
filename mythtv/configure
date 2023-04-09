@@ -929,10 +929,10 @@ check_func_headers(){
     funcs=$2
     shift 2
     {
+        echo "#include <stdint.h>"
         for hdr in $headers; do
             print_include $hdr
         done
-        echo "#include <stdint.h>"
         for func in $funcs; do
             echo "long check_$func(void) { return (long) $func; }"
         done
@@ -5202,7 +5202,7 @@ check_builtin sem_timedwait semaphore.h "sem_t *s; sem_init(s,0,0); sem_timedwai
 check_builtin sync_val_compare_and_swap "" "int *ptr; int oldval, newval; __sync_val_compare_and_swap(ptr, oldval, newval)"
 check_builtin gmtime_r time.h "time_t *time; struct tm *tm; gmtime_r(time, tm)"
 check_builtin localtime_r time.h "time_t *time; struct tm *tm; localtime_r(time, tm)"
-check_builtin x264_csp_bgr "stdint.h x264.h" "X264_CSP_BGR"
+check_builtin x264_csp_bgr x264.h X264_CSP_BGR
 
 case "$custom_allocator" in
     jemalloc)
@@ -5557,8 +5557,8 @@ enabled libmp3lame        && require "libmp3lame >= 3.98.3" lame/lame.h lame_set
 enabled libpulse          && require_pkg_config libpulse libpulse pulse/pulseaudio.h pa_context_new
 enabled libv4l2           && require_pkg_config libv4l2 libv4l2 libv4l2.h v4l2_ioctl
 
-enabled libx264           && { use_pkg_config libx264 x264 "stdint.h x264.h" x264_encoder_encode ||
-                               { require libx264 "stdint.h x264.h" x264_encoder_encode -lx264 &&
+enabled libx264           && { use_pkg_config libx264 x264 x264.h x264_encoder_encode ||
+                               { require libx264 x264.h x264_encoder_encode -lx264 &&
                                  warn "using libx264 without pkg-config"; } } &&
                              require_cpp_condition x264.h "X264_BUILD >= 118" &&
                              { check_cpp_condition x264.h "X264_MPEG2" &&

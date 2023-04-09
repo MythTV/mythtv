@@ -1070,7 +1070,7 @@ class DatabaseConfig( object ):
             else:
                 raise MythError("Cannot find home directory to write to")
 
-        fp.write(etree.tostring(doc, pretty_print=True))
+        fp.write(etree.tostring(doc, encoding='unicode', pretty_print=True))
         fp.close()
 
 class DBCache( MythSchema ):

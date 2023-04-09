@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CaptureCard, CaptureCardList, CaptureDeviceList, CardTypeList, DiseqcConfig, DiseqcConfigList, DiseqcParm, DiseqcTree, DiseqcTreeList, InputGroupList } from './interfaces/capture-card.interface';
 import { BoolResponse } from './interfaces/common.interface';
+import { RecProfileGroupList } from './interfaces/recprofile.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -111,4 +112,33 @@ export class CaptureCardService {
       { InputId: InputId, InputGroupId: InputGroupId });
   }
 
-}
+  public GetRecProfileGroupList(GroupId: number, ProfileId: number, OnlyInUse: boolean) : Observable<RecProfileGroupList> {
+    let params = new HttpParams()
+    .set("GroupId", GroupId)
+    .set("ProfileId", ProfileId)
+    .set("OnlyInUse", OnlyInUse);
+    return this.httpClient.get<RecProfileGroupList>('/Capture/GetRecProfileGroupList', {params})
+  }
+
+  public AddRecProfile(GroupId: number, ProfileName: string, VideoCodec: string,
+     AudioCodec: string): Observable<number> {
+    return this.httpClient.post<number>('/Capture/AddRecProfile',
+      { GroupId: GroupId, ProfileName: ProfileName, VideoCodec: VideoCodec, AudioCodec: AudioCodec });
+  }
+
+  public DeleteRecProfile(ProfileId: number): Observable<BoolResponse> {
+   return this.httpClient.post<BoolResponse>('/Capture/DeleteRecProfile',
+     { ProfileId: ProfileId });
+ }
+
+  public UpdateRecProfile(ProfileId: number, VideoCodec: string, AudioCodec: string): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Capture/UpdateRecProfile',
+      { ProfileId: ProfileId, VideoCodec: VideoCodec, AudioCodec: AudioCodec });
+  }
+
+  public UpdateRecProfileParam(ProfileId: number, Name: string, Value: string): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Capture/UpdateRecProfileParam',
+      { ProfileId: ProfileId, Name: Name, Value: Value });
+  }
+
+ }

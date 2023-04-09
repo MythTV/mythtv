@@ -2711,15 +2711,8 @@ int RTjpeg::SetSize(const int *w, const int *h)
 
     if (m_keyRate > 0)
     {
-        if (m_old)
-            delete [] m_oldStart;
-        m_oldStart = new int16_t[((4*m_width*m_height)+32)];
-
-        auto tmp = (unsigned long)m_oldStart;
-        tmp += 32;
-        tmp = tmp>>5;
-
-        m_old = (int16_t *)(tmp<<5);
+        delete [] m_old;
+        m_old = new (std::align_val_t(32)) int16_t[4*m_width*m_height];
         if (!m_old)
         {
             fprintf(stderr, "RTjpeg: Could not allocate memory\n");
@@ -2755,13 +2748,8 @@ int RTjpeg::SetIntra(int *key, int *lm, int *cm)
     m_cMask = *cm;
 #endif
 
-    if (m_old)
-        delete [] m_oldStart;
-    m_oldStart = new int16_t[((4*m_width*m_height)+32)];
-    auto tmp = (unsigned long)m_oldStart;
-    tmp += 32;
-    tmp = tmp >> 5;
-    m_old = (int16_t *)(tmp << 5);
+    delete [] m_old;
+    m_old = new (std::align_val_t(32)) int16_t[4*m_width*m_height];
     if (!m_old)
     {
          fprintf(stderr, "RTjpeg: Could not allocate memory\n");
@@ -2787,7 +2775,7 @@ RTjpeg::RTjpeg(void)
 
 RTjpeg::~RTjpeg(void)
 {
-    delete [] m_oldStart;
+    delete [] m_old;
 }
 
 inline int RTjpeg::compressYUV420(int8_t *sp, uint8_t **planes)

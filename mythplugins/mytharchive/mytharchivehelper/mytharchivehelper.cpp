@@ -27,7 +27,6 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
-#include <sys/wait.h>  // for WIFEXITED and WEXITSTATUS
 #include <unistd.h>
 
 #include <QtGlobal>

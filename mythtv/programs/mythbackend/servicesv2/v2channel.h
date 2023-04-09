@@ -32,6 +32,7 @@
 #include "v2videoMultiplexList.h"
 #include "v2lineup.h"
 #include "v2grabber.h"
+#include "v2commMethod.h"
 
 #define CHANNEL_SERVICE QString("/Channel/")
 #define CHANNEL_HANDLE  QString("Channel")
@@ -40,7 +41,7 @@
 class V2Channel : public MythHTTPService
 {
     Q_OBJECT
-    Q_CLASSINFO("Version",      "1.11")
+    Q_CLASSINFO("Version",      "1.12")
     Q_CLASSINFO("UpdateDBChannel",        "methods=POST;name=bool")
     Q_CLASSINFO("AddDBChannel",           "methods=POST;name=bool")
     Q_CLASSINFO("RemoveDBChannel",        "methods=POST;name=bool")
@@ -49,6 +50,7 @@ class V2Channel : public MythHTTPService
     Q_CLASSINFO("RemoveAllVideoSources",  "methods=POST;name=bool")
     Q_CLASSINFO("RemoveVideoSource",      "methods=POST;name=bool")
     Q_CLASSINFO("FetchChannelsFromSource","methods=GET,POST;name=int")
+    Q_CLASSINFO("GetAvailableChanid",     "methods=GET,POST;name=int")
     Q_CLASSINFO("GetXMLTVIdList",         "methods=GET,POST,HEAD;name=StringList")
 
     public:
@@ -89,7 +91,10 @@ class V2Channel : public MythHTTPService
                                                      const QString &Format,
                                                      const QString &XMLTVID,
                                                      const QString &DefaultAuthority,
-                                                     uint          ServiceType );
+                                                     uint          ServiceType,
+                                                     int           RecPriority,
+                                                     int           TimeOffset,
+                                                     int           CommMethod );
 
         bool                   AddDBChannel        ( uint          MplexID,
                                                      uint          SourceID,
@@ -108,9 +113,16 @@ class V2Channel : public MythHTTPService
                                                      const QString &Format,
                                                      const QString &XMLTVID,
                                                      const QString &DefaultAuthority,
-                                                     uint          ServiceType );
+                                                     uint          ServiceType,
+                                                     int           RecPriority,
+                                                     int           TimeOffset,
+                                                     int           CommMethod );
 
         static bool            RemoveDBChannel     ( uint          ChannelID );
+
+        static uint           GetAvailableChanid   ( void );
+
+        static V2CommMethodList* GetCommMethodList  ( void );
 
         /* Video Source Methods */
 

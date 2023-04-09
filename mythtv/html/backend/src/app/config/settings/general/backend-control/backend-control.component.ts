@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 
-import { BackendControl } from 'src/app/services/interfaces/setup.interface';
+import { MythService } from 'src/app/services/myth.service';
 import { SetupService } from 'src/app/services/setup.service';
 
 @Component({
@@ -11,26 +11,65 @@ import { SetupService } from 'src/app/services/setup.service';
 })
 export class BackendControlComponent implements OnInit, AfterViewInit {
 
-  beCtrlData: BackendControl = this.setupService.getBackendControl();
   @ViewChild("backendcontrol")
   currentForm!: NgForm;
 
-  constructor(private setupService: SetupService) { }
+  successCount = 0;
+  errorCount = 0;
+  BackendStopCommand = "killall mythbackend";
+  BackendStartCommand = "mythbackend";
+
+  constructor(public setupService: SetupService, private mythService: MythService) { }
 
   ngOnInit(): void {
   }
+
   ngAfterViewInit() {
     this.setupService.setCurrentForm(this.currentForm);
   }
 
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
+  getBackendControl() {
+    this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "BackendStopCommand", Default: "killall mythbackend" })
+      .subscribe({
+        next: data => this.BackendStopCommand = data.String,
+        error: () => this.errorCount++
+      });
+    this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "BackendStartCommand", Default: "mythbackend" })
+      .subscribe({
+        next: data => this.BackendStartCommand = data.String,
+        error: () => this.errorCount++
+      });
   }
 
+  becObserver = {
+    next: (x: any) => {
+      if (x.bool)
+        this.successCount++;
+      else {
+        this.errorCount++;
+        if (this.currentForm)
+          this.currentForm.form.markAsDirty();
+      }
+    },
+    error: (err: any) => {
+      console.error(err);
+      this.errorCount++;
+      if (this.currentForm)
+        this.currentForm.form.markAsDirty();
+    },
+  };
+
   saveForm() {
-    console.log("save form clicked");
-    this.setupService.saveBackendControl(this.currentForm);
+    this.successCount = 0;
+    this.errorCount = 0;
+    this.mythService.PutSetting({
+      HostName: '_GLOBAL_', Key: "BackendStopCommand",
+      Value: this.BackendStopCommand
+    }).subscribe(this.becObserver);
+    this.mythService.PutSetting({
+      HostName: '_GLOBAL_', Key: "BackendStartCommand",
+      Value: this.BackendStartCommand
+    }).subscribe(this.becObserver);
   }
 
 }

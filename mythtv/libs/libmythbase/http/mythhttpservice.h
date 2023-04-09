@@ -77,12 +77,6 @@ class MBASE_PUBLIC V2HttpRedirectException
         typename std::enable_if<std::is_same<T, QString>::value || \
                                 std::is_same<T, QDateTime>::value ||   \
                                 std::is_same<T, QVariantMap>::value || \
-                                std::is_same<T, QVariantList>::value, void>::type \
-        set##Name(T& value) { m_##Name = std::move(value); }       \
-        template <class T>                                         \
-        typename std::enable_if<std::is_same<T, QString>::value || \
-                                std::is_same<T, QDateTime>::value ||   \
-                                std::is_same<T, QVariantMap>::value || \
                                 std::is_same<T, QVariantList>::value,void>::type \
         set##Name(const T& value) { m_##Name = value; }             \
         template <class T>                                          \

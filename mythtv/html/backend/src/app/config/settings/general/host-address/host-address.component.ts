@@ -10,9 +10,8 @@ import { SetupService } from 'src/app/services/setup.service';
     templateUrl: './host-address.component.html',
     styleUrls: ['./host-address.component.css']
 })
-export class HostAddressComponent implements OnInit,  AfterViewInit {
+export class HostAddressComponent implements OnInit, AfterViewInit {
     m_HostAddressData!: HostAddress;
-    m_showHelp: boolean = false;
 
     m_IPsAll!: string[];
     m_IPsV4!: string[];
@@ -22,8 +21,8 @@ export class HostAddressComponent implements OnInit,  AfterViewInit {
     @ViewChild("hostaddress")
     currentForm!: NgForm;
 
-    constructor(private setupService: SetupService,
-                private configService: ConfigService) {
+    constructor(public setupService: SetupService,
+        private configService: ConfigService) {
 
         this.m_HostAddressData = this.setupService.getHostAddressData();
         configService.GetIPAddresses("All").subscribe(result => this.m_IPsAll = result.IPAddresses);
@@ -55,11 +54,6 @@ export class HostAddressComponent implements OnInit,  AfterViewInit {
             else
                 this.m_HostAddressData.MasterServerName = this.m_savedMaster;
         }
-    }
-
-    showHelp() {
-        this.m_showHelp = true;
-        console.log(this);
     }
 
     saveForm() {

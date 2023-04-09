@@ -14,14 +14,15 @@ import { SetupService } from 'src/app/services/setup.service';
 export class SettingsComponent implements OnInit, CanComponentDeactivate {
 
     m_showHelp: boolean = false;
-    currentTab: number= -1;
+    currentTab: number = -1;
     // This allows for up to 16 tabs
-    dirtyMessages : string[] = ["","","","","","","","","","","","","","","",""];
-    forms : any [] = [,,,,,,,,,,,,,,,,];
-    dirtyText = 'settings.unsaved';
-    warningText = 'settings.warning';
+    dirtyMessages: string[] = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""];
+    forms: any[] = [, , , , , , , , , , , , , , , ,];
+    dirtyText = 'settings.common.unsaved';
+    warningText = 'settings.common.warning';
 
-    constructor(private setupService: SetupService,  private translate: TranslateService) {
+    constructor(private setupService: SetupService, private translate: TranslateService) {
+        this.setupService.setCurrentForm(null);
         translate.get(this.dirtyText).subscribe(data => this.dirtyText = data);
         translate.get(this.warningText).subscribe(data => this.warningText = data);
     }
@@ -29,9 +30,9 @@ export class SettingsComponent implements OnInit, CanComponentDeactivate {
     ngOnInit(): void {
     }
 
-    onTabOpen(e: { index: number}) {
+    onTabOpen(e: { index: number }) {
         this.showDirty();
-        if ( typeof this.forms[e.index] == 'undefined')
+        if (typeof this.forms[e.index] == 'undefined')
             this.forms[e.index] = this.setupService.getCurrentForm();
         this.currentTab = e.index;
         console.log("onTabOpen");
@@ -50,7 +51,7 @@ export class SettingsComponent implements OnInit, CanComponentDeactivate {
     }
 
     showDirty() {
-        if ( this.currentTab == -1)
+        if (this.currentTab == -1)
             return;
         if ((<NgForm>this.forms[this.currentTab]).dirty)
             this.dirtyMessages[this.currentTab] = this.dirtyText;
@@ -64,7 +65,7 @@ export class SettingsComponent implements OnInit, CanComponentDeactivate {
 
     confirm(message?: string): Observable<boolean> {
         const confirmation = window.confirm(message);
-            return of(confirmation);
+        return of(confirmation);
     };
 
     canDeactivate(): Observable<boolean> | boolean {

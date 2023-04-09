@@ -1,10 +1,13 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Calendar } from 'primeng/calendar';
-import {TranslateService} from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
 
-import { JobQBackend, JobQCommands } from 'src/app/services/interfaces/setup.interface';
+import { JobQCommands } from 'src/app/services/interfaces/setup.interface';
 import { SetupService } from 'src/app/services/setup.service';
 import { NgForm } from '@angular/forms';
+import { GetSettingResponse } from 'src/app/services/interfaces/myth.interface';
+import { Observable } from 'rxjs';
+import { MythService } from 'src/app/services/myth.service';
 
 interface ddParm {
   name: string,
@@ -19,34 +22,50 @@ interface ddParm {
 
 export class JobqueueBackendComponent implements OnInit, AfterViewInit {
 
-  JobQBData: JobQBackend;
   JobQCmds!: JobQCommands;
-
-  @ViewChild("JobQueueWindowStart")
-  JobQueueWindowStart! : Calendar;
-
-  @ViewChild("JobQueueWindowEnd")
-  JobQueueWindowEnd! : Calendar;
 
   @ViewChild("jobqbackend")
   currentForm!: NgForm;
 
+  successCount = 0;
+  errorCount = 0;
+  JobQueueMaxSimultaneousJobs = 1;
+  JobQueueCheckFrequency = 60;
+  JobQueueWindowStart = new Date(0);
+  @ViewChild("JobQueueWindowStartHT") JobQueueWindowStartHT!: Calendar;
+  JobQueueWindowStartHT$ = new Observable<GetSettingResponse>();
+  JobQueueWindowEnd = new Date(0);
+  @ViewChild("JobQueueWindowEndHT") JobQueueWindowEndHT!: Calendar;
+  JobQueueWindowEndHT$ = new Observable<GetSettingResponse>();
+  JobQueueCPU = "0";
+  JobAllowMetadata = true;
+  JobAllowCommFlag = true;
+  JobAllowTranscode = true;
+  JobAllowPreview = true;
+  JobAllowUserJob1 = false;
+  JobAllowUserJob2 = false;
+  JobAllowUserJob3 = false;
+  JobAllowUserJob4 = false;
+
+
 
   cpuOptions: ddParm[] = [
-    {name: "settings.jobqbackend.cpu_low", code: "0"},
-    {name: "settings.jobqbackend.cpu_med", code: "1"},
-    {name: "settings.jobqbackend.cpu_high", code: "2"}
+    { name: "settings.jobqbackend.cpu_low", code: "0" },
+    { name: "settings.jobqbackend.cpu_med", code: "1" },
+    { name: "settings.jobqbackend.cpu_high", code: "2" }
   ];
 
-  constructor(private setupService: SetupService, private translate: TranslateService) {
-    this.JobQBData = this.setupService.getJobQBackend();
+  constructor(public setupService: SetupService, private translate: TranslateService,
+    private mythService: MythService) {
+    this.getJobQBackend();
+
     // These two calls are a work-around for the bug that
     // the time-picker does not update when the backend value
     // is filled into the Date backing field.
-    this.JobQBData.JobQueueWindowStart$.subscribe
-      ({complete: () => this.JobQueueWindowStart.updateInputfield()});
-    this.JobQBData.JobQueueWindowEnd$.subscribe
-      ({complete: () => this.JobQueueWindowEnd.updateInputfield()});
+    this.JobQueueWindowStartHT$.subscribe
+      ({ complete: () => this.JobQueueWindowStartHT.updateInputfield() });
+    this.JobQueueWindowEndHT$.subscribe
+      ({ complete: () => this.JobQueueWindowEndHT.updateInputfield() });
 
     this.JobQCmds = this.setupService.getJobQCommands();
 
@@ -62,14 +81,162 @@ export class JobqueueBackendComponent implements OnInit, AfterViewInit {
     this.setupService.setCurrentForm(this.currentForm);
   }
 
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
+  getJobQBackend() {
+    this.successCount = 0;
+    this.errorCount = 0
+    this.setupService.parseTime(this.JobQueueWindowStart, "00:00");
+    this.setupService.parseTime(this.JobQueueWindowEnd, "23:59");
+    const hostName = this.setupService.getHostName();
+
+    this.mythService.GetSetting({ HostName: hostName, Key: "JobQueueMaxSimultaneousJobs", Default: "1" })
+      .subscribe({
+        next: data => this.JobQueueMaxSimultaneousJobs = Number(data.String),
+        error: () => this.errorCount++
+      });
+    this.mythService.GetSetting({ HostName: hostName, Key: "JobQueueCheckFrequency", Default: "60" })
+      .subscribe({
+        next: data => this.JobQueueCheckFrequency = Number(data.String),
+        error: () => this.errorCount++
+      });
+    this.JobQueueWindowStartHT$ = this.mythService.GetSetting({
+      HostName: hostName, Key: "JobQueueWindowStart", Default: "00:00"
+    });
+    this.JobQueueWindowStartHT$
+      .subscribe({
+        next: data => this.setupService.parseTime(this.JobQueueWindowStart, data.String),
+        error: () => this.errorCount++
+      });
+    this.JobQueueWindowEndHT$ = this.mythService.GetSetting({
+      HostName: hostName, Key: "JobQueueWindowEnd", Default: "23:59"
+    });
+    this.JobQueueWindowEndHT$
+      .subscribe({
+        next: data => this.setupService.parseTime(this.JobQueueWindowEnd, data.String),
+        error: () => this.errorCount++
+      });
+    this.mythService.GetSetting({ HostName: hostName, Key: "JobQueueCPU", Default: "0" })
+      .subscribe({
+        next: data => this.JobQueueCPU = data.String,
+        error: () => this.errorCount++
+      });
+    this.mythService.GetSetting({ HostName: hostName, Key: "JobAllowMetadata", Default: "1" })
+      .subscribe({
+        next: data => this.JobAllowMetadata = (data.String == '1'),
+        error: () => this.errorCount++
+      });
+    this.mythService.GetSetting({ HostName: hostName, Key: "JobAllowCommFlag", Default: "1" })
+      .subscribe({
+        next: data => this.JobAllowCommFlag = (data.String == '1'),
+        error: () => this.errorCount++
+      });
+    this.mythService.GetSetting({ HostName: hostName, Key: "JobAllowTranscode", Default: "1" })
+      .subscribe({
+        next: data => this.JobAllowTranscode = (data.String == '1'),
+        error: () => this.errorCount++
+      });
+    this.mythService.GetSetting({ HostName: hostName, Key: "JobAllowPreview", Default: "1" })
+      .subscribe({
+        next: data => this.JobAllowPreview = (data.String == '1'),
+        error: () => this.errorCount++
+      });
+    this.mythService.GetSetting({ HostName: hostName, Key: "JobAllowUserJob1", Default: "0" })
+      .subscribe({
+        next: data => this.JobAllowUserJob1 = (data.String == '1'),
+        error: () => this.errorCount++
+      });
+    this.mythService.GetSetting({ HostName: hostName, Key: "JobAllowUserJob2", Default: "0" })
+      .subscribe({
+        next: data => this.JobAllowUserJob2 = (data.String == '1'),
+        error: () => this.errorCount++
+      });
+    this.mythService.GetSetting({ HostName: hostName, Key: "JobAllowUserJob3", Default: "0" })
+      .subscribe({
+        next: data => this.JobAllowUserJob3 = (data.String == '1'),
+        error: () => this.errorCount++
+      });
+    this.mythService.GetSetting({ HostName: hostName, Key: "JobAllowUserJob4", Default: "0" })
+      .subscribe({
+        next: data => this.JobAllowUserJob4 = (data.String == '1'),
+        error: () => this.errorCount++
+      });
   }
 
+  jqbObserver = {
+    next: (x: any) => {
+      if (x.bool)
+        this.successCount++;
+      else {
+        this.errorCount++;
+        if (this.currentForm)
+          this.currentForm.form.markAsDirty();
+      }
+    },
+    error: (err: any) => {
+      console.error(err);
+      this.errorCount++;
+      if (this.currentForm)
+        this.currentForm.form.markAsDirty();
+    },
+  };
+
   saveForm() {
-    console.log("save form clicked");
-    this.setupService.saveJobQBackend(this.currentForm);
+    this.successCount = 0;
+    this.errorCount = 0;
+    const hostName = this.setupService.getHostName();
+
+    this.mythService.PutSetting({
+      HostName: hostName, Key: "JobQueueMaxSimultaneousJobs",
+      Value: String(this.JobQueueMaxSimultaneousJobs)
+    }).subscribe(this.jqbObserver);
+    this.mythService.PutSetting({
+      HostName: hostName, Key: "JobQueueCheckFrequency",
+      Value: String(this.JobQueueCheckFrequency)
+    }).subscribe(this.jqbObserver);
+    this.mythService.PutSetting({
+      HostName: hostName, Key: "JobQueueWindowStart",
+      Value: this.setupService.formatTime(this.JobQueueWindowStart)
+    }).subscribe(this.jqbObserver);
+    this.mythService.PutSetting({
+      HostName: hostName, Key: "JobQueueWindowEnd",
+      Value: this.setupService.formatTime(this.JobQueueWindowEnd)
+    }).subscribe(this.jqbObserver);
+    this.mythService.PutSetting({
+      HostName: hostName, Key: "JobQueueCPU",
+      Value: this.JobQueueCPU
+    }).subscribe(this.jqbObserver);
+    this.mythService.PutSetting({
+      HostName: hostName, Key: "JobAllowMetadata",
+      Value: this.JobAllowMetadata ? "1" : "0"
+    }).subscribe(this.jqbObserver);
+    this.mythService.PutSetting({
+      HostName: hostName, Key: "JobAllowCommFlag",
+      Value: this.JobAllowCommFlag ? "1" : "0"
+    }).subscribe(this.jqbObserver);
+    this.mythService.PutSetting({
+      HostName: hostName, Key: "JobAllowTranscode",
+      Value: this.JobAllowTranscode ? "1" : "0"
+    }).subscribe(this.jqbObserver);
+    this.mythService.PutSetting({
+      HostName: hostName, Key: "JobAllowPreview",
+      Value: this.JobAllowPreview ? "1" : "0"
+    }).subscribe(this.jqbObserver);
+    this.mythService.PutSetting({
+      HostName: hostName, Key: "JobAllowUserJob1",
+      Value: this.JobAllowUserJob1 ? "1" : "0"
+    }).subscribe(this.jqbObserver);
+    this.mythService.PutSetting({
+      HostName: hostName, Key: "JobAllowUserJob2",
+      Value: this.JobAllowUserJob2 ? "1" : "0"
+    }).subscribe(this.jqbObserver);
+    this.mythService.PutSetting({
+      HostName: hostName, Key: "JobAllowUserJob3",
+      Value: this.JobAllowUserJob3 ? "1" : "0"
+    }).subscribe(this.jqbObserver);
+    this.mythService.PutSetting({
+      HostName: hostName, Key: "JobAllowUserJob4",
+      Value: this.JobAllowUserJob4 ? "1" : "0"
+    }).subscribe(this.jqbObserver);
+
   }
 
 }

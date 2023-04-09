@@ -1344,8 +1344,22 @@ V2ProgramList* V2Dvr::GetUpcomingList( int  nStartIndex,
                                         int  nCount,
                                         bool bShowAll,
                                         int  nRecordId,
-                                        int  nRecStatus )
+                                        const QString & RecStatus )
 {
+    int nRecStatus = 0;
+    if (!RecStatus.isEmpty())
+    {
+        // Handle enum name
+        QMetaEnum meta = QMetaEnum::fromType<RecStatus::Type>();
+        bool ok {false};
+        nRecStatus = meta.keyToValue(RecStatus.toLocal8Bit(), &ok);
+        // if enum name not valid try for int nRecStatus
+        if (!ok)
+            nRecStatus = RecStatus.toInt(&ok);
+        // if still not valid use 99999 to trigger an "unknown" response
+        if (!ok)
+            nRecStatus = 99999;
+    }
     auto *pPrograms = new V2ProgramList();
     int size = FillUpcomingList(pPrograms->GetPrograms(), pPrograms,
                                          nStartIndex,
@@ -1904,18 +1918,36 @@ int V2Dvr::RecordedIdForPathname(const QString & pathname)
     return recordedid;
 }
 
-QString V2Dvr::RecStatusToString(int RecStatus)
+QString V2Dvr::RecStatusToString(const QString & RecStatus)
 {
-    auto type = static_cast<RecStatus::Type>(RecStatus);
+    // Handle enum name
+    QMetaEnum meta = QMetaEnum::fromType<RecStatus::Type>();
+    bool ok {false};
+    int value = meta.keyToValue(RecStatus.toLocal8Bit(), &ok);
+    // if enum name not valid try for int value
+    if (!ok)
+        value = RecStatus.toInt(&ok);
+    // if still not valid use 0 to trigger an "unknown" response
+    if (!ok)
+        value = 0;
+    auto type = static_cast<RecStatus::Type>(value);
     return RecStatus::toString(type);
 }
 
-QString V2Dvr::RecStatusToDescription(int RecStatus, int recType,
+QString V2Dvr::RecStatusToDescription(const QString &  RecStatus, int recType,
                                     const QDateTime &StartTime)
 {
-    //if (!StartTime.isValid())
-    //    throw QString("StartTime appears invalid.");
-    auto recstatusType = static_cast<RecStatus::Type>(RecStatus);
+    // Handle enum name
+    QMetaEnum meta = QMetaEnum::fromType<RecStatus::Type>();
+    bool ok {false};
+    int value = meta.keyToValue(RecStatus.toLocal8Bit(), &ok);
+    // if enum name not valid try for int value
+    if (!ok)
+        value = RecStatus.toInt(&ok);
+    // if still not valid use 0 to trigger an "unknown" response
+    if (!ok)
+        value = 0;
+    auto recstatusType = static_cast<RecStatus::Type>(value);
     auto recordingType = static_cast<RecordingType>(recType);
     return RecStatus::toDescription(recstatusType, recordingType, StartTime);
 }

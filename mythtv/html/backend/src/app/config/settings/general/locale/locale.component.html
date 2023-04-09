@@ -11,8 +11,8 @@
                 <p-fieldset class="mb-4 w-full" legend="{{ 'settings.locale.tvformat_label' | translate }}">
                     <div class="form-group field">
                         <label for="tvformat" class="label block">TV Format</label>
-                        <p-dropdown [options]="m_TVFormats" [(ngModel)]="m_LocaleData.TVFormat"
-                            class="w-full mb-2" name="tvformat" aria-describedby="tvformat-help">
+                        <p-dropdown [options]="m_TVFormats" [(ngModel)]="TVFormat" class="w-full mb-2" name="tvformat"
+                            aria-describedby="tvformat-help">
                         </p-dropdown>
                         <small class="block mt-2" id="tvformat-help">
                             {{ 'settings.locale.tvformat_desc' | translate }}
@@ -20,9 +20,10 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="vbiformat" class="label block">{{ 'settings.locale.vbiformat_label' | translate }}</label>
-                        <p-dropdown [options]="m_vbiFormats" [(ngModel)]="m_LocaleData.VbiFormat"
-                            class="mb-5  w-full" name="vbiformat" aria-describedby="vbiformat-help">
+                        <label for="vbiformat" class="label block">{{ 'settings.locale.vbiformat_label' | translate
+                            }}</label>
+                        <p-dropdown [options]="m_vbiFormats" [(ngModel)]="VbiFormat" class="mb-5  w-full"
+                            name="vbiformat" aria-describedby="vbiformat-help">
                         </p-dropdown>
                         <small class="block mt-2" id="vbiformat-help">
                             {{ 'settings.locale.vbiformat_desc' | translate }}
@@ -32,9 +33,10 @@
 
                 <p-fieldset class="mb-4 w-full" legend="Frequency Tables">
                     <div class="form-group field">
-                        <label for="freqtable" class="label block">{{ 'settings.locale.channfreq_label' | translate }}</label>
-                        <p-dropdown [options]="m_FreqTables" [(ngModel)]="m_LocaleData.FreqTable"
-                            class="mb-2 w-full" name="freqtable">
+                        <label for="freqtable" class="label block">{{ 'settings.locale.channfreq_label' | translate
+                            }}</label>
+                        <p-dropdown [options]="m_FreqTables" [(ngModel)]="FreqTable" class="mb-2 w-full"
+                            name="freqtable">
                         </p-dropdown>
                         <small class="block pt-2" id="freqtable-help">
                             {{ 'settings.locale.channfreq_desc' | translate }}
@@ -42,24 +44,22 @@
                     </div>
                 </p-fieldset>
             </div>
-            </ng-template>
+        </ng-template>
 
-            <ng-template pTemplate="footer">
-                <div class="grid nogutter">
-                    <div class="col-12">
-                        <p-message *ngIf="this.m_LocaleData.successCount > 0 && this.m_LocaleData.errorCount == 0 && !locale.dirty"
-                            severity="success" text="{{ 'common.savesuccess' | translate }}" ></p-message>
-                        <p-message *ngIf="this.m_LocaleData.errorCount > 0"
-                            severity="error" text="{{ 'common.networkfail' | translate }}" ></p-message>
-                    </div>
-                    <p-button class="col pr-1" label="{{'common.save' | translate}}"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); locale.form.markAsPristine()"
-                                     [disabled]="(!locale.dirty || false)"></p-button>
-                    <p-button class="col-2 help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()"
-                        icon="pi pi-info-circle" styleClass="p-button-info"></p-button>
+        <ng-template pTemplate="footer">
+            <div class="grid nogutter">
+                <div class="col-12">
+                    <p-message *ngIf="this.successCount > 0 && this.errorCount == 0 && !locale.dirty" severity="success"
+                        text="{{ 'common.savesuccess' | translate }}"></p-message>
+                    <p-message *ngIf="this.errorCount > 0" severity="error"
+                        text="{{ 'common.networkfail' | translate }}"></p-message>
                 </div>
-            </ng-template>
+                <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
+                    (onClick)="saveForm(); locale.form.markAsPristine()"
+                    [disabled]="!locale.dirty || setupService.schedulingEnabled"></p-button>
+            </div>
+        </ng-template>
 
     </p-card>
 
 </form>
-

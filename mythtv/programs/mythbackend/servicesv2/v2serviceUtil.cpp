@@ -1,12 +1,24 @@
+// Standard UNIX C headers
+#include <unistd.h>
+#include <fcntl.h>
+#if defined(__FreeBSD__) || defined(__APPLE__) || defined(__OpenBSD__) || defined(_WIN32)
+#include <sys/types.h>
+#else
+#include <sys/sysmacros.h>
+#endif
+#include <sys/stat.h>
+
 // MythTV
 #include "libmythbase/mythscheduler.h"
 #include "libmythbase/programinfo.h"
+#include "libmythbase/programtypes.h"
 #include "libmythbase/recordingtypes.h"
 #include "libmythmetadata/videoutils.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/channelgroup.h"
 #include "libmythtv/channelinfo.h"
 #include "libmythtv/channelutil.h"
+#include "libmythtv/recorders/firewiredevice.h"
 #include "libmythtv/recordinginfo.h"
 #include "libmythtv/tv_rec.h"
 
@@ -104,6 +116,7 @@ void V2FillProgramInfo( V2Program *pProgram,
 
         pRecording->setRecordedId ( pRecInfo.GetRecordingID()     );
         pRecording->setStatus  ( pRecInfo.GetRecordingStatus()    );
+        pRecording->setStatusName  ( pRecInfo.GetRecordingStatus()    );
         pRecording->setPriority( pRecInfo.GetRecordingPriority()  );
         pRecording->setStartTs ( pRecInfo.GetRecordingStartTime() );
         pRecording->setEndTs   ( pRecInfo.GetRecordingEndTime()   );
@@ -193,6 +206,9 @@ bool V2FillChannelInfo( V2ChannelInfo *pChannel,
         pChannel->setXMLTVID(channelInfo.m_xmltvId);
         pChannel->setDefaultAuth(channelInfo.m_defaultAuthority);
         pChannel->setServiceType(channelInfo.m_serviceType);
+        pChannel->setRecPriority(channelInfo.m_recPriority);
+        pChannel->setTimeOffset(channelInfo.m_tmOffset);
+        pChannel->setCommMethod(channelInfo.m_commMethod);
 
         QList<uint> groupIds = channelInfo.GetGroupIds();
         QString sGroupIds;
@@ -872,4 +888,129 @@ DBCredits * V2jsonCastToCredits(const QJsonObject &cast)
     }
 
     return credits;
+}
+
+// Code copied from class VideoDevice
+V2CaptureDeviceList* getV4l2List  ( const QRegularExpression &driver, const QString & cardType )
+{
+    auto* pList = new V2CaptureDeviceList();
+    uint minor_min = 0;
+    uint minor_max = 15;
+    QString card  = QString();
+
+    // /dev/v4l/video*
+    QDir dev("/dev/v4l", "video*", QDir::Name, QDir::System);
+    fillSelectionsFromDir(dev, minor_min, minor_max,
+                            card, driver, false, pList, cardType);
+
+    // /dev/video*
+    dev.setPath("/dev");
+    fillSelectionsFromDir(dev, minor_min, minor_max,
+                            card, driver, false, pList, cardType);
+
+    // /dev/dtv/video*
+    dev.setPath("/dev/dtv");
+    fillSelectionsFromDir(dev, minor_min, minor_max,
+                            card, driver, false, pList, cardType);
+
+    // /dev/dtv*
+    dev.setPath("/dev");
+    dev.setNameFilters(QStringList("dtv*"));
+    fillSelectionsFromDir(dev, minor_min, minor_max,
+                            card, driver, false, pList, cardType);
+
+    return pList;
+}
+
+uint fillSelectionsFromDir(const QDir& dir,
+                            uint minor_min, uint minor_max,
+                            const QString& card, const QRegularExpression& driver,
+                            bool allow_duplicates, V2CaptureDeviceList *pList,
+                            const QString & cardType)
+{
+    uint cnt = 0;
+    QMap<uint, uint> minorlist;
+    QFileInfoList entries = dir.entryInfoList();
+    for (const auto & fi : qAsConst(entries))
+    {
+        struct stat st {};
+        QString filepath = fi.absoluteFilePath();
+        int err = lstat(filepath.toLocal8Bit().constData(), &st);
+
+        if (err)
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Could not stat file: %1").arg(filepath));
+            continue;
+        }
+
+        // is this is a character device?
+        if (!S_ISCHR(st.st_mode))
+            continue;
+
+        // is this device is in our minor range?
+        uint minor_num = minor(st.st_rdev);
+        if (minor_min > minor_num || minor_max < minor_num)
+            continue;
+
+        // ignore duplicates if allow_duplicates not set
+        if (!allow_duplicates && minorlist[minor_num])
+            continue;
+
+        // if the driver returns any info add this device to our list
+        QByteArray tmp = filepath.toLatin1();
+        int videofd = open(tmp.constData(), O_RDWR);
+        if (videofd >= 0)
+        {
+            QString card_name;
+            QString driver_name;
+            if (CardUtil::GetV4LInfo(videofd, card_name, driver_name))
+            {
+                auto match = driver.match(driver_name);
+                if ((!driver.pattern().isEmpty() || match.hasMatch()) &&
+                    (card.isEmpty() || (card_name == card)))
+                {
+                    auto* pDev = pList->AddCaptureDevice();
+                    pDev->setCardType (cardType);
+                    pDev->setVideoDevice (filepath);
+                    pDev->setFrontendName(card_name);
+                    QStringList inputs;
+                    CardUtil::GetDeviceInputNames(filepath, cardType, inputs);
+                    pDev->setInputNames(inputs);
+                    inputs = CardUtil::ProbeAudioInputs(filepath);
+                    pDev->setAudioDevices(inputs);
+                    if (cardType == "HDPVR")
+                        pDev->setChannelTimeout ( 15000 );
+                    cnt++;
+                }
+            }
+            close(videofd);
+        }
+        // add to list of minors discovered to avoid duplicates
+        minorlist[minor_num] = 1;
+    }
+
+    return cnt;
+}
+
+V2CaptureDeviceList* getFirewireList (const QString & cardType)
+{
+    auto* pList = new V2CaptureDeviceList();
+
+#ifdef USING_FIREWIRE
+    std::vector<AVCInfo> list = FirewireDevice::GetSTBList();
+    for (auto & info : list)
+    {
+        auto* pDev = pList->AddCaptureDevice();
+        pDev->setCardType (cardType);
+        QString guid = info.GetGUIDString();
+        pDev->setVideoDevice (guid);
+        QString model = FirewireDevice::GetModelName(info.m_vendorid, info.m_modelid);
+        pDev->setFirewireModel(model);
+        pDev->setDescription(info.m_product_name);
+        pDev->setSignalTimeout ( 2000 );
+        pDev->setChannelTimeout ( 9000 );
+    }
+#endif // USING_FIREWIRE
+    return pList;
 }

@@ -44,6 +44,7 @@ class basetzinfo( _pytzinfo ):
 
         index = self.__last
         direction = 0
+        oob_range = False
         while True:
             if dt < self._ranges[index][0]:
                 if direction == 1:
@@ -66,6 +67,7 @@ class basetzinfo( _pytzinfo ):
             if index >= len(self._ranges):
                 # out of bounds future, use final transition
                 index = len(self._ranges) - 1
+                oob_range = True
                 break
             elif index < 0:
                 # out of bounds past, undefined time frame
@@ -73,6 +75,9 @@ class basetzinfo( _pytzinfo ):
                                   self.tzname(), dt)
 
         self.__last = index
+        if oob_range:
+            # out of bounds future, use final transition
+            return self._transitions[self._ranges[index][2] + 1]
         return self._transitions[self._ranges[index][2]]
 
     def _get_transition_empty(self, dt=None):

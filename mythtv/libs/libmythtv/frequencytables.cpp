@@ -332,7 +332,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
 {
     // United Kingdom
     fmap["dvbt_ofdm_gb0"] = new FrequencyTable(
-        474000000, 850000000, 8000000, "Channel %1", 21,
+        474000000, 698000000, 8000000, "Channel %1", 21,
         DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,

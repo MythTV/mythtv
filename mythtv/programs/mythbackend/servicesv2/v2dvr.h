@@ -203,7 +203,7 @@ class V2Dvr : public MythHTTPService
                                             int              Count,
                                             bool             ShowAll,
                                             int              RecordId,
-                                            int              RecStatus );
+                                            const QString &  RecStatus );
 
     static V2EncoderList*    GetEncoderList      ( );
 
@@ -339,9 +339,9 @@ class V2Dvr : public MythHTTPService
 
     static int        RecordedIdForPathname( const QString   &Pathname  );
 
-    static QString    RecStatusToString    ( int              RecStatus );
+    static QString    RecStatusToString    ( const QString  & RecStatus );
 
-    static QString    RecStatusToDescription ( int            RecStatus,
+    static QString    RecStatusToDescription (const QString  & RecStatus,
                                                int            RecType,
                                                const QDateTime &StartTime );
 

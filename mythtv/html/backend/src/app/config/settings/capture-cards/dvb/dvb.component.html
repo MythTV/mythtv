@@ -25,7 +25,7 @@
                         </div>
 
                         <small class="block">
-                            {{ 'settings.capture.dvb.device_desc' | translate }}
+                            {{ 'settings.capture.device_desc' | translate }}
                         </small>
                     </div>
 
@@ -36,7 +36,7 @@
                             [(ngModel)]="this.currentDevice.FrontendName" name="FrontendName" disabled="true"
                             #FrontendName="ngModel" class="mb-2 form-control w-full" />
                         <small class="block">
-                            {{ 'settings.capture.dvb.frontend_desc' | translate }}
+                            {{ 'settings.capture.frontend_desc' | translate }}
                         </small>
                     </div>
 
@@ -47,7 +47,7 @@
                             [(ngModel)]="card.InputName" name="InputName" #InputName="ngModel">
                         </p-dropdown>
                         <small class="block">
-                            {{ 'settings.capture.dvb.inputname_desc' | translate }}
+                            {{ 'settings.capture.inputname_desc' | translate }}
                         </small>
                     </div>
 
@@ -138,12 +138,13 @@
                     </p-dialog>
                     &nbsp;
                     <p-button label="{{ 'settings.capture.dvb.satellite_connect' | translate }}" *ngIf="!diseqcTree"
-                        (onClick)="setupRootTrees() ; work.displayConnectDevice = true" icon="pi pi-plus-circle" styleClass="p-button-plain"
+                        (onClick)="setupRootTrees() ; work.displayConnectDevice = true" icon="pi pi-plus-circle"
+                        styleClass="p-button-plain"
                         pTooltip="{{ 'settings.capture.dvb.satellite_connect_tooltip' | translate }}">
                     </p-button>
                     <p-dialog header="{{ 'settings.capture.dvb.satellite_connect' | translate }}"
-                        [(visible)]="work.displayConnectDevice" [modal]="true" [style]="{width: '50vw'}" [draggable]="false"
-                        [resizable]="false">
+                        [(visible)]="work.displayConnectDevice" [modal]="true" [style]="{width: '50vw'}"
+                        [draggable]="false" [resizable]="false">
                         <p>{{ 'settings.capture.dvb.satellite_select' | translate }}</p>
                         <p-listbox [options]="diseqcRootTrees" [(ngModel)]="work.selectedDiseqcTree"
                             optionLabel="Description" name="diseqcRootTrees" optionValue="DiSEqCId"
@@ -165,7 +166,7 @@
                     <p-dialog header="{{ 'settings.capture.dvb.satellite_delete_header' | translate }}"
                         [(visible)]="work.displayDeleteDiseqc" [modal]="true" [style]="{width: '50vw'}"
                         [draggable]="false" [resizable]="false">
-                        <h2>{{ 'settings.ru_sure' | translate }}</h2>
+                        <h2>{{ 'settings.common.ru_sure' | translate }}</h2>
                         <p>{{ 'settings.capture.dvb.satellite_delete_desc' | translate }}</p>
                         <ng-template pTemplate="footer">
                             <p-button icon="pi pi-times-circle" (click)="work.displayDeleteDiseqc=false"
@@ -177,12 +178,13 @@
                     </p-dialog>
                     &nbsp;
                     <p-button label="{{ 'settings.capture.dvb.satellite_disconnect' | translate }}" *ngIf="diseqcTree"
-                        (onClick)="work.displayDisconnect = true" icon="pi pi-minus-circle" styleClass="p-button-warning">
+                        (onClick)="work.displayDisconnect = true" icon="pi pi-minus-circle"
+                        styleClass="p-button-warning">
                     </p-button>
                     <p-dialog header="{{ 'settings.capture.dvb.satellite_disconnect' | translate }}"
-                        [(visible)]="work.displayDisconnect" [modal]="true" [style]="{width: '50vw'}" [draggable]="false"
-                        [resizable]="false">
-                        <h2>{{ 'settings.ru_sure' | translate }}</h2>
+                        [(visible)]="work.displayDisconnect" [modal]="true" [style]="{width: '50vw'}"
+                        [draggable]="false" [resizable]="false">
+                        <h2>{{ 'settings.common.ru_sure' | translate }}</h2>
                         <p>{{ 'settings.capture.dvb.satellite_disconnect_warning' | translate }}</p>
                         <ng-template pTemplate="footer">
                             <p-button icon="pi pi-times-circle" (click)="work.displayDisconnect=false"
@@ -223,9 +225,7 @@
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
                     (onClick)="saveForm(); dvbform.form.markAsPristine()"
-                    [disabled]="(!dvbform.dirty || !card.VideoDevice)"></p-button>
-                <p-button class="col-2 help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()"
-                    icon="pi pi-info-circle" styleClass="p-button-info"></p-button>
+                    [disabled]="!dvbform.dirty || !card.VideoDevice || setupService.schedulingEnabled"></p-button>
             </div>
         </ng-template>
     </p-card>

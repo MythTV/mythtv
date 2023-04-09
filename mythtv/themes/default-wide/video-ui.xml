@@ -992,6 +992,7 @@
 
         <buttonlist name="child_select" from="baseselector">
             <position>430,270</position>
+            <searchposition>430,320</searchposition>
         </buttonlist>
 
         <checkbox name="browse_check" from="basecheckbox">

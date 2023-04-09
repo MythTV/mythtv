@@ -12,33 +12,6 @@
 
 #define DXVA2_E_NEW_VIDEO_DEVICE MAKE_HRESULT(1, 4, 4097)
 
-class MythD3DVertexBuffer
-{
-  public:
-    explicit MythD3DVertexBuffer(IDirect3DTexture9* tex = nullptr) :
-        m_dest(QRect(QPoint(0,0),QSize(0,0))),
-        m_src(QRect(QPoint(0,0),QSize(0,0))), m_texture(tex)
-    {
-    }
-
-    uint32_t           m_color {0xFFFFFFFF};
-    QRect              m_dest;
-    QRect              m_src;
-    IDirect3DTexture9 *m_texture;
-};
-
-class MythD3DSurface
-{
-  public:
-    MythD3DSurface(QSize size = QSize(0,0), D3DFORMAT fmt = D3DFMT_UNKNOWN) :
-        m_size(size), m_fmt(fmt)
-    {
-    }
-
-    QSize     m_size;
-    D3DFORMAT m_fmt;
-};
-
 struct TEXTUREVERTEX
 {
     FLOAT       x;
@@ -176,7 +149,7 @@ IDirect3DDevice9* D3D9Locker::Acquire(void)
 
 void* MythRenderD3D9::ResolveAddress(const char* lib, const char* proc)
 {
-    return QLibrary::resolve(lib, proc);
+    return (void *)QLibrary::resolve(lib, proc);
 }
 
 MythRenderD3D9::~MythRenderD3D9(void)
@@ -925,7 +898,7 @@ uint8_t* MythRenderD3D9::GetBuffer(IDirect3DSurface9* surface, uint &pitch)
     {
         LOG(VB_GENERAL, LOG_ERR, D3DLOC + "Failed to lock picture surface.");
         m_lock.unlock();
-        return false;
+        return nullptr;
     }
 
     pitch = d3drect.Pitch;
@@ -951,7 +924,7 @@ IDirect3DVertexBuffer9* MythRenderD3D9::CreateVertexBuffer(IDirect3DTexture9* te
         return nullptr;
 
     if (texture && !m_textures.contains(texture))
-        return false;
+        return nullptr;
 
     IDirect3DVertexBuffer9* temp_vbuf = nullptr;
     HRESULT hr = dev->CreateVertexBuffer(
@@ -962,7 +935,7 @@ IDirect3DVertexBuffer9* MythRenderD3D9::CreateVertexBuffer(IDirect3DTexture9* te
     if (FAILED(hr))
     {
         LOG(VB_GENERAL, LOG_ERR, D3DLOC + "Failed to create vertex buffer");
-        return false;
+        return nullptr;
     }
 
     m_vertexbuffers[temp_vbuf] = MythD3DVertexBuffer(texture);

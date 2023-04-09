@@ -112,7 +112,6 @@ private:
     int32_t   m_ySize              {0};
     int32_t   m_cSize              {0};
     int16_t  *m_old                {nullptr};
-    int16_t  *m_oldStart           {nullptr};
     int       m_keyCount           {0};
 
     int       m_width              {0};

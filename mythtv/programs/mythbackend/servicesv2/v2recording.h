@@ -26,7 +26,8 @@ class V2RecordingInfo : public QObject
     Q_CLASSINFO( "Version", "1.3" );
 
     SERVICE_PROPERTY2( uint                   , RecordedId  )
-    SERVICE_PROPERTY2( RecStatus::Type        , Status      )
+    SERVICE_PROPERTY2( int                    , Status      )
+    SERVICE_PROPERTY2( RecStatus::Type        , StatusName  )
     SERVICE_PROPERTY2( int                    , Priority    )
     SERVICE_PROPERTY2( QDateTime              , StartTs     )
     SERVICE_PROPERTY2( QDateTime              , EndTs       )
@@ -63,6 +64,7 @@ class V2RecordingInfo : public QObject
         {
             m_RecordedId      = src->m_RecordedId       ;
             m_Status          = src->m_Status           ;
+            m_StatusName      = src->m_StatusName       ;
             m_Priority        = src->m_Priority         ;
             m_StartTs         = src->m_StartTs          ;
             m_EndTs           = src->m_EndTs            ;
