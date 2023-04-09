@@ -68,6 +68,7 @@ class VideoDialog : public MythScreenType
 
   private slots:
     void UpdatePosition();
+    void UpdateVisible(MythUIButtonListItem *item);
     void UpdateText(MythUIButtonListItem *item);
     void handleSelect(MythUIButtonListItem *item);
     void SetCurrentNode(MythGenericTree *node);
@@ -184,6 +185,7 @@ class VideoDialog : public MythScreenType
 
     void OnVideoImageSetDone(VideoMetadata *metadata);
     void OnVideoSearchDone(MetadataLookup *lookup);
+    void OnPlaybackStopped();
 
   private:
     MythDialogBox    *m_menuPopup          {nullptr};
@@ -211,6 +213,7 @@ class VideoDialog : public MythScreenType
     MythUIStateType  *m_userRatingState    {nullptr};
     MythUIStateType  *m_watchedState       {nullptr};
     MythUIStateType  *m_studioState        {nullptr};
+    MythUIStateType  *m_bookmarkState      {nullptr};
 
     MetadataFactory *m_metadataFactory     {nullptr};
 
