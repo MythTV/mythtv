@@ -49,11 +49,11 @@ void InitializeMythDirs(void)
 
     // Turn into Canonical Path for consistent compares
 
-    QDir sDir(qgetenv("ProgramData") + "\\mythtv\\");
+    QDir sDir(qgetenv("ProgramData") + "/mythtv/");
     sharedir = sDir.canonicalPath() + "/";
 
     if (confdir.isEmpty())
-        confdir  = qgetenv( "LOCALAPPDATA" ) + "\\mythtv";
+        confdir  = qgetenv( "LOCALAPPDATA" ) + "/mythtv";
 
   #if 0
     // The following code only works for Qt 5.0 and above, but it may
