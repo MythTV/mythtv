@@ -211,6 +211,7 @@ void InitializeMythDirs(void)
     LOG(VB_GENERAL, LOG_DEBUG, "pluginsdir        = "+ pluginsdir       );
     LOG(VB_GENERAL, LOG_DEBUG, "translationsdir   = "+ translationsdir  );
     LOG(VB_GENERAL, LOG_DEBUG, "filtersdir        = "+ filtersdir       );
+    LOG(VB_GENERAL, LOG_DEBUG, "confdir           = "+ confdir          );
     LOG(VB_GENERAL, LOG_DEBUG, "cachedir          = "+ cachedir         );
     LOG(VB_GENERAL, LOG_DEBUG, "remotecachedir    = "+ remotecachedir   );
     LOG(VB_GENERAL, LOG_DEBUG, "themebasecachedir = "+ themebasecachedir);
