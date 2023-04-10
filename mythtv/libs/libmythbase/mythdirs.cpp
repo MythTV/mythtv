@@ -123,6 +123,7 @@ void InitializeMythDirs(void)
 
     if (sharedir.isEmpty())
         sharedir = confdir;
+    sharedir = QDir(sharedir).canonicalPath() + "/";
 
 #elif defined(Q_OS_ANDROID)
     if (installprefix.isEmpty())
