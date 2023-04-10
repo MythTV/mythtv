@@ -5,9 +5,11 @@
 #include <QDir>
 #include <QCoreApplication>
 
-#ifdef Q_OS_ANDROID
+#if defined(Q_OS_ANDROID)
 #include <QStandardPaths>
 #include <sys/statfs.h>
+#elif defined(Q_OS_WIN)
+#include <QStandardPaths>
 #endif
 
 #include "mythdirs.h"
@@ -66,18 +68,38 @@ void InitializeMythDirs(void)
     qApp->setOrganizationName( "mythtv" );
 
     QStringList lstPaths = QStandardPaths::standardLocations(
-                                        QStandardPaths::DataLocation);
+                                        QStandardPaths::AppDataLocation);
 
     // Remove AppName from end of path
 
+    QString sAppName = qApp->applicationName();
     if (!lstPaths.isEmpty())
     {
-        QString sAppName = qApp->applicationName();
+        for (auto &path : lstPaths)
+        {
+            if (path.endsWith(sAppName))
+                path = path.left(path.length() - sAppName.length());
+            LOG(VB_GENERAL, LOG_DEBUG, QString("app data location: %1 (%2)")
+                .arg(path).arg(QDir(path).exists() ? "exists" : "doesn't exist"));
+        }
 
         sharedir = lstPaths.last();
 
         if (sharedir.endsWith( sAppName ))
             sharedir = sharedir.left( sharedir.length() - sAppName.length());
+    }
+
+    lstPaths = QStandardPaths::standardLocations(
+                                        QStandardPaths::AppConfigLocation);
+    if (!lstPaths.isEmpty())
+    {
+        for (auto &path : lstPaths)
+        {
+            if (path.endsWith(sAppName))
+                path = path.left(path.length() - sAppName.length());
+            LOG(VB_GENERAL, LOG_DEBUG, QString("app config location: %1 (%2)")
+                .arg(path).arg(QDir(path).exists() ? "exists" : "doesn't exist"));
+        }
 
         // Only use if user didn't override with env variable.
         if (confdir.isEmpty())
