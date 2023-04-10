@@ -2630,8 +2630,8 @@ static HostCheckBoxSetting *SmoothTransitions()
 
     gc->setValue(true);
 
-    gc->setHelpText(AppearanceSettings::tr("Enable smooth transitions with fade-in and fade-out of menu pages. "
-                                           "Disabling this can make the GUI respond faster."));
+    gc->setHelpText(AppearanceSettings::tr("Enable smooth transitions with fade-in and fade-out of menu pages and enable GUI animations. "
+                                           "Disabling this can make the GUI respond faster especially on low-powered machines."));
     return gc;
 }
 
