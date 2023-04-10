@@ -685,12 +685,10 @@ void RecordingInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)
     query.prepare("UPDATE recorded"
                   " SET recgroup = :RECGROUP, "
                   "     recgroupid = :RECGROUPID "
-                  " WHERE chanid = :CHANID"
-                  " AND starttime = :START ;");
+                  " WHERE recordedid = :RECORDEDID");
     query.bindValue(":RECGROUP", null_to_empty(newrecgroup));
     query.bindValue(":RECGROUPID", newrecgroupid);
-    query.bindValue(":START", m_recStartTs);
-    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":RECORDEDID", m_recordedId);
 
     if (!query.exec())
         MythDB::DBError("RecGroup update", query);
