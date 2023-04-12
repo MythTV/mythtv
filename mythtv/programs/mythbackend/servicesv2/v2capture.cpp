@@ -719,8 +719,8 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
             auto word = it.split(' ');
             // VideoDevice is set as deviceid:tunertype:tunernum
             if (word.size() == 5) {
-                pDev->setVideoDevice(QString("%1:%2:%3").arg(word[0]).arg(word[4]).arg(word[3]));
-                pDev->setVideoDevicePrompt(QString("%1, %2, Tuner #%3").arg(word[0]).arg(word[4]).arg(word[3]));
+                pDev->setVideoDevice(QString("%1:%2:%3").arg(word[0], word[4], word[3]));
+                pDev->setVideoDevicePrompt(QString("%1, %2, Tuner #%3").arg(word[0], word[4], word[3]));
                 pDev->setDescription(word[1]);
                 pDev->setIPAddress(word[2]);
                 pDev->setTunerType(word[4]);
@@ -737,7 +737,7 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
             // "deviceid ip tunernum tunertype"
             auto word = it.split(" ");
             if (word.size() == 4) {
-                QString device = QString("%1-%2-%3").arg(word[0]).arg(word[2]).arg(word[3]);
+                QString device = QString("%1-%2-%3").arg(word[0], word[2], word[3]);
                 pDev->setVideoDevice(device);
                 pDev->setVideoDevicePrompt(device);
                 QString desc = CardUtil::GetVBoxdesc(word[0], word[1], word[2], word[3]);
