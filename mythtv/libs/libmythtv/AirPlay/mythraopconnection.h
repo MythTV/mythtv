@@ -142,6 +142,12 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     AES_KEY         m_aesKey              {};
     static EVP_PKEY      *g_devPrivKey;
     std::vector<uint8_t>  m_sessionKey;
+#if OPENSSL_VERSION_NUMBER < 0x030000000L
+    const EVP_CIPHER     *m_cipher        {nullptr};
+#else
+    EVP_CIPHER           *m_cipher        {nullptr};
+#endif
+    EVP_CIPHER_CTX       *m_cctx          {nullptr};
     static RSA     *g_rsa;
     static QString  g_rsaLastError;
     // audio out

@@ -82,6 +82,12 @@ MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
 {
     m_id = GetNotificationCenter()->Register(this);
     memset(&m_aesKey, 0, sizeof(m_aesKey));
+#if OPENSSL_VERSION_NUMBER < 0x030000000L
+    m_cipher = EVP_aes_128_cbc();
+#else
+    m_cipher = EVP_CIPHER_fetch(nullptr, "AES-128-CBC", nullptr);
+#endif
+    m_cctx = EVP_CIPHER_CTX_new();
 }
 
 MythRAOPConnection::~MythRAOPConnection()
@@ -124,6 +130,13 @@ MythRAOPConnection::~MythRAOPConnection()
         if (nc)
             nc->UnRegister(this, m_id);
     }
+
+    EVP_CIPHER_CTX_free(m_cctx);
+    m_cctx = nullptr;
+#if OPENSSL_VERSION_NUMBER >= 0x030000000L
+    EVP_CIPHER_free(m_cipher);
+#endif
+    m_cipher = nullptr;
 }
 
 void MythRAOPConnection::CleanUp(void)
@@ -649,12 +662,41 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
         return -1;
 
     int aeslen = len & ~0xf;
-    std::array<uint8_t,16> iv {};
+    int outlen1 {0};
+    int outlen2 {0};
     std::array<uint8_t,MAX_PACKET_SIZE> decrypted_data {};
-    std::copy(m_aesIV.cbegin(), m_aesIV.cbegin() + iv.size(), iv.data());
-    AES_cbc_encrypt((const unsigned char *)data_in,
-                    decrypted_data.data(), aeslen,
-                    &m_aesKey, iv.data(), AES_DECRYPT);
+    EVP_CIPHER_CTX_reset(m_cctx);
+    EVP_CIPHER_CTX_set_padding(m_cctx, 0);
+    if (
+#if OPENSSL_VERSION_NUMBER < 0x030000000L
+        // Debian < 12, Fedora < 36, RHEL < 9, SuSe 15, Ubuntu < 2204
+        EVP_DecryptInit_ex(m_cctx, m_cipher, nullptr, m_sessionKey.data(),
+                           reinterpret_cast<const uint8_t *>(m_aesIV.data()))
+#else
+        EVP_DecryptInit_ex2(m_cctx, m_cipher, m_sessionKey.data(),
+                            reinterpret_cast<const uint8_t *>(m_aesIV.data()),
+                            nullptr)
+#endif
+        != 1)
+    {
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+            QString("EVP_DecryptInit_ex failed. (%1)")
+            .arg(ERR_error_string(ERR_get_error(), nullptr)));
+    }
+    else if (EVP_DecryptUpdate(m_cctx, decrypted_data.data(), &outlen1,
+                               reinterpret_cast<const uint8_t *>(data_in),
+                               aeslen) != 1)
+    {
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+            QString("EVP_DecryptUpdate failed. (%1)")
+            .arg(ERR_error_string(ERR_get_error(), nullptr)));
+    }
+    else if (EVP_DecryptFinal_ex(m_cctx, decrypted_data.data() + outlen1, &outlen2) != 1)
+    {
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+            QString("EVP_DecryptFinal_ex failed. (%1)")
+            .arg(ERR_error_string(ERR_get_error(), nullptr)));
+    }
     std::copy(data_in + aeslen, data_in + len,
               decrypted_data.data() + aeslen);
 
