@@ -36,7 +36,6 @@
 #define LOC QString("RAOP Conn: ")
 static constexpr size_t MAX_PACKET_SIZE { 2048 };
 
-RSA *MythRAOPConnection::g_rsa = nullptr;
 EVP_PKEY *MythRAOPConnection::g_devPrivKey = nullptr;
 QString MythRAOPConnection::g_rsaLastError;
 
@@ -81,7 +80,6 @@ MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
     m_dataPort(port)
 {
     m_id = GetNotificationCenter()->Register(this);
-    memset(&m_aesKey, 0, sizeof(m_aesKey));
 #if OPENSSL_VERSION_NUMBER < 0x030000000L
     m_cipher = EVP_aes_128_cbc();
 #else
@@ -1188,8 +1186,6 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                         // SUCCESS
                         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
                             "Successfully decrypted AES key from RSA.");
-                        AES_set_decrypt_key(m_sessionKey.data(),
-                                            128, &m_aesKey);
                     }
                     else
                     {
@@ -1586,13 +1582,13 @@ void MythRAOPConnection::FinishResponse(RaopNetStream *stream, QTcpSocket *socke
  * The RSA key is resident in memory for the entire duration of the application
  * as such RSA_free is never called on it.
  */
-RSA *MythRAOPConnection::LoadKey(void)
+bool MythRAOPConnection::LoadKey(void)
 {
     static QMutex s_lock;
     QMutexLocker locker(&s_lock);
 
-    if (g_rsa)
-        return g_rsa;
+    if (g_devPrivKey)
+        return true;
 
     QString sName( "/RAOPKey.rsa" );
     FILE *file = fopen(GetConfDir().toUtf8() + sName.toUtf8(), "rb");
@@ -1600,9 +1596,8 @@ RSA *MythRAOPConnection::LoadKey(void)
     if ( !file )
     {
         g_rsaLastError = tr("Failed to read key from: %1").arg(GetConfDir() + sName);
-        g_rsa = nullptr;
         LOG(VB_PLAYBACK, LOG_ERR, LOC + g_rsaLastError);
-        return nullptr;
+        return false;
     }
 
     g_devPrivKey = PEM_read_PrivateKey(file, nullptr, nullptr, nullptr);
@@ -1617,20 +1612,17 @@ RSA *MythRAOPConnection::LoadKey(void)
             g_rsaLastError = tr("Key is not a RSA private key.");
             EVP_PKEY_free(g_devPrivKey);
             g_devPrivKey = nullptr;
-            g_rsa = nullptr;
             LOG(VB_PLAYBACK, LOG_ERR, LOC + g_rsaLastError);
-            return nullptr;
+            return false;
         }
         g_rsaLastError = "";
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "Loaded RSA private key");
-        g_rsa = EVP_PKEY_get1_RSA(g_devPrivKey);
-        return g_rsa;
+        return true;
     }
 
     g_rsaLastError = tr("Failed to load RSA private key.");
-    g_rsa = nullptr;
     LOG(VB_PLAYBACK, LOG_ERR, LOC + g_rsaLastError);
-    return nullptr;
+    return false;
 }
 
 RawHash MythRAOPConnection::FindTags(const QStringList &lines)
