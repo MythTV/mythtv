@@ -17,6 +17,11 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/programinfo.h"
 
+// Decode a text string according to
+//   Draft ETSI EN 300 468 V1.16.1 (2019-05)
+//   Digital Video Broadcasting (DVB);
+//   Specification for Service Information (SI) in DVB systems
+//   Annex A (normative): Coding of text characters
 
 static QString decode_iso6937(const unsigned char *buf, uint length)
 {
@@ -150,6 +155,12 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
         LOG(VB_SIPARSER, LOG_ERR,
             "dvb_decode_text: Multi-byte coded text is not yet supported.");
         return "";
+    }
+
+    // UTF-8 encoding of ISO/IEC 10646
+    if (src[0] == 0x15)
+    {
+        return decode_text(src, raw_length);
     }
 
     // if a override encoding is specified and the default ISO 6937 encoding
