@@ -32,12 +32,18 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
         DisplayPauseFrame();
     });
 
-    // Seeking has finished
+    // Seeking has finished; remove slow seek user feedback window
     connect(this, &MythPlayerUI::SeekingComplete, [&]()
     {
         m_osdLock.lock();
         m_osd.HideWindow(OSD_WIN_MESSAGE);
         m_osdLock.unlock();
+    });
+
+    // Seeking has finished; update position on OSD
+    connect(this, &MythPlayerUI::SeekingDone, [&]()
+    {
+        UpdateOSDPosition();
     });
 
     // Setup OSD debug

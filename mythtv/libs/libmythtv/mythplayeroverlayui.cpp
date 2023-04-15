@@ -243,6 +243,13 @@ void MythPlayerOverlayUI::UpdateSliderInfo(osdInfo &Info, bool PaddedFields)
                 m_playerCtx->m_playingRecStart.addSecs(static_cast<qint64>(secsplayed.count()));
             Info.text[relPrefix + "recordedtime"] = recordedtime.toLocalTime().toString(dtformat);
         }
+
+        if (i == 0)
+        {
+            LOG(VB_OSD, LOG_INFO, LOC +
+                QString(" playbackLen:%1").arg(playbackLen.count()) +
+                QString(" secsplayed:%1").arg(secsplayed.count()));
+        }
     }
 }
 

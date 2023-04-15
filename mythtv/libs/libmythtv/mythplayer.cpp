@@ -1664,6 +1664,8 @@ void MythPlayer::WaitForSeek(uint64_t frame, uint64_t seeksnap_wanted)
     }
     if (needclear)
         emit SeekingComplete();
+
+    emit SeekingDone();
 }
 
 /** \fn MythPlayer::ClearAfterSeek(bool)
