@@ -23,14 +23,15 @@ def _donothing(*args, **kwargs):
     pass
 
 class DummyLogger( LOGLEVEL, LOGMASK, LOGFACILITY ):
-    def __init__(self, module=None): pass
+    def __init__(self, module=None, db=None): pass
     def logTB(self, mask): pass
     def log(self, mask, level, message, detail=None): pass
     def __call__(self, mask, level, message, detail=None): pass
 
 class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
     """
-    MythLog(module='pythonbindings', lstr=None, lbit=None) -> logging object
+    MythLog(module='pythonbindings', lstr=None, lbit=None, \
+                    db=None) -> logging object
 
     'module' defines the source of the message in the logs
     'lstr' and 'lbit' define the message filter
@@ -251,8 +252,9 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
         cls._initlogger()
         return super(MythLog, cls).__new__(cls)
 
-    def __init__(self, module='pythonbindings'):
+    def __init__(self, module='pythonbindings', db=None):
         self.module = module
+        self.db = db
 
     @classmethod
     def _setlevel(cls, level):
