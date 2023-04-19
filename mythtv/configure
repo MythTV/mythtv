@@ -7524,6 +7524,7 @@ cp_if_changed $TMPPRO settings2.pro
 
 echo "Creating libs/libmythbase/mythversion.h"
 sed -e "s/@MYTHTV_BINARY_VERSION@/${MYTHTV_BINARY_VERSION}/g" \
+    -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
     libs/libmythbase/mythversion.h.in > $TMPH
 cp_if_changed $TMPH libs/libmythbase/mythversion.h
 
