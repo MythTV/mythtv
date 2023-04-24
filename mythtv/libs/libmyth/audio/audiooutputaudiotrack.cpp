@@ -1,5 +1,13 @@
+#include <QtGlobal>
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>
+#else
+#include <QJniEnvironment>
+#include <QJniObject>
+#define QAndroidJniEnvironment QJniEnvironment
+#define QAndroidJniObject QJniObject
+#endif
 #include <android/log.h>
 
 #include "libmythbase/mythlogging.h"

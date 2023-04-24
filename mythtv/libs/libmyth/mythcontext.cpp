@@ -17,7 +17,14 @@
 #include <QMutex>
 #include <QTcpSocket>
 #ifdef Q_OS_ANDROID
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QtAndroidExtras>
+#else
+#include <QJniEnvironment>
+#include <QJniObject>
+#define QAndroidJniEnvironment QJniEnvironment
+#define QAndroidJniObject QJniObject
+#endif
 #endif
 
 #ifdef _WIN32
@@ -610,7 +617,11 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
             bool exception=false;
             QAndroidJniEnvironment env;
             QAndroidJniObject myID = QAndroidJniObject::fromString("android_id");
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
             QAndroidJniObject activity = QtAndroid::androidActivity();
+#else
+            QJniObject activity = QNativeInterface::QAndroidApplication::context();
+#endif
             ANDROID_EXCEPTION_CHECK;
             QAndroidJniObject appctx = activity.callObjectMethod
                 ("getApplicationContext", "()Landroid/content/Context;");

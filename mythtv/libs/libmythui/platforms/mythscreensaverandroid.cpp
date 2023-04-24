@@ -1,6 +1,12 @@
 #include "libmythbase/mythlogging.h"
 #include "platforms/mythscreensaverandroid.h"
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QtAndroidExtras>
+#else
+#include <QCoreApplication>
+#include <QJniObject>
+#define QAndroidJniObject QJniObject
+#endif
 
 // call in java is :
 //
@@ -25,7 +31,11 @@ MythScreenSaverAndroid::~MythScreenSaverAndroid()
 
 void MythScreenSaverAndroid::Disable()
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QAndroidJniObject activity = QtAndroid::androidActivity();
+#else
+    QJniObject activity = QNativeInterface::QAndroidApplication::context();
+#endif
     LOG(VB_GENERAL, LOG_INFO, LOC + "disable");
     if (activity.isValid()) {
         LOG(VB_GENERAL, LOG_INFO, LOC + "disable 1");
@@ -47,7 +57,11 @@ void MythScreenSaverAndroid::Disable()
 
 void MythScreenSaverAndroid::Restore()
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QAndroidJniObject activity = QtAndroid::androidActivity();
+#else
+    QJniObject activity = QNativeInterface::QAndroidApplication::context();
+#endif
     LOG(VB_GENERAL, LOG_INFO, LOC + "restore");
     if (activity.isValid()) {
         LOG(VB_GENERAL, LOG_INFO, LOC + "restore 1");

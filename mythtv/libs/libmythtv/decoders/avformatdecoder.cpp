@@ -29,7 +29,12 @@ extern "C" {
 extern "C" {
 #include "libavcodec/jni.h"
 }
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QtAndroidExtras>
+#else
+#include <QJniEnvironment>
+#define QAndroidJniEnvironment QJniEnvironment
+#endif
 #endif // Android
 
 // regardless of building with V4L2 or not, enable IVTV VBI data

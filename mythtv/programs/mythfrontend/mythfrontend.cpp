@@ -9,7 +9,13 @@
 // Qt
 #include <QtGlobal>
 #ifdef Q_OS_ANDROID
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QtAndroidExtras>
+#else
+#include <QCoreApplication>
+#include <QJniObject>
+#define QAndroidJniObject QJniObject
+#endif
 #endif
 #include <QApplication>
 #include <QDir>
@@ -1435,7 +1441,11 @@ static int reloadTheme(void)
     // reinitializing the main windows causes a segfault
     // with android
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     auto activity = QtAndroid::androidActivity();
+#else
+    QJniObject activity = QNativeInterface::QAndroidApplication::context();
+#endif
     auto packageManager = activity.callObjectMethod
         (   "getPackageManager",
             "()Landroid/content/pm/PackageManager;"  );
