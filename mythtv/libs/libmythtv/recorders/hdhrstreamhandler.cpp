@@ -481,8 +481,12 @@ QString HDHRStreamHandler::TunerSet(const QString &name, const QString &val)
 
     if (error)
     {
+        // Terminate recording when HDHomeRun lost connection
+        if (strstr(error, "ERROR: lock no longer held"))
+            m_bError = true;
+
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceSet(%1 %2): %3")
-                .arg(name, val, error));
+                .arg(name, val2, error));
         return {};
     }
 
