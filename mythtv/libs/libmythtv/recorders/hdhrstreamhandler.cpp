@@ -453,7 +453,6 @@ QString HDHRStreamHandler::TunerSet(const QString &name, const QString &val)
         return {};
     }
 
-
     QString valname = QString("/tuner%1/%2").arg(m_tuner).arg(name);
     char *value = nullptr;
     char *error = nullptr;
@@ -461,26 +460,29 @@ QString HDHRStreamHandler::TunerSet(const QString &name, const QString &val)
 #if 0
     LOG(VB_CHANSCAN, LOG_DEBUG, LOC + valname + " " + val);
 #endif
+
+    // Receive full transport stream when pid 0x2000 is present
+    QString val2 = val;
+    if (name.contains("filter") && val.contains("0x2000"))
+    {
+        val2 = "0x0000-0x1FFF";
+        LOG(VB_RECORD, LOG_INFO, LOC + valname + " fixup: \"" + val + "\" to \"" +val2 + "\"");
+    }
+
     if (hdhomerun_device_set_var(
             m_hdhomerunDevice, valname.toLocal8Bit().constData(),
-            val.toLocal8Bit().constData(), &value, &error) < 0)
+            val2.toLocal8Bit().constData(), &value, &error) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Set %1 to '%2' request failed").arg(valname, val) +
+            QString("Set %1 to '%2' request failed").arg(valname, val2) +
             ENO);
-
         return {};
     }
 
     if (error)
     {
-        // Skip error messages from MPTS recordings
-        if (!(val.contains("0x2000") && strstr(error, "ERROR: invalid pid filter")))
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceSet(%1 %2): %3")
-                    .arg(name, val, error));
-        }
-
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceSet(%1 %2): %3")
+                .arg(name, val, error));
         return {};
     }
 
