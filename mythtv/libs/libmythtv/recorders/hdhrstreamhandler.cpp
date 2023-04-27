@@ -411,8 +411,7 @@ bool HDHRStreamHandler::Connect(void)
     return true;
 }
 
-QString HDHRStreamHandler::TunerGet(
-    const QString &name, bool report_error_return, bool print_error) const
+QString HDHRStreamHandler::TunerGet(const QString &name)
 {
     QMutexLocker locker(&m_hdhrLock);
 
@@ -434,23 +433,17 @@ QString HDHRStreamHandler::TunerGet(
         return {};
     }
 
-    if (report_error_return && error)
+    if (error)
     {
-        if (print_error)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceGet(%1): %2")
-                    .arg(name, error));
-        }
-
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceGet(%1): %2")
+                .arg(name, error));
         return {};
     }
 
     return {value};
 }
 
-QString HDHRStreamHandler::TunerSet(
-    const QString &name, const QString &val,
-    bool report_error_return, bool print_error)
+QString HDHRStreamHandler::TunerSet(const QString &name, const QString &val)
 {
     QMutexLocker locker(&m_hdhrLock);
 
@@ -479,16 +472,13 @@ QString HDHRStreamHandler::TunerSet(
         return {};
     }
 
-    if (report_error_return && error)
+    if (error)
     {
-        if (print_error)
+        // Skip error messages from MPTS recordings
+        if (!(val.contains("0x2000") && strstr(error, "ERROR: invalid pid filter")))
         {
-            // Skip error messages from MPTS recordings
-            if (!(val.contains("0x2000") && strstr(error, "ERROR: invalid pid filter")))
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceSet(%1 %2): %3")
-                        .arg(name, val, error));
-            }
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceSet(%1 %2): %3")
+                    .arg(name, val, error));
         }
 
         return {};
@@ -540,7 +530,7 @@ bool HDHRStreamHandler::TuneProgram(uint mpeg_prog_num)
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Tuning program %1")
             .arg(mpeg_prog_num));
     return !TunerSet(
-        "program", QString::number(mpeg_prog_num), false).isEmpty();
+        "program", QString::number(mpeg_prog_num)).isEmpty();
 }
 
 bool HDHRStreamHandler::TuneVChannel(const QString &vchn)

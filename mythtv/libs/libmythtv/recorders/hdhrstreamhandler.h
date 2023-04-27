@@ -75,12 +75,8 @@ class HDHRStreamHandler : public StreamHandler
 
     bool Connect(void);
 
-    QString TunerGet(const QString &name,
-                     bool report_error_return = true,
-                     bool print_error = true) const;
-    QString TunerSet(const QString &name, const QString &value,
-                     bool report_error_return = true,
-                     bool print_error = true);
+    QString TunerGet(const QString &name);
+    QString TunerSet(const QString &name, const QString &value);
 
     bool Open(void);
     void Close(void);
