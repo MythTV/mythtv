@@ -486,6 +486,7 @@ void StatusBox::doListingsStatus()
     AddLogLine(tr("Mythfrontend version: %1 (%2)")
                .arg(GetMythSourcePath(), GetMythSourceVersion()),
                helpmsg);
+    AddLogLine(tr("Database schema version: %1").arg(gCoreContext->GetSetting("DBSchemaVer")));
     AddLogLine(tr("Last mythfilldatabase guide update:"), helpmsg);
     tmp = tr("Started:   %1").arg(
         MythDate::toString(
@@ -1489,7 +1490,7 @@ void StatusBox::doRenderStatus()
                 auto * rend = GetMythMainWindow()->GetRenderDevice();
                 if (auto * gl = dynamic_cast<MythRenderOpenGL*>(rend); gl != nullptr)
                     swapcount = gl->GetSwapCount();
-                Item->SetText(tr("Current fps: %1").arg(swapcount));
+                Item->SetText(tr("Current fps\t: %1").arg(swapcount));
             };
 
             auto * fps = AddLogLine("");
