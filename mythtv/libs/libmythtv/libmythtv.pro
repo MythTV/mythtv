@@ -430,9 +430,7 @@ using_frontend {
 
     # Text subtitle parser
     HEADERS += captions/textsubtitleparser.h
-    HEADERS += captions/xine_demux_sputext.h
     SOURCES += captions/textsubtitleparser.cpp
-    SOURCES += captions/xine_demux_sputext.cpp
 
     # A/V decoders
     HEADERS += decoders/decoderbase.h

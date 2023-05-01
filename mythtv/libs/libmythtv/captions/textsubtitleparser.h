@@ -7,6 +7,11 @@
 #ifndef TEXT_SUBTITLE_PARSER_H
 #define TEXT_SUBTITLE_PARSER_H
 
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+}
+
 // C++ headers
 #include <cstdint>
 #include <vector>
@@ -119,6 +124,11 @@ class TextSubtitleParser
   public:
     static void LoadSubtitles(const QString &fileName, TextSubtitles &target,
                               bool inBackground);
+    static int  decode(TextSubtitles &target, AVCodecContext *dec_ctx, AVStream *stream, AVPacket *pkt);
+
+  private:
+    static int     read_packet(void *opaque, uint8_t *buf, int buf_size);
+    static int64_t seek_packet(void *opaque, int64_t offset, int whence);
 };
 
 #endif
