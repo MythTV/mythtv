@@ -37,6 +37,7 @@
 #include "libmythbase/mythversion.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/recordingprofile.h"
+#include "libmythtv/recorders/satiputils.h"
 
 // MythBackend
 #include "v2capture.h"
@@ -64,6 +65,7 @@ void V2Capture::RegisterCustomTypes()
     qRegisterMetaType<V2RecProfile*>("V2RecProfile");
     qRegisterMetaType<V2RecProfileGroup*>("V2RecProfileGroup");
     qRegisterMetaType<V2RecProfileGroupList*>("V2RecProfileGroupList");
+    qRegisterMetaType<V2CardSubType*>("V2CardSubType");
 }
 
 V2Capture::V2Capture()
@@ -263,6 +265,52 @@ V2CaptureCard* V2Capture::GetCaptureCard( int nCardId )
 
     return pCaptureCard;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+V2CardSubType* V2Capture::GetCardSubType     ( int CardId     )
+{
+    auto* pCardType = new V2CardSubType();
+    QString subtype = CardUtil::ProbeSubTypeName(CardId);
+    CardUtil::INPUT_TYPES cardType = CardUtil::toInputType(subtype);
+
+#ifdef USING_SATIP
+    if (cardType == CardUtil::SATIP)
+        cardType = SatIP::toDVBInputType(CardUtil::GetVideoDevice(CardId));
+#endif // USING_SATIP
+
+    bool HDHRdoesDVBC = false;
+    bool HDHRdoesDVB = false;
+
+#ifdef USING_HDHOMERUN
+    if (cardType == CardUtil::HDHOMERUN)
+    {
+        QString device = CardUtil::GetVideoDevice(CardId);
+        HDHRdoesDVBC = CardUtil::HDHRdoesDVBC(device);
+        HDHRdoesDVB = CardUtil::HDHRdoesDVB(device);
+    }
+#endif // USING_HDHOMERUN
+
+    pCardType->setCardId(CardId);
+    pCardType->setSubType (subtype);
+    // This enum is handled differently from others because it has
+    // two names for the same value in a few cases. We choose
+    // the name that starts with "DV" when this happens
+    QMetaEnum meta = QMetaEnum::fromType<CardUtil::INPUT_TYPES>();
+    QString key = meta.valueToKeys(cardType);
+    QStringList keyList = key.split("|");
+    key = keyList[0];
+    if (keyList.length() > 1 && keyList[1].startsWith("DV"))
+        key = keyList[1];
+    // pCardType->setInputType (cardType);
+    pCardType->setInputType (key);
+    pCardType->setHDHRdoesDVBC (HDHRdoesDVBC);
+    pCardType->setHDHRdoesDVB (HDHRdoesDVB);
+    return pCardType;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

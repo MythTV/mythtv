@@ -51,6 +51,34 @@ static void channum_not_empty(ChannelInsertInfo &chan)
     }
 }
 
+
+ChannelImporter::ChannelImporter(bool gui, bool interactive,
+                    bool _delete, bool insert, bool save,
+                    bool fta_only, bool lcn_only, bool complete_only,
+                    bool full_channel_search,
+                    bool remove_duplicates,
+                    ServiceRequirements service_requirements,
+                    bool success) :
+        m_useGui(gui),
+        m_isInteractive(interactive),
+        m_doDelete(_delete),
+        m_doInsert(insert),
+        m_doSave(save),
+        m_ftaOnly(fta_only),
+        m_lcnOnly(lcn_only),
+        m_completeOnly(complete_only),
+        m_fullChannelSearch(full_channel_search),
+        m_removeDuplicates(remove_duplicates),
+        m_success(success),
+        m_serviceRequirements(service_requirements)
+{
+    if (gCoreContext->IsBackend() && m_useGui)
+    {
+        m_useWeb = true;
+        m_pWeb = ChannelScannerWeb::getInstance();
+    }
+}
+
 void ChannelImporter::Process(const ScanDTVTransportList &_transports,
                               int sourceid)
 {
@@ -67,11 +95,16 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
                                               "No new channels to process") :
                                              "No channels to process.."));
 
-            ShowOkPopup(
+            QString msg(
                 channels ?
                 (m_success ? tr("Found %n channel(s)", "", channels) :
                              tr("Failed to find any new channels!"))
                            : tr("Failed to find any channels."));
+            if (m_useWeb)
+                m_pWeb->m_dlgMsg = msg;
+            else
+                ShowOkPopup(msg);
+
         }
         else
         {
@@ -82,6 +115,12 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
 
         return;
     }
+
+
+    // Temporary check, incomplete code
+    //  Otherwise may crash the backend
+    // if (m_useWeb)
+    //     return;
 
     ScanDTVTransportList transports = _transports;
     QString msg;
@@ -274,6 +313,8 @@ uint ChannelImporter::DeleteChannels(
     // if some is selected ask about each individually
     //: %n is the number of channels
     QString msg = tr("Found %n off-air channel(s).", "", off_air_list.size());
+    if (m_useWeb)
+        m_pWeb->log(msg);
     DeleteAction action = QueryUserDelete(msg);
     if (kDeleteIgnoreAll == action)
         return 0;
@@ -351,8 +392,9 @@ uint ChannelImporter::DeleteUnusedTransports(uint sourceid)
     }
 
     QString msg = tr("Found %n unused transport(s).", "", query.size());
-
     LOG(VB_GENERAL, LOG_INFO, LOC + msg);
+    if (m_useWeb)
+        m_pWeb->log(msg);
 
     if (query.size() == 0)
         return 0;
@@ -1736,6 +1778,18 @@ ChannelImporter::QueryUserDelete(const QString &msg)
         m_functorRetval = -1;
         do
         {
+            if (m_useWeb) {
+                m_pWeb->m_mutex.lock();
+                m_pWeb->m_dlgMsg = msg;
+                m_pWeb->m_dlgButtons.append(tr("Delete All"));
+                m_pWeb->m_dlgButtons.append(tr("Set all invisible"));
+                m_pWeb->m_dlgButtons.append(tr("Ignore All"));
+                m_pWeb->m_waitCondition.wait(&m_pWeb->m_mutex);
+                m_functorRetval = m_pWeb->m_dlgButton;
+                m_pWeb->m_mutex.unlock();
+                continue;
+            }
+
             MythScreenStack *popupStack =
                 GetMythMainWindow()->GetStack("popup stack");
             auto *deleteDialog =
@@ -1812,6 +1866,18 @@ ChannelImporter::QueryUserInsert(const QString &msg)
         m_functorRetval = -1;
         do
         {
+            if (m_useWeb) {
+                m_pWeb->m_mutex.lock();
+                m_pWeb->m_dlgMsg = msg;
+                m_pWeb->m_dlgButtons.append(tr("Insert All"));
+                m_pWeb->m_dlgButtons.append(tr("Insert Manually"));
+                m_pWeb->m_dlgButtons.append(tr("Ignore All"));
+                m_pWeb->m_waitCondition.wait(&m_pWeb->m_mutex);
+                m_functorRetval = m_pWeb->m_dlgButton;
+                m_pWeb->m_mutex.unlock();
+                continue;
+            }
+
             MythScreenStack *popupStack =
                 GetMythMainWindow()->GetStack("popup stack");
             auto *insertDialog =
@@ -1886,6 +1952,17 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
         m_functorRetval = -1;
         do
         {
+            if (m_useWeb) {
+                m_pWeb->m_mutex.lock();
+                m_pWeb->m_dlgMsg = msg;
+                m_pWeb->m_dlgButtons.append(tr("Update All"));
+                m_pWeb->m_dlgButtons.append(tr("Ignore All"));
+                m_pWeb->m_waitCondition.wait(&m_pWeb->m_mutex);
+                m_functorRetval = m_pWeb->m_dlgButton;
+                m_pWeb->m_mutex.unlock();
+                continue;
+            }
+
             MythScreenStack *popupStack =
                 GetMythMainWindow()->GetStack("popup stack");
             auto *updateDialog =
@@ -1948,64 +2025,92 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
 }
 
 OkCancelType ChannelImporter::ShowManualChannelPopup(
-    MythMainWindow *parent, const QString& title,
+    const QString& title,
     const QString& message, QString &text)
 {
     int dmc = m_functorRetval;      // Default menu choice
     m_functorRetval = -1;
-    MythScreenStack *popupStack = parent->GetStack("popup stack");
-    auto *popup = new MythDialogBox(title, message, popupStack,
-                                    "manualchannelpopup");
 
-    if (popup->Create())
-    {
-        popup->AddButtonD(QCoreApplication::translate("(Common)", "OK"), 0 == dmc);
-        popup->AddButtonD(tr("Edit"), 1 == dmc);
-        popup->AddButtonD(QCoreApplication::translate("(Common)", "Cancel"), 2 == dmc);
-        popup->AddButtonD(QCoreApplication::translate("(Common)", "Cancel All"), 3 == dmc);
-        QObject::connect(popup, &MythDialogBox::Closed, this,
-                         [this](const QString & /*resultId*/, int result)
-                         {
-                             m_functorRetval = result;
-                             m_eventLoop.quit();
-                         });
-        popupStack->AddScreen(popup);
-        m_eventLoop.exec();
+    MythScreenStack *popupStack = nullptr;
+    if (m_useWeb) {
+        m_pWeb->m_mutex.lock();
+        m_pWeb->m_dlgMsg = message;
+        m_pWeb->m_dlgButtons.append(tr("OK"));
+        m_pWeb->m_dlgButtons.append(tr("Edit"));
+        m_pWeb->m_dlgButtons.append(tr("Cancel"));
+        m_pWeb->m_dlgButtons.append(tr("Cancel All"));
+        m_pWeb->m_waitCondition.wait(&m_pWeb->m_mutex);
+        m_functorRetval = m_pWeb->m_dlgButton;
+        m_pWeb->m_mutex.unlock();
     }
     else
     {
-        delete popup;
-        popup = nullptr;
-    }
+        MythMainWindow *parent = GetMythMainWindow();
+        popupStack = parent->GetStack("popup stack");
+        auto *popup = new MythDialogBox(title, message, popupStack,
+                                        "manualchannelpopup");
 
-    // Choice "Edit"
-    if (1 == m_functorRetval)
-    {
-        auto *textEdit =
-            new MythTextInputDialog(popupStack,
-                                    tr("Please enter a unique channel number."),
-                                    FilterNone, false, text);
-        if (textEdit->Create())
+        if (popup->Create())
         {
-            QObject::connect(textEdit, &MythTextInputDialog::haveResult, this,
-                             [this,&text](QString result)
-                             {
-                                 m_functorRetval = 0;
-                                 text = std::move(result);
-                             });
-            QObject::connect(textEdit, &MythTextInputDialog::Exiting, this,
-                             [this]()
-                             {
-                                 m_eventLoop.quit();
-                             });
-
-            popupStack->AddScreen(textEdit);
+            popup->AddButtonD(QCoreApplication::translate("(Common)", "OK"), 0 == dmc);
+            popup->AddButtonD(tr("Edit"), 1 == dmc);
+            popup->AddButtonD(QCoreApplication::translate("(Common)", "Cancel"), 2 == dmc);
+            popup->AddButtonD(QCoreApplication::translate("(Common)", "Cancel All"), 3 == dmc);
+            QObject::connect(popup, &MythDialogBox::Closed, this,
+                            [this](const QString & /*resultId*/, int result)
+                            {
+                                m_functorRetval = result;
+                                m_eventLoop.quit();
+                            });
+            popupStack->AddScreen(popup);
             m_eventLoop.exec();
         }
         else
-            delete textEdit;
+        {
+            delete popup;
+            popup = nullptr;
+        }
     }
+    // Choice "Edit"
+    if (1 == m_functorRetval)
+    {
 
+        if (m_useWeb) {
+            m_pWeb->m_mutex.lock();
+            m_pWeb->m_dlgMsg = tr("Please enter a unique channel number.");
+            m_pWeb->m_dlgInputReq = true;
+            m_pWeb->m_waitCondition.wait(&m_pWeb->m_mutex);
+            m_functorRetval = m_pWeb->m_dlgButton;
+            text = m_pWeb->m_dlgString;
+            m_pWeb->m_mutex.unlock();
+        }
+        else
+        {
+            auto *textEdit =
+                new MythTextInputDialog(popupStack,
+                                        tr("Please enter a unique channel number."),
+                                        FilterNone, false, text);
+            if (textEdit->Create())
+            {
+                QObject::connect(textEdit, &MythTextInputDialog::haveResult, this,
+                                [this,&text](QString result)
+                                {
+                                    m_functorRetval = 0;
+                                    text = std::move(result);
+                                });
+                QObject::connect(textEdit, &MythTextInputDialog::Exiting, this,
+                                [this]()
+                                {
+                                    m_eventLoop.quit();
+                                });
+
+                popupStack->AddScreen(textEdit);
+                m_eventLoop.exec();
+            }
+            else
+                delete textEdit;
+        }
+    }
     OkCancelType rval = kOCTCancel;
     switch (m_functorRetval) {
         case 0: rval = kOCTOk;        break;
@@ -2018,63 +2123,92 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
 }
 
 OkCancelType ChannelImporter::ShowResolveChannelPopup(
-    MythMainWindow *parent, const QString& title,
+    const QString& title,
     const QString& message, QString &text)
 {
     int dmc = m_functorRetval;      // Default menu choice
     m_functorRetval = -1;
-    MythScreenStack *popupStack = parent->GetStack("popup stack");
-    auto *popup = new MythDialogBox(title, message, popupStack,
-                                    "resolvechannelpopup");
 
-    if (popup->Create())
-    {
-        popup->AddButtonD(QCoreApplication::translate("(Common)", "OK"), 0 == dmc);
-        popup->AddButtonD(QCoreApplication::translate("(Common)", "OK All"), 1 == dmc);
-        popup->AddButtonD(tr("Edit"), 2 == dmc);
-        popup->AddButtonD(QCoreApplication::translate("(Common)", "Cancel"), 3 == dmc);
-        popup->AddButtonD(QCoreApplication::translate("(Common)", "Cancel All"), 4 == dmc);
-        QObject::connect(popup, &MythDialogBox::Closed, this,
-                         [this](const QString & /*resultId*/, int result)
-                         {
-                             m_functorRetval = result;
-                             m_eventLoop.quit();
-                         });
-        popupStack->AddScreen(popup);
-        m_eventLoop.exec();
+    MythScreenStack *popupStack = nullptr;
+    if (m_useWeb) {
+        m_pWeb->m_mutex.lock();
+        m_pWeb->m_dlgMsg = message;
+        m_pWeb->m_dlgButtons.append(tr("OK"));
+        m_pWeb->m_dlgButtons.append(tr("OK All"));
+        m_pWeb->m_dlgButtons.append(tr("Edit"));
+        m_pWeb->m_dlgButtons.append(tr("Cancel"));
+        m_pWeb->m_dlgButtons.append(tr("Cancel All"));
+        m_pWeb->m_waitCondition.wait(&m_pWeb->m_mutex);
+        m_functorRetval = m_pWeb->m_dlgButton;
+        m_pWeb->m_mutex.unlock();
     }
     else
     {
-        delete popup;
-        popup = nullptr;
-    }
+        MythMainWindow *parent = GetMythMainWindow();
+        popupStack = parent->GetStack("popup stack");
+        auto *popup = new MythDialogBox(title, message, popupStack,
+                                        "resolvechannelpopup");
 
-    // Choice "Edit"
-    if (2 == m_functorRetval)
-    {
-        auto *textEdit =
-            new MythTextInputDialog(popupStack,
-                                    tr("Please enter a unique channel number."),
-                                    FilterNone, false, text);
-        if (textEdit->Create())
+        if (popup->Create())
         {
-            QObject::connect(textEdit, &MythTextInputDialog::haveResult, this,
-                             [this,&text](QString result)
-                             {
-                                 m_functorRetval = 0;
-                                 text = std::move(result);
-                             });
-            QObject::connect(textEdit, &MythTextInputDialog::Exiting, this,
-                             [this]()
-                             {
-                                 m_eventLoop.quit();
-                             });
-
-            popupStack->AddScreen(textEdit);
+            popup->AddButtonD(QCoreApplication::translate("(Common)", "OK"), 0 == dmc);
+            popup->AddButtonD(QCoreApplication::translate("(Common)", "OK All"), 1 == dmc);
+            popup->AddButtonD(tr("Edit"), 2 == dmc);
+            popup->AddButtonD(QCoreApplication::translate("(Common)", "Cancel"), 3 == dmc);
+            popup->AddButtonD(QCoreApplication::translate("(Common)", "Cancel All"), 4 == dmc);
+            QObject::connect(popup, &MythDialogBox::Closed, this,
+                            [this](const QString & /*resultId*/, int result)
+                            {
+                                m_functorRetval = result;
+                                m_eventLoop.quit();
+                            });
+            popupStack->AddScreen(popup);
             m_eventLoop.exec();
         }
         else
-            delete textEdit;
+        {
+            delete popup;
+            popup = nullptr;
+        }
+    }
+    // Choice "Edit"
+    if (2 == m_functorRetval)
+    {
+        if (m_useWeb) {
+            m_pWeb->m_mutex.lock();
+            m_pWeb->m_dlgMsg = tr("Please enter a unique channel number.");
+            m_pWeb->m_dlgInputReq = true;
+            m_pWeb->m_waitCondition.wait(&m_pWeb->m_mutex);
+            m_functorRetval = m_pWeb->m_dlgButton;
+            text = m_pWeb->m_dlgString;
+            m_pWeb->m_mutex.unlock();
+        }
+        else
+        {
+            auto *textEdit =
+                new MythTextInputDialog(popupStack,
+                                        tr("Please enter a unique channel number."),
+                                        FilterNone, false, text);
+            if (textEdit->Create())
+            {
+                QObject::connect(textEdit, &MythTextInputDialog::haveResult, this,
+                                [this,&text](QString result)
+                                {
+                                    m_functorRetval = 0;
+                                    text = std::move(result);
+                                });
+                QObject::connect(textEdit, &MythTextInputDialog::Exiting, this,
+                                [this]()
+                                {
+                                    m_eventLoop.quit();
+                                });
+
+                popupStack->AddScreen(textEdit);
+                m_eventLoop.exec();
+            }
+            else
+                delete textEdit;
+        }
     }
 
     OkCancelType rval = kOCTCancel;
@@ -2111,7 +2245,7 @@ OkCancelType ChannelImporter::QueryUserResolve(
             msg2 += "\n";
             msg2 += tr("Default value is %1.").arg(val);
             ret = ShowResolveChannelPopup(
-                GetMythMainWindow(), tr("Channel Importer"),
+                    tr("Channel Importer"),
                 msg2, val);
 
             if (kOCTOk != ret && kOCTOkAll != ret)
@@ -2188,7 +2322,7 @@ OkCancelType ChannelImporter::QueryUserInsert(
             msg2 += " ";
             msg2 += tr("Default value is %1").arg(val);
             ret = ShowManualChannelPopup(
-                GetMythMainWindow(), tr("Channel Importer"),
+                 tr("Channel Importer"),
                 msg2, val);
 
             if (kOCTOk != ret)

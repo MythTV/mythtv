@@ -290,7 +290,7 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
             addSelection(tr("Import existing scan"),
                          QString::number(ExistingScanImport));
             break;
-        case CardUtil::QAM:
+        case CardUtil::QAM:  // QAM == DVBC
             addSelection(tr("Full Scan (Tuned)"),
                          QString::number(NITAddScan_DVBC));
             addSelection(tr("Full Scan"),

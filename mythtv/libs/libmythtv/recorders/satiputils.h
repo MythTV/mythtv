@@ -6,10 +6,10 @@
 #include <QStringList>
 
 // MythTV headers
-#include "dtvconfparserhelpers.h"
-#include "cardutil.h"
+#include "libmythtv/dtvconfparserhelpers.h"
+#include "libmythtv/cardutil.h"
 
-class SatIP
+class MTV_PUBLIC SatIP
 {
   public:
     static QStringList probeDevices(void);
