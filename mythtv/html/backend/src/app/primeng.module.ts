@@ -27,6 +27,8 @@ import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 import { RadioButtonModule } from 'primeng/radiobutton';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { ScrollPanelModule } from 'primeng/scrollpanel';
 
 
 @NgModule({
@@ -57,7 +59,9 @@ import { RadioButtonModule } from 'primeng/radiobutton';
         ToastModule,
         ToolbarModule,
         TooltipModule,
-        RadioButtonModule
+        RadioButtonModule,
+        ProgressBarModule,
+        ScrollPanelModule
     ]
 })
 

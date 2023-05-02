@@ -20,10 +20,25 @@ export class BackendWarningComponent implements OnInit {
   recStartTime = '';
   ready = false;
   delay = 0;
+  busy = false;
 
   constructor(private mythService: MythService, public setupService: SetupService,
     private dvrService: DvrService) {
     this.getBackendInfo();
+    this.refreshInfo();
+  }
+
+  refreshInfo() {
+    setTimeout(() => {
+      this.mythService.GetBackendInfo()
+        .subscribe({
+          next: data =>
+            this.setupService.schedulingEnabled = data.BackendInfo.Env.SchedulingEnabled,
+          // default to true in case backend is down
+          error: () => this.setupService.schedulingEnabled = true
+        });
+      this.refreshInfo();
+    }, 120000);
   }
 
   getBackendInfo() {

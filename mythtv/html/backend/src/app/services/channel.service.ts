@@ -3,12 +3,17 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
   Channel,
+  ChannelScanRequest,
+  ChannelScanStatus,
   CommMethodList,
   DBChannelRequest,
   FetchChannelsFromSourceRequest,
   GetChannelInfoListRequest,
   GetVideoMultiplexListRequest,
-  UpdateVideoSourceRequest } from './interfaces/channel.interface';
+  Scan,
+  ScanDialogResponse,
+  UpdateVideoSourceRequest
+} from './interfaces/channel.interface';
 import { ChannelInfoList } from './interfaces/channelinfolist.interface';
 import { BoolResponse, StringListResponse } from './interfaces/common.interface';
 import { GetDDLineupListRequest, LineupList } from './interfaces/lineup.interface';
@@ -22,30 +27,30 @@ export class ChannelService {
 
   constructor(private httpClient: HttpClient) { }
 
-  public AddDBChannel(request : DBChannelRequest) : Observable<BoolResponse> {
+  public AddDBChannel(request: DBChannelRequest): Observable<BoolResponse> {
     return this.httpClient.post<BoolResponse>('/Channel/AddDBChannel', request);
   }
 
-  public UpdateDBChannel(request : DBChannelRequest) : Observable<BoolResponse> {
+  public UpdateDBChannel(request: DBChannelRequest): Observable<BoolResponse> {
     return this.httpClient.post<BoolResponse>('/Channel/UpdateDBChannel', request);
   }
 
-  public AddVideoSource(videosource : VideoSource) : Observable<number> {
+  public AddVideoSource(videosource: VideoSource): Observable<number> {
     return this.httpClient.post<number>('/Channel/AddVideoSource', videosource);
   }
 
-  public FetchChannelsFromSource(request : FetchChannelsFromSourceRequest) : Observable<number> {
+  public FetchChannelsFromSource(request: FetchChannelsFromSourceRequest): Observable<number> {
     let params = new HttpParams()
       .set("SourceId", request.SourceId)
       .set("CardId", request.CardId)
       .set("WaitForFinish", request.WaitForFinish);
-    return this.httpClient.get<number>('/Channel/FetchChannelsFromSource', {params});
+    return this.httpClient.get<number>('/Channel/FetchChannelsFromSource', { params });
   }
 
-  public GetChannelInfo(channel : number) : Observable<Channel> {
+  public GetChannelInfo(channel: number): Observable<Channel> {
     let params = new HttpParams()
       .set("ChanID", channel);
-    return this.httpClient.get<Channel>('/Channel/GetChannelInfo', {params});
+    return this.httpClient.get<Channel>('/Channel/GetChannelInfo', { params });
   }
 
   public GetChannelInfoList(request: GetChannelInfoListRequest): Observable<ChannelInfoList> {
@@ -71,71 +76,94 @@ export class ChannelService {
     return this.httpClient.get<ChannelInfoList>('/Channel/GetChannelInfoList', { params });
   }
 
-  public GetDDLineupList(request : GetDDLineupListRequest) : Observable<LineupList> {
+  public GetDDLineupList(request: GetDDLineupListRequest): Observable<LineupList> {
     let params = new HttpParams()
       .set("Source", request.Source)
       .set("UserId", request.UserId)
       .set("Password", request.Password);
-    return this.httpClient.get<LineupList>('/Channel/GetDDLineupList', {params});
+    return this.httpClient.get<LineupList>('/Channel/GetDDLineupList', { params });
   }
 
-  public GetVideoMultiplex(mplexid : number) : Observable<VideoMultiplex> {
+  public GetVideoMultiplex(mplexid: number): Observable<VideoMultiplex> {
     let params = new HttpParams()
       .set("MplexID", mplexid);
-    return this.httpClient.get<VideoMultiplex>('/Channel/GetVideoMultiplex', {params});
+    return this.httpClient.get<VideoMultiplex>('/Channel/GetVideoMultiplex', { params });
   }
 
-  public GetVideoMultiplexList(request: GetVideoMultiplexListRequest) : Observable<VideoMultiplexList> {
+  public GetVideoMultiplexList(request: GetVideoMultiplexListRequest): Observable<VideoMultiplexList> {
     let params = new HttpParams()
-      .set("SourceID", request.SourceID)
-      .set("StartIndex", request.StartIndex)
-      .set("Count", request.Count);
-    return this.httpClient.get<VideoMultiplexList>('/Channel/GetVideoMultiplexLost', {params});
+      .set("SourceID", request.SourceID);
+    if (request.StartIndex)
+      params = params.set("StartIndex", request.StartIndex)
+    if (request.Count)
+      params = params.set("Count", request.Count);
+    return this.httpClient.get<VideoMultiplexList>('/Channel/GetVideoMultiplexList', { params });
   }
 
-  public GetVideoSource(sourceid : number) : Observable<VideoSource> {
+  public GetVideoSource(sourceid: number): Observable<VideoSource> {
     let params = new HttpParams()
       .set("SourceID", sourceid);
-    return this.httpClient.get<VideoSource>('/Channel/GetVideoSource', {params});
+    return this.httpClient.get<VideoSource>('/Channel/GetVideoSource', { params });
   }
 
-  public GetVideoSourceList() : Observable<VideoSourceList> {
+  public GetVideoSourceList(): Observable<VideoSourceList> {
     return this.httpClient.get<VideoSourceList>('/Channel/GetVideoSourceList');
   }
 
-  public GetXMLTVIdList(sourceid : number) : Observable<StringListResponse> {
+  public GetXMLTVIdList(sourceid: number): Observable<StringListResponse> {
     let params = new HttpParams()
       .set("SourceID", sourceid);
-    return this.httpClient.get<StringListResponse>('/Channel/GetXMLTVIdList', {params});
+    return this.httpClient.get<StringListResponse>('/Channel/GetXMLTVIdList', { params });
   }
 
-  public GetAvailableChanid(): Observable<{int: number}> {
-    return this.httpClient.get<{int: number}>('/Channel/GetAvailableChanid', {});
+  public GetAvailableChanid(): Observable<{ int: number }> {
+    return this.httpClient.get<{ int: number }>('/Channel/GetAvailableChanid', {});
   }
 
-  public RemoveDBChannel(channelid : number) : Observable<BoolResponse> {
-    return this.httpClient.post<BoolResponse>('/Channel/RemoveDBChannel', {ChannelID: channelid});
+  public RemoveDBChannel(channelid: number): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Channel/RemoveDBChannel', { ChannelID: channelid });
   }
 
-  public RemoveVideoSource(sourceid : number) : Observable<BoolResponse> {
+  public RemoveVideoSource(sourceid: number): Observable<BoolResponse> {
     return this.httpClient.post<BoolResponse>('/Channel/RemoveVideoSource', { SourceId: sourceid });
   }
 
-  public UpdateVideoSource(request : UpdateVideoSourceRequest) : Observable<BoolResponse> {
+  public UpdateVideoSource(request: UpdateVideoSourceRequest): Observable<BoolResponse> {
     return this.httpClient.post<BoolResponse>('/Channel/UpdateVideoSource', request);
   }
 
-  public GetGrabberList() : Observable<GrabberList> {
+  public GetGrabberList(): Observable<GrabberList> {
     return this.httpClient.get<GrabberList>('/Channel/GetGrabberList');
   }
 
-  public GetFreqTableList() : Observable<FreqTableList> {
+  public GetFreqTableList(): Observable<FreqTableList> {
     return this.httpClient.get<FreqTableList>('/Channel/GetFreqTableList');
   }
 
-  public GetCommMethodList() : Observable<CommMethodList> {
+  public GetCommMethodList(): Observable<CommMethodList> {
     return this.httpClient.get<CommMethodList>('/Channel/GetCommMethodList');
   }
 
+  public StartScan(request: ChannelScanRequest): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Channel/StartScan', request);
+  }
+
+  public GetScanStatus(): Observable<{ ScanStatus: ChannelScanStatus }> {
+    return this.httpClient.get<{ ScanStatus: ChannelScanStatus }>('/Channel/GetScanStatus');
+  }
+
+  public StopScan(CardId: number): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Channel/StopScan', { Cardid: CardId });
+  }
+
+  public GetScanList(sourceid: number): Observable<{ ScanList: { Scans: Scan[] } }> {
+    let params = new HttpParams()
+      .set("SourceID", sourceid);
+    return this.httpClient.get<{ ScanList: { Scans: Scan[] } }>('/Channel/GetScanList', { params });
+  }
+
+  public SendScanDialogResponse(request: ScanDialogResponse): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Channel/SendScanDialogResponse', request);
+  }
 
 }

@@ -7,10 +7,10 @@
             <ng-template pTemplate="header">
                 <div class="grid  w-full" *ngIf="readyCount > 1">
                     <div class="col-9 pr-1">
-                        {{m_CaptureCardsFiltered[ix].CardType}}
-                        {{m_CaptureCardsFiltered[ix].VideoDevice}}
-                        ({{m_CaptureCardsFiltered[ix].DisplayName}})
-                        =&gt; {{videoSourceLookup[m_CaptureCardsFiltered[ix].SourceId].SourceName}}
+                        {{card.CardType}}
+                        {{card.VideoDevice}}
+                        ({{card.DisplayName}})
+                        =&gt; {{videoSourceLookup[card.SourceId].SourceName}}
                         <b>&nbsp;{{ dirtyMessages[ix] }}</b>
                     </div>
                 </div>

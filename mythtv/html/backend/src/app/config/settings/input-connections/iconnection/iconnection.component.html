@@ -148,18 +148,20 @@
                         </small>
                     </div>
 
-                    <div class="form-group field">
-                        <p class="p-error block">
-                            Scan for channels to be added here.
-                        </p>
-                    </div>
+                    <!-- Scan Panel -->
+                    <p-fieldset class="mb-4 w-full" legend="{{ 'settings.iconnection.scan_title' | translate }}"
+                        [collapsed]="true" [toggleable]="true" *ngIf="!work.isUnscanable">
+                        <app-channelscan [card]="card" [cardList]="cardList"></app-channelscan>
+                    </p-fieldset>
+
+                    <br><br>
 
                     <div class="form-group field">
                         <div class="grid">
                             <div style="display:flex; align-items:center;">
                                 <p-button label="{{ 'settings.iconnection.fetch.label' | translate }}"
                                     icon="pi pi-download" iconPos="left" (onClick)="work.fetchChannelsDialog=true"
-                                    [disabled]="!card.SourceId || connform.dirty == true || work.fetchStatus == 1">
+                                    [disabled]="!card.SourceId || connform.dirty == true || work.fetchStatus == 1 || setupService.schedulingEnabled">
                                 </p-button>
                             </div>
                             <div style="display:flex; align-items:center;">
@@ -185,73 +187,73 @@
                     </p-dialog>
 
                     <div class="form-group field">
-                        <label for="StartChannel" class="block">{{ 'settings.iconnection.startchan.label' | translate
+                        <label for="StartChannel" class="block">{{ 'settings.iconnection.startchan_label' | translate
                             }}</label>
                         <p-dropdown [options]="sourceChannels" [(ngModel)]="card.StartChannel" placeholder="Select Item"
                             [editable]="false" optionLabel="ChanNum" optionValue="ChanNum" scrollHeight="400px"
                             [style]="{'minWidth':'400px'}" name="StartChannel" #StartChannel="ngModel">
                         </p-dropdown>
                         <small class="block">
-                            {{ 'settings.iconnection.startchan.desc' | translate }}
+                            {{ 'settings.iconnection.startchan_desc' | translate }}
                         </small>
                     </div>
 
                     <!-- Interactions Panel -->
-                    <p-fieldset class="mb-4 w-full" legend="{{ 'settings.iconnection.interact.title' | translate }}"
+                    <p-fieldset class="mb-4 w-full" legend="{{ 'settings.iconnection.interact_title' | translate }}"
                         [toggleable]="true" [collapsed]="true">
 
                         <div class="form-group field">
-                            <label for="RecLimit" class="block">{{ 'settings.iconnection.maxrec.label' | translate
+                            <label for="RecLimit" class="block">{{ 'settings.iconnection.maxrec_label' | translate
                                 }}</label>
                             <p-inputNumber [(ngModel)]="card.RecLimit" name="RecLimit" id="RecLimit"
                                 [showButtons]="true" [min]="1" [max]="10" [step]="1"></p-inputNumber>
                             <small class="block">
-                                {{ 'settings.iconnection.maxrec.desc' | translate }}
+                                {{ 'settings.iconnection.maxrec_desc' | translate }}
                             </small>
                         </div>
 
                         <div class="form-group field">
                             <p-checkbox inputId="SchedGroup" [(ngModel)]="card.SchedGroup" name="SchedGroup"
                                 #DVBWaitForSeqStart="ngModel" class="mb-2 w-full" [binary]="true"
-                                label="{{ 'settings.iconnection.schedgrp.label' | translate }}">
+                                label="{{ 'settings.iconnection.schedgrp_label' | translate }}">
                             </p-checkbox>
                             <small class="block">
-                                {{ 'settings.iconnection.schedgrp.desc' | translate }}
+                                {{ 'settings.iconnection.schedgrp_desc' | translate }}
                             </small>
                         </div>
 
                         <div class="form-group field">
-                            <label for="RecPriority" class="block">{{ 'settings.iconnection.recpri.label' | translate
+                            <label for="RecPriority" class="block">{{ 'settings.iconnection.recpri_label' | translate
                                 }}</label>
                             <p-inputNumber [(ngModel)]="card.RecPriority" name="RecPriority" id="RecPriority"
                                 [showButtons]="true" [min]="-99" [max]="99" [step]="1"></p-inputNumber>
                             <small class="block">
-                                {{ 'settings.iconnection.recpri.desc' | translate }}
+                                {{ 'settings.iconnection.recpri_desc' | translate }}
                             </small>
                         </div>
 
                         <div class="form-group field">
-                            <label for="SchedOrder" class="block">{{ 'settings.iconnection.schedorder.label' | translate
+                            <label for="SchedOrder" class="block">{{ 'settings.iconnection.schedorder_label' | translate
                                 }}</label>
                             <p-inputNumber [(ngModel)]="card.SchedOrder" name="SchedOrder" id="SchedOrder"
                                 [showButtons]="true" [min]="0" [max]="99" [step]="1"></p-inputNumber>
                             <small class="block">
-                                {{ 'settings.iconnection.schedorder.ldesc' | translate }}
+                                {{ 'settings.iconnection.schedorder_desc' | translate }}
                             </small>
                         </div>
 
                         <div class="form-group field">
-                            <label for="LiveTVOrder" class="block">{{ 'settings.iconnection.liveorder.label' | translate
+                            <label for="LiveTVOrder" class="block">{{ 'settings.iconnection.liveorder_label' | translate
                                 }}</label>
                             <p-inputNumber [(ngModel)]="card.LiveTVOrder" name="LiveTVOrder" id="LiveTVOrder"
                                 [showButtons]="true" [min]="0" [max]="99" [step]="1"></p-inputNumber>
                             <small class="block">
-                                {{ 'settings.iconnection.liveorder.desc' | translate }}
+                                {{ 'settings.iconnection.liveorder_desc' | translate }}
                             </small>
                         </div>
 
                         <div class="form-group field">
-                            <label for="inputGroupName" class="block">{{ 'settings.iconnection.inpgroup.label' |
+                            <label for="inputGroupName" class="block">{{ 'settings.iconnection.inpgroup_label' |
                                 translate }}</label>
                             <p-dropdown [options]="selectGroups" [(ngModel)]="work.inputGroupName"
                                 placeholder="Optional Group Name" [editable]="true" optionLabel="InputGroupName"
@@ -259,7 +261,7 @@
                                 name="inputGroupName" #inputGroupName="ngModel">
                             </p-dropdown>
                             <small class="block">
-                                {{ 'settings.iconnection.inpgroup.desc' | translate }}
+                                {{ 'settings.iconnection.inpgroup_desc' | translate }}
                             </small>
                         </div>
                     </p-fieldset>

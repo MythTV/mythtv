@@ -167,20 +167,15 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
       this.loadDiseqc();
     }
 
-    let obs = new Observable(x => {
-      setTimeout(() => {
-        x.next(1);
-        x.complete();
-      }, 100)
-    });
-    obs.subscribe(x => {
+    setTimeout(() => {
       if (this.card.DisplayName)
         this.currentForm.form.markAsPristine();
       else {
         this.card.DisplayName = "Input " + this.card.CardId;
         this.currentForm.form.markAsDirty();
       }
-    });
+    }, 100);
+
     this.captureCardService.GetCaptureDeviceList(this.card.CardType)
       .subscribe({
         next: data => {
