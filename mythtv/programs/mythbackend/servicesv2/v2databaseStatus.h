@@ -29,14 +29,7 @@ class V2DatabaseStatus : public QObject
     public:
 
         Q_INVOKABLE V2DatabaseStatus(QObject *parent = nullptr)
-            : QObject( parent ),
-              m_LocalEnabled (false),
-              m_WOLEnabled (false),
-              m_WOLReconnect (0),
-              m_WOLRetry (0),
-              m_Connected (false),
-              m_HaveDatabase (false),
-              m_SchemaVersion (false)
+            : QObject( parent )
         {
         }
 

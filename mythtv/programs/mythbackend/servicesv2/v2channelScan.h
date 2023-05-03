@@ -25,12 +25,7 @@ class  V2ScanStatus : public QObject
     public:
 
         Q_INVOKABLE V2ScanStatus(QObject *parent = nullptr)
-            : QObject( parent ),
-            m_CardId (0),
-            m_SignalLock (false),
-            m_Progress (0),
-            m_SignalNoise (0),
-            m_SignalStrength (0)
+            : QObject( parent )
         {
         }
 
@@ -54,11 +49,7 @@ class  V2Scan : public QObject
     public:
 
         Q_INVOKABLE V2Scan(QObject *parent = nullptr)
-            : QObject( parent ),
-            m_ScanId (0),
-            m_CardId (0),
-            m_SourceId (0),
-            m_Processed (false)
+            : QObject( parent )
         {
         }
 

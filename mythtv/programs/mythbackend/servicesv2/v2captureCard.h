@@ -181,10 +181,8 @@ class V2CaptureDevice : public QObject
 
         Q_INVOKABLE V2CaptureDevice(QObject *parent = nullptr)
             : QObject          ( parent ),
-              m_TunerNumber    ( 0      ),
               m_SignalTimeout  ( 1000   ),
-              m_ChannelTimeout ( 3000   ),
-              m_TuningDelay    ( 0 )
+              m_ChannelTimeout ( 3000   )
         {
         }
 
@@ -320,10 +318,7 @@ class V2CardSubType :public QObject
     public:
 
         Q_INVOKABLE V2CardSubType(QObject *parent = nullptr)
-            :   QObject      ( parent ),
-                m_CardId       ( 0 ),
-                m_HDHRdoesDVBC ( false ),
-                m_HDHRdoesDVB  ( false )
+            :   QObject      ( parent )
         {
         }
 
