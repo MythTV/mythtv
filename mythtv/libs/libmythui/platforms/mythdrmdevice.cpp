@@ -508,7 +508,9 @@ MythDRMDevice::MythDRMDevice(QString Device, bool NeedPlanes)
     Load();
     m_valid = false;
 
-    // Find a user suggested connector or the first connected
+    // Find a user suggested connector or the first connected.  Oddly
+    // clang-tidy-16 thinks the "if" and "else" clauses are the same.
+    // NOLINTNEXTLINE(bugprone-branch-clone)
     if (!s_mythDRMConnector.isEmpty())
     {
         m_connector = MythDRMConnector::GetConnectorByName(m_connectors, s_mythDRMConnector);
@@ -1027,7 +1029,9 @@ void MythDRMDevice::AnalysePlanes()
     };
 
     // Note: If video is an overlay or both planes are of the same type then
-    // video composition will likely fail if there is no zpos support
+    // video composition will likely fail if there is no zpos support.  Oddly
+    // clang-tidy-16 thinks the "if" and "else" clauses are the same.
+    // NOLINTNEXTLINE(bugprone-branch-clone)
     if (primaryVideo.empty())
     {
         m_videoPlane = overlayVideo.front();
