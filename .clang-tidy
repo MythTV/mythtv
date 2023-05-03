@@ -159,6 +159,10 @@ Checks: '-*,
         # are in MythTV. ,
        -misc-no-recursion,
 
+        # New in clang16. As of 2023-05-03, there are 1445 unique
+        # warnings. ,
+       -misc-use-anonymous-namespace,
+
     modernize-*,
 
         # Noisy!!!  foo(void) => foo()  ,
