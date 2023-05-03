@@ -1116,9 +1116,9 @@ V2ScanList*  V2Channel::GetScanList  ( uint SourceId)
 {
     auto scanList = LoadScanList(SourceId);
     auto * pResult = new V2ScanList();
-    for (ScanInfo scan : scanList)
+    for (const ScanInfo &scan : scanList)
     {
-        auto pItem = pResult->AddNewScan();
+        auto *pItem = pResult->AddNewScan();
         pItem->setScanId    (scan.m_scanid);
         pItem->setCardId    (scan.m_cardid);
         pItem->setSourceId  (scan.m_sourceid);
