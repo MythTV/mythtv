@@ -757,10 +757,9 @@ void ChannelOptionsRawTS::Save(void)
         if (!ok || (m_sids[i]->getValue().toUInt() == 0U))
             continue;
 
-        pid_cache.push_back(
-            pid_cache_item_t(
+        pid_cache.emplace_back(
                 pid, m_sids[i]->getValue().toUInt() | 0x10000 |
-                (m_pcrs[i]->getValue().toUInt() ? 0x200 : 0x0)));
+                (m_pcrs[i]->getValue().toUInt() ? 0x200 : 0x0));
     }
 
     ChannelUtil::SaveCachedPids(chanid, pid_cache, true /* delete_all */);

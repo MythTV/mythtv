@@ -3645,8 +3645,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
         QString cn = name.trimmed();
         if (!cn.isEmpty())
         {
-            cast.push_back(VideoMetadata::cast_list::
-                        value_type(-1, cn));
+            cast.emplace_back(-1, cn);
         }
     }
 
@@ -3661,8 +3660,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
         QString genre_name = name.trimmed();
         if (!genre_name.isEmpty())
         {
-            video_genres.push_back(
-                    VideoMetadata::genre_list::value_type(-1, genre_name));
+            video_genres.emplace_back(-1, genre_name);
         }
     }
 
@@ -3677,9 +3675,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
         QString country_name = name.trimmed();
         if (!country_name.isEmpty())
         {
-            video_countries.push_back(
-                    VideoMetadata::country_list::value_type(-1,
-                            country_name));
+            video_countries.emplace_back(-1, country_name);
         }
     }
 

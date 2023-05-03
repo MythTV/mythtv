@@ -469,8 +469,8 @@ void MythDVDDecoder::PostProcessTracks(void)
                     {
                         // Create a dummy track if the physical stream has not
                         // yet been seen.
-                        filteredTracks.push_back(StreamInfo(-1, lang, static_cast<uint>(lang_indx),
-                                                            streamid, 0, 0, false, false, false));
+                        filteredTracks.emplace_back(-1, lang, static_cast<uint>(lang_indx),
+                                                    streamid, 0, 0, false, false, false);
                     }
                     else
                     {

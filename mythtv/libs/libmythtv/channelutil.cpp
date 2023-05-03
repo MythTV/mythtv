@@ -873,7 +873,7 @@ bool ChannelUtil::GetCachedPids(uint chanid,
         int pid = query.value(0).toInt();
         int tid = query.value(1).toInt();
         if ((pid >= 0) && (tid >= 0))
-            pid_cache.push_back(pid_cache_item_t(pid, tid));
+            pid_cache.emplace_back(pid, tid);
     }
     stable_sort(pid_cache.begin(), pid_cache.end(), lt_pidcache);
 
