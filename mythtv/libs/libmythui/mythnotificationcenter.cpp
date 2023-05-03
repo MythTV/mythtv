@@ -498,7 +498,7 @@ void MythNotificationScreen::SetErrorState(void) const
     if (!m_errorState)
         return;
 
-    const char *state = "ok";
+    const char *state {nullptr};
 
     if (m_type == MythNotification::Error)
     {
