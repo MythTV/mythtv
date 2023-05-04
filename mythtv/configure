@@ -94,6 +94,9 @@ Advanced options (experts only):
   --sysinclude=PATH        location of cross-build system headers
   --cc=CC                  use C compiler CC [$cc_default]
   --cxx=CXX                use C++ compiler CXX [$cxx_default]
+  --optflags=OPTFLAGS      use specified optimization flags for the C compiler
+  --cxxoptflags=OPTFLAGS   use specified optimization flags for the C++ compiler
+  --enable-lto             enable Link Time Optimization
   --enable-set-cc-default  set cc_default and cxx_default to that provided by --cc= and -cxx
   --ld=LD                  use linker LD
   --qmake=QMAKE            use specified qmake [$qmake_default]
@@ -613,10 +616,6 @@ add_ldlibflags(){
     append LDLIBFLAGS $($ldflags_filter "$@")
 }
 
-add_stripflags(){
-    append ASMSTRIPFLAGS "$@"
-}
-
 add_extralibs(){
     prepend extralibs $($ldflags_filter "$@")
 }
@@ -835,20 +834,6 @@ EOF
 check_ldflags(){
     log check_ldflags "$@"
     test_ldflags "$@" && add_ldflags "$@"
-}
-
-test_stripflags(){
-    log test_stripflags "$@"
-    # call check_cc to get a fresh TMPO
-    check_cc <<EOF
-int main(void) { return 0; }
-EOF
-    check_cmd $strip $ASMSTRIPFLAGS "$@" $TMPO
-}
-
-check_stripflags(){
-    log check_stripflags "$@"
-    test_stripflags "$@" && add_stripflags "$@"
 }
 
 check_header(){
@@ -1930,6 +1915,7 @@ MYTHTV_LIST='
     silent_cc
     symbol_visibility
     deprecation_warnings
+    ffmpeg_warnings
 '
 
 USING_LIST='
@@ -1974,7 +1960,6 @@ CMDLINE_SELECT="
     optimizations
     rpath
     set_cc_default
-    stripping
     $MYTHTV_LIST
     $MYTHTV_CONFIG_LIST
 "
@@ -2003,6 +1988,7 @@ MYTHTV_PATHS_LIST='
 
 MYTHTV_CMDLINE_SET='
     compile_type
+    cxxoptflags
     logging
     python
     qmake
@@ -2053,7 +2039,6 @@ CMDLINE_SET="
     random_seed
     ranlib
     samples
-    strip
     sws_max_filter_size
     sysinclude
     sysroot
@@ -2227,13 +2212,11 @@ ln_s_default="ln -s -f"
 nm_default="nm -g"
 pkg_config_default=pkg-config
 ranlib_default="ranlib"
-strip_default="strip"
 version_script='--version-script'
 x86asmexe_default="nasm"
 windres_default="windres"
 nvcc_default="nvcc"
 nvccflags_default="-gencode arch=compute_30,code=sm_30 -O2"
-striptype="direct"
 
 # MythTV toolchain
 ccache="yes"
@@ -2288,7 +2271,6 @@ host_os=$target_os_default
 # machine
 if test "$target_os_default" = aix; then
     arch_default=$(uname -p)
-    strip_default="strip -X32_64"
 else
     arch_default=$(uname -m)
 fi
@@ -2298,7 +2280,6 @@ intrinsics="none"
 # configurable options
 enable $PROGRAM_LIST
 enable $LIBRARY_LIST
-enable stripping
 
 enable asm
 enable debug
@@ -2358,6 +2339,7 @@ enable opengl
 enable egl
 enable symbol_visibility
 enable deprecation_warnings
+disable ffmpeg_warnings
 enable v4l2
 enable v4l2prime
 enable x11
@@ -2535,6 +2517,8 @@ for opt do
     optval="${opt#*=}"
     case "$opt" in
 #Myth options
+        -O*) cxxoptflags=$opt
+        ;;
         --compile-type=*) compile_type=$optval
         ;;
         --libdir-name=*) libdir_name=$optval
@@ -2909,12 +2893,11 @@ if ${cross_prefix}${ranlib_default} 2>&1 | grep -q "\-D "; then
 else
     ranlib_default="${cross_prefix}${ranlib_default}"
 fi
-strip_default="${cross_prefix}${strip_default}"
 windres_default="${cross_prefix}${windres_default}"
 
 sysinclude_default="${sysroot}/usr/include"
 
-set_default arch cc cxx doxygen pkg_config ranlib strip sysinclude \
+set_default arch cc cxx doxygen pkg_config ranlib sysinclude \
     target_exec target_os x86asmexe nvcc
 enabled cross_compile || host_cc_default=$cc
 set_default host_cc
@@ -3349,7 +3332,6 @@ probe_cc(){
         # -Qvec- -Qsimd- to prevent miscompilation, -GS, fp:precise for consistency
         # with MSVC which enables it by default.
         _cflags='-Qms0 -Qvec- -Qsimd- -GS -fp:precise'
-        disable stripping
     elif $_cc -? 2>/dev/null | grep -q 'LLVM.*Linker'; then
         # lld can emulate multiple different linkers; in ms link.exe mode,
         # the -? parameter gives the help output which contains an identifyable
@@ -3381,7 +3363,6 @@ probe_cc(){
         _ld_lib='lib%.a'
         _ld_path='-libpath:'
         _flags='-nologo'
-        disable stripping
     elif $_cc --version 2>/dev/null | grep -q ^cparser; then
         _type=cparser
         _ident=$($_cc --version | head -n1)
@@ -3433,23 +3414,29 @@ if $cxx -v 2>&1 | grep -qi ^gcc; then
     cxx_type=gxx
     gxx_version=$($cxx -dumpversion)
     gxx_major=$(echo $gxx_version | sed "s/\([0-9]*\).*/\\1/")
+    cxxflags_speed='-O3'
+    cxxflags_size='-Os'
+    cxxflags_opt='-O2'
+    cxxflags_noopt='-O1'
 elif $cxx --version 2>/dev/null | grep -q Intel; then
     cxx_type=icpc
     gxx_version="AV_STRINGIFY(__INTEL_COMPILER)"
     cxx_ident=$($cxx --version | head -n1)
     icpc_version=$($cxx -dumpversion)
-    speed_cxxflags='-O3'
-    size_cxxflags='-Os'
-    noopt_cxxflags='-O1'
+    cxxflags_speed='-O3'
+    cxxflags_size='-Os'
+    cxxflags_opt='-O2'
+    cxxflags_noopt='-O1'
 elif $cxx --version 2>/dev/null | grep -q clang; then
     cxx_type=clangxx
     gxx_version="AV_STRINGIFY(__CLANG_COMPILER)"
     cxx_ident=$($cxx --version | head -n1)
     clangxx_version=$($cxx -dumpversion) # GCC equivalent version
     clangxx_major=$(echo $cxx_ident | sed "s/.*version \([0-9]*\).*/\\1/")
-    speed_cxxflags='-O3'
-    size_cxxflags='-Os'
-    noopt_cxxflags='-O1'
+    cxxflags_speed='-O3'
+    cxxflags_size='-Os'
+    cxxflags_opt='-O2'
+    cxxflags_noopt='-O1'
 fi
 
 test -n "$cxx_type" && enable $cxx_type ||
@@ -4293,7 +4280,6 @@ case $target_os in
         ;;
     bsd/os)
         add_extralibs -lpoll -lgnugetopt
-        strip="strip -d"
         ;;
     darwin)
         enable  appleremote
@@ -4317,7 +4303,6 @@ case $target_os in
         #Need to add @rpath in front of install name so test unit can use non-installed lib
         SHFLAGS='-headerpad_max_install_names -dynamiclib -Wl,-single_module -Wl,-install_name,@rpath/$(SLIBNAME),-current_version,$(LIBVERSION),-compatibility_version,$(LIBMAJOR)'
         enabled x86_32 && append SHFLAGS -Wl,-read_only_relocs,suppress
-        strip="${strip} -x"
         add_ldflags -Wl,-dynamic,-search_paths_first
         SLIBSUF=".dylib"
         SLIBNAME_WITH_VERSION='$(SLIBPREF)$(FULLNAME).$(LIBVERSION)$(SLIBSUF)'
@@ -4473,8 +4458,6 @@ case $target_os in
         ranlib="echo ignoring ranlib"
         ;;
     os/2*)
-        strip="lxlite -CS"
-        striptype=""
         objformat="aout"
         add_ldflags -Zomf -Zbin-files -Zargs-wild -Zhigh-mem -Zmap
         SHFLAGS='$(SUBDIR)$(NAME).def -Zdll -Zomf'
@@ -4692,22 +4675,67 @@ if test $target_os = android ; then
     append CONFIG_INCLUDEPATH $sysinclude "${sysroot}${prefix}"
 fi
 
+enable debug
 append CCONFIG "$compile_type"
-if test x$compile_type = x"release" ; then
-    add_cflags   -DNDEBUG
-    add_cxxflags -DNDEBUG
-    check_cxxflags -O2
-    enable debug
-elif test x$compile_type = x"profile" ; then
-    add_cflags   -DNDEBUG
-    add_cxxflags -DNDEBUG
-    check_cxxflags -O2
-    enable debug
-    disable stripping
-elif test x$compile_type = x"debug"; then
-    enable debug
-    disable optimizations stripping
+if test x$compile_type = x"debug"; then
+    add_cxxflags -DMYTH_DEBUG
+    disable optimizations
+else
+    # disable <cassert> / <assert.h>
+    CONFIG_DEFINES="$CONFIG_DEFINES NDEBUG"
+    if test x$compile_type = x"release" ; then
+        cxxoptflags_compile_type=$cxxflags_opt
+    elif test x$compile_type = x"profile" ; then
+        cxxoptflags_compile_type=$cxxflags_opt
+    fi
 fi
+
+if [ -z "$optflags" ]; then
+    if enabled small; then
+        optflags=$cflags_size
+    elif enabled optimizations; then
+        optflags=$cflags_speed
+    else
+        optflags=$cflags_noopt
+    fi
+fi
+
+if [ -z "$cxxoptflags" ]; then
+    if enabled small; then
+        cxxoptflags=$cxxflags_size
+    elif [ -n "$cxxoptflags_compile_type" ]; then
+        cxxoptflags=$cxxoptflags_compile_type
+    elif enabled optimizations; then
+        cxxoptflags=$cxxflags_opt
+    else
+        cxxoptflags=$cxxflags_noopt
+    fi
+fi
+
+check_optflags(){
+    check_cflags "$@"
+    enabled lto && check_ldflags "$@"
+}
+
+check_cxxoptflags(){
+    check_cxxflags "$@"
+    enabled lto && check_ldflags "$@"
+}
+
+check_optflags $optflags
+check_optflags -fno-math-errno
+check_optflags -fno-signed-zeros
+
+check_cxxoptflags $cxxoptflags
+
+if enabled lto; then
+    test "$cc_type" != "$ld_type" && die "LTO requires same compiler and linker"
+    check_cflags  -flto
+    check_cxxflags -flto
+    check_ldflags -flto $cpuflags
+    disable inline_asm_direct_symbol_refs
+fi
+
 
 enabled silent_cc && append CCONFIG "silent"
 
@@ -5829,9 +5857,6 @@ enabled rpath && add_ldexeflags -Wl,-rpath,$libdir
 enabled rpath && add_ldlibflags -Wl,-rpath,$libdir
 test_ldflags -Wl,-Bsymbolic && append SHFLAGS -Wl,-Bsymbolic
 
-# add some strip flags
-check_stripflags -x
-
 enabled neon_clobber_test &&
     check_ldflags -Wl,--wrap,avcodec_open2              \
                   -Wl,--wrap,avcodec_decode_audio4      \
@@ -5884,16 +5909,6 @@ EOF
     fi
 fi
 
-if [ -z "$optflags" ]; then
-    if enabled small; then
-        optflags=$cflags_size
-    elif enabled optimizations; then
-        optflags=$cflags_speed
-    else
-        optflags=$cflags_noopt
-    fi
-fi
-
 if [ -z "$nvccflags" ]; then
     nvccflags=$nvccflags_default
 fi
@@ -5904,22 +5919,6 @@ else
     nvccflags="$nvccflags -m32"
 fi
 
-check_optflags(){
-    check_cflags "$@"
-    enabled lto && check_ldflags "$@"
-}
-
-check_optflags $optflags
-check_optflags -fno-math-errno
-check_optflags -fno-signed-zeros
-
-if enabled lto; then
-    test "$cc_type" != "$ld_type" && die "LTO requires same compiler and linker"
-    check_cflags  -flto
-    check_cxxflags -flto
-    check_ldflags -flto $cpuflags
-    disable inline_asm_direct_symbol_refs
-fi
 
 if enabled dvb; then
     [ -d "$dvb_path" ] || dvb_path="${sysroot}/usr/include"
@@ -6224,9 +6223,6 @@ if enabled libcec ; then
     else
         check_cxx -I"$libcec_path" <<EOF || { disable libcec; }
 #include <libcec/cec.h>
-#include <iostream>
-using namespace std;
-using namespace CEC;
 #include <libcec/cecloader.h>
 int main(void) {
     #if (CEC_LIB_VERSION_MAJOR < 2)
@@ -6286,17 +6282,7 @@ if test $target_os = darwin; then
     fi
 fi
 
-if [ -n "$optflags" ]; then
-    add_cflags $optflags
-elif enabled small; then
-    add_cflags $cflags_size
-elif enabled optimizations; then
-    add_cflags $cflags_speed
-else
-    add_cflags $cflags_noopt
-fi
-check_cflags -fno-math-errno
-check_cflags -fno-signed-zeros
+
 check_cc -mno-red-zone <<EOF && noredzone_flags="-mno-red-zone"
 int x;
 EOF
@@ -6723,6 +6709,16 @@ ffmpeg_optenable() {
     done
 }
 
+ffmpeg_optenableif() {
+    while test -n "$1" ; do
+        val=$(eval "echo \$$1")
+        if enabled "$1" ; then
+            ffopts="$ffopts --enable-"$(echo "$1" | sed 's/_/-/g')
+        fi
+        shift
+    done
+}
+
 ffopts=
 ffmpeg_optset arch cross_prefix sysroot sysinclude cc cxx ld cpu
 ffmpeg_optset extra_cxxflags extra_ldflags target_os
@@ -6732,7 +6728,7 @@ ffmpeg_optset ar nm ranlib
 ffmpeg_optenable cross_compile libmp3lame libx264 libx265 libvpx libxvid
 ffmpeg_optenable vdpau libxml2 libass dxva2
 ffmpeg_optenable libbluray libfontconfig libfreetype libiec61883
-ffmpeg_optenable crystalhd sdl2 ffplay
+ffmpeg_optenable sdl2 ffplay
 
 if test $target_os = "android"; then
     enabled mediacodec && enable jni
@@ -6742,36 +6738,19 @@ if test $target_os = "android"; then
 else
     disable mediacodec
 fi
-if enabled vaapi; then
-    ffopts="$ffopts --enable-vaapi"
-fi
 
-if enabled mmal; then
-    ffopts="$ffopts --enable-mmal"
-fi
+ffmpeg_optenableif vaapi mmal libaom libdav1d gnutls lto
 
 if enabled drm; then
     ffopts="$ffopts --enable-libdrm"
 fi
 
-if enabled libaom; then
-    ffopts="$ffopts --enable-libaom"
+
+ffmpeg_extra_cflags="$extra_cflags"
+if disabled ffmpeg_warnings; then
+    ffmpeg_extra_cflags="$ffmpeg_extra_cflags -w"
 fi
 
-
-if enabled libdav1d; then
-    ffopts="$ffopts --enable-libdav1d"
-fi
-
-if enabled gnutls; then
-    ffopts="$ffopts --enable-gnutls"
-fi
-
-if enabled lto; then
-    ffopts="$ffopts --enable-lto"
-fi
-
-ffmpeg_extra_cflags="$extra_cflags -w"
 if test "$ID" = "raspbian"; then
     case $cpu in
         armv*) ffmpeg_extra_ldflags="$ffmpeg_extra_libs -latomic" ;;
@@ -6782,8 +6761,7 @@ append ffopts \
 --extra-cflags=\'"$ffmpeg_extra_cflags"\' \
 --extra-ldflags=\'"$ffmpeg_extra_ldflags"\' \
 --extra-libs=\'"$ffmpeg_extra_ldflags"\' \
---enable-stripping \
---strip=\'"echo skipping strip"\' \
+--disable-stripping \
 --disable-manpages  \
 --disable-podpages  \
 --disable-doc \
@@ -6945,9 +6923,6 @@ if enabled source_path_used; then
     map 'test -f "$source_path/$v" && $ln_s "$source_path/$v" $v' $FILES
 fi
 
-enabled stripping || strip="echo skipping strip"
-enabled stripping || striptype=""
-
 config_files="$TMPH $TMPMAK"
 
 if enabled backend; then
@@ -7058,6 +7033,10 @@ echo "# Compilation Options"
 echo "C++ standard supported    ${CPP_STANDARD}"
 echo "Enforce c++11 nullptr     ${enforce_nullptr-no}"
 echo "Enforce shadowed vars     ${enforce_wshadow-no}"
+echo "## Optimization"
+echo "C++                       ${cxxoptflags}"
+echo "C                         ${optflags}"
+echo "LTO                       ${lto-no}"
 echo ""
 
 # Remove redundant elements from variables
@@ -7129,8 +7108,6 @@ AR_O=$ar_o
 QMAKE_AR=$ar $arflags
 RANLIB=$ranlib
 QMAKE_RANLIB=$ranlib
-STRIP=$strip
-STRIPTYPE=$striptype
 NVCC=$nvcc
 CP=cp -p
 LN_S=$ln_s
@@ -7166,7 +7143,6 @@ DOXYGEN=$doxygen
 LDFLAGS=$LDFLAGS
 LDEXEFLAGS=$LDEXEFLAGS
 LDLIBFLAGS=$LDLIBFLAGS
-ASMSTRIPFLAGS=$ASMSTRIPFLAGS
 X86ASMFLAGS=$X86ASMFLAGS
 BUILDSUF=$build_suffix
 PROGSSUF=$progs_suffix

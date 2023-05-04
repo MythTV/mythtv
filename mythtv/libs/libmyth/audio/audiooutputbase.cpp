@@ -109,7 +109,7 @@ AudioOutputBase::~AudioOutputBase()
     if (m_kAudioSRCOutputSize > 0)
         delete[] m_srcOut;
 
-#ifndef NDEBUG
+#ifdef MYTH_DEBUG
     assert(m_memoryCorruptionTest0 == 0xdeadbeef);
     assert(m_memoryCorruptionTest1 == 0xdeadbeef);
     assert(m_memoryCorruptionTest2 == 0xdeadbeef);

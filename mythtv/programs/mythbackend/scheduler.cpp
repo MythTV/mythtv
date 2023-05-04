@@ -617,11 +617,11 @@ void Scheduler::PrintRec(const RecordingInfo *p, const QString &prefix)
     // is included.  Because PrintList is 1 character longer than
     // PrintRec, the output is off by 1 character.  To compensate,
     // initialize outstr to 1 space in those cases.
-#ifndef NDEBUG // debug compile type
+#ifdef MYTH_DEBUG // debug compile type
     static QString initialOutstr = " ";
-#else // defined NDEBUG
+#else // !MYTH_DEBUG
     static QString initialOutstr = "";
-#endif
+#endif // MYTH_DEBUG
 
     QString outstr = initialOutstr + prefix;
 
