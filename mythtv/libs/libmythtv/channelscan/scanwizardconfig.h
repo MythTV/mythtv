@@ -103,7 +103,9 @@ class ScanTypeSetting : public TransMythUIComboBoxSetting
         // Import using the VBox API to get the channel list
         VBoxImport,
         // Import using the ExternalRecorder API to get the channel list
-        ExternRecImport
+        ExternRecImport,
+        // Import using the HDHomeRun API to get the channel list
+        HDHRImport
     };
 
     ScanTypeSetting()

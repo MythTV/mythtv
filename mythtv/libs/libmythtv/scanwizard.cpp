@@ -72,7 +72,7 @@ void ScanWizard::Scan()
     if (scantype == ScanTypeSetting::DVBUtilsImport)
     {
         m_scannerPane->ImportDVBUtils(sourceid, m_lastHWCardType,
-                                    GetFilename());
+                                      GetFilename());
     }
     else if (scantype == ScanTypeSetting::NITAddScan_DVBT)
     {
@@ -108,13 +108,19 @@ void ScanWizard::Scan()
     {
         do_scan = false;
         m_scannerPane->ImportVBox(cardid, inputname, sourceid,
-                                DoFreeToAirOnly(),
-                                GetServiceRequirements());
+                                  DoFreeToAirOnly(),
+                                  GetServiceRequirements());
     }
     else if (scantype == ScanTypeSetting::ExternRecImport)
     {
         do_scan = false;
         m_scannerPane->ImportExternRecorder(cardid, inputname, sourceid);
+    }
+    else if (scantype == ScanTypeSetting::HDHRImport)
+    {
+        do_scan = false;
+        m_scannerPane->ImportHDHR(cardid, inputname, sourceid,
+                                  GetServiceRequirements());
     }
     else if (scantype == ScanTypeSetting::IPTVImportMPTS)
     {

@@ -404,6 +404,30 @@ bool ChannelScanner::ImportExternRecorder(uint cardid, const QString &inputname,
 #endif
 }
 
+bool ChannelScanner::ImportHDHR(uint cardid, const QString &inputname, uint sourceid,
+                                ServiceRequirements serviceType)
+{
+    m_sourceid = sourceid;
+#ifdef USING_HDHOMERUN
+    if (!m_scanMonitor)
+        m_scanMonitor = new ScanMonitor(this);
+
+    // Create a HDHomeRun scan object
+    m_hdhrScanner = new HDHRChannelFetcher(cardid, inputname, sourceid, serviceType, m_scanMonitor);
+
+    MonitorProgress(false, false, false, false);
+
+    m_hdhrScanner->Scan();
+
+    return true;
+#else
+    (void) cardid;
+    (void) inputname;
+    (void) serviceType;
+    return false;
+#endif
+}
+
 void ChannelScanner::PreScanCommon(
     int scantype,
     uint cardid,
