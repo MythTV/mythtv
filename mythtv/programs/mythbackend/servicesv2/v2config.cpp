@@ -60,7 +60,7 @@ bool V2Config::SetDatabaseCredentials(const QString &Host, const QString &UserNa
         port = Port;
 
     if (DoTest && !TestDatabase(Host, UserName, Password, db, port))
-        throw( QString( "Database test failed. Not saving database connection information." ));
+        return false;
 
     DatabaseParams dbparms;
     dbparms.m_dbName = db;
