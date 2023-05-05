@@ -158,9 +158,16 @@
     "setupDatabase": "Database Setup",
     "setupNetwork": "Backend Network",
     "setupStorageGroups": "Storage Groups",
-    "testConnection": "Test Connection",
+    "testConnection": "Test Database Connection",
     "title": "Initial Setup Wizard",
-    "userRequired": "User is required"
+    "userRequired": "User is required",
+    "connectionsuccess": "Connection to database was successful",
+    "connectionfail": "Unsuccessful connection to database",
+    "ipaddress_help": "The hostname or IP address of the machine hosting the database.",
+    "port_help": "The port number the database is running on. This is usually the default 3306.",
+    "user_help": "The MySQL user name to use while connecting to the database. The default is mythtv.",
+    "password_help": "The MySQL password to use while connecting to the database.",
+    "dbname_help": "The name of the database. This is usually 'mythconverg'."
   },
   "testbed": {
     "title": "This is a testbed area",

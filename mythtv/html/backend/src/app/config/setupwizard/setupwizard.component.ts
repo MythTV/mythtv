@@ -16,7 +16,7 @@ export class SetupWizardComponent implements OnInit {
                 private configService: ConfigService,
                 private translate: TranslateService) { }
     wizardItems: MenuItem[] = [];
-    
+
     ngOnInit(): void {
         this.translate.get('setupwizard.chooseLanguage').subscribe(
             (translated: string) => {
@@ -41,8 +41,6 @@ export class SetupWizardComponent implements OnInit {
                     routerLink: 'restart'
                 }
                 ]
-            })
-        
-        this.router.navigate(['settings/selectlanguage']);
+            });
     }
 }

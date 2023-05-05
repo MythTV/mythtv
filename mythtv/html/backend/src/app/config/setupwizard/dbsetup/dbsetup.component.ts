@@ -1,13 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormBuilder, Validators } from '@angular/forms';
-import { Database } from '../../../services/interfaces/myth.interface';
 import { ConfigService } from '../../../services/config.service';
 import { MythService } from '../../../services/myth.service';
 import { WizardData } from '../../../services/interfaces/wizarddata.interface';
 import { SetupWizardService } from '../../../services/setupwizard.service';
-import { HttpErrorResponse } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
+import { TestDBSettingsRequest } from 'src/app/services/interfaces/myth.interface';
+import { TranslateService } from '@ngx-translate/core';
+import { NgForm } from '@angular/forms';
+import { Observable, of } from 'rxjs';
+import { SetupService } from 'src/app/services/setup.service';
 
 @Component({
     selector: 'app-dbsetup',
@@ -17,15 +19,33 @@ import { MessageService } from 'primeng/api';
 })
 export class DbsetupComponent implements OnInit {
 
+    @ViewChild("databaseForm") currentForm!: NgForm;
+
     m_wizardData!: WizardData;
-    m_showHelp: boolean = false;
+
+    successCount = 0;
+    errorCount = 0;
+    expectedCount = 2;
+    connectionFail = false;
+
+    msg_testconnection = 'setupwizard.testConnection';
+    msg_connectionsuccess = 'setupwizard.connectionsuccess';
+    msg_connectionfail = 'setupwizard.connectionfail';
+    warningText = 'settings.common.warning';
+
 
     constructor(private router: Router,
         private configService: ConfigService,
         private mythService: MythService,
         private wizardService: SetupWizardService,
-        private formBuilder: FormBuilder,
-        private messageService: MessageService) { }
+        private translate: TranslateService,
+        private messageService: MessageService,
+        public setupService: SetupService) {
+        this.translate.get(this.msg_testconnection).subscribe(data => this.msg_testconnection = data);
+        this.translate.get(this.msg_connectionsuccess).subscribe(data => this.msg_connectionsuccess = data);
+        this.translate.get(this.msg_connectionfail).subscribe(data => this.msg_connectionfail = data);
+        this.translate.get(this.warningText).subscribe(data => this.warningText = data);
+    }
 
     ngOnInit(): void {
         this.wizardService.initDatabaseStatus();
@@ -33,41 +53,78 @@ export class DbsetupComponent implements OnInit {
     }
 
     previousPage() {
-        this.router.navigate(['settings/selectlanguage']);
+        this.router.navigate(['setupwizard/selectlanguage']);
         return;
     }
 
     nextPage() {
-        this.router.navigate(['settings/backendnetwork']);
+        this.router.navigate(['setupwizard/backendnetwork']);
         return;
     }
 
-    showHelp() {
-        this.m_showHelp = true;
-    }
-
-    saveForm() {
-        console.log("save form clicked");
-    }
-
-    testConnection() {
-        console.log(this.m_wizardData.Database);
-        this.configService.SetDatabaseCredentials(this.m_wizardData.Database).subscribe(
-            result => {
-                // we got a good return code
-                console.log(result);
-                this.messageService.add({severity:'success', life: 5000, summary:'Test Database Connection', detail:'Connection to database was successful'});
-                this.wizardService.updateDatabaseStatus();
-            },
-            (err: HttpErrorResponse) => {
-                // we got an error return code
-                console.log("Failed to set creditals", err.statusText);
-
-                this.m_wizardData.DatabaseStatus.DatabaseStatus.Connected = false;
-                this.m_wizardData.DatabaseStatus.DatabaseStatus.HaveDatabase = false;
-                this.m_wizardData.DatabaseStatus.DatabaseStatus.SchemaVersion = 0;
-                this.messageService.add({severity:'error', life: 5000, summary:'Test Database Connection', detail:'Connection to database failed'});
+    saveObserver = {
+        next: (x: any) => {
+            if (x.bool) {
+                this.successCount++;
             }
-        );
+            else {
+                this.errorCount++;
+                if (this.currentForm)
+                    this.currentForm.form.markAsDirty();
+            }
+        },
+        error: (err: any) => {
+            console.error(err);
+            this.errorCount++;
+            if (this.currentForm)
+                this.currentForm.form.markAsDirty();
+        },
+    };
+
+    saveForm(doSave: boolean) {
+        this.successCount = 0;
+        this.errorCount = 0;
+        this.expectedCount = 1;
+        this.connectionFail = false;
+        const params: TestDBSettingsRequest = {
+            HostName: this.m_wizardData.Database.Host,
+            UserName: this.m_wizardData.Database.UserName,
+            Password: this.m_wizardData.Database.Password,
+            DBName: this.m_wizardData.Database.Name,
+            dbPort: this.m_wizardData.Database.Port
+        }
+        this.mythService.TestDBSettings(params).subscribe(result => {
+            if (result.bool) {
+                if (doSave) {
+                    this.configService.SetDatabaseCredentials(this.m_wizardData.Database)
+                        .subscribe(this.saveObserver);
+                }
+                else
+                    this.messageService.add({ severity: 'success', life: 5000, summary: this.msg_testconnection, detail: this.msg_connectionsuccess });
+            }
+            else {
+                this.messageService.add({ severity: 'error', life: 5000, summary: this.msg_testconnection, detail: this.msg_connectionfail });
+                this.connectionFail = true;
+            }
+        });
+    }
+
+    confirm(message?: string): Observable<boolean> {
+        const confirmation = window.confirm(message);
+        return of(confirmation);
+    };
+
+    canDeactivate(): Observable<boolean> | boolean {
+        if (this.currentForm && this.currentForm.dirty)
+            return this.confirm(this.warningText);
+        return true;
+    }
+
+    @HostListener('window:beforeunload', ['$event'])
+    onWindowClose(event: any): void {
+        if (this.currentForm && this.currentForm.dirty) {
+            event.preventDefault();
+            event.returnValue = false;
+        }
     }
 }

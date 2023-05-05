@@ -1,11 +1,6 @@
 <p-toast></p-toast>
 
-<p-dialog header="Database Setup - Help" [(visible)]="m_showHelp">
-    <h4>Some very helpful help text goes here</h4>
-    <p>Some more very very helpful text goes here!</p>
-</p-dialog>
-
-<form class="ml-3 mr-3" name="databaseForm" #databaseForm="ngForm" (ngSubmit)="saveForm()">
+<form class="ml-3 mr-3" name="databaseForm" #databaseForm="ngForm">
     <p-card class="m-5">
         <ng-template pTemplate="title">
             {{ 'setupwizard.databaseSetup' | translate }}
@@ -17,104 +12,138 @@
             <div class="formgrid grid form-group">
                 <div class="field col-12 md:col-6">
                     <label for="ipaddress" class="label block">{{ 'setupwizard.MySQLServerIP' | translate }}</label>
-                    <input pInputText id="ipaddress" type="text" aria-describedby="ipaddress-help" 
-                           [(ngModel)]="m_wizardData.Database.Host" name="hostname" #host="ngModel" class="mb-2 form-control w-full" 
-                           [ngClass]="{'is-invalid': host.invalid }" placeholder="Ex. 127.0.0.1 or localhost" required />
-                    <small id="ipaddress-help">The hostname or IP address of the machine hosting the database.</small>
+                    <input pInputText id="ipaddress" type="text" aria-describedby="ipaddress-help"
+                        [(ngModel)]="m_wizardData.Database.Host" name="hostname" #host="ngModel"
+                        class="mb-2 form-control w-full" [ngClass]="{'is-invalid': host.invalid }"
+                        placeholder="Ex. 127.0.0.1 or localhost" required />
+                    <small id="ipaddress-help">{{ 'setupwizard.ipaddress_help' | translate }}</small>
                     <div *ngIf="host.invalid && (host.dirty || host.touched)">
-                        <small id="address-help" class="p-error block">{{ 'setupwizard.IPorAddressRequired' | translate }}</small>
+                        <small id="address-help" class="p-error block">{{ 'setupwizard.IPorAddressRequired' | translate
+                            }}</small>
                     </div>
                 </div>
 
                 <div class="field col-12 md:col-6">
                     <label for="port" class="label block">{{ 'setupwizard.MySQLServerPort' | translate }}</label>
-                    <input pInputText id="port" type="number" aria-describedby="port-help" 
-                           [(ngModel)]="m_wizardData.Database.Port" name="port" #port="ngModel" class=" mb-2 form-control w-full" placeholder="Ex. 3306" min="0" max="65536"/>
-                    <small id="port-help">The port number the database is running on. This is usually the default 3306.</small>
-                   <div *ngIf="port.invalid && (port.dirty || port.touched)">
+                    <input pInputText id="port" type="number" aria-describedby="port-help"
+                        [(ngModel)]="m_wizardData.Database.Port" name="port" #port="ngModel"
+                        class=" mb-2 form-control w-full" placeholder="Ex. 3306" min="0" max="65536" />
+                    <small id="port-help">{{ 'setupwizard.port_help' | translate }}</small>
+                    <div *ngIf="port.invalid && (port.dirty || port.touched)">
                         <small class="p-error block">{{ 'setupwizard.portRequired' | translate }}</small>
                     </div>
                 </div>
 
                 <div class="field col-12 md:col-6">
                     <label for="user" class="label block">{{ 'setupwizard.MySQLUser' | translate }}</label>
-                    <input pInputText id="user" type="text" aria-describedby="user-help" 
-                        [(ngModel)]="m_wizardData.Database.UserName" name="user" #user="ngModel" class="mb-2 form-control w-full" placeholder="Ex. mythtv" required/>
-                    <small id="user-help">The MySQL user name to use while connecting to the database. The default is mythtv.</small>
+                    <input pInputText id="user" type="text" aria-describedby="user-help"
+                        [(ngModel)]="m_wizardData.Database.UserName" name="user" #user="ngModel"
+                        class="mb-2 form-control w-full" placeholder="Ex. mythtv" required />
+                    <small id="user-help">{{ 'setupwizard.user_help' | translate }}</small>
                     <div *ngIf="user.invalid && (user.dirty || user.touched)">
                         <small class="p-error block">{{ 'setupwizard.userRequired' | translate }}</small>
                     </div>
                 </div>
                 <div class="field col-12 md:col-6">
                     <label for="password" class="label block">{{ 'setupwizard.MySQLPassword' | translate }}</label>
-                    <input pInputText id="password" type="text" aria-describedby="password-help" 
-                           [(ngModel)]="m_wizardData.Database.Password" name="password" #password="ngModel" class="mb-2 form-control w-full" placeholder="Ex. mythtv" required/>
-                    <small id="password-help">The MySQL password to use while connecting to the database.</small>
-                   <div *ngIf="password.invalid && (password.dirty || password.touched)">
+                    <input pInputText id="password" type="text" aria-describedby="password-help"
+                        [(ngModel)]="m_wizardData.Database.Password" name="password" #password="ngModel"
+                        class="mb-2 form-control w-full" placeholder="Ex. mythtv" required />
+                    <small id="password-help">{{ 'setupwizard.password_help' | translate }}</small>
+                    <div *ngIf="password.invalid && (password.dirty || password.touched)">
                         <small class="p-error block">{{ 'setupwizard.passwordRequired' | translate }}</small>
                     </div>
                 </div>
 
                 <div class="field col-12 md:col-6">
                     <label for="dbname" class="label block">{{ 'setupwizard.MySQLDatabaseName' | translate }}</label>
-                    <input pInputText id="dbname" type="text" aria-describedby="dbname-help" 
-                           [(ngModel)]="m_wizardData.Database.Name" name="dbname" #dbname="ngModel" class="mb-2 form-control w-full" placeholder="Ex. mythconverg" required/>
-                    <small id="dbname-help">The name of the database. This is usually 'mythconverg'.</small>
-                   <div *ngIf="dbname.invalid && (dbname.dirty || dbname.touched)">
+                    <input pInputText id="dbname" type="text" aria-describedby="dbname-help"
+                        [(ngModel)]="m_wizardData.Database.Name" name="dbname" #dbname="ngModel"
+                        class="mb-2 form-control w-full" placeholder="Ex. mythconverg" required />
+                    <small id="dbname-help">{{ 'setupwizard.dbname_help' | translate }}</small>
+                    <div *ngIf="dbname.invalid && (dbname.dirty || dbname.touched)">
                         <small class="p-error block">{{ 'setupwizard.databaseNameRequired' | translate }}</small>
                     </div>
-                </div>           
-             </div>
-             <div>
-                <p-button type="button" class="mr-1 p-button-raised p-button-secondary" label="{{ 'setupwizard.testConnection' | translate }}" (click)="testConnection()" [disabled]="databaseForm.invalid == null || databaseForm.invalid"></p-button>              
+                </div>
             </div>
-            
+            <div>
+                <p-button type="button" class="mr-1 p-button-raised p-button-secondary"
+                    label="{{ 'setupwizard.testConnection' | translate }}" (click)="saveForm(false)"
+                    [disabled]="databaseForm.invalid == null || databaseForm.invalid"></p-button>
+            </div>
+
             <div class="pt-4" style="display: flex">
                 <!-- connected -->
                 <div *ngIf="m_wizardData.DatabaseStatus.DatabaseStatus.Connected else notconnected">
-                    <p-message class="pr-2" severity="success" text="{{ 'setupwizard.connectedToDatabase' | translate }}"></p-message>
+                    <p-message class="pr-2" severity="success"
+                        text="{{ 'setupwizard.connectedToDatabase' | translate }}"></p-message>
                 </div>
-                
+
                 <ng-template #notconnected>
                     <div #notconnected class="pr-2 notconnected">
-                        <p-message class="" severity="error" text="{{ 'setupwizard.notConnectedToDatabase' | translate }}"></p-message>
+                        <p-message class="" severity="error"
+                            text="{{ 'setupwizard.notConnectedToDatabase' | translate }}"></p-message>
                     </div>
                 </ng-template>
-                
+
                 <!-- have database -->
                 <div *ngIf="m_wizardData.DatabaseStatus.DatabaseStatus.HaveDatabase else nodatabase">
-                    <p-message class="pr-2" severity="success" text="Have '{{m_wizardData.Database.Name}}' database"></p-message>
+                    <p-message class="pr-2" severity="success"
+                        text="Have '{{m_wizardData.Database.Name}}' database"></p-message>
                 </div>
-                
+
                 <ng-template #nodatabase>
                     <div #nodatabase class="pr-2 nodatabase">
-                        <p-message severity="error" text="Do not have '{{m_wizardData.Database.Name}}' database"></p-message>
+                        <p-message severity="error"
+                            text="Do not have '{{m_wizardData.Database.Name}}' database"></p-message>
                     </div>
                 </ng-template>
-                
+
                 <!-- schema version -->
-                <div *ngIf="m_wizardData.DatabaseStatus.DatabaseStatus.Connected && m_wizardData.DatabaseStatus.DatabaseStatus.HaveDatabase else noschema">
+                <div
+                    *ngIf="m_wizardData.DatabaseStatus.DatabaseStatus.Connected && m_wizardData.DatabaseStatus.DatabaseStatus.HaveDatabase else noschema">
                     <p-message class="pr-2" severity="info"
                         text="Database schema version is {{m_wizardData.DatabaseStatus.DatabaseStatus.SchemaVersion}}"></p-message>
                 </div>
-                
+
                 <ng-template #noschema>
                     <div #nodatabase class="pr-2 noschema">
-                        <p-message severity="info" text="{{ 'setupwizard.databaseSchemaUnknown' | translate }}"></p-message>
+                        <p-message severity="info"
+                            text="{{ 'setupwizard.databaseSchemaUnknown' | translate }}"></p-message>
                     </div>
                 </ng-template>
             </div>
 
-        </ng-template>   
-        
-        <ng-template pTemplate="footer">
-            <div class="p-grid p-nogutter p-justify-end">
-                <p-button class="pr-1" label="{{ 'common.back' | translate }}" (onClick)="previousPage()" icon="pi pi-angle-left" iconPos="left"></p-button>
-                <p-button label="{{'common.next' | translate}}" (onClick)="nextPage()" icon="pi pi-angle-right" iconPos="right" 
-                          [disabled]="databaseForm.invalid || !m_wizardData.DatabaseStatus.DatabaseStatus.Connected || !m_wizardData.DatabaseStatus.DatabaseStatus.HaveDatabase">
-                </p-button>              
-                <p-button class="help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()" icon="pi pi-info-circle" styleClass="p-button-info" ></p-button>
-            </div>          
         </ng-template>
+
+        <ng-template pTemplate="footer">
+            <div class="grid nogutter m-5">
+                <div class="col-12">
+                    <p-message
+                        *ngIf="successCount > 0 && successCount == expectedCount && errorCount == 0 && !databaseForm.dirty"
+                        severity="success" text="{{ 'common.savesuccess' | translate }}"></p-message>
+                    <p-message *ngIf="errorCount > 0" severity="error"
+                        text="{{ 'common.networkfail' | translate }}"></p-message>
+                    <p-message *ngIf="connectionFail" severity="error"
+                        text="{{ 'setupwizard.connectionfail' | translate }}"></p-message>
+                </div>
+
+                <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
+                    (onClick)="saveForm(true); databaseForm.form.markAsPristine()"
+                    [disabled]="!databaseForm.dirty || setupService.schedulingEnabled"></p-button>
+
+                <p-button class="pr-3" label="{{ 'common.back' | translate }}" (onClick)="previousPage()"
+                    icon="pi pi-angle-left" iconPos="left"></p-button>
+
+                <p-button class="pr-3" label="{{ 'common.next' | translate }}" (onClick)="nextPage()"
+                    icon="pi pi-angle-right" iconPos="right"
+                    [disabled]="(m_wizardData.Country.Code == '') || (m_wizardData.Language.Code == '')">
+                </p-button>
+
+            </div>
+        </ng-template>
+
+
+
     </p-card>
 </form>

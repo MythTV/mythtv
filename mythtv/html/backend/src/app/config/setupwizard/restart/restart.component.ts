@@ -13,7 +13,7 @@ export class RestartComponent implements OnInit {
   m_wizardData!: WizardData;
 
   constructor(private router: Router,
-              private wizardService: SetupWizardService) { }
+    private wizardService: SetupWizardService) { }
 
   ngOnInit(): void {
     this.m_wizardData = this.wizardService.getWizardData();
@@ -23,7 +23,7 @@ export class RestartComponent implements OnInit {
     this.router.navigate(['settings/sgsetup']);
 
     return;
-}
+  }
 
 
   restartBackend() {

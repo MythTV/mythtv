@@ -1,7 +1,8 @@
+<app-backend-warning></app-backend-warning>
 <div class="content-section implementation">
     <div class="card">
         <h1>{{ 'setupwizard.title' | translate }}</h1>
-        <p-steps [model]="wizardItems" [readonly]="true"></p-steps>
+        <p-steps [model]="wizardItems" [readonly]="false"></p-steps>
     </div>
     <router-outlet></router-outlet>
 </div>
