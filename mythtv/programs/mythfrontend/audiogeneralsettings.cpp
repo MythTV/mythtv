@@ -159,7 +159,7 @@ AudioConfigSettings::AudioConfigSettings()
     addChild(srcqualityoverride);
 
     advancedSettings->addChild(Audio48kOverride());
-#if USING_ALSA
+#ifdef USING_ALSA
     advancedSettings->addChild(SPDIFRateOverride());
 #endif
 
