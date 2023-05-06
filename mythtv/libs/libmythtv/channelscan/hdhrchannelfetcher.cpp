@@ -177,16 +177,20 @@ QString HDHRIPv4Address(const QString &device)
 #endif
 }
 
-// Examples of hdhrmod values: a8qam64-6875 a8qam256-6900 t8dvbt2
-QString HDHRMod2Modsys(const QString hdhrmod)
+// Examples of hdhrmod values: a8qam64-6875 a8qam256-6900 t8dvbt2 8vsb
+DTVModulationSystem HDHRMod2Modsys(const QString hdhrmod)
 {
     if (hdhrmod.contains("dvbt2"))
-        return DTVModulationSystem(DTVModulationSystem::kModulationSystem_DVBT2).toString();
+        return DTVModulationSystem(DTVModulationSystem::kModulationSystem_DVBT2);
     if (hdhrmod.contains("dvbt"))
-        return DTVModulationSystem(DTVModulationSystem::kModulationSystem_DVBT).toString();
+        return DTVModulationSystem(DTVModulationSystem::kModulationSystem_DVBT);
     if (hdhrmod.startsWith("a8qam"))
-        return DTVModulationSystem(DTVModulationSystem::kModulationSystem_DVBC_ANNEX_A).toString();
-    return DTVModulationSystem(DTVModulationSystem::kModulationSystem_UNDEFINED).toString();
+        return DTVModulationSystem(DTVModulationSystem::kModulationSystem_DVBC_ANNEX_A);
+    if (hdhrmod.contains("vsb"))
+        return DTVModulationSystem(DTVModulationSystem::kModulationSystem_ATSC);
+    if (hdhrmod.contains("psk"))
+        return DTVModulationSystem(DTVModulationSystem::kModulationSystem_ATSC);
+    return DTVModulationSystem(DTVModulationSystem::kModulationSystem_UNDEFINED);
 }
 
 signed char HDHRMod2Bandwidth(const QString hdhrmod)
@@ -214,11 +218,28 @@ uint HDHRMod2SymbolRate(const QString hdhrmod)
 
 QString HDHRMod2Modulation(const QString hdhrmod)
 {
-    if (hdhrmod.contains("qam64"))
-        return DTVModulation(DTVModulation::kModulationQAM64).toString();
     if (hdhrmod.contains("qam256"))
         return DTVModulation(DTVModulation::kModulationQAM256).toString();
+    if (hdhrmod.contains("qam128"))
+        return DTVModulation(DTVModulation::kModulationQAM128).toString();
+    if (hdhrmod.contains("qam64"))
+        return DTVModulation(DTVModulation::kModulationQAM64).toString();
+    if (hdhrmod.contains("qam16"))
+        return DTVModulation(DTVModulation::kModulationQAM16).toString();
+    if (hdhrmod.contains("qpsk"))
+        return DTVModulation(DTVModulation::kModulationQPSK).toString();
+    if (hdhrmod.contains("8vsb"))
+        return DTVModulation(DTVModulation::kModulation8VSB).toString();
     return DTVModulation(DTVModulation::kModulationQAMAuto).toString();
+}
+
+void  HDHRMajorMinorChannel(QString channum, uint &atsc_major_channel, uint &atsc_minor_channel)
+{
+    if (channum.contains("."))
+    {
+        QChar dot;
+        QTextStream(&channum) >> atsc_major_channel >> dot >> atsc_minor_channel;
+    }
 }
 
 } // namespace
@@ -349,12 +370,15 @@ void HDHRChannelFetcher::run(void)
         uint transportID    = (*it).m_transportID;
         uint frequency      = (*it).m_frequency;
 
-        QString modsys = HDHRMod2Modsys(hdhrmod);
+        DTVModulationSystem modsys = HDHRMod2Modsys(hdhrmod);
         QString modulation = HDHRMod2Modulation(hdhrmod);
         uint symbolrate = HDHRMod2SymbolRate(hdhrmod);
         signed char bandwidth = HDHRMod2Bandwidth(hdhrmod);
         uint atsc_major_channel = 0;
         uint atsc_minor_channel = 0;
+        HDHRMajorMinorChannel(channum, atsc_major_channel, atsc_minor_channel);
+        QString sistandard = (atsc_major_channel > 0 && atsc_minor_channel > 0) ? "atsc" : "dvb";
+
         bool use_on_air_guide = true;
 
         QString msg = tr("%1 channel %2: %3").arg(channelType).arg(channum, -5, QChar(' ')).arg(name, -15, QChar(' '));
@@ -398,26 +422,32 @@ void HDHRChannelFetcher::run(void)
             }
 
             // A new dtv_multiplex entry will be created if necessary, otherwise an existing one is returned
-            uint mplexID = ChannelUtil::CreateMultiplex(m_sourceId, "dvb", frequency, modulation,
+            uint mplexID = ChannelUtil::CreateMultiplex(m_sourceId, sistandard, frequency, modulation,
                                                         transportID, networkID, symbolrate, bandwidth,
                                                         'v', 'a', 'a', QString(), QString(), 'a', QString(),
-                                                        QString(), QString(), modsys, "0.35");
+                                                        QString(), QString(), modsys.toString(), "0.35");
+            if (mplexID == 0)
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("No multiplex for %1 sid:%2 freq:%3 url:%4")
+                    .arg(msg).arg(serviceID, -5, 10, QChar(' ')).arg(frequency).arg((*it).m_tuning.GetDataURL().toString()));
+                continue;
+            }
 
             if (adding_channel)
             {
                 ChannelUtil::CreateChannel(mplexID, m_sourceId, chanid, name, name,
-                                           channum, serviceID, atsc_major_channel, atsc_minor_channel,
-                                           use_on_air_guide, kChannelVisible, QString(),
-                                           QString(), "Default", QString());
+                                        channum, serviceID, atsc_major_channel, atsc_minor_channel,
+                                        use_on_air_guide, kChannelVisible, QString(),
+                                        QString(), "Default", QString());
 
                 ChannelUtil::CreateIPTVTuningData(chanid, (*it).m_tuning);
             }
             else
             {
                 ChannelUtil::UpdateChannel(mplexID, m_sourceId, chanid, name, name,
-                                           channum, serviceID, atsc_major_channel, atsc_minor_channel,
-                                           use_on_air_guide, kChannelVisible, QString(),
-                                           QString(), "Default", QString());
+                                        channum, serviceID, atsc_major_channel, atsc_minor_channel,
+                                        use_on_air_guide, kChannelVisible, QString(),
+                                        QString(), "Default", QString());
 
                 ChannelUtil::UpdateIPTVTuningData(chanid, (*it).m_tuning);
             }
