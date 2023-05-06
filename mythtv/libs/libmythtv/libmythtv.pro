@@ -961,6 +961,10 @@ using_backend {
         SOURCES += recorders/hdhrrecorder.cpp
         SOURCES += recorders/hdhrstreamhandler.cpp
 
+        # HDHomeRun channel list import
+        HEADERS += channelscan/hdhrchannelfetcher.h
+        SOURCES += channelscan/hdhrchannelfetcher.cpp
+
         HEADERS *= recorders/streamhandler.h
         SOURCES *= recorders/streamhandler.cpp
 

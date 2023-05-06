@@ -49,6 +49,10 @@
 #include "externrecscanner.h"
 #endif
 
+#ifdef USING_HDHOMERUN
+#include "hdhrchannelfetcher.h"
+#endif
+
 class ScanMonitor;
 class IPTVChannelFetcher;
 class ExternRecChannelFetcher;
@@ -101,6 +105,8 @@ class MTV_PUBLIC ChannelScanner
                             bool ftaOnly, ServiceRequirements serviceType);
     virtual bool ImportExternRecorder(uint cardid, const QString &inputname,
                                       uint sourceid);
+    virtual bool ImportHDHR(uint cardid, const QString &inputname, uint sourceid,
+                            ServiceRequirements serviceType);
 
   protected:
     virtual void Teardown(void);
@@ -135,6 +141,10 @@ class MTV_PUBLIC ChannelScanner
 #endif
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
     ExternRecChannelScanner *m_externRecScanner    {nullptr};
+#endif
+    // HDHomeRun channel list import
+#ifdef USING_HDHOMERUN
+    HDHRChannelFetcher      *m_hdhrScanner         {nullptr};
 #endif
 
     /// Only fta channels desired post scan?
