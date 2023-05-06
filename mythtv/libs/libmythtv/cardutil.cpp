@@ -105,7 +105,7 @@ QString CardUtil::GetScanableInputTypes(void)
 bool CardUtil::IsCableCardPresent(uint inputid,
                                   const QString &inputType)
 {
-#if (!USING_HDHOMERUN && !USING_CETON)
+#if !defined(USING_HDHOMERUN) && !defined(USING_CETON)
     Q_UNUSED(inputid);
 #endif
 

@@ -1410,7 +1410,7 @@ static void FirewireConfigurationGroup(CaptureCard& parent, CardType& cardtype)
 }
 #endif
 
-#if USING_HDHOMERUN
+#ifdef USING_HDHOMERUN
 
 // -----------------------
 // HDHomeRun Configuration
