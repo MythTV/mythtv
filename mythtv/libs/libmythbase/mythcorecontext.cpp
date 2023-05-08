@@ -1892,7 +1892,7 @@ void MythCoreContext::WaitUntilSignals(std::vector<CoreWaitInfo> & sigs) const
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("Waiting for signal %1")
             .arg(s.name));
-        connect(this, s.fn, &eventLoop, &QEventLoop::quit);
+        connect(this, s.fn, &eventLoop, &QEventLoop::quit);// clazy:exclude connect-non-signal
     }
 
     eventLoop.exec(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
