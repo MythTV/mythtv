@@ -28,7 +28,7 @@ class HDHRChannelInfo
     HDHRChannelInfo() = default;
     HDHRChannelInfo(QString name,
                     QString number,
-                    QString url,
+                    const QString& url,
                     QString modulation,
                     QString videoCodec,
                     QString audioCodec,
@@ -81,7 +81,7 @@ class HDHRChannelInfo
     QString        m_modulation;
     QString        m_videoCodec;
     QString        m_audioCodec;
-    uint           m_frequency;
+    uint           m_frequency   {0};
     uint           m_serviceID   {0};
     uint           m_networkID   {0};
     uint           m_transportID {0};

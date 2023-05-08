@@ -108,7 +108,7 @@ bool sendQuery(const QString& query, QDomDocument* xmlDoc)
     return true;
 }
 
-hdhr_chan_map_t *getChannels(QString ip)
+hdhr_chan_map_t *getChannels(const QString& ip)
 {
     auto *result = new hdhr_chan_map_t;
     auto *xmlDoc = new QDomDocument();
@@ -178,7 +178,7 @@ QString HDHRIPv4Address(const QString &device)
 }
 
 // Examples of hdhrmod values: a8qam64-6875 a8qam256-6900 t8dvbt2 8vsb
-DTVModulationSystem HDHRMod2Modsys(const QString hdhrmod)
+DTVModulationSystem HDHRMod2Modsys(const QString& hdhrmod)
 {
     if (hdhrmod.contains("dvbt2"))
         return DTVModulationSystem(DTVModulationSystem::kModulationSystem_DVBT2);
@@ -193,7 +193,7 @@ DTVModulationSystem HDHRMod2Modsys(const QString hdhrmod)
     return DTVModulationSystem(DTVModulationSystem::kModulationSystem_UNDEFINED);
 }
 
-signed char HDHRMod2Bandwidth(const QString hdhrmod)
+signed char HDHRMod2Bandwidth(const QString& hdhrmod)
 {
     if (hdhrmod.startsWith("t8") || hdhrmod.startsWith("a8"))
         return '8';
@@ -204,9 +204,9 @@ signed char HDHRMod2Bandwidth(const QString hdhrmod)
     return 'a';
 }
 
-uint HDHRMod2SymbolRate(const QString hdhrmod)
+uint HDHRMod2SymbolRate(const QString& hdhrmod)
 {
-    QRegularExpression re(R"(^(a8qam\d+-)(\d+))");
+    static const QRegularExpression re(R"(^(a8qam\d+-)(\d+))");
     QRegularExpressionMatch match = re.match(hdhrmod);
     if (match.hasMatch())
     {
@@ -216,7 +216,7 @@ uint HDHRMod2SymbolRate(const QString hdhrmod)
     return 0;
 }
 
-QString HDHRMod2Modulation(const QString hdhrmod)
+QString HDHRMod2Modulation(const QString& hdhrmod)
 {
     if (hdhrmod.contains("qam256"))
         return DTVModulation(DTVModulation::kModulationQAM256).toString();
