@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { CanComponentDeactivate } from 'src/app/can-deactivate-guard.service';
@@ -21,7 +22,7 @@ export class SettingsComponent implements OnInit, CanComponentDeactivate {
     dirtyText = 'settings.common.unsaved';
     warningText = 'settings.common.warning';
 
-    constructor(private setupService: SetupService, private translate: TranslateService) {
+    constructor(private setupService: SetupService, private translate: TranslateService, public router: Router) {
         this.setupService.setCurrentForm(null);
         translate.get(this.dirtyText).subscribe(data => this.dirtyText = data);
         translate.get(this.warningText).subscribe(data => this.warningText = data);

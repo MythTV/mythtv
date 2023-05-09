@@ -34,7 +34,7 @@ export class DbsetupComponent implements OnInit {
     warningText = 'settings.common.warning';
 
 
-    constructor(private router: Router,
+    constructor(public router: Router,
         private configService: ConfigService,
         private mythService: MythService,
         private wizardService: SetupWizardService,
@@ -50,16 +50,6 @@ export class DbsetupComponent implements OnInit {
     ngOnInit(): void {
         this.wizardService.initDatabaseStatus();
         this.m_wizardData = this.wizardService.getWizardData();
-    }
-
-    previousPage() {
-        this.router.navigate(['setupwizard/selectlanguage']);
-        return;
-    }
-
-    nextPage() {
-        this.router.navigate(['setupwizard/backendnetwork']);
-        return;
     }
 
     saveObserver = {

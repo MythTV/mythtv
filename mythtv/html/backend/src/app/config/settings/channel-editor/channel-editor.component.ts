@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of, PartialObserver } from 'rxjs';
 import { ChannelService } from 'src/app/services/channel.service';
@@ -66,7 +67,7 @@ export class ChannelEditorComponent implements OnInit {
   channelOperation = 0;
 
   constructor(private channelService: ChannelService, private translate: TranslateService,
-    public setupService: SetupService) {
+    public setupService: SetupService, public router: Router) {
     this.loadLists();
     this.loadTranslations();
   }

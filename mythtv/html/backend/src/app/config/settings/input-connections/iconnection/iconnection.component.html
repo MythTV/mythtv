@@ -12,7 +12,7 @@
 
                     <div *ngIf="diseqcTree" [ngSwitch]="diseqcTree.Type">
                         <div class="form-group field" *ngSwitchCase="'switch'">
-                            <label for="Port" class="block">{{ 'settings.iconnection.switchport_label' | translate
+                            <label for="Port" class="label block">{{ 'settings.iconnection.switchport_label' | translate
                                 }}</label>
                             <p-inputNumber [(ngModel)]="work.switchPort" name="Port" id="Port" [showButtons]="true"
                                 [min]="1" [max]="diseqcTree.SwitchPorts" [step]="1"></p-inputNumber>
@@ -22,7 +22,7 @@
                         </div>
                         <div *ngSwitchCase="'rotor'">
                             <div class="form-group field">
-                                <label for="Degrees" class="block">{{ 'settings.iconnection.longitude_label' | translate
+                                <label for="Degrees" class="label block">{{ 'settings.iconnection.longitude_label' | translate
                                     }}</label>
                                 <p-inputNumber [(ngModel)]="work.rotorDegrees" name="Degrees" id="Degrees" [min]="0"
                                     [max]="180" [maxFractionDigits]="4"></p-inputNumber>
@@ -30,12 +30,12 @@
                                 <div class="field-radiobutton">
                                     <p-radioButton name="hemisphere" value="1" [(ngModel)]="work.hemisphere"
                                         inputId="east"></p-radioButton>
-                                    <label for="east">{{ 'settings.iconnection.longitude_east' | translate }}</label>
+                                    <label for="east" class="label block">{{ 'settings.iconnection.longitude_east' | translate }}</label>
                                 </div>
                                 <div class="field-radiobutton">
                                     <p-radioButton name="hemisphere" value="-1" [(ngModel)]="work.hemisphere"
                                         inputId="west"></p-radioButton>
-                                    <label for="west">{{ 'settings.iconnection.longitude_west' | translate }}</label>
+                                    <label for="west" class="label block">{{ 'settings.iconnection.longitude_west' | translate }}</label>
                                 </div>
                                 <small class="block">
                                     {{ 'settings.iconnection.longitude_desc' | translate }}
@@ -44,16 +44,16 @@
                             </div>
                         </div>
                         <div *ngSwitchCase="'scr'" class="form-group field">
-                            <label class="block">{{ 'settings.iconnection.unicablepos_label' | translate }}</label>
+                            <label class="label block">{{ 'settings.iconnection.unicablepos_label' | translate }}</label>
                             <div class="field-radiobutton">
                                 <p-radioButton name="scrPort" value="A" [(ngModel)]="work.scrPort" inputId="portA">
                                 </p-radioButton>
-                                <label for="portA">{{ 'settings.iconnection.unicablepos_porta' | translate }}</label>
+                                <label for="portA" class="label block">{{ 'settings.iconnection.unicablepos_porta' | translate }}</label>
                             </div>
                             <div class="field-radiobutton">
                                 <p-radioButton name="scrPort" value="B" [(ngModel)]="work.scrPort"
                                     inputId="portB"></p-radioButton>
-                                <label for="portA">{{ 'settings.iconnection.unicablepos_portb' | translate }}</label>
+                                <label for="portB" class="label block">{{ 'settings.iconnection.unicablepos_portb' | translate }}</label>
                             </div>
                             <small class="block">
                                 {{ 'settings.iconnection.unicablepos_desc' | translate }}
@@ -63,7 +63,7 @@
                     </div>
 
                     <div class="form-group field" *ngIf="card.CardType == 'DVB'">
-                        <label for="Delivery" class="block">{{ 'settings.iconnection.delivery_label' | translate
+                        <label for="Delivery" class="label block">{{ 'settings.iconnection.delivery_label' | translate
                             }}</label>
                         <input pInputText id="Delivery" [(ngModel)]="card.InputName" name="Delivery" disabled="true"
                             #InputName="ngModel" class="mb-2 form-control w-full" />
@@ -73,7 +73,7 @@
                     </div>
 
                     <div class="form-group field" *ngIf="card.CardType != 'DVB'">
-                        <label for="InputName" class="block">{{ 'settings.iconnection.input_label' | translate
+                        <label for="InputName" class="label block">{{ 'settings.iconnection.input_label' | translate
                             }}</label>
                         <p-dropdown *ngIf="work.isReady" [options]="this.currentDevice.InputNames"
                             [(ngModel)]="card.InputName" name="InputName" #InputName="ngModel">
@@ -84,7 +84,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="DisplayName" class="block">{{ 'settings.iconnection.displayname_label' | translate
+                        <label for="DisplayName" class="label block">{{ 'settings.iconnection.displayname_label' | translate
                             }}</label>
                         <input pInputText id="DisplayName" [(ngModel)]="card.DisplayName" name="DisplayName"
                             #DisplayName="ngModel" class="mb-2 form-control w-full" />
@@ -94,7 +94,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="SourceId" class="block">{{ 'settings.iconnection.sourceid_label' | translate
+                        <label for="SourceId" class="label block">{{ 'settings.iconnection.sourceid_label' | translate
                             }}</label>
                         <p-dropdown [options]="videoSourceList.VideoSourceList.VideoSources" [(ngModel)]="card.SourceId"
                             [editable]="false" optionLabel="SourceName" optionValue="Id" [maxlength]="0"
@@ -107,7 +107,7 @@
                     </div>
 
                     <div class="form-group field" *ngIf="work.isEncoder || work.isUnscanable">
-                        <label for="ExternalCommand" class="block">{{ 'settings.iconnection.externalcmd_label' |
+                        <label for="ExternalCommand" class="label block">{{ 'settings.iconnection.externalcmd_label' |
                             translate }}</label>
                         <input pInputText id="ExternalCommand" [(ngModel)]="card.ExternalCommand" name="ExternalCommand"
                             #ExternalCommand="ngModel" class="mb-2 form-control w-full" />
@@ -117,7 +117,7 @@
                     </div>
 
                     <div class="form-group field" *ngIf="work.showPresetTuner">
-                        <label for="TuneChan" class="block">{{ 'settings.iconnection.tunechan_label' | translate
+                        <label for="TuneChan" class="label block">{{ 'settings.iconnection.tunechan_label' | translate
                             }}</label>
                         <input pInputText id="TuneChan" [(ngModel)]="card.TuneChan" name="TuneChan" #TuneChan="ngModel"
                             class="mb-2 form-control w-full" />
@@ -127,7 +127,7 @@
                     </div>
 
                     <div class="form-group field" *ngIf="!work.isEncoder && !work.isUnscanable">
-                        <label for="Quicktune" class="block">{{ 'settings.iconnection.quicktune_label' | translate
+                        <label for="Quicktune" class="label block">{{ 'settings.iconnection.quicktune_label' | translate
                             }}</label>
                         <p-dropdown [options]="quickTuneValues" [(ngModel)]="card.Quicktune" [editable]="false"
                             optionLabel="prompt" optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}"
@@ -140,7 +140,7 @@
 
                     <div class="form-group field" *ngIf="card.CardType == 'DVB'">
                         <p-checkbox inputId="DishnetEIT" [(ngModel)]="card.DishnetEIT" name="DishnetEIT"
-                            #DishnetEIT="ngModel" class="mb-2 w-full" [binary]="true"
+                            #DishnetEIT="ngModel" class="label mb-2 w-full" [binary]="true"
                             label="{{ 'settings.iconnection.dishneteit_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
@@ -187,7 +187,7 @@
                     </p-dialog>
 
                     <div class="form-group field">
-                        <label for="StartChannel" class="block">{{ 'settings.iconnection.startchan_label' | translate
+                        <label for="StartChannel" class="label block">{{ 'settings.iconnection.startchan_label' | translate
                             }}</label>
                         <p-dropdown [options]="sourceChannels" [(ngModel)]="card.StartChannel" placeholder="Select Item"
                             [editable]="false" optionLabel="ChanNum" optionValue="ChanNum" scrollHeight="400px"
@@ -203,7 +203,7 @@
                         [toggleable]="true" [collapsed]="true">
 
                         <div class="form-group field">
-                            <label for="RecLimit" class="block">{{ 'settings.iconnection.maxrec_label' | translate
+                            <label for="RecLimit" class="label block">{{ 'settings.iconnection.maxrec_label' | translate
                                 }}</label>
                             <p-inputNumber [(ngModel)]="card.RecLimit" name="RecLimit" id="RecLimit"
                                 [showButtons]="true" [min]="1" [max]="10" [step]="1"></p-inputNumber>
@@ -214,7 +214,7 @@
 
                         <div class="form-group field">
                             <p-checkbox inputId="SchedGroup" [(ngModel)]="card.SchedGroup" name="SchedGroup"
-                                #DVBWaitForSeqStart="ngModel" class="mb-2 w-full" [binary]="true"
+                                #DVBWaitForSeqStart="ngModel" class="label mb-2 w-full" [binary]="true"
                                 label="{{ 'settings.iconnection.schedgrp_label' | translate }}">
                             </p-checkbox>
                             <small class="block">
@@ -223,7 +223,7 @@
                         </div>
 
                         <div class="form-group field">
-                            <label for="RecPriority" class="block">{{ 'settings.iconnection.recpri_label' | translate
+                            <label for="RecPriority" class="label block">{{ 'settings.iconnection.recpri_label' | translate
                                 }}</label>
                             <p-inputNumber [(ngModel)]="card.RecPriority" name="RecPriority" id="RecPriority"
                                 [showButtons]="true" [min]="-99" [max]="99" [step]="1"></p-inputNumber>
@@ -233,7 +233,7 @@
                         </div>
 
                         <div class="form-group field">
-                            <label for="SchedOrder" class="block">{{ 'settings.iconnection.schedorder_label' | translate
+                            <label for="SchedOrder" class="label block">{{ 'settings.iconnection.schedorder_label' | translate
                                 }}</label>
                             <p-inputNumber [(ngModel)]="card.SchedOrder" name="SchedOrder" id="SchedOrder"
                                 [showButtons]="true" [min]="0" [max]="99" [step]="1"></p-inputNumber>
@@ -243,7 +243,7 @@
                         </div>
 
                         <div class="form-group field">
-                            <label for="LiveTVOrder" class="block">{{ 'settings.iconnection.liveorder_label' | translate
+                            <label for="LiveTVOrder" class="label block">{{ 'settings.iconnection.liveorder_label' | translate
                                 }}</label>
                             <p-inputNumber [(ngModel)]="card.LiveTVOrder" name="LiveTVOrder" id="LiveTVOrder"
                                 [showButtons]="true" [min]="0" [max]="99" [step]="1"></p-inputNumber>
@@ -253,7 +253,7 @@
                         </div>
 
                         <div class="form-group field">
-                            <label for="inputGroupName" class="block">{{ 'settings.iconnection.inpgroup_label' |
+                            <label for="inputGroupName" class="label block">{{ 'settings.iconnection.inpgroup_label' |
                                 translate }}</label>
                             <p-dropdown [options]="selectGroups" [(ngModel)]="work.inputGroupName"
                                 placeholder="Optional Group Name" [editable]="true" optionLabel="InputGroupName"

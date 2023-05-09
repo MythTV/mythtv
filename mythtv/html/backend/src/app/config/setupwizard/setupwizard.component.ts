@@ -1,8 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ConfigService } from '../../services/config.service';
 import { MenuItem } from 'primeng/api';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { SetupWizardService } from 'src/app/services/setupwizard.service';
+import { WizardData } from 'src/app/services/interfaces/wizarddata.interface';
 
 
 @Component({
@@ -10,37 +12,69 @@ import { TranslateService } from '@ngx-translate/core';
     templateUrl: './setupwizard.component.html',
     styleUrls: ['./setupwizard.component.css']
 })
-export class SetupWizardComponent implements OnInit {
+export class SetupWizardComponent implements OnInit, AfterViewInit {
 
-    constructor(private router: Router,
-                private configService: ConfigService,
-                private translate: TranslateService) { }
+    @ViewChild("top") topElement!: ElementRef;
+
+    constructor(private router: Router, private wizardService: SetupWizardService,
+        private configService: ConfigService,
+        private translate: TranslateService) { }
     wizardItems: MenuItem[] = [];
+    activeIndex = 0;
+    xactive = -1;
 
     ngOnInit(): void {
-        this.translate.get('setupwizard.chooseLanguage').subscribe(
+        this.translate.get('setupwizard.steps.selectlanguage').subscribe(
             (translated: string) => {
                 this.wizardItems = [{
-                    label: this.translate.instant('setupwizard.chooseLanguage'),
+                    label: this.translate.instant('setupwizard.steps.selectlanguage'),
                     routerLink: 'selectlanguage'
                 },
                 {
-                    label: this.translate.instant('setupwizard.setupDatabase'),
+                    label: this.translate.instant('setupwizard.steps.dbsetup'),
                     routerLink: 'dbsetup'
                 },
                 {
-                    label: this.translate.instant('setupwizard.setupNetwork'),
-                    routerLink: 'backendnetwork'
+                    label: this.translate.instant('setupwizard.steps.general'),
+                    routerLink: 'general'
                 },
                 {
-                    label: this.translate.instant('setupwizard.setupStorageGroups'),
-                    routerLink: 'sgsetup'
+                    label: this.translate.instant('setupwizard.steps.capture_cards'),
+                    routerLink: 'capture-cards'
                 },
                 {
-                    label: this.translate.instant('setupwizard.done'),
-                    routerLink: 'restart'
-                }
-                ]
+                    label: this.translate.instant('setupwizard.steps.recording_profiles'),
+                    routerLink: 'recording-profiles'
+                },
+                {
+                    label: this.translate.instant('setupwizard.steps.video_sources'),
+                    routerLink: 'video-sources'
+                },
+                {
+                    label: this.translate.instant('setupwizard.steps.input_connections'),
+                    routerLink: 'input-connections'
+                },
+                {
+                    label: this.translate.instant('setupwizard.steps.channel_editor'),
+                    routerLink: 'channel-editor'
+                },
+                {
+                    label: this.translate.instant('setupwizard.steps.storage_groups'),
+                    routerLink: 'storage-groups'
+                },
+                {
+                    label: this.translate.instant('setupwizard.steps.system_events'),
+                    routerLink: 'system-events'
+                }]
             });
     }
+
+    ngAfterViewInit(): void {
+        this.wizardService.m_topElement = this.topElement;
+    }
+
+    onActiveIndexChange(ev: number) {
+        this.xactive = ev;
+    }
+
 }

@@ -26,9 +26,6 @@ import { JobqueueComponent } from './status/components/jobqueue/jobqueue.compone
 import { MachineinfoComponent } from './status/components/machineinfo/machineinfo.component';
 import { SelectLanguageComponent } from './config/setupwizard/selectlanguage/selectlanguage.component';
 import { DbsetupComponent } from './config/setupwizard/dbsetup/dbsetup.component';
-import { BackendnetworkComponent } from './config/setupwizard/backendnetwork/backendnetwork.component';
-import { SgsetupComponent } from './config/setupwizard/sgsetup/sgsetup.component';
-import { RestartComponent } from './config/setupwizard/restart/restart.component';
 import { TestbedComponent } from './testbed/testbed.component';
 import { GuideComponent } from './guide/guide.component';
 import { ChannelIconComponent } from './guide/components/channelicon/channelicon.component';
@@ -98,9 +95,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     MachineinfoComponent,
     SelectLanguageComponent,
     DbsetupComponent,
-    BackendnetworkComponent,
-    SgsetupComponent,
-    RestartComponent,
     TestbedComponent,
     GuideComponent,
     ChannelIconComponent,

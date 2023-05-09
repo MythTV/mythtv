@@ -1,5 +1,7 @@
 {
-    "setupwizard": {
-        "title": "Initiële Installatiewizard"
+    "settings":  {
+        "main": {
+            "title" : "MythTV-installatie"
+        }
     }
 }

@@ -1,8 +1,8 @@
 <div class="block card w-full">
     <div class="block">
-        <h1 style="text-align: center;">{{ 'settings.main.title' | translate }}</h1>
+        <!-- <h1 style="text-align: center;">{{ 'settings.main.title' | translate }}</h1> -->
         <p-card class="m-5">
-            <div *ngIf="retryCount == 0">
+            <!-- <div *ngIf="retryCount == 0">
                 <p>{{ 'settings.main.schedstatus' | translate }}:
                     <b *ngIf="setupService.schedulingEnabled">{{ 'settings.main.schedenabled' | translate }}</b>
                     <b *ngIf="!setupService.schedulingEnabled">{{ 'settings.main.scheddisabled' | translate }}</b>
@@ -28,14 +28,34 @@
                         {{ 'settings.main.scheddisabled_desc' | translate }}
                     </p>
                 </div>
+            </div> -->
+            <div class="flex" *ngIf="setupService.schedulingEnabled && retryCount == 0">
+                <div class="flex align-items-center">
+                    <p-button class="pr-5 pb-1 pt-0 m-0" label="Enable Updates" icon="pi pi-save" iconPos="left"
+                        (onClick)="disableSched();"></p-button>
+                </div>
+                <div class="flex align-items-center">Enabling updates will prevent any recordings from taking place
+                    until you restart</div>
             </div>
-            <div class="block">
-                <p-button class="col pr-1" label="Disable Scheduler" icon="pi pi-save" iconPos="left"
-                    (onClick)="disableSched();"
-                    [disabled]="!setupService.schedulingEnabled || retryCount > 0"></p-button>
-                <p-button class="col pr-1" label="Restart Backend" icon="pi pi-save" iconPos="left"
-                    (onClick)="restart();" [disabled]="setupService.schedulingEnabled || retryCount > 0"></p-button>
+            <div class="flex" *ngIf="!setupService.schedulingEnabled && retryCount == 0">
+                <div class="flex align-items-center">
+                    <p-button class="pr-5 pb-1 pt-0 m-0" label="Restart Backend" icon="pi pi-save" iconPos="left"
+                        (onClick)="restart();"></p-button>
+                </div>
+                <div class="flex align-items-center">
+                    <div class="text-pink-500">Recordings are disabled until you restart</div>
+                </div>
+            </div>
+            <div>
+                <small *ngIf="upComing.length > 0" class="pb-0 m-0">
+                    {{ 'settings.main.upcomingrec' |
+                    translate: { Title: upComing[0].Title, StartTime: recStartTime, Status: recStatusDesc } }}
+                </small>
+            </div>
+            <div>
                 <p-progressSpinner *ngIf="retryCount > 0"></p-progressSpinner>
+                <p-message *ngIf="retryCount > 0" severity="info"
+                    text="Restarting Backend"></p-message>
                 <p>
                     <p-message *ngIf="this.errorCount > 0 && retryCount == 0" severity="error"
                         text="{{ 'common.networkfail' | translate }}"></p-message>

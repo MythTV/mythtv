@@ -14,7 +14,7 @@
                     [toggleable]="true" [collapsed]="true">
 
                     <div class="form-group field">
-                        <label for="WOLbackendReconnectWaitTime" class="block">{{
+                        <label for="WOLbackendReconnectWaitTime" class="label block">{{
                             'settings.backendwake.master.delay_label' | translate }}</label>
                         <p-inputNumber [(ngModel)]="WOLbackendReconnectWaitTime"
                             name="WOLbackendReconnectWaitTime" id="WOLbackendReconnectWaitTime" [showButtons]="true"
@@ -25,7 +25,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="WOLbackendConnectRetry" class="block">{{
+                        <label for="WOLbackendConnectRetry" class="label block">{{
                             'settings.backendwake.master.attempts_label' | translate }}</label>
                         <p-inputNumber [(ngModel)]="WOLbackendConnectRetry" name="WOLbackendConnectRetry"
                             id="WOLbackendConnectRetry" [showButtons]="true" [min]="1" [max]="60"
@@ -36,7 +36,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="WOLbackendCommand" class="block">{{ 'settings.backendwake.master.cmd_label' |
+                        <label for="WOLbackendCommand" class="label block">{{ 'settings.backendwake.master.cmd_label' |
                             translate }}</label>
                         <input pInputText id="WOLbackendCommand" [(ngModel)]="WOLbackendCommand"
                             name="WOLbackendCommand" class="mb-2 form-control w-full" />
@@ -52,7 +52,7 @@
                     [toggleable]="true" [collapsed]="true">
 
                     <div class="form-group field">
-                        <label for="SleepCommand" class="block">{{ 'settings.backendwake.slave.sleep_label' | translate
+                        <label for="SleepCommand" class="label block">{{ 'settings.backendwake.slave.sleep_label' | translate
                             }}</label>
                         <input pInputText id="SleepCommand" [(ngModel)]="SleepCommand" name="SleepCommand"
                             class="mb-2 form-control w-full" />
@@ -62,7 +62,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="WakeUpCommand" class="block">{{ 'settings.backendwake.slave.wake_label' | translate
+                        <label for="WakeUpCommand" class="label block">{{ 'settings.backendwake.slave.wake_label' | translate
                             }}</label>
                         <input pInputText id="WakeUpCommand" [(ngModel)]="WakeUpCommand" name="WakeUpCommand"
                             class="mb-2 form-control w-full" />

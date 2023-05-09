@@ -37,7 +37,7 @@ export class SelectLanguageComponent implements OnInit, AfterViewInit {
     warningText = 'settings.common.warning';
 
 
-    constructor(private router: Router, private translate: TranslateService,
+    constructor(public router: Router, private translate: TranslateService,
         public setupService: SetupService, private configService: ConfigService,
         private wizardService: SetupWizardService, private mythService: MythService) {
         this.translate.get(this.warningText).subscribe(data => {
@@ -72,10 +72,10 @@ export class SelectLanguageComponent implements OnInit, AfterViewInit {
             if (el)
                 el.nativeElement.scrollIntoView({ behavior: "instant", inline: "start", block: "center" });
         }
-    }
 
-    nextPage() {
-        this.router.navigate(['setupwizard/dbsetup']);
+        if (this.wizardService.m_topElement != null)
+            this.wizardService.m_topElement.nativeElement.scrollIntoView({ behavior: "instant", block: "start" });
+
     }
 
     saveObserver = {

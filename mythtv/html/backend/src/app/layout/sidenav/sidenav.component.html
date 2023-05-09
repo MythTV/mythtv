@@ -29,15 +29,15 @@
                                 <span class="p-ink"></span>
                             </a>
                         </li>
-                        <li  (click)="menu.toggle($event)" pTooltip="Backend Settings" [tooltipDisabled]="m_showSidebar === false">
+                        <!-- <li  (click)="menu.toggle($event)" pTooltip="Backend Settings" [tooltipDisabled]="m_showSidebar === false">
                             <a pRipple
                                 class="p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
                                 <i class="pi pi-sliders-v mr-2 lg:mr-0 text-base lg:text-xl"></i>
                                 <span class="font-medium inline lg:hidden">Backend Settings</span>
                                 <span class="p-ink"></span>
                             </a>
-                        </li>
-                        <p-menu #menu [popup]="true" [model]="m_setupMenu"></p-menu>
+                        </li> -->
+                        <!-- <p-menu #menu [popup]="true" [model]="m_setupMenu"></p-menu> -->
                         <li [routerLink]="'guide'" pTooltip="{{ 'navbar.tvGuide' | translate }}" [tooltipDisabled]="m_showSidebar === false">
                             <a pRipple
                                 class="p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
@@ -46,7 +46,7 @@
                                 <span class="p-ink"></span>
                             </a>
                         </li>
-                        <ng-container *ngIf="m_devMode">
+                        <!-- <ng-container *ngIf="m_devMode">
                             <li [routerLink]="'testbed'" pTooltip="{{ 'navbar.testbed' | translate }}" [tooltipDisabled]="m_showSidebar === false">
                                 <a pRipple
                                     class="p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
@@ -55,7 +55,7 @@
                                     <span class="p-ink"></span>
                                 </a>
                             </li>
-                        </ng-container>
+                        </ng-container> -->
                     </ul>
                 </div>
             </div>

@@ -10,7 +10,7 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="Description" class="block">{{ 'settings.capture.diseqc.description_label' |
+                        <label for="Description" class="label block">{{ 'settings.capture.diseqc.description_label' |
                             translate }}</label>
                         <input pInputText id="ip" [(ngModel)]="diseqcTree.Description" name="Description"
                             #Description="ngModel" class="mb-2 form-control w-full" />
@@ -20,7 +20,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="ScrUserband" class="block">{{ 'settings.capture.diseqc.unicable.userband_label' |
+                        <label for="ScrUserband" class="label block">{{ 'settings.capture.diseqc.unicable.userband_label' |
                             translate
                             }}</label>
                         <p-inputNumber [(ngModel)]="diseqcTree.ScrUserband" name="ScrUserband" id="ScrUserband"
@@ -31,7 +31,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="ScrFrequency" class="block">{{ 'settings.capture.diseqc.unicable.frequency_label' |
+                        <label for="ScrFrequency" class="label block">{{ 'settings.capture.diseqc.unicable.frequency_label' |
                             translate }}</label>
                         <p-inputNumber [(ngModel)]="diseqcTree.ScrFrequency" name="ScrFrequency" id="ScrFrequency"
                             mode="decimal" inputId="withoutgrouping" [useGrouping]="false">
@@ -42,7 +42,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="ScrPin" class="block">{{ 'settings.capture.diseqc.unicable.pin_label' | translate
+                        <label for="ScrPin" class="label block">{{ 'settings.capture.diseqc.unicable.pin_label' | translate
                             }}</label>
                         <p-inputNumber [(ngModel)]="diseqcTree.ScrPin" name="ScrPin" id="ScrPin" mode="decimal"
                             inputId="withoutgrouping" [useGrouping]="false" [min]="-1" [max]="255">
@@ -53,9 +53,8 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="CmdRepeat" class="block">{{ 'settings.capture.diseqc.cmdrepeat_label' |
-                            translate
-                            }}</label>
+                        <label for="CmdRepeat" class="label block">{{ 'settings.capture.diseqc.cmdrepeat_label' |
+                            translate }}</label>
                         <p-inputNumber [(ngModel)]="diseqcTree.CmdRepeat" name="CmdRepeat" id="CmdRepeat"
                             [showButtons]="true" [min]="0" [max]="15" [step]="1"></p-inputNumber>
                         <small class="block">
@@ -73,7 +72,8 @@
                         <p-dialog header="{{ 'settings.capture.dvb.newsatellite_heading' | translate }}"
                             [(visible)]="work.displayNewDiseqc" [modal]="true" [style]="{width: '50vw'}"
                             [draggable]="false" [resizable]="false">
-                            <p>{{ 'settings.capture.dvb.newsatellite_devtype' | translate }}</p>
+                            <label for="disenqcTypes" class="label block">{{ 'settings.capture.dvb.newsatellite_devtype' |
+                                translate }}</label>
                             <p-listbox [options]="captureCardService.diseqcTypes" [(ngModel)]="selectedDiseqcType"
                                 optionLabel="description" name="disenqcTypes" optionDisabled="inactive"
                                 (onDblClick)="newDiseqc();"></p-listbox>

@@ -10,7 +10,7 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="Description" class="block">{{ 'settings.capture.diseqc.description_label' |
+                        <label for="Description" class="label block">{{ 'settings.capture.diseqc.description_label' |
                             translate }}</label>
                         <input pInputText id="ip" [(ngModel)]="diseqcTree.Description" name="Description"
                             #Description="ngModel" class="mb-2 form-control w-full" />
@@ -20,7 +20,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="CmdRepeat" class="block">{{ 'settings.capture.diseqc.cmdrepeat_label' |
+                        <label for="CmdRepeat" class="label block">{{ 'settings.capture.diseqc.cmdrepeat_label' |
                             translate
                             }}</label>
                         <p-inputNumber [(ngModel)]="diseqcTree.CmdRepeat" name="CmdRepeat" id="CmdRepeat"
@@ -31,7 +31,8 @@
                     </div>
 
                     <div class="form-group field" [style]="{'width':'25rem'}">
-                        <label for="SubType" class="block">{{ 'settings.capture.diseqc.switch.type_label' | translate
+                        <label for="SubType" class="label block">{{ 'settings.capture.diseqc.switch.type_label' |
+                            translate
                             }}</label>
                         <p-dropdown [options]="switchSubTypes" [(ngModel)]="currentSubType" [editable]="false"
                             optionLabel="Name" (onChange)="updateSubType();" [maxlength]="0"
@@ -43,7 +44,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="Address" class="block">{{ 'settings.capture.diseqc.address_label' | translate
+                        <label for="Address" class="label block">{{ 'settings.capture.diseqc.address_label' | translate
                             }}</label>
                         <input pInputText id="Address" [(ngModel)]="work.addressText" name="Address" #Address="ngModel"
                             class="mb-2 form-control w-full" [disabled]="!work.enableAddrAndPorts" />
@@ -53,7 +54,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="SwitchPorts" class="block">
+                        <label for="SwitchPorts" class="label block">
                             {{ 'settings.capture.diseqc.switchports_label' | translate }}
                         </label>
                         <p-inputNumber [(ngModel)]="diseqcTree.SwitchPorts" name="SwitchPorts" id="SwitchPorts"
@@ -122,7 +123,9 @@
                         <p-dialog header="{{ 'settings.capture.dvb.newsatellite_heading' | translate }}"
                             [(visible)]="work.displayNewDiseqc" [modal]="true" [style]="{width: '50vw'}"
                             [draggable]="false" [resizable]="false">
-                            <p>{{ 'settings.capture.dvb.newsatellite_devtype' | translate }}</p>
+                            <label for="disenqcTypes" class="label block">
+                                {{ 'settings.capture.dvb.newsatellite_devtype' | translate }}
+                            </label>
                             <p-listbox [options]="captureCardService.diseqcTypes" [(ngModel)]="selectedDiseqcType"
                                 optionLabel="description" name="disenqcTypes" optionDisabled="inactive"
                                 (onDblClick)="newDiseqc();"></p-listbox>

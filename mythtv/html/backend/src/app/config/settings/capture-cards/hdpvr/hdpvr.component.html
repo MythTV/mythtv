@@ -11,7 +11,7 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="VideoDevice" class="block">{{ 'settings.capture.v4l2.device_label' | translate
+                        <label for="VideoDevice" class="label block">{{ 'settings.capture.v4l2.device_label' | translate
                             }}</label>
                         <p-dropdown *ngIf="isReady" [options]="captureDeviceList.CaptureDeviceList.CaptureDevices"
                             [(ngModel)]="currentDevice" [editable]="false" optionLabel="VideoDevice"
@@ -29,7 +29,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="FrontendName" class="block">{{ 'settings.capture.v4l2.frontend_label' | translate
+                        <label for="FrontendName" class="label block">{{ 'settings.capture.v4l2.frontend_label' | translate
                             }}</label>
                         <input pInputText id="FrontendName" *ngIf="isReady"
                             [(ngModel)]="currentDevice.FrontendName" name="FrontendName" disabled="true"
@@ -40,7 +40,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="AudioDevice" class="block">{{ 'settings.capture.hdpvr.audiodevice_label' | translate
+                        <label for="AudioDevice" class="label block">{{ 'settings.capture.hdpvr.audiodevice_label' | translate
                             }}</label>
                         <p-dropdown *ngIf="isReady" [options]="currentDevice.AudioDevices"
                             [(ngModel)]="card.AudioDevice" [editable]="false"
@@ -53,7 +53,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="ChannelTimeout" class="block">{{ 'settings.capture.tunetimeout_label' | translate
+                        <label for="ChannelTimeout" class="label block">{{ 'settings.capture.tunetimeout_label' | translate
                             }}</label>
                         <p-inputNumber [(ngModel)]="card.ChannelTimeout" name="ChannelTimeout" id="ChannelTimeout"
                             [showButtons]="true" [min]="2000" [max]="65000" [step]="250"></p-inputNumber>

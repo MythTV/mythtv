@@ -11,7 +11,7 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="startupCommand" class="block">{{ 'settings.shutwake.startcmd_label' | translate
+                        <label for="startupCommand" class="label block">{{ 'settings.shutwake.startcmd_label' | translate
                             }}</label>
                         <input pInputText id="startupCommand" [(ngModel)]="startupCommand" name="startupCommand"
                             class="mb-2 form-control w-full" />
@@ -22,7 +22,7 @@
 
                     <div class="form-group field">
                         <p-checkbox inputId="blockSDWUwithoutClient" [(ngModel)]="blockSDWUwithoutClient"
-                            name="blockSDWUwithoutClient" class="mb-2 w-full" [binary]="true"
+                            name="blockSDWUwithoutClient" class="mb-2 w-full label" [binary]="true"
                             label="{{ 'settings.shutwake.block_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
@@ -31,7 +31,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="idleTimeoutSecs" class="block">{{ 'settings.shutwake.idletime_label' | translate
+                        <label for="idleTimeoutSecs" class="label block">{{ 'settings.shutwake.idletime_label' | translate
                             }}}</label>
                         <p-inputNumber [(ngModel)]="idleTimeoutSecs" name="idleTimeoutSecs" id="idleTimeoutSecs"
                             [showButtons]="true" [min]="0" [max]="1200" [step]="5"></p-inputNumber>
@@ -41,7 +41,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="idleWaitForRecordingTime" class="block">{{ 'settings.shutwake.maxwait_label' |
+                        <label for="idleWaitForRecordingTime" class="label block">{{ 'settings.shutwake.maxwait_label' |
                             translate }}</label>
                         <p-inputNumber [(ngModel)]="idleWaitForRecordingTime" name="idleWaitForRecordingTime"
                             id="idleWaitForRecordingTime" [showButtons]="true" [min]="0" [max]="300"
@@ -52,7 +52,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="StartupSecsBeforeRecording" class="block">{{ 'settings.shutwake.startbefore_label' |
+                        <label for="StartupSecsBeforeRecording" class="label block">{{ 'settings.shutwake.startbefore_label' |
                             translate }}</label>
                         <p-inputNumber [(ngModel)]="StartupSecsBeforeRecording" name="StartupSecsBeforeRecording"
                             id="StartupSecsBeforeRecording" [showButtons]="true" [min]="0" [max]="300"
@@ -63,7 +63,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="WakeupTimeFormat" class="block">{{ 'settings.shutwake.timeformat_label' | translate
+                        <label for="WakeupTimeFormat" class="label block">{{ 'settings.shutwake.timeformat_label' | translate
                             }}</label>
                         <input pInputText id="WakeupTimeFormat" [(ngModel)]="WakeupTimeFormat" name="WakeupTimeFormat"
                             class="mb-2 form-control w-full" />
@@ -73,7 +73,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="SetWakeuptimeCommand" class="block">{{ 'settings.shutwake.timecmd_label' | translate
+                        <label for="SetWakeuptimeCommand" class="label block">{{ 'settings.shutwake.timecmd_label' | translate
                             }}</label>
                         <input pInputText id="SetWakeuptimeCommand" [(ngModel)]="SetWakeuptimeCommand"
                             name="SetWakeuptimeCommand" class="mb-2 form-control w-full" />
@@ -83,7 +83,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="ServerHaltCommand" class="block">{{ 'settings.shutwake.serverhalt_label' | translate
+                        <label for="ServerHaltCommand" class="label block">{{ 'settings.shutwake.serverhalt_label' | translate
                             }}</label>
                         <input pInputText id="ServerHaltCommand" [(ngModel)]="ServerHaltCommand"
                             name="ServerHaltCommand" class="mb-2 form-control w-full" />
@@ -93,7 +93,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="preSDWUCheckCommand" class="block">{{ 'settings.shutwake.preshut_label' | translate
+                        <label for="preSDWUCheckCommand" class="label block">{{ 'settings.shutwake.preshut_label' | translate
                             }}</label>
                         <input pInputText id="preSDWUCheckCommand" [(ngModel)]="preSDWUCheckCommand"
                             name="preSDWUCheckCommand" class="mb-2 form-control w-full" />

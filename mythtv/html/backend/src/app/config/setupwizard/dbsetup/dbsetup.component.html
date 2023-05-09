@@ -65,6 +65,66 @@
                         <small class="p-error block">{{ 'setupwizard.databaseNameRequired' | translate }}</small>
                     </div>
                 </div>
+
+                <div class="field col-12">
+                    <p-checkbox [(ngModel)]="m_wizardData.Database.LocalEnabled" name="LocalEnabled" class="mb-2 w-full label block"
+                        [binary]="true" label="{{ 'setupwizard.LocalEnabled_label' | translate }}">
+                    </p-checkbox>
+                    <small class="block">
+                        {{ 'setupwizard.LocalEnabled_desc' | translate }}
+                    </small>
+                </div>
+
+                <div class="field col-12" *ngIf="m_wizardData.Database.LocalEnabled">
+                    <label for="LocalHostName" class="label block">{{ 'setupwizard.LocalHostName_label' | translate }}</label>
+                    <input pInputText id="LocalHostName" type="text" aria-describedby="LocalHostName-help"
+                        [(ngModel)]="m_wizardData.Database.LocalHostName" name="LocalHostName" #LocalHostName="ngModel"
+                        class="mb-2 form-control w-full" />
+                    <small id="LocalHostName-help">{{ 'setupwizard.LocalHostName_desc' | translate }}</small>
+                </div>
+
+                <div class="field col-12">
+                    <p-checkbox [(ngModel)]="m_wizardData.Database.WOLEnabled" name="WOLEnabled" class="mb-2 w-full label block"
+                        [binary]="true" label="{{ 'setupwizard.WOLEnabled_label' | translate }}">
+                    </p-checkbox>
+                    <small class="block">
+                        {{ 'setupwizard.WOLEnabled_desc' | translate }}
+                    </small>
+                </div>
+
+                <div class="field col-12 md:col-6" *ngIf="m_wizardData.Database.WOLEnabled">
+                    <label for="WOLReconnect" class="label block">
+                        {{ 'settings.vsource.WOLReconnect_label' | translate }}
+                    </label>
+                    <p-inputNumber [(ngModel)]="m_wizardData.Database.WOLReconnect" name="WOLReconnect" id="WOLReconnect"
+                        [min]="0" [max]="60" [step]="1" [useGrouping]="false" [showButtons]="true">
+                    </p-inputNumber>
+                    <small class="block">
+                        {{ 'settings.vsource.WOLReconnect_desc' | translate }}
+                    </small>
+                </div>
+
+                <div class="field col-12 md:col-6" *ngIf="m_wizardData.Database.WOLEnabled">
+                    <label for="WOLRetry" class="label block">
+                        {{ 'settings.vsource.WOLRetry_label' | translate }}
+                    </label>
+                    <p-inputNumber [(ngModel)]="m_wizardData.Database.WOLRetry" name="WOLRetry" id="WOLRetry"
+                        [min]="1" [max]="10" [step]="1" [useGrouping]="false" [showButtons]="true">
+                    </p-inputNumber>
+                    <small class="block">
+                        {{ 'settings.vsource.WOLRetry_desc' | translate }}
+                    </small>
+                </div>
+
+                <div class="field col-12" *ngIf="m_wizardData.Database.WOLEnabled">
+                    <label for="WOLCommand" class="label block">{{ 'setupwizard.WOLCommand_label' | translate }}</label>
+                    <input pInputText id="WOLCommand" type="text" aria-describedby="WOLCommand-help"
+                        [(ngModel)]="m_wizardData.Database.WOLCommand" name="WOLCommand" #WOLCommand="ngModel"
+                        class="mb-2 form-control w-full" />
+                    <small id="WOLCommand-help">{{ 'setupwizard.WOLCommand_desc' | translate }}</small>
+                </div>
+
+
             </div>
             <div>
                 <p-button type="button" class="mr-1 p-button-raised p-button-secondary"
@@ -132,10 +192,10 @@
                     (onClick)="saveForm(true); databaseForm.form.markAsPristine()"
                     [disabled]="!databaseForm.dirty || setupService.schedulingEnabled"></p-button>
 
-                <p-button class="pr-3" label="{{ 'common.back' | translate }}" (onClick)="previousPage()"
+                <p-button class="pr-3" label="{{ 'common.back' | translate }}" (onClick)="router.navigate(['setupwizard/selectlanguage'])"
                     icon="pi pi-angle-left" iconPos="left"></p-button>
 
-                <p-button class="pr-3" label="{{ 'common.next' | translate }}" (onClick)="nextPage()"
+                <p-button class="pr-3" label="{{ 'common.next' | translate }}" (onClick)="router.navigate(['setupwizard/general'])"
                     icon="pi pi-angle-right" iconPos="right"
                     [disabled]="(m_wizardData.Country.Code == '') || (m_wizardData.Language.Code == '')">
                 </p-button>

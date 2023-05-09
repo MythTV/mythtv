@@ -11,7 +11,7 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="VideoDevice" class="block">{{ 'settings.capture.firewire.device_label' | translate
+                        <label for="VideoDevice" class="label block">{{ 'settings.capture.firewire.device_label' | translate
                             }}</label>
                         <p-dropdown *ngIf="isReady" [options]="captureDeviceList.CaptureDeviceList.CaptureDevices"
                             [(ngModel)]="currentDevice" [editable]="false" optionLabel="VideoDevice"
@@ -28,7 +28,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label class="block">{{ 'settings.capture.vbox.description_label' | translate
+                        <label class="label block">{{ 'settings.capture.vbox.description_label' | translate
                             }}</label>
                         <div class="col-10 bg-blue-100">
                             {{ currentDevice.Description}} &nbsp;
@@ -38,7 +38,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="FirewireModel" class="block">{{ 'settings.capture.firewire.model_label' | translate
+                        <label for="FirewireModel" class="label block">{{ 'settings.capture.firewire.model_label' | translate
                             }}</label>
                         <p-dropdown [options]="models" [(ngModel)]="card.FirewireModel" [editable]="false"
                             optionLabel="name" optionValue="value" [maxlength]="0" [style]="{'minWidth':'83%'}"
@@ -50,7 +50,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="FirewireConnection" class="block">{{ 'settings.capture.firewire.connection_label' |
+                        <label for="FirewireConnection" class="label block">{{ 'settings.capture.firewire.connection_label' |
                             translate
                             }}</label>
                         <p-dropdown [options]="connectionTypes" [(ngModel)]="card.FirewireConnection" [editable]="false"
@@ -63,7 +63,7 @@
 
 
                     <div class="form-group field">
-                        <label for="FirewireSpeed" class="block">{{ 'settings.capture.firewire.speed_label' | translate
+                        <label for="FirewireSpeed" class="label block">{{ 'settings.capture.firewire.speed_label' | translate
                             }}</label>
                         <p-dropdown [options]="speeds" [(ngModel)]="card.FirewireSpeed" [editable]="false"
                             optionLabel="name" optionValue="value" [maxlength]="0" [style]="{'minWidth':'83%'}"
@@ -74,7 +74,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="SignalTimeout" class="block">{{ 'settings.capture.sigtimeout_label' | translate
+                        <label for="SignalTimeout" class="label block">{{ 'settings.capture.sigtimeout_label' | translate
                             }}</label>
                         <p-inputNumber [(ngModel)]="card.SignalTimeout" name="SignalTimeout" id="SignalTimeout"
                             [showButtons]="true" [min]="250" [max]="60000" [step]="250"></p-inputNumber>
@@ -84,7 +84,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="ChannelTimeout" class="block">{{ 'settings.capture.tunetimeout_label' | translate
+                        <label for="ChannelTimeout" class="label block">{{ 'settings.capture.tunetimeout_label' | translate
                             }}</label>
                         <p-inputNumber [(ngModel)]="card.ChannelTimeout" name="ChannelTimeout" id="ChannelTimeout"
                             [showButtons]="true" [min]="2000" [max]="65000" [step]="250"></p-inputNumber>

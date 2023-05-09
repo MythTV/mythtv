@@ -10,7 +10,7 @@
             <div class="grid">
                 <div class="mb-4 w-full">
                     <div class="form-group field">
-                        <label for="VideoDevice" class="block">{{ 'settings.capture.hdhomerun.device_label' | translate
+                        <label for="VideoDevice" class="label block">{{ 'settings.capture.hdhomerun.device_label' | translate
                             }}</label>
                         <div [style]="{'width':'30rem'}">
                             <p-listbox *ngIf="work.isReady"
@@ -25,7 +25,7 @@
                         </div>
                     </div>
                     <div class="form-group field">
-                        <label for="SignalTimeout" class="block">{{ 'settings.capture.sigtimeout_label' | translate
+                        <label for="SignalTimeout" class="label block">{{ 'settings.capture.sigtimeout_label' | translate
                             }}</label>
                         <p-inputNumber [(ngModel)]="card.SignalTimeout" name="SignalTimeout" id="SignalTimeout"
                             [showButtons]="true" [min]="250" [max]="60000" [step]="250"></p-inputNumber>
@@ -35,7 +35,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="ChannelTimeout" class="block">{{ 'settings.capture.tunetimeout_label' | translate
+                        <label for="ChannelTimeout" class="label block">{{ 'settings.capture.tunetimeout_label' | translate
                             }}</label>
                         <p-inputNumber [(ngModel)]="card.ChannelTimeout" name="ChannelTimeout" id="ChannelTimeout"
                             [showButtons]="true" [min]="1750" [max]="65000" [step]="250"></p-inputNumber>
@@ -46,7 +46,7 @@
 
                     <div class="form-group field">
                         <p-checkbox inputId="DVBEITScan" [(ngModel)]="card.DVBEITScan" name="DVBEITScan"
-                            #DVBEITScan="ngModel" class="mb-2 w-full" [binary]="true"
+                            #DVBEITScan="ngModel" class="label mb-2 w-full" [binary]="true"
                             label="{{ 'settings.capture.hdhomerun.eitscan_label' | translate }}">
                         </p-checkbox>
                         <small class="block">

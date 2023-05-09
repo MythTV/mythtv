@@ -30,6 +30,10 @@ export interface Database {
     LocalEnabled:       boolean;
     LocalHostName:      string;
     DoTest:             boolean; // will test connection if true
+    WOLEnabled?:        boolean;
+    WOLReconnect?:      number;
+    WOLRetry?:          number;
+    WOLCommand?:        string;
 }
 
 export interface WOL {

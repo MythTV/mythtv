@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { CanComponentDeactivate } from 'src/app/can-deactivate-guard.service';
@@ -41,7 +42,7 @@ export class VideoSourcesComponent implements OnInit, CanComponentDeactivate {
   };
 
   constructor(public setupService: SetupService, private translate: TranslateService,
-    private channelService: ChannelService) {
+    private channelService: ChannelService,  public router: Router) {
     this.setupService.setCurrentForm(null);
     this.loadSources();
     translate.get(this.dirtyText).subscribe(data => this.dirtyText = data);

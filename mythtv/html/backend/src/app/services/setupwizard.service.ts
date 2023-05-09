@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable, OnInit } from '@angular/core';
+import { ElementRef, Injectable, OnInit } from '@angular/core';
 import { ConfigService } from './config.service';
 import { Country, MythCountryList } from './interfaces/country.interface';
 import { Language, MythLanguageList } from './interfaces/language.interface';
@@ -25,16 +25,23 @@ export class SetupWizardService implements OnInit {
         Database: {
             Host: 'localhost', Port: 3306, UserName: 'mythtv', Password: 'mythtv', Ping: false,
             Name: 'mythconverg', Type: 'QMYSQL', LocalHostName: 'my-unique-identifier-goes-here',
-            LocalEnabled: false, DoTest: true
+            LocalEnabled: false, DoTest: true,
+            WOLEnabled: false, WOLReconnect: 0, WOLRetry: 0, WOLCommand: ''
         },
         DatabaseStatus: {
             DatabaseStatus: {
                 Host: '', Port: 0, UserName: '', Password: '', Ping: false,
                 Name: '', Type: '', LocalHostName: '',
-                LocalEnabled: false, Connected: false, HaveDatabase: false, SchemaVersion: 0
+                LocalEnabled: false, Connected: false, HaveDatabase: false, SchemaVersion: 0,
+                WOLEnabled: false,
+                WOLReconnect: 0,
+                WOLRetry: 0,
+                WOLCommand: ''
             }
         }
     };
+
+    m_topElement: ElementRef | null = null;
 
     m_hostName: string = '';
 
@@ -75,6 +82,11 @@ export class SetupWizardService implements OnInit {
                 this.m_wizardData.Database.UserName = result.DatabaseStatus.UserName;
                 this.m_wizardData.Database.Password = result.DatabaseStatus.Password;
                 this.m_wizardData.Database.Name = result.DatabaseStatus.Name;
+                this.m_wizardData.Database.LocalEnabled = result.DatabaseStatus.LocalEnabled;
+                this.m_wizardData.Database.WOLEnabled = result.DatabaseStatus.WOLEnabled;
+                this.m_wizardData.Database.WOLReconnect = result.DatabaseStatus.WOLReconnect;
+                this.m_wizardData.Database.WOLRetry = result.DatabaseStatus.WOLRetry;
+                this.m_wizardData.Database.WOLCommand = result.DatabaseStatus.WOLCommand;
                 this.m_initialized++;
             },
             (err: HttpErrorResponse) => { console.log("Failed to get database status", err.statusText); }

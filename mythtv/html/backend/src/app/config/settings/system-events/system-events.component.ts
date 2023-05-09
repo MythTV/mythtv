@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { ConfigService } from 'src/app/services/config.service';
@@ -30,7 +31,7 @@ export class SystemEventsComponent implements OnInit {
   kClearSettingValue = "<clear_setting_value>";
 
   constructor(private configService: ConfigService, private translate: TranslateService,
-    public setupService: SetupService, private mythService: MythService) {
+    public setupService: SetupService, private mythService: MythService,  public router: Router) {
     this.configService.GetSystemEvents().subscribe(data => {
       this.eventList = data;
       this.events = data.SystemEventList.SystemEvents;

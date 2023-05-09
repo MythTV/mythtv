@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { CanComponentDeactivate } from 'src/app/can-deactivate-guard.service';
@@ -62,7 +63,7 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
 
   cardTypes!: CardTypeExt[];
 
-  constructor(private mythService: MythService,
+  constructor(private mythService: MythService, public router: Router,
     private captureCardService: CaptureCardService, public setupService: SetupService,
     private translate: TranslateService) {
     this.setupService.setCurrentForm(null);

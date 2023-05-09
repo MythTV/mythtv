@@ -6,6 +6,7 @@ import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { RecProfile, RecProfileGroup } from 'src/app/services/interfaces/recprofile.interface';
 import { SetupService } from 'src/app/services/setup.service';
 import { ProfileGroupComponent } from './profile-group/profile-group.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-recording-profiles',
@@ -27,7 +28,7 @@ export class RecordingProfilesComponent implements OnInit {
 
   groups: RecProfileGroup[] = [];
 
-  constructor(private captureCardService: CaptureCardService,
+  constructor(private captureCardService: CaptureCardService,  public router: Router,
     private translate: TranslateService, private setupService: SetupService) {
     this.setupService.setCurrentForm(null);
     this.loadGroups();

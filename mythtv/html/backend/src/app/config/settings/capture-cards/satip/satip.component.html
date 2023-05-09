@@ -11,7 +11,7 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="VideoDevice" class="block">{{ 'settings.capture.satip.device_label' | translate
+                        <label for="VideoDevice" class="label block">{{ 'settings.capture.satip.device_label' | translate
                             }}</label>
                         <p-dropdown *ngIf="isReady" [options]="captureDeviceList.CaptureDeviceList.CaptureDevices"
                             [(ngModel)]="currentDevice" [editable]="false" optionLabel="VideoDevicePrompt"
@@ -29,7 +29,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label class="block">{{ 'settings.capture.satip.friendly_label' | translate
+                        <label class="label block">{{ 'settings.capture.satip.friendly_label' | translate
                             }}</label>
                         <div class="col-10 bg-blue-100">
                             {{ currentDevice.Description}} &nbsp;
@@ -40,7 +40,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label class="block">{{ 'settings.capture.satip.tunertype_label' | translate
+                        <label class="label block">{{ 'settings.capture.satip.tunertype_label' | translate
                             }}</label>
                         <div class="col-10 bg-blue-100">
                             {{ currentDevice.TunerType}} &nbsp;
@@ -51,7 +51,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label class="block">{{ 'settings.capture.satip.tunerindex_label' | translate
+                        <label class="label block">{{ 'settings.capture.satip.tunerindex_label' | translate
                             }}</label>
                         <div class="col-10 bg-blue-100">
                             {{ currentDevice.TunerNumber}} &nbsp;
@@ -62,7 +62,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label class="block">{{ 'settings.capture.satip.deviceid_label' | translate
+                        <label class="label block">{{ 'settings.capture.satip.deviceid_label' | translate
                             }}</label>
                         <div class="col-10 bg-blue-100">
                             {{ card.VideoDevice}} &nbsp;
@@ -73,7 +73,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="SignalTimeout" class="block">{{ 'settings.capture.sigtimeout_label' | translate
+                        <label for="SignalTimeout" class="label block">{{ 'settings.capture.sigtimeout_label' | translate
                             }}</label>
                         <p-inputNumber [(ngModel)]="card.SignalTimeout" name="SignalTimeout" id="SignalTimeout"
                             [showButtons]="true" [min]="250" [max]="60000" [step]="250"></p-inputNumber>
@@ -83,7 +83,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="ChannelTimeout" class="block">{{ 'settings.capture.tunetimeout_label' | translate
+                        <label for="ChannelTimeout" class="label block">{{ 'settings.capture.tunetimeout_label' | translate
                             }}</label>
                         <p-inputNumber [(ngModel)]="card.ChannelTimeout" name="ChannelTimeout" id="ChannelTimeout"
                             [showButtons]="true" [min]="2000" [max]="65000" [step]="250"></p-inputNumber>
@@ -94,7 +94,7 @@
 
                     <div class="form-group field">
                         <p-checkbox inputId="DVBEITScan" [(ngModel)]="card.DVBEITScan" name="DVBEITScan"
-                            #DVBEITScan="ngModel" class="mb-2 w-full" [binary]="true"
+                            #DVBEITScan="ngModel" class="label mb-2 w-full" [binary]="true"
                             label="{{ 'settings.capture.dvb.eitscan_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
@@ -103,7 +103,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="DVBDiSEqCType" class="block">{{ 'settings.capture.satip.diseqcpos_label' | translate
+                        <label for="DVBDiSEqCType" class="label block">{{ 'settings.capture.satip.diseqcpos_label' | translate
                             }}</label>
                         <p-inputNumber [(ngModel)]="card.DVBDiSEqCType" name="DVBDiSEqCType" id="DVBDiSEqCType"
                             [showButtons]="true" [min]="1" [max]="255" [step]="1"></p-inputNumber>
