@@ -295,7 +295,7 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
         ImportVBox(cardid, inputname, sourceid,
                                 freeToAirOnly,
                                 service_requirements);
-    else if (nScanType == ScanTypeSetting::VBoxImport)
+    else if (nScanType == ScanTypeSetting::HDHRImport)
         ImportHDHR(cardid, inputname, sourceid,
                                 service_requirements);
     else if (nScanType == ScanTypeSetting::ExternRecImport)
