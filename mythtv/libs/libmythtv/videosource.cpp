@@ -2435,10 +2435,10 @@ void HDPVRConfigurationGroup::probeCard(const QString &device)
         else if (!dn.isEmpty())
             ci = cn + "  [" + dn + "]";
         close(videofd);
+        m_audioInput->fillSelections(device);
     }
 
     m_cardInfo->setValue(ci);
-    m_audioInput->fillSelections(device);
 }
 
 V4L2encGroup::V4L2encGroup(CaptureCard &parent, CardType& cardtype) :
