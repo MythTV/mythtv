@@ -3206,7 +3206,7 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
         ds->setValue(CardUtil::GetDeliverySystemFromDB(_cardid));
         addChild(ds);
     }
-    else
+    else if (CardUtil::IsV4L(cardtype))
     {
         addChild(m_inputName);
     }
