@@ -52,6 +52,7 @@ class SubtitleReader : public QObject
     static void FreeAVSubtitle(AVSubtitle &sub);
 
     TextSubtitles* GetTextSubtitles(void) { return &m_textSubtitles; }
+    TextSubtitleParser* GetParser(void) { return m_externalParser; }
     bool HasTextSubtitles(void);
     void LoadExternalSubtitles(const QString &subtitleFileName, bool isInProgress);
 
@@ -66,6 +67,8 @@ class SubtitleReader : public QObject
     bool          m_textSubtitlesEnabled    {false};
     RawTextSubs   m_rawTextSubtitles;
     bool          m_rawTextSubtitlesEnabled {false};
+
+    TextSubtitleParser *m_externalParser {nullptr};
 };
 
 #endif // SUBTITLEREADER_H

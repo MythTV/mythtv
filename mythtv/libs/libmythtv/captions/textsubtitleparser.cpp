@@ -40,9 +40,10 @@
 class SubtitleLoadHelper : public QRunnable
 {
   public:
-    SubtitleLoadHelper(const QString &fileName,
+    SubtitleLoadHelper(TextSubtitleParser *parent,
                        TextSubtitles *target)
-        : m_fileName(fileName), m_target(target)
+
+        : m_parent(parent), m_target(target)
     {
         QMutexLocker locker(&s_lock);
         ++s_loading[m_target];
@@ -50,7 +51,7 @@ class SubtitleLoadHelper : public QRunnable
 
     void run(void) override // QRunnable
     {
-        TextSubtitleParser::LoadSubtitles(m_fileName, *m_target, false);
+        m_parent->LoadSubtitles(false);
 
         QMutexLocker locker(&s_lock);
         --s_loading[m_target];
@@ -77,8 +78,8 @@ class SubtitleLoadHelper : public QRunnable
     }
 
   private:
-    const QString &m_fileName;
-    TextSubtitles *m_target;
+    TextSubtitleParser *m_parent { nullptr };
+    TextSubtitles      *m_target { nullptr };
 
     static QMutex                     s_lock;
     static QWaitCondition             s_wait;
@@ -185,7 +186,7 @@ bool TextSubtitles::HasSubtitleChanged(uint64_t timecode) const
  *         current video position.
  *  \return The subtitles as a list of strings.
  */
-QStringList TextSubtitles::GetSubtitles(uint64_t timecode)
+QStringList TextSubtitles::GetSubtitles(TextSubtitleParser *parser, uint64_t timecode)
 {
     if (!m_isInProgress && m_subtitles.empty())
         return {};
@@ -232,7 +233,7 @@ QStringList TextSubtitles::GetSubtitles(uint64_t timecode)
             if (!m_fileName.isEmpty() &&
                 m_lastLoaded.msecsTo(now) >= maxReloadInterval)
             {
-                TextSubtitleParser::LoadSubtitles(m_fileName, *this, true);
+                parser->LoadSubtitles(true);
             }
         }
         else
@@ -281,6 +282,12 @@ struct local_buffer_t {
   off_t              rbuffer_len;
   off_t              rbuffer_cur;
 };
+
+TextSubtitleParser::~TextSubtitleParser()
+{
+    avcodec_free_context(&m_decCtx);
+    delete m_loadHelper;
+}
 
 /// \brief Read data from the file buffer into the avio context buffer.
 int TextSubtitleParser::read_packet(void *opaque, uint8_t *buf, int buf_size)
@@ -333,20 +340,19 @@ int64_t TextSubtitleParser::seek_packet(void *opaque, int64_t offset, int whence
 /// guessed if the format cannot provide them). pkt->pts can be
 /// AV_NOPTS_VALUE if the video format has B-frames, so it is better to
 /// rely on pkt->dts if you do not decompress the payload.
-int TextSubtitleParser::decode(TextSubtitles &target, AVCodecContext *dec_ctx,
-                               AVStream *stream, AVPacket *pkt)
+int TextSubtitleParser::decode(AVPacket *pkt)
 {
     AVSubtitle sub {};
     int got_sub_ptr {0};
 
-    int ret = avcodec_decode_subtitle2(dec_ctx, &sub, &got_sub_ptr, pkt);
+    int ret = avcodec_decode_subtitle2(m_decCtx, &sub, &got_sub_ptr, pkt);
     if (ret < 0)
         return ret;
     if (!got_sub_ptr)
         return -1;
 
-    long start = static_cast<long>(av_q2d(stream->time_base) * pkt->dts * 1000);
-    long duration = static_cast<long>(av_q2d(stream->time_base) * pkt->duration * 1000);
+    long start = static_cast<long>(av_q2d(m_stream->time_base) * pkt->dts * 1000);
+    long duration = static_cast<long>(av_q2d(m_stream->time_base) * pkt->duration * 1000);
 
     if (sub.format != 1)
     {
@@ -395,57 +401,55 @@ int TextSubtitleParser::decode(TextSubtitles &target, AVCodecContext *dec_ctx,
 #endif
             newsub.m_textLines.append(lines);
         }
-        target.AddSubtitle(newsub);
+        m_target->AddSubtitle(newsub);
     }
 
     avsubtitle_free(&sub);
     return ret;
 }
 
-void TextSubtitleParser::LoadSubtitles(const QString &fileName,
-                                       TextSubtitles &target,
-                                       bool inBackground)
+void TextSubtitleParser::LoadSubtitles(bool inBackground)
 {
     std::string errbuf;
 
     if (inBackground)
     {
-        if (!SubtitleLoadHelper::IsLoading(&target))
+        if (!SubtitleLoadHelper::IsLoading(m_target))
         {
+            m_loadHelper = new SubtitleLoadHelper(this, m_target);
             MThreadPool::globalInstance()->
-                start(new SubtitleLoadHelper(fileName, &target),
-                      "SubtitleLoadHelper");
+                start(m_loadHelper, "SubtitleLoadHelper");
         }
         return;
     }
     local_buffer_t sub_data {};
-    RemoteFileWrapper rfile(fileName/*, false, false, 0*/);
+    RemoteFileWrapper rfile(m_fileName/*, false, false, 0*/);
 
     LOG(VB_VBI, LOG_INFO,
-        QString("Preparing to load subtitle file %1").arg(fileName));
+        QString("Preparing to load subtitle file %1").arg(m_fileName));
     if (!rfile.isOpen())
     {
         LOG(VB_VBI, LOG_INFO,
-            QString("Failed to load subtitle file %1").arg(fileName));
+            QString("Failed to load subtitle file %1").arg(m_fileName));
         return;
     }
-    target.SetHasSubtitles(true);
-    target.SetFilename(fileName);
+    m_target->SetHasSubtitles(true);
+    m_target->SetFilename(m_fileName);
 
     // Only reload if rfile.GetFileSize() has changed.
     off_t new_len = rfile.GetFileSize();
-    if (target.GetByteCount() == new_len)
+    if (m_target->GetByteCount() == new_len)
     {
         LOG(VB_VBI, LOG_INFO,
             QString("Filesize unchanged (%1), not reloading subs (%2)")
-            .arg(new_len).arg(fileName));
-        target.SetLastLoaded();
+            .arg(new_len).arg(m_fileName));
+        m_target->SetLastLoaded();
         return;
     }
     LOG(VB_VBI, LOG_INFO,
         QString("Preparing to read %1 subtitle bytes from %2")
-        .arg(new_len).arg(fileName));
-    target.SetByteCount(new_len);
+        .arg(new_len).arg(m_fileName));
+    m_target->SetByteCount(new_len);
     sub_data.rbuffer_len = new_len;
     sub_data.rbuffer_text = new char[sub_data.rbuffer_len + 1];
     sub_data.rbuffer_cur = 0;
@@ -488,23 +492,23 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
         avformat_free_context(fmt_ctx);
         return;
     }
-    AVStream *stream = fmt_ctx->streams[stream_num];
-    if (stream == nullptr) {
+    m_stream = fmt_ctx->streams[stream_num];
+    if (m_stream == nullptr) {
         LOG(VB_VBI, LOG_INFO, QString("Stream %1 is null").arg(stream_num));
         avformat_free_context(fmt_ctx);
         return;
     }
 
     // Create a decoder for this subtitle stream context.
-    AVCodecContext *dec_ctx = avcodec_alloc_context3(codec);
-    if (!dec_ctx) {
+    m_decCtx = avcodec_alloc_context3(codec);
+    if (!m_decCtx) {
         LOG(VB_VBI, LOG_INFO, QString("Couldn't allocate decoder context"));
         avformat_free_context(fmt_ctx);
         return;
     }
-    if (avcodec_open2(dec_ctx, codec, nullptr) < 0) {
+    if (avcodec_open2(m_decCtx, codec, nullptr) < 0) {
         LOG(VB_VBI, LOG_INFO, QString("Couldn't open decoder context"));
-        avcodec_free_context(&dec_ctx);
+        avcodec_free_context(&m_decCtx);
         avformat_free_context(fmt_ctx);
         return;
     }
@@ -515,7 +519,7 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
     while (av_read_frame(fmt_ctx, pkt) >= 0)
     {
         int bytes {0};
-        while ((bytes = decode(target, dec_ctx, stream, pkt)) >= 0)
+        while ((bytes = decode(pkt)) >= 0)
         {
             pkt->data += bytes;
             pkt->size -= bytes;
@@ -529,15 +533,14 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
     /* flush the decoder */
     pkt->data = nullptr;
     pkt->size = 0;
-    while (decode(target, dec_ctx, stream, pkt) >= 0)
+    while (decode(pkt) >= 0)
     {
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("Loaded %1 %2 subtitles from '%3'")
-        .arg(target.GetSubtitleCount()).arg(codec->long_name, fileName));
-    target.SetLastLoaded();
+        .arg(m_target->GetSubtitleCount()).arg(codec->long_name, m_fileName));
+    m_target->SetLastLoaded();
 
     av_packet_free(&pkt);
-    avcodec_free_context(&dec_ctx);
     avformat_free_context(fmt_ctx);
 }

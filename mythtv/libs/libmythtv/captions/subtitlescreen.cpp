@@ -2167,7 +2167,7 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         return;
     }
 
-    QStringList rawsubs = subs->GetSubtitles(playPos);
+    QStringList rawsubs = subs->GetSubtitles(m_subreader->GetParser(), playPos);
     if (rawsubs.empty())
     {
         subs->Unlock();

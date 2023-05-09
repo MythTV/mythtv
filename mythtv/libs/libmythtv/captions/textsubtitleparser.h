@@ -38,6 +38,7 @@ class text_subtitle_t
 
 using TextSubtitleList = std::vector<text_subtitle_t>;
 
+class TextSubtitleParser;
 class TextSubtitles : public QObject
 {
     Q_OBJECT
@@ -55,7 +56,7 @@ class TextSubtitles : public QObject
     ~TextSubtitles() override;
 
     bool HasSubtitleChanged(uint64_t timecode) const;
-    QStringList GetSubtitles(uint64_t timecode);
+    QStringList GetSubtitles(TextSubtitleParser *parser, uint64_t timecode);
 
     /** \fn TextSubtitles::IsFrameBasedTiming(void) const
      *  \brief Returns true in case the subtitle timing data is frame-based.
@@ -119,16 +120,29 @@ class TextSubtitles : public QObject
 #endif
 };
 
+class SubtitleReader;
+class SubtitleLoadHelper;
+
 class TextSubtitleParser
 {
   public:
-    static void LoadSubtitles(const QString &fileName, TextSubtitles &target,
-                              bool inBackground);
-    static int  decode(TextSubtitles &target, AVCodecContext *dec_ctx, AVStream *stream, AVPacket *pkt);
+    TextSubtitleParser(SubtitleReader *parent, QString fileName, TextSubtitles *target)
+        : m_parent(parent), m_target(target), m_fileName(std::move(fileName)) {};
+    ~TextSubtitleParser();
+    void LoadSubtitles(bool inBackground);
+    int  decode(AVPacket *pkt);
 
   private:
     static int     read_packet(void *opaque, uint8_t *buf, int buf_size);
     static int64_t seek_packet(void *opaque, int64_t offset, int whence);
+
+    SubtitleReader     *m_parent     {nullptr};
+    SubtitleLoadHelper *m_loadHelper {nullptr};
+    TextSubtitles      *m_target     {nullptr};
+    QString             m_fileName;
+
+    AVCodecContext     *m_decCtx     {nullptr};
+    AVStream           *m_stream     {nullptr};
 };
 
 #endif

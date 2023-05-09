@@ -106,7 +106,10 @@ void SubtitleReader::LoadExternalSubtitles(const QString &subtitleFileName,
     m_textSubtitles.Clear();
     m_textSubtitles.SetInProgress(isInProgress);
     if (!subtitleFileName.isEmpty())
-        TextSubtitleParser::LoadSubtitles(subtitleFileName, m_textSubtitles, false);
+    {
+        m_externalParser = new TextSubtitleParser(this, subtitleFileName, &m_textSubtitles);
+        m_externalParser->LoadSubtitles(false);
+    }
 }
 
 bool SubtitleReader::HasTextSubtitles(void)
