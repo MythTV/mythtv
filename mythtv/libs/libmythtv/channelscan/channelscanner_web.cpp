@@ -133,6 +133,8 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
     }
     else if (ScanType == "VBOXIMPORT")
         nScanType = ScanTypeSetting::VBoxImport;
+    else if (ScanType == "HDHRIMPORT")
+        nScanType = ScanTypeSetting::HDHRImport;
     else if (ScanType == "MPTSIMPORT")
         nScanType = ScanTypeSetting::IPTVImportMPTS;
     else if (ScanType == "M3UIMPORT")
@@ -292,6 +294,9 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
     else if (nScanType == ScanTypeSetting::VBoxImport)
         ImportVBox(cardid, inputname, sourceid,
                                 freeToAirOnly,
+                                service_requirements);
+    else if (nScanType == ScanTypeSetting::VBoxImport)
+        ImportHDHR(cardid, inputname, sourceid,
                                 service_requirements);
     else if (nScanType == ScanTypeSetting::ExternRecImport)
         ImportExternRecorder(cardid, inputname, sourceid);

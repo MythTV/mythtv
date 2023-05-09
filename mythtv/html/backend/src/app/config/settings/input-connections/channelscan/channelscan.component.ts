@@ -421,6 +421,7 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
         else
           this.scanTypes.push({ label: 'settings.channelscan.type.full', value: 'FULL' });
         this.scanTypes.push({ label: 'settings.channelscan.type.import', value: 'IMPORT' });
+        this.scanTypes.push({ label: 'settings.channelscan.type.hdhrimport', value: 'HDHRIMPORT' });
         transp = true;
         break;
       case 'VBOX':

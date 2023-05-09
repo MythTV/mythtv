@@ -879,7 +879,8 @@
         "erroropen": "Failed to open the card",
         "alltransport": "Scan of all existing transports",
         "onetransport": "Scan of single existing transport",
-        "transports": "Scan existing transport(s)"
+        "transports": "Scan existing transport(s)",
+        "hdhrimport": "HDHomeRun Channel Import"
       },
       "scantype_dvbt_desc": "For DVB-T/T2 and scan type 'Full Scan' select a country to get the correct set of frequencies.",
       "freq": {
