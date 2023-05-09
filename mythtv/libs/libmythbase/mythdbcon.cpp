@@ -36,12 +36,19 @@
 
 static constexpr std::chrono::seconds kPurgeTimeout { 1h };
 
+static QMutex sMutex;
+
 bool TestDatabase(const QString& dbHostName,
                   const QString& dbUserName,
                   QString dbPassword,
                   QString dbName,
                   int dbPort)
 {
+    // ensure only one of these runs at a time, otherwise
+    // a segfault may happen as a connection is destroyed while
+    // being used. QSqlDatabase will remove a connection
+    // if another is created with the same name.
+    QMutexLocker locker(&sMutex);
     bool ret = false;
 
     if (dbHostName.isEmpty() || dbUserName.isEmpty())

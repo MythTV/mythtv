@@ -11,6 +11,9 @@
 #define CONFIG_SERVICE QString("/Config/")
 #define CONFIG_HANDLE  QString("Config")
 
+// Only endpoints that don't require a fully configured mythbackend (eg a new
+// setup with no database or tuners for example) should be put here.
+
 class V2Config : public MythHTTPService
 {
     Q_OBJECT
@@ -30,7 +33,13 @@ class V2Config : public MythHTTPService
                                                          const QString &Password,
                                                          const QString &Name,
                                                          int   Port,
-                                                         bool  DoTest );
+                                                         bool  DoTest,
+                                                         bool  LocalEnabled,
+                                                         const QString &LocalHostName,
+                                                         bool  WOLEnabled,
+                                                         int   WOLReconnect,
+                                                         int   WOLRetry,
+                                                         const QString &WOLCommand);
 
     static V2DatabaseStatus* GetDatabaseStatus         ( void );
 
