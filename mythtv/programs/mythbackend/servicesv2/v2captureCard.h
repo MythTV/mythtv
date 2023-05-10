@@ -322,7 +322,6 @@ class V2CardSubType :public QObject
         Q_INVOKABLE V2CardSubType(QObject *parent = nullptr)
             :   QObject      ( parent ),
                 m_CardId       ( 0 ),
-                m_InputType     ( CardUtil::ERROR_UNKNOWN ),
                 m_HDHRdoesDVBC ( false ),
                 m_HDHRdoesDVB  ( false )
         {
