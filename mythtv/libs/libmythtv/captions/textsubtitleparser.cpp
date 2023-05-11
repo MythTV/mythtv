@@ -484,33 +484,36 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
     }
 
     // Find the subtitle stream and its context.
-    const AVCodec *codec {nullptr};
-    int stream_num = av_find_best_stream(fmt_ctx, AVMEDIA_TYPE_SUBTITLE, -1, -1, &codec, 0);
-    if (stream_num < 0) {
-        LOG(VB_VBI, LOG_INFO, QString("Couldn't find subtitle stream. %1")
-            .arg(av_make_error_stdstring(errbuf,stream_num)));
-        avformat_free_context(fmt_ctx);
-        return;
-    }
-    m_stream = fmt_ctx->streams[stream_num];
-    if (m_stream == nullptr) {
-        LOG(VB_VBI, LOG_INFO, QString("Stream %1 is null").arg(stream_num));
-        avformat_free_context(fmt_ctx);
-        return;
-    }
+    if (!m_decCtx)
+    {
+        const AVCodec *codec {nullptr};
+        int stream_num = av_find_best_stream(fmt_ctx, AVMEDIA_TYPE_SUBTITLE, -1, -1, &codec, 0);
+        if (stream_num < 0) {
+            LOG(VB_VBI, LOG_INFO, QString("Couldn't find subtitle stream. %1")
+                .arg(av_make_error_stdstring(errbuf,stream_num)));
+            avformat_free_context(fmt_ctx);
+            return;
+        }
+        m_stream = fmt_ctx->streams[stream_num];
+        if (m_stream == nullptr) {
+            LOG(VB_VBI, LOG_INFO, QString("Stream %1 is null").arg(stream_num));
+            avformat_free_context(fmt_ctx);
+            return;
+        }
 
-    // Create a decoder for this subtitle stream context.
-    m_decCtx = avcodec_alloc_context3(codec);
-    if (!m_decCtx) {
-        LOG(VB_VBI, LOG_INFO, QString("Couldn't allocate decoder context"));
-        avformat_free_context(fmt_ctx);
-        return;
-    }
-    if (avcodec_open2(m_decCtx, codec, nullptr) < 0) {
-        LOG(VB_VBI, LOG_INFO, QString("Couldn't open decoder context"));
-        avcodec_free_context(&m_decCtx);
-        avformat_free_context(fmt_ctx);
-        return;
+        // Create a decoder for this subtitle stream context.
+        m_decCtx = avcodec_alloc_context3(codec);
+        if (!m_decCtx) {
+            LOG(VB_VBI, LOG_INFO, QString("Couldn't allocate decoder context"));
+            avformat_free_context(fmt_ctx);
+            return;
+        }
+        if (avcodec_open2(m_decCtx, codec, nullptr) < 0) {
+            LOG(VB_VBI, LOG_INFO, QString("Couldn't open decoder context"));
+            avcodec_free_context(&m_decCtx);
+            avformat_free_context(fmt_ctx);
+            return;
+        }
     }
 
     /* decode until eof */
@@ -538,7 +541,8 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("Loaded %1 %2 subtitles from '%3'")
-        .arg(m_target->GetSubtitleCount()).arg(codec->long_name, m_fileName));
+        .arg(m_target->GetSubtitleCount())
+        .arg(m_decCtx->codec->long_name, m_fileName));
     m_target->SetLastLoaded();
 
     av_packet_free(&pkt);
