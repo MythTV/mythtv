@@ -290,19 +290,28 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
         post_event(m_scanMonitor, ScannerEvent::ScanComplete, 0);
     }
     else if (nScanType == ScanTypeSetting::IPTVImport)
+    {
         ImportM3U(cardid, inputname, sourceid, false);
+    }
     else if (nScanType == ScanTypeSetting::VBoxImport)
+    {
         ImportVBox(cardid, inputname, sourceid,
                                 freeToAirOnly,
                                 service_requirements);
+    }
     else if (nScanType == ScanTypeSetting::HDHRImport)
+    {
         ImportHDHR(cardid, inputname, sourceid,
                                 service_requirements);
+    }
     else if (nScanType == ScanTypeSetting::ExternRecImport)
+    {
         ImportExternRecorder(cardid, inputname, sourceid);
+    }
     else if (nScanType == ScanTypeSetting::IPTVImportMPTS)
         ImportM3U(cardid, inputname, sourceid, true);
     else
+    {
         Scan(
         nScanType,
         cardid,
@@ -325,6 +334,7 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
         FreqTable,
         FirstChan,
         LastChan);
+    }
 
     return true;
 }
