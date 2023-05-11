@@ -13,13 +13,7 @@
 #include <algorithm>
 
 // Qt
-#include <QRegularExpression>
 #include <QRunnable>
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-#include <QTextCodec>
-#else
-#include <QStringDecoder>
-#endif
 #include <QFile>
 #include <QDataStream>
 
@@ -32,6 +26,7 @@
 #include "libmyth/mythaverror.h"
 
 #include "captions/textsubtitleparser.h"
+#include "captions/subtitlereader.h"
 
 #define IO_BUFFER_SIZE 32768
 
@@ -351,60 +346,11 @@ int TextSubtitleParser::decode(AVPacket *pkt)
     if (!got_sub_ptr)
         return -1;
 
-    long start = static_cast<long>(av_q2d(m_stream->time_base) * pkt->dts * 1000);
-    long duration = static_cast<long>(av_q2d(m_stream->time_base) * pkt->duration * 1000);
+    sub.start_display_time = av_q2d(m_stream->time_base) * pkt->dts * 1000;
+    sub.end_display_time = av_q2d(m_stream->time_base) * (pkt->dts + pkt->duration) * 1000;
 
-    if (sub.format != 1)
-    {
-        LOG(VB_VBI, LOG_INFO, QString("Time %1, Not a text subtitle").arg(start));
-        return -1;
-    }
-
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-    const auto * codec = QTextCodec::codecForName("utf-8");
-#else
-    auto toUtf16 = QStringDecoder(QStringDecoder::Utf8);
-#endif
-    for (uint i = 0 ; i < sub.num_rects; i++)
-    {
-        text_subtitle_t newsub(start, start + duration);
-        QString text;
-        if (sub.rects[i]->type == SUBTITLE_TEXT)
-        {
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-            text = codec->toUnicode(sub.rects[i]->text, strlen(sub.rects[i]->text));
-#else
-            text = toUtf16.decode(sub.rects[i]->text);
-#endif
-            newsub.m_textLines.push_back(text);
-        }
-        else if (sub.rects[i]->type == SUBTITLE_ASS)
-        {
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-            text = codec->toUnicode(sub.rects[i]->ass, strlen(sub.rects[i]->ass));
-#else
-            text = toUtf16.decode(sub.rects[i]->ass);
-#endif
-            static const QRegularExpression continuation(R"(\\+n +)",
-                                                  QRegularExpression::CaseInsensitiveOption);
-            static const QRegularExpression endOfLine(R"(\\+[Nn])",
-                                               QRegularExpression::CaseInsensitiveOption);
-            // ASS "event" line. Comma seperated. Last field is the text.
-            text = text.section(QChar(','),-1);
-            // collapse continuation lines
-            text = text.remove(continuation);
-            // split into multiple lines
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList lines = text.split(endOfLine, QString::KeepEmptyParts);
-#else
-            QStringList lines = text.split(endOfLine, Qt::KeepEmptyParts);
-#endif
-            newsub.m_textLines.append(lines);
-        }
-        m_target->AddSubtitle(newsub);
-    }
-
-    avsubtitle_free(&sub);
+    m_parent->AddAVSubtitle(sub, m_decCtx->codec_id == AV_CODEC_ID_XSUB, false);
+    m_count += 1;
     return ret;
 }
 
@@ -422,6 +368,12 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
         }
         return;
     }
+
+    // External subtitles are now presented as AV Subtitles.
+    m_parent->EnableAVSubtitles(true);
+    m_parent->EnableTextSubtitles(false);
+    m_parent->EnableRawTextSubtitles(false);
+
     local_buffer_t sub_data {};
     RemoteFileWrapper rfile(m_fileName/*, false, false, 0*/);
 
@@ -541,10 +493,19 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("Loaded %1 %2 subtitles from '%3'")
-        .arg(m_target->GetSubtitleCount())
+        .arg(m_count)
         .arg(m_decCtx->codec->long_name, m_fileName));
     m_target->SetLastLoaded();
 
     av_packet_free(&pkt);
+    m_stream = nullptr;
     avformat_free_context(fmt_ctx);
+}
+
+QByteArray TextSubtitleParser::GetSubHeader()
+{
+    if (nullptr == m_decCtx)
+        return {};
+    return { reinterpret_cast<char*>(m_decCtx->subtitle_header),
+             m_decCtx->subtitle_header_size };
 }

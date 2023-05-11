@@ -2458,6 +2458,12 @@ void SubtitleScreen::InitialiseAssTrack(int tracknum)
     m_assTrackNum = tracknum;
 
     QByteArray header = m_player->GetDecoder()->GetSubHeader(tracknum);
+    if (header.isNull())
+    {
+        TextSubtitleParser* parser = m_player->GetSubReader(tracknum)->GetParser();
+        if (parser)
+            header = parser->GetSubHeader();
+    }
     if (!header.isNull())
         ass_process_codec_private(m_assTrack, header.data(), header.size());
 

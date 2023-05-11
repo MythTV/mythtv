@@ -82,6 +82,8 @@ const double MythPlayer::kSeekToEndOffset = 1.0;
 MythPlayer::MythPlayer(PlayerContext* Context, PlayerFlags Flags)
   : m_playerCtx(Context),
     m_playerFlags(Flags),
+    //AV subtitles
+    m_subReader(this),
     // CC608/708
     m_cc608(this), m_cc708(this),
     // Audio

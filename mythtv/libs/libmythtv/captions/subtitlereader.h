@@ -11,6 +11,8 @@ extern "C" {
 #include "libmythbase/mythdeque.h"
 #include "textsubtitleparser.h"
 
+class MythPlayer;
+
 class AVSubtitles
 {
   public:
@@ -38,7 +40,7 @@ class SubtitleReader : public QObject
     void TextSubtitlesUpdated();
 
   public:
-    SubtitleReader();
+    SubtitleReader(MythPlayer *parent);
    ~SubtitleReader() override;
 
     void EnableAVSubtitles(bool enable);
@@ -48,7 +50,7 @@ class SubtitleReader : public QObject
     AVSubtitles* GetAVSubtitles(void) { return &m_avSubtitles; }
     bool AddAVSubtitle(AVSubtitle& subtitle, bool fix_position,
                        bool allow_forced);
-    void ClearAVSubtitles(void);
+    void ClearAVSubtitles(bool force = false);
     static void FreeAVSubtitle(AVSubtitle &sub);
 
     TextSubtitles* GetTextSubtitles(void) { return &m_textSubtitles; }
@@ -61,6 +63,8 @@ class SubtitleReader : public QObject
     void ClearRawTextSubtitles(void);
 
   private:
+    MythPlayer    *m_parent                 {nullptr};
+
     AVSubtitles   m_avSubtitles;
     bool          m_avSubtitlesEnabled      {false};
     TextSubtitles m_textSubtitles;
@@ -68,7 +72,7 @@ class SubtitleReader : public QObject
     RawTextSubs   m_rawTextSubtitles;
     bool          m_rawTextSubtitlesEnabled {false};
 
-    TextSubtitleParser *m_externalParser {nullptr};
+    TextSubtitleParser *m_externalParser    {nullptr};
 };
 
 #endif // SUBTITLEREADER_H
