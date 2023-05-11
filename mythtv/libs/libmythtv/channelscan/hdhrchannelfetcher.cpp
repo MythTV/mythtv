@@ -361,7 +361,7 @@ void HDHRChannelFetcher::run(void)
     hdhr_chan_map_t::const_iterator it = m_channels->cbegin();
     for (uint i = 1; it != m_channels->cend(); ++it, ++i)
     {
-        QString channum     = it.key();
+        const QString& channum = it.key();
         QString name        = (*it).m_name;
         uint serviceID      = (*it).m_serviceID;
         QString channelType = (*it).m_channelType;
