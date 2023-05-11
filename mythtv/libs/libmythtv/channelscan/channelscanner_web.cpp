@@ -155,15 +155,14 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
         m_dlgMsg = QObject::tr("This scan type is not supported");
         return false;
     }
-    ServiceRequirements service_requirements;
+    ServiceRequirements service_requirements
+        {static_cast<ServiceRequirements> (kRequireVideo | kRequireAudio)};
     if (DesiredServices == "tv")
         service_requirements = static_cast<ServiceRequirements> (kRequireVideo | kRequireAudio);
     else if (DesiredServices == "audio")
         service_requirements = kRequireAudio;
     else if (DesiredServices == "all")
         service_requirements = kRequireNothing;
-    else
-        service_requirements = static_cast<ServiceRequirements> (kRequireVideo | kRequireAudio);
     QString freq_std;
     switch(nScanType)
     {
