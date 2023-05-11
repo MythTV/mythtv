@@ -385,7 +385,7 @@ void HDHRChannelFetcher::run(void)
         LOG(VB_CHANSCAN, LOG_INFO, QString("Found %1").arg(msg));
 
         if ((channelType == "Radio") && (m_serviceType & kRequireVideo))
-        {
+        { // NOLINT(bugprone-branch-clone)
             // Ignore this radio channel
             if (m_scanMonitor)
             {
