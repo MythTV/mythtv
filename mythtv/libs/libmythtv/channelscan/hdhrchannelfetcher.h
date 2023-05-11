@@ -114,7 +114,6 @@ class HDHRChannelFetcher : public QRunnable
     uint                 m_cardId;
     QString              m_inputName;
     uint                 m_sourceId;
-    bool                 m_ftaOnly;
     ServiceRequirements  m_serviceType;
     hdhr_chan_map_t     *m_channels       {nullptr};
     uint                 m_chanCnt        {1};
