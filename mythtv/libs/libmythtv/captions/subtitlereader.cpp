@@ -15,7 +15,6 @@ SubtitleReader::SubtitleReader(MythPlayer *parent)
 SubtitleReader::~SubtitleReader()
 {
     ClearAVSubtitles(true);
-    m_textSubtitles.Clear();
     ClearRawTextSubtitles();
 }
 
@@ -113,7 +112,6 @@ void SubtitleReader::FreeAVSubtitle(AVSubtitle &subtitle)
 void SubtitleReader::LoadExternalSubtitles(const QString &subtitleFileName,
                                            bool isInProgress)
 {
-    m_textSubtitles.Clear();
     m_textSubtitles.SetInProgress(isInProgress);
     if (!subtitleFileName.isEmpty())
     {

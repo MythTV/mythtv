@@ -53,7 +53,6 @@ class SubtitleReader : public QObject
     void ClearAVSubtitles(bool force = false);
     static void FreeAVSubtitle(AVSubtitle &sub);
 
-    TextSubtitles* GetTextSubtitles(void) { return &m_textSubtitles; }
     TextSubtitleParser* GetParser(void) { return m_externalParser; }
     bool HasTextSubtitles(void);
     void LoadExternalSubtitles(const QString &subtitleFileName, bool isInProgress);

@@ -47,39 +47,13 @@ class TextSubtitles : public QObject
     void TextSubtitlesUpdated();
 
   public:
-    TextSubtitles()
-    {
-        m_lastReturnedSubtitle.m_start = 0;
-        m_lastReturnedSubtitle.m_end   = 0;
-    }
-
     ~TextSubtitles() override;
-
-    bool HasSubtitleChanged(uint64_t timecode) const;
-    QStringList GetSubtitles(TextSubtitleParser *parser, uint64_t timecode);
-
-    /** \fn TextSubtitles::IsFrameBasedTiming(void) const
-     *  \brief Returns true in case the subtitle timing data is frame-based.
-     *
-     *  If the timing is frame-based, the client should use frame counts as
-     *  timecodes for the HasSubtitleChanged() and GetSubtitles() methods,
-     *  otherwise the timecode is milliseconds from the video start.
-     */
-    bool IsFrameBasedTiming(void) const
-        { return m_frameBasedTiming; }
-
-    void SetFrameBasedTiming(bool frameBasedTiming) {
-        QMutexLocker locker(&m_lock);
-        m_frameBasedTiming = frameBasedTiming;
-    }
 
     void SetFilename(const QString &fileName) {
         QMutexLocker locker(&m_lock);
         m_fileName = fileName;
     }
 
-    void AddSubtitle(const text_subtitle_t& newSub);
-    void Clear(void);
     void SetLastLoaded(void);
     void SetByteCount(off_t count) {
         QMutexLocker locker(&m_lock);
@@ -101,8 +75,6 @@ class TextSubtitles : public QObject
 
   private:
     TextSubtitleList          m_subtitles;
-    mutable text_subtitle_t   m_lastReturnedSubtitle;
-    bool                      m_frameBasedTiming {false};
     QString                   m_fileName;
     QDateTime                 m_lastLoaded;
     off_t                     m_byteCount        {0};
