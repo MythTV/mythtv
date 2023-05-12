@@ -585,15 +585,19 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 {
     gBackendContext = new BackendContext();
 
+    if (gCoreContext->IsDatabaseIgnored())
+    {
+        return run_setup_webserver();
+    }
     if (!DBUtil::CheckTimeZoneSupport())
     {
         LOG(VB_GENERAL, LOG_ERR,
             "MySQL time zone support is missing.  "
             "Please install it and try again.  "
             "See 'mysql_tzinfo_to_sql' for assistance.");
-        return GENERIC_EXIT_DB_NOTIMEZONE;
+        gCoreContext->GetDB()->IgnoreDatabase(true);
+        return run_setup_webserver();
     }
-
     bool ismaster = gCoreContext->IsMasterHost();
 
     if (!UpgradeTVDatabaseSchema(ismaster, ismaster, true))
@@ -621,11 +625,11 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     {
         std::cerr << "No setting found for this machine's BackendServerAddr.\n"
                   << "Please run mythtv-setup on this machine.\n"
-                  << "Go to page \"1. General\" / \"Host Address Backend Setup\" and examine the values.\n"
+                  << "Go to page \"General\" / \"Host Address Backend Setup\" and examine the values.\n"
                   << "N.B. The default values are correct for a combined frontend/backend machine.\n"
                   << "Press Escape, select \"Save and Exit\" and exit mythtv-setup.\n"
                   << "Then start mythbackend again.\n";
-        return GENERIC_EXIT_SETUP_ERROR;
+        return run_setup_webserver();
     }
 
     gSysEventHandler = new MythSystemEventHandler();
@@ -821,5 +825,61 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     LOG(VB_GENERAL, LOG_NOTICE, "MythBackend exiting");
     be_sd_notify("STOPPING=1\nSTATUS=Exiting");
 
+    return exitCode;
+}
+
+// This is a copy of the code from above, to start backend in a restricted mode, only running the web server
+// when the database is unusable, so thet the user can use the web app to fix the settings.
+
+int run_setup_webserver()
+{
+    LOG(VB_GENERAL, LOG_NOTICE, "**********************************************************************");
+    LOG(VB_GENERAL, LOG_NOTICE, "***** MythBackend starting in webapp only mode for initial setup *****");
+    LOG(VB_GENERAL, LOG_NOTICE, "***** Use http://localhost:6744 to perform setup                 *****");
+    LOG(VB_GENERAL, LOG_NOTICE, "**********************************************************************");
+
+    const HTTPServices be_services = {
+        { VIDEO_SERVICE, &MythHTTPService::Create<V2Video> },
+        { MYTH_SERVICE, &MythHTTPService::Create<V2Myth> },
+        { DVR_SERVICE, &MythHTTPService::Create<V2Dvr> },
+        { CONTENT_SERVICE, &MythHTTPService::Create<V2Content> },
+        { GUIDE_SERVICE, &MythHTTPService::Create<V2Guide> },
+        { CHANNEL_SERVICE, &MythHTTPService::Create<V2Channel> },
+        { STATUS_SERVICE, &MythHTTPService::Create<V2Status> },
+        { CAPTURE_SERVICE, &MythHTTPService::Create<V2Capture> },
+        { MUSIC_SERVICE, &MythHTTPService::Create<V2Music> },
+        { CONFIG_SERVICE, &MythHTTPService::Create<V2Config> },
+    };
+
+    MythHTTPInstance::Addservices(be_services);
+
+    // Send all unknown requests into the web app. make bookmarks and direct access work.
+    auto spa_index = [](auto && PH1) { return MythHTTPRewrite::RewriteToSPA(std::forward<decltype(PH1)>(PH1), "apps/backend/index.html"); };
+    MythHTTPInstance::AddErrorPageHandler({ "=404", spa_index });
+
+    // Serve components of the backend web app as if they were hosted at '/'
+    auto main_js = [](auto && PH1) { return MythHTTPRewrite::RewriteFile(std::forward<decltype(PH1)>(PH1), "apps/backend/main.js"); };
+    auto styles_css = [](auto && PH1) { return MythHTTPRewrite::RewriteFile(std::forward<decltype(PH1)>(PH1), "apps/backend/styles.css"); };
+    auto polyfills_js = [](auto && PH1) { return MythHTTPRewrite::RewriteFile(std::forward<decltype(PH1)>(PH1), "apps/backend/polyfills.js"); };
+    auto runtime_js = [](auto && PH1) { return MythHTTPRewrite::RewriteFile(std::forward<decltype(PH1)>(PH1), "apps/backend/runtime.js"); };
+
+    // Default index page
+    auto root = [](auto && PH1) { return MythHTTPRoot::RedirectRoot(std::forward<decltype(PH1)>(PH1), "apps/backend/index.html"); };
+
+    const HTTPHandlers be_handlers = {
+        { "/main.js", main_js },
+        { "/styles.css", styles_css },
+        { "/polyfills.js", polyfills_js },
+        { "/runtime.js", runtime_js },
+        { "/", root }
+    };
+
+    MythHTTPScopedInstance webserver(be_handlers);
+
+    ///////////////////////////////
+    ///////////////////////////////
+    int exitCode = qApp->exec();
+
+    LOG(VB_GENERAL, LOG_NOTICE, "MythBackend setup webapp exiting");
     return exitCode;
 }

@@ -3,9 +3,9 @@
 // Created     : Feb. 12, 2007
 //
 // Purpose     : XML Configuration file Class
-//                                                                            
+//
 // Copyright (c) 2007 David Blain <dblain@mythtv.org>
-//                                          
+//
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -27,10 +27,10 @@
 
 //////////////////////////////////////////////////////////////////////////////
 //
-// **NOTE:  Performance Issue *** 
+// **NOTE:  Performance Issue ***
 //
-// This class loads an XML file into a QDomDocument.  All requests for 
-// getting or setting values navigates the DOM each time.  All settings should 
+// This class loads an XML file into a QDomDocument.  All requests for
+// getting or setting values navigates the DOM each time.  All settings should
 // only be read/written once if possible.
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -63,6 +63,8 @@ class MBASE_PUBLIC XmlConfiguration
 
     bool Load();
     bool Save();
+
+    bool FileExists();
 
     bool GetValue(const QString &setting, const bool defaultValue)
     {

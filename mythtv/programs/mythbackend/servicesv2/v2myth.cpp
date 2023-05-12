@@ -1117,6 +1117,8 @@ V2BackendInfo* V2Myth::GetBackendInfo( void )
     if (scheduler != nullptr)
         pEnv->setSchedulingEnabled(scheduler->QueryScheduling());
     pLog->setLogArgs       ( logPropagateArgs      );
+    pEnv->setIsDatabaseIgnored(gCoreContext->GetDB()->IsDatabaseIgnored());
+    pEnv->setDBTimezoneSupport(DBUtil::CheckTimeZoneSupport());
 
     // ----------------------------------------------------------------------
     // Return the pointer... caller is responsible to delete it!!!

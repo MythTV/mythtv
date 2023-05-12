@@ -83,7 +83,10 @@ bool V2Config::SetDatabaseCredentials(const QString &Host, const QString &UserNa
     dbparms.m_wolReconnect = std::chrono::seconds(WOLReconnect);
     dbparms.m_wolRetry = WOLRetry;
     dbparms.m_wolCommand = WOLCommand;
-    bResult = gContext->SaveDatabaseParams(dbparms);
+    // We need the force parameter set to true here, otherwise if you accept the
+    // default values, it does not save the file and theus does not create
+    // config.xml.
+    bResult = gContext->SaveDatabaseParams(dbparms, true);
 
     return bResult;
 }

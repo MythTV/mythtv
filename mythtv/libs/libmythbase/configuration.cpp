@@ -3,9 +3,9 @@
 // Created     : Feb. 12, 2007
 //
 // Purpose     : Configuration file Class
-//                                                                            
+//
 // Copyright (c) 2007 David Blain <dblain@mythtv.org>
-//                                          
+//
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -23,6 +23,14 @@
 #include "mythlogging.h"
 #include "mythdb.h"
 #include "compat.h"
+
+
+bool XmlConfiguration::FileExists()
+{
+    QString pathName = m_path + '/' + m_fileName;
+    QFile file(pathName);
+    return file.exists();
+}
 
 bool XmlConfiguration::Load()
 {
@@ -81,7 +89,7 @@ bool XmlConfiguration::Save()
     LOG(VB_GENERAL, LOG_DEBUG, QString("Saving %1").arg(pathName));
 
     QFile file(pathName + ".new");
-    
+
     if (!file.exists())
     {
         QDir directory(m_path);

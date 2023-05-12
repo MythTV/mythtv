@@ -24,6 +24,7 @@
 // MythTV
 #include "libmythbase/cleanupguard.h"
 #include "libmythbase/compat.h"
+#include "libmythbase/configuration.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
@@ -129,10 +130,28 @@ int main(int argc, char **argv)
     (void)sd_notify(0, "STATUS=Connecting to database.");
 #endif
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(false))
+
+    // If setup has not been done (ie. the config.xml does not exist),
+    // set the ignoreDB flag, which will cause only the web-app to
+    // start, so that setup can be done.
+
+    bool ignoreDB = false;
+    {
+        auto config = XmlConfiguration();
+        ignoreDB = !config.FileExists();
+    }
+
+    // Init Parameters:
+    // bool Init(bool gui = true,
+    //           bool promptForBackend = false,
+    //           bool disableAutoDiscovery = false,
+    //           bool ignoreDB = false);
+
+    if (!gContext->Init(false,false,false,ignoreDB))
     {
         LOG(VB_GENERAL, LOG_CRIT, "Failed to init MythContext.");
-        return GENERIC_EXIT_NO_MYTHCONTEXT;
+        gCoreContext->GetDB()->IgnoreDatabase(true);
+        // return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
     MythTranslation::load("mythfrontend");

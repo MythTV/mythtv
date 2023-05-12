@@ -26,6 +26,8 @@ class V2EnvInfo : public QObject
     SERVICE_PROPERTY2( QString, USER        )
     SERVICE_PROPERTY2( QString, MYTHCONFDIR );
     SERVICE_PROPERTY2( bool,    SchedulingEnabled );
+    SERVICE_PROPERTY2( bool,    IsDatabaseIgnored );
+    SERVICE_PROPERTY2( bool,    DBTimezoneSupport );
 
     public:
 
@@ -35,7 +37,10 @@ class V2EnvInfo : public QObject
               m_LCALL       ( ""     ),
               m_LCCTYPE     ( ""     ),
               m_HOME        ( ""     ),
-              m_MYTHCONFDIR ( ""     )
+              m_MYTHCONFDIR ( ""     ),
+              m_SchedulingEnabled (false),
+              m_IsDatabaseIgnored (false),
+              m_DBTimezoneSupport (false)
         {
         }
 
