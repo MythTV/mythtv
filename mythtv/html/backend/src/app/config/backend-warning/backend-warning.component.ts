@@ -1,10 +1,9 @@
-import { HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { DvrService } from 'src/app/services/dvr.service';
-import { BackendInfo } from 'src/app/services/interfaces/backend.interface';
 import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
 import { MythService } from 'src/app/services/myth.service';
 import { SetupService } from 'src/app/services/setup.service';
+import { SetupWizardService } from 'src/app/services/setupwizard.service';
 
 @Component({
   selector: 'app-backend-warning',
@@ -23,7 +22,7 @@ export class BackendWarningComponent implements OnInit {
   busy = false;
 
   constructor(private mythService: MythService, public setupService: SetupService,
-    private dvrService: DvrService) {
+    private dvrService: DvrService, private wizardService: SetupWizardService) {
     this.getBackendInfo();
     this.refreshInfo();
   }
@@ -51,6 +50,13 @@ export class BackendWarningComponent implements OnInit {
       .subscribe({
         next: data => {
           this.setupService.schedulingEnabled = data.BackendInfo.Env.SchedulingEnabled;
+          this.setupService.isDatabaseIgnored = data.BackendInfo.Env.IsDatabaseIgnored;
+          this.setupService.DBTimezoneSupport = data.BackendInfo.Env.DBTimezoneSupport;
+          if (this.setupService.isDatabaseIgnored)
+            this.wizardService.wizardItems = this.wizardService.dbSetupMenu;
+          else
+            this.wizardService.wizardItems = this.wizardService.fullMenu;
+          this.wizardService.getWizardData();
           this.retryCount = 0;
           setTimeout(() => this.getUpcoming(), this.delay);
           this.delay = 0;

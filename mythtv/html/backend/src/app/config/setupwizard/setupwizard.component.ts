@@ -4,8 +4,6 @@ import { MenuItem } from 'primeng/api';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { SetupWizardService } from 'src/app/services/setupwizard.service';
-import { WizardData } from 'src/app/services/interfaces/wizarddata.interface';
-
 
 @Component({
     selector: 'app-settings',
@@ -16,56 +14,63 @@ export class SetupWizardComponent implements OnInit, AfterViewInit {
 
     @ViewChild("top") topElement!: ElementRef;
 
-    constructor(private router: Router, private wizardService: SetupWizardService,
+    constructor(private router: Router, public wizardService: SetupWizardService,
         private configService: ConfigService,
         private translate: TranslateService) { }
-    wizardItems: MenuItem[] = [];
+    fullMenu: MenuItem[] = [];
+    dbSetupMenu: MenuItem[] = [];
+
     activeIndex = 0;
     xactive = -1;
 
     ngOnInit(): void {
         this.translate.get('setupwizard.steps.selectlanguage').subscribe(
             (translated: string) => {
-                this.wizardItems = [{
-                    label: this.translate.instant('setupwizard.steps.selectlanguage'),
-                    routerLink: 'selectlanguage'
-                },
-                {
-                    label: this.translate.instant('setupwizard.steps.dbsetup'),
-                    routerLink: 'dbsetup'
-                },
-                {
-                    label: this.translate.instant('setupwizard.steps.general'),
-                    routerLink: 'general'
-                },
-                {
-                    label: this.translate.instant('setupwizard.steps.capture_cards'),
-                    routerLink: 'capture-cards'
-                },
-                {
-                    label: this.translate.instant('setupwizard.steps.recording_profiles'),
-                    routerLink: 'recording-profiles'
-                },
-                {
-                    label: this.translate.instant('setupwizard.steps.video_sources'),
-                    routerLink: 'video-sources'
-                },
-                {
-                    label: this.translate.instant('setupwizard.steps.input_connections'),
-                    routerLink: 'input-connections'
-                },
-                {
-                    label: this.translate.instant('setupwizard.steps.channel_editor'),
-                    routerLink: 'channel-editor'
-                },
-                {
-                    label: this.translate.instant('setupwizard.steps.storage_groups'),
-                    routerLink: 'storage-groups'
-                },
-                {
-                    label: this.translate.instant('setupwizard.steps.system_events'),
-                    routerLink: 'system-events'
-                }]
+                this.fullMenu = [
+                    {
+                        label: this.translate.instant('setupwizard.steps.dbsetup'),
+                        routerLink: 'dbsetup'
+                    },
+                    {
+                        label: this.translate.instant('setupwizard.steps.selectlanguage'),
+                        routerLink: 'selectlanguage'
+                    },
+                    {
+                        label: this.translate.instant('setupwizard.steps.general'),
+                        routerLink: 'general'
+                    },
+                    {
+                        label: this.translate.instant('setupwizard.steps.capture_cards'),
+                        routerLink: 'capture-cards'
+                    },
+                    {
+                        label: this.translate.instant('setupwizard.steps.recording_profiles'),
+                        routerLink: 'recording-profiles'
+                    },
+                    {
+                        label: this.translate.instant('setupwizard.steps.video_sources'),
+                        routerLink: 'video-sources'
+                    },
+                    {
+                        label: this.translate.instant('setupwizard.steps.input_connections'),
+                        routerLink: 'input-connections'
+                    },
+                    {
+                        label: this.translate.instant('setupwizard.steps.channel_editor'),
+                        routerLink: 'channel-editor'
+                    },
+                    {
+                        label: this.translate.instant('setupwizard.steps.storage_groups'),
+                        routerLink: 'storage-groups'
+                    },
+                    {
+                        label: this.translate.instant('setupwizard.steps.system_events'),
+                        routerLink: 'system-events'
+                    }];
+                this.wizardService.fullMenu = this.fullMenu;
+                this.dbSetupMenu = [this.fullMenu[0]];
+                this.wizardService.dbSetupMenu = this.dbSetupMenu;
+                this.wizardService.wizardItems = this.wizardService.fullMenu;
             });
     }
 

@@ -6,15 +6,13 @@ import { Language, MythLanguageList } from './interfaces/language.interface';
 import { GetSettingResponse, MythHostName } from './interfaces/myth.interface';
 import { WizardData } from './interfaces/wizarddata.interface';
 import { MythService } from './myth.service';
-import { Observable, Subscriber } from 'rxjs';
+import { MenuItem } from 'primeng/api';
 
 @Injectable({
     providedIn: 'root'
 })
 export class SetupWizardService implements OnInit {
 
-    // Initalization is complete when this is equal to 4.
-    m_initialized = 0;
     m_wizardData: WizardData = {
         Country: {
             Code: '', Country: '', NativeCountry: '', Image: ''
@@ -51,6 +49,10 @@ export class SetupWizardService implements OnInit {
     m_countrySetting: string = '';
     m_countries: Country[] = [];
 
+    fullMenu: MenuItem[] = [];
+    dbSetupMenu: MenuItem[] = [];
+    wizardItems: MenuItem[] = [];
+
     constructor(private configService: ConfigService,
         private mythService: MythService) {
         this.mythService.GetHostName().subscribe((value: MythHostName) => {
@@ -62,14 +64,12 @@ export class SetupWizardService implements OnInit {
     }
 
     Init(): void {
-        this.m_initialized = 1;
         this.initDatabaseStatus();
         this.initLanguages();
     }
 
     getWizardData(): WizardData {
-        if (this.m_initialized == 0)
-            this.Init();
+        this.Init();
         return this.m_wizardData;
     }
 
@@ -87,7 +87,6 @@ export class SetupWizardService implements OnInit {
                 this.m_wizardData.Database.WOLReconnect = result.DatabaseStatus.WOLReconnect;
                 this.m_wizardData.Database.WOLRetry = result.DatabaseStatus.WOLRetry;
                 this.m_wizardData.Database.WOLCommand = result.DatabaseStatus.WOLCommand;
-                this.m_initialized++;
             },
             (err: HttpErrorResponse) => { console.log("Failed to get database status", err.statusText); }
         );
@@ -109,7 +108,6 @@ export class SetupWizardService implements OnInit {
         this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: 'Country', Default: 'US' })
             .subscribe((result: GetSettingResponse) => {
                 this.m_wizardData.Country = this.findCountryByCode(result.String);
-                this.m_initialized++;
             })
     }
 
@@ -126,7 +124,6 @@ export class SetupWizardService implements OnInit {
     initLanguage() {
         this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: 'Language', Default: 'en_US' }).subscribe((result: GetSettingResponse) => {
             this.m_wizardData.Language = this.findLanguageByCode(result.String);
-            this.m_initialized++;
         })
     }
 

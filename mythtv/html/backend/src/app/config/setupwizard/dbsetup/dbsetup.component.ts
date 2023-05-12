@@ -10,6 +10,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { NgForm } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { SetupService } from 'src/app/services/setup.service';
+import { Clipboard } from '@angular/cdk/clipboard';
 
 @Component({
     selector: 'app-dbsetup',
@@ -27,6 +28,9 @@ export class DbsetupComponent implements OnInit {
     errorCount = 0;
     expectedCount = 2;
     connectionFail = false;
+    commandlist = '';
+    mySqlCommand = 'sudo mysql -u root < setup.sql'
+    tzCommand = 'mysql_tzinfo_to_sql /usr/share/zoneinfo | sudo mysql -u root mysql'
 
     msg_testconnection = 'setupwizard.testConnection';
     msg_connectionsuccess = 'setupwizard.connectionsuccess';
@@ -40,7 +44,8 @@ export class DbsetupComponent implements OnInit {
         private wizardService: SetupWizardService,
         private translate: TranslateService,
         private messageService: MessageService,
-        public setupService: SetupService) {
+        public setupService: SetupService,
+        private clipboard: Clipboard) {
         this.translate.get(this.msg_testconnection).subscribe(data => this.msg_testconnection = data);
         this.translate.get(this.msg_connectionsuccess).subscribe(data => this.msg_connectionsuccess = data);
         this.translate.get(this.msg_connectionfail).subscribe(data => this.msg_connectionfail = data);
@@ -50,6 +55,10 @@ export class DbsetupComponent implements OnInit {
     ngOnInit(): void {
         this.wizardService.initDatabaseStatus();
         this.m_wizardData = this.wizardService.getWizardData();
+    }
+
+    copyToclipboard(value: string): void {
+        this.clipboard.copy(value);
     }
 
     saveObserver = {
@@ -83,6 +92,7 @@ export class DbsetupComponent implements OnInit {
             DBName: this.m_wizardData.Database.Name,
             dbPort: this.m_wizardData.Database.Port
         }
+        this.commandlist = '';
         this.mythService.TestDBSettings(params).subscribe(result => {
             if (result.bool) {
                 if (doSave) {
@@ -95,6 +105,11 @@ export class DbsetupComponent implements OnInit {
             else {
                 this.messageService.add({ severity: 'error', life: 5000, summary: this.msg_testconnection, detail: this.msg_connectionfail });
                 this.connectionFail = true;
+                this.commandlist =
+                `CREATE DATABASE IF NOT EXISTS ${this.m_wizardData.Database.Name};\n` +
+                `ALTER DATABASE ${this.m_wizardData.Database.Name} DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;\n` +
+                `CREATE USER IF NOT EXISTS '${this.m_wizardData.Database.UserName}'@'localhost' IDENTIFIED WITH mysql_native_password by '${this.m_wizardData.Database.Password}';\n` +
+                `GRANT ALL ON ${this.m_wizardData.Database.Name}.* TO '${this.m_wizardData.Database.UserName}'@'localhost';`
             }
         });
     }

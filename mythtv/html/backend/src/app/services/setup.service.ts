@@ -40,8 +40,8 @@ export class SetupService {
             successCount: 0,
             errorCount: 0,
             thisHostName: this.m_hostName,
-            BackendServerPort: 4543,
-            BackendStatusPort: 4544,
+            BackendServerPort: 6543,
+            BackendStatusPort: 6544,
             SecurityPin: '0000',
             AllowConnFromAll: false,
             ListenOnAllIps: true,
@@ -52,27 +52,27 @@ export class SetupService {
             IsMasterBackend: true,
             MasterServerName: this.m_hostName,
         };
-        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "BackendServerPort" })
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "BackendServerPort", Default:"6543" })
             .subscribe({
                 next: data => this.m_HostAddressData.BackendServerPort = Number(data.String),
                 error: () => this.m_HostAddressData.errorCount++
             });
-        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "BackendStatusPort" })
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "BackendStatusPort", Default: "6544" })
             .subscribe({
                 next: data => this.m_HostAddressData.BackendStatusPort = Number(data.String),
                 error: () => this.m_HostAddressData.errorCount++
             });
-        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "SecurityPin" })
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "SecurityPin", Default: "0000"})
             .subscribe({
                 next: data => this.m_HostAddressData.SecurityPin = data.String,
                 error: () => this.m_HostAddressData.errorCount++
             });
-        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "AllowConnFromAll" })
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "AllowConnFromAll", Default: "0" })
             .subscribe({
                 next: data => this.m_HostAddressData.AllowConnFromAll = (data.String == "1"),
                 error: () => this.m_HostAddressData.errorCount++
             });
-        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "ListenOnAllIps" })
+        this.mythService.GetSetting({ HostName: this.m_hostName, Key: "ListenOnAllIps", Default: "1" })
             .subscribe({
                 next: data => this.m_HostAddressData.ListenOnAllIps = (data.String == "1"),
                 error: () => this.m_HostAddressData.errorCount++
@@ -97,7 +97,7 @@ export class SetupService {
                 next: data => this.m_HostAddressData.BackendServerAddr = data.String,
                 error: () => this.m_HostAddressData.errorCount++
             });
-        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "MasterServerName" })
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "MasterServerName", Default: this.m_hostName })
             .subscribe({
                 next: data => {
                     this.m_HostAddressData.MasterServerName = data.String;
@@ -322,5 +322,6 @@ export class SetupService {
 
     // This is here to be shared among tabs on an accordian
     schedulingEnabled = true;
-
+    isDatabaseIgnored = false;
+    DBTimezoneSupport = false;
 }
