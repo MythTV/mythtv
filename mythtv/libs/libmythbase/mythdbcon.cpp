@@ -131,8 +131,6 @@ bool MSqlDatabase::isOpen()
 
 bool MSqlDatabase::OpenDatabase(bool skipdb)
 {
-    if (gCoreContext->GetDB()->IsDatabaseIgnored() && m_name != "dbtest")
-        return false;
     if (!m_db.isValid())
     {
         LOG(VB_GENERAL, LOG_ERR,
