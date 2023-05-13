@@ -62,7 +62,11 @@ MythWebSocket::MythWebSocket(bool Server, QTcpSocket *Socket, MythSocketProtocol
 
 MythWebSocket::~MythWebSocket()
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     delete m_utf8CodecState;
+#else
+    delete m_toUtf16;
+#endif
     delete m_timer;
 }
 
@@ -298,16 +302,28 @@ void MythWebSocket::Read()
                     if (m_preferRawText)
                     {
                         m_dataFragments.emplace_back(payload);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
                         (void)m_utf8Codec->toUnicode(payload->data(), payload->size(), m_utf8CodecState);
+#endif
                     }
                     else
                     {
                         if (!m_string)
                             m_string = MythSharedString::CreateString();
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
                         (*m_string).append(m_utf8Codec->toUnicode(payload->data(), payload->size(), m_utf8CodecState));
+#else
+                        (*m_string).append(m_toUtf16->decode(*payload));
+#endif
                     }
 
-                    if (m_utf8CodecState->invalidChars)
+                    if (
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                        m_utf8CodecState->invalidChars
+#else
+                        m_toUtf16->hasError()
+#endif
+                        )
                     {
                         LOG(VB_HTTP, LOG_ERR, LOC + "Invalid UTF-8");
                         SendClose(WSCloseBadData, "Invalid UTF-8");
@@ -358,14 +374,25 @@ void MythWebSocket::Read()
                         // Final UTF-8 validation
                         if ((WSOpTextFrame == messageopcode))
                         {
-                            if (m_utf8CodecState->remainingChars)
+                            if (
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                                m_utf8CodecState->remainingChars
+#else
+                                m_toUtf16->hasError()
+#endif
+                                )
                             {
                                 LOG(VB_HTTP, LOG_ERR, LOC + "Invalid UTF-8");
                                 SendClose(WSCloseBadData, "Invalid UTF-8");
                                 valid = false;
                             }
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
                             delete m_utf8CodecState;
                             m_utf8CodecState = new QTextCodec::ConverterState;
+#else
+                            delete m_toUtf16;
+                            m_toUtf16 = new QStringDecoder;
+#endif
                         }
 
                         // Echo back to the Autobahn server
@@ -516,10 +543,16 @@ void MythWebSocket::CloseReceived(const DataPayload& Payload)
         if ((*Payload).size() > 2)
         {
             auto utf8 = (*Payload).mid(2);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
             QTextCodec::ConverterState state;
             (void)m_utf8Codec->toUnicode(utf8.constData(), utf8.size(), &state);
             if (state.invalidChars || state.remainingChars)
                 close = WSCloseProtocolError;
+#else
+            (void)m_toUtf16->decode(utf8);
+            if(m_toUtf16->hasError())
+                close = WSCloseProtocolError;
+#endif
         }
 
         if (WSCloseNormal == close)
