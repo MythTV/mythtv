@@ -20,8 +20,11 @@
 
 #include "test_mythdbcon.h"
 
+#include "libmythbase/mythcorecontext.h"
+
 void TestDbCon::initTestCase()
 {
+    gCoreContext = new MythCoreContext("test_mythdbcon_1.0", nullptr);
 }
 
 void TestDbCon::test_escapeAsQuery_data(void)
