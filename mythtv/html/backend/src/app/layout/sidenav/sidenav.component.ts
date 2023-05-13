@@ -1,5 +1,5 @@
 import { Component, isDevMode, OnInit, ViewChild } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { DataService } from 'src/app/services/data.service';
 
 @Component({
     selector: 'app-sidenav',
@@ -9,14 +9,7 @@ import { Subscription } from 'rxjs';
 
 export class SidenavComponent implements OnInit {
 
-    m_showSidebar: boolean = true;
-    m_showSidebarSub!: Subscription;
-
-    m_devMode: boolean = isDevMode();
-    m_haveDatabase: boolean = true;
-
-
-    constructor() { }
+    constructor(public dataService: DataService) { }
 
     ngOnInit(): void {
     }
