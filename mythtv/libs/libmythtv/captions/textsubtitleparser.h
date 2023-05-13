@@ -38,7 +38,6 @@ class text_subtitle_t
 
 using TextSubtitleList = std::vector<text_subtitle_t>;
 
-class TextSubtitleParser;
 class TextSubtitles : public QObject
 {
     Q_OBJECT
@@ -65,25 +64,18 @@ class TextSubtitles : public QObject
         m_isInProgress = isInProgress;
     }
     void SetHasSubtitles(bool hasSubs) { m_hasSubtitles = hasSubs; }
-
-    // Returns -1 if there is no subtitle file.
-    int GetSubtitleCount(void) const
-        { return m_hasSubtitles ? m_subtitles.size() : -1; }
+    bool GetHasSubtitles() const { return m_hasSubtitles; }
 
     void Lock(void)   { m_lock.lock();   }
     void Unlock(void) { m_lock.unlock(); }
 
   private:
-    TextSubtitleList          m_subtitles;
     QString                   m_fileName;
     QDateTime                 m_lastLoaded;
     off_t                     m_byteCount        {0};
     // Note: m_isInProgress is overly conservative because it doesn't
     // change from true to false after a recording completes.
     bool                      m_isInProgress     {false};
-    // It's possible to have zero subtitles at the start of playback
-    // because none have yet been written for an in-progress
-    // recording, so use m_hasSubtitles instead of m_subtitles.size().
     bool                      m_hasSubtitles     {false};
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QMutex                    m_lock             {QMutex::Recursive};

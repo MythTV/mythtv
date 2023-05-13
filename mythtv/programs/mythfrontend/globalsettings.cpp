@@ -17,7 +17,6 @@
 #include <QFileInfo>
 #include <QFontDatabase>
 #include <QImage>
-#include <QTextCodec>
 #include <QtGlobal>
 
 // MythTV headers
@@ -1567,23 +1566,6 @@ static HostComboBoxSetting *DecodeVBIFormat()
     return gc;
 }
 #endif
-
-static HostComboBoxSetting *SubtitleCodec()
-{
-    auto *gc = new HostComboBoxSetting("SubtitleCodec");
-
-    gc->setLabel(OSDSettings::tr("Subtitle Codec"));
-
-    QList<QByteArray> list = QTextCodec::availableCodecs();
-
-    for (const auto & codec : qAsConst(list))
-    {
-        QString val = QString(codec);
-        gc->addSelection(val, val, val.toLower() == "utf-8");
-    }
-
-    return gc;
-}
 
 static HostComboBoxSetting *ChannelOrdering()
 {
@@ -4498,7 +4480,6 @@ OSDSettings::OSDSettings()
     addChild(PersistentBrowseMode());
     addChild(BrowseAllTuners());
     addChild(DefaultCCMode());
-    addChild(SubtitleCodec());
 
     //GroupSetting *cc = new GroupSetting();
     //cc->setLabel(tr("Closed Captions"));

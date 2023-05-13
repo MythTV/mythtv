@@ -122,7 +122,7 @@ void SubtitleReader::LoadExternalSubtitles(const QString &subtitleFileName,
 
 bool SubtitleReader::HasTextSubtitles(void)
 {
-    return m_textSubtitles.GetSubtitleCount() >= 0;
+    return m_textSubtitles.GetHasSubtitles();
 }
 
 QStringList SubtitleReader::GetRawTextSubtitles(std::chrono::milliseconds &duration)
