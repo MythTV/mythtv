@@ -533,11 +533,28 @@ static bool parse_extinf(const QString &line,
         }
     }
 
+    // Parse extension, HDHomeRun style
+    // EG. #EXTINF:-1 channel-id="22" channel-number="22" tvg-name="Omroep Brabant",22 Omroep Brabant
+    static const QRegularExpression chanNumName6
+        { R"(^-?\d+\s+channel-id=\"([^\"]+)\"\s+channel-number=\"([^\"]+)\"\s+tvg-name=\"([^\"]+)\".*$)" };
+    match = chanNumName6.match(line);
+    if (match.hasMatch())
+    {
+        channum = match.captured(2).simplified();
+        name = match.captured(3).simplified();
+        bool ok = false;
+        int channel_number = channum.toInt (&ok);
+        if (ok && (channel_number > 0))
+        {
+            return true;
+        }
+    }
+
     // Parse extension portion, https://github.com/iptv-org/iptv/blob/master/channels/ style
     // EG. #EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="https://i.imgur.com/VejnhiB.png" group-title="News",BBC News
-    static const QRegularExpression chanNumName6
+    static const QRegularExpression chanNumName7
         { "(^-?\\d+)\\s+[^,]*[^,]*,(.*)$" };
-    match = chanNumName6.match(line);
+    match = chanNumName7.match(line);
     if (match.hasMatch())
     {
         channum = match.captured(1).simplified();
