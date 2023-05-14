@@ -5463,15 +5463,12 @@ if enabled system_libbluray; then
                             die "ERROR: can not find libbluray."
                         fi
                         ;;
-                    ubuntu)
-                        case $VERSION_ID in
-                            17*|18*|19*|2*)
-                                die "ERROR: can not find libbluray."
-                                ;;
-                        esac
-                        ;;
-                    debian)
-                        if test $VERSION_ID -gt 8; then
+                    rhel)
+                        # RHEL8 doesn't ship libbluray-devel because of
+                        # some issue between RedHat and EPEL.
+                        #
+                        # Allow the internel libbluray to compile.
+                        if test ${VERSION_ID%\.*} -gt 8; then
                             die "ERROR: can not find libbluray."
                         fi
                         ;;
