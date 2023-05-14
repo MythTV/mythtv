@@ -420,7 +420,10 @@ bool MythPlayerCaptionsUI::HasCaptionTrack(uint Mode)
 {
     if (Mode == kDisplayNone)
         return false;
-    if (((Mode == kDisplayTextSubtitle) && m_captionsState.m_externalTextSubs) || (Mode == kDisplayNUVTeletextCaptions))
+    if (Mode == kDisplayNUVTeletextCaptions)
+        return true;
+    // External subtitles are now decoded with FFmpeg and are AVSubtitles.
+    if ((Mode == kDisplayAVSubtitle) && m_captionsState.m_externalTextSubs)
         return true;
     if (!(Mode == kDisplayTextSubtitle) && m_decoder->GetTrackCount(toTrackType(Mode)))
         return true;

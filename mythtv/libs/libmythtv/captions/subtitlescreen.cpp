@@ -1756,9 +1756,7 @@ void SubtitleScreen::Pulse(void)
 
     DisplayAVSubtitles(); // allow forced subtitles to work
 
-    if (kDisplayTextSubtitle == m_subtitleType)
-        DisplayTextSubtitles();
-    else if (kDisplayCC608 == m_subtitleType)
+    if (kDisplayCC608 == m_subtitleType)
         DisplayCC608Subtitles();
     else if (kDisplayCC708 == m_subtitleType)
         DisplayCC708Subtitles();
@@ -2102,82 +2100,6 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
     return (ysplit + 1);
 }
 
-void SubtitleScreen::DisplayTextSubtitles(void)
-{
-    if (!m_player || !m_subreader)
-        return;
-
-    bool changed = (m_textFontZoom != m_textFontZoomPrev);
-    changed |= (m_textFontDelayMs != m_textFontDelayMsPrev);
-    changed |= (m_textFontMinDurationMsPrev != m_textFontMinDurationMs);
-    changed |= (m_textFontDurationExtensionMsPrev != m_textFontDurationExtensionMs);
-    MythVideoOutput *vo = m_player->GetVideoOutput();
-    if (!vo)
-        return;
-    m_safeArea = vo->GetSafeRect();
-
-    MythVideoFrame *currentFrame = vo->GetLastShownFrame();
-    if (!currentFrame)
-        return;
-
-    TextSubtitles *subs = m_subreader->GetTextSubtitles();
-    subs->Lock();
-    uint64_t playPos = 0;
-    int playPosAdj = m_textFontDelayMs.count();
-    if (subs->IsFrameBasedTiming())
-    {
-        // frame based subtitles get out of synch after running mythcommflag
-        // for the file, i.e., the following number is wrong and does not
-        // match the subtitle frame numbers:
-        playPos = currentFrame->m_frameNumber;
-        playPosAdj /= m_player->GetFrameRate();
-    }
-    else
-    {
-        // Use timecodes for time based SRT subtitles. Feeding this into
-        // NormalizeVideoTimecode() should adjust for non-zero start times
-        // and wraps. For MPEG, wraps will occur just once every 26.5 hours
-        // and other formats less frequently so this should be sufficient.
-        // Note: timecodes should now always be valid even in the case
-        // when a frame doesn't have a valid timestamp. If an exception is
-        // found where this is not true then we need to use the frameNumber
-        // when timecode is not defined by uncommenting the following lines.
-        //if (currentFrame->timecode == 0)
-        //    playPos = (uint64_t)
-        //        ((currentFrame->frameNumber / video_frame_rate) * 1000);
-        //else
-        auto tc_ms = currentFrame->m_timecode;
-        playPos = m_player->GetDecoder()->NormalizeVideoTimecode(tc_ms).count();
-    }
-    playPos -= playPosAdj;
-    if (playPos != 0)
-        changed |= subs->HasSubtitleChanged(playPos);
-    if (!changed)
-    {
-        subs->Unlock();
-        return;
-    }
-
-    SetElementDeleted();
-    DeleteAllChildren();
-
-    if (playPos == 0)
-    {
-        subs->Unlock();
-        return;
-    }
-
-    QStringList rawsubs = subs->GetSubtitles(playPos);
-    if (rawsubs.empty())
-    {
-        subs->Unlock();
-        return;
-    }
-
-    subs->Unlock();
-    DrawTextSubtitles(rawsubs, 0ms, 0ms);
-}
-
 void SubtitleScreen::DisplayRawTextSubtitles(void)
 {
     if (!m_player || !m_subreader)
@@ -2458,6 +2380,12 @@ void SubtitleScreen::InitialiseAssTrack(int tracknum)
     m_assTrackNum = tracknum;
 
     QByteArray header = m_player->GetDecoder()->GetSubHeader(tracknum);
+    if (header.isNull())
+    {
+        TextSubtitleParser* parser = m_player->GetSubReader(tracknum)->GetParser();
+        if (parser)
+            header = parser->GetSubHeader();
+    }
     if (!header.isNull())
         ass_process_codec_private(m_assTrack, header.data(), header.size());
 
