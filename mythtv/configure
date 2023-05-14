@@ -3433,6 +3433,9 @@ if $cxx -v 2>&1 | grep -qi ^gcc; then
     cxx_type=gxx
     gxx_version=$($cxx -dumpversion)
     gxx_major=$(echo $gxx_version | sed "s/\([0-9]*\).*/\\1/")
+    if test $gxx_major -lt 8; then
+        die "MythTV requires GCC 8 or better."
+    fi
 elif $cxx --version 2>/dev/null | grep -q Intel; then
     cxx_type=icpc
     gxx_version="AV_STRINGIFY(__INTEL_COMPILER)"
@@ -6475,18 +6478,6 @@ if enabled gxx; then
     # produces files that contain "useless" casts.
     #check_cxxflags -Wuseless-cast
 
-    # Ubuntu 16.04 uses gcc 5.4.0 which complains about '[[clang::fallthrough]]'
-    gxx_major_version=$(echo $gxx_version | sed -e 's/\([[:digit:]]\{1,\}\).*/\1/')
-    if test $gxx_major_version -lt 7; then
-        if enabled arm; then
-            check_cxxflags -Wno-psabi
-        fi
-        check_cxxflags -Wno-attributes
-    fi
-    # GCC on centos7 doesn't handle the '{}' initializer properly.
-    if test $gxx_major_version -lt 5; then
-        check_cxxflags -Wno-missing-field-initializers
-    fi
     check_cxxflags -funit-at-a-time
     # Don't complain about over-aligned types
     check_cxxflags -faligned-new
