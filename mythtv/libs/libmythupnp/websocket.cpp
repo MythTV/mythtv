@@ -646,7 +646,7 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
                 }
                 else
                     break;
-                [[clang::fallthrough]];
+                [[fallthrough]];
             case WebSocketFrame::kOpTextFrame:
             case WebSocketFrame::kOpBinaryFrame:
                 HandleDataFrame(frame);

@@ -199,7 +199,7 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 				case DSM_CC_STREAM  :
 				case ISO13522_STREAM:
 					p->done = true;
-					[[clang::fallthrough]];
+					[[fallthrough]];
 				case PRIVATE_STREAM1:
 				case VIDEO_STREAM_S ... VIDEO_STREAM_E:
 				case AUDIO_STREAM_S ... AUDIO_STREAM_E:

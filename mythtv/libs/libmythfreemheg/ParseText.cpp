@@ -391,7 +391,7 @@ void MHParseText::NextSym()
         {
             case '\n':
                 m_lineCount++;
-                [[clang::fallthrough]];
+                [[fallthrough]];
             case ' ':
             case '\r':
             case '\t':

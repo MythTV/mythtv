@@ -317,7 +317,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 			s_zfd.hypercosEffect = iRAND (2);
 			// Checked Fedora26 get-plugins-good sources.
 			// No break statement there.
-			[[clang::fallthrough]];
+			[[fallthrough]];
                     case 13:
                     case 20:
                     case 21:

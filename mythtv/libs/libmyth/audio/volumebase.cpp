@@ -44,7 +44,7 @@ class VolumeWriteBackThread : public MThread
             break;
         case kFinished:
             wait();
-            [[clang::fallthrough]];
+            [[fallthrough]];
         case kStopped:
             m_state = kRunning;
             start();
