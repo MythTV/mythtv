@@ -207,7 +207,7 @@ static QString decode_text(const unsigned char *buf, uint length)
     {
         return iconv_helper(4 + buf[0], (char*)(buf + 1), length - 1);
     }
-    if (buf[0] == 0x10)
+    if ((buf[0] == 0x10) && (length >= 3))
     {
         // If the first byte of the text field has a value "0x10"
         // then the following two bytes carry a 16-bit value (uimsbf) N
