@@ -1796,7 +1796,10 @@ class IPTVHost : public CaptureCardTextEditSetting
         setValue("http://mafreebox.freebox.fr/freeboxtv/playlist.m3u");
         setLabel(QObject::tr("M3U URL"));
         setHelpText(
-            QObject::tr("URL of M3U containing RTSP/RTP/UDP channel URLs."));
+            QObject::tr("URL of M3U file containing RTSP/RTP/UDP/HTTP channel URLs,"
+            " example for HDHomeRun: http://<ipv4>/lineup.m3u and for Freebox:"
+            " http://mafreebox.freebox.fr/freeboxtv/playlist.m3u."
+            ));
     }
 };
 
