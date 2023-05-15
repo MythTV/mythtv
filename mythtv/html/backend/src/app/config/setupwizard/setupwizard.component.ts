@@ -21,7 +21,7 @@ export class SetupWizardComponent implements OnInit, AfterViewInit {
     dbSetupMenu: MenuItem[] = [];
 
     activeIndex = 0;
-    xactive = -1;
+    activeItem! : MenuItem;
 
     ngOnInit(): void {
         this.translate.get('setupwizard.steps.selectlanguage').subscribe(
@@ -68,6 +68,7 @@ export class SetupWizardComponent implements OnInit, AfterViewInit {
                         routerLink: 'system-events'
                     }];
                 this.wizardService.fullMenu = this.fullMenu;
+                this.activeItem = this.fullMenu[0];
                 this.dbSetupMenu = [this.fullMenu[0]];
                 this.wizardService.dbSetupMenu = this.dbSetupMenu;
                 this.wizardService.wizardItems = this.wizardService.fullMenu;
@@ -76,10 +77,6 @@ export class SetupWizardComponent implements OnInit, AfterViewInit {
 
     ngAfterViewInit(): void {
         this.wizardService.m_topElement = this.topElement;
-    }
-
-    onActiveIndexChange(ev: number) {
-        this.xactive = ev;
     }
 
 }

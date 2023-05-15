@@ -22,11 +22,13 @@
     "instructions": "Instructions"
   },
   "dashboard": {
-    "warning": "Please note this is a work in progress and some features are not fully working!"
+    "backendStatus": "Backend Status",
+    "channeleditor": "Channel Editor",
+    "programguide": "Program Guide",
+    "recordings": "Recordings"
   },
   "navbar": {
     "backendSetup": "Backend Setup",
-    "backendStatus": "Backend Status",
     "changeLanguage": "Change Language",
     "dashboard": "Dashboard",
     "login": "Log In",
@@ -759,7 +761,15 @@
       "commmethod_label": "Commercial Detection Method",
       "commmethod_desc": "Changes the method of commercial detection used for recordings on this channel or skips detection by marking the channel as Commercial Free.",
       "delete_details": "This will delete Channel:{{ChanNum}}, Name:{{ChannelName}}, Source:{{Source}}",
-      "delete_this": "Delete Channel"
+      "delete_this": "Delete Channel",
+      "col_channum": "Chan Num",
+      "col_freqid": "Freq Id",
+      "col_callsign": "Call Sign",
+      "col_name": "Name",
+      "col_source": "Source",
+      "col_priority": "Priority",
+      "col_visibility": "Visibility",
+      "col_useeit": "Use EIT"
     },
     "rprofiles": {
       "title": "Recording Profiles",

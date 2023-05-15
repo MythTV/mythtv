@@ -12,6 +12,7 @@ import { InputConnectionsComponent } from '../settings/input-connections/input-c
 import { ChannelEditorComponent } from '../settings/channel-editor/channel-editor.component';
 import { StorageGroupsComponent } from '../settings/storage-groups/storage-groups.component';
 import { SystemEventsComponent } from '../settings/system-events/system-events.component';
+import { WizChanneleditComponent } from './wiz-channeledit/wiz-channeledit.component';
 
 @NgModule({
 	imports: [
@@ -47,7 +48,7 @@ import { SystemEventsComponent } from '../settings/system-events/system-events.c
 						canDeactivate: [CanDeactivateGuardService]
 					},
 					{
-						path: 'channel-editor', component: ChannelEditorComponent,
+						path: 'channel-editor', component: WizChanneleditComponent,
 						canDeactivate: [CanDeactivateGuardService]
 					},
 					{

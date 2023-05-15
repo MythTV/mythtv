@@ -1,0 +1,13 @@
+<p-card class="m-5">
+    <app-channel-editor></app-channel-editor>
+    <br><br><br><br>
+    <div class="flex justify-content-end">
+        <p-button class="p-3" label="{{ 'common.back' | translate }}"
+            (onClick)="router.navigate(['setupwizard/input-connections'])" icon="pi pi-angle-left"
+            iconPos="left"></p-button>
+
+        <p-button class="p-3" label="{{ 'common.next' | translate }}"
+            (onClick)="router.navigate(['setupwizard/storage-groups'])" icon="pi pi-angle-right" iconPos="right"></p-button>
+    </div>
+
+</p-card>

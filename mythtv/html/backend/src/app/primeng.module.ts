@@ -10,7 +10,7 @@ import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
 import { DropdownModule } from 'primeng/dropdown';
 import { FieldsetModule } from 'primeng/fieldset';
-import {InputNumberModule} from 'primeng/inputnumber';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { ListboxModule } from 'primeng/listbox';
 import { MenubarModule } from 'primeng/menubar';
 import { MessageModule } from 'primeng/message';
@@ -29,7 +29,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
-
+import { TabMenuModule } from 'primeng/tabmenu';
 
 @NgModule({
     exports: [
@@ -61,7 +61,8 @@ import { ScrollPanelModule } from 'primeng/scrollpanel';
         TooltipModule,
         RadioButtonModule,
         ProgressBarModule,
-        ScrollPanelModule
+        ScrollPanelModule,
+        TabMenuModule
     ]
 })
 

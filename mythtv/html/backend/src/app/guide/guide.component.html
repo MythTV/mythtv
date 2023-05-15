@@ -1,3 +1,4 @@
+<h2>{{ 'dashboard.programguide' | translate }} </h2>
 <div *ngIf="(m_guideData$ | async)?.ProgramGuide as pg; else loading">
     <p-dataView [value]="pg.Channels" [totalRecords]="pg.TotalAvailable">
         <ng-template pTemplate="header" styleClass="timeHeader">

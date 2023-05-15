@@ -73,6 +73,9 @@ import { SatipComponent } from './config/settings/capture-cards/satip/satip.comp
 import { VboxComponent } from './config/settings/capture-cards/vbox/vbox.component';
 import { FirewireComponent } from './config/settings/capture-cards/firewire/firewire.component';
 import { ChannelscanComponent } from './config/settings/input-connections/channelscan/channelscan.component';
+import { DashboardRoutingModule } from './dashboard/dashboard-routing.module';
+import { WizChanneleditComponent } from './config/setupwizard/wiz-channeledit/wiz-channeledit.component';
+import { RecordingsComponent } from './dashboard/recordings/recordings.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -142,6 +145,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     VboxComponent,
     FirewireComponent,
     ChannelscanComponent,
+    WizChanneleditComponent,
+    RecordingsComponent,
   ],
   imports: [
     BrowserModule,
@@ -162,6 +167,7 @@ export function HttpLoaderFactory(http: HttpClient) {
 
     PrimeNGModule,
     SetupWizardRoutingModule,
+    DashboardRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]

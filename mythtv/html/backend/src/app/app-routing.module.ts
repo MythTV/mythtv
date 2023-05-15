@@ -15,42 +15,8 @@ import { RecordingProfilesComponent } from './config/settings/recording-profiles
 import { SystemEventsComponent } from './config/settings/system-events/system-events.component';
 
 const routes: Routes = [
-  { path: '', component: DashboardComponent },
-  { path: 'status', component: StatusComponent },
+  { path: 'dashboard', component: DashboardComponent },
   { path: 'setupwizard', component: SetupWizardComponent },
-  {
-    path: 'settings/general', component: SettingsComponent,
-    canDeactivate: [CanDeactivateGuardService]
-  },
-  {
-    path: 'settings/capture-cards', component: CaptureCardsComponent,
-    canDeactivate: [CanDeactivateGuardService]
-  },
-  {
-    path: 'settings/recording-profiles', component: RecordingProfilesComponent,
-    canDeactivate: [CanDeactivateGuardService]
-  },
-  {
-    path: 'settings/video-sources', component: VideoSourcesComponent,
-    canDeactivate: [CanDeactivateGuardService]
-  },
-  {
-    path: 'settings/input-connections', component: InputConnectionsComponent,
-    canDeactivate: [CanDeactivateGuardService]
-  },
-  {
-    path: 'settings/channel-editor', component: ChannelEditorComponent,
-    canDeactivate: [CanDeactivateGuardService]
-  },
-  {
-    path: 'settings/storage-groups', component: StorageGroupsComponent,
-    canDeactivate: [CanDeactivateGuardService]
-  },
-  {
-    path: 'settings/system-events', component: SystemEventsComponent,
-    canDeactivate: [CanDeactivateGuardService]
-  },
-  { path: 'guide', component: GuideComponent },
 ];
 
 @NgModule({
