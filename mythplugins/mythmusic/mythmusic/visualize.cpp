@@ -289,7 +289,9 @@ bool StereoScope::process( VisualNode *node )
 bool StereoScope::draw( QPainter *p, const QColor &back )
 {
     if (back != Qt::green)      // hack!!! for WaveForm
-      p->fillRect(0, 0, m_size.width(), m_size.height(), back);
+    {
+        p->fillRect(0, 0, m_size.width(), m_size.height(), back);
+    }
     for ( int i = 1; i < m_size.width(); i++ )
     {
 #if TWOCOLOUR
@@ -479,7 +481,9 @@ bool MonoScope::process( VisualNode *node )
 bool MonoScope::draw( QPainter *p, const QColor &back )
 {
     if (back != Qt::green)      // hack!!! for WaveForm
-      p->fillRect( 0, 0, m_size.width(), m_size.height(), back );
+    {
+        p->fillRect( 0, 0, m_size.width(), m_size.height(), back );
+    }
     for ( int i = 1; i < m_size.width(); i++ ) {
 #if TWOCOLOUR
         double per = ( static_cast<double>(m_magnitudes[i]) * 2.0 ) /
@@ -530,6 +534,9 @@ bool MonoScope::draw( QPainter *p, const QColor &back )
 ///////////////////////////////////////////////////////////////////////////////
 // WaveForm - see whole track - by twitham@sbcglobal.net, 2023/01
 
+// static class members survive size changes for continuous display
+QImage WaveForm::m_image {nullptr}; // picture of spectrogram
+
 WaveForm::~WaveForm()
 {
     saveload(nullptr);
@@ -573,7 +580,7 @@ void WaveForm::saveload(MusicMetadata *meta)
     }
     if (m_image.isNull())
     {
-        m_image = QImage(WF_WIDTH, WF_HEIGHT, QImage::Format_RGB32);
+        m_image = QImage(m_wfsize.width(), m_wfsize.height(), QImage::Format_RGB32);
         m_image.fill(qRgb(0, 0, 0));
     }
     m_minl = 0;                 // drop last pixel, prepare for first
@@ -583,15 +590,17 @@ void WaveForm::saveload(MusicMetadata *meta)
     m_maxr = 0;
     m_sqrr = 0;
     m_position = 0;
-    m_lastx = WF_WIDTH;
+    m_lastx = m_wfsize.width();
     m_font = QApplication::font();
-// m_font.setPointSize(14);
-    m_font.setPixelSize(20);    // small to be mostly unnoticed
+    // m_font.setPointSize(14);
+    m_font.setPixelSize(m_size.height() / 60); // small to be mostly unnoticed
 }
 
 unsigned long WaveForm::getDesiredSamples(void)
 {
-    return (unsigned long) WF_AUDIO_SIZE;  // Maximum we can be given
+    // could be an adjustable class member, but this hard code works well
+    // return (unsigned long) WF_AUDIO_SIZE;  // Maximum we can be given
+    return 4096;           // maximum samples per update, may get less
 }
 
 bool WaveForm::processUndisplayed(VisualNode *node)
@@ -620,7 +629,8 @@ bool WaveForm::process(VisualNode *node)
     // return process_all_types(node, true);
 
     // StereoScope overlay must process only the displayed nodes
-    return StereoScope::process(node);
+    StereoScope::process(node);
+    return false;               // update even when silent
 }
 
 bool WaveForm::process_all_types(VisualNode *node, bool displayed)
@@ -657,16 +667,16 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
             }
             m_position++;
         }
-        uint xx = WF_WIDTH * m_offset / m_duration;
+        uint xx = m_wfsize.width() * m_offset / m_duration;
         if (xx != m_lastx)   // draw one finished line of min/max/rms
         {
             if (m_lastx > xx - 1) // right to left wrap
             {
                 m_lastx = xx - 1;
             }
-            int h = WF_HEIGHT / 4;  // amplitude above or below zero
-            int y = WF_HEIGHT / 4;  // left zero line
-            int yr = WF_HEIGHT * 3 / 4; // right  zero line
+            int h = m_wfsize.height() / 4;  // amplitude above or below zero
+            int y = m_wfsize.height() / 4;  // left zero line
+            int yr = m_wfsize.height() * 3 / 4; // right  zero line
             if (!m_right)
             {           // mono - drop full waveform below StereoScope
                 y = yr;
@@ -683,8 +693,8 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
                 LOG(VB_PLAYBACK, LOG_DEBUG,
                     QString("WF painting at %1,%2/%3").arg(x).arg(y).arg(yr));
 
-                painter.setPen(qRgb(0, 0, 0)); // clear prior content
-                painter.drawLine(x, 0, x, WF_HEIGHT);
+                painter.setPen(Qt::black); // clear prior content
+                painter.drawLine(x, 0, x, m_wfsize.height());
 
                 // Audacity uses 50,50,200 and 100,100,220 - I'm going
                 // darker to better contrast the StereoScope overlay
@@ -703,8 +713,8 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
                 {
                     int rmsr = sqrt(m_sqrr / m_position) * y / 32768;
                     painter.drawLine(x, yr - rmsr, x, yr + rmsr);
-                    painter.drawLine(x, WF_HEIGHT / 2, // left/right delta
-                                     x, WF_HEIGHT / 2 - rmsl + rmsr);
+                    painter.drawLine(x, m_wfsize.height() / 2, // L / R delta
+                                     x, m_wfsize.height() / 2 - rmsl + rmsr);
                 }
             }
             m_minl = 0;                 // reset metrics for next line
@@ -724,7 +734,7 @@ bool WaveForm::draw( QPainter *p, const QColor &back )
 {
     p->fillRect(0, 0, 0, 0, back); // no clearing, here to suppress warning
     if (!m_image.isNull())
-    {			     // background, updated by ::process above
+    {                        // background, updated by ::process above
         p->drawImage(0, 0, m_image.scaled(m_size,
                                           Qt::IgnoreAspectRatio,
                                           Qt::SmoothTransformation));
@@ -732,29 +742,31 @@ bool WaveForm::draw( QPainter *p, const QColor &back )
 
     StereoScope::draw(p, Qt::green); // green == no clearing!
 
-    p->setPen(Qt::yellow);
-    unsigned int x = m_size.width() * m_offset / m_duration;
-    p->drawLine(x, 0, x, m_size.height());
+    p->fillRect(m_size.width() * m_offset / m_duration, 0,
+                1, m_size.height(), qRgb(128, 128, 128));
 
     if (m_showtext && m_size.width() > 500) // metrics in corners
     {
-        p->setPen(Qt::white);
+        p->setPen(qRgb(128, 128, 128)); // Qt::white);
         p->setFont(m_font);
         QRect text(5, 5, m_size.width() - 10, m_size.height() - 10);
         p->drawText(text, Qt::AlignTop | Qt::AlignLeft,
                     QString("%1:%2")
                     .arg(m_offset / 1000 / 60)
                     .arg(m_offset / 1000 % 60, 2, 10, QChar('0')));
+        p->drawText(text, Qt::AlignTop | Qt::AlignHCenter,
+                    QString("%1%")
+                    .arg(100.0 * m_offset / m_duration, 0, 'f', 0));
         p->drawText(text, Qt::AlignTop | Qt::AlignRight,
                     QString("%1:%2")
                     .arg(m_duration / 1000 / 60)
                     .arg(m_duration / 1000 % 60, 2, 10, QChar('0')));
         p->drawText(text, Qt::AlignBottom | Qt::AlignLeft,
                     QString("%1 lines/s")
-                    .arg(1000.0 * WF_WIDTH / m_duration, 0, 'f', 1));
+                    .arg(1000.0 * m_wfsize.width() / m_duration, 0, 'f', 1));
         p->drawText(text, Qt::AlignBottom | Qt::AlignRight,
                     QString("%1 ms/line")
-                    .arg(1.0 * m_duration / WF_WIDTH, 0, 'f', 1));
+                    .arg(1.0 * m_duration / m_wfsize.width(), 0, 'f', 1));
     }
     return true;
 }
