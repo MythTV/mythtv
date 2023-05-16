@@ -180,6 +180,7 @@ class LogScale
 {
   public:
     explicit LogScale(int maxscale = 0, int maxrange = 0);
+    ~LogScale();
 
     int scale() const { return m_s; }
     int range() const { return m_r; }
@@ -190,9 +191,43 @@ class LogScale
 
 
   private:
-    std::vector<int> m_indices;
+    int *m_indices {nullptr};
     int  m_s       {0};
     int  m_r       {0};
+};
+
+// Spectrogram - by twitham@sbcglobal.net, 2023/05
+
+class Spectrogram : public VisualBase
+{
+  public:
+    Spectrogram();
+    ~Spectrogram() override;
+
+    unsigned long getDesiredSamples(void) override;
+    void resize(const QSize &size) override; // VisualBase
+    bool processUndisplayed(VisualNode *node) override;
+    bool process( VisualNode *node ) override;
+    bool draw(QPainter *p, const QColor &back = Qt::black) override;
+    void handleKeyPress(const QString &action) override
+        {(void) action;}
+    static QImage s_image;      // picture of spectrogram
+    static int    s_offset;     // position on screen
+
+  protected:
+    static inline double clamp(double cur, double max, double min);
+    QSize              m_sgsize {1920, 1080}; // picture size
+    QSize              m_size;                // displayed dize
+    LogScale           m_scale;
+    int                m_fftlen {16 * 1024}; // window width
+    QVector<float>     m_sigL;               // signal window
+    QVector<float>     m_sigR;
+    FFTSample*         m_dftL        { nullptr }; // real in, complex out
+    FFTSample*         m_dftR        { nullptr };
+    RDFTContext*       m_rdftContext { nullptr };
+    int                *m_red   {nullptr};
+    int                *m_green {nullptr};
+    int                *m_blue  {nullptr};
 };
 
 class Spectrum : public VisualBase
