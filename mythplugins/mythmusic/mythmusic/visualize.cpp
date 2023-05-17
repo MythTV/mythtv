@@ -534,9 +534,6 @@ bool MonoScope::draw( QPainter *p, const QColor &back )
 ///////////////////////////////////////////////////////////////////////////////
 // WaveForm - see whole track - by twitham@sbcglobal.net, 2023/01
 
-// static class members survive size changes for continuous display
-QImage WaveForm::m_image {nullptr}; // picture of spectrogram
-
 WaveForm::~WaveForm()
 {
     saveload(nullptr);
@@ -600,7 +597,7 @@ unsigned long WaveForm::getDesiredSamples(void)
 {
     // could be an adjustable class member, but this hard code works well
     // return (unsigned long) WF_AUDIO_SIZE;  // Maximum we can be given
-    return 4096;           // maximum samples per update, may get less
+    return WFAudioSize;    // maximum samples per update, may get less
 }
 
 bool WaveForm::processUndisplayed(VisualNode *node)
@@ -743,11 +740,11 @@ bool WaveForm::draw( QPainter *p, const QColor &back )
     StereoScope::draw(p, Qt::green); // green == no clearing!
 
     p->fillRect(m_size.width() * m_offset / m_duration, 0,
-                1, m_size.height(), qRgb(128, 128, 128));
+                1, m_size.height(), Qt::darkGray);
 
     if (m_showtext && m_size.width() > 500) // metrics in corners
     {
-        p->setPen(qRgb(128, 128, 128)); // Qt::white);
+        p->setPen(Qt::darkGray);
         p->setFont(m_font);
         QRect text(5, 5, m_size.width() - 10, m_size.height() - 10);
         p->drawText(text, Qt::AlignTop | Qt::AlignLeft,
