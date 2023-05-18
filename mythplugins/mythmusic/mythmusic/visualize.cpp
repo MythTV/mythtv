@@ -869,6 +869,253 @@ static class WaveFormFactory : public VisFactory
 }WaveFormFactory;
 
 ///////////////////////////////////////////////////////////////////////////////
+// Spectrogram - by twitham@sbcglobal.net, 2023/05
+//
+// A spectrogram needs the entire sound signal.  A wide sliding window
+// is needed to detect low frequencies, 2^14 = 16384 works great.  But
+// then the detected frequencies can linger up to 16384/44100=372
+// milliseconds!  We solve this by shrinking the signal amplitude over
+// time within the window.  This way all frequencies are still there
+// but only recent time has high amplitude.  This nicely displays even
+// quick sounds of a few milliseconds.
+
+// Static class members survive size changes for continuous display.
+// See the comment about s_image in WaveForm
+QImage Spectrogram::s_image {nullptr}; // picture of spectrogram
+int    Spectrogram::s_offset {0};      // position on screen
+
+Spectrogram::Spectrogram()
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("Spectrogram : Being Initialised"));
+
+    m_fps = 15;                 // needed?  right?
+
+    m_dftL = static_cast<FFTSample*>(av_malloc(sizeof(FFTSample) * m_fftlen));
+    m_dftR = static_cast<FFTSample*>(av_malloc(sizeof(FFTSample) * m_fftlen));
+
+    m_rdftContext = av_rdft_init(std::log2(m_fftlen), DFT_R2C);
+
+    m_scale.setMax(m_fftlen / 2, m_sgsize.height() / 2);
+    m_sigL.resize(m_fftlen);
+    m_sigR.resize(m_fftlen);
+
+    // cache a continuous color spectrum:
+    // 0000ff blue
+    // 00ffff cyan
+    // 00ff00 green
+    // ffff00 yellow
+    // ff0000 red
+    // ff00ff magenta
+    // 0000ff blue
+    int red[]   = {0, 0, 9, 1, 1, 8}; // 8 = ramp down
+    int green[] = {9, 1, 1, 8, 0, 0}; // 9 = ramp up
+    int blue[]  = {1, 8, 0, 0, 9, 1};
+    m_red   = (int *) malloc(sizeof(int) * 257 * 6);
+    m_green = (int *) malloc(sizeof(int) * 257 * 6);
+    m_blue  = (int *) malloc(sizeof(int) * 257 * 6);
+    for (int i = 0; i < 6; i++)
+    {
+        int r = red[i];
+        int g = green[i];
+        int b = blue[i];
+        for (int u = 0; u < 256; u++) { // u ramps up
+            int d = 256 - u;            // d ramps down
+            m_red[  i * 256 + u] = r == 9 ? u : r == 8 ? d : r * 255;
+            m_green[i * 256 + u] = g == 9 ? u : g == 8 ? d : g * 255;
+            m_blue[ i * 256 + u] = b == 9 ? u : b == 8 ? d : b * 255;
+        }
+    }
+}
+
+Spectrogram::~Spectrogram()
+{
+    av_freep(&m_dftL);
+    av_freep(&m_dftR);
+    av_rdft_end(m_rdftContext);
+    if (m_red)   free(m_red);
+    if (m_green) free(m_green);
+    if (m_blue)  free(m_blue);
+}
+
+void Spectrogram::resize(const QSize &newsize)
+{
+    m_size = newsize;
+}
+
+template<typename T> T sq(T a) { return a*a; };
+
+unsigned long Spectrogram::getDesiredSamples(void)
+{
+    // maximum samples per update, may get less
+    return (unsigned long)kSGAudioSize;
+}
+
+bool Spectrogram::process(VisualNode */*node*/)
+{
+    return false;
+}
+
+bool Spectrogram::processUndisplayed(VisualNode *node)
+{
+    // as of v33, this processes *all* samples, see WaveForm
+
+    int i = 0;
+    int w = m_sgsize.width();   // drawing size
+    int h = m_sgsize.height();
+    if (s_image.isNull())
+    {
+        s_image = QImage(w, h, QImage::Format_RGB32);
+        s_image.fill(qRgb(0, 0, 0));
+        s_offset = 0;
+    }
+    if (node)     // shift previous samples left, then append new node
+    {
+        i = node->m_length;
+        (i <= m_fftlen) || (i = m_fftlen);
+        int start = m_fftlen - i;
+        for (int k = 0; k < start; k++)
+        {
+            float mult = 0.8F;  // decay older sound by this much
+            if (k > start - i)  // prior set ramps from mult to 1.0
+            {
+                mult = mult + (1 - mult) * (1 - (start - k) / (start - i));
+            }
+            m_sigL[k] = mult * m_sigL[i + k];
+            m_sigR[k] = mult * m_sigR[i + k];
+        }
+        for (uint k = 0; k < node->m_length; k++) // append current samples
+        {
+            m_sigL[start + k] = node->m_left[k] / 32768.; // +/- 1 peak-to-peak
+            if (node->m_right)
+                m_sigR[start + k] = node->m_right[k] / 32768.;
+        }
+        // LOG(VB_PLAYBACK, LOG_DEBUG,
+        //     QString("SG 0=%1,%2\t%3=%4,%5").arg(node->m_left[0]).arg(node->m_left[1]).arg(i-1).arg(node->m_left[i-2]).arg(node->m_left[i-1]));
+        int end = m_fftlen / 40; // ramp window ends down to zero crossing
+        for (int k = 0; k < m_fftlen; k++)
+        {
+            float mult = k < end ? k / end : k > m_fftlen - end ?
+                (m_fftlen - k) / end : 1;
+            m_dftL[k] = m_sigL[k] * mult;
+            m_dftR[k] = m_sigR[k] * mult;
+        }
+    }
+    av_rdft_calc(m_rdftContext, m_dftL); // run the real FFT!
+    av_rdft_calc(m_rdftContext, m_dftR);
+
+    QPainter painter(&s_image);
+    painter.setPen(Qt::black);  // clear prior content
+    painter.fillRect(s_offset,     0, 256, h, Qt::black);
+    painter.fillRect(s_offset - w, 0, 256, h, Qt::black);
+
+    long index = 1;             // frequency index
+    int prev = 0;               // previous frequency
+    float gain = 5.0;           // compensate for window function loss
+    for (i = 0; (int)i < h / 2; i++)
+    {
+        float left = 0;
+        float right = 0;
+        int count = 0;
+        for (auto j = prev + 1; j <= index; j++) {
+            // // linear magnitude:
+            // left   += sqrt(sq(m_dftL[2 * j]) + sq(m_dftL[2 * j + 1]));
+            // right  += sqrt(sq(m_dftR[2 * j]) + sq(m_dftR[2 * j + 1]));
+            // power spectrum (dBm):
+            left  += 10 * log10(sq(m_dftL[2 * j]) + sq(m_dftL[2 * j + 1]));
+            right += 10 * log10(sq(m_dftR[2 * j]) + sq(m_dftR[2 * j + 1]));
+            count++;
+        }
+        left /= count;          // mean of bucket of values, or peak?
+        right /= count;
+        prev = index;
+
+        // LOG(VB_PLAYBACK, LOG_DEBUG,
+        //     QString("SG i=%1, index=%2 (%3)\tleft=%4,\tmag=%5").arg(i).arg(index).arg(count).arg(left).arg(magL));
+
+        left *= gain;
+        float mag = clamp(left, 255, 0);
+        int z = (int)(mag * 6);
+        h = m_sgsize.height() / 2;
+        left > 255 ? painter.setPen(Qt::white) :
+            painter.setPen(qRgb(m_red[z], m_green[z], m_blue[z]));
+        painter.drawLine(s_offset,     h - i, s_offset     + mag, h - i);
+        painter.drawLine(s_offset - w, h - i, s_offset - w + mag, h - i);
+        left > 255 ? painter.setPen(Qt::yellow) :
+            painter.setPen(qRgb(mag, mag, mag));
+        painter.drawPoint(s_offset, h - i);
+
+        right *= gain;          // copy of above, s/left/right/g
+        mag = clamp(right, 255, 0);
+        z = (int)(mag * 6);
+        h = m_sgsize.height();
+        right > 255 ? painter.setPen(Qt::white) :
+            painter.setPen(qRgb(m_red[z], m_green[z], m_blue[z]));
+        painter.drawLine(s_offset,     h - i, s_offset     + mag, h - i);
+        painter.drawLine(s_offset - w, h - i, s_offset - w + mag, h - i);
+        right > 255 ? painter.setPen(Qt::yellow) :
+            painter.setPen(qRgb(mag, mag, mag));
+        painter.drawPoint(s_offset, h - i);
+
+        index = m_scale[i];
+    }
+    if (++s_offset >= w)
+    {
+        s_offset = 0;
+    }
+    return false;
+}
+
+double Spectrogram::clamp(double cur, double max, double min)
+{
+    if (isnan(cur)) return 0;
+    if (cur > max) cur = max;
+    if (cur < min) cur = min;
+    return cur;
+}
+
+bool Spectrogram::draw(QPainter *p, const QColor &back)
+{
+    p->fillRect(0, 0, 0, 0, back); // no clearing, here to suppress warning
+    if (!s_image.isNull())
+    {                        // background, updated by ::process above
+        p->drawImage(0, 0, s_image.scaled(m_size,
+                                          Qt::IgnoreAspectRatio,
+                                          Qt::SmoothTransformation));
+    }
+    // // DEBUG: see the whole signal going into the FFT:
+    // if (m_size.height() > 1000) {
+    //  p->setPen(Qt::yellow);
+    //  float h = m_size.height() / 10;
+    //  for (int j = 0; j < m_fftlen; j++) {
+    //      p->drawPoint(j % m_size.width(), int(j / m_size.width()) * h + h - h * m_sigL[j]);
+    //  }
+    // }
+    return true;
+}
+
+static class SpectrogramFactory : public VisFactory
+{
+  public:
+    const QString &name(void) const override // VisFactory
+    {
+        static QString s_name = QCoreApplication::translate("Visualizers",
+                                                            "Spectrogram");
+        return s_name;
+    }
+
+    uint plugins(QStringList *list) const override // VisFactory
+    {
+        *list << name();
+        return 1;
+    }
+
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const override // VisFactory
+    {
+        return new Spectrogram();
+    }
+}SpectrogramFactory;
+
+///////////////////////////////////////////////////////////////////////////////
 // Spectrum
 //
 
@@ -927,7 +1174,7 @@ void Spectrum::resize(const QSize &newsize)
                     log( static_cast<double>(FFTW_N) );
 }
 
-template<typename T> T sq(T a) { return a*a; };
+// template<typename T> T sq(T a) { return a*a; };
 
 bool Spectrum::process(VisualNode *node)
 {
