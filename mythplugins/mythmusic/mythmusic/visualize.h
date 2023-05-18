@@ -142,7 +142,8 @@ class MonoScope : public StereoScope
 
 class WaveForm : public StereoScope
 {
-    static constexpr unsigned long WFAudioSize { 4096 };
+    static constexpr unsigned long kWFAudioSize { 4096 };
+    static QImage s_image;	// picture of full track
 
 public:
     WaveForm() = default;
@@ -155,14 +156,12 @@ public:
     void handleKeyPress(const QString &action) override;
 
   protected:
-    bool process_all_types(VisualNode *node, bool displayed);
     void saveload(MusicMetadata *meta);
     QSize         m_wfsize {1920, 1080}; // picture size
     unsigned long m_offset {0};          // node offset for draw
     short         *m_right {nullptr};
     QFont         m_font;       // optional text overlay
     bool          m_showtext {true};
-    QImage        m_image;      // picture of full track
     MusicMetadata *m_currentMetadata {nullptr};
     unsigned long m_duration {60000}; // file length in milliseconds
     unsigned int  m_lastx    {1920};  // vert line tracker

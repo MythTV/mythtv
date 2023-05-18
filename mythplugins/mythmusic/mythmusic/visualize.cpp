@@ -534,9 +534,21 @@ bool MonoScope::draw( QPainter *p, const QColor &back )
 ///////////////////////////////////////////////////////////////////////////////
 // WaveForm - see whole track - by twitham@sbcglobal.net, 2023/01
 
+// As/of v34, switching from small preview to fullscreen destroys and
+// recreates this object.  So I use this static to survive which works
+// only becasue there is 1 instance per process.  If mythfrontend ever
+// decides to display more than one visual at a time, it should also
+// be fixed to not destroy the instance but rather to resize it
+// dynamically.  At that time, this could return to an m_image class
+// member.  But more of this file might also need refactored to enable
+// long-life resizable visuals.
+
+QImage WaveForm::s_image {nullptr}; // picture of full track
+
 WaveForm::~WaveForm()
 {
     saveload(nullptr);
+    LOG(VB_PLAYBACK, LOG_INFO, QString("WF going down"));
 }
 
 // cache current track, if any, before loading cache of given track
@@ -555,7 +567,7 @@ void WaveForm::saveload(MusicMetadata *meta)
         filename = QString("%1/%2.png").arg(cache)
             .arg(stream ? 0 : m_currentMetadata->ID());
         LOG(VB_PLAYBACK, LOG_INFO, QString("WF saving to %1").arg(filename));
-        if (!m_image.save(filename))
+        if (!s_image.save(filename))
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("WF saving to %1 failed: " + ENO).arg(filename));
@@ -566,7 +578,7 @@ void WaveForm::saveload(MusicMetadata *meta)
     {
         filename = QString("%1/%2.png").arg(cache).arg(stream ? 0 : meta->ID());
         LOG(VB_PLAYBACK, LOG_INFO, QString("WF loading from %1").arg(filename));
-        if (!m_image.load(filename))
+        if (!s_image.load(filename))
         {
             LOG(VB_GENERAL, LOG_WARNING,
                 QString("WF loading %1 failed, recreating").arg(filename));
@@ -575,10 +587,10 @@ void WaveForm::saveload(MusicMetadata *meta)
         // but this is now compensated for by drawing wider "pixels"
         m_duration = stream ? 60000 : meta->Length().count(); // millisecs
     }
-    if (m_image.isNull())
+    if (s_image.isNull())
     {
-        m_image = QImage(m_wfsize.width(), m_wfsize.height(), QImage::Format_RGB32);
-        m_image.fill(qRgb(0, 0, 0));
+        s_image = QImage(m_wfsize.width(), m_wfsize.height(), QImage::Format_RGB32);
+        s_image.fill(qRgb(0, 0, 0));
     }
     m_minl = 0;                 // drop last pixel, prepare for first
     m_maxl = 0;
@@ -596,8 +608,18 @@ void WaveForm::saveload(MusicMetadata *meta)
 unsigned long WaveForm::getDesiredSamples(void)
 {
     // could be an adjustable class member, but this hard code works well
-    // return (unsigned long) WF_AUDIO_SIZE;  // Maximum we can be given
-    return WFAudioSize;    // maximum samples per update, may get less
+    return kWFAudioSize;    // maximum samples per update, may get less
+}
+
+bool WaveForm::process(VisualNode *node)
+{
+    // After 2023/01 bugfix below, processUndisplayed processes this
+    // node again after this process!  If that is ever changed in
+    // mainvisual.cpp, then this would need adjusted.
+
+    // StereoScope overlay must process only the displayed nodes
+    StereoScope::process(node);
+    return false;               // update even when silent
 }
 
 bool WaveForm::processUndisplayed(VisualNode *node)
@@ -608,43 +630,22 @@ bool WaveForm::processUndisplayed(VisualNode *node)
     // <      m_vis->processUndisplayed(node);
     // >      m_vis->processUndisplayed(m_nodes.first());
 
-    // now this receives *all* nodes.
+    // now this receives *all* nodes.  So we don't need any processing
+    // in ::process above as that would double process.
 
-    return process_all_types(node, false);
-}
-
-bool WaveForm::process(VisualNode *node)
-{
-    // After 2023/01 bugfix above, processUndisplayed processes this
-    // node again after this process!  If that is ever changed in
-    // mainvisual.cpp, then this might need adjusted.  To test,
-    // uncomment the following line and see:
-
-    // mythfrontend --loglevel debug -v playback
-
-    // this would double-process the displayed nodes:
-    // return process_all_types(node, true);
-
-    // StereoScope overlay must process only the displayed nodes
-    StereoScope::process(node);
-    return false;               // update even when silent
-}
-
-bool WaveForm::process_all_types(VisualNode *node, bool displayed)
-{
     MusicMetadata *meta = gPlayer->getCurrentMetadata();
     if (meta && meta != m_currentMetadata)
     {
         saveload(meta);
     }
-    if (node && !m_image.isNull())
+    if (node && !s_image.isNull())
     {
         m_offset = node->m_offset.count() % m_duration; // for ::draw below
         m_right = node->m_right;
         uint n = node->m_length;
-        LOG(VB_PLAYBACK, LOG_DEBUG,
-            QString("WF process %1 samples at %2, display=%3").
-            arg(n).arg(m_offset).arg(displayed));
+        // LOG(VB_PLAYBACK, LOG_DEBUG,
+        //     QString("WF process %1 samples at %2, display=%3").
+        //     arg(n).arg(m_offset).arg(displayed));
 
 // TODO: interpolate timestamps to process correct samples per pixel
 // rather than fitting all we get in 1 or more pixels
@@ -684,11 +685,11 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
             // duplicate the vertical lines than draw rectangles since
             // lines are the more common case. -twitham
 
-            QPainter painter(&m_image);
+            QPainter painter(&s_image);
             for (uint x = m_lastx + 1; x <= xx; x++)
             {
-                LOG(VB_PLAYBACK, LOG_DEBUG,
-                    QString("WF painting at %1,%2/%3").arg(x).arg(y).arg(yr));
+                // LOG(VB_PLAYBACK, LOG_DEBUG,
+                //     QString("WF painting at %1,%2/%3").arg(x).arg(y).arg(yr));
 
                 painter.setPen(Qt::black); // clear prior content
                 painter.drawLine(x, 0, x, m_wfsize.height());
@@ -730,9 +731,9 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
 bool WaveForm::draw( QPainter *p, const QColor &back )
 {
     p->fillRect(0, 0, 0, 0, back); // no clearing, here to suppress warning
-    if (!m_image.isNull())
+    if (!s_image.isNull())
     {                        // background, updated by ::process above
-        p->drawImage(0, 0, m_image.scaled(m_size,
+        p->drawImage(0, 0, s_image.scaled(m_size,
                                           Qt::IgnoreAspectRatio,
                                           Qt::SmoothTransformation));
     }
