@@ -922,6 +922,7 @@ void Spectrogram::resize(const QSize &newsize)
     m_size = newsize;
 }
 
+// this moved up from Spectrum so both can use it
 template<typename T> T sq(T a) { return a*a; };
 
 unsigned long Spectrogram::getDesiredSamples(void)
@@ -1154,10 +1155,16 @@ void Spectrum::resize(const QSize &newsize)
                     log( static_cast<double>(FFTW_N) );
 }
 
+// this moved up to Spectrogram so both can use it
 // template<typename T> T sq(T a) { return a*a; };
 
 bool Spectrum::process(VisualNode *node)
 {
+    // Take a bunch of data in *node
+    // and break it down into spectrum
+    // values
+    bool allZero = true;
+
     uint i = 0;
     long w = 0;
     QRect *rectsp = m_rects.data();
@@ -1179,7 +1186,7 @@ bool Spectrum::process(VisualNode *node)
     for (auto k = i; k < FFTW_N; k++)
     {
         m_dftL[k] = (FFTComplex){ .re = 0, .im = 0 };
-        m_dftR[k] = (FFTComplex){ .re = 0, .im = 0 };
+        m_dftL[k] = (FFTComplex){ .re = 0, .im = 0 };
     }
     av_fft_permute(m_fftContextForward, m_dftL);
     av_fft_calc(m_fftContextForward, m_dftL);
@@ -1237,6 +1244,11 @@ bool Spectrum::process(VisualNode *node)
             magR = 1.;
         }
 
+        if (magR != 1 || magL != 1)
+        {
+            allZero = false;
+        }
+
         magnitudesp[i] = magL;
         magnitudesp[i + m_scale.range()] = magR;
         rectsp[i].setTop( m_size.height() / 2 - int( magL ) );
@@ -1245,6 +1257,7 @@ bool Spectrum::process(VisualNode *node)
         index = m_scale[i];
     }
 
+    Q_UNUSED(allZero);
     return false;
 }
 
