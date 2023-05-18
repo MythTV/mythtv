@@ -859,7 +859,8 @@ static class WaveFormFactory : public VisFactory
 // but only recent time has high amplitude.  This nicely displays even
 // quick sounds of a few milliseconds.
 
-// static class members survive size changes for continuous display
+// Static class members survive size changes for continuous display.
+// See the comment about s_image in WaveForm
 QImage Spectrogram::s_image {nullptr}; // picture of spectrogram
 int    Spectrogram::s_offset {0};      // position on screen
 
@@ -925,7 +926,8 @@ template<typename T> T sq(T a) { return a*a; };
 
 unsigned long Spectrogram::getDesiredSamples(void)
 {
-    return 4096;           // maximum samples per update, may get less
+    // maximum samples per update, may get less
+    return (unsigned long)kSGAudioSize;
 }
 
 bool Spectrogram::process(VisualNode */*node*/)
@@ -935,6 +937,8 @@ bool Spectrogram::process(VisualNode */*node*/)
 
 bool Spectrogram::processUndisplayed(VisualNode *node)
 {
+    // as of v33, this processes *all* samples, see WaveForm
+
     int i = 0;
     int w = m_sgsize.width();   // drawing size
     int h = m_sgsize.height();
@@ -967,7 +971,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
         }
         // LOG(VB_PLAYBACK, LOG_DEBUG,
         //     QString("SG 0=%1,%2\t%3=%4,%5").arg(node->m_left[0]).arg(node->m_left[1]).arg(i-1).arg(node->m_left[i-2]).arg(node->m_left[i-1]));
-        int end = m_fftlen / 20; // ramp window ends down to zero crossing
+        int end = m_fftlen / 40; // ramp window ends down to zero crossing
         for (int k = 0; k < m_fftlen; k++)
         {
             float mult = k < end ? k / end : k > m_fftlen - end ?
