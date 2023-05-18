@@ -4218,6 +4218,8 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
             gCoreContext->dispatch(me);
         }
         TeardownRecorder(kFlagKillRec);
+        if (m_tvChain)
+            rec = nullptr;
         goto err_ret;
     }
 
