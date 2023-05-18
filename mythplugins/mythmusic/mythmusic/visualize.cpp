@@ -942,6 +942,7 @@ void Spectrogram::resize(const QSize &newsize)
     m_size = newsize;
 }
 
+// this moved up from Spectrum so both can use it
 template<typename T> T sq(T a) { return a*a; };
 
 unsigned long Spectrogram::getDesiredSamples(void)
@@ -1174,6 +1175,7 @@ void Spectrum::resize(const QSize &newsize)
                     log( static_cast<double>(FFTW_N) );
 }
 
+// this moved up to Spectrogram so both can use it
 // template<typename T> T sq(T a) { return a*a; };
 
 bool Spectrum::process(VisualNode *node)
