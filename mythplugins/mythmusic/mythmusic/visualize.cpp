@@ -946,7 +946,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
     if (s_image.isNull())
     {
         s_image = QImage(w, h, QImage::Format_RGB32);
-        s_image.fill(qRgb(0, 0, 0));
+        s_image.fill(Qt::black);
         s_offset = 0;
     }
     if (node)     // shift previous samples left, then append new node
@@ -970,8 +970,6 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
             if (node->m_right)
                 m_sigR[start + k] = node->m_right[k] / 32768.;
         }
-        // LOG(VB_PLAYBACK, LOG_DEBUG,
-        //     QString("SG 0=%1,%2\t%3=%4,%5").arg(node->m_left[0]).arg(node->m_left[1]).arg(i-1).arg(node->m_left[i-2]).arg(node->m_left[i-1]));
         int end = m_fftlen / 40; // ramp window ends down to zero crossing
         for (int k = 0; k < m_fftlen; k++)
         {
@@ -989,10 +987,10 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
     painter.fillRect(s_offset,     0, 256, h, Qt::black);
     painter.fillRect(s_offset - w, 0, 256, h, Qt::black);
 
-    long index = 1;             // frequency index
+    int index = 1;              // frequency index
     int prev = 0;               // previous frequency
     float gain = 5.0;           // compensate for window function loss
-    for (i = 0; (int)i < h / 2; i++)
+    for (i = 1; i < h / 2; i++)
     {
         float left = 0;
         float right = 0;
@@ -1006,12 +1004,15 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
             right += 10 * log10(sq(m_dftR[2 * j]) + sq(m_dftR[2 * j + 1]));
             count++;
         }
+        (count > 0) || (count = 1);
         left /= count;          // mean of bucket of values, or peak?
         right /= count;
-        prev = index;
 
+        // float bw = 1. / (16384. / 44100.);
+        // float freq = bw * index;
         // LOG(VB_PLAYBACK, LOG_DEBUG,
-        //     QString("SG i=%1, index=%2 (%3)\tleft=%4,\tmag=%5").arg(i).arg(index).arg(count).arg(left).arg(magL));
+        //     QString("SG i=%1, index=%2 (%3) %4 hz \tleft=%5,\tright=%6")
+        //     .arg(i).arg(index).arg(count).arg(freq).arg(left).arg(right));
 
         left *= gain;
         float mag = clamp(left, 255, 0);
@@ -1037,7 +1038,9 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
             painter.setPen(qRgb(mag, mag, mag));
         painter.drawPoint(s_offset, h - i);
 
+        prev = index;
         index = m_scale[i];
+        (prev < index) || (prev = index -1);
     }
     if (++s_offset >= w)
     {
