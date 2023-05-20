@@ -67,11 +67,14 @@ static constexpr uint32_t byte4BCD2int(uint8_t i, uint8_t j, uint8_t k, uint8_t 
           byteBCDH2int(j) * 100000     + byteBCDL2int(j) * 10000   +
           byteBCDH2int(k) * 1000       + byteBCDL2int(k) * 100     +
           byteBCDH2int(l) * 10         + byteBCDL2int(l)); };
+static constexpr uint64_t byte4BCD2int64(uint8_t i, uint8_t j, uint8_t k, uint8_t l)
+{ return static_cast<uint64_t>(byte4BCD2int(i, j, k, l)); }
 
 static_assert( byteBCD2int(0x98) == 98);
 static_assert(byte2BCD2int(0x98, 0x76) == 9876);
 static_assert(byte3BCD2int(0x98, 0x76, 0x54) == 987654);
 static_assert(byte4BCD2int(0x98, 0x76, 0x54, 0x32) == 98765432);
+static_assert(byte4BCD2int64(0x98, 0x76, 0x54, 0x32) == 98765432ULL);
 
 // DVB Bluebook A038 (Sept 2011) p 77
 class NetworkNameDescriptor : public MPEGDescriptor
@@ -764,7 +767,7 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
     {
         if (m_data == nullptr)
             return 0;
-        return byte4BCD2int(m_data[2], m_data[3], m_data[4], m_data[5]) * 100;
+        return byte4BCD2int64(m_data[2], m_data[3], m_data[4], m_data[5]) * 100;
     }
     // reserved_future_use     12   6.0
     // FEC_outer                4   7.4
@@ -842,7 +845,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     }
     uint64_t FrequencykHz(void) const
     {
-        return byte4BCD2int(m_data[2], m_data[3], m_data[4], m_data[5]) * 10;
+        return byte4BCD2int64(m_data[2], m_data[3], m_data[4], m_data[5]) * 10;
     }
     /// orbital_position       16   6.0
     uint OrbitalPosition(void) const
