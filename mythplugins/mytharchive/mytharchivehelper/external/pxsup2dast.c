@@ -44,7 +44,7 @@ typedef unsigned char			bool8;
 #include <ctype.h>
 #include <setjmp.h>
 #include <zlib.h>
-#if _WIN32
+#ifdef _WIN32
 #include <dirent.h>
 #endif
 
