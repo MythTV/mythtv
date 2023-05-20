@@ -63,7 +63,7 @@ static constexpr uint32_t byte3BCD2int(uint8_t i, uint8_t j, uint8_t k)
           byteBCDH2int(j) * 1000     + byteBCDL2int(j) * 100       +
           byteBCDH2int(k) * 10       + byteBCDL2int(k)); };
 static constexpr uint32_t byte4BCD2int(uint8_t i, uint8_t j, uint8_t k, uint8_t l)
-{ return (byteBCDH2int(i) * 10000000LL + byteBCDL2int(i) * 1000000 +
+{ return (byteBCDH2int(i) * 10000000   + byteBCDL2int(i) * 1000000 +
           byteBCDH2int(j) * 100000     + byteBCDL2int(j) * 10000   +
           byteBCDH2int(k) * 1000       + byteBCDL2int(k) * 100     +
           byteBCDH2int(l) * 10         + byteBCDL2int(l)); };
