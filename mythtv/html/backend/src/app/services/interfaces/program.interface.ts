@@ -4,7 +4,7 @@ import { Channel } from "./channel.interface";
 import { Recording } from "./recording.interface";
 
 export interface ScheduleOrProgram {
-    Airdate:            string;
+    Airdate:            Date;
     Artwork:            ArtworkInfoList;
     AudioPropNames:     string;
     AudioProps:         number;

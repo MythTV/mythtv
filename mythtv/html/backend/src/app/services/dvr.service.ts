@@ -13,12 +13,15 @@ import {
   GetPlayGroupListResponse,
   GetProgramCategoriesResponse,
   GetRecGroupListResponse,
+  GetRecordedListRequest,
   GetRecordedRequest,
   GetRecordScheduleListRequest,
   GetRecordScheduleRequest,
   GetRecStorageGroupListResponse,
   GetUpcomingListResponse,
-  GetUpcomingRequest
+  GetUpcomingRequest,
+  UnDeleteRecordingRequest,
+  UpdateRecordedMetadataRequest
 } from './interfaces/dvr.interface';
 import { BoolResponse, StringResponse } from './interfaces/common.interface';
 import { ProgramList, ScheduleOrProgram } from './interfaces/program.interface';
@@ -50,11 +53,19 @@ export class DvrService {
   }
 
   public AllowReRecord(RecordedId: number): Observable<BoolResponse> {
-    return this.httpClient.post<BoolResponse>('/Dvr/AllowReRecord', RecordedId);
+    return this.httpClient.post<BoolResponse>('/Dvr/AllowReRecord', { RecordedId: RecordedId });
   }
 
   public DeleteRecording(request: DeleteRecordingRequest): Observable<BoolResponse> {
     return this.httpClient.post<BoolResponse>('/Dvr/DeleteRecording', request);
+  }
+
+  public UnDeleteRecording(request: UnDeleteRecordingRequest): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Dvr/UnDeleteRecording', request);
+  }
+
+  public UpdateRecordedMetadata(request: UpdateRecordedMetadataRequest): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Dvr/UpdateRecordedMetadata', request);
   }
 
   public DisableRecordSchedule(recordid: number): Observable<BoolResponse> {
@@ -177,12 +188,19 @@ export class DvrService {
     return this.httpClient.get<RecRuleList>('/Dvr/GetRecordScheduleList', { params });
   }
 
-  public GetRecorded(request: GetRecordedRequest): Observable<ScheduleOrProgram> {
+  public GetRecorded(request: GetRecordedRequest): Observable<{ Program: ScheduleOrProgram }> {
     let params = new HttpParams()
-      .set("RecordedId", request.RecordedId)
-      .set("ChanId", request.ChanId)
-      .set("StartTime", request.StartTime);
-    return this.httpClient.get<ScheduleOrProgram>('/Dvr/GetRecorded', { params });
+    for (const [key, value] of Object.entries(request))
+      params = params.set(key, value);
+    return this.httpClient.get<{ Program: ScheduleOrProgram }>('/Dvr/GetRecorded', { params });
+  }
+
+  // All parameters are optional
+  public GetRecordedList(request: GetRecordedListRequest): Observable<{ ProgramList: ProgramList }> {
+    let params = new HttpParams();
+    for (const [key, value] of Object.entries(request))
+      params = params.set(key, value);
+    return this.httpClient.get<{ ProgramList: ProgramList }>('/Dvr/GetRecordedList', { params });
   }
 
   // All parameters are optional

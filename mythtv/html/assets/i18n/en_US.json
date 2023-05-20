@@ -5,6 +5,8 @@
     "loading": "Loading",
     "next": "Next",
     "save": "Save",
+    "success": "Success",
+    "failed": "Failed",
     "savesuccess": "Saved Successfully",
     "networkfail": "ERROR: Backend Network Failure",
     "cancel": "Cancel",
@@ -25,7 +27,34 @@
     "backendStatus": "Backend Status",
     "channeleditor": "Channel Editor",
     "programguide": "Program Guide",
-    "recordings": "Recordings"
+    "recordings": {
+      "heading": "Recordings",
+      "mnu_delete": "Delete",
+      "mnu_delete_rerec": "Delete and Allow Rerecord",
+      "mnu_undelete": "Undelete",
+      "mnu_rerec": "Allow Rerecord",
+      "mnu_markwatched": "Mark as Watched",
+      "mnu_markunwatched": "Mark as Unwatched",
+      "mnu_updatemeta": "Update Metadata",
+      "mnu_updaterecrule": "Update Record Rule",
+      "mnu_stoprec": "Stop Recording",
+      "filter": "Filter",
+      "title": "Title",
+      "recgrp": "Rec Grp",
+      "subtitle": "Subtitle",
+      "inetref": "InetRef",
+      "seas_ep": "Seas Ep",
+      "orig_airdate": "Orig Airdate",
+      "airdate": "Airdate",
+      "channel": "Channel",
+      "length_mins": "Length Mins",
+      "file_size": "File Size",
+      "description": "Description",
+      "season": "Season",
+      "episode": "Episode",
+      "canundel": "You can reverse this by using Undelete.",
+      "alreadydel": "Already Deleted"
+    }
   },
   "navbar": {
     "backendSetup": "Backend Setup",
@@ -769,7 +798,9 @@
       "col_source": "Source",
       "col_priority": "Priority",
       "col_visibility": "Visibility",
-      "col_useeit": "Use EIT"
+      "col_useeit": "Use EIT",
+      "updatechan": "Update Channel",
+      "deletechan": "Delete Channel"
     },
     "rprofiles": {
       "title": "Recording Profiles",
@@ -851,15 +882,11 @@
     },
     "main": {
       "title": "MythTV Setup",
-      "schedstatus": "Scheduler Status",
-      "schedenabled": "Enabled",
-      "scheddisabled": "Disabled",
       "upcomingrec": "Next upcoming recording: {{Title}} at {{StartTime}}. Status: {{Status}}",
-      "noupcomingrec": "There are no upcoming recordings.",
-      "savedisabled_warning": "Saving and Deleting are disabled because the Scheduler is enabled.",
-      "savedisabled_desc": "You must disable the scheduler to enable saving and deleting. While the scheduler is disabled, any recordings that reach their start time will be canceled.",
-      "scheddisabled_warning": "The Scheduler is disabled. No recordings will take place.",
-      "scheddisabled_desc": "Please restart the backend after finishing your updates, otherwise the scheduler will remain disabled and nothing will record."
+      "enableupdates_label": "Enable Updates",
+      "enableupdates_desc": "Enabling updates will prevent any recordings from taking place until you restart",
+      "restart_label": "Restart Backend",
+      "restart_desc": "Recordings are disabled until you restart"
     },
     "channelscan": {
       "services_label": "Desired Services",

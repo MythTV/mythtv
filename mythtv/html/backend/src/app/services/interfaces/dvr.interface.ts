@@ -58,11 +58,17 @@ export interface AddRecordedCreditsRequest {
 }
 
 export interface DeleteRecordingRequest {
-    RecordedId: number;
-    ChanId: number;
-    StartTime: string; // dateTime
-    ForceDelete: boolean;
-    AllowRerecord: boolean;
+    RecordedId?: number;
+    ChanId?: number;
+    StartTime?: string; // dateTime
+    ForceDelete?: boolean;
+    AllowRerecord?: boolean;
+}
+
+export interface UnDeleteRecordingRequest {
+    RecordedId?: number;
+    ChanId?: number;
+    StartTime?: string; // dateTime
 }
 
 export interface GetConflictListRequest {
@@ -140,7 +146,43 @@ export interface GetRecordScheduleListRequest {
 }
 
 export interface GetRecordedRequest {
-    RecordedId: number;
-    ChanId: number;
-    StartTime: string; // dateTime
+    RecordedId?: number;
+    ChanId?: number;
+    StartTime?: string; // dateTime
+}
+
+export interface GetRecordedListRequest {
+    Descending?:    boolean;
+    StartIndex?:    number;
+    Count?:         number;
+    TitleRegEx?:    string;
+    RecGroup?:      string;
+    StorageGroup?:  string;
+    Category?:      string;
+    Sort?:          string;
+    IgnoreLiveTV?:  boolean;
+    IgnoreDeleted?: boolean;
+    IncChannel?:    boolean;
+    Details?:       boolean;
+    IncCast?:       boolean;
+    IncArtWork?:    boolean;
+    IncRecording?:  boolean;
+}
+
+export interface UpdateRecordedMetadataRequest {
+    RecordedId:               number;
+    AutoExpire?:              boolean;
+    BookmarkOffset?:          number;
+    BookmarkOffsetType?:      string;
+    Damaged?:                 boolean;
+    Description?:             string;
+    Episode?:                 number;
+    Inetref?:                 string;
+    OriginalAirDate?:         Date;
+    Preserve?:                boolean;
+    Season?:                  number;
+    Stars?:                   number;
+    SubTitle?:                string;
+    Title?:                   string;
+    Watched?:                 boolean;
 }

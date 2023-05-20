@@ -1,24 +1,30 @@
 <form class="ml-3 mr-3" name="chanform" #chanform="ngForm">
-    <div class="block card w-full" style="height: calc(100vh - 200px)">
+    <div class="block card w-full" style="height: 90vh" *ngIf="chansLoaded else loading">
         <h2>{{ 'settings.chanedit.title' | translate }}</h2>
-        <p-table [value]="allChannels" scrollHeight="flex" [scrollable]="true"
-            styleClass="p-datatable-gridlines p-datatable-striped" [rowHover]="true">
+        <p-table [value]="allChannels" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
+            [rowHover]="true">
             <ng-template pTemplate="caption">
                 <button pButton pRipple label="{{ 'settings.chanedit.new_channel' | translate }}" icon="pi pi-plus"
                     class="p-button-success mr-2" (click)="openNew()"></button>
             </ng-template>
             <ng-template pTemplate="header">
                 <tr>
-                    <th style="flex-grow: 4"></th>
-                    <th style="flex-grow: 4">{{ 'settings.chanedit.col_channum' | translate }}</th>
-                    <th style="flex-grow: 3">{{ 'settings.chanedit.col_freqid' | translate }}</th>
-                    <th style="flex-grow: 5">{{ 'settings.chanedit.col_callsign' | translate }}</th>
-                    <th style="flex-grow: 12">{{ 'settings.chanedit.col_name' | translate }}</th>
-                    <th style="flex-grow: 8">{{ 'settings.chanedit.col_source' | translate }}</th>
-                    <th style="flex-grow: 3">{{ 'settings.chanedit.col_priority' | translate }}</th>
-                    <th style="flex-grow: 5">{{ 'settings.chanedit.col_visibility' | translate }}</th>
-                    <th style="flex-grow: 3">{{ 'settings.chanedit.col_useeit' | translate }}</th>
-                    <th style="flex-grow: 3">
+                    <th>Filter: &nbsp;&nbsp; Source: &nbsp; <p-columnFilter type="text" field="Source"></p-columnFilter>
+                    </th>
+                </tr>
+                <tr>
+                    <th style="flex-grow:  42; flex-basis: 0;">&nbsp;</th>
+                    <th style="flex-grow:  44; flex-basis: 0;" pSortableColumn="ChanSeq">
+                        {{ 'settings.chanedit.col_channum' | translate }} <p-sortIcon field="ChanSeq"></p-sortIcon></th>
+                    <th style="flex-grow:  30; flex-basis: 0;">{{ 'settings.chanedit.col_freqid' | translate }}</th>
+                    <th style="flex-grow:  50; flex-basis: 0;">{{ 'settings.chanedit.col_callsign' | translate }}</th>
+                    <th style="flex-grow: 120; flex-basis: 0;">{{ 'settings.chanedit.col_name' | translate }}</th>
+                    <th style="flex-grow:  80; flex-basis: 0;" pSortableColumn="Source">
+                        {{ 'settings.chanedit.col_source' | translate }} <p-sortIcon field="Source"></p-sortIcon></th>
+                    <th style="flex-grow:  30; flex-basis: 0;">{{ 'settings.chanedit.col_priority' | translate }}</th>
+                    <th style="flex-grow:  50; flex-basis: 0;">{{ 'settings.chanedit.col_visibility' | translate }}</th>
+                    <th style="flex-grow:  30; flex-basis: 0;">{{ 'settings.chanedit.col_useeit' | translate }}</th>
+                    <th style="flex-grow:  30; flex-basis: 0;">
                         <!-- These are disabled buttons to ensure the spacing of the heading
                          matches the spacing of the rows -->
                         <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-success"
@@ -30,25 +36,25 @@
             </ng-template>
             <ng-template pTemplate="body" let-channel>
                 <tr height="40" [ngClass]="{'line-through' : channel.ChanId < 0}">
-                    <td style="flex-grow: 4">
+                    <td style="flex-grow: 42">
                         <img src="{{channel.IconURL}}" height="32" width="42" *ngIf="channel.IconURL; else nullIcon"
                             style="background-color:#000000" onerror="this.height='0'">
                         <ng-template #nullIcon><img height="32" width="42"></ng-template>
                     </td>
-                    <td style="flex-grow: 4">{{channel.ChanNum}}</td>
-                    <td style="flex-grow: 3">{{channel.FrequencyId}}</td>
-                    <td style="flex-grow: 5">{{channel.CallSign}}</td>
-                    <td style="flex-grow: 12">{{channel.ChannelName}}</td>
-                    <td style="flex-grow: 8">{{ getSource(channel) }}</td>
-                    <td style="flex-grow: 3">{{channel.RecPriority}}</td>
-                    <td style="flex-grow: 5">{{ getVisibility(channel) }}</td>
-                    <td style="flex-grow: 3">{{ channel.UseEIT ? 'Y' : 'N' }}</td>
-                    <td style="flex-grow: 3">
+                    <td style="flex-grow:  44; flex-basis: 0;">{{ channel.ChanNum }}</td>
+                    <td style="flex-grow:  30; flex-basis: 0;">{{ channel.FrequencyId }}</td>
+                    <td style="flex-grow:  50; flex-basis: 0;">{{ channel.CallSign }}</td>
+                    <td style="flex-grow: 120; flex-basis: 0;">{{ channel.ChannelName }}</td>
+                    <td style="flex-grow:  80; flex-basis: 0;">{{ channel.Source }}</td>
+                    <td style="flex-grow:  30; flex-basis: 0;">{{ channel.RecPriority }}</td>
+                    <td style="flex-grow:  50; flex-basis: 0;">{{ getVisibility(channel) }}</td>
+                    <td style="flex-grow:  30; flex-basis: 0;">{{ channel.UseEIT ? 'Y' : 'N' }}</td>
+                    <td style="flex-grow:  30; flex-basis: 0;">
                         <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-success"
                             (click)="editChannel(channel)" [disabled]="channel.ChanId < 0"
-                            pTooltip="{{ 'settings.common.clipboard_tooltip' | translate }}"></button>
+                            pTooltip="{{ 'settings.chanedit.updatechan' | translate }}"></button>
                         <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
-                            (click)="deleteRequest(channel)"
+                            (click)="deleteRequest(channel)" pTooltip="{{ 'settings.chanedit.deletechan' | translate }}"
                             [disabled]="channel.ChanId < 0"></button>
                     </td>
                 </tr>
@@ -208,6 +214,7 @@
                         || channel.CallSign.trim() == ''"></p-button>
             </ng-template>
         </p-dialog>
+
         <p-dialog header="{{ 'common.unsaved_heading' | translate }}" [(visible)]="displayUnsaved" [modal]="true">
             <p>{{ 'common.unsaved_message' | translate }}</p>
             <ng-template pTemplate="footer">
@@ -241,4 +248,7 @@
         </p-dialog>
 
     </div>
+    <ng-template #loading>
+        <p-progressSpinner></p-progressSpinner>
+    </ng-template>
 </form>

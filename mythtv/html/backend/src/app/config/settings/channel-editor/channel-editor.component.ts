@@ -8,17 +8,22 @@ import { Channel, CommMethod, DBChannelRequest } from 'src/app/services/interfac
 import { VideoSource } from 'src/app/services/interfaces/videosource.interface';
 import { SetupService } from 'src/app/services/setup.service';
 
+
+interface MyChannel extends Channel {
+  ChanSeq?: number;
+  Source?: string;
+}
+
 @Component({
   selector: 'app-channel-editor',
   templateUrl: './channel-editor.component.html',
   styleUrls: ['./channel-editor.component.css']
 })
-
 export class ChannelEditorComponent implements OnInit {
 
   @ViewChild("chanform") currentForm!: NgForm;
 
-  allChannels: Channel[] = [];
+  allChannels: MyChannel[] = [];
   videoSources: VideoSource[] = [];
   commMethods: CommMethod[] = [];
 
@@ -60,9 +65,10 @@ export class ChannelEditorComponent implements OnInit {
   dialogHeader = "";
   displayUnsaved = false;
   displayDelete = false;
+  chansLoaded = false;
 
-  channel: Channel = this.resetChannel();
-  editingChannel?: Channel;
+  channel: MyChannel = this.resetChannel();
+  editingChannel?: MyChannel;
   // channelOperation -1 = delete, 0 = update, 1 = add
   channelOperation = 0;
 
@@ -76,7 +82,7 @@ export class ChannelEditorComponent implements OnInit {
     this.markPristine();
   }
 
-  resetChannel(): Channel {
+  resetChannel(): MyChannel {
     return {
       ATSCMajorChan: 0,
       ATSCMinorChan: 0,
@@ -105,15 +111,28 @@ export class ChannelEditorComponent implements OnInit {
       TimeOffset: 0,
       UseEIT: false,
       Visible: true,
-      XMLTVID: ''
+      XMLTVID: '',
+      ChanSeq: 0
     };
   }
 
   loadLists() {
-    this.channelService.GetChannelInfoList({ Details: true }).subscribe(data =>
-      this.allChannels = data.ChannelInfoList.ChannelInfos);
-    this.channelService.GetVideoSourceList().subscribe(data =>
-      this.videoSources = data.VideoSourceList.VideoSources);
+    this.channelService.GetChannelInfoList({ Details: true }).subscribe(data => {
+      this.allChannels = data.ChannelInfoList.ChannelInfos;
+      // this.allChannels.forEach((entry,index) => entry.ChanSeq = index);
+      this.chansLoaded = true;
+      this.channelService.GetVideoSourceList().subscribe(data => {
+        this.videoSources = data.VideoSourceList.VideoSources;
+        this.allChannels.forEach((entry,index) => {
+          entry.ChanSeq = index;
+          entry.Source = this.getSource(entry);
+        });
+      });
+
+
+    });
+    // this.channelService.GetVideoSourceList().subscribe(data =>
+    //   this.videoSources = data.VideoSourceList.VideoSources);
     this.channelService.GetCommMethodList().subscribe(data =>
       this.commMethods = data.CommMethodList.CommMethods);
   }
@@ -147,14 +166,14 @@ export class ChannelEditorComponent implements OnInit {
     });
   }
 
-  getSource(channel: Channel): string {
+  getSource(channel: MyChannel): string {
     const ret = this.videoSources.find(element => channel.SourceId == element.Id);
     if (ret != undefined)
       return ret.SourceName;
     return ""
   }
 
-  getVisibility(channel: Channel): string {
+  getVisibility(channel: MyChannel): string {
     const ret = this.visibilities.find(element => channel.ExtendedVisible == element.value);
     if (ret != undefined)
       return ret.prompt;
@@ -171,7 +190,7 @@ export class ChannelEditorComponent implements OnInit {
     this.markPristine();
   }
 
-  editChannel(channel: Channel): void {
+  editChannel(channel: MyChannel): void {
     this.editingChannel = channel;
     this.successCount = 0;
     this.errorCount = 0;
@@ -278,14 +297,14 @@ export class ChannelEditorComponent implements OnInit {
     };
   }
 
-  deleteRequest(channel: Channel) {
+  deleteRequest(channel: MyChannel) {
     this.successCount = 0;
     this.errorCount = 0;
     this.channel = channel;
     this.displayDelete = true;
   }
 
-  deleteChannel(channel: Channel) {
+  deleteChannel(channel: MyChannel) {
     this.channel = channel;
     this.channelOperation = -1;
     this.channelService.RemoveDBChannel(channel.ChanId).subscribe(this.saveObserver);
@@ -296,7 +315,7 @@ export class ChannelEditorComponent implements OnInit {
       setTimeout(() => {
         x.next(1);
         x.complete();
-      }, 100)
+      }, 200)
     });
     obs.subscribe(x =>
       this.currentForm.form.markAsPristine()

@@ -1,3 +1,5 @@
-<h1></h1>
-<p-tabMenu [model]="fullMenu" [activeItem]="activeItem" [scrollable]="true"></p-tabMenu>
-<router-outlet></router-outlet>
+<div *ngIf="translateDone">
+    <h1></h1>
+    <p-tabMenu [model]="fullMenu" [activeItem]="activeItem" [scrollable]="true"></p-tabMenu>
+    <router-outlet></router-outlet>
+</div>
