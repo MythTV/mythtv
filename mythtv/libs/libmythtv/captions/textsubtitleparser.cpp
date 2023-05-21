@@ -277,7 +277,15 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
     m_target->SetFilename(m_fileName);
 
     // Only reload if rfile.GetFileSize() has changed.
+    // RemoteFile::GetFileSize can return -1 on error.
     off_t new_len = rfile.GetFileSize();
+    if (new_len < 0)
+    {
+        LOG(VB_VBI, LOG_INFO,
+            QString("Failed to get file size for %1").arg(m_fileName));
+        return;
+    }
+
     if (m_target->GetByteCount() == new_len)
     {
         LOG(VB_VBI, LOG_INFO,
