@@ -873,7 +873,7 @@ DTC::MarkupList* Dvr::GetRecordedMarkup ( int RecordedId )
         else
             pMarkup->setData(QString::number(entry.data));
     }
-    for (auto entry : qAsConst(mapSeek))
+    for (const auto& entry : qAsConst(mapSeek))
     {
         DTC::Markup *pSeek = pMarkupList->AddNewSeek();
         QString typestr = toString(static_cast<MarkTypes>(entry.type));

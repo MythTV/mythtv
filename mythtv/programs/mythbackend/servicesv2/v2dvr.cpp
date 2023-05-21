@@ -1046,7 +1046,7 @@ V2MarkupList* V2Dvr::GetRecordedMarkup ( int RecordedId )
         else
             pMarkup->setData(QString::number(entry.data));
     }
-    for (auto entry : qAsConst(mapSeek))
+    for (const auto& entry : qAsConst(mapSeek))
     {
         V2Markup *pSeek = pMarkupList->AddNewSeek();
         QString typestr = toString(static_cast<MarkTypes>(entry.type));
