@@ -44,14 +44,14 @@ bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
         forced = forced || static_cast<bool>(subtitle.rects[i]->flags & AV_SUBTITLE_FLAG_FORCED);
     }
 
-    if (!m_avSubtitlesEnabled && !forced)
+    if (!m_avSubtitlesEnabled)
     {
-        FreeAVSubtitle(subtitle);
-        return enableforced;
-    }
+        if (!forced)
+        {
+            FreeAVSubtitle(subtitle);
+            return enableforced;
+        }
 
-    if (!m_avSubtitlesEnabled && forced)
-    {
         if (!allow_forced)
         {
             LOG(VB_PLAYBACK, LOG_INFO,
@@ -59,6 +59,7 @@ bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
             FreeAVSubtitle(subtitle);
             return enableforced;
         }
+
         LOG(VB_PLAYBACK, LOG_INFO,
             "SubtitleReader: Allowing forced AV subtitle.");
         enableforced = true;
