@@ -478,7 +478,7 @@ void LogForwardThread::forwardMessage(LoggingItem *item)
     // Does this client have an entry in the loggers map, does that
     // entry have a list of loggers, and does that list have anything
     // in it.  I.E. is there anywhere to log this item.
-    if (logItem && logItem->m_itemList && !logItem->m_itemList->isEmpty())
+    if (logItem->m_itemList && !logItem->m_itemList->isEmpty())
     {
         // Log this item on each of the loggers.
         for (auto *it : qAsConst(*logItem->m_itemList))
