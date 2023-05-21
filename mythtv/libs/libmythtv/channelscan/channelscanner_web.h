@@ -98,9 +98,9 @@ protected:
 
 private:
   static ChannelScannerWeb *s_Instance;
-  int m_runType = 0;
-  bool m_onlysavescan;
-  bool m_interactive;
+  int m_runType {0};
+  bool m_onlysavescan {false};
+  bool m_interactive {false};
   ScanDTVTransportList m_transports;
   int m_scantype {-1};
   int m_scanId {0};
