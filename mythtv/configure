@@ -7310,7 +7310,7 @@ cat > $TMPH <<EOF
 #ifndef MYTHTV_CONFIG_H
 #define MYTHTV_CONFIG_H
 
-/* NOLINTBEGIN(cppcoreguidelines-macro-usage) */
+/* NOLINTBEGIN(modernize-macro-to-enum) */
 
 #define QT_MIN_VERSION_STR "$QT_MIN_VERSION_STR"
 #define QT_MIN_VERSION_HEX $QT_MIN_VERSION_HEX
@@ -7480,7 +7480,7 @@ fi
 
 cat >> $TMPH <<EOF
 
-/* NOLINTEND(cppcoreguidelines-macro-usage) */
+/* NOLINTEND(modernize-macro-to-enum) */
 
 #endif /* MYTHTV_CONFIG_H */
 EOF
