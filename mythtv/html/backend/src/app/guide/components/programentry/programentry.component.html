@@ -1,20 +1,21 @@
-<div class="programBox" [style.width.%]=durationToWidth() (click)="showDetailsDialog()">
+<div class="programBox cursor-pointer" [style.width.%]=durationToWidth() (click)="showDetailsDialog()">
     <div class="programTitle">{{ program.Title }}</div>
     <div class="programBody">
         <div *ngIf="program.SubTitle.length != 0">
             <div class="programSubtitle">{{ program.SubTitle }}</div>
         </div>
+        <div *ngIf="program.Recording">
+            <div class="programSubtitle" [ngStyle]="['WillRecord','Recording'].indexOf(program.Recording.StatusName)>-1?
+            {'background-color':'palegreen'}:{'background-color':'pink'}">
+                {{ guide.recStatusText[program.Recording.StatusName] }}</div>
+        </div>
         <div class="programDescription">{{ program.Description }}</div>
     </div>
 </div>
-<p-dialog header=" {{ program.Title }}" [(visible)]="displayDetails" [style]="{width: '50vw'}">
-    <div class="programSubtitle">{{ toLocalShortTime(program.StartTime) }} - {{ toLocalShortTime(program.EndTime) }}
-        <ng-container *ngIf="program.SubTitle.length != 0">
-            : {{ program.SubTitle }}
-        </ng-container>
-    </div>
-    <p>{{ program.Description }}</p>
+<p-dialog header=" {{ program.Title }} : {{ program.SubTitle }}" [(visible)]="editSchedule" [modal]="true"
+    [style]="{height: '75vw', width: '50vw'}" [closable]="false" [closeOnEscape]="false">
+    <app-schedule></app-schedule>
     <ng-template pTemplate="footer">
-        <p-button icon="pi pi-check" (click)="displayDetails=false" label="Ok" styleClass="p-button-text"></p-button>
+        <p-button icon="pi pi-check" (click)="editSchedule=false" label="Ok" styleClass="p-button-text"></p-button>
     </ng-template>
 </p-dialog>

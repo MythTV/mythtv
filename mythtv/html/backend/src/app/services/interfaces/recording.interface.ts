@@ -17,6 +17,7 @@ export interface Recording {
     RecordedId:     number;
     StartTs:        string;
     Status:         number;
+    StatusName:     string;
     StorageGroup:   string;
 }
 

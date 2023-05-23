@@ -1038,5 +1038,35 @@
       "rolloff_label": "Roll-off",
       "rolloff_desc": "Roll-off factor (Default: 0.35)"
     }
+  },
+  "data": {
+    "recstatus": {
+      "Pending": "Pending",
+      "Failing": "Failing",
+      "MissedFuture": "Missed Future",
+      "Tuning": "Tuning",
+      "Failed": "Failed",
+      "TunerBusy": "Tuner Busy",
+      "LowDiskSpace": "Low Disk Space",
+      "Cancelled": "Cancelled",
+      "Missed": "Missed",
+      "Aborted": "Aborted",
+      "Recorded": "Recorded",
+      "Recording": "Recording",
+      "WillRecord": "Will Record",
+      "Unknown": "Unknown",
+      "DontRecord": "Dont Record",
+      "PreviousRecording": "Previous Recording",
+      "CurrentRecording": "Current Recording",
+      "EarlierShowing": "Earlier Showing",
+      "TooManyRecordings": "Too Many Recordings",
+      "NotListed": "Not Listed",
+      "Conflict": "Conflict",
+      "LaterShowing": "Later Showing",
+      "Repeat": "Repeat",
+      "Inactive": "Inactive",
+      "NeverRecord": "Never Record",
+      "Offline": "Offline"
+    }
   }
 }

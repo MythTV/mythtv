@@ -14,11 +14,4 @@ export class ChannelIconComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  IconUrl(url: string) : string {
-    if (url == null || url.length == 0) {
-      return "/images/tv/channel_icon.svg";
-    } else {
-      return url;
-    }
-  }
 }

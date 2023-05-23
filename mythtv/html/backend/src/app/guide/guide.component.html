@@ -1,22 +1,26 @@
 <h2>{{ 'dashboard.programguide' | translate }} </h2>
-<div *ngIf="(m_guideData$ | async)?.ProgramGuide as pg; else loading">
-    <p-dataView [value]="pg.Channels" [totalRecords]="pg.TotalAvailable">
+<!-- <div *ngIf="(m_guideData$ | async)?.ProgramGuide as pg; else loading"> -->
+<div *ngIf="loaded; else loading">
+    <p-dataView [value]="m_programGuide.ProgramGuide.Channels"
+        [totalRecords]="m_programGuide.ProgramGuide.TotalAvailable">
         <ng-template pTemplate="header" styleClass="timeHeader">
-            <div class="col-12">
-                <p-calendar
-                    [(ngModel)]="m_startDate"
-                    [showTime]="true"
-                    [stepMinute]="30"
-                    [dateFormat]=(m_dateFormat)
+            <div class="flex">
+            <div class="flex flex-initial">
+                <p-calendar [(ngModel)]="m_pickerDate" [showTime]="true" [stepMinute]="30" [dateFormat]=(m_dateFormat)
                     (onClose)="onDatePickerClose()">
                 </p-calendar>
             </div>
+            <div class="flex flex-initial">
+                <div *ngIf="refreshing"><p-progressSpinner
+                        [style]="{width: '30px', height: '30px'}"></p-progressSpinner></div>
+            </div>
+        </div>
         </ng-template>
         <ng-template let-channelrow let-i="rowIndex" pTemplate="listItem">
             <div class="grid col-12 p-3">
                 <ng-container *ngIf="( i % 5 ) == 0">
                     <div class="col-12">
-                        <app-guide-timebar [startTime]="pg.StartTime"></app-guide-timebar>
+                        <app-guide-timebar [guide]="this"></app-guide-timebar>
                     </div>
                 </ng-container>
                 <div class="grid flex-grow-1">
@@ -25,9 +29,11 @@
                     </div>
                     <div class="col">
                         <ng-container *ngFor="let program of channelrow.Programs">
-                            <ng-container *ngIf="inDisplayWindow(program.StartTime, program.EndTime)">
+                            <ng-container *ngIf="!refreshing && inDisplayWindow(program.StartTime, program.EndTime)">
                                 <app-guide-programentry [program]="program"
-                                    [guideStartTime]="pg.StartTime" [guideEndTime]="pg.EndTime">
+                                    [guideStartTime]="m_programGuide.ProgramGuide.StartTime"
+                                    [guideEndTime]="m_programGuide.ProgramGuide.EndTime"
+                                    [guide]="this">
                                 </app-guide-programentry>
                             </ng-container>
                         </ng-container>

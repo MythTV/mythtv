@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { MenuItem, Message, MessageService } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { PartialObserver } from 'rxjs';
 import { DvrService } from 'src/app/services/dvr.service';
@@ -21,7 +21,7 @@ export class RecordingsComponent implements OnInit {
   @ViewChild("menu") menu!: Menu;
 
   recordings!: ProgramList;
-  program!: ScheduleOrProgram;
+  program: ScheduleOrProgram = <ScheduleOrProgram>{ Title: '' };
   editingProgram?: ScheduleOrProgram;
   displayMetadataDlg = false;
   displayUnsaved = false;
@@ -59,8 +59,6 @@ export class RecordingsComponent implements OnInit {
       this.translate.get(value).subscribe(data => {
         Object.defineProperty(this.msg, key, { value: data });
       });
-
-      this.program = <ScheduleOrProgram>{ Title: '' };
     }
 
     const mnu_entries = [this.mnu_delete, this.mnu_delete_rerec, this.mnu_undelete, this.mnu_rerec, this.mnu_markwatched,
