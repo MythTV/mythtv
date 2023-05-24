@@ -2277,6 +2277,21 @@ static HostCheckBoxSetting *GuiSizeForTV()
     return gc;
 }
 
+static HostCheckBoxSetting *ForceFullScreen()
+{
+    auto *gc = new HostCheckBoxSetting("ForceFullScreen");
+
+    gc->setLabel(AppearanceSettings::tr("Force Full Screen for GUI and TV playback"));
+
+    gc->setValue(false);
+
+    gc->setHelpText(AppearanceSettings::tr(
+        "Use Full Screen for GUI and TV playback independent of the settings for "
+        "the GUI dimensions. This does not change the values of the GUI dimensions "
+        "so it is easy to switch from window mode to full screen and back."));
+    return gc;
+}
+
 static HostCheckBoxSetting *UseVideoModes()
 {
     HostCheckBoxSetting *gc = new VideoModeSettings("UseVideoModes");
@@ -4684,6 +4699,7 @@ AppearanceSettings::AppearanceSettings()
     PopulateScreens(MythDisplay::GetScreenCount());
     connect(m_display, &MythDisplay::ScreenCountChanged, this, &AppearanceSettings::PopulateScreens);
 
+    screen->addChild(ForceFullScreen());
     screen->addChild(new GuiDimension());
 
     screen->addChild(GuiSizeForTV());
