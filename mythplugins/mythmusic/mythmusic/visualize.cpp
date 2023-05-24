@@ -647,13 +647,14 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
             short int val = node->m_left[i];
             if (val > m_maxl) m_maxl = val;
             if (val < m_minl) m_minl = val;
-            m_sqrl += val * val;
+            long valSquared = static_cast<long>(val) * static_cast<long>(val);
+            m_sqrl += valSquared;
             if (m_right)
             {
                 val = node->m_right[i];
                 if (val > m_maxr) m_maxr = val;
                 if (val < m_minr) m_minr = val;
-                m_sqrr += val * val;
+                m_sqrr += valSquared;
             }
             m_position++;
         }

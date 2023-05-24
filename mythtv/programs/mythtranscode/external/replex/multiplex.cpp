@@ -202,7 +202,7 @@ static void writeout_video(multiplex_t *mx)
 	    viu->frame == I_FRAME){
 		if (!mx->startup && mx->is_ts){
 			write_ts_patpmt(mx->ext.data(), mx->extcnt, 1, outbuf.data());
-			write(mx->fd_out, outbuf.data(), mx->pack_size*2);
+			write(mx->fd_out, outbuf.data(), static_cast<size_t>(mx->pack_size)*2);
 			ptsinc(&mx->SCR, mx->SCRinc*2);
 		} else if (!mx->startup && mx->navpack){
 			write_nav_pack(mx->pack_size, mx->extcnt, 
@@ -875,7 +875,7 @@ void setup_multiplex(multiplex_t *mx)
 	if (mx->is_ts) {
 		std::array<uint8_t,2048> outbuf {};
 		write_ts_patpmt(mx->ext.data(), mx->extcnt, 1, outbuf.data());
-		write(mx->fd_out, outbuf.data(), mx->pack_size*2);
+		write(mx->fd_out, outbuf.data(), static_cast<size_t>(mx->pack_size)*2);
 		ptsinc(&mx->SCR, mx->SCRinc*2);
 		mx->startup = 1;
 	} else if (mx->navpack){
