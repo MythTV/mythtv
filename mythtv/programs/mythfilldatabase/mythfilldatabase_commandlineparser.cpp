@@ -45,13 +45,9 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
         ->SetRequiredChildOf("file");
 
 
-    add("--update", "update", false, "Run non-destructive updates",
-            "Run non-destructive updates on the database for "
-            "users in xmltv zones that do not provide channel "
-            "data. Stops the addition of new channels and the "
-            "changing of channel icons.")
+    add("--update", "update", false, "", "")
         ->SetBlocks("manual")
-        ->SetDeprecated("Use --only-update-guide instead.")
+        ->SetRemoved("Use --only-update-guide instead.", "34")
         ->SetGroup("Guide Data Handling");
     add("--only-update-guide", "onlyguide", false, "Only update guide data",
             "Only update the guide data, do not alter channels or icons.")

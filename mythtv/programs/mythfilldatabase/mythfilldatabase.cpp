@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
         fill_data.m_chanData.m_interactive = true;
     }
 
-    if (cmdline.toBool("onlyguide") || cmdline.toBool("update"))
+    if (cmdline.toBool("onlyguide"))
     {
         LOG(VB_GENERAL, LOG_NOTICE,
             "Only updating guide data, channel and icon updates will be ignored");
