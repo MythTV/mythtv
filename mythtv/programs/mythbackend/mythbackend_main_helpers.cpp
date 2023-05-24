@@ -325,27 +325,6 @@ void cleanup(void)
 
 int handle_command(const MythBackendCommandLineParser &cmdline)
 {
-    QString eventString;
-
-    if (cmdline.toBool("event"))
-        eventString = cmdline.toString("event");
-    else if (cmdline.toBool("systemevent"))
-    {
-        eventString = "SYSTEM_EVENT " +
-                      cmdline.toString("systemevent") +
-                      QString(" SENDER %1").arg(gCoreContext->GetHostName());
-    }
-
-    if (!eventString.isEmpty())
-    {
-        if (gCoreContext->ConnectToMasterServer())
-        {
-            gCoreContext->SendMessage(eventString);
-            return GENERIC_EXIT_OK;
-        }
-        return GENERIC_EXIT_NO_MYTHCONTEXT;
-    }
-
     if (cmdline.toBool("setverbose"))
     {
         if (gCoreContext->ConnectToMasterServer())
@@ -380,19 +359,6 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
         return GENERIC_EXIT_CONNECT_ERROR;
     }
 
-    if (cmdline.toBool("clearcache"))
-    {
-        if (gCoreContext->ConnectToMasterServer())
-        {
-            gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
-            LOG(VB_GENERAL, LOG_INFO, "Sent CLEAR_SETTINGS_CACHE message");
-            return GENERIC_EXIT_OK;
-        }
-        LOG(VB_GENERAL, LOG_ERR, "Unable to connect to backend, settings "
-            "cache will not be cleared.");
-        return GENERIC_EXIT_CONNECT_ERROR;
-    }
-
     if (cmdline.toBool("printsched") ||
         cmdline.toBool("testsched"))
     {
@@ -424,37 +390,6 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
         logLevel = oldLogLevel;
         delete sched;
         return GENERIC_EXIT_OK;
-    }
-
-    if (cmdline.toBool("resched"))
-    {
-        bool ok = false;
-        if (gCoreContext->ConnectToMasterServer())
-        {
-            LOG(VB_GENERAL, LOG_INFO, "Connected to master for reschedule");
-            ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(),
-                                                "MythBackendCommand");
-            ok = true;
-        }
-        else
-            LOG(VB_GENERAL, LOG_ERR, "Cannot connect to master for reschedule");
-
-        return (ok) ? GENERIC_EXIT_OK : GENERIC_EXIT_CONNECT_ERROR;
-    }
-
-    if (cmdline.toBool("scanvideos"))
-    {
-        bool ok = false;
-        if (gCoreContext->ConnectToMasterServer())
-        {
-            gCoreContext->SendReceiveStringList(QStringList() << "SCAN_VIDEOS");
-            LOG(VB_GENERAL, LOG_INFO, "Requested video scan");
-            ok = true;
-        }
-        else
-            LOG(VB_GENERAL, LOG_ERR, "Cannot connect to master for video scan");
-
-        return (ok) ? GENERIC_EXIT_OK : GENERIC_EXIT_CONNECT_ERROR;
     }
 
     if (cmdline.toBool("printexpire"))

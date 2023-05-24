@@ -160,10 +160,8 @@ int main(int argc, char **argv)
 
     cmdline.ApplySettingsOverride();
 
-    if (cmdline.toBool("event")         || cmdline.toBool("systemevent") ||
-        cmdline.toBool("setverbose")    || cmdline.toBool("printsched") ||
-        cmdline.toBool("testsched")     || cmdline.toBool("resched") ||
-        cmdline.toBool("scanvideos")    || cmdline.toBool("clearcache") ||
+    if (cmdline.toBool("setverbose")    || cmdline.toBool("printsched") ||
+        cmdline.toBool("testsched")     ||
         cmdline.toBool("printexpire")   || cmdline.toBool("setloglevel"))
     {
         gCoreContext->SetAsBackend(false);
