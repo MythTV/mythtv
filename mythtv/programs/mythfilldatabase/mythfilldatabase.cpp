@@ -155,25 +155,6 @@ int main(int argc, char *argv[])
             fill_data.SetRefresh(0, true);
     }
 
-    if (cmdline.toBool("refreshtoday"))
-        cmdline.SetValue("refresh",
-                cmdline.toStringList("refresh") << "today");
-    if (cmdline.toBool("dontrefreshtomorrow"))
-        cmdline.SetValue("refresh",
-                cmdline.toStringList("refresh") << "nottomorrow");
-    if (cmdline.toBool("refreshsecond"))
-        cmdline.SetValue("refresh",
-                cmdline.toStringList("refresh") << "second");
-    if (cmdline.toBool("refreshall"))
-        cmdline.SetValue("refresh",
-                cmdline.toStringList("refresh") << "all");
-    if (cmdline.toBool("refreshday"))
-    {
-        cmdline.SetValue("refresh",
-                cmdline.toStringList("refresh") <<
-                                        cmdline.toStringList("refreshday"));
-    }
-
     QStringList sl = cmdline.toStringList("refresh");
     if (!sl.isEmpty())
     {
