@@ -108,7 +108,7 @@ export class RecordingsComponent implements OnInit {
     this.menuToShow.push(this.mnu_updatemeta);
     // todo: implement this
     // this.menuToShow.push(this.mnu_updaterecrule);
-    this.program = program; this.menu.toggle(event)
+    this.menu.toggle(event);
   }
 
   delete(event: any, rerec: boolean) {

@@ -16,6 +16,7 @@ export class DashboardComponent implements OnInit {
     { label: 'dashboard.channeleditor', routerLink: 'channel-editor' },
     { label: 'dashboard.programguide', routerLink: 'program-guide' },
     { label: 'dashboard.recordings.heading', routerLink: 'recordings' },
+    { label: 'dashboard.upcoming.heading', routerLink: 'upcoming' },
   ]
 
   activeItem = this.fullMenu[0];

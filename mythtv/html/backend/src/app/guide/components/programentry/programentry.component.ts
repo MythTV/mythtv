@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
 import { GuideComponent } from '../../guide.component';
+import { DataService } from 'src/app/services/data.service';
 
 @Component({
   selector: 'app-guide-programentry',
@@ -11,11 +12,10 @@ export class ProgramEntryComponent implements OnInit {
   @Input() program!: ScheduleOrProgram;
   @Input() guideStartTime!: string;
   @Input() guideEndTime!: string;
-  @Input() guide!: GuideComponent;
 
   editSchedule: boolean = false;
 
-  constructor() {
+  constructor(public dataService: DataService) {
   }
 
   ngOnInit(): void {

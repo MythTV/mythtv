@@ -206,16 +206,8 @@ export class DvrService {
   // All parameters are optional
   public GetUpcomingList(request: GetUpcomingRequest): Observable<GetUpcomingListResponse> {
     let params = new HttpParams();
-    if (request.Count)
-      params = params.set("Count", request.Count);
-    if (request.RecordId)
-      params = params.set("RecordId", request.RecordId);
-    if (request.ShowAll)
-      params = params.set("ShowAll", request.ShowAll);
-    if (request.StartIndex)
-      params = params.set("StartIndex", request.StartIndex);
-    if (request.Status)
-      params = params.set("Status", request.Status);
+    for (const [key, value] of Object.entries(request))
+      params = params.set(key, value);
     return this.httpClient.get<GetUpcomingListResponse>('/Dvr/GetUpcomingList', { params });
   }
 

@@ -54,6 +54,14 @@
       "episode": "Episode",
       "canundel": "You can reverse this by using Undelete.",
       "alreadydel": "Already Deleted"
+    },
+    "upcoming": {
+      "heading": "Upcoming",
+      "date": "Date",
+      "time": "Time",
+      "status": "Status",
+      "showall": "Show All",
+      "encoder": "Encoder"
     }
   },
   "navbar": {

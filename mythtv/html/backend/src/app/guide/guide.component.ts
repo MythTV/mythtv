@@ -6,10 +6,6 @@ import { Channel } from '../services/interfaces/channel.interface';
 import { ProgramGuide } from 'src/app/services/interfaces/programguide.interface';
 import { TranslateService, TranslationChangeEvent } from '@ngx-translate/core';
 
-interface AssociativeArray {
-  [key: string]: string
-}
-
 @Component({
   selector: 'app-guide',
   templateUrl: './guide.component.html',
@@ -17,35 +13,6 @@ interface AssociativeArray {
 })
 export class GuideComponent implements OnInit {
 
-  // This associative array will hold translations for each status
-  recStatusText : AssociativeArray = {
-    Pending: '',
-    Failing: '',
-    MissedFuture: '',
-    Tuning: '',
-    Failed: '',
-    TunerBusy: '',
-    LowDiskSpace: '',
-    Cancelled: '',
-    Missed: '',
-    Aborted: '',
-    Recorded: '',
-    Recording: '',
-    WillRecord: '',
-    Unknown: '',
-    DontRecord: '',
-    PreviousRecording: '',
-    CurrentRecording: '',
-    EarlierShowing: '',
-    TooManyRecordings: '',
-    NotListed: '',
-    Conflict: '',
-    LaterShowing: '',
-    Repeat: '',
-    Inactive: '',
-    NeverRecord: '',
-    Offline: '',
-  }
 
   m_guideData$!: Observable<ProgramGuide>;
   m_startDate: Date = new Date();
@@ -68,19 +35,9 @@ export class GuideComponent implements OnInit {
       console.log("Event: language change, new language (" + event.lang + ")");
       this.switchLanguage(event.lang);
       this.fetchData();
-      this.getTranslations();
     })
-    this.getTranslations();
   }
 
-  getTranslations() {
-    // Translation keys like 'data.recstatus.Pending'
-    for (const [key, value] of Object.entries(this.recStatusText)) {
-      this.translate.get('data.recstatus.' + key).subscribe(data => {
-        Object.defineProperty(this.recStatusText, key, { value: data });
-      });
-    }
-  }
 
   ngOnInit(): void {
     this.fetchData();
@@ -97,8 +54,6 @@ export class GuideComponent implements OnInit {
   }
 
   fetchData(reqDate?: Date): void {
-    // this.m_guideData$ = this.guideService.GetProgramGuide(reqDate).pipe(
-    //   tap(data =>
     this.guideService.GetProgramGuide(reqDate).subscribe(data => {
       this.m_programGuide = data;
       this.m_startDate = new Date(data.ProgramGuide.StartTime);
