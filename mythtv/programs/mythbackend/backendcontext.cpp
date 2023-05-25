@@ -6,12 +6,8 @@
 
 QMap<int, EncoderLink *> gTVList;
 AutoExpire  *gExpirer      = nullptr;
-JobQueue    *gJobQueue     = nullptr;
-HouseKeeper *gHousekeeping = nullptr;
-MediaServer *g_pUPnp       = nullptr;
 BackendContext *gBackendContext = nullptr;
 QString      gPidFile;
-MythSystemEventHandler *gSysEventHandler = nullptr;
 
 BackendContext::~BackendContext()
 {

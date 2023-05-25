@@ -77,7 +77,11 @@ static inline void be_sd_notify(const char */*str*/) {};
 #define LOC_WARN QString("MythBackend, Warning: ")
 #define LOC_ERR  QString("MythBackend, Error: ")
 
-static MainServer *mainServer = nullptr;
+static HouseKeeper            *gHousekeeping    { nullptr };
+static JobQueue               *gJobQueue        { nullptr };
+static MythSystemEventHandler *gSysEventHandler { nullptr };
+static MediaServer            *g_pUPnp          { nullptr };
+static MainServer             *mainServer       { nullptr };
 
 bool setupTVs(bool ismaster, bool &error)
 {
