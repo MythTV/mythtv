@@ -15,7 +15,6 @@ class BackendContext;
 extern QMap<int, EncoderLink *> gTVList;
 extern AutoExpire  *gExpirer;
 extern BackendContext *gBackendContext;
-extern QString      gPidFile;
 
 class Frontend
 {

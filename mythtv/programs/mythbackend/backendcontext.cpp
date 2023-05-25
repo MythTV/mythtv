@@ -7,7 +7,6 @@
 QMap<int, EncoderLink *> gTVList;
 AutoExpire  *gExpirer      = nullptr;
 BackendContext *gBackendContext = nullptr;
-QString      gPidFile;
 
 BackendContext::~BackendContext()
 {

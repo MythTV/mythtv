@@ -106,7 +106,6 @@ int main(int argc, char **argv)
            .toUtf8().constData(), 1);
 #endif
 
-    gPidFile = cmdline.toString("pidfile");
     int retval = cmdline.Daemonize();
     if (retval != GENERIC_EXIT_OK)
         return retval;

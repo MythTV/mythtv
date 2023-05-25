@@ -19,6 +19,8 @@ void MythBackendCommandLineParser::LoadArguments(void)
     addPIDFile();
 
     CommandLineArg::AllowOneOf(QList<CommandLineArg*>()
+         << add("--pidfile", "pidfile", "",
+                "Filename to save the application pid.", "")
          << add("--printsched", "printsched", false,
                 "Print upcoming list of scheduled recordings.", "")
 //                    ->SetDeprecated("use mythutil instead")
