@@ -998,23 +998,24 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
         int count = 0;
         for (auto j = prev + 1; j <= index; j++)
         {    // for the freqency bins of this pixel, find peak or mean
-
-            // // linear magnitude:
-            // tmp = sqrt(sq(m_dftL[2 * j]) + sq(m_dftL[2 * j + 1]));
-
-            // power spectrum (dBm):
-            tmp = 10 * log10(sq(m_dftL[2 * j]) + sq(m_dftL[2 * j + 1]));
+            tmp = sq(m_dftL[2 * j]) + sq(m_dftL[2 * j + 1]);
             left  = m_binpeak ? (tmp > left  ? tmp : left ) : left  + tmp;
-            tmp = 10 * log10(sq(m_dftR[2 * j]) + sq(m_dftR[2 * j + 1]));
+            tmp = sq(m_dftR[2 * j]) + sq(m_dftR[2 * j + 1]);
             right = m_binpeak ? (tmp > right ? tmp : right) : right + tmp;
             count++;
         }
         if (!m_binpeak)
-        {			// mean of the frequency bins
+        {                       // mean of the frequency bins
             (count > 0) || (count = 1);
             left /= count;
             right /= count;
         }
+        // linear magnitude:           sqrt(sq(real) + sq(im));
+        // left = sqrt(left);
+        // right = sqrt(right);
+        // power spectrum (dBm): 10 * log10(sq(real) + sq(im));
+        left = 10 * log10(left);
+        right = 10 * log10(right);
 
         // float bw = 1. / (16384. / 44100.);
         // float freq = bw * index;
