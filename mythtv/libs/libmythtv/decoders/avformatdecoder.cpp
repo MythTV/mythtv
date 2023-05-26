@@ -3828,38 +3828,52 @@ void AvFormatDecoder::ProcessVBIDataPacket(
 void AvFormatDecoder::ProcessDVBDataPacket(
     const AVStream* /*stream*/, const AVPacket *pkt)
 {
+    // ETSI EN 301 775 V1.2.1 (2003-05)
+    // Check data_identifier value
+    // Defined in 4.4.2 Semantics for PES data field, Table 2
+    // Support only the "low range" 0x10-0x1F because they have
+    // the fixed data_unit_length of 0x2C (44) that the teletext
+    // decoder expects.
+    //
     const uint8_t *buf     = pkt->data;
     const uint8_t *buf_end = pkt->data + pkt->size;
 
+    if (*buf >= 0x10 && *buf <= 0x1F)
+    {
+        buf++;
+    }
+    else
+    {
+        LOG(VB_VBI, LOG_WARNING, LOC +
+            QString("VBI: Unknown data_identier: %1 discarded").arg(*buf));
+        return;
+    }
 
+    // Process data packets in the PES packet payload
     while (buf < buf_end)
     {
-        if (*buf == 0x10)
+        if (*buf == 0x02)               // data_unit_id 0x02    EBU Teletext non-subtitle data
         {
-            buf++; // skip
-        }
-        else if (*buf == 0x02)
-        {
-            buf += 4;
+            buf += 4;                   // Skip data_unit_id, data_unit_length (0x2C, 44) and first two data bytes
             if ((buf_end - buf) >= 42)
                 m_ttd->Decode(buf, VBI_DVB);
             buf += 42;
         }
-        else if (*buf == 0x03)
+        else if (*buf == 0x03)          // data_unit_id 0x03    EBU Teletext subtitle data
         {
             buf += 4;
             if ((buf_end - buf) >= 42)
                 m_ttd->Decode(buf, VBI_DVB_SUBTITLE);
             buf += 42;
         }
-        else if (*buf == 0xff)
+        else if (*buf == 0xff)          // data_unit_id 0xff    stuffing
         {
-            buf += 3;
+            buf += 46;                  // data_unit_id, data_unit_length and 44 data bytes
         }
         else
         {
-            LOG(VB_VBI, LOG_ERR, LOC +
-                QString("VBI: Unknown descriptor: %1").arg(*buf));
+            LOG(VB_VBI, LOG_WARNING, LOC +
+                QString("VBI: Unsupported data_unit_id: %1 discarded").arg(*buf));
             buf += 46;
         }
     }
