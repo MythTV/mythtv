@@ -987,8 +987,8 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
     painter.fillRect(s_offset,     0, 256, h, Qt::black);
     painter.fillRect(s_offset - w, 0, 256, h, Qt::black);
 
-    int index = 1;              // frequency index
-    int prev = 0;               // previous frequency
+    int index = 1;              // frequency index of this pixel
+    int prev = 0;               // frequency index of previous pixel
     float gain = 5.0;           // compensate for window function loss
     for (i = 1; i < h / 2; i++)
     {                           // for each pixel of the spectrogram...
@@ -1047,8 +1047,8 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
             painter.setPen(qRgb(mag, mag, mag));
         painter.drawPoint(s_offset, h - i);
 
-        prev = index;
-        index = m_scale[i];
+        prev = index;           // next pixel is FFT bins from here
+        index = m_scale[i];     // to the next bin by LOG scale
         (prev < index) || (prev = index -1);
     }
     if (++s_offset >= w)
