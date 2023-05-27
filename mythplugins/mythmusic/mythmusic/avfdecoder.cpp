@@ -314,7 +314,7 @@ bool avfDecoder::initialize()
             mdata.setAlbum("");
             mdata.setLength(-1ms);
 
-            DecoderHandlerEvent ev(DecoderHandlerEvent::Meta, mdata);
+            DecoderHandlerEvent ev(DecoderHandlerEvent::kMeta, mdata);
             dispatch(ev);
         }
     }
@@ -437,7 +437,7 @@ void avfDecoder::run()
         return;
     }
 
-    m_stat = DecoderEvent::Decoding;
+    m_stat = DecoderEvent::kDecoding;
     {
         DecoderEvent e((DecoderEvent::Type) m_stat);
         dispatch(e);
@@ -529,9 +529,9 @@ void avfDecoder::run()
     }
 
     if (m_finish)
-        m_stat = DecoderEvent::Finished;
+        m_stat = DecoderEvent::kFinished;
     else if (m_userStop)
-        m_stat = DecoderEvent::Stopped;
+        m_stat = DecoderEvent::kStopped;
 
     {
         DecoderEvent e((DecoderEvent::Type) m_stat);
@@ -569,7 +569,7 @@ void avfDecoder::checkMetatdata(void)
             mdata.setAlbum(meta_map["album"]);
             mdata.setLength(-1ms);
 
-            DecoderHandlerEvent ev(DecoderHandlerEvent::Meta, mdata);
+            DecoderHandlerEvent ev(DecoderHandlerEvent::kMeta, mdata);
             dispatch(ev);
         }
 
@@ -580,7 +580,7 @@ void avfDecoder::checkMetatdata(void)
     {
         int available = (int) (m_inputContext->getContext()->pb->buf_end - m_inputContext->getContext()->pb->buffer);
         int maxSize = m_inputContext->getContext()->pb->buffer_size;
-        DecoderHandlerEvent ev(DecoderHandlerEvent::BufferStatus, available, maxSize);
+        DecoderHandlerEvent ev(DecoderHandlerEvent::kBufferStatus, available, maxSize);
         dispatch(ev);
     }
 }

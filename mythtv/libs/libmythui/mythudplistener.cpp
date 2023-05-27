@@ -156,7 +156,7 @@ void MythUDPListener::Process(const QByteArray& Buffer, const QHostAddress& /*Se
         if (notification)
         {
             origin = origin.isEmpty() ? tr("UDP Listener") : origin;
-            ShowNotification(error ? MythNotification::Error :
+            ShowNotification(error ? MythNotification::kError :
                              MythNotification::TypeFromString(type),
                              msg, origin, description, image, extra,
                              progress_text, progress, timeout,
@@ -165,7 +165,7 @@ void MythUDPListener::Process(const QByteArray& Buffer, const QHostAddress& /*Se
         else
         {
             QStringList args(QString::number(timeout.count()));
-            qApp->postEvent(GetMythMainWindow(), new MythEvent(MythEvent::MythUserMessage, msg, args));
+            qApp->postEvent(GetMythMainWindow(), new MythEvent(MythEvent::kMythUserMessage, msg, args));
         }
     }
 }

@@ -161,7 +161,7 @@ bool MythFrontendService::SendMessage(const QString& Message, uint Timeout)
     if (Message.isEmpty())
         return false;
     QStringList data(QString::number(std::clamp(Timeout, 0U, 1000U)));
-    qApp->postEvent(GetMythMainWindow(), new MythEvent(MythEvent::MythUserMessage, Message, data));
+    qApp->postEvent(GetMythMainWindow(), new MythEvent(MythEvent::kMythUserMessage, Message, data));
     return true;
 }
 
@@ -182,7 +182,7 @@ bool MythFrontendService::SendNotification(bool  Error,                const QSt
     if (Message.isEmpty() || !GetNotificationCenter())
         return false;
 
-    ShowNotification(Error ? MythNotification::Error : MythNotification::TypeFromString(Type),
+    ShowNotification(Error ? MythNotification::kError : MythNotification::TypeFromString(Type),
                      Message, Origin.isNull() ? tr("FrontendServices") : Origin,
                      Description, Image, Extra, ProgressText, Progress, Timeout,
                      Fullscreen, Visibility, static_cast<MythNotification::Priority>(Priority));

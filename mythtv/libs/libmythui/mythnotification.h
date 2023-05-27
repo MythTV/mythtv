@@ -29,13 +29,13 @@ using VNMask = unsigned int;
 class MUI_PUBLIC MythNotification : public MythEvent
 {
   public:
-    static const Type New;
-    static const Type Update;
-    static const Type Info;
-    static const Type Error;
-    static const Type Warning;
-    static const Type Check;
-    static const Type Busy;
+    static const Type kNew;
+    static const Type kUpdate;
+    static const Type kInfo;
+    static const Type kError;
+    static const Type kWarning;
+    static const Type kCheck;
+    static const Type kBusy;
 
     MythNotification(Type nType, void* Parent = nullptr);
     MythNotification(int Id, void* Parent);

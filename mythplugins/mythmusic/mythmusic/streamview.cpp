@@ -104,7 +104,7 @@ void StreamView::customEvent(QEvent *event)
 {
     bool handled = true;
 
-    if (event->type() == MusicPlayerEvent::PlayedTracksChangedEvent)
+    if (event->type() == MusicPlayerEvent::kPlayedTracksChangedEvent)
     {
         if (!gPlayer->getPlayedTracksList().isEmpty())
             updateTrackInfo(gPlayer->getCurrentMetadata());
@@ -127,7 +127,7 @@ void StreamView::customEvent(QEvent *event)
             m_playedTracksList->SetItemCurrent(item);
         }
     }
-    else if (event->type() == MusicPlayerEvent::TrackChangeEvent)
+    else if (event->type() == MusicPlayerEvent::kTrackChangeEvent)
     {
         auto *mpe = dynamic_cast<MusicPlayerEvent *>(event);
 
@@ -172,7 +172,7 @@ void StreamView::customEvent(QEvent *event)
 
         updateTrackInfo(gPlayer->getCurrentMetadata());
     }
-    else if (event->type() == OutputEvent::Playing)
+    else if (event->type() == OutputEvent::kPlaying)
     {
         if (gPlayer->isPlaying())
         {
@@ -190,7 +190,7 @@ void StreamView::customEvent(QEvent *event)
         // pass it on to the default handler in MusicCommon
         handled = false;
     }
-    else if (event->type() == OutputEvent::Stopped)
+    else if (event->type() == OutputEvent::kStopped)
     {
         if (m_streamList)
         {
@@ -205,10 +205,10 @@ void StreamView::customEvent(QEvent *event)
         // pass it on to the default handler in MusicCommon
         handled = false;
     }
-    else if (event->type() == OutputEvent::Buffering)
+    else if (event->type() == OutputEvent::kBuffering)
     {
     }
-    else if (event->type() == MythEvent::MythEventMessage)
+    else if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
@@ -251,7 +251,7 @@ void StreamView::customEvent(QEvent *event)
             }
         }
     }
-    else if (event->type() == DecoderHandlerEvent::OperationStart)
+    else if (event->type() == DecoderHandlerEvent::kOperationStart)
     {
         auto *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
         if (!dhe)
@@ -261,7 +261,7 @@ void StreamView::customEvent(QEvent *event)
             m_bufferStatus->SetText(*dhe->getMessage());
         }
     }
-    else if (event->type() == DecoderHandlerEvent::BufferStatus)
+    else if (event->type() == DecoderHandlerEvent::kBufferStatus)
     {
         auto *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
         if (!dhe)
@@ -283,7 +283,7 @@ void StreamView::customEvent(QEvent *event)
             m_bufferProgress->SetUsed(available);
         }
     }
-    else if (event->type() == DecoderHandlerEvent::OperationStop)
+    else if (event->type() == DecoderHandlerEvent::kOperationStop)
     {
         if (m_bufferStatus)
             m_bufferStatus->Reset();

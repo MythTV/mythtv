@@ -163,7 +163,7 @@ bool PBHEventHandler::event(QEvent *e)
         }
         return true;
     }
-    if (e->type() == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent*>(e);
         if (me == nullptr)

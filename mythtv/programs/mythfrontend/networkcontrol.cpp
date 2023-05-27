@@ -1541,7 +1541,7 @@ QString NetworkControl::processMessage(NetworkCommand *nc)
 
     QString message = nc->getCommand().remove(0, 7).trimmed();
     MythMainWindow *window = GetMythMainWindow();
-    auto* me = new MythEvent(MythEvent::MythUserMessage, message);
+    auto* me = new MythEvent(MythEvent::kMythUserMessage, message);
     qApp->postEvent(window, me);
     return {"OK"};
 }
@@ -1595,7 +1595,7 @@ void NetworkControl::sendReplyToClient(NetworkControlClient *ncc,
 
 void NetworkControl::customEvent(QEvent *e)
 {
-    if (e->type() == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(e);
         if (me == nullptr)
@@ -1862,7 +1862,7 @@ QString NetworkControl::saveScreenshot(NetworkCommand *nc)
         args << QString::number(width);
         args << QString::number(height);
     }
-    auto *me = new MythEvent(MythEvent::MythEventMessage,
+    auto *me = new MythEvent(MythEvent::kMythEventMessage,
                                   ACTION_SCREENSHOT, args);
     qApp->postEvent(window, me);
     return "OK";

@@ -15,7 +15,7 @@ MessageHandler::MessageHandler(void)
 
 void MessageHandler::customEvent(QEvent *e)
 {
-    if (e->type() != MythEvent::MythEventMessage)
+    if (e->type() != MythEvent::kMythEventMessage)
         return;
 
     if (!gCoreContext->IsMasterBackend())

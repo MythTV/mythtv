@@ -103,18 +103,18 @@ class ScannerEvent : public QEvent
     void    ConfigurableValue(Configurable *cfg_ptr)
         { m_cfgPtr = cfg_ptr; }
 
-    static const Type ScanComplete;
-    static const Type ScanShutdown;
-    static const Type ScanErrored;
-    static const Type AppendTextToLog;
-    static const Type SetStatusText;
-    static const Type SetStatusTitleText;
-    static const Type SetPercentComplete;
-    static const Type SetStatusRotorPosition;
-    static const Type SetStatusSignalToNoise;
-    static const Type SetStatusSignalStrength;
-    static const Type SetStatusSignalLock;
-    static const Type SetStatusChannelTuned;
+    static const Type kScanComplete;
+    static const Type kScanShutdown;
+    static const Type kScanErrored;
+    static const Type kAppendTextToLog;
+    static const Type kSetStatusText;
+    static const Type kSetStatusTitleText;
+    static const Type kSetPercentComplete;
+    static const Type kSetStatusRotorPosition;
+    static const Type kSetStatusSignalToNoise;
+    static const Type kSetStatusSignalStrength;
+    static const Type kSetStatusSignalLock;
+    static const Type kSetStatusChannelTuned;
 
   private:
     ~ScannerEvent() override = default;

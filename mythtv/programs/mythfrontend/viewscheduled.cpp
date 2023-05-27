@@ -581,7 +581,7 @@ void ViewScheduled::EmbedTVWindow(void)
 
 void ViewScheduled::customEvent(QEvent *event)
 {
-    if (event->type() == MythEvent::MythEventMessage)
+    if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)

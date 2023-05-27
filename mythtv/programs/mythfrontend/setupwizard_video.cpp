@@ -230,7 +230,7 @@ void VideoSetupWizard::initProgressDialog()
 
 void VideoSetupWizard::customEvent(QEvent *e)
 {
-    if (e->type() == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(e);
         if (me == nullptr)

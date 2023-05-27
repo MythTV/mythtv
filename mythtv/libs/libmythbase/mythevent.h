@@ -37,7 +37,7 @@ class MBASE_PUBLIC MythEvent : public QEvent
 
     // lmessage is passed by value for thread safety reasons per DanielK
     explicit MythEvent(QString lmessage)
-        : QEvent(MythEventMessage),
+        : QEvent(kMythEventMessage),
         m_message(::std::move(lmessage)),
         m_extradata("empty")
     {
@@ -45,7 +45,7 @@ class MBASE_PUBLIC MythEvent : public QEvent
 
     // lmessage is passed by value for thread safety reasons per DanielK
     MythEvent(QString lmessage, QStringList lextradata)
-        : QEvent(MythEventMessage),
+        : QEvent(kMythEventMessage),
         m_message(::std::move(lmessage)),
         m_extradata(std::move(lextradata))
     {
@@ -53,7 +53,7 @@ class MBASE_PUBLIC MythEvent : public QEvent
 
     // lmessage is passed by value for thread safety reasons per DanielK
     MythEvent(QString lmessage, const QString& lextradata)
-        : QEvent(MythEventMessage),
+        : QEvent(kMythEventMessage),
         m_message(::std::move(lmessage)),
         m_extradata(lextradata)
     {
@@ -76,8 +76,8 @@ class MBASE_PUBLIC MythEvent : public QEvent
     { return new MythEvent(type(), m_message, m_extradata); }
 #endif
 
-    static const Type MythEventMessage;
-    static const Type MythUserMessage;
+    static const Type kMythEventMessage;
+    static const Type kMythUserMessage;
     static const Type kUpdateTvProgressEventType;
     static const Type kExitToMainMenuEventType;
     static const Type kMythPostShowEventType;

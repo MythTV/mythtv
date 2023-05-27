@@ -67,7 +67,7 @@ void BackendConnectionManager::customEvent(QEvent *event)
     bool reconnect = false;
     uint reconnect_timeout = 5000;
 
-    if (event->type() == MythEvent::MythEventMessage)
+    if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
