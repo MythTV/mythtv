@@ -14,6 +14,14 @@
 #include "libmythbase/mythlogging.h"
 #include "mythnotification.h"
 
+const QEvent::Type MythNotification::New     = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type MythNotification::Update  = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type MythNotification::Info    = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type MythNotification::Error   = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type MythNotification::Warning = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type MythNotification::Check   = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type MythNotification::Busy    = static_cast<QEvent::Type>(QEvent::registerEventType());
+
 MythNotification::MythNotification(Type nType, void* Parent)
   : MythEvent(nType, "NOTIFICATION"),
     m_parent(Parent)

@@ -29,13 +29,13 @@ using VNMask = unsigned int;
 class MUI_PUBLIC MythNotification : public MythEvent
 {
   public:
-    static inline Type New     = static_cast<QEvent::Type>(QEvent::registerEventType());
-    static inline Type Update  = static_cast<QEvent::Type>(QEvent::registerEventType());
-    static inline Type Info    = static_cast<QEvent::Type>(QEvent::registerEventType());
-    static inline Type Error   = static_cast<QEvent::Type>(QEvent::registerEventType());
-    static inline Type Warning = static_cast<QEvent::Type>(QEvent::registerEventType());
-    static inline Type Check   = static_cast<QEvent::Type>(QEvent::registerEventType());
-    static inline Type Busy    = static_cast<QEvent::Type>(QEvent::registerEventType());
+    static const Type New;
+    static const Type Update;
+    static const Type Info;
+    static const Type Error;
+    static const Type Warning;
+    static const Type Check;
+    static const Type Busy;
 
     MythNotification(Type nType, void* Parent = nullptr);
     MythNotification(int Id, void* Parent);
