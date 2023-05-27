@@ -85,7 +85,7 @@ class NetworkControlCloseEvent : public QEvent
 
     NetworkControlClient *getClient() { return m_networkControlClient; }
 
-    static Type kEventType;
+    static const Type kEventType;
 
   private:
     NetworkControlClient *m_networkControlClient {nullptr};

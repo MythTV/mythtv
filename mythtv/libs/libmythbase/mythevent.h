@@ -76,18 +76,18 @@ class MBASE_PUBLIC MythEvent : public QEvent
     { return new MythEvent(type(), m_message, m_extradata); }
 #endif
 
-    static Type MythEventMessage;
-    static Type MythUserMessage;
-    static Type kUpdateTvProgressEventType;
-    static Type kExitToMainMenuEventType;
-    static Type kMythPostShowEventType;
-    static Type kPushDisableDrawingEventType;
-    static Type kPopDisableDrawingEventType;
-    static Type kLockInputDevicesEventType;
-    static Type kUnlockInputDevicesEventType;
-    static Type kUpdateBrowseInfoEventType;
-    static Type kDisableUDPListenerEventType;
-    static Type kEnableUDPListenerEventType;
+    static const Type MythEventMessage;
+    static const Type MythUserMessage;
+    static const Type kUpdateTvProgressEventType;
+    static const Type kExitToMainMenuEventType;
+    static const Type kMythPostShowEventType;
+    static const Type kPushDisableDrawingEventType;
+    static const Type kPopDisableDrawingEventType;
+    static const Type kLockInputDevicesEventType;
+    static const Type kUnlockInputDevicesEventType;
+    static const Type kUpdateBrowseInfoEventType;
+    static const Type kDisableUDPListenerEventType;
+    static const Type kEnableUDPListenerEventType;
 
   // No implicit copying.
   protected:
@@ -110,7 +110,7 @@ class MBASE_PUBLIC ExternalKeycodeEvent : public QEvent
 
     int getKeycode() const { return m_keycode; }
 
-    static Type kEventType;
+    static const Type kEventType;
 
   private:
     int m_keycode;

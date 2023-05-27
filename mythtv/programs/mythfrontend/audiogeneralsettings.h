@@ -141,7 +141,7 @@ class ChannelChangedEvent : public QEvent
     QString m_channel;
     bool    m_fulltest;
 
-    static Type kEventType;
+    static const Type kEventType;
 };
 
 class AudioTestThread : public MThread

@@ -24,7 +24,7 @@
 #include "dbaccess.h"
 #include "dirscan.h"
 
-QEvent::Type VideoScanChanges::kEventType =
+const QEvent::Type VideoScanChanges::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 namespace

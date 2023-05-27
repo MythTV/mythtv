@@ -346,9 +346,9 @@ public:
     explicit UpdateGuideEvent(GuideUpdaterBase *updater) :
         QEvent(kEventType), m_updater(updater) {}
     GuideUpdaterBase *m_updater {nullptr};
-    static Type kEventType;
+    static const Type kEventType;
 };
-QEvent::Type UpdateGuideEvent::kEventType =
+const QEvent::Type UpdateGuideEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 class GuideHelper : public QRunnable

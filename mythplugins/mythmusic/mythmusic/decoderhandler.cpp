@@ -23,12 +23,12 @@
 
 /**********************************************************************/
 
-QEvent::Type DecoderHandlerEvent::Ready = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type DecoderHandlerEvent::Meta = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type DecoderHandlerEvent::BufferStatus = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type DecoderHandlerEvent::OperationStart = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type DecoderHandlerEvent::OperationStop = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type DecoderHandlerEvent::Error = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type DecoderHandlerEvent::Ready = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type DecoderHandlerEvent::Meta = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type DecoderHandlerEvent::BufferStatus = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type DecoderHandlerEvent::OperationStart = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type DecoderHandlerEvent::OperationStop = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type DecoderHandlerEvent::Error = (QEvent::Type) QEvent::registerEventType();
 
 DecoderHandlerEvent::DecoderHandlerEvent(Type type, const MusicMetadata &meta)
     : MythEvent(type)

@@ -35,29 +35,29 @@
 // Qt headers
 #include <QCoreApplication>
 
-QEvent::Type ScannerEvent::ScanComplete =
+const QEvent::Type ScannerEvent::ScanComplete =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type ScannerEvent::ScanShutdown =
+const QEvent::Type ScannerEvent::ScanShutdown =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type ScannerEvent::ScanErrored =
+const QEvent::Type ScannerEvent::ScanErrored =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type ScannerEvent::AppendTextToLog =
+const QEvent::Type ScannerEvent::AppendTextToLog =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type ScannerEvent::SetStatusText =
+const QEvent::Type ScannerEvent::SetStatusText =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type ScannerEvent::SetStatusTitleText =
+const QEvent::Type ScannerEvent::SetStatusTitleText =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type ScannerEvent::SetPercentComplete =
+const QEvent::Type ScannerEvent::SetPercentComplete =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type ScannerEvent::SetStatusRotorPosition =
+const QEvent::Type ScannerEvent::SetStatusRotorPosition =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type ScannerEvent::SetStatusSignalToNoise =
+const QEvent::Type ScannerEvent::SetStatusSignalToNoise =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type ScannerEvent::SetStatusSignalStrength =
+const QEvent::Type ScannerEvent::SetStatusSignalStrength =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type ScannerEvent::SetStatusSignalLock =
+const QEvent::Type ScannerEvent::SetStatusSignalLock =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type ScannerEvent::SetStatusChannelTuned =
+const QEvent::Type ScannerEvent::SetStatusChannelTuned =
     (QEvent::Type) QEvent::registerEventType();
 
 /// Percentage to set to after the transports have been scanned

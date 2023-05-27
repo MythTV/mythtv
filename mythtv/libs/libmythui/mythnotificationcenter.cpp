@@ -34,7 +34,7 @@ static constexpr std::chrono::milliseconds DEFAULT_DURATION { 5s };
 
 //// MythNotificationCenterEvent
 
-QEvent::Type MythNotificationCenterEvent::kEventType =
+const QEvent::Type MythNotificationCenterEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 //// class MythNotificationScreenStack

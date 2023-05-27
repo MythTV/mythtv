@@ -38,7 +38,7 @@ class META_PUBLIC ImageDLEvent : public QEvent
 
     MetadataLookup *m_item {nullptr};
 
-    static Type kEventType;
+    static const Type kEventType;
 };
 
 class META_PUBLIC ImageDLFailureEvent : public QEvent
@@ -64,7 +64,7 @@ class META_PUBLIC ImageDLFailureEvent : public QEvent
 
     MetadataLookup *m_item {nullptr};
 
-    static Type kEventType;
+    static const Type kEventType;
 };
 
 class META_PUBLIC ThumbnailDLEvent : public QEvent
@@ -81,7 +81,7 @@ class META_PUBLIC ThumbnailDLEvent : public QEvent
 
     ThumbnailData *m_thumb {nullptr};
 
-    static Type kEventType;
+    static const Type kEventType;
 };
 
 class META_PUBLIC MetadataImageDownload : public MThread

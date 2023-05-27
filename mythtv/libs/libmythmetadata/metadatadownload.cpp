@@ -20,10 +20,10 @@
 #include "metadatadownload.h"
 #include "metadatafactory.h"
 
-QEvent::Type MetadataLookupEvent::kEventType =
+const QEvent::Type MetadataLookupEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-QEvent::Type MetadataLookupFailure::kEventType =
+const QEvent::Type MetadataLookupFailure::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 MetadataDownload::~MetadataDownload()

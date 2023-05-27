@@ -60,12 +60,12 @@ class MPUBLIC OutputEvent : public MythEvent
     MythEvent *clone(void) const override // MythEvent
         { return new OutputEvent(*this); }
 
-    static Type Playing;
-    static Type Buffering;
-    static Type Info;
-    static Type Paused;
-    static Type Stopped;
-    static Type Error;
+    static const Type Playing;
+    static const Type Buffering;
+    static const Type Info;
+    static const Type Paused;
+    static const Type Stopped;
+    static const Type Error;
 
   private:
     OutputEvent(const OutputEvent &o) : MythEvent(o),

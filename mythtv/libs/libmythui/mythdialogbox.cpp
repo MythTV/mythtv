@@ -24,7 +24,7 @@
 #include "mythuispinbox.h"
 #include "mythgesture.h"
 
-QEvent::Type DialogCompletionEvent::kEventType =
+const QEvent::Type DialogCompletionEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 // Force this class to have a vtable so that dynamic_cast works.

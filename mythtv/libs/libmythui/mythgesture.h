@@ -88,7 +88,7 @@ class MUI_PUBLIC MythGestureEvent : public QEvent
     Qt::MouseButton GetButton   () const { return m_button; }
     QString         GetButtonName() const;
 
-    static Type kEventType;
+    static const Type kEventType;
 
   private:
     Gesture m_gesture { Unknown  };

@@ -196,19 +196,19 @@ class RipStatusEvent : public QEvent
     QString m_text;
     int     m_value {-1};
 
-    static Type kTrackTextEvent;
-    static Type kOverallTextEvent;
-    static Type kStatusTextEvent;
-    static Type kTrackProgressEvent;
-    static Type kTrackPercentEvent;
-    static Type kTrackStartEvent;
-    static Type kOverallProgressEvent;
-    static Type kOverallPercentEvent;
-    static Type kOverallStartEvent;
-    static Type kCopyStartEvent;
-    static Type kCopyEndEvent;
-    static Type kFinishedEvent;
-    static Type kEncoderErrorEvent;
+    static const Type kTrackTextEvent;
+    static const Type kOverallTextEvent;
+    static const Type kStatusTextEvent;
+    static const Type kTrackProgressEvent;
+    static const Type kTrackPercentEvent;
+    static const Type kTrackStartEvent;
+    static const Type kOverallProgressEvent;
+    static const Type kOverallPercentEvent;
+    static const Type kOverallStartEvent;
+    static const Type kCopyStartEvent;
+    static const Type kCopyEndEvent;
+    static const Type kFinishedEvent;
+    static const Type kEncoderErrorEvent;
 };
 
 class RipStatus : public MythScreenType

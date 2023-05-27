@@ -56,9 +56,9 @@
 static constexpr qint64 FE_SHORT_TO {  2000 }; //  2 seconds
 static constexpr qint64 FE_LONG_TO  { 10000 }; // 10 seconds
 
-static QEvent::Type kNetworkControlDataReadyEvent =
+static const QEvent::Type kNetworkControlDataReadyEvent =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type NetworkControlCloseEvent::kEventType =
+const QEvent::Type NetworkControlCloseEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 static const QRegularExpression kChanID1RE { "^\\d+$" };

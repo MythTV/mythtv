@@ -27,7 +27,7 @@ class MUI_PUBLIC MythNotificationCenterEvent : public MythEvent
 public:
     MythNotificationCenterEvent() : MythEvent(kEventType) { }
 
-    static Type kEventType;
+    static const Type kEventType;
 
     // No implicit copying.
     MythNotificationCenterEvent(MythNotificationCenterEvent &&) = delete;

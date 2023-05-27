@@ -42,10 +42,10 @@ class DecoderEvent : public MythEvent
     MythEvent *clone(void) const override // MythEvent
         { return new DecoderEvent(*this); }
 
-    static Type Decoding;
-    static Type Stopped;
-    static Type Finished;
-    static Type Error;
+    static const Type Decoding;
+    static const Type Stopped;
+    static const Type Finished;
+    static const Type Error;
 
   private:
     DecoderEvent(const DecoderEvent &o) : MythEvent(o)

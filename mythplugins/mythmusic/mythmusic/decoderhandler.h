@@ -43,12 +43,12 @@ class DecoderHandlerEvent : public MythEvent
 
     MythEvent *clone(void) const override; // MythEvent
 
-    static Type Ready;
-    static Type Meta;
-    static Type BufferStatus;
-    static Type OperationStart;
-    static Type OperationStop;
-    static Type Error;
+    static const Type Ready;
+    static const Type Meta;
+    static const Type BufferStatus;
+    static const Type OperationStart;
+    static const Type OperationStop;
+    static const Type Error;
 
   // No implicit copying.
   protected:

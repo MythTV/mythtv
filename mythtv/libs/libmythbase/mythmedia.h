@@ -190,7 +190,7 @@ class MBASE_PUBLIC MythMediaEvent : public QEvent
     MythMediaStatus getOldStatus(void) const { return m_oldStatus; }
     MythMediaDevice* getDevice(void) { return m_device.isNull() ? nullptr : m_device.data(); }
 
-    static Type kEventType;
+    static const Type kEventType;
 
   protected:
     MythMediaStatus m_oldStatus;

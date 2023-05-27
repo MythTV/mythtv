@@ -39,18 +39,18 @@ QString gCDdevice = "";
 
 ////////////////////////////////////////////////////////////////
 
-QEvent::Type MusicPlayerEvent::TrackChangeEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::VolumeChangeEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::TrackAddedEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::TrackRemovedEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::TrackUnavailableEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::AllTracksRemovedEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::MetadataChangedEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::TrackStatsChangedEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::AlbumArtChangedEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::CDChangedEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::PlaylistChangedEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::PlayedTracksChangedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::TrackChangeEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::VolumeChangeEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::TrackAddedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::TrackRemovedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::TrackUnavailableEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::AllTracksRemovedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::MetadataChangedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::TrackStatsChangedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::AlbumArtChangedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::CDChangedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::PlaylistChangedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::PlayedTracksChangedEvent = (QEvent::Type) QEvent::registerEventType();
 
 MusicPlayer::MusicPlayer(QObject *parent)
     :QObject(parent)
