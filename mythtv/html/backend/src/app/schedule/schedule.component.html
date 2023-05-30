@@ -1,2 +1,249 @@
-<h1>Schedule a recording</h1>
-Not yet implemented.
+<form class="ml-3 mr-3" name="schedform" #schedform="ngForm">
+    <div *ngIf="recRule">
+        <p-dialog header="{{ 'dashboard.sched.heading' | translate }}" [(visible)]="displayDlg" [modal]="true"
+            [style]="{height: '75vw', width: '50vw'}" [closable]="false" [closeOnEscape]="false">
+            <p> {{ channel?.ChanNum }} {{ channel?.CallSign }}</p>
+            <p> {{ formatDate(recRule.StartTime) }} {{ formatTime(recRule.StartTime) }} -
+                {{ formatTime(recRule.EndTime )}}
+            </p>
+            <b> {{ recRule.Title }} </b>
+            <p> {{ recRule.SubTitle }} </p>
+            <p> <span *ngIf="recRule.Season && recRule.Episode"> (s{{ recRule.Season }}e{{recRule.Episode}})</span>
+                {{ recRule.Description }} </p>
+            <p-divider></p-divider>
+
+            <div class="form-group field">
+                <label for="Type" class="label block">{{ 'dashboard.sched.type_label' | translate
+                    }}</label>
+                <p-dropdown [options]="typeList" [(ngModel)]="recRule.Type" [editable]="false" optionLabel="prompt"
+                    optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}" name="Type" #Type="ngModel">
+                </p-dropdown>
+            </div>
+
+            <div class="form-group field">
+                <label for="RecGroup" class="label block">{{ 'dashboard.sched.recgroup_label' | translate
+                    }}</label>
+                <p-dropdown [options]="recGroups" [(ngModel)]="recRule.RecGroup" [editable]="true" [maxlength]="64"
+                    [style]="{'minWidth':'400px'}" name="RecGroup" #RecGroup="ngModel">
+                </p-dropdown>
+            </div>
+
+            <div class="form-group field">
+                <p-checkbox inputId="Active" [(ngModel)]="recRule.Inactive" name="Active" #Active="ngModel"
+                    class="label mb-2 w-full" [binary]="true" label="{{ 'dashboard.sched.active_label' | translate }}"
+                    [trueValue]="false" [falseValue]="true">
+                </p-checkbox>
+            </div>
+
+            <div class="form-group field">
+                <label for="PlayGroup" class="label block">{{ 'dashboard.sched.playgroup_label' | translate
+                    }}</label>
+                <p-dropdown [options]="playGroups" [(ngModel)]="recRule.PlayGroup" [editable]="false" [maxlength]="0"
+                    [style]="{'minWidth':'400px'}" PlayGroup="Type" #PlayGroup="ngModel" name="PlayGroup">
+                </p-dropdown>
+            </div>
+
+            <div class="form-group field">
+                <label for="StartOffset" class="label block">{{ 'dashboard.sched.startoffset_label' | translate
+                    }}</label>
+                <p-inputNumber [(ngModel)]="recRule.StartOffset" name="StartOffset" id="StartOffset"
+                    [showButtons]="true" [min]="-480" [max]="480" [step]="1"></p-inputNumber>
+            </div>
+
+            <div class="form-group field">
+                <label for="EndOffset" class="label block">{{ 'dashboard.sched.endoffset_label' | translate
+                    }}</label>
+                <p-inputNumber [(ngModel)]="recRule.EndOffset" name="EndOffset" id="EndOffset" [showButtons]="true"
+                    [min]="-480" [max]="480" [step]="1"></p-inputNumber>
+            </div>
+
+            <div class="form-group field">
+                <p-checkbox inputId="NewEpisOnly" [(ngModel)]="recRule.NewEpisOnly" name="NewEpisOnly" #UseEIT="ngModel"
+                    class="label mb-2 w-full" [binary]="true" label="{{ 'dashboard.sched.newepis_label' | translate }}">
+                </p-checkbox>
+            </div>
+
+            <div class="form-group field">
+                <label for="RecPriority" class="label block">{{ 'dashboard.sched.priority_label' | translate
+                    }}</label>
+                <p-inputNumber [(ngModel)]="recRule.RecPriority" name="RecPriority" id="RecPriority"
+                    [showButtons]="true" [min]="-100" [max]="100" [step]="1"></p-inputNumber>
+            </div>
+
+            <div class="form-group field">
+                <label for="PreferredInput" class="label block">{{ 'dashboard.sched.prefinput_label' | translate
+                    }}</label>
+                <p-dropdown [options]="inputList.Inputs" [(ngModel)]="recRule.PreferredInput" [editable]="false"
+                    optionLabel="DisplayName" optionValue="Id" [maxlength]="0" [style]="{'minWidth':'400px'}"
+                    name="PreferredInput" #PreferredInput="ngModel">
+                </p-dropdown>
+            </div>
+
+            <div class="form-group field">
+                <label for="DupMethod" class="label block">{{ 'dashboard.sched.dupmethod_label' | translate
+                    }}</label>
+                <p-dropdown [options]="dupMethodList" [(ngModel)]="recRule.DupMethod" [editable]="false"
+                    optionLabel="prompt" optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}"
+                    name="DupMethod" #DupMethod="ngModel">
+                </p-dropdown>
+            </div>
+
+            <div class="form-group field">
+                <label for="DupIn" class="label block">{{ 'dashboard.sched.dupin_label' | translate
+                    }}</label>
+                <p-dropdown [options]="dupInList" [(ngModel)]="recRule.DupIn" [editable]="false" optionLabel="prompt"
+                    optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}" name="DupIn" #DupIn="ngModel">
+                </p-dropdown>
+            </div>
+
+            <div class="form-group field">
+                <label for="Filters" class="label block">{{ 'dashboard.sched.filters_label' | translate
+                    }}</label>
+                <p-multiSelect [options]="recRuleFilters" [(ngModel)]="selectedFilters" optionLabel="Description"
+                    optionValue="Id" [style]="{'minWidth':'400px', maxHeight:'400px', maxWidth: '640px'}" name="Filters"
+                    #Filters="ngModel" (onChange)="filterToRec(recRule)"></p-multiSelect>
+            </div>
+
+            <div class="form-group field">
+                <label for="RecProfile" class="label block">{{ 'dashboard.sched.recprofile_label' | translate
+                    }}</label>
+                <p-dropdown [options]="recProfileList" [(ngModel)]="recRule.RecProfile" [editable]="false"
+                    optionLabel="prompt" optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}"
+                    name="RecProfile" #RecProfile="ngModel">
+                </p-dropdown>
+            </div>
+
+            <div class="form-group field">
+                <label for="StorageGroup" class="label block">{{ 'dashboard.sched.sgroup_label' | translate
+                    }}</label>
+                <p-dropdown [options]="recStorageGroups" [(ngModel)]="recRule.StorageGroup" [editable]="false"
+                    [maxlength]="0" [style]="{'minWidth':'400px'}" name="StorageGroup" #StorageGroup="ngModel">
+                </p-dropdown>
+            </div>
+
+            <div class="form-group field">
+                <label for="MaxEpisodes" class="label block">{{ 'dashboard.sched.maxeps_label' | translate
+                    }}</label>
+                <p-inputNumber [(ngModel)]="recRule.MaxEpisodes" name="MaxEpisodes" id="MaxEpisodes"
+                    [showButtons]="true" [min]="0" [max]="100" [step]="1"></p-inputNumber>
+            </div>
+
+            <div class="form-group field">
+                <p-checkbox inputId="MaxNewest" [(ngModel)]="recRule.MaxNewest" name="MaxNewest" #MaxNewest="ngModel"
+                    class="label mb-2 w-full" [binary]="true"
+                    label="{{ 'dashboard.sched.maxnewest_label' | translate }}">
+                </p-checkbox>
+                <small class="block">
+                    {{ 'dashboard.sched.maxnewest_desc' | translate }}
+                </small>
+            </div>
+
+            <div class="form-group field">
+                <p-checkbox inputId="AutoExpire" [(ngModel)]="recRule.AutoExpire" name="AutoExpire"
+                    #AutoExpire="ngModel" class="label mb-2 w-full" [binary]="true"
+                    label="{{ 'dashboard.sched.autoexpire_label' | translate }}">
+                </p-checkbox>
+            </div>
+
+            <div class="form-group field">
+                <label for="PostProc" class="label block">{{ 'dashboard.sched.postproc_label' | translate
+                    }}</label>
+                <p-multiSelect [options]="postProcList" [(ngModel)]="selectedPostProc" optionLabel="prompt"
+                    optionValue="value" [style]="{'minWidth':'400px', maxHeight:'400px', maxWidth: '640px'}"
+                    name="PostProc" #PostProc="ngModel" [filter]="true"
+                    (onChange)="postProcToRec(recRule)"></p-multiSelect>
+            </div>
+
+            <div class="form-group field">
+                <label for="InetRef" class="label block">{{ 'dashboard.sched.inetref_label' | translate }}</label>
+                <div class="grid p-0">
+                    <div class="col-3 flex align-items-center">
+                        <p-radioButton name="prefix" value="ttvdb4.py_" [(ngModel)]="metaPrefix" inputId="ttvdb"
+                            (ngModelChange)="iCheckbox(recRule)"></p-radioButton>
+                        <label for="ttvdb"><img class="pl-1 " src="images/metadata/thetvdb.png" alt="thtvdb"
+                                height="40"></label>
+                    </div>
+                    <div class="col-9 flex align-items-center">
+                        <a href="{{ URLencode('https://thetvdb.com/search?query='+recRule.Title) }}" target="_blank">
+                            {{ 'dashboard.sched.isearch' | translate }} thetvdb.com</a>
+                        <br>
+                    </div>
+                    <div class="col-3 flex align-items-center">
+                        <p-radioButton name="prefix" value="tvmaze.py_" [(ngModel)]="metaPrefix" inputId="tvmaze"
+                            (ngModelChange)="iCheckbox(recRule)"></p-radioButton>
+                        <label for="tvmaze"><img class="pl-1 " src="images/metadata/tvmaze.png" alt="tvmaze"
+                                height="40"></label>
+                    </div>
+                    <div class="col-9 flex align-items-center">
+                        <a href="{{ URLencode('https://www.tvmaze.com/search?q='+recRule.Title) }}" target="_blank">
+                            {{ 'dashboard.sched.isearch' | translate }} tvmaze.com</a>
+                        <br>
+                    </div>
+                    <div class="col-3 flex align-items-center">
+                        <p-radioButton name="prefix" value="tmdb3.py_" [(ngModel)]="metaPrefix" inputId="tmdb"
+                            (ngModelChange)="iCheckbox(recRule)"></p-radioButton>
+                        <label for="tmdb"><img class="pl-1 " src="images/metadata/themoviedb.svg" alt="themoviedb"
+                                height="40"></label>
+                    </div>
+                    <div class="col-9 flex align-items-center">
+                        <a href="{{ URLencode('https://www.themoviedb.org/search?query='+recRule.Title) }}"
+                            target="_blank">
+                            {{ 'dashboard.sched.isearch' | translate }} themoviedb.org</a>
+                        <br>
+                    </div>
+                </div>
+                {{ metaPrefix }} &nbsp;
+                <input pInputText id="InetRef" [(ngModel)]="recRule.InetRef" name="InetRef" #InetRef="ngModel"
+                    class="mb-2 form-control w-full" (ngModelChange)="iText(recRule)" />
+                <small class="block">
+                    {{ 'dashboard.sched.inetref_desc' | translate }}<br>
+                </small>
+            </div>
+
+            <div class="form-group field">
+                <label for="Template" class="label block">{{ 'dashboard.sched.template_label' | translate
+                    }}</label>
+                <p-dropdown [options]="templates" [(ngModel)]="templateId" [editable]="false" optionLabel="Title"
+                    optionValue="Id" [maxlength]="0" [style]="{'minWidth':'400px'}" name="Template" #Template="ngModel"
+                    class="pr-5">
+                </p-dropdown>
+                <p-button icon="pi pi-check-circle" (onClick)="templateChange(recRule)"
+                    label="{{ 'dashboard.sched.template_apply' | translate }}" styleClass="p-button-success"
+                    [disabled]="!templateId"></p-button>
+
+            </div>
+
+            <!-- Blank space here is so that the dropdown box can fit, otherwise there can be an impossible
+                 situation with the scroll bars and the dropdown box-->
+            <br><br><br><br><br><br><br><br>
+
+            <ng-template pTemplate="footer">
+                <div class="col-12" style="text-align: left;">
+                    <p-message *ngIf="successCount > 0 && errorCount == 0 && !schedform.dirty" severity="success"
+                        text="{{ 'common.savesuccess' | translate }}"></p-message>
+                    <p-message *ngIf="errorCount > 0" severity="error"
+                        text="{{ 'common.networkfail' | translate }}"></p-message>
+                </div>
+                <p-button icon="pi pi-times-circle" (onClick)="close()" label="{{ 'common.close' | translate }}"
+                    styleClass="p-button-warning">
+                </p-button>
+                <p-button icon="pi pi-check-circle" (onClick)="save();" label="{{ 'common.save' | translate }}"
+                    styleClass="p-button-success"
+                    [disabled]="!schedform.dirty || recRule.Id == 0 && recRule.Type == 'Not Recording' "></p-button>
+            </ng-template>
+
+        </p-dialog>
+
+        <p-dialog header="{{ 'common.unsaved_heading' | translate }}" [(visible)]="displayUnsaved" [modal]="true">
+            <p>{{ 'common.unsaved_message' | translate }}</p>
+            <ng-template pTemplate="footer">
+                <p-button icon="pi pi-times-circle" (onClick)="close()" label="{{ 'common.nosave' | translate }}"
+                    styleClass="p-button-danger">
+                </p-button>
+                <p-button icon="pi pi-check-circle" (onClick)="displayUnsaved=false"
+                    label="{{ 'common.continue' | translate }}" styleClass="p-button-success">
+                </p-button>
+            </ng-template>
+        </p-dialog>
+    </div>
+</form>

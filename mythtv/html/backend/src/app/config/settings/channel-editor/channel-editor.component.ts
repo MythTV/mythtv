@@ -322,13 +322,11 @@ export class ChannelEditorComponent implements OnInit {
     );
   }
 
-  // Since the dialog is modal we may not actually need this function
   confirm(message?: string): Observable<boolean> {
     const confirmation = window.confirm(message);
     return of(confirmation);
   };
 
-  // Since the dialog is modal we may not actually need this function
   canDeactivate(): Observable<boolean> | boolean {
     if (this.currentForm && this.currentForm.dirty)
       return this.confirm(this.warningText);

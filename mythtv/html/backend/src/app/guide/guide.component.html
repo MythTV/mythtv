@@ -31,7 +31,8 @@
                             <ng-container *ngIf="!refreshing && inDisplayWindow(program.StartTime, program.EndTime)">
                                 <app-guide-programentry [program]="program"
                                     [guideStartTime]="m_programGuide.ProgramGuide.StartTime"
-                                    [guideEndTime]="m_programGuide.ProgramGuide.EndTime">
+                                    [guideEndTime]="m_programGuide.ProgramGuide.EndTime"
+                                    [guideComponent]="this" [channel]="channelrow">
                                 </app-guide-programentry>
                             </ng-container>
                         </ng-container>
@@ -41,6 +42,7 @@
         </ng-template>
     </p-dataView>
 </div>
+<app-schedule [inter]="inter"></app-schedule>
 <ng-template #loading>
     <p-progressSpinner></p-progressSpinner>
 </ng-template>

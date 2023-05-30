@@ -4,24 +4,24 @@ import { Observable } from 'rxjs';
 import {
   AddDontRecordScheduleRequest,
   AddRecordedCreditsRequest,
-  AddRecordScheduleRequest,
   DeleteRecordingRequest,
   GetConflictListRequest,
   GetExpiringListRequest,
   GetLastPlayPosRequest,
   GetOldRecordedListRequest,
-  GetPlayGroupListResponse,
-  GetProgramCategoriesResponse,
-  GetRecGroupListResponse,
+  PlayGroupList,
+  ProgramCategories,
+  RecGroupList,
   GetRecordedListRequest,
   GetRecordedRequest,
   GetRecordScheduleListRequest,
   GetRecordScheduleRequest,
-  GetRecStorageGroupListResponse,
-  GetUpcomingListResponse,
+  RecStorageGroupList,
+  UpcomingList,
   GetUpcomingRequest,
   UnDeleteRecordingRequest,
-  UpdateRecordedMetadataRequest
+  UpdateRecordedMetadataRequest,
+  RecordScheduleRequest
 } from './interfaces/dvr.interface';
 import { BoolResponse, StringResponse } from './interfaces/common.interface';
 import { ProgramList, ScheduleOrProgram } from './interfaces/program.interface';
@@ -40,8 +40,16 @@ export class DvrService {
     return this.httpClient.post<BoolResponse>('/Dvr/AddDontRecordSchedule', request);
   }
 
-  public AddRecordSchedule(request: AddRecordScheduleRequest): Observable<number> {
+  public AddRecordSchedule(request: RecordScheduleRequest): Observable<number> {
     return this.httpClient.post<number>('/Dvr/AddRecordSchedule', request);
+  }
+
+  public UpdateRecordSchedule(request: RecordScheduleRequest): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Dvr/UpdateRecordSchedule', request);
+  }
+
+  public RemoveRecordSchedule(RecordId: number): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Dvr/RemoveRecordSchedule', {RecordId: RecordId});
   }
 
   public AddRecordedCredits(request: AddRecordedCreditsRequest): Observable<BoolResponse> {
@@ -119,8 +127,8 @@ export class DvrService {
     return this.httpClient.get<ProgramList>('/Dvr/GetExpiringList', { params });
   }
 
-  public GetInputList(): Observable<InputList> {
-    return this.httpClient.get<InputList>('/Dvr/GetInputList');
+  public GetInputList(): Observable<{InputList: InputList}> {
+    return this.httpClient.get<{InputList: InputList}>('/Dvr/GetInputList');
   }
 
   public GetLastPlayPos(request: GetLastPlayPosRequest): Observable<number> {
@@ -146,46 +154,40 @@ export class DvrService {
     return this.httpClient.get<ProgramList>('/Dvr/GetOldRecordedList', { params });
   }
 
-  public GetPlayGroupList(): Observable<GetPlayGroupListResponse> {
-    return this.httpClient.get<GetPlayGroupListResponse>('/Dvr/GetPlayGroupList');
+  public GetPlayGroupList(): Observable<PlayGroupList> {
+    return this.httpClient.get<PlayGroupList>('/Dvr/GetPlayGroupList');
   }
 
-  public GetProgramCategories(OnlyRecorded: boolean): Observable<GetProgramCategoriesResponse> {
+  public GetProgramCategories(OnlyRecorded: boolean): Observable<ProgramCategories> {
     let params = new HttpParams()
       .set("OnlyRecorded", OnlyRecorded);
-    return this.httpClient.get<GetProgramCategoriesResponse>('/Dvr/GetProgramCategories')
+    return this.httpClient.get<ProgramCategories>('/Dvr/GetProgramCategories')
   }
 
-  public GetRecGroupList(): Observable<GetRecGroupListResponse> {
-    return this.httpClient.get<GetRecGroupListResponse>('/Dvr/GetRecGroupList');
+  public GetRecGroupList(): Observable<RecGroupList> {
+    return this.httpClient.get<RecGroupList>('/Dvr/GetRecGroupList');
   }
 
-  public GetRecRuleFilterList(): Observable<RecRuleFilterList> {
-    return this.httpClient.get<RecRuleFilterList>('/Dvr/GetRecRuleFilterList');
+  public GetRecRuleFilterList(): Observable<{RecRuleFilterList: RecRuleFilterList}> {
+    return this.httpClient.get<{RecRuleFilterList: RecRuleFilterList}>('/Dvr/GetRecRuleFilterList');
   }
 
-  public GetRecStorageGroupList(): Observable<GetRecStorageGroupListResponse> {
-    return this.httpClient.get<GetRecStorageGroupListResponse>('/Dvr/GetRecStorageGroupList');
+  public GetRecStorageGroupList(): Observable<RecStorageGroupList> {
+    return this.httpClient.get<RecStorageGroupList>('/Dvr/GetRecStorageGroupList');
   }
 
-  public GetRecordSchedule(request: GetRecordScheduleRequest): Observable<RecRule> {
+  public GetRecordSchedule(request: GetRecordScheduleRequest): Observable<{RecRule: RecRule}> {
     let params = new HttpParams()
-      .set("RecordId", request.RecordId)
-      .set("Template", request.Template)
-      .set("RecordedId", request.RecordedId)
-      .set("ChanId", request.ChanId)
-      .set("StartTime", request.StartTime)
-      .set("MakeOverride", request.MakeOverride);
-    return this.httpClient.get<RecRule>('/Dvr/GetRecordSchedule', { params });
+    for (const [key, value] of Object.entries(request))
+      params = params.set(key, value);
+    return this.httpClient.get<{RecRule: RecRule}>('/Dvr/GetRecordSchedule', { params });
   }
 
-  public GetRecordScheduleList(request: GetRecordScheduleListRequest): Observable<RecRuleList> {
+  public GetRecordScheduleList(request: GetRecordScheduleListRequest): Observable<{RecRuleList: RecRuleList}> {
     let params = new HttpParams()
-      .set("StartIndex", request.StartIndex)
-      .set("Count", request.Count)
-      .set("Sort", request.Sort)
-      .set("Descending", request.Descending);
-    return this.httpClient.get<RecRuleList>('/Dvr/GetRecordScheduleList', { params });
+    for (const [key, value] of Object.entries(request))
+      params = params.set(key, value);
+    return this.httpClient.get<{RecRuleList: RecRuleList}>('/Dvr/GetRecordScheduleList', { params });
   }
 
   public GetRecorded(request: GetRecordedRequest): Observable<{ Program: ScheduleOrProgram }> {
@@ -204,11 +206,11 @@ export class DvrService {
   }
 
   // All parameters are optional
-  public GetUpcomingList(request: GetUpcomingRequest): Observable<GetUpcomingListResponse> {
+  public GetUpcomingList(request: GetUpcomingRequest): Observable<UpcomingList> {
     let params = new HttpParams();
     for (const [key, value] of Object.entries(request))
       params = params.set(key, value);
-    return this.httpClient.get<GetUpcomingListResponse>('/Dvr/GetUpcomingList', { params });
+    return this.httpClient.get<UpcomingList>('/Dvr/GetUpcomingList', { params });
   }
 
   public RecStatusToString(recStatus: number): Observable<StringResponse> {

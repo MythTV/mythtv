@@ -53,7 +53,8 @@
       "season": "Season",
       "episode": "Episode",
       "canundel": "You can reverse this by using Undelete.",
-      "alreadydel": "Already Deleted"
+      "alreadydel": "Already Deleted",
+      "edit_metadata": "Edit Metadata"
     },
     "upcoming": {
       "heading": "Upcoming",
@@ -62,6 +63,70 @@
       "status": "Status",
       "showall": "Show All",
       "encoder": "Encoder"
+    },
+    "sched": {
+      "type": {
+        "del_template": "Delete this recording rule template",
+        "mod_template": "Modify this recording rule template",
+        "del_override": "Record this showing with normal options",
+        "rec_override": "Record this showing with override options",
+        "dont_rec_override": "Do not record this showing",
+        "not": "Do Not Record This Program",
+        "this": "Record Only This Showing",
+        "one": "Record Only One Showing",
+        "weekly": "Record one showing every week",
+        "daily": "Record one showing every day",
+        "all": "Record All Showings"
+      },
+      "type_label": "Schedule Type",
+      "recgroup_label": "Recording Group",
+      "active_label": "Recording Rule is Active",
+      "playgroup_label": "Playback Group",
+      "newepis_label": "Record New Episodes Only",
+      "startoffset_label": "Number of Extra Minutes to Record at Start",
+      "endoffset_label": "Number of Extra Minutes to Record at End",
+      "priority_label": "Recording Priority",
+      "input_any": "Any Input",
+      "prefinput_label": "Preferred Input",
+      "dupmethod": {
+        "none": "Don't Match Duplicates",
+        "s_and_d": "Match Using Subtitle & Description",
+        "s_then_d": "Match Using Subtitle Then Description",
+        "s": "Match Duplicates Using Subtitle",
+        "d": "Match Duplicates Using Description"
+      },
+      "dupmethod_label": "Duplicate Match Method",
+      "dupin": {
+        "both": "Current and Previous Recordings",
+        "curr": "Current Recordings Only",
+        "prev": "Previous Recordings Only"
+      },
+      "dupin_label": "Duplicate Search Scope",
+      "filters_label": "Filter Options",
+      "recprof": {
+        "default": "Default",
+        "livetv": "Live TV",
+        "highq": "High Quality",
+        "lowq": "Low Quality"
+      },
+      "recprofile_label": "Recording Profile",
+      "sgroup_label": "Storage Group",
+      "maxeps_label": "Maximum Number of Episodes to Keep",
+      "maxnewest_label": "Deletion on Maximum Episodes",
+      "maxnewest_desc": "If unchecked, stop recording when maximum episodes are reached.",
+      "autoexpire_label": "Auto Expire",
+      "postproc": {
+        "autocommflag": "Commercial Flag Recordings",
+        "autometalookup": "Look up MetaData",
+        "autotranscode": "Transcode Recordings"
+      },
+      "postproc_label": "Post Processing Options",
+      "inetref_label": "Metadata Lookup Id (InetRef)",
+      "inetref_desc": "Use TheTVDB, TVmaze or TMDB to look up recording metadata. Select a radio button above and use the link to search the web site. Once you find the correct series on the web page, select it and copy the numeric id from the URL, or from the web page in the case of thetvdb.com. Enter that in the input box immediately after the prefix xxxx.py_",
+      "template_label": "Use Template",
+      "template_apply": "Apply Template Change",
+      "isearch": "Search",
+      "heading": "Schedule recording"
     }
   },
   "navbar": {

@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
 import { GuideComponent } from '../../guide.component';
 import { DataService } from 'src/app/services/data.service';
+import { Channel } from 'src/app/services/interfaces/channel.interface';
 
 @Component({
   selector: 'app-guide-programentry',
@@ -10,8 +11,10 @@ import { DataService } from 'src/app/services/data.service';
 })
 export class ProgramEntryComponent implements OnInit {
   @Input() program!: ScheduleOrProgram;
+  @Input() channel!: Channel;
   @Input() guideStartTime!: string;
   @Input() guideEndTime!: string;
+  @Input() guideComponent!: GuideComponent;
 
   editSchedule: boolean = false;
 
@@ -36,8 +39,8 @@ export class ProgramEntryComponent implements OnInit {
     return program_width;
   }
 
-
-  showDetailsDialog() {
-    this.editSchedule = true;
+  openDialog() {
+    if (this.guideComponent.inter.sched)
+      this.guideComponent.inter.sched.open(this.program, this.channel);
   }
 }

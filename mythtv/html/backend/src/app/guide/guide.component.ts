@@ -5,6 +5,7 @@ import { GuideService } from 'src/app/services/guide.service';
 import { Channel } from '../services/interfaces/channel.interface';
 import { ProgramGuide } from 'src/app/services/interfaces/programguide.interface';
 import { TranslateService, TranslationChangeEvent } from '@ngx-translate/core';
+import { ScheduleLink } from '../schedule/schedule.component';
 
 @Component({
   selector: 'app-guide',
@@ -25,6 +26,7 @@ export class GuideComponent implements OnInit {
   m_programGuide!: ProgramGuide;
   loaded = false;
   refreshing = false;
+  inter: ScheduleLink = { guide: this };
 
   constructor(private guideService: GuideService,
     private translate: TranslateService) {
@@ -86,7 +88,13 @@ export class GuideComponent implements OnInit {
     else
       this.m_startDate = new Date();
     console.log("New time is " + this.m_startDate);
-    this.fetchData(this.m_startDate);
-    this.refreshing = true;
+    this.refresh(true);
+  }
+
+  refresh(hide: boolean) {
+    if (this.m_startDate){
+      this.fetchData(this.m_startDate);
+      this.refreshing = hide;
+    }
   }
 }

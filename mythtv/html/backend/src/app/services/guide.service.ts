@@ -76,7 +76,7 @@ export class GuideService {
   }
 
   public GetProgramGuide(reqDate?: Date) : Observable<ProgramGuide> {
-    if (typeof reqDate !== 'undefined') {
+    if (reqDate) {
       this.startDate = reqDate;
     }
     let time : string = this.toHalfHour(this.startDate).toISOString();
