@@ -4,6 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { PartialObserver } from 'rxjs';
+import { ScheduleLink } from 'src/app/schedule/schedule.component';
 import { DataService } from 'src/app/services/data.service';
 import { DvrService } from 'src/app/services/dvr.service';
 import { ProgramList, ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
@@ -20,7 +21,6 @@ export class UpcomingComponent implements OnInit {
   @ViewChild("menu") menu!: Menu;
 
   recordings!: ProgramList;
-  program: ScheduleOrProgram = <ScheduleOrProgram>{ Title: '' };
   editingProgram?: ScheduleOrProgram;
   displayUpdateDlg = false;
   displayUnsaved = false;
@@ -28,34 +28,19 @@ export class UpcomingComponent implements OnInit {
   errorCount = 0;
   showAllStatuses = false;
   refreshing = false;
-
-
-  // Menu Items
-  mnu_updaterecrule: MenuItem = { label: 'dashboard.recordings.mnu_updaterecrule', command: (event) => this.updaterecrule(event) };
-  mnu_stoprec: MenuItem = { label: 'dashboard.recordings.mnu_stoprec', command: (event) => this.stoprec(event) };
-
-  menuToShow: MenuItem[] = [];
+  inter: ScheduleLink = { summaryComponent: this };
 
   constructor(private dvrService: DvrService, private messageService: MessageService,
     private translate: TranslateService, public dataService: DataService) {
-    this.getList();
-
-    const mnu_entries = [this.mnu_updaterecrule, this.mnu_stoprec];
-    mnu_entries.forEach(entry => {
-      if (entry.label)
-        this.translate.get(entry.label).subscribe(data =>
-          entry.label = data
-        );
-    });
+    this.refresh();
   }
 
-  getList() {
+  refresh() {
     this.refreshing = true;
     this.dvrService.GetUpcomingList({ ShowAll: this.showAllStatuses }).subscribe(data => {
       this.recordings = data.ProgramList
       this.refreshing = false;
     });
-
   }
 
   ngOnInit(): void { }
@@ -84,11 +69,10 @@ export class UpcomingComponent implements OnInit {
     return duration;
   }
 
-  updateRecRule(program: ScheduleOrProgram, event: any) {
-    this.program = program;
+  updateRecRule(program: ScheduleOrProgram) {
+    let copyProgram = Object.assign({}, program);
+    if (this.inter.sched)
+      this.inter.sched.open(copyProgram);
   }
-
-  updaterecrule(event: any) { }
-  stoprec(event: any) { }
 
 }

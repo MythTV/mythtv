@@ -11,7 +11,6 @@
     </div>
     <div class="block card w-full" style="height: 90vh" *ngIf="recordings else loading">
 
-        <p-menu #menu [popup]="true" [model]="menuToShow"></p-menu>
         <p-table [value]="recordings.Programs" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
             [rowHover]="true">
             <ng-template pTemplate="caption">
@@ -20,7 +19,7 @@
                 <tr>
                     <th>
                         <p-checkbox inputId="showAllStatuses" [(ngModel)]="showAllStatuses" name="showAllStatuses"
-                            #showAll="ngModel" [binary]="true" (onChange)="getList()" label="{{ 'dashboard.upcoming.showall' | translate }}">
+                            #showAll="ngModel" [binary]="true" (onChange)="refresh()" label="{{ 'dashboard.upcoming.showall' | translate }}">
                         </p-checkbox>
 
                     </th>
@@ -79,13 +78,14 @@
                         {{dataService.recStatusText[program.Recording.StatusName]}}</td>
                     <td style="flex-grow: 3; flex-basis: 0;" class="p-1">
                         <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-primary"
-                            (click)="updateRecRule(program,$event)"></button>
+                            (click)="updateRecRule(program)"></button>
                     </td>
                 </tr>
             </ng-template>
         </p-table>
 
     </div>
+    <app-schedule [inter]="inter"></app-schedule>
     <ng-template #loading>
         <p-progressSpinner></p-progressSpinner>
     </ng-template>

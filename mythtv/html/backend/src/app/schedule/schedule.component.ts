@@ -11,9 +11,13 @@ import { RecordScheduleRequest } from '../services/interfaces/dvr.interface';
 import { GuideComponent } from '../guide/guide.component';
 import { Observable, of } from 'rxjs';
 
+export interface SchedulerSummary {
+  refresh(): void;
+}
+
 export interface ScheduleLink {
   sched?: ScheduleComponent;
-  guide: GuideComponent;
+  summaryComponent: SchedulerSummary;
 }
 
 interface ListEntry {
@@ -200,10 +204,7 @@ export class ScheduleComponent implements OnInit {
         if (!channel && this.program.Channel)
           this.channel = this.program.Channel;
       }
-      else
-        return; // nothing to do
     }
-    // this.setupData();
     this.loadLists();
     this.displayDlg = true;
   }
@@ -231,15 +232,17 @@ export class ScheduleComponent implements OnInit {
       // this.recRule = <RecRule>Object.assign({}, this.defaultTemplate);
       this.recRule.Type = 'Not Recording';
     }
-    if (this.program && this.channel)
+    if (!this.recRule.SearchType)
+      this.recRule.SearchType = 'None';
+
+    // if (this.program && this.channel && this.recRule.Id == 0)
+    if (this.program && this.channel && this.recRule.SearchType == 'None')
       this.mergeProgram(this.recRule, this.program, this.channel);
 
     if (!this.recRule.Type)
       this.recRule.Type = 'Not Recording';
     if (!this.recRule.StartTime)
       this.recRule.StartTime = (new Date()).toISOString();
-    if (!this.recRule.SearchType)
-      this.recRule.SearchType = 'None';
 
     this.filterFromRec(this.recRule);
     this.postProcFromRec(this.recRule);
@@ -279,13 +282,14 @@ export class ScheduleComponent implements OnInit {
       );
     else {
       const isManual = (this.recRule.SearchType == 'Manual Search');
+      const isSearch = (this.recRule.SearchType != 'None');
       this.typeList.push(
         {
           prompt: this.translate.instant('dashboard.sched.type.not'),
           value: 'Not Recording'
         }
       );
-      if (this.recRule.CallSign)
+      if (this.recRule.CallSign && !isSearch)
         this.typeList.push(
           {
             prompt: this.translate.instant('dashboard.sched.type.this'),
@@ -299,7 +303,7 @@ export class ScheduleComponent implements OnInit {
             value: 'Record One'
           }
         );
-      if (!this.recRule.CallSign || isManual)
+      if (!this.recRule.CallSign || isSearch)
         this.typeList.push(
           {
             prompt: this.translate.instant('dashboard.sched.type.weekly'),
@@ -477,7 +481,7 @@ export class ScheduleComponent implements OnInit {
         if (this.recRule.Id && x.bool) {
           this.successCount++;
           this.currentForm.form.markAsPristine();
-          setTimeout(() => this.inter.guide.refresh(false), 5000);
+          setTimeout(() => this.inter.summaryComponent.refresh(), 3000);
           // after a deletion clear out the id so the next save
           // would add a new one.
           if (this.recRule.Type == 'Not Recording')
@@ -486,7 +490,7 @@ export class ScheduleComponent implements OnInit {
         else if (!this.recRule.Id && x.uint) {
           this.successCount++;
           this.currentForm.form.markAsPristine();
-          setTimeout(() => this.inter.guide.refresh(false), 5000);
+          setTimeout(() => this.inter.summaryComponent.refresh(), 3000);
           this.recRule.Id = x.uint;
         }
         else {
@@ -579,7 +583,7 @@ export class ScheduleComponent implements OnInit {
     return ret;
   }
 
-  URLencode(x: string) : string {
+  URLencode(x: string): string {
     return encodeURI(x);
   }
 
