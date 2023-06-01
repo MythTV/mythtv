@@ -31,6 +31,7 @@ export class DbsetupComponent implements OnInit {
     commandlist = '';
     mySqlCommand = 'sudo mysql -u root < setup.sql'
     tzCommand = 'mysql_tzinfo_to_sql /usr/share/zoneinfo | sudo mysql -u root mysql'
+    dbtype = "MySQL";
 
     msg_testconnection = 'setupwizard.testConnection';
     msg_connectionsuccess = 'setupwizard.connectionsuccess';
@@ -105,13 +106,21 @@ export class DbsetupComponent implements OnInit {
             else {
                 this.messageService.add({ severity: 'error', life: 5000, summary: this.msg_testconnection, detail: this.msg_connectionfail });
                 this.connectionFail = true;
-                this.commandlist =
-                `CREATE DATABASE IF NOT EXISTS ${this.m_wizardData.Database.Name};\n` +
-                `ALTER DATABASE ${this.m_wizardData.Database.Name} DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;\n` +
-                `CREATE USER IF NOT EXISTS '${this.m_wizardData.Database.UserName}'@'localhost' IDENTIFIED WITH mysql_native_password by '${this.m_wizardData.Database.Password}';\n` +
-                `GRANT ALL ON ${this.m_wizardData.Database.Name}.* TO '${this.m_wizardData.Database.UserName}'@'localhost';`
+                this.setCommandList();
             }
         });
+    }
+
+    setCommandList() {
+        let pwType = '';
+        if (this.dbtype == 'MySQL')
+            pwType = 'WITH mysql_native_password';
+        this.commandlist =
+        `CREATE DATABASE IF NOT EXISTS ${this.m_wizardData.Database.Name};\n` +
+        `CREATE USER IF NOT EXISTS '${this.m_wizardData.Database.UserName}'@'localhost' IDENTIFIED ${pwType} by '${this.m_wizardData.Database.Password}';\n` +
+        `CREATE USER IF NOT EXISTS '${this.m_wizardData.Database.UserName}'@'%' IDENTIFIED ${pwType} by '${this.m_wizardData.Database.Password}';\n` +
+        `GRANT ALL ON ${this.m_wizardData.Database.Name}.* TO '${this.m_wizardData.Database.UserName}'@'localhost';\n` +
+        `GRANT ALL ON ${this.m_wizardData.Database.Name}.* TO '${this.m_wizardData.Database.UserName}'@'%';`
     }
 
     confirm(message?: string): Observable<boolean> {

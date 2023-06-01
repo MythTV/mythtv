@@ -20,38 +20,43 @@ export class SetupService {
 
 
     constructor(private mythService: MythService, private translate: TranslateService) {
-        this.mythService.GetHostName().subscribe(data => {
-            this.m_hostName = data.String;
-        });
     }
 
     Init(): void {
         this.m_initialized = true;
     }
 
-    getHostName(): string {
-        return this.m_hostName;
-    }
-
-    m_HostAddressData!: HostAddress;
+    m_HostAddressData: HostAddress = {
+        successCount: 0,
+        errorCount: 0,
+        thisHostName:  this.m_hostName,
+        BackendServerPort: 6543,
+        BackendStatusPort: 6544,
+        SecurityPin: '0000',
+        AllowConnFromAll: false,
+        ListenOnAllIps: true,
+        BackendServerIP: '127.0.0.1',
+        BackendServerIP6: '::1',
+        AllowLinkLocal: true,
+        BackendServerAddr: '',
+        IsMasterBackend: true,
+        MasterServerName: this.m_hostName,
+    };
 
     getHostAddressData(): HostAddress {
-        this.m_HostAddressData = {
-            successCount: 0,
-            errorCount: 0,
-            thisHostName: this.m_hostName,
-            BackendServerPort: 6543,
-            BackendStatusPort: 6544,
-            SecurityPin: '0000',
-            AllowConnFromAll: false,
-            ListenOnAllIps: true,
-            BackendServerIP: '127.0.0.1',
-            BackendServerIP6: '::1',
-            AllowLinkLocal: true,
-            BackendServerAddr: '',
-            IsMasterBackend: true,
-            MasterServerName: this.m_hostName,
-        };
+        this.mythService.GetHostName().subscribe({
+            next: data => {
+                this.m_hostName = data.String;
+                this.m_HostAddressData.thisHostName = this.m_hostName;
+                this.m_HostAddressData.MasterServerName = this.m_hostName;
+                this.getHostSettings();
+            },
+            error: () => this.m_HostAddressData.errorCount++
+        })
+        return this.m_HostAddressData;
+    }
+
+    getHostSettings () {
         this.mythService.GetSetting({ HostName: this.m_hostName, Key: "BackendServerPort", Default:"6543" })
             .subscribe({
                 next: data => this.m_HostAddressData.BackendServerPort = Number(data.String),
@@ -106,7 +111,6 @@ export class SetupService {
                 error: () => this.m_HostAddressData.errorCount++
             });
 
-        return this.m_HostAddressData;
     }
 
     HostAddressObs = {

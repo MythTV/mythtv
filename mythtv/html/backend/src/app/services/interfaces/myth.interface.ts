@@ -1,4 +1,5 @@
 import { StorageGroupDirList } from "./storagegroup.interface";
+
 export interface MythHostName {
     String: string;  // That's what the service returns as the key
 }
