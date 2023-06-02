@@ -55,7 +55,8 @@ HTTPResponse MythHTTPRewrite::RewriteToSPA(const HTTPRequest2& Request, const QS
 
     LOG(VB_HTTP, LOG_INFO, QString("Rewriting request to web app '%1'").arg(File));
     if (!File.isEmpty()
-        && (Request->m_path.isEmpty() || Request->m_path == "/" || Request->m_path == "/settings/"))
+        && (Request->m_path.isEmpty() || Request->m_path == "/"
+            || Request->m_path == "/dashboard/" || Request->m_path == "/setupwizard/"))
     {
         Request->m_fileName = File;
         Request->m_status = HTTPOK;
