@@ -156,7 +156,7 @@ HTTPResponse MythHTTPService::HTTPRequest(const HTTPRequest2& Request)
                 QString file = info.absoluteFilePath();
                 if (file.size() == 0)
                 {
-                    LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Invalid request for unknown file"));
+                    LOG(VB_HTTP, LOG_WARNING, LOC + QString("Invalid request for unknown file"));
                     Request->m_status = HTTPNotFound;
                     result =  MythHTTPResponse::ErrorResponse(Request);
                 }

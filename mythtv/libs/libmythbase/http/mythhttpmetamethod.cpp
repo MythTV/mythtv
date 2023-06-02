@@ -53,7 +53,7 @@ MythHTTPMetaMethod::MythHTTPMetaMethod(int Index, QMetaMethod& Method, int Reque
     // fail if all arguments are required and used
     if (Method.parameterCount() > (Q_METAMETHOD_INVOKE_MAX_ARGS - 1))
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Method '%1' takes more than %2 parameters; will probably fail")
+        LOG(VB_HTTP, LOG_WARNING, LOC + QString("Method '%1' takes more than %2 parameters; will probably fail")
             .arg(Method.name().constData()).arg(Q_METAMETHOD_INVOKE_MAX_ARGS - 1));
     }
 
