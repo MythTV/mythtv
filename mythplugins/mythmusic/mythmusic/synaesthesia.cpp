@@ -584,12 +584,10 @@ bool Synaesthesia::process(VisualNode *node)
     return false;
 }
 
-bool Synaesthesia::draw(QPainter *p, const QColor &back)
+bool Synaesthesia::draw(QPainter *p, [[maybe_unused]] const QColor &back)
 {
     if (!m_outputImage)
         return true;
-
-    (void)back;
 
     auto *ptrOutput = (uint32_t *)output;
 
@@ -643,10 +641,9 @@ static class SynaesthesiaFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent,  const QString &pluginName) const override // VisFactory
+    VisualBase *create([[maybe_unused]] MainVisual *parent,
+                       [[maybe_unused]] const QString &pluginName) const override // VisFactory
     {
-        (void)parent;
-        (void)pluginName;
         return new Synaesthesia();
     }
 } SynaesthesiaFactory;

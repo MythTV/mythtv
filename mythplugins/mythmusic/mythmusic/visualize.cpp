@@ -915,7 +915,7 @@ bool Spectrum::process(VisualNode *node)
     // Take a bunch of data in *node
     // and break it down into spectrum
     // values
-    bool allZero = true;
+    [[maybe_unused]] bool allZero = true;
 
     uint i = 0;
     long w = 0;
@@ -1009,7 +1009,6 @@ bool Spectrum::process(VisualNode *node)
         index = m_scale[i];
     }
 
-    Q_UNUSED(allZero);
     return false;
 }
 

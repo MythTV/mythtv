@@ -271,10 +271,8 @@ void MythBrowser::slotLoadStarted(void)
         item->SetText(tr("Loading..."));
 }
 
-void MythBrowser::slotLoadFinished(bool OK)
+void MythBrowser::slotLoadFinished([[maybe_unused]] bool OK)
 {
-    (void) OK;
-
     if (m_progressBar)
         m_progressBar->SetUsed(0);
 

@@ -297,9 +297,8 @@ void SearchView::ShowMenu(void)
         MusicCommon::ShowMenu();
 }
 
-void SearchView::fieldSelected(MythUIButtonListItem *item)
+void SearchView::fieldSelected([[maybe_unused]] MythUIButtonListItem *item)
 {
-    (void) item;
     updateTracksList();
 }
 

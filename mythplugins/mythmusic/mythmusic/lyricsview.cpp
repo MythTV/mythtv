@@ -576,10 +576,8 @@ void EditLyricsDialog::loadLyrics(void)
     m_lyricsEdit->SetText(lyrics);
 }
 
-void EditLyricsDialog::syncronizedChanged(bool syncronized)
+void EditLyricsDialog::syncronizedChanged([[maybe_unused]] bool syncronized)
 {
-    (void) syncronized;
-
     loadLyrics();
 }
 

@@ -76,10 +76,8 @@ void BumpScope::resize(const QSize &newsize)
     generate_cmap(m_color);
 }
 
-void BumpScope::blur_8(unsigned char *ptr, int w, int h, ptrdiff_t bpl)
+void BumpScope::blur_8(unsigned char *ptr, [[maybe_unused]] int w, int h, ptrdiff_t bpl)
 {
-    (void)w;
-
     uchar *iptr = ptr + bpl + 1;
     uint i = bpl * h;
 
@@ -382,15 +380,13 @@ bool BumpScope::process(VisualNode *node)
     return false;
 }
 
-bool BumpScope::draw(QPainter *p, const QColor &back)
+bool BumpScope::draw(QPainter *p, [[maybe_unused]] const QColor &back)
 {
     if (!m_image || m_image->isNull())
     {
         LOG(VB_GENERAL, LOG_ERR, "BumpScope::draw: Bad image");
         return false;
     }
-
-    (void)back;
 
     m_ilx = m_x;
     m_ily = m_y;
@@ -542,10 +538,9 @@ static class BumpScopeFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, const QString &pluginName) const override // VisFactory
+    VisualBase *create([[maybe_unused]] MainVisual *parent,
+                       [[maybe_unused]] const QString &pluginName) const override // VisFactory
     {
-        (void)parent;
-        (void)pluginName;
         return new BumpScope();
     }
 }BumpScopeFactory;
