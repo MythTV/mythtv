@@ -21,7 +21,8 @@
     "unsaved_heading": "Unsaved Changes",
     "unsaved_message": "There are unsaved changes.",
     "submit": "Submit",
-    "instructions": "Instructions"
+    "instructions": "Instructions",
+    "refresh": "Refresh"
   },
   "dashboard": {
     "backendStatus": "Backend Status",
@@ -47,7 +48,7 @@
       "orig_airdate": "Orig Airdate",
       "airdate": "Airdate",
       "channel": "Channel",
-      "length_mins": "Length Mins",
+      "duration": "Duration",
       "file_size": "File Size",
       "description": "Description",
       "season": "Season",
@@ -873,7 +874,12 @@
       "col_visibility": "Visibility",
       "col_useeit": "Use EIT",
       "updatechan": "Update Channel",
-      "deletechan": "Delete Channel"
+      "deletechan": "Delete Channel",
+      "unassigned": "(Unassigned)",
+      "all": "All",
+      "delete_source": "Delete all Channels from Selected Source",
+      "delete_source_details": "This will delete all channels from source: {{Source}}",
+      "delete_all_details": "This will delete all channels"
     },
     "rprofiles": {
       "title": "Recording Profiles",

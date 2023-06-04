@@ -10,8 +10,12 @@
                     </p-calendar>
                 </div>
                 <div class="flex flex-initial">
-                    <div *ngIf="refreshing"><p-progressSpinner
+                    <div *ngIf="refreshing else refreshBn"><p-progressSpinner
                             [style]="{width: '30px', height: '30px'}"></p-progressSpinner></div>
+                    <ng-template #refreshBn>
+                        <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
+                        (click)="refreshing=true;refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
+                    </ng-template>
                 </div>
             </div>
         </ng-template>
@@ -28,11 +32,11 @@
                     </div>
                     <div class="col">
                         <ng-container *ngFor="let program of channelrow.Programs">
-                            <ng-container *ngIf="!refreshing && inDisplayWindow(program.StartTime, program.EndTime)">
+                            <ng-container *ngIf="!timeChange && inDisplayWindow(program.StartTime, program.EndTime)">
                                 <app-guide-programentry [program]="program"
                                     [guideStartTime]="m_programGuide.ProgramGuide.StartTime"
-                                    [guideEndTime]="m_programGuide.ProgramGuide.EndTime"
-                                    [guideComponent]="this" [channel]="channelrow">
+                                    [guideEndTime]="m_programGuide.ProgramGuide.EndTime" [guideComponent]="this"
+                                    [channel]="channelrow">
                                 </app-guide-programentry>
                             </ng-container>
                         </ng-container>

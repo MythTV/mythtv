@@ -26,6 +26,7 @@ export class ChannelEditorComponent implements OnInit {
   allChannels: MyChannel[] = [];
   videoSources: VideoSource[] = [];
   commMethods: CommMethod[] = [];
+  sourceNames: string[] = [];
 
   tvFormats = [
     { value: "Default", prompt: "common.default" },
@@ -55,9 +56,10 @@ export class ChannelEditorComponent implements OnInit {
   headingEdit = "settings.chanedit.title";
   warningText = 'settings.common.warning';
   deleteText = 'settings.common.ru_sure';
+  unassignedText = 'settings.chanedit.unassigned';
 
   transDone = 0;
-  numTranslations = 8;
+  numTranslations = 9;
   successCount = 0;
   errorCount = 0;
 
@@ -65,16 +67,34 @@ export class ChannelEditorComponent implements OnInit {
   dialogHeader = "";
   displayUnsaved = false;
   displayDelete = false;
+  displayDeleteSource = false;
+  working = false;
   chansLoaded = false;
+  filterEvent = {
+    filters: {
+      Source: {
+        matchMode: '',
+        value: ''
+      }
+    }
+
+  };
 
   channel: MyChannel = this.resetChannel();
   editingChannel?: MyChannel;
-  // channelOperation -1 = delete, 0 = update, 1 = add
+  // channelOperation -2 = delete source -1 = delete channel, 0 = update, 1 = add
   channelOperation = 0;
 
   constructor(private channelService: ChannelService, private translate: TranslateService,
     public setupService: SetupService, public router: Router) {
-    this.loadLists();
+
+    this.translate.get(this.unassignedText).subscribe(data => {
+      // this translation has to be done before loading lists
+      this.unassignedText = data;
+      this.transDone++
+      this.loadLists();
+    });
+
     this.loadTranslations();
   }
 
@@ -123,7 +143,9 @@ export class ChannelEditorComponent implements OnInit {
       this.chansLoaded = true;
       this.channelService.GetVideoSourceList().subscribe(data => {
         this.videoSources = data.VideoSourceList.VideoSources;
-        this.allChannels.forEach((entry,index) => {
+        this.videoSources.unshift(<VideoSource>{ Id: 0, SourceName: this.unassignedText });
+        this.videoSources.forEach((entry) => this.sourceNames.push(entry.SourceName));
+        this.allChannels.forEach((entry, index) => {
           entry.ChanSeq = index;
           entry.Source = this.getSource(entry);
         });
@@ -170,7 +192,7 @@ export class ChannelEditorComponent implements OnInit {
     const ret = this.videoSources.find(element => channel.SourceId == element.Id);
     if (ret != undefined)
       return ret.SourceName;
-    return ""
+    return this.unassignedText;
   }
 
   getVisibility(channel: MyChannel): string {
@@ -186,7 +208,6 @@ export class ChannelEditorComponent implements OnInit {
     this.dialogHeader = this.headingNew;
     this.channel = this.resetChannel();
     this.displayChannelDlg = true;
-    // this.currentForm.form.markAsPristine();
     this.markPristine();
   }
 
@@ -197,7 +218,6 @@ export class ChannelEditorComponent implements OnInit {
     this.dialogHeader = this.headingEdit;
     this.channel = Object.assign({}, channel);
     this.displayChannelDlg = true;
-    // this.currentForm.form.markAsPristine();
     this.markPristine();
   }
 
@@ -209,29 +229,41 @@ export class ChannelEditorComponent implements OnInit {
         this.currentForm.form.markAsPristine();
         switch (this.channelOperation) {
           case 0:
-            if (this.editingChannel)
+            if (this.editingChannel) {
               Object.assign(this.editingChannel, this.channel);
+              this.editingChannel.Source = this.getSource(this.editingChannel);
+            }
             break;
           case 1:
             this.allChannels.push(this.channel);
             break;
           case -1:
+            // Delete channel request
             this.channel.ChanId = -99;
             this.displayDelete = false;
+            this.displayDeleteSource = false;
+            this.currentForm.form.markAsPristine();
+            break;
+          case -2:
+            // Delete source request
+            this.channel.ChanId = -99;
+            // continue with next channel
+            this.deleteSource();
             break;
         }
       }
       else {
         console.log("saveObserver error", x);
         this.errorCount++;
+        this.working = false;
       }
     },
     error: (err: any) => {
       console.log("saveObserver error", err);
       this.errorCount++;
+      this.working = false;
     }
   };
-
 
   saveChannel() {
     this.successCount = 0;
@@ -298,28 +330,51 @@ export class ChannelEditorComponent implements OnInit {
   }
 
   deleteRequest(channel: MyChannel) {
-    this.successCount = 0;
-    this.errorCount = 0;
     this.channel = channel;
     this.displayDelete = true;
   }
 
-  deleteChannel(channel: MyChannel) {
+  deleteChannel(channel: MyChannel, source?: boolean) {
+    this.successCount = 0;
+    this.errorCount = 0;
     this.channel = channel;
-    this.channelOperation = -1;
+    if (source)
+      // delete source
+      this.channelOperation = -2;
+    else
+      // delete channel
+      this.channelOperation = -1;
+    console.log("Delete Channel", channel)
     this.channelService.RemoveDBChannel(channel.ChanId).subscribe(this.saveObserver);
   }
 
+  deleteSourceRequest() {
+    this.channel = this.resetChannel();
+    this.displayDeleteSource = true;
+  }
+
+  deleteSource() {
+    this.working = true;
+    const next = this.allChannels.find(entry =>
+      entry.ChanId > 0
+      && (!this.filterEvent.filters.Source.value
+        || this.filterEvent.filters.Source.value == entry.Source));
+    if (next)
+      this.deleteChannel(next, true);
+    else {
+      this.displayDelete = false;
+      this.displayDeleteSource = false;
+      this.currentForm.form.markAsPristine();
+      this.working = false;
+    }
+  }
+
+  onFilter(event: any) {
+    this.filterEvent = event;
+  }
+
   markPristine() {
-    let obs = new Observable(x => {
-      setTimeout(() => {
-        x.next(1);
-        x.complete();
-      }, 200)
-    });
-    obs.subscribe(x =>
-      this.currentForm.form.markAsPristine()
-    );
+    setTimeout(() => this.currentForm.form.markAsPristine(), 200);
   }
 
   confirm(message?: string): Observable<boolean> {

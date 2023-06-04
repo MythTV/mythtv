@@ -26,6 +26,7 @@ export class GuideComponent implements OnInit, SchedulerSummary {
   m_programGuide!: ProgramGuide;
   loaded = false;
   refreshing = false;
+  timeChange = false;
   inter: ScheduleLink = { summaryComponent: this };
 
   constructor(private guideService: GuideService,
@@ -65,6 +66,7 @@ export class GuideComponent implements OnInit, SchedulerSummary {
       this.m_channelTotal = data.ProgramGuide.TotalAvailable;
       this.loaded = true;
       this.refreshing = false;
+      this.timeChange = false;
     });
   }
 
@@ -88,12 +90,14 @@ export class GuideComponent implements OnInit, SchedulerSummary {
     else
       this.m_startDate = new Date();
     console.log("New time is " + this.m_startDate);
-    this.refreshing = true;
+    this.timeChange = true;
     this.refresh();
   }
 
   refresh() : void {
-    if (this.m_startDate)
+    if (this.m_startDate) {
       this.fetchData(this.m_startDate);
+      this.refreshing = true;
+    }
   }
 }

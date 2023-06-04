@@ -14,7 +14,15 @@
                     <th>{{ 'dashboard.recordings.filter' | translate }}: &nbsp;&nbsp; {{ 'dashboard.recordings.title' |
                         translate }}: &nbsp; <p-columnFilter type="text" field="Title"></p-columnFilter>
                         {{ 'dashboard.recordings.recgrp' | translate }}: &nbsp; <p-columnFilter type="text"
-                            field="Recording.RecGroup"></p-columnFilter></th>
+                            field="Recording.RecGroup"></p-columnFilter>
+                        <div *ngIf="refreshing else refreshBn"><p-progressSpinner
+                                [style]="{width: '30px', height: '30px'}"></p-progressSpinner></div>
+                        <ng-template #refreshBn>
+                            <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
+                                (click)="refreshing=true;loadRecordings()"
+                                pTooltip="{{ 'common.refresh' | translate }}"></button>
+                        </ng-template>
+                    </th>
                 </tr>
                 <tr>
                     <th style="flex-grow: 40; flex-basis: 0;" class="p-1" pSortableColumn="Title">
@@ -36,8 +44,9 @@
                     <th style="flex-grow: 15; flex-basis: 0;" class="p-1" pSortableColumn="Recording.RecGroup">
                         {{ 'dashboard.recordings.recgrp' | translate }} <p-sortIcon
                             field="Recording.RecGroup"></p-sortIcon> </th>
-                    <th style="flex-grow: 10; flex-basis: 0;" class="justify-content-end p-1">{{
-                        'dashboard.recordings.length_mins' | translate }}</th>
+                    <th style="flex-grow: 10; flex-basis: 0;" class="justify-content-end p-1">
+                        {{ 'dashboard.recordings.duration' | translate }}
+                    </th>
                     <th style="flex-grow: 20; flex-basis: 0;" class="justify-content-end p-1">{{
                         'dashboard.recordings.file_size' | translate }}</th>
                     <th style="flex-grow: 3; flex-basis: 0;" class="p-1">
@@ -46,22 +55,24 @@
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-program>
-                <tr height="40" [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}">
-                    <td style="flex-grow: 40; flex-basis: 0;" class="p-1">{{program.Title}}</td>
+                <tr height="25" [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}">
+                    <td style="flex-grow: 40; flex-basis: 0;" class="p-1 white-space-nowrap overflow-hidden">
+                        {{program.Title}}</td>
                     <td style="flex-grow: 3; flex-basis: 0;" class="p-1">
                         <i class="pi pi-eye" *ngIf="program.ProgramFlagNames.indexOf('WATCHED') > -1"></i>
                     </td>
-                    <td style="flex-grow: 45; flex-basis: 0;" class="p-1">{{program.SubTitle}}</td>
+                    <td style="flex-grow: 45; flex-basis: 0;" class="p-1 white-space-nowrap overflow-hidden">
+                        {{program.SubTitle}}</td>
                     <td style="flex-grow: 10; flex-basis: 0;" class="p-1">{{program.Season}}x{{program.Episode}}</td>
                     <td style="flex-grow: 20; flex-basis: 0;" class="justify-content-end p-1">
                         {{formatDate(program.Airdate)}}</td>
                     <td style="flex-grow: 20; flex-basis: 0;" class="justify-content-end p-1">
-                        {{formatDate(program.StartTime)}}&nbsp;</td>
+                        {{formatDate(program.StartTime)}}</td>
                     <td style="flex-grow: 25; flex-basis: 0;" class="p-1">
                         {{program.Channel.ChanNum}}/{{program.Channel.CallSign}}</td>
                     <td style="flex-grow: 15; flex-basis: 0;" class="p-1">{{program.Recording.RecGroup}}</td>
                     <td style="flex-grow: 10; flex-basis: 0;" class="justify-content-end p-1">{{ getDuration(program) |
-                        number:'1.0-0' }}</td>
+                        number:'1.0-0' }} min</td>
                     <td style="flex-grow: 20; flex-basis: 0;" class="justify-content-end p-1">
                         {{program.Recording.FileSize / 1000000 | number:'1.0-0'}} MB</td>
                     <td style="flex-grow: 3; flex-basis: 0;" class="p-1">
@@ -72,8 +83,8 @@
             </ng-template>
         </p-table>
 
-        <p-dialog header="{{ 'dashboard.recordings.edit_metadata' | translate }}" [(visible)]="displayMetadataDlg" [modal]="true"
-            [style]="{height: '75vw', width: '50vw'}" [closable]="false" [closeOnEscape]="false">
+        <p-dialog header="{{ 'dashboard.recordings.edit_metadata' | translate }}" [(visible)]="displayMetadataDlg"
+            [modal]="true" [style]="{height: '75vw', width: '50vw'}" [closable]="false" [closeOnEscape]="false">
 
             <div class="form-group field">
                 <label for="Title" class="label block">{{ 'dashboard.recordings.title' | translate }}</label>

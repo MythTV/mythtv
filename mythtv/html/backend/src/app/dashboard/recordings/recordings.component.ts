@@ -27,6 +27,7 @@ export class RecordingsComponent implements OnInit {
   displayUnsaved = false;
   successCount = 0;
   errorCount = 0;
+  refreshing = false;
 
   msg = {
     Success: 'common.success',
@@ -51,9 +52,7 @@ export class RecordingsComponent implements OnInit {
 
   constructor(private dvrService: DvrService, private messageService: MessageService,
     private translate: TranslateService) {
-    dvrService.GetRecordedList({}).subscribe(data =>
-      this.recordings = data.ProgramList);
-
+    this.loadRecordings();
     // translations
     for (const [key, value] of Object.entries(this.msg)) {
       this.translate.get(value).subscribe(data => {
@@ -73,6 +72,13 @@ export class RecordingsComponent implements OnInit {
   }
 
   ngOnInit(): void { }
+
+  loadRecordings() {
+    this.dvrService.GetRecordedList({}).subscribe(data => {
+      this.recordings = data.ProgramList;
+      this.refreshing = false;
+    });
+  }
 
   formatDate(date: string): string {
     if (!date)

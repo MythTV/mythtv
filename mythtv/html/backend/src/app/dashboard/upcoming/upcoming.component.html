@@ -2,13 +2,7 @@
     <div style="white-space: 'pre-line';">
         <p-toast position="center"></p-toast>
     </div>
-    <div class="flex">
-        <h2>{{ 'dashboard.upcoming.heading' | translate }}</h2>
-        <div class="flex flex-initial">
-            <div *ngIf="refreshing"><p-progressSpinner [style]="{width: '30px', height: '30px'}"></p-progressSpinner>
-            </div>
-        </div>
-    </div>
+    <h2>{{ 'dashboard.upcoming.heading' | translate }}</h2>
     <div class="block card w-full" style="height: 90vh" *ngIf="recordings else loading">
 
         <p-table [value]="recordings.Programs" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
@@ -19,8 +13,17 @@
                 <tr>
                     <th>
                         <p-checkbox inputId="showAllStatuses" [(ngModel)]="showAllStatuses" name="showAllStatuses"
-                            #showAll="ngModel" [binary]="true" (onChange)="refresh()" label="{{ 'dashboard.upcoming.showall' | translate }}">
+                            #showAll="ngModel" [binary]="true" (onChange)="refresh()"
+                            label="{{ 'dashboard.upcoming.showall' | translate }} ">
                         </p-checkbox>
+                        &nbsp;&nbsp;&nbsp;
+                        <div *ngIf="refreshing else refreshBn"><p-progressSpinner
+                                [style]="{width: '30px', height: '30px'}"></p-progressSpinner></div>
+                        <ng-template #refreshBn>
+                            <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
+                                (click)="refreshing=true;refresh()"
+                                pTooltip="{{ 'common.refresh' | translate }}"></button>
+                        </ng-template>
 
                     </th>
                 </tr>
@@ -29,8 +32,9 @@
                         {{ 'dashboard.upcoming.date' | translate }} </th>
                     <th style="flex-grow: 15; flex-basis: 0;" class="justify-content-end p-1">
                         {{ 'dashboard.upcoming.time' | translate }} </th>
-                    <th style="flex-grow: 10; flex-basis: 0;" class="justify-content-end pl-1 pr-3 pt-1 pb-1"></th>
-                    <th style="flex-grow: 20; flex-basis: 0;" class="p-1">{{ 'dashboard.upcoming.encoder' | translate }} </th>
+                    <th style="flex-grow: 15; flex-basis: 0;" class="justify-content-end pl-1 pr-3 pt-1 pb-1"></th>
+                    <th style="flex-grow: 20; flex-basis: 0;" class="p-1">{{ 'dashboard.upcoming.encoder' | translate }}
+                    </th>
                     <th style="flex-grow: 40; flex-basis: 0;" class="p-1">
                         {{ 'dashboard.recordings.title' | translate }}</th>
                     <th style="flex-grow: 3; flex-basis: 0;" class="p-1"></th>
@@ -47,26 +51,30 @@
                         {{ 'dashboard.recordings.recgrp' | translate }} </th>
                     <th style="flex-grow: 18; flex-basis: 0;" class="p-1">
                         {{ 'dashboard.upcoming.status' | translate }} </th>
-                    <th style="flex-grow: 3; flex-basis: 0;" class="p-1"> <button pButton pRipple
-                            icon="pi pi-pencil" [disabled]="true" class="p-button-text p-button-primary"></button>
+                    <th style="flex-grow: 3; flex-basis: 0;" class="p-1"> <button pButton pRipple icon="pi pi-pencil"
+                            [disabled]="true" class="p-button-text p-button-primary"></button>
                     </th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-program>
-                <tr height="40">
-                    <td style="flex-grow: 20; flex-basis: 0;" class="justify-content-end p-1">
-                        {{formatDate(program.StartTime)}}&nbsp;</td>
-                    <td style="flex-grow: 15; flex-basis: 0;" class="justify-content-end p-1">
-                        {{formatTime(program.StartTime)}}&nbsp;</td>
-                    <td style="flex-grow: 10; flex-basis: 0;" class="justify-content-end pl-1 pr-3 pt-1 pb-1">{{
-                        getDuration(program) |
-                        number:'1.0-0' }} min</td>
+                <tr height="25">
+                    <td style="flex-grow: 20; flex-basis: 0;"
+                        class="justify-content-end p-1 white-space-nowrap overflow-hidden">
+                        {{formatDate(program.StartTime)}}</td>
+                    <td style="flex-grow: 15; flex-basis: 0;"
+                        class="justify-content-end p-1 white-space-nowrap overflow-hidden">
+                        {{formatTime(program.StartTime)}}</td>
+                    <td style="flex-grow: 15; flex-basis: 0;"
+                        class="justify-content-end pl-1 pr-3 pt-1 pb-1 white-space-nowrap overflow-hidden">
+                        {{ getDuration(program) | number:'1.0-0' }} min</td>
                     <td style="flex-grow: 20; flex-basis: 0;" class="p-1">{{program.Recording.EncoderName}}</td>
-                    <td style="flex-grow: 40; flex-basis: 0;" class="p-1">{{program.Title}}</td>
+                    <td style="flex-grow: 40; flex-basis: 0;" class="p-1 white-space-nowrap overflow-hidden">
+                        {{program.Title}}</td>
                     <td style="flex-grow: 3; flex-basis: 0;" class="p-1">
                         <i class="pi pi-eye" *ngIf="program.ProgramFlagNames.indexOf('WATCHED') > -1"></i>
                     </td>
-                    <td style="flex-grow: 45; flex-basis: 0;" class="p-1">{{program.SubTitle}}</td>
+                    <td style="flex-grow: 45; flex-basis: 0;" class="p-1 white-space-nowrap overflow-hidden">
+                        {{program.SubTitle}}</td>
                     <td style="flex-grow: 10; flex-basis: 0;" class="p-1">{{program.Season}}x{{program.Episode}}</td>
                     <td style="flex-grow: 20; flex-basis: 0;" class="justify-content-end p-1">
                         {{formatDate(program.Airdate)}}</td>
