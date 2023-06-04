@@ -892,9 +892,8 @@ static void handleGalleryMedia(MythMediaDevice *dev)
         LOG(VB_MEDIA, LOG_INFO, "Main: Ignoring new gallery media - autorun not set");
 }
 
-static void TVMenuCallback(void *data, QString &selection)
+static void TVMenuCallback([[maybe_unused]] void *data, QString &selection)
 {
-    (void)data;
     QString sel = selection.toLower();
 
     if (sel.startsWith("settings ") || sel == "video_settings_general")

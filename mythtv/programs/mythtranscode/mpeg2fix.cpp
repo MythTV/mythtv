@@ -45,10 +45,8 @@ extern "C" {
 #define O_LARGEFILE 0
 #endif
 
-static void *my_malloc(unsigned size, mpeg2_alloc_t reason)
+static void *my_malloc(unsigned size, [[maybe_unused]] mpeg2_alloc_t reason)
 {
-    (void)reason;
-
     if (size)
     {
         char *buf = (char *) malloc (size + 63 + sizeof (void **));
@@ -65,10 +63,9 @@ static void *my_malloc(unsigned size, mpeg2_alloc_t reason)
     return nullptr;
 }
 
-static void my_av_print(void *ptr, int level, const char* fmt, va_list vl)
+static void my_av_print([[maybe_unused]] void *ptr,
+                        int level, const char* fmt, va_list vl)
 {
-    (void) ptr;
-
     static QString s_fullLine("");
 
     if (level > AV_LOG_INFO)

@@ -1154,9 +1154,8 @@ class dirhandler : public DirectoryHandler
     }
 
     DirectoryHandler *newDir(const QString &dir_name,
-                             const QString &fq_dir_name) override // DirectoryHandler
+                             [[maybe_unused]] const QString &fq_dir_name) override // DirectoryHandler
     {
-        (void) fq_dir_name;
         smart_dir_node dir = m_directory->addSubDir(dir_name);
         DirectoryHandler *dh = new dirhandler(dir, m_prefix, m_metalist,
                                               m_dhFreeList,
@@ -1172,13 +1171,11 @@ class dirhandler : public DirectoryHandler
         handleFile(file_name, fq_file_name, extension, "");
     }
 
-    void handleFile(const QString &file_name,
+    void handleFile([[maybe_unused]] const QString &file_name,
                     const QString &fq_file_name,
-                    const QString &extension,
+                    [[maybe_unused]] const QString &extension,
                     const QString &host) override // DirectoryHandler
     {
-        (void) file_name;
-        (void) extension;
         const QString& file_string(fq_file_name);
 
         VideoMetadataListManager::VideoMetadataPtr myData(

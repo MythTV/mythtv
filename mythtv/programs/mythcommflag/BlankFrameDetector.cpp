@@ -615,10 +615,8 @@ BlankFrameDetector::computeForLogoSurplus(
 
 int
 BlankFrameDetector::computeForLogoDeficit(
-        const TemplateMatcher *templateMatcher)
+        [[maybe_unused]] const TemplateMatcher *templateMatcher)
 {
-    (void)templateMatcher;  /* gcc */
-
     LOG(VB_COMMFLAG, LOG_INFO, "BlankFrameDetector adjusting for "
                                "too little logo coverage (unimplemented)");
     return 0;

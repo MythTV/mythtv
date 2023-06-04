@@ -433,10 +433,9 @@ namespace
             m_item->DisplayState(value, name);
         }
 
-        void handleImage(const QString &name, const QString &filename) override // CopyMetadataDestination
+        void handleImage([[maybe_unused]] const QString &name,
+                         [[maybe_unused]] const QString &filename) override // CopyMetadataDestination
         {
-            (void) name;
-            (void) filename;
         }
 
       private:
@@ -3002,20 +3001,17 @@ namespace
     {
         explicit SimpleCollect(QStringList &fileList) : m_fileList(fileList) {}
 
-        DirectoryHandler *newDir(const QString &dirName,
-                const QString &fqDirName) override // DirectoryHandler
+        DirectoryHandler *newDir([[maybe_unused]] const QString &dirName,
+                [[maybe_unused]] const QString &fqDirName) override // DirectoryHandler
         {
-            (void) dirName;
-            (void) fqDirName;
             return this;
         }
 
-        void handleFile(const QString &fileName, const QString &fqFileName,
-                const QString &extension, const QString &host) override // DirectoryHandler
+        void handleFile([[maybe_unused]] const QString &fileName,
+                        const QString &fqFileName,
+                        [[maybe_unused]] const QString &extension,
+                        [[maybe_unused]] const QString &host) override // DirectoryHandler
         {
-            (void) fileName;
-            (void) extension;
-            (void) host;
             m_fileList.push_back(fqFileName);
         }
 

@@ -7354,10 +7354,9 @@ void MainServer::HandleSetLogLevel(const QStringList &slist, PlaybackSock *pbs)
     SendResponse(pbssock, retlist);
 }
 
-void MainServer::HandleIsRecording(const QStringList &slist, PlaybackSock *pbs)
+void MainServer::HandleIsRecording([[maybe_unused]] const QStringList &slist,
+                                   PlaybackSock *pbs)
 {
-    (void)slist;
-
     MythSocket *pbssock = pbs->getSocket();
     int RecordingsInProgress = 0;
     int LiveTVRecordingsInProgress = 0;
