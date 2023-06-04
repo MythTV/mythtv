@@ -56,13 +56,11 @@ bool MythEGL::InitEGL(void)
         return true;
 
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to resolve EGL functions");
-#else
-    (void)m_context;
 #endif
     return false;
 }
 
-bool MythEGL::HasEGLExtension(QString Extension)
+bool MythEGL::HasEGLExtension([[maybe_unused]] QString Extension)
 {
 #ifdef USING_EGL
     OpenGLLocker locker(m_context);
@@ -71,8 +69,6 @@ bool MythEGL::HasEGLExtension(QString Extension)
         QByteArray extensions = QByteArray(eglQueryString(m_eglDisplay, EGL_EXTENSIONS));
         return extensions.contains(Extension.data()->toLatin1());
     }
-#else
-    (void)Extension;
 #endif
     return false;
 }

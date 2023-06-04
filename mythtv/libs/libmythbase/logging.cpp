@@ -178,8 +178,7 @@ void LoggingItem::setThreadTid(void)
         m_tid = syscall(SYS_gettid);
 #elif defined(__FreeBSD__)
         long lwpid;
-        int dummy = thr_self( &lwpid );
-        (void)dummy;
+        [[maybe_unused]] int dummy = thr_self( &lwpid );
         m_tid = (int64_t)lwpid;
 #elif defined(Q_OS_DARWIN)
         m_tid = (int64_t)mach_thread_self();
@@ -719,17 +718,15 @@ void loggingDeregisterThread(void)
 /// \brief  Map a syslog facility name back to the enumerated value
 /// \param  facility    QString containing the facility name
 /// \return Syslog facility as enumerated type.  Negative if not found.
-int syslogGetFacility(const QString& facility)
+int syslogGetFacility([[maybe_unused]] const QString& facility)
 {
 #ifdef _WIN32
     LOG(VB_GENERAL, LOG_NOTICE,
         "Windows does not support syslog, disabling" );
-    Q_UNUSED(facility);
     return( -2 );
 #elif defined(Q_OS_ANDROID)
     LOG(VB_GENERAL, LOG_NOTICE,
         "Android does not support syslog, disabling" );
-    Q_UNUSED(facility);
     return( -2 );
 #else
     const CODE *name = nullptr;

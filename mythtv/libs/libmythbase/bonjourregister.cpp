@@ -93,14 +93,12 @@ void BonjourRegister::socketReadyRead()
 }
 
 
-void BonjourRegister::BonjourCallback(DNSServiceRef ref, DNSServiceFlags flags,
+void BonjourRegister::BonjourCallback([[maybe_unused]] DNSServiceRef ref,
+                                      [[maybe_unused]] DNSServiceFlags flags,
                                       DNSServiceErrorType errorcode,
                                       const char *name, const char *type,
                                       const char *domain, void *object)
 {
-    (void)ref;
-    (void)flags;
-
     auto *bonjour = static_cast<BonjourRegister *>(object);
     if (bonjour)
     {

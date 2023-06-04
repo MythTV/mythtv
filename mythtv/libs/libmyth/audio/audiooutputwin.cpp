@@ -91,14 +91,12 @@ class AudioOutputWinPrivate
     HANDLE    m_hEvent {nullptr};
 };
 
-void CALLBACK AudioOutputWinPrivate::waveOutProc(HWAVEOUT hwo, UINT uMsg,
+void CALLBACK AudioOutputWinPrivate::waveOutProc([[maybe_unused]] HWAVEOUT hwo,
+                                                 UINT uMsg,
                                                  DWORD dwInstance,
-                                                 DWORD dwParam1, DWORD dwParam2)
+                                                 [[maybe_unused]] DWORD dwParam1,
+                                                 [[maybe_unused]] DWORD dwParam2)
 {
-    Q_UNUSED(hwo);
-    Q_UNUSED(dwParam1);
-    Q_UNUSED(dwParam2);
-
     if (uMsg != WOM_DONE)
         return;
 

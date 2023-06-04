@@ -313,7 +313,8 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
 /*! \brief Create a MythDRMDevice instance.
  * \returns A valid instance or nullptr on error.
 */
-MythDRMPtr MythDRMDevice::Create(QScreen *qScreen, const QString &Device, bool NeedPlanes)
+MythDRMPtr MythDRMDevice::Create(QScreen *qScreen, const QString &Device,
+                                 [[maybe_unused]] bool NeedPlanes)
 {
 #ifdef USING_QTPRIVATEHEADERS
     auto * app = dynamic_cast<QGuiApplication *>(QCoreApplication::instance());
@@ -363,8 +364,6 @@ MythDRMPtr MythDRMDevice::Create(QScreen *qScreen, const QString &Device, bool N
 #ifdef USING_QTPRIVATEHEADERS
     if (auto result = std::shared_ptr<MythDRMDevice>(new MythDRMDevice(Device, NeedPlanes)); result && result->m_valid)
         return result;
-#else
-    (void)NeedPlanes;
 #endif
     return nullptr;
 }

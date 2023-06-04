@@ -76,7 +76,7 @@ AudioOutput *AudioOutput::OpenAudio(
 }
 
 AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
-                                    bool willsuspendpa)
+                                    [[maybe_unused]] bool willsuspendpa)
 {
     QString &main_device = settings.m_mainDevice;
     AudioOutput *ret = nullptr;
@@ -150,9 +150,6 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
             pulsestatus = PulseHandler::Suspend(PulseHandler::kPulseSuspend);
         }
     }
-#else // !USING_PULSE
-    // Quiet warning error when not compiling with pulseaudio
-    Q_UNUSED(willsuspendpa);
 #endif // USING_PULSE
 
     if (main_device.startsWith("ALSA:"))

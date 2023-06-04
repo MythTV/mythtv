@@ -187,12 +187,12 @@ bool DBUtil::IsBackupInProgress(void)
  *  \param disableRotation Disable backup rotation
  *  \return                MythDBBackupStatus indicating the result
  */
-MythDBBackupStatus DBUtil::BackupDB(QString &filename, bool disableRotation)
+MythDBBackupStatus DBUtil::BackupDB(QString &filename,
+                                    [[maybe_unused]] bool disableRotation)
 {
     filename = QString();
 
 #ifdef _WIN32
-    Q_UNUSED(disableRotation);
     LOG(VB_GENERAL, LOG_CRIT, "Database backups disabled on Windows.");
     return kDB_Backup_Disabled;
 #else

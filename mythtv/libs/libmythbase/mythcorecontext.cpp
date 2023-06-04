@@ -297,7 +297,7 @@ void MythCoreContext::setTestStringSettings(QMap<QString,QString> &overrides)
 
 bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,
                                          const QString &announcement,
-                                         std::chrono::milliseconds timeout,
+                                         [[maybe_unused]] std::chrono::milliseconds timeout,
                                          bool &proto_mismatch)
 {
     proto_mismatch = false;
@@ -308,8 +308,6 @@ bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,
         proto_mismatch = true;
         return false;
     }
-#else
-    Q_UNUSED(timeout);
 #endif
 
     QStringList strlist(announcement);
@@ -1652,10 +1650,8 @@ void MythCoreContext::readyRead(MythSocket *sock)
     while (sock->IsDataAvailable());
 }
 
-void MythCoreContext::connectionClosed(MythSocket *sock)
+void MythCoreContext::connectionClosed([[maybe_unused]] MythSocket *sock)
 {
-    (void)sock;
-
     LOG(VB_GENERAL, LOG_NOTICE, LOC +
         "Event socket closed.  No connection to the backend.");
 

@@ -145,7 +145,8 @@ void SignalHandler::SetHandler(int signum, SigHandlerFunc handler)
         s_singleton->SetHandlerPrivate(signum, handler);
 }
 
-void SignalHandler::SetHandlerPrivate(int signum, SigHandlerFunc handler)
+void SignalHandler::SetHandlerPrivate([[maybe_unused]] int signum,
+                                      [[maybe_unused]] SigHandlerFunc handler)
 {
 #ifndef _WIN32
     const char *signame = strsignal(signum);
@@ -180,9 +181,6 @@ void SignalHandler::SetHandlerPrivate(int signum, SigHandlerFunc handler)
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("Setup %1 handler").arg(signal_name));
-#else
-    Q_UNUSED(signum);
-    Q_UNUSED(handler);
 #endif
 }
 
@@ -194,14 +192,14 @@ struct SignalInfo {
     uint64_t m_value;
 };
 
-void SignalHandler::signalHandler(int signum, siginfo_t *info, void *context)
+void SignalHandler::signalHandler(int signum,
+                                  [[maybe_unused]] siginfo_t *info,
+                                  [[maybe_unused]] void *context)
 {
     SignalInfo signalInfo {};
 
-    (void)context;
     signalInfo.m_signum = signum;
 #ifdef _WIN32
-    (void)info;
     signalInfo.m_code   = 0;
     signalInfo.m_pid    = 0;
     signalInfo.m_uid    = 0;

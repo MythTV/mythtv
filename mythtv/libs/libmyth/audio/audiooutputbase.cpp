@@ -114,11 +114,6 @@ AudioOutputBase::~AudioOutputBase()
     assert(m_memoryCorruptionTest1 == 0xdeadbeef);
     assert(m_memoryCorruptionTest2 == 0xdeadbeef);
     assert(m_memoryCorruptionTest3 == 0xdeadbeef);
-#else
-    Q_UNUSED(m_memoryCorruptionTest0);
-    Q_UNUSED(m_memoryCorruptionTest1);
-    Q_UNUSED(m_memoryCorruptionTest2);
-    Q_UNUSED(m_memoryCorruptionTest3);
 #endif
 }
 

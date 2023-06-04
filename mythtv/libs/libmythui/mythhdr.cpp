@@ -26,7 +26,8 @@ bool MythHDRMetadata::Equals(MythHDRMetadata* Other)
            m_displayPrimaries[2][1]    == Other->m_displayPrimaries[2][1];
 }
 
-MythHDRPtr MythHDR::Create(MythDisplay* MDisplay, const MythHDRDesc& Desc)
+MythHDRPtr MythHDR::Create([[maybe_unused]] MythDisplay* MDisplay,
+                           const MythHDRDesc& Desc)
 {
     MythHDRPtr result = nullptr;
 
@@ -35,8 +36,6 @@ MythHDRPtr MythHDR::Create(MythDisplay* MDisplay, const MythHDRDesc& Desc)
     {
 #if defined (USING_DRM) && defined (USING_QTPRIVATEHEADERS)
         result = MythDRMHDR::Create(MDisplay, Desc);
-#else
-        (void)MDisplay;
 #endif
     }
 

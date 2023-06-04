@@ -80,7 +80,7 @@
 /*! \brief Create a MythDisplay object appropriate for the current platform.
  * \note This function always returns a valid MythDisplay object.
 */
-MythDisplay* MythDisplay::Create(MythMainWindow* MainWindow)
+MythDisplay* MythDisplay::Create([[maybe_unused]] MythMainWindow* MainWindow)
 {
     MythDisplay* result = nullptr;
 #ifdef USING_X11
@@ -111,8 +111,6 @@ MythDisplay* MythDisplay::Create(MythMainWindow* MainWindow)
         }
 #endif
     }
-#else
-    (void)MainWindow;
 #endif
 #ifdef USING_MMAL
     if (!result)

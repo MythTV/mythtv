@@ -94,9 +94,8 @@ void TestMythGenericTree::test_state(void)
     QCOMPARE(QString("tres"), node.GetState("three"));
 }
 
-static QString test_cb_fn(const QString &name, void *data)
+static QString test_cb_fn(const QString &name, [[maybe_unused]] void *data)
 {
-    Q_UNUSED(data);
     if (name == QStringLiteral("key2"))
         return QStringLiteral("beta");
     if (name == QStringLiteral("key3"))

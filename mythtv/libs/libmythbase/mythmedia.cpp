@@ -304,10 +304,8 @@ void MythMediaDevice::RegisterMediaExtensions(uint mediatype,
         s_ext_to_media[ext] |= mediatype;
 }
 
-MythMediaError MythMediaDevice::eject(bool open_close)
+MythMediaError MythMediaDevice::eject([[maybe_unused]] bool open_close)
 {
-    (void) open_close;
-
 #ifdef Q_OS_DARWIN
     QString  command = "diskutil eject " + m_devicePath;
 

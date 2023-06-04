@@ -36,12 +36,9 @@ class META_PUBLIC MetaIO
     * \param mdata A pointer to a MusicMetadata object
     * \returns Boolean to indicate success/failure.
     */
-    virtual bool writeVolatileMetadata(const QString & filename, MusicMetadata* mdata)
+    virtual bool writeVolatileMetadata([[maybe_unused]] const QString & filename,
+                                       [[maybe_unused]] MusicMetadata* mdata)
     {
-        // These are here so that the parameters can be documented
-        // with doxygen.
-        (void) filename;
-        (void) mdata;
         return false;
     }
 
@@ -69,42 +66,33 @@ class META_PUBLIC MetaIO
     * \param filename The filename to read images from.
     * \returns the list of embedded images
     */
-    virtual AlbumArtList getAlbumArtList(const QString &filename)
+    virtual AlbumArtList getAlbumArtList([[maybe_unused]] const QString &filename)
     {
-        (void)filename;
         return {};
     }
 
-    virtual bool writeAlbumArt(const QString &filename,
-                               const AlbumArtImage *albumart)
+    virtual bool writeAlbumArt([[maybe_unused]] const QString &filename,
+                               [[maybe_unused]] const AlbumArtImage *albumart)
     {
-        (void)filename;
-        (void)albumart;
         return false;
     }
 
-    virtual bool removeAlbumArt(const QString &filename,
-                                const AlbumArtImage *albumart)
+    virtual bool removeAlbumArt([[maybe_unused]] const QString &filename,
+                                [[maybe_unused]] const AlbumArtImage *albumart)
     {
-        (void)filename;
-        (void)albumart;
         return false;
     }
 
-    virtual bool changeImageType(const QString &filename,
-                                 const AlbumArtImage *albumart,
-                                 ImageType newType)
+    virtual bool changeImageType([[maybe_unused]] const QString &filename,
+                                 [[maybe_unused]] const AlbumArtImage *albumart,
+                                 [[maybe_unused]] ImageType newType)
     {
-        (void)filename;
-        (void)albumart;
-        (void)newType;
         return false;
     }
 
-    virtual QImage *getAlbumArt(const QString &filename, ImageType type)
+    virtual QImage *getAlbumArt([[maybe_unused]] const QString &filename,
+                                [[maybe_unused]] ImageType type)
     {
-        (void)filename;
-        (void)type;
         return nullptr;
     }
 
@@ -133,9 +121,8 @@ class META_PUBLIC MetaIO
 
     void readFromFilename(MusicMetadata *metadata);
 
-    virtual bool TagExists(const QString &filename)
+    virtual bool TagExists([[maybe_unused]] const QString &filename)
     { 
-        (void)filename;
         return false;
     }
 
