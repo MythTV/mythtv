@@ -3952,6 +3952,10 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
     else if (!IsDVDStillFrame && SeekHandleAction(Actions, IsDVD))
     {
     }
+    else if (IsActionable(ACTION_SELECT, Actions) && HasQueuedChannel())
+    {
+        CommitQueuedInput();
+    }
     else
     {
         handled = false;
