@@ -114,9 +114,9 @@ class AvFormatDecoder : public DecoderBase
     bool IsLastFrameKey(void) const override { return false; } // DecoderBase
 
     /// This is a No-op for this class.
-    void WriteStoredData(MythMediaBuffer *Buffer, bool storevid,
-                         std::chrono::milliseconds timecodeOffset) override // DecoderBase
-        { (void)Buffer; (void)storevid; (void)timecodeOffset;}
+    void WriteStoredData([[maybe_unused]] MythMediaBuffer *Buffer,
+                         [[maybe_unused]] bool storevid,
+                         [[maybe_unused]] std::chrono::milliseconds timecodeOffset) override {} // DecoderBase
 
     /// This is a No-op for this class.
     void SetRawAudioState(bool state) override { (void)state; } // DecoderBase

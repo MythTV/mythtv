@@ -304,9 +304,10 @@ bool VideoOutputD3D::CreatePauseFrame(void)
     return true;
 }
 
-void VideoOutputD3D::RenderFrame(MythVideoFrame *buffer, FrameScanType t, OSD *osd)
+void VideoOutputD3D::RenderFrame(MythVideoFrame *buffer,
+                                 FrameScanType t,
+                                 [[maybe_unused]] OSD *osd)
 {
-    (void)osd;
     if (IsErrored())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +

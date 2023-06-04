@@ -330,11 +330,11 @@ DTVConfParser::return_t ChannelScanner::ImportDVBUtils(
     return ret;
 }
 
-bool ChannelScanner::ImportM3U(uint cardid, const QString &inputname,
-                               uint sourceid, bool is_mpts)
+bool ChannelScanner::ImportM3U([[maybe_unused]] uint cardid,
+                               [[maybe_unused]] const QString &inputname,
+                               uint sourceid,
+                               bool is_mpts)
 {
-    (void) cardid;
-    (void) inputname;
     m_sourceid = sourceid;
 
     if (!m_scanMonitor)
@@ -354,8 +354,11 @@ bool ChannelScanner::ImportM3U(uint cardid, const QString &inputname,
     return true;
 }
 
-bool ChannelScanner::ImportVBox(uint cardid, const QString &inputname, uint sourceid,
-                                bool ftaOnly, ServiceRequirements serviceType)
+bool ChannelScanner::ImportVBox([[maybe_unused]] uint cardid,
+                                [[maybe_unused]] const QString &inputname,
+                                uint sourceid,
+                                [[maybe_unused]] bool ftaOnly,
+                                [[maybe_unused]] ServiceRequirements serviceType)
 {
     m_sourceid = sourceid;
 #ifdef USING_VBOX
@@ -371,13 +374,12 @@ bool ChannelScanner::ImportVBox(uint cardid, const QString &inputname, uint sour
 
     return true;
 #else
-    (void) cardid;
-    (void) inputname;
     return false;
 #endif
 }
 
-bool ChannelScanner::ImportExternRecorder(uint cardid, const QString &inputname,
+bool ChannelScanner::ImportExternRecorder([[maybe_unused]] uint cardid,
+                                          [[maybe_unused]] const QString &inputname,
                                           uint sourceid)
 {
     m_sourceid = sourceid;
@@ -397,15 +399,14 @@ bool ChannelScanner::ImportExternRecorder(uint cardid, const QString &inputname,
 
     return true;
 #else
-    (void) cardid;
-    (void) inputname;
-
     return false;
 #endif
 }
 
-bool ChannelScanner::ImportHDHR(uint cardid, const QString &inputname, uint sourceid,
-                                ServiceRequirements serviceType)
+bool ChannelScanner::ImportHDHR([[maybe_unused]] uint cardid,
+                                [[maybe_unused]] const QString &inputname,
+                                uint sourceid,
+                                [[maybe_unused]] ServiceRequirements serviceType)
 {
     m_sourceid = sourceid;
 #ifdef USING_HDHOMERUN
@@ -421,9 +422,6 @@ bool ChannelScanner::ImportHDHR(uint cardid, const QString &inputname, uint sour
 
     return true;
 #else
-    (void) cardid;
-    (void) inputname;
-    (void) serviceType;
     return false;
 #endif
 }
@@ -433,7 +431,7 @@ void ChannelScanner::PreScanCommon(
     uint cardid,
     const QString &inputname,
     uint sourceid,
-    bool do_ignore_signal_timeout,
+    [[maybe_unused]] bool do_ignore_signal_timeout,
     bool do_test_decryption)
 {
     bool monitor_snr = false;
@@ -481,8 +479,6 @@ void ChannelScanner::PreScanCommon(
 
         m_channel = new DVBChannel(device);
     }
-#else
-    (void)do_ignore_signal_timeout;
 #endif
 
 #ifdef USING_V4L2

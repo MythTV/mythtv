@@ -88,14 +88,11 @@ extern "C" {
         HDHRSignalMonitor, SignalMonitorValue
  */
 
-SignalMonitor *SignalMonitor::Init(const QString& cardtype, int db_cardnum,
-                                   ChannelBase *channel,
+SignalMonitor *SignalMonitor::Init([[maybe_unused]] const QString& cardtype,
+                                   [[maybe_unused]] int db_cardnum,
+                                   [[maybe_unused]] ChannelBase *channel,
                                    bool release_stream)
 {
-    (void) cardtype;
-    (void) db_cardnum;
-    (void) channel;
-
     SignalMonitor *signalMonitor = nullptr;
 
     if (cardtype == "GuaranteedToFail")

@@ -410,12 +410,10 @@ vbi_line(struct vbi *vbi, const unsigned char *p)
 // called when new vbi data is waiting
 
 void
-vbi_handler(struct vbi *vbi, int fd)
+vbi_handler(struct vbi *vbi, [[maybe_unused]] int fd)
 {
     int n = 0;
     unsigned int seq = 0;
-
-    (void)fd;
 
     n = read(vbi->fd, rawbuf, vbi->bufsize);
 
@@ -545,7 +543,7 @@ set_decode_parms(struct vbi *vbi, struct v4l2_vbi_format *p)
 #endif // USING_V4L2
 
 static int
-setup_dev(struct vbi *vbi)
+setup_dev([[maybe_unused]] struct vbi *vbi)
 {
 #ifdef USING_V4L2
     struct v4l2_format v4l2_format {};
@@ -581,7 +579,6 @@ setup_dev(struct vbi *vbi)
 
     return 0;
 #else
-     (void)vbi;
     return -1;
 #endif // USING_V4L2
 }
@@ -589,12 +586,13 @@ setup_dev(struct vbi *vbi)
 
 
 struct vbi *
-vbi_open(const char *vbi_dev_name, struct cache *ca, int fine_tune, int big_buf)
+vbi_open(const char *vbi_dev_name,
+         [[maybe_unused]] struct cache *ca,
+         int fine_tune,
+         int big_buf)
 {
     static int s_inited = 0;
     struct vbi *vbi = nullptr;
-
-    (void)ca;
 
     if (! s_inited)
        lang_init();
@@ -652,13 +650,12 @@ vbi_close(struct vbi *vbi)
 
 
 struct vt_page *
-vbi_query_page(struct vbi *vbi, int pgno, int subno)
+vbi_query_page([[maybe_unused]] struct vbi *vbi,
+               [[maybe_unused]] int pgno,
+               [[maybe_unused]] int subno)
 {
 #ifdef IMPLEMENTED
     struct vt_page *vtp = 0;
-
-    (void)pgno;
-    (void)subno;
 
     if (vbi->cache)
         vtp = vbi->cache->op->get(vbi->cache, pgno, subno);
@@ -671,9 +668,6 @@ vbi_query_page(struct vbi *vbi, int pgno, int subno)
     vbi_send(vbi, EV_PAGE, 1, 0, 0, vtp);
     return vtp;
 #else
-    (void)vbi;
-    (void)pgno;
-    (void)subno;
     return nullptr;
 #endif
 }

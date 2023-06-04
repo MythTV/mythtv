@@ -627,9 +627,8 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
     }
 };
 
-void ChannelOptionsCommon::onAirGuideChanged(bool fValue)
+void ChannelOptionsCommon::onAirGuideChanged([[maybe_unused]] bool fValue)
 {
-    (void)fValue;
 }
 
 void ChannelOptionsCommon::sourceChanged(const QString& sourceid)

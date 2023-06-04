@@ -360,13 +360,10 @@ to check for duplicates in the BUSQ
  */
 bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
                              const bool upgradeIfNoUI,
-                             const bool informSystemd)
+                             [[maybe_unused]] const bool informSystemd)
 {
 #ifdef IGNORE_SCHEMA_VER_MISMATCH
     return true;
-#endif
-#if CONFIG_SYSTEMD_NOTIFY == 0
-    Q_UNUSED(informSystemd);
 #endif
     SchemaUpgradeWizard *schema_wizard = nullptr;
 

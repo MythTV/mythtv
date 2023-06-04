@@ -260,9 +260,8 @@ bool RecorderBase::IsRecordingRequested(void)
  *  \param clear if true any generated timecodes should be reset.
  *  \sa Unpause(), WaitForPause()
  */
-void RecorderBase::Pause(bool clear)
+void RecorderBase::Pause([[maybe_unused]] bool clear)
 {
-    (void) clear;
     QMutexLocker locker(&m_pauseLock);
     m_requestPause = true;
 }

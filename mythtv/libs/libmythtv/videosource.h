@@ -32,9 +32,8 @@ static inline bool is_grabber_external(const QString &grabber)
              grabber == "/bin/true");
 }
 
-static inline bool is_grabber_labs(const QString &grabber)
+static inline bool is_grabber_labs([[maybe_unused]] const QString &grabber)
 {
-    Q_UNUSED(grabber);
     return false;
 }
 

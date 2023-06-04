@@ -173,17 +173,6 @@ bool FirewireRecorder::ProcessTSPacket(const TSPacket &tspacket)
     return true;
 }
 
-void FirewireRecorder::SetOptionsFromProfile(RecordingProfile *profile,
-                                                 const QString &videodev,
-                                                 const QString &audiodev,
-                                                 const QString &vbidev)
-{
-    (void)videodev;
-    (void)audiodev;
-    (void)vbidev;
-    (void)profile;
-}
-
 // documented in recorderbase.cpp
 bool FirewireRecorder::PauseAndWait(std::chrono::milliseconds timeout)
 {
