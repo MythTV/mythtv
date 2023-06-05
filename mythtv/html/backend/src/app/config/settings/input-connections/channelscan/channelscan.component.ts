@@ -8,6 +8,7 @@ import { CaptureCardList, CardAndInput, CardSubType } from 'src/app/services/int
 import { ChannelScanRequest, ChannelScanStatus, Scan, ScanDialogResponse } from 'src/app/services/interfaces/channel.interface';
 import { VideoMultiplex, VideoMultiplexList } from 'src/app/services/interfaces/multiplex.interface';
 import { SetupService } from 'src/app/services/setup.service';
+import { IconnectionComponent } from '../iconnection/iconnection.component';
 
 
 interface ScanExt extends Scan {
@@ -55,6 +56,7 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
 
   @Input() card!: CardAndInput;
   @Input() cardList!: CaptureCardList;
+  @Input() iconnection!: IconnectionComponent;
   @ViewChild("scroll") scrollpanel!: ScrollPanel;
   @ViewChild("statusPanel") statusPanel!: Fieldset;
 
@@ -103,7 +105,7 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
   ];
 
   satTuningTable = [
-    new SatTuning("(Select Satellite)", 0,    "h", "27500000", "qpsk", "DVB-S2", "auto"),
+    new SatTuning("(Select Satellite)", 0, "h", "27500000", "qpsk", "DVB-S2", "auto"),
     new SatTuning("Eutelsat  7.0E", 10804000, "v", "30000000", "qpsk", "DVB-S2", "5/6"),
     new SatTuning("Hotbird  13.0E", 12015000, "h", "27500000", "8psk", "DVB-S2", "3/4"),
     new SatTuning("Astra-1  19.2E", 11229000, "v", "22000000", "8psk", "DVB-S2", "2/3"),
@@ -547,7 +549,8 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
   respondDialog() {
     this.dialogResponse.CardId = this.card.CardId;
     this.dialogResponse.DialogButton = this.scanStatus.DialogButtons.indexOf(this.buttonText);
-    this.channelService.SendScanDialogResponse(this.dialogResponse).subscribe();
+    this.channelService.SendScanDialogResponse(this.dialogResponse)
+      .subscribe(x => this.iconnection.loadChannels());
   }
 
   refreshStatus() {
