@@ -6,6 +6,7 @@ import { ChannelEditorComponent } from '../config/settings/channel-editor/channe
 import { GuideComponent } from '../guide/guide.component';
 import { RecordingsComponent } from './recordings/recordings.component';
 import { UpcomingComponent } from './upcoming/upcoming.component';
+import { RecrulesComponent } from './recrules/recrules.component';
 
 @NgModule({
 	imports: [
@@ -17,6 +18,7 @@ import { UpcomingComponent } from './upcoming/upcoming.component';
 					{ path: 'program-guide', component: GuideComponent },
 					{ path: 'recordings', component: RecordingsComponent },
 					{ path: 'upcoming', component: UpcomingComponent },
+					{ path: 'recrules', component: RecrulesComponent },
 				]
 			}
 		])

@@ -4,7 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { PartialObserver } from 'rxjs';
-import { ScheduleLink } from 'src/app/schedule/schedule.component';
+import { ScheduleLink, SchedulerSummary } from 'src/app/schedule/schedule.component';
 import { DataService } from 'src/app/services/data.service';
 import { DvrService } from 'src/app/services/dvr.service';
 import { ProgramList, ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
@@ -15,7 +15,7 @@ import { ProgramList, ScheduleOrProgram } from 'src/app/services/interfaces/prog
   styleUrls: ['./upcoming.component.css'],
   providers: [MessageService]
 })
-export class UpcomingComponent implements OnInit {
+export class UpcomingComponent implements OnInit, SchedulerSummary {
 
   @ViewChild("upcomingform") currentForm!: NgForm;
   @ViewChild("menu") menu!: Menu;

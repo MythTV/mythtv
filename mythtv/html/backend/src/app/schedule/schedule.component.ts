@@ -8,7 +8,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { MythService } from '../services/myth.service';
 import { NgForm } from '@angular/forms';
 import { RecordScheduleRequest } from '../services/interfaces/dvr.interface';
-import { GuideComponent } from '../guide/guide.component';
 import { Observable, of } from 'rxjs';
 
 export interface SchedulerSummary {

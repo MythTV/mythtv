@@ -78,6 +78,7 @@ import { WizChanneleditComponent } from './config/setupwizard/wiz-channeledit/wi
 import { RecordingsComponent } from './dashboard/recordings/recordings.component';
 import { ScheduleComponent } from './schedule/schedule.component';
 import { UpcomingComponent } from './dashboard/upcoming/upcoming.component';
+import { RecrulesComponent } from './dashboard/recrules/recrules.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -151,6 +152,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     RecordingsComponent,
     ScheduleComponent,
     UpcomingComponent,
+    RecrulesComponent,
   ],
   imports: [
     BrowserModule,

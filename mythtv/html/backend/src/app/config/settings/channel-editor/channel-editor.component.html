@@ -1,7 +1,7 @@
 <h2>{{ 'settings.chanedit.title' | translate }}</h2>
 <div class="block card w-full" style="height: 90vh" *ngIf="(chansLoaded && transDone >= numTranslations) else loading">
     <p-table [value]="allChannels" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
-        [rowHover]="true" (onFilter)="onFilter($event)">
+        [rowHover]="true" (onFilter)="onFilter($event)" responsiveLayout="scroll">
         <ng-template pTemplate="caption">
             <button pButton pRipple label="{{ 'settings.chanedit.new_channel' | translate }}" icon="pi pi-plus"
                 class="p-button-success mr-2" (click)="openNew()"></button>
@@ -27,18 +27,18 @@
                 </th>
             </tr>
             <tr>
-                <th style="flex-grow:  42; flex-basis: 0;">&nbsp;</th>
-                <th style="flex-grow:  44; flex-basis: 0;" pSortableColumn="ChanSeq">
+                <th style="flex-basis:  8%">&nbsp;</th>
+                <th style="flex-basis:  9%" pSortableColumn="ChanSeq">
                     {{ 'settings.chanedit.col_channum' | translate }} <p-sortIcon field="ChanSeq"></p-sortIcon></th>
-                <th style="flex-grow:  30; flex-basis: 0;">{{ 'settings.chanedit.col_freqid' | translate }}</th>
-                <th style="flex-grow:  50; flex-basis: 0;">{{ 'settings.chanedit.col_callsign' | translate }}</th>
-                <th style="flex-grow: 120; flex-basis: 0;">{{ 'settings.chanedit.col_name' | translate }}</th>
-                <th style="flex-grow:  80; flex-basis: 0;" pSortableColumn="Source">
+                <th style="flex-basis:  6%">{{ 'settings.chanedit.col_freqid' | translate }}</th>
+                <th style="flex-basis:  10%">{{ 'settings.chanedit.col_callsign' | translate }}</th>
+                <th style="flex-basis:  24%">{{ 'settings.chanedit.col_name' | translate }}</th>
+                <th style="flex-basis:  16%" pSortableColumn="Source">
                     {{ 'settings.chanedit.col_source' | translate }} <p-sortIcon field="Source"></p-sortIcon></th>
-                <th style="flex-grow:  30; flex-basis: 0;">{{ 'settings.chanedit.col_priority' | translate }}</th>
-                <th style="flex-grow:  50; flex-basis: 0;">{{ 'settings.chanedit.col_visibility' | translate }}</th>
-                <th style="flex-grow:  30; flex-basis: 0;">{{ 'settings.chanedit.col_useeit' | translate }}</th>
-                <th style="flex-grow:  30; flex-basis: 0;">
+                <th style="flex-basis:  6%">{{ 'settings.chanedit.col_priority' | translate }}</th>
+                <th style="flex-basis:  10%">{{ 'settings.chanedit.col_visibility' | translate }}</th>
+                <th style="flex-basis:  6%">{{ 'settings.chanedit.col_useeit' | translate }}</th>
+                <th style="flex-basis:  6%">
                     <!-- These are disabled buttons to ensure the spacing of the heading
                          matches the spacing of the rows -->
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-success"
@@ -50,20 +50,20 @@
         </ng-template>
         <ng-template pTemplate="body" let-channel>
             <tr height="40" [ngClass]="{'line-through' : channel.ChanId < 0}">
-                <td style="flex-grow: 42">
+                <td style="flex-basis: 8%">
                     <img src="{{channel.IconURL}}" height="32" width="42" *ngIf="channel.IconURL; else nullIcon"
                         style="background-color:#000000" onerror="this.height='0'">
                     <ng-template #nullIcon><img height="32" width="42"></ng-template>
                 </td>
-                <td style="flex-grow:  44; flex-basis: 0;">{{ channel.ChanNum }}</td>
-                <td style="flex-grow:  30; flex-basis: 0;">{{ channel.FrequencyId }}</td>
-                <td style="flex-grow:  50; flex-basis: 0;">{{ channel.CallSign }}</td>
-                <td style="flex-grow: 120; flex-basis: 0;">{{ channel.ChannelName }}</td>
-                <td style="flex-grow:  80; flex-basis: 0;">{{ channel.Source }}</td>
-                <td style="flex-grow:  30; flex-basis: 0;">{{ channel.RecPriority }}</td>
-                <td style="flex-grow:  50; flex-basis: 0;">{{ getVisibility(channel) }}</td>
-                <td style="flex-grow:  30; flex-basis: 0;">{{ channel.UseEIT ? 'Y' : 'N' }}</td>
-                <td style="flex-grow:  30; flex-basis: 0;">
+                <td style="flex-basis:  9%">{{ channel.ChanNum }}</td>
+                <td style="flex-basis:  6%">{{ channel.FrequencyId }}</td>
+                <td style="flex-basis:  10%">{{ channel.CallSign }}</td>
+                <td style="flex-basis:  24%">{{ channel.ChannelName }}</td>
+                <td style="flex-basis:  16%">{{ channel.Source }}</td>
+                <td style="flex-basis:  6%">{{ channel.RecPriority }}</td>
+                <td style="flex-basis:  10%">{{ getVisibility(channel) }}</td>
+                <td style="flex-basis:  6%">{{ channel.UseEIT ? 'Y' : 'N' }}</td>
+                <td style="flex-basis:  6%">
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-success"
                         (click)="editChannel(channel)" [disabled]="channel.ChanId < 0"
                         pTooltip="{{ 'settings.chanedit.updatechan' | translate }}"></button>

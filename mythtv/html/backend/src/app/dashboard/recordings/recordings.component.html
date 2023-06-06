@@ -6,7 +6,7 @@
     <div class="block card w-full" style="height: 90vh" *ngIf="recordings else loading">
         <p-menu #menu [popup]="true" [model]="menuToShow"></p-menu>
         <p-table [value]="recordings.Programs" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
-            [rowHover]="true">
+            [rowHover]="true" responsiveLayout="scroll">
             <ng-template pTemplate="caption">
             </ng-template>
             <ng-template pTemplate="header">
@@ -25,57 +25,57 @@
                     </th>
                 </tr>
                 <tr>
-                    <th style="flex-grow: 40; flex-basis: 0;" class="p-1" pSortableColumn="Title">
+                    <th style="flex-basis: 12%" class="p-1" pSortableColumn="Title">
                         {{ 'dashboard.recordings.title' | translate }} <p-sortIcon field="Title"></p-sortIcon></th>
-                    <th style="flex-grow: 3; flex-basis: 0;" class="p-1"></th>
-                    <th style="flex-grow: 45; flex-basis: 0;" class="p-1">{{ 'dashboard.recordings.subtitle' | translate
+                    <th style="flex-basis: 2%" class="p-1"></th>
+                    <th style="flex-basis: 18%" class="p-1">{{ 'dashboard.recordings.subtitle' | translate
                         }}</th>
-                    <th style="flex-grow: 10; flex-basis: 0;" class="p-1">{{ 'dashboard.recordings.seas_ep' | translate
+                    <th style="flex-basis: 4%" class="p-1">{{ 'dashboard.recordings.seas_ep' | translate
                         }}</th>
-                    <th style="flex-grow: 20; flex-basis: 0;" class="justify-content-end p-1" pSortableColumn="Airdate">
+                    <th style="flex-basis: 8%" class="justify-content-end p-1" pSortableColumn="Airdate">
                         {{ 'dashboard.recordings.orig_airdate' | translate }} <p-sortIcon field="Airdate"></p-sortIcon>
                     </th>
-                    <th style="flex-grow: 20; flex-basis: 0;" class="justify-content-end p-1"
+                    <th style="flex-basis: 8%" class="justify-content-end p-1"
                         pSortableColumn="StartTime">
                         {{ 'dashboard.recordings.airdate' | translate }} <p-sortIcon field="StartTime"></p-sortIcon>
                     </th>
-                    <th style="flex-grow: 25; flex-basis: 0;" class="p-1">{{ 'dashboard.recordings.channel' | translate
+                    <th style="flex-basis: 10%" class="p-1">{{ 'dashboard.recordings.channel' | translate
                         }}</th>
-                    <th style="flex-grow: 15; flex-basis: 0;" class="p-1" pSortableColumn="Recording.RecGroup">
+                    <th style="flex-basis: 8%" class="p-1" pSortableColumn="Recording.RecGroup">
                         {{ 'dashboard.recordings.recgrp' | translate }} <p-sortIcon
                             field="Recording.RecGroup"></p-sortIcon> </th>
-                    <th style="flex-grow: 10; flex-basis: 0;" class="justify-content-end p-1">
+                    <th style="flex-basis: 6%" class="justify-content-end p-1">
                         {{ 'dashboard.recordings.duration' | translate }}
                     </th>
-                    <th style="flex-grow: 20; flex-basis: 0;" class="justify-content-end p-1">{{
+                    <th style="flex-basis: 8%" class="justify-content-end p-1">{{
                         'dashboard.recordings.file_size' | translate }}</th>
-                    <th style="flex-grow: 3; flex-basis: 0;" class="p-1">
+                    <th style="flex-basis: 2%" class="p-1">
                         <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"></button>
                     </th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-program>
-                <tr height="25" [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}">
-                    <td style="flex-grow: 40; flex-basis: 0;" class="p-1 white-space-nowrap overflow-hidden">
+                <tr [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}">
+                    <td style="flex-basis: 12%" class="p-1 overflow-hidden">
                         {{program.Title}}</td>
-                    <td style="flex-grow: 3; flex-basis: 0;" class="p-1">
+                    <td style="flex-basis: 2%" class="p-1">
                         <i class="pi pi-eye" *ngIf="program.ProgramFlagNames.indexOf('WATCHED') > -1"></i>
                     </td>
-                    <td style="flex-grow: 45; flex-basis: 0;" class="p-1 white-space-nowrap overflow-hidden">
+                    <td style="flex-basis: 18%" class="p-1 overflow-hidden">
                         {{program.SubTitle}}</td>
-                    <td style="flex-grow: 10; flex-basis: 0;" class="p-1">{{program.Season}}x{{program.Episode}}</td>
-                    <td style="flex-grow: 20; flex-basis: 0;" class="justify-content-end p-1">
+                    <td style="flex-basis: 4%" class="p-1">{{program.Season}}x{{program.Episode}}</td>
+                    <td style="flex-basis: 8%" class="justify-content-end p-1">
                         {{formatDate(program.Airdate)}}</td>
-                    <td style="flex-grow: 20; flex-basis: 0;" class="justify-content-end p-1">
+                    <td style="flex-basis: 8%" class="justify-content-end p-1">
                         {{formatDate(program.StartTime)}}</td>
-                    <td style="flex-grow: 25; flex-basis: 0;" class="p-1">
-                        {{program.Channel.ChanNum}}/{{program.Channel.CallSign}}</td>
-                    <td style="flex-grow: 15; flex-basis: 0;" class="p-1">{{program.Recording.RecGroup}}</td>
-                    <td style="flex-grow: 10; flex-basis: 0;" class="justify-content-end p-1">{{ getDuration(program) |
+                    <td style="flex-basis: 10%" class="p-1">
+                        {{program.Channel.ChanNum}} {{program.Channel.CallSign}}</td>
+                    <td style="flex-basis: 8%" class="p-1">{{program.Recording.RecGroup}}</td>
+                    <td style="flex-basis: 6%" class="justify-content-end p-1">{{ getDuration(program) |
                         number:'1.0-0' }} min</td>
-                    <td style="flex-grow: 20; flex-basis: 0;" class="justify-content-end p-1">
+                    <td style="flex-basis: 8%" class="justify-content-end p-1">
                         {{program.Recording.FileSize / 1000000 | number:'1.0-0'}} MB</td>
-                    <td style="flex-grow: 3; flex-basis: 0;" class="p-1">
+                    <td style="flex-basis: 2%" class="p-1">
                         <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
                             (click)="showMenu(program,$event)"></button>
                     </td>
