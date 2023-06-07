@@ -555,7 +555,6 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
 
   refreshStatus() {
     this.channelService.GetScanStatus().subscribe(data => {
-      // if (data.ScanStatus.CardId == this.card.CardId) {
       this.scanStatus = data.ScanStatus;
       this.scrollpanel.scrollTop(100000);
       if (this.scanStatus.Status == 'RUNNING')
@@ -564,6 +563,8 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
         this.refreshCount--;
       if (this.refreshCount > 0)
         setTimeout(() => this.refreshStatus(), 500);
+      else
+        this.iconnection.loadChannels();
     });
   }
 
