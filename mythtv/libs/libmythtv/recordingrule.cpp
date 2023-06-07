@@ -940,7 +940,7 @@ bool RecordingRule::IsValid(QString &msg) const
         }
     }
 
-    if (!isSearch)
+    if (m_type != kTemplateRecord && !isSearch)
     {
         if (!m_startdate.isValid() || !m_starttime.isValid() ||
             !m_enddate.isValid() || !m_endtime.isValid())
@@ -963,7 +963,8 @@ bool RecordingRule::IsValid(QString &msg) const
         }
     }
 
-    if (m_findday < 0 || m_findday > 6 || !m_findtime.isValid())
+    if (m_type != kTemplateRecord
+        && (m_findday < 0 || m_findday > 6 || !m_findtime.isValid()) )
     {
         msg = QString("Invalid find values.");
         return false;
