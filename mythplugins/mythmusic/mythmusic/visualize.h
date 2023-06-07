@@ -217,7 +217,7 @@ class Spectrogram : public VisualBase
     static inline double clamp(double cur, double max, double min);
     QSize          m_sgsize {1920, 1080}; // picture size
     QSize          m_size;                // displayed dize
-    LogScale       m_scale;
+    LogScale       m_scale;		  // Y-axis
     int            m_fftlen {16 * 1024}; // window width
     QVector<float> m_sigL;               // decaying signal window
     QVector<float> m_sigR;
