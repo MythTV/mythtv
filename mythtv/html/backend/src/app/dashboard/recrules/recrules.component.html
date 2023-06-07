@@ -1,1 +1,65 @@
-<h2>Coming soon</h2>
+<h2>{{ 'dashboard.recrules.heading' | translate }}</h2>
+<div class="block card w-full" style="height: 90vh" *ngIf="rulesLoaded else loading">
+    <p-table [value]="recRules" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
+        [rowHover]="true" responsiveLayout="scroll">
+        <ng-template pTemplate="caption">
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="flex-basis: 20%" class="p-1" pSortableColumn="Title">
+                    {{ 'dashboard.recordings.title' | translate }} <p-sortIcon field="Title"></p-sortIcon></th>
+                <th style="flex-basis: 20%" class="p-1">{{ 'dashboard.recrule.type' | translate
+                    }}</th>
+                <th style="flex-basis: 10%" class="p-1">{{ 'common.priority' | translate
+                    }}</th>
+                <th style="flex-basis: 10%" class="p-1">
+                    {{ 'dashboard.recordings.recgrp' | translate }}
+                </th>
+                <th style="flex-basis: 10%" class="p-1">
+                    {{ 'dashboard.recrules.storgrp' | translate }}
+                </th>
+                <th style="flex-basis: 10%" class="justify-content-end pr-5" pSortableColumn="LastRecorded">
+                    {{ 'dashboard.recrules.lastrec' | translate }}<p-sortIcon field="LastRecorded"></p-sortIcon>
+                </th>
+                <th style="flex-basis: 15%" class="justify-content-end pr-5" pSortableColumn="NextRecording">
+                    {{ 'dashboard.recrules.nextrec' | translate }}<p-sortIcon field="NextRecording"></p-sortIcon>
+                </th>
+                <th style="flex-basis: 5%" class="p-1">Active</th>
+                <th style="flex-basis: 5%" class="p-1">
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-primary"
+                        [disabled]="true"></button>
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-recrule>
+            <tr>
+                <td style="flex-basis: 20%" class="p-1 overflow-hidden">
+                    {{recrule.Title}}</td>
+                <td style="flex-basis: 20%" class="p-1">
+                    {{ typeValue[recrule.Type]}}</td>
+                <td style="flex-basis: 10%" class="p-1">{{recrule.RecPriority}}</td>
+                <td style="flex-basis: 10%" class="p-1">{{recrule.RecGroup}}</td>
+                <td style="flex-basis: 10%" class="p-1">{{recrule.StorageGroup}}</td>
+                <td style="flex-basis: 10%" class="justify-content-end p-1 pr-5">
+                    {{formatDate(recrule.LastRecorded)}}</td>
+                <td style="flex-basis: 15%" class="justify-content-end p-1 pr-5">
+                    {{formatDate(recrule.NextRecording)}} {{formatTime(recrule.NextRecording)}}</td>
+                <td style="flex-basis: 5%" class="p-1">
+                    <i class="pi pi-times" style="color:red" *ngIf="recrule.Inactive else checkmark"></i>
+                    <ng-template #checkmark>
+                        <i class="pi pi-check" style="color:darkgreen"></i>
+                    </ng-template>
+                </td>
+                <td style="flex-basis: 5%" class="p-1">
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-primary"
+                        (click)="updateRecRule(recrule)"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+</div>
+<app-schedule [inter]="inter"></app-schedule>
+<ng-template #loading>
+    <p-progressSpinner></p-progressSpinner>
+</ng-template>

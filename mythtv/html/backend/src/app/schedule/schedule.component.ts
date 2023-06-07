@@ -46,6 +46,7 @@ export class ScheduleComponent implements OnInit {
   program?: ScheduleOrProgram;
   channel?: Channel;
   recRule?: RecRule;
+  masterRecRule?: RecRule;
   defaultTemplate?: RecRule;
 
   recRules: RecRule[] = [];
@@ -188,6 +189,8 @@ export class ScheduleComponent implements OnInit {
       this.loadCount = 0;
       this.setupData();
     }
+    this.displayDlg = true;
+    this.currentForm.form.markAsPristine();
   }
 
   loadFail() {
@@ -196,7 +199,8 @@ export class ScheduleComponent implements OnInit {
 
   open(program?: ScheduleOrProgram, channel?: Channel, recRule?: RecRule) {
     this.program = program;
-    this.recRule = recRule;
+    this.masterRecRule = recRule;
+    this.recRule = Object.assign({}, recRule);
     this.channel = channel;
     if (!this.recRule) {
       if (this.program) {
@@ -205,31 +209,33 @@ export class ScheduleComponent implements OnInit {
       }
     }
     this.loadLists();
-    this.displayDlg = true;
   }
 
   setupData() {
     var recId = 0;
+    this.typeList = [];
+    let ruleType: string = '';
+    if (this.masterRecRule)
+      ruleType = this.masterRecRule.Type;
     this.templates = [<RecRule>{ Id: 0, Title: '' }];
     this.defaultTemplate = undefined;
     if (this.program && this.program.Recording)
       recId = this.program.Recording.RecordId;
-    this.recRules.forEach((recRule, index) => {
-      if (recRule.Id == recId)
-        this.recRule = recRule;
-      if (recRule.Type == 'Recording Template') {
-        this.templates.push(recRule);
-        if (recRule.Title == 'Default (Template)')
-          this.defaultTemplate = recRule;
+    this.recRules.forEach((entry, index) => {
+      if (entry.Id == recId)
+        this.recRule = entry;
+      if (entry.Type == 'Recording Template') {
+        this.templates.push(entry);
+        if (entry.Title == 'Default (Template)')
+          this.defaultTemplate = entry;
       }
     });
+    console.log(this)
     if (!this.recRule) {
-      // if (recId != 0) message re missing rec rule
       this.recRule = <RecRule>{ Id: 0 };
       if (this.defaultTemplate)
         this.mergeTemplate(this.recRule, this.defaultTemplate)
-      // this.recRule = <RecRule>Object.assign({}, this.defaultTemplate);
-      this.recRule.Type = 'Not Recording';
+      ruleType = 'Not Recording';
     }
     if (!this.recRule.SearchType)
       this.recRule.SearchType = 'None';
@@ -238,17 +244,21 @@ export class ScheduleComponent implements OnInit {
     if (this.program && this.channel && this.recRule.SearchType == 'None')
       this.mergeProgram(this.recRule, this.program, this.channel);
 
-    if (!this.recRule.Type)
-      this.recRule.Type = 'Not Recording';
+    if (!ruleType)
+      ruleType = 'Not Recording';
     if (!this.recRule.StartTime)
       this.recRule.StartTime = (new Date()).toISOString();
 
     this.filterFromRec(this.recRule);
     this.postProcFromRec(this.recRule);
 
-    // typeList : ListEntry []
-    this.typeList = [];
-    if (this.recRule.Type == 'Recording Template') {
+    if (ruleType == 'Recording Template') {
+      this.typeList.push(
+        {
+          prompt: this.translate.instant('dashboard.sched.type.mod_template'),
+          value: 'Recording Template'
+        }
+      );
       if (this.recRule.Category != 'Default') {
         this.typeList.push(
           {
@@ -257,14 +267,8 @@ export class ScheduleComponent implements OnInit {
           }
         );
       }
-      this.typeList.push(
-        {
-          prompt: this.translate.instant('dashboard.sched.type.mod_template'),
-          value: 'Recording Template'
-        }
-      );
     }
-    else if (this.recRule.Type == 'Override Recording')
+    else if (ruleType == 'Override Recording')
       this.typeList.push(
         {
           prompt: this.translate.instant('dashboard.sched.type.del_override'),
@@ -321,6 +325,11 @@ export class ScheduleComponent implements OnInit {
           }
         );
     }
+    setTimeout(() => {
+      if (this.recRule)
+        this.recRule.Type = ruleType;
+      this.currentForm.form.markAsPristine();
+    }, 10);
   }
 
 

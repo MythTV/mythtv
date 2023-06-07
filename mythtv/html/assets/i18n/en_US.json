@@ -22,7 +22,8 @@
     "unsaved_message": "There are unsaved changes.",
     "submit": "Submit",
     "instructions": "Instructions",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "priority": "Priority"
   },
   "dashboard": {
     "backendStatus": "Backend Status",
@@ -130,7 +131,13 @@
       "heading": "Schedule recording"
     },
     "recrules": {
-      "heading": "Recording Rules"
+      "heading": "Recording Rules",
+      "storgrp": "Storage Group",
+      "lastrec": "Last Recorded",
+      "nextrec": "Next Recording"
+    },
+    "recrule": {
+      "type": "Type"
     }
   },
   "navbar": {
@@ -1150,5 +1157,15 @@
       "NeverRecord": "Never Record",
       "Offline": "Offline"
     }
+  },
+  "recrule": {
+    "SingleRecord": "Single Record",
+    "RecordAll": "Record All",
+    "RecordOne": "Record One",
+    "RecordDaily": "Record Daily",
+    "RecordWeekly": "Record Weekly",
+    "OverrideRecording": "Override Recording",
+    "RecordingTemplate": "Recording Template",
+    "NotRecording": "Not Recording"
   }
 }
