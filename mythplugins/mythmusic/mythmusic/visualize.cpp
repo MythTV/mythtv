@@ -879,30 +879,32 @@ Spectrogram::Spectrogram()
     m_sigL.resize(m_fftlen);
     m_sigR.resize(m_fftlen);
 
-    // cache a continuous color spectrum:
-    // 0000ff blue
-    // 00ffff cyan
-    // 00ff00 green
-    // ffff00 yellow
-    // ff0000 red
-    // ff00ff magenta
-    // 0000ff blue
-    int red[]   = {0, 0, 9, 1, 1, 8}; // 8 = ramp down
-    int green[] = {9, 1, 1, 8, 0, 0}; // 9 = ramp up
-    int blue[]  = {1, 8, 0, 0, 9, 1};
-    m_red   = (int *) malloc(sizeof(int) * 257 * 6);
-    m_green = (int *) malloc(sizeof(int) * 257 * 6);
-    m_blue  = (int *) malloc(sizeof(int) * 257 * 6);
-    for (int i = 0; i < 6; i++)
+    // cache a continuous color spectrum ([0-1535] = 256 colors * 6 ramps):
+    // 0000ff blue              from here, G of RGB ramps UP to:
+    // 00ffff cyan              then       B ramps down to:
+    // 00ff00 green             then       R ramps  UP  to:
+    // ffff00 yellow            then       G ramps down to:
+    // ff0000 red               then       B ramps  UP  to:
+    // ff00ff magenta           then       R ramps down to:
+    // 0000ff blue              we end where we started!
+    static constexpr int UP { 2 };
+    static constexpr int DN { 3 };
+    int red[]   = {  0,  0, UP,  1,  1, DN }; // 0=OFF, 1=ON
+    int green[] = { UP,  1,  1, DN,  0,  0 };
+    int blue[]  = {  1, DN,  0,  0, UP,  1 };
+    m_red   = (int *) malloc(sizeof(int) * 256 * 6);
+    m_green = (int *) malloc(sizeof(int) * 256 * 6);
+    m_blue  = (int *) malloc(sizeof(int) * 256 * 6);
+    for (int i = 0; i < 6; i++) // for 6 color transitions...
     {
-        int r = red[i];
+        int r = red[i];         // 0=OFF, 1=ON, UP, or DN
         int g = green[i];
         int b = blue[i];
         for (int u = 0; u < 256; u++) { // u ramps up
             int d = 256 - u;            // d ramps down
-            m_red[  i * 256 + u] = r == 9 ? u : r == 8 ? d : r * 255;
-            m_green[i * 256 + u] = g == 9 ? u : g == 8 ? d : g * 255;
-            m_blue[ i * 256 + u] = b == 9 ? u : b == 8 ? d : b * 255;
+            m_red[  i * 256 + u] = r == UP ? u : r == DN ? d : r * 255;
+            m_green[i * 256 + u] = g == UP ? u : g == DN ? d : g * 255;
+            m_blue[ i * 256 + u] = b == UP ? u : b == DN ? d : b * 255;
         }
     }
 }
