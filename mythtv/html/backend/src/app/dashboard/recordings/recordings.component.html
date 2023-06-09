@@ -35,8 +35,7 @@
                     <th style="flex-basis: 8%" class="justify-content-end p-1" pSortableColumn="Airdate">
                         {{ 'dashboard.recordings.orig_airdate' | translate }} <p-sortIcon field="Airdate"></p-sortIcon>
                     </th>
-                    <th style="flex-basis: 8%" class="justify-content-end p-1"
-                        pSortableColumn="StartTime">
+                    <th style="flex-basis: 8%" class="justify-content-end p-1" pSortableColumn="StartTime">
                         {{ 'dashboard.recordings.airdate' | translate }} <p-sortIcon field="StartTime"></p-sortIcon>
                     </th>
                     <th style="flex-basis: 10%" class="p-1">{{ 'dashboard.recordings.channel' | translate
@@ -50,7 +49,8 @@
                     <th style="flex-basis: 8%" class="justify-content-end p-1">{{
                         'dashboard.recordings.file_size' | translate }}</th>
                     <th style="flex-basis: 2%" class="p-1">
-                        <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary" [disabled]="true"></button>
+                        <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
+                            [disabled]="true"></button>
                     </th>
                 </tr>
             </ng-template>
@@ -63,7 +63,10 @@
                     </td>
                     <td style="flex-basis: 18%" class="p-1 overflow-hidden">
                         {{program.SubTitle}}</td>
-                    <td style="flex-basis: 4%" class="p-1">{{program.Season}}x{{program.Episode}}</td>
+                    <td style="flex-basis: 4%" class="p-1">
+                        <div *ngIf="program.Season>0 || program.Episode>0"> {{program.Season}}x{{program.Episode}}
+                        </div>
+                    </td>
                     <td style="flex-basis: 8%" class="justify-content-end p-1">
                         {{formatDate(program.Airdate)}}</td>
                     <td style="flex-basis: 8%" class="justify-content-end p-1">

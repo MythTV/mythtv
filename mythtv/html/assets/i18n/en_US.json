@@ -138,6 +138,10 @@
     },
     "recrule": {
       "type": "Type"
+    },
+    "videos": {
+      "heading": "Videos",
+      "releasedate": "Release Date"
     }
   },
   "navbar": {

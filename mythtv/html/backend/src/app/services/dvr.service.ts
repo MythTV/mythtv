@@ -77,7 +77,7 @@ export class DvrService {
   }
 
   public DisableRecordSchedule(recordid: number): Observable<BoolResponse> {
-    return this.httpClient.post<BoolResponse>('/Dvr/DisableRecordSchedule', recordid);
+    return this.httpClient.post<BoolResponse>('/Dvr/DisableRecordSchedule', {RecordId: recordid});
   }
 
   public DupInToDescription(DupIn: string): Observable<string> {

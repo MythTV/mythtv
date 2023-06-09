@@ -12,6 +12,7 @@ const PROXY_CONFIG = [
             "/Content",
             "/Dvr",
             "/Channel",
+            "/Video",
         ],
         target: "http://localhost:6744",
     }

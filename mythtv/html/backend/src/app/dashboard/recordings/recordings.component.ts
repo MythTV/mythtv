@@ -177,8 +177,8 @@ export class RecordingsComponent implements OnInit {
     this.messageService.add({
       severity: severity, summary: text,
       detail: action + ' ' + this.program.Title + ' ' + this.program.SubTitle + extraText,
-      sticky: true,
-      contentStyleClass: 'recsmsg'
+      sticky: true
+      // contentStyleClass: 'recsmsg'
     });
   }
 
@@ -213,8 +213,6 @@ export class RecordingsComponent implements OnInit {
         },
         error: (err: any) => this.networkError(err)
       });
-
-
   }
 
   updatemeta(event: any) {
