@@ -46,8 +46,10 @@ export class ScheduleComponent implements OnInit {
   program?: ScheduleOrProgram;
   channel?: Channel;
   recRule?: RecRule;
-  masterRecRule?: RecRule;
   defaultTemplate?: RecRule;
+  reqProgram?: ScheduleOrProgram
+  reqChannel?: Channel
+  reqRecRule?: RecRule
 
   recRules: RecRule[] = [];
   playGroups: string[] = [];
@@ -179,8 +181,6 @@ export class ScheduleComponent implements OnInit {
           error: () => this.loadFail()
         });
     }
-
-
   }
 
   loadSuccess() {
@@ -188,9 +188,9 @@ export class ScheduleComponent implements OnInit {
     if (this.loadCount == 10) {
       this.loadCount = 0;
       this.setupData();
+      this.displayDlg = true;
+      this.currentForm.form.markAsPristine();
     }
-    this.displayDlg = true;
-    this.currentForm.form.markAsPristine();
   }
 
   loadFail() {
@@ -198,39 +198,44 @@ export class ScheduleComponent implements OnInit {
   }
 
   open(program?: ScheduleOrProgram, channel?: Channel, recRule?: RecRule) {
-    this.program = program;
-    this.masterRecRule = recRule;
-    this.recRule = Object.assign({}, recRule);
-    this.channel = channel;
-    if (!this.recRule) {
-      if (this.program) {
-        if (!channel && this.program.Channel)
-          this.channel = this.program.Channel;
-      }
-    }
+    this.reqProgram = program;
+    this.reqChannel = channel;
+    this.reqRecRule = recRule;
     this.loadLists();
   }
 
   setupData() {
+    this.program = this.reqProgram;
+    if (this.reqRecRule)
+      this.recRule = Object.assign({}, this.reqRecRule);
+    else
+      this.recRule = undefined;
+    this.channel = this.reqChannel;
+    if (this.program) {
+      if (!this.channel && this.program.Channel)
+        this.channel = this.program.Channel;
+    }
+
     var recId = 0;
     this.typeList = [];
     let ruleType: string = '';
-    if (this.masterRecRule)
-      ruleType = this.masterRecRule.Type;
+    if (this.reqRecRule)
+      ruleType = this.reqRecRule.Type;
     this.templates = [<RecRule>{ Id: 0, Title: '' }];
     this.defaultTemplate = undefined;
     if (this.program && this.program.Recording)
       recId = this.program.Recording.RecordId;
     this.recRules.forEach((entry, index) => {
-      if (entry.Id == recId)
+      if (entry.Id == recId) {
         this.recRule = entry;
+        ruleType = this.recRule.Type;
+      }
       if (entry.Type == 'Recording Template') {
         this.templates.push(entry);
         if (entry.Title == 'Default (Template)')
           this.defaultTemplate = entry;
       }
     });
-    console.log(this)
     if (!this.recRule) {
       this.recRule = <RecRule>{ Id: 0 };
       if (this.defaultTemplate)
