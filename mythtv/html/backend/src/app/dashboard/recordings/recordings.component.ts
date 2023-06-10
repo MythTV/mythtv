@@ -218,7 +218,10 @@ export class RecordingsComponent implements OnInit {
   updatemeta(event: any) {
     this.editingProgram = this.program;
     this.program = Object.assign({}, this.program);
-    this.program.Airdate = new Date(this.program.Airdate + ' 00:00');
+    if (this.program.Airdate)
+      this.program.Airdate = new Date(this.program.Airdate + ' 00:00');
+    else
+      this.program.Airdate = <Date><unknown>null;
     this.displayMetadataDlg = true;
   }
 
