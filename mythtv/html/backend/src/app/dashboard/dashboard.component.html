@@ -1,5 +1,13 @@
 <div *ngIf="translateDone">
-    <h1></h1>
-    <p-tabMenu [model]="fullMenu" [activeItem]="activeItem" [scrollable]="true"></p-tabMenu>
-    <router-outlet></router-outlet>
+  <h1></h1>
+  <div class="flex flex-row">
+    <button pButton pRipple icon="pi pi-angle-double-left" class="p-button-text p-button-primary"
+      (click)="menu.navBackward()"></button>
+    <div class="col-11">
+      <p-tabMenu #menu [model]="fullMenu" [activeItem]="activeItem" [scrollable]="false"></p-tabMenu>
+    </div>
+    <button pButton pRipple icon="pi pi-angle-double-right" class="p-button-text p-button-primary"
+      (click)="menu.navForward()"></button>
+  </div>
+  <router-outlet></router-outlet>
 </div>
