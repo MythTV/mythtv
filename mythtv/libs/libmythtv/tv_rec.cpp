@@ -4784,6 +4784,28 @@ TVRec* TVRec::GetTVRec(uint inputid)
     return *it;
 }
 
+void TVRec::EnableActiveScan(bool enable) {
+    if (m_scanner != nullptr) {
+        if (enable) {
+            if ( ! HasFlags(kFlagEITScannerRunning)
+                && m_eitScanStartTime > MythDate::current().addYears(9))
+                {
+                    auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
+                    m_eitScanStartTime = MythDate::current().addSecs(secs.count());
+                }
+        }
+        else {
+            m_eitScanStartTime = MythDate::current().addYears(10);
+            if (HasFlags(kFlagEITScannerRunning))
+            {
+                m_scanner->StopActiveScan();
+                ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
+            }
+
+        }
+    }
+}
+
 QString TuningRequest::toString(void) const
 {
     return QString("Program(%1) channel(%2) input(%3) flags(%4)")

@@ -18,6 +18,7 @@
 #include "libmythbase/mythversion.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythbase/version.h"
+#include "libmythtv/tv_rec.h"
 
 // MythBackend
 #include "backendcontext.h"
@@ -1232,8 +1233,16 @@ bool V2Myth::ManageScheduler ( bool Enable, bool Disable )
         return false;
     if (Enable)
         scheduler->EnableScheduling();
-    if (Disable)
+    else
         scheduler->DisableScheduling();
+    // Stop EIT scanning
+    QMapIterator<uint,TVRec*> iter(TVRec::s_inputs);
+    while (iter.hasNext())
+    {
+        iter.next();
+        auto tvrec = iter.value();
+        tvrec->EnableActiveScan(Enable);
+    }
     return true;
 }
 
