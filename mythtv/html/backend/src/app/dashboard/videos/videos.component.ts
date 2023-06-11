@@ -173,7 +173,7 @@ export class VideosComponent implements OnInit {
     this.messageService.add({
       severity: severity, summary: text,
       detail: action + ' ' + this.video.Title + ' ' + this.video.SubTitle + extraText,
-      sticky: true,
+      life: 3000,
       // contentStyleClass: 'recsmsg'
     });
   }

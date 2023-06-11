@@ -177,7 +177,7 @@ export class RecordingsComponent implements OnInit {
     this.messageService.add({
       severity: severity, summary: text,
       detail: action + ' ' + this.program.Title + ' ' + this.program.SubTitle + extraText,
-      sticky: true
+      life: 3000
       // contentStyleClass: 'recsmsg'
     });
   }
