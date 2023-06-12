@@ -67,6 +67,7 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
   ];
 
   cardSubType!: CardSubType;
+  scanSubType = '';
 
   scanTypes: Sel[] = [];
 
@@ -378,6 +379,7 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
   buildScanTypeList() {
     let transp = false;
     this.helpText = '';
+    this.scanSubType = this.cardSubType.InputType;
     switch (this.cardSubType.InputType) {
       case 'V4L':
       case 'MPEG':
@@ -411,17 +413,21 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
         break;
       case 'HDHOMERUN':
         if (this.cardSubType.HDHRdoesDVBC) {
+          this.scanSubType = 'DVBC';
           this.scanTypes.push({ label: 'settings.channelscan.type.fulltuned', value: 'FULLTUNED' });
           this.scanTypes.push({ label: 'settings.channelscan.type.full', value: 'FULL' });
           this.scanTypes.push({ label: 'settings.channelscan.type.import', value: 'IMPORT' });
         }
         else if (this.cardSubType.HDHRdoesDVB) {
+          this.scanSubType = 'DVBT';
           this.scanTypes.push({ label: 'settings.channelscan.type.full', value: 'FULL' });
           this.scanTypes.push({ label: 'settings.channelscan.type.fulltuned', value: 'FULLTUNED' });
           this.helpText = 'settings.channelscan.scantype_dvbt_desc';
         }
-        else
+        else {
+          this.scanSubType = 'ATSC';
           this.scanTypes.push({ label: 'settings.channelscan.type.full', value: 'FULL' });
+        }
         this.scanTypes.push({ label: 'settings.channelscan.type.import', value: 'IMPORT' });
         this.scanTypes.push({ label: 'settings.channelscan.type.hdhrimport', value: 'HDHRIMPORT' });
         transp = true;
@@ -456,6 +462,10 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
 
     if (this.helpText)
       this.translate.get(this.helpText).subscribe(data => this.helpText = data);
+  }
+
+  onScanTypeChange() {
+    setTimeout(() => this.onFreqTableChange(false),100);
   }
 
   onFreqTableChange(modchange: boolean) {
@@ -536,7 +546,6 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
   startScan() {
     this.scanRequest.CardId = this.card.CardId;
     this.channelService.StartScan(this.scanRequest).subscribe(data => {
-      console.log(data);
       setTimeout(() => this.refreshStatus(), 500);
     });
 
