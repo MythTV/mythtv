@@ -999,11 +999,6 @@ QString CardUtil::ProbeSubTypeName(uint inputid)
     if ("DVB" != type)
         return type;
 
-// test only - put subtype in firewire_model
-// see enum INPUT_TYPES for valid character values
-QString fake = get_on_input("firewire_model", inputid);
-if (!fake.isEmpty()) return fake;
-
     DTVTunerType tunertype;
     int fd_frontend = OpenVideoDevice(inputid);
     if (fd_frontend < 0)
