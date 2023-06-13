@@ -50,7 +50,7 @@ export interface RecRule {
     EndTime:        string; // dateTime
     SeriesId:       string;
     ProgramId:      string;
-    InetRef:        string;
+    Inetref:        string;
     ChanId:         number;
     CallSign:       string;
     FindDay:        number;

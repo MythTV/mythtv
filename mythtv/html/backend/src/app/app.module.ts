@@ -80,6 +80,7 @@ import { ScheduleComponent } from './schedule/schedule.component';
 import { UpcomingComponent } from './dashboard/upcoming/upcoming.component';
 import { RecrulesComponent } from './dashboard/recrules/recrules.component';
 import { VideosComponent } from './dashboard/videos/videos.component';
+import { ProgramsComponent } from './dashboard/programs/programs.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -155,6 +156,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     UpcomingComponent,
     RecrulesComponent,
     VideosComponent,
+    ProgramsComponent,
   ],
   imports: [
     BrowserModule,

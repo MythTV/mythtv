@@ -28,7 +28,7 @@ export interface RecordScheduleRequest {
     Inactive: boolean;
     Season: number;
     Episode: number;
-    InetRef: string;
+    Inetref: string;
     Type?: string;
     SearchType?: string;
     RecPriority: number;

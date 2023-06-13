@@ -407,16 +407,16 @@ export class ScheduleComponent implements OnInit {
   }
 
   iCheckbox(recRule: RecRule) {
-    if (!recRule.InetRef)
-      recRule.InetRef = '';
-    if (recRule.InetRef.includes('.py_'))
-      recRule.InetRef = recRule.InetRef.replace(/^.*\.py_/, this.metaPrefix);
+    if (!recRule.Inetref)
+      recRule.Inetref = '';
+    if (recRule.Inetref.includes('.py_'))
+      recRule.Inetref = recRule.Inetref.replace(/^.*\.py_/, this.metaPrefix);
     else
-      recRule.InetRef = this.metaPrefix + recRule.InetRef;
+      recRule.Inetref = this.metaPrefix + recRule.Inetref;
   }
 
   iText(recRule: RecRule) {
-    this.metaPrefix = recRule.InetRef.replace(/_.*/, '_');
+    this.metaPrefix = recRule.Inetref.replace(/_.*/, '_');
     if (!this.metaPrefix.endsWith('.py_'))
       this.metaPrefix = '';
   }
@@ -565,7 +565,7 @@ export class ScheduleComponent implements OnInit {
       Inactive: recRule.Inactive,
       Season: recRule.Season,
       Episode: recRule.Episode,
-      InetRef: recRule.InetRef,
+      Inetref: recRule.Inetref,
       Type: recRule.Type,
       SearchType: recRule.SearchType,
       RecPriority: recRule.RecPriority,

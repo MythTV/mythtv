@@ -155,7 +155,7 @@
             </div>
 
             <div class="form-group field" *ngIf="recRule.Type != 'Recording Template'">
-                <label for="InetRef" class="label block">{{ 'dashboard.sched.inetref_label' | translate }}</label>
+                <label for="Inetref" class="label block">{{ 'dashboard.sched.inetref_label' | translate }}</label>
                 <div class="grid p-0">
                     <div class="col-3 flex align-items-center">
                         <p-radioButton name="prefix" value="ttvdb4.py_" [(ngModel)]="metaPrefix" inputId="ttvdb"
@@ -193,7 +193,7 @@
                     </div>
                 </div>
                 {{ metaPrefix }} &nbsp;
-                <input pInputText id="InetRef" [(ngModel)]="recRule.InetRef" name="InetRef" #InetRef="ngModel"
+                <input pInputText id="Inetref" [(ngModel)]="recRule.Inetref" name="Inetref" #Inetref="ngModel"
                     class="mb-2 form-control w-full" (ngModelChange)="iText(recRule)" />
                 <small class="block">
                     {{ 'dashboard.sched.inetref_desc' | translate }}<br>
