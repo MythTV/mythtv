@@ -1129,7 +1129,8 @@
       "sattuning_desc": "Select a satellite from this list for the tuning data of the reference transponder.",
       "dvbsmodulation_desc": "Modulation, QPSK, 8PSK, QAM-16, 16APSK, 32APSK. Most DVB-S transponders use QPSK, while DVB-S2 use 8PSK, 16APSK, or 32APSK. QAM-16 is not available for DVB-S2 transports.",
       "rolloff_label": "Roll-off",
-      "rolloff_desc": "Roll-off factor (Default: 0.35)"
+      "rolloff_desc": "Roll-off factor (Default: 0.35)",
+      "scan_desc": "Before running this you must select the video source, and save the page if any changes have not been saved."
     }
   },
   "data": {

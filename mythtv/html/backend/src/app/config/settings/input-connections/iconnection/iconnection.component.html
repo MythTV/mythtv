@@ -161,7 +161,7 @@
                             <div style="display:flex; align-items:center;">
                                 <p-button label="{{ 'settings.iconnection.fetch.label' | translate }}"
                                     icon="pi pi-download" iconPos="left" (onClick)="work.fetchChannelsDialog=true"
-                                    [disabled]="!card.SourceId || connform.dirty == true || work.fetchStatus == 1 || setupService.schedulingEnabled">
+                                    [disabled]="!card.SourceId || connform.dirty || work.fetchStatus == 1 || setupService.schedulingEnabled">
                                 </p-button>
                             </div>
                             <div style="display:flex; align-items:center;">
