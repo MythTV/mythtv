@@ -3944,9 +3944,8 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1377")
     {
-        DBUpdates updates {
-            "DELETE FROM settings WHERE value='SubtitleCodec'; ",
-        };
+        // Change reverted, but the version number can't be reused.
+        DBUpdates updates {};
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1378", dbver))
             return false;
