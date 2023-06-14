@@ -8,8 +8,12 @@
 #include "mythvideocolourspace.h"
 #include "fourcc.h"
 #include "mythvaapiinterop.h"
+
+#ifdef USING_EGL
 #include "mythvaapidrminterop.h"
+#else
 #include "mythvaapiglxinterop.h"
+#endif
 
 extern "C" {
 #include "libavfilter/buffersrc.h"
@@ -57,14 +61,14 @@ void MythVAAPIInterop::GetVAAPITypes(MythRenderOpenGL* Context, MythInteropGPU::
     // zero copy
     if (egl && MythVAAPIInteropDRM::IsSupported(Context))
         vaapitypes.emplace_back(GL_VAAPIEGLDRM);
-#endif
+#else
     // 1x copy
     if (!egl && !wayland && MythVAAPIInteropGLXPixmap::IsSupported(Context))
         vaapitypes.emplace_back(GL_VAAPIGLXPIX);
     // 2x copy
     if (!egl && !opengles && !wayland)
         vaapitypes.emplace_back(GL_VAAPIGLXCOPY);
-
+#endif
     if (!vaapitypes.empty())
         Types[FMT_VAAPI] = vaapitypes;
 }
@@ -82,11 +86,12 @@ MythVAAPIInterop* MythVAAPIInterop::CreateVAAPI(MythPlayerUI *Player, MythRender
 #ifdef USING_EGL
             if ((type == GL_VAAPIEGLDRM) || (type == DRM_DRMPRIME))
                 return new MythVAAPIInteropDRM(Player, Context, type);
-#endif
+#else
             if (type == GL_VAAPIGLXPIX)
                 return new MythVAAPIInteropGLXPixmap(Player, Context);
             if (type == GL_VAAPIGLXCOPY)
                 return new MythVAAPIInteropGLXCopy(Player, Context);
+#endif
         }
     }
     return nullptr;

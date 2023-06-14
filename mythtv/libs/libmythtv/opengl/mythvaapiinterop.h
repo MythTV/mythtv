@@ -25,9 +25,12 @@ struct AVFilterContext;
 #undef None            // X11/X.h defines this. Causes compile failure in Qt6.
 #undef Cursor
 #undef pointer
-#include "va/va_glx.h"
+#ifdef USING_EGL
 #include "va/va_drm.h"
 #include "va/va_drmcommon.h"
+#else
+#include "va/va_glx.h"
+#endif
 #undef Bool            // Interferes with cmake moc file compilation
 
 #ifndef VA_FOURCC_I420
