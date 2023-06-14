@@ -11,7 +11,8 @@ import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface
 export class ProgramsComponent implements OnInit {
   @Input() programs: ScheduleOrProgram[] = [];
   @Input() inter!: ScheduleLink;
-
+  // Usage: GUIDE, UPCOMING
+  @Input() usage: string = '';
 
   // programs!: ProgramList;
   editingProgram?: ScheduleOrProgram;
@@ -27,26 +28,48 @@ export class ProgramsComponent implements OnInit {
 
   ngOnInit(): void { }
 
-  formatDate(date: string): string {
-    if (!date)
+  formatStartDate(program: ScheduleOrProgram): string {
+    let starttm;
+    if (this.usage == 'UPCOMING') {
+      starttm = new Date(program.Recording.StartTs).getTime();
+    }
+    else {
+      starttm = new Date(program.StartTime).getTime();
+    }
+    return new Date(starttm).toLocaleDateString()
+  }
+
+  formatAirDate(program: ScheduleOrProgram): string {
+    if (!program.Airdate)
       return '';
-    if (date.length == 10)
-      date = date + ' 00:00';
+    let date = program.Airdate + ' 00:00';
     return new Date(date).toLocaleDateString()
   }
 
-  formatTime(date: string): string {
-    if (!date)
-      return '';
-    // Get the locale specific time and remove the seconds
-    const t = new Date(date);
-    const tWithSecs = t.toLocaleTimeString() + ' ';
+
+  formatStartTime(program: ScheduleOrProgram): string {
+    let starttm;
+    if (this.usage == 'UPCOMING') {
+      starttm = new Date(program.Recording.StartTs).getTime();
+    }
+    else {
+      starttm = new Date(program.StartTime).getTime();
+    }
+    const tWithSecs = new Date(starttm).toLocaleTimeString() + ' ';
     return tWithSecs.replace(/:.. /, ' ');
   }
 
   getDuration(program: ScheduleOrProgram): number {
-    const starttm = new Date(program.Recording.StartTs).getTime();
-    const endtm = new Date(program.Recording.EndTs).getTime();
+    let starttm;
+    let endtm;
+    if (this.usage == 'UPCOMING') {
+      starttm = new Date(program.Recording.StartTs).getTime();
+      endtm = new Date(program.Recording.EndTs).getTime();
+    }
+    else {
+      starttm = new Date(program.StartTime).getTime();
+      endtm = new Date(program.EndTime).getTime();
+    }
     const duration = (endtm - starttm) / 60000;
     return duration;
   }

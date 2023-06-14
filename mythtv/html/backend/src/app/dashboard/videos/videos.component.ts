@@ -160,7 +160,10 @@ export class VideosComponent implements OnInit {
   updatemeta(event: any) {
     this.editingVideo = this.video;
     this.video = Object.assign({}, this.video);
-    this.video.ReleaseDate = new Date(this.video.ReleaseDate);
+    if (this.video.ReleaseDate)
+      this.video.ReleaseDate = new Date(this.video.ReleaseDate);
+    else
+      this.video.ReleaseDate = <Date><unknown>null
     this.displayMetadataDlg = true;
   }
 

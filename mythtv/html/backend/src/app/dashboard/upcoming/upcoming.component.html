@@ -17,7 +17,7 @@
                     (click)="refreshing=true;refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
             </ng-template>
         </div>
-        <app-programs [inter]="inter" [programs]="recordings.Programs"></app-programs>
+        <app-programs [inter]="inter" [programs]="recordings.Programs" [usage]="'UPCOMING'"></app-programs>
     </div>
     <ng-template #loading>
         <p-progressSpinner></p-progressSpinner>

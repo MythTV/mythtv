@@ -142,6 +142,10 @@
     "videos": {
       "heading": "Videos",
       "releasedate": "Release Date"
+    },
+    "guide": {
+      "channel": "Channel",
+      "retgrid": "Return to Grid Display"
     }
   },
   "navbar": {

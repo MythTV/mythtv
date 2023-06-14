@@ -6,6 +6,7 @@ import { Channel } from '../services/interfaces/channel.interface';
 import { ProgramGuide } from 'src/app/services/interfaces/programguide.interface';
 import { TranslateService, TranslationChangeEvent } from '@ngx-translate/core';
 import { ScheduleLink, SchedulerSummary } from '../schedule/schedule.component';
+import { ScheduleOrProgram } from '../services/interfaces/program.interface';
 
 @Component({
   selector: 'app-guide',
@@ -24,10 +25,18 @@ export class GuideComponent implements OnInit, SchedulerSummary {
   m_channelTotal: number = 10;
   m_rows: number = 10;
   m_programGuide!: ProgramGuide;
+  listPrograms: ScheduleOrProgram[] = [];
+  channel!: Channel;
   loaded = false;
   refreshing = false;
   timeChange = false;
   inter: ScheduleLink = { summaryComponent: this };
+  // channel?: Channel;
+  // display Type
+  readonly GRID = 1;
+  readonly CHANNEL = 2;
+  readonly SEARCH = 3;
+  displayType = this.GRID;
 
   constructor(private guideService: GuideService,
     private translate: TranslateService) {
@@ -70,6 +79,21 @@ export class GuideComponent implements OnInit, SchedulerSummary {
     });
   }
 
+  fetchChannel() {
+    // Ask for a time 1 second after selected time
+    // Otherwise gives you shows that end at atha time also
+    let millisecs = this.m_startDate.getTime();
+    let startDate = new Date(millisecs + 1000);
+    this.guideService.GetProgramList({
+      ChanId: this.channel.ChanId, Details: true,
+      StartTime: startDate.toISOString()
+    }).subscribe(data => {
+      this.listPrograms = data.ProgramList.Programs;
+      this.loaded = true;
+      this.refreshing = false;
+    });
+  }
+
   inDisplayWindow(startTime: string, endTime: string): boolean {
     let p_start = new Date(startTime);
     let p_end = new Date(endTime);
@@ -94,10 +118,29 @@ export class GuideComponent implements OnInit, SchedulerSummary {
     this.refresh();
   }
 
-  refresh() : void {
-    if (this.m_startDate) {
-      this.fetchData(this.m_startDate);
-      this.refreshing = true;
+  refresh(): void {
+    switch (this.displayType) {
+      case this.GRID:
+        if (this.m_startDate) {
+          this.fetchData(this.m_startDate);
+          this.refreshing = true;
+        }
+        break;
+      case this.CHANNEL:
+        this.refreshing = true;
+        this.fetchChannel();
+        break;
     }
+  }
+
+  onChannel(channel: Channel) {
+    this.channel = channel;
+    this.displayType = this.CHANNEL;
+    this.refresh();
+  }
+
+  onGrid() {
+    this.displayType = this.GRID;
+    this.refresh();
   }
 }

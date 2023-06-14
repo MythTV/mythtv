@@ -89,11 +89,11 @@ export class GuideService {
     return this.httpClient.post<ProgramGuide>('/Guide/GetProgramGuide', params);
   }
 
-  public GetProgramList(request: GetProgramListRequest): Observable<ProgramList> {
+  public GetProgramList(request: GetProgramListRequest): Observable<{ ProgramList: ProgramList }> {
     let params = new HttpParams()
     for (const [key, value] of Object.entries(request))
       params = params.set(key, value);
-    return this.httpClient.get<ProgramList>('/Guide/GetProgramList', { params });
+    return this.httpClient.get<{ ProgramList: ProgramList }>('/Guide/GetProgramList', { params });
   }
 
   public GetStoredSearches(searchType: string): Observable<GetStoredSearchesResponse> {

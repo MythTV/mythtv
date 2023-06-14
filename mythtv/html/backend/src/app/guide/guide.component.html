@@ -1,50 +1,66 @@
 <h2>{{ 'dashboard.programguide' | translate }} </h2>
 <div *ngIf="loaded; else loading">
-    <p-dataView [value]="m_programGuide.ProgramGuide.Channels"
-        [totalRecords]="m_programGuide.ProgramGuide.TotalAvailable">
-        <ng-template pTemplate="header" styleClass="timeHeader">
-            <div class="flex">
-                <div class="flex flex-initial">
-                    <p-calendar [(ngModel)]="m_pickerDate" [showTime]="true" [stepMinute]="30"
-                        [dateFormat]=(m_dateFormat) (onClose)="onDatePickerClose()">
-                    </p-calendar>
-                </div>
-                <div class="flex flex-initial">
-                    <div *ngIf="refreshing else refreshBn"><p-progressSpinner
-                            [style]="{width: '30px', height: '30px'}"></p-progressSpinner></div>
-                    <ng-template #refreshBn>
-                        <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
-                        (click)="refreshing=true;refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
-                    </ng-template>
-                </div>
-            </div>
-        </ng-template>
-        <ng-template let-channelrow let-i="rowIndex" pTemplate="listItem">
-            <div class="grid col-12 p-3">
-                <ng-container *ngIf="( i % 5 ) == 0">
-                    <div class="col-12">
-                        <app-guide-timebar [guide]="this"></app-guide-timebar>
-                    </div>
-                </ng-container>
-                <div class="grid flex-grow-1">
-                    <div class="col-1">
-                        <app-guide-channelicon [channel]=channelrow></app-guide-channelicon>
-                    </div>
-                    <div class="col">
-                        <ng-container *ngFor="let program of channelrow.Programs">
-                            <ng-container *ngIf="!timeChange && inDisplayWindow(program.StartTime, program.EndTime)">
-                                <app-guide-programentry [program]="program"
-                                    [guideStartTime]="m_programGuide.ProgramGuide.StartTime"
-                                    [guideEndTime]="m_programGuide.ProgramGuide.EndTime" [guideComponent]="this"
-                                    [channel]="channelrow">
-                                </app-guide-programentry>
+    <div class="flex">
+        <div class="flex align-items-center">
+            <!-- *ngIf="displayType == GRID"> -->
+            <p-calendar [(ngModel)]="m_pickerDate" [showTime]="true" [stepMinute]="30" [dateFormat]=(m_dateFormat)
+                (onClose)="onDatePickerClose()">
+            </p-calendar>
+        </div>
+        <div class="flex align-items-center p-5" *ngIf="displayType == CHANNEL">
+            <b> {{ 'dashboard.guide.channel' | translate }} {{channel.ChanNum}} {{channel.CallSign}}
+                {{channel.ChannelName}}</b>
+        </div>
+        <div class="flex align-items-center" *ngIf="[CHANNEL,SEARCH].indexOf(displayType) > -1 ">
+            <button pButton pRipple icon="pi pi-table" class="p-button-text"
+                pTooltip="{{ 'dashboard.guide.retgrid' | translate }}" (click)="onGrid()"></button>
+        </div>
+        <div class="flex align-items-center">
+            <div *ngIf="refreshing else refreshBn"><p-progressSpinner
+                    [style]="{width: '30px', height: '30px'}"></p-progressSpinner></div>
+            <ng-template #refreshBn>
+                <button pButton pRipple icon="pi pi-refresh" class="p-button-text"
+                    (click)="refreshing=true;refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
+            </ng-template>
+        </div>
+    </div>
+    <div *ngIf="displayType == GRID">
+        <p-dataView [value]="m_programGuide.ProgramGuide.Channels"
+            [totalRecords]="m_programGuide.ProgramGuide.TotalAvailable">
+            <ng-template pTemplate="header" styleClass="timeHeader">
+            </ng-template>
+            <ng-template let-channelrow let-i="rowIndex" pTemplate="listItem">
+                <div class="grid col-12 p-3">
+                    <ng-container *ngIf="( i % 5 ) == 0">
+                        <div class="col-12">
+                            <app-guide-timebar [guide]="this"></app-guide-timebar>
+                        </div>
+                    </ng-container>
+                    <div class="grid flex-grow-1">
+                        <div class="col-1">
+                            <app-guide-channelicon [channel]=channelrow [guideComponent]="this"></app-guide-channelicon>
+                        </div>
+                        <div class="col">
+                            <ng-container *ngFor="let program of channelrow.Programs">
+                                <ng-container
+                                    *ngIf="!timeChange && inDisplayWindow(program.StartTime, program.EndTime)">
+                                    <app-guide-programentry [program]="program"
+                                        [guideStartTime]="m_programGuide.ProgramGuide.StartTime"
+                                        [guideEndTime]="m_programGuide.ProgramGuide.EndTime" [guideComponent]="this"
+                                        [channel]="channelrow">
+                                    </app-guide-programentry>
+                                </ng-container>
                             </ng-container>
-                        </ng-container>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </ng-template>
-    </p-dataView>
+            </ng-template>
+        </p-dataView>
+    </div>
+    <div *ngIf="[CHANNEL,SEARCH].indexOf(displayType) > -1 ">
+        <app-programs [inter]="inter" [programs]="listPrograms" [usage]="'GUIDE'"></app-programs>
+    </div>
+
 </div>
 <app-schedule [inter]="inter"></app-schedule>
 <ng-template #loading>
