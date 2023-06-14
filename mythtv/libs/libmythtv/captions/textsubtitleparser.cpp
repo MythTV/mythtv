@@ -16,6 +16,11 @@
 #include <QRunnable>
 #include <QFile>
 #include <QDataStream>
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+#include <QTextCodec>
+#elif QT_VERSION < QT_VERSION_CHECK(6,3,0)
+#include <QStringConverter>
+#endif
 
 // MythTV
 #include "libmythbase/mthreadpool.h"
@@ -307,6 +312,19 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
     LOG(VB_VBI, LOG_INFO,
         QString("Finished reading %1 subtitle bytes (requested %2)")
         .arg(numread).arg(new_len));
+    bool isUtf8 {false};
+    auto qba = QByteArray::fromRawData(sub_data.rbuffer_text,
+                                       sub_data.rbuffer_len);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    QTextCodec *textCodec = QTextCodec::codecForUtfText(qba, nullptr);
+    isUtf8 = (textCodec != nullptr);
+#elif QT_VERSION < QT_VERSION_CHECK(6,3,0)
+    auto qba_encoding = QStringConverter::encodingForData(qba);
+    isUtf8 = qba_encoding.has_value
+        && (qba_encoding.value == QStringConverter::Utf8);
+#else
+    isUtf8 = qba.isValidUtf8();
+#endif
 
     // Create a format context and tie it to the file buffer.
     AVFormatContext *fmt_ctx = avformat_alloc_context();
@@ -332,6 +350,7 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
     }
 
     // Find the subtitle stream and its context.
+    QString encoding {"utf-8"};
     if (!m_decCtx)
     {
         const AVCodec *codec {nullptr};
@@ -356,8 +375,22 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
             avformat_free_context(fmt_ctx);
             return;
         }
-        if (avcodec_open2(m_decCtx, codec, nullptr) < 0) {
-            LOG(VB_VBI, LOG_INFO, QString("Couldn't open decoder context"));
+
+        // Ask FFmpeg to convert subtitles to utf-8.
+        AVDictionary *dict = nullptr;
+        if (!isUtf8)
+        {
+            encoding = gCoreContext->GetSetting("SubtitleCodec", "utf-8");
+            if (encoding != "utf-8")
+            {
+                LOG(VB_VBI, LOG_INFO,
+                    QString("Converting from %1 to utf-8.").arg(encoding));
+                av_dict_set(&dict, "sub_charenc", qPrintable(encoding), 0);
+            }
+        }
+        if (avcodec_open2(m_decCtx, codec, &dict) < 0) {
+            LOG(VB_VBI, LOG_INFO,
+                QString("Couldn't open decoder context for encoding %1").arg(encoding));
             avcodec_free_context(&m_decCtx);
             avformat_free_context(fmt_ctx);
             return;
@@ -369,28 +402,16 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
     av_new_packet(pkt, 4096);
     while (av_read_frame(fmt_ctx, pkt) >= 0)
     {
-        int bytes {0};
-        while ((bytes = decode(pkt)) >= 0)
-        {
-            pkt->data += bytes;
-            pkt->size -= bytes;
-        }
+        decode(pkt);
 
         // reset buffer for next packet
         pkt->data = pkt->buf->data;
         pkt->size = pkt->buf->size;
     }
 
-    /* flush the decoder */
-    pkt->data = nullptr;
-    pkt->size = 0;
-    while (decode(pkt) >= 0)
-    {
-    }
-
-    LOG(VB_GENERAL, LOG_INFO, QString("Loaded %1 %2 subtitles from '%3'")
+    LOG(VB_GENERAL, LOG_INFO, QString("Loaded %1 %2 '%3' subtitles from %4")
         .arg(m_count)
-        .arg(m_decCtx->codec->long_name, m_fileName));
+        .arg(encoding, m_decCtx->codec->long_name, m_fileName));
     m_target->SetLastLoaded();
 
     av_packet_free(&pkt);

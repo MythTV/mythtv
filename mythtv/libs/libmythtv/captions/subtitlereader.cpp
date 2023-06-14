@@ -3,7 +3,6 @@
 
 // If the count of subtitle buffers is greater than this, force a clear
 static const int MAX_BUFFERS_BEFORE_CLEAR = 175;  // 125 too low for karaoke
-static const int MAX_EXT_BUFFERS_BEFORE_CLEAR = 500;  // 2 hr movie, titles every 15 s
 
 SubtitleReader::SubtitleReader(MythPlayer *parent)
   : m_parent(parent)
@@ -71,14 +70,13 @@ bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
     m_avSubtitles.m_buffers.push_back(subtitle);
     // in case forced subtitles aren't displayed, avoid leaking by
     // manually clearing the subtitles
-    size_t max_buffers = m_externalParser
-        ? MAX_EXT_BUFFERS_BEFORE_CLEAR
-        : MAX_BUFFERS_BEFORE_CLEAR;
-    if (m_avSubtitles.m_buffers.size() > max_buffers)
+    if (!m_externalParser &&
+        (m_avSubtitles.m_buffers.size() > MAX_BUFFERS_BEFORE_CLEAR))
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("SubtitleReader: >%1 AVSubtitles queued - clearing.")
-                .arg(max_buffers));
+            QString("SubtitleReader: %1 AVSubtitles queued (more than %2) - clearing.")
+                .arg(m_avSubtitles.m_buffers.size())
+                .arg(MAX_BUFFERS_BEFORE_CLEAR));
         clearsubs = true;
     }
     m_avSubtitles.m_lock.unlock();
