@@ -864,20 +864,34 @@ static class WaveFormFactory : public VisFactory
 QImage Spectrogram::s_image {nullptr}; // picture of spectrogram
 int    Spectrogram::s_offset {0};      // position on screen
 
-Spectrogram::Spectrogram()
+Spectrogram::Spectrogram(bool hist)
 {
-    LOG(VB_GENERAL, LOG_INFO, QString("Spectrogram : Being Initialised"));
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Spectrogram : Being Initialised, history=%1").arg(hist));
 
-    m_fps = 15;                 // needed?  right?
+    m_history = hist;   // historical spectrogram?, else spectrum only
+
+    m_fps = 40;         // getting 1152 samples / 44100 = 38.28125 fps
+
+    if (s_image.isNull())  // static histogram survives resize/restart
+    {
+        s_image = QImage(
+            m_sgsize.width(), m_sgsize.height(), QImage::Format_RGB32);
+    }
+    m_image = m_history ? &s_image : new QImage(
+        m_sgsize.width(), m_sgsize.height(), QImage::Format_RGB32);
 
     m_dftL = static_cast<FFTSample*>(av_malloc(sizeof(FFTSample) * m_fftlen));
     m_dftR = static_cast<FFTSample*>(av_malloc(sizeof(FFTSample) * m_fftlen));
 
     m_rdftContext = av_rdft_init(std::log2(m_fftlen), DFT_R2C);
 
-    m_scale.setMax(m_fftlen / 2, m_sgsize.height() / 2);
+    m_scale.setMax(m_fftlen / 2, m_history ?
+                   m_sgsize.height() / 2 : m_sgsize.width());
     m_sigL.resize(m_fftlen);
     m_sigR.resize(m_fftlen);
+
+    // TODO: promote this to a separate ColorSpectrum class
 
     // cache a continuous color spectrum ([0-1535] = 256 colors * 6 ramps):
     // 0000ff blue              from here, G of RGB ramps UP to:
@@ -935,6 +949,21 @@ unsigned long Spectrogram::getDesiredSamples(void)
 
 bool Spectrogram::process(VisualNode */*node*/)
 {
+    // TODO: label certain frequencies instead: 50, 100, 200, 500,
+    // 1000, 2000, 5000, 10000
+
+    // QPainter painter(m_image);
+    // painter.setPen(Qt::cyan);
+    // for (auto h = m_sgsize.height(); h > 0; h -= m_sgsize.height() / 2)
+    // {
+    //     for (auto i = 0; i < m_sgsize.height() / 2; i += 20)
+    //     {
+    //         QRect text(10, h - i - 10, 100, 20);
+    //         painter.drawText(text, Qt::AlignVCenter | Qt::AlignRight,
+    //                          QString("%1")
+    //                          .arg(m_scale[i] * 22050 / 8192)); // hack!!!
+    //     }
+    // }
     return false;
 }
 
@@ -945,20 +974,21 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
     int i = 0;
     int w = m_sgsize.width();   // drawing size
     int h = m_sgsize.height();
-    if (s_image.isNull())
+    if (m_image->isNull())
     {
-        s_image = QImage(w, h, QImage::Format_RGB32);
-        s_image.fill(Qt::black);
+        m_image = new QImage(w, h, QImage::Format_RGB32);
+        m_image->fill(Qt::black);
         s_offset = 0;
     }
     if (node)     // shift previous samples left, then append new node
     {
         i = node->m_length;
+        // LOG(VB_PLAYBACK, LOG_DEBUG, QString("SG got %1 samples").arg(i));
         (i <= m_fftlen) || (i = m_fftlen);
         int start = m_fftlen - i;
+        float mult = 0.8F;      // decay older sound by this much
         for (int k = 0; k < start; k++)
         {
-            float mult = 0.8F;  // decay older sound by this much
             if (k > start - i)  // prior set ramps from mult to 1.0
             {
                 mult = mult + (1 - mult) * (1 - (start - k) / (start - i));
@@ -975,7 +1005,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
         int end = m_fftlen / 40; // ramp window ends down to zero crossing
         for (int k = 0; k < m_fftlen; k++)
         {
-            float mult = k < end ? k / end : k > m_fftlen - end ?
+            mult = k < end ? k / end : k > m_fftlen - end ?
                 (m_fftlen - k) / end : 1;
             m_dftL[k] = m_sigL[k] * mult;
             m_dftR[k] = m_sigR[k] * mult;
@@ -984,21 +1014,28 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
     av_rdft_calc(m_rdftContext, m_dftL); // run the real FFT!
     av_rdft_calc(m_rdftContext, m_dftR);
 
-    QPainter painter(&s_image);
+    QPainter painter(m_image);
     painter.setPen(Qt::black);  // clear prior content
-    painter.fillRect(s_offset,     0, 256, h, Qt::black);
-    painter.fillRect(s_offset - w, 0, 256, h, Qt::black);
+    if (m_history)
+    {
+        painter.fillRect(s_offset,     0, 256, h, Qt::black);
+        painter.fillRect(s_offset - w, 0, 256, h, Qt::black);
+    }
+    else
+    {
+        painter.fillRect(0, 0, w, h, Qt::black);
+    }
 
     int index = 1;              // frequency index of this pixel
     int prev = 0;               // frequency index of previous pixel
     float gain = 5.0;           // compensate for window function loss
-    for (i = 1; i < h / 2; i++)
+    for (i = 1; i < (m_history ? h / 2 : w); i++)
     {                           // for each pixel of the spectrogram...
         float left = 0;
         float right = 0;
         float tmp = 0;
         int count = 0;
-        for (auto j = prev + 1; j <= index; j++)
+        for (auto j = prev + 1; j <= index; j++) // log scale!
         {    // for the freqency bins of this pixel, find peak or mean
             tmp = sq(m_dftL[2 * j]) + sq(m_dftL[2 * j + 1]);
             left  = m_binpeak ? (tmp > left  ? tmp : left ) : left  + tmp;
@@ -1021,39 +1058,53 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
 
         // float bw = 1. / (16384. / 44100.);
         // float freq = bw * index;
-        // LOG(VB_PLAYBACK, LOG_DEBUG,
+        // LOG(VB_PLAYBACK, LOG_DEBUG, // verbose - never use in production!!!
         //     QString("SG i=%1, index=%2 (%3) %4 hz \tleft=%5,\tright=%6")
         //     .arg(i).arg(index).arg(count).arg(freq).arg(left).arg(right));
 
         left *= gain;
         float mag = clamp(left, 255, 0);
         int z = (int)(mag * 6);
-        h = m_sgsize.height() / 2;
         left > 255 ? painter.setPen(Qt::white) :
             painter.setPen(qRgb(m_red[z], m_green[z], m_blue[z]));
-        painter.drawLine(s_offset,     h - i, s_offset     + mag, h - i);
-        painter.drawLine(s_offset - w, h - i, s_offset - w + mag, h - i);
-        left > 255 ? painter.setPen(Qt::yellow) :
-            painter.setPen(qRgb(mag, mag, mag));
-        painter.drawPoint(s_offset, h - i);
+        if (m_history)
+        {
+            h = m_sgsize.height() / 2;
+            painter.drawLine(s_offset,     h - i, s_offset     + mag, h - i);
+            painter.drawLine(s_offset - w, h - i, s_offset - w + mag, h - i);
+            left > 255 ? painter.setPen(Qt::yellow) :
+                painter.setPen(qRgb(mag, mag, mag));
+            painter.drawPoint(s_offset, h - i);
+        }
+        else
+        {
+            painter.drawLine(i, h / 2, i, h / 2 - h / 2 * mag / 256);
+        }
 
         right *= gain;          // copy of above, s/left/right/g
         mag = clamp(right, 255, 0);
         z = (int)(mag * 6);
-        h = m_sgsize.height();
         right > 255 ? painter.setPen(Qt::white) :
             painter.setPen(qRgb(m_red[z], m_green[z], m_blue[z]));
-        painter.drawLine(s_offset,     h - i, s_offset     + mag, h - i);
-        painter.drawLine(s_offset - w, h - i, s_offset - w + mag, h - i);
-        right > 255 ? painter.setPen(Qt::yellow) :
-            painter.setPen(qRgb(mag, mag, mag));
-        painter.drawPoint(s_offset, h - i);
+        if (m_history)
+        {
+            h = m_sgsize.height();
+            painter.drawLine(s_offset,     h - i, s_offset     + mag, h - i);
+            painter.drawLine(s_offset - w, h - i, s_offset - w + mag, h - i);
+            right > 255 ? painter.setPen(Qt::yellow) :
+                painter.setPen(qRgb(mag, mag, mag));
+            painter.drawPoint(s_offset, h - i);
+        }
+        else
+        {
+            painter.drawLine(i, h / 2, i, h / 2 + h / 2 * mag / 256);
+        }
 
         prev = index;           // next pixel is FFT bins from here
         index = m_scale[i];     // to the next bin by LOG scale
         (prev < index) || (prev = index -1);
     }
-    if (++s_offset >= w)
+    if (m_history && ++s_offset >= w)
     {
         s_offset = 0;
     }
@@ -1071,11 +1122,11 @@ double Spectrogram::clamp(double cur, double max, double min)
 bool Spectrogram::draw(QPainter *p, const QColor &back)
 {
     p->fillRect(0, 0, 0, 0, back); // no clearing, here to suppress warning
-    if (!s_image.isNull())
+    if (!m_image->isNull())
     {                        // background, updated by ::process above
-        p->drawImage(0, 0, s_image.scaled(m_size,
-                                          Qt::IgnoreAspectRatio,
-                                          Qt::SmoothTransformation));
+        p->drawImage(0, 0, m_image->scaled(m_size,
+                                           Qt::IgnoreAspectRatio,
+                                           Qt::SmoothTransformation));
     }
     // // DEBUG: see the whole signal going into the FFT:
     // if (m_size.height() > 1000) {
@@ -1087,6 +1138,8 @@ bool Spectrogram::draw(QPainter *p, const QColor &back)
     // }
     return true;
 }
+
+// passing true to the above constructor gives the spectrum with full history:
 
 static class SpectrogramFactory : public VisFactory
 {
@@ -1106,9 +1159,33 @@ static class SpectrogramFactory : public VisFactory
 
     VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const override // VisFactory
     {
-        return new Spectrogram();
+        return new Spectrogram(true); // history
     }
 }SpectrogramFactory;
+
+// passing false to the above constructor gives the spectrum with no history:
+
+static class SpectrumDetailFactory : public VisFactory
+{
+  public:
+    const QString &name(void) const override // VisFactory
+    {
+        static QString s_name = QCoreApplication::translate("Visualizers",
+                                                            "SpectrumDetail");
+        return s_name;
+    }
+
+    uint plugins(QStringList *list) const override // VisFactory
+    {
+        *list << name();
+        return 1;
+    }
+
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const override // VisFactory
+    {
+        return new Spectrogram(false); // no history
+    }
+}SpectrumDetailFactory;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Spectrum

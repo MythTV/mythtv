@@ -199,10 +199,11 @@ class LogScale
 
 class Spectrogram : public VisualBase
 {
-    static constexpr int kSGAudioSize { 4096 };
+    // 1152 is the most I can get = 38.28125 fps @ 44100
+    static constexpr int kSGAudioSize { 1152 };
 
   public:
-    Spectrogram();
+    Spectrogram(bool hist);
     ~Spectrogram() override;
 
     unsigned long getDesiredSamples(void) override;
@@ -217,19 +218,27 @@ class Spectrogram : public VisualBase
 
   protected:
     static inline double clamp(double cur, double max, double min);
+    QImage         *m_image;              // picture in use
     QSize          m_sgsize {1920, 1080}; // picture size
     QSize          m_size;                // displayed dize
-    LogScale       m_scale;		  // Y-axis
+    LogScale       m_scale;               // Y-axis
     int            m_fftlen {16 * 1024}; // window width
     QVector<float> m_sigL;               // decaying signal window
     QVector<float> m_sigR;
     FFTSample*     m_dftL { nullptr }; // real in, complex out
     FFTSample*     m_dftR { nullptr };
     RDFTContext*   m_rdftContext { nullptr };
-    int            *m_red   {nullptr};
+    int            *m_red   {nullptr}; // continuous color spectrum
     int            *m_green {nullptr};
     int            *m_blue  {nullptr};
-    bool           m_binpeak { false }; // peak of bins, else mean
+    bool           m_binpeak { true }; // peak of bins, else mean
+    bool           m_history { true }; // spectrogram? or spectrum
+};
+class SpectrumDetail : public Spectrogram
+{
+  public:
+    SpectrumDetail() = default;
+    ~SpectrumDetail() override = default;
 };
 
 class Spectrum : public VisualBase
