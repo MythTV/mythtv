@@ -17,7 +17,6 @@
 #include <QFileInfo>
 #include <QFontDatabase>
 #include <QImage>
-#include <QTextCodec>
 #include <QtGlobal>
 
 // MythTV headers
@@ -31,6 +30,7 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythpower.h"
 #include "libmythbase/mythsorthelper.h"
+#include "libmythbase/mythsystem.h"
 #include "libmythbase/mythtranslation.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/channelgroup.h"
@@ -1570,11 +1570,26 @@ static HostComboBoxSetting *DecodeVBIFormat()
 
 static HostComboBoxSetting *SubtitleCodec()
 {
+    static const QRegularExpression crlf { "[\r\n]" };
+    static const QRegularExpression suffix { "(//.*)" };
+
     auto *gc = new HostComboBoxSetting("SubtitleCodec");
 
     gc->setLabel(OSDSettings::tr("Subtitle Codec"));
 
-    QList<QByteArray> list = QTextCodec::availableCodecs();
+    // Translations are now done via FFmpeg(iconv).  Get the list of
+    // encodings that iconv supports.
+    QScopedPointer<MythSystem>
+        cmd(MythSystem::Create({"iconv", "-l"}, kMSStdOut));
+    cmd->Wait();
+    QString results = cmd->GetStandardOutputStream()->readAll();
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+    QStringList list = results.toLower().split(crlf, QString::SkipEmptyParts);
+#else
+    QStringList list = results.toLower().split(crlf, Qt::SkipEmptyParts);
+#endif
+    list.replaceInStrings(suffix, "");
+    list.sort();
 
     for (const auto & codec : qAsConst(list))
     {
