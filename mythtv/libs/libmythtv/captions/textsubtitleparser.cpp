@@ -317,7 +317,7 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
     auto *avio_ctx_buffer = (uint8_t*)av_malloc(IO_BUFFER_SIZE);
     if (avio_ctx_buffer == nullptr)
     {
-        LOG(VB_VBI, LOG_INFO, "Couldn't allocate mamory for avio context");
+        LOG(VB_VBI, LOG_INFO, "Couldn't allocate memory for avio context");
         avformat_free_context(fmt_ctx);
         return;
     }
