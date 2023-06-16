@@ -33,7 +33,9 @@
 #include "channelimporter.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/channelscan/scanwizardconfig.h"
-
+#ifdef USING_SATIP
+#include "recorders/satiputils.h"
+#endif // USING_SATIP
 
 #define LOC QString("ChScanWeb: ")
 
@@ -88,6 +90,13 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
 
     QString subType = CardUtil::ProbeSubTypeName(cardid);
     CardUtil::INPUT_TYPES inputType = CardUtil::toInputType(subType);
+
+#ifdef USING_SATIP
+    if (inputType == CardUtil::SATIP)
+    {
+        inputType = SatIP::toDVBInputType(CardUtil::GetVideoDevice(cardid));
+    }
+#endif // USING_SATIP
 
     int nScanType = -99;
     if (ScanType == "FULL")
