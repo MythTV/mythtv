@@ -126,6 +126,8 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
                 else
                     nScanType = ScanTypeSetting::FullScan_ATSC;
                 break;
+            default:
+                break;
         }
     }
     else if (ScanType == "FULLTUNED")
@@ -151,6 +153,8 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
                     nScanType = ScanTypeSetting::NITAddScan_DVBC;
                 else if (CardUtil::HDHRdoesDVB(CardUtil::GetVideoDevice(cardid)))
                     nScanType = ScanTypeSetting::NITAddScan_DVBT;
+                break;
+            default:
                 break;
         }
     }
