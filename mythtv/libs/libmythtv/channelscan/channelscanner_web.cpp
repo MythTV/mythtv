@@ -86,49 +86,63 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
     m_cardid = cardid;
     m_scanId = ScanId;
 
-    QString inputType = CardUtil::ProbeSubTypeName(cardid);
+    QString subType = CardUtil::ProbeSubTypeName(cardid);
+    CardUtil::INPUT_TYPES inputType = CardUtil::toInputType(subType);
 
     int nScanType = -99;
     if (ScanType == "FULL")
     {
-        if (inputType == "ATSC")
-            nScanType = ScanTypeSetting::FullScan_ATSC;
-        else if (inputType == "DVBT")
-            nScanType = ScanTypeSetting::FullScan_DVBT;
-        else if (inputType == "V4L" || inputType == "MPEG")
-            nScanType = ScanTypeSetting::FullScan_Analog;
-        else if (inputType == "DVBT2")
-            nScanType = ScanTypeSetting::FullScan_DVBT2;
-        else if (inputType == "DVBC")
-            nScanType = ScanTypeSetting::FullScan_DVBC;
-        else if (inputType == "HDHOMERUN")
-        {
-            if (CardUtil::HDHRdoesDVBC(CardUtil::GetVideoDevice(cardid)))
-                nScanType = ScanTypeSetting::FullScan_DVBC;
-            else if (CardUtil::HDHRdoesDVB(CardUtil::GetVideoDevice(cardid)))
-                nScanType = ScanTypeSetting::FullScan_DVBT;
-            else
+        switch(inputType) {
+            case CardUtil::ATSC:
                 nScanType = ScanTypeSetting::FullScan_ATSC;
+                break;
+            case CardUtil::DVBT:
+                nScanType = ScanTypeSetting::FullScan_DVBT;
+                break;
+            case CardUtil::V4L:
+            case CardUtil::MPEG:
+                nScanType = ScanTypeSetting::FullScan_Analog;
+                break;
+            case CardUtil::DVBT2:
+                nScanType = ScanTypeSetting::FullScan_DVBT2;
+                break;
+            case CardUtil::DVBC:
+                nScanType = ScanTypeSetting::FullScan_DVBC;
+                break;
+            case  CardUtil::HDHOMERUN:
+                if (CardUtil::HDHRdoesDVBC(CardUtil::GetVideoDevice(cardid)))
+                    nScanType = ScanTypeSetting::FullScan_DVBC;
+                else if (CardUtil::HDHRdoesDVB(CardUtil::GetVideoDevice(cardid)))
+                    nScanType = ScanTypeSetting::FullScan_DVBT;
+                else
+                    nScanType = ScanTypeSetting::FullScan_ATSC;
+                break;
         }
     }
     else if (ScanType == "FULLTUNED")
     {
-        if (inputType == "DVBT")
-            nScanType = ScanTypeSetting::NITAddScan_DVBT;
-        else if (inputType == "DVBT2")
-            nScanType = ScanTypeSetting::NITAddScan_DVBT2;
-        else if (inputType == "DVBS")
-            nScanType = ScanTypeSetting::NITAddScan_DVBS;
-        else if (inputType == "DVBS2")
-            nScanType = ScanTypeSetting::NITAddScan_DVBS2;
-        else if (inputType == "DVBC")
-            nScanType = ScanTypeSetting::NITAddScan_DVBC;
-        else if (inputType == "HDHOMERUN")
-        {
-            if (CardUtil::HDHRdoesDVBC(CardUtil::GetVideoDevice(cardid)))
-                nScanType = ScanTypeSetting::NITAddScan_DVBC;
-            else if (CardUtil::HDHRdoesDVB(CardUtil::GetVideoDevice(cardid)))
+        switch(inputType) {
+            case CardUtil::DVBT:
                 nScanType = ScanTypeSetting::NITAddScan_DVBT;
+                break;
+            case CardUtil::DVBT2:
+                nScanType = ScanTypeSetting::NITAddScan_DVBT2;
+                break;
+            case CardUtil::DVBS:
+                nScanType = ScanTypeSetting::NITAddScan_DVBS;
+                break;
+            case CardUtil::DVBS2:
+                nScanType = ScanTypeSetting::NITAddScan_DVBS2;
+                break;
+            case CardUtil::DVBC:
+                nScanType = ScanTypeSetting::NITAddScan_DVBC;
+                break;
+            case CardUtil::HDHOMERUN:
+                if (CardUtil::HDHRdoesDVBC(CardUtil::GetVideoDevice(cardid)))
+                    nScanType = ScanTypeSetting::NITAddScan_DVBC;
+                else if (CardUtil::HDHRdoesDVB(CardUtil::GetVideoDevice(cardid)))
+                    nScanType = ScanTypeSetting::NITAddScan_DVBT;
+                break;
         }
     }
     else if (ScanType == "VBOXIMPORT")
@@ -197,8 +211,6 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
         case ScanTypeSetting::FullScan_Analog:
             modulation = "analog";
             break;
-        default:
-            modulation = "unknown";
     }
 
     m_scantype = nScanType;
