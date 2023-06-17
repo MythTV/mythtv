@@ -2,10 +2,7 @@
 <div class="content-section implementation">
     <h1>{{ 'settings.main.title' | translate }}</h1>
     <div class="card">
-        <p-steps [model]="wizardService.wizardItems" [readonly]="false" [activeIndex]="activeIndex"
-            class="hidden xl:block "></p-steps>
-
-        <div class="flex flex-row xl:hidden">
+        <div class="flex flex-row">
             <button pButton pRipple icon="pi pi-angle-double-left" class="p-button-text p-button-primary"
                 (click)="menu.navBackward()"></button>
             <div class="col-11">

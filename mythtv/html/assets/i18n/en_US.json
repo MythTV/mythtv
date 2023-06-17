@@ -340,7 +340,7 @@
       "upnp_label": "Video content to show a WMP client",
       "upnp_desc": "Which tree to show a Windows Media Player client when it requests a list of videos.",
       "statapp_label": "Miscellaneous Status Application",
-      "statapp_desc": "External application or script that outputs extra information for inclusion in the backend status page. See <a href=\"http://www.mythtv.org/wiki/Miscellaneous_Status_Information\">Miscellaneous Status Information</a> in the wiki.",
+      "statapp_desc": "External application or script that outputs extra information for inclusion in the backend status page. See <a href=\"http://www.mythtv.org/wiki/Miscellaneous_Status_Information\" target=\"_blank\">Miscellaneous Status Information</a> in the wiki.",
       "disback_label": "Disable automatic database backup",
       "disback_desc": "If enabled, MythTV will not backup the database before upgrades. You should therefore have your own database backup strategy in place.",
       "disfwr_label": "Disable FireWire reset",
@@ -753,7 +753,7 @@
       "nameInUse": "ERROR: This name is already in use.",
       "nameRequired": "Name is required.",
       "grabberconfig_label": "Configure Grabber",
-      "grabberconfig_desc": "Configure the grabber by running this command using ssh or terminal logged into the backend:",
+      "grabberconfig_desc": "Configure the grabber by running this command using ssh or terminal logged into the backend. See <a href=\"http://www.mythtv.org/wiki/XMLTV\" target=\"_blank\">XMLTV</a> in the wiki.",
       "eit_label": "Perform EIT scan",
       "eit_desc": "If enabled, program guide data for channels on this source will be updated with data provided by the channels themselves 'Over-the-Air'.",
       "WOLReconnect_label": "Reconnect Time",
@@ -897,7 +897,8 @@
       "all": "All",
       "delete_source": "Delete all Channels from Selected Source",
       "delete_source_details": "This will delete all channels from source: {{Source}}",
-      "delete_all_details": "This will delete all channels"
+      "delete_all_details": "This will delete all channels",
+      "delete_message": "To delete channels use Backend Setup Channel Editor."
     },
     "rprofiles": {
       "title": "Recording Profiles",

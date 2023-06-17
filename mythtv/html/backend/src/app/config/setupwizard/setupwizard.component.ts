@@ -1,9 +1,8 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { ConfigService } from '../../services/config.service';
 import { MenuItem } from 'primeng/api';
-import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { SetupWizardService } from 'src/app/services/setupwizard.service';
+import { SetupService } from 'src/app/services/setup.service';
 
 @Component({
     selector: 'app-settings',
@@ -14,14 +13,16 @@ export class SetupWizardComponent implements OnInit, AfterViewInit {
 
     @ViewChild("top") topElement!: ElementRef;
 
-    constructor(private router: Router, public wizardService: SetupWizardService,
-        private configService: ConfigService,
-        private translate: TranslateService) { }
+    constructor(public wizardService: SetupWizardService,
+        private setupService: SetupService,
+        private translate: TranslateService) {
+        setupService.pageType = 'S';
+    }
     fullMenu: MenuItem[] = [];
     dbSetupMenu: MenuItem[] = [];
 
     activeIndex = 0;
-    activeItem! : MenuItem;
+    activeItem!: MenuItem;
 
     ngOnInit(): void {
         this.translate.get('setupwizard.steps.selectlanguage').subscribe(

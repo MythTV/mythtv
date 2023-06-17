@@ -4,7 +4,8 @@
         [rowHover]="true" (onFilter)="onFilter($event)" responsiveLayout="scroll">
         <ng-template pTemplate="caption">
             <button pButton pRipple label="{{ 'settings.chanedit.new_channel' | translate }}" icon="pi pi-plus"
-                class="p-button-success mr-2" (click)="openNew()"></button>
+                class="p-button-success mr-2" (click)="openNew()"
+                [disabled]="setupService.pageType == 'S' && setupService.schedulingEnabled"></button>
         </ng-template>
         <ng-template pTemplate="header">
             <tr>
@@ -22,8 +23,14 @@
                         </ng-template>
                     </p-columnFilter>
                     <p-button icon="pi pi-trash" (onClick)="deleteSourceRequest()"
+                        *ngIf="setupService.pageType == 'S' else explain"
                         pTooltip="{{ 'settings.chanedit.delete_source' | translate }}"
-                        label="{{ 'common.delete' | translate }}" styleClass="p-button-danger"></p-button>
+                        label="{{ 'common.delete' | translate }}" styleClass="p-button-danger"
+                        [disabled]="setupService.schedulingEnabled">
+                    </p-button>
+                    <ng-template #explain>
+                        {{ 'settings.chanedit.delete_message' | translate }}
+                    </ng-template>
                 </th>
             </tr>
             <tr>
@@ -44,7 +51,7 @@
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-success"
                         disabled="true"></button>
                     <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
-                        disabled="true"></button>
+                        *ngIf="setupService.pageType == 'S'" disabled="true"></button>
                 </th>
             </tr>
         </ng-template>
@@ -65,11 +72,13 @@
                 <td style="flex-basis:  6%">{{ channel.UseEIT ? 'Y' : 'N' }}</td>
                 <td style="flex-basis:  6%">
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-success"
-                        (click)="editChannel(channel)" [disabled]="channel.ChanId < 0"
+                        (click)="editChannel(channel)" [disabled]="channel.ChanId < 0
+                        || (setupService.pageType == 'S' && setupService.schedulingEnabled)"
                         pTooltip="{{ 'settings.chanedit.updatechan' | translate }}"></button>
                     <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
-                        (click)="deleteRequest(channel)" pTooltip="{{ 'settings.chanedit.deletechan' | translate }}"
-                        [disabled]="channel.ChanId < 0"></button>
+                        *ngIf="setupService.pageType == 'S'" (click)="deleteRequest(channel)"
+                        pTooltip="{{ 'settings.chanedit.deletechan' | translate }}"
+                        [disabled]="channel.ChanId < 0 || setupService.schedulingEnabled"></button>
                 </td>
             </tr>
         </ng-template>

@@ -328,4 +328,6 @@ export class SetupService {
     schedulingEnabled = true;
     isDatabaseIgnored = false;
     DBTimezoneSupport = false;
+    // pageType: Setup: 'S', Dashboard: 'D'
+    pageType = '';
 }

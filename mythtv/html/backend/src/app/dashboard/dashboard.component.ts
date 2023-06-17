@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem } from 'primeng/api';
+import { SetupService } from '../services/setup.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -23,7 +24,8 @@ export class DashboardComponent implements OnInit {
 
   activeItem = this.fullMenu[0];
 
-  constructor(private translate: TranslateService) {
+  constructor(private translate: TranslateService, private setupService: SetupService) {
+    setupService.pageType = 'D';
     this.fullMenu.forEach(entry => {
       if (entry.label)
         this.translate.get(entry.label).subscribe(data => {
