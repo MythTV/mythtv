@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
 import { GuideService } from 'src/app/services/guide.service';
 import { Channel } from '../services/interfaces/channel.interface';
 import { ProgramGuide } from 'src/app/services/interfaces/programguide.interface';
 import { TranslateService, TranslationChangeEvent } from '@ngx-translate/core';
 import { ScheduleLink, SchedulerSummary } from '../schedule/schedule.component';
 import { ScheduleOrProgram } from '../services/interfaces/program.interface';
+import { GetProgramListRequest } from '../services/interfaces/guide.interface';
 
 @Component({
   selector: 'app-guide',
@@ -35,8 +35,10 @@ export class GuideComponent implements OnInit, SchedulerSummary {
   // display Type
   readonly GRID = 1;
   readonly CHANNEL = 2;
-  readonly SEARCH = 3;
+  readonly TITLESEARCH = 3;
+  readonly PEOPLESEARCH = 4;
   displayType = this.GRID;
+  searchValue = '';
 
   constructor(private guideService: GuideService,
     private translate: TranslateService) {
@@ -79,15 +81,30 @@ export class GuideComponent implements OnInit, SchedulerSummary {
     });
   }
 
-  fetchChannel() {
+  fetchDetails() {
     // Ask for a time 1 second after selected time
     // Otherwise gives you shows that end at atha time also
     let millisecs = this.m_startDate.getTime();
     let startDate = new Date(millisecs + 1000);
-    this.guideService.GetProgramList({
-      ChanId: this.channel.ChanId, Details: true,
+    let request: GetProgramListRequest = {
+      Details: true,
       StartTime: startDate.toISOString()
-    }).subscribe(data => {
+    };
+    switch (this.displayType) {
+      case this.CHANNEL:
+        request.ChanId = this.channel.ChanId;
+        break;
+      case this.TITLESEARCH:
+        request.TitleFilter = this.searchValue;
+        request.Count = 1000;
+        break;
+      case this.PEOPLESEARCH:
+        request.PersonFilter = this.searchValue;
+        request.Count = 1000;
+        break;
+    }
+    this.listPrograms = [];
+    this.guideService.GetProgramList(request).subscribe(data => {
       this.listPrograms = data.ProgramList.Programs;
       this.loaded = true;
       this.refreshing = false;
@@ -119,16 +136,19 @@ export class GuideComponent implements OnInit, SchedulerSummary {
   }
 
   refresh(): void {
+    this.refreshing = true;
     switch (this.displayType) {
       case this.GRID:
         if (this.m_startDate) {
-          this.fetchData(this.m_startDate);
           this.refreshing = true;
+          this.fetchData(this.m_startDate);
         }
         break;
       case this.CHANNEL:
+      case this.TITLESEARCH:
+      case this.PEOPLESEARCH:
         this.refreshing = true;
-        this.fetchChannel();
+        this.fetchDetails();
         break;
     }
   }
@@ -142,5 +162,21 @@ export class GuideComponent implements OnInit, SchedulerSummary {
   onGrid() {
     this.displayType = this.GRID;
     this.refresh();
+  }
+
+  titleSearch() {
+    this.searchValue = this.searchValue.trim();
+    if (this.searchValue.length > 1) {
+      this.displayType = this.TITLESEARCH;
+      this.refresh();
+    }
+  }
+
+  peopleSearch() {
+    this.searchValue = this.searchValue.trim();
+    if (this.searchValue.length > 1) {
+      this.displayType = this.PEOPLESEARCH;
+      this.refresh();
+    }
   }
 }
