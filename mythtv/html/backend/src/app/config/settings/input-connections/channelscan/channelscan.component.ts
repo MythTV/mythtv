@@ -6,7 +6,7 @@ import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { ChannelService } from 'src/app/services/channel.service';
 import { CaptureCardList, CardAndInput, CardSubType } from 'src/app/services/interfaces/capture-card.interface';
 import { ChannelScanRequest, ChannelScanStatus, Scan, ScanDialogResponse } from 'src/app/services/interfaces/channel.interface';
-import { VideoMultiplex, VideoMultiplexList } from 'src/app/services/interfaces/multiplex.interface';
+import { VideoMultiplex} from 'src/app/services/interfaces/multiplex.interface';
 import { SetupService } from 'src/app/services/setup.service';
 import { IconnectionComponent } from '../iconnection/iconnection.component';
 
@@ -356,9 +356,9 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
 
 
   ngOnInit(): void {
-    // 1 second timeout to allow DVB card to be ready. Otherwise it fails to open
+    // subject.subscribe to allow DVB card to be ready. Otherwise it fails to open
     // because it is already open from the GetCaptureDeviceList call
-    setTimeout(() => {
+    this.iconnection.deviceFree.subscribe((x) => {
       this.captureCardService.GetCardSubType(this.card.CardId).subscribe(data => {
         this.cardSubType = data.CardSubType;
         this.buildScanTypeList();
@@ -372,7 +372,12 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
         if (['DVBS', 'DVBS2'].includes(this.cardSubType.InputType))
           this.scanRequest.SymbolRate = '27500000';       // default value
       })
-    }, 1000);
+    });
+    // In case this ran after capturedevices was already loaded (unlikely)
+    if (this.iconnection.captureDeviceList.CaptureDeviceList.CaptureDevices.length > 0
+      && !this.cardSubType) {
+      this.iconnection.deviceFree.next(true);
+    }
   }
 
 
@@ -465,7 +470,7 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
   }
 
   onScanTypeChange() {
-    setTimeout(() => this.onFreqTableChange(false),100);
+    setTimeout(() => this.onFreqTableChange(false), 100);
   }
 
   onFreqTableChange(modchange: boolean) {

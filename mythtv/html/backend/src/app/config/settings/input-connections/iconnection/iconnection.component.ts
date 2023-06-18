@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { Observable, PartialObserver } from 'rxjs';
+import { PartialObserver, Subject } from 'rxjs';
 import { startWith } from 'rxjs/operators';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { ChannelService } from 'src/app/services/channel.service';
@@ -77,6 +77,8 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     hemisphere: 1,
     isReady: false,
   };
+
+  deviceFree = new Subject<boolean>();
 
   orgInputGroupIds: number[] = [];
 
@@ -181,6 +183,7 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
         next: data => {
           this.captureDeviceList = data;
           this.setupDevice();
+          this.deviceFree.next(true);
         },
         error: (err: any) => {
           console.log("GetCaptureDeviceList", err);
