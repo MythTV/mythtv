@@ -171,9 +171,19 @@ struct local_buffer_t {
   off_t              rbuffer_cur;
 };
 
+TextSubtitleParser::TextSubtitleParser(SubtitleReader *parent, QString fileName, TextSubtitles *target)
+    : m_parent(parent), m_target(target), m_fileName(std::move(fileName))
+{
+    m_pkt = av_packet_alloc();
+    av_new_packet(m_pkt, 4096);
+}
+
 TextSubtitleParser::~TextSubtitleParser()
 {
     avcodec_free_context(&m_decCtx);
+    avformat_free_context(m_fmtCtx);
+    av_packet_free(&m_pkt);
+    m_stream = nullptr;
     delete m_loadHelper;
 }
 
@@ -327,8 +337,8 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
 #endif
 
     // Create a format context and tie it to the file buffer.
-    AVFormatContext *fmt_ctx = avformat_alloc_context();
-    if (fmt_ctx == nullptr) {
+    m_fmtCtx = avformat_alloc_context();
+    if (m_fmtCtx == nullptr) {
         LOG(VB_VBI, LOG_INFO, "Couldn't allocate format context");
         return;
     }
@@ -336,13 +346,13 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
     if (avio_ctx_buffer == nullptr)
     {
         LOG(VB_VBI, LOG_INFO, "Couldn't allocate memory for avio context");
-        avformat_free_context(fmt_ctx);
+        avformat_free_context(m_fmtCtx);
         return;
     }
-    fmt_ctx->pb = avio_alloc_context(avio_ctx_buffer, IO_BUFFER_SIZE,
+    m_fmtCtx->pb = avio_alloc_context(avio_ctx_buffer, IO_BUFFER_SIZE,
                                      0, &sub_data,
                                      &read_packet, nullptr, &seek_packet);
-    if(int ret = avformat_open_input(&fmt_ctx, nullptr, nullptr, nullptr); ret < 0) {
+    if (int ret = avformat_open_input(&m_fmtCtx, nullptr, nullptr, nullptr); ret < 0) {
         LOG(VB_VBI, LOG_INFO, QString("Couldn't open input context %1")
             .arg(av_make_error_stdstring(errbuf,ret)));
         // FFmpeg frees context on error.
@@ -354,17 +364,17 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
     if (!m_decCtx)
     {
         const AVCodec *codec {nullptr};
-        int stream_num = av_find_best_stream(fmt_ctx, AVMEDIA_TYPE_SUBTITLE, -1, -1, &codec, 0);
+        int stream_num = av_find_best_stream(m_fmtCtx, AVMEDIA_TYPE_SUBTITLE, -1, -1, &codec, 0);
         if (stream_num < 0) {
             LOG(VB_VBI, LOG_INFO, QString("Couldn't find subtitle stream. %1")
                 .arg(av_make_error_stdstring(errbuf,stream_num)));
-            avformat_free_context(fmt_ctx);
+            avformat_free_context(m_fmtCtx);
             return;
         }
-        m_stream = fmt_ctx->streams[stream_num];
+        m_stream = m_fmtCtx->streams[stream_num];
         if (m_stream == nullptr) {
             LOG(VB_VBI, LOG_INFO, QString("Stream %1 is null").arg(stream_num));
-            avformat_free_context(fmt_ctx);
+            avformat_free_context(m_fmtCtx);
             return;
         }
 
@@ -372,7 +382,7 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
         m_decCtx = avcodec_alloc_context3(codec);
         if (!m_decCtx) {
             LOG(VB_VBI, LOG_INFO, QString("Couldn't allocate decoder context"));
-            avformat_free_context(fmt_ctx);
+            avformat_free_context(m_fmtCtx);
             return;
         }
 
@@ -392,31 +402,25 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
             LOG(VB_VBI, LOG_INFO,
                 QString("Couldn't open decoder context for encoding %1").arg(encoding));
             avcodec_free_context(&m_decCtx);
-            avformat_free_context(fmt_ctx);
+            avformat_free_context(m_fmtCtx);
             return;
         }
     }
 
     /* decode until eof */
-    AVPacket *pkt = av_packet_alloc();
-    av_new_packet(pkt, 4096);
-    while (av_read_frame(fmt_ctx, pkt) >= 0)
+    while (av_read_frame(m_fmtCtx, m_pkt) >= 0)
     {
-        decode(pkt);
+        decode(m_pkt);
 
         // reset buffer for next packet
-        pkt->data = pkt->buf->data;
-        pkt->size = pkt->buf->size;
+        m_pkt->data = m_pkt->buf->data;
+        m_pkt->size = m_pkt->buf->size;
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("Loaded %1 %2 '%3' subtitles from %4")
         .arg(m_count)
         .arg(encoding, m_decCtx->codec->long_name, m_fileName));
     m_target->SetLastLoaded();
-
-    av_packet_free(&pkt);
-    m_stream = nullptr;
-    avformat_free_context(fmt_ctx);
 }
 
 QByteArray TextSubtitleParser::GetSubHeader()

@@ -90,8 +90,7 @@ class SubtitleLoadHelper;
 class TextSubtitleParser
 {
   public:
-    TextSubtitleParser(SubtitleReader *parent, QString fileName, TextSubtitles *target)
-        : m_parent(parent), m_target(target), m_fileName(std::move(fileName)) {};
+    TextSubtitleParser(SubtitleReader *parent, QString fileName, TextSubtitles *target);
     ~TextSubtitleParser();
     void LoadSubtitles(bool inBackground);
     int  decode(AVPacket *pkt);
@@ -106,8 +105,10 @@ class TextSubtitleParser
     TextSubtitles      *m_target     {nullptr};
     QString             m_fileName;
 
+    AVFormatContext    *m_fmtCtx     {nullptr};
     AVCodecContext     *m_decCtx     {nullptr};
     AVStream           *m_stream     {nullptr};
+    AVPacket           *m_pkt        {nullptr};
 
     uint32_t            m_count      {0};
 };
