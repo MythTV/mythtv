@@ -51,6 +51,12 @@ void MythBackendCommandLineParser::LoadArguments(void)
 //                    ->SetDeprecated("use mythutil instead");
     );
 
+    add("--webonly", "webonly", false, "Start in web-server-only mode.",
+            "Start the backend in web server mode, where only the "
+            "web server is running. "
+            "This is only for use when the backend crashes due "
+            " to an invalid configuration, and you need to use setup "
+            "to rectify it. Scheduler is disabled in this mode.");
     add("--nosched", "nosched", false, "",
             "Intended for debugging use only, disable the scheduler "
             "on this backend if it is the master backend, preventing "

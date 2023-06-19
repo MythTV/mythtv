@@ -568,6 +568,9 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     be_sd_notify("STATUS=Loading translation");
     MythTranslation::load("mythfrontend");
 
+    if (cmdline.toBool("webonly"))
+        return run_setup_webserver();
+
     if (!ismaster)
     {
         be_sd_notify("STATUS=Connecting to master backend");

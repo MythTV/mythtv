@@ -169,7 +169,7 @@ int main(int argc, char **argv)
 
     gCoreContext->SetAsBackend(true);
     retval = run_backend(cmdline);
-    // Retcode 256 is a special value to signal to mythbackend to restart
+    // Retcode 258 is a special value to signal to mythbackend to restart
     // This is used by the V2Myth/Shutdown?Restart=true API call
     if (retval == 258) {
         LOG(VB_GENERAL, LOG_INFO,
