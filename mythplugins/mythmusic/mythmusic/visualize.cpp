@@ -922,9 +922,18 @@ Spectrogram::Spectrogram(bool hist)
     {
         s_image = QImage(
             m_sgsize.width(), m_sgsize.height(), QImage::Format_RGB32);
+        s_image.fill(Qt::black);
     }
-    m_image = m_history ? &s_image : new QImage(
-        m_sgsize.width(), m_sgsize.height(), QImage::Format_RGB32);
+    if (m_history)
+    {
+	m_image = &s_image;
+    }
+    else
+    {
+        m_image = new QImage(
+	    m_sgsize.width(), m_sgsize.height(), QImage::Format_RGB32);
+        m_image->fill(Qt::black);
+    }
 
     m_dftL = static_cast<FFTSample*>(av_malloc(sizeof(FFTSample) * m_fftlen));
     m_dftR = static_cast<FFTSample*>(av_malloc(sizeof(FFTSample) * m_fftlen));
