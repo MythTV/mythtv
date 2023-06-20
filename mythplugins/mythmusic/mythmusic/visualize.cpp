@@ -151,6 +151,51 @@ int LogScale::operator[](int index)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// MelScale, example: (8192 fft, 1920 pixels, 22050 hz)
+
+MelScale::MelScale(int maxscale, int maxrange, int maxfreq)
+{
+    setMax(maxscale, maxrange, maxfreq);
+}
+
+double MelScale::hz2mel(double hz)
+{
+    return 1127 * log(1 + hz / 700);
+}
+
+double MelScale::mel2hz(double mel)
+{
+    return 700 * (exp(mel / 1127) - 1);
+}
+
+void MelScale::setMax(int maxscale, int maxrange, int maxfreq)
+{
+    if (maxscale == 0 || maxrange == 0 || maxfreq == 0)
+        return;
+
+    m_indices.clear();
+    m_indices.resize(maxrange, 0);
+
+    double maxmel = hz2mel(maxfreq);
+    double hzperbin = (double) maxfreq / (double) maxscale;
+
+    for (int i = 0; i < maxrange; i++)
+    {
+        double mel = maxmel * i / maxrange;
+        double hz = mel2hz(mel);
+        int bin = int(hz / hzperbin);
+        m_indices[i] = bin;
+        // LOG(VB_PLAYBACK, LOG_INFO, QString("Mel maxmel=%1, hzperbin=%2, hz=%3, i=%4, bin=%5")
+        //     .arg(maxmel).arg(hzperbin).arg(hz).arg(i).arg(bin));
+    }
+}
+
+int MelScale::operator[](int index)
+{
+    return m_indices[index];
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // StereoScope
 
 StereoScope::StereoScope()
@@ -886,8 +931,10 @@ Spectrogram::Spectrogram(bool hist)
 
     m_rdftContext = av_rdft_init(std::log2(m_fftlen), DFT_R2C);
 
+    // hack!!! Should 44100 sample rate be queried or measured?
+    // Likely close enough for most audio recordings...
     m_scale.setMax(m_fftlen / 2, m_history ?
-                   m_sgsize.height() / 2 : m_sgsize.width());
+                   m_sgsize.height() / 2 : m_sgsize.width(), 44100/2);
     m_sigL.resize(m_fftlen);
     m_sigR.resize(m_fftlen);
 
@@ -954,13 +1001,26 @@ bool Spectrogram::process(VisualNode */*node*/)
 
     // QPainter painter(m_image);
     // painter.setPen(Qt::cyan);
-    // for (auto h = m_sgsize.height(); h > 0; h -= m_sgsize.height() / 2)
+    // QFont font = QApplication::font();
+    // font.setPixelSize(14);
+    // painter.setFont(font);
+    // if (m_history)
     // {
-    //     for (auto i = 0; i < m_sgsize.height() / 2; i += 20)
+    //     for (auto h = m_sgsize.height(); h > 0; h -= m_sgsize.height() / 2)
     //     {
-    //         QRect text(10, h - i - 10, 100, 20);
-    //         painter.drawText(text, Qt::AlignVCenter | Qt::AlignRight,
-    //                          QString("%1")
+    //         for (auto i = 0; i < m_sgsize.height() / 2; i += 20)
+    //         {
+    //             painter.drawText(0, h - i,
+    //                              QString("...%1.%2.%3...").arg(i).arg(m_scale[i])
+    //                              .arg(m_scale[i] * 22050 / 8192)); // hack!!!
+    //         }
+    //     }
+    // } else {
+    //     painter.rotate(90);
+    //     for (auto i = 0; i < m_sgsize.width(); i += 20)
+    //     {
+    //         painter.drawText(0, -1 * i,
+    //                          QString("...%1.%2.%3...").arg(i).arg(m_scale[i])
     //                          .arg(m_scale[i] * 22050 / 8192)); // hack!!!
     //     }
     // }
@@ -969,7 +1029,7 @@ bool Spectrogram::process(VisualNode */*node*/)
 
 bool Spectrogram::processUndisplayed(VisualNode *node)
 {
-    // as of v33, this processes *all* samples, see WaveForm
+    // as of v33, this processes *all* samples, see the comments in WaveForm
 
     int i = 0;
     int w = m_sgsize.width();   // drawing size
@@ -1020,9 +1080,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
     {
         painter.fillRect(s_offset,     0, 256, h, Qt::black);
         painter.fillRect(s_offset - w, 0, 256, h, Qt::black);
-    }
-    else
-    {
+    } else {
         painter.fillRect(0, 0, w, h, Qt::black);
     }
 
@@ -1075,9 +1133,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
             left > 255 ? painter.setPen(Qt::yellow) :
                 painter.setPen(qRgb(mag, mag, mag));
             painter.drawPoint(s_offset, h - i);
-        }
-        else
-        {
+        } else {
             painter.drawLine(i, h / 2, i, h / 2 - h / 2 * mag / 256);
         }
 
@@ -1094,9 +1150,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
             right > 255 ? painter.setPen(Qt::yellow) :
                 painter.setPen(qRgb(mag, mag, mag));
             painter.drawPoint(s_offset, h - i);
-        }
-        else
-        {
+        } else {
             painter.drawLine(i, h / 2, i, h / 2 + h / 2 * mag / 256);
         }
 
@@ -1137,6 +1191,18 @@ bool Spectrogram::draw(QPainter *p, const QColor &back)
     //  }
     // }
     return true;
+}
+
+void Spectrogram::handleKeyPress(const QString &action)
+{
+    LOG(VB_PLAYBACK, LOG_INFO, QString("SG keypress = %1").arg(action));
+
+    // I'd like to tweak options upon certain key hit, but
+    // mythfrontend doesn't appear to call this.  Bug?
+    if (action == "SELECT")
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, QString("SG keypress SELECT hit"));
+    }
 }
 
 // passing true to the above constructor gives the spectrum with full history:

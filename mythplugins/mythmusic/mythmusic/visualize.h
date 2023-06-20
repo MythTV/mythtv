@@ -70,6 +70,7 @@ class VisualBase
 
     // this is called on nodes that will not be displayed :: Not needed for most visualizations
     // (i.e. between the displayed frames, if you need the whole audio stream)
+    // as of v33, this processes *all* samples, see the comments in WaveForm
     virtual bool processUndisplayed( VisualNode */*node*/ )
     {
         return true; // By default this does nothing : Ignore the in-between chunks of audio data
@@ -195,6 +196,20 @@ class LogScale
     int  m_r       {0};
 };
 
+class MelScale
+{
+  public:
+    explicit MelScale(int maxscale = 0, int maxrange = 0, int maxfreq = 0);
+
+    void setMax(int maxscale, int maxrange, int maxfreq);
+    double hz2mel(double hz);
+    double mel2hz(double mel);
+    int operator[](int index);
+
+  private:
+    std::vector<int> m_indices;
+};
+
 // Spectrogram - by twitham@sbcglobal.net, 2023/05
 
 class Spectrogram : public VisualBase
@@ -211,8 +226,8 @@ class Spectrogram : public VisualBase
     bool processUndisplayed(VisualNode *node) override;
     bool process( VisualNode *node ) override;
     bool draw(QPainter *p, const QColor &back = Qt::black) override;
-    void handleKeyPress(const QString &action) override
-        {(void) action;}
+    void handleKeyPress(const QString &action) override;
+    // {(void) action;}
     static QImage s_image;      // picture of spectrogram
     static int    s_offset;     // position on screen
 
@@ -221,7 +236,7 @@ class Spectrogram : public VisualBase
     QImage         *m_image;              // picture in use
     QSize          m_sgsize {1920, 1080}; // picture size
     QSize          m_size;                // displayed dize
-    LogScale       m_scale;               // Y-axis
+    MelScale       m_scale;               // Y-axis
     int            m_fftlen {16 * 1024}; // window width
     QVector<float> m_sigL;               // decaying signal window
     QVector<float> m_sigR;
