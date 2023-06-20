@@ -425,3 +425,13 @@ QByteArray TextSubtitleParser::GetSubHeader()
     return { reinterpret_cast<char*>(m_decCtx->subtitle_header),
              m_decCtx->subtitle_header_size };
 }
+
+void TextSubtitleParser::SeekFrame(int64_t ts, int flags)
+{
+    if (av_seek_frame(m_fmtCtx, -1, ts, flags) < 0)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("TextSubtitleParser av_seek_frame(fmtCtx, -1, %1, %2) -- error")
+            .arg(ts).arg(flags));
+    }
+}

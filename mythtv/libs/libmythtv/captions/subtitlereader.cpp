@@ -1,6 +1,19 @@
 #include "libmythbase/mythlogging.h"
 #include "captions/subtitlereader.h"
 
+#ifdef DEBUG_SUBTITLES
+QString toString(const AVSubtitle& sub)
+{
+    auto start = QTime(0,0).addMSecs(sub.start_display_time);
+    auto end = QTime(0,0).addMSecs(sub.end_display_time);
+    return QString("%1-%2 (%3-%4)")
+        .arg(start.toString("HH:mm:ss.zzz"),
+             end.toString("HH:mm:ss.zzz"))
+        .arg(sub.start_display_time)
+        .arg(sub.end_display_time);
+}
+#endif
+
 // If the count of subtitle buffers is greater than this, force a clear
 static const int MAX_BUFFERS_BEFORE_CLEAR = 175;  // 125 too low for karaoke
 
@@ -30,6 +43,16 @@ void SubtitleReader::EnableTextSubtitles(bool enable)
 void SubtitleReader::EnableRawTextSubtitles(bool enable)
 {
     m_rawTextSubtitlesEnabled = enable;
+}
+
+void SubtitleReader::SeekFrame(int64_t ts, int flags)
+{
+    m_avSubtitles.m_needSync = true;
+    if (m_externalParser)
+    {
+        ClearAVSubtitles();
+        m_externalParser->SeekFrame(ts, flags);
+    }
 }
 
 bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
@@ -63,6 +86,14 @@ bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
             "SubtitleReader: Allowing forced AV subtitle.");
         enableforced = true;
     }
+
+#ifdef DEBUG_SUBTITLES
+    if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
+    {
+        LOG(VB_PLAYBACK, LOG_DEBUG,
+            QString("AddAVSubtitle adding sub %1").arg(toString(subtitle)));
+    }
+#endif
 
     bool clearsubs = false;
     m_avSubtitles.m_lock.lock();
@@ -116,6 +147,7 @@ void SubtitleReader::LoadExternalSubtitles(const QString &subtitleFileName,
 
 void SubtitleReader::ReadNextSubtitle(void)
 {
+    m_avSubtitles.m_needSync = false;
     if (m_externalParser)
         m_externalParser->ReadNextSubtitle();
 }

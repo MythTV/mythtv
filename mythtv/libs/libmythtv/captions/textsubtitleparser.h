@@ -95,6 +95,7 @@ class TextSubtitleParser
     void LoadSubtitles(bool inBackground);
     int  decode(AVPacket *pkt);
     QByteArray GetSubHeader();
+    void SeekFrame(int64_t ts, int flags);
     int ReadNextSubtitle(void);
 
   private:

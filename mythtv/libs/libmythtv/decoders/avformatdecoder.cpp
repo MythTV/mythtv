@@ -645,6 +645,8 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
         m_getRawFrames = oldrawstate;
         return false;
     }
+    if (auto* reader = m_parent->GetSubReader(); reader)
+        reader->SeekFrame(ts, flags);
 
     int normalframes = 0;
 
