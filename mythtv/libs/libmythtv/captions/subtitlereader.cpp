@@ -119,6 +119,12 @@ void SubtitleReader::LoadExternalSubtitles(const QString &subtitleFileName,
     }
 }
 
+void SubtitleReader::ReadNextSubtitle(void)
+{
+    if (m_externalParser)
+        m_externalParser->ReadNextSubtitle();
+}
+
 bool SubtitleReader::HasTextSubtitles(void)
 {
     return m_textSubtitles.GetHasSubtitles();

@@ -95,6 +95,7 @@ class TextSubtitleParser
     void LoadSubtitles(bool inBackground);
     int  decode(AVPacket *pkt);
     QByteArray GetSubHeader();
+    int ReadNextSubtitle(void);
 
   private:
     static int     read_packet(void *opaque, uint8_t *buf, int buf_size);
@@ -109,8 +110,6 @@ class TextSubtitleParser
     AVCodecContext     *m_decCtx     {nullptr};
     AVStream           *m_stream     {nullptr};
     AVPacket           *m_pkt        {nullptr};
-
-    uint32_t            m_count      {0};
 };
 
 #endif

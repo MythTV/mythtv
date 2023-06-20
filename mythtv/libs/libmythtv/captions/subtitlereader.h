@@ -56,6 +56,7 @@ class SubtitleReader : public QObject
     TextSubtitleParser* GetParser(void) { return m_externalParser; }
     bool HasTextSubtitles(void);
     void LoadExternalSubtitles(const QString &subtitleFileName, bool isInProgress);
+    void ReadNextSubtitle(void);
 
     QStringList GetRawTextSubtitles(std::chrono::milliseconds &duration);
     void AddRawTextSubtitle(const QStringList& list, std::chrono::milliseconds duration);

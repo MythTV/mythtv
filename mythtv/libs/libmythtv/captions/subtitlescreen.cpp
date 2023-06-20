@@ -1832,6 +1832,12 @@ void SubtitleScreen::DisplayAVSubtitles(void)
     QMutexLocker lock(&(subs->m_lock));
     if (subs->m_buffers.empty() && (kDisplayAVSubtitle != m_subtitleType))
         return;
+    if (subs->m_buffers.empty() && m_subreader)
+    {
+        lock.unlock();
+        m_subreader->ReadNextSubtitle();
+        lock.relock();
+    }
 
     MythVideoOutput *videoOut = m_player->GetVideoOutput();
     MythVideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : nullptr;

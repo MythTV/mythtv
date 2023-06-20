@@ -231,29 +231,35 @@ int64_t TextSubtitleParser::seek_packet(void *opaque, int64_t offset, int whence
     return 0;
 }
 
-/// \brief Decode a single packet worth of data.
+/// \brief Read the next subtitle in the AV stream.
 ///
 /// av_read_frame guarantees that pkt->pts, pkt->dts and pkt->duration
 /// are always set to correct values in AVStream.time_base units (and
 /// guessed if the format cannot provide them). pkt->pts can be
 /// AV_NOPTS_VALUE if the video format has B-frames, so it is better to
 /// rely on pkt->dts if you do not decompress the payload.
-int TextSubtitleParser::decode(AVPacket *pkt)
+int TextSubtitleParser::ReadNextSubtitle(void)
 {
+    // reset buffer
+    m_pkt->data = m_pkt->buf->data;
+    m_pkt->size = m_pkt->buf->size;
+
+    int ret = av_read_frame(m_fmtCtx, m_pkt);
+    if (ret < 0)
+        return ret;
+
     AVSubtitle sub {};
     int got_sub_ptr {0};
-
-    int ret = avcodec_decode_subtitle2(m_decCtx, &sub, &got_sub_ptr, pkt);
+    ret = avcodec_decode_subtitle2(m_decCtx, &sub, &got_sub_ptr, m_pkt);
     if (ret < 0)
         return ret;
     if (!got_sub_ptr)
         return -1;
 
-    sub.start_display_time = av_q2d(m_stream->time_base) * pkt->dts * 1000;
-    sub.end_display_time = av_q2d(m_stream->time_base) * (pkt->dts + pkt->duration) * 1000;
+    sub.start_display_time = av_q2d(m_stream->time_base) * m_pkt->dts * 1000;
+    sub.end_display_time = av_q2d(m_stream->time_base) * (m_pkt->dts + m_pkt->duration) * 1000;
 
     m_parent->AddAVSubtitle(sub, m_decCtx->codec_id == AV_CODEC_ID_XSUB, false);
-    m_count += 1;
     return ret;
 }
 
@@ -407,18 +413,7 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
         }
     }
 
-    /* decode until eof */
-    while (av_read_frame(m_fmtCtx, m_pkt) >= 0)
-    {
-        decode(m_pkt);
-
-        // reset buffer for next packet
-        m_pkt->data = m_pkt->buf->data;
-        m_pkt->size = m_pkt->buf->size;
-    }
-
-    LOG(VB_GENERAL, LOG_INFO, QString("Loaded %1 %2 '%3' subtitles from %4")
-        .arg(m_count)
+    LOG(VB_GENERAL, LOG_INFO, QString("Loaded %2 '%3' subtitles from %4")
         .arg(encoding, m_decCtx->codec->long_name, m_fileName));
     m_target->SetLastLoaded();
 }
