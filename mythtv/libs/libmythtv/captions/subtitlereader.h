@@ -50,7 +50,7 @@ class SubtitleReader : public QObject
     AVSubtitles* GetAVSubtitles(void) { return &m_avSubtitles; }
     bool AddAVSubtitle(AVSubtitle& subtitle, bool fix_position,
                        bool allow_forced);
-    void ClearAVSubtitles(bool force = false);
+    void ClearAVSubtitles(void);
     static void FreeAVSubtitle(AVSubtitle &sub);
 
     TextSubtitleParser* GetParser(void) { return m_externalParser; }

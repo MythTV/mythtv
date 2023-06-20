@@ -13,7 +13,7 @@ SubtitleReader::SubtitleReader(MythPlayer *parent)
 
 SubtitleReader::~SubtitleReader()
 {
-    ClearAVSubtitles(true);
+    ClearAVSubtitles();
     ClearRawTextSubtitles();
 }
 
@@ -87,13 +87,8 @@ bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
     return enableforced;
 }
 
-void SubtitleReader::ClearAVSubtitles(bool force)
+void SubtitleReader::ClearAVSubtitles(void)
 {
-    // Don't flush subtitles loaded from an external file.  They won't
-    // get repopulated as the stream continues to play.
-    if (m_externalParser && !force)
-        return;
-
     m_avSubtitles.m_lock.lock();
     while (!m_avSubtitles.m_buffers.empty())
     {
