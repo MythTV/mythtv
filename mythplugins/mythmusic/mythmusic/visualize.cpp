@@ -556,7 +556,7 @@ void WaveForm::saveload(MusicMetadata *meta)
 {
     QString cache = GetConfDir() + "/MythMusic/WaveForm";
     QString filename;
-    int stream = gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_RADIO;
+    m_stream = gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_RADIO;
     if (m_currentMetadata)     // cache work in progress for next time
     {
         QDir dir(cache);
@@ -565,7 +565,7 @@ void WaveForm::saveload(MusicMetadata *meta)
             dir.mkpath(cache);
         }
         filename = QString("%1/%2.png").arg(cache)
-            .arg(stream ? 0 : m_currentMetadata->ID());
+            .arg(m_stream ? 0 : m_currentMetadata->ID());
         LOG(VB_PLAYBACK, LOG_INFO, QString("WF saving to %1").arg(filename));
         if (!s_image.save(filename))
         {
@@ -576,7 +576,7 @@ void WaveForm::saveload(MusicMetadata *meta)
     m_currentMetadata = meta;
     if (meta)                   // load previous work from cache
     {
-        filename = QString("%1/%2.png").arg(cache).arg(stream ? 0 : meta->ID());
+        filename = QString("%1/%2.png").arg(cache).arg(m_stream ? 0 : meta->ID());
         LOG(VB_PLAYBACK, LOG_INFO, QString("WF loading from %1").arg(filename));
         if (!s_image.load(filename))
         {
@@ -585,7 +585,7 @@ void WaveForm::saveload(MusicMetadata *meta)
         }
         // 60 seconds skips pixels with < 44100 streams like 22050,
         // but this is now compensated for by drawing wider "pixels"
-        m_duration = stream ? 60000 : meta->Length().count(); // millisecs
+        m_duration = m_stream ? 60000 : meta->Length().count(); // millisecs
     }
     if (s_image.isNull())
     {
@@ -691,8 +691,17 @@ bool WaveForm::processUndisplayed(VisualNode *node)
                 // LOG(VB_PLAYBACK, LOG_DEBUG,
                 //     QString("WF painting at %1,%2/%3").arg(x).arg(y).arg(yr));
 
-                painter.setPen(Qt::black); // clear prior content
-                painter.drawLine(x, 0, x, m_wfsize.height());
+                // clear prior content of this column
+		if (m_stream)  // clear 5 seconds of future, with wrap
+		{
+		    painter.fillRect(x, 0, 32 * 5,
+				     m_wfsize.height(), Qt::black);
+		    painter.fillRect(x - m_wfsize.width(), 0, 32 * 5,
+				     m_wfsize.height(), Qt::black);
+		} else {	// preserve the future, if any
+		    painter.fillRect(x, 0, 1,
+				     m_wfsize.height(), Qt::black);
+		}
 
                 // Audacity uses 50,50,200 and 100,100,220 - I'm going
                 // darker to better contrast the StereoScope overlay

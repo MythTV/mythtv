@@ -171,6 +171,7 @@ public:
     short int     m_minr     {0};     // right range minimum
     short int     m_maxr     {0};     // right range maximum
     unsigned long m_sqrr     {0};     // sum of squares, for RMS
+    bool          m_stream   {false}; // true if radio stream
 };
 
 class LogScale
