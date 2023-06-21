@@ -8,6 +8,8 @@ import { DvrService } from 'src/app/services/dvr.service';
 import { UpdateRecordedMetadataRequest } from 'src/app/services/interfaces/dvr.interface';
 import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
 import { ProgramList } from 'src/app/services/interfaces/program.interface';
+import { JobQCommands } from 'src/app/services/interfaces/setup.interface';
+import { SetupService } from 'src/app/services/setup.service';
 
 @Component({
   selector: 'app-recordings',
@@ -21,9 +23,11 @@ export class RecordingsComponent implements OnInit {
   @ViewChild("menu") menu!: Menu;
 
   recordings!: ProgramList;
+  JobQCmds!: JobQCommands;
   program: ScheduleOrProgram = <ScheduleOrProgram>{ Title: '' };
   editingProgram?: ScheduleOrProgram;
   displayMetadataDlg = false;
+  displayRunJobs = false;
   displayUnsaved = false;
   successCount = 0;
   errorCount = 0;
@@ -37,6 +41,17 @@ export class RecordingsComponent implements OnInit {
     AlreadyDel: 'dashboard.recordings.alreadydel'
   }
 
+  jobsoffset = 3; // number of items before user jobs
+  jobs: MenuItem[] = [
+    { id: 'Transcode', label: 'dashboard.recordings.job_Transcode', command: (event) => this.runjob(event) },
+    { id: 'Commflag', label: 'dashboard.recordings.job_Commflag', command: (event) => this.runjob(event) },
+    { id: 'Metadata', label: 'dashboard.recordings.job_Metadata', command: (event) => this.runjob(event) },
+    { id: 'UserJob1', visible: false, command: (event) => this.runjob(event) },
+    { id: 'UserJob2', visible: false, command: (event) => this.runjob(event) },
+    { id: 'UserJob3', visible: false, command: (event) => this.runjob(event) },
+    { id: 'UserJob4', visible: false, command: (event) => this.runjob(event) }
+  ];
+
   // Menu Items
   mnu_delete: MenuItem = { label: 'dashboard.recordings.mnu_delete', command: (event) => this.delete(event, false) };
   mnu_delete_rerec: MenuItem = { label: 'dashboard.recordings.mnu_delete_rerec', command: (event) => this.delete(event, true) };
@@ -47,12 +62,15 @@ export class RecordingsComponent implements OnInit {
   mnu_updatemeta: MenuItem = { label: 'dashboard.recordings.mnu_updatemeta', command: (event) => this.updatemeta(event) };
   mnu_updaterecrule: MenuItem = { label: 'dashboard.recordings.mnu_updaterecrule', command: (event) => this.updaterecrule(event) };
   mnu_stoprec: MenuItem = { label: 'dashboard.recordings.mnu_stoprec', command: (event) => this.stoprec(event) };
+  mnu_runjobs: MenuItem = { label: 'dashboard.recordings.mnu_runjobs', items: this.jobs };
 
   menuToShow: MenuItem[] = [];
 
   constructor(private dvrService: DvrService, private messageService: MessageService,
-    private translate: TranslateService) {
+    public translate: TranslateService, private setupService: SetupService) {
     this.loadRecordings();
+    this.JobQCmds = this.setupService.getJobQCommands();
+
     // translations
     for (const [key, value] of Object.entries(this.msg)) {
       this.translate.get(value).subscribe(data => {
@@ -61,7 +79,8 @@ export class RecordingsComponent implements OnInit {
     }
 
     const mnu_entries = [this.mnu_delete, this.mnu_delete_rerec, this.mnu_undelete, this.mnu_rerec, this.mnu_markwatched,
-    this.mnu_markunwatched, this.mnu_updatemeta, this.mnu_updaterecrule, this.mnu_stoprec];
+    this.mnu_markunwatched, this.mnu_updatemeta, this.mnu_updaterecrule, this.mnu_stoprec, this.mnu_runjobs,
+    this.jobs[0], this.jobs[1], this.jobs[2]]
 
     mnu_entries.forEach(entry => {
       if (entry.label)
@@ -112,6 +131,17 @@ export class RecordingsComponent implements OnInit {
     else
       this.menuToShow.push(this.mnu_markwatched);
     this.menuToShow.push(this.mnu_updatemeta);
+    if (this.program.Recording.RecGroup != 'Deleted') {
+      this.menuToShow.push(this.mnu_runjobs);
+      for (let ix = 0; ix < 4; ix++) {
+        if (this.JobQCmds.UserJob[ix]) {
+          this.jobs[ix + this.jobsoffset].visible = true;
+          this.jobs[ix + this.jobsoffset].label = this.JobQCmds.UserJobDesc[ix];
+        }
+        else
+          this.jobs[ix + this.jobsoffset].visible = false;
+      }
+    }
     // todo: implement this
     // this.menuToShow.push(this.mnu_updaterecrule);
     this.menu.toggle(event);
@@ -122,7 +152,6 @@ export class RecordingsComponent implements OnInit {
     this.dvrService.GetRecorded({ RecordedId: this.program.Recording.RecordedId })
       .subscribe({
         next: (x) => {
-          console.log(x)
           if (x.Program.Recording.RecGroup == 'Deleted') {
             this.sendMessage('error', event.item.label, this.msg.AlreadyDel);
             this.program.Recording.RecGroup = 'Deleted';
@@ -228,7 +257,6 @@ export class RecordingsComponent implements OnInit {
   saveObserver: PartialObserver<any> = {
     next: (x: any) => {
       if (x.bool) {
-        console.log("saveObserver success", x);
         this.successCount++;
         this.currentForm.form.markAsPristine();
         if (this.editingProgram)
@@ -289,5 +317,22 @@ export class RecordingsComponent implements OnInit {
 
   updaterecrule(event: any) { }
   stoprec(event: any) { }
+
+  runjob(event: any) {
+    this.dvrService.ManageJobQueue({
+      Action: 'Add',
+      JobName: event.item.id,
+      RecordedId: this.program.Recording.RecordedId,
+    }).subscribe({
+      next: (x) => {
+        if (x.int > 0) {
+          this.sendMessage('success', event.item.label, this.msg.Success);
+        }
+        else
+          this.sendMessage('error', event.item.label, this.msg.Failed);
+      },
+      error: (err: any) => this.networkError(err)
+    });
+  }
 
 }

@@ -191,3 +191,13 @@ export interface UpdateRecordedMetadataRequest {
     Title?:                   string;
     Watched?:                 boolean;
 }
+
+export interface ManageJobQueueRequest {
+    Action:         string;
+    JobName:        string;
+    JobId?:         number;
+    RecordedId:     number;
+    JobStartTime?:  Date;
+    RemoteHost?:    string;
+    JobArgs?:       string;
+}

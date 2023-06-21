@@ -21,7 +21,8 @@ import {
   GetUpcomingRequest,
   UnDeleteRecordingRequest,
   UpdateRecordedMetadataRequest,
-  RecordScheduleRequest
+  RecordScheduleRequest,
+  ManageJobQueueRequest
 } from './interfaces/dvr.interface';
 import { BoolResponse, StringResponse } from './interfaces/common.interface';
 import { ProgramList, ScheduleOrProgram } from './interfaces/program.interface';
@@ -217,5 +218,9 @@ export class DvrService {
     let params = new HttpParams()
       .set("RecStatus", recStatus);
     return this.httpClient.get<StringResponse>('/Dvr/RecStatusToString', { params });
+  }
+
+  public ManageJobQueue(request: ManageJobQueueRequest): Observable<{int: number}> {
+    return this.httpClient.post<{int: number}>('/Dvr/ManageJobQueue', request);
   }
 }

@@ -56,7 +56,11 @@
       "episode": "Episode",
       "canundel": "You can reverse this by using Undelete.",
       "alreadydel": "Already Deleted",
-      "edit_metadata": "Edit Metadata"
+      "edit_metadata": "Edit Metadata",
+      "mnu_runjobs": "Run Jobs",
+      "job_Transcode": "Transcode",
+      "job_Commflag": "Detect Commercials",
+      "job_Metadata": "Look up Metadata"
     },
     "upcoming": {
       "heading": "Upcoming",
@@ -434,7 +438,8 @@
       "preview_label": "Allow Preview Jobs",
       "cpu_low": "Low",
       "cpu_med": "Medium",
-      "cpu_high": "High"
+      "cpu_high": "High",
+      "trans_label": "Allow Transcoding Jobs"
     },
     "jobqglobal": {
       "title": "Job Queue (Global)",

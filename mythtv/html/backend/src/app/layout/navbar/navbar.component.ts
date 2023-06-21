@@ -48,7 +48,6 @@ export class NavbarComponent implements OnInit {
             .subscribe(
                 data => {
                     var url = this.router.url;
-                    console.log(url);
                     if (data.BackendInfo.Env.IsDatabaseIgnored
                         || (!data.BackendInfo.Env.SchedulingEnabled && !url.startsWith('/setupwizard/')))
                         router.navigate(['setupwizard/dbsetup']);

@@ -4,7 +4,7 @@
     </div>
     <h2>{{ 'dashboard.recordings.heading' | translate }}</h2>
     <div class="block card w-full" style="height: 90vh" *ngIf="recordings else loading">
-        <p-menu #menu [popup]="true" [model]="menuToShow"></p-menu>
+        <p-slideMenu #menu [popup]="true" [model]="menuToShow" [viewportHeight]="360" [backLabel]="translate.instant('common.back')"></p-slideMenu>
         <p-table [value]="recordings.Programs" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
             [rowHover]="true" responsiveLayout="scroll">
             <ng-template pTemplate="caption">
@@ -86,6 +86,7 @@
             </ng-template>
         </p-table>
 
+        <!-- Edit Metadata Dialog -->
         <p-dialog header="{{ 'dashboard.recordings.edit_metadata' | translate }}" [(visible)]="displayMetadataDlg"
             [modal]="true" [style]="{height: '75vw', width: '50vw'}" [closable]="false" [closeOnEscape]="false">
 
@@ -150,9 +151,9 @@
                     styleClass="p-button-success"
                     [disabled]="!recsform.dirty || program.Title.trim() == '' "></p-button>
             </ng-template>
-
         </p-dialog>
 
+        <!-- Unsaved Changes Warning Dialog -->
         <p-dialog header="{{ 'common.unsaved_heading' | translate }}" [(visible)]="displayUnsaved" [modal]="true">
             <p>{{ 'common.unsaved_message' | translate }}</p>
             <ng-template pTemplate="footer">
