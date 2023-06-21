@@ -21208,7 +21208,7 @@ Il Grabber non fornisce i numeri dei canali, quindi devi impostarlo manualmente.
     <message>
         <location filename="../libs/libmythbase/recordingtypes.cpp" line="262"/>
         <source>Match duplicates using subtitle</source>
-        <translation>Trova duplicati usando il sottotitolo</translation>
+        <translation>Trova duplicati usando sottotitoli</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/recordingtypes.cpp" line="245"/>
@@ -21238,12 +21238,12 @@ Il Grabber non fornisce i numeri dei canali, quindi devi impostarlo manualmente.
     <message>
         <location filename="../libs/libmythbase/recordingtypes.cpp" line="182"/>
         <source>Look for duplicates in current and previous recordings</source>
-        <translation>Cerca duplicati in registrazioni correnti e precedenti</translation>
+        <translation>Cerca duplicati nelle registrazioni correnti e precedenti</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/recordingtypes.cpp" line="178"/>
         <source>Look for duplicates in current recordings only</source>
-        <translation>Cerca duplicati solo in registrazioni correnti</translation>
+        <translation>Cerca duplicati solo nelle registrazioni correnti</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/recordingtypes.cpp" line="159"/>
@@ -21269,7 +21269,7 @@ Il Grabber non fornisce i numeri dei canali, quindi devi impostarlo manualmente.
     <message>
         <location filename="../libs/libmythbase/recordingtypes.cpp" line="180"/>
         <source>Look for duplicates in previous recordings only</source>
-        <translation>Cerca duplicati solo in registrazioni precedenti</translation>
+        <translation>Cerca duplicati solo nelle registrazioni precedenti</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/recordingtypes.cpp" line="187"/>
@@ -22776,7 +22776,7 @@ Nome Database: %2</translation>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="143"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="319"/>
         <source>AutoExpire List</source>
-        <translation>ListaAutoElim</translation>
+        <translation>Auto-eliminaz</translation>
     </message>
     <message>
         <source>Acknowledge all log entries at this priority level or lower?</source>
@@ -22849,7 +22849,7 @@ Nome Database: %2</translation>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="344"/>
         <source>Disable AutoExpire</source>
-        <translation>Disab. Autocancella</translation>
+        <translation>Disabilita autocancellazione</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="454"/>
@@ -25360,7 +25360,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="83"/>
         <source>%PLAYEDTIME| of% %TOTALTIME% %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</source>
-        <translatorcomment>From the possible translations for &quot;behind&quot; to let the user better understand the referred time &quot;differita&quot; (deferred as of timeshift) is the better choice rather than &quot;ritardo&quot; which is a possible alternative.</translatorcomment>
+        <translatorcomment>From the possible translations for &quot;behind&quot; preferred &quot;differita&quot; (deferred as of timeshift) rather than &quot;ritardo&quot; which is a possible alternative.</translatorcomment>
         <translation>%PLAYEDTIME| di% %TOTALTIME% %(|REMAININGTIME| restanti)%%(differita |BEHINDTIME|)%</translation>
     </message>
     <message>
@@ -25942,7 +25942,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="262"/>
         <source>%|watchedpercent|%% watched</source>
-        <translation>visto %|watchedpercent|%%</translation>
+        <translation>%|watchedpercent|%% visto</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="265"/>
@@ -26190,7 +26190,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="358"/>
         <source>AUTOEXPIRE</source>
-        <translation>AUTOSCADE</translation>
+        <translation>AUTOEXPIRE</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="359"/>
@@ -26475,7 +26475,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="460"/>
         <source>BOOKMARKED</source>
-        <translation>SEGNATO</translation>
+        <translation>BOOKMARKED</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="462"/>
@@ -26625,17 +26625,17 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="533"/>
         <source>CFLAGQUEUED</source>
-        <translation>IDPUBACCOD</translation>
+        <translation>CFLAGQUEUED</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="534"/>
         <source>COMFLAGGED</source>
-        <translation>PUBBL_IDENT</translation>
+        <translation>COMFLAGGED</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="535"/>
         <source>COMFLAGGING</source>
-        <translation>IDENT_PUBBL</translation>
+        <translation>COMFLAGGING</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="536"/>
@@ -26650,7 +26650,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="539"/>
         <source>CUTLIST</source>
-        <translation>LISTATAGLI</translation>
+        <translation>CUTLIST</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="544"/>
@@ -31358,7 +31358,7 @@ gg MMMM aaaa</translation>
         <location filename="../themes/themestrings.h" line="82"/>
         <source>%PLAYEDTIME% of %TOTALTIME%
 %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</source>
-        <translatorcomment>From the possible translations for &quot;behind&quot; to let the user better understand the referred time &quot;differita&quot; (deferred as of timeshift) is the better choice rather than &quot;ritardo&quot; which is a possible alternative.</translatorcomment>
+        <translatorcomment>From the possible translations for &quot;behind&quot; preferred &quot;differita&quot; (deferred as of timeshift) rather than &quot;ritardo&quot; which is a possible alternative.</translatorcomment>
         <translation>%PLAYEDTIME% di %TOTALTIME%
 %(|REMAININGTIME| restanti)%%(differita |BEHINDTIME|)%</translation>
     </message>
@@ -36097,7 +36097,7 @@ Per programmare una registrazione, esci da questa schermata e seleziona &apos;Gu
     <message>
         <location filename="../themes/themestrings.h" line="81"/>
         <source>%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</source>
-        <translatorcomment>From the possible translations for &quot;behind&quot; to let the user better understand the referred time &quot;differita&quot; (deferred as of timeshift) is the better choice rather than &quot;ritardo&quot; which is a possible alternative.</translatorcomment>
+        <translatorcomment>From the possible translations for &quot;behind&quot; preferred &quot;differita&quot; (deferred as of timeshift) rather than &quot;ritardo&quot; which is a possible alternative.</translatorcomment>
         <translation>%PLAYEDTIME% di %TOTALTIME% %(|REMAININGTIME| restanti)%%(differita |BEHINDTIME|)%</translation>
     </message>
     <message>
