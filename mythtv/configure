@@ -5435,7 +5435,7 @@ enabled libudev && check_lib udev libudev.h udev_new -ludev || disable libudev
 
 # libexiv2
 if enabled system_libexiv2 ; then
-    if $(pkg-config --atleast-version="0.27.99" exiv2); then
+    if $(pkg-config --atleast-version="0.99" exiv2); then
         use_pkg_config exiv2 exiv2 exiv2/exiv2.hpp versionNumber
     elif [ $target_os != "android" ] ; then
         disable system_libexiv2
