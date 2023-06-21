@@ -5538,6 +5538,7 @@ if enabled bdjava; then
         
         echo "${javac_version}" | grep -E -q '^javac (9|1[0-1])' && java_code_version=1.6
         echo "${javac_version}" | grep -E -q '^javac (1[2-9])' && java_code_version=1.7
+        echo "${javac_version}" | grep -E -q '^javac (2.*)' && java_code_version=1.7
     fi
 fi
 
