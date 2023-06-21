@@ -10,7 +10,7 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="Description" class="block">{{ 'settings.capture.diseqc.description_label' |
+                        <label for="Description" class="label block">{{ 'settings.capture.diseqc.description_label' |
                             translate }}</label>
                         <input pInputText id="ip" [(ngModel)]="diseqcTree.Description" name="Description"
                             #Description="ngModel" class="mb-2 form-control w-full" />
@@ -20,7 +20,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="CmdRepeat" class="block">{{ 'settings.capture.diseqc.cmdrepeat_label' |
+                        <label for="CmdRepeat" class="label block">{{ 'settings.capture.diseqc.cmdrepeat_label' |
                             translate
                             }}</label>
                         <p-inputNumber [(ngModel)]="diseqcTree.CmdRepeat" name="CmdRepeat" id="CmdRepeat"
@@ -31,7 +31,7 @@
                     </div>
 
                     <div class="form-group field" [style]="{'width':'25rem'}">
-                        <label for="SubType" class="block">{{ 'settings.capture.diseqc.rotor.type_label' | translate
+                        <label for="SubType" class="label block">{{ 'settings.capture.diseqc.rotor.type_label' | translate
                             }}</label>
                         <p-dropdown [options]="rotorSubTypes" [(ngModel)]="currentSubType" [editable]="false"
                             optionLabel="Name" (onChange)="updateSubType();" [maxlength]="0"
@@ -43,7 +43,7 @@
                     </div>
 
                     <div class="form-group field" *ngIf="diseqcTree.SubType == 'diseqc_1_2'">
-                        <label for="RotorPositions" class="block">{{ 'settings.capture.diseqc.rotor.positions_label' |
+                        <label for="RotorPositions" class="label block">{{ 'settings.capture.diseqc.rotor.positions_label' |
                             translate }}</label>
                         <div [style]="{'width':'25rem'}">
                             <p-table [value]="rotorPositions" dataKey="Num" responsiveLayout="scroll"
@@ -84,7 +84,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="RotorLoSpeed" class="block">{{ 'settings.capture.diseqc.rotor.lospeed_label' |
+                        <label for="RotorLoSpeed" class="label block">{{ 'settings.capture.diseqc.rotor.lospeed_label' |
                             translate }}</label>
                         <p-inputNumber [(ngModel)]="diseqcTree.RotorLoSpeed" name="RotorLoSpeed" id="RotorLoSpeed"
                             mode="decimal" [maxFractionDigits]="5">
@@ -95,7 +95,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="RotorHiSpeed" class="block">{{ 'settings.capture.diseqc.rotor.hispeed_label' |
+                        <label for="RotorHiSpeed" class="label block">{{ 'settings.capture.diseqc.rotor.hispeed_label' |
                             translate }}</label>
                         <p-inputNumber [(ngModel)]="diseqcTree.RotorHiSpeed" name="RotorHiSpeed" id="RotorHiSpeed"
                             mode="decimal" [maxFractionDigits]="5">
@@ -106,7 +106,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="Latitude" class="block">{{ 'settings.capture.diseqc.rotor.latitude_label' |
+                        <label for="Latitude" class="label block">{{ 'settings.capture.diseqc.rotor.latitude_label' |
                             translate }}</label>
                         <p-inputNumber [(ngModel)]="fields.Latitude" name="Latitude" id="Latitude" mode="decimal"
                             [maxFractionDigits]="5">
@@ -117,7 +117,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="Longitude" class="block">{{ 'settings.capture.diseqc.rotor.longitude_label' |
+                        <label for="Longitude" class="label block">{{ 'settings.capture.diseqc.rotor.longitude_label' |
                             translate }}</label>
                         <p-inputNumber [(ngModel)]="fields.Longitude" name="Longitude" id="Longitude" mode="decimal"
                             [maxFractionDigits]="5">
@@ -137,7 +137,8 @@
                         <p-dialog header="{{ 'settings.capture.dvb.newsatellite_heading' | translate }}"
                             [(visible)]="work.displayNewDiseqc" [modal]="true" [style]="{width: '50vw'}"
                             [draggable]="false" [resizable]="false">
-                            <p>{{ 'settings.capture.dvb.newsatellite_devtype' | translate }}</p>
+                            <label for="disenqcTypes" class="label block">{{ 'settings.capture.dvb.newsatellite_devtype' |
+                                translate }}</label>
                             <p-listbox [options]="captureCardService.diseqcTypes" [(ngModel)]="selectedDiseqcType"
                                 optionLabel="description" name="disenqcTypes" optionDisabled="inactive"
                                 (onDblClick)="newDiseqc();"></p-listbox>

@@ -647,7 +647,8 @@ void MythDisplay::InitScreenBounds()
         return;
     }
 
-    if (GetMythDB()->GetBoolSetting("RunFrontendInWindow", false))
+    if (!GetMythDB()->GetBoolSetting("ForceFullScreen", false) &&
+        GetMythDB()->GetBoolSetting("RunFrontendInWindow", false))
     {
         LOG(VB_GUI, LOG_INFO, LOC + "Running in a window");
         // This doesn't include the area occupied by the

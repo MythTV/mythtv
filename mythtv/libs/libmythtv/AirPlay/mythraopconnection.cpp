@@ -26,10 +26,17 @@
 
 #include "libmythui/mythmainwindow.h"
 
+// OpenSSL 3.0.0 release
+// 8 bits major, 8 bits minor 24 bits patch, 4 bits release flag.
+#if OPENSSL_VERSION_NUMBER < 0x030000000L
+#define EVP_PKEY_get_id EVP_PKEY_id
+#define EVP_PKEY_get_size EVP_PKEY_size
+#endif
+
 #define LOC QString("RAOP Conn: ")
 static constexpr size_t MAX_PACKET_SIZE { 2048 };
 
-RSA *MythRAOPConnection::g_rsa = nullptr;
+EVP_PKEY *MythRAOPConnection::g_devPrivKey = nullptr;
 QString MythRAOPConnection::g_rsaLastError;
 
 // RAOP RTP packet type
@@ -73,7 +80,12 @@ MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
     m_dataPort(port)
 {
     m_id = GetNotificationCenter()->Register(this);
-    memset(&m_aesKey, 0, sizeof(m_aesKey));
+#if OPENSSL_VERSION_NUMBER < 0x030000000L
+    m_cipher = EVP_aes_128_cbc();
+#else
+    m_cipher = EVP_CIPHER_fetch(nullptr, "AES-128-CBC", nullptr);
+#endif
+    m_cctx = EVP_CIPHER_CTX_new();
 }
 
 MythRAOPConnection::~MythRAOPConnection()
@@ -116,6 +128,13 @@ MythRAOPConnection::~MythRAOPConnection()
         if (nc)
             nc->UnRegister(this, m_id);
     }
+
+    EVP_CIPHER_CTX_free(m_cctx);
+    m_cctx = nullptr;
+#if OPENSSL_VERSION_NUMBER >= 0x030000000L
+    EVP_CIPHER_free(m_cipher);
+#endif
+    m_cipher = nullptr;
 }
 
 void MythRAOPConnection::CleanUp(void)
@@ -641,12 +660,41 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
         return -1;
 
     int aeslen = len & ~0xf;
-    std::array<uint8_t,16> iv {};
+    int outlen1 {0};
+    int outlen2 {0};
     std::array<uint8_t,MAX_PACKET_SIZE> decrypted_data {};
-    std::copy(m_aesIV.cbegin(), m_aesIV.cbegin() + iv.size(), iv.data());
-    AES_cbc_encrypt((const unsigned char *)data_in,
-                    decrypted_data.data(), aeslen,
-                    &m_aesKey, iv.data(), AES_DECRYPT);
+    EVP_CIPHER_CTX_reset(m_cctx);
+    EVP_CIPHER_CTX_set_padding(m_cctx, 0);
+    if (
+#if OPENSSL_VERSION_NUMBER < 0x030000000L
+        // Debian < 12, Fedora < 36, RHEL < 9, SuSe 15, Ubuntu < 2204
+        EVP_DecryptInit_ex(m_cctx, m_cipher, nullptr, m_sessionKey.data(),
+                           reinterpret_cast<const uint8_t *>(m_aesIV.data()))
+#else
+        EVP_DecryptInit_ex2(m_cctx, m_cipher, m_sessionKey.data(),
+                            reinterpret_cast<const uint8_t *>(m_aesIV.data()),
+                            nullptr)
+#endif
+        != 1)
+    {
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+            QString("EVP_DecryptInit_ex failed. (%1)")
+            .arg(ERR_error_string(ERR_get_error(), nullptr)));
+    }
+    else if (EVP_DecryptUpdate(m_cctx, decrypted_data.data(), &outlen1,
+                               reinterpret_cast<const uint8_t *>(data_in),
+                               aeslen) != 1)
+    {
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+            QString("EVP_DecryptUpdate failed. (%1)")
+            .arg(ERR_error_string(ERR_get_error(), nullptr)));
+    }
+    else if (EVP_DecryptFinal_ex(m_cctx, decrypted_data.data() + outlen1, &outlen2) != 1)
+    {
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+            QString("EVP_DecryptFinal_ex failed. (%1)")
+            .arg(ERR_error_string(ERR_get_error(), nullptr)));
+    }
     std::copy(data_in + aeslen, data_in + len,
               decrypted_data.data() + aeslen);
 
@@ -847,9 +895,14 @@ void MythRAOPConnection::readClient(void)
         return;
 
     QByteArray data = socket->readAll();
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("readClient(%1): ")
-        .arg(data.size()) + data.constData());
-
+    if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
+    {
+        QByteArray printable = data.left(32);
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("readClient(%1): %2%3")
+            .arg(data.size())
+            .arg(printable.toHex().toUpper().data(),
+                 data.size() > 32 ? "..." : ""));
+    }
     // For big content, we may be called several times for a single packet
     if (!m_incomingPartial)
     {
@@ -982,8 +1035,9 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         *m_textStream << "Apple-Response: ";
         if (!LoadKey())
             return;
-        int tosize = RSA_size(LoadKey());
-        auto *to = new uint8_t[tosize];
+        size_t tosize = EVP_PKEY_size(g_devPrivKey);
+        std::vector<uint8_t>to;
+        to.resize(tosize);
 
         QByteArray challenge =
         QByteArray::fromBase64(tags["Apple-Challenge"].toLatin1());
@@ -991,7 +1045,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         if (challenge_size != 16)
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                QString("Decoded challenge size %1, expected 16")
+                QString("Base64 decoded challenge size %1, expected 16")
                 .arg(challenge_size));
             if (challenge_size > 16)
                 challenge_size = 16;
@@ -1042,10 +1096,34 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             .arg(QByteArray((char *)from.data(), i).toBase64().constData())
             .arg(i));
 
-        RSA_private_encrypt(i, from.data(), to, LoadKey(), RSA_PKCS1_PADDING);
+        auto *pctx = EVP_PKEY_CTX_new(g_devPrivKey, nullptr);
+        if (nullptr == pctx)
+        {
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                QString("Cannot create ENV_PKEY_CTX from key. (%1)")
+                .arg(ERR_error_string(ERR_get_error(), nullptr)));
+        }
+        else if (EVP_PKEY_sign_init(pctx) <= 0)
+        {
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                QString("EVP_PKEY_sign_init failed. (%1)")
+                .arg(ERR_error_string(ERR_get_error(), nullptr)));
+        }
+        else if (EVP_PKEY_CTX_set_rsa_padding(pctx, RSA_PKCS1_PADDING) <= 0)
+        {
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                QString("Cannot set RSA_PKCS1_PADDING on context. (%1)")
+                .arg(ERR_error_string(ERR_get_error(), nullptr)));
+        }
+        else if (EVP_PKEY_sign(pctx, to.data(), &tosize,
+                          from.data(), i) <= 0)
+        {
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                QString("EVP_PKEY_sign failed. (%1)")
+                .arg(ERR_error_string(ERR_get_error(), nullptr)));
+        }
 
-        QByteArray base64 = QByteArray((const char *)to, tosize).toBase64();
-        delete[] to;
+        QByteArray base64 = QByteArray((const char *)to.data(), tosize).toBase64();
 
         for (int pos = base64.size() - 1; pos > 0; pos--)
         {
@@ -1075,29 +1153,46 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                 QString key = line.mid(12).trimmed();
                 QByteArray decodedkey = QByteArray::fromBase64(key.toLatin1());
                 LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-                    QString("RSAAESKey: %1 (decoded size %2)")
+                    QString("RSAAESKey: %1 (base64 decoded size %2)")
                     .arg(key).arg(decodedkey.size()));
 
                 if (LoadKey())
                 {
-                    int size = sizeof(char) * RSA_size(LoadKey());
-                    char *decryptedkey = new char[size];
-                    if (RSA_private_decrypt(decodedkey.size(),
-                                            (const unsigned char *)decodedkey.constData(),
-                                            (unsigned char *)decryptedkey,
-                                            LoadKey(), RSA_PKCS1_OAEP_PADDING))
+                    size_t size = EVP_PKEY_get_size(g_devPrivKey);
+                    auto *pctx = EVP_PKEY_CTX_new(g_devPrivKey /* EVP_PKEY *pkey */,
+                                                  nullptr      /* ENGINE *e */);
+                    m_sessionKey.resize(size);
+                    size_t size_out {size};
+                    if (nullptr == pctx)
                     {
+                        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                            QString("Cannot create ENV_PKEY_CTX from key. (%1)")
+                            .arg(ERR_error_string(ERR_get_error(), nullptr)));
+                    }
+                    else if (EVP_PKEY_decrypt_init(pctx) <= 0)
+                    {
+                        LOG(VB_PLAYBACK, LOG_WARNING, LOC + QString("EVP_PKEY_decrypt_init failed. (%1)")
+                            .arg(ERR_error_string(ERR_get_error(), nullptr)));
+                    }
+                    else if (EVP_PKEY_CTX_set_rsa_padding(pctx, RSA_PKCS1_OAEP_PADDING) <= 0)
+                    {
+                        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                            QString("Cannot set RSA_PKCS1_OAEP_PADDING on context. (%1)")
+                            .arg(ERR_error_string(ERR_get_error(), nullptr)));
+                    }
+                    else if (EVP_PKEY_decrypt(pctx, m_sessionKey.data(), &size_out,
+                                              (const unsigned char *)decodedkey.constData(), decodedkey.size()) > 0)
+                    {
+                        // SUCCESS
                         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
                             "Successfully decrypted AES key from RSA.");
-                        AES_set_decrypt_key((const unsigned char *)decryptedkey,
-                                            128, &m_aesKey);
                     }
                     else
                     {
                         LOG(VB_PLAYBACK, LOG_WARNING, LOC +
-                            "Failed to decrypt AES key from RSA.");
+                            QString("Failed to decrypt AES key from RSA. (%1)")
+                            .arg(ERR_error_string(ERR_get_error(), nullptr)));
                     }
-                    delete [] decryptedkey;
                 }
             }
             else if (line.startsWith("a=aesiv:"))
@@ -1105,7 +1200,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                 QString aesiv = line.mid(8).trimmed();
                 m_aesIV = QByteArray::fromBase64(aesiv.toLatin1());
                 LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-                    QString("AESIV: %1 (decoded size %2)")
+                    QString("AESIV: %1 (base64 decoded size %2)")
                     .arg(aesiv).arg(m_aesIV.size()));
             }
             else if (line.startsWith("a=fmtp:"))
@@ -1487,13 +1582,13 @@ void MythRAOPConnection::FinishResponse(RaopNetStream *stream, QTcpSocket *socke
  * The RSA key is resident in memory for the entire duration of the application
  * as such RSA_free is never called on it.
  */
-RSA *MythRAOPConnection::LoadKey(void)
+bool MythRAOPConnection::LoadKey(void)
 {
     static QMutex s_lock;
     QMutexLocker locker(&s_lock);
 
-    if (g_rsa)
-        return g_rsa;
+    if (g_devPrivKey)
+        return true;
 
     QString sName( "/RAOPKey.rsa" );
     FILE *file = fopen(GetConfDir().toUtf8() + sName.toUtf8(), "rb");
@@ -1501,26 +1596,33 @@ RSA *MythRAOPConnection::LoadKey(void)
     if ( !file )
     {
         g_rsaLastError = tr("Failed to read key from: %1").arg(GetConfDir() + sName);
-        g_rsa = nullptr;
         LOG(VB_PLAYBACK, LOG_ERR, LOC + g_rsaLastError);
-        return nullptr;
+        return false;
     }
 
-    g_rsa = PEM_read_RSAPrivateKey(file, nullptr, nullptr, nullptr);
+    g_devPrivKey = PEM_read_PrivateKey(file, nullptr, nullptr, nullptr);
     fclose(file);
 
-    if (g_rsa)
+    if (g_devPrivKey)
     {
+        int id = EVP_PKEY_get_id(g_devPrivKey);
+        int type = EVP_PKEY_type(id);
+        if (type != EVP_PKEY_RSA)
+        {
+            g_rsaLastError = tr("Key is not a RSA private key.");
+            EVP_PKEY_free(g_devPrivKey);
+            g_devPrivKey = nullptr;
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + g_rsaLastError);
+            return false;
+        }
         g_rsaLastError = "";
-        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-            QString("Loaded RSA private key (%1)").arg(RSA_check_key(g_rsa)));
-        return g_rsa;
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "Loaded RSA private key");
+        return true;
     }
 
     g_rsaLastError = tr("Failed to load RSA private key.");
-    g_rsa = nullptr;
     LOG(VB_PLAYBACK, LOG_ERR, LOC + g_rsaLastError);
-    return nullptr;
+    return false;
 }
 
 RawHash MythRAOPConnection::FindTags(const QStringList &lines)

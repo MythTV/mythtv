@@ -1,6 +1,7 @@
 #include "mythuianimation.h"
 #include "mythuitype.h"
 #include "mythmainwindow.h"
+#include "libmythbase/mythcorecontext.h"
 
 #include <QDomDocument>
 
@@ -48,7 +49,8 @@ QRect UIEffects::GetExtent(const QSize size) const
 
 void MythUIAnimation::Activate(void)
 {
-    m_active = true;
+    if (GetMythDB()->GetBoolSetting("SmoothTransitions", true))
+        m_active = true;
     setCurrentTime(0);
 }
 

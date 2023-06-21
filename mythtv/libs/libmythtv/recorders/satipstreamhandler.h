@@ -44,6 +44,7 @@ class SatIPStreamHandler : public StreamHandler
 
   private:
     explicit SatIPStreamHandler(const QString & device, int inputid);
+    ~SatIPStreamHandler() override;
 
     bool Open(void);
     void Close(void);
@@ -130,7 +131,7 @@ class SatIPControlReadHelper : public QObject
 
   public:
     explicit SatIPControlReadHelper(SatIPStreamHandler *handler);
-    ~SatIPControlReadHelper() override = default;
+    ~SatIPControlReadHelper() override;
 
   public slots:
     void ReadPending(void);

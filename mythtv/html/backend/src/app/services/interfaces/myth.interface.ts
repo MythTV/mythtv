@@ -1,4 +1,5 @@
 import { StorageGroupDirList } from "./storagegroup.interface";
+
 export interface MythHostName {
     String: string;  // That's what the service returns as the key
 }
@@ -30,6 +31,10 @@ export interface Database {
     LocalEnabled:       boolean;
     LocalHostName:      string;
     DoTest:             boolean; // will test connection if true
+    WOLEnabled?:        boolean;
+    WOLReconnect?:      number;
+    WOLRetry?:          number;
+    WOLCommand?:        string;
 }
 
 export interface WOL {

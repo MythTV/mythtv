@@ -1,8 +1,19 @@
+<span #top></span>
 <div class="content-section implementation">
+    <h1>{{ 'settings.main.title' | translate }}</h1>
     <div class="card">
-        <h1>{{ 'setupwizard.title' | translate }}</h1>
-        <p-steps [model]="wizardItems" [readonly]="true"></p-steps>
+        <div class="flex flex-row">
+            <button pButton pRipple icon="pi pi-angle-double-left" class="p-button-text p-button-primary"
+                (click)="menu.navBackward()"></button>
+            <div class="col-11">
+                <p-tabMenu #menu [model]="wizardService.wizardItems" [activeItem]="activeItem"
+                    [scrollable]="false"></p-tabMenu>
+            </div>
+            <button pButton pRipple icon="pi pi-angle-double-right" class="p-button-text p-button-primary"
+                (click)="menu.navForward()"></button>
+        </div>
+
     </div>
+    <app-backend-warning></app-backend-warning>
     <router-outlet></router-outlet>
 </div>
-

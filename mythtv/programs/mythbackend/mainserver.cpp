@@ -3683,11 +3683,11 @@ void MainServer::HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs)
       case 4:
         if (!slist[3].isEmpty())
             hostname = slist[3];
-        [[clang::fallthrough]];
+        [[fallthrough]];
       case 3:
         if (slist[2].isEmpty())
             storageGroup = slist[2];
-        [[clang::fallthrough]];
+        [[fallthrough]];
       case 2:
         filename = slist[1];
         if (filename.isEmpty() ||

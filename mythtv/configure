@@ -1250,10 +1250,11 @@ EOF
 }
 
 check_python(){
-    log check_python
+    log check_python "$@"
+    version=${1}
     check_cmd $python <<EOF
 import sys
-if sys.version_info < (3,6,0):
+if sys.version_info < $version:
     sys.exit(1)
 EOF
 }
@@ -1265,6 +1266,24 @@ check_py_lib(){
 import sys
 try:
     import $lib
+except:
+    sys.exit(1)
+sys.exit(0)
+EOF
+}
+
+check_py_lib_version(){
+    log check_py_lib_version "$@"
+    lib=${1}
+    version=${2}
+    check_cmd $python <<EOF
+import sys
+try:
+    # see PEP 440
+    import $lib
+    vlist = [int(x) for x in $lib.__version__.split('.') if x.isnumeric()]
+    if tuple(vlist) < $version:
+        raise
 except:
     sys.exit(1)
 sys.exit(0)
@@ -3433,6 +3452,9 @@ if $cxx -v 2>&1 | grep -qi ^gcc; then
     cxx_type=gxx
     gxx_version=$($cxx -dumpversion)
     gxx_major=$(echo $gxx_version | sed "s/\([0-9]*\).*/\\1/")
+    if test $gxx_major -lt 8; then
+        die "MythTV requires GCC 8 or better."
+    fi
 elif $cxx --version 2>/dev/null | grep -q Intel; then
     cxx_type=icpc
     gxx_version="AV_STRINGIFY(__INTEL_COMPILER)"
@@ -5460,15 +5482,12 @@ if enabled system_libbluray; then
                             die "ERROR: can not find libbluray."
                         fi
                         ;;
-                    ubuntu)
-                        case $VERSION_ID in
-                            17*|18*|19*|2*)
-                                die "ERROR: can not find libbluray."
-                                ;;
-                        esac
-                        ;;
-                    debian)
-                        if test $VERSION_ID -gt 8; then
+                    rhel)
+                        # RHEL8 doesn't ship libbluray-devel because of
+                        # some issue between RedHat and EPEL.
+                        #
+                        # Allow the internel libbluray to compile.
+                        if test ${VERSION_ID%\.*} -gt 8; then
                             die "ERROR: can not find libbluray."
                         fi
                         ;;
@@ -6475,18 +6494,6 @@ if enabled gxx; then
     # produces files that contain "useless" casts.
     #check_cxxflags -Wuseless-cast
 
-    # Ubuntu 16.04 uses gcc 5.4.0 which complains about '[[clang::fallthrough]]'
-    gxx_major_version=$(echo $gxx_version | sed -e 's/\([[:digit:]]\{1,\}\).*/\1/')
-    if test $gxx_major_version -lt 7; then
-        if enabled arm; then
-            check_cxxflags -Wno-psabi
-        fi
-        check_cxxflags -Wno-attributes
-    fi
-    # GCC on centos7 doesn't handle the '{}' initializer properly.
-    if test $gxx_major_version -lt 5; then
-        check_cxxflags -Wno-missing-field-initializers
-    fi
     check_cxxflags -funit-at-a-time
     # Don't complain about over-aligned types
     check_cxxflags -faligned-new
@@ -6551,12 +6558,13 @@ fi
 
 # Check for python dependencies
 if enabled bindings_python; then
-    check_python               || disable_bindings_python "Python 3.6 or greater"
+    check_python "(3,8,0)"     || disable_bindings_python "Python 3.8 or greater"
     check_py_lib MySQLdb       || disable_bindings_python "MySQLdb"
     check_py_lib lxml          || disable_bindings_python "lxml"
     check_py_lib requests      || disable_bindings_python "requests"
     check_py_lib simplejson    || disable_bindings_python "simplejson"
     check_py_lib future        || disable_bindings_python "future"
+    check_python "(3,11,1)" && check_py_lib wheel && check_py_lib_version pip "(23,0,1)" && USE_PYTHON_PIP="yes"
 fi
 
 # Check for perl dependencies
@@ -7302,7 +7310,7 @@ cat > $TMPH <<EOF
 #ifndef MYTHTV_CONFIG_H
 #define MYTHTV_CONFIG_H
 
-/* NOLINTBEGIN(cppcoreguidelines-macro-usage) */
+/* NOLINTBEGIN(modernize-macro-to-enum) */
 
 #define QT_MIN_VERSION_STR "$QT_MIN_VERSION_STR"
 #define QT_MIN_VERSION_HEX $QT_MIN_VERSION_HEX
@@ -7466,9 +7474,13 @@ if test x"$CONFIG_INCLUDEPATH" != x"" ; then
   echo "CONFIG_INCLUDEPATH=$CONFIG_INCLUDEPATH" >> $TMPMAK
 fi
 
+if test x"$USE_PYTHON_PIP" != x"" ; then
+  echo "USE_PYTHON_PIP=$USE_PYTHON_PIP" >> $TMPMAK
+fi
+
 cat >> $TMPH <<EOF
 
-/* NOLINTEND(cppcoreguidelines-macro-usage) */
+/* NOLINTEND(modernize-macro-to-enum) */
 
 #endif /* MYTHTV_CONFIG_H */
 EOF
@@ -7524,6 +7536,7 @@ cp_if_changed $TMPPRO settings2.pro
 
 echo "Creating libs/libmythbase/mythversion.h"
 sed -e "s/@MYTHTV_BINARY_VERSION@/${MYTHTV_BINARY_VERSION}/g" \
+    -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
     libs/libmythbase/mythversion.h.in > $TMPH
 cp_if_changed $TMPH libs/libmythbase/mythversion.h
 
@@ -7537,10 +7550,11 @@ sed -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
     bindings/python/setup.cfg.in > $TMPPRO
 cp_if_changed $TMPPRO bindings/python/setup.cfg
 
-echo "Creating bindings/python/MythTV/static.py"
+echo "Creating bindings/python/MythTV/_versions.py"
 sed -e "s/@MYTHTV_PYTHON_OWN_VERSION@/${MYTHTV_PYTHON_OWN_VERSION}/g" \
-    bindings/python/MythTV/static.py.in > $TMPPRO
-cp_if_changed $TMPPRO bindings/python/MythTV/static.py
+    -e "s!@MYTHTV_INSTALL_PREFIX@!${prefix}!g" \
+    bindings/python/MythTV/_versions.py.in > $TMPPRO
+cp_if_changed $TMPPRO bindings/python/MythTV/_versions.py
 
 echo "Creating bindings/python/MythTV/services_api/mythversions.py"
 sed -e "s/@MYTHTV_PYTHON_VERSION_LIST@/${MYTHTV_PYTHON_VERSION_LIST}/g" \

@@ -25,7 +25,7 @@ export class MiscSettingsComponent implements OnInit, AfterViewInit {
     MiscStatusScript = "";
     DisableAutomaticBackup = false;
     DisableFirewireReset = false;
-
+    hostName = '';
 
     soptions = [
         { name: 'settings.misc.sg_balfree', code: "BalancedFreeSpace" },
@@ -49,12 +49,16 @@ export class MiscSettingsComponent implements OnInit, AfterViewInit {
         translate.get(this.soptions[3].name).subscribe(data => this.soptions[3].name = data);
         translate.get(this.uoptions[0].name).subscribe(data => this.uoptions[0].name = data);
         translate.get(this.uoptions[1].name).subscribe(data => this.uoptions[1].name = data);
-        this.getMiscellaneousData();
+        this.mythService.GetHostName().subscribe({
+            next: data => {
+              this.hostName = data.String;
+              this.getMiscellaneousData();
+            },
+            error: () => this.errorCount++
+          })
     }
 
     getMiscellaneousData() {
-
-        const hostName = this.setupService.getHostName();
 
         this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "MasterBackendOverride", Default: "0" })
             .subscribe({
@@ -66,7 +70,7 @@ export class MiscSettingsComponent implements OnInit, AfterViewInit {
                 next: data => this.DeletesFollowLinks = (data.String == "1"),
                 error: () => this.errorCount++
             });
-        this.mythService.GetSetting({ HostName: hostName, Key: "TruncateDeletesSlowly", Default: "0" })
+        this.mythService.GetSetting({ HostName: this.hostName, Key: "TruncateDeletesSlowly", Default: "0" })
             .subscribe({
                 next: data => this.TruncateDeletesSlowly = (data.String == "1"),
                 error: () => this.errorCount++
@@ -86,7 +90,7 @@ export class MiscSettingsComponent implements OnInit, AfterViewInit {
                 next: data => this.UPNPWmpSource = data.String,
                 error: () => this.errorCount++
             });
-        this.mythService.GetSetting({ HostName: hostName, Key: "MiscStatusScript", Default: "" })
+        this.mythService.GetSetting({ HostName: this.hostName, Key: "MiscStatusScript", Default: "" })
             .subscribe({
                 next: data => this.MiscStatusScript = data.String,
                 error: () => this.errorCount++
@@ -96,7 +100,7 @@ export class MiscSettingsComponent implements OnInit, AfterViewInit {
                 next: data => this.DisableAutomaticBackup = (data.String == "1"),
                 error: () => this.errorCount++
             });
-        this.mythService.GetSetting({ HostName: hostName, Key: "DisableFirewireReset", Default: "0" })
+        this.mythService.GetSetting({ HostName: this.hostName, Key: "DisableFirewireReset", Default: "0" })
             .subscribe({
                 next: data => this.DisableFirewireReset = (data.String == "1"),
                 error: () => this.errorCount++
@@ -135,8 +139,6 @@ export class MiscSettingsComponent implements OnInit, AfterViewInit {
         this.successCount = 0;
         this.errorCount = 0;
 
-        const hostName = this.setupService.getHostName();
-
         this.mythService.PutSetting({
             HostName: '_GLOBAL_', Key: "MasterBackendOverride",
             Value: this.MasterBackendOverride ? "1" : "0"
@@ -148,7 +150,7 @@ export class MiscSettingsComponent implements OnInit, AfterViewInit {
         })
             .subscribe(this.miscObserver);
         this.mythService.PutSetting({
-            HostName: hostName, Key: "TruncateDeletesSlowly",
+            HostName: this.hostName, Key: "TruncateDeletesSlowly",
             Value: this.TruncateDeletesSlowly ? "1" : "0"
         })
             .subscribe(this.miscObserver);
@@ -168,7 +170,7 @@ export class MiscSettingsComponent implements OnInit, AfterViewInit {
         })
             .subscribe(this.miscObserver);
         this.mythService.PutSetting({
-            HostName: hostName, Key: "MiscStatusScript",
+            HostName: this.hostName, Key: "MiscStatusScript",
             Value: this.MiscStatusScript
         })
             .subscribe(this.miscObserver);
@@ -178,7 +180,7 @@ export class MiscSettingsComponent implements OnInit, AfterViewInit {
         })
             .subscribe(this.miscObserver);
         this.mythService.PutSetting({
-            HostName: hostName, Key: "DisableFirewireReset",
+            HostName: this.hostName, Key: "DisableFirewireReset",
             Value: this.DisableFirewireReset ? "1" : "0"
         })
             .subscribe(this.miscObserver);

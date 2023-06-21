@@ -6,7 +6,12 @@ export interface AddDontRecordScheduleRequest {
     NeverRecord: boolean;
 }
 
-export interface AddRecordScheduleRequest {
+// This supports AddRecordSchedule and UpdateRecordSchedule
+// For AddRecordSchedule RecordId is not used
+// For UpdateRecordSchedule  ParentId and LastRecorded
+// are not used
+export interface RecordScheduleRequest {
+    RecordId?: number;
     Title: string;
     Subtitle: string;
     Description: string;
@@ -19,18 +24,18 @@ export interface AddRecordScheduleRequest {
     Station: string;
     FindDay: number;
     FindTime: string; // time
-    ParentId: number;
+    ParentId?: number;
     Inactive: boolean;
     Season: number;
     Episode: number;
-    InetRef: string;
+    Inetref: string;
     Type?: string;
     SearchType?: string;
     RecPriority: number;
     PreferredInput: number;
     StartOffset: number;
     EndOffset: number;
-    LastRecorded: string; // dateTime
+    LastRecorded?: string; // dateTime
     DupMethod?: string;
     DupIn?: string;
     NewEpisOnly: boolean;
@@ -58,11 +63,17 @@ export interface AddRecordedCreditsRequest {
 }
 
 export interface DeleteRecordingRequest {
-    RecordedId: number;
-    ChanId: number;
-    StartTime: string; // dateTime
-    ForceDelete: boolean;
-    AllowRerecord: boolean;
+    RecordedId?: number;
+    ChanId?: number;
+    StartTime?: string; // dateTime
+    ForceDelete?: boolean;
+    AllowRerecord?: boolean;
+}
+
+export interface UnDeleteRecordingRequest {
+    RecordedId?: number;
+    ChanId?: number;
+    StartTime?: string; // dateTime
 }
 
 export interface GetConflictListRequest {
@@ -95,20 +106,20 @@ export interface GetOldRecordedListRequest {
     Sort: string;
 }
 
-export interface GetPlayGroupListResponse {
-    PlayGroupList: String[];
+export interface PlayGroupList {
+    PlayGroupList: string[];
 }
 
-export interface GetProgramCategoriesResponse {
-    ProgramCategories: String[];
+export interface ProgramCategories {
+    ProgramCategories: string[];
 }
 
-export interface GetRecGroupListResponse {
-    RecGroupList: String[];
+export interface RecGroupList {
+    RecGroupList: string[];
 }
 
-export interface GetRecStorageGroupListResponse {
-    RecStorageGroupList: String[];
+export interface RecStorageGroupList {
+    RecStorageGroupList: string[];
 }
 
 export interface GetUpcomingRequest {
@@ -119,28 +130,64 @@ export interface GetUpcomingRequest {
     Status?:     number;
 }
 
-export interface GetUpcomingListResponse {
+export interface UpcomingList {
     ProgramList: ProgramList;
 }
 
 export interface GetRecordScheduleRequest {
-    RecordId: number;
-    Template: string;
-    RecordedId: number;
-    ChanId: number;
-    StartTime: string; // dateTime
-    MakeOverride: boolean;
+    RecordId?: number;
+    Template?: string;
+    RecordedId?: number;
+    ChanId?: number;
+    StartTime?: string; // dateTime
+    MakeOverride?: boolean;
 }
 
 export interface GetRecordScheduleListRequest {
-    StartIndex: number;
-    Count: number;
-    Sort: string;
-    Descending: boolean;
+    StartIndex?: number;
+    Count?: number;
+    Sort?: string;
+    Descending?: boolean;
 }
 
 export interface GetRecordedRequest {
-    RecordedId: number;
-    ChanId: number;
-    StartTime: string; // dateTime
+    RecordedId?: number;
+    ChanId?: number;
+    StartTime?: string; // dateTime
+}
+
+export interface GetRecordedListRequest {
+    Descending?:    boolean;
+    StartIndex?:    number;
+    Count?:         number;
+    TitleRegEx?:    string;
+    RecGroup?:      string;
+    StorageGroup?:  string;
+    Category?:      string;
+    Sort?:          string;
+    IgnoreLiveTV?:  boolean;
+    IgnoreDeleted?: boolean;
+    IncChannel?:    boolean;
+    Details?:       boolean;
+    IncCast?:       boolean;
+    IncArtWork?:    boolean;
+    IncRecording?:  boolean;
+}
+
+export interface UpdateRecordedMetadataRequest {
+    RecordedId:               number;
+    AutoExpire?:              boolean;
+    BookmarkOffset?:          number;
+    BookmarkOffsetType?:      string;
+    Damaged?:                 boolean;
+    Description?:             string;
+    Episode?:                 number;
+    Inetref?:                 string;
+    OriginalAirDate?:         Date;
+    Preserve?:                boolean;
+    Season?:                  number;
+    Stars?:                   number;
+    SubTitle?:                string;
+    Title?:                   string;
+    Watched?:                 boolean;
 }

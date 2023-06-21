@@ -46,10 +46,10 @@ Checks: '-*,
         # As of 2022-12-19, there are 1014 unique warnings. ,
        -bugprone-easily-swappable-parameters,
 
-        # As of 2022-12-19, there are 123 unique warnings. ,
+        # As of 2023-05-22, there are 97 unique warnings. ,
        -bugprone-implicit-widening-of-multiplication-result,
 
-        # As of 2022-12-19, there are 161 unique warnings. ,
+        # As of 2023-05-22, there are 156 unique warnings. ,
        -bugprone-assignment-in-if-condition
 
     cert-*,
@@ -63,18 +63,18 @@ Checks: '-*,
        -cert-env33-c,
 
         # Calls to standard library functions where the return value
-        # isnt checked. These should all be fixed. As of 2022-12-19,
-        # there are 344 warnings. ,
+        # isnt checked. These should all be fixed. As of 2023-05-22,
+        # there are 340 warnings. ,
        -cert-err33-c,
 
         # string-to-number conversion functions that do not verify the
-        # validity of the conversion.  As of 2022-12-19, there are 85
+        # validity of the conversion.  As of 2023-05-22, there are 43
         # warnings. ,
        -cert-err34-c,
 
         # Lots of complaints about constructors of static objects
         # possibly throwing exceptions that cant be caught. As of
-        # 2022-12-19, there are 540 warnings. ,
+        # 2023-05-22, there are 508 warnings. ,
        -cert-err58-cpp,
 
     clang-analyzer-*,
@@ -98,13 +98,13 @@ Checks: '-*,
         # As of 2022-12-19, there are 142 unique warnings. ,
        -cppcoreguidelines-avoid-goto,
 
-        # As of 2022-12-19, there are 1413 unique warnings. ,
+        # As of 2023-05022, there are 1257 unique warnings. ,
        -cppcoreguidelines-avoid-non-const-global-variables,
 
-        # As of 2022-12-19, there are 2503 unique warnings. ,
+        # As of 2023-05-22, there are 374 unique warnings. ,
        -cppcoreguidelines-narrowing-conversions,
 
-        # As of 2022-12-19, there are 213 unique warnings. ,
+        # As of 2022-12-19, there are 212 unique warnings. ,
        -cppcoreguidelines-no-malloc,
 
         # No gsl. ,
@@ -124,10 +124,10 @@ Checks: '-*,
         # As of 2022-12-19, there are 17 unique warnings. ,
        -cppcoreguidelines-pro-type-const-cast,
 
-        # As of 2022-12-19, there are 799 unique warnings. ,
+        # As of 2023-05-22, there are 744 unique warnings. ,
        -cppcoreguidelines-pro-type-cstyle-cast,
 
-        # As of 2022-12-19, there are 563 unique warnings. ,
+        # As of 2022-12-19, there are 425 unique warnings. ,
        -cppcoreguidelines-pro-type-reinterpret-cast,
 
         # Recommends using boost:: to access unions. ,
@@ -147,9 +147,9 @@ Checks: '-*,
 
     misc-*,
 
-        # New in clang15. As of 2022-12-19, there are 16055 unique
+        # New in clang15. As of 2023-05-22, there are 15546 unique
         # warnings. ,
-       -misc-const-correctness
+       -misc-const-correctness,
 
         # Complains about every public or protected variable in a class. ,
        -misc-non-private-member-variables-in-classes,
@@ -158,6 +158,10 @@ Checks: '-*,
         # related to the Q_DECLARE_METATYPE macro and the other 225
         # are in MythTV. ,
        -misc-no-recursion,
+
+        # New in clang16. As of 2023-05-03, there are 1445 unique
+        # warnings. ,
+       -misc-use-anonymous-namespace,
 
     modernize-*,
 
@@ -170,9 +174,9 @@ Checks: '-*,
         # Disable newer C++14/17 tests for now. ,
        -modernize-use-nodiscard,
 
-        # New in clang15. As of 2022-12-19, the vast majority of these
-        # unique warnings (661 of 700) are from the config.h file. ,
-       -modernize-macro-to-enum
+        # Renamed from cppcoreguidelines-macro-to-enum in clang15. As
+        # of 2023-05-22, there are 41 unique warnings. ,
+       -modernize-macro-to-enum,
 
     performance-*,
 
@@ -198,7 +202,7 @@ Checks: '-*,
         # 2022-12-19, there are 426 unique warnings. ,
        -readability-implicit-bool-conversion,
 
-        # As of 2022-12-19, there are 16263 unique warnings. ,
+        # As of 2023-05-22, there are 14798 unique warnings. ,
        -readability-magic-numbers,
 
         # Doesn''t understand Qt signals/slots. ,

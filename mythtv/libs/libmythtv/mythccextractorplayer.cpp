@@ -816,7 +816,7 @@ SubtitleReader *MythCCExtractorPlayer::GetSubReader(uint id)
 {
     if (!m_dvbsubInfo[id].m_reader)
     {
-        m_dvbsubInfo[id].m_reader = new SubtitleReader();
+        m_dvbsubInfo[id].m_reader = new SubtitleReader(this);
         m_dvbsubInfo[id].m_reader->EnableAVSubtitles(true);
         m_dvbsubInfo[id].m_reader->EnableTextSubtitles(true);
         m_dvbsubInfo[id].m_reader->EnableRawTextSubtitles(true);

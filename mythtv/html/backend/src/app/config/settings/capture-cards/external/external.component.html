@@ -11,7 +11,7 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="VideoDevice" class="block">{{ 'settings.capture.external.command_label' | translate
+                        <label for="VideoDevice" class="label block">{{ 'settings.capture.external.command_label' | translate
                             }}</label>
                         <input pInputText id="VideoDevice" [(ngModel)]="card.VideoDevice" name="VideoDevice"
                             #VideoDevice="ngModel" class="mb-2 form-control w-full" />
@@ -21,7 +21,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="ChannelTimeout" class="block">{{ 'settings.capture.tunetimeout_label' | translate
+                        <label for="ChannelTimeout" class="label block">{{ 'settings.capture.tunetimeout_label' | translate
                             }}</label>
                         <p-inputNumber [(ngModel)]="card.ChannelTimeout" name="ChannelTimeout" id="ChannelTimeout"
                             [showButtons]="true" [min]="1750" [max]="65000" [step]="250"></p-inputNumber>

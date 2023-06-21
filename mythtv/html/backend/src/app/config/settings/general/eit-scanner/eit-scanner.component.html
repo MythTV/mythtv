@@ -12,7 +12,7 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="EITTransportTimeout" class="block" >{{ 'settings.eit.timeout_label' | translate }}</label>
+                        <label for="EITTransportTimeout" class="label block" >{{ 'settings.eit.timeout_label' | translate }}</label>
                         <p-inputNumber [(ngModel)]="EITTransportTimeout" name="EITTransportTimeout" id="EITTransportTimeout"
                             [showButtons]="true" [min]="1" [max]="15" [step]="1"></p-inputNumber>
                         <small class="block">
@@ -22,7 +22,7 @@
 
 
                     <div class="form-group field">
-                        <label for="EITCrawIdleStart" class="block" >{{ 'settings.eit.crawl_label' | translate }}</label>
+                        <label for="EITCrawIdleStart" class="label block" >{{ 'settings.eit.crawl_label' | translate }}</label>
                         <p-inputNumber [(ngModel)]="EITCrawIdleStart" name="EITCrawIdleStart" id="EITCrawIdleStart"
                             [showButtons]="true" [min]="30" [max]="7200" [step]="30"></p-inputNumber>
                         <small class="block">

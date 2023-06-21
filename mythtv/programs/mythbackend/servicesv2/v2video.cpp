@@ -290,11 +290,9 @@ V2VideoLookupList* V2Video::LookupVideo( const QString    &Title,
 
     //MetadataLookupList is a reference counted list.
     //it will delete all its content at its end of life
-    for( int n = 0; n < list.size(); n++ )
+    for(const auto & lookup : qAsConst(list))
     {
         V2VideoLookup *pVideoLookup = pVideoLookups->AddNewVideoLookup();
-
-        MetadataLookup *lookup = list[n];
 
         if (lookup)
         {

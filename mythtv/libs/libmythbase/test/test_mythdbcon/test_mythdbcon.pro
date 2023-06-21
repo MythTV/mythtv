@@ -6,7 +6,7 @@ QT += network sql testlib
 TEMPLATE = app
 TARGET = test_mythdbcon
 DEPENDPATH += . ../..
-INCLUDEPATH += . ../..
+INCLUDEPATH += . ../.. ../../..
 
 # Add all the necessary libraries
 LIBS += -L../.. -lmythbase-$$LIBVERSION

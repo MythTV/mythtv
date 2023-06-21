@@ -3,6 +3,7 @@
 
 // MythTV headers
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/mythversion.h"
 #include "httptsstreamhandler.h"
 
 #define LOC QString("HTTPTSSH[%1](%2): ").arg(m_inputId).arg(m_device)
@@ -147,7 +148,15 @@ bool HTTPReader::DownloadStream(const QUrl& url)
 
     // the HTTP request
     m_replylock.lock();
-    m_reply = m_mgr.get(QNetworkRequest(url));
+    QNetworkRequest m_req = QNetworkRequest(url);
+    m_req.setAttribute(QNetworkRequest::RedirectPolicyAttribute,
+                       QNetworkRequest::NoLessSafeRedirectPolicy);
+    m_req.setHeader(QNetworkRequest::UserAgentHeader,
+                    QString("MythTV/%1 %2/%3")
+                    .arg(MYTH_VERSION_MAJMIN,
+                         QSysInfo::productType(),
+                         QSysInfo::productVersion()));
+    m_reply = m_mgr.get(m_req);
     m_replylock.unlock();
 
     connect(&m_timer, &QTimer::timeout, &event_loop, &QEventLoop::quit);

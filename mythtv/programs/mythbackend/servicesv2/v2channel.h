@@ -33,6 +33,7 @@
 #include "v2lineup.h"
 #include "v2grabber.h"
 #include "v2commMethod.h"
+#include "v2channelScan.h"
 
 #define CHANNEL_SERVICE QString("/Channel/")
 #define CHANNEL_HANDLE  QString("Channel")
@@ -52,6 +53,9 @@ class V2Channel : public MythHTTPService
     Q_CLASSINFO("FetchChannelsFromSource","methods=GET,POST;name=int")
     Q_CLASSINFO("GetAvailableChanid",     "methods=GET,POST;name=int")
     Q_CLASSINFO("GetXMLTVIdList",         "methods=GET,POST,HEAD;name=StringList")
+    Q_CLASSINFO("StartScan",              "methods=POST;name=bool")
+    Q_CLASSINFO("StopScan",               "methods=POST;name=bool")
+    Q_CLASSINFO("SendScanDialogResponse", "methods=POST;name=bool")
 
     public:
         V2Channel();
@@ -183,6 +187,49 @@ class V2Channel : public MythHTTPService
         static V2GrabberList*     GetGrabberList  (  );
 
         static QStringList        GetFreqTableList         (  );
+
+        static bool               StartScan             (   uint CardId,
+                                                            const QString &DesiredServices,
+                                                            bool FreeToAirOnly,
+                                                            bool ChannelNumbersOnly,
+                                                            bool CompleteChannelsOnly,
+                                                            bool FullChannelSearch,
+                                                            bool RemoveDuplicates,
+                                                            bool AddFullTS,
+                                                            bool TestDecryptable,
+                                                            const QString &ScanType,
+                                                            const QString &FreqTable,
+                                                            const QString &Modulation,
+                                                            const QString &FirstChan,
+                                                            const QString &LastChan,
+                                                            uint ScanId,
+                                                            bool IgnoreSignalTimeout,
+                                                            bool FollowNITSetting,
+                                                            uint MplexId,
+                                                            const QString &Frequency,
+                                                            const QString &Bandwidth,
+                                                            const QString &Polarity,
+                                                            const QString &SymbolRate,
+                                                            const QString &Inversion,
+                                                            const QString &Constellation,
+                                                            const QString &ModSys,
+                                                            const QString &CodeRateLP,
+                                                            const QString &CodeRateHP,
+                                                            const QString &FEC,
+                                                            const QString &TransmissionMode,
+                                                            const QString &GuardInterval,
+                                                            const QString &Hierarchy,
+                                                            const QString &RollOff);
+
+        static V2ScanStatus*      GetScanStatus            (  );
+
+        static bool               StopScan                ( uint Cardid);
+
+        static V2ScanList*        GetScanList             ( uint SourceId);
+
+        static bool               SendScanDialogResponse  ( uint Cardid,
+                                                            const QString &DialogString,
+                                                            int DialogButton );
 
     private:
         Q_DISABLE_COPY(V2Channel)

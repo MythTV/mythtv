@@ -268,7 +268,7 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
                 {
                     // file has changed hosts
                     // add to delete list for further processing
-                    remove.push_back(std::make_pair(file->GetID(), lname));
+                    remove.emplace_back(file->GetID(), lname);
                 }
                 else
                 {
@@ -281,14 +281,14 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
             {
                 // If it's only in the database, and not on a host we
                 // cannot reach, mark it as for removal later.
-                remove.push_back(std::make_pair(file->GetID(), lname));
+                remove.emplace_back(file->GetID(), lname);
             }
             else if (m_liveSGHosts.contains(lhost))
             {
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Removing file SG(%1) :%2:")
                         .arg(lhost, lname));
-                remove.push_back(std::make_pair(file->GetID(), lname));
+                remove.emplace_back(file->GetID(), lname);
             }
             else
             {

@@ -1015,13 +1015,13 @@ class AudioDevice : public CaptureCardComboBoxSetting
                                    "audiodevice")
     {
         setLabel(QObject::tr("Audio device"));
-#if USING_OSS
+#ifdef USING_OSS
         QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
         fillSelectionsFromDir(dev);
         dev.setPath("/dev/sound");
         fillSelectionsFromDir(dev);
 #endif
-#if USING_ALSA
+#ifdef USING_ALSA
         addSelection("ALSA:default", "ALSA:default");
 #endif
         addSelection(QObject::tr("(None)"), "NULL");
@@ -1410,7 +1410,7 @@ static void FirewireConfigurationGroup(CaptureCard& parent, CardType& cardtype)
 }
 #endif
 
-#if USING_HDHOMERUN
+#ifdef USING_HDHOMERUN
 
 // -----------------------
 // HDHomeRun Configuration
@@ -1796,7 +1796,10 @@ class IPTVHost : public CaptureCardTextEditSetting
         setValue("http://mafreebox.freebox.fr/freeboxtv/playlist.m3u");
         setLabel(QObject::tr("M3U URL"));
         setHelpText(
-            QObject::tr("URL of M3U containing RTSP/RTP/UDP channel URLs."));
+            QObject::tr("URL of M3U file containing RTSP/RTP/UDP/HTTP channel URLs,"
+            " example for HDHomeRun: http://<ipv4>/lineup.m3u and for Freebox:"
+            " http://mafreebox.freebox.fr/freeboxtv/playlist.m3u."
+            ));
     }
 };
 
@@ -2435,10 +2438,10 @@ void HDPVRConfigurationGroup::probeCard(const QString &device)
         else if (!dn.isEmpty())
             ci = cn + "  [" + dn + "]";
         close(videofd);
+        m_audioInput->fillSelections(device);
     }
 
     m_cardInfo->setValue(ci);
-    m_audioInput->fillSelections(device);
 }
 
 V4L2encGroup::V4L2encGroup(CaptureCard &parent, CardType& cardtype) :
@@ -3206,7 +3209,7 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
         ds->setValue(CardUtil::GetDeliverySystemFromDB(_cardid));
         addChild(ds);
     }
-    else
+    else if (CardUtil::IsV4L(cardtype))
     {
         addChild(m_inputName);
     }

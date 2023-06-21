@@ -24,6 +24,7 @@
 // MythTV
 #include "libmythbase/cleanupguard.h"
 #include "libmythbase/compat.h"
+#include "libmythbase/configuration.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
@@ -105,7 +106,6 @@ int main(int argc, char **argv)
            .toUtf8().constData(), 1);
 #endif
 
-    gPidFile = cmdline.toString("pidfile");
     int retval = cmdline.Daemonize();
     if (retval != GENERIC_EXIT_OK)
         return retval;
@@ -129,10 +129,28 @@ int main(int argc, char **argv)
     (void)sd_notify(0, "STATUS=Connecting to database.");
 #endif
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(false))
+
+    // If setup has not been done (ie. the config.xml does not exist),
+    // set the ignoreDB flag, which will cause only the web-app to
+    // start, so that setup can be done.
+
+    bool ignoreDB = false;
+    {
+        auto config = XmlConfiguration();
+        ignoreDB = !config.FileExists();
+    }
+
+    // Init Parameters:
+    // bool Init(bool gui = true,
+    //           bool promptForBackend = false,
+    //           bool disableAutoDiscovery = false,
+    //           bool ignoreDB = false);
+
+    if (!gContext->Init(false,false,false,ignoreDB))
     {
         LOG(VB_GENERAL, LOG_CRIT, "Failed to init MythContext.");
-        return GENERIC_EXIT_NO_MYTHCONTEXT;
+        gCoreContext->GetDB()->IgnoreDatabase(true);
+        // return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
     MythTranslation::load("mythfrontend");
@@ -141,10 +159,8 @@ int main(int argc, char **argv)
 
     cmdline.ApplySettingsOverride();
 
-    if (cmdline.toBool("event")         || cmdline.toBool("systemevent") ||
-        cmdline.toBool("setverbose")    || cmdline.toBool("printsched") ||
-        cmdline.toBool("testsched")     || cmdline.toBool("resched") ||
-        cmdline.toBool("scanvideos")    || cmdline.toBool("clearcache") ||
+    if (cmdline.toBool("setverbose")    || cmdline.toBool("printsched") ||
+        cmdline.toBool("testsched")     ||
         cmdline.toBool("printexpire")   || cmdline.toBool("setloglevel"))
     {
         gCoreContext->SetAsBackend(false);
@@ -153,7 +169,7 @@ int main(int argc, char **argv)
 
     gCoreContext->SetAsBackend(true);
     retval = run_backend(cmdline);
-    // Retcode 256 is a special value to signal to mythbackend to restart
+    // Retcode 258 is a special value to signal to mythbackend to restart
     // This is used by the V2Myth/Shutdown?Restart=true API call
     if (retval == 258) {
         LOG(VB_GENERAL, LOG_INFO,

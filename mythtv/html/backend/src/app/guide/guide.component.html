@@ -1,41 +1,87 @@
-<div *ngIf="(m_guideData$ | async)?.ProgramGuide as pg; else loading">
-    <p-dataView [value]="pg.Channels" [totalRecords]="pg.TotalAvailable">
-        <ng-template pTemplate="header" styleClass="timeHeader">
-            <div class="col-12">
-                <p-calendar
-                    [(ngModel)]="m_startDate"
-                    [showTime]="true"
-                    [stepMinute]="30"
-                    [dateFormat]=(m_dateFormat)
-                    (onClose)="onDatePickerClose()">
-                </p-calendar>
-            </div>
-        </ng-template>
-        <ng-template let-channelrow let-i="rowIndex" pTemplate="listItem">
-            <div class="grid col-12 p-3">
-                <ng-container *ngIf="( i % 5 ) == 0">
-                    <div class="col-12">
-                        <app-guide-timebar [startTime]="pg.StartTime"></app-guide-timebar>
-                    </div>
-                </ng-container>
-                <div class="grid flex-grow-1">
-                    <div class="col-1">
-                        <app-guide-channelicon [channel]=channelrow></app-guide-channelicon>
-                    </div>
-                    <div class="col">
-                        <ng-container *ngFor="let program of channelrow.Programs">
-                            <ng-container *ngIf="inDisplayWindow(program.StartTime, program.EndTime)">
-                                <app-guide-programentry [program]="program"
-                                    [guideStartTime]="pg.StartTime" [guideEndTime]="pg.EndTime">
-                                </app-guide-programentry>
+<h2>{{ 'dashboard.programguide' | translate }} </h2>
+<div *ngIf="loaded; else loading">
+    <div class="flex">
+
+        <div class="flex align-items-center">
+            <p-calendar [(ngModel)]="m_pickerDate" [showTime]="true" [stepMinute]="30" [dateFormat]=(m_dateFormat)
+                (onClose)="onDatePickerClose()">
+            </p-calendar>
+        </div>
+
+        <div class="flex align-items-center p-5" *ngIf="displayType == CHANNEL">
+            <b> {{ 'dashboard.guide.channel' | translate }} {{channel.ChanNum}} {{channel.CallSign}}
+                {{channel.ChannelName}}</b>
+        </div>
+        <div class="flex align-items-center p-5" *ngIf="displayType == PEOPLESEARCH">
+            <b> {{ 'dashboard.guide.people_search' | translate }} </b>
+        </div>
+        <div class="flex align-items-center p-5" *ngIf="displayType == TITLESEARCH">
+            <b> {{ 'dashboard.guide.title_search' | translate }} </b>
+        </div>
+
+        <div class="flex align-items-center pl-5" *ngIf="[GRID,TITLESEARCH,PEOPLESEARCH].indexOf(displayType) > -1">
+            <input type="text" pInputText id="searchValue" [(ngModel)]="searchValue" name="searchValue"
+                class="text-xl" placeholder="Search" />
+            <button pButton pRipple icon="pi pi-search" class="p-button-text" (click)="titleSearch()"
+                pTooltip="{{ 'dashboard.guide.title_search' | translate }}"></button>
+            <button pButton pRipple icon="pi pi-user" class="p-button-text" (click)="peopleSearch()"
+                pTooltip="{{ 'dashboard.guide.people_search' | translate }}"></button>
+        </div>
+
+        <div class="flex align-items-center"  *ngIf="[CHANNEL,TITLESEARCH,PEOPLESEARCH].indexOf(displayType) > -1">
+            <button pButton pRipple icon="pi pi-table" class="p-button-text"
+                pTooltip="{{ 'dashboard.guide.retgrid' | translate }}" (click)="onGrid()"></button>
+        </div>
+        <div class="flex align-items-center">
+            <div *ngIf="refreshing else refreshBn"><p-progressSpinner
+                    [style]="{width: '30px', height: '30px'}"></p-progressSpinner></div>
+            <ng-template #refreshBn>
+                <div *ngIf="[CHANNEL,GRID].indexOf(displayType) > -1 ">
+                    <button pButton pRipple icon="pi pi-refresh" class="p-button-text"
+                        (click)="refreshing=true;refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+    <div *ngIf="displayType == GRID">
+        <p-dataView [value]="m_programGuide.ProgramGuide.Channels"
+            [totalRecords]="m_programGuide.ProgramGuide.TotalAvailable">
+            <ng-template pTemplate="header" styleClass="timeHeader">
+            </ng-template>
+            <ng-template let-channelrow let-i="rowIndex" pTemplate="listItem">
+                <div class="grid col-12 p-3">
+                    <ng-container *ngIf="( i % 5 ) == 0">
+                        <div class="col-12">
+                            <app-guide-timebar [guide]="this"></app-guide-timebar>
+                        </div>
+                    </ng-container>
+                    <div class="grid flex-grow-1">
+                        <div class="col-1">
+                            <app-guide-channelicon [channel]=channelrow [guideComponent]="this"></app-guide-channelicon>
+                        </div>
+                        <div class="col">
+                            <ng-container *ngFor="let program of channelrow.Programs">
+                                <ng-container
+                                    *ngIf="!timeChange && inDisplayWindow(program.StartTime, program.EndTime)">
+                                    <app-guide-programentry [program]="program"
+                                        [guideStartTime]="m_programGuide.ProgramGuide.StartTime"
+                                        [guideEndTime]="m_programGuide.ProgramGuide.EndTime" [guideComponent]="this"
+                                        [channel]="channelrow">
+                                    </app-guide-programentry>
+                                </ng-container>
                             </ng-container>
-                        </ng-container>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </ng-template>
-    </p-dataView>
+            </ng-template>
+        </p-dataView>
+    </div>
+    <div *ngIf="[CHANNEL,TITLESEARCH,PEOPLESEARCH].indexOf(displayType) > -1 ">
+        <app-programs [inter]="inter" [programs]="listPrograms" [usage]="'GUIDE'"></app-programs>
+    </div>
+
 </div>
+<app-schedule [inter]="inter"></app-schedule>
 <ng-template #loading>
-    <p-progressSpinner [style]="{width: '30px', height: '30px'}"></p-progressSpinner>
+    <p-progressSpinner></p-progressSpinner>
 </ng-template>

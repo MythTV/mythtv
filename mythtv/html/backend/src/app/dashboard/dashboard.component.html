@@ -1,113 +1,13 @@
-<h1>Dashboard</h1>
-<p-card class="p2">
-    <div><p-message severity="warn" text="{{ 'dashboard.warning' | translate }}"></p-message></div>
-</p-card>
-<div class="grid p2 mt-3">
-    <div class="col-12 md:col-6 lg:col-3">
-        <p-panel class="showHeader" header="Server Status" styleClass="dark-panel">
-            <div class="pt-2">
-                <p-skeleton styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="5rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" height="4rem"></p-skeleton>
-            </div>
-        </p-panel>
+<div *ngIf="translateDone">
+  <h1></h1>
+  <div class="flex flex-row">
+    <button pButton pRipple icon="pi pi-angle-double-left" class="p-button-text p-button-primary"
+      (click)="menu.navBackward()"></button>
+    <div class="col-11">
+      <p-tabMenu #menu [model]="fullMenu" [activeItem]="activeItem" [scrollable]="false"></p-tabMenu>
     </div>
-
-    <div class="col-12 md:col-6 lg:col-3">
-        <p-panel header="Current Tuner Status" styleClass="dark-panel">
-            <div class="pt-2">
-                <p-skeleton styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="5rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" height="4rem"></p-skeleton>
-            </div>
-        </p-panel>
-    </div>
-
-    <div class="col-12 md:col-6 lg:col-3">
-        <p-panel header="EPG Status" styleClass="dark-panel">
-            <div class="pt-2">
-                <p-skeleton styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="5rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" height="4rem"></p-skeleton>
-            </div>
-        </p-panel>
-    </div>
-
-    <div class="col-12 md:col-6 lg:col-3">
-        <p-panel header="Storage Group Status" styleClass="dark-panel">
-            <div class="pt-2">
-                <p-skeleton styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="5rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" height="4rem"></p-skeleton>
-            </div>
-        </p-panel>
-    </div>
-
-    <div class="col-12 md:col-6 lg:col-3">
-        <p-panel header="Job Queue" styleClass="dark-panel">
-            <div class="pt-2">
-                <p-skeleton styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="5rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" height="4rem"></p-skeleton>
-            </div>
-        </p-panel>
-    </div>
-
-    <div class="col-12 md:col-6 lg:col-3">
-        <p-panel header="Frontends" styleClass="dark-panel">
-            <div class="pt-2">
-                <p-skeleton styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="5rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" height="4rem"></p-skeleton>
-            </div>
-        </p-panel>
-    </div>
-
-    <div class="col-12 md:col-6 lg:col-3">
-        <p-panel header="Recent Recordings" styleClass="dark-panel">
-            <div class="pt-2">
-                <p-skeleton styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="5rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" height="4rem"></p-skeleton>
-            </div>
-        </p-panel>
-    </div>
-
-    <div class="col-12 md:col-6 lg:col-3">
-        <p-panel header="Dashboard Title 8" styleClass="dark-panel">
-            <div class="pt-2">
-                <p-skeleton styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="5rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" height="4rem"></p-skeleton>
-            </div>
-        </p-panel>
-    </div>
-
-    <div class="col-12 md:col-6 lg:col-3">
-        <p-panel header="Dashboard Title 9" styleClass="dark-panel">
-            <div class="pt-2">
-                <p-skeleton styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="5rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="10rem" height="4rem"></p-skeleton>
-            </div>
-        </p-panel>
-    </div>
+    <button pButton pRipple icon="pi pi-angle-double-right" class="p-button-text p-button-primary"
+      (click)="menu.navForward()"></button>
+  </div>
+  <router-outlet></router-outlet>
 </div>

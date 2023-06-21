@@ -87,8 +87,8 @@ export interface GetChannelInfoListRequest {
 
 export interface GetVideoMultiplexListRequest {
     SourceID:           number;
-    StartIndex:         number;
-    Count:              number;
+    StartIndex?:        number;
+    Count?:             number;
 }
 
 export interface UpdateVideoSourceRequest {
@@ -106,4 +106,68 @@ export interface UpdateVideoSourceRequest {
     RegionId:           number;
     ScanFrequency:      number;
     LCNOffset:          number;
+}
+
+export interface ChannelScanRequest {
+    CardId:                 number;
+    DesiredServices:        string;
+    FreeToAirOnly:          boolean;
+    ChannelNumbersOnly:     boolean;
+    CompleteChannelsOnly:   boolean;
+    FullChannelSearch:      boolean;
+    RemoveDuplicates:       boolean;
+    AddFullTS:              boolean;
+    TestDecryptable:        boolean;
+    ScanType:               string;
+    FreqTable:              string;
+    Modulation:             string;
+    FirstChan:              string;
+    LastChan:               string;
+    ScanId:                 number;
+    IgnoreSignalTimeout:    boolean;
+    FollowNITSetting:       boolean;
+    MplexId:                number;
+    Frequency:              number;
+    Bandwidth:              string;
+    Polarity:               string;
+    SymbolRate:             string;
+    Inversion:              string;
+    Constellation:          string;
+    ModSys:                 string;
+    CodeRateLP:             string;
+    CodeRateHP:             string;
+    FEC:                    string;
+    TransmissionMode:       string;
+    GuardInterval:          string;
+    Hierarchy:              string;
+    RollOff:                string;
+}
+
+export interface ChannelScanStatus {
+    CardId:                 number;
+    Status:                 string;
+    SignalLock:             boolean;
+    Progress:               number;
+    SignalNoise:            number;
+    SignalStrength:         number;
+    StatusLog:              string;
+    StatusText:             string;
+    StatusTitle:            string;
+    DialogMsg:              string;
+    DialogInputReq:         boolean;
+    DialogButtons:          string[];
+}
+
+export interface ScanDialogResponse {
+    CardId:                 number;
+    DialogString:            string;
+    DialogButton:           number;
+}
+
+export interface Scan {
+    ScanId:                 number;
+    CardId:                 number;
+    SourceId:               number;
+    Processed:              boolean;
+    ScanDate:               string;       // Date
 }

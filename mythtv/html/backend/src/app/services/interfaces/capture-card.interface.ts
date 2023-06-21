@@ -136,16 +136,26 @@ export interface DiseqcParm {
     description: string,
     type: string,
     inactive: boolean
-  }
+}
 
-  export interface InputGroup {
-    CardInputId:    number;
-    InputGroupId:   number;
+export interface InputGroup {
+    CardInputId: number;
+    InputGroupId: number;
     InputGroupName: string;
-  }
+}
 
-  export interface InputGroupList {
-    InputGroupList : {
-        InputGroups: InputGroup [];
+export interface InputGroupList {
+    InputGroupList: {
+        InputGroups: InputGroup[];
     }
+}
+
+export interface CardSubType {
+    // CardSubType : {
+        CardId:         number;
+        SubType:        string;
+        InputType:      string;
+        HDHRdoesDVBC:   boolean;
+        HDHRdoesDVB:    boolean;
+    // }
 }

@@ -63,15 +63,18 @@ static constexpr uint32_t byte3BCD2int(uint8_t i, uint8_t j, uint8_t k)
           byteBCDH2int(j) * 1000     + byteBCDL2int(j) * 100       +
           byteBCDH2int(k) * 10       + byteBCDL2int(k)); };
 static constexpr uint32_t byte4BCD2int(uint8_t i, uint8_t j, uint8_t k, uint8_t l)
-{ return (byteBCDH2int(i) * 10000000LL + byteBCDL2int(i) * 1000000 +
+{ return (byteBCDH2int(i) * 10000000   + byteBCDL2int(i) * 1000000 +
           byteBCDH2int(j) * 100000     + byteBCDL2int(j) * 10000   +
           byteBCDH2int(k) * 1000       + byteBCDL2int(k) * 100     +
           byteBCDH2int(l) * 10         + byteBCDL2int(l)); };
+static constexpr uint64_t byte4BCD2int64(uint8_t i, uint8_t j, uint8_t k, uint8_t l)
+{ return static_cast<uint64_t>(byte4BCD2int(i, j, k, l)); }
 
 static_assert( byteBCD2int(0x98) == 98);
 static_assert(byte2BCD2int(0x98, 0x76) == 9876);
 static_assert(byte3BCD2int(0x98, 0x76, 0x54) == 987654);
 static_assert(byte4BCD2int(0x98, 0x76, 0x54, 0x32) == 98765432);
+static_assert(byte4BCD2int64(0x98, 0x76, 0x54, 0x32) == 98765432ULL);
 
 // DVB Bluebook A038 (Sept 2011) p 77
 class NetworkNameDescriptor : public MPEGDescriptor
@@ -671,7 +674,7 @@ class CountryAvailabilityDescriptor : public MPEGDescriptor
     QString CountryNames(void) const
     {
         QString countries="";
-        for (uint i=0; i<CountryCount(); i++)
+        for (size_t i=0; i<CountryCount(); i++)
         {
             if (i!=0) countries.append(" ");
             countries.append(QString::fromLatin1(
@@ -764,7 +767,7 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
     {
         if (m_data == nullptr)
             return 0;
-        return byte4BCD2int(m_data[2], m_data[3], m_data[4], m_data[5]) * 100;
+        return byte4BCD2int64(m_data[2], m_data[3], m_data[4], m_data[5]) * 100;
     }
     // reserved_future_use     12   6.0
     // FEC_outer                4   7.4
@@ -842,7 +845,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     }
     uint64_t FrequencykHz(void) const
     {
-        return byte4BCD2int(m_data[2], m_data[3], m_data[4], m_data[5]) * 10;
+        return byte4BCD2int64(m_data[2], m_data[3], m_data[4], m_data[5]) * 10;
     }
     /// orbital_position       16   6.0
     uint OrbitalPosition(void) const
@@ -2649,7 +2652,7 @@ class FreesatLCNDescriptor : public MPEGDescriptor
 
         const unsigned char *payload = &data[2];
 
-        uint offset = 0;
+        size_t offset = 0;
         while ((offset + 5 < DescriptorLength()) &&
                (offset + 5 + payload[offset+4] <= DescriptorLength()))
         {
@@ -2674,19 +2677,19 @@ class FreesatLCNDescriptor : public MPEGDescriptor
     uint ServiceCount(void) const
         { return m_entries.size(); }
 
-    uint ServiceID(int i) const
+    uint ServiceID(size_t i) const
         { return *m_entries[i] << 8 | *(m_entries[i]+1); }
 
-    uint ChanID(int i) const
+    uint ChanID(size_t i) const
         { return (*(m_entries[i] + 2) << 8 | *(m_entries[i] + 3)) & 0x7FFF; }
 
-    uint LCNCount(int i) const
+    uint LCNCount(size_t i) const
         { return *(m_entries[i] + 4) / 4; }
 
-    uint LogicalChannelNumber(int i, int j) const
+    uint LogicalChannelNumber(size_t i, size_t j) const
         { return (*(m_entries[i] + 5 + j*4) << 8 | *(m_entries[i] + 5 + j*4 + 1)) & 0xFFF; }
 
-    uint RegionID(int i, int j) const
+    uint RegionID(size_t i, size_t j) const
         { return *(m_entries[i] + 5 + j*4 + 2) << 8 | *(m_entries[i] + 5 + j*4 + 3); }
 
     QString toString(void) const override; // MPEGDescriptor
@@ -2826,19 +2829,19 @@ class SkyLCNDescriptor : public MPEGDescriptor
     uint ServiceCount(void) const
         { return (DescriptorLength() - 2) / 9; }
 
-    uint ServiceID(int i) const
+    uint ServiceID(size_t i) const
         { return *(m_data + 4 + i*9) << 8 | *(m_data + 5 + i*9); }
 
-    uint ServiceType(int i) const
+    uint ServiceType(size_t i) const
         { return *(m_data + 6 + i*9); }
 
-    uint ChannelID(int i) const
+    uint ChannelID(size_t i) const
         { return *(m_data + 7 + i*9) << 8 | *(m_data + 8 + i*9); }
 
-    uint LogicalChannelNumber(int i) const
+    uint LogicalChannelNumber(size_t i) const
         { return *(m_data + 9 + i*9) << 8 | *(m_data + 10 + i*9); }
 
-    uint Flags(int i) const
+    uint Flags(size_t i) const
         { return *(m_data + 11 + i*9) << 8 | *(m_data + 12 + i*9); }
 
     QString toString(void) const override; // MPEGDescriptor

@@ -1,5 +1,6 @@
-import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of, PartialObserver } from 'rxjs';
 import { ChannelService } from 'src/app/services/channel.service';
@@ -7,19 +8,25 @@ import { Channel, CommMethod, DBChannelRequest } from 'src/app/services/interfac
 import { VideoSource } from 'src/app/services/interfaces/videosource.interface';
 import { SetupService } from 'src/app/services/setup.service';
 
+
+interface MyChannel extends Channel {
+  ChanSeq?: number;
+  Source?: string;
+}
+
 @Component({
   selector: 'app-channel-editor',
   templateUrl: './channel-editor.component.html',
   styleUrls: ['./channel-editor.component.css']
 })
-
 export class ChannelEditorComponent implements OnInit {
 
   @ViewChild("chanform") currentForm!: NgForm;
 
-  allChannels: Channel[] = [];
+  allChannels: MyChannel[] = [];
   videoSources: VideoSource[] = [];
   commMethods: CommMethod[] = [];
+  sourceNames: string[] = [];
 
   tvFormats = [
     { value: "Default", prompt: "common.default" },
@@ -49,9 +56,10 @@ export class ChannelEditorComponent implements OnInit {
   headingEdit = "settings.chanedit.title";
   warningText = 'settings.common.warning';
   deleteText = 'settings.common.ru_sure';
+  unassignedText = 'settings.chanedit.unassigned';
 
   transDone = 0;
-  numTranslations = 8;
+  numTranslations = 9;
   successCount = 0;
   errorCount = 0;
 
@@ -59,15 +67,34 @@ export class ChannelEditorComponent implements OnInit {
   dialogHeader = "";
   displayUnsaved = false;
   displayDelete = false;
+  displayDeleteSource = false;
+  working = false;
+  chansLoaded = false;
+  filterEvent = {
+    filters: {
+      Source: {
+        matchMode: '',
+        value: ''
+      }
+    }
 
-  channel: Channel = this.resetChannel();
-  editingChannel?: Channel;
-  // channelOperation -1 = delete, 0 = update, 1 = add
+  };
+
+  channel: MyChannel = this.resetChannel();
+  editingChannel?: MyChannel;
+  // channelOperation -2 = delete source -1 = delete channel, 0 = update, 1 = add
   channelOperation = 0;
 
   constructor(private channelService: ChannelService, private translate: TranslateService,
-    public setupService: SetupService) {
-    this.loadLists();
+    public setupService: SetupService, public router: Router) {
+
+    this.translate.get(this.unassignedText).subscribe(data => {
+      // this translation has to be done before loading lists
+      this.unassignedText = data;
+      this.transDone++
+      this.loadLists();
+    });
+
     this.loadTranslations();
   }
 
@@ -75,7 +102,7 @@ export class ChannelEditorComponent implements OnInit {
     this.markPristine();
   }
 
-  resetChannel(): Channel {
+  resetChannel(): MyChannel {
     return {
       ATSCMajorChan: 0,
       ATSCMinorChan: 0,
@@ -104,15 +131,30 @@ export class ChannelEditorComponent implements OnInit {
       TimeOffset: 0,
       UseEIT: false,
       Visible: true,
-      XMLTVID: ''
+      XMLTVID: '',
+      ChanSeq: 0
     };
   }
 
   loadLists() {
-    this.channelService.GetChannelInfoList({ Details: true }).subscribe(data =>
-      this.allChannels = data.ChannelInfoList.ChannelInfos);
-    this.channelService.GetVideoSourceList().subscribe(data =>
-      this.videoSources = data.VideoSourceList.VideoSources);
+    this.channelService.GetChannelInfoList({ Details: true }).subscribe(data => {
+      this.allChannels = data.ChannelInfoList.ChannelInfos;
+      // this.allChannels.forEach((entry,index) => entry.ChanSeq = index);
+      this.chansLoaded = true;
+      this.channelService.GetVideoSourceList().subscribe(data => {
+        this.videoSources = data.VideoSourceList.VideoSources;
+        this.videoSources.unshift(<VideoSource>{ Id: 0, SourceName: this.unassignedText });
+        this.videoSources.forEach((entry) => this.sourceNames.push(entry.SourceName));
+        this.allChannels.forEach((entry, index) => {
+          entry.ChanSeq = index;
+          entry.Source = this.getSource(entry);
+        });
+      });
+
+
+    });
+    // this.channelService.GetVideoSourceList().subscribe(data =>
+    //   this.videoSources = data.VideoSourceList.VideoSources);
     this.channelService.GetCommMethodList().subscribe(data =>
       this.commMethods = data.CommMethodList.CommMethods);
   }
@@ -146,14 +188,14 @@ export class ChannelEditorComponent implements OnInit {
     });
   }
 
-  getSource(channel: Channel): string {
+  getSource(channel: MyChannel): string {
     const ret = this.videoSources.find(element => channel.SourceId == element.Id);
     if (ret != undefined)
       return ret.SourceName;
-    return ""
+    return this.unassignedText;
   }
 
-  getVisibility(channel: Channel): string {
+  getVisibility(channel: MyChannel): string {
     const ret = this.visibilities.find(element => channel.ExtendedVisible == element.value);
     if (ret != undefined)
       return ret.prompt;
@@ -166,18 +208,16 @@ export class ChannelEditorComponent implements OnInit {
     this.dialogHeader = this.headingNew;
     this.channel = this.resetChannel();
     this.displayChannelDlg = true;
-    // this.currentForm.form.markAsPristine();
     this.markPristine();
   }
 
-  editChannel(channel: Channel): void {
+  editChannel(channel: MyChannel): void {
     this.editingChannel = channel;
     this.successCount = 0;
     this.errorCount = 0;
     this.dialogHeader = this.headingEdit;
     this.channel = Object.assign({}, channel);
     this.displayChannelDlg = true;
-    // this.currentForm.form.markAsPristine();
     this.markPristine();
   }
 
@@ -189,29 +229,41 @@ export class ChannelEditorComponent implements OnInit {
         this.currentForm.form.markAsPristine();
         switch (this.channelOperation) {
           case 0:
-            if (this.editingChannel)
+            if (this.editingChannel) {
               Object.assign(this.editingChannel, this.channel);
+              this.editingChannel.Source = this.getSource(this.editingChannel);
+            }
             break;
           case 1:
             this.allChannels.push(this.channel);
             break;
           case -1:
+            // Delete channel request
             this.channel.ChanId = -99;
             this.displayDelete = false;
+            this.displayDeleteSource = false;
+            this.currentForm.form.markAsPristine();
+            break;
+          case -2:
+            // Delete source request
+            this.channel.ChanId = -99;
+            // continue with next channel
+            this.deleteSource();
             break;
         }
       }
       else {
         console.log("saveObserver error", x);
         this.errorCount++;
+        this.working = false;
       }
     },
     error: (err: any) => {
       console.log("saveObserver error", err);
       this.errorCount++;
+      this.working = false;
     }
   };
-
 
   saveChannel() {
     this.successCount = 0;
@@ -277,38 +329,59 @@ export class ChannelEditorComponent implements OnInit {
     };
   }
 
-  deleteRequest(channel: Channel) {
-    this.successCount = 0;
-    this.errorCount = 0;
+  deleteRequest(channel: MyChannel) {
     this.channel = channel;
     this.displayDelete = true;
   }
 
-  deleteChannel(channel: Channel) {
+  deleteChannel(channel: MyChannel, source?: boolean) {
+    this.successCount = 0;
+    this.errorCount = 0;
     this.channel = channel;
-    this.channelOperation = -1;
+    if (source)
+      // delete source
+      this.channelOperation = -2;
+    else
+      // delete channel
+      this.channelOperation = -1;
+    console.log("Delete Channel", channel)
     this.channelService.RemoveDBChannel(channel.ChanId).subscribe(this.saveObserver);
   }
 
-  markPristine() {
-    let obs = new Observable(x => {
-      setTimeout(() => {
-        x.next(1);
-        x.complete();
-      }, 100)
-    });
-    obs.subscribe(x =>
-      this.currentForm.form.markAsPristine()
-    );
+  deleteSourceRequest() {
+    this.channel = this.resetChannel();
+    this.displayDeleteSource = true;
   }
 
-  // Since the dialog is modal we may not actually need this function
+  deleteSource() {
+    this.working = true;
+    const next = this.allChannels.find(entry =>
+      entry.ChanId > 0
+      && (!this.filterEvent.filters.Source.value
+        || this.filterEvent.filters.Source.value == entry.Source));
+    if (next)
+      this.deleteChannel(next, true);
+    else {
+      this.displayDelete = false;
+      this.displayDeleteSource = false;
+      this.currentForm.form.markAsPristine();
+      this.working = false;
+    }
+  }
+
+  onFilter(event: any) {
+    this.filterEvent = event;
+  }
+
+  markPristine() {
+    setTimeout(() => this.currentForm.form.markAsPristine(), 200);
+  }
+
   confirm(message?: string): Observable<boolean> {
     const confirmation = window.confirm(message);
     return of(confirmation);
   };
 
-  // Since the dialog is modal we may not actually need this function
   canDeactivate(): Observable<boolean> | boolean {
     if (this.currentForm && this.currentForm.dirty)
       return this.confirm(this.warningText);

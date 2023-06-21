@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CaptureCard, CaptureCardList, CaptureDeviceList, CardTypeList, DiseqcConfig, DiseqcConfigList, DiseqcParm, DiseqcTree, DiseqcTreeList, InputGroupList } from './interfaces/capture-card.interface';
+import { CaptureCard, CaptureCardList, CaptureDeviceList, CardSubType, CardTypeList, DiseqcConfig, DiseqcConfigList, DiseqcParm, DiseqcTree, DiseqcTreeList, InputGroupList } from './interfaces/capture-card.interface';
 import { BoolResponse } from './interfaces/common.interface';
 import { RecProfileGroupList } from './interfaces/recprofile.interface';
 
@@ -141,4 +141,8 @@ export class CaptureCardService {
       { ProfileId: ProfileId, Name: Name, Value: Value });
   }
 
+  public GetCardSubType(CardId: number) : Observable<{CardSubType: CardSubType}> {
+    let params = new HttpParams().set("cardid",CardId);
+    return this.httpClient.get<{CardSubType: CardSubType}>('/Capture/GetCardSubType', {params})
+  }
  }

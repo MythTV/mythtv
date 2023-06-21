@@ -313,7 +313,7 @@ void DTVConfParser::AddChannel(const DTVMultiplex &mux, DTVChannelInfo &chan)
         }
     }
 
-    m_channels.push_back(DTVTransport(mux));
+    m_channels.emplace_back(mux);
     m_channels.back().channels.push_back(chan);
 
     LOG(VB_GENERAL, LOG_INFO, "Imported channel: " + chan.toString() +

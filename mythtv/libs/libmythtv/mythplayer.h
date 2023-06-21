@@ -99,6 +99,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     void CheckCallbacks();
     void SeekingSlow(int Count);
     void SeekingComplete();
+    void SeekingDone();
     void PauseChanged(bool Paused);
     void RequestResetCaptions();
     void SignalTracksChanged(uint Type);

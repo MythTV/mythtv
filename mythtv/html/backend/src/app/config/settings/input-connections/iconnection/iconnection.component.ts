@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { Observable, PartialObserver } from 'rxjs';
+import { PartialObserver, Subject } from 'rxjs';
 import { startWith } from 'rxjs/operators';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { ChannelService } from 'src/app/services/channel.service';
@@ -77,6 +77,8 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     hemisphere: 1,
     isReady: false,
   };
+
+  deviceFree = new Subject<boolean>();
 
   orgInputGroupIds: number[] = [];
 
@@ -167,25 +169,21 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
       this.loadDiseqc();
     }
 
-    let obs = new Observable(x => {
-      setTimeout(() => {
-        x.next(1);
-        x.complete();
-      }, 100)
-    });
-    obs.subscribe(x => {
+    setTimeout(() => {
       if (this.card.DisplayName)
         this.currentForm.form.markAsPristine();
       else {
         this.card.DisplayName = "Input " + this.card.CardId;
         this.currentForm.form.markAsDirty();
       }
-    });
+    }, 100);
+
     this.captureCardService.GetCaptureDeviceList(this.card.CardType)
       .subscribe({
         next: data => {
           this.captureDeviceList = data;
           this.setupDevice();
+          this.deviceFree.next(true);
         },
         error: (err: any) => {
           console.log("GetCaptureDeviceList", err);

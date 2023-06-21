@@ -40,7 +40,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
 
     bool            Set(const QString& opt);
     bool            Set(const QString& opt, const QByteArray& val);
-    void            Set(QVariant val)               { m_stored = std::move(val);
+    void            Set(const QVariant& val)        { m_stored = val;
                                                       m_given = true; }
 
     CommandLineArg* SetParent(const QString &opt);

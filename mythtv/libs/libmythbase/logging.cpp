@@ -54,9 +54,6 @@ extern "C" {
 #include <mach/mach.h>
 #endif
 
-// QJson
-#include "qjsonwrapper/Json.h"
-
 #ifdef Q_OS_ANDROID
 #include <android/log.h>
 #endif
@@ -78,11 +75,10 @@ struct LogPropagateOpts {
     bool    m_propagate;
     int     m_quiet;
     int     m_facility;
-    bool    m_dblog;
     QString m_path;
 };
 
-LogPropagateOpts        logPropagateOpts {false, 0, 0, true, ""};
+LogPropagateOpts        logPropagateOpts {false, 0, 0, ""};
 QString                 logPropagateArgs;
 QStringList             logPropagateArgList;
 
@@ -134,16 +130,6 @@ LoggingItem::LoggingItem(const char *_file, const char *_function,
     m_file = (slash != nullptr) ? slash+1 : _file;
     m_epoch = nowAsDuration<std::chrono::microseconds>();
     setThreadTid();
-}
-
-QByteArray LoggingItem::toByteArray(void)
-{
-    QVariantMap variant = QJsonWrapper::qobject2qvariant(this);
-    QByteArray json = QJsonWrapper::toJson(variant);
-
-    //cout << json.constData() << endl;
-
-    return json;
 }
 
 /// \brief Get the name of the thread that produced the LoggingItem
@@ -231,12 +217,12 @@ char LoggingItem::getLevelChar (void)
 ///        and deregistration if the VERBOSE_THREADS environment variable is
 ///        set.
 LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
-                           QString table, int facility) :
+                           int facility) :
     MThread("Logger"),
     m_waitNotEmpty(new QWaitCondition()),
     m_waitEmpty(new QWaitCondition()),
     m_filename(std::move(filename)), m_progress(progress), m_quiet(quiet),
-    m_tablename(std::move(table)), m_facility(facility), m_pid(getpid())
+    m_facility(facility), m_pid(getpid())
 {
     if (qEnvironmentVariableIsSet("VERBOSE_THREADS"))
     {
@@ -370,17 +356,7 @@ void LoggerThread::handleItem(LoggingItem *item)
 
     if (!item->m_message.isEmpty())
     {
-        /// TODO: This converts the LoggingItem to json for sending to
-        /// the log server.  Now that the log server is gone, it just
-        /// passed the json to the logForwardThread, where it will
-        /// eventually be converted back to a LoggingItem.  It should
-        /// be possible to eliminate the double conversion now that
-        /// the log server is gone and all logging happens in one
-        /// process.
-        QList<QByteArray> list;
-        list.append(QByteArray());
-        list.append(item->toByteArray());
-        logForwardMessage(list);
+        logForwardMessage(item);
     }
 }
 
@@ -520,7 +496,6 @@ void LoggerThread::fillItem(LoggingItem *item)
     item->setPid(m_pid);
     item->setThreadName(item->getThreadName());
     item->setAppName(m_appname);
-    item->setTable(m_tablename);
     item->setLogFile(m_filename);
     item->setFacility(m_facility);
 }
@@ -542,18 +517,6 @@ LoggingItem *LoggingItem::create(const char *_file,
 
     return item;
 }
-
-LoggingItem *LoggingItem::create(QByteArray &buf)
-{
-    // Deserialize buffer
-    QVariant variant = QJsonWrapper::parseJson(buf);
-
-    auto *item = new LoggingItem;
-    QJsonWrapper::qvariant2qobject(variant.toMap(), item);
-
-    return item;
-}
-
 
 /// \brief  Format and send a log message into the queue.  This is called from
 ///         the LOG() macro.  The intention is minimal blocking of the caller.
@@ -631,12 +594,6 @@ void logPropagateCalc(void)
         logPropagateArgList << "--quiet";
     }
 
-    if (logPropagateOpts.m_dblog)
-    {
-        logPropagateArgs += " --enable-dblog";
-        logPropagateArgList << "--enable-dblog";
-    }
-
 #if !defined(_WIN32) && !defined(Q_OS_ANDROID)
     if (logPropagateOpts.m_facility >= 0)
     {
@@ -674,13 +631,12 @@ bool logPropagateQuiet(void)
 /// \param  quiet       quiet level requested (squelches all console output)
 /// \param  facility    Syslog facility to use.  -1 to disable syslog output
 /// \param  level       Minimum logging level to put into the logs
-/// \param  dblog       true if database logging is requested
 /// \param  propagate   true if the logfile path needs to be propagated to child
 ///                     processes.
 /// \param  testHarness Should always be false. Set to true when
 ///                     invoked by the testing code.
 void logStart(const QString& logfile, bool progress, int quiet, int facility,
-              LogLevel_t level, bool dblog, bool propagate, bool testHarness)
+              LogLevel_t level, bool propagate, bool testHarness)
 {
     if (logThread && logThread->isRunning())
         return;
@@ -692,7 +648,6 @@ void logStart(const QString& logfile, bool progress, int quiet, int facility,
     logPropagateOpts.m_propagate = propagate;
     logPropagateOpts.m_quiet = quiet;
     logPropagateOpts.m_facility = facility;
-    logPropagateOpts.m_dblog = dblog;
 
     if (propagate)
     {
@@ -705,10 +660,8 @@ void logStart(const QString& logfile, bool progress, int quiet, int facility,
     if (testHarness)
         return;
 
-    QString table = dblog ? QString("logging") : QString("");
-
     if (!logThread)
-        logThread = new LoggerThread(logfile, progress, quiet, table, facility);
+        logThread = new LoggerThread(logfile, progress, quiet, facility);
 
     logThread->start();
 }

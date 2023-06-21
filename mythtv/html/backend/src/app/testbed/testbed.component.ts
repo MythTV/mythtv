@@ -10,7 +10,7 @@ import { ContentService } from '../services/content.service';
 
 import { MythHostName, MythTimeZone, MythConnectionInfo, GetSettingResponse, GetStorageGroupDirsResponse, SettingList } from '../services/interfaces/myth.interface';
 import { MythDatabaseStatus } from '../services/interfaces/config.interface';
-import { GetRecStorageGroupListResponse } from '../services/interfaces/dvr.interface';
+import { RecStorageGroupList } from '../services/interfaces/dvr.interface';
 import { BoolResponse } from '../services/interfaces/common.interface';
 import { IconlookupService } from '../services/external/iconlookup.service';
 import { CallsignLookupResponse } from '../services/interfaces/iconlookup.interface';
@@ -32,7 +32,7 @@ export class TestbedComponent implements OnInit {
     m_connectionInfo$!: Observable<MythConnectionInfo>;
     m_setting$!: Observable<GetSettingResponse>;
     m_databaseStatus$!: Observable<MythDatabaseStatus>;
-    m_storageGroupList$!: Observable<GetRecStorageGroupListResponse>;
+    m_storageGroupList$!: Observable<RecStorageGroupList>;
     m_storageGroupDirs$!: Observable<GetStorageGroupDirsResponse>;
     m_downloadTest$!: Observable<BoolResponse>;
     m_addStorageGroupDir$!: Observable<BoolResponse>;

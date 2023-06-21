@@ -23,16 +23,19 @@ export interface VideoMultiplex {
     ServiceVersion:     number;
     UpdateTimeStamp:    string; // dateTime
     DefaultAuthority:   string;
+    Description:        string;
 }
 
 export interface VideoMultiplexList {
-    StartIndex:         number;
-    Count:              number;
-    CurrentPage:        number;
-    TotalPages:         number;
-    TotalAvailable:     number;
-    AsOf:               string; // dateTime
-    Version:            string;
-    ProtoVer:           string;
-    VideoMultiplexes:   VideoMultiplex[];
+    VideoMultiplexList : {
+        StartIndex:         number;
+        Count:              number;
+        CurrentPage:        number;
+        TotalPages:         number;
+        TotalAvailable:     number;
+        AsOf:               string; // dateTime
+        Version:            string;
+        ProtoVer:           string;
+        VideoMultiplexes:   VideoMultiplex[];
+    }
 }

@@ -24,30 +24,23 @@ static inline bool sse2_check()
 {
 #ifdef Q_PROCESSOR_X86_64
     return true;
-#endif
+#else
     static int has_sse2 = -1;
     if (has_sse2 != -1)
         return (bool)has_sse2;
     __asm__(
         // -fPIC - we may not clobber ebx/rbx
-#ifdef Q_PROCESSOR_X86_64
-        "push       %%rbx               \n\t"
-#else
         "push       %%ebx               \n\t"
-#endif
         "mov        $1, %%eax           \n\t"
         "cpuid                          \n\t"
         "and        $0x4000000, %%edx   \n\t"
         "shr        $26, %%edx          \n\t"
-#ifdef Q_PROCESSOR_X86_64
-        "pop        %%rbx               \n\t"
-#else
         "pop        %%ebx               \n\t"
-#endif
         :"=d"(has_sse2)
         ::"%eax","%ecx"
     );
     return (bool)has_sse2;
+#endif
 }
 #endif //Q_PROCESSOR_X86
 

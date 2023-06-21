@@ -2647,7 +2647,7 @@ void MythCommandLineParser::addDVBv3(void)
 }
 
 /** \brief Canned argument definition for all logging options, including
- *  --verbose, --logpath, --quiet, --loglevel, --syslog, and --enable-dblog
+ *  --verbose, --logpath, --quiet, --loglevel, --syslog
   */
 void MythCommandLineParser::addLogging(
     const QString &defaultVerbosity, LogLevel_t defaultLogLevel)
@@ -2697,11 +2697,12 @@ void MythCommandLineParser::addLogging(
                 )
                 ->SetGroup("Logging");
 #endif
-    add("--nodblog", "nodblog", false, "Disable database logging.", "")
+    add("--nodblog", "nodblog", false, "", "")
                 ->SetGroup("Logging")
-                ->SetDeprecated("this is now the default, see --enable-dblog");
-    add("--enable-dblog", "enabledblog", false, "Enable logging to database.", "")
-                ->SetGroup("Logging");
+                ->SetRemoved("Database logging has been removed.", "34");
+    add("--enable-dblog", "enabledblog", false, "", "")
+                ->SetGroup("Logging")
+                ->SetRemoved("Database logging has been removed.", "34");
 
     add(QStringList{"-l", "--logfile"},
         "logfile", "", "", "")
@@ -2895,7 +2896,6 @@ int MythCommandLineParser::ConfigureLogging(const QString& mask, bool progress)
 	facility = SYSTEMD_JOURNAL_FACILITY;
     }
 #endif
-    bool dblog = toBool("enabledblog");
     LogLevel_t level = GetLogLevel();
     if (level == LOG_UNKNOWN)
         return GENERIC_EXIT_INVALID_CMDLINE;
@@ -2917,7 +2917,7 @@ int MythCommandLineParser::ConfigureLogging(const QString& mask, bool progress)
     if (toBool("daemon"))
         quiet = std::max(quiet, 1);
 
-    logStart(logfile, progress, quiet, facility, level, dblog, propagate);
+    logStart(logfile, progress, quiet, facility, level, propagate);
     qInstallMessageHandler([](QtMsgType /*unused*/, const QMessageLogContext& /*unused*/, const QString &Msg)
         { LOG(VB_GENERAL, LOG_INFO, "Qt: " + Msg); });
 

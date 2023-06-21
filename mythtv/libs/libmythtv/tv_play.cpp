@@ -3952,6 +3952,10 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
     else if (!IsDVDStillFrame && SeekHandleAction(Actions, IsDVD))
     {
     }
+    else if (IsActionable(ACTION_SELECT, Actions) && HasQueuedChannel())
+    {
+        CommitQueuedInput();
+    }
     else
     {
         handled = false;
@@ -4096,21 +4100,15 @@ bool TV::ActivePostQHandleAction(const QStringList &Actions)
 
     if (IsActionable(ACTION_SETBOOKMARK, Actions))
     {
-        if (!CommitQueuedInput())
-        {
-            m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-            SetBookmark(false);
-            m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        }
+        m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
+        SetBookmark(false);
+        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
     }
     if (IsActionable(ACTION_TOGGLEBOOKMARK, Actions))
     {
-        if (!CommitQueuedInput())
-        {
-            m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-            SetBookmark(m_player->GetBookmark() != 0U);
-            m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        }
+        m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
+        SetBookmark(m_player->GetBookmark() != 0U);
+        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
     }
     else if (IsActionable("NEXTFAV", Actions) && islivetv)
         ChangeChannel(CHANNEL_DIRECTION_FAVORITE);

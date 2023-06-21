@@ -11,7 +11,7 @@
                 <div class="mb-4 w-full"u>
 
                     <div class="form-group field">
-                        <label for="VideoDevicePrompt" class="block">{{ 'settings.capture.satip.device_label' |
+                        <label for="VideoDevicePrompt" class="label block">{{ 'settings.capture.satip.device_label' |
                             translate
                             }}</label>
                         <p-dropdown *ngIf="isReady" [options]="captureDeviceList.CaptureDeviceList.CaptureDevices"
@@ -30,7 +30,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label class="block">{{ 'settings.capture.vbox.deviceid_label' | translate
+                        <label class="label block">{{ 'settings.capture.vbox.deviceid_label' | translate
                             }}</label>
                         <div class="col-10 bg-blue-100">
                             {{ card.VideoDevice}} &nbsp;
@@ -41,7 +41,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label class="block">{{ 'settings.capture.vbox.description_label' | translate
+                        <label class="label block">{{ 'settings.capture.vbox.description_label' | translate
                             }}</label>
                         <div class="col-10 bg-blue-100">
                             {{ currentDevice.Description}} &nbsp;
@@ -51,26 +51,26 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="ip" class="block">{{ 'settings.capture.ceton.ipaddress_label' | translate }}</label>
+                        <label for="ip" class="label block">{{ 'settings.capture.ceton.ipaddress_label' | translate }}</label>
                         <input pInputText id="ip" [(ngModel)]="currentDevice.IPAddress" name="ip" #ipAddress="ngModel"
                             class="mb-2 form-control w-full" [disabled]="currentDevice !== manualDevice" />
                         <small class="block">
-                            {{ 'settings.capture.ceton.ipaddress_desc' | translate }}
+                            {{ 'settings.capture.vbox.ipaddress_desc' | translate }}
                         </small>
                     </div>
 
                     <div class="form-group field">
-                        <label for="tuner" class="block">{{ 'settings.capture.ceton.tuner_label' | translate }}</label>
+                        <label for="tuner" class="label block">{{ 'settings.capture.ceton.tuner_label' | translate }}</label>
                         <input pInputText id="tuner" [(ngModel)]="currentDevice.TunerNumber" name="tuner"
                             #ipAddress="ngModel" class="mb-2 form-control w-full"
                             [disabled]="currentDevice !== manualDevice" />
                         <small class="block">
-                            {{ 'settings.capture.ceton.tuner_desc' | translate }}
+                            {{ 'settings.capture.vbox.tuner_desc' | translate }}
                         </small>
                     </div>
 
                     <div class="form-group field">
-                        <label for="SignalTimeout" class="block">{{ 'settings.capture.sigtimeout_label' | translate
+                        <label for="SignalTimeout" class="label block">{{ 'settings.capture.sigtimeout_label' | translate
                             }}</label>
                         <p-inputNumber [(ngModel)]="card.SignalTimeout" name="SignalTimeout" id="SignalTimeout"
                             [showButtons]="true" [min]="250" [max]="60000" [step]="250"></p-inputNumber>
@@ -80,7 +80,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="ChannelTimeout" class="block">{{ 'settings.capture.tunetimeout_label' | translate
+                        <label for="ChannelTimeout" class="label block">{{ 'settings.capture.tunetimeout_label' | translate
                             }}</label>
                         <p-inputNumber [(ngModel)]="card.ChannelTimeout" name="ChannelTimeout" id="ChannelTimeout"
                             [showButtons]="true" [min]="2000" [max]="65000" [step]="250"></p-inputNumber>

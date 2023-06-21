@@ -66,7 +66,6 @@ class LoggingItem: public QObject, public ReferenceCounter
     Q_PROPERTY(QString function READ function WRITE setFunction)
     Q_PROPERTY(QString threadName READ threadName WRITE setThreadName)
     Q_PROPERTY(QString appName READ appName WRITE setAppName)
-    Q_PROPERTY(QString table READ table WRITE setTable)
     Q_PROPERTY(QString logFile READ logFile WRITE setLogFile)
     Q_PROPERTY(QString message READ message WRITE setMessage)
 
@@ -80,8 +79,6 @@ class LoggingItem: public QObject, public ReferenceCounter
     void setThreadTid(void);
     static LoggingItem *create(const char *_file, const char *_function, int _line, LogLevel_t _level,
                                LoggingType _type);
-    static LoggingItem *create(QByteArray &buf);
-    QByteArray toByteArray(void);
     QString getTimestamp(const char *format = "yyyy-MM-dd HH:mm:ss") const;
     QString getTimestampUs(const char *format = "yyyy-MM-dd HH:mm:ss") const;
     char getLevelChar(void);
@@ -99,7 +96,6 @@ class LoggingItem: public QObject, public ReferenceCounter
     QString             function() const    { return m_function; };
     QString             threadName() const  { return m_threadName; };
     QString             appName() const     { return m_appName; };
-    QString             table() const       { return m_table; };
     QString             logFile() const     { return m_logFile; };
     QString             message() const     { return m_message; };
 
@@ -116,7 +112,6 @@ class LoggingItem: public QObject, public ReferenceCounter
     void setFunction(const QString &val)    { m_function = val; };
     void setThreadName(const QString &val)  { m_threadName = val; };
     void setAppName(const QString &val)     { m_appName = val; };
-    void setTable(const QString &val)       { m_table = val; };
     void setLogFile(const QString &val)     { m_logFile = val; };
     void setMessage(const QString &val)     { m_message = val; };
 
@@ -133,7 +128,6 @@ class LoggingItem: public QObject, public ReferenceCounter
     QString             m_function   {};
     QString             m_threadName {};
     QString             m_appName    {};
-    QString             m_table      {};
     QString             m_logFile    {};
     QString             m_message    {};
 
@@ -154,8 +148,7 @@ class LoggerThread : public QObject, public MThread
     friend MBASE_PUBLIC void LogPrintLine(uint64_t mask, LogLevel_t level, const char *file, int line,
                              const char *function, QString message);
   public:
-    LoggerThread(QString filename, bool progress, bool quiet, QString table,
-                 int facility);
+    LoggerThread(QString filename, bool progress, bool quiet, int facility);
     ~LoggerThread() override;
     void run(void) override; // MThread
     void stop(void);
@@ -179,7 +172,6 @@ class LoggerThread : public QObject, public MThread
     bool    m_quiet;       ///< silence the console (console only)
     QString m_appname {QCoreApplication::applicationName()};
                            ///< Cached application name
-    QString m_tablename;   ///< Cached table name for db logging
     int     m_facility;    ///< Cached syslog facility (or -1 to disable)
     pid_t   m_pid;         ///< Cached pid value
 

@@ -53,6 +53,9 @@ ChannelWizard::ChannelWizard(int id, int default_sourceid)
     auto *common = new ChannelOptionsCommon(*m_cid, default_sourceid,!all_v4l);
     addChild(common);
 
+    auto *iptv = new ChannelOptionsIPTV(*m_cid);
+    addChild(iptv);
+
     auto *filters = new ChannelOptionsFilters(*m_cid);
     addChild(filters);
 

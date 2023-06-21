@@ -373,7 +373,7 @@ void SearchView::updateTracksList(void)
             case 5: // tags
             {
                 //TODO add tag query.  Remove fallthrough once added.
-                [[clang::fallthrough]];
+                [[fallthrough]];
             }
             case 0: // all fields
             default:

@@ -1,5 +1,4 @@
-<app-backend-warning></app-backend-warning>
-<div class="block card w-full">
+<p-card class="m-5">
     <h2>{{ 'settings.iconnections.title' | translate }}</h2>
     <p-accordion class="col-12 w-full" (onClose)="onTabClose($event)" (onOpen)="onTabOpen($event)">
         <p-accordionTab *ngFor="let card of m_CaptureCardsFiltered; index as ix; first as isFirst"
@@ -7,10 +6,10 @@
             <ng-template pTemplate="header">
                 <div class="grid  w-full" *ngIf="readyCount > 1">
                     <div class="col-9 pr-1">
-                        {{m_CaptureCardsFiltered[ix].CardType}}
-                        {{m_CaptureCardsFiltered[ix].VideoDevice}}
-                        ({{m_CaptureCardsFiltered[ix].DisplayName}})
-                        =&gt; {{videoSourceLookup[m_CaptureCardsFiltered[ix].SourceId].SourceName}}
+                        {{card.CardType}}
+                        {{card.VideoDevice}}
+                        ({{card.DisplayName}})
+                        =&gt; {{videoSourceLookup[card.SourceId].SourceName}}
                         <b>&nbsp;{{ dirtyMessages[ix] }}</b>
                     </div>
                 </div>
@@ -22,4 +21,14 @@
             </ng-template>
         </p-accordionTab>
     </p-accordion>
-</div>
+
+    <div class="flex justify-content-end">
+        <p-button class="p-3" label="{{ 'common.back' | translate }}"
+            (onClick)="router.navigate(['setupwizard/video-sources'])" icon="pi pi-angle-left"
+            iconPos="left"></p-button>
+
+        <p-button class="p-3" label="{{ 'common.next' | translate }}"
+            (onClick)="router.navigate(['setupwizard/channel-editor'])" icon="pi pi-angle-right" iconPos="right"></p-button>
+    </div>
+
+</p-card>

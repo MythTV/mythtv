@@ -290,7 +290,7 @@ class DBDataWrite( DBData ):
     def _sanitize(self, data, fill=True):
         """Remove fields from dictionary that are not in database table."""
         data = data.copy()
-        for key in data.keys():
+        for key in list(data.keys()):
             if key not in self._field_order:
                 del data[key]
         for key in self._defaults:

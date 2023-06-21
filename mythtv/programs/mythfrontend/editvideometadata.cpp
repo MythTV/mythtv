@@ -374,7 +374,7 @@ void EditMetadataDialog::fillWidgets()
         {
             title = md->GetTitle();
         }
-        tc.push_back(std::make_pair(md->GetID(), title));
+        tc.emplace_back(md->GetID(), title);
     }
     std::sort(tc.begin(), tc.end(), title_sort<title_list::value_type>());
 

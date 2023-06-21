@@ -51,7 +51,7 @@ MBASE_PUBLIC void resetLogging(void);
 MBASE_PUBLIC void logStart(const QString& logfile, bool progress = false,
                            int quiet = 0,
                            int facility = 0, LogLevel_t level = LOG_INFO,
-                           bool dblog = true, bool propagate = false,
+                           bool propagate = false,
                            bool testHarness = false);
 MBASE_PUBLIC void logStop(void);
 MBASE_PUBLIC void logPropagateCalc(void);

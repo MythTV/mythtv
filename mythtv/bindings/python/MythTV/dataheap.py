@@ -15,18 +15,25 @@ from MythTV.utility import CMPRecord, CMPVideo, MARKUPLIST, datetime, ParseSet
 import re
 import locale
 import xml.etree.ElementTree as etree
+from collections import UserString
 from datetime import date, time
 
 _default_datetime = datetime(1900,1,1, tzinfo=datetime.UTCTZ())
 
 
-class Artwork( str ):
+class Artwork( UserString ):
+    """A mutable string implementation for Artwork."""
+
     _types = {'coverart':   'Coverart',
               'coverfile':  'Coverart',
               'fanart':     'Fanart',
               'banner':     'Banners',
               'screenshot': 'ScreenShots',
               'trailer':    'Trailers'}
+
+    # We inherit object.__hash__, so we must deny this explicitly
+    # to prevent the usage as key in dicts
+    __hash__ = None
 
     @property
     def data(self):
@@ -60,10 +67,7 @@ class Artwork( str ):
             # return a dumb string
             return str.__new__(str, attr)
         else:
-            try:
-                return super(Artwork, cls).__new__(cls, attr, parent, imagetype)
-            except TypeError:
-                return super(Artwork, cls).__new__(cls, attr)
+            return super(Artwork, cls).__new__(cls)
 
     def __init__(self, attr, parent=None, imagetype=None):
         self.attr = attr
@@ -88,6 +92,18 @@ class Artwork( str ):
 
     def __delete__(self, inst):
         inst[self.attr] = inst._defaults.get(self.attr, "")
+
+    def __setitem__(self, index, sub):
+        if index < 0:
+            index += len(self.data)
+        if index < 0 or index >= len(self.data): raise IndexError
+        self.data = self.data[:index] + sub + self.data[index+1:]
+
+    def __delitem__(self, index):
+        if index < 0:
+            index += len(self.data)
+        if index < 0 or index >= len(self.data): raise IndexError
+        self.data = self.data[:index] + self.data[index+1:]
 
     @property
     def exists(self):
@@ -295,6 +311,14 @@ class Recorded( CMPRecord, DBDataWrite ):
         _ref = ['chanid','starttime']
         _cref = ['person']
 
+    class _Role(DBDataWrite):
+        _table = 'roles'
+        _key = ['name']
+
+    class _InverseRole(DBData):
+        _table = 'roles'
+        _key = ['roleid']
+
     class _Seek( DBDataRef, MARKUP ):
         _table = 'recordedseek'
         _ref = ['chanid','starttime']
@@ -469,21 +493,68 @@ class Recorded( CMPRecord, DBDataWrite ):
                 self[tagt] = metadata[tagf]
 
         # pull cast
-        trans = {'Author':'writer'}
+        if overwrite:
+            self.cast.clean()
+
+        trans = {'Author': 'writer'}
+        prio = 0
         for cast in metadata.people:
-            self.cast.append(str(cast.name),
-                             str(trans.get(cast.job,
-                                        cast.job.lower().replace(' ','_'))))
+            # priority starts with '1', zero is reserved
+            prio += 1
+            # use or create an entry in the 'Roles' table if character is given:
+            if hasattr(cast, "character"):
+                try:
+                    char = self._Role(cast.character, self._db)
+                    roleid = char.roleid
+                except MythError:
+                    char = self._Role(db=self._db).create({'name': cast.character})
+                    char.update()
+                    roleid = char.roleid
+                priority = prio
+            else:
+                roleid = 0
+                priority = 0
+
+            role = str(trans.get(cast.job, cast.job.lower().replace(' ', '_')))
+            # this avoids unnecessary commits of the same data:
+            if not hasattr(CAST_ROLES, role.upper()):
+                role = ''
+
+            # check if cast exists, update it
+            cast_item = None
+            for item in [x for x in list(self.cast) if cast.name == x.name]:
+                # this supports actors playing multiple characters:
+                if item.role == role and item.roleid in [0, roleid]:
+                    cast_item = item
+                    break
+
+            # only overwrite if 'roleid' needs an update
+            if cast_item:
+                if cast_item.roleid != roleid:
+                    self.cast.delete(*cast_item.values())
+                else:
+                    continue
+            self.cast.append(str(cast.name), role, priority, roleid)
 
         # pull images
+        founddict = { 'banner'  : False,
+                      'coverart': False,
+                      'fanart'  : False }
+
         for image in metadata.images:
             if not hasattr(self.artwork, image.type):
-                pass
-            if getattr(self.artwork, image.type, ''):
                 continue
-            setattr(self.artwork, image.type, image.filename)
+            # use only the first valid artwork when overwriting:
+            if (overwrite or not getattr(self.artwork, image.type, '')) \
+                    and not founddict[image.type]:
+                founddict[image.type] = True
+            else:
+                continue
+            filename = "%s_%s" % (self.inetref.replace('.', '_'), image.filename)
+            setattr(self.artwork, image.type, filename)
             getattr(self.artwork, image.type).downloadFrom(image.url)
 
+        self.artwork.update()
         self.update()
 
     def exportMetadata(self):
@@ -509,16 +580,37 @@ class Recorded( CMPRecord, DBDataWrite ):
                 metadata[tagt] = self[tagf]
 
         # pull cast
-        for member in self.cast:
-            name = member.name
-            role = ' '.join([word.capitalize() for word in member.role.split('_')])
-            if role=='Writer': role = 'Author'
-            metadata.people.append(OrdDict((('name',name), ('job',role))))
+        # sort cast according given priority, add character if available
+        prio_list = []
+        tmp_list = [x for x in self.cast if x.priority > 0]
+        tmp_list.sort(key=lambda k: (k.role, k.priority))
+        prio_list.extend(tmp_list)
+        tmp_list = [x for x in self.cast if x.priority == 0]
+        tmp_list.sort(key=lambda k: (k.role, k.name))
+        prio_list.extend(tmp_list)
 
-#        for arttype in ['coverart', 'fanart', 'banner']:
-#            art = getattr(self.artwork, arttype)
-#            if art:
-#                metadata.images.append(OrdDict((('type',arttype), ('filename',art))))
+        for pitem in prio_list:
+            character = None
+            name = pitem.name
+            if pitem.roleid:
+                character = self._InverseRole(pitem.roleid, self._db).name
+            role = ' '.join([word.capitalize() for word in pitem.role.split('_')])
+            if role == 'Writer': role = 'Author'
+            if character:
+                metadata.people.append(OrdDict((('name', name), ('job', role),
+                                                ('character', character))))
+            else:
+                metadata.people.append(OrdDict((('name', name), ('job', role))))
+
+        # pull artworks
+        for arttype in ['coverart', 'fanart', 'banner']:
+            art = getattr(self.artwork, arttype)
+            if art:
+                # process URI (myth://<group>@<host>[:<port>]/<path/to/file>)
+                # should we use for hostname 'art.hostname' or 'localhost'?
+                url = "myth://%s@%s/%s" % (art.imagetype, art.hostname, str(art))
+                metadata.images.append \
+                    (OrdDict((('type', arttype), ('filename', str(art)), ('url', url))))
 
         return metadata
 
@@ -1148,10 +1240,14 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
             metadata.countries.append(country.country)
 
         # pull images
-#        for arttype in ['coverart', 'fanart', 'banner', 'screenshot']:
-#            art = getattr(self, arttype)
-#            if art:
-#                metadata.images.append(OrdDict((('type',arttype), ('filename',art))))
+        for arttype in ['coverart', 'fanart', 'banner', 'screenshot']:
+            art = getattr(self, arttype)
+            if art:
+                # process URI (myth://<group>@<host>[:<port>]/<path/to/file>)
+                # should we use for hostname 'art.hostname' or 'localhost'?
+                url = "myth://%s@%s/%s" % (art.imagetype, art.hostname, str(art))
+                metadata.images.append \
+                    (OrdDict((('type', arttype), ('filename', str(art)), ('url', url))))
 
         return metadata
 
@@ -1217,6 +1313,67 @@ class VideoGrabber( Grabber ):
         except KeyError:
             raise MythError('Invalid MythVideo grabber')
         self.append('-l',lang)
+
+
+class InetrefGrabber( Grabber ):
+    """
+    InetrefGrabber(inetref, lang='en', db=None) -> Grabber object
+            'inetref' holds the grabber name and the id
+    """
+    logmodule = 'Python Inetref Grabber'
+
+    cls = VideoMetadata
+
+    def __init__(self, inetref, season=None, episode=None, lang='en', db=None):
+        self.grabber = inetref.split('_')[0]
+        try:
+            self.iref = inetref.split('_')[1]
+        except IndexError as e:
+            raise MythError("MythTV interef error: '%s' !" % inetref)
+
+        self.season = season
+        self.episode = episode
+        relative_paths = ['share/mythtv/metadata/Movie',
+                          'share/mythtv/metadata/Television']
+        prefix = None
+        for path in relative_paths:
+            long_path = os.path.join(INSTALL_PREFIX, path)
+            grabber_path = os.path.join(long_path, self.grabber)
+            if os.path.isfile(grabber_path):
+                prefix = long_path
+                break
+        if not prefix:
+            raise MythError("Invalid MythTV grabber prefix!")
+        else:
+            try:
+                Grabber.__init__(self, setting=None, db=db, path=self.grabber, prefix=prefix)
+            except KeyError:
+                raise MythError('Invalid MythTV grabber')
+            self.append('-l', lang)
+
+    def grabMetadata(self, search_collection=False):
+        """
+        obj.grabMetadata(search_collection=False/True)  -> metadata object
+
+            Returns a direct search for a specific movie or episode based on
+            the 'inetref' entry.
+        """
+
+        if (self.season is not None) and (self.episode is not None):
+            args = (self.iref, self.season, self.episode)
+        else:
+            args = (self.iref,)
+
+        if search_collection:
+            mdata = next(self.command('-C', *args))
+        else:
+            mdata = next(self.command('-D', *args))
+
+        # extend inetref with the grabber prefix:
+        if mdata.get('inetref') and mdata.inetref:
+            mdata.inetref = "%s_%s" % (self.grabber, mdata.inetref)
+        return mdata
+
 
 #### MYTHNETVISION ####
 

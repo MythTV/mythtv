@@ -231,6 +231,14 @@ SatIPStreamHandler::SatIPStreamHandler(const QString &device, int inputid)
     m_rtsp = new SatIPRTSP(m_inputId);
 }
 
+SatIPStreamHandler::~SatIPStreamHandler()
+{
+    LOG(VB_RECORD, LOG_DEBUG, LOC +
+        QString("dtor for %2").arg(m_device));
+    delete m_controlReadHelper;
+    delete m_dataReadHelper;
+}
+
 bool SatIPStreamHandler::UpdateFilters(void)
 {
 #ifdef DEBUG_PID_FILTERS
@@ -536,6 +544,8 @@ SatIPDataReadHelper::SatIPDataReadHelper(SatIPStreamHandler* handler)
 SatIPDataReadHelper::~SatIPDataReadHelper()
 {
     LOG(VB_RECORD, LOG_INFO, LOC_DRH + QString("%1").arg(__func__));
+    disconnect(m_socket, &QIODevice::readyRead,
+               this,     &SatIPDataReadHelper::ReadPending);
 }
 
 void SatIPDataReadHelper::ReadPending()
@@ -639,6 +649,13 @@ SatIPControlReadHelper::SatIPControlReadHelper(SatIPStreamHandler *handler)
     // Call ReadPending when there is a message received on m_socket
     connect(m_socket, &QUdpSocket::readyRead,
             this,     &SatIPControlReadHelper::ReadPending);
+}
+
+SatIPControlReadHelper::~SatIPControlReadHelper()
+{
+    LOG(VB_RECORD, LOG_INFO, LOC_CRH + QString("%1").arg(__func__));
+    disconnect(m_socket, &QIODevice::readyRead,
+               this,     &SatIPControlReadHelper::ReadPending);
 }
 
 // Process a RTCP packet received on m_socket

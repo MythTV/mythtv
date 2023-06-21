@@ -1,8 +1,19 @@
 <div class="grid">
     <!-- TODO: Use today or date-->
-    <div class="col-1 datebox">{{ 'primeng.today' | translate }}</div>
-    <div class="col segmentbox">{{ segmentToStartTime(0) }}</div>
+    <div class="col-1 datebox">{{ guide.m_startDate.toLocaleDateString() }}</div>
+    <div class="col segmentbox">
+        <div class="flex">
+            <div class="flex-none cursor-pointer" (click)="pageLeft()">&lt;&lt;</div>
+            <div class="flex-none">&nbsp;{{ segmentToStartTime(0) }}</div>
+        </div>
+    </div>
     <div class="col segmentbox">{{ segmentToStartTime(1) }}</div>
     <div class="col segmentbox">{{ segmentToStartTime(2) }}</div>
-    <div class="col segmentbox">{{ segmentToStartTime(3) }}</div>
+    <div class="col segmentbox">
+        <div class="flex">
+            <div class="flex-none">{{ segmentToStartTime(3) }}</div>
+            <div class="flex-grow-1">&nbsp;</div>
+            <div class="flex-none cursor-pointer" (click)="pageRight()">&gt;&gt;</div>
+        </div>
+    </div>
 </div>

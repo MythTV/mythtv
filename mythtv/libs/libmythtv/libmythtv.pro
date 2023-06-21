@@ -430,9 +430,7 @@ using_frontend {
 
     # Text subtitle parser
     HEADERS += captions/textsubtitleparser.h
-    HEADERS += captions/xine_demux_sputext.h
     SOURCES += captions/textsubtitleparser.cpp
-    SOURCES += captions/xine_demux_sputext.cpp
 
     # A/V decoders
     HEADERS += decoders/decoderbase.h
@@ -756,6 +754,7 @@ using_backend {
     HEADERS += channelscan/channelscanner_gui.h
     HEADERS += channelscan/channelscanner_gui_scan_pane.h
     HEADERS += channelscan/channelscanner_cli.h
+    HEADERS += channelscan/channelscanner_web.h
     HEADERS += channelscan/frequencytablesetting.h
     HEADERS += channelscan/inputselectorsetting.h
     HEADERS += channelscan/channelscanmiscsettings.h
@@ -778,6 +777,7 @@ using_backend {
     SOURCES += channelscan/channelscanner_gui.cpp
     SOURCES += channelscan/channelscanner_gui_scan_pane.cpp
     SOURCES += channelscan/channelscanner_cli.cpp
+    SOURCES += channelscan/channelscanner_web.cpp
     SOURCES += channelscan/frequencytablesetting.cpp
     SOURCES += channelscan/inputselectorsetting.cpp
     SOURCES += channelscan/multiplexsetting.cpp
@@ -958,6 +958,10 @@ using_backend {
         SOURCES += recorders/hdhrchannel.cpp
         SOURCES += recorders/hdhrrecorder.cpp
         SOURCES += recorders/hdhrstreamhandler.cpp
+
+        # HDHomeRun channel list import
+        HEADERS += channelscan/hdhrchannelfetcher.h
+        SOURCES += channelscan/hdhrchannelfetcher.cpp
 
         HEADERS *= recorders/streamhandler.h
         SOURCES *= recorders/streamhandler.cpp

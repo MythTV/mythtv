@@ -1072,8 +1072,6 @@ static bool shortTermRefPicSet(BitReader& br, int stRPSIdx,
 
     if (inter_ref_pic_set_prediction_flag)
     {
-        int16_t  deltaRPS = 0;
-
         /*
           delta_idx_minus1 plus 1 specifies the difference between the
           value of stRPSIdx and the index, into the list of the
@@ -1089,10 +1087,12 @@ static bool shortTermRefPicSet(BitReader& br, int stRPSIdx,
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 QString("Invalid delta_idx_minus1? %1").arg(delta_idx_minus1));
 
-        br.get_bits(1); // delta_rps_sign; u(1)
-        if (br.get_ue_golomb() > 32767) // abs_delta_rps_minus1;  ue(v)
+        int8_t delta_rps_sign = br.get_bits(1); // u(1)
+        int abs_delta_rps_minus1 = br.get_ue_golomb();  // ue(v)
+        if (abs_delta_rps_minus1 > 32767)
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 QString("Invalid abs_delta_rps_minus1"));
+        int deltaRPS = ( 1 - 2 * delta_rps_sign ) * ( abs_delta_rps_minus1 + 1 );
 
         /*
           The variable RefRPSIdx is derived as follows:

@@ -1,3 +1,4 @@
+<h2>{{ 'dashboard.backendStatus' | translate }} </h2>
 <div *ngIf="(m_status$ | async)?.BackendStatus as st; else loading">
     <app-status-encoders [encoders]="st.Encoders"></app-status-encoders>
     <app-status-scheduled [scheduled]="st.Scheduled"></app-status-scheduled>

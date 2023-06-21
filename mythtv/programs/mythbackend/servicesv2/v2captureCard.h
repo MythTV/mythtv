@@ -14,6 +14,7 @@
 #include <QString>
 
 #include "libmythbase/http/mythhttpservice.h"
+#include "libmythtv/cardutil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -180,10 +181,8 @@ class V2CaptureDevice : public QObject
 
         Q_INVOKABLE V2CaptureDevice(QObject *parent = nullptr)
             : QObject          ( parent ),
-              m_TunerNumber    ( 0      ),
               m_SignalTimeout  ( 1000   ),
-              m_ChannelTimeout ( 3000   ),
-              m_TuningDelay    ( 0 )
+              m_ChannelTimeout ( 3000   )
         {
         }
 
@@ -305,6 +304,28 @@ class V2DiseqcConfig : public QObject
 
 Q_DECLARE_METATYPE(V2DiseqcConfig*)
 
+class V2CardSubType :public QObject
+{
+    Q_OBJECT
+    Q_CLASSINFO( "Version"    , "1.0" );
 
+    SERVICE_PROPERTY2( uint                   ,   CardId )
+    SERVICE_PROPERTY2( QString                ,   SubType )
+    SERVICE_PROPERTY2( QString                ,   InputType )
+    SERVICE_PROPERTY2( bool                   ,   HDHRdoesDVBC )
+    SERVICE_PROPERTY2( bool                   ,   HDHRdoesDVB )
+
+    public:
+
+        Q_INVOKABLE V2CardSubType(QObject *parent = nullptr)
+            :   QObject      ( parent )
+        {
+        }
+
+    private:
+        Q_DISABLE_COPY(V2CardSubType);
+};
+
+Q_DECLARE_METATYPE(V2CardSubType*)
 
 #endif

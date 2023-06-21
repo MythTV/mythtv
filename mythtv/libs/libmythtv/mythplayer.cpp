@@ -82,6 +82,8 @@ const double MythPlayer::kSeekToEndOffset = 1.0;
 MythPlayer::MythPlayer(PlayerContext* Context, PlayerFlags Flags)
   : m_playerCtx(Context),
     m_playerFlags(Flags),
+    //AV subtitles
+    m_subReader(this),
     // CC608/708
     m_cc608(this), m_cc708(this),
     // Audio
@@ -1664,6 +1666,8 @@ void MythPlayer::WaitForSeek(uint64_t frame, uint64_t seeksnap_wanted)
     }
     if (needclear)
         emit SeekingComplete();
+
+    emit SeekingDone();
 }
 
 /** \fn MythPlayer::ClearAfterSeek(bool)

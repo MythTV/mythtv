@@ -101,7 +101,6 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
         cls._LOGFILE = stdout
         cls._logwrite = cls._logfile
         cls._QUIET = 0
-        cls._DBLOG = False
         cls._SYSLOG = None
         cls._JOURNALLOG = False
         cls._lock = allocate_lock()
@@ -117,10 +116,6 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
                 arg = next(args)
                 if arg == '--quiet':
                     cls._QUIET += 1
-                elif arg == '--nodblog':
-                    cls._DBLOG = False
-                elif arg == '--enable-dblog':
-                    cls._DBLOG = True
                 elif arg == '--loglevel':
                     cls._setlevel(next(args))
                 elif arg == '--verbose':
@@ -152,8 +147,6 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
         n = 0
         if opts.quiet:
             cls._QUIET = opts.quiet
-        if opts.dblog:
-            cls._DBLOG = True
         if opts.loglevel:
             cls._setlevel(opts.loglevel)
         if opts.verbose:
@@ -181,8 +174,6 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
         n = 0
         if opts.quiet:
             cls._QUIET = opts.quiet
-        if opts.dblog:
-            cls._DBLOG = True
         if opts.loglevel:
             cls._setlevel(opts.loglevel)
         if opts.verbose:
@@ -209,10 +200,6 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
         cls._parseinput = cls._optparseinput
         parser.add_option('--quiet', action="count", dest="quiet",
             help="Run quiet. One use squelches terminal, two stops all logging.")
-        parser.add_option('--nodblog', action="store_true", dest="nodblog",
-            help="Prevent logging to the database (legacy: disabled by default).")
-        parser.add_option('--enable-dblog', action="store_true", dest="dblog",
-            help="Enable logging to the database.")
         parser.add_option('--loglevel', type="string", action="store", dest="loglevel",
             help="Specify log verbosity, using standard syslog levels.")
         parser.add_option('--verbose', type="string", action="store", dest="verbose",
@@ -241,10 +228,6 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
         cls._parseinput = cls._argparseinput
         parser.add_argument('--quiet', action=Count, nargs=0, dest="quiet",
             help="Run quiet. One use squelches terminal, two stops all logging.")
-        parser.add_argument('--nodblog', action="store_true", dest="nodblog",
-            help="Prevent logging to the database (legacy: disabled by default).")
-        parser.add_argument('--enable-dblog', action="store_true", dest="dblog",
-            help="Enable logging to the database.")
         parser.add_argument('--loglevel', action="store", dest="loglevel",
             help="Specify log verbosity, using standard syslog levels.")
         parser.add_argument('--verbose', action="store", dest="verbose",
@@ -441,7 +424,6 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
 
         with self._lock:
             self._logwrite(mask, level, message, detail)
-        self._logdatabase(mask, level, message, detail)
 
     def _logfile(self, mask, level, message, detail):
         if self._QUIET and (self._LOGFILE == stdout):
@@ -489,21 +471,6 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
             application = application.rsplit('/', 1)[1]
         msg = ("[{0}]: {1}{2}".format(self.module, message, detail))
         journal.send(msg, PRIORITY=level, SYSLOG_IDENTIFIER=application )
-
-    def _logdatabase(self, mask, level, message, detail):
-        if self.db and self._DBLOG:
-            with self.db.cursor(DummyLogger()) as cursor:
-                application = argv[0]
-                if '/' in application:
-                    application = application.rsplit('/', 1)[1]
-
-                cursor.execute("""INSERT INTO logging
-                                    (host, application, pid, thread,
-                                     msgtime, level, message)
-                                  VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                    (self.db.gethostname(), application,
-                     os.getpid(), self.module, self.time(), level,
-                     message + (' -- {0}'.format(detail) if detail else '')))
 
     def __call__(self, mask, level, message, detail=None):
         self.log(mask, level, message, detail)

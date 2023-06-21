@@ -107,11 +107,6 @@ LogScale::LogScale(int maxscale, int maxrange)
     setMax(maxscale, maxrange);
 }
 
-LogScale::~LogScale()
-{
-    delete [] m_indices;
-}
-
 void LogScale::setMax(int maxscale, int maxrange)
 {
     if (maxscale == 0 || maxrange == 0)
@@ -120,17 +115,14 @@ void LogScale::setMax(int maxscale, int maxrange)
     m_s = maxscale;
     m_r = maxrange;
 
-    delete [] m_indices;
-
     auto domain = (long double) maxscale;
     auto range  = (long double) maxrange;
     long double x  = 1.0;
     long double dx = 1.0;
     long double e4 = 1.0E-8;
 
-    m_indices = new int[maxrange];
-    for (int i = 0; i < maxrange; i++)
-        m_indices[i] = 0;
+    m_indices.clear();
+    m_indices.resize(maxrange, 0);
 
     // initialize log scale
     for (uint i=0; i<10000 && (std::abs(dx) > e4); i++)
@@ -655,13 +647,13 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
             short int val = node->m_left[i];
             if (val > m_maxl) m_maxl = val;
             if (val < m_minl) m_minl = val;
-            m_sqrl += val * val;
+            m_sqrl += static_cast<long>(val) * static_cast<long>(val);
             if (m_right)
             {
                 val = node->m_right[i];
                 if (val > m_maxr) m_maxr = val;
                 if (val < m_minr) m_minr = val;
-                m_sqrr += val * val;
+                m_sqrr += static_cast<long>(val) * static_cast<long>(val);
             }
             m_position++;
         }

@@ -93,11 +93,11 @@ int AudioInputALSA::GetSamples(void* buf, uint nbytes)
             if (!recov)
                 break;
         }
-        [[clang::fallthrough]];
+        [[fallthrough]];
         case SND_PCM_STATE_PREPARED:
             if (AlsaBad(snd_pcm_start(m_pcmHandle), "pcm start failed"))
                  break;
-            [[clang::fallthrough]];
+            [[fallthrough]];
         case SND_PCM_STATE_RUNNING:
             bytes_read = PcmRead(buf, nbytes);
             break;
@@ -311,7 +311,7 @@ bool AudioInputALSA::Recovery(int err)
 #if ESTRPIPE != EPIPE
         case -ESTRPIPE:
             suspense = true;
-            [[clang::fallthrough]];
+            [[fallthrough]];
 #endif
         case -EPIPE:
         {

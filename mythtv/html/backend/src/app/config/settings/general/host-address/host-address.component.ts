@@ -25,7 +25,11 @@ export class HostAddressComponent implements OnInit, AfterViewInit {
         private configService: ConfigService) {
 
         this.m_HostAddressData = this.setupService.getHostAddressData();
-        configService.GetIPAddresses("All").subscribe(result => this.m_IPsAll = result.IPAddresses);
+        // Set this for 500 msgit log later to avoid messages that value changed after checked
+        // (pristine) and also avoid form being set as dirty.
+        setTimeout(() =>
+            configService.GetIPAddresses("All").subscribe(result => this.m_IPsAll = result.IPAddresses)
+            , 500)
         configService.GetIPAddresses("IPv4").subscribe(result => this.m_IPsV4 = result.IPAddresses);
         configService.GetIPAddresses("IPv6").subscribe(result => this.m_IPsV6 = result.IPAddresses);
     }

@@ -1046,7 +1046,7 @@ V2MarkupList* V2Dvr::GetRecordedMarkup ( int RecordedId )
         else
             pMarkup->setData(QString::number(entry.data));
     }
-    for (auto entry : qAsConst(mapSeek))
+    for (const auto& entry : qAsConst(mapSeek))
     {
         V2Markup *pSeek = pMarkupList->AddNewSeek();
         QString typestr = toString(static_cast<MarkTypes>(entry.type));
@@ -2214,7 +2214,8 @@ bool V2Dvr::UpdateRecordedMetadata ( uint             RecordedId,
 
     if (HAS_PARAMv2("OriginalAirDate"))
     {
-        if (!OriginalAirDate.isValid())
+        // OriginalAirDate can be set to null by submitting value 'null' in json
+        if (!OriginalAirDate.isValid() && !OriginalAirDate.isNull())
         {
             LOG(VB_GENERAL, LOG_ERR, "Need valid OriginalAirDate yyyy-mm-dd.");
             return false;

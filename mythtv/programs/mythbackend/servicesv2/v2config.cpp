@@ -21,6 +21,9 @@
 #include "v2databaseStatus.h"
 #include "v2languageList.h"
 
+// Only endpoints that don't require a fully configured mythbackend (eg a new
+// setup with no database or tuners for example) should be put here.
+
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
     (CONFIG_HANDLE, V2Config::staticMetaObject, &V2Config::RegisterCustomTypes))
@@ -46,7 +49,10 @@ V2Config::V2Config()
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-bool V2Config::SetDatabaseCredentials(const QString &Host, const QString &UserName, const QString &Password, const QString &Name, int Port, bool DoTest)
+bool V2Config::SetDatabaseCredentials(const QString &Host, const QString &UserName,
+    const QString &Password, const QString &Name, int Port, bool DoTest,
+    bool  LocalEnabled, const QString &LocalHostName, bool WOLEnabled,
+    int WOLReconnect, int WOLRetry, const QString  &WOLCommand)
 {
     bool bResult = false;
 
@@ -60,7 +66,7 @@ bool V2Config::SetDatabaseCredentials(const QString &Host, const QString &UserNa
         port = Port;
 
     if (DoTest && !TestDatabase(Host, UserName, Password, db, port))
-        throw( QString( "Database test failed. Not saving database connection information." ));
+        return false;
 
     DatabaseParams dbparms;
     dbparms.m_dbName = db;
@@ -68,14 +74,19 @@ bool V2Config::SetDatabaseCredentials(const QString &Host, const QString &UserNa
     dbparms.m_dbPassword = Password;
     dbparms.m_dbHostName = Host;
     dbparms.m_dbPort = port;
-
-    // Just use some sane defaults for these values
-    dbparms.m_wolEnabled = false;
-    dbparms.m_wolReconnect = 1s;
-    dbparms.m_wolRetry = 3;
-    dbparms.m_wolCommand = QString();
-
-    bResult = gContext->SaveDatabaseParams(dbparms);
+    dbparms.m_localEnabled = LocalEnabled;
+    if (LocalEnabled)
+        dbparms.m_localHostName = LocalHostName;
+    else
+        dbparms.m_localHostName = "my-unique-identifier-goes-here";
+    dbparms.m_wolEnabled = WOLEnabled;
+    dbparms.m_wolReconnect = std::chrono::seconds(WOLReconnect);
+    dbparms.m_wolRetry = WOLRetry;
+    dbparms.m_wolCommand = WOLCommand;
+    // We need the force parameter set to true here, otherwise if you accept the
+    // default values, it does not save the file and theus does not create
+    // config.xml.
+    bResult = gContext->SaveDatabaseParams(dbparms, true);
 
     return bResult;
 }
@@ -98,6 +109,10 @@ V2DatabaseStatus* V2Config::GetDatabaseStatus()
     pInfo->setType(params.m_dbType);
     pInfo->setLocalEnabled(params.m_localEnabled);
     pInfo->setLocalHostName(params.m_localHostName);
+    pInfo->setWOLEnabled(params.m_wolEnabled);
+    pInfo->setWOLReconnect(params.m_wolReconnect.count());
+    pInfo->setWOLRetry(params.m_wolRetry);
+    pInfo->setWOLCommand(params.m_wolCommand);
 
     // are we connected to the database?
     bool connected = TestDatabase(params.m_dbHostName, params.m_dbUserName, params.m_dbPassword, params.m_dbName, params.m_dbPort);

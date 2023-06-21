@@ -1012,8 +1012,7 @@ void VideoListImp::buildFsysList()
     }
     else
     {
-        node_paths.push_back(
-            node_to_path_list::value_type(QObject::tr("videos"), dirs[0]));
+        node_paths.emplace_back(QObject::tr("videos"), dirs[0]);
     }
 
     //
@@ -1162,7 +1161,7 @@ class dirhandler : public DirectoryHandler
         DirectoryHandler *dh = new dirhandler(dir, m_prefix, m_metalist,
                                               m_dhFreeList,
                                               m_inferTitle);
-        m_dhFreeList.push_back(dh);
+        m_dhFreeList.emplace_back(dh);
         return dh;
     }
 

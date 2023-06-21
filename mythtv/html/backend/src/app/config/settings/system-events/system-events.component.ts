@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { ConfigService } from 'src/app/services/config.service';
@@ -18,6 +19,7 @@ export class SystemEventsComponent implements OnInit {
   @ViewChild("eventsform") currentForm!: NgForm;
   eventList!: SystemEventList;
 
+  hostName = '';
   events: SystemEvent[] = [];
 
   successCount = 0;
@@ -30,11 +32,18 @@ export class SystemEventsComponent implements OnInit {
   kClearSettingValue = "<clear_setting_value>";
 
   constructor(private configService: ConfigService, private translate: TranslateService,
-    public setupService: SetupService, private mythService: MythService) {
-    this.configService.GetSystemEvents().subscribe(data => {
-      this.eventList = data;
-      this.events = data.SystemEventList.SystemEvents;
-    });
+    public setupService: SetupService, private mythService: MythService, public router: Router) {
+    this.mythService.GetHostName().subscribe({
+      next: data => {
+        this.hostName = data.String;
+        this.configService.GetSystemEvents().subscribe(data => {
+          this.eventList = data;
+          this.events = data.SystemEventList.SystemEvents;
+        });
+      },
+      error: () => this.errorCount++
+    })
+
     this.translate.get(this.warningText).subscribe(data => {
       this.warningText = data
     });
@@ -65,19 +74,19 @@ export class SystemEventsComponent implements OnInit {
     this.successCount = 0;
     this.errorCount = 0;
     this.expectedCount = 0;
-    const hostName = this.setupService.getHostName();
+    // const hostName = this.setupService.getHostName();
 
     this.events.forEach(entry => {
       let value = entry.Value.trim();
       if (value)
         // value = this.kClearSettingValue;
         this.mythService.PutSetting({
-          HostName: hostName, Key: entry.Key,
+          HostName: this.hostName, Key: entry.Key,
           Value: value
         }).subscribe(this.jqbObserver);
       else
         this.mythService.DeleteSetting({
-          HostName: hostName, Key: entry.Key
+          HostName: this.hostName, Key: entry.Key
         }).subscribe(this.jqbObserver);
       this.expectedCount++;
     });

@@ -27,9 +27,6 @@ win32-msvc* {
   include ( config.mak )
 }
 
-contains(QT_MAJOR_VERSION, 6) {
-QT += core5compat
-}
 CONFIG += $$CCONFIG
 CONFIG += c++17
 CONFIG += no_qt_rpath

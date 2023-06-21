@@ -3931,6 +3931,27 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1376")
+    {
+        DBUpdates updates {
+            "DROP TABLE IF EXISTS `logging`;",
+            "UPDATE settings SET data='0' WHERE value='LogEnabled'; ",   // Keeps MythWeb happy
+        };
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1377", dbver))
+            return false;
+    }
+
+    if (dbver == "1377")
+    {
+        DBUpdates updates {
+            "DELETE FROM settings WHERE value='SubtitleCodec'; ",
+        };
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1378", dbver))
+            return false;
+    }
+
     return true;
 }
 

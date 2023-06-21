@@ -107,7 +107,10 @@ class MythContextPrivate : public QObject
     bool LoadDatabaseSettings(void);
     bool SaveDatabaseParams(const DatabaseParams &params, bool force);
 
-    bool    PromptForDatabaseParams(const QString &error);
+    // No longer prompt for database, instaed allow the
+    // web server to start so that the datbase can be
+    // set up there
+    // bool    PromptForDatabaseParams(const QString &error);
     QString TestDBconnection(bool prompt=true);
     void    SilenceDBerrors(void);
     void    EnableDBerrors(void);
@@ -511,8 +514,11 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
 
         if (!manualSelect)
         {
-            if (!PromptForDatabaseParams(failure))
-                goto NoDBfound;
+            // No longer prompt for database, instaed allow the
+            // web server to start so that the datbase can be
+            // set up there
+            // if (!PromptForDatabaseParams(failure))
+            goto NoDBfound;
         }
         failure = TestDBconnection();
         if (!failure.isEmpty())
@@ -701,93 +707,97 @@ void MythContextSlotHandler::OnCloseDialog(void)
 }
 
 
-bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
-{
-    bool accepted = false;
-    if (m_gui)
-    {
-        TempMainWindow();
+// No longer prompt for database, instaed allow the
+// web server to start so that the datbase can be
+// set up there
 
-        // Tell the user what went wrong:
-        if (!error.isEmpty())
-            ShowOkPopup(error);
+// bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
+// {
+//     bool accepted = false;
+//     if (m_gui)
+//     {
+//         TempMainWindow();
 
-        // ask user for database parameters
+//         // Tell the user what went wrong:
+//         if (!error.isEmpty())
+//             ShowOkPopup(error);
 
-        EnableDBerrors();
-        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        auto *dbsetting = new DatabaseSettings();
-        auto *ssd = new StandardSettingDialog(mainStack, "databasesettings",
-                                              dbsetting);
-        if (ssd->Create())
-        {
-            mainStack->AddScreen(ssd);
-            connect(dbsetting, &DatabaseSettings::isClosing,
-                m_sh, &MythContextSlotHandler::OnCloseDialog);
-            if (!m_loop->isRunning())
-                m_loop->exec();
-        }
-        else
-            delete ssd;
-        SilenceDBerrors();
-        EndTempWindow();
-        accepted = true;
-    }
-    else
-    {
-        DatabaseParams params = m_dbParams;
-        QString        response;
-        std::this_thread::sleep_for(1s);
-        // give user chance to skip config
-        std::cout << std::endl << error.toLocal8Bit().constData() << std::endl << std::endl;
-        response = getResponse("Would you like to configure the database "
-                               "connection now?",
-                               "no");
-        if (!response.startsWith('y', Qt::CaseInsensitive))
-            return false;
+//         // ask user for database parameters
 
-        params.m_dbHostName = getResponse("Database host name:",
-                                          params.m_dbHostName);
-        response = getResponse("Should I test connectivity to this host "
-                               "using the ping command?", "yes");
-        params.m_dbHostPing = response.startsWith('y', Qt::CaseInsensitive);
+//         EnableDBerrors();
+//         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+//         auto *dbsetting = new DatabaseSettings();
+//         auto *ssd = new StandardSettingDialog(mainStack, "databasesettings",
+//                                               dbsetting);
+//         if (ssd->Create())
+//         {
+//             mainStack->AddScreen(ssd);
+//             connect(dbsetting, &DatabaseSettings::isClosing,
+//                 m_sh, &MythContextSlotHandler::OnCloseDialog);
+//             if (!m_loop->isRunning())
+//                 m_loop->exec();
+//         }
+//         else
+//             delete ssd;
+//         SilenceDBerrors();
+//         EndTempWindow();
+//         accepted = true;
+//     }
+//     else
+//     {
+//         DatabaseParams params = m_dbParams;
+//         QString        response;
+//         std::this_thread::sleep_for(1s);
+//         // give user chance to skip config
+//         std::cout << std::endl << error.toLocal8Bit().constData() << std::endl << std::endl;
+//         response = getResponse("Would you like to configure the database "
+//                                "connection now?",
+//                                "no");
+//         if (!response.startsWith('y', Qt::CaseInsensitive))
+//             return false;
 
-        params.m_dbPort     = intResponse("Database non-default port:",
-                                          params.m_dbPort);
-        params.m_dbName     = getResponse("Database name:",
-                                          params.m_dbName);
-        params.m_dbUserName = getResponse("Database user name:",
-                                          params.m_dbUserName);
-        params.m_dbPassword = getResponse("Database password:",
-                                          params.m_dbPassword);
+//         params.m_dbHostName = getResponse("Database host name:",
+//                                           params.m_dbHostName);
+//         response = getResponse("Should I test connectivity to this host "
+//                                "using the ping command?", "yes");
+//         params.m_dbHostPing = response.startsWith('y', Qt::CaseInsensitive);
 
-        params.m_localHostName = getResponse("Unique identifier for this machine "
-                                             "(if empty, the local host name "
-                                             "will be used):",
-                                             params.m_localHostName);
-        params.m_localEnabled = !params.m_localHostName.isEmpty();
+//         params.m_dbPort     = intResponse("Database non-default port:",
+//                                           params.m_dbPort);
+//         params.m_dbName     = getResponse("Database name:",
+//                                           params.m_dbName);
+//         params.m_dbUserName = getResponse("Database user name:",
+//                                           params.m_dbUserName);
+//         params.m_dbPassword = getResponse("Database password:",
+//                                           params.m_dbPassword);
 
-        response = getResponse("Would you like to use Wake-On-LAN to retry "
-                               "database connections?",
-                               (params.m_wolEnabled ? "yes" : "no"));
-        params.m_wolEnabled = response.startsWith('y', Qt::CaseInsensitive);
+//         params.m_localHostName = getResponse("Unique identifier for this machine "
+//                                              "(if empty, the local host name "
+//                                              "will be used):",
+//                                              params.m_localHostName);
+//         params.m_localEnabled = !params.m_localHostName.isEmpty();
 
-        if (params.m_wolEnabled)
-        {
-            params.m_wolReconnect =
-                std::chrono::seconds(intResponse("Seconds to wait for "
-                                                 "reconnection:",
-                                                 params.m_wolReconnect.count()));
-            params.m_wolRetry     = intResponse("Number of times to retry:",
-                                                params.m_wolRetry);
-            params.m_wolCommand   = getResponse("Command to use to wake server or server MAC address:",
-                                                params.m_wolCommand);
-        }
+//         response = getResponse("Would you like to use Wake-On-LAN to retry "
+//                                "database connections?",
+//                                (params.m_wolEnabled ? "yes" : "no"));
+//         params.m_wolEnabled = response.startsWith('y', Qt::CaseInsensitive);
 
-        accepted = m_parent->SaveDatabaseParams(params);
-    }
-    return accepted;
-}
+//         if (params.m_wolEnabled)
+//         {
+//             params.m_wolReconnect =
+//                 std::chrono::seconds(intResponse("Seconds to wait for "
+//                                                  "reconnection:",
+//                                                  params.m_wolReconnect.count()));
+//             params.m_wolRetry     = intResponse("Number of times to retry:",
+//                                                 params.m_wolRetry);
+//             params.m_wolCommand   = getResponse("Command to use to wake server or server MAC address:",
+//                                                 params.m_wolCommand);
+//         }
+
+//         accepted = m_parent->SaveDatabaseParams(params);
+//     }
+//     return accepted;
+// }
 
 /**
  * Some quick sanity checks before opening a database connection
@@ -906,12 +916,12 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                         break;
                 }
                 startupState = st_dbAwake;
-                [[clang::fallthrough]];
+                [[fallthrough]];
             case st_dbAwake:
                 if (!checkPort(host, port, useTimeout))
                     break;
                 startupState = st_dbStarted;
-                [[clang::fallthrough]];
+                [[fallthrough]];
             case st_dbStarted:
                 // If the database is connecting with link-local
                 // address, it may have changed
@@ -932,7 +942,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                     break;
                 }
                 startupState = st_dbConnects;
-                [[clang::fallthrough]];
+                [[fallthrough]];
             case st_dbConnects:
                 if (m_needsBackend)
                 {
@@ -962,7 +972,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                 backendIP = gCoreContext->GetSettingOnHost
                     ("BackendServerAddr", masterserver);
                 backendPort = MythCoreContext::GetMasterServerPort();
-                [[clang::fallthrough]];
+                [[fallthrough]];
             case st_beWOL:
                 if (!beWOLCmd.isEmpty())
                 {
@@ -972,12 +982,12 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                         break;
                 }
                 startupState = st_beAwake;
-                [[clang::fallthrough]];
+                [[fallthrough]];
             case st_beAwake:
                 if (!checkPort(backendIP, backendPort, useTimeout))
                     break;
                 startupState = st_success;
-                [[clang::fallthrough]];
+                [[fallthrough]];
             case st_success:
                 // Quiet compiler warning.
                 break;
@@ -1696,9 +1706,9 @@ void MythContext::SetDisableEventPopup(bool check)
     d->m_disableeventpopup = check;
 }
 
-bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
+bool MythContext::SaveDatabaseParams(const DatabaseParams &params, bool force)
 {
-    return d->SaveDatabaseParams(params, false);
+    return d->SaveDatabaseParams(params, force);
 }
 
 bool MythContext::saveSettingsCache(void)

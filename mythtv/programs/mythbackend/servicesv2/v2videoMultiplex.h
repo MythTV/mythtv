@@ -38,6 +38,7 @@ class V2VideoMultiplex : public QObject
     SERVICE_PROPERTY2( int        , ServiceVersion   )
     SERVICE_PROPERTY2( QDateTime  , UpdateTimeStamp  )
     SERVICE_PROPERTY2( QString    , DefaultAuthority )
+    SERVICE_PROPERTY2( QString    , Description      )
 
     public:
 
@@ -72,6 +73,7 @@ class V2VideoMultiplex : public QObject
             m_ServiceVersion   = src->m_ServiceVersion   ;
             m_UpdateTimeStamp  = src->m_UpdateTimeStamp  ;
             m_DefaultAuthority = src->m_DefaultAuthority ;
+            m_Description      = src->m_Description      ;
         }
 
     private:

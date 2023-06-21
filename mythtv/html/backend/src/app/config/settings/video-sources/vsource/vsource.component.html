@@ -11,7 +11,7 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="SourceName" class="block">{{ 'settings.vsource.source_label' | translate }}</label>
+                        <label for="SourceName" class="label block">{{ 'settings.vsource.source_label' | translate }}</label>
                         <input pInputText id="SourceName" [(ngModel)]="videoSource.SourceName" name="SourceName"
                             #SourceName="ngModel" class="mb-2 form-control w-full" [disabled]="videoSource.Id>0"
                             (change)="checkName()" [maxlength]="50" />
@@ -26,7 +26,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="Grabber" class="block">
+                        <label for="Grabber" class="label block">
                             {{ 'settings.vsource.grabber_label' | translate }}
                         </label>
                         <p-dropdown *ngIf="grabberList.GrabberList.Grabbers.length > 0"
@@ -40,12 +40,10 @@
                     </div>
 
                     <div class="form-group field" *ngIf="configCommand.length>0">
-                        <label for="configure" class="block">
+                        <label for="configure" class="label block">
                             {{ 'settings.vsource.grabberconfig_label' | translate }}
                         </label>
-                        <p>
-                            {{ 'settings.vsource.grabberconfig_desc' | translate }}
-                        </p>
+                            <p [innerHTML]="'settings.vsource.grabberconfig_desc' | translate"></p>
                         <table>
                             <tr>
                                 <td class="align-items-center bg-blue-100" style="font-family: monospace;">
@@ -62,7 +60,7 @@
 
                     <div class="form-group field">
                         <p-checkbox inputId="UseEIT" [(ngModel)]="videoSource.UseEIT" name="UseEIT" #UseEIT="ngModel"
-                            class="mb-2 w-full" [binary]="true" label="{{ 'settings.vsource.eit_label' | translate }}">
+                            class="label mb-2 w-full" [binary]="true" label="{{ 'settings.vsource.eit_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
                             {{ 'settings.vsource.eit_desc' | translate }}
@@ -70,7 +68,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="FreqTable" class="block">
+                        <label for="FreqTable" class="label block">
                             {{ 'settings.vsource.freqtable_label' | translate }}
                         </label>
                         <p-dropdown *ngIf="freqTableList.FreqTableList.length > 0"
@@ -83,7 +81,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="ScanFrequency" class="block">
+                        <label for="ScanFrequency" class="label block">
                             {{ 'settings.vsource.scanfreq_label' | translate }}
                         </label>
                         <p-inputNumber [(ngModel)]="videoSource.ScanFrequency" name="ScanFrequency" id="ScanFrequency"
@@ -95,7 +93,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="NITId" class="block">
+                        <label for="NITId" class="label block">
                             {{ 'settings.vsource.netid_label' | translate }}
                         </label>
                         <p-inputNumber [(ngModel)]="videoSource.NITId" name="NITId" id="NITId" [showButtons]="true"
@@ -106,7 +104,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="BouquetId" class="block">
+                        <label for="BouquetId" class="label block">
                             {{ 'settings.vsource.bouquet_label' | translate }}
                         </label>
                         <p-inputNumber [(ngModel)]="videoSource.BouquetId" name="BouquetId" id="BouquetId"
@@ -117,7 +115,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="RegionId" class="block">
+                        <label for="RegionId" class="label block">
                             {{ 'settings.vsource.region_label' | translate }}
                         </label>
                         <p-inputNumber [(ngModel)]="videoSource.RegionId" name="RegionId" id="RegionId"
@@ -128,7 +126,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="LCNOffset" class="block">
+                        <label for="LCNOffset" class="label block">
                             {{ 'settings.vsource.lcnoffset_label' | translate }}
                         </label>
                         <p-inputNumber [(ngModel)]="videoSource.LCNOffset" name="LCNOffset" id="LCNOffset"

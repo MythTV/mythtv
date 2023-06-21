@@ -5,6 +5,7 @@ import { Database } from './interfaces/myth.interface';
 import { MythDatabaseStatus, IPAddressList, SystemEventList } from './interfaces/config.interface';
 import { MythCountryList } from './interfaces/country.interface';
 import { MythLanguageList } from './interfaces/language.interface';
+import { BoolResponse } from './interfaces/common.interface';
 
 @Injectable({
     providedIn: 'root'
@@ -17,8 +18,8 @@ export class ConfigService {
         return this.httpClient.get<MythDatabaseStatus>('/Config/GetDatabaseStatus')
     }
 
-    public SetDatabaseCredentials(data: Database): Observable<Database> {
-        return this.httpClient.post<Database>('/Config/SetDatabaseCredentials', data)
+    public SetDatabaseCredentials(data: Database): Observable<BoolResponse> {
+        return this.httpClient.post<BoolResponse>('/Config/SetDatabaseCredentials', data)
     }
     public GetCountries(): Observable<MythCountryList> {
         return this.httpClient.get<MythCountryList>('/Config/GetCountries')

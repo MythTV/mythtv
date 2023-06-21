@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
@@ -43,7 +44,7 @@ export class InputConnectionsComponent implements OnInit {
   // Video Sources Indexed by id
   videoSourceLookup: VideoSource[] = [];
 
-  constructor(private mythService: MythService,
+  constructor(private mythService: MythService, public router: Router,
     private captureCardService: CaptureCardService, private setupService: SetupService,
     private translate: TranslateService, private channelService: ChannelService) {
     this.setupService.setCurrentForm(null);

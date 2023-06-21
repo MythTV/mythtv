@@ -104,6 +104,18 @@ class ChannelDBStorage : public SimpleDBStorage
     const ChannelID& m_id;
 };
 
+class IPTVChannelDBStorage : public SimpleDBStorage
+{
+  public:
+    IPTVChannelDBStorage(StorageUser *_user, const ChannelID &_id, const QString& _name) :
+        SimpleDBStorage(_user, "iptv_channel", _name), m_id(_id) { }
+
+    QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage
+    QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
+
+    const ChannelID& m_id;
+};
+
 class OnAirGuide;
 class XmltvID;
 class Freqid;
@@ -134,6 +146,12 @@ class MTV_PUBLIC ChannelOptionsFilters: public GroupSetting
 {
   public:
     explicit ChannelOptionsFilters(const ChannelID& id);
+};
+
+class MTV_PUBLIC ChannelOptionsIPTV: public GroupSetting
+{
+  public:
+    explicit ChannelOptionsIPTV(const ChannelID& id);
 };
 
 class MTV_PUBLIC ChannelOptionsV4L: public GroupSetting

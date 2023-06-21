@@ -1,6 +1,0 @@
-00:01:10:This is a subtitle.
-00:01:30
-00:02:20:This is a second subtitle.
-00:03:30:This is a third subtitle.
-00:04:40:This is a fourth subtitle.
-00:05:00

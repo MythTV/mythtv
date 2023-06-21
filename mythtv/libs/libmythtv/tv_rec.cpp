@@ -1868,7 +1868,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
 
     // Check if this is an DVB channel
     int progNum = dtvchan->GetProgramNumber();
-    if ((progNum >= 0) && (tuningmode == "dvb") && (m_genOpt.m_inputType != "VBOX"))
+    if ((progNum >= 0) && (tuningmode == "dvb") && CardUtil::IsChannelReusable(m_genOpt.m_inputType))
     {
         int netid   = dtvchan->GetOriginalNetworkID();
         int tsid    = dtvchan->GetTransportID();
@@ -4218,6 +4218,8 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
             gCoreContext->dispatch(me);
         }
         TeardownRecorder(kFlagKillRec);
+        if (m_tvChain)
+            rec = nullptr;
         goto err_ret;
     }
 
@@ -4780,6 +4782,28 @@ TVRec* TVRec::GetTVRec(uint inputid)
     if (it == s_inputs.constEnd())
         return nullptr;
     return *it;
+}
+
+void TVRec::EnableActiveScan(bool enable) {
+    if (m_scanner != nullptr) {
+        if (enable) {
+            if ( ! HasFlags(kFlagEITScannerRunning)
+                && m_eitScanStartTime > MythDate::current().addYears(9))
+                {
+                    auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
+                    m_eitScanStartTime = MythDate::current().addSecs(secs.count());
+                }
+        }
+        else {
+            m_eitScanStartTime = MythDate::current().addYears(10);
+            if (HasFlags(kFlagEITScannerRunning))
+            {
+                m_scanner->StopActiveScan();
+                ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
+            }
+
+        }
+    }
 }
 
 QString TuningRequest::toString(void) const

@@ -1,0 +1,25 @@
+<div class="ml-3 mr-3">
+    <div style="white-space: 'pre-line';">
+        <p-toast position="center"></p-toast>
+    </div>
+    <h2>{{ 'dashboard.upcoming.heading' | translate }}</h2>
+    <div class="block card w-full" *ngIf="recordings else loading">
+        <div class="flex">
+            <p-checkbox inputId="showAllStatuses" [(ngModel)]="showAllStatuses" name="showAllStatuses"
+                #showAll="ngModel" [binary]="true" (onChange)="refresh()"
+                label="{{ 'dashboard.upcoming.showall' | translate }} ">
+            </p-checkbox>
+            &nbsp;&nbsp;&nbsp;
+            <div *ngIf="refreshing else refreshBn"><p-progressSpinner
+                    [style]="{width: '30px', height: '30px'}"></p-progressSpinner></div>
+            <ng-template #refreshBn>
+                <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
+                    (click)="refreshing=true;refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
+            </ng-template>
+        </div>
+        <app-programs [inter]="inter" [programs]="recordings.Programs" [usage]="'UPCOMING'"></app-programs>
+    </div>
+    <ng-template #loading>
+        <p-progressSpinner></p-progressSpinner>
+    </ng-template>
+</div>

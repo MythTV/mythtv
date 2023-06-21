@@ -39,6 +39,10 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/programtypes.h"
 #include "libmythtv/channelutil.h"
+#include "libmythtv/channelscan/scanwizardconfig.h"
+#include "libmythtv/channelscan/channelscanner_web.h"
+#include "libmythtv/channelscan/scaninfo.h"
+#include "libmythtv/channelscan/channelimporter.h"
 #include "libmythtv/sourceutil.h"
 #include "libmythtv/cardutil.h"
 #include "libmythbase/mythdate.h"
@@ -83,6 +87,9 @@ void V2Channel::RegisterCustomTypes()
     qRegisterMetaType<V2FreqTableList*>("V2FreqTableList");
     qRegisterMetaType<V2CommMethodList*>("V2CommMethodList");
     qRegisterMetaType<V2CommMethod*>("V2CommMethod");
+    qRegisterMetaType<V2ScanStatus*>("V2ScanStatus");
+    qRegisterMetaType<V2Scan*>("V2Scan");
+    qRegisterMetaType<V2ScanList*>("V2ScanList");
 }
 
 V2Channel::V2Channel() : MythHTTPService(s_service)
@@ -753,6 +760,35 @@ V2VideoMultiplexList* V2Channel::GetVideoMultiplexList( uint nSourceID,
             pVideoMultiplex->setUpdateTimeStamp(
                 MythDate::as_utc(query.value(22).toDateTime()));
             pVideoMultiplex->setDefaultAuthority(   query.value(23).toString()      );
+
+            // Code from libs/libmythtv/channelscan/multiplexsetting.cpp:53
+            QString DisplayText;
+            if (query.value(9).toString() == "8vsb")    //modulation
+            {
+                QString ChannelNumber =
+                    // value(4) = frequency
+                    QString("Freq %1").arg(query.value(4).toInt());
+                int findFrequency = (query.value(4).toInt() / 1000) - 1750;
+                for (const auto & list : gChanLists[0].list)
+                {
+                    if ((list.freq <= findFrequency + 200) &&
+                        (list.freq >= findFrequency - 200))
+                    {
+                        ChannelNumber = QString("%1").arg(list.name);
+                    }
+                }
+                //: %1 is the channel number
+                DisplayText = tr("ATSC Channel %1").arg(ChannelNumber);
+            }
+            else
+            {
+                DisplayText = QString("%1 Hz (%2) (%3) (%4)")
+                    .arg(query.value(4).toString(),     // frequency
+                        query.value(6).toString(),      // symbolrate
+                        query.value(3).toString(),      // networkid
+                        query.value(2).toString());     // transportid
+            }
+            pVideoMultiplex->setDescription(DisplayText);
         }
     }
 
@@ -972,4 +1008,140 @@ QStringList V2Channel::GetFreqTableList (  )
     }
     return freqList;
 
+}
+
+bool  V2Channel::StartScan (uint CardId,
+                            const QString &DesiredServices,
+                            bool FreeToAirOnly,
+                            bool ChannelNumbersOnly,
+                            bool CompleteChannelsOnly,
+                            bool FullChannelSearch,
+                            bool RemoveDuplicates,
+                            bool AddFullTS,
+                            bool TestDecryptable,
+                            const QString &ScanType,
+                            const QString &FreqTable,
+                            const QString &Modulation,
+                            const QString &FirstChan,
+                            const QString &LastChan,
+                            uint ScanId,
+                            bool IgnoreSignalTimeout,
+                            bool FollowNITSetting,
+                            uint MplexId,
+                            const QString &Frequency,
+                            const QString &Bandwidth,
+                            const QString &Polarity,
+                            const QString &SymbolRate,
+                            const QString &Inversion,
+                            const QString &Constellation,
+                            const QString &ModSys,
+                            const QString &CodeRateLP,
+                            const QString &CodeRateHP,
+                            const QString &FEC,
+                            const QString &TransmissionMode,
+                            const QString &GuardInterval,
+                            const QString &Hierarchy,
+                            const QString &RollOff)
+{
+    ChannelScannerWeb * pScanner = ChannelScannerWeb::getInstance();
+    if (pScanner->m_status == "RUNNING")
+        return false;
+
+    return pScanner->StartScan (CardId,
+                                DesiredServices,
+                                FreeToAirOnly,
+                                ChannelNumbersOnly,
+                                CompleteChannelsOnly,
+                                FullChannelSearch,
+                                RemoveDuplicates,
+                                AddFullTS,
+                                TestDecryptable,
+                                ScanType,
+                                FreqTable,
+                                Modulation,
+                                FirstChan,
+                                LastChan,
+                                ScanId,
+                                IgnoreSignalTimeout,
+                                FollowNITSetting,
+                                MplexId,
+                                Frequency,
+                                Bandwidth,
+                                Polarity,
+                                SymbolRate,
+                                Inversion,
+                                Constellation,
+                                ModSys,
+                                CodeRateLP,
+                                CodeRateHP,
+                                FEC,
+                                TransmissionMode,
+                                GuardInterval,
+                                Hierarchy,
+                                RollOff);
+}
+
+
+V2ScanStatus*     V2Channel::GetScanStatus ()
+{
+    auto *pStatus = new V2ScanStatus();
+    ChannelScannerWeb * pScanner = ChannelScannerWeb::getInstance();
+    pStatus->setCardId(pScanner->m_cardid);
+    pStatus->setStatus(pScanner->m_status);
+    pStatus->setSignalLock(pScanner->m_statusLock);
+    pStatus->setProgress(pScanner->m_statusProgress);
+    pStatus->setSignalNoise(pScanner->m_statusSnr);
+    pStatus->setSignalStrength(pScanner->m_statusSignalStrength);
+    pStatus->setStatusLog(pScanner->m_statusLog);
+    pStatus->setStatusText(pScanner->m_statusText);
+    pStatus->setStatusTitle(pScanner->m_statusTitleText);
+    pStatus->setDialogMsg(pScanner->m_dlgMsg);
+    pStatus->setDialogButtons(pScanner->m_dlgButtons);
+    pStatus->setDialogInputReq(pScanner->m_dlgInputReq);
+
+    return pStatus;
+}
+
+
+bool  V2Channel::StopScan  ( uint Cardid )
+{
+    ChannelScannerWeb * pScanner = ChannelScannerWeb::getInstance();
+    if (pScanner->m_status != "RUNNING" || pScanner->m_cardid != Cardid)
+        return false;
+    pScanner->stopScan();
+    return true;
+}
+
+V2ScanList*  V2Channel::GetScanList  ( uint SourceId)
+{
+    auto scanList = LoadScanList(SourceId);
+    auto * pResult = new V2ScanList();
+    for (const ScanInfo &scan : scanList)
+    {
+        auto *pItem = pResult->AddNewScan();
+        pItem->setScanId    (scan.m_scanid);
+        pItem->setCardId    (scan.m_cardid);
+        pItem->setSourceId  (scan.m_sourceid);
+        pItem->setProcessed (scan.m_processed);
+        pItem->setScanDate  (scan.m_scandate);
+    }
+    return pResult;
+}
+
+bool  V2Channel::SendScanDialogResponse ( uint Cardid,
+                                          const QString &DialogString,
+                                          int DialogButton )
+{
+    ChannelScannerWeb * pScanner = ChannelScannerWeb::getInstance();
+    if (pScanner->m_cardid == Cardid)
+    {
+        pScanner->m_dlgString = DialogString;
+        pScanner->m_dlgButton = DialogButton;
+        pScanner->m_dlgButtons.clear();
+        pScanner->m_dlgInputReq = false;
+        pScanner->m_dlgMsg = "";
+        pScanner->m_waitCondition.wakeOne();
+        return true;
+    }
+    return false;
 }

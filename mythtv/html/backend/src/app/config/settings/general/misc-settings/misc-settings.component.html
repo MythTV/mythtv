@@ -13,7 +13,7 @@
                     [toggleable]="true" [collapsed]="true">
 
                     <div class="form-group field">
-                        <p-checkbox [(ngModel)]="MasterBackendOverride" name="MasterBackendOverride" class="mb-2 w-full"
+                        <p-checkbox [(ngModel)]="MasterBackendOverride" name="MasterBackendOverride" class="mb-2 w-full label"
                             [binary]="true" label="{{ 'settings.misc.mbo_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
@@ -22,7 +22,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <p-checkbox [(ngModel)]="DeletesFollowLinks" name="DeletesFollowLinks" class="mb-2 w-full"
+                        <p-checkbox [(ngModel)]="DeletesFollowLinks" name="DeletesFollowLinks" class="mb-2 w-full label"
                             [binary]="true" label="{{ 'settings.misc.follow_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
@@ -31,7 +31,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <p-checkbox [(ngModel)]="TruncateDeletesSlowly" name="TruncateDeletesSlowly" class="mb-2 w-full"
+                        <p-checkbox [(ngModel)]="TruncateDeletesSlowly" name="TruncateDeletesSlowly" class="mb-2 w-full label"
                             [binary]="true" label="{{ 'settings.misc.slowly_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
@@ -40,7 +40,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="HDRingbufferSize" class="block">{{ 'settings.misc.ringbuf_label' | translate
+                        <label for="HDRingbufferSize" class="label block">{{ 'settings.misc.ringbuf_label' | translate
                             }}</label>
                         <p-inputNumber [(ngModel)]="HDRingbufferSize" name="HDRingbufferSize" id="HDRingbufferSize"
                             [showButtons]="true" [min]="4700" [max]="94000" [step]="4700"></p-inputNumber>
@@ -50,7 +50,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <label for="StorageScheduler" class="block">{{ 'settings.misc.sg_label' | translate }}</label>
+                        <label for="StorageScheduler" class="label block">{{ 'settings.misc.sg_label' | translate }}</label>
                         <p-dropdown [options]="soptions " [(ngModel)]="StorageScheduler" optionLabel="name"
                             optionValue="code" class="block w-15rem mb-2" name="StorageScheduler">
                         </p-dropdown>
@@ -64,7 +64,7 @@
                 <p-fieldset class="mb-4 w-full" legend="{{ 'settings.misc.panel_upnp' | translate }}"
                     [toggleable]="true" [collapsed]="true">
                     <div class="form-group field">
-                        <label for="UPNPWmpSource" class="block">{{ 'settings.misc.upnp_label' | translate }}</label>
+                        <label for="UPNPWmpSource" class="label block">{{ 'settings.misc.upnp_label' | translate }}</label>
                         <p-dropdown [options]="uoptions" [(ngModel)]="UPNPWmpSource" optionLabel="name"
                             optionValue="code" class="block w-15rem mb-2" name="UPNPWmpSource">
                         </p-dropdown>
@@ -77,7 +77,7 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="MiscStatusScript" class="block">{{ 'settings.misc.statapp_label' | translate
+                        <label for="MiscStatusScript" class="label block">{{ 'settings.misc.statapp_label' | translate
                             }}</label>
                         <input pInputText id="MiscStatusScript" [(ngModel)]="MiscStatusScript" name="MiscStatusScript"
                             class="mb-2 form-control w-full" />
@@ -89,7 +89,7 @@
 
                     <div class="form-group field">
                         <p-checkbox [(ngModel)]="DisableAutomaticBackup" name="DisableAutomaticBackup"
-                            class="mb-2 w-full" [binary]="true" label="{{ 'settings.misc.disback_label' | translate }}">
+                            class="mb-2 w-full label" [binary]="true" label="{{ 'settings.misc.disback_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
                             {{ 'settings.misc.disback_desc' | translate }}
@@ -97,7 +97,7 @@
                     </div>
 
                     <div class="form-group field">
-                        <p-checkbox [(ngModel)]="DisableFirewireReset" name="DisableFirewireReset" class="mb-2 w-full"
+                        <p-checkbox [(ngModel)]="DisableFirewireReset" name="DisableFirewireReset" class="mb-2 w-full label"
                             [binary]="true" label="{{ 'settings.misc.disfwr_label' | translate }}">
                         </p-checkbox>
                         <small class="block">

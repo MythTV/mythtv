@@ -49,7 +49,7 @@ SOURCES += internetContent.cpp mythbackend_main_helpers.cpp backendcontext.cpp
 SOURCES += httpconfig.cpp mythsettings.cpp mythbackend_commandlineparser.cpp
 SOURCES += recordingextender.cpp
 
-SOURCES += services/myth.cpp services/guide.cpp services/content.cpp 
+SOURCES += services/myth.cpp services/guide.cpp services/content.cpp
 SOURCES += services/dvr.cpp services/channel.cpp services/video.cpp
 SOURCES += services/serviceUtil.cpp services/capture.cpp
 SOURCES += services/image.cpp services/music.cpp
@@ -90,7 +90,7 @@ HEADERS += servicesv2/v2titleInfo.h servicesv2/v2titleInfoList.h
 HEADERS += servicesv2/v2recRuleList.h
 HEADERS += servicesv2/v2content.h
 HEADERS += servicesv2/v2guide.h servicesv2/v2programGuide.h
-HEADERS += servicesv2/v2channel.h
+HEADERS += servicesv2/v2channel.h servicesv2/v2channelScan.h
 HEADERS += servicesv2/v2commMethod.h
 HEADERS += servicesv2/v2channelInfoList.h servicesv2/v2lineup.h
 HEADERS += servicesv2/v2videoSource.h servicesv2/v2videoSourceList.h

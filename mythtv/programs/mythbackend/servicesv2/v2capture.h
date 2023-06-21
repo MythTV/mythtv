@@ -69,6 +69,8 @@ class V2Capture : public MythHTTPService
 
     static V2CaptureCard*       GetCaptureCard     ( int              CardId     );
 
+    static V2CardSubType*       GetCardSubType     ( int              CardId     );
+
     static bool                 RemoveAllCaptureCards ( void );
 
     static bool                 RemoveCaptureCard  ( int              CardId     );

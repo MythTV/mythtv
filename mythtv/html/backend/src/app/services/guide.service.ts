@@ -10,7 +10,8 @@ import {
   GetProgramDetailsRequest,
   GetProgramGuideRequest,
   GetProgramListRequest,
-  GetStoredSearchesResponse } from './interfaces/guide.interface';
+  GetStoredSearchesResponse
+} from './interfaces/guide.interface';
 import { BoolResponse } from './interfaces/common.interface';
 import { ChannelGroupList } from './interfaces/channelgroup.interface';
 import { ProgramList, ScheduleOrProgram } from './interfaces/program.interface';
@@ -19,104 +20,89 @@ import { ProgramList, ScheduleOrProgram } from './interfaces/program.interface';
   providedIn: 'root'
 })
 export class GuideService {
-  startDate : Date;
-  guide_data$! : ProgramGuide;
+  startDate: Date;
+  guide_data$!: ProgramGuide;
 
-  toTime(date : string) {
-      let d = new Date(date);
-      return d.toISOString();
+  toTime(date: string) {
+    let d = new Date(date);
+    return d.toISOString();
   }
-  toStartTime(date : string) {
-      return this.toTime(date);
+  toStartTime(date: string) {
+    return this.toTime(date);
   }
-  toEndTime(date : string) {
-      let d = new Date(date);
-      //let tomorrow = new Date(d.getTime()+86400000);
-      let endAt = new Date(d.getTime()+7200000);
-      return this.toTime(endAt.toISOString());
+  toEndTime(date: string) {
+    let d = new Date(date);
+    //let tomorrow = new Date(d.getTime()+86400000);
+    let endAt = new Date(d.getTime() + 7200000);
+    return this.toTime(endAt.toISOString());
   }
-  toHalfHour(date : Date) {
-      let d = new Date(date);
-      d.setMinutes((d.getMinutes() < 30) ? 0 : 30);
-      d.setSeconds(0);
-      return d;
+  toHalfHour(date: Date) {
+    let d = new Date(date);
+    d.setMinutes((d.getMinutes() < 30) ? 0 : 30);
+    d.setSeconds(0);
+    return d;
   }
 
   constructor(private httpClient: HttpClient) {
     this.startDate = new Date;
   }
 
-  public AddToChannelGroup(request : ChannelGroupRequest) : Observable<BoolResponse> {
+  public AddToChannelGroup(request: ChannelGroupRequest): Observable<BoolResponse> {
     return this.httpClient.post<BoolResponse>('/Guide/AddToChannelGroup', request);
   }
 
-  public GetCategoryList() : Observable<GetCategoryListResponse> {
+  public GetCategoryList(): Observable<GetCategoryListResponse> {
     return this.httpClient.get<GetCategoryListResponse>('/Guide/GetCategoryList');
   }
 
-  public GetChannelGroupList(IncludeEmpty : boolean) : Observable<ChannelGroupList> {
+  public GetChannelGroupList(IncludeEmpty: boolean): Observable<ChannelGroupList> {
     let params = new HttpParams()
       .set("IncludeEmpty", IncludeEmpty);
-    return this.httpClient.get<ChannelGroupList>('/Guide/GetChannelGroupList', {params});
+    return this.httpClient.get<ChannelGroupList>('/Guide/GetChannelGroupList', { params });
   }
 
-  public GetChannelIcon(request : GetChannelIconRequest) : Observable<string> {
+  public GetChannelIcon(request: GetChannelIconRequest): Observable<string> {
     let params = new HttpParams()
       .set("ChanId", request.ChanId)
       .set("Width", request.Width)
       .set("Height", request.Height)
-    return this.httpClient.get<string>('/Guide/GetChannelIcon', {params});
+    return this.httpClient.get<string>('/Guide/GetChannelIcon', { params });
   }
 
-  public GetProgramDetails(request : GetProgramDetailsRequest) : Observable<ScheduleOrProgram> {
+  public GetProgramDetails(request: GetProgramDetailsRequest): Observable<ScheduleOrProgram> {
     let params = new HttpParams()
       .set("ChanId", request.ChanId)
       .set("StartTime", request.StartTime);
-    return this.httpClient.get<ScheduleOrProgram>('/Guide/GetProgramDetails', {params});
+    return this.httpClient.get<ScheduleOrProgram>('/Guide/GetProgramDetails', { params });
   }
 
-  public GetProgramGuide(reqDate?: Date) : Observable<ProgramGuide> {
-    if (typeof reqDate !== 'undefined') {
+  public GetProgramGuide(reqDate?: Date): Observable<ProgramGuide> {
+    if (reqDate) {
       this.startDate = reqDate;
     }
-    let time : string = this.toHalfHour(this.startDate).toISOString();
-    let params : GetProgramGuideRequest = {
+    let time: string = this.toHalfHour(this.startDate).toISOString();
+    let params: GetProgramGuideRequest = {
       "StartTime": this.toStartTime(time),
       "EndTime": this.toEndTime(time),
-      "Details": "true",
+      "Details": true,
     };
     return this.httpClient.post<ProgramGuide>('/Guide/GetProgramGuide', params);
   }
 
-  public GetProgramList(request : GetProgramListRequest) : Observable<ProgramList> {
+  public GetProgramList(request: GetProgramListRequest): Observable<{ ProgramList: ProgramList }> {
     let params = new HttpParams()
-      .set("StartIndex", request.StartIndex)
-      .set("Count", request.Count)
-      .set("StartTime", request.StartTime)
-      .set("EndTime", request.EndTime)
-      .set("ChanId", request.ChanId);
-    if (typeof request.Descending !== 'undefined')
-      params = params.set("Descending", request.Descending);
-    if (typeof request.Details !== 'undefined')
-      params = params.set("Details", request.Details);
-    if (typeof request.KeywordFilter !== 'undefined')
-      params = params.set("KeywordFilter", request.KeywordFilter);
-    if (typeof request.OnlyNew !== 'undefined')
-      params = params.set("OnlyNew", request.OnlyNew);
-    if (typeof request.PersonFilter !== 'undefined')
-      params = params.set("PersonFilter", request.PersonFilter);
-    if (typeof request.Sort !== 'undefined')
-      params = params.set("Sort", request.Sort);
-    return this.httpClient.get<ProgramList>('/Guide/GetProgramList', {params});
+    for (const [key, value] of Object.entries(request))
+      params = params.set(key, value);
+    return this.httpClient.get<{ ProgramList: ProgramList }>('/Guide/GetProgramList', { params });
   }
 
-  public GetStoredSearches(searchType : string) : Observable<GetStoredSearchesResponse> {
+  public GetStoredSearches(searchType: string): Observable<GetStoredSearchesResponse> {
     let params = new HttpParams()
       .set("Type", searchType);
-    return this.httpClient.get<GetStoredSearchesResponse>('/Guide/GetStoredSearches', {params});
+    return this.httpClient.get<GetStoredSearchesResponse>('/Guide/GetStoredSearches', { params });
   }
 
-  public RemoveFromChannelGroup(request : ChannelGroupRequest) : Observable<BoolResponse> {
+  public RemoveFromChannelGroup(request: ChannelGroupRequest): Observable<BoolResponse> {
     return this.httpClient.post<BoolResponse>('/Guide/RemoveFromChannelGroup', request);
   }
 }

@@ -87,10 +87,10 @@ class MUI_PUBLIC MythDRMDevice
     int        m_fd            { -1 };
     bool       m_atomic        { false };
     bool       m_authenticated { false };
-    DRMConns   m_connectors;
-    DRMEncs    m_encoders;
-    DRMCrtcs   m_crtcs;
-    DRMPlanes  m_planes;
+    DRMConns   m_connectors    {};
+    DRMEncs    m_encoders      {};
+    DRMCrtcs   m_crtcs         {};
+    DRMPlanes  m_planes        {};
     DRMConn    m_connector     { nullptr };
     DRMCrtc    m_crtc          { nullptr };
     QSize      m_resolution    { };

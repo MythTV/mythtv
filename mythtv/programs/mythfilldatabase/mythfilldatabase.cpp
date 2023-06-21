@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
         fill_data.m_chanData.m_interactive = true;
     }
 
-    if (cmdline.toBool("onlyguide") || cmdline.toBool("update"))
+    if (cmdline.toBool("onlyguide"))
     {
         LOG(VB_GENERAL, LOG_NOTICE,
             "Only updating guide data, channel and icon updates will be ignored");
@@ -153,25 +153,6 @@ int main(int argc, char *argv[])
         fill_data.m_maxDays = cmdline.toInt("maxdays");
         if (fill_data.m_maxDays == 1)
             fill_data.SetRefresh(0, true);
-    }
-
-    if (cmdline.toBool("refreshtoday"))
-        cmdline.SetValue("refresh",
-                cmdline.toStringList("refresh") << "today");
-    if (cmdline.toBool("dontrefreshtomorrow"))
-        cmdline.SetValue("refresh",
-                cmdline.toStringList("refresh") << "nottomorrow");
-    if (cmdline.toBool("refreshsecond"))
-        cmdline.SetValue("refresh",
-                cmdline.toStringList("refresh") << "second");
-    if (cmdline.toBool("refreshall"))
-        cmdline.SetValue("refresh",
-                cmdline.toStringList("refresh") << "all");
-    if (cmdline.toBool("refreshday"))
-    {
-        cmdline.SetValue("refresh",
-                cmdline.toStringList("refresh") <<
-                                        cmdline.toStringList("refreshday"));
     }
 
     QStringList sl = cmdline.toStringList("refresh");

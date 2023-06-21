@@ -882,7 +882,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     if (!fifodir.isEmpty())
     {
         AudioPlayer *aplayer = player->GetAudio();
-        const char  *audio_codec_name = "unknown";
+        const char  *audio_codec_name {nullptr};
 
         switch(aplayer->GetCodec())
         {

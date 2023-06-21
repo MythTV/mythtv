@@ -411,8 +411,7 @@ bool HDHRStreamHandler::Connect(void)
     return true;
 }
 
-QString HDHRStreamHandler::TunerGet(
-    const QString &name, bool report_error_return, bool print_error) const
+QString HDHRStreamHandler::TunerGet(const QString &name)
 {
     QMutexLocker locker(&m_hdhrLock);
 
@@ -434,23 +433,17 @@ QString HDHRStreamHandler::TunerGet(
         return {};
     }
 
-    if (report_error_return && error)
+    if (error)
     {
-        if (print_error)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceGet(%1): %2")
-                    .arg(name, error));
-        }
-
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceGet(%1): %2")
+                .arg(name, error));
         return {};
     }
 
     return {value};
 }
 
-QString HDHRStreamHandler::TunerSet(
-    const QString &name, const QString &val,
-    bool report_error_return, bool print_error)
+QString HDHRStreamHandler::TunerSet(const QString &name, const QString &val)
 {
     QMutexLocker locker(&m_hdhrLock);
 
@@ -460,7 +453,6 @@ QString HDHRStreamHandler::TunerSet(
         return {};
     }
 
-
     QString valname = QString("/tuner%1/%2").arg(m_tuner).arg(name);
     char *value = nullptr;
     char *error = nullptr;
@@ -468,29 +460,33 @@ QString HDHRStreamHandler::TunerSet(
 #if 0
     LOG(VB_CHANSCAN, LOG_DEBUG, LOC + valname + " " + val);
 #endif
+
+    // Receive full transport stream when pid 0x2000 is present
+    QString val2 = val;
+    if (name.contains("filter") && val.contains("0x2000"))
+    {
+        val2 = "0x0000-0x1FFF";
+        LOG(VB_RECORD, LOG_INFO, LOC + valname + " fixup: \"" + val + "\" to \"" +val2 + "\"");
+    }
+
     if (hdhomerun_device_set_var(
             m_hdhomerunDevice, valname.toLocal8Bit().constData(),
-            val.toLocal8Bit().constData(), &value, &error) < 0)
+            val2.toLocal8Bit().constData(), &value, &error) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Set %1 to '%2' request failed").arg(valname, val) +
+            QString("Set %1 to '%2' request failed").arg(valname, val2) +
             ENO);
-
         return {};
     }
 
-    if (report_error_return && error)
+    if (error)
     {
-        if (print_error)
-        {
-            // Skip error messages from MPTS recordings
-            if (!(val.contains("0x2000") && strstr(error, "ERROR: invalid pid filter")))
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceSet(%1 %2): %3")
-                        .arg(name, val, error));
-            }
-        }
+        // Terminate recording when HDHomeRun lost connection
+        if (strstr(error, "ERROR: lock no longer held"))
+            m_bError = true;
 
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceSet(%1 %2): %3")
+                .arg(name, val2, error));
         return {};
     }
 
@@ -540,7 +536,7 @@ bool HDHRStreamHandler::TuneProgram(uint mpeg_prog_num)
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Tuning program %1")
             .arg(mpeg_prog_num));
     return !TunerSet(
-        "program", QString::number(mpeg_prog_num), false).isEmpty();
+        "program", QString::number(mpeg_prog_num)).isEmpty();
 }
 
 bool HDHRStreamHandler::TuneVChannel(const QString &vchn)

@@ -17,7 +17,6 @@
 #include <QFileInfo>
 #include <QFontDatabase>
 #include <QImage>
-#include <QTextCodec>
 #include <QtGlobal>
 
 // MythTV headers
@@ -1568,23 +1567,6 @@ static HostComboBoxSetting *DecodeVBIFormat()
 }
 #endif
 
-static HostComboBoxSetting *SubtitleCodec()
-{
-    auto *gc = new HostComboBoxSetting("SubtitleCodec");
-
-    gc->setLabel(OSDSettings::tr("Subtitle Codec"));
-
-    QList<QByteArray> list = QTextCodec::availableCodecs();
-
-    for (const auto & codec : qAsConst(list))
-    {
-        QString val = QString(codec);
-        gc->addSelection(val, val, val.toLower() == "utf-8");
-    }
-
-    return gc;
-}
-
 static HostComboBoxSetting *ChannelOrdering()
 {
     auto *gc = new HostComboBoxSetting("ChannelOrdering");
@@ -2295,6 +2277,21 @@ static HostCheckBoxSetting *GuiSizeForTV()
     return gc;
 }
 
+static HostCheckBoxSetting *ForceFullScreen()
+{
+    auto *gc = new HostCheckBoxSetting("ForceFullScreen");
+
+    gc->setLabel(AppearanceSettings::tr("Force Full Screen for GUI and TV playback"));
+
+    gc->setValue(false);
+
+    gc->setHelpText(AppearanceSettings::tr(
+        "Use Full Screen for GUI and TV playback independent of the settings for "
+        "the GUI dimensions. This does not change the values of the GUI dimensions "
+        "so it is easy to switch from window mode to full screen and back."));
+    return gc;
+}
+
 static HostCheckBoxSetting *UseVideoModes()
 {
     HostCheckBoxSetting *gc = new VideoModeSettings("UseVideoModes");
@@ -2630,8 +2627,8 @@ static HostCheckBoxSetting *SmoothTransitions()
 
     gc->setValue(true);
 
-    gc->setHelpText(AppearanceSettings::tr("Enable smooth transitions with fade-in and fade-out of menu pages. "
-                                           "Disabling this can make the GUI respond faster."));
+    gc->setHelpText(AppearanceSettings::tr("Enable smooth transitions with fade-in and fade-out of menu pages and enable GUI animations. "
+                                           "Disabling this can make the GUI respond faster especially on low-powered machines."));
     return gc;
 }
 
@@ -4498,7 +4495,6 @@ OSDSettings::OSDSettings()
     addChild(PersistentBrowseMode());
     addChild(BrowseAllTuners());
     addChild(DefaultCCMode());
-    addChild(SubtitleCodec());
 
     //GroupSetting *cc = new GroupSetting();
     //cc->setLabel(tr("Closed Captions"));
@@ -4703,6 +4699,7 @@ AppearanceSettings::AppearanceSettings()
     PopulateScreens(MythDisplay::GetScreenCount());
     connect(m_display, &MythDisplay::ScreenCountChanged, this, &AppearanceSettings::PopulateScreens);
 
+    screen->addChild(ForceFullScreen());
     screen->addChild(new GuiDimension());
 
     screen->addChild(GuiSizeForTV());

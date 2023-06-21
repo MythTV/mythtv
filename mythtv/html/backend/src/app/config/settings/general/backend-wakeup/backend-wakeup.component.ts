@@ -14,6 +14,7 @@ export class BackendWakeupComponent implements OnInit, AfterViewInit {
   @ViewChild("backendwakeup")
   currentForm!: NgForm;
 
+  hostName = '';
   successCount = 0;
   errorCount = 0;
   WOLbackendReconnectWaitTime = 0;
@@ -33,8 +34,18 @@ export class BackendWakeupComponent implements OnInit, AfterViewInit {
     this.setupService.setCurrentForm(this.currentForm);
   }
 
-  getBackendWake(){
-    const hostName = this.setupService.getHostName();
+  getBackendWake() {
+    this.mythService.GetHostName().subscribe({
+      next: data => {
+        this.hostName = data.String;
+        this.getSettings();
+      },
+      error: () => this.errorCount++
+    })
+
+  }
+
+  getSettings() {
     this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "WOLbackendReconnectWaitTime", Default: "0" })
       .subscribe({
         next: data => this.WOLbackendReconnectWaitTime = Number(data.String),
@@ -50,18 +61,19 @@ export class BackendWakeupComponent implements OnInit, AfterViewInit {
         next: data => this.WOLbackendCommand = data.String,
         error: () => this.errorCount++
       });
-    this.mythService.GetSetting({ HostName: hostName, Key: "SleepCommand", Default: "" })
+    this.mythService.GetSetting({ HostName: this.hostName, Key: "SleepCommand", Default: "" })
       .subscribe({
         next: data => this.SleepCommand = data.String,
         error: () => this.errorCount++
       });
-    this.mythService.GetSetting({ HostName: hostName, Key: "WakeUpCommand", Default: "" })
+    this.mythService.GetSetting({ HostName: this.hostName, Key: "WakeUpCommand", Default: "" })
       .subscribe({
         next: data => this.WakeUpCommand = data.String,
         error: () => this.errorCount++
       });
 
   }
+
 
   bewObserver = {
     next: (x: any) => {
@@ -84,7 +96,6 @@ export class BackendWakeupComponent implements OnInit, AfterViewInit {
   saveForm() {
     this.successCount = 0;
     this.errorCount = 0;
-    const hostName = this.setupService.getHostName();
     this.mythService.PutSetting({
       HostName: '_GLOBAL_', Key: "WOLbackendReconnectWaitTime",
       Value: String(this.WOLbackendReconnectWaitTime)
@@ -98,11 +109,11 @@ export class BackendWakeupComponent implements OnInit, AfterViewInit {
       Value: this.WOLbackendCommand
     }).subscribe(this.bewObserver);
     this.mythService.PutSetting({
-      HostName: hostName, Key: "SleepCommand",
+      HostName: this.hostName, Key: "SleepCommand",
       Value: this.SleepCommand
     }).subscribe(this.bewObserver);
     this.mythService.PutSetting({
-      HostName: hostName, Key: "WakeUpCommand",
+      HostName: this.hostName, Key: "WakeUpCommand",
       Value: this.WakeUpCommand
     }).subscribe(this.bewObserver);
   }

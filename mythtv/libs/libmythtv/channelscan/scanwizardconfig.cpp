@@ -290,7 +290,7 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
             addSelection(tr("Import existing scan"),
                          QString::number(ExistingScanImport));
             break;
-        case CardUtil::QAM:
+        case CardUtil::QAM:  // QAM == DVBC
             addSelection(tr("Full Scan (Tuned)"),
                          QString::number(NITAddScan_DVBC));
             addSelection(tr("Full Scan"),
@@ -325,10 +325,14 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
                 setHelpText(fullScanHelpTextDVBT2);
             }
             else
+            {
                 addSelection(tr("Full Scan"),
                              QString::number(FullScan_ATSC), true);
+            }
 //             addSelection(tr("Import channels.conf"),
 //                          QString::number(DVBUtilsImport));
+            addSelection(tr("HDHomeRun Channel Import"),
+                         QString::number(HDHRImport));
             addSelection(tr("Import existing scan"),
                          QString::number(ExistingScanImport));
             break;

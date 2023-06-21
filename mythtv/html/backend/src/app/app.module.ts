@@ -26,9 +26,6 @@ import { JobqueueComponent } from './status/components/jobqueue/jobqueue.compone
 import { MachineinfoComponent } from './status/components/machineinfo/machineinfo.component';
 import { SelectLanguageComponent } from './config/setupwizard/selectlanguage/selectlanguage.component';
 import { DbsetupComponent } from './config/setupwizard/dbsetup/dbsetup.component';
-import { BackendnetworkComponent } from './config/setupwizard/backendnetwork/backendnetwork.component';
-import { SgsetupComponent } from './config/setupwizard/sgsetup/sgsetup.component';
-import { RestartComponent } from './config/setupwizard/restart/restart.component';
 import { TestbedComponent } from './testbed/testbed.component';
 import { GuideComponent } from './guide/guide.component';
 import { ChannelIconComponent } from './guide/components/channelicon/channelicon.component';
@@ -75,6 +72,15 @@ import { HdpvrComponent } from './config/settings/capture-cards/hdpvr/hdpvr.comp
 import { SatipComponent } from './config/settings/capture-cards/satip/satip.component';
 import { VboxComponent } from './config/settings/capture-cards/vbox/vbox.component';
 import { FirewireComponent } from './config/settings/capture-cards/firewire/firewire.component';
+import { ChannelscanComponent } from './config/settings/input-connections/channelscan/channelscan.component';
+import { DashboardRoutingModule } from './dashboard/dashboard-routing.module';
+import { WizChanneleditComponent } from './config/setupwizard/wiz-channeledit/wiz-channeledit.component';
+import { RecordingsComponent } from './dashboard/recordings/recordings.component';
+import { ScheduleComponent } from './schedule/schedule.component';
+import { UpcomingComponent } from './dashboard/upcoming/upcoming.component';
+import { RecrulesComponent } from './dashboard/recrules/recrules.component';
+import { VideosComponent } from './dashboard/videos/videos.component';
+import { ProgramsComponent } from './dashboard/programs/programs.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -97,9 +103,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     MachineinfoComponent,
     SelectLanguageComponent,
     DbsetupComponent,
-    BackendnetworkComponent,
-    SgsetupComponent,
-    RestartComponent,
     TestbedComponent,
     GuideComponent,
     ChannelIconComponent,
@@ -146,6 +149,14 @@ export function HttpLoaderFactory(http: HttpClient) {
     SatipComponent,
     VboxComponent,
     FirewireComponent,
+    ChannelscanComponent,
+    WizChanneleditComponent,
+    RecordingsComponent,
+    ScheduleComponent,
+    UpcomingComponent,
+    RecrulesComponent,
+    VideosComponent,
+    ProgramsComponent,
   ],
   imports: [
     BrowserModule,
@@ -166,6 +177,7 @@ export function HttpLoaderFactory(http: HttpClient) {
 
     PrimeNGModule,
     SetupWizardRoutingModule,
+    DashboardRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]
