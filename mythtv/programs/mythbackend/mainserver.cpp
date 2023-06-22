@@ -5235,7 +5235,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                             (!strcmp(fstypename, "afpfs")) || // ApplShr
                             (!strcmp(fstypename, "smbfs")))   // SMB
                             localStr = "0";
-#elif __linux__
+#elif defined(__linux__)
                         long fstype = statbuf.f_type;
                         if ((fstype == 0x6969) ||             // NFS
                             (fstype == 0x517B) ||             // SMB
