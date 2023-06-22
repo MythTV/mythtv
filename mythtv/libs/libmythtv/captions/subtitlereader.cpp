@@ -1,9 +1,21 @@
 #include "libmythbase/mythlogging.h"
 #include "captions/subtitlereader.h"
 
+#ifdef DEBUG_SUBTITLES
+QString toString(const AVSubtitle& sub)
+{
+    auto start = QTime(0,0).addMSecs(sub.start_display_time);
+    auto end = QTime(0,0).addMSecs(sub.end_display_time);
+    return QString("%1-%2 (%3-%4)")
+        .arg(start.toString("HH:mm:ss.zzz"),
+             end.toString("HH:mm:ss.zzz"))
+        .arg(sub.start_display_time)
+        .arg(sub.end_display_time);
+}
+#endif
+
 // If the count of subtitle buffers is greater than this, force a clear
 static const int MAX_BUFFERS_BEFORE_CLEAR = 175;  // 125 too low for karaoke
-static const int MAX_EXT_BUFFERS_BEFORE_CLEAR = 500;  // 2 hr movie, titles every 15 s
 
 SubtitleReader::SubtitleReader(MythPlayer *parent)
   : m_parent(parent)
@@ -14,7 +26,7 @@ SubtitleReader::SubtitleReader(MythPlayer *parent)
 
 SubtitleReader::~SubtitleReader()
 {
-    ClearAVSubtitles(true);
+    ClearAVSubtitles();
     ClearRawTextSubtitles();
 }
 
@@ -31,6 +43,16 @@ void SubtitleReader::EnableTextSubtitles(bool enable)
 void SubtitleReader::EnableRawTextSubtitles(bool enable)
 {
     m_rawTextSubtitlesEnabled = enable;
+}
+
+void SubtitleReader::SeekFrame(int64_t ts, int flags)
+{
+    m_avSubtitles.m_needSync = true;
+    if (m_externalParser)
+    {
+        ClearAVSubtitles();
+        m_externalParser->SeekFrame(ts, flags);
+    }
 }
 
 bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
@@ -65,20 +87,27 @@ bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
         enableforced = true;
     }
 
+#ifdef DEBUG_SUBTITLES
+    if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
+    {
+        LOG(VB_PLAYBACK, LOG_DEBUG,
+            QString("AddAVSubtitle adding sub %1").arg(toString(subtitle)));
+    }
+#endif
+
     bool clearsubs = false;
     m_avSubtitles.m_lock.lock();
     m_avSubtitles.m_fixPosition = fix_position;
     m_avSubtitles.m_buffers.push_back(subtitle);
     // in case forced subtitles aren't displayed, avoid leaking by
     // manually clearing the subtitles
-    size_t max_buffers = m_externalParser
-        ? MAX_EXT_BUFFERS_BEFORE_CLEAR
-        : MAX_BUFFERS_BEFORE_CLEAR;
-    if (m_avSubtitles.m_buffers.size() > max_buffers)
+    if (!m_externalParser &&
+        (m_avSubtitles.m_buffers.size() > MAX_BUFFERS_BEFORE_CLEAR))
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("SubtitleReader: >%1 AVSubtitles queued - clearing.")
-                .arg(max_buffers));
+            QString("SubtitleReader: %1 AVSubtitles queued (more than %2) - clearing.")
+                .arg(m_avSubtitles.m_buffers.size())
+                .arg(MAX_BUFFERS_BEFORE_CLEAR));
         clearsubs = true;
     }
     m_avSubtitles.m_lock.unlock();
@@ -89,13 +118,8 @@ bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
     return enableforced;
 }
 
-void SubtitleReader::ClearAVSubtitles(bool force)
+void SubtitleReader::ClearAVSubtitles(void)
 {
-    // Don't flush subtitles loaded from an external file.  They won't
-    // get repopulated as the stream continues to play.
-    if (m_externalParser && !force)
-        return;
-
     m_avSubtitles.m_lock.lock();
     while (!m_avSubtitles.m_buffers.empty())
     {
@@ -119,6 +143,13 @@ void SubtitleReader::LoadExternalSubtitles(const QString &subtitleFileName,
         m_externalParser = new TextSubtitleParser(this, subtitleFileName, &m_textSubtitles);
         m_externalParser->LoadSubtitles(false);
     }
+}
+
+void SubtitleReader::ReadNextSubtitle(void)
+{
+    m_avSubtitles.m_needSync = false;
+    if (m_externalParser)
+        m_externalParser->ReadNextSubtitle();
 }
 
 bool SubtitleReader::HasTextSubtitles(void)

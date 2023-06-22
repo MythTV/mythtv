@@ -8,8 +8,14 @@ extern "C" {
 }
 
 #include "libmythbase/mythchrono.h"
+#include "libmythbase/mythdate.h"
 #include "libmythbase/mythdeque.h"
 #include "textsubtitleparser.h"
+
+#define DEBUG_SUBTITLES 1
+#ifdef DEBUG_SUBTITLES
+QString toString(const AVSubtitle& sub);
+#endif
 
 class MythPlayer;
 
@@ -20,6 +26,7 @@ class AVSubtitles
     MythDeque<AVSubtitle> m_buffers;
     QMutex                m_lock;
     bool                  m_fixPosition {false};
+    bool                  m_needSync    {false};
 };
 
 class RawTextSubs
@@ -50,12 +57,14 @@ class SubtitleReader : public QObject
     AVSubtitles* GetAVSubtitles(void) { return &m_avSubtitles; }
     bool AddAVSubtitle(AVSubtitle& subtitle, bool fix_position,
                        bool allow_forced);
-    void ClearAVSubtitles(bool force = false);
+    void ClearAVSubtitles(void);
     static void FreeAVSubtitle(AVSubtitle &sub);
 
     TextSubtitleParser* GetParser(void) { return m_externalParser; }
     bool HasTextSubtitles(void);
     void LoadExternalSubtitles(const QString &subtitleFileName, bool isInProgress);
+    void ReadNextSubtitle(void);
+    void SeekFrame(int64_t ts, int flags);
 
     QStringList GetRawTextSubtitles(std::chrono::milliseconds &duration);
     void AddRawTextSubtitle(const QStringList& list, std::chrono::milliseconds duration);
