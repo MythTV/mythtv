@@ -211,19 +211,19 @@
         "dateIs": "Datoen er",
         "dateIsNot": "Dato er ikke",
         "dayNames": [
-            "Sunday",
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday"
+            "søndag",
+            "mandag",
+            "tirsdag",
+            "onsdag",
+            "Torsdag",
+            "fredag",
+            "lørdag"
         ],
         "dayNamesMin": [
             "Su",
             "Mo",
             "ti",
-            "We",
+            "Vi",
             "Th",
             "Fr",
             "Sa"
@@ -251,18 +251,18 @@
         "matchAny": "Match noen",
         "medium": "Medium",
         "monthNames": [
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-            "August",
-            "September",
-            "October",
-            "November",
-            "December"
+            "januar",
+            "februar",
+            "mars",
+            "april",
+            "Kan",
+            "juni",
+            "juli",
+            "august",
+            "september",
+            "oktober",
+            "november",
+            "desember"
         ],
         "monthNamesShort": [
             "Jan",

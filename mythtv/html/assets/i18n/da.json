@@ -229,13 +229,13 @@
             "Sa"
         ],
         "dayNamesShort": [
-            "Sun",
-            "Mon",
-            "Tue",
-            "Wed",
-            "Thu",
-            "Fri",
-            "Sat"
+            "Sol",
+            "man",
+            "tir",
+            "ons",
+            "tor",
+            "fre",
+            "Lør"
         ],
         "emptyFilterMessage": "Ingen resultater fundet",
         "emptyMessage": "Ingen resultater fundet",
@@ -266,17 +266,17 @@
         ],
         "monthNamesShort": [
             "Jan",
-            "Feb",
+            "feb",
             "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec"
+            "apr",
+            "Kan",
+            "jun",
+            "jul",
+            "aug",
+            "sep",
+            "okt",
+            "nov",
+            "dec"
         ],
         "noFilter": "Intet filter",
         "notContains": "Ikke indeholder",

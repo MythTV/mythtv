@@ -229,13 +229,13 @@
             "Sa"
         ],
         "dayNamesShort": [
-            "Sun",
-            "Mon",
-            "Tue",
-            "Wed",
-            "Thu",
-            "Fri",
-            "Sat"
+            "Nap",
+            "Hétfő",
+            "kedd",
+            "Házasodik",
+            "cs",
+            "Péntek",
+            "Ült"
         ],
         "emptyFilterMessage": "Nincs találat",
         "emptyMessage": "Nincs találat",
@@ -261,22 +261,22 @@
             "augusztus",
             "szeptember",
             "október",
-            "November",
-            "December"
+            "november",
+            "december"
         ],
         "monthNamesShort": [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec"
+            "jan",
+            "Február",
+            "márc",
+            "Április",
+            "Lehet",
+            "Június",
+            "Július",
+            "Augusztus",
+            "szept",
+            "Október",
+            "November",
+            "December"
         ],
         "noFilter": "Nincs szűrő",
         "notContains": "Nem tartalmaz",

@@ -229,13 +229,13 @@
             "Sa"
         ],
         "dayNamesShort": [
-            "Sun",
-            "Mon",
-            "Tue",
-            "Wed",
-            "Thu",
-            "Fri",
-            "Sat"
+            "Sole",
+            "lun",
+            "Mar",
+            "mer",
+            "gio",
+            "ven",
+            "Sab"
         ],
         "emptyFilterMessage": "Nessun risultato trovato",
         "emptyMessage": "Nessun risultato trovato",
@@ -265,18 +265,18 @@
             "Dicembre"
         ],
         "monthNamesShort": [
-            "Jan",
-            "Feb",
+            "gen",
+            "febbraio",
             "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec"
+            "apr",
+            "Maggio",
+            "giu",
+            "lug",
+            "agosto",
+            "Sett",
+            "ottobre",
+            "nov",
+            "Dic"
         ],
         "noFilter": "Senza Filtro",
         "notContains": "Non contiene",

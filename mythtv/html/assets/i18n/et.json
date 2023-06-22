@@ -229,13 +229,13 @@
             "Sa"
         ],
         "dayNamesShort": [
-            "Sun",
-            "Mon",
-            "Tue",
-            "Wed",
-            "Thu",
-            "Fri",
-            "Sat"
+            "Päike",
+            "Esmasp",
+            "teisip",
+            "kolmap",
+            "Neljap",
+            "P",
+            "laup"
         ],
         "emptyFilterMessage": "Tulemusi ei leitud",
         "emptyMessage": "Tulemusi ei leitud",
@@ -265,18 +265,18 @@
             "detsembril"
         ],
         "monthNamesShort": [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec"
+            "jaan",
+            "veebr",
+            "märts",
+            "apr",
+            "mai",
+            "juuni",
+            "juuli",
+            "augustil",
+            "sept",
+            "okt",
+            "nov",
+            "dets"
         ],
         "noFilter": "Ilma filtrita",
         "notContains": "Ei sisalda",

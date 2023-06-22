@@ -223,19 +223,19 @@
             "do",
             "Mes",
             "ma",
-            "We",
+            "Nosotros",
             "el",
             "fr",
             "Sá."
         ],
         "dayNamesShort": [
-            "Sun",
-            "Mon",
-            "Tue",
-            "Wed",
-            "Thu",
-            "Fri",
-            "Sat"
+            "Sol",
+            "Lun",
+            "Mar",
+            "Casarse",
+            "Jue",
+            "Vie",
+            "Se sentó"
         ],
         "emptyFilterMessage": "No se han encontrado resultados",
         "emptyMessage": "No se han encontrado resultados",
@@ -265,18 +265,18 @@
             "Diciembre"
         ],
         "monthNamesShort": [
-            "Jan",
+            "Ene",
             "Feb",
             "Mar",
-            "Apr",
-            "May",
+            "Abr",
+            "Puede",
             "Jun",
             "Jul",
-            "Aug",
+            "Ago",
             "Sep",
             "Oct",
             "Nov",
-            "Dec"
+            "Dic"
         ],
         "noFilter": "Sin filtro",
         "notContains": "no contiene",

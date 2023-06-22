@@ -222,20 +222,20 @@
         "dayNamesMin": [
             "Su",
             "Mo",
-            "Tu",
+            "Di",
             "Wir",
             "Th",
             "Fr",
             "Sa"
         ],
         "dayNamesShort": [
-            "Sun",
-            "Mon",
-            "Tue",
-            "Wed",
-            "Thu",
-            "Fri",
-            "Sat"
+            "Sonne",
+            "Mo",
+            "Di",
+            "Heiraten",
+            "Do",
+            "Fr",
+            "Sa"
         ],
         "emptyFilterMessage": "keine Ergebnisse gefunden",
         "emptyMessage": "keine Ergebnisse gefunden",
@@ -266,17 +266,17 @@
         ],
         "monthNamesShort": [
             "Jan",
-            "Feb",
-            "Mar",
+            "Febr",
+            "Beschädigen",
             "Apr",
-            "May",
+            "Dürfen",
             "Jun",
-            "Jul",
+            "Juli",
             "Aug",
-            "Sep",
-            "Oct",
+            "Sept",
+            "Okt",
             "Nov",
-            "Dec"
+            "Dez"
         ],
         "noFilter": "Kein Filter",
         "notContains": "Nicht enthalten",
