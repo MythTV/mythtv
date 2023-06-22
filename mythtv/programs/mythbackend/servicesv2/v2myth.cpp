@@ -1240,7 +1240,7 @@ bool V2Myth::ManageScheduler ( bool Enable, bool Disable )
     while (iter.hasNext())
     {
         iter.next();
-        auto tvrec = iter.value();
+        auto *tvrec = iter.value();
         tvrec->EnableActiveScan(Enable);
     }
     return true;
