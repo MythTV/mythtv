@@ -7562,14 +7562,6 @@ sed -e "s/@MYTHTV_PYTHON_VERSION_LIST@/${MYTHTV_PYTHON_VERSION_LIST}/g" \
     bindings/python/MythTV/services_api/mythversions.py.in > $TMPPRO
 cp_if_changed $TMPPRO bindings/python/MythTV/services_api/mythversions.py
 
-DOXYGEN_SOURCES="doxygen-architecture-document.cpp ../contrib ../libs ../programs ../../mythplugins"
-DOXYGEN_EXCLUDES="../libs/libmythmpeg2"
-echo "Creating docs/doxygen-paths.cfg.inc"
-sed -e "s#@DOXYGEN_SOURCES@#${DOXYGEN_SOURCES}#g" \
-    -e "s#@DOXYGEN_EXCLUDES@#${DOXYGEN_EXCLUDES}#g" \
-    docs/doxygen-paths.cfg.inc.in > $TMPPRO
-cp_if_changed $TMPPRO docs/doxygen-paths.cfg.inc
-
 #
 # Configure subdirs
 #
