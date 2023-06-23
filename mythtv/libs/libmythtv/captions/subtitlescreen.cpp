@@ -1846,7 +1846,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
     MythVideoOutput *videoOut = m_player->GetVideoOutput();
     MythVideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : nullptr;
 
-    if (subs->m_buffers.empty() && m_subreader)
+    if (subs->m_buffers.empty() && (m_subreader->GetParser() != nullptr))
     {
         if (subs->m_needSync && (currentFrame != nullptr))
         {
