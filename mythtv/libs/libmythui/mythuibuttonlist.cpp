@@ -2725,10 +2725,10 @@ class NextButtonListPageEvent : public QEvent
         QEvent(kEventType), m_start(start), m_pageSize(pageSize) {}
     const int m_start;
     const int m_pageSize;
-    static Type kEventType;
+    static const Type kEventType;
 };
 
-QEvent::Type NextButtonListPageEvent::kEventType =
+const QEvent::Type NextButtonListPageEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 void MythUIButtonList::customEvent(QEvent *event)

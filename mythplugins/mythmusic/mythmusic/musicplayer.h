@@ -36,18 +36,18 @@ class MusicPlayerEvent : public MythEvent
         uint m_volume {0};
         bool m_isMuted {false};
 
-        static Type TrackChangeEvent;
-        static Type VolumeChangeEvent;
-        static Type TrackAddedEvent;
-        static Type TrackRemovedEvent;
-        static Type TrackUnavailableEvent;
-        static Type AllTracksRemovedEvent;
-        static Type MetadataChangedEvent;
-        static Type TrackStatsChangedEvent;
-        static Type AlbumArtChangedEvent;
-        static Type CDChangedEvent;
-        static Type PlaylistChangedEvent;
-        static Type PlayedTracksChangedEvent;
+        static const Type kTrackChangeEvent;
+        static const Type kVolumeChangeEvent;
+        static const Type kTrackAddedEvent;
+        static const Type kTrackRemovedEvent;
+        static const Type kTrackUnavailableEvent;
+        static const Type kAllTracksRemovedEvent;
+        static const Type kMetadataChangedEvent;
+        static const Type kTrackStatsChangedEvent;
+        static const Type kAlbumArtChangedEvent;
+        static const Type kCDChangedEvent;
+        static const Type kPlaylistChangedEvent;
+        static const Type kPlayedTracksChangedEvent;
 
     // No implicit copying.
     protected:

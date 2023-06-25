@@ -7,5 +7,5 @@
 // Own header
 #include "devices/jsmenuevent.h"
 
-QEvent::Type JoystickKeycodeEvent::kEventType =
+const QEvent::Type JoystickKeycodeEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();

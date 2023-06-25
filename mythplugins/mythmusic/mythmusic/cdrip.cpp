@@ -67,31 +67,31 @@
 #endif // CD_FRAMESIZE_RAW
 #endif // HAVE_CDIO
 
-QEvent::Type RipStatusEvent::kTrackTextEvent =
+const QEvent::Type RipStatusEvent::kTrackTextEvent =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type RipStatusEvent::kOverallTextEvent =
+const QEvent::Type RipStatusEvent::kOverallTextEvent =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type RipStatusEvent::kStatusTextEvent =
+const QEvent::Type RipStatusEvent::kStatusTextEvent =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type RipStatusEvent::kTrackProgressEvent =
+const QEvent::Type RipStatusEvent::kTrackProgressEvent =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type RipStatusEvent::kTrackPercentEvent =
+const QEvent::Type RipStatusEvent::kTrackPercentEvent =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type RipStatusEvent::kTrackStartEvent =
+const QEvent::Type RipStatusEvent::kTrackStartEvent =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type RipStatusEvent::kOverallProgressEvent =
+const QEvent::Type RipStatusEvent::kOverallProgressEvent =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type RipStatusEvent::kOverallPercentEvent =
+const QEvent::Type RipStatusEvent::kOverallPercentEvent =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type RipStatusEvent::kOverallStartEvent =
+const QEvent::Type RipStatusEvent::kOverallStartEvent =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type RipStatusEvent::kCopyStartEvent =
+const QEvent::Type RipStatusEvent::kCopyStartEvent =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type RipStatusEvent::kCopyEndEvent =
+const QEvent::Type RipStatusEvent::kCopyEndEvent =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type RipStatusEvent::kFinishedEvent =
+const QEvent::Type RipStatusEvent::kFinishedEvent =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type RipStatusEvent::kEncoderErrorEvent =
+const QEvent::Type RipStatusEvent::kEncoderErrorEvent =
     (QEvent::Type) QEvent::registerEventType();
 
 void CDScannerThread::run()

@@ -38,7 +38,7 @@ class SemaphoreLocker
     QSemaphore *m_lock {nullptr};
 };
 
-QEvent::Type ScreenLoadCompletionEvent::kEventType =
+const QEvent::Type ScreenLoadCompletionEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 class ScreenLoadTask : public QRunnable

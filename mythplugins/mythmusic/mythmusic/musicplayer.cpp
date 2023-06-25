@@ -39,18 +39,18 @@ QString gCDdevice = "";
 
 ////////////////////////////////////////////////////////////////
 
-QEvent::Type MusicPlayerEvent::TrackChangeEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::VolumeChangeEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::TrackAddedEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::TrackRemovedEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::TrackUnavailableEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::AllTracksRemovedEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::MetadataChangedEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::TrackStatsChangedEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::AlbumArtChangedEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::CDChangedEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::PlaylistChangedEvent = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MusicPlayerEvent::PlayedTracksChangedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::kTrackChangeEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::kVolumeChangeEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::kTrackAddedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::kTrackRemovedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::kTrackUnavailableEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::kAllTracksRemovedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::kMetadataChangedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::kTrackStatsChangedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::kAlbumArtChangedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::kCDChangedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::kPlaylistChangedEvent = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type MusicPlayerEvent::kPlayedTracksChangedEvent = (QEvent::Type) QEvent::registerEventType();
 
 MusicPlayer::MusicPlayer(QObject *parent)
     :QObject(parent)
@@ -277,7 +277,7 @@ void MusicPlayer::stop(bool stopAll)
 
     // because we don't actually stop the audio output we have to fake a Stopped
     // event so any listeners can act on it
-    OutputEvent oe(OutputEvent::Stopped);
+    OutputEvent oe(OutputEvent::kStopped);
     dispatch(oe);
 
     gCoreContext->emitTVPlaybackStopped();
@@ -545,12 +545,12 @@ void MusicPlayer::StopPlayback(void)
 void MusicPlayer::customEvent(QEvent *event)
 {
     // handle decoderHandler events
-    if (event->type() == DecoderHandlerEvent::Ready)
+    if (event->type() == DecoderHandlerEvent::kReady)
     {
         m_errorCount = 0;
         decoderHandlerReady();
     }
-    else if (event->type() == DecoderHandlerEvent::Meta)
+    else if (event->type() == DecoderHandlerEvent::kMeta)
     {
         auto *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
         if (!dhe)
@@ -589,11 +589,11 @@ void MusicPlayer::customEvent(QEvent *event)
         }
 
         // tell any listeners we've added a new track to the played list
-        MusicPlayerEvent me(MusicPlayerEvent::PlayedTracksChangedEvent, mdata->ID());
+        MusicPlayerEvent me(MusicPlayerEvent::kPlayedTracksChangedEvent, mdata->ID());
         dispatch(me);
     }
     // handle MythEvent events
-    else if (event->type() == MythEvent::MythEventMessage)
+    else if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent*>(event);
         if (!me)
@@ -798,7 +798,7 @@ void MusicPlayer::customEvent(QEvent *event)
         }
     }
 
-    if (event->type() == OutputEvent::Error)
+    if (event->type() == OutputEvent::kError)
     {
         auto *aoe = dynamic_cast<OutputEvent *>(event);
 
@@ -820,7 +820,7 @@ void MusicPlayer::customEvent(QEvent *event)
             stop(true);
         }
     }
-    else if (event->type() == DecoderEvent::Error)
+    else if (event->type() == DecoderEvent::kError)
     {
         auto *dxe = dynamic_cast<DecoderEvent *>(event);
 
@@ -842,7 +842,7 @@ void MusicPlayer::customEvent(QEvent *event)
             stop(true);
         }
     }
-    else if (event->type() == DecoderHandlerEvent::Error)
+    else if (event->type() == DecoderHandlerEvent::kError)
     {
         auto *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
 
@@ -864,7 +864,7 @@ void MusicPlayer::customEvent(QEvent *event)
             stop(true);
         }
     }
-    else if (event->type() == OutputEvent::Info)
+    else if (event->type() == OutputEvent::kInfo)
     {
         auto *oe = dynamic_cast<OutputEvent*>(event);
 
@@ -899,7 +899,7 @@ void MusicPlayer::customEvent(QEvent *event)
             }
         }
     }
-    else if (event->type() == DecoderEvent::Finished)
+    else if (event->type() == DecoderEvent::kFinished)
     {
         if (m_oneshotMetadata)
         {
@@ -923,17 +923,17 @@ void MusicPlayer::customEvent(QEvent *event)
                 gPlayer->sendMetadataChangedEvent(getCurrentMetadata()->ID());
 
                 // this will force the playlist stats to update
-                MusicPlayerEvent me(MusicPlayerEvent::TrackChangeEvent, m_currentTrack);
+                MusicPlayerEvent me(MusicPlayerEvent::kTrackChangeEvent, m_currentTrack);
                 dispatch(me);
             }
 
             nextAuto();
         }
     }
-    else if (event->type() == DecoderEvent::Stopped)
+    else if (event->type() == DecoderEvent::kStopped)
     {
     }
-    else if (event->type() == DecoderHandlerEvent::BufferStatus)
+    else if (event->type() == DecoderHandlerEvent::kBufferStatus)
     {
         auto *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
         if (!dhe)
@@ -1330,37 +1330,37 @@ void MusicPlayer::decSpeed()
 
 void MusicPlayer::sendVolumeChangedEvent(void)
 {
-    MusicPlayerEvent me(MusicPlayerEvent::VolumeChangeEvent, getVolume(), isMuted());
+    MusicPlayerEvent me(MusicPlayerEvent::kVolumeChangeEvent, getVolume(), isMuted());
     dispatch(me);
 }
 
 void MusicPlayer::sendMetadataChangedEvent(int trackID)
 {
-    MusicPlayerEvent me(MusicPlayerEvent::MetadataChangedEvent, trackID);
+    MusicPlayerEvent me(MusicPlayerEvent::kMetadataChangedEvent, trackID);
     dispatch(me);
 }
 
 void MusicPlayer::sendTrackStatsChangedEvent(int trackID)
 {
-    MusicPlayerEvent me(MusicPlayerEvent::TrackStatsChangedEvent, trackID);
+    MusicPlayerEvent me(MusicPlayerEvent::kTrackStatsChangedEvent, trackID);
     dispatch(me);
 }
 
 void MusicPlayer::sendAlbumArtChangedEvent(int trackID)
 {
-    MusicPlayerEvent me(MusicPlayerEvent::AlbumArtChangedEvent, trackID);
+    MusicPlayerEvent me(MusicPlayerEvent::kAlbumArtChangedEvent, trackID);
     dispatch(me);
 }
 
 void MusicPlayer::sendTrackUnavailableEvent(int trackID)
 {
-    MusicPlayerEvent me(MusicPlayerEvent::TrackUnavailableEvent, trackID);
+    MusicPlayerEvent me(MusicPlayerEvent::kTrackUnavailableEvent, trackID);
     dispatch(me);
 }
 
 void MusicPlayer::sendCDChangedEvent(void)
 {
-    MusicPlayerEvent me(MusicPlayerEvent::CDChangedEvent, -1);
+    MusicPlayerEvent me(MusicPlayerEvent::kCDChangedEvent, -1);
     dispatch(me);
 }
 
@@ -1429,12 +1429,12 @@ void MusicPlayer::activePlaylistChanged(int trackID, bool deleted)
     {
         if (deleted)
         {
-            MusicPlayerEvent me(MusicPlayerEvent::AllTracksRemovedEvent, 0);
+            MusicPlayerEvent me(MusicPlayerEvent::kAllTracksRemovedEvent, 0);
             dispatch(me);
         }
         else
         {
-            MusicPlayerEvent me(MusicPlayerEvent::TrackAddedEvent, trackID);
+            MusicPlayerEvent me(MusicPlayerEvent::kTrackAddedEvent, trackID);
             dispatch(me);
         }
     }
@@ -1442,12 +1442,12 @@ void MusicPlayer::activePlaylistChanged(int trackID, bool deleted)
     {
         if (deleted)
         {
-            MusicPlayerEvent me(MusicPlayerEvent::TrackRemovedEvent, trackID);
+            MusicPlayerEvent me(MusicPlayerEvent::kTrackRemovedEvent, trackID);
             dispatch(me);
         }
         else
         {
-            MusicPlayerEvent me(MusicPlayerEvent::TrackAddedEvent, trackID);
+            MusicPlayerEvent me(MusicPlayerEvent::kTrackAddedEvent, trackID);
             dispatch(me);
         }
     }
@@ -1488,7 +1488,7 @@ void MusicPlayer::activePlaylistChanged(int trackID, bool deleted)
 
 void MusicPlayer::playlistChanged(int playlistID)
 {
-    MusicPlayerEvent me(MusicPlayerEvent::PlaylistChangedEvent, playlistID);
+    MusicPlayerEvent me(MusicPlayerEvent::kPlaylistChangedEvent, playlistID);
     dispatch(me);
 }
 
@@ -1576,7 +1576,7 @@ void MusicPlayer::decoderHandlerReady(void)
     }
 
     // tell any listeners we've started playing a new track
-    MusicPlayerEvent me(MusicPlayerEvent::TrackChangeEvent, m_currentTrack);
+    MusicPlayerEvent me(MusicPlayerEvent::kTrackChangeEvent, m_currentTrack);
     dispatch(me);
 }
 
@@ -1634,7 +1634,7 @@ void MusicPlayer::sendNotification(int notificationID, const QString &title, con
     map["minm"] = author;
     map["asal"] = desc;
 
-    auto *n = new MythImageNotification(MythNotification::Info, image, map);
+    auto *n = new MythImageNotification(MythNotification::kInfo, image, map);
 
     n->SetId(notificationID);
     n->SetParent(this);

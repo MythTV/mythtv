@@ -30,7 +30,7 @@ class MUI_PUBLIC ScreenLoadCompletionEvent : public QEvent
 
     QString GetId() { return m_id; }
 
-    static Type kEventType;
+    static const Type kEventType;
 
   private:
     QString m_id;

@@ -24,7 +24,7 @@ class LircKeycodeEvent : public QEvent
     QString               text(void)      const { return m_text;      }
     QString               lirctext(void)  const { return m_lirctext;  }
 
-    static Type kEventType;
+    static const Type kEventType;
 
     static const unsigned kLIRCInvalidKeyCombo  = 0xFFFFFFFF;
 

@@ -3918,7 +3918,7 @@ void PlaybackBox::customEvent(QEvent *event)
         if (resultid == "transcode" && dce->GetResult() >= 0)
             changeProfileAndTranscode(dce->GetData().toInt());
     }
-    else if (event->type() == MythEvent::MythEventMessage)
+    else if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)

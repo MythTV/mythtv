@@ -34,10 +34,10 @@ class MPUBLIC OutputEvent : public MythEvent
     explicit OutputEvent(Type type) :
         MythEvent(type) {}
     OutputEvent(std::chrono::seconds s, unsigned long w, int b, int f, int p, int c) :
-        MythEvent(Info), m_elaspedSeconds(s), m_writtenBytes(w),
+        MythEvent(kInfo), m_elaspedSeconds(s), m_writtenBytes(w),
         m_brate(b), m_freq(f), m_prec(p), m_chan(c) {}
     explicit OutputEvent(const QString &e) :
-        MythEvent(Error)
+        MythEvent(kError)
     {
         QByteArray tmp = e.toUtf8();
         m_errorMsg = new QString(tmp.constData());
@@ -60,12 +60,12 @@ class MPUBLIC OutputEvent : public MythEvent
     MythEvent *clone(void) const override // MythEvent
         { return new OutputEvent(*this); }
 
-    static Type Playing;
-    static Type Buffering;
-    static Type Info;
-    static Type Paused;
-    static Type Stopped;
-    static Type Error;
+    static const Type kPlaying;
+    static const Type kBuffering;
+    static const Type kInfo;
+    static const Type kPaused;
+    static const Type kStopped;
+    static const Type kError;
 
   private:
     OutputEvent(const OutputEvent &o) : MythEvent(o),

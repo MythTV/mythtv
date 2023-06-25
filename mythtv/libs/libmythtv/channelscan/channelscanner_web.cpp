@@ -311,7 +311,7 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
         m_serviceRequirements = service_requirements;
         m_sourceid            = sourceid;
         // The import is handled by the monitor thread after the complete event
-        post_event(m_scanMonitor, ScannerEvent::ScanComplete, 0);
+        post_event(m_scanMonitor, ScannerEvent::kScanComplete, 0);
     }
     else if (nScanType == ScanTypeSetting::IPTVImport)
     {
@@ -406,7 +406,7 @@ void ChannelScannerWeb::stopScan()
 {
     if (m_scanMonitor)
     {
-        post_event(m_scanMonitor, ScannerEvent::ScanShutdown, 0);
+        post_event(m_scanMonitor, ScannerEvent::kScanShutdown, 0);
     }
 }
 
@@ -434,19 +434,19 @@ void ChannelScannerWeb::stopMon(void)
 void ChannelScannerWeb::HandleEvent(const ScannerEvent *scanEvent)
 {
     auto type = scanEvent->type();
-    if ((type == ScannerEvent::ScanComplete) ||
-        (type == ScannerEvent::ScanShutdown) ||
-        (type == ScannerEvent::ScanErrored))
+    if ((type == ScannerEvent::kScanComplete) ||
+        (type == ScannerEvent::kScanShutdown) ||
+        (type == ScannerEvent::kScanErrored))
     {
-        if (type == ScannerEvent::ScanComplete)
+        if (type == ScannerEvent::kScanComplete)
         {
             m_statusText = tr("Scan Complete");
         }
-        else if (type == ScannerEvent::ScanShutdown)
+        else if (type == ScannerEvent::kScanShutdown)
         {
             m_statusText = tr("Scan Shut Down");
         }
-        else if (type == ScannerEvent::ScanErrored)
+        else if (type == ScannerEvent::kScanErrored)
         {
             m_statusText = tr("Scan Error") + " " + scanEvent->strValue();
         }
@@ -474,7 +474,7 @@ void ChannelScannerWeb::HandleEvent(const ScannerEvent *scanEvent)
                             m_serviceRequirements);
             ci.Process(transports, get_on_input("sourceid", m_cardid).toUInt());
         }
-        else if (type != ScannerEvent::ScanErrored) // && !m_transports.empty())
+        else if (type != ScannerEvent::kScanErrored) // && !m_transports.empty())
         {
             Process(m_transports, success);
         }
@@ -482,21 +482,21 @@ void ChannelScannerWeb::HandleEvent(const ScannerEvent *scanEvent)
         m_status = "IDLE";
 
     }
-    else if (type == ScannerEvent::AppendTextToLog)
+    else if (type == ScannerEvent::kAppendTextToLog)
         log(scanEvent->strValue());
-    else if (type == ScannerEvent::SetStatusText)
+    else if (type == ScannerEvent::kSetStatusText)
         m_statusText = scanEvent->strValue();
-    else if (type == ScannerEvent::SetPercentComplete)
+    else if (type == ScannerEvent::kSetPercentComplete)
         m_statusProgress = scanEvent->intValue();
-    else if (type == ScannerEvent::SetStatusSignalLock)
+    else if (type == ScannerEvent::kSetStatusSignalLock)
         m_statusLock = scanEvent->boolValue();
-    else if (type == ScannerEvent::SetStatusSignalToNoise)
+    else if (type == ScannerEvent::kSetStatusSignalToNoise)
         m_statusSnr = scanEvent->intValue() * 100 / 65535;
-    else if (type == ScannerEvent::SetStatusTitleText)
+    else if (type == ScannerEvent::kSetStatusTitleText)
         m_statusTitleText = scanEvent->strValue();
-    else if (type == ScannerEvent::SetStatusRotorPosition)
+    else if (type == ScannerEvent::kSetStatusRotorPosition)
         m_statusRotorPosition = scanEvent->intValue();
-    else if (type == ScannerEvent::SetStatusSignalStrength)
+    else if (type == ScannerEvent::kSetStatusSignalStrength)
         m_statusSignalStrength = scanEvent->intValue() * 100 / 65535;
 
     QString msg;

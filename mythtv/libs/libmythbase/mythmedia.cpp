@@ -62,7 +62,7 @@ const std::array<const QString,3> MythMediaDevice::kMediaErrorStrings
     "MEDIAERR_UNSUPPORTED"
 };
 
-QEvent::Type MythMediaEvent::kEventType =
+const QEvent::Type MythMediaEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 // Force this class to have a vtable so that dynamic_cast works.

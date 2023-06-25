@@ -30,7 +30,7 @@ class DecoderEvent : public MythEvent
 {
   public:
     explicit DecoderEvent(Type type) : MythEvent(type) { ; }
-    explicit DecoderEvent(QString *e) : MythEvent(Error), m_errorMsg(e) { ; }
+    explicit DecoderEvent(QString *e) : MythEvent(kError), m_errorMsg(e) { ; }
 
     ~DecoderEvent() override
     {
@@ -42,10 +42,10 @@ class DecoderEvent : public MythEvent
     MythEvent *clone(void) const override // MythEvent
         { return new DecoderEvent(*this); }
 
-    static Type Decoding;
-    static Type Stopped;
-    static Type Finished;
-    static Type Error;
+    static const Type kDecoding;
+    static const Type kStopped;
+    static const Type kFinished;
+    static const Type kError;
 
   private:
     DecoderEvent(const DecoderEvent &o) : MythEvent(o)

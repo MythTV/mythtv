@@ -3880,7 +3880,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
             if (!m_curRecording->GetSubtitle().isEmpty())
                 title += " - " + m_curRecording->GetSubtitle();
 
-            MythNotification mn(MythNotification::Check, desc,
+            MythNotification mn(MythNotification::kCheck, desc,
                                 "Recording", title,
                                 tr("See 'Tuning timeout' in mythtv-setup "
                                    "for this input."));
@@ -3935,7 +3935,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
         if (!m_curRecording->GetSubtitle().isEmpty())
             title += " - " + m_curRecording->GetSubtitle();
 
-        MythNotification mn(MythNotification::Error, desc,
+        MythNotification mn(MythNotification::kError, desc,
                             "Recording", title,
                             tr("See 'Tuning timeout' in mythtv-setup "
                                "for this input."));

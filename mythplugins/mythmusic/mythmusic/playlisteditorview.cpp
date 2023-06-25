@@ -176,29 +176,29 @@ bool PlaylistEditorView::Create(void)
 
 void PlaylistEditorView::customEvent(QEvent *event)
 {
-    if ((event->type() == MusicPlayerEvent::MetadataChangedEvent) ||
-        (event->type() == MusicPlayerEvent::AlbumArtChangedEvent))
+    if ((event->type() == MusicPlayerEvent::kMetadataChangedEvent) ||
+        (event->type() == MusicPlayerEvent::kAlbumArtChangedEvent))
     { // NOLINT(bugprone-branch-clone)
         // TODO: this could be more efficient
         reloadTree();
     }
-    else if ((event->type() == MusicPlayerEvent::TrackRemovedEvent) ||
-             (event->type() == MusicPlayerEvent::TrackAddedEvent)   ||
-             (event->type() == MusicPlayerEvent::AllTracksRemovedEvent))
+    else if ((event->type() == MusicPlayerEvent::kTrackRemovedEvent) ||
+             (event->type() == MusicPlayerEvent::kTrackAddedEvent)   ||
+             (event->type() == MusicPlayerEvent::kAllTracksRemovedEvent))
     {
         updateSelectedTracks();
     }
-    else if (event->type() == MusicPlayerEvent::PlaylistChangedEvent)
+    else if (event->type() == MusicPlayerEvent::kPlaylistChangedEvent)
     {
         //TODO should just update the relevent playlist here
         reloadTree();
     }
-    else if (event->type() == MusicPlayerEvent::CDChangedEvent)
+    else if (event->type() == MusicPlayerEvent::kCDChangedEvent)
     {
         //TODO should just update the cd node
         reloadTree();
     }
-    else if (event->type() == MythEvent::MythEventMessage)
+    else if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent*>(event);
         if (!me)

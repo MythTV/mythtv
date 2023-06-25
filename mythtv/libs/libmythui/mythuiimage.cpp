@@ -462,7 +462,7 @@ class ImageLoadEvent : public QEvent
     AnimationFrames *GetAnimationFrames() const { return m_images; }
     bool GetAbortState() const        { return m_aborted; }
 
-    static Type kEventType;
+    static const Type kEventType;
 
   private:
     const MythUIImage *m_parent   {nullptr};
@@ -478,7 +478,7 @@ class ImageLoadEvent : public QEvent
     bool               m_aborted;
 };
 
-QEvent::Type ImageLoadEvent::kEventType =
+const QEvent::Type ImageLoadEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 /*!

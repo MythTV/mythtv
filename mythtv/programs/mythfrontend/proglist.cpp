@@ -1666,7 +1666,7 @@ void ProgLister::customEvent(QEvent *event)
                 ShowChooseViewMenu();
         }
     }
-    else if (event->type() == MythEvent::MythEventMessage)
+    else if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)

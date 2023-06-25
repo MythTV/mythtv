@@ -38,7 +38,7 @@
 #include <algorithm>
 #include <complex>
 
-QEvent::Type MythGestureEvent::kEventType = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type MythGestureEvent::kEventType = static_cast<QEvent::Type>(QEvent::registerEventType());
 
 /*! \class MythGestureEvent
  * \brief A custom event that represents a mouse gesture.

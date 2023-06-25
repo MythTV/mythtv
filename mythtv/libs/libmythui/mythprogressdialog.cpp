@@ -9,7 +9,7 @@
 #include "mythuitext.h"
 #include "mythuiprogressbar.h"
 
-QEvent::Type ProgressUpdateEvent::kEventType =
+const QEvent::Type ProgressUpdateEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 // Force this class to have a vtable so that dynamic_cast works.
