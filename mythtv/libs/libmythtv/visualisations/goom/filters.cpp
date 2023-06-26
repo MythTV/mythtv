@@ -492,7 +492,7 @@ getAsmUse ()
 void
 zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uint resy, int switchIncr, float switchMult)
 {
-	static unsigned char s_pertedec = 8;
+	[[maybe_unused]] static unsigned char s_pertedec = 8;
 	static char s_firstTime = 1;
 
         static constexpr int8_t INTERLACE_INCR   {  16 };
@@ -546,9 +546,6 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 		hypercosEffect = zf->hypercosEffect;
 		noisify = zf->noisify;
 	}
-
-	/* Silence a gcc warning */
-	(void)s_pertedec;
 
 	/** generation d'un effet **/
 	if (s_firstTime || zf) {

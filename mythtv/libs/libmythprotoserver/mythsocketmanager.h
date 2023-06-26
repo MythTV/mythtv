@@ -27,10 +27,8 @@ class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCB
 
     void readyRead(MythSocket *socket) override; // MythSocketCBs
     void connectionClosed(MythSocket *socket) override; // MythSocketCBs
-    void connectionFailed(MythSocket *socket) override // MythSocketCBs
-        { (void)socket; }
-    void connected(MythSocket *socket) override // MythSocketCBs
-        { (void)socket; }
+    void connectionFailed([[maybe_unused]] MythSocket *socket) override {}; // MythSocketCBs
+    void connected([[maybe_unused]] MythSocket *socket) override {}; // MythSocketCBs
 
     void SetThreadCount(uint count);
 

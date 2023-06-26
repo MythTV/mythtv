@@ -112,7 +112,8 @@ void CDEjectorThread::run()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static long int getSectorCount (QString &cddevice, int tracknum)
+static long int getSectorCount ([[maybe_unused]] QString &cddevice,
+                                [[maybe_unused]] int tracknum)
 {
 #ifdef HAVE_CDIO
     QByteArray devname = cddevice.toLatin1();
@@ -148,8 +149,6 @@ static long int getSectorCount (QString &cddevice, int tracknum)
         QString("Error: cdrip - cdda_track_audiop(%1) returned 0").arg(cddevice));
 
     cdda_close(device);
-#else
-    (void)cddevice; (void)tracknum;
 #endif // HAVE_CDIO
     return 0;
 }
@@ -390,7 +389,9 @@ void CDRipperThread::run(void)
     RunEpilog();
 }
 
-int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
+int CDRipperThread::ripTrack([[maybe_unused]] QString &cddevice,
+                             [[maybe_unused]] Encoder *encoder,
+                             [[maybe_unused]] int tracknum)
 {
 #ifdef HAVE_CDIO
     QByteArray devname = cddevice.toLatin1();
@@ -508,7 +509,6 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 
     return (curpos - start + 1) * CD_FRAMESIZE_RAW;
 #else
-    (void)cddevice; (void)encoder; (void)tracknum;
     return 0;
 #endif // HAVE_CDIO
 }

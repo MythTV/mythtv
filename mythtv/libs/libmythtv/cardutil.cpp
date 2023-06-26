@@ -102,13 +102,9 @@ QString CardUtil::GetScanableInputTypes(void)
     return QString("(%1)").arg(inputTypes.join(','));
 }
 
-bool CardUtil::IsCableCardPresent(uint inputid,
+bool CardUtil::IsCableCardPresent([[maybe_unused]] uint inputid,
                                   const QString &inputType)
 {
-#if !defined(USING_HDHOMERUN) && !defined(USING_CETON)
-    Q_UNUSED(inputid);
-#endif
-
     if (inputType == "HDHOMERUN")
     {
 #ifdef USING_HDHOMERUN
@@ -214,7 +210,8 @@ bool CardUtil::IsCableCardPresent(uint inputid,
     return false;
 }
 
-bool CardUtil::HasTuner(const QString &rawtype, const QString & device)
+bool CardUtil::HasTuner(const QString &rawtype,
+                        [[maybe_unused]] const QString & device)
 {
     if (rawtype == "DVB"     || rawtype == "HDHOMERUN" ||
         rawtype == "FREEBOX" || rawtype == "CETON" ||
@@ -227,8 +224,6 @@ bool CardUtil::HasTuner(const QString &rawtype, const QString & device)
         V4L2util v4l2(device);
         return !v4l2 ? false : v4l2.HasTuner();
     }
-#else
-    Q_UNUSED(device);
 #endif
 
     if (rawtype == "EXTERNAL")
@@ -632,7 +627,7 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
 }
 
 // Get the list of delivery systems from the card
-QStringList CardUtil::ProbeDeliverySystems(const QString &device)
+QStringList CardUtil::ProbeDeliverySystems([[maybe_unused]] const QString &device)
 {
     QStringList delsyslist;
 
@@ -674,15 +669,13 @@ QStringList CardUtil::ProbeDeliverySystems(const QString &device)
     LOG(VB_GENERAL, LOG_INFO, QString("CardUtil(%1): ").arg(device) + msg);
 
     close(fd_frontend);
-#else
-    Q_UNUSED(device);
 #endif  // USING_DVB
 
     return delsyslist;
 }
 
 // Get the list of all supported delivery systems from the card
-QStringList CardUtil::ProbeDeliverySystems(int fd_frontend)
+QStringList CardUtil::ProbeDeliverySystems([[maybe_unused]] int fd_frontend)
 {
     QStringList delsyslist;
 
@@ -704,14 +697,12 @@ QStringList CardUtil::ProbeDeliverySystems(int fd_frontend)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "FE_GET_PROPERTY ioctl failed " + ENO);
     }
-#else
-   Q_UNUSED(fd_frontend);
 #endif  // USING_DVB
 
     return delsyslist;
 }
 
-QString CardUtil::ProbeDefaultDeliverySystem(const QString &device)
+QString CardUtil::ProbeDefaultDeliverySystem([[maybe_unused]] const QString &device)
 {
     DTVModulationSystem delsys;
 
@@ -722,8 +713,6 @@ QString CardUtil::ProbeDefaultDeliverySystem(const QString &device)
         delsys = ProbeBestDeliverySystem(fd);
         close(fd);
     }
-#else
-    Q_UNUSED(device);
 #endif  // USING_DVB
 
     return delsys.toString();
@@ -750,7 +739,7 @@ QString CardUtil::ProbeDVBType(const QString &device)
 /** \fn CardUtil::ProbeDVBFrontendName(const QString &)
  *  \brief Returns the input type from the video device
  */
-QString CardUtil::ProbeDVBFrontendName(const QString &device)
+QString CardUtil::ProbeDVBFrontendName([[maybe_unused]] const QString &device)
 {
     QString ret = "ERROR_UNKNOWN";
 
@@ -772,8 +761,6 @@ QString CardUtil::ProbeDVBFrontendName(const QString &device)
     ret = info.name;
 
     close(fd_frontend);
-#else
-    Q_UNUSED(device);
 #endif // USING_DVB
 
     return ret;
@@ -923,7 +910,7 @@ DTVModulationSystem CardUtil::GetDeliverySystem(uint inputid)
 }
 
 // Get the currently configured delivery system from the device
-DTVModulationSystem CardUtil::ProbeCurrentDeliverySystem(const QString &device)
+DTVModulationSystem CardUtil::ProbeCurrentDeliverySystem([[maybe_unused]] const QString &device)
 {
     DTVModulationSystem delsys;
 
@@ -948,15 +935,13 @@ DTVModulationSystem CardUtil::ProbeCurrentDeliverySystem(const QString &device)
         .arg(device).arg(delsys).arg(delsys.toString()));
 
     close(fd_frontend);
-#else
-    Q_UNUSED(device);
 #endif
 
     return delsys;
 }
 
 // Get the currently configured delivery system from the device
-DTVModulationSystem CardUtil::ProbeCurrentDeliverySystem(int fd_frontend)
+DTVModulationSystem CardUtil::ProbeCurrentDeliverySystem([[maybe_unused]] int fd_frontend)
 {
     DTVModulationSystem delsys;
 
@@ -980,8 +965,6 @@ DTVModulationSystem CardUtil::ProbeCurrentDeliverySystem(int fd_frontend)
 
     delsys = prop.u.data;
 
-#else
-    Q_UNUSED(fd_frontend);
 #endif // USING_DVB
 
     return delsys;
@@ -1052,7 +1035,7 @@ bool CardUtil::IsDVBInputType(const QString &inputType)
 // If the current delivery system is DVB-T and DVB-T2 is supported then select DVB-T2
 // If the current delivery system is DVB-S and DVB-S2 is supported then select DVB-S2
 //
-DTVModulationSystem CardUtil::ProbeBestDeliverySystem(int fd)
+DTVModulationSystem CardUtil::ProbeBestDeliverySystem([[maybe_unused]] int fd)
 {
     DTVModulationSystem delsys;
 
@@ -1093,8 +1076,6 @@ DTVModulationSystem CardUtil::ProbeBestDeliverySystem(int fd)
             delsys = newdelsys;
         }
     }
-#else
-    Q_UNUSED(fd);
 #endif
 
     return delsys;
@@ -1103,7 +1084,8 @@ DTVModulationSystem CardUtil::ProbeBestDeliverySystem(int fd)
 // Get the delivery system from the database
 // If not found then get the best delivery system from the card
 //
-DTVModulationSystem CardUtil::GetOrProbeDeliverySystem(uint inputid, int fd)
+DTVModulationSystem CardUtil::GetOrProbeDeliverySystem([[maybe_unused]] uint inputid,
+                                                       [[maybe_unused]] int fd)
 {
     DTVModulationSystem delsys;
 #ifdef USING_DVB
@@ -1122,9 +1104,6 @@ DTVModulationSystem CardUtil::GetOrProbeDeliverySystem(uint inputid, int fd)
         QString("CardUtil[%1]: ").arg(inputid) +
         QString("No capturecard delivery system in database, using: %1").arg(delsys.toString()));
 
-#else
-    Q_UNUSED(inputid);
-    Q_UNUSED(fd);
 #endif
 
     return delsys;
@@ -1133,7 +1112,8 @@ DTVModulationSystem CardUtil::GetOrProbeDeliverySystem(uint inputid, int fd)
 // Configure the tuner to use the delivery system from database
 // If not found then set to the best delivery system from the card
 //
-int CardUtil::SetDefaultDeliverySystem(uint inputid, int fd)
+int CardUtil::SetDefaultDeliverySystem([[maybe_unused]] uint inputid,
+                                       [[maybe_unused]] int fd)
 {
     int ret = -1;
 
@@ -1143,9 +1123,6 @@ int CardUtil::SetDefaultDeliverySystem(uint inputid, int fd)
     {
         ret = SetDeliverySystem(inputid, delsys, fd);
     }
-#else
-    Q_UNUSED(inputid);
-    Q_UNUSED(fd);
 #endif
 
     return ret;
@@ -1153,7 +1130,7 @@ int CardUtil::SetDefaultDeliverySystem(uint inputid, int fd)
 
 // Set delivery system from database
 //
-int CardUtil::SetDeliverySystem(uint inputid)
+int CardUtil::SetDeliverySystem([[maybe_unused]] uint inputid)
 {
     int ret = -1;
 
@@ -1163,14 +1140,13 @@ int CardUtil::SetDeliverySystem(uint inputid)
     {
         ret = SetDeliverySystem(inputid, delsys);
     }
-#else
-    Q_UNUSED(inputid);
 #endif // USING_DVB
 
     return ret;
 }
 
-int CardUtil::SetDeliverySystem(uint inputid, DTVModulationSystem delsys)
+int CardUtil::SetDeliverySystem([[maybe_unused]] uint inputid,
+                                [[maybe_unused]] DTVModulationSystem delsys)
 {
     int ret = -1;
 
@@ -1197,16 +1173,14 @@ int CardUtil::SetDeliverySystem(uint inputid, DTVModulationSystem delsys)
     ret = SetDeliverySystem(inputid, delsys, fd_frontend);
 
     close(fd_frontend);
-#else
-    Q_UNUSED(inputid);
-    Q_UNUSED(delsys);
 #endif // USING_DVB
 
     return ret;
 }
 
 // Get delivery system from the database and write it to the card
-int CardUtil::SetDeliverySystem(uint inputid, int fd)
+int CardUtil::SetDeliverySystem([[maybe_unused]] uint inputid,
+                                [[maybe_unused]] int fd)
 {
     int ret = -1;
 
@@ -1216,16 +1190,15 @@ int CardUtil::SetDeliverySystem(uint inputid, int fd)
     {
         ret = SetDeliverySystem(inputid, delsys, fd);
     }
-#else
-    Q_UNUSED(inputid);
-    Q_UNUSED(fd);
 #endif // USING_DVB
 
     return ret;
 }
 
 // Write the delivery system to the card
-int CardUtil::SetDeliverySystem(uint inputid, DTVModulationSystem delsys, int fd)
+int CardUtil::SetDeliverySystem([[maybe_unused]] uint inputid,
+                                [[maybe_unused]] DTVModulationSystem delsys,
+                                [[maybe_unused]] int fd)
 {
     int ret = -1;
 
@@ -1250,10 +1223,6 @@ int CardUtil::SetDeliverySystem(uint inputid, DTVModulationSystem delsys, int fd
                 .arg(inputid) + ENO);
         return ret;
     }
-#else
-    Q_UNUSED(inputid);
-    Q_UNUSED(delsys);
-    Q_UNUSED(fd);
 #endif // USING_DVB
 
     return ret;
@@ -2358,9 +2327,8 @@ uint CardUtil::GetQuickTuning(uint inputid, const QString &input_name)
     return quicktune;
 }
 
-bool CardUtil::hasV4L2(int videofd)
+bool CardUtil::hasV4L2([[maybe_unused]] int videofd)
 {
-    (void) videofd;
 #ifdef USING_V4L2
     struct v4l2_capability vcap {};
 
@@ -2401,10 +2369,8 @@ bool CardUtil::GetV4LInfo(
     return !input.isEmpty();
 }
 
-InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
+InputNames CardUtil::ProbeV4LVideoInputs([[maybe_unused]] int videofd, bool &ok)
 {
-    (void) videofd;
-
     InputNames list;
     ok = false;
 
@@ -2435,10 +2401,8 @@ InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
     return list;
 }
 
-InputNames CardUtil::ProbeV4LAudioInputs(int videofd, bool &ok)
+InputNames CardUtil::ProbeV4LAudioInputs([[maybe_unused]] int videofd, bool &ok)
 {
-    (void) videofd;
-
     InputNames list;
     ok = false;
 
@@ -2495,7 +2459,7 @@ InputNames CardUtil::GetConfiguredDVBInputs(const QString &device)
 //
 // Source linuxtv.org v4l-utils/lib/libdvbv5/dvb-v5.c
 //
-QStringList CardUtil::CapabilitiesToString(uint64_t capabilities)
+QStringList CardUtil::CapabilitiesToString([[maybe_unused]] uint64_t capabilities)
 {
     QStringList caps;
 #ifdef USING_DVB
@@ -2544,8 +2508,6 @@ QStringList CardUtil::CapabilitiesToString(uint64_t capabilities)
         if (capabilities & cap.idx)
             caps.append(cap.name);
     }
-#else
-    Q_UNUSED(capabilities);
 #endif  // USING_DVB
     return caps;
 }
@@ -2641,7 +2603,7 @@ QStringList CardUtil::ProbeV4LAudioInputs(const QString& device)
     return ret;
 }
 
-QStringList CardUtil::ProbeDVBInputs(const QString& device)
+QStringList CardUtil::ProbeDVBInputs([[maybe_unused]] const QString& device)
 {
     QStringList ret;
 
@@ -2654,7 +2616,6 @@ QStringList CardUtil::ProbeDVBInputs(const QString& device)
             ret += *it;
     }
 #else
-    (void) device;
     ret += QObject::tr("ERROR, Compile with DVB support to query inputs");
 #endif
 
@@ -3094,10 +3055,8 @@ QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
  *                                      const QStringList &modTypes);
  */
 
-bool CardUtil::HDHRdoesDVB(const QString &device)
+bool CardUtil::HDHRdoesDVB([[maybe_unused]] const QString &device)
 {
-    (void) device;
-
 #ifdef USING_HDHOMERUN
     hdhomerun_device_t *hdhr =
         hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
@@ -3122,10 +3081,8 @@ bool CardUtil::HDHRdoesDVB(const QString &device)
  * If the device is valid, check if the model does DVB-C.
  */
 
-bool CardUtil::HDHRdoesDVBC(const QString &device)
+bool CardUtil::HDHRdoesDVBC([[maybe_unused]] const QString &device)
 {
-    (void) device;
-
 #ifdef USING_HDHOMERUN
     hdhomerun_device_t *hdhr =
         hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
@@ -3150,12 +3107,12 @@ bool CardUtil::HDHRdoesDVBC(const QString &device)
  * Get a nicely formatted string describing the device
  */
 
-QString CardUtil::GetHDHRdesc(const QString &device)
+QString CardUtil::GetHDHRdesc([[maybe_unused]] const QString &device)
 {
     QString connectErr = QObject::tr("Unable to connect to device.");
 
 #ifdef USING_HDHOMERUN
-    bool      deviceIsIP = false;
+    [[maybe_unused]] bool deviceIsIP = false;
 
     if (device.contains('.'))  // Simplistic check, but also allows DNS names
         deviceIsIP = true;
@@ -3167,7 +3124,6 @@ QString CardUtil::GetHDHRdesc(const QString &device)
         if (!validID || !hdhomerun_discover_validate_device_id(dev))
             return QObject::tr("Invalid Device ID");
     }
-    (void) deviceIsIP;
 
     LOG(VB_GENERAL, LOG_INFO, "CardUtil::GetHDHRdescription(" + device +
                               ") - trying to locate device");
@@ -3196,8 +3152,6 @@ QString CardUtil::GetHDHRdesc(const QString &device)
 
     return description;
 #else
-
-    (void) device;
     return connectErr;
 #endif
 }
@@ -3206,8 +3160,10 @@ QString CardUtil::GetHDHRdesc(const QString &device)
  * Get a nicely formatted string describing the device
  */
 
-QString CardUtil::GetVBoxdesc(const QString &id, const QString &ip,
-                              const QString &tunerNo, const QString &tunerType)
+QString CardUtil::GetVBoxdesc([[maybe_unused]] const QString &id,
+                              [[maybe_unused]] const QString &ip,
+                              [[maybe_unused]] const QString &tunerNo,
+                              [[maybe_unused]] const QString &tunerType)
 {
     QString connectErr = QObject::tr("Unable to connect to device.");
 
@@ -3237,11 +3193,6 @@ QString CardUtil::GetVBoxdesc(const QString &id, const QString &ip,
                    .arg(id, ip, tunerNo, tunerType);
 
 #else
-    (void) id;
-    (void) ip;
-    (void) tunerNo;
-    (void) tunerType;
-
     return connectErr;
 #endif
 }
@@ -3278,7 +3229,7 @@ static bool write_sys(const QString& sys_dev, const QString& str)
 }
 #endif
 
-int CardUtil::GetASIDeviceNumber(const QString &device, QString *error)
+int CardUtil::GetASIDeviceNumber([[maybe_unused]] const QString &device, QString *error)
 {
 #ifdef USING_ASI
     // basic confirmation
@@ -3327,14 +3278,13 @@ int CardUtil::GetASIDeviceNumber(const QString &device, QString *error)
 
     return device_num;
 #else
-    (void) device;
     if (error)
         *error = "Not compiled with ASI support.";
     return -1;
 #endif
 }
 
-uint CardUtil::GetASIBufferSize(uint device_num, QString *error)
+uint CardUtil::GetASIBufferSize([[maybe_unused]] uint device_num, QString *error)
 {
 #ifdef USING_ASI
     // get the buffer size
@@ -3352,14 +3302,13 @@ uint CardUtil::GetASIBufferSize(uint device_num, QString *error)
     }
     return buf_size;
 #else
-    (void) device_num;
     if (error)
         *error = "Not compiled with ASI support.";
     return 0;
 #endif
 }
 
-uint CardUtil::GetASINumBuffers(uint device_num, QString *error)
+uint CardUtil::GetASINumBuffers([[maybe_unused]] uint device_num, QString *error)
 {
 #ifdef USING_ASI
     // get the buffer size
@@ -3377,14 +3326,13 @@ uint CardUtil::GetASINumBuffers(uint device_num, QString *error)
     }
     return num_buffers;
 #else
-    (void) device_num;
     if (error)
         *error = "Not compiled with ASI support.";
     return 0;
 #endif
 }
 
-int CardUtil::GetASIMode(uint device_num, QString *error)
+int CardUtil::GetASIMode([[maybe_unused]] uint device_num, QString *error)
 {
 #ifdef USING_ASI
     QString sys_bufsize_contents = read_sys(sys_dev(device_num, "mode"));
@@ -3401,14 +3349,15 @@ int CardUtil::GetASIMode(uint device_num, QString *error)
     }
     return mode;
 #else
-    (void) device_num;
     if (error)
         *error = "Not compiled with ASI support.";
     return -1;
 #endif
 }
 
-bool CardUtil::SetASIMode(uint device_num, uint mode, QString *error)
+bool CardUtil::SetASIMode([[maybe_unused]] uint device_num,
+                          [[maybe_unused]] uint mode,
+                          QString *error)
 {
 #ifdef USING_ASI
     QString sys_bufsize_contents = read_sys(sys_dev(device_num, "mode"));
@@ -3424,8 +3373,6 @@ bool CardUtil::SetASIMode(uint device_num, uint mode, QString *error)
     }
     return ok;
 #else
-    Q_UNUSED(device_num);
-    Q_UNUSED(mode);
     if (error)
         *error = "Not compiled with ASI support.";
     return false;

@@ -22,10 +22,8 @@ struct GameData
 
 static void GameCallback(void *data, QString &selection)
 {
-    auto *ddata = static_cast<GameData *>(data);
+    [[maybe_unused]] auto *ddata = static_cast<GameData *>(data);
     QString sel = selection.toLower();
-
-    (void)ddata;
 
     if (sel == "game_settings")
     {

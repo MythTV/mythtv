@@ -331,10 +331,8 @@ void ThumbFinder::changeSeekAmount(bool up)
     m_seekAmountText->SetText(kSeekAmounts[m_currentSeek].name);
 }
 
-void ThumbFinder::gridItemChanged(MythUIButtonListItem *item)
+void ThumbFinder::gridItemChanged([[maybe_unused]] MythUIButtonListItem *item)
 {
-    (void) item;
-
     int itemNo = m_imageGrid->GetCurrentPos();
     ThumbImage *thumb = m_thumbList.at(itemNo);
     if (thumb)

@@ -63,9 +63,9 @@ void RTPPacketBuffer::PushDataPacket(const UDPPacket &udp_packet)
 }
 
 void RTPPacketBuffer::PushFECPacket(
-    const UDPPacket &packet, uint fec_stream_num)
+    const UDPPacket &packet,
+    [[maybe_unused]] uint fec_stream_num)
 {
-    (void) fec_stream_num;
     // TODO IMPLEMENT
     // for now just free the packet for immediate reuse
     FreePacket(packet);

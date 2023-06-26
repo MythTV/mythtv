@@ -650,7 +650,8 @@ bool insertInDB(RSSSite* site)
                       site->GetUpdated(), site->GetType());
 }
 
-bool insertInDB(const QString &name, const QString &sortname,
+bool insertInDB(const QString &name,
+                [[maybe_unused]] const QString &sortname,
                 const QString &thumbnail,
                 const QString &description, const QString &url,
                 const QString &author, const bool download,
@@ -665,7 +666,7 @@ bool insertInDB(const QString &name, const QString &sortname,
             "VALUES( :NAME, :THUMBNAIL, :DESCRIPTION, :URL, :AUTHOR, :DOWNLOAD, "
             ":UPDATED, :PODCAST, :TYPE);");
     query.bindValue(":NAME", name);
-    Q_UNUSED(sortname); // query.bindValue(":SORTNAME", sortname);
+    // query.bindValue(":SORTNAME", sortname);
     query.bindValue(":THUMBNAIL", thumbnail);
     query.bindValue(":DESCRIPTION", description);
     query.bindValue(":URL", url);

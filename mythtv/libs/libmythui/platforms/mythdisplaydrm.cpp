@@ -35,15 +35,13 @@ bool MythDisplayDRM::DirectRenderingAvailable()
     return false;
 }
 
-MythDisplayDRM::MythDisplayDRM(MythMainWindow* MainWindow)
+MythDisplayDRM::MythDisplayDRM([[maybe_unused]] MythMainWindow* MainWindow)
 {
     m_device = MythDRMDevice::Create(m_screen);
     Initialise();
 #ifdef USING_QTPRIVATEHEADERS
     if (MainWindow && m_device && m_device->GetVideoPlane())
         connect(MainWindow, &MythMainWindow::SignalWindowReady, this, &MythDisplayDRM::MainWindowReady);
-#else
-    (void)MainWindow;
 #endif
 }
 

@@ -1886,7 +1886,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
             desc += 2; // Skip data ID
             while (desc != endDesc)
             {
-                uint appTypeCode = desc[0]<<8 | desc[1];
+                [[maybe_unused]] uint appTypeCode = desc[0]<<8 | desc[1];
                 desc += 3; // Skip app type code and boot priority hint
                 uint appSpecDataLen = *desc++;
 #ifdef USING_MHEG
@@ -1905,8 +1905,6 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
                     }
                 }
                 else
-#else
-                (void) appTypeCode;
 #endif // USING_MHEG
                 {
                     desc += appSpecDataLen;
@@ -3742,10 +3740,8 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
  *  \sa CC608Decoder, TeletextDecoder
  */
 void AvFormatDecoder::ProcessVBIDataPacket(
-    const AVStream *stream, const AVPacket *pkt)
+    [[maybe_unused]] const AVStream *stream, const AVPacket *pkt)
 {
-    (void) stream;
-
     const uint8_t *buf     = pkt->data;
     uint64_t linemask      = 0;
     std::chrono::microseconds utc = m_lastCcPtsu;
@@ -3884,7 +3880,8 @@ void AvFormatDecoder::ProcessDVBDataPacket(
 /** \fn AvFormatDecoder::ProcessDSMCCPacket(const AVStream*, const AVPacket*)
  *  \brief Process DSMCC object carousel packet.
  */
-void AvFormatDecoder::ProcessDSMCCPacket(const AVStream *str, const AVPacket *pkt)
+void AvFormatDecoder::ProcessDSMCCPacket([[maybe_unused]] const AVStream *str,
+                                         [[maybe_unused]] const AVPacket *pkt)
 {
 #ifdef USING_MHEG
     if (!m_itv && ! (m_itv = m_parent->GetInteractiveTV()))
@@ -3916,9 +3913,6 @@ void AvFormatDecoder::ProcessDSMCCPacket(const AVStream *str, const AVPacket *pk
         length -= sectionLen;
         data += sectionLen;
     }
-#else
-    Q_UNUSED(str);
-    Q_UNUSED(pkt);
 #endif // USING_MHEG
 }
 
@@ -4025,7 +4019,7 @@ bool AvFormatDecoder::ProcessRawTextPacket(AVPacket* Packet)
 }
 
 bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
-                                        DecodeType decodetype)
+                                        [[maybe_unused]] DecodeType decodetype)
 {
     enum AVCodecID codec_id = curstream->codecpar->codec_id;
 
@@ -4046,8 +4040,6 @@ bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
 #ifdef USING_MHEG
             if (!(decodetype & kDecodeVideo))
                 m_allowedQuit |= (m_itv && m_itv->ImageHasChanged());
-#else
-            Q_UNUSED(decodetype);
 #endif // USING_MHEG:
             break;
         }

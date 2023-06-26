@@ -693,10 +693,8 @@ void ClassicCommDetector::GetCommercialBreakList(frm_dir_map_t &marks)
     LOG(VB_COMMFLAG, LOG_INFO, "Final Commercial Break Map");
 }
 
-void ClassicCommDetector::recordingFinished(long long totalFileSize)
+void ClassicCommDetector::recordingFinished([[maybe_unused]] long long totalFileSize)
 {
-    (void)totalFileSize;
-
     m_stillRecording = false;
 }
 

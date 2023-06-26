@@ -46,15 +46,11 @@
 #define LOC QString("ImportRec[%1](%2): ") \
             .arg(TVREC_CARDNUM, m_videodevice)
 
-void ImportRecorder::SetOptionsFromProfile(RecordingProfile *profile,
+void ImportRecorder::SetOptionsFromProfile([[maybe_unused]] RecordingProfile *profile,
                                            const QString &videodev,
-                                           const QString &audiodev,
-                                           const QString &vbidev)
+                                           [[maybe_unused]] const QString &audiodev,
+                                           [[maybe_unused]] const QString &vbidev)
 {
-    (void)audiodev;
-    (void)vbidev;
-    (void)profile;
-
     QString testVideoDev = videodev;
 
     if (videodev.startsWith("file:", Qt::CaseInsensitive))

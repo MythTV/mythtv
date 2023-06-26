@@ -172,9 +172,10 @@ static uint32_t def_size(udfread_block_input *p_gen)
     return (uint32_t)(p->m_file->GetRealFileSize() / UDF_BLOCK_SIZE);
 }
 
-static int def_read(udfread_block_input *p_gen, uint32_t lba, void *buf, uint32_t nblocks, int flags)
+static int def_read(udfread_block_input *p_gen, uint32_t lba,
+                    void *buf, uint32_t nblocks,
+                    [[maybe_unused]] int flags)
 {
-    (void)flags;
     int result = -1;
     auto *p = (blockInput_t *)p_gen;
 

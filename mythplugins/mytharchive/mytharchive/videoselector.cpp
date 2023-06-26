@@ -506,9 +506,8 @@ void VideoSelector::getVideoList(void)
     setCategory(nullptr);
 }
 
-void VideoSelector::setCategory(MythUIButtonListItem *item)
+void VideoSelector::setCategory([[maybe_unused]] MythUIButtonListItem *item)
 {
-    (void)item;
     updateVideoList();
 }
 

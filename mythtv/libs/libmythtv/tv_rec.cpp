@@ -2780,13 +2780,11 @@ void TVRec::InitAutoRunJobs(RecordingInfo *rec, AutoRunInitType t,
  *         RecStatus::Cancelled, and set to -1 to base the decision of the recording
  *         group.
  */
-void TVRec::SetLiveRecording(int recording)
+void TVRec::SetLiveRecording([[maybe_unused]] int recording)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("SetLiveRecording(%1)").arg(recording));
     QMutexLocker locker(&m_stateChangeLock);
-
-    (void) recording;
 
     RecStatus::Type recstat = RecStatus::Cancelled;
     bool was_rec = m_pseudoLiveTVRecording;

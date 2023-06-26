@@ -957,9 +957,8 @@ void MusicCommon::showVolume(void)
     popupStack->AddScreen(vol);
 }
 
-void MusicCommon::showSpeed(bool show)
+void MusicCommon::showSpeed([[maybe_unused]] bool show)
 {
-    (void) show;
 }
 
 void MusicCommon::switchVisualizer(const QString &visual)

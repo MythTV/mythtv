@@ -189,7 +189,8 @@ void MythHTTPServer::Init()
     m_config.m_timeout = static_cast<std::chrono::milliseconds>(timeout * 1000);
 }
 
-void MythHTTPServer::Started(bool Tcp, bool Ssl)
+void MythHTTPServer::Started([[maybe_unused]] bool Tcp,
+                             [[maybe_unused]] bool Ssl)
 {
 #ifdef USING_LIBDNS_SD
     // Advertise our webserver
@@ -217,9 +218,6 @@ void MythHTTPServer::Started(bool Tcp, bool Ssl)
         m_bonjourSSL->Register(m_config.m_sslPort, QByteArrayLiteral("_https._tcp"),
             QStringLiteral("%1 on %2").arg(QCoreApplication::applicationName(), host).toLatin1().constData(), {});
     }
-#else
-    Q_UNUSED(Tcp);
-    Q_UNUSED(Ssl);
 #endif
 
     // Build our list of hosts and allowed origins.

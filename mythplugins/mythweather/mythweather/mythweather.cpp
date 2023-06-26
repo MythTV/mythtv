@@ -83,10 +83,8 @@ int mythplugin_run()
     return RunWeather();
 }
 
-static void WeatherCallback(void *data, QString &selection)
+static void WeatherCallback([[maybe_unused]] void *data, QString &selection)
 {
-    (void) data;
-
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     if (selection == "SETTINGS_GENERAL")

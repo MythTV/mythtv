@@ -58,8 +58,9 @@ class UPNP_PUBLIC JSONSerializer : public Serializer
 
     public:
 
-                 JSONSerializer( QIODevice *pDevice, const QString &sRequestName )
-                     : m_stream( pDevice ) { Q_UNUSED(sRequestName) }
+                 JSONSerializer( QIODevice *pDevice,
+                                 [[maybe_unused]] const QString &sRequestName )
+                     : m_stream( pDevice ) {};
         virtual ~JSONSerializer() = default;
 
         QString GetContentType() override; // Serializer

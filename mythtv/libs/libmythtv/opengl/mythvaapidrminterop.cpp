@@ -407,9 +407,9 @@ static inline void VADRMtoPRIME(VADRMPRIMESurfaceDescriptor* VaDRM, AVDRMFrameDe
  * for testing DRM PRIME functionality on desktops.
 */
 std::vector<MythVideoTextureOpenGL*>
-MythVAAPIInteropDRM::AcquirePrime(VASurfaceID Id,
-                                  MythRenderOpenGL* Context,
-                                  MythVideoFrame* Frame)
+MythVAAPIInteropDRM::AcquirePrime([[maybe_unused]] VASurfaceID Id,
+                                  [[maybe_unused]] MythRenderOpenGL* Context,
+                                  [[maybe_unused]] MythVideoFrame* Frame)
 {
     std::vector<MythVideoTextureOpenGL*> result;
 
@@ -419,15 +419,11 @@ MythVAAPIInteropDRM::AcquirePrime(VASurfaceID Id,
     if (!m_drmFrames.contains(Id))
         return result;
     result = CreateTextures(m_drmFrames[Id], Context, Frame, false);
-#else
-    (void)Id;
-    (void)Context;
-    (void)Frame;
 #endif
     return result;
 }
 
-AVDRMFrameDescriptor* MythVAAPIInteropDRM::GetDRMFrameDescriptor(VASurfaceID Id)
+AVDRMFrameDescriptor* MythVAAPIInteropDRM::GetDRMFrameDescriptor([[maybe_unused]] VASurfaceID Id)
 {
 #if VA_CHECK_VERSION(1, 1, 0)
     INIT_ST;
@@ -442,7 +438,6 @@ AVDRMFrameDescriptor* MythVAAPIInteropDRM::GetDRMFrameDescriptor(VASurfaceID Id)
     VADRMtoPRIME(&vadesc, drmdesc);
     return drmdesc;
 #else
-    (void)Id;
     return nullptr;
 #endif
 }

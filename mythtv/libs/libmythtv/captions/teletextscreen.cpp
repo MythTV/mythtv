@@ -340,11 +340,11 @@ void TeletextScreen::DrawLine(const tt_line_array& page, uint row, int lang)
     SetBackgroundColor(bgcolor);
 
     bool mosaic = false;
-    bool seperation = false;
+    [[maybe_unused]] bool seperation = false;
     bool conceal = false;
-    bool flash = false;
+    [[maybe_unused]] bool flash = false;
     bool doubleheight = false;
-    bool blink = false;
+    [[maybe_unused]] bool blink = false;
     bool hold = false;
     bool endbox = false;
     bool startbox = false;
@@ -500,9 +500,6 @@ void TeletextScreen::DrawLine(const tt_line_array& page, uint row, int lang)
             }
         }
     }
-    Q_UNUSED(seperation);
-    Q_UNUSED(flash);
-    Q_UNUSED(blink);
 }
 
 void TeletextScreen::DrawCharacter(int x, int y, QChar ch, bool doubleheight)

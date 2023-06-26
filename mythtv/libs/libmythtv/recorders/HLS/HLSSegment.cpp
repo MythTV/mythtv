@@ -29,7 +29,7 @@ HLSRecSegment::HLSRecSegment(int seq, std::chrono::seconds duration,
 }
 
 HLSRecSegment::HLSRecSegment(int seq, std::chrono::seconds duration, QString title,
-           QUrl uri, const QString& current_key_path)
+           QUrl uri, [[maybe_unused]] const QString& current_key_path)
     : m_sequence(seq),
       m_duration(duration),
       m_title(std::move(title)),
@@ -38,8 +38,6 @@ HLSRecSegment::HLSRecSegment(int seq, std::chrono::seconds duration, QString tit
     LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
 #ifdef USING_LIBCRYPTO
     m_psz_key_path  = current_key_path;
-#else
-    Q_UNUSED(current_key_path);
 #endif
 }
 

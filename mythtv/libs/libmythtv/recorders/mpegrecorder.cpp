@@ -267,12 +267,9 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
 
 void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
                                          const QString &videodev,
-                                         const QString &audiodev,
-                                         const QString &vbidev)
+                                         [[maybe_unused]] const QString &audiodev,
+                                         [[maybe_unused]] const QString &vbidev)
 {
-    (void)audiodev;
-    (void)vbidev;
-
     if (videodev.startsWith("file:", Qt::CaseInsensitive))
     {
         m_deviceIsMpegFile = true;

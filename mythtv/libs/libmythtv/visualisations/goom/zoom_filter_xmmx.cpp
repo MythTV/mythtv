@@ -251,14 +251,14 @@ void zoom_filter_xmmx (int prevX, int prevY,
 int zoom_filter_xmmx_supported () {
 	return 0;
 }
-void zoom_filter_xmmx (int prevX, int prevY,
-                       unsigned int *expix1, unsigned int *expix2,//NOLINT(readability-non-const-parameter)
-                       const int *brutS, const int *brutD, int buffratio,
-                       GoomCoefficients& precalCoef)
+void zoom_filter_xmmx ([[maybe_unused]] int prevX,
+                       [[maybe_unused]] int prevY,
+                       [[maybe_unused]] unsigned int *expix1,
+                       [[maybe_unused]] unsigned int *expix2,
+                       [[maybe_unused]] const int *brutS,
+                       [[maybe_unused]] const int *brutD,
+                       [[maybe_unused]] int buffratio,
+                       [[maybe_unused]] GoomCoefficients& precalCoef)
 {
-    (void) prevX;     (void) prevY;
-    (void) expix1;    (void) expix2;
-    (void) brutS;     (void) brutD;
-    (void) buffratio; (void) precalCoef;
 }
 #endif

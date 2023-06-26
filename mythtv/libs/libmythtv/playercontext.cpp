@@ -230,26 +230,22 @@ QString PlayerContext::GetPreviousChannel(void) const
     return preChan;
 }
 
-void PlayerContext::LockPlayingInfo(const char *file, int line) const
+void PlayerContext::LockPlayingInfo([[maybe_unused]] const char *file,
+                                    [[maybe_unused]] int line) const
 {
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, QString("LockPlayingInfo(%1,%2)")
             .arg(file).arg(line));
-#else
-    Q_UNUSED(file);
-    Q_UNUSED(line);
 #endif
     m_playingInfoLock.lock();
 }
 
-void PlayerContext::UnlockPlayingInfo(const char *file, int line) const
+void PlayerContext::UnlockPlayingInfo([[maybe_unused]] const char *file,
+                                      [[maybe_unused]] int line) const
 {
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, QString("UnlockPlayingInfo(%1,%2)")
             .arg(file).arg(line));
-#else
-    Q_UNUSED(file);
-    Q_UNUSED(line);
 #endif
     m_playingInfoLock.unlock();
 }
@@ -259,14 +255,12 @@ void PlayerContext::UnlockPlayingInfo(const char *file, int line) const
  *        used to ensure player can only be deleted after
  *        osd in TV() is unlocked.
  */
-void PlayerContext::LockDeletePlayer(const char *file, int line) const
+void PlayerContext::LockDeletePlayer([[maybe_unused]] const char *file,
+                                     [[maybe_unused]] int line) const
 {
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, QString("LockDeletePlayer(%1,%2)")
             .arg(file).arg(line));
-#else
-    Q_UNUSED(file);
-    Q_UNUSED(line);
 #endif
     m_deletePlayerLock.lock();
 }
@@ -274,14 +268,12 @@ void PlayerContext::LockDeletePlayer(const char *file, int line) const
 /**
  * \brief allow player to be deleted.
  */
-void PlayerContext::UnlockDeletePlayer(const char *file, int line) const
+void PlayerContext::UnlockDeletePlayer([[maybe_unused]] const char *file,
+                                       [[maybe_unused]] int line) const
 {
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, QString("UnlockDeletePlayer(%1,%2)")
             .arg(file).arg(line));
-#else
-    Q_UNUSED(file);
-    Q_UNUSED(line);
 #endif
     m_deletePlayerLock.unlock();
 }

@@ -252,10 +252,8 @@ static void runBurnDVD(void)
 static void (*m_callback)(void *, QString &) = nullptr;
 static void *m_callbackdata = nullptr;
 
-static void ArchiveCallback(void *data, QString &selection)
+static void ArchiveCallback([[maybe_unused]] void *data, QString &selection)
 {
-    (void) data;
-
     QString sel = selection.toLower();
 
     if (sel == "archive_create_dvd")

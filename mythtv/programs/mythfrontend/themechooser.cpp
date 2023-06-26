@@ -581,11 +581,9 @@ void ThemeChooser::showPopupMenu(void)
     }
 }
 
-void ThemeChooser::popupClosed(const QString &which, int result)
+void ThemeChooser::popupClosed([[maybe_unused]] const QString &which,
+                               [[maybe_unused]] int result)
 {
-    (void)which;
-    (void)result;
-
     m_popupMenu = nullptr;
 }
 

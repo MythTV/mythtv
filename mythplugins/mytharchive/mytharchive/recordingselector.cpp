@@ -486,9 +486,8 @@ void RecordingSelector::updateCategorySelector(void)
     }
 }
 
-void RecordingSelector::setCategory(MythUIButtonListItem *item)
+void RecordingSelector::setCategory([[maybe_unused]] MythUIButtonListItem *item)
 {
-    (void)item;
     updateRecordingList();
 }
 

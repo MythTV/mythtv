@@ -984,10 +984,9 @@ RecExtMlbDataSource::loadPage(const ActiveGame& game, const QUrl& _url)
 /// @param info A data structure describing the sport/league.
 /// @param dt The date for which sporting events should be retrieved.
 /// @returns a URL to extract the list of sporting events from the MLB API.
-QUrl RecExtMlbDataSource::makeInfoUrl (const SportInfo& info, const QDateTime& dt)
+QUrl RecExtMlbDataSource::makeInfoUrl ([[maybe_unused]] const SportInfo& info,
+                                       const QDateTime& dt)
 {
-    Q_UNUSED(info);
-
     if (!dt.isValid())
         return {};
 

@@ -361,8 +361,8 @@ void ChannelBase::HandleScript(const QString &freqid)
     }
 }
 
-bool ChannelBase::ChangeInternalChannel(const QString &freqid,
-                                        uint inputid) const
+bool ChannelBase::ChangeInternalChannel([[maybe_unused]] const QString &freqid,
+                                        [[maybe_unused]] uint inputid) const
 {
 #ifdef USING_FIREWIRE
     FirewireDevice *device = nullptr;
@@ -402,8 +402,6 @@ bool ChannelBase::ChangeInternalChannel(const QString &freqid,
     device = nullptr;
     return true;
 #else
-    Q_UNUSED(freqid);
-    Q_UNUSED(inputid);
     return false;
 #endif
 }
@@ -699,7 +697,7 @@ ChannelBase *ChannelBase::CreateChannel(
     TVRec                    *tvrec,
     const GeneralDBOptions   &genOpt,
     const DVBDBOptions       &dvbOpt,
-    const FireWireDBOptions  &fwOpt,
+    [[maybe_unused]] const FireWireDBOptions  &fwOpt,
     const QString            &startchannel,
     bool                      enter_power_save_mode,
     QString                  &rbFileExt,
@@ -721,8 +719,6 @@ ChannelBase *ChannelBase::CreateChannel(
     {
 #ifdef USING_FIREWIRE
         channel = new FirewireChannel(tvrec, genOpt.m_videoDev, fwOpt);
-#else
-        Q_UNUSED(fwOpt);
 #endif
     }
 #ifdef USING_HDHOMERUN

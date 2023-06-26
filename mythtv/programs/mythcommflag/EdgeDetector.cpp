@@ -70,7 +70,9 @@ static int sort_ascending(const void *aa, const void *bb)
 
 static int
 edge_mark(AVFrame *dst, int dstheight,
-        int extratop, int extraright, int extrabottom, int extraleft,
+        int extratop, int extraright,
+        [[maybe_unused]] int extrabottom,
+        int extraleft,
         const unsigned int *sgm, unsigned int *sgmsorted, int percentile,
         int excluderow, int excludecol, int excludewidth, int excludeheight)
 {
@@ -86,8 +88,6 @@ edge_mark(AVFrame *dst, int dstheight,
 
     const int           dstwidth = dst->linesize[0];
     const int           padded_width = extraleft + dstwidth + extraright;
-
-    (void)extrabottom;  /* gcc */
 
     /*
      * sgm: SGM values of padded (convolved) image
@@ -196,12 +196,11 @@ int edge_mark_uniform_exclude(AVFrame *dst, int dstheight, int extramargin,
 };  /* namespace */
 
 int
-EdgeDetector::setExcludeArea(int row, int col, int width, int height)
+EdgeDetector::setExcludeArea([[maybe_unused]] int row,
+                             [[maybe_unused]] int col,
+                             [[maybe_unused]] int width,
+                             [[maybe_unused]] int height)
 {
-    (void)row;  /* gcc */
-    (void)col;  /* gcc */
-    (void)width;    /* gcc */
-    (void)height;   /* gcc */
     return 0;
 }
 
