@@ -85,12 +85,13 @@ export class InputConnectionsComponent implements OnInit {
     this.channelService.GetVideoSourceList()
       .subscribe(data => {
         this.videoSourceList = data;
-        this.videoSourceList.VideoSourceList.VideoSources.unshift(<VideoSource>{ Id: 0, SourceName: "(None)" })
+        this.videoSourceList.VideoSourceList.VideoSources.unshift(<VideoSource>{
+          Id: 0, SourceName: "(None)", ScanFrequency: 0
+        })
         this.videoSourceLookup = [];
         this.videoSourceList.VideoSourceList.VideoSources.forEach(data => {
           this.videoSourceLookup[data.Id] = data;
         });
-        // this.videoSourceLookup[0] = <VideoSource>{SourceName: "(None)"};
         this.readyCount++;
       });
   }

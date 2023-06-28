@@ -650,7 +650,7 @@
             },
             "freqtable_desc": "The option of scanning only \"High\" frequency channels is useful because most digital channels are on the higher frequencies.",
             "freqtable_label": "Frequency Table",
-            "frequency_desc": "The frequency for this transport (multiplex) in {{unit}} (Option has no default).",
+            "frequency_desc": "The frequency for this transport (multiplex) in {{unit}}. The default is set in Video Source Setup.",
             "frequency_label": "Frequency",
             "ftaonly_desc": "If set, only non-encrypted channels will be added during the scan.",
             "ftaonly_label": "Unencrypted Only",
