@@ -77,6 +77,12 @@ export class ScheduleComponent implements OnInit {
     { prompt: this.translate.instant('dashboard.sched.dupin.prev'), value: 'Previous Recordings' },
   ];
 
+  autoExtendList: ListEntry[] = [
+    { prompt: this.translate.instant('dashboard.sched.extend_none'), value: 'None' },
+    { prompt: 'ESPN', value: 'ESPN' },
+    { prompt: 'MLB', value: 'MLB' },
+  ];
+
   recProfileList: ListEntry[] = [
     { prompt: this.translate.instant('dashboard.sched.recprof.default'), value: 'Default' },
     { prompt: this.translate.instant('dashboard.sched.recprof.livetv'), value: 'Live TV' },
@@ -592,6 +598,7 @@ export class ScheduleComponent implements OnInit {
       AutoUserJob3: recRule.AutoUserJob3,
       AutoUserJob4: recRule.AutoUserJob4,
       Transcoder: recRule.Transcoder,
+      AutoExtend: recRule.AutoExtend
     };
     return ret;
   }

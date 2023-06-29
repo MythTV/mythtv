@@ -55,6 +55,7 @@ export interface RecordScheduleRequest {
     AutoUserJob3: boolean;
     AutoUserJob4: boolean;
     Transcoder: number;
+    AutoExtend?: string;
 }
 
 export interface AddRecordedCreditsRequest {

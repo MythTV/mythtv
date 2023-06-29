@@ -139,7 +139,9 @@
                 "this": "Record Only This Showing",
                 "weekly": "Record one showing every week"
             },
-            "type_label": "Schedule Type"
+            "type_label": "Schedule Type",
+            "extend_none": "None",
+            "autoextend_label": "Auto Extend"
         },
         "upcoming": {
             "date": "Date",
