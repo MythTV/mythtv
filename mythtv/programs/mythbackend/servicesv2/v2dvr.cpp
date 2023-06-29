@@ -1421,7 +1421,8 @@ uint V2Dvr::AddRecordSchedule   (
                                bool      bAutoUserJob2,
                                bool      bAutoUserJob3,
                                bool      bAutoUserJob4,
-                               int       nTranscoder)
+                               int       nTranscoder,
+                               const QString&   AutoExtend)
 {
     QDateTime recstartts = StartTime.toUTC();
     QDateTime recendts = EndTime.toUTC();
@@ -1518,6 +1519,7 @@ uint V2Dvr::AddRecordSchedule   (
     rule.m_autoUserJob4 = bAutoUserJob4;
 
     rule.m_transcoder = nTranscoder;
+    rule.m_autoExtend = autoExtendTypeFromString(AutoExtend);
 
     rule.m_lastRecorded = lastrects;
 
@@ -1573,7 +1575,8 @@ bool V2Dvr::UpdateRecordSchedule ( uint      nRecordId,
                                  bool      bAutoUserJob2,
                                  bool      bAutoUserJob3,
                                  bool      bAutoUserJob4,
-                                 int       nTranscoder)
+                                 int       nTranscoder,
+                                 const QString&   AutoExtend)
 {
     if (nRecordId == 0 )
         throw QString("Record ID is invalid.");
@@ -1689,6 +1692,9 @@ bool V2Dvr::UpdateRecordSchedule ( uint      nRecordId,
     pRule.m_autoUserJob4 = bAutoUserJob4;
 
     pRule.m_transcoder = nTranscoder;
+
+    if (!AutoExtend.isEmpty())
+        pRule.m_autoExtend = autoExtendTypeFromString(AutoExtend);
 
     QString msg;
     if (!pRule.IsValid(msg))

@@ -305,6 +305,7 @@ void V2FillRecRuleInfo( V2RecRule  *pRecRule,
     pRecRule->setLastRecorded   (  pRule->m_lastRecorded           );
     pRecRule->setLastDeleted    (  pRule->m_lastDeleted            );
     pRecRule->setAverageDelay   (  pRule->m_averageDelay           );
+    pRecRule->setAutoExtend     (  toString(pRule->m_autoExtend)   );
 }
 
 void V2FillArtworkInfoList( V2ArtworkInfoList *pArtworkInfoList,

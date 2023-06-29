@@ -267,7 +267,8 @@ class V2Dvr : public MythHTTPService
                                             bool      AutoUserJob2,
                                             bool      AutoUserJob3,
                                             bool      AutoUserJob4,
-                                            int       Transcoder);
+                                            int       Transcoder,
+                                            const QString&   AutoExtend);
 
     static bool        UpdateRecordSchedule ( uint    RecordId,
                                               const QString&   Title,
@@ -310,7 +311,8 @@ class V2Dvr : public MythHTTPService
                                               bool      AutoUserJob2,
                                               bool      AutoUserJob3,
                                               bool      AutoUserJob4,
-                                              int       Transcoder);
+                                              int       Transcoder,
+                                              const QString&   AutoExtend);
 
     static bool       RemoveRecordSchedule ( uint             RecordId   );
 
