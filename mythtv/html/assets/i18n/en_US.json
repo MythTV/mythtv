@@ -154,6 +154,46 @@
         "videos": {
             "heading": "Videos",
             "releasedate": "Release Date"
+        },
+        "status": {
+            "encoder_title": "Encoder Status",
+            "encoder_text": "Encoder {{ Id }} is on host {{ HostName }}, State: {{ State }}",
+            "endtime_text": "This recording is scheduled to end at {{ EndTime }}.",
+            "card_text": "Card: {{ CardId }}, Input: {{ Id }} is {{ InputName }}, Display Name: {{ DisplayName }}",
+            "no_encoders": "Backend has no encoders",
+            "schedule_title": "Schedule",
+            "schedule_text": "The next {{ length }} show(s) that are scheduled for recording.",
+            "schedule_none": "Nothing scheduled to record",
+            "jobs_title": "Job queue",
+            "jobs_text": "Jobs currently in Queue or recently ended",
+            "jobs_status": "Status",
+            "jobs_none": "Job queue is currently empty",
+            "mach": {
+                "title": "Machine Info",
+                "load": "This machine's load average",
+                "minute": "Minute",
+                "minutes": "Minutes",
+                "disk_summ": "Disk Usage Summary",
+                "disk_total": "Total Disk Space",
+                "total_space": "Total Space",
+                "space_used": "Space Used",
+                "space_free": "Space Free",
+                "space_after_expire": "Space Available after Auto-expire",
+                "space_livetv": "Space Used by LiveTV",
+                "space_deleted": "Space Used by Deleted Recordings",
+                "space_expirable": "Space Used by Auto-expirable Recordings",
+                "disk_details": "Disk Usage Details",
+                "none": "No Machine Info available",
+                "disk_none": "No Disk Info available",
+                "myth_drive": "MythTV Drive",
+                "disk_dirs": "Directories"
+            },
+            "backends_title": "Backends",
+            "backends_detail": "Backend: {{ Name }} is a {{ Type }} on IP {{ IP }}",
+            "backends_none": "No Backends",
+            "frontends_title": "Frontends",
+            "frontends_detail": "Frontend: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",
+            "frontends_none": "No Frontends"
         }
     },
     "data": {
@@ -914,7 +954,8 @@
             "tvformat_desc": "The TV standard to use for viewing TV.",
             "tvformat_label": "TV Formats",
             "vbiformat_desc": "The VBI (Vertical Blanking Interval) is used to carry Teletext or Closed Captions data.",
-            "vbiformat_label": "VBI Format"
+            "vbiformat_label": "VBI Format",
+            "freqtable_label": "Frequency Tables"
         },
         "main": {
             "enableupdates_desc": "Enabling updates will prevent any recordings from taking place until you restart",

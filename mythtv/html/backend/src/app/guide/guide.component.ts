@@ -20,7 +20,7 @@ export class GuideComponent implements OnInit, SchedulerSummary {
   m_startDate: Date = new Date();
   m_pickerDate: Date = new Date();
   m_endDate: Date = new Date();
-  m_dateFormat: string = ''
+  // m_dateFormat: string = ''
   m_channelData: Channel[] = [];
   m_channelTotal: number = 10;
   m_rows: number = 10;
@@ -43,7 +43,7 @@ export class GuideComponent implements OnInit, SchedulerSummary {
   constructor(private guideService: GuideService,
     private translate: TranslateService) {
 
-    this.setDateFormat();
+    // this.setDateFormat();
 
     this.translate.onLangChange.subscribe((event: TranslationChangeEvent) => {
       console.log("Event: language change, new language (" + event.lang + ")");
@@ -57,14 +57,14 @@ export class GuideComponent implements OnInit, SchedulerSummary {
     this.fetchData();
   }
 
-  setDateFormat(): void {
-    this.translate.get("primeng.dateFormat").subscribe(data => this.m_dateFormat = data);
-    console.log("Date format is (" + this.m_dateFormat + ")");
-  }
+  // setDateFormat(): void {
+  //   this.translate.get("primeng.dateFormat").subscribe(data => this.m_dateFormat = data);
+  //   console.log("Date format is (" + this.m_dateFormat + ")");
+  // }
 
   switchLanguage(language: string): void {
     this.translate.use(language);
-    this.setDateFormat();
+    // this.setDateFormat();
   }
 
   fetchData(reqDate?: Date): void {
@@ -125,12 +125,12 @@ export class GuideComponent implements OnInit, SchedulerSummary {
     return (p_start < w_end);
   }
 
-  onDatePickerClose(): void {
-    if (this.m_pickerDate)
-      this.m_startDate = new Date(this.m_pickerDate);
-    else
-      this.m_startDate = new Date();
-    console.log("New time is " + this.m_startDate);
+  onDateChange(): void {
+    if (!this.m_pickerDate)
+      this.m_pickerDate = new Date();
+    if (this.m_pickerDate.getTime() == this.m_startDate.getTime())
+      return;
+    this.m_startDate = new Date(this.m_pickerDate);
     this.timeChange = true;
     this.refresh();
   }

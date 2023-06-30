@@ -28,11 +28,11 @@ export class TimebarComponent implements OnInit {
 
   pageLeft() {
     this.guide.m_pickerDate = new Date(this.guide.m_startDate.getTime() - 7200000);
-    this.guide.onDatePickerClose();
+    this.guide.onDateChange();
   }
 
   pageRight() {
     this.guide.m_pickerDate = new Date(this.guide.m_startDate.getTime() + 7200000);
-    this.guide.onDatePickerClose();
+    this.guide.onDateChange();
   }
 }
