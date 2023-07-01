@@ -70,7 +70,7 @@
                         <div *ngIf="video.Season>0 || video.Episode>0"> {{video.Season}}x{{video.Episode}} </div>
                     </td>
                     <td style="flex-basis: 12%" class="justify-content-end p-1">
-                        {{formatDate(video.ReleaseDate)}}</td>
+                        {{utility.formatDate(video.ReleaseDate)}}</td>
                     <td style="flex-basis: 10%" class="justify-content-end p-1">
                         <div *ngIf="video.Length > 0"> {{ video.Length }} min </div>
                     </td>

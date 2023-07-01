@@ -6,7 +6,7 @@
         <ul>
             <li *ngFor="let schedule of scheduled" class="flex">
                 <div pTooltip="{{schedule.Description}}" tooltipPosition="bottom">
-                    {{ formatDate(schedule.StartTime) }} {{ formatTime(schedule.StartTime) }} - {{schedule.Recording.EncoderId}} - {{schedule.Channel.CallSign}} -
+                    {{ utility.formatDate(schedule.StartTime) }} {{ utility.formatTime(schedule.StartTime) }} - {{schedule.Recording.EncoderId}} - {{schedule.Channel.CallSign}} -
                     {{schedule.Title}}
                 </div>
             </li>

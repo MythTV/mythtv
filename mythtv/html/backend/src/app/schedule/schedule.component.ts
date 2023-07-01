@@ -9,6 +9,7 @@ import { MythService } from '../services/myth.service';
 import { NgForm } from '@angular/forms';
 import { RecordScheduleRequest } from '../services/interfaces/dvr.interface';
 import { Observable, of } from 'rxjs';
+import { UtilityService } from '../services/utility.service';
 
 export interface SchedulerSummary {
   refresh(): void;
@@ -106,7 +107,7 @@ export class ScheduleComponent implements OnInit {
   templateId = 0;
 
   constructor(private dvrService: DvrService, private translate: TranslateService,
-    public mythService: MythService) {
+    private mythService: MythService, public utility: UtilityService) {
   }
 
   ngOnInit(): void {
@@ -360,24 +361,6 @@ export class ScheduleComponent implements OnInit {
     let date = new Date(recRule.StartTime);
     recRule.FindDay = (date.getDay() + 1) % 7;
     recRule.FindTime = date.toTimeString().slice(0, 8);
-  }
-
-
-  formatDate(date?: string): string {
-    if (!date)
-      return '';
-    if (date.length == 10)
-      date = date + ' 00:00';
-    return new Date(date).toLocaleDateString()
-  }
-
-  formatTime(date?: string): string {
-    if (!date)
-      return '';
-    // Get the locale specific time and remove the seconds
-    const t = new Date(date);
-    const tWithSecs = t.toLocaleTimeString() + ' ';
-    return tWithSecs.replace(/:.. /, ' ');
   }
 
   filterFromRec(recRule: RecRule) {

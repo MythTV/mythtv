@@ -41,9 +41,9 @@
                 <td style="flex-basis: 10%" class="p-1">{{recrule.RecGroup}}</td>
                 <td style="flex-basis: 10%" class="p-1">{{recrule.StorageGroup}}</td>
                 <td style="flex-basis: 10%" class="justify-content-end p-1 pr-5">
-                    {{formatDate(recrule.LastRecorded)}}</td>
+                    {{utility.formatDate(recrule.LastRecorded)}}</td>
                 <td style="flex-basis: 15%" class="justify-content-end p-1 pr-5">
-                    {{formatDate(recrule.NextRecording)}} {{formatTime(recrule.NextRecording)}}</td>
+                    {{utility.formatDate(recrule.NextRecording)}} {{utility.formatTime(recrule.NextRecording)}}</td>
                 <td style="flex-basis: 5%" class="p-1">
                     <i class="pi pi-times" style="color:red" *ngIf="recrule.Inactive else checkmark"></i>
                     <ng-template #checkmark>

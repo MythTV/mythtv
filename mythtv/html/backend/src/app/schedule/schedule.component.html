@@ -3,8 +3,8 @@
         <p-dialog header="{{ 'dashboard.sched.heading' | translate }}" [(visible)]="displayDlg" [modal]="true"
             [style]="{height: '75vw', width: '500px'}" [closable]="false" [closeOnEscape]="false">
             <p> {{ channel?.ChanNum }} {{ channel?.CallSign }}</p>
-            <p> {{ formatDate(recRule.StartTime) }} {{ formatTime(recRule.StartTime) }} -
-                {{ formatTime(recRule.EndTime )}}
+            <p> {{ utility.formatDate(recRule.StartTime) }} {{ utility.formatTime(recRule.StartTime) }} -
+                {{ utility.formatTime(recRule.EndTime )}}
             </p>
             <b> {{ recRule.Title }} </b>
             <p> {{ recRule.SubTitle }} </p>

@@ -10,6 +10,7 @@ import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface
 import { ProgramList } from 'src/app/services/interfaces/program.interface';
 import { JobQCommands } from 'src/app/services/interfaces/setup.interface';
 import { SetupService } from 'src/app/services/setup.service';
+import { UtilityService } from 'src/app/services/utility.service';
 
 @Component({
   selector: 'app-recordings',
@@ -67,7 +68,8 @@ export class RecordingsComponent implements OnInit {
   menuToShow: MenuItem[] = [];
 
   constructor(private dvrService: DvrService, private messageService: MessageService,
-    public translate: TranslateService, private setupService: SetupService) {
+    public translate: TranslateService, private setupService: SetupService,
+    public utility: UtilityService) {
     this.loadRecordings();
     this.JobQCmds = this.setupService.getJobQCommands();
 
@@ -97,14 +99,6 @@ export class RecordingsComponent implements OnInit {
       this.recordings = data.ProgramList;
       this.refreshing = false;
     });
-  }
-
-  formatDate(date: string): string {
-    if (!date)
-      return '';
-    if (date.length == 10)
-      date = date + ' 00:00';
-    return new Date(date).toLocaleDateString()
   }
 
   getDuration(program: ScheduleOrProgram): number {

@@ -5,6 +5,7 @@ import { MenuItem, MessageService } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { PartialObserver } from 'rxjs';
 import { UpdateVideoMetadataRequest, VideoMetadataInfo } from 'src/app/services/interfaces/video.interface';
+import { UtilityService } from 'src/app/services/utility.service';
 import { VideoService } from 'src/app/services/video.service';
 
 @Component({
@@ -44,7 +45,7 @@ export class VideosComponent implements OnInit {
 
 
   constructor(private videoService: VideoService, private translate: TranslateService,
-    private messageService: MessageService) {
+    private messageService: MessageService, public utility: UtilityService) {
     this.loadVideos();
 
     // translations
@@ -76,14 +77,6 @@ export class VideosComponent implements OnInit {
       this.filterVideos();
       this.loaded = true;
     });
-  }
-
-  formatDate(date: string): string {
-    if (!date)
-      return '';
-    if (date.length == 10)
-      date = date + ' 00:00';
-    return new Date(date).toLocaleDateString()
   }
 
   filterVideos() {

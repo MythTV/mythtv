@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { JobQueueJob } from 'src/app/services/interfaces/jobqueue.interface';
+import { UtilityService } from 'src/app/services/utility.service';
 
 @Component({
   selector: 'app-status-jobqueue',
@@ -9,7 +10,7 @@ import { JobQueueJob } from 'src/app/services/interfaces/jobqueue.interface';
 export class JobqueueComponent implements OnInit {
   @Input() jobqueue?: JobQueueJob[];
 
-  constructor() { }
+  constructor(public utility: UtilityService) { }
 
   ngOnInit(): void {
   }
