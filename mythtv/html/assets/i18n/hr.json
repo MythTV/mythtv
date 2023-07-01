@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "Pravilo snimanja je aktivno",
             "autoexpire_label": "Automatski istek",
+            "autoextend_label": "Automatsko proširenje",
             "dupin": {
                 "both": "Trenutačne i prethodne snimke",
                 "curr": "Samo trenutne snimke",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "Duplicirana metoda podudaranja",
             "endoffset_label": "Broj dodatnih minuta za snimanje na kraju",
+            "extend_none": "Nijedan",
             "filters_label": "Opcije filtra",
             "heading": "Zakažite snimanje",
             "inetref_desc": "Koristite TheTVDB, TVmaze ili TMDB za traženje metapodataka snimanja. Odaberite radio gumb iznad i upotrijebite vezu za pretraživanje web stranice. Nakon što pronađete ispravnu seriju na web stranici, odaberite je i kopirajte numerički ID s URL-a ili s web stranice u slučaju thetvdb.com. Unesite to u okvir za unos odmah nakon prefiksa xxxx.py_",
@@ -140,6 +142,46 @@
                 "weekly": "Snimite jednu emisiju svaki tjedan"
             },
             "type_label": "Vrsta rasporeda"
+        },
+        "status": {
+            "backends_detail": "Pozadina: {{ Name }} je {{ Type }} na IP-u {{ IP }}",
+            "backends_none": "Nema pozadine",
+            "backends_title": "Pozadine",
+            "card_text": "Kartica: {{ CardId }}, Unos: {{ Id }} je {{ InputName }}, Prikazno ime: {{ DisplayName }}",
+            "encoder_text": "Enkoder {{ Id }} je na hostu {{ HostName }}, stanje: {{ State }}",
+            "encoder_title": "Status kodera",
+            "endtime_text": "Završetak ovog snimanja zakazan je za {{ EndTime }}.",
+            "frontends_detail": "Sučelje: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",
+            "frontends_none": "Nema sučelja",
+            "frontends_title": "Sučelja",
+            "jobs_none": "Red čekanja poslova trenutno je prazan",
+            "jobs_status": "Status",
+            "jobs_text": "Poslovi trenutno u redu čekanja ili nedavno završeni",
+            "jobs_title": "Red čekanja poslova",
+            "mach": {
+                "disk_details": "Pojedinosti o korištenju diska",
+                "disk_dirs": "Imenici",
+                "disk_none": "Informacije o disku nisu dostupne",
+                "disk_summ": "Sažetak korištenja diska",
+                "disk_total": "Ukupni prostor na disku",
+                "load": "Prosječno opterećenje ovog stroja",
+                "minute": "Minuta",
+                "minutes": "minuta",
+                "myth_drive": "MythTV Drive",
+                "none": "Informacije o stroju nisu dostupne",
+                "space_after_expire": "Prostor dostupan nakon automatskog isteka",
+                "space_deleted": "Prostor koji koriste izbrisane snimke",
+                "space_expirable": "Prostor koji koriste snimke s automatskim istekom",
+                "space_free": "Prostor slobodan",
+                "space_livetv": "Prostor koji koristi LiveTV",
+                "space_used": "Iskorišten prostor",
+                "title": "Informacije o stroju",
+                "total_space": "Totalni prostor"
+            },
+            "no_encoders": "Pozadina nema kodere",
+            "schedule_none": "Ništa nije planirano za snimanje",
+            "schedule_text": "Sljedećih {{ length }} emisija(e) koje su zakazane za snimanje.",
+            "schedule_title": "Raspored"
         },
         "upcoming": {
             "date": "Datum",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "Odaberite odgovarajuću tablicu frekvencija za vaš sustav. Ako imate antenu, koristite '-bcast frekvenciju.",
             "channfreq_label": "Tablica frekvencija kanala",
+            "freqtable_label": "Tablice učestalosti",
             "subtitle": "Oni postavljaju neke zadane postavke specifične za zemlju",
             "title": "Lokalne postavke",
             "tvformat_desc": "TV standard koji se koristi za gledanje televizije.",
@@ -919,6 +962,8 @@
             "enableupdates_label": "Omogući ažuriranja",
             "restart_desc": "Snimke su onemogućene dok ponovno ne pokrenete",
             "restart_label": "Ponovo pokrenite pozadinu",
+            "slave_instructions": "Čini se da je ovo pomoćna pozadina. Ako je namijenjen kao podređena pozadina, onemogućite zakazivanje na msster pozadini dok izvodite postavljanje podređene pozadine.",
+            "slave_warning": "Ako ovo nije zamišljeno kao podređena pozadina, idite na Postavljanje, Općenito, Postavljanje pozadine adrese hosta i odaberite \"Ovaj poslužitelj je glavna pozadina\" ili pak postavite ispravan prilagođeni identifikator na stranici Postavljanje baze podataka. Spremite i ponovno pokrenite pozadinu,",
             "title": "Postavljanje MythTV-a",
             "upcomingrec": "Sljedeće nadolazeće snimanje: {{Title}} u {{StartTime}}. Status: {{Status}}"
         },

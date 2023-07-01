@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "Die Aufzeichnungsregel ist aktiv",
             "autoexpire_label": "Automatisches Ablaufen",
+            "autoextend_label": "Automatische Verlängerung",
             "dupin": {
                 "both": "Aktuelle und frühere Aufnahmen",
                 "curr": "Nur aktuelle Aufnahmen",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "Duplikat-Match-Methode",
             "endoffset_label": "Anzahl der zusätzlichen Minuten, die am Ende aufgezeichnet werden sollen",
+            "extend_none": "Keiner",
             "filters_label": "Filteroptionen",
             "heading": "Planen Sie die Aufnahme",
             "inetref_desc": "Verwenden Sie TheTVDB, TVmaze oder TMDB, um nach Aufzeichnungsmetadaten zu suchen. Wählen Sie oben ein Optionsfeld aus und verwenden Sie den Link, um die Website zu durchsuchen. Sobald Sie die richtige Serie auf der Webseite gefunden haben, wählen Sie sie aus und kopieren Sie die numerische ID von der URL oder von der Webseite im Fall von thetvdb.com. Geben Sie das direkt nach dem Präfix xxxx.py_ in das Eingabefeld ein.",
@@ -140,6 +142,46 @@
                 "weekly": "Nehmen Sie jede Woche eine Vorführung auf"
             },
             "type_label": "Zeitplantyp"
+        },
+        "status": {
+            "backends_detail": "Backend: {{ Name }} ist ein {{ Type }} auf IP {{ IP }}",
+            "backends_none": "Keine Backends",
+            "backends_title": "Backends",
+            "card_text": "Karte: {{ CardId }}, Eingabe: {{ Id }} ist {{ InputName }}, Anzeigename: {{ DisplayName }}",
+            "encoder_text": "Encoder {{ Id }} ist auf Host {{ HostName }}, Status: {{ State }}",
+            "encoder_title": "Encoderstatus",
+            "endtime_text": "Das Ende dieser Aufzeichnung ist für {{ EndTime }} geplant.",
+            "frontends_detail": "Frontend: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",
+            "frontends_none": "Keine Frontends",
+            "frontends_title": "Frontends",
+            "jobs_none": "Die Auftragswarteschlange ist derzeit leer",
+            "jobs_status": "Status",
+            "jobs_text": "Jobs, die sich derzeit in der Warteschlange befinden oder kürzlich beendet wurden",
+            "jobs_title": "Auftragswarteschlange",
+            "mach": {
+                "disk_details": "Details zur Festplattennutzung",
+                "disk_dirs": "Verzeichnisse",
+                "disk_none": "Keine Festplatteninformationen verfügbar",
+                "disk_summ": "Zusammenfassung der Festplattennutzung",
+                "disk_total": "Gesamter Speicherplatz",
+                "load": "Der Auslastungsdurchschnitt dieser Maschine",
+                "minute": "Minute",
+                "minutes": "Protokoll",
+                "myth_drive": "MythTV-Laufwerk",
+                "none": "Keine Maschineninformationen verfügbar",
+                "space_after_expire": "Nach dem automatischen Ablauf verfügbarer Speicherplatz",
+                "space_deleted": "Von gelöschten Aufnahmen belegter Speicherplatz",
+                "space_expirable": "Von automatisch ablaufenden Aufzeichnungen belegter Speicherplatz",
+                "space_free": "Platzfrei",
+                "space_livetv": "Von LiveTV genutzter Speicherplatz",
+                "space_used": "Genutzter Platz",
+                "title": "Maschineninfo",
+                "total_space": "Gesamtfläche"
+            },
+            "no_encoders": "Backend hat keine Encoder",
+            "schedule_none": "Es ist keine Aufnahme geplant",
+            "schedule_text": "Die nächsten {{ length }} Sendung(en), deren Aufnahme geplant ist.",
+            "schedule_title": "Zeitplan"
         },
         "upcoming": {
             "date": "Datum",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "Wählen Sie die passende Frequenztabelle für Ihr System aus. Wenn Sie eine Antenne haben, verwenden Sie eine '-bcast-Frequenz.",
             "channfreq_label": "Kanalfrequenztabelle",
+            "freqtable_label": "Häufigkeitstabellen",
             "subtitle": "Diese legen einige länderspezifische Standardeinstellungen fest",
             "title": "Gebietsschemaeinstellungen",
             "tvformat_desc": "Der zum Fernsehen zu verwendende TV-Standard.",
@@ -919,6 +962,8 @@
             "enableupdates_label": "Aktivieren Sie Updates",
             "restart_desc": "Die Aufzeichnungen sind bis zum Neustart deaktiviert",
             "restart_label": "Backend neu starten",
+            "slave_instructions": "Dies scheint ein Slave-Backend zu sein. Wenn es als Slave-Backend gedacht ist, deaktivieren Sie bitte die Planung auf dem msster-Backend, während Sie das Slave-Backend-Setup ausführen.",
+            "slave_warning": "Wenn dies nicht als Slave-Backend gedacht ist, gehen Sie bitte zu „Setup“, „Allgemein“, „Hostadressen-Backend-Setup“ und wählen Sie „Dieser Server ist das Master-Backend“ oder legen Sie die korrekte benutzerdefinierte Kennung auf der Seite „Datenbank-Setup“ fest. Speichern Sie das Backend und starten Sie es neu.",
             "title": "MythTV-Setup",
             "upcomingrec": "Nächste bevorstehende Aufnahme: {{Title}} um {{StartTime}}. Status: {{Status}}"
         },

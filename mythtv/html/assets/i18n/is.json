@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "Upptökuregla er virk",
             "autoexpire_label": "Rennur sjálfkrafa út",
+            "autoextend_label": "Sjálfvirk framlenging",
             "dupin": {
                 "both": "Núverandi og fyrri upptökur",
                 "curr": "Aðeins núverandi upptökur",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "Afrit samsvörunaraðferð",
             "endoffset_label": "Fjöldi aukamínúta til að taka upp í lok",
+            "extend_none": "Enginn",
             "filters_label": "Síuvalkostir",
             "heading": "Skipuleggðu upptöku",
             "inetref_desc": "Notaðu TheTVDB, TVmaze eða TMDB til að fletta upp upptökulýsigögnum. Veldu valhnapp fyrir ofan og notaðu hlekkinn til að leita á vefsíðunni. Þegar þú hefur fundið réttu röðina á vefsíðunni skaltu velja hana og afrita tölulega auðkennið af vefslóðinni, eða af vefsíðunni ef um er að ræða thetvdb.com. Sláðu það inn í inntaksreitinn strax á eftir forskeytinu xxxx.py_",
@@ -140,6 +142,46 @@
                 "weekly": "Taktu upp eina sýningu í hverri viku"
             },
             "type_label": "Dagskrá Tegund"
+        },
+        "status": {
+            "backends_detail": "Bakendi: {{ Name }} er {{ Type }} á IP {{ IP }}",
+            "backends_none": "Engir bakenda",
+            "backends_title": "Bakenda",
+            "card_text": "Kort: {{ CardId }}, Inntak: {{ Id }} er {{ InputName }}, Birtingarnafn: {{ DisplayName }}",
+            "encoder_text": "Kóðarinn {{ Id }} er á hýsingaraðila {{ HostName }}, ríki: {{ State }}",
+            "encoder_title": "Staða kóðara",
+            "endtime_text": "Áætlað er að þessari upptöku ljúki {{ EndTime }}.",
+            "frontends_detail": "Framenda: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",
+            "frontends_none": "Engir framenda",
+            "frontends_title": "Framenda",
+            "jobs_none": "Atvinnuröð er tóm eins og er",
+            "jobs_status": "Staða",
+            "jobs_text": "Störf sem eru í biðröð eða nýlega lokið",
+            "jobs_title": "Atvinnuröð",
+            "mach": {
+                "disk_details": "Upplýsingar um notkun disks",
+                "disk_dirs": "Möppur",
+                "disk_none": "Engar diskaupplýsingar tiltækar",
+                "disk_summ": "Yfirlit yfir disknotkun",
+                "disk_total": "Heildarpláss",
+                "load": "Meðalhleðsla þessarar vélar",
+                "minute": "Mínúta",
+                "minutes": "Fundargerð",
+                "myth_drive": "MythTV Drive",
+                "none": "Engar vélaupplýsingar tiltækar",
+                "space_after_expire": "Pláss laust eftir að sjálfkrafa rennur út",
+                "space_deleted": "Rými notað af eyttum upptökum",
+                "space_expirable": "Rými notað af upptökum sem renna sjálfkrafa út",
+                "space_free": "Pláss laust",
+                "space_livetv": "Rými notað af LiveTV",
+                "space_used": "Rými notað",
+                "title": "Upplýsingar um vél",
+                "total_space": "Heildarrými"
+            },
+            "no_encoders": "Bakendi hefur enga kóðara",
+            "schedule_none": "Ekkert áætlað að taka upp",
+            "schedule_text": "Næstu {{ length }} sýning(ar) sem eru áætluð til upptöku.",
+            "schedule_title": "Dagskrá"
         },
         "upcoming": {
             "date": "Dagsetning",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "Veldu viðeigandi tíðnitöflu fyrir kerfið þitt. Ef þú ert með loftnet skaltu nota '-bcast tíðni.",
             "channfreq_label": "Rás tíðni tafla",
+            "freqtable_label": "Tíðnitöflur",
             "subtitle": "Þetta setja nokkrar landssértækar sjálfgefnar stillingar",
             "title": "Staðarstillingar",
             "tvformat_desc": "Sjónvarpsstaðalinn til að nota til að skoða sjónvarp.",
@@ -919,6 +962,8 @@
             "enableupdates_label": "Virkja uppfærslur",
             "restart_desc": "Upptökur eru óvirkar þar til þú endurræsir",
             "restart_label": "Endurræstu bakenda",
+            "slave_instructions": "Þetta virðist vera þrælabakendi. Ef það er ætlað sem þrælabakendi, vinsamlegast slökktu á tímasetningu á msster bakendanum meðan þú keyrir uppsetningu þrælabakendans.",
+            "slave_warning": "Ef þetta er ekki ætlað sem þrælabakendi, vinsamlegast farðu í Uppsetning, Almennt, Uppsetning hýsingarfangs, og veldu „Þessi þjónn er aðalbakendi“ eða stilltu rétt sérsniðið auðkenni á gagnagrunnsuppsetningu síðunni. Vistaðu og endurræstu bakendann,",
             "title": "MythTV uppsetning",
             "upcomingrec": "Næsta væntanleg upptaka: {{Title}} kl. {{StartTime}}. Staða: {{Staða}}"
         },

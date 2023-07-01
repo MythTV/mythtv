@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "Inspelningsregeln är aktiv",
             "autoexpire_label": "Utgår automatiskt",
+            "autoextend_label": "Automatisk förlängning",
             "dupin": {
                 "both": "Aktuella och tidigare inspelningar",
                 "curr": "Endast aktuella inspelningar",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "Duplicera matchningsmetod",
             "endoffset_label": "Antal extra minuter att spela in vid slutet",
+            "extend_none": "Ingen",
             "filters_label": "Filteralternativ",
             "heading": "Schemalägg inspelning",
             "inetref_desc": "Använd TheTVDB, TVmaze eller TMDB för att slå upp inspelningsmetadata. Välj en alternativknapp ovan och använd länken för att söka på webbplatsen. När du har hittat rätt serie på webbsidan, välj den och kopiera det numeriska ID:t från URL:en eller från webbsidan när det gäller thetvdb.com. Ange det i inmatningsrutan omedelbart efter prefixet xxxx.py_",
@@ -140,6 +142,46 @@
                 "weekly": "Spela in en visning varje vecka"
             },
             "type_label": "Schematyp"
+        },
+        "status": {
+            "backends_detail": "Backend: {{ Name }} är en {{ Type }} på IP {{ IP }}",
+            "backends_none": "Inga backends",
+            "backends_title": "Backends",
+            "card_text": "Kort: {{ CardId }}, Inmatning: {{ Id }} är {{ InputName }}, Visningsnamn: {{ DisplayName }}",
+            "encoder_text": "Kodaren {{ Id }} finns på värden {{ HostName }}, stat: {{ State }}",
+            "encoder_title": "Kodarstatus",
+            "endtime_text": "Den här inspelningen är planerad att avslutas vid {{ EndTime }}.",
+            "frontends_detail": "Gränssnitt: {{ Name }}, IP-port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",
+            "frontends_none": "Inga frontends",
+            "frontends_title": "Frontends",
+            "jobs_none": "Jobbkön är för närvarande tom",
+            "jobs_status": "Status",
+            "jobs_text": "Jobb i kö eller nyligen avslutade",
+            "jobs_title": "Jobbkö",
+            "mach": {
+                "disk_details": "Information om diskanvändning",
+                "disk_dirs": "Kataloger",
+                "disk_none": "Ingen diskinformation tillgänglig",
+                "disk_summ": "Sammanfattning av diskanvändning",
+                "disk_total": "Totalt diskutrymme",
+                "load": "Denna maskins belastningsgenomsnitt",
+                "minute": "Minut",
+                "minutes": "Minuter",
+                "myth_drive": "MythTV Drive",
+                "none": "Ingen maskininformation tillgänglig",
+                "space_after_expire": "Utrymme tillgängligt efter Auto-expire",
+                "space_deleted": "Utrymme som används av raderade inspelningar",
+                "space_expirable": "Utrymme som används av Auto-expirable Recordings",
+                "space_free": "Utrymme ledigt",
+                "space_livetv": "Utrymme som används av LiveTV",
+                "space_used": "Utrymme som används",
+                "title": "Maskininfo",
+                "total_space": "Totalt utrymme"
+            },
+            "no_encoders": "Backend har inga kodare",
+            "schedule_none": "Inget planerat att spela in",
+            "schedule_text": "Nästa {{ length }} show(er) som är schemalagda för inspelning.",
+            "schedule_title": "Schema"
         },
         "upcoming": {
             "date": "Datum",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "Välj lämplig frekvenstabell för ditt system. Om du har en antenn, använd en '-bcast-frekvens.",
             "channfreq_label": "Kanalfrekvenstabell",
+            "freqtable_label": "Frekvenstabeller",
             "subtitle": "Dessa anger vissa landsspecifika standardinställningar",
             "title": "Lokalinställningar",
             "tvformat_desc": "TV-standarden att använda för att titta på TV.",
@@ -919,6 +962,8 @@
             "enableupdates_label": "Aktivera uppdateringar",
             "restart_desc": "Inspelningar är inaktiverade tills du startar om",
             "restart_label": "Starta om Backend",
+            "slave_instructions": "Detta verkar vara en slavbackend. Om den är avsedd som en slavbackend, inaktivera schemaläggning på msster-backend medan du kör slavbackend-installation.",
+            "slave_warning": "Om detta inte är avsett som en slavbackend, gå till Setup, General, Host Address Backend Setup och välj \"Den här servern är Master Backend\" eller ställ in rätt anpassad identifierare på Databas Setup-sidan. Spara och starta om backend,",
             "title": "MythTV Setup",
             "upcomingrec": "Nästa kommande inspelning: {{Title}} kl. {{StartTime}}. Status: {{Status}}"
         },

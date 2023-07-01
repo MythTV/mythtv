@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "La regola di registrazione è attiva",
             "autoexpire_label": "Scadenza automatica",
+            "autoextend_label": "Estendi automaticamente",
             "dupin": {
                 "both": "Registrazioni attuali e precedenti",
                 "curr": "Solo registrazioni correnti",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "Metodo di corrispondenza duplicato",
             "endoffset_label": "Numero di minuti extra da registrare alla fine",
+            "extend_none": "Nessuno",
             "filters_label": "Opzioni filtro",
             "heading": "Pianifica la registrazione",
             "inetref_desc": "Usa TheTVDB, TVmaze o TMDB per cercare i metadati delle registrazioni. Selezionare un pulsante di opzione in alto e utilizzare il collegamento per cercare nel sito web. Una volta trovata la serie corretta sulla pagina web, selezionala e copia l'id numerico dall'URL, o dalla pagina web nel caso di thetvdb.com. Inseriscilo nella casella di input subito dopo il prefisso xxxx.py_",
@@ -140,6 +142,46 @@
                 "weekly": "Registra una proiezione ogni settimana"
             },
             "type_label": "Tipo di pianificazione"
+        },
+        "status": {
+            "backends_detail": "Backend: {{ Name }} è un {{ Type }} su IP {{ IP }}",
+            "backends_none": "Nessun backend",
+            "backends_title": "Backend",
+            "card_text": "Carta: {{ CardId }}, Input: {{ Id }} è {{ InputName }}, Nome visualizzato: {{ DisplayName }}",
+            "encoder_text": "Il codificatore {{ Id }} è sull'host {{ HostName }}, Stato: {{ State }}",
+            "encoder_title": "Stato dell'encoder",
+            "endtime_text": "Questa registrazione dovrebbe terminare alle {{ EndTime }}.",
+            "frontends_detail": "Frontend: {{ Name }}, Porta IP: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",
+            "frontends_none": "Nessun frontend",
+            "frontends_title": "Frontend",
+            "jobs_none": "La coda dei processi è attualmente vuota",
+            "jobs_status": "Stato",
+            "jobs_text": "Lavori attualmente in coda o terminati di recente",
+            "jobs_title": "Coda di lavoro",
+            "mach": {
+                "disk_details": "Dettagli sull'utilizzo del disco",
+                "disk_dirs": "Directory",
+                "disk_none": "Nessuna informazione sul disco disponibile",
+                "disk_summ": "Riepilogo dell'utilizzo del disco",
+                "disk_total": "Spazio totale su disco",
+                "load": "Il carico medio di questa macchina",
+                "minute": "Minuto",
+                "minutes": "Minuti",
+                "myth_drive": "Mito TV Drive",
+                "none": "Nessuna informazione sulla macchina disponibile",
+                "space_after_expire": "Spazio disponibile dopo la scadenza automatica",
+                "space_deleted": "Spazio utilizzato dalle registrazioni eliminate",
+                "space_expirable": "Spazio utilizzato dalle registrazioni con scadenza automatica",
+                "space_free": "Spazio libero",
+                "space_livetv": "Spazio utilizzato da LiveTV",
+                "space_used": "Spazio utilizzato",
+                "title": "Informazioni sulla macchina",
+                "total_space": "Spazio totale"
+            },
+            "no_encoders": "Il backend non ha codificatori",
+            "schedule_none": "Niente da registrare",
+            "schedule_text": "I prossimi {{ length }} spettacoli programmati per la registrazione.",
+            "schedule_title": "Programma"
         },
         "upcoming": {
             "date": "Data",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "Selezionare la tabella delle frequenze appropriata per il proprio sistema. Se hai un'antenna, usa una frequenza '-bcast.",
             "channfreq_label": "Tabella delle frequenze dei canali",
+            "freqtable_label": "Tabelle di frequenza",
             "subtitle": "Questi impostano alcune impostazioni predefinite specifiche del paese",
             "title": "Impostazioni internazionali",
             "tvformat_desc": "Lo standard TV da utilizzare per guardare la TV.",
@@ -919,6 +962,8 @@
             "enableupdates_label": "Abilita Aggiornamenti",
             "restart_desc": "Le registrazioni sono disabilitate fino al riavvio",
             "restart_label": "Riavvia il back-end",
+            "slave_instructions": "Questo sembra essere un backend slave. Se è inteso come back-end slave, disabilitare la pianificazione sul back-end msster durante l'esecuzione della configurazione del back-end slave.",
+            "slave_warning": "Se questo non è inteso come back-end slave, vai a Configurazione, Generale, Configurazione back-end indirizzo host e seleziona \"Questo server è il back-end principale\" oppure imposta l'identificatore personalizzato corretto nella pagina Configurazione database. Salva e riavvia il backend,",
             "title": "Installazione di MythTV",
             "upcomingrec": "Prossima registrazione in arrivo: {{Title}} alle {{StartTime}}. Stato: {{Stato}}"
         },

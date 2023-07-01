@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "Reguła nagrywania jest aktywna",
             "autoexpire_label": "Automatyczne wygasanie",
+            "autoextend_label": "Automatyczne rozszerzenie",
             "dupin": {
                 "both": "Bieżące i poprzednie nagrania",
                 "curr": "Tylko bieżące nagrania",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "Duplikat metody dopasowania",
             "endoffset_label": "Liczba dodatkowych minut do nagrania na końcu",
+            "extend_none": "Nic",
             "filters_label": "Opcje filtra",
             "heading": "Zaplanuj nagrywanie",
             "inetref_desc": "Użyj TheTVDB, TVmaze lub TMDB, aby wyszukać metadane nagrania. Wybierz przycisk radiowy powyżej i użyj łącza, aby przeszukać witrynę internetową. Po znalezieniu odpowiedniego serialu na stronie internetowej wybierz go i skopiuj numeryczny identyfikator z adresu URL lub ze strony internetowej w przypadku thetvdb.com. Wpisz to w polu wejściowym bezpośrednio po prefiksie xxxx.py_",
@@ -140,6 +142,46 @@
                 "weekly": "Nagraj jeden pokaz co tydzień"
             },
             "type_label": "Typ harmonogramu"
+        },
+        "status": {
+            "backends_detail": "Backend: {{ Name }} to {{ Type }} na IP {{ IP }}",
+            "backends_none": "Brak zaplecza",
+            "backends_title": "Backendy",
+            "card_text": "Karta: {{ CardId }}, Wejście: {{ Id }} to {{ InputName }}, Wyświetlana nazwa: {{ DisplayName }}",
+            "encoder_text": "Koder {{ Id }} jest na hoście {{ HostName }}, stan: {{ State }}",
+            "encoder_title": "Stan enkodera",
+            "endtime_text": "To nagranie ma zakończyć się o {{ EndTime }}.",
+            "frontends_detail": "Frontend: {{ Name }}, Port IP: {{ IP }}: {{ Port }}, Online: {{ OnLine }}",
+            "frontends_none": "Brak frontendów",
+            "frontends_title": "Początek końca",
+            "jobs_none": "Kolejka zadań jest obecnie pusta",
+            "jobs_status": "Status",
+            "jobs_text": "Oferty pracy znajdujące się obecnie w kolejce lub niedawno zakończone",
+            "jobs_title": "Kolejka zadań",
+            "mach": {
+                "disk_details": "Szczegóły wykorzystania dysku",
+                "disk_dirs": "Katalogi",
+                "disk_none": "Brak dostępnych informacji o dysku",
+                "disk_summ": "Podsumowanie użycia dysku",
+                "disk_total": "Całkowita przestrzeń dyskowa",
+                "load": "Średnie obciążenie tej maszyny",
+                "minute": "Minuta",
+                "minutes": "Minuty",
+                "myth_drive": "Dysk MythTV",
+                "none": "Brak dostępnych informacji o maszynie",
+                "space_after_expire": "Miejsce dostępne po automatycznym wygaśnięciu",
+                "space_deleted": "Miejsce używane przez usunięte nagrania",
+                "space_expirable": "Miejsce używane przez nagrania, które wygasają automatycznie",
+                "space_free": "Wolna przestrzeń",
+                "space_livetv": "Przestrzeń używana przez LiveTV",
+                "space_used": "Wykorzystana przestrzeń",
+                "title": "Informacje o maszynie",
+                "total_space": "Całkowita przestrzeń"
+            },
+            "no_encoders": "Backend nie ma koderów",
+            "schedule_none": "Nie zaplanowano nagrywania",
+            "schedule_text": "Kolejne programy ({{ length }}), które są zaplanowane do nagrania.",
+            "schedule_title": "Harmonogram"
         },
         "upcoming": {
             "date": "Data",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "Wybierz odpowiednią tabelę częstotliwości dla swojego systemu. Jeśli masz antenę, użyj częstotliwości „-bcast”.",
             "channfreq_label": "Tabela częstotliwości kanałów",
+            "freqtable_label": "Tabele częstotliwości",
             "subtitle": "Ustawiają one domyślne ustawienia specyficzne dla danego kraju",
             "title": "Ustawienia regionalne",
             "tvformat_desc": "Standard telewizyjny używany do oglądania telewizji.",
@@ -919,6 +962,8 @@
             "enableupdates_label": "Włącz aktualizacje",
             "restart_desc": "Nagrania są wyłączone do ponownego uruchomienia",
             "restart_label": "Uruchom ponownie zaplecze",
+            "slave_instructions": "Wygląda na to, że jest to backend podrzędny. Jeśli ma służyć jako podrzędny backend, wyłącz planowanie na backendzie msster podczas uruchamiania konfiguracji podrzędnego backendu.",
+            "slave_warning": "Jeśli nie jest to zaplecze podrzędne, przejdź do Ustawienia, Ogólne, Konfiguracja zaplecza adresu hosta i wybierz „Ten serwer jest głównym zapleczem” lub ustaw poprawny niestandardowy identyfikator na stronie Konfiguracja bazy danych. Zapisz i uruchom ponownie backend,",
             "title": "Konfiguracja MythTV",
             "upcomingrec": "Następne nadchodzące nagranie: {{Title}} o {{StartTime}}. Stan: {{Status}}"
         },

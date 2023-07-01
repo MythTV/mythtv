@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "Pravilo snemanja je aktivno",
             "autoexpire_label": "Samodejni potek",
+            "autoextend_label": "Samodejno podaljšanje",
             "dupin": {
                 "both": "Trenutni in prejšnji posnetki",
                 "curr": "Samo trenutni posnetki",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "Podvojena metoda ujemanja",
             "endoffset_label": "Število dodatnih minut za snemanje ob koncu",
+            "extend_none": "Noben",
             "filters_label": "Možnosti filtra",
             "heading": "Načrtujte snemanje",
             "inetref_desc": "Za iskanje metapodatkov o snemanju uporabite TheTVDB, TVmaze ali TMDB. Izberite izbirni gumb zgoraj in uporabite povezavo za iskanje po spletnem mestu. Ko najdete pravilno serijo na spletni strani, jo izberite in kopirajte številčni ID iz URL-ja ali s spletne strani v primeru thetvdb.com. To vnesite v vnosno polje takoj za predpono xxxx.py_",
@@ -140,6 +142,46 @@
                 "weekly": "Vsak teden posnemite eno oddajo"
             },
             "type_label": "Vrsta urnika"
+        },
+        "status": {
+            "backends_detail": "Backend: {{ Name }} je {{ Type }} na IP {{ IP }}",
+            "backends_none": "Brez ozadja",
+            "backends_title": "Zaledja",
+            "card_text": "Kartica: {{ CardId }}, vnos: {{ Id }} je {{ InputName }}, prikazno ime: {{ DisplayName }}",
+            "encoder_text": "Kodirnik {{ Id }} je na gostitelju {{ HostName }}, stanje: {{ State }}",
+            "encoder_title": "Status kodirnika",
+            "endtime_text": "To snemanje naj bi se končalo ob {{ EndTime }}.",
+            "frontends_detail": "Frontend: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",
+            "frontends_none": "Brez sprednjih strani",
+            "frontends_title": "Frontendi",
+            "jobs_none": "Čakalna vrsta opravil je trenutno prazna",
+            "jobs_status": "Stanje",
+            "jobs_text": "Opravila, ki so trenutno v čakalni vrsti ali so bila nedavno zaključena",
+            "jobs_title": "Čakalna vrsta opravil",
+            "mach": {
+                "disk_details": "Podrobnosti o uporabi diska",
+                "disk_dirs": "Imeniki",
+                "disk_none": "Informacije o disku niso na voljo",
+                "disk_summ": "Povzetek uporabe diska",
+                "disk_total": "Skupni prostor na disku",
+                "load": "Povprečna obremenitev tega stroja",
+                "minute": "minuta",
+                "minutes": "minute",
+                "myth_drive": "MythTV Drive",
+                "none": "Informacije o stroju niso na voljo",
+                "space_after_expire": "Prostor na voljo po samodejnem poteku",
+                "space_deleted": "Prostor, ki ga uporabljajo izbrisani posnetki",
+                "space_expirable": "Prostor, ki ga uporabljajo posnetki s samodejnim iztekom",
+                "space_free": "Brez prostora",
+                "space_livetv": "Prostor, ki ga uporablja LiveTV",
+                "space_used": "Uporabljen prostor",
+                "title": "Informacije o stroju",
+                "total_space": "Skupni prostor"
+            },
+            "no_encoders": "Zaledje nima kodirnikov",
+            "schedule_none": "Nič ni predvideno za snemanje",
+            "schedule_text": "Naslednje {{ length }} oddaje(e), ki so predvidene za snemanje.",
+            "schedule_title": "Urnik"
         },
         "upcoming": {
             "date": "Datum",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "Izberite ustrezno tabelo frekvenc za vaš sistem. Če imate anteno, uporabite frekvenco '-bcast.",
             "channfreq_label": "Frekvenčna tabela kanalov",
+            "freqtable_label": "Frekvenčne tabele",
             "subtitle": "Ti nastavijo nekatere privzete nastavitve za posamezne države",
             "title": "Lokalne nastavitve",
             "tvformat_desc": "TV standard, ki se uporablja za gledanje televizije.",
@@ -919,6 +962,8 @@
             "enableupdates_label": "Omogoči posodobitve",
             "restart_desc": "Posnetki so onemogočeni, dokler znova ne zaženete",
             "restart_label": "Znova zaženite zaledje",
+            "slave_instructions": "Zdi se, da je to podrejeno zaledje. Če je mišljeno kot podrejeno zaledje, onemogočite razporejanje na zaledju msster med izvajanjem nastavitve podrejenega zaledja.",
+            "slave_warning": "Če to ni predvideno kot podrejeno zaledje, pojdite na Nastavitve, Splošno, Nastavitev zaledja naslova gostitelja in izberite »Ta strežnik je glavno zaledje« ali pa nastavite pravilen identifikator po meri na strani z nastavitvami baze podatkov. Shranite in znova zaženite zaledje,",
             "title": "Nastavitev MythTV",
             "upcomingrec": "Naslednji prihajajoči posnetek: {{Title}} ob {{StartTime}}. Status: {{Status}}"
         },

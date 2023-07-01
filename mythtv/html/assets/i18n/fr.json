@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "La règle d'enregistrement est active",
             "autoexpire_label": "Expiration automatique",
+            "autoextend_label": "Extension automatique",
             "dupin": {
                 "both": "Enregistrements actuels et précédents",
                 "curr": "Enregistrements en cours uniquement",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "Méthode de correspondance en double",
             "endoffset_label": "Nombre de minutes supplémentaires à enregistrer à la fin",
+            "extend_none": "Aucun",
             "filters_label": "Options de filtrage",
             "heading": "Planifier l'enregistrement",
             "inetref_desc": "Utilisez TheTVDB, TVmaze ou TMDB pour rechercher les métadonnées d'enregistrement. Sélectionnez un bouton radio ci-dessus et utilisez le lien pour effectuer une recherche sur le site Web. Une fois que vous avez trouvé la série correcte sur la page Web, sélectionnez-la et copiez l'identifiant numérique à partir de l'URL ou de la page Web dans le cas de thetvdb.com. Entrez cela dans la zone de saisie immédiatement après le préfixe xxxx.py_",
@@ -140,6 +142,46 @@
                 "weekly": "Enregistrez une diffusion chaque semaine"
             },
             "type_label": "Type d'horaire"
+        },
+        "status": {
+            "backends_detail": "Backend : {{ Name }} est un {{ Type }} sur l'IP {{ IP }}",
+            "backends_none": "Aucun backend",
+            "backends_title": "Backends",
+            "card_text": "Carte : {{ CardId }}, entrée : {{ Id }} est {{ InputName }}, nom d'affichage : {{ DisplayName }}",
+            "encoder_text": "L'encodeur {{ Id }} est sur l'hôte {{ HostName }}, État : {{ State }}",
+            "encoder_title": "État de l'encodeur",
+            "endtime_text": "Cet enregistrement doit se terminer à {{ EndTime }}.",
+            "frontends_detail": "Frontend : {{ Name }}, IP-Port : {{ IP }} :{{ Port }}, Online : {{ OnLine }}",
+            "frontends_none": "Pas d'interfaces",
+            "frontends_title": "Parties avant",
+            "jobs_none": "La file d'attente des tâches est actuellement vide",
+            "jobs_status": "Statut",
+            "jobs_text": "Emplois actuellement en file d'attente ou récemment terminés",
+            "jobs_title": "File d'attente des travaux",
+            "mach": {
+                "disk_details": "Détails de l'utilisation du disque",
+                "disk_dirs": "Annuaires",
+                "disk_none": "Aucune information de disque disponible",
+                "disk_summ": "Résumé de l'utilisation du disque",
+                "disk_total": "Espace disque total",
+                "load": "La charge moyenne de cette machine",
+                "minute": "Minute",
+                "minutes": "Minutes",
+                "myth_drive": "Lecteur MythTV",
+                "none": "Aucune information machine disponible",
+                "space_after_expire": "Espace disponible après l'expiration automatique",
+                "space_deleted": "Espace utilisé par les enregistrements supprimés",
+                "space_expirable": "Espace utilisé par les enregistrements expirables automatiquement",
+                "space_free": "Espace libre",
+                "space_livetv": "Espace utilisé par LiveTV",
+                "space_used": "Espace utilisé",
+                "title": "Informations sur l'appareil",
+                "total_space": "Espace total"
+            },
+            "no_encoders": "Le backend n'a pas d'encodeurs",
+            "schedule_none": "Rien de prévu à enregistrer",
+            "schedule_text": "La ou les prochaines émissions de {{ length }} dont l'enregistrement est programmé.",
+            "schedule_title": "Calendrier"
         },
         "upcoming": {
             "date": "Date",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "Sélectionnez le tableau de fréquence approprié pour votre système. Si vous avez une antenne, utilisez une fréquence '-bcast.",
             "channfreq_label": "Tableau des fréquences des canaux",
+            "freqtable_label": "Tableaux de fréquence",
             "subtitle": "Ceux-ci définissent certains paramètres par défaut spécifiques au pays",
             "title": "Paramètres régionaux",
             "tvformat_desc": "La norme TV à utiliser pour regarder la télévision.",
@@ -919,6 +962,8 @@
             "enableupdates_label": "Activer les mises à jour",
             "restart_desc": "Les enregistrements sont désactivés jusqu'à ce que vous redémarriez",
             "restart_label": "Redémarrer le backend",
+            "slave_instructions": "Cela semble être un backend esclave. S'il est conçu comme un backend esclave, veuillez désactiver la planification sur le backend msster lors de l'exécution de la configuration du backend esclave.",
+            "slave_warning": "S'il ne s'agit pas d'un backend esclave, accédez à Configuration, Général, Configuration du backend de l'adresse de l'hôte et sélectionnez \"Ce serveur est le backend maître\" ou définissez l'identifiant personnalisé correct sur la page Configuration de la base de données. Enregistrez et redémarrez le backend,",
             "title": "Configuration Myth TV",
             "upcomingrec": "Prochain enregistrement à venir : {{Title}} à {{StartTime}}. Statut : {{Statut}}"
         },

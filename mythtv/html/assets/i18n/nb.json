@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "Opptaksregelen er aktiv",
             "autoexpire_label": "Utløper automatisk",
+            "autoextend_label": "Autoutvid",
             "dupin": {
                 "both": "Nåværende og tidligere opptak",
                 "curr": "Kun gjeldende opptak",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "Duplikatmatchmetode",
             "endoffset_label": "Antall ekstra minutter å registrere ved slutten",
+            "extend_none": "Ingen",
             "filters_label": "Filteralternativer",
             "heading": "Planlegg opptak",
             "inetref_desc": "Bruk TheTVDB, TVmaze eller TMDB for å slå opp opptaksmetadata. Velg en alternativknapp ovenfor og bruk lenken for å søke på nettstedet. Når du finner den riktige serien på nettsiden, velg den og kopier den numeriske ID-en fra URL-en, eller fra nettsiden i tilfellet thetvdb.com. Skriv inn det i inndataboksen umiddelbart etter prefikset xxxx.py_",
@@ -140,6 +142,46 @@
                 "weekly": "Ta opp en visning hver uke"
             },
             "type_label": "Tidsplantype"
+        },
+        "status": {
+            "backends_detail": "Backend: {{ Name }} er en {{ Type }} på IP {{ IP }}",
+            "backends_none": "Ingen backends",
+            "backends_title": "Backends",
+            "card_text": "Kort: {{ CardId }}, Inndata: {{ Id }} er {{ InputName }}, Visningsnavn: {{ DisplayName }}",
+            "encoder_text": "Koderen {{ Id }} er på vert {{ HostName }}, stat: {{ State }}",
+            "encoder_title": "Enkoderstatus",
+            "endtime_text": "Dette opptaket er planlagt avsluttet {{ EndTime }}.",
+            "frontends_detail": "Grensesnitt: {{ Name }}, IP-port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",
+            "frontends_none": "Ingen frontends",
+            "frontends_title": "Frontends",
+            "jobs_none": "Jobbkøen er tom",
+            "jobs_status": "Status",
+            "jobs_text": "Jobber som er i kø eller nylig avsluttet",
+            "jobs_title": "Jobbkø",
+            "mach": {
+                "disk_details": "Diskbruksdetaljer",
+                "disk_dirs": "Kataloger",
+                "disk_none": "Ingen diskinformasjon tilgjengelig",
+                "disk_summ": "Oppsummering av diskbruk",
+                "disk_total": "Total diskplass",
+                "load": "Denne maskinens belastningsgjennomsnitt",
+                "minute": "Minutt",
+                "minutes": "Minutter",
+                "myth_drive": "MythTV Drive",
+                "none": "Ingen maskininformasjon tilgjengelig",
+                "space_after_expire": "Plass tilgjengelig etter automatisk utløp",
+                "space_deleted": "Plass brukt av slettede opptak",
+                "space_expirable": "Plass som brukes av opptak som kan utløpe automatisk",
+                "space_free": "Plass ledig",
+                "space_livetv": "Plass brukt av LiveTV",
+                "space_used": "Plass brukt",
+                "title": "Maskininfo",
+                "total_space": "Totalt område, totalt areal"
+            },
+            "no_encoders": "Backend har ingen kodere",
+            "schedule_none": "Ingenting er planlagt å ta opp",
+            "schedule_text": "Neste {{ length }} show(er) som er planlagt for opptak.",
+            "schedule_title": "Rute"
         },
         "upcoming": {
             "date": "Dato",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "Velg riktig frekvenstabell for systemet ditt. Hvis du har en antenne, bruk en '-bcast-frekvens.",
             "channfreq_label": "Kanalfrekvenstabell",
+            "freqtable_label": "Frekvenstabeller",
             "subtitle": "Disse angir noen landsspesifikke standardinnstillinger",
             "title": "Lokale innstillinger",
             "tvformat_desc": "TV-standarden som skal brukes for å se på TV.",
@@ -919,6 +962,8 @@
             "enableupdates_label": "Aktiver oppdateringer",
             "restart_desc": "Opptak er deaktivert til du starter på nytt",
             "restart_label": "Start Backend på nytt",
+            "slave_instructions": "Dette ser ut til å være en slave-backend. Hvis det er ment som en slave-backend, vennligst deaktiver planlegging på msster-backend mens du kjører slave-backend-oppsett.",
+            "slave_warning": "Hvis dette ikke er ment som en slave-backend, vennligst gå til Oppsett, Generelt, Host Address Backend Setup, og velg \"Denne serveren er Master Backend\" eller angi riktig egendefinert identifikator på Database Setup-siden. Lagre og start backend på nytt,",
             "title": "MythTV-oppsett",
             "upcomingrec": "Neste kommende opptak: {{Title}} kl. {{StartTime}}. Status: {{Status}}"
         },

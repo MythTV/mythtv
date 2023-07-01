@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "錄音規則已激活",
             "autoexpire_label": "自動過期",
+            "autoextend_label": "自動擴展",
             "dupin": {
                 "both": "當前和以前的錄音",
                 "curr": "僅當前錄音",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "重複匹配法",
             "endoffset_label": "結束時記錄的額外分鐘數",
+            "extend_none": "沒有任何",
             "filters_label": "過濾器選項",
             "heading": "安排錄音",
             "inetref_desc": "使用 TheTVDB、TVmaze 或 TMDB 查找錄製元數據。選擇上面的單選按鈕並使用鏈接搜索網站。在網頁上找到正確的系列後，選擇它並從 URL 複製數字 ID，如果是 thetvdb.com，則從網頁複製數字 ID。在前綴 xxxx.py_ 之後的輸入框中輸入",
@@ -140,6 +142,46 @@
                 "weekly": "每週錄製一場放映"
             },
             "type_label": "時間表類型"
+        },
+        "status": {
+            "backends_detail": "後端：{{ Name }} 是 IP {{ IP }} 上的 {{ IP }}",
+            "backends_none": "無後端",
+            "backends_title": "後端",
+            "card_text": "卡：{{ CardId }}，輸入：{{ Id }} 是 {{ InputName }}，顯示名稱：{{ DisplayName }}",
+            "encoder_text": "編碼器 {{ Id }} 位於主機 {{ HostName }} 上，狀態：{{ State }}",
+            "encoder_title": "編碼器狀態",
+            "endtime_text": "該錄製計劃於 {{ EndTime }} 結束。",
+            "frontends_detail": "前端：{{ Name }}，IP 端口：{{ IP }}：{{ Port }}，在線：{{ OnLine }}",
+            "frontends_none": "無前端",
+            "frontends_title": "前端",
+            "jobs_none": "作業隊列當前為空",
+            "jobs_status": "地位",
+            "jobs_text": "當前在隊列中或最近結束的作業",
+            "jobs_title": "作業隊列",
+            "mach": {
+                "disk_details": "磁盤使用詳情",
+                "disk_dirs": "目錄",
+                "disk_none": "沒有可用的磁盤信息",
+                "disk_summ": "磁盤使用情況摘要",
+                "disk_total": "總磁盤空間",
+                "load": "這台機器的平均負載",
+                "minute": "分鐘",
+                "minutes": "分鐘",
+                "myth_drive": "神話電視驅動器",
+                "none": "無可用機器信息",
+                "space_after_expire": "自動過期後可用空間",
+                "space_deleted": "已刪除錄音所使用的空間",
+                "space_expirable": "自動過期錄音所使用的空間",
+                "space_free": "自由空間",
+                "space_livetv": "LiveTV 使用的空間",
+                "space_used": "已用空間",
+                "title": "機器信息",
+                "total_space": "整體空間"
+            },
+            "no_encoders": "後端沒有編碼器",
+            "schedule_none": "沒有預定要錄製的內容",
+            "schedule_text": "計劃錄製的下一個 {{ length }} 個節目。",
+            "schedule_title": "日程"
         },
         "upcoming": {
             "date": "日期",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "為您的系統選擇適當的頻率表。如果您有天線，請使用“-bcast”頻率。",
             "channfreq_label": "頻道頻率表",
+            "freqtable_label": "頻率表",
             "subtitle": "這些設置了一些特定於國家/地區的默認設置",
             "title": "區域設置",
             "tvformat_desc": "用於觀看電視的電視標準。",
@@ -919,6 +962,8 @@
             "enableupdates_label": "啟用更新",
             "restart_desc": "錄音將被禁用，直到您重新啟動為止",
             "restart_label": "重啟後端",
+            "slave_instructions": "這似乎是一個從屬後端。如果它打算作為從屬後端，請在運行從屬後端設置時禁用 msster 後端上的調度。",
+            "slave_warning": "如果這不是作為從屬後端，請轉至“設置”、“常規”、“主機地址後端設置”，然後選擇“此服務器是主後端”，或者在“數據庫設置”頁面上設置正確的自定義標識符。保存並重新啟動後端，",
             "title": "神話電視設置",
             "upcomingrec": "下一個即將錄製的節目：{{Title}}，時間：{{StartTime}}。狀態：{{狀態}}"
         },

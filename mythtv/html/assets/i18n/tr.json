@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "Kayıt Kuralı Aktif",
             "autoexpire_label": "Otomatik Süre Sonu",
+            "autoextend_label": "Otomatik Uzatma",
             "dupin": {
                 "both": "Mevcut ve Önceki Kayıtlar",
                 "curr": "Yalnızca Güncel Kayıtlar",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "Yinelenen Eşleştirme Yöntemi",
             "endoffset_label": "Sonunda Kaydedilecek Ekstra Dakika Sayısı",
+            "extend_none": "Hiçbiri",
             "filters_label": "Filtre seçenekleri",
             "heading": "Kaydı planla",
             "inetref_desc": "Kayıt meta verilerini aramak için TheTVDB, TVmaze veya TMDB'yi kullanın. Yukarıda bir radyo düğmesi seçin ve web sitesinde arama yapmak için bağlantıyı kullanın. Web sayfasında doğru diziyi bulduğunuzda, onu seçin ve URL'den veya thetvdb.com olması durumunda web sayfasından sayısal kimliği kopyalayın. Bunu xxxx.py_ önekinden hemen sonra giriş kutusuna girin.",
@@ -140,6 +142,46 @@
                 "weekly": "Her hafta bir gösterim kaydedin"
             },
             "type_label": "Zamanlama türü"
+        },
+        "status": {
+            "backends_detail": "Arka uç: {{ Name }}, IP {{ Type }} üzerinde bir {{ IP }}'dir",
+            "backends_none": "Arka Uç Yok",
+            "backends_title": "arka uçlar",
+            "card_text": "Kart: {{ CardId }}, Giriş: {{ Id }}, {{ InputName }}, Görünen Ad: {{ DisplayName }}",
+            "encoder_text": "{{ Id }} kodlayıcı {{ HostName }} ana bilgisayarında, Eyalet: {{ State }}",
+            "encoder_title": "Kodlayıcı Durumu",
+            "endtime_text": "Bu kayıt, {{ EndTime }} tarihinde sona ermek üzere planlandı.",
+            "frontends_detail": "Ön Uç: {{ Name }}, IP Bağlantı Noktası: {{ IP }}:{{ Port }}, Çevrimiçi: {{ OnLine }}",
+            "frontends_none": "Ön Uç Yok",
+            "frontends_title": "ön uçlar",
+            "jobs_none": "İş kuyruğu şu anda boş",
+            "jobs_status": "Durum",
+            "jobs_text": "Şu anda Kuyrukta olan veya yakın zamanda sona eren işler",
+            "jobs_title": "iş kuyruğu",
+            "mach": {
+                "disk_details": "Disk Kullanım Ayrıntıları",
+                "disk_dirs": "dizinler",
+                "disk_none": "Disk Bilgisi yok",
+                "disk_summ": "Disk Kullanım Özeti",
+                "disk_total": "Toplam Disk Alanı",
+                "load": "Bu makinenin yük ortalaması",
+                "minute": "Dakika",
+                "minutes": "Dakika",
+                "myth_drive": "MythTV Sürücüsü",
+                "none": "Makine Bilgisi yok",
+                "space_after_expire": "Otomatik Süre Sonunun Ardından Kullanılabilir Alan",
+                "space_deleted": "Silinen Kayıtların Kullandığı Alan",
+                "space_expirable": "Otomatik Süresi Dolan Kayıtlar Tarafından Kullanılan Alan",
+                "space_free": "Boşluksuz",
+                "space_livetv": "LiveTV Tarafından Kullanılan Alan",
+                "space_used": "Kullanılan Alan",
+                "title": "Makine Bilgisi",
+                "total_space": "Toplam alan"
+            },
+            "no_encoders": "Arka uçta kodlayıcı yok",
+            "schedule_none": "Kaydedilecek programlanmış bir şey yok",
+            "schedule_text": "Kayıt için planlanan sonraki {{ length }} gösteri(ler).",
+            "schedule_title": "Takvim"
         },
         "upcoming": {
             "date": "Tarih",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "Sisteminiz için uygun frekans tablosunu seçin. Bir anteniniz varsa, bir '-bcast frekansı' kullanın.",
             "channfreq_label": "Kanal Frekans Tablosu",
+            "freqtable_label": "Frekans Tabloları",
             "subtitle": "Bunlar, ülkeye özgü bazı varsayılan ayarları belirler",
             "title": "Yerel Ayarlar",
             "tvformat_desc": "TV izlemek için kullanılacak TV standardı.",
@@ -919,6 +962,8 @@
             "enableupdates_label": "Güncellemeleri Etkinleştir",
             "restart_desc": "Siz yeniden başlatana kadar kayıtlar devre dışı bırakılır",
             "restart_label": "Arka Ucu Yeniden Başlat",
+            "slave_instructions": "Bu bir bağımlı arka uç gibi görünüyor. Köle arka uç olarak amaçlanıyorsa, lütfen bağımlı arka uç kurulumunu çalıştırırken msster arka ucunda planlamayı devre dışı bırakın.",
+            "slave_warning": "Bu bir bağımlı arka uç olarak tasarlanmadıysa, lütfen Kurulum, Genel, Ana Bilgisayar Adresi Arka Uç Kurulumu'na gidin ve \"Bu sunucu Ana Arka Uçtur\" seçeneğini seçin veya Veritabanı Kurulumu sayfasında doğru özel tanımlayıcıyı ayarlayın. Arka ucu kaydedin ve yeniden başlatın,",
             "title": "MythTV Kurulumu",
             "upcomingrec": "Sıradaki kayıt: {{Title}}, {{StartTime}}. Durum: {{Durum}}"
         },

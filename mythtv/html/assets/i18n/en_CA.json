@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "Recording Rule is Active",
             "autoexpire_label": "Auto Expire",
+            "autoextend_label": "Auto Extend",
             "dupin": {
                 "both": "Current and Previous Recordings",
                 "curr": "Current Recordings Only",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "Duplicate Match Method",
             "endoffset_label": "Number of Extra Minutes to Record at End",
+            "extend_none": "None",
             "filters_label": "Filter Options",
             "heading": "Schedule recording",
             "inetref_desc": "Use TheTVDB, TVmaze or TMDB to look up recording metadata. Select a radio button above and use the link to search the web site. Once you find the correct series on the web page, select it and copy the numeric id from the URL, or from the web page in the case of thetvdb.com. Enter that in the input box immediately after the prefix xxxx.py_",
@@ -140,6 +142,46 @@
                 "weekly": "Record one showing every week"
             },
             "type_label": "Schedule Type"
+        },
+        "status": {
+            "backends_detail": "Backend: {{ Name }} is a {{ Type }} on IP {{ IP }}",
+            "backends_none": "No Backends",
+            "backends_title": "Backends",
+            "card_text": "Card: {{ CardId }}, Input: {{ Id }} is {{ InputName }}, Display Name: {{ DisplayName }}",
+            "encoder_text": "Encoder {{ Id }} is on host {{ HostName }}, State: {{ State }}",
+            "encoder_title": "Encoder Status",
+            "endtime_text": "This recording is scheduled to end at {{ EndTime }}.",
+            "frontends_detail": "Frontend: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",
+            "frontends_none": "No Frontends",
+            "frontends_title": "Frontends",
+            "jobs_none": "Job queue is currently empty",
+            "jobs_status": "Status",
+            "jobs_text": "Jobs currently in Queue or recently ended",
+            "jobs_title": "Job queue",
+            "mach": {
+                "disk_details": "Disk Usage Details",
+                "disk_dirs": "Directories",
+                "disk_none": "No Disk Info available",
+                "disk_summ": "Disk Usage Summary",
+                "disk_total": "Total Disk Space",
+                "load": "This machine's load average",
+                "minute": "Minute",
+                "minutes": "Minutes",
+                "myth_drive": "MythTV Drive",
+                "none": "No Machine Info available",
+                "space_after_expire": "Space Available after Auto-expire",
+                "space_deleted": "Space Used by Deleted Recordings",
+                "space_expirable": "Space Used by Auto-expirable Recordings",
+                "space_free": "Space Free",
+                "space_livetv": "Space Used by LiveTV",
+                "space_used": "Space Used",
+                "title": "Machine Info",
+                "total_space": "Total Space"
+            },
+            "no_encoders": "Backend has no encoders",
+            "schedule_none": "Nothing scheduled to record",
+            "schedule_text": "The next {{ length }} show(s) that are scheduled for recording.",
+            "schedule_title": "Schedule"
         },
         "upcoming": {
             "date": "Date",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "Select the appropriate frequency table for your system. If you have an aerial, use a '-bcast frequency.",
             "channfreq_label": "Channel Frequency Table",
+            "freqtable_label": "Frequency Tables",
             "subtitle": "These set some country specific default settings",
             "title": "Locale Settings",
             "tvformat_desc": "The TV standard to use for viewing TV.",
@@ -919,6 +962,8 @@
             "enableupdates_label": "Enable Updates",
             "restart_desc": "Recordings are disabled until you restart",
             "restart_label": "Restart Backend",
+            "slave_instructions": "This appears to be a slave backend. If it is intended as a slave backend, please disable scheduling on the msster backend while running slave backend setup.",
+            "slave_warning": "If this is not intended as a slave backend, please go to Setup, General, Host Address Backend Setup, and select \"This server is the Master Backend\" or else set the correct custom identifier on the Database Setup page. Save and Restart the backend,",
             "title": "MythTV Setup",
             "upcomingrec": "Next upcoming recording: {{Title}} at {{StartTime}}. Status: {{Status}}"
         },

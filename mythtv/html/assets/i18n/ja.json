@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "記録ルールがアクティブです",
             "autoexpire_label": "自動期限切れ",
+            "autoextend_label": "自動延長",
             "dupin": {
                 "both": "現在および以前の録音",
                 "curr": "現在の録音のみ",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "重複一致メソッド",
             "endoffset_label": "終了時に追加で録画する分数",
+            "extend_none": "なし",
             "filters_label": "フィルターオプション",
             "heading": "スケジュール録画",
             "inetref_desc": "TheTVDB、TVmaze、または TMDB を使用して録画メタデータを検索します。上のラジオ ボタンを選択し、リンクを使用して Web サイトを検索します。 Web ページで正しいシリーズを見つけたら、それを選択し、URL から、または thetvdb.com の場合は Web ページから数値 ID をコピーします。プレフィックス xxxx.py_ の直後に入力ボックスにそれを入力します。",
@@ -140,6 +142,46 @@
                 "weekly": "毎週 1 つの上映を録画する"
             },
             "type_label": "スケジュールの種類"
+        },
+        "status": {
+            "backends_detail": "バックエンド: {{ Name }} は IP {{ IP }} 上の {{ IP }} です",
+            "backends_none": "バックエンドなし",
+            "backends_title": "バックエンド",
+            "card_text": "カード: {{ CardId }}、入力: {{ Id }} は {{ InputName }}、表示名: {{ DisplayName }}",
+            "encoder_text": "エンコーダ {{ Id }} はホスト {{ HostName }} 上にあり、状態: {{ State }}",
+            "encoder_title": "エンコーダのステータス",
+            "endtime_text": "この録画は {{ EndTime }} に終了するようにスケジュールされています。",
+            "frontends_detail": "フロントエンド: {{ Name }}、IP ポート: {{ IP }}:{{ Port }}、オンライン: {{ OnLine }}",
+            "frontends_none": "フロントエンドなし",
+            "frontends_title": "フロントエンド",
+            "jobs_none": "ジョブキューは現在空です",
+            "jobs_status": "スターテス",
+            "jobs_text": "現在キューにあるジョブ、または最近終了したジョブ",
+            "jobs_title": "ジョブキュー",
+            "mach": {
+                "disk_details": "ディスク使用量の詳細",
+                "disk_dirs": "ディレクトリ",
+                "disk_none": "利用可能なディスク情報がありません",
+                "disk_summ": "ディスク使用量の概要",
+                "disk_total": "総ディスク容量",
+                "load": "このマシンのロードアベレージ",
+                "minute": "分",
+                "minutes": "分",
+                "myth_drive": "MythTV ドライブ",
+                "none": "マシン情報がありません",
+                "space_after_expire": "自動期限切れ後に利用可能なスペース",
+                "space_deleted": "削除された録音によって使用されるスペース",
+                "space_expirable": "自動有効期限切れの録画によって使用されるスペース",
+                "space_free": "スペースフリー",
+                "space_livetv": "LiveTV が使用するスペース",
+                "space_used": "使用スペース",
+                "title": "マシン情報",
+                "total_space": "総スペース"
+            },
+            "no_encoders": "バックエンドにはエンコーダーがありません",
+            "schedule_none": "録画予定は何もありません",
+            "schedule_text": "次の {{ length }} には、録画がスケジュールされているものが表示されます。",
+            "schedule_title": "スケジュール"
         },
         "upcoming": {
             "date": "日にち",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "システムに適切な周波数テーブルを選択します。アンテナをお持ちの場合は、「-bcast 周波数」を使用してください。",
             "channfreq_label": "チャネル周波数テーブル",
+            "freqtable_label": "度数表",
             "subtitle": "これらは国固有のデフォルト設定をいくつか設定します",
             "title": "ロケール設定",
             "tvformat_desc": "テレビの視聴に使用するテレビ規格。",
@@ -919,6 +962,8 @@
             "enableupdates_label": "アップデートを有効にする",
             "restart_desc": "再起動するまで録音は無効になります",
             "restart_label": "バックエンドの再起動",
+            "slave_instructions": "これはスレーブ バックエンドであるようです。スレーブ バックエンドとして使用する場合は、スレーブ バックエンド セットアップの実行中に msster バックエンドのスケジューリングを無効にしてください。",
+            "slave_warning": "これがスレーブ バックエンドとして意図されていない場合は、[セットアップ]、[全般]、[ホスト アドレス バックエンド セットアップ] に移動し、[このサーバーはマスター バックエンドです] を選択するか、データベース セットアップ ページで正しいカスタム ID を設定してください。バックエンドを保存して再起動します。",
             "title": "MythTV のセットアップ",
             "upcomingrec": "次回の録画: {{Title}}、時刻: {{StartTime}}。ステータス: {{ステータス}}"
         },

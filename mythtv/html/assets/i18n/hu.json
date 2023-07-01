@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "A rögzítési szabály aktív",
             "autoexpire_label": "Automatikus lejárat",
+            "autoextend_label": "Automatikus kiterjesztés",
             "dupin": {
                 "both": "Jelenlegi és korábbi felvételek",
                 "curr": "Csak aktuális felvételek",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "Duplicate Match Method",
             "endoffset_label": "A végén rögzítendő többletpercek száma",
+            "extend_none": "Egyik sem",
             "filters_label": "Szűrési beállítások",
             "heading": "Felvétel ütemezése",
             "inetref_desc": "A felvétel metaadatainak megkereséséhez használja a TheTVDB, TVmaze vagy TMDB alkalmazást. Válassza ki a fenti rádiógombot, és használja a hivatkozást a webhelyen való kereséshez. Ha megtalálta a megfelelő sorozatot a weboldalon, válassza ki azt, és másolja ki a numerikus azonosítót az URL-ből, vagy a thetvdb.com esetében a weboldalról. Írja be ezt a beviteli mezőbe közvetlenül az xxxx.py_ előtag után",
@@ -140,6 +142,46 @@
                 "weekly": "Rögzítsen egy bemutatót minden héten"
             },
             "type_label": "Ütemezés típusa"
+        },
+        "status": {
+            "backends_detail": "Háttérrendszer: a {{ Name }} egy {{ Type }} az {{ IP }} IP-n",
+            "backends_none": "Nincsenek háttérprogramok",
+            "backends_title": "Háttérrendszerek",
+            "card_text": "Kártya: {{ CardId }}, bemenet: {{ Id }}: {{ InputName }}, megjelenített név: {{ DisplayName }}",
+            "encoder_text": "A(z) {{ Id }} kódoló a(z) {{ HostName }} gazdagépen található, állapot: {{ State }}",
+            "encoder_title": "Kódoló állapota",
+            "endtime_text": "Ez a felvétel a tervek szerint {{ EndTime }}-kor ér véget.",
+            "frontends_detail": "Frontend: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",
+            "frontends_none": "Nincs frontend",
+            "frontends_title": "Frontendek",
+            "jobs_none": "A feladatsor jelenleg üres",
+            "jobs_status": "Állapot",
+            "jobs_text": "Jelenleg várólistában lévő vagy nemrégiben véget ért munkák",
+            "jobs_title": "Munkasor",
+            "mach": {
+                "disk_details": "Lemezhasználati részletek",
+                "disk_dirs": "Könyvtárak",
+                "disk_none": "Nincs elérhető lemezinformáció",
+                "disk_summ": "Lemezhasználati összefoglaló",
+                "disk_total": "Teljes lemezterület",
+                "load": "A gép átlagos terhelése",
+                "minute": "Perc",
+                "minutes": "Percek",
+                "myth_drive": "MythTV Drive",
+                "none": "Gépinformáció nem áll rendelkezésre",
+                "space_after_expire": "Szabad hely az automatikus lejárat után",
+                "space_deleted": "A törölt felvételek által használt terület",
+                "space_expirable": "Az automatikusan lejárt felvételek által használt terület",
+                "space_free": "Hely szabad",
+                "space_livetv": "A LiveTV által használt terület",
+                "space_used": "Használt hely",
+                "title": "Gép Info",
+                "total_space": "Teljes tér"
+            },
+            "no_encoders": "A háttérben nincsenek kódolók",
+            "schedule_none": "Nincs ütemezett rögzítés",
+            "schedule_text": "A következő felvételre ütemezett {{ length }} műsor(ok).",
+            "schedule_title": "Menetrend"
         },
         "upcoming": {
             "date": "Dátum",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "Válassza ki a rendszerének megfelelő frekvenciatáblázatot. Ha van antennája, használjon '-bcast frekvenciát.",
             "channfreq_label": "Csatorna frekvencia táblázat",
+            "freqtable_label": "Gyakorisági táblázatok",
             "subtitle": "Ezek beállítanak néhány országspecifikus alapértelmezett beállítást",
             "title": "Nyelv-beállítások",
             "tvformat_desc": "A tévénézéshez használt TV szabvány.",
@@ -919,6 +962,8 @@
             "enableupdates_label": "Frissítések engedélyezése",
             "restart_desc": "A felvételek le vannak tiltva az újraindításig",
             "restart_label": "Indítsa újra a Backendet",
+            "slave_instructions": "Ez egy szolga háttérprogramnak tűnik. Ha szolga háttérprogramnak szánja, kérjük, kapcsolja ki az ütemezést az msster háttérrendszeren, miközben a szolga háttérprogramot futtatja.",
+            "slave_warning": "Ha ezt nem szolga háttérprogramnak szánja, lépjen a Beállítás, Általános, Gazdacím-háttérbeállítás menüpontra, és válassza ki az \"Ez a kiszolgáló a fő háttérrendszer\" lehetőséget, vagy állítsa be a megfelelő egyéni azonosítót az Adatbázis beállítása oldalon. Mentse és indítsa újra a háttérprogramot,",
             "title": "MythTV beállítása",
             "upcomingrec": "Következő felvétel: {{Title}}, {{StartTime}}. Állapot: {{Status}}"
         },

@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "录音规则已激活",
             "autoexpire_label": "自动过期",
+            "autoextend_label": "自动扩展",
             "dupin": {
                 "both": "当前和以前的录音",
                 "curr": "仅当前录音",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "重复匹配法",
             "endoffset_label": "结束时记录的额外分钟数",
+            "extend_none": "没有任何",
             "filters_label": "过滤器选项",
             "heading": "安排录音",
             "inetref_desc": "使用 TheTVDB、TVmaze 或 TMDB 查找录制元数据。选择上面的单选按钮并使用链接搜索网站。在网页上找到正确的系列后，选择它并从 URL 复制数字 ID，如果是 thetvdb.com，则从网页复制数字 ID。在前缀 xxxx.py_ 之后的输入框中输入",
@@ -140,6 +142,46 @@
                 "weekly": "每周录制一场放映"
             },
             "type_label": "时间表类型"
+        },
+        "status": {
+            "backends_detail": "后端：{{ Name }} 是 IP {{ IP }} 上的 {{ IP }}",
+            "backends_none": "无后端",
+            "backends_title": "后端",
+            "card_text": "卡：{{ CardId }}，输入：{{ Id }} 是 {{ InputName }}，显示名称：{{ DisplayName }}",
+            "encoder_text": "编码器 {{ Id }} 位于主机 {{ HostName }} 上，状态：{{ State }}",
+            "encoder_title": "编码器状态",
+            "endtime_text": "该录制计划于 {{ EndTime }} 结束。",
+            "frontends_detail": "前端：{{ Name }}，IP 端口：{{ IP }}：{{ Port }}，在线：{{ OnLine }}",
+            "frontends_none": "无前端",
+            "frontends_title": "前端",
+            "jobs_none": "作业队列当前为空",
+            "jobs_status": "地位",
+            "jobs_text": "当前在队列中或最近结束的作业",
+            "jobs_title": "作业队列",
+            "mach": {
+                "disk_details": "磁盘使用详情",
+                "disk_dirs": "目录",
+                "disk_none": "没有可用的磁盘信息",
+                "disk_summ": "磁盘使用情况摘要",
+                "disk_total": "总磁盘空间",
+                "load": "这台机器的平均负载",
+                "minute": "分钟",
+                "minutes": "分钟",
+                "myth_drive": "神话电视驱动器",
+                "none": "无可用机器信息",
+                "space_after_expire": "自动过期后可用空间",
+                "space_deleted": "已删除录音所使用的空间",
+                "space_expirable": "自动过期录音所使用的空间",
+                "space_free": "自由空间",
+                "space_livetv": "LiveTV 使用的空间",
+                "space_used": "已用空间",
+                "title": "机器信息",
+                "total_space": "整体空间"
+            },
+            "no_encoders": "后端没有编码器",
+            "schedule_none": "没有预定要录制的内容",
+            "schedule_text": "计划录制的下一个 {{ length }} 个节目。",
+            "schedule_title": "日程"
         },
         "upcoming": {
             "date": "日期",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "为您的系统选择适当的频率表。如果您有天线，请使用“-bcast”频率。",
             "channfreq_label": "频道频率表",
+            "freqtable_label": "频率表",
             "subtitle": "这些设置了一些特定于国家/地区的默认设置",
             "title": "区域设置",
             "tvformat_desc": "用于观看电视的电视标准。",
@@ -919,6 +962,8 @@
             "enableupdates_label": "启用更新",
             "restart_desc": "录音将被禁用，直到您重新启动为止",
             "restart_label": "重启后端",
+            "slave_instructions": "这似乎是一个从属后端。如果它打算作为从属后端，请在运行从属后端设置时禁用 msster 后端上的调度。",
+            "slave_warning": "如果这不是作为从属后端，请转至“设置”、“常规”、“主机地址后端设置”，然后选择“此服务器是主后端”，或者在“数据库设置”页面上设置正确的自定义标识符。保存并重新启动后端，",
             "title": "神话电视设置",
             "upcomingrec": "下一个即将录制的节目：{{Title}}，时间：{{StartTime}}。状态：{{状态}}"
         },

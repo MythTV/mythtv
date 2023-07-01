@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "La regla de gravació està activa",
             "autoexpire_label": "Caducitat automàtica",
+            "autoextend_label": "Extensió automàtica",
             "dupin": {
                 "both": "Enregistraments actuals i anteriors",
                 "curr": "Només enregistraments actuals",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "Mètode de concordança duplicada",
             "endoffset_label": "Nombre de minuts addicionals per gravar al final",
+            "extend_none": "Cap",
             "filters_label": "Opcions de filtre",
             "heading": "Programa la gravació",
             "inetref_desc": "Utilitzeu TheTVDB, TVmaze o TMDB per cercar metadades de gravació. Seleccioneu un botó d'opció a dalt i utilitzeu l'enllaç per cercar al lloc web. Un cop trobeu la sèrie correcta a la pàgina web, seleccioneu-la i copieu l'identificador numèric de l'URL o de la pàgina web en el cas de thetvdb.com. Introduïu-ho al quadre d'entrada immediatament després del prefix xxxx.py_",
@@ -140,6 +142,46 @@
                 "weekly": "Grava una sessió cada setmana"
             },
             "type_label": "Tipus d'horari"
+        },
+        "status": {
+            "backends_detail": "Backend: {{ Name }} és un {{ Type }} a la IP {{ IP }}",
+            "backends_none": "Sense backends",
+            "backends_title": "Backends",
+            "card_text": "Targeta: {{ CardId }}, entrada: {{ Id }} és {{ InputName }}, nom visualitzat: {{ DisplayName }}",
+            "encoder_text": "El codificador {{ Id }} és a l'amfitrió {{ HostName }}, Estat: {{ State }}",
+            "encoder_title": "Estat del codificador",
+            "endtime_text": "Està previst que aquesta gravació finalitzi a les {{ EndTime }}.",
+            "frontends_detail": "Frontend: {{ Name }}, Port IP: {{ IP }}:{{ Port }}, En línia: {{ OnLine }}",
+            "frontends_none": "Sense Frontends",
+            "frontends_title": "Frontends",
+            "jobs_none": "La cua de treballs està buida actualment",
+            "jobs_status": "Estat",
+            "jobs_text": "Feines actualment a la cua o acabades recentment",
+            "jobs_title": "Cua de treball",
+            "mach": {
+                "disk_details": "Detalls d'ús del disc",
+                "disk_dirs": "Directoris",
+                "disk_none": "No hi ha informació del disc disponible",
+                "disk_summ": "Resum d'ús del disc",
+                "disk_total": "Espai total en disc",
+                "load": "La càrrega mitjana d'aquesta màquina",
+                "minute": "Minut",
+                "minutes": "Minuts",
+                "myth_drive": "MythTV Drive",
+                "none": "No hi ha informació de la màquina disponible",
+                "space_after_expire": "Espai disponible després de la caducitat automàtica",
+                "space_deleted": "Espai utilitzat per les gravacions suprimides",
+                "space_expirable": "Espai utilitzat per enregistraments amb caducitat automàtica",
+                "space_free": "Espai Lliure",
+                "space_livetv": "Espai utilitzat per LiveTV",
+                "space_used": "Espai utilitzat",
+                "title": "Informació de la màquina",
+                "total_space": "Espai total"
+            },
+            "no_encoders": "El backend no té codificadors",
+            "schedule_none": "No hi ha res programat per gravar",
+            "schedule_text": "Els propers {{ length }} mostren que estan programats per a la gravació.",
+            "schedule_title": "Horari"
         },
         "upcoming": {
             "date": "Data",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "Seleccioneu la taula de freqüències adequada per al vostre sistema. Si teniu una antena, utilitzeu una freqüència '-bcast.",
             "channfreq_label": "Taula de freqüències de canals",
+            "freqtable_label": "Taules de Freqüències",
             "subtitle": "Aquests estableixen alguns paràmetres predeterminats específics del país",
             "title": "Configuració de la configuració regional",
             "tvformat_desc": "L'estàndard de televisió que s'utilitza per veure la televisió.",
@@ -919,6 +962,8 @@
             "enableupdates_label": "Activa les actualitzacions",
             "restart_desc": "Les gravacions es desactiven fins que reinicieu",
             "restart_label": "Reinicieu el backend",
+            "slave_instructions": "Sembla ser un backend esclau. Si està pensat com a backend esclau, si us plau, desactiveu la programació al backend msster mentre executeu la configuració del backend esclau.",
+            "slave_warning": "Si no està pensat com a backend esclau, aneu a Configuració, General, Configuració del backend de l'adreça de l'amfitrió i seleccioneu \"Aquest servidor és el backend mestre\" o bé establiu l'identificador personalitzat correcte a la pàgina Configuració de la base de dades. Desa i reinicia el backend,",
             "title": "Configuració de MythTV",
             "upcomingrec": "Pròxima gravació: {{Títol}} a {{StartTime}}. Estat: {{Estat}}"
         },

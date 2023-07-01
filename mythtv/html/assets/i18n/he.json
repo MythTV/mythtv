@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "כלל ההקלטה פעיל",
             "autoexpire_label": "תוקף אוטומטי",
+            "autoextend_label": "הרחבה אוטומטית",
             "dupin": {
                 "both": "הקלטות נוכחיות וקדמות",
                 "curr": "הקלטות נוכחיות בלבד",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "שיטת התאמה כפולה",
             "endoffset_label": "מספר הדקות הנוספות להקלטה בסיום",
+            "extend_none": "אף אחד",
             "filters_label": "אפשרויות סינון",
             "heading": "תזמן הקלטה",
             "inetref_desc": "השתמש ב-TheTVDB, TVmaze או TMDB כדי לחפש מטא נתונים של הקלטה. בחר בלחצן בחירה למעלה והשתמש בקישור כדי לחפש באתר האינטרנט. לאחר שתמצא את הסדרה הנכונה בדף האינטרנט, בחר אותה והעתק את המזהה המספרי מכתובת האתר, או מדף האינטרנט במקרה של thetvdb.com. הזן את זה בתיבת הקלט מיד אחרי הקידומת xxxx.py_",
@@ -140,6 +142,46 @@
                 "weekly": "הקלט הצגה אחת בכל שבוע"
             },
             "type_label": "סוג לוח זמנים"
+        },
+        "status": {
+            "backends_detail": "אחורי: {{ Name }} הוא {{ Type }} ב-IP {{ IP }}",
+            "backends_none": "אין אחוריים",
+            "backends_title": "קצוות אחוריים",
+            "card_text": "כרטיס: {{ CardId }}, קלט: {{ Id }} הוא {{ InputName }}, שם תצוגה: {{ DisplayName }}",
+            "encoder_text": "המקודד {{ Id }} נמצא במארח {{ HostName }}, מדינה: {{ State }}",
+            "encoder_title": "מצב מקודד",
+            "endtime_text": "הקלטה זו מתוכננת להסתיים ב-{{ EndTime }}.",
+            "frontends_detail": "ממשק קצה: {{ Name }}, יציאת IP: {{ IP }}:{{ Port }}, מקוונת: {{ OnLine }}",
+            "frontends_none": "אין חזיתות",
+            "frontends_title": "חזיתות",
+            "jobs_none": "תור העבודה ריק כרגע",
+            "jobs_status": "סטָטוּס",
+            "jobs_text": "משרות כרגע בתור או שהסתיימו לאחרונה",
+            "jobs_title": "תור עבודה",
+            "mach": {
+                "disk_details": "פרטי שימוש בדיסק",
+                "disk_dirs": "מדריכים",
+                "disk_none": "אין מידע על דיסק זמין",
+                "disk_summ": "סיכום שימוש בדיסק",
+                "disk_total": "שטח דיסק כולל",
+                "load": "ממוצע העומס של המכונה הזו",
+                "minute": "דַקָה",
+                "minutes": "דקות",
+                "myth_drive": "MythTV Drive",
+                "none": "אין מידע על מכונה זמין",
+                "space_after_expire": "מקום פנוי לאחר התוקף האוטומטי",
+                "space_deleted": "שטח בשימוש על ידי הקלטות שנמחקו",
+                "space_expirable": "שטח בשימוש בהקלטות הניתנות לתוקף אוטומטי",
+                "space_free": "מקום פנוי",
+                "space_livetv": "שטח בשימוש על ידי LiveTV",
+                "space_used": "שטח בשימוש",
+                "title": "מידע על מכונה",
+                "total_space": "השטח הכולל"
+            },
+            "no_encoders": "Backend אין מקודדים",
+            "schedule_none": "שום דבר לא מתוכנן להקליט",
+            "schedule_text": "המופעים הבאים של {{ length }} המתוכננים להקלטה.",
+            "schedule_title": "לוח זמנים"
         },
         "upcoming": {
             "date": "תַאֲרִיך",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "בחר את טבלת התדרים המתאימה למערכת שלך. אם יש לך אנטנה, השתמש בתדר '-bcast.",
             "channfreq_label": "טבלת תדירות ערוצים",
+            "freqtable_label": "טבלאות תדירות",
             "subtitle": "אלה מגדירים כמה הגדרות ברירת מחדל ספציפיות למדינה",
             "title": "הגדרות מיקום",
             "tvformat_desc": "תקן הטלוויזיה לשימוש לצפייה בטלוויזיה.",
@@ -919,6 +962,8 @@
             "enableupdates_label": "הפעל עדכונים",
             "restart_desc": "ההקלטות מושבתות עד שתפעיל מחדש",
             "restart_label": "הפעל מחדש את Backend",
+            "slave_instructions": "נראה שזהו קצה עבד. אם זה נועד כ-slave backend, אנא השבת את התזמון ב-msster backend בזמן הפעלת ה-slave backend.",
+            "slave_warning": "אם זה לא נועד כ-slave backend, עבור אל הגדרות, כללי, הגדרת קצה עורפי של כתובת מארח, ובחר \"שרת זה הוא ה-Master Backend\" או הגדר את המזהה המותאם אישית הנכון בדף הגדרת מסד הנתונים. שמור והפעל מחדש את הקצה האחורי,",
             "title": "הגדרת MythTV",
             "upcomingrec": "ההקלטה הקרובה הבאה: {{כותרת}} ב-{{StartTime}}. סטטוס: {{סטטוס}}"
         },

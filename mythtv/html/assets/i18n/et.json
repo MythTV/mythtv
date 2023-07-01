@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "Salvestusreegel on aktiivne",
             "autoexpire_label": "Automaatne aegumine",
+            "autoextend_label": "Automaatne pikendamine",
             "dupin": {
                 "both": "Praegused ja varasemad salvestised",
                 "curr": "Ainult praegused salvestised",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "Dubleeriva vaste meetod",
             "endoffset_label": "Lõpus salvestatavate lisaminutite arv",
+            "extend_none": "Mitte ühtegi",
             "filters_label": "Filtri valikud",
             "heading": "Salvestamise ajakava",
             "inetref_desc": "Salvestamise metaandmete otsimiseks kasutage rakendust TheTVDB, TVmaze või TMDB. Valige ülaltoodud raadionupp ja kasutage veebisaidilt otsimiseks linki. Kui leiate veebilehelt õige seeria, valige see ja kopeerige numbriline ID URL-ist või veebisaidilt thetvdb.com veebilehelt. Sisestage see sisestuskasti kohe pärast eesliidet xxxx.py_",
@@ -140,6 +142,46 @@
                 "weekly": "Salvestage üks saade igal nädalal"
             },
             "type_label": "Ajakava tüüp"
+        },
+        "status": {
+            "backends_detail": "Taustaprogramm: {{ Name }} on {{ Type }} IP-l {{ IP }}",
+            "backends_none": "Taustaprogramme pole",
+            "backends_title": "Taustaprogrammid",
+            "card_text": "Kaart: {{ CardId }}, sisend: {{ Id }} on {{ InputName }}, kuvatav nimi: {{ DisplayName }}",
+            "encoder_text": "Kodeerija {{ Id }} on hostis {{ HostName }}, olek: {{ State }}",
+            "encoder_title": "Kodeerija olek",
+            "endtime_text": "See salvestus on kavandatud lõppema {{ EndTime }}.",
+            "frontends_detail": "Frontend: {{ Name }}, IP-port: {{ IP }}:{{ Port }}, võrgus: {{ OnLine }}",
+            "frontends_none": "Esiserve pole",
+            "frontends_title": "Esiküljed",
+            "jobs_none": "Tööjärjekord on praegu tühi",
+            "jobs_status": "Olek",
+            "jobs_text": "Töökohad on praegu järjekorras või hiljuti lõppenud",
+            "jobs_title": "Tööjärjekord",
+            "mach": {
+                "disk_details": "Ketta kasutamise üksikasjad",
+                "disk_dirs": "Kataloogid",
+                "disk_none": "Kettateave pole saadaval",
+                "disk_summ": "Ketta kasutamise kokkuvõte",
+                "disk_total": "Kokku kettaruumi",
+                "load": "Selle masina keskmine koormus",
+                "minute": "Minut",
+                "minutes": "Minutid",
+                "myth_drive": "MythTV draiv",
+                "none": "Masinateave pole saadaval",
+                "space_after_expire": "Ruum on saadaval pärast automaatset aegumist",
+                "space_deleted": "Kustutatud salvestiste kasutatav ruum",
+                "space_expirable": "Automaatselt aeguvate salvestiste kasutatav ruum",
+                "space_free": "Ruumi vaba",
+                "space_livetv": "LiveTV kasutatav ruum",
+                "space_used": "Kasutatud ruum",
+                "title": "Masina info",
+                "total_space": "Kogu ruum"
+            },
+            "no_encoders": "Taustaprogrammil pole kodeerijaid",
+            "schedule_none": "Midagi pole plaanitud salvestada",
+            "schedule_text": "Järgmised {{ length }} saade(d), mis on salvestamiseks kavandatud.",
+            "schedule_title": "Ajakava"
         },
         "upcoming": {
             "date": "Kuupäev",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "Valige oma süsteemile sobiv sagedustabel. Kui teil on antenn, kasutage '-bcast'i sagedust.",
             "channfreq_label": "Kanali sagedustabel",
+            "freqtable_label": "Sagedustabelid",
             "subtitle": "Need määravad mõned riigipõhised vaikeseaded",
             "title": "Lokaadi sätted",
             "tvformat_desc": "Teleri vaatamise standard.",
@@ -919,6 +962,8 @@
             "enableupdates_label": "Luba värskendused",
             "restart_desc": "Salvestus on keelatud kuni taaskäivitamiseni",
             "restart_label": "Taaskäivitage taustaprogramm",
+            "slave_instructions": "See näib olevat ori taustaprogramm. Kui see on ette nähtud alam-taustaprogrammiks, keelake alam-taustaprogrammi seadistamise ajal ajastamine mssteri taustaprogrammis.",
+            "slave_warning": "Kui see pole mõeldud alluva taustaprogrammina, minge jaotisse Seadistamine, Üldine, Hostiaadressi taustaprogrammi häälestus ja valige \"See server on põhitaustaprogramm\" või määrake andmebaasi häälestuse lehel õige kohandatud identifikaator. Salvestage ja taaskäivitage taustaprogramm,",
             "title": "MythTV seadistamine",
             "upcomingrec": "Järgmine salvestus: {{Title}} kell {{StartTime}}. Olek: {{Status}}"
         },

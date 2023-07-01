@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "Pravidlo nahrávání je aktivní",
             "autoexpire_label": "Automatické vypršení platnosti",
+            "autoextend_label": "Automatické prodloužení",
             "dupin": {
                 "both": "Aktuální a předchozí nahrávky",
                 "curr": "Pouze aktuální nahrávky",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "Metoda duplicitní shody",
             "endoffset_label": "Počet minut navíc k záznamu na konci",
+            "extend_none": "Žádný",
             "filters_label": "Možnosti filtru",
             "heading": "Naplánujte nahrávání",
             "inetref_desc": "K vyhledání metadat nahrávky použijte TheTVDB, TVmaze nebo TMDB. Vyberte přepínač výše a použijte odkaz k vyhledávání na webu. Jakmile na webové stránce najdete správnou sérii, vyberte ji a zkopírujte číselné ID z adresy URL nebo z webové stránky v případě thetvdb.com. Zadejte to do vstupního pole bezprostředně za předponou xxxx.py_",
@@ -140,6 +142,46 @@
                 "weekly": "Každý týden nahrajte jedno představení"
             },
             "type_label": "Typ rozvrhu"
+        },
+        "status": {
+            "backends_detail": "Backend: {{ Name }} je {{ Type }} na IP {{ IP }}",
+            "backends_none": "Žádné backendy",
+            "backends_title": "Backendy",
+            "card_text": "Karta: {{ CardId }}, vstup: {{ Id }} je {{ InputName }}, zobrazovaný název: {{ DisplayName }}",
+            "encoder_text": "Kodér {{ Id }} je na hostiteli {{ HostName }}, Stav: {{ State }}",
+            "encoder_title": "Stav kodéru",
+            "endtime_text": "Ukončení tohoto nahrávání je naplánováno na {{ EndTime }}.",
+            "frontends_detail": "Frontend: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",
+            "frontends_none": "Žádné frontendy",
+            "frontends_title": "Frontendy",
+            "jobs_none": "Fronta úloh je momentálně prázdná",
+            "jobs_status": "Postavení",
+            "jobs_text": "Úlohy aktuálně ve frontě nebo nedávno ukončené",
+            "jobs_title": "Fronta práce",
+            "mach": {
+                "disk_details": "Podrobnosti o využití disku",
+                "disk_dirs": "Adresáře",
+                "disk_none": "Nejsou k dispozici žádné informace o disku",
+                "disk_summ": "Shrnutí využití disku",
+                "disk_total": "Celkový prostor na disku",
+                "load": "Průměrná zátěž tohoto stroje",
+                "minute": "Minuta",
+                "minutes": "Minut",
+                "myth_drive": "MythTV Drive",
+                "none": "Nejsou k dispozici žádné informace o stroji",
+                "space_after_expire": "Volné místo po automatickém vypršení",
+                "space_deleted": "Prostor využívaný smazanými nahrávkami",
+                "space_expirable": "Prostor používaný nahrávkami s automatickou expirací",
+                "space_free": "Prostor zdarma",
+                "space_livetv": "Prostor využívaný LiveTV",
+                "space_used": "Využitý prostor",
+                "title": "Informace o stroji",
+                "total_space": "Celkový prostor"
+            },
+            "no_encoders": "Backend nemá žádné kodéry",
+            "schedule_none": "Nic plánovaného k nahrávání",
+            "schedule_text": "Dalších {{ length }} pořadů, které jsou naplánovány k nahrávání.",
+            "schedule_title": "Plán"
         },
         "upcoming": {
             "date": "datum",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "Vyberte vhodnou tabulku frekvencí pro váš systém. Pokud máte anténu, použijte frekvenci '-bcast.",
             "channfreq_label": "Tabulka frekvence kanálů",
+            "freqtable_label": "Frekvenční tabulky",
             "subtitle": "Nastaví některá výchozí nastavení specifická pro danou zemi",
             "title": "Nastavení národního prostředí",
             "tvformat_desc": "Televizní standard používaný pro sledování televize.",
@@ -919,6 +962,8 @@
             "enableupdates_label": "Povolit aktualizace",
             "restart_desc": "Záznamy jsou zakázány, dokud nerestartujete",
             "restart_label": "Restartujte backend",
+            "slave_instructions": "Zdá se, že jde o podřízený backend. Pokud je zamýšlen jako podřízený backend, vypněte plánování na backendu msster při spuštění nastavení podřízeného backendu.",
+            "slave_warning": "Pokud toto není zamýšleno jako podřízený backend, přejděte na Nastavení, Obecné, Nastavení backendu adresy hostitele a vyberte „Tento server je hlavní backend“ nebo nastavte správný uživatelský identifikátor na stránce Nastavení databáze. Uložte a restartujte backend,",
             "title": "Nastavení MythTV",
             "upcomingrec": "Další nadcházející nahrávka: {{Title}} v {{StartTime}}. Stav: {{Status}}"
         },

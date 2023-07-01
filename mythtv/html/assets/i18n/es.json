@@ -80,6 +80,7 @@
         "sched": {
             "active_label": "La regla de grabación está activa",
             "autoexpire_label": "Caducidad automática",
+            "autoextend_label": "Extensión automática",
             "dupin": {
                 "both": "Grabaciones actuales y anteriores",
                 "curr": "Solo grabaciones actuales",
@@ -95,6 +96,7 @@
             },
             "dupmethod_label": "Método de coincidencia duplicada",
             "endoffset_label": "Número de minutos adicionales para grabar al final",
+            "extend_none": "Ninguno",
             "filters_label": "Opciones de filtro",
             "heading": "Programar grabación",
             "inetref_desc": "Utilice TheTVDB, TVmaze o TMDB para buscar metadatos de grabación. Seleccione un botón de radio arriba y use el enlace para buscar en el sitio web. Una vez que encuentre la serie correcta en la página web, selecciónela y copie la identificación numérica de la URL, o de la página web en el caso de thetvdb.com. Ingrese eso en el cuadro de entrada inmediatamente después del prefijo xxxx.py_",
@@ -140,6 +142,46 @@
                 "weekly": "Grabar una presentación cada semana"
             },
             "type_label": "Tipo de horario"
+        },
+        "status": {
+            "backends_detail": "Backend: {{ Name }} es un {{ Type }} en IP {{ IP }}",
+            "backends_none": "Sin backends",
+            "backends_title": "backends",
+            "card_text": "Tarjeta: {{ CardId }}, Entrada: {{ Id }} es {{ InputName }}, Nombre para mostrar: {{ DisplayName }}",
+            "encoder_text": "El codificador {{ Id }} está en el host {{ HostName }}, estado: {{ State }}",
+            "encoder_title": "Estado del codificador",
+            "endtime_text": "Esta grabación está programada para finalizar a las {{ EndTime }}.",
+            "frontends_detail": "Interfaz: {{ Name }}, Puerto IP: {{ IP }}:{{ Port }}, En línea: {{ OnLine }}",
+            "frontends_none": "Sin interfaces",
+            "frontends_title": "Frente termina",
+            "jobs_none": "La cola de trabajos está actualmente vacía",
+            "jobs_status": "Estado",
+            "jobs_text": "Trabajos actualmente en cola o terminados recientemente",
+            "jobs_title": "Cola de trabajos",
+            "mach": {
+                "disk_details": "Detalles de uso del disco",
+                "disk_dirs": "Directorios",
+                "disk_none": "No hay información de disco disponible",
+                "disk_summ": "Resumen de uso del disco",
+                "disk_total": "Espacio total en disco",
+                "load": "El promedio de carga de esta máquina",
+                "minute": "Minuto",
+                "minutes": "Minutos",
+                "myth_drive": "Unidad de MythTV",
+                "none": "No hay información de la máquina disponible",
+                "space_after_expire": "Espacio disponible después de la expiración automática",
+                "space_deleted": "Espacio utilizado por grabaciones eliminadas",
+                "space_expirable": "Espacio utilizado por grabaciones autoexpirables",
+                "space_free": "Espacio libre",
+                "space_livetv": "Espacio utilizado por LiveTV",
+                "space_used": "Espacio usado",
+                "title": "Información de la máquina",
+                "total_space": "Espacio total"
+            },
+            "no_encoders": "Backend no tiene codificadores",
+            "schedule_none": "Nada programado para grabar",
+            "schedule_text": "Los próximos {{ length }} programas que están programados para grabar.",
+            "schedule_title": "Cronograma"
         },
         "upcoming": {
             "date": "Fecha",
@@ -907,6 +949,7 @@
         "locale": {
             "channfreq_desc": "Seleccione la tabla de frecuencias apropiada para su sistema. Si tiene una antena, use una frecuencia '-bcast.",
             "channfreq_label": "Tabla de frecuencias de canales",
+            "freqtable_label": "Tablas de frecuencia",
             "subtitle": "Estos establecen algunas configuraciones predeterminadas específicas del país",
             "title": "Configuración regional",
             "tvformat_desc": "El estándar de TV que se utilizará para ver la televisión.",
@@ -919,6 +962,8 @@
             "enableupdates_label": "Habilitar actualizaciones",
             "restart_desc": "Las grabaciones están deshabilitadas hasta que reinicies",
             "restart_label": "Reiniciar back-end",
+            "slave_instructions": "Esto parece ser un backend esclavo. Si está diseñado como un backend esclavo, deshabilite la programación en el backend msster mientras ejecuta la configuración del backend esclavo.",
+            "slave_warning": "Si esto no está diseñado como un backend esclavo, vaya a Configuración, General, Configuración del backend de la dirección del host y seleccione \"Este servidor es el backend maestro\" o establezca el identificador personalizado correcto en la página Configuración de la base de datos. Guarde y reinicie el backend,",
             "title": "Configuración de MyTVTV",
             "upcomingrec": "Próxima grabación: {{Title}} a las {{StartTime}}. Estado: {{Estado}}"
         },
