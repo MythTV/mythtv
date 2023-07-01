@@ -596,7 +596,7 @@
             "commmethod_desc": "Altera o método de detecção comercial usado para gravações neste canal ou pula a detecção marcando o canal como Comercial Livre.",
             "commmethod_label": "Método de Detecção Comercial",
             "delete_all_details": "Isso excluirá todos os canais",
-            "delete_details": "Isso excluirá Canal:{{ChanNum}}, Nome:{{ChannelName}}, Fonte:{{Fonte}}",
+            "delete_details": "Isso excluirá Canal:{{ChanNum}}, Nome:{{ChannelName}}, Fonte:{{Source}}",
             "delete_message": "Para excluir canais, use o Editor de canal de configuração de back-end.",
             "delete_source": "Excluir todos os canais da fonte selecionada",
             "delete_source_details": "Isso excluirá todos os canais da fonte: {{Source}}",
@@ -965,7 +965,7 @@
             "slave_instructions": "Isso parece ser um back-end escravo. Se for planejado como um back-end escravo, desative o agendamento no back-end msster enquanto estiver executando a configuração do back-end escravo.",
             "slave_warning": "Se isso não for um back-end escravo, vá para Configuração, Geral, Configuração do back-end do endereço do host e selecione \"Este servidor é o back-end mestre\" ou defina o identificador personalizado correto na página Configuração do banco de dados. Salve e reinicie o back-end,",
             "title": "Configuração do MythTV",
-            "upcomingrec": "Próxima gravação: {{Title}} às {{StartTime}}. Estado: {{Estado}}"
+            "upcomingrec": "Próxima gravação: {{Title}} às {{StartTime}}. Estado: {{Status}}"
         },
         "misc": {
             "bal_io": "E/S de disco balanceado",

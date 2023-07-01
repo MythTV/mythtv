@@ -144,7 +144,7 @@
             "type_label": "时间表类型"
         },
         "status": {
-            "backends_detail": "后端：{{ Name }} 是 IP {{ IP }} 上的 {{ IP }}",
+            "backends_detail": "后端：{{ Name }} 是 IP {{ Type }} 上的 {{ Type }}",
             "backends_none": "无后端",
             "backends_title": "后端",
             "card_text": "卡：{{ CardId }}，输入：{{ Id }} 是 {{ InputName }}，显示名称：{{ DisplayName }}",
@@ -965,7 +965,7 @@
             "slave_instructions": "这似乎是一个从属后端。如果它打算作为从属后端，请在运行从属后端设置时禁用 msster 后端上的调度。",
             "slave_warning": "如果这不是作为从属后端，请转至“设置”、“常规”、“主机地址后端设置”，然后选择“此服务器是主后端”，或者在“数据库设置”页面上设置正确的自定义标识符。保存并重新启动后端，",
             "title": "神话电视设置",
-            "upcomingrec": "下一个即将录制的节目：{{Title}}，时间：{{StartTime}}。状态：{{状态}}"
+            "upcomingrec": "下一个即将录制的节目：{{Title}}，时间：{{StartTime}}。状态：{{Status}}"
         },
         "misc": {
             "bal_io": "平衡磁盘 I/O",
@@ -1003,7 +1003,7 @@
             "audiocodec_label": "音频编解码器",
             "autotranscode_desc": "使用此配置文件进行录制并且录制计划配置为允许转码时自动转码。",
             "autotranscode_label": "录制后启用自动转码",
-            "delete_details": "这将删除群组 {{GroupName}} 中的个人资料 {{ProfileName}}。",
+            "delete_details": "这将删除群组 {{GroupName}} 中的个人资料 {{GroupName}}。",
             "delete_this": "删除此录音配置文件",
             "encodingthreadcount_desc": "设置为小于或等于将执行编码的后端处理器数量的值。",
             "encodingthreadcount_label": "线程数",

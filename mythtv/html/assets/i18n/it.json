@@ -965,7 +965,7 @@
             "slave_instructions": "Questo sembra essere un backend slave. Se è inteso come back-end slave, disabilitare la pianificazione sul back-end msster durante l'esecuzione della configurazione del back-end slave.",
             "slave_warning": "Se questo non è inteso come back-end slave, vai a Configurazione, Generale, Configurazione back-end indirizzo host e seleziona \"Questo server è il back-end principale\" oppure imposta l'identificatore personalizzato corretto nella pagina Configurazione database. Salva e riavvia il backend,",
             "title": "Installazione di MythTV",
-            "upcomingrec": "Prossima registrazione in arrivo: {{Title}} alle {{StartTime}}. Stato: {{Stato}}"
+            "upcomingrec": "Prossima registrazione in arrivo: {{Title}} alle {{StartTime}}. Stato: {{Status}}"
         },
         "misc": {
             "bal_io": "I/O su disco bilanciato",
@@ -1083,7 +1083,7 @@
             "name_label": "Nome del gruppo di archiviazione",
             "name_prompt": "Immettere il nuovo nome del gruppo di archiviazione",
             "seldir_title": "Seleziona Rubrica",
-            "sgroup_title": "Gruppo di archiviazione {{nome}}",
+            "sgroup_title": "Gruppo di archiviazione {{name}}",
             "special": {
                 "Banners": "Banner",
                 "Coverart": "Copertina",

@@ -596,10 +596,10 @@
             "commmethod_desc": "Breytir aðferð við auglýsingaskynjun sem notuð er fyrir upptökur á þessari rás eða sleppir uppgötvun með því að merkja rásina sem Auglýsingalaus.",
             "commmethod_label": "Auglýsingagreiningaraðferð",
             "delete_all_details": "Þetta mun eyða öllum rásum",
-            "delete_details": "Þetta mun eyða Rás:{{ChanNum}}, Nafni:{{ChannelName}}, Heimild:{{Heimild}}",
+            "delete_details": "Þetta mun eyða Rás:{{ChanNum}}, Nafni:{{ChannelName}}, Heimild:{{Source}}",
             "delete_message": "Notaðu Backend Setup Channel Editor til að eyða rásum.",
             "delete_source": "Eyða öllum rásum frá völdum uppruna",
-            "delete_source_details": "Þetta mun eyða öllum rásum frá uppruna: {{Heimild}}",
+            "delete_source_details": "Þetta mun eyða öllum rásum frá uppruna: {{Source}}",
             "delete_this": "Eyða rás",
             "deletechan": "Eyða rás",
             "eit_desc": "Ef þetta er virkt verða leiðbeiningarupplýsingar fyrir þessa rás uppfærðar með því að nota „Over-the-air“ dagskrárskráningar.",
@@ -692,7 +692,7 @@
             },
             "freqtable_desc": "Möguleikinn á að skanna aðeins „Há“ tíðnirásir er gagnlegur vegna þess að flestar stafrænar rásir eru á hærri tíðnum.",
             "freqtable_label": "Tíðni tafla",
-            "frequency_desc": "Tíðni þessa flutnings (multiplex) í {{einingu}} (valkostur er ekki sjálfgefið).",
+            "frequency_desc": "Tíðni þessa flutnings (multiplex) í {{unit}} (valkostur er ekki sjálfgefið).",
             "frequency_label": "Tíðni",
             "ftaonly_desc": "Ef þetta er stillt verður aðeins ódulkóðuðum rásum bætt við meðan á skönnuninni stendur.",
             "ftaonly_label": "Aðeins ódulkóðað",
@@ -965,7 +965,7 @@
             "slave_instructions": "Þetta virðist vera þrælabakendi. Ef það er ætlað sem þrælabakendi, vinsamlegast slökktu á tímasetningu á msster bakendanum meðan þú keyrir uppsetningu þrælabakendans.",
             "slave_warning": "Ef þetta er ekki ætlað sem þrælabakendi, vinsamlegast farðu í Uppsetning, Almennt, Uppsetning hýsingarfangs, og veldu „Þessi þjónn er aðalbakendi“ eða stilltu rétt sérsniðið auðkenni á gagnagrunnsuppsetningu síðunni. Vistaðu og endurræstu bakendann,",
             "title": "MythTV uppsetning",
-            "upcomingrec": "Næsta væntanleg upptaka: {{Title}} kl. {{StartTime}}. Staða: {{Staða}}"
+            "upcomingrec": "Næsta væntanleg upptaka: {{Title}} kl. {{StartTime}}. Staða: {{Status}}"
         },
         "misc": {
             "bal_io": "Balanced disk I/O",

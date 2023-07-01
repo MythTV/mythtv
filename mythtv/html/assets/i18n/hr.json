@@ -599,7 +599,7 @@
             "delete_details": "Ovo će izbrisati kanal:{{ChanNum}}, naziv:{{ChannelName}}, izvor:{{Source}}",
             "delete_message": "Za brisanje kanala upotrijebite Uređivač kanala za pozadinsko postavljanje.",
             "delete_source": "Izbrišite sve kanale iz odabranog izvora",
-            "delete_source_details": "Ovo će izbrisati sve kanale iz izvora: {{Izvor}}",
+            "delete_source_details": "Ovo će izbrisati sve kanale iz izvora: {{Source}}",
             "delete_this": "Izbriši kanal",
             "deletechan": "Izbriši kanal",
             "eit_desc": "Ako je omogućeno, informacije vodiča za ovaj kanal ažurirat će se pomoću popisa programa 'Over-the-Air'.",

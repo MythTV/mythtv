@@ -1083,7 +1083,7 @@
             "name_label": "Nazwa grupy pamięci masowej",
             "name_prompt": "Wprowadź nową nazwę grupy pamięci masowej",
             "seldir_title": "Wybierz katalog",
-            "sgroup_title": "Grupa pamięci {{nazwa}}",
+            "sgroup_title": "Grupa pamięci {{name}}",
             "special": {
                 "Banners": "Banery",
                 "Coverart": "Okładka",

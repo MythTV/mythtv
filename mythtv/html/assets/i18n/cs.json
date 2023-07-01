@@ -692,7 +692,7 @@
             },
             "freqtable_desc": "Možnost skenování pouze „vysokofrekvenčních“ kanálů je užitečná, protože většina digitálních kanálů je na vyšších frekvencích.",
             "freqtable_label": "Frekvenční tabulka",
-            "frequency_desc": "Frekvence pro tento přenos (multiplex) v {{jednotce}} (volba nemá žádné výchozí nastavení).",
+            "frequency_desc": "Frekvence pro tento přenos (multiplex) v {{unit}} (volba nemá žádné výchozí nastavení).",
             "frequency_label": "Frekvence",
             "ftaonly_desc": "Pokud je nastaveno, budou během vyhledávání přidány pouze nešifrované kanály.",
             "ftaonly_label": "Pouze nešifrované",

@@ -965,7 +965,7 @@
             "slave_instructions": "Cela semble être un backend esclave. S'il est conçu comme un backend esclave, veuillez désactiver la planification sur le backend msster lors de l'exécution de la configuration du backend esclave.",
             "slave_warning": "S'il ne s'agit pas d'un backend esclave, accédez à Configuration, Général, Configuration du backend de l'adresse de l'hôte et sélectionnez \"Ce serveur est le backend maître\" ou définissez l'identifiant personnalisé correct sur la page Configuration de la base de données. Enregistrez et redémarrez le backend,",
             "title": "Configuration Myth TV",
-            "upcomingrec": "Prochain enregistrement à venir : {{Title}} à {{StartTime}}. Statut : {{Statut}}"
+            "upcomingrec": "Prochain enregistrement à venir : {{Title}} à {{StartTime}}. Statut : {{Status}}"
         },
         "misc": {
             "bal_io": "E/S disque équilibrées",

@@ -144,7 +144,7 @@
             "type_label": "時間表類型"
         },
         "status": {
-            "backends_detail": "後端：{{ Name }} 是 IP {{ IP }} 上的 {{ IP }}",
+            "backends_detail": "後端：{{ Name }} 是 IP {{ Type }} 上的 {{ Type }}",
             "backends_none": "無後端",
             "backends_title": "後端",
             "card_text": "卡：{{ CardId }}，輸入：{{ Id }} 是 {{ InputName }}，顯示名稱：{{ DisplayName }}",
@@ -965,7 +965,7 @@
             "slave_instructions": "這似乎是一個從屬後端。如果它打算作為從屬後端，請在運行從屬後端設置時禁用 msster 後端上的調度。",
             "slave_warning": "如果這不是作為從屬後端，請轉至“設置”、“常規”、“主機地址後端設置”，然後選擇“此服務器是主後端”，或者在“數據庫設置”頁面上設置正確的自定義標識符。保存並重新啟動後端，",
             "title": "神話電視設置",
-            "upcomingrec": "下一個即將錄製的節目：{{Title}}，時間：{{StartTime}}。狀態：{{狀態}}"
+            "upcomingrec": "下一個即將錄製的節目：{{Title}}，時間：{{StartTime}}。狀態：{{Status}}"
         },
         "misc": {
             "bal_io": "平衡磁盤 I/O",
@@ -1003,7 +1003,7 @@
             "audiocodec_label": "音頻編解碼器",
             "autotranscode_desc": "使用此配置文件進行錄製並且錄製計劃配置為允許轉碼時自動轉碼。",
             "autotranscode_label": "錄製後啟用自動轉碼",
-            "delete_details": "這將刪除群組 {{GroupName}} 中的個人資料 {{ProfileName}}。",
+            "delete_details": "這將刪除群組 {{GroupName}} 中的個人資料 {{GroupName}}。",
             "delete_this": "刪除此錄音配置文件",
             "encodingthreadcount_desc": "設置為小於或等於將執行編碼的後端處理器數量的值。",
             "encodingthreadcount_label": "線程數",

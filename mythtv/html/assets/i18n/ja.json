@@ -144,7 +144,7 @@
             "type_label": "スケジュールの種類"
         },
         "status": {
-            "backends_detail": "バックエンド: {{ Name }} は IP {{ IP }} 上の {{ IP }} です",
+            "backends_detail": "バックエンド: {{ Name }} は IP {{ Type }} 上の {{ Type }} です",
             "backends_none": "バックエンドなし",
             "backends_title": "バックエンド",
             "card_text": "カード: {{ CardId }}、入力: {{ Id }} は {{ InputName }}、表示名: {{ DisplayName }}",
@@ -965,7 +965,7 @@
             "slave_instructions": "これはスレーブ バックエンドであるようです。スレーブ バックエンドとして使用する場合は、スレーブ バックエンド セットアップの実行中に msster バックエンドのスケジューリングを無効にしてください。",
             "slave_warning": "これがスレーブ バックエンドとして意図されていない場合は、[セットアップ]、[全般]、[ホスト アドレス バックエンド セットアップ] に移動し、[このサーバーはマスター バックエンドです] を選択するか、データベース セットアップ ページで正しいカスタム ID を設定してください。バックエンドを保存して再起動します。",
             "title": "MythTV のセットアップ",
-            "upcomingrec": "次回の録画: {{Title}}、時刻: {{StartTime}}。ステータス: {{ステータス}}"
+            "upcomingrec": "次回の録画: {{Title}}、時刻: {{StartTime}}。ステータス: {{Status}}"
         },
         "misc": {
             "bal_io": "バランスのとれたディスク I/O",
@@ -1003,7 +1003,7 @@
             "audiocodec_label": "オーディオコーデック",
             "autotranscode_desc": "このプロファイルを使用して録画が行われ、録画のスケジュールがトランスコードを許可するように構成されている場合、自動的にトランスコードされます。",
             "autotranscode_label": "録画後の自動トランスコードを有効にする",
-            "delete_details": "これにより、グループ {{GroupName}} 内のプロファイル {{ProfileName}} が削除されます。",
+            "delete_details": "これにより、グループ {{GroupName}} 内のプロファイル {{GroupName}} が削除されます。",
             "delete_this": "この録音プロファイルを削除します",
             "encodingthreadcount_desc": "エンコードを実行するバックエンドのプロセッサの数以下の値に設定します。",
             "encodingthreadcount_label": "スレッド数",
@@ -1083,7 +1083,7 @@
             "name_label": "ストレージグループ名",
             "name_prompt": "新しいストレージ グループ名を入力してください",
             "seldir_title": "ディレクトリの選択",
-            "sgroup_title": "ストレージ グループ {{名前}}",
+            "sgroup_title": "ストレージ グループ {{name}}",
             "special": {
                 "Banners": "バナー",
                 "Coverart": "カバーアート",

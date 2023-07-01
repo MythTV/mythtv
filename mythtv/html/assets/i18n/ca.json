@@ -596,10 +596,10 @@
             "commmethod_desc": "Canvia el mètode de detecció comercial utilitzat per a les gravacions d'aquest canal o omet la detecció marcant el canal com a lliure comercial.",
             "commmethod_label": "Mètode de detecció comercial",
             "delete_all_details": "Això suprimirà tots els canals",
-            "delete_details": "Això suprimirà Canal:{{ChanNum}}, Nom:{{NomCanal}}, Font:{{Font}}",
+            "delete_details": "Això suprimirà Canal:{{ChanNum}}, Nom:{{ChannelName}}, Font:{{Source}}",
             "delete_message": "Per suprimir canals, utilitzeu l'Editor de canals de configuració del backend.",
             "delete_source": "Suprimeix tots els canals de la font seleccionada",
-            "delete_source_details": "Això suprimirà tots els canals de la font: {{Font}}",
+            "delete_source_details": "Això suprimirà tots els canals de la font: {{Source}}",
             "delete_this": "Suprimeix el canal",
             "deletechan": "Suprimeix el canal",
             "eit_desc": "Si està activat, la informació de guia d'aquest canal s'actualitzarà mitjançant les llistes de programes \"Over-the-Air\".",
@@ -692,7 +692,7 @@
             },
             "freqtable_desc": "L'opció d'escanejar només canals de freqüència \"Alta\" és útil perquè la majoria dels canals digitals es troben a les freqüències més altes.",
             "freqtable_label": "Taula de Freqüències",
-            "frequency_desc": "La freqüència d'aquest transport (múltiplex) a {{unitat}} (L'opció no té cap predeterminat).",
+            "frequency_desc": "La freqüència d'aquest transport (múltiplex) a {{unit}} (L'opció no té cap predeterminat).",
             "frequency_label": "Freqüència",
             "ftaonly_desc": "Si s'estableix, només s'afegiran canals no xifrats durant l'exploració.",
             "ftaonly_label": "Només sense xifrar",
@@ -965,7 +965,7 @@
             "slave_instructions": "Sembla ser un backend esclau. Si està pensat com a backend esclau, si us plau, desactiveu la programació al backend msster mentre executeu la configuració del backend esclau.",
             "slave_warning": "Si no està pensat com a backend esclau, aneu a Configuració, General, Configuració del backend de l'adreça de l'amfitrió i seleccioneu \"Aquest servidor és el backend mestre\" o bé establiu l'identificador personalitzat correcte a la pàgina Configuració de la base de dades. Desa i reinicia el backend,",
             "title": "Configuració de MythTV",
-            "upcomingrec": "Pròxima gravació: {{Títol}} a {{StartTime}}. Estat: {{Estat}}"
+            "upcomingrec": "Pròxima gravació: {{Title}} a {{StartTime}}. Estat: {{Status}}"
         },
         "misc": {
             "bal_io": "E/S de disc equilibrat",

@@ -385,7 +385,7 @@
             "delete_all": "Tüm yakalama Kartlarını Sil",
             "delete_all_all": "Tüm ana bilgisayarlardaki Tüm yakalama Kartlarını Sil",
             "delete_details": "Bu, {{CardType}} Cihaz:{{VideoDevice}} Ad:{{DisplayName}}'ı silecek",
-            "delete_on_host": "{{ana bilgisayar}} üzerindeki Tüm yakalama Kartlarını Sil",
+            "delete_on_host": "{{host}} üzerindeki Tüm yakalama Kartlarını Sil",
             "delete_this": "Bu Yakalama Kartını Sil",
             "demo": {
                 "file_desc": "Bir kaydı simüle etmek için kullanılan yerel bir MPEG dosyası.",
@@ -596,10 +596,10 @@
             "commmethod_desc": "Bu kanaldaki kayıtlar için kullanılan ticari algılama yöntemini değiştirir veya kanalı Reklamsız olarak işaretleyerek algılamayı atlar.",
             "commmethod_label": "Ticari Tespit Yöntemi",
             "delete_all_details": "Bu, tüm kanalları silecek",
-            "delete_details": "Bu, Kanal:{{ChanNum}}, Ad:{{KanalAdı}}, Kaynak:{{Kaynak}}'ı silecek",
+            "delete_details": "Bu, Kanal:{{ChanNum}}, Ad:{{ChannelName}}, Kaynak:{{Source}}'ı silecek",
             "delete_message": "Kanalları silmek için Backend Setup Channel Editor'ı kullanın.",
             "delete_source": "Seçilen Kaynaktan Tüm Kanalları Sil",
-            "delete_source_details": "Bu, şu kaynaktaki tüm kanalları siler: {{Kaynak}}",
+            "delete_source_details": "Bu, şu kaynaktaki tüm kanalları siler: {{Source}}",
             "delete_this": "Kanalı Sil",
             "deletechan": "Kanalı Sil",
             "eit_desc": "Etkinleştirilirse, bu kanal için kılavuz bilgileri 'Kablosuz' program listeleri kullanılarak güncellenecektir.",
@@ -965,7 +965,7 @@
             "slave_instructions": "Bu bir bağımlı arka uç gibi görünüyor. Köle arka uç olarak amaçlanıyorsa, lütfen bağımlı arka uç kurulumunu çalıştırırken msster arka ucunda planlamayı devre dışı bırakın.",
             "slave_warning": "Bu bir bağımlı arka uç olarak tasarlanmadıysa, lütfen Kurulum, Genel, Ana Bilgisayar Adresi Arka Uç Kurulumu'na gidin ve \"Bu sunucu Ana Arka Uçtur\" seçeneğini seçin veya Veritabanı Kurulumu sayfasında doğru özel tanımlayıcıyı ayarlayın. Arka ucu kaydedin ve yeniden başlatın,",
             "title": "MythTV Kurulumu",
-            "upcomingrec": "Sıradaki kayıt: {{Title}}, {{StartTime}}. Durum: {{Durum}}"
+            "upcomingrec": "Sıradaki kayıt: {{Title}}, {{StartTime}}. Durum: {{Status}}"
         },
         "misc": {
             "bal_io": "Dengeli disk G/Ç",
@@ -1003,7 +1003,7 @@
             "audiocodec_label": "Ses Codec'i",
             "autotranscode_desc": "Bu profil kullanılarak bir kayıt yapıldığında ve kaydın programı kod dönüştürmeye izin verecek şekilde yapılandırıldığında otomatik olarak kod dönüştürme.",
             "autotranscode_label": "Kayıttan Sonra Otomatik Kod Dönüştürmeyi Etkinleştir",
-            "delete_details": "Bu, {{GroupName}} grubundaki {{ProfileName}} Profilini silecek.",
+            "delete_details": "Bu, {{GroupName}} grubundaki {{GroupName}} Profilini silecek.",
             "delete_this": "Bu Kayıt Profilini Sil",
             "encodingthreadcount_desc": "Arka uçta kodlamayı yapacak işlemci sayısından küçük veya ona eşit bir değere ayarlayın.",
             "encodingthreadcount_label": "Konu Sayısı",
@@ -1135,7 +1135,7 @@
             "bouquet_desc": "Astra-2 28.2E uydusunda Freesat veya Sky için buket kimliği. Bu uyduyu almazsanız, bunu 0'da bırakın. Bu, Freesat ve Sky kanal numaralarını almak için gereklidir. Değer 272, Freesat buketi 'İngiltere HD'yi seçer. MythTV Wiki'ye bakın <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
             "bouquet_label": "buket kimliği",
             "delete_all": "Tüm Video Kaynaklarını Sil",
-            "delete_details": "Bu, {{GörünenAdı}} ({{Grabber}}) siler",
+            "delete_details": "Bu, {{DisplayName}} ({{Grabber}}) siler",
             "delete_this": "Bu Video Kaynağını Sil",
             "eit_desc": "Etkinleştirilirse, bu kaynaktaki kanallar için program rehberi verileri, kanalların kendileri tarafından sağlanan \"Kablosuz\" verilerle güncellenecektir.",
             "eit_label": "EIT taraması gerçekleştirin",

@@ -596,7 +596,7 @@
             "commmethod_desc": "Wijzigt de methode voor commerciële detectie die wordt gebruikt voor opnamen op dit kanaal of slaat detectie over door het kanaal te markeren als Commercial Free.",
             "commmethod_label": "Commerciële detectiemethode",
             "delete_all_details": "Hiermee worden alle zenders verwijderd",
-            "delete_details": "Hiermee wordt kanaal:{{ChanNum}}, naam:{{ChannelName}}, bron:{{bron}} verwijderd",
+            "delete_details": "Hiermee wordt kanaal:{{ChanNum}}, naam:{{ChannelName}}, bron:{{Source}} verwijderd",
             "delete_message": "Gebruik Backend Setup Channel Editor om kanalen te verwijderen.",
             "delete_source": "Verwijder alle kanalen van de geselecteerde bron",
             "delete_source_details": "Hiermee worden alle kanalen uit de bron verwijderd: {{Source}}",

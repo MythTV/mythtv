@@ -692,7 +692,7 @@
             },
             "freqtable_desc": "La opción de escanear solo los canales de frecuencia \"alta\" es útil porque la mayoría de los canales digitales están en las frecuencias más altas.",
             "freqtable_label": "Tabla de frecuencia",
-            "frequency_desc": "La frecuencia para este transporte (multiplex) en {{unidad}} (La opción no tiene valor predeterminado).",
+            "frequency_desc": "La frecuencia para este transporte (multiplex) en {{unit}} (La opción no tiene valor predeterminado).",
             "frequency_label": "Frecuencia",
             "ftaonly_desc": "Si está configurado, solo se agregarán canales no encriptados durante el escaneo.",
             "ftaonly_label": "Solo sin cifrar",
@@ -965,7 +965,7 @@
             "slave_instructions": "Esto parece ser un backend esclavo. Si está diseñado como un backend esclavo, deshabilite la programación en el backend msster mientras ejecuta la configuración del backend esclavo.",
             "slave_warning": "Si esto no está diseñado como un backend esclavo, vaya a Configuración, General, Configuración del backend de la dirección del host y seleccione \"Este servidor es el backend maestro\" o establezca el identificador personalizado correcto en la página Configuración de la base de datos. Guarde y reinicie el backend,",
             "title": "Configuración de MyTVTV",
-            "upcomingrec": "Próxima grabación: {{Title}} a las {{StartTime}}. Estado: {{Estado}}"
+            "upcomingrec": "Próxima grabación: {{Title}} a las {{StartTime}}. Estado: {{Status}}"
         },
         "misc": {
             "bal_io": "E/S de disco balanceado",
@@ -1083,7 +1083,7 @@
             "name_label": "Nombre del grupo de almacenamiento",
             "name_prompt": "Ingrese el nuevo nombre del grupo de almacenamiento",
             "seldir_title": "Seleccionar directorio",
-            "sgroup_title": "Grupo de almacenamiento {{nombre}}",
+            "sgroup_title": "Grupo de almacenamiento {{name}}",
             "special": {
                 "Banners": "pancartas",
                 "Coverart": "Arte de la cubierta",
@@ -1098,7 +1098,7 @@
                 "Trailers": "Remolques",
                 "Videos": "Vídeos"
             },
-            "tab_create_title": "(Crear {{nombre}} Grupo)",
+            "tab_create_title": "(Crear {{name}} Grupo)",
             "title": "Grupos de almacenamiento",
             "updir": "SUBIR 1 NIVEL"
         },
