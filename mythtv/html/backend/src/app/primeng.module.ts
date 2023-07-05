@@ -32,6 +32,7 @@ import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { TabMenuModule } from 'primeng/tabmenu';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SlideMenuModule } from 'primeng/slidemenu';
+import {InputTextareaModule} from 'primeng/inputtextarea';
 
 @NgModule({
     exports: [
@@ -66,7 +67,8 @@ import { SlideMenuModule } from 'primeng/slidemenu';
         ScrollPanelModule,
         TabMenuModule,
         MultiSelectModule,
-        SlideMenuModule
+        SlideMenuModule,
+        InputTextareaModule
     ]
 })
 

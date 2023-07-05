@@ -3,6 +3,10 @@
     <p-table [value]="recRules" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
         [rowHover]="true" responsiveLayout="scroll">
         <ng-template pTemplate="caption">
+            <button pButton pRipple label="{{ 'dashboard.recrules.new_recrule' | translate }}" icon="pi pi-plus"
+                class="p-button-success mr-2" (click)="newRecRule()"></button>
+                <button pButton pRipple label="{{ 'dashboard.recrules.new_teplate' | translate }}"
+                class="p-button-success p-button-outlined mr-2" (click)="newTemplate()" icon="pi pi-plus"></button>
         </ng-template>
         <ng-template pTemplate="header">
             <tr>
