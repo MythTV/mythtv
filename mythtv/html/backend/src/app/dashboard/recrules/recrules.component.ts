@@ -71,9 +71,16 @@ export class RecrulesComponent implements OnInit, SchedulerSummary {
 
   }
 
-  updateRecRule(recRule: RecRule) {
+  newRecRule() {
+    this.updateRecRule();
+  }
+
+  updateRecRule(recRule?: RecRule) {
     if (this.inter.sched)
       this.inter.sched.open(undefined, undefined, recRule);
   }
 
+  newTemplate() {
+    this.updateRecRule( <RecRule>{ Type: 'Recording Template' });
+  }
 }

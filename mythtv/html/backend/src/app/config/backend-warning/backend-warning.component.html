@@ -33,7 +33,7 @@
             <div>
                 <p-progressSpinner *ngIf="retryCount > 0"></p-progressSpinner>
                 <p-message *ngIf="retryCount > 0" severity="info"
-                    text="Restarting Backend"></p-message>
+                    text="{{ 'settings.main.restarting' | translate }}"></p-message>
                 <p>
                     <p-message *ngIf="this.errorCount > 0 && retryCount == 0" severity="error"
                         text="{{ 'common.networkfail' | translate }}"></p-message>

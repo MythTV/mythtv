@@ -23,7 +23,8 @@
         "success": "Success",
         "unsaved_heading": "Unsaved Changes",
         "unsaved_message": "There are unsaved changes.",
-        "yes": "Yes"
+        "yes": "Yes",
+        "backenderror": "Backend error."
     },
     "dashboard": {
         "backendStatus": "Backend Status",
@@ -75,7 +76,9 @@
             "heading": "Recording Rules",
             "lastrec": "Last Recorded",
             "nextrec": "Next Recording",
-            "storgrp": "Storage Group"
+            "storgrp": "Storage Group",
+            "new_recrule": "New Recording Rule",
+            "new_teplate": "New Recording Template"
         },
         "sched": {
             "active_label": "Recording Rule is Active",
@@ -141,7 +144,17 @@
                 "this": "Record Only This Showing",
                 "weekly": "Record one showing every week"
             },
-            "type_label": "Schedule Type"
+            "type_label": "Schedule Type",
+            "srchtype_label": "Search Type",
+            "title_label": "Title",
+            "subtitle_label": "Subtitle",
+            "description_label": "Description",
+            "add_tables_label": "Additional Tables",
+            "sqlwhere_label": "SQL Where Condition",
+            "srchValue_label": "Search Value",
+            "channel_label": "Channel",
+            "starttime_label": "Start Date and Time",
+            "duration_label": "Duration"
         },
         "status": {
             "backends_detail": "Backend: {{ Name }} is a {{ Type }} on IP {{ IP }}",
@@ -341,7 +354,14 @@
         "RecordOne": "Record One",
         "RecordWeekly": "Record Weekly",
         "RecordingTemplate": "Recording Template",
-        "SingleRecord": "Single Record"
+        "SingleRecord": "Single Record",
+        "srch_None": "None",
+        "srch_PowerSearch": "Power Search",
+        "srch_TitleSearch": "Title Search",
+        "srch_KeywordSearch": "Keyword Search",
+        "srch_PeopleSearch": "People Search",
+        "srch_ManualSearch": "Manual Search",
+        "template": "Template"
     },
     "settings": {
         "backendctrl": {
@@ -965,7 +985,8 @@
             "slave_instructions": "This appears to be a slave backend. If it is intended as a slave backend, please disable scheduling on the msster backend while running slave backend setup.",
             "slave_warning": "If this is not intended as a slave backend, please go to Setup, General, Host Address Backend Setup, and select \"This server is the Master Backend\" or else set the correct custom identifier on the Database Setup page. Save and Restart the backend,",
             "title": "MythTV Setup",
-            "upcomingrec": "Next upcoming recording: {{Title}} at {{StartTime}}. Status: {{Status}}"
+            "upcomingrec": "Next upcoming recording: {{Title}} at {{StartTime}}. Status: {{Status}}",
+            "restarting": "Restarting Backend"
         },
         "misc": {
             "bal_io": "Balanced disk I/O",
