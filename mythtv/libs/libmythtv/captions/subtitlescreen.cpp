@@ -1904,7 +1904,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                 if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
                 {
                     LOG(VB_PLAYBACK, LOG_DEBUG,
-                        LOC + QString("time %1, drop %2 **********")
+                        LOC + QString("time %1, drop %2")
                         .arg(toString(currentFrame), toString(subtitle)));
                 }
 #endif
