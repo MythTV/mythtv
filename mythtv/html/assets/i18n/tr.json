@@ -1,6 +1,7 @@
 {
     "common": {
         "back": "Geri",
+        "backenderror": "Arka uç hatası.",
         "cancel": "İptal etmek",
         "close": "Kapalı",
         "continue": "Düzenlemeye Devam Et",
@@ -74,13 +75,18 @@
         "recrules": {
             "heading": "Kayıt Kuralları",
             "lastrec": "Son Kayıt",
+            "new_recrule": "Yeni Kayıt Kuralı",
+            "new_teplate": "Yeni Kayıt Şablonu",
             "nextrec": "Sonraki Kayıt",
             "storgrp": "Depolama Grubu"
         },
         "sched": {
             "active_label": "Kayıt Kuralı Aktif",
+            "add_tables_label": "Ek Tablolar",
             "autoexpire_label": "Otomatik Süre Sonu",
             "autoextend_label": "Otomatik Uzatma",
+            "channel_label": "Kanal",
+            "description_label": "Tanım",
             "dupin": {
                 "both": "Mevcut ve Önceki Kayıtlar",
                 "curr": "Yalnızca Güncel Kayıtlar",
@@ -95,6 +101,7 @@
                 "s_then_d": "Altyazıyı ve Açıklamayı Kullanarak Eşleştirin"
             },
             "dupmethod_label": "Yinelenen Eşleştirme Yöntemi",
+            "duration_label": "Süre",
             "endoffset_label": "Sonunda Kaydedilecek Ekstra Dakika Sayısı",
             "extend_none": "Hiçbiri",
             "filters_label": "Filtre seçenekleri",
@@ -125,9 +132,15 @@
             },
             "recprofile_label": "Kayıt Profili",
             "sgroup_label": "Depolama Grubu",
+            "sqlwhere_label": "SQL Nerede Koşul",
+            "srchValue_label": "Arama Değeri",
+            "srchtype_label": "Arama Tipi",
             "startoffset_label": "Başlangıçta Kaydedilecek Ekstra Dakika Sayısı",
+            "starttime_label": "Başlangıç ​​Tarihi ve Saati",
+            "subtitle_label": "Alt yazı",
             "template_apply": "Şablon Değişikliğini Uygula",
             "template_label": "Şablon kullan",
+            "title_label": "Başlık",
             "type": {
                 "all": "Tüm Gösterileri Kaydedin",
                 "daily": "Her gün bir gösterim kaydedin",
@@ -341,7 +354,14 @@
         "RecordOne": "Bir Kayıt",
         "RecordWeekly": "Haftalık Kayıt",
         "RecordingTemplate": "Kayıt Şablonu",
-        "SingleRecord": "Tek Kayıt"
+        "SingleRecord": "Tek Kayıt",
+        "srch_KeywordSearch": "Anahtar kelime araması",
+        "srch_ManualSearch": "Manuel Arama",
+        "srch_None": "Hiçbiri",
+        "srch_PeopleSearch": "İnsan arama",
+        "srch_PowerSearch": "Güçlü Arama",
+        "srch_TitleSearch": "Başlık arama",
+        "template": "Şablon"
     },
     "settings": {
         "backendctrl": {
@@ -962,6 +982,7 @@
             "enableupdates_label": "Güncellemeleri Etkinleştir",
             "restart_desc": "Siz yeniden başlatana kadar kayıtlar devre dışı bırakılır",
             "restart_label": "Arka Ucu Yeniden Başlat",
+            "restarting": "Arka Ucu Yeniden Başlatma",
             "slave_instructions": "Bu bir bağımlı arka uç gibi görünüyor. Köle arka uç olarak amaçlanıyorsa, lütfen bağımlı arka uç kurulumunu çalıştırırken msster arka ucunda planlamayı devre dışı bırakın.",
             "slave_warning": "Bu bir bağımlı arka uç olarak tasarlanmadıysa, lütfen Kurulum, Genel, Ana Bilgisayar Adresi Arka Uç Kurulumu'na gidin ve \"Bu sunucu Ana Arka Uçtur\" seçeneğini seçin veya Veritabanı Kurulumu sayfasında doğru özel tanımlayıcıyı ayarlayın. Arka ucu kaydedin ve yeniden başlatın,",
             "title": "MythTV Kurulumu",

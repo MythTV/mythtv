@@ -1,6 +1,7 @@
 {
     "common": {
         "back": "Nazaj",
+        "backenderror": "Napaka zaledja.",
         "cancel": "Prekliči",
         "close": "Zapri",
         "continue": "Nadaljujte z urejanjem",
@@ -74,13 +75,18 @@
         "recrules": {
             "heading": "Pravila snemanja",
             "lastrec": "Nazadnje posneto",
+            "new_recrule": "Novo pravilo snemanja",
+            "new_teplate": "Nova predloga za snemanje",
             "nextrec": "Naslednji posnetek",
             "storgrp": "Skupina za shranjevanje"
         },
         "sched": {
             "active_label": "Pravilo snemanja je aktivno",
+            "add_tables_label": "Dodatne tabele",
             "autoexpire_label": "Samodejni potek",
             "autoextend_label": "Samodejno podaljšanje",
+            "channel_label": "Kanal",
+            "description_label": "Opis",
             "dupin": {
                 "both": "Trenutni in prejšnji posnetki",
                 "curr": "Samo trenutni posnetki",
@@ -95,6 +101,7 @@
                 "s_then_d": "Ujemanje s podnapisi in nato opisom"
             },
             "dupmethod_label": "Podvojena metoda ujemanja",
+            "duration_label": "Trajanje",
             "endoffset_label": "Število dodatnih minut za snemanje ob koncu",
             "extend_none": "Noben",
             "filters_label": "Možnosti filtra",
@@ -125,9 +132,15 @@
             },
             "recprofile_label": "Profil snemanja",
             "sgroup_label": "Skupina za shranjevanje",
+            "sqlwhere_label": "SQL Kje pogoj",
+            "srchValue_label": "Vrednost iskanja",
+            "srchtype_label": "Vrsta iskanja",
             "startoffset_label": "Število dodatnih minut za snemanje na začetku",
+            "starttime_label": "Začetni datum in čas",
+            "subtitle_label": "Podnaslov",
             "template_apply": "Uporabi spremembo predloge",
             "template_label": "Uporabite predlogo",
+            "title_label": "Naslov",
             "type": {
                 "all": "Posnemite vse prikaze",
                 "daily": "Vsak dan posnemite eno oddajo",
@@ -341,7 +354,14 @@
         "RecordOne": "Posnetek ena",
         "RecordWeekly": "Snemaj tedensko",
         "RecordingTemplate": "Predloga za snemanje",
-        "SingleRecord": "Enotni zapis"
+        "SingleRecord": "Enotni zapis",
+        "srch_KeywordSearch": "Iskanje po ključnih besedah",
+        "srch_ManualSearch": "Ročno iskanje",
+        "srch_None": "Noben",
+        "srch_PeopleSearch": "Iskanje ljudi",
+        "srch_PowerSearch": "Močno iskanje",
+        "srch_TitleSearch": "Iskanje po naslovu",
+        "template": "Predloga"
     },
     "settings": {
         "backendctrl": {
@@ -962,6 +982,7 @@
             "enableupdates_label": "Omogoči posodobitve",
             "restart_desc": "Posnetki so onemogočeni, dokler znova ne zaženete",
             "restart_label": "Znova zaženite zaledje",
+            "restarting": "Ponovni zagon zaledja",
             "slave_instructions": "Zdi se, da je to podrejeno zaledje. Če je mišljeno kot podrejeno zaledje, onemogočite razporejanje na zaledju msster med izvajanjem nastavitve podrejenega zaledja.",
             "slave_warning": "Če to ni predvideno kot podrejeno zaledje, pojdite na Nastavitve, Splošno, Nastavitev zaledja naslova gostitelja in izberite »Ta strežnik je glavno zaledje« ali pa nastavite pravilen identifikator po meri na strani z nastavitvami baze podatkov. Shranite in znova zaženite zaledje,",
             "title": "Nastavitev MythTV",

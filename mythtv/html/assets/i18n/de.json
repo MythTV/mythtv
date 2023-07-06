@@ -1,6 +1,7 @@
 {
     "common": {
         "back": "Zurück",
+        "backenderror": "Backend-Fehler.",
         "cancel": "Stornieren",
         "close": "Schließen",
         "continue": "Bearbeiten Sie weiter",
@@ -74,13 +75,18 @@
         "recrules": {
             "heading": "Aufnahmeregeln",
             "lastrec": "Zuletzt aufgezeichnet",
+            "new_recrule": "Neue Aufzeichnungsregel",
+            "new_teplate": "Neue Aufnahmevorlage",
             "nextrec": "Nächste Aufnahme",
             "storgrp": "Speichergruppe"
         },
         "sched": {
             "active_label": "Die Aufzeichnungsregel ist aktiv",
+            "add_tables_label": "Zusätzliche Tabellen",
             "autoexpire_label": "Automatisches Ablaufen",
             "autoextend_label": "Automatische Verlängerung",
+            "channel_label": "Kanal",
+            "description_label": "Beschreibung",
             "dupin": {
                 "both": "Aktuelle und frühere Aufnahmen",
                 "curr": "Nur aktuelle Aufnahmen",
@@ -95,6 +101,7 @@
                 "s_then_d": "Übereinstimmung mit Untertitel und dann Beschreibung"
             },
             "dupmethod_label": "Duplikat-Match-Methode",
+            "duration_label": "Dauer",
             "endoffset_label": "Anzahl der zusätzlichen Minuten, die am Ende aufgezeichnet werden sollen",
             "extend_none": "Keiner",
             "filters_label": "Filteroptionen",
@@ -125,9 +132,15 @@
             },
             "recprofile_label": "Aufnahmeprofil",
             "sgroup_label": "Speichergruppe",
+            "sqlwhere_label": "SQL-Where-Bedingung",
+            "srchValue_label": "Suchwert",
+            "srchtype_label": "Suchtyp",
             "startoffset_label": "Anzahl der zusätzlichen Minuten, die beim Start aufgezeichnet werden müssen",
+            "starttime_label": "Startdatum und -uhrzeit",
+            "subtitle_label": "Untertitel",
             "template_apply": "Vorlagenänderung anwenden",
             "template_label": "Benutze Template",
+            "title_label": "Titel",
             "type": {
                 "all": "Zeichnen Sie alle Vorführungen auf",
                 "daily": "Nehmen Sie jeden Tag eine Vorführung auf",
@@ -341,7 +354,14 @@
         "RecordOne": "Nehmen Sie Eins auf",
         "RecordWeekly": "Wöchentlich aufzeichnen",
         "RecordingTemplate": "Aufnahmevorlage",
-        "SingleRecord": "Einzelner Datensatz"
+        "SingleRecord": "Einzelner Datensatz",
+        "srch_KeywordSearch": "Schlagwortsuche",
+        "srch_ManualSearch": "Manuelle Suche",
+        "srch_None": "Keiner",
+        "srch_PeopleSearch": "Personensuche",
+        "srch_PowerSearch": "Power-Suche",
+        "srch_TitleSearch": "Titelsuche",
+        "template": "Vorlage"
     },
     "settings": {
         "backendctrl": {
@@ -962,6 +982,7 @@
             "enableupdates_label": "Aktivieren Sie Updates",
             "restart_desc": "Die Aufzeichnungen sind bis zum Neustart deaktiviert",
             "restart_label": "Backend neu starten",
+            "restarting": "Backend neu starten",
             "slave_instructions": "Dies scheint ein Slave-Backend zu sein. Wenn es als Slave-Backend gedacht ist, deaktivieren Sie bitte die Planung auf dem msster-Backend, während Sie das Slave-Backend-Setup ausführen.",
             "slave_warning": "Wenn dies nicht als Slave-Backend gedacht ist, gehen Sie bitte zu „Setup“, „Allgemein“, „Hostadressen-Backend-Setup“ und wählen Sie „Dieser Server ist das Master-Backend“ oder legen Sie die korrekte benutzerdefinierte Kennung auf der Seite „Datenbank-Setup“ fest. Speichern Sie das Backend und starten Sie es neu.",
             "title": "MythTV-Setup",

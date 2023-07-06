@@ -1,6 +1,7 @@
 {
     "common": {
         "back": "tagasi",
+        "backenderror": "Taustaprogrammi viga.",
         "cancel": "Tühista",
         "close": "Sulge",
         "continue": "Jätka redigeerimist",
@@ -74,13 +75,18 @@
         "recrules": {
             "heading": "Salvestusreeglid",
             "lastrec": "Viimati salvestatud",
+            "new_recrule": "Uus salvestamise reegel",
+            "new_teplate": "Uus salvestusmall",
             "nextrec": "Järgmine salvestus",
             "storgrp": "Salvestusgrupp"
         },
         "sched": {
             "active_label": "Salvestusreegel on aktiivne",
+            "add_tables_label": "Täiendavad tabelid",
             "autoexpire_label": "Automaatne aegumine",
             "autoextend_label": "Automaatne pikendamine",
+            "channel_label": "Kanal",
+            "description_label": "Kirjeldus",
             "dupin": {
                 "both": "Praegused ja varasemad salvestised",
                 "curr": "Ainult praegused salvestised",
@@ -95,6 +101,7 @@
                 "s_then_d": "Sobitage subtiitrite ja seejärel kirjelduse abil"
             },
             "dupmethod_label": "Dubleeriva vaste meetod",
+            "duration_label": "Kestus",
             "endoffset_label": "Lõpus salvestatavate lisaminutite arv",
             "extend_none": "Mitte ühtegi",
             "filters_label": "Filtri valikud",
@@ -125,9 +132,15 @@
             },
             "recprofile_label": "Salvestusprofiil",
             "sgroup_label": "Salvestusgrupp",
+            "sqlwhere_label": "SQL Kus tingimus",
+            "srchValue_label": "Otsinguväärtus",
+            "srchtype_label": "Otsingu tüüp",
             "startoffset_label": "Lisaminutite arv alguses",
+            "starttime_label": "Alguskuupäev ja kellaaeg",
+            "subtitle_label": "Alapealkiri",
             "template_apply": "Rakenda malli muudatus",
             "template_label": "Kasutage malli",
+            "title_label": "Pealkiri",
             "type": {
                 "all": "Salvestage kõik saated",
                 "daily": "Salvestage üks saade iga päev",
@@ -341,7 +354,14 @@
         "RecordOne": "Record One",
         "RecordWeekly": "Rekord nädalas",
         "RecordingTemplate": "Salvestusmall",
-        "SingleRecord": "Üksik rekord"
+        "SingleRecord": "Üksik rekord",
+        "srch_KeywordSearch": "Võtmesõna otsing",
+        "srch_ManualSearch": "Käsitsi otsing",
+        "srch_None": "Mitte ühtegi",
+        "srch_PeopleSearch": "Inimeste otsing",
+        "srch_PowerSearch": "Power Search",
+        "srch_TitleSearch": "Pealkirja otsing",
+        "template": "Mall"
     },
     "settings": {
         "backendctrl": {
@@ -962,6 +982,7 @@
             "enableupdates_label": "Luba värskendused",
             "restart_desc": "Salvestus on keelatud kuni taaskäivitamiseni",
             "restart_label": "Taaskäivitage taustaprogramm",
+            "restarting": "Taustaprogrammi taaskäivitamine",
             "slave_instructions": "See näib olevat ori taustaprogramm. Kui see on ette nähtud alam-taustaprogrammiks, keelake alam-taustaprogrammi seadistamise ajal ajastamine mssteri taustaprogrammis.",
             "slave_warning": "Kui see pole mõeldud alluva taustaprogrammina, minge jaotisse Seadistamine, Üldine, Hostiaadressi taustaprogrammi häälestus ja valige \"See server on põhitaustaprogramm\" või määrake andmebaasi häälestuse lehel õige kohandatud identifikaator. Salvestage ja taaskäivitage taustaprogramm,",
             "title": "MythTV seadistamine",

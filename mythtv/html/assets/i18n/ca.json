@@ -1,6 +1,7 @@
 {
     "common": {
         "back": "esquena",
+        "backenderror": "Error de backend.",
         "cancel": "Cancel · lar",
         "close": "Tanca",
         "continue": "Continuar editant",
@@ -74,13 +75,18 @@
         "recrules": {
             "heading": "Normes de gravació",
             "lastrec": "Darrera gravació",
+            "new_recrule": "Nova regla d'enregistrament",
+            "new_teplate": "Nova plantilla de gravació",
             "nextrec": "Pròxima gravació",
             "storgrp": "Grup d'emmagatzematge"
         },
         "sched": {
             "active_label": "La regla de gravació està activa",
+            "add_tables_label": "Taules addicionals",
             "autoexpire_label": "Caducitat automàtica",
             "autoextend_label": "Extensió automàtica",
+            "channel_label": "Canal",
+            "description_label": "Descripció",
             "dupin": {
                 "both": "Enregistraments actuals i anteriors",
                 "curr": "Només enregistraments actuals",
@@ -95,6 +101,7 @@
                 "s_then_d": "Coincideix amb el subtítol i després amb la descripció"
             },
             "dupmethod_label": "Mètode de concordança duplicada",
+            "duration_label": "Durada",
             "endoffset_label": "Nombre de minuts addicionals per gravar al final",
             "extend_none": "Cap",
             "filters_label": "Opcions de filtre",
@@ -125,9 +132,15 @@
             },
             "recprofile_label": "Perfil de gravació",
             "sgroup_label": "Grup d'emmagatzematge",
+            "sqlwhere_label": "Condició on SQL",
+            "srchValue_label": "Valor de cerca",
+            "srchtype_label": "Tipus de cerca",
             "startoffset_label": "Nombre de minuts addicionals per gravar a l'inici",
+            "starttime_label": "Data i hora d'inici",
+            "subtitle_label": "Subtítol",
             "template_apply": "Aplica el canvi de plantilla",
             "template_label": "Utilitzeu la plantilla",
+            "title_label": "Títol",
             "type": {
                 "all": "Registra totes les projeccions",
                 "daily": "Grava una projecció cada dia",
@@ -341,7 +354,14 @@
         "RecordOne": "Record One",
         "RecordWeekly": "Grava setmanalment",
         "RecordingTemplate": "Plantilla de gravació",
-        "SingleRecord": "Record únic"
+        "SingleRecord": "Record únic",
+        "srch_KeywordSearch": "Cerca de paraules clau",
+        "srch_ManualSearch": "Cerca manual",
+        "srch_None": "Cap",
+        "srch_PeopleSearch": "Cerca de persones",
+        "srch_PowerSearch": "Potència de cerca",
+        "srch_TitleSearch": "Cerca de títols",
+        "template": "Plantilla"
     },
     "settings": {
         "backendctrl": {
@@ -962,6 +982,7 @@
             "enableupdates_label": "Activa les actualitzacions",
             "restart_desc": "Les gravacions es desactiven fins que reinicieu",
             "restart_label": "Reinicieu el backend",
+            "restarting": "Reiniciant el backend",
             "slave_instructions": "Sembla ser un backend esclau. Si està pensat com a backend esclau, si us plau, desactiveu la programació al backend msster mentre executeu la configuració del backend esclau.",
             "slave_warning": "Si no està pensat com a backend esclau, aneu a Configuració, General, Configuració del backend de l'adreça de l'amfitrió i seleccioneu \"Aquest servidor és el backend mestre\" o bé establiu l'identificador personalitzat correcte a la pàgina Configuració de la base de dades. Desa i reinicia el backend,",
             "title": "Configuració de MythTV",

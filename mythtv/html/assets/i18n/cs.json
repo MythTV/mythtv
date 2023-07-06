@@ -1,6 +1,7 @@
 {
     "common": {
         "back": "Zadní",
+        "backenderror": "Chyba backendu.",
         "cancel": "zrušení",
         "close": "Zavřít",
         "continue": "Pokračovat v úpravách",
@@ -74,13 +75,18 @@
         "recrules": {
             "heading": "Pravidla nahrávání",
             "lastrec": "Naposledy zaznamenáno",
+            "new_recrule": "Nové pravidlo nahrávání",
+            "new_teplate": "Nová šablona nahrávání",
             "nextrec": "Další záznam",
             "storgrp": "Skupina úložiště"
         },
         "sched": {
             "active_label": "Pravidlo nahrávání je aktivní",
+            "add_tables_label": "Doplňkové tabulky",
             "autoexpire_label": "Automatické vypršení platnosti",
             "autoextend_label": "Automatické prodloužení",
+            "channel_label": "Kanál",
+            "description_label": "Popis",
             "dupin": {
                 "both": "Aktuální a předchozí nahrávky",
                 "curr": "Pouze aktuální nahrávky",
@@ -95,6 +101,7 @@
                 "s_then_d": "Porovnejte pomocí titulků a poté popisu"
             },
             "dupmethod_label": "Metoda duplicitní shody",
+            "duration_label": "Doba trvání",
             "endoffset_label": "Počet minut navíc k záznamu na konci",
             "extend_none": "Žádný",
             "filters_label": "Možnosti filtru",
@@ -125,9 +132,15 @@
             },
             "recprofile_label": "Záznamový profil",
             "sgroup_label": "Skupina úložiště",
+            "sqlwhere_label": "SQL kde podmínka",
+            "srchValue_label": "Hodnota vyhledávání",
+            "srchtype_label": "Typ vyhledávání",
             "startoffset_label": "Počet minut navíc k záznamu na začátku",
+            "starttime_label": "Datum a čas zahájení",
+            "subtitle_label": "Titulky",
             "template_apply": "Použít změnu šablony",
             "template_label": "Použijte šablonu",
+            "title_label": "Titul",
             "type": {
                 "all": "Záznam všech představení",
                 "daily": "Každý den zaznamenejte jeden pořad",
@@ -341,7 +354,14 @@
         "RecordOne": "Záznam jedna",
         "RecordWeekly": "Record Weekly",
         "RecordingTemplate": "Šablona nahrávání",
-        "SingleRecord": "Jeden záznam"
+        "SingleRecord": "Jeden záznam",
+        "srch_KeywordSearch": "Vyhledávání klíčových slov",
+        "srch_ManualSearch": "Ruční vyhledávání",
+        "srch_None": "Žádný",
+        "srch_PeopleSearch": "Vyhledávání lidí",
+        "srch_PowerSearch": "Power Search",
+        "srch_TitleSearch": "Vyhledávání titulů",
+        "template": "Šablona"
     },
     "settings": {
         "backendctrl": {
@@ -962,6 +982,7 @@
             "enableupdates_label": "Povolit aktualizace",
             "restart_desc": "Záznamy jsou zakázány, dokud nerestartujete",
             "restart_label": "Restartujte backend",
+            "restarting": "Restartování backendu",
             "slave_instructions": "Zdá se, že jde o podřízený backend. Pokud je zamýšlen jako podřízený backend, vypněte plánování na backendu msster při spuštění nastavení podřízeného backendu.",
             "slave_warning": "Pokud toto není zamýšleno jako podřízený backend, přejděte na Nastavení, Obecné, Nastavení backendu adresy hostitele a vyberte „Tento server je hlavní backend“ nebo nastavte správný uživatelský identifikátor na stránce Nastavení databáze. Uložte a restartujte backend,",
             "title": "Nastavení MythTV",

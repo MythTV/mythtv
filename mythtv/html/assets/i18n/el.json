@@ -1,6 +1,7 @@
 {
     "common": {
         "back": "Πίσω",
+        "backenderror": "Σφάλμα backend.",
         "cancel": "Ματαίωση",
         "close": "Κλείσε",
         "continue": "Συνέχεια Επεξεργασίας",
@@ -74,13 +75,18 @@
         "recrules": {
             "heading": "Κανόνες εγγραφής",
             "lastrec": "Τελευταία Ηχογράφηση",
+            "new_recrule": "Νέος κανόνας ηχογράφησης",
+            "new_teplate": "Νέο πρότυπο εγγραφής",
             "nextrec": "Επόμενη Ηχογράφηση",
             "storgrp": "Ομάδα αποθήκευσης"
         },
         "sched": {
             "active_label": "Ο κανόνας εγγραφής είναι ενεργός",
+            "add_tables_label": "Πρόσθετοι πίνακες",
             "autoexpire_label": "Αυτόματη Λήξη",
             "autoextend_label": "Αυτόματη επέκταση",
+            "channel_label": "Κανάλι",
+            "description_label": "Περιγραφή",
             "dupin": {
                 "both": "Τρέχουσες και Προηγούμενες Ηχογραφήσεις",
                 "curr": "Μόνο τρέχουσες εγγραφές",
@@ -95,6 +101,7 @@
                 "s_then_d": "Αντιστοιχίστε χρησιμοποιώντας υπότιτλους και μετά περιγραφή"
             },
             "dupmethod_label": "Διπλότυπη μέθοδος αντιστοίχισης",
+            "duration_label": "Διάρκεια",
             "endoffset_label": "Αριθμός επιπλέον λεπτών για εγγραφή στο τέλος",
             "extend_none": "Κανένας",
             "filters_label": "Επιλογές φίλτρου",
@@ -125,9 +132,15 @@
             },
             "recprofile_label": "Προφίλ εγγραφής",
             "sgroup_label": "Ομάδα αποθήκευσης",
+            "sqlwhere_label": "SQL Where Condition",
+            "srchValue_label": "Τιμή αναζήτησης",
+            "srchtype_label": "Τύπος αναζήτησης",
             "startoffset_label": "Αριθμός επιπλέον λεπτών για εγγραφή κατά την έναρξη",
+            "starttime_label": "Ημερομηνία και ώρα έναρξης",
+            "subtitle_label": "Υπότιτλος",
             "template_apply": "Εφαρμογή αλλαγής προτύπου",
             "template_label": "Χρησιμοποιήστε το πρότυπο",
+            "title_label": "Τίτλος",
             "type": {
                 "all": "Καταγραφή όλων των προβολών",
                 "daily": "Καταγράψτε μία προβολή κάθε μέρα",
@@ -341,7 +354,14 @@
         "RecordOne": "Record One",
         "RecordWeekly": "Record Weekly",
         "RecordingTemplate": "Πρότυπο εγγραφής",
-        "SingleRecord": "Ενιαίος δίσκος"
+        "SingleRecord": "Ενιαίος δίσκος",
+        "srch_KeywordSearch": "Αναζήτηση με λέξη κλειδί",
+        "srch_ManualSearch": "Μη αυτόματη αναζήτηση",
+        "srch_None": "Κανένας",
+        "srch_PeopleSearch": "Αναζήτηση ατόμων",
+        "srch_PowerSearch": "Power Search",
+        "srch_TitleSearch": "Αναζήτηση τίτλου",
+        "template": "Πρότυπο"
     },
     "settings": {
         "backendctrl": {
@@ -962,6 +982,7 @@
             "enableupdates_label": "Ενεργοποίηση ενημερώσεων",
             "restart_desc": "Οι εγγραφές είναι απενεργοποιημένες μέχρι να κάνετε επανεκκίνηση",
             "restart_label": "Επανεκκινήστε το Backend",
+            "restarting": "Επανεκκίνηση του Backend",
             "slave_instructions": "Αυτό φαίνεται να είναι ένα slave backend. Εάν προορίζεται ως βοηθητικό σύστημα υποστήριξης, απενεργοποιήστε τον προγραμματισμό στο σύστημα υποστήριξης msster ενώ εκτελείτε τη ρύθμιση υποτελούς υποστήριξης.",
             "slave_warning": "Εάν αυτό δεν προορίζεται ως βοηθητικό σύστημα υποστήριξης, μεταβείτε στο Setup, General, Host Address Backend Setup και επιλέξτε \"This server is the Master Backend\" ή ορίστε το σωστό προσαρμοσμένο αναγνωριστικό στη σελίδα Setup Database. Αποθηκεύστε και επανεκκινήστε το backend,",
             "title": "Ρύθμιση MythTV",

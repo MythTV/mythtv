@@ -1,6 +1,7 @@
 {
     "common": {
         "back": "Retour",
+        "backenderror": "Erreur de back-end.",
         "cancel": "Annuler",
         "close": "Fermer",
         "continue": "Continuer l'édition",
@@ -74,13 +75,18 @@
         "recrules": {
             "heading": "Règles d'enregistrement",
             "lastrec": "Dernier enregistrement",
+            "new_recrule": "Nouvelle règle d'enregistrement",
+            "new_teplate": "Nouveau modèle d'enregistrement",
             "nextrec": "Enregistrement suivant",
             "storgrp": "Groupe de stockage"
         },
         "sched": {
             "active_label": "La règle d'enregistrement est active",
+            "add_tables_label": "Tableaux supplémentaires",
             "autoexpire_label": "Expiration automatique",
             "autoextend_label": "Extension automatique",
+            "channel_label": "Canaliser",
+            "description_label": "Description",
             "dupin": {
                 "both": "Enregistrements actuels et précédents",
                 "curr": "Enregistrements en cours uniquement",
@@ -95,6 +101,7 @@
                 "s_then_d": "Faire correspondre en utilisant le sous-titre puis la description"
             },
             "dupmethod_label": "Méthode de correspondance en double",
+            "duration_label": "Durée",
             "endoffset_label": "Nombre de minutes supplémentaires à enregistrer à la fin",
             "extend_none": "Aucun",
             "filters_label": "Options de filtrage",
@@ -125,9 +132,15 @@
             },
             "recprofile_label": "Profil d'enregistrement",
             "sgroup_label": "Groupe de stockage",
+            "sqlwhere_label": "Condition SQL Where",
+            "srchValue_label": "Valeur de recherche",
+            "srchtype_label": "Type de recherche",
             "startoffset_label": "Nombre de minutes supplémentaires à enregistrer au début",
+            "starttime_label": "Date et heure de début",
+            "subtitle_label": "Sous-titre",
             "template_apply": "Appliquer le changement de modèle",
             "template_label": "Utilise le modèle",
+            "title_label": "Titre",
             "type": {
                 "all": "Enregistrer toutes les projections",
                 "daily": "Enregistrez une diffusion chaque jour",
@@ -341,7 +354,14 @@
         "RecordOne": "Enregistrer un",
         "RecordWeekly": "Enregistrer chaque semaine",
         "RecordingTemplate": "Modèle d'enregistrement",
-        "SingleRecord": "Enregistrement unique"
+        "SingleRecord": "Enregistrement unique",
+        "srch_KeywordSearch": "Recherche par mot clé",
+        "srch_ManualSearch": "Recherche manuelle",
+        "srch_None": "Aucun",
+        "srch_PeopleSearch": "Recherche de personnes",
+        "srch_PowerSearch": "Recherche avancée",
+        "srch_TitleSearch": "Recherche de titre",
+        "template": "Modèle"
     },
     "settings": {
         "backendctrl": {
@@ -962,6 +982,7 @@
             "enableupdates_label": "Activer les mises à jour",
             "restart_desc": "Les enregistrements sont désactivés jusqu'à ce que vous redémarriez",
             "restart_label": "Redémarrer le backend",
+            "restarting": "Redémarrage du backend",
             "slave_instructions": "Cela semble être un backend esclave. S'il est conçu comme un backend esclave, veuillez désactiver la planification sur le backend msster lors de l'exécution de la configuration du backend esclave.",
             "slave_warning": "S'il ne s'agit pas d'un backend esclave, accédez à Configuration, Général, Configuration du backend de l'adresse de l'hôte et sélectionnez \"Ce serveur est le backend maître\" ou définissez l'identifiant personnalisé correct sur la page Configuration de la base de données. Enregistrez et redémarrez le backend,",
             "title": "Configuration Myth TV",

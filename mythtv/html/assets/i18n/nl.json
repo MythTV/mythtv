@@ -1,6 +1,7 @@
 {
     "common": {
         "back": "Rug",
+        "backenderror": "Backend-fout.",
         "cancel": "Annuleren",
         "close": "Dichtbij",
         "continue": "Ga door met bewerken",
@@ -74,13 +75,18 @@
         "recrules": {
             "heading": "Opname regels",
             "lastrec": "Laatst opgenomen",
+            "new_recrule": "Nieuwe opnameregel",
+            "new_teplate": "Nieuw opnamesjabloon",
             "nextrec": "Volgende opname",
             "storgrp": "Opslag groep"
         },
         "sched": {
             "active_label": "Opnameregel is actief",
+            "add_tables_label": "Extra tabellen",
             "autoexpire_label": "Automatisch verlopen",
             "autoextend_label": "Automatisch verlengen",
+            "channel_label": "Kanaal",
+            "description_label": "Beschrijving",
             "dupin": {
                 "both": "Huidige en vorige opnames",
                 "curr": "Alleen huidige opnamen",
@@ -95,6 +101,7 @@
                 "s_then_d": "Match met behulp van ondertiteling en vervolgens beschrijving"
             },
             "dupmethod_label": "Dubbele matchmethode",
+            "duration_label": "Duur",
             "endoffset_label": "Aantal extra minuten om aan het einde op te nemen",
             "extend_none": "Geen",
             "filters_label": "Filteropties",
@@ -125,9 +132,15 @@
             },
             "recprofile_label": "opname profiel",
             "sgroup_label": "Opslag groep",
+            "sqlwhere_label": "SQL Where-voorwaarde",
+            "srchValue_label": "Zoek Waarde",
+            "srchtype_label": "Zoektype",
             "startoffset_label": "Aantal extra minuten om op te nemen bij start",
+            "starttime_label": "Begindatum en -tijd",
+            "subtitle_label": "Ondertitel",
             "template_apply": "Sjabloonwijziging toepassen",
             "template_label": "Gebruik sjabloon",
+            "title_label": "Titel",
             "type": {
                 "all": "Registreer alle vertoningen",
                 "daily": "Neem elke dag één show op",
@@ -341,7 +354,14 @@
         "RecordOne": "Neem een ​​op",
         "RecordWeekly": "Wekelijks opnemen",
         "RecordingTemplate": "Opname sjabloon",
-        "SingleRecord": "Enkele opname"
+        "SingleRecord": "Enkele opname",
+        "srch_KeywordSearch": "Zoeken op sleutelwoorden",
+        "srch_ManualSearch": "Handmatig zoeken",
+        "srch_None": "Geen",
+        "srch_PeopleSearch": "Mensen zoeken",
+        "srch_PowerSearch": "Krachtig zoeken",
+        "srch_TitleSearch": "Titel zoeken",
+        "template": "Sjabloon"
     },
     "settings": {
         "backendctrl": {
@@ -962,6 +982,7 @@
             "enableupdates_label": "Updates inschakelen",
             "restart_desc": "Opnames zijn uitgeschakeld totdat u opnieuw opstart",
             "restart_label": "Back-end opnieuw opstarten",
+            "restarting": "Backend opnieuw opstarten",
             "slave_instructions": "Dit lijkt een slave-backend te zijn. Als het bedoeld is als een slave-backend, schakelt u planning op de msster-backend uit terwijl u de slave-backend-setup uitvoert.",
             "slave_warning": "Als dit niet bedoeld is als een slave-backend, ga dan naar Setup, General, Host Address Backend Setup en selecteer \"This server is the Master Backend\" of stel anders de juiste aangepaste identifier in op de Database Setup-pagina. Bewaar en herstart de backend,",
             "title": "MythTV-installatie",

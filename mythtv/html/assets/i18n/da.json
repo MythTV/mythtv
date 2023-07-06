@@ -1,6 +1,7 @@
 {
     "common": {
         "back": "Tilbage",
+        "backenderror": "Backend fejl.",
         "cancel": "Afbestille",
         "close": "Tæt",
         "continue": "Fortsæt redigering",
@@ -74,13 +75,18 @@
         "recrules": {
             "heading": "Regler for optagelse",
             "lastrec": "Sidst optaget",
+            "new_recrule": "Ny optagelsesregel",
+            "new_teplate": "Ny optagelsesskabelon",
             "nextrec": "Næste optagelse",
             "storgrp": "Lagergruppe"
         },
         "sched": {
             "active_label": "Reglen for optagelse er aktiv",
+            "add_tables_label": "Yderligere tabeller",
             "autoexpire_label": "Auto udløber",
             "autoextend_label": "Automatisk forlængelse",
+            "channel_label": "Kanal",
+            "description_label": "Beskrivelse",
             "dupin": {
                 "both": "Nuværende og tidligere optagelser",
                 "curr": "Kun aktuelle optagelser",
@@ -95,6 +101,7 @@
                 "s_then_d": "Match ved hjælp af undertekst og derefter beskrivelse"
             },
             "dupmethod_label": "Dublet matchmetode",
+            "duration_label": "Varighed",
             "endoffset_label": "Antal ekstra minutter at optage ved slutningen",
             "extend_none": "Ingen",
             "filters_label": "Filterindstillinger",
@@ -125,9 +132,15 @@
             },
             "recprofile_label": "Optagelsesprofil",
             "sgroup_label": "Lagergruppe",
+            "sqlwhere_label": "SQL Where Condition",
+            "srchValue_label": "Søgeværdi",
+            "srchtype_label": "Søgetype",
             "startoffset_label": "Antal ekstra minutter at optage ved start",
+            "starttime_label": "Startdato og -tid",
+            "subtitle_label": "Undertekst",
             "template_apply": "Anvend skabelonændring",
             "template_label": "Brug skabelon",
+            "title_label": "Titel",
             "type": {
                 "all": "Optag alle fremvisninger",
                 "daily": "Optag en visning hver dag",
@@ -341,7 +354,14 @@
         "RecordOne": "Optag en",
         "RecordWeekly": "Optag ugentligt",
         "RecordingTemplate": "Optagelsesskabelon",
-        "SingleRecord": "Enkelt plade"
+        "SingleRecord": "Enkelt plade",
+        "srch_KeywordSearch": "Søgeordssøgning",
+        "srch_ManualSearch": "Manuel søgning",
+        "srch_None": "Ingen",
+        "srch_PeopleSearch": "People Search",
+        "srch_PowerSearch": "Power Search",
+        "srch_TitleSearch": "Titelsøgning",
+        "template": "Skabelon"
     },
     "settings": {
         "backendctrl": {
@@ -962,6 +982,7 @@
             "enableupdates_label": "Aktiver opdateringer",
             "restart_desc": "Optagelser er deaktiveret, indtil du genstarter",
             "restart_label": "Genstart Backend",
+            "restarting": "Genstarter Backend",
             "slave_instructions": "Dette ser ud til at være en slave backend. Hvis det er beregnet som en slave-backend, skal du deaktivere planlægning på msster-backend, mens du kører slave-backend-opsætning.",
             "slave_warning": "Hvis dette ikke er beregnet som en slave-backend, skal du gå til Opsætning, Generelt, Host Address Backend-opsætning og vælge \"Denne server er Master Backend\" eller ellers indstil den korrekte brugerdefinerede identifikator på siden Databaseopsætning. Gem og genstart backend,",
             "title": "MythTV-opsætning",

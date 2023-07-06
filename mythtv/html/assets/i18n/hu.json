@@ -1,6 +1,7 @@
 {
     "common": {
         "back": "Hát",
+        "backenderror": "Háttér hiba.",
         "cancel": "Megszünteti",
         "close": "Bezárás",
         "continue": "Szerkesztés folytatása",
@@ -74,13 +75,18 @@
         "recrules": {
             "heading": "Felvételi szabályok",
             "lastrec": "Utoljára rögzített",
+            "new_recrule": "Új rögzítési szabály",
+            "new_teplate": "Új felvételi sablon",
             "nextrec": "Következő felvétel",
             "storgrp": "Tárolócsoport"
         },
         "sched": {
             "active_label": "A rögzítési szabály aktív",
+            "add_tables_label": "További táblázatok",
             "autoexpire_label": "Automatikus lejárat",
             "autoextend_label": "Automatikus kiterjesztés",
+            "channel_label": "Csatorna",
+            "description_label": "Leírás",
             "dupin": {
                 "both": "Jelenlegi és korábbi felvételek",
                 "curr": "Csak aktuális felvételek",
@@ -95,6 +101,7 @@
                 "s_then_d": "Egyezzen a felirattal, majd leírással"
             },
             "dupmethod_label": "Duplicate Match Method",
+            "duration_label": "Időtartam",
             "endoffset_label": "A végén rögzítendő többletpercek száma",
             "extend_none": "Egyik sem",
             "filters_label": "Szűrési beállítások",
@@ -125,9 +132,15 @@
             },
             "recprofile_label": "Felvételi profil",
             "sgroup_label": "Tárolócsoport",
+            "sqlwhere_label": "SQL Hol feltétel",
+            "srchValue_label": "Keresési érték",
+            "srchtype_label": "Keresés típusa",
             "startoffset_label": "Az induláskor rögzítendő többletpercek száma",
+            "starttime_label": "Kezdés dátuma és időpontja",
+            "subtitle_label": "Felirat",
             "template_apply": "Sablonmódosítás alkalmazása",
             "template_label": "Sablon használata",
+            "title_label": "Cím",
             "type": {
                 "all": "Minden előadás rögzítése",
                 "daily": "Minden nap rögzítsen egy műsort",
@@ -341,7 +354,14 @@
         "RecordOne": "Record One",
         "RecordWeekly": "Heti rekord",
         "RecordingTemplate": "Felvételi sablon",
-        "SingleRecord": "Egyetlen rekord"
+        "SingleRecord": "Egyetlen rekord",
+        "srch_KeywordSearch": "Kulcsszavas keresés",
+        "srch_ManualSearch": "Kézi keresés",
+        "srch_None": "Egyik sem",
+        "srch_PeopleSearch": "Emberek keresése",
+        "srch_PowerSearch": "Power Search",
+        "srch_TitleSearch": "Cím keresése",
+        "template": "Sablon"
     },
     "settings": {
         "backendctrl": {
@@ -962,6 +982,7 @@
             "enableupdates_label": "Frissítések engedélyezése",
             "restart_desc": "A felvételek le vannak tiltva az újraindításig",
             "restart_label": "Indítsa újra a Backendet",
+            "restarting": "Backend újraindítása",
             "slave_instructions": "Ez egy szolga háttérprogramnak tűnik. Ha szolga háttérprogramnak szánja, kérjük, kapcsolja ki az ütemezést az msster háttérrendszeren, miközben a szolga háttérprogramot futtatja.",
             "slave_warning": "Ha ezt nem szolga háttérprogramnak szánja, lépjen a Beállítás, Általános, Gazdacím-háttérbeállítás menüpontra, és válassza ki az \"Ez a kiszolgáló a fő háttérrendszer\" lehetőséget, vagy állítsa be a megfelelő egyéni azonosítót az Adatbázis beállítása oldalon. Mentse és indítsa újra a háttérprogramot,",
             "title": "MythTV beállítása",

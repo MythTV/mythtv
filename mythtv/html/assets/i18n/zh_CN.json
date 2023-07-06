@@ -1,6 +1,7 @@
 {
     "common": {
         "back": "后退",
+        "backenderror": "后端错误。",
         "cancel": "取消",
         "close": "关闭",
         "continue": "继续编辑",
@@ -74,13 +75,18 @@
         "recrules": {
             "heading": "录音规则",
             "lastrec": "最后记录",
+            "new_recrule": "新的录音规则",
+            "new_teplate": "新录音模板",
             "nextrec": "下一个录音",
             "storgrp": "存储组"
         },
         "sched": {
             "active_label": "录音规则已激活",
+            "add_tables_label": "附加表",
             "autoexpire_label": "自动过期",
             "autoextend_label": "自动扩展",
+            "channel_label": "渠道",
+            "description_label": "描述",
             "dupin": {
                 "both": "当前和以前的录音",
                 "curr": "仅当前录音",
@@ -95,6 +101,7 @@
                 "s_then_d": "使用字幕然后描述进行匹配"
             },
             "dupmethod_label": "重复匹配法",
+            "duration_label": "期间",
             "endoffset_label": "结束时记录的额外分钟数",
             "extend_none": "没有任何",
             "filters_label": "过滤器选项",
@@ -125,9 +132,15 @@
             },
             "recprofile_label": "录音档案",
             "sgroup_label": "存储组",
+            "sqlwhere_label": "SQLWhere条件",
+            "srchValue_label": "搜索值",
+            "srchtype_label": "搜索类型",
             "startoffset_label": "开始时记录的额外分钟数",
+            "starttime_label": "开始日期和时间",
+            "subtitle_label": "字幕",
             "template_apply": "应用模板更改",
             "template_label": "使用模板",
+            "title_label": "标题",
             "type": {
                 "all": "记录所有放映",
                 "daily": "每天录制一场",
@@ -341,7 +354,14 @@
         "RecordOne": "记录一",
         "RecordWeekly": "每周记录",
         "RecordingTemplate": "录音模板",
-        "SingleRecord": "单条记录"
+        "SingleRecord": "单条记录",
+        "srch_KeywordSearch": "关键词搜索",
+        "srch_ManualSearch": "手动搜索",
+        "srch_None": "没有任何",
+        "srch_PeopleSearch": "人物搜索",
+        "srch_PowerSearch": "强力搜索",
+        "srch_TitleSearch": "标题搜索",
+        "template": "模板"
     },
     "settings": {
         "backendctrl": {
@@ -962,6 +982,7 @@
             "enableupdates_label": "启用更新",
             "restart_desc": "录音将被禁用，直到您重新启动为止",
             "restart_label": "重启后端",
+            "restarting": "重启后端",
             "slave_instructions": "这似乎是一个从属后端。如果它打算作为从属后端，请在运行从属后端设置时禁用 msster 后端上的调度。",
             "slave_warning": "如果这不是作为从属后端，请转至“设置”、“常规”、“主机地址后端设置”，然后选择“此服务器是主后端”，或者在“数据库设置”页面上设置正确的自定义标识符。保存并重新启动后端，",
             "title": "神话电视设置",

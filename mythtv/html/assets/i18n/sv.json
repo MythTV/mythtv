@@ -1,6 +1,7 @@
 {
     "common": {
         "back": "Tillbaka",
+        "backenderror": "Backend-fel.",
         "cancel": "Annullera",
         "close": "Stänga",
         "continue": "Fortsätt redigera",
@@ -74,13 +75,18 @@
         "recrules": {
             "heading": "Inspelningsregler",
             "lastrec": "Senast inspelad",
+            "new_recrule": "Ny inspelningsregel",
+            "new_teplate": "Ny inspelningsmall",
             "nextrec": "Nästa inspelning",
             "storgrp": "Lagringsgrupp"
         },
         "sched": {
             "active_label": "Inspelningsregeln är aktiv",
+            "add_tables_label": "Ytterligare tabeller",
             "autoexpire_label": "Utgår automatiskt",
             "autoextend_label": "Automatisk förlängning",
+            "channel_label": "Kanal",
+            "description_label": "Beskrivning",
             "dupin": {
                 "both": "Aktuella och tidigare inspelningar",
                 "curr": "Endast aktuella inspelningar",
@@ -95,6 +101,7 @@
                 "s_then_d": "Matcha med textning sedan beskrivning"
             },
             "dupmethod_label": "Duplicera matchningsmetod",
+            "duration_label": "Varaktighet",
             "endoffset_label": "Antal extra minuter att spela in vid slutet",
             "extend_none": "Ingen",
             "filters_label": "Filteralternativ",
@@ -125,9 +132,15 @@
             },
             "recprofile_label": "Inspelningsprofil",
             "sgroup_label": "Lagringsgrupp",
+            "sqlwhere_label": "SQL Where Condition",
+            "srchValue_label": "Sökvärde",
+            "srchtype_label": "Söktyp",
             "startoffset_label": "Antal extra minuter att spela in vid start",
+            "starttime_label": "Startdatum och tid",
+            "subtitle_label": "Texta",
             "template_apply": "Använd malländring",
             "template_label": "Använd mall",
+            "title_label": "Titel",
             "type": {
                 "all": "Spela in alla visningar",
                 "daily": "Spela in en visning varje dag",
@@ -341,7 +354,14 @@
         "RecordOne": "Spela in ett",
         "RecordWeekly": "Record Weekly",
         "RecordingTemplate": "Inspelningsmall",
-        "SingleRecord": "Singelskiva"
+        "SingleRecord": "Singelskiva",
+        "srch_KeywordSearch": "Nyckelordssökning",
+        "srch_ManualSearch": "Manuell sökning",
+        "srch_None": "Ingen",
+        "srch_PeopleSearch": "People Search",
+        "srch_PowerSearch": "Power Search",
+        "srch_TitleSearch": "Titelsökning",
+        "template": "Mall"
     },
     "settings": {
         "backendctrl": {
@@ -962,6 +982,7 @@
             "enableupdates_label": "Aktivera uppdateringar",
             "restart_desc": "Inspelningar är inaktiverade tills du startar om",
             "restart_label": "Starta om Backend",
+            "restarting": "Startar om backend",
             "slave_instructions": "Detta verkar vara en slavbackend. Om den är avsedd som en slavbackend, inaktivera schemaläggning på msster-backend medan du kör slavbackend-installation.",
             "slave_warning": "Om detta inte är avsett som en slavbackend, gå till Setup, General, Host Address Backend Setup och välj \"Den här servern är Master Backend\" eller ställ in rätt anpassad identifierare på Databas Setup-sidan. Spara och starta om backend,",
             "title": "MythTV Setup",

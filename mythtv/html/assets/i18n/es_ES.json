@@ -1,6 +1,7 @@
 {
     "common": {
         "back": "Atrás",
+        "backenderror": "Error de fondo.",
         "cancel": "Cancelar",
         "close": "Cerca",
         "continue": "Continua editando",
@@ -74,13 +75,18 @@
         "recrules": {
             "heading": "Reglas de grabación",
             "lastrec": "Última grabación",
+            "new_recrule": "Nueva regla de grabación",
+            "new_teplate": "Nueva plantilla de grabación",
             "nextrec": "Próxima grabación",
             "storgrp": "Grupo de almacenamiento"
         },
         "sched": {
             "active_label": "La regla de grabación está activa",
+            "add_tables_label": "Mesas Adicionales",
             "autoexpire_label": "Caducidad automática",
             "autoextend_label": "Extensión automática",
+            "channel_label": "Canal",
+            "description_label": "Descripción",
             "dupin": {
                 "both": "Grabaciones actuales y anteriores",
                 "curr": "Solo grabaciones actuales",
@@ -95,6 +101,7 @@
                 "s_then_d": "Coincidencia usando subtítulo y luego descripción"
             },
             "dupmethod_label": "Método de coincidencia duplicada",
+            "duration_label": "Duración",
             "endoffset_label": "Número de minutos adicionales para grabar al final",
             "extend_none": "Ninguno",
             "filters_label": "Opciones de filtro",
@@ -125,9 +132,15 @@
             },
             "recprofile_label": "Perfil de grabación",
             "sgroup_label": "Grupo de almacenamiento",
+            "sqlwhere_label": "SQL Donde Condición",
+            "srchValue_label": "Valor de búsqueda",
+            "srchtype_label": "Tipo de búsqueda",
             "startoffset_label": "Número de minutos adicionales para registrar al inicio",
+            "starttime_label": "Fecha y hora de inicio",
+            "subtitle_label": "Subtitular",
             "template_apply": "Aplicar cambio de plantilla",
             "template_label": "Usar plantilla",
+            "title_label": "Título",
             "type": {
                 "all": "Grabar todas las exhibiciones",
                 "daily": "Grabe una presentación todos los días",
@@ -341,7 +354,14 @@
         "RecordOne": "Grabar uno",
         "RecordWeekly": "Grabar Semanalmente",
         "RecordingTemplate": "Plantilla de grabación",
-        "SingleRecord": "Registro único"
+        "SingleRecord": "Registro único",
+        "srch_KeywordSearch": "Búsqueda por palabra clave",
+        "srch_ManualSearch": "Búsqueda manual",
+        "srch_None": "Ninguno",
+        "srch_PeopleSearch": "Búsqueda de personas",
+        "srch_PowerSearch": "Búsqueda de energía",
+        "srch_TitleSearch": "Buscar título",
+        "template": "Plantilla"
     },
     "settings": {
         "backendctrl": {
@@ -962,6 +982,7 @@
             "enableupdates_label": "Habilitar actualizaciones",
             "restart_desc": "Las grabaciones están deshabilitadas hasta que reinicies",
             "restart_label": "Reiniciar back-end",
+            "restarting": "Reiniciar back-end",
             "slave_instructions": "Esto parece ser un backend esclavo. Si está diseñado como un backend esclavo, deshabilite la programación en el backend msster mientras ejecuta la configuración del backend esclavo.",
             "slave_warning": "Si esto no está diseñado como un backend esclavo, vaya a Configuración, General, Configuración del backend de la dirección del host y seleccione \"Este servidor es el backend maestro\" o establezca el identificador personalizado correcto en la página Configuración de la base de datos. Guarde y reinicie el backend,",
             "title": "Configuración de MyTVTV",

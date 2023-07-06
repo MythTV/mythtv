@@ -1,6 +1,7 @@
 {
     "common": {
         "back": "バック",
+        "backenderror": "バックエンドエラー。",
         "cancel": "キャンセル",
         "close": "近い",
         "continue": "編集を続ける",
@@ -74,13 +75,18 @@
         "recrules": {
             "heading": "録音ルール",
             "lastrec": "最終記録",
+            "new_recrule": "新しい録音ルール",
+            "new_teplate": "新しい録音テンプレート",
             "nextrec": "次の録音",
             "storgrp": "ストレージグループ"
         },
         "sched": {
             "active_label": "記録ルールがアクティブです",
+            "add_tables_label": "追加のテーブル",
             "autoexpire_label": "自動期限切れ",
             "autoextend_label": "自動延長",
+            "channel_label": "チャネル",
+            "description_label": "説明",
             "dupin": {
                 "both": "現在および以前の録音",
                 "curr": "現在の録音のみ",
@@ -95,6 +101,7 @@
                 "s_then_d": "字幕と説明を使用して一致"
             },
             "dupmethod_label": "重複一致メソッド",
+            "duration_label": "間隔",
             "endoffset_label": "終了時に追加で録画する分数",
             "extend_none": "なし",
             "filters_label": "フィルターオプション",
@@ -125,9 +132,15 @@
             },
             "recprofile_label": "録音プロファイル",
             "sgroup_label": "ストレージグループ",
+            "sqlwhere_label": "SQL の Where 条件",
+            "srchValue_label": "検索値",
+            "srchtype_label": "検索タイプ",
             "startoffset_label": "開始時に録画する追加の分数",
+            "starttime_label": "開始日時",
+            "subtitle_label": "字幕",
             "template_apply": "テンプレートの変更を適用",
             "template_label": "テンプレートを使用する",
+            "title_label": "タイトル",
             "type": {
                 "all": "すべての番組を録画する",
                 "daily": "毎日 1 つの上映を録画する",
@@ -341,7 +354,14 @@
         "RecordOne": "レコード 1",
         "RecordWeekly": "毎週記録する",
         "RecordingTemplate": "録音テンプレート",
-        "SingleRecord": "シングルレコード"
+        "SingleRecord": "シングルレコード",
+        "srch_KeywordSearch": "キーワード検索",
+        "srch_ManualSearch": "手動検索",
+        "srch_None": "なし",
+        "srch_PeopleSearch": "人物検索",
+        "srch_PowerSearch": "パワーサーチ",
+        "srch_TitleSearch": "タイトル検索",
+        "template": "レンプレート"
     },
     "settings": {
         "backendctrl": {
@@ -962,6 +982,7 @@
             "enableupdates_label": "アップデートを有効にする",
             "restart_desc": "再起動するまで録音は無効になります",
             "restart_label": "バックエンドの再起動",
+            "restarting": "バックエンドの再起動",
             "slave_instructions": "これはスレーブ バックエンドであるようです。スレーブ バックエンドとして使用する場合は、スレーブ バックエンド セットアップの実行中に msster バックエンドのスケジューリングを無効にしてください。",
             "slave_warning": "これがスレーブ バックエンドとして意図されていない場合は、[セットアップ]、[全般]、[ホスト アドレス バックエンド セットアップ] に移動し、[このサーバーはマスター バックエンドです] を選択するか、データベース セットアップ ページで正しいカスタム ID を設定してください。バックエンドを保存して再起動します。",
             "title": "MythTV のセットアップ",

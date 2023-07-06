@@ -1,6 +1,7 @@
 {
     "common": {
         "back": "indietro",
+        "backenderror": "Backend villa.",
         "cancel": "Hætta við",
         "close": "Loka",
         "continue": "Halda áfram að breyta",
@@ -74,13 +75,18 @@
         "recrules": {
             "heading": "Upptökureglur",
             "lastrec": "Síðast tekið upp",
+            "new_recrule": "Ný upptökuregla",
+            "new_teplate": "Nýtt upptökusniðmát",
             "nextrec": "Næsta upptaka",
             "storgrp": "Geymsluhópur"
         },
         "sched": {
             "active_label": "Upptökuregla er virk",
+            "add_tables_label": "Viðbótartöflur",
             "autoexpire_label": "Rennur sjálfkrafa út",
             "autoextend_label": "Sjálfvirk framlenging",
+            "channel_label": "Rás",
+            "description_label": "Lýsing",
             "dupin": {
                 "both": "Núverandi og fyrri upptökur",
                 "curr": "Aðeins núverandi upptökur",
@@ -95,6 +101,7 @@
                 "s_then_d": "Samsvörun með texta og síðan lýsingu"
             },
             "dupmethod_label": "Afrit samsvörunaraðferð",
+            "duration_label": "Lengd",
             "endoffset_label": "Fjöldi aukamínúta til að taka upp í lok",
             "extend_none": "Enginn",
             "filters_label": "Síuvalkostir",
@@ -125,9 +132,15 @@
             },
             "recprofile_label": "Upptökusnið",
             "sgroup_label": "Geymsluhópur",
+            "sqlwhere_label": "SQL Hvar ástand",
+            "srchValue_label": "Leitargildi",
+            "srchtype_label": "Leitartegund",
             "startoffset_label": "Fjöldi aukamínúta til að taka upp við upphaf",
+            "starttime_label": "Upphafsdagur og tími",
+            "subtitle_label": "Undirtitill",
             "template_apply": "Notaðu sniðmátsbreytingu",
             "template_label": "Notaðu sniðmát",
+            "title_label": "Titill",
             "type": {
                 "all": "Taktu upp allar sýningar",
                 "daily": "Taktu upp eina sýningu á hverjum degi",
@@ -341,7 +354,14 @@
         "RecordOne": "Record One",
         "RecordWeekly": "Record Weekly",
         "RecordingTemplate": "Upptökusniðmát",
-        "SingleRecord": "Einstök plata"
+        "SingleRecord": "Einstök plata",
+        "srch_KeywordSearch": "Leitarorðaleit",
+        "srch_ManualSearch": "Handvirk leit",
+        "srch_None": "Enginn",
+        "srch_PeopleSearch": "Fólksleit",
+        "srch_PowerSearch": "Power Search",
+        "srch_TitleSearch": "Titilleit",
+        "template": "Sniðmát"
     },
     "settings": {
         "backendctrl": {
@@ -962,6 +982,7 @@
             "enableupdates_label": "Virkja uppfærslur",
             "restart_desc": "Upptökur eru óvirkar þar til þú endurræsir",
             "restart_label": "Endurræstu bakenda",
+            "restarting": "Endurræsir bakenda",
             "slave_instructions": "Þetta virðist vera þrælabakendi. Ef það er ætlað sem þrælabakendi, vinsamlegast slökktu á tímasetningu á msster bakendanum meðan þú keyrir uppsetningu þrælabakendans.",
             "slave_warning": "Ef þetta er ekki ætlað sem þrælabakendi, vinsamlegast farðu í Uppsetning, Almennt, Uppsetning hýsingarfangs, og veldu „Þessi þjónn er aðalbakendi“ eða stilltu rétt sérsniðið auðkenni á gagnagrunnsuppsetningu síðunni. Vistaðu og endurræstu bakendann,",
             "title": "MythTV uppsetning",

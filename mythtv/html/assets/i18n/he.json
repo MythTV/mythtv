@@ -1,6 +1,7 @@
 {
     "common": {
         "back": "חזור",
+        "backenderror": "שגיאת קצה אחורי.",
         "cancel": "לְבַטֵל",
         "close": "סגור",
         "continue": "המשך בעריכה",
@@ -74,13 +75,18 @@
         "recrules": {
             "heading": "כללי הקלטה",
             "lastrec": "הוקלט לאחרונה",
+            "new_recrule": "כלל הקלטה חדש",
+            "new_teplate": "תבנית הקלטה חדשה",
             "nextrec": "ההקלטה הבאה",
             "storgrp": "קבוצת אחסון"
         },
         "sched": {
             "active_label": "כלל ההקלטה פעיל",
+            "add_tables_label": "טבלאות נוספות",
             "autoexpire_label": "תוקף אוטומטי",
             "autoextend_label": "הרחבה אוטומטית",
+            "channel_label": "עָרוּץ",
+            "description_label": "תיאור",
             "dupin": {
                 "both": "הקלטות נוכחיות וקדמות",
                 "curr": "הקלטות נוכחיות בלבד",
@@ -95,6 +101,7 @@
                 "s_then_d": "התאמה באמצעות כתוביות ואז תיאור"
             },
             "dupmethod_label": "שיטת התאמה כפולה",
+            "duration_label": "מֶשֶׁך",
             "endoffset_label": "מספר הדקות הנוספות להקלטה בסיום",
             "extend_none": "אף אחד",
             "filters_label": "אפשרויות סינון",
@@ -125,9 +132,15 @@
             },
             "recprofile_label": "פרופיל הקלטה",
             "sgroup_label": "קבוצת אחסון",
+            "sqlwhere_label": "תנאי SQL Where",
+            "srchValue_label": "ערך חיפוש",
+            "srchtype_label": "סוג חיפוש",
             "startoffset_label": "מספר הדקות הנוספות להקלטה בהתחלה",
+            "starttime_label": "תאריך ושעה התחלה",
+            "subtitle_label": "כתוביות",
             "template_apply": "החל שינוי תבנית",
             "template_label": "השתמש בתבנית",
+            "title_label": "כותרת",
             "type": {
                 "all": "הקלט את כל ההצגות",
                 "daily": "הקלט הצגה אחת בכל יום",
@@ -341,7 +354,14 @@
         "RecordOne": "הקלטה אחת",
         "RecordWeekly": "Record Weekly",
         "RecordingTemplate": "תבנית הקלטה",
-        "SingleRecord": "תקליט בודד"
+        "SingleRecord": "תקליט בודד",
+        "srch_KeywordSearch": "חיפוש מילות מפתח",
+        "srch_ManualSearch": "חיפוש ידני",
+        "srch_None": "אף אחד",
+        "srch_PeopleSearch": "חיפוש אנשים",
+        "srch_PowerSearch": "חיפוש כוח",
+        "srch_TitleSearch": "חיפוש כותרת",
+        "template": "תבנית"
     },
     "settings": {
         "backendctrl": {
@@ -962,6 +982,7 @@
             "enableupdates_label": "הפעל עדכונים",
             "restart_desc": "ההקלטות מושבתות עד שתפעיל מחדש",
             "restart_label": "הפעל מחדש את Backend",
+            "restarting": "הפעלה מחדש של Backend",
             "slave_instructions": "נראה שזהו קצה עבד. אם זה נועד כ-slave backend, אנא השבת את התזמון ב-msster backend בזמן הפעלת ה-slave backend.",
             "slave_warning": "אם זה לא נועד כ-slave backend, עבור אל הגדרות, כללי, הגדרת קצה עורפי של כתובת מארח, ובחר \"שרת זה הוא ה-Master Backend\" או הגדר את המזהה המותאם אישית הנכון בדף הגדרת מסד הנתונים. שמור והפעל מחדש את הקצה האחורי,",
             "title": "הגדרת MythTV",
