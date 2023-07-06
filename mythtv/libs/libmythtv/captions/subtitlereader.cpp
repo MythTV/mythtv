@@ -145,11 +145,12 @@ void SubtitleReader::LoadExternalSubtitles(const QString &subtitleFileName,
     }
 }
 
-void SubtitleReader::ReadNextSubtitle(void)
+int SubtitleReader::ReadNextSubtitle(void)
 {
     m_avSubtitles.m_needSync = false;
     if (m_externalParser)
-        m_externalParser->ReadNextSubtitle();
+        return m_externalParser->ReadNextSubtitle();
+    return -1;
 }
 
 bool SubtitleReader::HasTextSubtitles(void)
