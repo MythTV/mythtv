@@ -144,7 +144,7 @@
             "type_label": "スケジュールの種類"
         },
         "status": {
-            "backends_detail": "バックエンド: {{ Name }} は IP {{ Type }} 上の {{ Type }} です",
+            "backends_detail": "バックエンド: {{ Name }} は IP {{ Type }} 上の {{ IP }}}} です",
             "backends_none": "バックエンドなし",
             "backends_title": "バックエンド",
             "card_text": "カード: {{ CardId }}、入力: {{ Id }} は {{ InputName }}、表示名: {{ DisplayName }}",
@@ -1003,7 +1003,7 @@
             "audiocodec_label": "オーディオコーデック",
             "autotranscode_desc": "このプロファイルを使用して録画が行われ、録画のスケジュールがトランスコードを許可するように構成されている場合、自動的にトランスコードされます。",
             "autotranscode_label": "録画後の自動トランスコードを有効にする",
-            "delete_details": "これにより、グループ {{GroupName}} 内のプロファイル {{GroupName}} が削除されます。",
+            "delete_details": "これにより、グループ {{ProfileName}}}} 内のプロファイル {{GroupName}} が削除されます。",
             "delete_this": "この録音プロファイルを削除します",
             "encodingthreadcount_desc": "エンコードを実行するバックエンドのプロセッサの数以下の値に設定します。",
             "encodingthreadcount_label": "スレッド数",

@@ -144,7 +144,7 @@
             "type_label": "時間表類型"
         },
         "status": {
-            "backends_detail": "後端：{{ Name }} 是 IP {{ Type }} 上的 {{ Type }}",
+            "backends_detail": "後端：{{ Name }} 是 IP {{ Type }} 上的 {{ IP }}}}",
             "backends_none": "無後端",
             "backends_title": "後端",
             "card_text": "卡：{{ CardId }}，輸入：{{ Id }} 是 {{ InputName }}，顯示名稱：{{ DisplayName }}",
@@ -1003,7 +1003,7 @@
             "audiocodec_label": "音頻編解碼器",
             "autotranscode_desc": "使用此配置文件進行錄製並且錄製計劃配置為允許轉碼時自動轉碼。",
             "autotranscode_label": "錄製後啟用自動轉碼",
-            "delete_details": "這將刪除群組 {{GroupName}} 中的個人資料 {{GroupName}}。",
+            "delete_details": "這將刪除群組 {{ProfileName}}}} 中的個人資料 {{GroupName}}。",
             "delete_this": "刪除此錄音配置文件",
             "encodingthreadcount_desc": "設置為小於或等於將執行編碼的後端處理器數量的值。",
             "encodingthreadcount_label": "線程數",

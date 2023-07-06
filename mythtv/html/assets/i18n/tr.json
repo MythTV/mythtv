@@ -1003,7 +1003,7 @@
             "audiocodec_label": "Ses Codec'i",
             "autotranscode_desc": "Bu profil kullanılarak bir kayıt yapıldığında ve kaydın programı kod dönüştürmeye izin verecek şekilde yapılandırıldığında otomatik olarak kod dönüştürme.",
             "autotranscode_label": "Kayıttan Sonra Otomatik Kod Dönüştürmeyi Etkinleştir",
-            "delete_details": "Bu, {{GroupName}} grubundaki {{GroupName}} Profilini silecek.",
+            "delete_details": "Bu, {{ProfileName}}}} grubundaki {{GroupName}} Profilini silecek.",
             "delete_this": "Bu Kayıt Profilini Sil",
             "encodingthreadcount_desc": "Arka uçta kodlamayı yapacak işlemci sayısından küçük veya ona eşit bir değere ayarlayın.",
             "encodingthreadcount_label": "Konu Sayısı",

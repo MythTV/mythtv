@@ -596,7 +596,7 @@
             "commmethod_desc": "Muuttaa tämän kanavan tallennuksissa käytettyä kaupallisen tunnistusmenetelmän tai ohittaa havaitsemisen merkitsemällä kanavan kaupalliseksi vapaaksi.",
             "commmethod_label": "Kaupallinen tunnistusmenetelmä",
             "delete_all_details": "Tämä poistaa kaikki kanavat",
-            "delete_details": "Tämä poistaa kanavan:{{ChanNum}}, Name:{{ChanNum}}, Source:{{Source}}",
+            "delete_details": "Tämä poistaa kanavan:{{ChanNum}}, Name:{{ChannelName}}}}, Source:{{Source}}",
             "delete_message": "Kanavien poistamiseksi käytä Backend Setup Channel Editoria -ohjelmaa.",
             "delete_source": "Poista kaikki kanavat valitusta lähteestä",
             "delete_source_details": "Tämä poistaa kaikki kanavat lähteestä: {{Source}}",
