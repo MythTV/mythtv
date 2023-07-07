@@ -1386,7 +1386,7 @@ SubtitleScreen::SubtitleScreen(MythPlayer *Player, MythPainter *Painter,
 {
     m_painter = Painter;
 
-    connect(m_player, &MythPlayer::SeekingDone, [&]()
+    connect(m_player, &MythPlayer::SeekingDone, this, [&]()
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "SeekingDone signal received.");
         m_atEnd = false;
@@ -1853,9 +1853,12 @@ void SubtitleScreen::DisplayAVSubtitles(void)
     MythVideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : nullptr;
     int ret {0};
 
+    if (!currentFrame || !videoOut)
+        return;
+
     if (subs->m_buffers.empty() && (m_subreader->GetParser() != nullptr))
     {
-        if (subs->m_needSync && (currentFrame != nullptr))
+        if (subs->m_needSync)
         {
             // Seeking on a subtitle stream is a pain. The internals
             // of ff_subtitles_queue_seek() calls search_sub_ts(),
@@ -1931,9 +1934,6 @@ void SubtitleScreen::DisplayAVSubtitles(void)
         }
         lock.relock();
     }
-
-    if (!currentFrame || !videoOut)
-        return;
 
     float tmp = 0.0;
     QRect dummy;
