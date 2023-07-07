@@ -332,8 +332,8 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
     isUtf8 = (textCodec != nullptr);
 #elif QT_VERSION < QT_VERSION_CHECK(6,3,0)
     auto qba_encoding = QStringConverter::encodingForData(qba);
-    isUtf8 = qba_encoding.has_value
-        && (qba_encoding.value == QStringConverter::Utf8);
+    isUtf8 = qba_encoding.has_value()
+        && (qba_encoding.value() == QStringConverter::Utf8);
 #else
     isUtf8 = qba.isValidUtf8();
 #endif
