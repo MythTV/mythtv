@@ -2088,10 +2088,15 @@ void SchedOptMixin::Load(void)
         m_inputList->SetValueByData(m_rule->m_prefInput);
     }
 
+    bool isOverride = (m_rule->m_type != kNotRecording &&
+                        m_rule->m_type != kDontRecord &&
+                        m_rule->m_type != kOverrideRecord);
+
     // Active/Disabled
     if (m_ruleactiveCheck)
     {
         m_ruleactiveCheck->SetCheckState(!m_rule->m_isInactive);
+        m_ruleactiveCheck->SetEnabled(isOverride);
     }
 
     // Record new and repeat
@@ -2183,8 +2188,11 @@ void SchedOptMixin::RuleChanged(void)
                                    m_rule->m_dupMethod != kDupCheckNone);
     if (m_inputList)
         m_inputList->SetEnabled(isScheduled);
+    bool isOverride = (m_rule->m_type != kNotRecording &&
+                        m_rule->m_type != kDontRecord &&
+                        m_rule->m_type != kOverrideRecord);
     if (m_ruleactiveCheck)
-        m_ruleactiveCheck->SetEnabled(isScheduled);
+        m_ruleactiveCheck->SetEnabled(isOverride);
     if (m_newrepeatList)
         m_newrepeatList->SetEnabled(isScheduled && !isSingle && m_haveRepeats);
 }
