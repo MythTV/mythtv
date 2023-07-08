@@ -29,9 +29,12 @@ export class RecrulesComponent implements OnInit, SchedulerSummary {
     "Record Daily": "",
     "Record Weekly": "",
     "Override Recording": "",
+    "Do not Record": "",
     "Recording Template": "",
     "Not Recording": ""
   };
+
+  deSpacer = new RegExp(/ /g);
 
   rulesLoaded = false;
   errorCount = 0;
@@ -40,7 +43,7 @@ export class RecrulesComponent implements OnInit, SchedulerSummary {
     public utility: UtilityService) {
     // translations
     for (const [key, value] of Object.entries(this.typeValue)) {
-      const label = 'recrule.' + key.replace(' ', '');
+      const label = 'recrule.' + key.replace(this.deSpacer, '');
       this.translate.get(label).subscribe(data => {
         Object.defineProperty(this.typeValue, key, { value: data });
       });

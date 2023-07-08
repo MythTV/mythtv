@@ -2,7 +2,7 @@
     <div *ngIf="recRule">
         <p-dialog header="{{ 'dashboard.sched.heading' | translate }}" [(visible)]="displayDlg" [modal]="true"
             [style]="{height: '90vw', width: '700px'}" [closable]="false" [closeOnEscape]="false">
-            <p> {{ channel?.ChanNum }} {{ channel?.CallSign }}</p>
+            <p> {{ recRule.CallSign }}</p>
             <p> {{ utility.formatDate(recRule.StartTime) }} {{ utility.formatTime(recRule.StartTime) }} -
                 {{ utility.formatTime(recRule.EndTime )}}
             </p>
@@ -111,7 +111,8 @@
             <div class="form-group field">
                 <p-checkbox inputId="Active" [(ngModel)]="recRule.Inactive" name="Active" #Active="ngModel"
                     class="label mb-2 w-full" [binary]="true" label="{{ 'dashboard.sched.active_label' | translate }}"
-                    [trueValue]="false" [falseValue]="true">
+                    [trueValue]="false" [falseValue]="true"
+                    [disabled]="override">
                 </p-checkbox>
             </div>
 

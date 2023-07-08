@@ -67,7 +67,9 @@
             "seas_ep": "Seas Ep",
             "season": "Season",
             "subtitle": "Subtitle",
-            "title": "Title"
+            "title": "Title",
+            "edit_rule": "Edit Recording Rule",
+            "override_rule": "Add or Edit Override Rule"
         },
         "recrule": {
             "type": "Type"
@@ -347,6 +349,7 @@
         "weekHeader": "Wk"
     },
     "recrule": {
+        "DonotRecord": "Do not Record",
         "NotRecording": "Not Recording",
         "OverrideRecording": "Override Recording",
         "RecordAll": "Record All",

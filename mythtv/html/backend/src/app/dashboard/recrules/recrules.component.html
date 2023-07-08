@@ -5,7 +5,7 @@
         <ng-template pTemplate="caption">
             <button pButton pRipple label="{{ 'dashboard.recrules.new_recrule' | translate }}" icon="pi pi-plus"
                 class="p-button-success mr-2" (click)="newRecRule()"></button>
-                <button pButton pRipple label="{{ 'dashboard.recrules.new_teplate' | translate }}"
+            <button pButton pRipple label="{{ 'dashboard.recrules.new_teplate' | translate }}"
                 class="p-button-success p-button-outlined mr-2" (click)="newTemplate()" icon="pi pi-plus"></button>
         </ng-template>
         <ng-template pTemplate="header">
@@ -56,7 +56,8 @@
                 </td>
                 <td style="flex-basis: 5%" class="p-1">
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-primary"
-                        (click)="updateRecRule(recrule)"></button>
+                        (click)="updateRecRule(recrule)" pTooltip="{{ 'dashboard.recordings.edit_rule' | translate }}"
+                        tooltipPosition="left"></button>
                 </td>
             </tr>
         </ng-template>

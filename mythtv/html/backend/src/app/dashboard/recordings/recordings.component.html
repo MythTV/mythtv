@@ -4,7 +4,8 @@
     </div>
     <h2>{{ 'dashboard.recordings.heading' | translate }}</h2>
     <div class="block card w-full" style="height: 90vh" *ngIf="recordings else loading">
-        <p-slideMenu #menu [popup]="true" [model]="menuToShow" [viewportHeight]="360" [backLabel]="translate.instant('common.back')"></p-slideMenu>
+        <p-slideMenu #menu [popup]="true" [model]="menuToShow" [viewportHeight]="360"
+            [backLabel]="translate.instant('common.back')"></p-slideMenu>
         <p-table [value]="recordings.Programs" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
             [rowHover]="true" responsiveLayout="scroll">
             <ng-template pTemplate="caption">
@@ -61,7 +62,8 @@
                     <td style="flex-basis: 2%" class="p-1">
                         <i class="pi pi-eye" *ngIf="program.ProgramFlagNames.indexOf('WATCHED') > -1"></i>
                     </td>
-                    <td style="flex-basis: 18%" class="p-1 overflow-hidden">
+                    <td style="flex-basis: 18%" class="p-1 overflow-hidden" pTooltip="{{program.Description}}"
+                        tooltipPosition="top">
                         {{program.SubTitle}}</td>
                     <td style="flex-basis: 4%" class="p-1">
                         <div *ngIf="program.Season>0 || program.Episode>0"> {{program.Season}}x{{program.Episode}}
@@ -111,9 +113,8 @@
             <div class="form-group field">
                 <label for="Description" class="label block">{{ 'dashboard.recordings.description' | translate
                     }}</label>
-                <textarea pInputTextarea [rows]="5" [cols]="30" id="Description"
-                    [(ngModel)]="program.Description" name="Description" #Description="ngModel"
-                    class="mb-2 form-control w-full"></textarea>
+                <textarea pInputTextarea [rows]="5" [cols]="30" id="Description" [(ngModel)]="program.Description"
+                    name="Description" #Description="ngModel" class="mb-2 form-control w-full"></textarea>
             </div>
 
             <div class="form-group field">

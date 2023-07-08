@@ -55,6 +55,7 @@ export class ScheduleComponent implements OnInit {
   titleRows = 1;
   subTitleRows = 1;
   descriptionRows = 5;
+  override = false;
   program?: ScheduleOrProgram;
   channel?: Channel;
   recRule?: RecRule;
@@ -249,9 +250,20 @@ export class ScheduleComponent implements OnInit {
   }
 
   setupData() {
+    let newOverride = false;
     this.program = this.reqProgram;
+    let ruleType = '';
     if (this.reqRecRule)
-      this.recRule = Object.assign({}, this.reqRecRule);
+      ruleType = this.reqRecRule.Type;
+    if (this.reqRecRule) {
+      if (['Override Recording', 'Do not Record'].indexOf(ruleType) > -1 && !this.reqRecRule.Id) {
+        newOverride = true;
+        this.recRule = undefined;
+      }
+      else
+        // This works because RecRule only has elementary items.
+        this.recRule = Object.assign({}, this.reqRecRule);
+    }
     else
       this.recRule = undefined;
     this.channel = this.reqChannel;
@@ -262,12 +274,9 @@ export class ScheduleComponent implements OnInit {
 
     var recId = 0;
     this.typeList = [];
-    let ruleType: string = '';
-    if (this.reqRecRule)
-      ruleType = this.reqRecRule.Type;
     this.templates = [<RecRule>{ Id: 0, Title: '' }];
     this.defaultTemplate = undefined;
-    if (this.program && this.program.Recording)
+    if (this.program && this.program.Recording && !newOverride)
       recId = this.program.Recording.RecordId;
     this.recRules.forEach((entry, index) => {
       if (entry.Id == recId) {
@@ -296,6 +305,9 @@ export class ScheduleComponent implements OnInit {
     if (this.program && this.channel && this.recRule.SearchType == 'None')
       this.mergeProgram(this.recRule, this.program, this.channel);
 
+    if (newOverride)
+      this.recRule.ParentId = this.program!.Recording.RecordId;
+
     if (!ruleType)
       ruleType = 'Not Recording';
 
@@ -314,6 +326,10 @@ export class ScheduleComponent implements OnInit {
 
     if (!this.srchTypeDisabled)
       this.onSearchTypeChange();
+
+    if (this.override)
+      this.recRule.Inactive = false;
+
     setTimeout(() => {
       if (this.recRule)
         this.recRule.Type = ruleType;
@@ -324,6 +340,7 @@ export class ScheduleComponent implements OnInit {
   setupTypeList(recRule: RecRule) {
     let ruleType = recRule.Type;
     this.typeList.length = 0;
+    this.override = false;
     if (ruleType == 'Recording Template') {
       this.typeList.push(
         {
@@ -340,7 +357,8 @@ export class ScheduleComponent implements OnInit {
         );
       }
     }
-    else if (ruleType == 'Override Recording')
+    else if (['Override Recording', 'Do not Record'].indexOf(ruleType) > -1) {
+      this.override = true;
       this.typeList.push(
         {
           prompt: this.translate.instant('dashboard.sched.type.del_override'),
@@ -355,6 +373,7 @@ export class ScheduleComponent implements OnInit {
           value: 'Do not Record'
         }
       );
+    }
     else {
       const isManual = (recRule.SearchType == 'Manual Search');
       const isSearch = (recRule.SearchType != 'None');

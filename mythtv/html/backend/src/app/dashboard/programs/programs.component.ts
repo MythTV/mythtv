@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ScheduleLink } from 'src/app/schedule/schedule.component';
 import { DataService } from 'src/app/services/data.service';
 import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
+import { RecRule } from 'src/app/services/interfaces/recording.interface';
 
 @Component({
   selector: 'app-programs',
@@ -14,8 +15,6 @@ export class ProgramsComponent implements OnInit {
   // Usage: GUIDE, UPCOMING
   @Input() usage: string = '';
 
-  // programs!: ProgramList;
-  editingProgram?: ScheduleOrProgram;
   displayUpdateDlg = false;
   displayUnsaved = false;
   successCount = 0;
@@ -75,9 +74,17 @@ export class ProgramsComponent implements OnInit {
   }
 
   updateRecRule(program: ScheduleOrProgram) {
-    let copyProgram = Object.assign({}, program);
     if (this.inter.sched)
-      this.inter.sched.open(copyProgram);
+      this.inter.sched.open(program);
+  }
+
+  override(program: ScheduleOrProgram) {
+    if (this.inter.sched) {
+      if (program.Recording.RecType == 7) // If already an override
+        this.inter.sched.open(program);
+      else
+        this.inter.sched.open(program, undefined, <RecRule>{ Type: 'Override Recording' });
+    }
   }
 
 }

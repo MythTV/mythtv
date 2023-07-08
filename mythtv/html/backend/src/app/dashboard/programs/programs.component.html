@@ -25,6 +25,10 @@
                     {{ 'dashboard.recordings.recgrp' | translate }} </th>
                 <th style="flex-basis: 7%" class="p-1">
                     {{ 'dashboard.upcoming.status' | translate }} </th>
+                <th style="flex-basis: 2%" class="p-1" *ngIf="usage == 'UPCOMING'">
+                    <button pButton pRipple icon="pi pi-paperclip" [disabled]="true"
+                        class="p-button-text p-button-primary"></button>
+                </th>
                 <th style="flex-basis: 2%" class="p-1"> <button pButton pRipple icon="pi pi-pencil" [disabled]="true"
                         class="p-button-text p-button-primary"></button>
                 </th>
@@ -41,7 +45,8 @@
                 <td style="flex-basis: 8%" class="p-1" *ngIf="usage == 'UPCOMING'">{{program.Recording.EncoderName}}
                 </td>
                 <td style="flex-basis: 12%" class="p-1 overflow-hidden"> {{program.Title}}</td>
-                <td style="flex-basis: 18%" class="p-1 overflow-hidden">
+                <td style="flex-basis: 18%" class="p-1 overflow-hidden" pTooltip="{{program.Description}}"
+                    tooltipPosition="top">
                     {{program.SubTitle.slice(0,50)}}</td>
                 <td style="flex-basis: 4%" class="p-1">
                     <div *ngIf="program.Season>0 || program.Episode>0"> {{program.Season}}x{{program.Episode}}</div>
@@ -57,9 +62,15 @@
                         {{dataService.recStatusText[program.Recording.StatusName]}}
                     </div>
                 </td>
+                <td style="flex-basis: 2%" class="p-1" *ngIf="usage == 'UPCOMING'">
+                    <button pButton pRipple icon="pi pi-paperclip" class="p-button-text p-button-primary"
+                        (click)="override(program)" pTooltip="{{ 'dashboard.recordings.override_rule' | translate }}"
+                        tooltipPosition="left"></button>
+                </td>
                 <td style="flex-basis: 2%" class="p-1">
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-primary"
-                        (click)="updateRecRule(program)"></button>
+                        (click)="updateRecRule(program)" pTooltip="{{ 'dashboard.recordings.edit_rule' | translate }}"
+                        tooltipPosition="left" [disabled]="program.Recording && program.Recording.RecType == 7"></button>
                 </td>
             </tr>
         </ng-template>
