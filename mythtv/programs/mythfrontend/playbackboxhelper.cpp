@@ -64,9 +64,19 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
 
     QStringList::const_iterator it2 = slist.begin();
     ProgramInfo evinfo(it2, slist.end());
+    bool first {true};
+    CheckAvailabilityType firstType {};
     QSet<CheckAvailabilityType> cats;
     for (; it2 != slist.end(); ++it2)
-        cats.insert((CheckAvailabilityType)(*it2).toUInt());
+    {
+        auto type = (CheckAvailabilityType)(*it2).toUInt();
+        if (first)
+        {
+            firstType = type;
+            first = false;
+        }
+        cats.insert(type);
+    }
 
     {
         QMutexLocker locker(&m_pbh.m_lock);
@@ -119,7 +129,7 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
 
     list.clear();
     list.push_back(QString::number(evinfo.GetRecordingID()));
-    list.push_back(QString::number((int)*cats.begin()));
+    list.push_back(QString::number((int)firstType));
     list.push_back(QString::number((int)availableStatus));
     list.push_back(QString::number(evinfo.GetFilesize()));
     list.push_back(QString::number(tm.hour()));
