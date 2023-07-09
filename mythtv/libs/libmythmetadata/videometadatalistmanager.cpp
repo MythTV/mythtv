@@ -441,6 +441,8 @@ bool meta_dir_node::has_entries() const
     {
         for (const auto & subdir : m_subdirs)
         {
+            if (subdir == nullptr)
+                continue;
             ret = subdir->has_entries();
             if (ret) break;
         }
