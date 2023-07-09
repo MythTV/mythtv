@@ -913,6 +913,13 @@ bool RecordingRule::IsValid(QString &msg) const
         return false;
     }
 
+    // Inactive overrides cause errors so are disallowed.
+    if (isOverride && m_isInactive)
+    {
+        msg = QString("Invalid Inactive Override.");
+        return false;
+    }
+
     if (m_title.isEmpty())
     {
         msg = QString("Invalid title.");
