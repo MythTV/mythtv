@@ -223,4 +223,9 @@ export class DvrService {
   public ManageJobQueue(request: ManageJobQueueRequest): Observable<{int: number}> {
     return this.httpClient.post<{int: number}>('/Dvr/ManageJobQueue', request);
   }
+
+  public StopRecording(recordedId: number): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Dvr/StopRecording', {RecordedId: recordedId});
+  }
+
 }

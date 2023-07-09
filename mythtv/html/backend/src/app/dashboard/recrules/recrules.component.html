@@ -71,21 +71,21 @@
 </div>
 
 <p-dialog header="{{ 'dashboard.recordings.delete_rule' | translate }}" [(visible)]="displayDelete" [modal]="true"
-[draggable]="false" [resizable]="false">
-<h2>{{ 'settings.common.ru_sure' | translate }}</h2>
-<p>{{ 'dashboard.recordings.delete_details' |
-    translate }} <br><b> {{ recRule?.Title }}: {{ recRule?.Type }}</b></p>
-<ng-template pTemplate="footer">
-    <div class="col-12" style="text-align: left;">
-        <p-message *ngIf="errorCount > 0" severity="error"
-            text="{{ 'common.networkfail' | translate }}"></p-message>
-    </div>
-    <p-button icon="pi pi-times-circle" (onClick)="displayDelete=false"
-        label="{{ 'common.close' | translate }}" styleClass="p-button-warning">
-    </p-button>
-    <p-button icon="pi pi-check-circle" (onClick)="deleteRule(recRule!)"
-        label="{{ 'common.delete' | translate }}" styleClass="p-button-danger"></p-button>
-</ng-template>
+    [draggable]="false" [resizable]="false">
+    <h2>{{ 'settings.common.ru_sure' | translate }}</h2>
+    <p>{{ 'dashboard.recordings.delete_details' |
+        translate }} <br><b> {{ recRule?.Title }}: {{ recRule?.Type }}</b></p>
+    <ng-template pTemplate="footer">
+        <div class="col-12" style="text-align: left;">
+            <p-message *ngIf="errorCount > 0" severity="error"
+                text="{{ 'common.networkfail' | translate }}"></p-message>
+        </div>
+        <p-button icon="pi pi-times-circle" (onClick)="displayDelete=false" label="{{ 'common.close' | translate }}"
+            styleClass="p-button-warning">
+        </p-button>
+        <p-button icon="pi pi-check-circle" (onClick)="deleteRule(recRule!)" label="{{ 'common.delete' | translate }}"
+            styleClass="p-button-danger"></p-button>
+    </ng-template>
 </p-dialog>
 
 <app-schedule [inter]="inter"></app-schedule>

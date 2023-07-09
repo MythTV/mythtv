@@ -97,7 +97,7 @@ export class RecrulesComponent implements OnInit, SchedulerSummary {
           // Delete
           this.successCount++;
           this.displayDelete = false;
-          setTimeout(() => this.refresh(), 3000);
+          setTimeout(() => this.refresh(), 1000);
         }
         else if (!this.recRule.Id && x.uint) {
           // Add

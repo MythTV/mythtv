@@ -71,7 +71,9 @@
             "edit_rule": "Edit Recording Rule",
             "override_rule": "Add or Edit Override Rule",
             "delete_rule": "Delete Recording Rule",
-            "delete_details": "This will delete the Recording Rule"
+            "delete_details": "This will delete the Recording Rule",
+            "stop_recording": "Stop Recording",
+            "stop_details": "This will Stop Recording"
         },
         "recrule": {
             "type": "Type"

@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ScheduleLink } from 'src/app/schedule/schedule.component';
 import { DataService } from 'src/app/services/data.service';
+import { DvrService } from 'src/app/services/dvr.service';
 import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
 import { RecRule } from 'src/app/services/interfaces/recording.interface';
 
@@ -15,14 +16,12 @@ export class ProgramsComponent implements OnInit {
   // Usage: GUIDE, UPCOMING
   @Input() usage: string = '';
 
-  displayUpdateDlg = false;
-  displayUnsaved = false;
+  displayStop = false;
   successCount = 0;
   errorCount = 0;
-  showAllStatuses = false;
-  refreshing = false;
+  program?: ScheduleOrProgram;
 
-  constructor(public dataService: DataService) {
+  constructor(public dataService: DataService, private dvrService: DvrService) {
   }
 
   ngOnInit(): void { }
@@ -85,6 +84,32 @@ export class ProgramsComponent implements OnInit {
       else
         this.inter.sched.open(program, undefined, <RecRule>{ Type: 'Override Recording' });
     }
+  }
+
+  stopRequest(program: ScheduleOrProgram) {
+    if (program.Recording.RecordId) {
+      this.program = program;
+      this.displayStop = true;
+    }
+  }
+
+  stopRecording(program: ScheduleOrProgram) {
+    this.errorCount = 0;
+    this.dvrService.StopRecording(program.Recording.RecordedId)
+      .subscribe({
+        next: (x) => {
+          if (x.bool) {
+            this.displayStop = false;
+            setTimeout(() => this.inter.summaryComponent.refresh(), 3000);
+          }
+          else
+            this.errorCount++;
+        },
+        error: (err) => {
+          this.errorCount++;
+        }
+
+      });
   }
 
 }
