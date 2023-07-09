@@ -74,8 +74,7 @@
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-text"
                         (click)="editChannel(channel)" [disabled]="channel.ChanId < 0
                         || (setupService.pageType == 'S' && setupService.schedulingEnabled)"
-                        pTooltip="{{ 'settings.chanedit.updatechan' | translate }}"
-                        tooltipPosition="left"></button>
+                        pTooltip="{{ 'settings.chanedit.editchan' | translate }}" tooltipPosition="left"></button>
                     <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
                         *ngIf="setupService.pageType == 'S'" (click)="deleteRequest(channel)"
                         pTooltip="{{ 'settings.chanedit.deletechan' | translate }}"

@@ -69,7 +69,9 @@
             "subtitle": "Subtitle",
             "title": "Title",
             "edit_rule": "Edit Recording Rule",
-            "override_rule": "Add or Edit Override Rule"
+            "override_rule": "Add or Edit Override Rule",
+            "delete_rule": "Delete Recording Rule",
+            "delete_details": "This will delete the Recording Rule"
         },
         "recrule": {
             "type": "Type"
@@ -644,7 +646,7 @@
             "timeoffset_label": "Listings Time Offset",
             "title": "Channel Editor",
             "unassigned": "(Unassigned)",
-            "updatechan": "Update Channel",
+            "editchan": "Edit Channel",
             "visible": "Visible",
             "visible_desc": "If set to Always Visible or Visible, the channel will be visible in the EPG.  Set to Always Visible or Never Visible to prevent MythTV and other utilities from automatically managing the value for this channel..",
             "visible_label": "Visibility",
