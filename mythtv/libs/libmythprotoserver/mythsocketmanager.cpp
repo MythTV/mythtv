@@ -65,10 +65,11 @@ MythSocketManager::~MythSocketManager()
     m_handlerMap.clear();
 
     QMutexLocker locker(&m_socketListLock);
-    while (!m_socketList.empty())
+    for (auto iter = m_socketList.begin();
+         iter != m_socketList.end();
+         iter = m_socketList.erase(iter))
     {
-        (*m_socketList.begin())->DecrRef();
-        m_socketList.erase(m_socketList.begin());
+        (*iter)->DecrRef();
     }
 }
 
