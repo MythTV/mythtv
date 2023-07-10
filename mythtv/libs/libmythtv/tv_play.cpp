@@ -9275,7 +9275,7 @@ void TV::FillOSDMenuJumpRec(const QString &Category, int Level, const QString &S
             auto progIndex = static_cast<uint>(plist.size());
             const QString& group = Iprog.key();
 
-            if (plist[0]->GetRecordingGroup() != currecgroup)
+            if (plist[0] && (plist[0]->GetRecordingGroup() != currecgroup))
                 SetLastProgram(plist[0]);
 
             if (progIndex == 1 && Level == 0)
