@@ -2469,14 +2469,14 @@ bool ChannelScanSM::ScanIPTVChannels(uint sourceid,
 bool ChannelScanSM::ScanTransportsStartingOn(
     int sourceid, const QMap<QString,QString> &startChan)
 {
-    if (startChan.find("std")  == startChan.end() ||
-        startChan.find("type") == startChan.end())
-    {
+    auto iter = startChan.find("type");
+    if (iter == startChan.end())
         return false;
-    }
+    iter = startChan.find("std");
+    if (iter == startChan.end())
+        return false;
 
-    QString std    = *startChan.find("std");
-    QString si_std = (std.toLower() != "atsc") ? "dvb" : "atsc";
+    QString si_std = ((*iter).toLower() != "atsc") ? "dvb" : "atsc";
     bool    ok     = false;
 
     if (m_scanning)
