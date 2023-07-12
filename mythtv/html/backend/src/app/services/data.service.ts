@@ -55,8 +55,12 @@ export class DataService {
         }
     }
 
-
     toggleShowSidebar() {
         this.m_showSidebar = !this.m_showSidebar;
     }
+
+    showSidebar(x: boolean) {
+        this.m_showSidebar = x;
+    }
+
 }

@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -11,7 +11,8 @@ import { SetupService } from 'src/app/services/setup.service';
 @Component({
   selector: 'app-system-events',
   templateUrl: './system-events.component.html',
-  styleUrls: ['./system-events.component.css']
+  styleUrls: ['./system-events.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 
 export class SystemEventsComponent implements OnInit {

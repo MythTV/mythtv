@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -16,7 +16,8 @@ interface CardTypeExt extends CardType {
 @Component({
   selector: 'app-capture-cards',
   templateUrl: './capture-cards.component.html',
-  styleUrls: ['./capture-cards.component.css']
+  styleUrls: ['./capture-cards.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
 

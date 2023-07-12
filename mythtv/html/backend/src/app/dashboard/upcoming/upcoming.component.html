@@ -1,4 +1,4 @@
-<div class="ml-3 mr-3">
+<div>
     <div style="white-space: 'pre-line';">
         <p-toast position="center"></p-toast>
     </div>
@@ -11,7 +11,7 @@
             </p-checkbox>
             &nbsp;&nbsp;&nbsp;
             <div *ngIf="refreshing else refreshBn"><p-progressSpinner
-                    [style]="{width: '30px', height: '30px'}"></p-progressSpinner></div>
+                    [style]="{width: '2rem', height: '2rem'}"></p-progressSpinner></div>
             <ng-template #refreshBn>
                 <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
                     (click)="refreshing=true;refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>

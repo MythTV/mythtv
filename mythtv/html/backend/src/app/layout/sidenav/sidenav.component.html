@@ -7,7 +7,7 @@
                 <div class="mt-1 select-none">
                     <ul class="list-none p-3 lg:py-3 lg:px-2 m-0">
                         <li [routerLink]="'dashboard/status'" pTooltip="{{ 'navbar.dashboard' | translate }}"
-                            [tooltipDisabled]="dataService.m_showSidebar === false">
+                            [tooltipDisabled]="dataService.m_showSidebar === false" (click)="dataService.showSidebar(true)">
                             <a pRipple
                                 class="p-ripple p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center
                                 hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
@@ -17,7 +17,7 @@
                             </a>
                         </li>
                         <li [routerLink]="'setupwizard/dbsetup'" pTooltip="{{ 'navbar.backendSetup' | translate }}"
-                            [tooltipDisabled]="dataService.m_showSidebar === false">
+                            [tooltipDisabled]="dataService.m_showSidebar === false" (click)="dataService.showSidebar(true)">
                             <a pRipple class="p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800
                                 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
                                 <i class="pi pi-cog mr-2 lg:mr-0 text-base lg:text-xl"></i>
@@ -27,7 +27,7 @@
                             </a>
                         </li>
                         <li [routerLink]="'dashboard/program-guide'" pTooltip="{{ 'dashboard.programguide' | translate }}"
-                            [tooltipDisabled]="dataService.m_showSidebar === false">
+                            [tooltipDisabled]="dataService.m_showSidebar === false" (click)="dataService.showSidebar(true)">
                             <a pRipple class="p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800
                                 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
                                 <i class="pi pi-map mr-2 lg:mr-0 text-base lg:text-xl"></i>
@@ -39,7 +39,7 @@
                 </div>
             </div>
         </div>
-        <div class="contentarea px-3 w-full">
+        <div class="contentarea px-0 lg:px-3 w-full">
             <router-outlet></router-outlet>
         </div>
     </div>

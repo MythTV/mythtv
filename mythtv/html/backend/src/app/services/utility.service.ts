@@ -5,14 +5,19 @@ import { Injectable } from '@angular/core';
 })
 export class UtilityService {
 
+  allSlashes = new RegExp(/\//g);
+
   constructor() { }
 
-  formatDate(date: string): string {
+  formatDate(date: string, innerHtml?: boolean): string {
     if (!date)
       return '';
     if (date.length == 10)
       date = date + ' 00:00';
-    return new Date(date).toLocaleDateString()
+    let x = new Date(date).toLocaleDateString();
+    if (innerHtml)
+      return x.replace(this.allSlashes, '/<wbr>');
+    return x;
   }
 
   formatTime(date: string): string {

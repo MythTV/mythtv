@@ -1,5 +1,5 @@
-<form class="ml-3 mr-3" name="hostaddress" #hostaddress="ngForm">
-    <p-card class="m-5">
+<form class="mx-0 md:mx-3" name="hostaddress" #hostaddress="ngForm">
+    <p-card class="m-0 md:m-5">
         <ng-template pTemplate="title">
             {{ 'settings.hostaddress.title' | translate }}
         </ng-template>
@@ -139,7 +139,7 @@
                                 {{ 'settings.hostaddress.primaryip_label' | translate }}
                             </label>
                             <p-dropdown [options]="m_IPsAll " [(ngModel)]="m_HostAddressData.BackendServerAddr"
-                                [editable]="true" class="block w-15rem mb-2" name="BackendServerAddr"
+                                [editable]="true" class="block mb-2 w-full" name="BackendServerAddr"
                                 #BackendServerAddr="ngModel" aria-describedby="BackendServerAddr-help">
                             </p-dropdown>
                             <small class="block w-full" id="BackendServerAddr-help">

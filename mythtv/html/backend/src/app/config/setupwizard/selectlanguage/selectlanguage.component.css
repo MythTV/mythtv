@@ -2,3 +2,14 @@
     display: flex;
     align-items: center;
 }
+@media screen and (max-width: 48rem) {
+    .p-card-body {
+        padding: 0rem !important;
+    }
+    .p-card-content {
+        padding: 0rem !important;
+    }
+    .p-accordion-content {
+        padding: 0rem !important;
+    }
+}

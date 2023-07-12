@@ -1,12 +1,10 @@
 <div class="flex flex-column relative flex-auto">
     <div class="toolbar flex justify-content-between align-items-center pm-8 surface-section relative lg:static  surface-border"
-        style="height: 80px;">
+        style="height: 80px;" *ngIf="showTopBar else hidden">
         <div class="toolbar flex align-items-left flex-shrink-0" style="height: 80px;">
-            <a pRipple
-                class="p-ripple p-element my-3 mx-1 flex align-items-center cursor-pointer p-3 lg:hidden lg:justify-content-center
+            <a pRipple class="p-ripple p-element my-3 mx-1 flex align-items-center cursor-pointer p-3 lg:hidden lg:justify-content-center
                  hover:bg-gray-800 border-round text-300 hover:text-0
-                transition-duration-150 transition-colors"
-                (click)="toggleShowSidebar()">
+                transition-duration-150 transition-colors" (click)="toggleShowSidebar()">
                 <i class="pi pi-bars mr-1 lg:ml-1 text-base lg:text-xl "></i>
                 <span class="p-ink" ng serve></span>
             </a>
@@ -15,10 +13,12 @@
                 <h1>{{ 'navbar.mainheading' | translate }}</h1>
             </div>
         </div>
-        <div class="toolbar flex-grow-1" style="height: 80px;"></div>
+        <div class="toolbar flex flex-grow-1 align-items-end" style="height: 80px;">
+            <button pButton pRipple icon="pi pi-angle-up" class="p-button-text lg:col-offset-3 p-button-secondary"
+                (click)="showTopBar=false" pTooltip="{{ 'navbar.hide' | translate }}"></button>
+        </div>
         <div class="pr-2 toolbar" style="height: 80px;">
-            <a pRipple style="height: 80px;"
-                class="toolbar p-ripple p-element my-2 mx-2 flex align-items-center cursor-pointer p-3 md:hidden md:justify-content-center
+            <a pRipple style="height: 80px;" class="toolbar p-ripple p-element my-2 mx-2 flex align-items-center cursor-pointer p-3 md:hidden md:justify-content-center
                  hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors"
                 (click)="toggleShowNavbar()">
                 <i class="pi pi-ellipsis-v mr-1 md:mr-0 text-base md:text-xl "></i>
@@ -56,6 +56,14 @@
             </ul>
         </div>
     </div>
+
+    <ng-template #hidden>
+        <div class="toolbar block flex flex-grow-1 justify-content-center align-items-end " style="height: 2rem;">
+            <button pButton pRipple icon="pi pi-angle-down" class="p-button-text p-button-secondary"
+                (click)="showTopBar=true" pTooltip="{{ 'navbar.show' | translate }}"></button>
+        </div>
+    </ng-template>
+
 </div>
 
 <p-overlayPanel #themePanel [showCloseIcon]="true" [style]="{width: '350px'}">

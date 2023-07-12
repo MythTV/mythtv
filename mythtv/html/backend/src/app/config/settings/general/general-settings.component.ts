@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -10,7 +10,8 @@ import { SetupService } from 'src/app/services/setup.service';
 @Component({
     selector: 'app-general-settings',
     templateUrl: './general-settings.component.html',
-    styleUrls: ['./general-settings.component.css']
+    styleUrls: ['./general-settings.component.css'],
+    encapsulation: ViewEncapsulation.None,
 })
 export class SettingsComponent implements OnInit, CanComponentDeactivate {
 

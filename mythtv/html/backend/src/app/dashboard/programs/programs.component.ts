@@ -4,6 +4,7 @@ import { DataService } from 'src/app/services/data.service';
 import { DvrService } from 'src/app/services/dvr.service';
 import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
 import { RecRule } from 'src/app/services/interfaces/recording.interface';
+import { UtilityService } from 'src/app/services/utility.service';
 
 @Component({
   selector: 'app-programs',
@@ -21,7 +22,8 @@ export class ProgramsComponent implements OnInit {
   errorCount = 0;
   program?: ScheduleOrProgram;
 
-  constructor(public dataService: DataService, private dvrService: DvrService) {
+  constructor(public dataService: DataService, private dvrService: DvrService,
+    private utility: UtilityService) {
   }
 
   ngOnInit(): void { }
@@ -29,19 +31,19 @@ export class ProgramsComponent implements OnInit {
   formatStartDate(program: ScheduleOrProgram): string {
     let starttm;
     if (this.usage == 'UPCOMING') {
-      starttm = new Date(program.Recording.StartTs).getTime();
+      starttm = program.Recording.StartTs;
     }
     else {
-      starttm = new Date(program.StartTime).getTime();
+      starttm = program.StartTime;
     }
-    return new Date(starttm).toLocaleDateString()
+    return this.utility.formatDate(starttm, true);
   }
 
   formatAirDate(program: ScheduleOrProgram): string {
     if (!program.Airdate)
       return '';
     let date = program.Airdate + ' 00:00';
-    return new Date(date).toLocaleDateString()
+    return this.utility.formatDate(date, true);
   }
 
 

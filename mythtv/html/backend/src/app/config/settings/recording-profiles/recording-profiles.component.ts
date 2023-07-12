@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
@@ -11,7 +11,8 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-recording-profiles',
   templateUrl: './recording-profiles.component.html',
-  styleUrls: ['./recording-profiles.component.css']
+  styleUrls: ['./recording-profiles.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class RecordingProfilesComponent implements OnInit {
 
