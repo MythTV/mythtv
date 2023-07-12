@@ -73,7 +73,7 @@ def doCheckTranslations(us_flat, code, filename, desc):
     dest_dict = json.load(dest_f)
     dest_f.close()
 
-    dest_flat = flatten(dest_dict)
+    dest_flat = flatten(dest_dict, reducer='dot')
 
     for key, value in us_flat.items():
         destString = dest_flat.get(key)
@@ -86,7 +86,7 @@ def doCheckTranslations(us_flat, code, filename, desc):
             print("Updating empty string '%s' -> '%s'" % (value, destString))
             dest_flat[key] = destString
 
-    dest_dict = unflatten(dest_flat)
+    dest_dict = unflatten(dest_flat, splitter='dot')
 
     # save to destination file
     with open(translation_dir + filename, mode="w", encoding="utf8") as outfile:
@@ -98,12 +98,12 @@ def checkTranslations():
 
     # re-open sorted US source file
     us_code, us_filename, us_desc = US_LANG
-    print("Opening source US language %s from %s" % (us_desc, us_filename))
+    print("Re-opening sorted source US language %s from %s" % (us_desc, us_filename))
     us_f = open(translation_dir + us_filename)
     us_dict = json.load(us_f)
     us_f.close()
 
-    us_flat =flatten(us_dict)
+    us_flat = flatten(us_dict, reducer='dot')
 
     # loop through all the language files
     for dest_code, dest_filename, dest_desc in DEST_LANGS:
@@ -177,15 +177,6 @@ def sortUSTrans():
 
     print("%s translation sorted and saved OK" % src_desc)
 
-def createTupleKey(keys):
-    keylist = keys.split('.')
-
-    t = ()
-    for key in keylist:
-        t = t + (key,)
-
-    return t
-
 def doAddString(code, filename, desc, key, value):
     # open language file
     print("\nOpening file for language %s from %s" % (desc, filename))
@@ -193,12 +184,11 @@ def doAddString(code, filename, desc, key, value):
     src_dict = json.load(src_f)
     src_f.close()
 
-    d =flatten(src_dict)
-    t = createTupleKey(key)
+    d = flatten(src_dict, reducer='dot')
 
-    d[t] = value
+    d[key] = value
 
-    src_dict = unflatten(d)
+    src_dict = unflatten(d, splitter='dot')
 
     # save to destination file
     with open(translation_dir + filename, mode="w", encoding="utf8") as outfile:
@@ -226,16 +216,19 @@ def doAmendString(code, filename, desc, key, value):
     src_dict = json.load(src_f)
     src_f.close()
 
-    d =flatten(src_dict)
-    t = createTupleKey(key)
+    d = flatten(src_dict, reducer='dot')
 
-    oldValue = d.get(t, "*NONE*")
+    oldValue = d.get(key)
+
+    if oldValue == None:
+        print("ERROR: key not found '%s'. Aborting!" % key)
+        return
 
     print("Changing string from '%s' to '%s'" % (oldValue, value))
 
-    d[t] = value
+    d[key] = value
 
-    src_dict = unflatten(d)
+    src_dict = unflatten(d, splitter='dot')
 
     # save to destination file
     with open(translation_dir + filename, mode="w", encoding="utf8") as outfile:
@@ -262,20 +255,23 @@ def doRemoveString(code, filename, desc, key):
     src_dict = json.load(src_f)
     src_f.close()
 
-    d = flatten(src_dict)
+    d = flatten(src_dict, reducer='dot')
 
-    t = createTupleKey(key)
+    # check the key exists
+    if d.get(key) == None:
+        print("WARNING: key '%s' not found. Nothing to remove!")
+        return
 
-    if isinstance(d[t], str):
-        print("Removing string: %s" % d[t])
-        del d[t]
-    elif isinstance(d[t], dict):
+    if isinstance(d[key], str):
+        print("Removing string: %s" % d[key])
+        del d[key]
+    elif isinstance(d[key], dict):
         # only delete the dict if it is empty
-        if len(d[t]) == 0:
+        if len(d[key]) == 0:
             print("Removing empty dict with key: %s" % key)
-            del d[t]
+            del d[key]
 
-    src_dict = unflatten(d)
+    src_dict = unflatten(d, splitter='dot')
 
     # save to destination file
     with open(translation_dir + filename, mode="w", encoding="utf8") as outfile:
@@ -301,7 +297,7 @@ def doFixTemplates(us_flat, code, filename, desc):
     src_dict = json.load(src_f)
     src_f.close()
 
-    d =flatten(src_dict)
+    d = flatten(src_dict)
 
     # loop through the US dictionary looking for templates
     for key, value in us_flat.items():
@@ -378,7 +374,7 @@ def listKeys(lang):
     src_dict = json.load(src_f)
     src_f.close()
 
-    d =flatten(src_dict, reducer='dot')
+    d = flatten(src_dict, reducer='dot')
 
     for key, value in d.items():
         print("{:<50} {:<100}".format(key, str(value)))
@@ -441,19 +437,19 @@ if __name__ == '__main__':
     parser.add_option('-c', "--amend", action="store_true", default=False,
                       dest="amend", help="Amend the strings in all translation files for the give key. Needs key and value.")
     parser.add_option('-l', "--listkeys", action="store_true", default=False,
-                      dest="listkeys", help="List all keys and strings from a language file. [default: 'en_US'")
+                      dest="listkeys", help="List all keys and strings from a language file. [default: 'en_US'].")
     parser.add_option('-i', "--listlanguages", action="store_true", default=False,
                       dest="listlangs", help="List all supported languages")
     parser.add_option('-L', "--language", metavar="LANGUAGE", default=None,
-                      dest="language", help="The language to show key/values for.")
+                      dest="language", help="The language to show keys/values for.")
     parser.add_option('-k','--key', metavar="KEY", default=None,
-                      dest="key", help=("The key used by add/remove/amend options"))
+                      dest="key", help=("The key used by add/remove/amend options."))
     parser.add_option('-v','--value', metavar="VALUE", default=None,
-                      dest="value", help=("The value used by add option"))
+                      dest="value", help=("The string value used by add/amend option."))
     parser.add_option('-d','--datadir', metavar="DIR", default=None,
-                      dest="datadir", help=("The location of the JSON language files.[default: '" + translation_dir + "'"))
+                      dest="datadir", help=("The location of the JSON language files. [default: '" + translation_dir + "']"))
     parser.add_option('-f','--fixtemplates', action="store_true", default=None,
-                      dest="fixtemplates", help=("Check all languages files for broken template string."))
+                      dest="fixtemplates", help=("Check all language files for broken template strings."))
     opts, args = parser.parse_args()
 
     if opts.datadir:
