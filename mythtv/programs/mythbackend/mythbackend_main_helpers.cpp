@@ -640,6 +640,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
                 sched->SetExpirer(gExpirer);
         }
         gCoreContext->SetScheduler(sched);
+        ChannelGroup::UpdateChannelGroups();
     }
 
     if (!cmdline.toBool("nohousekeeper"))
