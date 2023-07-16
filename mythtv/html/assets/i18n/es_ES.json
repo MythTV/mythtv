@@ -8,6 +8,11 @@
         "default": "Por defecto",
         "delete": "Borrar",
         "failed": "Fallido",
+        "filter": {
+            "contains": "Contiene",
+            "equals": "Coincidencia exacta",
+            "startswith": "Comienza con"
+        },
         "help": "Ayuda",
         "instructions": "Instrucciones",
         "loading": "Cargando",

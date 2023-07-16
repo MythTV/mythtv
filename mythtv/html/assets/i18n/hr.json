@@ -8,6 +8,11 @@
         "default": "Zadano",
         "delete": "Izbrisati",
         "failed": "Neuspjeh",
+        "filter": {
+            "contains": "Sadrži",
+            "equals": "Točno podudaranje",
+            "startswith": "Počinje sa"
+        },
         "help": "Pomozite",
         "instructions": "upute",
         "loading": "Učitavam",

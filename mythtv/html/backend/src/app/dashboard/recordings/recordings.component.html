@@ -1,28 +1,29 @@
 <form name="recsform" #recsform="ngForm">
+
     <div style="white-space: 'pre-line';">
         <p-toast position="center"></p-toast>
     </div>
+
     <h2>{{ 'dashboard.recordings.heading' | translate }}</h2>
-    <div class="block card w-full" style="height: 90vh" *ngIf="recordings else loading">
+    <div class="block card w-full" style="height: 90vh">
+
         <p-slideMenu #menu [popup]="true" [model]="menuToShow" [viewportHeight]="360"
             [backLabel]="translate.instant('common.back')"></p-slideMenu>
-        <p-table [value]="recordings.Programs" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
-            [rowHover]="true" responsiveLayout="scroll">
+
+        <p-table [value]="programs" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
+            [virtualScroll]="true" [rows]="50" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true">
             <ng-template pTemplate="caption">
             </ng-template>
             <ng-template pTemplate="header">
                 <tr>
                     <th>{{ 'dashboard.recordings.filter' | translate }}: &nbsp;&nbsp; {{ 'dashboard.recordings.title' |
-                        translate }}: &nbsp; <p-columnFilter type="text" field="Title"></p-columnFilter>
+                        translate }}: &nbsp; <p-columnFilter type="text" field="Title"
+                            [matchModeOptions]="matchModeTitle"></p-columnFilter>
                         {{ 'dashboard.recordings.recgrp' | translate }}: &nbsp; <p-columnFilter type="text"
-                            field="Recording.RecGroup"></p-columnFilter>
-                        <div *ngIf="refreshing else refreshBn"><p-progressSpinner
-                                [style]="{width: '30px', height: '30px'}"></p-progressSpinner></div>
-                        <ng-template #refreshBn>
-                            <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
-                                (click)="refreshing=true;loadRecordings()"
-                                pTooltip="{{ 'common.refresh' | translate }}"></button>
-                        </ng-template>
+                            [matchModeOptions]="matchModeRecGrp" field="Recording.RecGroup"></p-columnFilter>
+                        <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
+                            (click)="refreshing=true;refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
+                        &nbsp;&nbsp;&nbsp;{{ programs.length }} Rows
                     </th>
                 </tr>
                 <tr>
@@ -170,7 +171,4 @@
         </p-dialog>
 
     </div>
-    <ng-template #loading>
-        <p-progressSpinner></p-progressSpinner>
-    </ng-template>
 </form>

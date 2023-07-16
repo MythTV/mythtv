@@ -8,6 +8,11 @@
         "default": "Standard",
         "delete": "Radera",
         "failed": "Misslyckades",
+        "filter": {
+            "contains": "Innehåller",
+            "equals": "Exakt matchning",
+            "startswith": "Börjar med"
+        },
         "help": "Hjälp",
         "instructions": "Instruktioner",
         "loading": "Läser in",

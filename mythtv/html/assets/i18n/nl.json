@@ -8,6 +8,11 @@
         "default": "Standaard",
         "delete": "Verwijderen",
         "failed": "Mislukt",
+        "filter": {
+            "contains": "Bevat",
+            "equals": "Exacte overeenkomst",
+            "startswith": "Begint met"
+        },
         "help": "Hulp",
         "instructions": "Instructies",
         "loading": "Bezig met laden",

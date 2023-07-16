@@ -8,6 +8,11 @@
         "default": "По умолчанию",
         "delete": "Удалить",
         "failed": "Неуспешный",
+        "filter": {
+            "contains": "Содержит",
+            "equals": "Полное совпадение",
+            "startswith": "Начинается с"
+        },
         "help": "Помощь",
         "instructions": "инструкции",
         "loading": "Загрузка",

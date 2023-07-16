@@ -8,6 +8,11 @@
         "default": "デフォルト",
         "delete": "消去",
         "failed": "失敗した",
+        "filter": {
+            "contains": "含まれています",
+            "equals": "完全に一致",
+            "startswith": "で始まる"
+        },
         "help": "助けて",
         "instructions": "手順",
         "loading": "読み込み中",

@@ -8,6 +8,11 @@
         "default": "Sjálfgefið",
         "delete": "Eyða",
         "failed": "Mistókst",
+        "filter": {
+            "contains": "Inniheldur",
+            "equals": "Nákvæm samsvörun",
+            "startswith": "Byrjar með"
+        },
         "help": "Aiuto",
         "instructions": "Leiðbeiningar",
         "loading": "Caricamento in corso",

@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { MenuItem, MessageService } from 'primeng/api';
+import { FilterMatchMode, LazyLoadEvent, MenuItem, MessageService, SelectItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { PartialObserver } from 'rxjs';
 import { DvrService } from 'src/app/services/dvr.service';
-import { UpdateRecordedMetadataRequest } from 'src/app/services/interfaces/dvr.interface';
+import { GetRecordedListRequest, UpdateRecordedMetadataRequest } from 'src/app/services/interfaces/dvr.interface';
 import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
 import { ProgramList } from 'src/app/services/interfaces/program.interface';
 import { JobQCommands } from 'src/app/services/interfaces/setup.interface';
@@ -24,6 +24,8 @@ export class RecordingsComponent implements OnInit {
   @ViewChild("menu") menu!: Menu;
 
   recordings!: ProgramList;
+  programs: ScheduleOrProgram[] = [];
+  lazyLoadEvent!: LazyLoadEvent;
   JobQCmds!: JobQCommands;
   program: ScheduleOrProgram = <ScheduleOrProgram>{ Title: '' };
   editingProgram?: ScheduleOrProgram;
@@ -67,10 +69,29 @@ export class RecordingsComponent implements OnInit {
 
   menuToShow: MenuItem[] = [];
 
+  matchModeRecGrp: SelectItem[] = [{
+    value: FilterMatchMode.EQUALS,
+    label: 'common.filter.equals'
+  }];
+
+  matchModeTitle: SelectItem[] = [{
+    value: FilterMatchMode.STARTS_WITH,
+    label: 'common.filter.startswith',
+  },
+  {
+    value: FilterMatchMode.CONTAINS,
+    label: 'common.filter.contains',
+  },
+  {
+    value: FilterMatchMode.EQUALS,
+    label: 'common.filter.equals',
+  }
+  ];
+
+
   constructor(private dvrService: DvrService, private messageService: MessageService,
     public translate: TranslateService, private setupService: SetupService,
     public utility: UtilityService) {
-    this.loadRecordings();
     this.JobQCmds = this.setupService.getJobQCommands();
 
     // translations
@@ -82,7 +103,7 @@ export class RecordingsComponent implements OnInit {
 
     const mnu_entries = [this.mnu_delete, this.mnu_delete_rerec, this.mnu_undelete, this.mnu_rerec, this.mnu_markwatched,
     this.mnu_markunwatched, this.mnu_updatemeta, this.mnu_updaterecrule, this.mnu_stoprec, this.mnu_runjobs,
-    this.jobs[0], this.jobs[1], this.jobs[2]]
+    this.jobs[0], this.jobs[1], this.jobs[2], ...this.matchModeRecGrp, ...this.matchModeTitle]
 
     mnu_entries.forEach(entry => {
       if (entry.label)
@@ -92,13 +113,62 @@ export class RecordingsComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+  }
 
-  loadRecordings() {
-    this.dvrService.GetRecordedList({}).subscribe(data => {
+  loadLazy(event: LazyLoadEvent) {
+    this.lazyLoadEvent = event;
+    let request: GetRecordedListRequest = {
+      StartIndex: 0,
+      Count: 1
+    };
+    if (event.first)
+      request.StartIndex = event.first;
+    if (event.rows)
+      request.Count = event.rows;
+    if (event.sortField) {
+      request.Sort = event.sortField
+      if (event.sortField == 'Airdate')
+        request.Sort = 'originalairdate';
+      else if (event.sortField == 'Recording.RecGroup')
+        request.Sort = 'recgroup';
+      else
+        request.Sort = event.sortField;
+      if (event.sortOrder)
+        request.Sort = request.Sort + (event.sortOrder > 0 ? 'asc' : 'desc');
+    }
+    if (event.filters) {
+      if (event.filters.Title.value) {
+        switch (event.filters.Title.matchMode) {
+          case FilterMatchMode.STARTS_WITH:
+            request.TitleRegEx = '^' + event.filters.Title.value;
+            break;
+          case FilterMatchMode.CONTAINS:
+            request.TitleRegEx = event.filters.Title.value;
+            break;
+          case FilterMatchMode.EQUALS:
+            request.TitleRegEx = '^' + event.filters.Title.value + '$';
+            break;
+        }
+      }
+      if (event.filters['Recording.RecGroup'].value) {
+        if (event.filters['Recording.RecGroup'].matchMode == FilterMatchMode.EQUALS)
+          request.RecGroup = event.filters['Recording.RecGroup'].value;
+      }
+    }
+    this.dvrService.GetRecordedList(request).subscribe(data => {
       this.recordings = data.ProgramList;
+      this.programs.length = data.ProgramList.TotalAvailable;
+      // populate page of virtual programs
+      this.programs.splice(request.StartIndex!, request.Count!, ...this.recordings.Programs);
+      // notify of change
+      this.programs = [...this.programs]
       this.refreshing = false;
     });
+  }
+
+  refresh() {
+    this.loadLazy(this.lazyLoadEvent);
   }
 
   getDuration(program: ScheduleOrProgram): number {

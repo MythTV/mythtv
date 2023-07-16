@@ -8,6 +8,11 @@
         "default": "Varsayılan",
         "delete": "Silmek",
         "failed": "Arızalı",
+        "filter": {
+            "contains": "içerir",
+            "equals": "Tam eşleşme",
+            "startswith": "İle başlar"
+        },
         "help": "Yardım",
         "instructions": "Talimatlar",
         "loading": "Yükleniyor",

@@ -8,6 +8,11 @@
         "default": "Misligholde",
         "delete": "Slett",
         "failed": "Mislyktes",
+        "filter": {
+            "contains": "Inneholder",
+            "equals": "Nøyaktig treff",
+            "startswith": "Begynner med"
+        },
         "help": "Hjelp",
         "instructions": "Bruksanvisning",
         "loading": "Laster",

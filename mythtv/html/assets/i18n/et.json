@@ -8,6 +8,11 @@
         "default": "Vaikimisi",
         "delete": "Kustuta",
         "failed": "Ebaõnnestunud",
+        "filter": {
+            "contains": "Sisaldab",
+            "equals": "Täpne vaste",
+            "startswith": "Alustab"
+        },
         "help": "ABI",
         "instructions": "Juhised",
         "loading": "Laadimine",

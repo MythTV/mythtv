@@ -8,6 +8,11 @@
         "default": "Standard",
         "delete": "Löschen",
         "failed": "Fehlgeschlagen",
+        "filter": {
+            "contains": "Enthält",
+            "equals": "Genaue Übereinstimmung",
+            "startswith": "Beginnt mit"
+        },
         "help": "Hilfe",
         "instructions": "Anweisungen",
         "loading": "Wird geladen",

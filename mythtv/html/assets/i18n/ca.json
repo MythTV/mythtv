@@ -8,6 +8,11 @@
         "default": "Per defecte",
         "delete": "Suprimeix",
         "failed": "Fracassat",
+        "filter": {
+            "contains": "Conté",
+            "equals": "Coincidència exacta",
+            "startswith": "Comença amb"
+        },
         "help": "Ajuda",
         "instructions": "Instruccions",
         "loading": "Carregant",

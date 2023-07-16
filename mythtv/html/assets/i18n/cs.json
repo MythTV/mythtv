@@ -8,6 +8,11 @@
         "default": "Výchozí",
         "delete": "Vymazat",
         "failed": "Nepodařilo se",
+        "filter": {
+            "contains": "Obsahuje",
+            "equals": "Přesná shoda",
+            "startswith": "Začíná s"
+        },
         "help": "Pomoc",
         "instructions": "Instrukce",
         "loading": "načítání",

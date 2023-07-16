@@ -8,6 +8,11 @@
         "default": "בְּרִירַת מֶחדָל",
         "delete": "לִמְחוֹק",
         "failed": "נִכשָׁל",
+        "filter": {
+            "contains": "מכיל",
+            "equals": "התאמה מדוייקת",
+            "startswith": "מתחיל עם"
+        },
         "help": "עזרה",
         "instructions": "הוראות",
         "loading": "טעינה",

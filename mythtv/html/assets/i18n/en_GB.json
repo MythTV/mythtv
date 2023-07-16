@@ -8,6 +8,11 @@
         "default": "Default",
         "delete": "Delete",
         "failed": "Failed",
+        "filter": {
+            "contains": "Contains",
+            "equals": "Exact Match",
+            "startswith": "Starts With"
+        },
         "help": "Help",
         "instructions": "Instructions",
         "loading": "Loading",

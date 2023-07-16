@@ -8,6 +8,11 @@
         "default": "Privzeto",
         "delete": "Izbriši",
         "failed": "Ni uspelo",
+        "filter": {
+            "contains": "Vsebuje",
+            "equals": "Natančno ujemanje",
+            "startswith": "Začne se z"
+        },
         "help": "pomoč",
         "instructions": "Navodila",
         "loading": "nalaganje",

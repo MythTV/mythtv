@@ -8,6 +8,11 @@
         "default": "Προκαθορισμένο",
         "delete": "Διαγράφω",
         "failed": "Απέτυχε",
+        "filter": {
+            "contains": "Περιέχει",
+            "equals": "Ακριβής αντιστοιχία",
+            "startswith": "Ξεκινάει με"
+        },
         "help": "Βοήθεια",
         "instructions": "Οδηγίες",
         "loading": "Φόρτωση",

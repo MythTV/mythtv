@@ -8,6 +8,11 @@
         "default": "Alapértelmezett",
         "delete": "Töröl",
         "failed": "nem sikerült",
+        "filter": {
+            "contains": "Tartalmaz",
+            "equals": "Pontos egyezés",
+            "startswith": "Ezzel kezdődik"
+        },
         "help": "Segítség",
         "instructions": "Utasítás",
         "loading": "Betöltés",

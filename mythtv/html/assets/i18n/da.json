@@ -8,6 +8,11 @@
         "default": "Standard",
         "delete": "Slet",
         "failed": "mislykkedes",
+        "filter": {
+            "contains": "Indeholder",
+            "equals": "Præcis match",
+            "startswith": "Starter med"
+        },
         "help": "Hjælp",
         "instructions": "Instruktioner",
         "loading": "Indlæser",

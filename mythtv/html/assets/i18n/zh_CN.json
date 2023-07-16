@@ -8,6 +8,11 @@
         "default": "默认",
         "delete": "删除",
         "failed": "失败的",
+        "filter": {
+            "contains": "包含",
+            "equals": "完全符合",
+            "startswith": "以。。开始"
+        },
         "help": "帮助",
         "instructions": "指示",
         "loading": "加载中",

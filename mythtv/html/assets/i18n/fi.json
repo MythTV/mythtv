@@ -8,6 +8,11 @@
         "default": "Oletus",
         "delete": "Poistaa",
         "failed": "Epäonnistui",
+        "filter": {
+            "contains": "Sisältää",
+            "equals": "Tarkka ottelu",
+            "startswith": "Alkaa kanssa"
+        },
         "help": "auta",
         "instructions": "Ohjeet",
         "loading": "Ladataan",

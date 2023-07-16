@@ -8,6 +8,11 @@
         "default": "По подразбиране",
         "delete": "Изтрий",
         "failed": "Се провали",
+        "filter": {
+            "contains": "Съдържа",
+            "equals": "Точно съвпадение",
+            "startswith": "Започва с"
+        },
         "help": "Помогне",
         "instructions": "Инструкции",
         "loading": "Зареждане",

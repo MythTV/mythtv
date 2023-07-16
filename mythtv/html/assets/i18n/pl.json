@@ -8,6 +8,11 @@
         "default": "Domyślny",
         "delete": "Usuwać",
         "failed": "Przegrany",
+        "filter": {
+            "contains": "Zawiera",
+            "equals": "Dokładne dopasowanie",
+            "startswith": "Zaczynać z"
+        },
         "help": "Pomoc",
         "instructions": "Instrukcje",
         "loading": "Ładowanie",
