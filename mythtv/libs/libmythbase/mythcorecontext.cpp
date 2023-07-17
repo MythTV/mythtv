@@ -15,6 +15,7 @@
 #include <QNetworkAddressEntry>
 #include <QLocale>
 #include <QPair>
+#include <QRegularExpression>
 #include <QDateTime>
 
 // Std
@@ -239,6 +240,8 @@ bool MythCoreContext::Init(void)
     }
 
 #ifndef _WIN32
+    static const QRegularExpression utf8
+        { "utf-?8", QRegularExpression::CaseInsensitiveOption };
     QString lang_variables("");
     QString lc_value = setlocale(LC_CTYPE, nullptr);
     if (lc_value.isEmpty())
@@ -249,10 +252,10 @@ bool MythCoreContext::Init(void)
         if (lc_value.isEmpty())
             lc_value = qEnvironmentVariable("LC_CTYPE");
     }
-    if (!lc_value.contains("UTF-8", Qt::CaseInsensitive))
+    if (!lc_value.contains(utf8))
         lang_variables.append("LC_ALL or LC_CTYPE");
     lc_value = qEnvironmentVariable("LANG");
-    if (!lc_value.contains("UTF-8", Qt::CaseInsensitive))
+    if (!lc_value.contains(utf8))
     {
         if (!lang_variables.isEmpty())
             lang_variables.append(", and ");
