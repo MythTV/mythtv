@@ -812,7 +812,14 @@ void PlaylistEditorView::treeItemClicked(MythUIButtonListItem *item)
 
     if (mnode->getAction() == "trackid")
     {
-        if (gPlayer->getCurrentPlaylist()->checkTrack(mnode->getInt()))
+        if (gPlayer->getInPlayNow())
+        {
+            gPlayer->addTrack(mnode->getInt(), false);
+            gPlayer->setCurrentTrackPos(gPlayer->getCurrentPlaylist()->getTrackCount() - 1);
+            updateUIPlaylist();
+            mnode->setCheck(MythUIButtonListItem::FullChecked);
+        }
+        else if (gPlayer->getCurrentPlaylist()->checkTrack(mnode->getInt()))
         {
             // remove track from the current playlist
             gPlayer->removeTrack(mnode->getInt());

@@ -178,7 +178,7 @@ void SearchView::customEvent(QEvent *event)
                     }
                 }
             }
-            else if (resulttext == tr("Add To Playlist And Play"))
+            else if (resulttext == tr("Play Now"))
             {
                 if (GetFocusWidget() == m_tracksList)
                 {
@@ -273,8 +273,8 @@ void SearchView::ShowMenu(void)
                     menu->AddItem(tr("Remove From Playlist"));
                 else
                 {
+                    menu->AddItem(tr("Play Now"));
                     menu->AddItem(tr("Add To Playlist"));
-                    menu->AddItem(tr("Add To Playlist And Play"));
                 }
             }
         }
