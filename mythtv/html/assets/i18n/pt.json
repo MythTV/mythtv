@@ -49,6 +49,7 @@
             "delete_details": "Isso excluirá a regra de gravação",
             "delete_rule": "Excluir Regra de Gravação",
             "description": "Descrição",
+            "download": "Baixar Gravação",
             "duration": "Duração",
             "edit_metadata": "Editar metadados",
             "edit_rule": "Editar Regra de Gravação",
@@ -216,6 +217,7 @@
             "time": "Tempo"
         },
         "videos": {
+            "download": "Baixar video",
             "heading": "Vídeos",
             "releasedate": "Data de lançamento"
         }

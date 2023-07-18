@@ -49,6 +49,7 @@
             "delete_details": "這將刪除記錄規則",
             "delete_rule": "刪除錄音規則",
             "description": "描述",
+            "download": "下載錄音",
             "duration": "期間",
             "edit_metadata": "編輯元數據",
             "edit_rule": "編輯錄音規則",
@@ -216,6 +217,7 @@
             "time": "時間"
         },
         "videos": {
+            "download": "下載視頻",
             "heading": "影片",
             "releasedate": "發布日期"
         }

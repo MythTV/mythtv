@@ -49,6 +49,7 @@
             "delete_details": "פעולה זו תמחק את כלל ההקלטה",
             "delete_rule": "מחק את כלל ההקלטה",
             "description": "תיאור",
+            "download": "הורד הקלטה",
             "duration": "מֶשֶׁך",
             "edit_metadata": "ערוך מטא נתונים",
             "edit_rule": "ערוך את כלל ההקלטה",
@@ -216,6 +217,7 @@
             "time": "זְמַן"
         },
         "videos": {
+            "download": "הורד סרטון",
             "heading": "סרטונים",
             "releasedate": "תאריך הוצאה"
         }

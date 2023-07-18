@@ -49,6 +49,7 @@
             "delete_details": "Þetta mun eyða upptökureglunni",
             "delete_rule": "Eyða upptökureglu",
             "description": "Lýsing",
+            "download": "Sækja upptöku",
             "duration": "Lengd",
             "edit_metadata": "Breyta lýsigögnum",
             "edit_rule": "Breyta upptökureglu",
@@ -216,6 +217,7 @@
             "time": "Tími"
         },
         "videos": {
+            "download": "Sækja myndbandið",
             "heading": "Myndbönd",
             "releasedate": "Útgáfudagur"
         }

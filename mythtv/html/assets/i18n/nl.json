@@ -49,6 +49,7 @@
             "delete_details": "Hiermee wordt de opnameregel verwijderd",
             "delete_rule": "Opnameregel verwijderen",
             "description": "Beschrijving",
+            "download": "Opname downloaden",
             "duration": "Duur",
             "edit_metadata": "Metagegevens bewerken",
             "edit_rule": "Opnameregel bewerken",
@@ -216,6 +217,7 @@
             "time": "Tijd"
         },
         "videos": {
+            "download": "Download video",
             "heading": "Videos",
             "releasedate": "Datum van publicatie"
         }

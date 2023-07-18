@@ -49,6 +49,7 @@
             "delete_details": "Detta tar bort inspelningsregeln",
             "delete_rule": "Ta bort inspelningsregel",
             "description": "Beskrivning",
+            "download": "Ladda ner inspelning",
             "duration": "Varaktighet",
             "edit_metadata": "Redigera metadata",
             "edit_rule": "Redigera inspelningsregel",
@@ -216,6 +217,7 @@
             "time": "Tid"
         },
         "videos": {
+            "download": "Ladda ner video",
             "heading": "videoklipp",
             "releasedate": "Utgivningsdatum"
         }

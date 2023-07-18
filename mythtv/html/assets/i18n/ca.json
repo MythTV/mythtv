@@ -49,6 +49,7 @@
             "delete_details": "Això suprimirà la regla de gravació",
             "delete_rule": "Suprimeix la regla de gravació",
             "description": "Descripció",
+            "download": "Descarregar Enregistrament",
             "duration": "Durada",
             "edit_metadata": "Edita les metadades",
             "edit_rule": "Edita la regla de gravació",
@@ -216,6 +217,7 @@
             "time": "Temps"
         },
         "videos": {
+            "download": "Descarrega el vídeo",
             "heading": "Vídeos",
             "releasedate": "Data de publicació"
         }

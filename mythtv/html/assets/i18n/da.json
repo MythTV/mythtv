@@ -49,6 +49,7 @@
             "delete_details": "Dette vil slette optagelsesreglen",
             "delete_rule": "Slet optagelsesregel",
             "description": "Beskrivelse",
+            "download": "Download optagelse",
             "duration": "Varighed",
             "edit_metadata": "Rediger metadata",
             "edit_rule": "Rediger optagelsesregel",
@@ -216,6 +217,7 @@
             "time": "Tid"
         },
         "videos": {
+            "download": "Download video",
             "heading": "Videoer",
             "releasedate": "Udgivelses dato"
         }

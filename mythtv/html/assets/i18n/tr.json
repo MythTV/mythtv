@@ -49,6 +49,7 @@
             "delete_details": "Bu Kayıt Kuralını siler",
             "delete_rule": "Kayıt Kuralını Sil",
             "description": "Tanım",
+            "download": "Kaydı İndir",
             "duration": "Süre",
             "edit_metadata": "Meta Verileri Düzenle",
             "edit_rule": "Kayıt Kuralını Düzenle",
@@ -216,6 +217,7 @@
             "time": "Zaman"
         },
         "videos": {
+            "download": "Video indir",
             "heading": "videolar",
             "releasedate": "Yayın tarihi"
         }

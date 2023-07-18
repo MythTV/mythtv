@@ -49,6 +49,7 @@
             "delete_details": "This will delete the Recording Rule",
             "delete_rule": "Delete Recording Rule",
             "description": "Description",
+            "download": "Download Recording",
             "duration": "Duration",
             "edit_metadata": "Edit Metadata",
             "edit_rule": "Edit Recording Rule",
@@ -216,6 +217,7 @@
             "time": "Time"
         },
         "videos": {
+            "download": "Download Video",
             "heading": "Videos",
             "releasedate": "Release Date"
         }

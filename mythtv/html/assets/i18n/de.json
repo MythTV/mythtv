@@ -49,6 +49,7 @@
             "delete_details": "Dadurch wird die Aufzeichnungsregel gelöscht",
             "delete_rule": "Aufzeichnungsregel löschen",
             "description": "Beschreibung",
+            "download": "Aufnahme herunterladen",
             "duration": "Dauer",
             "edit_metadata": "Metadaten bearbeiten",
             "edit_rule": "Aufzeichnungsregel bearbeiten",
@@ -216,6 +217,7 @@
             "time": "Zeit"
         },
         "videos": {
+            "download": "Video herunterladen",
             "heading": "Videos",
             "releasedate": "Veröffentlichungsdatum"
         }

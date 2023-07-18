@@ -49,6 +49,7 @@
             "delete_details": "Tämä poistaa tallennussäännön",
             "delete_rule": "Poista tallennussääntö",
             "description": "Kuvaus",
+            "download": "Lataa tallennus",
             "duration": "Kesto",
             "edit_metadata": "Muokkaa metatietoja",
             "edit_rule": "Muokkaa tallennussääntöä",
@@ -216,6 +217,7 @@
             "time": "Aika"
         },
         "videos": {
+            "download": "Lataa video",
             "heading": "Videot",
             "releasedate": "Julkaisupäivä"
         }

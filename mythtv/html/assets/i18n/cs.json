@@ -49,6 +49,7 @@
             "delete_details": "Tím se odstraní pravidlo nahrávání",
             "delete_rule": "Odstranit pravidlo nahrávání",
             "description": "Popis",
+            "download": "Stáhnout záznam",
             "duration": "Doba trvání",
             "edit_metadata": "Upravit metadata",
             "edit_rule": "Upravit pravidlo nahrávání",
@@ -216,6 +217,7 @@
             "time": "Čas"
         },
         "videos": {
+            "download": "Stáhnout video",
             "heading": "videa",
             "releasedate": "Datum vydání"
         }

@@ -49,6 +49,7 @@
             "delete_details": "See kustutab salvestusreegli",
             "delete_rule": "Salvestusreegli kustutamine",
             "description": "Kirjeldus",
+            "download": "Laadige alla salvestus",
             "duration": "Kestus",
             "edit_metadata": "Redigeeri metaandmeid",
             "edit_rule": "Redigeeri salvestusreeglit",
@@ -216,6 +217,7 @@
             "time": "Aeg"
         },
         "videos": {
+            "download": "Laadige video alla",
             "heading": "Videod",
             "releasedate": "Väljalaske kuupäev"
         }

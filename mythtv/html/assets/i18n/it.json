@@ -49,6 +49,7 @@
             "delete_details": "Questa operazione eliminerà la regola di registrazione",
             "delete_rule": "Elimina regola di registrazione",
             "description": "Descrizione",
+            "download": "Scarica la registrazione",
             "duration": "Durata",
             "edit_metadata": "Modifica metadati",
             "edit_rule": "Modifica regola di registrazione",
@@ -216,6 +217,7 @@
             "time": "Tempo"
         },
         "videos": {
+            "download": "Scarica video",
             "heading": "Video",
             "releasedate": "Data di rilascio"
         }

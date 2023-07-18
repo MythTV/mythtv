@@ -21,6 +21,12 @@
                                 styleClass="p-button-primary">
                             </p-button>
                         </div>
+                        &nbsp;&nbsp;&nbsp;
+                        <p-checkbox inputId="showAllVideos" [(ngModel)]="showAllVideos" name="showAllVideos"
+                            #showAll="ngModel" [binary]="true" (onChange)="showAllChange()"
+                            label="{{ 'dashboard.upcoming.showall' | translate }} ">
+                        </p-checkbox>
+
                         <div *ngIf="refreshing else refreshBn"><p-progressSpinner
                                 [style]="{width: '30px', height: '30px'}"></p-progressSpinner></div>
                         <ng-template #refreshBn>
@@ -28,7 +34,7 @@
                                 (click)="refreshing=true;loadVideos()"
                                 pTooltip="{{ 'common.refresh' | translate }}"></button>
                         </ng-template>
-
+                        &nbsp;&nbsp;&nbsp;{{ videos.length }} Rows
                     </th>
                 </tr>
                 <tr>
@@ -45,7 +51,9 @@
                     <th style="flex-basis: 10%" class="justify-content-end p-1">
                         {{ 'dashboard.recordings.duration' | translate }}
                     </th>
-                    <th style="flex-basis: 3%" class="p-1">
+                    <th style="flex-basis: 6%" class="p-1">
+                        <a target="_blank">
+                            <i class="pi pi-download"></i></a>
                         <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
                             [disabled]="true"></button>
                     </th>
@@ -77,8 +85,11 @@
                     <td style="flex-basis: 10%" class="justify-content-end p-1">
                         <div *ngIf="video.Length > 0"> {{ video.Length }} min </div>
                     </td>
-                    <td style="flex-basis: 3%" class="p-1">
+                    <td style="flex-basis: 6%" class="p-1">
                         <div *ngIf="video.ContentType != 'D'">
+                            <a href="{{URLencode('/Content/GetVideo?Id=' + video.Id)}}" target="_blank"
+                                pTooltip="{{ 'dashboard.videos.download' | translate }}" tooltipPosition="left">
+                                <i class="pi pi-download"></i></a>
                             <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
                                 (click)="showMenu(video,$event)"></button>
                         </div>

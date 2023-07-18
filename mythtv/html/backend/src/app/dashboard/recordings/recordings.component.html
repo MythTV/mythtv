@@ -16,11 +16,24 @@
             </ng-template>
             <ng-template pTemplate="header">
                 <tr>
-                    <th>{{ 'dashboard.recordings.filter' | translate }}: &nbsp;&nbsp; {{ 'dashboard.recordings.title' |
-                        translate }}: &nbsp; <p-columnFilter type="text" field="Title"
-                            [matchModeOptions]="matchModeTitle"></p-columnFilter>
-                        {{ 'dashboard.recordings.recgrp' | translate }}: &nbsp; <p-columnFilter type="text"
-                            [matchModeOptions]="matchModeRecGrp" field="Recording.RecGroup"></p-columnFilter>
+                    <th>
+                        {{ 'dashboard.recordings.filter' | translate }}: &nbsp;&nbsp; {{ 'dashboard.recordings.title' |
+                        translate }}: &nbsp;
+                        <p-columnFilter type="text" field="Title" [matchModeOptions]="matchModeTitle"></p-columnFilter>
+
+                        {{ 'dashboard.recordings.recgrp' | translate }}: &nbsp;
+                        <p-columnFilter field="Recording.RecGroup" matchMode="equals" [showMenu]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-dropdown [ngModel]="value" [options]="recGroups" name="filter"
+                                    (onChange)="filter($event.value)"
+                                    placeholder="{{ 'settings.chanedit.all' | translate }}" [showClear]="true">
+                                    <ng-template let-option pTemplate="item">
+                                        {{option}}
+                                    </ng-template>
+                                </p-dropdown>
+                            </ng-template>
+                        </p-columnFilter>
+
                         <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
                             (click)="refreshing=true;refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
                         &nbsp;&nbsp;&nbsp;{{ programs.length }} Rows
@@ -50,7 +63,9 @@
                     </th>
                     <th style="flex-basis: 8%" class="justify-content-end p-1">{{
                         'dashboard.recordings.file_size' | translate }}</th>
-                    <th style="flex-basis: 2%" class="p-1">
+                    <th style="flex-basis: 4%" class="p-1">
+                        <a target="_blank">
+                            <i class="pi pi-download"></i></a>
                         <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
                             [disabled]="true"></button>
                     </th>
@@ -83,7 +98,10 @@
                         number:'1.0-0' }} min</td>
                     <td style="flex-basis: 8%" class="justify-content-end p-1">
                         {{program.Recording.FileSize / 1000000 | number:'1.0-0'}} MB</td>
-                    <td style="flex-basis: 2%" class="p-1">
+                    <td style="flex-basis: 4%" class="p-1">
+                        <a href="{{URLencode('/Content/GetRecording?RecordedId=' + program.Recording.RecordedId)}}"
+                            target="_blank" pTooltip="{{ 'dashboard.recordings.download' | translate }}" tooltipPosition="left">
+                            <i class="pi pi-download"></i></a>
                         <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
                             (click)="showMenu(program,$event)"></button>
                     </td>

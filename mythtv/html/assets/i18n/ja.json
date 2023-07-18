@@ -49,6 +49,7 @@
             "delete_details": "これにより、録音ルールが削除されます",
             "delete_rule": "録画ルールの削除",
             "description": "説明",
+            "download": "録音をダウンロードする",
             "duration": "間隔",
             "edit_metadata": "メタデータの編集",
             "edit_rule": "記録ルールの編集",
@@ -216,6 +217,7 @@
             "time": "時間"
         },
         "videos": {
+            "download": "ビデオをダウンロードする",
             "heading": "動画",
             "releasedate": "発売日"
         }

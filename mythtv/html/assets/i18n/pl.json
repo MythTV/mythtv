@@ -49,6 +49,7 @@
             "delete_details": "Spowoduje to usunięcie reguły nagrywania",
             "delete_rule": "Usuń regułę nagrywania",
             "description": "Opis",
+            "download": "Pobierz nagranie",
             "duration": "Czas trwania",
             "edit_metadata": "Edytuj metadane",
             "edit_rule": "Edytuj regułę nagrywania",
@@ -216,6 +217,7 @@
             "time": "Czas"
         },
         "videos": {
+            "download": "Ściągnij wideo",
             "heading": "Filmy",
             "releasedate": "Data wydania"
         }

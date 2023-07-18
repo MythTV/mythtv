@@ -49,6 +49,7 @@
             "delete_details": "这将删除记录规则",
             "delete_rule": "删除录音规则",
             "description": "描述",
+            "download": "下载录音",
             "duration": "期间",
             "edit_metadata": "编辑元数据",
             "edit_rule": "编辑录音规则",
@@ -216,6 +217,7 @@
             "time": "时间"
         },
         "videos": {
+            "download": "下载视频",
             "heading": "视频",
             "releasedate": "发布日期"
         }

@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { MenuItem, MessageService } from 'primeng/api';
+import { LazyLoadEvent, MenuItem, MessageService } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { PartialObserver } from 'rxjs';
 import { UpdateVideoMetadataRequest, VideoMetadataInfo } from 'src/app/services/interfaces/video.interface';
@@ -30,6 +30,7 @@ export class VideosComponent implements OnInit {
   editingVideo?: VideoMetadataInfo;
   displayMetadataDlg = false;
   displayUnsaved = false;
+  showAllVideos = false;
 
   mnu_markwatched: MenuItem = { label: 'dashboard.recordings.mnu_markwatched', command: (event) => this.markwatched(event, true) };
   mnu_markunwatched: MenuItem = { label: 'dashboard.recordings.mnu_markunwatched', command: (event) => this.markwatched(event, false) };
@@ -72,46 +73,61 @@ export class VideosComponent implements OnInit {
   loadVideos() {
     this.videoService.GetVideoList({ Sort: "FileName" }).subscribe(data => {
       this.allVideos = data.VideoMetadataInfoList.VideoMetadataInfos;
-      // this.videos = data.VideoMetadataInfoList.VideoMetadataInfos;
-      this.refreshing = false;
       this.filterVideos();
       this.loaded = true;
+      this.refreshing = false;
     });
   }
 
+  showAllChange() {
+    this.refreshing = true;
+    setTimeout(() => this.filterVideos(), 100);
+  }
+
   filterVideos() {
-    this.videos = [];
-    let prior = '';
-    let search = this.directory.join('/');
-    if (search.length > 0)
-      search += '/';
-    this.allVideos.forEach(
-      video => {
-        const parts = video.FileName.split('/');
-        if (video.FileName.startsWith(search)) {
-          if (parts.length == this.directory.length + 1) {
-            this.videos.push(video);
-            prior = '';
-          }
-          else {
-            let dir = parts.slice(0, this.directory.length + 1)
-              .join('/') + '/';
-            if (dir != prior) {
-              // Dummy directory entry
-              this.videos.push(<VideoMetadataInfo>{
-                FileName: dir,
-                Title: parts[this.directory.length],
-                ContentType: 'D',  // indicates directory
-                Season: 0,
-                Episode: 0,
-                Length: 0
-              });
-              prior = dir;
+    if (this.showAllVideos) {
+      this.directory.length = 0;
+      this.videos = [...this.allVideos];
+    }
+    else {
+      this.videos = [];
+      let prior = '';
+      let search = this.directory.join('/');
+      if (search.length > 0)
+        search += '/';
+      this.allVideos.forEach(
+        video => {
+          const parts = video.FileName.split('/');
+          if (video.FileName.startsWith(search)) {
+            if (parts.length == this.directory.length + 1) {
+              this.videos.push(video);
+              prior = '';
+            }
+            else {
+              let dir = parts.slice(0, this.directory.length + 1)
+                .join('/') + '/';
+              if (dir != prior) {
+                // Dummy directory entry
+                this.videos.push(<VideoMetadataInfo>{
+                  FileName: dir,
+                  Title: parts[this.directory.length],
+                  ContentType: 'D',  // indicates directory
+                  Season: 0,
+                  Episode: 0,
+                  Length: 0
+                });
+                prior = dir;
+              }
             }
           }
         }
-      }
-    );
+      );
+    }
+    this.refreshing = false;
+  }
+
+  URLencode(x: string): string {
+    return encodeURI(x);
   }
 
   onDirectory(subdir: string) {
@@ -170,7 +186,6 @@ export class VideosComponent implements OnInit {
       severity: severity, summary: text,
       detail: action + ' ' + this.video.Title + ' ' + this.video.SubTitle + extraText,
       life: 3000,
-      // contentStyleClass: 'recsmsg'
     });
   }
 

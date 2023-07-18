@@ -49,6 +49,7 @@
             "delete_details": "Ezzel törli a rögzítési szabályt",
             "delete_rule": "Törölje a rögzítési szabályt",
             "description": "Leírás",
+            "download": "Letöltés Felvétel",
             "duration": "Időtartam",
             "edit_metadata": "Metaadatok szerkesztése",
             "edit_rule": "Rögzítési szabály szerkesztése",
@@ -216,6 +217,7 @@
             "time": "Idő"
         },
         "videos": {
+            "download": "Videó letöltése",
             "heading": "Videók",
             "releasedate": "Kiadási dátum"
         }

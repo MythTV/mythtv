@@ -25,6 +25,7 @@ export class RecordingsComponent implements OnInit {
 
   recordings!: ProgramList;
   programs: ScheduleOrProgram[] = [];
+  recGroups: string[] = [];
   lazyLoadEvent!: LazyLoadEvent;
   JobQCmds!: JobQCommands;
   program: ScheduleOrProgram = <ScheduleOrProgram>{ Title: '' };
@@ -88,12 +89,16 @@ export class RecordingsComponent implements OnInit {
   }
   ];
 
-
   constructor(private dvrService: DvrService, private messageService: MessageService,
     public translate: TranslateService, private setupService: SetupService,
     public utility: UtilityService) {
     this.JobQCmds = this.setupService.getJobQCommands();
 
+    this.dvrService.GetRecGroupList()
+      .subscribe((data) => {
+        this.recGroups = data.RecGroupList;
+        this.recGroups.push('Deleted');
+      });
     // translations
     for (const [key, value] of Object.entries(this.msg)) {
       this.translate.get(value).subscribe(data => {
@@ -160,7 +165,9 @@ export class RecordingsComponent implements OnInit {
       this.recordings = data.ProgramList;
       this.programs.length = data.ProgramList.TotalAvailable;
       // populate page of virtual programs
-      this.programs.splice(request.StartIndex!, request.Count!, ...this.recordings.Programs);
+      // this.programs.splice(request.StartIndex!, request.Count!, ...this.recordings.Programs);
+      this.programs.splice(this.recordings.StartIndex, this.recordings.Count,
+        ...this.recordings.Programs);
       // notify of change
       this.programs = [...this.programs]
       this.refreshing = false;
@@ -169,6 +176,10 @@ export class RecordingsComponent implements OnInit {
 
   refresh() {
     this.loadLazy(this.lazyLoadEvent);
+  }
+
+  URLencode(x: string): string {
+    return encodeURI(x);
   }
 
   getDuration(program: ScheduleOrProgram): number {

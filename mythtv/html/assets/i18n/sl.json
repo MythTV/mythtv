@@ -49,6 +49,7 @@
             "delete_details": "S tem boste izbrisali pravilo snemanja",
             "delete_rule": "Izbriši pravilo snemanja",
             "description": "Opis",
+            "download": "Prenos posnetka",
             "duration": "Trajanje",
             "edit_metadata": "Uredi metapodatke",
             "edit_rule": "Uredi pravilo snemanja",
@@ -216,6 +217,7 @@
             "time": "Čas"
         },
         "videos": {
+            "download": "Prenesi video",
             "heading": "Videoposnetki",
             "releasedate": "Datum izdaje"
         }
