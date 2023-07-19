@@ -515,13 +515,11 @@ void TeletextReader::PageUpdated(int page, int subpage)
 }
 
 void TeletextReader::HeaderUpdated(
-    int page, int subpage, tt_line_array& page_ptr, int lang)
+    [[maybe_unused]] int page,
+    [[maybe_unused]] int subpage,
+    [[maybe_unused]] tt_line_array& page_ptr,
+    [[maybe_unused]] int lang)
 {
-    (void)page;
-    (void)subpage;
-    (void)page_ptr;
-    (void)lang;
-
     if (!m_curpageShowHeader)
         return;
 

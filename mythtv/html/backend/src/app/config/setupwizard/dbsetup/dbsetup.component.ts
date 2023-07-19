@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfigService } from '../../../services/config.service';
 import { MythService } from '../../../services/myth.service';
@@ -16,7 +16,8 @@ import { Clipboard } from '@angular/cdk/clipboard';
     selector: 'app-dbsetup',
     templateUrl: './dbsetup.component.html',
     styleUrls: ['./dbsetup.component.css'],
-    providers: [MessageService]
+    providers: [MessageService],
+    encapsulation: ViewEncapsulation.None,
 })
 export class DbsetupComponent implements OnInit {
 

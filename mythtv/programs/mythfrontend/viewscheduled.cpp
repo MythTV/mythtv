@@ -268,6 +268,11 @@ void ViewScheduled::LoadList(bool useExistingData)
     while (pit != m_recList.end())
     {
         ProgramInfo *pginfo = *pit;
+        if (pginfo == nullptr)
+        {
+            pit = m_recList.erase(pit);
+            continue;
+        }
 
         pginfo->CalculateRecordedProgress();
 
@@ -343,6 +348,8 @@ void ViewScheduled::LoadList(bool useExistingData)
         for (int i = listPos; i >= 0; --i)
         {
             ProgramInfo *pginfo = plist[i];
+            if (pginfo == nullptr)
+                continue;
             if (callsign == pginfo->GetChannelSchedulingID() &&
                 startts  == pginfo->GetScheduledStartTime())
             {
@@ -581,7 +588,7 @@ void ViewScheduled::EmbedTVWindow(void)
 
 void ViewScheduled::customEvent(QEvent *event)
 {
-    if (event->type() == MythEvent::MythEventMessage)
+    if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)

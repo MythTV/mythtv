@@ -105,10 +105,8 @@ static void runZMMiniPlayer(void)
 static void (*m_callback)(void *, QString &) = nullptr;
 static void *m_callbackdata = nullptr;
 
-static void ZoneMinderCallback(void *data, QString &selection)
+static void ZoneMinderCallback([[maybe_unused]] void *data, QString &selection)
 {
-    (void) data;
-
     QString sel = selection.toLower();
 
     if (sel == "zm_console")

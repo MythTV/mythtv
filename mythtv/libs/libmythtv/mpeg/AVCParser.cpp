@@ -780,8 +780,7 @@ void AVCParser::decode_SPS(BitReader& br)
           8.2.1. The value of offset_for_non_ref_pic shall be in the
           range of -231 to 231 - 1, inclusive.
          */
-        int offset_for_non_ref_pic = br.get_se_golomb();
-        (void) offset_for_non_ref_pic; // suppress unused var warning
+        [[maybe_unused]] int offset_for_non_ref_pic = br.get_se_golomb();
 
         /*
           offset_for_top_to_bottom_field is used to calculate the
@@ -789,8 +788,7 @@ void AVCParser::decode_SPS(BitReader& br)
           subclause 8.2.1. The value of offset_for_top_to_bottom_field
           shall be in the range of -231 to 231 - 1, inclusive.
          */
-        int offset_for_top_to_bottom_field = br.get_se_golomb();
-        (void) offset_for_top_to_bottom_field; // suppress unused var warning
+        [[maybe_unused]] int offset_for_top_to_bottom_field = br.get_se_golomb();
 
         /*
           offset_for_ref_frame[ i ] is an element of a list of

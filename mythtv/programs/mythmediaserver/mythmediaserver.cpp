@@ -161,6 +161,7 @@ int main(int argc, char *argv[])
 
     ms_sd_notify("STOPPING=1\nSTATUS=Exiting");
     delete sysEventHandler;
+    delete sockmanager;
 
     return exitCode ? exitCode : GENERIC_EXIT_OK;
 }

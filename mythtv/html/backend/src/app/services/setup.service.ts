@@ -262,12 +262,14 @@ export class SetupService {
         }
         for (let ix = 0; ix < 4; ix++) {
             let num = ix + 1;
-            let defaultName;
             this.translate.get('settings.services.job_default', { num: num })
                 .subscribe(data => this.m_JobQCommands.UserJobDesc[ix] = data);
-            this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "UserJobDesc" + num, Default: defaultName })
+            this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "UserJobDesc" + num, Default: "" })
                 .subscribe({
-                    next: data => this.m_JobQCommands.UserJobDesc[ix] = data.String,
+                    next: data => {
+                        if (data.String && data.String.length > 0)
+                            this.m_JobQCommands.UserJobDesc[ix] = data.String;
+                    },
                     error: () => this.m_JobQCommands.errorCount++
                 });
             this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "UserJob" + num, Default: "" })

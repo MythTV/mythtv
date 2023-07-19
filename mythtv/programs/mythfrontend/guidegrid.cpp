@@ -346,9 +346,9 @@ public:
     explicit UpdateGuideEvent(GuideUpdaterBase *updater) :
         QEvent(kEventType), m_updater(updater) {}
     GuideUpdaterBase *m_updater {nullptr};
-    static Type kEventType;
+    static const Type kEventType;
 };
-QEvent::Type UpdateGuideEvent::kEventType =
+const QEvent::Type UpdateGuideEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 class GuideHelper : public QRunnable
@@ -1853,7 +1853,7 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
 
 void GuideGrid::customEvent(QEvent *event)
 {
-    if (event->type() == MythEvent::MythEventMessage)
+    if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)

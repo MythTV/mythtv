@@ -63,16 +63,12 @@ void MythVideoTextureVulkan::DeleteTexture(MythVulkanObject* Vulkan,
 }
 
 std::vector<MythVideoTextureVulkan*>
-MythVideoTextureVulkan::CreateSoftwareTextures(MythVulkanObject* Vulkan,
-                                               VkCommandBuffer CommandBuffer,
-                                               VideoFrameType Type,
+MythVideoTextureVulkan::CreateSoftwareTextures([[maybe_unused]] MythVulkanObject* Vulkan,
+                                               [[maybe_unused]] VkCommandBuffer CommandBuffer,
+                                               [[maybe_unused]] VideoFrameType Type,
                                                VideoFrameType Format,
                                                QSize Size)
 {
-    (void)Vulkan;
-    (void)CommandBuffer;
-    (void)Type;
-
     std::vector<MythVideoTextureVulkan*> result;
 
     uint count = MythVideoFrame::GetNumPlanes(Format);

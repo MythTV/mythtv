@@ -1081,8 +1081,17 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                 i += 16;
             }
         }
-        memcpy(&from[i], m_hardwareId.constData(), AIRPLAY_HARDWARE_ID_SIZE);
-        i += AIRPLAY_HARDWARE_ID_SIZE;
+        if (m_hardwareId.size() == AIRPLAY_HARDWARE_ID_SIZE)
+        {
+            memcpy(&from[i], m_hardwareId.constData(), AIRPLAY_HARDWARE_ID_SIZE);
+            i += AIRPLAY_HARDWARE_ID_SIZE;
+        }
+        else
+        {
+            LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                QString("Hardware MAC address size %1, expected %2")
+                .arg(m_hardwareId.size()).arg(AIRPLAY_HARDWARE_ID_SIZE));
+        }
 
         int pad = 32 - i;
         if (pad > 0)
@@ -1897,12 +1906,12 @@ void MythRAOPConnection::SendNotification(bool update)
 
     if (!update || !m_firstSend)
     {
-        n = new MythMediaNotification(MythNotification::New,
+        n = new MythMediaNotification(MythNotification::kNew,
                                       image, m_dmap, duration, position);
     }
     else
     {
-        n = new MythPlaybackNotification(MythNotification::Update,
+        n = new MythPlaybackNotification(MythNotification::kUpdate,
                                          duration, position);
     }
     n->SetId(m_id);

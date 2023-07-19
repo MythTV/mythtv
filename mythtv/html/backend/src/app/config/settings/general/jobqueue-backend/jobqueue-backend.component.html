@@ -87,7 +87,7 @@
 
                     <div class="form-group field">
                         <p-checkbox inputId="JobAllowTranscode" [(ngModel)]="JobAllowTranscode" name="JobAllowTranscode"
-                            class="label mb-2 w-full" [binary]="true" label="Allow Transcoding Jobs">
+                            class="label mb-2 w-full" [binary]="true" label="{{ 'settings.jobqbackend.trans_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
                             {{ 'settings.jobqbackend.allow_desc' | translate }}

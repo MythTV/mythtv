@@ -116,8 +116,7 @@ class StereoScope : public VisualBase
     void resize( const QSize &size ) override; // VisualBase
     bool process( VisualNode *node ) override; // VisualBase
     bool draw( QPainter *p, const QColor &back ) override; // VisualBase
-    void handleKeyPress(const QString &action) override // VisualBase
-        {(void) action;}
+    void handleKeyPress([[maybe_unused]] const QString &action) override {}; // VisualBase
 
   protected:
     QColor         m_startColor  {Qt::yellow};
@@ -208,8 +207,7 @@ class Spectrum : public VisualBase
     void resize(const QSize &size) override; // VisualBase
     bool process(VisualNode *node) override; // VisualBase
     bool draw(QPainter *p, const QColor &back = Qt::black) override; // VisualBase
-    void handleKeyPress(const QString &action) override // VisualBase
-        {(void) action;}
+    void handleKeyPress([[maybe_unused]] const QString &action) override {}; // VisualBase
 
   protected:
     static inline double clamp(double cur, double max, double min);
@@ -240,8 +238,7 @@ class Squares : public Spectrum
 
     void resize (const QSize &newsize) override; // Spectrum
     bool draw(QPainter *p, const QColor &back = Qt::black) override; // Spectrum
-    void handleKeyPress(const QString &action) override // Spectrum
-        {(void) action;}
+    void handleKeyPress([[maybe_unused]] const QString &action) override {}; // Spectrum
 
   private:
     void drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h);
@@ -293,8 +290,7 @@ struct piano_key_data {
     unsigned long getDesiredSamples(void) override; // VisualBase
 
     bool draw(QPainter *p, const QColor &back = Qt::black) override; // VisualBase
-    void handleKeyPress(const QString &action) override // VisualBase
-        {(void) action;}
+    void handleKeyPress([[maybe_unused]] const QString &action) override {}; // VisualBase
 
   protected:
     static inline double clamp(double cur, double max, double min);
@@ -354,8 +350,7 @@ class Blank : public VisualBase
     void resize(const QSize &size) override; // VisualBase
     bool process(VisualNode *node = nullptr) override; // VisualBase
     bool draw(QPainter *p, const QColor &back = Qt::black) override; // VisualBase
-    void handleKeyPress(const QString &action) override // VisualBase
-        {(void) action;}
+    void handleKeyPress([[maybe_unused]] const QString &action) override {}; // VisualBase
 
   private:
     QSize m_size;

@@ -20,6 +20,8 @@ export class BackendWarningComponent implements OnInit {
   ready = false;
   delay = 0;
   busy = false;
+  hostName = '';
+  masterServerName = '';
 
   constructor(private mythService: MythService, public setupService: SetupService,
     private dvrService: DvrService, private wizardService: SetupWizardService) {
@@ -29,13 +31,7 @@ export class BackendWarningComponent implements OnInit {
 
   refreshInfo() {
     setTimeout(() => {
-      this.mythService.GetBackendInfo()
-        .subscribe({
-          next: data =>
-            this.setupService.schedulingEnabled = data.BackendInfo.Env.SchedulingEnabled,
-          // default to true in case backend is down
-          error: () => this.setupService.schedulingEnabled = true
-        });
+      this.getBackendInfo();
       this.refreshInfo();
     }, 120000);
   }
@@ -46,6 +42,19 @@ export class BackendWarningComponent implements OnInit {
     this.recStatusDesc = '';
     this.recStartTime = '';
     this.upComing = [];
+    this.mythService.GetHostName().subscribe({
+      next: data => {
+        this.hostName = data.String;
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "MasterServerName", Default: this.hostName })
+          .subscribe({
+            next: data => {
+              this.masterServerName = data.String;
+            },
+            error: () => this.errorCount++
+          });
+      },
+      error: () => this.errorCount++
+    })
     this.mythService.GetBackendInfo()
       .subscribe({
         next: data => {
@@ -62,6 +71,8 @@ export class BackendWarningComponent implements OnInit {
           this.delay = 0;
         },
         error: () => {
+          // default to true in case backend is down
+          this.setupService.schedulingEnabled = true;
           this.errorCount++;
           if (this.errorCount < this.retryCount)
             setTimeout(() => this.getBackendInfo(), 5000);

@@ -61,6 +61,7 @@ class  V2RecRule : public QObject
     SERVICE_PROPERTY2( QDateTime  , LastRecorded   )
     SERVICE_PROPERTY2( QDateTime  , LastDeleted    )
     SERVICE_PROPERTY2( int        , AverageDelay   )
+    SERVICE_PROPERTY2( QString    , AutoExtend   )
 
     public:
 
@@ -118,6 +119,7 @@ class  V2RecRule : public QObject
             m_LastRecorded  = src->m_LastRecorded  ;
             m_LastDeleted   = src->m_LastDeleted   ;
             m_AverageDelay  = src->m_AverageDelay  ;
+            m_AutoExtend    = src->m_AutoExtend    ;
         }
 
     private:

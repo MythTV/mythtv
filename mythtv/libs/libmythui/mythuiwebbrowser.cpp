@@ -241,7 +241,7 @@ QString BrowserApi::GetMetadata(void)
 
 void BrowserApi::customEvent(QEvent *e)
 {
-    if (e->type() == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(e);
         if (me == nullptr)
@@ -652,7 +652,7 @@ void MythWebView::customEvent(QEvent *event)
             }
         }
     }
-    else if (event->type() == MythEvent::MythEventMessage)
+    else if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)

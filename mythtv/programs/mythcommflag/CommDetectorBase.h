@@ -36,8 +36,7 @@ public:
     void resume();
 
     virtual void GetCommercialBreakList(frm_dir_map_t &comms) = 0;
-    virtual void recordingFinished(long long totalFileSize)
-        { (void)totalFileSize; };
+    virtual void recordingFinished([[maybe_unused]] long long totalFileSize) {};
     virtual void requestCommBreakMapUpdate(void) {};
 
     virtual void PrintFullMap(

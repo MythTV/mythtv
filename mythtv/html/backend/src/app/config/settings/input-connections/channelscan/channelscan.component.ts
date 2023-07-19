@@ -6,9 +6,10 @@ import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { ChannelService } from 'src/app/services/channel.service';
 import { CaptureCardList, CardAndInput, CardSubType } from 'src/app/services/interfaces/capture-card.interface';
 import { ChannelScanRequest, ChannelScanStatus, Scan, ScanDialogResponse } from 'src/app/services/interfaces/channel.interface';
-import { VideoMultiplex} from 'src/app/services/interfaces/multiplex.interface';
+import { VideoMultiplex } from 'src/app/services/interfaces/multiplex.interface';
 import { SetupService } from 'src/app/services/setup.service';
 import { IconnectionComponent } from '../iconnection/iconnection.component';
+import { VideoSource } from 'src/app/services/interfaces/videosource.interface';
 
 
 interface ScanExt extends Scan {
@@ -57,6 +58,7 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
   @Input() card!: CardAndInput;
   @Input() cardList!: CaptureCardList;
   @Input() iconnection!: IconnectionComponent;
+  @Input() videoSourceLookup!: VideoSource[];
   @ViewChild("scroll") scrollpanel!: ScrollPanel;
   @ViewChild("statusPanel") statusPanel!: Fieldset;
 
@@ -107,11 +109,12 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
 
   satTuningTable = [
     new SatTuning("(Select Satellite)", 0, "h", "27500000", "qpsk", "DVB-S2", "auto"),
-    new SatTuning("Eutelsat  7.0E", 10804000, "v", "30000000", "qpsk", "DVB-S2", "5/6"),
-    new SatTuning("Hotbird  13.0E", 12015000, "h", "27500000", "8psk", "DVB-S2", "3/4"),
-    new SatTuning("Astra-1  19.2E", 11229000, "v", "22000000", "8psk", "DVB-S2", "2/3"),
-    new SatTuning("Astra-3  23.5E", 12031500, "h", "27500000", "qpsk", "DVB-S2", "auto"),
-    new SatTuning("Astra-2  28.2E", 10714000, "h", "22000000", "qpsk", "DVB-S", "5/6"),
+    new SatTuning("Thor 5/6/7 0.8W", 10872000, "h", "25000000", "8psk", "DVB-S2", "3/4"),
+    new SatTuning("Eutelsat   7.0E", 10721000, "h", "22000000", "qpsk", "DVB-S", "3/4"),
+    new SatTuning("Hotbird   13.0E", 12015000, "h", "27500000", "8psk", "DVB-S2", "3/4"),
+    new SatTuning("Astra-1   19.2E", 11229000, "v", "22000000", "8psk", "DVB-S2", "2/3"),
+    new SatTuning("Astra-3   23.5E", 12031500, "h", "27500000", "qpsk", "DVB-S2", "auto"),
+    new SatTuning("Astra-2   28.2E", 10714000, "h", "22000000", "qpsk", "DVB-S", "5/6"),
   ]
 
   atscModulationTable = [
@@ -470,6 +473,10 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
   }
 
   onScanTypeChange() {
+    if (this.scanRequest.ScanType == 'FULLTUNED')
+      this.scanRequest.Frequency = this.videoSourceLookup[this.card.SourceId].ScanFrequency;
+    else
+      this.scanRequest.Frequency = 0;
     setTimeout(() => this.onFreqTableChange(false), 100);
   }
 

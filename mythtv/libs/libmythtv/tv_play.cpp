@@ -2940,8 +2940,8 @@ bool TV::eventFilter(QObject* Object, QEvent* Event)
     if (MythGestureEvent::kEventType == Event->type())
         return m_ignoreKeyPresses ? false : event(Event);
 
-    if (Event->type() == MythEvent::MythEventMessage ||
-        Event->type() == MythEvent::MythUserMessage  ||
+    if (Event->type() == MythEvent::kMythEventMessage ||
+        Event->type() == MythEvent::kMythUserMessage  ||
         Event->type() == MythEvent::kUpdateTvProgressEventType ||
         Event->type() == MythMediaEvent::kEventType)
     {
@@ -7140,7 +7140,7 @@ void TV::customEvent(QEvent *Event)
         return;
     }
 
-    if (Event->type() == MythEvent::MythUserMessage)
+    if (Event->type() == MythEvent::kMythUserMessage)
     {
         auto *me = dynamic_cast<MythEvent*>(Event);
         if (me == nullptr)
@@ -7220,7 +7220,7 @@ void TV::customEvent(QEvent *Event)
         return;
     }
 
-    if (Event->type() != MythEvent::MythEventMessage)
+    if (Event->type() != MythEvent::kMythEventMessage)
         return;
 
     uint cardnum   = 0;
@@ -9275,7 +9275,7 @@ void TV::FillOSDMenuJumpRec(const QString &Category, int Level, const QString &S
             auto progIndex = static_cast<uint>(plist.size());
             const QString& group = Iprog.key();
 
-            if (plist[0]->GetRecordingGroup() != currecgroup)
+            if (plist[0] && (plist[0]->GetRecordingGroup() != currecgroup))
                 SetLastProgram(plist[0]);
 
             if (progIndex == 1 && Level == 0)

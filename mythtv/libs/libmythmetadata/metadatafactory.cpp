@@ -33,7 +33,7 @@
 #include "videometadata.h"
 
 
-QEvent::Type MetadataFactoryNoResult::kEventType =
+const QEvent::Type MetadataFactoryNoResult::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 MetadataFactoryNoResult::~MetadataFactoryNoResult()
@@ -45,7 +45,7 @@ MetadataFactoryNoResult::~MetadataFactoryNoResult()
     }
 }
 
-QEvent::Type MetadataFactorySingleResult::kEventType =
+const QEvent::Type MetadataFactorySingleResult::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 MetadataFactorySingleResult::~MetadataFactorySingleResult()
@@ -57,7 +57,7 @@ MetadataFactorySingleResult::~MetadataFactorySingleResult()
     }
 }
 
-QEvent::Type MetadataFactoryMultiResult::kEventType =
+const QEvent::Type MetadataFactoryMultiResult::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 // Force this class to have a vtable so that dynamic_cast works.
@@ -66,7 +66,7 @@ MetadataFactoryMultiResult::~MetadataFactoryMultiResult()
 {
 }
 
-QEvent::Type MetadataFactoryVideoChanges::kEventType =
+const QEvent::Type MetadataFactoryVideoChanges::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 // Force this class to have a vtable so that dynamic_cast works.

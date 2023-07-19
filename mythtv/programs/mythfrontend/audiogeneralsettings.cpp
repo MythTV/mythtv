@@ -630,7 +630,7 @@ AudioTestThread::AudioTestThread(QObject *parent,
     }
 }
 
-QEvent::Type ChannelChangedEvent::kEventType =
+const QEvent::Type ChannelChangedEvent::kEventType =
     static_cast<QEvent::Type>(QEvent::registerEventType());
 
 AudioTestThread::~AudioTestThread()

@@ -84,6 +84,7 @@ export interface RecRule {
     LastRecorded:   string; // dateTime
     LastDeleted:    string; // dateTime
     AverageDelay:   number;
+    AutoExtend:     string;
 }
 
 export interface RecRuleList {

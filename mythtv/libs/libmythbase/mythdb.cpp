@@ -57,7 +57,7 @@ void DestroyMythDB(void)
     MythDB::destroyMythDB();
 }
 
-MythDB *GetMythTestDB(const QString& testname)
+MythDB *GetMythTestDB([[maybe_unused]] const QString& testname)
 {
     auto * db = MythDB::getMythDB();
 
@@ -71,7 +71,6 @@ MythDB *GetMythTestDB(const QString& testname)
         QString("mythtv_%1.%2.sqlite3")
         .arg(testname).arg(MythRandom(),8,16,QLatin1Char('0'));
 #else
-    Q_UNUSED(testname);
     params.m_dbName = ":memory:";
 #endif
     params.m_dbType = "QSQLITE";

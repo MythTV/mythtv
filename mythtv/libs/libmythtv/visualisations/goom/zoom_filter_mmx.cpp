@@ -134,20 +134,15 @@ int zoom_filter_mmx_supported () {
     return 0;
 }
 
-void zoom_filter_mmx (int prevX, int prevY,
-                      const unsigned int *expix1, unsigned int *expix2,
-                      const int *brutS, const int *brutD, int buffratio,
-                      const GoomCoefficients &precalCoef)
+void zoom_filter_mmx ([[maybe_unused]] int prevX,
+                      [[maybe_unused]] int prevY,
+                      [[maybe_unused]] const unsigned int *expix1,
+                      [[maybe_unused]] unsigned int *expix2,
+                      [[maybe_unused]] const int *brutS,
+                      [[maybe_unused]] const int *brutD,
+                      [[maybe_unused]] int buffratio,
+                      [[maybe_unused]] const GoomCoefficients &precalCoef)
 {
-    (void)prevX;
-    (void)prevY;
-    (void)expix1;
-    (void)expix2;
-    (void)brutS;
-    (void)brutD;
-    (void)buffratio;
-    (void)precalCoef;
-    return;
 }
 
 #endif

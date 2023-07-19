@@ -380,9 +380,8 @@ bool FileAssocDialog::Create()
     return true;
 }
 
-void FileAssocDialog::OnFASelected(MythUIButtonListItem *item)
+void FileAssocDialog::OnFASelected([[maybe_unused]] MythUIButtonListItem *item)
 {
-    (void) item;
     UpdateScreen();
 }
 

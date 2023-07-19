@@ -1,31 +1,31 @@
 #include "mythevent.h"
 #include "mythlogging.h"
 
-QEvent::Type MythEvent::MythEventMessage =
+const QEvent::Type MythEvent::kMythEventMessage =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MythEvent::MythUserMessage =
+const QEvent::Type MythEvent::kMythUserMessage =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MythEvent::kUpdateTvProgressEventType =
+const QEvent::Type MythEvent::kUpdateTvProgressEventType =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MythEvent::kExitToMainMenuEventType =
+const QEvent::Type MythEvent::kExitToMainMenuEventType =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MythEvent::kMythPostShowEventType =
+const QEvent::Type MythEvent::kMythPostShowEventType =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MythEvent::kPushDisableDrawingEventType =
+const QEvent::Type MythEvent::kPushDisableDrawingEventType =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MythEvent::kPopDisableDrawingEventType =
+const QEvent::Type MythEvent::kPopDisableDrawingEventType =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MythEvent::kLockInputDevicesEventType =
+const QEvent::Type MythEvent::kLockInputDevicesEventType =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MythEvent::kUnlockInputDevicesEventType =
+const QEvent::Type MythEvent::kUnlockInputDevicesEventType =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MythEvent::kUpdateBrowseInfoEventType =
+const QEvent::Type MythEvent::kUpdateBrowseInfoEventType =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MythEvent::kDisableUDPListenerEventType =
+const QEvent::Type MythEvent::kDisableUDPListenerEventType =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MythEvent::kEnableUDPListenerEventType =
+const QEvent::Type MythEvent::kEnableUDPListenerEventType =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type ExternalKeycodeEvent::kEventType =
+const QEvent::Type ExternalKeycodeEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 // Force this class to have a vtable so that dynamic_cast works.

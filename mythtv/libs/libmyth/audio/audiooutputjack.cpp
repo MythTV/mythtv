@@ -229,7 +229,7 @@ void AudioOutputJACK::CloseDevice()
     }
 
     VBAUDIO("Jack: Stop Event");
-    OutputEvent e(OutputEvent::Stopped);
+    OutputEvent e(OutputEvent::kStopped);
     dispatch(e);
 }
 
@@ -383,7 +383,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
         if (!m_actuallyPaused)
         {
             VBAUDIO("JackCallback: audio paused");
-            OutputEvent e(OutputEvent::Paused);
+            OutputEvent e(OutputEvent::kPaused);
             dispatch(e);
             m_wasPaused = true;
         }
@@ -395,7 +395,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
         if (m_wasPaused)
         {
             VBAUDIO("JackCallback: Play Event");
-            OutputEvent e(OutputEvent::Playing);
+            OutputEvent e(OutputEvent::kPlaying);
             dispatch(e);
             m_wasPaused = false;
         }
@@ -554,10 +554,9 @@ void AudioOutputJACK::StopOutputThread(void)
 }
 
 // Don't need WriteAudio - this is only for the base class audio loop
-void AudioOutputJACK::WriteAudio(unsigned char *aubuf, int size)
+void AudioOutputJACK::WriteAudio([[maybe_unused]] unsigned char *aubuf,
+                                 [[maybe_unused]] int size)
 {
-    (void)aubuf;
-    (void)size;
     // unneeded and unused in JACK
 }
 

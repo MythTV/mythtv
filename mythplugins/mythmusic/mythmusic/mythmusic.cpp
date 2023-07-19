@@ -259,10 +259,8 @@ static void startImport(void)
 static void (*m_callback)(void *, QString &) = nullptr;
 static void *m_callbackdata = nullptr;
 
-static void MusicCallback(void *data, QString &selection)
+static void MusicCallback([[maybe_unused]] void *data, QString &selection)
 {
-    (void) data;
-
     QString sel = selection.toLower();
     if (sel == "music_create_playlist")
         startDatabaseTree();
@@ -778,9 +776,8 @@ static void handleCDMedia(MythMediaDevice *cd)
     }
 }
 #else
-static void handleCDMedia(MythMediaDevice *cd)
+static void handleCDMedia([[maybe_unused]] MythMediaDevice *cd)
 {
-    Q_UNUSED(cd);
     LOG(VB_GENERAL, LOG_NOTICE, "MythMusic got a media changed event"
                                 "but cdio support is not compiled in");
 }

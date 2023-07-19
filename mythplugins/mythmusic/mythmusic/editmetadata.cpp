@@ -780,7 +780,7 @@ void EditMetadataDialog::customEvent(QEvent *event)
             }
         }
     }
-    else if (event->type() == MythEvent::MythEventMessage)
+    else if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
@@ -1172,7 +1172,7 @@ void EditAlbumartDialog::customEvent(QEvent *event)
             showTypeMenu(false);
         }
     }
-    else if (event->type() == MythEvent::MythEventMessage)
+    else if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)

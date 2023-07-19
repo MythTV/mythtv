@@ -200,7 +200,7 @@
     <div class="form-group field">
         <label for="Frequency" class="label block">{{ 'settings.channelscan.frequency_label' | translate
             }}</label>
-        <p-inputNumber [(ngModel)]="scanRequest.Frequency" name="Frequency" id="Frequency"></p-inputNumber>
+        <p-inputNumber [(ngModel)]="scanRequest.Frequency" name="Frequency" id="Frequency" [min]="0" [max]="999999999"></p-inputNumber>
         <small class="block">
             <div [translate]="'settings.channelscan.frequency_desc'"
                 [translateParams]="{unit: ['DVBS','DVBS2'].includes(scanSubType) ? 'kHZ' : 'Hz'}">

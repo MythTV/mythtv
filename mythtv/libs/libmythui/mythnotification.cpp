@@ -14,6 +14,14 @@
 #include "libmythbase/mythlogging.h"
 #include "mythnotification.h"
 
+const QEvent::Type MythNotification::kNew     = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type MythNotification::kUpdate  = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type MythNotification::kInfo    = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type MythNotification::kError   = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type MythNotification::kWarning = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type MythNotification::kCheck   = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type MythNotification::kBusy    = static_cast<QEvent::Type>(QEvent::registerEventType());
+
 MythNotification::MythNotification(Type nType, void* Parent)
   : MythEvent(nType, "NOTIFICATION"),
     m_parent(Parent)
@@ -21,7 +29,7 @@ MythNotification::MythNotification(Type nType, void* Parent)
 }
 
 MythNotification::MythNotification(int Id, void* Parent)
-  : MythEvent(Update, "NOTIFICATION"),
+  : MythEvent(kUpdate, "NOTIFICATION"),
     m_id(Id),
     m_parent(Parent)
 {
@@ -29,7 +37,7 @@ MythNotification::MythNotification(int Id, void* Parent)
 
 MythNotification::MythNotification(const QString& Title, const QString& Author,
                                    const QString& Details)
-  : MythEvent(New, "NOTIFICATION"),
+  : MythEvent(kNew, "NOTIFICATION"),
     m_description(Title),
     m_metadata({{"minm", Title}, {"asar", Author}, {"asal", Details}})
 {
@@ -227,11 +235,11 @@ QString MythPlaybackNotification::StringFromSeconds(std::chrono::seconds Time)
 
 MythNotification::Type MythNotification::TypeFromString(const QString& Type)
 {
-    if (Type == "error")   return MythNotification::Error;
-    if (Type == "warning") return MythNotification::Warning;
-    if (Type == "check")   return MythNotification::Check;
-    if (Type == "busy")    return MythNotification::Busy;
-    return MythNotification::New;
+    if (Type == "error")   return MythNotification::kError;
+    if (Type == "warning") return MythNotification::kWarning;
+    if (Type == "check")   return MythNotification::kCheck;
+    if (Type == "busy")    return MythNotification::kBusy;
+    return MythNotification::kNew;
 }
 
 MythImageNotification::MythImageNotification(Type nType, QImage Image)
@@ -340,27 +348,27 @@ MythEvent* MythMediaNotification::clone() const
 
 MythErrorNotification::MythErrorNotification(const QString& Title, const QString& Author,
                                              const QString& Details)
-  : MythNotification(Error, Title, Author, Details)
+  : MythNotification(kError, Title, Author, Details)
 {
     SetDuration(10s);
 }
 
 MythWarningNotification::MythWarningNotification(const QString& Title, const QString& Author,
                                                  const QString& Details)
-  : MythNotification(Warning, Title, Author, Details)
+  : MythNotification(kWarning, Title, Author, Details)
 {
     SetDuration(10s);
 }
 
 MythCheckNotification::MythCheckNotification(const QString& Title, const QString& Author,
                                              const QString& Details)
-  : MythNotification(Check, Title, Author, Details)
+  : MythNotification(kCheck, Title, Author, Details)
 {
     SetDuration(5s);
 }
 
 MythBusyNotification::MythBusyNotification(const QString& Title, const QString& Author,
                                            const QString& Details)
-  : MythNotification(Busy, Title, Author, Details)
+  : MythNotification(kBusy, Title, Author, Details)
 {
 }

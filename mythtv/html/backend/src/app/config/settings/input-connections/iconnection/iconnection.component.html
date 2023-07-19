@@ -151,7 +151,8 @@
                     <!-- Scan Panel -->
                     <p-fieldset class="mb-4 w-full" legend="{{ 'settings.iconnection.scan_title' | translate }}"
                         [collapsed]="true" [toggleable]="true" *ngIf="!work.isUnscanable">
-                        <app-channelscan [card]="card" [cardList]="cardList" [iconnection]="this"></app-channelscan>
+                        <app-channelscan [card]="card" [cardList]="cardList" [iconnection]="this"
+                            [videoSourceLookup]="videoSourceLookup"></app-channelscan>
                     </p-fieldset>
 
                     <br><br>

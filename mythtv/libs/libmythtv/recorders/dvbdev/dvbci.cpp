@@ -864,10 +864,9 @@ int cCiSession::SendData(int Tag, int Length, const uint8_t *Data)
   return m_tc->SendData(buffer);
 }
 
-bool cCiSession::Process(int Length, const uint8_t *Data)
+bool cCiSession::Process([[maybe_unused]] int Length,
+                         [[maybe_unused]] const uint8_t *Data)
 {
-  (void)Length;
-  (void)Data;
   return true;
 }
 

@@ -71,13 +71,10 @@ void V4L2encRecorder::SetStrOption(RecordingProfile *profile, const QString &nam
 
 void V4L2encRecorder::SetOptionsFromProfile(RecordingProfile *profile,
                                          const QString &videodev,
-                                         const QString &audiodev,
-                                         const QString &vbidev)
+                                         [[maybe_unused]] const QString &audiodev,
+                                         [[maybe_unused]] const QString &vbidev)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "SetOptionsFromProfile() -- begin");  //debugging
-
-    (void)audiodev;
-    (void)vbidev;
 
     SetOption("videodevice", videodev);
     SetOption("vbidevice", vbidev);

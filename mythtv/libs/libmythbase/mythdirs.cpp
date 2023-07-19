@@ -5,9 +5,11 @@
 #include <QDir>
 #include <QCoreApplication>
 
-#ifdef Q_OS_ANDROID
+#if defined(Q_OS_ANDROID)
 #include <QStandardPaths>
 #include <sys/statfs.h>
+#elif defined(Q_OS_WIN)
+#include <QStandardPaths>
 #endif
 
 #include "mythdirs.h"
@@ -40,7 +42,7 @@ void InitializeMythDirs(void)
 
 #ifdef _WIN32
 
-    if (installprefix.length() == 0)
+    if (installprefix.isEmpty())
         installprefix = QDir( qApp->applicationDirPath() )
                             .absolutePath();
 
@@ -49,11 +51,19 @@ void InitializeMythDirs(void)
 
     // Turn into Canonical Path for consistent compares
 
-    QDir sDir(qgetenv("ProgramData") + "\\mythtv\\");
-    sharedir = sDir.canonicalPath() + "/";
+    QDir sDir(qgetenv("ProgramData") + "/mythtv/");
+    if (sDir.exists())
+        sharedir = sDir.canonicalPath() + "/";
 
-    if (confdir.length() == 0)
-        confdir  = qgetenv( "LOCALAPPDATA" ) + "\\mythtv";
+    if(sharedir.isEmpty())
+    {
+        sharedir = appbindir + "data/mythtv/";
+    }
+    if (confdir.isEmpty())
+    {
+        confdir  = qgetenv( "LOCALAPPDATA" ) + "/mythtv";
+        confdir = QDir(confdir).canonicalPath() + "/";
+    }
 
   #if 0
     // The following code only works for Qt 5.0 and above, but it may
@@ -66,21 +76,41 @@ void InitializeMythDirs(void)
     qApp->setOrganizationName( "mythtv" );
 
     QStringList lstPaths = QStandardPaths::standardLocations(
-                                        QStandardPaths::DataLocation);
+                                        QStandardPaths::AppDataLocation);
 
     // Remove AppName from end of path
 
-    if (lstPaths.length() > 0)
+    QString sAppName = qApp->applicationName();
+    if (!lstPaths.isEmpty())
     {
-        QString sAppName = qApp->applicationName();
+        for (auto &path : lstPaths)
+        {
+            if (path.endsWith(sAppName))
+                path = path.left(path.length() - sAppName.length());
+            LOG(VB_GENERAL, LOG_DEBUG, QString("app data location: %1 (%2)")
+                .arg(path).arg(QDir(path).exists() ? "exists" : "doesn't exist"));
+        }
 
         sharedir = lstPaths.last();
 
         if (sharedir.endsWith( sAppName ))
             sharedir = sharedir.left( sharedir.length() - sAppName.length());
+    }
+
+    lstPaths = QStandardPaths::standardLocations(
+                                        QStandardPaths::AppConfigLocation);
+    if (!lstPaths.isEmpty())
+    {
+        for (auto &path : lstPaths)
+        {
+            if (path.endsWith(sAppName))
+                path = path.left(path.length() - sAppName.length());
+            LOG(VB_GENERAL, LOG_DEBUG, QString("app config location: %1 (%2)")
+                .arg(path).arg(QDir(path).exists() ? "exists" : "doesn't exist"));
+        }
 
         // Only use if user didn't override with env variable.
-        if (confdir.length() == 0)
+        if (confdir.isEmpty())
         {
             confdir = lstPaths.first();
 
@@ -91,8 +121,9 @@ void InitializeMythDirs(void)
 
   #endif
 
-    if (sharedir.length() == 0)
+    if (sharedir.isEmpty())
         sharedir = confdir;
+    sharedir = QDir(sharedir).canonicalPath() + "/";
 
 #elif defined(Q_OS_ANDROID)
     if (installprefix.isEmpty())
@@ -152,7 +183,7 @@ void InitializeMythDirs(void)
 
 #else
 
-    if (installprefix.length() == 0)
+    if (installprefix.isEmpty())
         installprefix = QString(RUNPREFIX);
 
     QDir prefixDir = qApp->applicationDirPath();
@@ -181,7 +212,7 @@ void InitializeMythDirs(void)
 
 #endif
 
-    if (confdir.length() == 0)
+    if (confdir.isEmpty())
         confdir = QDir::homePath() + "/.mythtv";
     cachedir = confdir + "/cache";
     remotecachedir = cachedir + "/remotecache";
@@ -211,6 +242,7 @@ void InitializeMythDirs(void)
     LOG(VB_GENERAL, LOG_DEBUG, "pluginsdir        = "+ pluginsdir       );
     LOG(VB_GENERAL, LOG_DEBUG, "translationsdir   = "+ translationsdir  );
     LOG(VB_GENERAL, LOG_DEBUG, "filtersdir        = "+ filtersdir       );
+    LOG(VB_GENERAL, LOG_DEBUG, "confdir           = "+ confdir          );
     LOG(VB_GENERAL, LOG_DEBUG, "cachedir          = "+ cachedir         );
     LOG(VB_GENERAL, LOG_DEBUG, "remotecachedir    = "+ remotecachedir   );
     LOG(VB_GENERAL, LOG_DEBUG, "themebasecachedir = "+ themebasecachedir);

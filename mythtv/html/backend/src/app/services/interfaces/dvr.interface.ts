@@ -55,6 +55,7 @@ export interface RecordScheduleRequest {
     AutoUserJob3: boolean;
     AutoUserJob4: boolean;
     Transcoder: number;
+    AutoExtend?: string;
 }
 
 export interface AddRecordedCreditsRequest {
@@ -190,4 +191,14 @@ export interface UpdateRecordedMetadataRequest {
     SubTitle?:                string;
     Title?:                   string;
     Watched?:                 boolean;
+}
+
+export interface ManageJobQueueRequest {
+    Action:         string;
+    JobName:        string;
+    JobId?:         number;
+    RecordedId:     number;
+    JobStartTime?:  Date;
+    RemoteHost?:    string;
+    JobArgs?:       string;
 }

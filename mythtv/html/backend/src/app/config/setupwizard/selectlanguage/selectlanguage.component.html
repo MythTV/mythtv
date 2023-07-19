@@ -1,6 +1,6 @@
-<div class="wizard-content m-3">
-    <form class="ml-3 mr-3" name="langform" #langform="ngForm">
-        <p-card class="m-5">
+<div class="wizard-content m-0 md:m-3">
+    <form class="mx-0 md:mx-3" name="langform" #langform="ngForm">
+        <p-card class="m-0 md:m-5">
             <ng-template pTemplate="title">
                 {{ 'setupwizard.localSetup' | translate }}
             </ng-template>
@@ -8,7 +8,7 @@
                 {{ 'setupwizard.countryAndLanguage' | translate }}
             </ng-template>
             <ng-template pTemplate="content">
-                <div class="grid m-3">
+                <div class="grid m-0 md:m-3">
                     <div class="col-12 md:col-6 pt-2">
                         <p-listbox [options]="m_countries" [(ngModel)]="m_wizardData.Country" [multiple]="false"
                             [filter]="true" optionLabel="Country"

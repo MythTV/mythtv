@@ -462,7 +462,7 @@ class ImageLoadEvent : public QEvent
     AnimationFrames *GetAnimationFrames() const { return m_images; }
     bool GetAbortState() const        { return m_aborted; }
 
-    static Type kEventType;
+    static const Type kEventType;
 
   private:
     const MythUIImage *m_parent   {nullptr};
@@ -478,7 +478,7 @@ class ImageLoadEvent : public QEvent
     bool               m_aborted;
 };
 
-QEvent::Type ImageLoadEvent::kEventType =
+const QEvent::Type ImageLoadEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 /*!
@@ -619,14 +619,12 @@ void MythUIImage::Clear(void)
     QWriteLocker updateLocker(&d->m_updateLock);
     QMutexLocker locker(&m_imagesLock);
 
-    while (!m_images.isEmpty())
+    for (auto it = m_images.begin();
+         it != m_images.end();
+         it = m_images.erase(it))
     {
-        QHash<int, MythImage *>::iterator it = m_images.begin();
-
         if (*it)
             (*it)->DecrRef();
-
-        m_images.remove(it.key());
     }
 
     m_delays.clear();

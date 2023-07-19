@@ -3,6 +3,10 @@
     <p-table [value]="recRules" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
         [rowHover]="true" responsiveLayout="scroll">
         <ng-template pTemplate="caption">
+            <button pButton pRipple label="{{ 'dashboard.recrules.new_recrule' | translate }}" icon="pi pi-plus"
+                class="p-button-success mr-2" (click)="newRecRule()"></button>
+            <button pButton pRipple label="{{ 'dashboard.recrules.new_teplate' | translate }}"
+                class="p-button-success p-button-outlined mr-2" (click)="newTemplate()" icon="pi pi-plus"></button>
         </ng-template>
         <ng-template pTemplate="header">
             <tr>
@@ -25,8 +29,10 @@
                     {{ 'dashboard.recrules.nextrec' | translate }}<p-sortIcon field="NextRecording"></p-sortIcon>
                 </th>
                 <th style="flex-basis: 5%" class="p-1">Active</th>
-                <th style="flex-basis: 5%" class="p-1">
+                <th style="flex-basis: 6%" class="p-1">
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-primary"
+                        [disabled]="true"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
                         [disabled]="true"></button>
                 </th>
             </tr>
@@ -41,24 +47,47 @@
                 <td style="flex-basis: 10%" class="p-1">{{recrule.RecGroup}}</td>
                 <td style="flex-basis: 10%" class="p-1">{{recrule.StorageGroup}}</td>
                 <td style="flex-basis: 10%" class="justify-content-end p-1 pr-5">
-                    {{formatDate(recrule.LastRecorded)}}</td>
+                    {{utility.formatDate(recrule.LastRecorded)}}</td>
                 <td style="flex-basis: 15%" class="justify-content-end p-1 pr-5">
-                    {{formatDate(recrule.NextRecording)}} {{formatTime(recrule.NextRecording)}}</td>
+                    {{utility.formatDate(recrule.NextRecording)}} {{utility.formatTime(recrule.NextRecording)}}</td>
                 <td style="flex-basis: 5%" class="p-1">
                     <i class="pi pi-times" style="color:red" *ngIf="recrule.Inactive else checkmark"></i>
                     <ng-template #checkmark>
                         <i class="pi pi-check" style="color:darkgreen"></i>
                     </ng-template>
                 </td>
-                <td style="flex-basis: 5%" class="p-1">
+                <td style="flex-basis: 6%" class="p-1">
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-primary"
-                        (click)="updateRecRule(recrule)"></button>
+                        (click)="updateRecRule(recrule)" pTooltip="{{ 'dashboard.recordings.edit_rule' | translate }}"
+                        tooltipPosition="left"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
+                        (click)="deleteRequest(recrule)" pTooltip="{{ 'dashboard.recordings.delete_rule' | translate }}"
+                        tooltipPosition="left"></button>
+
                 </td>
             </tr>
         </ng-template>
     </p-table>
-
 </div>
+
+<p-dialog header="{{ 'dashboard.recordings.delete_rule' | translate }}" [(visible)]="displayDelete" [modal]="true"
+    [draggable]="false" [resizable]="false">
+    <h2>{{ 'settings.common.ru_sure' | translate }}</h2>
+    <p>{{ 'dashboard.recordings.delete_details' |
+        translate }} <br><b> {{ recRule?.Title }}: {{ recRule?.Type }}</b></p>
+    <ng-template pTemplate="footer">
+        <div class="col-12" style="text-align: left;">
+            <p-message *ngIf="errorCount > 0" severity="error"
+                text="{{ 'common.networkfail' | translate }}"></p-message>
+        </div>
+        <p-button icon="pi pi-times-circle" (onClick)="displayDelete=false" label="{{ 'common.close' | translate }}"
+            styleClass="p-button-warning">
+        </p-button>
+        <p-button icon="pi pi-check-circle" (onClick)="deleteRule(recRule!)" label="{{ 'common.delete' | translate }}"
+            styleClass="p-button-danger"></p-button>
+    </ng-template>
+</p-dialog>
+
 <app-schedule [inter]="inter"></app-schedule>
 <ng-template #loading>
     <p-progressSpinner></p-progressSpinner>

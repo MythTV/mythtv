@@ -55,8 +55,10 @@
 #include "devices/mythinputdevicehandler.h"
 
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #ifdef Q_OS_ANDROID
 #include <QtAndroid>
+#endif
 #endif
 
 static constexpr std::chrono::milliseconds GESTURE_TIMEOUT    { 1s    };
@@ -227,10 +229,11 @@ MythMainWindow::~MythMainWindow()
 
     delete m_themeBase;
 
-    while (!m_priv->m_keyContexts.isEmpty())
+    for (auto iter = m_priv->m_keyContexts.begin();
+         iter != m_priv->m_keyContexts.end();
+         iter = m_priv->m_keyContexts.erase(iter))
     {
-        KeyContext *context = *m_priv->m_keyContexts.begin();
-        m_priv->m_keyContexts.erase(m_priv->m_keyContexts.begin());
+        KeyContext *context = *iter;
         delete context;
     }
 
@@ -520,7 +523,7 @@ void MythMainWindow::DoRemoteScreenShot(const QString& Filename, int Width, int 
     args << QString::number(Width);
     args << QString::number(Height);
     args << Filename;
-    MythEvent me(MythEvent::MythEventMessage, ACTION_SCREENSHOT, args);
+    MythEvent me(MythEvent::kMythEventMessage, ACTION_SCREENSHOT, args);
     QCoreApplication::sendEvent(this, &me);
 }
 
@@ -778,7 +781,11 @@ void MythMainWindow::DelayedAction()
     Show();
 
 #ifdef Q_OS_ANDROID
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QtAndroid::hideSplashScreen();
+#else
+    QNativeInterface::QAndroidApplication::hideSplashScreen();
+#endif
 #endif
 }
 
@@ -1973,7 +1980,7 @@ void MythMainWindow::customEvent(QEvent* Event)
     {
         MythUDP::EnableUDPListener(true);
     }
-    else if (Event->type() == MythEvent::MythEventMessage)
+    else if (Event->type() == MythEvent::kMythEventMessage)
     {
         auto * event = dynamic_cast<MythEvent *>(Event);
         if (event == nullptr)
@@ -2059,7 +2066,7 @@ void MythMainWindow::customEvent(QEvent* Event)
             gCoreContext->AllowShutdown();
         }
     }
-    else if (Event->type() == MythEvent::MythUserMessage)
+    else if (Event->type() == MythEvent::kMythUserMessage)
     {
         if (auto * event = dynamic_cast<MythEvent *>(Event); event != nullptr)
             if (const QString& message = event->Message(); !message.isEmpty())

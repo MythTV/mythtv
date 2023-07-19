@@ -12,6 +12,16 @@
 #define LOC      QString("Subtitles: ")
 #define LOC_WARN QString("Subtitles Warning: ")
 
+#ifdef DEBUG_SUBTITLES
+static QString toString(MythVideoFrame const * const frame)
+{
+    std::chrono::milliseconds time = frame->m_timecode;
+    return QString("%1(%2)")
+        .arg(MythDate::formatTime(time,"HH:mm:ss.zzz"))
+        .arg(time.count());
+}
+#endif
+
 // Class SubWrapper is used to attach caching structures to MythUIType
 // objects in the SubtitleScreen's m_ChildrenList.  If these objects
 // inherit from SubWrapper, they can carry relevant information and an
@@ -1375,6 +1385,12 @@ SubtitleScreen::SubtitleScreen(MythPlayer *Player, MythPainter *Painter,
     m_format(new SubtitleFormat)
 {
     m_painter = Painter;
+
+    connect(m_player, &MythPlayer::SeekingDone, this, [&]()
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "SeekingDone signal received.");
+        m_atEnd = false;
+    });
 }
 
 SubtitleScreen::~SubtitleScreen(void)
@@ -1835,22 +1851,128 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 
     MythVideoOutput *videoOut = m_player->GetVideoOutput();
     MythVideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : nullptr;
+    int ret {0};
 
     if (!currentFrame || !videoOut)
         return;
+
+    if (subs->m_buffers.empty() && (m_subreader->GetParser() != nullptr))
+    {
+        if (subs->m_needSync)
+        {
+            // Seeking on a subtitle stream is a pain. The internals
+            // of ff_subtitles_queue_seek() calls search_sub_ts(),
+            // which always returns the subtitle that starts on or
+            // before the current timestamp.
+            //
+            // If avformat_seek_file() has been asked to search
+            // forward, then the subsequent range check will always
+            // fail because avformat_seek_file() has set the minimum
+            // timestamp to the requested timestamp.  This call only
+            // succeeds if the timestamp matches to the millisecond.
+            //
+            // If avformat_seek_file() has been asked to search
+            // backward then a subtitle will be returned, but because
+            // that subtitle is in the past the code below this
+            // comment will always consume that subtitle, resulting in
+            // a new seek every time this function is called.
+            //
+            // The solution seems to be to seek backwards so that we
+            // get the subtitle that should have most recently been
+            // displayed, then skip that subtitle to get the one that
+            // should be displayed next.
+            lock.unlock();
+            m_subreader->SeekFrame(currentFrame->m_timecode.count()*1000,
+                                   AVSEEK_FLAG_BACKWARD);
+            ret = m_subreader->ReadNextSubtitle();
+            if (ret < 0)
+            {
+                m_atEnd = true;
+#ifdef DEBUG_SUBTITLES
+                if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
+                {
+                    LOG(VB_PLAYBACK, LOG_DEBUG,
+                        LOC + QString("time %1, no subtitle available after seek")
+                        .arg(toString(currentFrame)));
+                }
+#endif
+            }
+            lock.relock();
+
+            AVSubtitle subtitle = subs->m_buffers.front();
+            if (subtitle.end_display_time < currentFrame->m_timecode.count())
+            {
+                subs->m_buffers.pop_front();
+#ifdef DEBUG_SUBTITLES
+                if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
+                {
+                    LOG(VB_PLAYBACK, LOG_DEBUG,
+                        LOC + QString("time %1, drop %2")
+                        .arg(toString(currentFrame), toString(subtitle)));
+                }
+#endif
+            }
+        }
+
+        // Always add one subtitle.
+        lock.unlock();
+        if (!m_atEnd)
+        {
+            ret = m_subreader->ReadNextSubtitle();
+            if (ret < 0)
+            {
+                m_atEnd = true;
+#ifdef DEBUG_SUBTITLES
+                if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
+                {
+                    LOG(VB_PLAYBACK, LOG_DEBUG,
+                        LOC + QString("time %1, no subtitle available")
+                        .arg(toString(currentFrame)));
+                }
+#endif
+            }
+        }
+        lock.relock();
+    }
 
     float tmp = 0.0;
     QRect dummy;
     videoOut->GetOSDBounds(dummy, m_safeArea, tmp, tmp, tmp);
 
+    [[maybe_unused]] bool assForceNext {false};
     while (!subs->m_buffers.empty())
     {
         AVSubtitle subtitle = subs->m_buffers.front();
         if (subtitle.start_display_time > currentFrame->m_timecode.count())
+        {
+#ifdef DEBUG_SUBTITLES
+            if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
+            {
+                LOG(VB_PLAYBACK, LOG_DEBUG,
+                    LOC + QString("time %1, next %2")
+                    .arg(toString(currentFrame), toString(subtitle)));
+            }
+#endif
             break;
+        }
+
+        // If this is the most recently displayed subtitle and a
+        // backward jump means that it needs to be displayed again,
+        // the call to ass_render_frame will say there is no work to
+        // be done. Force RenderAssTrack to display the subtitle
+        // anyway.
+        assForceNext = true;
 
         auto displayfor = std::chrono::milliseconds(subtitle.end_display_time -
                                                     subtitle.start_display_time);
+#ifdef DEBUG_SUBTITLES
+        if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
+        {
+            LOG(VB_PLAYBACK, LOG_DEBUG,
+                LOC + QString("time %1, show %2")
+                .arg(toString(currentFrame), toString(subtitle)));
+        }
+#endif
         if (displayfor == 0ms)
             displayfor = 60s;
         displayfor = (displayfor < 50ms) ? 50ms : displayfor;
@@ -1936,8 +2058,9 @@ void SubtitleScreen::DisplayAVSubtitles(void)
         SubtitleReader::FreeAVSubtitle(subtitle);
     }
 #ifdef USING_LIBASS
-    RenderAssTrack(currentFrame->m_timecode);
+    RenderAssTrack(currentFrame->m_timecode, assForceNext);
 #endif
+    subs->m_needSync = false;
 }
 
 int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
@@ -2414,7 +2537,7 @@ void SubtitleScreen::ResizeAssRenderer(void)
     ass_set_font_scale(m_assRenderer, 1.0);
 }
 
-void SubtitleScreen::RenderAssTrack(std::chrono::milliseconds timecode)
+void SubtitleScreen::RenderAssTrack(std::chrono::milliseconds timecode, bool force)
 {
     if (!m_player || !m_assRenderer || !m_assTrack)
         return;
@@ -2430,7 +2553,7 @@ void SubtitleScreen::RenderAssTrack(std::chrono::milliseconds timecode)
 
     int changed = 0;
     ASS_Image *images = ass_render_frame(m_assRenderer, m_assTrack, timecode.count(), &changed);
-    if (!changed)
+    if (!changed && !force)
         return;
 
     int count = 0;

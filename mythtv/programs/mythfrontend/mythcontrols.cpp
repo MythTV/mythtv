@@ -144,18 +144,16 @@ void MythControls::ChangeButtonFocus(int direction)
 /**
  *  \brief Slot handling a button being pressed in the left list
  */
-void MythControls::LeftPressed(MythUIButtonListItem *item)
+void MythControls::LeftPressed([[maybe_unused]] MythUIButtonListItem *item)
 {
-    (void) item;
     NextPrevWidgetFocus(true);
 }
 
 /**
  *  \brief Slot handling a button being pressed in the left list
  */
-void MythControls::RightPressed(MythUIButtonListItem *item)
+void MythControls::RightPressed([[maybe_unused]] MythUIButtonListItem *item)
 {
-    (void) item;
     if (m_currentView == kActionsByContext)
         ChangeButtonFocus(0);
 }

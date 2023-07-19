@@ -399,7 +399,7 @@ class AudioCompressionSettings : public GroupSetting
 {
   public:
     AudioCompressionSettings(const RecordingProfile &parentProfile,
-                             V4L2util* v4l2) :
+                             [[maybe_unused]] V4L2util* v4l2) :
         m_parent(parentProfile)
     {
         setName(QObject::tr("Audio Quality"));
@@ -511,8 +511,6 @@ class AudioCompressionSettings : public GroupSetting
                 }
             }
         }
-#else
-	Q_UNUSED(v4l2);
 #endif //  USING_V4L2
     }
 
@@ -895,7 +893,7 @@ class VideoCompressionSettings : public GroupSetting
 {
   public:
     VideoCompressionSettings(const RecordingProfile &parentProfile,
-                             V4L2util* v4l2) :
+                             [[maybe_unused]] V4L2util* v4l2) :
         m_parent(parentProfile)
     {
         setName(QObject::tr("Video Compression"));
@@ -1127,8 +1125,6 @@ class VideoCompressionSettings : public GroupSetting
                 }
             }
         }
-#else
-	Q_UNUSED(v4l2);
 #endif // USING_V4L2
     }
 
@@ -1486,7 +1482,7 @@ void RecordingProfile::FiltersChanged(const QString &val)
 }
 
 bool RecordingProfile::loadByType(const QString &name, const QString &card,
-                                  const QString &videodev)
+                                  [[maybe_unused]] const QString &videodev)
 {
     QString hostname = gCoreContext->GetHostName().toLower();
     QString cardtype = card;
@@ -1499,8 +1495,6 @@ bool RecordingProfile::loadByType(const QString &name, const QString &card,
         if (m_v4l2util->IsOpen())
             cardtype = m_v4l2util->ProfileName();
     }
-#else
-    Q_UNUSED(videodev);
 #endif
 
     MSqlQuery result(MSqlQuery::InitCon());

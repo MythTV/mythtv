@@ -349,13 +349,19 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
         iibreak = breakMap->erase(iibreak);
 
         /* Trim leading blanks from commercial break. */
-        long long addb = *blankMap->find(iib);
+        auto iter = blankMap->find(iib);
+        if (iter == blankMap->end())
+            break;
+        long long addb = *iter;
         addb = addb / 2;
         if (addb > MAX_BLANK_FRAMES)
             addb = MAX_BLANK_FRAMES;
         iib += addb;
         /* Add trailing blanks to commercial break. */
-        long long adde = *blankMap->find(iie);
+        iter = blankMap->find(iib);
+        if (iter == blankMap->end())
+            break;
+        long long adde = *iter;
         iie += adde;
         long long sube = adde / 2;
         if (sube > MAX_BLANK_FRAMES)
@@ -615,10 +621,8 @@ BlankFrameDetector::computeForLogoSurplus(
 
 int
 BlankFrameDetector::computeForLogoDeficit(
-        const TemplateMatcher *templateMatcher)
+        [[maybe_unused]] const TemplateMatcher *templateMatcher)
 {
-    (void)templateMatcher;  /* gcc */
-
     LOG(VB_COMMFLAG, LOG_INFO, "BlankFrameDetector adjusting for "
                                "too little logo coverage (unimplemented)");
     return 0;

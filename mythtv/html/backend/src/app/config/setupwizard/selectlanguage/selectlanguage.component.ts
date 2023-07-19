@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { MythCountryList, Country } from '../../../services/interfaces/country.interface';
 import { MythLanguageList, Language } from "../../../services/interfaces/language.interface";
@@ -14,7 +14,8 @@ import { MythService } from 'src/app/services/myth.service';
 @Component({
     selector: 'app-selectlanguage',
     templateUrl: './selectlanguage.component.html',
-    styleUrls: ['./selectlanguage.component.css']
+    styleUrls: ['./selectlanguage.component.css'],
+    encapsulation: ViewEncapsulation.None,
 })
 
 export class SelectLanguageComponent implements OnInit, AfterViewInit {

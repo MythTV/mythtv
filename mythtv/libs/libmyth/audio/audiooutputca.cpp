@@ -395,10 +395,9 @@ bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
 }
 
 // unneeded and unused in CA
-void AudioOutputCA::WriteAudio(unsigned char *aubuf, int size)
+void AudioOutputCA::WriteAudio([[maybe_unused]] unsigned char *aubuf,
+                               [[maybe_unused]] int size)
 {
-    (void)aubuf;
-    (void)size;
 }
 
 int AudioOutputCA::GetBufferedOnSoundcard(void) const
@@ -427,13 +426,10 @@ std::chrono::milliseconds AudioOutputCA::GetAudiotime(void)
 OSStatus RenderCallbackAnalog(void                       *inRefCon,
                               AudioUnitRenderActionFlags *ioActionFlags,
                               const AudioTimeStamp       *inTimeStamp,
-                              UInt32                     inBusNumber,
-                              UInt32                     inNumberFrames,
+                              [[maybe_unused]] UInt32     inBusNumber,
+                              [[maybe_unused]] UInt32     inNumberFrames,
                               AudioBufferList            *ioData)
 {
-    (void)inBusNumber;
-    (void)inNumberFrames;
-
     AudioOutputCA *inst = (static_cast<CoreAudioData *>(inRefCon))->mCA;
 
     if (!inst->RenderAudio((unsigned char *)(ioData->mBuffers[0].mData),
@@ -447,10 +443,9 @@ OSStatus RenderCallbackAnalog(void                       *inRefCon,
     return noErr;
 }
 
-int AudioOutputCA::GetVolumeChannel(int channel) const
+int AudioOutputCA::GetVolumeChannel([[maybe_unused]] int channel) const
 {
     // FIXME: this only returns global volume
-    (void)channel;
     Float32 volume;
 
     if (!AudioUnitGetParameter(d->mOutputUnit,
@@ -461,19 +456,18 @@ int AudioOutputCA::GetVolumeChannel(int channel) const
     return 0;    // error case
 }
 
-void AudioOutputCA::SetVolumeChannel(int channel, int volume)
+void AudioOutputCA::SetVolumeChannel([[maybe_unused]] int channel, int volume)
 {
     // FIXME: this only sets global volume
-    (void)channel;
     AudioUnitSetParameter(d->mOutputUnit, kHALOutputParam_Volume,
                           kAudioUnitScope_Global, 0, (volume * 0.01F), 0);
 }
 
 // IOProc style callback for SPDIF audio output
-static OSStatus RenderCallbackSPDIF(AudioDeviceID        inDevice,
-                                    const AudioTimeStamp *inNow,
-                                    const void           *inInputData,
-                                    const AudioTimeStamp *inInputTime,
+static OSStatus RenderCallbackSPDIF([[maybe_unused]] AudioDeviceID        inDevice,
+                                    [[maybe_unused]] const AudioTimeStamp *inNow,
+                                    [[maybe_unused]] const void           *inInputData,
+                                    [[maybe_unused]] const AudioTimeStamp *inInputTime,
                                     AudioBufferList      *outOutputData,
                                     const AudioTimeStamp *inOutputTime,
                                     void                 *inRefCon)
@@ -481,11 +475,6 @@ static OSStatus RenderCallbackSPDIF(AudioDeviceID        inDevice,
     auto *d = static_cast<CoreAudioData *>(inRefCon);
     AudioOutputCA    *a = d->mCA;
     int           index = d->mStreamIndex;
-
-    (void)inDevice;     // unused
-    (void)inNow;        // unused
-    (void)inInputData;  // unused
-    (void)inInputTime;  // unused
 
     /*
      * HACK: No idea why this would be the case, but after the second run, we get

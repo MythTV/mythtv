@@ -252,7 +252,7 @@ void ProgFinder::ShowMenu(void)
 
 void ProgFinder::customEvent(QEvent *event)
 {
-    if (event->type() == MythEvent::MythEventMessage)
+    if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
@@ -795,22 +795,19 @@ void JaProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindin
 }
 
 
-bool JaProgFinder::formatSelectedData(QString& data)
+bool JaProgFinder::formatSelectedData([[maybe_unused]] QString& data)
 {
-    (void)data;
     return true;
 }
 
-bool JaProgFinder::formatSelectedData(QString& data, int charNum)
+bool JaProgFinder::formatSelectedData([[maybe_unused]] QString& data,
+                                      [[maybe_unused]] int charNum)
 {
-    (void)data;
-    (void)charNum;
     return true;
 }
 
-void JaProgFinder::restoreSelectedData(QString& data)
+void JaProgFinder::restoreSelectedData([[maybe_unused]] QString& data)
 {
-    (void)data;
 }
 
 // Hebrew specific program finder
@@ -882,22 +879,19 @@ void HeProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindin
     bindings[":STARTTIME"] = progStart.addSecs(50 - progStart.time().second());
 }
 
-bool HeProgFinder::formatSelectedData(QString& data)
+bool HeProgFinder::formatSelectedData([[maybe_unused]] QString& data)
 {
-    (void)data;
     return true;
 }
 
-bool HeProgFinder::formatSelectedData(QString& data, int charNum)
+bool HeProgFinder::formatSelectedData([[maybe_unused]] QString& data,
+                                      [[maybe_unused]] int charNum)
 {
-    (void)data;
-    (void)charNum;
     return true;
 }
 
-void HeProgFinder::restoreSelectedData(QString& data)
+void HeProgFinder::restoreSelectedData([[maybe_unused]] QString& data)
 {
-    (void)data;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1013,22 +1007,19 @@ void RuProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings
    }
 }
 
-bool RuProgFinder::formatSelectedData(QString& data)
+bool RuProgFinder::formatSelectedData([[maybe_unused]] QString& data)
 {
-    (void)data;
     return true;
 }
 
-bool RuProgFinder::formatSelectedData(QString& data, int charNum)
+bool RuProgFinder::formatSelectedData([[maybe_unused]] QString& data,
+                                      [[maybe_unused]] int charNum)
 {
-    (void)data;
-    (void)charNum;
     return true;
 }
 
-void RuProgFinder::restoreSelectedData(QString& data)
+void RuProgFinder::restoreSelectedData([[maybe_unused]] QString& data)
 {
-    (void)data;
 }
 
 ProgramInfo *ProgFinder::GetCurrentProgram(void) const

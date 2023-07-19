@@ -83,7 +83,8 @@ class MUI_PUBLIC MythPainter : public QObject
     virtual void DrawEllipse(QRect area, const QBrush &fillBrush,
                              const QPen &linePen, int alpha);
 
-    virtual void PushTransformation(const UIEffects &zoom, QPointF center = QPointF());
+    virtual void PushTransformation([[maybe_unused]] const UIEffects &zoom,
+                                    [[maybe_unused]] QPointF center = QPointF()) {};
     virtual void PopTransformation(void) { }
 
     /// Returns a blank reference counted image in the format required

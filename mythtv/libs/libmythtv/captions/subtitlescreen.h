@@ -253,6 +253,7 @@ private:
     std::chrono::milliseconds m_textFontDurationExtensionMsPrev {0ms};
     bool            m_refreshModified     {false};
     bool            m_refreshDeleted      {false};
+    bool            m_atEnd               {false};
     int             m_fontStretch;
     QString         m_family; // 608, 708, text, teletext
     // Subtitles initialized but still to be processed and drawn
@@ -267,7 +268,7 @@ private:
     void CleanupAssTrack(void);
     void AddAssEvent(char *event, uint32_t starttime, uint32_t endtime);
     void ResizeAssRenderer(void);
-    void RenderAssTrack(std::chrono::milliseconds timecode);
+    void RenderAssTrack(std::chrono::milliseconds timecode, bool force);
 
     ASS_Library    *m_assLibrary          {nullptr};
     ASS_Renderer   *m_assRenderer         {nullptr};

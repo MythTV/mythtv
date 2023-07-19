@@ -316,7 +316,6 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     this.work.fetchStatus = 1;
     this.channelService.FetchChannelsFromSource(parm).subscribe({
       next: (x: any) => {
-        console.log(x);
         if (x.int > 0)
           this.work.fetchStatus = 2;
         else

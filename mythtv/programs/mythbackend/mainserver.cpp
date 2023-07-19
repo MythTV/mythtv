@@ -1134,7 +1134,7 @@ void MainServer::customEvent(QEvent *e)
         }
     }
 
-    if (e->type() == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(e);
         if (me == nullptr)
@@ -5235,7 +5235,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                             (!strcmp(fstypename, "afpfs")) || // ApplShr
                             (!strcmp(fstypename, "smbfs")))   // SMB
                             localStr = "0";
-#elif __linux__
+#elif defined(__linux__)
                         long fstype = statbuf.f_type;
                         if ((fstype == 0x6969) ||             // NFS
                             (fstype == 0x517B) ||             // SMB
@@ -7354,10 +7354,9 @@ void MainServer::HandleSetLogLevel(const QStringList &slist, PlaybackSock *pbs)
     SendResponse(pbssock, retlist);
 }
 
-void MainServer::HandleIsRecording(const QStringList &slist, PlaybackSock *pbs)
+void MainServer::HandleIsRecording([[maybe_unused]] const QStringList &slist,
+                                   PlaybackSock *pbs)
 {
-    (void)slist;
-
     MythSocket *pbssock = pbs->getSocket();
     int RecordingsInProgress = 0;
     int LiveTVRecordingsInProgress = 0;

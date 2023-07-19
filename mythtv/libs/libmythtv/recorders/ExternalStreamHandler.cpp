@@ -72,7 +72,9 @@ ExternIO::~ExternIO(void)
     delete[] m_buffer;
 }
 
-bool ExternIO::Ready(int fd, std::chrono::milliseconds timeout, const QString & what)
+bool ExternIO::Ready([[maybe_unused]] int fd,
+                     [[maybe_unused]] std::chrono::milliseconds timeout,
+                     [[maybe_unused]] const QString & what)
 {
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
     std::array<struct pollfd,2> m_poll {};
@@ -100,10 +102,6 @@ bool ExternIO::Ready(int fd, std::chrono::milliseconds timeout, const QString & 
             m_error = "poll overflow";
         return false;
     }
-#else
-    Q_UNUSED(fd);
-    Q_UNUSED(timeout);
-    Q_UNUSED(what);
 #endif // !defined( USING_MINGW ) && !defined( _MSC_VER )
     return false;
 }
@@ -242,16 +240,13 @@ bool ExternIO::Run(void)
 }
 
 /* Return true if the process is not, or is no longer running */
-bool ExternIO::KillIfRunning(const QString & cmd)
+bool ExternIO::KillIfRunning([[maybe_unused]] const QString & cmd)
 {
 #if defined(Q_OS_DARWIN) || defined(__FreeBSD__) || defined(__OpenBSD__)
-    Q_UNUSED(cmd);
     return false;
 #elif defined USING_MINGW
-    Q_UNUSED(cmd);
     return false;
 #elif defined( _MSC_VER )
-    Q_UNUSED(cmd);
     return false;
 #else
     QString grp = QString("pgrep -x -f -- \"%1\" 2>&1 > /dev/null").arg(cmd);

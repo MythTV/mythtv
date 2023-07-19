@@ -30,9 +30,8 @@ BorderDetector::BorderDetector(void)
 }
 
 int
-BorderDetector::MythPlayerInited(const MythPlayer *player)
+BorderDetector::MythPlayerInited([[maybe_unused]] const MythPlayer *player)
 {
-    (void)player;  /* gcc */
     m_timeReported = false;
     memset(&m_analyzeTime, 0, sizeof(m_analyzeTime));
     return 0;

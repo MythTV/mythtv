@@ -9,7 +9,13 @@
 // Qt
 #include <QtGlobal>
 #ifdef Q_OS_ANDROID
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QtAndroidExtras>
+#else
+#include <QCoreApplication>
+#include <QJniObject>
+#define QAndroidJniObject QJniObject
+#endif
 #endif
 #include <QApplication>
 #include <QDir>
@@ -892,9 +898,8 @@ static void handleGalleryMedia(MythMediaDevice *dev)
         LOG(VB_MEDIA, LOG_INFO, "Main: Ignoring new gallery media - autorun not set");
 }
 
-static void TVMenuCallback(void *data, QString &selection)
+static void TVMenuCallback([[maybe_unused]] void *data, QString &selection)
 {
-    (void)data;
     QString sel = selection.toLower();
 
     if (sel.startsWith("settings ") || sel == "video_settings_general")
@@ -1436,7 +1441,11 @@ static int reloadTheme(void)
     // reinitializing the main windows causes a segfault
     // with android
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     auto activity = QtAndroid::androidActivity();
+#else
+    QJniObject activity = QNativeInterface::QAndroidApplication::context();
+#endif
     auto packageManager = activity.callObjectMethod
         (   "getPackageManager",
             "()Landroid/content/pm/PackageManager;"  );

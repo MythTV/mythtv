@@ -767,7 +767,8 @@ TemplateFinder::~TemplateFinder(void)
 }
 
 enum FrameAnalyzer::analyzeFrameResult
-TemplateFinder::MythPlayerInited(MythPlayer *player, long long nframes)
+TemplateFinder::MythPlayerInited(MythPlayer *player,
+                                 [[maybe_unused]] long long nframes)
 {
     /*
      * Only detect edges in portions of the frame where we expect to find
@@ -781,7 +782,6 @@ TemplateFinder::MythPlayerInited(MythPlayer *player, long long nframes)
     QString tmpldims;
     QString playerdims;
 
-    (void)nframes; /* gcc */
     QSize buf_dim = player->GetVideoBufferSize();
     m_width  = buf_dim.width();
     m_height = buf_dim.height();
@@ -980,9 +980,8 @@ error:
 }
 
 int
-TemplateFinder::finished(long long nframes, bool final)
+TemplateFinder::finished([[maybe_unused]] long long nframes, bool final)
 {
-    (void)nframes;  /* gcc */
     if (!m_tmplDone)
     {
         if (!template_alloc(m_scores, m_width, m_height,

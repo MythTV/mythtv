@@ -423,7 +423,7 @@ bool PreviewGenerator::RemotePreviewRun(void)
 
 bool PreviewGenerator::event(QEvent *e)
 {
-    if (e->type() != MythEvent::MythEventMessage)
+    if (e->type() != MythEvent::kMythEventMessage)
         return QObject::event(e);
 
     auto *me = dynamic_cast<MythEvent*>(e);

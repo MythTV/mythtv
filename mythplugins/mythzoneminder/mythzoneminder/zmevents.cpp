@@ -220,10 +220,8 @@ void ZMEvents::dateChanged()
     getEventList();
 }
 
-void ZMEvents::eventChanged(MythUIButtonListItem *item)
+void ZMEvents::eventChanged([[maybe_unused]] MythUIButtonListItem *item)
 {
-    (void) item;
-
     if (m_eventNoText)
     {
         if (m_eventGrid->GetCount() > 0)

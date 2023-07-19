@@ -56,9 +56,9 @@
 static constexpr qint64 FE_SHORT_TO {  2000 }; //  2 seconds
 static constexpr qint64 FE_LONG_TO  { 10000 }; // 10 seconds
 
-static QEvent::Type kNetworkControlDataReadyEvent =
+static const QEvent::Type kNetworkControlDataReadyEvent =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type NetworkControlCloseEvent::kEventType =
+const QEvent::Type NetworkControlCloseEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 static const QRegularExpression kChanID1RE { "^\\d+$" };
@@ -1541,7 +1541,7 @@ QString NetworkControl::processMessage(NetworkCommand *nc)
 
     QString message = nc->getCommand().remove(0, 7).trimmed();
     MythMainWindow *window = GetMythMainWindow();
-    auto* me = new MythEvent(MythEvent::MythUserMessage, message);
+    auto* me = new MythEvent(MythEvent::kMythUserMessage, message);
     qApp->postEvent(window, me);
     return {"OK"};
 }
@@ -1595,7 +1595,7 @@ void NetworkControl::sendReplyToClient(NetworkControlClient *ncc,
 
 void NetworkControl::customEvent(QEvent *e)
 {
-    if (e->type() == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(e);
         if (me == nullptr)
@@ -1862,7 +1862,7 @@ QString NetworkControl::saveScreenshot(NetworkCommand *nc)
         args << QString::number(width);
         args << QString::number(height);
     }
-    auto *me = new MythEvent(MythEvent::MythEventMessage,
+    auto *me = new MythEvent(MythEvent::kMythEventMessage,
                                   ACTION_SCREENSHOT, args);
     qApp->postEvent(window, me);
     return "OK";

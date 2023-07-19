@@ -26,7 +26,7 @@ class META_PUBLIC MetadataFactoryMultiResult : public QEvent
 
     MetadataLookupList m_results;
 
-    static Type kEventType;
+    static const Type kEventType;
 };
 
 class META_PUBLIC MetadataFactorySingleResult : public QEvent
@@ -44,7 +44,7 @@ class META_PUBLIC MetadataFactorySingleResult : public QEvent
 
     MetadataLookup *m_result {nullptr};
 
-    static Type kEventType;
+    static const Type kEventType;
 };
 
 class META_PUBLIC MetadataFactoryNoResult : public QEvent
@@ -62,7 +62,7 @@ class META_PUBLIC MetadataFactoryNoResult : public QEvent
 
     MetadataLookup *m_result {nullptr};
 
-    static Type kEventType;
+    static const Type kEventType;
 };
 
 class META_PUBLIC MetadataFactoryVideoChanges : public QEvent
@@ -79,7 +79,7 @@ class META_PUBLIC MetadataFactoryVideoChanges : public QEvent
     QList<int> m_moved; // intids moved to new filename
     QList<int> m_deleted; // orphaned/deleted intids
 
-    static Type kEventType;
+    static const Type kEventType;
 };
 
 class META_PUBLIC MetadataFactory : public QObject

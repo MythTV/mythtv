@@ -1,19 +1,25 @@
 <div class="statusBox">
-    <h2>Encoder Status</h2>
+    <h2>{{ 'dashboard.status.encoder_title' | translate }}</h2>
     <div *ngIf="encoders?.length != 0; else noEncoders">
         <div *ngFor="let encoder of encoders">
             <ul>
                 <!-- TODO: The details of the Capture Card need to be pulled from the /Capture API -->
                 <li>
-                    Encoder {{ encoder.Id }} is on host {{ encoder.HostName }}, State: {{ EncoderStatusText(encoder.State) }}
+                    {{ 'dashboard.status.encoder_text' |
+                    translate: { Id: encoder.Id, HostName: encoder.HostName, State: EncoderStatusText(encoder.State) }
+                    }}
                     <!-- TVState.kState_RecordingOnly = 7 -->
-                    <ng-container *ngIf="encoder.State == 7"> '{{ encoder.Recording.Title }}' on {{ encoder.Recording.Channel.CallSign }}.
-                        This recording is scheduled to end at {{ encoder.Recording.EndTime }}.
+                    <ng-container *ngIf="encoder.State == 7"> '{{ encoder.Recording.Title }}' on {{
+                        encoder.Recording.Channel.CallSign }}.
+                        {{ 'dashboard.status.endtime_text' |
+                        translate: { EndTime: utility.formatTime(encoder.Recording.EndTime) } }}
                     </ng-container>
                 </li>
                 <div *ngFor="let input of encoder.Inputs">
                     <ul>
-                        <li>Card: {{ input.CardId }}, Input: {{ input.Id }} is {{ input.InputName }}, displayname: {{ input.DisplayName }} </li>
+                        <li>{{ 'dashboard.status.card_text' |
+                            translate: { CardId: input.CardId, Id: input.Id, InputName: input.InputName, DisplayName:
+                            input.DisplayName } }} </li>
                     </ul>
                 </div>
             </ul>
@@ -21,5 +27,5 @@
     </div>
 </div>
 <ng-template #noEncoders>
-    <div>Backend has no encoders</div>
+    <div>{{ 'dashboard.status.no_encoders' | translate }}</div>
 </ng-template>

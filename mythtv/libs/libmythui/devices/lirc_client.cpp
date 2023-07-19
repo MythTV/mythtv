@@ -429,10 +429,10 @@ static void lirc_parse_string(const struct lirc_state *state, char *s,const char
 	*t=0;
 }
 
-static void lirc_parse_include(char *s,const char *name,int line)
+static void lirc_parse_include(char *s,
+                               [[maybe_unused]] const char *name,
+                               [[maybe_unused]] int line)
 {
-        (void)name;
-        (void)line;
 	size_t len=strlen(s);
 	if(len<2)
 	{

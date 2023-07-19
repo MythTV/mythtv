@@ -15,7 +15,7 @@ class DummyChannel : public ChannelBase
 {
   public:
     explicit DummyChannel(TVRec *parent): ChannelBase(parent)
-        { (void)parent; m_curChannelName.clear(); m_curInputName.clear(); }
+        { m_curChannelName.clear(); m_curInputName.clear(); }
     ~DummyChannel(void) override = default;
 
     bool IsTunable(const QString &/*channum*/) const override // ChannelBase

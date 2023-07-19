@@ -106,7 +106,10 @@ bool getUptime(std::chrono::seconds &uptime)
  *  \todo Memory Statistics are not supported (by MythTV) on NT or DOS.
  *  \return true if it succeeds, false otherwise.
  */
-bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
+bool getMemStats([[maybe_unused]] int &totalMB,
+                 [[maybe_unused]] int &freeMB,
+                 [[maybe_unused]] int &totalVM,
+                 [[maybe_unused]] int &freeVM)
 {
 #ifdef __linux__
     static constexpr size_t MB { 1024LL * 1024 };
@@ -159,10 +162,6 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     freeVM = (int)(free >> 10);
     return true;
 #else
-    Q_UNUSED(totalMB);
-    Q_UNUSED(freeMB);
-    Q_UNUSED(totalVM);
-    Q_UNUSED(freeVM);
     return false;
 #endif
 }

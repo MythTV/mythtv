@@ -25,7 +25,7 @@ class MUI_PUBLIC ProgressUpdateEvent : public QEvent
     uint GetTotal() const { return m_total; }
     uint GetCount() const { return m_count; }
 
-    static Type kEventType;
+    static const Type kEventType;
 
   private:
     uint m_total {0};

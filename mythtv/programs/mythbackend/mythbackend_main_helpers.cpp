@@ -219,9 +219,9 @@ bool setupTVs(bool ismaster, bool &error)
                     LOG(VB_GENERAL, LOG_ERR, "Problem with capture cards. " +
                             cidmsg + " failed init");
                     delete tv;
-                    // The master assumes card comes up so we need to
-                    // set error and exit if a non-master card fails.
-                    error = true;
+                    // No longer set an error here, because we need the
+                    // slave backend to be able to start without a capture
+                    // card, so that it can be setup through the web app
                 }
             }
         }
@@ -562,7 +562,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         LOG(VB_GENERAL, LOG_ERR,
             QString("Couldn't upgrade database to new schema on %1 backend.")
             .arg(ismaster ? "master" : "slave"));
-        return GENERIC_EXIT_DB_OUTOFDATE;
+        return run_setup_webserver();
     }
 
     be_sd_notify("STATUS=Loading translation");
@@ -640,6 +640,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
                 sched->SetExpirer(gExpirer);
         }
         gCoreContext->SetScheduler(sched);
+        ChannelGroup::UpdateChannelGroups();
     }
 
     if (!cmdline.toBool("nohousekeeper"))

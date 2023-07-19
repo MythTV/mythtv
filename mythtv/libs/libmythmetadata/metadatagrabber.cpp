@@ -463,10 +463,10 @@ MetadataLookupList MetaGrabberScript::SearchSubtitle(const QString &title,
 }
 
 MetadataLookupList MetaGrabberScript::SearchSubtitle(const QString &inetref,
-                        const QString &title, const QString &subtitle,
+                        [[maybe_unused]] const QString &title,
+                        const QString &subtitle,
                         MetadataLookup *lookup, bool passseas)
 {
-    (void)title;
     QStringList args;
     SetDefaultArgs(args);
 

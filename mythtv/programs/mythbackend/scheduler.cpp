@@ -3304,11 +3304,10 @@ void Scheduler::HandleIdleShutdown(
 }
 
 //returns true, if the shutdown is not blocked
-bool Scheduler::CheckShutdownServer(std::chrono::seconds prerollseconds,
+bool Scheduler::CheckShutdownServer([[maybe_unused]] std::chrono::seconds prerollseconds,
                                     QDateTime &idleSince,
                                     bool &blockShutdown, uint logmask)
 {
-    (void)prerollseconds;
     bool retval = false;
     QString preSDWUCheckCommand = gCoreContext->GetSetting("preSDWUCheckCommand",
                                                        "");

@@ -156,7 +156,7 @@ hdhr_chan_map_t *getChannels(const QString& ip)
     return result;
 }
 
-QString HDHRIPv4Address(const QString &device)
+QString HDHRIPv4Address([[maybe_unused]] const QString &device)
 {
 #ifdef USING_HDHOMERUN
     hdhomerun_device_t *hdhr =
@@ -172,7 +172,6 @@ QString HDHRIPv4Address(const QString &device)
 
     return QString("%1.%2.%3.%4").arg(ipv4>>24&0xff).arg(ipv4>>16&0xff).arg(ipv4>>8&0xff).arg(ipv4&0xff);
 #else
-    (void) device;
     return {};
 #endif
 }

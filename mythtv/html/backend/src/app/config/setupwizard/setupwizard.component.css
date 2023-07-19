@@ -10,3 +10,12 @@
 .medium-width {
     width: "600";
 }
+
+/* @media screen and (max-width: 48rem) {
+    .p-card-body {
+        padding: 0rem !important;
+    }
+    .p-card-content {
+        padding: 0rem !important;
+    }
+} */

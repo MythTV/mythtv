@@ -20,13 +20,13 @@
 #include "constants.h"
 #include "musicplayer.h"
 
-QEvent::Type DecoderEvent::Decoding =
+const QEvent::Type DecoderEvent::kDecoding =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type DecoderEvent::Stopped =
+const QEvent::Type DecoderEvent::kStopped =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type DecoderEvent::Finished =
+const QEvent::Type DecoderEvent::kFinished =
     (QEvent::Type) QEvent::registerEventType();
-QEvent::Type DecoderEvent::Error =
+const QEvent::Type DecoderEvent::kError =
     (QEvent::Type) QEvent::registerEventType();
 
 Decoder::~Decoder()

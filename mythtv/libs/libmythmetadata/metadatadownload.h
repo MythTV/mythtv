@@ -17,7 +17,7 @@ class META_PUBLIC MetadataLookupEvent : public QEvent
 
     MetadataLookupList m_lookupList;
 
-    static Type kEventType;
+    static const Type kEventType;
 };
 
 class META_PUBLIC MetadataLookupFailure : public QEvent
@@ -29,7 +29,7 @@ class META_PUBLIC MetadataLookupFailure : public QEvent
 
     MetadataLookupList m_lookupList;
 
-    static Type kEventType;
+    static const Type kEventType;
 };
 
 class META_PUBLIC MetadataDownload : public MThread

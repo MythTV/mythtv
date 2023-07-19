@@ -54,7 +54,7 @@ class MUI_PUBLIC DialogCompletionEvent : public QEvent
     QString GetResultText() { return m_resultText; }
     QVariant GetData() { return m_resultData; }
 
-    static Type kEventType;
+    static const Type kEventType;
 
   private:
     QString m_id;

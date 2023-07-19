@@ -863,7 +863,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
                     GetNotificationCenter()->Register(this);
             }
             // send full screen display notification
-            MythImageNotification n(MythNotification::New, image);
+            MythImageNotification n(MythNotification::kNew, image);
             n.SetId(m_connections[session].m_notificationid);
             n.SetParent(this);
             n.SetFullScreen(true);

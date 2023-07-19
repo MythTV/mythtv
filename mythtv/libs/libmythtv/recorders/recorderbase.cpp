@@ -260,9 +260,8 @@ bool RecorderBase::IsRecordingRequested(void)
  *  \param clear if true any generated timecodes should be reset.
  *  \sa Unpause(), WaitForPause()
  */
-void RecorderBase::Pause(bool clear)
+void RecorderBase::Pause([[maybe_unused]] bool clear)
 {
-    (void) clear;
     QMutexLocker locker(&m_pauseLock);
     m_requestPause = true;
 }
@@ -666,35 +665,43 @@ void RecorderBase::TryWriteProgStartMark(const frm_pos_map_t &durationDeltaCopy)
             .arg(m_estimatedProgStartMS));
         return;
     }
+    frm_pos_map_t::const_iterator first_it = durationDeltaCopy.begin();
+    if (first_it == durationDeltaCopy.end())
+    {
+        LOG(VB_RECORD, LOG_DEBUG, "No progstart mark because map is empty");
+        return;
+    }
     frm_pos_map_t::const_iterator last_it = durationDeltaCopy.end();
     --last_it;
     long long bookmarkFrame = 0;
+    long long first_time { first_it.value() };
+    long long last_time  { last_it.value()  };
     LOG(VB_RECORD, LOG_DEBUG,
         QString("durationDeltaCopy.begin() = (%1,%2)")
-        .arg(durationDeltaCopy.begin().key())
-        .arg(durationDeltaCopy.begin().value()));
-    if (m_estimatedProgStartMS > *last_it)
+        .arg(first_it.key())
+        .arg(first_it.value()));
+    if (m_estimatedProgStartMS > last_time)
     {
         // Do nothing because we haven't reached recstartts yet.
         LOG(VB_RECORD, LOG_DEBUG,
             QString("No progstart mark yet because estimatedProgStartMS=%1 "
                     "and *last_it=%2")
-            .arg(m_estimatedProgStartMS).arg(*last_it));
+            .arg(m_estimatedProgStartMS).arg(last_time));
     }
     else if (m_lastSavedDuration <= m_estimatedProgStartMS &&
-             m_estimatedProgStartMS < *durationDeltaCopy.begin())
+             m_estimatedProgStartMS < first_time)
     {
         // Set progstart mark @ lastSavedKeyframe
         LOG(VB_RECORD, LOG_DEBUG,
             QString("Set progstart mark=%1 because %2<=%3<%4")
             .arg(m_lastSavedKeyframe).arg(m_lastSavedDuration)
-            .arg(m_estimatedProgStartMS).arg(*durationDeltaCopy.begin()));
+            .arg(m_estimatedProgStartMS).arg(first_time));
         bookmarkFrame = m_lastSavedKeyframe;
     }
-    else if (*durationDeltaCopy.begin() <= m_estimatedProgStartMS &&
-             m_estimatedProgStartMS < *last_it)
+    else if (first_time <= m_estimatedProgStartMS &&
+             m_estimatedProgStartMS < last_time)
     {
-        frm_pos_map_t::const_iterator upper_it = durationDeltaCopy.begin();
+        frm_pos_map_t::const_iterator upper_it = first_it;
         for (; upper_it != durationDeltaCopy.end(); ++upper_it)
         {
             if (*upper_it > m_estimatedProgStartMS)

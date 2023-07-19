@@ -309,7 +309,7 @@ bool BackendSelection::TryDBfromURL(const QString &error, const QString& URL)
 
 void BackendSelection::customEvent(QEvent *event)
 {
-    if (event->type() == MythEvent::MythEventMessage)
+    if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)

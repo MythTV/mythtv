@@ -829,11 +829,9 @@ class VideoDevice : public CaptureCardComboBoxSetting
      *  \param dir      The directory to open and search for devices.
      *  \param absPath  Ignored. The function always uses absolute paths.
      */
-    void fillSelectionsFromDir(const QDir &dir, bool absPath = true)
+    void fillSelectionsFromDir(const QDir &dir,
+                               [[maybe_unused]] bool absPath = true)
     {
-        // Needed to make both compiler and doxygen happy.
-        (void) absPath;
-
         fillSelectionsFromDir(dir, 0, 255, QString(), QRegularExpression(), false);
     }
 
@@ -940,11 +938,9 @@ class VBIDevice : public CaptureCardComboBoxSetting
      *  \param dir      The directory to open and search for devices.
      *  \param absPath  Ignored. The function always uses absolute paths.
      */
-    void fillSelectionsFromDir(const QDir &dir, bool absPath = true)
+    void fillSelectionsFromDir(const QDir &dir,
+                               [[maybe_unused]] bool absPath = true)
     {
-        // Needed to make both compiler and doxygen happy.
-        (void) absPath;
-
         fillSelectionsFromDir(dir, QString(), QString());
     }
 
@@ -1326,10 +1322,8 @@ FirewireModel::FirewireModel(const CaptureCard  &parent,
     setHelpText(help);
 }
 
-void FirewireModel::SetGUID(const QString &_guid)
+void FirewireModel::SetGUID([[maybe_unused]] const QString &_guid)
 {
-    (void) _guid;
-
 #ifdef USING_FIREWIRE
     AVCInfo info = m_guid->GetAVCInfo(_guid);
     QString model = FirewireDevice::GetModelName(info.m_vendorid, info.m_modelid);
@@ -1337,10 +1331,8 @@ void FirewireModel::SetGUID(const QString &_guid)
 #endif // USING_FIREWIRE
 }
 
-void FirewireDesc::SetGUID(const QString &_guid)
+void FirewireDesc::SetGUID([[maybe_unused]] const QString &_guid)
 {
-    (void) _guid;
-
     setLabel(tr("Description"));
 
 #ifdef USING_FIREWIRE
@@ -1909,7 +1901,7 @@ ASIConfigurationGroup::ASIConfigurationGroup(CaptureCard& a_parent,
     probeCard(m_device->getValue());
 };
 
-void ASIConfigurationGroup::probeCard(const QString &device)
+void ASIConfigurationGroup::probeCard([[maybe_unused]] const QString &device)
 {
 #ifdef USING_ASI
     if (device.isEmpty())
@@ -1935,7 +1927,6 @@ void ASIConfigurationGroup::probeCard(const QString &device)
     }
     m_cardInfo->setValue(tr("Valid DVEO ASI card"));
 #else
-    Q_UNUSED(device);
     m_cardInfo->setValue(QString("Not compiled with ASI support"));
 #endif
 }
@@ -2471,7 +2462,7 @@ V4L2encGroup::V4L2encGroup(CaptureCard &parent, CardType& cardtype) :
         probeCard(device_name);
 }
 
-void V4L2encGroup::probeCard(const QString &device_name)
+void V4L2encGroup::probeCard([[maybe_unused]] const QString &device_name)
 {
 #ifdef USING_V4L2
     QString    card_name = tr("Failed to open");
@@ -2518,8 +2509,6 @@ void V4L2encGroup::probeCard(const QString &device_name)
         m_device->addTargetedChild(m_driverName,
                                    new ChannelTimeout(m_parent, 15s, 2s));
     }
-#else
-    Q_UNUSED(device_name);
 #endif // USING_V4L2
 }
 

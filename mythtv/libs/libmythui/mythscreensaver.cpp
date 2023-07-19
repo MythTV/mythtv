@@ -37,7 +37,8 @@
  * use the MythMainWindow object here (or in any MythScreenSaver constructor) as
  * it is not complete. Instead listen for the MythMainWindow::signalWindowReady signal.
 */
-MythScreenSaverControl::MythScreenSaverControl(MythMainWindow* MainWin, MythDisplay* mDisplay)
+MythScreenSaverControl::MythScreenSaverControl([[maybe_unused]] MythMainWindow* MainWin,
+                                               [[maybe_unused]] MythDisplay* mDisplay)
 {
 #if defined(USING_DBUS)
     m_screenSavers.push_back(new MythScreenSaverDBus(this));
@@ -59,14 +60,10 @@ MythScreenSaverControl::MythScreenSaverControl(MythMainWindow* MainWin, MythDisp
     MythScreenSaverDRM* drmsaver = MythScreenSaverDRM::Create(this, mDisplay);
     if (drmsaver)
         m_screenSavers.push_back(drmsaver);
-#else
-    (void)mDisplay;
 #endif
 #ifdef USING_WAYLANDEXTRAS
     if (QGuiApplication::platformName().toLower().contains("wayland"))
         m_screenSavers.push_back(new MythScreenSaverWayland(this, MainWin));
-#else
-    (void)MainWin;
 #endif
 
     for (auto * screensaver : m_screenSavers)

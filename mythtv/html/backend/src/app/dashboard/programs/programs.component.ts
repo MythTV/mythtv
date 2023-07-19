@@ -1,7 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ScheduleLink } from 'src/app/schedule/schedule.component';
 import { DataService } from 'src/app/services/data.service';
+import { DvrService } from 'src/app/services/dvr.service';
 import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
+import { RecRule } from 'src/app/services/interfaces/recording.interface';
+import { UtilityService } from 'src/app/services/utility.service';
 
 @Component({
   selector: 'app-programs',
@@ -14,16 +17,13 @@ export class ProgramsComponent implements OnInit {
   // Usage: GUIDE, UPCOMING
   @Input() usage: string = '';
 
-  // programs!: ProgramList;
-  editingProgram?: ScheduleOrProgram;
-  displayUpdateDlg = false;
-  displayUnsaved = false;
+  displayStop = false;
   successCount = 0;
   errorCount = 0;
-  showAllStatuses = false;
-  refreshing = false;
+  program?: ScheduleOrProgram;
 
-  constructor(public dataService: DataService) {
+  constructor(public dataService: DataService, private dvrService: DvrService,
+    private utility: UtilityService) {
   }
 
   ngOnInit(): void { }
@@ -31,19 +31,19 @@ export class ProgramsComponent implements OnInit {
   formatStartDate(program: ScheduleOrProgram): string {
     let starttm;
     if (this.usage == 'UPCOMING') {
-      starttm = new Date(program.Recording.StartTs).getTime();
+      starttm = program.Recording.StartTs;
     }
     else {
-      starttm = new Date(program.StartTime).getTime();
+      starttm = program.StartTime;
     }
-    return new Date(starttm).toLocaleDateString()
+    return this.utility.formatDate(starttm, true);
   }
 
   formatAirDate(program: ScheduleOrProgram): string {
     if (!program.Airdate)
       return '';
     let date = program.Airdate + ' 00:00';
-    return new Date(date).toLocaleDateString()
+    return this.utility.formatDate(date, true);
   }
 
 
@@ -75,9 +75,43 @@ export class ProgramsComponent implements OnInit {
   }
 
   updateRecRule(program: ScheduleOrProgram) {
-    let copyProgram = Object.assign({}, program);
     if (this.inter.sched)
-      this.inter.sched.open(copyProgram);
+      this.inter.sched.open(program);
+  }
+
+  override(program: ScheduleOrProgram) {
+    if (this.inter.sched) {
+      if (program.Recording.RecType == 7) // If already an override
+        this.inter.sched.open(program);
+      else
+        this.inter.sched.open(program, undefined, <RecRule>{ Type: 'Override Recording' });
+    }
+  }
+
+  stopRequest(program: ScheduleOrProgram) {
+    if (program.Recording.RecordId) {
+      this.program = program;
+      this.displayStop = true;
+    }
+  }
+
+  stopRecording(program: ScheduleOrProgram) {
+    this.errorCount = 0;
+    this.dvrService.StopRecording(program.Recording.RecordedId)
+      .subscribe({
+        next: (x) => {
+          if (x.bool) {
+            this.displayStop = false;
+            setTimeout(() => this.inter.summaryComponent.refresh(), 3000);
+          }
+          else
+            this.errorCount++;
+        },
+        error: (err) => {
+          this.errorCount++;
+        }
+
+      });
   }
 
 }

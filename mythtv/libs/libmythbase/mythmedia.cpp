@@ -62,7 +62,7 @@ const std::array<const QString,3> MythMediaDevice::kMediaErrorStrings
     "MEDIAERR_UNSUPPORTED"
 };
 
-QEvent::Type MythMediaEvent::kEventType =
+const QEvent::Type MythMediaEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 // Force this class to have a vtable so that dynamic_cast works.
@@ -304,10 +304,8 @@ void MythMediaDevice::RegisterMediaExtensions(uint mediatype,
         s_ext_to_media[ext] |= mediatype;
 }
 
-MythMediaError MythMediaDevice::eject(bool open_close)
+MythMediaError MythMediaDevice::eject([[maybe_unused]] bool open_close)
 {
-    (void) open_close;
-
 #ifdef Q_OS_DARWIN
     QString  command = "diskutil eject " + m_devicePath;
 

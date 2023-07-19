@@ -30,7 +30,9 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { TabMenuModule } from 'primeng/tabmenu';
-import {MultiSelectModule} from 'primeng/multiselect';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { SlideMenuModule } from 'primeng/slidemenu';
+import {InputTextareaModule} from 'primeng/inputtextarea';
 
 @NgModule({
     exports: [
@@ -64,7 +66,9 @@ import {MultiSelectModule} from 'primeng/multiselect';
         ProgressBarModule,
         ScrollPanelModule,
         TabMenuModule,
-        MultiSelectModule
+        MultiSelectModule,
+        SlideMenuModule,
+        InputTextareaModule
     ]
 })
 
