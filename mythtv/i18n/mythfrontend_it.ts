@@ -15538,7 +15538,7 @@ non può essere vuoto.</translation>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="698"/>
         <source>Syndicated Episode Number</source>
-        <translation>Numero episodio sindacato</translation>
+        <translation>N. Episodio accorpato</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="708"/>
