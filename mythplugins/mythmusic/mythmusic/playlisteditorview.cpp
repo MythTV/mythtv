@@ -159,6 +159,11 @@ bool PlaylistEditorView::Create(void)
         QStringList route = gCoreContext->GetSetting("MusicTreeLastActive", "").split("\n");
         restoreTreePosition(route);
     }
+    else	 // default to Albums, rather than All Tracks, 2023/07
+    {
+        QStringList route = (QString("Root Music Node.Albums").split("."));
+        restoreTreePosition(route);
+    }
 
     connect(m_playlistTree, &MythUIButtonTree::itemClicked,
             this, &PlaylistEditorView::treeItemClicked);
