@@ -334,7 +334,7 @@ void HttpServer::RegisterExtension( HttpServerExtension *pExtension )
         {
             m_basePaths.insert( base, pExtension );
             LOG(VB_HTTP, LOG_INFO, QString("HttpServer: Registering %1 extension path %2")
-                .arg(pExtension->m_sName).arg(base));
+                .arg(pExtension->m_sName, base));
         }
         m_rwlock.unlock();
     }
