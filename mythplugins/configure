@@ -471,13 +471,23 @@ check_py_lib(){
     log check_py_lib "$@"
     lib=${1}
     check_cmd $python <<EOF
-from distutils.sysconfig import get_python_lib
 import sys
-for mythroot in '${mythroot}'.split(':'):
-    sys.path.append(get_python_lib(prefix=mythroot +'${prefix}'))
-    sys.path.append(get_python_lib(prefix=mythroot +'${prefix}/local'))
-sys.path.append(get_python_lib(prefix='${sysroot}${prefix}'))
-sys.path.append(get_python_lib(prefix='${sysroot}${prefix}/local'))
+try:
+    from distutils.sysconfig import get_python_lib
+    for mythroot in '${mythroot}'.split(':'):
+        sys.path.append(get_python_lib(prefix=mythroot +'${prefix}'))
+        sys.path.append(get_python_lib(prefix=mythroot +'${prefix}/local'))
+    sys.path.append(get_python_lib(prefix='${sysroot}${prefix}'))
+    sys.path.append(get_python_lib(prefix='${sysroot}${prefix}/local'))
+except:
+    # python 3.12+
+    from sysconfig import get_path
+    for mroot in '${mythroot}'.split(':'):
+        sys.path.append(mroot + get_path('purelib'))
+    vars = {'base': '${sysroot}${prefix}', 'prefix': '${prefix}'}
+    sys.path.append(get_path('purelib', vars=vars, expand=True))
+    vars = {'base': '${sysroot}${prefix}', 'prefix': '${prefix}/local'}
+    sys.path.append(get_path('purelib', vars=vars, expand=True))
 try:
     import $lib
 except:
