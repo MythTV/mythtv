@@ -702,7 +702,12 @@ void myth_yield(void)
 #include <sys/ptrace.h>
 #include <sys/syscall.h>
 #if __has_include(<linux/ioprio.h>)
+// Starting with kernel 6.5.0, the following include uses the C++
+// reserved keyword "class" as a variable name. Fortunately we can
+// redefine it without any ill effects.
+#define class class2
 #include <linux/ioprio.h>
+#undef class
 #else
 static constexpr int8_t IOPRIO_BITS        { 16 };
 static constexpr int8_t IOPRIO_CLASS_SHIFT { 13 };
