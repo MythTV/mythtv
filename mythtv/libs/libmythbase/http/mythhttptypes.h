@@ -61,6 +61,7 @@ class MythHTTPConfig
 {
   public:
     quint16      m_port    { 0 };
+    quint16      m_port_2  { 0 };
     quint16      m_sslPort { 0 };
     QString      m_rootDir;
     QString      m_serverName;
