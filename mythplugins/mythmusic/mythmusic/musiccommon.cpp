@@ -2406,8 +2406,16 @@ MythMenu* MusicCommon::createPlaylistOptionsMenu(void)
 
     auto *menu = new MythMenu(label, this, "playlistoptionsmenu");
 
-    menu->AddItem(tr("Play Now"));
-    menu->AddItem(tr("Add Tracks"));
+    if (gPlayer->getInPlayNow())
+    {
+	menu->AddItem(tr("Play Now"));
+	menu->AddItem(tr("Add Tracks"));
+    }
+    else
+    {
+	menu->AddItem(tr("Add Tracks"));
+	menu->AddItem(tr("Play Now"));
+    }
     menu->AddItem(tr("Replace Tracks"));
 
     return menu;
