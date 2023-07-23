@@ -3337,6 +3337,8 @@ void TVRec::RingBufferChanged(MythMediaBuffer *Buffer, RecordingInfo *pginfo, Re
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "RingBufferChanged()");
 
+    QMutexLocker lock(&m_stateChangeLock);
+
     if (pginfo)
     {
         if (m_curRecording)

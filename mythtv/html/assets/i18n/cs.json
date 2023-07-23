@@ -1,12 +1,18 @@
 {
     "common": {
         "back": "Zadní",
+        "backenderror": "Chyba backendu.",
         "cancel": "zrušení",
         "close": "Zavřít",
         "continue": "Pokračovat v úpravách",
         "default": "Výchozí",
         "delete": "Vymazat",
         "failed": "Nepodařilo se",
+        "filter": {
+            "contains": "Obsahuje",
+            "equals": "Přesná shoda",
+            "startswith": "Začíná s"
+        },
         "help": "Pomoc",
         "instructions": "Instrukce",
         "loading": "načítání",
@@ -40,9 +46,13 @@
             "alreadydel": "Již smazáno",
             "canundel": "Toto můžete zvrátit pomocí funkce Undelete.",
             "channel": "Kanál",
+            "delete_details": "Tím se odstraní pravidlo nahrávání",
+            "delete_rule": "Odstranit pravidlo nahrávání",
             "description": "Popis",
+            "download": "Stáhnout záznam",
             "duration": "Doba trvání",
             "edit_metadata": "Upravit metadata",
+            "edit_rule": "Upravit pravidlo nahrávání",
             "episode": "Epizoda",
             "file_size": "Velikost souboru",
             "filter": "Filtr",
@@ -62,9 +72,12 @@
             "mnu_updatemeta": "Aktualizujte metadata",
             "mnu_updaterecrule": "Aktualizovat pravidlo záznamu",
             "orig_airdate": "Původní datum vysílání",
+            "override_rule": "Přidat nebo upravit pravidlo přepsání",
             "recgrp": "Rec Grp",
             "seas_ep": "Seas Ep",
             "season": "Sezóna",
+            "stop_details": "Tím se zastaví nahrávání",
+            "stop_recording": "Zastavit nahrávání",
             "subtitle": "Titulky",
             "title": "Titul"
         },
@@ -74,13 +87,18 @@
         "recrules": {
             "heading": "Pravidla nahrávání",
             "lastrec": "Naposledy zaznamenáno",
+            "new_recrule": "Nové pravidlo nahrávání",
+            "new_teplate": "Nová šablona nahrávání",
             "nextrec": "Další záznam",
             "storgrp": "Skupina úložiště"
         },
         "sched": {
             "active_label": "Pravidlo nahrávání je aktivní",
+            "add_tables_label": "Doplňkové tabulky",
             "autoexpire_label": "Automatické vypršení platnosti",
             "autoextend_label": "Automatické prodloužení",
+            "channel_label": "Kanál",
+            "description_label": "Popis",
             "dupin": {
                 "both": "Aktuální a předchozí nahrávky",
                 "curr": "Pouze aktuální nahrávky",
@@ -95,6 +113,7 @@
                 "s_then_d": "Porovnejte pomocí titulků a poté popisu"
             },
             "dupmethod_label": "Metoda duplicitní shody",
+            "duration_label": "Doba trvání",
             "endoffset_label": "Počet minut navíc k záznamu na konci",
             "extend_none": "Žádný",
             "filters_label": "Možnosti filtru",
@@ -125,9 +144,15 @@
             },
             "recprofile_label": "Záznamový profil",
             "sgroup_label": "Skupina úložiště",
+            "sqlwhere_label": "SQL kde podmínka",
+            "srchValue_label": "Hodnota vyhledávání",
+            "srchtype_label": "Typ vyhledávání",
             "startoffset_label": "Počet minut navíc k záznamu na začátku",
+            "starttime_label": "Datum a čas zahájení",
+            "subtitle_label": "Titulky",
             "template_apply": "Použít změnu šablony",
             "template_label": "Použijte šablonu",
+            "title_label": "Titul",
             "type": {
                 "all": "Záznam všech představení",
                 "daily": "Každý den zaznamenejte jeden pořad",
@@ -192,6 +217,7 @@
             "time": "Čas"
         },
         "videos": {
+            "download": "Stáhnout video",
             "heading": "videa",
             "releasedate": "Datum vydání"
         }
@@ -230,8 +256,10 @@
         "backendSetup": "Nastavení backendu",
         "changeLanguage": "Změnit jazyk",
         "dashboard": "Přístrojová deska",
+        "hide": "Skrýt horní banner",
         "login": "Přihlásit se",
         "mainheading": "Backend MythTV",
+        "show": "Zobrazit horní banner",
         "switchServer": "Přepnout server",
         "switchTheme": "Přepnout téma",
         "testbed": "Testbed",
@@ -334,6 +362,7 @@
         "weekHeader": "Wk"
     },
     "recrule": {
+        "DonotRecord": "Nenahrávat",
         "NotRecording": "Nenahrává se",
         "OverrideRecording": "Přepsat nahrávání",
         "RecordAll": "Zaznamenat vše",
@@ -341,7 +370,14 @@
         "RecordOne": "Záznam jedna",
         "RecordWeekly": "Record Weekly",
         "RecordingTemplate": "Šablona nahrávání",
-        "SingleRecord": "Jeden záznam"
+        "SingleRecord": "Jeden záznam",
+        "srch_KeywordSearch": "Vyhledávání klíčových slov",
+        "srch_ManualSearch": "Ruční vyhledávání",
+        "srch_None": "Žádný",
+        "srch_PeopleSearch": "Vyhledávání lidí",
+        "srch_PowerSearch": "Power Search",
+        "srch_TitleSearch": "Vyhledávání titulů",
+        "template": "Šablona"
     },
     "settings": {
         "backendctrl": {
@@ -602,6 +638,7 @@
             "delete_source_details": "Tímto smažete všechny kanály ze zdroje: {{Source}}",
             "delete_this": "Smazat kanál",
             "deletechan": "Smazat kanál",
+            "editchan": "Upravit kanál",
             "eit_desc": "Pokud je povoleno, informace průvodce pro tento kanál budou aktualizovány pomocí seznamů programů „Over-the-Air“.",
             "eit_label": "Použijte On Air Guide",
             "format_desc": "Pokud tento kanál používá na obrazovce Obecné nastavení backendu jiný formát než TV Format, nastavte jej zde.",
@@ -621,7 +658,6 @@
             "timeoffset_label": "Časový posun výpisů",
             "title": "Editor kanálu",
             "unassigned": "(Nepřiřazeno)",
-            "updatechan": "Aktualizovat kanál",
             "visible": "Viditelné",
             "visible_desc": "Pokud je nastaveno na Vždy viditelné nebo Viditelné, kanál bude viditelný v EPG. Nastavením na Vždy viditelné nebo Nikdy neviditelné zabráníte MythTV a dalším obslužným programům v automatické správě hodnoty pro tento kanál.",
             "visible_label": "Viditelnost",
@@ -692,7 +728,7 @@
             },
             "freqtable_desc": "Možnost skenování pouze „vysokofrekvenčních“ kanálů je užitečná, protože většina digitálních kanálů je na vyšších frekvencích.",
             "freqtable_label": "Frekvenční tabulka",
-            "frequency_desc": "Frekvence pro tento přenos (multiplex) v {{unit}} (volba nemá žádné výchozí nastavení).",
+            "frequency_desc": "Frekvence pro tento přenos (multiplex) v {{unit}}. Výchozí nastavení je nastaveno v Nastavení zdroje videa.",
             "frequency_label": "Frekvence",
             "ftaonly_desc": "Pokud je nastaveno, budou během vyhledávání přidány pouze nešifrované kanály.",
             "ftaonly_label": "Pouze nešifrované",
@@ -962,6 +998,7 @@
             "enableupdates_label": "Povolit aktualizace",
             "restart_desc": "Záznamy jsou zakázány, dokud nerestartujete",
             "restart_label": "Restartujte backend",
+            "restarting": "Restartování backendu",
             "slave_instructions": "Zdá se, že jde o podřízený backend. Pokud je zamýšlen jako podřízený backend, vypněte plánování na backendu msster při spuštění nastavení podřízeného backendu.",
             "slave_warning": "Pokud toto není zamýšleno jako podřízený backend, přejděte na Nastavení, Obecné, Nastavení backendu adresy hostitele a vyberte „Tento server je hlavní backend“ nebo nastavte správný uživatelský identifikátor na stránce Nastavení databáze. Uložte a restartujte backend,",
             "title": "Nastavení MythTV",

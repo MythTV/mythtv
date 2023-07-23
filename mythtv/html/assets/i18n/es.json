@@ -1,12 +1,18 @@
 {
     "common": {
         "back": "atrás",
+        "backenderror": "Error de fondo.",
         "cancel": "Cancelar",
         "close": "Cerca",
         "continue": "Continua editando",
         "default": "Por defecto",
         "delete": "Borrar",
         "failed": "Fallido",
+        "filter": {
+            "contains": "Contiene",
+            "equals": "Coincidencia exacta",
+            "startswith": "Comienza con"
+        },
         "help": "Ayuda",
         "instructions": "Instrucciones",
         "loading": "Cargando",
@@ -40,9 +46,13 @@
             "alreadydel": "ya eliminado",
             "canundel": "Puede revertir esto usando Recuperar.",
             "channel": "Canal",
+            "delete_details": "Esto eliminará la regla de grabación",
+            "delete_rule": "Eliminar regla de grabación",
             "description": "Descripción",
+            "download": "Descargar grabación",
             "duration": "Duración",
             "edit_metadata": "Editar metadatos",
+            "edit_rule": "Editar regla de grabación",
             "episode": "Episodio",
             "file_size": "Tamaño del archivo",
             "filter": "Filtrar",
@@ -62,9 +72,12 @@
             "mnu_updatemeta": "Actualizar metadatos",
             "mnu_updaterecrule": "Actualizar regla de registro",
             "orig_airdate": "Fecha de emisión original",
+            "override_rule": "Agregar o editar regla de anulación",
             "recgrp": "Grupo rec.",
             "seas_ep": "mares ep",
             "season": "Estación",
+            "stop_details": "Esto dejará de grabar",
+            "stop_recording": "Para de grabar",
             "subtitle": "Subtitular",
             "title": "Título"
         },
@@ -74,13 +87,18 @@
         "recrules": {
             "heading": "Reglas de grabación",
             "lastrec": "Última grabación",
+            "new_recrule": "Nueva regla de grabación",
+            "new_teplate": "Nueva plantilla de grabación",
             "nextrec": "Próxima grabación",
             "storgrp": "Grupo de almacenamiento"
         },
         "sched": {
             "active_label": "La regla de grabación está activa",
+            "add_tables_label": "Mesas Adicionales",
             "autoexpire_label": "Caducidad automática",
             "autoextend_label": "Extensión automática",
+            "channel_label": "Canal",
+            "description_label": "Descripción",
             "dupin": {
                 "both": "Grabaciones actuales y anteriores",
                 "curr": "Solo grabaciones actuales",
@@ -95,6 +113,7 @@
                 "s_then_d": "Coincidencia usando subtítulo y luego descripción"
             },
             "dupmethod_label": "Método de coincidencia duplicada",
+            "duration_label": "Duración",
             "endoffset_label": "Número de minutos adicionales para grabar al final",
             "extend_none": "Ninguno",
             "filters_label": "Opciones de filtro",
@@ -125,9 +144,15 @@
             },
             "recprofile_label": "Perfil de grabación",
             "sgroup_label": "Grupo de almacenamiento",
+            "sqlwhere_label": "SQL Donde Condición",
+            "srchValue_label": "Valor de búsqueda",
+            "srchtype_label": "Tipo de búsqueda",
             "startoffset_label": "Número de minutos adicionales para registrar al inicio",
+            "starttime_label": "Fecha y hora de inicio",
+            "subtitle_label": "Subtitular",
             "template_apply": "Aplicar cambio de plantilla",
             "template_label": "Usar plantilla",
+            "title_label": "Título",
             "type": {
                 "all": "Grabar todas las exhibiciones",
                 "daily": "Grabe una presentación todos los días",
@@ -192,6 +217,7 @@
             "time": "Tiempo"
         },
         "videos": {
+            "download": "Descargar video",
             "heading": "Vídeos",
             "releasedate": "Fecha de lanzamiento"
         }
@@ -230,8 +256,10 @@
         "backendSetup": "Configuración de back-end",
         "changeLanguage": "Cambiar idioma",
         "dashboard": "Tablero",
+        "hide": "Ocultar banner superior",
         "login": "Iniciar sesión",
         "mainheading": "Servidor de MythTV",
+        "show": "Mostrar banner superior",
         "switchServer": "Cambiar servidor",
         "switchTheme": "Cambiar tema",
         "testbed": "banco de pruebas",
@@ -334,6 +362,7 @@
         "weekHeader": "semana"
     },
     "recrule": {
+        "DonotRecord": "no grabar",
         "NotRecording": "No grabando",
         "OverrideRecording": "Anular grabación",
         "RecordAll": "Grabar todo",
@@ -341,7 +370,14 @@
         "RecordOne": "Grabar uno",
         "RecordWeekly": "Grabar Semanalmente",
         "RecordingTemplate": "Plantilla de grabación",
-        "SingleRecord": "Registro único"
+        "SingleRecord": "Registro único",
+        "srch_KeywordSearch": "Búsqueda por palabra clave",
+        "srch_ManualSearch": "Búsqueda manual",
+        "srch_None": "Ninguno",
+        "srch_PeopleSearch": "Búsqueda de personas",
+        "srch_PowerSearch": "Búsqueda de energía",
+        "srch_TitleSearch": "Buscar título",
+        "template": "Plantilla"
     },
     "settings": {
         "backendctrl": {
@@ -602,6 +638,7 @@
             "delete_source_details": "Esto eliminará todos los canales de la fuente: {{Source}}",
             "delete_this": "Eliminar canal",
             "deletechan": "Eliminar canal",
+            "editchan": "Editar canal",
             "eit_desc": "Si está habilitado, la información de la guía para este canal se actualizará utilizando las listas de programas 'Over-the-Air'.",
             "eit_label": "Guía de uso en el aire",
             "format_desc": "Si este canal usa un formato que no sea Formato de TV en la pantalla Configuración general de back-end, configúrelo aquí.",
@@ -621,7 +658,6 @@
             "timeoffset_label": "Compensación de tiempo de listados",
             "title": "Editor de canales",
             "unassigned": "(Sin asignar)",
-            "updatechan": "Actualizar canal",
             "visible": "Visible",
             "visible_desc": "Si se establece en Siempre visible o Visible, el canal será visible en la EPG. Establézcalo en Siempre visible o Nunca visible para evitar que MythTV y otras utilidades administren automáticamente el valor de este canal.",
             "visible_label": "Visibilidad",
@@ -692,7 +728,7 @@
             },
             "freqtable_desc": "La opción de escanear solo los canales de frecuencia \"alta\" es útil porque la mayoría de los canales digitales están en las frecuencias más altas.",
             "freqtable_label": "Tabla de frecuencia",
-            "frequency_desc": "La frecuencia para este transporte (multiplex) en {{unit}} (La opción no tiene valor predeterminado).",
+            "frequency_desc": "La frecuencia para este transporte (multiplex) en {{unit}}. El valor predeterminado se establece en Configuración de fuente de video.",
             "frequency_label": "Frecuencia",
             "ftaonly_desc": "Si está configurado, solo se agregarán canales no encriptados durante el escaneo.",
             "ftaonly_label": "Solo sin cifrar",
@@ -962,6 +998,7 @@
             "enableupdates_label": "Habilitar actualizaciones",
             "restart_desc": "Las grabaciones están deshabilitadas hasta que reinicies",
             "restart_label": "Reiniciar back-end",
+            "restarting": "Reiniciar back-end",
             "slave_instructions": "Esto parece ser un backend esclavo. Si está diseñado como un backend esclavo, deshabilite la programación en el backend msster mientras ejecuta la configuración del backend esclavo.",
             "slave_warning": "Si esto no está diseñado como un backend esclavo, vaya a Configuración, General, Configuración del backend de la dirección del host y seleccione \"Este servidor es el backend maestro\" o establezca el identificador personalizado correcto en la página Configuración de la base de datos. Guarde y reinicie el backend,",
             "title": "Configuración de MyTVTV",

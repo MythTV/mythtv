@@ -331,8 +331,11 @@ void HttpServer::RegisterExtension( HttpServerExtension *pExtension )
         QStringList list = pExtension->GetBasePaths();
 
         for( const QString& base : qAsConst(list))
+        {
             m_basePaths.insert( base, pExtension );
-
+            LOG(VB_HTTP, LOG_INFO, QString("HttpServer: Registering %1 extension path %2")
+                .arg(pExtension->m_sName, base));
+        }
         m_rwlock.unlock();
     }
 }
@@ -569,7 +572,7 @@ void HttpWorker::run(void)
                         m_socketTimeout = nTimeout; // Converts to milliseconds
 
                         // ------------------------------------------------------
-                        // Request Parsed... Pass on to Main HttpServer class to 
+                        // Request Parsed... Pass on to Main HttpServer class to
                         // delegate processing to HttpServerExtensions.
                         // ------------------------------------------------------
                         if ((pRequest->m_nResponseStatus != 400) &&

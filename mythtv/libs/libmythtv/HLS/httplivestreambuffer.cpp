@@ -2455,6 +2455,8 @@ void HLSRingBuffer::SanitizeStreams(StreamsList *streams)
     for (int n = streams->size() - 1 ; n >= 0; n--)
     {
         HLSStream *hls = GetStream(n, streams);
+        if (hls == nullptr)
+            continue;
         if (hls->NumSegments() == 0)
         {
             streams->removeAt(n);
@@ -2477,6 +2479,8 @@ void HLSRingBuffer::SanitizeStreams(StreamsList *streams)
     for (int n = 0; n < streams->size(); n++)
     {
         HLSStream *hls = GetStream(n, streams);
+        if (hls == nullptr)
+            continue;
         int id      = hls->Id();
         int seq     = hls->StartSequence();
         int newstart= idstart.value(id);

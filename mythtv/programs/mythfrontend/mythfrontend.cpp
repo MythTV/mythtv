@@ -2004,6 +2004,8 @@ Q_DECL_EXPORT int main(int argc, char **argv)
         fe_sd_notify("STATUS=Registering frontend with bonjour");
         QByteArray dummy;
         int port = gCoreContext->GetNumSetting("UPnP/MythFrontend/ServicePort", 6547);
+        // frontend upnp server is now ServicePort + 4 (default 6551)
+        port += 4;
         QByteArray name("Mythfrontend on ");
         name.append(gCoreContext->GetHostName().toUtf8());
         bonjour->Register(port, "_mythfrontend._tcp",

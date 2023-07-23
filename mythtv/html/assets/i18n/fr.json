@@ -1,12 +1,18 @@
 {
     "common": {
         "back": "Retour",
+        "backenderror": "Erreur de back-end.",
         "cancel": "Annuler",
         "close": "Fermer",
         "continue": "Continuer l'édition",
         "default": "Défaut",
         "delete": "Supprimer",
         "failed": "Échoué",
+        "filter": {
+            "contains": "Contient",
+            "equals": "Correspondance exacte",
+            "startswith": "Commence avec"
+        },
         "help": "Aidez-moi",
         "instructions": "Instructions",
         "loading": "Chargement",
@@ -40,9 +46,13 @@
             "alreadydel": "Déjà supprimé",
             "canundel": "Vous pouvez inverser cela en utilisant Undelete.",
             "channel": "Canaliser",
+            "delete_details": "Cela supprimera la règle d'enregistrement",
+            "delete_rule": "Supprimer la règle d'enregistrement",
             "description": "Description",
+            "download": "Télécharger l'enregistrement",
             "duration": "Durée",
             "edit_metadata": "Modifier les métadonnées",
+            "edit_rule": "Modifier la règle d'enregistrement",
             "episode": "Épisode",
             "file_size": "Taille du fichier",
             "filter": "Filtre",
@@ -62,9 +72,12 @@
             "mnu_updatemeta": "Mettre à jour les métadonnées",
             "mnu_updaterecrule": "Mettre à jour la règle d'enregistrement",
             "orig_airdate": "Date de diffusion originale",
+            "override_rule": "Ajouter ou modifier une règle de remplacement",
             "recgrp": "Groupe de réc.",
             "seas_ep": "Épisode des mers",
             "season": "Saison",
+            "stop_details": "Cela arrêtera l'enregistrement",
+            "stop_recording": "Arrête d'enregistrer",
             "subtitle": "Sous-titre",
             "title": "Titre"
         },
@@ -74,13 +87,18 @@
         "recrules": {
             "heading": "Règles d'enregistrement",
             "lastrec": "Dernier enregistrement",
+            "new_recrule": "Nouvelle règle d'enregistrement",
+            "new_teplate": "Nouveau modèle d'enregistrement",
             "nextrec": "Enregistrement suivant",
             "storgrp": "Groupe de stockage"
         },
         "sched": {
             "active_label": "La règle d'enregistrement est active",
+            "add_tables_label": "Tableaux supplémentaires",
             "autoexpire_label": "Expiration automatique",
             "autoextend_label": "Extension automatique",
+            "channel_label": "Canaliser",
+            "description_label": "Description",
             "dupin": {
                 "both": "Enregistrements actuels et précédents",
                 "curr": "Enregistrements en cours uniquement",
@@ -95,6 +113,7 @@
                 "s_then_d": "Faire correspondre en utilisant le sous-titre puis la description"
             },
             "dupmethod_label": "Méthode de correspondance en double",
+            "duration_label": "Durée",
             "endoffset_label": "Nombre de minutes supplémentaires à enregistrer à la fin",
             "extend_none": "Aucun",
             "filters_label": "Options de filtrage",
@@ -125,9 +144,15 @@
             },
             "recprofile_label": "Profil d'enregistrement",
             "sgroup_label": "Groupe de stockage",
+            "sqlwhere_label": "Condition SQL Where",
+            "srchValue_label": "Valeur de recherche",
+            "srchtype_label": "Type de recherche",
             "startoffset_label": "Nombre de minutes supplémentaires à enregistrer au début",
+            "starttime_label": "Date et heure de début",
+            "subtitle_label": "Sous-titre",
             "template_apply": "Appliquer le changement de modèle",
             "template_label": "Utilise le modèle",
+            "title_label": "Titre",
             "type": {
                 "all": "Enregistrer toutes les projections",
                 "daily": "Enregistrez une diffusion chaque jour",
@@ -192,6 +217,7 @@
             "time": "Temps"
         },
         "videos": {
+            "download": "Télécharger la video",
             "heading": "Vidéos",
             "releasedate": "Date de sortie"
         }
@@ -230,8 +256,10 @@
         "backendSetup": "Configuration du back-end",
         "changeLanguage": "Changer de langue",
         "dashboard": "Tableau de bord",
+        "hide": "Masquer la bannière supérieure",
         "login": "S'identifier",
         "mainheading": "Backend de MythTV",
+        "show": "Afficher la bannière supérieure",
         "switchServer": "Changer de serveur",
         "switchTheme": "Changer de thème",
         "testbed": "Banc d'essai",
@@ -334,6 +362,7 @@
         "weekHeader": "Semaine"
     },
     "recrule": {
+        "DonotRecord": "Ne pas enregistrer",
         "NotRecording": "Pas d'enregistrement",
         "OverrideRecording": "Remplacer l'enregistrement",
         "RecordAll": "Tout enregistrer",
@@ -341,7 +370,14 @@
         "RecordOne": "Enregistrer un",
         "RecordWeekly": "Enregistrer chaque semaine",
         "RecordingTemplate": "Modèle d'enregistrement",
-        "SingleRecord": "Enregistrement unique"
+        "SingleRecord": "Enregistrement unique",
+        "srch_KeywordSearch": "Recherche par mot clé",
+        "srch_ManualSearch": "Recherche manuelle",
+        "srch_None": "Aucun",
+        "srch_PeopleSearch": "Recherche de personnes",
+        "srch_PowerSearch": "Recherche avancée",
+        "srch_TitleSearch": "Recherche de titre",
+        "template": "Modèle"
     },
     "settings": {
         "backendctrl": {
@@ -602,6 +638,7 @@
             "delete_source_details": "Cela supprimera toutes les chaînes de la source : {{Source}}",
             "delete_this": "Supprimer la chaîne",
             "deletechan": "Supprimer la chaîne",
+            "editchan": "Modifier la chaîne",
             "eit_desc": "Si cette option est activée, les informations du guide pour cette chaîne seront mises à jour à l'aide des listes de programmes \"Over-the-Air\".",
             "eit_label": "Utiliser le guide en direct",
             "format_desc": "Si cette chaîne utilise un format autre que TV Format dans l'écran General Backend Setup, réglez-le ici.",
@@ -621,7 +658,6 @@
             "timeoffset_label": "Décalage horaire des annonces",
             "title": "Éditeur de chaînes",
             "unassigned": "(Non attribué)",
-            "updatechan": "Mettre à jour la chaîne",
             "visible": "Visible",
             "visible_desc": "S'il est réglé sur Toujours visible ou Visible, la chaîne sera visible dans l'EPG. Réglez sur Toujours visible ou Jamais visible pour empêcher MythTV et d'autres utilitaires de gérer automatiquement la valeur de cette chaîne.",
             "visible_label": "Visibilité",
@@ -692,7 +728,7 @@
             },
             "freqtable_desc": "L'option de balayage uniquement des canaux de fréquence \"haute\" est utile car la plupart des canaux numériques sont sur les fréquences les plus élevées.",
             "freqtable_label": "Tableau des fréquences",
-            "frequency_desc": "La fréquence de ce transport (multiplex) dans {{unit}} (l'option n'a pas de valeur par défaut).",
+            "frequency_desc": "La fréquence de ce transport (multiplex) dans {{unit}}. La valeur par défaut est définie dans la configuration de la source vidéo.",
             "frequency_label": "Fréquence",
             "ftaonly_desc": "Si cette option est définie, seules les chaînes non cryptées seront ajoutées lors de la recherche.",
             "ftaonly_label": "Non crypté uniquement",
@@ -962,6 +998,7 @@
             "enableupdates_label": "Activer les mises à jour",
             "restart_desc": "Les enregistrements sont désactivés jusqu'à ce que vous redémarriez",
             "restart_label": "Redémarrer le backend",
+            "restarting": "Redémarrage du backend",
             "slave_instructions": "Cela semble être un backend esclave. S'il est conçu comme un backend esclave, veuillez désactiver la planification sur le backend msster lors de l'exécution de la configuration du backend esclave.",
             "slave_warning": "S'il ne s'agit pas d'un backend esclave, accédez à Configuration, Général, Configuration du backend de l'adresse de l'hôte et sélectionnez \"Ce serveur est le backend maître\" ou définissez l'identifiant personnalisé correct sur la page Configuration de la base de données. Enregistrez et redémarrez le backend,",
             "title": "Configuration Myth TV",

@@ -1,12 +1,18 @@
 {
     "common": {
         "back": "tagasi",
+        "backenderror": "Taustaprogrammi viga.",
         "cancel": "Tühista",
         "close": "Sulge",
         "continue": "Jätka redigeerimist",
         "default": "Vaikimisi",
         "delete": "Kustuta",
         "failed": "Ebaõnnestunud",
+        "filter": {
+            "contains": "Sisaldab",
+            "equals": "Täpne vaste",
+            "startswith": "Alustab"
+        },
         "help": "ABI",
         "instructions": "Juhised",
         "loading": "Laadimine",
@@ -40,9 +46,13 @@
             "alreadydel": "Juba kustutatud",
             "canundel": "Saate selle tühistada, kasutades funktsiooni Undelete.",
             "channel": "Kanal",
+            "delete_details": "See kustutab salvestusreegli",
+            "delete_rule": "Salvestusreegli kustutamine",
             "description": "Kirjeldus",
+            "download": "Laadige alla salvestus",
             "duration": "Kestus",
             "edit_metadata": "Redigeeri metaandmeid",
+            "edit_rule": "Redigeeri salvestusreeglit",
             "episode": "Episood",
             "file_size": "Faili suurus",
             "filter": "Filter",
@@ -62,9 +72,12 @@
             "mnu_updatemeta": "Värskenda metaandmeid",
             "mnu_updaterecrule": "Värskendage salvestusreeglit",
             "orig_airdate": "Algne eetri kuupäev",
+            "override_rule": "Alistusreegli lisamine või muutmine",
             "recgrp": "Rec Grp",
             "seas_ep": "Seas Ep",
             "season": "Hooaeg",
+            "stop_details": "See peatab salvestamise",
+            "stop_recording": "Lõpeta salvestamine",
             "subtitle": "Alapealkiri",
             "title": "Pealkiri"
         },
@@ -74,13 +87,18 @@
         "recrules": {
             "heading": "Salvestusreeglid",
             "lastrec": "Viimati salvestatud",
+            "new_recrule": "Uus salvestamise reegel",
+            "new_teplate": "Uus salvestusmall",
             "nextrec": "Järgmine salvestus",
             "storgrp": "Salvestusgrupp"
         },
         "sched": {
             "active_label": "Salvestusreegel on aktiivne",
+            "add_tables_label": "Täiendavad tabelid",
             "autoexpire_label": "Automaatne aegumine",
             "autoextend_label": "Automaatne pikendamine",
+            "channel_label": "Kanal",
+            "description_label": "Kirjeldus",
             "dupin": {
                 "both": "Praegused ja varasemad salvestised",
                 "curr": "Ainult praegused salvestised",
@@ -95,6 +113,7 @@
                 "s_then_d": "Sobitage subtiitrite ja seejärel kirjelduse abil"
             },
             "dupmethod_label": "Dubleeriva vaste meetod",
+            "duration_label": "Kestus",
             "endoffset_label": "Lõpus salvestatavate lisaminutite arv",
             "extend_none": "Mitte ühtegi",
             "filters_label": "Filtri valikud",
@@ -125,9 +144,15 @@
             },
             "recprofile_label": "Salvestusprofiil",
             "sgroup_label": "Salvestusgrupp",
+            "sqlwhere_label": "SQL Kus tingimus",
+            "srchValue_label": "Otsinguväärtus",
+            "srchtype_label": "Otsingu tüüp",
             "startoffset_label": "Lisaminutite arv alguses",
+            "starttime_label": "Alguskuupäev ja kellaaeg",
+            "subtitle_label": "Alapealkiri",
             "template_apply": "Rakenda malli muudatus",
             "template_label": "Kasutage malli",
+            "title_label": "Pealkiri",
             "type": {
                 "all": "Salvestage kõik saated",
                 "daily": "Salvestage üks saade iga päev",
@@ -192,6 +217,7 @@
             "time": "Aeg"
         },
         "videos": {
+            "download": "Laadige video alla",
             "heading": "Videod",
             "releasedate": "Väljalaske kuupäev"
         }
@@ -230,8 +256,10 @@
         "backendSetup": "Taustaprogrammi häälestus",
         "changeLanguage": "Keele vahetamine",
         "dashboard": "Armatuurlaud",
+        "hide": "Peida ülemine bänner",
         "login": "Logi sisse",
         "mainheading": "MythTV taustaprogramm",
+        "show": "Kuva ülemine bänner",
         "switchServer": "Vaheta serverit",
         "switchTheme": "Vaheta teemat",
         "testbed": "Katsealus",
@@ -334,6 +362,7 @@
         "weekHeader": "Wk"
     },
     "recrule": {
+        "DonotRecord": "Ära salvesta",
         "NotRecording": "Ei salvesta",
         "OverrideRecording": "Salvestamise alistamine",
         "RecordAll": "Salvestage kõik",
@@ -341,7 +370,14 @@
         "RecordOne": "Record One",
         "RecordWeekly": "Rekord nädalas",
         "RecordingTemplate": "Salvestusmall",
-        "SingleRecord": "Üksik rekord"
+        "SingleRecord": "Üksik rekord",
+        "srch_KeywordSearch": "Võtmesõna otsing",
+        "srch_ManualSearch": "Käsitsi otsing",
+        "srch_None": "Mitte ühtegi",
+        "srch_PeopleSearch": "Inimeste otsing",
+        "srch_PowerSearch": "Power Search",
+        "srch_TitleSearch": "Pealkirja otsing",
+        "template": "Mall"
     },
     "settings": {
         "backendctrl": {
@@ -602,6 +638,7 @@
             "delete_source_details": "See kustutab kõik kanalid allikast: {{Source}}",
             "delete_this": "Kustuta kanal",
             "deletechan": "Kustuta kanal",
+            "editchan": "Redigeeri kanalit",
             "eit_desc": "Kui see on lubatud, värskendatakse selle kanali juhenditeavet \"Over-the-Air\" programmide loendite abil.",
             "eit_label": "Kasutage On Air Guide",
             "format_desc": "Kui see kanal kasutab üldse tausta häälestuse ekraanil muud vormingut kui TV Format, määrake see siin.",
@@ -621,7 +658,6 @@
             "timeoffset_label": "Nimekirjad Ajanihe",
             "title": "Kanali redaktor",
             "unassigned": "(Määramata)",
-            "updatechan": "Värskenda kanalit",
             "visible": "Nähtav",
             "visible_desc": "Kui seadeks on valitud Alati nähtav või Nähtav, on kanal EPG-s nähtav. Määrake väärtusele Alati nähtav või Mitte kunagi nähtav, et MythTV ja muud utiliidid ei haldaks automaatselt selle kanali väärtust.",
             "visible_label": "Nähtavus",
@@ -692,7 +728,7 @@
             },
             "freqtable_desc": "Valik skannida ainult \"kõrge sagedusega\" kanaleid on kasulik, kuna enamik digitaalkanaleid on kõrgematel sagedustel.",
             "freqtable_label": "Sageduste tabel",
-            "frequency_desc": "Selle transpordi (multipleks) sagedus ühikus {{unit}} (valikul ei ole vaikimisi).",
+            "frequency_desc": "Selle transpordi (multipleks) sagedus {{unit}}. Vaikimisi on määratud jaotises Video Source Setup.",
             "frequency_label": "Sagedus",
             "ftaonly_desc": "Kui see on määratud, lisatakse skannimise ajal ainult krüpteerimata kanalid.",
             "ftaonly_label": "Ainult krüptimata",
@@ -962,6 +998,7 @@
             "enableupdates_label": "Luba värskendused",
             "restart_desc": "Salvestus on keelatud kuni taaskäivitamiseni",
             "restart_label": "Taaskäivitage taustaprogramm",
+            "restarting": "Taustaprogrammi taaskäivitamine",
             "slave_instructions": "See näib olevat ori taustaprogramm. Kui see on ette nähtud alam-taustaprogrammiks, keelake alam-taustaprogrammi seadistamise ajal ajastamine mssteri taustaprogrammis.",
             "slave_warning": "Kui see pole mõeldud alluva taustaprogrammina, minge jaotisse Seadistamine, Üldine, Hostiaadressi taustaprogrammi häälestus ja valige \"See server on põhitaustaprogramm\" või määrake andmebaasi häälestuse lehel õige kohandatud identifikaator. Salvestage ja taaskäivitage taustaprogramm,",
             "title": "MythTV seadistamine",

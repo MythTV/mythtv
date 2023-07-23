@@ -32,15 +32,17 @@ const QString ActionSet::kGlobalContext = "Global";
 
 ActionSet::~ActionSet()
 {
-    while (!m_contexts.empty())
+    for (auto iter1 = m_contexts.begin();
+         iter1 != m_contexts.end();
+         iter1 = m_contexts.erase(iter1))
     {
-        ActionContext &ctx = *m_contexts.begin();
-        while (!ctx.empty())
+        ActionContext &ctx = iter1.value();
+        for (auto iter2 = ctx.begin();
+             iter2 != ctx.end();
+             iter2 = ctx.erase(iter2))
         {
-            delete *ctx.begin();
-            ctx.erase(ctx.begin());
+            delete iter2.value();
         }
-        m_contexts.erase(m_contexts.begin());
     }
 }
 

@@ -48,6 +48,8 @@ MediaRenderer::MediaRenderer()
     LOG(VB_UPNP, LOG_INFO, "MediaRenderer(): Begin");
 
     int nPort = XmlConfiguration().GetValue("UPnP/MythFrontend/ServicePort", 6547);
+    // frontend upnp server is now ServicePort + 4 (default 6551)
+    nPort += 4;
 
     auto *pHttpServer = new HttpServer();
 

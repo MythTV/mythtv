@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -13,7 +13,8 @@ import { SetupService } from 'src/app/services/setup.service';
 @Component({
   selector: 'app-input-connections',
   templateUrl: './input-connections.component.html',
-  styleUrls: ['./input-connections.component.css']
+  styleUrls: ['./input-connections.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class InputConnectionsComponent implements OnInit {
 

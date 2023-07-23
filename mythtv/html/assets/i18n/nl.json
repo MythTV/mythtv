@@ -1,12 +1,18 @@
 {
     "common": {
         "back": "Rug",
+        "backenderror": "Backend-fout.",
         "cancel": "Annuleren",
         "close": "Dichtbij",
         "continue": "Ga door met bewerken",
         "default": "Standaard",
         "delete": "Verwijderen",
         "failed": "Mislukt",
+        "filter": {
+            "contains": "Bevat",
+            "equals": "Exacte overeenkomst",
+            "startswith": "Begint met"
+        },
         "help": "Hulp",
         "instructions": "Instructies",
         "loading": "Bezig met laden",
@@ -40,9 +46,13 @@
             "alreadydel": "Reeds verwijderd",
             "canundel": "U kunt dit ongedaan maken door Undelete te gebruiken.",
             "channel": "Kanaal",
+            "delete_details": "Hiermee wordt de opnameregel verwijderd",
+            "delete_rule": "Opnameregel verwijderen",
             "description": "Beschrijving",
+            "download": "Opname downloaden",
             "duration": "Duur",
             "edit_metadata": "Metagegevens bewerken",
+            "edit_rule": "Opnameregel bewerken",
             "episode": "Aflevering",
             "file_size": "Bestandsgrootte",
             "filter": "Filter",
@@ -62,9 +72,12 @@
             "mnu_updatemeta": "Metagegevens bijwerken",
             "mnu_updaterecrule": "Recordregel bijwerken",
             "orig_airdate": "Originele uitzenddatum",
+            "override_rule": "Negeerregel toevoegen of bewerken",
             "recgrp": "Rec Grp",
             "seas_ep": "Zeeën Ep",
             "season": "Seizoen",
+            "stop_details": "Hierdoor wordt de opname gestopt",
+            "stop_recording": "Stop met opnemen",
             "subtitle": "Ondertitel",
             "title": "Titel"
         },
@@ -74,13 +87,18 @@
         "recrules": {
             "heading": "Opname regels",
             "lastrec": "Laatst opgenomen",
+            "new_recrule": "Nieuwe opnameregel",
+            "new_teplate": "Nieuw opnamesjabloon",
             "nextrec": "Volgende opname",
             "storgrp": "Opslag groep"
         },
         "sched": {
             "active_label": "Opnameregel is actief",
+            "add_tables_label": "Extra tabellen",
             "autoexpire_label": "Automatisch verlopen",
             "autoextend_label": "Automatisch verlengen",
+            "channel_label": "Kanaal",
+            "description_label": "Beschrijving",
             "dupin": {
                 "both": "Huidige en vorige opnames",
                 "curr": "Alleen huidige opnamen",
@@ -95,6 +113,7 @@
                 "s_then_d": "Match met behulp van ondertiteling en vervolgens beschrijving"
             },
             "dupmethod_label": "Dubbele matchmethode",
+            "duration_label": "Duur",
             "endoffset_label": "Aantal extra minuten om aan het einde op te nemen",
             "extend_none": "Geen",
             "filters_label": "Filteropties",
@@ -125,9 +144,15 @@
             },
             "recprofile_label": "opname profiel",
             "sgroup_label": "Opslag groep",
+            "sqlwhere_label": "SQL Where-voorwaarde",
+            "srchValue_label": "Zoek Waarde",
+            "srchtype_label": "Zoektype",
             "startoffset_label": "Aantal extra minuten om op te nemen bij start",
+            "starttime_label": "Begindatum en -tijd",
+            "subtitle_label": "Ondertitel",
             "template_apply": "Sjabloonwijziging toepassen",
             "template_label": "Gebruik sjabloon",
+            "title_label": "Titel",
             "type": {
                 "all": "Registreer alle vertoningen",
                 "daily": "Neem elke dag één show op",
@@ -192,6 +217,7 @@
             "time": "Tijd"
         },
         "videos": {
+            "download": "Download video",
             "heading": "Videos",
             "releasedate": "Datum van publicatie"
         }
@@ -230,8 +256,10 @@
         "backendSetup": "Backend-configuratie",
         "changeLanguage": "Taal wijzigen",
         "dashboard": "Dashboard",
+        "hide": "Verberg de bovenste banner",
         "login": "Log in",
         "mainheading": "MythTV-backend",
+        "show": "Topbanner weergeven",
         "switchServer": "Wissel van server",
         "switchTheme": "Wissel van thema",
         "testbed": "Proefbank",
@@ -334,6 +362,7 @@
         "weekHeader": "Wk"
     },
     "recrule": {
+        "DonotRecord": "Niet opnemen",
         "NotRecording": "Niet opnemen",
         "OverrideRecording": "Opname overschrijven",
         "RecordAll": "Alles opnemen",
@@ -341,7 +370,14 @@
         "RecordOne": "Neem een ​​op",
         "RecordWeekly": "Wekelijks opnemen",
         "RecordingTemplate": "Opname sjabloon",
-        "SingleRecord": "Enkele opname"
+        "SingleRecord": "Enkele opname",
+        "srch_KeywordSearch": "Zoeken op sleutelwoorden",
+        "srch_ManualSearch": "Handmatig zoeken",
+        "srch_None": "Geen",
+        "srch_PeopleSearch": "Mensen zoeken",
+        "srch_PowerSearch": "Krachtig zoeken",
+        "srch_TitleSearch": "Titel zoeken",
+        "template": "Sjabloon"
     },
     "settings": {
         "backendctrl": {
@@ -602,6 +638,7 @@
             "delete_source_details": "Hiermee worden alle kanalen uit de bron verwijderd: {{Source}}",
             "delete_this": "Kanaal verwijderen",
             "deletechan": "Kanaal verwijderen",
+            "editchan": "Kanaal bewerken",
             "eit_desc": "Indien ingeschakeld, wordt de gidsinformatie voor dit kanaal bijgewerkt met behulp van 'Over-the-Air'-programmaoverzichten.",
             "eit_label": "Gebruik de On Air-gids",
             "format_desc": "Als dit kanaal een ander formaat gebruikt dan TV Format in het scherm General Backend Setup, stel het dan hier in.",
@@ -621,7 +658,6 @@
             "timeoffset_label": "Vermeldingen tijdsverschuiving",
             "title": "Kanaal-editor",
             "unassigned": "(Niet toegewezen)",
-            "updatechan": "Kanaal bijwerken",
             "visible": "Zichtbaar",
             "visible_desc": "Indien ingesteld op Altijd zichtbaar of Zichtbaar, is het kanaal zichtbaar in de EPG. Stel in op Altijd zichtbaar of Nooit zichtbaar om te voorkomen dat MythTV en andere hulpprogramma's de waarde voor dit kanaal automatisch beheren.",
             "visible_label": "Zichtbaarheid",
@@ -692,7 +728,7 @@
             },
             "freqtable_desc": "De optie om alleen \"Hoge\" frequentiekanalen te scannen is handig omdat de meeste digitale kanalen op de hogere frequenties zijn.",
             "freqtable_label": "Frequentietabel",
-            "frequency_desc": "De frequentie voor dit transport (multiplex) in {{unit}} (Optie heeft geen standaard).",
+            "frequency_desc": "De frequentie voor dit transport (multiplex) in {{unit}}. De standaardwaarde wordt ingesteld in Videobron instellen.",
             "frequency_label": "Frequentie",
             "ftaonly_desc": "Indien ingesteld, worden tijdens de scan alleen niet-gecodeerde kanalen toegevoegd.",
             "ftaonly_label": "Alleen onversleuteld",
@@ -962,6 +998,7 @@
             "enableupdates_label": "Updates inschakelen",
             "restart_desc": "Opnames zijn uitgeschakeld totdat u opnieuw opstart",
             "restart_label": "Back-end opnieuw opstarten",
+            "restarting": "Backend opnieuw opstarten",
             "slave_instructions": "Dit lijkt een slave-backend te zijn. Als het bedoeld is als een slave-backend, schakelt u planning op de msster-backend uit terwijl u de slave-backend-setup uitvoert.",
             "slave_warning": "Als dit niet bedoeld is als een slave-backend, ga dan naar Setup, General, Host Address Backend Setup en selecteer \"This server is the Master Backend\" of stel anders de juiste aangepaste identifier in op de Database Setup-pagina. Bewaar en herstart de backend,",
             "title": "MythTV-installatie",

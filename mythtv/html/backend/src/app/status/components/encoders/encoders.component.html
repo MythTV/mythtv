@@ -12,7 +12,7 @@
                     <ng-container *ngIf="encoder.State == 7"> '{{ encoder.Recording.Title }}' on {{
                         encoder.Recording.Channel.CallSign }}.
                         {{ 'dashboard.status.endtime_text' |
-                        translate: { EndTime: encoder.Recording.EndTime } }}
+                        translate: { EndTime: utility.formatTime(encoder.Recording.EndTime) } }}
                     </ng-container>
                 </li>
                 <div *ngFor="let input of encoder.Inputs">

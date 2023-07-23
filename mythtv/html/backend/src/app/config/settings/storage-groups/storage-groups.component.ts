@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -18,7 +18,8 @@ interface GroupCard {
 @Component({
   selector: 'app-storage-groups',
   templateUrl: './storage-groups.component.html',
-  styleUrls: ['./storage-groups.component.css']
+  styleUrls: ['./storage-groups.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 
 export class StorageGroupsComponent implements OnInit, CanComponentDeactivate {

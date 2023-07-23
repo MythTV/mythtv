@@ -11,6 +11,7 @@
 #include "mythdirs.h"
 #include "mythcorecontext.h"
 #include "mythlogging.h"
+#include "libmythbase/configuration.h"
 #ifdef USING_LIBDNS_SD
 #include "bonjourregister.h"
 #endif
@@ -92,6 +93,8 @@ void MythHTTPServer::EnableDisable(bool Enable)
                     .arg(serverPort()).arg(m_config.m_port));
                 m_config.m_port = serverPort();
             }
+            if (m_config.m_port_2)
+                listen(m_config.m_port_2);
         }
 
         if (ssl)
@@ -127,22 +130,17 @@ void MythHTTPServer::Init()
     // Decide on the ports to use
     if (gCoreContext->IsFrontend())
     {
-        m_config.m_port    = static_cast<uint16_t>(gCoreContext->GetNumSetting("UPnP/MythFrontend/ServicePort", 6547));
+        m_config.m_port = XmlConfiguration().GetValue("UPnP/MythFrontend/ServicePort", 6547);
         // I don't think there is an existing setting for this
         m_config.m_sslPort = static_cast<uint16_t>(gCoreContext->GetNumSetting("FrontendSSLPort", m_config.m_port + 10));
 
-        // TEMPORARY
-        m_config.m_port = 8081;
-        m_config.m_sslPort = 8091;
     }
     else if (gCoreContext->IsBackend())
     {
         m_config.m_port    = static_cast<uint16_t>(gCoreContext->GetBackendStatusPort());
+        // Additional port, may be removed later
+        m_config.m_port_2  = m_config.m_port + 200;
         m_config.m_sslPort = static_cast<uint16_t>(gCoreContext->GetNumSetting("BackendSSLPort", m_config.m_port + 10));
-
-        // TEMPORARY
-        m_config.m_port    = m_config.m_port + 200;
-        m_config.m_sslPort = m_config.m_sslPort + 200;
     }
     else
     {

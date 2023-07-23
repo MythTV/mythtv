@@ -619,14 +619,12 @@ void MythUIImage::Clear(void)
     QWriteLocker updateLocker(&d->m_updateLock);
     QMutexLocker locker(&m_imagesLock);
 
-    while (!m_images.isEmpty())
+    for (auto it = m_images.begin();
+         it != m_images.end();
+         it = m_images.erase(it))
     {
-        QHash<int, MythImage *>::iterator it = m_images.begin();
-
         if (*it)
             (*it)->DecrRef();
-
-        m_images.remove(it.key());
     }
 
     m_delays.clear();

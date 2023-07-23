@@ -1385,6 +1385,12 @@ SubtitleScreen::SubtitleScreen(MythPlayer *Player, MythPainter *Painter,
     m_format(new SubtitleFormat)
 {
     m_painter = Painter;
+
+    connect(m_player, &MythPlayer::SeekingDone, this, [&]()
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "SeekingDone signal received.");
+        m_atEnd = false;
+    });
 }
 
 SubtitleScreen::~SubtitleScreen(void)
@@ -1845,10 +1851,14 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 
     MythVideoOutput *videoOut = m_player->GetVideoOutput();
     MythVideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : nullptr;
+    int ret {0};
+
+    if (!currentFrame || !videoOut)
+        return;
 
     if (subs->m_buffers.empty() && (m_subreader->GetParser() != nullptr))
     {
-        if (subs->m_needSync && (currentFrame != nullptr))
+        if (subs->m_needSync)
         {
             // Seeking on a subtitle stream is a pain. The internals
             // of ff_subtitles_queue_seek() calls search_sub_ts(),
@@ -1874,7 +1884,19 @@ void SubtitleScreen::DisplayAVSubtitles(void)
             lock.unlock();
             m_subreader->SeekFrame(currentFrame->m_timecode.count()*1000,
                                    AVSEEK_FLAG_BACKWARD);
-            m_subreader->ReadNextSubtitle();
+            ret = m_subreader->ReadNextSubtitle();
+            if (ret < 0)
+            {
+                m_atEnd = true;
+#ifdef DEBUG_SUBTITLES
+                if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
+                {
+                    LOG(VB_PLAYBACK, LOG_DEBUG,
+                        LOC + QString("time %1, no subtitle available after seek")
+                        .arg(toString(currentFrame)));
+                }
+#endif
+            }
             lock.relock();
 
             AVSubtitle subtitle = subs->m_buffers.front();
@@ -1885,7 +1907,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                 if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
                 {
                     LOG(VB_PLAYBACK, LOG_DEBUG,
-                        LOC + QString("time %1, drop %2 **********")
+                        LOC + QString("time %1, drop %2")
                         .arg(toString(currentFrame), toString(subtitle)));
                 }
 #endif
@@ -1894,12 +1916,24 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 
         // Always add one subtitle.
         lock.unlock();
-        m_subreader->ReadNextSubtitle();
+        if (!m_atEnd)
+        {
+            ret = m_subreader->ReadNextSubtitle();
+            if (ret < 0)
+            {
+                m_atEnd = true;
+#ifdef DEBUG_SUBTITLES
+                if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
+                {
+                    LOG(VB_PLAYBACK, LOG_DEBUG,
+                        LOC + QString("time %1, no subtitle available")
+                        .arg(toString(currentFrame)));
+                }
+#endif
+            }
+        }
         lock.relock();
     }
-
-    if (!currentFrame || !videoOut)
-        return;
 
     float tmp = 0.0;
     QRect dummy;

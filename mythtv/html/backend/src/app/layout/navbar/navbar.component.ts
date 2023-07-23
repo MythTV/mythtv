@@ -23,6 +23,7 @@ export class NavbarComponent implements OnInit {
     m_selectedLanguage!: Language;
 
     m_showNavbar: boolean = true;
+    showTopBar = true;
     m_devMode: boolean = isDevMode();
     m_haveDatabase: boolean = true;
 

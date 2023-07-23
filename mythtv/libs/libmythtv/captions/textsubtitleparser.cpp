@@ -175,7 +175,6 @@ TextSubtitleParser::TextSubtitleParser(SubtitleReader *parent, QString fileName,
     : m_parent(parent), m_target(target), m_fileName(std::move(fileName))
 {
     m_pkt = av_packet_alloc();
-    av_new_packet(m_pkt, 4096);
 }
 
 TextSubtitleParser::~TextSubtitleParser()
@@ -240,9 +239,6 @@ int64_t TextSubtitleParser::seek_packet(void *opaque, int64_t offset, int whence
 /// rely on pkt->dts if you do not decompress the payload.
 int TextSubtitleParser::ReadNextSubtitle(void)
 {
-    // reset buffer
-    m_pkt->data = m_pkt->buf->data;
-    m_pkt->size = m_pkt->buf->size;
 
     int ret = av_read_frame(m_fmtCtx, m_pkt);
     if (ret < 0)
@@ -336,8 +332,8 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
     isUtf8 = (textCodec != nullptr);
 #elif QT_VERSION < QT_VERSION_CHECK(6,3,0)
     auto qba_encoding = QStringConverter::encodingForData(qba);
-    isUtf8 = qba_encoding.has_value
-        && (qba_encoding.value == QStringConverter::Utf8);
+    isUtf8 = qba_encoding.has_value()
+        && (qba_encoding.value() == QStringConverter::Utf8);
 #else
     isUtf8 = qba.isValidUtf8();
 #endif

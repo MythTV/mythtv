@@ -1580,7 +1580,8 @@ static HostComboBoxSetting *SubtitleCodec()
     // Translations are now done via FFmpeg(iconv).  Get the list of
     // encodings that iconv supports.
     QScopedPointer<MythSystem>
-        cmd(MythSystem::Create({"iconv", "-l"}, kMSStdOut));
+        cmd(MythSystem::Create({"iconv", "-l"},
+                               kMSStdOut | kMSDontDisableDrawing));
     cmd->Wait();
     QString results = cmd->GetStandardOutputStream()->readAll();
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)

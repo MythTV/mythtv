@@ -1,12 +1,18 @@
 {
     "common": {
         "back": "Geri",
+        "backenderror": "Arka uç hatası.",
         "cancel": "İptal etmek",
         "close": "Kapalı",
         "continue": "Düzenlemeye Devam Et",
         "default": "Varsayılan",
         "delete": "Silmek",
         "failed": "Arızalı",
+        "filter": {
+            "contains": "içerir",
+            "equals": "Tam eşleşme",
+            "startswith": "İle başlar"
+        },
         "help": "Yardım",
         "instructions": "Talimatlar",
         "loading": "Yükleniyor",
@@ -40,9 +46,13 @@
             "alreadydel": "Zaten Silinmiş",
             "canundel": "Geri Al'ı kullanarak bunu tersine çevirebilirsiniz.",
             "channel": "Kanal",
+            "delete_details": "Bu Kayıt Kuralını siler",
+            "delete_rule": "Kayıt Kuralını Sil",
             "description": "Tanım",
+            "download": "Kaydı İndir",
             "duration": "Süre",
             "edit_metadata": "Meta Verileri Düzenle",
+            "edit_rule": "Kayıt Kuralını Düzenle",
             "episode": "Bölüm",
             "file_size": "Dosya boyutu",
             "filter": "filtre",
@@ -62,9 +72,12 @@
             "mnu_updatemeta": "Meta Verileri Güncelle",
             "mnu_updaterecrule": "Kayıt Kuralını Güncelle",
             "orig_airdate": "Orijinal Yayın Tarihi",
+            "override_rule": "Geçersiz Kılma Kuralı Ekleme veya Düzenleme",
             "recgrp": "Kayıt Grubu",
             "seas_ep": "denizler",
             "season": "Mevsim",
+            "stop_details": "Bu Kaydı Durduracak",
+            "stop_recording": "Kaydetmeyi bırak",
             "subtitle": "Alt yazı",
             "title": "Başlık"
         },
@@ -74,13 +87,18 @@
         "recrules": {
             "heading": "Kayıt Kuralları",
             "lastrec": "Son Kayıt",
+            "new_recrule": "Yeni Kayıt Kuralı",
+            "new_teplate": "Yeni Kayıt Şablonu",
             "nextrec": "Sonraki Kayıt",
             "storgrp": "Depolama Grubu"
         },
         "sched": {
             "active_label": "Kayıt Kuralı Aktif",
+            "add_tables_label": "Ek Tablolar",
             "autoexpire_label": "Otomatik Süre Sonu",
             "autoextend_label": "Otomatik Uzatma",
+            "channel_label": "Kanal",
+            "description_label": "Tanım",
             "dupin": {
                 "both": "Mevcut ve Önceki Kayıtlar",
                 "curr": "Yalnızca Güncel Kayıtlar",
@@ -95,6 +113,7 @@
                 "s_then_d": "Altyazıyı ve Açıklamayı Kullanarak Eşleştirin"
             },
             "dupmethod_label": "Yinelenen Eşleştirme Yöntemi",
+            "duration_label": "Süre",
             "endoffset_label": "Sonunda Kaydedilecek Ekstra Dakika Sayısı",
             "extend_none": "Hiçbiri",
             "filters_label": "Filtre seçenekleri",
@@ -125,9 +144,15 @@
             },
             "recprofile_label": "Kayıt Profili",
             "sgroup_label": "Depolama Grubu",
+            "sqlwhere_label": "SQL Nerede Koşul",
+            "srchValue_label": "Arama Değeri",
+            "srchtype_label": "Arama Tipi",
             "startoffset_label": "Başlangıçta Kaydedilecek Ekstra Dakika Sayısı",
+            "starttime_label": "Başlangıç ​​Tarihi ve Saati",
+            "subtitle_label": "Alt yazı",
             "template_apply": "Şablon Değişikliğini Uygula",
             "template_label": "Şablon kullan",
+            "title_label": "Başlık",
             "type": {
                 "all": "Tüm Gösterileri Kaydedin",
                 "daily": "Her gün bir gösterim kaydedin",
@@ -192,6 +217,7 @@
             "time": "Zaman"
         },
         "videos": {
+            "download": "Video indir",
             "heading": "videolar",
             "releasedate": "Yayın tarihi"
         }
@@ -230,8 +256,10 @@
         "backendSetup": "Arka Uç Kurulumu",
         "changeLanguage": "Dili değiştir",
         "dashboard": "Gösterge Paneli",
+        "hide": "Üst Banner'ı gizle",
         "login": "Giriş yapmak",
         "mainheading": "MythTV Arka Ucu",
+        "show": "Üst Banner'ı göster",
         "switchServer": "Sunucu Değiştir",
         "switchTheme": "Temayı Değiştir",
         "testbed": "Test ortamı",
@@ -334,6 +362,7 @@
         "weekHeader": "hafta"
     },
     "recrule": {
+        "DonotRecord": "Kaydetme",
         "NotRecording": "Kayıt Yapılmıyor",
         "OverrideRecording": "Kaydı Geçersiz Kılma",
         "RecordAll": "Tümünü Kaydet",
@@ -341,7 +370,14 @@
         "RecordOne": "Bir Kayıt",
         "RecordWeekly": "Haftalık Kayıt",
         "RecordingTemplate": "Kayıt Şablonu",
-        "SingleRecord": "Tek Kayıt"
+        "SingleRecord": "Tek Kayıt",
+        "srch_KeywordSearch": "Anahtar kelime araması",
+        "srch_ManualSearch": "Manuel Arama",
+        "srch_None": "Hiçbiri",
+        "srch_PeopleSearch": "İnsan arama",
+        "srch_PowerSearch": "Güçlü Arama",
+        "srch_TitleSearch": "Başlık arama",
+        "template": "Şablon"
     },
     "settings": {
         "backendctrl": {
@@ -602,6 +638,7 @@
             "delete_source_details": "Bu, şu kaynaktaki tüm kanalları siler: {{Source}}",
             "delete_this": "Kanalı Sil",
             "deletechan": "Kanalı Sil",
+            "editchan": "Kanalı Düzenle",
             "eit_desc": "Etkinleştirilirse, bu kanal için kılavuz bilgileri 'Kablosuz' program listeleri kullanılarak güncellenecektir.",
             "eit_label": "Canlı Kullanım Kılavuzu",
             "format_desc": "Bu kanal, Genel Arka Uç Kurulumu ekranındaki TV Formatı dışında bir format kullanıyorsa, buradan ayarlayın.",
@@ -621,7 +658,6 @@
             "timeoffset_label": "Listeleme Zaman Farkı",
             "title": "Kanal Editörü",
             "unassigned": "(Atanmamış)",
-            "updatechan": "Kanalı Güncelle",
             "visible": "Görünür",
             "visible_desc": "Her Zaman Görünür veya Görünür olarak ayarlanırsa, kanal EPG'de görünür olacaktır. MythTV ve diğer yardımcı programların bu kanalın değerini otomatik olarak yönetmesini önlemek için Her Zaman Görünür veya Asla Görünmez olarak ayarlayın.",
             "visible_label": "görünürlük",
@@ -692,7 +728,7 @@
             },
             "freqtable_desc": "Yalnızca \"Yüksek\" frekanslı kanalları tarama seçeneği yararlıdır çünkü çoğu dijital kanal daha yüksek frekanslardadır.",
             "freqtable_label": "Frekans tablosu",
-            "frequency_desc": "{{unit}} cinsinden bu aktarım (multipleks) için sıklık (Seçeneğin varsayılanı yoktur).",
+            "frequency_desc": "{{unit}} cinsinden bu taşımanın (çoklu) sıklığı. Varsayılan, Video Kaynağı Kurulumunda ayarlanmıştır.",
             "frequency_label": "Sıklık",
             "ftaonly_desc": "Ayarlanırsa, tarama sırasında yalnızca şifrelenmemiş kanallar eklenecektir.",
             "ftaonly_label": "Yalnızca şifrelenmemiş",
@@ -962,6 +998,7 @@
             "enableupdates_label": "Güncellemeleri Etkinleştir",
             "restart_desc": "Siz yeniden başlatana kadar kayıtlar devre dışı bırakılır",
             "restart_label": "Arka Ucu Yeniden Başlat",
+            "restarting": "Arka Ucu Yeniden Başlatma",
             "slave_instructions": "Bu bir bağımlı arka uç gibi görünüyor. Köle arka uç olarak amaçlanıyorsa, lütfen bağımlı arka uç kurulumunu çalıştırırken msster arka ucunda planlamayı devre dışı bırakın.",
             "slave_warning": "Bu bir bağımlı arka uç olarak tasarlanmadıysa, lütfen Kurulum, Genel, Ana Bilgisayar Adresi Arka Uç Kurulumu'na gidin ve \"Bu sunucu Ana Arka Uçtur\" seçeneğini seçin veya Veritabanı Kurulumu sayfasında doğru özel tanımlayıcıyı ayarlayın. Arka ucu kaydedin ve yeniden başlatın,",
             "title": "MythTV Kurulumu",
@@ -1003,7 +1040,7 @@
             "audiocodec_label": "Ses Codec'i",
             "autotranscode_desc": "Bu profil kullanılarak bir kayıt yapıldığında ve kaydın programı kod dönüştürmeye izin verecek şekilde yapılandırıldığında otomatik olarak kod dönüştürme.",
             "autotranscode_label": "Kayıttan Sonra Otomatik Kod Dönüştürmeyi Etkinleştir",
-            "delete_details": "Bu, {{GroupName}} grubundaki {{GroupName}} Profilini silecek.",
+            "delete_details": "Bu, {{ProfileName}}}} grubundaki {{GroupName}} Profilini silecek.",
             "delete_this": "Bu Kayıt Profilini Sil",
             "encodingthreadcount_desc": "Arka uçta kodlamayı yapacak işlemci sayısından küçük veya ona eşit bir değere ayarlayın.",
             "encodingthreadcount_label": "Konu Sayısı",

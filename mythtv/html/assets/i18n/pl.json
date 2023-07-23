@@ -1,12 +1,18 @@
 {
     "common": {
         "back": "Z powrotem",
+        "backenderror": "Błąd zaplecza.",
         "cancel": "Anulować",
         "close": "Zamknąć",
         "continue": "Kontynuuj edycję",
         "default": "Domyślny",
         "delete": "Usuwać",
         "failed": "Przegrany",
+        "filter": {
+            "contains": "Zawiera",
+            "equals": "Dokładne dopasowanie",
+            "startswith": "Zaczynać z"
+        },
         "help": "Pomoc",
         "instructions": "Instrukcje",
         "loading": "Ładowanie",
@@ -40,9 +46,13 @@
             "alreadydel": "Już usunięte",
             "canundel": "Możesz to odwrócić, używając opcji Cofnij usunięcie.",
             "channel": "Kanał",
+            "delete_details": "Spowoduje to usunięcie reguły nagrywania",
+            "delete_rule": "Usuń regułę nagrywania",
             "description": "Opis",
+            "download": "Pobierz nagranie",
             "duration": "Czas trwania",
             "edit_metadata": "Edytuj metadane",
+            "edit_rule": "Edytuj regułę nagrywania",
             "episode": "Epizod",
             "file_size": "Rozmiar pliku",
             "filter": "Filtr",
@@ -62,9 +72,12 @@
             "mnu_updatemeta": "Zaktualizuj metadane",
             "mnu_updaterecrule": "Zaktualizuj regułę rekordu",
             "orig_airdate": "Oryginalna data emisji",
+            "override_rule": "Dodaj lub edytuj regułę nadpisywania",
             "recgrp": "Grupa nagr",
             "seas_ep": "Seas odc",
             "season": "Pora roku",
+            "stop_details": "Spowoduje to zatrzymanie nagrywania",
+            "stop_recording": "Zatrzymaj nagrywanie",
             "subtitle": "Podtytuł",
             "title": "Tytuł"
         },
@@ -74,13 +87,18 @@
         "recrules": {
             "heading": "Zasady nagrywania",
             "lastrec": "Ostatnio nagrany",
+            "new_recrule": "Nowa reguła nagrywania",
+            "new_teplate": "Nowy szablon nagrywania",
             "nextrec": "Następne nagranie",
             "storgrp": "Grupa pamięci"
         },
         "sched": {
             "active_label": "Reguła nagrywania jest aktywna",
+            "add_tables_label": "Dodatkowe tabele",
             "autoexpire_label": "Automatyczne wygasanie",
             "autoextend_label": "Automatyczne rozszerzenie",
+            "channel_label": "Kanał",
+            "description_label": "Opis",
             "dupin": {
                 "both": "Bieżące i poprzednie nagrania",
                 "curr": "Tylko bieżące nagrania",
@@ -95,6 +113,7 @@
                 "s_then_d": "Dopasuj, używając napisów, a następnie opisu"
             },
             "dupmethod_label": "Duplikat metody dopasowania",
+            "duration_label": "Czas trwania",
             "endoffset_label": "Liczba dodatkowych minut do nagrania na końcu",
             "extend_none": "Nic",
             "filters_label": "Opcje filtra",
@@ -125,9 +144,15 @@
             },
             "recprofile_label": "Profil nagrywania",
             "sgroup_label": "Grupa pamięci",
+            "sqlwhere_label": "SQL gdzie Warunek",
+            "srchValue_label": "Wyszukaj wartość",
+            "srchtype_label": "Typ wyszukiwania",
             "startoffset_label": "Liczba dodatkowych minut do nagrania na starcie",
+            "starttime_label": "Data i godzina rozpoczęcia",
+            "subtitle_label": "Podtytuł",
             "template_apply": "Zastosuj zmianę szablonu",
             "template_label": "Użyj szablonu",
+            "title_label": "Tytuł",
             "type": {
                 "all": "Nagraj wszystkie pokazy",
                 "daily": "Nagraj jeden pokaz każdego dnia",
@@ -192,6 +217,7 @@
             "time": "Czas"
         },
         "videos": {
+            "download": "Ściągnij wideo",
             "heading": "Filmy",
             "releasedate": "Data wydania"
         }
@@ -230,8 +256,10 @@
         "backendSetup": "Konfiguracja zaplecza",
         "changeLanguage": "Zmień język",
         "dashboard": "Panel",
+        "hide": "Ukryj górny baner",
         "login": "Zaloguj sie",
         "mainheading": "Zaplecze MythTV",
+        "show": "Pokaż górny baner",
         "switchServer": "Zmień serwer",
         "switchTheme": "Przełącz motyw",
         "testbed": "Stanowisko testowe",
@@ -334,6 +362,7 @@
         "weekHeader": "Wk"
     },
     "recrule": {
+        "DonotRecord": "Nie nagrywaj",
         "NotRecording": "Nie nagrywanie",
         "OverrideRecording": "Zastąp nagrywanie",
         "RecordAll": "Nagraj wszystko",
@@ -341,7 +370,14 @@
         "RecordOne": "Nagraj jeden",
         "RecordWeekly": "Rekordowy Tydzień",
         "RecordingTemplate": "Szablon nagrywania",
-        "SingleRecord": "Pojedynczy rekord"
+        "SingleRecord": "Pojedynczy rekord",
+        "srch_KeywordSearch": "Szukanie słowa kluczowego",
+        "srch_ManualSearch": "Wyszukiwanie ręczne",
+        "srch_None": "Nic",
+        "srch_PeopleSearch": "Ludzie szukają",
+        "srch_PowerSearch": "Wyszukiwanie mocy",
+        "srch_TitleSearch": "Wyszukiwanie tytułów",
+        "template": "Szablon"
     },
     "settings": {
         "backendctrl": {
@@ -602,6 +638,7 @@
             "delete_source_details": "Spowoduje to usunięcie wszystkich kanałów ze źródła: {{Source}}",
             "delete_this": "Usuń kanał",
             "deletechan": "Usuń kanał",
+            "editchan": "Edytuj kanał",
             "eit_desc": "Jeśli ta opcja jest włączona, informacje przewodnika dla tego kanału będą aktualizowane przy użyciu list programów „Over-the-Air”.",
             "eit_label": "Skorzystaj z przewodnika Air",
             "format_desc": "Jeśli ten kanał używa formatu innego niż TV Format na ekranie General Backend Setup, ustaw go tutaj.",
@@ -621,7 +658,6 @@
             "timeoffset_label": "Przesunięcie czasowe aukcji",
             "title": "Edytor kanału",
             "unassigned": "(Nieprzypisany)",
-            "updatechan": "Zaktualizuj kanał",
             "visible": "Widoczny",
             "visible_desc": "W przypadku ustawienia Zawsze widoczny lub Widoczny, kanał będzie widoczny w EPG. Ustaw Zawsze widoczny lub Nigdy nie widoczny, aby uniemożliwić MythTV i innym narzędziom automatyczne zarządzanie wartością dla tego kanału.",
             "visible_label": "Widoczność",
@@ -692,7 +728,7 @@
             },
             "freqtable_desc": "Opcja skanowania tylko kanałów o „wysokiej” częstotliwości jest przydatna, ponieważ większość kanałów cyfrowych znajduje się na wyższych częstotliwościach.",
             "freqtable_label": "Tabela częstotliwości",
-            "frequency_desc": "Częstotliwość tego transportu (multipleksu) w {{unit}} (Opcja nie ma wartości domyślnej).",
+            "frequency_desc": "Częstotliwość tego transportu (multipleksu) w {{unit}}. Wartość domyślna jest ustawiona w Konfiguracja źródła wideo.",
             "frequency_label": "Częstotliwość",
             "ftaonly_desc": "Jeśli jest ustawiona, podczas skanowania zostaną dodane tylko kanały nieszyfrowane.",
             "ftaonly_label": "Tylko niezaszyfrowane",
@@ -962,6 +998,7 @@
             "enableupdates_label": "Włącz aktualizacje",
             "restart_desc": "Nagrania są wyłączone do ponownego uruchomienia",
             "restart_label": "Uruchom ponownie zaplecze",
+            "restarting": "Ponowne uruchamianie backendu",
             "slave_instructions": "Wygląda na to, że jest to backend podrzędny. Jeśli ma służyć jako podrzędny backend, wyłącz planowanie na backendzie msster podczas uruchamiania konfiguracji podrzędnego backendu.",
             "slave_warning": "Jeśli nie jest to zaplecze podrzędne, przejdź do Ustawienia, Ogólne, Konfiguracja zaplecza adresu hosta i wybierz „Ten serwer jest głównym zapleczem” lub ustaw poprawny niestandardowy identyfikator na stronie Konfiguracja bazy danych. Zapisz i uruchom ponownie backend,",
             "title": "Konfiguracja MythTV",

@@ -1,12 +1,18 @@
 {
     "common": {
         "back": "Back",
+        "backenderror": "Backend error.",
         "cancel": "Cancel",
         "close": "Close",
         "continue": "Continue Editing",
         "default": "Default",
         "delete": "Delete",
         "failed": "Failed",
+        "filter": {
+            "contains": "Contains",
+            "equals": "Exact Match",
+            "startswith": "Starts With"
+        },
         "help": "Help",
         "instructions": "Instructions",
         "loading": "Loading",
@@ -40,9 +46,13 @@
             "alreadydel": "Already Deleted",
             "canundel": "You can reverse this by using Undelete.",
             "channel": "Channel",
+            "delete_details": "This will delete the Recording Rule",
+            "delete_rule": "Delete Recording Rule",
             "description": "Description",
+            "download": "Download Recording",
             "duration": "Duration",
             "edit_metadata": "Edit Metadata",
+            "edit_rule": "Edit Recording Rule",
             "episode": "Episode",
             "file_size": "File Size",
             "filter": "Filter",
@@ -62,9 +72,12 @@
             "mnu_updatemeta": "Update Metadata",
             "mnu_updaterecrule": "Update Record Rule",
             "orig_airdate": "Orig Airdate",
+            "override_rule": "Add or Edit Override Rule",
             "recgrp": "Rec Grp",
             "seas_ep": "Seas Ep",
             "season": "Season",
+            "stop_details": "This will Stop Recording",
+            "stop_recording": "Stop Recording",
             "subtitle": "Subtitle",
             "title": "Title"
         },
@@ -74,13 +87,18 @@
         "recrules": {
             "heading": "Recording Rules",
             "lastrec": "Last Recorded",
+            "new_recrule": "New Recording Rule",
+            "new_teplate": "New Recording Template",
             "nextrec": "Next Recording",
             "storgrp": "Storage Group"
         },
         "sched": {
             "active_label": "Recording Rule is Active",
+            "add_tables_label": "Additional Tables",
             "autoexpire_label": "Auto Expire",
             "autoextend_label": "Auto Extend",
+            "channel_label": "Channel",
+            "description_label": "Description",
             "dupin": {
                 "both": "Current and Previous Recordings",
                 "curr": "Current Recordings Only",
@@ -95,6 +113,7 @@
                 "s_then_d": "Match Using Subtitle Then Description"
             },
             "dupmethod_label": "Duplicate Match Method",
+            "duration_label": "Duration",
             "endoffset_label": "Number of Extra Minutes to Record at End",
             "extend_none": "None",
             "filters_label": "Filter Options",
@@ -125,9 +144,15 @@
             },
             "recprofile_label": "Recording Profile",
             "sgroup_label": "Storage Group",
+            "sqlwhere_label": "SQL Where Condition",
+            "srchValue_label": "Search Value",
+            "srchtype_label": "Search Type",
             "startoffset_label": "Number of Extra Minutes to Record at Start",
+            "starttime_label": "Start Date and Time",
+            "subtitle_label": "Subtitle",
             "template_apply": "Apply Template Change",
             "template_label": "Use Template",
+            "title_label": "Title",
             "type": {
                 "all": "Record All Showings",
                 "daily": "Record one showing every day",
@@ -192,6 +217,7 @@
             "time": "Time"
         },
         "videos": {
+            "download": "Download Video",
             "heading": "Videos",
             "releasedate": "Release Date"
         }
@@ -230,8 +256,10 @@
         "backendSetup": "Backend Setup",
         "changeLanguage": "Change Language",
         "dashboard": "Dashboard",
+        "hide": "Hide top Banner",
         "login": "Log In",
         "mainheading": "MythTV Backend",
+        "show": "Show top Banner",
         "switchServer": "Switch Server",
         "switchTheme": "Switch Theme",
         "testbed": "Testbed",
@@ -334,6 +362,7 @@
         "weekHeader": "Wk"
     },
     "recrule": {
+        "DonotRecord": "Do not Record",
         "NotRecording": "Not Recording",
         "OverrideRecording": "Override Recording",
         "RecordAll": "Record All",
@@ -341,7 +370,14 @@
         "RecordOne": "Record One",
         "RecordWeekly": "Record Weekly",
         "RecordingTemplate": "Recording Template",
-        "SingleRecord": "Single Record"
+        "SingleRecord": "Single Record",
+        "srch_KeywordSearch": "Keyword Search",
+        "srch_ManualSearch": "Manual Search",
+        "srch_None": "None",
+        "srch_PeopleSearch": "People Search",
+        "srch_PowerSearch": "Power Search",
+        "srch_TitleSearch": "Title Search",
+        "template": "Template"
     },
     "settings": {
         "backendctrl": {
@@ -602,6 +638,7 @@
             "delete_source_details": "This will delete all channels from source: {{Source}}",
             "delete_this": "Delete Channel",
             "deletechan": "Delete Channel",
+            "editchan": "Edit Channel",
             "eit_desc": "If enabled, guide information for this channel will be updated using 'Over-the-Air' program listings.",
             "eit_label": "Use On Air Guide",
             "format_desc": "If this channel uses a format other than TV Format in the General Backend Setup screen, set it here.",
@@ -621,7 +658,6 @@
             "timeoffset_label": "Listings Time Offset",
             "title": "Channel Editor",
             "unassigned": "(Unassigned)",
-            "updatechan": "Update Channel",
             "visible": "Visible",
             "visible_desc": "If set to Always Visible or Visible, the channel will be visible in the EPG.  Set to Always Visible or Never Visible to prevent MythTV and other utilities from automatically managing the value for this channel..",
             "visible_label": "Visibility",
@@ -692,7 +728,7 @@
             },
             "freqtable_desc": "The option of scanning only \"High\" frequency channels is useful because most digital channels are on the higher frequencies.",
             "freqtable_label": "Frequency Table",
-            "frequency_desc": "The frequency for this transport (multiplex) in {{unit}} (Option has no default).",
+            "frequency_desc": "The frequency for this transport (multiplex) in {{unit}}. The default is set in Video Source Setup.",
             "frequency_label": "Frequency",
             "ftaonly_desc": "If set, only non-encrypted channels will be added during the scan.",
             "ftaonly_label": "Unencrypted Only",
@@ -962,6 +998,7 @@
             "enableupdates_label": "Enable Updates",
             "restart_desc": "Recordings are disabled until you restart",
             "restart_label": "Restart Backend",
+            "restarting": "Restarting Backend",
             "slave_instructions": "This appears to be a slave backend. If it is intended as a slave backend, please disable scheduling on the msster backend while running slave backend setup.",
             "slave_warning": "If this is not intended as a slave backend, please go to Setup, General, Host Address Backend Setup, and select \"This server is the Master Backend\" or else set the correct custom identifier on the Database Setup page. Save and Restart the backend,",
             "title": "MythTV Setup",

@@ -192,7 +192,10 @@ void AutoExpire::CalcParams()
 
             for (auto cardid : qAsConst(fsEncoderMap[fsit->getFSysID()]))
             {
-                EncoderLink *enc = *(m_encoderList->constFind(cardid));
+                auto iter = m_encoderList->constFind(cardid);
+                if (iter == m_encoderList->constEnd())
+                    continue;
+                EncoderLink *enc = *iter;
 
                 if (!enc->IsConnected() || !enc->IsBusy())
                 {

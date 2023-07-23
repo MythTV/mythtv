@@ -1,12 +1,18 @@
 {
     "common": {
         "back": "Zurück",
+        "backenderror": "Backend-Fehler.",
         "cancel": "Stornieren",
         "close": "Schließen",
         "continue": "Bearbeiten Sie weiter",
         "default": "Standard",
         "delete": "Löschen",
         "failed": "Fehlgeschlagen",
+        "filter": {
+            "contains": "Enthält",
+            "equals": "Genaue Übereinstimmung",
+            "startswith": "Beginnt mit"
+        },
         "help": "Hilfe",
         "instructions": "Anweisungen",
         "loading": "Wird geladen",
@@ -40,9 +46,13 @@
             "alreadydel": "Bereits gelöscht",
             "canundel": "Sie können dies rückgängig machen, indem Sie Undelete verwenden.",
             "channel": "Kanal",
+            "delete_details": "Dadurch wird die Aufzeichnungsregel gelöscht",
+            "delete_rule": "Aufzeichnungsregel löschen",
             "description": "Beschreibung",
+            "download": "Aufnahme herunterladen",
             "duration": "Dauer",
             "edit_metadata": "Metadaten bearbeiten",
+            "edit_rule": "Aufzeichnungsregel bearbeiten",
             "episode": "Folge",
             "file_size": "Dateigröße",
             "filter": "Filter",
@@ -62,9 +72,12 @@
             "mnu_updatemeta": "Metadaten aktualisieren",
             "mnu_updaterecrule": "Datensatzregel aktualisieren",
             "orig_airdate": "Ursprüngliches Sendedatum",
+            "override_rule": "Außerkraftsetzungsregel hinzufügen oder bearbeiten",
             "recgrp": "Rec Grp",
             "seas_ep": "Meere Ep",
             "season": "Jahreszeit",
+            "stop_details": "Dadurch wird die Aufnahme beendet",
+            "stop_recording": "Höre auf, aufzunehmen",
             "subtitle": "Untertitel",
             "title": "Titel"
         },
@@ -74,13 +87,18 @@
         "recrules": {
             "heading": "Aufnahmeregeln",
             "lastrec": "Zuletzt aufgezeichnet",
+            "new_recrule": "Neue Aufzeichnungsregel",
+            "new_teplate": "Neue Aufnahmevorlage",
             "nextrec": "Nächste Aufnahme",
             "storgrp": "Speichergruppe"
         },
         "sched": {
             "active_label": "Die Aufzeichnungsregel ist aktiv",
+            "add_tables_label": "Zusätzliche Tabellen",
             "autoexpire_label": "Automatisches Ablaufen",
             "autoextend_label": "Automatische Verlängerung",
+            "channel_label": "Kanal",
+            "description_label": "Beschreibung",
             "dupin": {
                 "both": "Aktuelle und frühere Aufnahmen",
                 "curr": "Nur aktuelle Aufnahmen",
@@ -95,6 +113,7 @@
                 "s_then_d": "Übereinstimmung mit Untertitel und dann Beschreibung"
             },
             "dupmethod_label": "Duplikat-Match-Methode",
+            "duration_label": "Dauer",
             "endoffset_label": "Anzahl der zusätzlichen Minuten, die am Ende aufgezeichnet werden sollen",
             "extend_none": "Keiner",
             "filters_label": "Filteroptionen",
@@ -125,9 +144,15 @@
             },
             "recprofile_label": "Aufnahmeprofil",
             "sgroup_label": "Speichergruppe",
+            "sqlwhere_label": "SQL-Where-Bedingung",
+            "srchValue_label": "Suchwert",
+            "srchtype_label": "Suchtyp",
             "startoffset_label": "Anzahl der zusätzlichen Minuten, die beim Start aufgezeichnet werden müssen",
+            "starttime_label": "Startdatum und -uhrzeit",
+            "subtitle_label": "Untertitel",
             "template_apply": "Vorlagenänderung anwenden",
             "template_label": "Benutze Template",
+            "title_label": "Titel",
             "type": {
                 "all": "Zeichnen Sie alle Vorführungen auf",
                 "daily": "Nehmen Sie jeden Tag eine Vorführung auf",
@@ -192,6 +217,7 @@
             "time": "Zeit"
         },
         "videos": {
+            "download": "Video herunterladen",
             "heading": "Videos",
             "releasedate": "Veröffentlichungsdatum"
         }
@@ -230,8 +256,10 @@
         "backendSetup": "Backend-Setup",
         "changeLanguage": "Sprache ändern",
         "dashboard": "Instrumententafel",
+        "hide": "Oberes Banner ausblenden",
         "login": "Einloggen",
         "mainheading": "MythTV-Backend",
+        "show": "Top-Banner anzeigen",
         "switchServer": "Server wechseln",
         "switchTheme": "Thema wechseln",
         "testbed": "Prüfstand",
@@ -334,6 +362,7 @@
         "weekHeader": "Wo"
     },
     "recrule": {
+        "DonotRecord": "Nicht aufzeichnen",
         "NotRecording": "Keine Aufnahme",
         "OverrideRecording": "Aufzeichnung außer Kraft setzen",
         "RecordAll": "Alle aufzeichnen",
@@ -341,7 +370,14 @@
         "RecordOne": "Nehmen Sie Eins auf",
         "RecordWeekly": "Wöchentlich aufzeichnen",
         "RecordingTemplate": "Aufnahmevorlage",
-        "SingleRecord": "Einzelner Datensatz"
+        "SingleRecord": "Einzelner Datensatz",
+        "srch_KeywordSearch": "Schlagwortsuche",
+        "srch_ManualSearch": "Manuelle Suche",
+        "srch_None": "Keiner",
+        "srch_PeopleSearch": "Personensuche",
+        "srch_PowerSearch": "Power-Suche",
+        "srch_TitleSearch": "Titelsuche",
+        "template": "Vorlage"
     },
     "settings": {
         "backendctrl": {
@@ -602,6 +638,7 @@
             "delete_source_details": "Dadurch werden alle Kanäle aus der Quelle gelöscht: {{Source}}",
             "delete_this": "Kanal löschen",
             "deletechan": "Kanal löschen",
+            "editchan": "Kanal bearbeiten",
             "eit_desc": "Wenn diese Option aktiviert ist, werden die Guide-Informationen für diesen Kanal mithilfe von „Over-the-Air“-Programmlisten aktualisiert.",
             "eit_label": "Verwenden Sie On Air Guide",
             "format_desc": "Wenn dieser Kanal im Bildschirm „Allgemeines Backend-Setup“ ein anderes Format als „TV-Format“ verwendet, stellen Sie es hier ein.",
@@ -621,7 +658,6 @@
             "timeoffset_label": "Zeitversatz der Einträge",
             "title": "Kanaleditor",
             "unassigned": "(Nicht zugewiesen)",
-            "updatechan": "Kanal aktualisieren",
             "visible": "Sichtbar",
             "visible_desc": "Bei der Einstellung „Immer sichtbar“ oder „Sichtbar“ ist der Kanal im EPG sichtbar. Stellen Sie „Immer sichtbar“ oder „Nie sichtbar“ ein, um zu verhindern, dass MythTV und andere Dienstprogramme den Wert für diesen Kanal automatisch verwalten.",
             "visible_label": "Sichtweite",
@@ -692,7 +728,7 @@
             },
             "freqtable_desc": "Die Option, nur Kanäle mit „hoher“ Frequenz zu scannen, ist nützlich, da die meisten digitalen Kanäle auf höheren Frequenzen liegen.",
             "freqtable_label": "Häufigkeitstabelle",
-            "frequency_desc": "Die Häufigkeit für diesen Transport (Multiplex) in {{unit}} (Option hat keinen Standardwert).",
+            "frequency_desc": "Die Häufigkeit für diesen Transport (Multiplex) in {{unit}}. Die Standardeinstellung wird im Videoquellen-Setup festgelegt.",
             "frequency_label": "Frequenz",
             "ftaonly_desc": "Wenn eingestellt, werden beim Scan nur unverschlüsselte Kanäle hinzugefügt.",
             "ftaonly_label": "Nur unverschlüsselt",
@@ -962,6 +998,7 @@
             "enableupdates_label": "Aktivieren Sie Updates",
             "restart_desc": "Die Aufzeichnungen sind bis zum Neustart deaktiviert",
             "restart_label": "Backend neu starten",
+            "restarting": "Backend neu starten",
             "slave_instructions": "Dies scheint ein Slave-Backend zu sein. Wenn es als Slave-Backend gedacht ist, deaktivieren Sie bitte die Planung auf dem msster-Backend, während Sie das Slave-Backend-Setup ausführen.",
             "slave_warning": "Wenn dies nicht als Slave-Backend gedacht ist, gehen Sie bitte zu „Setup“, „Allgemein“, „Hostadressen-Backend-Setup“ und wählen Sie „Dieser Server ist das Master-Backend“ oder legen Sie die korrekte benutzerdefinierte Kennung auf der Seite „Datenbank-Setup“ fest. Speichern Sie das Backend und starten Sie es neu.",
             "title": "MythTV-Setup",

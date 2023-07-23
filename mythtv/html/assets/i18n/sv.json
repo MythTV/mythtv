@@ -1,12 +1,18 @@
 {
     "common": {
         "back": "Tillbaka",
+        "backenderror": "Backend-fel.",
         "cancel": "Annullera",
         "close": "Stänga",
         "continue": "Fortsätt redigera",
         "default": "Standard",
         "delete": "Radera",
         "failed": "Misslyckades",
+        "filter": {
+            "contains": "Innehåller",
+            "equals": "Exakt matchning",
+            "startswith": "Börjar med"
+        },
         "help": "Hjälp",
         "instructions": "Instruktioner",
         "loading": "Läser in",
@@ -40,9 +46,13 @@
             "alreadydel": "Redan raderad",
             "canundel": "Du kan vända detta genom att använda Återställ.",
             "channel": "Kanal",
+            "delete_details": "Detta tar bort inspelningsregeln",
+            "delete_rule": "Ta bort inspelningsregel",
             "description": "Beskrivning",
+            "download": "Ladda ner inspelning",
             "duration": "Varaktighet",
             "edit_metadata": "Redigera metadata",
+            "edit_rule": "Redigera inspelningsregel",
             "episode": "Episod",
             "file_size": "Filstorlek",
             "filter": "Filtrera",
@@ -62,9 +72,12 @@
             "mnu_updatemeta": "Uppdatera metadata",
             "mnu_updaterecrule": "Uppdatera postregel",
             "orig_airdate": "Original Air Date",
+            "override_rule": "Lägg till eller redigera åsidosättningsregel",
             "recgrp": "Rec Grp",
             "seas_ep": "Seas Ep",
             "season": "Säsong",
+            "stop_details": "Detta kommer att stoppa inspelningen",
+            "stop_recording": "Stoppa inspelning",
             "subtitle": "Texta",
             "title": "Titel"
         },
@@ -74,13 +87,18 @@
         "recrules": {
             "heading": "Inspelningsregler",
             "lastrec": "Senast inspelad",
+            "new_recrule": "Ny inspelningsregel",
+            "new_teplate": "Ny inspelningsmall",
             "nextrec": "Nästa inspelning",
             "storgrp": "Lagringsgrupp"
         },
         "sched": {
             "active_label": "Inspelningsregeln är aktiv",
+            "add_tables_label": "Ytterligare tabeller",
             "autoexpire_label": "Utgår automatiskt",
             "autoextend_label": "Automatisk förlängning",
+            "channel_label": "Kanal",
+            "description_label": "Beskrivning",
             "dupin": {
                 "both": "Aktuella och tidigare inspelningar",
                 "curr": "Endast aktuella inspelningar",
@@ -95,6 +113,7 @@
                 "s_then_d": "Matcha med textning sedan beskrivning"
             },
             "dupmethod_label": "Duplicera matchningsmetod",
+            "duration_label": "Varaktighet",
             "endoffset_label": "Antal extra minuter att spela in vid slutet",
             "extend_none": "Ingen",
             "filters_label": "Filteralternativ",
@@ -125,9 +144,15 @@
             },
             "recprofile_label": "Inspelningsprofil",
             "sgroup_label": "Lagringsgrupp",
+            "sqlwhere_label": "SQL Where Condition",
+            "srchValue_label": "Sökvärde",
+            "srchtype_label": "Söktyp",
             "startoffset_label": "Antal extra minuter att spela in vid start",
+            "starttime_label": "Startdatum och tid",
+            "subtitle_label": "Texta",
             "template_apply": "Använd malländring",
             "template_label": "Använd mall",
+            "title_label": "Titel",
             "type": {
                 "all": "Spela in alla visningar",
                 "daily": "Spela in en visning varje dag",
@@ -192,6 +217,7 @@
             "time": "Tid"
         },
         "videos": {
+            "download": "Ladda ner video",
             "heading": "videoklipp",
             "releasedate": "Utgivningsdatum"
         }
@@ -230,8 +256,10 @@
         "backendSetup": "Backend Setup",
         "changeLanguage": "Ändra språk",
         "dashboard": "instrumentbräda",
+        "hide": "Dölj översta banner",
         "login": "Logga in",
         "mainheading": "MythTV Backend",
+        "show": "Visa toppbanner",
         "switchServer": "Byt server",
         "switchTheme": "Byt tema",
         "testbed": "Testbädd",
@@ -334,6 +362,7 @@
         "weekHeader": "Wk"
     },
     "recrule": {
+        "DonotRecord": "Spela inte in",
         "NotRecording": "Spelar inte in",
         "OverrideRecording": "Åsidosätt inspelning",
         "RecordAll": "Spela in alla",
@@ -341,7 +370,14 @@
         "RecordOne": "Spela in ett",
         "RecordWeekly": "Record Weekly",
         "RecordingTemplate": "Inspelningsmall",
-        "SingleRecord": "Singelskiva"
+        "SingleRecord": "Singelskiva",
+        "srch_KeywordSearch": "Nyckelordssökning",
+        "srch_ManualSearch": "Manuell sökning",
+        "srch_None": "Ingen",
+        "srch_PeopleSearch": "People Search",
+        "srch_PowerSearch": "Power Search",
+        "srch_TitleSearch": "Titelsökning",
+        "template": "Mall"
     },
     "settings": {
         "backendctrl": {
@@ -602,6 +638,7 @@
             "delete_source_details": "Detta tar bort alla kanaler från källan: {{Source}}",
             "delete_this": "Ta bort kanal",
             "deletechan": "Ta bort kanal",
+            "editchan": "Redigera kanal",
             "eit_desc": "Om det är aktiverat kommer guideinformationen för den här kanalen att uppdateras med hjälp av \"Over-the-Air\" programlistor.",
             "eit_label": "Använd On Air Guide",
             "format_desc": "Om den här kanalen använder ett annat format än TV-format på skärmen Allmänna backend-inställningar, ställ in det här.",
@@ -621,7 +658,6 @@
             "timeoffset_label": "Listor Tidsförskjutning",
             "title": "Kanalredigerare",
             "unassigned": "(Otilldelad)",
-            "updatechan": "Uppdatera kanal",
             "visible": "Synlig",
             "visible_desc": "Om den är inställd på Alltid synlig eller Synlig kommer kanalen att vara synlig i EPG. Ställ in på Alltid synlig eller Aldrig synlig för att förhindra att MythTV och andra verktyg automatiskt hanterar värdet för den här kanalen.",
             "visible_label": "Synlighet",
@@ -692,7 +728,7 @@
             },
             "freqtable_desc": "Alternativet att bara skanna \"Hög\" frekvenskanaler är användbart eftersom de flesta digitala kanaler är på de högre frekvenserna.",
             "freqtable_label": "Frekvenstabell",
-            "frequency_desc": "Frekvensen för denna transport (multiplex) i {{unit}} (alternativet har ingen standard).",
+            "frequency_desc": "Frekvensen för denna transport (multiplex) i {{unit}}. Standardinställningen är inställd i Video Source Setup.",
             "frequency_label": "Frekvens",
             "ftaonly_desc": "Om det är inställt kommer endast icke-krypterade kanaler att läggas till under skanningen.",
             "ftaonly_label": "Endast okrypterad",
@@ -962,6 +998,7 @@
             "enableupdates_label": "Aktivera uppdateringar",
             "restart_desc": "Inspelningar är inaktiverade tills du startar om",
             "restart_label": "Starta om Backend",
+            "restarting": "Startar om backend",
             "slave_instructions": "Detta verkar vara en slavbackend. Om den är avsedd som en slavbackend, inaktivera schemaläggning på msster-backend medan du kör slavbackend-installation.",
             "slave_warning": "Om detta inte är avsett som en slavbackend, gå till Setup, General, Host Address Backend Setup och välj \"Den här servern är Master Backend\" eller ställ in rätt anpassad identifierare på Databas Setup-sidan. Spara och starta om backend,",
             "title": "MythTV Setup",

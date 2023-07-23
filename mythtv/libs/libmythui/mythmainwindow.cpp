@@ -229,10 +229,11 @@ MythMainWindow::~MythMainWindow()
 
     delete m_themeBase;
 
-    while (!m_priv->m_keyContexts.isEmpty())
+    for (auto iter = m_priv->m_keyContexts.begin();
+         iter != m_priv->m_keyContexts.end();
+         iter = m_priv->m_keyContexts.erase(iter))
     {
-        KeyContext *context = *m_priv->m_keyContexts.begin();
-        m_priv->m_keyContexts.erase(m_priv->m_keyContexts.begin());
+        KeyContext *context = *iter;
         delete context;
     }
 

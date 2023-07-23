@@ -1,12 +1,18 @@
 {
     "common": {
         "back": "Nazaj",
+        "backenderror": "Napaka zaledja.",
         "cancel": "Prekliči",
         "close": "Zapri",
         "continue": "Nadaljujte z urejanjem",
         "default": "Privzeto",
         "delete": "Izbriši",
         "failed": "Ni uspelo",
+        "filter": {
+            "contains": "Vsebuje",
+            "equals": "Natančno ujemanje",
+            "startswith": "Začne se z"
+        },
         "help": "pomoč",
         "instructions": "Navodila",
         "loading": "nalaganje",
@@ -40,9 +46,13 @@
             "alreadydel": "Že izbrisano",
             "canundel": "To lahko obrnete z uporabo Undelete.",
             "channel": "Kanal",
+            "delete_details": "S tem boste izbrisali pravilo snemanja",
+            "delete_rule": "Izbriši pravilo snemanja",
             "description": "Opis",
+            "download": "Prenos posnetka",
             "duration": "Trajanje",
             "edit_metadata": "Uredi metapodatke",
+            "edit_rule": "Uredi pravilo snemanja",
             "episode": "Epizoda",
             "file_size": "Velikost datoteke",
             "filter": "Filter",
@@ -62,9 +72,12 @@
             "mnu_updatemeta": "Posodobi metapodatke",
             "mnu_updaterecrule": "Posodobi pravilo zapisa",
             "orig_airdate": "Prvotni datum predvajanja",
+            "override_rule": "Dodajanje ali urejanje pravila za preglasitev",
             "recgrp": "Rec Grp",
             "seas_ep": "morja ep",
             "season": "Sezona",
+            "stop_details": "To bo ustavilo snemanje",
+            "stop_recording": "Ustavi snemanje",
             "subtitle": "Podnaslov",
             "title": "Naslov"
         },
@@ -74,13 +87,18 @@
         "recrules": {
             "heading": "Pravila snemanja",
             "lastrec": "Nazadnje posneto",
+            "new_recrule": "Novo pravilo snemanja",
+            "new_teplate": "Nova predloga za snemanje",
             "nextrec": "Naslednji posnetek",
             "storgrp": "Skupina za shranjevanje"
         },
         "sched": {
             "active_label": "Pravilo snemanja je aktivno",
+            "add_tables_label": "Dodatne tabele",
             "autoexpire_label": "Samodejni potek",
             "autoextend_label": "Samodejno podaljšanje",
+            "channel_label": "Kanal",
+            "description_label": "Opis",
             "dupin": {
                 "both": "Trenutni in prejšnji posnetki",
                 "curr": "Samo trenutni posnetki",
@@ -95,6 +113,7 @@
                 "s_then_d": "Ujemanje s podnapisi in nato opisom"
             },
             "dupmethod_label": "Podvojena metoda ujemanja",
+            "duration_label": "Trajanje",
             "endoffset_label": "Število dodatnih minut za snemanje ob koncu",
             "extend_none": "Noben",
             "filters_label": "Možnosti filtra",
@@ -125,9 +144,15 @@
             },
             "recprofile_label": "Profil snemanja",
             "sgroup_label": "Skupina za shranjevanje",
+            "sqlwhere_label": "SQL Kje pogoj",
+            "srchValue_label": "Vrednost iskanja",
+            "srchtype_label": "Vrsta iskanja",
             "startoffset_label": "Število dodatnih minut za snemanje na začetku",
+            "starttime_label": "Začetni datum in čas",
+            "subtitle_label": "Podnaslov",
             "template_apply": "Uporabi spremembo predloge",
             "template_label": "Uporabite predlogo",
+            "title_label": "Naslov",
             "type": {
                 "all": "Posnemite vse prikaze",
                 "daily": "Vsak dan posnemite eno oddajo",
@@ -192,6 +217,7 @@
             "time": "Čas"
         },
         "videos": {
+            "download": "Prenesi video",
             "heading": "Videoposnetki",
             "releasedate": "Datum izdaje"
         }
@@ -230,8 +256,10 @@
         "backendSetup": "Nastavitev zaledja",
         "changeLanguage": "Spremeni jezik",
         "dashboard": "Nadzorna plošča",
+        "hide": "Skrij zgornjo pasico",
         "login": "Vpiši se",
         "mainheading": "Zaledje MythTV",
+        "show": "Prikaži zgornjo pasico",
         "switchServer": "Switch Server",
         "switchTheme": "Preklopi temo",
         "testbed": "Preizkušena",
@@ -334,6 +362,7 @@
         "weekHeader": "Td"
     },
     "recrule": {
+        "DonotRecord": "Ne snemaj",
         "NotRecording": "Ne snema",
         "OverrideRecording": "Preglasi snemanje",
         "RecordAll": "Posnemi vse",
@@ -341,7 +370,14 @@
         "RecordOne": "Posnetek ena",
         "RecordWeekly": "Snemaj tedensko",
         "RecordingTemplate": "Predloga za snemanje",
-        "SingleRecord": "Enotni zapis"
+        "SingleRecord": "Enotni zapis",
+        "srch_KeywordSearch": "Iskanje po ključnih besedah",
+        "srch_ManualSearch": "Ročno iskanje",
+        "srch_None": "Noben",
+        "srch_PeopleSearch": "Iskanje ljudi",
+        "srch_PowerSearch": "Močno iskanje",
+        "srch_TitleSearch": "Iskanje po naslovu",
+        "template": "Predloga"
     },
     "settings": {
         "backendctrl": {
@@ -602,6 +638,7 @@
             "delete_source_details": "S tem boste izbrisali vse kanale iz vira: {{Source}}",
             "delete_this": "Izbriši kanal",
             "deletechan": "Izbriši kanal",
+            "editchan": "Uredi kanal",
             "eit_desc": "Če je omogočeno, bodo informacije vodnika za ta kanal posodobljene s seznami programov »Over-the-Air«.",
             "eit_label": "Uporabite On Air Guide",
             "format_desc": "Če ta kanal uporablja format, ki ni TV format na zaslonu Splošne nastavitve zaledja, ga nastavite tukaj.",
@@ -621,7 +658,6 @@
             "timeoffset_label": "Oglasi Časovni zamik",
             "title": "Urejevalnik kanalov",
             "unassigned": "(Nedodeljeno)",
-            "updatechan": "Posodobi kanal",
             "visible": "Vidno",
             "visible_desc": "Če je nastavljen na Always Visible ali Visible, bo kanal viden v EPG. Nastavite na Vedno vidno ali Nikoli vidno, da preprečite, da bi MythTV in drugi pripomočki samodejno upravljali vrednost za ta kanal.",
             "visible_label": "Vidnost",
@@ -692,7 +728,7 @@
             },
             "freqtable_desc": "Možnost skeniranja samo »visokofrekvenčnih« kanalov je uporabna, ker je večina digitalnih kanalov na višjih frekvencah.",
             "freqtable_label": "Frekvenčna tabela",
-            "frequency_desc": "Frekvenca za ta transport (multipleks) v {{unit}} (Možnost nima privzete vrednosti).",
+            "frequency_desc": "Frekvenca za ta transport (multipleks) v {{unit}}. Privzeto je nastavljeno v nastavitvah video vira.",
             "frequency_label": "Pogostost",
             "ftaonly_desc": "Če je nastavljeno, bodo med skeniranjem dodani samo nešifrirani kanali.",
             "ftaonly_label": "Samo nešifrirano",
@@ -962,6 +998,7 @@
             "enableupdates_label": "Omogoči posodobitve",
             "restart_desc": "Posnetki so onemogočeni, dokler znova ne zaženete",
             "restart_label": "Znova zaženite zaledje",
+            "restarting": "Ponovni zagon zaledja",
             "slave_instructions": "Zdi se, da je to podrejeno zaledje. Če je mišljeno kot podrejeno zaledje, onemogočite razporejanje na zaledju msster med izvajanjem nastavitve podrejenega zaledja.",
             "slave_warning": "Če to ni predvideno kot podrejeno zaledje, pojdite na Nastavitve, Splošno, Nastavitev zaledja naslova gostitelja in izberite »Ta strežnik je glavno zaledje« ali pa nastavite pravilen identifikator po meri na strani z nastavitvami baze podatkov. Shranite in znova zaženite zaledje,",
             "title": "Nastavitev MythTV",

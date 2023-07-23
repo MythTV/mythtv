@@ -1,12 +1,18 @@
 {
     "common": {
         "back": "esquena",
+        "backenderror": "Error de backend.",
         "cancel": "Cancel · lar",
         "close": "Tanca",
         "continue": "Continuar editant",
         "default": "Per defecte",
         "delete": "Suprimeix",
         "failed": "Fracassat",
+        "filter": {
+            "contains": "Conté",
+            "equals": "Coincidència exacta",
+            "startswith": "Comença amb"
+        },
         "help": "Ajuda",
         "instructions": "Instruccions",
         "loading": "Carregant",
@@ -40,9 +46,13 @@
             "alreadydel": "Ja s'ha eliminat",
             "canundel": "Podeu revertir-ho fent servir Undelete.",
             "channel": "Canal",
+            "delete_details": "Això suprimirà la regla de gravació",
+            "delete_rule": "Suprimeix la regla de gravació",
             "description": "Descripció",
+            "download": "Descarregar Enregistrament",
             "duration": "Durada",
             "edit_metadata": "Edita les metadades",
+            "edit_rule": "Edita la regla de gravació",
             "episode": "Episodi",
             "file_size": "Mida de l'arxiu",
             "filter": "Filtre",
@@ -62,9 +72,12 @@
             "mnu_updatemeta": "Actualitza les metadades",
             "mnu_updaterecrule": "Actualitza la regla de registre",
             "orig_airdate": "Data d'emissió original",
+            "override_rule": "Afegeix o edita una regla de substitució",
             "recgrp": "Rec Grp",
             "seas_ep": "Mars Ep",
             "season": "Temporada",
+            "stop_details": "Això aturarà la gravació",
+            "stop_recording": "Atura la gravació",
             "subtitle": "Subtítol",
             "title": "Títol"
         },
@@ -74,13 +87,18 @@
         "recrules": {
             "heading": "Normes de gravació",
             "lastrec": "Darrera gravació",
+            "new_recrule": "Nova regla d'enregistrament",
+            "new_teplate": "Nova plantilla de gravació",
             "nextrec": "Pròxima gravació",
             "storgrp": "Grup d'emmagatzematge"
         },
         "sched": {
             "active_label": "La regla de gravació està activa",
+            "add_tables_label": "Taules addicionals",
             "autoexpire_label": "Caducitat automàtica",
             "autoextend_label": "Extensió automàtica",
+            "channel_label": "Canal",
+            "description_label": "Descripció",
             "dupin": {
                 "both": "Enregistraments actuals i anteriors",
                 "curr": "Només enregistraments actuals",
@@ -95,6 +113,7 @@
                 "s_then_d": "Coincideix amb el subtítol i després amb la descripció"
             },
             "dupmethod_label": "Mètode de concordança duplicada",
+            "duration_label": "Durada",
             "endoffset_label": "Nombre de minuts addicionals per gravar al final",
             "extend_none": "Cap",
             "filters_label": "Opcions de filtre",
@@ -125,9 +144,15 @@
             },
             "recprofile_label": "Perfil de gravació",
             "sgroup_label": "Grup d'emmagatzematge",
+            "sqlwhere_label": "Condició on SQL",
+            "srchValue_label": "Valor de cerca",
+            "srchtype_label": "Tipus de cerca",
             "startoffset_label": "Nombre de minuts addicionals per gravar a l'inici",
+            "starttime_label": "Data i hora d'inici",
+            "subtitle_label": "Subtítol",
             "template_apply": "Aplica el canvi de plantilla",
             "template_label": "Utilitzeu la plantilla",
+            "title_label": "Títol",
             "type": {
                 "all": "Registra totes les projeccions",
                 "daily": "Grava una projecció cada dia",
@@ -192,6 +217,7 @@
             "time": "Temps"
         },
         "videos": {
+            "download": "Descarrega el vídeo",
             "heading": "Vídeos",
             "releasedate": "Data de publicació"
         }
@@ -230,8 +256,10 @@
         "backendSetup": "Configuració del backend",
         "changeLanguage": "Canviar d'idioma",
         "dashboard": "panell",
+        "hide": "Amaga el bàner superior",
         "login": "Iniciar Sessió",
         "mainheading": "Backend de MythTV",
+        "show": "Mostra el bàner superior",
         "switchServer": "Canvia de servidor",
         "switchTheme": "Canvia el tema",
         "testbed": "Banc de proves",
@@ -334,6 +362,7 @@
         "weekHeader": "Set"
     },
     "recrule": {
+        "DonotRecord": "No enregistreu",
         "NotRecording": "No enregistrant",
         "OverrideRecording": "Anul·lació de la gravació",
         "RecordAll": "Enregistrar-ho tot",
@@ -341,7 +370,14 @@
         "RecordOne": "Record One",
         "RecordWeekly": "Grava setmanalment",
         "RecordingTemplate": "Plantilla de gravació",
-        "SingleRecord": "Record únic"
+        "SingleRecord": "Record únic",
+        "srch_KeywordSearch": "Cerca de paraules clau",
+        "srch_ManualSearch": "Cerca manual",
+        "srch_None": "Cap",
+        "srch_PeopleSearch": "Cerca de persones",
+        "srch_PowerSearch": "Potència de cerca",
+        "srch_TitleSearch": "Cerca de títols",
+        "template": "Plantilla"
     },
     "settings": {
         "backendctrl": {
@@ -602,6 +638,7 @@
             "delete_source_details": "Això suprimirà tots els canals de la font: {{Source}}",
             "delete_this": "Suprimeix el canal",
             "deletechan": "Suprimeix el canal",
+            "editchan": "Edita el canal",
             "eit_desc": "Si està activat, la informació de guia d'aquest canal s'actualitzarà mitjançant les llistes de programes \"Over-the-Air\".",
             "eit_label": "Utilitzeu la guia a l'aire",
             "format_desc": "Si aquest canal utilitza un format diferent del format de TV a la pantalla de configuració general del backend, configureu-lo aquí.",
@@ -621,7 +658,6 @@
             "timeoffset_label": "Desplaçament de temps de llistats",
             "title": "Editor de canals",
             "unassigned": "(Sense assignar)",
-            "updatechan": "Actualitza el canal",
             "visible": "Visible",
             "visible_desc": "Si s'estableix com a Sempre visible o Visible, el canal serà visible a l'EPG. Establiu a Sempre visible o Mai visible per evitar que MythTV i altres utilitats gestionen automàticament el valor d'aquest canal.",
             "visible_label": "Visibilitat",
@@ -692,7 +728,7 @@
             },
             "freqtable_desc": "L'opció d'escanejar només canals de freqüència \"Alta\" és útil perquè la majoria dels canals digitals es troben a les freqüències més altes.",
             "freqtable_label": "Taula de Freqüències",
-            "frequency_desc": "La freqüència d'aquest transport (múltiplex) a {{unit}} (L'opció no té cap predeterminat).",
+            "frequency_desc": "La freqüència d'aquest transport (múltiplex) en {{unit}}. El valor predeterminat s'estableix a Configuració de la font de vídeo.",
             "frequency_label": "Freqüència",
             "ftaonly_desc": "Si s'estableix, només s'afegiran canals no xifrats durant l'exploració.",
             "ftaonly_label": "Només sense xifrar",
@@ -962,6 +998,7 @@
             "enableupdates_label": "Activa les actualitzacions",
             "restart_desc": "Les gravacions es desactiven fins que reinicieu",
             "restart_label": "Reinicieu el backend",
+            "restarting": "Reiniciant el backend",
             "slave_instructions": "Sembla ser un backend esclau. Si està pensat com a backend esclau, si us plau, desactiveu la programació al backend msster mentre executeu la configuració del backend esclau.",
             "slave_warning": "Si no està pensat com a backend esclau, aneu a Configuració, General, Configuració del backend de l'adreça de l'amfitrió i seleccioneu \"Aquest servidor és el backend mestre\" o bé establiu l'identificador personalitzat correcte a la pàgina Configuració de la base de dades. Desa i reinicia el backend,",
             "title": "Configuració de MythTV",

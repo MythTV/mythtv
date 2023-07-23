@@ -10,6 +10,7 @@ import { NgForm } from '@angular/forms';
 import { RecordScheduleRequest } from '../services/interfaces/dvr.interface';
 import { Observable, of } from 'rxjs';
 import { UtilityService } from '../services/utility.service';
+import { ChannelService } from '../services/channel.service';
 
 export interface SchedulerSummary {
   refresh(): void;
@@ -23,12 +24,16 @@ export interface ScheduleLink {
 interface ListEntry {
   prompt: string;
   value: string;
+  inactive?: boolean;
 }
 
 interface BoolAssociativeArray {
   [key: string]: boolean
 }
 
+interface MyChannel extends Channel {
+  Description?: string;
+}
 
 @Component({
   selector: 'app-schedule',
@@ -44,6 +49,13 @@ export class ScheduleComponent implements OnInit {
   loadCount = 0;
   successCount = 0;
   errorCount = 0;
+  errortext = '';
+  htmlRegex = new RegExp("<TITLE>|</TITLE>");
+  srchTypeDisabled = true;
+  titleRows = 1;
+  subTitleRows = 1;
+  descriptionRows = 5;
+  override = false;
   program?: ScheduleOrProgram;
   channel?: Channel;
   recRule?: RecRule;
@@ -51,6 +63,8 @@ export class ScheduleComponent implements OnInit {
   reqProgram?: ScheduleOrProgram
   reqChannel?: Channel
   reqRecRule?: RecRule
+  reqDate = new Date();
+  reqDuration = 60;
 
   recRules: RecRule[] = [];
   playGroups: string[] = [];
@@ -63,6 +77,16 @@ export class ScheduleComponent implements OnInit {
   selectedFilters: number[] = [];
   templates: RecRule[] = [];
   typeList: ListEntry[] = [];
+  allChannels: MyChannel[] = [];
+
+  srchTypeList: ListEntry[] = [
+    { prompt: this.translate.instant('recrule.srch_None'), value: 'None' },
+    { prompt: this.translate.instant('recrule.srch_PowerSearch'), value: 'Power Search' },
+    { prompt: this.translate.instant('recrule.srch_TitleSearch'), value: 'Title Search' },
+    { prompt: this.translate.instant('recrule.srch_KeywordSearch'), value: 'Keyword Search' },
+    { prompt: this.translate.instant('recrule.srch_PeopleSearch'), value: 'People Search' },
+    { prompt: this.translate.instant('recrule.srch_ManualSearch'), value: 'Manual Search' },
+  ]
 
   dupMethodList: ListEntry[] = [
     { prompt: this.translate.instant('dashboard.sched.dupmethod.none'), value: 'None' },
@@ -107,7 +131,7 @@ export class ScheduleComponent implements OnInit {
   templateId = 0;
 
   constructor(private dvrService: DvrService, private translate: TranslateService,
-    private mythService: MythService, public utility: UtilityService) {
+    private mythService: MythService, public utility: UtilityService, private channelService: ChannelService) {
   }
 
   ngOnInit(): void {
@@ -188,6 +212,11 @@ export class ScheduleComponent implements OnInit {
           error: () => this.loadFail()
         });
     }
+    this.channelService.GetChannelInfoList({ Details: true }).subscribe(data => {
+      this.allChannels = data.ChannelInfoList.ChannelInfos;
+      this.allChannels.forEach(channel => channel.Description
+        = channel.ChanNum + ' ' + channel.ChannelName + ' (' + channel.CallSign + ')')
+    });
   }
 
   loadSuccess() {
@@ -208,13 +237,33 @@ export class ScheduleComponent implements OnInit {
     this.reqProgram = program;
     this.reqChannel = channel;
     this.reqRecRule = recRule;
+    this.titleRows = 1;
+    if (program || recRule) {
+      this.srchTypeDisabled = true;
+      this.srchTypeList[0].inactive = false;
+    }
+    else {
+      this.srchTypeDisabled = false;
+      this.srchTypeList[0].inactive = true;
+    }
     this.loadLists();
   }
 
   setupData() {
+    let newOverride = false;
     this.program = this.reqProgram;
+    let ruleType = '';
     if (this.reqRecRule)
-      this.recRule = Object.assign({}, this.reqRecRule);
+      ruleType = this.reqRecRule.Type;
+    if (this.reqRecRule) {
+      if (['Override Recording', 'Do not Record'].indexOf(ruleType) > -1 && !this.reqRecRule.Id) {
+        newOverride = true;
+        this.recRule = undefined;
+      }
+      else
+        // This works because RecRule only has elementary items.
+        this.recRule = Object.assign({}, this.reqRecRule);
+    }
     else
       this.recRule = undefined;
     this.channel = this.reqChannel;
@@ -225,12 +274,9 @@ export class ScheduleComponent implements OnInit {
 
     var recId = 0;
     this.typeList = [];
-    let ruleType: string = '';
-    if (this.reqRecRule)
-      ruleType = this.reqRecRule.Type;
     this.templates = [<RecRule>{ Id: 0, Title: '' }];
     this.defaultTemplate = undefined;
-    if (this.program && this.program.Recording)
+    if (this.program && this.program.Recording && !newOverride)
       recId = this.program.Recording.RecordId;
     this.recRules.forEach((entry, index) => {
       if (entry.Id == recId) {
@@ -239,31 +285,62 @@ export class ScheduleComponent implements OnInit {
       }
       if (entry.Type == 'Recording Template') {
         this.templates.push(entry);
-        if (entry.Title == 'Default (Template)')
+        if (entry.Category == 'Default')
           this.defaultTemplate = entry;
       }
     });
     if (!this.recRule) {
       this.recRule = <RecRule>{ Id: 0 };
+    }
+    if (!this.recRule.Title) {
+      this.recRule.Title = ''
+      this.recRule.SubTitle = ''
+      this.recRule.Description = ''
       if (this.defaultTemplate)
         this.mergeTemplate(this.recRule, this.defaultTemplate)
-      ruleType = 'Not Recording';
     }
     if (!this.recRule.SearchType)
       this.recRule.SearchType = 'None';
 
-    // if (this.program && this.channel && this.recRule.Id == 0)
     if (this.program && this.channel && this.recRule.SearchType == 'None')
       this.mergeProgram(this.recRule, this.program, this.channel);
 
+    if (newOverride)
+      this.recRule.ParentId = this.program!.Recording.RecordId;
+
     if (!ruleType)
       ruleType = 'Not Recording';
-    if (!this.recRule.StartTime)
-      this.recRule.StartTime = (new Date()).toISOString();
+
+    if (!this.recRule.StartTime) {
+      let date = new Date();
+      this.recRule.StartTime = date.toISOString();
+      this.recRule.FindDay = (date.getDay() + 1) % 7;
+      this.recRule.FindTime = date.toTimeString().slice(0, 8);
+    }
 
     this.filterFromRec(this.recRule);
     this.postProcFromRec(this.recRule);
 
+    this.recRule.Type = ruleType;
+    this.setupTypeList(this.recRule);
+
+    if (!this.srchTypeDisabled)
+      this.onSearchTypeChange();
+
+    if (this.override)
+      this.recRule.Inactive = false;
+
+    setTimeout(() => {
+      if (this.recRule)
+        this.recRule.Type = ruleType;
+      this.currentForm.form.markAsPristine();
+    }, 10);
+  }
+
+  setupTypeList(recRule: RecRule) {
+    let ruleType = recRule.Type;
+    this.typeList.length = 0;
+    this.override = false;
     if (ruleType == 'Recording Template') {
       this.typeList.push(
         {
@@ -271,7 +348,7 @@ export class ScheduleComponent implements OnInit {
           value: 'Recording Template'
         }
       );
-      if (this.recRule.Category != 'Default') {
+      if (recRule.Category != 'Default' && recRule.Id > 0) {
         this.typeList.push(
           {
             prompt: this.translate.instant('dashboard.sched.type.del_template'),
@@ -280,7 +357,8 @@ export class ScheduleComponent implements OnInit {
         );
       }
     }
-    else if (ruleType == 'Override Recording')
+    else if (['Override Recording', 'Do not Record'].indexOf(ruleType) > -1) {
+      this.override = true;
       this.typeList.push(
         {
           prompt: this.translate.instant('dashboard.sched.type.del_override'),
@@ -295,16 +373,17 @@ export class ScheduleComponent implements OnInit {
           value: 'Do not Record'
         }
       );
+    }
     else {
-      const isManual = (this.recRule.SearchType == 'Manual Search');
-      const isSearch = (this.recRule.SearchType != 'None');
+      const isManual = (recRule.SearchType == 'Manual Search');
+      const isSearch = (recRule.SearchType != 'None');
       this.typeList.push(
         {
           prompt: this.translate.instant('dashboard.sched.type.not'),
           value: 'Not Recording'
         }
       );
-      if (this.recRule.CallSign && !isSearch)
+      if (recRule.CallSign && !isSearch || isManual)
         this.typeList.push(
           {
             prompt: this.translate.instant('dashboard.sched.type.this'),
@@ -318,7 +397,7 @@ export class ScheduleComponent implements OnInit {
             value: 'Record One'
           }
         );
-      if (!this.recRule.CallSign || isSearch)
+      if (!recRule.CallSign || isSearch)
         this.typeList.push(
           {
             prompt: this.translate.instant('dashboard.sched.type.weekly'),
@@ -337,11 +416,11 @@ export class ScheduleComponent implements OnInit {
           }
         );
     }
-    setTimeout(() => {
-      if (this.recRule)
-        this.recRule.Type = ruleType;
-      this.currentForm.form.markAsPristine();
-    }, 10);
+    // If the selected entry is no longet in the available list, set it to the
+    // first item in the list
+    if (this.typeList.findIndex((x) => x.value == recRule.Type) == -1) {
+      recRule.Type = this.typeList[0].value;
+    }
   }
 
 
@@ -417,6 +496,92 @@ export class ScheduleComponent implements OnInit {
     this.templateId = 0;
   }
 
+  onSearchTypeChange() {
+    if (this.recRule) {
+      this.recRule.Title = '';
+      this.reqDate = new Date();
+      this.reqDate.setMinutes(0);
+      this.reqDate.setSeconds(0, 0);
+      this.reqDuration = 60;
+      this.onDateChange();
+      if (this.recRule.SearchType == "Manual Search") {
+        this.recRule.Description = '';
+        setTimeout(() => this.onChannelChange(), 100);
+      }
+      if (this.recRule.SearchType == "Power Search") {
+        this.subTitleRows = 5;
+      }
+      else {
+        this.subTitleRows = 1;
+      }
+      if (['None', 'Power Search'].indexOf(this.recRule.SearchType) > -1)
+        this.descriptionRows = 5;
+      else
+        this.descriptionRows = 1;
+      this.recRule.SubTitle = '';
+      this.recRule.Description = '';
+      this.setupTypeList(this.recRule);
+    }
+    this.onTitleBlur();
+    this.onDescriptionBlur();
+  }
+
+  onTitleBlur() {
+    if (this.recRule) {
+      this.recRule.Title = this.recRule.Title.trim();
+      if (this.recRule.Title.length > 0) {
+        let desc;
+        if (['Manual Search', 'Power Search'].indexOf(this.recRule.SearchType) > -1 && this.recRule.Title.length > 0)
+          desc = '(' + this.trSearch(this.recRule.SearchType) + ')'
+        if (this.recRule.Type == 'Recording Template' && this.recRule.Title.length > 0)
+          desc = '(' + this.translate.instant('recrule.template') + ')'
+        if (desc && this.recRule.Title.indexOf(desc) == -1)
+          this.recRule.Title = this.recRule.Title + ' ' + desc;
+      }
+      if (this.recRule.SearchType == 'Manual Search')
+        this.recRule.Description = this.recRule.Title;
+    }
+  }
+
+  onDescriptionBlur() {
+    if (this.recRule) {
+      this.recRule.Description = this.recRule.Description.trim();
+      if (['Title Search', 'Keyword Search', 'People Search'].indexOf(this.recRule.SearchType) > -1)
+        if (this.recRule.Description.length > 0)
+          this.recRule.Title = this.recRule.Description + ' (' + this.trSearch(this.recRule.SearchType) + ')';
+        else
+          this.recRule.Title = '';
+    }
+  }
+
+  onChannelChange() {
+    if (this.recRule && this.channel) {
+      this.recRule.ChanId = this.channel.ChanId;
+      this.recRule.CallSign = this.channel.CallSign;
+    }
+  }
+
+  onDateChange() {
+    if (this.recRule) {
+      this.recRule.StartTime = this.reqDate.toISOString();
+      this.recRule.FindDay = (this.reqDate.getDay() + 1) % 7;
+      this.recRule.FindTime = this.reqDate.toTimeString().slice(0, 8);
+      this.onDurationChange();
+    }
+  }
+
+  onDurationChange() {
+    if (this.recRule) {
+      let start = new Date(this.recRule.StartTime);
+      let end = new Date(start.getTime() + this.reqDuration * 60000);
+      this.recRule.EndTime = end.toISOString();
+    }
+  }
+
+  trSearch(value: string): string {
+    return this.translate.instant('recrule.srch_' + value.replace(' ', ''));
+  }
+
   mergeTemplate(recRule: RecRule, template: RecRule) {
     recRule.Inactive = template.Inactive;
     recRule.RecPriority = template.RecPriority;
@@ -445,7 +610,6 @@ export class ScheduleComponent implements OnInit {
     this.postProcFromRec(recRule);
     this.filterFromRec(recRule);
   }
-
 
   close() {
 
@@ -508,12 +672,18 @@ export class ScheduleComponent implements OnInit {
     },
     error: (err: any) => {
       console.error(err);
+      if (err.status == 400) {
+        let parts = (<string>err.error).split(this.htmlRegex);
+        if (parts.length > 1)
+          this.errortext = parts[1];
+      }
       this.errorCount++;
       this.currentForm.form.markAsDirty();
     },
   };
 
   save() {
+    this.errortext = '';
     if (!this.recRule)
       return;
     if (this.recRule.Id == 0 && this.recRule.Type == 'Not Recording')
@@ -608,7 +778,5 @@ export class ScheduleComponent implements OnInit {
       event.returnValue = false;
     }
   }
-
-
 
 }

@@ -1,12 +1,18 @@
 {
     "common": {
         "back": "Tilbage",
+        "backenderror": "Backend fejl.",
         "cancel": "Afbestille",
         "close": "Tæt",
         "continue": "Fortsæt redigering",
         "default": "Standard",
         "delete": "Slet",
         "failed": "mislykkedes",
+        "filter": {
+            "contains": "Indeholder",
+            "equals": "Præcis match",
+            "startswith": "Starter med"
+        },
         "help": "Hjælp",
         "instructions": "Instruktioner",
         "loading": "Indlæser",
@@ -40,9 +46,13 @@
             "alreadydel": "Allerede slettet",
             "canundel": "Du kan vende dette ved at bruge Undelete.",
             "channel": "Kanal",
+            "delete_details": "Dette vil slette optagelsesreglen",
+            "delete_rule": "Slet optagelsesregel",
             "description": "Beskrivelse",
+            "download": "Download optagelse",
             "duration": "Varighed",
             "edit_metadata": "Rediger metadata",
+            "edit_rule": "Rediger optagelsesregel",
             "episode": "Episode",
             "file_size": "Filstørrelse",
             "filter": "Filter",
@@ -62,9 +72,12 @@
             "mnu_updatemeta": "Opdater metadata",
             "mnu_updaterecrule": "Opdater registreringsregel",
             "orig_airdate": "Original luftdato",
+            "override_rule": "Tilføj eller rediger tilsidesættelsesregel",
             "recgrp": "Rec Grp",
             "seas_ep": "Seas Ep",
             "season": "Sæson",
+            "stop_details": "Dette vil stoppe optagelsen",
+            "stop_recording": "Stop optagelse",
             "subtitle": "Undertekst",
             "title": "Titel"
         },
@@ -74,13 +87,18 @@
         "recrules": {
             "heading": "Regler for optagelse",
             "lastrec": "Sidst optaget",
+            "new_recrule": "Ny optagelsesregel",
+            "new_teplate": "Ny optagelsesskabelon",
             "nextrec": "Næste optagelse",
             "storgrp": "Lagergruppe"
         },
         "sched": {
             "active_label": "Reglen for optagelse er aktiv",
+            "add_tables_label": "Yderligere tabeller",
             "autoexpire_label": "Auto udløber",
             "autoextend_label": "Automatisk forlængelse",
+            "channel_label": "Kanal",
+            "description_label": "Beskrivelse",
             "dupin": {
                 "both": "Nuværende og tidligere optagelser",
                 "curr": "Kun aktuelle optagelser",
@@ -95,6 +113,7 @@
                 "s_then_d": "Match ved hjælp af undertekst og derefter beskrivelse"
             },
             "dupmethod_label": "Dublet matchmetode",
+            "duration_label": "Varighed",
             "endoffset_label": "Antal ekstra minutter at optage ved slutningen",
             "extend_none": "Ingen",
             "filters_label": "Filterindstillinger",
@@ -125,9 +144,15 @@
             },
             "recprofile_label": "Optagelsesprofil",
             "sgroup_label": "Lagergruppe",
+            "sqlwhere_label": "SQL Where Condition",
+            "srchValue_label": "Søgeværdi",
+            "srchtype_label": "Søgetype",
             "startoffset_label": "Antal ekstra minutter at optage ved start",
+            "starttime_label": "Startdato og -tid",
+            "subtitle_label": "Undertekst",
             "template_apply": "Anvend skabelonændring",
             "template_label": "Brug skabelon",
+            "title_label": "Titel",
             "type": {
                 "all": "Optag alle fremvisninger",
                 "daily": "Optag en visning hver dag",
@@ -192,6 +217,7 @@
             "time": "Tid"
         },
         "videos": {
+            "download": "Download video",
             "heading": "Videoer",
             "releasedate": "Udgivelses dato"
         }
@@ -230,8 +256,10 @@
         "backendSetup": "Backend opsætning",
         "changeLanguage": "Skift sprog",
         "dashboard": "instrumentbræt",
+        "hide": "Skjul øverste banner",
         "login": "Log på",
         "mainheading": "MythTV Backend",
+        "show": "Vis øverste banner",
         "switchServer": "Skift server",
         "switchTheme": "Skift tema",
         "testbed": "Testbed",
@@ -334,6 +362,7 @@
         "weekHeader": "Ug"
     },
     "recrule": {
+        "DonotRecord": "Optag ikke",
         "NotRecording": "Optager ikke",
         "OverrideRecording": "Tilsidesæt optagelse",
         "RecordAll": "Optag alle",
@@ -341,7 +370,14 @@
         "RecordOne": "Optag en",
         "RecordWeekly": "Optag ugentligt",
         "RecordingTemplate": "Optagelsesskabelon",
-        "SingleRecord": "Enkelt plade"
+        "SingleRecord": "Enkelt plade",
+        "srch_KeywordSearch": "Søgeordssøgning",
+        "srch_ManualSearch": "Manuel søgning",
+        "srch_None": "Ingen",
+        "srch_PeopleSearch": "People Search",
+        "srch_PowerSearch": "Power Search",
+        "srch_TitleSearch": "Titelsøgning",
+        "template": "Skabelon"
     },
     "settings": {
         "backendctrl": {
@@ -602,6 +638,7 @@
             "delete_source_details": "Dette vil slette alle kanaler fra kilden: {{Source}}",
             "delete_this": "Slet kanal",
             "deletechan": "Slet kanal",
+            "editchan": "Rediger kanal",
             "eit_desc": "Hvis det er aktiveret, vil guideoplysninger for denne kanal blive opdateret ved hjælp af 'Over-the-Air' programoversigter.",
             "eit_label": "Brug On Air Guide",
             "format_desc": "Hvis denne kanal bruger et andet format end TV-format på skærmen General Backend Setup, skal du indstille det her.",
@@ -621,7 +658,6 @@
             "timeoffset_label": "Fortegnelser Tidsforskydning",
             "title": "Kanalredaktør",
             "unassigned": "(Ikke tildelt)",
-            "updatechan": "Opdater kanal",
             "visible": "Synlig",
             "visible_desc": "Hvis den er indstillet til Always Visible eller Visible, vil kanalen være synlig i EPG'en. Indstil til Always Visible eller Never Visible for at forhindre MythTV og andre hjælpeprogrammer i automatisk at administrere værdien for denne kanal.",
             "visible_label": "Sigtbarhed",
@@ -692,7 +728,7 @@
             },
             "freqtable_desc": "Muligheden for kun at scanne \"høje\" frekvenskanaler er nyttig, fordi de fleste digitale kanaler er på de højere frekvenser.",
             "freqtable_label": "Frekvens tabel",
-            "frequency_desc": "Frekvensen for denne transport (multiplex) i {{unit}} (Indstillingen har ingen standard).",
+            "frequency_desc": "Frekvensen for denne transport (multiplex) i {{unit}}. Standarden er indstillet i Video Source Setup.",
             "frequency_label": "Frekvens",
             "ftaonly_desc": "Hvis indstillet, vil kun ikke-krypterede kanaler blive tilføjet under scanningen.",
             "ftaonly_label": "Kun ukrypteret",
@@ -962,6 +998,7 @@
             "enableupdates_label": "Aktiver opdateringer",
             "restart_desc": "Optagelser er deaktiveret, indtil du genstarter",
             "restart_label": "Genstart Backend",
+            "restarting": "Genstarter Backend",
             "slave_instructions": "Dette ser ud til at være en slave backend. Hvis det er beregnet som en slave-backend, skal du deaktivere planlægning på msster-backend, mens du kører slave-backend-opsætning.",
             "slave_warning": "Hvis dette ikke er beregnet som en slave-backend, skal du gå til Opsætning, Generelt, Host Address Backend-opsætning og vælge \"Denne server er Master Backend\" eller ellers indstil den korrekte brugerdefinerede identifikator på siden Databaseopsætning. Gem og genstart backend,",
             "title": "MythTV-opsætning",

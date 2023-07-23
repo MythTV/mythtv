@@ -1,12 +1,18 @@
 {
     "common": {
         "back": "后退",
+        "backenderror": "后端错误。",
         "cancel": "取消",
         "close": "关闭",
         "continue": "继续编辑",
         "default": "默认",
         "delete": "删除",
         "failed": "失败的",
+        "filter": {
+            "contains": "包含",
+            "equals": "完全符合",
+            "startswith": "以。。开始"
+        },
         "help": "帮助",
         "instructions": "指示",
         "loading": "加载中",
@@ -40,9 +46,13 @@
             "alreadydel": "已删除",
             "canundel": "您可以使用取消删除来反转此情况。",
             "channel": "渠道",
+            "delete_details": "这将删除记录规则",
+            "delete_rule": "删除录音规则",
             "description": "描述",
+            "download": "下载录音",
             "duration": "期间",
             "edit_metadata": "编辑元数据",
+            "edit_rule": "编辑录音规则",
             "episode": "插曲",
             "file_size": "文件大小",
             "filter": "筛选",
@@ -62,9 +72,12 @@
             "mnu_updatemeta": "更新元数据",
             "mnu_updaterecrule": "更新记录规则",
             "orig_airdate": "原始播出日期",
+            "override_rule": "添加或编辑覆盖规则",
             "recgrp": "记录组",
             "seas_ep": "海洋EP",
             "season": "季节",
+            "stop_details": "这将停止录制",
+            "stop_recording": "停止录音",
             "subtitle": "字幕",
             "title": "标题"
         },
@@ -74,13 +87,18 @@
         "recrules": {
             "heading": "录音规则",
             "lastrec": "最后记录",
+            "new_recrule": "新的录音规则",
+            "new_teplate": "新录音模板",
             "nextrec": "下一个录音",
             "storgrp": "存储组"
         },
         "sched": {
             "active_label": "录音规则已激活",
+            "add_tables_label": "附加表",
             "autoexpire_label": "自动过期",
             "autoextend_label": "自动扩展",
+            "channel_label": "渠道",
+            "description_label": "描述",
             "dupin": {
                 "both": "当前和以前的录音",
                 "curr": "仅当前录音",
@@ -95,6 +113,7 @@
                 "s_then_d": "使用字幕然后描述进行匹配"
             },
             "dupmethod_label": "重复匹配法",
+            "duration_label": "期间",
             "endoffset_label": "结束时记录的额外分钟数",
             "extend_none": "没有任何",
             "filters_label": "过滤器选项",
@@ -125,9 +144,15 @@
             },
             "recprofile_label": "录音档案",
             "sgroup_label": "存储组",
+            "sqlwhere_label": "SQLWhere条件",
+            "srchValue_label": "搜索值",
+            "srchtype_label": "搜索类型",
             "startoffset_label": "开始时记录的额外分钟数",
+            "starttime_label": "开始日期和时间",
+            "subtitle_label": "字幕",
             "template_apply": "应用模板更改",
             "template_label": "使用模板",
+            "title_label": "标题",
             "type": {
                 "all": "记录所有放映",
                 "daily": "每天录制一场",
@@ -144,7 +169,7 @@
             "type_label": "时间表类型"
         },
         "status": {
-            "backends_detail": "后端：{{ Name }} 是 IP {{ Type }} 上的 {{ Type }}",
+            "backends_detail": "后端：{{ Name }} 是 IP {{ Type }} 上的 {{ IP }}}}",
             "backends_none": "无后端",
             "backends_title": "后端",
             "card_text": "卡：{{ CardId }}，输入：{{ Id }} 是 {{ InputName }}，显示名称：{{ DisplayName }}",
@@ -192,6 +217,7 @@
             "time": "时间"
         },
         "videos": {
+            "download": "下载视频",
             "heading": "视频",
             "releasedate": "发布日期"
         }
@@ -230,8 +256,10 @@
         "backendSetup": "后端设置",
         "changeLanguage": "改变语言",
         "dashboard": "仪表板",
+        "hide": "隐藏顶部横幅",
         "login": "登录",
         "mainheading": "神话电视后端",
+        "show": "显示顶部横幅",
         "switchServer": "切换服务器",
         "switchTheme": "切换主题",
         "testbed": "试验台",
@@ -334,6 +362,7 @@
         "weekHeader": "周"
     },
     "recrule": {
+        "DonotRecord": "不记录",
         "NotRecording": "不录音",
         "OverrideRecording": "覆盖录音",
         "RecordAll": "全部记录",
@@ -341,7 +370,14 @@
         "RecordOne": "记录一",
         "RecordWeekly": "每周记录",
         "RecordingTemplate": "录音模板",
-        "SingleRecord": "单条记录"
+        "SingleRecord": "单条记录",
+        "srch_KeywordSearch": "关键词搜索",
+        "srch_ManualSearch": "手动搜索",
+        "srch_None": "没有任何",
+        "srch_PeopleSearch": "人物搜索",
+        "srch_PowerSearch": "强力搜索",
+        "srch_TitleSearch": "标题搜索",
+        "template": "模板"
     },
     "settings": {
         "backendctrl": {
@@ -602,6 +638,7 @@
             "delete_source_details": "这将从来源删除所有频道：{{Source}}",
             "delete_this": "删除频道",
             "deletechan": "删除频道",
+            "editchan": "编辑频道",
             "eit_desc": "如果启用，该频道的指南信息将使用“无线”节目列表进行更新。",
             "eit_label": "使用直播指南",
             "format_desc": "如果该频道使用常规后端设置屏幕中电视格式以外的格式，请在此处进行设置。",
@@ -621,7 +658,6 @@
             "timeoffset_label": "列表时间偏移",
             "title": "频道编辑",
             "unassigned": "（未分配）",
-            "updatechan": "更新频道",
             "visible": "可见的",
             "visible_desc": "如果设置为“始终可见”或“可见”，该频道将在 EPG 中可见。设置为“始终可见”或“从不可见”以防止 MythTV 和其他实用程序自动管理该频道的值。",
             "visible_label": "能见度",
@@ -692,7 +728,7 @@
             },
             "freqtable_desc": "仅扫描“高”频率频道的选项非常有用，因为大多数数字频道都处于较高频率。",
             "freqtable_label": "频率表",
-            "frequency_desc": "{{unit}} 中此传输（多路复用）的频率（选项没有默认值）。",
+            "frequency_desc": "{{unit}} 中此传输（多路复用）的频率。默认值在视频源设置中设置。",
             "frequency_label": "频率",
             "ftaonly_desc": "如果设置，则在扫描期间仅添加非加密通道。",
             "ftaonly_label": "仅未加密",
@@ -962,6 +998,7 @@
             "enableupdates_label": "启用更新",
             "restart_desc": "录音将被禁用，直到您重新启动为止",
             "restart_label": "重启后端",
+            "restarting": "重启后端",
             "slave_instructions": "这似乎是一个从属后端。如果它打算作为从属后端，请在运行从属后端设置时禁用 msster 后端上的调度。",
             "slave_warning": "如果这不是作为从属后端，请转至“设置”、“常规”、“主机地址后端设置”，然后选择“此服务器是主后端”，或者在“数据库设置”页面上设置正确的自定义标识符。保存并重新启动后端，",
             "title": "神话电视设置",
@@ -1003,7 +1040,7 @@
             "audiocodec_label": "音频编解码器",
             "autotranscode_desc": "使用此配置文件进行录制并且录制计划配置为允许转码时自动转码。",
             "autotranscode_label": "录制后启用自动转码",
-            "delete_details": "这将删除群组 {{GroupName}} 中的个人资料 {{GroupName}}。",
+            "delete_details": "这将删除群组 {{ProfileName}}}} 中的个人资料 {{GroupName}}。",
             "delete_this": "删除此录音配置文件",
             "encodingthreadcount_desc": "设置为小于或等于将执行编码的后端处理器数量的值。",
             "encodingthreadcount_label": "线程数",

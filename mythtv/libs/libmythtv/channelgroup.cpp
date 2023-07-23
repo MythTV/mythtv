@@ -471,6 +471,8 @@ void ChannelGroup::UpdateChannelGroups(void)
     QMap<int, QString> connectedSources;
     QMap<int, QString> disconnectedSources;
 
+    LOG(VB_GENERAL, LOG_INFO, QString("Running UpdateChannelGroups"));
+
     // Get list of all video sources
     {
         MSqlQuery query(MSqlQuery::InitCon());

@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Encoder, TVState } from 'src/app/services/interfaces/encoder.interface';
+import { UtilityService } from 'src/app/services/utility.service';
 
 @Component({
   selector: 'app-status-encoders',
@@ -9,7 +10,7 @@ import { Encoder, TVState } from 'src/app/services/interfaces/encoder.interface'
 export class EncodersComponent implements OnInit {
   @Input() encoders? : Encoder[];
 
-  constructor() { }
+  constructor(public utility: UtilityService) { }
 
   ngOnInit(): void {
   }

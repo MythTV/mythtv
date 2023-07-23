@@ -1,12 +1,18 @@
 {
     "common": {
         "back": "Tilbake",
+        "backenderror": "Backend-feil.",
         "cancel": "Avbryt",
         "close": "Lukk",
         "continue": "Fortsett redigering",
         "default": "Misligholde",
         "delete": "Slett",
         "failed": "Mislyktes",
+        "filter": {
+            "contains": "Inneholder",
+            "equals": "Nøyaktig treff",
+            "startswith": "Begynner med"
+        },
         "help": "Hjelp",
         "instructions": "Bruksanvisning",
         "loading": "Laster",
@@ -40,9 +46,13 @@
             "alreadydel": "Allerede slettet",
             "canundel": "Du kan reversere dette ved å bruke Angre sletting.",
             "channel": "Kanal",
+            "delete_details": "Dette vil slette opptaksregelen",
+            "delete_rule": "Slett opptaksregel",
             "description": "Beskrivelse",
+            "download": "Last ned opptak",
             "duration": "Varighet",
             "edit_metadata": "Rediger metadata",
+            "edit_rule": "Rediger opptaksregel",
             "episode": "Episode",
             "file_size": "Filstørrelse",
             "filter": "Filter",
@@ -62,9 +72,12 @@
             "mnu_updatemeta": "Oppdater metadata",
             "mnu_updaterecrule": "Oppdater postregel",
             "orig_airdate": "Original luftdato",
+            "override_rule": "Legg til eller rediger overstyringsregel",
             "recgrp": "Rec Grp",
             "seas_ep": "Seas Ep",
             "season": "Årstid",
+            "stop_details": "Dette vil stoppe opptaket",
+            "stop_recording": "Stopp opptak",
             "subtitle": "Undertekst",
             "title": "Tittel"
         },
@@ -74,13 +87,18 @@
         "recrules": {
             "heading": "Regler for opptak",
             "lastrec": "Sist registrert",
+            "new_recrule": "Ny opptaksregel",
+            "new_teplate": "Ny opptaksmal",
             "nextrec": "Neste opptak",
             "storgrp": "Lagringsgruppe"
         },
         "sched": {
             "active_label": "Opptaksregelen er aktiv",
+            "add_tables_label": "Ytterligere tabeller",
             "autoexpire_label": "Utløper automatisk",
             "autoextend_label": "Autoutvid",
+            "channel_label": "Kanal",
+            "description_label": "Beskrivelse",
             "dupin": {
                 "both": "Nåværende og tidligere opptak",
                 "curr": "Kun gjeldende opptak",
@@ -95,6 +113,7 @@
                 "s_then_d": "Match ved å bruke undertekst og deretter beskrivelse"
             },
             "dupmethod_label": "Duplikatmatchmetode",
+            "duration_label": "Varighet",
             "endoffset_label": "Antall ekstra minutter å registrere ved slutten",
             "extend_none": "Ingen",
             "filters_label": "Filteralternativer",
@@ -125,9 +144,15 @@
             },
             "recprofile_label": "Opptaksprofil",
             "sgroup_label": "Lagringsgruppe",
+            "sqlwhere_label": "SQL Where Condition",
+            "srchValue_label": "Søkeverdi",
+            "srchtype_label": "Søketype",
             "startoffset_label": "Antall ekstra minutter å registrere ved start",
+            "starttime_label": "Startdato og klokkeslett",
+            "subtitle_label": "Undertekst",
             "template_apply": "Bruk malendring",
             "template_label": "Bruk mal",
+            "title_label": "Tittel",
             "type": {
                 "all": "Registrer alle visninger",
                 "daily": "Ta opp en visning hver dag",
@@ -192,6 +217,7 @@
             "time": "Tid"
         },
         "videos": {
+            "download": "Last ned video",
             "heading": "Videoer",
             "releasedate": "Utgivelsesdato"
         }
@@ -230,8 +256,10 @@
         "backendSetup": "Oppsett av backend",
         "changeLanguage": "Skifte språk",
         "dashboard": "dashbord",
+        "hide": "Skjul toppbanner",
         "login": "Logg inn",
         "mainheading": "MythTV Backend",
+        "show": "Vis toppbanner",
         "switchServer": "Bytt server",
         "switchTheme": "Bytt tema",
         "testbed": "Prøveseng",
@@ -334,6 +362,7 @@
         "weekHeader": "Wk"
     },
     "recrule": {
+        "DonotRecord": "Ikke ta opp",
         "NotRecording": "Ikke opptak",
         "OverrideRecording": "Overstyr opptak",
         "RecordAll": "Ta opp alle",
@@ -341,7 +370,14 @@
         "RecordOne": "Record One",
         "RecordWeekly": "Record Weekly",
         "RecordingTemplate": "Opptaksmal",
-        "SingleRecord": "Enkelt plate"
+        "SingleRecord": "Enkelt plate",
+        "srch_KeywordSearch": "Stikkordsøk",
+        "srch_ManualSearch": "Manuelt søk",
+        "srch_None": "Ingen",
+        "srch_PeopleSearch": "People Search",
+        "srch_PowerSearch": "Power Search",
+        "srch_TitleSearch": "Tittelsøk",
+        "template": "Mal"
     },
     "settings": {
         "backendctrl": {
@@ -602,6 +638,7 @@
             "delete_source_details": "Dette vil slette alle kanaler fra kilden: {{Source}}",
             "delete_this": "Slett kanal",
             "deletechan": "Slett kanal",
+            "editchan": "Rediger kanal",
             "eit_desc": "Hvis aktivert, vil guideinformasjon for denne kanalen bli oppdatert ved hjelp av 'Over-the-Air' programoppføringer.",
             "eit_label": "Bruk On Air Guide",
             "format_desc": "Hvis denne kanalen bruker et annet format enn TV-format i skjermbildet General Backend Setup, angi det her.",
@@ -621,7 +658,6 @@
             "timeoffset_label": "Oppføringstidsforskyvning",
             "title": "Kanalredaktør",
             "unassigned": "(Ikke tildelt)",
-            "updatechan": "Oppdater kanalen",
             "visible": "Synlig",
             "visible_desc": "Hvis satt til Alltid synlig eller Synlig, vil kanalen være synlig i EPG. Sett til Alltid synlig eller Aldri synlig for å forhindre at MythTV og andre verktøy automatisk administrerer verdien for denne kanalen.",
             "visible_label": "Synlighet",
@@ -692,7 +728,7 @@
             },
             "freqtable_desc": "Alternativet for å skanne kun \"Høy\" frekvenskanaler er nyttig fordi de fleste digitale kanaler er på de høyere frekvensene.",
             "freqtable_label": "Frekvenstabell",
-            "frequency_desc": "Frekvensen for denne transporten (multipleks) i {{unit}} (alternativet har ingen standard).",
+            "frequency_desc": "Frekvensen for denne transporten (multipleks) i {{unit}}. Standard er satt i Video Source Setup.",
             "frequency_label": "Frekvens",
             "ftaonly_desc": "Hvis angitt, vil bare ikke-krypterte kanaler legges til under skanningen.",
             "ftaonly_label": "Kun ukryptert",
@@ -962,6 +998,7 @@
             "enableupdates_label": "Aktiver oppdateringer",
             "restart_desc": "Opptak er deaktivert til du starter på nytt",
             "restart_label": "Start Backend på nytt",
+            "restarting": "Starter Backend på nytt",
             "slave_instructions": "Dette ser ut til å være en slave-backend. Hvis det er ment som en slave-backend, vennligst deaktiver planlegging på msster-backend mens du kjører slave-backend-oppsett.",
             "slave_warning": "Hvis dette ikke er ment som en slave-backend, vennligst gå til Oppsett, Generelt, Host Address Backend Setup, og velg \"Denne serveren er Master Backend\" eller angi riktig egendefinert identifikator på Database Setup-siden. Lagre og start backend på nytt,",
             "title": "MythTV-oppsett",

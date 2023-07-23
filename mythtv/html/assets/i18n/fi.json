@@ -1,12 +1,18 @@
 {
     "common": {
         "back": "Takaisin",
+        "backenderror": "Taustaohjelmavirhe.",
         "cancel": "Peruuttaa",
         "close": "kiinni",
         "continue": "Jatka muokkaamista",
         "default": "Oletus",
         "delete": "Poistaa",
         "failed": "Epäonnistui",
+        "filter": {
+            "contains": "Sisältää",
+            "equals": "Tarkka ottelu",
+            "startswith": "Alkaa kanssa"
+        },
         "help": "auta",
         "instructions": "Ohjeet",
         "loading": "Ladataan",
@@ -40,9 +46,13 @@
             "alreadydel": "Jo Poistettu",
             "canundel": "Voit peruuttaa tämän käyttämällä Undelete-toimintoa.",
             "channel": "kanava",
+            "delete_details": "Tämä poistaa tallennussäännön",
+            "delete_rule": "Poista tallennussääntö",
             "description": "Kuvaus",
+            "download": "Lataa tallennus",
             "duration": "Kesto",
             "edit_metadata": "Muokkaa metatietoja",
+            "edit_rule": "Muokkaa tallennussääntöä",
             "episode": "Jakso",
             "file_size": "Tiedoston koko",
             "filter": "Suodattaa",
@@ -62,9 +72,12 @@
             "mnu_updatemeta": "Päivitä metatiedot",
             "mnu_updaterecrule": "Päivitä tallennussääntö",
             "orig_airdate": "Alkuperäinen lentopäivämäärä",
+            "override_rule": "Lisää tai muokkaa ohitussääntöä",
             "recgrp": "Rec Grp",
             "seas_ep": "Seas Ep",
             "season": "Kausi",
+            "stop_details": "Tämä lopettaa tallennuksen",
+            "stop_recording": "Lopeta tallennus",
             "subtitle": "Tekstitys",
             "title": "Otsikko"
         },
@@ -74,13 +87,18 @@
         "recrules": {
             "heading": "Tallennussäännöt",
             "lastrec": "Viimeksi tallennettu",
+            "new_recrule": "Uusi tallennussääntö",
+            "new_teplate": "Uusi tallennusmalli",
             "nextrec": "Seuraava tallennus",
             "storgrp": "Varastointiryhmä"
         },
         "sched": {
             "active_label": "Tallennussääntö on aktiivinen",
+            "add_tables_label": "Lisätaulukot",
             "autoexpire_label": "Automaattinen vanheneminen",
             "autoextend_label": "Automaattinen laajennus",
+            "channel_label": "kanava",
+            "description_label": "Kuvaus",
             "dupin": {
                 "both": "Nykyiset ja aiemmat tallenteet",
                 "curr": "Vain nykyiset tallenteet",
@@ -95,6 +113,7 @@
                 "s_then_d": "Vastaa käyttämällä tekstitystä ja kuvausta"
             },
             "dupmethod_label": "Kaksoissovitusmenetelmä",
+            "duration_label": "Kesto",
             "endoffset_label": "Tallennettavien lisäminuuttien määrä lopussa",
             "extend_none": "Ei mitään",
             "filters_label": "Suodatinvalinnat",
@@ -125,9 +144,15 @@
             },
             "recprofile_label": "Tallennusprofiili",
             "sgroup_label": "Varastointiryhmä",
+            "sqlwhere_label": "SQL Missä -ehto",
+            "srchValue_label": "Hakuarvo",
+            "srchtype_label": "Hakutyyppi",
             "startoffset_label": "Tallennettavien lisäminuuttien määrä alussa",
+            "starttime_label": "Aloituspäivämäärä ja -aika",
+            "subtitle_label": "Tekstitys",
             "template_apply": "Käytä mallin muutosta",
             "template_label": "Käytä mallia",
+            "title_label": "Otsikko",
             "type": {
                 "all": "Tallenna kaikki esitykset",
                 "daily": "Nauhoita yksi esitys joka päivä",
@@ -192,6 +217,7 @@
             "time": "Aika"
         },
         "videos": {
+            "download": "Lataa video",
             "heading": "Videot",
             "releasedate": "Julkaisupäivä"
         }
@@ -230,8 +256,10 @@
         "backendSetup": "Taustajärjestelmän asetukset",
         "changeLanguage": "Vaihda kieltä",
         "dashboard": "kojelauta",
+        "hide": "Piilota ylin banneri",
         "login": "kirjaudu sisään",
         "mainheading": "MythTV taustaohjelma",
+        "show": "Näytä ylin banneri",
         "switchServer": "Vaihda palvelinta",
         "switchTheme": "Vaihda teemaa",
         "testbed": "Testbed",
@@ -334,6 +362,7 @@
         "weekHeader": "vk"
     },
     "recrule": {
+        "DonotRecord": "Älä tallenna",
         "NotRecording": "Ei tallenneta",
         "OverrideRecording": "Ohita tallennus",
         "RecordAll": "Tallenna kaikki",
@@ -341,7 +370,14 @@
         "RecordOne": "Record One",
         "RecordWeekly": "Ennätys viikoittain",
         "RecordingTemplate": "Tallennusmalli",
-        "SingleRecord": "Yksittäinen levy"
+        "SingleRecord": "Yksittäinen levy",
+        "srch_KeywordSearch": "Sanahaku",
+        "srch_ManualSearch": "Manuaalinen haku",
+        "srch_None": "Ei mitään",
+        "srch_PeopleSearch": "Ihmiset haku",
+        "srch_PowerSearch": "Tehohaku",
+        "srch_TitleSearch": "Otsikkohaku",
+        "template": "Sapluuna"
     },
     "settings": {
         "backendctrl": {
@@ -596,12 +632,13 @@
             "commmethod_desc": "Muuttaa tämän kanavan tallennuksissa käytettyä kaupallisen tunnistusmenetelmän tai ohittaa havaitsemisen merkitsemällä kanavan kaupalliseksi vapaaksi.",
             "commmethod_label": "Kaupallinen tunnistusmenetelmä",
             "delete_all_details": "Tämä poistaa kaikki kanavat",
-            "delete_details": "Tämä poistaa kanavan:{{ChanNum}}, Name:{{ChanNum}}, Source:{{Source}}",
+            "delete_details": "Tämä poistaa kanavan:{{ChanNum}}, Name:{{ChannelName}}}}, Source:{{Source}}",
             "delete_message": "Kanavien poistamiseksi käytä Backend Setup Channel Editoria -ohjelmaa.",
             "delete_source": "Poista kaikki kanavat valitusta lähteestä",
             "delete_source_details": "Tämä poistaa kaikki kanavat lähteestä: {{Source}}",
             "delete_this": "Poista kanava",
             "deletechan": "Poista kanava",
+            "editchan": "Muokkaa kanavaa",
             "eit_desc": "Jos tämä on käytössä, tämän kanavan opastiedot päivitetään \"Over-the-Air\" -ohjelmaluetteloiden avulla.",
             "eit_label": "Käytä On Air -opasta",
             "format_desc": "Jos tämä kanava käyttää muuta muotoa kuin TV-muoto Yleiset taustaasetukset -näytössä, aseta se tässä.",
@@ -621,7 +658,6 @@
             "timeoffset_label": "Listauksen aikapoikkeama",
             "title": "Kanavaeditori",
             "unassigned": "(määrittämätön)",
-            "updatechan": "Päivitä kanava",
             "visible": "Näkyy",
             "visible_desc": "Jos asetuksena on Aina näkyvissä tai Näkyvissä, kanava näkyy EPG:ssä. Aseta Aina näkyvissä tai Ei koskaan näkyvissä estääksesi MythTV:tä ja muita apuohjelmia hallitsemasta automaattisesti tämän kanavan arvoa.",
             "visible_label": "Näkyvyys",
@@ -692,7 +728,7 @@
             },
             "freqtable_desc": "Vain \"korkeataajuisten\" kanavien skannausvaihtoehto on hyödyllinen, koska useimmat digitaaliset kanavat ovat korkeammilla taajuuksilla.",
             "freqtable_label": "Taajuustaulukko",
-            "frequency_desc": "Tämän kuljetuksen (multipleksi) taajuus {{unit}} (vaihtoehdolla ei ole oletusarvoa).",
+            "frequency_desc": "Tämän kuljetuksen (multipleksi) taajuus {{unit}}. Oletusasetus on kohdassa Video Source Setup.",
             "frequency_label": "Taajuus",
             "ftaonly_desc": "Jos asetettu, vain salaamattomat kanavat lisätään skannauksen aikana.",
             "ftaonly_label": "Vain salaamaton",
@@ -962,6 +998,7 @@
             "enableupdates_label": "Ota päivitykset käyttöön",
             "restart_desc": "Tallentaminen on poissa käytöstä, kunnes käynnistät sen uudelleen",
             "restart_label": "Käynnistä taustaohjelma uudelleen",
+            "restarting": "Backend käynnistetään uudelleen",
             "slave_instructions": "Tämä näyttää olevan orja-taustaohjelma. Jos se on tarkoitettu orja-taustajärjestelmäksi, poista ajoitus käytöstä msster-taustajärjestelmässä, kun suoritat orjataustajärjestelmän asetuksia.",
             "slave_warning": "Jos tätä ei ole tarkoitettu orjataustajärjestelmäksi, siirry kohtaan Asetukset, Yleiset, Isäntäosoitteen taustajärjestelmän asetukset ja valitse \"Tämä palvelin on päätaustajärjestelmä\" tai aseta oikea mukautettu tunniste Tietokannan asetukset -sivulla. Tallenna ja käynnistä taustaohjelma uudelleen,",
             "title": "MythTV:n asennus",

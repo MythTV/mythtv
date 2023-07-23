@@ -1,12 +1,18 @@
 {
     "common": {
         "back": "indietro",
+        "backenderror": "Errore di back-end.",
         "cancel": "Annulla",
         "close": "Vicino",
         "continue": "Continua a modificare",
         "default": "Predefinito",
         "delete": "Eliminare",
         "failed": "Fallito",
+        "filter": {
+            "contains": "Contiene",
+            "equals": "Corrispondenza esatta",
+            "startswith": "Inizia con"
+        },
         "help": "Aiuto",
         "instructions": "Istruzioni",
         "loading": "Caricamento in corso",
@@ -40,9 +46,13 @@
             "alreadydel": "Già cancellato",
             "canundel": "Puoi invertire questa situazione utilizzando Undelete.",
             "channel": "Canale",
+            "delete_details": "Questa operazione eliminerà la regola di registrazione",
+            "delete_rule": "Elimina regola di registrazione",
             "description": "Descrizione",
+            "download": "Scarica la registrazione",
             "duration": "Durata",
             "edit_metadata": "Modifica metadati",
+            "edit_rule": "Modifica regola di registrazione",
             "episode": "Episodio",
             "file_size": "Dimensione del file",
             "filter": "Filtro",
@@ -62,9 +72,12 @@
             "mnu_updatemeta": "Aggiorna metadati",
             "mnu_updaterecrule": "Aggiorna regola record",
             "orig_airdate": "Data di messa in onda originale",
+            "override_rule": "Aggiungi o modifica regola di sostituzione",
             "recgrp": "Rec Grp",
             "seas_ep": "Mari Ep",
             "season": "Stagione",
+            "stop_details": "Questo interromperà la registrazione",
+            "stop_recording": "Interrompi la registrazione",
             "subtitle": "Sottotitolo",
             "title": "Titolo"
         },
@@ -74,13 +87,18 @@
         "recrules": {
             "heading": "Regole di registrazione",
             "lastrec": "Ultima registrazione",
+            "new_recrule": "Nuova regola di registrazione",
+            "new_teplate": "Nuovo modello di registrazione",
             "nextrec": "Prossima registrazione",
             "storgrp": "Gruppo di archiviazione"
         },
         "sched": {
             "active_label": "La regola di registrazione è attiva",
+            "add_tables_label": "Tabelle aggiuntive",
             "autoexpire_label": "Scadenza automatica",
             "autoextend_label": "Estendi automaticamente",
+            "channel_label": "Canale",
+            "description_label": "Descrizione",
             "dupin": {
                 "both": "Registrazioni attuali e precedenti",
                 "curr": "Solo registrazioni correnti",
@@ -95,6 +113,7 @@
                 "s_then_d": "Abbina usando i sottotitoli e poi la descrizione"
             },
             "dupmethod_label": "Metodo di corrispondenza duplicato",
+            "duration_label": "Durata",
             "endoffset_label": "Numero di minuti extra da registrare alla fine",
             "extend_none": "Nessuno",
             "filters_label": "Opzioni filtro",
@@ -125,9 +144,15 @@
             },
             "recprofile_label": "Profilo di registrazione",
             "sgroup_label": "Gruppo di archiviazione",
+            "sqlwhere_label": "Condizione SQL Where",
+            "srchValue_label": "Valore di ricerca",
+            "srchtype_label": "Tipo di ricerca",
             "startoffset_label": "Numero di minuti extra da registrare all'avvio",
+            "starttime_label": "Data e ora di inizio",
+            "subtitle_label": "Sottotitolo",
             "template_apply": "Applicare la modifica del modello",
             "template_label": "Usa modello",
+            "title_label": "Titolo",
             "type": {
                 "all": "Registra tutte le proiezioni",
                 "daily": "Registra una proiezione ogni giorno",
@@ -192,6 +217,7 @@
             "time": "Tempo"
         },
         "videos": {
+            "download": "Scarica video",
             "heading": "Video",
             "releasedate": "Data di rilascio"
         }
@@ -230,8 +256,10 @@
         "backendSetup": "Configurazione back-end",
         "changeLanguage": "Cambia lingua",
         "dashboard": "Cruscotto",
+        "hide": "Nascondi banner superiore",
         "login": "Accesso",
         "mainheading": "Back-end di MythTV",
+        "show": "Mostra banner in alto",
         "switchServer": "Cambia server",
         "switchTheme": "Cambia tema",
         "testbed": "Banco di prova",
@@ -334,6 +362,7 @@
         "weekHeader": "sett"
     },
     "recrule": {
+        "DonotRecord": "Non registrare",
         "NotRecording": "Non registrazione",
         "OverrideRecording": "Sovrascrivi registrazione",
         "RecordAll": "Registra tutto",
@@ -341,7 +370,14 @@
         "RecordOne": "Registra uno",
         "RecordWeekly": "Registra settimanalmente",
         "RecordingTemplate": "Modello di registrazione",
-        "SingleRecord": "Record unico"
+        "SingleRecord": "Record unico",
+        "srch_KeywordSearch": "Ricerca per parola chiave",
+        "srch_ManualSearch": "Ricerca manuale",
+        "srch_None": "Nessuno",
+        "srch_PeopleSearch": "Cerca persone",
+        "srch_PowerSearch": "Ricerca di potere",
+        "srch_TitleSearch": "Ricerca del titolo",
+        "template": "Modello"
     },
     "settings": {
         "backendctrl": {
@@ -602,6 +638,7 @@
             "delete_source_details": "Questo eliminerà tutti i canali dalla sorgente: {{Source}}",
             "delete_this": "Elimina canale",
             "deletechan": "Elimina canale",
+            "editchan": "Modifica canale",
             "eit_desc": "Se abilitato, le informazioni della guida per questo canale verranno aggiornate utilizzando gli elenchi dei programmi \"Over-the-Air\".",
             "eit_label": "Utilizzare la guida in onda",
             "format_desc": "Se questo canale utilizza un formato diverso da TV Format nella schermata General Backend Setup, impostalo qui.",
@@ -621,7 +658,6 @@
             "timeoffset_label": "Elenchi Time Offset",
             "title": "Editor di canali",
             "unassigned": "(Non assegnato)",
-            "updatechan": "Aggiorna canale",
             "visible": "Visibile",
             "visible_desc": "Se impostato su Sempre visibile o Visibile, il canale sarà visibile nell'EPG. Impostare su Sempre visibile o Mai visibile per impedire a MythTV e ad altre utilità di gestire automaticamente il valore per questo canale.",
             "visible_label": "Visibilità",
@@ -692,7 +728,7 @@
             },
             "freqtable_desc": "L'opzione di scansione solo dei canali a frequenza \"Alta\" è utile perché la maggior parte dei canali digitali si trova sulle frequenze più alte.",
             "freqtable_label": "Tabella delle frequenze",
-            "frequency_desc": "La frequenza per questo trasporto (multiplex) in {{unit}} (l'opzione non ha valori predefiniti).",
+            "frequency_desc": "La frequenza per questo trasporto (multiplex) in {{unit}}. L'impostazione predefinita è impostata in Configurazione sorgente video.",
             "frequency_label": "Frequenza",
             "ftaonly_desc": "Se impostato, durante la scansione verranno aggiunti solo i canali non crittografati.",
             "ftaonly_label": "Solo non crittografato",
@@ -962,6 +998,7 @@
             "enableupdates_label": "Abilita Aggiornamenti",
             "restart_desc": "Le registrazioni sono disabilitate fino al riavvio",
             "restart_label": "Riavvia il back-end",
+            "restarting": "Riavvio del backend",
             "slave_instructions": "Questo sembra essere un backend slave. Se è inteso come back-end slave, disabilitare la pianificazione sul back-end msster durante l'esecuzione della configurazione del back-end slave.",
             "slave_warning": "Se questo non è inteso come back-end slave, vai a Configurazione, Generale, Configurazione back-end indirizzo host e seleziona \"Questo server è il back-end principale\" oppure imposta l'identificatore personalizzato corretto nella pagina Configurazione database. Salva e riavvia il backend,",
             "title": "Installazione di MythTV",
