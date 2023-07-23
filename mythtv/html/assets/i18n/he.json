@@ -999,7 +999,8 @@
             "restart_desc": "ההקלטות מושבתות עד שתפעיל מחדש",
             "restart_label": "הפעל מחדש את Backend",
             "restarting": "הפעלה מחדש של Backend",
-            "slave_instructions": "נראה שזהו קצה עבד. אם זה נועד כ-slave backend, אנא השבת את התזמון ב-msster backend בזמן הפעלת ה-slave backend.",
+            "slave_enabled": "עדכונים מופעלים תמיד ב-slave backend.",
+            "slave_instructions": "נראה שזהו קצה עבד. אם הוא מיועד כ-slave backend, אנא השבת את התזמון ב-master backend בזמן הפעלת ה-slave backend.",
             "slave_warning": "אם זה לא נועד כ-slave backend, עבור אל הגדרות, כללי, הגדרת קצה עורפי של כתובת מארח, ובחר \"שרת זה הוא ה-Master Backend\" או הגדר את המזהה המותאם אישית הנכון בדף הגדרת מסד הנתונים. שמור והפעל מחדש את הקצה האחורי,",
             "title": "הגדרת MythTV",
             "upcomingrec": "ההקלטה הקרובה הבאה: {{Title}} ב-{{StartTime}}. סטטוס: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "גרסת סכימת מסד הנתונים אינה ידועה",
         "databaseSetup": "הגדרת מסד נתונים",
         "dbname_help": "שם מסד הנתונים. זה בדרך כלל 'מיתוסים'.",
+        "dbsetup": {
+            "havedb": "יש לך מסד נתונים של '{{Name}}'",
+            "havenotdb": "אין לך מסד נתונים '{{Name}}'",
+            "schemaver": "גרסת סכימת מסד הנתונים היא {{SchemaVersion}}"
+        },
         "done": "בוצע",
         "enterDBLoginDetails": "הזן את פרטי הכניסה למסד הנתונים",
         "ignoremessages": "התעלם מהודעות שאומרות \"לא ניתן לטעון את 'xxxxx' כאזור זמן. דילוג עליו.\"",

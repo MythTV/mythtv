@@ -999,7 +999,8 @@
             "restart_desc": "Opptak er deaktivert til du starter på nytt",
             "restart_label": "Start Backend på nytt",
             "restarting": "Starter Backend på nytt",
-            "slave_instructions": "Dette ser ut til å være en slave-backend. Hvis det er ment som en slave-backend, vennligst deaktiver planlegging på msster-backend mens du kjører slave-backend-oppsett.",
+            "slave_enabled": "Oppdateringer er alltid aktivert på en slave-backend.",
+            "slave_instructions": "Dette ser ut til å være en slave-backend. Hvis det er ment som en slave-backend, vennligst deaktiver planlegging på master-backend mens du kjører slave-backend-oppsett.",
             "slave_warning": "Hvis dette ikke er ment som en slave-backend, vennligst gå til Oppsett, Generelt, Host Address Backend Setup, og velg \"Denne serveren er Master Backend\" eller angi riktig egendefinert identifikator på Database Setup-siden. Lagre og start backend på nytt,",
             "title": "MythTV-oppsett",
             "upcomingrec": "Neste kommende opptak: {{Title}} kl. {{StartTime}}. Status: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "Databaseskjemaversjonen er ukjent",
         "databaseSetup": "Databaseoppsett",
         "dbname_help": "Navnet på databasen. Dette er vanligvis 'mytekonverg'.",
+        "dbsetup": {
+            "havedb": "Har '{{Name}}' database",
+            "havenotdb": "Har ikke '{{Name}}'-database",
+            "schemaver": "Databaseskjemaversjonen er {{SchemaVersion}}"
+        },
         "done": "FERDIG",
         "enterDBLoginDetails": "Skriv inn påloggingsdetaljer for databasen",
         "ignoremessages": "Ignorer meldinger som sier \"Kan ikke laste 'xxxxx' som tidssone. Hopp over den.\"",

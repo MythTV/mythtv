@@ -5,7 +5,7 @@ import { MythService } from '../../../services/myth.service';
 import { WizardData } from '../../../services/interfaces/wizarddata.interface';
 import { SetupWizardService } from '../../../services/setupwizard.service';
 import { MessageService } from 'primeng/api';
-import { TestDBSettingsRequest } from 'src/app/services/interfaces/myth.interface';
+import { Database, TestDBSettingsRequest } from 'src/app/services/interfaces/myth.interface';
 import { TranslateService } from '@ngx-translate/core';
 import { NgForm } from '@angular/forms';
 import { Observable, of } from 'rxjs';
@@ -24,6 +24,8 @@ export class DbsetupComponent implements OnInit {
     @ViewChild("databaseForm") currentForm!: NgForm;
 
     m_wizardData!: WizardData;
+    database!: Database;
+    // testDbName = '';
 
     successCount = 0;
     errorCount = 0;
@@ -57,6 +59,16 @@ export class DbsetupComponent implements OnInit {
     ngOnInit(): void {
         this.wizardService.initDatabaseStatus();
         this.m_wizardData = this.wizardService.getWizardData();
+        // This copies the default values so the html does not fail to find
+        // anything.
+        this.database = Object.assign({}, this.m_wizardData.Database);
+        this.wizardService.dbPromise.then(() => {
+            // Once the database is read, this copies the actualt values
+            this.database = Object.assign({}, this.m_wizardData.Database);
+            // this.testDbName = this.database.Name;
+        },
+            () => this.errorCount++,
+        )
     }
 
     copyToclipboard(value: string): void {
@@ -88,17 +100,18 @@ export class DbsetupComponent implements OnInit {
         this.expectedCount = 1;
         this.connectionFail = false;
         const params: TestDBSettingsRequest = {
-            HostName: this.m_wizardData.Database.Host,
-            UserName: this.m_wizardData.Database.UserName,
-            Password: this.m_wizardData.Database.Password,
-            DBName: this.m_wizardData.Database.Name,
-            dbPort: this.m_wizardData.Database.Port
+            HostName: this.database.Host,
+            UserName: this.database.UserName,
+            Password: this.database.Password,
+            DBName: this.database.Name,
+            dbPort: this.database.Port
         }
+        // this.testDbName = this.database.Name;
         this.commandlist = '';
         this.mythService.TestDBSettings(params).subscribe(result => {
             if (result.bool) {
                 if (doSave) {
-                    this.configService.SetDatabaseCredentials(this.m_wizardData.Database)
+                    this.configService.SetDatabaseCredentials(this.database)
                         .subscribe(this.saveObserver);
                 }
                 else
@@ -117,11 +130,11 @@ export class DbsetupComponent implements OnInit {
         if (this.dbtype == 'MySQL')
             pwType = 'WITH mysql_native_password';
         this.commandlist =
-        `CREATE DATABASE IF NOT EXISTS ${this.m_wizardData.Database.Name};\n` +
-        `CREATE USER IF NOT EXISTS '${this.m_wizardData.Database.UserName}'@'localhost' IDENTIFIED ${pwType} by '${this.m_wizardData.Database.Password}';\n` +
-        `CREATE USER IF NOT EXISTS '${this.m_wizardData.Database.UserName}'@'%' IDENTIFIED ${pwType} by '${this.m_wizardData.Database.Password}';\n` +
-        `GRANT ALL ON ${this.m_wizardData.Database.Name}.* TO '${this.m_wizardData.Database.UserName}'@'localhost';\n` +
-        `GRANT ALL ON ${this.m_wizardData.Database.Name}.* TO '${this.m_wizardData.Database.UserName}'@'%';`
+            `CREATE DATABASE IF NOT EXISTS ${this.database.Name};\n` +
+            `CREATE USER IF NOT EXISTS '${this.database.UserName}'@'localhost' IDENTIFIED ${pwType} by '${this.database.Password}';\n` +
+            `CREATE USER IF NOT EXISTS '${this.database.UserName}'@'%' IDENTIFIED ${pwType} by '${this.database.Password}';\n` +
+            `GRANT ALL ON ${this.database.Name}.* TO '${this.database.UserName}'@'localhost';\n` +
+            `GRANT ALL ON ${this.database.Name}.* TO '${this.database.UserName}'@'%';`
     }
 
     confirm(message?: string): Observable<boolean> {

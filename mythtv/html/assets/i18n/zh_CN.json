@@ -999,7 +999,8 @@
             "restart_desc": "录音将被禁用，直到您重新启动为止",
             "restart_label": "重启后端",
             "restarting": "重启后端",
-            "slave_instructions": "这似乎是一个从属后端。如果它打算作为从属后端，请在运行从属后端设置时禁用 msster 后端上的调度。",
+            "slave_enabled": "从属后端始终启用更新。",
+            "slave_instructions": "这似乎是一个从属后端。如果它打算作为从后端，请在运行从后端设置时禁用主后端上的调度。",
             "slave_warning": "如果这不是作为从属后端，请转至“设置”、“常规”、“主机地址后端设置”，然后选择“此服务器是主后端”，或者在“数据库设置”页面上设置正确的自定义标识符。保存并重新启动后端，",
             "title": "神话电视设置",
             "upcomingrec": "下一个即将录制的节目：{{Title}}，时间：{{StartTime}}。状态：{{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "数据库架构版本未知",
         "databaseSetup": "数据库设置",
         "dbname_help": "数据库的名称。这通常是“神话汇聚”。",
+        "dbsetup": {
+            "havedb": "拥有“{{Name}}”数据库",
+            "havenotdb": "没有“{{Name}}”数据库",
+            "schemaver": "数据库架构版本是 {{SchemaVersion}}"
+        },
         "done": "完毕",
         "enterDBLoginDetails": "输入数据库登录详细信息",
         "ignoremessages": "忽略显示“无法加载‘xxxxx’作为时区。跳过它。”的消息。",

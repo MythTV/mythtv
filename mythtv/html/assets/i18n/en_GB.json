@@ -999,7 +999,8 @@
             "restart_desc": "Recordings are disabled until you restart",
             "restart_label": "Restart Backend",
             "restarting": "Restarting Backend",
-            "slave_instructions": "This appears to be a slave backend. If it is intended as a slave backend, please disable scheduling on the msster backend while running slave backend setup.",
+            "slave_enabled": "Updates are always enabled on a slave backend.",
+            "slave_instructions": "This appears to be a slave backend. If it is intended as a slave backend, please disable scheduling on the master backend while running slave backend setup.",
             "slave_warning": "If this is not intended as a slave backend, please go to Setup, General, Host Address Backend Setup, and select \"This server is the Master Backend\" or else set the correct custom identifier on the Database Setup page. Save and Restart the backend,",
             "title": "MythTV Setup",
             "upcomingrec": "Next upcoming recording: {{Title}} at {{StartTime}}. Status: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "Database schema version is unknown",
         "databaseSetup": "Database Setup",
         "dbname_help": "The name of the database. This is usually 'mythconverg'.",
+        "dbsetup": {
+            "havedb": "Have '{{Name}}' database",
+            "havenotdb": "Do not have '{{Name}}' database",
+            "schemaver": "Database schema version is {{SchemaVersion}}"
+        },
         "done": "Done",
         "enterDBLoginDetails": "Enter the database login details",
         "ignoremessages": "Ignore messages that say \"Unable to load 'xxxxx' as time zone. Skipping it.\"",

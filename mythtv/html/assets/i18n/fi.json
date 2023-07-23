@@ -999,7 +999,8 @@
             "restart_desc": "Tallentaminen on poissa käytöstä, kunnes käynnistät sen uudelleen",
             "restart_label": "Käynnistä taustaohjelma uudelleen",
             "restarting": "Backend käynnistetään uudelleen",
-            "slave_instructions": "Tämä näyttää olevan orja-taustaohjelma. Jos se on tarkoitettu orja-taustajärjestelmäksi, poista ajoitus käytöstä msster-taustajärjestelmässä, kun suoritat orjataustajärjestelmän asetuksia.",
+            "slave_enabled": "Päivitykset ovat aina käytössä orjataustajärjestelmässä.",
+            "slave_instructions": "Tämä näyttää olevan orja-taustaohjelma. Jos se on tarkoitettu orjataustaohjelmaksi, poista ajoitus käytöstä isäntätaustassa suorittaessasi orjataustajärjestelmän asetuksia.",
             "slave_warning": "Jos tätä ei ole tarkoitettu orjataustajärjestelmäksi, siirry kohtaan Asetukset, Yleiset, Isäntäosoitteen taustajärjestelmän asetukset ja valitse \"Tämä palvelin on päätaustajärjestelmä\" tai aseta oikea mukautettu tunniste Tietokannan asetukset -sivulla. Tallenna ja käynnistä taustaohjelma uudelleen,",
             "title": "MythTV:n asennus",
             "upcomingrec": "Seuraava tuleva nauhoitus: {{Title}} klo {{StartTime}}. Tila: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "Tietokantaskeeman versio on tuntematon",
         "databaseSetup": "Tietokannan asetukset",
         "dbname_help": "Tietokannan nimi. Tämä on yleensä \"mythconverg\".",
+        "dbsetup": {
+            "havedb": "Sinulla on tietokanta '{{Name}}'",
+            "havenotdb": "Sinulla ei ole '{{Name}}'-tietokantaa",
+            "schemaver": "Tietokantaskeeman versio on {{SchemaVersion}}"
+        },
         "done": "Tehty",
         "enterDBLoginDetails": "Anna tietokantaan kirjautumistiedot",
         "ignoremessages": "Ohita viestit, joissa sanotaan \"xxxxx:n lataaminen aikavyöhykkeeksi epäonnistui. Ohitetaan.\"",

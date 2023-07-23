@@ -999,7 +999,8 @@
             "restart_desc": "Les gravacions es desactiven fins que reinicieu",
             "restart_label": "Reinicieu el backend",
             "restarting": "Reiniciant el backend",
-            "slave_instructions": "Sembla ser un backend esclau. Si està pensat com a backend esclau, si us plau, desactiveu la programació al backend msster mentre executeu la configuració del backend esclau.",
+            "slave_enabled": "Les actualitzacions sempre estan habilitades en un backend esclau.",
+            "slave_instructions": "Sembla ser un backend esclau. Si està pensat com a backend esclau, desactiveu la programació al backend principal mentre executeu la configuració del backend esclau.",
             "slave_warning": "Si no està pensat com a backend esclau, aneu a Configuració, General, Configuració del backend de l'adreça de l'amfitrió i seleccioneu \"Aquest servidor és el backend mestre\" o bé establiu l'identificador personalitzat correcte a la pàgina Configuració de la base de dades. Desa i reinicia el backend,",
             "title": "Configuració de MythTV",
             "upcomingrec": "Pròxima gravació: {{Title}} a {{StartTime}}. Estat: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "Es desconeix la versió de l'esquema de la base de dades",
         "databaseSetup": "Configuració de la base de dades",
         "dbname_help": "El nom de la base de dades. Això sol ser \"mythconverg\".",
+        "dbsetup": {
+            "havedb": "Teniu la base de dades \"{{Name}}\".",
+            "havenotdb": "No teniu una base de dades \"{{Name}}\".",
+            "schemaver": "La versió de l'esquema de la base de dades és {{SchemaVersion}}"
+        },
         "done": "Fet",
         "enterDBLoginDetails": "Introduïu les dades d'inici de sessió de la base de dades",
         "ignoremessages": "Ignoreu els missatges que diuen \"No es pot carregar 'xxxxx' com a zona horària. S'ha omès\".",

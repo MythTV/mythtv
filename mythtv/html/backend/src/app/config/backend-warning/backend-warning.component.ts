@@ -37,7 +37,8 @@ export class BackendWarningComponent implements OnInit {
   }
 
   getBackendInfo() {
-    this.errorCount = 0;
+    if (this.retryCount == 0)
+      this.errorCount = 0;
     this.ready = false;
     this.recStatusDesc = '';
     this.recStartTime = '';
@@ -66,16 +67,28 @@ export class BackendWarningComponent implements OnInit {
           else
             this.wizardService.wizardItems = this.wizardService.fullMenu;
           this.wizardService.getWizardData();
-          this.retryCount = 0;
-          setTimeout(() => this.getUpcoming(), this.delay);
-          this.delay = 0;
+          if (this.retryCount > 0 && this.errorCount > 0) {
+            // a succssful restart was done
+            this.retryCount = 0;
+            this.errorCount = 0;
+          }
+          else if (this.retryCount > 0 && this.errorCount == 0)
+            // we are waiting for the shutdown that is
+            // part of a restart
+            setTimeout(() => this.getBackendInfo(), 2000);
+          if (this.retryCount == 0) {
+            // successful restart or no restart
+            setTimeout(() => this.getUpcoming(), this.delay);
+            this.delay = 0;
+          }
         },
         error: () => {
           // default to true in case backend is down
           this.setupService.schedulingEnabled = true;
           this.errorCount++;
           if (this.errorCount < this.retryCount)
-            setTimeout(() => this.getBackendInfo(), 5000);
+            // shutdowsn doen, waiting for restart
+            setTimeout(() => this.getBackendInfo(), 2000);
           else
             this.retryCount = 0;
         }
@@ -116,7 +129,7 @@ export class BackendWarningComponent implements OnInit {
       .subscribe({
         next: data => {
           if (data.bool) {
-            this.retryCount = 5;
+            this.retryCount = 12;
             this.getBackendInfo();
           }
           else

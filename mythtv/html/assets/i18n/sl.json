@@ -999,7 +999,8 @@
             "restart_desc": "Posnetki so onemogočeni, dokler znova ne zaženete",
             "restart_label": "Znova zaženite zaledje",
             "restarting": "Ponovni zagon zaledja",
-            "slave_instructions": "Zdi se, da je to podrejeno zaledje. Če je mišljeno kot podrejeno zaledje, onemogočite razporejanje na zaledju msster med izvajanjem nastavitve podrejenega zaledja.",
+            "slave_enabled": "Posodobitve so vedno omogočene na podrejenem zaledju.",
+            "slave_instructions": "Zdi se, da je to podrejeno zaledje. Če je mišljeno kot podrejeno zaledje, onemogočite razporejanje na glavnem zaledju med izvajanjem nastavitve podrejenega zaledja.",
             "slave_warning": "Če to ni predvideno kot podrejeno zaledje, pojdite na Nastavitve, Splošno, Nastavitev zaledja naslova gostitelja in izberite »Ta strežnik je glavno zaledje« ali pa nastavite pravilen identifikator po meri na strani z nastavitvami baze podatkov. Shranite in znova zaženite zaledje,",
             "title": "Nastavitev MythTV",
             "upcomingrec": "Naslednji prihajajoči posnetek: {{Title}} ob {{StartTime}}. Status: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "Različica sheme baze podatkov ni znana",
         "databaseSetup": "Nastavitev baze podatkov",
         "dbname_help": "Ime baze podatkov. To je običajno 'mythconverg'.",
+        "dbsetup": {
+            "havedb": "Imeti bazo podatkov '{{Name}}'",
+            "havenotdb": "Nima podatkovne zbirke '{{Name}}'",
+            "schemaver": "Različica sheme baze podatkov je {{SchemaVersion}}"
+        },
         "done": "Končano",
         "enterDBLoginDetails": "Vnesite podatke za prijavo v bazo podatkov",
         "ignoremessages": "Prezrite sporočila, ki pravijo: »Ni mogoče naložiti 'xxxxx' kot časovni pas. Preskočim ga.«",

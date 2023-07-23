@@ -999,7 +999,8 @@
             "restart_desc": "Upptökur eru óvirkar þar til þú endurræsir",
             "restart_label": "Endurræstu bakenda",
             "restarting": "Endurræsir bakenda",
-            "slave_instructions": "Þetta virðist vera þrælabakendi. Ef það er ætlað sem þrælabakendi, vinsamlegast slökktu á tímasetningu á msster bakendanum meðan þú keyrir uppsetningu þrælabakendans.",
+            "slave_enabled": "Uppfærslur eru alltaf virkar á bakenda þræls.",
+            "slave_instructions": "Þetta virðist vera þrælabakendi. Ef það er ætlað sem þrælabakendi, vinsamlegast slökktu á tímasetningu á aðalbakendanum meðan þú keyrir uppsetningu þrælabakendans.",
             "slave_warning": "Ef þetta er ekki ætlað sem þrælabakendi, vinsamlegast farðu í Uppsetning, Almennt, Uppsetning hýsingarfangs, og veldu „Þessi þjónn er aðalbakendi“ eða stilltu rétt sérsniðið auðkenni á gagnagrunnsuppsetningu síðunni. Vistaðu og endurræstu bakendann,",
             "title": "MythTV uppsetning",
             "upcomingrec": "Næsta væntanleg upptaka: {{Title}} kl. {{StartTime}}. Staða: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "La versione dello schema del database è sconosciuta",
         "databaseSetup": "Configurazione del database",
         "dbname_help": "Nafn gagnagrunnsins. Þetta er venjulega „mythconverg“.",
+        "dbsetup": {
+            "havedb": "Hafa '{{Name}}' gagnagrunn",
+            "havenotdb": "Ertu ekki með '{{Name}}' gagnagrunn",
+            "schemaver": "Útgáfa gagnagrunnsskema er {{SchemaVersion}}"
+        },
         "done": "Fatto",
         "enterDBLoginDetails": "Immettere i dettagli di accesso al database",
         "ignoremessages": "Hunsa skilaboð sem segja \"Ekki er hægt að hlaða 'xxxxx' sem tímabelti. Sleppir því.\"",

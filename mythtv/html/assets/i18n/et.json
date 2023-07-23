@@ -999,7 +999,8 @@
             "restart_desc": "Salvestus on keelatud kuni taaskäivitamiseni",
             "restart_label": "Taaskäivitage taustaprogramm",
             "restarting": "Taustaprogrammi taaskäivitamine",
-            "slave_instructions": "See näib olevat ori taustaprogramm. Kui see on ette nähtud alam-taustaprogrammiks, keelake alam-taustaprogrammi seadistamise ajal ajastamine mssteri taustaprogrammis.",
+            "slave_enabled": "Värskendused on alam-taustaprogrammis alati lubatud.",
+            "slave_instructions": "See näib olevat ori taustaprogramm. Kui see on ette nähtud alam-taustaprogrammiks, keelake alam-taustaprogrammi seadistamise ajal põhitaustaprogrammi ajastamine.",
             "slave_warning": "Kui see pole mõeldud alluva taustaprogrammina, minge jaotisse Seadistamine, Üldine, Hostiaadressi taustaprogrammi häälestus ja valige \"See server on põhitaustaprogramm\" või määrake andmebaasi häälestuse lehel õige kohandatud identifikaator. Salvestage ja taaskäivitage taustaprogramm,",
             "title": "MythTV seadistamine",
             "upcomingrec": "Järgmine salvestus: {{Title}} kell {{StartTime}}. Olek: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "Andmebaasi skeemi versioon pole teada",
         "databaseSetup": "Andmebaasi häälestus",
         "dbname_help": "Andmebaasi nimi. See on tavaliselt \"müüdikonverg\".",
+        "dbsetup": {
+            "havedb": "Kas teil on andmebaas „{{Name}}”.",
+            "havenotdb": "Teil pole andmebaasi „{{Name}}”.",
+            "schemaver": "Andmebaasi skeemi versioon on {{SchemaVersion}}"
+        },
         "done": "Valmis",
         "enterDBLoginDetails": "Sisestage andmebaasi sisselogimisandmed",
         "ignoremessages": "Ignoreerige sõnumeid, mis ütlevad: \"Ajavööndina ei saa laadida 'xxxxx'. Jätame selle vahele.\"",

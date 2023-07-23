@@ -999,7 +999,8 @@
             "restart_desc": "Les enregistrements sont désactivés jusqu'à ce que vous redémarriez",
             "restart_label": "Redémarrer le backend",
             "restarting": "Redémarrage du backend",
-            "slave_instructions": "Cela semble être un backend esclave. S'il est conçu comme un backend esclave, veuillez désactiver la planification sur le backend msster lors de l'exécution de la configuration du backend esclave.",
+            "slave_enabled": "Les mises à jour sont toujours activées sur un backend esclave.",
+            "slave_instructions": "Cela semble être un backend esclave. S'il est conçu comme un backend esclave, veuillez désactiver la planification sur le backend maître lors de l'exécution de la configuration du backend esclave.",
             "slave_warning": "S'il ne s'agit pas d'un backend esclave, accédez à Configuration, Général, Configuration du backend de l'adresse de l'hôte et sélectionnez \"Ce serveur est le backend maître\" ou définissez l'identifiant personnalisé correct sur la page Configuration de la base de données. Enregistrez et redémarrez le backend,",
             "title": "Configuration Myth TV",
             "upcomingrec": "Prochain enregistrement à venir : {{Title}} à {{StartTime}}. Statut : {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "La version du schéma de la base de données est inconnue",
         "databaseSetup": "Configuration de la base de données",
         "dbname_help": "Le nom de la base de données. C'est généralement 'mythconverg'.",
+        "dbsetup": {
+            "havedb": "Avoir la base de données '{{Name}}'",
+            "havenotdb": "Ne pas avoir la base de données '{{Name}}'",
+            "schemaver": "La version du schéma de la base de données est {{SchemaVersion}}"
+        },
         "done": "Terminé",
         "enterDBLoginDetails": "Entrez les informations de connexion à la base de données",
         "ignoremessages": "Ignorez les messages indiquant \"Impossible de charger 'xxxxx' comme fuseau horaire. Ignorer.\"",

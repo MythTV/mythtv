@@ -63,6 +63,8 @@ export class SetupWizardService implements OnInit {
     ngOnInit(): void {
     }
 
+    dbPromise!: Promise<any>;
+
     Init(): void {
         this.initDatabaseStatus();
         this.initLanguages();
@@ -74,22 +76,29 @@ export class SetupWizardService implements OnInit {
     }
 
     initDatabaseStatus() {
-        this.configService.GetDatabaseStatus().subscribe(
-            result => {
-                this.m_wizardData.DatabaseStatus = result;
-                this.m_wizardData.Database.Host = result.DatabaseStatus.Host;
-                this.m_wizardData.Database.Port = result.DatabaseStatus.Port;
-                this.m_wizardData.Database.UserName = result.DatabaseStatus.UserName;
-                this.m_wizardData.Database.Password = result.DatabaseStatus.Password;
-                this.m_wizardData.Database.Name = result.DatabaseStatus.Name;
-                this.m_wizardData.Database.LocalEnabled = result.DatabaseStatus.LocalEnabled;
-                this.m_wizardData.Database.WOLEnabled = result.DatabaseStatus.WOLEnabled;
-                this.m_wizardData.Database.WOLReconnect = result.DatabaseStatus.WOLReconnect;
-                this.m_wizardData.Database.WOLRetry = result.DatabaseStatus.WOLRetry;
-                this.m_wizardData.Database.WOLCommand = result.DatabaseStatus.WOLCommand;
-            },
-            (err: HttpErrorResponse) => { console.log("Failed to get database status", err.statusText); }
-        );
+        this.dbPromise = new Promise((resolve, reject) => {
+            this.configService.GetDatabaseStatus().subscribe(
+                result => {
+                    this.m_wizardData.DatabaseStatus = result;
+                    this.m_wizardData.Database.Host = result.DatabaseStatus.Host;
+                    this.m_wizardData.Database.Port = result.DatabaseStatus.Port;
+                    this.m_wizardData.Database.UserName = result.DatabaseStatus.UserName;
+                    this.m_wizardData.Database.Password = result.DatabaseStatus.Password;
+                    this.m_wizardData.Database.Name = result.DatabaseStatus.Name;
+                    this.m_wizardData.Database.LocalEnabled = result.DatabaseStatus.LocalEnabled;
+                    this.m_wizardData.Database.LocalHostName = result.DatabaseStatus.LocalHostName;
+                    this.m_wizardData.Database.WOLEnabled = result.DatabaseStatus.WOLEnabled;
+                    this.m_wizardData.Database.WOLReconnect = result.DatabaseStatus.WOLReconnect;
+                    this.m_wizardData.Database.WOLRetry = result.DatabaseStatus.WOLRetry;
+                    this.m_wizardData.Database.WOLCommand = result.DatabaseStatus.WOLCommand;
+                    resolve(true);
+                },
+                (err: HttpErrorResponse) => {
+                    console.log("Failed to get database status", err.statusText);
+                    reject(true);
+                }
+            );
+        });
     }
 
     initLanguages() {

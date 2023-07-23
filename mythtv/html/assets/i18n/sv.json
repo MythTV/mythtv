@@ -999,7 +999,8 @@
             "restart_desc": "Inspelningar är inaktiverade tills du startar om",
             "restart_label": "Starta om Backend",
             "restarting": "Startar om backend",
-            "slave_instructions": "Detta verkar vara en slavbackend. Om den är avsedd som en slavbackend, inaktivera schemaläggning på msster-backend medan du kör slavbackend-installation.",
+            "slave_enabled": "Uppdateringar är alltid aktiverade på en slavbackend.",
+            "slave_instructions": "Detta verkar vara en slavbackend. Om den är avsedd som en slavbackend, inaktivera schemaläggning på masterbackend medan du kör slavbackend-installation.",
             "slave_warning": "Om detta inte är avsett som en slavbackend, gå till Setup, General, Host Address Backend Setup och välj \"Den här servern är Master Backend\" eller ställ in rätt anpassad identifierare på Databas Setup-sidan. Spara och starta om backend,",
             "title": "MythTV Setup",
             "upcomingrec": "Nästa kommande inspelning: {{Title}} kl. {{StartTime}}. Status: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "Databasschemaversionen är okänd",
         "databaseSetup": "Databasinställningar",
         "dbname_help": "Namnet på databasen. Detta är vanligtvis 'mythconverg'.",
+        "dbsetup": {
+            "havedb": "Har databas '{{Name}}'",
+            "havenotdb": "Har inte '{{Name}}' databas",
+            "schemaver": "Databasschemaversionen är {{SchemaVersion}}"
+        },
         "done": "Gjort",
         "enterDBLoginDetails": "Ange databasens inloggningsuppgifter",
         "ignoremessages": "Ignorera meddelanden som säger \"Det går inte att ladda 'xxxxx' som tidszon. Hoppa över det.\"",

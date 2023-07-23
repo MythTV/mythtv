@@ -999,7 +999,8 @@
             "restart_desc": "As gravações são desativadas até você reiniciar",
             "restart_label": "Reiniciar back-end",
             "restarting": "Reiniciando o back-end",
-            "slave_instructions": "Isso parece ser um back-end escravo. Se for planejado como um back-end escravo, desative o agendamento no back-end msster enquanto estiver executando a configuração do back-end escravo.",
+            "slave_enabled": "As atualizações são sempre habilitadas em um back-end escravo.",
+            "slave_instructions": "Isso parece ser um back-end escravo. Se for destinado a um back-end escravo, desative o agendamento no back-end mestre enquanto executa a configuração do back-end escravo.",
             "slave_warning": "Se isso não for um back-end escravo, vá para Configuração, Geral, Configuração do back-end do endereço do host e selecione \"Este servidor é o back-end mestre\" ou defina o identificador personalizado correto na página Configuração do banco de dados. Salve e reinicie o back-end,",
             "title": "Configuração do MythTV",
             "upcomingrec": "Próxima gravação: {{Title}} às {{StartTime}}. Estado: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "A versão do esquema do banco de dados é desconhecida",
         "databaseSetup": "Configuração do banco de dados",
         "dbname_help": "O nome do banco de dados. Isso geralmente é 'mitoconverg'.",
+        "dbsetup": {
+            "havedb": "Ter banco de dados '{{Name}}'",
+            "havenotdb": "Não tem banco de dados '{{Name}}'",
+            "schemaver": "A versão do esquema do banco de dados é {{SchemaVersion}}"
+        },
         "done": "Feito",
         "enterDBLoginDetails": "Digite os detalhes de login do banco de dados",
         "ignoremessages": "Ignore as mensagens que dizem \"Não foi possível carregar 'xxxxx' como fuso horário. Ignorando.\"",
