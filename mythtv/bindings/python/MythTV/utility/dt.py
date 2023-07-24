@@ -14,6 +14,15 @@ from collections import namedtuple
 import os
 import re
 import time
+
+HAVEZONEINFO = False
+try:
+    # python 3.9+
+    from zoneinfo import ZoneInfo
+    HAVEZONEINFO = True
+except ImportError:
+    HAVEZONEINFO = False
+
 from .singleton import InputSingleton
 time.tzset()
 
@@ -263,6 +272,7 @@ class datetime( _pydatetime ):
     Customized datetime class offering canned import and export of several
     common time formats, and 'duck' importing between them.
     """
+    global HAVEZONEINFO
     _reiso = re.compile('(?P<year>[0-9]{4})'
                        '-(?P<month>[0-9]{1,2})'
                        '-(?P<day>[0-9]{1,2})'
@@ -289,22 +299,45 @@ class datetime( _pydatetime ):
                             '(?P<tzmin>[0-9]{2})'
                         ')?')
     _localtz = None
+    _utctz = None
 
     @classmethod
     def localTZ(cls):
+        global HAVEZONEINFO
         if cls._localtz is None:
-            try:
-                cls._localtz = posixtzinfo()
-            except:
-                cls._localtz = offsettzinfo.local()
+            if HAVEZONEINFO:
+                try:
+                    if os.getenv('TZ'):
+                        cls._localtz = ZoneInfo(os.getenv('TZ'))
+                    elif os.path.exists('/usr/share/zoneinfo/localtime'):
+                        cls._localtz = ZoneInfo('localtime')
+                    else:
+                        with open('/etc/localtime', 'rb') as zfile:
+                            cls._localtz = ZoneInfo.from_file(zfile, 'localtime')
+                except:
+                    HAVEZONEINFO = False
+            if not HAVEZONEINFO:
+                try:
+                    cls._localtz = posixtzinfo()
+                except:
+                    cls._localtz = offsettzinfo.local()
         return cls._localtz
 
     @classmethod
     def UTCTZ(cls):
-        try:
-            return posixtzinfo('Etc/UTC')
-        except:
-            return offsettzinfo()
+        global HAVEZONEINFO
+        if cls._utctz is None:
+            if HAVEZONEINFO:
+                try:
+                    cls._utctz = ZoneInfo('Etc/UTC')
+                except:
+                    HAVEZONEINFO = False
+            if not HAVEZONEINFO:
+                try:
+                    cls._utctz = posixtzinfo('Etc/UTC')
+                except:
+                    cls._utctz = offsettzinfo()
+        return cls._utctz
 
     @classmethod
     def fromDatetime(cls, dt, tzinfo=None):
