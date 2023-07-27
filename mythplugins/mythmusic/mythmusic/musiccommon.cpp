@@ -1366,12 +1366,6 @@ void MusicCommon::customEvent(QEvent *event)
                 switchView(MV_PLAYLISTEDITORTREE);
             else if (resulttext == tr("Lyrics"))
                 switchView(MV_LYRICS);
-            else if (resulttext == tr("Play Now"))
-            {
-                m_playlistOptions.insertPLOption = PL_INSERTATEND;
-                m_playlistOptions.playPLOption = PL_FIRSTNEW;
-                doUpdatePlaylist();
-            }
         }
         else if (resultid == "submenu")
         {
@@ -1534,7 +1528,10 @@ void MusicCommon::customEvent(QEvent *event)
                 doUpdatePlaylist();
             }
             else if (resulttext == tr("Play Now"))
-            {
+            {               // cancel shuffles and repeats to play now
+                gPlayer->setShuffleMode(MusicPlayer::SHUFFLE_OFF);
+                gPlayer->setRepeatMode(MusicPlayer::REPEAT_OFF);
+                updateShuffleMode(true);
                 m_playlistOptions.insertPLOption = PL_INSERTATEND;
                 m_playlistOptions.playPLOption = PL_FIRSTNEW;
                 doUpdatePlaylist();
@@ -2408,13 +2405,13 @@ MythMenu* MusicCommon::createPlaylistOptionsMenu(void)
 
     if (gPlayer->getInPlayNow())
     {
-	menu->AddItem(tr("Play Now"));
-	menu->AddItem(tr("Add Tracks"));
+        menu->AddItem(tr("Play Now"));
+        menu->AddItem(tr("Add Tracks"));
     }
     else
     {
-	menu->AddItem(tr("Add Tracks"));
-	menu->AddItem(tr("Play Now"));
+        menu->AddItem(tr("Add Tracks"));
+        menu->AddItem(tr("Play Now"));
     }
     menu->AddItem(tr("Replace Tracks"));
 
