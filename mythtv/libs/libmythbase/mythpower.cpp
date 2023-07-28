@@ -90,7 +90,7 @@ MythPower* MythPower::AcquireRelease(void *Reference, bool Acquire, std::chrono:
 #ifdef Q_OS_DARWIN
             // NB OSX may have DBUS but it won't help here
             s_instance = new MythPowerOSX();
-#elif USING_DBUS
+#elif defined(USING_DBUS)
             if (MythPowerDBus::IsAvailable())
                 s_instance = new MythPowerDBus();
 #endif
