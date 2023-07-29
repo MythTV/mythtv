@@ -675,11 +675,19 @@ LookupType GuessLookupType(ProgramInfo *pginfo)
         // weird combination of both, we've got to try everything.
         auto *rule = new RecordingRule();
         rule->m_recordID = pginfo->GetRecordingRuleID();
+        // Load rule information from the database
         rule->Load();
         int ruleepisode = rule->m_episode;
+        RecordingType rulerectype = rule->m_type;
         delete rule;
 
-        if (ruleepisode == 0 && pginfo->GetEpisode() == 0 &&
+        // If recording rule is periodic, it's probably a TV show.
+        if ((rulerectype == kDailyRecord) ||
+            (rulerectype == kWeeklyRecord))
+        {
+            ret = kProbableTelevision;
+        }
+        else if (ruleepisode == 0 && pginfo->GetEpisode() == 0 &&
             pginfo->GetSubtitle().isEmpty())
             ret = kProbableMovie;
         else if (ruleepisode > 0 && pginfo->GetSubtitle().isEmpty())
@@ -731,6 +739,8 @@ LookupType GuessLookupType(RecordingRule *recrule)
         return ret;
 
     if (recrule->m_season > 0 || recrule->m_episode > 0 ||
+        (recrule->m_type == kDailyRecord) ||
+        (recrule->m_type == kWeeklyRecord) ||
         !recrule->m_subtitle.isEmpty())
         ret = kProbableTelevision;
     else

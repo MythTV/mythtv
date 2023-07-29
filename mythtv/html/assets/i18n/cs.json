@@ -999,7 +999,8 @@
             "restart_desc": "Záznamy jsou zakázány, dokud nerestartujete",
             "restart_label": "Restartujte backend",
             "restarting": "Restartování backendu",
-            "slave_instructions": "Zdá se, že jde o podřízený backend. Pokud je zamýšlen jako podřízený backend, vypněte plánování na backendu msster při spuštění nastavení podřízeného backendu.",
+            "slave_enabled": "Aktualizace jsou vždy povoleny na podřízeném backendu.",
+            "slave_instructions": "Zdá se, že jde o podřízený backend. Pokud je zamýšlen jako podřízený backend, vypněte plánování na hlavním backendu při spuštění nastavení podřízeného backendu.",
             "slave_warning": "Pokud toto není zamýšleno jako podřízený backend, přejděte na Nastavení, Obecné, Nastavení backendu adresy hostitele a vyberte „Tento server je hlavní backend“ nebo nastavte správný uživatelský identifikátor na stránce Nastavení databáze. Uložte a restartujte backend,",
             "title": "Nastavení MythTV",
             "upcomingrec": "Další nadcházející nahrávka: {{Title}} v {{StartTime}}. Stav: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "Verze schématu databáze není známa",
         "databaseSetup": "Nastavení databáze",
         "dbname_help": "Název databáze. To je obvykle 'mythconverg'.",
+        "dbsetup": {
+            "havedb": "Mít databázi '{{Name}}'",
+            "havenotdb": "Nemáte databázi '{{Name}}'",
+            "schemaver": "Verze schématu databáze je {{SchemaVersion}}"
+        },
         "done": "Hotovo",
         "enterDBLoginDetails": "Zadejte přihlašovací údaje do databáze",
         "ignoremessages": "Ignorujte zprávy, které říkají „Nelze načíst 'xxxxx' jako časové pásmo. Přeskakování.“",

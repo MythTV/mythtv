@@ -999,7 +999,8 @@
             "restart_desc": "Optagelser er deaktiveret, indtil du genstarter",
             "restart_label": "Genstart Backend",
             "restarting": "Genstarter Backend",
-            "slave_instructions": "Dette ser ud til at være en slave backend. Hvis det er beregnet som en slave-backend, skal du deaktivere planlægning på msster-backend, mens du kører slave-backend-opsætning.",
+            "slave_enabled": "Opdateringer er altid aktiveret på en slave-backend.",
+            "slave_instructions": "Dette ser ud til at være en slave backend. Hvis det er beregnet som en slave-backend, skal du deaktivere planlægning på master-backend, mens du kører slave-backend-opsætning.",
             "slave_warning": "Hvis dette ikke er beregnet som en slave-backend, skal du gå til Opsætning, Generelt, Host Address Backend-opsætning og vælge \"Denne server er Master Backend\" eller ellers indstil den korrekte brugerdefinerede identifikator på siden Databaseopsætning. Gem og genstart backend,",
             "title": "MythTV-opsætning",
             "upcomingrec": "Næste kommende optagelse: {{Title}} kl. {{StartTime}}. Status: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "Databaseskemaversionen er ukendt",
         "databaseSetup": "Database opsætning",
         "dbname_help": "Navnet på databasen. Dette er normalt 'mythconverg'.",
+        "dbsetup": {
+            "havedb": "Har '{{Name}}' database",
+            "havenotdb": "Har ikke '{{Name}}'-database",
+            "schemaver": "Databaseskemaversionen er {{SchemaVersion}}"
+        },
         "done": "Færdig",
         "enterDBLoginDetails": "Indtast databasens loginoplysninger",
         "ignoremessages": "Ignorer beskeder, der siger \"Kan ikke indlæse 'xxxxx' som tidszone. Springer det over.\"",

@@ -999,7 +999,8 @@
             "restart_desc": "Opnames zijn uitgeschakeld totdat u opnieuw opstart",
             "restart_label": "Back-end opnieuw opstarten",
             "restarting": "Backend opnieuw opstarten",
-            "slave_instructions": "Dit lijkt een slave-backend te zijn. Als het bedoeld is als een slave-backend, schakelt u planning op de msster-backend uit terwijl u de slave-backend-setup uitvoert.",
+            "slave_enabled": "Updates zijn altijd ingeschakeld op een slave-backend.",
+            "slave_instructions": "Dit lijkt een slave-backend te zijn. Als het bedoeld is als een slave-backend, schakelt u de planning op de master-backend uit terwijl u de slave-backend-installatie uitvoert.",
             "slave_warning": "Als dit niet bedoeld is als een slave-backend, ga dan naar Setup, General, Host Address Backend Setup en selecteer \"This server is the Master Backend\" of stel anders de juiste aangepaste identifier in op de Database Setup-pagina. Bewaar en herstart de backend,",
             "title": "MythTV-installatie",
             "upcomingrec": "Eerstvolgende opname: {{Title}} om {{StartTime}}. Status: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "De versie van het databaseschema is onbekend",
         "databaseSetup": "Database-instelling",
         "dbname_help": "De naam van de databank. Dit is meestal 'mythconverg'.",
+        "dbsetup": {
+            "havedb": "Heb '{{Name}}'-database",
+            "havenotdb": "Heb geen '{{Name}}'-database",
+            "schemaver": "Databaseschemaversie is {{SchemaVersion}}"
+        },
         "done": "Klaar",
         "enterDBLoginDetails": "Voer de inloggegevens van de database in",
         "ignoremessages": "Negeer berichten die zeggen \"Kan 'xxxxx' niet laden als tijdzone. Wordt overgeslagen.\"",

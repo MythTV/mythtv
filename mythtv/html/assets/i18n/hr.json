@@ -999,7 +999,8 @@
             "restart_desc": "Snimke su onemogućene dok ponovno ne pokrenete",
             "restart_label": "Ponovo pokrenite pozadinu",
             "restarting": "Ponovno pokretanje pozadine",
-            "slave_instructions": "Čini se da je ovo pomoćna pozadina. Ako je namijenjen kao podređena pozadina, onemogućite zakazivanje na msster pozadini dok izvodite postavljanje podređene pozadine.",
+            "slave_enabled": "Ažuriranja su uvijek omogućena na pomoćnoj pozadini.",
+            "slave_instructions": "Čini se da je ovo pomoćna pozadina. Ako je namijenjen kao podređena pozadina, onemogućite zakazivanje na glavnoj pozadini dok izvodite postavljanje podređene pozadine.",
             "slave_warning": "Ako ovo nije zamišljeno kao podređena pozadina, idite na Postavljanje, Općenito, Postavljanje pozadine adrese hosta i odaberite \"Ovaj poslužitelj je glavna pozadina\" ili pak postavite ispravan prilagođeni identifikator na stranici Postavljanje baze podataka. Spremite i ponovno pokrenite pozadinu,",
             "title": "Postavljanje MythTV-a",
             "upcomingrec": "Sljedeće nadolazeće snimanje: {{Title}} u {{StartTime}}. Status: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "Verzija sheme baze podataka nije poznata",
         "databaseSetup": "Postavljanje baze podataka",
         "dbname_help": "Naziv baze podataka. To je obično 'mythconverg'.",
+        "dbsetup": {
+            "havedb": "Imati '{{Name}}' bazu podataka",
+            "havenotdb": "Nemate '{{Name}}' bazu podataka",
+            "schemaver": "Verzija sheme baze podataka je {{SchemaVersion}}"
+        },
         "done": "Gotovo",
         "enterDBLoginDetails": "Unesite podatke za prijavu u bazu podataka",
         "ignoremessages": "Ignorirajte poruke koje kažu \"Nije moguće učitati 'xxxxx' kao vremensku zonu. Preskakanje.\"",

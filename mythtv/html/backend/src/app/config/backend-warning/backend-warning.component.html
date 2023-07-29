@@ -13,10 +13,11 @@
                     <p-button class="pr-5 pb-1 pt-0 m-0" label="{{ 'settings.main.restart_label' | translate }}" icon="pi pi-save" iconPos="left"
                         (onClick)="restart();"></p-button>
                 </div>
-                <div class="flex align-items-center" *ngIf="masterServerName == hostName">
+                <div class="flex align-items-center" *ngIf="!masterServerName || !hostName || masterServerName == hostName">
                     <div class="text-pink-500">{{ 'settings.main.restart_desc' | translate }}</div>
                 </div>
-                <div class="flex align-items-center" *ngIf="masterServerName != hostName">Updates are always enabled on a slave backend.</div>
+                <div class="flex align-items-center" *ngIf="masterServerName && hostName && masterServerName != hostName">
+                    {{ 'settings.main.slave_enabled' | translate }}</div>
             </div>
             <div>
                 <small *ngIf="upComing.length > 0" class="pb-0 m-0">
@@ -24,7 +25,7 @@
                     translate: { Title: upComing[0].Title, StartTime: recStartTime, Status: recStatusDesc } }}
                 </small>
             </div>
-            <div *ngIf="masterServerName != hostName  && retryCount == 0">
+            <div *ngIf="masterServerName && hostName && masterServerName != hostName && retryCount == 0">
                 <p>{{ 'settings.main.slave_instructions' | translate }}
                 </p>
                 <p>{{ 'settings.main.slave_warning' | translate }}
@@ -35,7 +36,7 @@
                 <p-message *ngIf="retryCount > 0" severity="info"
                     text="{{ 'settings.main.restarting' | translate }}"></p-message>
                 <p>
-                    <p-message *ngIf="this.errorCount > 0 && retryCount == 0" severity="error"
+                    <p-message *ngIf="!setupService.isDatabaseIgnored && this.errorCount > 0 && retryCount == 0" severity="error"
                         text="{{ 'common.networkfail' | translate }}"></p-message>
                 </p>
             </div>

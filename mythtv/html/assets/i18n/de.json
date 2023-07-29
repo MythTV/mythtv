@@ -999,7 +999,8 @@
             "restart_desc": "Die Aufzeichnungen sind bis zum Neustart deaktiviert",
             "restart_label": "Backend neu starten",
             "restarting": "Backend neu starten",
-            "slave_instructions": "Dies scheint ein Slave-Backend zu sein. Wenn es als Slave-Backend gedacht ist, deaktivieren Sie bitte die Planung auf dem msster-Backend, während Sie das Slave-Backend-Setup ausführen.",
+            "slave_enabled": "Updates sind immer auf einem Slave-Backend aktiviert.",
+            "slave_instructions": "Dies scheint ein Slave-Backend zu sein. Wenn es als Slave-Backend gedacht ist, deaktivieren Sie bitte die Planung auf dem Master-Backend, während Sie die Einrichtung des Slave-Backends ausführen.",
             "slave_warning": "Wenn dies nicht als Slave-Backend gedacht ist, gehen Sie bitte zu „Setup“, „Allgemein“, „Hostadressen-Backend-Setup“ und wählen Sie „Dieser Server ist das Master-Backend“ oder legen Sie die korrekte benutzerdefinierte Kennung auf der Seite „Datenbank-Setup“ fest. Speichern Sie das Backend und starten Sie es neu.",
             "title": "MythTV-Setup",
             "upcomingrec": "Nächste bevorstehende Aufnahme: {{Title}} um {{StartTime}}. Status: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "Die Version des Datenbankschemas ist unbekannt",
         "databaseSetup": "Datenbank-Setup",
         "dbname_help": "Der Name der Datenbank. Dies ist normalerweise „mythconverg“.",
+        "dbsetup": {
+            "havedb": "Verfügen über die Datenbank „{{Name}}“.",
+            "havenotdb": "Die Datenbank „{{Name}}“ ist nicht vorhanden",
+            "schemaver": "Datenbankschemaversion ist {{SchemaVersion}}"
+        },
         "done": "Erledigt",
         "enterDBLoginDetails": "Geben Sie die Anmeldedaten für die Datenbank ein",
         "ignoremessages": "Ignorieren Sie Meldungen mit der Meldung „‚xxxxx‘ konnte nicht als Zeitzone geladen werden. Wird übersprungen.“",

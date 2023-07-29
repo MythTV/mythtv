@@ -999,7 +999,8 @@
             "restart_desc": "Nagrania są wyłączone do ponownego uruchomienia",
             "restart_label": "Uruchom ponownie zaplecze",
             "restarting": "Ponowne uruchamianie backendu",
-            "slave_instructions": "Wygląda na to, że jest to backend podrzędny. Jeśli ma służyć jako podrzędny backend, wyłącz planowanie na backendzie msster podczas uruchamiania konfiguracji podrzędnego backendu.",
+            "slave_enabled": "Aktualizacje są zawsze włączone na podrzędnym zapleczu.",
+            "slave_instructions": "Wygląda na to, że jest to backend podrzędny. Jeśli ma służyć jako podrzędny backend, wyłącz planowanie na głównym backendzie podczas uruchamiania konfiguracji podrzędnego backendu.",
             "slave_warning": "Jeśli nie jest to zaplecze podrzędne, przejdź do Ustawienia, Ogólne, Konfiguracja zaplecza adresu hosta i wybierz „Ten serwer jest głównym zapleczem” lub ustaw poprawny niestandardowy identyfikator na stronie Konfiguracja bazy danych. Zapisz i uruchom ponownie backend,",
             "title": "Konfiguracja MythTV",
             "upcomingrec": "Następne nadchodzące nagranie: {{Title}} o {{StartTime}}. Stan: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "Wersja schematu bazy danych jest nieznana",
         "databaseSetup": "Konfiguracja bazy danych",
         "dbname_help": "Nazwa bazy danych. Zwykle jest to „konwergencja mitów”.",
+        "dbsetup": {
+            "havedb": "Mieć bazę danych „{{Name}}”.",
+            "havenotdb": "Nie masz bazy danych „{{Name}}”.",
+            "schemaver": "Wersja schematu bazy danych to {{SchemaVersion}}"
+        },
         "done": "Zrobione",
         "enterDBLoginDetails": "Wprowadź dane logowania do bazy danych",
         "ignoremessages": "Ignoruj ​​komunikaty o treści „Nie można załadować strefy czasowej „xxxxx”. Pomiń ją.",

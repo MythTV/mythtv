@@ -999,7 +999,8 @@
             "restart_desc": "A felvételek le vannak tiltva az újraindításig",
             "restart_label": "Indítsa újra a Backendet",
             "restarting": "Backend újraindítása",
-            "slave_instructions": "Ez egy szolga háttérprogramnak tűnik. Ha szolga háttérprogramnak szánja, kérjük, kapcsolja ki az ütemezést az msster háttérrendszeren, miközben a szolga háttérprogramot futtatja.",
+            "slave_enabled": "A frissítések mindig engedélyezve vannak a slave háttérrendszeren.",
+            "slave_instructions": "Ez egy szolga háttérprogramnak tűnik. Ha szolga háttérprogramnak szánja, tiltsa le az ütemezést a mester háttérrendszeren a szolga háttérprogram telepítése közben.",
             "slave_warning": "Ha ezt nem szolga háttérprogramnak szánja, lépjen a Beállítás, Általános, Gazdacím-háttérbeállítás menüpontra, és válassza ki az \"Ez a kiszolgáló a fő háttérrendszer\" lehetőséget, vagy állítsa be a megfelelő egyéni azonosítót az Adatbázis beállítása oldalon. Mentse és indítsa újra a háttérprogramot,",
             "title": "MythTV beállítása",
             "upcomingrec": "Következő felvétel: {{Title}}, {{StartTime}}. Állapot: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "Az adatbázisséma verziója ismeretlen",
         "databaseSetup": "Adatbázis beállítása",
         "dbname_help": "Az adatbázis neve. Ez általában „mítoszkonverg”.",
+        "dbsetup": {
+            "havedb": "Rendelkezik „{{Name}}” adatbázissal",
+            "havenotdb": "Nincs '{{Name}}' adatbázisa",
+            "schemaver": "Az adatbázisséma verziója: {{SchemaVersion}}"
+        },
         "done": "Kesz",
         "enterDBLoginDetails": "Adja meg az adatbázis bejelentkezési adatait",
         "ignoremessages": "Hagyja figyelmen kívül azokat az üzeneteket, amelyek azt írják: „Nem sikerült betölteni az „xxxxx” időzónát. Kihagyom.",

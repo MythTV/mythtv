@@ -999,7 +999,8 @@
             "restart_desc": "Las grabaciones están deshabilitadas hasta que reinicies",
             "restart_label": "Reiniciar back-end",
             "restarting": "Reiniciar back-end",
-            "slave_instructions": "Esto parece ser un backend esclavo. Si está diseñado como un backend esclavo, deshabilite la programación en el backend msster mientras ejecuta la configuración del backend esclavo.",
+            "slave_enabled": "Las actualizaciones siempre están habilitadas en un backend esclavo.",
+            "slave_instructions": "Esto parece ser un backend esclavo. Si está diseñado como un backend esclavo, deshabilite la programación en el backend maestro mientras ejecuta la configuración del backend esclavo.",
             "slave_warning": "Si esto no está diseñado como un backend esclavo, vaya a Configuración, General, Configuración del backend de la dirección del host y seleccione \"Este servidor es el backend maestro\" o establezca el identificador personalizado correcto en la página Configuración de la base de datos. Guarde y reinicie el backend,",
             "title": "Configuración de MyTVTV",
             "upcomingrec": "Próxima grabación: {{Title}} a las {{StartTime}}. Estado: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "La versión del esquema de la base de datos es desconocida",
         "databaseSetup": "Configuración de la base de datos",
         "dbname_help": "El nombre de la base de datos. Esto suele ser 'mythconverg'.",
+        "dbsetup": {
+            "havedb": "Tener la base de datos '{{Name}}'",
+            "havenotdb": "No tengo la base de datos '{{Name}}'",
+            "schemaver": "La versión del esquema de la base de datos es {{SchemaVersion}}"
+        },
         "done": "hecho",
         "enterDBLoginDetails": "Ingrese los datos de inicio de sesión de la base de datos",
         "ignoremessages": "Ignore los mensajes que dicen \"No se puede cargar 'xxxxx' como zona horaria. Omitiéndolo\".",

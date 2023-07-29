@@ -999,7 +999,8 @@
             "restart_desc": "錄音將被禁用，直到您重新啟動為止",
             "restart_label": "重啟後端",
             "restarting": "重啟後端",
-            "slave_instructions": "這似乎是一個從屬後端。如果它打算作為從屬後端，請在運行從屬後端設置時禁用 msster 後端上的調度。",
+            "slave_enabled": "從屬後端始終啟用更新。",
+            "slave_instructions": "這似乎是一個從屬後端。如果它打算作為從後端，請在運行從後端設置時禁用主後端上的調度。",
             "slave_warning": "如果這不是作為從屬後端，請轉至“設置”、“常規”、“主機地址後端設置”，然後選擇“此服務器是主後端”，或者在“數據庫設置”頁面上設置正確的自定義標識符。保存並重新啟動後端，",
             "title": "神話電視設置",
             "upcomingrec": "下一個即將錄製的節目：{{Title}}，時間：{{StartTime}}。狀態：{{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "數據庫架構版本未知",
         "databaseSetup": "數據庫設置",
         "dbname_help": "數據庫的名稱。這通常是“神話匯聚”。",
+        "dbsetup": {
+            "havedb": "擁有“{{Name}}”數據庫",
+            "havenotdb": "沒有“{{Name}}”數據庫",
+            "schemaver": "數據庫架構版本是 {{SchemaVersion}}"
+        },
         "done": "完畢",
         "enterDBLoginDetails": "輸入數據庫登錄詳細信息",
         "ignoremessages": "忽略顯示“無法加載‘xxxxx’作為時區。跳過它。”的消息。",

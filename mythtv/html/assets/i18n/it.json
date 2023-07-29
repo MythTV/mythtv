@@ -999,7 +999,8 @@
             "restart_desc": "Le registrazioni sono disabilitate fino al riavvio",
             "restart_label": "Riavvia il back-end",
             "restarting": "Riavvio del backend",
-            "slave_instructions": "Questo sembra essere un backend slave. Se è inteso come back-end slave, disabilitare la pianificazione sul back-end msster durante l'esecuzione della configurazione del back-end slave.",
+            "slave_enabled": "Gli aggiornamenti sono sempre abilitati su un backend slave.",
+            "slave_instructions": "Questo sembra essere un backend slave. Se è inteso come back-end slave, disabilita la pianificazione sul back-end principale durante l'esecuzione della configurazione del back-end slave.",
             "slave_warning": "Se questo non è inteso come back-end slave, vai a Configurazione, Generale, Configurazione back-end indirizzo host e seleziona \"Questo server è il back-end principale\" oppure imposta l'identificatore personalizzato corretto nella pagina Configurazione database. Salva e riavvia il backend,",
             "title": "Installazione di MythTV",
             "upcomingrec": "Prossima registrazione in arrivo: {{Title}} alle {{StartTime}}. Stato: {{Status}}"
@@ -1223,6 +1224,11 @@
         "databaseSchemaUnknown": "La versione dello schema del database è sconosciuta",
         "databaseSetup": "Configurazione del database",
         "dbname_help": "Il nome del database. Di solito è 'mythconverg'.",
+        "dbsetup": {
+            "havedb": "Avere il database '{{Name}}'",
+            "havenotdb": "Non hai il database '{{Name}}'",
+            "schemaver": "La versione dello schema del database è {{SchemaVersion}}"
+        },
         "done": "Fatto",
         "enterDBLoginDetails": "Immettere i dettagli di accesso al database",
         "ignoremessages": "Ignora i messaggi che dicono \"Impossibile caricare 'xxxxx' come fuso orario. Salto.\"",

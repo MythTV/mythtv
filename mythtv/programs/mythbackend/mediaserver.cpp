@@ -70,6 +70,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     int nWSPort   = nPort + 5;
     // UPNP port is now status port + 6 (default 6550)
     nPort += 6;
+    nSSLPort += 6;
 
     auto *pHttpServer = new HttpServer();
 
