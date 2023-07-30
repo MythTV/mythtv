@@ -1350,9 +1350,9 @@ void MusicCommon::customEvent(QEvent *event)
             if (resulttext == tr("Fullscreen Visualizer"))
                 switchView(MV_VISUALIZER);
             else if (resulttext == tr("Playlist Editor") ||
-                     resulttext == tr("Play Now..."))
+                     resulttext == tr("Play Now"))
             {
-                gPlayer->inPlayNow(resulttext == tr("Play Now..."));
+                gPlayer->inPlayNow(resulttext == tr("Play Now"));
                 if (gCoreContext->GetSetting("MusicPlaylistEditorView", "tree") ==  "tree")
                     switchView(MV_PLAYLISTEDITORTREE);
                 else
@@ -2196,7 +2196,7 @@ MythMenu* MusicCommon::createMainMenu(void)
     }
     else if (m_currentView == MV_PLAYLIST)
     {
-        menu->AddItem(MusicCommon::tr("Play Now..."));
+        menu->AddItem(MusicCommon::tr("Play Now"));
         menu->AddItem(MusicCommon::tr("Playlist Editor"));
     }
 
