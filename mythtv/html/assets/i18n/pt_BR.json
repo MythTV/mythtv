@@ -212,7 +212,8 @@
             "date": "Data",
             "encoder": "Codificador",
             "heading": "Por vir",
-            "showall": "Mostre tudo",
+            "recrule": "regra de gravação",
+            "showall": "Todos os valores de status",
             "status": "Status",
             "time": "Tempo"
         },

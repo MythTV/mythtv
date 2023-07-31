@@ -212,7 +212,8 @@
             "date": "Dátum",
             "encoder": "Kódoló",
             "heading": "Közelgő",
-            "showall": "Mutasd az összeset",
+            "recrule": "Felvételi szabály",
+            "showall": "Minden állapotérték",
             "status": "Állapot",
             "time": "Idő"
         },

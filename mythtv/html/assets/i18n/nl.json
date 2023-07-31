@@ -212,7 +212,8 @@
             "date": "Datum",
             "encoder": "Encoder",
             "heading": "Aanstaande",
-            "showall": "Toon alles",
+            "recrule": "Opname regel",
+            "showall": "Alle statuswaarden",
             "status": "Toestand",
             "time": "Tijd"
         },

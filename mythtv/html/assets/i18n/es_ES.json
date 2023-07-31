@@ -212,7 +212,8 @@
             "date": "Fecha",
             "encoder": "codificador",
             "heading": "próximos",
-            "showall": "Mostrar todo",
+            "recrule": "Regla de grabación",
+            "showall": "Todos los valores de estado",
             "status": "Estado",
             "time": "Tiempo"
         },

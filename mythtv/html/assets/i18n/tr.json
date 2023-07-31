@@ -212,7 +212,8 @@
             "date": "Tarih",
             "encoder": "kodlayıcı",
             "heading": "Yaklaşan",
-            "showall": "Hepsini Göster ↓",
+            "recrule": "Kayıt Kuralı",
+            "showall": "Tüm Durum Değerleri",
             "status": "Durum",
             "time": "Zaman"
         },

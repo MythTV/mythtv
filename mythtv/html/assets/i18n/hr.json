@@ -212,7 +212,8 @@
             "date": "Datum",
             "encoder": "Koder",
             "heading": "Nadolazeće",
-            "showall": "Pokaži sve",
+            "recrule": "Pravilo snimanja",
+            "showall": "Sve vrijednosti statusa",
             "status": "Status",
             "time": "Vrijeme"
         },

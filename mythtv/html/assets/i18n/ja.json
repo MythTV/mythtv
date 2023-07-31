@@ -212,7 +212,8 @@
             "date": "日にち",
             "encoder": "エンコーダ",
             "heading": "今後の予定",
-            "showall": "すべて表示する",
+            "recrule": "録音ルール",
+            "showall": "すべてのステータス値",
             "status": "スターテス",
             "time": "時間"
         },

@@ -212,7 +212,8 @@
             "date": "Date",
             "encoder": "Encodeur",
             "heading": "A venir",
-            "showall": "Afficher tout",
+            "recrule": "Règle d'enregistrement",
+            "showall": "Toutes les valeurs de statut",
             "status": "Statut",
             "time": "Temps"
         },

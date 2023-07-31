@@ -212,7 +212,8 @@
             "date": "Datum",
             "encoder": "Encoder",
             "heading": "Kommande",
-            "showall": "Visa allt",
+            "recrule": "Inspelningsregel",
+            "showall": "Alla statusvärden",
             "status": "Status",
             "time": "Tid"
         },

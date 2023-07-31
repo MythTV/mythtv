@@ -212,7 +212,8 @@
             "date": "日期",
             "encoder": "編碼器",
             "heading": "即將到來",
-            "showall": "顯示所有",
+            "recrule": "錄音規則",
+            "showall": "所有狀態值",
             "status": "地位",
             "time": "時間"
         },

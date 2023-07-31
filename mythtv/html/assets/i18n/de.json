@@ -212,7 +212,8 @@
             "date": "Datum",
             "encoder": "Encoder",
             "heading": "Bevorstehende",
-            "showall": "Zeige alles",
+            "recrule": "Aufzeichnungsregel",
+            "showall": "Alle Statuswerte",
             "status": "Status",
             "time": "Zeit"
         },

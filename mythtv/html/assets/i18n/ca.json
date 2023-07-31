@@ -212,7 +212,8 @@
             "date": "Data",
             "encoder": "Codificador",
             "heading": "Properament",
-            "showall": "Mostrar tots",
+            "recrule": "Regla de gravació",
+            "showall": "Tots els valors d'estat",
             "status": "Estat",
             "time": "Temps"
         },

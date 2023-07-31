@@ -212,7 +212,8 @@
             "date": "Dato",
             "encoder": "Enkoder",
             "heading": "Kommende",
-            "showall": "Vis alt",
+            "recrule": "Opptaksregel",
+            "showall": "Alle statusverdier",
             "status": "Status",
             "time": "Tid"
         },

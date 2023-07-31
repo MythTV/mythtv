@@ -212,7 +212,8 @@
             "date": "Dagsetning",
             "encoder": "Kóðari",
             "heading": "Væntanlegt",
-            "showall": "Sýna allt",
+            "recrule": "Upptökuregla",
+            "showall": "Öll stöðugildi",
             "status": "Staða",
             "time": "Tími"
         },

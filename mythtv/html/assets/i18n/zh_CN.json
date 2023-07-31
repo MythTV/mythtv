@@ -212,7 +212,8 @@
             "date": "日期",
             "encoder": "编码器",
             "heading": "即将推出",
-            "showall": "显示所有",
+            "recrule": "录音规则",
+            "showall": "所有状态值",
             "status": "地位",
             "time": "时间"
         },
