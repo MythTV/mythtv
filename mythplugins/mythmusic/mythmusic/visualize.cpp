@@ -769,7 +769,7 @@ bool WaveForm::draw( QPainter *p, const QColor &back )
 {
     p->fillRect(0, 0, 0, 0, back); // no clearing, here to suppress warning
     if (!m_image.isNull())
-    {			     // background, updated by ::process above
+    {                        // background, updated by ::process above
         p->drawImage(0, 0, m_image.scaled(m_size,
                                           Qt::IgnoreAspectRatio,
                                           Qt::SmoothTransformation));
@@ -926,12 +926,12 @@ Spectrogram::Spectrogram(bool hist)
     }
     if (m_history)
     {
-	m_image = &s_image;
+        m_image = &s_image;
     }
     else
     {
         m_image = new QImage(
-	    m_sgsize.width(), m_sgsize.height(), QImage::Format_RGB32);
+            m_sgsize.width(), m_sgsize.height(), QImage::Format_RGB32);
         m_image->fill(Qt::black);
     }
 
