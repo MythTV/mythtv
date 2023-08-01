@@ -212,7 +212,8 @@
             "date": "Päivämäärä",
             "encoder": "Enkooderi",
             "heading": "Tuleva",
-            "showall": "Näytä kaikki",
+            "recrule": "Tallennussääntö",
+            "showall": "Kaikki tilan arvot",
             "status": "Tila",
             "time": "Aika"
         },

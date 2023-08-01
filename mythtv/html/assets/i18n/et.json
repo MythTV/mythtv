@@ -212,7 +212,8 @@
             "date": "Kuupäev",
             "encoder": "Kodeerija",
             "heading": "Tulemas",
-            "showall": "Näita kõike",
+            "recrule": "Salvestusreegel",
+            "showall": "Kõik olekuväärtused",
             "status": "Olek",
             "time": "Aeg"
         },

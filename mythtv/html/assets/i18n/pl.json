@@ -212,7 +212,8 @@
             "date": "Data",
             "encoder": "Koder",
             "heading": "Nadchodzące",
-            "showall": "Pokaż wszystko",
+            "recrule": "Zasada nagrywania",
+            "showall": "Wszystkie wartości stanu",
             "status": "Status",
             "time": "Czas"
         },

@@ -212,7 +212,8 @@
             "date": "datum",
             "encoder": "Kodér",
             "heading": "Nadcházející",
-            "showall": "Ukázat vše",
+            "recrule": "Pravidlo nahrávání",
+            "showall": "Všechny hodnoty stavu",
             "status": "Postavení",
             "time": "Čas"
         },

@@ -212,7 +212,8 @@
             "date": "Data",
             "encoder": "Codificatore",
             "heading": "In arrivo",
-            "showall": "Mostra tutto",
+            "recrule": "Regola di registrazione",
+            "showall": "Tutti i valori di stato",
             "status": "Stato",
             "time": "Tempo"
         },

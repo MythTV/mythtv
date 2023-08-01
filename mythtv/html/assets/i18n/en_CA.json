@@ -212,7 +212,8 @@
             "date": "Date",
             "encoder": "Encoder",
             "heading": "Upcoming",
-            "showall": "Show All",
+            "recrule": "Recording Rule",
+            "showall": "All Status Values",
             "status": "Status",
             "time": "Time"
         },

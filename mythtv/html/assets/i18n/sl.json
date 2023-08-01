@@ -212,7 +212,8 @@
             "date": "Datum",
             "encoder": "Kodirnik",
             "heading": "Prihajajoče",
-            "showall": "Pokaži vse",
+            "recrule": "Pravilo snemanja",
+            "showall": "Vse vrednosti stanja",
             "status": "Stanje",
             "time": "Čas"
         },

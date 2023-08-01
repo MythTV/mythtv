@@ -212,7 +212,8 @@
             "date": "Dato",
             "encoder": "Encoder",
             "heading": "Kommende",
-            "showall": "Vis alt",
+            "recrule": "Optagelsesregel",
+            "showall": "Alle statusværdier",
             "status": "Status",
             "time": "Tid"
         },
