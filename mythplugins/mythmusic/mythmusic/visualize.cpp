@@ -946,12 +946,12 @@ Spectrogram::Spectrogram(bool hist)
     }
     if (m_history)
     {
-	m_image = &s_image;
+        m_image = &s_image;
     }
     else
     {
         m_image = new QImage(
-	    m_sgsize.width(), m_sgsize.height(), QImage::Format_RGB32);
+            m_sgsize.width(), m_sgsize.height(), QImage::Format_RGB32);
         m_image->fill(Qt::black);
     }
 
