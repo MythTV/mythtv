@@ -692,16 +692,16 @@ bool WaveForm::processUndisplayed(VisualNode *node)
                 //     QString("WF painting at %1,%2/%3").arg(x).arg(y).arg(yr));
 
                 // clear prior content of this column
-		if (m_stream)  // clear 5 seconds of future, with wrap
-		{
-		    painter.fillRect(x, 0, 32 * 5,
-				     m_wfsize.height(), Qt::black);
-		    painter.fillRect(x - m_wfsize.width(), 0, 32 * 5,
-				     m_wfsize.height(), Qt::black);
-		} else {	// preserve the future, if any
-		    painter.fillRect(x, 0, 1,
-				     m_wfsize.height(), Qt::black);
-		}
+                if (m_stream)  // clear 5 seconds of future, with wrap
+                {
+                    painter.fillRect(x, 0, 32 * 5,
+                                     m_wfsize.height(), Qt::black);
+                    painter.fillRect(x - m_wfsize.width(), 0, 32 * 5,
+                                     m_wfsize.height(), Qt::black);
+                } else {        // preserve the future, if any
+                    painter.fillRect(x, 0, 1,
+                                     m_wfsize.height(), Qt::black);
+                }
 
                 // Audacity uses 50,50,200 and 100,100,220 - I'm going
                 // darker to better contrast the StereoScope overlay
