@@ -193,6 +193,9 @@
                 "minute": "Minut",
                 "minutes": "Minuts",
                 "myth_drive": "MythTV Drive",
+                "mythfill_last": "La darrera execució de la base de dades mythfill va començar el {{GuideStart}} i va acabar el {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Propera execució de la base de dades mythfill suggerida {{GuideNext}}.",
+                "mythfill_until": "Hi ha dades de guia fins a {{GuideThru}} ({{GuideDays}} dies).",
                 "none": "No hi ha informació de la màquina disponible",
                 "space_after_expire": "Espai disponible després de la caducitat automàtica",
                 "space_deleted": "Espai utilitzat per les gravacions suprimides",
@@ -203,6 +206,7 @@
                 "title": "Informació de la màquina",
                 "total_space": "Espai total"
             },
+            "misc_title": "Divers",
             "no_encoders": "El backend no té codificadors",
             "schedule_none": "No hi ha res programat per gravar",
             "schedule_text": "Els propers {{ length }} mostren que estan programats per a la gravació.",

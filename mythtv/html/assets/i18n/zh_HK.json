@@ -193,6 +193,9 @@
                 "minute": "分鐘",
                 "minutes": "分鐘",
                 "myth_drive": "神話電視驅動器",
+                "mythfill_last": "上次 mythfilldatabase 運行開始於 {{GuideStart}}，結束於 {{GuideEnd}}，{{GuideStatus}}",
+                "mythfill_next": "建議下一個 mythfilldatabase 運行 {{GuideNext}}。",
+                "mythfill_until": "指南數據截至 {{GuideThru}}（{{GuideDays}} 天）。",
                 "none": "無可用機器信息",
                 "space_after_expire": "自動過期後可用空間",
                 "space_deleted": "已刪除錄音所使用的空間",
@@ -203,6 +206,7 @@
                 "title": "機器信息",
                 "total_space": "整體空間"
             },
+            "misc_title": "各種各樣的",
             "no_encoders": "後端沒有編碼器",
             "schedule_none": "沒有預定要錄製的內容",
             "schedule_text": "計劃錄製的下一個 {{ length }} 個節目。",

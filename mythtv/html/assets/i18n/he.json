@@ -193,6 +193,9 @@
                 "minute": "דַקָה",
                 "minutes": "דקות",
                 "myth_drive": "MythTV Drive",
+                "mythfill_last": "הריצה האחרונה של מסד הנתונים של mythfill התחילה ב-{{GuideStart}} והסתיימה ב-{{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "הציע להפעיל את מסד הנתונים הבא של mythfill {{GuideNext}}.",
+                "mythfill_until": "יש נתוני מדריך עד {{GuideThru}} ({{GuideDays}} ימים).",
                 "none": "אין מידע על מכונה זמין",
                 "space_after_expire": "מקום פנוי לאחר התוקף האוטומטי",
                 "space_deleted": "שטח בשימוש על ידי הקלטות שנמחקו",
@@ -203,6 +206,7 @@
                 "title": "מידע על מכונה",
                 "total_space": "השטח הכולל"
             },
+            "misc_title": "שונות",
             "no_encoders": "Backend אין מקודדים",
             "schedule_none": "שום דבר לא מתוכנן להקליט",
             "schedule_text": "המופעים הבאים של {{ length }} המתוכננים להקלטה.",

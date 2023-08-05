@@ -193,6 +193,9 @@
                 "minute": "Minuto",
                 "minutes": "Minutos",
                 "myth_drive": "MythTV Drive",
+                "mythfill_last": "A última execução do mythfilldatabase começou em {{GuideStart}} e terminou em {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Sugestão de próxima execução do mythfilldatabase {{GuideNext}}.",
+                "mythfill_until": "Há dados do guia até {{GuideThru}} ({{GuideDays}} dias).",
                 "none": "Nenhuma informação da máquina disponível",
                 "space_after_expire": "Espaço disponível após a expiração automática",
                 "space_deleted": "Espaço usado por gravações excluídas",
@@ -203,6 +206,7 @@
                 "title": "Informações da máquina",
                 "total_space": "Espaço total"
             },
+            "misc_title": "Diversos",
             "no_encoders": "O back-end não tem codificadores",
             "schedule_none": "Nada agendado para gravar",
             "schedule_text": "O(s) próximo(s) show(ões) de {{ length }} agendados para gravação.",

@@ -26,8 +26,11 @@ export class UtilityService {
     // Get the locale specific time and remove the seconds
     const t = new Date(date);
     const tWithSecs = t.toLocaleTimeString() + ' ';
-    return tWithSecs.replace(/:.. /, ' ');
+    return tWithSecs.replace(/:.. /, '');
   }
 
+  formatDateTime(date: string, innerHtml?: boolean) {
+    return this.formatDate(date, innerHtml) + ' ' + this.formatTime(date);
+  }
 
 }

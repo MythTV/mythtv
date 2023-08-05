@@ -193,6 +193,9 @@
                 "minute": "Minute",
                 "minutes": "Protokoll",
                 "myth_drive": "MythTV-Laufwerk",
+                "mythfill_last": "Der letzte mythfilldatabase-Lauf begann am {{GuideStart}} und endete am {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Empfohlener nächster mythfilldatabase-Lauf: {{GuideNext}}.",
+                "mythfill_until": "Es gibt Guide-Daten bis {{GuideThru}} ({{GuideDays}} Tage).",
                 "none": "Keine Maschineninformationen verfügbar",
                 "space_after_expire": "Nach dem automatischen Ablauf verfügbarer Speicherplatz",
                 "space_deleted": "Von gelöschten Aufnahmen belegter Speicherplatz",
@@ -203,6 +206,7 @@
                 "title": "Maschineninfo",
                 "total_space": "Gesamtfläche"
             },
+            "misc_title": "Sonstig",
             "no_encoders": "Backend hat keine Encoder",
             "schedule_none": "Es ist keine Aufnahme geplant",
             "schedule_text": "Die nächsten {{ length }} Sendung(en), deren Aufnahme geplant ist.",

@@ -193,6 +193,9 @@
                 "minute": "Minut",
                 "minutes": "Minuter",
                 "myth_drive": "MythTV Drive",
+                "mythfill_last": "Den senaste körningen av mythfilldatabasen startade {{GuideStart}} och slutade {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Föreslog nästa körning av mythfilldatabasen {{GuideNext}}.",
+                "mythfill_until": "Det finns guidedata fram till {{GuideThru}} ({{GuideDays}} dagar).",
                 "none": "Ingen maskininformation tillgänglig",
                 "space_after_expire": "Utrymme tillgängligt efter Auto-expire",
                 "space_deleted": "Utrymme som används av raderade inspelningar",
@@ -203,6 +206,7 @@
                 "title": "Maskininfo",
                 "total_space": "Totalt utrymme"
             },
+            "misc_title": "Diverse",
             "no_encoders": "Backend har inga kodare",
             "schedule_none": "Inget planerat att spela in",
             "schedule_text": "Nästa {{ length }} show(er) som är schemalagda för inspelning.",

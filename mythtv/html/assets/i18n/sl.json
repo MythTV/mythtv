@@ -193,6 +193,9 @@
                 "minute": "minuta",
                 "minutes": "minute",
                 "myth_drive": "MythTV Drive",
+                "mythfill_last": "Zadnji zagon mythfilldatabase se je začel {{GuideStart}} in končal {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Predlagani naslednji zagon mythfilldatabase {{GuideNext}}.",
+                "mythfill_until": "Na voljo so vodniški podatki do {{GuideThru}} ({{GuideDays}} dni).",
                 "none": "Informacije o stroju niso na voljo",
                 "space_after_expire": "Prostor na voljo po samodejnem poteku",
                 "space_deleted": "Prostor, ki ga uporabljajo izbrisani posnetki",
@@ -203,6 +206,7 @@
                 "title": "Informacije o stroju",
                 "total_space": "Skupni prostor"
             },
+            "misc_title": "Razno",
             "no_encoders": "Zaledje nima kodirnikov",
             "schedule_none": "Nič ni predvideno za snemanje",
             "schedule_text": "Naslednje {{ length }} oddaje(e), ki so predvidene za snemanje.",

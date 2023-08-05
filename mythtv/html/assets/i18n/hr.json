@@ -193,6 +193,9 @@
                 "minute": "Minuta",
                 "minutes": "minuta",
                 "myth_drive": "MythTV Drive",
+                "mythfill_last": "Zadnje pokretanje mythfilldatabase počelo je {{GuideStart}} i završilo {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Predloženo sljedeće pokretanje mythfilldatabase {{GuideNext}}.",
+                "mythfill_until": "Postoje podaci vodiča do {{GuideThru}} ({{GuideDays}} dana).",
                 "none": "Informacije o stroju nisu dostupne",
                 "space_after_expire": "Prostor dostupan nakon automatskog isteka",
                 "space_deleted": "Prostor koji koriste izbrisane snimke",
@@ -203,6 +206,7 @@
                 "title": "Informacije o stroju",
                 "total_space": "Totalni prostor"
             },
+            "misc_title": "Razno",
             "no_encoders": "Pozadina nema kodere",
             "schedule_none": "Ništa nije planirano za snimanje",
             "schedule_text": "Sljedećih {{ length }} emisija(e) koje su zakazane za snimanje.",

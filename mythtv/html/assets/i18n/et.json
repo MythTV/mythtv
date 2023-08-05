@@ -193,6 +193,9 @@
                 "minute": "Minut",
                 "minutes": "Minutid",
                 "myth_drive": "MythTV draiv",
+                "mythfill_last": "Viimane müüditäite andmebaasi käitamine algas {{GuideStart}} ja lõppes {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Soovitatav mythfilldatabase järgmine käitamine {{GuideNext}}.",
+                "mythfill_until": "Juhendi andmed on saadaval kuni {{GuideThru}} ({{GuideDays}} päeva).",
                 "none": "Masinateave pole saadaval",
                 "space_after_expire": "Ruum on saadaval pärast automaatset aegumist",
                 "space_deleted": "Kustutatud salvestiste kasutatav ruum",
@@ -203,6 +206,7 @@
                 "title": "Masina info",
                 "total_space": "Kogu ruum"
             },
+            "misc_title": "Mitmesugust",
             "no_encoders": "Taustaprogrammil pole kodeerijaid",
             "schedule_none": "Midagi pole plaanitud salvestada",
             "schedule_text": "Järgmised {{ length }} saade(d), mis on salvestamiseks kavandatud.",

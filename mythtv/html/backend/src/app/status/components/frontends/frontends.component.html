@@ -1,5 +1,5 @@
 <div class="statusBox">
-    <p>{{ 'dashboard.status.frontends_title' | translate }}:</p>
+    <h2>{{ 'dashboard.status.frontends_title' | translate }}</h2>
     <div *ngIf="frontends?.length != 0; else noFrontends">
         <ul>
             <div *ngFor="let frontend of frontends">

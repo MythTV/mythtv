@@ -193,6 +193,9 @@
                 "minute": "Minuut",
                 "minutes": "Minuten",
                 "myth_drive": "MythTV-schijf",
+                "mythfill_last": "De laatste mythfilldatabase-run is gestart op {{GuideStart}} en geëindigd op {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Voorgestelde volgende mythfilldatabase run {{GuideNext}}.",
+                "mythfill_until": "Er zijn gidsgegevens tot {{GuideThru}} ({{GuideDays}} dagen).",
                 "none": "Geen machine-info beschikbaar",
                 "space_after_expire": "Ruimte beschikbaar na automatisch verlopen",
                 "space_deleted": "Ruimte gebruikt door verwijderde opnamen",
@@ -203,6 +206,7 @@
                 "title": "Machine-info",
                 "total_space": "Totale ruimte"
             },
+            "misc_title": "Gemengd",
             "no_encoders": "Backend heeft geen encoders",
             "schedule_none": "Niets gepland om op te nemen",
             "schedule_text": "De volgende {{ length }} show(s) die gepland staan ​​voor opname.",
