@@ -198,12 +198,12 @@ bool TrackInfoPopup::keyPressEvent(QKeyEvent *event)
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+	handled = true;
 
-        if (action == "INFO")
-        {
-            showTrackInfo(gPlayer->getCurrentMetadata());
-            handled = true;
-        }
+	if (action == "ESCAPE")
+	    Close();
+        else if (action == "INFO")
+	    showTrackInfo(gPlayer->getCurrentMetadata());
         else
             handled = false;
     }
