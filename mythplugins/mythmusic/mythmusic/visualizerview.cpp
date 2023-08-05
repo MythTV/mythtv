@@ -42,11 +42,13 @@ bool VisualizerView::Create(void)
 
     if (err)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'lyricsview'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'visualizerview'");
         return false;
     }
 
     BuildFocusList();
+
+    m_currentView = MV_VISUALIZER;
 
     return true;
 }
@@ -111,7 +113,7 @@ void VisualizerView::showTrackInfoPopup(void)
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    auto *popup = new TrackInfoPopup(popupStack, gPlayer->getCurrentMetadata());
+    auto *popup = new TrackInfoPopup(popupStack);
 
     if (!popup->Create())
     {
@@ -144,9 +146,20 @@ bool TrackInfoPopup::Create(void)
     if (!err)
         return false;
 
+    // find common widgets available on any view
+    m_currentView = MV_VISUALIZER; // reverted to zero ?!
+    err = CreateCommon();
+
+    if (err)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'trackinfo_popup'");
+        return false;
+    }
+
     // get map for current track
+    MusicMetadata *metadata = gPlayer->getCurrentMetadata();
     InfoMap metadataMap;
-    m_metadata->toMap(metadataMap); 
+    metadata->toMap(metadataMap);
 
     // add the map from the next track
     MusicMetadata *nextMetadata = gPlayer->getNextMetadata();
@@ -157,14 +170,14 @@ bool TrackInfoPopup::Create(void)
 
     MythUIStateType *ratingState = dynamic_cast<MythUIStateType *>(GetChild("ratingstate"));
     if (ratingState)
-        ratingState->DisplayState(QString("%1").arg(m_metadata->Rating()));
+        ratingState->DisplayState(QString("%1").arg(metadata->Rating()));
 
     MythUIImage *albumImage = dynamic_cast<MythUIImage *>(GetChild("coverart"));
     if (albumImage)
     {
-        if (!m_metadata->getAlbumArtFile().isEmpty())
+        if (!metadata->getAlbumArtFile().isEmpty())
         {
-            albumImage->SetFilename(m_metadata->getAlbumArtFile());
+            albumImage->SetFilename(metadata->getAlbumArtFile());
             albumImage->Load();
         }
     }
@@ -185,15 +198,17 @@ bool TrackInfoPopup::keyPressEvent(QKeyEvent *event)
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
-        handled = true;
 
         if (action == "INFO")
-            Close();
+        {
+            showTrackInfo(gPlayer->getCurrentMetadata());
+            handled = true;
+        }
         else
             handled = false;
     }
 
-    if (!handled && MythScreenType::keyPressEvent(event))
+    if (!handled && MusicCommon::keyPressEvent(event))
         handled = true;
 
     return handled;
