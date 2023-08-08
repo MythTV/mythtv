@@ -23,7 +23,6 @@ export class RecordingsComponent implements OnInit {
   @ViewChild("recsform") currentForm!: NgForm;
   @ViewChild("menu") menu!: Menu;
 
-  recordings!: ProgramList;
   programs: ScheduleOrProgram[] = [];
   recGroups: string[] = [];
   lazyLoadEvent!: LazyLoadEvent;
@@ -162,12 +161,12 @@ export class RecordingsComponent implements OnInit {
       }
     }
     this.dvrService.GetRecordedList(request).subscribe(data => {
-      this.recordings = data.ProgramList;
+      let recordings = data.ProgramList;
       this.programs.length = data.ProgramList.TotalAvailable;
       // populate page of virtual programs
       // this.programs.splice(request.StartIndex!, request.Count!, ...this.recordings.Programs);
-      this.programs.splice(this.recordings.StartIndex, this.recordings.Count,
-        ...this.recordings.Programs);
+      this.programs.splice(recordings.StartIndex, recordings.Count,
+        ...recordings.Programs);
       // notify of change
       this.programs = [...this.programs]
       this.refreshing = false;

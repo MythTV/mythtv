@@ -1,4 +1,9 @@
 import { Injectable } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+
+interface StringAssociativeArray {
+  [key: string]: string
+}
 
 @Injectable({
   providedIn: 'root'
@@ -6,8 +11,29 @@ import { Injectable } from '@angular/core';
 export class UtilityService {
 
   allSlashes = new RegExp(/\//g);
+  deSpacer = new RegExp(/ /g);
 
-  constructor() { }
+  recTypeTrans: StringAssociativeArray = {
+    "Single Record": "",
+    "Record All": "",
+    "Record One": "",
+    "Record Daily": "",
+    "Record Weekly": "",
+    "Override Recording": "",
+    "Do not Record": "",
+    "Recording Template": "",
+    "Not Recording": ""
+  };
+
+  constructor(private translate: TranslateService) {
+    // translations
+    for (const [key, value] of Object.entries(this.recTypeTrans)) {
+      const label = 'recrule.' + key.replace(this.deSpacer, '');
+      this.translate.get(label).subscribe(data => {
+        Object.defineProperty(this.recTypeTrans, key, { value: data });
+      });
+    }
+  }
 
   formatDate(date: string, innerHtml?: boolean): string {
     if (!date)
