@@ -458,6 +458,9 @@ void avfDecoder::run()
                 LOG(VB_GENERAL, LOG_ERR, "Error seeking");
 
             m_seekTime = -1.0;
+            // Play all pending and restart buffering, else REW/FFWD
+            // takes 1 second per keypress at the "buffered" wait below.
+            output()->Drain();  // (see issue #784)
         }
 
         while (!m_finish && !m_userStop && m_seekTime <= 0.0)
