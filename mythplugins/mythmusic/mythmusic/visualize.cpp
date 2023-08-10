@@ -669,7 +669,7 @@ bool WaveForm::processUndisplayed(VisualNode *node)
         if (xx != m_lastx)   // draw one finished line of min/max/rms
         {
             if (m_lastx > xx - 1 || // REW seek or right to left edge wrap
-                m_lastx <= xx - 5 * m_duration / m_wfsize.width()) // FFWD
+                m_lastx < xx - 5)   // FFWD seek
             {
                 m_lastx = xx - 1;
             }
