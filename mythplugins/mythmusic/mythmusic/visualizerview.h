@@ -33,16 +33,16 @@ class VisualizerView : public MusicCommon
     static void showTrackInfoPopup(void);
 };
 
-class MPLUGIN_PUBLIC TrackInfoPopup : public MusicCommon
+class MPLUGIN_PUBLIC TrackInfoPopup : public VisualizerView
 {
   Q_OBJECT
   public:
-    explicit TrackInfoPopup(MythScreenStack *parent)
-	: MusicCommon(parent, nullptr, "trackinfopopup") {}
+    TrackInfoPopup(MythScreenStack *parent)
+        : VisualizerView(parent, nullptr) {}
     ~TrackInfoPopup(void) override;
 
-    bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *event) override; // MusicCommon
+    bool Create(void) override; // VisualizerView
+    bool keyPressEvent(QKeyEvent *event) override; // VisualizerView
 
   protected:
     QTimer        *m_displayTimer {nullptr};
