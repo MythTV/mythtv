@@ -76,9 +76,7 @@ bool VisualizerView::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "INFO")
-        {
             showTrackInfoPopup();
-        }
         else
             handled = false;
     }
@@ -96,7 +94,7 @@ void VisualizerView::ShowMenu(void)
     auto *menu = new MythMenu(label, this, "menu");
 
     menu->AddItem(tr("Change Visualizer"), nullptr, createVisualizerMenu());
-    menu->AddItem(tr("Show Track Info"), &VisualizerView::showTrackInfoPopup);
+    menu->AddItem(tr("Show Track Info"), &showTrackInfoPopup);
     menu->AddItem(tr("Other Options"), nullptr, createMainMenu());
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -115,13 +113,10 @@ void VisualizerView::showTrackInfoPopup(void)
 
     auto *popup = new TrackInfoPopup(popupStack);
 
-    if (!popup->Create())
-    {
+    if (popup->Create())
+        popupStack->AddScreen(popup);
+    else
         delete popup;
-        return;
-    }
-
-    popupStack->AddScreen(popup);
 }
 
 //---------------------------------------------------------
@@ -204,9 +199,29 @@ bool TrackInfoPopup::keyPressEvent(QKeyEvent *event)
             Close();
         else if (action == "INFO")
             showTrackInfo(gPlayer->getCurrentMetadata());
+        else if (action == "MENU")
+        {
+            // menu over info misbehaves: if we close after 8 seconds,
+            // then menu seg faults!  We could workaround that by
+            // canceling our timer as shown here, but menu fails to
+            // get the visualizer list (how does m_visualModes.count()
+            // == 0?)  So just doing nothing forces user to ESCAPE out
+            // of info to get to the working menu.  -twitham
+
+            // if (m_displayTimer)
+            // {
+            //     m_displayTimer->stop();
+            //     delete m_displayTimer;
+            //     m_displayTimer = nullptr;
+            // }
+            // handled = false;
+        }
         else
             handled = false;
     }
+    // keep info up while seeking, theme should show progressbar/time
+    if (m_displayTimer)
+        m_displayTimer->start(MUSICINFOPOPUPTIME);
 
     if (!handled && MusicCommon::keyPressEvent(event))
         handled = true;
