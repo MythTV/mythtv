@@ -329,7 +329,7 @@ QString CommandLineArg::GetKeywordString(void) const
 {
     // this may cause problems if the terminal is too narrow, or if too
     // many keywords for the same argument are used
-    return m_keywords.join(" OR ");
+    return m_keywords.join(", ");
 }
 
 /** \brief Return length of full keyword string for use in determining indent
@@ -411,6 +411,7 @@ QString CommandLineArg::GetHelpString(int off, const QString& group, bool force)
     // print the first line with the available keywords
     QStringList hlist = m_help.split('\n');
     wrapList(hlist, termwidth-off);
+    msg << "  ";
     if (!m_parents.isEmpty())
         msg << "  ";
     msg << GetKeywordString().leftJustified(off, ' ')
@@ -1438,9 +1439,9 @@ QString MythCommandLineParser::GetHelpString(void) const
         for (const auto & group : qAsConst(groups))
         {
             if (group.isEmpty())
-                msg << "Misc. Options:" << QT_ENDL;
+                msg << "Misc. Options:" << QT_ENDL << QT_ENDL;
             else
-                msg << group.toLocal8Bit().constData() << " Options:" << QT_ENDL;
+                msg << group.toLocal8Bit().constData() << " Options:" << QT_ENDL << QT_ENDL;
 
             for (auto * cmdarg : qAsConst(m_namedArgs))
                 msg << cmdarg->GetHelpString(maxlen, group);
