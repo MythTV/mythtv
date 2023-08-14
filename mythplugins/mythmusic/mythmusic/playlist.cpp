@@ -680,13 +680,14 @@ void Playlist::fillSongsFromSonglist(const QString& songList)
         gPlayer->activePlaylistChanged(-1, false);
 }
 
-void Playlist::fillSonglistFromQuery(const QString& whereClause,
-                                     bool removeDuplicates,
-                                     InsertPLOption insertOption,
-                                     int currentTrackID)
+int Playlist::fillSonglistFromQuery(const QString& whereClause,
+                                    bool removeDuplicates,
+                                    InsertPLOption insertOption,
+                                    int currentTrackID)
 {
     QString orig_songlist = toRawSonglist();
     QString new_songlist;
+    int added = 0;
 
     disableSaves();
     removeAllTracks();
@@ -716,17 +717,18 @@ void Playlist::fillSonglistFromQuery(const QString& whereClause,
         fillSongsFromSonglist(new_songlist);
         enableSaves();
         changed();
-        return;
+        return 0;
     }
 
     while (query.next())
     {
         new_songlist += "," + query.value(0).toString();
+        added++;
     }
     new_songlist.remove(0, 1);
 
     if (removeDuplicates && insertOption != PL_REPLACE)
-        new_songlist = removeDuplicateTracks(orig_songlist, new_songlist);
+        orig_songlist = removeDuplicateTracks(new_songlist, orig_songlist);
 
     switch (insertOption)
     {
@@ -777,13 +779,14 @@ void Playlist::fillSonglistFromQuery(const QString& whereClause,
 
     enableSaves();
     changed();
+    return added;
 }
 
 // songList is a list of trackIDs to add
-void Playlist::fillSonglistFromList(const QList<int> &songList,
-                                    bool removeDuplicates,
-                                    InsertPLOption insertOption,
-                                    int currentTrackID)
+int Playlist::fillSonglistFromList(const QList<int> &songList,
+                                   bool removeDuplicates,
+                                   InsertPLOption insertOption,
+                                   int currentTrackID)
 {
     QString orig_songlist = toRawSonglist();
     QString new_songlist;
@@ -799,7 +802,7 @@ void Playlist::fillSonglistFromList(const QList<int> &songList,
     new_songlist.remove(0, 1);
 
     if (removeDuplicates && insertOption != PL_REPLACE)
-        new_songlist = removeDuplicateTracks(orig_songlist, new_songlist);
+        orig_songlist = removeDuplicateTracks(new_songlist, orig_songlist);
 
     switch (insertOption)
     {
@@ -851,6 +854,7 @@ void Playlist::fillSonglistFromList(const QList<int> &songList,
     enableSaves();
 
     changed();
+    return songList.count();
 }
 
 QString Playlist::toRawSonglist(bool shuffled, bool tracksOnly)
@@ -892,10 +896,10 @@ QString Playlist::toRawSonglist(bool shuffled, bool tracksOnly)
     return rawList;
 }
 
-void Playlist::fillSonglistFromSmartPlaylist(const QString& category, const QString& name,
-                                             bool removeDuplicates,
-                                             InsertPLOption insertOption,
-                                             int currentTrackID)
+int Playlist::fillSonglistFromSmartPlaylist(const QString& category, const QString& name,
+                                            bool removeDuplicates,
+                                            InsertPLOption insertOption,
+                                            int currentTrackID)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -905,7 +909,7 @@ void Playlist::fillSonglistFromSmartPlaylist(const QString& category, const QStr
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("Cannot find Smartplaylist Category: %1") .arg(category));
-        return;
+        return 0;
     }
 
     // find smartplaylist
@@ -934,13 +938,13 @@ void Playlist::fillSonglistFromSmartPlaylist(const QString& category, const QStr
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("Cannot find smartplaylist: %1").arg(name));
-            return;
+            return 0;
         }
     }
     else
     {
         MythDB::DBError("Find SmartPlaylist", query);
-        return;
+        return 0;
     }
 
     // get smartplaylist items
@@ -980,8 +984,8 @@ void Playlist::fillSonglistFromSmartPlaylist(const QString& category, const QStr
     if (limitTo > 0)
         whereClause +=  " LIMIT " + QString::number(limitTo);
 
-    fillSonglistFromQuery(whereClause, removeDuplicates,
-                          insertOption, currentTrackID);
+    return fillSonglistFromQuery(whereClause, removeDuplicates,
+                                 insertOption, currentTrackID);
 }
 
 void Playlist::changed(void)

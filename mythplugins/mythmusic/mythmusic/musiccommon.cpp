@@ -1530,8 +1530,9 @@ void MusicCommon::customEvent(QEvent *event)
             else if (resulttext == tr("Play Now"))
             {               // cancel shuffles and repeats to play now
                 gPlayer->setShuffleMode(MusicPlayer::SHUFFLE_OFF);
+                updateShuffleMode();
                 gPlayer->setRepeatMode(MusicPlayer::REPEAT_OFF);
-                updateShuffleMode(true);
+                updateRepeatMode();
                 m_playlistOptions.insertPLOption = PL_INSERTATEND;
                 m_playlistOptions.playPLOption = PL_FIRSTNEW;
                 doUpdatePlaylist();
@@ -2540,11 +2541,8 @@ void MusicCommon::showPlaylistOptionsMenu(bool addMainMenu)
 void MusicCommon::doUpdatePlaylist(void)
 {
     int curTrackID = -1;
-    int trackCount = 0;
+    int added = 0;
     int curPos = gPlayer->getCurrentTrackPos();
-
-    if (gPlayer->getCurrentPlaylist())
-        trackCount = gPlayer->getCurrentPlaylist()->getTrackCount();
 
     // store id of current track
     if (gPlayer->getCurrentMetadata())
@@ -2553,16 +2551,16 @@ void MusicCommon::doUpdatePlaylist(void)
     if (!m_whereClause.isEmpty())
     {
         // update playlist from quick playlist
-        gMusicData->m_all_playlists->getActive()->fillSonglistFromQuery(
-            m_whereClause, false, // play now must be able to repeat songs
+        added = gMusicData->m_all_playlists->getActive()->fillSonglistFromQuery(
+            m_whereClause, true,
             m_playlistOptions.insertPLOption, curTrackID);
         m_whereClause.clear();
     }
     else if (!m_songList.isEmpty())
     {
         // update playlist from song list (from the playlist editor)
-        gMusicData->m_all_playlists->getActive()->fillSonglistFromList(
-            m_songList, false, // play now must be able to repeat songs
+        added = gMusicData->m_all_playlists->getActive()->fillSonglistFromList(
+            m_songList, true,
             m_playlistOptions.insertPLOption, curTrackID);
 
         m_songList.clear();
@@ -2601,7 +2599,7 @@ void MusicCommon::doUpdatePlaylist(void)
                     case PL_INSERTATEND:
                     {
                         pause();
-                        if (!gPlayer->setCurrentTrackPos(trackCount))
+                        if (!gPlayer->setCurrentTrackPos(gPlayer->getCurrentPlaylist()->getTrackCount() - added))
                             playFirstTrack();
                         break;
                     }
