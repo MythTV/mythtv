@@ -773,7 +773,7 @@
         </textarea>
 
         <textarea name="playlisttime" from="basetextarea">
-            <area>210,0,230,30</area>
+            <area>200,0,240,30</area>
             <font>basesmall</font>
             <align>right,top</align>
         </textarea>
