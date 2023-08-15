@@ -497,7 +497,7 @@
             <position>340,170</position>
         </textarea>
 
-        <statetype name="ratingstate" from="baseratingstate">
+        <statetype name="ratingstate" from="baseratingstate" depends="!channel">
             <position>180,115</position>
         </statetype>
 
