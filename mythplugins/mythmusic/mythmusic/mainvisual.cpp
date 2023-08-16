@@ -214,8 +214,15 @@ void MainVisual::timeout()
         std::chrono::milliseconds timestamp = gPlayer->getOutput()->GetAudiotime();
         while (m_nodes.size() > 1)
         {
-            if (m_nodes.first()->m_offset > timestamp)
-                break;
+            // LOG(VB_PLAYBACK, LOG_DEBUG,
+            //  QString("\tMV %1 first > %2 timestamp").
+            //  arg(m_nodes.first()->m_offset.count()).arg(timestamp.count()));
+            if (m_nodes.first()->m_offset >= timestamp + 5s)
+            {
+                // REW seek: drain buffer and start over
+            }
+            else if (m_nodes.first()->m_offset > timestamp)
+                break;          // at current time
 
             if (m_vis)
                 m_vis->processUndisplayed(m_nodes.first());
