@@ -16,35 +16,37 @@
 #include "libmythbase/mythrandom.h"
 #include "libmythbase/mythtimer.h"
 
+#include "cardutil.h"
 #include "channelutil.h"
 #include "eithelper.h"
 #include "eitscanner.h"
 #include "recorders/channelbase.h"
 #include "scheduledrecording.h"
+#include "sourceutil.h"
 #include "tv_rec.h"
 
-#define LOC QString("EITScanner: ")
-#define LOC_ID QString("EITScanner[%1]: ").arg(m_cardnum)
+#define LOC QString("EITScanner[%1]: ").arg(m_cardnum)
 
 /** \class EITScanner
  *  \brief Acts as glue between ChannelBase, EITSource and EITHelper.
  *
  *   This is the class where the "EIT Crawl" is implemented.
- *
  */
 EITScanner::EITScanner(uint cardnum)
     : m_eitHelper(new EITHelper(cardnum)),
       m_eventThread(new MThread("EIT", this)),
-      m_activeScanNextChanIndex(MythRandom()),
       m_cardnum(cardnum)
 {
     QStringList langPref = iso639_get_language_list();
     m_eitHelper->SetLanguagePreferences(langPref);
 
-    LOG(VB_EIT, LOG_INFO, LOC_ID + "Start EIT scanner thread");
+    LOG(VB_EIT, LOG_INFO, LOC + "Start EIT scanner thread");
     m_eventThread->start(QThread::IdlePriority);
 }
 
+/** \fn EITScanner::TeardownAll(void)
+ *  \brief Stop active scan, delete thread and delete eithelper.
+ */
 void EITScanner::TeardownAll(void)
 {
     StopActiveScan();
@@ -66,8 +68,8 @@ void EITScanner::TeardownAll(void)
     }
 }
 
-/**
- *  \brief This runs the event loop for EITScanner until 'exitThread' is true.
+/** \fn EITScanner::run(void)
+ *  \brief This runs the event loop for EITScanner until 'm_exitThread' is true.
  */
 void EITScanner::run(void)
 {
@@ -79,13 +81,8 @@ void EITScanner::run(void)
     while (!m_exitThread)
     {
         m_lock.unlock();
+
         uint list_size = m_eitHelper->GetListSize();
-
-        m_lock.lock();
-        if (m_eitSource)
-            m_eitSource->SetEITRate(1.0F);
-        m_lock.unlock();
-
         if (list_size)
         {
             eitCount += m_eitHelper->ProcessEvents();
@@ -98,7 +95,7 @@ void EITScanner::run(void)
         if (!m_activeScan && eitCount && (t.elapsed() > 60s))
         {
             LOG(VB_EIT, LOG_INFO,
-                LOC_ID + QString("Added %1 EIT events in passive scan").arg(eitCount));
+                LOC + QString("Added %1 EIT events in passive scan").arg(eitCount));
             eitCount = 0;
             RescheduleRecordings();
         }
@@ -110,7 +107,7 @@ void EITScanner::run(void)
             if (eitCount)
             {
                 LOG(VB_EIT, LOG_INFO,
-                    LOC_ID + QString("Added %1 EIT events in active scan").arg(eitCount));
+                    LOC + QString("Added %1 EIT events in active scan").arg(eitCount));
                 eitCount = 0;
                 RescheduleRecordings();
             }
@@ -118,7 +115,6 @@ void EITScanner::run(void)
             if (m_activeScanNextChan == m_activeScanChannels.end())
             {
                 m_activeScanNextChan = m_activeScanChannels.begin();
-                m_activeScanNextChanIndex = 0;
             }
 
             if (!(*m_activeScanNextChan).isEmpty())
@@ -126,24 +122,22 @@ void EITScanner::run(void)
                 EITHelper::WriteEITCache();
                 if (m_rec->QueueEITChannelChange(*m_activeScanNextChan))
                 {
-                    m_eitHelper->SetChannelID(ChannelUtil::GetChanID(
-                        m_rec->GetSourceID(), *m_activeScanNextChan));
-                    LOG(VB_EIT, LOG_INFO, LOC_ID +
-                        QString("Next looking for EIT data on multiplex of channel %1 of source %2")
-                        .arg(*m_activeScanNextChan).arg(m_rec->GetSourceID()));
+                    uint sourceid = m_rec->GetSourceID();
+                    uint chanid = ChannelUtil::GetChanID(sourceid, *m_activeScanNextChan);
+                    m_eitHelper->SetChannelID(chanid);
+
+                    uint mplexid = ChannelUtil::GetMplexID(chanid);
+                    QString sourcename = SourceUtil::GetSourceName(sourceid);
+                    LOG(VB_EIT, LOG_INFO, LOC +
+                        QString("Next EIT active scan source %1 '%2' multiplex %3 chanid %4 channel %5")
+                            .arg(sourceid).arg(sourcename).arg(mplexid).arg(chanid).arg(*m_activeScanNextChan));
                 }
             }
 
-            m_activeScanNextTrig = MythDate::current()
-                .addSecs(m_activeScanTrigTime.count());
-            if (!m_activeScanChannels.empty())
-            {
-                ++m_activeScanNextChan;
-                m_activeScanNextChanIndex =
-                    (m_activeScanNextChanIndex+1) % m_activeScanChannels.size();
-            }
+            m_activeScanNextTrig = MythDate::current().addSecs(m_activeScanTrigTime.count());
+            m_activeScanNextChan++;
 
-            // 24 hours ago
+            // Remove all EIT cache entries that are more than 24 hours old
             EITHelper::PruneEITCache(m_activeScanNextTrig.toSecsSinceEpoch() - 86400);
         }
 
@@ -176,7 +170,7 @@ void EITScanner::RescheduleRecordings(void)
     m_eitHelper->RescheduleRecordings();
 }
 
-/** \fn EITScanner::StartEITEventProcessing(ChannelBase*, EITSource*, bool)
+/** \fn EITScanner::StartEITEventProcessing(ChannelBase*, EITSource*)
  *  \brief Start inserting Event Information Tables from the multiplex
  *         we happen to be tuned to into the database.
  */
@@ -191,21 +185,24 @@ void EITScanner::StartEITEventProcessing(ChannelBase *channel,
     m_eitSource->SetEITHelper(m_eitHelper);
     m_eitSource->SetEITRate(1.0F);
     int chanid = m_channel->GetChanID();
+    QString channum = m_channel->GetChannelName();
     if (chanid > 0)
     {
+        uint sourceid = m_channel->GetSourceID();
+        uint mplexid = ChannelUtil::GetMplexID(chanid);
+        QString sourcename = SourceUtil::GetSourceName(sourceid);
         m_eitHelper->SetChannelID(chanid);
-        m_eitHelper->SetSourceID(ChannelUtil::GetSourceIDForChannel(chanid));
-        LOG(VB_EIT, LOG_INFO, LOC_ID +
-            QString("Start processing EIT events in %1 scan for channel %2 chanid %3")
-                .arg(m_activeScan ? "active" : "passive",
-                     m_channel->GetChannelName(),
-                     QString::number(chanid)));
+        m_eitHelper->SetSourceID(sourceid);
+        LOG(VB_EIT, LOG_INFO, LOC +
+            QString("Start EIT %1 scan source %2 '%3' multiplex %4 chanid %5 channel %6")
+                .arg(m_activeScan ? "active" : "passive").arg(sourceid).arg(sourcename)
+                .arg(mplexid).arg(chanid).arg(channum));
     }
     else
     {
-        LOG(VB_EIT, LOG_INFO, LOC_ID +
-            QString("Failed to start processing EIT events, invalid chanid:%1")
-                .arg(chanid));
+        LOG(VB_EIT, LOG_INFO, LOC +
+            QString("Failed to start EIT scan, invalid chanid %1 channum %2")
+                .arg(chanid).arg(channum));
     }
 }
 
@@ -226,31 +223,37 @@ void EITScanner::StopEITEventProcessing(void)
     EITHelper::WriteEITCache();
     m_eitHelper->SetChannelID(0);
     m_eitHelper->SetSourceID(0);
-    LOG(VB_EIT, LOG_INFO, LOC_ID +
-        QString("Stop processing EIT events in %1 scan")
+    LOG(VB_EIT, LOG_INFO, LOC +
+        QString("Stop EIT %1 scan")
             .arg(m_activeScanStopped ? "passive" : "active"));
 }
 
+/** \fn EITScanner::StartActiveScan(TVRec *rec, std::chrono::seconds)
+ *  \brief Start active EIT scan.
+ */
 void EITScanner::StartActiveScan(TVRec *rec, std::chrono::seconds max_seconds_per_source)
 {
     m_rec = rec;
 
     if (m_activeScanChannels.isEmpty())
     {
-        // TODO get input name and use it in crawl.
+        // Create a channel list with one channel from each multiplex
+        // from the video source connected to this input.
+        // This list is then used in the EIT crawl so that all
+        // available multiplexes are visited in turn.
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(
             "SELECT channum, MIN(chanid) "
             "FROM channel, capturecard, videosource "
-            "WHERE deleted              IS NULL            AND "
-            "      capturecard.sourceid = channel.sourceid AND "
-            "      videosource.sourceid = channel.sourceid AND "
-            "      channel.mplexid        IS NOT NULL      AND "
-            "      visible              > 0                AND "
-            "      useonairguide        = 1                AND "
-            "      useeit               = 1                AND "
-            "      channum             != ''               AND "
-            "      capturecard.cardid   = :CARDID "
+            "WHERE capturecard.sourceid  = channel.sourceid AND "
+            "      videosource.sourceid  = channel.sourceid AND "
+            "      channel.deleted       IS NULL            AND "
+            "      channel.mplexid       IS NOT NULL        AND "
+            "      channel.visible       > 0                AND "
+            "      channel.useonairguide = 1                AND "
+            "      channel.channum      != ''               AND "
+            "      videosource.useeit    = 1                AND "
+            "      capturecard.cardid    = :CARDID "
             "GROUP BY mplexid "
             "ORDER BY capturecard.sourceid, mplexid, "
             "         atsc_major_chan, atsc_minor_chan ");
@@ -268,9 +271,13 @@ void EITScanner::StartActiveScan(TVRec *rec, std::chrono::seconds max_seconds_pe
         m_activeScanNextChan = m_activeScanChannels.begin();
     }
 
-    LOG(VB_EIT, LOG_INFO, LOC_ID +
-        QString("StartActiveScan called with %1 multiplexes")
-            .arg(m_activeScanChannels.size()));
+    {
+        uint sourceid = m_rec->GetSourceID();
+        QString sourcename = SourceUtil::GetSourceName(sourceid);
+        LOG(VB_EIT, LOG_INFO, LOC +
+            QString("StartActiveScan for source %1 '%2' with %3 multiplexes")
+                .arg(sourceid).arg(sourcename).arg(m_activeScanChannels.size()));
+    }
 
     // Start at a random channel. This is so that multiple cards with
     // the same source don't all scan the same channels in the same
@@ -281,15 +288,15 @@ void EITScanner::StartActiveScan(TVRec *rec, std::chrono::seconds max_seconds_pe
         // next channel.  This makes sure the immediately following
         // channels get scanned in a timely manner if we keep erroring
         // out on the previous channel.
-        m_activeScanNextChanIndex =
-            (m_activeScanNextChanIndex+1) % m_activeScanChannels.size();
-        m_activeScanNextChan =
-            m_activeScanChannels.begin() + m_activeScanNextChanIndex;
+        auto nextChanIndex = MythRandom() % m_activeScanChannels.size();
+        m_activeScanNextChan = m_activeScanChannels.begin() + nextChanIndex;
 
+        // Start scan now
         m_activeScanNextTrig = MythDate::current();
-        m_activeScanTrigTime = max_seconds_per_source;
+
         // Add a little randomness to trigger time so multiple
         // cards will have a staggered channel changing time.
+        m_activeScanTrigTime = max_seconds_per_source;
         m_activeScanTrigTime += std::chrono::seconds(MythRandom(0, 28));
 
         m_activeScanStopped = false;
@@ -297,6 +304,9 @@ void EITScanner::StartActiveScan(TVRec *rec, std::chrono::seconds max_seconds_pe
     }
 }
 
+/** \fn EITScanner::StopActiveScan(void)
+ *  \brief Stop active EIT scan.
+ */
 void EITScanner::StopActiveScan(void)
 {
     QMutexLocker locker(&m_lock);
