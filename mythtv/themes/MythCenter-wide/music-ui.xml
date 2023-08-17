@@ -367,13 +367,14 @@
         <textarea name="year" from="basetextarea">
             <area>590,50,390,35</area>
             <font>basesmall</font>
-            <align>right,vcenter</align>
+            <align>right,top</align>
         </textarea>
         <textarea name="tracknum" from="year" depends="!channel">
             <position>590,80</position>
         </textarea>
         <textarea name="time" from="year" depends="!channel">
-            <position>590,115</position>
+            <position>810,115</position>
+            <align>left</align>
         </textarea>
         <textarea name="length" from="year" depends="!time">
             <position>590,115</position>
