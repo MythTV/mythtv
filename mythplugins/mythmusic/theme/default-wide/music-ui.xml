@@ -591,7 +591,8 @@
             <position>590,80</position>
         </textarea>
         <textarea name="time" from="year" depends="!channel">
-            <position>590,115</position>
+            <position>810,115</position>
+            <align>left</align>
         </textarea>
         <textarea name="length" from="year" depends="!time">
             <position>590,115</position>
