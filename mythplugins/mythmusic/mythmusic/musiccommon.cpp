@@ -1100,8 +1100,13 @@ void MusicCommon::seekforward()
 
 void MusicCommon::seekback()
 {
+    // I don't know why, but seeking before 00:05 fails.  Repeated
+    // rewind under 00:05 can hold time < 5s while the music plays.
+    // Time starts incrementing from zero but is now several seconds
+    // behind.  Finishing a track after this records a truncated
+    // length.  We can workaround this by limiting rewind to 1s.
     std::chrono::seconds nextTime = m_currentTime - 5s;
-    nextTime = std::clamp(nextTime, 0s, m_maxTime);
+    nextTime = std::clamp(nextTime, 1s, m_maxTime); // #787
     seek(nextTime);
 }
 
