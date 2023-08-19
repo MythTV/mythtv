@@ -37,10 +37,6 @@
 #include "musicplayer.h"
 #include "visualize.h"
 
-static constexpr int FFTW_N { 512 };
-// static_assert(FFTW_N==SAMPLES_DEFAULT_SIZE)
-
-
 VisFactory* VisFactory::g_pVisFactories = nullptr;
 
 VisualBase::VisualBase(bool screensaverenable)
@@ -172,6 +168,9 @@ void MelScale::setMax(int maxscale, int maxrange, int maxfreq)
 {
     if (maxscale == 0 || maxrange == 0 || maxfreq == 0)
         return;
+
+    m_s = maxscale;
+    m_r = maxrange;
 
     m_indices.clear();
     m_indices.resize(maxrange, 0);
@@ -1266,7 +1265,7 @@ static class SpectrumDetailFactory : public VisFactory
     const QString &name(void) const override // VisFactory
     {
         static QString s_name = QCoreApplication::translate("Visualizers",
-                                                            "SpectrumDetail");
+                                                            "Spectrum");
         return s_name;
     }
 
@@ -1290,19 +1289,19 @@ Spectrum::Spectrum()
 {
     LOG(VB_GENERAL, LOG_INFO, QString("Spectrum : Being Initialised"));
 
-    m_fps = 15;
+    m_fps = 40;         // getting 1152 samples / 44100 = 38.28125 fps
 
-    m_dftL = static_cast<FFTComplex*>(av_malloc(sizeof(FFTComplex) * FFTW_N));
-    m_dftR = static_cast<FFTComplex*>(av_malloc(sizeof(FFTComplex) * FFTW_N));
+    m_dftL = static_cast<FFTSample*>(av_malloc(sizeof(FFTSample) * m_fftlen));
+    m_dftR = static_cast<FFTSample*>(av_malloc(sizeof(FFTSample) * m_fftlen));
 
-    m_fftContextForward = av_fft_init(std::log2(FFTW_N), 0);
+    m_rdftContext = av_rdft_init(std::log2(m_fftlen), DFT_R2C);
 }
 
 Spectrum::~Spectrum()
 {
     av_freep(&m_dftL);
     av_freep(&m_dftR);
-    av_fft_end(m_fftContextForward);
+    av_rdft_end(m_rdftContext);
 }
 
 void Spectrum::resize(const QSize &newsize)
@@ -1315,19 +1314,23 @@ void Spectrum::resize(const QSize &newsize)
 
     m_size = newsize;
 
-    m_analyzerBarWidth = m_size.width() / 64;
+    m_analyzerBarWidth = m_size.width() / 128;
 
     if (m_analyzerBarWidth < 6)
         m_analyzerBarWidth = 6;
 
-    m_scale.setMax(192, m_size.width() / m_analyzerBarWidth);
+    m_scale.setMax(m_fftlen/2, m_size.width() / m_analyzerBarWidth, 44100/2);
+    m_sigL.resize(m_fftlen);
+    m_sigR.resize(m_fftlen);
 
-    m_rects.resize( m_scale.range() );
+    m_rectsL.resize( m_scale.range() );
+    m_rectsR.resize( m_scale.range() );
     int w = 0;
     // NOLINTNEXTLINE(modernize-loop-convert)
-    for (uint i = 0; i < (uint)m_rects.size(); i++, w += m_analyzerBarWidth)
+    for (uint i = 0; i < (uint)m_rectsL.size(); i++, w += m_analyzerBarWidth)
     {
-        m_rects[i].setRect(w, m_size.height() / 2, m_analyzerBarWidth - 1, 1);
+        m_rectsL[i].setRect(w, m_size.height() / 2, m_analyzerBarWidth - 1, 1);
+        m_rectsR[i].setRect(w, m_size.height() / 2, m_analyzerBarWidth - 1, 1);
     }
 
     m_magnitudes.resize( m_scale.range() * 2 );
@@ -1337,63 +1340,80 @@ void Spectrum::resize(const QSize &newsize)
         m_magnitudes[os] = 0.0;
     }
 
-    m_scaleFactor = ( static_cast<double>(m_size.height()) / 2.0 ) /
-                    log( static_cast<double>(FFTW_N) );
+    m_scaleFactor = m_size.height() / 2 / 42;
 }
 
 // this moved up to Spectrogram so both can use it
 // template<typename T> T sq(T a) { return a*a; };
 
-bool Spectrum::process(VisualNode *node)
+bool Spectrum::process(VisualNode */*node*/)
 {
-    // Take a bunch of data in *node
-    // and break it down into spectrum
-    // values
-    [[maybe_unused]] bool allZero = true;
+    return false;
+}
+
+bool Spectrum::processUndisplayed(VisualNode *node)
+{
+    // copied from Spectrogram for better FFT window
+
+    if (node)     // shift previous samples left, then append new node
+    {
+        int i = node->m_length;
+        // LOG(VB_PLAYBACK, LOG_DEBUG, QString("SG got %1 samples").arg(i));
+        (i <= m_fftlen) || (i = m_fftlen);
+        int start = m_fftlen - i;
+        float mult = 0.8F;      // decay older sound by this much
+        for (int k = 0; k < start; k++)
+        {
+            if (k > start - i)  // prior set ramps from mult to 1.0
+            {
+                mult = mult + (1 - mult) * (1 - (start - k) / (start - i));
+            }
+            m_sigL[k] = mult * m_sigL[i + k];
+            m_sigR[k] = mult * m_sigR[i + k];
+        }
+        for (uint k = 0; k < node->m_length; k++) // append current samples
+        {
+            m_sigL[start + k] = node->m_left[k] / 32768.; // +/- 1 peak-to-peak
+            if (node->m_right)
+                m_sigR[start + k] = node->m_right[k] / 32768.;
+        }
+        int end = m_fftlen / 40; // ramp window ends down to zero crossing
+        for (int k = 0; k < m_fftlen; k++)
+        {
+            mult = k < end ? k / end : k > m_fftlen - end ?
+                (m_fftlen - k) / end : 1;
+            m_dftL[k] = m_sigL[k] * mult;
+            m_dftR[k] = m_sigR[k] * mult;
+        }
+    }
+    av_rdft_calc(m_rdftContext, m_dftL); // run the real FFT!
+    av_rdft_calc(m_rdftContext, m_dftR);
 
     uint i = 0;
     long w = 0;
-    QRect *rectsp = m_rects.data();
-    double *magnitudesp = m_magnitudes.data();
+    QRect *rectspL = m_rectsL.data();
+    QRect *rectspR = m_rectsR.data();
+    float *magnitudesp = m_magnitudes.data();
 
-    if (node)
+    int index = 1;              // frequency index of this pixel
+    int prev = 0;               // frequency index of previous pixel
+    float adjHeight = m_size.height() / 2.0;
+
+    for (i = 0; (int)i < m_rectsL.size(); i++, w += m_analyzerBarWidth)
     {
-        i = node->m_length;
-        if (i > FFTW_N)
-            i = FFTW_N;
-        for (unsigned long k = 0; k < node->m_length; k++)
-        {
-            m_dftL[k] = (FFTComplex){ .re = (FFTSample)node->m_left[k], .im = 0 };
-            if (node->m_right)
-                m_dftR[k] = (FFTComplex){ .re = (FFTSample)node->m_right[k], .im = 0 };
+        float magL = 0;         // modified from Spectrogram
+        float magR = 0;
+        float tmp = 0;
+        for (auto j = prev + 1; j <= index; j++) // log scale!
+        {    // for the freqency bins of this pixel, find peak or mean
+            tmp = sq(m_dftL[2 * j]) + sq(m_dftL[2 * j + 1]);
+            magL  = tmp > magL  ? tmp : magL;
+            tmp = sq(m_dftR[2 * j]) + sq(m_dftR[2 * j + 1]);
+            magR = tmp > magR ? tmp : magR;
         }
-    }
+        magL = 10 * log10(magL) * m_scaleFactor;
+        magR = 10 * log10(magR) * m_scaleFactor;
 
-    for (auto k = i; k < FFTW_N; k++)
-    {
-        m_dftL[k] = (FFTComplex){ .re = 0, .im = 0 };
-        m_dftL[k] = (FFTComplex){ .re = 0, .im = 0 };
-    }
-    av_fft_permute(m_fftContextForward, m_dftL);
-    av_fft_calc(m_fftContextForward, m_dftL);
-
-    av_fft_permute(m_fftContextForward, m_dftR);
-    av_fft_calc(m_fftContextForward, m_dftR);
-
-    long index = 1;
-
-    for (i = 0; (int)i < m_rects.size(); i++, w += m_analyzerBarWidth)
-    {
-        // The 1D output is Hermitian symmetric (Yk = Yn-k) so Yn = Y0 etc.
-        // The dft_r2c_1d plan doesn't output these redundant values
-        // and furthermore they're not allocated in the ctor
-        double tmp = 2 * sq(m_dftL[index].re);
-        double magL = (tmp > 1.) ? (log(tmp) - 22.0) * m_scaleFactor : 0.;
-
-        tmp = 2 * sq(m_dftR[index].re);
-        double magR = (tmp > 1.) ? (log(tmp) - 22.0) * m_scaleFactor : 0.;
-
-        double adjHeight = static_cast<double>(m_size.height()) / 2.0;
         if (magL > adjHeight)
         {
             magL = adjHeight;
@@ -1407,9 +1427,9 @@ bool Spectrum::process(VisualNode *node)
             }
             magL = tmp;
         }
-        if (magL < 1.)
+        if (magL < 1)
         {
-            magL = 1.;
+            magL = 1;
         }
 
         if (magR > adjHeight)
@@ -1425,22 +1445,19 @@ bool Spectrum::process(VisualNode *node)
             }
             magR = tmp;
         }
-        if (magR < 1.)
+        if (magR < 1)
         {
-            magR = 1.;
-        }
-
-        if (magR != 1 || magL != 1)
-        {
-            allZero = false;
+            magR = 1;
         }
 
         magnitudesp[i] = magL;
         magnitudesp[i + m_scale.range()] = magR;
-        rectsp[i].setTop( m_size.height() / 2 - int( magL ) );
-        rectsp[i].setBottom( m_size.height() / 2 + int( magR ) );
+        rectspL[i].setTop( m_size.height() / 2 - int( magL ) );
+        rectspR[i].setBottom( m_size.height() / 2 + int( magR ) );
 
-        index = m_scale[i];
+        prev = index;           // next pixel is FFT bins from here
+        index = m_scale[i];     // to the next bin by LOG scale
+        (prev < index) || (prev = index -1);
     }
 
     return false;
@@ -1463,12 +1480,13 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
     // just uses some Qt methods to draw on a pixmap.
     // MainVisual then bitblts that onto the screen.
 
-    QRect *rectsp = m_rects.data();
+    QRect *rectspL = m_rectsL.data();
+    QRect *rectspR = m_rectsR.data();
 
     p->fillRect(0, 0, m_size.width(), m_size.height(), back);
-    for (uint i = 0; i < (uint)m_rects.size(); i++)
+    for (uint i = 0; i < (uint)m_rectsL.size(); i++)
     {
-        double per = double( rectsp[i].height() - 2 ) / double( m_size.height() );
+        double per = ( rectspL[i].height() - 2. ) / (m_size.height() / 2.);
 
         per = clamp(per, 1.0, 0.0);
 
@@ -1483,8 +1501,26 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
         g = clamp(g, 255.0, 0.0);
         b = clamp(b, 255.0, 0.0);
 
-        if(rectsp[i].height() > 4)
-            p->fillRect(rectsp[i], QColor(int(r), int(g), int(b)));
+        if(rectspL[i].height() > 4)
+            p->fillRect(rectspL[i], QColor(int(r), int(g), int(b)));
+
+        per = ( rectspR[i].height() - 2. ) / (m_size.height() / 2.);
+
+        per = clamp(per, 1.0, 0.0);
+
+        r = m_startColor.red() +
+            (m_targetColor.red() - m_startColor.red()) * (per * per);
+        g = m_startColor.green() +
+            (m_targetColor.green() - m_startColor.green()) * (per * per);
+        b = m_startColor.blue() +
+            (m_targetColor.blue() - m_startColor.blue()) * (per * per);
+
+        r = clamp(r, 255.0, 0.0);
+        g = clamp(g, 255.0, 0.0);
+        b = clamp(b, 255.0, 0.0);
+
+        if(rectspR[i].height() > 4)
+            p->fillRect(rectspR[i], QColor(int(r), int(g), int(b)));
     }
 
     return true;
@@ -1496,7 +1532,7 @@ static class SpectrumFactory : public VisFactory
     const QString &name(void) const override // VisFactory
     {
         static QString s_name = QCoreApplication::translate("Visualizers",
-                                                            "Spectrum");
+                                                            "SpectrumBars");
         return s_name;
     }
 
@@ -1531,7 +1567,7 @@ void Squares::resize (const QSize &newsize) {
 void Squares::drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h)
 {
     double per = NAN;
-    int correction = (m_actualSize.width() % m_rects.size ()) / 2;
+    int correction = (m_actualSize.width() % m_rectsL.size ());
     int x = ((i / 2) * w) + correction;
     int y = 0;
 
@@ -1565,12 +1601,15 @@ void Squares::drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h)
 bool Squares::draw(QPainter *p, const QColor &back)
 {
     p->fillRect (0, 0, m_actualSize.width(), m_actualSize.height(), back);
-    int w = m_actualSize.width() / (m_rects.size() / 2);
+    int w = m_actualSize.width() / (m_rectsL.size() / 2);
     int h = w;
     int center = m_actualSize.height() / 2;
 
-    QRect *rectsp = m_rects.data();
-    for (uint i = 0; i < (uint)m_rects.size(); i++)
+    QRect *rectsp = m_rectsL.data();
+    for (uint i = 0; i < (uint)m_rectsL.size() * 2; i += 2)
+        drawRect(p, &(rectsp[i]), i, center, w, h);
+    rectsp = m_rectsR.data();
+    for (uint i = 1; i < (uint)m_rectsR.size() * 2 + 1; i += 2)
         drawRect(p, &(rectsp[i]), i, center, w, h);
 
     return true;

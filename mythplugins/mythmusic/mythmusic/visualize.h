@@ -199,6 +199,9 @@ class MelScale
   public:
     explicit MelScale(int maxscale = 0, int maxrange = 0, int maxfreq = 0);
 
+    int scale() const { return m_s; }
+    int range() const { return m_r; }
+
     void setMax(int maxscale, int maxrange, int maxfreq);
     double hz2mel(double hz);
     double mel2hz(double mel);
@@ -206,6 +209,8 @@ class MelScale
 
   private:
     std::vector<int> m_indices;
+    int  m_s       {0};
+    int  m_r       {0};
 };
 
 // Spectrogram - by twitham@sbcglobal.net, 2023/05
@@ -221,6 +226,7 @@ class Spectrogram : public VisualBase
 
     unsigned long getDesiredSamples(void) override;
     void resize(const QSize &size) override; // VisualBase
+    void FFT(VisualNode *node);
     bool processUndisplayed(VisualNode *node) override;
     bool process( VisualNode *node ) override;
     bool draw(QPainter *p, const QColor &back = Qt::black) override;
@@ -266,6 +272,7 @@ class Spectrum : public VisualBase
 
     void resize(const QSize &size) override; // VisualBase
     bool process(VisualNode *node) override; // VisualBase
+    bool processUndisplayed(VisualNode *node) override; // VisualBase
     bool draw(QPainter *p, const QColor &back = Qt::black) override; // VisualBase
     void handleKeyPress([[maybe_unused]] const QString &action) override {}; // VisualBase
 
@@ -274,20 +281,24 @@ class Spectrum : public VisualBase
 
     QColor             m_startColor       {Qt::blue};
     QColor             m_targetColor      {Qt::red};
-    QVector<QRect>     m_rects;
-    QVector<double>    m_magnitudes;
+    QVector<QRect>     m_rectsL;
+    QVector<QRect>     m_rectsR;
+    QVector<float>     m_magnitudes;
     QSize              m_size;
-    LogScale           m_scale;
+    MelScale           m_scale;
 
     // Setup the "magical" audio data transformations
     // provided by the Fast Fourier Transforms library
-    double             m_scaleFactor      {2.0};
-    double             m_falloff          {10.0};
+    float              m_scaleFactor      {2.0};
+    float              m_falloff          {10.0};
     int                m_analyzerBarWidth {6};
 
-    FFTComplex*        m_dftL              { nullptr };
-    FFTComplex*        m_dftR              { nullptr };
-    FFTContext*        m_fftContextForward { nullptr };
+    int            m_fftlen {16 * 1024}; // window width
+    QVector<float> m_sigL;               // decaying signal window
+    QVector<float> m_sigR;
+    FFTSample*     m_dftL { nullptr }; // real in, complex out
+    FFTSample*     m_dftR { nullptr };
+    RDFTContext*   m_rdftContext { nullptr };
 };
 
 class Squares : public Spectrum
