@@ -143,7 +143,7 @@ class MonoScope : public StereoScope
 class WaveForm : public StereoScope
 {
     static constexpr unsigned long kWFAudioSize { 4096 };
-    static QImage s_image;	// picture of full track
+    static QImage s_image;      // picture of full track
 
 public:
     WaveForm() = default;
@@ -180,8 +180,8 @@ class LogScale
   public:
     explicit LogScale(int maxscale = 0, int maxrange = 0);
 
-    int scale() const { return m_s; }
-    int range() const { return m_r; }
+    int scale() const { return m_scale; }
+    int range() const { return m_range; }
 
     void setMax(int maxscale, int maxrange);
 
@@ -190,8 +190,8 @@ class LogScale
 
   private:
     std::vector<int> m_indices;
-    int  m_s       {0};
-    int  m_r       {0};
+    int  m_scale       {0};
+    int  m_range       {0};
 };
 
 class MelScale
@@ -199,8 +199,8 @@ class MelScale
   public:
     explicit MelScale(int maxscale = 0, int maxrange = 0, int maxfreq = 0);
 
-    int scale() const { return m_s; }
-    int range() const { return m_r; }
+    int scale() const { return m_scale; }
+    int range() const { return m_range; }
 
     void setMax(int maxscale, int maxrange, int maxfreq);
     double hz2mel(double hz);
@@ -209,8 +209,8 @@ class MelScale
 
   private:
     std::vector<int> m_indices;
-    int  m_s       {0};
-    int  m_r       {0};
+    int  m_scale       {0};
+    int  m_range       {0};
 };
 
 // Spectrogram - by twitham@sbcglobal.net, 2023/05

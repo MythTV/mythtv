@@ -108,8 +108,8 @@ void LogScale::setMax(int maxscale, int maxrange)
     if (maxscale == 0 || maxrange == 0)
         return;
 
-    m_s = maxscale;
-    m_r = maxrange;
+    m_scale = maxscale;
+    m_range = maxrange;
 
     auto domain = (long double) maxscale;
     auto range  = (long double) maxrange;
@@ -169,8 +169,8 @@ void MelScale::setMax(int maxscale, int maxrange, int maxfreq)
     if (maxscale == 0 || maxrange == 0 || maxfreq == 0)
         return;
 
-    m_s = maxscale;
-    m_r = maxrange;
+    m_scale = maxscale;
+    m_range = maxrange;
 
     m_indices.clear();
     m_indices.resize(maxrange, 0);
