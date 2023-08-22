@@ -4,8 +4,8 @@
         <p>{{ 'dashboard.status.jobs_text' | translate }}:</p>
         <ul>
             <div *ngFor="let job of jobqueue">
-                <p>{{ utility.formatDate(job.StatusTime) }} {{ utility.formatTime(job.StatusTime) }} - {{ job.Program.Title }} - {{ JobTypeText(job.Type) }} -
-                    {{ 'dashboard.status.jobs_status' | translate }}: {{ JobStatusText(job.Status) }} </p>
+                <p>{{ utility.formatDate(job.StatusTime) }} {{ utility.formatTime(job.StatusTime) }} - {{ job.Program.Title }} - {{ job.LocalizedJobName }} -
+                    {{ 'dashboard.status.jobs_status' | translate }}: {{ job.LocalizedStatus }} </p>
                 <!-- Add details of failed job -->
             </div>
         </ul>
