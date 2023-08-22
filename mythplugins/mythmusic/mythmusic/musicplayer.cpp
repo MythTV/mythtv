@@ -891,7 +891,7 @@ void MusicPlayer::customEvent(QEvent *event)
         // update the current tracks time in the last played list
         if (m_playMode == PLAYMODE_RADIO)
         {
-            if (!m_playedList.isEmpty())
+            if (!m_playedList.isEmpty() && m_currentTime > 0s)
             {
                 m_playedList.last()->setLength(m_currentTime);
                 // this will update any track lengths displayed on screen
