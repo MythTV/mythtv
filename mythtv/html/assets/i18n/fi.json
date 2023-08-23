@@ -193,6 +193,9 @@
                 "minute": "Minuutti",
                 "minutes": "Pöytäkirja",
                 "myth_drive": "MythTV Drive",
+                "mythfill_last": "Viimeisin mythfilldatabase ajo alkoi {{GuideStart}} ja päättyi {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Ehdotettu seuraava mythfilldatabase ajo {{GuideNext}}.",
+                "mythfill_until": "Opasdataa on saatavilla {{GuideThru}} asti ({{GuideDays}} päivää).",
                 "none": "Konetietoja ei ole saatavilla",
                 "space_after_expire": "Tila käytettävissä automaattisen vanhenemisen jälkeen",
                 "space_deleted": "Poistettujen tallenteiden käyttämä tila",
@@ -203,6 +206,7 @@
                 "title": "Konetiedot",
                 "total_space": "Kokonaistila"
             },
+            "misc_title": "Sekalaista",
             "no_encoders": "Taustajärjestelmässä ei ole koodereita",
             "schedule_none": "Mitään ei ole suunniteltu tallennettavaksi",
             "schedule_text": "Seuraavat {{ length }} esitys(ä) jotka on ajoitettu tallennettavaksi.",

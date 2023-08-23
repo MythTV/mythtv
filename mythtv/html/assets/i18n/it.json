@@ -193,6 +193,9 @@
                 "minute": "Minuto",
                 "minutes": "Minuti",
                 "myth_drive": "Mito TV Drive",
+                "mythfill_last": "L'ultima esecuzione del database mythfill è iniziata il {{GuideStart}} ed è terminata il {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Prossima esecuzione suggerita di mythfilldatabase {{GuideNext}}.",
+                "mythfill_until": "Ci sono dati guida fino a {{GuideThru}} ({{GuideDays}} giorni).",
                 "none": "Nessuna informazione sulla macchina disponibile",
                 "space_after_expire": "Spazio disponibile dopo la scadenza automatica",
                 "space_deleted": "Spazio utilizzato dalle registrazioni eliminate",
@@ -203,6 +206,7 @@
                 "title": "Informazioni sulla macchina",
                 "total_space": "Spazio totale"
             },
+            "misc_title": "Varie",
             "no_encoders": "Il backend non ha codificatori",
             "schedule_none": "Niente da registrare",
             "schedule_text": "I prossimi {{ length }} spettacoli programmati per la registrazione.",

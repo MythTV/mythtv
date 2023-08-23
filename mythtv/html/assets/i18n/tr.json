@@ -193,6 +193,9 @@
                 "minute": "Dakika",
                 "minutes": "Dakika",
                 "myth_drive": "MythTV Sürücüsü",
+                "mythfill_last": "Son efsane doldurma veri tabanı çalıştırması {{GuideStart}} tarihinde başladı ve {{GuideEnd}}, {{GuideStatus}} tarihinde sona erdi",
+                "mythfill_next": "Önerilen bir sonraki mithfilldatabase çalıştırması {{GuideNext}}.",
+                "mythfill_until": "{{GuideThru}} ({{GuideDays}} gün) tarihine kadar kılavuz verileri var.",
                 "none": "Makine Bilgisi yok",
                 "space_after_expire": "Otomatik Süre Sonunun Ardından Kullanılabilir Alan",
                 "space_deleted": "Silinen Kayıtların Kullandığı Alan",
@@ -203,6 +206,7 @@
                 "title": "Makine Bilgisi",
                 "total_space": "Toplam alan"
             },
+            "misc_title": "Çeşitli",
             "no_encoders": "Arka uçta kodlayıcı yok",
             "schedule_none": "Kaydedilecek programlanmış bir şey yok",
             "schedule_text": "Kayıt için planlanan sonraki {{ length }} gösteri(ler).",

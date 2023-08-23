@@ -193,6 +193,9 @@
                 "minute": "Minute",
                 "minutes": "Minutes",
                 "myth_drive": "MythTV Drive",
+                "mythfill_last": "Last mythfilldatabase run started on {{GuideStart}} and ended on {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Suggested next mythfilldatabase run {{GuideNext}}.",
+                "mythfill_until": "There's guide data until {{GuideThru}} ({{GuideDays}} days).",
                 "none": "No Machine Info available",
                 "space_after_expire": "Space Available after Auto-expire",
                 "space_deleted": "Space Used by Deleted Recordings",
@@ -203,6 +206,7 @@
                 "title": "Machine Info",
                 "total_space": "Total Space"
             },
+            "misc_title": "Miscellaneous",
             "no_encoders": "Backend has no encoders",
             "schedule_none": "Nothing scheduled to record",
             "schedule_text": "The next {{ length }} show(s) that are scheduled for recording.",

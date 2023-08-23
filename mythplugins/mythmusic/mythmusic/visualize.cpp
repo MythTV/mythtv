@@ -37,10 +37,6 @@
 #include "musicplayer.h"
 #include "visualize.h"
 
-static constexpr int FFTW_N { 512 };
-// static_assert(FFTW_N==SAMPLES_DEFAULT_SIZE)
-
-
 VisFactory* VisFactory::g_pVisFactories = nullptr;
 
 VisualBase::VisualBase(bool screensaverenable)
@@ -112,8 +108,8 @@ void LogScale::setMax(int maxscale, int maxrange)
     if (maxscale == 0 || maxrange == 0)
         return;
 
-    m_s = maxscale;
-    m_r = maxrange;
+    m_scale = maxscale;
+    m_range = maxrange;
 
     auto domain = (long double) maxscale;
     auto range  = (long double) maxrange;
@@ -146,6 +142,54 @@ void LogScale::setMax(int maxscale, int maxrange)
 }
 
 int LogScale::operator[](int index)
+{
+    return m_indices[index];
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// MelScale, example: (8192 fft, 1920 pixels, 22050 hz)
+
+MelScale::MelScale(int maxscale, int maxrange, int maxfreq)
+{
+    setMax(maxscale, maxrange, maxfreq);
+}
+
+double MelScale::hz2mel(double hz)
+{
+    return 1127 * log(1 + hz / 700);
+}
+
+double MelScale::mel2hz(double mel)
+{
+    return 700 * (exp(mel / 1127) - 1);
+}
+
+void MelScale::setMax(int maxscale, int maxrange, int maxfreq)
+{
+    if (maxscale == 0 || maxrange == 0 || maxfreq == 0)
+        return;
+
+    m_scale = maxscale;
+    m_range = maxrange;
+
+    m_indices.clear();
+    m_indices.resize(maxrange, 0);
+
+    double maxmel = hz2mel(maxfreq);
+    double hzperbin = (double) maxfreq / (double) maxscale;
+
+    for (int i = 0; i < maxrange; i++)
+    {
+        double mel = maxmel * i / maxrange;
+        double hz = mel2hz(mel);
+        int bin = int(hz / hzperbin);
+        m_indices[i] = bin;
+        // LOG(VB_PLAYBACK, LOG_INFO, QString("Mel maxmel=%1, hzperbin=%2, hz=%3, i=%4, bin=%5")
+        //     .arg(maxmel).arg(hzperbin).arg(hz).arg(i).arg(bin));
+    }
+}
+
+int MelScale::operator[](int index)
 {
     return m_indices[index];
 }
@@ -289,7 +333,9 @@ bool StereoScope::process( VisualNode *node )
 bool StereoScope::draw( QPainter *p, const QColor &back )
 {
     if (back != Qt::green)      // hack!!! for WaveForm
-      p->fillRect(0, 0, m_size.width(), m_size.height(), back);
+    {
+        p->fillRect(0, 0, m_size.width(), m_size.height(), back);
+    }
     for ( int i = 1; i < m_size.width(); i++ )
     {
 #if TWOCOLOUR
@@ -479,7 +525,9 @@ bool MonoScope::process( VisualNode *node )
 bool MonoScope::draw( QPainter *p, const QColor &back )
 {
     if (back != Qt::green)      // hack!!! for WaveForm
-      p->fillRect( 0, 0, m_size.width(), m_size.height(), back );
+    {
+        p->fillRect( 0, 0, m_size.width(), m_size.height(), back );
+    }
     for ( int i = 1; i < m_size.width(); i++ ) {
 #if TWOCOLOUR
         double per = ( static_cast<double>(m_magnitudes[i]) * 2.0 ) /
@@ -530,9 +578,21 @@ bool MonoScope::draw( QPainter *p, const QColor &back )
 ///////////////////////////////////////////////////////////////////////////////
 // WaveForm - see whole track - by twitham@sbcglobal.net, 2023/01
 
+// As/of v34, switching from small preview to fullscreen destroys and
+// recreates this object.  So I use this static to survive which works
+// only becasue there is 1 instance per process.  If mythfrontend ever
+// decides to display more than one visual at a time, it should also
+// be fixed to not destroy the instance but rather to resize it
+// dynamically.  At that time, this could return to an m_image class
+// member.  But more of this file might also need refactored to enable
+// long-life resizable visuals.
+
+QImage WaveForm::s_image {nullptr}; // picture of full track
+
 WaveForm::~WaveForm()
 {
     saveload(nullptr);
+    LOG(VB_PLAYBACK, LOG_INFO, QString("WF going down"));
 }
 
 // cache current track, if any, before loading cache of given track
@@ -540,7 +600,7 @@ void WaveForm::saveload(MusicMetadata *meta)
 {
     QString cache = GetConfDir() + "/MythMusic/WaveForm";
     QString filename;
-    int stream = gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_RADIO;
+    m_stream = gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_RADIO;
     if (m_currentMetadata)     // cache work in progress for next time
     {
         QDir dir(cache);
@@ -549,9 +609,9 @@ void WaveForm::saveload(MusicMetadata *meta)
             dir.mkpath(cache);
         }
         filename = QString("%1/%2.png").arg(cache)
-            .arg(stream ? 0 : m_currentMetadata->ID());
+            .arg(m_stream ? 0 : m_currentMetadata->ID());
         LOG(VB_PLAYBACK, LOG_INFO, QString("WF saving to %1").arg(filename));
-        if (!m_image.save(filename))
+        if (!s_image.save(filename))
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("WF saving to %1 failed: " + ENO).arg(filename));
@@ -560,21 +620,21 @@ void WaveForm::saveload(MusicMetadata *meta)
     m_currentMetadata = meta;
     if (meta)                   // load previous work from cache
     {
-        filename = QString("%1/%2.png").arg(cache).arg(stream ? 0 : meta->ID());
+        filename = QString("%1/%2.png").arg(cache).arg(m_stream ? 0 : meta->ID());
         LOG(VB_PLAYBACK, LOG_INFO, QString("WF loading from %1").arg(filename));
-        if (!m_image.load(filename))
+        if (!s_image.load(filename))
         {
             LOG(VB_GENERAL, LOG_WARNING,
                 QString("WF loading %1 failed, recreating").arg(filename));
         }
         // 60 seconds skips pixels with < 44100 streams like 22050,
         // but this is now compensated for by drawing wider "pixels"
-        m_duration = stream ? 60000 : meta->Length().count(); // millisecs
+        m_duration = m_stream ? 60000 : meta->Length().count(); // millisecs
     }
-    if (m_image.isNull())
+    if (s_image.isNull())
     {
-        m_image = QImage(WF_WIDTH, WF_HEIGHT, QImage::Format_RGB32);
-        m_image.fill(qRgb(0, 0, 0));
+        s_image = QImage(m_wfsize.width(), m_wfsize.height(), QImage::Format_RGB32);
+        s_image.fill(qRgb(0, 0, 0));
     }
     m_minl = 0;                 // drop last pixel, prepare for first
     m_maxl = 0;
@@ -583,15 +643,27 @@ void WaveForm::saveload(MusicMetadata *meta)
     m_maxr = 0;
     m_sqrr = 0;
     m_position = 0;
-    m_lastx = WF_WIDTH;
+    m_lastx = m_wfsize.width();
     m_font = QApplication::font();
-// m_font.setPointSize(14);
-    m_font.setPixelSize(20);    // small to be mostly unnoticed
+    // m_font.setPointSize(14);
+    m_font.setPixelSize(m_size.height() / 60); // small to be mostly unnoticed
 }
 
 unsigned long WaveForm::getDesiredSamples(void)
 {
-    return (unsigned long) WF_AUDIO_SIZE;  // Maximum we can be given
+    // could be an adjustable class member, but this hard code works well
+    return kWFAudioSize;    // maximum samples per update, may get less
+}
+
+bool WaveForm::process(VisualNode *node)
+{
+    // After 2023/01 bugfix below, processUndisplayed processes this
+    // node again after this process!  If that is ever changed in
+    // mainvisual.cpp, then this would need adjusted.
+
+    // StereoScope overlay must process only the displayed nodes
+    StereoScope::process(node);
+    return false;               // update even when silent
 }
 
 bool WaveForm::processUndisplayed(VisualNode *node)
@@ -602,42 +674,22 @@ bool WaveForm::processUndisplayed(VisualNode *node)
     // <      m_vis->processUndisplayed(node);
     // >      m_vis->processUndisplayed(m_nodes.first());
 
-    // now this receives *all* nodes.
+    // now this receives *all* nodes.  So we don't need any processing
+    // in ::process above as that would double process.
 
-    return process_all_types(node, false);
-}
-
-bool WaveForm::process(VisualNode *node)
-{
-    // After 2023/01 bugfix above, processUndisplayed processes this
-    // node again after this process!  If that is ever changed in
-    // mainvisual.cpp, then this might need adjusted.  To test,
-    // uncomment the following line and see:
-
-    // mythfrontend --loglevel debug -v playback
-
-    // this would double-process the displayed nodes:
-    // return process_all_types(node, true);
-
-    // StereoScope overlay must process only the displayed nodes
-    return StereoScope::process(node);
-}
-
-bool WaveForm::process_all_types(VisualNode *node, bool displayed)
-{
     MusicMetadata *meta = gPlayer->getCurrentMetadata();
     if (meta && meta != m_currentMetadata)
     {
         saveload(meta);
     }
-    if (node && !m_image.isNull())
+    if (node && !s_image.isNull())
     {
         m_offset = node->m_offset.count() % m_duration; // for ::draw below
         m_right = node->m_right;
         uint n = node->m_length;
-        LOG(VB_PLAYBACK, LOG_DEBUG,
-            QString("WF process %1 samples at %2, display=%3").
-            arg(n).arg(m_offset).arg(displayed));
+        // LOG(VB_PLAYBACK, LOG_DEBUG,
+        //     QString("WF process %1 samples at %2, display=%3").
+        //     arg(n).arg(m_offset).arg(displayed));
 
 // TODO: interpolate timestamps to process correct samples per pixel
 // rather than fitting all we get in 1 or more pixels
@@ -657,16 +709,17 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
             }
             m_position++;
         }
-        uint xx = WF_WIDTH * m_offset / m_duration;
+        uint xx = m_wfsize.width() * m_offset / m_duration;
         if (xx != m_lastx)   // draw one finished line of min/max/rms
         {
-            if (m_lastx > xx - 1) // right to left wrap
+            if (m_lastx > xx - 1 || // REW seek or right to left edge wrap
+                m_lastx < xx - 5)   // FFWD seek
             {
                 m_lastx = xx - 1;
             }
-            int h = WF_HEIGHT / 4;  // amplitude above or below zero
-            int y = WF_HEIGHT / 4;  // left zero line
-            int yr = WF_HEIGHT * 3 / 4; // right  zero line
+            int h = m_wfsize.height() / 4;  // amplitude above or below zero
+            int y = m_wfsize.height() / 4;  // left zero line
+            int yr = m_wfsize.height() * 3 / 4; // right  zero line
             if (!m_right)
             {           // mono - drop full waveform below StereoScope
                 y = yr;
@@ -677,14 +730,23 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
             // duplicate the vertical lines than draw rectangles since
             // lines are the more common case. -twitham
 
-            QPainter painter(&m_image);
+            QPainter painter(&s_image);
             for (uint x = m_lastx + 1; x <= xx; x++)
             {
-                LOG(VB_PLAYBACK, LOG_DEBUG,
-                    QString("WF painting at %1,%2/%3").arg(x).arg(y).arg(yr));
+                // LOG(VB_PLAYBACK, LOG_DEBUG,
+                //     QString("WF painting at %1,%2/%3").arg(x).arg(y).arg(yr));
 
-                painter.setPen(qRgb(0, 0, 0)); // clear prior content
-                painter.drawLine(x, 0, x, WF_HEIGHT);
+                // clear prior content of this column
+                if (m_stream)  // clear 5 seconds of future, with wrap
+                {
+                    painter.fillRect(x, 0, 32 * 5,
+                                     m_wfsize.height(), Qt::black);
+                    painter.fillRect(x - m_wfsize.width(), 0, 32 * 5,
+                                     m_wfsize.height(), Qt::black);
+                } else {        // preserve the future, if any
+                    painter.fillRect(x, 0, 1,
+                                     m_wfsize.height(), Qt::black);
+                }
 
                 // Audacity uses 50,50,200 and 100,100,220 - I'm going
                 // darker to better contrast the StereoScope overlay
@@ -703,8 +765,8 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
                 {
                     int rmsr = sqrt(m_sqrr / m_position) * y / 32768;
                     painter.drawLine(x, yr - rmsr, x, yr + rmsr);
-                    painter.drawLine(x, WF_HEIGHT / 2, // left/right delta
-                                     x, WF_HEIGHT / 2 - rmsl + rmsr);
+                    painter.drawLine(x, m_wfsize.height() / 2, // L / R delta
+                                     x, m_wfsize.height() / 2 - rmsl + rmsr);
                 }
             }
             m_minl = 0;                 // reset metrics for next line
@@ -723,38 +785,40 @@ bool WaveForm::process_all_types(VisualNode *node, bool displayed)
 bool WaveForm::draw( QPainter *p, const QColor &back )
 {
     p->fillRect(0, 0, 0, 0, back); // no clearing, here to suppress warning
-    if (!m_image.isNull())
-    {			     // background, updated by ::process above
-        p->drawImage(0, 0, m_image.scaled(m_size,
+    if (!s_image.isNull())
+    {                        // background, updated by ::process above
+        p->drawImage(0, 0, s_image.scaled(m_size,
                                           Qt::IgnoreAspectRatio,
                                           Qt::SmoothTransformation));
     }
 
     StereoScope::draw(p, Qt::green); // green == no clearing!
 
-    p->setPen(Qt::yellow);
-    unsigned int x = m_size.width() * m_offset / m_duration;
-    p->drawLine(x, 0, x, m_size.height());
+    p->fillRect(m_size.width() * m_offset / m_duration, 0,
+                1, m_size.height(), Qt::darkGray);
 
     if (m_showtext && m_size.width() > 500) // metrics in corners
     {
-        p->setPen(Qt::white);
+        p->setPen(Qt::darkGray);
         p->setFont(m_font);
         QRect text(5, 5, m_size.width() - 10, m_size.height() - 10);
         p->drawText(text, Qt::AlignTop | Qt::AlignLeft,
                     QString("%1:%2")
                     .arg(m_offset / 1000 / 60)
                     .arg(m_offset / 1000 % 60, 2, 10, QChar('0')));
+        p->drawText(text, Qt::AlignTop | Qt::AlignHCenter,
+                    QString("%1%")
+                    .arg(100.0 * m_offset / m_duration, 0, 'f', 0));
         p->drawText(text, Qt::AlignTop | Qt::AlignRight,
                     QString("%1:%2")
                     .arg(m_duration / 1000 / 60)
                     .arg(m_duration / 1000 % 60, 2, 10, QChar('0')));
         p->drawText(text, Qt::AlignBottom | Qt::AlignLeft,
                     QString("%1 lines/s")
-                    .arg(1000.0 * WF_WIDTH / m_duration, 0, 'f', 1));
+                    .arg(1000.0 * m_wfsize.width() / m_duration, 0, 'f', 1));
         p->drawText(text, Qt::AlignBottom | Qt::AlignRight,
                     QString("%1 ms/line")
-                    .arg(1.0 * m_duration / WF_WIDTH, 0, 'f', 1));
+                    .arg(1.0 * m_duration / m_wfsize.width(), 0, 'f', 1));
     }
     return true;
 }
@@ -849,6 +913,375 @@ static class WaveFormFactory : public VisFactory
 }WaveFormFactory;
 
 ///////////////////////////////////////////////////////////////////////////////
+// Spectrogram - by twitham@sbcglobal.net, 2023/05
+//
+// A spectrogram needs the entire sound signal.  A wide sliding window
+// is needed to detect low frequencies, 2^14 = 16384 works great.  But
+// then the detected frequencies can linger up to 16384/44100=372
+// milliseconds!  We solve this by shrinking the signal amplitude over
+// time within the window.  This way all frequencies are still there
+// but only recent time has high amplitude.  This nicely displays even
+// quick sounds of a few milliseconds.
+
+// Static class members survive size changes for continuous display.
+// See the comment about s_image in WaveForm
+QImage Spectrogram::s_image {nullptr}; // picture of spectrogram
+int    Spectrogram::s_offset {0};      // position on screen
+
+Spectrogram::Spectrogram(bool hist)
+{
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Spectrogram : Being Initialised, history=%1").arg(hist));
+
+    m_history = hist;   // historical spectrogram?, else spectrum only
+
+    m_fps = 40;         // getting 1152 samples / 44100 = 38.28125 fps
+
+    if (s_image.isNull())  // static histogram survives resize/restart
+    {
+        s_image = QImage(
+            m_sgsize.width(), m_sgsize.height(), QImage::Format_RGB32);
+        s_image.fill(Qt::black);
+    }
+    if (m_history)
+    {
+        m_image = &s_image;
+    }
+    else
+    {
+        m_image = new QImage(
+            m_sgsize.width(), m_sgsize.height(), QImage::Format_RGB32);
+        m_image->fill(Qt::black);
+    }
+
+    m_dftL = static_cast<FFTSample*>(av_malloc(sizeof(FFTSample) * m_fftlen));
+    m_dftR = static_cast<FFTSample*>(av_malloc(sizeof(FFTSample) * m_fftlen));
+
+    m_rdftContext = av_rdft_init(std::log2(m_fftlen), DFT_R2C);
+
+    // hack!!! Should 44100 sample rate be queried or measured?
+    // Likely close enough for most audio recordings...
+    m_scale.setMax(m_fftlen / 2, m_history ?
+                   m_sgsize.height() / 2 : m_sgsize.width(), 44100/2);
+    m_sigL.resize(m_fftlen);
+    m_sigR.resize(m_fftlen);
+
+    // TODO: promote this to a separate ColorSpectrum class
+
+    // cache a continuous color spectrum ([0-1535] = 256 colors * 6 ramps):
+    // 0000ff blue              from here, G of RGB ramps UP to:
+    // 00ffff cyan              then       B ramps down to:
+    // 00ff00 green             then       R ramps  UP  to:
+    // ffff00 yellow            then       G ramps down to:
+    // ff0000 red               then       B ramps  UP  to:
+    // ff00ff magenta           then       R ramps down to:
+    // 0000ff blue              we end where we started!
+    static constexpr int UP { 2 };
+    static constexpr int DN { 3 };
+    int red[]   = {  0,  0, UP,  1,  1, DN }; // 0=OFF, 1=ON
+    int green[] = { UP,  1,  1, DN,  0,  0 };
+    int blue[]  = {  1, DN,  0,  0, UP,  1 };
+    m_red   = (int *) malloc(sizeof(int) * 256 * 6);
+    m_green = (int *) malloc(sizeof(int) * 256 * 6);
+    m_blue  = (int *) malloc(sizeof(int) * 256 * 6);
+    for (int i = 0; i < 6; i++) // for 6 color transitions...
+    {
+        int r = red[i];         // 0=OFF, 1=ON, UP, or DN
+        int g = green[i];
+        int b = blue[i];
+        for (int u = 0; u < 256; u++) { // u ramps up
+            int d = 256 - u;            // d ramps down
+            m_red[  i * 256 + u] = r == UP ? u : r == DN ? d : r * 255;
+            m_green[i * 256 + u] = g == UP ? u : g == DN ? d : g * 255;
+            m_blue[ i * 256 + u] = b == UP ? u : b == DN ? d : b * 255;
+        }
+    }
+}
+
+Spectrogram::~Spectrogram()
+{
+    av_freep(&m_dftL);
+    av_freep(&m_dftR);
+    av_rdft_end(m_rdftContext);
+    if (m_red)   free(m_red);
+    if (m_green) free(m_green);
+    if (m_blue)  free(m_blue);
+}
+
+void Spectrogram::resize(const QSize &newsize)
+{
+    m_size = newsize;
+}
+
+// this moved up from Spectrum so both can use it
+template<typename T> T sq(T a) { return a*a; };
+
+unsigned long Spectrogram::getDesiredSamples(void)
+{
+    // maximum samples per update, may get less
+    return (unsigned long)kSGAudioSize;
+}
+
+bool Spectrogram::process(VisualNode */*node*/)
+{
+    // TODO: label certain frequencies instead: 50, 100, 200, 500,
+    // 1000, 2000, 5000, 10000
+
+    // QPainter painter(m_image);
+    // painter.setPen(Qt::cyan);
+    // QFont font = QApplication::font();
+    // font.setPixelSize(14);
+    // painter.setFont(font);
+    // if (m_history)
+    // {
+    //     for (auto h = m_sgsize.height(); h > 0; h -= m_sgsize.height() / 2)
+    //     {
+    //         for (auto i = 0; i < m_sgsize.height() / 2; i += 20)
+    //         {
+    //             painter.drawText(0, h - i,
+    //                              QString("...%1.%2.%3...").arg(i).arg(m_scale[i])
+    //                              .arg(m_scale[i] * 22050 / 8192)); // hack!!!
+    //         }
+    //     }
+    // } else {
+    //     painter.rotate(90);
+    //     for (auto i = 0; i < m_sgsize.width(); i += 20)
+    //     {
+    //         painter.drawText(0, -1 * i,
+    //                          QString("...%1.%2.%3...").arg(i).arg(m_scale[i])
+    //                          .arg(m_scale[i] * 22050 / 8192)); // hack!!!
+    //     }
+    // }
+    return false;
+}
+
+bool Spectrogram::processUndisplayed(VisualNode *node)
+{
+    // as of v33, this processes *all* samples, see the comments in WaveForm
+
+    int i = 0;
+    int w = m_sgsize.width();   // drawing size
+    int h = m_sgsize.height();
+    if (m_image->isNull())
+    {
+        m_image = new QImage(w, h, QImage::Format_RGB32);
+        m_image->fill(Qt::black);
+        s_offset = 0;
+    }
+    if (node)     // shift previous samples left, then append new node
+    {
+        i = node->m_length;
+        // LOG(VB_PLAYBACK, LOG_DEBUG, QString("SG got %1 samples").arg(i));
+        (i <= m_fftlen) || (i = m_fftlen);
+        int start = m_fftlen - i;
+        float mult = 0.8F;      // decay older sound by this much
+        for (int k = 0; k < start; k++)
+        {
+            if (k > start - i)  // prior set ramps from mult to 1.0
+            {
+                mult = mult + (1 - mult) * (1 - (start - k) / (start - i));
+            }
+            m_sigL[k] = mult * m_sigL[i + k];
+            m_sigR[k] = mult * m_sigR[i + k];
+        }
+        for (uint k = 0; k < node->m_length; k++) // append current samples
+        {
+            m_sigL[start + k] = node->m_left[k] / 32768.; // +/- 1 peak-to-peak
+            if (node->m_right)
+                m_sigR[start + k] = node->m_right[k] / 32768.;
+        }
+        int end = m_fftlen / 40; // ramp window ends down to zero crossing
+        for (int k = 0; k < m_fftlen; k++)
+        {
+            mult = k < end ? k / end : k > m_fftlen - end ?
+                (m_fftlen - k) / end : 1;
+            m_dftL[k] = m_sigL[k] * mult;
+            m_dftR[k] = m_sigR[k] * mult;
+        }
+    }
+    av_rdft_calc(m_rdftContext, m_dftL); // run the real FFT!
+    av_rdft_calc(m_rdftContext, m_dftR);
+
+    QPainter painter(m_image);
+    painter.setPen(Qt::black);  // clear prior content
+    if (m_history)
+    {
+        painter.fillRect(s_offset,     0, 256, h, Qt::black);
+        painter.fillRect(s_offset - w, 0, 256, h, Qt::black);
+    } else {
+        painter.fillRect(0, 0, w, h, Qt::black);
+    }
+
+    int index = 1;              // frequency index of this pixel
+    int prev = 0;               // frequency index of previous pixel
+    float gain = 5.0;           // compensate for window function loss
+    for (i = 1; i < (m_history ? h / 2 : w); i++)
+    {                           // for each pixel of the spectrogram...
+        float left = 0;
+        float right = 0;
+        float tmp = 0;
+        int count = 0;
+        for (auto j = prev + 1; j <= index; j++) // log scale!
+        {    // for the freqency bins of this pixel, find peak or mean
+            tmp = sq(m_dftL[2 * j]) + sq(m_dftL[2 * j + 1]);
+            left  = m_binpeak ? (tmp > left  ? tmp : left ) : left  + tmp;
+            tmp = sq(m_dftR[2 * j]) + sq(m_dftR[2 * j + 1]);
+            right = m_binpeak ? (tmp > right ? tmp : right) : right + tmp;
+            count++;
+        }
+        if (!m_binpeak)
+        {                       // mean of the frequency bins
+            (count > 0) || (count = 1);
+            left /= count;
+            right /= count;
+        }
+        // linear magnitude:           sqrt(sq(real) + sq(im));
+        // left = sqrt(left);
+        // right = sqrt(right);
+        // power spectrum (dBm): 10 * log10(sq(real) + sq(im));
+        left = 10 * log10(left);
+        right = 10 * log10(right);
+
+        // float bw = 1. / (16384. / 44100.);
+        // float freq = bw * index;
+        // LOG(VB_PLAYBACK, LOG_DEBUG, // verbose - never use in production!!!
+        //     QString("SG i=%1, index=%2 (%3) %4 hz \tleft=%5,\tright=%6")
+        //     .arg(i).arg(index).arg(count).arg(freq).arg(left).arg(right));
+
+        left *= gain;
+        float mag = clamp(left, 255, 0);
+        int z = (int)(mag * 6);
+        left > 255 ? painter.setPen(Qt::white) :
+            painter.setPen(qRgb(m_red[z], m_green[z], m_blue[z]));
+        if (m_history)
+        {
+            h = m_sgsize.height() / 2;
+            painter.drawLine(s_offset,     h - i, s_offset     + mag, h - i);
+            painter.drawLine(s_offset - w, h - i, s_offset - w + mag, h - i);
+            left > 255 ? painter.setPen(Qt::yellow) :
+                painter.setPen(qRgb(mag, mag, mag));
+            painter.drawPoint(s_offset, h - i);
+        } else {
+            painter.drawLine(i, h / 2, i, h / 2 - h / 2 * mag / 256);
+        }
+
+        right *= gain;          // copy of above, s/left/right/g
+        mag = clamp(right, 255, 0);
+        z = (int)(mag * 6);
+        right > 255 ? painter.setPen(Qt::white) :
+            painter.setPen(qRgb(m_red[z], m_green[z], m_blue[z]));
+        if (m_history)
+        {
+            h = m_sgsize.height();
+            painter.drawLine(s_offset,     h - i, s_offset     + mag, h - i);
+            painter.drawLine(s_offset - w, h - i, s_offset - w + mag, h - i);
+            right > 255 ? painter.setPen(Qt::yellow) :
+                painter.setPen(qRgb(mag, mag, mag));
+            painter.drawPoint(s_offset, h - i);
+        } else {
+            painter.drawLine(i, h / 2, i, h / 2 + h / 2 * mag / 256);
+        }
+
+        prev = index;           // next pixel is FFT bins from here
+        index = m_scale[i];     // to the next bin by LOG scale
+        (prev < index) || (prev = index -1);
+    }
+    if (m_history && ++s_offset >= w)
+    {
+        s_offset = 0;
+    }
+    return false;
+}
+
+double Spectrogram::clamp(double cur, double max, double min)
+{
+    if (isnan(cur)) return 0;
+    if (cur > max) cur = max;
+    if (cur < min) cur = min;
+    return cur;
+}
+
+bool Spectrogram::draw(QPainter *p, const QColor &back)
+{
+    p->fillRect(0, 0, 0, 0, back); // no clearing, here to suppress warning
+    if (!m_image->isNull())
+    {                        // background, updated by ::process above
+        p->drawImage(0, 0, m_image->scaled(m_size,
+                                           Qt::IgnoreAspectRatio,
+                                           Qt::SmoothTransformation));
+    }
+    // // DEBUG: see the whole signal going into the FFT:
+    // if (m_size.height() > 1000) {
+    //  p->setPen(Qt::yellow);
+    //  float h = m_size.height() / 10;
+    //  for (int j = 0; j < m_fftlen; j++) {
+    //      p->drawPoint(j % m_size.width(), int(j / m_size.width()) * h + h - h * m_sigL[j]);
+    //  }
+    // }
+    return true;
+}
+
+void Spectrogram::handleKeyPress(const QString &action)
+{
+    LOG(VB_PLAYBACK, LOG_INFO, QString("SG keypress = %1").arg(action));
+
+    // I'd like to tweak options upon certain key hit, but
+    // mythfrontend doesn't appear to call this.  Bug?
+    if (action == "SELECT")
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, QString("SG keypress SELECT hit"));
+    }
+}
+
+// passing true to the above constructor gives the spectrum with full history:
+
+static class SpectrogramFactory : public VisFactory
+{
+  public:
+    const QString &name(void) const override // VisFactory
+    {
+        static QString s_name = QCoreApplication::translate("Visualizers",
+                                                            "Spectrogram");
+        return s_name;
+    }
+
+    uint plugins(QStringList *list) const override // VisFactory
+    {
+        *list << name();
+        return 1;
+    }
+
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const override // VisFactory
+    {
+        return new Spectrogram(true); // history
+    }
+}SpectrogramFactory;
+
+// passing false to the above constructor gives the spectrum with no history:
+
+static class SpectrumDetailFactory : public VisFactory
+{
+  public:
+    const QString &name(void) const override // VisFactory
+    {
+        static QString s_name = QCoreApplication::translate("Visualizers",
+                                                            "Spectrum");
+        return s_name;
+    }
+
+    uint plugins(QStringList *list) const override // VisFactory
+    {
+        *list << name();
+        return 1;
+    }
+
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const override // VisFactory
+    {
+        return new Spectrogram(false); // no history
+    }
+}SpectrumDetailFactory;
+
+///////////////////////////////////////////////////////////////////////////////
 // Spectrum
 //
 
@@ -856,19 +1289,19 @@ Spectrum::Spectrum()
 {
     LOG(VB_GENERAL, LOG_INFO, QString("Spectrum : Being Initialised"));
 
-    m_fps = 15;
+    m_fps = 40;         // getting 1152 samples / 44100 = 38.28125 fps
 
-    m_dftL = static_cast<FFTComplex*>(av_malloc(sizeof(FFTComplex) * FFTW_N));
-    m_dftR = static_cast<FFTComplex*>(av_malloc(sizeof(FFTComplex) * FFTW_N));
+    m_dftL = static_cast<FFTSample*>(av_malloc(sizeof(FFTSample) * m_fftlen));
+    m_dftR = static_cast<FFTSample*>(av_malloc(sizeof(FFTSample) * m_fftlen));
 
-    m_fftContextForward = av_fft_init(std::log2(FFTW_N), 0);
+    m_rdftContext = av_rdft_init(std::log2(m_fftlen), DFT_R2C);
 }
 
 Spectrum::~Spectrum()
 {
     av_freep(&m_dftL);
     av_freep(&m_dftR);
-    av_fft_end(m_fftContextForward);
+    av_rdft_end(m_rdftContext);
 }
 
 void Spectrum::resize(const QSize &newsize)
@@ -881,19 +1314,23 @@ void Spectrum::resize(const QSize &newsize)
 
     m_size = newsize;
 
-    m_analyzerBarWidth = m_size.width() / 64;
+    m_analyzerBarWidth = m_size.width() / 128;
 
     if (m_analyzerBarWidth < 6)
         m_analyzerBarWidth = 6;
 
-    m_scale.setMax(192, m_size.width() / m_analyzerBarWidth);
+    m_scale.setMax(m_fftlen/2, m_size.width() / m_analyzerBarWidth, 44100/2);
+    m_sigL.resize(m_fftlen);
+    m_sigR.resize(m_fftlen);
 
-    m_rects.resize( m_scale.range() );
+    m_rectsL.resize( m_scale.range() );
+    m_rectsR.resize( m_scale.range() );
     int w = 0;
     // NOLINTNEXTLINE(modernize-loop-convert)
-    for (uint i = 0; i < (uint)m_rects.size(); i++, w += m_analyzerBarWidth)
+    for (uint i = 0; i < (uint)m_rectsL.size(); i++, w += m_analyzerBarWidth)
     {
-        m_rects[i].setRect(w, m_size.height() / 2, m_analyzerBarWidth - 1, 1);
+        m_rectsL[i].setRect(w, m_size.height() / 2, m_analyzerBarWidth - 1, 1);
+        m_rectsR[i].setRect(w, m_size.height() / 2, m_analyzerBarWidth - 1, 1);
     }
 
     m_magnitudes.resize( m_scale.range() * 2 );
@@ -903,62 +1340,80 @@ void Spectrum::resize(const QSize &newsize)
         m_magnitudes[os] = 0.0;
     }
 
-    m_scaleFactor = ( static_cast<double>(m_size.height()) / 2.0 ) /
-                    log( static_cast<double>(FFTW_N) );
+    m_scaleFactor = m_size.height() / 2 / 42;
 }
 
-template<typename T> T sq(T a) { return a*a; };
+// this moved up to Spectrogram so both can use it
+// template<typename T> T sq(T a) { return a*a; };
 
-bool Spectrum::process(VisualNode *node)
+bool Spectrum::process(VisualNode */*node*/)
 {
-    // Take a bunch of data in *node
-    // and break it down into spectrum
-    // values
-    [[maybe_unused]] bool allZero = true;
+    return false;
+}
+
+bool Spectrum::processUndisplayed(VisualNode *node)
+{
+    // copied from Spectrogram for better FFT window
+
+    if (node)     // shift previous samples left, then append new node
+    {
+        int i = node->m_length;
+        // LOG(VB_PLAYBACK, LOG_DEBUG, QString("SG got %1 samples").arg(i));
+        (i <= m_fftlen) || (i = m_fftlen);
+        int start = m_fftlen - i;
+        float mult = 0.8F;      // decay older sound by this much
+        for (int k = 0; k < start; k++)
+        {
+            if (k > start - i)  // prior set ramps from mult to 1.0
+            {
+                mult = mult + (1 - mult) * (1 - (start - k) / (start - i));
+            }
+            m_sigL[k] = mult * m_sigL[i + k];
+            m_sigR[k] = mult * m_sigR[i + k];
+        }
+        for (uint k = 0; k < node->m_length; k++) // append current samples
+        {
+            m_sigL[start + k] = node->m_left[k] / 32768.; // +/- 1 peak-to-peak
+            if (node->m_right)
+                m_sigR[start + k] = node->m_right[k] / 32768.;
+        }
+        int end = m_fftlen / 40; // ramp window ends down to zero crossing
+        for (int k = 0; k < m_fftlen; k++)
+        {
+            mult = k < end ? k / end : k > m_fftlen - end ?
+                (m_fftlen - k) / end : 1;
+            m_dftL[k] = m_sigL[k] * mult;
+            m_dftR[k] = m_sigR[k] * mult;
+        }
+    }
+    av_rdft_calc(m_rdftContext, m_dftL); // run the real FFT!
+    av_rdft_calc(m_rdftContext, m_dftR);
 
     uint i = 0;
     long w = 0;
-    QRect *rectsp = m_rects.data();
-    double *magnitudesp = m_magnitudes.data();
+    QRect *rectspL = m_rectsL.data();
+    QRect *rectspR = m_rectsR.data();
+    float *magnitudesp = m_magnitudes.data();
 
-    if (node)
+    int index = 1;              // frequency index of this pixel
+    int prev = 0;               // frequency index of previous pixel
+    float adjHeight = m_size.height() / 2.0;
+
+    for (i = 0; (int)i < m_rectsL.size(); i++, w += m_analyzerBarWidth)
     {
-        i = node->m_length;
-        if (i > FFTW_N)
-            i = FFTW_N;
-        for (unsigned long k = 0; k < node->m_length; k++)
-        {
-            m_dftL[k] = (FFTComplex){ .re = (FFTSample)node->m_left[k], .im = 0 };
-            if (node->m_right)
-                m_dftR[k] = (FFTComplex){ .re = (FFTSample)node->m_right[k], .im = 0 };
+        float magL = 0;         // modified from Spectrogram
+        float magR = 0;
+        float tmp = 0;
+        for (auto j = prev + 1; j <= index; j++) // log scale!
+        {    // for the freqency bins of this pixel, find peak or mean
+            tmp = sq(m_dftL[2 * j]) + sq(m_dftL[2 * j + 1]);
+            magL  = tmp > magL  ? tmp : magL;
+            tmp = sq(m_dftR[2 * j]) + sq(m_dftR[2 * j + 1]);
+            magR = tmp > magR ? tmp : magR;
         }
-    }
+        magL = 10 * log10(magL) * m_scaleFactor;
+        magR = 10 * log10(magR) * m_scaleFactor;
 
-    for (auto k = i; k < FFTW_N; k++)
-    {
-        m_dftL[k] = (FFTComplex){ .re = 0, .im = 0 };
-        m_dftL[k] = (FFTComplex){ .re = 0, .im = 0 };
-    }
-    av_fft_permute(m_fftContextForward, m_dftL);
-    av_fft_calc(m_fftContextForward, m_dftL);
-
-    av_fft_permute(m_fftContextForward, m_dftR);
-    av_fft_calc(m_fftContextForward, m_dftR);
-
-    long index = 1;
-
-    for (i = 0; (int)i < m_rects.size(); i++, w += m_analyzerBarWidth)
-    {
-        // The 1D output is Hermitian symmetric (Yk = Yn-k) so Yn = Y0 etc.
-        // The dft_r2c_1d plan doesn't output these redundant values
-        // and furthermore they're not allocated in the ctor
-        double tmp = 2 * sq(m_dftL[index].re);
-        double magL = (tmp > 1.) ? (log(tmp) - 22.0) * m_scaleFactor : 0.;
-
-        tmp = 2 * sq(m_dftR[index].re);
-        double magR = (tmp > 1.) ? (log(tmp) - 22.0) * m_scaleFactor : 0.;
-
-        double adjHeight = static_cast<double>(m_size.height()) / 2.0;
         if (magL > adjHeight)
         {
             magL = adjHeight;
@@ -972,9 +1427,9 @@ bool Spectrum::process(VisualNode *node)
             }
             magL = tmp;
         }
-        if (magL < 1.)
+        if (magL < 1)
         {
-            magL = 1.;
+            magL = 1;
         }
 
         if (magR > adjHeight)
@@ -990,22 +1445,19 @@ bool Spectrum::process(VisualNode *node)
             }
             magR = tmp;
         }
-        if (magR < 1.)
+        if (magR < 1)
         {
-            magR = 1.;
-        }
-
-        if (magR != 1 || magL != 1)
-        {
-            allZero = false;
+            magR = 1;
         }
 
         magnitudesp[i] = magL;
         magnitudesp[i + m_scale.range()] = magR;
-        rectsp[i].setTop( m_size.height() / 2 - int( magL ) );
-        rectsp[i].setBottom( m_size.height() / 2 + int( magR ) );
+        rectspL[i].setTop( m_size.height() / 2 - int( magL ) );
+        rectspR[i].setBottom( m_size.height() / 2 + int( magR ) );
 
-        index = m_scale[i];
+        prev = index;           // next pixel is FFT bins from here
+        index = m_scale[i];     // to the next bin by LOG scale
+        (prev < index) || (prev = index -1);
     }
 
     return false;
@@ -1028,12 +1480,13 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
     // just uses some Qt methods to draw on a pixmap.
     // MainVisual then bitblts that onto the screen.
 
-    QRect *rectsp = m_rects.data();
+    QRect *rectspL = m_rectsL.data();
+    QRect *rectspR = m_rectsR.data();
 
     p->fillRect(0, 0, m_size.width(), m_size.height(), back);
-    for (uint i = 0; i < (uint)m_rects.size(); i++)
+    for (uint i = 0; i < (uint)m_rectsL.size(); i++)
     {
-        double per = double( rectsp[i].height() - 2 ) / double( m_size.height() );
+        double per = ( rectspL[i].height() - 2. ) / (m_size.height() / 2.);
 
         per = clamp(per, 1.0, 0.0);
 
@@ -1048,8 +1501,26 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
         g = clamp(g, 255.0, 0.0);
         b = clamp(b, 255.0, 0.0);
 
-        if(rectsp[i].height() > 4)
-            p->fillRect(rectsp[i], QColor(int(r), int(g), int(b)));
+        if(rectspL[i].height() > 4)
+            p->fillRect(rectspL[i], QColor(int(r), int(g), int(b)));
+
+        per = ( rectspR[i].height() - 2. ) / (m_size.height() / 2.);
+
+        per = clamp(per, 1.0, 0.0);
+
+        r = m_startColor.red() +
+            (m_targetColor.red() - m_startColor.red()) * (per * per);
+        g = m_startColor.green() +
+            (m_targetColor.green() - m_startColor.green()) * (per * per);
+        b = m_startColor.blue() +
+            (m_targetColor.blue() - m_startColor.blue()) * (per * per);
+
+        r = clamp(r, 255.0, 0.0);
+        g = clamp(g, 255.0, 0.0);
+        b = clamp(b, 255.0, 0.0);
+
+        if(rectspR[i].height() > 4)
+            p->fillRect(rectspR[i], QColor(int(r), int(g), int(b)));
     }
 
     return true;
@@ -1061,7 +1532,7 @@ static class SpectrumFactory : public VisFactory
     const QString &name(void) const override // VisFactory
     {
         static QString s_name = QCoreApplication::translate("Visualizers",
-                                                            "Spectrum");
+                                                            "SpectrumBars");
         return s_name;
     }
 
@@ -1096,7 +1567,7 @@ void Squares::resize (const QSize &newsize) {
 void Squares::drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h)
 {
     double per = NAN;
-    int correction = (m_actualSize.width() % m_rects.size ()) / 2;
+    int correction = (m_actualSize.width() % m_rectsL.size ());
     int x = ((i / 2) * w) + correction;
     int y = 0;
 
@@ -1130,12 +1601,15 @@ void Squares::drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h)
 bool Squares::draw(QPainter *p, const QColor &back)
 {
     p->fillRect (0, 0, m_actualSize.width(), m_actualSize.height(), back);
-    int w = m_actualSize.width() / (m_rects.size() / 2);
+    int w = m_actualSize.width() / (m_rectsL.size() / 2);
     int h = w;
     int center = m_actualSize.height() / 2;
 
-    QRect *rectsp = m_rects.data();
-    for (uint i = 0; i < (uint)m_rects.size(); i++)
+    QRect *rectsp = m_rectsL.data();
+    for (uint i = 0; i < (uint)m_rectsL.size() * 2; i += 2)
+        drawRect(p, &(rectsp[i]), i, center, w, h);
+    rectsp = m_rectsR.data();
+    for (uint i = 1; i < (uint)m_rectsR.size() * 2 + 1; i += 2)
         drawRect(p, &(rectsp[i]), i, center, w, h);
 
     return true;

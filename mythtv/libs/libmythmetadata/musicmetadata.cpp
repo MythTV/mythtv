@@ -341,7 +341,7 @@ bool MusicMetadata::updateStreamList(void)
     LOG(VB_GENERAL, LOG_INFO, "MusicMetadata: downloading radio streams list");
 
     // download compressed stream file
-    if (!GetMythDownloadManager()->download(QString(STREAMUPDATEURL), &compressedData), false)
+    if (!GetMythDownloadManager()->download(QString(STREAMUPDATEURL), &compressedData, false))
     {
         LOG(VB_GENERAL, LOG_ERR, "MusicMetadata: failed to download radio stream list");
         gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", nullptr);

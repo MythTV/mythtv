@@ -1,14 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { ScheduleComponent, ScheduleLink, SchedulerSummary } from 'src/app/schedule/schedule.component';
+import { ScheduleLink, SchedulerSummary } from 'src/app/schedule/schedule.component';
 import { DvrService } from 'src/app/services/dvr.service';
 import { RecRule } from 'src/app/services/interfaces/recording.interface';
 import { UtilityService } from 'src/app/services/utility.service';
-
-interface StringAssociativeArray {
-  [key: string]: string
-}
-
 
 @Component({
   selector: 'app-recrules',
@@ -23,18 +17,6 @@ export class RecrulesComponent implements OnInit, SchedulerSummary {
   inter: ScheduleLink = { summaryComponent: this };
 
 
-  typeValue: StringAssociativeArray = {
-    "Single Record": "",
-    "Record All": "",
-    "Record One": "",
-    "Record Daily": "",
-    "Record Weekly": "",
-    "Override Recording": "",
-    "Do not Record": "",
-    "Recording Template": "",
-    "Not Recording": ""
-  };
-
   deSpacer = new RegExp(/ /g);
 
   rulesLoaded = false;
@@ -42,15 +24,8 @@ export class RecrulesComponent implements OnInit, SchedulerSummary {
   successCount = 0;
   displayDelete = false;
 
-  constructor(private dvrService: DvrService, private translate: TranslateService,
+  constructor(private dvrService: DvrService,
     public utility: UtilityService) {
-    // translations
-    for (const [key, value] of Object.entries(this.typeValue)) {
-      const label = 'recrule.' + key.replace(this.deSpacer, '');
-      this.translate.get(label).subscribe(data => {
-        Object.defineProperty(this.typeValue, key, { value: data });
-      });
-    }
   }
 
   refresh(): void {

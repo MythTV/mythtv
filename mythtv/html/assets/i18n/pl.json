@@ -193,6 +193,9 @@
                 "minute": "Minuta",
                 "minutes": "Minuty",
                 "myth_drive": "Dysk MythTV",
+                "mythfill_last": "Ostatnie uruchomienie bazy danych mythfilldatabase rozpoczęło się {{GuideStart}} i zakończyło się {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Sugerowane następne uruchomienie bazy danych mythfill {{GuideNext}}.",
+                "mythfill_until": "Dostępne są dane przewodnika do {{GuideThru}} ({{GuideDays}} dni).",
                 "none": "Brak dostępnych informacji o maszynie",
                 "space_after_expire": "Miejsce dostępne po automatycznym wygaśnięciu",
                 "space_deleted": "Miejsce używane przez usunięte nagrania",
@@ -203,6 +206,7 @@
                 "title": "Informacje o maszynie",
                 "total_space": "Całkowita przestrzeń"
             },
+            "misc_title": "Różnorodny",
             "no_encoders": "Backend nie ma koderów",
             "schedule_none": "Nie zaplanowano nagrywania",
             "schedule_text": "Kolejne programy ({{ length }}), które są zaplanowane do nagrania.",

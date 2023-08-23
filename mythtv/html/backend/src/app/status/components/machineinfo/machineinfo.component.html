@@ -4,9 +4,9 @@
         <div>
             <p>{{ 'dashboard.status.mach.load' | translate }}</p>
             <ul>
-                <li>1 {{ 'dashboard.status.mach.minute' | translate }}: {{ machineinfo.LoadAvg1 }}</li>
-                <li>5 {{ 'dashboard.status.mach.minutes' | translate }}: {{ machineinfo.LoadAvg2 }}</li>
-                <li>15 {{ 'dashboard.status.mach.minutes' | translate }}: {{ machineinfo.LoadAvg3 }}</li>
+                <li>1 {{ 'dashboard.status.mach.minute' | translate }}: {{ machineinfo.LoadAvg1.toLocaleString() }}</li>
+                <li>5 {{ 'dashboard.status.mach.minutes' | translate }}: {{ machineinfo.LoadAvg2.toLocaleString() }}</li>
+                <li>15 {{ 'dashboard.status.mach.minutes' | translate }}: {{ machineinfo.LoadAvg3.toLocaleString() }}</li>
             </ul>
         </div>
         <div *ngIf="getStorageGroupTotal(machineinfo.StorageGroups) as sg; else noDiskInfo">
@@ -15,14 +15,14 @@
                 <!-- pretty print values in MB/GB -->
                 <li>{{ 'dashboard.status.mach.disk_total' | translate }}:</li>
                 <ul>
-                    <li>{{ 'dashboard.status.mach.total_space' | translate }}: {{ sg.Total }}</li>
-                    <li>{{ 'dashboard.status.mach.space_used' | translate }}: {{ sg.Used }}</li>
-                    <li>{{ 'dashboard.status.mach.space_free' | translate }}: {{ sg.Free }}</li>
-                    <li>{{ 'dashboard.status.mach.space_after_expire' | translate }}: {{ sg.Free + sg.Expirable }}</li>
+                    <li>{{ 'dashboard.status.mach.total_space' | translate }}: {{ sg.Total.toLocaleString() }} MiB</li>
+                    <li>{{ 'dashboard.status.mach.space_used' | translate }}: {{ sg.Used.toLocaleString() }} MiB</li>
+                    <li>{{ 'dashboard.status.mach.space_free' | translate }}: {{ sg.Free.toLocaleString() }} MiB</li>
+                    <li>{{ 'dashboard.status.mach.space_after_expire' | translate }}: {{ (sg.Free + sg.Expirable).toLocaleString() }}</li>
                     <ul>
-                        <li>{{ 'dashboard.status.mach.space_livetv' | translate }}: {{ sg.LiveTV }}</li>
-                        <li>{{ 'dashboard.status.mach.space_deleted' | translate }}: {{ sg.Deleted }}</li>
-                        <li>{{ 'dashboard.status.mach.space_expirable' | translate }}: {{ sg.Expirable }}</li>
+                        <li>{{ 'dashboard.status.mach.space_livetv' | translate }}: {{ sg.LiveTV.toLocaleString() }} MiB</li>
+                        <li>{{ 'dashboard.status.mach.space_deleted' | translate }}: {{ sg.Deleted.toLocaleString() }} MiB</li>
+                        <li>{{ 'dashboard.status.mach.space_expirable' | translate }}: {{ sg.Expirable.toLocaleString() }} MiB</li>
                     </ul>
                 </ul>
             </ul>
@@ -32,6 +32,19 @@
             <div *ngFor="let sg of getStorageGroupDetails(machineinfo.StorageGroups)">
                 <ng-container *ngTemplateOutlet="printStorageGroup; context: sg"></ng-container>
             </div>
+        </div>
+        <div>
+            <p>{{ 'dashboard.status.mach.mythfill_last'
+                | translate: {GuideStart: utility.formatDateTime(machineinfo.GuideStart),
+                GuideEnd: utility.formatDateTime(machineinfo.GuideEnd),
+                GuideStatus: machineinfo.GuideStatus} }}<br>
+                {{ 'dashboard.status.mach.mythfill_next'
+                | translate: {GuideNext: utility.formatDateTime(machineinfo.GuideNext)} }}<br>
+                {{ 'dashboard.status.mach.mythfill_until'
+                | translate: {GuideThru: utility.formatDateTime(machineinfo.GuideThru),
+                GuideDays: machineinfo.GuideDays} }}
+            </p>
+
         </div>
     </div>
 </div>
@@ -47,9 +60,9 @@
         <li>{{ 'dashboard.status.mach.myth_drive' | translate }} #{{ Id }}</li>
         <ul>
             <li>{{ 'dashboard.status.mach.disk_dirs' | translate }}: {{ Directory }}</li>
-            <li>{{ 'dashboard.status.mach.total_space' | translate }}: {{ Total }}</li>
-            <li>{{ 'dashboard.status.mach.space_used' | translate }}: {{ Used }}</li>
-            <li>{{ 'dashboard.status.mach.space_free' | translate }}: {{ Free }}</li>
+            <li>{{ 'dashboard.status.mach.total_space' | translate }}: {{ Total.toLocaleString() }}  MiB</li>
+            <li>{{ 'dashboard.status.mach.space_used' | translate }}: {{ Used.toLocaleString() }}  MiB</li>
+            <li>{{ 'dashboard.status.mach.space_free' | translate }}: {{ Free.toLocaleString() }}  MiB</li>
         </ul>
     </ul>
 </ng-template>

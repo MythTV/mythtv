@@ -6,15 +6,15 @@ import { Backend } from "./backend.interface";
 import { Frontend } from "./frontend.interface";
 
 export interface MachineInfo {
+    LoadAvg1:       number;
+    LoadAvg2:       number;
+    LoadAvg3:       number;
+    GuideStart:     string; // date
+    GuideEnd:       string; // date
+    GuideThru:      string; // date
     GuideDays:      number;
-    GuideEnds:      string;
-    GuideNext:      string;
-    GuideStart:     string;
+    GuideNext:      string; // date
     GuideStatus:    string;
-    GuideThru:      string;
-    LoadAvg1:       string;
-    LoadAvg2:       string;
-    LoadAvg3:       string;
     StorageGroups:  StorageGroup[];
 }
 

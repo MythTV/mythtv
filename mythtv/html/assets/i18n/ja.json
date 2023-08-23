@@ -193,6 +193,9 @@
                 "minute": "分",
                 "minutes": "分",
                 "myth_drive": "MythTV ドライブ",
+                "mythfill_last": "mythfilldatabase の最後の実行は {{GuideStart}} に開始され、{{GuideEnd}}、{{GuideStatus}} に終了しました。",
+                "mythfill_next": "次に mythfilldatabase で {{GuideNext}} を実行することを提案します。",
+                "mythfill_until": "ガイド データは {{GuideThru}} ({{GuideDays}} 日) まであります。",
                 "none": "マシン情報がありません",
                 "space_after_expire": "自動期限切れ後に利用可能なスペース",
                 "space_deleted": "削除された録音によって使用されるスペース",
@@ -203,6 +206,7 @@
                 "title": "マシン情報",
                 "total_space": "総スペース"
             },
+            "misc_title": "その他",
             "no_encoders": "バックエンドにはエンコーダーがありません",
             "schedule_none": "録画予定は何もありません",
             "schedule_text": "次の {{ length }} には、録画がスケジュールされているものが表示されます。",

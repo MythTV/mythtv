@@ -1100,8 +1100,13 @@ void MusicCommon::seekforward()
 
 void MusicCommon::seekback()
 {
+    // I don't know why, but seeking before 00:05 fails.  Repeated
+    // rewind under 00:05 can hold time < 5s while the music plays.
+    // Time starts incrementing from zero but is now several seconds
+    // behind.  Finishing a track after this records a truncated
+    // length.  We can workaround this by limiting rewind to 1s.
     std::chrono::seconds nextTime = m_currentTime - 5s;
-    nextTime = std::clamp(nextTime, 0s, m_maxTime);
+    nextTime = std::clamp(nextTime, 1s, m_maxTime); // #787
     seek(nextTime);
 }
 
@@ -2136,10 +2141,15 @@ QString MusicCommon::getTimeString(std::chrono::seconds exTime, std::chrono::sec
 {
     if (maxTime <= 0ms)
         return MythDate::formatTime(exTime,
-                              (exTime >= 1h) ? "H:mm:ss" : "mm:ss");
+                                    (exTime >= 1h) ? "H:mm:ss" : "mm:ss");
 
     QString fmt = (maxTime >= 1h) ? "H:mm:ss" : "mm:ss";
-    return MythDate::formatTime(exTime, fmt) + " / " + MythDate::formatTime(maxTime, fmt);
+    QString out = MythDate::formatTime(exTime, fmt)
+        + " / " + MythDate::formatTime(maxTime, fmt);
+    float speed = gPlayer->getSpeed();
+    if (int(speed * 100.0F + 0.5F) != 100) // v34 - show altered speed
+        out += QString(", %1").arg(speed);
+    return out;
 }
 
 void MusicCommon::searchButtonList(void)

@@ -193,6 +193,9 @@
                 "minute": "Minut",
                 "minutes": "Referater",
                 "myth_drive": "MythTV Drive",
+                "mythfill_last": "Sidste kørsel af mythfilldatabase startede den {{GuideStart}} og sluttede den {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Foreslået næste kørsel af mythfilldatabase {{GuideNext}}.",
+                "mythfill_until": "Der er guidedata indtil {{GuideThru}} ({{GuideDays}} dage).",
                 "none": "Ingen maskinoplysninger tilgængelig",
                 "space_after_expire": "Plads til rådighed efter automatisk udløb",
                 "space_deleted": "Plads brugt af slettede optagelser",
@@ -203,6 +206,7 @@
                 "title": "Maskin info",
                 "total_space": "Total plads"
             },
+            "misc_title": "Diverse",
             "no_encoders": "Backend har ingen indkodere",
             "schedule_none": "Intet planlagt til at optage",
             "schedule_text": "De næste {{ length }} show(s), der er planlagt til optagelse.",

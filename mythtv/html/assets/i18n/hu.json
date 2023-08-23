@@ -193,6 +193,9 @@
                 "minute": "Perc",
                 "minutes": "Percek",
                 "myth_drive": "MythTV Drive",
+                "mythfill_last": "A mythfilldatabase legutóbbi futtatása ekkor kezdődött: {{GuideStart}}, és ekkor ért véget: {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "A mythfilldatabase következő futtatása javasolt: {{GuideNext}}.",
+                "mythfill_until": "Útmutató adatok vannak {{GuideThru}}-ig ({{GuideDays}} nap).",
                 "none": "Gépinformáció nem áll rendelkezésre",
                 "space_after_expire": "Szabad hely az automatikus lejárat után",
                 "space_deleted": "A törölt felvételek által használt terület",
@@ -203,6 +206,7 @@
                 "title": "Gép Info",
                 "total_space": "Teljes tér"
             },
+            "misc_title": "Vegyes",
             "no_encoders": "A háttérben nincsenek kódolók",
             "schedule_none": "Nincs ütemezett rögzítés",
             "schedule_text": "A következő felvételre ütemezett {{ length }} műsor(ok).",

@@ -193,6 +193,9 @@
                 "minute": "минута",
                 "minutes": "Минути",
                 "myth_drive": "MythTV Drive",
+                "mythfill_last": "Последното изпълнение на mythfilldatabase започна на {{GuideStart}} и завърши на {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Предложено следващо изпълнение на mythfilldatabase {{GuideNext}}.",
+                "mythfill_until": "Има справочни данни до {{GuideThru}} ({{GuideDays}} дни).",
                 "none": "Няма налична информация за машината",
                 "space_after_expire": "Налично място след автоматично изтичане",
                 "space_deleted": "Пространство, използвано от изтритите записи",
@@ -203,6 +206,7 @@
                 "title": "Информация за машината",
                 "total_space": "Общо пространство"
             },
+            "misc_title": "Разни",
             "no_encoders": "Backend няма енкодери",
             "schedule_none": "Няма планирано записване",
             "schedule_text": "Следващите {{ length }} предавания, които са насрочени за запис.",

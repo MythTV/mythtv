@@ -6,6 +6,12 @@
     <app-status-machineinfo [machineinfo]="st.MachineInfo"></app-status-machineinfo>
     <app-status-backends [backends]="st.Backends"></app-status-backends>
     <app-status-frontends [frontends]="st.Frontends"></app-status-frontends>
+    <div class="statusBox" *ngIf="st.Miscellaneous">
+        <h2>{{ 'dashboard.status.misc_title' | translate }}</h2>
+        <div>
+            {{st.Miscellaneous}}
+        </div>
+    </div>
 </div>
 <ng-template #loading>
     <div>Loading...</div>

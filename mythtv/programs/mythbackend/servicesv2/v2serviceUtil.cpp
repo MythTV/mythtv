@@ -773,6 +773,10 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
     if (nRecordId <= 0)
         nRecordId = -1;
 
+    // For nRecStatus to be effective, showAll must be true.
+    if (nRecStatus != 0)
+        bShowAll = true;
+
     // NOTE: Fetching this information directly from the schedule is
     //       significantly faster than using ProgramInfo::LoadFromScheduler()
     auto *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
@@ -795,7 +799,7 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
 
         if (!bShowAll && ((((*it)->GetRecordingStatus() >= RecStatus::Pending) &&
                            ((*it)->GetRecordingStatus() <= RecStatus::WillRecord)) ||
-                          ((*it)->GetRecordingStatus() == RecStatus::Recorded) ||
+                          ((*it)->GetRecordingStatus() == RecStatus::Offline) ||
                           ((*it)->GetRecordingStatus() == RecStatus::Conflict)) &&
             ((*it)->GetRecordingEndTime() > MythDate::current()))
         {   // NOLINT(bugprone-branch-clone)

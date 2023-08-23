@@ -193,6 +193,9 @@
                 "minute": "Minute",
                 "minutes": "Minutes",
                 "myth_drive": "Lecteur MythTV",
+                "mythfill_last": "La dernière exécution de mythfilldatabase a commencé le {{GuideStart}} et s'est terminée le {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Prochaine exécution suggérée de mythfilldatabase {{GuideNext}}.",
+                "mythfill_until": "Il y a des données de guide jusqu'à {{GuideThru}} ({{GuideDays}} jours).",
                 "none": "Aucune information machine disponible",
                 "space_after_expire": "Espace disponible après l'expiration automatique",
                 "space_deleted": "Espace utilisé par les enregistrements supprimés",
@@ -203,6 +206,7 @@
                 "title": "Informations sur l'appareil",
                 "total_space": "Espace total"
             },
+            "misc_title": "Divers",
             "no_encoders": "Le backend n'a pas d'encodeurs",
             "schedule_none": "Rien de prévu à enregistrer",
             "schedule_text": "La ou les prochaines émissions de {{ length }} dont l'enregistrement est programmé.",

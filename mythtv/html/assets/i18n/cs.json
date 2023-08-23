@@ -193,6 +193,9 @@
                 "minute": "Minuta",
                 "minutes": "Minut",
                 "myth_drive": "MythTV Drive",
+                "mythfill_last": "Poslední běh mythfilldatabase začal {{GuideStart}} a skončil {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Doporučené další spuštění databáze mythfilldatabase {{GuideNext}}.",
+                "mythfill_until": "Údaje o průvodcích jsou k dispozici do {{GuideThru}} ({{GuideDays}} dní).",
                 "none": "Nejsou k dispozici žádné informace o stroji",
                 "space_after_expire": "Volné místo po automatickém vypršení",
                 "space_deleted": "Prostor využívaný smazanými nahrávkami",
@@ -203,6 +206,7 @@
                 "title": "Informace o stroji",
                 "total_space": "Celkový prostor"
             },
+            "misc_title": "Smíšený",
             "no_encoders": "Backend nemá žádné kodéry",
             "schedule_none": "Nic plánovaného k nahrávání",
             "schedule_text": "Dalších {{ length }} pořadů, které jsou naplánovány k nahrávání.",

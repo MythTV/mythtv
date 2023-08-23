@@ -1,5 +1,5 @@
 <div class="statusBox">
-    <p>{{ 'dashboard.status.backends_title' | translate }}:</p>
+    <h2>{{ 'dashboard.status.backends_title' | translate }}</h2>
     <div *ngIf="backends?.length != 0; else noBackends">
         <ul>
             <div *ngFor="let backend of backends">

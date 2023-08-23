@@ -193,6 +193,9 @@
                 "minute": "Mínúta",
                 "minutes": "Fundargerð",
                 "myth_drive": "MythTV Drive",
+                "mythfill_last": "Síðasta mythfilldatabase keyrsla hófst {{GuideStart}} og lauk {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Stungið upp á næstu mythfilldatabase keyrslu {{GuideNext}}.",
+                "mythfill_until": "Það eru leiðargögn til {{GuideThru}} ({{GuideDays}} dagar).",
                 "none": "Engar vélaupplýsingar tiltækar",
                 "space_after_expire": "Pláss laust eftir að sjálfkrafa rennur út",
                 "space_deleted": "Rými notað af eyttum upptökum",
@@ -203,6 +206,7 @@
                 "title": "Upplýsingar um vél",
                 "total_space": "Heildarrými"
             },
+            "misc_title": "Ýmislegt",
             "no_encoders": "Bakendi hefur enga kóðara",
             "schedule_none": "Ekkert áætlað að taka upp",
             "schedule_text": "Næstu {{ length }} sýning(ar) sem eru áætluð til upptöku.",

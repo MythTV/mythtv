@@ -5080,7 +5080,8 @@ void AvFormatDecoder::StreamChangeCheck(void)
 {
     if (m_streamsChanged)
     {
-        SeekReset(0, 0, true, true);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("StreamChangeCheck skip SeekReset"));
+        // SeekReset(0, 0, true, true);
         ScanStreams(false);
         m_streamsChanged = false;
     }

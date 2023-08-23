@@ -193,6 +193,9 @@
                 "minute": "Minutt",
                 "minutes": "Minutter",
                 "myth_drive": "MythTV Drive",
+                "mythfill_last": "Siste kjøring av mythfilldatabase startet på {{GuideStart}} og avsluttet på {{GuideEnd}}, {{GuideStatus}}",
+                "mythfill_next": "Foreslått neste kjøring av mythfilldatabase {{GuideNext}}.",
+                "mythfill_until": "Det er guidedata frem til {{GuideThru}} ({{GuideDays}} dager).",
                 "none": "Ingen maskininformasjon tilgjengelig",
                 "space_after_expire": "Plass tilgjengelig etter automatisk utløp",
                 "space_deleted": "Plass brukt av slettede opptak",
@@ -203,6 +206,7 @@
                 "title": "Maskininfo",
                 "total_space": "Totalt område, totalt areal"
             },
+            "misc_title": "Diverse",
             "no_encoders": "Backend har ingen kodere",
             "schedule_none": "Ingenting er planlagt å ta opp",
             "schedule_text": "Neste {{ length }} show(er) som er planlagt for opptak.",
