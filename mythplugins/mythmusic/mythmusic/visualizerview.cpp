@@ -223,7 +223,7 @@ bool TrackInfoPopup::keyPressEvent(QKeyEvent *event)
     if (m_displayTimer)
         m_displayTimer->start(MUSICINFOPOPUPTIME);
 
-    if (!handled && MusicCommon::keyPressEvent(event))
+    if (!handled && VisualizerView::keyPressEvent(event))
         handled = true;
 
     return handled;

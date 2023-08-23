@@ -154,16 +154,6 @@ MelScale::MelScale(int maxscale, int maxrange, int maxfreq)
     setMax(maxscale, maxrange, maxfreq);
 }
 
-double MelScale::hz2mel(double hz)
-{
-    return 1127 * log(1 + hz / 700);
-}
-
-double MelScale::mel2hz(double mel)
-{
-    return 700 * (exp(mel / 1127) - 1);
-}
-
 void MelScale::setMax(int maxscale, int maxrange, int maxfreq)
 {
     if (maxscale == 0 || maxrange == 0 || maxfreq == 0)
@@ -978,12 +968,12 @@ Spectrogram::Spectrogram(bool hist)
     // 0000ff blue              we end where we started!
     static constexpr int UP { 2 };
     static constexpr int DN { 3 };
-    int red[]   = {  0,  0, UP,  1,  1, DN }; // 0=OFF, 1=ON
-    int green[] = { UP,  1,  1, DN,  0,  0 };
-    int blue[]  = {  1, DN,  0,  0, UP,  1 };
-    m_red   = (int *) malloc(sizeof(int) * 256 * 6);
-    m_green = (int *) malloc(sizeof(int) * 256 * 6);
-    m_blue  = (int *) malloc(sizeof(int) * 256 * 6);
+    static QVector<int> red   {  0,  0, UP,  1,  1, DN }; // 0=OFF, 1=ON
+    static QVector<int> green { UP,  1,  1, DN,  0,  0 };
+    static QVector<int> blue  {  1, DN,  0,  0, UP,  1 };
+    m_red.resize(  256 * 6);
+    m_green.resize(256 * 6);
+    m_blue.resize( 256 * 6);
     for (int i = 0; i < 6; i++) // for 6 color transitions...
     {
         int r = red[i];         // 0=OFF, 1=ON, UP, or DN
@@ -1003,9 +993,6 @@ Spectrogram::~Spectrogram()
     av_freep(&m_dftL);
     av_freep(&m_dftR);
     av_rdft_end(m_rdftContext);
-    if (m_red)   free(m_red);
-    if (m_green) free(m_green);
-    if (m_blue)  free(m_blue);
 }
 
 void Spectrogram::resize(const QSize &newsize)
@@ -1076,10 +1063,11 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
         int start = m_fftlen - i;
         float mult = 0.8F;      // decay older sound by this much
         for (int k = 0; k < start; k++)
-        {
-            if (k > start - i)  // prior set ramps from mult to 1.0
+        {                       // prior set ramps from mult to 1.0
+            if (k > start - i && start > i)
             {
-                mult = mult + (1 - mult) * (1 - (start - k) / (start - i));
+                mult = mult + (1 - mult) *
+                    (1 - (float)(start - k) / (float)(start - i));
             }
             m_sigL[k] = mult * m_sigL[i + k];
             m_sigR[k] = mult * m_sigR[i + k];
@@ -1149,7 +1137,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
         //     .arg(i).arg(index).arg(count).arg(freq).arg(left).arg(right));
 
         left *= gain;
-        float mag = clamp(left, 255, 0);
+        int mag = clamp(left, 255, 0);
         int z = (int)(mag * 6);
         left > 255 ? painter.setPen(Qt::white) :
             painter.setPen(qRgb(m_red[z], m_green[z], m_blue[z]));
@@ -1340,7 +1328,7 @@ void Spectrum::resize(const QSize &newsize)
         m_magnitudes[os] = 0.0;
     }
 
-    m_scaleFactor = m_size.height() / 2 / 42;
+    m_scaleFactor = m_size.height() / 2. / 42.;
 }
 
 // this moved up to Spectrogram so both can use it

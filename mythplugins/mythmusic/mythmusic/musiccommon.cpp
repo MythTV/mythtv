@@ -2147,7 +2147,7 @@ QString MusicCommon::getTimeString(std::chrono::seconds exTime, std::chrono::sec
     QString out = MythDate::formatTime(exTime, fmt)
         + " / " + MythDate::formatTime(maxTime, fmt);
     float speed = gPlayer->getSpeed();
-    if (int(speed * 100.0F + 0.5F) != 100) // v34 - show altered speed
+    if (lroundf(speed * 100.0F) != 100.0F) // v34 - show altered speed
         out += QString(", %1").arg(speed);
     return out;
 }

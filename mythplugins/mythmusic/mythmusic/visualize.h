@@ -203,8 +203,8 @@ class MelScale
     int range() const { return m_range; }
 
     void setMax(int maxscale, int maxrange, int maxfreq);
-    double hz2mel(double hz);
-    double mel2hz(double mel);
+    static double hz2mel(double hz) { return 1127 * log(1 + hz / 700); }
+    static double mel2hz(double mel) { return 700 * (exp(mel / 1127) - 1); }
     int operator[](int index);
 
   private:
@@ -247,9 +247,9 @@ class Spectrogram : public VisualBase
     FFTSample*     m_dftL { nullptr }; // real in, complex out
     FFTSample*     m_dftR { nullptr };
     RDFTContext*   m_rdftContext { nullptr };
-    int            *m_red   {nullptr}; // continuous color spectrum
-    int            *m_green {nullptr};
-    int            *m_blue  {nullptr};
+    QVector<int>   m_red;       // continuous color spectrum
+    QVector<int>   m_green;
+    QVector<int>   m_blue;
     bool           m_binpeak { true }; // peak of bins, else mean
     bool           m_history { true }; // spectrogram? or spectrum
 };
