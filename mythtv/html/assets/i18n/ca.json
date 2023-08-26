@@ -46,6 +46,7 @@
             "alreadydel": "Ja s'ha eliminat",
             "canundel": "Podeu revertir-ho fent servir Undelete.",
             "channel": "Canal",
+            "damaged": "Espatllat",
             "delete_details": "Això suprimirà la regla de gravació",
             "delete_rule": "Suprimeix la regla de gravació",
             "description": "Descripció",
@@ -63,6 +64,8 @@
             "job_Transcode": "Transcodificar",
             "mnu_delete": "Suprimeix",
             "mnu_delete_rerec": "Suprimeix i permet tornar a gravar",
+            "mnu_markdamaged": "Marca com a danyat",
+            "mnu_markundamaged": "Marca com a indemne",
             "mnu_markunwatched": "Marca com a no observat",
             "mnu_markwatched": "Marca com a vist",
             "mnu_rerec": "Permet tornar a gravar",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Recuperació",
             "mnu_updatemeta": "Actualitza les metadades",
             "mnu_updaterecrule": "Actualitza la regla de registre",
+            "nonrerec": "Per permetre la nova gravació del programa danyat, utilitzeu Allow Re Record.",
             "orig_airdate": "Data d'emissió original",
             "override_rule": "Afegeix o edita una regla de substitució",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "Això aturarà la gravació",
             "stop_recording": "Atura la gravació",
             "subtitle": "Subtítol",
-            "title": "Títol"
+            "title": "Títol",
+            "watched": "Mirat"
         },
         "recrule": {
             "type": "Tipus"

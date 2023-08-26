@@ -46,6 +46,7 @@
             "alreadydel": "Já Excluído",
             "canundel": "Você pode reverter isso usando Undelete.",
             "channel": "Canal",
+            "damaged": "Danificado",
             "delete_details": "Isso excluirá a regra de gravação",
             "delete_rule": "Excluir Regra de Gravação",
             "description": "Descrição",
@@ -63,6 +64,8 @@
             "job_Transcode": "Transcodificar",
             "mnu_delete": "Excluir",
             "mnu_delete_rerec": "Excluir e permitir regravação",
+            "mnu_markdamaged": "Marcar como danificado",
+            "mnu_markundamaged": "Marcar como não danificado",
             "mnu_markunwatched": "Marcar como não assistido",
             "mnu_markwatched": "Marcar como assistido",
             "mnu_rerec": "Permitir regravação",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Recuperar",
             "mnu_updatemeta": "Atualizar metadados",
             "mnu_updaterecrule": "Atualizar regra de registro",
+            "nonrerec": "Para permitir a nova gravação do programa danificado, use Permitir nova gravação.",
             "orig_airdate": "Data Original de Transmissão",
             "override_rule": "Adicionar ou editar regra de substituição",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "Isso interromperá a gravação",
             "stop_recording": "Pare de gravar",
             "subtitle": "Legenda",
-            "title": "Título"
+            "title": "Título",
+            "watched": "Assistido"
         },
         "recrule": {
             "type": "Tipo"

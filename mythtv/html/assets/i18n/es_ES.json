@@ -46,6 +46,7 @@
             "alreadydel": "ya eliminado",
             "canundel": "Puede revertir esto usando Recuperar.",
             "channel": "Canal",
+            "damaged": "Dañado",
             "delete_details": "Esto eliminará la regla de grabación",
             "delete_rule": "Eliminar regla de grabación",
             "description": "Descripción",
@@ -63,6 +64,8 @@
             "job_Transcode": "Transcodificar",
             "mnu_delete": "Borrar",
             "mnu_delete_rerec": "Eliminar y permitir volver a grabar",
+            "mnu_markdamaged": "Marcar como dañado",
+            "mnu_markundamaged": "Marcar como no dañado",
             "mnu_markunwatched": "Marcar como no visto",
             "mnu_markwatched": "Marcar como visto",
             "mnu_rerec": "Permitir volver a grabar",
@@ -71,6 +74,7 @@
             "mnu_undelete": "recuperar",
             "mnu_updatemeta": "Actualizar metadatos",
             "mnu_updaterecrule": "Actualizar regla de registro",
+            "nonrerec": "Para permitir la regrabación del programa dañado, utilice Permitir regrabación.",
             "orig_airdate": "Fecha de emisión original",
             "override_rule": "Agregar o editar regla de anulación",
             "recgrp": "Grupo rec.",
@@ -79,7 +83,8 @@
             "stop_details": "Esto dejará de grabar",
             "stop_recording": "Para de grabar",
             "subtitle": "Subtitular",
-            "title": "Título"
+            "title": "Título",
+            "watched": "Observó"
         },
         "recrule": {
             "type": "Tipo"

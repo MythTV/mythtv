@@ -46,6 +46,7 @@
             "alreadydel": "Jo Poistettu",
             "canundel": "Voit peruuttaa tämän käyttämällä Undelete-toimintoa.",
             "channel": "kanava",
+            "damaged": "Vaurioitunut",
             "delete_details": "Tämä poistaa tallennussäännön",
             "delete_rule": "Poista tallennussääntö",
             "description": "Kuvaus",
@@ -63,6 +64,8 @@
             "job_Transcode": "Transkoodaus",
             "mnu_delete": "Poistaa",
             "mnu_delete_rerec": "Poista ja salli tallennus uudelleen",
+            "mnu_markdamaged": "Merkitse vaurioituneeksi",
+            "mnu_markundamaged": "Merkitse vahingoittumattomaksi",
             "mnu_markunwatched": "Merkitse katsomattomaksi",
             "mnu_markwatched": "Merkitse katsotuksi",
             "mnu_rerec": "Salli tallennus uudelleen",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Peruuta",
             "mnu_updatemeta": "Päivitä metatiedot",
             "mnu_updaterecrule": "Päivitä tallennussääntö",
+            "nonrerec": "Salli vioittuneen ohjelman tallentaminen uudelleen valitsemalla Allow Re Record.",
             "orig_airdate": "Alkuperäinen lentopäivämäärä",
             "override_rule": "Lisää tai muokkaa ohitussääntöä",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "Tämä lopettaa tallennuksen",
             "stop_recording": "Lopeta tallennus",
             "subtitle": "Tekstitys",
-            "title": "Otsikko"
+            "title": "Otsikko",
+            "watched": "Katsoi"
         },
         "recrule": {
             "type": "Tyyppi"

@@ -46,6 +46,7 @@
             "alreadydel": "Allerede slettet",
             "canundel": "Du kan reversere dette ved å bruke Angre sletting.",
             "channel": "Kanal",
+            "damaged": "Skadet",
             "delete_details": "Dette vil slette opptaksregelen",
             "delete_rule": "Slett opptaksregel",
             "description": "Beskrivelse",
@@ -63,6 +64,8 @@
             "job_Transcode": "Transkode",
             "mnu_delete": "Slett",
             "mnu_delete_rerec": "Slett og tillat opptak på nytt",
+            "mnu_markdamaged": "Merk som skadet",
+            "mnu_markundamaged": "Merk som uskadet",
             "mnu_markunwatched": "Merk som usett",
             "mnu_markwatched": "Merk som sett",
             "mnu_rerec": "Tillat opptak på nytt",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Angre sletting",
             "mnu_updatemeta": "Oppdater metadata",
             "mnu_updaterecrule": "Oppdater postregel",
+            "nonrerec": "For å tillate ny registrering av det skadede programmet, vennligst bruk Tillat ny registrering.",
             "orig_airdate": "Original luftdato",
             "override_rule": "Legg til eller rediger overstyringsregel",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "Dette vil stoppe opptaket",
             "stop_recording": "Stopp opptak",
             "subtitle": "Undertekst",
-            "title": "Tittel"
+            "title": "Tittel",
+            "watched": "Så på"
         },
         "recrule": {
             "type": "Type"

@@ -46,6 +46,7 @@
             "alreadydel": "Allerede slettet",
             "canundel": "Du kan vende dette ved at bruge Undelete.",
             "channel": "Kanal",
+            "damaged": "Beskadiget",
             "delete_details": "Dette vil slette optagelsesreglen",
             "delete_rule": "Slet optagelsesregel",
             "description": "Beskrivelse",
@@ -63,6 +64,8 @@
             "job_Transcode": "Omkode",
             "mnu_delete": "Slet",
             "mnu_delete_rerec": "Slet og tillad genindspilning",
+            "mnu_markdamaged": "Marker som beskadiget",
+            "mnu_markundamaged": "Marker som ubeskadiget",
             "mnu_markunwatched": "Markér som uovervåget",
             "mnu_markwatched": "Marker som set",
             "mnu_rerec": "Tillad Genoptagelse",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Fortryd sletning",
             "mnu_updatemeta": "Opdater metadata",
             "mnu_updaterecrule": "Opdater registreringsregel",
+            "nonrerec": "For at tillade genoptagelse af det beskadigede program, brug venligst Tillad genoptagelse.",
             "orig_airdate": "Original luftdato",
             "override_rule": "Tilføj eller rediger tilsidesættelsesregel",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "Dette vil stoppe optagelsen",
             "stop_recording": "Stop optagelse",
             "subtitle": "Undertekst",
-            "title": "Titel"
+            "title": "Titel",
+            "watched": "Så"
         },
         "recrule": {
             "type": "Type"

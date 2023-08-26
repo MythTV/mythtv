@@ -46,6 +46,7 @@
             "alreadydel": "כבר נמחק",
             "canundel": "אתה יכול להפוך זאת על ידי שימוש בביטול המחיקה.",
             "channel": "עָרוּץ",
+            "damaged": "פגום",
             "delete_details": "פעולה זו תמחק את כלל ההקלטה",
             "delete_rule": "מחק את כלל ההקלטה",
             "description": "תיאור",
@@ -63,6 +64,8 @@
             "job_Transcode": "המרת קוד",
             "mnu_delete": "לִמְחוֹק",
             "mnu_delete_rerec": "מחק ואפשר הקלטה מחדש",
+            "mnu_markdamaged": "סמן כפגום",
+            "mnu_markundamaged": "סמן כלא פגום",
             "mnu_markunwatched": "סמן כלא נצפה",
             "mnu_markwatched": "סמן כנצפית",
             "mnu_rerec": "אפשר הקלטה חוזרת",
@@ -71,6 +74,7 @@
             "mnu_undelete": "בטל מחיקה",
             "mnu_updatemeta": "עדכן מטא נתונים",
             "mnu_updaterecrule": "עדכון כלל הרשומה",
+            "nonrerec": "כדי לאפשר הקלטה חוזרת של התוכנית הפגומה, אנא השתמש ב- Allow Re Record.",
             "orig_airdate": "תאריך שידור מקורי",
             "override_rule": "הוסף או ערוך כלל ביטול",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "פעולה זו תפסיק את ההקלטה",
             "stop_recording": "הפסק להקליט",
             "subtitle": "כתוביות",
-            "title": "כותרת"
+            "title": "כותרת",
+            "watched": "צפו"
         },
         "recrule": {
             "type": "סוּג"

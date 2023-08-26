@@ -46,6 +46,7 @@
             "alreadydel": "Zaten Silinmiş",
             "canundel": "Geri Al'ı kullanarak bunu tersine çevirebilirsiniz.",
             "channel": "Kanal",
+            "damaged": "Hasarlı",
             "delete_details": "Bu Kayıt Kuralını siler",
             "delete_rule": "Kayıt Kuralını Sil",
             "description": "Tanım",
@@ -63,6 +64,8 @@
             "job_Transcode": "kod dönüştürme",
             "mnu_delete": "Silmek",
             "mnu_delete_rerec": "Sil ve Yeniden Kayda İzin Ver",
+            "mnu_markdamaged": "Hasarlı Olarak İşaretle",
+            "mnu_markundamaged": "Hasarsız Olarak İşaretle",
             "mnu_markunwatched": "İzlenmedi Olarak İşaretle",
             "mnu_markwatched": "İzlendi Olarak İşaretle",
             "mnu_rerec": "Yeniden Kayda İzin Ver",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Silme işlemini geri al",
             "mnu_updatemeta": "Meta Verileri Güncelle",
             "mnu_updaterecrule": "Kayıt Kuralını Güncelle",
+            "nonrerec": "Hasarlı programın yeniden kaydedilmesine izin vermek için lütfen Yeniden Kayda İzin Ver seçeneğini kullanın.",
             "orig_airdate": "Orijinal Yayın Tarihi",
             "override_rule": "Geçersiz Kılma Kuralı Ekleme veya Düzenleme",
             "recgrp": "Kayıt Grubu",
@@ -79,7 +83,8 @@
             "stop_details": "Bu Kaydı Durduracak",
             "stop_recording": "Kaydetmeyi bırak",
             "subtitle": "Alt yazı",
-            "title": "Başlık"
+            "title": "Başlık",
+            "watched": "izlendi"
         },
         "recrule": {
             "type": "Tip"

@@ -46,6 +46,7 @@
             "alreadydel": "Že izbrisano",
             "canundel": "To lahko obrnete z uporabo Undelete.",
             "channel": "Kanal",
+            "damaged": "Poškodovan",
             "delete_details": "S tem boste izbrisali pravilo snemanja",
             "delete_rule": "Izbriši pravilo snemanja",
             "description": "Opis",
@@ -63,6 +64,8 @@
             "job_Transcode": "Prekodiraj",
             "mnu_delete": "Izbriši",
             "mnu_delete_rerec": "Izbriši in dovoli ponovno snemanje",
+            "mnu_markdamaged": "Označi kot poškodovano",
+            "mnu_markundamaged": "Označi kot nepoškodovano",
             "mnu_markunwatched": "Označi kot neogledano",
             "mnu_markwatched": "Označi kot gledano",
             "mnu_rerec": "Dovoli ponovno snemanje",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Razveljavi brisanje",
             "mnu_updatemeta": "Posodobi metapodatke",
             "mnu_updaterecrule": "Posodobi pravilo zapisa",
+            "nonrerec": "Če želite omogočiti ponovno snemanje poškodovanega programa, uporabite možnost Dovoli ponovno snemanje.",
             "orig_airdate": "Prvotni datum predvajanja",
             "override_rule": "Dodajanje ali urejanje pravila za preglasitev",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "To bo ustavilo snemanje",
             "stop_recording": "Ustavi snemanje",
             "subtitle": "Podnaslov",
-            "title": "Naslov"
+            "title": "Naslov",
+            "watched": "Gledal"
         },
         "recrule": {
             "type": "Vrsta"

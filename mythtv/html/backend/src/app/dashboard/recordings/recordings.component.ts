@@ -7,7 +7,6 @@ import { PartialObserver } from 'rxjs';
 import { DvrService } from 'src/app/services/dvr.service';
 import { GetRecordedListRequest, UpdateRecordedMetadataRequest } from 'src/app/services/interfaces/dvr.interface';
 import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
-import { ProgramList } from 'src/app/services/interfaces/program.interface';
 import { JobQCommands } from 'src/app/services/interfaces/setup.interface';
 import { SetupService } from 'src/app/services/setup.service';
 import { UtilityService } from 'src/app/services/utility.service';
@@ -27,7 +26,7 @@ export class RecordingsComponent implements OnInit {
   recGroups: string[] = [];
   lazyLoadEvent!: LazyLoadEvent;
   JobQCmds!: JobQCommands;
-  program: ScheduleOrProgram = <ScheduleOrProgram>{ Title: '' };
+  program: ScheduleOrProgram = <ScheduleOrProgram>{ Title: '', Recording: {} };
   editingProgram?: ScheduleOrProgram;
   displayMetadataDlg = false;
   displayRunJobs = false;
@@ -41,7 +40,8 @@ export class RecordingsComponent implements OnInit {
     Failed: 'common.failed',
     NetFail: 'common.networkfail',
     CanUndo: 'dashboard.recordings.canundel',
-    AlreadyDel: 'dashboard.recordings.alreadydel'
+    AlreadyDel: 'dashboard.recordings.alreadydel',
+    NonReRec: 'dashboard.recordings.nonrerec'
   }
 
   jobsoffset = 3; // number of items before user jobs
@@ -62,6 +62,8 @@ export class RecordingsComponent implements OnInit {
   mnu_rerec: MenuItem = { label: 'dashboard.recordings.mnu_rerec', command: (event) => this.rerec(event) };
   mnu_markwatched: MenuItem = { label: 'dashboard.recordings.mnu_markwatched', command: (event) => this.markwatched(event, true) };
   mnu_markunwatched: MenuItem = { label: 'dashboard.recordings.mnu_markunwatched', command: (event) => this.markwatched(event, false) };
+  mnu_markdamaged: MenuItem = { label: 'dashboard.recordings.mnu_markdamaged', command: (event) => this.markdamaged(event, true) };
+  mnu_markundamaged: MenuItem = { label: 'dashboard.recordings.mnu_markundamaged', command: (event) => this.markdamaged(event, false) };
   mnu_updatemeta: MenuItem = { label: 'dashboard.recordings.mnu_updatemeta', command: (event) => this.updatemeta(event) };
   mnu_updaterecrule: MenuItem = { label: 'dashboard.recordings.mnu_updaterecrule', command: (event) => this.updaterecrule(event) };
   mnu_stoprec: MenuItem = { label: 'dashboard.recordings.mnu_stoprec', command: (event) => this.stoprec(event) };
@@ -106,8 +108,9 @@ export class RecordingsComponent implements OnInit {
     }
 
     const mnu_entries = [this.mnu_delete, this.mnu_delete_rerec, this.mnu_undelete, this.mnu_rerec, this.mnu_markwatched,
-    this.mnu_markunwatched, this.mnu_updatemeta, this.mnu_updaterecrule, this.mnu_stoprec, this.mnu_runjobs,
-    this.jobs[0], this.jobs[1], this.jobs[2], ...this.matchModeRecGrp, ...this.matchModeTitle]
+    this.mnu_markunwatched, this.mnu_markdamaged, this.mnu_markundamaged, this.mnu_updatemeta, this.mnu_updaterecrule,
+    this.mnu_stoprec, this.mnu_runjobs, this.jobs[0], this.jobs[1], this.jobs[2],
+    ...this.matchModeRecGrp, ...this.matchModeTitle]
 
     mnu_entries.forEach(entry => {
       if (entry.label)
@@ -204,6 +207,10 @@ export class RecordingsComponent implements OnInit {
       this.menuToShow.push(this.mnu_markunwatched);
     else
       this.menuToShow.push(this.mnu_markwatched);
+    if (program.VideoPropNames.indexOf('DAMAGED') > -1)
+      this.menuToShow.push(this.mnu_markundamaged);
+    else
+      this.menuToShow.push(this.mnu_markdamaged);
     this.menuToShow.push(this.mnu_updatemeta);
     if (this.program.Recording.RecGroup != 'Deleted') {
       this.menuToShow.push(this.mnu_runjobs);
@@ -318,6 +325,28 @@ export class RecordingsComponent implements OnInit {
       });
   }
 
+  markdamaged(event: any, damaged: boolean) {
+    this.dvrService.UpdateRecordedMetadata(
+      { RecordedId: this.program.Recording.RecordedId, Damaged: damaged }).subscribe({
+        next: (x) => {
+          if (x.bool) {
+            if (damaged) {
+              this.sendMessage('success', event.item.label, this.msg.Success, this.msg.NonReRec);
+              this.program.VideoPropNames = this.program.VideoPropNames + '|DAMAGED|';
+            }
+            else {
+              this.sendMessage('success', event.item.label, this.msg.Success);
+              const regex = /DAMAGED/g;
+              this.program.VideoPropNames = this.program.VideoPropNames.replace(regex, '');
+            }
+          }
+          else
+            this.sendMessage('error', event.item.label, this.msg.Failed);
+        },
+        error: (err: any) => this.networkError(err)
+      });
+  }
+
   updatemeta(event: any) {
     this.editingProgram = this.program;
     this.program = Object.assign({}, this.program);
@@ -326,6 +355,7 @@ export class RecordingsComponent implements OnInit {
     else
       this.program.Airdate = <Date><unknown>null;
     this.displayMetadataDlg = true;
+    this.currentForm.form.markAsPristine();
   }
 
   saveObserver: PartialObserver<any> = {
@@ -359,7 +389,8 @@ export class RecordingsComponent implements OnInit {
       OriginalAirDate: this.program.Airdate,
       Season: this.program.Season,
       SubTitle: this.program.SubTitle,
-      Title: this.program.Title
+      Title: this.program.Title,
+      RecGroup: this.program.Recording.RecGroup
     };
 
     this.dvrService.UpdateRecordedMetadata(request).subscribe(this.saveObserver);

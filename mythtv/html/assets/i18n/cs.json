@@ -46,6 +46,7 @@
             "alreadydel": "Již smazáno",
             "canundel": "Toto můžete zvrátit pomocí funkce Undelete.",
             "channel": "Kanál",
+            "damaged": "Poškozený",
             "delete_details": "Tím se odstraní pravidlo nahrávání",
             "delete_rule": "Odstranit pravidlo nahrávání",
             "description": "Popis",
@@ -63,6 +64,8 @@
             "job_Transcode": "Překódovat",
             "mnu_delete": "Vymazat",
             "mnu_delete_rerec": "Smazat a povolit opětovné nahrávání",
+            "mnu_markdamaged": "Označit jako poškozené",
+            "mnu_markundamaged": "Označit jako nepoškozené",
             "mnu_markunwatched": "Označit jako nesledované",
             "mnu_markwatched": "Označit jako sledované",
             "mnu_rerec": "Povolit opětovné nahrávání",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Obnovit",
             "mnu_updatemeta": "Aktualizujte metadata",
             "mnu_updaterecrule": "Aktualizovat pravidlo záznamu",
+            "nonrerec": "Chcete-li povolit opětovné nahrávání poškozeného programu, použijte možnost Povolit opětovné nahrávání.",
             "orig_airdate": "Původní datum vysílání",
             "override_rule": "Přidat nebo upravit pravidlo přepsání",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "Tím se zastaví nahrávání",
             "stop_recording": "Zastavit nahrávání",
             "subtitle": "Titulky",
-            "title": "Titul"
+            "title": "Titul",
+            "watched": "Pozorovala"
         },
         "recrule": {
             "type": "Typ"

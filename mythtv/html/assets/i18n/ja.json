@@ -46,6 +46,7 @@
             "alreadydel": "すでに削除されています",
             "canundel": "Undelete を使用すると、これを元に戻すことができます。",
             "channel": "チャネル",
+            "damaged": "破損した",
             "delete_details": "これにより、録音ルールが削除されます",
             "delete_rule": "録画ルールの削除",
             "description": "説明",
@@ -63,6 +64,8 @@
             "job_Transcode": "トランスコード",
             "mnu_delete": "消去",
             "mnu_delete_rerec": "削除して再録音を許可する",
+            "mnu_markdamaged": "破損としてマークする",
+            "mnu_markundamaged": "無傷としてマーク",
             "mnu_markunwatched": "未視聴としてマーク",
             "mnu_markwatched": "監視済みとしてマークする",
             "mnu_rerec": "再録音を許可する",
@@ -71,6 +74,7 @@
             "mnu_undelete": "削除を取り消す",
             "mnu_updatemeta": "メタデータの更新",
             "mnu_updaterecrule": "レコード更新ルール",
+            "nonrerec": "破損した番組の再録画を許可するには、「再録画を許可」を使用してください。",
             "orig_airdate": "元の放送日",
             "override_rule": "上書きルールの追加または編集",
             "recgrp": "レクグループ",
@@ -79,7 +83,8 @@
             "stop_details": "これにより録音が停止します",
             "stop_recording": "録音を停止する",
             "subtitle": "字幕",
-            "title": "タイトル"
+            "title": "タイトル",
+            "watched": "見た"
         },
         "recrule": {
             "type": "タイプ"

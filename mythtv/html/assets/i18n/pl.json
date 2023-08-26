@@ -46,6 +46,7 @@
             "alreadydel": "Już usunięte",
             "canundel": "Możesz to odwrócić, używając opcji Cofnij usunięcie.",
             "channel": "Kanał",
+            "damaged": "Uszkodzony",
             "delete_details": "Spowoduje to usunięcie reguły nagrywania",
             "delete_rule": "Usuń regułę nagrywania",
             "description": "Opis",
@@ -63,6 +64,8 @@
             "job_Transcode": "Transkoduj",
             "mnu_delete": "Usuwać",
             "mnu_delete_rerec": "Usuń i zezwól na ponowne nagranie",
+            "mnu_markdamaged": "Oznacz jako uszkodzony",
+            "mnu_markundamaged": "Oznacz jako nieuszkodzone",
             "mnu_markunwatched": "Oznacz jako nieobserwowane",
             "mnu_markwatched": "Oznacz jako obejrzane",
             "mnu_rerec": "Zezwalaj na ponowne nagrywanie",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Cofnij usunięcie",
             "mnu_updatemeta": "Zaktualizuj metadane",
             "mnu_updaterecrule": "Zaktualizuj regułę rekordu",
+            "nonrerec": "Aby umożliwić ponowne nagranie uszkodzonego programu, użyj opcji Zezwól na ponowne nagranie.",
             "orig_airdate": "Oryginalna data emisji",
             "override_rule": "Dodaj lub edytuj regułę nadpisywania",
             "recgrp": "Grupa nagr",
@@ -79,7 +83,8 @@
             "stop_details": "Spowoduje to zatrzymanie nagrywania",
             "stop_recording": "Zatrzymaj nagrywanie",
             "subtitle": "Podtytuł",
-            "title": "Tytuł"
+            "title": "Tytuł",
+            "watched": "Obejrzane"
         },
         "recrule": {
             "type": "Typ"

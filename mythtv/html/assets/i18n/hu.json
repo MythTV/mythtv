@@ -46,6 +46,7 @@
             "alreadydel": "Már törölve",
             "canundel": "Ezt megfordíthatja az Undelete használatával.",
             "channel": "Csatorna",
+            "damaged": "Sérült",
             "delete_details": "Ezzel törli a rögzítési szabályt",
             "delete_rule": "Törölje a rögzítési szabályt",
             "description": "Leírás",
@@ -63,6 +64,8 @@
             "job_Transcode": "Átkódolás",
             "mnu_delete": "Töröl",
             "mnu_delete_rerec": "Törlés és újrarögzítés engedélyezése",
+            "mnu_markdamaged": "Megjelölés sérültként",
+            "mnu_markundamaged": "Megjelölés sértetlenként",
             "mnu_markunwatched": "Megjelölés nem figyeltként",
             "mnu_markwatched": "Megjelölés figyeltként",
             "mnu_rerec": "Újrarögzítés engedélyezése",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Törlés visszavonása",
             "mnu_updatemeta": "Frissítse a metaadatokat",
             "mnu_updaterecrule": "Frissítse a rögzítési szabályt",
+            "nonrerec": "A sérült program újbóli rögzítésének engedélyezéséhez használja az Allow Re Record lehetőséget.",
             "orig_airdate": "Eredeti sugárzási dátum",
             "override_rule": "Felülbírálási szabály hozzáadása vagy szerkesztése",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "Ezzel leállítja a rögzítést",
             "stop_recording": "Felvétel leállítása",
             "subtitle": "Felirat",
-            "title": "Cím"
+            "title": "Cím",
+            "watched": "Figyelt"
         },
         "recrule": {
             "type": "típus"

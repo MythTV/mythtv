@@ -46,6 +46,7 @@
             "alreadydel": "Déjà supprimé",
             "canundel": "Vous pouvez inverser cela en utilisant Undelete.",
             "channel": "Canaliser",
+            "damaged": "Endommagé",
             "delete_details": "Cela supprimera la règle d'enregistrement",
             "delete_rule": "Supprimer la règle d'enregistrement",
             "description": "Description",
@@ -63,6 +64,8 @@
             "job_Transcode": "Transcoder",
             "mnu_delete": "Supprimer",
             "mnu_delete_rerec": "Supprimer et autoriser le réenregistrement",
+            "mnu_markdamaged": "Marquer comme endommagé",
+            "mnu_markundamaged": "Marquer comme intact",
             "mnu_markunwatched": "Marquer comme non surveillé",
             "mnu_markwatched": "Marquer comme regardé",
             "mnu_rerec": "Autoriser le réenregistrement",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Annuler la suppression",
             "mnu_updatemeta": "Mettre à jour les métadonnées",
             "mnu_updaterecrule": "Mettre à jour la règle d'enregistrement",
+            "nonrerec": "Pour autoriser le réenregistrement du programme endommagé, veuillez utiliser Autoriser le réenregistrement.",
             "orig_airdate": "Date de diffusion originale",
             "override_rule": "Ajouter ou modifier une règle de remplacement",
             "recgrp": "Groupe de réc.",
@@ -79,7 +83,8 @@
             "stop_details": "Cela arrêtera l'enregistrement",
             "stop_recording": "Arrête d'enregistrer",
             "subtitle": "Sous-titre",
-            "title": "Titre"
+            "title": "Titre",
+            "watched": "Regardé"
         },
         "recrule": {
             "type": "Taper"

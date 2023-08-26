@@ -46,6 +46,7 @@
             "alreadydel": "Redan raderad",
             "canundel": "Du kan vända detta genom att använda Återställ.",
             "channel": "Kanal",
+            "damaged": "Skadad",
             "delete_details": "Detta tar bort inspelningsregeln",
             "delete_rule": "Ta bort inspelningsregel",
             "description": "Beskrivning",
@@ -63,6 +64,8 @@
             "job_Transcode": "Omkoda",
             "mnu_delete": "Radera",
             "mnu_delete_rerec": "Ta bort och tillåt ominspelning",
+            "mnu_markdamaged": "Markera som skadad",
+            "mnu_markundamaged": "Markera som oskadad",
             "mnu_markunwatched": "Markera som obevakad",
             "mnu_markwatched": "Markera som bevakad",
             "mnu_rerec": "Tillåt ominspelning",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Ångra radering",
             "mnu_updatemeta": "Uppdatera metadata",
             "mnu_updaterecrule": "Uppdatera postregel",
+            "nonrerec": "För att tillåta återinspelning av det skadade programmet, använd Allow Re Record.",
             "orig_airdate": "Original Air Date",
             "override_rule": "Lägg till eller redigera åsidosättningsregel",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "Detta kommer att stoppa inspelningen",
             "stop_recording": "Stoppa inspelning",
             "subtitle": "Texta",
-            "title": "Titel"
+            "title": "Titel",
+            "watched": "Betraktade"
         },
         "recrule": {
             "type": "Typ"

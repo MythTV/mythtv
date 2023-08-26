@@ -46,6 +46,7 @@
             "alreadydel": "Reeds verwijderd",
             "canundel": "U kunt dit ongedaan maken door Undelete te gebruiken.",
             "channel": "Kanaal",
+            "damaged": "Beschadigd",
             "delete_details": "Hiermee wordt de opnameregel verwijderd",
             "delete_rule": "Opnameregel verwijderen",
             "description": "Beschrijving",
@@ -63,6 +64,8 @@
             "job_Transcode": "Transcoderen",
             "mnu_delete": "Verwijderen",
             "mnu_delete_rerec": "Verwijderen en opnieuw opnemen toestaan",
+            "mnu_markdamaged": "Markeer als beschadigd",
+            "mnu_markundamaged": "Markeer als onbeschadigd",
             "mnu_markunwatched": "Markeren als niet bekeken",
             "mnu_markwatched": "Markeren als bekeken",
             "mnu_rerec": "Opnieuw opnemen toestaan",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Verwijderen ongedaan maken",
             "mnu_updatemeta": "Metagegevens bijwerken",
             "mnu_updaterecrule": "Recordregel bijwerken",
+            "nonrerec": "Om opnieuw opnemen van het beschadigde programma mogelijk te maken, gebruikt u Toestaan ​​opnieuw opnemen.",
             "orig_airdate": "Originele uitzenddatum",
             "override_rule": "Negeerregel toevoegen of bewerken",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "Hierdoor wordt de opname gestopt",
             "stop_recording": "Stop met opnemen",
             "subtitle": "Ondertitel",
-            "title": "Titel"
+            "title": "Titel",
+            "watched": "Bekeken"
         },
         "recrule": {
             "type": "Type"

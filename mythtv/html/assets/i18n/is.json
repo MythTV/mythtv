@@ -46,6 +46,7 @@
             "alreadydel": "Þegar eytt",
             "canundel": "Þú getur snúið þessu við með því að nota Undelete.",
             "channel": "Rás",
+            "damaged": "Skemmdur",
             "delete_details": "Þetta mun eyða upptökureglunni",
             "delete_rule": "Eyða upptökureglu",
             "description": "Lýsing",
@@ -63,6 +64,8 @@
             "job_Transcode": "Umkóðun",
             "mnu_delete": "Eyða",
             "mnu_delete_rerec": "Eyða og leyfa endurupptöku",
+            "mnu_markdamaged": "Merktu sem skemmd",
+            "mnu_markundamaged": "Merktu sem óskemmd",
             "mnu_markunwatched": "Merktu sem Óhorft",
             "mnu_markwatched": "Merktu sem horft",
             "mnu_rerec": "Leyfa endurupptöku",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Afturkalla eyðingu",
             "mnu_updatemeta": "Uppfærðu lýsigögn",
             "mnu_updaterecrule": "Uppfærðu skráningarreglu",
+            "nonrerec": "Til að leyfa endurskráningu á skemmda forritinu skaltu nota Allow Re Record.",
             "orig_airdate": "Upprunaleg flugdagsetning",
             "override_rule": "Bæta við eða breyta hnekkjareglu",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "Þetta mun hætta upptöku",
             "stop_recording": "Hætta upptöku",
             "subtitle": "Undirtitill",
-            "title": "Titill"
+            "title": "Titill",
+            "watched": "Horfði á"
         },
         "recrule": {
             "type": "Gerð"

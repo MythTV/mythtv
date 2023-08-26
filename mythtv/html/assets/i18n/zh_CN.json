@@ -46,6 +46,7 @@
             "alreadydel": "已删除",
             "canundel": "您可以使用取消删除来反转此情况。",
             "channel": "渠道",
+            "damaged": "损坏的",
             "delete_details": "这将删除记录规则",
             "delete_rule": "删除录音规则",
             "description": "描述",
@@ -63,6 +64,8 @@
             "job_Transcode": "转码",
             "mnu_delete": "删除",
             "mnu_delete_rerec": "删除并允许重新录制",
+            "mnu_markdamaged": "标记为已损坏",
+            "mnu_markundamaged": "标记为未损坏",
             "mnu_markunwatched": "标记为未观看",
             "mnu_markwatched": "标记为已观看",
             "mnu_rerec": "允许重新录制",
@@ -71,6 +74,7 @@
             "mnu_undelete": "恢复删除",
             "mnu_updatemeta": "更新元数据",
             "mnu_updaterecrule": "更新记录规则",
+            "nonrerec": "要允许重新录制损坏的程序，请使用“允许重新录制”。",
             "orig_airdate": "原始播出日期",
             "override_rule": "添加或编辑覆盖规则",
             "recgrp": "记录组",
@@ -79,7 +83,8 @@
             "stop_details": "这将停止录制",
             "stop_recording": "停止录音",
             "subtitle": "字幕",
-            "title": "标题"
+            "title": "标题",
+            "watched": "看过"
         },
         "recrule": {
             "type": "类型"

@@ -46,6 +46,7 @@
             "alreadydel": "Bereits gelöscht",
             "canundel": "Sie können dies rückgängig machen, indem Sie Undelete verwenden.",
             "channel": "Kanal",
+            "damaged": "Beschädigt",
             "delete_details": "Dadurch wird die Aufzeichnungsregel gelöscht",
             "delete_rule": "Aufzeichnungsregel löschen",
             "description": "Beschreibung",
@@ -63,6 +64,8 @@
             "job_Transcode": "Transkodieren",
             "mnu_delete": "Löschen",
             "mnu_delete_rerec": "Löschen und Neuaufnahme zulassen",
+            "mnu_markdamaged": "Als beschädigt markieren",
+            "mnu_markundamaged": "Als unbeschädigt markieren",
             "mnu_markunwatched": "Als „Unbeobachtet“ markieren",
             "mnu_markwatched": "Als beobachtet markieren",
             "mnu_rerec": "Neuaufnahme zulassen",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Wiederherstellen",
             "mnu_updatemeta": "Metadaten aktualisieren",
             "mnu_updaterecrule": "Datensatzregel aktualisieren",
+            "nonrerec": "Um das erneute Aufzeichnen des beschädigten Programms zu ermöglichen, verwenden Sie bitte „Erneutes Aufzeichnen zulassen“.",
             "orig_airdate": "Ursprüngliches Sendedatum",
             "override_rule": "Außerkraftsetzungsregel hinzufügen oder bearbeiten",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "Dadurch wird die Aufnahme beendet",
             "stop_recording": "Höre auf, aufzunehmen",
             "subtitle": "Untertitel",
-            "title": "Titel"
+            "title": "Titel",
+            "watched": "Schaute"
         },
         "recrule": {
             "type": "Typ"

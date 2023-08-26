@@ -46,6 +46,7 @@
             "alreadydel": "Already Deleted",
             "canundel": "You can reverse this by using Undelete.",
             "channel": "Channel",
+            "damaged": "Damaged",
             "delete_details": "This will delete the Recording Rule",
             "delete_rule": "Delete Recording Rule",
             "description": "Description",
@@ -63,6 +64,8 @@
             "job_Transcode": "Transcode",
             "mnu_delete": "Delete",
             "mnu_delete_rerec": "Delete and Allow Rerecord",
+            "mnu_markdamaged": "Mark as Damaged",
+            "mnu_markundamaged": "Mark as Undamaged",
             "mnu_markunwatched": "Mark as Unwatched",
             "mnu_markwatched": "Mark as Watched",
             "mnu_rerec": "Allow Rerecord",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Undelete",
             "mnu_updatemeta": "Update Metadata",
             "mnu_updaterecrule": "Update Record Rule",
+            "nonrerec": "To allow re record of the damaged program, please use Allow Re Record.",
             "orig_airdate": "Orig Airdate",
             "override_rule": "Add or Edit Override Rule",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "This will Stop Recording",
             "stop_recording": "Stop Recording",
             "subtitle": "Subtitle",
-            "title": "Title"
+            "title": "Title",
+            "watched": "Watched"
         },
         "recrule": {
             "type": "Type"

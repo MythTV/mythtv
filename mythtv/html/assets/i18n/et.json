@@ -46,6 +46,7 @@
             "alreadydel": "Juba kustutatud",
             "canundel": "Saate selle tühistada, kasutades funktsiooni Undelete.",
             "channel": "Kanal",
+            "damaged": "Kahjustatud",
             "delete_details": "See kustutab salvestusreegli",
             "delete_rule": "Salvestusreegli kustutamine",
             "description": "Kirjeldus",
@@ -63,6 +64,8 @@
             "job_Transcode": "Ümberkodeerimine",
             "mnu_delete": "Kustuta",
             "mnu_delete_rerec": "Kustuta ja luba uuesti salvestada",
+            "mnu_markdamaged": "Märgi kahjustatud",
+            "mnu_markundamaged": "Märgi kahjutuks",
             "mnu_markunwatched": "Märgi jälgimata",
             "mnu_markwatched": "Märgi vaadatuks",
             "mnu_rerec": "Luba uuesti salvestada",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Taasta kustutamine",
             "mnu_updatemeta": "Värskenda metaandmeid",
             "mnu_updaterecrule": "Värskendage salvestusreeglit",
+            "nonrerec": "Kahjustatud programmi uuesti salvestamise lubamiseks kasutage käsku Luba uuesti salvestada.",
             "orig_airdate": "Algne eetri kuupäev",
             "override_rule": "Alistusreegli lisamine või muutmine",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "See peatab salvestamise",
             "stop_recording": "Lõpeta salvestamine",
             "subtitle": "Alapealkiri",
-            "title": "Pealkiri"
+            "title": "Pealkiri",
+            "watched": "Vaadati"
         },
         "recrule": {
             "type": "Tüüp"
