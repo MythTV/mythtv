@@ -381,7 +381,8 @@ class V2Dvr : public MythHTTPService
                                                uint             Stars,
                                                const QString   &SubTitle,
                                                const QString   &Title,
-                                               bool             Watched );
+                                               bool             Watched,
+                                               const QString   &RecGroup );
 
   private:
     Q_DISABLE_COPY(V2Dvr)
