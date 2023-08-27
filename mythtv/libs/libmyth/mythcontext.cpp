@@ -1617,6 +1617,15 @@ bool MythContext::Init(const bool gui,
 
     SetDisableEventPopup(true);
 
+    if (gui && QCoreApplication::applicationName() == MYTH_APPNAME_MYTHTV_SETUP)
+    {
+        d->TempMainWindow(false);
+        QString warning = QObject::tr("mythtv-setup is deprecated.\n"
+                "To set up MythTV, start mythbackend and use:\n"
+                "http://localhost:6544/setupwizard");
+        WaitFor(ShowOkPopup(warning));
+    }
+
     if (m_appBinaryVersion != MYTH_BINARY_VERSION)
     {
         LOG(VB_GENERAL, LOG_EMERG,
@@ -1630,7 +1639,7 @@ bool MythContext::Init(const bool gui,
         if (gui)
         {
             d->TempMainWindow(false);
-            ShowOkPopup(warning);
+            WaitFor(ShowOkPopup(warning));
         }
         LOG(VB_GENERAL, LOG_WARNING, warning);
 
@@ -1665,7 +1674,7 @@ bool MythContext::Init(const bool gui,
         if (gui)
         {
             d->TempMainWindow(false);
-            ShowOkPopup(warning);
+            WaitFor(ShowOkPopup(warning));
         }
         LOG(VB_GENERAL, LOG_WARNING, warning);
 
