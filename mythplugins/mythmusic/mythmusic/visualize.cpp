@@ -1059,7 +1059,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
     {
         i = node->m_length;
         // LOG(VB_PLAYBACK, LOG_DEBUG, QString("SG got %1 samples").arg(i));
-        (i <= m_fftlen) || (i = m_fftlen);
+        i = std::min(i, m_fftlen);
         int start = m_fftlen - i;
         float mult = 0.8F;      // decay older sound by this much
         for (int k = 0; k < start; k++)
@@ -1072,7 +1072,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
             m_sigL[k] = mult * m_sigL[i + k];
             m_sigR[k] = mult * m_sigR[i + k];
         }
-        for (uint k = 0; k < node->m_length; k++) // append current samples
+        for (int k = 0; k < i; k++) // append current samples
         {
             m_sigL[start + k] = node->m_left[k] / 32768.; // +/- 1 peak-to-peak
             if (node->m_right)
@@ -1081,8 +1081,9 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
         int end = m_fftlen / 40; // ramp window ends down to zero crossing
         for (int k = 0; k < m_fftlen; k++)
         {
-            mult = k < end ? k / end : k > m_fftlen - end ?
-                (m_fftlen - k) / end : 1;
+	    mult = k < end ? (float)k / (float)end
+		       : k > m_fftlen - end ?
+                (float)(m_fftlen - k) / (float)end : 1;
             m_dftL[k] = m_sigL[k] * mult;
             m_dftR[k] = m_sigR[k] * mult;
         }
@@ -1117,9 +1118,8 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
             right = m_binpeak ? (tmp > right ? tmp : right) : right + tmp;
             count++;
         }
-        if (!m_binpeak)
+        if (!m_binpeak  && count > 0)
         {                       // mean of the frequency bins
-            (count > 0) || (count = 1);
             left /= count;
             right /= count;
         }
@@ -1172,7 +1172,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
 
         prev = index;           // next pixel is FFT bins from here
         index = m_scale[i];     // to the next bin by LOG scale
-        (prev < index) || (prev = index -1);
+	prev = std::min(prev, index - 1);
     }
     if (m_history && ++s_offset >= w)
     {
@@ -1347,7 +1347,7 @@ bool Spectrum::processUndisplayed(VisualNode *node)
     {
         int i = node->m_length;
         // LOG(VB_PLAYBACK, LOG_DEBUG, QString("SG got %1 samples").arg(i));
-        (i <= m_fftlen) || (i = m_fftlen);
+        i = std::min(i, m_fftlen);
         int start = m_fftlen - i;
         float mult = 0.8F;      // decay older sound by this much
         for (int k = 0; k < start; k++)
@@ -1359,7 +1359,7 @@ bool Spectrum::processUndisplayed(VisualNode *node)
             m_sigL[k] = mult * m_sigL[i + k];
             m_sigR[k] = mult * m_sigR[i + k];
         }
-        for (uint k = 0; k < node->m_length; k++) // append current samples
+        for (int k = 0; k < i; k++) // append current samples
         {
             m_sigL[start + k] = node->m_left[k] / 32768.; // +/- 1 peak-to-peak
             if (node->m_right)
