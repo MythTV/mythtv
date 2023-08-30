@@ -968,12 +968,9 @@ Spectrogram::Spectrogram(bool hist)
     // 0000ff blue              we end where we started!
     static constexpr int UP { 2 };
     static constexpr int DN { 3 };
-    static QVector<int> red   {  0,  0, UP,  1,  1, DN }; // 0=OFF, 1=ON
-    static QVector<int> green { UP,  1,  1, DN,  0,  0 };
-    static QVector<int> blue  {  1, DN,  0,  0, UP,  1 };
-    m_red.resize(  256 * 6);
-    m_green.resize(256 * 6);
-    m_blue.resize( 256 * 6);
+    static const std::array<int,6> red   {  0,  0, UP,  1,  1, DN }; // 0=OFF, 1=ON
+    static const std::array<int,6> green { UP,  1,  1, DN,  0,  0 };
+    static const std::array<int,6> blue  {  1, DN,  0,  0, UP,  1 };
     for (int i = 0; i < 6; i++) // for 6 color transitions...
     {
         int r = red[i];         // 0=OFF, 1=ON, UP, or DN
