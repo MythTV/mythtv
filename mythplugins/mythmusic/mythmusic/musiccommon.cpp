@@ -889,6 +889,7 @@ void MusicCommon::changeSpeed(bool up)
         else
             gPlayer->decSpeed();
         showSpeed(true);
+        updatePlaylistStats(); // update trackspeed and map for templates
     }
 }
 
@@ -1066,10 +1067,8 @@ void MusicCommon::stop(void)
 {
     gPlayer->stop();
 
-    QString time_string = getTimeString(m_maxTime, 0s);
-
     if (m_timeText)
-        m_timeText->SetText(time_string);
+        m_timeText->SetText(getTimeString(m_maxTime, 0s));
     if (m_infoText)
         m_infoText->Reset();
 }
@@ -2119,6 +2118,9 @@ void MusicCommon::updatePlaylistStats(void)
         else if (playlistName ==  "stream_playlist")
             playlistName = tr("Stream Playlist");
         map["playlistname"] = playlistName;
+        map["playedtime"] = getTimeString(m_currentTime, 0s); // v34 - parts
+        map["totaltime"] = getTimeString(m_maxTime, 0s);
+        map["trackspeed"] = getTimeString(-1s, 0s);
     }
     else
     {
@@ -2129,6 +2131,9 @@ void MusicCommon::updatePlaylistStats(void)
         map["playlistplayedtime"] = "";
         map["playlisttotaltime"] = "";
         map["playlistname"] = "";
+        map["playedtime"] = ""; // v34 - parts for track templates
+        map["totaltime"] = "";
+        map["trackspeed"] = "";
     }
 
     SetTextFromMap(map);
@@ -2139,16 +2144,22 @@ void MusicCommon::updatePlaylistStats(void)
 
 QString MusicCommon::getTimeString(std::chrono::seconds exTime, std::chrono::seconds maxTime)
 {
-    if (maxTime <= 0ms)
+    if (exTime > -1s && maxTime <= 0s)
         return MythDate::formatTime(exTime,
                                     (exTime >= 1h) ? "H:mm:ss" : "mm:ss");
 
     QString fmt = (maxTime >= 1h) ? "H:mm:ss" : "mm:ss";
     QString out = MythDate::formatTime(exTime, fmt)
         + " / " + MythDate::formatTime(maxTime, fmt);
-    float speed = gPlayer->getSpeed();
-    if (lroundf(speed * 100.0F) != 100.0F) // v34 - show altered speed
-        out += QString(", %1").arg(speed);
+    float speed = gPlayer->getSpeed(); // v34 - show altered speed
+    QString speedstr = "";
+    if (lroundf(speed * 100.0F) != 100.0F)
+    {
+        speedstr = QString("%1").arg(speed);
+        out += ", " + speedstr + "X";
+    }
+    if (exTime <= -1s)
+        return speedstr;
     return out;
 }
 
