@@ -247,9 +247,9 @@ class Spectrogram : public VisualBase
     FFTSample*     m_dftL { nullptr }; // real in, complex out
     FFTSample*     m_dftR { nullptr };
     RDFTContext*   m_rdftContext { nullptr };
-    std::array<int,256*6> m_red; // continuous color spectrum
-    std::array<int,256*6> m_green;
-    std::array<int,256*6> m_blue;
+    std::array<int,256*6> m_red   {0}; // continuous color spectrum
+    std::array<int,256*6> m_green {0};
+    std::array<int,256*6> m_blue  {0};
     bool           m_binpeak { true }; // peak of bins, else mean
     bool           m_history { true }; // spectrogram? or spectrum
 };

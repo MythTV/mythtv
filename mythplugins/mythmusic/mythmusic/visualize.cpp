@@ -1043,7 +1043,6 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
 {
     // as of v33, this processes *all* samples, see the comments in WaveForm
 
-    int i = 0;
     int w = m_sgsize.width();   // drawing size
     int h = m_sgsize.height();
     if (m_image->isNull())
@@ -1054,9 +1053,8 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
     }
     if (node)     // shift previous samples left, then append new node
     {
-        i = node->m_length;
-        // LOG(VB_PLAYBACK, LOG_DEBUG, QString("SG got %1 samples").arg(i));
-        i = std::min(i, m_fftlen);
+        // LOG(VB_PLAYBACK, LOG_DEBUG, QString("SG got %1 samples").arg(node->m_length));
+        int i = std::min((int)(node->m_length), m_fftlen);
         int start = m_fftlen - i;
         float mult = 0.8F;      // decay older sound by this much
         for (int k = 0; k < start; k++)
@@ -1101,7 +1099,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
     int index = 1;              // frequency index of this pixel
     int prev = 0;               // frequency index of previous pixel
     float gain = 5.0;           // compensate for window function loss
-    for (i = 1; i < (m_history ? h / 2 : w); i++)
+    for (int i = 1; i < (m_history ? h / 2 : w); i++)
     {                           // for each pixel of the spectrogram...
         float left = 0;
         float right = 0;
@@ -1342,16 +1340,16 @@ bool Spectrum::processUndisplayed(VisualNode *node)
 
     if (node)     // shift previous samples left, then append new node
     {
-        int i = node->m_length;
-        // LOG(VB_PLAYBACK, LOG_DEBUG, QString("SG got %1 samples").arg(i));
-        i = std::min(i, m_fftlen);
+        // LOG(VB_PLAYBACK, LOG_DEBUG, QString("SG got %1 samples").arg(node->m_length));
+        int i = std::min((int)(node->m_length), m_fftlen);
         int start = m_fftlen - i;
         float mult = 0.8F;      // decay older sound by this much
         for (int k = 0; k < start; k++)
-        {
-            if (k > start - i)  // prior set ramps from mult to 1.0
+        {                       // prior set ramps from mult to 1.0
+            if (k > start - i && start > i)
             {
-                mult = mult + (1 - mult) * (1 - (start - k) / (start - i));
+                mult = mult + (1 - mult) *
+                    (1 - (float)(start - k) / (float)(start - i));
             }
             m_sigL[k] = mult * m_sigL[i + k];
             m_sigR[k] = mult * m_sigR[i + k];
@@ -1374,7 +1372,6 @@ bool Spectrum::processUndisplayed(VisualNode *node)
     av_rdft_calc(m_rdftContext, m_dftL); // run the real FFT!
     av_rdft_calc(m_rdftContext, m_dftR);
 
-    uint i = 0;
     long w = 0;
     QRect *rectspL = m_rectsL.data();
     QRect *rectspR = m_rectsR.data();
@@ -1384,7 +1381,7 @@ bool Spectrum::processUndisplayed(VisualNode *node)
     int prev = 0;               // frequency index of previous pixel
     float adjHeight = m_size.height() / 2.0;
 
-    for (i = 0; (int)i < m_rectsL.size(); i++, w += m_analyzerBarWidth)
+    for (int i = 0; (int)i < m_rectsL.size(); i++, w += m_analyzerBarWidth)
     {
         float magL = 0;         // modified from Spectrogram
         float magR = 0;
