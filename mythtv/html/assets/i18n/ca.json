@@ -173,6 +173,8 @@
             },
             "type_label": "Tipus d'horari"
         },
+        "scrolltabsleft": "Desplaça les pestanyes a l'esquerra",
+        "scrolltabsright": "Desplaça les pestanyes a la dreta",
         "status": {
             "backends_detail": "Backend: {{ Name }} és un {{ Type }} a la IP {{ IP }}",
             "backends_none": "Sense backends",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "Descarrega el vídeo",
             "heading": "Vídeos",
-            "releasedate": "Data de publicació"
+            "releasedate": "Data de publicació",
+            "showall": "Aplanar les llistes de directoris"
         }
     },
     "data": {

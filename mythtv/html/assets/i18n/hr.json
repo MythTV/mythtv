@@ -173,6 +173,8 @@
             },
             "type_label": "Vrsta rasporeda"
         },
+        "scrolltabsleft": "Pomicanje kartica ulijevo",
+        "scrolltabsright": "Pomicanje kartica udesno",
         "status": {
             "backends_detail": "Pozadina: {{ Name }} je {{ Type }} na IP-u {{ IP }}",
             "backends_none": "Nema pozadine",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "Download Video",
             "heading": "Video zapisi",
-            "releasedate": "Datum izlaska"
+            "releasedate": "Datum izlaska",
+            "showall": "Izjednačite popise imenika"
         }
     },
     "data": {

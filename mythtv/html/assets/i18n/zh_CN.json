@@ -173,6 +173,8 @@
             },
             "type_label": "时间表类型"
         },
+        "scrolltabsleft": "向左滚动选项卡",
+        "scrolltabsright": "向右滚动选项卡",
         "status": {
             "backends_detail": "后端：{{ Name }} 是 IP {{ Type }} 上的 {{ IP }}}}",
             "backends_none": "无后端",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "下载视频",
             "heading": "视频",
-            "releasedate": "发布日期"
+            "releasedate": "发布日期",
+            "showall": "展平目录列表"
         }
     },
     "data": {

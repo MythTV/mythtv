@@ -173,6 +173,8 @@
             },
             "type_label": "Zeitplantyp"
         },
+        "scrolltabsleft": "Tabs nach links scrollen",
+        "scrolltabsright": "Scrollen Sie durch die Tabs nach rechts",
         "status": {
             "backends_detail": "Backend: {{ Name }} ist ein {{ Type }} auf IP {{ IP }}",
             "backends_none": "Keine Backends",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "Video herunterladen",
             "heading": "Videos",
-            "releasedate": "Veröffentlichungsdatum"
+            "releasedate": "Veröffentlichungsdatum",
+            "showall": "Verzeichnislisten reduzieren"
         }
     },
     "data": {

@@ -173,6 +173,8 @@
             },
             "type_label": "Aikataulun tyyppi"
         },
+        "scrolltabsleft": "Vieritä välilehtiä vasemmalle",
+        "scrolltabsright": "Vieritä välilehtiä oikealle",
         "status": {
             "backends_detail": "Taustajärjestelmä: {{ Name }} on {{ Type }} IP-osoitteessa {{ IP }}",
             "backends_none": "Ei taustaohjelmia",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "Lataa video",
             "heading": "Videot",
-            "releasedate": "Julkaisupäivä"
+            "releasedate": "Julkaisupäivä",
+            "showall": "Litistä hakemistolistat"
         }
     },
     "data": {

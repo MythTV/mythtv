@@ -173,6 +173,8 @@
             },
             "type_label": "Schedule Type"
         },
+        "scrolltabsleft": "Scroll Tabs Left",
+        "scrolltabsright": "Scroll Tabs Right",
         "status": {
             "backends_detail": "Backend: {{ Name }} is a {{ Type }} on IP {{ IP }}",
             "backends_none": "No Backends",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "Download Video",
             "heading": "Videos",
-            "releasedate": "Release Date"
+            "releasedate": "Release Date",
+            "showall": "Flatten Directory Lists"
         }
     },
     "data": {

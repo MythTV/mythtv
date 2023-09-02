@@ -173,6 +173,8 @@
             },
             "type_label": "スケジュールの種類"
         },
+        "scrolltabsleft": "タブを左にスクロール",
+        "scrolltabsright": "タブを右にスクロール",
         "status": {
             "backends_detail": "バックエンド: {{ Name }} は IP {{ Type }} 上の {{ IP }}}} です",
             "backends_none": "バックエンドなし",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "ビデオをダウンロードする",
             "heading": "動画",
-            "releasedate": "発売日"
+            "releasedate": "発売日",
+            "showall": "ディレクトリリストのフラット化"
         }
     },
     "data": {

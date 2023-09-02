@@ -173,6 +173,8 @@
             },
             "type_label": "סוג לוח זמנים"
         },
+        "scrolltabsleft": "גלול כרטיסיות שמאלה",
+        "scrolltabsright": "גלול כרטיסיות ימינה",
         "status": {
             "backends_detail": "אחורי: {{ Name }} הוא {{ Type }} ב-IP {{ IP }}",
             "backends_none": "אין אחוריים",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "הורד סרטון",
             "heading": "סרטונים",
-            "releasedate": "תאריך הוצאה"
+            "releasedate": "תאריך הוצאה",
+            "showall": "שטח רשימות ספריות"
         }
     },
     "data": {

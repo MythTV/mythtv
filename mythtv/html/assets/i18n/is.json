@@ -173,6 +173,8 @@
             },
             "type_label": "Dagskrá Tegund"
         },
+        "scrolltabsleft": "Skrunaðu flipa til vinstri",
+        "scrolltabsright": "Skrunaðu flipa til hægri",
         "status": {
             "backends_detail": "Bakendi: {{ Name }} er {{ Type }} á IP {{ IP }}",
             "backends_none": "Engir bakenda",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "Sækja myndbandið",
             "heading": "Myndbönd",
-            "releasedate": "Útgáfudagur"
+            "releasedate": "Útgáfudagur",
+            "showall": "Flettu skráarlista"
         }
     },
     "data": {

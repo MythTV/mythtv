@@ -173,6 +173,8 @@
             },
             "type_label": "Ajakava tüüp"
         },
+        "scrolltabsleft": "Kerige vahekaarte vasakule",
+        "scrolltabsright": "Kerige vahekaarte paremale",
         "status": {
             "backends_detail": "Taustaprogramm: {{ Name }} on {{ Type }} IP-l {{ IP }}",
             "backends_none": "Taustaprogramme pole",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "Laadige video alla",
             "heading": "Videod",
-            "releasedate": "Väljalaske kuupäev"
+            "releasedate": "Väljalaske kuupäev",
+            "showall": "Kataloogiloendite lamendamine"
         }
     },
     "data": {

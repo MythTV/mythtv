@@ -24,7 +24,7 @@
                         &nbsp;&nbsp;&nbsp;
                         <p-checkbox inputId="showAllVideos" [(ngModel)]="showAllVideos" name="showAllVideos"
                             #showAll="ngModel" [binary]="true" (onChange)="showAllChange()"
-                            label="{{ 'dashboard.upcoming.showall' | translate }} ">
+                            label="{{ 'dashboard.videos.showall' | translate }} ">
                         </p-checkbox>
 
                         <div *ngIf="refreshing else refreshBn"><p-progressSpinner
@@ -89,7 +89,7 @@
                         <div *ngIf="video.ContentType != 'D'">
                             <a href="{{URLencode('/Content/GetVideo?Id=' + video.Id)}}" target="_blank"
                                 pTooltip="{{ 'dashboard.videos.download' | translate }}" tooltipPosition="left">
-                                <i class="pi pi-download"></i></a>
+                                <i class="pi pi-download text-primary"></i></a>
                             <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
                                 (click)="showMenu(video,$event)"></button>
                         </div>

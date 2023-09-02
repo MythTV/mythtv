@@ -173,6 +173,8 @@
             },
             "type_label": "Skematype"
         },
+        "scrolltabsleft": "Rul faner til venstre",
+        "scrolltabsright": "Rul faner til højre",
         "status": {
             "backends_detail": "Backend: {{ Name }} er en {{ Type }} på IP {{ IP }}",
             "backends_none": "Ingen backends",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "Download video",
             "heading": "Videoer",
-            "releasedate": "Udgivelses dato"
+            "releasedate": "Udgivelses dato",
+            "showall": "Udjævn kataloglister"
         }
     },
     "data": {

@@ -173,6 +173,8 @@
             },
             "type_label": "Schematyp"
         },
+        "scrolltabsleft": "Bläddra flikarna åt vänster",
+        "scrolltabsright": "Rulla flikar åt höger",
         "status": {
             "backends_detail": "Backend: {{ Name }} är en {{ Type }} på IP {{ IP }}",
             "backends_none": "Inga backends",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "Ladda ner video",
             "heading": "videoklipp",
-            "releasedate": "Utgivningsdatum"
+            "releasedate": "Utgivningsdatum",
+            "showall": "Platta kataloglistor"
         }
     },
     "data": {

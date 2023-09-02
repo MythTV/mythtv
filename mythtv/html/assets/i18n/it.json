@@ -173,6 +173,8 @@
             },
             "type_label": "Tipo di pianificazione"
         },
+        "scrolltabsleft": "Scorri le schede a sinistra",
+        "scrolltabsright": "Scorri le schede verso destra",
         "status": {
             "backends_detail": "Backend: {{ Name }} è un {{ Type }} su IP {{ IP }}",
             "backends_none": "Nessun backend",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "Scarica video",
             "heading": "Video",
-            "releasedate": "Data di rilascio"
+            "releasedate": "Data di rilascio",
+            "showall": "Appiattire elenchi di directory"
         }
     },
     "data": {

@@ -173,6 +173,8 @@
             },
             "type_label": "Тип график"
         },
+        "scrolltabsleft": "Превъртете раздели наляво",
+        "scrolltabsright": "Превъртете разделите надясно",
         "status": {
             "backends_detail": "Backend: {{ Name }} е {{ Type }} на IP {{ IP }}",
             "backends_none": "Без бекенд",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "Изтегляне на видео",
             "heading": "Видеоклипове",
-            "releasedate": "Дата на излизане"
+            "releasedate": "Дата на излизане",
+            "showall": "Изравняване на списъци с директории"
         }
     },
     "data": {

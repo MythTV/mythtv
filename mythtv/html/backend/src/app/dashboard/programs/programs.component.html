@@ -59,8 +59,8 @@
                     {{program.Channel.ChanNum}} {{program.Channel.CallSign}}</td>
                 <td style="flex-basis: 8%" class="p-1" *ngIf="usage == 'UPCOMING'">{{program.Recording.RecGroup}}</td>
                 <td style="flex-basis: 7%" class="p-1">
-                    <div *ngIf="program.Recording" [ngStyle]="['WillRecord','Recording','Recorded'].indexOf(program.Recording.StatusName)>-1?
-                        {'background-color':'palegreen'}:{'background-color':'pink'}">
+                    <div *ngIf="program.Recording" [ngClass]="['WillRecord','Recording','Recorded'].indexOf(program.Recording.StatusName)>-1?
+                        'text-green-500' : 'text-pink-500'">
                         {{dataService.recStatusText[program.Recording.StatusName]}}
                     </div>
                 </td>

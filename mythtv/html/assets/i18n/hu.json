@@ -173,6 +173,8 @@
             },
             "type_label": "Ütemezés típusa"
         },
+        "scrolltabsleft": "Görgesse a lapokat balra",
+        "scrolltabsright": "Görgesse a lapokat jobbra",
         "status": {
             "backends_detail": "Háttérrendszer: a {{ Name }} egy {{ Type }} az {{ IP }} IP-n",
             "backends_none": "Nincsenek háttérprogramok",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "Videó letöltése",
             "heading": "Videók",
-            "releasedate": "Kiadási dátum"
+            "releasedate": "Kiadási dátum",
+            "showall": "Címtárlisták egyesítése"
         }
     },
     "data": {

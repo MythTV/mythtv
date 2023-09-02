@@ -173,6 +173,8 @@
             },
             "type_label": "Schematype"
         },
+        "scrolltabsleft": "Blader door tabbladen naar links",
+        "scrolltabsright": "Blader door tabbladen naar rechts",
         "status": {
             "backends_detail": "Backend: {{ Name }} is een {{ Type }} op IP {{ IP }}",
             "backends_none": "Geen back-ends",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "Download video",
             "heading": "Videos",
-            "releasedate": "Datum van publicatie"
+            "releasedate": "Datum van publicatie",
+            "showall": "Maak directorylijsten plat"
         }
     },
     "data": {

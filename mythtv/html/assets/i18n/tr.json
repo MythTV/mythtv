@@ -173,6 +173,8 @@
             },
             "type_label": "Zamanlama türü"
         },
+        "scrolltabsleft": "Sekmeleri Sola Kaydır",
+        "scrolltabsright": "Sekmeleri Sağa Kaydır",
         "status": {
             "backends_detail": "Arka uç: {{ Name }}, IP {{ Type }} üzerinde bir {{ IP }}'dir",
             "backends_none": "Arka Uç Yok",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "Video indir",
             "heading": "videolar",
-            "releasedate": "Yayın tarihi"
+            "releasedate": "Yayın tarihi",
+            "showall": "Dizin Listelerini Düzleştir"
         }
     },
     "data": {

@@ -173,6 +173,8 @@
             },
             "type_label": "Tipo de programação"
         },
+        "scrolltabsleft": "Rolar guias para a esquerda",
+        "scrolltabsright": "Rolar as guias para a direita",
         "status": {
             "backends_detail": "Back-end: {{ Name }} é um {{ Type }} no IP {{ IP }}",
             "backends_none": "Sem back-ends",
@@ -229,7 +231,8 @@
         "videos": {
             "download": "Baixar video",
             "heading": "Vídeos",
-            "releasedate": "Data de lançamento"
+            "releasedate": "Data de lançamento",
+            "showall": "Achatar listas de diretórios"
         }
     },
     "data": {
