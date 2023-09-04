@@ -1031,6 +1031,10 @@
     <window name="miniplayer">
         <area>-1,5,590,190</area>
 
+        <textarea name="channel"> <!--radio stream?-->
+            <area>0,0,0,0</area>          <!--hidden-->
+        </textarea>
+
         <imagetype name="track_info_background">
             <filename>miniplayer_background.png</filename>
             <area>10,10,569,170</area>
@@ -1063,8 +1067,8 @@
             <area>170,125,250,25</area>
         </textarea>
 
-        <textarea name="time" from="basetextarea">
-            <area>385,125,185,25</area>
+        <textarea name="time" from="basetextarea" depends="!channel">
+            <area>285,125,285,25</area>
             <align>right</align>
         </textarea>
 
