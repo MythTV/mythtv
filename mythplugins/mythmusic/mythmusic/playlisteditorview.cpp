@@ -154,7 +154,7 @@ bool PlaylistEditorView::Create(void)
 
     m_playlistTree->AssignTree(m_rootNode);
 
-    if (m_restorePosition)
+    if (true) // v34 - continue where we left off (was m_restorePosition)
     {
         QStringList route = gCoreContext->GetSetting("MusicTreeLastActive", "").split("\n");
         restoreTreePosition(route);
