@@ -43,10 +43,14 @@
                         <label for="configure" class="label block">
                             {{ 'settings.vsource.grabberconfig_label' | translate }}
                         </label>
-                            <p [innerHTML]="'settings.vsource.grabberconfig_desc' | translate"></p>
+                        <p>
+                            {{ 'settings.vsource.grabberconfig_desc' | translate }}
+                            <a href="http://www.mythtv.org/wiki/XMLTV" target="_blank">XMLTV</a>
+                        </p>
                         <table>
                             <tr>
-                                <td class="align-items-center bg-blue-100" style="font-family: monospace;">
+                                <td class="align-items-center bg-blue-100 text-gray-900"
+                                    style="font-family: monospace;">
                                     {{ configCommand }}
                                 </td>
                                 <td class="align-items-center">
@@ -60,7 +64,8 @@
 
                     <div class="form-group field">
                         <p-checkbox inputId="UseEIT" [(ngModel)]="videoSource.UseEIT" name="UseEIT" #UseEIT="ngModel"
-                            class="label mb-2 w-full" [binary]="true" label="{{ 'settings.vsource.eit_label' | translate }}">
+                            class="label mb-2 w-full" [binary]="true"
+                            label="{{ 'settings.vsource.eit_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
                             {{ 'settings.vsource.eit_desc' | translate }}
@@ -110,7 +115,9 @@
                         <p-inputNumber [(ngModel)]="videoSource.BouquetId" name="BouquetId" id="BouquetId"
                             [showButtons]="true" [min]="0" [max]="65535" [step]="1" [useGrouping]="false">
                         </p-inputNumber>
-                        <small class="block" [innerHTML]="'settings.vsource.bouquet_desc' | translate">
+                        <small class="block">
+                        {{'settings.vsource.bouquet_desc' | translate}}
+                            <a href="https://www.mythtv.org/wiki/DVB_UK" target="_blank">DVB UK</a>
                         </small>
                     </div>
 
@@ -121,7 +128,9 @@
                         <p-inputNumber [(ngModel)]="videoSource.RegionId" name="RegionId" id="RegionId"
                             [showButtons]="true" [min]="0" [max]="100" [step]="1" [useGrouping]="false">
                         </p-inputNumber>
-                        <small class="block" [innerHTML]="'settings.vsource.region_desc' | translate">
+                        <small class="block">
+                            {{'settings.vsource.region_desc' | translate}}
+                            <a href="https://www.mythtv.org/wiki/DVB_UK" target="_blank">DVB UK</a>
                         </small>
                     </div>
 
