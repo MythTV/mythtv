@@ -119,9 +119,9 @@ class MusicPlayer : public QObject, public MythObservable
     void canShowPlayer(bool canShow) { m_canShowPlayer = canShow; }
     bool getCanShowPlayer(void) const { return m_canShowPlayer; }
 
-    /// whether we entered the Play Now browser
-    void inPlayNow(bool inPlayNow) { m_inPlayNow = inPlayNow; }
-    bool getInPlayNow(void) const { return m_inPlayNow; }
+    /// whether we prefer Play Now over Add Tracks
+    void setPlayNow(bool PlayNow);
+    bool getPlayNow(void);
 
     Decoder        *getDecoder(void) { return m_decoderHandler ? m_decoderHandler->getDecoder() : nullptr; }
     DecoderHandler *getDecoderHandler(void) { return m_decoderHandler; }
@@ -234,7 +234,6 @@ class MusicPlayer : public QObject, public MythObservable
     bool         m_isPlaying          {false};
     bool         m_isAutoplay         {false};
     bool         m_canShowPlayer      {true};
-    bool         m_inPlayNow          {false};
     bool         m_autoShowPlayer     {true};
     bool         m_wasPlaying         {false};
     bool         m_updatedLastplay    {false};
