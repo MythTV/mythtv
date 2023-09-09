@@ -109,10 +109,8 @@ void SearchView::customEvent(QEvent *event)
         MusicCommon::customEvent(event);
         handled = true;
 
-        if (m_playTrack)
+        if (m_playTrack == 1 || (m_playTrack == -1 && gPlayer->getPlayNow()))
         {
-            m_playTrack = false;
-
             if (event->type() == MusicPlayerEvent::kTrackAddedEvent)
             {
                 // make the added track current and play it
@@ -120,6 +118,7 @@ void SearchView::customEvent(QEvent *event)
                 playlistItemClicked(m_currentPlaylist->GetItemCurrent());
             }
         }
+        m_playTrack = -1;     // use PlayNow preference or menu option
     }
     else if (event->type() == MusicPlayerEvent::kAllTracksRemovedEvent)
     {
@@ -173,7 +172,7 @@ void SearchView::customEvent(QEvent *event)
                     MythUIButtonListItem *item = m_tracksList->GetItemCurrent();
                     if (item)
                     {
-                        m_playTrack = false;
+                        m_playTrack = 0;
                         trackClicked(item);
                     }
                 }
@@ -185,11 +184,15 @@ void SearchView::customEvent(QEvent *event)
                     MythUIButtonListItem *item = m_tracksList->GetItemCurrent();
                     if (item)
                     {
-                        m_playTrack = true;
+                        m_playTrack = 1;
                         trackClicked(item);
                     }
                 }
             }
+            else if (resulttext == tr("Prefer Play Now"))
+                gPlayer->setPlayNow(true);
+            else if (resulttext == tr("Prefer Add Tracks"))
+                gPlayer->setPlayNow(false);
             else if (resulttext == tr("Search List..."))
                 searchButtonList();
         }
@@ -238,7 +241,7 @@ bool SearchView::keyPressEvent(QKeyEvent *event)
                 MythUIButtonListItem *item = m_tracksList->GetItemCurrent();
                 if (item)
                 {
-                    m_playTrack = true;
+                    m_playTrack = 1;
                     trackClicked(item);
                 }
             }
@@ -273,8 +276,18 @@ void SearchView::ShowMenu(void)
                     menu->AddItem(tr("Remove From Playlist"));
                 else
                 {
-                    menu->AddItem(tr("Play Now"));
-                    menu->AddItem(tr("Add To Playlist"));
+                    if (gPlayer->getPlayNow())
+                    {
+                        menu->AddItem(tr("Play Now"));
+                        menu->AddItem(tr("Add To Playlist"));
+                        menu->AddItem(tr("Prefer Add To Playlist"));
+                    }
+                    else
+                    {
+                        menu->AddItem(tr("Add To Playlist"));
+                        menu->AddItem(tr("Play Now"));
+                        menu->AddItem(tr("Prefer Play Now"));
+                    }
                 }
             }
         }

@@ -1537,7 +1537,7 @@ void MusicCommon::customEvent(QEvent *event)
                 doUpdatePlaylist();
             }
             else if (resulttext == tr("Prefer Play Now"))
-		gPlayer->setPlayNow(true);
+                gPlayer->setPlayNow(true);
             else if (resulttext == tr("Prefer Add Tracks"))
                 gPlayer->setPlayNow(false);
         }
@@ -2201,7 +2201,7 @@ MythMenu* MusicCommon::createMainMenu(void)
     else if (m_currentView == MV_PLAYLIST)
     {
         menu->AddItem(tr("Playlist Editor"));
-	// this might be easier for new users to understand:
+        // this might be easier for new users to find / understand:
         // menu->AddItem(tr("Browse Music Library"));
     }
 

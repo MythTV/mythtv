@@ -154,12 +154,13 @@ bool PlaylistEditorView::Create(void)
 
     m_playlistTree->AssignTree(m_rootNode);
 
-    if (true) // v34 - continue where we left off (was m_restorePosition)
+    // if (m_restorePosition) // v33- only when switching gallery/tree
+    if (true)              // v34+ always enter where we exited
     {
         QStringList route = gCoreContext->GetSetting("MusicTreeLastActive", "").split("\n");
         restoreTreePosition(route);
     }
-    else         // default to Albums, rather than All Tracks, 2023/07
+    else               // not used, could enter at any point like this
     {
         QStringList route = (QString("Root Music Node.Albums").split("."));
         restoreTreePosition(route);
