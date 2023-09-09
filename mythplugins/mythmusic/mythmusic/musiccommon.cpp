@@ -478,10 +478,7 @@ void MusicCommon::switchView(MusicView view)
                 delete pleview;
 
             if (oldView)
-            {
-                disconnect(this, &MythScreenType::Exiting, nullptr, nullptr);
                 Close();
-            }
 
             break;
         }
@@ -508,10 +505,7 @@ void MusicCommon::switchView(MusicView view)
                 delete pleview;
 
             if (oldView)
-            {
-                disconnect(this, &MythScreenType::Exiting, nullptr, nullptr);
                 Close();
-            }
 
             break;
         }
