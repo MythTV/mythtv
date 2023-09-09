@@ -61,6 +61,7 @@ export interface GetVideoListRequest {
     Descending?: boolean;
     StartIndex?: number;
     Count?: number;
+    CollapseSubDirs?: boolean;
 }
 
 export interface UpdateVideoMetadataRequest {
