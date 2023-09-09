@@ -181,11 +181,30 @@ long V2Video::GetLastPlayPos( int  Id )
 }
 
 
+// If CollapseSubDirs is true, then files in subdirectories are not returned.
+// Instead, one row is returned for each subdirectory, with the full
+// directory name in FileName and the lowest part of the directory name
+// in Title. These directories are returned at the beginning of the list.
+//
+// Example: If the database has these files:
+// one.mkv
+// dir1/two.mkv
+// dir1/dir2/two.mkv
+//
+// With no Folder name and CollapseSubDirs=true, you get
+// one.mkv
+// dir1          Title=dir1
+//
+// With Folder=dir1 and CollapseSubDirs=true, you get
+// dir1/two.mkv
+// dir1/dir2     Title=dir2
+
 V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
                                                  const QString &Sort,
                                                  bool bDescending,
                                                  int nStartIndex,
-                                                 int nCount       )
+                                                 int nCount,
+                                                 bool CollapseSubDirs )
 {
     QString fields = "title,director,studio,plot,rating,year,releasedate,"
                      "userrating,length,playcount,filename,hash,showlevel,"
@@ -198,8 +217,17 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
     VideoMetadataListManager::metadata_list videolist;
 
     QString sql = "";
+    QString folder;
+    QString bindValue;
     if (!Folder.isEmpty())
-        sql.append(" WHERE filename LIKE '" + Folder + "%'");
+    {
+        if (Folder.endsWith('/'))
+            folder = Folder;
+        else
+            folder = Folder + "/";
+        bindValue = folder + "%";
+        sql.append(" WHERE filename LIKE :BINDVALUE ");
+    }
     sql.append(" ORDER BY ");
     QString sort = Sort.toLower();
     if (sort == "added")
@@ -213,8 +241,8 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
 
     if (bDescending)
         sql += " DESC";
-    VideoMetadataListManager::loadAllFromDatabase(videolist, sql);
 
+    VideoMetadataListManager::loadAllFromDatabase(videolist, sql, bindValue);
     std::vector<VideoMetadataListManager::VideoMetadataPtr> videos(videolist.begin(), videolist.end());
 
     // ----------------------------------------------------------------------
@@ -222,19 +250,77 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
     // ----------------------------------------------------------------------
 
     auto *pVideoMetadataInfos = new V2VideoMetadataInfoList();
+    QMap<QString, QString> map;
+    int folderlen = folder.length();
 
     nStartIndex   = (nStartIndex > 0) ? std::min( nStartIndex, (int)videos.size() ) : 0;
-    nCount        = (nCount > 0) ? std::min( nCount, (int)videos.size() ) : videos.size();
-    int nEndIndex = std::min((nStartIndex + nCount), (int)videos.size() );
+    int selectedCount = 0;
+    int totalCount = 0;
+    QString dir;
 
-    for( int n = nStartIndex; n < nEndIndex; n++ )
+    // Make directory list
+    if (CollapseSubDirs)
     {
-        V2VideoMetadataInfo *pVideoMetadataInfo = pVideoMetadataInfos->AddNewVideoMetadataInfo();
+        for( int n = 0; n < (int)videos.size(); n++ )
+        {
+            VideoMetadataListManager::VideoMetadataPtr metadata = videos[n];
+            if (!metadata)
+                break;
+            QString fnPart = metadata->GetFilename().mid(folderlen);
+            int slashPos = fnPart.indexOf('/');
+            if (slashPos > 0)
+            {
+                dir = fnPart.mid(0, slashPos);
+                if (!map.contains(dir))
+                    // use toLower here so that lower case are sorted in with
+                    // upper case rather than separately at the end.
+                    map.insert(dir.toLower(), dir);
+            }
+        }
+        // Insert directory entries at the front of the list, ordered ascending
+        // or descending, depending on the value of bDescending
+        QMapIterator<QString, QString> it(map);
+        if (bDescending)
+            it.toBack();
 
+        while (bDescending? it.hasPrevious() : it.hasNext())
+        {
+            if (bDescending)
+                it.previous();
+            else
+                it.next();
+            if (totalCount >= nStartIndex && (nCount == 0 || selectedCount < nCount)) {
+                V2VideoMetadataInfo *pVideoMetadataInfo;
+                pVideoMetadataInfo = pVideoMetadataInfos->AddNewVideoMetadataInfo();
+                pVideoMetadataInfo->setContentType("DIRECTORY");
+                pVideoMetadataInfo->setFileName(folder + it.value());
+                pVideoMetadataInfo->setTitle(it.value());
+                selectedCount++;
+            }
+            totalCount++;
+        }
+    }
+
+    for( int n = 0; n < (int)videos.size(); n++ )
+    {
         VideoMetadataListManager::VideoMetadataPtr metadata = videos[n];
+        if (!metadata)
+            break;
 
-        if (metadata)
+        if (CollapseSubDirs)
+        {
+            QString fnPart = metadata->GetFilename().mid(folderlen);
+            int slashPos = fnPart.indexOf('/');
+            if (slashPos > 0)
+                continue;
+        }
+
+        if (totalCount >= nStartIndex && (nCount == 0 || selectedCount < nCount)) {
+            V2VideoMetadataInfo *pVideoMetadataInfo = pVideoMetadataInfos->AddNewVideoMetadataInfo();
             V2FillVideoMetadataInfo ( pVideoMetadataInfo, metadata, true );
+            selectedCount++;
+        }
+        totalCount++;
     }
 
     int curPage = 0;
@@ -242,7 +328,7 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
     if (nCount == 0)
         totalPages = 1;
     else
-        totalPages = (int)ceil((float)videos.size() / nCount);
+        totalPages = (int)ceil((float)totalCount / nCount);
 
     if (totalPages == 1)
         curPage = 1;
@@ -252,10 +338,10 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
     }
 
     pVideoMetadataInfos->setStartIndex    ( nStartIndex     );
-    pVideoMetadataInfos->setCount         ( nCount          );
+    pVideoMetadataInfos->setCount         ( selectedCount   );
     pVideoMetadataInfos->setCurrentPage   ( curPage         );
     pVideoMetadataInfos->setTotalPages    ( totalPages      );
-    pVideoMetadataInfos->setTotalAvailable( videos.size()   );
+    pVideoMetadataInfos->setTotalAvailable( totalCount      );
     pVideoMetadataInfos->setAsOf          ( MythDate::current() );
     pVideoMetadataInfos->setVersion       ( MYTH_BINARY_VERSION );
     pVideoMetadataInfos->setProtoVer      ( MYTH_PROTO_VERSION  );
