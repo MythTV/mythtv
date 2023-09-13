@@ -77,6 +77,19 @@ bool VisualizerView::keyPressEvent(QKeyEvent *event)
 
         if (action == "INFO")
             showTrackInfoPopup();
+        else if (
+            action == "NEXTTRACK" ||
+            action == "PREVTRACK" ||
+            action == "FFWD" ||
+            action == "RWND" ||
+            action == "THMBUP" ||
+            action == "THMBDOWN" ||
+            action == "SPEEDUP" ||
+            action == "SPEEDDOWN")
+        {
+            handled = MusicCommon::keyPressEvent(event);
+            showTrackInfoPopup();
+        }
         else
             handled = false;
     }
@@ -94,7 +107,7 @@ void VisualizerView::ShowMenu(void)
     auto *menu = new MythMenu(label, this, "menu");
 
     menu->AddItem(tr("Change Visualizer"), nullptr, createVisualizerMenu());
-    menu->AddItem(tr("Show Track Info"), &showTrackInfoPopup);
+    menu->AddItem(tr("Show Track Info"), &VisualizerView::showTrackInfoPopup);
     menu->AddItem(tr("Other Options"), nullptr, createMainMenu());
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -109,6 +122,8 @@ void VisualizerView::ShowMenu(void)
 
 void VisualizerView::showTrackInfoPopup(void)
 {
+    if (m_currentView == MV_VISUALIZERINFO)
+        return;
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
     auto *popup = new TrackInfoPopup(popupStack);
@@ -142,7 +157,6 @@ bool TrackInfoPopup::Create(void)
         return false;
 
     // find common widgets available on any view
-    m_currentView = MV_VISUALIZER; // reverted to zero ?!
     err = CreateCommon();
 
     if (err)
@@ -150,6 +164,7 @@ bool TrackInfoPopup::Create(void)
         LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'trackinfo_popup'");
         return false;
     }
+    m_currentView = MV_VISUALIZERINFO;
 
     // get map for current track
     MusicMetadata *metadata = gPlayer->getCurrentMetadata();
@@ -187,6 +202,10 @@ bool TrackInfoPopup::Create(void)
 
 bool TrackInfoPopup::keyPressEvent(QKeyEvent *event)
 {
+    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
+        return true;
+
+    m_currentView = MV_VISUALIZERINFO;
     QStringList actions;
     bool handled = GetMythMainWindow()->TranslateKeyPress("Music", event, actions, false);
 
@@ -195,7 +214,13 @@ bool TrackInfoPopup::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "ESCAPE")
+        if (action == "SELECT")
+        {
+            if (m_displayTimer)
+                m_displayTimer->stop();
+            return true;
+        }
+        else if (action == "ESCAPE")
             Close();
         else if (action == "INFO")
             showTrackInfo(gPlayer->getCurrentMetadata());
