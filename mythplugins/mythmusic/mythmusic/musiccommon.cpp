@@ -2194,9 +2194,9 @@ MythMenu* MusicCommon::createMainMenu(void)
     }
     else if (m_currentView == MV_PLAYLIST)
     {
-        menu->AddItem(tr("Playlist Editor"));
+        // menu->AddItem(tr("Playlist Editor")); // v33-
         // this might be easier for new users to find / understand:
-        // menu->AddItem(tr("Browse Music Library"));
+        menu->AddItem(tr("Browse Music Library")); // v34+
     }
 
     QStringList screenList;
