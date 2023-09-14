@@ -75,6 +75,28 @@ bool VisualizerView::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
+        // unassgined arrow keys might as well be useful
+        if (action == "UP")
+        {
+            action = "PREVTRACK";
+            previous();
+        }
+        else if (action == "DOWN")
+        {
+            action = "NEXTTRACK";
+            next();
+        }
+        else if (action == "LEFT")
+        {
+            action = "RWND";
+            seekback();
+        }
+        else if (action == "RIGHT")
+        {
+            action = "FFWD";
+            seekforward();
+        }
+
         if (action == "INFO")
             showTrackInfoPopup();
         else if (
