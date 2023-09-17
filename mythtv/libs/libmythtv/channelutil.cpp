@@ -1960,11 +1960,13 @@ bool ChannelUtil::GetChannelData(
                         : query.value(8).toInt();
         chanid        = query.value(9).toUInt();
 
-        found += query.value(10).toInt();
+        if (query.value(10).toInt() > kChannelNotVisible)
+            found++;
     }
 
     while (query.next())
-        found += query.value(10).toInt();
+        if (query.value(10).toInt() > kChannelNotVisible)
+            found++;
 
     if (found == 0 && chanid)
     {
