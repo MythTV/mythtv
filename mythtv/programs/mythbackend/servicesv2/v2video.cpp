@@ -261,9 +261,8 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
     // Make directory list
     if (CollapseSubDirs)
     {
-        for( int n = 0; n < (int)videos.size(); n++ )
+        for( const auto& metadata : videos )
         {
-            VideoMetadataListManager::VideoMetadataPtr metadata = videos[n];
             if (!metadata)
                 break;
             QString fnPart = metadata->GetFilename().mid(folderlen);
@@ -272,9 +271,11 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
             {
                 dir = fnPart.mid(0, slashPos);
                 if (!map.contains(dir))
+                {
                     // use toLower here so that lower case are sorted in with
                     // upper case rather than separately at the end.
                     map.insert(dir.toLower(), dir);
+                }
             }
         }
         // Insert directory entries at the front of the list, ordered ascending
@@ -290,8 +291,8 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
             else
                 it.next();
             if (totalCount >= nStartIndex && (nCount == 0 || selectedCount < nCount)) {
-                V2VideoMetadataInfo *pVideoMetadataInfo;
-                pVideoMetadataInfo = pVideoMetadataInfos->AddNewVideoMetadataInfo();
+                V2VideoMetadataInfo *pVideoMetadataInfo =
+                    pVideoMetadataInfos->AddNewVideoMetadataInfo();
                 pVideoMetadataInfo->setContentType("DIRECTORY");
                 pVideoMetadataInfo->setFileName(folder + it.value());
                 pVideoMetadataInfo->setTitle(it.value());
@@ -301,9 +302,8 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
         }
     }
 
-    for( int n = 0; n < (int)videos.size(); n++ )
+    for( const auto& metadata : videos )
     {
-        VideoMetadataListManager::VideoMetadataPtr metadata = videos[n];
         if (!metadata)
             break;
 
