@@ -364,11 +364,6 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
         paramsChanged = true;
     }
 
-    // Mediacodec/Surface has an issue rendering frames after seeks.
-    // Enable the FF/Rew work around when using it.
-    m_ffrewUseRenderOne =
-        m_decoder && codec_is_mediacodec(m_decoder->GetVideoCodecID());
-
     if (!paramsChanged)
         return;
 
@@ -616,7 +611,7 @@ void MythPlayer::ReleaseNextVideoFrame(MythVideoFrame *buffer,
 
     if (m_videoOutput)
     {
-        if (abs(m_ffrewSkip) > 1 && m_ffrewUseRenderOne)
+        if (abs(m_ffrewSkip) > 1)
         {
             LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "Setting render one");
             m_renderOneFrame = true;
@@ -1181,7 +1176,7 @@ void MythPlayer::DoFFRewSkip(void)
         long long real_skip = CalcMaxFFTime(m_ffrewSkip - m_ffrewAdjust + delta) - delta;
         long long target_frame = m_decoder->GetFramesRead() + real_skip;
         if (real_skip >= 0)
-            m_decoder->DoFastForward(target_frame, m_ffrewUseRenderOne);
+            m_decoder->DoFastForward(target_frame, true);
 
         long long seek_frame = m_decoder->GetFramesRead();
         m_ffrewAdjust = seek_frame - target_frame;
@@ -1205,7 +1200,7 @@ void MythPlayer::DoFFRewSkip(void)
         bool      toBegin      = -cur_frame > m_ffrewSkip + m_ffrewAdjust;
         long long real_skip    = (toBegin) ? -cur_frame : m_ffrewSkip + m_ffrewAdjust;
         long long target_frame = cur_frame + real_skip;
-        m_decoder->DoRewind(target_frame, m_ffrewUseRenderOne);
+        m_decoder->DoRewind(target_frame, true);
 
         long long seek_frame  = m_decoder->GetFramesPlayed();
         m_ffrewAdjust = target_frame - seek_frame;

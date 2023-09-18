@@ -498,7 +498,6 @@ class MTV_PUBLIC MythPlayer : public QObject
         {microsecondsFromFloat(1000000.0F / 30)};///< always adjusted for play_speed
     int        m_fpsMultiplier            {1}; ///< used to detect changes
     int        m_ffrewSkip                {1};
-    bool       m_ffrewUseRenderOne        {false}; // mediacode work around
     int        m_ffrewAdjust              {0}; ///< offset after last skip
     float      m_ffrewScale               {1.0F}; ///< scale skip for large gops
     bool       m_fileChanged              {false};
