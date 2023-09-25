@@ -1535,9 +1535,9 @@ void MusicCommon::customEvent(QEvent *event)
                 doUpdatePlaylist();
             }
             else if (resulttext == tr("Prefer Play Now"))
-                gPlayer->setPlayNow(true);
+                MusicPlayer::setPlayNow(true);
             else if (resulttext == tr("Prefer Add Tracks"))
-                gPlayer->setPlayNow(false);
+                MusicPlayer::setPlayNow(false);
         }
         else if (resultid == "visualizermenu")
         {
@@ -2423,7 +2423,7 @@ MythMenu* MusicCommon::createPlaylistOptionsMenu(void)
 
     auto *menu = new MythMenu(label, this, "playlistoptionsmenu");
 
-    if (gPlayer->getPlayNow())
+    if (MusicPlayer::getPlayNow())
     {
         menu->AddItem(tr("Play Now"));
         menu->AddItem(tr("Add Tracks"));

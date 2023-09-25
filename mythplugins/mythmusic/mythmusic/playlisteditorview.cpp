@@ -708,7 +708,7 @@ MythMenu* PlaylistEditorView::createPlaylistMenu(void)
         if (mnode->getAction() == "playlist")
         {
             menu = new MythMenu(tr("Playlist Actions"), this, "treeplaylistmenu");
-            if (gPlayer->getPlayNow())
+            if (MusicPlayer::getPlayNow())
             {
                 menu->AddItem(tr("Play Now"));
                 menu->AddItem(tr("Add Tracks"));
@@ -749,7 +749,7 @@ MythMenu* PlaylistEditorView::createSmartPlaylistMenu(void)
         {
             menu = new MythMenu(tr("Smart Playlist Actions"), this, "smartplaylistmenu");
 
-            if (gPlayer->getPlayNow())
+            if (MusicPlayer::getPlayNow())
             {
                 menu->AddItem(tr("Play Now"));
                 menu->AddItem(tr("Add Tracks"));
@@ -857,7 +857,7 @@ void PlaylistEditorView::treeItemClicked(MythUIButtonListItem *item)
             gPlayer->removeTrack(mnode->getInt());
             mnode->setCheck(MythUIButtonListItem::NotChecked);
         }
-        else if (gPlayer->getPlayNow())
+        else if (MusicPlayer::getPlayNow())
         {
             gPlayer->addTrack(mnode->getInt(), false);
             gPlayer->setCurrentTrackPos(gPlayer->getCurrentPlaylist()->getTrackCount() - 1);

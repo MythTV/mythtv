@@ -109,7 +109,7 @@ void SearchView::customEvent(QEvent *event)
         MusicCommon::customEvent(event);
         handled = true;
 
-        if (m_playTrack == 1 || (m_playTrack == -1 && gPlayer->getPlayNow()))
+        if (m_playTrack == 1 || (m_playTrack == -1 && MusicPlayer::getPlayNow()))
         {
             if (event->type() == MusicPlayerEvent::kTrackAddedEvent)
             {
@@ -190,9 +190,9 @@ void SearchView::customEvent(QEvent *event)
                 }
             }
             else if (resulttext == tr("Prefer Play Now"))
-                gPlayer->setPlayNow(true);
+                MusicPlayer::setPlayNow(true);
             else if (resulttext == tr("Prefer Add Tracks"))
-                gPlayer->setPlayNow(false);
+                MusicPlayer::setPlayNow(false);
             else if (resulttext == tr("Search List..."))
                 searchButtonList();
         }
@@ -276,7 +276,7 @@ void SearchView::ShowMenu(void)
                     menu->AddItem(tr("Remove From Playlist"));
                 else
                 {
-                    if (gPlayer->getPlayNow())
+                    if (MusicPlayer::getPlayNow())
                     {
                         menu->AddItem(tr("Play Now"));
                         menu->AddItem(tr("Add To Playlist"));
