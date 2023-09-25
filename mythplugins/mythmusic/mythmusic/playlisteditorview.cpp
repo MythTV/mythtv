@@ -154,17 +154,8 @@ bool PlaylistEditorView::Create(void)
 
     m_playlistTree->AssignTree(m_rootNode);
 
-    // if (m_restorePosition) // v33- only when switching gallery/tree
-    if (true)              // v34+ always enter where we exited
-    {
-        QStringList route = gCoreContext->GetSetting("MusicTreeLastActive", "").split("\n");
-        restoreTreePosition(route);
-    }
-    else               // not used, could enter at any point like this
-    {
-        QStringList route = (QString("Root Music Node.Albums").split("."));
-        restoreTreePosition(route);
-    }
+    QStringList route = gCoreContext->GetSetting("MusicTreeLastActive", "").split("\n");
+    restoreTreePosition(route);
 
     connect(m_playlistTree, &MythUIButtonTree::itemClicked,
             this, &PlaylistEditorView::treeItemClicked);
