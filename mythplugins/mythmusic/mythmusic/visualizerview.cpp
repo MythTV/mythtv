@@ -242,7 +242,7 @@ bool TrackInfoPopup::keyPressEvent(QKeyEvent *event)
                 m_displayTimer->stop();
             return true;
         }
-        else if (action == "ESCAPE")
+        if (action == "ESCAPE")
             Close();
         else if (action == "INFO")
             showTrackInfo(gPlayer->getCurrentMetadata());
