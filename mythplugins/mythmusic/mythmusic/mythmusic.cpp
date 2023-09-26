@@ -831,9 +831,9 @@ static void setupKeys(void)
     REG_KEY("Music", "REFRESH",    QT_TRANSLATE_NOOP("MythControls",
         "Refresh music tree"),         "8");
     REG_KEY("Music", "SPEEDUP",    QT_TRANSLATE_NOOP("MythControls",
-        "Increase Play Speed"),   "W");
+        "Increase Play Speed"),   "W,3");
     REG_KEY("Music", "SPEEDDOWN",  QT_TRANSLATE_NOOP("MythControls",
-        "Decrease Play Speed"),   "X");
+        "Decrease Play Speed"),   "X,1");
     REG_KEY("Music", "MARK",       QT_TRANSLATE_NOOP("MythControls",
         "Toggle track selection"), "T");
     REG_KEY("Music", "TOGGLESHUFFLE", QT_TRANSLATE_NOOP("MythControls",
