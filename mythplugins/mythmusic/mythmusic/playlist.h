@@ -62,18 +62,18 @@ class Playlist : public QObject
     void describeYourself(void) const; //  debugging
 
     void fillSongsFromSonglist(const QString& songList);
-    void fillSonglistFromQuery(const QString& whereClause, 
-                               bool removeDuplicates = false,
-                               InsertPLOption insertOption = PL_REPLACE,
-                               int currentTrackID = 0);
-    void fillSonglistFromSmartPlaylist(const QString& category, const QString& name,
-                                       bool removeDuplicates = false,
-                                       InsertPLOption insertOption = PL_REPLACE,
-                                       int currentTrackID = 0);
-    void fillSonglistFromList(const QList<int> &songList,
-                              bool removeDuplicates,
-                              InsertPLOption insertOption,
-                              int currentTrackID);
+    int fillSonglistFromQuery(const QString& whereClause,
+                              bool removeDuplicates = false,
+                              InsertPLOption insertOption = PL_REPLACE,
+                              int currentTrackID = 0);
+    int fillSonglistFromSmartPlaylist(const QString& category, const QString& name,
+                                      bool removeDuplicates = false,
+                                      InsertPLOption insertOption = PL_REPLACE,
+                                      int currentTrackID = 0);
+    int fillSonglistFromList(const QList<int> &songList,
+                             bool removeDuplicates,
+                             InsertPLOption insertOption,
+                             int currentTrackID);
     QString toRawSonglist(bool shuffled = false, bool tracksOnly = false);
 
 

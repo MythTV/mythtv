@@ -119,6 +119,10 @@ class MusicPlayer : public QObject, public MythObservable
     void canShowPlayer(bool canShow) { m_canShowPlayer = canShow; }
     bool getCanShowPlayer(void) const { return m_canShowPlayer; }
 
+    /// whether we prefer Play Now over Add Tracks
+    void setPlayNow(bool PlayNow);
+    bool getPlayNow(void);
+
     Decoder        *getDecoder(void) { return m_decoderHandler ? m_decoderHandler->getDecoder() : nullptr; }
     DecoderHandler *getDecoderHandler(void) { return m_decoderHandler; }
     AudioOutput    *getOutput(void) { return m_output; }

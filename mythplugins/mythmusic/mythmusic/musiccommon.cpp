@@ -1348,7 +1348,8 @@ void MusicCommon::customEvent(QEvent *event)
         {
             if (resulttext == tr("Fullscreen Visualizer"))
                 switchView(MV_VISUALIZER);
-            else if (resulttext == tr("Playlist Editor"))
+            else if (resulttext == tr("Playlist Editor") ||
+                     resulttext == tr("Browse Music Library"))
             {
                 if (gCoreContext->GetSetting("MusicPlaylistEditorView", "tree") ==  "tree")
                     switchView(MV_PLAYLISTEDITORTREE);
@@ -1524,6 +1525,20 @@ void MusicCommon::customEvent(QEvent *event)
                 m_playlistOptions.insertPLOption = PL_INSERTATEND;
                 doUpdatePlaylist();
             }
+            else if (resulttext == tr("Play Now"))
+            {     // cancel shuffles and repeats to play only this now
+                gPlayer->setShuffleMode(MusicPlayer::SHUFFLE_OFF);
+                updateShuffleMode();
+                gPlayer->setRepeatMode(MusicPlayer::REPEAT_OFF);
+                updateRepeatMode();
+                m_playlistOptions.insertPLOption = PL_INSERTATEND;
+                m_playlistOptions.playPLOption = PL_FIRSTNEW;
+                doUpdatePlaylist();
+            }
+            else if (resulttext == tr("Prefer Play Now"))
+                gPlayer->setPlayNow(true);
+            else if (resulttext == tr("Prefer Add Tracks"))
+                gPlayer->setPlayNow(false);
         }
         else if (resultid == "visualizermenu")
         {
@@ -1626,7 +1641,8 @@ void MusicCommon::customEvent(QEvent *event)
                 if (mdata && mdata->ID() == (MusicMetadata::IdType) trackID)
                 {
                     m_currentPlaylist->RemoveItem(item);
-                    break;
+                    x -= 1;  // remove all entries, or:
+                    // break; // remove only first entry
                 }
             }
         }
@@ -1706,6 +1722,7 @@ void MusicCommon::customEvent(QEvent *event)
             gPlayer->getCurrentPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
                                                      m_currentTrack, &m_playlistPlayedTime);
 
+        updateUIPlaylist();     // else album art doesn't update
         updatePlaylistStats();
         updateTrackInfo(gPlayer->getCurrentMetadata());
     }
@@ -2178,11 +2195,19 @@ MythMenu* MusicCommon::createMainMenu(void)
     auto *menu = new MythMenu(label, this, "mainmenu");
 
     if (m_currentView == MV_PLAYLISTEDITORTREE)
+    {
         menu->AddItem(tr("Switch To Gallery View"));
+    }
     else if (m_currentView == MV_PLAYLISTEDITORGALLERY)
+    {
         menu->AddItem(tr("Switch To Tree View"));
+    }
     else if (m_currentView == MV_PLAYLIST)
-        menu->AddItem(MusicCommon::tr("Playlist Editor"));
+    {
+        // menu->AddItem(tr("Playlist Editor")); // v33-
+        // this might be easier for new users to find / understand:
+        menu->AddItem(tr("Browse Music Library")); // v34+
+    }
 
     QStringList screenList;
     MythScreenType *screen = this;
@@ -2387,8 +2412,20 @@ MythMenu* MusicCommon::createPlaylistOptionsMenu(void)
 
     auto *menu = new MythMenu(label, this, "playlistoptionsmenu");
 
-    menu->AddItem(tr("Replace Tracks"));
-    menu->AddItem(tr("Add Tracks"));
+    if (gPlayer->getPlayNow())
+    {
+        menu->AddItem(tr("Play Now"));
+        menu->AddItem(tr("Add Tracks"));
+        menu->AddItem(tr("Replace Tracks"));
+        menu->AddItem(tr("Prefer Add Tracks"));
+    }
+    else
+    {
+        menu->AddItem(tr("Add Tracks"));
+        menu->AddItem(tr("Play Now"));
+        menu->AddItem(tr("Replace Tracks"));
+        menu->AddItem(tr("Prefer Play Now"));
+    }
 
     return menu;
 }
@@ -2515,11 +2552,8 @@ void MusicCommon::showPlaylistOptionsMenu(bool addMainMenu)
 void MusicCommon::doUpdatePlaylist(void)
 {
     int curTrackID = -1;
-    int trackCount = 0;
+    int added = 0;
     int curPos = gPlayer->getCurrentTrackPos();
-
-    if (gPlayer->getCurrentPlaylist())
-        trackCount = gPlayer->getCurrentPlaylist()->getTrackCount();
 
     // store id of current track
     if (gPlayer->getCurrentMetadata())
@@ -2528,17 +2562,17 @@ void MusicCommon::doUpdatePlaylist(void)
     if (!m_whereClause.isEmpty())
     {
         // update playlist from quick playlist
-        gMusicData->m_all_playlists->getActive()->fillSonglistFromQuery(
-                    m_whereClause, true,
-                    m_playlistOptions.insertPLOption, curTrackID);
+        added = gMusicData->m_all_playlists->getActive()->fillSonglistFromQuery(
+            m_whereClause, true,
+            m_playlistOptions.insertPLOption, curTrackID);
         m_whereClause.clear();
     }
     else if (!m_songList.isEmpty())
     {
         // update playlist from song list (from the playlist editor)
-        gMusicData->m_all_playlists->getActive()->fillSonglistFromList(
-                    m_songList, true,
-                    m_playlistOptions.insertPLOption, curTrackID);
+        added = gMusicData->m_all_playlists->getActive()->fillSonglistFromList(
+            m_songList, true,
+            m_playlistOptions.insertPLOption, curTrackID);
 
         m_songList.clear();
     }
@@ -2547,9 +2581,9 @@ void MusicCommon::doUpdatePlaylist(void)
 
     updateUIPlaylist();
 
-    if (m_currentTrack == -1)
-        playFirstTrack();
-    else
+    // if (m_currentTrack == -1) // why? non-playing should also
+    //     playFirstTrack();     // start playing per options -twitham
+    // else
     {
         switch (m_playlistOptions.playPLOption)
         {
@@ -2576,7 +2610,7 @@ void MusicCommon::doUpdatePlaylist(void)
                     case PL_INSERTATEND:
                     {
                         pause();
-                        if (!gPlayer->setCurrentTrackPos(trackCount))
+                        if (!gPlayer->setCurrentTrackPos(gPlayer->getCurrentPlaylist()->getTrackCount() - added))
                             playFirstTrack();
                         break;
                     }

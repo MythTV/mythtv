@@ -219,6 +219,16 @@ void MusicPlayer::loadSettings(void)
 
     m_lastplayDelay = gCoreContext->GetDurSetting<std::chrono::seconds>("MusicLastPlayDelay", LASTPLAY_DELAY);
     m_autoShowPlayer = (gCoreContext->GetNumSetting("MusicAutoShowPlayer", 1) > 0);
+
+}
+
+void MusicPlayer::setPlayNow(bool PlayNow)
+{
+    gCoreContext->SaveBoolSetting("MusicPreferPlayNow", PlayNow);
+}
+bool MusicPlayer::getPlayNow(void)
+{
+    return gCoreContext->GetBoolSetting("MusicPreferPlayNow", false);
 }
 
 // this stops playing the playlist and plays the file pointed to by mdata
