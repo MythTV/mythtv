@@ -1281,8 +1281,8 @@
         </textarea>
 
         <textarea name="time" from="basetextarea">
-            <area>385,125,185,25</area>
-            <align>right</align>
+            <area>375,125,285,25</area>
+            <align>left</align>
         </textarea>
 
         <imagetype name="coverart">
