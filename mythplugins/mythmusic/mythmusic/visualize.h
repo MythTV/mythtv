@@ -253,12 +253,6 @@ class Spectrogram : public VisualBase
     bool           m_binpeak { true }; // peak of bins, else mean
     bool           m_history { true }; // spectrogram? or spectrum
 };
-class SpectrumDetail : public Spectrogram
-{
-  public:
-    SpectrumDetail() = default;
-    ~SpectrumDetail() override = default;
-};
 
 class Spectrum : public VisualBase
 {
