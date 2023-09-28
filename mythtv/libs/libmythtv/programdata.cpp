@@ -301,8 +301,8 @@ void DBEvent::AddPerson(DBPerson::Role role, const QString &name,
     if (!m_credits)
         m_credits = new DBCredits;
 
-    m_credits->push_back(DBPerson(role, name.simplified(),
-                                  priority, character.simplified()));
+    m_credits->emplace_back(role, name.simplified(),
+                            priority, character.simplified());
 }
 
 void DBEvent::AddPerson(const QString &role, const QString &name,
@@ -311,8 +311,8 @@ void DBEvent::AddPerson(const QString &role, const QString &name,
     if (!m_credits)
         m_credits = new DBCredits;
 
-    m_credits->push_back(DBPerson(role, name.simplified(),
-                                  priority, character.simplified()));
+    m_credits->emplace_back(role, name.simplified(),
+                            priority, character.simplified());
 }
 
 bool DBEvent::HasTimeConflict(const DBEvent &o) const

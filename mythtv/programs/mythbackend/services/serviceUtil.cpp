@@ -780,7 +780,7 @@ DBCredits * jsonCastToCredits(const QJsonObject &cast)
         QString     character = actor.value("CharacterName").toString("");
         QString     role      = actor.value("Role").toString("");
 
-        credits->push_back(DBPerson(role, name, priority, character));
+        credits->emplace_back(role, name, priority, character);
         ++priority;
     }
 
