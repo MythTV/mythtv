@@ -5,7 +5,6 @@
 #include <QFile>
 
 // MythTV
-#include "libmythbase/http/mythhttpresponse.h"
 #include "libmythbase/http/mythhttptypes.h"
 
 class MythHTTPFile : public QFile, public MythHTTPContent
