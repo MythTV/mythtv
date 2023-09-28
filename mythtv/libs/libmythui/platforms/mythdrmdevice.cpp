@@ -633,6 +633,7 @@ bool MythDRMDevice::CanSwitchModes() const
     return m_valid && m_authenticated && m_atomic;
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 const DRMModes& MythDRMDevice::GetModes() const
 {
     static const DRMModes empty;

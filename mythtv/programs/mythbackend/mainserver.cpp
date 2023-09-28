@@ -5638,6 +5638,9 @@ bool MainServer::HandleDeleteFile(const QString& filename, const QString& storag
         truncateThread->run();
     }
 
+    // The truncateThread should be deleted by QRunnable after it
+    // finished executing.
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     return true;
 }
 

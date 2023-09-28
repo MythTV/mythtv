@@ -1326,6 +1326,8 @@ void PlaybackProfileConfig::ReloadSettings(void)
     setChanged(true);
 }
 
+// This function doesn't guarantee that no exceptions will be thrown.
+// NOLINTNEXTLINE(performance-noexcept-swap)
 void PlaybackProfileConfig::swap(int indexA, int indexB)
 {
     for (PlaybackProfileItemConfig *profile : qAsConst(m_profiles))
