@@ -177,7 +177,9 @@ Checks: '-*,
         # Noisy!!!  foo(void) => foo()  ,
        -modernize-redundant-void-arg,
 
-        # As of 2023-09-19, there are 1798 unique warnings. ,
+        # As of 2023-09-29, there are 14 unique warnings
+        remaining. These all come from calls to
+        Q_GLOBAL_STATIC_WITH_ARGS and cant be fixed by us. ,
        -modernize-type-traits,
 
         # Why would anyone want this? ,
@@ -196,7 +198,7 @@ Checks: '-*,
        -performance-avoid-endl,
 
         # The Q_DECLARE_METATYPE macro triggers a warning from this
-        # new clang12 checker.  As of 2022-12-19, there vast majority
+        # new clang12 checker.  As of 2022-12-19, the vast majority
         # of these (236 of 292) warnings are associated with this
         # macro; the other 56 are in the MythTV code. ,
        -performance-no-int-to-ptr,
