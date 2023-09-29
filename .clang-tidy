@@ -104,7 +104,7 @@ Checks: '-*,
         # As of 2022-12-19, there are 142 unique warnings. ,
        -cppcoreguidelines-avoid-goto,
 
-        # As of 2023-05022, there are 1257 unique warnings. ,
+        # As of 2023-05-22, there are 1257 unique warnings. ,
        -cppcoreguidelines-avoid-non-const-global-variables,
 
         # As of 2023-05-22, there are 374 unique warnings. ,
@@ -233,6 +233,8 @@ CheckOptions:
 
   - { key: cppcoreguidelines-pro-type-member-init.IgnoreArrays, value: 1 }
   - { key: cppcoreguidelines-narrowing-conversions.PedanticMode, value: 0 } # test 1 at some point
+
+  - { key: misc-header-include-cycle.IgnoredFilesList, value: 'qglobal.h;mem.h;common.h' }
 
   - { key: modernize-make-shared.IgnoreMacros,             value: 0 }
   - { key: modernize-make-unique.IgnoreMacros,             value: 0 }
