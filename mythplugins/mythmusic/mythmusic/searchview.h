@@ -39,7 +39,7 @@ class SearchView : public MusicCommon
     static void trackVisible(MythUIButtonListItem *item);
 
   private:
-    bool                 m_playTrack    {false};
+    int                  m_playTrack    {-1};
     MythUIButtonList    *m_fieldList    {nullptr};
     MythUITextEdit      *m_criteriaEdit {nullptr};
     MythUIText          *m_matchesText  {nullptr};

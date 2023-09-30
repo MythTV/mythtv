@@ -46,6 +46,7 @@
             "alreadydel": "Redan raderad",
             "canundel": "Du kan vända detta genom att använda Återställ.",
             "channel": "Kanal",
+            "damaged": "Skadad",
             "delete_details": "Detta tar bort inspelningsregeln",
             "delete_rule": "Ta bort inspelningsregel",
             "description": "Beskrivning",
@@ -63,6 +64,8 @@
             "job_Transcode": "Omkoda",
             "mnu_delete": "Radera",
             "mnu_delete_rerec": "Ta bort och tillåt ominspelning",
+            "mnu_markdamaged": "Markera som skadad",
+            "mnu_markundamaged": "Markera som oskadad",
             "mnu_markunwatched": "Markera som obevakad",
             "mnu_markwatched": "Markera som bevakad",
             "mnu_rerec": "Tillåt ominspelning",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Ångra radering",
             "mnu_updatemeta": "Uppdatera metadata",
             "mnu_updaterecrule": "Uppdatera postregel",
+            "nonrerec": "För att tillåta återinspelning av det skadade programmet, använd Allow Re Record.",
             "orig_airdate": "Original Air Date",
             "override_rule": "Lägg till eller redigera åsidosättningsregel",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "Detta kommer att stoppa inspelningen",
             "stop_recording": "Stoppa inspelning",
             "subtitle": "Texta",
-            "title": "Titel"
+            "title": "Titel",
+            "watched": "Betraktade"
         },
         "recrule": {
             "type": "Typ"
@@ -168,6 +173,8 @@
             },
             "type_label": "Schematyp"
         },
+        "scrolltabsleft": "Bläddra flikarna åt vänster",
+        "scrolltabsright": "Rulla flikar åt höger",
         "status": {
             "backends_detail": "Backend: {{ Name }} är en {{ Type }} på IP {{ IP }}",
             "backends_none": "Inga backends",
@@ -224,7 +231,8 @@
         "videos": {
             "download": "Ladda ner video",
             "heading": "videoklipp",
-            "releasedate": "Utgivningsdatum"
+            "releasedate": "Utgivningsdatum",
+            "showall": "Platta kataloglistor"
         }
     },
     "data": {
@@ -1032,7 +1040,7 @@
             "sg_label": "Diskschemaläggare för lagringsgrupp",
             "slowly_desc": "Vissa filsystem använder mycket resurser när man tar bort stora filer. Om det är aktiverat gör det här alternativet att MythTV tar bort filer långsamt på denna backend för att minska effekten.",
             "slowly_label": "Ta bort filer långsamt",
-            "statapp_desc": "Externt program eller skript som matar ut extra information för inkludering i backend-statussidan. Se <a href=\"http://www.mythtv.org/wiki/Miscellaneous_Status_Information\" target=\"_blank\">Diverse statusinformation</a> i wikin.",
+            "statapp_desc": "Externt program eller skript som matar ut extra information för inkludering i backend-statussidan. Se MythTV-wikin:",
             "statapp_label": "Diverse statusansökan",
             "subtitle": "Allmänna inställningar för backend",
             "title": "Diverse inställningar",
@@ -1175,7 +1183,7 @@
             "WOLReconnect_label": "Återanslut tid",
             "WOLRetry_desc": "Antalet försök att väcka servern innan gränssnittet ger upp.",
             "WOLRetry_label": "Försök igen",
-            "bouquet_desc": "Bukett-ID för Freesat eller Sky på satellit Astra-2 28.2E. Lämna detta på 0 om du inte tar emot denna satellit. Detta behövs för att få Freesat- och Sky-kanalnumren. Värde 272 väljer Freesat bukett 'England HD'. Se MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "bouquet_desc": "Bukett-ID för Freesat eller Sky på satellit Astra-2 28.2E. Lämna detta på 0 om du inte tar emot denna satellit. Detta behövs för att få Freesat- och Sky-kanalnumren. Värde 272 väljer Freesat bukett 'England HD'. Se MythTV-wikin.",
             "bouquet_label": "Bukett ID",
             "delete_all": "Ta bort alla videokällor",
             "delete_details": "Detta tar bort {{DisplayName}} ({{Grabber}})",
@@ -1186,7 +1194,7 @@
             "freqtable_label": "Kanalfrekvenstabell",
             "grabber_desc": "Välj annonskällan. Vissa källor kräver att du har ett abonnemang.",
             "grabber_label": "Lista grabber",
-            "grabberconfig_desc": "Konfigurera grabbern genom att köra det här kommandot med ssh eller terminal inloggad i backend. Se <a href=\"http://www.mythtv.org/wiki/XMLTV\" target=\"_blank\">XMLTV</a> i wikin.",
+            "grabberconfig_desc": "Konfigurera grabbern genom att köra det här kommandot med ssh eller terminal inloggad i backend. Se MythTV-wikin:",
             "grabberconfig_label": "Konfigurera Grabber",
             "item_title": "Videokälla",
             "lcnoffset_desc": "Förskjutningen läggs till varje logiskt kanalnummer som hittas under en genomsökning av en DVB-videokälla. Detta gör det möjligt att ge olika videokällor ett icke-överlappande intervall av kanalnummer. Lämna på 0 om du bara har en videokälla eller om videokällorna inte har logiska DVB-kanalnummer.",
@@ -1196,7 +1204,7 @@
             "netid_desc": "Om din leverantör har bett dig att konfigurera en specifik nätverksidentifierare (Network_ID), ange den här. Lämna den på -1 annars.",
             "netid_label": "Nätverks ID",
             "new_video_source": "Ny videokälla",
-            "region_desc": "Region-ID för Freesat eller Sky på satelliten Astra-2 28.2E. Lämna detta på 0 du tar inte emot denna satellit. Detta behövs för att få Freesat- och Sky-kanalnumren. Värde 1 väljer region London. Se MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "region_desc": "Region-ID för Freesat eller Sky på satelliten Astra-2 28.2E. Lämna detta på 0 du tar inte emot denna satellit. Detta behövs för att få Freesat- och Sky-kanalnumren. Värde 1 väljer region London. Se MythTV-wikin:",
             "region_label": "Region-ID",
             "scanfreq_desc": "Frekvensen för att börja skanna denna videokälla. Detta är då standard för 'Full Scan (Tuned)' kanalskanning. Frekvensvärde i Hz för DVB-T/T2/C, i kHz för DVB-S/S2. Lämna vid 0 om det inte är känt.",
             "scanfreq_label": "Skanningsfrekvens",

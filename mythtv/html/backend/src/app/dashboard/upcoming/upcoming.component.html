@@ -101,14 +101,14 @@
                             {{program.Channel.ChanNum}} {{program.Channel.CallSign}}</td>
                         <td style="flex-basis: 8%" class="p-1">{{program.Recording.RecGroup}}</td>
                         <td style="flex-basis: 7%" class="p-1">
-                            <div *ngIf="program.Recording" [ngStyle]="['WillRecord','Recording','Recorded'].indexOf(program.Recording.StatusName)>-1?
-                                {'background-color':'palegreen'}:{'background-color':'pink'}">
+                            <div *ngIf="program.Recording"  [ngClass]="['WillRecord','Recording','Recorded'].indexOf(program.Recording.StatusName)>-1 ?
+                                'text-green-500' : 'text-pink-500'">
                                 {{dataService.recStatusText[program.Recording.StatusName]}}
                             </div>
                         </td>
                         <td style="flex-basis: 2%" class="p-1">
-                            <button pButton pRipple icon="pi pi-stop" class="p-button-text p-button-danger"
-                                *ngIf="program.Recording.StatusName == 'Recording' else overrideBn"
+                            <button pButton pRipple icon="pi pi-stop-circle" class="p-button-text p-button-danger"
+                                *ngIf="['Recording', 'Failing'].indexOf(program.Recording.StatusName) > -1 else overrideBn"
                                 (click)="stopRequest(program)"
                                 pTooltip="{{ 'dashboard.recordings.stop_recording' | translate }}"
                                 tooltipPosition="left"></button>

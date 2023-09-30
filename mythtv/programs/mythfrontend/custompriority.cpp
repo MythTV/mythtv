@@ -128,6 +128,9 @@ void CustomPriority::loadData()
     else
         MythDB::DBError("Get power search rules query", result);
 
+    // No memory leak. In the previous while loop, MythUIButtonListItem
+    // adds the new item into m_ruleList.
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     loadExampleRules();
 
     if (!m_pginfo->GetTitle().isEmpty())

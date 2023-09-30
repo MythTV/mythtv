@@ -278,7 +278,8 @@ class PlaybackProfileConfig : public GroupSetting
 
     void DeleteProfileItem(PlaybackProfileItemConfig *profile);
 
-    void swap(int indexA, int indexB);
+    // This function doesn't guarantee that no exceptions will be thrown.
+    void swap(int indexA, int indexB); // NOLINT(performance-noexcept-swap)
 
   private slots:
     void AddNewEntry(void);

@@ -46,6 +46,7 @@
             "alreadydel": "Že izbrisano",
             "canundel": "To lahko obrnete z uporabo Undelete.",
             "channel": "Kanal",
+            "damaged": "Poškodovan",
             "delete_details": "S tem boste izbrisali pravilo snemanja",
             "delete_rule": "Izbriši pravilo snemanja",
             "description": "Opis",
@@ -63,6 +64,8 @@
             "job_Transcode": "Prekodiraj",
             "mnu_delete": "Izbriši",
             "mnu_delete_rerec": "Izbriši in dovoli ponovno snemanje",
+            "mnu_markdamaged": "Označi kot poškodovano",
+            "mnu_markundamaged": "Označi kot nepoškodovano",
             "mnu_markunwatched": "Označi kot neogledano",
             "mnu_markwatched": "Označi kot gledano",
             "mnu_rerec": "Dovoli ponovno snemanje",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Razveljavi brisanje",
             "mnu_updatemeta": "Posodobi metapodatke",
             "mnu_updaterecrule": "Posodobi pravilo zapisa",
+            "nonrerec": "Če želite omogočiti ponovno snemanje poškodovanega programa, uporabite možnost Dovoli ponovno snemanje.",
             "orig_airdate": "Prvotni datum predvajanja",
             "override_rule": "Dodajanje ali urejanje pravila za preglasitev",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "To bo ustavilo snemanje",
             "stop_recording": "Ustavi snemanje",
             "subtitle": "Podnaslov",
-            "title": "Naslov"
+            "title": "Naslov",
+            "watched": "Gledal"
         },
         "recrule": {
             "type": "Vrsta"
@@ -168,6 +173,8 @@
             },
             "type_label": "Vrsta urnika"
         },
+        "scrolltabsleft": "Drsenje po zavihkih levo",
+        "scrolltabsright": "Pomik po zavihkih v desno",
         "status": {
             "backends_detail": "Backend: {{ Name }} je {{ Type }} na IP {{ IP }}",
             "backends_none": "Brez ozadja",
@@ -224,7 +231,8 @@
         "videos": {
             "download": "Prenesi video",
             "heading": "Videoposnetki",
-            "releasedate": "Datum izdaje"
+            "releasedate": "Datum izdaje",
+            "showall": "Izravnajte sezname imenikov"
         }
     },
     "data": {
@@ -1032,7 +1040,7 @@
             "sg_label": "Razporejevalnik diskov skupine za shranjevanje",
             "slowly_desc": "Nekateri datotečni sistemi pri brisanju velikih datotek porabijo veliko virov. Če je omogočena, ta možnost povzroči, da MythTV počasi briše datoteke v tem ozadju, da zmanjša vpliv.",
             "slowly_label": "Počasi brišite datoteke",
-            "statapp_desc": "Zunanja aplikacija ali skript, ki izpiše dodatne informacije za vključitev na stran s stanjem zaledja. Oglejte si <a href=\"http://www.mythtv.org/wiki/Miscellaneous_Status_Information\" target=\"_blank\">Razne informacije o stanju</a> v wikiju.",
+            "statapp_desc": "Zunanja aplikacija ali skript, ki izpiše dodatne informacije za vključitev na stran s stanjem zaledja. Oglejte si wiki MythTV:",
             "statapp_label": "Aplikacija za razno stanje",
             "subtitle": "Splošne nastavitve zaledja",
             "title": "Razne nastavitve",
@@ -1175,7 +1183,7 @@
             "WOLReconnect_label": "Čas ponovne povezave",
             "WOLRetry_desc": "Število ponovnih poskusov za prebujanje strežnika, preden vmesnik odpove.",
             "WOLRetry_label": "Ponovni poskusi",
-            "bouquet_desc": "Bouquet ID za Freesat ali Sky na satelitu Astra-2 28.2E. Pustite to na 0, če tega satelita ne sprejemate. To je potrebno za pridobitev številk kanalov Freesat in Sky. Vrednost 272 izbere Freesat šopek 'England HD'. Oglejte si MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "bouquet_desc": "Bouquet ID za Freesat ali Sky na satelitu Astra-2 28.2E. Pustite to na 0, če tega satelita ne sprejemate. To je potrebno za pridobitev številk kanalov Freesat in Sky. Vrednost 272 izbere Freesat šopek 'England HD'. Oglejte si wiki MythTV.",
             "bouquet_label": "ID šopka",
             "delete_all": "Izbriši vse video vire",
             "delete_details": "To bo izbrisalo {{DisplayName}} ({{Grabber}})",
@@ -1186,7 +1194,7 @@
             "freqtable_label": "Frekvenčna tabela kanalov",
             "grabber_desc": "Izberite vir seznamov. Nekateri viri zahtevajo, da imate naročnino.",
             "grabber_label": "Zajemalka oglasov",
-            "grabberconfig_desc": "Konfigurirajte grabber tako, da zaženete ta ukaz z uporabo ssh ali terminala, prijavljenega v ozadju. Oglejte si <a href=\"http://www.mythtv.org/wiki/XMLTV\" target=\"_blank\">XMLTV</a> v wikiju.",
+            "grabberconfig_desc": "Konfigurirajte grabber tako, da zaženete ta ukaz z uporabo ssh ali terminala, prijavljenega v ozadju. Oglejte si wiki MythTV:",
             "grabberconfig_label": "Konfigurirajte Grabber",
             "item_title": "Video vir",
             "lcnoffset_desc": "Odmik se doda vsaki številki logičnega kanala, najdeni med skeniranjem video vira DVB. To omogoča, da različnim video virom dodelite neprekrivajoče se območje številk kanalov. Pustite na 0, če imate samo en video vir ali če video viri nimajo številk logičnih kanalov DVB.",
@@ -1196,7 +1204,7 @@
             "netid_desc": "Če vas je ponudnik prosil, da konfigurirate določen identifikator omrežja (Network_ID), ga vnesite tukaj. V nasprotnem primeru pustite na -1.",
             "netid_label": "ID omrežja",
             "new_video_source": "Nov video vir",
-            "region_desc": "Regijski ID za Freesat ali Sky na satelitu Astra-2 28.2E. Pustite to na 0, ker tega satelita ne sprejemate. To je potrebno za pridobitev številk kanalov Freesat in Sky. Vrednost 1 izbere regijo London. Oglejte si MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "region_desc": "Regijski ID za Freesat ali Sky na satelitu Astra-2 28.2E. Pustite to na 0, ker tega satelita ne sprejemate. To je potrebno za pridobitev številk kanalov Freesat in Sky. Vrednost 1 izbere regijo London. Oglejte si wiki MythTV:",
             "region_label": "ID regije",
             "scanfreq_desc": "Frekvenca za začetek skeniranja tega video vira. To je potem privzeto za 'Full Scan (Tuned)' iskanje kanalov. Vrednost frekvence v Hz za DVB-T/T2/C, v kHz za DVB-S/S2. Pustite pri 0, če ni znano.",
             "scanfreq_label": "Frekvenca skeniranja",

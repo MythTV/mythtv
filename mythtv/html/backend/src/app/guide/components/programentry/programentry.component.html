@@ -5,8 +5,8 @@
             <div class="programSubtitle">{{ program.SubTitle }}</div>
         </div>
         <div *ngIf="program.Recording">
-            <div class="programSubtitle" [ngStyle]="['WillRecord','Recording'].indexOf(program.Recording.StatusName)>-1?
-            {'background-color':'palegreen'}:{'background-color':'pink'}">
+            <div class="programSubtitle" [ngClass]="['WillRecord','Recording'].indexOf(program.Recording.StatusName)>-1?
+                'bg-green-400' : 'bg-pink-400'">
                 {{ dataService.recStatusText[program.Recording.StatusName] }}</div>
         </div>
         <div class="programDescription">{{ program.Description }}</div>

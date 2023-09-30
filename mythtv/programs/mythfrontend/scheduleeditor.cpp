@@ -2247,8 +2247,8 @@ void FilterOptMixin::Load(void)
         {
             while (query.next())
             {
-                m_descriptions << QObject::tr(query.value(1).toString()
-                                              .toUtf8().constData());
+                m_descriptions << QCoreApplication::translate("SchedFilterEditor",
+                                    query.value(1).toString().toUtf8().constData());
             }
         }
         m_loaded = true;

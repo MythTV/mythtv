@@ -46,6 +46,7 @@
             "alreadydel": "Már törölve",
             "canundel": "Ezt megfordíthatja az Undelete használatával.",
             "channel": "Csatorna",
+            "damaged": "Sérült",
             "delete_details": "Ezzel törli a rögzítési szabályt",
             "delete_rule": "Törölje a rögzítési szabályt",
             "description": "Leírás",
@@ -63,6 +64,8 @@
             "job_Transcode": "Átkódolás",
             "mnu_delete": "Töröl",
             "mnu_delete_rerec": "Törlés és újrarögzítés engedélyezése",
+            "mnu_markdamaged": "Megjelölés sérültként",
+            "mnu_markundamaged": "Megjelölés sértetlenként",
             "mnu_markunwatched": "Megjelölés nem figyeltként",
             "mnu_markwatched": "Megjelölés figyeltként",
             "mnu_rerec": "Újrarögzítés engedélyezése",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Törlés visszavonása",
             "mnu_updatemeta": "Frissítse a metaadatokat",
             "mnu_updaterecrule": "Frissítse a rögzítési szabályt",
+            "nonrerec": "A sérült program újbóli rögzítésének engedélyezéséhez használja az Allow Re Record lehetőséget.",
             "orig_airdate": "Eredeti sugárzási dátum",
             "override_rule": "Felülbírálási szabály hozzáadása vagy szerkesztése",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "Ezzel leállítja a rögzítést",
             "stop_recording": "Felvétel leállítása",
             "subtitle": "Felirat",
-            "title": "Cím"
+            "title": "Cím",
+            "watched": "Figyelt"
         },
         "recrule": {
             "type": "típus"
@@ -168,6 +173,8 @@
             },
             "type_label": "Ütemezés típusa"
         },
+        "scrolltabsleft": "Görgesse a lapokat balra",
+        "scrolltabsright": "Görgesse a lapokat jobbra",
         "status": {
             "backends_detail": "Háttérrendszer: a {{ Name }} egy {{ Type }} az {{ IP }} IP-n",
             "backends_none": "Nincsenek háttérprogramok",
@@ -224,7 +231,8 @@
         "videos": {
             "download": "Videó letöltése",
             "heading": "Videók",
-            "releasedate": "Kiadási dátum"
+            "releasedate": "Kiadási dátum",
+            "showall": "Címtárlisták egyesítése"
         }
     },
     "data": {
@@ -1032,7 +1040,7 @@
             "sg_label": "Tárolócsoport lemezütemező",
             "slowly_desc": "Egyes fájlrendszerek sok erőforrást használnak fel a nagy fájlok törlésekor. Ha engedélyezve van, a MythTV lassan törli a fájlokat ezen a háttéren a hatás csökkentése érdekében.",
             "slowly_label": "Fájlok törlése lassan",
-            "statapp_desc": "Külső alkalmazás vagy szkript, amely extra információkat ad ki a háttér állapotoldalára való felvételhez. Lásd a <a href=\"http://www.mythtv.org/wiki/Miscellaneous_Status_Information\" target=\"_blank\">Egyéb állapotinformációkat</a> a wikiben.",
+            "statapp_desc": "Külső alkalmazás vagy szkript, amely további információkat ad ki a háttér állapotoldalára való felvételhez. Lásd a MythTV wikit:",
             "statapp_label": "Egyéb állapot alkalmazás",
             "subtitle": "Általános háttérbeállítások",
             "title": "Egyéb beállítások",
@@ -1175,7 +1183,7 @@
             "WOLReconnect_label": "Újracsatlakozási idő",
             "WOLRetry_desc": "A szerver felébresztésére irányuló próbálkozások száma, mielőtt a frontend feladná.",
             "WOLRetry_label": "Próbálja újra",
-            "bouquet_desc": "Csokorazonosító a Freesat vagy a Sky számára az Astra-2 28.2E műholdon. Hagyja ezt 0-n, ha nem veszi ezt a műholdat. Ez szükséges a Freesat és Sky csatornaszámok megszerzéséhez. A 272-es érték az „England HD” Freesat csokrot választja. Lásd a MythTV Wikit <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "bouquet_desc": "Csokor azonosítója a Freesathoz vagy a Skyhoz az Astra-2 28.2E műholdon. Hagyja ezt 0-n, ha nem veszi ezt a műholdat. Ez szükséges a Freesat és a Sky csatornaszámok megszerzéséhez. A 272-es érték az „England HD” Freesat csokrot választja. Lásd a MythTV wikit.",
             "bouquet_label": "Csokor azonosítója",
             "delete_all": "Törölje az összes videóforrást",
             "delete_details": "Ezzel törli a következőt: {{DisplayName}} ({{Grabber}})",
@@ -1186,7 +1194,7 @@
             "freqtable_label": "Csatorna frekvencia táblázat",
             "grabber_desc": "Válassza ki a listák forrását. Egyes forrásokhoz előfizetés szükséges.",
             "grabber_label": "Listákat markoló",
-            "grabberconfig_desc": "Állítsa be a grabber-t a parancs futtatásával az ssh vagy a háttérbe bejelentkezett terminál használatával. Lásd: <a href=\"http://www.mythtv.org/wiki/XMLTV\" target=\"_blank\">XMLTV</a> a wikiben.",
+            "grabberconfig_desc": "Állítsa be a grabber-t a parancs futtatásával az ssh vagy a háttérrendszerbe bejelentkezett terminál használatával. Lásd a MythTV wikit:",
             "grabberconfig_label": "Grabber konfigurálása",
             "item_title": "Videó forrása",
             "lcnoffset_desc": "Az eltolás hozzáadódik minden egyes logikai csatornaszámhoz, amelyet a DVB videoforrás pásztázása során találtak. Ez lehetővé teszi, hogy a különböző videoforrásoknak egy nem átfedő csatornaszám-tartományt adjunk. Ha csak egy videoforrással rendelkezik, vagy ha a videoforrások nem rendelkeznek DVB logikai csatornaszámmal, hagyja a 0 értéket.",
@@ -1196,7 +1204,7 @@
             "netid_desc": "Ha a szolgáltató egy adott hálózati azonosító (Network_ID) konfigurálására kérte, írja be ide. Ellenkező esetben hagyja -1-en.",
             "netid_label": "Hálózati azonosító",
             "new_video_source": "Új videóforrás",
-            "region_desc": "Régióazonosító a Freesat vagy a Sky számára az Astra-2 28.2E műholdon. Hagyja ezt a 0-n, nem fogja ezt a műholdat. Ez szükséges a Freesat és Sky csatornaszámok megszerzéséhez. Az 1. érték London régiót választja. Lásd a MythTV Wikit <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "region_desc": "Régióazonosító a Freesat vagy a Sky számára az Astra-2 28.2E műholdon. Hagyja ezt a 0-n, nem fogja ezt a műholdat. Ez szükséges a Freesat és a Sky csatornaszámok megszerzéséhez. Az 1. érték London régiót választja. Lásd a MythTV wikit:",
             "region_label": "Régióazonosító",
             "scanfreq_desc": "A videóforrás keresésének megkezdésének gyakorisága. Ekkor ez az alapértelmezett a „Teljes keresés (Tuned)” csatornakereséshez. Frekvenciaérték Hz-ben DVB-T/T2/C esetén, kHz-ben DVB-S/S2 esetén. Ha nem ismert, 0-nál induljon.",
             "scanfreq_label": "Szkennelési frekvencia",

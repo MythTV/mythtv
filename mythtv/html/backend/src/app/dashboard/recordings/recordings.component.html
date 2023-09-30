@@ -74,9 +74,13 @@
             <ng-template pTemplate="body" let-program>
                 <tr [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}">
                     <td style="flex-basis: 12%" class="p-1 overflow-hidden">
-                        {{program.Title}}</td>
+                        <i class="pi pi-exclamation-triangle p-1" *ngIf="program.VideoPropNames.indexOf('DAMAGED') > -1"
+                            pTooltip="{{ 'dashboard.recordings.damaged' | translate }}" tooltipPosition="top"></i>
+                        {{program.Title}}
+                    </td>
                     <td style="flex-basis: 2%" class="p-1">
-                        <i class="pi pi-eye" *ngIf="program.ProgramFlagNames.indexOf('WATCHED') > -1"></i>
+                        <i class="pi pi-eye" *ngIf="program.ProgramFlagNames.indexOf('WATCHED') > -1"
+                            pTooltip="{{ 'dashboard.recordings.watched' | translate }}" tooltipPosition="top"></i>
                     </td>
                     <td style="flex-basis: 18%" class="p-1 overflow-hidden" pTooltip="{{program.Description}}"
                         tooltipPosition="top">
@@ -100,8 +104,9 @@
                         {{program.Recording.FileSize / 1000000 | number:'1.0-0'}} MB</td>
                     <td style="flex-basis: 4%" class="p-1">
                         <a href="{{URLencode('/Content/GetRecording?RecordedId=' + program.Recording.RecordedId)}}"
-                            target="_blank" pTooltip="{{ 'dashboard.recordings.download' | translate }}" tooltipPosition="left">
-                            <i class="pi pi-download"></i></a>
+                            target="_blank" pTooltip="{{ 'dashboard.recordings.download' | translate }}"
+                            tooltipPosition="left">
+                            <i class="pi pi-download text-primary"></i></a>
                         <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
                             (click)="showMenu(program,$event)"></button>
                     </td>
@@ -157,6 +162,14 @@
                     }}</label>
                 <p-calendar [(ngModel)]="program.Airdate" dateFormat="yy-mm-dd" name="Airdate"
                     id="Airdate"></p-calendar>
+            </div>
+
+            <div class="form-group field">
+                <label for="RecGroup" class="label block">{{ 'dashboard.sched.recgroup_label' | translate
+                    }}</label>
+                <p-dropdown [options]="recGroups" [(ngModel)]="program.Recording.RecGroup" [editable]="true"
+                    [maxlength]="64" [style]="{'minWidth':'400px'}" name="RecGroup" #RecGroup="ngModel">
+                </p-dropdown>
             </div>
 
             <ng-template pTemplate="footer">

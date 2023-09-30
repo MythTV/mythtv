@@ -154,11 +154,8 @@ bool PlaylistEditorView::Create(void)
 
     m_playlistTree->AssignTree(m_rootNode);
 
-    if (m_restorePosition)
-    {
-        QStringList route = gCoreContext->GetSetting("MusicTreeLastActive", "").split("\n");
-        restoreTreePosition(route);
-    }
+    QStringList route = gCoreContext->GetSetting("MusicTreeLastActive", "").split("\n");
+    restoreTreePosition(route);
 
     connect(m_playlistTree, &MythUIButtonTree::itemClicked,
             this, &PlaylistEditorView::treeItemClicked);
@@ -297,14 +294,21 @@ void PlaylistEditorView::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Replace Tracks"))
             {
-                m_playlistOptions.playPLOption = PL_CURRENT;
                 m_playlistOptions.insertPLOption = PL_REPLACE;
                 doUpdatePlaylist();
             }
             else if (resulttext == tr("Add Tracks"))
             {
-                m_playlistOptions.playPLOption = PL_CURRENT;
                 m_playlistOptions.insertPLOption = PL_INSERTATEND;
+                doUpdatePlaylist();
+            }
+            else if (resulttext == tr("Play Now"))
+            {               // cancel shuffles and repeats to play now
+                gPlayer->setShuffleMode(MusicPlayer::SHUFFLE_OFF);
+                gPlayer->setRepeatMode(MusicPlayer::REPEAT_OFF);
+                updateShuffleMode(true);
+                m_playlistOptions.insertPLOption = PL_INSERTATEND;
+                m_playlistOptions.playPLOption = PL_FIRSTNEW;
                 doUpdatePlaylist();
             }
         }
@@ -331,13 +335,21 @@ void PlaylistEditorView::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Replace Tracks"))
             {
-                m_playlistOptions.playPLOption = PL_CURRENT;
                 m_playlistOptions.insertPLOption = PL_REPLACE;
                 doUpdatePlaylist();
             }
             else if (resulttext == tr("Add Tracks"))
             {
                 m_playlistOptions.insertPLOption = PL_INSERTATEND;
+                doUpdatePlaylist();
+            }
+            else if (resulttext == tr("Play Now"))
+            {               // cancel shuffles and repeats to play now
+                gPlayer->setShuffleMode(MusicPlayer::SHUFFLE_OFF);
+                gPlayer->setRepeatMode(MusicPlayer::REPEAT_OFF);
+                updateShuffleMode(true);
+                m_playlistOptions.insertPLOption = PL_INSERTATEND;
+                m_playlistOptions.playPLOption = PL_FIRSTNEW;
                 doUpdatePlaylist();
             }
         }
@@ -641,7 +653,7 @@ void PlaylistEditorView::ShowMenu(void)
             {
                 menu = createPlaylistMenu();
             }
-            else if ((mnode->getAction() == "trackid") ||
+            else if ( // (mnode->getAction() == "trackid") ||
                      (mnode->getAction() == "error"))
             {
             }
@@ -687,8 +699,17 @@ MythMenu* PlaylistEditorView::createPlaylistMenu(void)
         if (mnode->getAction() == "playlist")
         {
             menu = new MythMenu(tr("Playlist Actions"), this, "treeplaylistmenu");
+            if (MusicPlayer::getPlayNow())
+            {
+                menu->AddItem(tr("Play Now"));
+                menu->AddItem(tr("Add Tracks"));
+            }
+            else
+            {
+                menu->AddItem(tr("Add Tracks"));
+                menu->AddItem(tr("Play Now"));
+            }
             menu->AddItem(tr("Replace Tracks"));
-            menu->AddItem(tr("Add Tracks"));
             menu->AddItem(tr("Remove Playlist"));
         }
     }
@@ -719,8 +740,17 @@ MythMenu* PlaylistEditorView::createSmartPlaylistMenu(void)
         {
             menu = new MythMenu(tr("Smart Playlist Actions"), this, "smartplaylistmenu");
 
+            if (MusicPlayer::getPlayNow())
+            {
+                menu->AddItem(tr("Play Now"));
+                menu->AddItem(tr("Add Tracks"));
+            }
+            else
+            {
+                menu->AddItem(tr("Add Tracks"));
+                menu->AddItem(tr("Play Now"));
+            }
             menu->AddItem(tr("Replace Tracks"));
-            menu->AddItem(tr("Add Tracks"));
 
             menu->AddItem(tr("Edit Smart Playlist"));
             menu->AddItem(tr("New Smart Playlist"));
@@ -817,6 +847,13 @@ void PlaylistEditorView::treeItemClicked(MythUIButtonListItem *item)
             // remove track from the current playlist
             gPlayer->removeTrack(mnode->getInt());
             mnode->setCheck(MythUIButtonListItem::NotChecked);
+        }
+        else if (MusicPlayer::getPlayNow())
+        {
+            gPlayer->addTrack(mnode->getInt(), false);
+            gPlayer->setCurrentTrackPos(gPlayer->getCurrentPlaylist()->getTrackCount() - 1);
+            updateUIPlaylist();
+            mnode->setCheck(MythUIButtonListItem::FullChecked);
         }
         else
         {

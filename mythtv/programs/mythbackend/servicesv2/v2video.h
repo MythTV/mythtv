@@ -41,7 +41,8 @@ class V2Video : public MythHTTPService
                                                        const QString  &Sort,
                                                        bool           Descending,
                                                        int            StartIndex,
-                                                       int            Count      );
+                                                       int            Count,
+                                                       bool           CollapseSubDirs );
     static V2VideoLookupList*  LookupVideo        ( const QString    &Title,
                                                     const QString    &Subtitle,
                                                     const QString    &Inetref,

@@ -40,7 +40,8 @@ enum MusicView
     MV_ALBUMINFO,
     MV_TRACKINFO,
     MV_RADIO,
-    MV_MINIPLAYER
+    MV_MINIPLAYER,
+    MV_VISUALIZERINFO
 };
 
 Q_DECLARE_METATYPE(MusicView);
@@ -120,7 +121,7 @@ class MPLUGIN_PUBLIC MusicCommon : public MythScreenType
     void updateShuffleMode(bool updateUIList = false);
 
     void changeVolume(bool up) const;
-    static void changeSpeed(bool up);
+    void changeSpeed(bool up);
     void toggleMute(void) const;
     static void toggleUpmix(void);
     static void showVolume(void);

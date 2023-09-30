@@ -46,6 +46,7 @@
             "alreadydel": "Reeds verwijderd",
             "canundel": "U kunt dit ongedaan maken door Undelete te gebruiken.",
             "channel": "Kanaal",
+            "damaged": "Beschadigd",
             "delete_details": "Hiermee wordt de opnameregel verwijderd",
             "delete_rule": "Opnameregel verwijderen",
             "description": "Beschrijving",
@@ -63,6 +64,8 @@
             "job_Transcode": "Transcoderen",
             "mnu_delete": "Verwijderen",
             "mnu_delete_rerec": "Verwijderen en opnieuw opnemen toestaan",
+            "mnu_markdamaged": "Markeer als beschadigd",
+            "mnu_markundamaged": "Markeer als onbeschadigd",
             "mnu_markunwatched": "Markeren als niet bekeken",
             "mnu_markwatched": "Markeren als bekeken",
             "mnu_rerec": "Opnieuw opnemen toestaan",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Verwijderen ongedaan maken",
             "mnu_updatemeta": "Metagegevens bijwerken",
             "mnu_updaterecrule": "Recordregel bijwerken",
+            "nonrerec": "Om opnieuw opnemen van het beschadigde programma mogelijk te maken, gebruikt u Toestaan ​​opnieuw opnemen.",
             "orig_airdate": "Originele uitzenddatum",
             "override_rule": "Negeerregel toevoegen of bewerken",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "Hierdoor wordt de opname gestopt",
             "stop_recording": "Stop met opnemen",
             "subtitle": "Ondertitel",
-            "title": "Titel"
+            "title": "Titel",
+            "watched": "Bekeken"
         },
         "recrule": {
             "type": "Type"
@@ -168,6 +173,8 @@
             },
             "type_label": "Schematype"
         },
+        "scrolltabsleft": "Blader door tabbladen naar links",
+        "scrolltabsright": "Blader door tabbladen naar rechts",
         "status": {
             "backends_detail": "Backend: {{ Name }} is een {{ Type }} op IP {{ IP }}",
             "backends_none": "Geen back-ends",
@@ -224,7 +231,8 @@
         "videos": {
             "download": "Download video",
             "heading": "Videos",
-            "releasedate": "Datum van publicatie"
+            "releasedate": "Datum van publicatie",
+            "showall": "Maak directorylijsten plat"
         }
     },
     "data": {
@@ -1032,7 +1040,7 @@
             "sg_label": "Schijfplanner voor opslaggroepen",
             "slowly_desc": "Sommige bestandssystemen gebruiken veel bronnen bij het verwijderen van grote bestanden. Indien ingeschakeld, zorgt deze optie ervoor dat MythTV bestanden langzaam op deze backend verwijdert om de impact te verminderen.",
             "slowly_label": "Bestanden langzaam verwijderen",
-            "statapp_desc": "Externe applicatie of script dat extra informatie uitvoert voor opname in de backend-statuspagina. Zie <a href=\"http://www.mythtv.org/wiki/Miscellaneous_Status_Information\" target=\"_blank\">Overige statusinformatie</a> in de wiki.",
+            "statapp_desc": "Externe applicatie of script dat extra informatie uitvoert voor opname op de backend-statuspagina. Zie de MythTV-wiki:",
             "statapp_label": "Diverse statustoepassing",
             "subtitle": "Algemene backend-instellingen",
             "title": "Diverse instellingen",
@@ -1175,7 +1183,7 @@
             "WOLReconnect_label": "Tijd opnieuw verbinden",
             "WOLRetry_desc": "Het aantal nieuwe pogingen om de server te wekken voordat de frontend het opgeeft.",
             "WOLRetry_label": "Probeer pogingen opnieuw",
-            "bouquet_desc": "Boeket-ID voor Freesat of Sky op satelliet Astra-2 28.2E. Laat dit op 0 staan ​​als u deze satelliet niet ontvangt. Dit is nodig om de Freesat- en Sky-kanaalnummers te krijgen. Waarde 272 selecteert Freesat boeket 'England HD'. Zie de MythTV-wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "bouquet_desc": "Boeket-ID voor Freesat of Sky op satelliet Astra-2 28.2E. Laat deze op 0 staan ​​als u deze satelliet niet ontvangt. Dit is nodig om de Freesat- en Sky-kanaalnummers te krijgen. Waarde 272 selecteert Freesat boeket 'Engeland HD'. Zie de MythTV-wiki.",
             "bouquet_label": "Boeket ID",
             "delete_all": "Verwijder alle videobronnen",
             "delete_details": "Hiermee wordt {{DisplayName}} ({{Grabber}}) verwijderd",
@@ -1186,7 +1194,7 @@
             "freqtable_label": "Kanaalfrequentietabel",
             "grabber_desc": "Selecteer de vermeldingsbron. Voor sommige bronnen heb je een abonnement nodig.",
             "grabber_label": "Aanbiedingen grijper",
-            "grabberconfig_desc": "Configureer de grabber door deze opdracht uit te voeren met behulp van ssh of terminal ingelogd op de backend. Zie <a href=\"http://www.mythtv.org/wiki/XMLTV\" target=\"_blank\">XMLTV</a> in de wiki.",
+            "grabberconfig_desc": "Configureer de grabber door deze opdracht uit te voeren met behulp van ssh of terminal ingelogd op de backend. Zie de MythTV-wiki:",
             "grabberconfig_label": "Configureer Grabber",
             "item_title": "Video bron",
             "lcnoffset_desc": "De offset wordt toegevoegd aan elk logisch kanaalnummer dat wordt gevonden tijdens een scan van een DVB-videobron. Dit maakt het mogelijk om verschillende videobronnen een niet-overlappend bereik van kanaalnummers te geven. Laat op 0 staan ​​als u slechts één videobron heeft of als de videobronnen geen logische DVB-kanaalnummers hebben.",
@@ -1196,7 +1204,7 @@
             "netid_desc": "Als uw provider u heeft gevraagd om een ​​specifieke netwerk-ID (Network_ID) te configureren, voert u deze hier in. Laat het anders op -1 staan.",
             "netid_label": "Netwerk identificatie",
             "new_video_source": "Nieuwe videobron",
-            "region_desc": "Regio-ID voor Freesat of Sky op satelliet Astra-2 28.2E. Laat deze op 0 staan ​​u ontvangt deze satelliet niet. Dit is nodig om de Freesat- en Sky-kanaalnummers te krijgen. Waarde 1 selecteert regio Londen. Zie de MythTV-wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "region_desc": "Regio-ID voor Freesat of Sky op satelliet Astra-2 28.2E. Laat dit op 0 staan, je ontvangt deze satelliet niet. Dit is nodig om de Freesat- en Sky-kanaalnummers te krijgen. Waarde 1 selecteert regio Londen. Zie de MythTV-wiki:",
             "region_label": "Regio-ID",
             "scanfreq_desc": "De frequentie om te beginnen met het scannen van deze videobron. Dit is dan standaard voor 'Full Scan (Tuned)' kanaalscanning. Frequentiewaarde in Hz voor DVB-T/T2/C, in kHz voor DVB-S/S2. Laat op 0 indien niet bekend.",
             "scanfreq_label": "Scanfrequentie",

@@ -171,7 +171,7 @@
     <div class="form-group field" *ngIf="scanSubType == 'ATSC'">
         <label class="label block">{{ 'settings.channelscan.chancount_label' | translate
             }}</label>
-        <div class="col-10 bg-blue-100">
+        <div class="col-10 bg-blue-100 text-gray-900">
             {{ calcCount() }} &nbsp;
         </div>
         <small class="block">
@@ -501,7 +501,7 @@
         <div class="col-6">
 
             <div class="form-group field">
-                <div class="col-10 bg-blue-100">
+                <div class="col-10 bg-blue-100 text-gray-900">
                     <b>{{ scanStatus.StatusTitle }} &nbsp;</b>
                 </div>
             </div>
@@ -509,7 +509,7 @@
             <div class="form-group field">
                 <label class="label block">{{ 'settings.channelscan.status_label' | translate
                     }}</label>
-                <div class="col-10 bg-blue-100">
+                <div class="col-10 bg-blue-100 text-gray-900">
                     {{ scanStatus.StatusText }} &nbsp;
                 </div>
             </div>
@@ -517,7 +517,7 @@
             <div class="form-group field">
                 <label class="label block">{{ 'settings.channelscan.lock_label' | translate
                     }}</label>
-                <div class="col-10 bg-blue-100">
+                <div class="col-10 bg-blue-100 text-gray-900">
                     {{ scanStatus.SignalLock ? lockDesc : nolockDesc }} &nbsp;
                 </div>
             </div>
@@ -549,7 +549,7 @@
             <br>
 
             <div class="form-group field" *ngIf="scanStatus.DialogMsg">
-                <div class="col-10 bg-pink-100">
+                <div class="col-10"  style="color:black; background-color:pink">
                     <b>{{ scanStatus.DialogMsg }}</b> &nbsp;
                 </div>
                 <br>

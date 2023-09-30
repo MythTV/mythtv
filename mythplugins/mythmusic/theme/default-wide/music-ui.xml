@@ -117,7 +117,7 @@
             <area>35,20,1210,340</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
-            <value>You haven't selected any tracks to play</value>
+            <value>Press M (Menu) to add and play tracks</value>
         </textarea>
 
         <buttonlist name="currentplaylist" from="basecurrentplaylist">
@@ -1281,8 +1281,8 @@
         </textarea>
 
         <textarea name="time" from="basetextarea">
-            <area>385,125,185,25</area>
-            <align>right</align>
+            <area>375,125,285,25</area>
+            <align>left</align>
         </textarea>
 
         <imagetype name="coverart">

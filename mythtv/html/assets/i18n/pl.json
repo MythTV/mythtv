@@ -46,6 +46,7 @@
             "alreadydel": "Już usunięte",
             "canundel": "Możesz to odwrócić, używając opcji Cofnij usunięcie.",
             "channel": "Kanał",
+            "damaged": "Uszkodzony",
             "delete_details": "Spowoduje to usunięcie reguły nagrywania",
             "delete_rule": "Usuń regułę nagrywania",
             "description": "Opis",
@@ -63,6 +64,8 @@
             "job_Transcode": "Transkoduj",
             "mnu_delete": "Usuwać",
             "mnu_delete_rerec": "Usuń i zezwól na ponowne nagranie",
+            "mnu_markdamaged": "Oznacz jako uszkodzony",
+            "mnu_markundamaged": "Oznacz jako nieuszkodzone",
             "mnu_markunwatched": "Oznacz jako nieobserwowane",
             "mnu_markwatched": "Oznacz jako obejrzane",
             "mnu_rerec": "Zezwalaj na ponowne nagrywanie",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Cofnij usunięcie",
             "mnu_updatemeta": "Zaktualizuj metadane",
             "mnu_updaterecrule": "Zaktualizuj regułę rekordu",
+            "nonrerec": "Aby umożliwić ponowne nagranie uszkodzonego programu, użyj opcji Zezwól na ponowne nagranie.",
             "orig_airdate": "Oryginalna data emisji",
             "override_rule": "Dodaj lub edytuj regułę nadpisywania",
             "recgrp": "Grupa nagr",
@@ -79,7 +83,8 @@
             "stop_details": "Spowoduje to zatrzymanie nagrywania",
             "stop_recording": "Zatrzymaj nagrywanie",
             "subtitle": "Podtytuł",
-            "title": "Tytuł"
+            "title": "Tytuł",
+            "watched": "Obejrzane"
         },
         "recrule": {
             "type": "Typ"
@@ -168,6 +173,8 @@
             },
             "type_label": "Typ harmonogramu"
         },
+        "scrolltabsleft": "Przewiń karty w lewo",
+        "scrolltabsright": "Przewiń karty w prawo",
         "status": {
             "backends_detail": "Backend: {{ Name }} to {{ Type }} na IP {{ IP }}",
             "backends_none": "Brak zaplecza",
@@ -224,7 +231,8 @@
         "videos": {
             "download": "Ściągnij wideo",
             "heading": "Filmy",
-            "releasedate": "Data wydania"
+            "releasedate": "Data wydania",
+            "showall": "Spłaszcz listy katalogów"
         }
     },
     "data": {
@@ -1032,7 +1040,7 @@
             "sg_label": "Harmonogram dysków grupy pamięci masowej",
             "slowly_desc": "Niektóre systemy plików zużywają dużo zasobów podczas usuwania dużych plików. Jeśli ta opcja jest włączona, MythTV powoli usuwa pliki z tego zaplecza, aby zmniejszyć wpływ.",
             "slowly_label": "Usuń pliki powoli",
-            "statapp_desc": "Zewnętrzna aplikacja lub skrypt, który generuje dodatkowe informacje w celu umieszczenia ich na stronie stanu zaplecza. Zobacz <a href=\"http://www.mythtv.org/wiki/Miscellaneous_Status_Information\" target=\"_blank\">Inne informacje o statusie</a> na wiki.",
+            "statapp_desc": "Zewnętrzna aplikacja lub skrypt generujący dodatkowe informacje do umieszczenia na stronie stanu zaplecza. Zobacz wiki MythTV:",
             "statapp_label": "Różne wnioski o status",
             "subtitle": "Ogólne ustawienia zaplecza",
             "title": "Różne ustawienia",
@@ -1175,7 +1183,7 @@
             "WOLReconnect_label": "Czas ponownego połączenia",
             "WOLRetry_desc": "Liczba ponownych prób wybudzenia serwera, zanim frontend się podda.",
             "WOLRetry_label": "Ponów próby",
-            "bouquet_desc": "Identyfikator bukietu dla Freesat lub Sky na satelicie Astra-2 28.2E. Pozostaw to na 0, jeśli nie odbierasz tego satelity. Jest to potrzebne do uzyskania numerów kanałów Freesat i Sky. Wartość 272 wybiera bukiet Freesat „Anglia HD”. Zobacz wiki MythTV <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "bouquet_desc": "Identyfikator bukietu dla Freesat lub Sky na satelicie Astra-2 28.2E. Jeśli nie odbierasz tego satelity, pozostaw to na 0. Jest to potrzebne, aby uzyskać numery kanałów Freesat i Sky. Wartość 272 wybiera bukiet Freesat „England HD”. Zobacz wiki MythTV.",
             "bouquet_label": "Identyfikator bukietu",
             "delete_all": "Usuń wszystkie źródła wideo",
             "delete_details": "Spowoduje to usunięcie {{DisplayName}} ({{Grabber}})",
@@ -1186,7 +1194,7 @@
             "freqtable_label": "Tabela częstotliwości kanałów",
             "grabber_desc": "Wybierz źródło aukcji. Niektóre źródła wymagają posiadania subskrypcji.",
             "grabber_label": "Chwytak ofert",
-            "grabberconfig_desc": "Skonfiguruj grabbera, uruchamiając to polecenie za pomocą ssh lub terminala zalogowanego do zaplecza. Zobacz <a href=\"http://www.mythtv.org/wiki/XMLTV\" target=\"_blank\">XMLTV</a> na wiki.",
+            "grabberconfig_desc": "Skonfiguruj grabber, uruchamiając to polecenie przy użyciu protokołu ssh lub terminala zalogowanego do zaplecza. Zobacz wiki MythTV:",
             "grabberconfig_label": "Skonfiguruj Grabbera",
             "item_title": "Źródło wideo",
             "lcnoffset_desc": "Przesunięcie jest dodawane do każdego logicznego numeru kanału znalezionego podczas skanowania źródła wideo DVB. Dzięki temu możliwe jest nadanie różnym źródłom wideo nienakładającego się zakresu numerów kanałów. Pozostaw 0, jeśli masz tylko jedno źródło wideo lub jeśli źródła wideo nie mają logicznych numerów kanałów DVB.",
@@ -1196,7 +1204,7 @@
             "netid_desc": "Jeśli Twój dostawca poprosił Cię o skonfigurowanie określonego identyfikatora sieci (Network_ID), wprowadź go tutaj. W przeciwnym razie pozostaw na -1.",
             "netid_label": "Adres identyfikacyjny sieci",
             "new_video_source": "Nowe źródło wideo",
-            "region_desc": "Identyfikator regionu dla Freesat lub Sky na satelicie Astra-2 28.2E. Pozostaw to na 0, jeśli nie odbierasz tego satelity. Jest to potrzebne do uzyskania numerów kanałów Freesat i Sky. Wartość 1 wybiera region Londyn. Zobacz wiki MythTV <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "region_desc": "Identyfikator regionu dla Freesat lub Sky na satelicie Astra-2 28.2E. Zostaw to na 0, nie będziesz odbierał tego satelity. Jest to potrzebne, aby uzyskać numery kanałów Freesat i Sky. Wartość 1 wybiera region Londyn. Zobacz wiki MythTV:",
             "region_label": "Identyfikator regionu",
             "scanfreq_desc": "Częstotliwość rozpoczęcia skanowania tego źródła wideo. Jest to ustawienie domyślne dla skanowania kanałów „Pełne skanowanie (dostrojone)”. Wartość częstotliwości w Hz dla DVB-T/T2/C, w kHz dla DVB-S/S2. Pozostaw na 0, jeśli nie jest znany.",
             "scanfreq_label": "Częstotliwość skanowania",

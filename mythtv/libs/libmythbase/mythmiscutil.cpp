@@ -206,7 +206,7 @@ bool ping(const QString &host, std::chrono::milliseconds timeout)
                          kMSProcessEvents) == GENERIC_EXIT_OK;
 #else
     QString addrstr =
-        MythCoreContext::resolveAddress(host, gCoreContext->ResolveAny, true);
+        MythCoreContext::resolveAddress(host, MythCoreContext::ResolveAny, true);
     QHostAddress addr = QHostAddress(addrstr);
 #if defined(__FreeBSD__) || defined(Q_OS_DARWIN)
     QString timeoutparam("-t");

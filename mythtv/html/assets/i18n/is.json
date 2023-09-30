@@ -46,6 +46,7 @@
             "alreadydel": "Þegar eytt",
             "canundel": "Þú getur snúið þessu við með því að nota Undelete.",
             "channel": "Rás",
+            "damaged": "Skemmdur",
             "delete_details": "Þetta mun eyða upptökureglunni",
             "delete_rule": "Eyða upptökureglu",
             "description": "Lýsing",
@@ -63,6 +64,8 @@
             "job_Transcode": "Umkóðun",
             "mnu_delete": "Eyða",
             "mnu_delete_rerec": "Eyða og leyfa endurupptöku",
+            "mnu_markdamaged": "Merktu sem skemmd",
+            "mnu_markundamaged": "Merktu sem óskemmd",
             "mnu_markunwatched": "Merktu sem Óhorft",
             "mnu_markwatched": "Merktu sem horft",
             "mnu_rerec": "Leyfa endurupptöku",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Afturkalla eyðingu",
             "mnu_updatemeta": "Uppfærðu lýsigögn",
             "mnu_updaterecrule": "Uppfærðu skráningarreglu",
+            "nonrerec": "Til að leyfa endurskráningu á skemmda forritinu skaltu nota Allow Re Record.",
             "orig_airdate": "Upprunaleg flugdagsetning",
             "override_rule": "Bæta við eða breyta hnekkjareglu",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "Þetta mun hætta upptöku",
             "stop_recording": "Hætta upptöku",
             "subtitle": "Undirtitill",
-            "title": "Titill"
+            "title": "Titill",
+            "watched": "Horfði á"
         },
         "recrule": {
             "type": "Gerð"
@@ -168,6 +173,8 @@
             },
             "type_label": "Dagskrá Tegund"
         },
+        "scrolltabsleft": "Skrunaðu flipa til vinstri",
+        "scrolltabsright": "Skrunaðu flipa til hægri",
         "status": {
             "backends_detail": "Bakendi: {{ Name }} er {{ Type }} á IP {{ IP }}",
             "backends_none": "Engir bakenda",
@@ -224,7 +231,8 @@
         "videos": {
             "download": "Sækja myndbandið",
             "heading": "Myndbönd",
-            "releasedate": "Útgáfudagur"
+            "releasedate": "Útgáfudagur",
+            "showall": "Flettu skráarlista"
         }
     },
     "data": {
@@ -1032,7 +1040,7 @@
             "sg_label": "Geymsluhópur diskaáætlun",
             "slowly_desc": "Sum skráarkerfi nota mikið úrræði þegar stórum skrám er eytt. Ef þetta er virkt gerir þessi valkostur til þess að MythTV eyðir skrám hægt á þessum bakenda til að minnka áhrifin.",
             "slowly_label": "Eyða skrám hægt",
-            "statapp_desc": "Ytri forrit eða handrit sem gefur út aukaupplýsingar til að setja á bakendastöðusíðuna. Sjá <a href=\"http://www.mythtv.org/wiki/Miscellaneous_Status_Information\" target=\"_blank\">Ýmsar stöðuupplýsingar</a> á wiki.",
+            "statapp_desc": "Ytri forrit eða handrit sem gefur út aukaupplýsingar til að setja á bakendastöðusíðuna. Sjá MythTV wiki:",
             "statapp_label": "Ýmis stöðuumsókn",
             "subtitle": "Almennar bakendastillingar",
             "title": "Ýmsar stillingar",
@@ -1175,7 +1183,7 @@
             "WOLReconnect_label": "Tengist aftur Tími",
             "WOLRetry_desc": "Fjöldi endurtekinna tilrauna til að vekja þjóninn áður en framendinn gefst upp.",
             "WOLRetry_label": "Reyndu aftur tilraunir",
-            "bouquet_desc": "Auðkenni vönds fyrir Freesat eða Sky á gervihnatta Astra-2 28.2E. Skildu þetta eftir 0 ef þú færð ekki þennan gervihnött. Þetta er nauðsynlegt til að fá Freesat og Sky rásarnúmerin. Value 272 velur Freesat vönd 'England HD'. Sjá MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "bouquet_desc": "Auðkenni vönds fyrir Freesat eða Sky á gervihnatta Astra-2 28.2E. Skildu þetta eftir við 0 ef þú færð ekki þennan gervihnött. Þetta er nauðsynlegt til að fá Freesat og Sky rásarnúmerin. Value 272 velur Freesat vönd 'England HD'. Sjá MythTV wiki.",
             "bouquet_label": "Auðkenni vönds",
             "delete_all": "Eyða öllum vídeóheimildum",
             "delete_details": "Þetta mun eyða {{DisplayName}} ({{Grabber}})",
@@ -1186,7 +1194,7 @@
             "freqtable_label": "Rás tíðni tafla",
             "grabber_desc": "Veldu uppruna skráningar. Sumar heimildir krefjast þess að þú sért með áskrift.",
             "grabber_label": "Skráningargrípur",
-            "grabberconfig_desc": "Stilltu grabberinn með því að keyra þessa skipun með því að nota ssh eða flugstöð sem er skráður inn á bakenda. Sjá <a href=\"http://www.mythtv.org/wiki/XMLTV\" target=\"_blank\">XMLTV</a> á wiki.",
+            "grabberconfig_desc": "Stilltu grabberinn með því að keyra þessa skipun með því að nota ssh eða flugstöð sem er skráður inn á bakenda. Sjá MythTV wiki:",
             "grabberconfig_label": "Stilla Grabber",
             "item_title": "Uppspretta myndbands",
             "lcnoffset_desc": "Jöfnuninni er bætt við hvert rökrétt rásnúmer sem finnst við skönnun á DVB myndbandsuppsprettu. Þetta gerir það mögulegt að gefa mismunandi mynduppsprettum rásnúmerasvið sem ekki skarast. Skildu eftir 0 ef þú ert aðeins með einn myndbandsuppsprettu eða ef myndbandsuppspretturnar eru ekki með rökrétt DVB rásnúmer.",
@@ -1196,7 +1204,7 @@
             "netid_desc": "Ef þjónustuveitan þín hefur beðið þig um að stilla tiltekið netauðkenni (Network_ID) skaltu slá það inn hér. Látið það vera í -1 annars.",
             "netid_label": "Netauðkenni",
             "new_video_source": "Ný myndbandsuppspretta",
-            "region_desc": "Svæðisauðkenni fyrir Freesat eða Sky á gervihnött Astra-2 28.2E. Skildu þetta eftir á 0 þú færð ekki þennan gervihnött. Þetta er nauðsynlegt til að fá Freesat og Sky rásarnúmerin. Gildi 1 velur svæði London. Sjá MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "region_desc": "Svæðisauðkenni fyrir Freesat eða Sky á gervihnött Astra-2 28.2E. Skildu þetta eftir 0 þú færð ekki þennan gervihnött. Þetta er nauðsynlegt til að fá Freesat og Sky rásarnúmerin. Gildi 1 velur svæði London. Sjá MythTV wiki:",
             "region_label": "Svæðisauðkenni",
             "scanfreq_desc": "Tíðnin til að byrja að skanna þessa mynduppsprettu. Þetta er þá sjálfgefið fyrir 'Full Scan (Tuned)' rásarskönnun. Tíðnigildi í Hz fyrir DVB-T/T2/C, í kHz fyrir DVB-S/S2. Farðu á 0 ef ekki er vitað.",
             "scanfreq_label": "Skanna tíðni",

@@ -30,7 +30,7 @@ class VisualizerView : public MusicCommon
     void customEvent(QEvent *event) override; // MusicCommon
 
   private slots:
-    static void showTrackInfoPopup(void);
+    void showTrackInfoPopup(void);
 };
 
 class MPLUGIN_PUBLIC TrackInfoPopup : public VisualizerView

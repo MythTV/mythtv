@@ -46,6 +46,7 @@
             "alreadydel": "כבר נמחק",
             "canundel": "אתה יכול להפוך זאת על ידי שימוש בביטול המחיקה.",
             "channel": "עָרוּץ",
+            "damaged": "פגום",
             "delete_details": "פעולה זו תמחק את כלל ההקלטה",
             "delete_rule": "מחק את כלל ההקלטה",
             "description": "תיאור",
@@ -63,6 +64,8 @@
             "job_Transcode": "המרת קוד",
             "mnu_delete": "לִמְחוֹק",
             "mnu_delete_rerec": "מחק ואפשר הקלטה מחדש",
+            "mnu_markdamaged": "סמן כפגום",
+            "mnu_markundamaged": "סמן כלא פגום",
             "mnu_markunwatched": "סמן כלא נצפה",
             "mnu_markwatched": "סמן כנצפית",
             "mnu_rerec": "אפשר הקלטה חוזרת",
@@ -71,6 +74,7 @@
             "mnu_undelete": "בטל מחיקה",
             "mnu_updatemeta": "עדכן מטא נתונים",
             "mnu_updaterecrule": "עדכון כלל הרשומה",
+            "nonrerec": "כדי לאפשר הקלטה חוזרת של התוכנית הפגומה, אנא השתמש ב- Allow Re Record.",
             "orig_airdate": "תאריך שידור מקורי",
             "override_rule": "הוסף או ערוך כלל ביטול",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "פעולה זו תפסיק את ההקלטה",
             "stop_recording": "הפסק להקליט",
             "subtitle": "כתוביות",
-            "title": "כותרת"
+            "title": "כותרת",
+            "watched": "צפו"
         },
         "recrule": {
             "type": "סוּג"
@@ -168,6 +173,8 @@
             },
             "type_label": "סוג לוח זמנים"
         },
+        "scrolltabsleft": "גלול כרטיסיות שמאלה",
+        "scrolltabsright": "גלול כרטיסיות ימינה",
         "status": {
             "backends_detail": "אחורי: {{ Name }} הוא {{ Type }} ב-IP {{ IP }}",
             "backends_none": "אין אחוריים",
@@ -224,7 +231,8 @@
         "videos": {
             "download": "הורד סרטון",
             "heading": "סרטונים",
-            "releasedate": "תאריך הוצאה"
+            "releasedate": "תאריך הוצאה",
+            "showall": "שטח רשימות ספריות"
         }
     },
     "data": {
@@ -1032,7 +1040,7 @@
             "sg_label": "מתזמן דיסקים של קבוצת אחסון",
             "slowly_desc": "מערכות קבצים מסוימות משתמשות במשאבים רבים בעת מחיקת קבצים גדולים. אם מופעלת, אפשרות זו גורמת ל-MythTV למחוק קבצים לאט בקצה העורפי הזה כדי להפחית את ההשפעה.",
             "slowly_label": "מחק קבצים לאט",
-            "statapp_desc": "אפליקציה או סקריפט חיצוניים שמוציאים מידע נוסף להכללה בדף המצב האחורי. ראה <a href=\"http://www.mythtv.org/wiki/Miscellaneous_Status_Information\" target=\"_blank\">מידע סטטוס שונה</a> בויקי.",
+            "statapp_desc": "אפליקציה או סקריפט חיצוניים שמוציאים מידע נוסף להכללה בדף המצב האחורי. ראה את הוויקי של MythTV:",
             "statapp_label": "יישום סטטוס שונות",
             "subtitle": "הגדרות אחורי כלליות",
             "title": "הגדרות שונות",
@@ -1175,7 +1183,7 @@
             "WOLReconnect_label": "זמן חיבור מחדש",
             "WOLRetry_desc": "מספר הניסיונות החוזרים להעיר את השרת לפני שה-frontend מוותר.",
             "WOLRetry_label": "נסה שוב ניסיונות",
-            "bouquet_desc": "מזהה זר עבור Freesat או Sky בלוויין Astra-2 28.2E. השאר את זה ב-0 אם אינך מקבל את הלוויין הזה. זה נחוץ כדי לקבל את מספרי ערוצי Freesat ו-Sky. ערך 272 בוחר בזר Freesat 'אנגליה HD'. עיין ב-MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "bouquet_desc": "מזהה זר עבור Freesat או Sky בלוויין Astra-2 28.2E. השאר את זה ב-0 אם אינך מקבל את הלוויין הזה. זה נחוץ כדי לקבל את מספרי ערוצי Freesat ו-Sky. ערך 272 בוחר בזר Freesat 'אנגליה HD'. ראה את הוויקי של MythTV.",
             "bouquet_label": "מזהה זר",
             "delete_all": "מחק את כל מקורות הווידאו",
             "delete_details": "פעולה זו תמחק את {{DisplayName}} ({{Grabber}})",
@@ -1186,7 +1194,7 @@
             "freqtable_label": "טבלת תדירות ערוצים",
             "grabber_desc": "בחר את מקור הרישומים. מקורות מסוימים דורשים ממך מנוי.",
             "grabber_label": "חוטף רישומים",
-            "grabberconfig_desc": "הגדר את התופס על ידי הפעלת פקודה זו באמצעות ssh או מסוף מחובר ל-backend. ראה <a href=\"http://www.mythtv.org/wiki/XMLTV\" target=\"_blank\">XMLTV</a> בויקי.",
+            "grabberconfig_desc": "הגדר את התופס על ידי הפעלת פקודה זו באמצעות ssh או מסוף מחובר ל-backend. ראה את הוויקי של MythTV:",
             "grabberconfig_label": "הגדר את Grabber",
             "item_title": "מקור וידאו",
             "lcnoffset_desc": "ההיסט מתווסף לכל מספר ערוץ לוגי שנמצא במהלך סריקה של מקור וידאו DVB. זה מאפשר לתת למקורות וידאו שונים טווח לא חופף של מספרי ערוצים. השאר ב-0 אם יש לך רק מקור וידאו אחד או אם למקורות הווידאו אין מספרי ערוצים לוגיים של DVB.",
@@ -1196,7 +1204,7 @@
             "netid_desc": "אם הספק שלך ביקש ממך להגדיר מזהה רשת ספציפי (Network_ID), הזן אותו כאן. השאר אותו ב -1 אחרת.",
             "netid_label": "ת. ז רשת",
             "new_video_source": "מקור וידאו חדש",
-            "region_desc": "מזהה אזור עבור Freesat או Sky בלוויין Astra-2 28.2E. השאר את זה ב-0 אתה לא מקבל את הלוויין הזה. זה נחוץ כדי לקבל את מספרי ערוצי Freesat ו-Sky. ערך 1 בוחר באזור לונדון. עיין ב-MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "region_desc": "מזהה אזור עבור Freesat או Sky בלוויין Astra-2 28.2E. השאר את זה ב-0 אתה לא מקבל את הלוויין הזה. זה נחוץ כדי לקבל את מספרי ערוצי Freesat ו-Sky. ערך 1 בוחר באזור לונדון. ראה את הוויקי של MythTV:",
             "region_label": "מזהה אזור",
             "scanfreq_desc": "התדירות להתחיל לסרוק מקור וידאו זה. זוהי ברירת המחדל של סריקת ערוצים 'סריקה מלאה (מכווננת)'. ערך התדר ב-Hz עבור DVB-T/T2/C, ב-kHz עבור DVB-S/S2. השאר ב-0 אם לא ידוע.",
             "scanfreq_label": "תדירות סריקה",

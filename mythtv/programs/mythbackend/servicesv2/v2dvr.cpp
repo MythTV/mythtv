@@ -2127,7 +2127,8 @@ bool V2Dvr::UpdateRecordedMetadata ( uint             RecordedId,
                                      uint             Stars,
                                      const QString   &SubTitle,
                                      const QString   &Title,
-                                     bool             Watched )
+                                     bool             Watched,
+                                     const QString   &RecGroup )
 
 {
     if (m_request->m_queries.size() < 2 || !HAS_PARAMv2("RecordedId"))
@@ -2244,6 +2245,9 @@ bool V2Dvr::UpdateRecordedMetadata ( uint             RecordedId,
 
     if (HAS_PARAMv2("Watched"))
         pi.SaveWatched(Watched);
+
+    if (HAS_PARAMv2("RecGroup"))
+        ri.ApplyRecordRecGroupChange(RecGroup);
 
     return true;
 }

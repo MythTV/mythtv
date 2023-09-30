@@ -854,7 +854,7 @@
         </textarea>
 
         <textarea name="playlisttime" from="basetextarea">
-            <area>300,0,300,30</area>
+            <area>300,0,400,30</area>
             <font>basesmall</font>
             <align>left,top</align>
         </textarea>
@@ -913,7 +913,7 @@
         </textarea>
 
         <textarea name="time" from="basetextarea">
-            <area>1020,15,235,34</area>
+            <area>1020,15,245,34</area>
             <align>right</align>
             <font>basesmall</font>
         </textarea>
@@ -929,7 +929,7 @@
             <area>40,25,1200,190</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
-            <value>You haven't selected any tracks to play</value>
+            <value>Press M (Menu) to add and play tracks</value>
         </textarea>
 
         <buttonlist name="currentplaylist" from="basebuttonlist2">

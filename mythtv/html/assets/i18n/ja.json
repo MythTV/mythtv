@@ -46,6 +46,7 @@
             "alreadydel": "すでに削除されています",
             "canundel": "Undelete を使用すると、これを元に戻すことができます。",
             "channel": "チャネル",
+            "damaged": "破損した",
             "delete_details": "これにより、録音ルールが削除されます",
             "delete_rule": "録画ルールの削除",
             "description": "説明",
@@ -63,6 +64,8 @@
             "job_Transcode": "トランスコード",
             "mnu_delete": "消去",
             "mnu_delete_rerec": "削除して再録音を許可する",
+            "mnu_markdamaged": "破損としてマークする",
+            "mnu_markundamaged": "無傷としてマーク",
             "mnu_markunwatched": "未視聴としてマーク",
             "mnu_markwatched": "監視済みとしてマークする",
             "mnu_rerec": "再録音を許可する",
@@ -71,6 +74,7 @@
             "mnu_undelete": "削除を取り消す",
             "mnu_updatemeta": "メタデータの更新",
             "mnu_updaterecrule": "レコード更新ルール",
+            "nonrerec": "破損した番組の再録画を許可するには、「再録画を許可」を使用してください。",
             "orig_airdate": "元の放送日",
             "override_rule": "上書きルールの追加または編集",
             "recgrp": "レクグループ",
@@ -79,7 +83,8 @@
             "stop_details": "これにより録音が停止します",
             "stop_recording": "録音を停止する",
             "subtitle": "字幕",
-            "title": "タイトル"
+            "title": "タイトル",
+            "watched": "見た"
         },
         "recrule": {
             "type": "タイプ"
@@ -168,6 +173,8 @@
             },
             "type_label": "スケジュールの種類"
         },
+        "scrolltabsleft": "タブを左にスクロール",
+        "scrolltabsright": "タブを右にスクロール",
         "status": {
             "backends_detail": "バックエンド: {{ Name }} は IP {{ Type }} 上の {{ IP }}}} です",
             "backends_none": "バックエンドなし",
@@ -224,7 +231,8 @@
         "videos": {
             "download": "ビデオをダウンロードする",
             "heading": "動画",
-            "releasedate": "発売日"
+            "releasedate": "発売日",
+            "showall": "ディレクトリリストのフラット化"
         }
     },
     "data": {
@@ -1032,7 +1040,7 @@
             "sg_label": "ストレージグループディスクスケジューラ",
             "slowly_desc": "一部のファイルシステムでは、大きなファイルを削除するときに大量のリソースを使用します。このオプションを有効にすると、MythTV はこのバックエンドでファイルをゆっくりと削除し、影響を軽減します。",
             "slowly_label": "ファイルをゆっくり削除する",
-            "statapp_desc": "バックエンド ステータス ページに含めるための追加情報を出力する外部アプリケーションまたはスクリプト。 Wiki の<a href=\"http://www.mythtv.org/wiki/Miscellaneous_Status_Information\" target=\"_blank\">その他のステータス情報</a>を参照してください。",
+            "statapp_desc": "バックエンド ステータス ページに含めるための追加情報を出力する外部アプリケーションまたはスクリプト。 MythTV wiki を参照してください。",
             "statapp_label": "その他のステータス アプリケーション",
             "subtitle": "一般的なバックエンド設定",
             "title": "その他の設定",
@@ -1175,7 +1183,7 @@
             "WOLReconnect_label": "再接続時間",
             "WOLRetry_desc": "フロントエンドが放棄するまでにサーバーをウェイクアップするための再試行の回数。",
             "WOLRetry_label": "再試行",
-            "bouquet_desc": "Astra-2 28.2E 衛星の Freesat または Sky のブーケ ID。この衛星を受信しない場合は、0 のままにしてください。これは、Freesat および Sky チャネル番号を取得するために必要です。値 272 は、フリーサット ブーケ「イングランド HD」を選択します。 MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a> をご覧ください。",
+            "bouquet_desc": "Astra-2 28.2E 衛星の Freesat または Sky のブーケ ID。この衛星を受信しない場合は、0 のままにしてください。これは、Freesat および Sky チャネル番号を取得するために必要です。値 272 は、フリーサット ブーケ「イングランド HD」を選択します。 MythTV wiki を参照してください。",
             "bouquet_label": "花束ID",
             "delete_all": "すべてのビデオソースを削除",
             "delete_details": "これにより、{{DisplayName}} ({{Grabber}}) が削除されます",
@@ -1186,7 +1194,7 @@
             "freqtable_label": "チャネル周波数テーブル",
             "grabber_desc": "リストのソースを選択します。一部のソースではサブスクリプションが必要です。",
             "grabber_label": "リストグラバー",
-            "grabberconfig_desc": "ssh またはバックエンドにログインした端末を使用してこのコマンドを実行して、グラバーを構成します。 Wiki の <a href=\"http://www.mythtv.org/wiki/XMLTV\" target=\"_blank\">XMLTV</a> を参照してください。",
+            "grabberconfig_desc": "ssh またはバックエンドにログインした端末を使用してこのコマンドを実行して、グラバーを構成します。 MythTV wiki を参照してください。",
             "grabberconfig_label": "グラバーの構成",
             "item_title": "ビデオソース",
             "lcnoffset_desc": "オフセットは、DVB ビデオ ソースのスキャン中に見つかった各論理チャネル番号に追加されます。これにより、異なるビデオ ソースに重複しない範囲のチャネル番号を与えることが可能になります。ビデオ ソースが 1 つしかない場合、またはビデオ ソースに DVB 論理チャネル番号がない場合は、0 のままにしておきます。",
@@ -1196,7 +1204,7 @@
             "netid_desc": "プロバイダーから特定のネットワーク識別子 (Network_ID) を構成するよう求められた場合は、ここに入力します。それ以外の場合は、-1 のままにしておきます。",
             "netid_label": "ネットワークID",
             "new_video_source": "新しいビデオソース",
-            "region_desc": "Astra-2 28.2E 衛星上の Freesat または Sky のリージョン ID。この衛星を受信しない場合は、これを 0 のままにしておきます。これは、Freesat および Sky チャネル番号を取得するために必要です。値 1 はリージョン ロンドンを選択します。 MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a> をご覧ください。",
+            "region_desc": "Astra-2 28.2E 衛星上の Freesat または Sky のリージョン ID。この衛星を受信しない場合は、これを 0 のままにしておきます。これは、Freesat および Sky チャネル番号を取得するために必要です。値 1 はリージョン ロンドンを選択します。 MythTV wiki を参照してください。",
             "region_label": "地域ID",
             "scanfreq_desc": "このビデオ ソースのスキャンを開始する頻度。これは、「フル スキャン (調整)」チャネル スキャンのデフォルトになります。 DVB-T/T2/C の場合は Hz 単位、DVB-S/S2 の場合は kHz 単位の周波数値。不明な場合は 0 のままにしておきます。",
             "scanfreq_label": "スキャン頻度",

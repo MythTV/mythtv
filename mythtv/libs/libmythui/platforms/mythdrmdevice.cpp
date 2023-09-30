@@ -633,6 +633,7 @@ bool MythDRMDevice::CanSwitchModes() const
     return m_valid && m_authenticated && m_atomic;
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 const DRMModes& MythDRMDevice::GetModes() const
 {
     static const DRMModes empty;
@@ -981,10 +982,12 @@ void MythDRMDevice::AnalysePlanes()
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found %1 planes; %2 for this CRTC")
         .arg(allplanes.size()).arg(m_planes.size()));
 
+    // NOLINTBEGIN(cppcoreguidelines-init-variables)
     DRMPlanes primaryVideo;
     DRMPlanes overlayVideo;
     DRMPlanes primaryGUI;
     DRMPlanes overlayGUI;
+    // NOLINTEND(cppcoreguidelines-init-variables)
 
     for (const auto & plane : m_planes)
     {

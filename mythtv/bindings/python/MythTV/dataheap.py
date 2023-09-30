@@ -604,14 +604,16 @@ class Recorded( CMPRecord, DBDataWrite ):
 
         # pull artworks
         for arttype in ['coverart', 'fanart', 'banner']:
-            art = getattr(self.artwork, arttype)
-            if art:
-                # process URI (myth://<group>@<host>[:<port>]/<path/to/file>)
-                # should we use for hostname 'art.hostname' or 'localhost'?
-                url = "myth://%s@%s/%s" % (art.imagetype, art.hostname, str(art))
-                metadata.images.append \
-                    (OrdDict((('type', arttype), ('filename', str(art)), ('url', url))))
-
+            try:
+                art = getattr(self.artwork, arttype)
+                if art:
+                    # process URI (myth://<group>@<host>[:<port>]/<path/to/file>)
+                    # should we use for hostname 'art.hostname' or 'localhost'?
+                    url = "myth://%s@%s/%s" % (art.imagetype, art.hostname, str(art))
+                    metadata.images.append \
+                        (OrdDict((('type', arttype), ('filename', str(art)), ('url', url))))
+            except MythError:
+                pass
         return metadata
 
     def __getstate__(self):

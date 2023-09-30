@@ -3,8 +3,9 @@ import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { LazyLoadEvent, MenuItem, MessageService } from 'primeng/api';
 import { Menu } from 'primeng/menu';
+import { Table } from 'primeng/table';
 import { PartialObserver } from 'rxjs';
-import { UpdateVideoMetadataRequest, VideoMetadataInfo } from 'src/app/services/interfaces/video.interface';
+import { GetVideoListRequest, UpdateVideoMetadataRequest, VideoMetadataInfo } from 'src/app/services/interfaces/video.interface';
 import { UtilityService } from 'src/app/services/utility.service';
 import { VideoService } from 'src/app/services/video.service';
 
@@ -18,11 +19,10 @@ export class VideosComponent implements OnInit {
 
   @ViewChild("vidsform") currentForm!: NgForm;
   @ViewChild("menu") menu!: Menu;
+  @ViewChild("table") table!: Table;
 
-  allVideos: VideoMetadataInfo[] = [];
   videos: VideoMetadataInfo[] = [];
   refreshing = false;
-  loaded = false;
   successCount = 0;
   errorCount = 0;
   directory: string[] = [];
@@ -31,6 +31,7 @@ export class VideosComponent implements OnInit {
   displayMetadataDlg = false;
   displayUnsaved = false;
   showAllVideos = false;
+  lazyLoadEvent!: LazyLoadEvent;
 
   mnu_markwatched: MenuItem = { label: 'dashboard.recordings.mnu_markwatched', command: (event) => this.markwatched(event, true) };
   mnu_markunwatched: MenuItem = { label: 'dashboard.recordings.mnu_markunwatched', command: (event) => this.markwatched(event, false) };
@@ -47,8 +48,6 @@ export class VideosComponent implements OnInit {
 
   constructor(private videoService: VideoService, private translate: TranslateService,
     private messageService: MessageService, public utility: UtilityService) {
-    this.loadVideos();
-
     // translations
     for (const [key, value] of Object.entries(this.msg)) {
       this.translate.get(value).subscribe(data => {
@@ -69,61 +68,56 @@ export class VideosComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  loadLazy(event: LazyLoadEvent) {
+    this.lazyLoadEvent = event;
+    let request: GetVideoListRequest = {
+      Sort: "Title",
+      Folder: this.directory.join('/'),
+      CollapseSubDirs: !this.showAllVideos,
+      StartIndex: 0,
+      Count: 1
+    };
 
-  loadVideos() {
-    this.videoService.GetVideoList({ Sort: "FileName" }).subscribe(data => {
-      this.allVideos = data.VideoMetadataInfoList.VideoMetadataInfos;
-      this.filterVideos();
-      this.loaded = true;
+    if (event.sortField) {
+      // if (event.sortField == 'Title')
+      //   request.Sort = 'FileName';
+      // else
+        request.Sort = event.sortField;
+      if (event.sortOrder)
+        request.Descending = (event.sortOrder < 0);
+    }
+
+    if (event.first)
+      request.StartIndex = event.first;
+    if (event.rows) {
+      request.Count = event.rows;
+    }
+
+    this.videoService.GetVideoList(request).subscribe(data => {
+      let newList = data.VideoMetadataInfoList;
+      this.videos.length = data.VideoMetadataInfoList.TotalAvailable;
+      // populate page of virtual programs
+      this.videos.splice(newList.StartIndex, newList.Count,
+        ...newList.VideoMetadataInfos);
+      // notify of change
+      this.videos = [...this.videos]
       this.refreshing = false;
     });
+
+  }
+
+
+  reLoadVideos() {
+    this.table.resetScrollTop();
+    this.videos.length = 0;
+    this.lazyLoadEvent.first = 0;
+    this.lazyLoadEvent.rows = 100;
+    this.loadLazy(this.lazyLoadEvent);
   }
 
   showAllChange() {
     this.refreshing = true;
-    setTimeout(() => this.filterVideos(), 100);
-  }
-
-  filterVideos() {
-    if (this.showAllVideos) {
-      this.directory.length = 0;
-      this.videos = [...this.allVideos];
-    }
-    else {
-      this.videos = [];
-      let prior = '';
-      let search = this.directory.join('/');
-      if (search.length > 0)
-        search += '/';
-      this.allVideos.forEach(
-        video => {
-          const parts = video.FileName.split('/');
-          if (video.FileName.startsWith(search)) {
-            if (parts.length == this.directory.length + 1) {
-              this.videos.push(video);
-              prior = '';
-            }
-            else {
-              let dir = parts.slice(0, this.directory.length + 1)
-                .join('/') + '/';
-              if (dir != prior) {
-                // Dummy directory entry
-                this.videos.push(<VideoMetadataInfo>{
-                  FileName: dir,
-                  Title: parts[this.directory.length],
-                  ContentType: 'D',  // indicates directory
-                  Season: 0,
-                  Episode: 0,
-                  Length: 0
-                });
-                prior = dir;
-              }
-            }
-          }
-        }
-      );
-    }
-    this.refreshing = false;
+    setTimeout(() => this.reLoadVideos(), 100);
   }
 
   URLencode(x: string): string {
@@ -132,12 +126,12 @@ export class VideosComponent implements OnInit {
 
   onDirectory(subdir: string) {
     this.directory.push(subdir);
-    this.filterVideos();
+    this.reLoadVideos();
   }
 
   breadCrumb(ix: number) {
     this.directory.length = ix;
-    this.filterVideos();
+    this.reLoadVideos();
   }
 
   showMenu(video: VideoMetadataInfo, event: any) {

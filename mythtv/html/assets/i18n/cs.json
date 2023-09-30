@@ -46,6 +46,7 @@
             "alreadydel": "Již smazáno",
             "canundel": "Toto můžete zvrátit pomocí funkce Undelete.",
             "channel": "Kanál",
+            "damaged": "Poškozený",
             "delete_details": "Tím se odstraní pravidlo nahrávání",
             "delete_rule": "Odstranit pravidlo nahrávání",
             "description": "Popis",
@@ -63,6 +64,8 @@
             "job_Transcode": "Překódovat",
             "mnu_delete": "Vymazat",
             "mnu_delete_rerec": "Smazat a povolit opětovné nahrávání",
+            "mnu_markdamaged": "Označit jako poškozené",
+            "mnu_markundamaged": "Označit jako nepoškozené",
             "mnu_markunwatched": "Označit jako nesledované",
             "mnu_markwatched": "Označit jako sledované",
             "mnu_rerec": "Povolit opětovné nahrávání",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Obnovit",
             "mnu_updatemeta": "Aktualizujte metadata",
             "mnu_updaterecrule": "Aktualizovat pravidlo záznamu",
+            "nonrerec": "Chcete-li povolit opětovné nahrávání poškozeného programu, použijte možnost Povolit opětovné nahrávání.",
             "orig_airdate": "Původní datum vysílání",
             "override_rule": "Přidat nebo upravit pravidlo přepsání",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "Tím se zastaví nahrávání",
             "stop_recording": "Zastavit nahrávání",
             "subtitle": "Titulky",
-            "title": "Titul"
+            "title": "Titul",
+            "watched": "Pozorovala"
         },
         "recrule": {
             "type": "Typ"
@@ -168,6 +173,8 @@
             },
             "type_label": "Typ rozvrhu"
         },
+        "scrolltabsleft": "Posuňte záložky doleva",
+        "scrolltabsright": "Posuňte záložky doprava",
         "status": {
             "backends_detail": "Backend: {{ Name }} je {{ Type }} na IP {{ IP }}",
             "backends_none": "Žádné backendy",
@@ -224,7 +231,8 @@
         "videos": {
             "download": "Stáhnout video",
             "heading": "videa",
-            "releasedate": "Datum vydání"
+            "releasedate": "Datum vydání",
+            "showall": "Sloučit seznamy adresářů"
         }
     },
     "data": {
@@ -1032,7 +1040,7 @@
             "sg_label": "Plánovač disků skupiny úložiště",
             "slowly_desc": "Některé souborové systémy využívají při mazání velkých souborů velké množství prostředků. Pokud je tato možnost povolena, způsobí MythTV pomalé mazání souborů na tomto backendu, aby se zmírnil dopad.",
             "slowly_label": "Odstraňte soubory pomalu",
-            "statapp_desc": "Externí aplikace nebo skript, který vydává další informace pro zahrnutí na stránce stavu backendu. Viz <a href=\"http://www.mythtv.org/wiki/Miscellaneous_Status_Information\" target=\"_blank\">Různé stavové informace</a> na wiki.",
+            "statapp_desc": "Externí aplikace nebo skript, který vydává další informace pro zahrnutí na stránce stavu backendu. Podívejte se na wiki MythTV:",
             "statapp_label": "Žádost o různý stav",
             "subtitle": "Obecná nastavení backendu",
             "title": "Různá nastavení",
@@ -1175,7 +1183,7 @@
             "WOLReconnect_label": "Čas opětovného připojení",
             "WOLRetry_desc": "Počet opakování pro probuzení serveru, než se frontend vzdá.",
             "WOLRetry_label": "Opakovat pokusy",
-            "bouquet_desc": "ID kytice pro Freesat nebo Sky na satelitu Astra-2 28,2E. Nechte toto na 0, pokud tento satelit nepřijímáte. To je potřeba k získání čísel kanálů Freesat a Sky. Hodnota 272 vybírá kytici Freesat 'Anglie HD'. Podívejte se na MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "bouquet_desc": "ID kytice pro Freesat nebo Sky na satelitu Astra-2 28,2E. Nechte toto na 0, pokud tento satelit nepřijímáte. To je potřeba k získání čísel kanálů Freesat a Sky. Hodnota 272 vybírá kytici Freesat 'Anglie HD'. Podívejte se na wiki MythTV.",
             "bouquet_label": "ID kytice",
             "delete_all": "Smazat všechny zdroje videa",
             "delete_details": "Tímto smažete {{DisplayName}} ({{Grabber}})",
@@ -1186,7 +1194,7 @@
             "freqtable_label": "Tabulka frekvence kanálů",
             "grabber_desc": "Vyberte zdroj výpisů. Některé zdroje vyžadují, abyste měli předplatné.",
             "grabber_label": "Sběratel výpisů",
-            "grabberconfig_desc": "Nakonfigurujte grabber spuštěním tohoto příkazu pomocí ssh nebo terminálu přihlášeného do backendu. Viz <a href=\"http://www.mythtv.org/wiki/XMLTV\" target=\"_blank\">XMLTV</a> na wiki.",
+            "grabberconfig_desc": "Nakonfigurujte grabber spuštěním tohoto příkazu pomocí ssh nebo terminálu přihlášeného do backendu. Podívejte se na wiki MythTV:",
             "grabberconfig_label": "Nakonfigurujte Grabber",
             "item_title": "Zdroj videa",
             "lcnoffset_desc": "Posun je přidán ke každému logickému číslu kanálu nalezenému během vyhledávání zdroje DVB videa. To umožňuje přidělit různým zdrojům videa nepřekrývající se rozsah čísel kanálů. Ponechte hodnotu 0, pokud máte pouze jeden zdroj videa nebo pokud zdroje videa nemají logická čísla kanálů DVB.",
@@ -1196,7 +1204,7 @@
             "netid_desc": "Pokud vás váš poskytovatel požádal o konfiguraci konkrétního síťového identifikátoru (Network_ID), zadejte jej zde. V opačném případě nechte hodnotu -1.",
             "netid_label": "ID sítě",
             "new_video_source": "Nový zdroj videa",
-            "region_desc": "ID regionu pro Freesat nebo Sky na satelitu Astra-2 28,2E. Nechte toto na 0, tento satelit nepřijímáte. To je potřeba k získání čísel kanálů Freesat a Sky. Hodnota 1 vybírá region Londýn. Podívejte se na MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "region_desc": "ID regionu pro Freesat nebo Sky na satelitu Astra-2 28,2E. Nechte toto na 0, tento satelit nepřijímáte. To je potřeba k získání čísel kanálů Freesat a Sky. Hodnota 1 vybírá region Londýn. Podívejte se na wiki MythTV:",
             "region_label": "ID regionu",
             "scanfreq_desc": "Frekvence zahájení skenování tohoto zdroje videa. Toto je pak výchozí pro prohledávání kanálů „Úplné prohledání (vyladěno)“. Hodnota frekvence v Hz pro DVB-T/T2/C, v kHz pro DVB-S/S2. Nechte na 0, pokud to není známo.",
             "scanfreq_label": "Frekvence skenování",

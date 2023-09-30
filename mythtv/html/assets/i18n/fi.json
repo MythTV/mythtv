@@ -46,6 +46,7 @@
             "alreadydel": "Jo Poistettu",
             "canundel": "Voit peruuttaa tämän käyttämällä Undelete-toimintoa.",
             "channel": "kanava",
+            "damaged": "Vaurioitunut",
             "delete_details": "Tämä poistaa tallennussäännön",
             "delete_rule": "Poista tallennussääntö",
             "description": "Kuvaus",
@@ -63,6 +64,8 @@
             "job_Transcode": "Transkoodaus",
             "mnu_delete": "Poistaa",
             "mnu_delete_rerec": "Poista ja salli tallennus uudelleen",
+            "mnu_markdamaged": "Merkitse vaurioituneeksi",
+            "mnu_markundamaged": "Merkitse vahingoittumattomaksi",
             "mnu_markunwatched": "Merkitse katsomattomaksi",
             "mnu_markwatched": "Merkitse katsotuksi",
             "mnu_rerec": "Salli tallennus uudelleen",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Peruuta",
             "mnu_updatemeta": "Päivitä metatiedot",
             "mnu_updaterecrule": "Päivitä tallennussääntö",
+            "nonrerec": "Salli vioittuneen ohjelman tallentaminen uudelleen valitsemalla Allow Re Record.",
             "orig_airdate": "Alkuperäinen lentopäivämäärä",
             "override_rule": "Lisää tai muokkaa ohitussääntöä",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "Tämä lopettaa tallennuksen",
             "stop_recording": "Lopeta tallennus",
             "subtitle": "Tekstitys",
-            "title": "Otsikko"
+            "title": "Otsikko",
+            "watched": "Katsoi"
         },
         "recrule": {
             "type": "Tyyppi"
@@ -168,6 +173,8 @@
             },
             "type_label": "Aikataulun tyyppi"
         },
+        "scrolltabsleft": "Vieritä välilehtiä vasemmalle",
+        "scrolltabsright": "Vieritä välilehtiä oikealle",
         "status": {
             "backends_detail": "Taustajärjestelmä: {{ Name }} on {{ Type }} IP-osoitteessa {{ IP }}",
             "backends_none": "Ei taustaohjelmia",
@@ -224,7 +231,8 @@
         "videos": {
             "download": "Lataa video",
             "heading": "Videot",
-            "releasedate": "Julkaisupäivä"
+            "releasedate": "Julkaisupäivä",
+            "showall": "Litistä hakemistolistat"
         }
     },
     "data": {
@@ -1032,7 +1040,7 @@
             "sg_label": "Storage Group Disk Scheduler",
             "slowly_desc": "Jotkut tiedostojärjestelmät käyttävät paljon resursseja suurten tiedostojen poistamiseen. Jos tämä asetus on käytössä, MythTV poistaa tiedostoja hitaasti tästä taustaohjelmasta vaikutusten vähentämiseksi.",
             "slowly_label": "Poista tiedostot hitaasti",
-            "statapp_desc": "Ulkoinen sovellus tai komentosarja, joka tulostaa lisätietoa taustaohjelman tilasivulle sisällytettäväksi. Katso <a href=\"http://www.mythtv.org/wiki/Miscellaneous_Status_Information\" target=\"_blank\">Sekalaiset tilatiedot</a> wikissä.",
+            "statapp_desc": "Ulkoinen sovellus tai komentosarja, joka tulostaa lisätietoa taustaohjelmiston tilasivulle sisällytettäväksi. Katso MythTV-wiki:",
             "statapp_label": "Sekalainen tilasovellus",
             "subtitle": "Yleiset taustaasetukset",
             "title": "Muut asetukset",
@@ -1175,7 +1183,7 @@
             "WOLReconnect_label": "Yhdistä uudelleen",
             "WOLRetry_desc": "Uudelleenyritysten määrä herättää palvelin ennen kuin käyttöliittymä luovuttaa.",
             "WOLRetry_label": "Yritä uudelleen",
-            "bouquet_desc": "Kukkakimpun tunnus Freesatille tai Skylle satelliitissa Astra-2 28.2E. Jätä tämä arvoon 0, jos et vastaanota tätä satelliittia. Tämä tarvitaan Freesat- ja Sky-kanavanumeroiden saamiseksi. Arvo 272 valitsee Freesat-kimpun 'England HD'. Katso MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "bouquet_desc": "Kukkakimpun tunnus Freesatille tai Skylle satelliitissa Astra-2 28.2E. Jätä tämä arvoon 0, jos et vastaanota tätä satelliittia. Tämä tarvitaan Freesat- ja Sky-kanavanumeroiden saamiseksi. Arvo 272 valitsee Freesat-kimpun 'England HD'. Katso MythTV-wiki.",
             "bouquet_label": "Kimpun tunnus",
             "delete_all": "Poista kaikki videolähteet",
             "delete_details": "Tämä poistaa {{DisplayName}} ({{Grabber}})",
@@ -1186,7 +1194,7 @@
             "freqtable_label": "Kanavan taajuustaulukko",
             "grabber_desc": "Valitse listauksen lähde. Jotkut lähteet edellyttävät tilausta.",
             "grabber_label": "Listausten sieppaaja",
-            "grabberconfig_desc": "Määritä grabber suorittamalla tämä komento käyttämällä ssh-komentoa tai päätettä, joka on kirjautunut taustajärjestelmään. Katso <a href=\"http://www.mythtv.org/wiki/XMLTV\" target=\"_blank\">XMLTV</a> wikissä.",
+            "grabberconfig_desc": "Määritä grabber suorittamalla tämä komento käyttämällä ssh-komentoa tai päätettä, joka on kirjautunut taustajärjestelmään. Katso MythTV-wiki:",
             "grabberconfig_label": "Määritä Grabber",
             "item_title": "Videon lähde",
             "lcnoffset_desc": "Poikkeama lisätään jokaiseen loogiseen kanavanumeroon, joka löydetään DVB-videolähteen selauksen aikana. Tämä mahdollistaa sen, että eri videolähteille voidaan antaa ei-päällekkäinen kanavanumeroalue. Jätä arvoksi 0, jos sinulla on vain yksi videolähde tai jos videolähteillä ei ole loogisia DVB-kanavanumeroita.",
@@ -1196,7 +1204,7 @@
             "netid_desc": "Jos palveluntarjoajasi on pyytänyt sinua määrittämään tietyn verkkotunnisteen (Network_ID), kirjoita se tähän. Jätä muussa tapauksessa arvoon -1.",
             "netid_label": "Verkon tunnus",
             "new_video_source": "Uusi videolähde",
-            "region_desc": "Aluetunnus Freesatille tai Skylle satelliitissa Astra-2 28.2E. Jätä tämä arvoon 0, et vastaanota tätä satelliittia. Tämä tarvitaan Freesat- ja Sky-kanavanumeroiden saamiseksi. Arvo 1 valitsee Lontoon alueen. Katso MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "region_desc": "Aluetunnus Freesatille tai Skylle satelliitissa Astra-2 28.2E. Jätä tämä arvoon 0, et vastaanota tätä satelliittia. Tämä tarvitaan Freesat- ja Sky-kanavanumeroiden saamiseksi. Arvo 1 valitsee Lontoon alueen. Katso MythTV-wiki:",
             "region_label": "Aluetunnus",
             "scanfreq_desc": "Tämän videolähteen skannauksen alkamistaajuus. Tämä on sitten oletusarvo 'Täysi haku (viritetty)' kanavahakulle. Taajuusarvo hertseinä DVB-T/T2/C:lle, kHz DVB-S/S2:lle. Lähde klo 0, jos et tiedä.",
             "scanfreq_label": "Skannaustaajuus",

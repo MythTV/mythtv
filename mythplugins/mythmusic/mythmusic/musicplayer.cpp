@@ -219,6 +219,16 @@ void MusicPlayer::loadSettings(void)
 
     m_lastplayDelay = gCoreContext->GetDurSetting<std::chrono::seconds>("MusicLastPlayDelay", LASTPLAY_DELAY);
     m_autoShowPlayer = (gCoreContext->GetNumSetting("MusicAutoShowPlayer", 1) > 0);
+
+}
+
+void MusicPlayer::setPlayNow(bool PlayNow)
+{
+    gCoreContext->SaveBoolSetting("MusicPreferPlayNow", PlayNow);
+}
+bool MusicPlayer::getPlayNow(void)
+{
+    return gCoreContext->GetBoolSetting("MusicPreferPlayNow", false);
 }
 
 // this stops playing the playlist and plays the file pointed to by mdata
@@ -891,7 +901,7 @@ void MusicPlayer::customEvent(QEvent *event)
         // update the current tracks time in the last played list
         if (m_playMode == PLAYMODE_RADIO)
         {
-            if (!m_playedList.isEmpty())
+            if (!m_playedList.isEmpty() && m_currentTime > 0s)
             {
                 m_playedList.last()->setLength(m_currentTime);
                 // this will update any track lengths displayed on screen

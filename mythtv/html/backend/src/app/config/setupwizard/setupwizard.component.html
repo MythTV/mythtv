@@ -4,13 +4,13 @@
     <div class="card">
         <div class="flex flex-row">
             <button pButton pRipple icon="pi pi-angle-double-left" class="p-button-text p-button-primary"
-                (click)="menu.navBackward()"></button>
+                (click)="menu.navBackward()" pTooltip="{{ 'dashboard.scrolltabsleft' | translate }}"></button>
             <div class="col-11">
                 <p-tabMenu #menu [model]="wizardService.wizardItems" [activeItem]="activeItem"
                     [scrollable]="false"></p-tabMenu>
             </div>
             <button pButton pRipple icon="pi pi-angle-double-right" class="p-button-text p-button-primary"
-                (click)="menu.navForward()"></button>
+                (click)="menu.navForward()" pTooltip="{{ 'dashboard.scrolltabsright' | translate }}"></button>
         </div>
 
     </div>

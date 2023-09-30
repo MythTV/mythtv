@@ -3,10 +3,11 @@
         <p-toast position="center"></p-toast>
     </div>
     <h2>{{ 'dashboard.videos.heading' | translate }}</h2>
-    <div class="block card w-full" style="height: 90vh" *ngIf="loaded else loading">
+    <div class="block card w-full" style="height: 90vh">
         <p-menu #menu [popup]="true" [model]="menuToShow"></p-menu>
-        <p-table [value]="videos" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
-            [rowHover]="true" responsiveLayout="scroll">
+        <p-table #table name="table" [value]="videos" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
+            [virtualScroll]="true" [rows]="50" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
+            responsiveLayout="scroll">
             <ng-template pTemplate="caption">
             </ng-template>
             <ng-template pTemplate="header">
@@ -24,14 +25,14 @@
                         &nbsp;&nbsp;&nbsp;
                         <p-checkbox inputId="showAllVideos" [(ngModel)]="showAllVideos" name="showAllVideos"
                             #showAll="ngModel" [binary]="true" (onChange)="showAllChange()"
-                            label="{{ 'dashboard.upcoming.showall' | translate }} ">
+                            label="{{ 'dashboard.videos.showall' | translate }} ">
                         </p-checkbox>
 
                         <div *ngIf="refreshing else refreshBn"><p-progressSpinner
                                 [style]="{width: '30px', height: '30px'}"></p-progressSpinner></div>
                         <ng-template #refreshBn>
                             <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
-                                (click)="refreshing=true;loadVideos()"
+                                (click)="refreshing=true;reLoadVideos()"
                                 pTooltip="{{ 'common.refresh' | translate }}"></button>
                         </ng-template>
                         &nbsp;&nbsp;&nbsp;{{ videos.length }} Rows
@@ -62,7 +63,7 @@
             <ng-template pTemplate="body" let-video>
                 <tr>
                     <td style="flex-basis: 30%" class="p-1 overflow-hidden">
-                        <div *ngIf="video.ContentType == 'D' else title">
+                        <div *ngIf="video.ContentType == 'DIRECTORY' else title">
                             <button pButton pRipple icon="pi pi-folder" class="p-button-text p-button-primary"
                                 (click)="onDirectory(video.Title)" label="{{video.Title}}"></button>
                         </div>
@@ -86,10 +87,10 @@
                         <div *ngIf="video.Length > 0"> {{ video.Length }} min </div>
                     </td>
                     <td style="flex-basis: 6%" class="p-1">
-                        <div *ngIf="video.ContentType != 'D'">
+                        <div *ngIf="video.ContentType != 'DIRECTORY'">
                             <a href="{{URLencode('/Content/GetVideo?Id=' + video.Id)}}" target="_blank"
                                 pTooltip="{{ 'dashboard.videos.download' | translate }}" tooltipPosition="left">
-                                <i class="pi pi-download"></i></a>
+                                <i class="pi pi-download text-primary"></i></a>
                             <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
                                 (click)="showMenu(video,$event)"></button>
                         </div>
@@ -178,7 +179,4 @@
         </p-dialog>
 
     </form>
-    <ng-template #loading>
-        <p-progressSpinner></p-progressSpinner>
-    </ng-template>
 </div>

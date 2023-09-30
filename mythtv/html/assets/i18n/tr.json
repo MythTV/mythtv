@@ -46,6 +46,7 @@
             "alreadydel": "Zaten Silinmiş",
             "canundel": "Geri Al'ı kullanarak bunu tersine çevirebilirsiniz.",
             "channel": "Kanal",
+            "damaged": "Hasarlı",
             "delete_details": "Bu Kayıt Kuralını siler",
             "delete_rule": "Kayıt Kuralını Sil",
             "description": "Tanım",
@@ -63,6 +64,8 @@
             "job_Transcode": "kod dönüştürme",
             "mnu_delete": "Silmek",
             "mnu_delete_rerec": "Sil ve Yeniden Kayda İzin Ver",
+            "mnu_markdamaged": "Hasarlı Olarak İşaretle",
+            "mnu_markundamaged": "Hasarsız Olarak İşaretle",
             "mnu_markunwatched": "İzlenmedi Olarak İşaretle",
             "mnu_markwatched": "İzlendi Olarak İşaretle",
             "mnu_rerec": "Yeniden Kayda İzin Ver",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Silme işlemini geri al",
             "mnu_updatemeta": "Meta Verileri Güncelle",
             "mnu_updaterecrule": "Kayıt Kuralını Güncelle",
+            "nonrerec": "Hasarlı programın yeniden kaydedilmesine izin vermek için lütfen Yeniden Kayda İzin Ver seçeneğini kullanın.",
             "orig_airdate": "Orijinal Yayın Tarihi",
             "override_rule": "Geçersiz Kılma Kuralı Ekleme veya Düzenleme",
             "recgrp": "Kayıt Grubu",
@@ -79,7 +83,8 @@
             "stop_details": "Bu Kaydı Durduracak",
             "stop_recording": "Kaydetmeyi bırak",
             "subtitle": "Alt yazı",
-            "title": "Başlık"
+            "title": "Başlık",
+            "watched": "izlendi"
         },
         "recrule": {
             "type": "Tip"
@@ -168,6 +173,8 @@
             },
             "type_label": "Zamanlama türü"
         },
+        "scrolltabsleft": "Sekmeleri Sola Kaydır",
+        "scrolltabsright": "Sekmeleri Sağa Kaydır",
         "status": {
             "backends_detail": "Arka uç: {{ Name }}, IP {{ Type }} üzerinde bir {{ IP }}'dir",
             "backends_none": "Arka Uç Yok",
@@ -224,7 +231,8 @@
         "videos": {
             "download": "Video indir",
             "heading": "videolar",
-            "releasedate": "Yayın tarihi"
+            "releasedate": "Yayın tarihi",
+            "showall": "Dizin Listelerini Düzleştir"
         }
     },
     "data": {
@@ -1032,7 +1040,7 @@
             "sg_label": "Depolama Grubu Disk Zamanlayıcı",
             "slowly_desc": "Bazı dosya sistemleri, büyük dosyaları silerken çok fazla kaynak kullanır. Etkinleştirilirse, bu seçenek MythTV'nin etkiyi azaltmak için bu arka uçtaki dosyaları yavaşça silmesini sağlar.",
             "slowly_label": "Dosyaları Yavaş Yavaş Silin",
-            "statapp_desc": "Arka uç durum sayfasına dahil edilmek üzere ekstra bilgi veren harici uygulama veya komut dosyası. Wiki'de <a href=\"http://www.mythtv.org/wiki/Miscellaneous_Status_Information\" target=\"_blank\">Çeşitli Durum Bilgileri</a>'ne bakın.",
+            "statapp_desc": "Arka uç durum sayfasına eklenmek üzere ek bilgi veren harici uygulama veya komut dosyası. MythTV wiki'sine bakın:",
             "statapp_label": "Çeşitli Durum Başvurusu",
             "subtitle": "Genel Arka Uç Ayarları",
             "title": "Muhtelif Ayarlar",
@@ -1175,7 +1183,7 @@
             "WOLReconnect_label": "Yeniden Bağlanma Süresi",
             "WOLRetry_desc": "Ön uç pes etmeden önce sunucuyu uyandırmak için yapılan yeniden deneme sayısı.",
             "WOLRetry_label": "Yeniden Deneme Denemeleri",
-            "bouquet_desc": "Astra-2 28.2E uydusunda Freesat veya Sky için buket kimliği. Bu uyduyu almazsanız, bunu 0'da bırakın. Bu, Freesat ve Sky kanal numaralarını almak için gereklidir. Değer 272, Freesat buketi 'İngiltere HD'yi seçer. MythTV Wiki'ye bakın <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "bouquet_desc": "Astra-2 28.2E uydusunda Freesat veya Sky için Buket Kimliği. Bu uyduyu almıyorsanız bunu 0'da bırakın. Freesat ve Sky kanal numaralarını almak için bu gereklidir. Değer 272, Freesat buketi 'İngiltere HD'yi seçer. MythTV wiki'sine bakın.",
             "bouquet_label": "buket kimliği",
             "delete_all": "Tüm Video Kaynaklarını Sil",
             "delete_details": "Bu, {{DisplayName}} ({{Grabber}}) siler",
@@ -1186,7 +1194,7 @@
             "freqtable_label": "Kanal Frekans Tablosu",
             "grabber_desc": "Listeleme kaynağını seçin. Bazı kaynaklar abone olmanızı gerektirir.",
             "grabber_label": "Liste kapmak",
-            "grabberconfig_desc": "Arka uçta oturum açmış ssh veya terminal kullanarak bu komutu çalıştırarak yakalayıcıyı yapılandırın. Wiki'de <a href=\"http://www.mythtv.org/wiki/XMLTV\" target=\"_blank\">XMLTV</a>'ye bakın.",
+            "grabberconfig_desc": "Bu komutu ssh veya arka uçta oturum açmış terminali kullanarak çalıştırarak yakalayıcıyı yapılandırın. MythTV wiki'sine bakın:",
             "grabberconfig_label": "Grabber'ı Yapılandır",
             "item_title": "Video kaynağı",
             "lcnoffset_desc": "Ofset, bir DVB video kaynağının taranması sırasında bulunan her bir mantıksal kanal numarasına eklenir. Bu, farklı video kaynaklarına örtüşmeyen bir kanal numarası aralığı vermeyi mümkün kılar. Yalnızca bir video kaynağınız varsa veya video kaynaklarında DVB mantıksal kanal numaraları yoksa 0'da bırakın.",
@@ -1196,7 +1204,7 @@
             "netid_desc": "Sağlayıcınız sizden belirli bir ağ tanımlayıcısı (Network_ID) yapılandırmanızı istediyse, buraya girin. Aksi takdirde -1'de bırakın.",
             "netid_label": "Ağ kimliği",
             "new_video_source": "Yeni Video Kaynağı",
-            "region_desc": "Astra-2 28.2E uydusunda Freesat veya Sky için bölge kimliği. Bunu 0'da bırakın, bu uyduyu almıyorsunuz. Bu, Freesat ve Sky kanal numaralarını almak için gereklidir. Değer 1 Londra bölgesini seçer. MythTV Wiki'ye bakın <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "region_desc": "Astra-2 28.2E uydusundaki Freesat veya Sky için Bölge Kimliği. Bu uyduyu almıyorsanız bunu 0'da bırakın. Freesat ve Sky kanal numaralarını almak için bu gereklidir. Değer 1 Londra bölgesini seçer. MythTV wiki'sine bakın:",
             "region_label": "bölge kimliği",
             "scanfreq_desc": "Bu video kaynağını taramaya başlama sıklığı. Bu, 'Tam Tarama (Ayarlanmış)' kanal taraması için varsayılandır. DVB-T/T2/C için Hz cinsinden, DVB-S/S2 için kHz cinsinden frekans değeri. Bilinmiyorsa 0'da bırakın.",
             "scanfreq_label": "Tarama Sıklığı",

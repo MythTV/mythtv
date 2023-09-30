@@ -191,6 +191,7 @@ export interface UpdateRecordedMetadataRequest {
     SubTitle?:                string;
     Title?:                   string;
     Watched?:                 boolean;
+    RecGroup?:                string;
 }
 
 export interface ManageJobQueueRequest {

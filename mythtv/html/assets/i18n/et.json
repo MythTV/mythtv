@@ -46,6 +46,7 @@
             "alreadydel": "Juba kustutatud",
             "canundel": "Saate selle tühistada, kasutades funktsiooni Undelete.",
             "channel": "Kanal",
+            "damaged": "Kahjustatud",
             "delete_details": "See kustutab salvestusreegli",
             "delete_rule": "Salvestusreegli kustutamine",
             "description": "Kirjeldus",
@@ -63,6 +64,8 @@
             "job_Transcode": "Ümberkodeerimine",
             "mnu_delete": "Kustuta",
             "mnu_delete_rerec": "Kustuta ja luba uuesti salvestada",
+            "mnu_markdamaged": "Märgi kahjustatud",
+            "mnu_markundamaged": "Märgi kahjutuks",
             "mnu_markunwatched": "Märgi jälgimata",
             "mnu_markwatched": "Märgi vaadatuks",
             "mnu_rerec": "Luba uuesti salvestada",
@@ -71,6 +74,7 @@
             "mnu_undelete": "Taasta kustutamine",
             "mnu_updatemeta": "Värskenda metaandmeid",
             "mnu_updaterecrule": "Värskendage salvestusreeglit",
+            "nonrerec": "Kahjustatud programmi uuesti salvestamise lubamiseks kasutage käsku Luba uuesti salvestada.",
             "orig_airdate": "Algne eetri kuupäev",
             "override_rule": "Alistusreegli lisamine või muutmine",
             "recgrp": "Rec Grp",
@@ -79,7 +83,8 @@
             "stop_details": "See peatab salvestamise",
             "stop_recording": "Lõpeta salvestamine",
             "subtitle": "Alapealkiri",
-            "title": "Pealkiri"
+            "title": "Pealkiri",
+            "watched": "Vaadati"
         },
         "recrule": {
             "type": "Tüüp"
@@ -168,6 +173,8 @@
             },
             "type_label": "Ajakava tüüp"
         },
+        "scrolltabsleft": "Kerige vahekaarte vasakule",
+        "scrolltabsright": "Kerige vahekaarte paremale",
         "status": {
             "backends_detail": "Taustaprogramm: {{ Name }} on {{ Type }} IP-l {{ IP }}",
             "backends_none": "Taustaprogramme pole",
@@ -224,7 +231,8 @@
         "videos": {
             "download": "Laadige video alla",
             "heading": "Videod",
-            "releasedate": "Väljalaske kuupäev"
+            "releasedate": "Väljalaske kuupäev",
+            "showall": "Kataloogiloendite lamendamine"
         }
     },
     "data": {
@@ -1032,7 +1040,7 @@
             "sg_label": "Salvestusrühma kettaplaanija",
             "slowly_desc": "Mõned failisüsteemid kasutavad suurte failide kustutamisel palju ressursse. Kui see on lubatud, kustutab see suvand MythTV sellel taustaprogrammil faile aeglaselt, et mõju vähendada.",
             "slowly_label": "Kustutage failid aeglaselt",
-            "statapp_desc": "Väline rakendus või skript, mis väljastab lisateavet taustaprogrammi olekulehele lisamiseks. Vaadake vikis <a href=\"http://www.mythtv.org/wiki/Miscellaneous_Status_Information\" target=\"_blank\">Mitmesugust olekuteavet</a>.",
+            "statapp_desc": "Väline rakendus või skript, mis väljastab lisateavet taustaprogrammi olekulehele lisamiseks. Vaadake MythTV vikit:",
             "statapp_label": "Mitmesugused olekurakendused",
             "subtitle": "Üldised taustaprogrammi sätted",
             "title": "Mitmesugused seaded",
@@ -1175,7 +1183,7 @@
             "WOLReconnect_label": "Ühenduse taastamise aeg",
             "WOLRetry_desc": "Serveri äratamiseks tehtud korduskatsete arv enne, kui kasutajaliides loobub.",
             "WOLRetry_label": "Proovige uuesti",
-            "bouquet_desc": "Freesati või Sky kimbu ID satelliidil Astra-2 28.2E. Jätke see 0-le, kui te seda satelliiti vastu ei võta. Seda on vaja Freesati ja Sky kanalinumbrite saamiseks. Väärtus 272 valib Freesati kimbu 'England HD'. Vaadake MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "bouquet_desc": "Freesati või Sky kimbu ID satelliidil Astra-2 28.2E. Jätke see 0-le, kui te seda satelliiti vastu ei võta. Seda on vaja Freesati ja Sky kanalinumbrite saamiseks. Väärtus 272 valib Freesati kimbu 'England HD'. Vaadake MythTV vikit.",
             "bouquet_label": "Kimbu ID",
             "delete_all": "Kustuta kõik videoallikad",
             "delete_details": "See kustutab kasutaja {{DisplayName}} ({{Grabber}})",
@@ -1186,7 +1194,7 @@
             "freqtable_label": "Kanali sagedustabel",
             "grabber_desc": "Valige kirje allikas. Mõned allikad nõuavad tellimust.",
             "grabber_label": "Nimekirjade haaraja",
-            "grabberconfig_desc": "Seadistage haarats, käivitades selle käsu ssh-i või taustaprogrammi sisse logitud terminali abil. Vaadake vikis <a href=\"http://www.mythtv.org/wiki/XMLTV\" target=\"_blank\">XMLTV-d</a>.",
+            "grabberconfig_desc": "Seadistage haarats, käivitades selle käsu ssh-i või taustaprogrammi sisse logitud terminali abil. Vaadake MythTV vikit:",
             "grabberconfig_label": "Grabberi seadistamine",
             "item_title": "Video allikas",
             "lcnoffset_desc": "Nihe lisatakse igale DVB-videoallika skannimise käigus leitud loogilisele kanalinumbrile. See võimaldab anda erinevatele videoallikatele kanalite numbrite mittekattuvat vahemikku. Jätke 0, kui teil on ainult üks videoallikas või kui videoallikatel pole DVB loogilisi kanalinumbreid.",
@@ -1196,7 +1204,7 @@
             "netid_desc": "Kui teie teenusepakkuja on palunud teil konfigureerida konkreetse võrguidentifikaatori (Network_ID), sisestage see siia. Vastasel juhul jätke see väärtusele -1.",
             "netid_label": "Võrgu ID",
             "new_video_source": "Uus video allikas",
-            "region_desc": "Freesati või Sky piirkonna ID satelliidil Astra-2 28.2E. Jätke see 0-le, te ei võta seda satelliiti vastu. Seda on vaja Freesati ja Sky kanalinumbrite saamiseks. Väärtus 1 valib Londoni piirkonna. Vaadake MythTV Wiki <a href=\"https://www.mythtv.org/wiki/DVB_UK\" target=\"_blank\">https://www.mythtv.org/wiki/DVB_UK</a>.",
+            "region_desc": "Freesati või Sky piirkonna ID satelliidil Astra-2 28.2E. Jätke see 0-le, te ei võta seda satelliiti vastu. Seda on vaja Freesati ja Sky kanalinumbrite saamiseks. Väärtus 1 valib Londoni piirkonna. Vaadake MythTV vikit:",
             "region_label": "Piirkonna ID",
             "scanfreq_desc": "Selle videoallika skannimise alustamise sagedus. See on siis kanalite skannimise 'Täielik skannimine (häälestatud)' vaikeseade. Sagedusväärtus hertsides DVB-T/T2/C jaoks, kHz DVB-S/S2 puhul. Kui pole teada, lahkuge kell 0.",
             "scanfreq_label": "Skannimise sagedus",

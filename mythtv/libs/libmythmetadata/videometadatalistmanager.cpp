@@ -126,7 +126,8 @@ VideoMetadataListManager::loadOneFromDatabase(uint id)
 /// Query consumed in VideoMetadataImp::fromDBRow
 ///
 void VideoMetadataListManager::loadAllFromDatabase(metadata_list &items,
-                                                   const QString &sql)
+                                                   const QString &sql,
+                                                   const QString &bindValue)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.setForwardOnly(true);
@@ -142,6 +143,8 @@ void VideoMetadataListManager::loadAllFromDatabase(metadata_list &items,
         BaseMetadataQuery.append(sql);
 
     query.prepare(BaseMetadataQuery);
+    if (!bindValue.isEmpty())
+        query.bindValue(":BINDVALUE", bindValue);
 
     if (query.exec() && query.isActive())
     {
