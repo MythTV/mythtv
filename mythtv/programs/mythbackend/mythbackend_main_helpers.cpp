@@ -584,11 +584,8 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     if (gCoreContext->GetBackendServerIP().isEmpty())
     {
         std::cerr << "No setting found for this machine's BackendServerAddr.\n"
-                  << "Please run mythtv-setup on this machine.\n"
-                  << "Go to page \"General\" / \"Host Address Backend Setup\" and examine the values.\n"
-                  << "N.B. The default values are correct for a combined frontend/backend machine.\n"
-                  << "Press Escape, select \"Save and Exit\" and exit mythtv-setup.\n"
-                  << "Then start mythbackend again.\n";
+                  << "MythBackend starting in Web App only mode for initial setup.\n"
+                  << "Use http://<yourBackend>:6544 to perform setup.\n";
         return run_setup_webserver();
     }
 
@@ -730,7 +727,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     if (gCoreContext->IsMasterBackend())
         gCoreContext->SendSystemEvent("MASTER_STARTED");
 
-    // Provide systemd ready notification (for type=notify units)
+    // Provide systemd ready notification (for Type=notify)
     be_sd_notify("READY=1");
 
     const HTTPServices be_services = {
@@ -794,10 +791,10 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
 int run_setup_webserver()
 {
-    LOG(VB_GENERAL, LOG_NOTICE, "**********************************************************************");
-    LOG(VB_GENERAL, LOG_NOTICE, "***** MythBackend starting in webapp only mode for initial setup *****");
-    LOG(VB_GENERAL, LOG_NOTICE, "***** Use http://localhost:6744 to perform setup                 *****");
-    LOG(VB_GENERAL, LOG_NOTICE, "**********************************************************************");
+    LOG(VB_GENERAL, LOG_NOTICE, "***********************************************************************");
+    LOG(VB_GENERAL, LOG_NOTICE, "***** MythBackend starting in Web App only mode for initial setup *****");
+    LOG(VB_GENERAL, LOG_NOTICE, "***** Use http://<yourBackend>:6544 to perform setup              *****");
+    LOG(VB_GENERAL, LOG_NOTICE, "***********************************************************************");
 
     const HTTPServices be_services = {
         { VIDEO_SERVICE, &MythHTTPService::Create<V2Video> },
@@ -839,8 +836,11 @@ int run_setup_webserver()
 
     ///////////////////////////////
     ///////////////////////////////
+    // Provide systemd ready notification (for Type=notify)
+    be_sd_notify("READY=1\nSTATUS=Started in 'Web App only mode'");
     int exitCode = qApp->exec();
 
-    LOG(VB_GENERAL, LOG_NOTICE, "MythBackend setup webapp exiting");
+    be_sd_notify("STOPPING=1\nSTATUS='Exiting Web App only mode'");
+    LOG(VB_GENERAL, LOG_NOTICE, "MythBackend Web App only mode exiting");
     return exitCode;
 }
