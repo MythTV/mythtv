@@ -790,7 +790,7 @@
             "rolloff_label": "Cair fora",
             "sattuning_desc": "Selecione um satélite desta lista para os dados de ajuste do transponder de referência.",
             "sattuning_label": "Dados de sintonia de satélite",
-            "scan_desc": "Antes de executar isso, você deve selecionar a fonte de vídeo e salvar a página, caso alguma alteração não tenha sido salva.",
+            "scan_desc": "Antes de executar isso, você deve selecionar a fonte de vídeo. Iniciar digitalização salvará automaticamente a página, se necessário, antes da digitalização.",
             "scan_label": "Inicia escaneamento",
             "scanimport_label": "Digitalizar para importar",
             "scanimport_option": "Selecione uma opção de importação.",

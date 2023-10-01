@@ -790,7 +790,7 @@
             "rolloff_label": "Afrollen",
             "sattuning_desc": "Selecteer een satelliet uit deze lijst voor de afstemgegevens van de referentietransponder.",
             "sattuning_label": "Satelliet afstemmingsgegevens",
-            "scan_desc": "Voordat u dit uitvoert, moet u de videobron selecteren en de pagina opslaan als eventuele wijzigingen niet zijn opgeslagen.",
+            "scan_desc": "Voordat u dit uitvoert, moet u de videobron selecteren. Start Scan slaat de pagina indien nodig automatisch op voordat u gaat scannen.",
             "scan_label": "Start scan",
             "scanimport_label": "Scannen om te importeren",
             "scanimport_option": "Selecteer een importoptie.",

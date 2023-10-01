@@ -790,7 +790,7 @@
             "rolloff_label": "滾下",
             "sattuning_desc": "從此列表中選擇一顆衛星以獲取參考轉發器的調諧數據。",
             "sattuning_label": "衛星調諧數據",
-            "scan_desc": "在運行此命令之前，您必須選擇視頻源，如果尚未保存任何更改，請保存頁面。",
+            "scan_desc": "在運行之前，您必須選擇視訊來源。如果需要，開始掃描將在掃描前自動儲存頁面。",
             "scan_label": "開始掃描",
             "scanimport_label": "掃描導入",
             "scanimport_option": "選擇一個導入選項。",

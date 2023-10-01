@@ -790,7 +790,7 @@
             "rolloff_label": "Roll-off",
             "sattuning_desc": "Seleccioneu un satèl·lit d'aquesta llista per a les dades de sintonització del transpondedor de referència.",
             "sattuning_label": "Dades de sintonització de satèl·lit",
-            "scan_desc": "Abans d'executar-ho, heu de seleccionar la font del vídeo i desar la pàgina si no s'ha desat cap canvi.",
+            "scan_desc": "Abans d'executar-ho, heu de seleccionar la font de vídeo. Start Scan desarà automàticament la pàgina si cal abans d'escanejar.",
             "scan_label": "Inicieu l'escaneig",
             "scanimport_label": "Escaneja per importar",
             "scanimport_option": "Seleccioneu una opció d'importació.",

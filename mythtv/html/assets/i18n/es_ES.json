@@ -790,7 +790,7 @@
             "rolloff_label": "despegue",
             "sattuning_desc": "Seleccione un satélite de esta lista para los datos de sintonización del transpondedor de referencia.",
             "sattuning_label": "Datos de sintonización de satélite",
-            "scan_desc": "Antes de ejecutar esto, debe seleccionar la fuente de video y guardar la página si no se han guardado los cambios.",
+            "scan_desc": "Antes de ejecutar esto, debes seleccionar la fuente del video. Iniciar escaneo guardará automáticamente la página si es necesario antes de escanear.",
             "scan_label": "Iniciar escaneo",
             "scanimport_label": "Escanear para importar",
             "scanimport_option": "Seleccione una opción de importación.",

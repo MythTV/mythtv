@@ -790,7 +790,7 @@
             "rolloff_label": "Roll-off",
             "sattuning_desc": "Valige sellest loendist satelliit võrdlustranspondri häälestusandmete jaoks.",
             "sattuning_label": "Satelliidi häälestusandmed",
-            "scan_desc": "Enne selle käivitamist peate valima videoallika ja salvestama lehe, kui muudatusi pole salvestatud.",
+            "scan_desc": "Enne selle käivitamist peate valima videoallika. Käivita skannimine salvestab lehe vajadusel automaatselt enne skannimist.",
             "scan_label": "Alusta skannimist",
             "scanimport_label": "Skanni importimiseks",
             "scanimport_option": "Valige importimisvalik.",

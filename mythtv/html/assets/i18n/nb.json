@@ -790,7 +790,7 @@
             "rolloff_label": "Avrulling",
             "sattuning_desc": "Velg en satellitt fra denne listen for innstillingsdata for referansetransponderen.",
             "sattuning_label": "Satellittinnstillingsdata",
-            "scan_desc": "Før du kjører dette må du velge videokilden, og lagre siden hvis noen endringer ikke er lagret.",
+            "scan_desc": "Før du kjører dette må du velge videokilden. Start skanning vil automatisk lagre siden om nødvendig før skanning.",
             "scan_label": "Start søk",
             "scanimport_label": "Skann for å importere",
             "scanimport_option": "Velg et importalternativ.",

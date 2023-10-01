@@ -790,7 +790,7 @@
             "rolloff_label": "Roll-off",
             "sattuning_desc": "Válasszon egy műholdat ebből a listából a referenciatranszponder hangolási adataihoz.",
             "sattuning_label": "Műhold hangolási adatok",
-            "scan_desc": "Ennek futtatása előtt ki kell választania a videó forrását, és el kell mentenie az oldalt, ha a módosításokat nem menti el.",
+            "scan_desc": "Ennek futtatása előtt ki kell választania a videó forrását. A Start Scan automatikusan elmenti az oldalt, ha szükséges a szkennelés előtt.",
             "scan_label": "Indítsa el a szkennelést",
             "scanimport_label": "Szkennelés importáláshoz",
             "scanimport_option": "Válasszon egy importálási lehetőséget.",

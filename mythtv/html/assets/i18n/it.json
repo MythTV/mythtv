@@ -790,7 +790,7 @@
             "rolloff_label": "Rotolamento",
             "sattuning_desc": "Selezionare un satellite da questo elenco per i dati di sintonizzazione del transponder di riferimento.",
             "sattuning_label": "Dati di sintonizzazione satellitare",
-            "scan_desc": "Prima di eseguire questa operazione è necessario selezionare la sorgente video e salvare la pagina se non sono state salvate modifiche.",
+            "scan_desc": "Prima di eseguirlo è necessario selezionare la sorgente video. Avvia scansione salverà automaticamente la pagina, se necessario, prima della scansione.",
             "scan_label": "Inizia scansione",
             "scanimport_label": "Scansione da importare",
             "scanimport_option": "Seleziona un'opzione di importazione.",

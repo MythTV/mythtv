@@ -790,7 +790,7 @@
             "rolloff_label": "Sjet",
             "sattuning_desc": "Vyberte satelit z tohoto seznamu pro data ladění referenčního transpondéru.",
             "sattuning_label": "Údaje o satelitním ladění",
-            "scan_desc": "Před spuštěním musíte vybrat zdroj videa a uložit stránku, pokud nebyly uloženy nějaké změny.",
+            "scan_desc": "Před spuštěním musíte vybrat zdroj videa. Spustit skenování automaticky uloží stránku v případě potřeby před skenováním.",
             "scan_label": "Začni skenovat",
             "scanimport_label": "Skenování pro import",
             "scanimport_option": "Vyberte možnost importu.",

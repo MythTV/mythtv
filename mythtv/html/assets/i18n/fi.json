@@ -790,7 +790,7 @@
             "rolloff_label": "Roll-off",
             "sattuning_desc": "Valitse satelliitti tästä luettelosta referenssitransponderin viritystiedoille.",
             "sattuning_label": "Satelliittiviritystiedot",
-            "scan_desc": "Ennen kuin suoritat tämän, sinun on valittava videolähde ja tallennettava sivu, jos muutoksia ei ole tallennettu.",
+            "scan_desc": "Ennen kuin suoritat tämän, sinun on valittava videolähde. Aloita skannaus tallentaa sivun tarvittaessa automaattisesti ennen skannausta.",
             "scan_label": "Aloita skannaus",
             "scanimport_label": "Skannaa tuontiin",
             "scanimport_option": "Valitse tuontivaihtoehto.",

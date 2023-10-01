@@ -790,7 +790,7 @@
             "rolloff_label": "Odmotati",
             "sattuning_desc": "Odaberite satelit s ovog popisa za podatke ugađanja referentnog transpondera.",
             "sattuning_label": "Podaci o ugađanju satelita",
-            "scan_desc": "Prije pokretanja morate odabrati video izvor i spremiti stranicu ako promjene nisu spremljene.",
+            "scan_desc": "Prije pokretanja morate odabrati video izvor. Start Scan će automatski spremiti stranicu ako je potrebno prije skeniranja.",
             "scan_label": "Započni skeniranje",
             "scanimport_label": "Skeniraj za uvoz",
             "scanimport_option": "Odaberite opciju uvoza.",
