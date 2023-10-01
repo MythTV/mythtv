@@ -728,7 +728,7 @@ int Playlist::fillSonglistFromQuery(const QString& whereClause,
     new_songlist.remove(0, 1);
 
     if (removeDuplicates && insertOption != PL_REPLACE)
-        orig_songlist = removeDuplicateTracks(new_songlist, orig_songlist);
+        orig_songlist = removeItemsFromList(new_songlist, orig_songlist);
 
     switch (insertOption)
     {
@@ -802,7 +802,7 @@ int Playlist::fillSonglistFromList(const QList<int> &songList,
     new_songlist.remove(0, 1);
 
     if (removeDuplicates && insertOption != PL_REPLACE)
-        orig_songlist = removeDuplicateTracks(new_songlist, orig_songlist);
+	orig_songlist = removeItemsFromList(new_songlist, orig_songlist);
 
     switch (insertOption)
     {
@@ -1070,20 +1070,16 @@ void Playlist::savePlaylist(const QString& a_name, const QString& a_host)
     m_changed = false;
 }
 
-// Return a copy of the second list, having removed any song name that
+// Return a copy of the second list, having removed any item that
 // also appears in the first list.
 //
-// @note: This function only removes the first instance of any
-// matching string.  Subsequent instances of the string remain
-// untouched.
-//
-// @param remove_list A comma separated list of song names to be
+// @param remove_list A comma separated list of strings to be
 //                    removed from the source list.
-// @param source_list A comma separated list of song names to be
+// @param source_list A comma separated list of strings to be
 //                    processed.
-// @return A comma separated list of the song names remaining after
+// @return A comma separated list of the strings remaining after
 //         processing.
-QString Playlist::removeDuplicateTracks(const QString &remove_list, const QString &source_list)
+QString Playlist::removeItemsFromList(const QString &remove_list, const QString &source_list)
 {
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList removeList = remove_list.split(",", QString::SkipEmptyParts);
