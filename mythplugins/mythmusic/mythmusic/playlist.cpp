@@ -802,7 +802,7 @@ int Playlist::fillSonglistFromList(const QList<int> &songList,
     new_songlist.remove(0, 1);
 
     if (removeDuplicates && insertOption != PL_REPLACE)
-	orig_songlist = removeItemsFromList(new_songlist, orig_songlist);
+        orig_songlist = removeItemsFromList(new_songlist, orig_songlist);
 
     switch (insertOption)
     {
