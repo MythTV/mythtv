@@ -34,6 +34,7 @@ from flatten_dict import unflatten
 US_LANG = ('en_US', 'en_US.json', 'English US')
 
 DEST_LANGS = [
+            ('af',    'af.json',    'Afrikaans'),
             ('bg',    'bg.json',    'Bulgarian'),
             ('ca',    'ca.json',    'Catalan'),
             ('cs',    'cs.json',    'Czech'),
@@ -78,7 +79,13 @@ def doCheckTranslations(us_flat, code, filename, desc):
     for key, value in us_flat.items():
         destString = dest_flat.get(key)
         if destString == None:
-            destString = translate(value, code)
+            if isinstance(value,list):
+                destString = []
+                for element in value:
+                    trans = translate(element, code)
+                    destString.append(trans)
+            else:
+                destString = translate(value, code)
             print("Adding missing string '%s' -> '%s'" % (value, destString))
             dest_flat[key] = destString
         elif destString == "":
