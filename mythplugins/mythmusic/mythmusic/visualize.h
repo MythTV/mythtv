@@ -242,6 +242,7 @@ class Spectrogram : public VisualBase
     QSize          m_size;                // displayed dize
     MelScale       m_scale;               // Y-axis
     int            m_fftlen {16 * 1024}; // window width
+    int            m_color {0};          // color or grayscale
     QVector<float> m_sigL;               // decaying signal window
     QVector<float> m_sigR;
     FFTSample*     m_dftL { nullptr }; // real in, complex out

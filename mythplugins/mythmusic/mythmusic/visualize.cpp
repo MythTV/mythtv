@@ -815,10 +815,8 @@ bool WaveForm::draw( QPainter *p, const QColor &back )
 
 void WaveForm::handleKeyPress(const QString &action)
 {
-    LOG(VB_PLAYBACK, LOG_INFO, QString("WF keypress = %1").arg(action));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("WF keypress = %1").arg(action));
 
-    // I'd like to toggle overlay text upon certain key hit, but
-    // mythfrontend doesn't appear to call this.  Bug?
     if (action == "SELECT")
     {
         m_showtext = ! m_showtext;
@@ -926,6 +924,8 @@ Spectrogram::Spectrogram(bool hist)
     m_history = hist;   // historical spectrogram?, else spectrum only
 
     m_fps = 40;         // getting 1152 samples / 44100 = 38.28125 fps
+
+    m_color = gCoreContext->GetNumSetting("MusicSpectrogramColor", 0);
 
     if (s_image.isNull())  // static histogram survives resize/restart
     {
@@ -1076,8 +1076,8 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
         int end = m_fftlen / 40; // ramp window ends down to zero crossing
         for (int k = 0; k < m_fftlen; k++)
         {
-	    mult = k < end ? (float)k / (float)end
-		       : k > m_fftlen - end ?
+            mult = k < end ? (float)k / (float)end
+                       : k > m_fftlen - end ?
                 (float)(m_fftlen - k) / (float)end : 1;
             m_dftL[k] = m_sigL[k] * mult;
             m_dftR[k] = m_sigR[k] * mult;
@@ -1141,8 +1141,16 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
             h = m_sgsize.height() / 2;
             painter.drawLine(s_offset,     h - i, s_offset     + mag, h - i);
             painter.drawLine(s_offset - w, h - i, s_offset - w + mag, h - i);
-            left > 255 ? painter.setPen(Qt::yellow) :
-                painter.setPen(qRgb(mag, mag, mag));
+            if (m_color & 0x01)
+            {
+                if (left > 255)
+                    painter.setPen(Qt::white);
+                if (mag == 0)
+                    painter.setPen(Qt::black);
+            } else {
+                left > 255 ? painter.setPen(Qt::yellow) :
+                    painter.setPen(qRgb(mag, mag, mag));
+            }
             painter.drawPoint(s_offset, h - i);
         } else {
             painter.drawLine(i, h / 2, i, h / 2 - h / 2 * mag / 256);
@@ -1158,8 +1166,16 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
             h = m_sgsize.height();
             painter.drawLine(s_offset,     h - i, s_offset     + mag, h - i);
             painter.drawLine(s_offset - w, h - i, s_offset - w + mag, h - i);
-            right > 255 ? painter.setPen(Qt::yellow) :
-                painter.setPen(qRgb(mag, mag, mag));
+            if (m_color & 0x02)
+            {
+                if (left > 255)
+                    painter.setPen(Qt::white);
+                if (mag == 0)
+                    painter.setPen(Qt::black);
+            } else {
+                right > 255 ? painter.setPen(Qt::yellow) :
+                    painter.setPen(qRgb(mag, mag, mag));
+            }
             painter.drawPoint(s_offset, h - i);
         } else {
             painter.drawLine(i, h / 2, i, h / 2 + h / 2 * mag / 256);
@@ -1167,7 +1183,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
 
         prev = index;           // next pixel is FFT bins from here
         index = m_scale[i];     // to the next bin by LOG scale
-	prev = std::min(prev, index - 1);
+        prev = std::min(prev, index - 1);
     }
     if (m_history && ++s_offset >= w)
     {
@@ -1206,13 +1222,13 @@ bool Spectrogram::draw(QPainter *p, const QColor &back)
 
 void Spectrogram::handleKeyPress(const QString &action)
 {
-    LOG(VB_PLAYBACK, LOG_INFO, QString("SG keypress = %1").arg(action));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("SG keypress = %1").arg(action));
 
-    // I'd like to tweak options upon certain key hit, but
-    // mythfrontend doesn't appear to call this.  Bug?
     if (action == "SELECT")
     {
-        LOG(VB_PLAYBACK, LOG_INFO, QString("SG keypress SELECT hit"));
+        m_color = (m_color + 1) & 0x03;
+        gCoreContext->SaveSetting("MusicSpectrogramColor",
+                                  QString("%1").arg(m_color));
     }
 }
 
