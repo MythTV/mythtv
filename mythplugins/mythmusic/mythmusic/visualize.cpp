@@ -1141,7 +1141,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
             h = m_sgsize.height() / 2;
             painter.drawLine(s_offset,     h - i, s_offset     + mag, h - i);
             painter.drawLine(s_offset - w, h - i, s_offset - w + mag, h - i);
-            if (m_color & 0x01)
+            if (m_color & 0x01) // left in color?
             {
                 if (left > 255)
                     painter.setPen(Qt::white);
@@ -1166,7 +1166,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
             h = m_sgsize.height();
             painter.drawLine(s_offset,     h - i, s_offset     + mag, h - i);
             painter.drawLine(s_offset - w, h - i, s_offset - w + mag, h - i);
-            if (m_color & 0x02)
+            if (m_color & 0x02) // right in color?
             {
                 if (left > 255)
                     painter.setPen(Qt::white);
@@ -1224,9 +1224,9 @@ void Spectrogram::handleKeyPress(const QString &action)
 {
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("SG keypress = %1").arg(action));
 
-    if (action == "SELECT")
+    if (m_history && action == "SELECT")
     {
-        m_color = (m_color + 1) & 0x03;
+        m_color = (m_color + 1) & 0x03; // left and right color bits
         gCoreContext->SaveSetting("MusicSpectrogramColor",
                                   QString("%1").arg(m_color));
     }
