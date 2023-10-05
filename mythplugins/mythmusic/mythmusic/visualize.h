@@ -252,6 +252,7 @@ class Spectrogram : public VisualBase
     std::array<int,256*6> m_blue  {0};
     bool           m_binpeak { true }; // peak of bins, else mean
     bool           m_history { true }; // spectrogram? or spectrum
+    bool           m_showtext {false}; // freq overlay?
 };
 
 class Spectrum : public VisualBase

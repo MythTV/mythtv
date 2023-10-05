@@ -1011,31 +1011,36 @@ bool Spectrogram::process(VisualNode */*node*/)
     // TODO: label certain frequencies instead: 50, 100, 200, 500,
     // 1000, 2000, 5000, 10000
 
-    // QPainter painter(m_image);
-    // painter.setPen(Qt::cyan);
-    // QFont font = QApplication::font();
-    // font.setPixelSize(14);
-    // painter.setFont(font);
-    // if (m_history)
-    // {
-    //     for (auto h = m_sgsize.height(); h > 0; h -= m_sgsize.height() / 2)
-    //     {
-    //         for (auto i = 0; i < m_sgsize.height() / 2; i += 20)
-    //         {
-    //             painter.drawText(0, h - i,
-    //                              QString("...%1.%2.%3...").arg(i).arg(m_scale[i])
-    //                              .arg(m_scale[i] * 22050 / 8192)); // hack!!!
-    //         }
-    //     }
-    // } else {
-    //     painter.rotate(90);
-    //     for (auto i = 0; i < m_sgsize.width(); i += 20)
-    //     {
-    //         painter.drawText(0, -1 * i,
-    //                          QString("...%1.%2.%3...").arg(i).arg(m_scale[i])
-    //                          .arg(m_scale[i] * 22050 / 8192)); // hack!!!
-    //     }
-    // }
+    if (!m_showtext)
+        return false;
+
+    QPainter painter(m_image);
+    painter.setPen(Qt::white);
+    QFont font = QApplication::font();
+    font.setPixelSize(14);
+    painter.setFont(font);
+    if (m_history)              // currently unused in v34...
+    {
+        for (auto h = m_sgsize.height(); h > 0; h -= m_sgsize.height() / 2)
+        {
+            for (auto i = 0; i < m_sgsize.height() / 2; i += 20)
+            {
+                painter.drawText(0, h - i,
+                                 QString("...%1.%2.%3...").arg(i).arg(m_scale[i])
+                                 .arg(m_scale[i] * 22050 / (m_fftlen/2))); // hack!!!
+            }
+        }
+    } else {
+        painter.rotate(90);
+        for (auto i = 0; i < m_sgsize.width(); i += 20)
+        {
+            painter.drawText(m_sgsize.height()/2, -1 * i,
+                             QString("...%1...")
+                             .arg(m_scale[i] * 22050 / (m_fftlen/2))); // hack!!!
+                             // QString("...%1.%2.%3...").arg(i).arg(m_scale[i])
+                             // .arg(m_scale[i] * 22050 / (m_fftlen/2))); // hack!!!
+        }
+    }
     return false;
 }
 
@@ -1224,11 +1229,15 @@ void Spectrogram::handleKeyPress(const QString &action)
 {
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("SG keypress = %1").arg(action));
 
-    if (m_history && action == "SELECT")
-    {
-        m_color = (m_color + 1) & 0x03; // left and right color bits
-        gCoreContext->SaveSetting("MusicSpectrogramColor",
-                                  QString("%1").arg(m_color));
+    if (action == "SELECT") {
+        if (m_history)
+        {
+            m_color = (m_color + 1) & 0x03; // left and right color bits
+            gCoreContext->SaveSetting("MusicSpectrogramColor",
+                                      QString("%1").arg(m_color));
+        }
+        else
+            m_showtext = ! m_showtext;
     }
 }
 
