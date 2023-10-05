@@ -160,7 +160,7 @@ public:
     unsigned long m_offset {0};          // node offset for draw
     short         *m_right {nullptr};
     QFont         m_font;       // optional text overlay
-    bool          m_showtext {true};
+    bool          m_showtext {false};
     MusicMetadata *m_currentMetadata {nullptr};
     unsigned long m_duration {60000}; // file length in milliseconds
     unsigned int  m_lastx    {1920};  // vert line tracker
