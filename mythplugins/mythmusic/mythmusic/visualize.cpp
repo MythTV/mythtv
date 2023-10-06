@@ -165,6 +165,10 @@ void MelScale::setMax(int maxscale, int maxrange, int maxfreq)
     m_indices.clear();
     m_indices.resize(maxrange, 0);
 
+    int note = 0;               // first note is C0
+    double freq = 16.35;        // frequency of first note
+    double next = pow(2.0, 1.0 / 12.0); // factor separating notes
+
     double maxmel = hz2mel(maxfreq);
     double hzperbin = (double) maxfreq / (double) maxscale;
 
@@ -176,12 +180,24 @@ void MelScale::setMax(int maxscale, int maxrange, int maxfreq)
         m_indices[i] = bin;
         // LOG(VB_PLAYBACK, LOG_INFO, QString("Mel maxmel=%1, hzperbin=%2, hz=%3, i=%4, bin=%5")
         //     .arg(maxmel).arg(hzperbin).arg(hz).arg(i).arg(bin));
+
+        if (hz > freq) { // map note to pixel location for note labels
+            m_notes[note++] = i;
+            freq *= next;
+        }
     }
 }
 
 int MelScale::operator[](int index)
 {
     return m_indices[index];
+}
+
+int MelScale::pixel(int note)
+{
+    if (note < 0 || note > 143)
+        return 0;
+    return m_notes[note];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1008,9 +1024,6 @@ unsigned long Spectrogram::getDesiredSamples(void)
 
 bool Spectrogram::process(VisualNode */*node*/)
 {
-    // TODO: label certain frequencies instead: 50, 100, 200, 500,
-    // 1000, 2000, 5000, 10000
-
     if (!m_showtext)
         return false;
 
@@ -1019,11 +1032,13 @@ bool Spectrogram::process(VisualNode */*node*/)
     QFont font = QApplication::font();
     font.setPixelSize(14);
     painter.setFont(font);
+    int half = m_sgsize.height() / 2;
+
     if (m_history)              // currently unused in v34...
     {
-        for (auto h = m_sgsize.height(); h > 0; h -= m_sgsize.height() / 2)
+        for (auto h = m_sgsize.height(); h > 0; h -= half)
         {
-            for (auto i = 0; i < m_sgsize.height() / 2; i += 20)
+            for (auto i = 0; i < half; i += 20)
             {
                 painter.drawText(0, h - i,
                                  QString("...%1.%2.%3...").arg(i).arg(m_scale[i])
@@ -1031,11 +1046,19 @@ bool Spectrogram::process(VisualNode */*node*/)
             }
         }
     } else {
+        for (auto i = 0; i < 125; i++) // 125 notes fit in 22050 Hz
+        {
+            painter.drawText(m_scale.pixel(i) - 2, half - (i % 12) * 15 - 20,
+                             m_notes[i % 12]);
+            if (i % 12 == 5)    // octave numbers
+                painter.drawText(m_scale.pixel(i) - 2, half - 200,
+                                 QString("%1").arg(int(i / 12)));
+        }
         painter.rotate(90);
         for (auto i = 0; i < m_sgsize.width(); i += 20)
         {
-            painter.drawText(m_sgsize.height()/2, -1 * i,
-                             QString("...%1...")
+            painter.drawText(half + 20, -1 * i,
+                             QString("...%1")
                              .arg(m_scale[i] * 22050 / (m_fftlen/2))); // hack!!!
                              // QString("...%1.%2.%3...").arg(i).arg(m_scale[i])
                              // .arg(m_scale[i] * 22050 / (m_fftlen/2))); // hack!!!
