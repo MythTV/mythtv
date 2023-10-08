@@ -1073,10 +1073,6 @@ void Playlist::savePlaylist(const QString& a_name, const QString& a_host)
 // Return a copy of the second list, having removed any song name that
 // also appears in the first list.
 //
-// @note: This function only removes the first instance of any
-// matching string.  Subsequent instances of the string remain
-// untouched.
-//
 // @param remove_list A comma separated list of song names to be
 //                    removed from the source list.
 // @param source_list A comma separated list of song names to be
