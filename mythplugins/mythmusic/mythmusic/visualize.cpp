@@ -1030,7 +1030,7 @@ bool Spectrogram::process(VisualNode */*node*/)
     QPainter painter(m_image);
     painter.setPen(Qt::white);
     QFont font = QApplication::font();
-    font.setPixelSize(14);
+    font.setPixelSize(16);
     painter.setFont(font);
     int half = m_sgsize.height() / 2;
 
@@ -1047,21 +1047,22 @@ bool Spectrogram::process(VisualNode */*node*/)
         }
     } else {
         for (auto i = 0; i < 125; i++) // 125 notes fit in 22050 Hz
-        {
-            painter.drawText(m_scale.pixel(i) - 2, half - (i % 12) * 15 - 20,
-                             m_notes[i % 12]);
+        {                  // let Qt center the note text on the pixel
+            painter.drawText(m_scale.pixel(i) - 20, half - (i % 12) * 15 - 40,
+                             40, 40, Qt::AlignCenter, m_notes[i % 12]);
             if (i % 12 == 5)    // octave numbers
-                painter.drawText(m_scale.pixel(i) - 2, half - 200,
+                painter.drawText(m_scale.pixel(i) - 20, half - 220,
+                                 40, 40, Qt::AlignCenter,
                                  QString("%1").arg(int(i / 12)));
         }
-        painter.rotate(90);
+        painter.rotate(90);     // frequency in Hz
         for (auto i = 0; i < m_sgsize.width(); i += 20)
         {
-            painter.drawText(half + 20, -1 * i,
-                             QString("...%1")
+            painter.drawText(half + 50, -1 * i - 30, 60, 60, Qt::AlignCenter,
+                             QString("%1")
                              .arg(m_scale[i] * 22050 / (m_fftlen/2))); // hack!!!
-                             // QString("...%1.%2.%3...").arg(i).arg(m_scale[i])
-                             // .arg(m_scale[i] * 22050 / (m_fftlen/2))); // hack!!!
+            // QString("%1 %2 %3").arg(i).arg(m_scale[i])
+            // .arg(m_scale[i] * 22050 / (m_fftlen/2))); // hack!!!
         }
     }
     return false;
