@@ -2724,6 +2724,17 @@ void TV::PrepareToExitPlayer(int Line)
             at_end = true;
         }
 
+        // Save total frames for video file if not already present
+        if (m_playerContext.m_playingInfo->IsVideoFile())
+        {
+            auto totalFrames = m_playerContext.m_playingInfo->QueryTotalFrames();
+            if (!totalFrames)
+            {
+                totalFrames = m_playerContext.m_player->GetCurrentFrameCount();
+                m_playerContext.m_playingInfo->SaveTotalFrames(totalFrames);
+            }
+        }
+
         // Clear/Save play position without notification
         // The change must be broadcast when file is no longer in use
         // to update previews, ie. with the MarkNotInUse notification
