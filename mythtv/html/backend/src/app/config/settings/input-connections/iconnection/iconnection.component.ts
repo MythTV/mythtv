@@ -10,6 +10,7 @@ import { Channel, FetchChannelsFromSourceRequest, GetChannelInfoListRequest } fr
 import { VideoSource, VideoSourceList } from 'src/app/services/interfaces/videosource.interface';
 import { SetupService } from 'src/app/services/setup.service';
 import { InputConnectionsComponent } from '../input-connections.component';
+import { ChannelscanComponent } from '../channelscan/channelscan.component';
 
 @Component({
   selector: 'app-iconnection',
@@ -50,6 +51,7 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
 
   currentDevice: CaptureDevice = <CaptureDevice>{ FrontendName: "Unknown", InputNames: ['MPEG2TS'] };
 
+  scanComponent?: ChannelscanComponent;
 
   work = {
     successCount: 0,
@@ -76,6 +78,7 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     // Eastern = 1, Western = -1
     hemisphere: 1,
     isReady: false,
+    startScan: false,
   };
 
   deviceFree = new Subject<boolean>();
@@ -133,6 +136,12 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     });
   }
 
+  fillChannelList(): void {
+    this.sourceChannels = this.allChannels.filter(data => data.SourceId == this.card.SourceId);
+    if (!this.sourceChannels.find(data => data.ChanNum == this.card.StartChannel))
+      this.card.StartChannel = "";
+  }
+
   loadInputGroups() {
     this.captureCardService.GetInputGroupList().subscribe(data => {
       this.inputGroups = data.InputGroupList.InputGroups;
@@ -168,16 +177,8 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     if (this.card.CardType == "DVB") {
       this.loadDiseqc();
     }
-
-    setTimeout(() => {
-      if (this.card.DisplayName)
-        this.currentForm.form.markAsPristine();
-      else {
-        this.card.DisplayName = "Input " + this.card.CardId;
-        this.currentForm.form.markAsDirty();
-      }
-    }, 100);
-
+    if (!this.card.DisplayName)
+      this.card.DisplayName = "Input " + this.card.CardId;
     this.captureCardService.GetCaptureDeviceList(this.card.CardType)
       .subscribe({
         next: data => {
@@ -298,12 +299,12 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.setupService.setCurrentForm(this.currentForm);
-  }
-
-  fillChannelList(): void {
-    this.sourceChannels = this.allChannels.filter(data => data.SourceId == this.card.SourceId);
-    if (!this.sourceChannels.find(data => data.ChanNum == this.card.StartChannel))
-      this.card.StartChannel = "";
+    // This is needed tp prevent ExpressionChangedAfterItHasBeenCheckedError
+    // Previous value for 'ng-pristine': 'true'. Current value: 'false'.
+    this.currentForm.form.markAsDirty();
+    setTimeout(() => {
+      this.currentForm.form.markAsPristine();
+    }, 0);
   }
 
   fetchChannels(): void {
@@ -334,7 +335,6 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
   saveObserver: PartialObserver<any> = {
     next: (x: any) => {
       if (x.bool) {
-        console.log("saveObserver success", x);
         this.work.successCount++;
         if (this.work.recLimitUpd) {
           if (this.work.successCount == this.work.expectedCount) {
@@ -352,15 +352,22 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
           this.loadInputGroups();
           this.work.reloadGroups = false;
         }
+        if (this.work.successCount == this.work.expectedCount && this.work.startScan && this.scanComponent) {
+          this.work.startScan = false;
+          this.currentForm.form.markAsPristine();
+          this.scanComponent.startScan();
+        }
       }
       else {
         console.log("saveObserver error", x);
+        this.work.startScan = false;
         this.work.errorCount++;
         this.currentForm.form.markAsDirty();
       }
     },
     error: (err: any) => {
       console.log("saveObserver error", err);
+      this.work.startScan = false;
       this.work.errorCount++;
       this.currentForm.form.markAsDirty();
     }
@@ -499,7 +506,6 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
           })
       }
     }
-
   }
 
 }

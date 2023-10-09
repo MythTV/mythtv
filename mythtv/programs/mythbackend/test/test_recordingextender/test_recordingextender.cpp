@@ -564,7 +564,7 @@ void TestRecordingExtender::test_parseProgramInfo(void)
 void TestRecordingExtender::test_parseJson(void)
 {
     m_nowForTest = QDateTime::fromString("2021-09-22T23:59:00Z", Qt::ISODate);
-    auto* source = new TestRecExtMlbDataSource(this);
+    auto source = std::make_unique<TestRecExtMlbDataSource>(this);
 
     SportInfo info {"MLB Baseball", AutoExtendType::MLB, "", ""};
     ActiveGame game(0, "MLB Baseball", info);
@@ -689,7 +689,7 @@ void TestRecordingExtender::test_parseEspn(void)
     QFETCH(QString, expectedTextState);
 
     m_nowForTest = QDateTime::fromString(nowForTest, Qt::ISODate);
-    auto* source = new TestRecExtEspnDataSource(this);
+    auto source = std::make_unique<TestRecExtEspnDataSource>(this);
 
     SportInfo info {"MLB Baseball", AutoExtendType::ESPN, sport, league};
     ActiveGame game(0, "MLB Baseball", info);
@@ -731,8 +731,6 @@ void TestRecordingExtender::test_parseEspn(void)
     QCOMPARE(gameState.getPeriod(), expectedPeriod);
     QCOMPARE(gameState.isFinished(), expectedFinished);
     QCOMPARE(gameState.getTextState(), expectedTextState);
-
-    delete source;
 }
 
 void TestRecordingExtender::test_parseMlb_data(void)
@@ -788,7 +786,7 @@ void TestRecordingExtender::test_parseMlb(void)
     QFETCH(QString, expectedTextState);
 
     m_nowForTest = QDateTime::fromString(nowForTest, Qt::ISODate);
-    auto* source = new TestRecExtMlbDataSource(this);
+    auto source = std::make_unique<TestRecExtMlbDataSource>(this);
 
     SportInfo info {"MLB Baseball", AutoExtendType::MLB, "sport", "league"};
     ActiveGame game(0, "MLB Baseball", info);
@@ -832,8 +830,6 @@ void TestRecordingExtender::test_parseMlb(void)
     QCOMPARE(gameState.getPeriod(), expectedPeriod);
     QCOMPARE(gameState.isFinished(), expectedFinished);
     QCOMPARE(gameState.getTextState(), expectedTextState);
-
-    delete source;
 }
 
 void TestRecordingExtender::test_processNewRecordings_data(void)

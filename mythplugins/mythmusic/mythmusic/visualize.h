@@ -78,7 +78,7 @@ class VisualBase
 
     virtual bool draw( QPainter *, const QColor & ) = 0;
     virtual void resize( const QSize &size ) = 0;
-    virtual void handleKeyPress(const QString &action) = 0;
+    virtual void handleKeyPress([[maybe_unused]] const QString &action) { };
     virtual int getDesiredFPS(void) { return m_fps; }
     // Override this if you need the potential of capturing more data than the default
     virtual unsigned long getDesiredSamples(void) { return SAMPLES_DEFAULT_SIZE; }
@@ -117,7 +117,6 @@ class StereoScope : public VisualBase
     void resize( const QSize &size ) override; // VisualBase
     bool process( VisualNode *node ) override; // VisualBase
     bool draw( QPainter *p, const QColor &back ) override; // VisualBase
-    void handleKeyPress([[maybe_unused]] const QString &action) override {}; // VisualBase
 
   protected:
     QColor         m_startColor  {Qt::yellow};
@@ -161,7 +160,7 @@ public:
     unsigned long m_offset {0};          // node offset for draw
     short         *m_right {nullptr};
     QFont         m_font;       // optional text overlay
-    bool          m_showtext {true};
+    bool          m_showtext {false};
     MusicMetadata *m_currentMetadata {nullptr};
     unsigned long m_duration {60000}; // file length in milliseconds
     unsigned int  m_lastx    {1920};  // vert line tracker
@@ -206,9 +205,16 @@ class MelScale
     static double hz2mel(double hz) { return 1127 * log(1 + hz / 700); }
     static double mel2hz(double mel) { return 700 * (exp(mel / 1127) - 1); }
     int operator[](int index);
+    QString note(int note);     // text of note, 0 - 125
+    int pixel(int note);        // position of note
+    int freq(int note);         // frequency of note
 
   private:
-    std::vector<int> m_indices;
+    std::vector<int> m_indices;      // FFT bin of each pixel
+    std::array<QString, 12> m_notes  // one octave of notes
+    = {"C", ".", "D", ".", "E", "F", ".", "G", ".", "A", ".", "B"};
+    std::array<int,126> m_pixels {0}; // pixel of each note
+    std::array<int,126> m_freqs {0};  // frequency of each note
     int  m_scale       {0};
     int  m_range       {0};
 };
@@ -231,7 +237,7 @@ class Spectrogram : public VisualBase
     bool process( VisualNode *node ) override;
     bool draw(QPainter *p, const QColor &back = Qt::black) override;
     void handleKeyPress(const QString &action) override;
-    // {(void) action;}
+
     static QImage s_image;      // picture of spectrogram
     static int    s_offset;     // position on screen
 
@@ -239,9 +245,10 @@ class Spectrogram : public VisualBase
     static inline double clamp(double cur, double max, double min);
     QImage         *m_image;              // picture in use
     QSize          m_sgsize {1920, 1080}; // picture size
-    QSize          m_size;                // displayed dize
+    QSize          m_size;                // displayed size
     MelScale       m_scale;               // Y-axis
     int            m_fftlen {16 * 1024}; // window width
+    int            m_color {0};          // color or grayscale
     QVector<float> m_sigL;               // decaying signal window
     QVector<float> m_sigR;
     FFTSample*     m_dftL { nullptr }; // real in, complex out
@@ -252,6 +259,7 @@ class Spectrogram : public VisualBase
     std::array<int,256*6> m_blue  {0};
     bool           m_binpeak { true }; // peak of bins, else mean
     bool           m_history { true }; // spectrogram? or spectrum
+    bool           m_showtext {false}; // freq overlay?
 };
 
 class Spectrum : public VisualBase
@@ -268,7 +276,6 @@ class Spectrum : public VisualBase
     bool process(VisualNode *node) override; // VisualBase
     bool processUndisplayed(VisualNode *node) override; // VisualBase
     bool draw(QPainter *p, const QColor &back = Qt::black) override; // VisualBase
-    void handleKeyPress([[maybe_unused]] const QString &action) override {}; // VisualBase
 
   protected:
     static inline double clamp(double cur, double max, double min);
@@ -303,7 +310,6 @@ class Squares : public Spectrum
 
     void resize (const QSize &newsize) override; // Spectrum
     bool draw(QPainter *p, const QColor &back = Qt::black) override; // Spectrum
-    void handleKeyPress([[maybe_unused]] const QString &action) override {}; // Spectrum
 
   private:
     void drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h);
@@ -355,7 +361,6 @@ struct piano_key_data {
     unsigned long getDesiredSamples(void) override; // VisualBase
 
     bool draw(QPainter *p, const QColor &back = Qt::black) override; // VisualBase
-    void handleKeyPress([[maybe_unused]] const QString &action) override {}; // VisualBase
 
   protected:
     static inline double clamp(double cur, double max, double min);
@@ -415,7 +420,6 @@ class Blank : public VisualBase
     void resize(const QSize &size) override; // VisualBase
     bool process(VisualNode *node = nullptr) override; // VisualBase
     bool draw(QPainter *p, const QColor &back = Qt::black) override; // VisualBase
-    void handleKeyPress([[maybe_unused]] const QString &action) override {}; // VisualBase
 
   private:
     QSize m_size;

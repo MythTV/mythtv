@@ -1041,10 +1041,10 @@ class SignalTimeout : public CaptureCardSpinBoxSetting
                         "a signal when scanning for channels."));
     };
     // Handle non-integer seconds
-    template<typename T, typename = typename std::enable_if<std::is_floating_point<T>::value>::type >
+    template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>> >
     SignalTimeout(const CaptureCard &parent, std::chrono::milliseconds value, std::chrono::duration<T> min_secs) :
         SignalTimeout(parent, value, duration_cast<std::chrono::milliseconds>(min_secs)) {};
-    template<typename T, typename = typename std::enable_if<std::is_floating_point<T>::value>::type >
+    template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>> >
     SignalTimeout(const CaptureCard &parent, std::chrono::duration<T> value, std::chrono::duration<T> min_secs) :
         SignalTimeout(parent,
                       duration_cast<std::chrono::milliseconds>(value),
@@ -1067,10 +1067,10 @@ class ChannelTimeout : public CaptureCardSpinBoxSetting
                         "exceeded, the recording will be marked as failed."));
     };
     // Handle non-integer seconds
-    template<typename T, typename = typename std::enable_if<std::is_floating_point<T>::value>::type >
+    template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>> >
     ChannelTimeout(const CaptureCard &parent, std::chrono::milliseconds value, std::chrono::duration<T> min_secs) :
         ChannelTimeout(parent, value, duration_cast<std::chrono::milliseconds>(min_secs)) {};
-    template<typename T, typename = typename std::enable_if<std::is_floating_point<T>::value>::type >
+    template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>> >
     ChannelTimeout(const CaptureCard &parent, std::chrono::duration<T> value, std::chrono::duration<T> min_secs) :
         ChannelTimeout(parent, value, duration_cast<std::chrono::milliseconds>(min_secs)) {};
 };

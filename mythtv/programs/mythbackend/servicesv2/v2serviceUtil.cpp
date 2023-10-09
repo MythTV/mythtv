@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 
 // MythTV
+#include "libmythbase/compat.h"
 #include "libmythbase/mythscheduler.h"
 #include "libmythbase/programinfo.h"
 #include "libmythbase/programtypes.h"
