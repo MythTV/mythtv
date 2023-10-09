@@ -182,7 +182,7 @@ void MelScale::setMax(int maxscale, int maxrange, int maxfreq)
         //     .arg(maxmel).arg(hzperbin).arg(hz).arg(i).arg(bin));
 
         if (hz > freq) { // map note to pixel location for note labels
-            m_freqs[note] = int(freq + 0.5);
+            m_freqs[note] = lround(freq);
             m_pixels[note++] = i;
             freq *= next;
         }
@@ -197,7 +197,7 @@ int MelScale::operator[](int index)
 QString MelScale::note(int note)
 {
     if (note < 0 || note > 125)
-        return QString("");
+        return {};
     return m_notes[note % 12];
 }
 
@@ -1089,10 +1089,12 @@ bool Spectrogram::process(VisualNode */*node*/)
                                  80, 80, Qt::AlignVCenter|Qt::AlignLeft,
                                  QString("%1").arg(m_scale.freq(i)));
                 if (m_scale.note(i) != ".")
+                {
                     painter.drawText(half + 100, -1 * now - 40,
                                      80, 80, Qt::AlignVCenter|Qt::AlignLeft,
                                      QString("%1%2").arg(m_scale.note(i))
                                      .arg(int(i / 12)));
+                }
                 prev = now;
             }
         }
