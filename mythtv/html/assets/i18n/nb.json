@@ -56,6 +56,7 @@
             "edit_rule": "Rediger opptaksregel",
             "episode": "Episode",
             "file_size": "Filstørrelse",
+            "filename_label": "Filnavn",
             "filter": "Filter",
             "heading": "Opptak",
             "inetref": "InetRef",

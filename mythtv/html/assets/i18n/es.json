@@ -56,6 +56,7 @@
             "edit_rule": "Editar regla de grabación",
             "episode": "Episodio",
             "file_size": "Tamaño del archivo",
+            "filename_label": "Nombre del archivo",
             "filter": "Filtrar",
             "heading": "Grabaciones",
             "inetref": "InetRef",

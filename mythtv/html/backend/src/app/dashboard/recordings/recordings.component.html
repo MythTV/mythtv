@@ -172,6 +172,12 @@
                 </p-dropdown>
             </div>
 
+            <div class="form-group field">
+                <label for="FileName" class="label block">{{ 'dashboard.recordings.filename_label' | translate
+                    }}</label>
+                <pre>{{ program.FileName}}</pre>
+            </div>
+
             <ng-template pTemplate="footer">
                 <div class="col-12" style="text-align: left;">
                     <p-message *ngIf="successCount > 0 && errorCount == 0 && !recsform.dirty" severity="success"

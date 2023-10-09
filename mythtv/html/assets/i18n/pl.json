@@ -56,6 +56,7 @@
             "edit_rule": "Edytuj regułę nagrywania",
             "episode": "Epizod",
             "file_size": "Rozmiar pliku",
+            "filename_label": "Nazwa pliku",
             "filter": "Filtr",
             "heading": "Nagrania",
             "inetref": "InetRef",

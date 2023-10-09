@@ -56,6 +56,7 @@
             "edit_rule": "記録ルールの編集",
             "episode": "エピソード",
             "file_size": "ファイルサイズ",
+            "filename_label": "ファイル名",
             "filter": "フィルター",
             "heading": "録音",
             "inetref": "InetRef",

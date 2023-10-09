@@ -56,6 +56,7 @@
             "edit_rule": "Kayıt Kuralını Düzenle",
             "episode": "Bölüm",
             "file_size": "Dosya boyutu",
+            "filename_label": "Dosya adı",
             "filter": "filtre",
             "heading": "kayıtlar",
             "inetref": "InetRef",

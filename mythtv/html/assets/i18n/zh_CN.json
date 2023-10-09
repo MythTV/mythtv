@@ -56,6 +56,7 @@
             "edit_rule": "编辑录音规则",
             "episode": "插曲",
             "file_size": "文件大小",
+            "filename_label": "文件名",
             "filter": "筛选",
             "heading": "录音",
             "inetref": "InetRef",

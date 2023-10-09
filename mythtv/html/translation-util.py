@@ -34,7 +34,6 @@ from flatten_dict import unflatten
 US_LANG = ('en_US', 'en_US.json', 'English US')
 
 DEST_LANGS = [
-            ('af',    'af.json',    'Afrikaans'),
             ('bg',    'bg.json',    'Bulgarian'),
             ('ca',    'ca.json',    'Catalan'),
             ('cs',    'cs.json',    'Czech'),

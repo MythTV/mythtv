@@ -56,6 +56,7 @@
             "edit_rule": "Muokkaa tallennussääntöä",
             "episode": "Jakso",
             "file_size": "Tiedoston koko",
+            "filename_label": "Tiedoston nimi",
             "filter": "Suodattaa",
             "heading": "Tallenteet",
             "inetref": "InetRef",
