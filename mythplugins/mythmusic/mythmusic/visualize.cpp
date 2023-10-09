@@ -1079,8 +1079,10 @@ bool Spectrogram::process(VisualNode */*node*/)
         int prev = -30;
         for (auto i = 0; i < 125; i++) // 125 notes fit in 22050 Hz
         {
+	    if (i < 72 && m_scale.note(i) == ".") // skip low sharps
+	      continue;
             int now = m_scale.pixel(i);
-            if (now >= prev + 20) { // all won't fit in bass
+            if (now >= prev + 20) { // skip until good spacing
                 painter.drawText(half + 20, -1 * now - 40,
                                  80, 80, Qt::AlignVCenter|Qt::AlignLeft,
                                  QString("%1").arg(m_scale.freq(i)));
