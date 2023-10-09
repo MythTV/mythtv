@@ -3948,6 +3948,16 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1378")
+    {
+        DBUpdates updates {
+            "CREATE INDEX dir_id ON gallery_files (dir_id);"
+        };
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1379", dbver))
+            return false;
+    }
+
     return true;
 }
 
