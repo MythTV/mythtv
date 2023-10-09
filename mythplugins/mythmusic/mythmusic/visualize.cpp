@@ -1071,9 +1071,11 @@ bool Spectrogram::process(VisualNode */*node*/)
             painter.drawText(m_scale.pixel(i) - 20, half - (i % 12) * 15 - 40,
                              40, 40, Qt::AlignCenter, m_scale.note(i));
             if (i % 12 == 5)    // octave numbers
+            {
                 painter.drawText(m_scale.pixel(i) - 20, half - 220,
                                  40, 40, Qt::AlignCenter,
                                  QString("%1").arg(int(i / 12)));
+            }
         }
         painter.rotate(90);     // frequency in Hz draws down
         int prev = -30;
