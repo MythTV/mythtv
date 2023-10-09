@@ -205,11 +205,16 @@ class MelScale
     static double hz2mel(double hz) { return 1127 * log(1 + hz / 700); }
     static double mel2hz(double mel) { return 700 * (exp(mel / 1127) - 1); }
     int operator[](int index);
-    int pixel(int note);
+    QString note(int note);     // text of note, 0 - 125
+    int pixel(int note);        // position of note
+    int freq(int note);         // frequency of note
 
   private:
     std::vector<int> m_indices;      // FFT bin of each pixel
-    std::array<int,144> m_notes {0}; // pixel of each note
+    std::array<QString, 12> m_notes  // one octave of notes
+    = {"C", ".", "D", ".", "E", "F", ".", "G", ".", "A", ".", "B"};
+    std::array<int,126> m_pixels {0}; // pixel of each note
+    std::array<int,126> m_freqs {0};  // frequency of each note
     int  m_scale       {0};
     int  m_range       {0};
 };
@@ -242,8 +247,6 @@ class Spectrogram : public VisualBase
     QSize          m_sgsize {1920, 1080}; // picture size
     QSize          m_size;                // displayed size
     MelScale       m_scale;               // Y-axis
-    std::array<QString, 12> m_notes       // one octave
-    = {"C", ".", "D", ".", "E", "F", ".", "G", ".", "A", ".", "B"};
     int            m_fftlen {16 * 1024}; // window width
     int            m_color {0};          // color or grayscale
     QVector<float> m_sigL;               // decaying signal window

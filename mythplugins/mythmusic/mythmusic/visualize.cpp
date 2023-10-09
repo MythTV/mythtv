@@ -182,7 +182,8 @@ void MelScale::setMax(int maxscale, int maxrange, int maxfreq)
         //     .arg(maxmel).arg(hzperbin).arg(hz).arg(i).arg(bin));
 
         if (hz > freq) { // map note to pixel location for note labels
-            m_notes[note++] = i;
+            m_freqs[note] = int(freq + 0.5);
+            m_pixels[note++] = i;
             freq *= next;
         }
     }
@@ -193,11 +194,25 @@ int MelScale::operator[](int index)
     return m_indices[index];
 }
 
+QString MelScale::note(int note)
+{
+    if (note < 0 || note > 125)
+        return QString("");
+    return m_notes[note % 12];
+}
+
 int MelScale::pixel(int note)
 {
-    if (note < 0 || note > 143)
+    if (note < 0 || note > 125)
         return 0;
-    return m_notes[note];
+    return m_pixels[note];
+}
+
+int MelScale::freq(int note)
+{
+    if (note < 0 || note > 125)
+        return 0;
+    return m_freqs[note];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1046,23 +1061,36 @@ bool Spectrogram::process(VisualNode */*node*/)
             }
         }
     } else {
+        // static std::array<int, 5> treble = {52, 55, 59, 62, 65};
+        // for (auto i = 0; i < 5; i++) {
+        //     painter.drawLine(m_scale.pixel(treble[i]), 0,
+        //                      m_scale.pixel(treble[i]), m_sgsize.height());
+        // }
         for (auto i = 0; i < 125; i++) // 125 notes fit in 22050 Hz
         {                  // let Qt center the note text on the pixel
             painter.drawText(m_scale.pixel(i) - 20, half - (i % 12) * 15 - 40,
-                             40, 40, Qt::AlignCenter, m_notes[i % 12]);
+                             40, 40, Qt::AlignCenter, m_scale.note(i));
             if (i % 12 == 5)    // octave numbers
                 painter.drawText(m_scale.pixel(i) - 20, half - 220,
                                  40, 40, Qt::AlignCenter,
                                  QString("%1").arg(int(i / 12)));
         }
-        painter.rotate(90);     // frequency in Hz
-        for (auto i = 0; i < m_sgsize.width(); i += 20)
+        painter.rotate(90);     // frequency in Hz draws down
+        int prev = -30;
+        for (auto i = 0; i < 125; i++) // 125 notes fit in 22050 Hz
         {
-            painter.drawText(half + 50, -1 * i - 30, 60, 60, Qt::AlignCenter,
-                             QString("%1")
-                             .arg(m_scale[i] * 22050 / (m_fftlen/2))); // hack!!!
-            // QString("%1 %2 %3").arg(i).arg(m_scale[i])
-            // .arg(m_scale[i] * 22050 / (m_fftlen/2))); // hack!!!
+            int now = m_scale.pixel(i);
+            if (now >= prev + 20) { // all won't fit in bass
+                painter.drawText(half + 20, -1 * now - 40,
+                                 80, 80, Qt::AlignVCenter|Qt::AlignLeft,
+                                 QString("%1").arg(m_scale.freq(i)));
+                if (m_scale.note(i) != ".")
+                    painter.drawText(half + 100, -1 * now - 40,
+                                     80, 80, Qt::AlignVCenter|Qt::AlignLeft,
+                                     QString("%1%2").arg(m_scale.note(i))
+                                     .arg(int(i / 12)));
+                prev = now;
+            }
         }
     }
     return false;
