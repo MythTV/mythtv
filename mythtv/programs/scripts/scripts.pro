@@ -6,7 +6,7 @@ TEMPLATE = aux
 # database backup/restore scripts are standalone
 #
 database_scripts.path = $${PREFIX}/share/mythtv
-database_scripts.files = database/*
+database_scripts.files = database/*pl
 INSTALLS += database_scripts
 
 #
@@ -40,6 +40,7 @@ using_bindings_python {
     for(name, DIR_NAMES) {
         PYTHON_SOURCES -= $$name
     }
+    PYTHON_SOURCES -= $$files("CMakeLists.txt", true)
 
     python_pathfix.output  = $${OBJECTS_DIR}/${QMAKE_FILE_NAME}
     python_pathfix.commands = $${QMAKE_COPY} ${QMAKE_FILE_NAME} $${OBJECTS_DIR}/${QMAKE_FILE_NAME} $$escape_expand(\n\t) \
@@ -78,6 +79,7 @@ using_bindings_python {
     }
 
     PYTHON_SOURCES += metadata/Music/*
+    PYTHON_SOURCES -= $$files("CMakeLists.txt", true)
 
     python_pathfix.output  = $${OBJECTS_DIR}/${QMAKE_FILE_NAME}
     python_pathfix.commands = $${QMAKE_COPY_DIR} ${QMAKE_FILE_NAME} $${OBJECTS_DIR}/${QMAKE_FILE_NAME}
