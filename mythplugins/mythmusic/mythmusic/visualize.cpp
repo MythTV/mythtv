@@ -666,8 +666,7 @@ void WaveForm::saveload(MusicMetadata *meta)
     m_position = 0;
     m_lastx = m_wfsize.width();
     m_font = QApplication::font();
-    // m_font.setPointSize(14);
-    m_font.setPixelSize(m_size.height() / 60); // small to be mostly unnoticed
+    m_font.setPixelSize(18);    // small to be mostly unnoticed
 }
 
 unsigned long WaveForm::getDesiredSamples(void)
@@ -1049,15 +1048,17 @@ bool Spectrogram::process(VisualNode */*node*/)
     painter.setFont(font);
     int half = m_sgsize.height() / 2;
 
-    if (m_history)              // currently unused in v34...
+    if (m_history)
     {
         for (auto h = m_sgsize.height(); h > 0; h -= half)
         {
             for (auto i = 0; i < half; i += 20)
             {
-                painter.drawText(0, h - i,
-                                 QString("...%1.%2.%3...").arg(i).arg(m_scale[i])
-                                 .arg(m_scale[i] * 22050 / (m_fftlen/2))); // hack!!!
+                painter.drawText(s_offset, h - i - 20, 255, 40,
+                                 Qt::AlignRight|Qt::AlignVCenter,
+                                 // QString("%1 %2").arg(m_scale[i])
+                                 QString("%1")
+                                 .arg(m_scale[i] * 22050 / (m_fftlen/2)));
             }
         }
     } else {
@@ -1081,8 +1082,8 @@ bool Spectrogram::process(VisualNode */*node*/)
         int prev = -30;
         for (auto i = 0; i < 125; i++) // 125 notes fit in 22050 Hz
         {
-	    if (i < 72 && m_scale.note(i) == ".") // skip low sharps
-	      continue;
+            if (i < 72 && m_scale.note(i) == ".") // skip low sharps
+              continue;
             int now = m_scale.pixel(i);
             if (now >= prev + 20) { // skip until good spacing
                 painter.drawText(half + 20, -1 * now - 40,
@@ -1287,7 +1288,8 @@ void Spectrogram::handleKeyPress(const QString &action)
 {
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("SG keypress = %1").arg(action));
 
-    if (action == "SELECT") {
+    if (action == "SELECT")
+    {
         if (m_history)
         {
             m_color = (m_color + 1) & 0x03; // left and right color bits
@@ -1296,6 +1298,10 @@ void Spectrogram::handleKeyPress(const QString &action)
         }
         else
             m_showtext = ! m_showtext;
+    }
+    if (action == "2")          // 1/3 is slower/faster, 2 should be unused
+    {
+        m_showtext = ! m_showtext;
     }
 }
 
