@@ -1054,7 +1054,9 @@ bool Spectrogram::process(VisualNode */*node*/)
         {
             for (auto i = 0; i < half; i += 20)
             {
-                painter.drawText(s_offset, h - i - 20, 255, 40,
+                painter.drawText(s_offset > m_sgsize.width() - 255
+                                 ? s_offset - m_sgsize.width() : s_offset,
+                                 h - i - 20, 255, 40,
                                  Qt::AlignRight|Qt::AlignVCenter,
                                  // QString("%1 %2").arg(m_scale[i])
                                  QString("%1")
