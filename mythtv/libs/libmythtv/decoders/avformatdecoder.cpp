@@ -2781,7 +2781,15 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 
     // Set release method
     AVBufferRef *buffer =
-        av_buffer_create((uint8_t*)frame, 0, release_avf_buffer, nd, 0);
+        av_buffer_create((uint8_t*)frame, 0,
+                         [](void* Opaque, uint8_t* Data)
+                             {
+                                 AvFormatDecoder *avfd = static_cast<AvFormatDecoder*>(Opaque);
+                                 VideoFrame *vf = reinterpret_cast<VideoFrame*>(Data);
+                                 if (avfd && avfd->GetPlayer())
+                                     avfd->GetPlayer()->DeLimboFrame(vf);
+                             }
+                         , nd, 0);
     pic->buf[0] = buffer;
 
     return 0;
