@@ -2766,7 +2766,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
-    VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
+    MythVideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
 
     for (int i = 0; i < 4; i++)
     {
@@ -2785,7 +2785,7 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
                          [](void* Opaque, uint8_t* Data)
                              {
                                  AvFormatDecoder *avfd = static_cast<AvFormatDecoder*>(Opaque);
-                                 VideoFrame *vf = reinterpret_cast<VideoFrame*>(Data);
+                                 MythVideoFrame *vf = reinterpret_cast<MythVideoFrame*>(Data);
                                  if (avfd && avfd->GetPlayer())
                                      avfd->GetPlayer()->DeLimboFrame(vf);
                              }
