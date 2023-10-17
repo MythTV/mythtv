@@ -32,7 +32,8 @@ class VideoOutputD3D : public MythVideoOutput
                       float        video_aspect,
                       MythCodecID  av_codec_id,
                       bool        &aspect_only,
-                      int          reference_frames) override; // VideoOutput
+                      int          reference_frames,
+                      bool         force_change) override; // VideoOutput
     void UpdatePauseFrame(std::chrono::milliseconds &disp_timecode, FrameScanType Scan = kScan_Progressive) override; // VideoOutput
     void EmbedInWidget(const QRect &rect) override; // VideoOutput
     void StopEmbedding(void) override; // VideoOutput

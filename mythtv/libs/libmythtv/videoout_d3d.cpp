@@ -109,7 +109,8 @@ bool VideoOutputD3D::InputChanged(const QSize &video_dim_buf,
                                   float        video_aspect,
                                   MythCodecID  av_codec_id,
                                   bool        &aspect_only,
-                                  int          [[maybe_unused]] reference_frames)
+                                  int          [[maybe_unused]] reference_frames,
+                                  bool         force_change)
 {
     QMutexLocker locker(&m_lock);
 
@@ -127,7 +128,7 @@ bool VideoOutputD3D::InputChanged(const QSize &video_dim_buf,
     bool res_changed = video_dim_disp != cursize;
     bool asp_changed = video_aspect   != m_window.GetVideoAspect();
 
-    if (!res_changed && !cid_changed)
+    if (!res_changed && !cid_changed && !force_change)
     {
         if (asp_changed)
         {
