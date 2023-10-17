@@ -2774,10 +2774,10 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
         pic->linesize[i] = 0;
     }
     pic->opaque      = frame;
-    frame->pix_fmt   = c->pix_fmt;
+    frame->m_pixFmt  = c->pix_fmt;
     pic->reordered_opaque = c->reordered_opaque;
-    pic->data[0] = (uint8_t*)frame->buf;
-    pic->data[3] = (uint8_t*)frame->buf;
+    pic->data[0] = (uint8_t*)frame->m_buffer;
+    pic->data[3] = (uint8_t*)frame->m_buffer;
 
     // Set release method
     AVBufferRef *buffer =
