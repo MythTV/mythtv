@@ -54,6 +54,9 @@
 #ifdef USING_EGL
 #include "mythdrmprimecontext.h"
 #endif
+#ifdef USING_DXVA2
+#include "videoout_d3d.h"
+#endif
 #include "mythcodeccontext.h"
 
 extern "C" {

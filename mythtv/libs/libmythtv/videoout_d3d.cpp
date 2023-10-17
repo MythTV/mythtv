@@ -45,7 +45,7 @@ void VideoOutputD3D::GetRenderOptions(RenderOptions &Options)
 }
 
 VideoOutputD3D::VideoOutputD3D(void)
-  : MythVideoOutput(),
+  : MythVideoOutput()
 {
     m_pauseFrame.m_buffer = nullptr;
 }

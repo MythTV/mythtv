@@ -5,8 +5,8 @@
 
 // MythTV headers
 #include "mythvideoout.h"
-#include "mythrender_d3d9.h"
-#include "mythpainter_d3d9.h"
+#include "libmythui/mythrender_d3d9.h"
+#include "libmythui/mythpainter_d3d9.h"
 
 #ifdef USING_DXVA2
 #include "dxva2decoder.h"

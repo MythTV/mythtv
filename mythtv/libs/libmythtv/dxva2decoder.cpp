@@ -3,7 +3,7 @@
 
 #include "libmythbase/mythlogging.h"
 #include "initguid.h"
-#include "mythrender_d3d9.h"
+#include "libmythui/mythrender_d3d9.h"
 #include "dxva2decoder.h"
 
 static const GUID IID_IDirectXVideoDecoderService =
