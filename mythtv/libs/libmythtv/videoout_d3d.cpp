@@ -91,13 +91,6 @@ void VideoOutputD3D::DestroyContext(void)
     m_renderValid = false;
     m_renderReset = false;
 
-    while (!m_pips.empty())
-    {
-        delete *m_pips.begin();
-        m_pips.erase(m_pips.begin());
-    }
-    m_pipReady.clear();
-
     if (m_video)
     {
         delete m_video;
@@ -346,23 +339,6 @@ void VideoOutputD3D::RenderFrame(MythVideoFrame *buffer,
             {
                 if (!dummy)
                     m_video->Draw();
-                QMap<MythPlayer*,D3D9Image*>::iterator it = m_pips.begin();
-                for (; it != m_pips.end(); ++it)
-                {
-                    if (m_pipReady[it.key()])
-                    {
-                        if (m_pipActive == *it)
-                        {
-                            QRect rect = (*it)->GetRect();
-                            if (!rect.isNull())
-                            {
-                                rect.adjust(-10, -10, 10, 10);
-                                m_render->DrawRect(rect, QColor(128,0,0,255), 255);
-                            }
-                        }
-                       (*it)->Draw();
-                    }
-                }
 
                 if (m_visual)
                     m_visual->Draw(GetTotalOSDBounds(), m_osdPainter, nullptr);
@@ -460,8 +436,7 @@ void VideoOutputD3D::UpdateFrame(MythVideoFrame *frame, D3D9Image *img)
     img->ReleaseBuffer();
 }
 
-void VideoOutputD3D::PrepareFrame(MythVideoFrame *frame, const PIPMap &pipPlayers,
-                                  FrameScanType scan)
+void VideoOutputD3D::PrepareFrame(MythVideoFrame *frame, FrameScanType scan)
 {
     if (!m_render || !m_video)
         return;
@@ -497,9 +472,6 @@ void VideoOutputD3D::PrepareFrame(MythVideoFrame *frame, const PIPMap &pipPlayer
     if (frame)
         dummy = frame->m_dummy;
 
-    if (!m_window.IsEmbedding())
-        ShowPIPs(pipPlayers);
-
     // Test the device
     m_renderValid |= m_render->Test(m_renderReset);
     if (m_renderReset)
@@ -525,83 +497,6 @@ void VideoOutputD3D::PrepareFrame(MythVideoFrame *frame, const PIPMap &pipPlayer
             m_render->CopyFrame(m_pauseSurface, m_video);
         }
     }
-}
-
-void VideoOutputD3D::ShowPIP(MythPlayer *pipplayer, PIPLocation loc)
-{
-    if (!pipplayer)
-        return;
-
-    int pipw, piph;
-    MythVideoFrame *pipimage = pipplayer->GetCurrentFrame(pipw, piph);
-    const float pipVideoAspect = pipplayer->GetVideoAspect();
-    const QSize pipVideoDim    = pipplayer->GetVideoBufferSize();
-    const bool  pipActive      = pipplayer->IsPIPActive();
-    const bool  pipVisible     = pipplayer->IsPIPVisible();
-    const uint  pipVideoWidth  = pipVideoDim.width();
-    const uint  pipVideoHeight = pipVideoDim.height();
-
-    if ((pipVideoAspect <= 0) || !pipimage ||
-        !pipimage->m_buffer || (pipimage->m_type != FMT_YV12) || !pipVisible)
-    {
-        pipplayer->ReleaseCurrentFrame(pipimage);
-        return;
-    }
-
-    QRect position = GetPIPRect(loc, pipplayer);
-
-    m_pipReady[pipplayer] = false;
-    D3D9Image *m_pip = m_pips[pipplayer];
-    if (!m_pip)
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialise PiP.");
-        m_pip = new D3D9Image(m_render, QSize(pipVideoWidth, pipVideoHeight),
-                              true);
-        m_pips[pipplayer] = m_pip;
-        if (!m_pip->IsValid())
-        {
-            pipplayer->ReleaseCurrentFrame(pipimage);
-            return;
-        }
-    }
-
-    QSize current = m_pip->GetSize();
-    if ((uint)current.width()  != pipVideoWidth ||
-        (uint)current.height() != pipVideoHeight)
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Re-initialise PiP.");
-        delete m_pip;
-        m_pip = new D3D9Image(m_render, QSize(pipVideoWidth, pipVideoHeight),
-                              true);
-        m_pips[pipplayer] = m_pip;
-        if (!m_pip->IsValid())
-        {
-            pipplayer->ReleaseCurrentFrame(pipimage);
-            return;
-        }
-    }
-    m_pip->UpdateVertices(position, QRect(0, 0, pipVideoWidth, pipVideoHeight),
-                          255, true);
-    UpdateFrame(pipimage, m_pip);
-    m_pipReady[pipplayer] = true;
-    if (pipActive)
-        m_pipActive = m_pip;
-
-    pipplayer->ReleaseCurrentFrame(pipimage);
-}
-
-void VideoOutputD3D::RemovePIP(MythPlayer *pipplayer)
-{
-    if (!m_pips.contains(pipplayer))
-        return;
-
-    QMutexLocker locker(&m_lock);
-
-    D3D9Image *m_pip = m_pips[pipplayer];
-    if (m_pip)
-        delete m_pip;
-    m_pipReady.remove(pipplayer);
-    m_pips.remove(pipplayer);
 }
 
 QStringList VideoOutputD3D::GetAllowedRenderers(

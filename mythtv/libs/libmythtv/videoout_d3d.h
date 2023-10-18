@@ -22,7 +22,7 @@ class VideoOutputD3D : public MythVideoOutput
     bool Init(const QSize &video_dim_buf, const QSize &video_dim_disp, float video_aspect,
               WId winid, const QRect &win_rect, MythCodecID codec_id) override; // VideoOutput
     void RenderFrame(MythVideoFrame *buffer, FrameScanType, OSD *osd) override; // VideoOutput
-    void PrepareFrame(MythVideoFrame *frame, const PIPMap &pipPlayers, FrameScanType scan) override; // VideoOutput
+    void PrepareFrame(MythVideoFrame *frame, FrameScanType scan) override; // VideoOutput
     void EndFrame() override;
     void WindowResized(const QSize &new_size) override; // VideoOutput
     bool InputChanged(const QSize &video_dim_buf,
@@ -41,10 +41,6 @@ class VideoOutputD3D : public MythVideoOutput
                                              bool no_acceleration,
                                              AVPixelFormat &pix_fmt);
 
-    void ShowPIP(MythPlayer  *pipplayer, PIPLocation  loc) override; // VideoOutput
-    void RemovePIP(MythPlayer *pipplayer) override; // VideoOutput
-    bool IsPIPSupported(void) const override // VideoOutput
-        { return true; }
     MythPainter *GetOSDPainter(void) override; // VideoOutput
 
     bool CanVisualise(AudioPlayer *audio, MythRender */*render*/) override // VideoOutput
@@ -76,10 +72,6 @@ class VideoOutputD3D : public MythVideoOutput
     D3D9Image              *m_video          {nullptr};
     bool                    m_renderValid    {false};
     bool                    m_renderReset    {false};
-
-    QMap<MythPlayer*,D3D9Image*> m_pips;
-    QMap<MythPlayer*,bool>       m_pipReady  {nullptr};
-    D3D9Image                   *m_pipActive {nullptr};
 
     MythD3D9Painter        *m_osdPainter     {nullptr};
 
