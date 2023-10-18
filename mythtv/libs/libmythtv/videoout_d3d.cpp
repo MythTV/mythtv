@@ -1,5 +1,8 @@
 // -*- Mode: c++ -*-
 
+#include <windows.h>
+#include <mmsystem.h>
+
 #include <map>
 #include <iostream>
 #include <algorithm>
@@ -8,7 +11,6 @@
 #include "libmythui/mythmainwindow.h"
 
 #include "fourcc.h"
-#include "mmsystem.h"
 #include "mythavutil.h"
 #include "mythplayer.h"
 #include "mythvideoprofile.h"
