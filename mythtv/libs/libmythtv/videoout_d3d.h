@@ -29,8 +29,7 @@ class VideoOutputD3D : public MythVideoOutput
                       const QSize &video_dim_disp,
                       float        video_aspect,
                       MythCodecID  av_codec_id,
-                      bool        &aspect_only,
-                      MythMultiLocker *Locks) override; // VideoOutput
+                      bool        &aspect_only) override; // VideoOutput
     void UpdatePauseFrame(std::chrono::milliseconds &disp_timecode, FrameScanType Scan = kScan_Progressive) override; // VideoOutput
     void EmbedInWidget(const QRect &rect) override; // VideoOutput
     void StopEmbedding(void) override; // VideoOutput

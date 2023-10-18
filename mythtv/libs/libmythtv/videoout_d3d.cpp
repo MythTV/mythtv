@@ -126,8 +126,7 @@ bool VideoOutputD3D::InputChanged(const QSize &video_dim_buf,
                                   const QSize &video_dim_disp,
                                   float        video_aspect,
                                   MythCodecID  av_codec_id,
-                                  bool        &aspect_only,
-                                  MythMultiLocker*)
+                                  bool        &aspect_only)
 {
     QMutexLocker locker(&m_lock);
 
