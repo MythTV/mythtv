@@ -129,7 +129,9 @@ export class BackendWarningComponent implements OnInit {
       .subscribe({
         next: data => {
           if (data.bool) {
-            this.retryCount = 12;
+            // each retry generates 2 errors
+            // this retry count approximates to number of seconds
+            this.retryCount = 30;
             this.getBackendInfo();
           }
           else
