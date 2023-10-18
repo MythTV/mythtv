@@ -655,7 +655,7 @@ void WaveForm::saveload(MusicMetadata *meta)
     if (s_image.isNull())
     {
         s_image = QImage(m_wfsize.width(), m_wfsize.height(), QImage::Format_RGB32);
-        s_image.fill(qRgb(0, 0, 0));
+        s_image.fill(Qt::black);
     }
     m_minl = 0;                 // drop last pixel, prepare for first
     m_maxl = 0;
@@ -847,9 +847,13 @@ void WaveForm::handleKeyPress(const QString &action)
 {
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("WF keypress = %1").arg(action));
 
-    if (action == "SELECT")
+    if (action == "SELECT" || action == "2")
     {
         m_showtext = ! m_showtext;
+    }
+    else if (action == "DELETE" && !s_image.isNull())
+    {
+        s_image.fill(Qt::black);
     }
 }
 
