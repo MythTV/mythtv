@@ -192,9 +192,6 @@ static float get_aspect(AVCParser &p)
 
 
 int  get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
-#ifdef USING_DXVA2
-int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags);
-#endif
 
 // currently unused
 //static int determinable_frame_size(struct AVCodecContext *avctx)
@@ -1367,33 +1364,6 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
 
     return static_cast<float>(detected);
 }
-
-#ifdef USING_DXVA2
-// Declared separately to allow attribute
-static enum AVPixelFormat get_format_dxva2(struct AVCodecContext *,
-                                           const enum AVPixelFormat *);
-
-enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
-                                    const enum AVPixelFormat *valid_fmts)
-{
-    AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
-    if (nd && nd->GetPlayer())
-    {
-        static uint8_t *dummy[1] = { nullptr };
-        avctx->hwaccel_context =
-            (dxva_context*)nd->GetPlayer()->GetDecoderContext(nullptr, dummy[0]);
-    }
-
-    while (*valid_fmts != AV_PIX_FMT_NONE) {
-        if (avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_DXVA2_VLD))
-            return AV_PIX_FMT_DXVA2_VLD;
-        if (not avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_YUV420P))
-            return AV_PIX_FMT_YUV420P;
-        valid_fmts++;
-    }
-    return AV_PIX_FMT_NONE;
-}
-#endif
 
 int AvFormatDecoder::GetMaxReferenceFrames(AVCodecContext *Context)
 {
