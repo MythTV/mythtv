@@ -21,8 +21,11 @@ class VideoOutputD3D : public MythVideoOutput
 
     bool Init(const QSize &video_dim_buf, const QSize &video_dim_disp, float video_aspect,
               WId winid, const QRect &win_rect, MythCodecID codec_id) override; // VideoOutput
-    void RenderFrame(MythVideoFrame *buffer, FrameScanType, OSD *osd) override; // VideoOutput
+    void RenderFrame(MythVideoFrame *buffer, FrameScanType) override; // VideoOutput
+    void RenderOverlays(OSD *osd) override; // VideoOutput
+    void RenderEnd() override; // VideoOutput
     void PrepareFrame(MythVideoFrame *frame, FrameScanType scan) override; // VideoOutput
+    void PrepareEnd() override; // VideoOutput
     void EndFrame() override;
     void WindowResized(const QSize &new_size) override; // VideoOutput
     bool InputChanged(const QSize &video_dim_buf,
@@ -42,12 +45,6 @@ class VideoOutputD3D : public MythVideoOutput
                                              AVPixelFormat &pix_fmt);
 
     MythPainter *GetOSDPainter(void) override; // VideoOutput
-
-    bool CanVisualise(AudioPlayer *audio, MythRender */*render*/) override // VideoOutput
-        { return MythVideoOutput::CanVisualise(audio, (MythRender*)m_render); }
-    bool SetupVisualisation(AudioPlayer *audio, MythRender */*render*/,
-                            const QString &name) override // VideoOutput
-        { return MythVideoOutput::SetupVisualisation(audio, (MythRender*)m_render, name); }
 
   private:
     void TearDown(void);

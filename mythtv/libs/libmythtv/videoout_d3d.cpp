@@ -299,8 +299,7 @@ bool VideoOutputD3D::CreatePauseFrame(void)
 }
 
 void VideoOutputD3D::RenderFrame(MythVideoFrame *buffer,
-                                 FrameScanType t,
-                                 [[maybe_unused]] OSD *osd)
+                                 FrameScanType t)
 {
     if (IsErrored())
     {
@@ -339,18 +338,23 @@ void VideoOutputD3D::RenderFrame(MythVideoFrame *buffer,
             {
                 if (!dummy)
                     m_video->Draw();
-
-                if (m_visual)
-                    m_visual->Draw(GetTotalOSDBounds(), m_osdPainter, nullptr);
-
-                if (osd && m_osdPainter && !m_window.IsEmbedding())
-                    osd->Draw(m_osdPainter, GetTotalOSDBounds().size(),
-                                    true);
-                m_render->End();
             }
         }
 
     }
+}
+
+void VideoOutputD3D::RenderOverlays(OSD *osd)
+{
+    if (osd && m_osdPainter && !m_window.IsEmbedding())
+        osd->Draw(m_osdPainter, GetTotalOSDBounds().size(), true);
+}
+
+void VideoOutputD3D::RenderEnd()
+{
+    if (!m_renderValid)
+        return;
+    m_render->End();
 }
 
 void VideoOutputD3D::EndFrame()
