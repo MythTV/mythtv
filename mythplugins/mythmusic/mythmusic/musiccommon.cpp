@@ -165,7 +165,10 @@ void MusicCommon::init(bool startPlayback)
     {
         if (!gPlayer->isPlaying())
         {
-            if (m_currentView == MV_RADIO)
+            if (m_currentView == MV_VISUALIZER ||
+                m_currentView == MV_VISUALIZERINFO) // keep playmode
+                gPlayer->setPlayMode(gPlayer->getPlayMode());
+            else if (m_currentView == MV_RADIO)
                 gPlayer->setPlayMode(MusicPlayer::PLAYMODE_RADIO);
             else if (m_currentView == MV_PLAYLISTEDITORGALLERY || m_currentView == MV_PLAYLISTEDITORTREE)
                 gPlayer->setPlayMode(MusicPlayer::PLAYMODE_TRACKSEDITOR);
