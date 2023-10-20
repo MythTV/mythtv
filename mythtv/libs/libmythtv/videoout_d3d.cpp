@@ -142,7 +142,7 @@ bool VideoOutputD3D::InputChanged(QSize        video_dim_buf,
     TearDown();
     QRect disp = GetDisplayVisibleRect();
     if (Init(video_dim_buf, video_dim_disp,
-             video_aspect, (WId)m_hWnd, disp, av_codec_id))
+             video_aspect, disp, av_codec_id))
     {
         return true;
     }
@@ -175,7 +175,7 @@ bool VideoOutputD3D::SetupContext()
 
 bool VideoOutputD3D::Init(QSize video_dim_buf,
                           QSize video_dim_disp,
-                          float video_aspect, WId winid,
+                          float video_aspect,
                           QRect win_rect,MythCodecID codec_id)
 {
     MythPainter *painter = GetMythPainter();
@@ -183,10 +183,10 @@ bool VideoOutputD3D::Init(QSize video_dim_buf,
         painter->FreeResources();
 
     QMutexLocker locker(&m_lock);
-    m_hWnd      = (HWND)winid;
+    m_hWnd      = (HWND)m_display->m_widget->winId();
 
     MythVideoOutput::Init(video_dim_buf, video_dim_disp,
-                          video_aspect, winid, win_rect, codec_id);
+                          video_aspect, win_rect, codec_id);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Init with codec: %1")
                          .arg(toString(codec_id)));

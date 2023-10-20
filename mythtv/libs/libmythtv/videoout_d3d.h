@@ -20,7 +20,7 @@ class VideoOutputD3D : public MythVideoOutput
    ~VideoOutputD3D();
 
     bool Init(QSize video_dim_buf, QSize video_dim_disp, float video_aspect,
-              WId winid, QRect win_rect, MythCodecID codec_id) override; // VideoOutput
+              QRect win_rect, MythCodecID codec_id) override; // VideoOutput
     void RenderFrame(MythVideoFrame *buffer, FrameScanType) override; // VideoOutput
     void RenderOverlays(OSD *osd) override; // VideoOutput
     void RenderEnd() override; // VideoOutput
