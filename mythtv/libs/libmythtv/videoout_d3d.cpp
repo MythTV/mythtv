@@ -227,7 +227,7 @@ bool VideoOutputD3D::CreateBuffers(void)
 bool VideoOutputD3D::InitBuffers(void)
 {
 #ifdef USING_DXVA2
-    if ((codec_is_dxva2(video_codec_id)) && m_decoder)
+    if ((codec_is_dxva2(m_videoCodecID)) && m_decoder)
     {
         QMutexLocker locker(&m_lock);
         const QSize video_dim = GetVideoDim();
@@ -462,7 +462,7 @@ bool VideoOutputD3D::CreateDecoder(void)
     if (m_decoder)
         DeleteDecoder();
     QSize video_dim = GetVideoDim();
-    m_decoder = new DXVA2Decoder(NUM_DXVA2_BUFS, video_codec_id,
+    m_decoder = new DXVA2Decoder(NUM_DXVA2_BUFS, m_videoCodecID,
                                  video_dim.width(), video_dim.height());
     return (m_decoder && m_decoder->Init(m_render));
 #else
