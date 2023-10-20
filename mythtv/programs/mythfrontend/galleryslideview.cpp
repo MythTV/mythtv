@@ -50,6 +50,9 @@ GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
     m_delay.setSingleShot(true);
     m_delay.setInterval(gCoreContext->GetDurSetting<std::chrono::milliseconds>("GalleryStatusDelay", 0s));
     connect(&m_delay, &QTimer::timeout, this, &GallerySlideView::ShowStatus);
+
+    MythMainWindow::DisableScreensaver();
+    LOG(VB_GUI, LOG_DEBUG, "Created Slideview");
 }
 
 
@@ -59,6 +62,7 @@ GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
 GallerySlideView::~GallerySlideView()
 {
     delete m_view;
+    MythMainWindow::RestoreScreensaver();
     LOG(VB_GUI, LOG_DEBUG, "Deleted Slideview");
 }
 
