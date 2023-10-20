@@ -41,8 +41,8 @@ void VideoOutputD3D::GetRenderOptions(RenderOptions &Options)
     Options.priorities->insert("direct3d", 70);
 
 #ifdef USING_DXVA2
-    if (opts.decoders->contains("dxva2"))
-        (*opts.safe_renderers)["dxva2"].append("direct3d");
+    if (Options.decoders->contains("dxva2"))
+        (*Options.safe_renderers)["dxva2"].append("direct3d");
 #endif
 }
 
