@@ -274,8 +274,7 @@ void VideoOutputD3D::RenderFrame(MythVideoFrame *buffer,
     m_renderValid = m_render->Test(m_renderReset);
     if (m_renderValid)
     {
-        QRect dvr = m_window.GetITVResizing() ? m_window.GetITVDisplayRect() :
-                                  GetDisplayVideoRect();
+        QRect dvr = GetDisplayVideoRect();
         bool ok = m_render->ClearBuffer();
         if (ok && !dummy)
             ok = m_video->UpdateVertices(dvr, GetVideoRect(),
