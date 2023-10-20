@@ -36,11 +36,10 @@ class VideoOutputD3D : public MythVideoOutput
     void UpdatePauseFrame(std::chrono::milliseconds &disp_timecode, FrameScanType Scan = kScan_Progressive) override; // VideoOutput
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
-    static MythCodecID GetBestSupportedCodec(uint width, uint height,
-                                             const QString &decoder,
-                                             uint stream_type,
-                                             bool no_acceleration,
-                                             AVPixelFormat &pix_fmt);
+    static MythCodecID GetSupportedCodec(AVCodecContext **Context,
+                                         const AVCodec ** Codec,
+                                         const QString &decoder,
+                                         uint stream_type);
 
   private:
     void TearDown(void);

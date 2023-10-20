@@ -442,17 +442,13 @@ QStringList VideoOutputD3D::GetAllowedRenderers(
     return list;
 }
 
-MythCodecID VideoOutputD3D::GetBestSupportedCodec(
-    uint width,       uint height, const QString &decoder,
-    uint stream_type, bool no_acceleration,
-    AVPixelFormat &pix_fmt)
+MythCodecID VideoOutputD3D::GetSupportedCodec(
+    AVCodecContext **Context, const AVCodec ** Codec,
+    const QString &decoder, uint stream_type)
 {
 #ifdef USING_DXVA2
-    QSize size(width, height);
-    bool use_cpu = no_acceleration;
     MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_DXVA2 + (stream_type - 1));
-    use_cpu |= !codec_is_dxva2_hw(test_cid);
-    pix_fmt = AV_PIX_FMT_DXVA2_VLD;
+    bool use_cpu = !codec_is_dxva2_hw(test_cid);
     if ((decoder == "dxva2") && !getenv("NO_DXVA2") && !use_cpu)
         return test_cid;
 #endif
