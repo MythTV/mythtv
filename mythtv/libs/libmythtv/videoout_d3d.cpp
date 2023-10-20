@@ -193,7 +193,6 @@ bool VideoOutputD3D::Init(QSize video_dim_buf,
 
     success &= CreateBuffers();
     success &= InitBuffers();
-    success &= CreatePauseFrame();
 
     MoveResize();
 
@@ -213,13 +212,13 @@ bool VideoOutputD3D::CreateBuffers(void)
 {
     if (codec_is_dxva2(m_videoCodecID))
     {
-        m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_DXVA2), false, 2, 1, 4);
+        m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_DXVA2), 2, 1, 4);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created %1 empty DXVA2 buffers.")
             .arg(VideoBuffers::GetNumBuffers(FMT_DXVA2)));
         return true;
     }
 
-    m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), true, kNeedFreeFrames,
+    m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), kNeedFreeFrames,
                   kPrebufferFramesNormal, kPrebufferFramesSmall);
     return true;
 
@@ -247,21 +246,6 @@ bool VideoOutputD3D::InitBuffers(void)
     return m_videoBuffers.CreateBuffers(FMT_YV12,
                                   GetVideoDim().width(),
                                   GetVideoDim().height());
-}
-
-bool VideoOutputD3D::CreatePauseFrame(void)
-{
-    if (codec_is_dxva2(m_videoCodecID))
-        return true;
-
-    init(&m_pauseFrame, FMT_YV12,
-         new unsigned char[m_videoBuffers.GetScratchFrame()->m_bufferSize + 128],
-         m_videoBuffers.GetScratchFrame()->m_width,
-         m_videoBuffers.GetScratchFrame()->m_height,
-         m_videoBuffers.GetScratchFrame()->m_bufferSize);
-
-    m_pauseFrame.m_frameNumber = m_videoBuffers.GetScratchFrame()->m_frameNumber;
-    return true;
 }
 
 void VideoOutputD3D::RenderFrame(MythVideoFrame *buffer,

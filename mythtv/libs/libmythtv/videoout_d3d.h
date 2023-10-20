@@ -47,7 +47,6 @@ class VideoOutputD3D : public MythVideoOutput
     bool SetupContext(void);
     bool CreateBuffers(void);
     bool InitBuffers(void);
-    bool CreatePauseFrame(void);
     void SetProfile(void);
     void DestroyContext(void);
     void UpdateFrame(MythVideoFrame *frame, D3D9Image *img);
