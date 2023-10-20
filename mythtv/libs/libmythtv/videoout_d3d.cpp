@@ -104,8 +104,8 @@ void VideoOutputD3D::DestroyContext(void)
     }
 }
 
-bool VideoOutputD3D::InputChanged(const QSize &video_dim_buf,
-                                  const QSize &video_dim_disp,
+bool VideoOutputD3D::InputChanged(QSize        video_dim_buf,
+                                  QSize        video_dim_disp,
                                   float        video_aspect,
                                   MythCodecID  av_codec_id,
                                   bool        &aspect_only,
@@ -114,19 +114,19 @@ bool VideoOutputD3D::InputChanged(const QSize &video_dim_buf,
 {
     QMutexLocker locker(&m_lock);
 
-    QSize cursize = m_window.GetVideoDim();
+    QSize cursize = GetVideoDim();
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("InputChanged from %1: %2x%3 aspect %4 to %5: %6x%7 aspect %9")
             .arg(toString(m_videoCodecID)).arg(cursize.width())
-            .arg(cursize.height()).arg(m_window.GetVideoAspect())
+            .arg(cursize.height()).arg(GetVideoAspect())
             .arg(toString(av_codec_id)).arg(video_dim_disp.width())
             .arg(video_dim_disp.height()).arg(video_aspect));
 
 
     bool cid_changed = (m_videoCodecID != av_codec_id);
     bool res_changed = video_dim_disp != cursize;
-    bool asp_changed = video_aspect   != m_window.GetVideoAspect();
+    bool asp_changed = video_aspect   != GetVideoAspect();
 
     if (!res_changed && !cid_changed && !force_change)
     {
@@ -140,7 +140,7 @@ bool VideoOutputD3D::InputChanged(const QSize &video_dim_buf,
     }
 
     TearDown();
-    QRect disp = m_window.GetDisplayVisibleRect();
+    QRect disp = GetDisplayVisibleRect();
     if (Init(video_dim_buf, video_dim_disp,
              video_aspect, (WId)m_hWnd, disp, av_codec_id))
     {
@@ -157,9 +157,9 @@ bool VideoOutputD3D::SetupContext()
 {
     QMutexLocker locker(&m_lock);
     DestroyContext();
-    QSize size = m_window.GetVideoDim();
+    QSize size = GetVideoDim();
     m_render = new MythRenderD3D9();
-    if (!(m_render && m_render->Create(m_window.GetDisplayVisibleRect().size(),
+    if (!(m_render && m_render->Create(GetDisplayVisibleRect().size(),
                                  m_hWnd)))
         return false;
 
@@ -173,10 +173,10 @@ bool VideoOutputD3D::SetupContext()
     return true;
 }
 
-bool VideoOutputD3D::Init(const QSize &video_dim_buf,
-                          const QSize &video_dim_disp,
+bool VideoOutputD3D::Init(QSize video_dim_buf,
+                          QSize video_dim_disp,
                           float video_aspect, WId winid,
-                          const QRect &win_rect,MythCodecID codec_id)
+                          QRect win_rect,MythCodecID codec_id)
 {
     MythPainter *painter = GetMythPainter();
     if (painter)
@@ -186,7 +186,7 @@ bool VideoOutputD3D::Init(const QSize &video_dim_buf,
     m_hWnd      = (HWND)winid;
 
     MythVideoOutput::Init(video_dim_buf, video_dim_disp,
-                      video_aspect, winid, win_rect, codec_id);
+                          video_aspect, winid, win_rect, codec_id);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Init with codec: %1")
                          .arg(toString(codec_id)));
@@ -254,7 +254,7 @@ bool VideoOutputD3D::InitBuffers(void)
     if ((codec_is_dxva2(video_codec_id)) && m_decoder)
     {
         QMutexLocker locker(&m_lock);
-        const QSize video_dim = window.GetVideoDim();
+        const QSize video_dim = GetVideoDim();
         bool ok = true;
         for (int i = 0; i < NUM_DXVA2_BUFS; i++)
         {
@@ -268,8 +268,8 @@ bool VideoOutputD3D::InitBuffers(void)
     }
 #endif
     return m_videoBuffers.CreateBuffers(FMT_YV12,
-                                  m_window.GetVideoDim().width(),
-                                  m_window.GetVideoDim().height());
+                                  GetVideoDim().width(),
+                                  GetVideoDim().height());
 }
 
 bool VideoOutputD3D::CreatePauseFrame(void)
@@ -314,10 +314,10 @@ void VideoOutputD3D::RenderFrame(MythVideoFrame *buffer,
     if (m_renderValid)
     {
         QRect dvr = m_window.GetITVResizing() ? m_window.GetITVDisplayRect() :
-                                  m_window.GetDisplayVideoRect();
+                                  GetDisplayVideoRect();
         bool ok = m_render->ClearBuffer();
         if (ok && !dummy)
-            ok = m_video->UpdateVertices(dvr, m_window.GetVideoRect(),
+            ok = m_video->UpdateVertices(dvr, GetVideoRect(),
                                          255, true);
 
         if (ok)
@@ -335,7 +335,7 @@ void VideoOutputD3D::RenderFrame(MythVideoFrame *buffer,
 
 void VideoOutputD3D::RenderOverlays(OSD *osd)
 {
-    if (osd && m_osdPainter && !m_window.IsEmbedding())
+    if (osd && m_osdPainter && !IsEmbedding())
         osd->Draw(m_osdPainter, GetTotalOSDBounds().size(), true);
 }
 
@@ -360,24 +360,7 @@ void VideoOutputD3D::EndFrame()
 
     m_renderValid = m_render->Test(m_renderReset);
     if (m_renderValid)
-        m_render->Present(m_window.IsEmbedding() ? m_hEmbedWnd : nullptr);
-}
-
-void VideoOutputD3D::EmbedInWidget(const QRect &rect)
-{
-    if (m_window.IsEmbedding())
-        return;
-
-    MythVideoOutput::EmbedInWidget(rect);
-    // TODO: Initialise m_hEmbedWnd?
-}
-
-void VideoOutputD3D::StopEmbedding(void)
-{
-    if (!m_window.IsEmbedding())
-        return;
-
-    MythVideoOutput::StopEmbedding();
+        m_render->Present(IsEmbedding() ? m_hEmbedWnd : nullptr);
 }
 
 void VideoOutputD3D::UpdatePauseFrame(std::chrono::milliseconds &disp_timecode, FrameScanType)
@@ -532,7 +515,7 @@ bool VideoOutputD3D::CreateDecoder(void)
     QMutexLocker locker(&m_lock);
     if (m_decoder)
         DeleteDecoder();
-    QSize video_dim = window.GetVideoDim();
+    QSize video_dim = GetVideoDim();
     m_decoder = new DXVA2Decoder(NUM_DXVA2_BUFS, video_codec_id,
                                  video_dim.width(), video_dim.height());
     return (m_decoder && m_decoder->Init(m_render));

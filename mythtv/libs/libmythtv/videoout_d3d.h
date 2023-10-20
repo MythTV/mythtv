@@ -19,24 +19,22 @@ class VideoOutputD3D : public MythVideoOutput
     VideoOutputD3D();
    ~VideoOutputD3D();
 
-    bool Init(const QSize &video_dim_buf, const QSize &video_dim_disp, float video_aspect,
-              WId winid, const QRect &win_rect, MythCodecID codec_id) override; // VideoOutput
+    bool Init(QSize video_dim_buf, QSize video_dim_disp, float video_aspect,
+              WId winid, QRect win_rect, MythCodecID codec_id) override; // VideoOutput
     void RenderFrame(MythVideoFrame *buffer, FrameScanType) override; // VideoOutput
     void RenderOverlays(OSD *osd) override; // VideoOutput
     void RenderEnd() override; // VideoOutput
     void PrepareFrame(MythVideoFrame *frame, FrameScanType scan) override; // VideoOutput
     void PrepareEnd() override; // VideoOutput
     void EndFrame() override;
-    bool InputChanged(const QSize &video_dim_buf,
-                      const QSize &video_dim_disp,
+    bool InputChanged(QSize        video_dim_buf,
+                      QSize        video_dim_disp,
                       float        video_aspect,
                       MythCodecID  av_codec_id,
                       bool        &aspect_only,
                       int          reference_frames,
                       bool         force_change) override; // VideoOutput
     void UpdatePauseFrame(std::chrono::milliseconds &disp_timecode, FrameScanType Scan = kScan_Progressive) override; // VideoOutput
-    void EmbedInWidget(const QRect &rect) override; // VideoOutput
-    void StopEmbedding(void) override; // VideoOutput
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
     static MythCodecID GetBestSupportedCodec(uint width, uint height,
