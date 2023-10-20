@@ -182,8 +182,6 @@ bool VideoOutputD3D::Init(QSize video_dim_buf,
 
     bool success = true;
     success &= SetupContext();
-    InitDisplayMeasurements(video_dim_disp.width(), video_dim_disp.height(),
-                            false);
 
     if (codec_is_dxva2(m_videoCodecID))
     {
