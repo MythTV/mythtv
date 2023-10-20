@@ -46,8 +46,10 @@ void VideoOutputD3D::GetRenderOptions(RenderOptions &Options)
 #endif
 }
 
-VideoOutputD3D::VideoOutputD3D(void)
-  : MythVideoOutput()
+VideoOutputD3D::VideoOutputD3D(MythMainWindow* MainWindow, MythRenderD3D9* Render,
+                   MythD3D9Painter* Painter, MythDisplay* Display,
+                   const MythVideoProfilePtr& VideoProfile, QString& Profile)
+  : MythVideoOutputGPU(MainWindow, Render, Painter, Display, VideoProfile, Profile)
 {
     m_pauseFrame.m_buffer = nullptr;
 }

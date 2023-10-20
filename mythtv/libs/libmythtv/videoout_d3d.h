@@ -4,7 +4,7 @@
 #define VIDEOOUT_D3D_H_
 
 // MythTV headers
-#include "mythvideoout.h"
+#include "mythvideooutgpu.h"
 #include "libmythui/mythrender_d3d9.h"
 #include "libmythui/mythpainter_d3d9.h"
 
@@ -12,11 +12,13 @@
 #include "dxva2decoder.h"
 #endif
 
-class VideoOutputD3D : public MythVideoOutput
+class VideoOutputD3D : public MythVideoOutputGPU
 {
   public:
     static void GetRenderOptions(RenderOptions &Options);
-    VideoOutputD3D();
+    VideoOutputD3D(MythMainWindow* MainWindow, MythRenderD3D9* Render,
+                   MythD3D9Painter* Painter, MythDisplay* Display,
+                   const MythVideoProfilePtr& VideoProfile, QString& Profile);
    ~VideoOutputD3D();
 
     bool Init(QSize video_dim_buf, QSize video_dim_disp, float video_aspect,
