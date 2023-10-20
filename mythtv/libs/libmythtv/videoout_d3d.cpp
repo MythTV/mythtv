@@ -104,19 +104,6 @@ void VideoOutputD3D::DestroyContext(void)
     }
 }
 
-void VideoOutputD3D::WindowResized(const QSize &new_size)
-{
-    // FIXME this now requires the context to be re-created
-    /*
-    QMutexLocker locker(&m_lock);
-    window.SetDisplayVisibleRect(QRect(QPoint(0, 0), new_size));
-    window.SetDisplayAspect(
-        ((float)new_size.width()) / new_size.height());
-
-    MoveResize();
-    */
-}
-
 bool VideoOutputD3D::InputChanged(const QSize &video_dim_buf,
                                   const QSize &video_dim_disp,
                                   float        video_aspect,

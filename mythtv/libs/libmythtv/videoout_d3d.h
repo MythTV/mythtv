@@ -27,7 +27,6 @@ class VideoOutputD3D : public MythVideoOutput
     void PrepareFrame(MythVideoFrame *frame, FrameScanType scan) override; // VideoOutput
     void PrepareEnd() override; // VideoOutput
     void EndFrame() override;
-    void WindowResized(const QSize &new_size) override; // VideoOutput
     bool InputChanged(const QSize &video_dim_buf,
                       const QSize &video_dim_disp,
                       float        video_aspect,
