@@ -22,7 +22,6 @@ class VideoOutputD3D : public MythVideoOutput
     bool Init(QSize video_dim_buf, QSize video_dim_disp, float video_aspect,
               QRect win_rect, MythCodecID codec_id) override; // VideoOutput
     void RenderFrame(MythVideoFrame *buffer, FrameScanType) override; // VideoOutput
-    void RenderOverlays(OSD *osd) override; // VideoOutput
     void RenderEnd() override; // VideoOutput
     void PrepareFrame(MythVideoFrame *frame, FrameScanType scan) override; // VideoOutput
     void PrepareEnd() override; // VideoOutput
@@ -61,7 +60,6 @@ class VideoOutputD3D : public MythVideoOutput
     QRecursiveMutex         m_lock;
 #endif
     HWND                    m_hWnd           {nullptr};
-    HWND                    m_hEmbedWnd      {nullptr};
     MythRenderD3D9         *m_render         {nullptr};
     D3D9Image              *m_video          {nullptr};
     bool                    m_renderValid    {false};

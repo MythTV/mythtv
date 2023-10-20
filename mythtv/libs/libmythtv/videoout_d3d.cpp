@@ -310,12 +310,6 @@ void VideoOutputD3D::RenderFrame(MythVideoFrame *buffer,
     }
 }
 
-void VideoOutputD3D::RenderOverlays(OSD *osd)
-{
-    if (osd && m_osdPainter && !IsEmbedding())
-        osd->Draw(m_osdPainter, GetTotalOSDBounds().size(), true);
-}
-
 void VideoOutputD3D::RenderEnd()
 {
     if (!m_renderValid)
