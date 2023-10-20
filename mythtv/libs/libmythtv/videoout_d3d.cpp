@@ -69,18 +69,6 @@ void VideoOutputD3D::TearDown(void)
         m_pauseFrame.m_buffer = nullptr;
     }
 
-    if (m_osdPainter)
-    {
-        // Hack to ensure that the osd painter is not
-        // deleted while image load thread is still busy
-        // loading images with that painter
-        m_osdPainter->Teardown();
-        if (invalid_osd_painter)
-            delete invalid_osd_painter;
-        invalid_osd_painter = m_osdPainter;
-        m_osdPainter = nullptr;
-    }
-
     DeleteDecoder();
     DestroyContext();
 }
@@ -211,18 +199,7 @@ bool VideoOutputD3D::Init(QSize video_dim_buf,
 
     if (!success)
         TearDown();
-    else
-    {
-        m_osdPainter = new MythD3D9Painter(m_render);
-        if (m_osdPainter)
-        {
-            m_osdPainter->SetSwapControl(false);
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Created D3D9 osd painter.");
-        }
-        else
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Failed to create D3D9 osd painter.");
-    }
+
     return success;
 }
 
@@ -485,11 +462,6 @@ QStringList VideoOutputD3D::GetAllowedRenderers(
         list += "direct3d";
     }
     return list;
-}
-
-MythPainter *VideoOutputD3D::GetOSDPainter(void)
-{
-    return m_osdPainter;
 }
 
 MythCodecID VideoOutputD3D::GetBestSupportedCodec(

@@ -43,8 +43,6 @@ class VideoOutputD3D : public MythVideoOutput
                                              bool no_acceleration,
                                              AVPixelFormat &pix_fmt);
 
-    MythPainter *GetOSDPainter(void) override; // VideoOutput
-
   private:
     void TearDown(void);
     bool SetupContext(void);
@@ -68,8 +66,6 @@ class VideoOutputD3D : public MythVideoOutput
     D3D9Image              *m_video          {nullptr};
     bool                    m_renderValid    {false};
     bool                    m_renderReset    {false};
-
-    MythD3D9Painter        *m_osdPainter     {nullptr};
 
     bool CreateDecoder(void);
     void DeleteDecoder(void);
