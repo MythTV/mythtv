@@ -1,6 +1,6 @@
 {
     "common": {
-        "back": "バック",
+        "back": "戻る",
         "backenderror": "バックエンドエラー。",
         "cancel": "キャンセル",
         "close": "近い",
@@ -13,7 +13,7 @@
             "equals": "完全に一致",
             "startswith": "で始まる"
         },
-        "help": "助けて",
+        "help": "ヘルプ",
         "instructions": "手順",
         "loading": "読み込み中",
         "networkfail": "エラー: バックエンドネットワーク障害",
@@ -156,7 +156,6 @@
             "startoffset_label": "開始時に録画する追加の分数",
             "starttime_label": "開始日時",
             "subtitle_label": "字幕",
-            "template_apply": "テンプレートの変更を適用",
             "template_label": "テンプレートを使用する",
             "title_label": "タイトル",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "テレビフォーマット",
             "freqid": "周波数ID",
             "freqid_desc": "チューナーが認識するチャンネル番号。",
+            "mplex_desc": "このチャネルを伝送するトランスポート ストリームのブロードキャスト周波数。同じストリームで多くのチャネルを伝送できます。",
+            "mplex_label": "マルチプレックス",
             "never-visible": "決して見えない",
             "new_channel": "新しいチャンネル",
             "not-visible": "見えない",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "ラインナップ内のチャンネルとデータベース内のチャンネルの間の正確な対応関係を取得するためにリスティング サービスによって使用される ID。通常、これは「mythfilldatabase」の実行時に自動的に設定されます。",
             "xmltvid_label": "XMLTV ID"
         },
+        "chanedit_advanced": "高度な設定",
         "channelscan": {
             "FEC_desc": "前方誤り訂正 (デフォルト: 自動)",
             "FEC_label": "FEC",

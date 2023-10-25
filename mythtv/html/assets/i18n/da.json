@@ -156,7 +156,6 @@
             "startoffset_label": "Antal ekstra minutter at optage ved start",
             "starttime_label": "Startdato og -tid",
             "subtitle_label": "Undertekst",
-            "template_apply": "Anvend skabelonændring",
             "template_label": "Brug skabelon",
             "title_label": "Titel",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "TV-format",
             "freqid": "Frekvens-id",
             "freqid_desc": "Kanalnummer som forstået af dine tunere.",
+            "mplex_desc": "Udsendelsesfrekvens for den transportstrøm, der fører denne kanal. Den samme strøm kan bære mange kanaler.",
+            "mplex_label": "Multiplex",
             "never-visible": "Aldrig synlig",
             "new_channel": "Ny kanal",
             "not-visible": "Ikke synlig",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "ID, der bruges til at liste tjenester til at få en nøjagtig overensstemmelse mellem en kanal i din line-up og en kanal i deres database. Normalt indstilles dette automatisk, når 'mythfilldatabase' køres.",
             "xmltvid_label": "XMLTV ID"
         },
+        "chanedit_advanced": "Avancerede indstillinger",
         "channelscan": {
             "FEC_desc": "Videresend fejlkorrektion (standard: Auto)",
             "FEC_label": "FEC",

@@ -17,7 +17,7 @@
         "instructions": "Bruksanvisning",
         "loading": "Laster",
         "networkfail": "FEIL: Backend Network Feil",
-        "next": "neste",
+        "next": "Neste",
         "no": "Nei",
         "nosave": "Lukk uten å lagre",
         "ok": "Ok",
@@ -156,7 +156,6 @@
             "startoffset_label": "Antall ekstra minutter å registrere ved start",
             "starttime_label": "Startdato og klokkeslett",
             "subtitle_label": "Undertekst",
-            "template_apply": "Bruk malendring",
             "template_label": "Bruk mal",
             "title_label": "Tittel",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "TV-format",
             "freqid": "Frekvens-ID",
             "freqid_desc": "Kanalnummer som forstått av tunerne.",
+            "mplex_desc": "Kringkastingsfrekvens for transportstrømmen som fører denne kanalen. Den samme strømmen kan bære mange kanaler.",
+            "mplex_label": "Multipleks",
             "never-visible": "Aldri synlig",
             "new_channel": "Ny kanal",
             "not-visible": "Ikke synlig",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "ID som brukes av listetjenester for å få en nøyaktig korrespondanse mellom en kanal i serien din og en kanal i databasen deres. Normalt settes dette automatisk når 'mythfilldatabase' kjøres.",
             "xmltvid_label": "XMLTV ID"
         },
+        "chanedit_advanced": "Avanserte innstillinger",
         "channelscan": {
             "FEC_desc": "Videresend feilretting (standard: Auto)",
             "FEC_label": "FEC",

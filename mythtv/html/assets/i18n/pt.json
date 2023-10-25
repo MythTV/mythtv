@@ -156,7 +156,6 @@
             "startoffset_label": "Número de minutos extras a serem registrados no início",
             "starttime_label": "Data e hora de início",
             "subtitle_label": "Legenda",
-            "template_apply": "Aplicar alteração de modelo",
             "template_label": "Usar modelo",
             "title_label": "Título",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "Formato de TV",
             "freqid": "ID de frequência",
             "freqid_desc": "Número do canal conforme entendido por seus sintonizadores.",
+            "mplex_desc": "Broadcast Frequência do fluxo de transporte que transporta este canal. O mesmo fluxo pode transportar vários canais.",
+            "mplex_label": "Multiplexação",
             "never-visible": "Nunca Visível",
             "new_channel": "Novo canal",
             "not-visible": "Não visível",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "ID usado pelos serviços de listagem para obter uma correspondência exata entre um canal em sua programação e um canal em seu banco de dados. Normalmente, isso é definido automaticamente quando 'mythfilldatabase' é executado.",
             "xmltvid_label": "ID XMLTV"
         },
+        "chanedit_advanced": "Configurações avançadas",
         "channelscan": {
             "FEC_desc": "Correção de erro de encaminhamento (Padrão: Auto)",
             "FEC_label": "FEC",

@@ -13,11 +13,11 @@
             "equals": "Täpne vaste",
             "startswith": "Alustab"
         },
-        "help": "ABI",
+        "help": "Abi",
         "instructions": "Juhised",
         "loading": "Laadimine",
         "networkfail": "VIGA: taustavõrgu tõrge",
-        "next": "Järgmine",
+        "next": "Edasi",
         "no": "Ei",
         "nosave": "Sulgege ilma salvestamata",
         "ok": "Okei",
@@ -156,7 +156,6 @@
             "startoffset_label": "Lisaminutite arv alguses",
             "starttime_label": "Alguskuupäev ja kellaaeg",
             "subtitle_label": "Alapealkiri",
-            "template_apply": "Rakenda malli muudatus",
             "template_label": "Kasutage malli",
             "title_label": "Pealkiri",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "TV formaat",
             "freqid": "Sagedus Id",
             "freqid_desc": "Kanali number, nagu teie tuunerid mõistavad.",
+            "mplex_desc": "Seda kanalit edastava transpordivoo leviedastussagedus. Sama voog võib kanda palju kanaleid.",
+            "mplex_label": "Multipleks",
             "never-visible": "Pole kunagi nähtav",
             "new_channel": "Uus kanal",
             "not-visible": "Pole nähtav",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "ID, mida loenditeenused kasutavad teie loendis oleva kanali ja nende andmebaasis oleva kanali vahelise täpse vastavuse saamiseks. Tavaliselt määratakse see automaatselt, kui käivitatakse mythfilldatabase.",
             "xmltvid_label": "XMLTV ID"
         },
+        "chanedit_advanced": "Täpsemad seaded",
         "channelscan": {
             "FEC_desc": "Edasisuunas veaparandus (vaikimisi: automaatne)",
             "FEC_label": "FEC",

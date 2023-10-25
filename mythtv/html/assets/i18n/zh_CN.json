@@ -156,7 +156,6 @@
             "startoffset_label": "开始时记录的额外分钟数",
             "starttime_label": "开始日期和时间",
             "subtitle_label": "字幕",
-            "template_apply": "应用模板更改",
             "template_label": "使用模板",
             "title_label": "标题",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "电视格式",
             "freqid": "频率 ID",
             "freqid_desc": "您的调谐器理解的频道号。",
+            "mplex_desc": "承载该频道的传输流的广播频率。同一个流可以承载多个通道。",
+            "mplex_label": "多路复用",
             "never-visible": "永远不可见",
             "new_channel": "新频道",
             "not-visible": "不可见",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "列表服务使用 ID 来获取您的节目中的频道与其数据库中的频道之间的精确对应关系。通常，这是在运行“mythfilldatabase”时自动设置的。",
             "xmltvid_label": "XMLTV ID"
         },
+        "chanedit_advanced": "高级设置",
         "channelscan": {
             "FEC_desc": "前向纠错（默认值：自动）",
             "FEC_label": "前向纠错",

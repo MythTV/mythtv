@@ -1,6 +1,6 @@
 {
     "common": {
-        "back": "indietro",
+        "back": "Til baka",
         "backenderror": "Backend villa.",
         "cancel": "Hætta við",
         "close": "Loka",
@@ -13,11 +13,11 @@
             "equals": "Nákvæm samsvörun",
             "startswith": "Byrjar með"
         },
-        "help": "Aiuto",
+        "help": "Hjálp",
         "instructions": "Leiðbeiningar",
         "loading": "Caricamento in corso",
         "networkfail": "VILLA: Backend Network Bilun",
-        "next": "Il prossimo",
+        "next": "Næst",
         "no": "Nei",
         "nosave": "Lokaðu án þess að vista",
         "ok": "Allt í lagi",
@@ -156,7 +156,6 @@
             "startoffset_label": "Fjöldi aukamínúta til að taka upp við upphaf",
             "starttime_label": "Upphafsdagur og tími",
             "subtitle_label": "Undirtitill",
-            "template_apply": "Notaðu sniðmátsbreytingu",
             "template_label": "Notaðu sniðmát",
             "title_label": "Titill",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "Sjónvarpssnið",
             "freqid": "Tíðni auðkenni",
             "freqid_desc": "Rásarnúmer eins og útvarpstækin þín skilja.",
+            "mplex_desc": "Útsendingartíðni flutningsstraumsins sem flytur þessa rás. Sami straumurinn getur borið margar rásir.",
+            "mplex_label": "Multiplex",
             "never-visible": "Aldrei sýnilegur",
             "new_channel": "Ný rás",
             "not-visible": "Ekki sýnilegt",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "Auðkenni notað til að skrá þjónustu til að fá nákvæma samsvörun milli rásar í línunni þinni og rásar í gagnagrunni þeirra. Venjulega er þetta stillt sjálfkrafa þegar 'mythfilldatabase' er keyrt.",
             "xmltvid_label": "XMLTV auðkenni"
         },
+        "chanedit_advanced": "Ítarlegar stillingar",
         "channelscan": {
             "FEC_desc": "Áfram villuleiðrétting (sjálfgefið: Sjálfvirkt)",
             "FEC_label": "FEC",

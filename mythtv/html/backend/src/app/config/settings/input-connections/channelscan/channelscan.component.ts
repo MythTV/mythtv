@@ -60,7 +60,7 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
   @Input() iconnection!: IconnectionComponent;
   @Input() videoSourceLookup!: VideoSource[];
   @ViewChild("scroll") scrollpanel!: ScrollPanel;
-  @ViewChild("statusPanel") statusPanel!: Fieldset;
+  // @ViewChild("statusPanel") statusPanel!: Fieldset;
 
   serviceValues = [
     new Sel("settings.channelscan.tv", "tv"),

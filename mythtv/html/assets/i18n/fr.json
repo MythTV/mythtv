@@ -1,6 +1,6 @@
 {
     "common": {
-        "back": "Retour",
+        "back": "Dos",
         "backenderror": "Erreur de back-end.",
         "cancel": "Annuler",
         "close": "Fermer",
@@ -13,7 +13,7 @@
             "equals": "Correspondance exacte",
             "startswith": "Commence avec"
         },
-        "help": "Aidez-moi",
+        "help": "Aide",
         "instructions": "Instructions",
         "loading": "Chargement",
         "networkfail": "ERREUR : Échec du réseau principal",
@@ -156,7 +156,6 @@
             "startoffset_label": "Nombre de minutes supplémentaires à enregistrer au début",
             "starttime_label": "Date et heure de début",
             "subtitle_label": "Sous-titre",
-            "template_apply": "Appliquer le changement de modèle",
             "template_label": "Utilise le modèle",
             "title_label": "Titre",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "Format de télévision",
             "freqid": "Identifiant de fréquence",
             "freqid_desc": "Numéro de canal tel que compris par vos tuners.",
+            "mplex_desc": "Fréquence de diffusion du flux de transport qui achemine ce canal. Le même flux peut transporter plusieurs chaînes.",
+            "mplex_label": "Multiplex",
             "never-visible": "Jamais visible",
             "new_channel": "Nouvelle chaîne",
             "not-visible": "Invisible",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "ID utilisé par les services de référencement pour obtenir une correspondance exacte entre une chaîne de votre line-up et une chaîne de leur base de données. Normalement, cela est défini automatiquement lorsque 'mythfilldatabase' est exécuté.",
             "xmltvid_label": "Identifiant XMLTV"
         },
+        "chanedit_advanced": "Réglages avancés",
         "channelscan": {
             "FEC_desc": "Correction d'erreur directe (par défaut : Auto)",
             "FEC_label": "FEC",

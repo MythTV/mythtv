@@ -156,7 +156,6 @@
             "startoffset_label": "Número de minutos adicionales para registrar al inicio",
             "starttime_label": "Fecha y hora de inicio",
             "subtitle_label": "Subtitular",
-            "template_apply": "Aplicar cambio de plantilla",
             "template_label": "Usar plantilla",
             "title_label": "Título",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "Formato de televisión",
             "freqid": "ID de frecuencia",
             "freqid_desc": "Número de canal tal como lo entienden sus sintonizadores.",
+            "mplex_desc": "Frecuencia de transmisión del flujo de transporte que transporta este canal. La misma transmisión puede transportar muchos canales.",
+            "mplex_label": "Multicine",
             "never-visible": "nunca visible",
             "new_channel": "Nuevo canal",
             "not-visible": "No visible",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "ID utilizado por los servicios de listado para obtener una correspondencia exacta entre un canal en su programación y un canal en su base de datos. Normalmente, esto se configura automáticamente cuando se ejecuta 'mythfilldatabase'.",
             "xmltvid_label": "ID de XMLTV"
         },
+        "chanedit_advanced": "Ajustes avanzados",
         "channelscan": {
             "FEC_desc": "Corrección de errores de reenvío (predeterminado: automático)",
             "FEC_label": "FEC",

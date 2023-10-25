@@ -1,6 +1,6 @@
 {
     "common": {
-        "back": "indietro",
+        "back": "Indietro",
         "backenderror": "Errore di back-end.",
         "cancel": "Annulla",
         "close": "Vicino",
@@ -17,7 +17,7 @@
         "instructions": "Istruzioni",
         "loading": "Caricamento in corso",
         "networkfail": "ERRORE: errore di rete back-end",
-        "next": "Il prossimo",
+        "next": "Prossimo",
         "no": "NO",
         "nosave": "Chiudi senza salvare",
         "ok": "OK",
@@ -156,7 +156,6 @@
             "startoffset_label": "Numero di minuti extra da registrare all'avvio",
             "starttime_label": "Data e ora di inizio",
             "subtitle_label": "Sottotitolo",
-            "template_apply": "Applicare la modifica del modello",
             "template_label": "Usa modello",
             "title_label": "Titolo",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "Formato televisivo",
             "freqid": "Frequenza ID",
             "freqid_desc": "Numero di canale come compreso dai tuoi sintonizzatori.",
+            "mplex_desc": "Broadcast Frequenza del flusso di trasporto che trasporta questo canale. Lo stesso flusso può trasportare molti canali.",
+            "mplex_label": "Multisala",
             "never-visible": "Mai Visibile",
             "new_channel": "Nuovo canale",
             "not-visible": "Non visibile",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "ID utilizzato dai servizi di quotazione per ottenere una corrispondenza esatta tra un canale nella tua line-up e un canale nel loro database. Normalmente questo viene impostato automaticamente quando viene eseguito 'mythfilldatabase'.",
             "xmltvid_label": "ID XMLTV"
         },
+        "chanedit_advanced": "Impostazioni avanzate",
         "channelscan": {
             "FEC_desc": "Correzione degli errori di inoltro (predefinito: Auto)",
             "FEC_label": "FEC",

@@ -156,7 +156,6 @@
             "startoffset_label": "Nombre de minuts addicionals per gravar a l'inici",
             "starttime_label": "Data i hora d'inici",
             "subtitle_label": "Subtítol",
-            "template_apply": "Aplica el canvi de plantilla",
             "template_label": "Utilitzeu la plantilla",
             "title_label": "Títol",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "Format TV",
             "freqid": "Id. de freqüència",
             "freqid_desc": "Número de canal tal com l'entenen els vostres sintonitzadors.",
+            "mplex_desc": "Freqüència de difusió del flux de transport que transporta aquest canal. El mateix flux pot portar molts canals.",
+            "mplex_label": "Multiplex",
             "never-visible": "Mai Visible",
             "new_channel": "Canal nou",
             "not-visible": "No visible",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "Identificador utilitzat per llistar els serveis per obtenir una correspondència exacta entre un canal de la vostra línia i un canal de la seva base de dades. Normalment això s'estableix automàticament quan s'executa 'mythfilldatabase'.",
             "xmltvid_label": "ID XMLTV"
         },
+        "chanedit_advanced": "Configuració avançada",
         "channelscan": {
             "FEC_desc": "Correcció d'errors de reenviament (per defecte: automàtic)",
             "FEC_label": "FEC",

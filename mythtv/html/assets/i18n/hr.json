@@ -17,7 +17,7 @@
         "instructions": "upute",
         "loading": "Učitavam",
         "networkfail": "POGREŠKA: Kvar pozadinske mreže",
-        "next": "sljedeći",
+        "next": "Sljedeći",
         "no": "Ne",
         "nosave": "Zatvori bez spremanja",
         "ok": "U redu",
@@ -156,7 +156,6 @@
             "startoffset_label": "Broj dodatnih minuta za snimanje na početku",
             "starttime_label": "Datum i vrijeme početka",
             "subtitle_label": "Titl",
-            "template_apply": "Primijeni promjenu predloška",
             "template_label": "Koristite predložak",
             "title_label": "Titula",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "TV format",
             "freqid": "ID frekvencije",
             "freqid_desc": "Broj kanala kako ga razumiju vaši tuneri.",
+            "mplex_desc": "Frekvencija emitiranja prijenosnog toka koji prenosi ovaj kanal. Isti tok može nositi mnogo kanala.",
+            "mplex_label": "Multipleks",
             "never-visible": "Nikad vidljiv",
             "new_channel": "Novi kanal",
             "not-visible": "Nije vidljiv",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "ID koji se koristi za popis usluga za dobivanje točne korespondencije između kanala u vašoj postavi i kanala u njihovoj bazi podataka. Obično se ovo postavlja automatski kada se pokrene 'mythfilldatabase'.",
             "xmltvid_label": "XMLTV ID"
         },
+        "chanedit_advanced": "Napredne postavke",
         "channelscan": {
             "FEC_desc": "Naprijed ispravljanje pogrešaka (zadano: automatski)",
             "FEC_label": "FEC",

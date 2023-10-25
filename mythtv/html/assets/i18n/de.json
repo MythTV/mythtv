@@ -13,11 +13,11 @@
             "equals": "Genaue Übereinstimmung",
             "startswith": "Beginnt mit"
         },
-        "help": "Hilfe",
+        "help": "Helfen",
         "instructions": "Anweisungen",
         "loading": "Wird geladen",
         "networkfail": "FEHLER: Backend-Netzwerkfehler",
-        "next": "Nächster",
+        "next": "Nächste",
         "no": "NEIN",
         "nosave": "Schließen ohne speichern",
         "ok": "OK",
@@ -156,7 +156,6 @@
             "startoffset_label": "Anzahl der zusätzlichen Minuten, die beim Start aufgezeichnet werden müssen",
             "starttime_label": "Startdatum und -uhrzeit",
             "subtitle_label": "Untertitel",
-            "template_apply": "Vorlagenänderung anwenden",
             "template_label": "Benutze Template",
             "title_label": "Titel",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "TV-Format",
             "freqid": "Frequenz-ID",
             "freqid_desc": "Kanalnummer, wie sie von Ihrem Tuner verstanden wird.",
+            "mplex_desc": "Sendefrequenz des Transportstroms, der diesen Kanal überträgt. Derselbe Stream kann viele Kanäle übertragen.",
+            "mplex_label": "Multiplex",
             "never-visible": "Nie sichtbar",
             "new_channel": "Neuer Kanal",
             "not-visible": "Nicht sichtbar",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "ID, die von Auflistungsdiensten verwendet wird, um eine genaue Entsprechung zwischen einem Kanal in Ihrem Programm und einem Kanal in ihrer Datenbank zu erhalten. Normalerweise wird dies automatisch festgelegt, wenn „mythfilldatabase“ ausgeführt wird.",
             "xmltvid_label": "XMLTV-ID"
         },
+        "chanedit_advanced": "Erweiterte Einstellungen",
         "channelscan": {
             "FEC_desc": "Vorwärtsfehlerkorrektur (Standard: Auto)",
             "FEC_label": "FEC",

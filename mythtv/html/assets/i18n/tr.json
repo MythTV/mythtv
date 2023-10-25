@@ -156,7 +156,6 @@
             "startoffset_label": "Başlangıçta Kaydedilecek Ekstra Dakika Sayısı",
             "starttime_label": "Başlangıç ​​Tarihi ve Saati",
             "subtitle_label": "Alt yazı",
-            "template_apply": "Şablon Değişikliğini Uygula",
             "template_label": "Şablon kullan",
             "title_label": "Başlık",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "Televizyon Formatı",
             "freqid": "Sıklık Kimliği",
             "freqid_desc": "Ayarlayıcılarınız tarafından anlaşıldığı şekliyle Kanal Numarası.",
+            "mplex_desc": "Bu kanalı taşıyan taşıma akışının Yayın Frekansı. Aynı akış birçok kanalı taşıyabilir.",
+            "mplex_label": "Multipleks",
             "never-visible": "Asla Görünmez",
             "new_channel": "Yeni Kanal",
             "not-visible": "Görünmez",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "Dizilişinizdeki bir kanal ile veritabanındaki bir kanal arasında tam bir eşleşme elde etmek için listeleme hizmetleri tarafından kullanılan kimlik. Normalde bu, 'mythfilldatabase' çalıştırıldığında otomatik olarak ayarlanır.",
             "xmltvid_label": "XMLTV Kimliği"
         },
+        "chanedit_advanced": "Gelişmiş Ayarlar",
         "channelscan": {
             "FEC_desc": "İletme Hatası Düzeltme (Varsayılan ayar: Otomatik)",
             "FEC_label": "FEC",

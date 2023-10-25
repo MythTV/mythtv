@@ -5,6 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Observable, of, PartialObserver } from 'rxjs';
 import { ChannelService } from 'src/app/services/channel.service';
 import { Channel, CommMethod, DBChannelRequest } from 'src/app/services/interfaces/channel.interface';
+import { VideoMultiplex } from 'src/app/services/interfaces/multiplex.interface';
 import { VideoSource } from 'src/app/services/interfaces/videosource.interface';
 import { SetupService } from 'src/app/services/setup.service';
 
@@ -27,6 +28,7 @@ export class ChannelEditorComponent implements OnInit {
   videoSources: VideoSource[] = [];
   commMethods: CommMethod[] = [];
   sourceNames: string[] = [];
+  multiplexes: VideoMultiplex[] = [];
 
   tvFormats = [
     { value: "Default", prompt: "common.default" },
@@ -62,6 +64,7 @@ export class ChannelEditorComponent implements OnInit {
   numTranslations = 9;
   successCount = 0;
   errorCount = 0;
+  selectedAdvanced = false;
 
   displayChannelDlg: boolean = false;
   dialogHeader = "";
@@ -150,13 +153,15 @@ export class ChannelEditorComponent implements OnInit {
           entry.Source = this.getSource(entry);
         });
       });
-
-
     });
-    // this.channelService.GetVideoSourceList().subscribe(data =>
-    //   this.videoSources = data.VideoSourceList.VideoSources);
     this.channelService.GetCommMethodList().subscribe(data =>
       this.commMethods = data.CommMethodList.CommMethods);
+  }
+
+  loadMultiplexes(SourceID: number) {
+    this.channelService.GetVideoMultiplexList({ SourceID: SourceID }).subscribe((data => {
+      this.multiplexes = data.VideoMultiplexList.VideoMultiplexes;
+    }))
   }
 
   loadTranslations(): void {
@@ -219,6 +224,8 @@ export class ChannelEditorComponent implements OnInit {
     this.channel = Object.assign({}, channel);
     this.displayChannelDlg = true;
     this.markPristine();
+    this.loadMultiplexes(channel.SourceId);
+    this.selectedAdvanced = false;
   }
 
   saveObserver: PartialObserver<any> = {
@@ -282,7 +289,7 @@ export class ChannelEditorComponent implements OnInit {
       ExtendedVisible: this.channel.ExtendedVisible,
       Format: this.channel.Format,
       FrequencyID: this.channel.FrequencyId,
-      // MplexID:            this.channel.MplexId,
+      MplexID: this.channel.MplexId,
       RecPriority: this.channel.RecPriority,
       ServiceID: this.channel.ServiceId,
       // ServiceType:        this.channel.ServiceType,

@@ -156,7 +156,6 @@
             "startoffset_label": "Number of Extra Minutes to Record at Start",
             "starttime_label": "Start Date and Time",
             "subtitle_label": "Subtitle",
-            "template_apply": "Apply Template Change",
             "template_label": "Use Template",
             "title_label": "Title",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "TV Format",
             "freqid": "Frequency Id",
             "freqid_desc": "Channel Number as understood by your tuners.",
+            "mplex_desc": "Broadcast Frequency of the transport stream that carries this channel. The same stream can carry many channels.",
+            "mplex_label": "Multiplex",
             "never-visible": "Never Visible",
             "new_channel": "New Channel",
             "not-visible": "Not Visible",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "ID used by listing services to get an exact correspondence between a channel in your line-up and a channel in their database. Normally this is set automatically when 'mythfilldatabase' is run.",
             "xmltvid_label": "XMLTV ID"
         },
+        "chanedit_advanced": "Advanced Settings",
         "channelscan": {
             "FEC_desc": "Forward Error Correction (Default: Auto)",
             "FEC_label": "FEC",

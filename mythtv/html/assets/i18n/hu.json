@@ -1,6 +1,6 @@
 {
     "common": {
-        "back": "Hát",
+        "back": "Vissza",
         "backenderror": "Háttér hiba.",
         "cancel": "Megszünteti",
         "close": "Bezárás",
@@ -156,7 +156,6 @@
             "startoffset_label": "Az induláskor rögzítendő többletpercek száma",
             "starttime_label": "Kezdés dátuma és időpontja",
             "subtitle_label": "Felirat",
-            "template_apply": "Sablonmódosítás alkalmazása",
             "template_label": "Sablon használata",
             "title_label": "Cím",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "TV formátum",
             "freqid": "Frekvencia Id",
             "freqid_desc": "Csatornaszám a tunerek által értett módon.",
+            "mplex_desc": "A csatornát hordozó szállítási adatfolyam sugárzási frekvenciája. Ugyanaz az adatfolyam több csatornát is hordozhat.",
+            "mplex_label": "Multiplex",
             "never-visible": "Soha nem látható",
             "new_channel": "Új Csatorna",
             "not-visible": "Nem látható",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "Azonosító, amelyet a listázási szolgáltatások használnak, hogy pontos megfelelést kapjanak a felállásban lévő csatornák és az adatbázisukban lévő csatornák között. Általában ez automatikusan beáll, amikor a 'mythfilldatabase' fut.",
             "xmltvid_label": "XMLTV azonosító"
         },
+        "chanedit_advanced": "További beállítások",
         "channelscan": {
             "FEC_desc": "Továbbítási hibajavítás (alapértelmezett: automatikus)",
             "FEC_label": "FEC",

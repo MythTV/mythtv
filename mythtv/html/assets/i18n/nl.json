@@ -156,7 +156,6 @@
             "startoffset_label": "Aantal extra minuten om op te nemen bij start",
             "starttime_label": "Begindatum en -tijd",
             "subtitle_label": "Ondertitel",
-            "template_apply": "Sjabloonwijziging toepassen",
             "template_label": "Gebruik sjabloon",
             "title_label": "Titel",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "Tv-formaat",
             "freqid": "Frequentie-ID",
             "freqid_desc": "Kanaalnummer zoals begrepen door uw tuners.",
+            "mplex_desc": "Uitzendfrequentie van de transportstroom die dit kanaal draagt. Dezelfde stroom kan veel kanalen bevatten.",
+            "mplex_label": "Multiplex",
             "never-visible": "Nooit zichtbaar",
             "new_channel": "Nieuw kanaal",
             "not-visible": "Niet zichtbaar",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "ID gebruikt door lijstservices om een ​​exacte overeenkomst te krijgen tussen een kanaal in uw line-up en een kanaal in hun database. Normaal gesproken wordt dit automatisch ingesteld als 'mythfilldatabase' wordt uitgevoerd.",
             "xmltvid_label": "XMLTV-ID"
         },
+        "chanedit_advanced": "Geavanceerde instellingen",
         "channelscan": {
             "FEC_desc": "Voorwaartse foutcorrectie (standaard: automatisch)",
             "FEC_label": "FEC",

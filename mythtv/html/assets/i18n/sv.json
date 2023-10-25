@@ -156,7 +156,6 @@
             "startoffset_label": "Antal extra minuter att spela in vid start",
             "starttime_label": "Startdatum och tid",
             "subtitle_label": "Texta",
-            "template_apply": "Använd malländring",
             "template_label": "Använd mall",
             "title_label": "Titel",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "TV-format",
             "freqid": "Frekvens-ID",
             "freqid_desc": "Kanalnummer enligt dina tuners.",
+            "mplex_desc": "Sändningsfrekvens för transportströmmen som bär denna kanal. Samma ström kan bära många kanaler.",
+            "mplex_label": "Flerfaldig",
             "never-visible": "Aldrig synlig",
             "new_channel": "Ny kanal",
             "not-visible": "Inte synlig",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "ID som används av listtjänster för att få en exakt överensstämmelse mellan en kanal i din line-up och en kanal i deras databas. Normalt ställs detta in automatiskt när 'mythfilldatabase' körs.",
             "xmltvid_label": "XMLTV ID"
         },
+        "chanedit_advanced": "Avancerade inställningar",
         "channelscan": {
             "FEC_desc": "Vidarebefordra felkorrigering (standard: Auto)",
             "FEC_label": "FEC",

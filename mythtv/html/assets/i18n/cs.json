@@ -156,7 +156,6 @@
             "startoffset_label": "Počet minut navíc k záznamu na začátku",
             "starttime_label": "Datum a čas zahájení",
             "subtitle_label": "Titulky",
-            "template_apply": "Použít změnu šablony",
             "template_label": "Použijte šablonu",
             "title_label": "Titul",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "TV Formát",
             "freqid": "ID frekvence",
             "freqid_desc": "Číslo kanálu, jak ho chápou vaše tunery.",
+            "mplex_desc": "Vysílací frekvence transportního toku, který přenáší tento kanál. Stejný proud může přenášet mnoho kanálů.",
+            "mplex_label": "Multiplex",
             "never-visible": "Nikdy neviditelné",
             "new_channel": "Nový kanál",
             "not-visible": "Neviditelný",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "ID používané seznamem služeb k získání přesné korespondence mezi kanálem ve vaší sestavě a kanálem v jejich databázi. Normálně se toto nastavuje automaticky při spuštění 'mythfilldatabase'.",
             "xmltvid_label": "XMLTV ID"
         },
+        "chanedit_advanced": "Pokročilé nastavení",
         "channelscan": {
             "FEC_desc": "Dopředná oprava chyb (výchozí: Automaticky)",
             "FEC_label": "FEC",

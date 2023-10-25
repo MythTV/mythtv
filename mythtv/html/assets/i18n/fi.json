@@ -156,7 +156,6 @@
             "startoffset_label": "Tallennettavien lisäminuuttien määrä alussa",
             "starttime_label": "Aloituspäivämäärä ja -aika",
             "subtitle_label": "Tekstitys",
-            "template_apply": "Käytä mallin muutosta",
             "template_label": "Käytä mallia",
             "title_label": "Otsikko",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "TV-muoto",
             "freqid": "Taajuustunnus",
             "freqid_desc": "Kanavan numero virittimiesi ymmärtämänä.",
+            "mplex_desc": "Tätä kanavaa kuljettavan siirtovirran lähetystaajuus. Sama stream voi kuljettaa useita kanavia.",
+            "mplex_label": "Multiplex",
             "never-visible": "Ei koskaan näkyvissä",
             "new_channel": "Uusi kanava",
             "not-visible": "Ei näkyvä",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "Tunnus, jota listauspalvelut käyttävät saadakseen tarkan vastaavuuden kokoonpanossasi olevan kanavan ja tietokannassa olevan kanavan välillä. Normaalisti tämä asetetaan automaattisesti, kun \"mythfilldatabase\" ajetaan.",
             "xmltvid_label": "XMLTV-tunnus"
         },
+        "chanedit_advanced": "Lisäasetukset",
         "channelscan": {
             "FEC_desc": "Välitä virheen korjaus (oletus: automaattinen)",
             "FEC_label": "FEC",

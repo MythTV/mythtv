@@ -156,7 +156,6 @@
             "startoffset_label": "Število dodatnih minut za snemanje na začetku",
             "starttime_label": "Začetni datum in čas",
             "subtitle_label": "Podnaslov",
-            "template_apply": "Uporabi spremembo predloge",
             "template_label": "Uporabite predlogo",
             "title_label": "Naslov",
             "type": {
@@ -659,6 +658,8 @@
             "format_label": "TV format",
             "freqid": "Id frekvence",
             "freqid_desc": "Številka kanala, kot jo razumejo vaši sprejemniki.",
+            "mplex_desc": "Frekvenca oddajanja transportnega toka, ki prenaša ta kanal. Isti tok lahko prenaša več kanalov.",
+            "mplex_label": "Multipleks",
             "never-visible": "Nikoli vidno",
             "new_channel": "Nov kanal",
             "not-visible": "Ni vidno",
@@ -678,6 +679,7 @@
             "xmltvid_desc": "ID, ki se uporablja pri navajanju storitev za pridobitev natančnega ujemanja med kanalom v vaši postavi in ​​kanalom v njihovi bazi podatkov. Običajno se to nastavi samodejno, ko se zažene »mythfilldatabase«.",
             "xmltvid_label": "XMLTV ID"
         },
+        "chanedit_advanced": "Napredne nastavitve",
         "channelscan": {
             "FEC_desc": "Posredovanje popravljanja napak (privzeto: samodejno)",
             "FEC_label": "FEC",
