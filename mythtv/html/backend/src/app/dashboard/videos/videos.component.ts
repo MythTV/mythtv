@@ -71,7 +71,7 @@ export class VideosComponent implements OnInit {
   loadLazy(event: LazyLoadEvent) {
     this.lazyLoadEvent = event;
     let request: GetVideoListRequest = {
-      Sort: "Title",
+      Sort: "title",
       Folder: this.directory.join('/'),
       CollapseSubDirs: !this.showAllVideos,
       StartIndex: 0,
@@ -79,13 +79,11 @@ export class VideosComponent implements OnInit {
     };
 
     if (event.sortField) {
-      // if (event.sortField == 'Title')
-      //   request.Sort = 'FileName';
-      // else
-        request.Sort = event.sortField;
+      request.Sort = event.sortField;
       if (event.sortOrder)
         request.Descending = (event.sortOrder < 0);
     }
+    request.Sort += ',releasedate,title,season,episode'
 
     if (event.first)
       request.StartIndex = event.first;
