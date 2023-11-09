@@ -232,11 +232,20 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
     QString defSeq = " ASC";
     if (bDescending)
         defSeq = " DESC";
+
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+    QStringList sortList = Sort.toLower().split(',',QString::SkipEmptyParts);
+#else
     QStringList sortList = Sort.toLower().split(',',Qt::SkipEmptyParts);
+#endif
     bool next = false;
     for (int ix = 0 ; ix < sortList.length(); ix++)
     {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+        QStringList partList = sortList[ix].split(' ',QString::SkipEmptyParts);
+#else
         QStringList partList = sortList[ix].split(' ',Qt::SkipEmptyParts);
+#endif
         if (partList.length() == 0)
             continue;
         QString sort = partList[0];
