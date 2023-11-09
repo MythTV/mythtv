@@ -260,6 +260,8 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
             sql.append(sort);
             if (partList.length() > 1 && partList[1].compare("DESC",Qt::CaseInsensitive) == 0)
                 sql.append(" DESC");
+            else if (partList.length() > 1 && partList[1].compare("ASC",Qt::CaseInsensitive) == 0)
+                sql.append(" ASC");
             else
                 sql.append(defSeq);
             next = true;
@@ -339,8 +341,8 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
         if (CollapseSubDirs)
         {
             QString fnPart = metadata->GetFilename().mid(folderlen);
-            int slashPos = fnPart.indexOf('/');
-            if (slashPos > 0)
+            int slashPos = fnPart.indexOf('/',1);
+            if (slashPos >= 0)
                 continue;
         }
 
