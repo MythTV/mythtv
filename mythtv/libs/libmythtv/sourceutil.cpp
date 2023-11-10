@@ -1,5 +1,8 @@
 // -*- Mode: c++ -*-
 
+// Qt Headers
+#include <QRegularExpression>
+
 // MythTV headers
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdirs.h"

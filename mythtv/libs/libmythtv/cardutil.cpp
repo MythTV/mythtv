@@ -11,6 +11,8 @@
 // Qt headers
 #include <QMap>
 #include <QDir>
+#include <QRegularExpression>
+#include <QUrlQuery>
 
 // MythTV headers
 #include "libmythbase/mythconfig.h"
