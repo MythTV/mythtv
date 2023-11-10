@@ -239,12 +239,12 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
     QStringList sortList = Sort.toLower().split(',',Qt::SkipEmptyParts);
 #endif
     bool next = false;
-    for (int ix = 0 ; ix < sortList.length(); ix++)
+    for (const auto & item : sortList)
     {
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList partList = sortList[ix].split(' ',QString::SkipEmptyParts);
+        QStringList partList = item.split(' ',QString::SkipEmptyParts);
 #else
-        QStringList partList = sortList[ix].split(' ',Qt::SkipEmptyParts);
+        QStringList partList = item.split(' ',Qt::SkipEmptyParts);
 #endif
         if (partList.length() == 0)
             continue;
