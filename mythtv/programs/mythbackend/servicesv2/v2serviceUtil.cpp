@@ -701,7 +701,7 @@ void V2FillSeek(V2CutList* pCutList, RecordingInfo* rInfo, MarkTypes marktype)
 void FillEncoderList(QVariantList &list, QObject* parent)
 {
     QReadLocker tvlocker(&TVRec::s_inputsLock);
-    QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
+    QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo(true);
     for (auto * elink : qAsConst(gTVList))
     {
         if (elink != nullptr)

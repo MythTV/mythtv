@@ -1729,15 +1729,20 @@ bool CardUtil::GetInputInfo(InputInfo &input, std::vector<uint> *groupids)
     return true;
 }
 
-QList<InputInfo> CardUtil::GetAllInputInfo()
+// virtTuners to include virtual tuners in the list
+QList<InputInfo> CardUtil::GetAllInputInfo(bool virtTuners)
 {
     QList<InputInfo> infoInputList;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardid, "
+    QString queryStr = "SELECT cardid, "
                   "inputname, sourceid, livetvorder, "
                   "schedorder, displayname, recpriority, quicktune "
-                  "FROM capturecard");
+                  "FROM capturecard";
+
+    if (!virtTuners)
+        queryStr.append(" WHERE parentid = 0");
+    query.prepare(queryStr);
 
     if (!query.exec())
     {
