@@ -36,6 +36,7 @@
         "channeleditor": "Kanal Editörü",
         "guide": {
             "channel": "Kanal",
+            "full_search": "Tam arama",
             "people_search": "İnsan arama",
             "retgrid": "Izgara Görünümüne Dön",
             "title_search": "Başlık arama"

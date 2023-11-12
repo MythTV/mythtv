@@ -36,6 +36,7 @@
         "channeleditor": "Kanalredaktør",
         "guide": {
             "channel": "Kanal",
+            "full_search": "Fuld søgning",
             "people_search": "People Search",
             "retgrid": "Vend tilbage til gittervisning",
             "title_search": "Titelsøgning"

@@ -36,6 +36,7 @@
         "channeleditor": "Kanali redaktor",
         "guide": {
             "channel": "Kanal",
+            "full_search": "Täielik otsing",
             "people_search": "Inimeste otsing",
             "retgrid": "Naaske ruudustiku kuvale",
             "title_search": "Pealkirja otsing"

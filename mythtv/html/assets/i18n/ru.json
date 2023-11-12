@@ -36,6 +36,7 @@
         "channeleditor": "Редактор каналов",
         "guide": {
             "channel": "Канал",
+            "full_search": "Полный поиск",
             "people_search": "Поиск людей",
             "retgrid": "Вернуться к отображению сетки",
             "title_search": "Поиск по названию"

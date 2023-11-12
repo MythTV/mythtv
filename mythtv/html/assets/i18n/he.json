@@ -36,6 +36,7 @@
         "channeleditor": "עורך ערוץ",
         "guide": {
             "channel": "עָרוּץ",
+            "full_search": "חיפוש מלא",
             "people_search": "חיפוש אנשים",
             "retgrid": "חזור לתצוגת רשת",
             "title_search": "חיפוש כותרת"

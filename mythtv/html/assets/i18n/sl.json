@@ -36,6 +36,7 @@
         "channeleditor": "Urejevalnik kanalov",
         "guide": {
             "channel": "Kanal",
+            "full_search": "Celotno iskanje",
             "people_search": "Iskanje ljudi",
             "retgrid": "Nazaj na prikaz mreže",
             "title_search": "Iskanje po naslovu"

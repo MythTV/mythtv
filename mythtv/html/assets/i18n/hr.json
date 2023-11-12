@@ -36,6 +36,7 @@
         "channeleditor": "Urednik kanala",
         "guide": {
             "channel": "Kanal",
+            "full_search": "Potpuna pretraga",
             "people_search": "Pretraživanje ljudi",
             "retgrid": "Povratak na prikaz mreže",
             "title_search": "Pretraživanje naslova"

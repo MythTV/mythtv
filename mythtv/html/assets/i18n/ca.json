@@ -36,6 +36,7 @@
         "channeleditor": "Editor de canals",
         "guide": {
             "channel": "Canal",
+            "full_search": "Cerca completa",
             "people_search": "Cerca de persones",
             "retgrid": "Torna a la pantalla de quadrícula",
             "title_search": "Cerca de títols"

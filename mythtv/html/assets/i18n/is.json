@@ -36,6 +36,7 @@
         "channeleditor": "Rásarstjóri",
         "guide": {
             "channel": "Rás",
+            "full_search": "Full leit",
             "people_search": "Fólksleit",
             "retgrid": "Fara aftur í Grid Display",
             "title_search": "Titilleit"

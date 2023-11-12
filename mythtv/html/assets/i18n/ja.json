@@ -36,6 +36,7 @@
         "channeleditor": "チャンネル編集者",
         "guide": {
             "channel": "チャネル",
+            "full_search": "全検索",
             "people_search": "人物検索",
             "retgrid": "グリッド表示に戻る",
             "title_search": "タイトル検索"

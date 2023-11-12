@@ -37,6 +37,7 @@ export class GuideComponent implements OnInit, SchedulerSummary {
   readonly CHANNEL = 2;
   readonly TITLESEARCH = 3;
   readonly PEOPLESEARCH = 4;
+  readonly FULLSEARCH = 5;
   displayType = this.GRID;
   searchValue = '';
 
@@ -102,6 +103,10 @@ export class GuideComponent implements OnInit, SchedulerSummary {
         request.PersonFilter = this.searchValue;
         request.Count = 1000;
         break;
+      case this.FULLSEARCH:
+        request.KeywordFilter = this.searchValue;
+        request.Count = 1000;
+        break;
     }
     this.listPrograms = [];
     this.guideService.GetProgramList(request).subscribe(data => {
@@ -147,6 +152,7 @@ export class GuideComponent implements OnInit, SchedulerSummary {
       case this.CHANNEL:
       case this.TITLESEARCH:
       case this.PEOPLESEARCH:
+      case this.FULLSEARCH:
         this.refreshing = true;
         this.fetchDetails();
         break;
@@ -176,6 +182,14 @@ export class GuideComponent implements OnInit, SchedulerSummary {
     this.searchValue = this.searchValue.trim();
     if (this.searchValue.length > 1) {
       this.displayType = this.PEOPLESEARCH;
+      this.refresh();
+    }
+  }
+
+  fullSearch() {
+    this.searchValue = this.searchValue.trim();
+    if (this.searchValue.length > 1) {
+      this.displayType = this.FULLSEARCH;
       this.refresh();
     }
   }

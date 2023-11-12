@@ -36,6 +36,7 @@
         "channeleditor": "Kanavaeditori",
         "guide": {
             "channel": "kanava",
+            "full_search": "Täysi haku",
             "people_search": "Ihmiset haku",
             "retgrid": "Palaa ruudukkonäyttöön",
             "title_search": "Otsikkohaku"

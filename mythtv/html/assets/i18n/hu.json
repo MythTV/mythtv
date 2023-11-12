@@ -36,6 +36,7 @@
         "channeleditor": "Csatornaszerkesztő",
         "guide": {
             "channel": "Csatorna",
+            "full_search": "Teljes keresés",
             "people_search": "Emberek keresése",
             "retgrid": "Visszatérés a Rács megjelenítéséhez",
             "title_search": "Cím keresése"

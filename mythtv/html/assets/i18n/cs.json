@@ -36,6 +36,7 @@
         "channeleditor": "Editor kanálu",
         "guide": {
             "channel": "Kanál",
+            "full_search": "Úplné vyhledávání",
             "people_search": "Vyhledávání lidí",
             "retgrid": "Návrat k zobrazení mřížky",
             "title_search": "Vyhledávání titulů"

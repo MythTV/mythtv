@@ -36,6 +36,7 @@
         "channeleditor": "頻道編輯",
         "guide": {
             "channel": "渠道",
+            "full_search": "完整搜尋",
             "people_search": "人物搜索",
             "retgrid": "返回網格顯示",
             "title_search": "標題搜索"

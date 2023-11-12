@@ -36,6 +36,7 @@
         "channeleditor": "Channel Editor",
         "guide": {
             "channel": "Channel",
+            "full_search": "Full Search",
             "people_search": "People Search",
             "retgrid": "Return to Grid Display",
             "title_search": "Title Search"

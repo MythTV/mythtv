@@ -36,6 +36,7 @@
         "channeleditor": "Éditeur de chaînes",
         "guide": {
             "channel": "Canaliser",
+            "full_search": "Recherche complète",
             "people_search": "Recherche de personnes",
             "retgrid": "Revenir à l'affichage de la grille",
             "title_search": "Recherche de titre"

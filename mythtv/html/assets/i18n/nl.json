@@ -36,6 +36,7 @@
         "channeleditor": "Kanaal-editor",
         "guide": {
             "channel": "Kanaal",
+            "full_search": "Volledige zoekopdracht",
             "people_search": "Mensen zoeken",
             "retgrid": "Keer terug naar rasterweergave",
             "title_search": "Titel zoeken"
