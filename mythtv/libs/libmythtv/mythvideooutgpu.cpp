@@ -7,6 +7,10 @@
 #include "mythvideogpu.h"
 #include "mythvideooutgpu.h"
 
+#ifdef _WIN32
+#include "libmythui/mythpainter_d3d9.h"
+#include "videoout_d3d.h"
+#endif
 #ifdef USING_OPENGL
 #include "libmythui/opengl/mythpainteropengl.h"
 #include "opengl/mythvideooutopengl.h"
@@ -55,7 +59,9 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythR
     QStringList renderers;
 
 #ifdef _WIN32
-//    if (render->Type() == kRenderDirect3D9)
+//    auto * d3drender = dynamic_cast<MythRenderD3D9*>(Render);
+//    auto * d3dpainter = dynamic_cast<MythD3D9Painter*>(Painter);
+//    if (Render->Type() == kRenderDirect3D9)
 //        renderers += VideoOutputD3D::GetAllowedRenderers(CodecID, VideoDispDim);
 #endif
 
@@ -134,7 +140,9 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythR
 
 #ifdef _WIN32
 //        if (renderer == "direct3d")
-//            video = new VideoOutputD3D();
+//            video = new VideoOutputD3D(MainWindow, d3drender,
+//                                       d3dpainter, Display,
+//                                       videoprofile, renderer);
 #endif
 #ifdef USING_OPENGL
         // cppcheck-suppress knownConditionTrueFalse

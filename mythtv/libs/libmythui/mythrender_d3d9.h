@@ -11,6 +11,10 @@
 #include "mythrender_base.h"
 
 #ifdef USING_DXVA2
+#if defined (_WIN32)
+#define CINTERFACE
+#define COBJMACROS
+#endif
 #include "dxva2api.h"
 #else
 using IDirect3DDeviceManager9 = void*;
