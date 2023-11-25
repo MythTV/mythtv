@@ -63,7 +63,7 @@
             "inetref": "InetRef",
             "job_Commflag": "Detekce reklam",
             "job_Metadata": "Vyhledejte Metadata",
-            "job_Transcode": "Překódovat",
+            "job_Transcode": "Překódovat pomocí výchozího profilu",
             "mnu_delete": "Vymazat",
             "mnu_delete_rerec": "Smazat a povolit opětovné nahrávání",
             "mnu_markdamaged": "Označit jako poškozené",

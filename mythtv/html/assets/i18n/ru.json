@@ -63,7 +63,7 @@
             "inetref": "InetRef",
             "job_Commflag": "Обнаружение рекламы",
             "job_Metadata": "Посмотрите метаданные",
-            "job_Transcode": "Перекодировать",
+            "job_Transcode": "Перекодировать с профилем по умолчанию",
             "mnu_delete": "Удалить",
             "mnu_delete_rerec": "Удалить и разрешить повторную запись",
             "mnu_markdamaged": "Отметить как поврежденный",

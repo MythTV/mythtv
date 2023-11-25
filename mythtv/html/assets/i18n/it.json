@@ -63,7 +63,7 @@
             "inetref": "InetRif",
             "job_Commflag": "Rileva spot pubblicitari",
             "job_Metadata": "Cerca Metadati",
-            "job_Transcode": "Transcodifica",
+            "job_Transcode": "Transcodifica con il profilo predefinito",
             "mnu_delete": "Eliminare",
             "mnu_delete_rerec": "Elimina e consenti nuova registrazione",
             "mnu_markdamaged": "Contrassegna come danneggiato",

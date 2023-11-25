@@ -63,7 +63,7 @@
             "inetref": "InetRef",
             "job_Commflag": "Upptäck reklam",
             "job_Metadata": "Slå upp Metadata",
-            "job_Transcode": "Omkoda",
+            "job_Transcode": "Omkoda med standardprofil",
             "mnu_delete": "Radera",
             "mnu_delete_rerec": "Ta bort och tillåt ominspelning",
             "mnu_markdamaged": "Markera som skadad",

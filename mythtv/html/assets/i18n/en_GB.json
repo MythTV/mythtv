@@ -63,7 +63,7 @@
             "inetref": "InetRef",
             "job_Commflag": "Detect Commercials",
             "job_Metadata": "Look up Metadata",
-            "job_Transcode": "Transcode",
+            "job_Transcode": "Transcode with Default profile",
             "mnu_delete": "Delete",
             "mnu_delete_rerec": "Delete and Allow Rerecord",
             "mnu_markdamaged": "Mark as Damaged",

@@ -63,7 +63,7 @@
             "inetref": "InetRef",
             "job_Commflag": "檢測廣告",
             "job_Metadata": "查找元數據",
-            "job_Transcode": "轉碼",
+            "job_Transcode": "使用預設設定檔進行轉碼",
             "mnu_delete": "刪除",
             "mnu_delete_rerec": "刪除並允許重新錄製",
             "mnu_markdamaged": "標記為已損壞",

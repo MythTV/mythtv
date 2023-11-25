@@ -63,7 +63,7 @@
             "inetref": "InetRef",
             "job_Commflag": "Detectar comerciales",
             "job_Metadata": "Buscar metadatos",
-            "job_Transcode": "Transcodificar",
+            "job_Transcode": "Transcodificar con perfil predeterminado",
             "mnu_delete": "Borrar",
             "mnu_delete_rerec": "Eliminar y permitir volver a grabar",
             "mnu_markdamaged": "Marcar como dañado",

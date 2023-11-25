@@ -63,7 +63,7 @@
             "inetref": "InetRef",
             "job_Commflag": "Reklámok észlelése",
             "job_Metadata": "Keresse meg a Metaadatokat",
-            "job_Transcode": "Átkódolás",
+            "job_Transcode": "Átkódolás alapértelmezett profillal",
             "mnu_delete": "Töröl",
             "mnu_delete_rerec": "Törlés és újrarögzítés engedélyezése",
             "mnu_markdamaged": "Megjelölés sérültként",

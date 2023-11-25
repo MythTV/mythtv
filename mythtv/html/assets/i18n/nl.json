@@ -63,7 +63,7 @@
             "inetref": "InetRef",
             "job_Commflag": "Detecteer reclamespots",
             "job_Metadata": "Zoek metagegevens op",
-            "job_Transcode": "Transcoderen",
+            "job_Transcode": "Transcoderen met standaardprofiel",
             "mnu_delete": "Verwijderen",
             "mnu_delete_rerec": "Verwijderen en opnieuw opnemen toestaan",
             "mnu_markdamaged": "Markeer als beschadigd",

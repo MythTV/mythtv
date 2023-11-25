@@ -63,7 +63,7 @@
             "inetref": "InetRef",
             "job_Commflag": "Tuvastage reklaamid",
             "job_Metadata": "Otsige üles metaandmed",
-            "job_Transcode": "Ümberkodeerimine",
+            "job_Transcode": "Transkodeerimine vaikeprofiiliga",
             "mnu_delete": "Kustuta",
             "mnu_delete_rerec": "Kustuta ja luba uuesti salvestada",
             "mnu_markdamaged": "Märgi kahjustatud",

@@ -63,7 +63,7 @@
             "inetref": "InetRef",
             "job_Commflag": "Reklamları Algıla",
             "job_Metadata": "Meta verilere bak",
-            "job_Transcode": "kod dönüştürme",
+            "job_Transcode": "Varsayılan profille kod dönüştürme",
             "mnu_delete": "Silmek",
             "mnu_delete_rerec": "Sil ve Yeniden Kayda İzin Ver",
             "mnu_markdamaged": "Hasarlı Olarak İşaretle",

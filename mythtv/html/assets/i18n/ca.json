@@ -63,7 +63,7 @@
             "inetref": "InetRef",
             "job_Commflag": "Detectar comercials",
             "job_Metadata": "Cerca metadades",
-            "job_Transcode": "Transcodificar",
+            "job_Transcode": "Transcodifica amb el perfil predeterminat",
             "mnu_delete": "Suprimeix",
             "mnu_delete_rerec": "Suprimeix i permet tornar a gravar",
             "mnu_markdamaged": "Marca com a danyat",

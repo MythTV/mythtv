@@ -63,7 +63,7 @@
             "inetref": "InetRef",
             "job_Commflag": "זיהוי פרסומות",
             "job_Metadata": "חפש מטא נתונים",
-            "job_Transcode": "המרת קוד",
+            "job_Transcode": "המרת קידוד עם פרופיל ברירת מחדל",
             "mnu_delete": "לִמְחוֹק",
             "mnu_delete_rerec": "מחק ואפשר הקלטה מחדש",
             "mnu_markdamaged": "סמן כפגום",

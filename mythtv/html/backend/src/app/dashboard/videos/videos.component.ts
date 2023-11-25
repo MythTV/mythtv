@@ -83,7 +83,7 @@ export class VideosComponent implements OnInit {
       if (event.sortOrder)
         request.Descending = (event.sortOrder < 0);
     }
-    request.Sort += ',releasedate,title,season,episode'
+    request.Sort += ',title,releasedate,season,episode'
 
     if (event.first)
       request.StartIndex = event.first;

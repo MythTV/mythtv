@@ -63,7 +63,7 @@
             "inetref": "InetRef",
             "job_Commflag": "コマーシャルの検出",
             "job_Metadata": "メタデータの検索",
-            "job_Transcode": "トランスコード",
+            "job_Transcode": "デフォルトのプロファイルでトランスコードする",
             "mnu_delete": "消去",
             "mnu_delete_rerec": "削除して再録音を許可する",
             "mnu_markdamaged": "破損としてマークする",

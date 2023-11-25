@@ -63,7 +63,7 @@
             "inetref": "InetRef",
             "job_Commflag": "Откриване на реклами",
             "job_Metadata": "Потърсете метаданни",
-            "job_Transcode": "Прекодиране",
+            "job_Transcode": "Прекодиране с профил по подразбиране",
             "mnu_delete": "Изтрий",
             "mnu_delete_rerec": "Изтриване и разрешаване на повторен запис",
             "mnu_markdamaged": "Маркирайте като повредени",

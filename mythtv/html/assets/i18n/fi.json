@@ -63,7 +63,7 @@
             "inetref": "InetRef",
             "job_Commflag": "Tunnista mainokset",
             "job_Metadata": "Etsi Metadata",
-            "job_Transcode": "Transkoodaus",
+            "job_Transcode": "Transkoodaus oletusprofiililla",
             "mnu_delete": "Poistaa",
             "mnu_delete_rerec": "Poista ja salli tallennus uudelleen",
             "mnu_markdamaged": "Merkitse vaurioituneeksi",

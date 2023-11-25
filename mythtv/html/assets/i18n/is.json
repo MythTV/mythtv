@@ -63,7 +63,7 @@
             "inetref": "InetRef",
             "job_Commflag": "Uppgötvaðu auglýsingar",
             "job_Metadata": "Flettu upp Lýsigögn",
-            "job_Transcode": "Umkóðun",
+            "job_Transcode": "Umkóðun með sjálfgefnu sniði",
             "mnu_delete": "Eyða",
             "mnu_delete_rerec": "Eyða og leyfa endurupptöku",
             "mnu_markdamaged": "Merktu sem skemmd",

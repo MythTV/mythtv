@@ -63,7 +63,7 @@
             "inetref": "InetRef",
             "job_Commflag": "Opdag reklamer",
             "job_Metadata": "Slå metadata op",
-            "job_Transcode": "Omkode",
+            "job_Transcode": "Omkode med standardprofil",
             "mnu_delete": "Slet",
             "mnu_delete_rerec": "Slet og tillad genindspilning",
             "mnu_markdamaged": "Marker som beskadiget",
