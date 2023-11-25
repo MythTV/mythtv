@@ -12,6 +12,13 @@
 
 #define LOC QString("Slideview: ")
 
+// EXIF tag 0x9286 UserComment can contain garbage
+static QString clean_comment(QString comment)
+{
+    QString result;
+    std::copy_if(comment.cbegin(), comment.cend(), std::back_inserter(result), [](QChar x) { return x.isPrint(); } );
+    return result;
+}
 
 /**
  *  \brief  Constructor
@@ -647,8 +654,9 @@ void GallerySlideView::TransitionComplete()
         QStringList text;
         text << ImageManagerFe::LongDateOf(im);
 
-        if (!im->m_comment.isEmpty())
-            text << im->m_comment;
+        QString comment = clean_comment(im->m_comment);
+        if (!comment.isEmpty())
+            text << comment;
 
         m_uiCaptionText->SetText(text.join(" - "));
     }
