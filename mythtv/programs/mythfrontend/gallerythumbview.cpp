@@ -22,7 +22,7 @@
 #define LOC QString("Thumbview: ")
 
 // EXIF tag 0x9286 UserComment can contain garbage
-static QString clean_comment(QString comment)
+static QString clean_comment(const QString &comment)
 {
     QString result;
     std::copy_if(comment.cbegin(), comment.cend(), std::back_inserter(result), [](QChar x) { return x.isPrint(); } );
