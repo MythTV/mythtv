@@ -565,6 +565,8 @@ MetadataLookupList MetadataDownload::handleGame(MetadataLookup *lookup)
     MetadataLookupList list;
     MetaGrabberScript grabber =
         MetaGrabberScript::GetGrabber(kGrabberGame, lookup);
+    if (!grabber.IsValid())
+        return {};
 
     // If the inetref is populated, even in kLookupSearch mode,
     // become a kLookupData grab and use that.
@@ -608,6 +610,8 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup *lookup)
 
     MetaGrabberScript grabber =
         MetaGrabberScript::GetGrabber(kGrabberMovie, lookup);
+    if (!grabber.IsValid())
+        return {};
 
     // initial search mode
     if (!lookup->GetInetref().isEmpty() && lookup->GetInetref() != "00000000" &&
@@ -648,6 +652,8 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup *lookup)
 
     MetaGrabberScript grabber =
         MetaGrabberScript::GetGrabber(kGrabberTelevision, lookup);
+    if (!grabber.IsValid())
+        return {};
     bool searchcollection = false;
 
     // initial search mode

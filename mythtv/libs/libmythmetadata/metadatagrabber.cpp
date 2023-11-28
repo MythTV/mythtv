@@ -145,7 +145,16 @@ MetaGrabberScript MetaGrabberScript::GetGrabber(GrabberType defaultType,
         // fall through
     }
 
-    return GetType(defaultType);
+    auto grabber = GetType(defaultType);
+    if (!grabber.m_valid)
+    {
+        QString name = grabberTypes[defaultType].m_setting;
+        if (name.isEmpty())
+            name = QString("Type %1").arg(defaultType);
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Grabber '%1' is not configured. Do you need to set PYTHONPATH?").arg(name));
+    }
+    return grabber;
 }
 
 MetaGrabberScript MetaGrabberScript::GetType(const QString &type)
