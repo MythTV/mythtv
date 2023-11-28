@@ -1144,6 +1144,24 @@ int DecoderBase::AutoSelectTrack(uint Type)
     {
         // Find best track favoring forced.
         selTrack = BestTrack(Type, true);
+
+        if (Type == kTrackTypeSubtitle)
+        {
+            if (m_tracks[Type][selTrack].m_forced)
+            {
+                // A forced AV Subtitle tracks is handled without the user
+                // explicitly enabling subtitles. Try to find a good non-forced
+                // track that can be swapped to in the case the user does
+                // explicitly enable subtitles.
+                int nonForcedTrack = BestTrack(Type, false);
+
+                if (!m_tracks[Type][nonForcedTrack].m_forced)
+                {
+                    m_selectedForcedTrack[Type] = m_tracks[Type][selTrack];
+                    selTrack = nonForcedTrack;
+                }
+            }
+        }
     }
 
     int oldTrack = m_currentTrack[Type];
