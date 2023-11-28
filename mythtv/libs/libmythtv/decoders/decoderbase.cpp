@@ -1036,6 +1036,58 @@ bool DecoderBase::InsertTrack(uint Type, const StreamInfo &Info)
     return true;
 }
 
+/** \fn DecoderBase::BestTrack(uint, bool)
+ *  \brief Determine the best track according to weights
+ *
+ * Select the best track.  Primary attribute is to favor or disfavor
+ * a forced track. Secondary attribute is language preference,
+ * in order of most preferred to least preferred language.
+ * Third attribute is track order, preferring the earliesttrack.
+ *
+ * Whether to favor or disfavor forced is controlled by the second
+ * parameter.
+ *
+ * This function must not be called without taking m_trackLock
+ *
+ *  \return the highest weighted track, or -1 if none.
+*/
+int DecoderBase::BestTrack(uint Type, bool forcedPreferred)
+{
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Trying to select track (w/lang & %1forced)")
+        .arg(forcedPreferred ? "" : "!"));
+    const int kForcedWeight   = forcedPreferred ? (1 << 20) : -(1 << 20);
+    const int kLanguageWeight = (1 << 10);
+    const int kPositionWeight = (1 << 0);
+    int bestScore = -1;
+    int selTrack = -1;
+    uint numStreams = static_cast<uint>(m_tracks[Type].size());
+
+    for (uint i = 0; i < numStreams; i++)
+    {
+        bool forced = (Type == kTrackTypeSubtitle &&
+                        m_tracks[Type][i].m_forced &&
+                        m_parent->ForcedSubtitlesFavored());
+        int position = static_cast<int>(numStreams) - static_cast<int>(i);
+        int language = 0;
+        for (uint j = 0; (language == 0) && (j < m_languagePreference.size()); ++j)
+        {
+            if (m_tracks[Type][i].m_language == m_languagePreference[j])
+                language = static_cast<int>(m_languagePreference.size()) - static_cast<int>(j);
+        }
+        int score = (1 << 20) +
+                    (kForcedWeight * static_cast<int>(forced)) +
+                    (kLanguageWeight * language) +
+                    (kPositionWeight * position);
+        if (score > bestScore)
+        {
+            bestScore = score;
+            selTrack = static_cast<int>(i);
+        }
+    }
+
+    return selTrack;
+}
+
 /** \fn DecoderBase::AutoSelectTrack(uint)
  *  \brief Select best track.
  *
@@ -1090,38 +1142,8 @@ int DecoderBase::AutoSelectTrack(uint Type)
 
     if (selTrack < 0)
     {
-        // Select the best track.  Primary attribute is to favor a
-        // forced track.  Secondary attribute is language preference,
-        // in order of most preferred to least preferred language.
-        // Third attribute is track order, preferring the earliest
-        // track.
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Trying to select track (w/lang & forced)");
-        const int kForcedWeight   = (1 << 20);
-        const int kLanguageWeight = (1 << 10);
-        const int kPositionWeight = (1 << 0);
-        int bestScore = -1;
-        selTrack = 0;
-        for (uint i = 0; i < numStreams; i++)
-        {
-            bool forced = (Type == kTrackTypeSubtitle &&
-                           m_tracks[Type][i].m_forced &&
-                           m_parent->ForcedSubtitlesFavored());
-            int position = static_cast<int>(numStreams) - static_cast<int>(i);
-            int language = 0;
-            for (uint j = 0; (language == 0) && (j < m_languagePreference.size()); ++j)
-            {
-                if (m_tracks[Type][i].m_language == m_languagePreference[j])
-                    language = static_cast<int>(m_languagePreference.size()) - static_cast<int>(j);
-            }
-            int score = (kForcedWeight * static_cast<int>(forced)) +
-                        (kLanguageWeight * language) +
-                        (kPositionWeight * position);
-            if (score > bestScore)
-            {
-                bestScore = score;
-                selTrack = static_cast<int>(i);
-            }
-        }
+        // Find best track favoring forced.
+        selTrack = BestTrack(Type, true);
     }
 
     int oldTrack = m_currentTrack[Type];
