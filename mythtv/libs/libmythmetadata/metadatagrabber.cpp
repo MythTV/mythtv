@@ -130,12 +130,8 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
 MetaGrabberScript MetaGrabberScript::GetGrabber(GrabberType defaultType,
                                                 const MetadataLookup *lookup)
 {
-    if (!lookup)
-    {
-        return GetType(defaultType);
-    }
-
-    if (!lookup->GetInetref().isEmpty() &&
+    if (lookup &&
+        !lookup->GetInetref().isEmpty() &&
         lookup->GetInetref() != "00000000")
     {
         // inetref is defined, see if we have a pre-defined grabber
