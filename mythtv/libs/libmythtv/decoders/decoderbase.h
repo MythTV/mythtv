@@ -264,6 +264,7 @@ class DecoderBase
     static AVPixelFormat GetBestVideoFormat(AVPixelFormat* Formats, const VideoFrameTypes* RenderFormats);
 
   protected:
+    int          BestTrack(uint Type, bool forcedPreferred);
     virtual int  AutoSelectTrack(uint Type);
     void         AutoSelectTracks(void);
     void         ResetTracks(void);
