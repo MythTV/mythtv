@@ -192,14 +192,11 @@ MetaGrabberScript MetaGrabberScript::GetType(const GrabberType type)
         cmd = grabberTypes[type].m_def;
     }
 
-    if (s_grabberAge.isValid() && MythDate::secsInPast(s_grabberAge) <= kGrabberRefresh)
-    {
-        // just pull it from the cache
-        GrabberList list = GetList();
-        for (const auto& item : qAsConst(list))
-            if (item.GetPath().endsWith(cmd))
-                return item;
-    }
+    // just pull it from the cache
+    GrabberList list = GetList(type);
+    for (const auto& item : qAsConst(list))
+        if (item.GetPath().endsWith(cmd))
+            return item;
 
     // polling the cache will cause a refresh, so lets just grab and
     // process the script directly
