@@ -96,9 +96,13 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
                 QDir dir = QDir(path);
                 if (!dir.exists())
                 {
+                    LOG(VB_GENERAL, LOG_DEBUG, LOC +
+                        QString("No script directory %1").arg(path));
                     continue;
                 }
                 QStringList scripts = dir.entryList(QDir::Executable | QDir::Files);
+                LOG(VB_GENERAL, LOG_DEBUG, LOC +
+                    QString("Found %1 scripts in %2").arg(scripts.count()).arg(path));
                 if (scripts.count() == 0)
                     // no scripts found
                     continue;
@@ -113,6 +117,10 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
                     {
                         LOG(VB_GENERAL, LOG_DEBUG, LOC + "Adding " + script.m_command);
                         s_grabberList.append(script);
+                    }
+                    else
+                    {
+                        LOG(VB_GENERAL, LOG_DEBUG, LOC + "Failed " + name);
                     }
                  }
             }
