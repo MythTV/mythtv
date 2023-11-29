@@ -93,7 +93,12 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
             for (const auto& grabberType : qAsConst(grabberTypes))
             {
                 QString path = (grabberType.m_path).arg(GetShareDir());
-                QStringList scripts = QDir(path).entryList(QDir::Executable | QDir::Files);
+                QDir dir = QDir(path);
+                if (!dir.exists())
+                {
+                    continue;
+                }
+                QStringList scripts = dir.entryList(QDir::Executable | QDir::Files);
                 if (scripts.count() == 0)
                     // no scripts found
                     continue;
