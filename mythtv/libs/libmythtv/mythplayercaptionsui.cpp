@@ -204,7 +204,7 @@ void MythPlayerCaptionsUI::EnableCaptions(uint Mode, bool UpdateOSD)
         m_textDesired = newTextDesired;
     QString msg;
     if ((kDisplayCC608 & Mode) || (kDisplayCC708 & Mode) ||
-        (kDisplayAVSubtitle & Mode) || kDisplayRawTextSubtitle & Mode)
+        (kDisplayAVSubtitle & Mode) || (kDisplayRawTextSubtitle & Mode))
     {
         if (auto type = toTrackType(Mode); m_decoder != nullptr)
             if (auto track = GetTrack(type); track > -1)
