@@ -255,7 +255,7 @@ int TextSubtitleParser::ReadNextSubtitle(void)
     sub.start_display_time = av_q2d(m_stream->time_base) * m_pkt->dts * 1000;
     sub.end_display_time = av_q2d(m_stream->time_base) * (m_pkt->dts + m_pkt->duration) * 1000;
 
-    m_parent->AddAVSubtitle(sub, m_decCtx->codec_id == AV_CODEC_ID_XSUB, false, true);
+    m_parent->AddAVSubtitle(sub, m_decCtx->codec_id == AV_CODEC_ID_XSUB, false, false, true);
     return ret;
 }
 
