@@ -255,7 +255,7 @@ int TextSubtitleParser::ReadNextSubtitle(void)
     sub.start_display_time = av_q2d(m_stream->time_base) * m_pkt->dts * 1000;
     sub.end_display_time = av_q2d(m_stream->time_base) * (m_pkt->dts + m_pkt->duration) * 1000;
 
-    m_parent->AddAVSubtitle(sub, m_decCtx->codec_id == AV_CODEC_ID_XSUB, false);
+    m_parent->AddAVSubtitle(sub, m_decCtx->codec_id == AV_CODEC_ID_XSUB, false, true);
     return ret;
 }
 
@@ -275,8 +275,8 @@ void TextSubtitleParser::LoadSubtitles(bool inBackground)
     }
 
     // External subtitles are now presented as AV Subtitles.
-    m_parent->EnableAVSubtitles(true);
-    m_parent->EnableTextSubtitles(false);
+    m_parent->EnableAVSubtitles(false);
+    m_parent->EnableTextSubtitles(true);
     m_parent->EnableRawTextSubtitles(false);
 
     local_buffer_t sub_data {};
