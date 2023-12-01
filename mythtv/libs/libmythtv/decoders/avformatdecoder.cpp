@@ -3974,6 +3974,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 
         bool forcedon = m_parent->GetSubReader(pkt->stream_index)->AddAVSubtitle(
                 subtitle, curstream->codecpar->codec_id == AV_CODEC_ID_XSUB,
+                isForcedTrack,
                 m_parent->GetAllowForcedSubtitles(), false);
          m_parent->EnableForcedSubtitles(forcedon || isForcedTrack);
     }
