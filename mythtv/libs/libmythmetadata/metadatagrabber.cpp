@@ -93,7 +93,16 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
             for (const auto& grabberType : qAsConst(grabberTypes))
             {
                 QString path = (grabberType.m_path).arg(GetShareDir());
-                QStringList scripts = QDir(path).entryList(QDir::Executable | QDir::Files);
+                QDir dir = QDir(path);
+                if (!dir.exists())
+                {
+                    LOG(VB_GENERAL, LOG_DEBUG, LOC +
+                        QString("No script directory %1").arg(path));
+                    continue;
+                }
+                QStringList scripts = dir.entryList(QDir::Executable | QDir::Files);
+                LOG(VB_GENERAL, LOG_DEBUG, LOC +
+                    QString("Found %1 scripts in %2").arg(scripts.count()).arg(path));
                 if (scripts.count() == 0)
                     // no scripts found
                     continue;
@@ -108,6 +117,10 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
                     {
                         LOG(VB_GENERAL, LOG_DEBUG, LOC + "Adding " + script.m_command);
                         s_grabberList.append(script);
+                    }
+                    else
+                    {
+                        LOG(VB_GENERAL, LOG_DEBUG, LOC + "Failed " + name);
                     }
                  }
             }
@@ -130,12 +143,8 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
 MetaGrabberScript MetaGrabberScript::GetGrabber(GrabberType defaultType,
                                                 const MetadataLookup *lookup)
 {
-    if (!lookup)
-    {
-        return GetType(defaultType);
-    }
-
-    if (!lookup->GetInetref().isEmpty() &&
+    if (lookup &&
+        !lookup->GetInetref().isEmpty() &&
         lookup->GetInetref() != "00000000")
     {
         // inetref is defined, see if we have a pre-defined grabber
@@ -149,7 +158,16 @@ MetaGrabberScript MetaGrabberScript::GetGrabber(GrabberType defaultType,
         // fall through
     }
 
-    return GetType(defaultType);
+    auto grabber = GetType(defaultType);
+    if (!grabber.m_valid)
+    {
+        QString name = grabberTypes[defaultType].m_setting;
+        if (name.isEmpty())
+            name = QString("Type %1").arg(defaultType);
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Grabber '%1' is not configured. Do you need to set PYTHONPATH?").arg(name));
+    }
+    return grabber;
 }
 
 MetaGrabberScript MetaGrabberScript::GetType(const QString &type)
@@ -174,14 +192,11 @@ MetaGrabberScript MetaGrabberScript::GetType(const GrabberType type)
         cmd = grabberTypes[type].m_def;
     }
 
-    if (s_grabberAge.isValid() && MythDate::secsInPast(s_grabberAge) <= kGrabberRefresh)
-    {
-        // just pull it from the cache
-        GrabberList list = GetList();
-        for (const auto& item : qAsConst(list))
-            if (item.GetPath().endsWith(cmd))
-                return item;
-    }
+    // just pull it from the cache
+    GrabberList list = GetList(type);
+    for (const auto& item : qAsConst(list))
+        if (item.GetPath().endsWith(cmd))
+            return item;
 
     // polling the cache will cause a refresh, so lets just grab and
     // process the script directly
