@@ -88,7 +88,8 @@ bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
         enableforced = true;
     }
 
-    if (m_textSubtitlesEnabled && !isExternal || m_avSubtitlesEnabled && isExternal)
+    if ((m_textSubtitlesEnabled && !isExternal) ||
+        (m_avSubtitlesEnabled && isExternal))
     {
         FreeAVSubtitle(subtitle);
         return enableforced;
