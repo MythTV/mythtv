@@ -18,6 +18,7 @@
 #include <QRect>
 #include <QSize>
 #include <QStringList>
+#include <QTimer>
 #include <QWaitCondition>
 
 // MythTV

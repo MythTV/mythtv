@@ -1,4 +1,5 @@
 #include <QFontMetrics>
+#include <QRegularExpression>
 
 #include "libmythbase/mythlogging.h"
 #include "libmythui/mythfontproperties.h"

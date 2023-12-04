@@ -37,6 +37,7 @@
 #include <QDir>
 #include <QWaitCondition>
 #include <QWriteLocker>
+#include <QProcess>
 #include <QRegularExpression>
 #include <QEvent>
 #include <QTcpServer>

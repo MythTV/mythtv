@@ -8,6 +8,12 @@
 #endif
 #include <sys/stat.h>
 
+// Qt
+#include <QDir>
+#include <QFileInfoList>
+#include <QJsonArray>
+#include <QJsonObject>
+
 // MythTV
 #include "libmythbase/compat.h"
 #include "libmythbase/mythscheduler.h"

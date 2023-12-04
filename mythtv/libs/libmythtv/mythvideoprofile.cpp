@@ -2,6 +2,9 @@
 #include <algorithm>
 #include <utility>
 
+// Qt
+#include <QRegularExpression>
+
 // MythTV
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"

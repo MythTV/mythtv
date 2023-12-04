@@ -23,6 +23,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+// Qt
+#include <QJsonArray>
+#include <QJsonDocument>
+
 // MythTV
 #include "libmythbase/http/mythhttpmetaservice.h"
 #include "libmythbase/mythcorecontext.h"
