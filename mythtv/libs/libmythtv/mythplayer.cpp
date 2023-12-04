@@ -17,7 +17,6 @@
 #include <QHash>
 #include <QMap>
 #include <QThread>
-#include <QtCore/qnumeric.h>
 #include <utility>
 
 // MythTV headers
