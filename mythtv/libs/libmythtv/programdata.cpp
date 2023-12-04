@@ -6,7 +6,7 @@
 #include <utility>
 
 // Qt includes
-#include <QtCore> // for qAbs
+#include <QtGlobal> // for qAbs
 
 // MythTV headers
 #include "libmythbase/mythdb.h"
