@@ -1,6 +1,9 @@
 #ifndef V2SERVICEUTIL_H
 #define V2SERVICEUTIL_H
 
+// Qt
+#include <QDir>
+
 // MythTV
 #include "libmythmetadata/musicmetadata.h"
 #include "libmythmetadata/videometadatalistmanager.h"
