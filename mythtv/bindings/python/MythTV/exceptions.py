@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Provides custom error codes"""
 
 from MythTV.static import ERRCODES
@@ -191,7 +190,7 @@ class MythTZError( MythError ):
         if args[0] == self.TZ_ERROR:
             self.ename = 'TZ_ERROR'
             self.ecode, self.reason = args
-            self.args = ("Error processing time zone: {0}".format(self.reason))
+            self.args = ("Error processing time zone: {}".format(self.reason))
         elif args[0] == self.TZ_INVALID_FILE:
             self.ename = 'TZ_INVALID_FILE'
             self.ecode, = args

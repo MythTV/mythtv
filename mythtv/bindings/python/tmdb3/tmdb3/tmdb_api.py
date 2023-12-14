@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #-----------------------
 # Name: tmdb_api.py    Simple-to-use Python interface to TMDB's API v3
 # Python Library
@@ -156,7 +155,7 @@ class MovieSearchResult(SearchRepr, PagedRequest):
     def __init__(self, request, locale=None):
         if locale is None:
             locale = get_locale()
-        super(MovieSearchResult, self).__init__(
+        super().__init__(
                     request.new(language=locale.language),
                     lambda x: Movie(raw=x, locale=locale))
 
@@ -172,7 +171,7 @@ class SeriesSearchResult(SearchRepr, PagedRequest):
     def __init__(self, request, locale=None):
         if locale is None:
             locale = get_locale()
-        super(SeriesSearchResult, self).__init__(
+        super().__init__(
                     request.new(language=locale.language),
                     lambda x: Series_base(raw=x, locale=locale))
 
@@ -185,7 +184,7 @@ class PeopleSearchResult(SearchRepr, PagedRequest):
     """Stores a list of search matches."""
     _name = None
     def __init__(self, request):
-        super(PeopleSearchResult, self).__init__(
+        super().__init__(
                     request, lambda x: Person(raw=x))
 
 
@@ -197,7 +196,7 @@ class StudioSearchResult(SearchRepr, PagedRequest):
     """Stores a list of search matches."""
     _name = None
     def __init__(self, request):
-        super(StudioSearchResult, self).__init__(
+        super().__init__(
                     request, lambda x: Studio(raw=x))
 
 
@@ -209,7 +208,7 @@ class ListSearchResult(SearchRepr, PagedRequest):
     """Stores a list of search matches."""
     _name = None
     def __init__(self, request):
-        super(ListSearchResult, self).__init__(
+        super().__init__(
                     request, lambda x: List(raw=x))
 
 
@@ -224,7 +223,7 @@ class CollectionSearchResult(SearchRepr, PagedRequest):
     def __init__(self, request, locale=None):
         if locale is None:
             locale = get_locale()
-        super(CollectionSearchResult, self).__init__(
+        super().__init__(
                     request.new(language=locale.language),
                     lambda x: Collection(raw=x, locale=locale))
 
@@ -246,7 +245,7 @@ class Image(Element):
         if size not in self.sizes():
             raise TMDBImageSizeError
         url = Configuration.images['base_url'].rstrip('/')
-        return url+'/{0}/{1}'.format(size, self.filename)
+        return url+'/{}/{}'.format(size, self.filename)
 
     # sort preferring locale's language, but keep remaining ordering consistent
     def __lt__(self, other):
@@ -370,13 +369,13 @@ class Person(Element):
         return "<{0.__class__.__name__} '{0.name}'>".format(self)
 
     def _populate(self):
-        return Request('person/{0}'.format(self.id))
+        return Request('person/{}'.format(self.id))
 
     def _populate_credits(self):
-        return Request('person/{0}/credits'.format(self.id),
+        return Request('person/{}/credits'.format(self.id),
                        language=self._locale.language)
     def _populate_images(self):
-        return Request('person/{0}/images'.format(self.id))
+        return Request('person/{}/images'.format(self.id))
 
     roles = Datalist('cast', handler=lambda x: ReverseCast(raw=x),
                      poller=_populate_credits)
@@ -425,7 +424,7 @@ class Trailer(Element):
 
 class YoutubeTrailer(Trailer):
     def geturl(self):
-        return "http://www.youtube.com/watch?v={0}".format(self.source)
+        return "http://www.youtube.com/watch?v={}".format(self.source)
 
     def __repr__(self):
         # modified BASE64 encoding, no need to worry about unicode
@@ -465,7 +464,7 @@ class Genre(NameRepr, Element):
     name = Datapoint('name')
 
     def _populate_movies(self):
-        return Request('genre/{0}/movies'.format(self.id), \
+        return Request('genre/{}/movies'.format(self.id), \
                        language=self._locale.language)
 
     @property
@@ -498,10 +497,10 @@ class Studio(NameRepr, Element):
     parent = Datapoint('parent_company', handler=lambda x: Studio(raw=x))
 
     def _populate(self):
-        return Request('company/{0}'.format(self.id))
+        return Request('company/{}'.format(self.id))
 
     def _populate_movies(self):
-        return Request('company/{0}/movies'.format(self.id),
+        return Request('company/{}/movies'.format(self.id),
                        language=self._locale.language)
 
     # FIXME: add a cleaner way of adding types with no additional processing
@@ -562,7 +561,7 @@ class Movie(Element):
             session = get_session()
         account = Account(session=session)
         res = MovieSearchResult(
-                    Request('account/{0}/favorite_movies'.format(account.id),
+                    Request('account/{}/favorite_movies'.format(account.id),
                             session_id=session.sessionid))
         res._name = "Favorites"
         return res
@@ -573,7 +572,7 @@ class Movie(Element):
             session = get_session()
         account = Account(session=session)
         res = MovieSearchResult(
-                    Request('account/{0}/rated_movies'.format(account.id),
+                    Request('account/{}/rated_movies'.format(account.id),
                             session_id=session.sessionid))
         res._name = "Movies You Rated"
         return res
@@ -584,7 +583,7 @@ class Movie(Element):
             session = get_session()
         account = Account(session=session)
         res = MovieSearchResult(
-                    Request('account/{0}/movie_watchlist'.format(account.id),
+                    Request('account/{}/movie_watchlist'.format(account.id),
                             session_id=session.sessionid))
         res._name = "Movies You're Watching"
         return res
@@ -594,10 +593,10 @@ class Movie(Element):
         try:
             # assume string
             if not imdbid.startswith('tt'):
-                imdbid = "tt{0:0>7}".format(imdbid)
+                imdbid = "tt{:0>7}".format(imdbid)
         except AttributeError:
             # assume integer
-            imdbid = "tt{0:0>7}".format(imdbid)
+            imdbid = "tt{:0>7}".format(imdbid)
         if locale is None:
             locale = get_locale()
         movie = cls(imdbid, locale=locale)
@@ -634,40 +633,40 @@ class Movie(Element):
     languages = Datalist('spoken_languages', handler=Language)
 
     def _populate(self):
-        return Request('movie/{0}'.format(self.id), \
+        return Request('movie/{}'.format(self.id), \
                        language=self._locale.language)
 
     def _populate_titles(self):
         kwargs = {}
         if not self._locale.fallthrough:
             kwargs['country'] = self._locale.country
-        return Request('movie/{0}/alternative_titles'.format(self.id),
+        return Request('movie/{}/alternative_titles'.format(self.id),
                        **kwargs)
 
     def _populate_cast(self):
-        return Request('movie/{0}/casts'.format(self.id))
+        return Request('movie/{}/casts'.format(self.id))
 
     def _populate_images(self):
         kwargs = {}
         if not self._locale.fallthrough:
             kwargs['language'] = self._locale.language
-        return Request('movie/{0}/images'.format(self.id), **kwargs)
+        return Request('movie/{}/images'.format(self.id), **kwargs)
 
     def _populate_keywords(self):
-        return Request('movie/{0}/keywords'.format(self.id))
+        return Request('movie/{}/keywords'.format(self.id))
 
     def _populate_releases(self):
-        return Request('movie/{0}/releases'.format(self.id))
+        return Request('movie/{}/releases'.format(self.id))
 
     def _populate_cert_releases(self):
         return Request(f"movie/{self.id}/release_dates")
 
     def _populate_trailers(self):
-        return Request('movie/{0}/trailers'.format(self.id),
+        return Request('movie/{}/trailers'.format(self.id),
                             language=self._locale.language)
 
     def _populate_translations(self):
-        return Request('movie/{0}/translations'.format(self.id))
+        return Request('movie/{}/translations'.format(self.id))
 
     alternate_titles = Datalist('titles', handler=AlternateTitle, \
                                 poller=_populate_titles, sort=True)
@@ -695,7 +694,7 @@ class Movie(Element):
                             poller=_populate_translations)
 
     def setFavorite(self, value):
-        req = Request('account/{0}/favorite'.format(
+        req = Request('account/{}/favorite'.format(
                         Account(session=self._session).id),
                       session_id=self._session.sessionid)
         req.add_data({'movie_id': self.id,
@@ -706,14 +705,14 @@ class Movie(Element):
     def setRating(self, value):
         if not (0 <= value <= 10):
             raise TMDBError("Ratings must be between '0' and '10'.")
-        req = Request('movie/{0}/rating'.format(self.id),
+        req = Request('movie/{}/rating'.format(self.id),
                       session_id=self._session.sessionid)
         req.lifetime = 0
         req.add_data({'value':value})
         req.readJSON()
 
     def setWatchlist(self, value):
-        req = Request('account/{0}/movie_watchlist'.format(
+        req = Request('account/{}/movie_watchlist'.format(
                         Account(session=self._session).id),
                       session_id=self._session.sessionid)
         req.lifetime = 0
@@ -727,30 +726,30 @@ class Movie(Element):
     @property
     def similar(self):
         res = MovieSearchResult(Request(
-                                 'movie/{0}/similar_movies'.format(self.id)),
+                                 'movie/{}/similar_movies'.format(self.id)),
                                  locale=self._locale)
-        res._name = 'Similar to {0}'.format(self._printable_name())
+        res._name = 'Similar to {}'.format(self._printable_name())
         return res
 
     @property
     def lists(self):
-        res = ListSearchResult(Request('movie/{0}/lists'.format(self.id)))
-        res._name = "Lists containing {0}".format(self._printable_name())
+        res = ListSearchResult(Request('movie/{}/lists'.format(self.id)))
+        res._name = "Lists containing {}".format(self._printable_name())
         return res
 
     def _printable_name(self):
         if self.title is not None:
-            s = "'{0}'".format(self.title)
+            s = "'{}'".format(self.title)
         elif self.originaltitle is not None:
-            s = "'{0}'".format(self.originaltitle)
+            s = "'{}'".format(self.originaltitle)
         else:
             s = "'No Title'"
         if self.releasedate:
-            s = "{0} ({1})".format(s, self.releasedate.year)
+            s = "{} ({})".format(s, self.releasedate.year)
         return s
 
     def __repr__(self):
-        return "<{0} {1}>".format(self.__class__.__name__, self._printable_name())
+        return "<{} {}>".format(self.__class__.__name__, self._printable_name())
 
 
 class ReverseCast( Movie ):
@@ -780,14 +779,14 @@ class Collection(NameRepr, Element):
     overview = Datapoint('overview')
 
     def _populate(self):
-        return Request('collection/{0}'.format(self.id),
+        return Request('collection/{}'.format(self.id),
                        language=self._locale.language)
 
     def _populate_images(self):
         kwargs = {}
         if not self._locale.fallthrough:
             kwargs['language'] = self._locale.language
-        return Request('collection/{0}/images'.format(self.id), **kwargs)
+        return Request('collection/{}/images'.format(self.id), **kwargs)
 
     backdrops = Datalist('backdrops', handler=Backdrop,
                          poller=_populate_images, sort=True)
@@ -806,7 +805,7 @@ class List(NameRepr, Element):
     members = Datalist('items', handler=Movie)
 
     def _populate(self):
-        return Request('list/{0}'.format(self.id))
+        return Request('list/{}'.format(self.id))
 
 class Network(NameRepr,Element):
     id = Datapoint('id', initarg=1)
@@ -831,10 +830,10 @@ class Episode_base(NameRepr, Element):
 
 class Episode(Episode_base):
     def _populate(self):
-        return Request('tv/{0}/season/{1}/episode/{2}'.format(self.series_id, self.season_number, self.episode_number),
+        return Request('tv/{}/season/{}/episode/{}'.format(self.series_id, self.season_number, self.episode_number),
                        language=self._locale.language)
     def _populate_cast(self):
-        return Request('tv/{0}/season/{1}/episode/{2}/credits'.format(
+        return Request('tv/{}/season/{}/episode/{}/credits'.format(
             self.series_id, self.season_number, self.episode_number),
                        language=self._locale.language)
     cast = Datalist('cast', handler=Cast,
@@ -843,14 +842,14 @@ class Episode(Episode_base):
 
     # Items not currently used by tmdb3tv
     def _populate_external_ids(self):
-        return Request('tv/{0}/season/{1}/episode/{2}/external_ids'.format(
+        return Request('tv/{}/season/{}/episode/{}/external_ids'.format(
             self.series_id, self.season_number, self.episode_number))
 
     def _populate_images(self):
         kwargs = {}
         if not self._locale.fallthrough:
             kwargs['language'] = self._locale.language
-        return Request('tv/{0}/season/{1}/episode/{2}/images'.format(
+        return Request('tv/{}/season/{}/episode/{}/images'.format(
             self.series_id, self.season_number, self.episode_number), **kwargs)
 
     imdb_id = Datapoint('imdb_id', poller=_populate_external_ids)
@@ -872,7 +871,7 @@ class Season(NameRepr, Element):
                         passthrough={'series_id': 'series_id', 'season_number': 'season_number'})
 
     def _populate(self):
-        return Request('tv/{0}/season/{1}'.format(self.series_id, self.season_number),
+        return Request('tv/{}/season/{}'.format(self.series_id, self.season_number),
                        language=self._locale.language)
 
     # Items not currently used by tmdb3tv
@@ -880,10 +879,10 @@ class Season(NameRepr, Element):
         kwargs = {}
         if not self._locale.fallthrough:
             kwargs['language'] = self._locale.language
-        return Request('tv/{0}/season/{1}/images'.format(self.series_id, self.season_number), **kwargs)
+        return Request('tv/{}/season/{}/images'.format(self.series_id, self.season_number), **kwargs)
 
     def _populate_external_ids(self):
-        return Request('tv/{0}/season/{1}/external_ids'.format(self.series_id, self.season_number))
+        return Request('tv/{}/season/{}/external_ids'.format(self.series_id, self.season_number))
 
     posters = Datalist('posters', handler=Poster,
                        poller=_populate_images, sort=True)
@@ -925,21 +924,21 @@ class Series_base(NameRepr, Element):
 
 class Series(Series_base):
     def _populate(self):
-        return Request('tv/{0}'.format(self.id),
+        return Request('tv/{}'.format(self.id),
                        language=self._locale.language)
 
     # Items not currently used by tmdb3tv
     def _populate_cast(self):
-        return Request('tv/{0}/credits'.format(self.id))
+        return Request('tv/{}/credits'.format(self.id))
 
     def _populate_images(self):
         kwargs = {}
         if not self._locale.fallthrough:
             kwargs['language'] = self._locale.language
-        return Request('tv/{0}/images'.format(self.id), **kwargs)
+        return Request('tv/{}/images'.format(self.id), **kwargs)
 
     def _populate_external_ids(self):
-        return Request('tv/{0}/external_ids'.format(self.id))
+        return Request('tv/{}/external_ids'.format(self.id))
 
     cast = Datalist('cast', handler=Cast,
                     poller=_populate_cast, sort='order')

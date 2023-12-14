@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Provides managed logging."""
 
 from MythTV.static import LOGLEVEL, LOGMASK, LOGFACILITY
@@ -250,7 +249,7 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
         # abuse the __new__ constructor to set some immutable class attributes
         # before the class is instantiated
         cls._initlogger()
-        return super(MythLog, cls).__new__(cls)
+        return super().__new__(cls)
 
     def __init__(self, module='pythonbindings', db=None):
         self.module = module
@@ -286,7 +285,7 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
     @classmethod
     def _setpath(cls, filepath):
         cls._initlogger()
-        cls._setfile(os.path.join(filepath, "{0}.{1}.{2}.log"\
+        cls._setfile(os.path.join(filepath, "{}.{}.{}.log"\
                             .format(argv[0].split('/')[-1],
                                     datetime.now().strftime('%Y%m%d%H%M%S'),
                                     os.getpid())))
@@ -459,17 +458,17 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
 
     def _logsyslog(self, mask, level, message, detail):
         syslog.syslog(level,
-                      message + (' -- {0}'.format(detail) if detail else ''))
+                      message + (' -- {}'.format(detail) if detail else ''))
 
     def _logjournallog(self, mask, level, message, detail):
         if detail:
-            detail = ' -- {0}'.format(detail)
+            detail = ' -- {}'.format(detail)
         else:
             detail = ''
         application = argv[0]
         if '/' in application:
             application = application.rsplit('/', 1)[1]
-        msg = ("[{0}]: {1}{2}".format(self.module, message, detail))
+        msg = ("[{}]: {}{}".format(self.module, message, detail))
         journal.send(msg, PRIORITY=level, SYSLOG_IDENTIFIER=application )
 
     def __call__(self, mask, level, message, detail=None):

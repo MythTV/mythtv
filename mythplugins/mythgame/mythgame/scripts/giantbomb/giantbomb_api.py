@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: UTF-8 -*-
 # ----------------------
 # Name: giantbomb_api.py  Simple-to-use Python interface to the GiantBomb's API (api.giantbomb.com)
 # Python Script
@@ -36,7 +35,7 @@ if not IS_PY2:
 from .giantbomb_exceptions import (GiantBombBaseError, GiantBombHttpError, GiantBombXmlError,  GiantBombGameNotFound,)
 
 
-class OutStreamEncoder(object):
+class OutStreamEncoder:
     """Wraps a stream with an encoder"""
     def __init__(self, outstream, encoding=None):
         self.out = outstream
@@ -68,7 +67,7 @@ try:
         from io import StringIO
     from lxml import etree
 except Exception as e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -80,7 +79,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -106,16 +105,16 @@ class gamedbQueries():
 
         self.config['apikey'] = apikey
         self.config['debug'] = debug
-        self.config['searchURL'] = u'https://www.giantbomb.com/api/search'
-        self.config['dataURL'] = u'https://www.giantbomb.com/api/game/%s'
+        self.config['searchURL'] = 'https://www.giantbomb.com/api/search'
+        self.config['dataURL'] = 'https://www.giantbomb.com/api/game/%s'
         # giantbomb.com now requires a unique 'User-Agent':
         self.config['headers'] = {"User-Agent": 'MythTV giantbomb grabber 0.2'}
 
-        self.error_messages = {'GiantBombHttpError': u"! Error: A connection error to api.giantbomb.com was raised (%s)\n", 'GiantBombXmlError': u"! Error: Invalid XML was received from api.giantbomb.com (%s)\n", 'GiantBombBaseError': u"! Error: An error was raised (%s)\n", }
+        self.error_messages = {'GiantBombHttpError': "! Error: A connection error to api.giantbomb.com was raised (%s)\n", 'GiantBombXmlError': "! Error: Invalid XML was received from api.giantbomb.com (%s)\n", 'GiantBombBaseError': "! Error: An error was raised (%s)\n", }
 
         self.baseProcessingDir = os.path.dirname( os.path.realpath( __file__ ))
 
-        self.pubDateFormat = u'%a, %d %b %Y %H:%M:%S GMT'
+        self.pubDateFormat = '%a, %d %b %Y %H:%M:%S GMT'
         self.xmlParser = etree.XMLParser(remove_blank_text=True)
 
         self.supportedJobList = ["actor", "author", "producer", "executive producer", "director", "cinematographer", "composer", "editor", "casting", "voice actor", "music", "writer", "technical director", "design director", ]
@@ -172,7 +171,7 @@ class gamedbQueries():
                         return unicode(entity, "iso-8859-1")
             return text # leave as is
         if IS_PY2:
-            text23 = self.ampReplace(re.sub(u"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace(u'\n',u' ')
+            text23 = self.ampReplace(re.sub(r"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace('\n',' ')
         else:
             text23 = self.ampReplace(re.sub(r"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace('\n',' ')
         return text23
@@ -185,7 +184,7 @@ class gamedbQueries():
         try:
             return unicode(text, 'utf8')
         except UnicodeDecodeError:
-            return u''
+            return ''
         except (UnicodeEncodeError, TypeError):
             return text
     # end textUtf8()
@@ -195,7 +194,7 @@ class gamedbQueries():
         '''Replace all "&" characters with "&amp;"
         '''
         text = self.textUtf8(text)
-        return text.replace(u'&amp;',u'~~~~~').replace(u'&',u'&amp;').replace(u'~~~~~', u'&amp;')
+        return text.replace('&amp;','~~~~~').replace('&','&amp;').replace('~~~~~', '&amp;')
     # end ampReplace()
 
 
@@ -204,8 +203,8 @@ class gamedbQueries():
         return the string without HTML tags or LFs
         '''
         if not len(html):
-            return u""
-        return self.massageText(html).strip().replace(u'\n', u' ').replace(u'', u"&apos;").replace(u'', u"&apos;")
+            return ""
+        return self.massageText(html).strip().replace('\n', ' ').replace('', "&apos;").replace('', "&apos;")
     # end htmlToString()
 
     def getHtmlData(self, context, *args):
@@ -231,7 +230,7 @@ class gamedbQueries():
                 return filteredData[0]
             else:
                 return filteredData[0].text
-        return u''
+        return ''
     # end getHtmlData()
 
     def pubDate(self, context, *inputArgs):
@@ -243,19 +242,19 @@ class gamedbQueries():
         args = []
         for arg in inputArgs:
             args.append(arg)
-        if args[0] == u'':
+        if args[0] == '':
             return datetime.datetime.now().strftime(self.pubDateFormat)
         index = args[0].find('+')
         if index == -1:
             index = args[0].find('-')
         if index != -1 and index > 5:
             args[0] = args[0][:index].strip()
-        args[0] = args[0].replace(',', u'').replace('.', u'')
+        args[0] = args[0].replace(',', '').replace('.', '')
         try:
             if len(args) > 2:
                 pubdate = time.strptime(args[0], args[2])
             elif len(args) > 1:
-                args[1] = args[1].replace(',', u'').replace('.', u'')
+                args[1] = args[1].replace(',', '').replace('.', '')
                 if args[1].find('GMT') != -1:
                     args[1] = args[1][:args[1].find('GMT')].strip()
                     args[0] = args[0][:args[0].rfind(' ')].strip()
@@ -273,7 +272,7 @@ class gamedbQueries():
             else:
                 return datetime.datetime.now().strftime(self.pubDateFormat)
         except Exception as err:
-            sys.stderr.write(u'! Error: pubDate variables(%s) error(%s)\n' % (args, err))
+            sys.stderr.write('! Error: pubDate variables(%s) error(%s)\n' % (args, err))
         return args[0]
     # end pubDate()
 
@@ -296,16 +295,16 @@ class gamedbQueries():
             else:
                 month = None
         except:
-            return u''
+            return ''
         if not year:
-            return u''
+            return ''
         if month and not quarter:
-            pubdate = time.strptime((u'%s-%s-01' % (year, month)), '%Y-%m-%d')
+            pubdate = time.strptime(('%s-%s-01' % (year, month)), '%Y-%m-%d')
         elif not month and quarter:
-            month = str((int(quarter)*3))
-            pubdate = time.strptime((u'%s-%s-01' % (year, month)), '%Y-%m-%d')
+            month = str(int(quarter)*3)
+            pubdate = time.strptime(('%s-%s-01' % (year, month)), '%Y-%m-%d')
         else:
-            pubdate = time.strptime((u'%s-12-01' % (year, )), '%Y-%m-%d')
+            pubdate = time.strptime(('%s-12-01' % (year, )), '%Y-%m-%d')
 
         return time.strftime('%Y-%m-%d', pubdate)
     # end futureReleaseDate()
@@ -319,7 +318,7 @@ class gamedbQueries():
             ''' Create a single Image element
             return the image element
             '''
-            imageElement = etree.XML(u"<image></image>")
+            imageElement = etree.XML("<image></image>")
             imageElement.attrib['type'] = typeImage
             imageElement.attrib['url'] = url
             imageElement.attrib['thumb'] = thumb
@@ -332,7 +331,7 @@ class gamedbQueries():
             imageList = superImageFilter(imageElement)
             if len(imageList):
                 for image in imageList:
-                    self.imageElements.append(makeImageElement('coverart', image, image.replace(u'super', u'thumb')))
+                    self.imageElements.append(makeImageElement('coverart', image, image.replace('super', 'thumb')))
         htmlElement = self.getHtmlData('dummy', etree.tostring(args[1][0], method="text", encoding=unicode).strip())
         if len(htmlElement):
             for image in htmlElement[0].xpath('.//a/img/@src'):
@@ -340,14 +339,14 @@ class gamedbQueries():
                     continue
                 if image.find('thumb') == -1:
                     continue
-                self.imageElements.append(makeImageElement('screenshot', image.replace(u'thumb', u'super'), image))
+                self.imageElements.append(makeImageElement('screenshot', image.replace('thumb', 'super'), image))
 
         if len(args) > 2:
             for imageElement in args[2]:
                 imageList = superImageFilter(imageElement)
                 if len(imageList):
                     for image in imageList:
-                        self.imageElements.append(makeImageElement('screenshot', image, image.replace(u'super', u'thumb')))
+                        self.imageElements.append(makeImageElement('screenshot', image, image.replace('super', 'thumb')))
 
         if not len(self.imageElements):
             return False
@@ -428,10 +427,10 @@ class gamedbQueries():
         try:
             queryResult = etree.fromstring(res.content)
         except Exception as errmsg:
-            sys.stderr.write(u"! Error: Invalid XML was received from www.giantbomb.com (%s)\n" % errmsg)
+            sys.stderr.write("! Error: Invalid XML was received from www.giantbomb.com (%s)\n" % errmsg)
             sys.exit(1)
 
-        queryXslt = etree.XSLT(etree.parse(u'%s/XSLT/giantbombQuery.xsl' % self.baseProcessingDir))
+        queryXslt = etree.XSLT(etree.parse('%s/XSLT/giantbombQuery.xsl' % self.baseProcessingDir))
         gamebombXpath = etree.FunctionNamespace('https://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format')
         gamebombXpath.prefix = 'gamebombXpath'
         self.buildFuncDict()
@@ -465,10 +464,10 @@ class gamedbQueries():
         try:
             videoResult = etree.fromstring(res.content)
         except Exception as errmsg:
-            sys.stderr.write(u"! Error: Invalid XML was received from www.giantbomb.com (%s)\n" % errmsg)
+            sys.stderr.write("! Error: Invalid XML was received from www.giantbomb.com (%s)\n" % errmsg)
             sys.exit(1)
 
-        gameXslt = etree.XSLT(etree.parse(u'%s/XSLT/giantbombGame.xsl' % self.baseProcessingDir))
+        gameXslt = etree.XSLT(etree.parse('%s/XSLT/giantbombGame.xsl' % self.baseProcessingDir))
         gamebombXpath = etree.FunctionNamespace('https://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format')
         gamebombXpath.prefix = 'gamebombXpath'
         self.buildFuncDict()
@@ -493,10 +492,10 @@ def main():
     api_key = "b5883a902a8ed88b15ce21d07787c94fd6ad9f33"
     gamebomb = gamedbQueries(api_key)
     # Output a dictionary of matching movie titles
-    gamebomb.gameSearch(u'Grand')
+    gamebomb.gameSearch('Grand')
     print()
     # Output a dictionary of matching movie details for GiantBomb number '19995'
-    gamebomb.gameData(u'19995')
+    gamebomb.gameData('19995')
 # end main()
 
 if __name__ == '__main__':

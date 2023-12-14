@@ -226,11 +226,11 @@ class MiroInterpreter(cmd.Cmd):
         count = downloadingItems.count()
         for it in downloadingItems:
             logging.info(
-            u"(%s - %s) video is downloading with (%0.0f%%) complete" % (
-                it.get_channel_title(True).replace(u'/',u'-'),
-                it.get_title().replace(u'/',u'-'), it.download_progress()))
+            "(%s - %s) video is downloading with (%0.0f%%) complete" % (
+                it.get_channel_title(True).replace('/','-'),
+                it.get_title().replace('/','-'), it.download_progress()))
         if not count:
-            logging.info(u"No items downloading")
+            logging.info("No items downloading")
         if count:
             self.downloading = True
 
@@ -240,10 +240,10 @@ class MiroInterpreter(cmd.Cmd):
         try:
             messages.ImportFeeds(filename).send_to_backend()
             logging.info(
-                u"Import of OPML file (%s) sent to Miro" % (filename))
+                "Import of OPML file (%s) sent to Miro" % (filename))
         except Exception, e:
             logging.info(
-                u"Import of OPML file (%s) failed, error (%s)" % (filename, e))
+                "Import of OPML file (%s) failed, error (%s)" % (filename, e))
 
     @run_in_event_loop
     def do_mythtv_updatewatched(self, line):
@@ -255,17 +255,17 @@ class MiroInterpreter(cmd.Cmd):
                      break
             else:
                 logging.info(
-                    u"Item for Miro video (%s) not found, skipping" % video)
+                    "Item for Miro video (%s) not found, skipping" % video)
                 continue
             if self.simulation:
                 logging.info(
-                    u"Simulation: Item (%s - %s) marked as seen and watched" % (
+                    "Simulation: Item (%s - %s) marked as seen and watched" % (
                     it.get_channel_title(True), it.get_title()))
             else:
                 it.mark_watched(mark_other_items=True)
-                self.statistics[u'Miro_marked_watch_seen']+=1
+                self.statistics['Miro_marked_watch_seen']+=1
                 logging.info(
-                    u"Item (%s - %s) marked as seen and watched" % (
+                    "Item (%s - %s) marked as seen and watched" % (
                     it.get_channel_title(True), it.get_title()))
 
     @run_in_event_loop
@@ -273,20 +273,20 @@ class MiroInterpreter(cmd.Cmd):
         """Process MythTV get all un-watched video details"""
         if self.verbose:
              print
-             print u"Getting details on un-watched Miro videos"
+             print "Getting details on un-watched Miro videos"
         self.videofiles = []
         if item.Item.unwatched_downloaded_items().count():
             if self.verbose:
-                print u"%-20s %-10s %s" % (u"State", u"Size", u"Name")
-                print u"-" * 70
+                print "%-20s %-10s %s" % ("State", "Size", "Name")
+                print "-" * 70
             for it in item.Item.unwatched_downloaded_items():
                 # Skip any audio file as MythTV Internal player may abort
                 # the MythTV Frontend on a MP3
                 state = it.get_state()
-                if not state == u'newly-downloaded':
+                if not state == 'newly-downloaded':
                     continue
                 # Skip any bittorrent video downloads for legal concerns
-                if hasattr(it.get_parent(), u'url'):
+                if hasattr(it.get_parent(), 'url'):
                     if filetypes.is_torrent_filename(it.get_parent().url):
                         continue
 
@@ -294,9 +294,9 @@ class MiroInterpreter(cmd.Cmd):
                 # as Miro metadata is corrupt
                 if it.get_filename() is None:
                     it.expire()
-                    self.statistics[u'Miro_videos_deleted']+=1
+                    self.statistics['Miro_videos_deleted']+=1
                     logging.info(
-u'Unwatched video (%s) has been removed from Miro as item had no valid file name' % it.get_title())
+'Unwatched video (%s) has been removed from Miro as item had no valid file name' % it.get_title())
                     continue
 
                 self.printItems(it)
@@ -304,34 +304,34 @@ u'Unwatched video (%s) has been removed from Miro as item had no valid file name
             if self.verbose:
                 print
         if not len(self.videofiles):
-             logging.info(u"No un-watched Miro videos")
+             logging.info("No un-watched Miro videos")
 
     @run_in_event_loop
     def do_mythtv_getwatched(self, line):
         """Process MythTV get all watched/saved video details"""
         if self.verbose:
            print
-           print u"Getting details on watched/saved Miro videos"
+           print "Getting details on watched/saved Miro videos"
         self.videofiles = []
         if item.Item.downloaded_view().count():
             if self.verbose:
-                print u"%-20s %-10s %s" % (u"State", u"Size", u"Name")
-                print u"-" * 70
+                print "%-20s %-10s %s" % ("State", "Size", "Name")
+                print "-" * 70
             for it in item.Item.downloaded_view():
                 state = it.get_state()
-                if state == u'newly-downloaded':
+                if state == 'newly-downloaded':
                     continue
                 # Skip any bittorrent video downloads for legal concerns
-                if hasattr(it.get_parent(), u'url'):
+                if hasattr(it.get_parent(), 'url'):
                     if filetypes.is_torrent_filename(it.get_parent().url):
                         continue
 
                 # Any item without a proper file name needs to be removed as Miro metadata is corrupt
                 if it.get_filename() is None:
                     it.expire()
-                    self.statistics[u'Miro_videos_deleted']+=1
+                    self.statistics['Miro_videos_deleted']+=1
                     logging.info(
-u'Watched video (%s) has been removed from Miro as item had no valid file name' % it.get_title())
+'Watched video (%s) has been removed from Miro as item had no valid file name' % it.get_title())
                     continue
 
                 self.printItems(it)
@@ -339,7 +339,7 @@ u'Watched video (%s) has been removed from Miro as item had no valid file name' 
             if self.verbose:
                 print
         if not len(self.videofiles):
-             logging.info(u"No watched/saved Miro videos")
+             logging.info("No watched/saved Miro videos")
 
     ###########################################################
     # START - Function used for debugging - DO NOT UNCOMMENT
@@ -376,9 +376,9 @@ u'Watched video (%s) has been removed from Miro as item had no valid file name' 
         if not self.verbose:
             return
         state = it.get_state()
-        if state == u'downloading':
-            state += u' (%0.0f%%)' % it.download_progress()
-        print u"%-20s %-10s %s" % (state, it.get_size_for_display(),
+        if state == 'downloading':
+            state += ' (%0.0f%%)' % it.download_progress()
+        print "%-20s %-10s %s" % (state, it.get_size_for_display(),
             it.get_title())
     # end printItems()
 
@@ -403,19 +403,19 @@ u'Watched video (%s) has been removed from Miro as item had no valid file name' 
                             self.is_not_punct_char, args.lower()):
                     break
         else:
-            logging.info(u"No item named %s" % args)
+            logging.info("No item named %s" % args)
             return
         if it.is_downloaded():
             if self.simulation:
                 logging.info(
-u"Simulation: Item (%s - %s) has been removed from Miro" % (
+"Simulation: Item (%s - %s) has been removed from Miro" % (
                         it.get_channel_title(True), it.get_title()))
             else:
                 it.expire()
-                self.statistics[u'Miro_videos_deleted']+=1
-                logging.info(u'%s has been removed from Miro' % it.get_title())
+                self.statistics['Miro_videos_deleted']+=1
+                logging.info('%s has been removed from Miro' % it.get_title())
         else:
-            logging.info(u'%s is not downloaded' % it.get_title())
+            logging.info('%s is not downloaded' % it.get_title())
 
     def _get_item_dict(self, it):
         """Take an item and convert all elements into a dictionary
@@ -425,12 +425,12 @@ u"Simulation: Item (%s - %s) has been removed from Miro" % (
             if filename:
                 (dirName, fileName) = os.path.split(filename)
                 (fileBaseName, fileExtension)=os.path.splitext(fileName)
-                if not fileExtension[1:] in [u"png", u"jpg", u"bmp", u"gif"]:
-                    return u''
+                if not fileExtension[1:] in ["png", "jpg", "bmp", "gif"]:
+                    return ''
                 else:
                     return filename
             else:
-                return u''
+                return ''
 
         def useImageMagick(screenshot):
             """ Using ImageMagick's utility 'identify'. Decide whether the screen shot is worth using.
@@ -440,11 +440,11 @@ u"Simulation: Item (%s - %s) has been removed from Miro" % (
             >>> screenshot if the quality is good enough to use
             """
             if not self.imagemagick: # If imagemagick is not installed do not bother checking
-               return u''
+               return ''
 
             width_height = re.compile(
-u'''^(.+?)[ ]\[?([0-9]+)x([0-9]+)[^\\/]*$''', re.UNICODE)
-            p = subprocess.Popen(u'identify "%s"' % (screenshot),
+'''^(.+?)[ ]\\[?([0-9]+)x([0-9]+)[^\\/]*$''', re.UNICODE)
+            p = subprocess.Popen('identify "%s"' % (screenshot),
                                 shell=True, bufsize=4096,
                                 stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE,
@@ -458,9 +458,9 @@ u'''^(.+?)[ ]\[?([0-9]+)x([0-9]+)[^\\/]*$''', re.UNICODE)
                     width, height = int(width), int(height)
                     if width >= 320:
                         return screenshot
-                return u''
+                return ''
             else:
-                return u''
+                return ''
             return screenshot
         # end useImageMagick()
 
@@ -469,49 +469,49 @@ u'''^(.+?)[ ]\[?([0-9]+)x([0-9]+)[^\\/]*$''', re.UNICODE)
 
         # Conform to maximum length for MythTV database fields title and subtitle
         maximum_length = 128
-        channel_title = it.get_channel_title(True).replace(u'/',u'-')
+        channel_title = it.get_channel_title(True).replace('/','-')
         if channel_title:
             if len(channel_title) > maximum_length:
                 channel_title = channel_title[:maximum_length]
-            channel_title = channel_title.replace(u'"', u'')	# These characters mess with filenames
-        title = it.get_title().replace(u'/',u'-')
+            channel_title = channel_title.replace('"', '')	# These characters mess with filenames
+        title = it.get_title().replace('/','-')
         if title:
             if len(title) > maximum_length:
                 title = title[:maximum_length]
-            title = title.replace(u'"', u'')	# These characters mess with filenames
-            title = title.replace(u"'", u'')	# These characters mess with filenames
+            title = title.replace('"', '')	# These characters mess with filenames
+            title = title.replace("'", '')	# These characters mess with filenames
 
         item_dict =  {
-            u'feed_id': it.feed_id, u'parent_id': it.parent_id,
-            u'isContainerItem': it.is_container_item,
-            u'seen': it.get_state(),
-            u'autoDownloaded': it.auto_downloaded,
-            u'pendingManualDL': it.pending_manual_download,
-            u'downloadedTime': it.downloaded_time,
-            u'watchedTime': it.watched_time,
-            u'pendingReason': it.pending_reason,
-            u'title': title,
-            u'expired': it.expired,
-            u'keep': it.keep, u'videoFilename': it.get_filename(),
-            u'eligibleForAutoDownload': it.eligible_for_autodownload,
-            u'duration': it.duration,
-            u'screenshot': it.screenshot,
-            u'resumeTime': it.resume_time,
-            u'channelTitle': channel_title,
-            u'description': it.get_description(),
-            u'size': it.get_size(),
-            u'releasedate': it.get_release_date(),
-            u'length': it.get_duration_value(),
-            u'channel_icon': channel_icon,
-            u'item_icon': item_icon_filename,
-            u'inetref': u'', u'season': 1, u'episode': 1,
+            'feed_id': it.feed_id, 'parent_id': it.parent_id,
+            'isContainerItem': it.is_container_item,
+            'seen': it.get_state(),
+            'autoDownloaded': it.auto_downloaded,
+            'pendingManualDL': it.pending_manual_download,
+            'downloadedTime': it.downloaded_time,
+            'watchedTime': it.watched_time,
+            'pendingReason': it.pending_reason,
+            'title': title,
+            'expired': it.expired,
+            'keep': it.keep, 'videoFilename': it.get_filename(),
+            'eligibleForAutoDownload': it.eligible_for_autodownload,
+            'duration': it.duration,
+            'screenshot': it.screenshot,
+            'resumeTime': it.resume_time,
+            'channelTitle': channel_title,
+            'description': it.get_description(),
+            'size': it.get_size(),
+            'releasedate': it.get_release_date(),
+            'length': it.get_duration_value(),
+            'channel_icon': channel_icon,
+            'item_icon': item_icon_filename,
+            'inetref': '', 'season': 1, 'episode': 1,
         }
 
-        if not item_dict[u'screenshot']:
-            if item_dict[u'item_icon']:
-                item_dict[u'screenshot'] = useImageMagick(item_dict[u'item_icon'])
+        if not item_dict['screenshot']:
+            if item_dict['item_icon']:
+                item_dict['screenshot'] = useImageMagick(item_dict['item_icon'])
 
-        for key in [u'screenshot', u'channel_icon', u'item_icon']:
+        for key in ['screenshot', 'channel_icon', 'item_icon']:
             if item_dict[key]:
                 item_dict[key] = compatibleGraphics(item_dict[key])
             #if self.verbose:

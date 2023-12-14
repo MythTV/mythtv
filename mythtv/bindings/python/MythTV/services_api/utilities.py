@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """API utilities."""
 
 from datetime import datetime, timedelta

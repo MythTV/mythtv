@@ -1,4 +1,3 @@
-# -*- coding: UTF-8 -*-
 # ----------------------
 # Name: tmdb3.py
 # Python Script
@@ -125,12 +124,12 @@ def buildSingle(inetref, opts):
         m.countries.append(country.name)
     for cast in movie.cast:
         d = {'name':cast.name, 'character':cast.character, 'department':'Actors',
-             'job':'Actor', 'url':'http://www.themoviedb.org/people/{0}'.format(cast.id)}
+             'job':'Actor', 'url':'http://www.themoviedb.org/people/{}'.format(cast.id)}
         if cast.profile: d['thumb'] = cast.profile.geturl()
         m.people.append(d)
     for crew in movie.crew:
         d = {'name':crew.name, 'job':crew.job, 'department':crew.department,
-             'url':'http://www.themoviedb.org/people/{0}'.format(crew.id)}
+             'url':'http://www.themoviedb.org/people/{}'.format(crew.id)}
         if crew.profile: d['thumb'] = crew.profile.geturl()
         m.people.append(d)
     for backdrop in movie.backdrops:
@@ -377,17 +376,17 @@ def buildEpisode(args, opts):
 
     for cast in episode.cast:
         d = {'name':cast.name, 'character':cast.character, 'department':'Actors',
-             'job':'Actor', 'url':'http://www.themoviedb.org/people/{0}'.format(cast.id)}
+             'job':'Actor', 'url':'http://www.themoviedb.org/people/{}'.format(cast.id)}
         if cast.profile: d['thumb'] = cast.profile.geturl()
         m.people.append(d)
     for crew in episode.crew:
         d = {'name':crew.name, 'job':crew.job, 'department':crew.department,
-             'url':'http://www.themoviedb.org/people/{0}'.format(crew.id)}
+             'url':'http://www.themoviedb.org/people/{}'.format(crew.id)}
         if crew.profile: d['thumb'] = crew.profile.geturl()
         m.people.append(d)
     for guest in episode.guest_stars:
         d = {'name':guest.name, 'job':"Guest Star",
-             'url':'http://www.themoviedb.org/people/{0}'.format(guest.id)}
+             'url':'http://www.themoviedb.org/people/{}'.format(guest.id)}
         if guest.profile: d['thumb'] = guest.profile.geturl()
         m.people.append(d)
     if episode.still:

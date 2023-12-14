@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # smolt - Fedora hardware profiler
 #
 # Copyright (C) 2011 Raymond Wagner <raymond@wagnerrp.com>
@@ -19,10 +18,6 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
 
-from __future__ import division
-from __future__ import print_function
-from builtins import range
-from builtins import object
 from past.utils import old_div
 import os
 import re
@@ -39,7 +34,7 @@ _BE = MythTV.MythBE(db=_DB)
 _SETTINGS = _DB.settings[_DB.gethostname()]
 prefix = 'mythtv'
 
-class _Mythtv_data(object):
+class _Mythtv_data:
     def __init__(self, gate):
         self.get_data(gate)
 
@@ -162,8 +157,8 @@ class _Mythtv_data(object):
         class VideoSource( MythTV.database.DBData ): pass
 
         data = OrdDict()
-        usedsources = list(set([inp.sourceid for inp in CaptureCard.getAllEntries()]))
-        grabbers = list(set([VideoSource(id).xmltvgrabber for id in usedsources]))
+        usedsources = list({inp.sourceid for inp in CaptureCard.getAllEntries()})
+        grabbers = list({VideoSource(id).xmltvgrabber for id in usedsources})
         data.sourcecount = len(usedsources)
         data.grabbers = grabbers
         return data
@@ -208,7 +203,7 @@ class _Mythtv_data(object):
         sgnames  = list(set(sgnames))
 
         sgs = []
-        for host in set([_DB.gethostname(), _BE.hostname]):
+        for host in {_DB.gethostname(), _BE.hostname}:
             for sgname in sgnames:
                 for sg in _DB.getStorageGroup(sgname, host):
                     if sg.local:
@@ -229,7 +224,7 @@ class _Mythtv_data(object):
         def _read_file(filename):
             firstline=[]
             try:
-                with open(filename,'r') as f:
+                with open(filename) as f:
                         line = f.readline()
                         firstline = line.split()
             except:
@@ -308,7 +303,7 @@ class _Mythtv_data(object):
         class DisplayProfileGroups( MythTV.database.DBData ): pass
         class DisplayProfiles( OrdDict ):
             def __new__(cls, *args, **kwargs):
-                inst = super(DisplayProfiles, cls).__new__(cls, *args, **kwargs)
+                inst = super().__new__(cls, *args, **kwargs)
                 inst.__dict__['_profilegroupid'] = None
                 inst.__dict__['_profileid'] = None
                 inst.__dict__['_db'] = None
@@ -387,7 +382,7 @@ class _Mythtv_data(object):
         data.place_avg = 0
         data.place_stddev = 0
 
-        r = re.compile('Scheduled ([0-9]*) items in [0-9.]* = ([0-9.]*) match \+ ([0-9.]*) place')
+        r = re.compile(r'Scheduled ([0-9]*) items in [0-9.]* = ([0-9.]*) match \+ ([0-9.]*) place')
         data = OrdDict()
 
         c = _DB.cursor()
@@ -438,7 +433,7 @@ class _Mythtv_data(object):
                 else:
                     virtual[1] += isvirt
 
-        data = {'tuners':dict([(k,len(v)) for k,v in list(cardtypes.items())])}
+        data = {'tuners':{k:len(v) for k,v in list(cardtypes.items())}}
         if virtual[0]:
             data['vtpertuner'] = old_div(sum(virtual),float(virtual[0]))
         return data

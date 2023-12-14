@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: tedtalks_api - Simple-to-use Python interface to the TedTalks RSS feeds
 #                       (http://www.ted.com)
@@ -33,7 +31,7 @@ from operator import itemgetter, attrgetter
 from .tedtalks_exceptions import (TedTalksUrlError, TedTalksHttpError, TedTalksRssError, TedTalksVideoNotFound, TedTalksConfigFileError, TedTalksUrlDownloadError)
 import io
 
-class OutStreamEncoder(object):
+class OutStreamEncoder:
     """Wraps a stream with an encoder"""
     def __init__(self, outstream, encoding=None):
         self.out = outstream
@@ -98,7 +96,7 @@ if mashups_api.__version__ < '0.1.0':
     sys.exit(1)
 
 
-class Videos(object):
+class Videos:
     """Main interface to http://www.ted.com
     This is done to support a common naming framework for all python Netvision plugins no matter their
     site target.

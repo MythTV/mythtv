@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: youtube_api - Simple-to-use Python interface to the youtube API (http://www.youtube.com/)
 # Python Script
@@ -64,11 +62,11 @@ class JsonHandler:
         try:
             urlhandle = urllib.request.urlopen(self.url)
             return json.load(urlhandle)
-        except IOError as errormsg:
+        except OSError as errormsg:
             raise YouTubeHttpError(errormsg)
 
 
-class Videos(object):
+class Videos:
     """Main interface to http://www.youtube.com/
     This is done to support a common naming framework for all python Netvision plugins no matter their site
     target.
@@ -457,7 +455,7 @@ class Videos(object):
                     if item[key]:
                         item[key] = self.massageDescription(item[key].strip())
                         item[key] = item[key].replace('|', '-')
-                elif type(item[key]) == type(''):
+                elif type(item[key]) == str:
                     if item[key]:
                         item[key] = self.common.ampReplace(item[key].replace('"\n',' ').strip())
         except KeyError:

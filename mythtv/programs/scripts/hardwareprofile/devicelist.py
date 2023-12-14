@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # smolt - Fedora hardware profiler
 #
 # Copyright (C) 2010 Mike McGrath <mmcgrath@redhat.com>
@@ -18,7 +16,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
-from builtins import object
 import os
 from hwdata import DeviceMap
 
@@ -93,7 +90,7 @@ DATA_LIST = [   'vendor',
                 'subsystem_device']
 
 def cat(file_name):
-    fd = open(file_name, 'r')
+    fd = open(file_name)
     results = fd.readlines()
     fd.close()
     return results
@@ -118,11 +115,11 @@ def device_factory(cls, id):
         device.process()
     except OSError:
         pass
-    except IOError:
+    except OSError:
         pass
     return device
 
-class Device( object ):
+class Device:
     bus = 'Unknown'
     def __init__(self, id):
         self.id             = id

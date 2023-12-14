@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # smolt - Fedora hardware profiler
 #
 # Copyright (C) 2009 Sebastian Pipping <sebastian@pipping.org>
@@ -17,14 +16,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
-from builtins import str
-from builtins import object
 import configparser
 import os
 import logging
 
 
-class _GateBase(object):
+class _GateBase:
     def process(self, data_set, value_if_granted, value_else):
         if self.grants(data_set):
             return value_if_granted

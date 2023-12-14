@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Provides tools for UPNP searches"""
 
 from MythTV.exceptions import MythError
@@ -7,7 +6,7 @@ from MythTV.logging import MythLog
 from time import time
 import socket
 
-class MSearch( object ):
+class MSearch:
     """
     Opens a socket for performing UPNP searches.
     """
@@ -25,7 +24,7 @@ class MSearch( object ):
                 self.sock.bind(('', port))
                 self.addr = (addr, port)
                 listening = True
-            except socket.error as e:
+            except OSError as e:
                 if port < 1910:
                     port += 1
                 else:
@@ -65,7 +64,7 @@ class MSearch( object ):
         while (time()<atime) and self._runsearch:
             try:
                 sdata, saddr = sock.recvfrom(2048)
-            except socket.error:
+            except OSError:
                 continue #no data, continue
             sdata = sdata.decode('utf-8')
 

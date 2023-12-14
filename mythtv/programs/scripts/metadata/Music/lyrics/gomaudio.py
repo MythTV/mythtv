@@ -1,4 +1,3 @@
-# -*- Mode: python; coding: utf-8; tab-width: 8; indent-tabs-mode: t; -*-
 """
 Scraper for http://newlyrics.gomtv.com/
 
@@ -31,10 +30,10 @@ GOM_URL = "http://newlyrics.gomtv.com/cgi-bin/lyrics.cgi?cmd=find_get_lyrics&fil
 
 def remove_accents(data):
     nfkd_data = unicodedata.normalize('NFKD', data)
-    return u"".join([c for c in nfkd_data if not unicodedata.combining(c)])
+    return "".join([c for c in nfkd_data if not unicodedata.combining(c)])
 
 
-class gomClient(object):
+class gomClient:
     '''
     privide Gom specific function, such as key from mp3
     '''
@@ -120,7 +119,7 @@ def performSelfTest():
 
 def buildLyrics(lyrics):
     from lxml import etree
-    xml = etree.XML(u'<lyrics></lyrics>')
+    xml = etree.XML('<lyrics></lyrics>')
     etree.SubElement(xml, "artist").text = lyrics.artist
     etree.SubElement(xml, "album").text = lyrics.album
     etree.SubElement(xml, "title").text = lyrics.title
@@ -137,7 +136,7 @@ def buildLyrics(lyrics):
 
 def buildVersion():
     from lxml import etree
-    version = etree.XML(u'<grabber></grabber>')
+    version = etree.XML('<grabber></grabber>')
     etree.SubElement(version, "name").text = __title__
     etree.SubElement(version, "author").text = __author__
     etree.SubElement(version, "command").text = 'gomaudio.py'

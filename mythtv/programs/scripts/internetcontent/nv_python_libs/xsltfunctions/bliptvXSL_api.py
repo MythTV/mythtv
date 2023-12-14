@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: bliptvXSL_api - XPath and XSLT functions for the Blip.tv RSS/HTML itmes
 # Python Script
@@ -38,7 +36,7 @@ import os, sys, re, time, datetime, shutil, urllib.request, urllib.parse, urllib
 from copy import deepcopy
 import io
 
-class OutStreamEncoder(object):
+class OutStreamEncoder:
     """Wraps a stream with an encoder"""
     def __init__(self, outstream, encoding=None):
         self.out = outstream
@@ -88,7 +86,7 @@ if version < '2.7.2':
     sys.exit(1)
 
 
-class xpathFunctions(object):
+class xpathFunctions:
     """Functions specific extending XPath
     """
     def __init__(self):

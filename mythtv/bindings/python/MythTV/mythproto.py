@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Provides connection cache and data handlers for accessing the backend.
 """
@@ -24,7 +22,7 @@ import re
 import os
 
 
-class BECache( object ):
+class BECache:
     """
     BECache(backend=None, noshutdown=False, db=None)
                                             -> MythBackend connection object
@@ -44,7 +42,7 @@ class BECache( object ):
                               and returns the response.
     """
 
-    class _ConnHolder( object ):
+    class _ConnHolder:
         blockshutdown = 0
         command = None
         event = None
@@ -746,7 +744,7 @@ class FileOps( BECache ):
             regex = re.compile(regex)
         return EventLock(regex, self.hostname, self.db)
 
-    class _ProgramQuery( object ):
+    class _ProgramQuery:
         def __init__(self, query, header_length=0, sorted=False,
                      recstatus=None, handler=None):
             self.query = query
@@ -1071,7 +1069,7 @@ class EventLock( BECache ):
         self.regex = regex
         self._lock = allocate_lock()
         self._lock.acquire()
-        super(EventLock, self).__init__(backend, False, True, db)
+        super().__init__(backend, False, True, db)
 
     def _listhandlers(self):
         return [self._unlock]

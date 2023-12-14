@@ -16,9 +16,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
-from builtins import map
-from builtins import str
-from builtins import object
 import configparser
 import logging
 import os , sys
@@ -46,7 +43,7 @@ class PubUUIDError(Exception):
     def __str__(self):
         return str(self.msg)
 
-class _UuidDb(object):
+class _UuidDb:
     hw_uuid = None
 
     def __init__(self, database_filename):
@@ -98,7 +95,7 @@ class _UuidDb(object):
             with open('/proc/sys/kernel/random/uuid') as rand_uuid:
                 rand_uuid_string = rand_uuid.read().strip()
                 return rand_uuid_string
-        except IOError:
+        except OSError:
             try:
                 import uuid
                 return uuid.uuid4()
@@ -112,7 +109,7 @@ class _UuidDb(object):
         try:
             with open(self.hw_uuid_file) as hwuuidfile:
                 self.hw_uuid = hwuuidfile.read().strip()
-        except IOError:
+        except OSError:
             try:
                 self.hw_uuid = self.genUUID()
             except UUIDError:

@@ -39,9 +39,7 @@ Further Example:
   The main function of this file is a sample which downloads a page and
   then uploads it to the W3C validator.
 """
-from __future__ import print_function
 
-from builtins import object
 from email.generator import _make_boundary
 import mimetypes
 import os, stat
@@ -61,7 +59,7 @@ else:
     import urllib.parse as ulib
 
 
-class Callable(object):
+class Callable:
     def __init__(self, anycallable):
         self.__call__ = anycallable
 

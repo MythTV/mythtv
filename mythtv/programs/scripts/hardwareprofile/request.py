@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # smolt - Fedora hardware profiler
 #
 # Copyright (C) 2011 Raymond Wagner <sebastian@pipping.org>
@@ -21,7 +20,6 @@
 # providing the base url, user agent, and proxy information.
 # The object returned is slightly modified, with a shortcut to urlopen.
 
-from builtins import object
 
 try:
     import urllib2 as urllib
@@ -40,7 +38,7 @@ class _Request( urllib.Request ):
             return urllib.urlopen(self, None, self.timeout)
         return urllib.urlopen(self)
 
-class _RequestFactory( object ):
+class _RequestFactory:
     def __init__(self, baseurl, user_agent, timeout, proxy):
         self.base_url = baseurl
         self.user_agent = user_agent

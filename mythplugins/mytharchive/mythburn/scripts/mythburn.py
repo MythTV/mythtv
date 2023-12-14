@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
 # python 3 doesn't have a unicode type
 try:
@@ -115,7 +113,7 @@ try:
 except:
     # Some hardcoded values for ioctl calls,
     # not available on python > 3.5, see include/linux/cdrom.h
-    class CDROM(object):
+    class CDROM:
         CDS_NO_INFO = 0
         CDS_NO_DISC = 1
         CDS_TRAY_OPEN = 2
@@ -257,7 +255,7 @@ else:
 #############################################################
 # class to hold a font definition
 
-class FontDef(object):
+class FontDef:
     def __init__(self, name=None, fontFile=None, size=19, color="white", effect="normal", shadowColor="black", shadowSize=1):
         self.name = name
         self.fontFile = fontFile
@@ -308,10 +306,7 @@ class FontDef(object):
 def write(text, progress=True):
     """Simple place to channel all text output through"""
 
-    if sys.version_info == 2:
-        sys.stdout.write((text + "\n").encode("utf-8", "replace"))
-    else:
-        sys.stdout.write(text + "\n")
+    sys.stdout.write(text + "\n")
     sys.stdout.flush()
 
     if progress == True and progresslog != "":
@@ -2026,7 +2021,7 @@ def extractVideoFrame(source, destination, seconds):
             return (long(0),long(0))
         else:
             return myimage.size
-    except IOError:
+    except OSError:
         return (long(0),long(0))
 
 #############################################################
@@ -2146,7 +2141,7 @@ def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profil
     """Encodes a nuv video source file to MPEG2 video and AC3 audio, using mythtranscode & mythffmpeg"""
 
     # make sure mythtranscode hasn't left some stale fifos hanging around
-    if ((doesFileExist(os.path.join(folder, "audout")) or doesFileExist(os.path.join(folder, "vidout")))):
+    if (doesFileExist(os.path.join(folder, "audout")) or doesFileExist(os.path.join(folder, "vidout"))):
         fatalError("Something is wrong! Found one or more stale fifo's from mythtranscode\n"
                    "Delete the fifos in '%s' and start again" % folder)
 

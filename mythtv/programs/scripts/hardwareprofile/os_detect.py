@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # smolt - Fedora hardware profiler
 #
 # Copyright (C) 2008 James Meyer <james.meyer@operamail.com>
@@ -23,8 +21,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
-from __future__ import print_function
-from builtins import object
 import os
 
 class OrderedType( type ):
@@ -48,8 +44,8 @@ class OS(metaclass=OrderedType):
         self.ostype = ostype if ostype != -1 else 'posix'
 
         if (func is not None) and not callable(func):
-            raise TypeError((self.__class__.__name__ + "() requires a " \
-                            "provided function be callable."))
+            raise TypeError(self.__class__.__name__ + "() requires a " \
+                            "provided function be callable.")
 
         self.func = func
         self.inst = inst
@@ -72,16 +68,16 @@ class OS(metaclass=OrderedType):
             # being initialized into an object. we want to operate as a
             # descriptor, and receive a function as an argument
             if self.func is not None:
-                raise TypeError((self.__class__.__name__ + "() has already " \
-                                "been given a processing function"))
+                raise TypeError(self.__class__.__name__ + "() has already " \
+                                "been given a processing function")
             if (func is None) or not callable(func):
-                raise TypeError((self.__class__.__name__ + "() takes exactly " \
-                                "one callable as a function, (0 given)"))
+                raise TypeError(self.__class__.__name__ + "() takes exactly " \
+                                "one callable as a function, (0 given)")
             self.func = func
         else:
             if self._requires_func and (self.func is None):
-                raise RuntimeError((self.__class__.__name__ + "() has not " \
-                                   "been given a callable function"))
+                raise RuntimeError(self.__class__.__name__ + "() has not " \
+                                   "been given a callable function")
 
             # return boolean as to whether match was successful
 
@@ -109,7 +105,7 @@ class OSWithFile( OS ):
     _requires_func = False
     def __init__(self, filename, ostype='posix', func=None, inst=None):
         self.filename = filename
-        super(OSWithFile, self).__init__(ostype, func, inst)
+        super().__init__(ostype, func, inst)
 
     def __get__(self, inst, owner):
         if inst is None:
@@ -125,7 +121,7 @@ class OSWithFile( OS ):
         text = open(self.filename).read().strip()
         if self.func:
             # pass text into function for further processing
-            return super(OSWithFile, self).do_test(text)
+            return super().do_test(text)
         else:
             # store text as version string, and report success
             self.inst.name = text
@@ -163,7 +159,7 @@ class OSFromUname( OS ):
     def do_test(self, *args, **kwargs):
         if len(self.uname) == 0:
             return False
-        return super(OSFromUname, self).do_test(**self.uname)
+        return super().do_test(**self.uname)
 
 class OSInfoType( type ):
     def __new__(mcs, name, bases, attrs):
@@ -250,7 +246,7 @@ class get_os_info(metaclass=OSInfoType):
     def suselinux(self, text):
         import re
         text = text.split('\n')[0].strip()
-        return re.sub('\(\w*\)$', '', text)
+        return re.sub(r'\(\w*\)$', '', text)
 
     yellowdog   = OSWithFile('/etc/yellowdog-release')
     redhat      = OSWithFile('/etc/redhat-release')
@@ -265,7 +261,7 @@ class get_os_info(metaclass=OSInfoType):
     def OSX(self, OS, version):
         if OS != 'Darwin':
             return False
-        major,minor,point = [int(a) for a in version.split('.')]
+        major,minor,point = (int(a) for a in version.split('.'))
         return 'OS X 10.%s.%s' % (major-4, minor)
 
     @OS

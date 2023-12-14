@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: mtv_api - Simple-to-use Python interface to the MTV API (http://www.mtv.com/)
 # Python Script
@@ -41,14 +39,14 @@ import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error,
 import logging
 
 try:
-    import xml.etree.cElementTree as ElementTree
+    import xml.etree.ElementTree as ElementTree
 except ImportError:
     import xml.etree.ElementTree as ElementTree
 
 from .mtv_exceptions import (MtvUrlError, MtvHttpError, MtvRssError, MtvVideoNotFound, MtvInvalidSearchType, MtvXmlError, MtvVideoDetailError)
 import io
 
-class OutStreamEncoder(object):
+class OutStreamEncoder:
     """Wraps a stream with an encoder"""
     def __init__(self, outstream, encoding=None):
         self.out = outstream
@@ -81,7 +79,7 @@ class XmlHandler:
     def _grabUrl(self, url):
         try:
             urlhandle = urllib.request.urlopen(url)
-        except IOError as errormsg:
+        except OSError as errormsg:
             raise MtvHttpError(errormsg)
         return urlhandle.read()
 
@@ -94,7 +92,7 @@ class XmlHandler:
         return et
 
 
-class Videos(object):
+class Videos:
     """Main interface to http://www.mtv.com/
     This is done to support a common naming framework for all python Netvision plugins no matter their site
     target.
@@ -429,7 +427,7 @@ class Videos(object):
                         item[key] = self.massageDescription(item[key].strip())
                         item[key] = item[key].replace('|', '-')
                     continue
-                if type(item[key]) == type(''):
+                if type(item[key]) == str:
                     if item[key]:
                         item[key] = item[key].replace('"\n',' ').strip()
             elements_final.append(item)

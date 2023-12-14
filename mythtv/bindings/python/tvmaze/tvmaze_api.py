@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 #  Copyright (c) 2020 Lachlan Mackenzie
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -123,7 +121,7 @@ def _simple_iso_date_parser(date):
                 return isodate
             except:
                 pass
-    raise TypeError("time data '{0}' does not match ISO 8601 format" \
+    raise TypeError("time data '{}' does not match ISO 8601 format" \
                                 .format(date))
 
 

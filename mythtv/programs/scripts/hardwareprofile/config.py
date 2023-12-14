@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import os, re, sys
 from subprocess import Popen, PIPE
 import os_detect

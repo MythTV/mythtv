@@ -20,7 +20,6 @@
 # with the express permission of Red Hat, Inc.
 #
 
-from builtins import object
 import os
 
 # We cache the contents of /etc/mtab ... the following variables are used
@@ -28,7 +27,7 @@ import os
 mtab_mtime = None
 mtab_map = []
 
-class MntEntObj(object):
+class MntEntObj:
     mnt_fsname = None #* name of mounted file system */
     mnt_dir = None    #* file system path prefix */
     mnt_type = None   #* mount type (see mntent.h) */
@@ -48,7 +47,7 @@ class MntEntObj(object):
         return "%s %s %s %s %s %s" % (self.mnt_fsname, self.mnt_dir, self.mnt_type, \
                                       self.mnt_opts, self.mnt_freq, self.mnt_passno)
 
-class FileSystem(object):
+class FileSystem:
     def __init__(self, mntent):
         self.mnt_dev = mntent.mnt_fsname
         self.mnt_pnt = mntent.mnt_dir

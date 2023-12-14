@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: UTF-8 -*-
 
 __title__ = "TVmaze.com"
 __author__ = "Roland Ernst, Steve Erlenborn"
@@ -88,7 +87,7 @@ def buildList(tvtitle, opts):
             for k, v in l.__dict__.items():
                 print(k, " : ", v)
 
-    tree = etree.XML(u'<metadata></metadata>')
+    tree = etree.XML('<metadata></metadata>')
 
     for show_info in showlist:
         m = VideoMetadata()
@@ -214,7 +213,7 @@ def buildNumbers(args, opts):
 
     matchesFound = 0
     best_ep_quality = 0.5   # require at least this quality on string match
-    tree = etree.XML(u'<metadata></metadata>')
+    tree = etree.XML('<metadata></metadata>')
     for inetref in inetrefList:
         dtInTgtZone = None
         if dtInLocalZone:
@@ -323,7 +322,7 @@ def buildNumbers(args, opts):
                             print('"%s" added to best list, match_quality = %g' % (ep.name, match_quality))
                     else:
                         # Any items previously appended for a lesser match need to be eliminated
-                        tree = etree.XML(u'<metadata></metadata>')
+                        tree = etree.XML('<metadata></metadata>')
                         min_dist_list = [i]
                         best_ep_quality = match_quality
                         if opts.debug:
@@ -402,7 +401,7 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
                 break
 
     # build xml:
-    tree = etree.XML(u'<metadata></metadata>')
+    tree = etree.XML('<metadata></metadata>')
     item = buildSingleItem(inetref, season, tvmaze_episode_id)
     if item is not None:
         tree.append(item.toXML())
@@ -538,7 +537,7 @@ def buildCollection(tvinetref, opts):
         for k, v in show_info.__dict__.items():
             print(k, " : ", v)
 
-    tree = etree.XML(u'<metadata></metadata>')
+    tree = etree.XML('<metadata></metadata>')
     m = VideoMetadata()
     m.title = check_item(m, ("title", show_info.name), ignore=False)
     m.description = check_item(m, ("description", show_info.summary))
@@ -598,7 +597,7 @@ def buildCollection(tvinetref, opts):
 
 def buildVersion():
     from lxml import etree
-    version = etree.XML(u'<grabber></grabber>')
+    version = etree.XML('<grabber></grabber>')
     etree.SubElement(version, "name").text = __title__
     etree.SubElement(version, "author").text = __author__
     etree.SubElement(version, "thumbnail").text = 'tvmaze.png'
@@ -666,7 +665,7 @@ def main():
                       dest="collectiondata", help="Get Collection data.")
     parser.add_option('-N', "--numbers", action="store_true", default=False,
                       dest="tvnumbers", help="Get Season and Episode numbers")
-    parser.add_option('-l', "--language", metavar="LANGUAGE", default=u'en',
+    parser.add_option('-l', "--language", metavar="LANGUAGE", default='en',
                       dest="language", help="Specify language for filtering.")
     parser.add_option('-a', "--area", metavar="COUNTRY", default=None,
                       dest="country", help="Specify country for custom data.")
@@ -688,7 +687,7 @@ def main():
             with open("tvmaze_tests.txt") as f:
                 dtests = "".join(f.readlines())
             main.__doc__ += dtests
-        except IOError:
+        except OSError:
             pass
         # perhaps try optionflags=doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE
         doctest.testmod(verbose=opts.debug, optionflags=doctest.ELLIPSIS)

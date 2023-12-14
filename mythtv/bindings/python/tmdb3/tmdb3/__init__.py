@@ -1,4 +1,3 @@
-
 from .tmdb_api import Configuration, searchMovie, searchMovieWithYear, \
                      searchPerson, searchStudio, searchList, searchCollection, \
                      searchSeries, Person, Movie, Collection, Genre, List, \

@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 #  Copyright (c) 2020 Lachlan Mackenzie
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -33,7 +31,7 @@ import string
 from . import utils
 
 
-class Season(object):
+class Season:
     def __init__(self, data, special=False):
             self.id = data.get('id')
             self.url = data.get('url')

@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: mtv_exceptions - Custom exceptions used or raised by mtv_api
 # Python Script

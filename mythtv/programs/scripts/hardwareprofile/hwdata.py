@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # smolt - Fedora hardware profiler
 #
 # Copyright (C) 2010 Mike McGrath <mmcgrath@redhat.com>
@@ -19,29 +17,22 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import division
-from __future__ import absolute_import
-from builtins import int
-from builtins import open
-from builtins import object
 from smolt_config import get_config_attr
 
-class myVendor(object):
+class myVendor:
     def __init__(self):
         self.name = ""
         self.num = ""
         self.devices = {}
 
-class myDevice(object):
+class myDevice:
     def __init__(self):
         self.name = ""
         self.num = ""
         self.subvendors = {}
         self.vendor = ""
 
-class DeviceMap(object):
+class DeviceMap:
     vendors = {}
 
     def __init__(self, bus='pci'):
@@ -59,13 +50,13 @@ class DeviceMap(object):
                     # File isn't in the default python3 UTF-8, using latin1
                     fo = gzip.open(fn + ".gz", 'rt', encoding='latin1')
                     break
-                except IOError:
+                except OSError:
                     pass
             else:
                 try:
-                    fo = open(fn, 'rt', encoding='latin1')
+                    fo = open(fn, encoding='latin1')
                     break
-                except IOError:
+                except OSError:
                     pass
         else:
             raise Exception('Hardware data file not found.  Please set the location HWDATA_DIR in config.py')

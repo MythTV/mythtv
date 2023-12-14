@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #-----------------------
 # Name: tmdb_auth.py
 # Python Library
@@ -85,7 +84,7 @@ def get_session(sessionid=None):
         return Session.new()
 
 
-class Session(object):
+class Session:
     @classmethod
     def new(cls):
         return cls(None)

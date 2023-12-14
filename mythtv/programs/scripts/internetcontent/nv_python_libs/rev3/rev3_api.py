@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: rev3_api - Simple-to-use Python interface to the Revision3 RSS feeds (http://revision3.com/)
 # Python Script
@@ -39,7 +37,7 @@ from copy import deepcopy
 from .rev3_exceptions import (Rev3UrlError, Rev3HttpError, Rev3RssError, Rev3VideoNotFound, Rev3ConfigFileError, Rev3UrlDownloadError)
 import io
 
-class OutStreamEncoder(object):
+class OutStreamEncoder:
     """Wraps a stream with an encoder"""
     def __init__(self, outstream, encoding=None):
         self.out = outstream
@@ -86,7 +84,7 @@ if version < '2.7.2':
     sys.exit(1)
 
 
-class Videos(object):
+class Videos:
     """Main interface to http://www.rev3.com/
     This is done to support a common naming framework for all python Netvision plugins no matter their site
     target.

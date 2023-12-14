@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: thewb_exceptions - Custom exceptions used or raised by thewb_api
 # Python Script

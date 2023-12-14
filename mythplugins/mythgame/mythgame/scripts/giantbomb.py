@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: UTF-8 -*-
 # ----------------------
 # Name: giantbomb.py
 # Python Script
@@ -138,7 +137,7 @@ try:
         from io import StringIO
     from lxml import etree
 except Exception as e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 
@@ -151,7 +150,7 @@ else:
     unichr = chr
 
 
-class OutStreamEncoder(object):
+class OutStreamEncoder:
     """Wraps a stream with an encoder
     """
     def __init__(self, outstream, encoding=None):
@@ -187,7 +186,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -218,22 +217,22 @@ def main():
     # api.giantbomb.com api key provided for Mythtv
     apikey = "b5883a902a8ed88b15ce21d07787c94fd6ad9f33"
 
-    parser = OptionParser(usage=u"%prog usage: giantbomb -hdluvMD [parameters]\n <game name or gameid number>\n\nFor details on using giantbomb from the command execute './giantbomb.py -u'. For details on the meaning of the XML element tags see the wiki page at:\nhttps://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format")
+    parser = OptionParser(usage="%prog usage: giantbomb -hdluvMD [parameters]\n <game name or gameid number>\n\nFor details on using giantbomb from the command execute './giantbomb.py -u'. For details on the meaning of the XML element tags see the wiki page at:\nhttps://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format")
 
     parser.add_option(  "-d", "--debug", action="store_true", default=False, dest="debug",
-                        help=u"Show debugging info")
+                        help="Show debugging info")
     parser.add_option(  "-u", "--usage", action="store_true", default=False, dest="usage",
-                        help=u"Display examples for executing the giantbomb script")
+                        help="Display examples for executing the giantbomb script")
     parser.add_option(  "-v", "--version", action="store_true", default=False, dest="version",
-                        help=u"Display version and author")
-    parser.add_option(  "-l", "--language", metavar="LANGUAGE", default=u'en', dest="language",
-                        help=u"Select data that matches the specified language. At this time giantbomb.com only supports 'en' English.")
-    parser.add_option(  "-a", "--area", metavar="AREA", default=u"gb", dest="area",
-			help=u"Select data that matches the specified country. This option is currently not used.")
+                        help="Display version and author")
+    parser.add_option(  "-l", "--language", metavar="LANGUAGE", default='en', dest="language",
+                        help="Select data that matches the specified language. At this time giantbomb.com only supports 'en' English.")
+    parser.add_option(  "-a", "--area", metavar="AREA", default="gb", dest="area",
+			help="Select data that matches the specified country. This option is currently not used.")
     parser.add_option(  "-M", "--gamelist", action="store_true", default=False, dest="gamelist",
-                        help=u"Get matching Movie list")
+                        help="Get matching Movie list")
     parser.add_option(  "-D", "--gamedata", action="store_true", default=False, dest="gamedata",
-                        help=u"Get Movie metadata including graphic URLs")
+                        help="Get Movie metadata including graphic URLs")
 
     opts, args = parser.parse_args()
 
@@ -249,7 +248,7 @@ def main():
 
     # Process version command line requests
     if opts.version:
-        version = etree.XML(u'<grabber></grabber>')
+        version = etree.XML('<grabber></grabber>')
         etree.SubElement(version, "name").text = __title__
         etree.SubElement(version, "author").text = __author__
         etree.SubElement(version, "thumbnail").text = 'giantbomb.png'
@@ -269,7 +268,7 @@ def main():
         sys.stderr.write("! Error: There must be one value for any option. Your options are (%s)\n" % (args))
         sys.exit(1)
 
-    if args[0] == u'':
+    if args[0] == '':
         sys.stderr.write("! Error: There must be a non-empty argument, yours is empty.\n")
         sys.exit(1)
 

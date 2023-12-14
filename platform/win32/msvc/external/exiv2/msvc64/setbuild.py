@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: Latin-1 -*-
 
 """   setbuild - set the build environment you require  """
 

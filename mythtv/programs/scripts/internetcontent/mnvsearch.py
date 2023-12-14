@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: UTF-8 -*-
 # ----------------------
 # Name: mnvsearch.py
 # Python Script
@@ -110,7 +109,7 @@ __tree_max_page_items__ = 20
 import sys, os
 import io
 
-class OutStreamEncoder(object):
+class OutStreamEncoder:
     """Wraps a stream with an encoder"""
     def __init__(self, outstream, encoding=None):
         self.out = outstream

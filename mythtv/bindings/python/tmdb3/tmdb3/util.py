@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #-----------------------
 # Name: util.py    Assorted utilities used in tmdb_api
 # Python Library
@@ -11,23 +10,23 @@ from .locales import get_locale
 from .tmdb_auth import get_session
 
 
-class NameRepr(object):
+class NameRepr:
     """Mixin for __repr__ methods using 'name' attribute."""
     def __repr__(self):
         return ("<{0.__class__.__name__} '{0.name}'>".format(self))
 
 
-class SearchRepr(object):
+class SearchRepr:
     """
     Mixin for __repr__ methods for classes with '_name' and
     '_request' attributes.
     """
     def __repr__(self):
         name = self._name if self._name else self._request._kwargs['query']
-        return ("<Search Results: {0}>".format(name))
+        return ("<Search Results: {}>".format(name))
 
 
-class Poller(object):
+class Poller:
     """
     Wrapper for an optional callable to populate an Element derived
     class with raw data, or data from a Request.
@@ -103,7 +102,7 @@ class Poller(object):
         return unfilled
 
 
-class Data(object):
+class Data:
     """
     Basic response definition class
     This maps to a single key in a JSON dictionary received from the API
@@ -209,7 +208,7 @@ class Datalist(Data):
                        force the data to instead be passed in as the first
                        argument
         """
-        super(Datalist, self).__init__(field, None, handler, poller, raw, passthrough=passthrough)
+        super().__init__(field, None, handler, poller, raw, passthrough=passthrough)
         self.sort = sort
 
     def __set__(self, inst, value):
@@ -269,7 +268,7 @@ class Datadict(Data):
         """
         if key and attr:
             raise TypeError("`key` and `attr` cannot both be defined")
-        super(Datadict, self).__init__(field, None, handler, poller, raw, passthrough=passthrough)
+        super().__init__(field, None, handler, poller, raw, passthrough=passthrough)
         if key:
             self.getkey = lambda x: x[key]
         elif attr:
@@ -329,7 +328,7 @@ class ElementType( type ):
         # process all defined Data attribues, testing for use as an initial
         # argument, and building a list of what Pollers are used to populate
         # which Data points
-        pollermap = dict([(k, []) for k in pollers])
+        pollermap = {k: [] for k in pollers}
         initargs = []
         for k, v in list(data.items()):
             v.name = k
@@ -350,7 +349,7 @@ class ElementType( type ):
         for k, v in list(pollermap.items()):
             if len(v) == 0:
                 continue
-            lookup = dict([(attr.field, attr.name) for attr in v])
+            lookup = {attr.field: attr.name for attr in v}
             poller = Poller(pollers[k], lookup)
             attrs[k] = poller
             # backfill wrapped Poller into each mapped Data object, and ensure
@@ -389,7 +388,7 @@ class ElementType( type ):
             # defined by the Data definitions
             if len(args) != len(cls._InitArgs):
                 raise TypeError(
-                        '__init__() takes exactly {0} arguments ({1} given)'\
+                        '__init__() takes exactly {} arguments ({} given)'\
                             .format(len(cls._InitArgs)+1, len(args)+1))
             for a, v in zip(cls._InitArgs, args):
                 setattr(obj, a, v)
@@ -398,5 +397,5 @@ class ElementType( type ):
         return obj
 
 
-class Element( object, metaclass=ElementType ):
+class Element(metaclass=ElementType ):
     _lang = 'en'

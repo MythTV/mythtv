@@ -16,7 +16,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
-from builtins import object
 import configparser
 import logging
 import os
@@ -28,7 +27,7 @@ def _get_option_name(hw_uuid, host):
     return '%s__%s' % (hw_uuid, host)
 
 
-class _UuidDb(object):
+class _UuidDb:
     def __init__(self, database_filename):
         self._database_filename = database_filename
         self._config = configparser.RawConfigParser()

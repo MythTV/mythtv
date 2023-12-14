@@ -172,7 +172,7 @@ class InvalidSearchFieldError(UsageError):
 
 class InvalidIncludeError(UsageError):
     def __init__(self, msg='Invalid Includes', reason=None):
-        super(InvalidIncludeError, self).__init__(self)
+        super().__init__(self)
         self.msg = msg
         self.reason = reason
 
@@ -181,7 +181,7 @@ class InvalidIncludeError(UsageError):
 
 class InvalidFilterError(UsageError):
     def __init__(self, msg='Invalid Includes', reason=None):
-        super(InvalidFilterError, self).__init__(self)
+        super().__init__(self)
         self.msg = msg
         self.reason = reason
 
@@ -345,7 +345,7 @@ def set_rate_limit(limit_or_interval=1.0, new_requests=1):
         limit_interval = limit_or_interval
         limit_requests = new_requests
 
-class _rate_limit(object):
+class _rate_limit:
     """A decorator that limits the rate at which the function may be
     called. The rate is controlled by the `limit_interval` and
     `limit_requests` global variables.  The limiting is thread-safe;
@@ -502,11 +502,11 @@ def _safe_read(opener, req, body=None, max_retries=8, retry_delay_delta=2.0):
         except socket.timeout as exc:
             _log.info("socket timeout")
             last_exc = exc
-        except socket.error as exc:
+        except OSError as exc:
             if exc.errno == 104:
                 continue
             raise NetworkError(cause=exc)
-        except IOError as exc:
+        except OSError as exc:
             raise NetworkError(cause=exc)
 
     # Out of retries!

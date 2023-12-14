@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #-----------------------
 # Name: cache_engine.py
 # Python Library
@@ -11,7 +10,7 @@ from weakref import ref
 import sys
 
 
-class Engines(object):
+class Engines:
     """
     Static collector for engines to register against.
     """
@@ -37,13 +36,13 @@ class CacheEngineType(type):
     for named selection and use.
     """
     def __init__(cls, name, bases, attrs):
-        super(CacheEngineType, cls).__init__(name, bases, attrs)
+        super().__init__(name, bases, attrs)
         if name != 'CacheEngine':
             # skip base class
             Engines.register(cls)
 
 
-class CacheEngine(object, metaclass=CacheEngineType):
+class CacheEngine(metaclass=CacheEngineType):
 
     name = 'unspecified'
 
@@ -60,7 +59,7 @@ class CacheEngine(object, metaclass=CacheEngineType):
         raise RuntimeError
 
 
-class CacheObject(object):
+class CacheObject:
     """
     Cache object class, containing one stored record.
     """

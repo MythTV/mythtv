@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #-----------------------
 # Name: tmdb_request.py
 # Python Library
@@ -66,14 +65,14 @@ class Request(_py3Request):
         """
         kwargs['api_key'] = self.api_key
         self._url = url.lstrip('/')
-        self._kwargs = dict([(kwa, kwv) for kwa, kwv in list(kwargs.items())
-                                        if kwv is not None])
+        self._kwargs = {kwa: kwv for kwa, kwv in list(kwargs.items())
+                                        if kwv is not None}
 
         locale = get_locale()
         kwargs = {}
         for k, v in list(self._kwargs.items()):
             kwargs[k] = locale.encode(v)
-        url = '{0}{1}?{2}'\
+        url = '{}{}?{}'\
                 .format(self._base_url, self._url, urlencode(kwargs))
 
         _py3Request.__init__(self, url)
@@ -136,7 +135,7 @@ class Request(_py3Request):
                     if data.get('status_code', 1) ==25:
                         # Sleep and retry query.
                         if DEBUG:
-                            print('Retry after {0} seconds'.format(max(float(e.headers['retry-after']),10)))
+                            print('Retry after {} seconds'.format(max(float(e.headers['retry-after']),10)))
                         time.sleep(max(float(e.headers['retry-after']),10))
                         continue
                     else:

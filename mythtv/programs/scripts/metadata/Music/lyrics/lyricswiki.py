@@ -1,5 +1,3 @@
-#-*- coding: UTF-8 -*-
-
 import sys, re, socket
 
 try:
@@ -102,7 +100,7 @@ def performSelfTest():
 
 def buildLyrics(lyrics):
     from lxml import etree
-    xml = etree.XML(u'<lyrics></lyrics>')
+    xml = etree.XML('<lyrics></lyrics>')
     etree.SubElement(xml, "artist").text = lyrics.artist
     etree.SubElement(xml, "album").text = lyrics.album
     etree.SubElement(xml, "title").text = lyrics.title
@@ -119,7 +117,7 @@ def buildLyrics(lyrics):
 
 def buildVersion():
     from lxml import etree
-    version = etree.XML(u'<grabber></grabber>')
+    version = etree.XML('<grabber></grabber>')
     etree.SubElement(version, "name").text = __title__
     etree.SubElement(version, "author").text = __author__
     etree.SubElement(version, "command").text = 'lyricswiki.py'

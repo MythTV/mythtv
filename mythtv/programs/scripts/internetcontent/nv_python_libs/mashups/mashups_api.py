@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: mashups_api - Simple-to-use Python interface to Mashups of RSS feeds and HTML video data
 #
@@ -36,7 +34,7 @@ import logging
 from .mashups_exceptions import (MashupsUrlError, MashupsHttpError, MashupsRssError, MashupsVideoNotFound, MashupsConfigFileError, MashupsUrlDownloadError)
 import io
 
-class OutStreamEncoder(object):
+class OutStreamEncoder:
     """Wraps a stream with an encoder"""
     def __init__(self, outstream, encoding=None):
         self.out = outstream
@@ -83,7 +81,7 @@ if version < '2.7.2':
     sys.exit(1)
 
 
-class Videos(object):
+class Videos:
     """Main interface to any Mashup
     This is done to support a common naming framework for all python Netvision plugins
     no matter their site target.

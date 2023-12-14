@@ -32,7 +32,7 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
     Custom cursor, offering logging and error handling
     """
     def __init__(self, connection):
-        super(LoggedCursor, self).__init__(connection)
+        super().__init__(connection)
         self.log = None
         self.ping = ref(self._ping121)
         if MySQLdb.version_info >= (1, 2, 2):
@@ -73,8 +73,8 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
         self.log_query(query, args)
         try:
             if args is None:
-                return super(LoggedCursor, self).execute(query)
-            return super(LoggedCursor, self).execute(query, args)
+                return super().execute(query)
+            return super().execute(query, args)
         except Exception as e:
             raise MythDBError(MythDBError.DB_RAW, e.args)
 
@@ -99,7 +99,7 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
         query = self._sanitize(query)
         self.log_query(query, args)
         try:
-            return super(LoggedCursor, self).executemany(query, args)
+            return super().executemany(query, args)
         except Exception as e:
             raise MythDBError(MythDBError.DB_RAW, e.args)
 

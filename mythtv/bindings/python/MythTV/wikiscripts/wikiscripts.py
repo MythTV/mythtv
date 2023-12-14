@@ -1,4 +1,3 @@
-# -*- coding: UTF-8 -*-
 #----------------------
 
 try:
@@ -27,7 +26,6 @@ import os
 import sys
 import stat
 
-from builtins import input
 
 BASEURL = 'https://www.mythtv.org/wiki'
 
@@ -35,8 +33,8 @@ def getScripts():
     return Script.getAll()
 
 def getPage(**kwargs):
-    url = "{0}?{1}".format(BASEURL,
-            '&'.join(['{0}={1}'.format(k,v) for k,v in list(kwargs.items())]))
+    url = "{}?{}".format(BASEURL,
+            '&'.join(['{}={}'.format(k,v) for k,v in list(kwargs.items())]))
     return lxml.html.parse(urlopen(url)).getroot()
 
 def getWhatLinksHere(page):
@@ -47,7 +45,7 @@ def getWhatLinksHere(page):
         links.append('_'.join(link.find('a').text.split(' ')))
     return links
 
-class Script( object ):
+class Script:
     _cache   = None
     _queue   = Queue.Queue()
     _pool    = []
@@ -104,7 +102,7 @@ class Script( object ):
             return 0
 
     def __repr__(self):
-        return '<Script {0} at {1}>'.format(self.url, hex(id(self)))
+        return '<Script {} at {}>'.format(self.url, hex(id(self)))
 
     def __init__(self, url, refresh=False, pool=4):
         self.url = url

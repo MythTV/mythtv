@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # smolt - Fedora hardware profiler
 #
 # Copyright (C) 2007 Mike McGrath
