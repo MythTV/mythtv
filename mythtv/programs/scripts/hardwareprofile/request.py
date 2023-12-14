@@ -21,8 +21,6 @@
 # providing the base url, user agent, and proxy information.
 # The object returned is slightly modified, with a shortcut to urlopen.
 
-from future import standard_library
-standard_library.install_aliases()
 from builtins import object
 
 try:
