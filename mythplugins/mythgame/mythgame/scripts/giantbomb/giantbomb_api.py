@@ -27,11 +27,6 @@ import os, struct, sys, datetime, time, re
 import requests
 from copy import deepcopy
 
-IS_PY2 = sys.version_info[0] == 2
-if not IS_PY2:
-    unicode = str
-    unichr = chr
-
 from .giantbomb_exceptions import (GiantBombBaseError, GiantBombHttpError, GiantBombXmlError,  GiantBombGameNotFound,)
 
 
@@ -46,7 +41,7 @@ class OutStreamEncoder:
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
+        if isinstance(obj, str):
             obj = obj.encode(self.encoding)
         if IS_PY2:
             self.out.write(obj)
@@ -150,9 +145,9 @@ class gamedbQueries():
             if text[:2] == "&#":
                 try:
                     if text[:3] == "&#x":
-                        return unichr(int(text[3:-1], 16))
+                        return chr(int(text[3:-1], 16))
                     else:
-                        return unichr(int(text[2:-1]))
+                        return chr(int(text[2:-1]))
                 except ValueError:
                     pass
             elif text[:1] == "&":
@@ -164,11 +159,11 @@ class gamedbQueries():
                 if entity:
                     if entity[:2] == "&#":
                         try:
-                            return unichr(int(entity[2:-1]))
+                            return chr(int(entity[2:-1]))
                         except ValueError:
                             pass
                     else:
-                        return unicode(entity, "iso-8859-1")
+                        return str(entity, "iso-8859-1")
             return text # leave as is
         if IS_PY2:
             text23 = self.ampReplace(re.sub(r"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace('\n',' ')
@@ -182,7 +177,7 @@ class gamedbQueries():
         if text is None:
             return text
         try:
-            return unicode(text, 'utf8')
+            return str(text, 'utf8')
         except UnicodeDecodeError:
             return ''
         except (UnicodeEncodeError, TypeError):
@@ -332,7 +327,7 @@ class gamedbQueries():
             if len(imageList):
                 for image in imageList:
                     self.imageElements.append(makeImageElement('coverart', image, image.replace('super', 'thumb')))
-        htmlElement = self.getHtmlData('dummy', etree.tostring(args[1][0], method="text", encoding=unicode).strip())
+        htmlElement = self.getHtmlData('dummy', etree.tostring(args[1][0], method="text", encoding=str).strip())
         if len(htmlElement):
             for image in htmlElement[0].xpath('.//a/img/@src'):
                 if image.find('screen') == -1:

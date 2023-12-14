@@ -13,10 +13,7 @@ except ImportError:
 
 from optparse import OptionParser
 
-if sys.version_info < (2, 7):
-    import simplejson
-else:
-    import json as simplejson
+import json as simplejson
 
 from common import *
 

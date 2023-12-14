@@ -128,26 +128,18 @@ from optparse import OptionParser
 import re
 
 
-IS_PY2 = sys.version_info[0] == 2
-
 try:
-    if IS_PY2:
-        from StringIO import StringIO
-    else:
-        from io import StringIO
+    from io import StringIO
     from lxml import etree
 except Exception as e:
     sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 
-if IS_PY2:
-    stdio_type = file
-else:
-    import io
-    stdio_type = io.TextIOWrapper
-    unicode = str
-    unichr = chr
+import io
+stdio_type = io.TextIOWrapper
+unicode = str
+unichr = chr
 
 
 class OutStreamEncoder:

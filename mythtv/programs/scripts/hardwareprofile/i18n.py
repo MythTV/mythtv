@@ -39,7 +39,4 @@ except IndexError:
     locale.setlocale(locale.LC_ALL, 'C')
     t = gettext.translation('smolt', '/usr/share/locale/', fallback=True, languages='en_US')
 
-if sys.version_info[0] == 2:
-    _ = t.ugettext
-else:
-    _ = t.gettext
+_ = t.gettext

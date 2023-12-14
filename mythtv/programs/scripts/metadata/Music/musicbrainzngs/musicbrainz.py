@@ -12,13 +12,16 @@ import hashlib
 import locale
 import sys
 import json
+import http.client
+import urllib.error
+import urllib.request
+import urllib.parse
 import xml.etree.ElementTree as etree
 from xml.parsers import expat
 from warnings import warn
 
 from musicbrainzngs import mbxml
 from musicbrainzngs import util
-from musicbrainzngs import compat
 
 _version = "0.6dev"
 _log = logging.getLogger("musicbrainzngs")
@@ -238,9 +241,9 @@ def _check_filter_and_make_params(entity, includes, release_status=[], release_t
     the filters can be used with the given includes. Return a params
     dict that can be passed to _do_mb_query.
     """
-    if isinstance(release_status, compat.basestring):
+    if isinstance(release_status, (str, bytes)):
         release_status = [release_status]
-    if isinstance(release_type, compat.basestring):
+    if isinstance(release_type, (str, bytes)):
         release_type = [release_type]
     _check_filter(release_status, VALID_RELEASE_STATUSES)
     _check_filter(release_type, VALID_RELEASE_TYPES)
@@ -393,7 +396,7 @@ class _rate_limit:
             return self.fun(*args, **kwargs)
 
 # From pymb2
-class _RedirectPasswordMgr(compat.HTTPPasswordMgr):
+class _RedirectPasswordMgr(urllib.request.HTTPPasswordMgr):
     def __init__(self):
         self._realms = { }
 
@@ -408,13 +411,13 @@ class _RedirectPasswordMgr(compat.HTTPPasswordMgr):
         # ignoring the uri parameter intentionally
         self._realms[realm] = (username, password)
 
-class _DigestAuthHandler(compat.HTTPDigestAuthHandler):
+class _DigestAuthHandler(urllib.request.HTTPDigestAuthHandler):
     def get_authorization (self, req, chal):
         qop = chal.get ('qop', None)
         if qop and ',' in qop and 'auth' in qop.split (','):
             chal['qop'] = 'auth'
 
-        return compat.HTTPDigestAuthHandler.get_authorization (self, req, chal)
+        return urllib.request.HTTPDigestAuthHandler.get_authorization (self, req, chal)
 
     def _encode_utf8(self, msg):
         """The MusicBrainz server also accepts UTF-8 encoded passwords."""
@@ -439,10 +442,10 @@ class _DigestAuthHandler(compat.HTTPDigestAuthHandler):
         KD = lambda s, d: H("%s:%s" % (s, d))
         return H, KD
 
-class _MusicbrainzHttpRequest(compat.Request):
+class _MusicbrainzHttpRequest(urllib.request.Request):
     """ A custom request handler that allows DELETE and PUT"""
     def __init__(self, method, url, data=None):
-        compat.Request.__init__(self, url, data)
+        urllib.request.Request.__init__(self, url, data)
         allowed_m = ["GET", "POST", "DELETE", "PUT"]
         if method not in allowed_m:
             raise ValueError("invalid method: %s" % method)
@@ -473,7 +476,7 @@ def _safe_read(opener, req, body=None, max_retries=8, retry_delay_delta=2.0):
                 f = opener.open(req)
             return f.read()
 
-        except compat.HTTPError as exc:
+        except urllib.error.HTTPError as exc:
             if exc.code in (400, 404, 411):
                 # Bad request, not found, etc.
                 raise ResponseError(cause=exc)
@@ -487,13 +490,13 @@ def _safe_read(opener, req, body=None, max_retries=8, retry_delay_delta=2.0):
                 # retrying for now.
                 _log.info("unknown HTTP error %i" % exc.code)
             last_exc = exc
-        except compat.BadStatusLine as exc:
+        except http.client.BadStatusLine as exc:
             _log.info("bad status line")
             last_exc = exc
-        except compat.HTTPException as exc:
+        except http.client.HTTPException as exc:
             _log.info("miscellaneous HTTP exception: %s" % str(exc))
             last_exc = exc
-        except compat.URLError as exc:
+        except urllib.error.URLError as exc:
             if isinstance(exc.reason, socket.error):
                 code = exc.reason.errno
                 if code == 104: # "Connection reset by peer."
@@ -612,24 +615,24 @@ def _mb_request(path, method='GET', auth_required=AUTH_NO,
     # Encode Unicode arguments using UTF-8.
     newargs = []
     for key, value in sorted(args.items()):
-        if isinstance(value, compat.unicode):
+        if isinstance(value, str):
             value = value.encode('utf8')
         newargs.append((key, value))
 
     # Construct the full URL for the request, including hostname and
     # query string.
-    url = compat.urlunparse((
+    url = urllib.parse.urlunparse((
         'http',
         hostname,
         '/ws/2/%s' % path,
         '',
-        compat.urlencode(newargs),
+        urllib.parse.urlencode(newargs),
         ''
     ))
     _log.debug("%s request for %s" % (method, url))
 
     # Set up HTTP request handler and URL opener.
-    httpHandler = compat.HTTPHandler(debuglevel=0)
+    httpHandler = urllib.request.HTTPHandler(debuglevel=0)
     handlers = [httpHandler]
 
     # Add credentials if required.
@@ -651,7 +654,7 @@ def _mb_request(path, method='GET', auth_required=AUTH_NO,
         authHandler.add_password("musicbrainz.org", (), user, password)
         handlers.append(authHandler)
 
-    opener = compat.build_opener(*handlers)
+    opener = urllib.request.build_opener(*handlers)
 
     # Make request.
     req = _MusicbrainzHttpRequest(method, url, data)
@@ -1018,7 +1021,7 @@ def get_recordings_by_echoprint(echoprint, includes=[], release_status=[],
     warn("Echoprints were never introduced\n"
          "and will not be found (404)",
          Warning, stacklevel=2)
-    raise ResponseError(cause=compat.HTTPError(
+    raise ResponseError(cause=urllib.error.HTTPError(
                                             None, 404, "Not Found", None, None))
 
 @_docstring('recording')
@@ -1029,7 +1032,7 @@ def get_recordings_by_puid(puid, includes=[], release_status=[],
     warn("PUID support was removed from the server\n"
          "and no PUIDs will be found (404)",
          Warning, stacklevel=2)
-    raise ResponseError(cause=compat.HTTPError(
+    raise ResponseError(cause=urllib.error.HTTPError(
                                             None, 404, "Not Found", None, None))
 
 @_docstring('recording')

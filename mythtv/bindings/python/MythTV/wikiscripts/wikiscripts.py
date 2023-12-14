@@ -200,12 +200,8 @@ class Script:
         if refresh:
             cls._cache = {}
             return
-        if (sys.version_info[0] == 2):
-            path = '/tmp/mythwikiscripts.pickle'
-            fmode = 'r'
-        else:
-            path = '/tmp/mythwikiscripts.pickle3'
-            fmode = 'rb'
+        path = '/tmp/mythwikiscripts.pickle3'
+        fmode = 'rb'
         if os.access(path, os.F_OK):
             try:
                 fd = open(path, fmode)
@@ -221,14 +217,9 @@ class Script:
     def _dumpCache(cls):
         ### XXX ToDo allign pickle protocol versions
         try:
-            if (sys.version_info[0] == 2):
-                path = '/tmp/mythwikiscripts.pickle'
-                fd = open(path,'w')
-                cls._cache = pickle.dump(cls._cache,fd)
-            else:
-                path = '/tmp/mythwikiscripts.pickle3'
-                fd = open(path,'wb')
-                cls._cache = pickle.dump(cls._cache,fd,  protocol=1)
+            path = '/tmp/mythwikiscripts.pickle3'
+            fd = open(path,'wb')
+            cls._cache = pickle.dump(cls._cache,fd,  protocol=1)
             fd.close()
         except:
             os.remove(path)

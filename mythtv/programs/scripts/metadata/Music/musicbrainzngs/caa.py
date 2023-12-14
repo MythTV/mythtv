@@ -10,8 +10,9 @@ __all__ = [
     ]
 
 import json
+import urllib.request
+import urllib.parse
 
-from musicbrainzngs import compat
 from musicbrainzngs import musicbrainz
 
 hostname = "coverartarchive.org"
@@ -44,7 +45,7 @@ def _caa_request(mbid, imageid=None, size=None, entitytype="release"):
         path.append("%s-%s" % (imageid, size))
     elif imageid:
         path.append(imageid)
-    url = compat.urlunparse((
+    url = urllib.parse.urlunparse((
         'http',
         hostname,
         '/%s' % '/'.join(path),
@@ -55,10 +56,10 @@ def _caa_request(mbid, imageid=None, size=None, entitytype="release"):
     musicbrainz._log.debug("GET request for %s" % (url, ))
 
     # Set up HTTP request handler and URL opener.
-    httpHandler = compat.HTTPHandler(debuglevel=0)
+    httpHandler = urllib.request.HTTPHandler(debuglevel=0)
     handlers = [httpHandler]
 
-    opener = compat.build_opener(*handlers)
+    opener = urllib.request.build_opener(*handlers)
 
     # Make request.
     req = musicbrainz._MusicbrainzHttpRequest("GET", url, None)
