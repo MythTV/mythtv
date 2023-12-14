@@ -26,7 +26,6 @@
 from __future__ import print_function
 from builtins import object
 import os
-from future.utils import with_metaclass
 
 class OrderedType( type ):
     # provide global sequencing for OS class and subclasses to ensure
@@ -37,7 +36,7 @@ class OrderedType( type ):
         mcs.nextorder += 1
         return type.__new__(mcs, name, bases, attrs)
 
-class OS( with_metaclass(OrderedType, object) ):
+class OS(metaclass=OrderedType):
     _requires_func = True
     def __init__(self, ostype=-1, func=None, inst=None):
         if callable(ostype):
@@ -189,7 +188,7 @@ class OSInfoType( type ):
             # fall through to Unknown
             return 'Unknown'
 
-class get_os_info( with_metaclass(OSInfoType, object) ):
+class get_os_info(metaclass=OSInfoType):
     @OS('nt')
     def windows(self):
         win_version = {

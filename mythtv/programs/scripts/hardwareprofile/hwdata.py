@@ -25,8 +25,6 @@ from __future__ import division
 from __future__ import absolute_import
 from builtins import int
 from builtins import open
-from future import standard_library
-standard_library.install_aliases()
 from builtins import object
 from smolt_config import get_config_attr
 
@@ -71,9 +69,9 @@ class DeviceMap(object):
                     pass
         else:
             raise Exception('Hardware data file not found.  Please set the location HWDATA_DIR in config.py')
-         
-            
-            
+
+
+
         vendors = {}
         curvendor = None
         curdevice = None
