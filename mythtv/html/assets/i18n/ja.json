@@ -39,7 +39,11 @@
             "full_search": "全検索",
             "people_search": "人物検索",
             "retgrid": "グリッド表示に戻る",
-            "title_search": "タイトル検索"
+            "title_search": "タイトル検索",
+            "type_movie": "映画",
+            "type_series": "シリーズ",
+            "type_sports": "スポーツ",
+            "type_tvshow": "テレビ番組"
         },
         "programguide": "番組ガイド",
         "recordings": {

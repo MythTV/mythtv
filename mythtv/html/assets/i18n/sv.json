@@ -39,7 +39,11 @@
             "full_search": "Fullständig sökning",
             "people_search": "People Search",
             "retgrid": "Återgå till Grid Display",
-            "title_search": "Titelsökning"
+            "title_search": "Titelsökning",
+            "type_movie": "Film",
+            "type_series": "Serier",
+            "type_sports": "sporter",
+            "type_tvshow": "TV program"
         },
         "programguide": "Programguide",
         "recordings": {

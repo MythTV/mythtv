@@ -84,7 +84,7 @@ export class GuideComponent implements OnInit, SchedulerSummary {
 
   fetchDetails() {
     // Ask for a time 1 second after selected time
-    // Otherwise gives you shows that end at atha time also
+    // Otherwise gives you shows that end at at that time also
     let millisecs = this.m_startDate.getTime();
     let startDate = new Date(millisecs + 1000);
     let request: GetProgramListRequest = {

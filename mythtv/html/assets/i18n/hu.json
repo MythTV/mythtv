@@ -39,7 +39,11 @@
             "full_search": "Teljes keresés",
             "people_search": "Emberek keresése",
             "retgrid": "Visszatérés a Rács megjelenítéséhez",
-            "title_search": "Cím keresése"
+            "title_search": "Cím keresése",
+            "type_movie": "Film",
+            "type_series": "Sorozat",
+            "type_sports": "Sport",
+            "type_tvshow": "TV-műsor"
         },
         "programguide": "Programkalauz",
         "recordings": {

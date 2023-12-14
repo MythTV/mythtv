@@ -39,7 +39,11 @@
             "full_search": "Úplné vyhledávání",
             "people_search": "Vyhledávání lidí",
             "retgrid": "Návrat k zobrazení mřížky",
-            "title_search": "Vyhledávání titulů"
+            "title_search": "Vyhledávání titulů",
+            "type_movie": "Film",
+            "type_series": "Série",
+            "type_sports": "Sportovní",
+            "type_tvshow": "Televizní show"
         },
         "programguide": "Programový průvodce",
         "recordings": {

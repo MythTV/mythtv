@@ -31,14 +31,14 @@
 .programBody {
     margin: 3px 5px 4px 5px;
     padding: 0px 0px 0px 2px;
-    color: var(--text-color-secondary);
+    color: white;
     height: 45px;
     z-index: 5;
     /*font-size: 0.8em;*/
 }
 
-.programSubtitle {
-    color: var(--text-color);
+.programCatType {
+    color: white;
     position: relative;
     font-weight: bold;
     margin-right: 5px;
@@ -47,8 +47,13 @@
     padding-bottom: 3px;
 }
 
-.programDescription {
+.programSubtitle {
     position: relative;
     z-index: 1;
     line-height: 15px;
 }
+
+.type_series  { background-color: darkblue; }
+.type_tvshow  { background-color: darkslategray; }
+.type_movie   { background-color: blueViolet; }
+.type_sports  { background-color: darkred; }

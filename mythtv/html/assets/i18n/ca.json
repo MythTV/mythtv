@@ -39,7 +39,11 @@
             "full_search": "Cerca completa",
             "people_search": "Cerca de persones",
             "retgrid": "Torna a la pantalla de quadrícula",
-            "title_search": "Cerca de títols"
+            "title_search": "Cerca de títols",
+            "type_movie": "Pel·lícula",
+            "type_series": "Sèrie",
+            "type_sports": "Esports",
+            "type_tvshow": "Programa de televisió"
         },
         "programguide": "Guia del programa",
         "recordings": {

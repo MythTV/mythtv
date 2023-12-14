@@ -22,6 +22,8 @@ import { ProgramList, ScheduleOrProgram } from './interfaces/program.interface';
 export class GuideService {
   startDate: Date;
   guide_data$!: ProgramGuide;
+  guide_hours = 3;
+  guide_millisecs = this.guide_hours * 60 * 60 * 1000;
 
   toTime(date: string) {
     let d = new Date(date);
@@ -33,7 +35,7 @@ export class GuideService {
   toEndTime(date: string) {
     let d = new Date(date);
     //let tomorrow = new Date(d.getTime()+86400000);
-    let endAt = new Date(d.getTime() + 7200000);
+    let endAt = new Date(d.getTime() + this.guide_millisecs);
     return this.toTime(endAt.toISOString());
   }
   toHalfHour(date: Date) {

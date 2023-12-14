@@ -39,7 +39,11 @@
             "full_search": "Ricerca completa",
             "people_search": "Cerca persone",
             "retgrid": "Ritorna alla visualizzazione della griglia",
-            "title_search": "Ricerca del titolo"
+            "title_search": "Ricerca del titolo",
+            "type_movie": "Film",
+            "type_series": "Serie",
+            "type_sports": "Gli sport",
+            "type_tvshow": "Programma televisivo"
         },
         "programguide": "Guida al programma",
         "recordings": {

@@ -39,7 +39,11 @@
             "full_search": "Potpuna pretraga",
             "people_search": "Pretraživanje ljudi",
             "retgrid": "Povratak na prikaz mreže",
-            "title_search": "Pretraživanje naslova"
+            "title_search": "Pretraživanje naslova",
+            "type_movie": "Film",
+            "type_series": "Niz",
+            "type_sports": "Sportski",
+            "type_tvshow": "TV emisija"
         },
         "programguide": "Programski vodič",
         "recordings": {

@@ -39,7 +39,11 @@
             "full_search": "Celotno iskanje",
             "people_search": "Iskanje ljudi",
             "retgrid": "Nazaj na prikaz mreže",
-            "title_search": "Iskanje po naslovu"
+            "title_search": "Iskanje po naslovu",
+            "type_movie": "Film",
+            "type_series": "serija",
+            "type_sports": "Šport",
+            "type_tvshow": "Televizijska oddaja"
         },
         "programguide": "Vodnik po programu",
         "recordings": {

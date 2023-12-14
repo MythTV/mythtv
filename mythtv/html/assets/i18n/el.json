@@ -39,7 +39,11 @@
             "full_search": "Πλήρης Αναζήτηση",
             "people_search": "Αναζήτηση ατόμων",
             "retgrid": "Επιστροφή στην οθόνη πλέγματος",
-            "title_search": "Αναζήτηση τίτλου"
+            "title_search": "Αναζήτηση τίτλου",
+            "type_movie": "Ταινία",
+            "type_series": "Σειρά",
+            "type_sports": "Αθλητισμός",
+            "type_tvshow": "Τηλεοπτική εκπομπή"
         },
         "programguide": "Οδηγός προγράμματος",
         "recordings": {

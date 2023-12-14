@@ -39,7 +39,11 @@
             "full_search": "חיפוש מלא",
             "people_search": "חיפוש אנשים",
             "retgrid": "חזור לתצוגת רשת",
-            "title_search": "חיפוש כותרת"
+            "title_search": "חיפוש כותרת",
+            "type_movie": "סרט",
+            "type_series": "סִדרָה",
+            "type_sports": "ספורט",
+            "type_tvshow": "תוכנית טלוויזיה"
         },
         "programguide": "מדריך תוכניות",
         "recordings": {

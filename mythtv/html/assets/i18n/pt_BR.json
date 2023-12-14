@@ -39,7 +39,11 @@
             "full_search": "Pesquisa completa",
             "people_search": "Pesquisa de pessoas",
             "retgrid": "Retornar à Exibição da Grade",
-            "title_search": "Pesquisa de título"
+            "title_search": "Pesquisa de título",
+            "type_movie": "Filme",
+            "type_series": "Series",
+            "type_sports": "Esportes",
+            "type_tvshow": "Programa de TV"
         },
         "programguide": "Guia do programa",
         "recordings": {

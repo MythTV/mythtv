@@ -39,7 +39,11 @@
             "full_search": "Volledige zoekopdracht",
             "people_search": "Mensen zoeken",
             "retgrid": "Keer terug naar rasterweergave",
-            "title_search": "Titel zoeken"
+            "title_search": "Titel zoeken",
+            "type_movie": "Film",
+            "type_series": "Serie",
+            "type_sports": "Sport",
+            "type_tvshow": "Tv programma"
         },
         "programguide": "Programma gids",
         "recordings": {

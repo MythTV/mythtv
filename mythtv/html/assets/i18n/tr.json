@@ -39,7 +39,11 @@
             "full_search": "Tam arama",
             "people_search": "İnsan arama",
             "retgrid": "Izgara Görünümüne Dön",
-            "title_search": "Başlık arama"
+            "title_search": "Başlık arama",
+            "type_movie": "Film",
+            "type_series": "Seri",
+            "type_sports": "Spor Dalları",
+            "type_tvshow": "Televizyon şovu"
         },
         "programguide": "Program Rehberi",
         "recordings": {

@@ -39,7 +39,11 @@
             "full_search": "完整搜尋",
             "people_search": "人物搜索",
             "retgrid": "返回網格顯示",
-            "title_search": "標題搜索"
+            "title_search": "標題搜索",
+            "type_movie": "電影",
+            "type_series": "系列",
+            "type_sports": "運動的",
+            "type_tvshow": "電視節目"
         },
         "programguide": "節目指南",
         "recordings": {

@@ -39,7 +39,11 @@
             "full_search": "Täielik otsing",
             "people_search": "Inimeste otsing",
             "retgrid": "Naaske ruudustiku kuvale",
-            "title_search": "Pealkirja otsing"
+            "title_search": "Pealkirja otsing",
+            "type_movie": "Film",
+            "type_series": "seeria",
+            "type_sports": "Sport",
+            "type_tvshow": "Telesaade"
         },
         "programguide": "Saatejuht",
         "recordings": {

@@ -39,7 +39,11 @@
             "full_search": "完整搜索",
             "people_search": "人物搜索",
             "retgrid": "返回网格显示",
-            "title_search": "标题搜索"
+            "title_search": "标题搜索",
+            "type_movie": "电影",
+            "type_series": "系列",
+            "type_sports": "运动的",
+            "type_tvshow": "电视节目"
         },
         "programguide": "节目指南",
         "recordings": {

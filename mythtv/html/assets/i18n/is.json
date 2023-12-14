@@ -39,7 +39,11 @@
             "full_search": "Full leit",
             "people_search": "Fólksleit",
             "retgrid": "Fara aftur í Grid Display",
-            "title_search": "Titilleit"
+            "title_search": "Titilleit",
+            "type_movie": "Kvikmynd",
+            "type_series": "Röð",
+            "type_sports": "Íþróttir",
+            "type_tvshow": "Sjónvarps þáttur"
         },
         "programguide": "Dagskrárleiðbeiningar",
         "recordings": {

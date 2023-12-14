@@ -39,7 +39,11 @@
             "full_search": "Fuld søgning",
             "people_search": "People Search",
             "retgrid": "Vend tilbage til gittervisning",
-            "title_search": "Titelsøgning"
+            "title_search": "Titelsøgning",
+            "type_movie": "Film",
+            "type_series": "Serie",
+            "type_sports": "Sport",
+            "type_tvshow": "TV show"
         },
         "programguide": "Programguide",
         "recordings": {

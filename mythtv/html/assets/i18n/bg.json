@@ -39,7 +39,11 @@
             "full_search": "Пълно търсене",
             "people_search": "Търсене на хора",
             "retgrid": "Върнете се към мрежовия дисплей",
-            "title_search": "Търсене на заглавие"
+            "title_search": "Търсене на заглавие",
+            "type_movie": "Филм",
+            "type_series": "Серия",
+            "type_sports": "Спорт",
+            "type_tvshow": "ТВ предаване"
         },
         "programguide": "Програмен справочник",
         "recordings": {

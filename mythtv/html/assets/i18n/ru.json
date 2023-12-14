@@ -39,7 +39,11 @@
             "full_search": "Полный поиск",
             "people_search": "Поиск людей",
             "retgrid": "Вернуться к отображению сетки",
-            "title_search": "Поиск по названию"
+            "title_search": "Поиск по названию",
+            "type_movie": "Фильм",
+            "type_series": "Ряд",
+            "type_sports": "Виды спорта",
+            "type_tvshow": "ТВ шоу"
         },
         "programguide": "программа передач",
         "recordings": {
