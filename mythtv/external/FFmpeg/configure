@@ -5546,8 +5546,6 @@ case $target_os in
         if enabled clang; then
             clang_version=$($cc -dumpversion)
             test ${clang_version%%.*} -eq 11 && add_cflags -fno-stack-check
-            # Workaround code for Xcode >= 15
-            test ${clang_version%%.*} -ge 15 && add_ldflags -ld_classic
         fi
         ;;
     msys*)
