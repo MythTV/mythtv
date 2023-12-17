@@ -16,6 +16,8 @@
         "help": "Aiuto",
         "instructions": "Istruzioni",
         "loading": "Caricamento in corso",
+        "mustenable": "Non è possibile salvare le modifiche se non si fa prima clic sul pulsante Abilita aggiornamenti.",
+        "mustrestart": "Una volta terminati gli aggiornamenti, riavviare il backend.",
         "networkfail": "ERRORE: errore di rete back-end",
         "next": "Prossimo",
         "no": "NO",

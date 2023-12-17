@@ -16,6 +16,8 @@
         "help": "Help",
         "instructions": "Instructions",
         "loading": "Loading",
+        "mustenable": "Changes cannot be saved unless you click the Enable Updates button first.",
+        "mustrestart": "When you are finished with updates, restart the backend.",
         "networkfail": "ERROR: Backend Network Failure",
         "next": "Next",
         "no": "No",

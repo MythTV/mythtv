@@ -16,6 +16,8 @@
         "help": "Helfen",
         "instructions": "Anweisungen",
         "loading": "Wird geladen",
+        "mustenable": "Änderungen können nur gespeichert werden, wenn Sie zuerst auf die Schaltfläche „Aktualisierungen aktivieren“ klicken.",
+        "mustrestart": "Wenn Sie mit den Updates fertig sind, starten Sie das Backend neu.",
         "networkfail": "FEHLER: Backend-Netzwerkfehler",
         "next": "Nächste",
         "no": "NEIN",

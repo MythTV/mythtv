@@ -16,6 +16,8 @@
         "help": "Pomoc",
         "instructions": "Instrukcje",
         "loading": "Ładowanie",
+        "mustenable": "Zmiany nie mogą zostać zapisane, chyba że najpierw klikniesz przycisk Włącz aktualizacje.",
+        "mustrestart": "Po zakończeniu aktualizacji uruchom ponownie backend.",
         "networkfail": "BŁĄD: Awaria sieci zaplecza",
         "next": "Następny",
         "no": "NIE",

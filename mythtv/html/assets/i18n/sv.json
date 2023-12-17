@@ -16,6 +16,8 @@
         "help": "Hjälp",
         "instructions": "Instruktioner",
         "loading": "Läser in",
+        "mustenable": "Ändringar kan inte sparas om du inte klickar på knappen Aktivera uppdateringar först.",
+        "mustrestart": "När du är klar med uppdateringarna, starta om backend.",
         "networkfail": "FEL: Backend-nätverksfel",
         "next": "Nästa",
         "no": "Nej",

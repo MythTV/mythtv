@@ -16,6 +16,8 @@
         "help": "Hjálp",
         "instructions": "Leiðbeiningar",
         "loading": "Caricamento in corso",
+        "mustenable": "Ekki er hægt að vista breytingar nema þú smellir á hnappinn Virkja uppfærslur fyrst.",
+        "mustrestart": "Þegar þú ert búinn með uppfærslur skaltu endurræsa bakendann.",
         "networkfail": "VILLA: Backend Network Bilun",
         "next": "Næst",
         "no": "Nei",

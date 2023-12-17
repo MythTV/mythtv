@@ -16,6 +16,8 @@
         "help": "Pomozite",
         "instructions": "upute",
         "loading": "Učitavam",
+        "mustenable": "Promjene se ne mogu spremiti ako prvo ne kliknete gumb Omogući ažuriranja.",
+        "mustrestart": "Kada završite s ažuriranjima, ponovno pokrenite pozadinu.",
         "networkfail": "POGREŠKA: Kvar pozadinske mreže",
         "next": "Sljedeći",
         "no": "Ne",

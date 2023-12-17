@@ -16,6 +16,8 @@
         "help": "Hulp",
         "instructions": "Instructies",
         "loading": "Bezig met laden",
+        "mustenable": "Wijzigingen kunnen niet worden opgeslagen tenzij u eerst op de knop Updates inschakelen klikt.",
+        "mustrestart": "Wanneer u klaar bent met updates, start u de backend opnieuw op.",
         "networkfail": "FOUT: Backend-netwerkfout",
         "next": "Volgende",
         "no": "Nee",

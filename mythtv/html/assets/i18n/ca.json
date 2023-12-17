@@ -16,6 +16,8 @@
         "help": "Ajuda",
         "instructions": "Instruccions",
         "loading": "Carregant",
+        "mustenable": "Els canvis no es poden desar tret que primer feu clic al botó Activa les actualitzacions.",
+        "mustrestart": "Quan hàgiu acabat amb les actualitzacions, reinicieu el backend.",
         "networkfail": "ERROR: fallada de la xarxa de fons",
         "next": "Pròxim",
         "no": "No",

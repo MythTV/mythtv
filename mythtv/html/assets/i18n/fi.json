@@ -16,6 +16,8 @@
         "help": "auta",
         "instructions": "Ohjeet",
         "loading": "Ladataan",
+        "mustenable": "Muutoksia ei voi tallentaa, ellet napsauta ensin Ota päivitykset käyttöön -painiketta.",
+        "mustrestart": "Kun olet lopettanut päivitykset, käynnistä taustaohjelma uudelleen.",
         "networkfail": "VIRHE: Backend Network Failure",
         "next": "Seuraava",
         "no": "Ei",

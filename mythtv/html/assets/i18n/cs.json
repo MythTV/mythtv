@@ -16,6 +16,8 @@
         "help": "Pomoc",
         "instructions": "Instrukce",
         "loading": "načítání",
+        "mustenable": "Změny nelze uložit, pokud nejprve neklepnete na tlačítko Povolit aktualizace.",
+        "mustrestart": "Po dokončení aktualizací restartujte backend.",
         "networkfail": "CHYBA: Backend Network Failure",
         "next": "další",
         "no": "Ne",

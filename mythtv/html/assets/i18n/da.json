@@ -16,6 +16,8 @@
         "help": "Hjælp",
         "instructions": "Instruktioner",
         "loading": "Indlæser",
+        "mustenable": "Ændringer kan ikke gemmes, medmindre du først klikker på knappen Aktiver opdateringer.",
+        "mustrestart": "Når du er færdig med opdateringer, skal du genstarte backend.",
         "networkfail": "FEJL: Backend-netværksfejl",
         "next": "Næste",
         "no": "Ingen",

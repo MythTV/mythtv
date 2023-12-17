@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { MessageService } from 'primeng/api';
 import { DvrService } from 'src/app/services/dvr.service';
 import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
 import { MythService } from 'src/app/services/myth.service';
@@ -8,7 +10,8 @@ import { SetupWizardService } from 'src/app/services/setupwizard.service';
 @Component({
   selector: 'app-backend-warning',
   templateUrl: './backend-warning.component.html',
-  styleUrls: ['./backend-warning.component.css']
+  styleUrls: ['./backend-warning.component.css'],
+  providers: [MessageService]
 })
 export class BackendWarningComponent implements OnInit {
 
@@ -24,7 +27,8 @@ export class BackendWarningComponent implements OnInit {
   masterServerName = '';
 
   constructor(private mythService: MythService, public setupService: SetupService,
-    private dvrService: DvrService, private wizardService: SetupWizardService) {
+    private dvrService: DvrService, private wizardService: SetupWizardService,
+    private messageService: MessageService, private translate: TranslateService) {
     this.getBackendInfo();
     this.refreshInfo();
   }

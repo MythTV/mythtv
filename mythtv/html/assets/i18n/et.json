@@ -16,6 +16,8 @@
         "help": "Abi",
         "instructions": "Juhised",
         "loading": "Laadimine",
+        "mustenable": "Muudatusi ei saa salvestada, kui te ei klõpsa esmalt nuppu Luba värskendused.",
+        "mustrestart": "Kui olete värskendustega lõpetanud, taaskäivitage taustaprogramm.",
         "networkfail": "VIGA: taustavõrgu tõrge",
         "next": "Edasi",
         "no": "Ei",

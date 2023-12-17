@@ -16,6 +16,8 @@
         "help": "Hjelp",
         "instructions": "Bruksanvisning",
         "loading": "Laster",
+        "mustenable": "Endringer kan ikke lagres med mindre du klikker på Aktiver oppdateringer-knappen først.",
+        "mustrestart": "Når du er ferdig med oppdateringer, start backend på nytt.",
         "networkfail": "FEIL: Backend Network Feil",
         "next": "Neste",
         "no": "Nei",

@@ -16,6 +16,8 @@
         "help": "pomoč",
         "instructions": "Navodila",
         "loading": "nalaganje",
+        "mustenable": "Sprememb ni mogoče shraniti, razen če najprej kliknete gumb Omogoči posodobitve.",
+        "mustrestart": "Ko končate s posodobitvami, znova zaženite zaledje.",
         "networkfail": "NAPAKA: Napaka zalednega omrežja",
         "next": "Naslednji",
         "no": "št",

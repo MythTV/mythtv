@@ -16,6 +16,8 @@
         "help": "Aide",
         "instructions": "Instructions",
         "loading": "Chargement",
+        "mustenable": "Les modifications ne peuvent être enregistrées que si vous cliquez d'abord sur le bouton Activer les mises à jour.",
+        "mustrestart": "Lorsque vous avez terminé les mises à jour, redémarrez le backend.",
         "networkfail": "ERREUR : Échec du réseau principal",
         "next": "Suivant",
         "no": "Non",

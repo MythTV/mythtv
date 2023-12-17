@@ -16,6 +16,8 @@
         "help": "Yardım",
         "instructions": "Talimatlar",
         "loading": "Yükleniyor",
+        "mustenable": "Önce Güncellemeleri Etkinleştir düğmesini tıklamadığınız sürece değişiklikler kaydedilemez.",
+        "mustrestart": "Güncellemeleri tamamladığınızda arka ucu yeniden başlatın.",
         "networkfail": "HATA: Arka Uç Ağ Hatası",
         "next": "Sonraki",
         "no": "HAYIR",

@@ -16,6 +16,8 @@
         "help": "Segítség",
         "instructions": "Utasítás",
         "loading": "Betöltés",
+        "mustenable": "A módosítások csak akkor menthetők el, ha először a Frissítések engedélyezése gombra kattint.",
+        "mustrestart": "Ha végzett a frissítésekkel, indítsa újra a háttérprogramot.",
         "networkfail": "HIBA: Háttérhálózati hiba",
         "next": "Következő",
         "no": "Nem",

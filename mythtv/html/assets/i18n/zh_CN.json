@@ -16,6 +16,8 @@
         "help": "帮助",
         "instructions": "指示",
         "loading": "加载中",
+        "mustenable": "除非您先单击“启用更新”按钮，否则无法保存更改。",
+        "mustrestart": "完成更新后，重新启动后端。",
         "networkfail": "错误：后端网络故障",
         "next": "下一个",
         "no": "不",

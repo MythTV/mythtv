@@ -16,6 +16,8 @@
         "help": "Ayuda",
         "instructions": "Instrucciones",
         "loading": "Cargando",
+        "mustenable": "Los cambios no se pueden guardar a menos que primero haga clic en el botón Habilitar actualizaciones.",
+        "mustrestart": "Cuando haya terminado con las actualizaciones, reinicie el backend.",
         "networkfail": "ERROR: falla de la red de fondo",
         "next": "Próximo",
         "no": "No",

@@ -16,6 +16,8 @@
         "help": "Ajuda",
         "instructions": "Instruções",
         "loading": "Carregando",
+        "mustenable": "As alterações não podem ser salvas a menos que você clique primeiro no botão Habilitar atualizações.",
+        "mustrestart": "Quando terminar as atualizações, reinicie o back-end.",
         "networkfail": "ERRO: falha na rede de back-end",
         "next": "Próximo",
         "no": "Não",
