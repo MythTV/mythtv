@@ -61,7 +61,8 @@ export class ChannelEditorComponent implements OnInit {
   unassignedText = 'settings.chanedit.unassigned';
 
   transDone = 0;
-  numTranslations = 9;
+  visDone = 0;
+  numTranslations = 10;
   successCount = 0;
   errorCount = 0;
   selectedAdvanced = false;
@@ -169,6 +170,10 @@ export class ChannelEditorComponent implements OnInit {
       this.translate.get(entry.prompt).subscribe(data => {
         entry.prompt = data;
         this.transDone++;   // There will be 4 of these
+        this.visDone++;
+        if (this.visDone >= this.visibilities.length)
+          // notify of change
+          this.visibilities = [...this.visibilities]
       });
     });
     this.translate.get(this.headingNew).subscribe(data => {
@@ -189,6 +194,8 @@ export class ChannelEditorComponent implements OnInit {
     });
     this.translate.get(this.tvFormats[0].prompt).subscribe(data => {
       this.tvFormats[0].prompt = data;
+      // notify of change
+      this.tvFormats = [...this.tvFormats]
       this.transDone++
     });
   }
