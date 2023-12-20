@@ -40,6 +40,7 @@
 #include "recorders/vboxutils.h"
 #include "recordingprofile.h"
 #include "recordingrule.h"
+#include "sourceutil.h"
 #include "tv_rec.h"
 #include "tvremoteutil.h"
 
@@ -50,6 +51,7 @@
 
 QReadWriteLock    TVRec::s_inputsLock;
 QMap<uint,TVRec*> TVRec::s_inputs;
+QMutex            TVRec::s_eitLock;
 
 static bool is_dishnet_eit(uint inputid);
 static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
@@ -158,34 +160,42 @@ bool TVRec::Init(void)
 
     if (!GetDevices(m_inputId, m_parentId, m_genOpt, m_dvbOpt, m_fwOpt))
     {
-        LOG(VB_CHANNEL, LOG_ERR, QString("[%1] Failed to GetDevices")
-            .arg(m_inputId));
+        LOG(VB_CHANNEL, LOG_ERR, LOC +
+            QString("Failed to GetDevices for input %1")
+                .arg(m_inputId));
         return false;
     }
 
     SetRecordingStatus(RecStatus::Unknown, __LINE__);
 
-    // configure the Channel instance
+    // Configure the Channel instance
     QString startchannel = CardUtil::GetStartChannel(m_inputId);
     if (startchannel.isEmpty())
         return false;
     if (!CreateChannel(startchannel, true))
     {
-        LOG(VB_CHANNEL, LOG_ERR, QString("[%1] Failed to create channel "
-                                         "instance for %2")
-            .arg(m_inputId)
-            .arg(startchannel));
+        LOG(VB_CHANNEL, LOG_ERR, LOC +
+            QString("Failed to create channel instance for %1")
+                .arg(startchannel));
         return false;
     }
 
-    m_transcodeFirst    =
-        gCoreContext->GetBoolSetting("AutoTranscodeBeforeAutoCommflag", false);
+    // All conflicting inputs for this input
+    if (m_parentId == 0)
+    {
+        m_eitInputs = CardUtil::GetConflictingInputs(m_inputId);
+    }
+
+    m_transcodeFirst    = gCoreContext->GetBoolSetting("AutoTranscodeBeforeAutoCommflag", false);
     m_earlyCommFlag     = gCoreContext->GetBoolSetting("AutoCommflagWhileRecording", false);
     m_runJobOnHostOnly  = gCoreContext->GetBoolSetting("JobsRunOnRecordHost", false);
     m_eitTransportTimeout = gCoreContext->GetDurSetting<std::chrono::minutes>("EITTransportTimeout", 5min);
-    if (m_eitTransportTimeout < 6s)
-        m_eitTransportTimeout = 6s;
+    if (m_eitTransportTimeout < 15s)
+        m_eitTransportTimeout = 15s;
     m_eitCrawlIdleStart = gCoreContext->GetDurSetting<std::chrono::seconds>("EITCrawIdleStart", 60s);
+    m_eitScanPeriod     = gCoreContext->GetDurSetting<std::chrono::minutes>("EITScanPeriod", 15min);
+    if (m_eitScanPeriod < 5min)
+        m_eitScanPeriod = 5min;
     m_audioSampleRateDB = gCoreContext->GetNumSetting("AudioSampleRate");
     m_overRecordSecNrml = gCoreContext->GetDurSetting<std::chrono::seconds>("RecordOverTime");
     m_overRecordSecCat  = gCoreContext->GetDurSetting<std::chrono::minutes>("CategoryOverTime");
@@ -312,7 +322,8 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, std::chrono::seconds secsle
         if (it != m_pendingRecordings.end())
         {
             (*it).m_ask = false;
-            (*it).m_doNotAsk = (*it).m_canceled = true;
+            (*it).m_doNotAsk = true;
+            (*it).m_canceled = true;
         }
         return;
     }
@@ -334,7 +345,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, std::chrono::seconds secsle
         return;
 
     // We also need to check our input groups
-    std::vector<unsigned int> inputids = CardUtil::GetConflictingInputs(rcinfo->GetInputID());
+    std::vector<uint> inputids = CardUtil::GetConflictingInputs(rcinfo->GetInputID());
 
     m_pendingRecordings[rcinfo->GetInputID()].m_possibleConflicts = inputids;
 
@@ -1047,7 +1058,7 @@ void TVRec::HandleStateChange(void)
         return;
     }
 
-    // Make sure EIT scan is stopped before any tuning,
+    // Stop EIT scanning on this input before any tuning,
     // to avoid race condition with it's tuning requests.
     if (m_scanner && HasFlags(kFlagEITScannerRunning))
     {
@@ -1057,6 +1068,34 @@ void TVRec::HandleStateChange(void)
         ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
         auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
         m_eitScanStartTime = MythDate::current().addSecs(secs.count());
+    }
+
+    // Stop EIT scanning on all conflicting inputs so that
+    // the tuner card is available for a new tuning request.
+    // Conflicting inputs are inputs that have independent video sources
+    // but that share a tuner card, such as a DVB-S/S2 tuner card that
+    // connects to multiple satellites with a DiSEqC switch.
+    if (m_scanner && !m_eitInputs.empty())
+    {
+        s_inputsLock.lockForRead();
+        s_eitLock.lock();
+        for (auto input : m_eitInputs)
+        {
+            auto tv_rec = s_inputs.value(input);
+            if (tv_rec && tv_rec->m_scanner && tv_rec->HasFlags(kFlagEITScannerRunning))
+            {
+                LOG(VB_EIT, LOG_INFO, LOC +
+                    QString("Stop EIT scan active on conflicting input %1")
+                        .arg(input));
+                tv_rec->m_scanner->StopActiveScan();
+                tv_rec->ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
+                tv_rec->CloseChannel();
+                auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
+                tv_rec->m_eitScanStartTime = MythDate::current().addSecs(secs.count());
+            }
+        }
+        s_eitLock.unlock();
+        s_inputsLock.unlock();
     }
 
     // Handle different state transitions
@@ -1097,15 +1136,14 @@ void TVRec::HandleStateChange(void)
     m_internalState = nextState;
     m_changeState = false;
 
-    m_eitScanStartTime = MythDate::current();
     if (m_scanner && (m_internalState == kState_None))
     {
         auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
-        m_eitScanStartTime = m_eitScanStartTime.addSecs(secs.count());
+        m_eitScanStartTime = MythDate::current().addSecs(secs.count());
     }
     else
     {
-        m_eitScanStartTime = m_eitScanStartTime.addYears(1);
+        m_eitScanStartTime = MythDate::current().addYears(1);
     }
 }
 #undef TRANSITION
@@ -1269,12 +1307,9 @@ static bool is_dishnet_eit(uint inputid)
 static int get_highest_input(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-
-    QString str =
+    query.prepare(
         "SELECT MAX(cardid) "
-        "FROM capturecard ";
-
-    query.prepare(str);
+        "FROM capturecard ");
 
     if (!query.exec() || !query.isActive())
     {
@@ -1307,8 +1342,6 @@ void TVRec::run(void)
     SetFlags(kFlagRunMainLoop, __FILE__, __LINE__);
     ClearFlags(kFlagExitPlayer | kFlagFinishRecording, __FILE__, __LINE__);
 
-    m_eitScanStartTime = MythDate::current();
-
     // Check whether we should use the EITScanner in this TVRec instance
     if (CardUtil::IsEITCapable(m_genOpt.m_inputType) &&         // Card type capable of receiving EIT?
         (!GetDTVChannel() || GetDTVChannel()->IsMaster()) &&    // Card is master and not a multirec instance
@@ -1316,11 +1349,11 @@ void TVRec::run(void)
     {
         m_scanner = new EITScanner(m_inputId);
         auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
-        m_eitScanStartTime = m_eitScanStartTime.addSecs(secs.count());
+        m_eitScanStartTime = MythDate::current().addSecs(secs.count());
     }
     else
     {
-        m_eitScanStartTime = m_eitScanStartTime.addYears(10);
+        m_eitScanStartTime = MythDate::current().addYears(10);
     }
 
     while (HasFlags(kFlagRunMainLoop))
@@ -1461,50 +1494,105 @@ void TVRec::run(void)
         }
 
         // Start active EIT scan
+        bool conflicting_input = false;
         if (m_scanner && m_channel &&
             MythDate::current() > m_eitScanStartTime)
         {
             if (!m_dvbOpt.m_dvbEitScan)
             {
                 LOG(VB_EIT, LOG_INFO, LOC +
-                    "EIT scanning disabled for this input.");
-                m_eitScanStartTime = m_eitScanStartTime.addYears(10);
+                    QString("EIT scanning disabled for input %1")
+                        .arg(GetInputId()));
+                m_eitScanStartTime = MythDate::current().addYears(10);
             }
             else if (!get_use_eit(GetInputId()))
             {
                 LOG(VB_EIT, LOG_INFO, LOC +
-                    "EIT scanning disabled for all channels on this input.");
-                m_eitScanStartTime = m_eitScanStartTime.addYears(10);
+                    QString("EIT scanning disabled for all inputs connected to video source %1")
+                        .arg(GetSourceID()));
+                m_eitScanStartTime = MythDate::current().addYears(10);
             }
             else
             {
-                // Check if another card in the same input group is
-                // busy.  This could be either virtual DVB-devices or
-                // a second tuner on a single card
+                LOG(VB_EIT, LOG_INFO, LOC +
+                    QString("EIT scanning enabled for input %1 connected to video source %2 '%3'")
+                        .arg(GetInputId()).arg(GetSourceID()).arg(SourceUtil::GetSourceName(GetSourceID())));
+
+                // Check if another card in the same input group is busy recording.
+                // This could be either a virtual DVB-device or a second tuner on a single card.
                 s_inputsLock.lockForRead();
+                s_eitLock.lock();
                 bool allow_eit = true;
-                std::vector<unsigned int> inputids =
-                    CardUtil::GetConflictingInputs(m_inputId);
+                std::vector<uint> inputids = CardUtil::GetConflictingInputs(m_inputId);
                 InputInfo busy_input;
                 for (uint i = 0; i < inputids.size() && allow_eit; ++i)
                     allow_eit = !RemoteIsBusy(inputids[i], busy_input);
+
+                // Check if another card in the same input group is busy with an EIT scan.
+                // We cannot start an EIT scan on this input if there is already an EIT scan
+                // running on a conflicting real input.
+                // Note that EIT scans never run on virtual inputs.
                 if (allow_eit)
                 {
+                    for (auto input : inputids)
+                    {
+                        auto tv_rec = s_inputs.value(input);
+                        if (tv_rec && tv_rec->m_scanner)
+                        {
+                            conflicting_input = true;
+                            if (tv_rec->HasFlags(kFlagEITScannerRunning))
+                            {
+                                LOG(VB_EIT, LOG_INFO, LOC +
+                                    QString("EIT scan on conflicting input %1").arg(input));
+                                allow_eit = false;
+                                busy_input.m_inputId = tv_rec->m_inputId;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (allow_eit)
+                {
+                    LOG(VB_EIT, LOG_INFO, LOC +
+                        QString("Start EIT active scan on input %1")
+                            .arg(m_inputId));
                     m_scanner->StartActiveScan(this, m_eitTransportTimeout);
                     SetFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
-                    m_eitScanStartTime =
-                        QDateTime::currentDateTime().addYears(1);
+                    m_eitScanStartTime = MythDate::current().addYears(1);
+                    if (conflicting_input)
+                        m_eitScanStopTime = MythDate::current().addSecs(m_eitScanPeriod.count());
+                    else
+                        m_eitScanStopTime = MythDate::current().addYears(1);
                 }
                 else
                 {
-                    LOG(VB_EIT, LOG_INFO, LOC + QString(
-                            "Postponing EIT scan on input [%1] "
-                            "because input %2 is busy")
-                        .arg(m_inputId).arg(busy_input.m_inputId));
-                    m_eitScanStartTime = m_eitScanStartTime.addSecs(300);
+                    const int seconds_postpone = 300;
+                    LOG(VB_EIT, LOG_INFO, LOC +
+                        QString("Postponing EIT scan on input %1 for %2 seconds because input %3 is busy")
+                            .arg(m_inputId).arg(seconds_postpone).arg(busy_input.m_inputId));
+                    m_eitScanStartTime = m_eitScanStartTime.addSecs(seconds_postpone);
                 }
+                s_eitLock.unlock();
                 s_inputsLock.unlock();
             }
+        }
+
+
+        // Stop active EIT scan and allow start of the EIT scan on one of the conflicting real inputs.
+        if (m_scanner && HasFlags(kFlagEITScannerRunning) && MythDate::current() > m_eitScanStopTime)
+        {
+            LOG(VB_EIT, LOG_INFO, LOC +
+                QString("Stop EIT scan on input %1 to allow scan on a conflicting input")
+                    .arg(GetInputId()));
+
+            m_scanner->StopActiveScan();
+            ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
+            TuningShutdowns(TuningRequest(kFlagNoRec));
+
+            auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
+            secs += m_eitScanPeriod;
+            m_eitScanStartTime = MythDate::current().addSecs(secs.count());
         }
 
         // We should be no more than a few thousand milliseconds,
@@ -3105,7 +3193,8 @@ bool TVRec::QueueEITChannelChange(const QString &name)
     }
 
     LOG(VB_CHANNEL, LOG_INFO, LOC +
-        QString("QueueEITChannelChange(%1) -- end --> %2").arg(name).arg(ok));
+        QString("QueueEITChannelChange(%1) -- end --> %2")
+            .arg(name).arg(ok ? "done" : "failed"));
 
     return ok;
 }
@@ -4000,13 +4089,18 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
         auto *dsd = dynamic_cast<DVBStreamData*>(streamData);
         if (dsd)
             dsd->SetDishNetEIT(is_dishnet_eit(m_inputId));
-        if (!get_use_eit(GetInputId()))
+        if (m_scanner)
         {
-            LOG(VB_EIT, LOG_INFO, LOC +
-                "EIT scanning disabled for all sources on this input.");
+            if (get_use_eit(GetInputId()))
+            {
+                m_scanner->StartEITEventProcessing(m_channel, streamData);
+            }
+            else
+            {
+                LOG(VB_EIT, LOG_INFO, LOC +
+                    "EIT scanning disabled for all sources on this input.");
+            }
         }
-        else if (m_scanner)
-            m_scanner->StartEITEventProcessing(m_channel, streamData);
     }
 
     return streamData;
@@ -4784,24 +4878,27 @@ TVRec* TVRec::GetTVRec(uint inputid)
     return *it;
 }
 
-void TVRec::EnableActiveScan(bool enable) {
-    if (m_scanner != nullptr) {
-        if (enable) {
-            if ( ! HasFlags(kFlagEITScannerRunning)
+void TVRec::EnableActiveScan(bool enable)
+{
+    if (m_scanner != nullptr)
+    {
+        if (enable)
+        {
+            if (!HasFlags(kFlagEITScannerRunning)
                 && m_eitScanStartTime > MythDate::current().addYears(9))
-                {
-                    auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
-                    m_eitScanStartTime = MythDate::current().addSecs(secs.count());
-                }
+            {
+                auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
+                m_eitScanStartTime = MythDate::current().addSecs(secs.count());
+            }
         }
-        else {
+        else
+        {
             m_eitScanStartTime = MythDate::current().addYears(10);
             if (HasFlags(kFlagEITScannerRunning))
             {
                 m_scanner->StopActiveScan();
                 ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
             }
-
         }
     }
 }
