@@ -233,6 +233,8 @@ void EITScanner::StopEITEventProcessing(void)
  */
 void EITScanner::StartActiveScan(TVRec *rec, std::chrono::seconds max_seconds_per_source)
 {
+    QMutexLocker locker(&m_lock);
+
     m_rec = rec;
 
     if (m_activeScanChannels.isEmpty())
@@ -268,29 +270,24 @@ void EITScanner::StartActiveScan(TVRec *rec, std::chrono::seconds max_seconds_pe
         while (query.next())
             m_activeScanChannels.push_back(query.value(0).toString());
 
-        m_activeScanNextChan = m_activeScanChannels.begin();
-    }
-
-    {
-        uint sourceid = m_rec->GetSourceID();
-        QString sourcename = SourceUtil::GetSourceName(sourceid);
-        LOG(VB_EIT, LOG_INFO, LOC +
-            QString("StartActiveScan for source %1 '%2' with %3 multiplexes")
-                .arg(sourceid).arg(sourcename).arg(m_activeScanChannels.size()));
-    }
-
-    // Start at a random channel. This is so that multiple cards with
-    // the same source don't all scan the same channels in the same
-    // order when the backend is first started up.
-    if (!m_activeScanChannels.empty())
-    {
-        // The start channel is random.  From now on, start on the
-        // next channel.  This makes sure the immediately following
-        // channels get scanned in a timely manner if we keep erroring
-        // out on the previous channel.
+        // Start at a random channel. This is so that multiple cards with
+        // the same source don't all scan the same channels in the same
+        // order when the backend is first started up.
+        // Also, from now on, always start on the next channel.
+        // This makes sure the immediately following channels get scanned
+        // in a timely manner if we keep erroring out on the previous channel.
         auto nextChanIndex = MythRandom() % m_activeScanChannels.size();
         m_activeScanNextChan = m_activeScanChannels.begin() + nextChanIndex;
 
+        uint sourceid = m_rec->GetSourceID();
+        QString sourcename = SourceUtil::GetSourceName(sourceid);
+        LOG(VB_EIT, LOG_INFO, LOC +
+            QString("EIT scan channel table for source %1 '%2' with %3 multiplexes")
+                .arg(sourceid).arg(sourcename).arg(m_activeScanChannels.size()));
+    }
+
+    if (!m_activeScanChannels.empty())
+    {
         // Start scan now
         m_activeScanNextTrig = MythDate::current();
 
@@ -301,6 +298,12 @@ void EITScanner::StartActiveScan(TVRec *rec, std::chrono::seconds max_seconds_pe
 
         m_activeScanStopped = false;
         m_activeScan = true;
+
+        uint sourceid = m_rec->GetSourceID();
+        QString sourcename = SourceUtil::GetSourceName(sourceid);
+        LOG(VB_EIT, LOG_INFO, LOC +
+            QString("EIT scan start on source %1 '%2'")
+                .arg(sourceid).arg(sourcename));
     }
 }
 
