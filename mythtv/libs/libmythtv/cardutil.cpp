@@ -2249,6 +2249,7 @@ std::vector<uint> CardUtil::GetConflictingInputs(uint inputid)
         "JOIN inputgroup ig ON ig.inputgroupid = g.inputgroupid "
         "JOIN capturecard c ON c.cardid = ig.cardinputid "
         "                      AND c.cardid <> :INPUTID2 "
+        "                      AND c.sourceid > 0 "
         "ORDER BY c.cardid");
 
     query.bindValue(":INPUTID1", inputid);
