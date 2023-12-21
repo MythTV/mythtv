@@ -4418,7 +4418,7 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
     std::vector<InputInfo> freeinputs;
     QMap<uint, QSet<uint> > groupids;
 
-    // Lopp over each encoder and divide the inputs into busy and free
+    // Loop over each encoder and divide the inputs into busy and free
     // lists.
     TVRec::s_inputsLock.lockForRead();
     for (auto * elink : qAsConst(*m_encoderList))
