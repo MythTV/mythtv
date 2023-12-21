@@ -1081,7 +1081,7 @@ void TVRec::HandleStateChange(void)
         s_eitLock.lock();
         for (auto input : m_eitInputs)
         {
-            auto tv_rec = s_inputs.value(input);
+            auto *tv_rec = s_inputs.value(input);
             if (tv_rec && tv_rec->m_scanner && tv_rec->HasFlags(kFlagEITScannerRunning))
             {
                 LOG(VB_EIT, LOG_INFO, LOC +
@@ -1536,7 +1536,7 @@ void TVRec::run(void)
                 {
                     for (auto input : inputids)
                     {
-                        auto tv_rec = s_inputs.value(input);
+                        auto *tv_rec = s_inputs.value(input);
                         if (tv_rec && tv_rec->m_scanner)
                         {
                             conflicting_input = true;
