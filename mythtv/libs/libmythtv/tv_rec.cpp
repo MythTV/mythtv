@@ -1089,7 +1089,7 @@ void TVRec::HandleStateChange(void)
                         .arg(input));
                 tv_rec->m_scanner->StopActiveScan();
                 tv_rec->ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
-                tv_rec->CloseChannel();
+                tv_rec->TuningShutdowns(TuningRequest(kFlagNoRec));
                 auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
                 tv_rec->m_eitScanStartTime = MythDate::current().addSecs(secs.count());
             }
