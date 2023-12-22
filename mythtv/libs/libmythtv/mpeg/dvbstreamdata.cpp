@@ -500,7 +500,8 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
             add_pids.push_back(PID::PREMIERE_EIT_SPORT_PID);
         }
 
-        if (find(cur_pids.begin(), cur_pids.end(),
+        if (m_desiredNetId == OriginalNetworkID::SES2 &&
+            find(cur_pids.begin(), cur_pids.end(),
                  (uint) PID::FREESAT_EIT_PID) == cur_pids.end())
         {
             add_pids.push_back(PID::FREESAT_EIT_PID);
@@ -569,7 +570,8 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
             del_pids.push_back(PID::PREMIERE_EIT_SPORT_PID);
         }
 
-        if (find(cur_pids.begin(), cur_pids.end(),
+        if (m_desiredNetId == OriginalNetworkID::SES2 &&
+            find(cur_pids.begin(), cur_pids.end(),
                  (uint) PID::FREESAT_EIT_PID) != cur_pids.end())
         {
             del_pids.push_back(PID::FREESAT_EIT_PID);
