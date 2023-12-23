@@ -75,8 +75,8 @@ void EITScanner::run(void)
 {
     m_lock.lock();
 
-    MythTimer t;
-    uint eitCount = 0;
+    MythTimer tsle;             // Time since last event or since start of active scan
+    uint eitCount = 0;          // Number of events processed
 
     while (!m_exitThread)
     {
@@ -86,13 +86,13 @@ void EITScanner::run(void)
         if (list_size)
         {
             eitCount += m_eitHelper->ProcessEvents();
-            t.start();
+            tsle.start();
         }
 
         // Tell the scheduler to run if we are in passive scan
         // and there have been updated events since the last scheduler run
         // but not in the last 60 seconds
-        if (!m_activeScan && eitCount && (t.elapsed() > 60s))
+        if (!m_activeScan && eitCount && (tsle.elapsed() > 60s))
         {
             LOG(VB_EIT, LOG_INFO,
                 LOC + QString("Added %1 EIT events in passive scan").arg(eitCount));
@@ -100,8 +100,11 @@ void EITScanner::run(void)
             RescheduleRecordings();
         }
 
-        // Is it time to move to the next transport in active scan?
-        if (m_activeScan && (MythDate::current() > m_activeScanNextTrig))
+        // Move to the next transport in active scan when no events
+        // have been received for 60 seconds or when the scan time is up.
+        const std::chrono::seconds eventTimeout = 60s;
+        bool noEvents = tsle.isRunning() && (tsle.elapsed() > eventTimeout);
+        if (m_activeScan && (noEvents || (MythDate::current() > m_activeScanNextTrig)))
         {
             // If there have been any new events, tell scheduler to run.
             if (eitCount)
@@ -110,6 +113,13 @@ void EITScanner::run(void)
                     LOC + QString("Added %1 EIT events in active scan").arg(eitCount));
                 eitCount = 0;
                 RescheduleRecordings();
+            }
+
+            if (noEvents)
+            {
+                LOG(VB_EIT, LOG_INFO, LOC +
+                    QString("No EIT events received in last %1 seconds, move to next transport")
+                        .arg(eventTimeout.count()));
             }
 
             if (m_activeScanNextChan == m_activeScanChannels.end())
@@ -128,7 +138,7 @@ void EITScanner::run(void)
 
                     uint mplexid = ChannelUtil::GetMplexID(chanid);
                     QString sourcename = SourceUtil::GetSourceName(sourceid);
-                    LOG(VB_EIT, LOG_INFO, LOC +
+                    LOG(VB_EIT, LOG_DEBUG, LOC +
                         QString("Next EIT active scan source %1 '%2' multiplex %3 chanid %4 channel %5")
                             .arg(sourceid).arg(sourcename).arg(mplexid).arg(chanid).arg(*m_activeScanNextChan));
                 }
@@ -136,6 +146,8 @@ void EITScanner::run(void)
 
             m_activeScanNextTrig = MythDate::current().addSecs(m_activeScanTrigTime.count());
             m_activeScanNextChan++;
+
+            tsle.start();
 
             // Remove all EIT cache entries that are more than 24 hours old
             EITHelper::PruneEITCache(m_activeScanNextTrig.toSecsSinceEpoch() - 86400);
