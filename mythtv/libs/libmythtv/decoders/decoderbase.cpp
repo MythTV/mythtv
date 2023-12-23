@@ -1065,8 +1065,7 @@ int DecoderBase::BestTrack(uint Type, bool forcedPreferred)
     for (uint i = 0; i < numStreams; i++)
     {
         bool forced = (Type == kTrackTypeSubtitle &&
-                        m_tracks[Type][i].m_forced &&
-                        m_parent->ForcedSubtitlesFavored());
+                        m_tracks[Type][i].m_forced);
         int position = static_cast<int>(numStreams) - static_cast<int>(i);
         int language = 0;
         for (uint j = 0; (language == 0) && (j < m_languagePreference.size()); ++j)

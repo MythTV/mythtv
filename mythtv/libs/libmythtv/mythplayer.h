@@ -201,9 +201,6 @@ class MTV_PUBLIC MythPlayer : public QObject
 
     // Public Audio/Subtitle/EIA-608/EIA-708 stream selection - thread safe
     void EnableForcedSubtitles(bool enable);
-    bool ForcedSubtitlesFavored(void) const {
-        return m_allowForcedSubtitles && !m_captionsEnabledbyDefault;
-    }
     // How to handle forced Subtitles (i.e. when in a movie someone speaks
     // in a different language than the rest of the movie, subtitles are
     // forced on even if the user doesn't have them turned on.)
