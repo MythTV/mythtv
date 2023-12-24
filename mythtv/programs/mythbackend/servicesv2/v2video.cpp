@@ -229,18 +229,49 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
         sql.append(" WHERE filename LIKE :BINDVALUE ");
     }
     sql.append(" ORDER BY ");
-    QString sort = Sort.toLower();
-    if (sort == "added")
-        sql.append("insertdate");
-    else if (sort == "released")
-        sql.append("releasedate");
-    else if (sortFields.contains(sort))
-        sql.append(sort);
-    else
-        sql.append("intid");
-
+    QString defSeq = " ASC";
     if (bDescending)
-        sql += " DESC";
+        defSeq = " DESC";
+
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+    QStringList sortList = Sort.toLower().split(',',QString::SkipEmptyParts);
+#else
+    QStringList sortList = Sort.toLower().split(',',Qt::SkipEmptyParts);
+#endif
+    bool next = false;
+    for (const auto & item : sortList)
+    {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+        QStringList partList = item.split(' ',QString::SkipEmptyParts);
+#else
+        QStringList partList = item.split(' ',Qt::SkipEmptyParts);
+#endif
+        if (partList.length() == 0)
+            continue;
+        QString sort = partList[0];
+        if (sort == "added")
+            sort = "insertdate";
+        else if (sort == "released")
+            sort = "releasedate";
+        if (sortFields.contains(sort))
+        {
+            if (next)
+                sql.append(",");
+            sql.append(sort);
+            if (partList.length() > 1 && partList[1].compare("DESC",Qt::CaseInsensitive) == 0)
+                sql.append(" DESC");
+            else if (partList.length() > 1 && partList[1].compare("ASC",Qt::CaseInsensitive) == 0)
+                sql.append(" ASC");
+            else
+                sql.append(defSeq);
+            next = true;
+        }
+    }
+    if (!next)
+    {
+        sql.append("intid");
+        sql.append(defSeq);
+    }
 
     VideoMetadataListManager::loadAllFromDatabase(videolist, sql, bindValue);
     std::vector<VideoMetadataListManager::VideoMetadataPtr> videos(videolist.begin(), videolist.end());
@@ -266,8 +297,8 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
             if (!metadata)
                 break;
             QString fnPart = metadata->GetFilename().mid(folderlen);
-            int slashPos = fnPart.indexOf('/');
-            if (slashPos > 0)
+            int slashPos = fnPart.indexOf('/',1);
+            if (slashPos >= 0)
             {
                 dir = fnPart.mid(0, slashPos);
                 if (!map.contains(dir))
@@ -310,8 +341,8 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
         if (CollapseSubDirs)
         {
             QString fnPart = metadata->GetFilename().mid(folderlen);
-            int slashPos = fnPart.indexOf('/');
-            if (slashPos > 0)
+            int slashPos = fnPart.indexOf('/',1);
+            if (slashPos >= 0)
                 continue;
         }
 

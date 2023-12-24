@@ -11,6 +11,8 @@
 // Qt headers
 #include <QMap>
 #include <QDir>
+#include <QRegularExpression>
+#include <QUrlQuery>
 
 // MythTV headers
 #include "libmythbase/mythconfig.h"
@@ -1727,15 +1729,20 @@ bool CardUtil::GetInputInfo(InputInfo &input, std::vector<uint> *groupids)
     return true;
 }
 
-QList<InputInfo> CardUtil::GetAllInputInfo()
+// virtTuners to include virtual tuners in the list
+QList<InputInfo> CardUtil::GetAllInputInfo(bool virtTuners)
 {
     QList<InputInfo> infoInputList;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardid, "
+    QString queryStr = "SELECT cardid, "
                   "inputname, sourceid, livetvorder, "
                   "schedorder, displayname, recpriority, quicktune "
-                  "FROM capturecard");
+                  "FROM capturecard";
+
+    if (!virtTuners)
+        queryStr.append(" WHERE parentid = 0");
+    query.prepare(queryStr);
 
     if (!query.exec())
     {
@@ -2242,6 +2249,7 @@ std::vector<uint> CardUtil::GetConflictingInputs(uint inputid)
         "JOIN inputgroup ig ON ig.inputgroupid = g.inputgroupid "
         "JOIN capturecard c ON c.cardid = ig.cardinputid "
         "                      AND c.cardid <> :INPUTID2 "
+        "                      AND c.sourceid > 0 "
         "ORDER BY c.cardid");
 
     query.bindValue(":INPUTID1", inputid);

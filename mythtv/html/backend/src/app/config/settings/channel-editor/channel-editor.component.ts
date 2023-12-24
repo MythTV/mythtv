@@ -5,6 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Observable, of, PartialObserver } from 'rxjs';
 import { ChannelService } from 'src/app/services/channel.service';
 import { Channel, CommMethod, DBChannelRequest } from 'src/app/services/interfaces/channel.interface';
+import { VideoMultiplex } from 'src/app/services/interfaces/multiplex.interface';
 import { VideoSource } from 'src/app/services/interfaces/videosource.interface';
 import { SetupService } from 'src/app/services/setup.service';
 
@@ -27,6 +28,7 @@ export class ChannelEditorComponent implements OnInit {
   videoSources: VideoSource[] = [];
   commMethods: CommMethod[] = [];
   sourceNames: string[] = [];
+  multiplexes: VideoMultiplex[] = [];
 
   tvFormats = [
     { value: "Default", prompt: "common.default" },
@@ -59,9 +61,11 @@ export class ChannelEditorComponent implements OnInit {
   unassignedText = 'settings.chanedit.unassigned';
 
   transDone = 0;
-  numTranslations = 9;
+  visDone = 0;
+  numTranslations = 10;
   successCount = 0;
   errorCount = 0;
+  selectedAdvanced = false;
 
   displayChannelDlg: boolean = false;
   dialogHeader = "";
@@ -150,13 +154,15 @@ export class ChannelEditorComponent implements OnInit {
           entry.Source = this.getSource(entry);
         });
       });
-
-
     });
-    // this.channelService.GetVideoSourceList().subscribe(data =>
-    //   this.videoSources = data.VideoSourceList.VideoSources);
     this.channelService.GetCommMethodList().subscribe(data =>
       this.commMethods = data.CommMethodList.CommMethods);
+  }
+
+  loadMultiplexes(SourceID: number) {
+    this.channelService.GetVideoMultiplexList({ SourceID: SourceID }).subscribe((data => {
+      this.multiplexes = data.VideoMultiplexList.VideoMultiplexes;
+    }))
   }
 
   loadTranslations(): void {
@@ -164,6 +170,10 @@ export class ChannelEditorComponent implements OnInit {
       this.translate.get(entry.prompt).subscribe(data => {
         entry.prompt = data;
         this.transDone++;   // There will be 4 of these
+        this.visDone++;
+        if (this.visDone >= this.visibilities.length)
+          // notify of change
+          this.visibilities = [...this.visibilities]
       });
     });
     this.translate.get(this.headingNew).subscribe(data => {
@@ -184,6 +194,8 @@ export class ChannelEditorComponent implements OnInit {
     });
     this.translate.get(this.tvFormats[0].prompt).subscribe(data => {
       this.tvFormats[0].prompt = data;
+      // notify of change
+      this.tvFormats = [...this.tvFormats]
       this.transDone++
     });
   }
@@ -219,6 +231,8 @@ export class ChannelEditorComponent implements OnInit {
     this.channel = Object.assign({}, channel);
     this.displayChannelDlg = true;
     this.markPristine();
+    this.loadMultiplexes(channel.SourceId);
+    this.selectedAdvanced = false;
   }
 
   saveObserver: PartialObserver<any> = {
@@ -282,7 +296,7 @@ export class ChannelEditorComponent implements OnInit {
       ExtendedVisible: this.channel.ExtendedVisible,
       Format: this.channel.Format,
       FrequencyID: this.channel.FrequencyId,
-      // MplexID:            this.channel.MplexId,
+      MplexID: this.channel.MplexId,
       RecPriority: this.channel.RecPriority,
       ServiceID: this.channel.ServiceId,
       // ServiceType:        this.channel.ServiceType,

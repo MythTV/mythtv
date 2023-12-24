@@ -65,7 +65,7 @@ class MBASE_PUBLIC V2HttpRedirectException
 /// @param Name The name of the variable to be defined. Also controls
 ///             the name of the getter and setter functions.
 ///
-/// This macro uses templating so it can pass parameters bby reference
+/// This macro uses templating so it can pass parameters by reference
 /// for complex types, and pass by value for simple types. The first
 /// template handles complex lvalue arguments, the second handles
 /// complex rvalue arguments, and the third handles simple arguments.
@@ -74,16 +74,16 @@ class MBASE_PUBLIC V2HttpRedirectException
     public:                                              \
         Type Get##Name() const { return m_##Name; }      \
         template <class T>                                         \
-        typename std::enable_if<std::is_same<T, QString>::value || \
-                                std::is_same<T, QDateTime>::value ||   \
-                                std::is_same<T, QVariantMap>::value || \
-                                std::is_same<T, QVariantList>::value,void>::type \
+        typename std::enable_if_t<std::is_same_v<T, QString> || \
+                                  std::is_same_v<T, QDateTime> || \
+                                  std::is_same_v<T, QVariantMap> ||     \
+                                  std::is_same_v<T, QVariantList>,void> \
         set##Name(const T& value) { m_##Name = value; }             \
         template <class T>                                          \
-        typename std::enable_if<!std::is_same<T, QString>::value && \
-                                !std::is_same<T, QDateTime>::value &&   \
-                                !std::is_same<T, QVariantMap>::value && \
-                                !std::is_same<T, QVariantList>::value,void>::type \
+        typename std::enable_if_t<!std::is_same_v<T, QString> && \
+                                  !std::is_same_v<T, QDateTime> && \
+                                  !std::is_same_v<T, QVariantMap> &&    \
+                                  !std::is_same_v<T, QVariantList>,void> \
         set##Name(T value) { m_##Name = value; }                    \
     private:                                             \
     Type m_##Name { };

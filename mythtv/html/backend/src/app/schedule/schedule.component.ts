@@ -234,6 +234,7 @@ export class ScheduleComponent implements OnInit {
   }
 
   open(program?: ScheduleOrProgram, channel?: Channel, recRule?: RecRule) {
+    this.templateId = 0;
     this.reqProgram = program;
     this.reqChannel = channel;
     this.reqRecRule = recRule;
@@ -490,10 +491,11 @@ export class ScheduleComponent implements OnInit {
   }
 
   templateChange(recRule: RecRule) {
-    const newTemplate = this.templates.find(entry => entry.Id == this.templateId);
-    if (newTemplate)
-      this.mergeTemplate(recRule, newTemplate);
-    this.templateId = 0;
+    if (this.templateId) {
+      const newTemplate = this.templates.find(entry => entry.Id == this.templateId);
+      if (newTemplate)
+        this.mergeTemplate(recRule, newTemplate);
+    }
   }
 
   onSearchTypeChange() {

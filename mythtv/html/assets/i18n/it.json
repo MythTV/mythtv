@@ -1,6 +1,6 @@
 {
     "common": {
-        "back": "indietro",
+        "back": "Indietro",
         "backenderror": "Errore di back-end.",
         "cancel": "Annulla",
         "close": "Vicino",
@@ -16,8 +16,10 @@
         "help": "Aiuto",
         "instructions": "Istruzioni",
         "loading": "Caricamento in corso",
+        "mustenable": "Non è possibile salvare le modifiche se non si fa prima clic sul pulsante Abilita aggiornamenti.",
+        "mustrestart": "Una volta terminati gli aggiornamenti, riavviare il backend.",
         "networkfail": "ERRORE: errore di rete back-end",
-        "next": "Il prossimo",
+        "next": "Prossimo",
         "no": "NO",
         "nosave": "Chiudi senza salvare",
         "ok": "OK",
@@ -36,9 +38,14 @@
         "channeleditor": "Editor di canali",
         "guide": {
             "channel": "Canale",
+            "full_search": "Ricerca completa",
             "people_search": "Cerca persone",
             "retgrid": "Ritorna alla visualizzazione della griglia",
-            "title_search": "Ricerca del titolo"
+            "title_search": "Ricerca del titolo",
+            "type_movie": "Film",
+            "type_series": "Serie",
+            "type_sports": "Gli sport",
+            "type_tvshow": "Programma televisivo"
         },
         "programguide": "Guida al programma",
         "recordings": {
@@ -56,12 +63,13 @@
             "edit_rule": "Modifica regola di registrazione",
             "episode": "Episodio",
             "file_size": "Dimensione del file",
+            "filename_label": "Nome del file",
             "filter": "Filtro",
             "heading": "Registrazioni",
             "inetref": "InetRif",
             "job_Commflag": "Rileva spot pubblicitari",
             "job_Metadata": "Cerca Metadati",
-            "job_Transcode": "Transcodifica",
+            "job_Transcode": "Transcodifica con il profilo predefinito",
             "mnu_delete": "Eliminare",
             "mnu_delete_rerec": "Elimina e consenti nuova registrazione",
             "mnu_markdamaged": "Contrassegna come danneggiato",
@@ -155,7 +163,6 @@
             "startoffset_label": "Numero di minuti extra da registrare all'avvio",
             "starttime_label": "Data e ora di inizio",
             "subtitle_label": "Sottotitolo",
-            "template_apply": "Applicare la modifica del modello",
             "template_label": "Usa modello",
             "title_label": "Titolo",
             "type": {
@@ -658,6 +665,8 @@
             "format_label": "Formato televisivo",
             "freqid": "Frequenza ID",
             "freqid_desc": "Numero di canale come compreso dai tuoi sintonizzatori.",
+            "mplex_desc": "Broadcast Frequenza del flusso di trasporto che trasporta questo canale. Lo stesso flusso può trasportare molti canali.",
+            "mplex_label": "Multisala",
             "never-visible": "Mai Visibile",
             "new_channel": "Nuovo canale",
             "not-visible": "Non visibile",
@@ -677,6 +686,7 @@
             "xmltvid_desc": "ID utilizzato dai servizi di quotazione per ottenere una corrispondenza esatta tra un canale nella tua line-up e un canale nel loro database. Normalmente questo viene impostato automaticamente quando viene eseguito 'mythfilldatabase'.",
             "xmltvid_label": "ID XMLTV"
         },
+        "chanedit_advanced": "Impostazioni avanzate",
         "channelscan": {
             "FEC_desc": "Correzione degli errori di inoltro (predefinito: Auto)",
             "FEC_label": "FEC",
@@ -790,7 +800,7 @@
             "rolloff_label": "Rotolamento",
             "sattuning_desc": "Selezionare un satellite da questo elenco per i dati di sintonizzazione del transponder di riferimento.",
             "sattuning_label": "Dati di sintonizzazione satellitare",
-            "scan_desc": "Prima di eseguire questa operazione è necessario selezionare la sorgente video e salvare la pagina se non sono state salvate modifiche.",
+            "scan_desc": "Prima di eseguirlo è necessario selezionare la sorgente video. Avvia scansione salverà automaticamente la pagina, se necessario, prima della scansione.",
             "scan_label": "Inizia scansione",
             "scanimport_label": "Scansione da importare",
             "scanimport_option": "Seleziona un'opzione di importazione.",

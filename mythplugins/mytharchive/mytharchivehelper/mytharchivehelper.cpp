@@ -45,6 +45,7 @@
 #include <QImage>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QRegularExpression>
 #include <QTextStream>
 
 // MythTV headers

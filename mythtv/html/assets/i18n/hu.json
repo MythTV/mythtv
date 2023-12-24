@@ -1,6 +1,6 @@
 {
     "common": {
-        "back": "Hát",
+        "back": "Vissza",
         "backenderror": "Háttér hiba.",
         "cancel": "Megszünteti",
         "close": "Bezárás",
@@ -16,6 +16,8 @@
         "help": "Segítség",
         "instructions": "Utasítás",
         "loading": "Betöltés",
+        "mustenable": "A módosítások csak akkor menthetők el, ha először a Frissítések engedélyezése gombra kattint.",
+        "mustrestart": "Ha végzett a frissítésekkel, indítsa újra a háttérprogramot.",
         "networkfail": "HIBA: Háttérhálózati hiba",
         "next": "Következő",
         "no": "Nem",
@@ -36,9 +38,14 @@
         "channeleditor": "Csatornaszerkesztő",
         "guide": {
             "channel": "Csatorna",
+            "full_search": "Teljes keresés",
             "people_search": "Emberek keresése",
             "retgrid": "Visszatérés a Rács megjelenítéséhez",
-            "title_search": "Cím keresése"
+            "title_search": "Cím keresése",
+            "type_movie": "Film",
+            "type_series": "Sorozat",
+            "type_sports": "Sport",
+            "type_tvshow": "TV-műsor"
         },
         "programguide": "Programkalauz",
         "recordings": {
@@ -56,12 +63,13 @@
             "edit_rule": "Rögzítési szabály szerkesztése",
             "episode": "Epizód",
             "file_size": "Fájl méret",
+            "filename_label": "Fájl név",
             "filter": "Szűrő",
             "heading": "Felvételek",
             "inetref": "InetRef",
             "job_Commflag": "Reklámok észlelése",
             "job_Metadata": "Keresse meg a Metaadatokat",
-            "job_Transcode": "Átkódolás",
+            "job_Transcode": "Átkódolás alapértelmezett profillal",
             "mnu_delete": "Töröl",
             "mnu_delete_rerec": "Törlés és újrarögzítés engedélyezése",
             "mnu_markdamaged": "Megjelölés sérültként",
@@ -155,7 +163,6 @@
             "startoffset_label": "Az induláskor rögzítendő többletpercek száma",
             "starttime_label": "Kezdés dátuma és időpontja",
             "subtitle_label": "Felirat",
-            "template_apply": "Sablonmódosítás alkalmazása",
             "template_label": "Sablon használata",
             "title_label": "Cím",
             "type": {
@@ -658,6 +665,8 @@
             "format_label": "TV formátum",
             "freqid": "Frekvencia Id",
             "freqid_desc": "Csatornaszám a tunerek által értett módon.",
+            "mplex_desc": "A csatornát hordozó szállítási adatfolyam sugárzási frekvenciája. Ugyanaz az adatfolyam több csatornát is hordozhat.",
+            "mplex_label": "Multiplex",
             "never-visible": "Soha nem látható",
             "new_channel": "Új Csatorna",
             "not-visible": "Nem látható",
@@ -677,6 +686,7 @@
             "xmltvid_desc": "Azonosító, amelyet a listázási szolgáltatások használnak, hogy pontos megfelelést kapjanak a felállásban lévő csatornák és az adatbázisukban lévő csatornák között. Általában ez automatikusan beáll, amikor a 'mythfilldatabase' fut.",
             "xmltvid_label": "XMLTV azonosító"
         },
+        "chanedit_advanced": "További beállítások",
         "channelscan": {
             "FEC_desc": "Továbbítási hibajavítás (alapértelmezett: automatikus)",
             "FEC_label": "FEC",
@@ -790,7 +800,7 @@
             "rolloff_label": "Roll-off",
             "sattuning_desc": "Válasszon egy műholdat ebből a listából a referenciatranszponder hangolási adataihoz.",
             "sattuning_label": "Műhold hangolási adatok",
-            "scan_desc": "Ennek futtatása előtt ki kell választania a videó forrását, és el kell mentenie az oldalt, ha a módosításokat nem menti el.",
+            "scan_desc": "Ennek futtatása előtt ki kell választania a videó forrását. A Start Scan automatikusan elmenti az oldalt, ha szükséges a szkennelés előtt.",
             "scan_label": "Indítsa el a szkennelést",
             "scanimport_label": "Szkennelés importáláshoz",
             "scanimport_option": "Válasszon egy importálási lehetőséget.",

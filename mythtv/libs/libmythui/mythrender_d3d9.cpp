@@ -10,7 +10,9 @@
 #include "libmythbase/mythlogging.h"
 #include "mythrender_d3d9.h"
 
+#ifndef DXVA2_E_NEW_VIDEO_DEVICE
 #define DXVA2_E_NEW_VIDEO_DEVICE MAKE_HRESULT(1, 4, 4097)
+#endif
 
 struct TEXTUREVERTEX
 {

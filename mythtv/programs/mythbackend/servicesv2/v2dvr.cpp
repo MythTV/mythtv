@@ -23,6 +23,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+// Qt
+#include <QJsonArray>
+#include <QJsonDocument>
+
 // MythTV
 #include "libmythbase/http/mythhttpmetaservice.h"
 #include "libmythbase/mythcorecontext.h"
@@ -1139,7 +1143,7 @@ V2InputList* V2Dvr::GetInputList()
 {
     auto *pList = new V2InputList();
 
-    QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
+    QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo(false);
     for (const auto & inputInfo : qAsConst(inputInfoList))
     {
         V2Input *input = pList->AddNewInput();

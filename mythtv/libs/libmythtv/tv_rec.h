@@ -362,6 +362,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     bool               m_runJobOnHostOnly         {false};
     std::chrono::seconds m_eitCrawlIdleStart      {1min};
     std::chrono::seconds m_eitTransportTimeout    {5min};
+    std::chrono::seconds m_eitScanPeriod          {15min};
     int                m_audioSampleRateDB        {0};
     std::chrono::seconds m_overRecordSecNrml      {0s};
     std::chrono::seconds m_overRecordSecCat       {0s};
@@ -371,6 +372,10 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     uint               m_inputId;
     uint               m_parentId                 {0};
     bool               m_isPip                    {false};
+
+    // Configuration variables for EIT on conflicting inputs
+    static QMutex      s_eitLock;
+    std::vector<uint>  m_eitInputs;
 
     // Configuration variables from database, based on inputid
     GeneralDBOptions   m_genOpt;
@@ -396,6 +401,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     TuningQueue        m_tuningRequests;
     TuningRequest      m_lastTuningRequest        {0};
     QDateTime          m_eitScanStartTime;
+    QDateTime          m_eitScanStopTime;
     mutable QMutex     m_triggerEventLoopLock;
     QWaitCondition     m_triggerEventLoopWait;
     bool               m_triggerEventLoopSignal   {false};

@@ -16,6 +16,8 @@
         "help": "auta",
         "instructions": "Ohjeet",
         "loading": "Ladataan",
+        "mustenable": "Muutoksia ei voi tallentaa, ellet napsauta ensin Ota päivitykset käyttöön -painiketta.",
+        "mustrestart": "Kun olet lopettanut päivitykset, käynnistä taustaohjelma uudelleen.",
         "networkfail": "VIRHE: Backend Network Failure",
         "next": "Seuraava",
         "no": "Ei",
@@ -36,9 +38,14 @@
         "channeleditor": "Kanavaeditori",
         "guide": {
             "channel": "kanava",
+            "full_search": "Täysi haku",
             "people_search": "Ihmiset haku",
             "retgrid": "Palaa ruudukkonäyttöön",
-            "title_search": "Otsikkohaku"
+            "title_search": "Otsikkohaku",
+            "type_movie": "Elokuva",
+            "type_series": "Sarja",
+            "type_sports": "Urheilu",
+            "type_tvshow": "Tv-ohjelma"
         },
         "programguide": "Ohjelmaopas",
         "recordings": {
@@ -56,12 +63,13 @@
             "edit_rule": "Muokkaa tallennussääntöä",
             "episode": "Jakso",
             "file_size": "Tiedoston koko",
+            "filename_label": "Tiedoston nimi",
             "filter": "Suodattaa",
             "heading": "Tallenteet",
             "inetref": "InetRef",
             "job_Commflag": "Tunnista mainokset",
             "job_Metadata": "Etsi Metadata",
-            "job_Transcode": "Transkoodaus",
+            "job_Transcode": "Transkoodaus oletusprofiililla",
             "mnu_delete": "Poistaa",
             "mnu_delete_rerec": "Poista ja salli tallennus uudelleen",
             "mnu_markdamaged": "Merkitse vaurioituneeksi",
@@ -155,7 +163,6 @@
             "startoffset_label": "Tallennettavien lisäminuuttien määrä alussa",
             "starttime_label": "Aloituspäivämäärä ja -aika",
             "subtitle_label": "Tekstitys",
-            "template_apply": "Käytä mallin muutosta",
             "template_label": "Käytä mallia",
             "title_label": "Otsikko",
             "type": {
@@ -658,6 +665,8 @@
             "format_label": "TV-muoto",
             "freqid": "Taajuustunnus",
             "freqid_desc": "Kanavan numero virittimiesi ymmärtämänä.",
+            "mplex_desc": "Tätä kanavaa kuljettavan siirtovirran lähetystaajuus. Sama stream voi kuljettaa useita kanavia.",
+            "mplex_label": "Multiplex",
             "never-visible": "Ei koskaan näkyvissä",
             "new_channel": "Uusi kanava",
             "not-visible": "Ei näkyvä",
@@ -677,6 +686,7 @@
             "xmltvid_desc": "Tunnus, jota listauspalvelut käyttävät saadakseen tarkan vastaavuuden kokoonpanossasi olevan kanavan ja tietokannassa olevan kanavan välillä. Normaalisti tämä asetetaan automaattisesti, kun \"mythfilldatabase\" ajetaan.",
             "xmltvid_label": "XMLTV-tunnus"
         },
+        "chanedit_advanced": "Lisäasetukset",
         "channelscan": {
             "FEC_desc": "Välitä virheen korjaus (oletus: automaattinen)",
             "FEC_label": "FEC",
@@ -790,7 +800,7 @@
             "rolloff_label": "Roll-off",
             "sattuning_desc": "Valitse satelliitti tästä luettelosta referenssitransponderin viritystiedoille.",
             "sattuning_label": "Satelliittiviritystiedot",
-            "scan_desc": "Ennen kuin suoritat tämän, sinun on valittava videolähde ja tallennettava sivu, jos muutoksia ei ole tallennettu.",
+            "scan_desc": "Ennen kuin suoritat tämän, sinun on valittava videolähde. Aloita skannaus tallentaa sivun tarvittaessa automaattisesti ennen skannausta.",
             "scan_label": "Aloita skannaus",
             "scanimport_label": "Skannaa tuontiin",
             "scanimport_option": "Valitse tuontivaihtoehto.",

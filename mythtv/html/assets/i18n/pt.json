@@ -16,6 +16,8 @@
         "help": "Ajuda",
         "instructions": "Instruções",
         "loading": "Carregando",
+        "mustenable": "As alterações não podem ser salvas a menos que você clique primeiro no botão Habilitar atualizações.",
+        "mustrestart": "Quando terminar as atualizações, reinicie o back-end.",
         "networkfail": "ERRO: falha na rede de back-end",
         "next": "Próximo",
         "no": "Não",
@@ -36,9 +38,14 @@
         "channeleditor": "Editor de canal",
         "guide": {
             "channel": "Canal",
+            "full_search": "Pesquisa completa",
             "people_search": "Pesquisa de pessoas",
             "retgrid": "Retornar à Exibição da Grade",
-            "title_search": "Pesquisa de título"
+            "title_search": "Pesquisa de título",
+            "type_movie": "Filme",
+            "type_series": "Series",
+            "type_sports": "Esportes",
+            "type_tvshow": "Programa de TV"
         },
         "programguide": "Guia do programa",
         "recordings": {
@@ -56,12 +63,13 @@
             "edit_rule": "Editar Regra de Gravação",
             "episode": "Episódio",
             "file_size": "Tamanho do arquivo",
+            "filename_label": "Nome do arquivo",
             "filter": "Filtro",
             "heading": "gravações",
             "inetref": "InetRef",
             "job_Commflag": "Detectar Comerciais",
             "job_Metadata": "Procurar metadados",
-            "job_Transcode": "Transcodificar",
+            "job_Transcode": "Transcodificar com perfil padrão",
             "mnu_delete": "Excluir",
             "mnu_delete_rerec": "Excluir e permitir regravação",
             "mnu_markdamaged": "Marcar como danificado",
@@ -155,7 +163,6 @@
             "startoffset_label": "Número de minutos extras a serem registrados no início",
             "starttime_label": "Data e hora de início",
             "subtitle_label": "Legenda",
-            "template_apply": "Aplicar alteração de modelo",
             "template_label": "Usar modelo",
             "title_label": "Título",
             "type": {
@@ -658,6 +665,8 @@
             "format_label": "Formato de TV",
             "freqid": "ID de frequência",
             "freqid_desc": "Número do canal conforme entendido por seus sintonizadores.",
+            "mplex_desc": "Broadcast Frequência do fluxo de transporte que transporta este canal. O mesmo fluxo pode transportar vários canais.",
+            "mplex_label": "Multiplexação",
             "never-visible": "Nunca Visível",
             "new_channel": "Novo canal",
             "not-visible": "Não visível",
@@ -677,6 +686,7 @@
             "xmltvid_desc": "ID usado pelos serviços de listagem para obter uma correspondência exata entre um canal em sua programação e um canal em seu banco de dados. Normalmente, isso é definido automaticamente quando 'mythfilldatabase' é executado.",
             "xmltvid_label": "ID XMLTV"
         },
+        "chanedit_advanced": "Configurações avançadas",
         "channelscan": {
             "FEC_desc": "Correção de erro de encaminhamento (Padrão: Auto)",
             "FEC_label": "FEC",
@@ -790,7 +800,7 @@
             "rolloff_label": "Cair fora",
             "sattuning_desc": "Selecione um satélite desta lista para os dados de ajuste do transponder de referência.",
             "sattuning_label": "Dados de sintonia de satélite",
-            "scan_desc": "Antes de executar isso, você deve selecionar a fonte de vídeo e salvar a página, caso alguma alteração não tenha sido salva.",
+            "scan_desc": "Antes de executar isso, você deve selecionar a fonte de vídeo. Iniciar digitalização salvará automaticamente a página, se necessário, antes da digitalização.",
             "scan_label": "Inicia escaneamento",
             "scanimport_label": "Digitalizar para importar",
             "scanimport_option": "Selecione uma opção de importação.",

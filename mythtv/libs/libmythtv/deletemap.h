@@ -5,6 +5,7 @@
 
 // Qt headers
 #include <QCoreApplication>
+#include <QVector>
 
 // MythTV headers
 #include "libmythbase/programtypes.h"   // for frm_dir_map_t, MarkTypes

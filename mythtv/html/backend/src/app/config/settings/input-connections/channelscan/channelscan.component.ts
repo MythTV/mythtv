@@ -60,7 +60,7 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
   @Input() iconnection!: IconnectionComponent;
   @Input() videoSourceLookup!: VideoSource[];
   @ViewChild("scroll") scrollpanel!: ScrollPanel;
-  @ViewChild("statusPanel") statusPanel!: Fieldset;
+  // @ViewChild("statusPanel") statusPanel!: Fieldset;
 
   serviceValues = [
     new Sel("settings.channelscan.tv", "tv"),
@@ -314,7 +314,7 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
   channels: string[] = [];
   channelCount = 1;
   // statusCollapsed = true;
-  refreshCount = 5;
+  refreshCount = 0;
   helpText = '';
 
   scans: ScanExt[] = [];
@@ -352,9 +352,10 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.refreshStatus();
+    this.refreshStatus(false);
     this.getScanList();
     this.getmultiplexList();
+    this.iconnection.scanComponent = this;
   }
 
 
@@ -552,13 +553,17 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
     this.channelService.GetVideoMultiplexList({ SourceID: this.card.SourceId }).subscribe(data => {
       this.multiplex = data.VideoMultiplexList.VideoMultiplexes;
     });
-
   }
 
   startScan() {
+    if (this.iconnection.currentForm && this.iconnection.currentForm.form.dirty) {
+      this.iconnection.work.startScan = true;
+      this.iconnection.saveForm();
+      return;
+    }
     this.scanRequest.CardId = this.card.CardId;
     this.channelService.StartScan(this.scanRequest).subscribe(data => {
-      setTimeout(() => this.refreshStatus(), 500);
+      setTimeout(() => this.refreshStatus(true), 500);
     });
 
   }
@@ -574,7 +579,7 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
       .subscribe(x => this.iconnection.loadChannels());
   }
 
-  refreshStatus() {
+  refreshStatus(doChannels: boolean ) {
     this.channelService.GetScanStatus().subscribe(data => {
       this.scanStatus = data.ScanStatus;
       this.scrollpanel.scrollTop(100000);
@@ -583,9 +588,11 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
       else
         this.refreshCount--;
       if (this.refreshCount > 0)
-        setTimeout(() => this.refreshStatus(), 500);
-      else
-        this.iconnection.loadChannels();
+        setTimeout(() => this.refreshStatus(true), 500);
+      else {
+        if (doChannels)
+          this.iconnection.loadChannels();
+      }
     });
   }
 

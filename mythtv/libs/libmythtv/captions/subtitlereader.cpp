@@ -57,7 +57,8 @@ void SubtitleReader::SeekFrame(int64_t ts, int flags)
 
 bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
                                    bool fix_position,
-                                   bool allow_forced)
+                                   bool allow_forced,
+                                   bool  isExternal)
 {
     bool enableforced = false;
     bool forced = false;
@@ -66,7 +67,7 @@ bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
         forced = forced || static_cast<bool>(subtitle.rects[i]->flags & AV_SUBTITLE_FLAG_FORCED);
     }
 
-    if (!m_avSubtitlesEnabled)
+    if (!m_avSubtitlesEnabled && !isExternal)
     {
         if (!forced)
         {
@@ -85,6 +86,20 @@ bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
         LOG(VB_PLAYBACK, LOG_INFO,
             "SubtitleReader: Allowing forced AV subtitle.");
         enableforced = true;
+    }
+
+    if ((m_textSubtitlesEnabled && !isExternal) ||
+        (m_avSubtitlesEnabled && isExternal))
+    {
+        FreeAVSubtitle(subtitle);
+        return enableforced;
+    }
+
+    // Sanity check to prevent seg fault
+    if (subtitle.num_rects > 1000)
+    {
+        FreeAVSubtitle(subtitle);
+        return enableforced;
     }
 
 #ifdef DEBUG_SUBTITLES

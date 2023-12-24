@@ -16,6 +16,8 @@
         "help": "Hulp",
         "instructions": "Instructies",
         "loading": "Bezig met laden",
+        "mustenable": "Wijzigingen kunnen niet worden opgeslagen tenzij u eerst op de knop Updates inschakelen klikt.",
+        "mustrestart": "Wanneer u klaar bent met updates, start u de backend opnieuw op.",
         "networkfail": "FOUT: Backend-netwerkfout",
         "next": "Volgende",
         "no": "Nee",
@@ -36,9 +38,14 @@
         "channeleditor": "Kanaal-editor",
         "guide": {
             "channel": "Kanaal",
+            "full_search": "Volledige zoekopdracht",
             "people_search": "Mensen zoeken",
             "retgrid": "Keer terug naar rasterweergave",
-            "title_search": "Titel zoeken"
+            "title_search": "Titel zoeken",
+            "type_movie": "Film",
+            "type_series": "Serie",
+            "type_sports": "Sport",
+            "type_tvshow": "Tv programma"
         },
         "programguide": "Programma gids",
         "recordings": {
@@ -56,12 +63,13 @@
             "edit_rule": "Opnameregel bewerken",
             "episode": "Aflevering",
             "file_size": "Bestandsgrootte",
+            "filename_label": "Bestandsnaam",
             "filter": "Filter",
             "heading": "Opnamen",
             "inetref": "InetRef",
             "job_Commflag": "Detecteer reclamespots",
             "job_Metadata": "Zoek metagegevens op",
-            "job_Transcode": "Transcoderen",
+            "job_Transcode": "Transcoderen met standaardprofiel",
             "mnu_delete": "Verwijderen",
             "mnu_delete_rerec": "Verwijderen en opnieuw opnemen toestaan",
             "mnu_markdamaged": "Markeer als beschadigd",
@@ -155,7 +163,6 @@
             "startoffset_label": "Aantal extra minuten om op te nemen bij start",
             "starttime_label": "Begindatum en -tijd",
             "subtitle_label": "Ondertitel",
-            "template_apply": "Sjabloonwijziging toepassen",
             "template_label": "Gebruik sjabloon",
             "title_label": "Titel",
             "type": {
@@ -658,6 +665,8 @@
             "format_label": "Tv-formaat",
             "freqid": "Frequentie-ID",
             "freqid_desc": "Kanaalnummer zoals begrepen door uw tuners.",
+            "mplex_desc": "Uitzendfrequentie van de transportstroom die dit kanaal draagt. Dezelfde stroom kan veel kanalen bevatten.",
+            "mplex_label": "Multiplex",
             "never-visible": "Nooit zichtbaar",
             "new_channel": "Nieuw kanaal",
             "not-visible": "Niet zichtbaar",
@@ -677,6 +686,7 @@
             "xmltvid_desc": "ID gebruikt door lijstservices om een ​​exacte overeenkomst te krijgen tussen een kanaal in uw line-up en een kanaal in hun database. Normaal gesproken wordt dit automatisch ingesteld als 'mythfilldatabase' wordt uitgevoerd.",
             "xmltvid_label": "XMLTV-ID"
         },
+        "chanedit_advanced": "Geavanceerde instellingen",
         "channelscan": {
             "FEC_desc": "Voorwaartse foutcorrectie (standaard: automatisch)",
             "FEC_label": "FEC",
@@ -790,7 +800,7 @@
             "rolloff_label": "Afrollen",
             "sattuning_desc": "Selecteer een satelliet uit deze lijst voor de afstemgegevens van de referentietransponder.",
             "sattuning_label": "Satelliet afstemmingsgegevens",
-            "scan_desc": "Voordat u dit uitvoert, moet u de videobron selecteren en de pagina opslaan als eventuele wijzigingen niet zijn opgeslagen.",
+            "scan_desc": "Voordat u dit uitvoert, moet u de videobron selecteren. Start Scan slaat de pagina indien nodig automatisch op voordat u gaat scannen.",
             "scan_label": "Start scan",
             "scanimport_label": "Scannen om te importeren",
             "scanimport_option": "Selecteer een importoptie.",

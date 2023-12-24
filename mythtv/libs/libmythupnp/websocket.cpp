@@ -4,6 +4,7 @@
 // C++
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 
 // MythTV headers
 #include "libmythbase/mythcorecontext.h"
@@ -18,7 +19,6 @@
 #include <QSslCipher>
 #include <QTcpSocket>
 #include <QThread>
-#include <QtCore>
 #include <QtGlobal>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -575,7 +575,7 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
         LOG(VB_HTTP, LOG_DEBUG, QString("Total Payload Size: %1 Bytes").arg(QString::number( m_readFrame.m_payloadSize)));
 
         if (!m_fuzzTesting &&
-            frame.m_payloadSize > qPow(2,20)) // Set 1MB limit on payload per frame
+            frame.m_payloadSize > std::pow(2,20)) // Set 1MB limit on payload per frame
         {
             LOG(VB_GENERAL, LOG_ERR, "WebSocketWorker::ProcessFrames() - Frame payload larger than limit of 1MB");
             SendClose(kCloseTooLarge, "Frame payload larger than limit of 1MB");
@@ -583,7 +583,7 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
         }
 
         if (!m_fuzzTesting &&
-            m_readFrame.m_payloadSize > qPow(2,22)) // Set 4MB limit on total payload
+            m_readFrame.m_payloadSize > std::pow(2,22)) // Set 4MB limit on total payload
         {
             LOG(VB_GENERAL, LOG_ERR, "WebSocketWorker::ProcessFrames() - Total payload larger than limit of 4MB");
             SendClose(kCloseTooLarge, "Total payload larger than limit of 4MB");
@@ -775,7 +775,7 @@ QByteArray WebSocketWorker::CreateFrame(WebSocketFrame::OpCode type,
 
     int payloadSize = payload.length();
 
-    if (payloadSize >= qPow(2,64))
+    if (payloadSize >= std::pow(2,64))
     {
         LOG(VB_GENERAL, LOG_ERR, "WebSocketWorker::CreateFrame() - Payload "
                               "exceeds the allowed size for a single frame");

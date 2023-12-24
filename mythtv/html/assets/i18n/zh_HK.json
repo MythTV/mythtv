@@ -16,6 +16,8 @@
         "help": "幫助",
         "instructions": "指示",
         "loading": "加載中",
+        "mustenable": "除非您先按一下「啟用更新」按鈕，否則無法儲存變更。",
+        "mustrestart": "完成更新後，重新啟動後端。",
         "networkfail": "錯誤：後端網絡故障",
         "next": "下一個",
         "no": "不",
@@ -36,9 +38,14 @@
         "channeleditor": "頻道編輯",
         "guide": {
             "channel": "渠道",
+            "full_search": "完整搜尋",
             "people_search": "人物搜索",
             "retgrid": "返回網格顯示",
-            "title_search": "標題搜索"
+            "title_search": "標題搜索",
+            "type_movie": "電影",
+            "type_series": "系列",
+            "type_sports": "運動的",
+            "type_tvshow": "電視節目"
         },
         "programguide": "節目指南",
         "recordings": {
@@ -56,12 +63,13 @@
             "edit_rule": "編輯錄音規則",
             "episode": "插曲",
             "file_size": "文件大小",
+            "filename_label": "檔案名稱",
             "filter": "篩選",
             "heading": "錄音",
             "inetref": "InetRef",
             "job_Commflag": "檢測廣告",
             "job_Metadata": "查找元數據",
-            "job_Transcode": "轉碼",
+            "job_Transcode": "使用預設設定檔進行轉碼",
             "mnu_delete": "刪除",
             "mnu_delete_rerec": "刪除並允許重新錄製",
             "mnu_markdamaged": "標記為已損壞",
@@ -155,7 +163,6 @@
             "startoffset_label": "開始時記錄的額外分鐘數",
             "starttime_label": "開始日期和時間",
             "subtitle_label": "字幕",
-            "template_apply": "應用模板更改",
             "template_label": "使用模板",
             "title_label": "標題",
             "type": {
@@ -658,6 +665,8 @@
             "format_label": "電視格式",
             "freqid": "頻率 ID",
             "freqid_desc": "您的調諧器理解的頻道號。",
+            "mplex_desc": "承載該頻道的傳輸流的廣播頻率。同一個流可以承載多個通道。",
+            "mplex_label": "多路復用",
             "never-visible": "永遠不可見",
             "new_channel": "新頻道",
             "not-visible": "不可見",
@@ -677,6 +686,7 @@
             "xmltvid_desc": "列表服務使用 ID 來獲取您的節目中的頻道與其數據庫中的頻道之間的精確對應關係。通常，這是在運行“mythfilldatabase”時自動設置的。",
             "xmltvid_label": "XMLTV ID"
         },
+        "chanedit_advanced": "進階設定",
         "channelscan": {
             "FEC_desc": "前向糾錯（默認值：自動）",
             "FEC_label": "前向糾錯",
@@ -790,7 +800,7 @@
             "rolloff_label": "滾下",
             "sattuning_desc": "從此列表中選擇一顆衛星以獲取參考轉發器的調諧數據。",
             "sattuning_label": "衛星調諧數據",
-            "scan_desc": "在運行此命令之前，您必須選擇視頻源，如果尚未保存任何更改，請保存頁面。",
+            "scan_desc": "在運行之前，您必須選擇視訊來源。如果需要，開始掃描將在掃描前自動儲存頁面。",
             "scan_label": "開始掃描",
             "scanimport_label": "掃描導入",
             "scanimport_option": "選擇一個導入選項。",

@@ -402,6 +402,20 @@ static GlobalSpinBoxSetting *EITCrawIdleStart()
     return gc;
 }
 
+static GlobalSpinBoxSetting *EITScanPeriod()
+{
+    auto *gc = new GlobalSpinBoxSetting("EITScanPeriod", 5, 60, 5);
+    gc->setLabel(QObject::tr("EIT scan period (mins)"));
+    gc->setValue(15);
+    QString helpText = QObject::tr(
+        "Time to do EIT scanning on one capture card before moving "
+        "to the next capture card in the same input group that is "
+        "configured for EIT scanning. This can happen with multiple "
+        "satellite LNBs connected via a DiSEqC switch.");
+    gc->setHelpText(helpText);
+    return gc;
+}
+
 static GlobalSpinBoxSetting *WOLbackendReconnectWaitTime()
 {
     auto *gc = new GlobalSpinBoxSetting("WOLbackendReconnectWaitTime", 0, 1200, 5);
@@ -955,6 +969,7 @@ BackendSettings::BackendSettings()
     group2a1->setLabel(QObject::tr("EIT Scanner Options"));
     group2a1->addChild(EITTransportTimeout());
     group2a1->addChild(EITCrawIdleStart());
+    group2a1->addChild(EITScanPeriod());
     addChild(group2a1);
 
     auto* group3 = new GroupSetting();

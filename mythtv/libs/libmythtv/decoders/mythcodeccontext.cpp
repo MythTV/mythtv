@@ -54,6 +54,9 @@
 #ifdef USING_EGL
 #include "mythdrmprimecontext.h"
 #endif
+#ifdef USING_DXVA2
+#include "videoout_d3d.h"
+#endif
 #include "mythcodeccontext.h"
 
 extern "C" {
@@ -267,7 +270,7 @@ MythCodecID MythCodecContext::FindDecoder(const QString &Decoder,
         return result;
 #endif
 #ifdef USING_DXVA2
-    result = VideoOutputD3D::GetBestSupportedCodec(width, height, Decoder, streamtype, false);
+    result = VideoOutputD3D::GetSupportedCodec(Context, Codec, Decoder, streamtype);
     if (codec_is_dxva2(result))
         return result;
 #endif

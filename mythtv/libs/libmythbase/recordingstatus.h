@@ -1,7 +1,6 @@
 #ifndef RECORDING_STATUS_H_
 #define RECORDING_STATUS_H_
 
-#include <QtCore>
 #include <QString>
 #include <QDateTime>
 

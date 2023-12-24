@@ -9,6 +9,7 @@
 #include <QHash>
 #include <QImage>
 #include <QReadWriteLock>
+#include <QRegularExpression>
 
 #include "libmythbase/mythdb.h"
 #include "libmythbase/stringutil.h"

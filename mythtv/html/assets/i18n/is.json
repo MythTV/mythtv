@@ -1,6 +1,6 @@
 {
     "common": {
-        "back": "indietro",
+        "back": "Til baka",
         "backenderror": "Backend villa.",
         "cancel": "Hætta við",
         "close": "Loka",
@@ -13,11 +13,13 @@
             "equals": "Nákvæm samsvörun",
             "startswith": "Byrjar með"
         },
-        "help": "Aiuto",
+        "help": "Hjálp",
         "instructions": "Leiðbeiningar",
         "loading": "Caricamento in corso",
+        "mustenable": "Ekki er hægt að vista breytingar nema þú smellir á hnappinn Virkja uppfærslur fyrst.",
+        "mustrestart": "Þegar þú ert búinn með uppfærslur skaltu endurræsa bakendann.",
         "networkfail": "VILLA: Backend Network Bilun",
-        "next": "Il prossimo",
+        "next": "Næst",
         "no": "Nei",
         "nosave": "Lokaðu án þess að vista",
         "ok": "Allt í lagi",
@@ -36,9 +38,14 @@
         "channeleditor": "Rásarstjóri",
         "guide": {
             "channel": "Rás",
+            "full_search": "Full leit",
             "people_search": "Fólksleit",
             "retgrid": "Fara aftur í Grid Display",
-            "title_search": "Titilleit"
+            "title_search": "Titilleit",
+            "type_movie": "Kvikmynd",
+            "type_series": "Röð",
+            "type_sports": "Íþróttir",
+            "type_tvshow": "Sjónvarps þáttur"
         },
         "programguide": "Dagskrárleiðbeiningar",
         "recordings": {
@@ -56,12 +63,13 @@
             "edit_rule": "Breyta upptökureglu",
             "episode": "Þáttur",
             "file_size": "Skjala stærð",
+            "filename_label": "Skráarnafn",
             "filter": "Sía",
             "heading": "Upptökur",
             "inetref": "InetRef",
             "job_Commflag": "Uppgötvaðu auglýsingar",
             "job_Metadata": "Flettu upp Lýsigögn",
-            "job_Transcode": "Umkóðun",
+            "job_Transcode": "Umkóðun með sjálfgefnu sniði",
             "mnu_delete": "Eyða",
             "mnu_delete_rerec": "Eyða og leyfa endurupptöku",
             "mnu_markdamaged": "Merktu sem skemmd",
@@ -155,7 +163,6 @@
             "startoffset_label": "Fjöldi aukamínúta til að taka upp við upphaf",
             "starttime_label": "Upphafsdagur og tími",
             "subtitle_label": "Undirtitill",
-            "template_apply": "Notaðu sniðmátsbreytingu",
             "template_label": "Notaðu sniðmát",
             "title_label": "Titill",
             "type": {
@@ -658,6 +665,8 @@
             "format_label": "Sjónvarpssnið",
             "freqid": "Tíðni auðkenni",
             "freqid_desc": "Rásarnúmer eins og útvarpstækin þín skilja.",
+            "mplex_desc": "Útsendingartíðni flutningsstraumsins sem flytur þessa rás. Sami straumurinn getur borið margar rásir.",
+            "mplex_label": "Multiplex",
             "never-visible": "Aldrei sýnilegur",
             "new_channel": "Ný rás",
             "not-visible": "Ekki sýnilegt",
@@ -677,6 +686,7 @@
             "xmltvid_desc": "Auðkenni notað til að skrá þjónustu til að fá nákvæma samsvörun milli rásar í línunni þinni og rásar í gagnagrunni þeirra. Venjulega er þetta stillt sjálfkrafa þegar 'mythfilldatabase' er keyrt.",
             "xmltvid_label": "XMLTV auðkenni"
         },
+        "chanedit_advanced": "Ítarlegar stillingar",
         "channelscan": {
             "FEC_desc": "Áfram villuleiðrétting (sjálfgefið: Sjálfvirkt)",
             "FEC_label": "FEC",
@@ -790,7 +800,7 @@
             "rolloff_label": "Rúlla af",
             "sattuning_desc": "Veldu gervihnött af þessum lista fyrir stillingargögn viðmiðunarsvarans.",
             "sattuning_label": "Gögn um gervihnattastillingar",
-            "scan_desc": "Áður en þú keyrir þetta verður þú að velja uppsprettu myndbandsins og vista síðuna ef einhverjar breytingar hafa ekki verið vistaðar.",
+            "scan_desc": "Áður en þú keyrir þetta þarftu að velja myndbandsuppsprettu. Byrja skönnun mun sjálfkrafa vista síðuna ef þörf krefur fyrir skönnun.",
             "scan_label": "Byrjaðu skönnun",
             "scanimport_label": "Skanna til að flytja inn",
             "scanimport_option": "Veldu innflutningsvalkost.",

@@ -37,6 +37,7 @@ export class GuideComponent implements OnInit, SchedulerSummary {
   readonly CHANNEL = 2;
   readonly TITLESEARCH = 3;
   readonly PEOPLESEARCH = 4;
+  readonly FULLSEARCH = 5;
   displayType = this.GRID;
   searchValue = '';
 
@@ -83,7 +84,7 @@ export class GuideComponent implements OnInit, SchedulerSummary {
 
   fetchDetails() {
     // Ask for a time 1 second after selected time
-    // Otherwise gives you shows that end at atha time also
+    // Otherwise gives you shows that end at at that time also
     let millisecs = this.m_startDate.getTime();
     let startDate = new Date(millisecs + 1000);
     let request: GetProgramListRequest = {
@@ -100,6 +101,10 @@ export class GuideComponent implements OnInit, SchedulerSummary {
         break;
       case this.PEOPLESEARCH:
         request.PersonFilter = this.searchValue;
+        request.Count = 1000;
+        break;
+      case this.FULLSEARCH:
+        request.KeywordFilter = this.searchValue;
         request.Count = 1000;
         break;
     }
@@ -147,6 +152,7 @@ export class GuideComponent implements OnInit, SchedulerSummary {
       case this.CHANNEL:
       case this.TITLESEARCH:
       case this.PEOPLESEARCH:
+      case this.FULLSEARCH:
         this.refreshing = true;
         this.fetchDetails();
         break;
@@ -176,6 +182,14 @@ export class GuideComponent implements OnInit, SchedulerSummary {
     this.searchValue = this.searchValue.trim();
     if (this.searchValue.length > 1) {
       this.displayType = this.PEOPLESEARCH;
+      this.refresh();
+    }
+  }
+
+  fullSearch() {
+    this.searchValue = this.searchValue.trim();
+    if (this.searchValue.length > 1) {
+      this.displayType = this.FULLSEARCH;
       this.refresh();
     }
   }

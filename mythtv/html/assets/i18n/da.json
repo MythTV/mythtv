@@ -16,6 +16,8 @@
         "help": "Hjælp",
         "instructions": "Instruktioner",
         "loading": "Indlæser",
+        "mustenable": "Ændringer kan ikke gemmes, medmindre du først klikker på knappen Aktiver opdateringer.",
+        "mustrestart": "Når du er færdig med opdateringer, skal du genstarte backend.",
         "networkfail": "FEJL: Backend-netværksfejl",
         "next": "Næste",
         "no": "Ingen",
@@ -36,9 +38,14 @@
         "channeleditor": "Kanalredaktør",
         "guide": {
             "channel": "Kanal",
+            "full_search": "Fuld søgning",
             "people_search": "People Search",
             "retgrid": "Vend tilbage til gittervisning",
-            "title_search": "Titelsøgning"
+            "title_search": "Titelsøgning",
+            "type_movie": "Film",
+            "type_series": "Serie",
+            "type_sports": "Sport",
+            "type_tvshow": "TV show"
         },
         "programguide": "Programguide",
         "recordings": {
@@ -56,12 +63,13 @@
             "edit_rule": "Rediger optagelsesregel",
             "episode": "Episode",
             "file_size": "Filstørrelse",
+            "filename_label": "Filnavn",
             "filter": "Filter",
             "heading": "Optagelser",
             "inetref": "InetRef",
             "job_Commflag": "Opdag reklamer",
             "job_Metadata": "Slå metadata op",
-            "job_Transcode": "Omkode",
+            "job_Transcode": "Omkode med standardprofil",
             "mnu_delete": "Slet",
             "mnu_delete_rerec": "Slet og tillad genindspilning",
             "mnu_markdamaged": "Marker som beskadiget",
@@ -155,7 +163,6 @@
             "startoffset_label": "Antal ekstra minutter at optage ved start",
             "starttime_label": "Startdato og -tid",
             "subtitle_label": "Undertekst",
-            "template_apply": "Anvend skabelonændring",
             "template_label": "Brug skabelon",
             "title_label": "Titel",
             "type": {
@@ -658,6 +665,8 @@
             "format_label": "TV-format",
             "freqid": "Frekvens-id",
             "freqid_desc": "Kanalnummer som forstået af dine tunere.",
+            "mplex_desc": "Udsendelsesfrekvens for den transportstrøm, der fører denne kanal. Den samme strøm kan bære mange kanaler.",
+            "mplex_label": "Multiplex",
             "never-visible": "Aldrig synlig",
             "new_channel": "Ny kanal",
             "not-visible": "Ikke synlig",
@@ -677,6 +686,7 @@
             "xmltvid_desc": "ID, der bruges til at liste tjenester til at få en nøjagtig overensstemmelse mellem en kanal i din line-up og en kanal i deres database. Normalt indstilles dette automatisk, når 'mythfilldatabase' køres.",
             "xmltvid_label": "XMLTV ID"
         },
+        "chanedit_advanced": "Avancerede indstillinger",
         "channelscan": {
             "FEC_desc": "Videresend fejlkorrektion (standard: Auto)",
             "FEC_label": "FEC",
@@ -790,7 +800,7 @@
             "rolloff_label": "Afrulning",
             "sattuning_desc": "Vælg en satellit fra denne liste til indstillingsdata for referencetransponderen.",
             "sattuning_label": "Satellit tuning data",
-            "scan_desc": "Før du kører dette, skal du vælge videokilden og gemme siden, hvis der ikke er gemt nogen ændringer.",
+            "scan_desc": "Før du kører dette, skal du vælge videokilden. Start scanning gemmer automatisk siden, hvis det er nødvendigt før scanning.",
             "scan_label": "Start scanning",
             "scanimport_label": "Scan for at importere",
             "scanimport_option": "Vælg en importindstilling.",

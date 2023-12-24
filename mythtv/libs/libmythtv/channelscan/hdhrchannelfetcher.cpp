@@ -5,6 +5,7 @@
 
 // Qt headers
 #include <QFile>
+#include <QRegularExpression>
 #include <QTextStream>
 #include <QString>
 #include <QStringList>

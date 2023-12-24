@@ -48,8 +48,7 @@
                 <th style="flex-basis:  6%">
                     <!-- These are disabled buttons to ensure the spacing of the heading
                          matches the spacing of the rows -->
-                    <button pButton pRipple icon="pi pi-pencil" class="p-button-text"
-                        disabled="true"></button>
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-text" disabled="true"></button>
                     <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
                         *ngIf="setupService.pageType == 'S'" disabled="true"></button>
                 </th>
@@ -71,14 +70,13 @@
                 <td style="flex-basis:  10%">{{ getVisibility(channel) }}</td>
                 <td style="flex-basis:  6%">{{ channel.UseEIT ? 'Y' : 'N' }}</td>
                 <td style="flex-basis:  6%">
-                    <button pButton pRipple icon="pi pi-pencil" class="p-button-text"
-                        (click)="editChannel(channel)" [disabled]="channel.ChanId < 0
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-text" (click)="editChannel(channel)"
+                        [disabled]="channel.ChanId < 0
                         || (setupService.pageType == 'S' && setupService.schedulingEnabled)"
                         pTooltip="{{ 'settings.chanedit.editchan' | translate }}" tooltipPosition="left"></button>
                     <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
                         *ngIf="setupService.pageType == 'S'" (click)="deleteRequest(channel)"
-                        pTooltip="{{ 'settings.chanedit.deletechan' | translate }}"
-                        tooltipPosition="left"
+                        pTooltip="{{ 'settings.chanedit.deletechan' | translate }}" tooltipPosition="left"
                         [disabled]="channel.ChanId < 0 || setupService.schedulingEnabled"></button>
                 </td>
             </tr>
@@ -139,16 +137,6 @@
             </p-dropdown>
             <small class="block">
                 {{ 'settings.chanedit.visible_desc' | translate }}
-            </small>
-        </div>
-
-        <div class="form-group field">
-            <label for="ServiceId" class="label block">{{ 'settings.chanedit.serviceid_label' | translate
-                }}</label>
-            <p-inputNumber [(ngModel)]="channel.ServiceId" name="ServiceId" id="ServiceId" [showButtons]="true"
-                [min]="-1" [max]="65535" [step]="1"></p-inputNumber>
-            <small class="block">
-                {{ 'settings.chanedit.serviceid_desc' | translate }}
             </small>
         </div>
 
@@ -225,6 +213,32 @@
             </small>
         </div>
 
+        <!-- Advanced Settings Panel -->
+        <p-accordion>
+            <p-accordionTab header="{{ 'settings.chanedit_advanced' | translate }}" [(selected)]="selectedAdvanced">
+                <div class="form-group field">
+                    <label for="MplexId" class="label block">{{ 'settings.chanedit.mplex_label' | translate
+                        }}</label>
+                    <p-dropdown [options]="multiplexes" [(ngModel)]="channel.MplexId" [editable]="false"
+                        optionLabel="Description" optionValue="MplexId" [maxlength]="0" [style]="{'minWidth':'400px'}"
+                        name="MplexId" #MplexId="ngModel">
+                    </p-dropdown>
+                    <small class="block">
+                        {{ 'settings.chanedit.mplex_desc' | translate }}
+                    </small>
+                </div>
+
+                <div class="form-group field">
+                    <label for="ServiceId" class="label block">{{ 'settings.chanedit.serviceid_label' | translate
+                        }}</label>
+                    <p-inputNumber [(ngModel)]="channel.ServiceId" name="ServiceId" id="ServiceId" [showButtons]="true"
+                        [min]="-1" [max]="65535" [step]="1"></p-inputNumber>
+                    <small class="block">
+                        {{ 'settings.chanedit.serviceid_desc' | translate }}
+                    </small>
+                </div>
+            </p-accordionTab>
+        </p-accordion>
         <!-- Blank space here is so that the dropdown box can fit, otherwise there can be an impossible
                  situation with the scroll bar and the drop box-->
         <br><br><br><br><br><br><br><br>

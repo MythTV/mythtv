@@ -55,11 +55,11 @@ class MUI_PUBLIC MythUIButtonListItem
     MythUIButtonListItem(MythUIButtonList *lbtype, const QString& text,
                          QVariant data, int listPosition = -1);
     template <typename SLOT>
-    MythUIButtonListItem(typename std::enable_if<FunctionPointerTest<SLOT>::MemberFunction, MythUIButtonList *>::type lbtype,
+    MythUIButtonListItem(std::enable_if_t<FunctionPointerTest<SLOT>::MemberFunction, MythUIButtonList *>lbtype,
                          const QString& text, SLOT slot, int listPosition = -1)
         : MythUIButtonListItem(lbtype, text, QVariant::fromValue(static_cast<MythUICallbackMF>(slot)), listPosition) { }
     template <typename SLOT>
-    MythUIButtonListItem(typename std::enable_if<FunctionPointerTest<SLOT>::MemberConstFunction, MythUIButtonList *>::type lbtype,
+    MythUIButtonListItem(std::enable_if_t<FunctionPointerTest<SLOT>::MemberConstFunction, MythUIButtonList *>lbtype,
                          const QString& text, SLOT slot, int listPosition = -1)
         : MythUIButtonListItem(lbtype, text, QVariant::fromValue(static_cast<MythUICallbackMFc>(slot)), listPosition) { }
     virtual ~MythUIButtonListItem();

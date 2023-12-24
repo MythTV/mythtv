@@ -16,6 +16,8 @@
         "help": "Pomoc",
         "instructions": "Instrukcje",
         "loading": "Ładowanie",
+        "mustenable": "Zmiany nie mogą zostać zapisane, chyba że najpierw klikniesz przycisk Włącz aktualizacje.",
+        "mustrestart": "Po zakończeniu aktualizacji uruchom ponownie backend.",
         "networkfail": "BŁĄD: Awaria sieci zaplecza",
         "next": "Następny",
         "no": "NIE",
@@ -36,9 +38,14 @@
         "channeleditor": "Edytor kanału",
         "guide": {
             "channel": "Kanał",
+            "full_search": "Pełne wyszukiwanie",
             "people_search": "Ludzie szukają",
             "retgrid": "Powrót do wyświetlania siatki",
-            "title_search": "Wyszukiwanie tytułów"
+            "title_search": "Wyszukiwanie tytułów",
+            "type_movie": "Film",
+            "type_series": "Seria",
+            "type_sports": "Sporty",
+            "type_tvshow": "Widowisko telewizyjne"
         },
         "programguide": "Przewodnik po programach",
         "recordings": {
@@ -56,12 +63,13 @@
             "edit_rule": "Edytuj regułę nagrywania",
             "episode": "Epizod",
             "file_size": "Rozmiar pliku",
+            "filename_label": "Nazwa pliku",
             "filter": "Filtr",
             "heading": "Nagrania",
             "inetref": "InetRef",
             "job_Commflag": "Wykrywaj reklamy",
             "job_Metadata": "Wyszukaj metadane",
-            "job_Transcode": "Transkoduj",
+            "job_Transcode": "Transkoduj z profilem domyślnym",
             "mnu_delete": "Usuwać",
             "mnu_delete_rerec": "Usuń i zezwól na ponowne nagranie",
             "mnu_markdamaged": "Oznacz jako uszkodzony",
@@ -155,7 +163,6 @@
             "startoffset_label": "Liczba dodatkowych minut do nagrania na starcie",
             "starttime_label": "Data i godzina rozpoczęcia",
             "subtitle_label": "Podtytuł",
-            "template_apply": "Zastosuj zmianę szablonu",
             "template_label": "Użyj szablonu",
             "title_label": "Tytuł",
             "type": {
@@ -658,6 +665,8 @@
             "format_label": "Format telewizyjny",
             "freqid": "Identyfikator częstotliwości",
             "freqid_desc": "Numer kanału w rozumieniu tunerów.",
+            "mplex_desc": "Rozgłaszanie Częstotliwość strumienia transportowego, który przenosi ten kanał. Ten sam strumień może przenosić wiele kanałów.",
+            "mplex_label": "Multipleks",
             "never-visible": "Nigdy nie widoczne",
             "new_channel": "Nowy kanał",
             "not-visible": "Niewidoczny",
@@ -677,6 +686,7 @@
             "xmltvid_desc": "Identyfikator używany przez serwisy wyświetlające listy w celu uzyskania dokładnej zgodności między kanałem w Twojej ofercie a kanałem w ich bazie danych. Zwykle jest to ustawiane automatycznie po uruchomieniu „mythfilldatabase”.",
             "xmltvid_label": "Identyfikator XMLTV"
         },
+        "chanedit_advanced": "Zaawansowane ustawienia",
         "channelscan": {
             "FEC_desc": "Korekcja błędów w przód (domyślnie: Auto)",
             "FEC_label": "FEC",
@@ -790,7 +800,7 @@
             "rolloff_label": "Zwijanie",
             "sattuning_desc": "Wybierz satelitę z tej listy, aby uzyskać dane strojenia transpondera referencyjnego.",
             "sattuning_label": "Dane dotyczące strojenia satelity",
-            "scan_desc": "Przed uruchomieniem tego musisz wybrać źródło wideo i zapisać stronę, jeśli jakiekolwiek zmiany nie zostały zapisane.",
+            "scan_desc": "Przed uruchomieniem musisz wybrać źródło wideo. Rozpocznij skanowanie automatycznie zapisze stronę, jeśli zajdzie taka potrzeba, przed skanowaniem.",
             "scan_label": "Rozpocznij skanowanie",
             "scanimport_label": "Skanuj do importu",
             "scanimport_option": "Wybierz opcję importu.",

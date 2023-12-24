@@ -66,7 +66,7 @@ DEST_LANGS = [
             ('zh-tw', 'zh_HK.json', 'Chinese (traditional)')
         ]
 
-def doCheckTranslations(us_flat, code, filename, desc):
+def doCheckTranslations(us_flat, code, filename, desc, keylist:list):
     # open dest language file
     print("\nOpening file for language %s from %s" % (desc, filename))
     dest_f = open(translation_dir + filename)
@@ -78,13 +78,29 @@ def doCheckTranslations(us_flat, code, filename, desc):
     for key, value in us_flat.items():
         destString = dest_flat.get(key)
         if destString == None:
-            destString = translate(value, code)
-            print("Adding missing string '%s' -> '%s'" % (value, destString))
+            action = "Adding missing string"
+        else:
+            action = "Updating string"
+        if destString == None or destString == "" or key in keylist:
+            if isinstance(value,list):
+                destString = []
+                for element in value:
+                    trans = translate(element, code)
+                    destString.append(trans)
+            else:
+                destString = translate(value, code)
+            print(action + " '%s' -> '%s'" % (value, destString))
             dest_flat[key] = destString
-        elif destString == "":
-            destString = translate(value, code)
-            print("Updating empty string '%s' -> '%s'" % (value, destString))
-            dest_flat[key] = destString
+        # elif destString == "":
+        #     destString = translate(value, code)
+        #     print("Updating empty string '%s' -> '%s'" % (value, destString))
+        #     dest_flat[key] = destString
+
+    # Check for strings to be deleted
+    for key in list(dest_flat):
+        if key not in us_flat:
+            print("Deleting string '%s' : '%s'" % (key, dest_flat[key]))
+            del dest_flat[key]
 
     dest_dict = unflatten(dest_flat, splitter='dot')
 
@@ -92,7 +108,7 @@ def doCheckTranslations(us_flat, code, filename, desc):
     with open(translation_dir + filename, mode="w", encoding="utf8") as outfile:
         json.dump(dest_dict, outfile, indent=4, ensure_ascii=False, sort_keys=True)
 
-def checkTranslations():
+def checkTranslations(keylist:list):
     # make sure the US JSON file has its keys sorted
     sortUSTrans()
 
@@ -105,9 +121,18 @@ def checkTranslations():
 
     us_flat = flatten(us_dict, reducer='dot')
 
+    # Check specific keys to force translate on
+    error = False
+    for key in keylist:
+        if key not in us_flat:
+            print ("Error invalid key: " + key)
+            error = True
+    if error:
+        sys.exit(2)
+
     # loop through all the language files
     for dest_code, dest_filename, dest_desc in DEST_LANGS:
-        doCheckTranslations(us_flat, dest_code, dest_filename, dest_desc)
+        doCheckTranslations(us_flat, dest_code, dest_filename, dest_desc, keylist)
 
     print("\nAll languages checked OK")
 
@@ -380,41 +405,9 @@ def listKeys(lang):
         print("{:<50} {:<100}".format(key, str(value)))
 
 def listLanguages():
-    print(
-'''
-The listkeys command supports these language codes:-
-    'bg'      Bulgarian
-    'ca'      Catalan
-    'cs'      Czech
-    'da'      Danish
-    'de'      German
-    'el'      Greek
-    'en_CA'   English Canadian
-    'en_GB'   English UK
-    'en_US'   English US
-    'es_ES'   Spanish
-    'es'      Spanish
-    'et'      Estonian
-    'fi'      Finnish
-    'fr'      French
-    'he'      Hebrew
-    'hr'      Croatian
-    'hu'      Hungarian
-    'is'      Icelandic
-    'it'      Italian
-    'ja'      Japanese
-    'no'      Norwegian
-    'nl'      Dutch
-    'pl'      Polish
-    'pt'      Portuguese
-    'pt'      Portuguese (Brazil)
-    'ru'      Russian
-    'sl'      Slovenian
-    'sv'      Swedish
-    'tr'      Turkish
-    'zh-cn'   Chinese (simplified)
-    'zh-tw'   Chinese (traditional)
-''')
+    print("The listkeys command supports these language codes:-")
+    for code,file,name in DEST_LANGS:
+        print("    {0:6}  {1}".format(code,name))
 
 if __name__ == '__main__':
 
@@ -427,15 +420,17 @@ if __name__ == '__main__':
     parser = OptionParser()
 
     parser.add_option('-t', "--check", action="store_true", default=False,
-                      dest="check", help="Check all language files for missing or empty strings and attempt to use Google translate on them.")
+                      dest="check", help="Check all language files for missing or empty strings and use Google translate on them. Write out the file with strings sorted. Any strings that were manually deleted from the en_US file are deleted from the other language files.")
+    parser.add_option('-F', "--flag", default="",metavar="KEYS",
+                      dest="flag", help="Requires list of keys, space separated, in quotes as one parameter. Flag the listed keys as changed so they are re-translated with the --check option. This parameter also runs the --check process even if it was not requested.")
     parser.add_option('-s', "--sort", action="store_true", default=False,
                       dest="sort", help="Sort all the keys in the US English language file.")
     parser.add_option('-a', "--add", action="store_true", default=False,
-                      dest="add", help="Add a new string to all the language files. Needs key and value.")
+                      dest="add", help="Add a new string to all the language files. Needs key and value. A key can also be added by manually adding it to the en_US file and running the --check option.")
     parser.add_option('-r', "--remove", action="store_true", default=False,
-                      dest="remove", help="Remove the key from all translation files. Needs key.")
+                      dest="remove", help="Remove the key from all translation files. Needs key. A key can also be removed from all translation files by manually removing it from the en_US file and running the --check option.")
     parser.add_option('-c', "--amend", action="store_true", default=False,
-                      dest="amend", help="Amend the strings in all translation files for the give key. Needs key and value.")
+                      dest="amend", help="Amend the strings in all translation files for the given key. Needs key and value. Strings can also be updated in all files by manually updating the en_US file and running with the --flag option and a list of keys of updated strings.")
     parser.add_option('-l', "--listkeys", action="store_true", default=False,
                       dest="listkeys", help="List all keys and strings from a language file. [default: 'en_US'].")
     parser.add_option('-i', "--listlanguages", action="store_true", default=False,
@@ -450,6 +445,11 @@ if __name__ == '__main__':
                       dest="datadir", help=("The location of the JSON language files. [default: '" + translation_dir + "']"))
     parser.add_option('-f','--fixtemplates', action="store_true", default=None,
                       dest="fixtemplates", help=("Check all language files for broken template strings."))
+
+    # If no option is supplied go to help
+    if len(sys.argv) == 1:
+        sys.argv.append("-h")
+
     opts, args = parser.parse_args()
 
     if opts.datadir:
@@ -459,8 +459,9 @@ if __name__ == '__main__':
     if opts.listlangs:
         listLanguages()
         sys.exit(0)
-    elif opts.check:
-        checkTranslations()
+    elif opts.check or opts.flag:
+        keylist = opts.flag.split()
+        checkTranslations(keylist)
         sys.exit(0)
     elif opts.sort:
         sortUSTrans()

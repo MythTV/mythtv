@@ -16,6 +16,8 @@
         "help": "Ayuda",
         "instructions": "Instrucciones",
         "loading": "Cargando",
+        "mustenable": "Los cambios no se pueden guardar a menos que primero haga clic en el botón Habilitar actualizaciones.",
+        "mustrestart": "Cuando haya terminado con las actualizaciones, reinicie el backend.",
         "networkfail": "ERROR: falla de la red de fondo",
         "next": "Próximo",
         "no": "No",
@@ -36,9 +38,14 @@
         "channeleditor": "Editor de canales",
         "guide": {
             "channel": "Canal",
+            "full_search": "Búsqueda completa",
             "people_search": "Búsqueda de personas",
             "retgrid": "Regresar a la pantalla de cuadrícula",
-            "title_search": "Buscar título"
+            "title_search": "Buscar título",
+            "type_movie": "Película",
+            "type_series": "Serie",
+            "type_sports": "Deportes",
+            "type_tvshow": "Programa de televisión"
         },
         "programguide": "Guía del programa",
         "recordings": {
@@ -56,12 +63,13 @@
             "edit_rule": "Editar regla de grabación",
             "episode": "Episodio",
             "file_size": "Tamaño del archivo",
+            "filename_label": "Nombre del archivo",
             "filter": "Filtrar",
             "heading": "Grabaciones",
             "inetref": "InetRef",
             "job_Commflag": "Detectar comerciales",
             "job_Metadata": "Buscar metadatos",
-            "job_Transcode": "Transcodificar",
+            "job_Transcode": "Transcodificar con perfil predeterminado",
             "mnu_delete": "Borrar",
             "mnu_delete_rerec": "Eliminar y permitir volver a grabar",
             "mnu_markdamaged": "Marcar como dañado",
@@ -155,7 +163,6 @@
             "startoffset_label": "Número de minutos adicionales para registrar al inicio",
             "starttime_label": "Fecha y hora de inicio",
             "subtitle_label": "Subtitular",
-            "template_apply": "Aplicar cambio de plantilla",
             "template_label": "Usar plantilla",
             "title_label": "Título",
             "type": {
@@ -658,6 +665,8 @@
             "format_label": "Formato de televisión",
             "freqid": "ID de frecuencia",
             "freqid_desc": "Número de canal tal como lo entienden sus sintonizadores.",
+            "mplex_desc": "Frecuencia de transmisión del flujo de transporte que transporta este canal. La misma transmisión puede transportar muchos canales.",
+            "mplex_label": "Multicine",
             "never-visible": "nunca visible",
             "new_channel": "Nuevo canal",
             "not-visible": "No visible",
@@ -677,6 +686,7 @@
             "xmltvid_desc": "ID utilizado por los servicios de listado para obtener una correspondencia exacta entre un canal en su programación y un canal en su base de datos. Normalmente, esto se configura automáticamente cuando se ejecuta 'mythfilldatabase'.",
             "xmltvid_label": "ID de XMLTV"
         },
+        "chanedit_advanced": "Ajustes avanzados",
         "channelscan": {
             "FEC_desc": "Corrección de errores de reenvío (predeterminado: automático)",
             "FEC_label": "FEC",
@@ -790,7 +800,7 @@
             "rolloff_label": "despegue",
             "sattuning_desc": "Seleccione un satélite de esta lista para los datos de sintonización del transpondedor de referencia.",
             "sattuning_label": "Datos de sintonización de satélite",
-            "scan_desc": "Antes de ejecutar esto, debe seleccionar la fuente de video y guardar la página si no se han guardado los cambios.",
+            "scan_desc": "Antes de ejecutar esto, debes seleccionar la fuente del video. Iniciar escaneo guardará automáticamente la página si es necesario antes de escanear.",
             "scan_label": "Iniciar escaneo",
             "scanimport_label": "Escanear para importar",
             "scanimport_option": "Seleccione una opción de importación.",

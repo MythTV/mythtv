@@ -16,6 +16,8 @@
         "help": "Ajuda",
         "instructions": "Instruccions",
         "loading": "Carregant",
+        "mustenable": "Els canvis no es poden desar tret que primer feu clic al botó Activa les actualitzacions.",
+        "mustrestart": "Quan hàgiu acabat amb les actualitzacions, reinicieu el backend.",
         "networkfail": "ERROR: fallada de la xarxa de fons",
         "next": "Pròxim",
         "no": "No",
@@ -36,9 +38,14 @@
         "channeleditor": "Editor de canals",
         "guide": {
             "channel": "Canal",
+            "full_search": "Cerca completa",
             "people_search": "Cerca de persones",
             "retgrid": "Torna a la pantalla de quadrícula",
-            "title_search": "Cerca de títols"
+            "title_search": "Cerca de títols",
+            "type_movie": "Pel·lícula",
+            "type_series": "Sèrie",
+            "type_sports": "Esports",
+            "type_tvshow": "Programa de televisió"
         },
         "programguide": "Guia del programa",
         "recordings": {
@@ -56,12 +63,13 @@
             "edit_rule": "Edita la regla de gravació",
             "episode": "Episodi",
             "file_size": "Mida de l'arxiu",
+            "filename_label": "Nom de l'arxiu",
             "filter": "Filtre",
             "heading": "Enregistraments",
             "inetref": "InetRef",
             "job_Commflag": "Detectar comercials",
             "job_Metadata": "Cerca metadades",
-            "job_Transcode": "Transcodificar",
+            "job_Transcode": "Transcodifica amb el perfil predeterminat",
             "mnu_delete": "Suprimeix",
             "mnu_delete_rerec": "Suprimeix i permet tornar a gravar",
             "mnu_markdamaged": "Marca com a danyat",
@@ -155,7 +163,6 @@
             "startoffset_label": "Nombre de minuts addicionals per gravar a l'inici",
             "starttime_label": "Data i hora d'inici",
             "subtitle_label": "Subtítol",
-            "template_apply": "Aplica el canvi de plantilla",
             "template_label": "Utilitzeu la plantilla",
             "title_label": "Títol",
             "type": {
@@ -658,6 +665,8 @@
             "format_label": "Format TV",
             "freqid": "Id. de freqüència",
             "freqid_desc": "Número de canal tal com l'entenen els vostres sintonitzadors.",
+            "mplex_desc": "Freqüència de difusió del flux de transport que transporta aquest canal. El mateix flux pot portar molts canals.",
+            "mplex_label": "Multiplex",
             "never-visible": "Mai Visible",
             "new_channel": "Canal nou",
             "not-visible": "No visible",
@@ -677,6 +686,7 @@
             "xmltvid_desc": "Identificador utilitzat per llistar els serveis per obtenir una correspondència exacta entre un canal de la vostra línia i un canal de la seva base de dades. Normalment això s'estableix automàticament quan s'executa 'mythfilldatabase'.",
             "xmltvid_label": "ID XMLTV"
         },
+        "chanedit_advanced": "Configuració avançada",
         "channelscan": {
             "FEC_desc": "Correcció d'errors de reenviament (per defecte: automàtic)",
             "FEC_label": "FEC",
@@ -790,7 +800,7 @@
             "rolloff_label": "Roll-off",
             "sattuning_desc": "Seleccioneu un satèl·lit d'aquesta llista per a les dades de sintonització del transpondedor de referència.",
             "sattuning_label": "Dades de sintonització de satèl·lit",
-            "scan_desc": "Abans d'executar-ho, heu de seleccionar la font del vídeo i desar la pàgina si no s'ha desat cap canvi.",
+            "scan_desc": "Abans d'executar-ho, heu de seleccionar la font de vídeo. Start Scan desarà automàticament la pàgina si cal abans d'escanejar.",
             "scan_label": "Inicieu l'escaneig",
             "scanimport_label": "Escaneja per importar",
             "scanimport_option": "Seleccioneu una opció d'importació.",

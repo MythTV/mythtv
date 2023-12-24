@@ -34,37 +34,37 @@
                 </th>
             </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-program>
+        <ng-template pTemplate="body" let-program >
             <tr>
-                <td style="flex-basis: 8%" class="justify-content-end p-1 overflow-hidden">
+                <td style="flex-basis: 8%" class="justify-content-end p-1 overflow-hidden" [ngClass]="'type_' + program.CatType">
                     <div [innerHTML]="formatStartDate(program)"></div>
                 </td>
-                <td style="flex-basis: 6%" class="justify-content-end p-1 overflow-hidden">
+                <td style="flex-basis: 6%" class="justify-content-end p-1 overflow-hidden" [ngClass]="'type_' + program.CatType">
                     {{formatStartTime(program)}}</td>
-                <td style="flex-basis: 7%" class="justify-content-end pl-1 pr-3 pt-1 pb-1 overflow-hidden">
+                <td style="flex-basis: 7%" class="justify-content-end pl-1 pr-3 pt-1 pb-1 overflow-hidden" [ngClass]="'type_' + program.CatType">
                     {{ getDuration(program) | number:'1.0-0' }} min</td>
-                <td style="flex-basis: 8%" class="p-1" *ngIf="usage == 'UPCOMING'">{{program.Recording.EncoderName}}
+                <td style="flex-basis: 8%" class="p-1" *ngIf="usage == 'UPCOMING'" [ngClass]="'type_' + program.CatType">{{program.Recording.EncoderName}}
                 </td>
-                <td style="flex-basis: 12%" class="p-1 overflow-hidden"> {{program.Title}}</td>
+                <td style="flex-basis: 12%" class="p-1 overflow-hidden" [ngClass]="'type_' + program.CatType"> {{program.Title}}</td>
                 <td style="flex-basis: 18%" class="p-1 overflow-hidden" pTooltip="{{program.Description}}"
-                    tooltipPosition="top">
+                    tooltipPosition="top" [ngClass]="'type_' + program.CatType">
                     {{program.SubTitle.slice(0,50)}}</td>
-                <td style="flex-basis: 4%" class="p-1">
+                <td style="flex-basis: 4%" class="p-1" [ngClass]="'type_' + program.CatType">
                     <div *ngIf="program.Season>0 || program.Episode>0"> {{program.Season}}x{{program.Episode}}</div>
                 </td>
-                <td style="flex-basis: 8%" class="justify-content-end p-1">
+                <td style="flex-basis: 8%" class="justify-content-end p-1" [ngClass]="'type_' + program.CatType">
                     <div [innerHTML]="formatAirDate(program)"></div>
                 </td>
-                <td style="flex-basis: 10%" class="p-1">
+                <td style="flex-basis: 10%" class="p-1" [ngClass]="'type_' + program.CatType">
                     {{program.Channel.ChanNum}} {{program.Channel.CallSign}}</td>
-                <td style="flex-basis: 8%" class="p-1" *ngIf="usage == 'UPCOMING'">{{program.Recording.RecGroup}}</td>
-                <td style="flex-basis: 7%" class="p-1">
+                <td style="flex-basis: 8%" class="p-1" *ngIf="usage == 'UPCOMING'" [ngClass]="'type_' + program.CatType">{{program.Recording.RecGroup}}</td>
+                <td style="flex-basis: 7%" class="p-1" [ngClass]="'type_' + program.CatType">
                     <div *ngIf="program.Recording" [ngClass]="['WillRecord','Recording','Recorded'].indexOf(program.Recording.StatusName)>-1?
-                        'text-green-500' : 'text-pink-500'">
-                        {{dataService.recStatusText[program.Recording.StatusName]}}
+                        'bg-green-500' : 'bg-pink-500'" class="text-white">
+                        <b>{{dataService.recStatusText[program.Recording.StatusName]}}</b>
                     </div>
                 </td>
-                <td style="flex-basis: 2%" class="p-1" *ngIf="usage == 'UPCOMING'">
+                <td style="flex-basis: 2%" class="p-1" *ngIf="usage == 'UPCOMING'" [ngClass]="'type_' + program.CatType">
                     <button pButton pRipple icon="pi pi-stop" class="p-button-text p-button-danger"
                         *ngIf="program.Recording.StatusName == 'Recording' else overrideBn"
                         (click)="stopRequest(program)"
@@ -77,7 +77,7 @@
                             tooltipPosition="left"></button>
                     </ng-template>
                 </td>
-                <td style="flex-basis: 2%" class="p-1">
+                <td style="flex-basis: 2%" class="p-1" [ngClass]="'type_' + program.CatType">
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-primary"
                         (click)="updateRecRule(program)" pTooltip="{{ 'dashboard.recordings.edit_rule' | translate }}"
                         tooltipPosition="left"

@@ -24,10 +24,9 @@
 #include <unistd.h>
 
 // Qt
+#include <QCoreApplication>
 #include <QElapsedTimer>
 #include <QFileInfo>
-#include <QProcess>
-#include <QtCore/QtCore>
 
 // MythTV
 #include "libmythbase/mythchrono.h"

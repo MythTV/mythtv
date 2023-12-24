@@ -16,6 +16,8 @@
         "help": "Help",
         "instructions": "Instructions",
         "loading": "Loading",
+        "mustenable": "Changes cannot be saved unless you click the Enable Updates button first.",
+        "mustrestart": "When you are finished with updates, restart the backend.",
         "networkfail": "ERROR: Backend Network Failure",
         "next": "Next",
         "no": "No",
@@ -36,9 +38,14 @@
         "channeleditor": "Channel Editor",
         "guide": {
             "channel": "Channel",
+            "full_search": "Full Search",
             "people_search": "People Search",
             "retgrid": "Return to Grid Display",
-            "title_search": "Title Search"
+            "title_search": "Title Search",
+            "type_movie": "Movie",
+            "type_series": "Series",
+            "type_sports": "Sports",
+            "type_tvshow": "TV Show"
         },
         "programguide": "Program Guide",
         "recordings": {
@@ -56,12 +63,13 @@
             "edit_rule": "Edit Recording Rule",
             "episode": "Episode",
             "file_size": "File Size",
+            "filename_label": "File Name",
             "filter": "Filter",
             "heading": "Recordings",
             "inetref": "InetRef",
             "job_Commflag": "Detect Commercials",
             "job_Metadata": "Look up Metadata",
-            "job_Transcode": "Transcode",
+            "job_Transcode": "Transcode with Default profile",
             "mnu_delete": "Delete",
             "mnu_delete_rerec": "Delete and Allow Rerecord",
             "mnu_markdamaged": "Mark as Damaged",
@@ -155,7 +163,6 @@
             "startoffset_label": "Number of Extra Minutes to Record at Start",
             "starttime_label": "Start Date and Time",
             "subtitle_label": "Subtitle",
-            "template_apply": "Apply Template Change",
             "template_label": "Use Template",
             "title_label": "Title",
             "type": {
@@ -658,6 +665,8 @@
             "format_label": "TV Format",
             "freqid": "Frequency Id",
             "freqid_desc": "Channel Number as understood by your tuners.",
+            "mplex_desc": "Broadcast Frequency of the transport stream that carries this channel. The same stream can carry many channels.",
+            "mplex_label": "Multiplex",
             "never-visible": "Never Visible",
             "new_channel": "New Channel",
             "not-visible": "Not Visible",
@@ -677,6 +686,7 @@
             "xmltvid_desc": "ID used by listing services to get an exact correspondence between a channel in your line-up and a channel in their database. Normally this is set automatically when 'mythfilldatabase' is run.",
             "xmltvid_label": "XMLTV ID"
         },
+        "chanedit_advanced": "Advanced Settings",
         "channelscan": {
             "FEC_desc": "Forward Error Correction (Default: Auto)",
             "FEC_label": "FEC",
@@ -790,7 +800,7 @@
             "rolloff_label": "Roll-off",
             "sattuning_desc": "Select a satellite from this list for the tuning data of the reference transponder.",
             "sattuning_label": "Satellite tuning data",
-            "scan_desc": "Before running this you must select the video source, and save the page if any changes have not been saved.",
+            "scan_desc": "Before running this you must select the video source. Start Scan will automatically save the page if needed before scanning.",
             "scan_label": "Start Scan",
             "scanimport_label": "Scan to Import",
             "scanimport_option": "Select an import option.",

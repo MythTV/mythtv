@@ -7,6 +7,7 @@
 
 // Qt headers
 #include <QFile>
+#include <QRegularExpression>
 #include <QTextStream>
 
 // MythTV headers

@@ -458,9 +458,17 @@ void ChannelScannerWeb::HandleEvent(const ScannerEvent *scanEvent)
             m_statusTitleText = msg;
         }
 
+        bool success = (m_iptvScanner != nullptr);
+#ifdef USING_VBOX
+        success |= (m_vboxScanner != nullptr);
+#endif
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+        success |= (m_externRecScanner != nullptr);
+#endif
+#ifdef USING_HDHOMERUN
+        success |= (m_hdhrScanner != nullptr);
+#endif
         Teardown();
-
-        bool success=false;
 
         if (m_scantype == ScanTypeSetting::ExistingScanImport)
         {
@@ -474,7 +482,7 @@ void ChannelScannerWeb::HandleEvent(const ScannerEvent *scanEvent)
                             m_serviceRequirements);
             ci.Process(transports, get_on_input("sourceid", m_cardid).toUInt());
         }
-        else if (type != ScannerEvent::kScanErrored) // && !m_transports.empty())
+        else if (type != ScannerEvent::kScanErrored)
         {
             Process(m_transports, success);
         }

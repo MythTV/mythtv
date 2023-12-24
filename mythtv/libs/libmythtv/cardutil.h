@@ -339,7 +339,7 @@ class MTV_PUBLIC CardUtil : public QObject
     static std::vector<uint> GetInputIDs(uint sourceid);
     static bool         GetInputInfo(InputInfo &input,
                                      std::vector<uint> *groupids = nullptr);
-    static QList<InputInfo> GetAllInputInfo();
+    static QList<InputInfo> GetAllInputInfo(bool virtTuners);
     static QString      GetInputName(uint inputid);
     static QString      GetStartChannel(uint inputid);
     static QString      GetDisplayName(uint inputid);

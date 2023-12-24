@@ -16,6 +16,8 @@
         "help": "Yardım",
         "instructions": "Talimatlar",
         "loading": "Yükleniyor",
+        "mustenable": "Önce Güncellemeleri Etkinleştir düğmesini tıklamadığınız sürece değişiklikler kaydedilemez.",
+        "mustrestart": "Güncellemeleri tamamladığınızda arka ucu yeniden başlatın.",
         "networkfail": "HATA: Arka Uç Ağ Hatası",
         "next": "Sonraki",
         "no": "HAYIR",
@@ -36,9 +38,14 @@
         "channeleditor": "Kanal Editörü",
         "guide": {
             "channel": "Kanal",
+            "full_search": "Tam arama",
             "people_search": "İnsan arama",
             "retgrid": "Izgara Görünümüne Dön",
-            "title_search": "Başlık arama"
+            "title_search": "Başlık arama",
+            "type_movie": "Film",
+            "type_series": "Seri",
+            "type_sports": "Spor Dalları",
+            "type_tvshow": "Televizyon şovu"
         },
         "programguide": "Program Rehberi",
         "recordings": {
@@ -56,12 +63,13 @@
             "edit_rule": "Kayıt Kuralını Düzenle",
             "episode": "Bölüm",
             "file_size": "Dosya boyutu",
+            "filename_label": "Dosya adı",
             "filter": "filtre",
             "heading": "kayıtlar",
             "inetref": "InetRef",
             "job_Commflag": "Reklamları Algıla",
             "job_Metadata": "Meta verilere bak",
-            "job_Transcode": "kod dönüştürme",
+            "job_Transcode": "Varsayılan profille kod dönüştürme",
             "mnu_delete": "Silmek",
             "mnu_delete_rerec": "Sil ve Yeniden Kayda İzin Ver",
             "mnu_markdamaged": "Hasarlı Olarak İşaretle",
@@ -155,7 +163,6 @@
             "startoffset_label": "Başlangıçta Kaydedilecek Ekstra Dakika Sayısı",
             "starttime_label": "Başlangıç ​​Tarihi ve Saati",
             "subtitle_label": "Alt yazı",
-            "template_apply": "Şablon Değişikliğini Uygula",
             "template_label": "Şablon kullan",
             "title_label": "Başlık",
             "type": {
@@ -658,6 +665,8 @@
             "format_label": "Televizyon Formatı",
             "freqid": "Sıklık Kimliği",
             "freqid_desc": "Ayarlayıcılarınız tarafından anlaşıldığı şekliyle Kanal Numarası.",
+            "mplex_desc": "Bu kanalı taşıyan taşıma akışının Yayın Frekansı. Aynı akış birçok kanalı taşıyabilir.",
+            "mplex_label": "Multipleks",
             "never-visible": "Asla Görünmez",
             "new_channel": "Yeni Kanal",
             "not-visible": "Görünmez",
@@ -677,6 +686,7 @@
             "xmltvid_desc": "Dizilişinizdeki bir kanal ile veritabanındaki bir kanal arasında tam bir eşleşme elde etmek için listeleme hizmetleri tarafından kullanılan kimlik. Normalde bu, 'mythfilldatabase' çalıştırıldığında otomatik olarak ayarlanır.",
             "xmltvid_label": "XMLTV Kimliği"
         },
+        "chanedit_advanced": "Gelişmiş Ayarlar",
         "channelscan": {
             "FEC_desc": "İletme Hatası Düzeltme (Varsayılan ayar: Otomatik)",
             "FEC_label": "FEC",
@@ -790,7 +800,7 @@
             "rolloff_label": "yuvarlanma",
             "sattuning_desc": "Referans transponderin ayarlama verileri için bu listeden bir uydu seçin.",
             "sattuning_label": "Uydu ayarlama verileri",
-            "scan_desc": "Bunu çalıştırmadan önce video kaynağını seçmeli ve herhangi bir değişiklik kaydedilmemişse sayfayı kaydetmelisiniz.",
+            "scan_desc": "Bunu çalıştırmadan önce video kaynağını seçmelisiniz. Taramayı Başlat, gerekirse taramadan önce sayfayı otomatik olarak kaydeder.",
             "scan_label": "Taramayı Başlat",
             "scanimport_label": "İçe Aktarmak için Tara",
             "scanimport_option": "Bir içe aktarma seçeneği belirleyin.",

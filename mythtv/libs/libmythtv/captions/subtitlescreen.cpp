@@ -1,4 +1,5 @@
 #include <QFontMetrics>
+#include <QRegularExpression>
 
 #include "libmythbase/mythlogging.h"
 #include "libmythui/mythfontproperties.h"
@@ -1846,7 +1847,9 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 
     AVSubtitles* subs = m_subreader->GetAVSubtitles();
     QMutexLocker lock(&(subs->m_lock));
-    if (subs->m_buffers.empty() && (kDisplayAVSubtitle != m_subtitleType))
+    if (subs->m_buffers.empty()
+      && (kDisplayAVSubtitle != m_subtitleType)
+      && (kDisplayTextSubtitle != m_subtitleType))
         return;
 
     MythVideoOutput *videoOut = m_player->GetVideoOutput();
@@ -1898,7 +1901,11 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 #endif
             }
             lock.relock();
+            subs->m_needSync = false;
 
+            // extra check to avoid segfault
+            if (subs->m_buffers.empty())
+                return;
             AVSubtitle subtitle = subs->m_buffers.front();
             if (subtitle.end_display_time < currentFrame->m_timecode.count())
             {
@@ -2060,7 +2067,6 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 #ifdef USING_LIBASS
     RenderAssTrack(currentFrame->m_timecode, assForceNext);
 #endif
-    subs->m_needSync = false;
 }
 
 int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,

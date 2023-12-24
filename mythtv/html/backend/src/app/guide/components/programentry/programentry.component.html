@@ -1,14 +1,15 @@
-<div class="programBox cursor-pointer" [style.width.%]=durationToWidth() (click)="openDialog()">
+<div class="programBox cursor-pointer" [ngClass]="'type_' + program.CatType" [style.width.%]=durationToWidth() (click)="openDialog()"
+    pTooltip="{{program.Description}}" tooltipPosition="top">
     <div class="programTitle">{{ program.Title }}</div>
     <div class="programBody">
-        <div *ngIf="program.SubTitle.length != 0">
-            <div class="programSubtitle">{{ program.SubTitle }}</div>
-        </div>
+        <div class="programCatType">{{ program.Category }}</div>
         <div *ngIf="program.Recording">
-            <div class="programSubtitle" [ngClass]="['WillRecord','Recording'].indexOf(program.Recording.StatusName)>-1?
-                'bg-green-400' : 'bg-pink-400'">
+            <div class="programCatType" [ngClass]="['WillRecord','Recording'].indexOf(program.Recording.StatusName)>-1?
+                'bg-green-500' : 'bg-pink-400'">
                 {{ dataService.recStatusText[program.Recording.StatusName] }}</div>
         </div>
-        <div class="programDescription">{{ program.Description }}</div>
+        <div *ngIf="program.SubTitle.length != 0">
+            <div class="programSubtitle">{{(program.Season > 0 ? 'S' + program.Season + 'E' + program.Episode : '') + ' ' +  program.SubTitle }}</div>
+        </div>
     </div>
 </div>

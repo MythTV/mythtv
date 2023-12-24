@@ -2,6 +2,7 @@
 #include "cutter.h"
 
 #include <algorithm>                    // for min
+#include <cmath>                        // for llroundf
 
 #include <QMap>                         // for QMap
 

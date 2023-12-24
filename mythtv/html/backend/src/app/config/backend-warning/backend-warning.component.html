@@ -1,22 +1,33 @@
 <div class="block card w-full">
     <div class="block">
         <p-card class="m-5">
+            <div class="flex mb-3" *ngIf="retryCount == 0">
+                <p-message *ngIf="setupService.schedulingEnabled; else mustrestart" severity="warn"
+                    [styleClass]="'font-bold'" text="{{ 'common.mustenable' | translate }}">
+                </p-message>
+                <ng-template #mustrestart>
+                    <p-message severity="warn" [styleClass]="'font-bold'" text="{{ 'common.mustrestart' | translate }}">
+                    </p-message>
+                </ng-template>
+            </div>
             <div class="flex" *ngIf="setupService.schedulingEnabled && retryCount == 0">
                 <div class="flex align-items-center">
-                    <p-button class="pr-5 pb-1 pt-0 m-0" label="{{ 'settings.main.enableupdates_label' | translate }}" icon="pi pi-save" iconPos="left"
-                        (onClick)="disableSched();"></p-button>
+                    <p-button class="pr-5 pb-1 pt-0 m-0" label="{{ 'settings.main.enableupdates_label' | translate }}"
+                        icon="pi pi-save" iconPos="left" (onClick)="disableSched();"></p-button>
                 </div>
                 <div class="flex align-items-center">{{ 'settings.main.enableupdates_desc' | translate }}</div>
             </div>
             <div class="flex" *ngIf="!setupService.schedulingEnabled && retryCount == 0">
                 <div class="flex align-items-center">
-                    <p-button class="pr-5 pb-1 pt-0 m-0" label="{{ 'settings.main.restart_label' | translate }}" icon="pi pi-save" iconPos="left"
-                        (onClick)="restart();"></p-button>
+                    <p-button class="pr-5 pb-1 pt-0 m-0" label="{{ 'settings.main.restart_label' | translate }}"
+                        icon="pi pi-save" iconPos="left" (onClick)="restart();"></p-button>
                 </div>
-                <div class="flex align-items-center" *ngIf="!masterServerName || !hostName || masterServerName == hostName">
+                <div class="flex align-items-center"
+                    *ngIf="!masterServerName || !hostName || masterServerName == hostName">
                     <div class="text-pink-500">{{ 'settings.main.restart_desc' | translate }}</div>
                 </div>
-                <div class="flex align-items-center" *ngIf="masterServerName && hostName && masterServerName != hostName">
+                <div class="flex align-items-center"
+                    *ngIf="masterServerName && hostName && masterServerName != hostName">
                     {{ 'settings.main.slave_enabled' | translate }}</div>
             </div>
             <div>
@@ -36,8 +47,8 @@
                 <p-message *ngIf="retryCount > 0" severity="info"
                     text="{{ 'settings.main.restarting' | translate }}"></p-message>
                 <p>
-                    <p-message *ngIf="!setupService.isDatabaseIgnored && this.errorCount > 0 && retryCount == 0" severity="error"
-                        text="{{ 'common.networkfail' | translate }}"></p-message>
+                    <p-message *ngIf="!setupService.isDatabaseIgnored && this.errorCount > 0 && retryCount == 0"
+                        severity="error" text="{{ 'common.networkfail' | translate }}"></p-message>
                 </p>
             </div>
         </p-card>

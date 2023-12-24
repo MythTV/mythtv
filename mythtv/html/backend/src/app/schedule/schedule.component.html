@@ -6,6 +6,16 @@
             <p> {{ utility.formatDate(recRule.StartTime) }} {{ utility.formatTime(recRule.StartTime) }} -
                 {{ utility.formatTime(recRule.EndTime )}}
             </p>
+
+            <div class="form-group field" *ngIf="recRule.Type != 'Recording Template'">
+                <label for="Template" class="label block">{{ 'dashboard.sched.template_label' | translate
+                    }}</label>
+                <p-dropdown [options]="templates" [(ngModel)]="templateId" [editable]="false" optionLabel="Title"
+                    optionValue="Id" [maxlength]="0" [style]="{'minWidth':'400px'}" name="Template" #Template="ngModel"
+                    class="pr-2" (onClick)="templateChange(recRule)" (onChange)="templateChange(recRule)">
+                </p-dropdown>
+            </div>
+
             <div class="form-group field">
                 <label for="SearchType" class="label block">{{ 'dashboard.sched.srchtype_label' | translate
                     }}</label>
@@ -288,19 +298,6 @@
                 <small class="block">
                     {{ 'dashboard.sched.inetref_desc' | translate }}<br>
                 </small>
-            </div>
-
-            <div class="form-group field" *ngIf="recRule.Type != 'Recording Template'">
-                <label for="Template" class="label block">{{ 'dashboard.sched.template_label' | translate
-                    }}</label>
-                <p-dropdown [options]="templates" [(ngModel)]="templateId" [editable]="false" optionLabel="Title"
-                    optionValue="Id" [maxlength]="0" [style]="{'minWidth':'400px'}" name="Template" #Template="ngModel"
-                    class="pr-5">
-                </p-dropdown>
-                <p-button icon="pi pi-check-circle" (onClick)="templateChange(recRule)"
-                    label="{{ 'dashboard.sched.template_apply' | translate }}" styleClass="p-button-success"
-                    [disabled]="!templateId"></p-button>
-
             </div>
 
             <!-- Blank space here is so that the dropdown box can fit, otherwise there can be an impossible

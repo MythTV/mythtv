@@ -21,6 +21,12 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
+// Qt
+#include <QFile>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QUrlQuery>
+
 // MythTV
 #include "libmythbase/mythchrono.h"
 #include "libmythbase/mythcorecontext.h"

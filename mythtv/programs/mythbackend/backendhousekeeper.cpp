@@ -9,6 +9,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QFileInfo>
+#include <QRegularExpression>
 #include <QStringList>
 
 // MythTV headers

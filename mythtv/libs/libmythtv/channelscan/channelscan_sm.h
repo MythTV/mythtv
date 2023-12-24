@@ -31,6 +31,7 @@
 #define SISCAN_H
 
 // Qt includes
+#include <QElapsedTimer>
 #include <QList>
 #include <QMap>
 #include <QMutex>

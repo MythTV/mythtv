@@ -10,6 +10,7 @@
 #include <QMap>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QRegularExpression>
 #include <QStringList>
 #include <QWaitCondition>
 #include <QtAlgorithms>

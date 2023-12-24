@@ -204,7 +204,7 @@ void MythPlayerCaptionsUI::EnableCaptions(uint Mode, bool UpdateOSD)
         m_textDesired = newTextDesired;
     QString msg;
     if ((kDisplayCC608 & Mode) || (kDisplayCC708 & Mode) ||
-        (kDisplayAVSubtitle & Mode) || kDisplayRawTextSubtitle & Mode)
+        (kDisplayAVSubtitle & Mode) || (kDisplayRawTextSubtitle & Mode))
     {
         if (auto type = toTrackType(Mode); m_decoder != nullptr)
             if (auto track = GetTrack(type); track > -1)
@@ -216,6 +216,8 @@ void MythPlayerCaptionsUI::EnableCaptions(uint Mode, bool UpdateOSD)
     if (kDisplayTextSubtitle & Mode)
     {
         m_captionsOverlay.EnableSubtitles(kDisplayTextSubtitle);
+        AVSubtitles* subs = m_subReader.GetAVSubtitles();
+        subs->m_needSync = true;
         msg += tr("Text subtitles");
     }
 
@@ -423,7 +425,7 @@ bool MythPlayerCaptionsUI::HasCaptionTrack(uint Mode)
     if (Mode == kDisplayNUVTeletextCaptions)
         return true;
     // External subtitles are now decoded with FFmpeg and are AVSubtitles.
-    if ((Mode == kDisplayAVSubtitle) && m_captionsState.m_externalTextSubs)
+    if ((Mode == kDisplayAVSubtitle || Mode == kDisplayTextSubtitle) && m_captionsState.m_externalTextSubs)
         return true;
     if (!(Mode == kDisplayTextSubtitle) && m_decoder->GetTrackCount(toTrackType(Mode)))
         return true;

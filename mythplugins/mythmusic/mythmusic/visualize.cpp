@@ -165,6 +165,10 @@ void MelScale::setMax(int maxscale, int maxrange, int maxfreq)
     m_indices.clear();
     m_indices.resize(maxrange, 0);
 
+    int note = 0;               // first note is C0
+    double freq = 16.35;        // frequency of first note
+    double next = pow(2.0, 1.0 / 12.0); // factor separating notes
+
     double maxmel = hz2mel(maxfreq);
     double hzperbin = (double) maxfreq / (double) maxscale;
 
@@ -176,12 +180,39 @@ void MelScale::setMax(int maxscale, int maxrange, int maxfreq)
         m_indices[i] = bin;
         // LOG(VB_PLAYBACK, LOG_INFO, QString("Mel maxmel=%1, hzperbin=%2, hz=%3, i=%4, bin=%5")
         //     .arg(maxmel).arg(hzperbin).arg(hz).arg(i).arg(bin));
+
+        if (hz > freq) { // map note to pixel location for note labels
+            m_freqs[note] = lround(freq);
+            m_pixels[note++] = i;
+            freq *= next;
+        }
     }
 }
 
 int MelScale::operator[](int index)
 {
     return m_indices[index];
+}
+
+QString MelScale::note(int note)
+{
+    if (note < 0 || note > 125)
+        return {};
+    return m_notes[note % 12];
+}
+
+int MelScale::pixel(int note)
+{
+    if (note < 0 || note > 125)
+        return 0;
+    return m_pixels[note];
+}
+
+int MelScale::freq(int note)
+{
+    if (note < 0 || note > 125)
+        return 0;
+    return m_freqs[note];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -624,7 +655,7 @@ void WaveForm::saveload(MusicMetadata *meta)
     if (s_image.isNull())
     {
         s_image = QImage(m_wfsize.width(), m_wfsize.height(), QImage::Format_RGB32);
-        s_image.fill(qRgb(0, 0, 0));
+        s_image.fill(Qt::black);
     }
     m_minl = 0;                 // drop last pixel, prepare for first
     m_maxl = 0;
@@ -635,8 +666,7 @@ void WaveForm::saveload(MusicMetadata *meta)
     m_position = 0;
     m_lastx = m_wfsize.width();
     m_font = QApplication::font();
-    // m_font.setPointSize(14);
-    m_font.setPixelSize(m_size.height() / 60); // small to be mostly unnoticed
+    m_font.setPixelSize(18);    // small to be mostly unnoticed
 }
 
 unsigned long WaveForm::getDesiredSamples(void)
@@ -815,13 +845,15 @@ bool WaveForm::draw( QPainter *p, const QColor &back )
 
 void WaveForm::handleKeyPress(const QString &action)
 {
-    LOG(VB_PLAYBACK, LOG_INFO, QString("WF keypress = %1").arg(action));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("WF keypress = %1").arg(action));
 
-    // I'd like to toggle overlay text upon certain key hit, but
-    // mythfrontend doesn't appear to call this.  Bug?
-    if (action == "SELECT")
+    if (action == "SELECT" || action == "2")
     {
         m_showtext = ! m_showtext;
+    }
+    else if (action == "DELETE" && !s_image.isNull())
+    {
+        s_image.fill(Qt::black);
     }
 }
 
@@ -927,6 +959,8 @@ Spectrogram::Spectrogram(bool hist)
 
     m_fps = 40;         // getting 1152 samples / 44100 = 38.28125 fps
 
+    m_color = gCoreContext->GetNumSetting("MusicSpectrogramColor", 0);
+
     if (s_image.isNull())  // static histogram survives resize/restart
     {
         s_image = QImage(
@@ -1008,34 +1042,70 @@ unsigned long Spectrogram::getDesiredSamples(void)
 
 bool Spectrogram::process(VisualNode */*node*/)
 {
-    // TODO: label certain frequencies instead: 50, 100, 200, 500,
-    // 1000, 2000, 5000, 10000
+    if (!m_showtext)
+        return false;
 
-    // QPainter painter(m_image);
-    // painter.setPen(Qt::cyan);
-    // QFont font = QApplication::font();
-    // font.setPixelSize(14);
-    // painter.setFont(font);
-    // if (m_history)
-    // {
-    //     for (auto h = m_sgsize.height(); h > 0; h -= m_sgsize.height() / 2)
-    //     {
-    //         for (auto i = 0; i < m_sgsize.height() / 2; i += 20)
-    //         {
-    //             painter.drawText(0, h - i,
-    //                              QString("...%1.%2.%3...").arg(i).arg(m_scale[i])
-    //                              .arg(m_scale[i] * 22050 / 8192)); // hack!!!
-    //         }
-    //     }
-    // } else {
-    //     painter.rotate(90);
-    //     for (auto i = 0; i < m_sgsize.width(); i += 20)
-    //     {
-    //         painter.drawText(0, -1 * i,
-    //                          QString("...%1.%2.%3...").arg(i).arg(m_scale[i])
-    //                          .arg(m_scale[i] * 22050 / 8192)); // hack!!!
-    //     }
-    // }
+    QPainter painter(m_image);
+    painter.setPen(Qt::white);
+    QFont font = QApplication::font();
+    font.setPixelSize(16);
+    painter.setFont(font);
+    int half = m_sgsize.height() / 2;
+
+    if (m_history)
+    {
+        for (auto h = m_sgsize.height(); h > 0; h -= half)
+        {
+            for (auto i = 0; i < half; i += 20)
+            {
+                painter.drawText(s_offset > m_sgsize.width() - 255
+                                 ? s_offset - m_sgsize.width() : s_offset,
+                                 h - i - 20, 255, 40,
+                                 Qt::AlignRight|Qt::AlignVCenter,
+                                 // QString("%1 %2").arg(m_scale[i])
+                                 QString("%1")
+                                 .arg(m_scale[i] * 22050 / (m_fftlen/2)));
+            }
+        }
+    } else {
+        // static std::array<int, 5> treble = {52, 55, 59, 62, 65};
+        // for (auto i = 0; i < 5; i++) {
+        //     painter.drawLine(m_scale.pixel(treble[i]), 0,
+        //                      m_scale.pixel(treble[i]), m_sgsize.height());
+        // }
+        for (auto i = 0; i < 125; i++) // 125 notes fit in 22050 Hz
+        {                  // let Qt center the note text on the pixel
+            painter.drawText(m_scale.pixel(i) - 20, half - (i % 12) * 15 - 40,
+                             40, 40, Qt::AlignCenter, m_scale.note(i));
+            if (i % 12 == 5)    // octave numbers
+            {
+                painter.drawText(m_scale.pixel(i) - 20, half - 220,
+                                 40, 40, Qt::AlignCenter,
+                                 QString("%1").arg(int(i / 12)));
+            }
+        }
+        painter.rotate(90);     // frequency in Hz draws down
+        int prev = -30;
+        for (auto i = 0; i < 125; i++) // 125 notes fit in 22050 Hz
+        {
+            if (i < 72 && m_scale.note(i) == ".") // skip low sharps
+              continue;
+            int now = m_scale.pixel(i);
+            if (now >= prev + 20) { // skip until good spacing
+                painter.drawText(half + 20, -1 * now - 40,
+                                 80, 80, Qt::AlignVCenter|Qt::AlignLeft,
+                                 QString("%1").arg(m_scale.freq(i)));
+                if (m_scale.note(i) != ".")
+                {
+                    painter.drawText(half + 100, -1 * now - 40,
+                                     80, 80, Qt::AlignVCenter|Qt::AlignLeft,
+                                     QString("%1%2").arg(m_scale.note(i))
+                                     .arg(int(i / 12)));
+                }
+                prev = now;
+            }
+        }
+    }
     return false;
 }
 
@@ -1076,8 +1146,8 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
         int end = m_fftlen / 40; // ramp window ends down to zero crossing
         for (int k = 0; k < m_fftlen; k++)
         {
-	    mult = k < end ? (float)k / (float)end
-		       : k > m_fftlen - end ?
+            mult = k < end ? (float)k / (float)end
+                       : k > m_fftlen - end ?
                 (float)(m_fftlen - k) / (float)end : 1;
             m_dftL[k] = m_sigL[k] * mult;
             m_dftR[k] = m_sigR[k] * mult;
@@ -1141,8 +1211,16 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
             h = m_sgsize.height() / 2;
             painter.drawLine(s_offset,     h - i, s_offset     + mag, h - i);
             painter.drawLine(s_offset - w, h - i, s_offset - w + mag, h - i);
-            left > 255 ? painter.setPen(Qt::yellow) :
-                painter.setPen(qRgb(mag, mag, mag));
+            if (m_color & 0x01) // left in color?
+            {
+                if (left > 255)
+                    painter.setPen(Qt::white);
+                if (mag == 0)
+                    painter.setPen(Qt::black);
+            } else {
+                left > 255 ? painter.setPen(Qt::yellow) :
+                    painter.setPen(qRgb(mag, mag, mag));
+            }
             painter.drawPoint(s_offset, h - i);
         } else {
             painter.drawLine(i, h / 2, i, h / 2 - h / 2 * mag / 256);
@@ -1158,8 +1236,16 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
             h = m_sgsize.height();
             painter.drawLine(s_offset,     h - i, s_offset     + mag, h - i);
             painter.drawLine(s_offset - w, h - i, s_offset - w + mag, h - i);
-            right > 255 ? painter.setPen(Qt::yellow) :
-                painter.setPen(qRgb(mag, mag, mag));
+            if (m_color & 0x02) // right in color?
+            {
+                if (left > 255)
+                    painter.setPen(Qt::white);
+                if (mag == 0)
+                    painter.setPen(Qt::black);
+            } else {
+                right > 255 ? painter.setPen(Qt::yellow) :
+                    painter.setPen(qRgb(mag, mag, mag));
+            }
             painter.drawPoint(s_offset, h - i);
         } else {
             painter.drawLine(i, h / 2, i, h / 2 + h / 2 * mag / 256);
@@ -1167,7 +1253,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
 
         prev = index;           // next pixel is FFT bins from here
         index = m_scale[i];     // to the next bin by LOG scale
-	prev = std::min(prev, index - 1);
+        prev = std::min(prev, index - 1);
     }
     if (m_history && ++s_offset >= w)
     {
@@ -1206,13 +1292,22 @@ bool Spectrogram::draw(QPainter *p, const QColor &back)
 
 void Spectrogram::handleKeyPress(const QString &action)
 {
-    LOG(VB_PLAYBACK, LOG_INFO, QString("SG keypress = %1").arg(action));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("SG keypress = %1").arg(action));
 
-    // I'd like to tweak options upon certain key hit, but
-    // mythfrontend doesn't appear to call this.  Bug?
     if (action == "SELECT")
     {
-        LOG(VB_PLAYBACK, LOG_INFO, QString("SG keypress SELECT hit"));
+        if (m_history)
+        {
+            m_color = (m_color + 1) & 0x03; // left and right color bits
+            gCoreContext->SaveSetting("MusicSpectrogramColor",
+                                      QString("%1").arg(m_color));
+        }
+        else
+            m_showtext = ! m_showtext;
+    }
+    if (action == "2")          // 1/3 is slower/faster, 2 should be unused
+    {
+        m_showtext = ! m_showtext;
     }
 }
 

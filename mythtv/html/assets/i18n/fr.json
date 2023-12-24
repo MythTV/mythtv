@@ -1,6 +1,6 @@
 {
     "common": {
-        "back": "Retour",
+        "back": "Dos",
         "backenderror": "Erreur de back-end.",
         "cancel": "Annuler",
         "close": "Fermer",
@@ -13,9 +13,11 @@
             "equals": "Correspondance exacte",
             "startswith": "Commence avec"
         },
-        "help": "Aidez-moi",
+        "help": "Aide",
         "instructions": "Instructions",
         "loading": "Chargement",
+        "mustenable": "Les modifications ne peuvent être enregistrées que si vous cliquez d'abord sur le bouton Activer les mises à jour.",
+        "mustrestart": "Lorsque vous avez terminé les mises à jour, redémarrez le backend.",
         "networkfail": "ERREUR : Échec du réseau principal",
         "next": "Suivant",
         "no": "Non",
@@ -36,9 +38,14 @@
         "channeleditor": "Éditeur de chaînes",
         "guide": {
             "channel": "Canaliser",
+            "full_search": "Recherche complète",
             "people_search": "Recherche de personnes",
             "retgrid": "Revenir à l'affichage de la grille",
-            "title_search": "Recherche de titre"
+            "title_search": "Recherche de titre",
+            "type_movie": "Film",
+            "type_series": "Série",
+            "type_sports": "Des sports",
+            "type_tvshow": "Émission de télévision"
         },
         "programguide": "Guide du programme",
         "recordings": {
@@ -56,12 +63,13 @@
             "edit_rule": "Modifier la règle d'enregistrement",
             "episode": "Épisode",
             "file_size": "Taille du fichier",
+            "filename_label": "Nom de fichier",
             "filter": "Filtre",
             "heading": "Enregistrements",
             "inetref": "InetRef",
             "job_Commflag": "Détecter les publicités",
             "job_Metadata": "Consulter les métadonnées",
-            "job_Transcode": "Transcoder",
+            "job_Transcode": "Transcoder avec le profil par défaut",
             "mnu_delete": "Supprimer",
             "mnu_delete_rerec": "Supprimer et autoriser le réenregistrement",
             "mnu_markdamaged": "Marquer comme endommagé",
@@ -155,7 +163,6 @@
             "startoffset_label": "Nombre de minutes supplémentaires à enregistrer au début",
             "starttime_label": "Date et heure de début",
             "subtitle_label": "Sous-titre",
-            "template_apply": "Appliquer le changement de modèle",
             "template_label": "Utilise le modèle",
             "title_label": "Titre",
             "type": {
@@ -658,6 +665,8 @@
             "format_label": "Format de télévision",
             "freqid": "Identifiant de fréquence",
             "freqid_desc": "Numéro de canal tel que compris par vos tuners.",
+            "mplex_desc": "Fréquence de diffusion du flux de transport qui achemine ce canal. Le même flux peut transporter plusieurs chaînes.",
+            "mplex_label": "Multiplex",
             "never-visible": "Jamais visible",
             "new_channel": "Nouvelle chaîne",
             "not-visible": "Invisible",
@@ -677,6 +686,7 @@
             "xmltvid_desc": "ID utilisé par les services de référencement pour obtenir une correspondance exacte entre une chaîne de votre line-up et une chaîne de leur base de données. Normalement, cela est défini automatiquement lorsque 'mythfilldatabase' est exécuté.",
             "xmltvid_label": "Identifiant XMLTV"
         },
+        "chanedit_advanced": "Réglages avancés",
         "channelscan": {
             "FEC_desc": "Correction d'erreur directe (par défaut : Auto)",
             "FEC_label": "FEC",
@@ -790,7 +800,7 @@
             "rolloff_label": "Roll-off",
             "sattuning_desc": "Sélectionnez un satellite dans cette liste pour les données de syntonisation du transpondeur de référence.",
             "sattuning_label": "Données de syntonisation des satellites",
-            "scan_desc": "Avant de l'exécuter, vous devez sélectionner la source vidéo et enregistrer la page si des modifications n'ont pas été enregistrées.",
+            "scan_desc": "Avant d'exécuter ceci, vous devez sélectionner la source vidéo. Démarrer la numérisation enregistrera automatiquement la page si nécessaire avant la numérisation.",
             "scan_label": "Lancer l'analyse",
             "scanimport_label": "Numériser pour importer",
             "scanimport_option": "Sélectionnez une option d'importation.",

@@ -192,9 +192,6 @@ static float get_aspect(AVCParser &p)
 
 
 int  get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
-#ifdef USING_DXVA2
-int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags);
-#endif
 
 // currently unused
 //static int determinable_frame_size(struct AVCodecContext *avctx)
@@ -1367,33 +1364,6 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
 
     return static_cast<float>(detected);
 }
-
-#ifdef USING_DXVA2
-// Declared separately to allow attribute
-static enum AVPixelFormat get_format_dxva2(struct AVCodecContext *,
-                                           const enum AVPixelFormat *);
-
-enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
-                                    const enum AVPixelFormat *valid_fmts)
-{
-    AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
-    if (nd && nd->GetPlayer())
-    {
-        static uint8_t *dummy[1] = { nullptr };
-        avctx->hwaccel_context =
-            (dxva_context*)nd->GetPlayer()->GetDecoderContext(nullptr, dummy[0]);
-    }
-
-    while (*valid_fmts != AV_PIX_FMT_NONE) {
-        if (avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_DXVA2_VLD))
-            return AV_PIX_FMT_DXVA2_VLD;
-        if (not avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_YUV420P))
-            return AV_PIX_FMT_YUV420P;
-        valid_fmts++;
-    }
-    return AV_PIX_FMT_NONE;
-}
-#endif
 
 int AvFormatDecoder::GetMaxReferenceFrames(AVCodecContext *Context)
 {
@@ -2766,7 +2736,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
-    VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
+    MythVideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
 
     for (int i = 0; i < 4; i++)
     {
@@ -2774,14 +2744,22 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
         pic->linesize[i] = 0;
     }
     pic->opaque      = frame;
-    frame->pix_fmt   = c->pix_fmt;
+    frame->m_pixFmt  = c->pix_fmt;
     pic->reordered_opaque = c->reordered_opaque;
-    pic->data[0] = (uint8_t*)frame->buf;
-    pic->data[3] = (uint8_t*)frame->buf;
+    pic->data[0] = (uint8_t*)frame->m_buffer;
+    pic->data[3] = (uint8_t*)frame->m_buffer;
 
     // Set release method
     AVBufferRef *buffer =
-        av_buffer_create((uint8_t*)frame, 0, release_avf_buffer, nd, 0);
+        av_buffer_create((uint8_t*)frame, 0,
+                         [](void* Opaque, uint8_t* Data)
+                             {
+                                 AvFormatDecoder *avfd = static_cast<AvFormatDecoder*>(Opaque);
+                                 MythVideoFrame *vf = reinterpret_cast<MythVideoFrame*>(Data);
+                                 if (avfd && avfd->GetPlayer())
+                                     avfd->GetPlayer()->DeLimboFrame(vf);
+                             }
+                         , nd, 0);
     pic->buf[0] = buffer;
 
     return 0;
@@ -3991,7 +3969,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 
         bool forcedon = m_parent->GetSubReader(pkt->stream_index)->AddAVSubtitle(
                 subtitle, curstream->codecpar->codec_id == AV_CODEC_ID_XSUB,
-                m_parent->GetAllowForcedSubtitles());
+                m_parent->GetAllowForcedSubtitles(), false);
          m_parent->EnableForcedSubtitles(forcedon || isForcedTrack);
     }
 

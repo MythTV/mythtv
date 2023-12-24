@@ -484,7 +484,7 @@
         <div style="display:flex; align-items:center;">
             <p-button label="{{ 'settings.channelscan.scan_label' | translate }}" icon="pi pi-play" iconPos="left"
                 (onClick)="startScan()" [disabled]="setupService.schedulingEnabled || scanStatus.Status == 'RUNNING'
-                 || (iconnection.currentForm && iconnection.currentForm.form.dirty) || !card.SourceId">
+                  || !card.SourceId">
             </p-button>
         </div>
     </div>

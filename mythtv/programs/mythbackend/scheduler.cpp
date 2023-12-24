@@ -5831,6 +5831,7 @@ bool Scheduler::InitInputInfoMap(void)
 
     query.prepare("SELECT cardid, parentid, schedgroup "
                   "FROM capturecard "
+                  "WHERE sourceid > 0 "
                   "ORDER BY cardid");
     if (!query.exec())
     {

@@ -21,8 +21,12 @@
 #ifndef MYTHTVEXTERNRECAPP_H
 #define MYTHTVEXTERNRECAPP_H
 
+#include <QDir>
+#include <QMap>
 #include <QObject>
-#include <QtCore/QtCore>
+#include <QProcess>
+#include <QSettings>
+#include <QString>
 
 #include <atomic>
 #include <condition_variable>

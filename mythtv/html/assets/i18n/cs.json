@@ -16,6 +16,8 @@
         "help": "Pomoc",
         "instructions": "Instrukce",
         "loading": "načítání",
+        "mustenable": "Změny nelze uložit, pokud nejprve neklepnete na tlačítko Povolit aktualizace.",
+        "mustrestart": "Po dokončení aktualizací restartujte backend.",
         "networkfail": "CHYBA: Backend Network Failure",
         "next": "další",
         "no": "Ne",
@@ -36,9 +38,14 @@
         "channeleditor": "Editor kanálu",
         "guide": {
             "channel": "Kanál",
+            "full_search": "Úplné vyhledávání",
             "people_search": "Vyhledávání lidí",
             "retgrid": "Návrat k zobrazení mřížky",
-            "title_search": "Vyhledávání titulů"
+            "title_search": "Vyhledávání titulů",
+            "type_movie": "Film",
+            "type_series": "Série",
+            "type_sports": "Sportovní",
+            "type_tvshow": "Televizní show"
         },
         "programguide": "Programový průvodce",
         "recordings": {
@@ -56,12 +63,13 @@
             "edit_rule": "Upravit pravidlo nahrávání",
             "episode": "Epizoda",
             "file_size": "Velikost souboru",
+            "filename_label": "Název souboru",
             "filter": "Filtr",
             "heading": "Nahrávky",
             "inetref": "InetRef",
             "job_Commflag": "Detekce reklam",
             "job_Metadata": "Vyhledejte Metadata",
-            "job_Transcode": "Překódovat",
+            "job_Transcode": "Překódovat pomocí výchozího profilu",
             "mnu_delete": "Vymazat",
             "mnu_delete_rerec": "Smazat a povolit opětovné nahrávání",
             "mnu_markdamaged": "Označit jako poškozené",
@@ -155,7 +163,6 @@
             "startoffset_label": "Počet minut navíc k záznamu na začátku",
             "starttime_label": "Datum a čas zahájení",
             "subtitle_label": "Titulky",
-            "template_apply": "Použít změnu šablony",
             "template_label": "Použijte šablonu",
             "title_label": "Titul",
             "type": {
@@ -658,6 +665,8 @@
             "format_label": "TV Formát",
             "freqid": "ID frekvence",
             "freqid_desc": "Číslo kanálu, jak ho chápou vaše tunery.",
+            "mplex_desc": "Vysílací frekvence transportního toku, který přenáší tento kanál. Stejný proud může přenášet mnoho kanálů.",
+            "mplex_label": "Multiplex",
             "never-visible": "Nikdy neviditelné",
             "new_channel": "Nový kanál",
             "not-visible": "Neviditelný",
@@ -677,6 +686,7 @@
             "xmltvid_desc": "ID používané seznamem služeb k získání přesné korespondence mezi kanálem ve vaší sestavě a kanálem v jejich databázi. Normálně se toto nastavuje automaticky při spuštění 'mythfilldatabase'.",
             "xmltvid_label": "XMLTV ID"
         },
+        "chanedit_advanced": "Pokročilé nastavení",
         "channelscan": {
             "FEC_desc": "Dopředná oprava chyb (výchozí: Automaticky)",
             "FEC_label": "FEC",
@@ -790,7 +800,7 @@
             "rolloff_label": "Sjet",
             "sattuning_desc": "Vyberte satelit z tohoto seznamu pro data ladění referenčního transpondéru.",
             "sattuning_label": "Údaje o satelitním ladění",
-            "scan_desc": "Před spuštěním musíte vybrat zdroj videa a uložit stránku, pokud nebyly uloženy nějaké změny.",
+            "scan_desc": "Před spuštěním musíte vybrat zdroj videa. Spustit skenování automaticky uloží stránku v případě potřeby před skenováním.",
             "scan_label": "Začni skenovat",
             "scanimport_label": "Skenování pro import",
             "scanimport_option": "Vyberte možnost importu.",
