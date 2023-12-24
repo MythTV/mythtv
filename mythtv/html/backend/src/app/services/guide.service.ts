@@ -78,7 +78,7 @@ export class GuideService {
     return this.httpClient.get<ScheduleOrProgram>('/Guide/GetProgramDetails', { params });
   }
 
-  public GetProgramGuide(reqDate?: Date): Observable<ProgramGuide> {
+  public GetProgramGuide(reqDate?: Date, ChannelGroupId?: number): Observable<ProgramGuide> {
     if (reqDate) {
       this.startDate = reqDate;
     }
@@ -87,6 +87,7 @@ export class GuideService {
       "StartTime": this.toStartTime(time),
       "EndTime": this.toEndTime(time),
       "Details": true,
+      "ChannelGroupId" : ChannelGroupId
     };
     return this.httpClient.post<ProgramGuide>('/Guide/GetProgramGuide', params);
   }

@@ -7,6 +7,7 @@ import { TranslateService, TranslationChangeEvent } from '@ngx-translate/core';
 import { ScheduleLink, SchedulerSummary } from '../schedule/schedule.component';
 import { ScheduleOrProgram } from '../services/interfaces/program.interface';
 import { GetProgramListRequest } from '../services/interfaces/guide.interface';
+import { ChannelGroup } from '../services/interfaces/channelgroup.interface';
 
 @Component({
   selector: 'app-guide',
@@ -20,18 +21,23 @@ export class GuideComponent implements OnInit, SchedulerSummary {
   m_startDate: Date = new Date();
   m_pickerDate: Date = new Date();
   m_endDate: Date = new Date();
-  // m_dateFormat: string = ''
+  channelGroups: ChannelGroup[] = [];
   m_channelData: Channel[] = [];
   m_channelTotal: number = 10;
   m_rows: number = 10;
   m_programGuide!: ProgramGuide;
   listPrograms: ScheduleOrProgram[] = [];
+  allGroup: ChannelGroup = {
+    GroupId: 0,
+    Name: this.translate.instant('settings.chanedit.all'),
+    Password: ''
+  }
+  channelGroup: ChannelGroup = this.allGroup;
   channel!: Channel;
   loaded = false;
   refreshing = false;
   timeChange = false;
   inter: ScheduleLink = { summaryComponent: this };
-  // channel?: Channel;
   // display Type
   readonly GRID = 1;
   readonly CHANNEL = 2;
@@ -43,9 +49,6 @@ export class GuideComponent implements OnInit, SchedulerSummary {
 
   constructor(private guideService: GuideService,
     private translate: TranslateService) {
-
-    // this.setDateFormat();
-
     this.translate.onLangChange.subscribe((event: TranslationChangeEvent) => {
       console.log("Event: language change, new language (" + event.lang + ")");
       this.switchLanguage(event.lang);
@@ -58,18 +61,21 @@ export class GuideComponent implements OnInit, SchedulerSummary {
     this.fetchData();
   }
 
-  // setDateFormat(): void {
-  //   this.translate.get("primeng.dateFormat").subscribe(data => this.m_dateFormat = data);
-  //   console.log("Date format is (" + this.m_dateFormat + ")");
-  // }
-
   switchLanguage(language: string): void {
     this.translate.use(language);
     // this.setDateFormat();
   }
 
   fetchData(reqDate?: Date): void {
-    this.guideService.GetProgramGuide(reqDate).subscribe(data => {
+    if (this.channelGroups.length == 0) {
+      this.guideService.GetChannelGroupList(false).subscribe(
+        data => {
+          console.log(data)
+          this.channelGroups = data.ChannelGroupList.ChannelGroups;
+          this.channelGroups.unshift(this.allGroup);
+        });
+    };
+    this.guideService.GetProgramGuide(reqDate, this.channelGroup.GroupId).subscribe(data => {
       this.m_programGuide = data;
       this.m_startDate = new Date(data.ProgramGuide.StartTime);
       this.m_pickerDate = new Date(this.m_startDate);

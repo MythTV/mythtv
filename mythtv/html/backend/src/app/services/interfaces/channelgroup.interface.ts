@@ -5,5 +5,7 @@ export interface ChannelGroup {
 }
 
 export interface ChannelGroupList {
-    ChannelGroups:  ChannelGroup[];
+    ChannelGroupList: {
+        ChannelGroups: ChannelGroup[];
+    }
 }
