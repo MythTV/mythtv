@@ -850,6 +850,8 @@
         "eit": {
             "crawl_desc": "Lágmarksfjöldi sekúndna eftir að upptökutæki verður aðgerðalaus til að bíða áður en MythTV byrjar að safna EIT skráningargögnum.",
             "crawl_label": "Bakendi aðgerðalaus fyrir EIT skrið (sekúndur)",
+            "scan_desc": "Tími til að gera EIT skönnun á einu handtökukorti áður en farið er yfir á næsta handfangakort í sama inntakshópi sem er stilltur fyrir EIT skönnun. Þetta getur gerst með mörgum LNB gervihnöttum tengdum með DiSEqC rofa.",
+            "scan_label": "EIT skannatímabil (mín)",
             "subtitle": "Ef þú ert að nota skráningar sem sendar eru af stöðinni, skilgreina þessir valkostir hvernig MythTV leitar að þeim.",
             "timeout_desc": "Hámarkstími til að eyða í bið (í mínútum) eftir skráningargögnum á einni stafrænni sjónvarpsrás áður en leitað er að nýjum skráningargögnum á næstu rás.",
             "timeout_label": "EIT flutningstími (mín.)",

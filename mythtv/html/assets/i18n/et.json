@@ -850,6 +850,8 @@
         "eit": {
             "crawl_desc": "Minimaalne arv sekundeid pärast seda, kui salvesti jääb jõude ootama, enne kui MythTV hakkab koguma EIT kirjete andmeid.",
             "crawl_label": "Taustaprogramm jõudeolekus enne EIT roomamist (s)",
+            "scan_desc": "Aeg teha EIT-skannimine ühel püüdmiskaardil, enne kui liikuda järgmisele salvestuskaardile samas sisendrühmas, mis on konfigureeritud EIT-skannimiseks. See võib juhtuda mitme satelliidi LNB-ga, mis on ühendatud DiSEqC lülitiga.",
+            "scan_label": "EIT skannimisperiood (minutites)",
             "subtitle": "Kui kasutate jaama edastatud loendeid, määravad need valikud, kuidas MythTV neid otsib.",
             "timeout_desc": "Maksimaalne aeg, mis kulub (minutites) ühe digi-TV kanali loendiandmete ootamiseks, enne kui järgmise kanali uute loendiandmete kontrollimist.",
             "timeout_label": "EIT transpordi ajalõpp (min)",

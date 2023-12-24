@@ -850,6 +850,8 @@
         "eit": {
             "crawl_desc": "La cantidad mínima de segundos después de que una grabadora queda inactiva para esperar antes de que MythTV comience a recopilar datos de listados de EIT.",
             "crawl_label": "Backend inactivo antes del rastreo de EIT (segundos)",
+            "scan_desc": "Es hora de realizar el escaneo EIT en una tarjeta de captura antes de pasar a la siguiente tarjeta de captura en el mismo grupo de entrada que está configurado para el escaneo EIT. Esto puede suceder con varios LNB satelitales conectados a través de un conmutador DiSEqC.",
+            "scan_label": "Período de escaneo EIT (minutos)",
             "subtitle": "Si está utilizando listados transmitidos por la estación, estas opciones definen cómo los busca MythTV.",
             "timeout_desc": "Tiempo máximo de espera (en minutos) para obtener datos de listados en un canal de TV digital antes de buscar nuevos datos de listados en el siguiente canal.",
             "timeout_label": "Tiempo de espera de transporte de EIT (minutos)",

@@ -850,6 +850,8 @@
         "eit": {
             "crawl_desc": "The minimum number of seconds after a recorder becomes idle to wait before MythTV begins collecting EIT listings data.",
             "crawl_label": "Backend idle before EIT crawl (secs)",
+            "scan_desc": "Time to do EIT scanning on one capture card before moving to the next capture card in the same input group that is configured for EIT scanning. This can happen with multiple satellite LNBs connected via a DiSEqC switch.",
+            "scan_label": "EIT scan period (mins)",
             "subtitle": "If you are using listings transmitted by the station, these options define how MythTV searches for them.",
             "timeout_desc": "Maximum time to spend waiting (in minutes) for listings data on one digital TV channel before checking for new listings data on the next channel.",
             "timeout_label": "EIT transport timeout (mins)",

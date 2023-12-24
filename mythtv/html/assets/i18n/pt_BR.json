@@ -850,6 +850,8 @@
         "eit": {
             "crawl_desc": "O número mínimo de segundos depois que um gravador fica ocioso para esperar antes que MythTV comece a coletar dados de listagens EIT.",
             "crawl_label": "Back-end inativo antes do rastreamento EIT (segundos)",
+            "scan_desc": "É hora de fazer a varredura EIT em uma placa de captura antes de passar para a próxima placa de captura no mesmo grupo de entrada configurado para varredura EIT. Isto pode acontecer com vários LNBs de satélite ligados através de um switch DiSEqC.",
+            "scan_label": "Período de verificação EIT (minutos)",
             "subtitle": "Se você estiver usando listagens transmitidas pela estação, essas opções definem como o MythTV as busca.",
             "timeout_desc": "Tempo máximo de espera (em minutos) pelos dados de listagem em um canal de TV digital antes de verificar novos dados de listagem no próximo canal.",
             "timeout_label": "Tempo limite de transporte EIT (minutos)",

@@ -850,6 +850,8 @@
         "eit": {
             "crawl_desc": "Die Mindestanzahl von Sekunden, nachdem ein Rekorder inaktiv ist, um zu warten, bevor MythTV mit der Erfassung von EIT-Listing-Daten beginnt.",
             "crawl_label": "Backend-Leerlauf vor EIT-Crawling (Sek.)",
+            "scan_desc": "Es ist Zeit, den EIT-Scan auf einer Capture-Karte durchzuführen, bevor zur nächsten Capture-Karte in derselben Eingabegruppe übergegangen wird, die für den EIT-Scan konfiguriert ist. Dies kann passieren, wenn mehrere Satelliten-LNBs über einen DiSEqC-Schalter verbunden sind.",
+            "scan_label": "EIT-Scanzeitraum (Minuten)",
             "subtitle": "Wenn Sie vom Sender übermittelte Einträge verwenden, legen diese Optionen fest, wie MythTV danach sucht.",
             "timeout_desc": "Maximale Wartezeit (in Minuten) für Programmdaten auf einem digitalen TV-Kanal, bevor nach neuen Programmdaten auf dem nächsten Kanal gesucht wird.",
             "timeout_label": "EIT-Transport-Timeout (Minuten)",

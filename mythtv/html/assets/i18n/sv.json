@@ -850,6 +850,8 @@
         "eit": {
             "crawl_desc": "Det minsta antalet sekunder efter att en inspelare blir inaktiv för att vänta innan MythTV börjar samla in EIT-listningsdata.",
             "crawl_label": "Backend inaktiv före EIT-genomsökning (sekunder)",
+            "scan_desc": "Dags att göra EIT-skanning på ett fångstkort innan du går till nästa fångstkort i samma ingångsgrupp som är konfigurerad för EIT-skanning. Detta kan hända med flera satellit-LNB:er anslutna via en DiSEqC-switch.",
+            "scan_label": "EIT-skanningsperiod (min)",
             "subtitle": "Om du använder listor som sänds av stationen, definierar dessa alternativ hur MythTV söker efter dem.",
             "timeout_desc": "Maximal tid att vänta (i minuter) för listningsdata på en digital TV-kanal innan du söker efter nya listningsdata på nästa kanal.",
             "timeout_label": "EIT transport timeout (minut)",

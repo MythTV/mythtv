@@ -850,6 +850,8 @@
         "eit": {
             "crawl_desc": "Minimalan broj sekundi nakon što snimač postane neaktivan prije nego što MythTV počne prikupljati podatke o popisima EIT-a.",
             "crawl_label": "Pozadina u mirovanju prije indeksiranja EIT-a (sekunde)",
+            "scan_desc": "Vrijeme je za EIT skeniranje na jednoj kartici za snimanje prije prelaska na sljedeću karticu za snimanje u istoj ulaznoj grupi koja je konfigurirana za EIT skeniranje. To se može dogoditi s više satelitskih LNB-a povezanih preko DiSEqC prekidača.",
+            "scan_label": "Razdoblje EIT skeniranja (min)",
             "subtitle": "Ako koristite popise koje prenosi postaja, ove opcije definiraju kako ih MythTV traži.",
             "timeout_desc": "Maksimalno vrijeme potrebno za čekanje (u minutama) na podatke o popisima na jednom digitalnom TV kanalu prije provjere novih podataka o popisima na sljedećem kanalu.",
             "timeout_label": "Vrijeme čekanja EIT prijenosa (minuta)",

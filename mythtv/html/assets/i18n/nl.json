@@ -850,6 +850,8 @@
         "eit": {
             "crawl_desc": "Het minimum aantal seconden nadat een recorder inactief is geworden om te wachten voordat MythTV begint met het verzamelen van EIT-lijstgegevens.",
             "crawl_label": "Backend inactief vóór EIT-crawl (sec)",
+            "scan_desc": "Tijd om EIT-scans uit te voeren op één capture-kaart voordat u doorgaat naar de volgende capture-kaart in dezelfde invoergroep die is geconfigureerd voor EIT-scannen. Dit kan gebeuren als er meerdere satelliet-LNB's zijn aangesloten via een DiSEqC-schakelaar.",
+            "scan_label": "EIT-scanperiode (minuten)",
             "subtitle": "Als u vermeldingen gebruikt die door de zender zijn verzonden, bepalen deze opties hoe MythTV ernaar zoekt.",
             "timeout_desc": "Maximale tijd om te wachten (in minuten) op vermeldingsgegevens op een digitale tv-zender voordat wordt gecontroleerd op nieuwe vermeldingsgegevens op de volgende zender.",
             "timeout_label": "EIT-transporttime-out (minuten)",

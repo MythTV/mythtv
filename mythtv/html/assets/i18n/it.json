@@ -850,6 +850,8 @@
         "eit": {
             "crawl_desc": "Il numero minimo di secondi dopo che un registratore diventa inattivo per attendere prima che MythTV inizi a raccogliere i dati degli elenchi EIT.",
             "crawl_label": "Back-end inattivo prima della scansione EIT (sec)",
+            "scan_desc": "È necessario eseguire la scansione EIT su una scheda di acquisizione prima di passare alla scheda di acquisizione successiva nello stesso gruppo di input configurato per la scansione EIT. Ciò può accadere con più LNB satellitari collegati tramite uno switch DiSEqC.",
+            "scan_label": "Periodo di scansione EIT (minuti)",
             "subtitle": "Se stai utilizzando le liste trasmesse dalla stazione, queste opzioni definiscono come MythTV le cerca.",
             "timeout_desc": "Tempo massimo da trascorrere in attesa (in minuti) dei dati dei palinsesti su un canale TV digitale prima di verificare i nuovi dati dei palinsesti sul canale successivo.",
             "timeout_label": "Timeout trasporto EIT (minuti)",

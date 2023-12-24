@@ -850,6 +850,8 @@
         "eit": {
             "crawl_desc": "Vähimmäismäärä sekunteja sen jälkeen, kun tallennin on joutunut odottamaan ennen kuin MythTV alkaa kerätä EIT-listaustietoja.",
             "crawl_label": "Taustaohjelma käyttämättömänä ennen EIT-indeksointia (s)",
+            "scan_desc": "Aika tehdä EIT-skannaus yhdellä sieppauskortilla ennen siirtymistä seuraavaan sieppauskorttiin samassa tuloryhmässä, joka on määritetty EIT-skannausta varten. Tämä voi tapahtua useiden satelliitti-LNB:iden ollessa kytkettynä DiSEqC-kytkimen kautta.",
+            "scan_label": "EIT-skannausjakso (minuuttia)",
             "subtitle": "Jos käytät aseman lähettämiä luetteloita, nämä vaihtoehdot määrittävät, kuinka MythTV etsii niitä.",
             "timeout_desc": "Enimmäisaika, joka kuluu odottamaan (minuutteina) yhden digitaalitelevisiokanavan listaustietoja ennen kuin seuraavan kanavan tiedot tarkistetaan.",
             "timeout_label": "EIT:n kuljetuksen aikakatkaisu (minuuttia)",

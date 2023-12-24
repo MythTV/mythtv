@@ -850,6 +850,8 @@
         "eit": {
             "crawl_desc": "A minimális másodpercek száma azután, hogy a felvevő tétlenné válik, hogy várjon, mielőtt a MythTV elkezdi gyűjteni az EIT-adatokat.",
             "crawl_label": "A háttér tétlen az EIT feltérképezése előtt (másodperc)",
+            "scan_desc": "Ideje elvégezni az EIT szkennelést egy rögzítési kártyán, mielőtt a következő rögzítési kártyára lépne ugyanabban a bemeneti csoportban, amely az EIT szkenneléshez van konfigurálva. Ez megtörténhet több, DiSEqC kapcsolón keresztül csatlakoztatott műholdas vevőfejnél.",
+            "scan_label": "EIT vizsgálati időszak (perc)",
             "subtitle": "Ha az állomás által közvetített listákat használ, ezek az opciók határozzák meg, hogy a MythTV hogyan keressen rájuk.",
             "timeout_desc": "Maximális várakozási idő (percekben) az egyik digitális TV-csatorna listázási adataira, mielőtt a következő csatornán keresne új listázási adatokat.",
             "timeout_label": "EIT szállítási időtúllépés (perc)",

@@ -850,6 +850,8 @@
         "eit": {
             "crawl_desc": "Minimalna liczba sekund, po których rejestrator staje się bezczynny, zanim MythTV zacznie zbierać dane o listach EIT.",
             "crawl_label": "Backend bezczynny przed indeksowaniem EIT (s)",
+            "scan_desc": "Czas wykonać skanowanie EIT na jednej karcie przechwytującej przed przejściem do następnej karty przechwytującej w tej samej grupie wejściowej, która jest skonfigurowana do skanowania EIT. Może się to zdarzyć w przypadku wielu konwerterów satelitarnych podłączonych za pomocą przełącznika DiSEqC.",
+            "scan_label": "Okres skanowania EIT (w minutach)",
             "subtitle": "Jeśli korzystasz z list przekazywanych przez stację, te opcje określają, w jaki sposób MythTV je wyszukuje.",
             "timeout_desc": "Maksymalny czas oczekiwania (w minutach) na dane o listach jednego cyfrowego kanału telewizyjnego przed sprawdzeniem nowych danych o listach w następnym kanale.",
             "timeout_label": "Limit czasu transportu EIT (min)",

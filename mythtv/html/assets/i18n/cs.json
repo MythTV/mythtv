@@ -850,6 +850,8 @@
         "eit": {
             "crawl_desc": "Minimální počet sekund poté, co se rekordér stane nečinným, aby se čekalo, než MythTV začne shromažďovat data výpisů EIT.",
             "crawl_label": "Backend nečinný před procházením EIT (s)",
+            "scan_desc": "Je čas provést skenování EIT na jedné snímací kartě před přesunem na další snímací kartu ve stejné vstupní skupině, která je nakonfigurována pro skenování EIT. To se může stát u více satelitních LNB připojených přes DiSEqC přepínač.",
+            "scan_label": "Doba skenování EIT (min)",
             "subtitle": "Pokud používáte seznamy vysílané stanicí, tyto možnosti definují, jak je MythTV vyhledává.",
             "timeout_desc": "Maximální doba čekání (v minutách) na data výpisů na jednom digitálním televizním kanálu před kontrolou nových dat výpisů na dalším kanálu.",
             "timeout_label": "Časový limit přenosu EIT (min)",

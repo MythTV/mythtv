@@ -850,6 +850,8 @@
         "eit": {
             "crawl_desc": "MythTV'nin EIT listeleme verilerini toplamaya başlamasını beklemek için bir kayıt cihazının boşta kalmasından sonraki minimum saniye sayısı.",
             "crawl_label": "EIT taramasından önce arka uç boşta (sn)",
+            "scan_desc": "EIT taraması için yapılandırılmış aynı giriş grubundaki bir sonraki yakalama kartına geçmeden önce bir yakalama kartında EIT taraması yapma zamanı. Bu, DiSEqC anahtarıyla bağlanan birden fazla uydu LNB'de gerçekleşebilir.",
+            "scan_label": "EIT tarama süresi (dakika)",
             "subtitle": "İstasyon tarafından iletilen listeleri kullanıyorsanız, bu seçenekler MythTV'nin bunları nasıl arayacağını tanımlar.",
             "timeout_desc": "Bir sonraki kanalda yeni listeleme verilerini kontrol etmeden önce, bir dijital TV kanalındaki listeleme verilerini beklemek için harcanan maksimum süre (dakika olarak).",
             "timeout_label": "EIT aktarım zaman aşımı (dk)",
