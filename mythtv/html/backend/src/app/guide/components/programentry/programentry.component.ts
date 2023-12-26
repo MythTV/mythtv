@@ -17,11 +17,14 @@ export class ProgramEntryComponent implements OnInit {
   @Input() guideComponent!: GuideComponent;
 
   editSchedule: boolean = false;
+  catclass = "type_other";
 
   constructor(public dataService: DataService) {
   }
 
   ngOnInit(): void {
+    if (['series','tvshow','movie','sports'].includes(this.program.CatType))
+      this.catclass = 'type_' + this.program.CatType;
   }
 
   durationToWidth(): number {
