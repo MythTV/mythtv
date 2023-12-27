@@ -975,6 +975,13 @@ int DecoderBase::SetTrack(uint Type, int TrackNo)
     {
         m_wantedTrack[Type]   = m_tracks[Type][static_cast<size_t>(m_currentTrack[Type])];
         m_selectedTrack[Type] = m_tracks[Type][static_cast<size_t>(m_currentTrack[Type])];
+        if (Type == kTrackTypeSubtitle)
+        {
+            // Rechoose the associated forced track, preferring the same language
+            int forcedTrackIndex = BestTrack(Type, true, m_selectedTrack[Type].m_language);
+            if (m_tracks[Type][forcedTrackIndex].m_forced)
+                m_selectedForcedTrack[Type] = m_tracks[Type][forcedTrackIndex];
+        }
     }
 
     return m_currentTrack[Type];
@@ -1047,11 +1054,14 @@ bool DecoderBase::InsertTrack(uint Type, const StreamInfo &Info)
  * Whether to favor or disfavor forced is controlled by the second
  * parameter.
  *
+ * A preferredlanguage can be specified as third parameter, which
+ * will override the user's preferrence list.
+ *
  * This function must not be called without taking m_trackLock
  *
  *  \return the highest weighted track, or -1 if none.
 */
-int DecoderBase::BestTrack(uint Type, bool forcedPreferred)
+int DecoderBase::BestTrack(uint Type, bool forcedPreferred, int preferredLanguage)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Trying to select track (w/lang & %1forced)")
         .arg(forcedPreferred ? "" : "!"));
@@ -1068,6 +1078,10 @@ int DecoderBase::BestTrack(uint Type, bool forcedPreferred)
                         m_tracks[Type][i].m_forced);
         int position = static_cast<int>(numStreams) - static_cast<int>(i);
         int language = 0;
+        if (preferredLanguage != 0 && m_tracks[Type][i].m_language == preferredLanguage)
+        {
+            language = static_cast<int>(m_languagePreference.size()) + 1;
+        }
         for (uint j = 0; (language == 0) && (j < m_languagePreference.size()); ++j)
         {
             if (m_tracks[Type][i].m_language == m_languagePreference[j])
