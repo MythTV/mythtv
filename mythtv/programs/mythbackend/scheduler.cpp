@@ -3807,7 +3807,9 @@ void Scheduler::UpdateManuals(uint recordid)
             query.bindValue(":STARTTIME", startdt);
             query.bindValue(":ENDTIME", startdt.addSecs(duration));
             query.bindValue(":TITLE", title);
-            query.bindValue(":SUBTITLE", subtitle);
+            query.bindValue(":SUBTITLE",
+                            !subtitle.isEmpty() ? subtitle :
+                            MythDate::toString(startdt, MythDate::kDatabase | MythDate::kOverrideLocal));
             query.bindValue(":DESCRIPTION", description);
             query.bindValue(":SEASON", season);
             query.bindValue(":EPISODE", episode);
