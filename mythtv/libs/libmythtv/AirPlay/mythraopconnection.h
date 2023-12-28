@@ -10,6 +10,7 @@
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <openssl/aes.h>
+#include <openssl/err.h>
 
 #include "libmythtv/mythtvexp.h"
 
@@ -57,7 +58,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     int         GetDataPort() const { return m_dataPort; }
     bool        HasAudio()    { return m_audio;    }
     static QMap<QString,QString> decodeDMAP(const QByteArray &dmap);
-    static RSA *LoadKey(void);
+    static bool LoadKey(void);
     static QString RSALastError(void) { return g_rsaLastError; }
 
   private slots:
@@ -138,8 +139,14 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     QMap<uint16_t,std::chrono::milliseconds> m_resends;
     // crypto
     QByteArray      m_aesIV;
-    AES_KEY         m_aesKey              {};
-    static RSA     *g_rsa;
+    static EVP_PKEY      *g_devPrivKey;
+    std::vector<uint8_t>  m_sessionKey;
+#if OPENSSL_VERSION_NUMBER < 0x030000000L
+    const EVP_CIPHER     *m_cipher        {nullptr};
+#else
+    EVP_CIPHER           *m_cipher        {nullptr};
+#endif
+    EVP_CIPHER_CTX       *m_cctx          {nullptr};
     static QString  g_rsaLastError;
     // audio out
     AudioOutput    *m_audio               {nullptr};

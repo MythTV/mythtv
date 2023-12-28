@@ -1,35 +1,37 @@
 <div class="flex flex-column relative flex-auto">
     <div class="toolbar flex justify-content-between align-items-center pm-8 surface-section relative lg:static  surface-border"
-        style="height: 85px;">
+        style="height: 80px;" *ngIf="showTopBar else hidden">
         <div class="toolbar flex align-items-left flex-shrink-0" style="height: 80px;">
-            <a pRipple class="p-ripple p-element my-3 mx-1 flex align-items-center cursor-pointer p-3 lg:hidden lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors" (click)="toggleShowSidebar()">
+            <a pRipple class="p-ripple p-element my-3 mx-1 flex align-items-center cursor-pointer p-3 lg:hidden lg:justify-content-center
+                 hover:bg-gray-800 border-round text-300 hover:text-0
+                transition-duration-150 transition-colors" (click)="toggleShowSidebar()">
                 <i class="pi pi-bars mr-1 lg:ml-1 text-base lg:text-xl "></i>
                 <span class="p-ink" ng serve></span>
             </a>
             <img class="py-2 pl-1" src="images/mythtv.png" alt="Image" height="80">
             <div class="hidden md:inline-flex">
-                <h1>MythTV Backend</h1>
+                <h1>{{ 'navbar.mainheading' | translate }}</h1>
             </div>
         </div>
-
-        <div class="pr-2">
-            <a pRipple class="p-ripple p-element my-2 mx-2 flex align-items-center cursor-pointer p-3 md:hidden md:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors" (click)="toggleShowNavbar()">
+        <div class="toolbar flex flex-grow-1 align-items-end" style="height: 80px;">
+            <button pButton pRipple icon="pi pi-angle-up" class="p-button-text lg:col-offset-3 p-button-secondary"
+                (click)="showTopBar=false" pTooltip="{{ 'navbar.hide' | translate }}"></button>
+        </div>
+        <div class="pr-2 toolbar" style="height: 80px;">
+            <a pRipple style="height: 80px;" class="toolbar p-ripple p-element my-2 mx-2 flex align-items-center cursor-pointer p-3 md:hidden md:justify-content-center
+                 hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors"
+                (click)="toggleShowNavbar()">
                 <i class="pi pi-ellipsis-v mr-1 md:mr-0 text-base md:text-xl "></i>
                 <span class="p-ink" ng serve></span>
             </a>
-            <ul class="toolbar list-none p-0 m-0 md:flex md:align-items-center select-none md:flex-row surface-section border-1 md:border-none surface-border right-0 top-100 z-2 shadow-2 md:shadow-none absolute md:static" [hidden]="m_showNavbar">
-                <li>
-                    <a pRipple tooltipPosition="bottom" pTooltip="{{ 'navbar.switchServer' | translate }}"
-                        class="p-ripple p-element my-3 mx-1 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
-                        <i class="pi pi-server mr-2 md:mr-0 text-base md:text-xl"></i>
-                        <span class="font-medium inline md:hidden">{{ 'navbar.switchServer' | translate }}</span>
-                        <span class="p-ink"></span>
-                    </a>
-                </li>
-                <li>
+            <ul class="toolbar list-none p-0 m-0 md:flex md:align-items-center select-none md:flex-row surface-section border-1
+             md:border-none surface-border right-0 top-100 z-2 shadow-2 md:shadow-none absolute md:static"
+                [hidden]="m_showNavbar">
+                <li class="toolbar" style="height: 80px;">
                     <a pRipple tooltipPosition="bottom" pTooltip="{{ 'navbar.switchTheme' | translate }}"
                         (click)="themePanel.toggle($event)"
-                        class="p-ripple p-element my-3 mx-1 flex align-items-center cursor-pointer p-2 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
+                        class="p-ripple p-element my-3 mx-1 flex align-items-center cursor-pointer p-2 lg:justify-content-center
+                         hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
                         <div *ngIf="m_selectedTheme">
                             <img src="images/themes/{{m_selectedTheme.Image}}" class="mr-2 lg:mr-0"
                                 style="width: 32px; height: 32px;">
@@ -38,10 +40,11 @@
                         <span class="p-ink"></span>
                     </a>
                 </li>
-                <li>
+                <li class="toolbar" style="height: 80px;">
                     <a pRipple tooltipPosition="bottom" pTooltip="{{ 'navbar.changeLanguage' | translate }}"
                         (click)="languagePanel.toggle($event)"
-                        class="p-ripple p-element my-3 mx-1 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
+                        class="p-ripple p-element my-3 mx-1 flex align-items-center cursor-pointer p-3 lg:justify-content-center
+                         hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
                         <div *ngIf="m_selectedLanguage">
                             <img src="images/locale/{{m_selectedLanguage.Image}}" class="mr-2 lg:mr-0"
                                 style="width: 32px;">
@@ -50,17 +53,17 @@
                         <span class="p-ink"></span>
                     </a>
                 </li>
-                <li>
-                    <a pRipple tooltipPosition="bottom" pTooltip="{{ 'navbar.login' | translate }}"
-                        class="p-ripple p-element my-3 mx-1 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
-                        <i class="pi pi-sign-in mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                        <span class="font-medium inline md:hidden">{{ 'navbar.login' | translate }}</span>
-                        <span class="p-ink"></span>
-                    </a>
-                </li>
             </ul>
         </div>
     </div>
+
+    <ng-template #hidden>
+        <div class="toolbar block flex flex-grow-1 justify-content-center align-items-end " style="height: 2rem;">
+            <button pButton pRipple icon="pi pi-angle-down" class="p-button-text p-button-secondary"
+                (click)="showTopBar=true" pTooltip="{{ 'navbar.show' | translate }}"></button>
+        </div>
+    </ng-template>
+
 </div>
 
 <p-overlayPanel #themePanel [showCloseIcon]="true" [style]="{width: '350px'}">

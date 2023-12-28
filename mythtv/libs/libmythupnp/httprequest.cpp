@@ -332,7 +332,7 @@ qint64 HTTPRequest::SendResponse( void )
                 // Let SendResponseFile try or send a 404
                 m_eResponseType = ResponseTypeFile;
             }
-            [[clang::fallthrough]];
+            [[fallthrough]];
         case ResponseTypeFile: // Binary files
             LOG(VB_HTTP, LOG_INFO,
                 QString("HTTPRequest::SendResponse( File ) :%1 -> %2:")

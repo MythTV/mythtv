@@ -1,0 +1,71 @@
+<div class="block card w-full">
+    <h3>{{ 'settings.rprofiles.grouptitle' | translate }} {{ group.Name }}</h3>
+
+    <p-button label="{{ 'settings.rprofiles.new_profile' | translate }}" (onClick)="displayNewDialog = true"
+        icon="pi pi-plus-circle" styleClass="p-button-plain"></p-button>
+    <p-dialog header="{{ 'settings.rprofiles.new_profile' | translate }}" [(visible)]="displayNewDialog" [modal]="true"
+        [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
+        <p>{{ 'settings.rprofiles.enter_profile_name' | translate }}</p>
+        <input pInputText id="Name" [(ngModel)]="newProfileName" name="Name" #Name="ngModel"
+            class="mb-2 form-control w-full" autofocus />
+
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-times-circle" (onClick)="displayNewDialog=false"
+                label="{{ 'common.cancel' | translate }}" styleClass="p-button-plain">
+            </p-button>
+            <p-button icon="pi pi-check-circle" (onClick)="newProfile();" label="{{ 'common.ok' | translate }}"
+                styleClass="p-button-plain" [disabled]="rejectName()">
+            </p-button>
+        </ng-template>
+    </p-dialog>
+
+    <div class="grid nogutter">
+        <div class="col-12" *ngIf="this.expectedCount && this.successCount == this.expectedCount">
+            <br>
+            <p-message severity="success" text="{{ 'settings.common.successful_delete' | translate }}">
+            </p-message>
+            <br>
+        </div>
+        <div class="col-12" *ngIf="this.errorCount > 0">
+            <br>
+            <p-message severity="error" text="{{ 'common.networkfail' | translate }}">
+            </p-message>
+            <br>
+        </div>
+    </div>
+
+    <p-accordion class="col-12 w-full" (onClose)="onTabClose($event)" (onOpen)="onTabOpen($event)">
+        <p-accordionTab *ngFor="let profile of group.RecProfiles; index as ix; first as isFirst"
+            [disabled]="disabledTab[ix]" [(selected)]="activeTab[ix]">
+            <ng-template pTemplate="header">
+                <div class="grid  w-full">
+                    <div class="col-9 pr-1">
+                        {{ profile.Name }}
+                        <b>&nbsp;{{ dirtyMessages[ix] }}</b>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="content">
+                <p-button styleClass="p-button-warning" label="{{ 'settings.rprofiles.delete_this' | translate }}"
+                    icon="pi pi-trash" (onClick)="displayDeleteThis[ix]=true" [disabled]="!group.RecProfiles[ix].Id || setupService.schedulingEnabled">
+                </p-button>
+                <p-dialog header="{{ 'settings.rprofiles.delete_this' | translate }}"
+                    [(visible)]="displayDeleteThis[ix]" [modal]="true" [style]="{width: '50vw'}" [draggable]="false"
+                    [resizable]="false">
+                    <h2>{{ 'settings.common.ru_sure' | translate }}</h2>
+                    <p>{{ 'settings.rprofiles.delete_details' |
+                        translate: { ProfileName: group.RecProfiles[ix].Name,
+                        GroupName: group.Name } }}</p>
+                    <ng-template pTemplate="footer">
+                        <p-button icon="pi pi-times-circle" (click)="displayDeleteThis[ix]=false"
+                            label="{{ 'common.no' | translate }}" styleClass="p-button-plain">
+                        </p-button>
+                        <p-button icon="pi pi-check-circle" (click)="deleteThis(ix)"
+                            label="{{ 'common.yes' | translate }}" styleClass="p-button-plain"></p-button>
+                    </ng-template>
+                </p-dialog>
+                <app-recprofile [profile]="profile" [group]="group" [parentComponent]="this"></app-recprofile>
+            </ng-template>
+        </p-accordionTab>
+    </p-accordion>
+</div>

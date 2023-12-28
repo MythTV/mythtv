@@ -4,14 +4,6 @@
 #include "libmythbase/housekeeper.h"
 #include "libmythbase/mythsystemlegacy.h"
 
-class LogCleanerTask : public DailyHouseKeeperTask
-{
-  public:
-    LogCleanerTask(void) : DailyHouseKeeperTask("LogClean", kHKGlobal) {};
-    bool DoRun(void) override; // HouseKeeperTask
-};
-
-
 class CleanupTask : public DailyHouseKeeperTask
 {
   public:

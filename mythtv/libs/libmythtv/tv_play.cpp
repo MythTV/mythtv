@@ -2940,8 +2940,8 @@ bool TV::eventFilter(QObject* Object, QEvent* Event)
     if (MythGestureEvent::kEventType == Event->type())
         return m_ignoreKeyPresses ? false : event(Event);
 
-    if (Event->type() == MythEvent::MythEventMessage ||
-        Event->type() == MythEvent::MythUserMessage  ||
+    if (Event->type() == MythEvent::kMythEventMessage ||
+        Event->type() == MythEvent::kMythUserMessage  ||
         Event->type() == MythEvent::kUpdateTvProgressEventType ||
         Event->type() == MythMediaEvent::kEventType)
     {
@@ -3952,6 +3952,10 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
     else if (!IsDVDStillFrame && SeekHandleAction(Actions, IsDVD))
     {
     }
+    else if (IsActionable(ACTION_SELECT, Actions) && HasQueuedChannel())
+    {
+        CommitQueuedInput();
+    }
     else
     {
         handled = false;
@@ -4096,21 +4100,15 @@ bool TV::ActivePostQHandleAction(const QStringList &Actions)
 
     if (IsActionable(ACTION_SETBOOKMARK, Actions))
     {
-        if (!CommitQueuedInput())
-        {
-            m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-            SetBookmark(false);
-            m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        }
+        m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
+        SetBookmark(false);
+        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
     }
     if (IsActionable(ACTION_TOGGLEBOOKMARK, Actions))
     {
-        if (!CommitQueuedInput())
-        {
-            m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-            SetBookmark(m_player->GetBookmark() != 0U);
-            m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        }
+        m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
+        SetBookmark(m_player->GetBookmark() != 0U);
+        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
     }
     else if (IsActionable("NEXTFAV", Actions) && islivetv)
         ChangeChannel(CHANNEL_DIRECTION_FAVORITE);
@@ -7142,7 +7140,7 @@ void TV::customEvent(QEvent *Event)
         return;
     }
 
-    if (Event->type() == MythEvent::MythUserMessage)
+    if (Event->type() == MythEvent::kMythUserMessage)
     {
         auto *me = dynamic_cast<MythEvent*>(Event);
         if (me == nullptr)
@@ -7222,7 +7220,7 @@ void TV::customEvent(QEvent *Event)
         return;
     }
 
-    if (Event->type() != MythEvent::MythEventMessage)
+    if (Event->type() != MythEvent::kMythEventMessage)
         return;
 
     uint cardnum   = 0;
@@ -9277,7 +9275,7 @@ void TV::FillOSDMenuJumpRec(const QString &Category, int Level, const QString &S
             auto progIndex = static_cast<uint>(plist.size());
             const QString& group = Iprog.key();
 
-            if (plist[0]->GetRecordingGroup() != currecgroup)
+            if (plist[0] && (plist[0]->GetRecordingGroup() != currecgroup))
                 SetLastProgram(plist[0]);
 
             if (progIndex == 1 && Level == 0)

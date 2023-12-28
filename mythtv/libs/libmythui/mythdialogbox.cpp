@@ -24,7 +24,7 @@
 #include "mythuispinbox.h"
 #include "mythgesture.h"
 
-QEvent::Type DialogCompletionEvent::kEventType =
+const QEvent::Type DialogCompletionEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 // Force this class to have a vtable so that dynamic_cast works.
@@ -468,14 +468,13 @@ bool MythConfirmationDialog::Create(void)
         return false;
     }
 
-    if (m_showCancel)
-    {
+    if (cancelButton && m_showCancel)
         connect(cancelButton, &MythUIButton::Clicked, this, &MythConfirmationDialog::Cancel);
-    }
-    else
+    else if (cancelButton)
         cancelButton->SetVisible(false);
 
-    connect(okButton, &MythUIButton::Clicked, this, &MythConfirmationDialog::Confirm);
+    if (okButton)
+        connect(okButton, &MythUIButton::Clicked, this, &MythConfirmationDialog::Confirm);
 
     m_messageText->SetText(m_message);
 
@@ -639,13 +638,15 @@ bool MythTextInputDialog::Create(void)
 
     if (cancelButton)
         connect(cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
-    connect(okButton, &MythUIButton::Clicked, this, &MythTextInputDialog::sendResult);
+    if (okButton)
+        connect(okButton, &MythUIButton::Clicked, this, &MythTextInputDialog::sendResult);
 
     m_textEdit->SetFilter(m_filter);
     m_textEdit->SetText(m_defaultValue);
     m_textEdit->SetPassword(m_isPassword);
 
-    messageText->SetText(m_message);
+    if (messageText)
+        messageText->SetText(m_message);
 
     BuildFocusList();
 
@@ -706,9 +707,11 @@ bool MythSpinBoxDialog::Create(void)
 
     if (cancelButton)
         connect(cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
-    connect(okButton, &MythUIButton::Clicked, this, &MythSpinBoxDialog::sendResult);
+    if (okButton)
+        connect(okButton, &MythUIButton::Clicked, this, &MythSpinBoxDialog::sendResult);
 
-    messageText->SetText(m_message);
+    if (messageText)
+        messageText->SetText(m_message);
     BuildFocusList();
 
     return true;
@@ -771,42 +774,6 @@ void MythSpinBoxDialog::sendResult()
 
 /////////////////////////////////////////////////////////////////////
 
-
-/** \fn MythUISearchDialog::MythUISearchDialog(MythScreenStack*,
-                                   const QString&,
-                                   const QStringList&,
-                                   bool  matchAnywhere,
-                                   const QString&)
- *  \brief the classes constructor
- *  \param parent the MythScreenStack this widget belongs to
- *  \param title  the text to show as the title
- *  \param list   the list of text strings to search
- *  \param matchAnywhere if true will match the input text anywhere in the string.
-                         if false will match only strings that start with the input text.
-                         Default is false.
- *  \param defaultValue  The initial value for the input text. Default is ""
- */
-MythUISearchDialog::MythUISearchDialog(MythScreenStack *parent,
-                                   const QString &title,
-                                   const QStringList &list,
-                                   bool  matchAnywhere,
-                                   const QString &defaultValue)
-                : MythScreenType(parent, "mythsearchdialogpopup")
-{
-    m_list = list;
-    m_matchAnywhere = matchAnywhere;
-    m_title = title;
-    m_defaultValue = defaultValue;
-
-    m_titleText = nullptr;
-    m_matchesText = nullptr;
-    m_textEdit = nullptr;
-    m_itemList = nullptr;
-
-    m_id = "";
-    m_retObject = nullptr;
-}
-
 bool MythUISearchDialog::Create(void)
 {
     if (!CopyWindowFromBase("MythSearchDialog", this))
@@ -832,7 +799,8 @@ bool MythUISearchDialog::Create(void)
     if (cancelButton)
         connect(cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
-    connect(okButton, &MythUIButton::Clicked, this, &MythUISearchDialog::slotSendResult);
+    if (okButton)
+        connect(okButton, &MythUIButton::Clicked, this, &MythUISearchDialog::slotSendResult);
 
     connect(m_itemList, &MythUIButtonList::itemClicked,
             this, &MythUISearchDialog::slotSendResult);
@@ -1042,7 +1010,8 @@ bool MythTimeInputDialog::Create()
     if (messageText && !m_message.isEmpty())
         messageText->SetText(m_message);
 
-    connect(okButton, &MythUIButton::Clicked, this, &MythTimeInputDialog::okClicked);
+    if (okButton)
+        connect(okButton, &MythUIButton::Clicked, this, &MythTimeInputDialog::okClicked);
 
     BuildFocusList();
 

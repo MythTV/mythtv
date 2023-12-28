@@ -10,20 +10,11 @@
 
 class EncoderLink;
 class AutoExpire;
-class Scheduler;
-class JobQueue;
-class HouseKeeper;
-class MediaServer;
 class BackendContext;
 
 extern QMap<int, EncoderLink *> gTVList;
 extern AutoExpire  *gExpirer;
-extern JobQueue    *gJobQueue;
-extern HouseKeeper *gHousekeeping;
-extern MediaServer *g_pUPnp;
 extern BackendContext *gBackendContext;
-extern QString      gPidFile;
-extern MythSystemEventHandler *gSysEventHandler;
 
 class Frontend
 {

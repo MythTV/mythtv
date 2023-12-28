@@ -4,22 +4,22 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnews/main.cpp" line="42"/>
+        <location filename="../mythnews/libmythnews.cpp" line="42"/>
         <source>RSS News feed reader</source>
         <translation>RSS nyhedsfeed læser</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="46"/>
+        <location filename="../mythnews/libmythnews.cpp" line="46"/>
         <source>Update news items</source>
         <translation>Opdater nyheder</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="48"/>
+        <location filename="../mythnews/libmythnews.cpp" line="48"/>
         <source>Force update news items</source>
         <translation>Gennemtving opdatering af nyheder</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="50"/>
+        <location filename="../mythnews/libmythnews.cpp" line="50"/>
         <source>Cancel news item updating</source>
         <translation>Annuller nyhedsopdateringen</translation>
     </message>
@@ -42,32 +42,32 @@
         <translation>Du har ikke konfigureret MythNews til at bruge nogen nyhedskilder.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="538"/>
+        <location filename="../mythnews/mythnews.cpp" line="515"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Der er ikke opsat nogen browser kommando! MythNews kræver at MythBrowser er installeret.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="627"/>
+        <location filename="../mythnews/mythnews.cpp" line="604"/>
         <source>Manage Feeds</source>
         <translation>Administrer feeds</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="628"/>
+        <location filename="../mythnews/mythnews.cpp" line="605"/>
         <source>Add Feed</source>
         <translation>Tilføj feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="631"/>
+        <location filename="../mythnews/mythnews.cpp" line="608"/>
         <source>Edit Feed</source>
         <translation>Rediger feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="632"/>
+        <location filename="../mythnews/mythnews.cpp" line="609"/>
         <source>Delete Feed</source>
         <translation>Slet feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="614"/>
+        <location filename="../mythnews/mythnews.cpp" line="591"/>
         <source>Options</source>
         <translation>Indstillinger</translation>
     </message>

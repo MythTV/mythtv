@@ -7,6 +7,7 @@
 
 // Qt headers
 #include <QFile>
+#include <QRegularExpression>
 #include <QTextStream>
 
 // MythTV headers
@@ -122,6 +123,8 @@ void ExternRecChannelScanner::run(void)
     QString callsign;
     QString xmltvid;
     QString icon;
+    int     atsc_major = 0;
+    int     atsc_minor = 0;
     int     cnt = 0;
 
     if (!fetch.FirstChannel(channum, name, callsign, xmltvid, icon))
@@ -140,6 +143,19 @@ void ExternRecChannelScanner::run(void)
     for (;;)
     {
         QString msg = tr("Channel #%1 : %2").arg(channum, name);
+        QStringList digits = channum.split(QRegularExpression("\\D+"));
+
+        if (digits.size() > 1)
+        {
+            atsc_major = digits.at(0).toInt();
+            atsc_minor = digits.at(1).toInt();
+            LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+                QString("ATSC: %1.%2").arg(atsc_major).arg(atsc_minor));
+        }
+        else
+        {
+            atsc_major = atsc_minor = 0;
+        }
 
         LOG(VB_CHANNEL, LOG_INFO, QString("Handling channel %1 %2")
             .arg(channum, name));
@@ -156,7 +172,7 @@ void ExternRecChannelScanner::run(void)
 
             chanid = ChannelUtil::CreateChanID(m_sourceId, channum);
             ChannelUtil::CreateChannel(0, m_sourceId, chanid, callsign, name,
-                                       channum, 1, 0, 0,
+                                       channum, 1, atsc_major, atsc_minor,
                                        false, kChannelVisible, QString(),
                                        icon, "Default", xmltvid);
         }
@@ -166,7 +182,7 @@ void ExternRecChannelScanner::run(void)
                 m_scanMonitor->ScanAppendTextToLog(tr("Updating %1").arg(msg));
 
             ChannelUtil::UpdateChannel(0, m_sourceId, chanid, callsign, name,
-                                       channum, 1, 0, 0,
+                                       channum, 1, atsc_major, atsc_minor,
                                        false, kChannelVisible, QString(),
                                        icon, "Default", xmltvid);
         }

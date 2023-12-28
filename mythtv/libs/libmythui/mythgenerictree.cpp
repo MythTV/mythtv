@@ -59,14 +59,13 @@ class SortableMythGenericTreeList : public QList<MythGenericTree*>
 
 ///////////////////////////////////////////////////////
 
-MythGenericTree::MythGenericTree(const QString &a_string, int an_int,
+MythGenericTree::MythGenericTree(QString a_string, int an_int,
                          bool selectable_flag)
+    : m_text(std::move(a_string)),
+      m_int(an_int),
+      m_selectable(selectable_flag)
 {
     m_subnodes = new SortableMythGenericTreeList;
-
-    m_text = a_string;
-    m_int = an_int;
-    m_selectable = selectable_flag;
 
     ensureSortFields();
 }

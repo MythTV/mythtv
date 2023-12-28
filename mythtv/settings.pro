@@ -1,3 +1,5 @@
+include (settings2.pro)
+
 win32-msvc* {
 
   SRC_PATH_BARE = $$(SRC_PATH_BARE)
@@ -25,9 +27,6 @@ win32-msvc* {
   include ( config.mak )
 }
 
-contains(QT_MAJOR_VERSION, 6) {
-QT += core5compat
-}
 CONFIG += $$CCONFIG
 CONFIG += c++17
 CONFIG += no_qt_rpath
@@ -79,9 +78,6 @@ isEmpty( LIBDIRNAME ) {
 isEmpty( LIBDIR ) {
     LIBDIR = $${RUNPREFIX}/$${LIBDIRNAME}
 }
-
-LIBVERSION = 33
-VERSION = 33.0
 
 # Die on the (common) case where OS X users inadvertently use Fink's
 # Qt/X11 install instead of Qt/Mac. '

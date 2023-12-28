@@ -43,6 +43,6 @@ class PROTOSERVER_PUBLIC DeleteHandler : public ReferenceCounter
 
 };
 
-QString GetPlaybackURL(ProgramInfo *pginfo, bool storePath = true);
+PROTOSERVER_PUBLIC QString GetPlaybackURL(ProgramInfo *pginfo, bool storePath = true);
 
 #endif

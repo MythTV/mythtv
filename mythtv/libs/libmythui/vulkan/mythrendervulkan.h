@@ -1,10 +1,13 @@
 #ifndef MYTHRENDERVULKAN_H
 #define MYTHRENDERVULKAN_H
 
+// C++
+#include <array>
+#include <optional>
+
 // Qt
 #include <QVulkanWindowRenderer>
 #include <QVulkanDeviceFunctions>
-#include <optional>
 
 // MythTV
 #include "libmythui/mythuiexp.h"

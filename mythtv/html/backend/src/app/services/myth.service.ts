@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams} from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import {
   MythHostName,
   MythTimeZone,
@@ -135,8 +135,11 @@ export class MythService {
   }
 
   public PutSetting(setting: PutSettingRequest) : Observable<BoolResponse> {
-    console.log(setting);
     return this.httpClient.post<BoolResponse>('/Myth/PutSetting', setting)
+  }
+
+  public DeleteSetting(setting: {HostName: string, Key: string}) : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Myth/DeleteSetting', setting)
   }
 
   public RemoveStorageGroupDir(request: RemoveStorageGroupRequest) : Observable<BoolResponse> {
@@ -144,12 +147,19 @@ export class MythService {
   }
 
   public SetConnectionInfo(data: Database) : Observable<BoolResponse> {
-    console.log("SetConnectionInfo :-" + data.Name);
     return this.httpClient.post<BoolResponse>('/Myth/SetConnectionInfo', data)
   }
 
   public TestDBSettings(request : TestDBSettingsRequest) : Observable<BoolResponse> {
     return this.httpClient.post<BoolResponse>('/Myth/TestDBSettings', request);
+  }
+
+  public ManageScheduler(request: {Enable?: boolean, Disable?: boolean}) : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Myth/ManageScheduler', request);
+  }
+
+  public Shutdown(request: {Retcode?: number, Restart?: boolean}) : Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Myth/Shutdown', request);
   }
 
 }

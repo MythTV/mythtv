@@ -19,6 +19,8 @@
  */
 #include "io/mythavformatwriter.h"
 
+#include <limits> // workaround QTBUG-90395
+
 #include <QtGlobal>
 #include <QtEndian>
 

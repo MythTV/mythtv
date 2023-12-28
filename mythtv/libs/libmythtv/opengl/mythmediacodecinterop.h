@@ -4,7 +4,14 @@
 // Qt
 #include <QMutex>
 #include <QWaitCondition>
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QtAndroidExtras>
+#else
+#include <QJniEnvironment>
+#include <QJniObject>
+#define QAndroidJniEnvironment QJniEnvironment
+#define QAndroidJniObject QJniObject
+#endif
 
 // MythTV
 #include "mythopenglinterop.h"

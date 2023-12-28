@@ -324,10 +324,8 @@ bool BookmarkManager::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void BookmarkManager::slotGroupSelected(MythUIButtonListItem *item)
+void BookmarkManager::slotGroupSelected([[maybe_unused]] MythUIButtonListItem *item)
 {
-    (void) item;
-
     UpdateURLList();
     m_bookmarkList->Refresh();
 }

@@ -1,0 +1,85 @@
+<form class="ml-3 mr-3" name="hdpvrform" #dvbform="ngForm">
+    <span #top></span>
+    <p-card class="m-5">
+        <ng-template pTemplate="title">
+            {{ 'settings.capture.hdpvr.title' | translate }}
+        </ng-template>
+        <ng-template pTemplate="subtitle">
+        </ng-template>
+        <ng-template pTemplate="content">
+            <div class="grid">
+                <div class="mb-4 w-full">
+
+                    <div class="form-group field">
+                        <label for="VideoDevice" class="label block">{{ 'settings.capture.v4l2.device_label' | translate
+                            }}</label>
+                        <p-dropdown *ngIf="isReady" [options]="captureDeviceList.CaptureDeviceList.CaptureDevices"
+                            [(ngModel)]="currentDevice" [editable]="false" optionLabel="VideoDevice"
+                            (onChange)="updateDevice();" [maxlength]="0" [style]="{'minWidth':'80%'}" name="VideoDevice"
+                            #VideoDevice="ngModel">
+                        </p-dropdown>
+                        <div *ngIf="warningMessage">
+                            <small class="p-error block">
+                                {{ warningMessage }}
+                            </small>
+                        </div>
+                        <small class="block">
+                            {{ 'settings.capture.device_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="FrontendName" class="label block">{{ 'settings.capture.v4l2.frontend_label' | translate
+                            }}</label>
+                        <input pInputText id="FrontendName" *ngIf="isReady"
+                            [(ngModel)]="currentDevice.FrontendName" name="FrontendName" disabled="true"
+                            #FrontendName="ngModel" class="mb-2 form-control w-full" />
+                        <small class="block">
+                            {{ 'settings.capture.frontend_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="AudioDevice" class="label block">{{ 'settings.capture.hdpvr.audiodevice_label' | translate
+                            }}</label>
+                        <p-dropdown *ngIf="isReady" [options]="currentDevice.AudioDevices"
+                            [(ngModel)]="card.AudioDevice" [editable]="false"
+                            [maxlength]="0" [style]="{'minWidth':'80%'}" name="AudioDevice"
+                            #AudioDevice="ngModel">
+                        </p-dropdown>
+                        <small class="block">
+                            {{ 'settings.capture.hdpvr.audiodevice_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="ChannelTimeout" class="label block">{{ 'settings.capture.tunetimeout_label' | translate
+                            }}</label>
+                        <p-inputNumber [(ngModel)]="card.ChannelTimeout" name="ChannelTimeout" id="ChannelTimeout"
+                            [showButtons]="true" [min]="2000" [max]="65000" [step]="250"></p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.capture.tunetimeout_desc' | translate }}
+                        </small>
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+            <div class="grid nogutter">
+                <div class="col-12">
+                    <p-message *ngIf="this.successCount > 0 && this.errorCount == 0 && !dvbform.dirty"
+                        severity="success" text="{{ 'common.savesuccess' | translate }}"></p-message>
+                    <p-message *ngIf="this.errorCount > 0" severity="error"
+                        text="{{ 'common.networkfail' | translate }}"></p-message>
+                </div>
+                <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
+                    (onClick)="saveForm(); dvbform.form.markAsPristine()"
+                    [disabled]="!dvbform.dirty || !card.VideoDevice || setupService.schedulingEnabled"></p-button>
+            </div>
+        </ng-template>
+
+
+    </p-card>
+</form>

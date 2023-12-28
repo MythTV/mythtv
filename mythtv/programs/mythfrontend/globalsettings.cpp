@@ -17,7 +17,6 @@
 #include <QFileInfo>
 #include <QFontDatabase>
 #include <QImage>
-#include <QTextCodec>
 #include <QtGlobal>
 
 // MythTV headers
@@ -31,6 +30,7 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythpower.h"
 #include "libmythbase/mythsorthelper.h"
+#include "libmythbase/mythsystem.h"
 #include "libmythbase/mythtranslation.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/channelgroup.h"
@@ -1326,6 +1326,8 @@ void PlaybackProfileConfig::ReloadSettings(void)
     setChanged(true);
 }
 
+// This function doesn't guarantee that no exceptions will be thrown.
+// NOLINTNEXTLINE(performance-noexcept-swap)
 void PlaybackProfileConfig::swap(int indexA, int indexB)
 {
     for (PlaybackProfileItemConfig *profile : qAsConst(m_profiles))
@@ -1570,11 +1572,27 @@ static HostComboBoxSetting *DecodeVBIFormat()
 
 static HostComboBoxSetting *SubtitleCodec()
 {
+    static const QRegularExpression crlf { "[\r\n]" };
+    static const QRegularExpression suffix { "(//.*)" };
+
     auto *gc = new HostComboBoxSetting("SubtitleCodec");
 
     gc->setLabel(OSDSettings::tr("Subtitle Codec"));
 
-    QList<QByteArray> list = QTextCodec::availableCodecs();
+    // Translations are now done via FFmpeg(iconv).  Get the list of
+    // encodings that iconv supports.
+    QScopedPointer<MythSystem>
+        cmd(MythSystem::Create({"iconv", "-l"},
+                               kMSStdOut | kMSDontDisableDrawing));
+    cmd->Wait();
+    QString results = cmd->GetStandardOutputStream()->readAll();
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+    QStringList list = results.toLower().split(crlf, QString::SkipEmptyParts);
+#else
+    QStringList list = results.toLower().split(crlf, Qt::SkipEmptyParts);
+#endif
+    list.replaceInStrings(suffix, "");
+    list.sort();
 
     for (const auto & codec : qAsConst(list))
     {
@@ -2149,6 +2167,7 @@ static HostComboBoxSetting *ScreenAspectRatio()
     gc->addSelection(AppearanceSettings::tr("32:10 (16:10 Side by side)"),    "3.2");
     gc->addSelection(AppearanceSettings::tr("16:20 (16:10 Above and below)"), "0.8");
     gc->setHelpText(AppearanceSettings::tr(
+            "This setting applies to video playback only, not to the GUI. "
             "Most modern displays have square pixels and the aspect ratio of the screen can be "
             "computed from the resolution (default). "
             "The aspect ratio can also be automatically detected from the connected display "
@@ -2291,6 +2310,21 @@ static HostCheckBoxSetting *GuiSizeForTV()
 
     gc->setHelpText(AppearanceSettings::tr("If enabled, use the above size for "
                                            "TV, otherwise use full screen."));
+    return gc;
+}
+
+static HostCheckBoxSetting *ForceFullScreen()
+{
+    auto *gc = new HostCheckBoxSetting("ForceFullScreen");
+
+    gc->setLabel(AppearanceSettings::tr("Force Full Screen for GUI and TV playback"));
+
+    gc->setValue(false);
+
+    gc->setHelpText(AppearanceSettings::tr(
+        "Use Full Screen for GUI and TV playback independent of the settings for "
+        "the GUI dimensions. This does not change the values of the GUI dimensions "
+        "so it is easy to switch from window mode to full screen and back."));
     return gc;
 }
 
@@ -2621,6 +2655,19 @@ static HostCheckBoxSetting *AlwaysOnTop()
     return gc;
 }
 
+static HostCheckBoxSetting *SmoothTransitions()
+{
+    auto *gc = new HostCheckBoxSetting("SmoothTransitions");
+
+    gc->setLabel(AppearanceSettings::tr("Smooth Transitions"));
+
+    gc->setValue(true);
+
+    gc->setHelpText(AppearanceSettings::tr("Enable smooth transitions with fade-in and fade-out of menu pages and enable GUI animations. "
+                                           "Disabling this can make the GUI respond faster especially on low-powered machines."));
+    return gc;
+}
+
 static HostSpinBoxSetting *StartupScreenDelay()
 {
     auto *gs = new HostSpinBoxSetting("StartupScreenDelay", -1, 60, 1, 1,
@@ -2938,6 +2985,19 @@ static GlobalTextEditSetting *SortPrefixExceptions()
                         "the common prefixes (The, A, An) from a title or "
                         "filename.   Enter multiple names separated by "
                         "semicolons."));
+    return gc;
+}
+
+static GlobalComboBoxSetting *ManualRecordStartChanType()
+{
+    auto *gc = new GlobalComboBoxSetting("ManualRecordStartChanType");
+
+    gc->setLabel(GeneralSettings::tr("Starting channel for Manual Record"));
+    gc->addSelection(GeneralSettings::tr("Guide Starting Channel"), "1", true);
+    gc->addSelection(GeneralSettings::tr("Last Manual Record Channel"), "2");
+    gc->setHelpText(GeneralSettings::tr(
+                        "When entering a new Manual Record Rule, "
+                        "the starting channel will default to this."));
     return gc;
 }
 
@@ -4121,6 +4181,7 @@ MainGeneralSettings::MainGeneralSettings()
         general->addChild(stripPrefixes);
         stripPrefixes->addTargetedChild("1", SortPrefixExceptions());
     }
+    general->addChild(ManualRecordStartChanType());
     addChild(general);
 
     addChild(EnableMediaMon());
@@ -4675,6 +4736,7 @@ AppearanceSettings::AppearanceSettings()
     PopulateScreens(MythDisplay::GetScreenCount());
     connect(m_display, &MythDisplay::ScreenCountChanged, this, &AppearanceSettings::PopulateScreens);
 
+    screen->addChild(ForceFullScreen());
     screen->addChild(new GuiDimension());
 
     screen->addChild(GuiSizeForTV());
@@ -4684,6 +4746,7 @@ AppearanceSettings::AppearanceSettings()
         screen->addChild(RunInWindow());
         screen->addChild(AlwaysOnTop());
     }
+    screen->addChild(SmoothTransitions());
     screen->addChild(StartupScreenDelay());
     screen->addChild(GUIFontZoom());
 #ifdef USING_AIRPLAY

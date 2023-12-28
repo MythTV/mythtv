@@ -19,44 +19,27 @@ void MythBackendCommandLineParser::LoadArguments(void)
     addPIDFile();
 
     CommandLineArg::AllowOneOf(QList<CommandLineArg*>()
+         << add("--pidfile", "pidfile", "",
+                "Filename to save the application pid.", "")
          << add("--printsched", "printsched", false,
                 "Print upcoming list of scheduled recordings.", "")
 //                    ->SetDeprecated("use mythutil instead")
          << add("--testsched", "testsched", false,
                 "do some scheduler testing.", "")
 //                    ->SetDeprecated("use mythutil instead")
-         << add("--resched", "resched", false,
-                "Trigger a run of the recording scheduler on the existing "
-                "master backend.",
-                "This command will connect to the master backend and trigger "
-                "a run of the recording scheduler. The call will return "
-                "immediately, however the scheduler run may take several "
-                "seconds to a minute or longer to complete.")
-                    ->SetDeprecated("use mythutil instead")
-         << add("--scanvideos", "scanvideos", false,
-                "Trigger a rescan of media content in MythVideo.",
-                "This command will connect to the master backend and trigger "
-                "a run of the Video scanner. The call will return "
-                "immediately, however the scanner may take several seconds "
-                "to tens of minutes, depending on how much new or moved "
-                "content it has to hash, and how quickly the scanner can "
-                "access those files to do so. If enabled, this will also "
-                "trigger the bulk metadata scanner upon completion.")
-                    ->SetDeprecated("use mythutil instead")
-         << add("--event", "event", "",
-                "Send a backend event test message.", "")
-                    ->SetDeprecated("use mythutil instead")
-         << add("--systemevent", "systemevent", "",
-                "Send a backend SYSTEM_EVENT test message.", "")
-                    ->SetDeprecated("use mythutil instead")
-         << add("--clearcache", "clearcache", false,
-                "Trigger a cache clear on all connected MythTV systems.",
-                "This command will connect to the master backend and trigger "
-                "a cache clear event, which will subsequently be pushed to "
-                "all other connected programs. This event will clear the "
-                "local database settings cache used by each program, causing "
-                "options to be re-read from the database upon next use.")
-                    ->SetDeprecated("use mythutil instead")
+         << add("--resched", "resched", false, "", "")
+                    ->SetRemoved("mythbackend is no longer used to trigger\n"
+                       "          rescheduling. Please use mythutil.", "34")
+         << add("--scanvideos", "scanvideos", false,"", "")
+                    ->SetRemoved("mythbackend is no longer used to trigger\n"
+                       "          scanning media content. Please use mythutil.", "34")
+         << add("--event", "event", "", "", "")
+                    ->SetRemoved("mythbackend is no longer used send an event.", "34")
+         << add("--systemevent", "systemevent", "", "", "")
+                    ->SetRemoved("mythbackend is no longer used send a SYSTEM_EVENT.", "34")
+         << add("--clearcache", "clearcache", false, "", "")
+                    ->SetRemoved("mythbackend is no longer used to clear\n"
+                       "          the database caches. Please use mythutil.", "34")
          << add("--printexpire", "printexpire", "ALL",
                 "Print upcoming list of recordings to be expired.", "")
 //                    ->SetDeprecated("use mythutil instead")
@@ -68,6 +51,12 @@ void MythBackendCommandLineParser::LoadArguments(void)
 //                    ->SetDeprecated("use mythutil instead");
     );
 
+    add("--webonly", "webonly", false, "Start in web-server-only mode.",
+            "Start the backend in web server mode, where only the "
+            "web server is running. "
+            "This is only for use when the backend crashes due "
+            " to an invalid configuration, and you need to use setup "
+            "to rectify it. Scheduler is disabled in this mode.");
     add("--nosched", "nosched", false, "",
             "Intended for debugging use only, disable the scheduler "
             "on this backend if it is the master backend, preventing "

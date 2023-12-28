@@ -1,0 +1,10 @@
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
+# If MYTHTV_VERSION_LIST needs to be changed, be sure to     #
+# test with the new back/frontend version. If you're just    #
+# getting data, no harm will be done. But if you Add/Delete/ #
+# Update anything, then all bets are off! Anything requiring #
+# an HTTP POST is potentially dangerous.                     #
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
+
+MYTHTV_VERSION_LIST = @MYTHTV_PYTHON_VERSION_LIST@
+

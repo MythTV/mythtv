@@ -49,7 +49,7 @@ SOURCES += internetContent.cpp mythbackend_main_helpers.cpp backendcontext.cpp
 SOURCES += httpconfig.cpp mythsettings.cpp mythbackend_commandlineparser.cpp
 SOURCES += recordingextender.cpp
 
-SOURCES += services/myth.cpp services/guide.cpp services/content.cpp 
+SOURCES += services/myth.cpp services/guide.cpp services/content.cpp
 SOURCES += services/dvr.cpp services/channel.cpp services/video.cpp
 SOURCES += services/serviceUtil.cpp services/capture.cpp
 SOURCES += services/image.cpp services/music.cpp
@@ -73,7 +73,7 @@ HEADERS += servicesv2/v2videoStreamInfo.h servicesv2/v2videoStreamInfoList.h
 HEADERS += servicesv2/v2blurayInfo.h
 HEADERS += servicesv2/v2country.h servicesv2/v2countryList.h
 HEADERS += servicesv2/v2language.h servicesv2/v2languageList.h
-HEADERS += servicesv2/v2databaseStatus.h
+HEADERS += servicesv2/v2databaseStatus.h servicesv2/v2systemEventList.h
 
 
 HEADERS += servicesv2/v2dvr.h servicesv2/v2recording.h
@@ -90,7 +90,8 @@ HEADERS += servicesv2/v2titleInfo.h servicesv2/v2titleInfoList.h
 HEADERS += servicesv2/v2recRuleList.h
 HEADERS += servicesv2/v2content.h
 HEADERS += servicesv2/v2guide.h servicesv2/v2programGuide.h
-HEADERS += servicesv2/v2channel.h
+HEADERS += servicesv2/v2channel.h servicesv2/v2channelScan.h
+HEADERS += servicesv2/v2commMethod.h
 HEADERS += servicesv2/v2channelInfoList.h servicesv2/v2lineup.h
 HEADERS += servicesv2/v2videoSource.h servicesv2/v2videoSourceList.h
 HEADERS += servicesv2/v2videoMultiplex.h servicesv2/v2videoMultiplexList.h
@@ -98,6 +99,7 @@ HEADERS += servicesv2/v2status.h
 HEADERS += servicesv2/preformat.h servicesv2/v2backendStatus.h
 HEADERS += servicesv2/v2capture.h
 HEADERS += servicesv2/v2captureCard.h servicesv2/v2captureCardList.h
+HEADERS += servicesv2/v2recordingProfile.h
 HEADERS += servicesv2/v2music.h
 HEADERS += servicesv2/v2musicMetadataInfo.h servicesv2/v2musicMetadataInfoList.h
 HEADERS += servicesv2/v2config.h

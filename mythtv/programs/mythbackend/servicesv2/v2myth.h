@@ -31,6 +31,7 @@ class V2Myth : public MythHTTPService
     Q_CLASSINFO( "ParseISODateString",    "methods=GET"                 )
     Q_CLASSINFO( "GetSetting",            "methods=GET;name=String"     )
     Q_CLASSINFO( "PutSetting",            "methods=POST"                )
+    Q_CLASSINFO( "DeleteSetting",         "methods=POST"                )
     Q_CLASSINFO( "TestDBSettings",        "methods=POST"                )
     Q_CLASSINFO( "SendMessage",           "methods=POST"                )
     Q_CLASSINFO( "SendNotification",      "methods=POST"                )
@@ -45,6 +46,8 @@ class V2Myth : public MythHTTPService
     Q_CLASSINFO( "ManageDigestUser",      "methods=POST"                )
     Q_CLASSINFO( "ManageUrlProtection",   "methods=POST"                )
     Q_CLASSINFO( "SetConnectionInfo",     "methods=POST"                )
+    Q_CLASSINFO("ManageScheduler",        "methods=POST")
+    Q_CLASSINFO("Shutdown",               "methods=POST")
 
 
   public:
@@ -114,9 +117,13 @@ class V2Myth : public MythHTTPService
                                               const QString   &Key,
                                               const QString   &Default );
     static V2SettingList* GetSettingList    ( const QString   &HostName );
+
     static bool           PutSetting        ( const QString   &HostName,
                                               const QString   &Key,
                                               const QString   &Value   );
+
+    static bool           DeleteSetting     ( const QString   &HostName,
+                                              const QString   &Key);
 
     static bool         TestDBSettings      ( const QString &HostName,
                                               const QString &UserName,
@@ -171,6 +178,11 @@ class V2Myth : public MythHTTPService
 
     static bool         ManageUrlProtection ( const QString &Services,
                                               const QString &AdminPassword );
+
+    static bool         ManageScheduler    ( bool Enable,
+                                              bool Disable );
+
+    static bool         Shutdown    ( int Retcode, bool Restart);
 
   private:
     Q_DISABLE_COPY(V2Myth)

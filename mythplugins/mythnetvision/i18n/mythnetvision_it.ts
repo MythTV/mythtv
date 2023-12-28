@@ -4,22 +4,22 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="69"/>
+        <location filename="../mythnetvision/mythnetvision.cpp" line="69"/>
         <source>Internet Television Client - Search</source>
         <translation>Client internet television - ricerca</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="71"/>
+        <location filename="../mythnetvision/mythnetvision.cpp" line="71"/>
         <source>Internet Television Client - Site/Tree View</source>
         <translation>Client internet television - sito/visione struttura</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="74"/>
+        <location filename="../mythnetvision/mythnetvision.cpp" line="74"/>
         <source>Previous Page</source>
         <translation>Pagina precedente</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="76"/>
+        <location filename="../mythnetvision/mythnetvision.cpp" line="76"/>
         <source>Next Page</source>
         <translation>Pagina successiva</translation>
     </message>
@@ -27,29 +27,29 @@
 <context>
     <name>NetBase</name>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="55"/>
+        <location filename="../mythnetvision/netbase.cpp" line="54"/>
         <source>Downloading Video...</source>
         <translation>Scaricamento video...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="148"/>
+        <location filename="../mythnetvision/netbase.cpp" line="147"/>
         <source>No browser command set! MythNetTree needs MythBrowser installed to display the video.</source>
         <translation>Nessun comando browser impostato! MythNetVision richiede MythBrowser installato per visualizzare il video.</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="185"/>
+        <location filename="../mythnetvision/netbase.cpp" line="184"/>
         <source>Are you sure you want to delete this file?</source>
         <translation>Sei sicuro di voler eliminare questo file?</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="246"/>
+        <location filename="../mythnetvision/netbase.cpp" line="245"/>
         <source>Downloading Video...
 (%1 of %2 MB)</source>
         <translation>Scaricamento video...
 (%1 di %2 MB)</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="276"/>
+        <location filename="../mythnetvision/netbase.cpp" line="275"/>
         <source>Error downloading video to backend.</source>
         <translation>Errore scaricamento video sul backend.</translation>
     </message>
@@ -122,7 +122,7 @@
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="283"/>
         <source>Searching %1 for &quot;%2&quot;...</source>
-        <translation type="unfinished">Cerco %1 per &quot;%2&quot;...</translation>
+        <translation>Cerco %1 per &quot;%2&quot;...</translation>
     </message>
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="307"/>
@@ -163,7 +163,7 @@
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="32"/>
         <source>RSS Feeds</source>
-        <translation type="unfinished">Feed RSS</translation>
+        <translation>Feed RSS</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="33"/>
@@ -304,7 +304,7 @@
 <context>
     <name>RSSEditor</name>
     <message>
-        <location filename="../mythnetvision/rsseditor.cpp" line="467"/>
+        <location filename="../mythnetvision/rsseditor.cpp" line="468"/>
         <source>Are you sure you want to unsubscribe from this feed?</source>
         <translation>Sei sicuro di voler rimuovere la sottoscrizione a questo feed?</translation>
     </message>
@@ -331,7 +331,7 @@
     <message>
         <location filename="themestrings.h" line="110"/>
         <source>Search:</source>
-        <translation type="unfinished">Cerca:</translation>
+        <translation>Cerca:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
@@ -407,38 +407,38 @@ Per nuove sottoscrizioni, inserisci semplicemente l&apos;URL e clicca su &quot;s
         <location filename="themestrings.h" line="5"/>
         <source>%00x00| - %%&quot;|SUBTITLE|&quot;
 %%|RATING| - %%DESCRIPTION%</source>
-        <translation type="unfinished">%00x00| - %%&quot;|SUBTITLE|&quot;
+        <translation>%00x00| - %%&quot;|SUBTITLE|&quot;
 %%|RATING| - %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="6"/>
         <source>%00x00| - %%&quot;|SUBTITLE|&quot;
 %%|YEARSTARS| - %%DESCRIPTION%</source>
-        <translation type="unfinished">%00x00| - %%&quot;|SUBTITLE|&quot;
+        <translation>%00x00| - %%&quot;|SUBTITLE|&quot;
 %%|YEARSTARS| - %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>%TITLE%% |SUBTITLE%</source>
-        <translation type="unfinished">%TITLE%% |SUBTITLE%</translation>
+        <translation>%TITLE%% |SUBTITLE%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="10"/>
         <source>%TITLE| %%~ |AUTHOR%</source>
-        <translation type="unfinished">%TITLE| %%~ |AUTHOR%</translation>
+        <translation>%TITLE| %%~ |AUTHOR%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>
         <source>%Userrating: |RATING|
 %%DESCRIPTION%</source>
-        <translation type="unfinished">%Userrating: |RATING|
+        <translation>%Userrating: |RATING|
 %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
         <source>%&quot;|SUBTITLE|&quot;
 %%DESCRIPTION%</source>
-        <translation type="unfinished">%&quot;|SUBTITLE|&quot;
+        <translation>%&quot;|SUBTITLE|&quot;
 %%DESCRIPTION%</translation>
     </message>
     <message>
@@ -446,129 +446,129 @@ Per nuove sottoscrizioni, inserisci semplicemente l&apos;URL e clicca su &quot;s
         <source>%&quot;|SUBTITLE|&quot;
 
 %%DESCRIPTION%</source>
-        <translation type="unfinished">%&quot;|SUBTITLE|&quot;
+        <translation>%&quot;|SUBTITLE|&quot;
 
 %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="14"/>
         <source>%author%%, |date%</source>
-        <translation type="unfinished">%author%%, |date%</translation>
+        <translation>%author%%, |date%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="15"/>
         <source>%resolution%%, |filesize_str%% (|length|)%</source>
-        <translation type="unfinished">%resolution%%, |filesize_str%% (|length|)%</translation>
+        <translation>%resolution%%, |filesize_str%% (|length|)%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>%resolution|, %%filesize_str| %</source>
-        <translation type="unfinished">%resolution|, %%filesize_str| %</translation>
+        <translation>%resolution|, %%filesize_str| %</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>%|(RATING)%</source>
-        <translation type="unfinished">%|(RATING)%</translation>
+        <translation>%|(RATING)%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>Browse Internet video</source>
-        <translation type="unfinished">Naviga internet video</translation>
+        <translation>Naviga internet video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>Can&apos;t find any search scripts!  This usually indicates missing search script prerequisities.  Try running a script from the command line.</source>
-        <translation type="unfinished">Non trovo nessuno script di ricerca! Ciò di solito indica che nello script di ricerca mancano i prerequisiti. Prova a eseguire uno script dalla riga di comando.</translation>
+        <translation>Non trovo nessuno script di ricerca! Ciò di solito indica che nello script di ricerca mancano i prerequisiti. Prova a eseguire uno script dalla riga di comando.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
         <source>Can&apos;t find any search scripts! This usually indicates missing search script prerequisites. Try running a script from the command line.</source>
-        <translation type="unfinished">Non trovo nessuno script di ricerca! Ciò di solito indica che nello script di ricerca mancano i prerequisiti. Prova a eseguire uno script dalla riga di comando.</translation>
+        <translation>Non trovo nessuno script di ricerca! Ciò di solito indica che nello script di ricerca mancano i prerequisiti. Prova a eseguire uno script dalla riga di comando.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="35"/>
         <source>Created by %author%%, |date%</source>
-        <translation type="unfinished">Creato da %author%%, |date%</translation>
+        <translation>Creato da %author%%, |date%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="36"/>
         <source>Date Posted:</source>
-        <translation type="unfinished">Pubblicato il:</translation>
+        <translation>Pubblicato il:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>Date:</source>
-        <translation type="unfinished">Data:</translation>
+        <translation>Data:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="45"/>
         <source>Edit RSS Subscriptions</source>
-        <translation type="unfinished">Modifica iscrizioni RSS</translation>
+        <translation>Modifica iscrizioni RSS</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="48"/>
         <source>Episode %1</source>
-        <translation type="unfinished">Episodio %1</translation>
+        <translation>Episodio %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="49"/>
         <source>Episode:</source>
-        <translation type="unfinished">Episodio:</translation>
+        <translation>Episodio:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>Feed Description:</source>
-        <translation type="unfinished">Descrizione feed:</translation>
+        <translation>Descrizione feed:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>File Size:</source>
-        <translation type="unfinished">Dimensione file:</translation>
+        <translation>Dimensione file:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="55"/>
         <source>INTERNET VIDEO BROWSER</source>
-        <translation type="unfinished">BROWSER INTERNET VIDEO</translation>
+        <translation>BROWSER INTERNET VIDEO</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="56"/>
         <source>INTERNET VIDEOS LIST</source>
-        <translation type="unfinished">ELENCO INTERNET VIDEO</translation>
+        <translation>ELENCO INTERNET VIDEO</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="57"/>
         <source>Internet Video Browser</source>
-        <translation type="unfinished">Browser Internet Video</translation>
+        <translation>Browser Internet Video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="61"/>
         <source>Manage RSS Subscribtions</source>
-        <translation type="unfinished">Gestisci sottoscrizioni RSS</translation>
+        <translation>Gestisci sottoscrizioni RSS</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="68"/>
         <source>Netvision Browse View</source>
-        <translation type="unfinished">Vista Browser NetVision</translation>
+        <translation>Vista Browser NetVision</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="69"/>
         <source>Netvision Gallery View</source>
-        <translation type="unfinished">Vista galleria Netvision</translation>
+        <translation>Vista galleria Netvision</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="70"/>
         <source>Netvision List View</source>
-        <translation type="unfinished">Vista elenco Netvision</translation>
+        <translation>Vista elenco Netvision</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="71"/>
         <source>Netvision Search</source>
-        <translation type="unfinished">Cerca Netvision</translation>
+        <translation>Cerca Netvision</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="72"/>
         <source>Netvision Site Grabbers</source>
-        <translation type="unfinished">Grabber sito Netvision</translation>
+        <translation>Grabber sito Netvision</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="76"/>
@@ -578,157 +578,157 @@ Per nuove sottoscrizioni, inserisci semplicemente l&apos;URL e clicca su &quot;s
     <message>
         <location filename="themestrings.h" line="77"/>
         <source>Not applicable</source>
-        <translation type="unfinished">Non applicabile</translation>
+        <translation>Non applicabile</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="78"/>
         <source>Not available</source>
-        <translation type="unfinished">Non disponibile</translation>
+        <translation>Non disponibile</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="79"/>
         <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="80"/>
         <source>Page</source>
-        <translation type="unfinished">Pagina</translation>
+        <translation>Pagina</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="82"/>
         <source>Posted:</source>
-        <translation type="unfinished">Inserito:</translation>
+        <translation>Inserito:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="84"/>
         <source>Preview</source>
-        <translation type="unfinished">Anteprima</translation>
+        <translation>Anteprima</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="85"/>
         <source>RSS Author:</source>
-        <translation type="unfinished">Autore RSS:</translation>
+        <translation>Autore RSS:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="86"/>
         <source>RSS Editor</source>
-        <translation type="unfinished">Editor RSS</translation>
+        <translation>Editor RSS</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="87"/>
         <source>RSS Feed Name:</source>
-        <translation type="unfinished">Nome feed RSS:</translation>
+        <translation>Nome feed RSS:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="88"/>
         <source>RSS Overview</source>
-        <translation type="unfinished">Panoramica RSS</translation>
+        <translation>Panoramica RSS</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="89"/>
         <source>RSS Subscriptions</source>
-        <translation type="unfinished">Sottoscrizioni RSS</translation>
+        <translation>Sottoscrizioni RSS</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="90"/>
         <source>RSS URL:</source>
-        <translation type="unfinished">URL RSS:</translation>
+        <translation>URL RSS:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="92"/>
         <source>Rating:</source>
-        <translation type="unfinished">Valutazione:</translation>
+        <translation>Valutazione:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="95"/>
         <source>Resolution</source>
-        <translation type="unfinished">Risoluzione</translation>
+        <translation>Risoluzione</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="96"/>
         <source>Resolution:</source>
-        <translation type="unfinished">Risoluzione:</translation>
+        <translation>Risoluzione:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="98"/>
         <source>Runtime:</source>
-        <translation type="unfinished">Durata:</translation>
+        <translation>Durata:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="100"/>
         <source>SEARCH INTERNET VIDEOS</source>
-        <translation type="unfinished">CERCA INTERNET VIDEO</translation>
+        <translation>CERCA INTERNET VIDEO</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="103"/>
         <source>Search Internet Videos</source>
-        <translation type="unfinished">Cerca internet video</translation>
+        <translation>Cerca internet video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="105"/>
         <source>Search Site:</source>
-        <translation type="unfinished">Cerca nel sito:</translation>
+        <translation>Cerca nel sito:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="106"/>
         <source>Search String:</source>
-        <translation type="unfinished">Stringa di ricerca:</translation>
+        <translation>Stringa di ricerca:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="111"/>
         <source>Season and Episode:</source>
-        <translation type="unfinished">Stagione e Episodio:</translation>
+        <translation>Stagione e Episodio:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="112"/>
         <source>Select icon image</source>
-        <translation type="unfinished">Selez. immagine icona</translation>
+        <translation>Selez. immagine icona</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="116"/>
         <source>Size:</source>
-        <translation type="unfinished">Dimensione:</translation>
+        <translation>Dimensione:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="118"/>
         <source>Stream type:</source>
-        <translation type="unfinished">Tipo stream:</translation>
+        <translation>Tipo stream:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="122"/>
         <source>Unknown</source>
-        <translation type="unfinished">Sconosciuto</translation>
+        <translation>Sconosciuto</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="125"/>
         <source>VIDEO GALLERY</source>
-        <translation type="unfinished">GALLERIA VIDEO</translation>
+        <translation>GALLERIA VIDEO</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="126"/>
         <source>Video Browser</source>
-        <translation type="unfinished">Browser video</translation>
+        <translation>Browser video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="127"/>
         <source>Video Gallery</source>
-        <translation type="unfinished">Galleria video</translation>
+        <translation>Galleria video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="128"/>
         <source>Video List</source>
-        <translation type="unfinished">Lista video</translation>
+        <translation>Lista video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="129"/>
         <source>Video Search</source>
-        <translation type="unfinished">Cerca video</translation>
+        <translation>Cerca video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="130"/>
         <source>Video length:</source>
-        <translation type="unfinished">Durata video:</translation>
+        <translation>Durata video:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="131"/>
@@ -743,7 +743,7 @@ Per nuove sottoscrizioni, inserisci semplicemente l&apos;URL e clicca su &quot;s
     <message>
         <location filename="themestrings.h" line="136"/>
         <source>rating</source>
-        <translation type="unfinished">Valutazione</translation>
+        <translation>Valutazione</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="64"/>
@@ -753,7 +753,7 @@ Per nuove sottoscrizioni, inserisci semplicemente l&apos;URL e clicca su &quot;s
     <message>
         <location filename="themestrings.h" line="34"/>
         <source>Choose the sites you wish to browse/search.</source>
-        <translation type="unfinished">Scegli i siti che desideri navigare/cercare.</translation>
+        <translation>Scegli i siti che desideri navigare/cercare.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="74"/>
@@ -773,12 +773,12 @@ Per nuove sottoscrizioni, inserisci semplicemente l&apos;URL e clicca su &quot;s
     <message>
         <location filename="themestrings.h" line="104"/>
         <source>Search Net Videos</source>
-        <translation type="unfinished">Cerca video in rete</translation>
+        <translation>Cerca video in rete</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="107"/>
         <source>Search Term:</source>
-        <translation type="unfinished">Cerca termine:</translation>
+        <translation>Cerca termine:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="117"/>
@@ -878,7 +878,7 @@ Per nuove sottoscrizioni, inserisci semplicemente l&apos;URL e clicca su &quot;s
     <message>
         <location filename="themestrings.h" line="108"/>
         <source>Search Videos</source>
-        <translation type="unfinished">Cerca video</translation>
+        <translation>Cerca video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="30"/>
@@ -954,7 +954,7 @@ Per aggiungere un sito, premere MENÙ, poi scegliere &quot;Scansione/gestione so
     <message>
         <location filename="themestrings.h" line="102"/>
         <source>Search Internet Video</source>
-        <translation type="unfinished">Cerca internet video</translation>
+        <translation>Cerca internet video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="113"/>
@@ -997,17 +997,17 @@ Autore: |AUTHOR%</translation>
     <message>
         <location filename="themestrings.h" line="109"/>
         <source>Search popular video sites</source>
-        <translation type="unfinished">Cerca di siti video popolari</translation>
+        <translation>Cerca di siti video popolari</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
         <source>Browse Internet Video</source>
-        <translation type="unfinished">Naviga internet video</translation>
+        <translation>Naviga internet video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>
         <source>Browse highlights and entire sites</source>
-        <translation type="unfinished">Naviga in evidenza e in interi siti</translation>
+        <translation>Naviga in evidenza e in interi siti</translation>
     </message>
 </context>
 <context>

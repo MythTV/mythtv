@@ -1,6 +1,15 @@
 // Qt
+#include <QtGlobal>
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QtAndroidExtras>
 #include <QAndroidJniEnvironment>
+#else
+#include <QCoreApplication>
+#include <QJniEnvironment>
+#include <QJniObject>
+#define QAndroidJniEnvironment QJniEnvironment
+#define QAndroidJniObject QJniObject
+#endif
 
 // MythTV
 #include "libmythbase/mythcorecontext.h"

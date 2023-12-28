@@ -29,36 +29,14 @@ MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name)
     : MythUIType(parent, name)
 {
     m_message = "";
-    m_filter = FilterNone;
-
-    m_isPassword = false;
-
-    m_blinkInterval = 0;
-    m_cursorBlinkRate = 40;
-
-    m_position = -1;
-
-    m_maxLength = 255;
-
-    m_backgroundState = nullptr;
-    m_cursorImage = nullptr;
-    m_text = nullptr;
-
-    m_keyboardPosition = VK_POSBELOWEDIT;
 
     connect(this, &MythUIType::TakingFocus, this, &MythUITextEdit::Select);
     connect(this, &MythUIType::LosingFocus, this, &MythUITextEdit::Deselect);
 
     m_canHaveFocus = true;
 
-    m_initialized = false;
-
     m_lastKeyPress.start();
-
-    m_composeKey = 0;
-
     m_messageBak.clear();
-    m_isIMEinput = false;
 }
 
 void MythUITextEdit::Select()

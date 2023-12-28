@@ -274,9 +274,9 @@ bool MythEDID::ParseBaseBlock(const quint8* Data)
                  qFuzzyCompare(m_gamma + 1.0F, 2.20F + 1.0F);
 
     // Parse blocks
-    for (uint i = 0; i < 4; ++i)
+    for (size_t i = 0; i < 4; ++i)
     {
-        uint offset = DATA_BLOCK_OFFSET + i * 18;
+        size_t offset = DATA_BLOCK_OFFSET + i * 18;
         if (Data[offset] == 0 || Data[offset + 1] == 0 || Data[offset + 2] == 0)
             ParseDisplayDescriptor(Data, offset);
         else
@@ -322,7 +322,7 @@ void MythEDID::ParseDisplayDescriptor(const quint8* Data, uint Offset)
     }
 }
 
-void MythEDID::ParseDetailedTimingDescriptor(const quint8* Data, uint Offset)
+void MythEDID::ParseDetailedTimingDescriptor(const quint8* Data, size_t Offset)
 {
     // We're only really interested in a more accurate display size
     auto width = Data[Offset + 12] + ((Data[Offset + 14] & 0xF0) << 4);
@@ -337,7 +337,7 @@ void MythEDID::ParseDetailedTimingDescriptor(const quint8* Data, uint Offset)
     }
 }
 
-bool MythEDID::ParseCTA861(const quint8* Data, uint Offset)
+bool MythEDID::ParseCTA861(const quint8* Data, size_t Offset)
 {
     if (Offset >= m_size)
         return false;
@@ -354,7 +354,7 @@ bool MythEDID::ParseCTA861(const quint8* Data, uint Offset)
     return result;
 }
 
-bool MythEDID::ParseCTABlock(const quint8* Data, uint Offset)
+bool MythEDID::ParseCTABlock(const quint8* Data, size_t Offset)
 {
     uint length = Data[Offset] & 0x1F;
     uint type  = (Data[Offset] & 0xE0) >> 5;
@@ -371,7 +371,7 @@ bool MythEDID::ParseCTABlock(const quint8* Data, uint Offset)
     return true;
 }
 
-bool MythEDID::ParseVSDB(const quint8* Data, uint Offset, uint Length)
+bool MythEDID::ParseVSDB(const quint8* Data, size_t Offset, size_t Length)
 {
     if (Offset + 3 >= m_size)
         return false;
@@ -452,7 +452,7 @@ bool MythEDID::ParseVSDB(const quint8* Data, uint Offset, uint Length)
     return true;
 }
 
-bool MythEDID::ParseExtended(const quint8* Data, uint Offset, uint Length)
+bool MythEDID::ParseExtended(const quint8* Data, size_t Offset, size_t Length)
 {
     if (Offset + 1 >= m_size)
         return false;

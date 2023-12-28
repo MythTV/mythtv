@@ -16,7 +16,8 @@ class META_PUBLIC VideoMetadataListManager
   public:
     static VideoMetadataPtr loadOneFromDatabase(uint id);
     static void loadAllFromDatabase(metadata_list &items,
-                                    const QString &sql = "");
+                                    const QString &sql = "",
+                                    const QString &bindValue = "");
 
   public:
     VideoMetadataListManager();
@@ -132,6 +133,8 @@ class META_PUBLIC meta_dir_node : public meta_node
 
         for (auto & subdir : m_subdirs)
         {
+            if (subdir == nullptr)
+                continue;
             subdir->sort(dir_sort, entry_sort);
         }
     }

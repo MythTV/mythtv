@@ -159,7 +159,7 @@ AudioConfigSettings::AudioConfigSettings()
     addChild(srcqualityoverride);
 
     advancedSettings->addChild(Audio48kOverride());
-#if USING_ALSA
+#ifdef USING_ALSA
     advancedSettings->addChild(SPDIFRateOverride());
 #endif
 
@@ -614,9 +614,9 @@ AudioTestThread::AudioTestThread(QObject *parent,
                                  bool hd) :
     MThread("AudioTest"),
     m_parent(parent), m_channels(channels), m_device(std::move(main)),
-    m_passthrough(std::move(passthrough)), m_hd(hd)
+    m_passthrough(std::move(passthrough)), m_hd(hd),
+    m_format(hd ? settings.BestSupportedFormat() : FORMAT_S16)
 {
-    m_format = hd ? settings.BestSupportedFormat() : FORMAT_S16;
     m_samplerate = hd ? settings.BestSupportedRate() : 48000;
 
     m_audioOutput = AudioOutput::OpenAudio(m_device, m_passthrough,
@@ -630,7 +630,7 @@ AudioTestThread::AudioTestThread(QObject *parent,
     }
 }
 
-QEvent::Type ChannelChangedEvent::kEventType =
+const QEvent::Type ChannelChangedEvent::kEventType =
     static_cast<QEvent::Type>(QEvent::registerEventType());
 
 AudioTestThread::~AudioTestThread()

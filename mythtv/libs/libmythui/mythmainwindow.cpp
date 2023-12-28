@@ -55,8 +55,10 @@
 #include "devices/mythinputdevicehandler.h"
 
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #ifdef Q_OS_ANDROID
 #include <QtAndroid>
+#endif
 #endif
 
 static constexpr std::chrono::milliseconds GESTURE_TIMEOUT    { 1s    };
@@ -227,10 +229,11 @@ MythMainWindow::~MythMainWindow()
 
     delete m_themeBase;
 
-    while (!m_priv->m_keyContexts.isEmpty())
+    for (auto iter = m_priv->m_keyContexts.begin();
+         iter != m_priv->m_keyContexts.end();
+         iter = m_priv->m_keyContexts.erase(iter))
     {
-        KeyContext *context = *m_priv->m_keyContexts.begin();
-        m_priv->m_keyContexts.erase(m_priv->m_keyContexts.begin());
+        KeyContext *context = *iter;
         delete context;
     }
 
@@ -520,7 +523,7 @@ void MythMainWindow::DoRemoteScreenShot(const QString& Filename, int Width, int 
     args << QString::number(Width);
     args << QString::number(Height);
     args << Filename;
-    MythEvent me(MythEvent::MythEventMessage, ACTION_SCREENSHOT, args);
+    MythEvent me(MythEvent::kMythEventMessage, ACTION_SCREENSHOT, args);
     QCoreApplication::sendEvent(this, &me);
 }
 
@@ -778,7 +781,11 @@ void MythMainWindow::DelayedAction()
     Show();
 
 #ifdef Q_OS_ANDROID
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QtAndroid::hideSplashScreen();
+#else
+    QNativeInterface::QAndroidApplication::hideSplashScreen();
+#endif
 #endif
 }
 
@@ -1682,8 +1689,8 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
             }
 #endif
 
-            // NOLINTNEXTLINE(readability-qualified-auto) // qt6
-            for (auto it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
+            QVector<MythScreenStack *>::const_reverse_iterator it;
+            for (it = m_priv->m_stackList.rbegin(); it != m_priv->m_stackList.rend(); it++)
             {
                 if (auto * top = (*it)->GetTopScreen(); top)
                 {
@@ -1711,8 +1718,8 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
                     QCoreApplication::instance()->notify(widget, ie);
                 break;
             }
-            // NOLINTNEXTLINE(readability-qualified-auto) // qt6
-            for (auto it = m_priv->m_stackList.end()-1; it != m_priv->m_stackList.begin()-1; --it)
+            QVector<MythScreenStack *>::const_reverse_iterator it;
+            for (it = m_priv->m_stackList.rbegin(); it != m_priv->m_stackList.rend(); it++)
             {
                 MythScreenType *top = (*it)->GetTopScreen();
                 if (top == nullptr)
@@ -1768,8 +1775,8 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
                     if (!mouseevent)
                         return MythUIScreenBounds::eventFilter(Watched, Event);
 
-                    // NOLINTNEXTLINE(readability-qualified-auto) // qt6
-                    for (auto it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
+                    QVector<MythScreenStack *>::const_reverse_iterator it;
+                    for (it = m_priv->m_stackList.rbegin(); it != m_priv->m_stackList.rend(); it++)
                     {
                         auto * screen = (*it)->GetTopScreen();
                         if (!screen || !screen->ContainsPoint(point))
@@ -1799,8 +1806,8 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
                         return true;
                     }
                     
-                    // NOLINTNEXTLINE(readability-qualified-auto) // qt6
-                    for (auto it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
+                    QVector<MythScreenStack *>::const_reverse_iterator it;
+                    for (it = m_priv->m_stackList.rbegin(); it != m_priv->m_stackList.rend(); it++)
                     {
                         MythScreenType *screen = (*it)->GetTopScreen();
                         if (!screen || !screen->ContainsPoint(point))
@@ -1973,7 +1980,7 @@ void MythMainWindow::customEvent(QEvent* Event)
     {
         MythUDP::EnableUDPListener(true);
     }
-    else if (Event->type() == MythEvent::MythEventMessage)
+    else if (Event->type() == MythEvent::kMythEventMessage)
     {
         auto * event = dynamic_cast<MythEvent *>(Event);
         if (event == nullptr)
@@ -2059,7 +2066,7 @@ void MythMainWindow::customEvent(QEvent* Event)
             gCoreContext->AllowShutdown();
         }
     }
-    else if (Event->type() == MythEvent::MythUserMessage)
+    else if (Event->type() == MythEvent::kMythUserMessage)
     {
         if (auto * event = dynamic_cast<MythEvent *>(Event); event != nullptr)
             if (const QString& message = event->Message(); !message.isEmpty())

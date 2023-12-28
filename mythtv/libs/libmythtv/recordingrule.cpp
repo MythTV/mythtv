@@ -913,6 +913,13 @@ bool RecordingRule::IsValid(QString &msg) const
         return false;
     }
 
+    // Inactive overrides cause errors so are disallowed.
+    if (isOverride && m_isInactive)
+    {
+        msg = QString("Invalid Inactive Override.");
+        return false;
+    }
+
     if (m_title.isEmpty())
     {
         msg = QString("Invalid title.");
@@ -921,13 +928,18 @@ bool RecordingRule::IsValid(QString &msg) const
 
     if (m_searchType == kPowerSearch)
     {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare(QString("SELECT NULL FROM (program, channel) "
-                              "%1 WHERE %2")
-                      .arg(m_subtitle, m_description));
-        if (m_description.contains(';') || !query.exec())
+        if (m_description.contains(';') || m_subtitle.contains(';'))
         {
-            msg = QString("Invalid custom search values.");
+            msg = QString("Invalid SQL, contains semicolon");
+            return false;
+        }
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(QString("SELECT NULL FROM (program, channel, oldrecorded AS oldrecstatus) "
+                              "%1 WHERE %2 LIMIT 5")
+                      .arg(m_subtitle, m_description));
+        if (!query.exec())
+        {
+            msg = QString("Invalid SQL Where clause." + query.lastError().databaseText());
             return false;
         }
     }
@@ -940,7 +952,7 @@ bool RecordingRule::IsValid(QString &msg) const
         }
     }
 
-    if (!isSearch)
+    if (m_type != kTemplateRecord && !isSearch)
     {
         if (!m_startdate.isValid() || !m_starttime.isValid() ||
             !m_enddate.isValid() || !m_endtime.isValid())
@@ -963,7 +975,8 @@ bool RecordingRule::IsValid(QString &msg) const
         }
     }
 
-    if (m_findday < 0 || m_findday > 6 || !m_findtime.isValid())
+    if (m_type != kTemplateRecord
+        && (m_findday < 0 || m_findday > 6 || !m_findtime.isValid()) )
     {
         msg = QString("Invalid find values.");
         return false;

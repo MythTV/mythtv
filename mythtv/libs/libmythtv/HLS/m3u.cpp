@@ -275,7 +275,8 @@ namespace M3U
         return true;
     }
 
-    bool ParseKey(int version, const QString& line, bool& aesmsg,
+    bool ParseKey(int version, const QString& line,
+                  [[maybe_unused]] bool& aesmsg,
                   const QString& loc, QString &path, QString &iv)
     {
         /*
@@ -284,10 +285,6 @@ namespace M3U
          * The METHOD attribute specifies the encryption method.  Two encryption
          * methods are defined: NONE and AES-128.
          */
-
-#ifndef USING_LIBCRYPTO
-        Q_UNUSED(aesmsg);
-#endif
 
         path.clear();
         iv.clear();

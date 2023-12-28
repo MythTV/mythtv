@@ -1,0 +1,36 @@
+# -*- coding: utf-8 -*-
+
+[metadata]
+name = MythTV
+version = @MYTHTV_VERSION_MAJMIN@
+description = MythTV Python bindings.
+long_description = Provides canned database and protocol access to the MythTV database, mythproto, mythxml, services_api and frontend remote control.
+url = https://mythtv.org
+
+
+[options]
+include_package_data = True
+
+packages=
+  MythTV
+  MythTV/tmdb3
+  MythTV/tvmaze
+  MythTV/ttvdbv4
+  MythTV/wikiscripts
+  MythTV/utility
+  MythTV/services_api
+
+package_dir =
+   MythTV/tmdb3 = ./tmdb3/tmdb3
+   MythTV/tvmaze = ./tvmaze
+   MythTV/ttvdbv4 = ./ttvdbv4
+
+scripts =
+  scripts/mythpython
+  scripts/mythwikiscripts
+
+python_requires = >=3.6
+
+[install]
+single_version_externally_managed = 1
+

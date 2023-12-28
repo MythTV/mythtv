@@ -121,7 +121,7 @@ class HLSSegment
 {
   public:
     HLSSegment(const std::chrono::seconds mduration, const int id, QString title,
-               QString uri, QString current_key_path)
+               QString uri, [[maybe_unused]] QString current_key_path)
       : m_id(id),
         m_duration(mduration), // Seconds
         m_title(std::move(title)),
@@ -129,8 +129,6 @@ class HLSSegment
     {
 #ifdef USING_LIBCRYPTO
         m_pszKeyPath = std::move(current_key_path);
-#else
-        Q_UNUSED(current_key_path);
 #endif
     }
 
@@ -2457,6 +2455,8 @@ void HLSRingBuffer::SanitizeStreams(StreamsList *streams)
     for (int n = streams->size() - 1 ; n >= 0; n--)
     {
         HLSStream *hls = GetStream(n, streams);
+        if (hls == nullptr)
+            continue;
         if (hls->NumSegments() == 0)
         {
             streams->removeAt(n);
@@ -2479,6 +2479,8 @@ void HLSRingBuffer::SanitizeStreams(StreamsList *streams)
     for (int n = 0; n < streams->size(); n++)
     {
         HLSStream *hls = GetStream(n, streams);
+        if (hls == nullptr)
+            continue;
         int id      = hls->Id();
         int seq     = hls->StartSequence();
         int newstart= idstart.value(id);

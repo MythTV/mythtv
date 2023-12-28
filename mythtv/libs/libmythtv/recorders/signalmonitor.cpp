@@ -88,14 +88,11 @@ extern "C" {
         HDHRSignalMonitor, SignalMonitorValue
  */
 
-SignalMonitor *SignalMonitor::Init(const QString& cardtype, int db_cardnum,
-                                   ChannelBase *channel,
+SignalMonitor *SignalMonitor::Init([[maybe_unused]] const QString& cardtype,
+                                   [[maybe_unused]] int db_cardnum,
+                                   [[maybe_unused]] ChannelBase *channel,
                                    bool release_stream)
 {
-    (void) cardtype;
-    (void) db_cardnum;
-    (void) channel;
-
     SignalMonitor *signalMonitor = nullptr;
 
     if (cardtype == "GuaranteedToFail")
@@ -217,7 +214,7 @@ SignalMonitor *SignalMonitor::Init(const QString& cardtype, int db_cardnum,
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Failed to create signal monitor in Init(%1, %2, 0x%3)")
-                .arg(cardtype).arg(db_cardnum).arg((long)channel,0,16));
+                .arg(cardtype).arg(db_cardnum).arg((uintptr_t)channel,0,16));
     }
 
     return signalMonitor;

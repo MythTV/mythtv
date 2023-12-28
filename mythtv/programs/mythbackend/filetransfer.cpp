@@ -16,9 +16,9 @@
 // MythBackend
 #include "filetransfer.h"
 
-FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
+BEFileTransfer::BEFileTransfer(QString &filename, MythSocket *remote,
                            bool usereadahead, std::chrono::milliseconds timeout) :
-    ReferenceCounter(QString("FileTransfer:%1").arg(filename)),
+    ReferenceCounter(QString("BEFileTransfer:%1").arg(filename)),
     m_rbuffer(MythMediaBuffer::Create(filename, false, usereadahead, timeout, true)),
     m_sock(remote)
 {
@@ -28,8 +28,8 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
         m_rbuffer->Start();
 }
 
-FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
-    ReferenceCounter(QString("FileTransfer:%1").arg(filename)),
+BEFileTransfer::BEFileTransfer(QString &filename, MythSocket *remote, bool write) :
+    ReferenceCounter(QString("BEFileTransfer:%1").arg(filename)),
     m_rbuffer(MythMediaBuffer::Create(filename, write)),
     m_sock(remote), m_writemode(write)
 {
@@ -42,11 +42,11 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
         m_rbuffer->Start();
 }
 
-FileTransfer::~FileTransfer()
+BEFileTransfer::~BEFileTransfer()
 {
     Stop();
 
-    if (m_sock) // FileTransfer becomes responsible for deleting the socket
+    if (m_sock) // BEFileTransfer becomes responsible for deleting the socket
         m_sock->DecrRef();
 
     if (m_rbuffer)
@@ -62,12 +62,12 @@ FileTransfer::~FileTransfer()
     }
 }
 
-bool FileTransfer::isOpen(void)
+bool BEFileTransfer::isOpen(void)
 {
     return m_rbuffer && m_rbuffer->IsOpen();
 }
 
-bool FileTransfer::ReOpen(const QString& newFilename)
+bool BEFileTransfer::ReOpen(const QString& newFilename)
 {
     if (!m_writemode)
         return false;
@@ -78,7 +78,7 @@ bool FileTransfer::ReOpen(const QString& newFilename)
     return false;
 }
 
-void FileTransfer::Stop(void)
+void BEFileTransfer::Stop(void)
 {
     if (m_readthreadlive)
     {
@@ -98,7 +98,7 @@ void FileTransfer::Stop(void)
         m_pginfo->UpdateInUseMark();
 }
 
-void FileTransfer::Pause(void)
+void BEFileTransfer::Pause(void)
 {
     LOG(VB_FILE, LOG_INFO, "calling StopReads()");
     if (m_rbuffer)
@@ -110,7 +110,7 @@ void FileTransfer::Pause(void)
         m_pginfo->UpdateInUseMark();
 }
 
-void FileTransfer::Unpause(void)
+void BEFileTransfer::Unpause(void)
 {
     LOG(VB_FILE, LOG_INFO, "calling StartReads()");
     if (m_rbuffer)
@@ -125,7 +125,7 @@ void FileTransfer::Unpause(void)
         m_pginfo->UpdateInUseMark();
 }
 
-int FileTransfer::RequestBlock(int size)
+int BEFileTransfer::RequestBlock(int size)
 {
     if (!m_readthreadlive || !m_rbuffer)
         return -1;
@@ -165,7 +165,7 @@ int FileTransfer::RequestBlock(int size)
     return (ret < 0) ? -1 : tot;
 }
 
-int FileTransfer::WriteBlock(int size)
+int BEFileTransfer::WriteBlock(int size)
 {
     if (!m_writemode || !m_rbuffer)
         return -1;
@@ -226,7 +226,7 @@ int FileTransfer::WriteBlock(int size)
     return (ret < 0) ? -1 : tot;
 }
 
-long long FileTransfer::Seek(long long curpos, long long pos, int whence)
+long long BEFileTransfer::Seek(long long curpos, long long pos, int whence)
 {
     if (m_pginfo)
         m_pginfo->UpdateInUseMark();
@@ -258,7 +258,7 @@ long long FileTransfer::Seek(long long curpos, long long pos, int whence)
     return ret;
 }
 
-uint64_t FileTransfer::GetFileSize(void)
+uint64_t BEFileTransfer::GetFileSize(void)
 {
     if (m_pginfo)
         m_pginfo->UpdateInUseMark();
@@ -266,7 +266,7 @@ uint64_t FileTransfer::GetFileSize(void)
     return m_rbuffer ? m_rbuffer->GetRealFileSize() : 0;
 }
 
-QString FileTransfer::GetFileName(void)
+QString BEFileTransfer::GetFileName(void)
 {
     if (!m_rbuffer)
         return {};
@@ -274,7 +274,7 @@ QString FileTransfer::GetFileName(void)
     return m_rbuffer->GetFilename();
 }
 
-void FileTransfer::SetTimeout(bool fast)
+void BEFileTransfer::SetTimeout(bool fast)
 {
     if (m_pginfo)
         m_pginfo->UpdateInUseMark();

@@ -50,7 +50,7 @@ export class VsourceComponent implements OnInit, AfterViewInit {
   configCommand = '';
 
   constructor(private channelService: ChannelService, private translate: TranslateService,
-    private setupService: SetupService, private clipboard: Clipboard, private mythService: MythService) {
+    public setupService: SetupService, private clipboard: Clipboard, private mythService: MythService) {
     translate.get(this.messages.nameInUse).subscribe(data => this.messages.nameInUse = data);
     translate.get(this.messages.nameRequired).subscribe(data => this.messages.nameRequired = data);
   }
@@ -151,11 +151,6 @@ export class VsourceComponent implements OnInit, AfterViewInit {
       this.channelService.AddVideoSource(this.videoSource)
         .subscribe(this.saveObserver);
     }
-  }
-
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
   }
 
 }

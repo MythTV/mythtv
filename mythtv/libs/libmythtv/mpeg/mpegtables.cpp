@@ -328,9 +328,8 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
     return true;
 }
 
-ProgramAssociationTable* ProgramAssociationTable::CreateBlank(bool smallPacket)
+ProgramAssociationTable* ProgramAssociationTable::CreateBlank([[maybe_unused]] bool smallPacket)
 {
-    (void) smallPacket; // currently always a small packet..
     TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
     auto *dst = tspacket->data() + sizeof(TSHeader) + 1; /* start of field pointer */
     std::copy(DEFAULT_PAT_HEADER.cbegin(), DEFAULT_PAT_HEADER.cend(), dst);

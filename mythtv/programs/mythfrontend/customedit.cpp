@@ -787,8 +787,8 @@ bool CustomEdit::checkSyntax(void)
     else
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare(QString("SELECT NULL FROM (program,channel) "
-                              "%1 WHERE\n%2").arg(from, desc));
+        query.prepare(QString("SELECT NULL FROM (program, channel, oldrecorded AS oldrecstatus) "
+                              "%1 WHERE %2 LIMIT 5").arg(from, desc));
 
         if (query.exec())
         {

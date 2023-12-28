@@ -72,15 +72,14 @@ class DTVChannel : public ChannelBase
     /// This is only called when there is no frequency set. This is used
     /// to implement "Channel Numbers" in analog tuning scenarios and to
     /// implement "Virtual Channels" in the OCUR and Firewire tuners.
-    bool Tune(const QString &freqid, int finetune) override // ChannelBase
+    bool Tune([[maybe_unused]] const QString &freqid,
+              [[maybe_unused]] int finetune) override // ChannelBase
     {
-        (void) freqid; (void) finetune;
         return false;
     }
 
-    virtual bool Tune(uint64_t frequency)
+    virtual bool Tune([[maybe_unused]] uint64_t frequency)
     {
-        (void) frequency;
         return false;
     }
 

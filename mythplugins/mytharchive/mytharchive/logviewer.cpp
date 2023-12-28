@@ -10,7 +10,6 @@
 #include <QTextStream>
 
 // mythtv
-#include <libmyth/mythcontext.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>
@@ -75,14 +74,6 @@ void showLogViewer(void)
     else
         showWarningDialog(QCoreApplication::translate("LogViewer",
             "Cannot find any logs to show!"));
-}
-
-LogViewer::LogViewer(MythScreenStack *parent) :
-    MythScreenType(parent, "logviewer")
-{
-    m_updateTime = gCoreContext->GetDurSetting<std::chrono::seconds>(
-        "LogViewerUpdateTime", DEFAULT_UPDATE_TIME);
-    m_autoUpdate = gCoreContext->GetBoolSetting("LogViewerAutoUpdate", true);
 }
 
 LogViewer::~LogViewer(void)

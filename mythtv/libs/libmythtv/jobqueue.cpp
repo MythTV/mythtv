@@ -78,7 +78,7 @@ JobQueue::~JobQueue(void)
 
 void JobQueue::customEvent(QEvent *e)
 {
-    if (e->type() == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(e);
         if (me == nullptr)
@@ -1115,6 +1115,7 @@ QString JobQueue::JobText(int jobType)
         case JOB_TRANSCODE:  return tr("Transcode");
         case JOB_COMMFLAG:   return tr("Flag Commercials");
         case JOB_METADATA:   return tr("Look up Metadata");
+        case JOB_PREVIEW:    return tr("Preview Generation");
     }
 
     if (jobType & JOB_USERJOB)

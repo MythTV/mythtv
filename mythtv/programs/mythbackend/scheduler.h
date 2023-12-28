@@ -108,6 +108,7 @@ class Scheduler : public MThread, public MythScheduler
 
     void DisableScheduling(void) { m_schedulingEnabled = false; }
     void EnableScheduling(void) { m_schedulingEnabled = true; }
+    bool QueryScheduling(void) const { return m_schedulingEnabled; }
     void GetNextLiveTVDir(uint cardid);
     void ResetIdleTime(void);
 

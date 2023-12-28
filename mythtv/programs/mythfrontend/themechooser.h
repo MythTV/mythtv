@@ -55,7 +55,7 @@ class ThemeChooser : public MythScreenType
     void themeChanged(void);
 
   private:
-    void LoadVersion(const QString &version, QStringList &themesSeen,
+    bool LoadVersion(const QString &version, QStringList &themesSeen,
                      bool alert_user);
 
     enum DownloadState

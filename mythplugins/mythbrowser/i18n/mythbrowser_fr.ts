@@ -181,27 +181,27 @@ Utiliser l&apos;option « Ajouter un signet » du menu pour ajouter de nouveaux 
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="109"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="109"/>
         <source>Move to next browser tab</source>
         <translation>Atteindre la prochaine adresse de navigation</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="111"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="111"/>
         <source>Move to previous browser tab</source>
         <translation>Atteindre la précédente adresse de navigation</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="114"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="114"/>
         <source>Show the bookmark manager</source>
         <translation>Afficher le gestionnaire des signets</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="116"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="116"/>
         <source>Show the webbrowser homepage</source>
         <translation>Afficher la page d&apos;accueil du navigateur</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="119"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="119"/>
         <source>Internal Web Browser</source>
         <translation>Navigateur Web interne</translation>
     </message>

@@ -276,52 +276,46 @@ void TestLogging::test_logPropagateCalc_data (void)
     QTest::addColumn<QString>("argument");
     QTest::addColumn<int>("quiet");
     QTest::addColumn<int>("facility");
-    QTest::addColumn<bool>("dblog");
     QTest::addColumn<bool>("propagate");
     QTest::addColumn<QString>("expectedArgs");
 
     QTest::newRow("plain")   << "general"
                              << static_cast<int>(0) << static_cast<int>(-1)
-                             << false << false
+                             << false
                              << "--verbose general --loglevel info";
     QTest::newRow("path")    << "general"
                              << static_cast<int>(0) << static_cast<int>(-1)
-                             << false << true
+                             << true
                              << "--verbose general --logpath /tmp --loglevel info";
     QTest::newRow("quiet")   << "general"
                              << static_cast<int>(2) << static_cast<int>(-1)
-                             << false << false
+                             << false
                              << "--verbose general --loglevel info --quiet --quiet";
 #if !defined(_WIN32) && !defined(Q_OS_ANDROID)
     QTest::newRow("syslog")  << "general"
                              << static_cast<int>(0) << static_cast<int>(LOG_DAEMON)
-                             << false << false
+                             << false
                              << "--verbose general --loglevel info --syslog daemon";
 #if CONFIG_SYSTEMD_JOURNAL
     QTest::newRow("systemd") << "general"
                              << static_cast<int>(0) << SYSTEMD_JOURNAL_FACILITY
-                             << false << false
+                             << false
                              << "--verbose general --loglevel info --systemd-journal";
 #endif
 #endif
-    QTest::newRow("dblog")   << "general"
-                             << static_cast<int>(0) << static_cast<int>(-1)
-                             << true << false
-                             << "--verbose general --loglevel info --enable-dblog";
     QTest::newRow("muddle")  << "general,schedule"
                              << static_cast<int>(2) << static_cast<int>(LOG_LOCAL0)
-                             << true << true
-                             << "--verbose general,schedule --logpath /tmp --loglevel info --quiet --quiet --enable-dblog --syslog local0";
+                             << true
+                             << "--verbose general,schedule --logpath /tmp --loglevel info --quiet --quiet --syslog local0";
     QTest::newRow("muddle2") << "schedule:debug,general:warn"
                              << static_cast<int>(2) << static_cast<int>(LOG_LOCAL0)
-                             << true << true
-                             << "--verbose general,schedule --logpath /tmp --loglevel info --quiet --quiet --enable-dblog --syslog local0";
+                             << true
+                             << "--verbose general,schedule --logpath /tmp --loglevel info --quiet --quiet --syslog local0";
 }
 
 void TestLogging::test_logPropagateCalc (void)
 {
     QFETCH(QString, argument);
-    QFETCH(bool, dblog);
     QFETCH(int, quiet);
     QFETCH(int, facility);
     QFETCH(bool, propagate);
@@ -332,7 +326,7 @@ void TestLogging::test_logPropagateCalc (void)
     std::streambuf* oldCoutBuffer = std::cerr.rdbuf(buffer.rdbuf());
     resetLogging();
     int actualExit = verboseArgParse(argument);
-    logStart("/tmp/test", false, quiet, facility, LOG_INFO, dblog, propagate, true);
+    logStart("/tmp/test", false, quiet, facility, LOG_INFO, propagate, true);
     std::cerr.rdbuf(oldCoutBuffer);
 
     // Check results
@@ -342,7 +336,5 @@ void TestLogging::test_logPropagateCalc (void)
 
     QCOMPARE(logPropagateArgs.trimmed(), expectedArgs);
 }
-
-// logPropagateCalc
 
 QTEST_APPLESS_MAIN(TestLogging)

@@ -1,5 +1,6 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
@@ -12,7 +13,8 @@ import { SetupService } from 'src/app/services/setup.service';
 @Component({
   selector: 'app-input-connections',
   templateUrl: './input-connections.component.html',
-  styleUrls: ['./input-connections.component.css']
+  styleUrls: ['./input-connections.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class InputConnectionsComponent implements OnInit {
 
@@ -23,8 +25,8 @@ export class InputConnectionsComponent implements OnInit {
   activeTab: boolean[] = [];
   readyCount = 0;
 
-  dirtyText = 'settings.unsaved';
-  warningText = 'settings.warning';
+  dirtyText = 'settings.common.unsaved';
+  warningText = 'settings.common.warning';
 
   m_hostName: string = ""; // hostname of the backend server
   m_CaptureCardList!: CaptureCardList;
@@ -43,9 +45,10 @@ export class InputConnectionsComponent implements OnInit {
   // Video Sources Indexed by id
   videoSourceLookup: VideoSource[] = [];
 
-  constructor(private mythService: MythService,
+  constructor(private mythService: MythService, public router: Router,
     private captureCardService: CaptureCardService, private setupService: SetupService,
     private translate: TranslateService, private channelService: ChannelService) {
+    this.setupService.setCurrentForm(null);
     this.mythService.GetHostName().subscribe(data => {
       this.m_hostName = data.String;
       this.loadCards(true);
@@ -83,12 +86,13 @@ export class InputConnectionsComponent implements OnInit {
     this.channelService.GetVideoSourceList()
       .subscribe(data => {
         this.videoSourceList = data;
-        this.videoSourceList.VideoSourceList.VideoSources.unshift(<VideoSource>{ Id: 0, SourceName: "(None)" })
+        this.videoSourceList.VideoSourceList.VideoSources.unshift(<VideoSource>{
+          Id: 0, SourceName: "(None)", ScanFrequency: 0
+        })
         this.videoSourceLookup = [];
         this.videoSourceList.VideoSourceList.VideoSources.forEach(data => {
           this.videoSourceLookup[data.Id] = data;
         });
-        // this.videoSourceLookup[0] = <VideoSource>{SourceName: "(None)"};
         this.readyCount++;
       });
   }

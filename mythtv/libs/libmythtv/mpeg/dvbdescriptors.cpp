@@ -1,3 +1,6 @@
+// For windows, force the second argument of `iconv' to non-const.
+#define WINICONV_CONST
+
 // C headers
 #include <iconv.h>
 #include <unistd.h>
@@ -14,6 +17,11 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/programinfo.h"
 
+// Decode a text string according to
+//   Draft ETSI EN 300 468 V1.16.1 (2019-05)
+//   Digital Video Broadcasting (DVB);
+//   Specification for Service Information (SI) in DVB systems
+//   Annex A (normative): Coding of text characters
 
 static QString decode_iso6937(const unsigned char *buf, uint length)
 {
@@ -149,6 +157,12 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
         return "";
     }
 
+    // UTF-8 encoding of ISO/IEC 10646
+    if (src[0] == 0x15)
+    {
+        return decode_text(src, raw_length);
+    }
+
     // if a override encoding is specified and the default ISO 6937 encoding
     // would be used copy the override encoding in front of the text
     auto *dst = new unsigned char[raw_length + encoding_override.size()];
@@ -193,7 +207,7 @@ static QString decode_text(const unsigned char *buf, uint length)
     {
         return iconv_helper(4 + buf[0], (char*)(buf + 1), length - 1);
     }
-    if (buf[0] == 0x10)
+    if ((buf[0] == 0x10) && (length >= 3))
     {
         // If the first byte of the text field has a value "0x10"
         // then the following two bytes carry a 16-bit value (uimsbf) N
@@ -945,7 +959,7 @@ QString SkyLCNDescriptor::toString() const
     ret += QString("\n      RegionID (%1) (0x%2) Raw (0x%3)")
         .arg(RegionID()).arg(RegionID(),4,16,QChar('0')).arg(RegionRaw(),4,16,QChar('0'));
 
-    for (uint i=0; i<ServiceCount(); i++)
+    for (size_t i=0; i<ServiceCount(); i++)
     {
         ret += QString("\n        ServiceID (%1) (0x%2) ").arg(ServiceID(i)).arg(ServiceID(i),4,16,QChar('0'));
         ret += QString("ServiceType (0x%1) ").arg(ServiceType(i),2,16,QChar('0'));
@@ -963,7 +977,7 @@ QString FreesatLCNDescriptor::toString() const
     ret += QString("(0x%1)").arg(DescriptorTag(),2,16,QChar('0'));
     ret += QString(" length(%1)").arg(DescriptorLength());
 
-    for (uint i=0; i<ServiceCount(); i++)
+    for (size_t i=0; i<ServiceCount(); i++)
     {
         ret += QString("\n      ServiceID (%1) (0x%2) ").arg(ServiceID(i)).arg(ServiceID(i),4,16,QChar('0'));
         ret += QString("ChanID (0x%1)").arg(ChanID(i), 4, 16, QChar('0'));

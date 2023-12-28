@@ -80,14 +80,14 @@ else
     esac
 fi
 
-if ! echo "${SOURCE_VERSION}" | egrep -i "v[0-9]+.*"   ; then
+if ! echo "${SOURCE_VERSION}" | grep -Ei "v[0-9]+.*"   ; then
     # Invalid version - use SRC_VERSION file
     echo "WARNING: Invalid source version ${SOURCE_VERSION}, must start with v and a number, will use SRC_VERSION file instead"
     . $GITTREEDIR/SRC_VERSION
 fi
 
 src_vn=`echo "${SOURCE_VERSION}" | sed "s/^[Vv]// ; s/-.*// ; s/\..*//"`
-MYTH_BINARY_VERSION=`grep "MYTH_BINARY_VERSION" libs/libmythbase/mythversion.h \
+MYTH_BINARY_VERSION=`grep -m 1 "MYTHTV_BINARY_VERSION" configure \
   | sed 's/.*"\(.*\)".*/\1/'`
 
 bin_vn=`echo $MYTH_BINARY_VERSION | sed 's/\..*//'`

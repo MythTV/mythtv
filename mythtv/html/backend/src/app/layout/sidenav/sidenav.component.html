@@ -1,66 +1,45 @@
-<ng-container *ngIf="m_haveDatabase">
+<ng-container>
     <div class="navbar flex relative lg:static surface-ground">
         <div id="sidebar"
-            class="bg-gray-900 lg:block flex-shrink-0 absolute lg:static left-0 top-0 z-2 border-gray-800 w-18rem lg:w-5rem select-none" [hidden]="m_showSidebar">
+            class="bg-gray-900 lg:block flex-shrink-0 absolute lg:static left-0 top-0 z-2 border-gray-800 w-18rem lg:w-5rem select-none"
+            [hidden]="dataService.m_showSidebar">
             <div class="flex flex-column h-full">
                 <div class="mt-1 select-none">
                     <ul class="list-none p-3 lg:py-3 lg:px-2 m-0">
-                        <li [routerLink]="''" pTooltip="{{ 'navbar.dashboard' | translate }}" [tooltipDisabled]="m_showSidebar === false">
+                        <li [routerLink]="'dashboard/status'" pTooltip="{{ 'navbar.dashboard' | translate }}"
+                            [tooltipDisabled]="dataService.m_showSidebar === false" (click)="dataService.showSidebar(true)">
                             <a pRipple
-                                class="p-ripple p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
+                                class="p-ripple p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center
+                                hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
                                 <i class="pi pi-home mr-2 lg:mr-0 text-base lg:text-xl"></i>
                                 <span class="font-medium inline lg:hidden">{{ 'navbar.dashboard' | translate }}</span>
                                 <span class="p-ink"></span>
                             </a>
                         </li>
-                        <li [routerLink]="'status'" pTooltip="{{ 'navbar.backendStatus' | translate }}" [tooltipDisabled]="m_showSidebar === false">
-                            <a pRipple
-                                class="p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
-                                <i class="pi pi-info-circle mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                                <span class="font-medium inline lg:hidden">{{ 'navbar.backendStatus' | translate }}</span>
-                                <span class="p-ink"></span>
-                            </a>
-                        </li>
-                        <li [routerLink]="'setupwizard'" pTooltip="{{ 'navbar.backendSetup' | translate }}" [tooltipDisabled]="m_showSidebar === false">
-                            <a pRipple
-                                class="p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
+                        <li [routerLink]="'setupwizard/dbsetup'" pTooltip="{{ 'navbar.backendSetup' | translate }}"
+                            [tooltipDisabled]="dataService.m_showSidebar === false" (click)="dataService.showSidebar(true)">
+                            <a pRipple class="p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800
+                                border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
                                 <i class="pi pi-cog mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                                <span class="font-medium inline lg:hidden">{{ 'navbar.backendSetup' | translate }}</span>
+                                <span class="font-medium inline lg:hidden">{{ 'navbar.backendSetup' | translate
+                                    }}</span>
                                 <span class="p-ink"></span>
                             </a>
                         </li>
-                        <li  (click)="menu.toggle($event)" pTooltip="Backend Settings" [tooltipDisabled]="m_showSidebar === false">
-                            <a pRipple
-                                class="p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
-                                <i class="pi pi-sliders-v mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                                <span class="font-medium inline lg:hidden">Backend Settings</span>
-                                <span class="p-ink"></span>
-                            </a>
-                        </li>
-                        <p-menu #menu [popup]="true" [model]="m_setupMenu"></p-menu>
-                        <li [routerLink]="'guide'" pTooltip="{{ 'navbar.tvGuide' | translate }}" [tooltipDisabled]="m_showSidebar === false">
-                            <a pRipple
-                                class="p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
+                        <li [routerLink]="'dashboard/program-guide'" pTooltip="{{ 'dashboard.programguide' | translate }}"
+                            [tooltipDisabled]="dataService.m_showSidebar === false" (click)="dataService.showSidebar(true)">
+                            <a pRipple class="p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800
+                                border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
                                 <i class="pi pi-map mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                                <span class="font-medium inline lg:hidden">{{ 'navbar.tvGuide' | translate }}</span>
+                                <span class="font-medium inline lg:hidden">{{ 'dashboard.programguide' | translate }}</span>
                                 <span class="p-ink"></span>
                             </a>
                         </li>
-                        <ng-container *ngIf="m_devMode">
-                            <li [routerLink]="'testbed'" pTooltip="{{ 'navbar.testbed' | translate }}" [tooltipDisabled]="m_showSidebar === false">
-                                <a pRipple
-                                    class="p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
-                                    <i class="pi pi-pencil mr-2 lg:mr-0 text-base lg:text-xl"></i>
-                                    <span class="font-medium inline lg:hidden">{{ 'navbar.testbed' | translate }}</span>
-                                    <span class="p-ink"></span>
-                                </a>
-                            </li>
-                        </ng-container>
                     </ul>
                 </div>
             </div>
         </div>
-        <div class="contentarea px-3 w-full">
+        <div class="contentarea px-0 lg:px-3 w-full">
             <router-outlet></router-outlet>
         </div>
     </div>

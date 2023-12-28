@@ -18,13 +18,13 @@
 
 #include "metadataimagedownload.h"
 
-QEvent::Type ImageDLEvent::kEventType =
+const QEvent::Type ImageDLEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-QEvent::Type ImageDLFailureEvent::kEventType =
+const QEvent::Type ImageDLFailureEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-QEvent::Type ThumbnailDLEvent::kEventType =
+const QEvent::Type ThumbnailDLEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 MetadataImageDownload::~MetadataImageDownload()

@@ -350,6 +350,8 @@ EOF
     }
     foreach my $row (@{$rows{'rows'}}) {
         my $show = new MythTV::Recording(@$row);
+    # Skip deleted recordings
+        next unless ($show->{'recgroup'} ne 'Deleted');
     # Skip LiveTV recordings?
         next unless (defined($live) || $show->{'recgroup'} ne 'LiveTV');
     # File doesn't exist locally

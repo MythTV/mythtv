@@ -55,13 +55,13 @@ ChannelScannerGUI::~ChannelScannerGUI()
     Teardown();
     if (m_scanMonitor)
     {
-        post_event(m_scanMonitor, ScannerEvent::ScanShutdown, kCodeRejected);
+        post_event(m_scanMonitor, ScannerEvent::kScanShutdown, kCodeRejected);
     }
 }
 
 void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
 {
-    if (scanEvent->type() == ScannerEvent::ScanComplete)
+    if (scanEvent->type() == ScannerEvent::kScanComplete)
     {
         if (m_scanStage)
             m_scanStage->SetScanProgress(1.0);
@@ -69,10 +69,10 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
         InformUser(tr("Scan complete"));
 
         // HACK: make channel insertion work after [21644]
-        post_event(m_scanMonitor, ScannerEvent::ScanShutdown, kCodeAccepted);
+        post_event(m_scanMonitor, ScannerEvent::kScanShutdown, kCodeAccepted);
     }
-    else if (scanEvent->type() == ScannerEvent::ScanShutdown ||
-             scanEvent->type() == ScannerEvent::ScanErrored)
+    else if (scanEvent->type() == ScannerEvent::kScanShutdown ||
+             scanEvent->type() == ScannerEvent::kScanErrored)
     {
         ScanDTVTransportList transports;
         if (m_sigmonScanner)
@@ -88,10 +88,13 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
         success |= (m_externRecScanner != nullptr);
 #endif
+#ifdef USING_HDHOMERUN
+        success |= (m_hdhrScanner != nullptr);
+#endif
 
         Teardown();
 
-        if (scanEvent->type() == ScannerEvent::ScanErrored)
+        if (scanEvent->type() == ScannerEvent::kScanErrored)
         {
             QString error = scanEvent->strValue();
             InformUser(error);
@@ -104,7 +107,7 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
             Process(transports, success);
         }
     }
-    else if (scanEvent->type() ==  ScannerEvent::AppendTextToLog)
+    else if (scanEvent->type() ==  ScannerEvent::kAppendTextToLog)
     {
         if (m_scanStage)
             m_scanStage->AppendLine(scanEvent->strValue());
@@ -114,19 +117,19 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
     if (!m_scanStage)
         return;
 
-    if (scanEvent->type() == ScannerEvent::SetStatusText)
+    if (scanEvent->type() == ScannerEvent::kSetStatusText)
         m_scanStage->SetStatusText(scanEvent->strValue());
-    else if (scanEvent->type() == ScannerEvent::SetStatusTitleText)
+    else if (scanEvent->type() == ScannerEvent::kSetStatusTitleText)
         m_scanStage->SetStatusTitleText(scanEvent->strValue());
-    else if (scanEvent->type() == ScannerEvent::SetPercentComplete)
+    else if (scanEvent->type() == ScannerEvent::kSetPercentComplete)
         m_scanStage->SetScanProgress(scanEvent->intValue() * 0.01);
-    else if (scanEvent->type() == ScannerEvent::SetStatusRotorPosition)
+    else if (scanEvent->type() == ScannerEvent::kSetStatusRotorPosition)
         m_scanStage->SetStatusRotorPosition(scanEvent->intValue());
-    else if (scanEvent->type() == ScannerEvent::SetStatusSignalLock)
+    else if (scanEvent->type() == ScannerEvent::kSetStatusSignalLock)
         m_scanStage->SetStatusLock(scanEvent->intValue());
-    else if (scanEvent->type() == ScannerEvent::SetStatusSignalToNoise)
+    else if (scanEvent->type() == ScannerEvent::kSetStatusSignalToNoise)
         m_scanStage->SetStatusSignalToNoise(scanEvent->intValue());
-    else if (scanEvent->type() == ScannerEvent::SetStatusSignalStrength)
+    else if (scanEvent->type() == ScannerEvent::kSetStatusSignalStrength)
         m_scanStage->SetStatusSignalStrength(scanEvent->intValue());
 }
 
@@ -150,7 +153,7 @@ void ChannelScannerGUI::quitScanning(void)
 
     if (m_scanMonitor)
     {
-        post_event(m_scanMonitor, ScannerEvent::ScanShutdown, kCodeRejected);
+        post_event(m_scanMonitor, ScannerEvent::kScanShutdown, kCodeRejected);
     }
 }
 

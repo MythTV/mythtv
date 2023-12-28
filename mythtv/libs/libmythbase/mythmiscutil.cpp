@@ -106,7 +106,10 @@ bool getUptime(std::chrono::seconds &uptime)
  *  \todo Memory Statistics are not supported (by MythTV) on NT or DOS.
  *  \return true if it succeeds, false otherwise.
  */
-bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
+bool getMemStats([[maybe_unused]] int &totalMB,
+                 [[maybe_unused]] int &freeMB,
+                 [[maybe_unused]] int &totalVM,
+                 [[maybe_unused]] int &freeVM)
 {
 #ifdef __linux__
     static constexpr size_t MB { 1024LL * 1024 };
@@ -159,10 +162,6 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     freeVM = (int)(free >> 10);
     return true;
 #else
-    Q_UNUSED(totalMB);
-    Q_UNUSED(freeMB);
-    Q_UNUSED(totalVM);
-    Q_UNUSED(freeVM);
     return false;
 #endif
 }
@@ -207,7 +206,7 @@ bool ping(const QString &host, std::chrono::milliseconds timeout)
                          kMSProcessEvents) == GENERIC_EXIT_OK;
 #else
     QString addrstr =
-        MythCoreContext::resolveAddress(host, gCoreContext->ResolveAny, true);
+        MythCoreContext::resolveAddress(host, MythCoreContext::ResolveAny, true);
     QHostAddress addr = QHostAddress(addrstr);
 #if defined(__FreeBSD__) || defined(Q_OS_DARWIN)
     QString timeoutparam("-t");
@@ -703,7 +702,12 @@ void myth_yield(void)
 #include <sys/ptrace.h>
 #include <sys/syscall.h>
 #if __has_include(<linux/ioprio.h>)
+// Starting with kernel 6.5.0, the following include uses the C++
+// reserved keyword "class" as a variable name. Fortunately we can
+// redefine it without any ill effects.
+#define class class2
 #include <linux/ioprio.h>
+#undef class
 #else
 static constexpr int8_t IOPRIO_BITS        { 16 };
 static constexpr int8_t IOPRIO_CLASS_SHIFT { 13 };

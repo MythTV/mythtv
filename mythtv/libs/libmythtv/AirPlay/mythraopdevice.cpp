@@ -1,3 +1,5 @@
+#include <limits> // workaround QTBUG-90395
+
 #include <QTimer>
 #include <QtEndian>
 #include <QNetworkInterface>

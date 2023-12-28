@@ -4,7 +4,7 @@
 <context>
     <name>(ArchiveUtils)</name>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="74"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="52"/>
         <source>Cannot find the MythArchive work directory.
 Have you set the correct path in the settings?</source>
         <translation>Impossibile trovare la directory di lavoro di MythArchive.
@@ -14,19 +14,19 @@ Have you set the correct path in the settings?</source>
 <context>
     <name>(MythArchiveMain)</name>
     <message>
-        <location filename="../mytharchive/main.cpp" line="92"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="92"/>
         <source>Found a lock file but the owning process isn&apos;t running!
 Removing stale lock file.</source>
         <translation>Trovato un file bloccato ma il processo proprietario non è in esecuzione!
 Rimuovo lo stato di blocco del file.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="203"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="203"/>
         <source>Last run did not create a playable DVD.</source>
         <translation>L&apos;ultima esecuzione non ha creato un DVD riproducibile.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="210"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="210"/>
         <source>Last run failed to create a DVD.</source>
         <translation>L&apos;ultima esecuzione ha fallito la creazione del DVD.</translation>
     </message>
@@ -370,7 +370,7 @@ Rimuovo lo stato di blocco del file.</translation>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="442"/>
         <source>MythArchive External Commands</source>
-        <translation>Comandi esterni MythArchive </translation>
+        <translation>Comandi esterni MythArchive</translation>
     </message>
     <message>
         <source>MythArchive Settings (2)</source>
@@ -393,37 +393,37 @@ Rimuovo lo stato di blocco del file.</translation>
 <context>
     <name>BurnMenu</name>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1093"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1092"/>
         <source>Cannot burn a DVD.
 The last run failed to create a DVD.</source>
-        <translation>Impossibile masterizzare un DVD.
-L&apos;ultima  creazione di un DVD è fallita.</translation>
+        <translation>Impossibile masterizzare il DVD.
+L&apos;ultimo tentativo di creare un DVD è fallito.</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/mythburn.cpp" line="1098"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1110"/>
+        <source>Burn DVD</source>
+        <translation>Scrivi DVD</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="1099"/>
-        <location filename="../mytharchive/mythburn.cpp" line="1111"/>
-        <source>Burn DVD</source>
-        <translation>Masterizza DVD</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1100"/>
         <source>
 Place a blank DVD in the drive and select an option below.</source>
         <translation>
 Colloca un DVD vergine nell&apos;unità e seleziona una opzione.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1112"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1111"/>
         <source>Burn DVD Rewritable</source>
         <translation>Masterizza DVD riscrivibile</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1113"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1112"/>
         <source>Burn DVD Rewritable (Force Erase)</source>
         <translation>Masterizza DVD riscrivibile (forza cancellazione)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1167"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1166"/>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
         <translation>Non è stato possibile eseguire mytharchivehelper per scrivere il DVD.</translation>
     </message>
@@ -499,50 +499,50 @@ Colloca un DVD vergine nell&apos;unità e seleziona una opzione.</translation>
 <context>
     <name>ExportNative</name>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="197"/>
+        <location filename="../mytharchive/exportnative.cpp" line="198"/>
         <source>You need to add at least one item to archive!</source>
         <translation>È richiesta l&apos;aggiunta di almeno un oggetto nell&apos;archivio!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="342"/>
+        <location filename="../mytharchive/exportnative.cpp" line="343"/>
         <source>Menu</source>
         <translation>Menù</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="349"/>
+        <location filename="../mytharchive/exportnative.cpp" line="350"/>
         <source>Remove Item</source>
         <translation>Rimuovi oggetti</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="441"/>
+        <location filename="../mytharchive/exportnative.cpp" line="442"/>
         <source>It was not possible to create the DVD. An error occured when running the scripts</source>
         <translation>Non è stato possibile creare il DVD. E&apos; occorso un errore durante l&apos;esecuzione degli script</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="477"/>
+        <location filename="../mytharchive/exportnative.cpp" line="478"/>
         <source>You don&apos;t have any videos!</source>
-        <translation>Non si hai nessun video!</translation>
+        <translation>Non c&apos;è nessun video!</translation>
     </message>
 </context>
 <context>
     <name>FileSelector</name>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="64"/>
+        <location filename="../mytharchive/fileselector.cpp" line="61"/>
         <source>Find File</source>
         <translation>Trova file</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="67"/>
+        <location filename="../mytharchive/fileselector.cpp" line="64"/>
         <source>Find Directory</source>
         <translation>Trova directory</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="70"/>
+        <location filename="../mytharchive/fileselector.cpp" line="67"/>
         <source>Find Files</source>
         <translation>Trova i file</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="283"/>
+        <location filename="../mytharchive/fileselector.cpp" line="280"/>
         <source>The selected item is not a directory!</source>
         <translation>L&apos;oggetto selezionato non è una directory!</translation>
     </message>
@@ -583,39 +583,39 @@ Colloca un DVD vergine nell&apos;unità e seleziona una opzione.</translation>
 <context>
     <name>LogViewer</name>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="76"/>
+        <location filename="../mytharchive/logviewer.cpp" line="75"/>
         <source>Cannot find any logs to show!</source>
         <translation>Impossibile trovare log da visualizzare!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="198"/>
+        <location filename="../mytharchive/logviewer.cpp" line="189"/>
         <source>Background creation has been asked to stop.
 This may take a few minutes.</source>
         <translation>E&apos; stato richiesto l&apos;arresto della creazione dello sfondo.
 Questo può richiedere alcuni minuti.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="337"/>
+        <location filename="../mytharchive/logviewer.cpp" line="328"/>
         <source>Menu</source>
         <translation>Menù</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="345"/>
+        <location filename="../mytharchive/logviewer.cpp" line="336"/>
         <source>Don&apos;t Auto Update</source>
         <translation>Nessun aggiornamento automatico</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="347"/>
+        <location filename="../mytharchive/logviewer.cpp" line="338"/>
         <source>Auto Update</source>
         <translation>Aggiornamento automatico</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="349"/>
+        <location filename="../mytharchive/logviewer.cpp" line="340"/>
         <source>Show Progress Log</source>
         <translation>Mostra log interattivo</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="350"/>
+        <location filename="../mytharchive/logviewer.cpp" line="341"/>
         <source>Show Full Log</source>
         <translation>Mostra log completo</translation>
     </message>
@@ -623,80 +623,80 @@ Questo può richiedere alcuni minuti.</translation>
 <context>
     <name>MythBurn</name>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="330"/>
-        <location filename="../mytharchive/mythburn.cpp" line="450"/>
+        <location filename="../mytharchive/mythburn.cpp" line="329"/>
+        <location filename="../mytharchive/mythburn.cpp" line="449"/>
         <source>No Cut List</source>
         <translation>Nessun elenco tagli</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="341"/>
+        <location filename="../mytharchive/mythburn.cpp" line="340"/>
         <source>You need to add at least one item to archive!</source>
         <translation>Devi aggiungere almeno un oggetto nell&apos;archivio!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="387"/>
+        <location filename="../mytharchive/mythburn.cpp" line="386"/>
         <source>Retrieving File Information. Please Wait...</source>
         <translation>Recupero informazioni sui file. Attendere...</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="453"/>
+        <location filename="../mytharchive/mythburn.cpp" line="452"/>
         <source>Encoder: </source>
         <translation>Encoder: </translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="765"/>
+        <location filename="../mytharchive/mythburn.cpp" line="764"/>
         <source>Menu</source>
         <translation>Menù</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="319"/>
-        <location filename="../mytharchive/mythburn.cpp" line="439"/>
+        <location filename="../mytharchive/mythburn.cpp" line="318"/>
+        <location filename="../mytharchive/mythburn.cpp" line="438"/>
         <source>Using Cut List</source>
         <translation>Usa elenco tagli</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="324"/>
-        <location filename="../mytharchive/mythburn.cpp" line="444"/>
+        <location filename="../mytharchive/mythburn.cpp" line="323"/>
+        <location filename="../mytharchive/mythburn.cpp" line="443"/>
         <source>Not Using Cut List</source>
         <translation>Non uso elenco tagli</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="776"/>
+        <location filename="../mytharchive/mythburn.cpp" line="775"/>
         <source>Don&apos;t Use Cut List</source>
         <translation>Non usare elenco tagli</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="781"/>
+        <location filename="../mytharchive/mythburn.cpp" line="780"/>
         <source>Use Cut List</source>
         <translation>Usa elenco tagli</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="786"/>
+        <location filename="../mytharchive/mythburn.cpp" line="785"/>
         <source>Remove Item</source>
         <translation>Rimuovi elemento</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="787"/>
+        <location filename="../mytharchive/mythburn.cpp" line="786"/>
         <source>Edit Details</source>
         <translation>Modifica dettagli</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="788"/>
+        <location filename="../mytharchive/mythburn.cpp" line="787"/>
         <source>Change Encoding Profile</source>
         <translation>Cambia profilo encoder</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="789"/>
+        <location filename="../mytharchive/mythburn.cpp" line="788"/>
         <source>Edit Thumbnails</source>
         <translation>Modifica anteprima</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="924"/>
+        <location filename="../mytharchive/mythburn.cpp" line="923"/>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
         <translation>Non è stato possibile creare il DVD, E&apos; occorso un errore durante l&apos;esecuzione degli script</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="966"/>
+        <location filename="../mytharchive/mythburn.cpp" line="965"/>
         <source>You don&apos;t have any videos!</source>
         <translation>Non hai nessun video!</translation>
     </message>
@@ -704,39 +704,39 @@ Questo può richiedere alcuni minuti.</translation>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mytharchive/main.cpp" line="323"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="323"/>
         <source>Toggle use cut list state for selected program</source>
         <translation>Attiva/Disattiva stato elenco lista tagli per il programma selezionato</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="326"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="326"/>
         <source>Create DVD</source>
         <translation>Crea DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="328"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="328"/>
         <source>Create Archive</source>
         <translation>Crea archivio</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="330"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="330"/>
         <source>Import Archive</source>
         <translation>Importa archivio</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="332"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="332"/>
         <source>View Archive Log</source>
         <translation>Mostra archivio log</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="334"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="334"/>
         <source>Play Created DVD</source>
-        <translation>Riproduci DVD creato</translation>
+        <translation>Leggi DVD creato</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="336"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="336"/>
         <source>Burn DVD</source>
-        <translation>Masterizza DVD</translation>
+        <translation>Scrivi DVD</translation>
     </message>
 </context>
 <context>
@@ -1047,36 +1047,36 @@ Collocare un DVD vergine nell&apos;unità e selezionare un opzione sotto.</trans
 <context>
     <name>RecordingSelector</name>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="88"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="373"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="478"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="89"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="374"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="479"/>
         <source>All Recordings</source>
         <translation>Tutte le registrazioni</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="109"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="110"/>
         <source>Retrieving Recording List.
 Please Wait...</source>
         <translation>Recupero elenco registrazioni.
 Attendere...</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="133"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="134"/>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
-        <translation>O non si dispone di nessuna registrazione o le registrazioni non sono disponibile localmente!</translation>
+        <translation>Non c&apos;è nessuna registrazione o le registrazioni non sono disponibili localmente!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="181"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="182"/>
         <source>Menu</source>
         <translation>Menù</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="188"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="189"/>
         <source>Clear All</source>
         <translation>Cancella tutto</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="189"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="190"/>
         <source>Select All</source>
         <translation>Seleziona tutto</translation>
     </message>
@@ -1084,48 +1084,48 @@ Attendere...</translation>
 <context>
     <name>SelectDestination</name>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="30"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="29"/>
         <source>Single Layer DVD</source>
         <translation>DVD singolo strato</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="34"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="33"/>
         <source>Dual Layer DVD</source>
         <translation>DVD doppio strato</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="31"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="30"/>
         <source>Single Layer DVD (4,482 MB)</source>
         <translation>DVD singolo strato (4,482 MB)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="35"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="34"/>
         <source>Dual Layer DVD (8,964 MB)</source>
         <translation>DVD doppio strato (8,964 MB)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="38"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="37"/>
         <source>DVD +/- RW</source>
         <translation>DVD +/- RW</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="39"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="38"/>
         <source>Rewritable DVD</source>
         <translation>DVD riscrivibile</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="42"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="41"/>
         <source>File</source>
         <translation>File</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="43"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="42"/>
         <source>Any file accessable from your filesystem.</source>
         <translation>Tutti file accesibili dal filesystem.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/selectdestination.cpp" line="261"/>
-        <location filename="../mytharchive/selectdestination.cpp" line="317"/>
+        <location filename="../mytharchive/selectdestination.cpp" line="262"/>
+        <location filename="../mytharchive/selectdestination.cpp" line="318"/>
         <source>Unknown</source>
         <translation>Sconosciuto</translation>
     </message>
@@ -1255,7 +1255,7 @@ Attendere...</translation>
     <message>
         <location filename="themestrings.h" line="154"/>
         <source>Log Viewer</source>
-        <translation>Visualizzatore log</translation>
+        <translation>Visualizza log</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="214"/>
@@ -1290,252 +1290,252 @@ Attendere...</translation>
     <message>
         <location filename="themestrings.h" line="6"/>
         <source>%SIZE% ~ %PROFILE%</source>
-        <translation type="unfinished">%SIZE% ~ %PROFILE%</translation>
+        <translation>%SIZE% ~ %PROFILE%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>%date% / %profile%</source>
-        <translation type="unfinished">%date% / %profile%</translation>
+        <translation>%date% / %profile%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>%size% (%profile%)</source>
-        <translation type="unfinished">%size% (%profile%)</translation>
+        <translation>%size% (%profile%)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>0.00Gb</source>
-        <translation type="unfinished">0.00Gb</translation>
+        <translation>0.00Gb</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>12.34GB</source>
-        <translation type="unfinished">12.34GB</translation>
+        <translation>12.34GB</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
         <source>&lt;-- Details</source>
-        <translation type="unfinished">&lt;-- Dettagli</translation>
+        <translation>&lt;-- Dettagli</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>&lt;-- Main Menu</source>
-        <translation type="unfinished">&lt;-- Menu Principale</translation>
+        <translation>&lt;-- Menu Principale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>Add Recordings</source>
-        <translation type="unfinished">Agg.Registrazioni</translation>
+        <translation>Agg.Registrazioni</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>Add Videos</source>
-        <translation type="unfinished">Aggiungi video</translation>
+        <translation>Aggiungi video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
         <source>Add a recording or video to archive.</source>
-        <translation type="unfinished">Aggiungi una registrazione o un video da archiviare.</translation>
+        <translation>Aggiungi una registrazione o un video da archiviare.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="30"/>
         <source>Add a recording, video or file to archive.</source>
-        <translation type="unfinished">Aggiungi una registrazione, un video o un file da archiviare.</translation>
+        <translation>Aggiungi una registrazione, un video o un file da archiviare.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="32"/>
         <source>Archive</source>
-        <translation type="unfinished">Archivio</translation>
+        <translation>Archivio</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="33"/>
         <source>Archive Callsign:</source>
-        <translation type="unfinished">Archivio Stazioni:</translation>
+        <translation>Archivio Stazioni:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="34"/>
         <source>Archive Chan ID:</source>
-        <translation type="unfinished">Archivio Chan ID:</translation>
+        <translation>Archivio Chan ID:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="35"/>
         <source>Archive Chan No:</source>
-        <translation type="unfinished">Archivio Chan No:</translation>
+        <translation>Archivio Chan No:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="36"/>
         <source>Archive Files</source>
-        <translation type="unfinished">Archivio File</translation>
+        <translation>Archivio File</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="38"/>
         <source>Archive Item:</source>
-        <translation type="unfinished">Archivio Elementi:</translation>
+        <translation>Archivio Elementi:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="40"/>
         <source>Archive Items to DVD</source>
-        <translation type="unfinished">Archivio elementi a DVD</translation>
+        <translation>Archivio elementi a DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
         <source>Archive Log Viewer</source>
-        <translation type="unfinished">Visualizza Log archivio</translation>
+        <translation>Visualizza Log archivio</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="42"/>
         <source>Archive Media</source>
-        <translation type="unfinished">Archivio Media</translation>
+        <translation>Archivio Media</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="43"/>
         <source>Archive Name:</source>
-        <translation type="unfinished">Nome archivio:</translation>
+        <translation>Nome archivio:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>Associate Channel</source>
-        <translation type="unfinished">Associa canale</translation>
+        <translation>Associa canale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="47"/>
         <source>Associated Channel</source>
-        <translation type="unfinished">Canale associato</translation>
+        <translation>Canale associato</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="49"/>
         <source>Burn</source>
-        <translation type="unfinished">Masterizza</translation>
+        <translation>Masterizza</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
         <source>Burn Created DVD</source>
-        <translation type="unfinished">Masterizza DVD creato</translation>
+        <translation>Scrivi DVD creato</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>Burn the last created archive to DVD</source>
-        <translation type="unfinished">Masterizza su DVD l&apos;ultimo archivio creato</translation>
+        <translation>Masterizza su DVD l&apos;ultimo archivio creato</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
         <source>Burn to DVD:</source>
-        <translation type="unfinished">Masterizza su DVD:</translation>
+        <translation>Masterizza su DVD:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>CUTLIST</source>
-        <translation type="unfinished">LISTATAGLI</translation>
+        <translation>LISTATAGLI</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="55"/>
         <source>Callsign</source>
-        <translation type="unfinished">Emittente</translation>
+        <translation>Emittente</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="57"/>
         <source>Callsign:  %1</source>
-        <translation type="unfinished">Emittente:  %1</translation>
+        <translation>Emittente:  %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="59"/>
         <source>Cancel Job</source>
-        <translation type="unfinished">Annulla lavoro</translation>
+        <translation>Annulla lavoro</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="61"/>
         <source>Chan. Id:</source>
-        <translation type="unfinished">Id Can.:</translation>
+        <translation>Id Can.:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="63"/>
         <source>Change</source>
-        <translation type="unfinished">Modifica</translation>
+        <translation>Modifica</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="65"/>
         <source>Channel ID</source>
-        <translation type="unfinished">ID Canale</translation>
+        <translation>ID Canale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="67"/>
         <source>Channel ID:  %1</source>
-        <translation type="unfinished">ID Canale:  %1</translation>
+        <translation>ID Canale:  %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="68"/>
         <source>Channel Name:</source>
-        <translation type="unfinished">Nome canale:</translation>
+        <translation>Nome canale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="69"/>
         <source>Channel No</source>
-        <translation type="unfinished">N. canale</translation>
+        <translation>N. canale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="71"/>
         <source>Channel Number:  %1</source>
-        <translation type="unfinished">Numero canale:  %1</translation>
+        <translation>Numero canale:  %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="74"/>
         <source>Chapter Menu --&gt;</source>
-        <translation type="unfinished">Menu capitolo --&gt;</translation>
+        <translation>Menu capitolo --&gt;</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="75"/>
         <source>Chapter Menu:</source>
-        <translation type="unfinished">Menu capitolo:</translation>
+        <translation>Menu capitolo:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="76"/>
         <source>Chapters</source>
-        <translation type="unfinished">Capitoli</translation>
+        <translation>Capitoli</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="82"/>
         <source>Create ISO Image:</source>
-        <translation type="unfinished">Crea immagine ISO:</translation>
+        <translation>Crea immagine ISO:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="83"/>
         <source>Create a</source>
-        <translation type="unfinished">Crea un</translation>
+        <translation>Crea un</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="84"/>
         <source>Create a DVD of your videos</source>
-        <translation type="unfinished">Crea un DVD dei tuoi video</translation>
+        <translation>Crea un DVD dei tuoi video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="85"/>
         <source>Current Destination:</source>
-        <translation type="unfinished">Destinazione attuale:</translation>
+        <translation>Destinazione attuale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="87"/>
         <source>Current Position:</source>
-        <translation type="unfinished">Posizione attuale:</translation>
+        <translation>Posizione attuale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="88"/>
         <source>Current Size:</source>
-        <translation type="unfinished">Dimensione attuale:</translation>
+        <translation>Dimensione attuale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="89"/>
         <source>Current selected item size: %1</source>
-        <translation type="unfinished">Dimensione elemento selezionato: %1</translation>
+        <translation>Dimensione elemento selezionato: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="90"/>
         <source>Current size: %1</source>
-        <translation type="unfinished">Dimensione attuale: %1</translation>
+        <translation>Dimensione attuale: %1</translation>
     </message>
     <message numerus="yes">
         <location filename="themestrings.h" line="91"/>
         <source>Current: %n</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Corrente: %n</numerusform>
             <numerusform>Correnti: %n</numerusform>
         </translation>
@@ -1543,147 +1543,147 @@ Attendere...</translation>
     <message>
         <location filename="themestrings.h" line="92"/>
         <source>DVD</source>
-        <translation type="unfinished">DVD</translation>
+        <translation>DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="93"/>
         <source>DVD Media</source>
-        <translation type="unfinished">DVD Media</translation>
+        <translation>DVD Media</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="94"/>
         <source>DVD Menu</source>
-        <translation type="unfinished">Menu DVD</translation>
+        <translation>Menu DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="96"/>
         <source>Date (time)</source>
-        <translation type="unfinished">Data (ora)</translation>
+        <translation>Data (ora)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="98"/>
         <source>Destination</source>
-        <translation type="unfinished">Destinazione</translation>
+        <translation>Destinazione</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="99"/>
         <source>Destination Free Space:</source>
-        <translation type="unfinished">Spazio libero su destinazione:</translation>
+        <translation>Spazio libero su destinazione:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="103"/>
         <source>Details:</source>
-        <translation type="unfinished">Dettagli:</translation>
+        <translation>Dettagli:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="104"/>
         <source>Done</source>
-        <translation type="unfinished">Fatto</translation>
+        <translation>Fatto</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="105"/>
         <source>Edit Archive item Information</source>
-        <translation type="unfinished">Modifica info elemento dell&apos;archivio</translation>
+        <translation>Modifica info elemento dell&apos;archivio</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="106"/>
         <source>Edit Details</source>
-        <translation type="unfinished">Modifica dettagli</translation>
+        <translation>Modifica dettagli</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="107"/>
         <source>Edit Thumbnails</source>
-        <translation type="unfinished">Modifica anteprima</translation>
+        <translation>Modifica anteprima</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="108"/>
         <source>Eject your</source>
-        <translation type="unfinished">Espelli il tuo</translation>
+        <translation>Espelli il tuo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="110"/>
         <source>Encode your video</source>
-        <translation type="unfinished">Codifica il video</translation>
+        <translation>Codifica il video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="111"/>
         <source>Encode your video to a file</source>
-        <translation type="unfinished">Codifica il video su un file</translation>
+        <translation>Codifica il video su un file</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="112"/>
         <source>Encoded Size:</source>
-        <translation type="unfinished">Dimensione codificata:</translation>
+        <translation>Dimensione codificata:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="113"/>
         <source>Encoder Profile:</source>
-        <translation type="unfinished">Profilo  encoder:</translation>
+        <translation>Profilo  encoder:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="114"/>
         <source>Encoding Profile</source>
-        <translation type="unfinished">Profilo codifica</translation>
+        <translation>Profilo codifica</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="116"/>
         <source>Error: %1</source>
-        <translation type="unfinished">Errore: %1</translation>
+        <translation>Errore: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="118"/>
         <source>Export</source>
-        <translation type="unfinished">Esporta</translation>
+        <translation>Esporta</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="119"/>
         <source>Export your</source>
-        <translation type="unfinished">Esporta il tuo</translation>
+        <translation>Esporta il tuo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="120"/>
         <source>Export your videos</source>
-        <translation type="unfinished">Esporta i tuoi video</translation>
+        <translation>Esporta i tuoi video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="121"/>
         <source>File</source>
-        <translation type="unfinished">File</translation>
+        <translation>File</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="122"/>
         <source>File Browser</source>
-        <translation type="unfinished">Browser File</translation>
+        <translation>Browser File</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="125"/>
         <source>File browser</source>
-        <translation type="unfinished">Browser file</translation>
+        <translation>Browser file</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="126"/>
         <source>File...</source>
-        <translation type="unfinished">File...</translation>
+        <translation>File...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="127"/>
         <source>Filename:</source>
-        <translation type="unfinished">Nome file:</translation>
+        <translation>Nome file:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="128"/>
         <source>Filesize</source>
-        <translation type="unfinished">Dimensione file</translation>
+        <translation>Dimensione file</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="132"/>
         <source>Find Location</source>
-        <translation type="unfinished">Trova posizione</translation>
+        <translation>Trova posizione</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="134"/>
         <source>First, select the thumb image you want to change from the overview. Second, press the &apos;tab&apos; key to move to the select thumb frame button to change the image.</source>
-        <translation type="unfinished">Seleziona prima dall&apos;elenco l&apos;icona che desideri modificare, poi premi il tasto &quot;Tab&quot; per passare al pulsante di selezione del riquadro dell&apos;icona per modificare l&apos;immagine.</translation>
+        <translation>Seleziona prima dall&apos;elenco l&apos;icona che desideri modificare, poi premi il tasto &quot;Tab&quot; per passare al pulsante di selezione del riquadro dell&apos;icona per modificare l&apos;immagine.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="135"/>
@@ -1693,124 +1693,124 @@ Attendere...</translation>
     <message>
         <location filename="themestrings.h" line="136"/>
         <source>Force Overwrite of DVD-RW Media:</source>
-        <translation type="unfinished">Forza sovrascrittura supporti DVD-RW:</translation>
+        <translation>Forza sovrascrittura supporti DVD-RW:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="140"/>
         <source>Import</source>
-        <translation type="unfinished">Importa</translation>
+        <translation>Importa</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="142"/>
         <source>Import an</source>
-        <translation type="unfinished">Importa un</translation>
+        <translation>Importa un</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="143"/>
         <source>Import recordings from a native archive</source>
-        <translation type="unfinished">Importa registrazioni da archivio originale</translation>
+        <translation>Importa registrazioni da archivio originale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="144"/>
         <source>Import videos from an Archive</source>
-        <translation type="unfinished">Importa registrazioni da un archivio</translation>
+        <translation>Importa registrazioni da un archivio</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="146"/>
         <source>Intro --&gt;</source>
-        <translation type="unfinished">Intro --&gt;</translation>
+        <translation>Intro --&gt;</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="147"/>
         <source>Intro:</source>
-        <translation type="unfinished">Intro:</translation>
+        <translation>Intro:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="148"/>
         <source>Local Callsign:</source>
-        <translation type="unfinished">Emittente locale:</translation>
+        <translation>Emittente locale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="149"/>
         <source>Local Chan ID:</source>
-        <translation type="unfinished">ID emittente locale:</translation>
+        <translation>ID emittente locale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="150"/>
         <source>Local Chan No:</source>
-        <translation type="unfinished">N. Can. locale:</translation>
+        <translation>N. Can. locale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="152"/>
         <source>Local Name:</source>
-        <translation type="unfinished">Nome locale:</translation>
+        <translation>Nome locale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="153"/>
         <source>Log</source>
-        <translation type="unfinished">Log</translation>
+        <translation>Log</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="155"/>
         <source>Log viewer</source>
-        <translation type="unfinished">Visualizz. Log</translation>
+        <translation>Visualizz. Log</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="156"/>
         <source>MENU changes focus. Numbers 0-9 jump to that thumb image.
 When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT jumps forward/backward by the seek amount, and SELECT chooses the current preview image for the selected thumb image.</source>
-        <translation type="unfinished">MENU cambia selezione. I numeri da 0 a 9 spostano sull&apos;immagine dell&apos;icona.
+        <translation>MENU cambia selezione. I numeri da 0 a 9 spostano sull&apos;immagine dell&apos;icona.
 Quando l&apos;immagine di anteprima è selezionata, SU/GIÙ cambia l&apos;entità dello spostamento, SINISTRA/DESTRA salta in avanti/indietro dell&apos;entità di spostamento definita e SELEZIONA sceglie l&apos;immagine di anteprima corrente come immagine della stazione selezionata.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="158"/>
         <source>Main Menu:</source>
-        <translation type="unfinished">Menù principale:</translation>
+        <translation>Menù principale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="159"/>
         <source>Main menu</source>
-        <translation type="unfinished">Menù principale</translation>
+        <translation>Menù principale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="161"/>
         <source>Make ISO image</source>
-        <translation type="unfinished">Crea immagine ISO</translation>
+        <translation>Crea immagine ISO</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="162"/>
         <source>Make ISO image:</source>
-        <translation type="unfinished">Crea immagine ISO:</translation>
+        <translation>Crea immagine ISO:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="163"/>
         <source>Media</source>
-        <translation type="unfinished">Media</translation>
+        <translation>Media</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="165"/>
         <source>Metadata</source>
-        <translation type="unfinished">Metadati</translation>
+        <translation>Metadati</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="166"/>
         <source>Name</source>
-        <translation type="unfinished">Nome</translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="168"/>
         <source>Name:  %1</source>
-        <translation type="unfinished">Nome:  %1</translation>
+        <translation>Nome:  %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="169"/>
         <source>Navigation</source>
-        <translation type="unfinished">Navigazione</translation>
+        <translation>Navigazione</translation>
     </message>
     <message numerus="yes">
         <location filename="themestrings.h" line="172"/>
         <source>New: %n</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Nuovo: %n</numerusform>
             <numerusform>Nuovi: %n</numerusform>
         </translation>
@@ -1818,47 +1818,47 @@ Quando l&apos;immagine di anteprima è selezionata, SU/GIÙ cambia l&apos;entit�
     <message>
         <location filename="themestrings.h" line="174"/>
         <source>No files are selected for DVD</source>
-        <translation type="unfinished">Non ci sono file selezionati per il DVD</translation>
+        <translation>Non ci sono file selezionati per il DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="177"/>
         <source>Not Applicable</source>
-        <translation type="unfinished">Non applicabile</translation>
+        <translation>Non applicabile</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="178"/>
         <source>Not Available in this Theme</source>
-        <translation type="unfinished">Non disponibile in questo tema</translation>
+        <translation>Non disponibile in questo tema</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="179"/>
         <source>Not available in this theme</source>
-        <translation type="unfinished">Non disponibile in questo tema</translation>
+        <translation>Non disponibile in questo tema</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="184"/>
         <source>Original Size:</source>
-        <translation type="unfinished">Dimensione originale:</translation>
+        <translation>Dimensione originale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="186"/>
         <source>Overwrite DVD-RW Media:</source>
-        <translation type="unfinished">Sovrascrivi media DVD-RW:</translation>
+        <translation>Sovrascrivi media DVD-RW:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="188"/>
         <source>Parental Level</source>
-        <translation type="unfinished">Livello parentale</translation>
+        <translation>Livello parentale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="189"/>
         <source>Parental Level:</source>
-        <translation type="unfinished">Livello parentale:</translation>
+        <translation>Livello parentale:</translation>
     </message>
     <message numerus="yes">
         <location filename="themestrings.h" line="191"/>
         <source>Parental Level: %n</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Livello parentale: %n</numerusform>
             <numerusform>Livelli parentali: %n</numerusform>
         </translation>
@@ -1866,82 +1866,82 @@ Quando l&apos;immagine di anteprima è selezionata, SU/GIÙ cambia l&apos;entit�
     <message>
         <location filename="themestrings.h" line="194"/>
         <source>Play the last created archive DVD</source>
-        <translation type="unfinished">Riproduci ultimo DVD archivio creato</translation>
+        <translation>Riproduci ultimo DVD archivio creato</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="195"/>
         <source>Position View:</source>
-        <translation type="unfinished">Vista posizione:</translation>
+        <translation>Vista posizione:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="196"/>
         <source>Press &apos;left&apos; and &apos;right&apos; arrows to move through the frames. Press &apos;up&apos; and &apos;down&apos; arrows to change seek amount. Press &apos;select&apos; or &apos;enter&apos; key to lock the selected thumb image.</source>
-        <translation type="unfinished">Premi le frecce &quot;sinistra&quot; e &quot;destra&quot; per spostarti tra i frame. Premi le frecce &quot;su&quot; e &quot;giù&quot; per modificare l&apos;entità della ricerca. Premi il tasto &quot;seleziona&quot; o &quot;invio&quot; per bloccare l&apos;immagine dell&apos;icona selezionata.</translation>
+        <translation>Premi le frecce &quot;sinistra&quot; e &quot;destra&quot; per spostarti tra i frame. Premi le frecce &quot;su&quot; e &quot;giù&quot; per modificare l&apos;entità della ricerca. Premi il tasto &quot;seleziona&quot; o &quot;invio&quot; per bloccare l&apos;immagine dell&apos;icona selezionata.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="198"/>
         <source>Preview</source>
-        <translation type="unfinished">Anteprima</translation>
+        <translation>Anteprima</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="201"/>
         <source>Read video from data dvd or file</source>
-        <translation type="unfinished">Leggi video da dvd o file dati</translation>
+        <translation>Leggi video da dvd o file dati</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="203"/>
         <source>Recordings</source>
-        <translation type="unfinished">Registrazioni</translation>
+        <translation>Registrazioni</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="204"/>
         <source>Recordings group:</source>
-        <translation type="unfinished">Gruppo registrazioni:</translation>
+        <translation>Gruppo registrazioni:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="206"/>
         <source>Save recordings and videos to a native archive</source>
-        <translation type="unfinished">Salva registrazioni e video in un archivio originale</translation>
+        <translation>Salva registrazioni e video in un archivio originale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="207"/>
         <source>Save recordings and videos to video DVD</source>
-        <translation type="unfinished">Salva registrazioni e video su DVD video</translation>
+        <translation>Salva registrazioni e video su DVD video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="209"/>
         <source>Search Chan ID</source>
-        <translation type="unfinished">Cerca ID Can</translation>
+        <translation>Cerca ID Can</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="210"/>
         <source>Search Chan NO</source>
-        <translation type="unfinished">Cerca N. Can</translation>
+        <translation>Cerca N. Can</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="212"/>
         <source>Search Local</source>
-        <translation type="unfinished">Cerca localmente</translation>
+        <translation>Cerca localmente</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="216"/>
         <source>Seek Amount:</source>
-        <translation type="unfinished">Entità spostamento:</translation>
+        <translation>Entità spostamento:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="217"/>
         <source>Seek amount:</source>
-        <translation type="unfinished">Entità spostamento:</translation>
+        <translation>Entità spostamento:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="220"/>
         <source>Select Channel</source>
-        <translation type="unfinished">Seleziona canale</translation>
+        <translation>Seleziona canale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="224"/>
         <source>Select Files</source>
-        <translation type="unfinished">Selesiona file</translation>
+        <translation>Selesiona file</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="225"/>
@@ -1951,52 +1951,52 @@ Quando l&apos;immagine di anteprima è selezionata, SU/GIÙ cambia l&apos;entit�
     <message>
         <location filename="themestrings.h" line="226"/>
         <source>Select Recordings for your archive or image</source>
-        <translation type="unfinished">Seleziona registrazioni per l&apos;archivio o immagine</translation>
+        <translation>Seleziona registrazioni per l&apos;archivio o immagine</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="228"/>
         <source>Select a destination for your archive or image</source>
-        <translation type="unfinished">Seleziona destinazione per l&apos;archivio o immagine</translation>
+        <translation>Seleziona destinazione per l&apos;archivio o immagine</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="233"/>
         <source>Select thumb image:</source>
-        <translation type="unfinished">Seleziona immagine icona:</translation>
+        <translation>Seleziona immagine icona:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="234"/>
         <source>Select your DVD menu theme</source>
-        <translation type="unfinished">Seleziona tema del menu del DVD</translation>
+        <translation>Seleziona tema del menu del DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="235"/>
         <source>Selected Items to be archived</source>
-        <translation type="unfinished">Elementi selezionati da archiviare</translation>
+        <translation>Elementi selezionati da archiviare</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="236"/>
         <source>Selected Items to be burned</source>
-        <translation type="unfinished">Elementi selezionati da masterizzare</translation>
+        <translation>Elementi selezionati da masterizzare</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="237"/>
         <source>Selected recording item size: %1</source>
-        <translation type="unfinished">Dimensioni della registrazione selezionata: %1</translation>
+        <translation>Dimensioni della registrazione selezionata: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="238"/>
         <source>Selected video item size: %1</source>
-        <translation type="unfinished">Dimensioni del video selezionato: %1</translation>
+        <translation>Dimensioni del video selezionato: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="239"/>
         <source>Sep 13, 2004 11:00 pm (1h 15m)</source>
-        <translation type="unfinished">Set 13, 2004 11:00 pm (1h 15m)</translation>
+        <translation>Set 13, 2004 11:00 pm (1h 15m)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="240"/>
         <source>Show</source>
-        <translation type="unfinished">Mostra</translation>
+        <translation>Mostra</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="241"/>
@@ -2006,7 +2006,7 @@ Quando l&apos;immagine di anteprima è selezionata, SU/GIÙ cambia l&apos;entit�
     <message>
         <location filename="themestrings.h" line="293"/>
         <source>~</source>
-        <translation type="unfinished">~</translation>
+        <translation>~</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="227"/>
@@ -2016,27 +2016,27 @@ Quando l&apos;immagine di anteprima è selezionata, SU/GIÙ cambia l&apos;entit�
     <message>
         <location filename="themestrings.h" line="242"/>
         <source>Show Videos</source>
-        <translation type="unfinished">Mostra video</translation>
+        <translation>Mostra video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="243"/>
         <source>Show log with archive activities</source>
-        <translation type="unfinished">Mostra log attività di archiviazione</translation>
+        <translation>Mostra log attività di archiviazione</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="244"/>
         <source>Show the Archive Log Viewer</source>
-        <translation type="unfinished">Mostra visualizzatore log dell&apos;archivio</translation>
+        <translation>Mostra visualizzatore log dell&apos;archivio</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="245"/>
         <source>Size:</source>
-        <translation type="unfinished">Dimensione:</translation>
+        <translation>Dimensione:</translation>
     </message>
     <message numerus="yes">
         <location filename="themestrings.h" line="246"/>
         <source>Size: %n</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Dimensione: %n</numerusform>
             <numerusform>Dimensioni: %n</numerusform>
         </translation>
@@ -2044,82 +2044,82 @@ Quando l&apos;immagine di anteprima è selezionata, SU/GIÙ cambia l&apos;entit�
     <message>
         <location filename="themestrings.h" line="249"/>
         <source>Start Time: %1</source>
-        <translation type="unfinished">Ora inizio: %1</translation>
+        <translation>Ora inizio: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="250"/>
         <source>Start to</source>
-        <translation type="unfinished">Inizia a</translation>
+        <translation>Inizia a</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="251"/>
         <source>Start to Burn your archive to DVD</source>
-        <translation type="unfinished">Inizia a masterizzare l&apos;archivio su DVD</translation>
+        <translation>Inizia a masterizzare l&apos;archivio su DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="253"/>
         <source>Subtitle: %1</source>
-        <translation type="unfinished">Sottotitolo: %1</translation>
+        <translation>Sottotitolo: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="254"/>
         <source>Test</source>
-        <translation type="unfinished">Test</translation>
+        <translation>Test</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="255"/>
         <source>Test created</source>
-        <translation type="unfinished">Test creato</translation>
+        <translation>Test creato</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="256"/>
         <source>Test created DVD</source>
-        <translation type="unfinished">Prova il DVD creato</translation>
+        <translation>Prova DVD creato</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="257"/>
         <source>Theme description</source>
-        <translation type="unfinished">Descrizione tema</translation>
+        <translation>Descrizione tema</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="258"/>
         <source>Theme for the DVD menu:</source>
-        <translation type="unfinished">Tema del menu del DVD:</translation>
+        <translation>Tema del menu del DVD:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="259"/>
         <source>Theme preview:</source>
-        <translation type="unfinished">Anteprima tema:</translation>
+        <translation>Anteprima tema:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="264"/>
         <source>Title: %1</source>
-        <translation type="unfinished">Titolo: %1</translation>
+        <translation>Titolo: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="265"/>
         <source>Tools and Utilities for archives</source>
-        <translation type="unfinished">Strumenti e utilità per gli archivi</translation>
+        <translation>Strumenti e utilità per gli archivi</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="268"/>
         <source>Use archive</source>
-        <translation type="unfinished">Usa archivio</translation>
+        <translation>Usa archivio</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="269"/>
         <source>Used: %1</source>
-        <translation type="unfinished">Usato: %1</translation>
+        <translation>Usato: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="270"/>
         <source>Utilities</source>
-        <translation type="unfinished">Utilità</translation>
+        <translation>Utilità</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="271"/>
         <source>Utilities for MythArchive</source>
-        <translation type="unfinished">Utilità per MythArchive</translation>
+        <translation>Utilità per MythArchive</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="273"/>
@@ -2129,57 +2129,57 @@ Quando l&apos;immagine di anteprima è selezionata, SU/GIÙ cambia l&apos;entit�
     <message>
         <location filename="themestrings.h" line="274"/>
         <source>Video category:</source>
-        <translation type="unfinished">Categoria video:</translation>
+        <translation>Categoria video:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="275"/>
         <source>Videos</source>
-        <translation type="unfinished">Video</translation>
+        <translation>Video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="276"/>
         <source>View progress of your archive or image</source>
-        <translation type="unfinished">Mostra stato di avanzamento dell&apos;archivio o immagine</translation>
+        <translation>Mostra stato di avanzamento dell&apos;archivio o immagine</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="277"/>
         <source>Write video to data dvd or file</source>
-        <translation type="unfinished">Scrivi video su dvd o file dati</translation>
+        <translation>Scrivi video su dvd o file dati</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="278"/>
         <source>XML File to Import</source>
-        <translation type="unfinished">File XML da importare</translation>
+        <translation>File XML da importare</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="279"/>
         <source>decrease seek amount</source>
-        <translation type="unfinished">riduci entità ricerca</translation>
+        <translation>riduci entità ricerca</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="281"/>
         <source>frame</source>
-        <translation type="unfinished">frame</translation>
+        <translation>frame</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="282"/>
         <source>increase seek amount</source>
-        <translation type="unfinished">aumenta entità ricerca</translation>
+        <translation>aumenta entità ricerca</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="283"/>
         <source>move left</source>
-        <translation type="unfinished">muovi a sinistra</translation>
+        <translation>muovi a sinistra</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="284"/>
         <source>move right</source>
-        <translation type="unfinished">muovi a destra</translation>
+        <translation>muovi a destra</translation>
     </message>
     <message numerus="yes">
         <location filename="themestrings.h" line="285"/>
         <source>profile: %n</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>profilo: %n</numerusform>
             <numerusform>profili: %n</numerusform>
         </translation>
@@ -2187,12 +2187,12 @@ Quando l&apos;immagine di anteprima è selezionata, SU/GIÙ cambia l&apos;entit�
     <message>
         <location filename="themestrings.h" line="286"/>
         <source>sep 13, 2004 11:00 pm (1h 15m)</source>
-        <translation type="unfinished">set 13, 2004 11:00 pm (1h 15m)</translation>
+        <translation>set 13, 2004 11:00 pm (1h 15m)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="288"/>
         <source>to</source>
-        <translation type="unfinished">a</translation>
+        <translation>a</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="289"/>
@@ -2292,17 +2292,17 @@ Quando l&apos;immagine di anteprima è selezionata, SU/GIÙ cambia l&apos;entit�
     <message>
         <location filename="themestrings.h" line="25"/>
         <source>Add Recording</source>
-        <translation>Agg.Registraz.</translation>
+        <translation>Agg.Registraz</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="27"/>
         <source>Add Video</source>
-        <translation>Aggiungi video</translation>
+        <translation>Agg.Video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="24"/>
         <source>Add File</source>
-        <translation>Aggiungi file</translation>
+        <translation>Agg.File</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>
@@ -2596,7 +2596,7 @@ Quando l&apos;immagine di anteprima è selezionata, SU/GIÙ cambia l&apos;entit�
     <message>
         <location filename="themestrings.h" line="193"/>
         <source>Play Created DVD</source>
-        <translation>Riproduci DVD creato</translation>
+        <translation>Vedi DVD creato</translation>
     </message>
     <message>
         <source>Burn DVD</source>
@@ -2606,17 +2606,17 @@ Quando l&apos;immagine di anteprima è selezionata, SU/GIÙ cambia l&apos;entit�
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="856"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="853"/>
         <source>Menu</source>
         <translation>Menù</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="863"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="860"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Esci, salva anteprime</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="864"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="861"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Esci, non salvare anteprime</translation>
     </message>
@@ -2624,28 +2624,28 @@ Quando l&apos;immagine di anteprima è selezionata, SU/GIÙ cambia l&apos;entit�
 <context>
     <name>VideoSelector</name>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="140"/>
+        <location filename="../mytharchive/videoselector.cpp" line="141"/>
         <source>Menu</source>
         <translation>Menù</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="147"/>
+        <location filename="../mytharchive/videoselector.cpp" line="148"/>
         <source>Clear All</source>
         <translation>Cancella tutto</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="148"/>
+        <location filename="../mytharchive/videoselector.cpp" line="149"/>
         <source>Select All</source>
         <translation>Seleziona tutto</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="330"/>
-        <location filename="../mytharchive/videoselector.cpp" line="496"/>
+        <location filename="../mytharchive/videoselector.cpp" line="331"/>
+        <location filename="../mytharchive/videoselector.cpp" line="497"/>
         <source>All Videos</source>
         <translation>Tutti i video</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="549"/>
+        <location filename="../mytharchive/videoselector.cpp" line="550"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>Devi inserire una password valida per questo livello parentale</translation>
     </message>

@@ -313,7 +313,8 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
 /*! \brief Create a MythDRMDevice instance.
  * \returns A valid instance or nullptr on error.
 */
-MythDRMPtr MythDRMDevice::Create(QScreen *qScreen, const QString &Device, bool NeedPlanes)
+MythDRMPtr MythDRMDevice::Create(QScreen *qScreen, const QString &Device,
+                                 [[maybe_unused]] bool NeedPlanes)
 {
 #ifdef USING_QTPRIVATEHEADERS
     auto * app = dynamic_cast<QGuiApplication *>(QCoreApplication::instance());
@@ -363,8 +364,6 @@ MythDRMPtr MythDRMDevice::Create(QScreen *qScreen, const QString &Device, bool N
 #ifdef USING_QTPRIVATEHEADERS
     if (auto result = std::shared_ptr<MythDRMDevice>(new MythDRMDevice(Device, NeedPlanes)); result && result->m_valid)
         return result;
-#else
-    (void)NeedPlanes;
 #endif
     return nullptr;
 }
@@ -508,7 +507,9 @@ MythDRMDevice::MythDRMDevice(QString Device, bool NeedPlanes)
     Load();
     m_valid = false;
 
-    // Find a user suggested connector or the first connected
+    // Find a user suggested connector or the first connected.  Oddly
+    // clang-tidy-16 thinks the "if" and "else" clauses are the same.
+    // NOLINTNEXTLINE(bugprone-branch-clone)
     if (!s_mythDRMConnector.isEmpty())
     {
         m_connector = MythDRMConnector::GetConnectorByName(m_connectors, s_mythDRMConnector);
@@ -632,6 +633,7 @@ bool MythDRMDevice::CanSwitchModes() const
     return m_valid && m_authenticated && m_atomic;
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 const DRMModes& MythDRMDevice::GetModes() const
 {
     static const DRMModes empty;
@@ -980,10 +982,12 @@ void MythDRMDevice::AnalysePlanes()
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found %1 planes; %2 for this CRTC")
         .arg(allplanes.size()).arg(m_planes.size()));
 
+    // NOLINTBEGIN(cppcoreguidelines-init-variables)
     DRMPlanes primaryVideo;
     DRMPlanes overlayVideo;
     DRMPlanes primaryGUI;
     DRMPlanes overlayGUI;
+    // NOLINTEND(cppcoreguidelines-init-variables)
 
     for (const auto & plane : m_planes)
     {
@@ -1027,7 +1031,9 @@ void MythDRMDevice::AnalysePlanes()
     };
 
     // Note: If video is an overlay or both planes are of the same type then
-    // video composition will likely fail if there is no zpos support
+    // video composition will likely fail if there is no zpos support.  Oddly
+    // clang-tidy-16 thinks the "if" and "else" clauses are the same.
+    // NOLINTNEXTLINE(bugprone-branch-clone)
     if (primaryVideo.empty())
     {
         m_videoPlane = overlayVideo.front();

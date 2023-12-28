@@ -8,6 +8,7 @@
 #include <QObject>
 #include <QMap>
 #include <QDateTime>
+#include <QElapsedTimer>
 
 // MythTV headers
 #include "libmythbase/programinfo.h"

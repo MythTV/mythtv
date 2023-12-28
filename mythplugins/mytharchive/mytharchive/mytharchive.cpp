@@ -8,6 +8,9 @@
 #include <csignal>
 #include <cstdlib>
 #include <iostream>
+#ifdef _WIN32
+#include <processthreadsapi.h>
+#endif
 
 // Qt
 #include <QApplication>
@@ -69,11 +72,16 @@ static bool checkProcess(const QString &lockFile)
     LOG(VB_GENERAL, LOG_NOTICE,
         QString("Checking if PID %1 is still running").arg(pid));
 
+#ifdef _WIN32
+    HANDLE handy = OpenProcess(SYNCHRONIZE|PROCESS_TERMINATE, TRUE, pid);
+    return TerminateProcess(handy,0) == 0;
+#else
     if (kill(pid, 0) == -1)
     {
         if (errno == ESRCH)
             return false;
     }
+#endif
 
     return true;
 }
@@ -244,10 +252,8 @@ static void runBurnDVD(void)
 static void (*m_callback)(void *, QString &) = nullptr;
 static void *m_callbackdata = nullptr;
 
-static void ArchiveCallback(void *data, QString &selection)
+static void ArchiveCallback([[maybe_unused]] void *data, QString &selection)
 {
-    (void) data;
-
     QString sel = selection.toLower();
 
     if (sel == "archive_create_dvd")

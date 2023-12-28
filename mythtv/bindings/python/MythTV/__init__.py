@@ -15,13 +15,13 @@ __all_data__        = ['Record', 'Recorded', 'RecordedProgram', 'OldRecorded', \
                        'InternetContent', 'InternetContentArticles', \
                        'InternetSource', 'Song', 'Album', 'Artist', \
                        'MusicPlaylist', 'MusicDirectory', 'RecordedArtwork', \
-                       'RecordedFile']
+                       'RecordedFile', 'InetrefGrabber']
 
 __all_method__      = ['MythBE', 'BEEventMonitor', 'MythSystemEvent', \
                        'Frontend', 'MythDB', 'MythXML', 'MythMusic', \
                        'MythVideo']
 
-__all__             = ['static', 'MSearch', 'MythLog', 'StorageGroup']\
+__all__             = ['static', '_versions', 'MSearch', 'MythLog', 'StorageGroup']\
                         +__all_exceptions__\
                         +__all_utility__\
                         +__all_system__\
@@ -29,6 +29,7 @@ __all__             = ['static', 'MSearch', 'MythLog', 'StorageGroup']\
                         +__all_data__\
                         +__all_method__
 
+from . import _versions
 from . import static
 from .exceptions import *
 from .logging import *
@@ -42,6 +43,6 @@ from .dataheap import *
 from .methodheap import *
 
 
-__version__ = OWN_VERSION
+__version__ = ".".join(str(x) for x in _versions.OWN_VERSION)
 static.dbmodule = dbmodule.__version__
 

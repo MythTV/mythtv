@@ -1,5 +1,6 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { CanComponentDeactivate } from 'src/app/can-deactivate-guard.service';
@@ -15,7 +16,8 @@ interface CardTypeExt extends CardType {
 @Component({
   selector: 'app-capture-cards',
   templateUrl: './capture-cards.component.html',
-  styleUrls: ['./capture-cards.component.css']
+  styleUrls: ['./capture-cards.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
 
@@ -27,6 +29,11 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
     'FREEBOX',
     'IMPORT',
     'DEMO',
+    'V4L2ENC',
+    'HDPVR',
+    'SATIP',
+    'VBOX',
+    'FIREWIRE'
   ];
 
   currentTab: number = -1;
@@ -36,8 +43,8 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
   disabledTab: boolean[] = [];
   activeTab: boolean[] = [];
   displayDeleteThis: boolean[] = [];
-  dirtyText = 'settings.unsaved';
-  warningText = 'settings.warning';
+  dirtyText = 'settings.common.unsaved';
+  warningText = 'settings.common.warning';
   deletedText = 'settings.common.deleted';
   newText = 'settings.common.new';
 
@@ -57,9 +64,10 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
 
   cardTypes!: CardTypeExt[];
 
-  constructor(private mythService: MythService,
-    private captureCardService: CaptureCardService, private setupService: SetupService,
+  constructor(private mythService: MythService, public router: Router,
+    private captureCardService: CaptureCardService, public setupService: SetupService,
     private translate: TranslateService) {
+    this.setupService.setCurrentForm(null);
     this.mythService.GetHostName().subscribe(data => {
       this.m_hostName = data.String;
       this.loadCards(true);
@@ -174,13 +182,6 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
     };
     // Update non-standard defaults on some card types.
     switch (newOne.CardType) {
-      case "DVB":
-        newOne.SignalTimeout = 500;
-        break;
-      case "HDHOMERUN":
-        newOne.SignalTimeout = 3000;
-        newOne.ChannelTimeout = 6000;
-        break;
       case "EXTERNAL":
         newOne.ChannelTimeout = 20000;
         break;
@@ -188,6 +189,8 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
         newOne.VideoDevice = "http://mafreebox.freebox.fr/freeboxtv/playlist.m3u"
         newOne.ChannelTimeout = 30000;
         break;
+      case "SATIP":
+        newOne.DVBDiSEqCType = 1;
     }
     for (let i = 0; i < this.activeTab.length; i++)
       this.activeTab[i] = false;

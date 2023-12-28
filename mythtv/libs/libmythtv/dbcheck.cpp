@@ -360,13 +360,10 @@ to check for duplicates in the BUSQ
  */
 bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
                              const bool upgradeIfNoUI,
-                             const bool informSystemd)
+                             [[maybe_unused]] const bool informSystemd)
 {
 #ifdef IGNORE_SCHEMA_VER_MISMATCH
     return true;
-#endif
-#if CONFIG_SYSTEMD_NOTIFY == 0
-    Q_UNUSED(informSystemd);
 #endif
     SchemaUpgradeWizard *schema_wizard = nullptr;
 
@@ -3928,6 +3925,36 @@ static bool doUpgradeTVDatabaseSchema(void)
         updates = getRecordingExtenderDbInfo(2);
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1376", dbver))
+            return false;
+    }
+
+    if (dbver == "1376")
+    {
+        DBUpdates updates {
+            "DROP TABLE IF EXISTS `logging`;",
+            "UPDATE settings SET data='0' WHERE value='LogEnabled'; ",   // Keeps MythWeb happy
+        };
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1377", dbver))
+            return false;
+    }
+
+    if (dbver == "1377")
+    {
+        // Change reverted, but the version number can't be reused.
+        DBUpdates updates {};
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1378", dbver))
+            return false;
+    }
+
+    if (dbver == "1378")
+    {
+        DBUpdates updates {
+            "CREATE INDEX dir_id ON gallery_files (dir_id);"
+        };
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1379", dbver))
             return false;
     }
 

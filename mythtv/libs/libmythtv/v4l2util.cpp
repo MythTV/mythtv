@@ -40,7 +40,7 @@ bool V4L2util::Open(const QString& dev_name, const QString& vbi_dev_name)
     m_fd = open(dev_name.toLatin1().constData(), O_RDWR);
     if (m_fd < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
+        LOG(VB_CHANNEL, LOG_INFO, LOC +
             QString("Could not open '%1': ").arg(dev_name) + ENO);
         return false;
     }

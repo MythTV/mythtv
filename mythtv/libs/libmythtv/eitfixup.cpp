@@ -2,6 +2,9 @@
 #include <algorithm>
 #include <array>
 
+// Qt Headers
+#include <QRegularExpression>
+
 // MythTV headers
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/programinfo.h" // for CategoryType, subtitle types and audio and video properties

@@ -479,10 +479,8 @@ bool DiSEqCDevTree::Store(uint cardid, const QString &device)
     return true;
 }
 
-bool DiSEqCDevTree::SetTone(bool on) const
+bool DiSEqCDevTree::SetTone([[maybe_unused]] bool on) const
 {
-    (void) on;
-
     bool success = false;
 
 #ifdef USING_DVB
@@ -671,7 +669,9 @@ static bool send_diseqc(int fd, const dvb_diseqc_master_cmd cmd)
  *  \param data_len Length of optional data.
  *  \param data Pointer to optional data.
  */
-bool DiSEqCDevTree::SendCommand(uint adr, uint cmd, uint repeats,
+bool DiSEqCDevTree::SendCommand([[maybe_unused]] uint adr,
+                                [[maybe_unused]] uint cmd,
+                                [[maybe_unused]] uint repeats,
                                 cmd_vec_t &data) const
 {
     // check payload validity
@@ -683,9 +683,6 @@ bool DiSEqCDevTree::SendCommand(uint adr, uint cmd, uint repeats,
 
 #ifndef USING_DVB
 
-    (void) adr;
-    (void) cmd;
-    (void) repeats;
     return false;
 
 #else // if USING_DVB
@@ -1359,14 +1356,10 @@ void DiSEqCDevSwitch::SetNumPorts(uint num_ports)
     m_numPorts = num_ports;
 }
 
-bool DiSEqCDevSwitch::ExecuteLegacy(const DiSEqCDevSettings &settings,
-                                    const DTVMultiplex &tuning,
-                                    uint pos)
+bool DiSEqCDevSwitch::ExecuteLegacy([[maybe_unused]] const DiSEqCDevSettings &settings,
+                                    [[maybe_unused]] const DTVMultiplex &tuning,
+                                    [[maybe_unused]] uint pos)
 {
-    (void) settings;
-    (void) tuning;
-    (void) pos;
-
 #if defined(USING_DVB) && defined(FE_DISHNETWORK_SEND_LEGACY_CMD)
     static const cmd_vec_t kSw21Cmds  { 0x34, 0x65, };
     static const cmd_vec_t kSw42Cmds  { 0x46, 0x17, };
@@ -1512,12 +1505,10 @@ bool DiSEqCDevSwitch::ExecuteTone(const DiSEqCDevSettings &/*settings*/,
     return false;
 }
 
-bool DiSEqCDevSwitch::ExecuteVoltage(const DiSEqCDevSettings &settings,
-                                     const DTVMultiplex &tuning, uint pos)
+bool DiSEqCDevSwitch::ExecuteVoltage([[maybe_unused]] const DiSEqCDevSettings &settings,
+                                     [[maybe_unused]] const DTVMultiplex &tuning,
+                                     uint pos)
 {
-    (void) settings;
-    (void) tuning;
-
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Changing to Voltage Switch port " +
             QString("%1/2").arg(pos + 1));
 
@@ -1534,12 +1525,10 @@ bool DiSEqCDevSwitch::ExecuteVoltage(const DiSEqCDevSettings &settings,
     return false;
 }
 
-bool DiSEqCDevSwitch::ExecuteMiniDiSEqC(const DiSEqCDevSettings &settings,
-                                        const DTVMultiplex &tuning, uint pos)
+bool DiSEqCDevSwitch::ExecuteMiniDiSEqC([[maybe_unused]] const DiSEqCDevSettings &settings,
+                                        [[maybe_unused]] const DTVMultiplex &tuning,
+                                        uint pos)
 {
-    (void) settings;
-    (void) tuning;
-
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Changing to MiniDiSEqC Switch port " +
             QString("%1/2").arg(pos + 1));
 
@@ -2202,10 +2191,10 @@ bool DiSEqCDevSCR::PowerOff(void) const
     return SendCommand(DISEQC_CMD_ODU, m_repeat, data);
 }
 
-bool DiSEqCDevSCR::SendCommand(uint cmd, uint repeats, cmd_vec_t &data) const
+bool DiSEqCDevSCR::SendCommand(uint cmd,
+                               [[maybe_unused]] uint repeats,
+                               cmd_vec_t &data) const
 {
-    (void) repeats;
-
     // power on bus
     if (!m_tree.SetVoltage(SEC_VOLTAGE_18))
         return false;

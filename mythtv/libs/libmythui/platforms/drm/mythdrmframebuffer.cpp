@@ -5,7 +5,8 @@
 /*! \class MythDRMFramebuffer
  * \brief A simple object representing a DRM Framebuffer object.
 */
-DRMFb MythDRMFramebuffer::Create(int FD, uint32_t Id)
+DRMFb MythDRMFramebuffer::Create([[maybe_unused]] int FD,
+                                 [[maybe_unused]] uint32_t Id)
 {
     /*
     Currently disabled as drmModeGetFB2 is not available on older systems and
@@ -13,15 +14,12 @@ DRMFb MythDRMFramebuffer::Create(int FD, uint32_t Id)
     if (auto fb = std::shared_ptr<MythDRMFramebuffer>(new MythDRMFramebuffer(FD, Id)); fb.get() && fb->m_id)
         return fb;
     */
-    (void)FD;
-    (void)Id;
     return nullptr;
 }
 
-MythDRMFramebuffer::MythDRMFramebuffer(int FD, uint32_t Id)
+MythDRMFramebuffer::MythDRMFramebuffer([[maybe_unused]] int FD,
+                                       [[maybe_unused]] uint32_t Id)
 {
-    (void)FD;
-    (void)Id;
     /*
     if (auto fb = drmModeGetFB2(FD, Id); fb)
     {

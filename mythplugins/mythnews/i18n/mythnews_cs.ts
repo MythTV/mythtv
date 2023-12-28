@@ -4,22 +4,22 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnews/main.cpp" line="42"/>
+        <location filename="../mythnews/libmythnews.cpp" line="42"/>
         <source>RSS News feed reader</source>
         <translation>RSS čtečka novinek</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="46"/>
+        <location filename="../mythnews/libmythnews.cpp" line="46"/>
         <source>Update news items</source>
         <translation>Aktualizovat novinky</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="48"/>
+        <location filename="../mythnews/libmythnews.cpp" line="48"/>
         <source>Force update news items</source>
         <translation>Vynutit aktualizaci novinek</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="50"/>
+        <location filename="../mythnews/libmythnews.cpp" line="50"/>
         <source>Cancel news item updating</source>
         <translation>Zrušit aktualizaci novinek</translation>
     </message>
@@ -37,22 +37,22 @@
         <translation>Neznámý</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="627"/>
+        <location filename="../mythnews/mythnews.cpp" line="604"/>
         <source>Manage Feeds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="628"/>
+        <location filename="../mythnews/mythnews.cpp" line="605"/>
         <source>Add Feed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="631"/>
+        <location filename="../mythnews/mythnews.cpp" line="608"/>
         <source>Edit Feed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="632"/>
+        <location filename="../mythnews/mythnews.cpp" line="609"/>
         <source>Delete Feed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -76,7 +76,7 @@
         <translation type="vanished">%1 of %2 (%3 procent)</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="538"/>
+        <location filename="../mythnews/mythnews.cpp" line="515"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Není nastaven příkaz pro spuštění prohlížeče! MythNews vyžaduje instalovaný MythBrowser.</translation>
     </message>
@@ -90,7 +90,7 @@
         <translation type="vanished">Smazat zdroj zpráv</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="614"/>
+        <location filename="../mythnews/mythnews.cpp" line="591"/>
         <source>Options</source>
         <translation>Možnosti</translation>
     </message>

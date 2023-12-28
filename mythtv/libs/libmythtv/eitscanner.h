@@ -42,8 +42,7 @@ class EITScanner : public QRunnable
 
   private:
     void TeardownAll(void);
-    static void *SpawnEventLoop(void*);
-           void  RescheduleRecordings(void);
+    void  RescheduleRecordings(void);
 
     QMutex                m_lock;
     ChannelBase          *m_channel                 {nullptr};
@@ -52,23 +51,18 @@ class EITScanner : public QRunnable
     EITHelper            *m_eitHelper               {nullptr};
     MThread              *m_eventThread             {nullptr};
     volatile bool         m_exitThread              {false};
-    QWaitCondition        m_exitThreadCond;                     // protected by lock
+    QWaitCondition        m_exitThreadCond;                     // protected by m_lock
 
     TVRec                *m_rec                     {nullptr};
     volatile bool         m_activeScan              {false};    // active scan true, passive scan false
-    volatile bool         m_activeScanStopped       {true};     // protected by lock
-    QWaitCondition        m_activeScanCond;                     // protected by lock
+    volatile bool         m_activeScanStopped       {true};     // protected by m_lock
+    QWaitCondition        m_activeScanCond;                     // protected by m_lock
     QDateTime             m_activeScanNextTrig;
     std::chrono::seconds  m_activeScanTrigTime      {0s};
     QStringList           m_activeScanChannels;
     QStringList::iterator m_activeScanNextChan;
-    uint                  m_activeScanNextChanIndex {0};
 
     uint                  m_cardnum;
-
-    static QMutex         s_resched_lock;
-    static QDateTime      s_resched_next_time;
-
 };
 
 #endif // EITSCANNER_H

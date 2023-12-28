@@ -1,0 +1,30 @@
+<p-card class="md:m-5">
+    <h2>{{ 'settings.rprofiles.title' | translate }}</h2>
+
+    <p-accordion class="col-12 w-full" (onOpen)="onTabOpen($event)" (onClose)="onTabClose($event)" >
+        <p-accordionTab *ngFor="let group of groups; index as ix; first as isFirst" [(selected)]="activeTab[ix]">
+            <ng-template pTemplate="header">
+                <div class="grid  w-full" *ngIf="readyCount > 0">
+                    <div class="col-9 pr-1">
+                        {{group.Name}}
+                        <b>&nbsp;{{ dirtyMessages[ix] }}</b>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="content">
+                <app-profile-group [group]="group"
+                    [parentComponent]="this"></app-profile-group>
+            </ng-template>
+        </p-accordionTab>
+    </p-accordion>
+
+    <div class="flex justify-content-end">
+        <p-button class="p-3" label="{{ 'common.back' | translate }}"
+            (onClick)="router.navigate(['setupwizard/capture-cards'])" icon="pi pi-angle-left"
+            iconPos="left"></p-button>
+
+        <p-button class="p-3" label="{{ 'common.next' | translate }}"
+            (onClick)="router.navigate(['setupwizard/video-sources'])" icon="pi pi-angle-right" iconPos="right"></p-button>
+    </div>
+
+</p-card>

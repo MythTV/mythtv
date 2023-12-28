@@ -224,9 +224,11 @@ V2BackendStatus*  V2Status::GetBackendStatus()
         pJob->setStartTs( (*it).startts    );
         pJob->setInsertTime((*it).inserttime);
         pJob->setType( (*it).type       );
+        pJob->setLocalizedJobName( JobQueue::JobText((*it).type) );
         pJob->setCmds( (*it).cmds       );
         pJob->setFlags( (*it).flags      );
         pJob->setStatus( (*it).status     );
+        pJob->setLocalizedStatus( JobQueue::StatusText((*it).status) );
         pJob->setStatusTime( (*it).statustime);
         pJob->setSchedRunTime( (*it).schedruntime);
         pJob->setArgs( (*it).args       );

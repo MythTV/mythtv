@@ -70,9 +70,16 @@ export interface CaptureDevice {
     CardType:       string;
     SubType:          string;
     VideoDevice:      string;
+    VideoDevicePrompt: string;
+    AudioDevices:     string [];
     FrontendName:     string;
     InputNames:       string [];
     DefaultInputName: string;
+    Description:      string;
+    FirewireModel:    string;
+    IPAddress:        string;
+    TunerType:        string;
+    TunerNumber:      number;
     SignalTimeout:    number;
     ChannelTimeout:   number;
     TuningDelay:      number;
@@ -129,16 +136,26 @@ export interface DiseqcParm {
     description: string,
     type: string,
     inactive: boolean
-  }
+}
 
-  export interface InputGroup {
-    CardInputId:    number;
-    InputGroupId:   number;
+export interface InputGroup {
+    CardInputId: number;
+    InputGroupId: number;
     InputGroupName: string;
-  }
+}
 
-  export interface InputGroupList {
-    InputGroupList : {
-        InputGroups: InputGroup [];
+export interface InputGroupList {
+    InputGroupList: {
+        InputGroups: InputGroup[];
     }
+}
+
+export interface CardSubType {
+    // CardSubType : {
+        CardId:         number;
+        SubType:        string;
+        InputType:      string;
+        HDHRdoesDVBC:   boolean;
+        HDHRdoesDVB:    boolean;
+    // }
 }

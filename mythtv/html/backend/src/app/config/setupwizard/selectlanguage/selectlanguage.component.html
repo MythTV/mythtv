@@ -1,82 +1,94 @@
-<p-dialog header="Country and Language Setup - Help" [(visible)]="m_showHelp">
-    <h4>Some very helpful help text goes here</h4>
-    <p>Some more very very helpful text goes here!</p>
-</p-dialog>
-
-
-<div class="wizard-content m-3">
-    <p-card>
-        <ng-template pTemplate="title">
-            {{ 'setupwizard.localSetup' | translate }}
-        </ng-template>
-        <ng-template pTemplate="subtitle">
-            {{ 'setupwizard.countryAndLanguage' | translate }}
-        </ng-template>
-        <ng-template pTemplate="content">
-            <div class="grid m-3">
-                <div class="col-12 md:col-6 pt-2">
-                    <p-listbox [options]="m_countries" [(ngModel)]="m_wizardData.Country" [multiple]="false"
-                        [filter]="true" optionLabel="Country" [listStyle]="{'max-height':'460px', 'min-height':'460px'}"
-                        (onChange)="countrySelected($event)">
-                        <ng-template pTemplate="header">
-                            <h2>{{ 'setupwizard.selectCountry' | translate }}</h2>
-                        </ng-template>
-                        <ng-template let-country pTemplate="item">
-                            <div #countryrow [attr.id]="country.Code" class="language-item">
-                                <img class="pr-3" src="images/locale/{{country.Image}}" style="width:70px">
-                                <pre><span class="font-bold">{{country.Country}}</span>{{country.NativeCountry !== null ? " - " + country.NativeCountry : ""}} ({{ country.Code}})</pre>
+<div class="wizard-content m-0 md:m-3">
+    <form class="mx-0 md:mx-3" name="langform" #langform="ngForm">
+        <p-card class="m-0 md:m-5">
+            <ng-template pTemplate="title">
+                {{ 'setupwizard.localSetup' | translate }}
+            </ng-template>
+            <ng-template pTemplate="subtitle">
+                {{ 'setupwizard.countryAndLanguage' | translate }}
+            </ng-template>
+            <ng-template pTemplate="content">
+                <div class="grid m-0 md:m-3">
+                    <div class="col-12 md:col-6 pt-2">
+                        <p-listbox [options]="m_countries" [(ngModel)]="m_wizardData.Country" [multiple]="false"
+                            [filter]="true" optionLabel="Country"
+                            [listStyle]="{'max-height':'460px', 'min-height':'460px'}" name="countries">
+                            <ng-template pTemplate="header">
+                                <h2>{{ 'setupwizard.selectCountry' | translate }}</h2>
+                            </ng-template>
+                            <ng-template let-country pTemplate="item">
+                                <div #countryrow [attr.id]="country.Code" class="language-item">
+                                    <img class="pr-3" src="images/locale/{{country.Image}}" style="width:70px">
+                                    <pre><span class="font-bold">{{country.Country}}</span>{{country.NativeCountry !== null ? " - " + country.NativeCountry : ""}} ({{ country.Code}})</pre>
+                                </div>
+                            </ng-template>
+                        </p-listbox>
+                        <div class="pt-5" *ngIf="((m_wizardData.Country.Code != '')) else noCountry">
+                            <p-message severity="success"
+                                text="{{ 'setupwizard.selectedCountry' | translate }} {{m_wizardData.Country.Country}}">
+                            </p-message>
+                        </div>
+                        <ng-template #noCountry>
+                            <div class="pt-5">
+                                <p-message severity="error"
+                                    text="{{ 'setupwizard.noCountry' | translate }}"></p-message>
                             </div>
                         </ng-template>
-                    </p-listbox>
-
-                    <div class="pt-5" *ngIf="((m_wizardData.Country.Code != '')) else noCountry">
-                        <p-message severity="success" text="{{ 'setupwizard.selectedCountry' | translate }} {{m_wizardData.Country.Country}}">
-                        </p-message>
                     </div>
-                    <ng-template #noCountry>
-                        <div class="pt-5">
-                            <p-message severity="error" text="{{ 'setupwizard.noCountry' | translate }}"></p-message>
+
+                    <div class="col-12 md:col-6">
+                        <p-listbox [options]="m_languages" [(ngModel)]="m_wizardData.Language" [multiple]="false"
+                            [filter]="true" optionLabel="Language"
+                            [listStyle]="{'max-height':'460px', 'min-height':'460px'}" name="languages">
+                            <ng-template pTemplate="header">
+                                <h2>{{ 'setupwizard.selectLanguage' | translate }}</h2>
+                            </ng-template>
+                            <ng-template let-language pTemplate="item">
+                                <div #languagerow [attr.id]="language.Code" class="language-item">
+                                    <img class="pr-3" src="images/locale/{{language.Image}}" style="width:70px">
+                                    <pre><span class="font-bold">{{language.Language}}</span> - {{language.NativeLanguage}} ({{language.Code}})</pre>
+                                </div>
+                            </ng-template>
+                        </p-listbox>
+
+                        <div class="pt-5" *ngIf="(m_wizardData.Language.Code != '') else noLanguage">
+                            <p-message severity="success"
+                                text="{{ 'setupwizard.selectedLanguage' | translate }} {{m_wizardData.Language.NativeLanguage}}">
+                            </p-message>
                         </div>
-                    </ng-template>
-
-                </div>
-
-                <div class="col-12 md:col-6">
-                    <p-listbox [options]="m_languages" [(ngModel)]="m_wizardData.Language" [multiple]="false"
-                        [filter]="true" optionLabel="Language"
-                        [listStyle]="{'max-height':'460px', 'min-height':'460px'}"
-                        (onChange)="languageSelected($event)">
-                        <ng-template pTemplate="header">
-                            <h2>{{ 'setupwizard.selectLanguage' | translate }}</h2>
-                        </ng-template>
-                        <ng-template let-language pTemplate="item" >
-                            <div #languagerow [attr.id]="language.Code" class="language-item">
-                                <img class="pr-3" src="images/locale/{{language.Image}}" style="width:70px"> 
-                                <pre><span class="font-bold">{{language.Language}}</span> - {{language.NativeLanguage}} ({{language.Code}})</pre>
+                        <ng-template #noLanguage>
+                            <div class="pt-5">
+                                <p-message class="pt-2" severity="error"
+                                    text="{{ 'setupwizard.noLanguage' | translate }}"></p-message>
                             </div>
                         </ng-template>
-                    </p-listbox>
-
-                    <div class="pt-5" *ngIf="(m_wizardData.Language.Code != '') else noLanguage">
-                        <p-message severity="success" text="{{ 'setupwizard.selectedLanguage' | translate }} {{m_wizardData.Language.NativeLanguage}}">
-                        </p-message>
                     </div>
-                    <ng-template #noLanguage>
-                        <div class="pt-5">
-                            <p-message class="pt-2" severity="error" text="{{ 'setupwizard.noLanguage' | translate }}"></p-message>
-                        </div>
-                    </ng-template>
                 </div>
-            </div>
-        </ng-template>
+            </ng-template>
 
-        <ng-template pTemplate="footer">
-            <div class="p-grid p-nogutter p-justify-end">
-                <p-button label="{{ 'common.next' | translate }}" (onClick)="nextPage()" icon="pi pi-angle-right" iconPos="right"
-                    [disabled]="(m_wizardData.Country.Code == '') || (m_wizardData.Language.Code == '')">
-                </p-button>
-                <p-button class="help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()" icon="pi pi-info-circle" styleClass="p-button-info" ></p-button>
-            </div>
-        </ng-template>
-    </p-card>
+            <ng-template pTemplate="footer">
+                <div class="grid nogutter m-5">
+                    <div class="col-12">
+                        <p-message
+                            *ngIf="successCount > 0 && successCount == expectedCount && errorCount == 0 && !langform.dirty"
+                            severity="success" text="{{ 'common.savesuccess' | translate }}"></p-message>
+                        <p-message *ngIf="this.errorCount > 0" severity="error"
+                            text="{{ 'common.networkfail' | translate }}"></p-message>
+                    </div>
+                    <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
+                        (onClick)="saveForm(); langform.form.markAsPristine()"
+                        [disabled]="!langform.dirty || setupService.schedulingEnabled"></p-button>
+
+                    <p-button class="pr-3" label="{{ 'common.back' | translate }}"
+                        (onClick)="router.navigate(['setupwizard/dbsetup'])" icon="pi pi-angle-left"
+                        iconPos="left"></p-button>
+
+                    <p-button label="{{ 'common.next' | translate }}"
+                        (onClick)="router.navigate(['setupwizard/general'])" icon="pi pi-angle-right" iconPos="right"
+                        [disabled]="(m_wizardData.Country.Code == '') || (m_wizardData.Language.Code == '')">
+                    </p-button>
+                </div>
+            </ng-template>
+        </p-card>
+    </form>
 </div>

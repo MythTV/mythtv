@@ -17,7 +17,14 @@
 #include <QMutex>
 #include <QTcpSocket>
 #ifdef Q_OS_ANDROID
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QtAndroidExtras>
+#else
+#include <QJniEnvironment>
+#include <QJniObject>
+#define QAndroidJniEnvironment QJniEnvironment
+#define QAndroidJniObject QJniObject
+#endif
 #endif
 
 #ifdef _WIN32
@@ -511,7 +518,11 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
 
         if (!manualSelect)
         {
-            if (!PromptForDatabaseParams(failure))
+            // If this is a backend, No longer prompt for database.
+            // Instaed allow the web server to start so that the
+            // database can be set up there
+            if (gCoreContext->IsBackend()
+                || !PromptForDatabaseParams(failure))
                 goto NoDBfound;
         }
         failure = TestDBconnection();
@@ -604,7 +615,11 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
             bool exception=false;
             QAndroidJniEnvironment env;
             QAndroidJniObject myID = QAndroidJniObject::fromString("android_id");
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
             QAndroidJniObject activity = QtAndroid::androidActivity();
+#else
+            QJniObject activity = QNativeInterface::QAndroidApplication::context();
+#endif
             ANDROID_EXCEPTION_CHECK;
             QAndroidJniObject appctx = activity.callObjectMethod
                 ("getApplicationContext", "()Landroid/content/Context;");
@@ -700,6 +715,10 @@ void MythContextSlotHandler::OnCloseDialog(void)
         d->m_loop->exit();
 }
 
+
+// No longer prompt for database, instaed allow the
+// web server to start so that the datbase can be
+// set up there
 
 bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
 {
@@ -906,12 +925,12 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                         break;
                 }
                 startupState = st_dbAwake;
-                [[clang::fallthrough]];
+                [[fallthrough]];
             case st_dbAwake:
                 if (!checkPort(host, port, useTimeout))
                     break;
                 startupState = st_dbStarted;
-                [[clang::fallthrough]];
+                [[fallthrough]];
             case st_dbStarted:
                 // If the database is connecting with link-local
                 // address, it may have changed
@@ -932,7 +951,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                     break;
                 }
                 startupState = st_dbConnects;
-                [[clang::fallthrough]];
+                [[fallthrough]];
             case st_dbConnects:
                 if (m_needsBackend)
                 {
@@ -962,7 +981,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                 backendIP = gCoreContext->GetSettingOnHost
                     ("BackendServerAddr", masterserver);
                 backendPort = MythCoreContext::GetMasterServerPort();
-                [[clang::fallthrough]];
+                [[fallthrough]];
             case st_beWOL:
                 if (!beWOLCmd.isEmpty())
                 {
@@ -972,12 +991,12 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                         break;
                 }
                 startupState = st_beAwake;
-                [[clang::fallthrough]];
+                [[fallthrough]];
             case st_beAwake:
                 if (!checkPort(backendIP, backendPort, useTimeout))
                     break;
                 startupState = st_success;
-                [[clang::fallthrough]];
+                [[fallthrough]];
             case st_success:
                 // Quiet compiler warning.
                 break;
@@ -1361,7 +1380,7 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
 
 bool MythContextPrivate::event(QEvent *e)
 {
-    if (e->type() == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::kMythEventMessage)
     {
         if (m_disableeventpopup)
             return true;
@@ -1598,6 +1617,15 @@ bool MythContext::Init(const bool gui,
 
     SetDisableEventPopup(true);
 
+    if (gui && QCoreApplication::applicationName() == MYTH_APPNAME_MYTHTV_SETUP)
+    {
+        d->TempMainWindow(false);
+        QString warning = QObject::tr("mythtv-setup is deprecated.\n"
+                "To set up MythTV, start mythbackend and use:\n"
+                "http://localhost:6544/setupwizard");
+        WaitFor(ShowOkPopup(warning));
+    }
+
     if (m_appBinaryVersion != MYTH_BINARY_VERSION)
     {
         LOG(VB_GENERAL, LOG_EMERG,
@@ -1611,7 +1639,7 @@ bool MythContext::Init(const bool gui,
         if (gui)
         {
             d->TempMainWindow(false);
-            ShowOkPopup(warning);
+            WaitFor(ShowOkPopup(warning));
         }
         LOG(VB_GENERAL, LOG_WARNING, warning);
 
@@ -1646,7 +1674,7 @@ bool MythContext::Init(const bool gui,
         if (gui)
         {
             d->TempMainWindow(false);
-            ShowOkPopup(warning);
+            WaitFor(ShowOkPopup(warning));
         }
         LOG(VB_GENERAL, LOG_WARNING, warning);
 
@@ -1696,9 +1724,9 @@ void MythContext::SetDisableEventPopup(bool check)
     d->m_disableeventpopup = check;
 }
 
-bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
+bool MythContext::SaveDatabaseParams(const DatabaseParams &params, bool force)
 {
-    return d->SaveDatabaseParams(params, false);
+    return d->SaveDatabaseParams(params, force);
 }
 
 bool MythContext::saveSettingsCache(void)

@@ -1,15 +1,16 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { Observable, PartialObserver } from 'rxjs';
+import { PartialObserver, Subject } from 'rxjs';
 import { startWith } from 'rxjs/operators';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { ChannelService } from 'src/app/services/channel.service';
-import { CardAndInput, CaptureCardList, InputGroup, DiseqcTreeList, DiseqcTree, DiseqcConfig } from 'src/app/services/interfaces/capture-card.interface';
+import { CardAndInput, CaptureCardList, InputGroup, DiseqcTreeList, DiseqcTree, DiseqcConfig, CaptureDeviceList, CaptureDevice } from 'src/app/services/interfaces/capture-card.interface';
 import { Channel, FetchChannelsFromSourceRequest, GetChannelInfoListRequest } from 'src/app/services/interfaces/channel.interface';
 import { VideoSource, VideoSourceList } from 'src/app/services/interfaces/videosource.interface';
 import { SetupService } from 'src/app/services/setup.service';
 import { InputConnectionsComponent } from '../input-connections.component';
+import { ChannelscanComponent } from '../channelscan/channelscan.component';
 
 @Component({
   selector: 'app-iconnection',
@@ -42,6 +43,16 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
 
   diseqcConfig!: DiseqcConfig;
 
+  captureDeviceList: CaptureDeviceList = {
+    CaptureDeviceList: {
+      CaptureDevices: [],
+    }
+  };
+
+  currentDevice: CaptureDevice = <CaptureDevice>{ FrontendName: "Unknown", InputNames: ['MPEG2TS'] };
+
+  scanComponent?: ChannelscanComponent;
+
   work = {
     successCount: 0,
     errorCount: 0,
@@ -66,7 +77,11 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     scrPort: "",
     // Eastern = 1, Western = -1
     hemisphere: 1,
+    isReady: false,
+    startScan: false,
   };
+
+  deviceFree = new Subject<boolean>();
 
   orgInputGroupIds: number[] = [];
 
@@ -77,6 +92,10 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     "settings.iconnection.fetch.failed",
     // "settings.iconnection.fetch.incompatible"
   ]
+
+  messages = {
+    devNotExist: 'settings.capture.dvb.devNotExist',
+  }
 
   preEncodedTypes = [
     "DVB", "FIREWIRE", "HDHOMERUN", "FREEBOX", "IMPORT", "DEMO",
@@ -98,7 +117,7 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
   ];
 
   constructor(private translate: TranslateService, private channelService: ChannelService,
-    private captureCardService: CaptureCardService, private setupService: SetupService) {
+    private captureCardService: CaptureCardService, public setupService: SetupService) {
 
     this.quickTuneValues.forEach(
       entry => translate.get(entry.prompt).subscribe(data => entry.prompt = data));
@@ -109,20 +128,18 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
 
   loadChannels() {
     const channelRequest: GetChannelInfoListRequest = {
-      SourceID: 0,
-      ChannelGroupID: 0,
-      StartIndex: 0,
-      Count: 0,
-      OnlyVisible: false,
-      Details: true,
-      OrderByName: false,
-      GroupByCallsign: false,
-      OnlyTunable: false
+      Details: true
     };
     this.channelService.GetChannelInfoList(channelRequest).subscribe(data => {
       this.allChannels = data.ChannelInfoList.ChannelInfos;
       this.fillChannelList();
     });
+  }
+
+  fillChannelList(): void {
+    this.sourceChannels = this.allChannels.filter(data => data.SourceId == this.card.SourceId);
+    if (!this.sourceChannels.find(data => data.ChanNum == this.card.StartChannel))
+      this.card.StartChannel = "";
   }
 
   loadInputGroups() {
@@ -151,35 +168,58 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    if (!this.card.InputName || this.card.InputName == "None")
-      this.card.InputName = "MPEG2TS";
     this.work.isEncoder = (this.preEncodedTypes.indexOf(this.card.CardType) < 0);
     this.work.isUnscanable = (this.unscanableTypes.indexOf(this.card.CardType) >= 0);
-    this.work.hasTuner = (this.unscanableTypes.indexOf(this.card.CardType) >= 0);
-    // if (!this.work.isUnscanable)
-    //   this.work.fetchStatus = 4;
+    this.work.hasTuner = (this.hasTunerTypes.indexOf(this.card.CardType) >= 0);
     if (this.work.isEncoder || this.work.isUnscanable)
       if (this.work.hasTuner || this.card.CardType == "EXTERNAL")
         this.work.showPresetTuner = true;
     if (this.card.CardType == "DVB") {
       this.loadDiseqc();
     }
-
-    let obs = new Observable(x => {
-      setTimeout(() => {
-        x.next(1);
-        x.complete();
-      }, 100)
-    });
-    obs.subscribe(x => {
-      if (this.card.DisplayName)
-        this.currentForm.form.markAsPristine();
-      else {
-        this.card.DisplayName = "Input " + this.card.CardId;
-        this.currentForm.form.markAsDirty();
-      }
-    });
+    if (!this.card.DisplayName)
+      this.card.DisplayName = "Input " + this.card.CardId;
+    this.captureCardService.GetCaptureDeviceList(this.card.CardType)
+      .subscribe({
+        next: data => {
+          this.captureDeviceList = data;
+          this.setupDevice();
+          this.deviceFree.next(true);
+        },
+        error: (err: any) => {
+          console.log("GetCaptureDeviceList", err);
+          this.work.errorCount++;
+        }
+      });
   }
+
+  // After load of devices, make sure the current record is selected in list
+  setupDevice(): void {
+    if (this.card.VideoDevice) {
+      let device = this.captureDeviceList.CaptureDeviceList.CaptureDevices.find(x => x.VideoDevice == this.card.VideoDevice);
+      if (device)
+        this.currentDevice = device;
+      else {
+        this.currentDevice = <CaptureDevice>{
+          VideoDevice: this.card.VideoDevice,
+          FrontendName: this.messages.devNotExist,
+          InputNames: ['MPEG2TS']
+        };
+        this.captureDeviceList.CaptureDeviceList.CaptureDevices.push(this.currentDevice);
+      }
+    }
+    if (this.currentDevice && this.card.InputName) {
+      if (!this.currentDevice.InputNames.includes(this.card.InputName)) {
+        this.currentDevice.InputNames.push(this.card.InputName);
+      }
+      if (!this.currentDevice.InputNames.includes('MPEG2TS')) {
+        this.currentDevice.InputNames.push('MPEG2TS');
+      }
+    }
+    this.work.isReady = true;
+  }
+
+
 
   loadDiseqc() {
     // Get DiseqcTree list
@@ -259,12 +299,12 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.setupService.setCurrentForm(this.currentForm);
-  }
-
-  fillChannelList(): void {
-    this.sourceChannels = this.allChannels.filter(data => data.SourceId == this.card.SourceId);
-    if (!this.sourceChannels.find(data => data.ChanNum == this.card.StartChannel))
-      this.card.StartChannel = "";
+    // This is needed tp prevent ExpressionChangedAfterItHasBeenCheckedError
+    // Previous value for 'ng-pristine': 'true'. Current value: 'false'.
+    this.currentForm.form.markAsDirty();
+    setTimeout(() => {
+      this.currentForm.form.markAsPristine();
+    }, 0);
   }
 
   fetchChannels(): void {
@@ -277,7 +317,6 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     this.work.fetchStatus = 1;
     this.channelService.FetchChannelsFromSource(parm).subscribe({
       next: (x: any) => {
-        console.log(x);
         if (x.int > 0)
           this.work.fetchStatus = 2;
         else
@@ -296,7 +335,6 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
   saveObserver: PartialObserver<any> = {
     next: (x: any) => {
       if (x.bool) {
-        console.log("saveObserver success", x);
         this.work.successCount++;
         if (this.work.recLimitUpd) {
           if (this.work.successCount == this.work.expectedCount) {
@@ -314,15 +352,22 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
           this.loadInputGroups();
           this.work.reloadGroups = false;
         }
+        if (this.work.successCount == this.work.expectedCount && this.work.startScan && this.scanComponent) {
+          this.work.startScan = false;
+          this.currentForm.form.markAsPristine();
+          this.scanComponent.startScan();
+        }
       }
       else {
         console.log("saveObserver error", x);
+        this.work.startScan = false;
         this.work.errorCount++;
         this.currentForm.form.markAsDirty();
       }
     },
     error: (err: any) => {
       console.log("saveObserver error", err);
+      this.work.startScan = false;
       this.work.errorCount++;
       this.currentForm.form.markAsDirty();
     }
@@ -364,6 +409,9 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     this.work.recLimitUpd = false;
     this.cardList.CaptureCardList.CaptureCards.forEach(entry => {
       if (entry.CardId == this.card.CardId || entry.ParentId == this.card.CardId) {
+        this.captureCardService.UpdateCaptureCard(entry.CardId, 'inputname',
+          entry.InputName = this.card.InputName)
+          .subscribe(this.saveObserver);
         this.captureCardService.UpdateCaptureCard(entry.CardId, 'displayname',
           entry.DisplayName = this.card.DisplayName)
           .subscribe(this.saveObserver);
@@ -409,7 +457,7 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
           String(entry.SchedOrder))
           .subscribe(this.saveObserver);
 
-        this.work.expectedCount += 9;
+        this.work.expectedCount += 10;
 
         if (inputGroupId != 0) {
           this.orgInputGroupIds.forEach(x => {
@@ -458,12 +506,6 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
           })
       }
     }
-
-  }
-
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
   }
 
 }

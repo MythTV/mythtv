@@ -48,10 +48,10 @@ class FirewireRecorder :
     bool ProcessTSPacket(const TSPacket &tspacket) override; // DTVRecorder
 
     // Sets
-    void SetOptionsFromProfile(RecordingProfile *profile,
-                               const QString &videodev,
-                               const QString &audiodev,
-                               const QString &vbidev) override; // DTVRecorder
+    void SetOptionsFromProfile([[maybe_unused]] RecordingProfile *profile,
+                               [[maybe_unused]] const QString &videodev,
+                               [[maybe_unused]] const QString &audiodev,
+                               [[maybe_unused]] const QString &vbidev) override {}; // DTVRecorder
 
   protected:
     void InitStreamData(void) override; // DTVRecorder

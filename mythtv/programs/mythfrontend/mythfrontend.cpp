@@ -9,7 +9,13 @@
 // Qt
 #include <QtGlobal>
 #ifdef Q_OS_ANDROID
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QtAndroidExtras>
+#else
+#include <QCoreApplication>
+#include <QJniObject>
+#define QAndroidJniObject QJniObject
+#endif
 #endif
 #include <QApplication>
 #include <QDir>
@@ -127,6 +133,7 @@ static inline void fe_sd_notify(const char */*str*/) {};
 #include "libmythbase/http/mythhttproot.h"
 #include "libmythbase/http/mythhttpinstance.h"
 #include "services/mythfrontendservice.h"
+#include "libmythbase/http/mythhttprewrite.h"
 
 static MythThemedMenu *g_menu;
 
@@ -892,9 +899,8 @@ static void handleGalleryMedia(MythMediaDevice *dev)
         LOG(VB_MEDIA, LOG_INFO, "Main: Ignoring new gallery media - autorun not set");
 }
 
-static void TVMenuCallback(void *data, QString &selection)
+static void TVMenuCallback([[maybe_unused]] void *data, QString &selection)
 {
-    (void)data;
     QString sel = selection.toLower();
 
     if (sel.startsWith("settings ") || sel == "video_settings_general")
@@ -1436,7 +1442,11 @@ static int reloadTheme(void)
     // reinitializing the main windows causes a segfault
     // with android
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     auto activity = QtAndroid::androidActivity();
+#else
+    QJniObject activity = QNativeInterface::QAndroidApplication::context();
+#endif
     auto packageManager = activity.callObjectMethod
         (   "getPackageManager",
             "()Landroid/content/pm/PackageManager;"  );
@@ -1846,7 +1856,7 @@ static int revokeRoot (void)
 }
 
 
-int main(int argc, char **argv)
+Q_DECL_EXPORT int main(int argc, char **argv)
 {
     bool bPromptForBackend    = false;
     bool bBypassAutoDiscovery = false;
@@ -1890,6 +1900,12 @@ int main(int argc, char **argv)
     SignalHandler::Init();
     SignalHandler::SetHandler(SIGUSR1, handleSIGUSR1);
     SignalHandler::SetHandler(SIGUSR2, handleSIGUSR2);
+#endif
+
+#if defined(Q_OS_ANDROID)
+    auto config = QSslConfiguration::defaultConfiguration();
+    config.setCaCertificates(QSslConfiguration::systemCaCertificates());
+    QSslConfiguration::setDefaultConfiguration(config);
 #endif
 
     int retval = cmdline.ConfigureLogging();
@@ -1989,6 +2005,8 @@ int main(int argc, char **argv)
         fe_sd_notify("STATUS=Registering frontend with bonjour");
         QByteArray dummy;
         int port = gCoreContext->GetNumSetting("UPnP/MythFrontend/ServicePort", 6547);
+        // frontend upnp server is now ServicePort + 4 (default 6551)
+        port += 4;
         QByteArray name("Mythfrontend on ");
         name.append(gCoreContext->GetHostName().toUtf8());
         bonjour->Register(port, "_mythfrontend._tcp",
@@ -2195,6 +2213,11 @@ int main(int argc, char **argv)
     int ret = 0;
     {
         MythHTTPInstance::Addservices({{ FRONTEND_SERVICE, &MythHTTPService::Create<MythFrontendService> }});
+
+        // Send all unknown requests into the web app. make bookmarks and direct access work.
+        auto spa_index = [](auto && PH1) { return MythHTTPRewrite::RewriteToSPA(std::forward<decltype(PH1)>(PH1), "mythfrontend.html"); };
+        MythHTTPInstance::AddErrorPageHandler({ "=404", spa_index });
+
         auto root = [](auto && PH1) { return MythHTTPRoot::RedirectRoot(std::forward<decltype(PH1)>(PH1), "mythfrontend.html"); };
         MythHTTPScopedInstance webserver({{ "/", root}});
         ret = QCoreApplication::exec();

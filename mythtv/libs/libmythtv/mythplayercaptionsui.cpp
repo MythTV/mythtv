@@ -204,7 +204,7 @@ void MythPlayerCaptionsUI::EnableCaptions(uint Mode, bool UpdateOSD)
         m_textDesired = newTextDesired;
     QString msg;
     if ((kDisplayCC608 & Mode) || (kDisplayCC708 & Mode) ||
-        (kDisplayAVSubtitle & Mode) || kDisplayRawTextSubtitle & Mode)
+        (kDisplayAVSubtitle & Mode) || (kDisplayRawTextSubtitle & Mode))
     {
         if (auto type = toTrackType(Mode); m_decoder != nullptr)
             if (auto track = GetTrack(type); track > -1)
@@ -216,6 +216,8 @@ void MythPlayerCaptionsUI::EnableCaptions(uint Mode, bool UpdateOSD)
     if (kDisplayTextSubtitle & Mode)
     {
         m_captionsOverlay.EnableSubtitles(kDisplayTextSubtitle);
+        AVSubtitles* subs = m_subReader.GetAVSubtitles();
+        subs->m_needSync = true;
         msg += tr("Text subtitles");
     }
 
@@ -420,7 +422,10 @@ bool MythPlayerCaptionsUI::HasCaptionTrack(uint Mode)
 {
     if (Mode == kDisplayNone)
         return false;
-    if (((Mode == kDisplayTextSubtitle) && m_captionsState.m_externalTextSubs) || (Mode == kDisplayNUVTeletextCaptions))
+    if (Mode == kDisplayNUVTeletextCaptions)
+        return true;
+    // External subtitles are now decoded with FFmpeg and are AVSubtitles.
+    if ((Mode == kDisplayAVSubtitle || Mode == kDisplayTextSubtitle) && m_captionsState.m_externalTextSubs)
         return true;
     if (!(Mode == kDisplayTextSubtitle) && m_decoder->GetTrackCount(toTrackType(Mode)))
         return true;
@@ -544,7 +549,8 @@ InteractiveTV* MythPlayerCaptionsUI::GetInteractiveTV()
  * parameter. This is fine as long as there is only one signal/slot connection but
  * I'm guessing won't work as well if signalled across threads.
 */
-void MythPlayerCaptionsUI::ITVHandleAction(const QString &Action, bool& Handled)
+void MythPlayerCaptionsUI::ITVHandleAction([[maybe_unused]] const QString &Action,
+                                           [[maybe_unused]] bool& Handled)
 {
 #ifdef USING_MHEG
     if (!GetInteractiveTV())
@@ -555,14 +561,13 @@ void MythPlayerCaptionsUI::ITVHandleAction(const QString &Action, bool& Handled)
 
     QMutexLocker locker(&m_itvLock);
     Handled = m_interactiveTV->OfferKey(Action);
-#else
-    Q_UNUSED(Action);
-    Q_UNUSED(Handled);
 #endif
 }
 
 /// \brief Restart the MHEG/MHP engine.
-void MythPlayerCaptionsUI::ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV)
+void MythPlayerCaptionsUI::ITVRestart([[maybe_unused]] uint Chanid,
+                                      [[maybe_unused]] uint Cardid,
+                                      [[maybe_unused]] bool IsLiveTV)
 {
 #ifdef USING_MHEG
     if (!GetInteractiveTV())
@@ -571,10 +576,6 @@ void MythPlayerCaptionsUI::ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV)
     QMutexLocker locker(&m_itvLock);
     m_interactiveTV->Restart(static_cast<int>(Chanid), static_cast<int>(Cardid), IsLiveTV);
     m_itvVisible = false;
-#else
-    Q_UNUSED(Chanid);
-    Q_UNUSED(Cardid);
-    Q_UNUSED(IsLiveTV);
 #endif
 }
 

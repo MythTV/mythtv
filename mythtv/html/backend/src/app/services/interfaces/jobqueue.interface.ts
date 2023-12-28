@@ -16,4 +16,6 @@ export interface JobQueueJob {
     Status:         number;
     StatusTime:     string;
     Type:           number;
+    LocalizedStatus:  string;
+    LocalizedJobName: string;
 }

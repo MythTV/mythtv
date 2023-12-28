@@ -21,7 +21,7 @@ export interface GetProgramDetailsRequest {
 export interface GetProgramGuideRequest {
     StartTime:          string;
     EndTime:            string;
-    Details:            string; // really a boolean
+    Details?:           boolean; // really a boolean
     ChannelGroupId?:    number;
     StartIndex?:        number;
     Count?:             number;
@@ -29,11 +29,11 @@ export interface GetProgramGuideRequest {
 }
 
 export interface GetProgramListRequest {
-    StartIndex:         number;
-    Count:              number;
-    StartTime:          string; // dateTime
-    EndTime:            string; // dateTime
-    ChanId:             number;
+    StartIndex?:        number;
+    Count?:             number;
+    StartTime?:         string; // dateTime
+    EndTime?:           string; // dateTime
+    ChanId?:            number;
     TitleFilter?:       string;
     CategoryFilter?:    string;
     PersonFilter?:      string;

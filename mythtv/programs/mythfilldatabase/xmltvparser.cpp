@@ -10,6 +10,7 @@
 #include <QFile>
 #include <QStringList>
 #include <QUrl>
+#include <QXmlStreamReader>
 
 // MythTV headers
 #include "libmythbase/exitcodes.h"

@@ -1115,7 +1115,7 @@ static std::array<const int,16> b1_to_service
   -1, // 0xF
 };
 
-bool CC608Decoder::XDSDecode(int field, int b1, int b2)
+bool CC608Decoder::XDSDecode([[maybe_unused]] int field, int b1, int b2)
 {
     if (field == 0)
         return false; // XDS is only on second field
@@ -1128,8 +1128,6 @@ bool CC608Decoder::XDSDecode(int field, int b1, int b2)
         .arg((CharCC(b2).unicode()>0x20) ? CharCC(b2) : QChar(' '))
         .arg(field).arg(m_xds[field])
         .arg(m_xdsCurService));
-#else
-    (void) field;
 #endif // DEBUG_XDS
 
     if (m_xdsCurService < 0)

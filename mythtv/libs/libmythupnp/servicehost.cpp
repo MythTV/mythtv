@@ -31,7 +31,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
     QStringMap            lowerParams;
 
     if (!pService)
-        throw;
+        throw QString("Invalid argument to MethodInfo::Invoke. pService in nullptr");
 
      // Change params to lower case for case-insensitive comparison
     for (auto it = reqParams.cbegin(); it != reqParams.cend(); ++it)
@@ -109,7 +109,8 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("MethodInfo::Invoke - Type unknown '%1'")
                         .arg(sParamType));
-                throw;
+                throw QString("MethodInfo::Invoke - Type unknown '%1'")
+                          .arg(sParamType);
             }
 
             types[nIdx+1] = nId;

@@ -21,6 +21,13 @@
 
 #define LOC QString("Thumbview: ")
 
+// EXIF tag 0x9286 UserComment can contain garbage
+static QString clean_comment(const QString &comment)
+{
+    QString result;
+    std::copy_if(comment.cbegin(), comment.cend(), std::back_inserter(result), [](QChar x) { return x.isPrint(); } );
+    return result;
+}
 
 //! Worker thread for running import
 class ShellThread: public MThread
@@ -365,7 +372,7 @@ bool GalleryThumbView::keyPressEvent(QKeyEvent *event)
 void GalleryThumbView::customEvent(QEvent *event)
 {
 
-    if (event->type() == MythEvent::MythEventMessage)
+    if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
@@ -764,7 +771,7 @@ void GalleryThumbView::UpdateImageItem(MythUIButtonListItem *item)
     {
     case kNameCaption: text = m_mgr.CrumbName(*im); break;
     case kDateCaption: text = m_mgr.ShortDateOf(im); break;
-    case kUserCaption: text = im->m_comment; break;
+    case kUserCaption: text = clean_comment(im->m_comment); break;
     default:
     case kNoCaption:   text = ""; break;
     }
@@ -999,8 +1006,9 @@ void GalleryThumbView::SetUiSelection(MythUIButtonListItem *item)
                 if (im->IsFile() || im->IsDevice())
                     text << ImageManagerFe::LongDateOf(im);
 
-                if (!im->m_comment.isEmpty())
-                    text << im->m_comment;
+                QString comment = clean_comment(im->m_comment);
+                if (!comment.isEmpty())
+                    text << comment;
             }
             m_captionText->SetText(text.join(" - "));
         }

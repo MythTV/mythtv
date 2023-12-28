@@ -124,7 +124,10 @@ class MTV_PUBLIC ChannelUtil
                                  QString format  = "Default",
                                  const QString& xmltvid = QString(),
                                  const QString& default_authority = QString(),
-                                 uint service_type = 0);
+                                 uint service_type = 0,
+                                 int  recpriority = 0,
+                                 int  tmOffset = 0,
+                                 int commMethod = -1);
 
     static bool    UpdateChannel(uint db_mplexid,
                                  uint source_id,
@@ -142,7 +145,12 @@ class MTV_PUBLIC ChannelUtil
                                  QString format  = QString(),
                                  const QString& xmltvid = QString(),
                                  const QString& default_authority = QString(),
-                                 uint service_type = 0);
+                                 uint service_type = 0,
+                                 // note INT_MIN is invalid for these fields
+                                 // to indicate that they are not to be updated
+                                 int  recpriority = INT_MIN,
+                                 int  tmOffset = INT_MIN,
+                                 int commMethod = INT_MIN);
 
     static bool    CreateIPTVTuningData(
         uint channel_id, const IPTVTuningData &tuning)

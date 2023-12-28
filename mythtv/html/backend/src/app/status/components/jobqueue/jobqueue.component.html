@@ -1,15 +1,16 @@
 <div class="statusBox">
-    <h2>Job queue</h2>
+    <h2>{{ 'dashboard.status.jobs_title' | translate }}</h2>
     <div *ngIf="jobqueue?.length != 0; else noJobs">
-        <p>Jobs currently in Queue or recently ended:</p>
+        <p>{{ 'dashboard.status.jobs_text' | translate }}:</p>
         <ul>
             <div *ngFor="let job of jobqueue">
-                <p>{{ job.StatusTime }} - {{ job.Program.Title }} - {{ JobTypeText(job.Type) }} - Status: {{ JobStatusText(job.Status) }} </p>
+                <p>{{ utility.formatDate(job.StatusTime) }} {{ utility.formatTime(job.StatusTime) }} - {{ job.Program.Title }} - {{ job.LocalizedJobName }} -
+                    {{ 'dashboard.status.jobs_status' | translate }}: {{ job.LocalizedStatus }} </p>
                 <!-- Add details of failed job -->
             </div>
         </ul>
     </div>
 </div>
 <ng-template #noJobs>
-    <p>Job queue is currently empty</p>
+    <p>{{ 'dashboard.status.jobs_none' | translate }}</p>
 </ng-template>

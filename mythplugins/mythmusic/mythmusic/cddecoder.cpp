@@ -159,7 +159,7 @@ bool CdDecoder::initialize()
 
     m_inited = m_userStop = m_finish = false;
     m_freq = m_bitrate = 0L;
-    m_stat = DecoderEvent::Error;
+    m_stat = DecoderEvent::kError;
     m_chan = 0;
     m_seekTime = -1.;
 
@@ -292,7 +292,7 @@ void CdDecoder::deinit()
 
     m_inited = m_userStop = m_finish = false;
     m_freq = m_bitrate = 0L;
-    m_stat = DecoderEvent::Finished;
+    m_stat = DecoderEvent::kFinished;
     m_chan = 0;
     setOutput(nullptr);
 }
@@ -308,7 +308,7 @@ void CdDecoder::run()
         return;
     }
 
-    m_stat = DecoderEvent::Decoding;
+    m_stat = DecoderEvent::kDecoding;
     // NB block scope required to prevent re-entrancy
     {
         DecoderEvent e(m_stat);
@@ -416,11 +416,11 @@ void CdDecoder::run()
     }
 
     if (m_finish)
-        m_stat = DecoderEvent::Finished;
+        m_stat = DecoderEvent::kFinished;
     else if (m_userStop)
-        m_stat = DecoderEvent::Stopped;
+        m_stat = DecoderEvent::kStopped;
     else
-        m_stat = DecoderEvent::Error;
+        m_stat = DecoderEvent::kError;
 
     // NB block scope required to step onto next track
     {

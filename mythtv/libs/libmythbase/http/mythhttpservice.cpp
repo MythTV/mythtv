@@ -44,7 +44,20 @@ HTTPResponse MythHTTPService::HTTPRequest(const HTTPRequest2& Request)
         // else
         //     return xsd.GetEnumXSD( Request, Request->m_queries.value("enum"));
     }
-
+    if ( method == "version" )
+    {
+        int nClassIdx = m_staticMetaService->m_meta.indexOfClassInfo( "Version" );
+        if (nClassIdx >=0)
+        {
+            QString sVersion =
+            m_staticMetaService->m_meta.classInfo(nClassIdx).value();
+            auto accept = MythHTTPEncoding::GetMimeTypes(MythHTTP::GetHeader(Request->m_headers, "accept"));
+            HTTPData content = MythSerialiser::Serialise("String", sVersion, accept);
+            content->m_cacheType = HTTPETag | HTTPShortLife;
+            HTTPResponse result = MythHTTPResponse::DataResponse(Request, content);
+            return result;
+        }
+    }
     // Find the method
     LOG(VB_HTTP, LOG_DEBUG, LOC + QString("Looking for method '%1'").arg(method));
     HTTPMethodPtr handler = nullptr;
@@ -156,7 +169,7 @@ HTTPResponse MythHTTPService::HTTPRequest(const HTTPRequest2& Request)
                 QString file = info.absoluteFilePath();
                 if (file.size() == 0)
                 {
-                    LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Invalid request for unknown file"));
+                    LOG(VB_HTTP, LOG_WARNING, LOC + QString("Invalid request for unknown file"));
                     Request->m_status = HTTPNotFound;
                     result =  MythHTTPResponse::ErrorResponse(Request);
                 }

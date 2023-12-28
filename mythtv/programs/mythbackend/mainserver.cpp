@@ -37,6 +37,7 @@
 #include <QDir>
 #include <QWaitCondition>
 #include <QWriteLocker>
+#include <QProcess>
 #include <QRegularExpression>
 #include <QEvent>
 #include <QTcpServer>
@@ -141,16 +142,16 @@ bool delete_file_immediately(const QString &filename,
 QMutex MainServer::s_truncate_and_close_lock;
 const std::chrono::milliseconds MainServer::kMasterServerReconnectTimeout { 1s };
 
-class ProcessRequestRunnable : public QRunnable
+class BEProcessRequestRunnable : public QRunnable
 {
   public:
-    ProcessRequestRunnable(MainServer &parent, MythSocket *sock) :
+    BEProcessRequestRunnable(MainServer &parent, MythSocket *sock) :
         m_parent(parent), m_sock(sock)
     {
         m_sock->IncrRef();
     }
 
-    ~ProcessRequestRunnable() override
+    ~BEProcessRequestRunnable() override
     {
         if (m_sock)
         {
@@ -265,12 +266,12 @@ MainServer::MainServer(bool master, int port,
         QHostAddress config_v4(gCoreContext->resolveSettingAddress(
                                             "BackendServerIP",
                                             QString(),
-                                            gCoreContext->ResolveIPv4, true));
+                                            MythCoreContext::ResolveIPv4, true));
         bool v4IsSet = !config_v4.isNull();
         QHostAddress config_v6(gCoreContext->resolveSettingAddress(
                                             "BackendServerIP6",
                                             QString(),
-                                            gCoreContext->ResolveIPv6, true));
+                                            MythCoreContext::ResolveIPv6, true));
         bool v6IsSet = !config_v6.isNull();
 
         if (v6IsSet && !listenAddrs.contains(config_v6))
@@ -446,7 +447,7 @@ void MainServer::NewConnection(qintptr socketDescriptor)
 void MainServer::readyRead(MythSocket *sock)
 {
     m_threadPool.startReserved(
-        new ProcessRequestRunnable(*this, sock),
+        new BEProcessRequestRunnable(*this, sock),
         "ProcessRequest", PRT_TIMEOUT);
 
     QCoreApplication::processEvents();
@@ -1134,7 +1135,7 @@ void MainServer::customEvent(QEvent *e)
         }
     }
 
-    if (e->type() == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(e);
         if (me == nullptr)
@@ -1959,7 +1960,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         for (++it; it != slist.cend(); ++it)
             checkfiles += *it;
 
-        FileTransfer *ft = nullptr;
+        BEFileTransfer *ft = nullptr;
         bool writemode = false;
         bool usereadahead = true;
         std::chrono::milliseconds timeout_ms = 2s;
@@ -2054,14 +2055,14 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             QWriteLocker lock(&m_sockListLock);
             if (!m_controlSocketList.remove(socket))
                 return; // socket was disconnected
-            ft = new FileTransfer(filename, socket, writemode);
+            ft = new BEFileTransfer(filename, socket, writemode);
         }
         else
         {
             QWriteLocker lock(&m_sockListLock);
             if (!m_controlSocketList.remove(socket))
                 return; // socket was disconnected
-            ft = new FileTransfer(filename, socket, usereadahead, timeout_ms);
+            ft = new BEFileTransfer(filename, socket, usereadahead, timeout_ms);
         }
 
         if (!ft->isOpen())
@@ -2070,7 +2071,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                 QString("Can't open %1").arg(filename));
             errlist << "filetransfer_unable_to_open_file";
             socket->WriteStringList(errlist);
-            socket->IncrRef(); // FileTransfer took ownership of the socket, take it back
+            socket->IncrRef(); // BEFileTransfer took ownership of the socket, take it back
             ft->DecrRef();
             return;
         }
@@ -2710,7 +2711,7 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks,
             return -2; // valid result, not an error condition
     }
 
-    if (fd < 0)
+    if (fd < 0 && errno != EISDIR)
         LOG(VB_GENERAL, LOG_ERR, LOC + errmsg + ENO);
 
     return fd;
@@ -2733,11 +2734,22 @@ int MainServer::OpenAndUnlink(const QString &filename)
 
     if (fd == -1)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + msg + " could not open " + ENO);
-        return -1;
+        if (errno == EISDIR)
+        {
+            QDir dir(filename);
+            if(MythRemoveDirectory(dir))
+            {
+                LOG(VB_GENERAL, LOG_ERR, msg + " could not delete directory " + ENO);
+                return -1;
+            }
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, msg + " could not open " + ENO);
+            return -1;
+        }
     }
-
-    if (unlink(fname.constData()))
+    else if (unlink(fname.constData()))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + msg + " could not unlink " + ENO);
         close(fd);
@@ -3672,11 +3684,11 @@ void MainServer::HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs)
       case 4:
         if (!slist[3].isEmpty())
             hostname = slist[3];
-        [[clang::fallthrough]];
+        [[fallthrough]];
       case 3:
         if (slist[2].isEmpty())
             storageGroup = slist[2];
-        [[clang::fallthrough]];
+        [[fallthrough]];
       case 2:
         filename = slist[1];
         if (filename.isEmpty() ||
@@ -4406,7 +4418,7 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
     std::vector<InputInfo> freeinputs;
     QMap<uint, QSet<uint> > groupids;
 
-    // Lopp over each encoder and divide the inputs into busy and free
+    // Loop over each encoder and divide the inputs into busy and free
     // lists.
     TVRec::s_inputsLock.lockForRead();
     for (auto * elink : qAsConst(*m_encoderList))
@@ -4993,8 +5005,9 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     }
     else if (command == "IS_BUSY")
     {
-        auto arg2 = std::chrono::seconds(slist[2].toInt());
-        std::chrono::seconds time_buffer = (slist.size() >= 3) ? arg2 : 5s;
+        std::chrono::seconds time_buffer = 5s;
+        if (slist.size() >= 3)
+            time_buffer = std::chrono::seconds(slist[2].toInt());
         InputInfo busy_input;
         retlist << QString::number((int)enc->IsBusy(&busy_input, time_buffer));
         busy_input.ToStringList(retlist);
@@ -5223,7 +5236,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                             (!strcmp(fstypename, "afpfs")) || // ApplShr
                             (!strcmp(fstypename, "smbfs")))   // SMB
                             localStr = "0";
-#elif __linux__
+#elif defined(__linux__)
                         long fstype = statbuf.f_type;
                         if ((fstype == 0x6969) ||             // NFS
                             (fstype == 0x517B) ||             // SMB
@@ -5626,6 +5639,9 @@ bool MainServer::HandleDeleteFile(const QString& filename, const QString& storag
         truncateThread->run();
     }
 
+    // The truncateThread should be deleted by QRunnable after it
+    // finished executing.
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     return true;
 }
 
@@ -7084,13 +7100,13 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
     QStringList retlist;
 
     m_sockListLock.lockForRead();
-    FileTransfer *ft = GetFileTransferByID(recnum);
+    BEFileTransfer *ft = GetFileTransferByID(recnum);
     if (!ft)
     {
         if (command == "DONE")
         {
             // if there is an error opening the file, we may not have a
-            // FileTransfer instance for this connection.
+            // BEFileTransfer instance for this connection.
             retlist << "OK";
         }
         else
@@ -7342,10 +7358,9 @@ void MainServer::HandleSetLogLevel(const QStringList &slist, PlaybackSock *pbs)
     SendResponse(pbssock, retlist);
 }
 
-void MainServer::HandleIsRecording(const QStringList &slist, PlaybackSock *pbs)
+void MainServer::HandleIsRecording([[maybe_unused]] const QStringList &slist,
+                                   PlaybackSock *pbs)
 {
-    (void)slist;
-
     MythSocket *pbssock = pbs->getSocket();
     int RecordingsInProgress = 0;
     int LiveTVRecordingsInProgress = 0;
@@ -7924,7 +7939,7 @@ void MainServer::connectionClosed(MythSocket *socket)
         MythSocket *sock = (*ft)->getSocket();
         if (sock == socket)
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("FileTransfer sock(%1) disconnected")
+            LOG(VB_GENERAL, LOG_INFO, QString("BEFileTransfer sock(%1) disconnected")
                 .arg(quintptr(socket),0,16) );
             (*ft)->DecrRef();
             m_fileTransferList.erase(ft);
@@ -8007,7 +8022,7 @@ PlaybackSock *MainServer::GetPlaybackBySock(MythSocket *sock)
 }
 
 /// Warning you must hold a sockListLock lock before calling this
-FileTransfer *MainServer::GetFileTransferByID(int id)
+BEFileTransfer *MainServer::GetFileTransferByID(int id)
 {
     for (auto & ft : m_fileTransferList)
         if (id == ft->getSocket()->GetSocketDescriptor())
@@ -8016,7 +8031,7 @@ FileTransfer *MainServer::GetFileTransferByID(int id)
 }
 
 /// Warning you must hold a sockListLock lock before calling this
-FileTransfer *MainServer::GetFileTransferBySock(MythSocket *sock)
+BEFileTransfer *MainServer::GetFileTransferBySock(MythSocket *sock)
 {
     for (auto & ft : m_fileTransferList)
         if (sock == ft->getSocket())

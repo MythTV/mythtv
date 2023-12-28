@@ -2981,7 +2981,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
      * create new ones, and notify any listener.
      */
     equal_streams = pmt_equal_streams(ts, items, last_item);
-    if (0 && (equal_streams != last_item || ts->pid_cnt != last_item))
+    if (equal_streams != last_item || ts->pid_cnt != last_item)
     {
         AVFormatContext *avctx = ts->stream;
 

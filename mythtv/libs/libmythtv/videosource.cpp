@@ -298,7 +298,7 @@ class XMLTVGrabber : public MythUIComboBoxSetting
             args += "baseline";
 
             MythSystemLegacy find_grabber_proc("tv_find_grabbers", args,
-                                                kMSStdOut | kMSRunShell);
+                                                kMSStdOut | kMSRunShell | kMSDontDisableDrawing);
             find_grabber_proc.Run(25s);
             LOG(VB_GENERAL, LOG_INFO,
                 loc + "Running 'tv_find_grabbers " + args.join(" ") + "'.");
@@ -829,11 +829,9 @@ class VideoDevice : public CaptureCardComboBoxSetting
      *  \param dir      The directory to open and search for devices.
      *  \param absPath  Ignored. The function always uses absolute paths.
      */
-    void fillSelectionsFromDir(const QDir &dir, bool absPath = true)
+    void fillSelectionsFromDir(const QDir &dir,
+                               [[maybe_unused]] bool absPath = true)
     {
-        // Needed to make both compiler and doxygen happy.
-        (void) absPath;
-
         fillSelectionsFromDir(dir, 0, 255, QString(), QRegularExpression(), false);
     }
 
@@ -940,11 +938,9 @@ class VBIDevice : public CaptureCardComboBoxSetting
      *  \param dir      The directory to open and search for devices.
      *  \param absPath  Ignored. The function always uses absolute paths.
      */
-    void fillSelectionsFromDir(const QDir &dir, bool absPath = true)
+    void fillSelectionsFromDir(const QDir &dir,
+                               [[maybe_unused]] bool absPath = true)
     {
-        // Needed to make both compiler and doxygen happy.
-        (void) absPath;
-
         fillSelectionsFromDir(dir, QString(), QString());
     }
 
@@ -1015,13 +1011,13 @@ class AudioDevice : public CaptureCardComboBoxSetting
                                    "audiodevice")
     {
         setLabel(QObject::tr("Audio device"));
-#if USING_OSS
+#ifdef USING_OSS
         QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
         fillSelectionsFromDir(dev);
         dev.setPath("/dev/sound");
         fillSelectionsFromDir(dev);
 #endif
-#if USING_ALSA
+#ifdef USING_ALSA
         addSelection("ALSA:default", "ALSA:default");
 #endif
         addSelection(QObject::tr("(None)"), "NULL");
@@ -1045,10 +1041,10 @@ class SignalTimeout : public CaptureCardSpinBoxSetting
                         "a signal when scanning for channels."));
     };
     // Handle non-integer seconds
-    template<typename T, typename = typename std::enable_if<std::is_floating_point<T>::value>::type >
+    template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>> >
     SignalTimeout(const CaptureCard &parent, std::chrono::milliseconds value, std::chrono::duration<T> min_secs) :
         SignalTimeout(parent, value, duration_cast<std::chrono::milliseconds>(min_secs)) {};
-    template<typename T, typename = typename std::enable_if<std::is_floating_point<T>::value>::type >
+    template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>> >
     SignalTimeout(const CaptureCard &parent, std::chrono::duration<T> value, std::chrono::duration<T> min_secs) :
         SignalTimeout(parent,
                       duration_cast<std::chrono::milliseconds>(value),
@@ -1071,10 +1067,10 @@ class ChannelTimeout : public CaptureCardSpinBoxSetting
                         "exceeded, the recording will be marked as failed."));
     };
     // Handle non-integer seconds
-    template<typename T, typename = typename std::enable_if<std::is_floating_point<T>::value>::type >
+    template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>> >
     ChannelTimeout(const CaptureCard &parent, std::chrono::milliseconds value, std::chrono::duration<T> min_secs) :
         ChannelTimeout(parent, value, duration_cast<std::chrono::milliseconds>(min_secs)) {};
-    template<typename T, typename = typename std::enable_if<std::is_floating_point<T>::value>::type >
+    template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>> >
     ChannelTimeout(const CaptureCard &parent, std::chrono::duration<T> value, std::chrono::duration<T> min_secs) :
         ChannelTimeout(parent, value, duration_cast<std::chrono::milliseconds>(min_secs)) {};
 };
@@ -1326,10 +1322,8 @@ FirewireModel::FirewireModel(const CaptureCard  &parent,
     setHelpText(help);
 }
 
-void FirewireModel::SetGUID(const QString &_guid)
+void FirewireModel::SetGUID([[maybe_unused]] const QString &_guid)
 {
-    (void) _guid;
-
 #ifdef USING_FIREWIRE
     AVCInfo info = m_guid->GetAVCInfo(_guid);
     QString model = FirewireDevice::GetModelName(info.m_vendorid, info.m_modelid);
@@ -1337,10 +1331,8 @@ void FirewireModel::SetGUID(const QString &_guid)
 #endif // USING_FIREWIRE
 }
 
-void FirewireDesc::SetGUID(const QString &_guid)
+void FirewireDesc::SetGUID([[maybe_unused]] const QString &_guid)
 {
-    (void) _guid;
-
     setLabel(tr("Description"));
 
 #ifdef USING_FIREWIRE
@@ -1410,7 +1402,7 @@ static void FirewireConfigurationGroup(CaptureCard& parent, CardType& cardtype)
 }
 #endif
 
-#if USING_HDHOMERUN
+#ifdef USING_HDHOMERUN
 
 // -----------------------
 // HDHomeRun Configuration
@@ -1796,7 +1788,10 @@ class IPTVHost : public CaptureCardTextEditSetting
         setValue("http://mafreebox.freebox.fr/freeboxtv/playlist.m3u");
         setLabel(QObject::tr("M3U URL"));
         setHelpText(
-            QObject::tr("URL of M3U containing RTSP/RTP/UDP channel URLs."));
+            QObject::tr("URL of M3U file containing RTSP/RTP/UDP/HTTP channel URLs,"
+            " example for HDHomeRun: http://<ipv4>/lineup.m3u and for Freebox:"
+            " http://mafreebox.freebox.fr/freeboxtv/playlist.m3u."
+            ));
     }
 };
 
@@ -1906,7 +1901,7 @@ ASIConfigurationGroup::ASIConfigurationGroup(CaptureCard& a_parent,
     probeCard(m_device->getValue());
 };
 
-void ASIConfigurationGroup::probeCard(const QString &device)
+void ASIConfigurationGroup::probeCard([[maybe_unused]] const QString &device)
 {
 #ifdef USING_ASI
     if (device.isEmpty())
@@ -1932,7 +1927,6 @@ void ASIConfigurationGroup::probeCard(const QString &device)
     }
     m_cardInfo->setValue(tr("Valid DVEO ASI card"));
 #else
-    Q_UNUSED(device);
     m_cardInfo->setValue(QString("Not compiled with ASI support"));
 #endif
 }
@@ -2435,10 +2429,10 @@ void HDPVRConfigurationGroup::probeCard(const QString &device)
         else if (!dn.isEmpty())
             ci = cn + "  [" + dn + "]";
         close(videofd);
+        m_audioInput->fillSelections(device);
     }
 
     m_cardInfo->setValue(ci);
-    m_audioInput->fillSelections(device);
 }
 
 V4L2encGroup::V4L2encGroup(CaptureCard &parent, CardType& cardtype) :
@@ -2468,7 +2462,7 @@ V4L2encGroup::V4L2encGroup(CaptureCard &parent, CardType& cardtype) :
         probeCard(device_name);
 }
 
-void V4L2encGroup::probeCard(const QString &device_name)
+void V4L2encGroup::probeCard([[maybe_unused]] const QString &device_name)
 {
 #ifdef USING_V4L2
     QString    card_name = tr("Failed to open");
@@ -2515,8 +2509,6 @@ void V4L2encGroup::probeCard(const QString &device_name)
         m_device->addTargetedChild(m_driverName,
                                    new ChannelTimeout(m_parent, 15s, 2s));
     }
-#else
-    Q_UNUSED(device_name);
 #endif // USING_V4L2
 }
 
@@ -2915,14 +2907,11 @@ class InputGroup : public TransMythUIComboBoxSetting
         uint inputid     = m_cardInput.getInputID();
         uint new_groupid = getValue().toUInt();
 
-        if (m_groupId)
+        if (m_groupId && (m_groupId != new_groupid))
             CardUtil::UnlinkInputGroup(inputid, m_groupId);
 
         if (new_groupid)
-        {
-            if (CardUtil::UnlinkInputGroup(inputid, new_groupid))
-                CardUtil::LinkInputGroup(inputid, new_groupid);
-        }
+            CardUtil::LinkInputGroup(inputid, new_groupid);
     }
 
     virtual void Save(const QString& /*destination*/) { Save(); }
@@ -3209,7 +3198,7 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
         ds->setValue(CardUtil::GetDeliverySystemFromDB(_cardid));
         addChild(ds);
     }
-    else
+    else if (CardUtil::IsV4L(cardtype))
     {
         addChild(m_inputName);
     }

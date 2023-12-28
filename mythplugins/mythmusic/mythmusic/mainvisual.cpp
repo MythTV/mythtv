@@ -214,11 +214,18 @@ void MainVisual::timeout()
         std::chrono::milliseconds timestamp = gPlayer->getOutput()->GetAudiotime();
         while (m_nodes.size() > 1)
         {
-            if (m_nodes.first()->m_offset > timestamp)
-                break;
+            // LOG(VB_PLAYBACK, LOG_DEBUG,
+            //  QString("\tMV %1 first > %2 timestamp").
+            //  arg(m_nodes.first()->m_offset.count()).arg(timestamp.count()));
+            if (m_nodes.first()->m_offset >= timestamp + 5s)
+            {
+                // REW seek: drain buffer and start over
+            }
+            else if (m_nodes.first()->m_offset > timestamp)
+                break;          // at current time
 
             if (m_vis)
-                m_vis->processUndisplayed(node);
+                m_vis->processUndisplayed(m_nodes.first());
 
             delete m_nodes.first();
             m_nodes.removeFirst();
@@ -254,17 +261,17 @@ void MainVisual::resize(const QSize size)
 
 void MainVisual::customEvent(QEvent *event)
 {
-    if ((event->type() == OutputEvent::Playing)   ||
-        (event->type() == OutputEvent::Info)      ||
-        (event->type() == OutputEvent::Buffering) ||
-        (event->type() == OutputEvent::Paused))
+    if ((event->type() == OutputEvent::kPlaying)   ||
+        (event->type() == OutputEvent::kInfo)      ||
+        (event->type() == OutputEvent::kBuffering) ||
+        (event->type() == OutputEvent::kPaused))
     {
         m_playing = true;
         if (!m_updateTimer->isActive())
             m_updateTimer->start();
     }
-    else if ((event->type() == OutputEvent::Stopped) ||
-             (event->type() == OutputEvent::Error))
+    else if ((event->type() == OutputEvent::kStopped) ||
+             (event->type() == OutputEvent::kError))
     {
         m_playing = false;
     }

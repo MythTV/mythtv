@@ -35,11 +35,11 @@ class MUI_PUBLIC MythUISpinBox : public MythUIButtonList
     bool keyPressEvent(QKeyEvent *event) override; // MythUIButtonList
 
     template <typename T>
-        typename std::enable_if<std::chrono::__is_duration<T>::value, T>::type
+        std::enable_if_t<std::chrono::__is_duration<T>::value, T>
         GetDuration()
     { return T(GetDataValue().toInt()); }
     template <typename T>
-        typename std::enable_if<std::chrono::__is_duration<T>::value, void>::type
+        std::enable_if_t<std::chrono::__is_duration<T>::value, void>
         SetDuration(T val)
     { return SetValueByData(static_cast<int>(val.count())); }
 

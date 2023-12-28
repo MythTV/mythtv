@@ -409,10 +409,11 @@ bool MThreadPool::TryStartInternal(
         m_priv->m_deleteThreads.pop_back();
     }
 
-    while (m_priv->m_availThreads.begin() != m_priv->m_availThreads.end())
+    for (auto iter = m_priv->m_availThreads.begin();
+         iter != m_priv->m_availThreads.end(); )
     {
-        MPoolThread *thread = *m_priv->m_availThreads.begin();
-        m_priv->m_availThreads.erase(m_priv->m_availThreads.begin());
+        MPoolThread *thread = *iter;
+        iter = m_priv->m_availThreads.erase(iter);
         m_priv->m_runningThreads.insert(thread);
         if (reserved)
             m_priv->m_reserveThread++;

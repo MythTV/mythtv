@@ -257,7 +257,7 @@ void TestRecordingExtender::test_findKnownSport_data(void)
                                << "soccer" << 1 << QStringList("ger.2");
     QTest::newRow("soccer97")  << "FIFA World Cup Qualifying" << 1
                                << "soccer" << 1 << fifaQualLeagues;
-    QTest::newRow("soccer97")  << "FIFA World Cup 2022 Qualifying Soccer" << 1
+    QTest::newRow("soccer98")  << "FIFA World Cup 2022 Qualifying Soccer" << 1
                                << "soccer" << 1 << fifaQualLeagues;
     QTest::newRow("soccer99")  << "FIFA Eliminatorias Copa Mundial 2022" << 1
                                << "soccer" << 1 << fifaQualLeagues;
@@ -271,6 +271,9 @@ void TestRecordingExtender::test_findKnownSport(void)
     QFETCH(QString, expectedSport);
     QFETCH(int, expectedLeagueSize);
     QFETCH(QStringList, expectedLeagues);
+
+    // Force the year for testing purposes.
+    m_forcedYearforTesting = 2022;
 
     SportInfoList infoList;
     bool present = findKnownSport(title, autoExtendTypeFromInt(autoExtendType),
@@ -561,7 +564,7 @@ void TestRecordingExtender::test_parseProgramInfo(void)
 void TestRecordingExtender::test_parseJson(void)
 {
     m_nowForTest = QDateTime::fromString("2021-09-22T23:59:00Z", Qt::ISODate);
-    auto* source = new TestRecExtMlbDataSource(this);
+    auto source = std::make_unique<TestRecExtMlbDataSource>(this);
 
     SportInfo info {"MLB Baseball", AutoExtendType::MLB, "", ""};
     ActiveGame game(0, "MLB Baseball", info);
@@ -686,7 +689,7 @@ void TestRecordingExtender::test_parseEspn(void)
     QFETCH(QString, expectedTextState);
 
     m_nowForTest = QDateTime::fromString(nowForTest, Qt::ISODate);
-    auto* source = new TestRecExtEspnDataSource(this);
+    auto source = std::make_unique<TestRecExtEspnDataSource>(this);
 
     SportInfo info {"MLB Baseball", AutoExtendType::ESPN, sport, league};
     ActiveGame game(0, "MLB Baseball", info);
@@ -728,8 +731,6 @@ void TestRecordingExtender::test_parseEspn(void)
     QCOMPARE(gameState.getPeriod(), expectedPeriod);
     QCOMPARE(gameState.isFinished(), expectedFinished);
     QCOMPARE(gameState.getTextState(), expectedTextState);
-
-    delete source;
 }
 
 void TestRecordingExtender::test_parseMlb_data(void)
@@ -785,7 +786,7 @@ void TestRecordingExtender::test_parseMlb(void)
     QFETCH(QString, expectedTextState);
 
     m_nowForTest = QDateTime::fromString(nowForTest, Qt::ISODate);
-    auto* source = new TestRecExtMlbDataSource(this);
+    auto source = std::make_unique<TestRecExtMlbDataSource>(this);
 
     SportInfo info {"MLB Baseball", AutoExtendType::MLB, "sport", "league"};
     ActiveGame game(0, "MLB Baseball", info);
@@ -829,8 +830,6 @@ void TestRecordingExtender::test_parseMlb(void)
     QCOMPARE(gameState.getPeriod(), expectedPeriod);
     QCOMPARE(gameState.isFinished(), expectedFinished);
     QCOMPARE(gameState.getTextState(), expectedTextState);
-
-    delete source;
 }
 
 void TestRecordingExtender::test_processNewRecordings_data(void)
@@ -907,6 +906,8 @@ void TestRecordingExtender::test_processNewRecordings(void)
     ri->m_recStatus    = RecStatus::Recording;
     rr->m_autoExtend   = AutoExtendType::ESPN;
 
+    // Force a couple of items for testing purposes.
+    m_forcedYearforTesting = 2022;
     gForceLocalUrl = true;
 
     // Kick RecordingExtender and cross fingers.

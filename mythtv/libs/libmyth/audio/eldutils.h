@@ -38,7 +38,7 @@ class MPUBLIC eld
 {
   public:
     eld(const char *buf, int size);
-    eld(const eld& /*rhs*/);
+    eld(const eld& rhs) = default;
     eld();
     ~eld()= default;
     eld& operator=(const eld& /*rhs*/);

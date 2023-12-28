@@ -179,156 +179,6 @@ static int QueueCommFlagJob(uint chanid, const QDateTime& starttime, bool rebuil
     return GENERIC_EXIT_DB_ERROR;
 }
 
-static int CopySkipListToCutList(uint chanid, const QDateTime& starttime)
-{
-    frm_dir_map_t cutlist;
-    frm_dir_map_t::const_iterator it;
-
-    QString startstring = MythDate::toString(starttime, MythDate::kFilename);
-    const ProgramInfo pginfo(chanid, starttime);
-
-    if (!pginfo.GetChanID())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("No program data exists for channel %1 at %2")
-                .arg(chanid).arg(startstring));
-        return GENERIC_EXIT_NO_RECORDING_DATA;
-    }
-
-    pginfo.QueryCommBreakList(cutlist);
-    for (it = cutlist.cbegin(); it != cutlist.cend(); ++it)
-    {
-        if (*it == MARK_COMM_START)
-            cutlist[it.key()] = MARK_CUT_START;
-        else
-            cutlist[it.key()] = MARK_CUT_END;
-    }
-    pginfo.SaveCutList(cutlist);
-
-    return GENERIC_EXIT_OK;
-}
-
-static int ClearSkipList(uint chanid, const QDateTime& starttime)
-{
-    QString startstring = MythDate::toString(starttime, MythDate::kFilename);
-    const ProgramInfo pginfo(chanid, starttime);
-
-    if (!pginfo.GetChanID())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("No program data exists for channel %1 at %2")
-                .arg(chanid).arg(startstring));
-        return GENERIC_EXIT_NO_RECORDING_DATA;
-    }
-
-    frm_dir_map_t skiplist;
-    pginfo.SaveCommBreakList(skiplist);
-
-    LOG(VB_GENERAL, LOG_NOTICE, "Commercial skip list cleared");
-
-    return GENERIC_EXIT_OK;
-}
-
-static int SetCutList(uint chanid, const QDateTime& starttime, QString newCutList)
-{
-    frm_dir_map_t cutlist;
-
-    newCutList.remove(" ");
-
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList tokens = newCutList.split(",", QString::SkipEmptyParts);
-#else
-    QStringList tokens = newCutList.split(",", Qt::SkipEmptyParts);
-#endif
-
-    for (const QString& token : qAsConst(tokens))
-    {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList cutpair = token.split("-", QString::SkipEmptyParts);
-#else
-        QStringList cutpair = token.split("-", Qt::SkipEmptyParts);
-#endif
-        cutlist[cutpair[0].toInt()] = MARK_CUT_START;
-        cutlist[cutpair[1].toInt()] = MARK_CUT_END;
-    }
-
-    QString startstring = MythDate::toString(starttime, MythDate::kFilename);
-    const ProgramInfo pginfo(chanid, starttime);
-
-    if (!pginfo.GetChanID())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("No program data exists for channel %1 at %2")
-                .arg(chanid).arg(startstring));
-        return GENERIC_EXIT_NO_RECORDING_DATA;
-    }
-
-    pginfo.SaveCutList(cutlist);
-
-    LOG(VB_GENERAL, LOG_NOTICE, QString("Cutlist set to: %1").arg(newCutList));
-
-    return GENERIC_EXIT_OK;
-}
-
-static int GetMarkupList(const QString& list, uint chanid, const QDateTime& starttime)
-{
-    frm_dir_map_t cutlist;
-    frm_dir_map_t::const_iterator it;
-    QString result;
-
-    QString startstring = MythDate::toString(starttime, MythDate::kFilename);
-    const ProgramInfo pginfo(chanid, starttime);
-
-    if (!pginfo.GetChanID())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("No program data exists for channel %1 at %2")
-                .arg(chanid).arg(startstring));
-        return GENERIC_EXIT_NO_RECORDING_DATA;
-    }
-
-    if (list == "cutlist")
-        pginfo.QueryCutList(cutlist);
-    else
-        pginfo.QueryCommBreakList(cutlist);
-
-    uint64_t lastStart = 0;
-    for (it = cutlist.cbegin(); it != cutlist.cend(); ++it)
-    {
-        if ((*it == MARK_COMM_START) ||
-            (*it == MARK_CUT_START))
-        {
-            if (!result.isEmpty())
-                result += ",";
-            lastStart = it.key();
-            result += QString("%1-").arg(lastStart);
-        }
-        else
-        {
-            if (result.isEmpty())
-                result += "0-";
-            result += QString("%1").arg(it.key());
-        }
-    }
-
-    if (result.endsWith('-'))
-    {
-        uint64_t lastFrame = pginfo.QueryLastFrameInPosMap() + 60;
-        if (lastFrame > lastStart)
-            result += QString("%1").arg(lastFrame);
-    }
-
-    if (list == "cutlist")
-        std::cout << QString("Cutlist: %1\n").arg(result).toLocal8Bit().constData();
-    else
-    {
-        std::cout << QString("Commercial Skip List: %1\n")
-            .arg(result).toLocal8Bit().constData();
-    }
-
-    return GENERIC_EXIT_OK;
-}
-
 static void streamOutCommercialBreakList(
     std::ostream &output, const frm_dir_map_t &commercialBreakList)
 {
@@ -478,7 +328,7 @@ static void commDetectorGotNewCommercialBreakList(void)
 
 static void incomingCustomEvent(QEvent* e)
 {
-    if (e->type() == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(e);
         if (me == nullptr)
@@ -1169,19 +1019,6 @@ int main(int argc, char *argv[])
         // operate on a recording in the database
         uint chanid = cmdline.toUInt("chanid");
         QDateTime starttime = cmdline.toDateTime("starttime");
-
-        if (cmdline.toBool("clearskiplist"))
-            return ClearSkipList(chanid, starttime);
-        if (cmdline.toBool("gencutlist"))
-            return CopySkipListToCutList(chanid, starttime);
-        if (cmdline.toBool("clearcutlist"))
-            return SetCutList(chanid, starttime, "");
-        if (cmdline.toBool("setcutlist"))
-            return SetCutList(chanid, starttime, cmdline.toString("setcutlist"));
-        if (cmdline.toBool("getcutlist"))
-            return GetMarkupList("cutlist", chanid, starttime);
-        if (cmdline.toBool("getskiplist"))
-            return GetMarkupList("commflag", chanid, starttime);
 
         // TODO: check for matching jobid
         // create temporary id to operate off of if not

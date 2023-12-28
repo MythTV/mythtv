@@ -54,7 +54,7 @@ bool Frontend::SendMessage(const QString &Message, uint TimeoutInt)
     if (Timeout > 0s && Timeout < 1000s)
         data << QString::number(Timeout.count());
     qApp->postEvent(GetMythMainWindow(),
-                    new MythEvent(MythEvent::MythUserMessage, Message,
+                    new MythEvent(MythEvent::kMythUserMessage, Message,
                     data));
     return true;
 }
@@ -78,7 +78,7 @@ bool  Frontend::SendNotification(bool  Error,
     if (!GetNotificationCenter())
         return false;
 
-    ShowNotification(Error ? MythNotification::Error :
+    ShowNotification(Error ? MythNotification::kError :
                              MythNotification::TypeFromString(Type),
                      Message,
                      Origin.isNull() ? tr("FrontendServices") : Origin,

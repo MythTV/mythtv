@@ -55,9 +55,8 @@ MythOpenGLTonemap::~MythOpenGLTonemap()
         m_colourSpace->DecrRef();
 }
 
-void MythOpenGLTonemap::UpdateColourSpace(bool PrimariesChanged)
+void MythOpenGLTonemap::UpdateColourSpace([[maybe_unused]] bool PrimariesChanged)
 {
-    (void)PrimariesChanged;
     OpenGLLocker locker(m_render);
     if (m_shader)
     {

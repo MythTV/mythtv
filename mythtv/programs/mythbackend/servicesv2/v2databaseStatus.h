@@ -18,33 +18,19 @@ class V2DatabaseStatus : public QObject
     SERVICE_PROPERTY2( QString , Type          )
     SERVICE_PROPERTY2( bool    , LocalEnabled  )
     SERVICE_PROPERTY2( QString , LocalHostName )
-
+    SERVICE_PROPERTY2( bool    , WOLEnabled    )
+    SERVICE_PROPERTY2( int     , WOLReconnect  )
+    SERVICE_PROPERTY2( int     , WOLRetry      )
+    SERVICE_PROPERTY2( QString , WOLCommand    )
     SERVICE_PROPERTY2( bool    , Connected     )
     SERVICE_PROPERTY2( bool    , HaveDatabase  )
     SERVICE_PROPERTY2( int     , SchemaVersion )
-
 
     public:
 
         Q_INVOKABLE V2DatabaseStatus(QObject *parent = nullptr)
             : QObject( parent )
         {
-        }
-
-        void Copy( const V2DatabaseStatus *src )
-        {
-            m_Host          = src->m_Host         ;
-            m_Ping          = src->m_Ping         ;
-            m_Port          = src->m_Port         ;
-            m_UserName      = src->m_UserName     ;
-            m_Password      = src->m_Password     ;
-            m_Name          = src->m_Name         ;
-            m_Type          = src->m_Type         ;
-            m_LocalEnabled  = src->m_LocalEnabled ;
-            m_LocalHostName = src->m_LocalHostName;
-            m_Connected     = src->m_Connected    ;
-            m_HaveDatabase  = src->m_HaveDatabase ;
-            m_SchemaVersion = src->m_SchemaVersion;
         }
 
     private:

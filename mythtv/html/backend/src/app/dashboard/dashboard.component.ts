@@ -1,12 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
-
-import { MythService } from '../services/myth.service';
-import { ConfigService } from '../services/config.service';
-import { MythHostName, MythTimeZone, MythConnectionInfo, GetSettingResponse } from '../services/interfaces/myth.interface';
-import { MythDatabaseStatus } from '../services/interfaces/config.interface';
-import { HttpErrorResponse } from '@angular/common/http';
+import { TranslateService } from '@ngx-translate/core';
+import { MenuItem } from 'primeng/api';
+import { SetupService } from '../services/setup.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,40 +9,33 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  m_hostname$!: Observable<MythHostName>;
-  m_timezone$!: Observable<MythTimeZone>;
-  m_connectionInfo$!: Observable<MythConnectionInfo>;
-  m_setting$!: Observable<GetSettingResponse>;
-  m_databaseStatus$!: Observable<MythDatabaseStatus>
 
-  public errorRes!: HttpErrorResponse;
+  translateDone = false;
 
-  constructor(private mythService: MythService, private configService: ConfigService) { }
+  fullMenu: MenuItem[] = [
+    { label: 'dashboard.backendStatus', routerLink: 'status' },
+    { label: 'dashboard.channeleditor', routerLink: 'channel-editor' },
+    { label: 'dashboard.programguide', routerLink: 'program-guide' },
+    { label: 'dashboard.recordings.heading', routerLink: 'recordings' },
+    { label: 'dashboard.upcoming.heading', routerLink: 'upcoming' },
+    { label: 'dashboard.recrules.heading', routerLink: 'recrules' },
+    { label: 'dashboard.videos.heading', routerLink: 'videos' },
+  ]
+
+  activeItem = this.fullMenu[0];
+
+  constructor(private translate: TranslateService, private setupService: SetupService) {
+    setupService.pageType = 'D';
+    this.fullMenu.forEach(entry => {
+      if (entry.label)
+        this.translate.get(entry.label).subscribe(data => {
+          entry.label = data;
+          this.translateDone = true;
+        });
+    });
+  }
 
   ngOnInit(): void {
-    this.m_hostname$ = this.mythService.GetHostName().pipe(
-      tap(data => console.log(data)),
-    )
-
-    this.m_timezone$ = this.mythService.GetTimeZone().pipe(
-      tap(data => console.log(data)),
-    )
-
-    // TODO: This call fails without a PIN set
-    this.m_connectionInfo$ = this.mythService.GetConnectionInfo("").pipe(
-      catchError((err: HttpErrorResponse) => {
-        console.error("error getting connection info", err);
-        this.errorRes = err;
-        return throwError(err);
-      })
-    )
-
-    this.m_setting$ = this.mythService.GetSetting({HostName: "localhost", Key: "TestSetting"}).pipe(
-      tap(data => console.log(data)),
-    )
-
-    this.m_databaseStatus$ = this.configService.GetDatabaseStatus().pipe(
-      tap(data => console.log("Database Status: " + data)),
-    )
   }
+
 }

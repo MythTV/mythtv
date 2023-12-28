@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
+#include <limits> // workaround QTBUG-90395
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>

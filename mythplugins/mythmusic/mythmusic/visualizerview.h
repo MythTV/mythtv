@@ -30,23 +30,21 @@ class VisualizerView : public MusicCommon
     void customEvent(QEvent *event) override; // MusicCommon
 
   private slots:
-    static void showTrackInfoPopup(void);
+    void showTrackInfoPopup(void);
 };
 
-class MPLUGIN_PUBLIC TrackInfoPopup : public MythScreenType
+class MPLUGIN_PUBLIC TrackInfoPopup : public VisualizerView
 {
   Q_OBJECT
   public:
-    TrackInfoPopup(MythScreenStack *parent, MusicMetadata *mdata)
-        : MythScreenType(parent, "trackinfopopup", false),
-        m_metadata(mdata) {}
+    TrackInfoPopup(MythScreenStack *parent)
+        : VisualizerView(parent, nullptr) {}
     ~TrackInfoPopup(void) override;
 
-    bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    bool Create(void) override; // VisualizerView
+    bool keyPressEvent(QKeyEvent *event) override; // VisualizerView
 
   protected:
-    MusicMetadata *m_metadata     {nullptr};
     QTimer        *m_displayTimer {nullptr};
 };
 

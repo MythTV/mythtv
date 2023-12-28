@@ -26,6 +26,9 @@ extern "C" {
 #undef Cursor
 #undef pointer
 #undef Bool            // Interferes with cmake moc file compilation
+#undef True            // Interferes with cmake moc file compilation
+#undef False           // Interferes with cmake moc file compilation
+#undef Always          // X11/X.h defines this. Causes compile failure in Qt6.
 #include "libavcodec/avcodec.h"
 }
 

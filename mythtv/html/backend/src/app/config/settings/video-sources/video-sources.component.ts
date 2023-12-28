@@ -1,5 +1,6 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { CanComponentDeactivate } from 'src/app/can-deactivate-guard.service';
@@ -10,7 +11,8 @@ import { SetupService } from 'src/app/services/setup.service';
 @Component({
   selector: 'app-video-sources',
   templateUrl: './video-sources.component.html',
-  styleUrls: ['./video-sources.component.css']
+  styleUrls: ['./video-sources.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class VideoSourcesComponent implements OnInit, CanComponentDeactivate {
 
@@ -21,8 +23,8 @@ export class VideoSourcesComponent implements OnInit, CanComponentDeactivate {
   disabledTab: boolean[] = [];
   activeTab: boolean[] = [];
   displayDeleteThis: boolean[] = [];
-  dirtyText = 'settings.unsaved';
-  warningText = 'settings.warning';
+  dirtyText = 'settings.common.unsaved';
+  warningText = 'settings.common.warning';
   deletedText = 'settings.common.deleted';
   newText = 'settings.common.new';
   successCount: number = 0;
@@ -40,8 +42,9 @@ export class VideoSourcesComponent implements OnInit, CanComponentDeactivate {
     }
   };
 
-  constructor(private setupService: SetupService, private translate: TranslateService,
-    private channelService: ChannelService) {
+  constructor(public setupService: SetupService, private translate: TranslateService,
+    private channelService: ChannelService,  public router: Router) {
+    this.setupService.setCurrentForm(null);
     this.loadSources();
     translate.get(this.dirtyText).subscribe(data => this.dirtyText = data);
     translate.get(this.warningText).subscribe(data => this.warningText = data);

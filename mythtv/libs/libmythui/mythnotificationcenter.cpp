@@ -34,7 +34,7 @@ static constexpr std::chrono::milliseconds DEFAULT_DURATION { 5s };
 
 //// MythNotificationCenterEvent
 
-QEvent::Type MythNotificationCenterEvent::kEventType =
+const QEvent::Type MythNotificationCenterEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 //// class MythNotificationScreenStack
@@ -211,15 +211,15 @@ void MythNotificationScreen::SetNotification(MythNotification &notification)
 
     m_type = notification.type();
 
-    if (m_type == MythNotification::Error   ||
-        m_type == MythNotification::Warning ||
-        m_type == MythNotification::Check ||
-        m_type == MythNotification::Busy)
+    if (m_type == MythNotification::kError   ||
+        m_type == MythNotification::kWarning ||
+        m_type == MythNotification::kCheck ||
+        m_type == MythNotification::kBusy)
     {
         m_update |= kImage;
         update = false;
     }
-    else if (m_type == MythNotification::Update)
+    else if (m_type == MythNotification::kUpdate)
     {
         update = true;
     }
@@ -498,21 +498,21 @@ void MythNotificationScreen::SetErrorState(void) const
     if (!m_errorState)
         return;
 
-    const char *state = "ok";
+    const char *state {nullptr};
 
-    if (m_type == MythNotification::Error)
+    if (m_type == MythNotification::kError)
     {
         state = "error";
     }
-    else if (m_type == MythNotification::Warning)
+    else if (m_type == MythNotification::kWarning)
     {
         state = "warning";
     }
-    else if (m_type == MythNotification::Check)
+    else if (m_type == MythNotification::kCheck)
     {
         state = "check";
     }
-    else if (m_type == MythNotification::Busy)
+    else if (m_type == MythNotification::kBusy)
     {
         state = "busy";
     }
@@ -884,7 +884,7 @@ bool NCPrivate::Queue(const MythNotification &notification)
             // refuse all notification updates
             if (m_suspended.contains(id))
             {
-                if (notification.type() == MythNotification::Update)
+                if (notification.type() == MythNotification::kUpdate)
                     return false;
                 // got something else than an update, remove it from the
                 // suspended list
@@ -1458,7 +1458,7 @@ void ShowNotification(bool  error,
                       const MythNotification::Priority priority,
                       const QString &style)
 {
-    ShowNotification(error ? MythNotification::Error : MythNotification::New,
+    ShowNotification(error ? MythNotification::kError : MythNotification::kNew,
                      msg, origin, detail, image, extra, progress_text, progress,
                      duration, fullscreen, visibility, priority, style);
 }
@@ -1488,15 +1488,15 @@ void ShowNotification(MythNotification::Type type,
     data["asal"] = detail;
     data["asfm"] = extra;
 
-    if (type == MythNotification::Error   ||
-        type == MythNotification::Warning ||
-        type == MythNotification::Check ||
-        type == MythNotification::Busy)
+    if (type == MythNotification::kError   ||
+        type == MythNotification::kWarning ||
+        type == MythNotification::kCheck ||
+        type == MythNotification::kBusy)
     {
         n = new MythNotification(type, data);
         if (duration != 0s &&
-            type != MythNotification::Check &&
-            type != MythNotification::Busy)
+            type != MythNotification::kCheck &&
+            type != MythNotification::kBusy)
         {
             // default duration for those type of notifications is 10s
             duration = 10s;

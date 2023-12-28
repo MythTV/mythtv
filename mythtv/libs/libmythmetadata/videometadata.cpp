@@ -508,7 +508,7 @@ void VideoMetadataImp::fillGenres()
             // Just add empty string for no-name genres
             QString name;
             vg.get(value, name);
-            m_genres.push_back(genre_list::value_type(value, name));
+            m_genres.emplace_back(value, name);
         }
     }
 }
@@ -526,7 +526,7 @@ void VideoMetadataImp::fillCountries()
             // Just add empty string for no-name countries
             QString name;
             vc.get(value, name);
-            m_countries.push_back(country_list::value_type(value, name));
+            m_countries.emplace_back(value, name);
         }
     }
 }
@@ -544,7 +544,7 @@ void VideoMetadataImp::fillCast()
             // Just add empty string for no-name cast
             QString name;
             vc.get(value, name);
-            m_cast.push_back(cast_list::value_type(value, name));
+            m_cast.emplace_back(value, name);
         }
     }
 }

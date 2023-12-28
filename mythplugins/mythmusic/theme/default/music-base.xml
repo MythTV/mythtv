@@ -415,7 +415,7 @@
         </progressbar>
 
         <textarea name="time" from="basetextarea">
-            <area>185,155,185,35</area>
+            <area>185,155,300,35</area>
             <font>basesmall</font>
         </textarea>
 
@@ -598,7 +598,7 @@
         <textarea name="playlisttime" from="basetextarea">
             <area>200,0,230,30</area>
             <font>basesmall</font>
-            <align>right,top</align>
+            <align>left,top</align>
         </textarea>
 
         <progressbar name="playlistprogress" from="baseplaylistprogress">
@@ -643,14 +643,14 @@
         </statetype>
 
         <textarea name="title" from="basetextarea">
-            <area>100,10,520,34</area>
+            <area>100,10,500,34</area>
             <font>basesmall</font>
             <align>left,vcenter</align>
             <template>%TITLE% by %ARTIST% on %ALBUM%</template>
         </textarea>
 
         <textarea name="time" from="basetextarea">
-            <area>620,10,155,34</area>
+            <area>600,10,175,34</area>
             <align>right,vcenter</align>
             <font>basesmall</font>
         </textarea>
@@ -666,7 +666,7 @@
             <area>35,25,730,190</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
-            <value>You haven't selected any tracks to play</value>
+            <value>Press M (Menu) to add and play tracks</value>
         </textarea>
 
         <buttonlist name="currentplaylist" from="basecurrentplaylist">

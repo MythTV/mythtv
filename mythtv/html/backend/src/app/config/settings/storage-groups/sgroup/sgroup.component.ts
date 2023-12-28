@@ -33,7 +33,7 @@ export class SgroupComponent implements OnInit, AfterViewInit {
   selectedDir = "";
   upString = "UP 1 LEVEL";
 
-  constructor(private mythService: MythService, private setupService: SetupService,
+  constructor(private mythService: MythService, public setupService: SetupService,
     private translate: TranslateService) {
 
     translate.get("settings.sgroups.updir")

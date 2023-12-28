@@ -1,5 +1,5 @@
-<div class="block card w-full">
-    <h3>{{ 'settings.sgroups.title' | translate }}</h3>
+<p-card class="m-5">
+    <h2>{{ 'settings.sgroups.title' | translate }}</h2>
 
     <p-button label="New Storage Group" (onClick)="displayNewDlg = true" icon="pi pi-plus-circle"
         styleClass="p-button-plain"></p-button>
@@ -41,4 +41,14 @@
             </ng-template>
         </p-accordionTab>
     </p-accordion>
-</div>
+
+    <div class="flex justify-content-end">
+        <p-button class="p-3" label="{{ 'common.back' | translate }}"
+            (onClick)="router.navigate(['setupwizard/channel-editor'])" icon="pi pi-angle-left"
+            iconPos="left"></p-button>
+
+        <p-button class="p-3" label="{{ 'common.next' | translate }}"
+            (onClick)="router.navigate(['setupwizard/system-events'])" icon="pi pi-angle-right" iconPos="right"></p-button>
+    </div>
+
+</p-card>

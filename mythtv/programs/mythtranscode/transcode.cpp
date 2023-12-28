@@ -10,6 +10,7 @@
 #include <QMap>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QRegularExpression>
 #include <QStringList>
 #include <QWaitCondition>
 #include <QtAlgorithms>
@@ -193,7 +194,7 @@ static void TranscodeWriteText(void *ptr, unsigned char *buf, int len,
 
 int Transcode::TranscodeFile(const QString &inputname,
                              const QString &outputname,
-                             const QString &profileName,
+                             [[maybe_unused]] const QString &profileName,
                              bool honorCutList, bool framecontrol,
                              int jobID, const QString& fifodir,
                              bool fifo_info, bool cleanCut,
@@ -210,10 +211,6 @@ int Transcode::TranscodeFile(const QString &inputname,
     std::unique_ptr<HTTPLiveStream> hls = nullptr;
     int hlsSegmentSize = 0;
     int hlsSegmentFrames = 0;
-
-#if !CONFIG_LIBMP3LAME
-    (void)profileName;
-#endif
 
     if (jobID >= 0)
         JobQueue::ChangeJobComment(jobID, "0% " + QObject::tr("Completed"));
@@ -882,7 +879,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     if (!fifodir.isEmpty())
     {
         AudioPlayer *aplayer = player->GetAudio();
-        const char  *audio_codec_name = "unknown";
+        const char  *audio_codec_name {nullptr};
 
         switch(aplayer->GetCodec())
         {

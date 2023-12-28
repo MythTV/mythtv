@@ -21,8 +21,12 @@
 #ifndef MYTHTVEXTERNRECAPP_H
 #define MYTHTVEXTERNRECAPP_H
 
+#include <QDir>
+#include <QMap>
 #include <QObject>
-#include <QtCore/QtCore>
+#include <QProcess>
+#include <QSettings>
+#include <QString>
 
 #include <atomic>
 #include <condition_variable>
@@ -41,6 +45,7 @@ class MythExternRecApp : public QObject
     bool Open(void);
     void Run(void);
 
+    void ReplaceVariables(QString & cmd) const;
     QString Desc(void) const;
     void MythLog(const QString & msg)
     { emit SendMessage("", "0", QString("STATUS:%1").arg(msg)); }
@@ -108,6 +113,7 @@ class MythExternRecApp : public QObject
     QString                 m_recDesc;
 
     QMap<QString, QString>  m_appEnv;
+    QMap<QString, QString>  m_settingVars;
 
     QProcess                m_tuneProc;
     QProcess                m_finishTuneProc;

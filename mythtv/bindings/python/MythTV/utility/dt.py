@@ -14,6 +14,15 @@ from collections import namedtuple
 import os
 import re
 import time
+
+HAVEZONEINFO = False
+try:
+    # python 3.9+
+    from zoneinfo import ZoneInfo
+    HAVEZONEINFO = True
+except ImportError:
+    HAVEZONEINFO = False
+
 from .singleton import InputSingleton
 time.tzset()
 
@@ -44,6 +53,7 @@ class basetzinfo( _pytzinfo ):
 
         index = self.__last
         direction = 0
+        oob_range = False
         while True:
             if dt < self._ranges[index][0]:
                 if direction == 1:
@@ -66,6 +76,7 @@ class basetzinfo( _pytzinfo ):
             if index >= len(self._ranges):
                 # out of bounds future, use final transition
                 index = len(self._ranges) - 1
+                oob_range = True
                 break
             elif index < 0:
                 # out of bounds past, undefined time frame
@@ -73,6 +84,9 @@ class basetzinfo( _pytzinfo ):
                                   self.tzname(), dt)
 
         self.__last = index
+        if oob_range:
+            # out of bounds future, use final transition
+            return self._transitions[self._ranges[index][2] + 1]
         return self._transitions[self._ranges[index][2]]
 
     def _get_transition_empty(self, dt=None):
@@ -258,6 +272,7 @@ class datetime( _pydatetime ):
     Customized datetime class offering canned import and export of several
     common time formats, and 'duck' importing between them.
     """
+    global HAVEZONEINFO
     _reiso = re.compile('(?P<year>[0-9]{4})'
                        '-(?P<month>[0-9]{1,2})'
                        '-(?P<day>[0-9]{1,2})'
@@ -284,22 +299,45 @@ class datetime( _pydatetime ):
                             '(?P<tzmin>[0-9]{2})'
                         ')?')
     _localtz = None
+    _utctz = None
 
     @classmethod
     def localTZ(cls):
+        global HAVEZONEINFO
         if cls._localtz is None:
-            try:
-                cls._localtz = posixtzinfo()
-            except:
-                cls._localtz = offsettzinfo.local()
+            if HAVEZONEINFO:
+                try:
+                    if os.getenv('TZ'):
+                        cls._localtz = ZoneInfo(os.getenv('TZ'))
+                    elif os.path.exists('/usr/share/zoneinfo/localtime'):
+                        cls._localtz = ZoneInfo('localtime')
+                    else:
+                        with open('/etc/localtime', 'rb') as zfile:
+                            cls._localtz = ZoneInfo.from_file(zfile, 'localtime')
+                except:
+                    HAVEZONEINFO = False
+            if not HAVEZONEINFO:
+                try:
+                    cls._localtz = posixtzinfo()
+                except:
+                    cls._localtz = offsettzinfo.local()
         return cls._localtz
 
     @classmethod
     def UTCTZ(cls):
-        try:
-            return posixtzinfo('Etc/UTC')
-        except:
-            return offsettzinfo()
+        global HAVEZONEINFO
+        if cls._utctz is None:
+            if HAVEZONEINFO:
+                try:
+                    cls._utctz = ZoneInfo('Etc/UTC')
+                except:
+                    HAVEZONEINFO = False
+            if not HAVEZONEINFO:
+                try:
+                    cls._utctz = posixtzinfo('Etc/UTC')
+                except:
+                    cls._utctz = offsettzinfo()
+        return cls._utctz
 
     @classmethod
     def fromDatetime(cls, dt, tzinfo=None):

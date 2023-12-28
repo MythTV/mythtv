@@ -18,16 +18,7 @@ except ImportError:
     sys.exit('Install python-requests or python3-requests')
 
 from ._version import __version__
-
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
-# If MYTHTV_VERSION_LIST needs to be changed, be sure to     #
-# test with the new back/frontend version. If you're just    #
-# getting data, no harm will be done. But if you Add/Delete/ #
-# Update anything, then all bets are off! Anything requiring #
-# an HTTP POST is potentially dangerous.                     #
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
-
-MYTHTV_VERSION_LIST = ('0.27', '0.28', '29', '30', '31', '32', '33')
+from .mythversions import MYTHTV_VERSION_LIST
 
 
 class Send(object):

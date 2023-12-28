@@ -23,12 +23,12 @@
 
 /**********************************************************************/
 
-QEvent::Type DecoderHandlerEvent::Ready = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type DecoderHandlerEvent::Meta = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type DecoderHandlerEvent::BufferStatus = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type DecoderHandlerEvent::OperationStart = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type DecoderHandlerEvent::OperationStop = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type DecoderHandlerEvent::Error = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type DecoderHandlerEvent::kReady = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type DecoderHandlerEvent::kMeta = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type DecoderHandlerEvent::kBufferStatus = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type DecoderHandlerEvent::kOperationStart = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type DecoderHandlerEvent::kOperationStop = (QEvent::Type) QEvent::registerEventType();
+const QEvent::Type DecoderHandlerEvent::kError = (QEvent::Type) QEvent::registerEventType();
 
 DecoderHandlerEvent::DecoderHandlerEvent(Type type, const MusicMetadata &meta)
     : MythEvent(type)
@@ -116,7 +116,7 @@ void DecoderHandler::doStart(bool result)
 void DecoderHandler::error(const QString &e)
 {
     auto *str = new QString(e);
-    DecoderHandlerEvent ev(DecoderHandlerEvent::Error, str);
+    DecoderHandlerEvent ev(DecoderHandlerEvent::kError, str);
     dispatch(ev);
 }
 
@@ -213,7 +213,7 @@ void DecoderHandler::customEvent(QEvent *event)
         dispatch(*dhe);
         return;
     }
-    if (event->type() == MythEvent::MythEventMessage)
+    if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
@@ -352,7 +352,7 @@ void DecoderHandler::doConnectDecoder(const QUrl &url, const QString &format)
 
     m_decoder->setURL(url.toString());
 
-    DecoderHandlerEvent ev(DecoderHandlerEvent::Ready);
+    DecoderHandlerEvent ev(DecoderHandlerEvent::kReady);
     dispatch(ev);
 }
 
@@ -360,14 +360,14 @@ void DecoderHandler::doFailed(const QUrl &url, const QString &message)
 {
     LOG(VB_NETWORK, LOG_ERR,
         QString("DecoderHandler error: '%1' - %2").arg(message, url.toString()));
-    DecoderHandlerEvent ev(DecoderHandlerEvent::Error, new QString(message));
+    DecoderHandlerEvent ev(DecoderHandlerEvent::kError, new QString(message));
     dispatch(ev);
 }
 
 void DecoderHandler::doOperationStart(const QString &name)
 {
     m_op = true;
-    DecoderHandlerEvent ev(DecoderHandlerEvent::OperationStart, new QString(name));
+    DecoderHandlerEvent ev(DecoderHandlerEvent::kOperationStart, new QString(name));
     dispatch(ev);
 }
 
@@ -377,6 +377,6 @@ void DecoderHandler::doOperationStop(void)
         return;
 
     m_op = false;
-    DecoderHandlerEvent ev(DecoderHandlerEvent::OperationStop);
+    DecoderHandlerEvent ev(DecoderHandlerEvent::kOperationStop);
     dispatch(ev);
 }

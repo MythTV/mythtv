@@ -14,12 +14,11 @@
 #include "libmythbase/mythlogging.h"
 
 MythUIClock::MythUIClock(MythUIType *parent, const QString &name)
-    : MythUIText(parent, name)
+    : MythUIText(parent, name),
+      m_timeFormat(GetMythDB()->GetSetting("TimeFormat", "h:mm ap")),
+      m_dateFormat(GetMythDB()->GetSetting("DateFormat", "ddd d MMM yyyy")),
+      m_shortDateFormat(GetMythDB()->GetSetting("ShortDateFormat", "ddd M/d"))
 {
-    m_dateFormat = GetMythDB()->GetSetting("DateFormat", "ddd d MMM yyyy");
-    m_shortDateFormat = GetMythDB()->GetSetting("ShortDateFormat", "ddd M/d");
-    m_timeFormat = GetMythDB()->GetSetting("TimeFormat", "h:mm ap");
-
     m_format = QString("%1, %2").arg(m_dateFormat, m_timeFormat);
 }
 

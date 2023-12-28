@@ -20,10 +20,6 @@
 #include "mpeg/mpegstreamdata.h"
 #include "mpeg/streamlisteners.h"
 
-#ifdef NEED_HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR
-static int hdhomerun_device_selector_load_from_str(struct hdhomerun_device_selector_t *hds, char *device_str);
-#endif
-
 #define LOC      QString("HDHRSH[%1](%2): ").arg(m_inputId).arg(m_device)
 
 QMap<int,HDHRStreamHandler*>     HDHRStreamHandler::s_handlers;
@@ -415,8 +411,7 @@ bool HDHRStreamHandler::Connect(void)
     return true;
 }
 
-QString HDHRStreamHandler::TunerGet(
-    const QString &name, bool report_error_return, bool print_error) const
+QString HDHRStreamHandler::TunerGet(const QString &name)
 {
     QMutexLocker locker(&m_hdhrLock);
 
@@ -438,23 +433,17 @@ QString HDHRStreamHandler::TunerGet(
         return {};
     }
 
-    if (report_error_return && error)
+    if (error)
     {
-        if (print_error)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceGet(%1): %2")
-                    .arg(name, error));
-        }
-
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceGet(%1): %2")
+                .arg(name, error));
         return {};
     }
 
     return {value};
 }
 
-QString HDHRStreamHandler::TunerSet(
-    const QString &name, const QString &val,
-    bool report_error_return, bool print_error)
+QString HDHRStreamHandler::TunerSet(const QString &name, const QString &val)
 {
     QMutexLocker locker(&m_hdhrLock);
 
@@ -464,7 +453,6 @@ QString HDHRStreamHandler::TunerSet(
         return {};
     }
 
-
     QString valname = QString("/tuner%1/%2").arg(m_tuner).arg(name);
     char *value = nullptr;
     char *error = nullptr;
@@ -472,29 +460,33 @@ QString HDHRStreamHandler::TunerSet(
 #if 0
     LOG(VB_CHANSCAN, LOG_DEBUG, LOC + valname + " " + val);
 #endif
+
+    // Receive full transport stream when pid 0x2000 is present
+    QString val2 = val;
+    if (name.contains("filter") && val.contains("0x2000"))
+    {
+        val2 = "0x0000-0x1FFF";
+        LOG(VB_RECORD, LOG_INFO, LOC + valname + " fixup: \"" + val + "\" to \"" +val2 + "\"");
+    }
+
     if (hdhomerun_device_set_var(
             m_hdhomerunDevice, valname.toLocal8Bit().constData(),
-            val.toLocal8Bit().constData(), &value, &error) < 0)
+            val2.toLocal8Bit().constData(), &value, &error) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Set %1 to '%2' request failed").arg(valname, val) +
+            QString("Set %1 to '%2' request failed").arg(valname, val2) +
             ENO);
-
         return {};
     }
 
-    if (report_error_return && error)
+    if (error)
     {
-        if (print_error)
-        {
-            // Skip error messages from MPTS recordings
-            if (!(val.contains("0x2000") && strstr(error, "ERROR: invalid pid filter")))
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceSet(%1 %2): %3")
-                        .arg(name, val, error));
-            }
-        }
+        // Terminate recording when HDHomeRun lost connection
+        if (strstr(error, "ERROR: lock no longer held"))
+            m_bError = true;
 
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceSet(%1 %2): %3")
+                .arg(name, val2, error));
         return {};
     }
 
@@ -544,7 +536,7 @@ bool HDHRStreamHandler::TuneProgram(uint mpeg_prog_num)
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Tuning program %1")
             .arg(mpeg_prog_num));
     return !TunerSet(
-        "program", QString::number(mpeg_prog_num), false).isEmpty();
+        "program", QString::number(mpeg_prog_num)).isEmpty();
 }
 
 bool HDHRStreamHandler::TuneVChannel(const QString &vchn)
@@ -564,98 +556,3 @@ bool HDHRStreamHandler::TuneVChannel(const QString &vchn)
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Tuning vchannel %1").arg(vchn));
     return !TunerSet("vchannel", vchn).isEmpty();
 }
-
-#ifdef NEED_HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR
-
-// Provide functions we need that are not included in some versions of
-// libhdhomerun.  These were taken
-// from version 20180817 and modified as needed.
-
-struct hdhomerun_device_selector_t {
-        struct hdhomerun_device_t **hd_list;
-        size_t hd_count;
-        struct hdhomerun_debug_t *dbg;
-};
-
-static int hdhomerun_device_selector_load_from_str_discover(struct hdhomerun_device_selector_t *hds, uint32_t target_ip, uint32_t device_id)
-{
-	struct hdhomerun_discover_device_t result;
-	int discover_count = hdhomerun_discover_find_devices_custom(target_ip, HDHOMERUN_DEVICE_TYPE_TUNER, device_id, &result, 1);
-	if (discover_count != 1) {
-		return 0;
-	}
-
-	int count = 0;
-	unsigned int tuner_index;
-	for (tuner_index = 0; tuner_index < result.tuner_count; tuner_index++) {
-		struct hdhomerun_device_t *hd = hdhomerun_device_create(result.device_id, result.ip_addr, tuner_index, hds->dbg);
-		if (!hd) {
-			continue;
-		}
-
-		hdhomerun_device_selector_add_device(hds, hd);
-		count++;
-	}
-
-	return count;
-}
-
-static int hdhomerun_device_selector_load_from_str(struct hdhomerun_device_selector_t *hds, char *device_str)
-{
-	/*
-	 * IP address based device_str.
-	 */
-	unsigned int a[4];
-	if (sscanf(device_str, "%u.%u.%u.%u", &a[0], &a[1], &a[2], &a[3]) == 4) {
-		uint32_t ip_addr = (uint32_t)((a[0] << 24) | (a[1] << 16) | (a[2] << 8) | (a[3] << 0));
-
-		/*
-		 * IP address + tuner number.
-		 */
-		unsigned int tuner;
-		if (sscanf(device_str, "%u.%u.%u.%u-%u", &a[0], &a[1], &a[2], &a[3], &tuner) == 5) {
-			struct hdhomerun_device_t *hd = hdhomerun_device_create(HDHOMERUN_DEVICE_ID_WILDCARD, ip_addr, tuner, hds->dbg);
-			if (!hd) {
-				return 0;
-			}
-
-			hdhomerun_device_selector_add_device(hds, hd);
-			return 1;
-		}
-
-		/*
-		 * IP address only - discover and add tuners.
-		 */
-		return hdhomerun_device_selector_load_from_str_discover(hds, ip_addr, HDHOMERUN_DEVICE_ID_WILDCARD);
-	}
-
-	/*
-	 * Device ID based device_str.
-	 */
-	char *end;
-	uint32_t device_id = (uint32_t)strtoul(device_str, &end, 16);
-	if ((end == device_str + 8) && hdhomerun_discover_validate_device_id(device_id)) {
-		/*
-		 * IP address + tuner number.
-		 */
-		if (*end == '-') {
-			unsigned int tuner = (unsigned int)strtoul(end + 1, NULL, 10);
-			struct hdhomerun_device_t *hd = hdhomerun_device_create(device_id, 0, tuner, hds->dbg);
-			if (!hd) {
-				return 0;
-			}
-
-			hdhomerun_device_selector_add_device(hds, hd);
-			return 1;
-		}
-
-		/*
-		 * Device ID only - discover and add tuners.
-		 */
-		return hdhomerun_device_selector_load_from_str_discover(hds, 0, device_id);
-	}
-
-        return 0;
-}
-
-#endif

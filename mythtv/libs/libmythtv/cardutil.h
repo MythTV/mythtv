@@ -11,6 +11,7 @@
 #include <QList>
 #include <QStringList>
 #include <QMap>
+#include <QMetaEnum>
 
 // MythTV headers
 #include "mythtvexp.h"
@@ -37,8 +38,10 @@ enum dvb_dev_type_t
 /** \class CardUtil
  *  \brief Collection of helper utilities for input DB use
  */
-class MTV_PUBLIC CardUtil
+class MTV_PUBLIC CardUtil : public QObject
 {
+    Q_OBJECT
+
   public:
     using InputTypes = QMap<QString, QString>;
 
@@ -69,6 +72,8 @@ class MTV_PUBLIC CardUtil
         V4L2ENC   = 21,
         SATIP     = 22
     };
+
+    Q_ENUM(INPUT_TYPES)
 
     static enum INPUT_TYPES toInputType(const QString &name)
     {
@@ -334,7 +339,7 @@ class MTV_PUBLIC CardUtil
     static std::vector<uint> GetInputIDs(uint sourceid);
     static bool         GetInputInfo(InputInfo &input,
                                      std::vector<uint> *groupids = nullptr);
-    static QList<InputInfo> GetAllInputInfo();
+    static QList<InputInfo> GetAllInputInfo(bool virtTuners);
     static QString      GetInputName(uint inputid);
     static QString      GetStartChannel(uint inputid);
     static QString      GetDisplayName(uint inputid);

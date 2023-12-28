@@ -216,13 +216,14 @@ static PlaybackBox::ViewMask m_viewMaskToggle(PlaybackBox::ViewMask mask,
 }
 
 static QString construct_sort_title(
-    QString title, PlaybackBox::ViewMask viewmask,
+    QString title, const QString& sortTitle, PlaybackBox::ViewMask viewmask,
     PlaybackBox::ViewTitleSort sortType, int recpriority)
 {
     if (title.isEmpty())
         return title;
 
-    QString sTitle = title;
+    QString sTitle = sortTitle.isEmpty()
+        ? title : sortTitle + " - " + title;
 
     if (viewmask == PlaybackBox::VIEW_TITLES &&
             sortType == PlaybackBox::TitleSortRecPriority)
@@ -1809,7 +1810,7 @@ bool PlaybackBox::UpdateUILists(void)
             if ((m_viewMask & VIEW_TITLES) && (!isLiveTVProg || isLiveTvGroup))
             {
                 sTitle = construct_sort_title(
-                            p->GetSortTitle(), m_viewMask, titleSort,
+                            p->GetTitle(), p->GetSortTitle(), m_viewMask, titleSort,
                             p->GetRecordingPriority());
                 sTitle = sTitle.toLower();
 
@@ -3917,7 +3918,7 @@ void PlaybackBox::customEvent(QEvent *event)
         if (resultid == "transcode" && dce->GetResult() >= 0)
             changeProfileAndTranscode(dce->GetData().toInt());
     }
-    else if (event->type() == MythEvent::MythEventMessage)
+    else if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)

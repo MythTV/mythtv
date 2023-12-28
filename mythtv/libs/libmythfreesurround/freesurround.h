@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 static constexpr uint16_t SURROUND_BUFSIZE { 8192 };
 
-class FreeSurround
+class Q_DECL_EXPORT FreeSurround
 {
 public:
     enum SurroundMode

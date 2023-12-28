@@ -1,4 +1,6 @@
 build/
+dist/
 *.pyc
 *.swo
 MythTV.egg-info/
+setup.cfg

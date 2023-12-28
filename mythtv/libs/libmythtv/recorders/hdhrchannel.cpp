@@ -119,15 +119,14 @@ static QString format_modulation(const DTVMultiplex &tuning)
     return "auto";
 }
 
-static QString format_dvbt(const DTVMultiplex &tuning, const QString &mod)
+static QString format_dvbt(const DTVMultiplex &tuning)
 {
     const QChar b = tuning.m_bandwidth.toChar();
-
-    if ((QChar('a') == b) || (mod == "auto"))
-        return "auto"; // uses bandwidth from channel map
-    if (QChar('a') != b)
-        return QString("t%1%2").arg(b).arg(mod);
-    return QString("auto%1t").arg(b);
+    if ((QChar('8') == b) || (QChar('7') == b) || (QChar('6') == b))
+    {
+        return QString("auto%1t").arg(b);
+    }
+    return "auto";
 }
 
 static QString format_dvbc(const DTVMultiplex &tuning, const QString &mod)
@@ -156,8 +155,11 @@ static QString get_tune_spec(
         return (mod == "auto") ? "qam" : mod;
     if (DTVTunerType::kTunerTypeDVBC == tunerType)
         return format_dvbc(tuning, mod);
-    if (DTVTunerType::kTunerTypeDVBT == tunerType)
-        return format_dvbt(tuning, mod);
+    if ((DTVTunerType::kTunerTypeDVBT == tunerType) ||
+        (DTVTunerType::kTunerTypeDVBT2 == tunerType))
+    {
+        return format_dvbt(tuning);
+    }
 
     return "auto";
 }

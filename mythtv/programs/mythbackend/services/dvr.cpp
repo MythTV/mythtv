@@ -24,6 +24,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // Qt
+#include <QJsonArray>
 #include <QMap>
 
 // MythTV
@@ -873,7 +874,7 @@ DTC::MarkupList* Dvr::GetRecordedMarkup ( int RecordedId )
         else
             pMarkup->setData(QString::number(entry.data));
     }
-    for (auto entry : qAsConst(mapSeek))
+    for (const auto& entry : qAsConst(mapSeek))
     {
         DTC::Markup *pSeek = pMarkupList->AddNewSeek();
         QString typestr = toString(static_cast<MarkTypes>(entry.type));
@@ -1002,7 +1003,7 @@ DTC::EncoderList* Dvr::GetEncoderList()
     auto* pList = new DTC::EncoderList();
 
     QReadLocker tvlocker(&TVRec::s_inputsLock);
-    QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
+    QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo(true);
     for (auto * elink : qAsConst(gTVList))
     {
         if (elink != nullptr)
@@ -1066,7 +1067,7 @@ DTC::InputList* Dvr::GetInputList()
 {
     auto *pList = new DTC::InputList();
 
-    QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
+    QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo(false);
     for (const auto & inputInfo : qAsConst(inputInfoList))
     {
         DTC::Input *input = pList->AddNewInput();

@@ -23,8 +23,8 @@ class MBASE_PUBLIC DatabaseParams
     bool    m_dbHostPing    {true};         ///< Can we test connectivity using ping?
     int     m_dbPort        {3306};         ///< database port
     QString m_dbUserName    {"mythtv"};     ///< DB user name
-    QString m_dbPassword    {"mythconverg"};///< DB password
-    QString m_dbName        {"mythtv"};     ///< database name
+    QString m_dbPassword    {"mythtv"};     ///< DB password
+    QString m_dbName        {"mythconverg"};     ///< database name
     QString m_dbType        {"QMYSQL"};     ///< database type (MySQL, Postgres, etc.)
 
     bool    m_localEnabled  {false};        ///< true if localHostName is not default

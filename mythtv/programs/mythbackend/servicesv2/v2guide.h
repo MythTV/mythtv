@@ -26,6 +26,9 @@
 #ifndef V2GUIDE_H
 #define V2GUIDE_H
 
+// Qt
+#include <QFileInfo>
+
 // MythTV
 #include "libmythbase/http/mythhttpservice.h"
 #include "libmythbase/programinfo.h"

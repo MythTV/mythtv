@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 
-import { EpgDownload } from 'src/app/services/interfaces/setup.interface';
+import { MythService } from 'src/app/services/myth.service';
 import { SetupService } from 'src/app/services/setup.service';
 
 @Component({
@@ -12,11 +12,15 @@ import { SetupService } from 'src/app/services/setup.service';
 
 export class EpgDownloadingComponent implements OnInit, AfterViewInit {
 
-  EpgDownloadData: EpgDownload = this.setupService.getEpgDownload();
   @ViewChild("epgdownload")
   currentForm!: NgForm;
 
-  constructor(private setupService: SetupService) {
+  successCount= 0;
+  errorCount = 0;
+  MythFillEnabled = true;
+
+  constructor(public setupService: SetupService, private mythService: MythService) {
+    this.getEpgDownload();
   }
 
   ngOnInit(): void {
@@ -26,14 +30,42 @@ export class EpgDownloadingComponent implements OnInit, AfterViewInit {
     this.setupService.setCurrentForm(this.currentForm);
   }
 
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
+  getEpgDownload() {
+    this.successCount= 0;
+    this.errorCount = 0;
+    this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "MythFillEnabled", Default: "1" })
+      .subscribe({
+        next: data => this.MythFillEnabled = (data.String == '1'),
+        error: () => this.errorCount++
+      });
   }
+
+  EpgDownloadObs = {
+    next: (x: any) => {
+      if (x.bool)
+        this.successCount++;
+      else {
+        this.errorCount++;
+        if (this.currentForm)
+          this.currentForm.form.markAsDirty();
+      }
+    },
+    error: (err: any) => {
+      console.error(err);
+      this.errorCount++
+      if (this.currentForm)
+        this.currentForm.form.markAsDirty();
+    },
+  };
 
   saveForm() {
     console.log("save form clicked");
-    this.setupService.saveEpgDownload(this.currentForm);
+    this.successCount = 0;
+    this.errorCount = 0;
+    this.mythService.PutSetting({
+      HostName: '_GLOBAL_', Key: "MythFillEnabled",
+      Value: this.MythFillEnabled ? "1" : "0"
+    }).subscribe(this.EpgDownloadObs);
   }
 
 }

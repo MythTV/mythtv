@@ -33,7 +33,7 @@
 #include "videometadata.h"
 
 
-QEvent::Type MetadataFactoryNoResult::kEventType =
+const QEvent::Type MetadataFactoryNoResult::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 MetadataFactoryNoResult::~MetadataFactoryNoResult()
@@ -45,7 +45,7 @@ MetadataFactoryNoResult::~MetadataFactoryNoResult()
     }
 }
 
-QEvent::Type MetadataFactorySingleResult::kEventType =
+const QEvent::Type MetadataFactorySingleResult::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 MetadataFactorySingleResult::~MetadataFactorySingleResult()
@@ -57,7 +57,7 @@ MetadataFactorySingleResult::~MetadataFactorySingleResult()
     }
 }
 
-QEvent::Type MetadataFactoryMultiResult::kEventType =
+const QEvent::Type MetadataFactoryMultiResult::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 // Force this class to have a vtable so that dynamic_cast works.
@@ -66,7 +66,7 @@ MetadataFactoryMultiResult::~MetadataFactoryMultiResult()
 {
 }
 
-QEvent::Type MetadataFactoryVideoChanges::kEventType =
+const QEvent::Type MetadataFactoryVideoChanges::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 // Force this class to have a vtable so that dynamic_cast works.
@@ -454,8 +454,7 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
         QString cn = name.trimmed();
         if (!cn.isEmpty())
         {
-            cast.push_back(VideoMetadata::cast_list::
-                        value_type(-1, cn));
+            cast.emplace_back(-1, cn);
         }
     }
 
@@ -470,8 +469,7 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
         QString genre_name = str.trimmed();
         if (!genre_name.isEmpty())
         {
-            video_genres.push_back(
-                    VideoMetadata::genre_list::value_type(-1, genre_name));
+            video_genres.emplace_back(-1, genre_name);
         }
     }
 
@@ -486,9 +484,7 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
         QString country_name = str.trimmed();
         if (!country_name.isEmpty())
         {
-            video_countries.push_back(
-                    VideoMetadata::country_list::value_type(-1,
-                            country_name));
+            video_countries.emplace_back(-1, country_name);
         }
     }
 
@@ -679,11 +675,19 @@ LookupType GuessLookupType(ProgramInfo *pginfo)
         // weird combination of both, we've got to try everything.
         auto *rule = new RecordingRule();
         rule->m_recordID = pginfo->GetRecordingRuleID();
+        // Load rule information from the database
         rule->Load();
         int ruleepisode = rule->m_episode;
+        RecordingType rulerectype = rule->m_type;
         delete rule;
 
-        if (ruleepisode == 0 && pginfo->GetEpisode() == 0 &&
+        // If recording rule is periodic, it's probably a TV show.
+        if ((rulerectype == kDailyRecord) ||
+            (rulerectype == kWeeklyRecord))
+        {
+            ret = kProbableTelevision;
+        }
+        else if (ruleepisode == 0 && pginfo->GetEpisode() == 0 &&
             pginfo->GetSubtitle().isEmpty())
             ret = kProbableMovie;
         else if (ruleepisode > 0 && pginfo->GetSubtitle().isEmpty())
@@ -735,6 +739,8 @@ LookupType GuessLookupType(RecordingRule *recrule)
         return ret;
 
     if (recrule->m_season > 0 || recrule->m_episode > 0 ||
+        (recrule->m_type == kDailyRecord) ||
+        (recrule->m_type == kWeeklyRecord) ||
         !recrule->m_subtitle.isEmpty())
         ret = kProbableTelevision;
     else

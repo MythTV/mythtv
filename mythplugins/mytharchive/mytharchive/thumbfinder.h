@@ -76,7 +76,7 @@ class ThumbFinder : public MythScreenType
     void updatePositionBar(int64_t frame);
     int  calcFinalDuration(void);
 
-    RemoteAVFormatContext m_inputFC      {nullptr};
+    ArchiveRemoteAVFormatContext m_inputFC {nullptr};
     AVCodecContext  *m_codecCtx          {nullptr};
     MythCodecMap     m_codecMap          {};
     const AVCodec   *m_codec             {nullptr};

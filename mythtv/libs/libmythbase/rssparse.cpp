@@ -19,11 +19,11 @@
 #define capturedView capturedRef
 #endif
 
-ResultItem::ResultItem(const QString& title, const QString& sortTitle,
-              const QString& subtitle, const QString& sortSubtitle,
-              const QString& desc, const QString& URL,
-              const QString& thumbnail, const QString& mediaURL,
-              const QString& author, const QDateTime& date,
+ResultItem::ResultItem(QString title, QString sortTitle,
+              QString subtitle, QString sortSubtitle,
+              QString desc, QString URL,
+              QString thumbnail, QString mediaURL,
+              QString author, const QDateTime& date,
               const QString& time, const QString& rating,
               const off_t filesize, const QString& player,
               const QStringList& playerargs, const QString& download,
@@ -32,16 +32,12 @@ ResultItem::ResultItem(const QString& title, const QString& sortTitle,
               const bool downloadable, const QStringList& countries,
               const uint season, const uint episode,
               const bool customhtml)
+    : m_title(std::move(title)), m_sorttitle(std::move(sortTitle)),
+      m_subtitle(std::move(subtitle)), m_sortsubtitle(std::move(sortSubtitle)),
+      m_desc(std::move(desc)), m_url(std::move(URL)),
+      m_thumbnail(std::move(thumbnail)), m_mediaURL(std::move(mediaURL)),
+      m_author(std::move(author))
 {
-    m_title = title;
-    m_sorttitle = sortTitle;
-    m_subtitle = subtitle;
-    m_sortsubtitle = sortSubtitle;
-    m_desc = desc;
-    m_url = URL;
-    m_thumbnail = thumbnail;
-    m_mediaURL = mediaURL;
-    m_author = author;
     if (!date.isNull())
         m_date = date;
     else

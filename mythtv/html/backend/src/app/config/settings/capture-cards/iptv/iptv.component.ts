@@ -22,7 +22,7 @@ export class IptvComponent implements OnInit, AfterViewInit {
     errorCount: 0,
   };
 
-  constructor(private captureCardService: CaptureCardService, private setupService: SetupService) { }
+  constructor(private captureCardService: CaptureCardService, public setupService: SetupService) { }
 
   ngOnInit(): void {
   }
@@ -42,11 +42,6 @@ export class IptvComponent implements OnInit, AfterViewInit {
         this.currentForm.form.markAsDirty()
       });
     }
-  }
-
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
   }
 
   // good response to add: {"int": 19}

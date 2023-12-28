@@ -54,6 +54,9 @@
 #ifdef USING_EGL
 #include "mythdrmprimecontext.h"
 #endif
+#ifdef USING_DXVA2
+#include "videoout_d3d.h"
+#endif
 #include "mythcodeccontext.h"
 
 extern "C" {
@@ -70,7 +73,8 @@ MythCodecContext::MythCodecContext(DecoderBase *Parent, MythCodecID CodecID)
 {
 }
 
-MythCodecContext *MythCodecContext::CreateContext(DecoderBase *Parent, MythCodecID Codec)
+MythCodecContext *MythCodecContext::CreateContext(DecoderBase *Parent,
+                                                  [[maybe_unused]] MythCodecID Codec)
 {
     MythCodecContext *mctx = nullptr;
 #ifdef USING_VAAPI
@@ -105,7 +109,6 @@ MythCodecContext *MythCodecContext::CreateContext(DecoderBase *Parent, MythCodec
     if (codec_is_drmprime(Codec))
         mctx = new MythDRMPRIMEContext(Parent, Codec);
 #endif
-    Q_UNUSED(Codec);
 
     if (!mctx)
         mctx = new MythCodecContext(Parent, Codec);
@@ -243,8 +246,10 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts, bool Reinit /*=false*/)
 #endif
 }
 
-MythCodecID MythCodecContext::FindDecoder(const QString &Decoder, AVStream *Stream,
-                                          AVCodecContext **Context, const AVCodec **Codec)
+MythCodecID MythCodecContext::FindDecoder(const QString &Decoder,
+                                          [[maybe_unused]] AVStream *Stream,
+                                          AVCodecContext **Context,
+                                          const AVCodec **Codec)
 {
     MythCodecID result = kCodec_NONE;
     uint streamtype = mpeg_version((*Context)->codec_id);
@@ -260,13 +265,12 @@ MythCodecID MythCodecContext::FindDecoder(const QString &Decoder, AVStream *Stre
         return result;
 #endif
 #ifdef USING_VTB
-    (void)Stream;
     result = MythVTBContext::GetSupportedCodec(Context, Codec, Decoder, streamtype);
     if (codec_is_vtb(result) || codec_is_vtb_dec(result))
         return result;
 #endif
 #ifdef USING_DXVA2
-    result = VideoOutputD3D::GetBestSupportedCodec(width, height, Decoder, streamtype, false);
+    result = VideoOutputD3D::GetSupportedCodec(Context, Codec, Decoder, streamtype);
     if (codec_is_dxva2(result))
         return result;
 #endif

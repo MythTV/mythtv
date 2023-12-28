@@ -7,7 +7,6 @@
 #include <QtGlobal>
 #include <QCoreApplication>
 #include <QString>
-#include <QtCore>
 #include <QtGui>
 
 // MythTV headers

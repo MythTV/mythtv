@@ -29,7 +29,7 @@ class JoystickKeycodeEvent : public QEvent
     Qt::KeyboardModifiers keyModifiers() const { return m_keyModifiers; }
     QEvent::Type keyAction() const { return m_keyAction; }
 
-    static Type kEventType;
+    static const Type kEventType;
 
   private:
     QString m_jsmenueventtext;

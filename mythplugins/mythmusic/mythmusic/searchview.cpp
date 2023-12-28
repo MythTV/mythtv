@@ -82,8 +82,8 @@ void SearchView::customEvent(QEvent *event)
 {
     bool handled = false;
 
-    if (event->type() == MusicPlayerEvent::TrackRemovedEvent ||
-        event->type() == MusicPlayerEvent::TrackAddedEvent)
+    if (event->type() == MusicPlayerEvent::kTrackRemovedEvent ||
+        event->type() == MusicPlayerEvent::kTrackAddedEvent)
     {
         auto *mpe = dynamic_cast<MusicPlayerEvent *>(event);
 
@@ -109,19 +109,18 @@ void SearchView::customEvent(QEvent *event)
         MusicCommon::customEvent(event);
         handled = true;
 
-        if (m_playTrack)
+        if (m_playTrack == 1 || (m_playTrack == -1 && MusicPlayer::getPlayNow()))
         {
-            m_playTrack = false;
-
-            if (event->type() == MusicPlayerEvent::TrackAddedEvent)
+            if (event->type() == MusicPlayerEvent::kTrackAddedEvent)
             {
                 // make the added track current and play it
                 m_currentPlaylist->SetItemCurrent(m_currentPlaylist->GetCount() - 1);
                 playlistItemClicked(m_currentPlaylist->GetItemCurrent());
             }
         }
+        m_playTrack = -1;     // use PlayNow preference or menu option
     }
-    else if (event->type() == MusicPlayerEvent::AllTracksRemovedEvent)
+    else if (event->type() == MusicPlayerEvent::kAllTracksRemovedEvent)
     {
         for (int x = 0; x < m_tracksList->GetCount(); x++)
         {
@@ -130,7 +129,7 @@ void SearchView::customEvent(QEvent *event)
                 item->DisplayState("off", "selectedstate");
         }
     }
-    else if (event->type() == MusicPlayerEvent::MetadataChangedEvent)
+    else if (event->type() == MusicPlayerEvent::kMetadataChangedEvent)
     {
         auto *mpe = dynamic_cast<MusicPlayerEvent *>(event);
 
@@ -173,23 +172,27 @@ void SearchView::customEvent(QEvent *event)
                     MythUIButtonListItem *item = m_tracksList->GetItemCurrent();
                     if (item)
                     {
-                        m_playTrack = false;
+                        m_playTrack = 0;
                         trackClicked(item);
                     }
                 }
             }
-            else if (resulttext == tr("Add To Playlist And Play"))
+            else if (resulttext == tr("Play Now"))
             {
                 if (GetFocusWidget() == m_tracksList)
                 {
                     MythUIButtonListItem *item = m_tracksList->GetItemCurrent();
                     if (item)
                     {
-                        m_playTrack = true;
+                        m_playTrack = 1;
                         trackClicked(item);
                     }
                 }
             }
+            else if (resulttext == tr("Prefer Play Now"))
+                MusicPlayer::setPlayNow(true);
+            else if (resulttext == tr("Prefer Add Tracks"))
+                MusicPlayer::setPlayNow(false);
             else if (resulttext == tr("Search List..."))
                 searchButtonList();
         }
@@ -238,7 +241,7 @@ bool SearchView::keyPressEvent(QKeyEvent *event)
                 MythUIButtonListItem *item = m_tracksList->GetItemCurrent();
                 if (item)
                 {
-                    m_playTrack = true;
+                    m_playTrack = 1;
                     trackClicked(item);
                 }
             }
@@ -273,8 +276,18 @@ void SearchView::ShowMenu(void)
                     menu->AddItem(tr("Remove From Playlist"));
                 else
                 {
-                    menu->AddItem(tr("Add To Playlist"));
-                    menu->AddItem(tr("Add To Playlist And Play"));
+                    if (MusicPlayer::getPlayNow())
+                    {
+                        menu->AddItem(tr("Play Now"));
+                        menu->AddItem(tr("Add To Playlist"));
+                        menu->AddItem(tr("Prefer Add To Playlist"));
+                    }
+                    else
+                    {
+                        menu->AddItem(tr("Add To Playlist"));
+                        menu->AddItem(tr("Play Now"));
+                        menu->AddItem(tr("Prefer Play Now"));
+                    }
                 }
             }
         }
@@ -297,9 +310,8 @@ void SearchView::ShowMenu(void)
         MusicCommon::ShowMenu();
 }
 
-void SearchView::fieldSelected(MythUIButtonListItem *item)
+void SearchView::fieldSelected([[maybe_unused]] MythUIButtonListItem *item)
 {
-    (void) item;
     updateTracksList();
 }
 
@@ -373,7 +385,7 @@ void SearchView::updateTracksList(void)
             case 5: // tags
             {
                 //TODO add tag query.  Remove fallthrough once added.
-                [[clang::fallthrough]];
+                [[fallthrough]];
             }
             case 0: // all fields
             default:

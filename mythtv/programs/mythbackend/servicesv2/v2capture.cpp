@@ -29,12 +29,15 @@
 #include <QMutex>
 
 // MythTV
+#include "libmyth/standardsettings.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythversion.h"
 #include "libmythtv/cardutil.h"
+#include "libmythtv/recordingprofile.h"
+#include "libmythtv/recorders/satiputils.h"
 
 // MythBackend
 #include "v2capture.h"
@@ -58,6 +61,11 @@ void V2Capture::RegisterCustomTypes()
     qRegisterMetaType<V2InputGroup*>("V2InputGroup");
     qRegisterMetaType<V2DiseqcConfig*>("V2DiseqcConfig");
     qRegisterMetaType<V2DiseqcConfigList*>("V2DiseqcConfigList");
+    qRegisterMetaType<V2RecProfParam*>("V2RecProfParam");
+    qRegisterMetaType<V2RecProfile*>("V2RecProfile");
+    qRegisterMetaType<V2RecProfileGroup*>("V2RecProfileGroup");
+    qRegisterMetaType<V2RecProfileGroupList*>("V2RecProfileGroupList");
+    qRegisterMetaType<V2CardSubType*>("V2CardSubType");
 }
 
 V2Capture::V2Capture()
@@ -70,7 +78,7 @@ V2Capture::V2Capture()
 /////////////////////////////////////////////////////////////////////////////
 
 V2CaptureCardList* V2Capture::GetCaptureCardList( const QString &sHostName,
-                                                  const QString &sCardType )
+                                                  const QString &CardType )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -93,18 +101,18 @@ V2CaptureCardList* V2Capture::GetCaptureCardList( const QString &sHostName,
 
     if (!sHostName.isEmpty())
         str += " WHERE hostname = :HOSTNAME";
-    else if (!sCardType.isEmpty())
+    else if (!CardType.isEmpty())
         str += " WHERE cardtype = :CARDTYPE";
 
-    if (!sHostName.isEmpty() && !sCardType.isEmpty())
+    if (!sHostName.isEmpty() && !CardType.isEmpty())
         str += " AND cardtype = :CARDTYPE";
 
     query.prepare(str);
 
     if (!sHostName.isEmpty())
         query.bindValue(":HOSTNAME", sHostName);
-    if (!sCardType.isEmpty())
-        query.bindValue(":CARDTYPE", sCardType);
+    if (!CardType.isEmpty())
+        query.bindValue(":CARDTYPE", CardType);
 
     if (!query.exec())
     {
@@ -262,6 +270,52 @@ V2CaptureCard* V2Capture::GetCaptureCard( int nCardId )
 //
 /////////////////////////////////////////////////////////////////////////////
 
+V2CardSubType* V2Capture::GetCardSubType     ( int CardId     )
+{
+    auto* pCardType = new V2CardSubType();
+    QString subtype = CardUtil::ProbeSubTypeName(CardId);
+    CardUtil::INPUT_TYPES cardType = CardUtil::toInputType(subtype);
+
+#ifdef USING_SATIP
+    if (cardType == CardUtil::SATIP)
+        cardType = SatIP::toDVBInputType(CardUtil::GetVideoDevice(CardId));
+#endif // USING_SATIP
+
+    bool HDHRdoesDVBC = false;
+    bool HDHRdoesDVB = false;
+
+#ifdef USING_HDHOMERUN
+    if (cardType == CardUtil::HDHOMERUN)
+    {
+        QString device = CardUtil::GetVideoDevice(CardId);
+        HDHRdoesDVBC = CardUtil::HDHRdoesDVBC(device);
+        HDHRdoesDVB = CardUtil::HDHRdoesDVB(device);
+    }
+#endif // USING_HDHOMERUN
+
+    pCardType->setCardId(CardId);
+    pCardType->setSubType (subtype);
+    // This enum is handled differently from others because it has
+    // two names for the same value in a few cases. We choose
+    // the name that starts with "DV" when this happens
+    QMetaEnum meta = QMetaEnum::fromType<CardUtil::INPUT_TYPES>();
+    QString key = meta.valueToKeys(cardType);
+    QStringList keyList = key.split("|");
+    key = keyList[0];
+    if (keyList.length() > 1 && keyList[1].startsWith("DV"))
+        key = keyList[1];
+    // pCardType->setInputType (cardType);
+    pCardType->setInputType (key);
+    pCardType->setHDHRdoesDVBC (HDHRdoesDVBC);
+    pCardType->setHDHRdoesDVB (HDHRdoesDVB);
+    return pCardType;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 bool V2Capture::RemoveAllCaptureCards( void )
 {
     return CardUtil::DeleteAllInputs();
@@ -284,7 +338,7 @@ bool V2Capture::RemoveCaptureCard( int nCardId )
 int V2Capture::AddCaptureCard     ( const QString    &sVideoDevice,
                                   const QString    &sAudioDevice,
                                   const QString    &sVBIDevice,
-                                  const QString    &sCardType,
+                                  const QString    &CardType,
                                   const uint       nAudioRateLimit,
                                   const QString    &sHostName,
                                   const uint       nDVBSWFilter,
@@ -306,12 +360,12 @@ int V2Capture::AddCaptureCard     ( const QString    &sVideoDevice,
                                   const uint       nDiSEqCId,
                                   bool             bDVBEITScan)
 {
-    if ( sVideoDevice.isEmpty() || sCardType.isEmpty() || sHostName.isEmpty() )
+    if ( sVideoDevice.isEmpty() || CardType.isEmpty() || sHostName.isEmpty() )
         throw( QString( "This API requires at least a video device node, a card type, "
                         "and a hostname." ));
 
     int nResult = CardUtil::CreateCaptureCard(sVideoDevice, sAudioDevice,
-                      sVBIDevice, sCardType, nAudioRateLimit,
+                      sVBIDevice, CardType, nAudioRateLimit,
                       sHostName, nDVBSWFilter, nDVBSatType, bDVBWaitForSeqStart,
                       bSkipBTAudio, bDVBOnDemand, nDVBDiSEqCType, nFirewireSpeed,
                       sFirewireModel, nFirewireConnection, std::chrono::milliseconds(nSignalTimeout),
@@ -578,21 +632,33 @@ static QString remove_chaff(const QString &name)
 
 
 
-V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &sCardType )
+V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType )
 {
-    auto* pList = new V2CaptureDeviceList();
+
+    if (CardType == "V4L2ENC") {
+        QRegularExpression drv { "^(?!ivtv|hdpvr|(saa7164(.*))).*$" };
+        return getV4l2List(drv, CardType);
+    }
+    if (CardType == "HDPVR") {
+        QRegularExpression drv { "^hdpvr$" };
+        return getV4l2List(drv, CardType);
+    }
+    if (CardType == "FIREWIRE") {
+        return getFirewireList(CardType);
+    }
 
     // Get devices from system
-    QStringList sdevs = CardUtil::ProbeVideoDevices(sCardType);
+    QStringList sdevs = CardUtil::ProbeVideoDevices(CardType);
 
+    auto* pList = new V2CaptureDeviceList();
     for (const auto & it : qAsConst(sdevs))
     {
         auto* pDev = pList->AddCaptureDevice();
-        pDev->setCardType (sCardType);
+        pDev->setCardType (CardType);
         pDev->setVideoDevice (it);
 #ifdef USING_DVB
         // From DVBConfigurationGroup::probeCard in Videosource.cpp
-        if (sCardType == "DVB")
+        if (CardType == "DVB")
         {
             QString frontendName = CardUtil::ProbeDVBFrontendName(it);
             pDev->setInputNames( CardUtil::ProbeDeliverySystems (it));
@@ -684,18 +750,56 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &sCardTyp
             pDev->setSignalTimeout ( signalTimeout );
             pDev->setChannelTimeout ( channelTimeout );
             pDev->setTuningDelay ( tuningDelay );
-        } // endif (sCardType == "DVB")
+        } // endif (CardType == "DVB")
 #endif // USING_DVB
-#ifdef USING_HDHOMERUN
-        if (sCardType == "HDHOMERUN")
+        if (CardType == "HDHOMERUN")
         {
             pDev->setSignalTimeout ( 3000 );
             pDev->setChannelTimeout ( 6000 );
         }
-#endif //USING_HDHOMERUN
+#ifdef USING_SATIP
+        if (CardType == "SATIP")
+        {
+            pDev->setSignalTimeout ( 7000 );
+            pDev->setChannelTimeout ( 10000 );
+            // Split video device into its parts and populate the output
+            // "deviceid friendlyname ip tunernum tunertype"
+            auto word = it.split(' ');
+            // VideoDevice is set as deviceid:tunertype:tunernum
+            if (word.size() == 5) {
+                pDev->setVideoDevice(QString("%1:%2:%3").arg(word[0], word[4], word[3]));
+                pDev->setVideoDevicePrompt(QString("%1, %2, Tuner #%3").arg(word[0], word[4], word[3]));
+                pDev->setDescription(word[1]);
+                pDev->setIPAddress(word[2]);
+                pDev->setTunerType(word[4]);
+                pDev->setTunerNumber(word[3].toUInt());
+            }
+        }
+#endif // USING_SATIP
+#ifdef USING_VBOX
+        if (CardType == "VBOX")
+        {
+            pDev->setSignalTimeout ( 7000 );
+            pDev->setChannelTimeout ( 10000 );
+            // Split video device into its parts and populate the output
+            // "deviceid ip tunernum tunertype"
+            auto word = it.split(" ");
+            if (word.size() == 4) {
+                QString device = QString("%1-%2-%3").arg(word[0], word[2], word[3]);
+                pDev->setVideoDevice(device);
+                pDev->setVideoDevicePrompt(device);
+                QString desc = CardUtil::GetVBoxdesc(word[0], word[1], word[2], word[3]);
+                pDev->setDescription(desc);
+                pDev->setIPAddress(word[1]);
+                pDev->setTunerType(word[3]);
+                pDev->setTunerNumber(word[2].toUInt());
+            }
+        }
+#endif // USING_VBOX
     } // endfor (const auto & it : qAsConst(sdevs))
     return pList;
 }
+
 
 
 V2DiseqcTreeList* V2Capture::GetDiseqcTreeList  (  )
@@ -1059,4 +1163,245 @@ bool V2Capture::RemoveDiseqcConfig  ( uint  CardId )
     }
     int numrows = query.numRowsAffected();
     return numrows > 0;
+}
+
+
+V2RecProfileGroupList* V2Capture::GetRecProfileGroupList ( uint GroupId, uint ProfileId, bool OnlyInUse ) {
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString str =
+        "SELECT profilegroups.id, profilegroups.name, cardtype, recordingprofiles.id, recordingprofiles.name, "
+        "videocodec, audiocodec, "
+        "codecparams.name, codecparams.value "
+        "FROM profilegroups  "
+        "INNER JOIN recordingprofiles on profilegroups.id = recordingprofiles.profilegroup "
+        "LEFT OUTER JOIN codecparams on codecparams.profile = recordingprofiles.id ";
+    QString where = "WHERE ";
+    if (OnlyInUse)
+    {
+        str.append(where).append("CARDTYPE = 'TRANSCODE' OR (cardtype in (SELECT cardtype FROM capturecard)) ");
+        where = "AND ";
+    }
+    if (GroupId > 0)
+    {
+        str.append(where).append("profilegroups.id = :GROUPID ");
+        where = "AND ";
+    }
+    if (ProfileId > 0)
+    {
+        str.append(where).append("recordingprofiles.id = :PROFILEID ");
+        where = "AND ";
+    }
+    str.append(
+        // Force TRANSCODE entry to be at the end
+        "ORDER BY IF(cardtype = 'TRANSCODE', 9999, profilegroups.id), recordingprofiles.id, codecparams.name ");
+
+    query.prepare(str);
+
+    if (GroupId > 0)
+        query.bindValue(":GROUPID", GroupId);
+    if (ProfileId > 0)
+        query.bindValue(":PROFILEID", ProfileId);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("MythAPI::GetRecProfileGroupList()", query);
+        throw( QString( "Database Error executing query." ));
+    }
+
+    // ----------------------------------------------------------------------
+    // return the results of the query
+    // ----------------------------------------------------------------------
+
+    auto* pList = new V2RecProfileGroupList();
+
+    int prevGroupId = -1;
+    int prevProfileId = -1;
+
+    V2RecProfileGroup * pGroup = nullptr;
+    V2RecProfile *pProfile = nullptr;
+
+    while (query.next())
+    {
+        int groupId = query.value(0).toInt();
+        if (groupId != prevGroupId)
+        {
+            pGroup = pList->AddProfileGroup();
+            pGroup->setId               ( groupId );
+            pGroup->setName             ( query.value(1).toString() );
+            pGroup->setCardType         ( query.value(2).toString() );
+            prevGroupId = groupId;
+        }
+        int profileId = query.value(3).toInt();
+        // the pGroup != nullptr check is to satisfy clang-tidy.
+        // pGroup should never be null unless the groupId on
+        // the database is -1, which should not happen.
+        if (profileId != prevProfileId && pGroup != nullptr)
+        {
+            pProfile = pGroup->AddProfile();
+            pProfile->setId          ( profileId );
+            pProfile->setName        ( query.value(4).toString() );
+            pProfile->setVideoCodec  ( query.value(5).toString() );
+            pProfile->setAudioCodec  ( query.value(6).toString() );
+            prevProfileId = profileId;
+        }
+        // the pProfile != nullptr check is to satisfy clang-tidy.
+        // pProfile should never be null unless the profileId on
+        // the database is -1, which should not happen.
+        if (!query.isNull(7) && pProfile != nullptr)
+        {
+            auto *pParam = pProfile->AddParam();
+            pParam->setName  ( query.value(7).toString() );
+            pParam->setValue ( query.value(8).toString() );
+        }
+    }
+
+    return pList;
+}
+
+int V2Capture::AddRecProfile  ( uint GroupId, const QString& ProfileName,
+    const QString& VideoCodec, const QString& AudioCodec )
+{
+    if (GroupId == 0 || ProfileName.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString( "AddRecProfile: GroupId and ProfileName are required." ));
+        return false;
+    }
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    // Check if it already exists
+    query.prepare(
+        "SELECT id "
+            "FROM recordingprofiles "
+            "WHERE name = :NAME AND profilegroup = :PROFILEGROUP;");
+    query.bindValue(":NAME", ProfileName);
+    query.bindValue(":PROFILEGROUP", GroupId);
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Capture::AddRecProfile", query);
+        throw( QString( "Database Error executing SELECT." ));
+    }
+    if (query.next())
+    {
+        int id = query.value(0).toInt();
+        LOG(VB_GENERAL, LOG_ERR,
+            QString( "Profile %1 already exists in group id %2 with id %3").arg(ProfileName).arg(GroupId).arg(id));
+        return false;
+    }
+
+    query.prepare(
+       "INSERT INTO recordingprofiles "
+           "(name, videocodec, audiocodec, profilegroup) "
+         "VALUES "
+           "(:NAME, :VIDEOCODEC, :AUDIOCODEC, :PROFILEGROUP);");
+    query.bindValue(":NAME", ProfileName);
+    query.bindValue(":VIDEOCODEC", VideoCodec);
+    query.bindValue(":AUDIOCODEC", AudioCodec);
+    query.bindValue(":PROFILEGROUP", GroupId);
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Capture::AddRecProfile", query);
+        throw( QString( "Database Error executing INSERT." ));
+    }
+    int id = query.lastInsertId().toInt();
+    RecordingProfile profile(ProfileName);
+    profile.loadByID(id);
+    profile.setCodecTypes();
+    profile.Save();
+    return id;
+}
+
+bool V2Capture::UpdateRecProfile ( uint ProfileId,
+                                   const QString& VideoCodec,
+                                   const QString& AudioCodec )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT id from recordingprofiles "
+        "WHERE id = :ID; ");
+    query.bindValue(":ID", ProfileId);
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Capture::UpdateRecProfileParam", query);
+        throw( QString( "Database Error executing SELECT." ));
+    }
+    uint id = -1;
+    if (query.next())
+    {
+        id = query.value(0).toUInt();
+    }
+    if (id != ProfileId)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("UpdateRecProfile: Profile id %1 does not exist").arg(ProfileId));
+        return false;
+    }
+    query.prepare(
+        "UPDATE recordingprofiles "
+        "SET videocodec = :VIDEOCODEC, "
+        "audiocodec = :AUDIOCODEC "
+        "WHERE id = :ID; ");
+    query.bindValue(":VIDEOCODEC", VideoCodec);
+    query.bindValue(":AUDIOCODEC", AudioCodec);
+    query.bindValue(":ID", ProfileId);
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Capture::UpdateRecProfileParam", query);
+        throw( QString( "Database Error executing UPDATE." ));
+    }
+    RecordingProfile profile;
+    profile.loadByID(ProfileId);
+    profile.setCodecTypes();
+    profile.Save();
+    return true;
+}
+
+bool V2Capture::DeleteRecProfile ( uint ProfileId )
+{
+    // Delete profile parameters
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "DELETE from codecparams "
+        "WHERE profile = :ID; ");
+    query.bindValue(":ID", ProfileId);
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Capture::UpdateRecProfileParam", query);
+        throw( QString( "Database Error executing DELETE." ));
+    }
+    int rows = query.numRowsAffected();
+    query.prepare(
+        "DELETE from recordingprofiles "
+        "WHERE id = :ID; ");
+    query.bindValue(":ID", ProfileId);
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Capture::UpdateRecProfileParam", query);
+        throw( QString( "Database Error executing DELETE." ));
+    }
+    return (rows > 0);
+}
+
+
+
+bool V2Capture::UpdateRecProfileParam ( uint ProfileId, const QString  &Name, const QString &Value )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+       "REPLACE INTO codecparams "
+           "(profile, name, value) "
+         "VALUES "
+           "(:PROFILE, :NAME, :VALUE);");
+    query.bindValue(":PROFILE", ProfileId);
+    query.bindValue(":NAME", Name);
+    query.bindValue(":VALUE", Value);
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Capture::UpdateRecProfileParam", query);
+        throw( QString( "Database Error executing REPLACE." ));
+    }
+    return true;
 }

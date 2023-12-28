@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { MachineInfo } from 'src/app/services/interfaces/status.interface';
 import { StorageGroup } from "src/app/services/interfaces/storagegroup.interface";
+import { UtilityService } from 'src/app/services/utility.service';
 
 @Component({
   selector: 'app-status-machineinfo',
@@ -10,7 +11,7 @@ import { StorageGroup } from "src/app/services/interfaces/storagegroup.interface
 export class MachineinfoComponent implements OnInit {
   @Input() machineinfo?: MachineInfo;
 
-  constructor() { }
+  constructor(public utility: UtilityService) { }
 
   ngOnInit(): void {
   }

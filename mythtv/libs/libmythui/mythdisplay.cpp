@@ -80,7 +80,7 @@
 /*! \brief Create a MythDisplay object appropriate for the current platform.
  * \note This function always returns a valid MythDisplay object.
 */
-MythDisplay* MythDisplay::Create(MythMainWindow* MainWindow)
+MythDisplay* MythDisplay::Create([[maybe_unused]] MythMainWindow* MainWindow)
 {
     MythDisplay* result = nullptr;
 #ifdef USING_X11
@@ -111,8 +111,6 @@ MythDisplay* MythDisplay::Create(MythMainWindow* MainWindow)
         }
 #endif
     }
-#else
-    (void)MainWindow;
 #endif
 #ifdef USING_MMAL
     if (!result)
@@ -178,9 +176,9 @@ QStringList MythDisplay::GetDescription()
         first = false;
         auto id = QString("(%1)").arg(screen->manufacturer());
         if (screen == current && !spanall)
-            result.append(tr("Current screen %1 %2:").arg(screen->name(), id));
+            result.append(tr("Current screen\t: %1 %2").arg(screen->name(), id));
         else
-            result.append(tr("Screen %1 %2:").arg(screen->name(), id));
+            result.append(tr("Screen\t\t: %1 %2").arg(screen->name(), id));
         result.append(tr("Size") + QString("\t\t: %1mmx%2mm")
                 .arg(screen->physicalSize().width()).arg(screen->physicalSize().height()));
         if (screen == current)
@@ -295,6 +293,10 @@ int MythDisplay::GetScreenCount()
 double MythDisplay::GetPixelAspectRatio()
 {
     if (m_physicalSize.isEmpty() || m_resolution.isEmpty())
+        return 1.0;
+
+    // HD-Ready or better displays always have square pixels
+    if (m_resolution.height() >= 720)
         return 1.0;
 
     return (m_physicalSize.width() / static_cast<double>(m_resolution.width())) /
@@ -643,7 +645,8 @@ void MythDisplay::InitScreenBounds()
         return;
     }
 
-    if (GetMythDB()->GetBoolSetting("RunFrontendInWindow", false))
+    if (!GetMythDB()->GetBoolSetting("ForceFullScreen", false) &&
+        GetMythDB()->GetBoolSetting("RunFrontendInWindow", false))
     {
         LOG(VB_GUI, LOG_INFO, LOC + "Running in a window");
         // This doesn't include the area occupied by the
@@ -1147,7 +1150,7 @@ void MythDisplay::DebugModes() const
     }
 }
 
-/*! \brief Shared static initialistaion code for all MythTV GUI applications.
+/*! \brief Shared static initialisation code for all MythTV GUI applications.
  *
  * \note This function must be called before Qt/QPA is initialised i.e. before
  * any call to QApplication.

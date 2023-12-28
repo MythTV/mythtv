@@ -58,12 +58,12 @@ MusicMetadata::MusicMetadata(int lid, QString lbroadcaster, QString lchannel, QS
             m_broadcaster(std::move(lbroadcaster)),
             m_channel(std::move(lchannel)),
             m_description(std::move(ldescription)),
+            m_urls(lurls),
             m_logoUrl(std::move(llogourl)),
             m_metaFormat(std::move(lmetaformat)),
             m_country(std::move(lcountry)),
             m_language(std::move(llanguage))
 {
-    m_urls = lurls;
     setRepo(RT_Radio);
     ensureSortFields();
 }
@@ -341,7 +341,7 @@ bool MusicMetadata::updateStreamList(void)
     LOG(VB_GENERAL, LOG_INFO, "MusicMetadata: downloading radio streams list");
 
     // download compressed stream file
-    if (!GetMythDownloadManager()->download(QString(STREAMUPDATEURL), &compressedData), false)
+    if (!GetMythDownloadManager()->download(QString(STREAMUPDATEURL), &compressedData, false))
     {
         LOG(VB_GENERAL, LOG_ERR, "MusicMetadata: failed to download radio stream list");
         gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", nullptr);

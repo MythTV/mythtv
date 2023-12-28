@@ -68,6 +68,9 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     int nPort     = GetMythDB()->GetNumSetting("BackendStatusPort", 6544);
     int nSSLPort  = GetMythDB()->GetNumSetting("BackendSSLPort", nPort + 10);
     int nWSPort   = nPort + 5;
+    // UPNP port is now status port + 6 (default 6550)
+    nPort += 6;
+    nSSLPort += 6;
 
     auto *pHttpServer = new HttpServer();
 

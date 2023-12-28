@@ -25,6 +25,7 @@
 #include "eldutils.h"
 
 #include <cinttypes>
+#include <limits> // workaround QTBUG-90395
 #include <sys/types.h>
 
 #include <QString>
@@ -142,11 +143,6 @@ eld::eld(const char *buf, int size)
 {
     m_e.formats = 0LL;
     update_eld(buf, size);
-}
-
-eld::eld(const eld &rhs)
-{
-    m_e = rhs.m_e;
 }
 
 eld::eld()

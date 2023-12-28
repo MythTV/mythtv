@@ -114,11 +114,6 @@ AudioOutputBase::~AudioOutputBase()
     assert(m_memoryCorruptionTest1 == 0xdeadbeef);
     assert(m_memoryCorruptionTest2 == 0xdeadbeef);
     assert(m_memoryCorruptionTest3 == 0xdeadbeef);
-#else
-    Q_UNUSED(m_memoryCorruptionTest0);
-    Q_UNUSED(m_memoryCorruptionTest1);
-    Q_UNUSED(m_memoryCorruptionTest2);
-    Q_UNUSED(m_memoryCorruptionTest3);
 #endif
 }
 
@@ -1663,7 +1658,7 @@ void AudioOutputBase::OutputAudioLoop(void)
             if (!m_actuallyPaused)
             {
                 VBAUDIO("OutputAudioLoop: audio paused");
-                OutputEvent e(OutputEvent::Paused);
+                OutputEvent e(OutputEvent::kPaused);
                 dispatch(e);
                 m_wasPaused = true;
             }
@@ -1678,7 +1673,7 @@ void AudioOutputBase::OutputAudioLoop(void)
         if (m_wasPaused)
         {
             VBAUDIO("OutputAudioLoop: Play Event");
-            OutputEvent e(OutputEvent::Playing);
+            OutputEvent e(OutputEvent::kPlaying);
             dispatch(e);
             m_wasPaused = false;
         }
@@ -1728,7 +1723,7 @@ void AudioOutputBase::OutputAudioLoop(void)
     delete[] zeros;
     delete[] fragment;
     VBAUDIO("OutputAudioLoop: Stop Event");
-    OutputEvent e(OutputEvent::Stopped);
+    OutputEvent e(OutputEvent::kStopped);
     dispatch(e);
 }
 

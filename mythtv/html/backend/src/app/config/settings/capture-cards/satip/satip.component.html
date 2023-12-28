@@ -1,0 +1,135 @@
+<form class="ml-3 mr-3" name="satipform" #satipform="ngForm">
+    <span #top></span>
+    <p-card class="m-5">
+        <ng-template pTemplate="title">
+            {{ 'settings.capture.satip.title' | translate }}
+        </ng-template>
+        <ng-template pTemplate="subtitle">
+        </ng-template>
+        <ng-template pTemplate="content">
+            <div class="grid">
+                <div class="mb-4 w-full">
+
+                    <div class="form-group field">
+                        <label for="VideoDevice" class="label block">{{ 'settings.capture.satip.device_label' | translate
+                            }}</label>
+                        <p-dropdown *ngIf="isReady" [options]="captureDeviceList.CaptureDeviceList.CaptureDevices"
+                            [(ngModel)]="currentDevice" [editable]="false" optionLabel="VideoDevicePrompt"
+                            (onChange)="updateDevice();" [maxlength]="0" [style]="{'minWidth':'83%'}" name="VideoDevice"
+                            #VideoDevice="ngModel">
+                        </p-dropdown>
+                        <div *ngIf="warningMessage">
+                            <small class="p-error block">
+                                {{ warningMessage }}
+                            </small>
+                        </div>
+                        <small class="block">
+                            {{ 'settings.capture.satip.device_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label class="label block">{{ 'settings.capture.satip.friendly_label' | translate
+                            }}</label>
+                        <div class="col-10 bg-blue-100 text-gray-900">
+                            {{ currentDevice.Description}} &nbsp;
+                        </div>
+                        <small class="block">
+                            {{ 'settings.capture.satip.friendly_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label class="label block">{{ 'settings.capture.satip.tunertype_label' | translate
+                            }}</label>
+                        <div class="col-10 bg-blue-100 text-gray-900">
+                            {{ currentDevice.TunerType}} &nbsp;
+                        </div>
+                        <small class="block">
+                            {{ 'settings.capture.tunertype_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label class="label block">{{ 'settings.capture.satip.tunerindex_label' | translate
+                            }}</label>
+                        <div class="col-10 bg-blue-100 text-gray-900">
+                            {{ currentDevice.TunerNumber}} &nbsp;
+                        </div>
+                        <small class="block">
+                            {{ 'settings.capture.tunerindex_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label class="label block">{{ 'settings.capture.satip.deviceid_label' | translate
+                            }}</label>
+                        <div class="col-10 bg-blue-100 text-gray-900">
+                            {{ card.VideoDevice}} &nbsp;
+                        </div>
+                        <small class="block">
+                            {{ 'settings.capture.deviceid_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="SignalTimeout" class="label block">{{ 'settings.capture.sigtimeout_label' | translate
+                            }}</label>
+                        <p-inputNumber [(ngModel)]="card.SignalTimeout" name="SignalTimeout" id="SignalTimeout"
+                            [showButtons]="true" [min]="250" [max]="60000" [step]="250"></p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.capture.sigtimeout_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="ChannelTimeout" class="label block">{{ 'settings.capture.tunetimeout_label' | translate
+                            }}</label>
+                        <p-inputNumber [(ngModel)]="card.ChannelTimeout" name="ChannelTimeout" id="ChannelTimeout"
+                            [showButtons]="true" [min]="2000" [max]="65000" [step]="250"></p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.capture.tunetimeout_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <p-checkbox inputId="DVBEITScan" [(ngModel)]="card.DVBEITScan" name="DVBEITScan"
+                            #DVBEITScan="ngModel" class="label mb-2 w-full" [binary]="true"
+                            label="{{ 'settings.capture.dvb.eitscan_label' | translate }}">
+                        </p-checkbox>
+                        <small class="block">
+                            {{ 'settings.capture.dvb.eitscan_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="DVBDiSEqCType" class="label block">{{ 'settings.capture.satip.diseqcpos_label' | translate
+                            }}</label>
+                        <p-inputNumber [(ngModel)]="card.DVBDiSEqCType" name="DVBDiSEqCType" id="DVBDiSEqCType"
+                            [showButtons]="true" [min]="1" [max]="255" [step]="1"></p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.capture.satip.diseqcpos_desc' | translate }}
+                        </small>
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+            <div class="grid nogutter">
+                <div class="col-12">
+                    <p-message *ngIf="this.successCount > 0 && this.errorCount == 0 && !satipform.dirty"
+                        severity="success" text="{{ 'common.savesuccess' | translate }}"></p-message>
+                    <p-message *ngIf="this.errorCount > 0" severity="error"
+                        text="{{ 'common.networkfail' | translate }}"></p-message>
+                </div>
+                <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
+                    (onClick)="saveForm(); satipform.form.markAsPristine()"
+                    [disabled]="!satipform.dirty || !card.VideoDevice || setupService.schedulingEnabled"></p-button>
+            </div>
+        </ng-template>
+
+
+    </p-card>
+</form>

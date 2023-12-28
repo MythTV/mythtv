@@ -269,6 +269,13 @@ check_lib_cxx(){
     check_header_cxx $header && check_func_cxx $func $header "$@"
 }
 
+cp_if_changed(){
+    cmp -s "$1" "$2" && { test "$quiet" != "yes" && echo "$2 is unchanged"; } && return
+    mkdir -p "$(dirname $2)"
+    cp -f "$1" "$2"
+    echo "Created $2"
+}
+
 #
 #    default parameters for all plugins
 #
@@ -464,13 +471,23 @@ check_py_lib(){
     log check_py_lib "$@"
     lib=${1}
     check_cmd $python <<EOF
-from distutils.sysconfig import get_python_lib
 import sys
-for mythroot in '${mythroot}'.split(':'):
-    sys.path.append(get_python_lib(prefix=mythroot +'${prefix}'))
-    sys.path.append(get_python_lib(prefix=mythroot +'${prefix}/local'))
-sys.path.append(get_python_lib(prefix='${sysroot}${prefix}'))
-sys.path.append(get_python_lib(prefix='${sysroot}${prefix}/local'))
+try:
+    from distutils.sysconfig import get_python_lib
+    for mythroot in '${mythroot}'.split(':'):
+        sys.path.append(get_python_lib(prefix=mythroot +'${prefix}'))
+        sys.path.append(get_python_lib(prefix=mythroot +'${prefix}/local'))
+    sys.path.append(get_python_lib(prefix='${sysroot}${prefix}'))
+    sys.path.append(get_python_lib(prefix='${sysroot}${prefix}/local'))
+except:
+    # python 3.12+
+    from sysconfig import get_path
+    for mroot in '${mythroot}'.split(':'):
+        sys.path.append(mroot + get_path('purelib'))
+    vars = {'base': '${sysroot}${prefix}', 'prefix': '${prefix}'}
+    sys.path.append(get_path('purelib', vars=vars, expand=True))
+    vars = {'base': '${sysroot}${prefix}', 'prefix': '${prefix}/local'}
+    sys.path.append(get_path('purelib', vars=vars, expand=True))
 try:
     import $lib
 except:
@@ -513,6 +530,7 @@ tmpfile TMPSH .sh
 tmpfile TMPCXX .cpp
 tmpfile TMPASM .asm
 tmpfile TMPMAK .mak
+tmpfile TMPPRO .pro
 
 unset -f mktemp
 
@@ -577,6 +595,11 @@ WEBKIT=$(cat mythconfig.mak | grep -e "^CONFIG_QTWEBKIT=yes")
 EXTRALIBS=$(cat mythconfig.mak | grep -e "^EXTRALIBS=")
 EXTRALIBS=${EXTRALIBS#EXTRALIBS=}
 
+MYTHTV_VERSION_MAJMIN=$(cat mythconfig.mak | grep -e "^MYTHTV_VERSION_MAJMIN=")
+MYTHTV_VERSION_MAJMIN=${MYTHTV_VERSION_MAJMIN#MYTHTV_VERSION_MAJMIN=}
+MYTHTV_LIBVERSION=$(cat mythconfig.mak | grep -e "^MYTHTV_LIBVERSION=")
+MYTHTV_LIBVERSION=${MYTHTV_LIBVERSION#MYTHTV_LIBVERSION=}
+
 QT_MIN_VERSION=$(cat mythconfig.mak | grep -e "^QT_MIN_VERSION=")
 QT_MIN_VERSION=${QT_MIN_VERSION#QT_MIN_VERSION=}
 QT_MIN_VERSION_STR=$(cat mythconfig.mak | grep -e "^QT_MIN_VERSION_STR=")
@@ -624,7 +647,6 @@ if enabled netvision; then
     check_py_lib lxml    || disable_netvision "Python lxml library (lxml)"
     check_py_lib xml     || disable_netvision "Python XML library (xml)"
     check_py_lib urllib  || disable_netvision "Python URL library (urllib)"
-    check_py_lib oauth   || disable_netvision "Python OAuth library (oauth)"
 
     disabled netvision && echo "Disabling MythNetvision due to missing dependencies."
 fi
@@ -713,6 +735,14 @@ if enabled zoneminder ; then
         disable zmserver
     fi
 fi
+
+echo "Creating settings2.pro"
+echo "MYTHTV_VERSION_MAJMIN: ${MYTHTV_VERSION_MAJMIN}"
+echo "MYTHTV_LIBVERSION: ${MYTHTV_LIBVERSION}"
+sed -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
+    -e "s/@MYTHTV_LIBVERSION@/${MYTHTV_LIBVERSION}/g" \
+    settings2.pro.in > $TMPPRO
+cp_if_changed $TMPPRO settings2.pro
 
 ###########################################################
 #                                                         #

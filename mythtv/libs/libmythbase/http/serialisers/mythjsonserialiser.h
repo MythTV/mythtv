@@ -14,7 +14,7 @@ class MythJSONSerialiser : public MythSerialiser
 
   protected:
     void AddObject    (const QString&     Name, const QVariant& Value);
-    void AddValue     (const QVariant&    Value);
+    void AddValue     (const QVariant&    Value, const QMetaProperty *MetaProperty = nullptr);
     void AddQObject   (const QObject*     Object);
     void AddStringList(const QVariant&    Values);
     void AddList      (const QVariant&    Values);

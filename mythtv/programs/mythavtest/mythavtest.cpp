@@ -37,10 +37,10 @@ class VideoPerformanceTest
       : m_file(std::move(filename)),
         m_noDecode(decodeno),
         m_decodeOnly(onlydecode),
+        m_secondsToRun(std::clamp(runfor, 1s, 3600s)),
         m_deinterlace(deint),
         m_allowGpu(gpu)
     {
-        m_secondsToRun = std::clamp(runfor, 1s, 3600s);
     }
 
    ~VideoPerformanceTest()

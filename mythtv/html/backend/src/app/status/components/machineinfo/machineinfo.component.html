@@ -1,55 +1,68 @@
 <div class="statusBox">
-    <h2>Machine Info</h2>
+    <h2>{{ 'dashboard.status.mach.title' | translate }}</h2>
     <div *ngIf="machineinfo; else noMachineInfo">
         <div>
-            <p>This machine's load average</p>
+            <p>{{ 'dashboard.status.mach.load' | translate }}</p>
             <ul>
-                <li>1 Minute: {{ machineinfo.LoadAvg1 }}</li>
-                <li>5 Minutes: {{ machineinfo.LoadAvg2 }}</li>
-                <li>15 Minutes: {{ machineinfo.LoadAvg3 }}</li>
+                <li>1 {{ 'dashboard.status.mach.minute' | translate }}: {{ machineinfo.LoadAvg1.toLocaleString() }}</li>
+                <li>5 {{ 'dashboard.status.mach.minutes' | translate }}: {{ machineinfo.LoadAvg2.toLocaleString() }}</li>
+                <li>15 {{ 'dashboard.status.mach.minutes' | translate }}: {{ machineinfo.LoadAvg3.toLocaleString() }}</li>
             </ul>
         </div>
         <div *ngIf="getStorageGroupTotal(machineinfo.StorageGroups) as sg; else noDiskInfo">
-            <p>Disk Usage Summary:</p>
+            <p>{{ 'dashboard.status.mach.disk_summ' | translate }}:</p>
             <ul>
                 <!-- pretty print values in MB/GB -->
-                <li>Total Disk Space:</li>
+                <li>{{ 'dashboard.status.mach.disk_total' | translate }}:</li>
                 <ul>
-                    <li>Total Space: {{ sg.Total }}</li>
-                    <li>Space Used: {{ sg.Used }}</li>
-                    <li>Space Free: {{ sg.Free }}</li>
-                    <li>Space Available after Auto-expire: {{ sg.Free + sg.Expirable }}</li>
+                    <li>{{ 'dashboard.status.mach.total_space' | translate }}: {{ sg.Total.toLocaleString() }} MiB</li>
+                    <li>{{ 'dashboard.status.mach.space_used' | translate }}: {{ sg.Used.toLocaleString() }} MiB</li>
+                    <li>{{ 'dashboard.status.mach.space_free' | translate }}: {{ sg.Free.toLocaleString() }} MiB</li>
+                    <li>{{ 'dashboard.status.mach.space_after_expire' | translate }}: {{ (sg.Free + sg.Expirable).toLocaleString() }}</li>
                     <ul>
-                        <li>Space Used by LiveTV: {{ sg.LiveTV }}</li>
-                        <li>Space Used by Deleted Recordings: {{ sg.Deleted }}</li>
-                        <li>Space Used by Auto-expirable Recordings: {{ sg.Expirable }}</li>
+                        <li>{{ 'dashboard.status.mach.space_livetv' | translate }}: {{ sg.LiveTV.toLocaleString() }} MiB</li>
+                        <li>{{ 'dashboard.status.mach.space_deleted' | translate }}: {{ sg.Deleted.toLocaleString() }} MiB</li>
+                        <li>{{ 'dashboard.status.mach.space_expirable' | translate }}: {{ sg.Expirable.toLocaleString() }} MiB</li>
                     </ul>
                 </ul>
             </ul>
         </div>
         <div>
-            <p>Disk Usage Details:</p>
+            <p>{{ 'dashboard.status.mach.disk_details' | translate }}:</p>
             <div *ngFor="let sg of getStorageGroupDetails(machineinfo.StorageGroups)">
                 <ng-container *ngTemplateOutlet="printStorageGroup; context: sg"></ng-container>
             </div>
+        </div>
+        <div>
+            <p>{{ 'dashboard.status.mach.mythfill_last'
+                | translate: {GuideStart: utility.formatDateTime(machineinfo.GuideStart),
+                GuideEnd: utility.formatDateTime(machineinfo.GuideEnd),
+                GuideStatus: machineinfo.GuideStatus} }}<br>
+                {{ 'dashboard.status.mach.mythfill_next'
+                | translate: {GuideNext: utility.formatDateTime(machineinfo.GuideNext)} }}<br>
+                {{ 'dashboard.status.mach.mythfill_until'
+                | translate: {GuideThru: utility.formatDateTime(machineinfo.GuideThru),
+                GuideDays: machineinfo.GuideDays} }}
+            </p>
+
         </div>
     </div>
 </div>
 
 <ng-template #noMachineInfo>
-    <p>No Machine Info available</p>
+    <p>{{ 'dashboard.status.mach.none' | translate }}</p>
 </ng-template>
 <ng-template #noDiskInfo>
-    <p>No Disk Info available</p>
+    <p>{{ 'dashboard.status.mach.disk_none' | translate }}</p>
 </ng-template>
 <ng-template #printStorageGroup let-Id=Id let-Directory=Directory let-Total=Total let-Used=Used let-Free=Free>
     <ul>
-        <li>MythTV Drive #{{ Id }}</li>
+        <li>{{ 'dashboard.status.mach.myth_drive' | translate }} #{{ Id }}</li>
         <ul>
-            <li>Directories: {{ Directory }}</li>
-            <li>Total Space: {{ Total }}</li>
-            <li>Space Used: {{ Used }}</li>
-            <li>Space Free: {{ Free }}</li>
+            <li>{{ 'dashboard.status.mach.disk_dirs' | translate }}: {{ Directory }}</li>
+            <li>{{ 'dashboard.status.mach.total_space' | translate }}: {{ Total.toLocaleString() }}  MiB</li>
+            <li>{{ 'dashboard.status.mach.space_used' | translate }}: {{ Used.toLocaleString() }}  MiB</li>
+            <li>{{ 'dashboard.status.mach.space_free' | translate }}: {{ Free.toLocaleString() }}  MiB</li>
         </ul>
     </ul>
 </ng-template>

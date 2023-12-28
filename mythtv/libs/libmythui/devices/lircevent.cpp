@@ -1,5 +1,5 @@
 
 #include "lircevent.h"
 
-QEvent::Type LircKeycodeEvent::kEventType =
+const QEvent::Type LircKeycodeEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();

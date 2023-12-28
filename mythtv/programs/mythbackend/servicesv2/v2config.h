@@ -6,9 +6,13 @@
 #include "v2databaseStatus.h"
 #include "v2languageList.h"
 #include "v2countryList.h"
+#include "v2systemEventList.h"
 
 #define CONFIG_SERVICE QString("/Config/")
 #define CONFIG_HANDLE  QString("Config")
+
+// Only endpoints that don't require a fully configured mythbackend (eg a new
+// setup with no database or tuners for example) should be put here.
 
 class V2Config : public MythHTTPService
 {
@@ -29,14 +33,23 @@ class V2Config : public MythHTTPService
                                                          const QString &Password,
                                                          const QString &Name,
                                                          int   Port,
-                                                         bool  DoTest );
+                                                         bool  DoTest,
+                                                         bool  LocalEnabled,
+                                                         const QString &LocalHostName,
+                                                         bool  WOLEnabled,
+                                                         int   WOLReconnect,
+                                                         int   WOLRetry,
+                                                         const QString &WOLCommand);
 
     static V2DatabaseStatus* GetDatabaseStatus         ( void );
 
     static V2CountryList*    GetCountries              ( void );
     static V2LanguageList*   GetLanguages              ( void );
+    static V2SystemEventList* GetSystemEvents          ( const QString &Host );
 
     static QStringList       GetIPAddresses            ( const QString &Protocol );
+
+
 
   private:
     Q_DISABLE_COPY(V2Config)

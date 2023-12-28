@@ -1,17 +1,11 @@
 # -*- coding: utf-8 -*-
 
 """
-Contains any static and global variables for MythTV Python Bindings
+Contains static and global variables for MythTV Python Bindings.
+Version information is placed in '_versions.py'.
 """
 
-OWN_VERSION = (33,0,-1,0)
-SCHEMA_VERSION = 1376
-NVSCHEMA_VERSION = 1007
-MUSICSCHEMA_VERSION = 1025
-PROTO_VERSION = '91'
-PROTO_TOKEN = 'BuzzOff'
-BACKEND_SEP = '[]:[]'
-INSTALL_PREFIX = '/usr/local'
+from MythTV._versions import *
 
 class MARKUP( object ):
     MARK_UNSET            = -10
@@ -121,6 +115,20 @@ class SUBTITLE_TYPES( object ):
     SUB_NORMAL          = 0x02
     SUB_ONSCREEN        = 0x04
     SUB_SIGNED          = 0x08
+
+class CAST_ROLES( object ):
+    UNKNOWN            = 0x0000
+    ACTOR              = 0x0001
+    DIRECTOR           = 0x0002
+    PRODUCER           = 0x0004
+    EXECUTIVE_PRODUCER = 0x0008
+    WRITER             = 0x0010
+    GUEST_STAR         = 0x0020
+    HOST               = 0x0040
+    ADAPTER            = 0x0080
+    PRESENTER          = 0x0100
+    COMMENTATOR        = 0x0200
+    GUEST              = 0x0400
 
 class JOBTYPE( object ):
     NONE         = 0x0000

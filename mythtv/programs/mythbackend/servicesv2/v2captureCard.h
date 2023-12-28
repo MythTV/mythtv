@@ -14,6 +14,7 @@
 #include <QString>
 
 #include "libmythbase/http/mythhttpservice.h"
+#include "libmythtv/cardutil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -162,9 +163,16 @@ class V2CaptureDevice : public QObject
     SERVICE_PROPERTY2( QString    ,     CardType       )
     SERVICE_PROPERTY2( QString    ,     SubType       )
     SERVICE_PROPERTY2( QString    ,     VideoDevice       )
+    SERVICE_PROPERTY2( QString    ,     VideoDevicePrompt )
+    SERVICE_PROPERTY2( QStringList,     AudioDevices       )
     SERVICE_PROPERTY2( QString    ,     FrontendName    )
     SERVICE_PROPERTY2( QStringList,     InputNames       )
     SERVICE_PROPERTY2( QString    ,     DefaultInputName )
+    SERVICE_PROPERTY2( QString    ,     Description )
+    SERVICE_PROPERTY2( QString    ,     FirewireModel )
+    SERVICE_PROPERTY2( QString    ,     IPAddress )
+    SERVICE_PROPERTY2( QString    ,     TunerType  )
+    SERVICE_PROPERTY2( uint       ,     TunerNumber  )
     SERVICE_PROPERTY2( uint       ,     SignalTimeout     )
     SERVICE_PROPERTY2( uint       ,     ChannelTimeout    )
     SERVICE_PROPERTY2( uint       ,     TuningDelay    )
@@ -296,6 +304,28 @@ class V2DiseqcConfig : public QObject
 
 Q_DECLARE_METATYPE(V2DiseqcConfig*)
 
+class V2CardSubType :public QObject
+{
+    Q_OBJECT
+    Q_CLASSINFO( "Version"    , "1.0" );
 
+    SERVICE_PROPERTY2( uint                   ,   CardId )
+    SERVICE_PROPERTY2( QString                ,   SubType )
+    SERVICE_PROPERTY2( QString                ,   InputType )
+    SERVICE_PROPERTY2( bool                   ,   HDHRdoesDVBC )
+    SERVICE_PROPERTY2( bool                   ,   HDHRdoesDVB )
+
+    public:
+
+        Q_INVOKABLE V2CardSubType(QObject *parent = nullptr)
+            :   QObject      ( parent )
+        {
+        }
+
+    private:
+        Q_DISABLE_COPY(V2CardSubType);
+};
+
+Q_DECLARE_METATYPE(V2CardSubType*)
 
 #endif

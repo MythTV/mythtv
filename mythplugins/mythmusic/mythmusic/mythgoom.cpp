@@ -126,10 +126,9 @@ static class GoomFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, const QString &pluginName) const override // VisFactory
+    VisualBase *create([[maybe_unused]] MainVisual *parent,
+                       [[maybe_unused]] const QString &pluginName) const override // VisFactory
     {
-        (void)parent;
-        (void)pluginName;
         return new Goom();
     }
 }GoomFactory;

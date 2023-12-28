@@ -77,7 +77,12 @@ static inline void be_sd_notify(const char */*str*/) {};
 #define LOC_WARN QString("MythBackend, Warning: ")
 #define LOC_ERR  QString("MythBackend, Error: ")
 
-static MainServer *mainServer = nullptr;
+static HouseKeeper            *gHousekeeping    { nullptr };
+static JobQueue               *gJobQueue        { nullptr };
+static MythSystemEventHandler *gSysEventHandler { nullptr };
+static MediaServer            *g_pUPnp          { nullptr };
+static MainServer             *mainServer       { nullptr };
+static QString gPidFile;
 
 bool setupTVs(bool ismaster, bool &error)
 {
@@ -214,9 +219,9 @@ bool setupTVs(bool ismaster, bool &error)
                     LOG(VB_GENERAL, LOG_ERR, "Problem with capture cards. " +
                             cidmsg + " failed init");
                     delete tv;
-                    // The master assumes card comes up so we need to
-                    // set error and exit if a non-master card fails.
-                    error = true;
+                    // No longer set an error here, because we need the
+                    // slave backend to be able to start without a capture
+                    // card, so that it can be setup through the web app
                 }
             }
         }
@@ -316,7 +321,7 @@ void cleanup(void)
 
     if (!gPidFile.isEmpty())
     {
-        unlink(gPidFile.toLatin1().constData());
+        QFile::remove(gPidFile);
         gPidFile.clear();
     }
 
@@ -325,27 +330,6 @@ void cleanup(void)
 
 int handle_command(const MythBackendCommandLineParser &cmdline)
 {
-    QString eventString;
-
-    if (cmdline.toBool("event"))
-        eventString = cmdline.toString("event");
-    else if (cmdline.toBool("systemevent"))
-    {
-        eventString = "SYSTEM_EVENT " +
-                      cmdline.toString("systemevent") +
-                      QString(" SENDER %1").arg(gCoreContext->GetHostName());
-    }
-
-    if (!eventString.isEmpty())
-    {
-        if (gCoreContext->ConnectToMasterServer())
-        {
-            gCoreContext->SendMessage(eventString);
-            return GENERIC_EXIT_OK;
-        }
-        return GENERIC_EXIT_NO_MYTHCONTEXT;
-    }
-
     if (cmdline.toBool("setverbose"))
     {
         if (gCoreContext->ConnectToMasterServer())
@@ -380,19 +364,6 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
         return GENERIC_EXIT_CONNECT_ERROR;
     }
 
-    if (cmdline.toBool("clearcache"))
-    {
-        if (gCoreContext->ConnectToMasterServer())
-        {
-            gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
-            LOG(VB_GENERAL, LOG_INFO, "Sent CLEAR_SETTINGS_CACHE message");
-            return GENERIC_EXIT_OK;
-        }
-        LOG(VB_GENERAL, LOG_ERR, "Unable to connect to backend, settings "
-            "cache will not be cleared.");
-        return GENERIC_EXIT_CONNECT_ERROR;
-    }
-
     if (cmdline.toBool("printsched") ||
         cmdline.toBool("testsched"))
     {
@@ -424,37 +395,6 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
         logLevel = oldLogLevel;
         delete sched;
         return GENERIC_EXIT_OK;
-    }
-
-    if (cmdline.toBool("resched"))
-    {
-        bool ok = false;
-        if (gCoreContext->ConnectToMasterServer())
-        {
-            LOG(VB_GENERAL, LOG_INFO, "Connected to master for reschedule");
-            ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(),
-                                                "MythBackendCommand");
-            ok = true;
-        }
-        else
-            LOG(VB_GENERAL, LOG_ERR, "Cannot connect to master for reschedule");
-
-        return (ok) ? GENERIC_EXIT_OK : GENERIC_EXIT_CONNECT_ERROR;
-    }
-
-    if (cmdline.toBool("scanvideos"))
-    {
-        bool ok = false;
-        if (gCoreContext->ConnectToMasterServer())
-        {
-            gCoreContext->SendReceiveStringList(QStringList() << "SCAN_VIDEOS");
-            LOG(VB_GENERAL, LOG_INFO, "Requested video scan");
-            ok = true;
-        }
-        else
-            LOG(VB_GENERAL, LOG_ERR, "Cannot connect to master for video scan");
-
-        return (ok) ? GENERIC_EXIT_OK : GENERIC_EXIT_CONNECT_ERROR;
     }
 
     if (cmdline.toBool("printexpire"))
@@ -583,17 +523,38 @@ void print_warnings(const MythBackendCommandLineParser &cmdline)
 
 int run_backend(MythBackendCommandLineParser &cmdline)
 {
+    gPidFile = cmdline.toString("pidfile");
+    if (!gPidFile.isEmpty())
+    {
+        QFile file(gPidFile);
+        if (file.open(QIODevice::WriteOnly))
+        {
+            qint64 pid = QCoreApplication::applicationPid();
+            file.write(qPrintable(QString("%1\n").arg(pid)));
+            file.close();
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_WARNING,
+                QString(LOC + "Cannot open pidfile named %1").arg(gPidFile));
+        }
+    }
+
     gBackendContext = new BackendContext();
 
+    if (gCoreContext->IsDatabaseIgnored())
+    {
+        return run_setup_webserver();
+    }
     if (!DBUtil::CheckTimeZoneSupport())
     {
         LOG(VB_GENERAL, LOG_ERR,
             "MySQL time zone support is missing.  "
             "Please install it and try again.  "
             "See 'mysql_tzinfo_to_sql' for assistance.");
-        return GENERIC_EXIT_DB_NOTIMEZONE;
+        gCoreContext->GetDB()->IgnoreDatabase(true);
+        return run_setup_webserver();
     }
-
     bool ismaster = gCoreContext->IsMasterHost();
 
     if (!UpgradeTVDatabaseSchema(ismaster, ismaster, true))
@@ -601,11 +562,14 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         LOG(VB_GENERAL, LOG_ERR,
             QString("Couldn't upgrade database to new schema on %1 backend.")
             .arg(ismaster ? "master" : "slave"));
-        return GENERIC_EXIT_DB_OUTOFDATE;
+        return run_setup_webserver();
     }
 
     be_sd_notify("STATUS=Loading translation");
     MythTranslation::load("mythfrontend");
+
+    if (cmdline.toBool("webonly"))
+        return run_setup_webserver();
 
     if (!ismaster)
     {
@@ -620,12 +584,9 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     if (gCoreContext->GetBackendServerIP().isEmpty())
     {
         std::cerr << "No setting found for this machine's BackendServerAddr.\n"
-                  << "Please run mythtv-setup on this machine.\n"
-                  << "Go to page \"1. General\" / \"Host Address Backend Setup\" and examine the values.\n"
-                  << "N.B. The default values are correct for a combined frontend/backend machine.\n"
-                  << "Press Escape, select \"Save and Exit\" and exit mythtv-setup.\n"
-                  << "Then start mythbackend again.\n";
-        return GENERIC_EXIT_SETUP_ERROR;
+                  << "MythBackend starting in Web App only mode for initial setup.\n"
+                  << "Use http://<yourBackend>:6544 to perform setup.\n";
+        return run_setup_webserver();
     }
 
     gSysEventHandler = new MythSystemEventHandler();
@@ -676,6 +637,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
                 sched->SetExpirer(gExpirer);
         }
         gCoreContext->SetScheduler(sched);
+        ChannelGroup::UpdateChannelGroups();
     }
 
     if (!cmdline.toBool("nohousekeeper"))
@@ -685,7 +647,6 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
         if (ismaster)
         {
-            gHousekeeping->RegisterTask(new LogCleanerTask());
             gHousekeeping->RegisterTask(new CleanupTask());
             gHousekeeping->RegisterTask(new ThemeUpdateTask());
             gHousekeeping->RegisterTask(new ArtworkTask());
@@ -766,7 +727,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     if (gCoreContext->IsMasterBackend())
         gCoreContext->SendSystemEvent("MASTER_STARTED");
 
-    // Provide systemd ready notification (for type=notify units)
+    // Provide systemd ready notification (for Type=notify)
     be_sd_notify("READY=1");
 
     const HTTPServices be_services = {
@@ -822,5 +783,64 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     LOG(VB_GENERAL, LOG_NOTICE, "MythBackend exiting");
     be_sd_notify("STOPPING=1\nSTATUS=Exiting");
 
+    return exitCode;
+}
+
+// This is a copy of the code from above, to start backend in a restricted mode, only running the web server
+// when the database is unusable, so thet the user can use the web app to fix the settings.
+
+int run_setup_webserver()
+{
+    LOG(VB_GENERAL, LOG_NOTICE, "***********************************************************************");
+    LOG(VB_GENERAL, LOG_NOTICE, "***** MythBackend starting in Web App only mode for initial setup *****");
+    LOG(VB_GENERAL, LOG_NOTICE, "***** Use http://<yourBackend>:6544 to perform setup              *****");
+    LOG(VB_GENERAL, LOG_NOTICE, "***********************************************************************");
+
+    const HTTPServices be_services = {
+        { VIDEO_SERVICE, &MythHTTPService::Create<V2Video> },
+        { MYTH_SERVICE, &MythHTTPService::Create<V2Myth> },
+        { DVR_SERVICE, &MythHTTPService::Create<V2Dvr> },
+        { CONTENT_SERVICE, &MythHTTPService::Create<V2Content> },
+        { GUIDE_SERVICE, &MythHTTPService::Create<V2Guide> },
+        { CHANNEL_SERVICE, &MythHTTPService::Create<V2Channel> },
+        { STATUS_SERVICE, &MythHTTPService::Create<V2Status> },
+        { CAPTURE_SERVICE, &MythHTTPService::Create<V2Capture> },
+        { MUSIC_SERVICE, &MythHTTPService::Create<V2Music> },
+        { CONFIG_SERVICE, &MythHTTPService::Create<V2Config> },
+    };
+
+    MythHTTPInstance::Addservices(be_services);
+
+    // Send all unknown requests into the web app. make bookmarks and direct access work.
+    auto spa_index = [](auto && PH1) { return MythHTTPRewrite::RewriteToSPA(std::forward<decltype(PH1)>(PH1), "apps/backend/index.html"); };
+    MythHTTPInstance::AddErrorPageHandler({ "=404", spa_index });
+
+    // Serve components of the backend web app as if they were hosted at '/'
+    auto main_js = [](auto && PH1) { return MythHTTPRewrite::RewriteFile(std::forward<decltype(PH1)>(PH1), "apps/backend/main.js"); };
+    auto styles_css = [](auto && PH1) { return MythHTTPRewrite::RewriteFile(std::forward<decltype(PH1)>(PH1), "apps/backend/styles.css"); };
+    auto polyfills_js = [](auto && PH1) { return MythHTTPRewrite::RewriteFile(std::forward<decltype(PH1)>(PH1), "apps/backend/polyfills.js"); };
+    auto runtime_js = [](auto && PH1) { return MythHTTPRewrite::RewriteFile(std::forward<decltype(PH1)>(PH1), "apps/backend/runtime.js"); };
+
+    // Default index page
+    auto root = [](auto && PH1) { return MythHTTPRoot::RedirectRoot(std::forward<decltype(PH1)>(PH1), "apps/backend/index.html"); };
+
+    const HTTPHandlers be_handlers = {
+        { "/main.js", main_js },
+        { "/styles.css", styles_css },
+        { "/polyfills.js", polyfills_js },
+        { "/runtime.js", runtime_js },
+        { "/", root }
+    };
+
+    MythHTTPScopedInstance webserver(be_handlers);
+
+    ///////////////////////////////
+    ///////////////////////////////
+    // Provide systemd ready notification (for Type=notify)
+    be_sd_notify("READY=1\nSTATUS=Started in 'Web App only mode'");
+    int exitCode = qApp->exec();
+
+    be_sd_notify("STOPPING=1\nSTATUS='Exiting Web App only mode'");
+    LOG(VB_GENERAL, LOG_NOTICE, "MythBackend Web App only mode exiting");
     return exitCode;
 }

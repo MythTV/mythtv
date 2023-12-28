@@ -100,12 +100,12 @@ void ServerPool::SelectDefaultListen(bool force)
     QHostAddress config_v4(gCoreContext->resolveSettingAddress(
                                            "BackendServerIP",
                                            QString(),
-                                           gCoreContext->ResolveIPv4, true));
+                                           MythCoreContext::ResolveIPv4, true));
     bool v4IsSet = config_v4.isNull();
     QHostAddress config_v6(gCoreContext->resolveSettingAddress(
                                            "BackendServerIP6",
                                            QString(),
-                                           gCoreContext->ResolveIPv6, true));
+                                           MythCoreContext::ResolveIPv6, true));
     bool v6IsSet = config_v6.isNull();
     bool allowLinkLocal = gCoreContext->GetBoolSetting("AllowLinkLocal", true);
 

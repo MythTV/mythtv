@@ -14,7 +14,7 @@
             <area>15,15,770,210</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
-            <value>You haven't selected any tracks to play</value>
+            <value>Press M (Menu) to add and play tracks</value>
         </textarea>
 
         <buttonlist name="currentplaylist" from="basecurrentplaylist">
@@ -449,10 +449,10 @@
 
     <!-- used in the visualiser screen to show some track details after a track change -->
     <window name="trackinfo_popup">
-        <area>-1,380,750,190</area>
+        <area>-1,380,750,200</area>
 
         <shape name="background" from="basebackground">
-            <area>0,0,750,190</area>
+            <area>0,0,750,200</area>
             <type>roundbox</type>
             <fill color="#303030" alpha="100" />
             <line color="#FFFFFF" alpha="50" width="2" />
@@ -479,18 +479,38 @@
             <font>basemedium</font>
         </textarea>
 
-        <statetype name="ratingstate" from="baseratingstate">
+        <textarea name="channel"> <!--radio stream?-->
+            <area>0,0,0,0</area>          <!--hidden-->
+        </textarea>
+        <textarea name="year" from="basetextarea">
+            <area>340,50,390,35</area>
+            <font>basesmall</font>
+            <align>right,top</align>
+        </textarea>
+        <textarea name="tracknum" from="year" depends="!channel">
+            <position>340,80</position>
+        </textarea>
+        <textarea name="time" from="year" depends="!channel">
+            <position>340,170</position>
+        </textarea>
+        <textarea name="length" from="year" depends="!time">
+            <position>340,170</position>
+        </textarea>
+
+        <statetype name="ratingstate" from="baseratingstate" depends="!channel">
             <position>180,115</position>
         </statetype>
 
-<!--
-        <textarea name="length" from="basetextarea">
-            <area>170,125,185,25</area>
-        </textarea>
--->
+        <progressbar name="progress" from="basetrackprogress">
+            <position>22,170</position>
+        </progressbar>
+
         <textarea name="nexttitle" from="basetextarea">
             <area>180,145,550,25</area>
             <template>Next: %NEXTTITLE% by %NEXTARTIST%</template>
+        </textarea>
+        <textarea name="url" from="basetextarea" depends="channel">
+            <area>180,145,550,25</area>
         </textarea>
 
         <imagetype name="coverart">

@@ -79,7 +79,7 @@ void MythVideoDRM::ColourSpaceUpdated(bool /*PrimariesChanged*/)
     if (!(m_colourSpace && m_device && m_videoPlane.get()))
         return;
 
-    MythAtomics queue;
+    MythAtomics queue; // NOLINT(cppcoreguidelines-init-variables)
     if (auto range = MythDRMProperty::GetProperty("COLOR_RANGE", m_videoPlane->m_properties); range.get())
     {
         auto rangev = MythVideoDRMUtils::FFmpegColorRangeToDRM(range, m_colourSpace->GetRange());

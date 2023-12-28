@@ -10,14 +10,14 @@ fi
 
 shortname=$1
 name=lib${shortname}
-fullname=${name}${build_suffix}
+fullname=libmyth${shortname}${build_suffix}
 comment=$2
 libs=$(eval echo \$extralibs_${shortname})
 deps=$(eval echo \$${shortname}_deps)
 
 for dep in $deps; do
     depname=lib${dep}
-    fulldepname=${depname}${build_suffix}
+    fulldepname=libmyth${dep}${build_suffix}
     . ${depname}/${depname}.version
     depversion=$(eval echo \$${depname}_VERSION)
     requires="$requires ${fulldepname} >= ${depversion}, "

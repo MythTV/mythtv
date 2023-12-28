@@ -15,6 +15,7 @@
 #include <QNetworkAddressEntry>
 #include <QLocale>
 #include <QPair>
+#include <QRegularExpression>
 #include <QDateTime>
 
 // Std
@@ -239,6 +240,8 @@ bool MythCoreContext::Init(void)
     }
 
 #ifndef _WIN32
+    static const QRegularExpression utf8
+        { "utf-?8", QRegularExpression::CaseInsensitiveOption };
     QString lang_variables("");
     QString lc_value = setlocale(LC_CTYPE, nullptr);
     if (lc_value.isEmpty())
@@ -249,10 +252,10 @@ bool MythCoreContext::Init(void)
         if (lc_value.isEmpty())
             lc_value = qEnvironmentVariable("LC_CTYPE");
     }
-    if (!lc_value.contains("UTF-8", Qt::CaseInsensitive))
+    if (!lc_value.contains(utf8))
         lang_variables.append("LC_ALL or LC_CTYPE");
     lc_value = qEnvironmentVariable("LANG");
-    if (!lc_value.contains("UTF-8", Qt::CaseInsensitive))
+    if (!lc_value.contains(utf8))
     {
         if (!lang_variables.isEmpty())
             lang_variables.append(", and ");
@@ -297,7 +300,7 @@ void MythCoreContext::setTestStringSettings(QMap<QString,QString> &overrides)
 
 bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,
                                          const QString &announcement,
-                                         std::chrono::milliseconds timeout,
+                                         [[maybe_unused]] std::chrono::milliseconds timeout,
                                          bool &proto_mismatch)
 {
     proto_mismatch = false;
@@ -308,8 +311,6 @@ bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,
         proto_mismatch = true;
         return false;
     }
-#else
-    Q_UNUSED(timeout);
 #endif
 
     QStringList strlist(announcement);
@@ -1652,10 +1653,8 @@ void MythCoreContext::readyRead(MythSocket *sock)
     while (sock->IsDataAvailable());
 }
 
-void MythCoreContext::connectionClosed(MythSocket *sock)
+void MythCoreContext::connectionClosed([[maybe_unused]] MythSocket *sock)
 {
-    (void)sock;
-
     LOG(VB_GENERAL, LOG_NOTICE, LOC +
         "Event socket closed.  No connection to the backend.");
 
@@ -1892,7 +1891,7 @@ void MythCoreContext::WaitUntilSignals(std::vector<CoreWaitInfo> & sigs) const
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("Waiting for signal %1")
             .arg(s.name));
-        connect(this, s.fn, &eventLoop, &QEventLoop::quit);
+        connect(this, s.fn, &eventLoop, &QEventLoop::quit);// clazy:exclude connect-non-signal
     }
 
     eventLoop.exec(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);

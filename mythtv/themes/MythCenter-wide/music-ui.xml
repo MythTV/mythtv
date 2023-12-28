@@ -117,7 +117,7 @@
             <area>35,20,1210,340</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
-            <value>You haven't selected any tracks to play</value>
+            <value>Press M (Menu) to add and play tracks</value>
         </textarea>
 
         <buttonlist name="currentplaylist" from="basecurrentplaylist">
@@ -361,18 +361,39 @@
             <font>basemedium</font>
         </textarea>
 
-        <statetype name="ratingstate" from="baseratingstate">
+        <textarea name="channel"> <!--radio stream?-->
+            <area>0,0,0,0</area>          <!--hidden-->
+        </textarea>
+        <textarea name="year" from="basetextarea">
+            <area>590,50,390,35</area>
+            <font>basesmall</font>
+            <align>right,top</align>
+        </textarea>
+        <textarea name="tracknum" from="year" depends="!channel">
+            <position>590,80</position>
+        </textarea>
+        <textarea name="time" from="year" depends="!channel">
+            <position>810,115</position>
+            <align>left</align>
+        </textarea>
+        <textarea name="length" from="year" depends="!time">
+            <position>590,115</position>
+        </textarea>
+
+        <statetype name="ratingstate" from="baseratingstate" depends="!channel">
             <position>180,115</position>
         </statetype>
 
-<!--
-        <textarea name="length" from="basetextarea">
-            <area>170,125,185,25</area>
-        </textarea>
--->
+        <progressbar name="progress" from="basetrackprogress">
+            <position>400,115</position>
+        </progressbar>
+
         <textarea name="nexttitle" from="basetextarea">
             <area>180,145,800,25</area>
             <template>Next: %NEXTTITLE% by %NEXTARTIST%</template>
+        </textarea>
+        <textarea name="url" from="basetextarea" depends="channel">
+            <area>180,145,800,25</area>
         </textarea>
 
         <imagetype name="coverart">
@@ -1010,6 +1031,10 @@
     <window name="miniplayer">
         <area>-1,5,590,190</area>
 
+        <textarea name="channel"> <!--radio stream?-->
+            <area>0,0,0,0</area>          <!--hidden-->
+        </textarea>
+
         <imagetype name="track_info_background">
             <filename>miniplayer_background.png</filename>
             <area>10,10,569,170</area>
@@ -1042,8 +1067,8 @@
             <area>170,125,250,25</area>
         </textarea>
 
-        <textarea name="time" from="basetextarea">
-            <area>385,125,185,25</area>
+        <textarea name="time" from="basetextarea" depends="!channel">
+            <area>285,125,285,25</area>
             <align>right</align>
         </textarea>
 

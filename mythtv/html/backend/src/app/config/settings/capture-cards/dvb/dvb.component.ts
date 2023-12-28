@@ -61,7 +61,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
 
   selectedDiseqcType: DiseqcParm = { description: "", type: "", inactive: true };
 
-  constructor(public captureCardService: CaptureCardService, private setupService: SetupService,
+  constructor(public captureCardService: CaptureCardService, public setupService: SetupService,
     private translate: TranslateService) {
     translate.get(this.messages.devNotExist).subscribe(data => this.messages.devNotExist = data);
     translate.get(this.messages.unknownName).subscribe(data => this.messages.unknownName = data);
@@ -235,7 +235,7 @@ export class DvbComponent implements OnInit, AfterViewInit {
     this.card.VideoDevice = this.currentDevice.VideoDevice;
     this.card.InputName = this.currentDevice.DefaultInputName;
     this.card.SignalTimeout = this.currentDevice.SignalTimeout;
-    this.card.SignalTimeout = this.currentDevice.SignalTimeout;
+    this.card.ChannelTimeout = this.currentDevice.ChannelTimeout;
     this.checkInUse();
   }
 
@@ -248,11 +248,6 @@ export class DvbComponent implements OnInit, AfterViewInit {
       this.work.warningMessage = this.messages.devInUse;
     else
       this.work.warningMessage = "";
-  }
-
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
   }
 
   // good response to add: {"int": 19}

@@ -1,5 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { GuideComponent } from '../../guide.component';
+import { GuideService } from 'src/app/services/guide.service';
 
 @Component({
   selector: 'app-guide-timebar',
@@ -7,36 +9,31 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['./timebar.component.css']
 })
 export class TimebarComponent implements OnInit {
-  @Input() startTime! : string;
+  @Input() guide!: GuideComponent;
 
-  constructor(private translate : TranslateService) { }
+   constructor(public guideService: GuideService) {
+  }
 
   ngOnInit(): void {
   }
 
-  toLocalShortTime(date : Date) : string {
-    let d = new Date(date);
-    let ampm = 'AM';
-    let h;
-    let m = d.getMinutes().toString().padStart(2, '0');
-    let hour = d.getHours();
-    if (hour == 0) {
-        h = 12;
-    } else if (hour > 12) {
-        h = hour - 12;
-    } else {
-        h = hour;
-    }
-    if (hour >= 12) {
-        ampm = 'PM';
-    }
-    return h + ":" + m + " " + ampm;
+   segmentToStartTime(segment: number) {
+    // let st = new Date(this.startTime);
+    const offset = segment * 1800000; /* 30 mins */
+    const t = new Date(this.guide.m_startDate.getTime() + offset);
+    // return this.toLocalShortTime(t);
+    // Get the locale specific time and remove the seconds
+    const tWithSecs = t.toLocaleTimeString() + ' ';
+    return tWithSecs.replace(/:.. /, ' ');
   }
 
-  segmentToStartTime(segment : number) {
-      let st = new Date(this.startTime);
-      const offset = segment * 1800000; /* 30 mins */
-      const t = new Date(st.getTime() + offset);
-      return this.toLocalShortTime(t);
+  pageLeft() {
+    this.guide.m_pickerDate = new Date(this.guide.m_startDate.getTime() - this.guideService.guide_millisecs);
+    this.guide.onDateChange();
+  }
+
+  pageRight() {
+    this.guide.m_pickerDate = new Date(this.guide.m_startDate.getTime() + this.guideService.guide_millisecs);
+    this.guide.onDateChange();
   }
 }

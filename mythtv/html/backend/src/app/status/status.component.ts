@@ -15,9 +15,6 @@ export class StatusComponent implements OnInit {
   constructor(private statusService: StatusService) { }
 
   ngOnInit(): void {
-    this.m_status$ = this.statusService.GetBackendStatus().pipe(
-      tap(x => console.log("Fetched BackendStatus as of " + x.BackendStatus.AsOf)),
-      tap(x => console.log(x)),
-    );
+    this.m_status$ = this.statusService.GetBackendStatus();
   }
 }

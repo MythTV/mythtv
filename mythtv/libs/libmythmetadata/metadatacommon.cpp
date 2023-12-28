@@ -5,6 +5,7 @@
 #include <QCoreApplication>
 #include <QLocale>
 #include <QMetaType>
+#include <QRegularExpression>
 
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlocale.h"

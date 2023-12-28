@@ -11,7 +11,7 @@
                 <div class="mb-4 w-full">
                     <table>
                         <tr *ngFor="let dirname of editDirs; index as ix">
-                            <td class="align-items-center bg-blue-100" style="font-family: monospace;">
+                            <td class="align-items-center bg-blue-100 text-gray-900" style="font-family: monospace;">
                                 {{editDirs[ix]}}
                             <td class="align-items-center">
                                 <button pButton pRipple type="button" icon="pi pi-pencil"
@@ -34,7 +34,7 @@
                     <p-dialog header="{{ 'settings.sgroups.seldir_title' | translate }}" [(visible)]="showEditDlg"
                         [modal]="true" [draggable]="false" [resizable]="false" [style]="{width: '50vw'}">
                         <div class="form-group field">
-                            <label for="DirName" class="block">{{ 'settings.sgroups.dirname_label' | translate
+                            <label for="DirName" class="label block">{{ 'settings.sgroups.dirname_label' | translate
                                 }}</label>
                             <input pInputText id="DirName" [(ngModel)]="editDirName" name="DirName" #DirName="ngModel"
                                 class="mb-2 form-control w-full" style="font-family: monospace;"
@@ -71,7 +71,7 @@
                         text="{{ 'common.networkfail' | translate }}"></p-message>
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
-                    (onClick)="saveForm(); sgroupform.form.markAsPristine()" [disabled]="(!sgroupform.dirty)">
+                    (onClick)="saveForm(); sgroupform.form.markAsPristine()" [disabled]="!sgroupform.dirty || setupService.schedulingEnabled">
                 </p-button>
             </div>
         </ng-template>

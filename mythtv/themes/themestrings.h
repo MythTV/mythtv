@@ -4,7 +4,6 @@
 void strings_null() {
     ThemeUI::tr(" Retro Originally by Gerhard Aldorf MythUI version based on MythCenter by Jeroen Brosens Conversion of Retro to MythUI by Chris Candreva A generally blue theme. Icon style is realistic based on clasic, 'Retro' styles. ");
     ThemeUI::tr("# to Keep:");
-    ThemeUI::tr("% - |year%% - |length%");
     ThemeUI::tr("%(|USERRATING)%");
     ThemeUI::tr("%00x00%");
     ThemeUI::tr("%00x00| %%SUBTITLE%");
@@ -79,6 +78,7 @@ void strings_null() {
     ThemeUI::tr("%ORIGINALAIRDATE% %REPEAT%");
     ThemeUI::tr("%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME| remaining)%");
     ThemeUI::tr("%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%");
+    ThemeUI::tr("%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME|)%%(|BEHINDTIME|)%");
     ThemeUI::tr("%PLAYEDTIME% of %TOTALTIME%\n%(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%");
     ThemeUI::tr("%PLAYEDTIME| of% %TOTALTIME% %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%");
     ThemeUI::tr("%PLAYGROUP% play group");
@@ -94,6 +94,7 @@ void strings_null() {
     ThemeUI::tr("%SHORTTIMEDATE%");
     ThemeUI::tr("%SOURCENAME|\n%%CHANID| %");
     ThemeUI::tr("%STARTDATE%  (%STARTTIME% - %ENDTIME%)  %LENMINS%");
+    ThemeUI::tr("%STARTDATE% %STARTTIME%%-|ENDTIME| %%00X00| %\n%\"|SUBTITLE|\" %%(|ORIGINALAIRDATE|)%");
     ThemeUI::tr("%STARTDATE|, %%STARTTIME%% - |ENDTIME%");
     ThemeUI::tr("%STARTDATE|, %%STARTTIME%% - |ENDTIME|: %%LENMINS%");
     ThemeUI::tr("%STARTDATE|, %%STARTTIME%%- |ENDTIME%");
@@ -124,7 +125,6 @@ void strings_null() {
     ThemeUI::tr("%TITLE%");
     ThemeUI::tr("%TITLE% %SUBTITLE%");
     ThemeUI::tr("%TITLE% %|(CATEGORY|)%");
-    ThemeUI::tr("%TITLE% - %ARTIST% %(|ALBUM|)%");
     ThemeUI::tr("%TITLE% - %SUBTITLE%");
     ThemeUI::tr("%TITLE%% (|YEAR|)%");
     ThemeUI::tr("%TITLE%% - [font]mymediumlight[/font]|SUBTITLE%");
@@ -175,13 +175,7 @@ void strings_null() {
     ThemeUI::tr("%\"|SUBTITLE|\"\n%%YEARSTARS| %%DESCRIPTION%");
     ThemeUI::tr("%\"|SUBTITLE|\"\n\n%%DESCRIPTION%");
     ThemeUI::tr("%\"|subtitle|\"\n%%description%");
-    ThemeUI::tr("%album% %(|year|)%");
-    ThemeUI::tr("%artist% - %title%");
-    ThemeUI::tr("%buttontext%");
-    ThemeUI::tr("%buttontext%\n%time%");
-    ThemeUI::tr("%callsign%  (Priority: %priority%)");
     ThemeUI::tr("%cast%");
-    ThemeUI::tr("%channel%");
     ThemeUI::tr("%channel% - %shortstarttimedate%");
     ThemeUI::tr("%channelsourcename%");
     ThemeUI::tr("%channum% %callsign%");
@@ -190,11 +184,7 @@ void strings_null() {
     ThemeUI::tr("%description%\n      Errata: %errata%");
     ThemeUI::tr("%director%%, |year%");
     ThemeUI::tr("%filesize_str% of %storagegroup% Storage");
-    ThemeUI::tr("%lastplayed% (played: %playcount% times)");
-    ThemeUI::tr("%lenmins%");
     ThemeUI::tr("%longchannel%  |  %filesize_str% of %storagegroup% Storage");
-    ThemeUI::tr("%longchannel% - %timedate%");
-    ThemeUI::tr("%longchannel% - %titlesubtitle%");
     ThemeUI::tr("%longchannel%% (|RECSTARTTIME%% - |RECENDTIME|)%");
     ThemeUI::tr("%n in current group", 0, 1);
     ThemeUI::tr("%n minute(s) early", 0, 1);
@@ -203,42 +193,27 @@ void strings_null() {
     ThemeUI::tr("%name% (%callsign%)", 0, 1);
     ThemeUI::tr("%name% / %callsign%  (Source: %sourcename%)", 0, 1);
     ThemeUI::tr("%name%% (v.|version%)", 0, 1);
-    ThemeUI::tr("%playlistplayedtime% of %playlisttotaltime%");
-    ThemeUI::tr("%progpriority% / %finalpriority%");
     ThemeUI::tr("%rating |USERRATING%");
     ThemeUI::tr("%recordedpercent%");
-    ThemeUI::tr("%rectypechar% - %titlesubtitle%");
     ThemeUI::tr("%rectypestatus% on card number %card%");
     ThemeUI::tr("%rectypestatus%% on card number |card%");
     ThemeUI::tr("%resolution% %(|aspect|)%");
     ThemeUI::tr("%s00e00%   %STARTDATE%   %STARTTIME%% - |ENDTIME%");
-    ThemeUI::tr("%shortstarttimedate% | %titlesubtitle%");
-    ThemeUI::tr("%shortstarttimedate% | %titlesubtitle% | %channel%");
-    ThemeUI::tr("%startdate%% - |00x00%\n%title%");
-    ThemeUI::tr("%startdate%%| startyear%, %starttime%");
     ThemeUI::tr("%startdate%%| year%");
     ThemeUI::tr("%startdate%%| year%, %starttime% - %endtime% (%lenmins%)");
+    ThemeUI::tr("%startdate%, %starttime%");
     ThemeUI::tr("%startdate|, %%starttime%");
     ThemeUI::tr("%startdate|, %%starttime%% - |endtime%");
-    ThemeUI::tr("%station% - %channel%");
     ThemeUI::tr("%time%");
-    ThemeUI::tr("%timedate% (%channel%)");
     ThemeUI::tr("%timedate% (%lenmins%)");
     ThemeUI::tr("%timedate% (%lenmins%) - %channel%");
-    ThemeUI::tr("%timedate% - %description%");
     ThemeUI::tr("%title %%messagearea%");
-    ThemeUI::tr("%title%");
     ThemeUI::tr("%title%  |  %timedate% on %channel%");
     ThemeUI::tr("%title%% (|year|)%");
-    ThemeUI::tr("%title%% - |artist%");
-    ThemeUI::tr("%title%% - |subtitle%");
     ThemeUI::tr("%title%% - |subtitle%% (|year|)%");
     ThemeUI::tr("%titlesubtitle%");
-    ThemeUI::tr("%titlesubtitle%  (Priority: %progpriority% / %finalpriority%)");
     ThemeUI::tr("%titlesubtitle%  |  %timedate% (%lenmins%)");
-    ThemeUI::tr("%userrating%");
     ThemeUI::tr("%userrating|/10%");
-    ThemeUI::tr("%volume% %(|mute|)%");
     ThemeUI::tr("%watchedpercent%");
     ThemeUI::tr("%year%% by |director%%, |length%%, rating: |userrating%");
     ThemeUI::tr("%year|, %%timedate%");
@@ -265,10 +240,6 @@ void strings_null() {
     ThemeUI::tr("(%STARTTIME% - %ENDTIME%)  %LENMINS%");
     ThemeUI::tr("(%STARTTIME% - %ENDTIME%) %LONGREPEAT% %YEARSTARS%%CHANNEL%\n%DESCRIPTION%");
     ThemeUI::tr("(%STARTTIME% - %ENDTIME%) %LONGREPEAT%%YEARSTARS%%DESCRIPTION%");
-    ThemeUI::tr("(%card%)");
-    ThemeUI::tr("(%channum%) %name% - %sourcename%", 0, 1);
-    ThemeUI::tr("(%statusbefore%) -> (%statusafter%)");
-    ThemeUI::tr("(%statusbefore%) -> (%statusafter%):  %shorttimedate% on %channel%");
     ThemeUI::tr("(1) All  (2) Important");
     ThemeUI::tr("(1) All (2) Important");
     ThemeUI::tr("(1) Channel    (2) Priority");
@@ -284,19 +255,14 @@ void strings_null() {
     ThemeUI::tr("-%n", 0, 1);
     ThemeUI::tr("->");
     ThemeUI::tr("/path/to/the/thing.jpg");
-    ThemeUI::tr("0");
     ThemeUI::tr("0 Stars");
     ThemeUI::tr("0 x 0");
     ThemeUI::tr("0%");
-    ThemeUI::tr("0.0");
-    ThemeUI::tr("0.5");
     ThemeUI::tr("0:00:00");
     ThemeUI::tr("1");
     ThemeUI::tr("1 Star");
     ThemeUI::tr("1 pixel");
     ThemeUI::tr("1. General");
-    ThemeUI::tr("1.0");
-    ThemeUI::tr("1.5");
     ThemeUI::tr("10 Stars");
     ThemeUI::tr("1080i");
     ThemeUI::tr("1080p");
@@ -305,21 +271,14 @@ void strings_null() {
     ThemeUI::tr("2");
     ThemeUI::tr("2 Stars");
     ThemeUI::tr("2. Capture cards");
-    ThemeUI::tr("2.0");
-    ThemeUI::tr("2.5");
     ThemeUI::tr("3");
     ThemeUI::tr("3 Stars");
     ThemeUI::tr("3. Recording Profiles");
-    ThemeUI::tr("3.0");
-    ThemeUI::tr("3.5");
     ThemeUI::tr("4");
     ThemeUI::tr("4 Stars");
     ThemeUI::tr("4. Video sources");
-    ThemeUI::tr("4.0");
-    ThemeUI::tr("4.5");
     ThemeUI::tr("5 Stars");
     ThemeUI::tr("5. Input connections");
-    ThemeUI::tr("5.0");
     ThemeUI::tr("576p");
     ThemeUI::tr("6 Stars");
     ThemeUI::tr("6. Channel Editor");
@@ -380,7 +339,6 @@ void strings_null() {
     ThemeUI::tr("Airdate:");
     ThemeUI::tr("Aired");
     ThemeUI::tr("Aired:");
-    ThemeUI::tr("Album:");
     ThemeUI::tr("All programs alphabetically sorted");
     ThemeUI::tr("Allow Recordings to Auto-Expire");
     ThemeUI::tr("Allow recordings to expire:");
@@ -400,8 +358,6 @@ void strings_null() {
     ThemeUI::tr("Archive Utilities");
     ThemeUI::tr("Archives");
     ThemeUI::tr("Arclight is a sleek theme meant for widescreen HD displays.  It is high contrast and uses shapes and an attractive layout to convey information simply and consistently.");
-    ThemeUI::tr("Article item:");
-    ThemeUI::tr("Artist:");
     ThemeUI::tr("Artwork Results");
     ThemeUI::tr("Artwork Search Results");
     ThemeUI::tr("Artwork and Data Sources");
@@ -411,7 +367,6 @@ void strings_null() {
     ThemeUI::tr("Artwork, Metadata Sources");
     ThemeUI::tr("Aspect Ratio");
     ThemeUI::tr("Aspect:");
-    ThemeUI::tr("Aspect: %1");
     ThemeUI::tr("Assign custom keys to MythTV shortcuts.");
     ThemeUI::tr("Associate File");
     ThemeUI::tr("Associate new file extensions");
@@ -426,7 +381,6 @@ void strings_null() {
     ThemeUI::tr("Audio Setup");
     ThemeUI::tr("Audio Track:");
     ThemeUI::tr("Audio codec:");
-    ThemeUI::tr("Audio volume:");
     ThemeUI::tr("Audio: %audiocodec%");
     ThemeUI::tr("Audio: 5 CH.");
     ThemeUI::tr("Audio: 7 CH.");
@@ -446,9 +400,7 @@ void strings_null() {
     ThemeUI::tr("AudioCodec: VORBIS");
     ThemeUI::tr("AudioCodec: WMAPRO");
     ThemeUI::tr("Auto Extend:");
-    ThemeUI::tr("Auto expire:");
     ThemeUI::tr("Automatically Commercial Flag Recordings");
-    ThemeUI::tr("Automatically Extend:");
     ThemeUI::tr("Automatically Look Up Metadata");
     ThemeUI::tr("Automatically Transcode Recordings");
     ThemeUI::tr("Available Buffer");
@@ -542,7 +494,6 @@ void strings_null() {
     ThemeUI::tr("Callsign:");
     ThemeUI::tr("Cancel");
     ThemeUI::tr("Captions");
-    ThemeUI::tr("Card: %card%");
     ThemeUI::tr("Cards");
     ThemeUI::tr("Cast");
     ThemeUI::tr("Cast Members");
@@ -571,7 +522,6 @@ void strings_null() {
     ThemeUI::tr("Change display groups");
     ThemeUI::tr("Change mythtv key bindings");
     ThemeUI::tr("Change recording group password");
-    ThemeUI::tr("Change:");
     ThemeUI::tr("Channel");
     ThemeUI::tr("Channel #");
     ThemeUI::tr("Channel # :");
@@ -583,7 +533,6 @@ void strings_null() {
     ThemeUI::tr("Channel Name:");
     ThemeUI::tr("Channel Number");
     ThemeUI::tr("Channel Priorities");
-    ThemeUI::tr("Channel Rec Priority");
     ThemeUI::tr("Channel Rec. Prio.");
     ThemeUI::tr("Channel Recording Priorities");
     ThemeUI::tr("Channel Scan");
@@ -603,7 +552,6 @@ void strings_null() {
     ThemeUI::tr("Choose Country and Language");
     ThemeUI::tr("Choose a");
     ThemeUI::tr("Choose a Theme");
-    ThemeUI::tr("Choose a local theme or download new");
     ThemeUI::tr("Choose a local theme or download new ones");
     ThemeUI::tr("Choose favourite webpages from a list");
     ThemeUI::tr("Choose programs from a grid-style list");
@@ -692,7 +640,6 @@ void strings_null() {
     ThemeUI::tr("Connection Ok");
     ThemeUI::tr("Context:");
     ThemeUI::tr("Contexts");
-    ThemeUI::tr("Controls:");
     ThemeUI::tr("Core MythTV behavior and system settings");
     ThemeUI::tr("Core Setup");
     ThemeUI::tr("Country");
@@ -710,17 +657,13 @@ void strings_null() {
     ThemeUI::tr("Coverart: %1");
     ThemeUI::tr("Coverfile:");
     ThemeUI::tr("Create a Custom Recording Rule");
-    ThemeUI::tr("Create advanced recording rules");
     ThemeUI::tr("Create and manage your music playlists");
     ThemeUI::tr("Current Profile:");
     ThemeUI::tr("Current Recording(s)");
     ThemeUI::tr("Current Recording(s):");
     ThemeUI::tr("Current Recordings");
-    ThemeUI::tr("Current Rule Phrase:");
     ThemeUI::tr("Current View:");
-    ThemeUI::tr("Current phrase to search for:");
     ThemeUI::tr("Current:");
-    ThemeUI::tr("Currently Playing:");
     ThemeUI::tr("Currently recording:");
     ThemeUI::tr("Custom");
     ThemeUI::tr("Custom Edit");
@@ -737,7 +680,6 @@ void strings_null() {
     ThemeUI::tr("Customize your channels settings");
     ThemeUI::tr("Customize your country settings");
     ThemeUI::tr("Customize your grabber settings");
-    ThemeUI::tr("Customize your recording schedule");
     ThemeUI::tr("DOLBY");
     ThemeUI::tr("DTS");
     ThemeUI::tr("DVD");
@@ -763,7 +705,6 @@ void strings_null() {
     ThemeUI::tr("Delete Recordings");
     ThemeUI::tr("Delete Rule");
     ThemeUI::tr("Delete Your Hardware Profile");
-    ThemeUI::tr("Delete system Profile");
     ThemeUI::tr("Delete your hardware profile");
     ThemeUI::tr("Description");
     ThemeUI::tr("Description:");
@@ -782,7 +723,6 @@ void strings_null() {
     ThemeUI::tr("Directed by: %1");
     ThemeUI::tr("Director");
     ThemeUI::tr("Director:");
-    ThemeUI::tr("Director: %director% - %length%");
     ThemeUI::tr("Directories");
     ThemeUI::tr("Directory Format");
     ThemeUI::tr("Directory:");
@@ -791,9 +731,7 @@ void strings_null() {
     ThemeUI::tr("Display unknown file types");
     ThemeUI::tr("Display unknown file types:");
     ThemeUI::tr("Done");
-    ThemeUI::tr("Download icons");
     ThemeUI::tr("Download progress:");
-    ThemeUI::tr("Download status");
     ThemeUI::tr("Downloadable");
     ThemeUI::tr("Dup Method:");
     ThemeUI::tr("Dup Scope:");
@@ -801,8 +739,6 @@ void strings_null() {
     ThemeUI::tr("Dupe Scope:");
     ThemeUI::tr("Duplicate Method:");
     ThemeUI::tr("Duplicate Scope:");
-    ThemeUI::tr("Duplication Methode:");
-    ThemeUI::tr("Duplication Scope:");
     ThemeUI::tr("Duration");
     ThemeUI::tr("Duration (min):");
     ThemeUI::tr("Duration of an image transition (ms):");
@@ -819,9 +755,7 @@ void strings_null() {
     ThemeUI::tr("Edit On Screen Display");
     ThemeUI::tr("Edit Power Search");
     ThemeUI::tr("Edit Power Search Fields");
-    ThemeUI::tr("Edit Powersearch");
     ThemeUI::tr("Edit Recording Metadata");
-    ThemeUI::tr("Edit System events");
     ThemeUI::tr("Edit Transports");
     ThemeUI::tr("Edit Video Information");
     ThemeUI::tr("Edit Video Metadata");
@@ -847,7 +781,6 @@ void strings_null() {
     ThemeUI::tr("Enable metadata in file browse mode:");
     ThemeUI::tr("Enable random trailer playback");
     ThemeUI::tr("End Offset:");
-    ThemeUI::tr("End late:");
     ThemeUI::tr("End on time");
     ThemeUI::tr("End recording %n minute(s) early", 0, 1);
     ThemeUI::tr("End recording %n minute(s) late", 0, 1);
@@ -895,8 +828,6 @@ void strings_null() {
     ThemeUI::tr("File Paths and general options");
     ThemeUI::tr("File Size:");
     ThemeUI::tr("File Types");
-    ThemeUI::tr("File browser");
-    ThemeUI::tr("File info:");
     ThemeUI::tr("File to Always Play Next:");
     ThemeUI::tr("File to Play Next:");
     ThemeUI::tr("FileBrowser");
@@ -914,7 +845,6 @@ void strings_null() {
     ThemeUI::tr("Filter: %1");
     ThemeUI::tr("Filters");
     ThemeUI::tr("Filters video list");
-    ThemeUI::tr("Filters you can apply:");
     ThemeUI::tr("Final");
     ThemeUI::tr("Final Priority");
     ThemeUI::tr("Final Priority:");
@@ -989,7 +919,6 @@ void strings_null() {
     ThemeUI::tr("Group selector");
     ThemeUI::tr("Group your favorite");
     ThemeUI::tr("Group your favorite channels together");
-    ThemeUI::tr("Grouplist item:");
     ThemeUI::tr("Groups");
     ThemeUI::tr("Guide");
     ThemeUI::tr("Guide appearance and behavior");
@@ -1006,7 +935,6 @@ void strings_null() {
     ThemeUI::tr("Hello");
     ThemeUI::tr("Hide Channels without channel number");
     ThemeUI::tr("Hide Channels without channel number.");
-    ThemeUI::tr("Hide Channels without channel number:");
     ThemeUI::tr("Hide channels without channel number");
     ThemeUI::tr("High");
     ThemeUI::tr("Home");
@@ -1014,7 +942,6 @@ void strings_null() {
     ThemeUI::tr("Homepage:");
     ThemeUI::tr("Hour");
     ThemeUI::tr("Hour:");
-    ThemeUI::tr("IMDB");
     ThemeUI::tr("IMDB ID:");
     ThemeUI::tr("IMDB: %1");
     ThemeUI::tr("INETREF:");
@@ -1088,22 +1015,17 @@ void strings_null() {
     ThemeUI::tr("LCARS");
     ThemeUI::tr("Language");
     ThemeUI::tr("Language Selection");
-    ThemeUI::tr("Language:");
-    ThemeUI::tr("Last Played:");
     ThemeUI::tr("Last Recorded");
     ThemeUI::tr("Last Recorded/Priority");
     ThemeUI::tr("Last Recorded:");
     ThemeUI::tr("Last recorded %lastrecordeddate%");
     ThemeUI::tr("Last: %statusbefore%");
     ThemeUI::tr("Learn what your system is up to.");
-    ThemeUI::tr("Lenght");
     ThemeUI::tr("Length:");
     ThemeUI::tr("Let's set up your DVR! On the next few screens, we will configure your system to play back audio and video, optimize your color and contrast, and make sure we are taking advantage of all of your hardware.  Press next to begin!");
-    ThemeUI::tr("Level");
     ThemeUI::tr("Limit Handling:");
     ThemeUI::tr("List Options");
     ThemeUI::tr("List Overview");
-    ThemeUI::tr("List item:");
     ThemeUI::tr("Listen to");
     ThemeUI::tr("Listen to Internet");
     ThemeUI::tr("Listen to Internet Radio Streams");
@@ -1125,7 +1047,6 @@ void strings_null() {
     ThemeUI::tr("Local Fanart");
     ThemeUI::tr("Local Search");
     ThemeUI::tr("Local weather forecast");
-    ThemeUI::tr("Locally installed");
     ThemeUI::tr("Location and sources for");
     ThemeUI::tr("Lock");
     ThemeUI::tr("Lock: %1");
@@ -1139,7 +1060,6 @@ void strings_null() {
     ThemeUI::tr("Looks");
     ThemeUI::tr("Low");
     ThemeUI::tr("Lowest");
-    ThemeUI::tr("MANAGE RECORDING RULES");
     ThemeUI::tr("MONO");
     ThemeUI::tr("MP3");
     ThemeUI::tr("MPEG-2");
@@ -1159,7 +1079,6 @@ void strings_null() {
     ThemeUI::tr("Manually Schedule programs");
     ThemeUI::tr("Master backend failed to wake.");
     ThemeUI::tr("Max Newest:");
-    ThemeUI::tr("Max episodes:");
     ThemeUI::tr("Max to Keep:");
     ThemeUI::tr("Maximum Number of Episodes to Keep:");
     ThemeUI::tr("Maximum Number of Newest Episodes:");
@@ -1172,7 +1091,6 @@ void strings_null() {
     ThemeUI::tr("MetaData");
     ThemeUI::tr("Metadata");
     ThemeUI::tr("Metadata Editor");
-    ThemeUI::tr("Metadata OPTIONS");
     ThemeUI::tr("Metadata Options");
     ThemeUI::tr("Metadata Results");
     ThemeUI::tr("Metadata Search Results");
@@ -1180,7 +1098,6 @@ void strings_null() {
     ThemeUI::tr("Metadata settings");
     ThemeUI::tr("Minute");
     ThemeUI::tr("Minute:");
-    ThemeUI::tr("Minutes");
     ThemeUI::tr("Modify, Add, and Delete television channels.");
     ThemeUI::tr("Monitor your cameras");
     ThemeUI::tr("Mono 1.0");
@@ -1209,14 +1126,9 @@ void strings_null() {
     ThemeUI::tr("Mute");
     ThemeUI::tr("My audio subsystem supports DTS");
     ThemeUI::tr("My audio subsystem supports DTS-HD");
-    ThemeUI::tr("My audio subsystem supports DTS-HD:");
-    ThemeUI::tr("My audio subsystem supports DTS:");
     ThemeUI::tr("My audio subsystem supports Dolby Digital");
-    ThemeUI::tr("My audio subsystem supports Dolby Digital:");
     ThemeUI::tr("My audio subsystem supports E-AC-3");
-    ThemeUI::tr("My audio subsystem supports E-AC-3:");
     ThemeUI::tr("My audio subsystem supports TrueHD");
-    ThemeUI::tr("My audio subsystem supports TrueHD:");
     ThemeUI::tr("My receiver supports DTS");
     ThemeUI::tr("My receiver supports DTS-HD");
     ThemeUI::tr("My receiver supports Dolby Digital");
@@ -1240,7 +1152,6 @@ void strings_null() {
     ThemeUI::tr("Native Resolution: %1");
     ThemeUI::tr("Navigate");
     ThemeUI::tr("Navigation");
-    ThemeUI::tr("Navigation control:");
     ThemeUI::tr("Net Search");
     ThemeUI::tr("New");
     ThemeUI::tr("New Password");
@@ -1255,7 +1166,6 @@ void strings_null() {
     ThemeUI::tr("Next File:");
     ThemeUI::tr("Next Scheduled Recording(s)");
     ThemeUI::tr("Next Scheduled Recording(s):");
-    ThemeUI::tr("Next Song:");
     ThemeUI::tr("Next recording");
     ThemeUI::tr("Next recording(s)");
     ThemeUI::tr("Next recordings");
@@ -1266,7 +1176,6 @@ void strings_null() {
     ThemeUI::tr("No additional info available");
     ThemeUI::tr("No episode limit");
     ThemeUI::tr("No extra info available");
-    ThemeUI::tr("No listings found for this program search.");
     ThemeUI::tr("No listings found for this program.");
     ThemeUI::tr("No recordings exist");
     ThemeUI::tr("No resolution specified");
@@ -1278,14 +1187,11 @@ void strings_null() {
     ThemeUI::tr("No videos in library, or no files found.  If you have configured a video directory, press \"M\" (or the MENU key) and select \"Scan for Changes.\"");
     ThemeUI::tr("No videos in library, or no files found. If you have configured a video directory, press \"M\" (or the MENU key) and select \"Scan for Changes.\"");
     ThemeUI::tr("No videos in library, or no files found.\n\n If you have configured a video directory, press \"M\" (or the MENU key) and select \"Scan for Changes.\"");
-    ThemeUI::tr("No volume controls configured");
     ThemeUI::tr("None");
     ThemeUI::tr("Normal");
     ThemeUI::tr("Normal recording priority");
     ThemeUI::tr("Not Found");
     ThemeUI::tr("Not applicable");
-    ThemeUI::tr("Not recorded yet");
-    ThemeUI::tr("Not sure which screen this is:");
     ThemeUI::tr("Number of Recordings:");
     ThemeUI::tr("Number of Speakers:");
     ThemeUI::tr("OK");
@@ -1309,10 +1215,7 @@ void strings_null() {
     ThemeUI::tr("Online Fanart");
     ThemeUI::tr("Optical");
     ThemeUI::tr("Optical Disks");
-    ThemeUI::tr("Optional category:");
-    ThemeUI::tr("Optional channel:");
     ThemeUI::tr("Optional description phrase:");
-    ThemeUI::tr("Optional genre:");
     ThemeUI::tr("Optional subtitle phrase:");
     ThemeUI::tr("Optional title phrase:");
     ThemeUI::tr("Options");
@@ -1320,15 +1223,9 @@ void strings_null() {
     ThemeUI::tr("Organize Recordings");
     ThemeUI::tr("Original Airdate: %1");
     ThemeUI::tr("Other Plugins");
-    ThemeUI::tr("P");
     ThemeUI::tr("PCM-BluRay");
     ThemeUI::tr("PCM-DVD");
     ThemeUI::tr("PLAYLIST");
-    ThemeUI::tr("POSTPROCESSING OPTIONS");
-    ThemeUI::tr("PROGRAM DETAILS");
-    ThemeUI::tr("PROGRAM GUIDE");
-    ThemeUI::tr("PROGRAM LIST");
-    ThemeUI::tr("PROGRAM SEARCH");
     ThemeUI::tr("Parental");
     ThemeUI::tr("Parental Control:");
     ThemeUI::tr("Parental Level");
@@ -1352,7 +1249,6 @@ void strings_null() {
     ThemeUI::tr("Perform Query");
     ThemeUI::tr("Perform basic configuration tasks");
     ThemeUI::tr("Perform daily updates of recording artwork");
-    ThemeUI::tr("Perform daily updates of recording artwork:");
     ThemeUI::tr("Perform daily updates:");
     ThemeUI::tr("Perform metadata update after video scan");
     ThemeUI::tr("Perform metadata update after video scan:");
@@ -1394,7 +1290,6 @@ void strings_null() {
     ThemeUI::tr("Play any of your media");
     ThemeUI::tr("Play any of your recorded programs");
     ThemeUI::tr("Play games");
-    ThemeUI::tr("Play group:");
     ThemeUI::tr("Play music files and internet radio streams");
     ThemeUI::tr("Play next");
     ThemeUI::tr("Play online streams");
@@ -1417,10 +1312,6 @@ void strings_null() {
     ThemeUI::tr("Player Command:");
     ThemeUI::tr("Player Settings");
     ThemeUI::tr("Player:");
-    ThemeUI::tr("Playlist duration:");
-    ThemeUI::tr("Playlist item:");
-    ThemeUI::tr("Playlist position:");
-    ThemeUI::tr("Playlist progress:");
     ThemeUI::tr("Playlist: %playlisttime%");
     ThemeUI::tr("Please Wait...");
     ThemeUI::tr("Please Wait....");
@@ -1436,12 +1327,9 @@ void strings_null() {
     ThemeUI::tr("Post Processing Editor");
     ThemeUI::tr("Post Processing Options");
     ThemeUI::tr("Post Processing Options Editor");
-    ThemeUI::tr("Post processing");
     ThemeUI::tr("Post-Processing Options");
     ThemeUI::tr("Power Search");
-    ThemeUI::tr("Powersearch");
     ThemeUI::tr("PreRecorded");
-    ThemeUI::tr("Press 'up', 'down, 'left' and 'right' arrows to move through the files and folders. Press 'select' or 'enter' key to select the file or folder.");
     ThemeUI::tr("Press MENU for options and ESC to quit.");
     ThemeUI::tr("Press SELECT to edit the other corner.");
     ThemeUI::tr("Press Up/Down from letter list, to navigate to another list.  Press Left/Right from Show or Episode list to navigate to another list.");
@@ -1455,16 +1343,13 @@ void strings_null() {
     ThemeUI::tr("Priorities");
     ThemeUI::tr("Prioritize some channels over others");
     ThemeUI::tr("Prioritize some recordings over others");
-    ThemeUI::tr("Prioritize some shows over others");
     ThemeUI::tr("Priority");
     ThemeUI::tr("Priority Change:");
     ThemeUI::tr("Priority:");
     ThemeUI::tr("Priority:  %1");
-    ThemeUI::tr("Priority: %finalpriority%");
     ThemeUI::tr("Priority: %priority%");
     ThemeUI::tr("Probe");
     ThemeUI::tr("Profile");
-    ThemeUI::tr("Profile:");
     ThemeUI::tr("Profiles");
     ThemeUI::tr("Program Details");
     ThemeUI::tr("Program Details:");
@@ -1478,7 +1363,6 @@ void strings_null() {
     ThemeUI::tr("Program Search");
     ThemeUI::tr("Program Searches");
     ThemeUI::tr("Program Title");
-    ThemeUI::tr("Programid");
     ThemeUI::tr("Programme Finder");
     ThemeUI::tr("Programme Searches");
     ThemeUI::tr("Programs");
@@ -1486,7 +1370,6 @@ void strings_null() {
     ThemeUI::tr("Protocol-Version: %1");
     ThemeUI::tr("Protocol: %PROTOCOLVERSION%");
     ThemeUI::tr("Quality:");
-    ThemeUI::tr("R");
     ThemeUI::tr("RECORDING");
     ThemeUI::tr("RTjpeg");
     ThemeUI::tr("Radio");
@@ -1517,22 +1400,17 @@ void strings_null() {
     ThemeUI::tr("Record Type:");
     ThemeUI::tr("Recorded");
     ThemeUI::tr("Recording");
-    ThemeUI::tr("Recording Group");
     ThemeUI::tr("Recording Group:");
     ThemeUI::tr("Recording Group: %1");
     ThemeUI::tr("Recording Groups");
     ThemeUI::tr("Recording Priorities");
-    ThemeUI::tr("Recording Priority");
     ThemeUI::tr("Recording Profile:");
     ThemeUI::tr("Recording Profile: %1");
     ThemeUI::tr("Recording Rule Active");
     ThemeUI::tr("Recording Rule Active:");
     ThemeUI::tr("Recording Rule is Active");
     ThemeUI::tr("Recording Rules");
-    ThemeUI::tr("Recording Status");
-    ThemeUI::tr("Recording Type");
     ThemeUI::tr("Recording details");
-    ThemeUI::tr("Recording group:");
     ThemeUI::tr("Recording groups");
     ThemeUI::tr("Recording has Subtitles Available");
     ThemeUI::tr("Recording has been transcoded");
@@ -1557,7 +1435,6 @@ void strings_null() {
     ThemeUI::tr("Resolution %RESOLUTION%");
     ThemeUI::tr("Resolution Unknown");
     ThemeUI::tr("Resolution:");
-    ThemeUI::tr("Resolution: %1");
     ThemeUI::tr("Resolution: %RESOLUTION%");
     ThemeUI::tr("Resolution: %resolution% - %aspect| \n%%DESCRIPTION%");
     ThemeUI::tr("Restore Data");
@@ -1578,17 +1455,12 @@ void strings_null() {
     ThemeUI::tr("Rule Overview");
     ThemeUI::tr("Rule SQL:");
     ThemeUI::tr("Rule Type:");
-    ThemeUI::tr("Rule active:");
     ThemeUI::tr("Rules");
     ThemeUI::tr("Run User Job #1");
     ThemeUI::tr("Run User Job #2");
     ThemeUI::tr("Run User Job #3");
     ThemeUI::tr("Run User Job #4");
     ThemeUI::tr("Run User job #2");
-    ThemeUI::tr("Run user job four");
-    ThemeUI::tr("Run user job one");
-    ThemeUI::tr("Run user job three");
-    ThemeUI::tr("Run user job two");
     ThemeUI::tr("Run userjob #1:");
     ThemeUI::tr("Run userjob #2:");
     ThemeUI::tr("Run userjob #3:");
@@ -1597,14 +1469,8 @@ void strings_null() {
     ThemeUI::tr("Runtime :");
     ThemeUI::tr("Runtime:");
     ThemeUI::tr("Runtime: %1");
-    ThemeUI::tr("S");
-    ThemeUI::tr("SCHEDULE EDITOR");
-    ThemeUI::tr("SCHEDULE FILTERS");
-    ThemeUI::tr("SCHEDULE OPTIONS");
     ThemeUI::tr("SD");
-    ThemeUI::tr("SEARCH");
     ThemeUI::tr("STEREO");
-    ThemeUI::tr("STORAGE OPTIONS");
     ThemeUI::tr("SUB");
     ThemeUI::tr("SUBTITLES");
     ThemeUI::tr("SURROUND");
@@ -1615,7 +1481,6 @@ void strings_null() {
     ThemeUI::tr("Sample rate: %samplerate%");
     ThemeUI::tr("Save");
     ThemeUI::tr("Save as default");
-    ThemeUI::tr("Scan");
     ThemeUI::tr("Scan Progress");
     ThemeUI::tr("Scan for New Music");
     ThemeUI::tr("Scanning");
@@ -1634,7 +1499,6 @@ void strings_null() {
     ThemeUI::tr("Schedule conflict(s)");
     ThemeUI::tr("Schedule conflict(s):");
     ThemeUI::tr("Schedule filters");
-    ThemeUI::tr("Schedule info");
     ThemeUI::tr("Schedule programs");
     ThemeUI::tr("Scheduled Recordings");
     ThemeUI::tr("Schedules Overview");
@@ -1647,7 +1511,6 @@ void strings_null() {
     ThemeUI::tr("Screenshot: %1");
     ThemeUI::tr("Screenshots");
     ThemeUI::tr("Search");
-    ThemeUI::tr("Search Field:");
     ThemeUI::tr("Search For");
     ThemeUI::tr("Search For:");
     ThemeUI::tr("Search Internet Video");
@@ -1671,7 +1534,6 @@ void strings_null() {
     ThemeUI::tr("Search by channel");
     ThemeUI::tr("Search files on your harddisk");
     ThemeUI::tr("Search for shows and more options");
-    ThemeUI::tr("Search item:");
     ThemeUI::tr("Search on");
     ThemeUI::tr("Search on broadcast times");
     ThemeUI::tr("Search on keywords");
@@ -1685,7 +1547,6 @@ void strings_null() {
     ThemeUI::tr("Search the local network for the MythTV Backend.");
     ThemeUI::tr("Search...");
     ThemeUI::tr("Searches");
-    ThemeUI::tr("Searchlist item:");
     ThemeUI::tr("Seas/Ep:");
     ThemeUI::tr("Season");
     ThemeUI::tr("Season and Episode");
@@ -1708,7 +1569,6 @@ void strings_null() {
     ThemeUI::tr("Seek: %1");
     ThemeUI::tr("Select 'Program Guide' or 'Program Finder'");
     ThemeUI::tr("Select 'Schedule a Recording' from the Main Menu");
-    ThemeUI::tr("Select Date:");
     ThemeUI::tr("Select Event:");
     ThemeUI::tr("Select Icons");
     ThemeUI::tr("Select Local Banner");
@@ -1718,7 +1578,6 @@ void strings_null() {
     ThemeUI::tr("Select Search");
     ThemeUI::tr("Select Time");
     ThemeUI::tr("Select Time & Date");
-    ThemeUI::tr("Select Time:");
     ThemeUI::tr("Select a clause from the list.");
     ThemeUI::tr("Select a clause from the list:");
     ThemeUI::tr("Select a letter...");
@@ -1730,10 +1589,8 @@ void strings_null() {
     ThemeUI::tr("Select an option below.");
     ThemeUI::tr("Select any jobs you want run on the recording.");
     ThemeUI::tr("Select artwork, and find recording information online.");
-    ThemeUI::tr("Select country and language");
     ThemeUI::tr("Select how the recording file should be treated.");
     ThemeUI::tr("Select item to be searched for from the list:");
-    ThemeUI::tr("Select recording rule:");
     ThemeUI::tr("Select the country in which you currently reside");
     ThemeUI::tr("Select the country where you reside.");
     ThemeUI::tr("Select the filter options for this recording.");
@@ -1749,7 +1606,6 @@ void strings_null() {
     ThemeUI::tr("Select your theme");
     ThemeUI::tr("Select, import, or play music");
     ThemeUI::tr("Select:");
-    ThemeUI::tr("Selected Image");
     ThemeUI::tr("Send");
     ThemeUI::tr("Send a Tweet");
     ThemeUI::tr("Send and receive");
@@ -1772,11 +1628,9 @@ void strings_null() {
     ThemeUI::tr("Settings to prioritize some channels over others");
     ThemeUI::tr("Settings to prioritize some shows over others");
     ThemeUI::tr("Setup");
-    ThemeUI::tr("Setup Audio Configuration");
     ThemeUI::tr("Setup Custom Priorities rules");
     ThemeUI::tr("Setup System event");
     ThemeUI::tr("Setup System event handlers");
-    ThemeUI::tr("Setup Video Configuration");
     ThemeUI::tr("Setup Weather");
     ThemeUI::tr("Setup Wizard");
     ThemeUI::tr("Setup behavior of the");
@@ -1788,7 +1642,6 @@ void strings_null() {
     ThemeUI::tr("Setup recording");
     ThemeUI::tr("Setup recordings");
     ThemeUI::tr("Setup recordings profiles");
-    ThemeUI::tr("Setup the behavior of the system events");
     ThemeUI::tr("Setup your");
     ThemeUI::tr("Setup your Movie");
     ThemeUI::tr("Setup your system");
@@ -1817,7 +1670,6 @@ void strings_null() {
     ThemeUI::tr("Signal / Noise");
     ThemeUI::tr("Signal Strength");
     ThemeUI::tr("Signal/Noise");
-    ThemeUI::tr("Site item:");
     ThemeUI::tr("Skin");
     ThemeUI::tr("Skins");
     ThemeUI::tr("Skip");
@@ -1830,7 +1682,6 @@ void strings_null() {
     ThemeUI::tr("Sort by (1) Title, (2) Priority, (4) Type");
     ThemeUI::tr("Sort by :");
     ThemeUI::tr("Sort by:");
-    ThemeUI::tr("Sort: (1) by Title, (2) by Priority, (4) by Type.");
     ThemeUI::tr("Sorting order of the shown images:");
     ThemeUI::tr("Source");
     ThemeUI::tr("Source:");
@@ -1847,7 +1698,6 @@ void strings_null() {
     ThemeUI::tr("Starring: %1");
     ThemeUI::tr("Stars");
     ThemeUI::tr("Stars:");
-    ThemeUI::tr("Start Date:");
     ThemeUI::tr("Start Frontend");
     ThemeUI::tr("Start Hour:");
     ThemeUI::tr("Start Minute:");
@@ -1855,7 +1705,6 @@ void strings_null() {
     ThemeUI::tr("Start Time (hh:mm):");
     ThemeUI::tr("Start Time:");
     ThemeUI::tr("Start cooking!");
-    ThemeUI::tr("Start early:");
     ThemeUI::tr("Start on time");
     ThemeUI::tr("Start recording %n minute(s) early", 0, 1);
     ThemeUI::tr("Start recording %n minute(s) late", 0, 1);
@@ -1871,7 +1720,6 @@ void strings_null() {
     ThemeUI::tr("Status Icons");
     ThemeUI::tr("Status:");
     ThemeUI::tr("Status: %1");
-    ThemeUI::tr("Status: %rectypechar%");
     ThemeUI::tr("Stereo 2.0");
     ThemeUI::tr("Storage");
     ThemeUI::tr("Storage Details");
@@ -1879,7 +1727,6 @@ void strings_null() {
     ThemeUI::tr("Storage Group: %1");
     ThemeUI::tr("Storage Options");
     ThemeUI::tr("Storage Options Editor");
-    ThemeUI::tr("Storage group:");
     ThemeUI::tr("Storage rate:");
     ThemeUI::tr("Storage to Buffer");
     ThemeUI::tr("Storage to Buffer :");
@@ -1894,7 +1741,6 @@ void strings_null() {
     ThemeUI::tr("Sub Title:");
     ThemeUI::tr("Submit");
     ThemeUI::tr("Submit Your Hardware Profile");
-    ThemeUI::tr("Submit system Profile");
     ThemeUI::tr("Submit your hardware profile");
     ThemeUI::tr("Subtitle");
     ThemeUI::tr("Subtitle:");
@@ -1942,7 +1788,6 @@ void strings_null() {
     ThemeUI::tr("Test High Definition");
     ThemeUI::tr("Test Rule");
     ThemeUI::tr("Test SD Playback");
-    ThemeUI::tr("Test Speakers");
     ThemeUI::tr("Test Standard Definition");
     ThemeUI::tr("Text Filter :");
     ThemeUI::tr("Text Filter:");
@@ -1976,7 +1821,6 @@ void strings_null() {
     ThemeUI::tr("Title 1 of 1");
     ThemeUI::tr("Title:");
     ThemeUI::tr("Titles");
-    ThemeUI::tr("To be determined");
     ThemeUI::tr("To create a custom priority rule, enter a name and priority adjustment. You can them select from existing priority templates or create one of your own using SQL syntax in the \"Clause SQL\" edit box.\n\nOnce you have completed your rule, can can Test, Delete, or Install it right away.");
     ThemeUI::tr("To create a custom recording rule, either select an existing rule, or create a new rule by typing in a name.  Then select a rule type and hit enter.  The SQL code will be transferred below, and you can edit it and insert your own program information. Finally, you can test, immediately activate, store, or cancel your rule.");
     ThemeUI::tr("To create a custom recording rule, either select an existing rule, or create a new rule by typing in a name. Then select a rule type and hit enter. The SQL code will be transferred below, and you can edit it and insert your own program information.\n\nFinally, you can test, immediately activate, store, or cancel your rule.");
@@ -1987,7 +1831,6 @@ void strings_null() {
     ThemeUI::tr("To schedule a recording, exit this screen and");
     ThemeUI::tr("Tools");
     ThemeUI::tr("Tools for your music library");
-    ThemeUI::tr("Track: %time%");
     ThemeUI::tr("Trailer");
     ThemeUI::tr("Trailer #:");
     ThemeUI::tr("Trailer:");
@@ -2017,7 +1860,6 @@ void strings_null() {
     ThemeUI::tr("Unmute");
     ThemeUI::tr("Up");
     ThemeUI::tr("Up Level");
-    ThemeUI::tr("Up to date");
     ThemeUI::tr("UpToDate");
     ThemeUI::tr("Upcoming");
     ThemeUI::tr("Upcoming Recording(s):");
@@ -2041,7 +1883,6 @@ void strings_null() {
     ThemeUI::tr("Use this language for Game Metadata");
     ThemeUI::tr("Use this language for TV Metadata");
     ThemeUI::tr("Use this language for the Movie Metadata");
-    ThemeUI::tr("User");
     ThemeUI::tr("User Rating");
     ThemeUI::tr("User Rating :");
     ThemeUI::tr("User Rating:");
@@ -2059,7 +1900,6 @@ void strings_null() {
     ThemeUI::tr("VIDEO GALLERY");
     ThemeUI::tr("VIDEO LIST");
     ThemeUI::tr("VIDEO MANAGER");
-    ThemeUI::tr("VRC-Like recording scheduler");
     ThemeUI::tr("Values from %LOW% to %HIGH% in increments of %STEP%");
     ThemeUI::tr("Version %1");
     ThemeUI::tr("Version Mismatch");
@@ -2125,7 +1965,6 @@ void strings_null() {
     ThemeUI::tr("View new");
     ThemeUI::tr("View new titles");
     ThemeUI::tr("View stored");
-    ThemeUI::tr("View system Profile");
     ThemeUI::tr("View the");
     ThemeUI::tr("View the weather forecast");
     ThemeUI::tr("View upcoming");
@@ -2141,7 +1980,6 @@ void strings_null() {
     ThemeUI::tr("Visible:");
     ThemeUI::tr("Visit Your Hardware Profile");
     ThemeUI::tr("Vorbis");
-    ThemeUI::tr("W");
     ThemeUI::tr("WARNING: There are conflicting scheduled recordings!");
     ThemeUI::tr("WATCH RECORDINGS");
     ThemeUI::tr("WATCHED");
@@ -2199,7 +2037,6 @@ void strings_null() {
     ThemeUI::tr("Year:");
     ThemeUI::tr("Year: %1");
     ThemeUI::tr("You Haven't Scheduled Any Programs To Be Recorded");
-    ThemeUI::tr("You Haven't Scheduled Any Programs To Be Recorded!\nTo schedule a recording, exit this screen and select 'Program Guide' or 'Program Finder'.");
     ThemeUI::tr("You Haven't Scheduled Any Programs To Be Recorded. To schedule a recording, exit this screen and select 'Program Guide' or 'Program Finder'");
     ThemeUI::tr("You Haven't Scheduled Any Programs To Be Recorded...");
     ThemeUI::tr("You Haven't Scheduled Any Programs To Be Recorded.\nTo schedule a recording, exit this screen and select 'Program Guide' or 'Program Finder'");
@@ -2211,7 +2048,6 @@ void strings_null() {
     ThemeUI::tr("You can specify basic criteria to create powerful search and record rules. Below, you may enter title, subtitle, and description phrases (all optional), as well as category, genre, and channel values to refine a complex search for programs.\n\nWhen you have completed your configuration, press \"OK\" to search.");
     ThemeUI::tr("You haven't defined any channels");
     ThemeUI::tr("You haven't made any changes");
-    ThemeUI::tr("You haven't made any changes in your Schedule.");
     ThemeUI::tr("You may enter a value here or cancel to continue using the Spinbox.");
     ThemeUI::tr("Your profile is located at:");
     ThemeUI::tr("Your profile's admin password is:");
@@ -2238,7 +2074,6 @@ void strings_null() {
     ThemeUI::tr("browse your Pictures library");
     ThemeUI::tr("callsign: %callsign%");
     ThemeUI::tr("dddd,  MMMM dd,  yyyy  |  hh:mm AP");
-    ThemeUI::tr("dddd, MMMM dd, yyyy  |");
     ThemeUI::tr("dddd\ndd MMM yyyy");
     ThemeUI::tr("dddd\ndd MMMM yyyy");
     ThemeUI::tr("decoded/free:");
@@ -2250,11 +2085,9 @@ void strings_null() {
     ThemeUI::tr("message:\n%message_text%");
     ThemeUI::tr("mostly restricted");
     ThemeUI::tr("name");
-    ThemeUI::tr("no info available");
     ThemeUI::tr("not recorded yet");
     ThemeUI::tr("ok");
     ThemeUI::tr("partially restricted");
-    ThemeUI::tr("publisher:");
     ThemeUI::tr("ratings");
     ThemeUI::tr("recording group filter set on %1");
     ThemeUI::tr("restricted");
@@ -2265,8 +2098,6 @@ void strings_null() {
     ThemeUI::tr("text_window_title");
     ThemeUI::tr("to adjust text size");
     ThemeUI::tr("unrestricted");
-    ThemeUI::tr("upcoming recordings");
     ThemeUI::tr("widescreen");
-    ThemeUI::tr("year");
     ThemeUI::tr("~");
 }

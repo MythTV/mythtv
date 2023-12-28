@@ -11,7 +11,7 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="VideoDevice" class="block">{{ 'settings.capture.import.file_label' | translate
+                        <label for="VideoDevice" class="label block">{{ 'settings.capture.import.file_label' | translate
                             }}</label>
                         <input pInputText id="VideoDevice" [(ngModel)]="card.VideoDevice" name="VideoDevice"
                             #VideoDevice="ngModel" class="mb-2 form-control w-full" />
@@ -35,9 +35,7 @@
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
                     (onClick)="saveForm(); demoform.form.markAsPristine()"
-                    [disabled]="(!demoform.dirty || !card.VideoDevice)"></p-button>
-                <p-button class="col-2 help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()"
-                    icon="pi pi-info-circle" styleClass="p-button-info"></p-button>
+                    [disabled]="!demoform.dirty || !card.VideoDevice || setupService.schedulingEnabled"></p-button>
             </div>
         </ng-template>
     </p-card>

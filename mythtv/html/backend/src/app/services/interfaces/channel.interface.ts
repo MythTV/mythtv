@@ -10,6 +10,7 @@ export interface Channel {
     ChannelGroups:      string; // null in sample data
     ChannelName:        string;
     CommFree:           boolean;
+    CommMethod:         number;
     DefaultAuth:        string;
     ExtendedVisible:    string;
     FineTune:           number;
@@ -20,33 +21,49 @@ export interface Channel {
     Inputs:             string; // null in sample data
     MplexId:            number;
     Programs:           ScheduleOrProgram[];
+    RecPriority:        number;
     ServiceId:          number;
     ServiceType:        number;
     SourceId:           number;
+    TimeOffset:         number;
     UseEIT:             boolean;
     Visible:            boolean;
     XMLTVID:            string;
 }
 
-export interface AddDBChannelRequest {
-    ATSCMajorChan:      number;
-    ATSCMinorChan:      number;
-    CallSign:           string;
+export interface CommMethod {
+    CommMethod:         string;
+    LocalizedName:      string;
+}
+
+export interface CommMethodList {
+    CommMethodList: {
+        CommMethods: CommMethod[];
+    }
+}
+
+export interface DBChannelRequest {
+    ATSCMajorChan?:     number;
+    ATSCMinorChan?:     number;
+    CallSign?:          string;
     ChannelID:          number;
-    ChannelNumber:      string; // number sent as string
-    ChannelName:        string;
-    DefaultAuthority:   string;
-    ExtendedVisible:    string;
-    Format:             string;
-    FrequencyID:        string; // null in sample data
-    Icon:               string;
-    MplexID:            number;
-    ServiceID:          number;
-    ServiceType:        number;
-    SourceID:           number;
-    UseEIT:             boolean;
-    Visible:            boolean;
-    XMLTVID:            string;
+    ChannelNumber?:     string; // number sent as string
+    ChannelName?:       string;
+    CommMethod?:        number;
+    DefaultAuthority?:  string;
+    ExtendedVisible?:   string;
+    Format?:            string;
+    FrequencyID?:       string; // null in sample data
+    Icon?:              string;
+    MplexID?:           number;
+    RecPriority?:       number;
+    ServiceID?:         number;
+    ServiceType?:       number;
+    SourceID?:          number;
+    TimeOffset?:        number;
+    UseEIT?:            boolean;
+    Visible?:           boolean;
+    XMLTVID?:           string;
 }
 
 export interface FetchChannelsFromSourceRequest {
@@ -55,22 +72,23 @@ export interface FetchChannelsFromSourceRequest {
     WaitForFinish:      boolean;
 }
 
+// All parameters are optional.
 export interface GetChannelInfoListRequest {
-    SourceID:           number;
-    ChannelGroupID:     number;
-    StartIndex:         number;
-    Count:              number;
-    OnlyVisible:        boolean;
-    Details:            boolean;
-    OrderByName:        boolean;
-    GroupByCallsign:    boolean;
-    OnlyTunable:        boolean;
+    SourceID?:           number;
+    ChannelGroupID?:     number;
+    StartIndex?:         number;
+    Count?:              number;
+    OnlyVisible?:        boolean;
+    Details?:            boolean;
+    OrderByName?:        boolean;
+    GroupByCallsign?:    boolean;
+    OnlyTunable?:        boolean;
 }
 
 export interface GetVideoMultiplexListRequest {
     SourceID:           number;
-    StartIndex:         number;
-    Count:              number;
+    StartIndex?:        number;
+    Count?:             number;
 }
 
 export interface UpdateVideoSourceRequest {
@@ -88,4 +106,68 @@ export interface UpdateVideoSourceRequest {
     RegionId:           number;
     ScanFrequency:      number;
     LCNOffset:          number;
+}
+
+export interface ChannelScanRequest {
+    CardId:                 number;
+    DesiredServices:        string;
+    FreeToAirOnly:          boolean;
+    ChannelNumbersOnly:     boolean;
+    CompleteChannelsOnly:   boolean;
+    FullChannelSearch:      boolean;
+    RemoveDuplicates:       boolean;
+    AddFullTS:              boolean;
+    TestDecryptable:        boolean;
+    ScanType:               string;
+    FreqTable:              string;
+    Modulation:             string;
+    FirstChan:              string;
+    LastChan:               string;
+    ScanId:                 number;
+    IgnoreSignalTimeout:    boolean;
+    FollowNITSetting:       boolean;
+    MplexId:                number;
+    Frequency:              number;
+    Bandwidth:              string;
+    Polarity:               string;
+    SymbolRate:             string;
+    Inversion:              string;
+    Constellation:          string;
+    ModSys:                 string;
+    CodeRateLP:             string;
+    CodeRateHP:             string;
+    FEC:                    string;
+    TransmissionMode:       string;
+    GuardInterval:          string;
+    Hierarchy:              string;
+    RollOff:                string;
+}
+
+export interface ChannelScanStatus {
+    CardId:                 number;
+    Status:                 string;
+    SignalLock:             boolean;
+    Progress:               number;
+    SignalNoise:            number;
+    SignalStrength:         number;
+    StatusLog:              string;
+    StatusText:             string;
+    StatusTitle:            string;
+    DialogMsg:              string;
+    DialogInputReq:         boolean;
+    DialogButtons:          string[];
+}
+
+export interface ScanDialogResponse {
+    CardId:                 number;
+    DialogString:            string;
+    DialogButton:           number;
+}
+
+export interface Scan {
+    ScanId:                 number;
+    CardId:                 number;
+    SourceId:               number;
+    Processed:              boolean;
+    ScanDate:               string;       // Date
 }

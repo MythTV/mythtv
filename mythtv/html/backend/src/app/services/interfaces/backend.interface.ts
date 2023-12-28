@@ -11,6 +11,9 @@ export interface EnvInfo {
     HOME:           string;
     USER:           string;
     MYTHCONFDIR:    string;
+    SchedulingEnabled: boolean;
+    IsDatabaseIgnored: boolean;
+    DBTimezoneSupport: boolean;
 }
 
 export interface LogInfo {

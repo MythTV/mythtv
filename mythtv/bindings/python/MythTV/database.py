@@ -290,7 +290,7 @@ class DBDataWrite( DBData ):
     def _sanitize(self, data, fill=True):
         """Remove fields from dictionary that are not in database table."""
         data = data.copy()
-        for key in data.keys():
+        for key in list(data.keys()):
             if key not in self._field_order:
                 del data[key]
         for key in self._defaults:
@@ -1070,7 +1070,7 @@ class DatabaseConfig( object ):
             else:
                 raise MythError("Cannot find home directory to write to")
 
-        fp.write(etree.tostring(doc, pretty_print=True))
+        fp.write(etree.tostring(doc, encoding='unicode', pretty_print=True))
         fp.close()
 
 class DBCache( MythSchema ):

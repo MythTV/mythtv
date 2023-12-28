@@ -45,13 +45,9 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
         ->SetRequiredChildOf("file");
 
 
-    add("--update", "update", false, "Run non-destructive updates",
-            "Run non-destructive updates on the database for "
-            "users in xmltv zones that do not provide channel "
-            "data. Stops the addition of new channels and the "
-            "changing of channel icons.")
+    add("--update", "update", false, "", "")
         ->SetBlocks("manual")
-        ->SetDeprecated("Use --only-update-guide instead.")
+        ->SetRemoved("Use --only-update-guide instead.", "34")
         ->SetGroup("Guide Data Handling");
     add("--only-update-guide", "onlyguide", false, "Only update guide data",
             "Only update the guide data, do not alter channels or icons.")
@@ -99,30 +95,18 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "for the guide data grabber to check for future "
             "listings.")
         ->SetGroup("Filtering");
-    add("--refresh-today", "refreshtoday", false, "",
-            "This option is only valid for selected grabbers.\n"
-            "Force a refresh for today's guide data.\nThis can be used "
-            "in combination with other --refresh-<n> options.")
-        ->SetDeprecated("use --refresh instead")
+    add("--refresh-today", "refreshtoday", false, "", "")
+        ->SetRemoved("use --refresh instead", "34")
+
         ->SetGroup("Filtering");
-    add("--dont-refresh-tomorrow", "dontrefreshtomorrow", false, "",
-            "This option is only valid for selected grabbers.\n"
-            "Prevent mythfilldatabase from pulling information for "
-            "tomorrow's listings. Data for tomorrow is always pulled "
-            "unless specifically specified otherwise.")
-        ->SetDeprecated("use --refresh instead")
+    add("--dont-refresh-tomorrow", "dontrefreshtomorrow", false, "", "")
+        ->SetRemoved("use --refresh instead", "34")
         ->SetGroup("Filtering");
-    add("--refresh-second", "refreshsecond", false, "",
-            "This option is only valid for selected grabbers.\n"
-            "Force a refresh for guide data two days from now. This can "
-            "be used in combination with other --refresh-<n> options.")
-        ->SetDeprecated("use --refresh instead")
+    add("--refresh-second", "refreshsecond", false, "", "")
+        ->SetRemoved("use --refresh instead", "34")
         ->SetGroup("Filtering");
-    add("--refresh-day", "refreshday", QMetaType::QStringList, "",
-            "This option is only valid for selected grabbers.\n"
-            "Force a refresh for guide data on a specific day. This can "
-            "be used in combination with other --refresh-<n> options.")
-        ->SetDeprecated("use --refresh instead")
+    add("--refresh-day", "refreshday", QMetaType::QStringList, "", "")
+        ->SetRemoved("use --refresh instead", "34")
         ->SetGroup("Filtering");
     add("--dont-refresh-tba", "dontrefreshtba", false,
             "don't refresh \"To be announced\" programs",
@@ -131,11 +115,8 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "programs marked as \"To be announced\".")
         ->SetGroup("Filtering");
 
-    add("--refresh-all", "refreshall", false, "",
-            "This option is only valid for selected grabbers.\n"
-            "This option forces a refresh of all guide data, but does so "
-            "with fourteen downloads of one day each.")
-        ->SetDeprecated("use --refresh instead")
+    add("--refresh-all", "refreshall", false, "", "")
+        ->SetRemoved("use --refresh instead", "34")
         ->SetBlocks("dontrefreshtomorrow")
         ->SetBlocks("refreshsecond")
         ->SetBlocks("refreshday")

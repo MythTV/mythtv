@@ -130,7 +130,7 @@ class MBASE_PUBLIC MThread
     static void usleep(std::chrono::microseconds time);
     template<typename R, typename P>
     static typename std::enable_if_t<std::chrono::treat_as_floating_point<R>::value, void>
-    usleep(std::chrono::duration<R,P> time) { usleep(duration_cast<std::chrono::microseconds>(time)); };
+    usleep(std::chrono::duration<R,P> time) { usleep(duration_cast<std::chrono::microseconds>(time)); }; // cppcheck-suppress [missingReturn,usleepCalled]
 
     MThreadInternal *m_thread {nullptr};
     QRunnable *m_runnable     {nullptr};

@@ -383,7 +383,7 @@ void MythHTTPSocket::Respond(const HTTPResponse& Response)
     for (const auto & header : qAsConst(Response->m_responseHeaders))
     {
         LOG(VB_HTTP, LOG_DEBUG, header->trimmed().constData());
-        m_queue.push_back(header);
+        m_queue.emplace_back(header);
     }
 
     // Queue in memory response content or file

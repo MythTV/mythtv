@@ -21,6 +21,12 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
+// Qt
+#include <QFile>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QUrlQuery>
+
 // MythTV
 #include "libmythbase/mythchrono.h"
 #include "libmythbase/mythcorecontext.h"
@@ -984,10 +990,9 @@ RecExtMlbDataSource::loadPage(const ActiveGame& game, const QUrl& _url)
 /// @param info A data structure describing the sport/league.
 /// @param dt The date for which sporting events should be retrieved.
 /// @returns a URL to extract the list of sporting events from the MLB API.
-QUrl RecExtMlbDataSource::makeInfoUrl (const SportInfo& info, const QDateTime& dt)
+QUrl RecExtMlbDataSource::makeInfoUrl ([[maybe_unused]] const SportInfo& info,
+                                       const QDateTime& dt)
 {
-    Q_UNUSED(info);
-
     if (!dt.isValid())
         return {};
 
@@ -1149,7 +1154,7 @@ RecExtDataSource* RecordingExtender::createDataSource(AutoExtendType type)
 /// @return true if the title matches a known sport.
 bool RecordingExtender::findKnownSport(const QString& _title,
                                        AutoExtendType type,
-                                       SportInfoList& infoList)
+                                       SportInfoList& infoList) const
 {
     static const QRegularExpression year {R"(\d{4})"};
     QRegularExpressionMatch match;
@@ -1158,7 +1163,9 @@ bool RecordingExtender::findKnownSport(const QString& _title,
     {
         bool ok {false};
         int matchYear = match.captured().toInt(&ok);
-        int thisYear = QDateTime::currentDateTimeUtc().date().year();
+        int thisYear = m_forcedYearforTesting
+            ? m_forcedYearforTesting
+            : QDateTime::currentDateTimeUtc().date().year();
         // FIFA Qualifiers can be in the year before the tournament.
         if (!ok || ((matchYear != thisYear) && (matchYear != thisYear+1)))
             return false;

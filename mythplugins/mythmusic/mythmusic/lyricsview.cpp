@@ -95,12 +95,12 @@ void LyricsView::customEvent(QEvent *event)
 {
     bool handled = false;
 
-    if ((event->type() == MusicPlayerEvent::TrackChangeEvent) ||
-        (event->type() == MusicPlayerEvent::PlayedTracksChangedEvent))
+    if ((event->type() == MusicPlayerEvent::kTrackChangeEvent) ||
+        (event->type() == MusicPlayerEvent::kPlayedTracksChangedEvent))
     {
         findLyrics();
     }
-    else if (event->type() == OutputEvent::Info)
+    else if (event->type() == OutputEvent::kInfo)
     {
         if (m_autoScroll)
         {
@@ -174,7 +174,7 @@ void LyricsView::customEvent(QEvent *event)
             handled = true;
         }
     }
-    else if (event->type() == DecoderHandlerEvent::OperationStart)
+    else if (event->type() == DecoderHandlerEvent::kOperationStart)
     {
         auto *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
         if (!dhe)
@@ -184,7 +184,7 @@ void LyricsView::customEvent(QEvent *event)
             m_bufferStatus->SetText(*dhe->getMessage());
         }
     }
-    else if (event->type() == DecoderHandlerEvent::BufferStatus)
+    else if (event->type() == DecoderHandlerEvent::kBufferStatus)
     {
         auto *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
         if (!dhe)
@@ -206,7 +206,7 @@ void LyricsView::customEvent(QEvent *event)
             m_bufferProgress->SetUsed(available);
         }
     }
-    else if (event->type() == DecoderHandlerEvent::OperationStop)
+    else if (event->type() == DecoderHandlerEvent::kOperationStop)
     {
         if (m_bufferStatus)
             m_bufferStatus->Reset();
@@ -576,10 +576,8 @@ void EditLyricsDialog::loadLyrics(void)
     m_lyricsEdit->SetText(lyrics);
 }
 
-void EditLyricsDialog::syncronizedChanged(bool syncronized)
+void EditLyricsDialog::syncronizedChanged([[maybe_unused]] bool syncronized)
 {
-    (void) syncronized;
-
     loadLyrics();
 }
 

@@ -165,7 +165,8 @@ static int pgm_expand_uniform(AVFrame *dst, const AVFrame *src,
             extramargin, extramargin, extramargin, extramargin);
 }
 
-int pgm_crop(AVFrame *dst, const AVFrame *src, int srcheight,
+int pgm_crop(AVFrame *dst, const AVFrame *src,
+             [[maybe_unused]] int srcheight,
              int srcrow, int srccol, int cropwidth, int cropheight)
 {
     const int   srcwidth = src->linesize[0];
@@ -184,7 +185,6 @@ int pgm_crop(AVFrame *dst, const AVFrame *src, int srcheight,
                 cropwidth);
     }
 
-    (void)srcheight;    /* gcc */
     return 0;
 }
 

@@ -1,0 +1,39 @@
+<form class="ml-3 mr-3" name="eventsform" #eventsform="ngForm">
+    <h2>{{ 'settings.sysevents.title' | translate }}</h2>
+    <p-card class="m-5">
+        <ng-template pTemplate="content">
+            <div class="grid">
+                <div class="mb-4 w-full" *ngFor="let event of events; index as ix; first as isFirst">
+                    <div class="form-group field">
+                        <label for="{{event.Key}}" class="label block">{{ event.LocalizedName }}</label>
+                        <input pInputText id="{{event.Key}}" [(ngModel)]="event.Value" name="{{event.Key}}"
+                            class="mb-2 form-control w-full" />
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+            <div class="grid nogutter">
+                <div class="col-12">
+                    <p-message
+                        *ngIf="successCount > 0 && successCount == expectedCount && errorCount == 0 && !eventsform.dirty"
+                        severity="success" text="{{ 'common.savesuccess' | translate }}"></p-message>
+                    <p-message *ngIf="this.errorCount > 0" severity="error"
+                        text="{{ 'common.networkfail' | translate }}"></p-message>
+                </div>
+                <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
+                    (onClick)="saveForm(); eventsform.form.markAsPristine()"
+                    [disabled]="!eventsform.dirty || setupService.schedulingEnabled"></p-button>
+            </div>
+        </ng-template>
+    </p-card>
+
+    <div class="flex justify-content-end">
+        <p-button class="p-3" label="{{ 'common.back' | translate }}"
+            (onClick)="router.navigate(['setupwizard/storage-groups'])" icon="pi pi-angle-left"
+            iconPos="left"></p-button>
+    </div>
+
+
+</form>

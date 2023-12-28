@@ -1,5 +1,6 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { CanComponentDeactivate } from 'src/app/can-deactivate-guard.service';
@@ -17,7 +18,8 @@ interface GroupCard {
 @Component({
   selector: 'app-storage-groups',
   templateUrl: './storage-groups.component.html',
-  styleUrls: ['./storage-groups.component.css']
+  styleUrls: ['./storage-groups.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 
 export class StorageGroupsComponent implements OnInit, CanComponentDeactivate {
@@ -27,8 +29,8 @@ export class StorageGroupsComponent implements OnInit, CanComponentDeactivate {
   currentTab: number = -1;
   activeTab: boolean[] = [];
 
-  dirtyText = 'settings.unsaved';
-  warningText = 'settings.warning';
+  dirtyText = 'settings.common.unsaved';
+  warningText = 'settings.common.warning';
   deletedText = 'settings.common.deleted';
   newText = 'settings.common.new';
 
@@ -54,7 +56,8 @@ export class StorageGroupsComponent implements OnInit, CanComponentDeactivate {
   newGroupName = "";
 
   constructor(private setupService: SetupService, private translate: TranslateService,
-    private mythService: MythService) {
+    private mythService: MythService, public router: Router) {
+    this.setupService.setCurrentForm(null);
     this.mythService.GetHostName().subscribe(data => {
       this.hostName = data.String;
       this.loadGroups();

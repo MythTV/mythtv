@@ -18,6 +18,7 @@
 #include <libmythui/mythdialogbox.h>
 
 // mythmusic
+#include "mainvisual.h"
 #include "musiccommon.h"
 #include "visualizerview.h"
 
@@ -42,19 +43,21 @@ bool VisualizerView::Create(void)
 
     if (err)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'lyricsview'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'visualizerview'");
         return false;
     }
 
     BuildFocusList();
+
+    m_currentView = MV_VISUALIZER;
 
     return true;
 }
 
 void VisualizerView::customEvent(QEvent *event)
 {
-    if (event->type() == MusicPlayerEvent::TrackChangeEvent ||
-        event->type() == MusicPlayerEvent::PlayedTracksChangedEvent)
+    if (event->type() == MusicPlayerEvent::kTrackChangeEvent ||
+        event->type() == MusicPlayerEvent::kPlayedTracksChangedEvent)
         showTrackInfoPopup();
 
     MusicCommon::customEvent(event);
@@ -73,8 +76,44 @@ bool VisualizerView::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "INFO")
+        if (m_mainvisual && m_mainvisual->visual())
+            m_mainvisual->visual()->handleKeyPress(action);
+
+        // unassgined arrow keys might as well be useful
+        if (action == "UP")
         {
+            action = "PREVTRACK";
+            previous();
+        }
+        else if (action == "DOWN")
+        {
+            action = "NEXTTRACK";
+            next();
+        }
+        else if (action == "LEFT")
+        {
+            action = "RWND";
+            seekback();
+        }
+        else if (action == "RIGHT")
+        {
+            action = "FFWD";
+            seekforward();
+        }
+
+        if (action == "INFO")
+            showTrackInfoPopup();
+        else if (
+            action == "NEXTTRACK" ||
+            action == "PREVTRACK" ||
+            action == "FFWD" ||
+            action == "RWND" ||
+            action == "THMBUP" ||
+            action == "THMBDOWN" ||
+            action == "SPEEDUP" ||
+            action == "SPEEDDOWN")
+        {
+            handled = MusicCommon::keyPressEvent(event);
             showTrackInfoPopup();
         }
         else
@@ -109,17 +148,16 @@ void VisualizerView::ShowMenu(void)
 
 void VisualizerView::showTrackInfoPopup(void)
 {
+    if (m_currentView == MV_VISUALIZERINFO)
+        return;
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    auto *popup = new TrackInfoPopup(popupStack, gPlayer->getCurrentMetadata());
+    auto *popup = new TrackInfoPopup(popupStack);
 
-    if (!popup->Create())
-    {
+    if (popup->Create())
+        popupStack->AddScreen(popup);
+    else
         delete popup;
-        return;
-    }
-
-    popupStack->AddScreen(popup);
 }
 
 //---------------------------------------------------------
@@ -144,9 +182,20 @@ bool TrackInfoPopup::Create(void)
     if (!err)
         return false;
 
+    // find common widgets available on any view
+    err = CreateCommon();
+
+    if (err)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'trackinfo_popup'");
+        return false;
+    }
+    m_currentView = MV_VISUALIZERINFO;
+
     // get map for current track
+    MusicMetadata *metadata = gPlayer->getCurrentMetadata();
     InfoMap metadataMap;
-    m_metadata->toMap(metadataMap); 
+    metadata->toMap(metadataMap);
 
     // add the map from the next track
     MusicMetadata *nextMetadata = gPlayer->getNextMetadata();
@@ -157,14 +206,14 @@ bool TrackInfoPopup::Create(void)
 
     MythUIStateType *ratingState = dynamic_cast<MythUIStateType *>(GetChild("ratingstate"));
     if (ratingState)
-        ratingState->DisplayState(QString("%1").arg(m_metadata->Rating()));
+        ratingState->DisplayState(QString("%1").arg(metadata->Rating()));
 
     MythUIImage *albumImage = dynamic_cast<MythUIImage *>(GetChild("coverart"));
     if (albumImage)
     {
-        if (!m_metadata->getAlbumArtFile().isEmpty())
+        if (!metadata->getAlbumArtFile().isEmpty())
         {
-            albumImage->SetFilename(m_metadata->getAlbumArtFile());
+            albumImage->SetFilename(metadata->getAlbumArtFile());
             albumImage->Load();
         }
     }
@@ -179,6 +228,10 @@ bool TrackInfoPopup::Create(void)
 
 bool TrackInfoPopup::keyPressEvent(QKeyEvent *event)
 {
+    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
+        return true;
+
+    m_currentView = MV_VISUALIZERINFO;
     QStringList actions;
     bool handled = GetMythMainWindow()->TranslateKeyPress("Music", event, actions, false);
 
@@ -187,13 +240,41 @@ bool TrackInfoPopup::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "INFO")
+        if (action == "SELECT")
+        {
+            if (m_displayTimer)
+                m_displayTimer->stop();
+            return true;
+        }
+        if (action == "ESCAPE")
             Close();
+        else if (action == "INFO")
+            showTrackInfo(gPlayer->getCurrentMetadata());
+        else if (action == "MENU")
+        {
+            // menu over info misbehaves: if we close after 8 seconds,
+            // then menu seg faults!  We could workaround that by
+            // canceling our timer as shown here, but menu fails to
+            // get the visualizer list (how does m_visualModes.count()
+            // == 0?)  So just doing nothing forces user to ESCAPE out
+            // of info to get to the working menu.  -twitham
+
+            // if (m_displayTimer)
+            // {
+            //     m_displayTimer->stop();
+            //     delete m_displayTimer;
+            //     m_displayTimer = nullptr;
+            // }
+            // handled = false;
+        }
         else
             handled = false;
     }
+    // keep info up while seeking, theme should show progressbar/time
+    if (m_displayTimer)
+        m_displayTimer->start(MUSICINFOPOPUPTIME);
 
-    if (!handled && MythScreenType::keyPressEvent(event))
+    if (!handled && VisualizerView::keyPressEvent(event))
         handled = true;
 
     return handled;

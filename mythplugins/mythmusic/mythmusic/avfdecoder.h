@@ -60,6 +60,7 @@ class avfDecoder : public QObject, public Decoder
 
     QTimer *m_mdataTimer                  {nullptr};
     QString m_lastMetadata;
+    QString m_lastMetadataParsed;
 
     int m_errCode                         {0};
 };

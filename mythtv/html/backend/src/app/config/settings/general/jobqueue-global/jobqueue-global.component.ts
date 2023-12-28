@@ -1,38 +1,121 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 
-import { JobQGlobal } from 'src/app/services/interfaces/setup.interface';
+import { MythService } from 'src/app/services/myth.service';
 import { SetupService } from 'src/app/services/setup.service';
 
 @Component({
-  selector: 'app-jobqueue-global',
-  templateUrl: './jobqueue-global.component.html',
-  styleUrls: ['./jobqueue-global.component.css']
+    selector: 'app-jobqueue-global',
+    templateUrl: './jobqueue-global.component.html',
+    styleUrls: ['./jobqueue-global.component.css']
 })
 export class JobqueueGlobalComponent implements OnInit, AfterViewInit {
 
-  JobQGlobalData: JobQGlobal = this.setupService.getJobQGlobal();
-  @ViewChild("jobqglobal")
-  currentForm!: NgForm;
+    @ViewChild("jobqglobal")
+    currentForm!: NgForm;
 
-  constructor(private setupService: SetupService) {
-  }
+    successCount = 0;
+    errorCount = 0;
+    JobsRunOnRecordHost = false;
+    AutoCommflagWhileRecording = false;
+    JobQueueCommFlagCommand = "mythcommflag";
+    JobQueueTranscodeCommand = "mythtranscode";
+    AutoTranscodeBeforeAutoCommflag = false;
+    SaveTranscoding = false;
 
-  ngOnInit(): void {
-  }
+    constructor(public setupService: SetupService, private mythService: MythService) {
+        this.getJobQGlobal();
+    }
 
-  ngAfterViewInit() {
-    this.setupService.setCurrentForm(this.currentForm);
-  }
+    ngOnInit(): void {
+    }
 
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
-  }
+    ngAfterViewInit() {
+        this.setupService.setCurrentForm(this.currentForm);
+    }
 
-  saveForm() {
-    console.log("save form clicked");
-    this.setupService.saveJobQGlobal(this.currentForm);
-  }
+    getJobQGlobal() {
+
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "JobsRunOnRecordHost", Default: "0" })
+            .subscribe({
+                next: data => this.JobsRunOnRecordHost = (data.String == '1'),
+                error: () => this.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "AutoCommflagWhileRecording", Default: "0" })
+            .subscribe({
+                next: data => this.AutoCommflagWhileRecording = (data.String == '1'),
+                error: () => this.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "JobQueueCommFlagCommand", Default: "mythcommflag" })
+            .subscribe({
+                next: data => this.JobQueueCommFlagCommand = data.String,
+                error: () => this.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "JobQueueTranscodeCommand", Default: "mythtranscode" })
+            .subscribe({
+                next: data => this.JobQueueTranscodeCommand = data.String,
+                error: () => this.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "AutoTranscodeBeforeAutoCommflag", Default: "0" })
+            .subscribe({
+                next: data => this.AutoTranscodeBeforeAutoCommflag = (data.String == '1'),
+                error: () => this.errorCount++
+            });
+        this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "SaveTranscoding", Default: "0" })
+            .subscribe({
+                next: data => this.SaveTranscoding = (data.String == '1'),
+                error: () => this.errorCount++
+            });
+    }
+
+    JobQGlobalObs = {
+        next: (x: any) => {
+            if (x.bool)
+                this.successCount++;
+            else {
+                this.errorCount++;
+                if (this.currentForm)
+                    this.currentForm.form.markAsDirty();
+            }
+        },
+        error: (err: any) => {
+            console.error(err);
+            this.errorCount++;
+            if (this.currentForm)
+                this.currentForm.form.markAsDirty();
+        },
+    };
+
+    saveForm() {
+        this.successCount = 0;
+        this.errorCount = 0;
+
+        this.successCount = 0;
+        this.errorCount = 0;
+        this.mythService.PutSetting({
+            HostName: '_GLOBAL_', Key: "JobsRunOnRecordHost",
+            Value: this.JobsRunOnRecordHost ? "1" : "0"
+        }).subscribe(this.JobQGlobalObs);
+        this.mythService.PutSetting({
+            HostName: '_GLOBAL_', Key: "AutoCommflagWhileRecording",
+            Value: this.AutoCommflagWhileRecording ? "1" : "0"
+        }).subscribe(this.JobQGlobalObs);
+        this.mythService.PutSetting({
+            HostName: '_GLOBAL_', Key: "JobQueueCommFlagCommand",
+            Value: this.JobQueueCommFlagCommand
+        }).subscribe(this.JobQGlobalObs);
+        this.mythService.PutSetting({
+            HostName: '_GLOBAL_', Key: "JobQueueTranscodeCommand",
+            Value: this.JobQueueTranscodeCommand
+        }).subscribe(this.JobQGlobalObs);
+        this.mythService.PutSetting({
+            HostName: '_GLOBAL_', Key: "AutoTranscodeBeforeAutoCommflag",
+            Value: this.AutoTranscodeBeforeAutoCommflag ? "1" : "0"
+        }).subscribe(this.JobQGlobalObs);
+        this.mythService.PutSetting({
+            HostName: '_GLOBAL_', Key: "SaveTranscoding",
+            Value: this.SaveTranscoding ? "1" : "0"
+        }).subscribe(this.JobQGlobalObs);
+    }
 
 }

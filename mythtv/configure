@@ -7,6 +7,18 @@
 # Copyright (c) 2005-2008 Mans Rullgard
 #
 
+#
+# All versioning information needed to create a release of MythTV.
+#
+MYTHTV_VERSION_MAJMIN="34.0"
+MYTHTV_LIBVERSION="34"
+# See mythtv/libs/libmythbase/mythversion.h.in
+MYTHTV_BINARY_VERSION="34.20220913-1"
+# See bindings/python/MythTV/static.py.in
+MYTHTV_PYTHON_OWN_VERSION="(34,0,-1,0)"
+# See python/MythTV/services_api/send.py.in
+MYTHTV_PYTHON_VERSION_LIST="('0.27', '0.28', '29', '30', '31', '32', '33', '34')"
+
 # Prevent locale nonsense from breaking basic text processing.
 LC_ALL=C
 export LC_ALL
@@ -917,10 +929,10 @@ check_func_headers(){
     funcs=$2
     shift 2
     {
+        echo "#include <stdint.h>"
         for hdr in $headers; do
             print_include $hdr
         done
-        echo "#include <stdint.h>"
         for func in $funcs; do
             echo "long check_$func(void) { return (long) $func; }"
         done
@@ -1238,10 +1250,11 @@ EOF
 }
 
 check_python(){
-    log check_python
+    log check_python "$@"
+    version=${1}
     check_cmd $python <<EOF
 import sys
-if sys.version_info < (3,6,0):
+if sys.version_info < $version:
     sys.exit(1)
 EOF
 }
@@ -1253,6 +1266,24 @@ check_py_lib(){
 import sys
 try:
     import $lib
+except:
+    sys.exit(1)
+sys.exit(0)
+EOF
+}
+
+check_py_lib_version(){
+    log check_py_lib_version "$@"
+    lib=${1}
+    version=${2}
+    check_cmd $python <<EOF
+import sys
+try:
+    # see PEP 440
+    import $lib
+    vlist = [int(x) for x in $lib.__version__.split('.') if x.isnumeric()]
+    if tuple(vlist) < $version:
+        raise
 except:
     sys.exit(1)
 sys.exit(0)
@@ -1327,26 +1358,15 @@ is_x86_mmx() {
 # system-dependent things.
 
 AVCODEC_COMPONENTS="
-    bsfs
-    decoders
-    encoders
-    hwaccels
-    parsers
 "
 
 AVDEVICE_COMPONENTS="
-    indevs
-    outdevs
 "
 
 AVFILTER_COMPONENTS="
-    filters
 "
 
 AVFORMAT_COMPONENTS="
-    demuxers
-    muxers
-    protocols
 "
 
 AVRESAMPLE_COMPONENTS=""
@@ -1354,12 +1374,6 @@ AVRESAMPLE_COMPONENTS=""
 AVUTIL_COMPONENTS=""
 
 COMPONENT_LIST="
-    $AVCODEC_COMPONENTS
-    $AVDEVICE_COMPONENTS
-    $AVFILTER_COMPONENTS
-    $AVFORMAT_COMPONENTS
-    $AVRESAMPLE_COMPONENTS
-    $AVUTIL_COMPONENTS
 "
 
 EXTERNAL_AUTODETECT_LIBRARY_LIST="
@@ -1429,6 +1443,7 @@ FEATURE_LIST="
     swscale_alpha
 "
 
+# needed for get_version for linking to *.so.
 LIBRARY_LIST="
     avcodec
     avdevice
@@ -1448,24 +1463,11 @@ LICENSE_LIST="
 
 PROGRAM_LIST="
     ffprobe
-    ffserver
     ffmpeg
     ffplay
 "
 
 SUBSYSTEM_LIST="
-    dct
-    dwt
-    error_resilience
-    faan
-    fast_unaligned
-    fft
-    lsp
-    lzo
-    mdct
-    pixelutils
-    network
-    rdft
 "
 
 # COMPONENT_LIST needs to come last to ensure correct dependency checking
@@ -1474,7 +1476,6 @@ CONFIG_LIST="
     $HWACCEL_LIBRARY_LIST
     $FEATURE_LIST
     $LICENSE_LIST
-    $LIBRARY_LIST
     $PROGRAM_LIST
     $SUBSYSTEM_LIST
     autodetect
@@ -1874,85 +1875,6 @@ HAVE_LIST="
 
 # options emitted with CONFIG_ prefix but not available on the command line
 CONFIG_EXTRA="
-    aandcttables
-    ac3dsp
-    audio_frame_queue
-    audiodsp
-    blockdsp
-    bswapdsp
-    cabac
-    dirac_parse
-    dvprofile
-    exif
-    faandct
-    faanidct
-    fdctdsp
-    flacdsp
-    fmtconvert
-    frame_thread_encoder
-    g722dsp
-    golomb
-    gplv3
-    h263dsp
-    h264chroma
-    h264dsp
-    h264parse
-    h264pred
-    h264qpel
-    hevcparse
-    hpeldsp
-    huffman
-    huffyuvdsp
-    huffyuvencdsp
-    idctdsp
-    iirfilter
-    mdct15
-    intrax8
-    iso_media
-    ividsp
-    jpegtables
-    lgplv3
-    libx262
-    llauddsp
-    llviddsp
-    llvidencdsp
-    lpc
-    lzf
-    me_cmp
-    mpeg_er
-    mpegaudio
-    mpegaudiodsp
-    mpegaudioheader
-    mpegvideo
-    mpegvideoenc
-    mss34dsp
-    pixblockdsp
-    qpeldsp
-    qsv
-    qsvdec
-    qsvenc
-    rangecoder
-    riffdec
-    riffenc
-    rtpdec
-    rtpenc_chain
-    rv34dsp
-    sinewin
-    snappy
-    srtp
-    startcode
-    texturedsp
-    texturedspenc
-    tpeldsp
-    vaapi_1
-    vaapi_encode
-    vc1dsp
-    videodsp
-    vp3dsp
-    vp56dsp
-    vp8dsp
-    wma_freqs
-    wmv2dsp
 "
 
 MYTHTV_CONFIG_LIST='
@@ -2263,90 +2185,9 @@ atomics_native_if_any="$ATOMICS_LIST"
 w32threads_deps="atomics_native"
 threads_if_any="$THREADS_LIST"
 
-# subsystems
-dct_select="rdft"
-dirac_parse_select="golomb"
-error_resilience_select="me_cmp"
-faandct_deps="faan fdctdsp"
-faanidct_deps="faan idctdsp"
-h264dsp_select="startcode"
-hevcparse_select="golomb"
-frame_thread_encoder_deps="encoders threads"
-intrax8_select="blockdsp idctdsp"
-mdct_select="fft"
-mdct15_select="fft"
-me_cmp_select="fdctdsp idctdsp pixblockdsp"
-mpeg_er_select="error_resilience"
-mpegaudio_select="mpegaudiodsp mpegaudioheader"
-mpegaudiodsp_select="dct"
-mpegvideo_select="blockdsp h264chroma hpeldsp idctdsp me_cmp mpeg_er videodsp"
-mpegvideoenc_select="me_cmp mpegvideo pixblockdsp qpeldsp"
-vc1dsp_select="h264chroma qpeldsp startcode"
-rdft_select="fft"
-
-# decoders / encoders
-
 # hardware accelerators
 dxva2_deps="dxva2api_h DXVA2_ConfigPictureDecode ole32"
 dxva2_extralibs="-luser32"
-
-h263_vaapi_hwaccel_deps="vaapi"
-h263_vaapi_hwaccel_select="h263_decoder"
-h264_dxva2_hwaccel_deps="dxva2"
-h264_dxva2_hwaccel_select="h264_decoder"
-h264_vaapi_hwaccel_deps="vaapi"
-h264_vaapi_hwaccel_select="h264_decoder"
-h264_vdpau_hwaccel_deps="vdpau"
-h264_vdpau_hwaccel_select="h264_decoder"
-hevc_dxva2_hwaccel_deps="dxva2 DXVA_PicParams_HEVC"
-hevc_dxva2_hwaccel_select="hevc_decoder"
-hevc_vaapi_hwaccel_deps="vaapi VAPictureParameterBufferHEVC"
-hevc_vaapi_hwaccel_select="hevc_decoder"
-hevc_vdpau_hwaccel_deps="vdpau VdpPictureInfoHEVC"
-hevc_vdpau_hwaccel_select="hevc_decoder"
-mpeg1_vdpau_hwaccel_deps="vdpau"
-mpeg1_vdpau_hwaccel_select="mpeg1video_decoder"
-mpeg2_dxva2_hwaccel_deps="dxva2"
-mpeg2_dxva2_hwaccel_select="mpeg2video_decoder"
-mpeg2_qsv_hwaccel_select="qsvdec_mpeg2"
-mpeg2_vaapi_hwaccel_deps="vaapi"
-mpeg2_vaapi_hwaccel_select="mpeg2video_decoder"
-mpeg2_vdpau_hwaccel_deps="vdpau"
-mpeg2_vdpau_hwaccel_select="mpeg2video_decoder"
-mpeg4_vaapi_hwaccel_deps="vaapi"
-mpeg4_vaapi_hwaccel_select="mpeg4_decoder"
-mpeg4_vdpau_hwaccel_deps="vdpau"
-mpeg4_vdpau_hwaccel_select="mpeg4_decoder"
-vc1_dxva2_hwaccel_deps="dxva2"
-vc1_dxva2_hwaccel_select="vc1_decoder"
-vc1_qsv_hwaccel_select="qsvdec_vc1"
-vc1_vaapi_hwaccel_deps="vaapi"
-vc1_vaapi_hwaccel_select="vc1_decoder"
-vc1_vdpau_hwaccel_deps="vdpau"
-vc1_vdpau_hwaccel_select="vc1_decoder"
-vp9_dxva2_hwaccel_deps="dxva2 DXVA_PicParams_VP9"
-vp9_dxva2_hwaccel_select="vp9_decoder"
-vp9_vaapi_hwaccel_deps="vaapi VADecPictureParameterBufferVP9_bit_depth"
-vp9_vaapi_hwaccel_select="vp9_decoder"
-wmv3_dxva2_hwaccel_select="vc1_dxva2_hwaccel"
-wmv3_vaapi_hwaccel_select="vc1_vaapi_hwaccel"
-wmv3_vdpau_hwaccel_select="vc1_vdpau_hwaccel"
-
-# hardware-accelerated codecs
-qsvdec_select="qsv"
-qsvenc_select="qsv"
-vaapi_encode_deps="vaapi"
-
-# parsers
-h264_parser_select="golomb h264dsp h264parse"
-hevc_parser_select="hevcparse"
-mpegaudio_parser_select="mpegaudioheader"
-mpegvideo_parser_select="mpegvideo"
-mpeg4video_parser_select="h263dsp mpegvideo qpeldsp"
-vc1_parser_select="vc1dsp"
-
-# bitstream_filters
-mjpeg2jpeg_bsf_select="jpegtables"
 
 # external libraries
 libmp3lame_encoder_deps="libmp3lame"
@@ -2356,252 +2197,8 @@ libx264_encoder_deps="libx264"
 libx264rgb_encoder_deps="libx264 x264_csp_bgr"
 libx264rgb_encoder_select="libx264_encoder"
 
-# demuxers / muxers
-ac3_demuxer_select="ac3_parser"
-aiff_muxer_select="iso_media"
-asf_demuxer_select="riffdec"
-asf_o_demuxer_select="riffdec"
-asf_muxer_select="riffenc"
-asf_stream_muxer_select="asf_muxer"
-avi_demuxer_select="iso_media riffdec exif"
-avi_muxer_select="riffenc"
-caf_demuxer_select="iso_media riffdec"
-caf_muxer_select="iso_media"
-dash_muxer_select="mp4_muxer"
-dash_demuxer_deps="libxml2"
-dirac_demuxer_select="dirac_parser"
-dts_demuxer_select="dca_parser"
-dtshd_demuxer_select="dca_parser"
-dv_demuxer_select="dvprofile"
-dv_muxer_select="dvprofile"
-dxa_demuxer_select="riffdec"
-eac3_demuxer_select="ac3_parser"
-f4v_muxer_select="mov_muxer"
-fifo_muxer_deps="threads"
-flac_demuxer_select="flac_parser"
-hds_muxer_select="flv_muxer"
-hls_muxer_select="mpegts_muxer"
-image2_alias_pix_demuxer_select="image2_demuxer"
-image2_brender_pix_demuxer_select="image2_demuxer"
-ipod_muxer_select="mov_muxer"
-ismv_muxer_select="mov_muxer"
-matroska_audio_muxer_select="matroska_muxer"
-matroska_demuxer_select="iso_media riffdec"
-matroska_muxer_select="iso_media riffenc"
-mmf_muxer_select="riffenc"
-mov_demuxer_select="iso_media riffdec"
-mov_demuxer_suggest="zlib"
-mov_muxer_select="iso_media riffenc rtpenc_chain"
-mp3_demuxer_select="mpegaudio_parser"
-mp3_muxer_select="mpegaudioheader"
-mp4_muxer_select="mov_muxer"
-mpegts_demuxer_select="iso_media"
-mpegts_muxer_select="adts_muxer latm_muxer"
-mpegtsraw_demuxer_select="mpegts_demuxer"
-mxf_d10_muxer_select="mxf_muxer"
-mxf_opatom_muxer_select="mxf_muxer"
-nut_muxer_select="riffenc"
-nuv_demuxer_select="riffdec"
-oga_muxer_select="ogg_muxer"
-ogg_demuxer_select="dirac_parse"
-ogv_muxer_select="ogg_muxer"
-psp_muxer_select="mov_muxer"
-rtp_demuxer_select="sdp_demuxer"
-rtp_muxer_select="golomb"
-rtpdec_select="asf_demuxer jpegtables mov_demuxer mpegts_demuxer rm_demuxer rtp_protocol srtp"
-rtsp_demuxer_select="http_protocol rtpdec"
-rtsp_muxer_select="rtp_muxer http_protocol rtp_protocol rtpenc_chain"
-sap_demuxer_select="sdp_demuxer"
-sap_muxer_select="rtp_muxer rtp_protocol rtpenc_chain"
-sdp_demuxer_select="rtpdec"
-smoothstreaming_muxer_select="ismv_muxer"
-spdif_muxer_select="aac_parser"
-spx_muxer_select="ogg_muxer"
-swf_demuxer_suggest="zlib"
-tak_demuxer_select="tak_parser"
-tg2_muxer_select="mov_muxer"
-tgp_muxer_select="mov_muxer"
-vobsub_demuxer_select="mpegps_demuxer"
-w64_demuxer_select="wav_demuxer"
-w64_muxer_select="wav_muxer"
-wav_demuxer_select="riffdec"
-wav_muxer_select="riffenc"
-webm_muxer_select="iso_media riffenc"
-webm_dash_manifest_demuxer_select="matroska_demuxer"
-wtv_demuxer_select="mpegts_demuxer riffdec"
-wtv_muxer_select="mpegts_muxer riffenc"
-xmv_demuxer_select="riffdec"
-xwma_demuxer_select="riffdec"
-
 # ffmpeg setting - value for image utils - 32 recommended, 1 used for now
 image_align=1
-
-# indevs / outdevs
-alsa_indev_deps="alsa"
-alsa_outdev_deps="alsa"
-bktr_indev_deps_any="dev_bktr_ioctl_bt848_h machine_ioctl_bt848_h dev_video_bktr_ioctl_bt848_h dev_ic_bt8xx_h"
-dshow_indev_deps="IBaseFilter"
-dshow_indev_extralibs="-lpsapi -lole32 -lstrmiids -luuid -loleaut32 -lshlwapi"
-fbdev_indev_deps="linux_fb_h"
-fbdev_outdev_deps="linux_fb_h"
-gdigrab_indev_deps="CreateDIBSection"
-gdigrab_indev_extralibs="-lgdi32"
-gdigrab_indev_select="bmp_decoder"
-iec61883_indev_deps="libiec61883"
-jack_indev_deps="jack"
-jack_indev_deps_any="sem_timedwait dispatch_dispatch_h"
-lavfi_indev_deps="avfilter"
-opengl_outdev_deps="opengl"
-oss_indev_deps_any="soundcard_h sys_soundcard_h"
-oss_outdev_deps_any="soundcard_h sys_soundcard_h"
-pulse_indev_deps="libpulse"
-pulse_outdev_deps="libpulse"
-vfwcap_indev_deps="vfw32 vfwcap_defines"
-
-# protocols
-async_protocol_deps="threads"
-bluray_protocol_deps="libbluray"
-ffrtmphttp_protocol_select="http_protocol"
-ftp_protocol_select="tcp_protocol"
-gopher_protocol_select="network"
-http_protocol_select="tcp_protocol"
-httpproxy_protocol_select="tcp_protocol"
-icecast_protocol_select="http_protocol"
-mmsh_protocol_select="http_protocol"
-mmst_protocol_select="network"
-rtmp_protocol_select="tcp_protocol"
-rtmpt_protocol_select="ffrtmphttp_protocol"
-rtp_protocol_select="udp_protocol"
-sctp_protocol_deps="struct_sctp_event_subscribe struct_msghdr_msg_flags"
-sctp_protocol_select="network"
-srtp_protocol_select="rtp_protocol srtp"
-tcp_protocol_select="network"
-udp_protocol_select="network"
-udplite_protocol_select="network"
-unix_protocol_deps="sys_un_h"
-unix_protocol_select="network"
-
-# filters
-afftfilt_filter_deps="avcodec"
-afftfilt_filter_select="fft"
-afir_filter_deps="avcodec"
-afir_filter_select="fft"
-amovie_filter_deps="avcodec avformat"
-aresample_filter_deps="swresample"
-ass_filter_deps="libass"
-atempo_filter_deps="avcodec"
-atempo_filter_select="rdft"
-blackframe_filter_deps="gpl"
-boxblur_filter_deps="gpl"
-colormatrix_filter_deps="gpl"
-cover_rect_filter_deps="avcodec avformat gpl"
-cropdetect_filter_deps="gpl"
-deinterlace_vaapi_filter_deps="vaapi"
-delogo_filter_deps="gpl"
-deshake_filter_select="pixelutils"
-drawtext_filter_deps="libfreetype"
-elbg_filter_deps="avcodec"
-eq_filter_deps="gpl"
-fftfilt_filter_deps="avcodec"
-fftfilt_filter_select="rdft"
-find_rect_filter_deps="avcodec avformat gpl"
-firequalizer_filter_deps="avcodec"
-firequalizer_filter_select="rdft"
-framerate_filter_select="pixelutils"
-fspp_filter_deps="gpl"
-geq_filter_deps="gpl"
-histeq_filter_deps="gpl"
-hqdn3d_filter_deps="gpl"
-interlace_filter_deps="gpl"
-kerndeint_filter_deps="gpl"
-mcdeint_filter_deps="avcodec gpl"
-movie_filter_deps="avcodec avformat"
-mpdecimate_filter_deps="gpl"
-mpdecimate_filter_select="pixelutils"
-mptestsrc_filter_deps="gpl"
-negate_filter_deps="lut_filter"
-nnedi_filter_deps="gpl"
-owdenoise_filter_deps="gpl"
-pan_filter_deps="swresample"
-perspective_filter_deps="gpl"
-phase_filter_deps="gpl"
-pp7_filter_deps="gpl"
-pp_filter_deps="gpl postproc"
-pullup_filter_deps="gpl"
-removelogo_filter_deps="avcodec avformat swscale"
-repeatfields_filter_deps="gpl"
-sab_filter_deps="gpl swscale"
-scale2ref_filter_deps="swscale"
-scale_filter_deps="swscale"
-select_filter_select="pixelutils"
-showcqt_filter_deps="avcodec avformat swscale"
-showcqt_filter_select="fft"
-showfreqs_filter_deps="avcodec"
-showfreqs_filter_select="fft"
-showspectrum_filter_deps="avcodec"
-showspectrum_filter_select="fft"
-showspectrumpic_filter_deps="avcodec"
-showspectrumpic_filter_select="fft"
-signature_filter_deps="gpl avcodec avformat"
-smartblur_filter_deps="gpl swscale"
-spectrumsynth_filter_deps="avcodec"
-spectrumsynth_filter_select="fft"
-spp_filter_deps="gpl avcodec"
-spp_filter_select="fft idctdsp fdctdsp me_cmp pixblockdsp"
-stereo3d_filter_deps="gpl"
-subtitles_filter_deps="avformat avcodec libass"
-super2xsai_filter_deps="gpl"
-pixfmts_super2xsai_test_deps="super2xsai_filter"
-tinterlace_filter_deps="gpl"
-tinterlace_merge_test_deps="tinterlace_filter"
-tinterlace_pad_test_deps="tinterlace_filter"
-tonemap_filter_deps="const_nan"
-uspp_filter_deps="gpl avcodec"
-vaguedenoiser_filter_deps="gpl"
-zoompan_filter_deps="swscale"
-scale_vaapi_filter_deps="vaapi VAProcPipelineParameterBuffer"
-
-# examples
-avio_dir_cmd_deps="avformat avutil"
-avio_reading_deps="avformat avcodec avutil"
-decode_audio_example_deps="avcodec avutil"
-decode_video_example_deps="avcodec avutil"
-demuxing_decoding_example_deps="avcodec avformat avutil"
-encode_audio_example_deps="avcodec avutil"
-encode_video_example_deps="avcodec avutil"
-extract_mvs_example_deps="avcodec avformat avutil"
-filter_audio_example_deps="avfilter avutil"
-filtering_audio_example_deps="avfilter avcodec avformat avutil"
-filtering_video_example_deps="avfilter avcodec avformat avutil"
-http_multiclient_example_deps="avformat avutil fork"
-hw_decode_example_deps="avcodec avformat avutil"
-metadata_example_deps="avformat avutil"
-muxing_example_deps="avcodec avformat avutil swscale"
-remuxing_example_deps="avcodec avformat avutil"
-resampling_audio_example_deps="avutil swresample"
-scaling_video_example_deps="avutil swscale"
-transcode_aac_example_deps="avcodec avformat swresample"
-transcoding_example_deps="avfilter avcodec avformat avutil"
-
-# libraries, in linking order
-avcodec_deps="avutil"
-avcodec_select="null_bsf"
-avdevice_deps="avformat avcodec avutil"
-avfilter_deps="avutil"
-avformat_deps="avcodec avutil"
-avformat_suggest="network"
-postproc_deps="avutil gpl"
-swresample_deps="avutil"
-swscale_deps="avutil"
-
-# programs
-ffmpeg_deps="avcodec avfilter avformat swresample"
-ffmpeg_select="aformat_filter anull_filter atrim_filter format_filter
-               null_filter
-               trim_filter"
-ffprobe_deps="avcodec avformat"
-ffserver_deps="avformat fork sarestart"
-ffserver_select="ffm_muxer rtp_protocol rtsp_demuxer"
 
 # mythtv dependencies
 audio_oss_deps_any="soundcard_h sys_soundcard_h"
@@ -2611,7 +2208,6 @@ hdhomerun_deps="backend"
 satip_deps="backend"
 vbox_deps="backend"
 ceton_deps="backend"
-mpegtsraw_demuxer_deps="merge_libavformat_mpegts_c"
 mythtranscode_deps="backend frontend"
 opengl_deps_any="agl_h GL_gl_h EGL_egl_h GLES2_gl2_h darwin windows x11"
 opengles_deps="GLES2_gl2_h"
@@ -2881,39 +2477,12 @@ find_things(){
     sed -n "s/^[^#]*$pattern.*([^,]*, *\([^,]*\)\(,.*\)*).*/\1_$thing/p" "$file"
 }
 
-ENCODER_LIST=$(find_things  encoder  ENC      external/FFmpeg/libavcodec/allcodecs.c)
-DECODER_LIST=$(find_things  decoder  DEC      external/FFmpeg/libavcodec/allcodecs.c)
-HWACCEL_LIST=$(find_things  hwaccel  HWACCEL  external/FFmpeg/libavcodec/allcodecs.c)
-PARSER_LIST=$(find_things   parser   PARSER   external/FFmpeg/libavcodec/allcodecs.c)
-MUXER_LIST=$(find_things    muxer    _MUX     external/FFmpeg/libavformat/allformats.c)
-DEMUXER_LIST=$(find_things  demuxer  DEMUX    external/FFmpeg/libavformat/allformats.c)
-OUTDEV_LIST=$(find_things   outdev   OUTDEV   external/FFmpeg/libavdevice/alldevices.c)
-INDEV_LIST=$(find_things    indev    _IN      external/FFmpeg/libavdevice/alldevices.c)
-FILTER_LIST=$(find_things   filter   FILTER   external/FFmpeg/libavfilter/allfilters.c)
-
 find_things_extern(){
     thing=$1
     pattern=$2
     file=$source_path/$3
     sed -n "s/^[^#]*extern.*$pattern *ff_\([^ ]*\)_$thing;/\1_$thing/p" "$file"
 }
-
-BSF_LIST=$(find_things_extern bsf AVBitStreamFilter external/FFmpeg/libavcodec/bitstream_filters.c)
-PROTOCOL_LIST=$(find_things_extern protocol URLProtocol external/FFmpeg/libavformat/protocols.c)
-
-ALL_COMPONENTS="
-    $BSF_LIST
-    $DECODER_LIST
-    $DEMUXER_LIST
-    $ENCODER_LIST
-    $FILTER_LIST
-    $HWACCEL_LIST
-    $INDEV_LIST
-    $MUXER_LIST
-    $OUTDEV_LIST
-    $PARSER_LIST
-    $PROTOCOL_LIST
-"
 
 for n in $COMPONENT_LIST; do
     v=$(toupper ${n%s})_LIST
@@ -3883,6 +3452,9 @@ if $cxx -v 2>&1 | grep -qi ^gcc; then
     cxx_type=gxx
     gxx_version=$($cxx -dumpversion)
     gxx_major=$(echo $gxx_version | sed "s/\([0-9]*\).*/\\1/")
+    if test $gxx_major -lt 8; then
+        die "MythTV requires GCC 8 or better."
+    fi
 elif $cxx --version 2>/dev/null | grep -q Intel; then
     cxx_type=icpc
     gxx_version="AV_STRINGIFY(__INTEL_COMPILER)"
@@ -4804,7 +4376,6 @@ case $target_os in
         enable  windows
         disable x11
         disable qtdbus
-        disable ffserver
         ###### Standard ffmpeg configure stuff follows:
         if test $target_os = "mingw32ce"; then
             disable network
@@ -4900,8 +4471,6 @@ case $target_os in
         enabled shared && ! enabled small && check_cmd $windres --version && enable gnu_windres
         ;;
     *-dos|freedos|opendos)
-        disable ffserver
-        disable $INDEV_LIST $OUTDEV_LIST
         network_extralibs="-lsocket"
         objformat="coff"
         enable dos_paths
@@ -5655,7 +5224,7 @@ check_builtin sem_timedwait semaphore.h "sem_t *s; sem_init(s,0,0); sem_timedwai
 check_builtin sync_val_compare_and_swap "" "int *ptr; int oldval, newval; __sync_val_compare_and_swap(ptr, oldval, newval)"
 check_builtin gmtime_r time.h "time_t *time; struct tm *tm; gmtime_r(time, tm)"
 check_builtin localtime_r time.h "time_t *time; struct tm *tm; localtime_r(time, tm)"
-check_builtin x264_csp_bgr "stdint.h x264.h" "X264_CSP_BGR"
+check_builtin x264_csp_bgr x264.h X264_CSP_BGR
 
 case "$custom_allocator" in
     jemalloc)
@@ -5866,7 +5435,7 @@ enabled libudev && check_lib udev libudev.h udev_new -ludev || disable libudev
 
 # libexiv2
 if enabled system_libexiv2 ; then
-    if $(pkg-config --atleast-version="0.27.99" exiv2); then
+    if $(pkg-config --atleast-version="0.99" exiv2); then
         use_pkg_config exiv2 exiv2 exiv2/exiv2.hpp versionNumber
     elif [ $target_os != "android" ] ; then
         disable system_libexiv2
@@ -5913,15 +5482,12 @@ if enabled system_libbluray; then
                             die "ERROR: can not find libbluray."
                         fi
                         ;;
-                    ubuntu)
-                        case $VERSION_ID in
-                            17*|18*|19*|2*)
-                                die "ERROR: can not find libbluray."
-                                ;;
-                        esac
-                        ;;
-                    debian)
-                        if test $VERSION_ID -gt 8; then
+                    rhel)
+                        # RHEL8 doesn't ship libbluray-devel because of
+                        # some issue between RedHat and EPEL.
+                        #
+                        # Allow the internel libbluray to compile.
+                        if test ${VERSION_ID%\.*} -gt 8; then
                             die "ERROR: can not find libbluray."
                         fi
                         ;;
@@ -5970,8 +5536,9 @@ if enabled bdjava; then
 
         javac_version=`"${JAVAC}" -version 2>&1 | head -n 1`
         
-        echo "${javac_version}" | grep -E -q '^javac\ (9|1[0-1])' && java_code_version=1.6
-        echo "${javac_version}" | grep -E -q '^javac\ (1[2-9])' && java_code_version=1.7
+        echo "${javac_version}" | grep -E -q '^javac (9|1[0-1])' && java_code_version=1.6
+        echo "${javac_version}" | grep -E -q '^javac (1[2-9])' && java_code_version=1.7
+        echo "${javac_version}" | grep -E -q '^javac (2.*)' && java_code_version=1.7
     fi
 fi
 
@@ -6010,8 +5577,8 @@ enabled libmp3lame        && require "libmp3lame >= 3.98.3" lame/lame.h lame_set
 enabled libpulse          && require_pkg_config libpulse libpulse pulse/pulseaudio.h pa_context_new
 enabled libv4l2           && require_pkg_config libv4l2 libv4l2 libv4l2.h v4l2_ioctl
 
-enabled libx264           && { use_pkg_config libx264 x264 "stdint.h x264.h" x264_encoder_encode ||
-                               { require libx264 "stdint.h x264.h" x264_encoder_encode -lx264 &&
+enabled libx264           && { use_pkg_config libx264 x264 x264.h x264_encoder_encode ||
+                               { require libx264 x264.h x264_encoder_encode -lx264 &&
                                  warn "using libx264 without pkg-config"; } } &&
                              require_cpp_condition x264.h "X264_BUILD >= 118" &&
                              { check_cpp_condition x264.h "X264_MPEG2" &&
@@ -6023,7 +5590,7 @@ enabled drm && check_cpp_condition drm_fourcc.h 'defined(DRM_FORMAT_MOD_LINEAR)'
 enabled drm && check_type drm_mode.h "struct hdr_metadata_infoframe"
 
 if enabled libmpeg2external; then
-    check_lib libmpeg2external mpeg2dec/mpeg2.h mpeg2_init -lmpeg2 || disable libmpeg2external
+    check_lib libmpeg2external "stdint.h mpeg2dec/mpeg2.h" mpeg2_init -lmpeg2 || disable libmpeg2external
     if disabled libmpeg2external; then
         die "Warning! No suitable external libmpeg2 found, use internal copy."
     fi
@@ -6042,19 +5609,11 @@ if enabled hdhomerun; then
         disable hdhomerun
     fi
 
-    # The switch from v1 to v2 occurred between the 20150615 and 20150826 releases.
-    if check_lib libhdhomerun ${HDHOMERUN_PREFIX}hdhomerun.h hdhomerun_discover_find_devices -lhdhomerun; then
-        HDHOMERUN_V2=no
-    elif check_lib libhdhomerun ${HDHOMERUN_PREFIX}hdhomerun.h hdhomerun_discover_find_devices_v2 -lhdhomerun; then
-        HDHOMERUN_V2=yes
+    # Figure out the API version
+    if check_lib libhdhomerun ${HDHOMERUN_PREFIX}hdhomerun.h hdhomerun_discover2_find_devices_broadcast -lhdhomerun; then
+        HDHOMERUN_VERSION=20221010
     else
-        disable hdhomerun
-    fi
-
-    if check_lib libhdhomerun ${HDHOMERUN_PREFIX}hdhomerun.h hdhomerun_device_selector_load_from_str -lhdhomerun ; then
-        HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR=no
-    else
-        HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR=yes
+        HDHOMERUN_VERSION=0
     fi
 fi
 
@@ -6936,18 +6495,6 @@ if enabled gxx; then
     # produces files that contain "useless" casts.
     #check_cxxflags -Wuseless-cast
 
-    # Ubuntu 16.04 uses gcc 5.4.0 which complains about '[[clang::fallthrough]]'
-    gxx_major_version=$(echo $gxx_version | sed -e 's/\([[:digit:]]\{1,\}\).*/\1/')
-    if test $gxx_major_version -lt 7; then
-        if enabled arm; then
-            check_cxxflags -Wno-psabi
-        fi
-        check_cxxflags -Wno-attributes
-    fi
-    # GCC on centos7 doesn't handle the '{}' initializer properly.
-    if test $gxx_major_version -lt 5; then
-        check_cxxflags -Wno-missing-field-initializers
-    fi
     check_cxxflags -funit-at-a-time
     # Don't complain about over-aligned types
     check_cxxflags -faligned-new
@@ -7012,12 +6559,13 @@ fi
 
 # Check for python dependencies
 if enabled bindings_python; then
-    check_python               || disable_bindings_python "Python 3.6 or greater"
+    check_python "(3,8,0)"     || disable_bindings_python "Python 3.8 or greater"
     check_py_lib MySQLdb       || disable_bindings_python "MySQLdb"
     check_py_lib lxml          || disable_bindings_python "lxml"
     check_py_lib requests      || disable_bindings_python "requests"
     check_py_lib simplejson    || disable_bindings_python "simplejson"
     check_py_lib future        || disable_bindings_python "future"
+    check_python "(3,11,1)" && check_py_lib wheel && check_py_lib_version pip "(23,0,1)" && USE_PYTHON_PIP="yes"
 fi
 
 # Check for perl dependencies
@@ -7077,7 +6625,6 @@ enabled asm || { arch=c; disable $ARCH_LIST $ARCH_EXT_LIST; }
 check_deps $CONFIG_LIST       \
            $CONFIG_EXTRA      \
            $HAVE_LIST         \
-           $ALL_COMPONENTS    \
            $MYTHTV_LIST       \
            $MYTHTV_CONFIG_LIST \
            $MYTHTV_HAVE_LIST  \
@@ -7109,8 +6656,6 @@ merge_deps() {
         done
     done
 }
-
-merge_deps libavfilter $FILTER_LIST
 
 map 'enabled $v && intrinsics=${v#intrinsics_}' $INTRINSICS_LIST
 
@@ -7144,51 +6689,6 @@ for lib in $AUTODETECT_LIBS; do
 done
 
 enabled zlib && add_cppflags -DZLIB_CONST
-
-# conditional library dependencies, in linking order
-enabled afftfilt_filter     && prepend avfilter_deps "avcodec"
-enabled afir_filter         && prepend avfilter_deps "avcodec"
-enabled amovie_filter       && prepend avfilter_deps "avformat avcodec"
-enabled aresample_filter    && prepend avfilter_deps "swresample"
-enabled atempo_filter       && prepend avfilter_deps "avcodec"
-enabled cover_rect_filter   && prepend avfilter_deps "avformat avcodec"
-enabled ebur128_filter && enabled swresample && prepend avfilter_deps "swresample"
-enabled elbg_filter         && prepend avfilter_deps "avcodec"
-enabled fftfilt_filter      && prepend avfilter_deps "avcodec"
-enabled find_rect_filter    && prepend avfilter_deps "avformat avcodec"
-enabled firequalizer_filter && prepend avfilter_deps "avcodec"
-enabled mcdeint_filter      && prepend avfilter_deps "avcodec"
-enabled movie_filter    && prepend avfilter_deps "avformat avcodec"
-enabled pan_filter          && prepend avfilter_deps "swresample"
-enabled pp_filter           && prepend avfilter_deps "postproc"
-enabled removelogo_filter   && prepend avfilter_deps "avformat avcodec swscale"
-enabled sab_filter          && prepend avfilter_deps "swscale"
-enabled scale_filter    && prepend avfilter_deps "swscale"
-enabled scale2ref_filter    && prepend avfilter_deps "swscale"
-enabled showcqt_filter      && prepend avfilter_deps "avformat avcodec swscale"
-enabled showfreqs_filter    && prepend avfilter_deps "avcodec"
-enabled showspectrum_filter && prepend avfilter_deps "avcodec"
-enabled signature_filter    && prepend avfilter_deps "avcodec avformat"
-enabled smartblur_filter    && prepend avfilter_deps "swscale"
-enabled spectrumsynth_filter && prepend avfilter_deps "avcodec"
-enabled spp_filter          && prepend avfilter_deps "avcodec"
-enabled subtitles_filter    && prepend avfilter_deps "avformat avcodec"
-enabled uspp_filter         && prepend avfilter_deps "avcodec"
-enabled zoompan_filter      && prepend avfilter_deps "swscale"
-
-enabled lavfi_indev         && prepend avdevice_deps "avfilter"
-
-expand_deps(){
-    lib_deps=${1}_deps
-    eval "deps=\$$lib_deps"
-    append $lib_deps $(map 'eval echo \$${v}_deps' $deps)
-    unique $lib_deps
-}
-
-#we have to remove gpl from the deps here as some code assumes all lib deps are libs
-postproc_deps="$(filter_out 'gpl' $postproc_deps)"
-
-map 'expand_deps $v' $LIBRARY_LIST
 
 if enabled x86 && (disabled mmx && ! enabled disable_mmx_for_debugging); then
     die "ERROR: MMX disabled on x86, MythTV will be very slow.\n\tDisable this check with --enable-disable-mmx-for-debugging"
@@ -7590,6 +7090,8 @@ echo "   $0 $MYTHTV_CONFIGURATION" >> config.log
 
 cat > $TMPMAK <<EOF
 # Automatically generated by configure - do not modify!
+MYTHTV_VERSION_MAJMIN=$MYTHTV_VERSION_MAJMIN
+MYTHTV_LIBVERSION=$MYTHTV_LIBVERSION
 QT_MIN_VERSION_STR=$QT_MIN_VERSION_STR
 QT_MIN_VERSION_HEX=$QT_MIN_VERSION_HEX
 QT_MIN_VERSION=$QT_MIN_VERSION
@@ -7671,7 +7173,6 @@ CXXPPFLAGS=$CXXPPFLAGS
 ECXXFLAGS=$ECXXFLAGS
 DOXYGEN=$doxygen
 LDFLAGS=$LDFLAGS
-LDFLAGS-ffserver=$FFSERVERLDFLAGS
 LDEXEFLAGS=$LDEXEFLAGS
 LDLIBFLAGS=$LDLIBFLAGS
 ASMSTRIPFLAGS=$ASMSTRIPFLAGS
@@ -7778,7 +7279,11 @@ if enabled darwin_da; then
 fi
 
 if enabled freetype2; then
-    echo "FREETYPE_CFLAGS=$($pkg_config --cflags $pkg_config_flags freetype2)" >> $TMPMAK
+    if test $target_os = "freebsd"; then
+        echo "FREETYPE_CFLAGS=$($pkg_config --cflags $pkg_config_flags freetype2 | sed -E -e 's#-I/usr/local/include ##g' -e 's#-I/usr/local/include\$##g')" >> $TMPMAK
+    else
+        echo "FREETYPE_CFLAGS=$($pkg_config --cflags $pkg_config_flags freetype2)" >> $TMPMAK
+    fi
     echo "FREETYPE_LIBS=$($pkg_config --libs $pkg_config_flags freetype2)" >> $TMPMAK
 fi
 
@@ -7806,7 +7311,7 @@ cat > $TMPH <<EOF
 #ifndef MYTHTV_CONFIG_H
 #define MYTHTV_CONFIG_H
 
-/* NOLINTBEGIN(cppcoreguidelines-macro-usage) */
+/* NOLINTBEGIN(modernize-macro-to-enum) */
 
 #define QT_MIN_VERSION_STR "$QT_MIN_VERSION_STR"
 #define QT_MIN_VERSION_HEX $QT_MIN_VERSION_HEX
@@ -7818,10 +7323,6 @@ cat > $TMPH <<EOF
 #define BUILDSUF "$build_suffix"
 #define SLIBSUF "$SLIBSUF"
 #define HAVE_MMX2 HAVE_MMXEXT
-#define SWS_MAX_FILTER_SIZE $sws_max_filter_size
-#define ASMALIGN(ZEROBITS) ".p2align " #ZEROBITS "\\n\\t"
-#define SIZEOF_INT $_sizeof_int
-#define SIZEOF_LONG $_sizeof_long
 #define JDK_HOME "$JDK_HOME"
 #define JAVA_ARCH "$java_arch"
 #define IMAGE_ALIGN $image_align
@@ -7855,7 +7356,6 @@ print_config HAVE_   "$config_files" $HAVE_LIST
 print_config HAVE_   "$config_files" $MYTHTV_HAVE_LIST
 print_config CONFIG_ "$config_files" $CONFIG_LIST       \
                                      $CONFIG_EXTRA      \
-                                     $ALL_COMPONENTS    \
                                      $MYTHTV_LIST       \
                                      $MYTHTV_CONFIG_LIST \
 
@@ -7975,17 +7475,20 @@ if test x"$CONFIG_INCLUDEPATH" != x"" ; then
   echo "CONFIG_INCLUDEPATH=$CONFIG_INCLUDEPATH" >> $TMPMAK
 fi
 
+if test x"$USE_PYTHON_PIP" != x"" ; then
+  echo "USE_PYTHON_PIP=$USE_PYTHON_PIP" >> $TMPMAK
+fi
+
 cat >> $TMPH <<EOF
 
-/* NOLINTEND(cppcoreguidelines-macro-usage) */
+/* NOLINTEND(modernize-macro-to-enum) */
 
 #endif /* MYTHTV_CONFIG_H */
 EOF
 
 enabled hdhomerun && cat >> $TMPMAK <<EOF
 HDHOMERUN_PREFIX=$HDHOMERUN_PREFIX
-HDHOMERUN_V2=$HDHOMERUN_V2
-HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR = $HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR
+HDHOMERUN_VERSION=$HDHOMERUN_VERSION
 EOF
 
 #echo "endif # FFMPEG_CONFIG_MAK" >> $TMPMAK
@@ -8022,6 +7525,46 @@ if [ -e libs/libmyth/mythconfig.h ] ; then
     rm -f libs/libmyth/mythconfig.h
 fi
 
+#
+# More file generation
+#
+
+echo "Creating settings2.pro"
+sed -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
+    -e "s/@MYTHTV_LIBVERSION@/${MYTHTV_LIBVERSION}/g" \
+    settings2.pro.in > $TMPPRO
+cp_if_changed $TMPPRO settings2.pro
+
+echo "Creating libs/libmythbase/mythversion.h"
+sed -e "s/@MYTHTV_BINARY_VERSION@/${MYTHTV_BINARY_VERSION}/g" \
+    -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
+    libs/libmythbase/mythversion.h.in > $TMPH
+cp_if_changed $TMPH libs/libmythbase/mythversion.h
+
+echo "Creating bindings/perl/Makefile.PL"
+sed -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
+    bindings/perl/Makefile.PL.in > $TMPPRO
+cp_if_changed $TMPPRO bindings/perl/Makefile.PL
+
+echo "Creating bindings/python/setup.cfg"
+sed -e "s/@MYTHTV_VERSION_MAJMIN@/${MYTHTV_VERSION_MAJMIN}/g" \
+    bindings/python/setup.cfg.in > $TMPPRO
+cp_if_changed $TMPPRO bindings/python/setup.cfg
+
+echo "Creating bindings/python/MythTV/_versions.py"
+sed -e "s/@MYTHTV_PYTHON_OWN_VERSION@/${MYTHTV_PYTHON_OWN_VERSION}/g" \
+    -e "s!@MYTHTV_INSTALL_PREFIX@!${prefix}!g" \
+    bindings/python/MythTV/_versions.py.in > $TMPPRO
+cp_if_changed $TMPPRO bindings/python/MythTV/_versions.py
+
+echo "Creating bindings/python/MythTV/services_api/mythversions.py"
+sed -e "s/@MYTHTV_PYTHON_VERSION_LIST@/${MYTHTV_PYTHON_VERSION_LIST}/g" \
+    bindings/python/MythTV/services_api/mythversions.py.in > $TMPPRO
+cp_if_changed $TMPPRO bindings/python/MythTV/services_api/mythversions.py
+
+#
+# Configure subdirs
+#
 if ! enabled system_libudfread; then
     echo "Configuring libudfread..."
     (cd external/libudfread ; \

@@ -364,6 +364,14 @@ bool ClassicCommDetector::go()
         LOG(VB_GENERAL, LOG_INFO, "Finding Logo");
 
         m_logoInfoAvailable = m_logoDetector->searchForLogo(m_player);
+        if (!m_logoInfoAvailable)
+        {
+            if (COMM_DETECT_LOGO == m_commDetectMethod)
+            {
+                LOG(VB_COMMFLAG, LOG_WARNING, "No logo found, abort flagging.");
+                return false;
+            }
+        }
 
         if (m_showProgress)
         {
@@ -685,10 +693,8 @@ void ClassicCommDetector::GetCommercialBreakList(frm_dir_map_t &marks)
     LOG(VB_COMMFLAG, LOG_INFO, "Final Commercial Break Map");
 }
 
-void ClassicCommDetector::recordingFinished(long long totalFileSize)
+void ClassicCommDetector::recordingFinished([[maybe_unused]] long long totalFileSize)
 {
-    (void)totalFileSize;
-
     m_stillRecording = false;
 }
 

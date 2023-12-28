@@ -433,10 +433,9 @@ namespace
             m_item->DisplayState(value, name);
         }
 
-        void handleImage(const QString &name, const QString &filename) override // CopyMetadataDestination
+        void handleImage([[maybe_unused]] const QString &name,
+                         [[maybe_unused]] const QString &filename) override // CopyMetadataDestination
         {
-            (void) name;
-            (void) filename;
         }
 
       private:
@@ -3002,20 +3001,17 @@ namespace
     {
         explicit SimpleCollect(QStringList &fileList) : m_fileList(fileList) {}
 
-        DirectoryHandler *newDir(const QString &dirName,
-                const QString &fqDirName) override // DirectoryHandler
+        DirectoryHandler *newDir([[maybe_unused]] const QString &dirName,
+                [[maybe_unused]] const QString &fqDirName) override // DirectoryHandler
         {
-            (void) dirName;
-            (void) fqDirName;
             return this;
         }
 
-        void handleFile(const QString &fileName, const QString &fqFileName,
-                const QString &extension, const QString &host) override // DirectoryHandler
+        void handleFile([[maybe_unused]] const QString &fileName,
+                        const QString &fqFileName,
+                        [[maybe_unused]] const QString &extension,
+                        [[maybe_unused]] const QString &host) override // DirectoryHandler
         {
-            (void) fileName;
-            (void) extension;
-            (void) host;
             m_fileList.push_back(fqFileName);
         }
 
@@ -3645,8 +3641,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
         QString cn = name.trimmed();
         if (!cn.isEmpty())
         {
-            cast.push_back(VideoMetadata::cast_list::
-                        value_type(-1, cn));
+            cast.emplace_back(-1, cn);
         }
     }
 
@@ -3661,8 +3656,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
         QString genre_name = name.trimmed();
         if (!genre_name.isEmpty())
         {
-            video_genres.push_back(
-                    VideoMetadata::genre_list::value_type(-1, genre_name));
+            video_genres.emplace_back(-1, genre_name);
         }
     }
 
@@ -3677,9 +3671,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
         QString country_name = name.trimmed();
         if (!country_name.isEmpty())
         {
-            video_countries.push_back(
-                    VideoMetadata::country_list::value_type(-1,
-                            country_name));
+            video_countries.emplace_back(-1, country_name);
         }
     }
 

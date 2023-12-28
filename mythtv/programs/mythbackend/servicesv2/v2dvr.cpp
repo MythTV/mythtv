@@ -23,6 +23,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+// Qt
+#include <QJsonArray>
+#include <QJsonDocument>
+
 // MythTV
 #include "libmythbase/http/mythhttpmetaservice.h"
 #include "libmythbase/mythcorecontext.h"
@@ -1046,7 +1050,7 @@ V2MarkupList* V2Dvr::GetRecordedMarkup ( int RecordedId )
         else
             pMarkup->setData(QString::number(entry.data));
     }
-    for (auto entry : qAsConst(mapSeek))
+    for (const auto& entry : qAsConst(mapSeek))
     {
         V2Markup *pSeek = pMarkupList->AddNewSeek();
         QString typestr = toString(static_cast<MarkTypes>(entry.type));
@@ -1139,7 +1143,7 @@ V2InputList* V2Dvr::GetInputList()
 {
     auto *pList = new V2InputList();
 
-    QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
+    QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo(false);
     for (const auto & inputInfo : qAsConst(inputInfoList))
     {
         V2Input *input = pList->AddNewInput();
@@ -1344,8 +1348,22 @@ V2ProgramList* V2Dvr::GetUpcomingList( int  nStartIndex,
                                         int  nCount,
                                         bool bShowAll,
                                         int  nRecordId,
-                                        int  nRecStatus )
+                                        const QString & RecStatus )
 {
+    int nRecStatus = 0;
+    if (!RecStatus.isEmpty())
+    {
+        // Handle enum name
+        QMetaEnum meta = QMetaEnum::fromType<RecStatus::Type>();
+        bool ok {false};
+        nRecStatus = meta.keyToValue(RecStatus.toLocal8Bit(), &ok);
+        // if enum name not valid try for int nRecStatus
+        if (!ok)
+            nRecStatus = RecStatus.toInt(&ok);
+        // if still not valid use 99999 to trigger an "unknown" response
+        if (!ok)
+            nRecStatus = 99999;
+    }
     auto *pPrograms = new V2ProgramList();
     int size = FillUpcomingList(pPrograms->GetPrograms(), pPrograms,
                                          nStartIndex,
@@ -1407,7 +1425,8 @@ uint V2Dvr::AddRecordSchedule   (
                                bool      bAutoUserJob2,
                                bool      bAutoUserJob3,
                                bool      bAutoUserJob4,
-                               int       nTranscoder)
+                               int       nTranscoder,
+                               const QString&   AutoExtend)
 {
     QDateTime recstartts = StartTime.toUTC();
     QDateTime recendts = EndTime.toUTC();
@@ -1504,6 +1523,7 @@ uint V2Dvr::AddRecordSchedule   (
     rule.m_autoUserJob4 = bAutoUserJob4;
 
     rule.m_transcoder = nTranscoder;
+    rule.m_autoExtend = autoExtendTypeFromString(AutoExtend);
 
     rule.m_lastRecorded = lastrects;
 
@@ -1559,7 +1579,8 @@ bool V2Dvr::UpdateRecordSchedule ( uint      nRecordId,
                                  bool      bAutoUserJob2,
                                  bool      bAutoUserJob3,
                                  bool      bAutoUserJob4,
-                                 int       nTranscoder)
+                                 int       nTranscoder,
+                                 const QString&   AutoExtend)
 {
     if (nRecordId == 0 )
         throw QString("Record ID is invalid.");
@@ -1675,6 +1696,9 @@ bool V2Dvr::UpdateRecordSchedule ( uint      nRecordId,
     pRule.m_autoUserJob4 = bAutoUserJob4;
 
     pRule.m_transcoder = nTranscoder;
+
+    if (!AutoExtend.isEmpty())
+        pRule.m_autoExtend = autoExtendTypeFromString(AutoExtend);
 
     QString msg;
     if (!pRule.IsValid(msg))
@@ -1904,18 +1928,36 @@ int V2Dvr::RecordedIdForPathname(const QString & pathname)
     return recordedid;
 }
 
-QString V2Dvr::RecStatusToString(int RecStatus)
+QString V2Dvr::RecStatusToString(const QString & RecStatus)
 {
-    auto type = static_cast<RecStatus::Type>(RecStatus);
+    // Handle enum name
+    QMetaEnum meta = QMetaEnum::fromType<RecStatus::Type>();
+    bool ok {false};
+    int value = meta.keyToValue(RecStatus.toLocal8Bit(), &ok);
+    // if enum name not valid try for int value
+    if (!ok)
+        value = RecStatus.toInt(&ok);
+    // if still not valid use 0 to trigger an "unknown" response
+    if (!ok)
+        value = 0;
+    auto type = static_cast<RecStatus::Type>(value);
     return RecStatus::toString(type);
 }
 
-QString V2Dvr::RecStatusToDescription(int RecStatus, int recType,
+QString V2Dvr::RecStatusToDescription(const QString &  RecStatus, int recType,
                                     const QDateTime &StartTime)
 {
-    //if (!StartTime.isValid())
-    //    throw QString("StartTime appears invalid.");
-    auto recstatusType = static_cast<RecStatus::Type>(RecStatus);
+    // Handle enum name
+    QMetaEnum meta = QMetaEnum::fromType<RecStatus::Type>();
+    bool ok {false};
+    int value = meta.keyToValue(RecStatus.toLocal8Bit(), &ok);
+    // if enum name not valid try for int value
+    if (!ok)
+        value = RecStatus.toInt(&ok);
+    // if still not valid use 0 to trigger an "unknown" response
+    if (!ok)
+        value = 0;
+    auto recstatusType = static_cast<RecStatus::Type>(value);
     auto recordingType = static_cast<RecordingType>(recType);
     return RecStatus::toDescription(recstatusType, recordingType, StartTime);
 }
@@ -2089,7 +2131,8 @@ bool V2Dvr::UpdateRecordedMetadata ( uint             RecordedId,
                                      uint             Stars,
                                      const QString   &SubTitle,
                                      const QString   &Title,
-                                     bool             Watched )
+                                     bool             Watched,
+                                     const QString   &RecGroup )
 
 {
     if (m_request->m_queries.size() < 2 || !HAS_PARAMv2("RecordedId"))
@@ -2182,7 +2225,8 @@ bool V2Dvr::UpdateRecordedMetadata ( uint             RecordedId,
 
     if (HAS_PARAMv2("OriginalAirDate"))
     {
-        if (!OriginalAirDate.isValid())
+        // OriginalAirDate can be set to null by submitting value 'null' in json
+        if (!OriginalAirDate.isValid() && !OriginalAirDate.isNull())
         {
             LOG(VB_GENERAL, LOG_ERR, "Need valid OriginalAirDate yyyy-mm-dd.");
             return false;
@@ -2205,6 +2249,9 @@ bool V2Dvr::UpdateRecordedMetadata ( uint             RecordedId,
 
     if (HAS_PARAMv2("Watched"))
         pi.SaveWatched(Watched);
+
+    if (HAS_PARAMv2("RecGroup"))
+        ri.ApplyRecordRecGroupChange(RecGroup);
 
     return true;
 }

@@ -560,11 +560,9 @@ void EditMetadataDialog::updateArtistImage(void)
 {
     QString artist =  m_artistEdit->GetText();
 
-    QString file;
-
     if (m_artistIcon)
     {
-        file = findIcon("artist", artist.toLower(), true);
+        QString file = findIcon("artist", artist.toLower(), true);
         if (!file.isEmpty())
         {
             m_artistIcon->SetFilename(file);
@@ -628,11 +626,9 @@ void EditMetadataDialog::setAlbum(const QString& album)
 
 void EditMetadataDialog::updateAlbumImage(void)
 {
-    QString file;
-
     if (m_albumIcon)
     {
-        file = s_metadata->getAlbumArtFile();
+        QString file = s_metadata->getAlbumArtFile();
         if (!file.isEmpty())
         {
             m_albumIcon->SetFilename(file);
@@ -680,11 +676,10 @@ void EditMetadataDialog::setGenre(const QString& genre)
 void EditMetadataDialog::updateGenreImage(void)
 {
     QString genre = m_genreEdit->GetText();
-    QString file;
 
     if (m_genreIcon)
     {
-        file = findIcon("genre", genre.toLower(), true);
+        QString file = findIcon("genre", genre.toLower(), true);
         if (!file.isEmpty())
         {
             m_genreIcon->SetFilename(file);
@@ -780,7 +775,7 @@ void EditMetadataDialog::customEvent(QEvent *event)
             }
         }
     }
-    else if (event->type() == MythEvent::MythEventMessage)
+    else if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
@@ -1172,7 +1167,7 @@ void EditAlbumartDialog::customEvent(QEvent *event)
             showTypeMenu(false);
         }
     }
-    else if (event->type() == MythEvent::MythEventMessage)
+    else if (event->type() == MythEvent::kMythEventMessage)
     {
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)

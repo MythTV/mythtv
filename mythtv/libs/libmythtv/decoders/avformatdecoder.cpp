@@ -29,7 +29,12 @@ extern "C" {
 extern "C" {
 #include "libavcodec/jni.h"
 }
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QtAndroidExtras>
+#else
+#include <QJniEnvironment>
+#define QAndroidJniEnvironment QJniEnvironment
+#endif
 #endif // Android
 
 // regardless of building with V4L2 or not, enable IVTV VBI data
@@ -187,9 +192,6 @@ static float get_aspect(AVCParser &p)
 
 
 int  get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
-#ifdef USING_DXVA2
-int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags);
-#endif
 
 // currently unused
 //static int determinable_frame_size(struct AVCodecContext *avctx)
@@ -645,6 +647,8 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
         m_getRawFrames = oldrawstate;
         return false;
     }
+    if (auto* reader = m_parent->GetSubReader(); reader)
+        reader->SeekFrame(ts, flags);
 
     int normalframes = 0;
 
@@ -1361,33 +1365,6 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
     return static_cast<float>(detected);
 }
 
-#ifdef USING_DXVA2
-// Declared separately to allow attribute
-static enum AVPixelFormat get_format_dxva2(struct AVCodecContext *,
-                                           const enum AVPixelFormat *);
-
-enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
-                                    const enum AVPixelFormat *valid_fmts)
-{
-    AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
-    if (nd && nd->GetPlayer())
-    {
-        static uint8_t *dummy[1] = { nullptr };
-        avctx->hwaccel_context =
-            (dxva_context*)nd->GetPlayer()->GetDecoderContext(nullptr, dummy[0]);
-    }
-
-    while (*valid_fmts != AV_PIX_FMT_NONE) {
-        if (avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_DXVA2_VLD))
-            return AV_PIX_FMT_DXVA2_VLD;
-        if (not avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_YUV420P))
-            return AV_PIX_FMT_YUV420P;
-        valid_fmts++;
-    }
-    return AV_PIX_FMT_NONE;
-}
-#endif
-
 int AvFormatDecoder::GetMaxReferenceFrames(AVCodecContext *Context)
 {
     switch (Context->codec_id)
@@ -1884,7 +1861,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
             desc += 2; // Skip data ID
             while (desc != endDesc)
             {
-                uint appTypeCode = desc[0]<<8 | desc[1];
+                [[maybe_unused]] uint appTypeCode = desc[0]<<8 | desc[1];
                 desc += 3; // Skip app type code and boot priority hint
                 uint appSpecDataLen = *desc++;
 #ifdef USING_MHEG
@@ -1903,8 +1880,6 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
                     }
                 }
                 else
-#else
-                (void) appTypeCode;
 #endif // USING_MHEG
                 {
                     desc += appSpecDataLen;
@@ -1947,6 +1922,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         m_ringBuffer->DVD()->AudioStreamsChanged(false);
         RemoveAudioStreams();
     }
+
+    if (m_ic == nullptr)
+        return -1;
 
     for (uint strm = 0; strm < m_ic->nb_streams; strm++)
     {
@@ -2237,7 +2215,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
     // Now find best video track to play
     m_resetHardwareDecoders = false;
-    if (!novideo && m_ic)
+    if (!novideo)
     {
         for(;;)
         {
@@ -2432,7 +2410,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         }
     }
 
-    if (m_ic && (static_cast<uint>(m_ic->bit_rate) > m_bitrate))
+    if (static_cast<uint>(m_ic->bit_rate) > m_bitrate)
         m_bitrate = static_cast<uint>(m_ic->bit_rate);
 
     if (m_bitrate > 0)
@@ -2446,7 +2424,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     if (m_ringBuffer)
     {
         m_ringBuffer->SetBufferSizeFactors(unknownbitrate,
-                        m_ic && QString(m_ic->iformat->name).contains("matroska"));
+                        QString(m_ic->iformat->name).contains("matroska"));
     }
 
     PostProcessTracks();
@@ -2758,7 +2736,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
-    VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
+    MythVideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
 
     for (int i = 0; i < 4; i++)
     {
@@ -2766,14 +2744,22 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
         pic->linesize[i] = 0;
     }
     pic->opaque      = frame;
-    frame->pix_fmt   = c->pix_fmt;
+    frame->m_pixFmt  = c->pix_fmt;
     pic->reordered_opaque = c->reordered_opaque;
-    pic->data[0] = (uint8_t*)frame->buf;
-    pic->data[3] = (uint8_t*)frame->buf;
+    pic->data[0] = (uint8_t*)frame->m_buffer;
+    pic->data[3] = (uint8_t*)frame->m_buffer;
 
     // Set release method
     AVBufferRef *buffer =
-        av_buffer_create((uint8_t*)frame, 0, release_avf_buffer, nd, 0);
+        av_buffer_create((uint8_t*)frame, 0,
+                         [](void* Opaque, uint8_t* Data)
+                             {
+                                 AvFormatDecoder *avfd = static_cast<AvFormatDecoder*>(Opaque);
+                                 MythVideoFrame *vf = reinterpret_cast<MythVideoFrame*>(Data);
+                                 if (avfd && avfd->GetPlayer())
+                                     avfd->GetPlayer()->DeLimboFrame(vf);
+                             }
+                         , nd, 0);
     pic->buf[0] = buffer;
 
     return 0;
@@ -3737,10 +3723,8 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
  *  \sa CC608Decoder, TeletextDecoder
  */
 void AvFormatDecoder::ProcessVBIDataPacket(
-    const AVStream *stream, const AVPacket *pkt)
+    [[maybe_unused]] const AVStream *stream, const AVPacket *pkt)
 {
-    (void) stream;
-
     const uint8_t *buf     = pkt->data;
     uint64_t linemask      = 0;
     std::chrono::microseconds utc = m_lastCcPtsu;
@@ -3825,38 +3809,52 @@ void AvFormatDecoder::ProcessVBIDataPacket(
 void AvFormatDecoder::ProcessDVBDataPacket(
     const AVStream* /*stream*/, const AVPacket *pkt)
 {
+    // ETSI EN 301 775 V1.2.1 (2003-05)
+    // Check data_identifier value
+    // Defined in 4.4.2 Semantics for PES data field, Table 2
+    // Support only the "low range" 0x10-0x1F because they have
+    // the fixed data_unit_length of 0x2C (44) that the teletext
+    // decoder expects.
+    //
     const uint8_t *buf     = pkt->data;
     const uint8_t *buf_end = pkt->data + pkt->size;
 
+    if (*buf >= 0x10 && *buf <= 0x1F)
+    {
+        buf++;
+    }
+    else
+    {
+        LOG(VB_VBI, LOG_WARNING, LOC +
+            QString("VBI: Unknown data_identier: %1 discarded").arg(*buf));
+        return;
+    }
 
+    // Process data packets in the PES packet payload
     while (buf < buf_end)
     {
-        if (*buf == 0x10)
+        if (*buf == 0x02)               // data_unit_id 0x02    EBU Teletext non-subtitle data
         {
-            buf++; // skip
-        }
-        else if (*buf == 0x02)
-        {
-            buf += 4;
+            buf += 4;                   // Skip data_unit_id, data_unit_length (0x2C, 44) and first two data bytes
             if ((buf_end - buf) >= 42)
                 m_ttd->Decode(buf, VBI_DVB);
             buf += 42;
         }
-        else if (*buf == 0x03)
+        else if (*buf == 0x03)          // data_unit_id 0x03    EBU Teletext subtitle data
         {
             buf += 4;
             if ((buf_end - buf) >= 42)
                 m_ttd->Decode(buf, VBI_DVB_SUBTITLE);
             buf += 42;
         }
-        else if (*buf == 0xff)
+        else if (*buf == 0xff)          // data_unit_id 0xff    stuffing
         {
-            buf += 3;
+            buf += 46;                  // data_unit_id, data_unit_length and 44 data bytes
         }
         else
         {
-            LOG(VB_VBI, LOG_ERR, LOC +
-                QString("VBI: Unknown descriptor: %1").arg(*buf));
+            LOG(VB_VBI, LOG_WARNING, LOC +
+                QString("VBI: Unsupported data_unit_id: %1 discarded").arg(*buf));
             buf += 46;
         }
     }
@@ -3865,7 +3863,8 @@ void AvFormatDecoder::ProcessDVBDataPacket(
 /** \fn AvFormatDecoder::ProcessDSMCCPacket(const AVStream*, const AVPacket*)
  *  \brief Process DSMCC object carousel packet.
  */
-void AvFormatDecoder::ProcessDSMCCPacket(const AVStream *str, const AVPacket *pkt)
+void AvFormatDecoder::ProcessDSMCCPacket([[maybe_unused]] const AVStream *str,
+                                         [[maybe_unused]] const AVPacket *pkt)
 {
 #ifdef USING_MHEG
     if (!m_itv && ! (m_itv = m_parent->GetInteractiveTV()))
@@ -3897,9 +3896,6 @@ void AvFormatDecoder::ProcessDSMCCPacket(const AVStream *str, const AVPacket *pk
         length -= sectionLen;
         data += sectionLen;
     }
-#else
-    Q_UNUSED(str);
-    Q_UNUSED(pkt);
 #endif // USING_MHEG
 }
 
@@ -3973,7 +3969,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 
         bool forcedon = m_parent->GetSubReader(pkt->stream_index)->AddAVSubtitle(
                 subtitle, curstream->codecpar->codec_id == AV_CODEC_ID_XSUB,
-                m_parent->GetAllowForcedSubtitles());
+                m_parent->GetAllowForcedSubtitles(), false);
          m_parent->EnableForcedSubtitles(forcedon || isForcedTrack);
     }
 
@@ -4006,7 +4002,7 @@ bool AvFormatDecoder::ProcessRawTextPacket(AVPacket* Packet)
 }
 
 bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
-                                        DecodeType decodetype)
+                                        [[maybe_unused]] DecodeType decodetype)
 {
     enum AVCodecID codec_id = curstream->codecpar->codec_id;
 
@@ -4027,8 +4023,6 @@ bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
 #ifdef USING_MHEG
             if (!(decodetype & kDecodeVideo))
                 m_allowedQuit |= (m_itv && m_itv->ImageHasChanged());
-#else
-            Q_UNUSED(decodetype);
 #endif // USING_MHEG:
             break;
         }
@@ -5064,7 +5058,8 @@ void AvFormatDecoder::StreamChangeCheck(void)
 {
     if (m_streamsChanged)
     {
-        SeekReset(0, 0, true, true);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("StreamChangeCheck skip SeekReset"));
+        // SeekReset(0, 0, true, true);
         ScanStreams(false);
         m_streamsChanged = false;
     }

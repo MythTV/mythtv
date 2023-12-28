@@ -49,6 +49,7 @@ class MUI_PUBLIC MythUIScreenBounds : public QWidget
     bool  m_qtFullScreen     { false };
     bool  m_alwaysOnTop      { false };
     int   m_fontStretch      { 100   };
+    bool  m_forceFullScreen  { false };
 
   private:
     static int s_XOverride;

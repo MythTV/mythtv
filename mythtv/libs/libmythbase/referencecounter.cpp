@@ -72,13 +72,13 @@ void ReferenceCounter::PrintDebug(void)
 void ReferenceCounter::PrintDebug(void) {}
 #endif
 
-ReferenceCounter::ReferenceCounter(const QString &debugName, bool logDebug) :
+ReferenceCounter::ReferenceCounter([[maybe_unused]] const QString &debugName,
+                                   bool logDebug) :
 #ifdef EXTRA_DEBUG
     m_debugName(debugName),
 #endif
     m_logDebug(logDebug)
 {
-    (void) debugName;
 #ifdef LEAK_DEBUG
     QWriteLocker locker(&leakLock);
     leakMap[this] = LeakInfo(debugName);

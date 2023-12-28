@@ -101,17 +101,18 @@ Usa l&apos;opzione menù &quot;Aggiungi segnalibro&quot; per aggiungere nuovi se
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="110"/>
         <source>This is the command that will be used to show the web browser. Use &apos;Internal&apos; to use the built in web browser&apos;. %ZOOM% and %URL% will be replaced with the zoom level and URL list.</source>
-        <translation>Questo è il comando che sarà utilizzato per mostrare il browser web. Usare &quot;Interno&quot; per utilizzare le funzioni integrate nel browser web. %ZOOM% e %URL% saranno sostituiti con il livello di ingrandimento e l&apos;elenco URL.</translation>
+        <translation>Comando utilizzato per avviare il browser web. Scegli &quot;Interno&quot; per utilizzare le funzioni integrate nel browser web.
+%ZOOM% e %URL% saranno sostituiti con il livello di ingrandimento e con l&apos;elenco URL.</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="116"/>
         <source>This is the default text size that will be used. Valid values for the Internal browser are from 0.3 to 5.0 with 1.0 being normal size less than 1 is smaller and greater than 1 is larger than normal size.</source>
-        <translation>Questa è la dimensione testo predefinita che verrà utilizzata. Valori validi per il browser interno sono da 0.3 a 5.0, dove 1.0 è la dimensione normale. inferore di 1 è più piccolo della dimensione normale e maggiore di 1 è più grande.</translation>
+        <translation>Dimensione testo predefinita che sarà utilizzata. Valori validi per il browser interno sono da 0.3 a 5.0, dove 1.0 è la dimensione normale, inferore a 1 è più piccolo e superiore a 1 è più grande.</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="123"/>
         <source>If checked this will enable browser plugins if the &apos;Internal&apos; browser is being used.</source>
-        <translation>Se impostato questo abiliterà i plugin del browser se viene utilizzato il browser &quot;Interno&quot;.</translation>
+        <translation>Se abilitato e viene utilizzato il browser &quot;Interno&quot; verranno abilitati i plugin.</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="128"/>
@@ -181,27 +182,27 @@ Usa l&apos;opzione menù &quot;Aggiungi segnalibro&quot; per aggiungere nuovi se
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="109"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="109"/>
         <source>Move to next browser tab</source>
         <translation>Sposta alla successiva scheda del browser</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="111"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="111"/>
         <source>Move to previous browser tab</source>
         <translation>Sposta alla precedente scheda del browser</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="114"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="114"/>
         <source>Show the bookmark manager</source>
         <translation>Mostra Gestore segnalibri</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="116"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="116"/>
         <source>Show the webbrowser homepage</source>
         <translation>Mostra homepage browser web</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="119"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="119"/>
         <source>Internal Web Browser</source>
         <translation>Browser web interno</translation>
     </message>
@@ -226,22 +227,22 @@ Usa l&apos;opzione menù &quot;Aggiungi segnalibro&quot; per aggiungere nuovi se
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>Search</source>
-        <translation type="unfinished">Cerca</translation>
+        <translation>Cerca</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="47"/>
         <source>Select bookmark</source>
-        <translation type="unfinished">Seleziona segnalibro</translation>
+        <translation>Seleziona segnalibro</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="48"/>
         <source>Select bookmark or add a new one</source>
-        <translation type="unfinished">Seleziona segnalibro o aggiungine uno</translation>
+        <translation>Seleziona segnalibro o aggiungine uno</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="49"/>
         <source>Select bookmark:</source>
-        <translation type="unfinished">Seleziona segnalibro:</translation>
+        <translation>Seleziona segnalibro:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
@@ -276,27 +277,27 @@ Usa l&apos;opzione menù &quot;Aggiungi segnalibro&quot; per aggiungere nuovi se
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>Text size:</source>
-        <translation type="unfinished">Dimensione testo:</translation>
+        <translation>Dimensione testo:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
         <source>URL Name:</source>
-        <translation type="unfinished">Nome URL:</translation>
+        <translation>Nome URL:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="56"/>
         <source>WEB BROWSER</source>
-        <translation type="unfinished">BROWSER WEB</translation>
+        <translation>BROWSER WEB</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="60"/>
         <source>Website Name</source>
-        <translation type="unfinished">Nome sito web</translation>
+        <translation>Nome sito web</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="61"/>
         <source>Website URL</source>
-        <translation type="unfinished">URL sito web</translation>
+        <translation>URL sito web</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="62"/>
@@ -368,7 +369,7 @@ Al termine della modifica, seleziona &quot;OK&quot; o &quot;Annulla&quot; per co
     <message>
         <location filename="themestrings.h" line="35"/>
         <source>Find category</source>
-        <translation type="unfinished">Trova categoria</translation>
+        <translation>Trova categoria</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="38"/>
@@ -378,12 +379,12 @@ Al termine della modifica, seleziona &quot;OK&quot; o &quot;Annulla&quot; per co
     <message>
         <location filename="themestrings.h" line="39"/>
         <source>Myth Web Browser</source>
-        <translation type="unfinished">Browser web Myth</translation>
+        <translation>Browser web Myth</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="43"/>
         <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="45"/>
@@ -398,7 +399,7 @@ Al termine della modifica, seleziona &quot;OK&quot; o &quot;Annulla&quot; per co
     <message numerus="yes">
         <location filename="themestrings.h" line="6"/>
         <source>%name% (%url%)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%name% (%url%)</numerusform>
             <numerusform>%name% (%url%)</numerusform>
         </translation>
@@ -406,52 +407,52 @@ Al termine della modifica, seleziona &quot;OK&quot; o &quot;Annulla&quot; per co
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>Bookmark Name:</source>
-        <translation type="unfinished">Nome segnalibro:</translation>
+        <translation>Nome segnalibro:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>Bookmark URL:</source>
-        <translation type="unfinished">URL segnalibro:</translation>
+        <translation>URL segnalibro:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>
         <source>Browse the web</source>
-        <translation type="unfinished">Naviga web</translation>
+        <translation>Naviga web</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>Browser</source>
-        <translation type="unfinished">Browser</translation>
+        <translation>Browser</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>Browser command:</source>
-        <translation type="unfinished">Comando browser:</translation>
+        <translation>Comando browser:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
         <source>Choose a bookmark to open in the webbrowser</source>
-        <translation type="unfinished">Scegli un segnalibro da aprire nel browser web</translation>
+        <translation>Scegli un segnalibro da aprire nel browser web</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>Command:</source>
-        <translation type="unfinished">Comando:</translation>
+        <translation>Comando:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>
         <source>Configure web browser settings</source>
-        <translation type="unfinished">Configura le impostazioni del browser</translation>
+        <translation>Configura le impostazioni del browser</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="27"/>
         <source>Edit your bookmarks</source>
-        <translation type="unfinished">Modifica segnalibri</translation>
+        <translation>Modifica segnalibri</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>Enable Plugins:</source>
-        <translation type="unfinished">Abilita plugin:</translation>
+        <translation>Abilita plugin:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
@@ -461,7 +462,7 @@ Al termine della modifica, seleziona &quot;OK&quot; o &quot;Annulla&quot; per co
     <message>
         <location filename="themestrings.h" line="31"/>
         <source>Enable browser plugins:</source>
-        <translation type="unfinished">Abilita plugin del browser:</translation>
+        <translation>Abilita plugin del browser:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="32"/>
@@ -501,7 +502,7 @@ Al termine della modifica, seleziona &quot;OK&quot; o &quot;Annulla&quot; per co
     <message>
         <location filename="themestrings.h" line="63"/>
         <source>Zoom:</source>
-        <translation type="unfinished">Zoom:</translation>
+        <translation>Zoom:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="64"/>

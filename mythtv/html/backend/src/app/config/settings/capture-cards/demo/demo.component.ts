@@ -21,7 +21,7 @@ export class DemoComponent implements OnInit, AfterViewInit {
     errorCount: 0,
   };
 
-  constructor(private captureCardService: CaptureCardService, private setupService: SetupService) { }
+  constructor(private captureCardService: CaptureCardService, public setupService: SetupService) { }
 
   ngOnInit(): void {
   }
@@ -29,11 +29,6 @@ export class DemoComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.setupService.setCurrentForm(this.currentForm);
     this.topElement.nativeElement.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  showHelp() {
-    console.log("show help clicked");
-    console.log(this);
   }
 
   // good response to add: {"int": 19}

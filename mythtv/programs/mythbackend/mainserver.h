@@ -138,10 +138,8 @@ class MainServer : public QObject, public MythSocketCBs
 
     void readyRead(MythSocket *socket) override; // MythSocketCBs
     void connectionClosed(MythSocket *socket) override; // MythSocketCBs
-    void connectionFailed(MythSocket *socket) override // MythSocketCBs
-        { (void)socket; }
-    void connected(MythSocket *socket) override // MythSocketCBs
-        { (void)socket; }
+    void connectionFailed([[maybe_unused]] MythSocket *socket) override {}; // MythSocketCBs
+    void connected([[maybe_unused]] MythSocket *socket) override {}; // MythSocketCBs
 
     void DeletePBS(PlaybackSock *sock);
 
@@ -282,8 +280,8 @@ class MainServer : public QObject, public MythSocketCBs
 
     PlaybackSock *GetSlaveByHostname(const QString &hostname);
     PlaybackSock *GetPlaybackBySock(MythSocket *socket);
-    FileTransfer *GetFileTransferByID(int id);
-    FileTransfer *GetFileTransferBySock(MythSocket *socket);
+    BEFileTransfer *GetFileTransferByID(int id);
+    BEFileTransfer *GetFileTransferBySock(MythSocket *socket);
 
     static QString LocalFilePath(const QString &path, const QString &wantgroup);
 
@@ -319,7 +317,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     QReadWriteLock         m_sockListLock;
     std::vector<PlaybackSock *> m_playbackList;
-    std::vector<FileTransfer *> m_fileTransferList;
+    std::vector<BEFileTransfer *> m_fileTransferList;
     QSet<MythSocket*>      m_controlSocketList;
     std::vector<MythSocket*>    m_decrRefSocketList;
 

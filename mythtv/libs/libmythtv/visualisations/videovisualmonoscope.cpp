@@ -1,6 +1,7 @@
 #include <algorithm>
 
 // MythTV
+#include "libmythbase/mythchrono.h"
 #include "videovisualmonoscope.h"
 
 #ifdef USING_OPENGL

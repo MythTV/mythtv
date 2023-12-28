@@ -413,7 +413,7 @@ void PrevRecordedList::LoadShowsByTitle(void)
     MSqlBindings bindings;
     QString sql = " AND oldrecorded.title = :TITLE " + m_where;
     uint selected = m_titleList->GetCurrentPos();
-    if (selected < m_titleData.size())
+    if (selected < m_titleData.size() && (m_titleData[selected] != nullptr))
         bindings[":TITLE"] = m_titleData[selected]->GetTitle();
     else
         bindings[":TITLE"] = "";
@@ -427,6 +427,12 @@ void PrevRecordedList::LoadShowsByDate(void)
 {
     MSqlBindings bindings;
     int selected = m_titleList->GetCurrentPos();
+    if (m_titleData[selected] == nullptr)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Invalid selection in title data: %1").arg(selected));
+        return;
+    }
     QString sortTitle = m_titleData[selected]->GetSortTitle();
     QStringList dateParts = sortTitle.split('/');
     if (dateParts.size() != 2)

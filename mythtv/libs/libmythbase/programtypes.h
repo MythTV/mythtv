@@ -20,7 +20,6 @@
 #include <QString>
 #include <QMap>
 #include <QHash>
-#include <QtCore>
 
 // MythTV headers
 #include "mythbaseexp.h" // for MBASE_PUBLIC

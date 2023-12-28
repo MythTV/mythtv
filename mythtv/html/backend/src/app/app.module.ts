@@ -26,9 +26,6 @@ import { JobqueueComponent } from './status/components/jobqueue/jobqueue.compone
 import { MachineinfoComponent } from './status/components/machineinfo/machineinfo.component';
 import { SelectLanguageComponent } from './config/setupwizard/selectlanguage/selectlanguage.component';
 import { DbsetupComponent } from './config/setupwizard/dbsetup/dbsetup.component';
-import { BackendnetworkComponent } from './config/setupwizard/backendnetwork/backendnetwork.component';
-import { SgsetupComponent } from './config/setupwizard/sgsetup/sgsetup.component';
-import { RestartComponent } from './config/setupwizard/restart/restart.component';
 import { TestbedComponent } from './testbed/testbed.component';
 import { GuideComponent } from './guide/guide.component';
 import { ChannelIconComponent } from './guide/components/channelicon/channelicon.component';
@@ -64,6 +61,26 @@ import { InputConnectionsComponent } from './config/settings/input-connections/i
 import { IconnectionComponent } from './config/settings/input-connections/iconnection/iconnection.component';
 import { StorageGroupsComponent } from './config/settings/storage-groups/storage-groups.component';
 import { SgroupComponent } from './config/settings/storage-groups/sgroup/sgroup.component';
+import { ChannelEditorComponent } from './config/settings/channel-editor/channel-editor.component';
+import { RecordingProfilesComponent } from './config/settings/recording-profiles/recording-profiles.component';
+import { ProfileGroupComponent } from './config/settings/recording-profiles/profile-group/profile-group.component';
+import { RecprofileComponent } from './config/settings/recording-profiles/profile-group/recprofile/recprofile.component';
+import { SystemEventsComponent } from './config/settings/system-events/system-events.component';
+import { BackendWarningComponent } from './config/backend-warning/backend-warning.component';
+import { V4l2Component } from './config/settings/capture-cards/v4l2/v4l2.component';
+import { HdpvrComponent } from './config/settings/capture-cards/hdpvr/hdpvr.component';
+import { SatipComponent } from './config/settings/capture-cards/satip/satip.component';
+import { VboxComponent } from './config/settings/capture-cards/vbox/vbox.component';
+import { FirewireComponent } from './config/settings/capture-cards/firewire/firewire.component';
+import { ChannelscanComponent } from './config/settings/input-connections/channelscan/channelscan.component';
+import { DashboardRoutingModule } from './dashboard/dashboard-routing.module';
+import { WizChanneleditComponent } from './config/setupwizard/wiz-channeledit/wiz-channeledit.component';
+import { RecordingsComponent } from './dashboard/recordings/recordings.component';
+import { ScheduleComponent } from './schedule/schedule.component';
+import { UpcomingComponent } from './dashboard/upcoming/upcoming.component';
+import { RecrulesComponent } from './dashboard/recrules/recrules.component';
+import { VideosComponent } from './dashboard/videos/videos.component';
+import { ProgramsComponent } from './dashboard/programs/programs.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -86,9 +103,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     MachineinfoComponent,
     SelectLanguageComponent,
     DbsetupComponent,
-    BackendnetworkComponent,
-    SgsetupComponent,
-    RestartComponent,
     TestbedComponent,
     GuideComponent,
     ChannelIconComponent,
@@ -124,6 +138,25 @@ export function HttpLoaderFactory(http: HttpClient) {
     IconnectionComponent,
     StorageGroupsComponent,
     SgroupComponent,
+    ChannelEditorComponent,
+    RecordingProfilesComponent,
+    ProfileGroupComponent,
+    RecprofileComponent,
+    SystemEventsComponent,
+    BackendWarningComponent,
+    V4l2Component,
+    HdpvrComponent,
+    SatipComponent,
+    VboxComponent,
+    FirewireComponent,
+    ChannelscanComponent,
+    WizChanneleditComponent,
+    RecordingsComponent,
+    ScheduleComponent,
+    UpcomingComponent,
+    RecrulesComponent,
+    VideosComponent,
+    ProgramsComponent,
   ],
   imports: [
     BrowserModule,
@@ -144,6 +177,7 @@ export function HttpLoaderFactory(http: HttpClient) {
 
     PrimeNGModule,
     SetupWizardRoutingModule,
+    DashboardRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]

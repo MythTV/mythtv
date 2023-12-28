@@ -9,6 +9,8 @@
 #ifndef MythTV_rtcpdatapacket_h
 #define MythTV_rtcpdatapacket_h
 
+#include <limits> // workaround QTBUG-90395
+
 #include <QHostAddress>
 #include <QByteArray>
 #include <QtEndian>

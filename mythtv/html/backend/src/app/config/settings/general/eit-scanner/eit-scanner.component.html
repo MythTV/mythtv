@@ -12,8 +12,8 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <label for="EITTransportTimeout" class="block" >{{ 'settings.eit.timeout_label' | translate }}</label>
-                        <p-inputNumber [(ngModel)]="eitData.EITTransportTimeout" name="EITTransportTimeout" id="EITTransportTimeout"
+                        <label for="EITTransportTimeout" class="label block" >{{ 'settings.eit.timeout_label' | translate }}</label>
+                        <p-inputNumber [(ngModel)]="EITTransportTimeout" name="EITTransportTimeout" id="EITTransportTimeout"
                             [showButtons]="true" [min]="1" [max]="15" [step]="1"></p-inputNumber>
                         <small class="block">
                             {{ 'settings.eit.timeout_desc' | translate }}
@@ -22,11 +22,20 @@
 
 
                     <div class="form-group field">
-                        <label for="EITCrawIdleStart" class="block" >{{ 'settings.eit.crawl_label' | translate }}</label>
-                        <p-inputNumber [(ngModel)]="eitData.EITCrawIdleStart" name="EITCrawIdleStart" id="EITCrawIdleStart"
+                        <label for="EITCrawIdleStart" class="label block" >{{ 'settings.eit.crawl_label' | translate }}</label>
+                        <p-inputNumber [(ngModel)]="EITCrawIdleStart" name="EITCrawIdleStart" id="EITCrawIdleStart"
                             [showButtons]="true" [min]="30" [max]="7200" [step]="30"></p-inputNumber>
                         <small class="block">
                             {{ 'settings.eit.crawl_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="EITScanPeriod" class="label block" >{{ 'settings.eit.scan_label' | translate }}</label>
+                        <p-inputNumber [(ngModel)]="EITScanPeriod" name="EITScanPeriod" id="EITScanPeriod"
+                            [showButtons]="true" [min]="5" [max]="60" [step]="5"></p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.eit.scan_desc' | translate }}
                         </small>
                     </div>
 
@@ -38,15 +47,13 @@
         <ng-template pTemplate="footer">
             <div class="grid nogutter">
                 <div class="col-12">
-                    <p-message *ngIf="this.eitData.successCount > 0 && this.eitData.errorCount == 0 && !eitscanopt.dirty"
+                    <p-message *ngIf="this.successCount > 0 && this.errorCount == 0 && !eitscanopt.dirty"
                         severity="success" text="{{ 'common.savesuccess' | translate }}" ></p-message>
-                    <p-message *ngIf="this.eitData.errorCount > 0"
+                    <p-message *ngIf="this.errorCount > 0"
                         severity="error" text="{{ 'common.networkfail' | translate }}" ></p-message>
                 </div>
                 <p-button class="col pr-1" label="{{'common.save' | translate}}"  icon="pi pi-save" iconPos="left" (onClick)="saveForm(); eitscanopt.form.markAsPristine()"
-                                 [disabled]="(!eitscanopt.dirty || false)"></p-button>
-                <p-button class="col-2 help-button" label="{{'common.help' | translate}}" (onClick)="showHelp()"
-                    icon="pi pi-info-circle" styleClass="p-button-info"></p-button>
+                                 [disabled]="!eitscanopt.dirty || setupService.schedulingEnabled"></p-button>
             </div>
         </ng-template>
     </p-card>

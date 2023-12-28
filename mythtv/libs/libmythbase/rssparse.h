@@ -114,11 +114,11 @@ class MBASE_PUBLIC ResultItem
     using resultList = QList<ResultItem *>;
     using List = std::vector<ResultItem>;
 
-    ResultItem(const QString& title, const QString& sortTitle,
-              const QString& subtitle, const QString& sortSubtitle,
-              const QString& desc, const QString& URL,
-              const QString& thumbnail, const QString& mediaURL,
-              const QString& author, const QDateTime& date, const QString& time,
+    ResultItem(QString title, QString sortTitle,
+              QString subtitle, QString sortSubtitle,
+              QString desc, QString URL,
+              QString thumbnail, QString mediaURL,
+              QString author, const QDateTime& date, const QString& time,
               const QString& rating, off_t filesize,
               const QString& player, const QStringList& playerargs,
               const QString& download, const QStringList& downloadargs,

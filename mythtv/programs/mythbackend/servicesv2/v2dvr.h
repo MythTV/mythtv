@@ -203,7 +203,7 @@ class V2Dvr : public MythHTTPService
                                             int              Count,
                                             bool             ShowAll,
                                             int              RecordId,
-                                            int              RecStatus );
+                                            const QString &  RecStatus );
 
     static V2EncoderList*    GetEncoderList      ( );
 
@@ -267,7 +267,8 @@ class V2Dvr : public MythHTTPService
                                             bool      AutoUserJob2,
                                             bool      AutoUserJob3,
                                             bool      AutoUserJob4,
-                                            int       Transcoder);
+                                            int       Transcoder,
+                                            const QString&   AutoExtend);
 
     static bool        UpdateRecordSchedule ( uint    RecordId,
                                               const QString&   Title,
@@ -310,7 +311,8 @@ class V2Dvr : public MythHTTPService
                                               bool      AutoUserJob2,
                                               bool      AutoUserJob3,
                                               bool      AutoUserJob4,
-                                              int       Transcoder);
+                                              int       Transcoder,
+                                              const QString&   AutoExtend);
 
     static bool       RemoveRecordSchedule ( uint             RecordId   );
 
@@ -339,9 +341,9 @@ class V2Dvr : public MythHTTPService
 
     static int        RecordedIdForPathname( const QString   &Pathname  );
 
-    static QString    RecStatusToString    ( int              RecStatus );
+    static QString    RecStatusToString    ( const QString  & RecStatus );
 
-    static QString    RecStatusToDescription ( int            RecStatus,
+    static QString    RecStatusToDescription (const QString  & RecStatus,
                                                int            RecType,
                                                const QDateTime &StartTime );
 
@@ -379,7 +381,8 @@ class V2Dvr : public MythHTTPService
                                                uint             Stars,
                                                const QString   &SubTitle,
                                                const QString   &Title,
-                                               bool             Watched );
+                                               bool             Watched,
+                                               const QString   &RecGroup );
 
   private:
     Q_DISABLE_COPY(V2Dvr)

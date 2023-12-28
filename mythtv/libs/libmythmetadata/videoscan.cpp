@@ -24,7 +24,7 @@
 #include "dbaccess.h"
 #include "dirscan.h"
 
-QEvent::Type VideoScanChanges::kEventType =
+const QEvent::Type VideoScanChanges::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 namespace
@@ -41,15 +41,13 @@ namespace
                 m_imageExt.insert(ext.toLower());
         }
 
-        DirectoryHandler *newDir(const QString &dir_name,
-                                 const QString &fq_dir_name) override // DirectoryHandler
+        DirectoryHandler *newDir([[maybe_unused]] const QString &dir_name,
+                                 [[maybe_unused]] const QString &fq_dir_name) override // DirectoryHandler
         {
-            (void) dir_name;
-            (void) fq_dir_name;
             return this;
         }
 
-        void handleFile(const QString &file_name,
+        void handleFile([[maybe_unused]] const QString &file_name,
                         const QString &fq_file_name,
                         const QString &extension,
                         const QString &host) override // DirectoryHandler
@@ -59,7 +57,6 @@ namespace
             LOG(VB_GENERAL, LOG_DEBUG,
                 QString("handleFile: %1 :: %2").arg(fq_file_name).arg(host));
 #endif
-            (void) file_name;
             if (m_imageExt.find(extension.toLower()) == m_imageExt.end())
             {
                 m_videoFiles[fq_file_name].check = false;
@@ -229,10 +226,8 @@ void VideoScannerThread::run()
 
 
 void VideoScannerThread::removeOrphans(unsigned int id,
-                                       const QString &filename)
+                                       [[maybe_unused]] const QString &filename)
 {
-    (void) filename;
-
     // TODO: use single DB connection for all calls
     if (m_removeAll)
         m_dbMetadata->purgeByID(id);
@@ -268,7 +263,7 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
                 {
                     // file has changed hosts
                     // add to delete list for further processing
-                    remove.push_back(std::make_pair(file->GetID(), lname));
+                    remove.emplace_back(file->GetID(), lname);
                 }
                 else
                 {
@@ -281,14 +276,14 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
             {
                 // If it's only in the database, and not on a host we
                 // cannot reach, mark it as for removal later.
-                remove.push_back(std::make_pair(file->GetID(), lname));
+                remove.emplace_back(file->GetID(), lname);
             }
             else if (m_liveSGHosts.contains(lhost))
             {
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Removing file SG(%1) :%2:")
                         .arg(lhost, lname));
-                remove.push_back(std::make_pair(file->GetID(), lname));
+                remove.emplace_back(file->GetID(), lname);
             }
             else
             {
