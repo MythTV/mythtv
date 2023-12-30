@@ -474,13 +474,13 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     auto ss2ba = [](const auto & ss){ return QByteArray::fromStdString(ss); };
     auto qs2ba = [](const auto & item){ return item.constData(); };
-    auto add_start_end = [order](const auto & field){
+    auto add_start_end = [&order](const auto & field){
         return QString("UPDATE %1 "
                        "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC'), "
                        "    endtime   = CONVERT_TZ(endtime, 'SYSTEM', 'Etc/UTC') "
                        "ORDER BY %2")
             .arg(QString::fromStdString(field)).arg(order).toLocal8Bit(); };
-    auto add_start = [order](const auto & field){
+    auto add_start = [&order](const auto & field){
         return QString("UPDATE %1 "
                        "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC') "
                        "ORDER BY %2")
