@@ -27,6 +27,7 @@
         "refresh": "Atualizar",
         "save": "Salvar",
         "savesuccess": "Salvo com sucesso",
+        "selected_menu": "Selecione uma ou mais linhas abaixo e clique aqui para executar uma ação nelas. Alternativamente, clique com o botão direito nas linhas selecionadas.",
         "submit": "Enviar",
         "success": "Sucesso",
         "unsaved_heading": "Alterações não salvas",
@@ -49,6 +50,7 @@
         },
         "programguide": "Guia do programa",
         "recordings": {
+            "actionsselected": "Ações em {{ num }} gravações selecionadas",
             "airdate": "Airdate",
             "alreadydel": "Já Excluído",
             "canundel": "Você pode reverter isso usando Undelete.",
@@ -70,6 +72,7 @@
             "job_Commflag": "Detectar Comerciais",
             "job_Metadata": "Procurar metadados",
             "job_Transcode": "Transcodificar com perfil padrão",
+            "jobsselected": "Execute trabalhos em {{ num }} gravações selecionadas",
             "mnu_delete": "Excluir",
             "mnu_delete_rerec": "Excluir e permitir regravação",
             "mnu_markdamaged": "Marcar como danificado",
@@ -81,6 +84,7 @@
             "mnu_stoprec": "Pare de gravar",
             "mnu_undelete": "Recuperar",
             "mnu_updatemeta": "Atualizar metadados",
+            "mnu_updaterecgrp": "Alterar grupo de gravação",
             "mnu_updaterecrule": "Atualizar regra de registro",
             "nonrerec": "Para permitir a nova gravação do programa danificado, use Permitir nova gravação.",
             "orig_airdate": "Data Original de Transmissão",
@@ -88,6 +92,7 @@
             "recgrp": "Rec Grp",
             "seas_ep": "Seas Ep",
             "season": "Temporada",
+            "selrecgroup": "Selecione o grupo de gravação",
             "stop_details": "Isso interromperá a gravação",
             "stop_recording": "Pare de gravar",
             "subtitle": "Legenda",
@@ -226,6 +231,7 @@
             "schedule_text": "O(s) próximo(s) show(ões) de {{ length }} agendados para gravação.",
             "schedule_title": "Agendar"
         },
+        "undefselection": "Algumas linhas selecionadas não foram carregadas. Percorra a lista e selecione novamente as linhas.",
         "upcoming": {
             "date": "Data",
             "encoder": "Codificador",

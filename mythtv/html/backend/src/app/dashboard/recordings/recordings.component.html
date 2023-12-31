@@ -7,16 +7,22 @@
     <h2>{{ 'dashboard.recordings.heading' | translate }}</h2>
     <div class="block card w-full" style="height: 90vh">
 
-        <p-slideMenu #menu [popup]="true" [model]="menuToShow" [viewportHeight]="360"
-            [backLabel]="translate.instant('common.back')"></p-slideMenu>
+        <p-tieredMenu #menu [popup]="true" [model]="menuToShow" class="font-bold">
+        </p-tieredMenu>
 
         <p-table [value]="programs" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
-            [virtualScroll]="true" [rows]="50" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true">
-            <ng-template pTemplate="caption">
+            [virtualScroll]="true" [rows]="50" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
+            selectionMode="multiple" [(selection)]="selection" [metaKeySelection]="true"
+            dataKey="Recording.RecordedId" (onRowSelect)="onSelectChange()" (onRowUnelect)="onSelectChange()">
+            <!-- [compareSelectionBy]="'equals'"> -->
+             <ng-template pTemplate="caption">
             </ng-template>
             <ng-template pTemplate="header">
                 <tr>
-                    <th>
+                    <th class="pl-1">
+                        <button pButton pRipple icon="pi pi-bars" class="p-button-text .p-button-success"
+                            (click)="showContextMenu(null, $event)" pTooltip="{{ 'common.selected_menu' | translate }}"
+                            tooltipPosition="top"></button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         {{ 'dashboard.recordings.filter' | translate }}: &nbsp;&nbsp; {{ 'dashboard.recordings.title' |
                         translate }}: &nbsp;
                         <p-columnFilter type="text" field="Title" [matchModeOptions]="matchModeTitle"></p-columnFilter>
@@ -35,7 +41,8 @@
                         </p-columnFilter>
 
                         <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
-                            (click)="refreshing=true;refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
+                            (click)="refreshing=true;refresh()" pTooltip="{{ 'common.refresh' | translate }}"
+                            tooltipPosition="top"></button>
                         &nbsp;&nbsp;&nbsp;{{ programs.length }} Rows
                     </th>
                 </tr>
@@ -63,7 +70,7 @@
                     </th>
                     <th style="flex-basis: 8%" class="justify-content-end p-1">{{
                         'dashboard.recordings.file_size' | translate }}</th>
-                    <th style="flex-basis: 4%" class="p-1">
+                    <th style="flex-basis: 4%" class="p-1" style="background: var(--surface-card);">
                         <a target="_blank">
                             <i class="pi pi-download"></i></a>
                         <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
@@ -71,8 +78,9 @@
                     </th>
                 </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-program>
-                <tr [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}">
+            <ng-template pTemplate="body" let-program let-rowIndex="rowIndex">
+                <tr [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}" [pSelectableRow]="program"
+                    [pSelectableRowIndex]="rowIndex" (contextmenu)="onContextMenu(program,$event)">
                     <td style="flex-basis: 12%" class="p-1 overflow-hidden">
                         <i class="pi pi-exclamation-triangle p-1" *ngIf="program.VideoPropNames.indexOf('DAMAGED') > -1"
                             pTooltip="{{ 'dashboard.recordings.damaged' | translate }}" tooltipPosition="top"></i>
@@ -89,7 +97,7 @@
                         <div *ngIf="program.Season>0 || program.Episode>0"> {{program.Season}}x{{program.Episode}}
                         </div>
                     </td>
-                    <td style="flex-basis: 8%" class="justify-content-end p-1">
+                    <td style="flex-basis: 8%" class="justify-content-end p-1" >
                         <div [innerHTML]="utility.formatDate(program.Airdate,true)"></div>
                     </td>
                     <td style="flex-basis: 8%" class="justify-content-end p-1">
@@ -102,13 +110,13 @@
                         number:'1.0-0' }} min</td>
                     <td style="flex-basis: 8%" class="justify-content-end p-1">
                         {{program.Recording.FileSize / 1000000 | number:'1.0-0'}} MB</td>
-                    <td style="flex-basis: 4%" class="p-1">
+                    <td style="flex-basis: 4%" class="p-1" style="background: var(--surface-card);">
                         <a href="{{URLencode('/Content/GetRecording?RecordedId=' + program.Recording.RecordedId)}}"
                             target="_blank" pTooltip="{{ 'dashboard.recordings.download' | translate }}"
                             tooltipPosition="left">
                             <i class="pi pi-download text-primary"></i></a>
                         <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
-                            (click)="showMenu(program,$event)"></button>
+                            (click)="showContextMenu(program,$event)"></button>
                     </td>
                 </tr>
             </ng-template>
@@ -191,6 +199,27 @@
                 <p-button icon="pi pi-check-circle" (onClick)="saveProgram();" label="{{ 'common.save' | translate }}"
                     styleClass="p-button-success"
                     [disabled]="!recsform.dirty || program.Title.trim() == '' "></p-button>
+            </ng-template>
+        </p-dialog>
+
+        <!-- Rec Group Dialog -->
+        <p-dialog header="{{ 'dashboard.recordings.selrecgroup' | translate }}" [(visible)]="displayRecGrpDlg"
+            [modal]="true" [draggable]="false" [resizable]="false">
+            <div class="form-group field">
+                <label for="newrecgroup" class="label block">{{ 'dashboard.sched.recgroup_label' | translate
+                    }}</label>
+                <input pInputText id="newrecgroup" [(ngModel)]="newRecGroup" name="newrecgroup" #newrecgroup="ngModel"
+                    class="mb-2 form-control w-full" />
+            </div>
+            <p-listbox [options]="recGroups" [(ngModel)]="newRecGroup" name="recgrplist" #recgrplist="ngModel">
+            </p-listbox>
+            <ng-template pTemplate="footer">
+                <p-button icon="pi pi-times-circle" (onClick)="displayRecGrpDlg=false"
+                    label="{{ 'common.cancel' | translate }}" styleClass="p-button-plain">
+                </p-button>
+                <p-button icon="pi pi-check-circle" (onClick)="updaterecgrp()" label="{{ 'common.ok' | translate }}"
+                    styleClass="p-button-plain"  [disabled]="!newRecGroup.trim()">
+                </p-button>
             </ng-template>
         </p-dialog>
 

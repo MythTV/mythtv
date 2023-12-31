@@ -27,6 +27,7 @@
         "refresh": "刷新",
         "save": "節省",
         "savesuccess": "保存成功",
+        "selected_menu": "選擇下面的一行或多行，然後按一下此處對其執行操作。或者，右鍵單擊選定的行。",
         "submit": "提交",
         "success": "成功",
         "unsaved_heading": "未保存的更改",
@@ -49,6 +50,7 @@
         },
         "programguide": "節目指南",
         "recordings": {
+            "actionsselected": "對 {{ num }} 個選定錄音執行的操作",
             "airdate": "播出日期",
             "alreadydel": "已刪除",
             "canundel": "您可以使用取消刪除來反轉此情況。",
@@ -70,6 +72,7 @@
             "job_Commflag": "檢測廣告",
             "job_Metadata": "查找元數據",
             "job_Transcode": "使用預設設定檔進行轉碼",
+            "jobsselected": "對 {{ num }} 個選定的錄音運行作業",
             "mnu_delete": "刪除",
             "mnu_delete_rerec": "刪除並允許重新錄製",
             "mnu_markdamaged": "標記為已損壞",
@@ -81,6 +84,7 @@
             "mnu_stoprec": "停止錄音",
             "mnu_undelete": "恢復刪除",
             "mnu_updatemeta": "更新元數據",
+            "mnu_updaterecgrp": "更改錄音組",
             "mnu_updaterecrule": "更新記錄規則",
             "nonrerec": "要允許重新錄製損壞的程序，請使用“允許重新錄製”。",
             "orig_airdate": "原始播出日期",
@@ -88,6 +92,7 @@
             "recgrp": "記錄組",
             "seas_ep": "海洋EP",
             "season": "季節",
+            "selrecgroup": "選擇錄音組",
             "stop_details": "這將停止錄製",
             "stop_recording": "停止錄音",
             "subtitle": "字幕",
@@ -226,6 +231,7 @@
             "schedule_text": "計劃錄製的下一個 {{ length }} 個節目。",
             "schedule_title": "日程"
         },
+        "undefselection": "某些選定的行尚未載入。請捲動清單並重新選擇行。",
         "upcoming": {
             "date": "日期",
             "encoder": "編碼器",

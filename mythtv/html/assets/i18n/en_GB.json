@@ -27,6 +27,7 @@
         "refresh": "Refresh",
         "save": "Save",
         "savesuccess": "Saved Successfully",
+        "selected_menu": "Select one or more rows below and click here to perform an action on them. Alternatively, right click the selected rows.",
         "submit": "Submit",
         "success": "Success",
         "unsaved_heading": "Unsaved Changes",
@@ -49,6 +50,7 @@
         },
         "programguide": "Program Guide",
         "recordings": {
+            "actionsselected": "Actions on {{ num }} Selected Recordings",
             "airdate": "Airdate",
             "alreadydel": "Already Deleted",
             "canundel": "You can reverse this by using Undelete.",
@@ -70,6 +72,7 @@
             "job_Commflag": "Detect Commercials",
             "job_Metadata": "Look up Metadata",
             "job_Transcode": "Transcode with Default profile",
+            "jobsselected": "Run Jobs on {{ num }} Selected Recordings",
             "mnu_delete": "Delete",
             "mnu_delete_rerec": "Delete and Allow Rerecord",
             "mnu_markdamaged": "Mark as Damaged",
@@ -81,6 +84,7 @@
             "mnu_stoprec": "Stop Recording",
             "mnu_undelete": "Undelete",
             "mnu_updatemeta": "Update Metadata",
+            "mnu_updaterecgrp": "Change Recording Group",
             "mnu_updaterecrule": "Update Record Rule",
             "nonrerec": "To allow re record of the damaged program, please use Allow Re Record.",
             "orig_airdate": "Orig Airdate",
@@ -88,6 +92,7 @@
             "recgrp": "Rec Grp",
             "seas_ep": "Seas Ep",
             "season": "Season",
+            "selrecgroup": "Select Recording Group",
             "stop_details": "This will Stop Recording",
             "stop_recording": "Stop Recording",
             "subtitle": "Subtitle",
@@ -226,6 +231,7 @@
             "schedule_text": "The next {{ length }} show(s) that are scheduled for recording.",
             "schedule_title": "Schedule"
         },
+        "undefselection": "Some selected rows have not been loaded. Please scroll through the list and re-select the rows.",
         "upcoming": {
             "date": "Date",
             "encoder": "Encoder",

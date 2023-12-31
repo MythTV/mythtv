@@ -27,6 +27,7 @@
         "refresh": "Uppdatera",
         "save": "Spara",
         "savesuccess": "Sparad",
+        "selected_menu": "Välj en eller flera rader nedan och klicka här för att utföra en åtgärd på dem. Alternativt högerklicka på de markerade raderna.",
         "submit": "Skicka in",
         "success": "Framgång",
         "unsaved_heading": "Osparade ändringar",
@@ -49,6 +50,7 @@
         },
         "programguide": "Programguide",
         "recordings": {
+            "actionsselected": "Åtgärder på {{ num }} valda inspelningar",
             "airdate": "Sändningsdatum",
             "alreadydel": "Redan raderad",
             "canundel": "Du kan vända detta genom att använda Återställ.",
@@ -70,6 +72,7 @@
             "job_Commflag": "Upptäck reklam",
             "job_Metadata": "Slå upp Metadata",
             "job_Transcode": "Omkoda med standardprofil",
+            "jobsselected": "Kör jobb på {{ num }} valda inspelningar",
             "mnu_delete": "Radera",
             "mnu_delete_rerec": "Ta bort och tillåt ominspelning",
             "mnu_markdamaged": "Markera som skadad",
@@ -81,6 +84,7 @@
             "mnu_stoprec": "Stoppa inspelning",
             "mnu_undelete": "Ångra radering",
             "mnu_updatemeta": "Uppdatera metadata",
+            "mnu_updaterecgrp": "Byt inspelningsgrupp",
             "mnu_updaterecrule": "Uppdatera postregel",
             "nonrerec": "För att tillåta återinspelning av det skadade programmet, använd Allow Re Record.",
             "orig_airdate": "Original Air Date",
@@ -88,6 +92,7 @@
             "recgrp": "Rec Grp",
             "seas_ep": "Seas Ep",
             "season": "Säsong",
+            "selrecgroup": "Välj Inspelningsgrupp",
             "stop_details": "Detta kommer att stoppa inspelningen",
             "stop_recording": "Stoppa inspelning",
             "subtitle": "Texta",
@@ -226,6 +231,7 @@
             "schedule_text": "Nästa {{ length }} show(er) som är schemalagda för inspelning.",
             "schedule_title": "Schema"
         },
+        "undefselection": "Vissa valda rader har inte laddats. Bläddra igenom listan och välj om raderna.",
         "upcoming": {
             "date": "Datum",
             "encoder": "Encoder",

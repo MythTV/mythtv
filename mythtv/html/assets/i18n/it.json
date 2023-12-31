@@ -27,6 +27,7 @@
         "refresh": "ricaricare",
         "save": "Salva",
         "savesuccess": "Salvato con successo",
+        "selected_menu": "Seleziona una o più righe di seguito e fai clic qui per eseguire un'azione su di esse. In alternativa, fare clic con il pulsante destro del mouse sulle righe selezionate.",
         "submit": "Invia",
         "success": "Successo",
         "unsaved_heading": "Modifiche non salvate",
@@ -49,6 +50,7 @@
         },
         "programguide": "Guida al programma",
         "recordings": {
+            "actionsselected": "Azioni su {{ num }} registrazioni selezionate",
             "airdate": "Airdate",
             "alreadydel": "Già cancellato",
             "canundel": "Puoi invertire questa situazione utilizzando Undelete.",
@@ -70,6 +72,7 @@
             "job_Commflag": "Rileva spot pubblicitari",
             "job_Metadata": "Cerca Metadati",
             "job_Transcode": "Transcodifica con il profilo predefinito",
+            "jobsselected": "Esegui lavori su {{ num }} registrazioni selezionate",
             "mnu_delete": "Eliminare",
             "mnu_delete_rerec": "Elimina e consenti nuova registrazione",
             "mnu_markdamaged": "Contrassegna come danneggiato",
@@ -81,6 +84,7 @@
             "mnu_stoprec": "Interrompi la registrazione",
             "mnu_undelete": "Annulla cancellazione",
             "mnu_updatemeta": "Aggiorna metadati",
+            "mnu_updaterecgrp": "Cambia gruppo di registrazione",
             "mnu_updaterecrule": "Aggiorna regola record",
             "nonrerec": "Per consentire la riregistrazione del programma danneggiato, utilizzare Consenti riregistrazione.",
             "orig_airdate": "Data di messa in onda originale",
@@ -88,6 +92,7 @@
             "recgrp": "Rec Grp",
             "seas_ep": "Mari Ep",
             "season": "Stagione",
+            "selrecgroup": "Seleziona Gruppo di registrazione",
             "stop_details": "Questo interromperà la registrazione",
             "stop_recording": "Interrompi la registrazione",
             "subtitle": "Sottotitolo",
@@ -226,6 +231,7 @@
             "schedule_text": "I prossimi {{ length }} spettacoli programmati per la registrazione.",
             "schedule_title": "Programma"
         },
+        "undefselection": "Alcune righe selezionate non sono state caricate. Scorri l'elenco e seleziona nuovamente le righe.",
         "upcoming": {
             "date": "Data",
             "encoder": "Codificatore",

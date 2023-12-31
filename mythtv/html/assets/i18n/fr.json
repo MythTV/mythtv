@@ -27,6 +27,7 @@
         "refresh": "Rafraîchir",
         "save": "Sauvegarder",
         "savesuccess": "Enregistré avec succès",
+        "selected_menu": "Sélectionnez une ou plusieurs lignes ci-dessous et cliquez ici pour effectuer une action sur celles-ci. Vous pouvez également cliquer avec le bouton droit sur les lignes sélectionnées.",
         "submit": "Soumettre",
         "success": "Succès",
         "unsaved_heading": "Modifications non enregistrées",
@@ -49,6 +50,7 @@
         },
         "programguide": "Guide du programme",
         "recordings": {
+            "actionsselected": "Actions sur {{ num }} enregistrements sélectionnés",
             "airdate": "Date de diffusion",
             "alreadydel": "Déjà supprimé",
             "canundel": "Vous pouvez inverser cela en utilisant Undelete.",
@@ -70,6 +72,7 @@
             "job_Commflag": "Détecter les publicités",
             "job_Metadata": "Consulter les métadonnées",
             "job_Transcode": "Transcoder avec le profil par défaut",
+            "jobsselected": "Exécuter des tâches sur {{ num }} enregistrements sélectionnés",
             "mnu_delete": "Supprimer",
             "mnu_delete_rerec": "Supprimer et autoriser le réenregistrement",
             "mnu_markdamaged": "Marquer comme endommagé",
@@ -81,6 +84,7 @@
             "mnu_stoprec": "Arrête d'enregistrer",
             "mnu_undelete": "Annuler la suppression",
             "mnu_updatemeta": "Mettre à jour les métadonnées",
+            "mnu_updaterecgrp": "Changer le groupe d'enregistrement",
             "mnu_updaterecrule": "Mettre à jour la règle d'enregistrement",
             "nonrerec": "Pour autoriser le réenregistrement du programme endommagé, veuillez utiliser Autoriser le réenregistrement.",
             "orig_airdate": "Date de diffusion originale",
@@ -88,6 +92,7 @@
             "recgrp": "Groupe de réc.",
             "seas_ep": "Épisode des mers",
             "season": "Saison",
+            "selrecgroup": "Sélectionnez le groupe d'enregistrement",
             "stop_details": "Cela arrêtera l'enregistrement",
             "stop_recording": "Arrête d'enregistrer",
             "subtitle": "Sous-titre",
@@ -226,6 +231,7 @@
             "schedule_text": "La ou les prochaines émissions de {{ length }} dont l'enregistrement est programmé.",
             "schedule_title": "Calendrier"
         },
+        "undefselection": "Certaines lignes sélectionnées n'ont pas été chargées. Veuillez faire défiler la liste et resélectionner les lignes.",
         "upcoming": {
             "date": "Date",
             "encoder": "Encodeur",

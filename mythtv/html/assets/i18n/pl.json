@@ -27,6 +27,7 @@
         "refresh": "Odświeżać",
         "save": "Ratować",
         "savesuccess": "Zapisano pomyślnie",
+        "selected_menu": "Wybierz jeden lub więcej wierszy poniżej i kliknij tutaj, aby wykonać na nich akcję. Alternatywnie kliknij prawym przyciskiem myszy wybrane wiersze.",
         "submit": "Składać",
         "success": "Powodzenie",
         "unsaved_heading": "Niezapisane zmiany",
@@ -49,6 +50,7 @@
         },
         "programguide": "Przewodnik po programach",
         "recordings": {
+            "actionsselected": "Działania na {{ num }} wybranych nagraniach",
             "airdate": "Data emisji",
             "alreadydel": "Już usunięte",
             "canundel": "Możesz to odwrócić, używając opcji Cofnij usunięcie.",
@@ -70,6 +72,7 @@
             "job_Commflag": "Wykrywaj reklamy",
             "job_Metadata": "Wyszukaj metadane",
             "job_Transcode": "Transkoduj z profilem domyślnym",
+            "jobsselected": "Uruchom zadania na {{ num }} wybranych nagraniach",
             "mnu_delete": "Usuwać",
             "mnu_delete_rerec": "Usuń i zezwól na ponowne nagranie",
             "mnu_markdamaged": "Oznacz jako uszkodzony",
@@ -81,6 +84,7 @@
             "mnu_stoprec": "Zatrzymaj nagrywanie",
             "mnu_undelete": "Cofnij usunięcie",
             "mnu_updatemeta": "Zaktualizuj metadane",
+            "mnu_updaterecgrp": "Zmień grupę nagrań",
             "mnu_updaterecrule": "Zaktualizuj regułę rekordu",
             "nonrerec": "Aby umożliwić ponowne nagranie uszkodzonego programu, użyj opcji Zezwól na ponowne nagranie.",
             "orig_airdate": "Oryginalna data emisji",
@@ -88,6 +92,7 @@
             "recgrp": "Grupa nagr",
             "seas_ep": "Seas odc",
             "season": "Pora roku",
+            "selrecgroup": "Wybierz grupę nagrań",
             "stop_details": "Spowoduje to zatrzymanie nagrywania",
             "stop_recording": "Zatrzymaj nagrywanie",
             "subtitle": "Podtytuł",
@@ -226,6 +231,7 @@
             "schedule_text": "Kolejne programy ({{ length }}), które są zaplanowane do nagrania.",
             "schedule_title": "Harmonogram"
         },
+        "undefselection": "Niektóre wybrane wiersze nie zostały załadowane. Proszę przewinąć listę i ponownie wybrać wiersze.",
         "upcoming": {
             "date": "Data",
             "encoder": "Koder",

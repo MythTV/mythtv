@@ -23,17 +23,22 @@ export class RecordingsComponent implements OnInit {
   @ViewChild("menu") menu!: Menu;
 
   programs: ScheduleOrProgram[] = [];
+  selection: ScheduleOrProgram[] = [];
+  actionList: ScheduleOrProgram[] = [];
   recGroups: string[] = [];
+  newRecGroup = '';
   lazyLoadEvent!: LazyLoadEvent;
   JobQCmds!: JobQCommands;
   program: ScheduleOrProgram = <ScheduleOrProgram>{ Title: '', Recording: {} };
   editingProgram?: ScheduleOrProgram;
   displayMetadataDlg = false;
+  displayRecGrpDlg = false;
   displayRunJobs = false;
   displayUnsaved = false;
   successCount = 0;
   errorCount = 0;
   refreshing = false;
+  priorRequest: GetRecordedListRequest = {};
 
   msg = {
     Success: 'common.success',
@@ -41,7 +46,10 @@ export class RecordingsComponent implements OnInit {
     NetFail: 'common.networkfail',
     CanUndo: 'dashboard.recordings.canundel',
     AlreadyDel: 'dashboard.recordings.alreadydel',
-    NonReRec: 'dashboard.recordings.nonrerec'
+    NonReRec: 'dashboard.recordings.nonrerec',
+    ActionsSelected: 'dashboard.recordings.actionsselected',
+    JobsSelected: 'dashboard.recordings.jobsselected',
+    UndefSelection: 'dashboard.undefselection'
   }
 
   jobsoffset = 3; // number of items before user jobs
@@ -64,6 +72,7 @@ export class RecordingsComponent implements OnInit {
   mnu_markunwatched: MenuItem = { label: 'dashboard.recordings.mnu_markunwatched', command: (event) => this.markwatched(event, false) };
   mnu_markdamaged: MenuItem = { label: 'dashboard.recordings.mnu_markdamaged', command: (event) => this.markdamaged(event, true) };
   mnu_markundamaged: MenuItem = { label: 'dashboard.recordings.mnu_markundamaged', command: (event) => this.markdamaged(event, false) };
+  mnu_updaterecgrp: MenuItem = { label: 'dashboard.recordings.mnu_updaterecgrp', command: (event) => this.promptrecgrp(event) };
   mnu_updatemeta: MenuItem = { label: 'dashboard.recordings.mnu_updatemeta', command: (event) => this.updatemeta(event) };
   mnu_updaterecrule: MenuItem = { label: 'dashboard.recordings.mnu_updaterecrule', command: (event) => this.updaterecrule(event) };
   mnu_stoprec: MenuItem = { label: 'dashboard.recordings.mnu_stoprec', command: (event) => this.stoprec(event) };
@@ -109,7 +118,7 @@ export class RecordingsComponent implements OnInit {
 
     const mnu_entries = [this.mnu_delete, this.mnu_delete_rerec, this.mnu_undelete, this.mnu_rerec, this.mnu_markwatched,
     this.mnu_markunwatched, this.mnu_markdamaged, this.mnu_markundamaged, this.mnu_updatemeta, this.mnu_updaterecrule,
-    this.mnu_stoprec, this.mnu_runjobs, this.jobs[0], this.jobs[1], this.jobs[2],
+    this.mnu_stoprec, this.mnu_updaterecgrp, this.mnu_runjobs, this.jobs[0], this.jobs[1], this.jobs[2],
     ...this.matchModeRecGrp, ...this.matchModeTitle]
 
     mnu_entries.forEach(entry => {
@@ -166,11 +175,17 @@ export class RecordingsComponent implements OnInit {
           request.RecGroup = event.filters['Recording.RecGroup'].value;
       }
     }
+    if (request.TitleRegEx != this.priorRequest.TitleRegEx
+      || request.RecGroup != this.priorRequest.RecGroup) {
+      this.programs = [];
+      this.selection = [];
+      this.priorRequest = request;
+    }
+
     this.dvrService.GetRecordedList(request).subscribe(data => {
       let recordings = data.ProgramList;
       this.programs.length = data.ProgramList.TotalAvailable;
       // populate page of virtual programs
-      // this.programs.splice(request.StartIndex!, request.Count!, ...this.recordings.Programs);
       this.programs.splice(recordings.StartIndex, recordings.Count,
         ...recordings.Programs);
       // notify of change
@@ -180,6 +195,7 @@ export class RecordingsComponent implements OnInit {
   }
 
   refresh() {
+    this.selection = [];
     this.loadLazy(this.lazyLoadEvent);
   }
 
@@ -194,29 +210,63 @@ export class RecordingsComponent implements OnInit {
     return duration;
   }
 
-  // todo: add a way of showing and updating these:
-  // AutoExpire, Damaged, Preserve
-  showMenu(program: ScheduleOrProgram, event: any) {
-    this.program = program;
-    this.menuToShow.length = 0;
-    if (this.program.Recording.RecGroup == 'Deleted')
-      this.menuToShow.push(this.mnu_undelete);
-    else {
-      this.menuToShow.push(this.mnu_delete);
-      this.menuToShow.push(this.mnu_delete_rerec);
+  onContextMenu(program: ScheduleOrProgram, event: any) {
+    if (this.selection.some((x) => !x)) {
+      this.sendMessage('error', null, '', this.msg.UndefSelection);
+      return false;
     }
-    this.menuToShow.push(this.mnu_rerec);
-    if (program.ProgramFlagNames.indexOf('WATCHED') > -1)
-      this.menuToShow.push(this.mnu_markunwatched);
+    if (this.selection.some((x) => x.Recording.RecordedId == program.Recording.RecordedId))
+      this.showContextMenu(null, event);
+    return false;
+  }
+
+  onSelectChange() {
+    this.menu.hide();
+  }
+
+  // todo: add a way of showing and updating these:
+  // AutoExpire, Preserve
+  showContextMenu(program: ScheduleOrProgram | null, event: any) {
+    this.actionList.length = 0;
+    if (program && program.Title)
+      this.actionList.push(program);
     else
-      this.menuToShow.push(this.mnu_markwatched);
-    if (program.VideoPropNames.indexOf('DAMAGED') > -1)
-      this.menuToShow.push(this.mnu_markundamaged);
+      this.actionList.push(...this.selection);
+    if (this.actionList.length == 0)
+      return;
+    if (this.actionList.some((x) => !x)) {
+      this.sendMessage('error', null, '', this.msg.UndefSelection);
+      return;
+    }
+    this.menuToShow.length = 0;
+    let subMenu: MenuItem[] = [];
+    if (this.actionList.some((x) => x.Recording.RecGroup == 'Deleted'))
+      subMenu.push(this.mnu_undelete);
+    if (this.actionList.some((x) => x.Recording.RecGroup != 'Deleted')) {
+      subMenu.push(this.mnu_delete);
+      subMenu.push(this.mnu_delete_rerec);
+    }
+    subMenu.push(this.mnu_rerec);
+    if (this.actionList.some((x) => x.ProgramFlagNames.indexOf('WATCHED') > -1))
+      subMenu.push(this.mnu_markunwatched);
+    if (this.actionList.some((x) => x.ProgramFlagNames.indexOf('WATCHED') < 0))
+      subMenu.push(this.mnu_markwatched);
+    if (this.actionList.some((x) => x.VideoPropNames.indexOf('DAMAGED') > -1))
+      subMenu.push(this.mnu_markundamaged);
+    if (this.actionList.some((x) => x.VideoPropNames.indexOf('DAMAGED') < 0))
+      subMenu.push(this.mnu_markdamaged);
+    subMenu.push(this.mnu_updaterecgrp);
+    if (this.actionList.length == 1) {
+      subMenu.push(this.mnu_updatemeta);
+      this.menuToShow.push({ label: this.actionList[0].Title + ' - ' + this.actionList[0].SubTitle, items: subMenu });
+    }
     else
-      this.menuToShow.push(this.mnu_markdamaged);
-    this.menuToShow.push(this.mnu_updatemeta);
-    if (this.program.Recording.RecGroup != 'Deleted') {
-      this.menuToShow.push(this.mnu_runjobs);
+      this.menuToShow.push({ label: this.msg.ActionsSelected.replace(/{{ *num *}}/, this.actionList.length.toString()), items: subMenu });
+    if (this.actionList.every((x) => x.Recording.RecGroup != 'Deleted')) {
+      if (this.actionList.length == 1)
+        this.menuToShow.push(this.mnu_runjobs)
+      else
+        this.menuToShow.push({ label: this.msg.JobsSelected.replace(/{{ *num *}}/, this.actionList.length.toString()), items: this.jobs });
       for (let ix = 0; ix < 4; ix++) {
         if (this.JobQCmds.UserJob[ix]) {
           this.jobs[ix + this.jobsoffset].visible = true;
@@ -232,133 +282,237 @@ export class RecordingsComponent implements OnInit {
   }
 
   delete(event: any, rerec: boolean) {
-    // check with backend not already deleted by another user
-    this.dvrService.GetRecorded({ RecordedId: this.program.Recording.RecordedId })
-      .subscribe({
-        next: (x) => {
-          if (x.Program.Recording.RecGroup == 'Deleted') {
-            this.sendMessage('error', event.item.label, this.msg.AlreadyDel);
-            this.program.Recording.RecGroup = 'Deleted';
+    let program = <ScheduleOrProgram>this.actionList.shift();
+    if (program) {
+      // check with backend not already deleted by another user
+      this.dvrService.GetRecorded({ RecordedId: program.Recording.RecordedId })
+        .subscribe({
+          next: (x) => {
+            if (x.Program.Recording.RecGroup == 'Deleted') {
+              this.sendMessage('error', program, event.item.label, this.msg.AlreadyDel);
+              program.Recording.RecGroup = 'Deleted';
+            }
+            else {
+              this.dvrService.DeleteRecording({
+                RecordedId: program.Recording.RecordedId,
+                AllowRerecord: rerec
+              }).subscribe({
+                next: (x) => {
+                  if (x.bool) {
+                    this.sendMessage('success', program, event.item.label, this.msg.Success, this.msg.CanUndo);
+                    program.Recording.RecGroup = 'Deleted';
+                  }
+                  else {
+                    this.sendMessage('error', program, event.item.label, this.msg.Failed);
+                  }
+                },
+                error: (err: any) => this.networkError(program, err)
+              });
+            }
+            this.delete(event, rerec);
+          },
+          error: (err: any) => {
+            this.networkError(program, err);
+            this.delete(event, rerec);
           }
-          else {
-            this.dvrService.DeleteRecording({
-              RecordedId: this.program.Recording.RecordedId,
-              AllowRerecord: rerec
-            }).subscribe({
-              next: (x) => {
-                if (x.bool) {
-                  this.sendMessage('success', event.item.label, this.msg.Success, this.msg.CanUndo);
-                  this.program.Recording.RecGroup = 'Deleted';
-                }
-                else {
-                  this.sendMessage('error', event.item.label, this.msg.Failed);
-                }
-              },
-              error: (err: any) => this.networkError(err)
-            });
-          }
-        },
-        error: (err: any) => this.networkError(err)
-      });
+        });
+    }
   }
 
   undelete(event: any) {
-    this.dvrService.UnDeleteRecording({ RecordedId: this.program.Recording.RecordedId, }).subscribe({
-      next: (x) => {
-        if (x.bool) {
-          this.program.Recording.RecGroup = 'Default';
-          this.sendMessage('success', event.item.label, this.msg.Success);
+    let program = <ScheduleOrProgram>this.actionList.shift();
+    if (program) {
+      this.dvrService.UnDeleteRecording({ RecordedId: program.Recording.RecordedId, }).subscribe({
+        next: (x) => {
+          if (x.bool) {
+            program.Recording.RecGroup = 'Default';
+            this.sendMessage('success', program, event.item.label, this.msg.Success);
+          }
+          else {
+            this.sendMessage('error', program, event.item.label, this.msg.Failed);
+          }
+          this.undelete(event);
+        },
+        error: (err: any) => {
+          this.networkError(program, err);
+          this.undelete(event);
         }
-        else {
-          this.sendMessage('error', event.item.label, this.msg.Failed);
-        }
-      },
-      error: (err: any) => this.networkError(err)
-    });
+      });
+    }
   }
 
-  networkError(err: any) {
+  networkError(program: ScheduleOrProgram, err: any) {
     console.log("network error", err);
-    this.sendMessage('error', '', this.msg.NetFail);
+    this.sendMessage('error', program, '', this.msg.NetFail);
   }
 
-  sendMessage(severity: string, action: string, text: string, extraText?: string) {
+  sendMessage(severity: string, program: ScheduleOrProgram | null, action: string, text: string, extraText?: string) {
     if (extraText)
       extraText = '\n' + extraText;
     else
       extraText = '';
+    let detail = action;
+    if (program != null)
+      detail = action + ' ' + program.Title + ' ' + program.SubTitle + extraText;
     this.messageService.add({
       severity: severity, summary: text,
-      detail: action + ' ' + this.program.Title + ' ' + this.program.SubTitle + extraText,
-      life: 3000
-      // contentStyleClass: 'recsmsg'
+      detail: detail,
+      life: 5000,
+      sticky: (severity == 'error')
     });
   }
 
   rerec(event: any) {
-    this.dvrService.AllowReRecord(this.program.Recording.RecordedId).subscribe({
-      next: (x) => {
-        if (x.bool)
-          this.sendMessage('success', event.item.label, this.msg.Success);
-        else
-          this.sendMessage('error', event.item.label, this.msg.Failed);
-      },
-      error: (err: any) => this.networkError(err)
-    });
-  }
-
-  markwatched(event: any, Watched: boolean) {
-    this.dvrService.UpdateRecordedMetadata(
-      { RecordedId: this.program.Recording.RecordedId, Watched: Watched }).subscribe({
+    let program = <ScheduleOrProgram>this.actionList.shift();
+    if (program) {
+      this.dvrService.AllowReRecord(program.Recording.RecordedId).subscribe({
         next: (x) => {
-          if (x.bool) {
-            this.sendMessage('success', event.item.label, this.msg.Success);
-            if (Watched) {
-              this.program.ProgramFlagNames = this.program.ProgramFlagNames + '|WATCHED|';
-            }
-            else {
-              const regex = /WATCHED/g;
-              this.program.ProgramFlagNames = this.program.ProgramFlagNames.replace(regex, '');
-            }
-          }
+          if (x.bool)
+            this.sendMessage('success', program, event.item.label, this.msg.Success);
           else
-            this.sendMessage('error', event.item.label, this.msg.Failed);
+            this.sendMessage('error', program, event.item.label, this.msg.Failed);
+          this.rerec(event);
         },
-        error: (err: any) => this.networkError(err)
+        error: (err: any) => {
+          this.networkError(program, err);
+          this.rerec(event);
+        }
       });
+    }
+  }
+  markwatched(event: any, Watched: boolean) {
+    let program = <ScheduleOrProgram>this.actionList.shift();
+    if (program) {
+      this.dvrService.UpdateRecordedMetadata(
+        { RecordedId: program.Recording.RecordedId, Watched: Watched }).subscribe({
+          next: (x) => {
+            if (x.bool) {
+              this.sendMessage('success', program, event.item.label, this.msg.Success);
+              if (Watched) {
+                program.ProgramFlagNames = program.ProgramFlagNames + '|WATCHED|';
+              }
+              else {
+                const regex = /WATCHED/g;
+                program.ProgramFlagNames = program.ProgramFlagNames.replace(regex, '');
+              }
+            }
+            else
+              this.sendMessage('error', program, event.item.label, this.msg.Failed);
+            this.markwatched(event, Watched);
+          },
+          error: (err: any) => {
+            this.networkError(program, err);
+            this.markwatched(event, Watched);
+          }
+        });
+    }
+
   }
 
   markdamaged(event: any, damaged: boolean) {
-    this.dvrService.UpdateRecordedMetadata(
-      { RecordedId: this.program.Recording.RecordedId, Damaged: damaged }).subscribe({
-        next: (x) => {
-          if (x.bool) {
-            if (damaged) {
-              this.sendMessage('success', event.item.label, this.msg.Success, this.msg.NonReRec);
-              this.program.VideoPropNames = this.program.VideoPropNames + '|DAMAGED|';
+    let program = <ScheduleOrProgram>this.actionList.shift();
+    if (program) {
+      this.dvrService.UpdateRecordedMetadata(
+        { RecordedId: program.Recording.RecordedId, Damaged: damaged }).subscribe({
+          next: (x) => {
+            if (x.bool) {
+              if (damaged) {
+                this.sendMessage('success', program, event.item.label, this.msg.Success, this.msg.NonReRec);
+                program.VideoPropNames = program.VideoPropNames + '|DAMAGED|';
+              }
+              else {
+                this.sendMessage('success', program, event.item.label, this.msg.Success);
+                const regex = /DAMAGED/g;
+                program.VideoPropNames = program.VideoPropNames.replace(regex, '');
+              }
             }
-            else {
-              this.sendMessage('success', event.item.label, this.msg.Success);
-              const regex = /DAMAGED/g;
-              this.program.VideoPropNames = this.program.VideoPropNames.replace(regex, '');
-            }
+            else
+              this.sendMessage('error', program, event.item.label, this.msg.Failed);
+            this.markdamaged(event, damaged);
+          },
+          error: (err: any) => {
+            this.networkError(program, err);
+            this.markdamaged(event, damaged);
           }
-          else
-            this.sendMessage('error', event.item.label, this.msg.Failed);
-        },
-        error: (err: any) => this.networkError(err)
-      });
+        });
+    }
   }
 
-  updatemeta(event: any) {
-    this.editingProgram = this.program;
-    this.program = Object.assign({}, this.program);
-    if (this.program.Airdate)
-      this.program.Airdate = new Date(this.program.Airdate + ' 00:00');
+  promptrecgrp(event: any) {
+    if (this.actionList.length == 1)
+      this.newRecGroup = this.actionList[0].Recording.RecGroup;
     else
-      this.program.Airdate = <Date><unknown>null;
-    this.displayMetadataDlg = true;
-    this.currentForm.form.markAsPristine();
+      this.newRecGroup = '';
+    this.displayRecGrpDlg = true;
+  }
+
+
+  updaterecgrp() {
+    this.displayRecGrpDlg = false;
+    this.newRecGroup = this.newRecGroup.trim();
+    let program = <ScheduleOrProgram>this.actionList.shift();
+    if (program && this.newRecGroup) {
+      this.dvrService.UpdateRecordedMetadata(
+        { RecordedId: program.Recording.RecordedId, RecGroup: this.newRecGroup }).subscribe({
+          next: (x) => {
+            if (x.bool) {
+              this.sendMessage('success', program, <string>this.mnu_updaterecgrp.label,
+                this.msg.Success);
+              program.Recording.RecGroup = this.newRecGroup;
+            }
+            else
+              this.sendMessage('error', program, <string>this.mnu_updaterecgrp.label,
+                this.msg.Failed);
+            this.updaterecgrp();
+          },
+          error: (err: any) => {
+            this.networkError(program, err);
+            this.updaterecgrp();
+          }
+        });
+    }
+  }
+
+  updaterecrule(event: any) { }
+  stoprec(event: any) { }
+
+  runjob(event: any) {
+    let program = <ScheduleOrProgram>this.actionList.shift();
+    if (program) {
+      this.dvrService.ManageJobQueue({
+        Action: 'Add',
+        JobName: event.item.id,
+        RecordedId: program.Recording.RecordedId,
+      }).subscribe({
+        next: (x) => {
+          if (x.int > 0) {
+            this.sendMessage('success', program, event.item.label, this.msg.Success);
+          }
+          else
+            this.sendMessage('error', program, event.item.label, this.msg.Failed);
+          this.runjob(event);
+        },
+        error: (err: any) => {
+          this.networkError(program, err);
+          this.runjob(event);
+        }
+      });
+    }
+  }
+
+
+  updatemeta(event: any) {
+    this.program = <ScheduleOrProgram>this.actionList.shift();
+    if (this.program) {
+      this.editingProgram = this.program;
+      this.program = Object.assign({}, this.program);
+      if (this.program.Airdate)
+        this.program.Airdate = new Date(this.program.Airdate + ' 00:00');
+      else
+        this.program.Airdate = <Date><unknown>null;
+      this.displayMetadataDlg = true;
+      this.currentForm.form.markAsPristine();
+    }
   }
 
   saveObserver: PartialObserver<any> = {
@@ -423,24 +577,5 @@ export class RecordingsComponent implements OnInit {
 
   }
 
-  updaterecrule(event: any) { }
-  stoprec(event: any) { }
-
-  runjob(event: any) {
-    this.dvrService.ManageJobQueue({
-      Action: 'Add',
-      JobName: event.item.id,
-      RecordedId: this.program.Recording.RecordedId,
-    }).subscribe({
-      next: (x) => {
-        if (x.int > 0) {
-          this.sendMessage('success', event.item.label, this.msg.Success);
-        }
-        else
-          this.sendMessage('error', event.item.label, this.msg.Failed);
-      },
-      error: (err: any) => this.networkError(err)
-    });
-  }
 
 }
