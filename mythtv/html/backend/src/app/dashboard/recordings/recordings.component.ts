@@ -179,6 +179,7 @@ export class RecordingsComponent implements OnInit {
       || request.RecGroup != this.priorRequest.RecGroup) {
       this.programs = [];
       this.selection = [];
+      this.menu.hide();
       this.priorRequest = request;
     }
 
@@ -196,6 +197,7 @@ export class RecordingsComponent implements OnInit {
 
   refresh() {
     this.selection = [];
+    this.menu.hide();
     this.loadLazy(this.lazyLoadEvent);
   }
 
