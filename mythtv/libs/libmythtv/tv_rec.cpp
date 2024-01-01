@@ -1263,6 +1263,7 @@ V4LChannel *TVRec::GetV4LChannel(void)
 #endif // USING_V4L2
 }
 
+// Check if EIT is enabled for the video source connected to this input
 static bool get_use_eit(uint inputid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1270,7 +1271,7 @@ static bool get_use_eit(uint inputid)
         "SELECT SUM(useeit) "
         "FROM videosource, capturecard "
         "WHERE videosource.sourceid = capturecard.sourceid AND"
-        "      capturecard.cardid     = :INPUTID");
+        "      capturecard.cardid   = :INPUTID");
     query.bindValue(":INPUTID", inputid);
 
     if (!query.exec() || !query.isActive())
@@ -1508,7 +1509,7 @@ void TVRec::run(void)
             else if (!get_use_eit(GetInputId()))
             {
                 LOG(VB_EIT, LOG_INFO, LOC +
-                    QString("EIT scanning disabled for all inputs connected to video source %1")
+                    QString("EIT scanning disabled for video source %1")
                         .arg(GetSourceID()));
                 m_eitScanStartTime = MythDate::current().addYears(10);
             }
@@ -4098,8 +4099,8 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
             else
             {
                 LOG(VB_EIT, LOG_INFO, LOC +
-                    "EIT scanning disabled for all sources on this input.");
-            }
+                    QString("EIT scanning disabled for video source %1")
+                        .arg(GetSourceID()));            }
         }
     }
 

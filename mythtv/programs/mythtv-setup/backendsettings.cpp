@@ -416,6 +416,19 @@ static GlobalSpinBoxSetting *EITScanPeriod()
     return gc;
 }
 
+static GlobalSpinBoxSetting *EITEventChunkSize()
+{
+    auto *gc = new GlobalSpinBoxSetting("EITEventChunkSize", 20, 1000, 20);
+    gc->setLabel(QObject::tr("EIT event chunk size"));
+    gc->setValue(20);
+    QString helpText = QObject::tr(
+        "Maximum number of DB inserts per ProcessEvents call. "
+        "This limits the rate at which EIT events are processed "
+        "in the backend so that there is always enough processing "
+        "capacity for the other backend tasks.");
+    gc->setHelpText(helpText);
+    return gc;
+}
 
 static GlobalCheckBoxSetting *EITCachePersistent()
 {
@@ -430,6 +443,7 @@ static GlobalCheckBoxSetting *EITCachePersistent()
     gc->setHelpText(helpText);
     return gc;
 }
+
 static GlobalSpinBoxSetting *WOLbackendReconnectWaitTime()
 {
     auto *gc = new GlobalSpinBoxSetting("WOLbackendReconnectWaitTime", 0, 1200, 5);
@@ -984,6 +998,7 @@ BackendSettings::BackendSettings()
     group2a1->addChild(EITTransportTimeout());
     group2a1->addChild(EITCrawIdleStart());
     group2a1->addChild(EITScanPeriod());
+    group2a1->addChild(EITEventChunkSize());
     group2a1->addChild(EITCachePersistent());
     addChild(group2a1);
 
