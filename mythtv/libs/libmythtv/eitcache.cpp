@@ -117,7 +117,6 @@ static void delete_in_db(uint endtime)
         MythDB::DBError("Error deleting old eitcache entries.", query);
 }
 
-
 enum channel_status
 {
     EITDATA      = 0,
@@ -208,9 +207,14 @@ static void unlock_channel(uint chanid, uint updated)
         MythDB::DBError("Error inserting eit statistics", query);
 }
 
-
 event_map_t * EITCache::LoadChannel(uint chanid)
 {
+    // Event map is empty when we do not backup the cache in the database
+    if (!m_persistent)
+    {
+        return new event_map_t();
+    }
+
     if (!lock_channel(chanid, m_lastPruneTime))
         return nullptr;
 
@@ -272,9 +276,13 @@ bool EITCache::WriteChannelToDB(QStringList &value_clauses, uint chanid)
         {
             if (modified(*it))
             {
-                replace_in_db(value_clauses, chanid, it.key(), *it);
+                if (m_persistent)
+                {
+                    replace_in_db(value_clauses, chanid, it.key(), *it);
+                }
+
                 updated++;
-                *it &= ~(uint64_t)0 >> 1; // mark as synced
+                *it &= ~(uint64_t)0 >> 1; // Mark as synced
             }
             ++it;
         }
@@ -285,13 +293,26 @@ bool EITCache::WriteChannelToDB(QStringList &value_clauses, uint chanid)
             removed++;
         }
     }
-    unlock_channel(chanid, updated);
+
+    if (m_persistent)
+    {
+        unlock_channel(chanid, updated);
+    }
 
     if (updated)
     {
-        LOG(VB_EIT, LOG_INFO, LOC + QString("Writing %1 modified entries of %2 "
-                                      "for chanid %3 to database.")
-                .arg(updated).arg(size).arg(chanid));
+        if (m_persistent)
+        {
+            LOG(VB_EIT, LOG_INFO, LOC +
+                QString("Writing %1 modified entries of %2 for chanid %3 to database.")
+                    .arg(updated).arg(size).arg(chanid));
+        }
+        else
+        {
+            LOG(VB_EIT, LOG_INFO, LOC +
+                QString("Updated %1 modified entries of %2 for chanid %3 in cache.")
+                    .arg(updated).arg(size).arg(chanid));
+        }
     }
     if (removed)
     {
@@ -318,18 +339,21 @@ void EITCache::WriteToDB(void)
             ++it;
     }
 
-    if(value_clauses.isEmpty())
+    if (m_persistent)
     {
-        return;
-    }
+        if(value_clauses.isEmpty())
+        {
+            return;
+        }
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(QString("REPLACE INTO eit_cache "
-                          "(chanid, eventid, tableid, version, endtime) "
-                          "VALUES %1").arg(value_clauses.join(",")));
-    if (!query.exec())
-    {
-        MythDB::DBError("Error updating eitcache", query);
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(QString("REPLACE INTO eit_cache "
+                            "(chanid, eventid, tableid, version, endtime) "
+                            "VALUES %1").arg(value_clauses.join(",")));
+        if (!query.exec())
+        {
+            MythDB::DBError("Error updating eitcache", query);
+        }
     }
 }
 
@@ -338,22 +362,20 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
 {
     m_accessCnt++;
 
-    if ((m_accessCnt <  100000 && (m_accessCnt %  10000 == 0)) ||
-        (m_accessCnt < 1000000 && (m_accessCnt % 100000 == 0)) ||
-        (m_accessCnt % 1000000 == 0))
+    if ((m_accessCnt < 100000 && (m_accessCnt %  10000 == 0)) ||
+        (m_accessCnt % 100000 == 0))
     {
         LOG(VB_EIT, LOG_INFO, LOC + GetStatistics());
-        WriteToDB();
     }
 
-    // don't re-add pruned entries
+    // Don't re-add pruned entries
     if (endtime < m_lastPruneTime)
     {
         m_prunedHitCnt++;
         return false;
     }
 
-    // validity check, reject events with endtime over 7 weeks in the future
+    // Validity check, reject events with endtime over 7 weeks in the future
     if (endtime > m_lastPruneTime + 50 * 86400)
     {
         m_futureHitCnt++;
@@ -426,7 +448,10 @@ uint EITCache::PruneOldEntries(uint timestamp)
     WriteToDB();
 
     // Prune old entries in the DB
-    delete_in_db(timestamp);
+    if (m_persistent)
+    {
+        delete_in_db(timestamp);
+    }
 
     return 0;
 }

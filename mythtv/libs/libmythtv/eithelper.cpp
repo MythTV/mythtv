@@ -40,6 +40,10 @@ static void init_fixup(FixupMap &fix);
 EITHelper::EITHelper(uint cardnum) :
     m_cardnum(cardnum)
 {
+    // Save EIT cache in database table eit_cache iff true
+    bool persistent = gCoreContext->GetBoolSetting("EITCachePersistent", true);
+    s_eitCache->SetPersistent(persistent);
+
     init_fixup(m_fixup);
 }
 

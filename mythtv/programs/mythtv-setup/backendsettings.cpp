@@ -416,6 +416,20 @@ static GlobalSpinBoxSetting *EITScanPeriod()
     return gc;
 }
 
+
+static GlobalCheckBoxSetting *EITCachePersistent()
+{
+    auto *gc = new GlobalCheckBoxSetting("EITCachePersistent");
+    gc->setLabel(QObject::tr("EIT cache persistent"));
+    gc->setValue(true);
+    QString helpText = QObject::tr(
+        "Save the content of the EIT cache in the database "
+        "and use that at the next start of the backend. "
+        "This reduces EIT event processing at a restart of the backend but at the "
+        "cost of updating the copy of the EIT cache in the database continuously.");
+    gc->setHelpText(helpText);
+    return gc;
+}
 static GlobalSpinBoxSetting *WOLbackendReconnectWaitTime()
 {
     auto *gc = new GlobalSpinBoxSetting("WOLbackendReconnectWaitTime", 0, 1200, 5);
@@ -970,6 +984,7 @@ BackendSettings::BackendSettings()
     group2a1->addChild(EITTransportTimeout());
     group2a1->addChild(EITCrawIdleStart());
     group2a1->addChild(EITScanPeriod());
+    group2a1->addChild(EITCachePersistent());
     addChild(group2a1);
 
     auto* group3 = new GroupSetting();
