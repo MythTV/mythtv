@@ -653,7 +653,7 @@
             "col_name": "Nome",
             "col_priority": "Priorità",
             "col_source": "Fonte",
-            "col_useeit": "Lo vedi",
+            "col_useeit": "Usa EIT",
             "col_visibility": "Visibilità",
             "commmethod_desc": "Cambia il metodo di rilevamento commerciale utilizzato per le registrazioni su questo canale o salta il rilevamento contrassegnando il canale come Senza pubblicità.",
             "commmethod_label": "Metodo di rilevamento commerciale",

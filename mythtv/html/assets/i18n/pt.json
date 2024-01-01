@@ -653,7 +653,7 @@
             "col_name": "Nome",
             "col_priority": "Prioridade",
             "col_source": "Fonte",
-            "col_useeit": "Você vê isso",
+            "col_useeit": "Usar EIT",
             "col_visibility": "Visibilidade",
             "commmethod_desc": "Altera o método de detecção comercial usado para gravações neste canal ou pula a detecção marcando o canal como Comercial Livre.",
             "commmethod_label": "Método de Detecção Comercial",

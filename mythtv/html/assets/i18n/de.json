@@ -653,7 +653,7 @@
             "col_name": "Name",
             "col_priority": "Priorität",
             "col_source": "Quelle",
-            "col_useeit": "Du siehst es",
+            "col_useeit": "Verwenden Sie EIT",
             "col_visibility": "Sichtweite",
             "commmethod_desc": "Ändert die Methode der kommerziellen Erkennung, die für Aufnahmen auf diesem Kanal verwendet wird, oder überspringt die Erkennung, indem der Kanal als werbefrei markiert wird.",
             "commmethod_label": "Kommerzielle Nachweismethode",

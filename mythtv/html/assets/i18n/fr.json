@@ -653,7 +653,7 @@
             "col_name": "Nom",
             "col_priority": "Priorité",
             "col_source": "Source",
-            "col_useeit": "Tu le vois",
+            "col_useeit": "Utiliser EIT",
             "col_visibility": "Visibilité",
             "commmethod_desc": "Modifie la méthode de détection commerciale utilisée pour les enregistrements sur cette chaîne ou saute la détection en marquant la chaîne comme étant sans publicité.",
             "commmethod_label": "Méthode de détection commerciale",
