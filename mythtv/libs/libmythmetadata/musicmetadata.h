@@ -523,6 +523,7 @@ class META_PUBLIC AlbumArtImages
 
   public:
     explicit AlbumArtImages(MusicMetadata *metadata, bool loadFromDB = true);
+    explicit AlbumArtImages(MusicMetadata *metadata, const AlbumArtImages &other);
     ~AlbumArtImages();
 
     void           scanForImages(void);

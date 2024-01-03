@@ -122,7 +122,10 @@ MusicMetadata& MusicMetadata::operator=(const MusicMetadata &rhs)
     m_compartistId = rhs.m_compartistId;
     m_albumId = rhs.m_albumId;
     m_genreId = rhs.m_genreId;
-    m_albumArt = nullptr;
+    if (rhs.m_albumArt)
+    {
+        m_albumArt = new AlbumArtImages(this, *rhs.m_albumArt);
+    }
     m_lyricsData = nullptr;
     m_format = rhs.m_format;
     m_changed = rhs.m_changed;
@@ -1296,6 +1299,11 @@ QString MusicMetadata::getAlbumArtFile(void)
 
             res = albumart_image->m_filename;
         }
+        else if (repo == RT_CD)
+        {
+            // CD tracks can only be played locally, so coverart is local too
+            return res;
+        }
         else
         {
             // check for the image in the storage group
@@ -1888,6 +1896,15 @@ AlbumArtImages::AlbumArtImages(MusicMetadata *metadata, bool loadFromDB)
 {
     if (loadFromDB)
         findImages();
+}
+
+AlbumArtImages::AlbumArtImages(MusicMetadata *metadata, const AlbumArtImages &other)
+    : m_parent(metadata)
+{
+    for (auto &srcImage : qAsConst(other.m_imageList))
+    {
+        m_imageList.append(new AlbumArtImage(srcImage));
+    }
 }
 
 AlbumArtImages::~AlbumArtImages()
