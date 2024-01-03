@@ -307,6 +307,7 @@ bool MusicBrainz::queryForDevice(const QString &deviceName)
     const auto discId = queryDiscId(deviceName.toStdString());
     if (discId.empty())
     {
+        reset();
         return false;
     }
     if (discId == m_discId)
@@ -315,6 +316,10 @@ bool MusicBrainz::queryForDevice(const QString &deviceName)
         LOG(VB_MEDIA, LOG_DEBUG, QString("musicbrainz: Metadata for disc %1 already present").arg(QString::fromStdString(m_discId)));
         return true;
     }
+
+    // new disc id, reset existing data
+    reset();
+
     const auto releaseId = queryRelease(discId);
     if (releaseId.empty())
     {
@@ -348,7 +353,17 @@ MusicMetadata *MusicBrainz::getMetadata(int track) const
         return nullptr;
     }
     auto *metadata = new MusicMetadata(it.value());
-    metadata->getAlbumArtImages()->addImage(&m_albumArt);
+    if (!m_albumArt.m_filename.isEmpty())
+    {
+        metadata->getAlbumArtImages()->addImage(&m_albumArt);
+    }
     return metadata;
+}
+
+void MusicBrainz::reset()
+{
+    LOG(VB_MEDIA, LOG_DEBUG, "musicbrainz: Reset metadata");
+    m_tracks.clear();
+    m_albumArt = AlbumArtImage();
 }
 

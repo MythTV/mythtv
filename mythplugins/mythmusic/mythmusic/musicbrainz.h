@@ -37,6 +37,10 @@ public:
      */
     MusicMetadata *getMetadata(int track) const;
 
+    /**
+     * Reset last queried metadata
+     */
+    void reset();
 private:
 
 #ifdef HAVE_MUSICBRAINZ

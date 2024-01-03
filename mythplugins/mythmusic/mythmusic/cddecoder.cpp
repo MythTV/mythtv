@@ -661,7 +661,7 @@ MusicMetadata *CdDecoder::getMetadata()
 #endif // CDTEXT
     {
 #ifdef HAVE_MUSICBRAINZ
-        if (isDiscChanged && !getMusicBrainz().hasMetadata(m_setTrackNum))
+        if (isDiscChanged)
         {
             // lazy load whole CD metadata
             getMusicBrainz().queryForDevice(m_deviceName);
