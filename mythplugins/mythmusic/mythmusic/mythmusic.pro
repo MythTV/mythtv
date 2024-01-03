@@ -70,6 +70,11 @@ cdio {
     LIBS += -lcdio -lcdio_cdda -lcdio_paranoia
 }
 
+musicbrainz {
+    HEADERS += musicbrainz.h
+    SOURCES += musicbrainz.cpp
+}
+
 mingw {
     LIBS += -logg
 

@@ -302,6 +302,7 @@ exif
 newexif
 dcraw
 cdio
+musicbrainz
 "
 
 DEPEND_LIST="
@@ -356,6 +357,7 @@ MythGame related options:
 MythMusic related options:
   --enable-mythmusic       build the mythmusic plugin [$music]
   --enable-cdio            enable cd playback [$cdio]
+  --enable-musicbrainz     enable fetching cd metadata from musicbrainz [$musicbrainz]
 
 MythNetvision related options:
   --enable-mythnetvision   build the mythnetvision plugin [$netvision]
@@ -715,7 +717,21 @@ if enabled music ; then
             enable cdio; # nop
         else
             disable cdio
-	fi
+        fi
+    fi
+    if enabled musicbrainz ; then
+        if ! check_lib discid/discid.h discid_new -ldiscid ; then
+            disable musicbrainz
+            echo "MusicBrainz support requires libdiscid."
+        elif ! check_lib musicbrainz5/mb5_c.h mb5_query_new -lmusicbrainz5 -lm -lstdc++; then
+            disable musicbrainz
+            echo "MusicBrainz support requires libmusicbrainz5."
+        elif ! check_lib coverart/caa_c.h caa_coverart_new -lcoverart -lm -lstdc++; then
+            disable musicbrainz
+            echo "MusicBrainz support requires libcoverart."
+        else
+            enable musicbrainz; # nop
+        fi
     fi
 
     if ! check_lib lame/lame.h lame_init -lmp3lame ; then
@@ -852,6 +868,16 @@ if enabled music ; then
       echo "#define HAVE_CDIO 1" >> ./mythmusic/mythmusic/config.h
       echo "CONFIG += cdio" >> ./mythmusic/mythmusic/config.pro
       echo "        libcdio        support will be included in MythMusic"
+      if enabled musicbrainz ; then
+        echo "#define HAVE_MUSICBRAINZ 1" >> ./mythmusic/mythmusic/config.h
+        echo "CONFIG += link_pkgconfig" >> ./mythmusic/mythmusic/config.pro
+        echo "CONFIG += musicbrainz" >> ./mythmusic/mythmusic/config.pro
+        echo "PKGCONFIG += libdiscid libmusicbrainz5 libcoverart" >> ./mythmusic/mythmusic/config.pro
+        echo "        musicbrainz    support will be included in MythMusic"
+      else
+        echo "#undef  HAVE_MUSICBRAINZ" >> ./mythmusic/mythmusic/config.h
+        echo "        musicbrainz    support will not be included in MythMusic"
+      fi
     else
       echo "#undef  HAVE_CDIO" >> ./mythmusic/mythmusic/config.h
       echo "        libcdio        support will not be included in MythMusic"
