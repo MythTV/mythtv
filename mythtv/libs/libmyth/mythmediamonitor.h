@@ -16,6 +16,8 @@
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythmedia.h"
 
+typedef void (*MediaCallback)(MythMediaDevice *mediadevice, bool forcePlayback);
+
 /// Stores details of media handlers
 
 // Adding member initializers caused compilation to fail with an error
@@ -23,7 +25,7 @@
 // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
 struct MHData
 {
-    void   (*callback)(MythMediaDevice *mediadevice);
+    MediaCallback callback;
     int      MythMediaType;
     QString  destination;
     QString  description;
@@ -78,10 +80,10 @@ class MPUBLIC MediaMonitor : public QObject
 
     void RegisterMediaHandler(const QString  &destination,
                               const QString  &description,
-                              void          (*callback) (MythMediaDevice*),
+                              MediaCallback  callback,
                               int             mediaType,
                               const QString  &extensions);
-    void JumpToMediaHandler(MythMediaDevice*  pMedia);
+    void JumpToMediaHandler(MythMediaDevice*  pMedia, bool forcePlayback = false);
 
     // Plugins should use these if they need to access optical disks:
     static QString defaultCDdevice();
@@ -145,7 +147,7 @@ class MPUBLIC MediaMonitor : public QObject
 static inline void
 REG_MEDIA_HANDLER (const QString&  destination,
                    const QString&  description,
-                   void          (*callback)(MythMediaDevice*),
+                   MediaCallback   callback,
                    int             mediaType,
                    const QString&  extensions)
 {
