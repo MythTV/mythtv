@@ -50,7 +50,6 @@ except ImportError:
     from urlparse import urlparse
 import json
 from json import JSONEncoder
-from simplejson import errors as sje
 import datetime
 import logging
 
@@ -790,8 +789,8 @@ class _HardwareProfile:
                 sys.exit(1)
 
             try:
-                admin_obj = admin_token.json()
-            except sje.JSONDecodeError:
+                admin_obj = json.loads(admin_token.content)
+            except json.JSONDecodeError:
                 self.session.close()
                 error(_('Incorrect server response. Expected a JSON string'))
                 return (1, None, None)
