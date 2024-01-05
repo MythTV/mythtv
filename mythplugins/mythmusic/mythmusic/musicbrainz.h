@@ -43,6 +43,11 @@ public:
     void reset();
 private:
 
+    /**
+     * Sets compilation flag for all metadata
+     */
+    void setCompilationFlag(bool isCompilation);
+
 #ifdef HAVE_MUSICBRAINZ
 
     /// Query disc id for specified device

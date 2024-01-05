@@ -63,10 +63,24 @@ static std::vector<std::string> queryArtists(const MusicBrainz5::CArtistCredit *
         return artist_names;
     }
 
+    std::string joinPhrase;
     for (int a = 0; a < artist_credit->NameCreditList()->NumItems(); ++a)
     {
-        auto *artist = artist_credit->NameCreditList()->Item(a)->Artist();
-        artist_names.emplace_back(artist->Name());
+        auto *nameCredit = artist_credit->NameCreditList()->Item(a);
+        auto *artist = nameCredit->Artist();
+        if (a == 0)
+        {
+            joinPhrase = nameCredit->JoinPhrase();
+            artist_names.emplace_back(artist->Name());
+        }
+        else if (!joinPhrase.empty())
+        {
+            artist_names.back() += joinPhrase + artist->Name();
+        }
+        else
+        {
+            artist_names.emplace_back(artist->Name());
+        }
     }
     return artist_names;
 }
@@ -120,6 +134,7 @@ std::string MusicBrainz::queryRelease(const std::string &discId)
                     }
                     auto media = fullRelease->MediaMatchingDiscID(discId);
                     LOG(VB_MEDIA, LOG_DEBUG, QString("musicbrainz: Found %1 matching media").arg(media.NumItems()));
+                    int artistDiff = 0;
                     for (int m = 0; m < media.NumItems(); ++m)
                     {
                         auto *medium = media.Item(m);
@@ -169,17 +184,34 @@ std::string MusicBrainz::queryRelease(const std::string &discId)
                                     metadata.setLength(std::chrono::milliseconds(recording->Length()));
                                     if (albumArtists.size() == 1)
                                     {
-                                        metadata.setArtist(QString::fromStdString(albumArtists[0]));
+                                        metadata.setCompilationArtist(QString::fromStdString(albumArtists[0]));
                                     }
                                     else if(albumArtists.size() > 1)
                                     {
+                                        metadata.setCompilationArtist(QObject::tr("Various Artists"));
+                                    }
+                                    if (artists.size() == 1)
+                                    {
+                                        metadata.setArtist(QString::fromStdString(artists[0]));
+                                    }
+                                    else if(artists.size() > 1)
+                                    {
                                         metadata.setArtist(QObject::tr("Various Artists"));
+                                    }
+                                    if (metadata.CompilationArtist() != metadata.Artist())
+                                    {
+                                        artistDiff++;
                                     }
                                     metadata.setYear(QDate::fromString(QString::fromStdString(fullRelease->Date()), Qt::ISODate).year());
                                 }
                             }
                         }
                     }
+                    // Set compilation flag if album artist differs from track artists
+                    // as there might be some tracks featuring guest artists we only set
+                    // the compilation flag if at least half of the track artists differ
+                    setCompilationFlag(artistDiff > m_tracks.count() / 2);
+
                     return fullRelease->ID();
                 }
             }
@@ -217,6 +249,15 @@ std::string MusicBrainz::queryRelease(const std::string &discId)
     }
 
     return {};
+}
+
+void MusicBrainz::setCompilationFlag(bool isCompilation)
+{
+    LOG(VB_MEDIA, LOG_DEBUG, QString("musicbrainz: Setting compilation flag: %1").arg(isCompilation));
+    for (auto &metadata : m_tracks)
+    {
+        metadata.setCompilation(isCompilation);
+    }
 }
 
 static void logError(CoverArtArchive::CCoverArt &coverArt)
