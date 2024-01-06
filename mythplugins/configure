@@ -261,12 +261,31 @@ int main(void){ $func(); }
 EOF
 }
 
+check_class_cxx(){
+    log check_class_cxx "$@"
+    class=$1
+    header=$2
+    shift 2
+    check_ld_cxx "$@" <<EOF
+#include <$header>
+int main(void){ $class; }
+EOF
+}
+
 check_lib_cxx(){
     log check_lib_cxx "$@"
     header="$1"
     func="$2"
     shift 2
     check_header_cxx $header && check_func_cxx $func $header "$@"
+}
+
+check_lib_cxx2(){
+    log check_lib_cxx2 "$@"
+    header="$1"
+    func="$2"
+    shift 2
+    check_header_cxx $header && check_class_cxx $func $header "$@"
 }
 
 cp_if_changed(){
@@ -693,6 +712,22 @@ if test x"$icc" != x ; then
     fi
 fi
 
+libmusicbrainz_pc(){
+    if $(pkg-config libmusicbrainz5cc --exists) ; then
+        echo "libmusicbrainz5cc"
+    else
+        echo "libmusicbrainz5"
+    fi
+}
+
+libcoverart_pc(){
+    if $(pkg-config libcoverartcc --exists) ; then
+        echo "libcoverartcc"
+    else
+        echo "libcoverart"
+    fi
+}
+
 if enabled music ; then
 
     if ! check_lib vorbis/codec.h vorbis_info_init -lvorbis || ! check_lib vorbis/vorbisenc.h vorbis_encode_setup_vbr -lvorbisenc -lvorbis -logg ; then
@@ -723,10 +758,10 @@ if enabled music ; then
         if ! check_lib discid/discid.h discid_new -ldiscid ; then
             disable musicbrainz
             echo "MusicBrainz support requires libdiscid."
-        elif ! check_lib musicbrainz5/mb5_c.h mb5_query_new -lmusicbrainz5 -lm -lstdc++; then
+        elif ! check_lib_cxx2 musicbrainz5/Query.h MusicBrainz5::CQuery\(\"test\"\) $(pkg-config $(libmusicbrainz_pc) --cflags --libs); then
             disable musicbrainz
             echo "MusicBrainz support requires libmusicbrainz5."
-        elif ! check_lib coverart/caa_c.h caa_coverart_new -lcoverart -lm -lstdc++; then
+        elif ! check_lib_cxx2 coverart/CoverArt.h CoverArtArchive::CCoverArt\(\"test\"\) $(pkg-config $(libcoverart_pc) --cflags --libs); then
             disable musicbrainz
             echo "MusicBrainz support requires libcoverart."
         else
@@ -872,7 +907,7 @@ if enabled music ; then
         echo "#define HAVE_MUSICBRAINZ 1" >> ./mythmusic/mythmusic/config.h
         echo "CONFIG += link_pkgconfig" >> ./mythmusic/mythmusic/config.pro
         echo "CONFIG += musicbrainz" >> ./mythmusic/mythmusic/config.pro
-        echo "PKGCONFIG += libdiscid libmusicbrainz5 libcoverart" >> ./mythmusic/mythmusic/config.pro
+        echo "PKGCONFIG += libdiscid $(libmusicbrainz_pc) $(libcoverart_pc)" >> ./mythmusic/mythmusic/config.pro
         echo "        musicbrainz    support will be included in MythMusic"
       else
         echo "#undef  HAVE_MUSICBRAINZ" >> ./mythmusic/mythmusic/config.h
