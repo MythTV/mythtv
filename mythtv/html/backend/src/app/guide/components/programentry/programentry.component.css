@@ -31,14 +31,12 @@
 .programBody {
     margin: 3px 5px 4px 5px;
     padding: 0px 0px 0px 2px;
-    color: white;
     height: 45px;
     z-index: 5;
     /*font-size: 0.8em;*/
 }
 
 .programCatType {
-    color: white;
     position: relative;
     font-weight: bold;
     margin-right: 5px;
@@ -52,9 +50,3 @@
     z-index: 1;
     line-height: 15px;
 }
-
-.type_series  { background-color: darkblue; }
-.type_tvshow  { background-color: darkslategray; }
-.type_movie   { background-color: blueViolet; }
-.type_sports  { background-color: darkred; }
-.type_other   { background-color: black; }

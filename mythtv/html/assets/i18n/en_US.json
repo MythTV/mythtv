@@ -16,8 +16,6 @@
         "help": "Help",
         "instructions": "Instructions",
         "loading": "Loading",
-        "mustenable": "Changes cannot be saved unless you click the Enable Updates button first.",
-        "mustrestart": "When you are finished with updates, restart the backend.",
         "networkfail": "ERROR: Backend Network Failure",
         "next": "Next",
         "no": "No",
@@ -38,15 +36,19 @@
         "backendStatus": "Backend Status",
         "channeleditor": "Channel Editor",
         "guide": {
+            "calendar_tip": "Date Picker: Select the time first, then the date.",
+            "catcolors": "Category Colors",
             "channel": "Channel",
+            "channel_group": "Channel Group",
+            "color_customize": "Customize colors this by editing this file: ",
+            "color_expl": "Shows with categories that do not have a Category color use the Category Type color.",
+            "color_includes": "This list only includes colors for programs on the current page of the guide. The full list of colors is in the file mentioned below.",
+            "colors": "Colors",
             "full_search": "Full Search",
             "people_search": "People Search",
             "retgrid": "Return to Grid Display",
             "title_search": "Title Search",
-            "type_movie": "Movie",
-            "type_series": "Series",
-            "type_sports": "Sports",
-            "type_tvshow": "TV Show"
+            "typecolors": "Category Type Colors"
         },
         "programguide": "Program Guide",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "Enabling updates will prevent any recordings from taking place until you restart",
             "enableupdates_label": "Enable Updates",
+            "mustenable": "Changes cannot be saved unless you click the Enable Updates button first.",
+            "mustrestart": "When you are finished with updates, restart the backend.",
             "restart_desc": "Recordings are disabled until you restart",
             "restart_label": "Restart Backend",
             "restarting": "Restarting Backend",
+            "shutdown_label": "Close Backend",
             "slave_enabled": "Updates are always enabled on a slave backend.",
             "slave_instructions": "This appears to be a slave backend. If it is intended as a slave backend, please disable scheduling on the master backend while running slave backend setup.",
             "slave_warning": "If this is not intended as a slave backend, please go to Setup, General, Host Address Backend Setup, and select \"This server is the Master Backend\" or else set the correct custom identifier on the Database Setup page. Save and Restart the backend,",
             "title": "MythTV Setup",
-            "upcomingrec": "Next upcoming recording: {{Title}} at {{StartTime}}. Status: {{Status}}"
+            "upcomingrec": "Next upcoming recording: {{Title}} at {{StartTime}}. Status: {{Status}}",
+            "webonly": {
+                "DBSETUP": "Backend cannot start normally because Database Setup is not complete.",
+                "DBTIMEZONE": "Backend cannot start normally because Database Timezones are not set up.",
+                "IPADDRESS": "Backend cannot start normally because General, Host Address, Primary IP Address is not set.",
+                "SCHEMAUPDATE": "Backend cannot start normally because Database Schema Update failed.",
+                "WEBONLYPARM": "Backend is in restricted mode due to --webonly parameter on the command line. You will have to restart manually."
+            }
         },
         "misc": {
             "bal_io": "Balanced disk I/O",

@@ -16,8 +16,6 @@
         "help": "Ayuda",
         "instructions": "Instrucciones",
         "loading": "Cargando",
-        "mustenable": "Los cambios no se pueden guardar a menos que primero haga clic en el botón Habilitar actualizaciones.",
-        "mustrestart": "Cuando haya terminado con las actualizaciones, reinicie el backend.",
         "networkfail": "ERROR: falla de la red de fondo",
         "next": "Próximo",
         "no": "No",
@@ -38,15 +36,19 @@
         "backendStatus": "Estado de back-end",
         "channeleditor": "Editor de canales",
         "guide": {
+            "calendar_tip": "Selector de fecha: seleccione primero la hora y luego la fecha.",
+            "catcolors": "Colores de categoría",
             "channel": "Canal",
+            "channel_group": "Grupo de canales",
+            "color_customize": "Personaliza los colores editando este archivo:",
+            "color_expl": "Los programas con categorías que no tienen un color de Categoría utilizan el color de Tipo de Categoría.",
+            "color_includes": "Esta lista solo incluye colores para programas en la página actual de la guía. La lista completa de colores se encuentra en el archivo que se menciona a continuación.",
+            "colors": "Colores",
             "full_search": "Búsqueda completa",
             "people_search": "Búsqueda de personas",
             "retgrid": "Regresar a la pantalla de cuadrícula",
             "title_search": "Buscar título",
-            "type_movie": "Película",
-            "type_series": "Serie",
-            "type_sports": "Deportes",
-            "type_tvshow": "Programa de televisión"
+            "typecolors": "Categoría Tipo Colores"
         },
         "programguide": "Guía del programa",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "Habilitar las actualizaciones evitará que se realicen grabaciones hasta que reinicie",
             "enableupdates_label": "Habilitar actualizaciones",
+            "mustenable": "Los cambios no se pueden guardar a menos que primero haga clic en el botón Habilitar actualizaciones.",
+            "mustrestart": "Cuando haya terminado con las actualizaciones, reinicie el backend.",
             "restart_desc": "Las grabaciones están deshabilitadas hasta que reinicies",
             "restart_label": "Reiniciar back-end",
             "restarting": "Reiniciar back-end",
+            "shutdown_label": "Cerrar el servidor",
             "slave_enabled": "Las actualizaciones siempre están habilitadas en un backend esclavo.",
             "slave_instructions": "Esto parece ser un backend esclavo. Si está diseñado como un backend esclavo, deshabilite la programación en el backend maestro mientras ejecuta la configuración del backend esclavo.",
             "slave_warning": "Si esto no está diseñado como un backend esclavo, vaya a Configuración, General, Configuración del backend de la dirección del host y seleccione \"Este servidor es el backend maestro\" o establezca el identificador personalizado correcto en la página Configuración de la base de datos. Guarde y reinicie el backend,",
             "title": "Configuración de MyTVTV",
-            "upcomingrec": "Próxima grabación: {{Title}} a las {{StartTime}}. Estado: {{Status}}"
+            "upcomingrec": "Próxima grabación: {{Title}} a las {{StartTime}}. Estado: {{Status}}",
+            "webonly": {
+                "DBSETUP": "El backend no puede iniciarse normalmente porque la configuración de la base de datos no está completa.",
+                "DBTIMEZONE": "El backend no puede iniciarse normalmente porque las zonas horarias de la base de datos no están configuradas.",
+                "IPADDRESS": "El backend no puede iniciarse normalmente porque General, Dirección de host y Dirección IP principal no están configurados.",
+                "SCHEMAUPDATE": "El backend no puede iniciarse normalmente porque falló la actualización del esquema de la base de datos.",
+                "WEBONLYPARM": "El backend está en modo restringido debido al parámetro --webonly en la línea de comando. Tendrás que reiniciar manualmente."
+            }
         },
         "misc": {
             "bal_io": "E/S de disco balanceado",

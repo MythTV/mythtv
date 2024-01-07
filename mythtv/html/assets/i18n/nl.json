@@ -16,8 +16,6 @@
         "help": "Hulp",
         "instructions": "Instructies",
         "loading": "Bezig met laden",
-        "mustenable": "Wijzigingen kunnen niet worden opgeslagen tenzij u eerst op de knop Updates inschakelen klikt.",
-        "mustrestart": "Wanneer u klaar bent met updates, start u de backend opnieuw op.",
         "networkfail": "FOUT: Backend-netwerkfout",
         "next": "Volgende",
         "no": "Nee",
@@ -38,15 +36,19 @@
         "backendStatus": "Backend-status",
         "channeleditor": "Kanaal-editor",
         "guide": {
+            "calendar_tip": "Datumkiezer: Selecteer eerst de tijd en vervolgens de datum.",
+            "catcolors": "Categorie Kleuren",
             "channel": "Kanaal",
+            "channel_group": "Kanaalgroep",
+            "color_customize": "Pas de kleuren aan door dit bestand te bewerken:",
+            "color_expl": "Voor shows met categorieën die geen categoriekleur hebben, wordt de categorietypekleur gebruikt.",
+            "color_includes": "Deze lijst bevat alleen kleuren voor programma's op de huidige pagina van de gids. De volledige lijst met kleuren staat in het onderstaande bestand.",
+            "colors": "Kleuren",
             "full_search": "Volledige zoekopdracht",
             "people_search": "Mensen zoeken",
             "retgrid": "Keer terug naar rasterweergave",
             "title_search": "Titel zoeken",
-            "type_movie": "Film",
-            "type_series": "Serie",
-            "type_sports": "Sport",
-            "type_tvshow": "Tv programma"
+            "typecolors": "Categorie Type Kleuren"
         },
         "programguide": "Programma gids",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "Als u updates inschakelt, worden er geen opnames gemaakt totdat u opnieuw opstart",
             "enableupdates_label": "Updates inschakelen",
+            "mustenable": "Wijzigingen kunnen niet worden opgeslagen tenzij u eerst op de knop Updates inschakelen klikt.",
+            "mustrestart": "Wanneer u klaar bent met updates, start u de backend opnieuw op.",
             "restart_desc": "Opnames zijn uitgeschakeld totdat u opnieuw opstart",
             "restart_label": "Back-end opnieuw opstarten",
             "restarting": "Backend opnieuw opstarten",
+            "shutdown_label": "Sluit de backend",
             "slave_enabled": "Updates zijn altijd ingeschakeld op een slave-backend.",
             "slave_instructions": "Dit lijkt een slave-backend te zijn. Als het bedoeld is als een slave-backend, schakelt u de planning op de master-backend uit terwijl u de slave-backend-installatie uitvoert.",
             "slave_warning": "Als dit niet bedoeld is als een slave-backend, ga dan naar Setup, General, Host Address Backend Setup en selecteer \"This server is the Master Backend\" of stel anders de juiste aangepaste identifier in op de Database Setup-pagina. Bewaar en herstart de backend,",
             "title": "MythTV-installatie",
-            "upcomingrec": "Eerstvolgende opname: {{Title}} om {{StartTime}}. Status: {{Status}}"
+            "upcomingrec": "Eerstvolgende opname: {{Title}} om {{StartTime}}. Status: {{Status}}",
+            "webonly": {
+                "DBSETUP": "Backend kan niet normaal starten omdat de database-installatie niet is voltooid.",
+                "DBTIMEZONE": "Backend kan niet normaal starten omdat Database-tijdzones niet zijn ingesteld.",
+                "IPADDRESS": "Backend kan niet normaal starten omdat Algemeen, Hostadres en Primair IP-adres niet zijn ingesteld.",
+                "SCHEMAUPDATE": "Backend kan niet normaal starten omdat het bijwerken van het databaseschema is mislukt.",
+                "WEBONLYPARM": "Backend bevindt zich in de beperkte modus vanwege de parameter --webonly op de opdrachtregel. U zult handmatig opnieuw moeten opstarten."
+            }
         },
         "misc": {
             "bal_io": "Gebalanceerde schijf-I/O",

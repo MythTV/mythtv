@@ -16,8 +16,6 @@
         "help": "Aide",
         "instructions": "Instructions",
         "loading": "Chargement",
-        "mustenable": "Les modifications ne peuvent être enregistrées que si vous cliquez d'abord sur le bouton Activer les mises à jour.",
-        "mustrestart": "Lorsque vous avez terminé les mises à jour, redémarrez le backend.",
         "networkfail": "ERREUR : Échec du réseau principal",
         "next": "Suivant",
         "no": "Non",
@@ -38,15 +36,19 @@
         "backendStatus": "Statut du serveur principal",
         "channeleditor": "Éditeur de chaînes",
         "guide": {
+            "calendar_tip": "Sélecteur de date : sélectionnez d'abord l'heure, puis la date.",
+            "catcolors": "Catégorie Couleurs",
             "channel": "Canaliser",
+            "channel_group": "Groupe de chaînes",
+            "color_customize": "Personnalisez les couleurs en éditant ce fichier :",
+            "color_expl": "Les émissions comportant des catégories qui n'ont pas de couleur de catégorie utilisent la couleur Type de catégorie.",
+            "color_includes": "Cette liste comprend uniquement les couleurs des programmes de la page actuelle du guide. La liste complète des couleurs se trouve dans le fichier mentionné ci-dessous.",
+            "colors": "Couleurs",
             "full_search": "Recherche complète",
             "people_search": "Recherche de personnes",
             "retgrid": "Revenir à l'affichage de la grille",
             "title_search": "Recherche de titre",
-            "type_movie": "Film",
-            "type_series": "Série",
-            "type_sports": "Des sports",
-            "type_tvshow": "Émission de télévision"
+            "typecolors": "Catégorie Type Couleurs"
         },
         "programguide": "Guide du programme",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "L'activation des mises à jour empêchera tout enregistrement d'avoir lieu jusqu'à ce que vous redémarriez",
             "enableupdates_label": "Activer les mises à jour",
+            "mustenable": "Les modifications ne peuvent être enregistrées que si vous cliquez d'abord sur le bouton Activer les mises à jour.",
+            "mustrestart": "Lorsque vous avez terminé les mises à jour, redémarrez le backend.",
             "restart_desc": "Les enregistrements sont désactivés jusqu'à ce que vous redémarriez",
             "restart_label": "Redémarrer le backend",
             "restarting": "Redémarrage du backend",
+            "shutdown_label": "Fermer le back-end",
             "slave_enabled": "Les mises à jour sont toujours activées sur un backend esclave.",
             "slave_instructions": "Cela semble être un backend esclave. S'il est conçu comme un backend esclave, veuillez désactiver la planification sur le backend maître lors de l'exécution de la configuration du backend esclave.",
             "slave_warning": "S'il ne s'agit pas d'un backend esclave, accédez à Configuration, Général, Configuration du backend de l'adresse de l'hôte et sélectionnez \"Ce serveur est le backend maître\" ou définissez l'identifiant personnalisé correct sur la page Configuration de la base de données. Enregistrez et redémarrez le backend,",
             "title": "Configuration Myth TV",
-            "upcomingrec": "Prochain enregistrement à venir : {{Title}} à {{StartTime}}. Statut : {{Status}}"
+            "upcomingrec": "Prochain enregistrement à venir : {{Title}} à {{StartTime}}. Statut : {{Status}}",
+            "webonly": {
+                "DBSETUP": "Le backend ne peut pas démarrer normalement car la configuration de la base de données n'est pas terminée.",
+                "DBTIMEZONE": "Le backend ne peut pas démarrer normalement car les fuseaux horaires de la base de données ne sont pas configurés.",
+                "IPADDRESS": "Le backend ne peut pas démarrer normalement car Général, Adresse hôte et Adresse IP principale ne sont pas définis.",
+                "SCHEMAUPDATE": "Le backend ne peut pas démarrer normalement car la mise à jour du schéma de base de données a échoué.",
+                "WEBONLYPARM": "Le backend est en mode restreint en raison du paramètre --webonly sur la ligne de commande. Vous devrez redémarrer manuellement."
+            }
         },
         "misc": {
             "bal_io": "E/S disque équilibrées",

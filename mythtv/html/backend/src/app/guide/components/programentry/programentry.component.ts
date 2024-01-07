@@ -17,14 +17,17 @@ export class ProgramEntryComponent implements OnInit {
   @Input() guideComponent!: GuideComponent;
 
   editSchedule: boolean = false;
-  catclass = "type_other";
+  typeclass = '';
+  catclass = ''
+  regex = /[^a-z0-9]/g;
 
   constructor(public dataService: DataService) {
   }
 
   ngOnInit(): void {
-    if (['series','tvshow','movie','sports'].includes(this.program.CatType))
-      this.catclass = 'type_' + this.program.CatType;
+    this.typeclass = 'guide_type_' + this.program.CatType;
+    this.catclass = 'guide_cat_'
+      + this.program.Category.toLowerCase().replace(this.regex, '_');
   }
 
   durationToWidth(): number {

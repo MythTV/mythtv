@@ -16,8 +16,6 @@
         "help": "Segítség",
         "instructions": "Utasítás",
         "loading": "Betöltés",
-        "mustenable": "A módosítások csak akkor menthetők el, ha először a Frissítések engedélyezése gombra kattint.",
-        "mustrestart": "Ha végzett a frissítésekkel, indítsa újra a háttérprogramot.",
         "networkfail": "HIBA: Háttérhálózati hiba",
         "next": "Következő",
         "no": "Nem",
@@ -38,15 +36,19 @@
         "backendStatus": "Háttérrendszer állapota",
         "channeleditor": "Csatornaszerkesztő",
         "guide": {
+            "calendar_tip": "Dátumválasztó: Először válassza ki az időt, majd a dátumot.",
+            "catcolors": "Kategória Színek",
             "channel": "Csatorna",
+            "channel_group": "Csatornacsoport",
+            "color_customize": "Testreszabhatja a színeket a fájl szerkesztésével:",
+            "color_expl": "A Kategória színnel nem rendelkező kategóriákkal rendelkező műsorok a Kategória típusa színt használják.",
+            "color_includes": "Ez a lista csak az útmutató aktuális oldalán található programok színeit tartalmazza. A színek teljes listája az alábbi fájlban található.",
+            "colors": "Színek",
             "full_search": "Teljes keresés",
             "people_search": "Emberek keresése",
             "retgrid": "Visszatérés a Rács megjelenítéséhez",
             "title_search": "Cím keresése",
-            "type_movie": "Film",
-            "type_series": "Sorozat",
-            "type_sports": "Sport",
-            "type_tvshow": "TV-műsor"
+            "typecolors": "Kategória Típus Színek"
         },
         "programguide": "Programkalauz",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "A frissítések engedélyezése megakadályozza a rögzítéseket az újraindításig",
             "enableupdates_label": "Frissítések engedélyezése",
+            "mustenable": "A módosítások csak akkor menthetők el, ha először a Frissítések engedélyezése gombra kattint.",
+            "mustrestart": "Ha végzett a frissítésekkel, indítsa újra a háttérprogramot.",
             "restart_desc": "A felvételek le vannak tiltva az újraindításig",
             "restart_label": "Indítsa újra a Backendet",
             "restarting": "Backend újraindítása",
+            "shutdown_label": "Háttér bezárása",
             "slave_enabled": "A frissítések mindig engedélyezve vannak a slave háttérrendszeren.",
             "slave_instructions": "Ez egy szolga háttérprogramnak tűnik. Ha szolga háttérprogramnak szánja, tiltsa le az ütemezést a mester háttérrendszeren a szolga háttérprogram telepítése közben.",
             "slave_warning": "Ha ezt nem szolga háttérprogramnak szánja, lépjen a Beállítás, Általános, Gazdacím-háttérbeállítás menüpontra, és válassza ki az \"Ez a kiszolgáló a fő háttérrendszer\" lehetőséget, vagy állítsa be a megfelelő egyéni azonosítót az Adatbázis beállítása oldalon. Mentse és indítsa újra a háttérprogramot,",
             "title": "MythTV beállítása",
-            "upcomingrec": "Következő felvétel: {{Title}}, {{StartTime}}. Állapot: {{Status}}"
+            "upcomingrec": "Következő felvétel: {{Title}}, {{StartTime}}. Állapot: {{Status}}",
+            "webonly": {
+                "DBSETUP": "A háttérprogram nem indul el normálisan, mert az adatbázis-beállítás nem fejeződött be.",
+                "DBTIMEZONE": "A háttérprogram nem indul el normálisan, mert az adatbázis időzónái nincsenek beállítva.",
+                "IPADDRESS": "A háttérprogram nem indul el normálisan, mert az Általános, a Gazdagép címe és az Elsődleges IP-cím nincs beállítva.",
+                "SCHEMAUPDATE": "A háttérprogram nem indul el rendesen, mert az adatbázisséma frissítése meghiúsult.",
+                "WEBONLYPARM": "A háttérprogram korlátozott módban van a parancssori --webonly paraméter miatt. Manuálisan újra kell indítania."
+            }
         },
         "misc": {
             "bal_io": "Kiegyensúlyozott lemez I/O",

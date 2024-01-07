@@ -16,8 +16,6 @@
         "help": "Abi",
         "instructions": "Juhised",
         "loading": "Laadimine",
-        "mustenable": "Muudatusi ei saa salvestada, kui te ei klõpsa esmalt nuppu Luba värskendused.",
-        "mustrestart": "Kui olete värskendustega lõpetanud, taaskäivitage taustaprogramm.",
         "networkfail": "VIGA: taustavõrgu tõrge",
         "next": "Edasi",
         "no": "Ei",
@@ -38,15 +36,19 @@
         "backendStatus": "Taustaprogrammi olek",
         "channeleditor": "Kanali redaktor",
         "guide": {
+            "calendar_tip": "Kuupäevavalija: valige esmalt kellaaeg ja seejärel kuupäev.",
+            "catcolors": "Kategooria Värvid",
             "channel": "Kanal",
+            "channel_group": "Kanaligrupp",
+            "color_customize": "Kohandage värve seda faili redigeerides:",
+            "color_expl": "Kategooriatega saated, millel pole kategooria värvi, kasutavad värvi Kategooria tüüp.",
+            "color_includes": "See loend sisaldab ainult juhendi praegusel lehel olevate programmide värve. Täielik värvide loend on allpool mainitud failis.",
+            "colors": "Värvid",
             "full_search": "Täielik otsing",
             "people_search": "Inimeste otsing",
             "retgrid": "Naaske ruudustiku kuvale",
             "title_search": "Pealkirja otsing",
-            "type_movie": "Film",
-            "type_series": "seeria",
-            "type_sports": "Sport",
-            "type_tvshow": "Telesaade"
+            "typecolors": "Kategooria Tüüp Värvid"
         },
         "programguide": "Saatejuht",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "Värskenduste lubamine takistab salvestuste toimumist kuni taaskäivitamiseni",
             "enableupdates_label": "Luba värskendused",
+            "mustenable": "Muudatusi ei saa salvestada, kui te ei klõpsa esmalt nuppu Luba värskendused.",
+            "mustrestart": "Kui olete värskendustega lõpetanud, taaskäivitage taustaprogramm.",
             "restart_desc": "Salvestus on keelatud kuni taaskäivitamiseni",
             "restart_label": "Taaskäivitage taustaprogramm",
             "restarting": "Taustaprogrammi taaskäivitamine",
+            "shutdown_label": "Sule taustaprogramm",
             "slave_enabled": "Värskendused on alam-taustaprogrammis alati lubatud.",
             "slave_instructions": "See näib olevat ori taustaprogramm. Kui see on ette nähtud alam-taustaprogrammiks, keelake alam-taustaprogrammi seadistamise ajal põhitaustaprogrammi ajastamine.",
             "slave_warning": "Kui see pole mõeldud alluva taustaprogrammina, minge jaotisse Seadistamine, Üldine, Hostiaadressi taustaprogrammi häälestus ja valige \"See server on põhitaustaprogramm\" või määrake andmebaasi häälestuse lehel õige kohandatud identifikaator. Salvestage ja taaskäivitage taustaprogramm,",
             "title": "MythTV seadistamine",
-            "upcomingrec": "Järgmine salvestus: {{Title}} kell {{StartTime}}. Olek: {{Status}}"
+            "upcomingrec": "Järgmine salvestus: {{Title}} kell {{StartTime}}. Olek: {{Status}}",
+            "webonly": {
+                "DBSETUP": "Taustaprogramm ei saa normaalselt käivituda, kuna andmebaasi häälestus pole lõppenud.",
+                "DBTIMEZONE": "Taustaprogramm ei saa normaalselt käivituda, kuna andmebaasi ajavööndid pole seadistatud.",
+                "IPADDRESS": "Taustaprogramm ei saa normaalselt käivituda, kuna Üldine, Hostiaadress, Peamine IP-aadress pole määratud.",
+                "SCHEMAUPDATE": "Taustaprogramm ei saa normaalselt käivituda, kuna andmebaasiskeemi värskendamine ebaõnnestus.",
+                "WEBONLYPARM": "Taustaprogramm on käsureal oleva parameetri --webonly tõttu piiratud režiimis. Peate käsitsi taaskäivitama."
+            }
         },
         "misc": {
             "bal_io": "Tasakaalustatud ketta I/O",

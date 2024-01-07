@@ -16,8 +16,6 @@
         "help": "Pomozite",
         "instructions": "upute",
         "loading": "Učitavam",
-        "mustenable": "Promjene se ne mogu spremiti ako prvo ne kliknete gumb Omogući ažuriranja.",
-        "mustrestart": "Kada završite s ažuriranjima, ponovno pokrenite pozadinu.",
         "networkfail": "POGREŠKA: Kvar pozadinske mreže",
         "next": "Sljedeći",
         "no": "Ne",
@@ -38,15 +36,19 @@
         "backendStatus": "Status pozadine",
         "channeleditor": "Urednik kanala",
         "guide": {
+            "calendar_tip": "Birač datuma: prvo odaberite vrijeme, a zatim datum.",
+            "catcolors": "Kategorija Boje",
             "channel": "Kanal",
+            "channel_group": "Grupa kanala",
+            "color_customize": "Prilagodite boje uređivanjem ove datoteke:",
+            "color_expl": "Emisije s kategorijama koje nemaju boju kategorije koriste boju vrste kategorije.",
+            "color_includes": "Ovaj popis uključuje samo boje za programe na trenutnoj stranici vodiča. Potpuni popis boja nalazi se u datoteci navedenoj u nastavku.",
+            "colors": "Boje",
             "full_search": "Potpuna pretraga",
             "people_search": "Pretraživanje ljudi",
             "retgrid": "Povratak na prikaz mreže",
             "title_search": "Pretraživanje naslova",
-            "type_movie": "Film",
-            "type_series": "Niz",
-            "type_sports": "Sportski",
-            "type_tvshow": "TV emisija"
+            "typecolors": "Vrsta kategorije Boje"
         },
         "programguide": "Programski vodič",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "Omogućavanje ažuriranja spriječit će bilo kakvo snimanje dok ga ponovno ne pokrenete",
             "enableupdates_label": "Omogući ažuriranja",
+            "mustenable": "Promjene se ne mogu spremiti ako prvo ne kliknete gumb Omogući ažuriranja.",
+            "mustrestart": "Kada završite s ažuriranjima, ponovno pokrenite pozadinu.",
             "restart_desc": "Snimke su onemogućene dok ponovno ne pokrenete",
             "restart_label": "Ponovo pokrenite pozadinu",
             "restarting": "Ponovno pokretanje pozadine",
+            "shutdown_label": "Zatvori Backend",
             "slave_enabled": "Ažuriranja su uvijek omogućena na pomoćnoj pozadini.",
             "slave_instructions": "Čini se da je ovo pomoćna pozadina. Ako je namijenjen kao podređena pozadina, onemogućite zakazivanje na glavnoj pozadini dok izvodite postavljanje podređene pozadine.",
             "slave_warning": "Ako ovo nije zamišljeno kao podređena pozadina, idite na Postavljanje, Općenito, Postavljanje pozadine adrese hosta i odaberite \"Ovaj poslužitelj je glavna pozadina\" ili pak postavite ispravan prilagođeni identifikator na stranici Postavljanje baze podataka. Spremite i ponovno pokrenite pozadinu,",
             "title": "Postavljanje MythTV-a",
-            "upcomingrec": "Sljedeće nadolazeće snimanje: {{Title}} u {{StartTime}}. Status: {{Status}}"
+            "upcomingrec": "Sljedeće nadolazeće snimanje: {{Title}} u {{StartTime}}. Status: {{Status}}",
+            "webonly": {
+                "DBSETUP": "Pozadina se ne može pokrenuti normalno jer postavljanje baze podataka nije dovršeno.",
+                "DBTIMEZONE": "Pozadina se ne može pokrenuti normalno jer vremenske zone baze podataka nisu postavljene.",
+                "IPADDRESS": "Pozadina se ne može pokrenuti normalno jer Općenito, Adresa glavnog računala, Primarna IP adresa nisu postavljeni.",
+                "SCHEMAUPDATE": "Pozadina se ne može pokrenuti normalno jer ažuriranje sheme baze podataka nije uspjelo.",
+                "WEBONLYPARM": "Pozadina je u ograničenom načinu rada zbog parametra --webonly u naredbenom retku. Morat ćete ponovno pokrenuti ručno."
+            }
         },
         "misc": {
             "bal_io": "Uravnoteženi disk I/O",

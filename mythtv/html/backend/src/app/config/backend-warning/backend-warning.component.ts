@@ -66,6 +66,7 @@ export class BackendWarningComponent implements OnInit {
           this.setupService.schedulingEnabled = data.BackendInfo.Env.SchedulingEnabled;
           this.setupService.isDatabaseIgnored = data.BackendInfo.Env.IsDatabaseIgnored;
           this.setupService.DBTimezoneSupport = data.BackendInfo.Env.DBTimezoneSupport;
+          this.setupService.WebOnlyStartup = data.BackendInfo.Env.WebOnlyStartup;
           if (this.setupService.isDatabaseIgnored)
             this.wizardService.wizardItems = this.wizardService.dbSetupMenu;
           else
@@ -129,20 +130,27 @@ export class BackendWarningComponent implements OnInit {
   }
 
   restart() {
-    this.mythService.Shutdown({ Restart: true })
+    let restart = this.setupService.WebOnlyStartup != 'WEBONLYPARM';
+    this.mythService.Shutdown({ Restart: restart })
       .subscribe({
         next: data => {
+          // if (restart) {
           if (data.bool) {
             // each retry generates 2 errors
             // this retry count approximates to number of seconds
-            this.retryCount = 30;
+            if (restart)
+              this.retryCount = 30;
+            else
+              this.retryCount = 9999;
             this.getBackendInfo();
           }
           else
             this.errorCount++;
+          // }
         },
         error: () => this.errorCount++
       });
+    // if (restart)
     this.delay = 5000;
   }
 

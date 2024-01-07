@@ -16,8 +16,6 @@
         "help": "pomoč",
         "instructions": "Navodila",
         "loading": "nalaganje",
-        "mustenable": "Sprememb ni mogoče shraniti, razen če najprej kliknete gumb Omogoči posodobitve.",
-        "mustrestart": "Ko končate s posodobitvami, znova zaženite zaledje.",
         "networkfail": "NAPAKA: Napaka zalednega omrežja",
         "next": "Naslednji",
         "no": "št",
@@ -38,15 +36,19 @@
         "backendStatus": "Stanje zaledja",
         "channeleditor": "Urejevalnik kanalov",
         "guide": {
+            "calendar_tip": "Izbirnik datuma: najprej izberite uro in nato datum.",
+            "catcolors": "Barve kategorije",
             "channel": "Kanal",
+            "channel_group": "Skupina kanalov",
+            "color_customize": "Prilagodite barve z urejanjem te datoteke:",
+            "color_expl": "Oddaje s kategorijami, ki nimajo barve kategorije, uporabljajo barvo vrste kategorije.",
+            "color_includes": "Ta seznam vključuje samo barve za programe na trenutni strani vodnika. Celoten seznam barv je v spodnji datoteki.",
+            "colors": "Barve",
             "full_search": "Celotno iskanje",
             "people_search": "Iskanje ljudi",
             "retgrid": "Nazaj na prikaz mreže",
             "title_search": "Iskanje po naslovu",
-            "type_movie": "Film",
-            "type_series": "serija",
-            "type_sports": "Šport",
-            "type_tvshow": "Televizijska oddaja"
+            "typecolors": "Vrsta kategorije Barve"
         },
         "programguide": "Vodnik po programu",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "Če omogočite posodobitve, boste preprečili snemanje, dokler znova ne zaženete",
             "enableupdates_label": "Omogoči posodobitve",
+            "mustenable": "Sprememb ni mogoče shraniti, razen če najprej kliknete gumb Omogoči posodobitve.",
+            "mustrestart": "Ko končate s posodobitvami, znova zaženite zaledje.",
             "restart_desc": "Posnetki so onemogočeni, dokler znova ne zaženete",
             "restart_label": "Znova zaženite zaledje",
             "restarting": "Ponovni zagon zaledja",
+            "shutdown_label": "Zapri zaledje",
             "slave_enabled": "Posodobitve so vedno omogočene na podrejenem zaledju.",
             "slave_instructions": "Zdi se, da je to podrejeno zaledje. Če je mišljeno kot podrejeno zaledje, onemogočite razporejanje na glavnem zaledju med izvajanjem nastavitve podrejenega zaledja.",
             "slave_warning": "Če to ni predvideno kot podrejeno zaledje, pojdite na Nastavitve, Splošno, Nastavitev zaledja naslova gostitelja in izberite »Ta strežnik je glavno zaledje« ali pa nastavite pravilen identifikator po meri na strani z nastavitvami baze podatkov. Shranite in znova zaženite zaledje,",
             "title": "Nastavitev MythTV",
-            "upcomingrec": "Naslednji prihajajoči posnetek: {{Title}} ob {{StartTime}}. Status: {{Status}}"
+            "upcomingrec": "Naslednji prihajajoči posnetek: {{Title}} ob {{StartTime}}. Status: {{Status}}",
+            "webonly": {
+                "DBSETUP": "Zaledje se ne more normalno zagnati, ker nastavitev baze podatkov ni dokončana.",
+                "DBTIMEZONE": "Zaledje se ne more normalno zagnati, ker časovni pasovi zbirke podatkov niso nastavljeni.",
+                "IPADDRESS": "Zaledje se ne more normalno zagnati, ker Splošno, Naslov gostitelja, Primarni naslov IP ni nastavljen.",
+                "SCHEMAUPDATE": "Zaledje se ne more normalno zagnati, ker posodobitev sheme baze podatkov ni uspela.",
+                "WEBONLYPARM": "Zaledje je v omejenem načinu zaradi parametra --webonly v ukazni vrstici. Ponovno boste morali zagnati ročno."
+            }
         },
         "misc": {
             "bal_io": "Uravnotežen disk I/O",

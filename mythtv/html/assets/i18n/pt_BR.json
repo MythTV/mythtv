@@ -16,8 +16,6 @@
         "help": "Ajuda",
         "instructions": "Instruções",
         "loading": "Carregando",
-        "mustenable": "As alterações não podem ser salvas a menos que você clique primeiro no botão Habilitar atualizações.",
-        "mustrestart": "Quando terminar as atualizações, reinicie o back-end.",
         "networkfail": "ERRO: falha na rede de back-end",
         "next": "Próximo",
         "no": "Não",
@@ -38,15 +36,19 @@
         "backendStatus": "Status do back-end",
         "channeleditor": "Editor de canal",
         "guide": {
+            "calendar_tip": "Seletor de data: selecione primeiro a hora e depois a data.",
+            "catcolors": "Categoria Cores",
             "channel": "Canal",
+            "channel_group": "Grupo de canais",
+            "color_customize": "Personalize as cores editando este arquivo:",
+            "color_expl": "Programas com categorias que não possuem uma cor de categoria usam a cor do tipo de categoria.",
+            "color_includes": "Esta lista inclui apenas cores para programas na página atual do guia. A lista completa de cores está no arquivo mencionado abaixo.",
+            "colors": "Cores",
             "full_search": "Pesquisa completa",
             "people_search": "Pesquisa de pessoas",
             "retgrid": "Retornar à Exibição da Grade",
             "title_search": "Pesquisa de título",
-            "type_movie": "Filme",
-            "type_series": "Series",
-            "type_sports": "Esportes",
-            "type_tvshow": "Programa de TV"
+            "typecolors": "Categoria Tipo Cores"
         },
         "programguide": "Guia do programa",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "A ativação das atualizações impedirá que qualquer gravação ocorra até que você reinicie",
             "enableupdates_label": "Ativar atualizações",
+            "mustenable": "As alterações não podem ser salvas a menos que você clique primeiro no botão Habilitar atualizações.",
+            "mustrestart": "Quando terminar as atualizações, reinicie o back-end.",
             "restart_desc": "As gravações são desativadas até você reiniciar",
             "restart_label": "Reiniciar back-end",
             "restarting": "Reiniciando o back-end",
+            "shutdown_label": "Fechar back-end",
             "slave_enabled": "As atualizações são sempre habilitadas em um back-end escravo.",
             "slave_instructions": "Isso parece ser um back-end escravo. Se for destinado a um back-end escravo, desative o agendamento no back-end mestre enquanto executa a configuração do back-end escravo.",
             "slave_warning": "Se isso não for um back-end escravo, vá para Configuração, Geral, Configuração do back-end do endereço do host e selecione \"Este servidor é o back-end mestre\" ou defina o identificador personalizado correto na página Configuração do banco de dados. Salve e reinicie o back-end,",
             "title": "Configuração do MythTV",
-            "upcomingrec": "Próxima gravação: {{Title}} às {{StartTime}}. Estado: {{Status}}"
+            "upcomingrec": "Próxima gravação: {{Title}} às {{StartTime}}. Estado: {{Status}}",
+            "webonly": {
+                "DBSETUP": "O back-end não pode ser iniciado normalmente porque a configuração do banco de dados não foi concluída.",
+                "DBTIMEZONE": "O back-end não pode iniciar normalmente porque os fusos horários do banco de dados não estão configurados.",
+                "IPADDRESS": "O back-end não pode iniciar normalmente porque Geral, Endereço de host e Endereço IP primário não estão definidos.",
+                "SCHEMAUPDATE": "O back-end não pode ser iniciado normalmente porque a atualização do esquema do banco de dados falhou.",
+                "WEBONLYPARM": "O backend está em modo restrito devido ao parâmetro --webonly na linha de comando. Você terá que reiniciar manualmente."
+            }
         },
         "misc": {
             "bal_io": "E/S de disco balanceado",

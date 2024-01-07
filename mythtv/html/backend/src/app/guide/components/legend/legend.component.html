@@ -1,0 +1,30 @@
+<div class="flex">
+    <div>
+        <p-dataView [value]="catTypes" layout="grid">
+            <ng-template pTemplate="header">
+                {{ 'dashboard.guide.typecolors' | translate }}
+            </ng-template>
+            <ng-template let-type let-i="rowIndex" pTemplate="gridItem">
+                <div class="md:col-2 px-3 py-1">
+                    <div [ngClass]="['guide_type_' + type,'guide_type_default']">
+                        &nbsp;{{ type }}</div>
+                </div>
+            </ng-template>
+        </p-dataView>
+
+        <p-dataView [value]="categories" layout="grid">
+            <ng-template pTemplate="header">
+                {{ 'dashboard.guide.catcolors' | translate }}
+            </ng-template>
+            <ng-template let-category let-i="rowIndex" pTemplate="gridItem">
+                <div class="md:col-2 px-3 py-1">
+                    <div [ngClass]="['guide_cat_' + category.toLowerCase().replace(regex, '_'),'px-1']">
+                        {{ category }}</div>
+                </div>
+            </ng-template>
+        </p-dataView>
+
+        <p>{{ 'dashboard.guide.color_includes' | translate }}<br>
+        {{ 'dashboard.guide.color_expl' | translate }}<br>
+        {{ 'dashboard.guide.color_customize' | translate }}<code>/usr/share/mythtv/html/assets/guidecolors.css</code>&nbsp;.</p>
+    </div>

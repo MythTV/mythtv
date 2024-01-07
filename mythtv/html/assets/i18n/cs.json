@@ -16,8 +16,6 @@
         "help": "Pomoc",
         "instructions": "Instrukce",
         "loading": "načítání",
-        "mustenable": "Změny nelze uložit, pokud nejprve neklepnete na tlačítko Povolit aktualizace.",
-        "mustrestart": "Po dokončení aktualizací restartujte backend.",
         "networkfail": "CHYBA: Backend Network Failure",
         "next": "další",
         "no": "Ne",
@@ -38,15 +36,19 @@
         "backendStatus": "Stav backendu",
         "channeleditor": "Editor kanálu",
         "guide": {
+            "calendar_tip": "Výběr data: Nejprve vyberte čas a poté datum.",
+            "catcolors": "Kategorie Barvy",
             "channel": "Kanál",
+            "channel_group": "Skupina kanálů",
+            "color_customize": "Přizpůsobte barvy úpravou tohoto souboru:",
+            "color_expl": "Pořady s kategoriemi, které nemají barvu Kategorie, používají barvu Typ kategorie.",
+            "color_includes": "Tento seznam obsahuje pouze barvy pro programy na aktuální stránce průvodce. Úplný seznam barev je v souboru uvedeném níže.",
+            "colors": "Barvy",
             "full_search": "Úplné vyhledávání",
             "people_search": "Vyhledávání lidí",
             "retgrid": "Návrat k zobrazení mřížky",
             "title_search": "Vyhledávání titulů",
-            "type_movie": "Film",
-            "type_series": "Série",
-            "type_sports": "Sportovní",
-            "type_tvshow": "Televizní show"
+            "typecolors": "Kategorie Typ Barvy"
         },
         "programguide": "Programový průvodce",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "Povolením aktualizací zabráníte nahrávání, dokud nerestartujete",
             "enableupdates_label": "Povolit aktualizace",
+            "mustenable": "Změny nelze uložit, pokud nejprve neklepnete na tlačítko Povolit aktualizace.",
+            "mustrestart": "Po dokončení aktualizací restartujte backend.",
             "restart_desc": "Záznamy jsou zakázány, dokud nerestartujete",
             "restart_label": "Restartujte backend",
             "restarting": "Restartování backendu",
+            "shutdown_label": "Zavřete Backend",
             "slave_enabled": "Aktualizace jsou vždy povoleny na podřízeném backendu.",
             "slave_instructions": "Zdá se, že jde o podřízený backend. Pokud je zamýšlen jako podřízený backend, vypněte plánování na hlavním backendu při spuštění nastavení podřízeného backendu.",
             "slave_warning": "Pokud toto není zamýšleno jako podřízený backend, přejděte na Nastavení, Obecné, Nastavení backendu adresy hostitele a vyberte „Tento server je hlavní backend“ nebo nastavte správný uživatelský identifikátor na stránce Nastavení databáze. Uložte a restartujte backend,",
             "title": "Nastavení MythTV",
-            "upcomingrec": "Další nadcházející nahrávka: {{Title}} v {{StartTime}}. Stav: {{Status}}"
+            "upcomingrec": "Další nadcházející nahrávka: {{Title}} v {{StartTime}}. Stav: {{Status}}",
+            "webonly": {
+                "DBSETUP": "Backend nelze normálně spustit, protože instalace databáze není dokončena.",
+                "DBTIMEZONE": "Backend nelze normálně spustit, protože databázová časová pásma nejsou nastavena.",
+                "IPADDRESS": "Backend nelze normálně spustit, protože není nastavena Obecná, Adresa hostitele a Primární IP adresa.",
+                "SCHEMAUPDATE": "Backend nelze normálně spustit, protože se nezdařila aktualizace schématu databáze.",
+                "WEBONLYPARM": "Backend je v omezeném režimu kvůli parametru --webonly na příkazovém řádku. Budete muset restartovat ručně."
+            }
         },
         "misc": {
             "bal_io": "Vyvážený disk I/O",

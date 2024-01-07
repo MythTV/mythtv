@@ -46,6 +46,7 @@ export class GuideComponent implements OnInit, SchedulerSummary {
   readonly FULLSEARCH = 5;
   displayType = this.GRID;
   searchValue = '';
+  showLegend = false;
 
   constructor(private guideService: GuideService,
     private translate: TranslateService) {

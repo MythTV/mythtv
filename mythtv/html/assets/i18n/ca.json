@@ -16,8 +16,6 @@
         "help": "Ajuda",
         "instructions": "Instruccions",
         "loading": "Carregant",
-        "mustenable": "Els canvis no es poden desar tret que primer feu clic al botó Activa les actualitzacions.",
-        "mustrestart": "Quan hàgiu acabat amb les actualitzacions, reinicieu el backend.",
         "networkfail": "ERROR: fallada de la xarxa de fons",
         "next": "Pròxim",
         "no": "No",
@@ -38,15 +36,19 @@
         "backendStatus": "Estat del backend",
         "channeleditor": "Editor de canals",
         "guide": {
+            "calendar_tip": "Selector de dates: seleccioneu primer l'hora i després la data.",
+            "catcolors": "Categoria Colors",
             "channel": "Canal",
+            "channel_group": "Grup de canals",
+            "color_customize": "Personalitzeu-ho els colors editant aquest fitxer:",
+            "color_expl": "Els programes amb categories que no tenen un color de categoria utilitzen el color de tipus de categoria.",
+            "color_includes": "Aquesta llista només inclou els colors dels programes de la pàgina actual de la guia. La llista completa de colors es troba al fitxer esmentat a continuació.",
+            "colors": "Colors",
             "full_search": "Cerca completa",
             "people_search": "Cerca de persones",
             "retgrid": "Torna a la pantalla de quadrícula",
             "title_search": "Cerca de títols",
-            "type_movie": "Pel·lícula",
-            "type_series": "Sèrie",
-            "type_sports": "Esports",
-            "type_tvshow": "Programa de televisió"
+            "typecolors": "Categoria Tipus Colors"
         },
         "programguide": "Guia del programa",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "Activar les actualitzacions evitarà que es facin enregistraments fins que no reinicieu",
             "enableupdates_label": "Activa les actualitzacions",
+            "mustenable": "Els canvis no es poden desar tret que primer feu clic al botó Activa les actualitzacions.",
+            "mustrestart": "Quan hàgiu acabat amb les actualitzacions, reinicieu el backend.",
             "restart_desc": "Les gravacions es desactiven fins que reinicieu",
             "restart_label": "Reinicieu el backend",
             "restarting": "Reiniciant el backend",
+            "shutdown_label": "Tanca el backend",
             "slave_enabled": "Les actualitzacions sempre estan habilitades en un backend esclau.",
             "slave_instructions": "Sembla ser un backend esclau. Si està pensat com a backend esclau, desactiveu la programació al backend principal mentre executeu la configuració del backend esclau.",
             "slave_warning": "Si no està pensat com a backend esclau, aneu a Configuració, General, Configuració del backend de l'adreça de l'amfitrió i seleccioneu \"Aquest servidor és el backend mestre\" o bé establiu l'identificador personalitzat correcte a la pàgina Configuració de la base de dades. Desa i reinicia el backend,",
             "title": "Configuració de MythTV",
-            "upcomingrec": "Pròxima gravació: {{Title}} a {{StartTime}}. Estat: {{Status}}"
+            "upcomingrec": "Pròxima gravació: {{Title}} a {{StartTime}}. Estat: {{Status}}",
+            "webonly": {
+                "DBSETUP": "El backend no pot iniciar-se normalment perquè la configuració de la base de dades no s'ha completat.",
+                "DBTIMEZONE": "El backend no pot començar amb normalitat perquè les zones horàries de la base de dades no estan configurades.",
+                "IPADDRESS": "El backend no pot iniciar-se amb normalitat perquè no s'estableix l'adreça general, l'adreça de l'amfitrió i l'adreça IP principal.",
+                "SCHEMAUPDATE": "El backend no pot iniciar-se normalment perquè l'actualització de l'esquema de la base de dades ha fallat.",
+                "WEBONLYPARM": "El backend està en mode restringit a causa del paràmetre --webonly a la línia d'ordres. Haureu de reiniciar manualment."
+            }
         },
         "misc": {
             "bal_io": "E/S de disc equilibrat",

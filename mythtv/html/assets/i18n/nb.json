@@ -16,8 +16,6 @@
         "help": "Hjelp",
         "instructions": "Bruksanvisning",
         "loading": "Laster",
-        "mustenable": "Endringer kan ikke lagres med mindre du klikker på Aktiver oppdateringer-knappen først.",
-        "mustrestart": "Når du er ferdig med oppdateringer, start backend på nytt.",
         "networkfail": "FEIL: Backend Network Feil",
         "next": "Neste",
         "no": "Nei",
@@ -38,15 +36,19 @@
         "backendStatus": "Backend Status",
         "channeleditor": "Kanalredaktør",
         "guide": {
+            "calendar_tip": "Datovelger: Velg først klokkeslettet og deretter datoen.",
+            "catcolors": "Kategori Farger",
             "channel": "Kanal",
+            "channel_group": "Kanalgruppe",
+            "color_customize": "Tilpass farger dette ved å redigere denne filen:",
+            "color_expl": "Viser med kategorier som ikke har en kategorifarge bruker Kategoritype-fargen.",
+            "color_includes": "Denne listen inkluderer kun farger for programmer på gjeldende side i veiledningen. Den fullstendige listen over farger er i filen nevnt nedenfor.",
+            "colors": "Farger",
             "full_search": "Fullt søk",
             "people_search": "People Search",
             "retgrid": "Gå tilbake til rutenettvisning",
             "title_search": "Tittelsøk",
-            "type_movie": "Film",
-            "type_series": "Serie",
-            "type_sports": "Sport",
-            "type_tvshow": "TV-show"
+            "typecolors": "Kategori Type Farger"
         },
         "programguide": "Programguide",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "Aktivering av oppdateringer vil forhindre at opptak finner sted før du starter på nytt",
             "enableupdates_label": "Aktiver oppdateringer",
+            "mustenable": "Endringer kan ikke lagres med mindre du klikker på Aktiver oppdateringer-knappen først.",
+            "mustrestart": "Når du er ferdig med oppdateringer, start backend på nytt.",
             "restart_desc": "Opptak er deaktivert til du starter på nytt",
             "restart_label": "Start Backend på nytt",
             "restarting": "Starter Backend på nytt",
+            "shutdown_label": "Lukk Backend",
             "slave_enabled": "Oppdateringer er alltid aktivert på en slave-backend.",
             "slave_instructions": "Dette ser ut til å være en slave-backend. Hvis det er ment som en slave-backend, vennligst deaktiver planlegging på master-backend mens du kjører slave-backend-oppsett.",
             "slave_warning": "Hvis dette ikke er ment som en slave-backend, vennligst gå til Oppsett, Generelt, Host Address Backend Setup, og velg \"Denne serveren er Master Backend\" eller angi riktig egendefinert identifikator på Database Setup-siden. Lagre og start backend på nytt,",
             "title": "MythTV-oppsett",
-            "upcomingrec": "Neste kommende opptak: {{Title}} kl. {{StartTime}}. Status: {{Status}}"
+            "upcomingrec": "Neste kommende opptak: {{Title}} kl. {{StartTime}}. Status: {{Status}}",
+            "webonly": {
+                "DBSETUP": "Backend kan ikke starte normalt fordi databaseoppsettet ikke er fullført.",
+                "DBTIMEZONE": "Backend kan ikke starte normalt fordi databasetidssoner ikke er satt opp.",
+                "IPADDRESS": "Backend kan ikke starte normalt fordi Generelt, Vertsadresse, Primær IP-adresse ikke er angitt.",
+                "SCHEMAUPDATE": "Backend kan ikke starte normalt fordi oppdatering av databaseskjema mislyktes.",
+                "WEBONLYPARM": "Backend er i begrenset modus på grunn av --webonly-parameteren på kommandolinjen. Du må starte på nytt manuelt."
+            }
         },
         "misc": {
             "bal_io": "Balansert disk I/O",

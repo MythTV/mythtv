@@ -16,8 +16,6 @@
         "help": "帮助",
         "instructions": "指示",
         "loading": "加载中",
-        "mustenable": "除非您先单击“启用更新”按钮，否则无法保存更改。",
-        "mustrestart": "完成更新后，重新启动后端。",
         "networkfail": "错误：后端网络故障",
         "next": "下一个",
         "no": "不",
@@ -38,15 +36,19 @@
         "backendStatus": "后端状态",
         "channeleditor": "频道编辑",
         "guide": {
+            "calendar_tip": "日期选择器：首先选择时间，然后选择日期。",
+            "catcolors": "类别 颜色",
             "channel": "渠道",
+            "channel_group": "渠道组",
+            "color_customize": "通过编辑此文件来自定义颜色：",
+            "color_expl": "没有类别颜色的类别的显示使用类别类型颜色。",
+            "color_includes": "此列表仅包含指南当前页面上的程序的颜色。完整的颜色列表位于下面提到的文件中。",
+            "colors": "颜色",
             "full_search": "完整搜索",
             "people_search": "人物搜索",
             "retgrid": "返回网格显示",
             "title_search": "标题搜索",
-            "type_movie": "电影",
-            "type_series": "系列",
-            "type_sports": "运动的",
-            "type_tvshow": "电视节目"
+            "typecolors": "类别 类型 颜色"
         },
         "programguide": "节目指南",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "启用更新将阻止进行任何录制，直到您重新启动为止",
             "enableupdates_label": "启用更新",
+            "mustenable": "除非您先单击“启用更新”按钮，否则无法保存更改。",
+            "mustrestart": "完成更新后，重新启动后端。",
             "restart_desc": "录音将被禁用，直到您重新启动为止",
             "restart_label": "重启后端",
             "restarting": "重启后端",
+            "shutdown_label": "关闭后端",
             "slave_enabled": "从属后端始终启用更新。",
             "slave_instructions": "这似乎是一个从属后端。如果它打算作为从后端，请在运行从后端设置时禁用主后端上的调度。",
             "slave_warning": "如果这不是作为从属后端，请转至“设置”、“常规”、“主机地址后端设置”，然后选择“此服务器是主后端”，或者在“数据库设置”页面上设置正确的自定义标识符。保存并重新启动后端，",
             "title": "神话电视设置",
-            "upcomingrec": "下一个即将录制的节目：{{Title}}，时间：{{StartTime}}。状态：{{Status}}"
+            "upcomingrec": "下一个即将录制的节目：{{Title}}，时间：{{StartTime}}。状态：{{Status}}",
+            "webonly": {
+                "DBSETUP": "由于数据库安装未完成，后端无法正常启动。",
+                "DBTIMEZONE": "由于数据库时区未设置，后端无法正常启动。",
+                "IPADDRESS": "由于未设置常规、主机地址、主 IP 地址，后端无法正常启动。",
+                "SCHEMAUPDATE": "由于数据库架构更新失败，后端无法正常启动。",
+                "WEBONLYPARM": "由于命令行上的 --webonly 参数，后端处于受限模式。您必须手动重新启动。"
+            }
         },
         "misc": {
             "bal_io": "平衡磁盘 I/O",

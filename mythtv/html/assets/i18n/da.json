@@ -16,8 +16,6 @@
         "help": "Hjælp",
         "instructions": "Instruktioner",
         "loading": "Indlæser",
-        "mustenable": "Ændringer kan ikke gemmes, medmindre du først klikker på knappen Aktiver opdateringer.",
-        "mustrestart": "Når du er færdig med opdateringer, skal du genstarte backend.",
         "networkfail": "FEJL: Backend-netværksfejl",
         "next": "Næste",
         "no": "Ingen",
@@ -38,15 +36,19 @@
         "backendStatus": "Backend Status",
         "channeleditor": "Kanalredaktør",
         "guide": {
+            "calendar_tip": "Datovælger: Vælg først tidspunktet og derefter datoen.",
+            "catcolors": "Kategori Farver",
             "channel": "Kanal",
+            "channel_group": "Kanalgruppe",
+            "color_customize": "Tilpas farverne ved at redigere denne fil:",
+            "color_expl": "Viser med kategorier, der ikke har en Kategori-farve, bruger Kategoritype-farven.",
+            "color_includes": "Denne liste indeholder kun farver til programmer på den aktuelle side i vejledningen. Den fulde liste over farver er i filen nævnt nedenfor.",
+            "colors": "Farver",
             "full_search": "Fuld søgning",
             "people_search": "People Search",
             "retgrid": "Vend tilbage til gittervisning",
             "title_search": "Titelsøgning",
-            "type_movie": "Film",
-            "type_series": "Serie",
-            "type_sports": "Sport",
-            "type_tvshow": "TV show"
+            "typecolors": "Kategori Type Farver"
         },
         "programguide": "Programguide",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "Aktivering af opdateringer forhindrer optagelser i at finde sted, indtil du genstarter",
             "enableupdates_label": "Aktiver opdateringer",
+            "mustenable": "Ændringer kan ikke gemmes, medmindre du først klikker på knappen Aktiver opdateringer.",
+            "mustrestart": "Når du er færdig med opdateringer, skal du genstarte backend.",
             "restart_desc": "Optagelser er deaktiveret, indtil du genstarter",
             "restart_label": "Genstart Backend",
             "restarting": "Genstarter Backend",
+            "shutdown_label": "Luk Backend",
             "slave_enabled": "Opdateringer er altid aktiveret på en slave-backend.",
             "slave_instructions": "Dette ser ud til at være en slave backend. Hvis det er beregnet som en slave-backend, skal du deaktivere planlægning på master-backend, mens du kører slave-backend-opsætning.",
             "slave_warning": "Hvis dette ikke er beregnet som en slave-backend, skal du gå til Opsætning, Generelt, Host Address Backend-opsætning og vælge \"Denne server er Master Backend\" eller ellers indstil den korrekte brugerdefinerede identifikator på siden Databaseopsætning. Gem og genstart backend,",
             "title": "MythTV-opsætning",
-            "upcomingrec": "Næste kommende optagelse: {{Title}} kl. {{StartTime}}. Status: {{Status}}"
+            "upcomingrec": "Næste kommende optagelse: {{Title}} kl. {{StartTime}}. Status: {{Status}}",
+            "webonly": {
+                "DBSETUP": "Backend kan ikke starte normalt, fordi databaseopsætningen ikke er færdig.",
+                "DBTIMEZONE": "Backend kan ikke starte normalt, fordi databasetidszoner ikke er konfigureret.",
+                "IPADDRESS": "Backend kan ikke starte normalt, fordi Generelt, Værtsadresse, Primær IP-adresse ikke er indstillet.",
+                "SCHEMAUPDATE": "Backend kan ikke starte normalt, fordi opdatering af databaseskema mislykkedes.",
+                "WEBONLYPARM": "Backend er i begrænset tilstand på grund af --webonly parameter på kommandolinjen. Du bliver nødt til at genstarte manuelt."
+            }
         },
         "misc": {
             "bal_io": "Balanceret disk I/O",

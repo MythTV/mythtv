@@ -16,8 +16,6 @@
         "help": "Aiuto",
         "instructions": "Istruzioni",
         "loading": "Caricamento in corso",
-        "mustenable": "Non è possibile salvare le modifiche se non si fa prima clic sul pulsante Abilita aggiornamenti.",
-        "mustrestart": "Una volta terminati gli aggiornamenti, riavviare il backend.",
         "networkfail": "ERRORE: errore di rete back-end",
         "next": "Prossimo",
         "no": "NO",
@@ -38,15 +36,19 @@
         "backendStatus": "Stato back-end",
         "channeleditor": "Editor di canali",
         "guide": {
+            "calendar_tip": "Selettore data: seleziona prima l'ora, poi la data.",
+            "catcolors": "Categoria Colori",
             "channel": "Canale",
+            "channel_group": "Gruppo di canali",
+            "color_customize": "Personalizza i colori modificando questo file:",
+            "color_expl": "Gli spettacoli con categorie che non hanno un colore Categoria utilizzano il colore Tipo categoria.",
+            "color_includes": "Questo elenco include solo i colori per i programmi nella pagina corrente della guida. L'elenco completo dei colori è nel file indicato di seguito.",
+            "colors": "Colori",
             "full_search": "Ricerca completa",
             "people_search": "Cerca persone",
             "retgrid": "Ritorna alla visualizzazione della griglia",
             "title_search": "Ricerca del titolo",
-            "type_movie": "Film",
-            "type_series": "Serie",
-            "type_sports": "Gli sport",
-            "type_tvshow": "Programma televisivo"
+            "typecolors": "Categoria Tipo Colori"
         },
         "programguide": "Guida al programma",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "L'abilitazione degli aggiornamenti impedirà qualsiasi registrazione fino al riavvio",
             "enableupdates_label": "Abilita Aggiornamenti",
+            "mustenable": "Non è possibile salvare le modifiche se non si fa prima clic sul pulsante Abilita aggiornamenti.",
+            "mustrestart": "Una volta terminati gli aggiornamenti, riavviare il backend.",
             "restart_desc": "Le registrazioni sono disabilitate fino al riavvio",
             "restart_label": "Riavvia il back-end",
             "restarting": "Riavvio del backend",
+            "shutdown_label": "Chiudi il back-end",
             "slave_enabled": "Gli aggiornamenti sono sempre abilitati su un backend slave.",
             "slave_instructions": "Questo sembra essere un backend slave. Se è inteso come back-end slave, disabilita la pianificazione sul back-end principale durante l'esecuzione della configurazione del back-end slave.",
             "slave_warning": "Se questo non è inteso come back-end slave, vai a Configurazione, Generale, Configurazione back-end indirizzo host e seleziona \"Questo server è il back-end principale\" oppure imposta l'identificatore personalizzato corretto nella pagina Configurazione database. Salva e riavvia il backend,",
             "title": "Installazione di MythTV",
-            "upcomingrec": "Prossima registrazione in arrivo: {{Title}} alle {{StartTime}}. Stato: {{Status}}"
+            "upcomingrec": "Prossima registrazione in arrivo: {{Title}} alle {{StartTime}}. Stato: {{Status}}",
+            "webonly": {
+                "DBSETUP": "Il backend non può avviarsi normalmente perché la configurazione del database non è completa.",
+                "DBTIMEZONE": "Il backend non può avviarsi normalmente perché i fusi orari del database non sono impostati.",
+                "IPADDRESS": "Il backend non può avviarsi normalmente perché Generale, Indirizzo host, Indirizzo IP primario non sono impostati.",
+                "SCHEMAUPDATE": "Il backend non può essere avviato normalmente perché l'aggiornamento dello schema del database non è riuscito.",
+                "WEBONLYPARM": "Il backend è in modalità limitata a causa del parametro --webonly sulla riga di comando. Dovrai riavviare manualmente."
+            }
         },
         "misc": {
             "bal_io": "I/O su disco bilanciato",

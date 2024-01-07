@@ -16,8 +16,6 @@
         "help": "Helfen",
         "instructions": "Anweisungen",
         "loading": "Wird geladen",
-        "mustenable": "Änderungen können nur gespeichert werden, wenn Sie zuerst auf die Schaltfläche „Aktualisierungen aktivieren“ klicken.",
-        "mustrestart": "Wenn Sie mit den Updates fertig sind, starten Sie das Backend neu.",
         "networkfail": "FEHLER: Backend-Netzwerkfehler",
         "next": "Nächste",
         "no": "NEIN",
@@ -38,15 +36,19 @@
         "backendStatus": "Backend-Status",
         "channeleditor": "Kanaleditor",
         "guide": {
+            "calendar_tip": "Datumsauswahl: Wählen Sie zuerst die Uhrzeit und dann das Datum aus.",
+            "catcolors": "Kategorie Farben",
             "channel": "Kanal",
+            "channel_group": "Kanalgruppe",
+            "color_customize": "Passen Sie die Farben an, indem Sie diese Datei bearbeiten:",
+            "color_expl": "Shows mit Kategorien, die keine Kategoriefarbe haben, verwenden die Kategorietypfarbe.",
+            "color_includes": "Diese Liste enthält nur Farben für Programme auf der aktuellen Seite des Handbuchs. Die vollständige Liste der Farben finden Sie in der unten genannten Datei.",
+            "colors": "Farben",
             "full_search": "Volle Suche",
             "people_search": "Personensuche",
             "retgrid": "Zurück zur Rasteranzeige",
             "title_search": "Titelsuche",
-            "type_movie": "Film",
-            "type_series": "Serie",
-            "type_sports": "Sport",
-            "type_tvshow": "Fernsehsendung"
+            "typecolors": "Kategorietypfarben"
         },
         "programguide": "Programm",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "Durch die Aktivierung von Updates wird verhindert, dass Aufzeichnungen stattfinden, bis Sie neu starten",
             "enableupdates_label": "Aktivieren Sie Updates",
+            "mustenable": "Änderungen können nur gespeichert werden, wenn Sie zuerst auf die Schaltfläche „Aktualisierungen aktivieren“ klicken.",
+            "mustrestart": "Wenn Sie mit den Updates fertig sind, starten Sie das Backend neu.",
             "restart_desc": "Die Aufzeichnungen sind bis zum Neustart deaktiviert",
             "restart_label": "Backend neu starten",
             "restarting": "Backend neu starten",
+            "shutdown_label": "Backend schließen",
             "slave_enabled": "Updates sind immer auf einem Slave-Backend aktiviert.",
             "slave_instructions": "Dies scheint ein Slave-Backend zu sein. Wenn es als Slave-Backend gedacht ist, deaktivieren Sie bitte die Planung auf dem Master-Backend, während Sie die Einrichtung des Slave-Backends ausführen.",
             "slave_warning": "Wenn dies nicht als Slave-Backend gedacht ist, gehen Sie bitte zu „Setup“, „Allgemein“, „Hostadressen-Backend-Setup“ und wählen Sie „Dieser Server ist das Master-Backend“ oder legen Sie die korrekte benutzerdefinierte Kennung auf der Seite „Datenbank-Setup“ fest. Speichern Sie das Backend und starten Sie es neu.",
             "title": "MythTV-Setup",
-            "upcomingrec": "Nächste bevorstehende Aufnahme: {{Title}} um {{StartTime}}. Status: {{Status}}"
+            "upcomingrec": "Nächste bevorstehende Aufnahme: {{Title}} um {{StartTime}}. Status: {{Status}}",
+            "webonly": {
+                "DBSETUP": "Das Backend kann nicht normal gestartet werden, da die Datenbankeinrichtung nicht abgeschlossen ist.",
+                "DBTIMEZONE": "Das Backend kann nicht normal starten, da die Datenbankzeitzonen nicht eingerichtet sind.",
+                "IPADDRESS": "Das Backend kann nicht normal starten, da „Allgemein“, „Hostadresse“ und „Primäre IP-Adresse“ nicht festgelegt sind.",
+                "SCHEMAUPDATE": "Das Backend kann nicht normal gestartet werden, da die Aktualisierung des Datenbankschemas fehlgeschlagen ist.",
+                "WEBONLYPARM": "Das Backend befindet sich aufgrund des Parameters --webonly in der Befehlszeile im eingeschränkten Modus. Sie müssen manuell neu starten."
+            }
         },
         "misc": {
             "bal_io": "Ausgeglichene Festplatten-E/A",

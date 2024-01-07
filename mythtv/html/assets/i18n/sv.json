@@ -16,8 +16,6 @@
         "help": "Hjälp",
         "instructions": "Instruktioner",
         "loading": "Läser in",
-        "mustenable": "Ändringar kan inte sparas om du inte klickar på knappen Aktivera uppdateringar först.",
-        "mustrestart": "När du är klar med uppdateringarna, starta om backend.",
         "networkfail": "FEL: Backend-nätverksfel",
         "next": "Nästa",
         "no": "Nej",
@@ -38,15 +36,19 @@
         "backendStatus": "Backend Status",
         "channeleditor": "Kanalredigerare",
         "guide": {
+            "calendar_tip": "Datumväljare: Välj först tid och sedan datum.",
+            "catcolors": "Kategori Färger",
             "channel": "Kanal",
+            "channel_group": "Kanalgrupp",
+            "color_customize": "Anpassa färgerna genom att redigera den här filen:",
+            "color_expl": "Program med kategorier som inte har en kategorifärg använder färgen kategorityp.",
+            "color_includes": "Denna lista innehåller endast färger för program på den aktuella sidan i guiden. Den fullständiga listan över färger finns i filen som nämns nedan.",
+            "colors": "Färger",
             "full_search": "Fullständig sökning",
             "people_search": "People Search",
             "retgrid": "Återgå till Grid Display",
             "title_search": "Titelsökning",
-            "type_movie": "Film",
-            "type_series": "Serier",
-            "type_sports": "sporter",
-            "type_tvshow": "TV program"
+            "typecolors": "Kategori Typ Färger"
         },
         "programguide": "Programguide",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "Om du aktiverar uppdateringar förhindras alla inspelningar tills du startar om",
             "enableupdates_label": "Aktivera uppdateringar",
+            "mustenable": "Ändringar kan inte sparas om du inte klickar på knappen Aktivera uppdateringar först.",
+            "mustrestart": "När du är klar med uppdateringarna, starta om backend.",
             "restart_desc": "Inspelningar är inaktiverade tills du startar om",
             "restart_label": "Starta om Backend",
             "restarting": "Startar om backend",
+            "shutdown_label": "Stäng Backend",
             "slave_enabled": "Uppdateringar är alltid aktiverade på en slavbackend.",
             "slave_instructions": "Detta verkar vara en slavbackend. Om den är avsedd som en slavbackend, inaktivera schemaläggning på masterbackend medan du kör slavbackend-installation.",
             "slave_warning": "Om detta inte är avsett som en slavbackend, gå till Setup, General, Host Address Backend Setup och välj \"Den här servern är Master Backend\" eller ställ in rätt anpassad identifierare på Databas Setup-sidan. Spara och starta om backend,",
             "title": "MythTV Setup",
-            "upcomingrec": "Nästa kommande inspelning: {{Title}} kl. {{StartTime}}. Status: {{Status}}"
+            "upcomingrec": "Nästa kommande inspelning: {{Title}} kl. {{StartTime}}. Status: {{Status}}",
+            "webonly": {
+                "DBSETUP": "Backend kan inte starta normalt eftersom databasinstallationen inte är klar.",
+                "DBTIMEZONE": "Backend kan inte starta normalt eftersom databastidszoner inte är inställda.",
+                "IPADDRESS": "Backend kan inte starta normalt eftersom Allmänt, Värdadress, Primär IP-adress inte är inställt.",
+                "SCHEMAUPDATE": "Backend kan inte starta normalt eftersom uppdatering av databasschema misslyckades.",
+                "WEBONLYPARM": "Backend är i begränsat läge på grund av parametern --webonly på kommandoraden. Du måste starta om manuellt."
+            }
         },
         "misc": {
             "bal_io": "Balanserad disk I/O",

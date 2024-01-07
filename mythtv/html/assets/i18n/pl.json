@@ -16,8 +16,6 @@
         "help": "Pomoc",
         "instructions": "Instrukcje",
         "loading": "Ładowanie",
-        "mustenable": "Zmiany nie mogą zostać zapisane, chyba że najpierw klikniesz przycisk Włącz aktualizacje.",
-        "mustrestart": "Po zakończeniu aktualizacji uruchom ponownie backend.",
         "networkfail": "BŁĄD: Awaria sieci zaplecza",
         "next": "Następny",
         "no": "NIE",
@@ -38,15 +36,19 @@
         "backendStatus": "Stan zaplecza",
         "channeleditor": "Edytor kanału",
         "guide": {
+            "calendar_tip": "Wybór daty: najpierw wybierz godzinę, a następnie datę.",
+            "catcolors": "Kategoria Kolory",
             "channel": "Kanał",
+            "channel_group": "Grupa kanałów",
+            "color_customize": "Dostosuj kolory, edytując ten plik:",
+            "color_expl": "W programach z kategoriami, które nie mają koloru kategorii, używany jest kolor typu kategorii.",
+            "color_includes": "Ta lista zawiera tylko kolory programów znajdujących się na bieżącej stronie przewodnika. Pełna lista kolorów znajduje się w pliku wymienionym poniżej.",
+            "colors": "Zabarwienie",
             "full_search": "Pełne wyszukiwanie",
             "people_search": "Ludzie szukają",
             "retgrid": "Powrót do wyświetlania siatki",
             "title_search": "Wyszukiwanie tytułów",
-            "type_movie": "Film",
-            "type_series": "Seria",
-            "type_sports": "Sporty",
-            "type_tvshow": "Widowisko telewizyjne"
+            "typecolors": "Kategoria Typ Kolory"
         },
         "programguide": "Przewodnik po programach",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "Włączenie aktualizacji zapobiegnie nagrywaniu do momentu ponownego uruchomienia",
             "enableupdates_label": "Włącz aktualizacje",
+            "mustenable": "Zmiany nie mogą zostać zapisane, chyba że najpierw klikniesz przycisk Włącz aktualizacje.",
+            "mustrestart": "Po zakończeniu aktualizacji uruchom ponownie backend.",
             "restart_desc": "Nagrania są wyłączone do ponownego uruchomienia",
             "restart_label": "Uruchom ponownie zaplecze",
             "restarting": "Ponowne uruchamianie backendu",
+            "shutdown_label": "Zamknij zaplecze",
             "slave_enabled": "Aktualizacje są zawsze włączone na podrzędnym zapleczu.",
             "slave_instructions": "Wygląda na to, że jest to backend podrzędny. Jeśli ma służyć jako podrzędny backend, wyłącz planowanie na głównym backendzie podczas uruchamiania konfiguracji podrzędnego backendu.",
             "slave_warning": "Jeśli nie jest to zaplecze podrzędne, przejdź do Ustawienia, Ogólne, Konfiguracja zaplecza adresu hosta i wybierz „Ten serwer jest głównym zapleczem” lub ustaw poprawny niestandardowy identyfikator na stronie Konfiguracja bazy danych. Zapisz i uruchom ponownie backend,",
             "title": "Konfiguracja MythTV",
-            "upcomingrec": "Następne nadchodzące nagranie: {{Title}} o {{StartTime}}. Stan: {{Status}}"
+            "upcomingrec": "Następne nadchodzące nagranie: {{Title}} o {{StartTime}}. Stan: {{Status}}",
+            "webonly": {
+                "DBSETUP": "Zaplecze nie może uruchomić się normalnie, ponieważ konfiguracja bazy danych nie została ukończona.",
+                "DBTIMEZONE": "Zaplecze nie może uruchomić się normalnie, ponieważ strefy czasowe bazy danych nie są skonfigurowane.",
+                "IPADDRESS": "Backend nie może uruchomić się normalnie, ponieważ nie ustawiono opcji Ogólne, Adres hosta i Podstawowy adres IP.",
+                "SCHEMAUPDATE": "Zaplecze nie może uruchomić się normalnie, ponieważ aktualizacja schematu bazy danych nie powiodła się.",
+                "WEBONLYPARM": "Backend jest w trybie ograniczonym z powodu parametru --webonly w wierszu poleceń. Będziesz musiał ponownie uruchomić ręcznie."
+            }
         },
         "misc": {
             "bal_io": "Zbalansowane we/wy dysku",

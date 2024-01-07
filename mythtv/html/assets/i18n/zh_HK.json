@@ -16,8 +16,6 @@
         "help": "幫助",
         "instructions": "指示",
         "loading": "加載中",
-        "mustenable": "除非您先按一下「啟用更新」按鈕，否則無法儲存變更。",
-        "mustrestart": "完成更新後，重新啟動後端。",
         "networkfail": "錯誤：後端網絡故障",
         "next": "下一個",
         "no": "不",
@@ -38,15 +36,19 @@
         "backendStatus": "後端狀態",
         "channeleditor": "頻道編輯",
         "guide": {
+            "calendar_tip": "日期選擇器：先選擇時間，然後選擇日期。",
+            "catcolors": "類別 顏色",
             "channel": "渠道",
+            "channel_group": "頻道組",
+            "color_customize": "透過編輯此文件來自訂顏色：",
+            "color_expl": "沒有類別顏色的類別的顯示使用類別類型顏色。",
+            "color_includes": "此清單僅包含指南目前頁面上的程式的顏色。完整的顏色清單位於下面提到的文件中。",
+            "colors": "顏色",
             "full_search": "完整搜尋",
             "people_search": "人物搜索",
             "retgrid": "返回網格顯示",
             "title_search": "標題搜索",
-            "type_movie": "電影",
-            "type_series": "系列",
-            "type_sports": "運動的",
-            "type_tvshow": "電視節目"
+            "typecolors": "類別 類型 顏色"
         },
         "programguide": "節目指南",
         "recordings": {
@@ -1027,14 +1029,24 @@
         "main": {
             "enableupdates_desc": "啟用更新將阻止進行任何錄製，直到您重新啟動為止",
             "enableupdates_label": "啟用更新",
+            "mustenable": "除非您先按一下「啟用更新」按鈕，否則無法儲存變更。",
+            "mustrestart": "完成更新後，重新啟動後端。",
             "restart_desc": "錄音將被禁用，直到您重新啟動為止",
             "restart_label": "重啟後端",
             "restarting": "重啟後端",
+            "shutdown_label": "關閉後端",
             "slave_enabled": "從屬後端始終啟用更新。",
             "slave_instructions": "這似乎是一個從屬後端。如果它打算作為從後端，請在運行從後端設置時禁用主後端上的調度。",
             "slave_warning": "如果這不是作為從屬後端，請轉至“設置”、“常規”、“主機地址後端設置”，然後選擇“此服務器是主後端”，或者在“數據庫設置”頁面上設置正確的自定義標識符。保存並重新啟動後端，",
             "title": "神話電視設置",
-            "upcomingrec": "下一個即將錄製的節目：{{Title}}，時間：{{StartTime}}。狀態：{{Status}}"
+            "upcomingrec": "下一個即將錄製的節目：{{Title}}，時間：{{StartTime}}。狀態：{{Status}}",
+            "webonly": {
+                "DBSETUP": "由於資料庫安裝未完成，後端無法正常啟動。",
+                "DBTIMEZONE": "由於資料庫時區未設置，後端無法正常啟動。",
+                "IPADDRESS": "由於未設定常規、主機位址、主 IP 位址，後端無法正常啟動。",
+                "SCHEMAUPDATE": "由於資料庫架構更新失敗，後端無法正常啟動。",
+                "WEBONLYPARM": "由於命令列上的 --webonly 參數，後端處於受限模式。您必須手動重新啟動。"
+            }
         },
         "misc": {
             "bal_io": "平衡磁盤 I/O",
