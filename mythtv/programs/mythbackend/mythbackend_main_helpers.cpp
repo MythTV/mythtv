@@ -553,6 +553,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
             "Please install it and try again.  "
             "See 'mysql_tzinfo_to_sql' for assistance.");
         gCoreContext->GetDB()->IgnoreDatabase(true);
+        gContext->setWebOnly(MythContext::kWebOnlyDBTimezone);
         return run_setup_webserver();
     }
     bool ismaster = gCoreContext->IsMasterHost();
@@ -562,6 +563,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         LOG(VB_GENERAL, LOG_ERR,
             QString("Couldn't upgrade database to new schema on %1 backend.")
             .arg(ismaster ? "master" : "slave"));
+        gContext->setWebOnly(MythContext::kWebOnlySchemaUpdate);
         return run_setup_webserver();
     }
 
@@ -569,8 +571,10 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     MythTranslation::load("mythfrontend");
 
     if (cmdline.toBool("webonly"))
+    {
+        gContext->setWebOnly(MythContext::kWebOnlyWebOnlyParm);
         return run_setup_webserver();
-
+    }
     if (!ismaster)
     {
         be_sd_notify("STATUS=Connecting to master backend");
@@ -586,6 +590,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         std::cerr << "No setting found for this machine's BackendServerAddr.\n"
                   << "MythBackend starting in Web App only mode for initial setup.\n"
                   << "Use http://<yourBackend>:6544 to perform setup.\n";
+        gContext->setWebOnly(MythContext::kWebOnlyIPAddress);
         return run_setup_webserver();
     }
 

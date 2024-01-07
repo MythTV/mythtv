@@ -138,6 +138,8 @@ int main(int argc, char **argv)
     {
         auto config = XmlConfiguration();
         ignoreDB = !config.FileExists();
+        if (ignoreDB)
+            gContext->setWebOnly(MythContext::kWebOnlyDBSetup);
     }
 
     // Init Parameters:
@@ -149,8 +151,7 @@ int main(int argc, char **argv)
     if (!gContext->Init(false,false,false,ignoreDB))
     {
         LOG(VB_GENERAL, LOG_CRIT, "Failed to init MythContext.");
-        gCoreContext->GetDB()->IgnoreDatabase(true);
-        // return GENERIC_EXIT_NO_MYTHCONTEXT;
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
     MythTranslation::load("mythfrontend");
