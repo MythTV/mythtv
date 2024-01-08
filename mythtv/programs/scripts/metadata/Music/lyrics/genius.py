@@ -20,7 +20,7 @@ import difflib
 from optparse import OptionParser
 from common import utilities
 
-import json as simplejson
+import json
 
 __author__      = "Paul Harrison and ronie'"
 __title__       = "Genius"
@@ -50,7 +50,7 @@ class LyricsFetcher:
             return False
 
         req.close()
-        data = simplejson.loads(response)
+        data = json.loads(response)
 
         try:
             name = data['response']['hits'][0]['result']['primary_artist']['name']
@@ -198,4 +198,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

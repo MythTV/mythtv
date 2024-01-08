@@ -1,6 +1,6 @@
 #-*- coding: UTF-8 -*-
 
-import sys, re, socket
+import json, sys, re, socket
 
 try:
     from urllib2 import quote, urlopen, HTTPError
@@ -14,11 +14,6 @@ except ImportError:
     from html import parser as html_parser
 
 from optparse import OptionParser
-
-if sys.version_info < (2, 7):
-    import simplejson
-else:
-    import json as simplejson
 
 from common import *
 
@@ -49,7 +44,7 @@ class LyricsFetcher:
         except:
             return False
         req.close()
-        data = simplejson.loads(response)
+        data = json.loads(response)
         try:
             self.page = data['url']
         except:
