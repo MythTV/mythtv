@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# -*- coding: utf-8 -*-
 #
 # Python script to check, add, remove, amend strings in the translation JSON files
 # used by the Angular MythTV webapp
@@ -407,7 +406,7 @@ def listKeys(lang):
 def listLanguages():
     print("The listkeys command supports these language codes:-")
     for code,file,name in DEST_LANGS:
-        print("    {0:6}  {1}".format(code,name))
+        print("    {:6}  {}".format(code,name))
 
 if __name__ == '__main__':
 

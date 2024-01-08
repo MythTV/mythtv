@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Provides data access classes for accessing and managing MythTV data
 """
@@ -67,7 +65,7 @@ class Artwork( UserString ):
             # return a dumb string
             return str.__new__(str, attr)
         else:
-            return super(Artwork, cls).__new__(cls)
+            return super().__new__(cls)
 
     def __init__(self, attr, parent=None, imagetype=None):
         self.attr = attr
@@ -128,7 +126,7 @@ class Record( CMPRecord, DBDataWrite, RECTYPE ):
     @classmethod
     def _setClassDefs(cls, db=None):
         db = DBCache(db)
-        super(Record, cls)._setClassDefs(db)
+        super()._setClassDefs(db)
         defaults = cls._template('Default', db=db)
         for k,v in list(defaults.items()):
             cls._defaults[k] = v
@@ -962,7 +960,7 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
     @classmethod
     def _setClassDefs(cls, db=None):
         db = DBCache(db)
-        super(Video, cls)._setClassDefs(db)
+        super()._setClassDefs(db)
         cls._fill_cm(db)
 
     @classmethod

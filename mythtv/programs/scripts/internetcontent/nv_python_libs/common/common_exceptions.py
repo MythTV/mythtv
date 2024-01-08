@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: common_exceptions - Custom exceptions used or raised by WebCgi_api
 # Python Script

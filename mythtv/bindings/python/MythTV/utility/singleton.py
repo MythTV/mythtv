@@ -11,13 +11,13 @@ class Singleton( type ):
     """
     def __new__(mcs, name, bases, kwargs):
         if '__slots__' in kwargs:
-            kwargs['__slots__']['_{0}__instance'.format(name)] = None
+            kwargs['__slots__']['_{}__instance'.format(name)] = None
         else:
-            kwargs['_{0}__instance'.format(name)] = None
+            kwargs['_{}__instance'.format(name)] = None
         return type.__new__(mcs, name, bases, kwargs)
 
     def __call__(cls, *args, **kwargs):
-        attr = '_{0}__instance'.format(cls.__name__)
+        attr = '_{}__instance'.format(cls.__name__)
         inst = getattr(cls, attr)
         if inst:
             return inst
@@ -32,13 +32,13 @@ class InputSingleton( type ):
     """
     def __new__(mcs, name, bases, kwargs):
         if '__slots__' in kwargs:
-            kwargs['__slots__']['_{0}__instance'.format(name)] = {}
+            kwargs['__slots__']['_{}__instance'.format(name)] = {}
         else:
-            kwargs['_{0}__instance'.format(name)] = {}
+            kwargs['_{}__instance'.format(name)] = {}
         return type.__new__(mcs, name, bases, kwargs)
 
     def __call__(cls, *args, **kwargs):
-        attr = '_{0}__instance'.format(cls.__name__)
+        attr = '_{}__instance'.format(cls.__name__)
         insts = getattr(cls, attr)
 
         from inspect import getcallargs
@@ -57,13 +57,13 @@ class CmpSingleton( type ):
     """
     def __new__(mcs, name, bases, kwargs):
         if '__slots__' in kwargs:
-            kwargs['__slots__']['_{0}__instance'.format(name)] = []
+            kwargs['__slots__']['_{}__instance'.format(name)] = []
         else:
-            kwargs['_{0}__instance'.format(name)] = []
+            kwargs['_{}__instance'.format(name)] = []
         return type.__new__(mcs, name, bases, kwargs)
 
     def __call__(cls, *args, **kwargs):
-        attr = '_{0}__instance'.format(cls.__name__)
+        attr = '_{}__instance'.format(cls.__name__)
         insts = getattr(cls, attr)
         obj = type.__call__(cls, *args, **kwargs)
         for inst in insts:

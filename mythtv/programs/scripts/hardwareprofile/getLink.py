@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 ### This module isn't used anywhere in the MythTV repository.
 
 # smolt - Fedora hardware profiler
@@ -21,7 +19,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
-from __future__ import print_function
 import sys
 from optparse import OptionParser
 import requests

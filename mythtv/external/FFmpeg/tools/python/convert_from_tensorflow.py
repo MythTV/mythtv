@@ -24,7 +24,7 @@ import convert_header as header
 
 __all__ = ['convert_from_tensorflow']
 
-class Operand(object):
+class Operand:
     IOTYPE_INPUT = 1
     IOTYPE_OUTPUT = 2
     IOTYPE_INTERMEDIATE = IOTYPE_INPUT | IOTYPE_OUTPUT

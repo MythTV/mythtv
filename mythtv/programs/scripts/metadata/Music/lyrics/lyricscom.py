@@ -1,4 +1,3 @@
-# -*- Mode: python; coding: utf-8; tab-width: 8; indent-tabs-mode: t; -*-
 """
 Scraper for http://www.lyrdb.com/
 
@@ -77,10 +76,10 @@ class LyricsFetcher:
                     return False
                 req2.close()
 
-                matchcode = re.search(u'<pre.*?>(.*?)</pre>', resp2, flags=re.DOTALL)
+                matchcode = re.search('<pre.*?>(.*?)</pre>', resp2, flags=re.DOTALL)
                 if matchcode:
                     lyricscode = (matchcode.group(1))
-                    lyr = re.sub(u'<[^<]+?>', '', lyricscode)
+                    lyr = re.sub('<[^<]+?>', '', lyricscode)
                     lyrics.lyrics = lyr.replace('\\n','\n')
                     return True
 
@@ -114,7 +113,7 @@ def performSelfTest():
 
 def buildLyrics(lyrics):
     from lxml import etree
-    xml = etree.XML(u'<lyrics></lyrics>')
+    xml = etree.XML('<lyrics></lyrics>')
     etree.SubElement(xml, "artist").text = lyrics.artist
     etree.SubElement(xml, "album").text = lyrics.album
     etree.SubElement(xml, "title").text = lyrics.title
@@ -131,7 +130,7 @@ def buildLyrics(lyrics):
 
 def buildVersion():
     from lxml import etree
-    version = etree.XML(u'<grabber></grabber>')
+    version = etree.XML('<grabber></grabber>')
     etree.SubElement(version, "name").text = __title__
     etree.SubElement(version, "author").text = __author__
     etree.SubElement(version, "command").text = 'lyricscom.py'

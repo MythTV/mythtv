@@ -1,4 +1,3 @@
-#-*- coding: UTF-8 -*-
 """
 Scraper for http://www.darklyrics.com/ - the largest metal lyrics archive on the Web.
 
@@ -157,7 +156,7 @@ def performSelfTest():
 
 def buildLyrics(lyrics):
     from lxml import etree
-    xml = etree.XML(u'<lyrics></lyrics>')
+    xml = etree.XML('<lyrics></lyrics>')
     etree.SubElement(xml, "artist").text = lyrics.artist
     etree.SubElement(xml, "album").text = lyrics.album
     etree.SubElement(xml, "title").text = lyrics.title
@@ -166,7 +165,7 @@ def buildLyrics(lyrics):
 
     lines = lyrics.lyrics.splitlines()
     for line in lines:
-        line2 = re.sub(u'[^\u0020-\uD7FF\u0009\u000A\u000D\uE000-\uFFFD\u10000-\u10FFFF]+', '', line)
+        line2 = re.sub('[^\u0020-\uD7FF\u0009\u000A\u000D\uE000-\uFFFD\u10000-\u10FFFF]+', '', line)
         etree.SubElement(xml, "lyric").text = line2
 
     utilities.log(True, utilities.convert_etree(etree.tostring(xml, encoding='UTF-8',
@@ -175,7 +174,7 @@ def buildLyrics(lyrics):
 
 def buildVersion():
     from lxml import etree
-    version = etree.XML(u'<grabber></grabber>')
+    version = etree.XML('<grabber></grabber>')
     etree.SubElement(version, "name").text = __title__
     etree.SubElement(version, "author").text = __author__
     etree.SubElement(version, "command").text = 'darklyrics.py'

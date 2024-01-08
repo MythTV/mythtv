@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: bliptv_api - Simple-to-use Python interface to the bliptv API (http://blip.tv/)
 # Python Script
@@ -43,14 +41,14 @@ import logging
 from MythTV import MythXML
 
 try:
-    import xml.etree.cElementTree as ElementTree
+    import xml.etree.ElementTree as ElementTree
 except ImportError:
     import xml.etree.ElementTree as ElementTree
 
 from .bliptv_exceptions import (BliptvUrlError, BliptvHttpError, BliptvRssError, BliptvVideoNotFound, BliptvXmlError)
 import io
 
-class OutStreamEncoder(object):
+class OutStreamEncoder:
     """Wraps a stream with an encoder"""
     def __init__(self, outstream, encoding=None):
         self.out = outstream
@@ -83,7 +81,7 @@ class XmlHandler:
     def _grabUrl(self, url):
         try:
             urlhandle = urllib.request.urlopen(url)
-        except IOError as errormsg:
+        except OSError as errormsg:
             raise BliptvHttpError(errormsg)
         return urlhandle.read()
 
@@ -96,7 +94,7 @@ class XmlHandler:
         return et
 
 
-class Videos(object):
+class Videos:
     """Main interface to http://blip.tv/
     This is done to support a common naming framework for all python Netvision plugins no matter their site
     target.

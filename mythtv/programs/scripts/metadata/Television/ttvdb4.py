@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: UTF-8 -*-
 
 # ----------------------------------------------------
 # Purpose:   MythTV Python Bindings for TheTVDB v4 API
@@ -40,7 +39,7 @@ def _parse_config(config):
 
 def buildVersion():
     from lxml import etree
-    version = etree.XML(u'<grabber></grabber>')
+    version = etree.XML('<grabber></grabber>')
     etree.SubElement(version, "name").text = __title__
     etree.SubElement(version, "author").text = __author__
     etree.SubElement(version, "thumbnail").text = 'ttvdb.png'
@@ -118,7 +117,7 @@ def main():
     parser.add_argument('-t', '--test', action="store_true", default=False,
                          dest="test", help="Perform self-test for dependencies.")
 
-    parser.add_argument('-l', "--language", metavar="LANGUAGE", default=u'en',
+    parser.add_argument('-l', "--language", metavar="LANGUAGE", default='en',
                         dest="language", help="Specify language for filtering.")
 
     parser.add_argument('-a', "--area", metavar="COUNTRY", default=None,
@@ -242,7 +241,7 @@ def main():
             with open("ttvdb4_doctests") as f:
                 dtests = "".join(f.readlines())
             main.__doc__ += dtests
-        except IOError:
+        except OSError:
             pass
         # perhaps try optionflags=doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE
         return doctest.testmod(verbose=args.debug, optionflags=doctest.ELLIPSIS)

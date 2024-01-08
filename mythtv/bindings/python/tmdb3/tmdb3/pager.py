@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #-----------------------
 # Name: pager.py    List-like structure designed for handling paged results
 # Python Library
@@ -26,7 +25,7 @@ class PagedIterator(Iterator):
     next = __next__  # for Python2
 
 
-class UnpagedData(object):
+class UnpagedData:
     def copy(self):
         return self.__class__()
 
@@ -104,7 +103,7 @@ class PagedRequest(PagedList):
         self._request = request
         if handler:
             self._handler = handler
-        super(PagedRequest, self).__init__(self._getpage(1), 20)
+        super().__init__(self._getpage(1), 20)
 
     def _getpage(self, page):
         req = self._request.new(page=page)

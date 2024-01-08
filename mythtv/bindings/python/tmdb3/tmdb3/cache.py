@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #-----------------------
 # Name: cache.py
 # Python Library
@@ -16,7 +15,7 @@ from . import cache_null
 from . import cache_file
 
 
-class Cache(object):
+class Cache:
     """
     This class implements a cache framework, allowing selecting of a
     pluggable engine. The framework stores data in a key/value manner,
@@ -80,7 +79,7 @@ class Cache(object):
         """
         return self.Cached(self, callback)
 
-    class Cached( object ):
+    class Cached:
         def __init__(self, cache, callback, func=None, inst=None):
             self.cache = cache
             self.callback = callback

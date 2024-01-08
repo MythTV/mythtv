@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: UTF-8 -*-
 # ----------------------
 # Name: giantbomb_exceptions - Custom exceptions used or raised by giantbomb_api
 # Python Script

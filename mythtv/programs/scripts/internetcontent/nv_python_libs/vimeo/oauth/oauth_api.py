@@ -68,7 +68,7 @@ def generate_verifier(length=8):
     return ''.join([str(random.randint(0, 9)) for i in range(length)])
 
 
-class OAuthConsumer(object):
+class OAuthConsumer:
     """Consumer of OAuth authentication.
 
     OAuthConsumer is a data type that represents the identity of the Consumer
@@ -83,7 +83,7 @@ class OAuthConsumer(object):
         self.secret = secret
 
 
-class OAuthToken(object):
+class OAuthToken:
     """OAuthToken is a data type that represents an End User via either an access
     or request token.
 
@@ -152,7 +152,7 @@ class OAuthToken(object):
         return self.to_string()
 
 
-class OAuthRequest(object):
+class OAuthRequest:
     """OAuthRequest represents the request and can be serialized.
 
     OAuth parameters:
@@ -365,7 +365,7 @@ class OAuthRequest(object):
         return parameters
     _split_url_string = staticmethod(_split_url_string)
 
-class OAuthServer(object):
+class OAuthServer:
     """A worker to check the validity of a request against a data store."""
     timestamp_threshold = 300 # In seconds, five minutes.
     version = VERSION
@@ -526,7 +526,7 @@ class OAuthServer(object):
             raise OAuthError('Nonce already used: %s' % str(nonce))
 
 
-class OAuthClient(object):
+class OAuthClient:
     """OAuthClient is a worker to attempt to execute a request."""
     consumer = None
     token = None
@@ -554,7 +554,7 @@ class OAuthClient(object):
         raise NotImplementedError
 
 
-class OAuthDataStore(object):
+class OAuthDataStore:
     """A database abstraction used to lookup consumers and tokens."""
 
     def lookup_consumer(self, key):
@@ -582,7 +582,7 @@ class OAuthDataStore(object):
         raise NotImplementedError
 
 
-class OAuthSignatureMethod(object):
+class OAuthSignatureMethod:
     """A strategy class that implements a signature method."""
     def get_name(self):
         """-> str."""

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 #-----------------------
 # Name: locales.py    Stores locale information for filtering results
 # Python Library
@@ -14,7 +12,7 @@
 # ----------------------
 
 
-class LocaleBase(object):
+class LocaleBase:
     __slots__ = ['__immutable']
     _stored = {}
     fallthrough = False
@@ -28,13 +26,13 @@ class LocaleBase(object):
         if getattr(self, '__immutable', False):
             raise NotImplementedError(self.__class__.__name__ +
                                       ' does not support modification.')
-        super(LocaleBase, self).__setattr__(key, value)
+        super().__setattr__(key, value)
 
     def __delattr__(self, key):
         if getattr(self, '__immutable', False):
             raise NotImplementedError(self.__class__.__name__ +
                                       ' does not support modification.')
-        super(LocaleBase, self).__delattr__(key)
+        super().__delattr__(key)
 
     def __lt__(self, other):
         return (id(self) != id(other)) and (str(self) > str(other))
@@ -52,7 +50,7 @@ class LocaleBase(object):
         try:
             return cls._stored[key.lower()]
         except:
-            raise Exception("LocaleBase: '{0}' is not a known valid {1} code."
+            raise Exception("LocaleBase: '{}' is not a known valid {} code."
                             .format(key, cls.__name__))
 
 
@@ -67,13 +65,13 @@ class Language(LocaleBase):
 #        self.ISO639_2B = iso2b
         self.englishname = ename
 #        self.nativename = nname
-        super(Language, self).__init__(iso1, iso2, ename)
+        super().__init__(iso1, iso2, ename)
 
     def __str__(self):
         return self.ISO639_1
 
     def __repr__(self):
-        return u"<Language '{0.englishname}' ({0.ISO639_1})>".format(self)
+        return "<Language '{0.englishname}' ({0.ISO639_1})>".format(self)
 
 
 class Country(LocaleBase):
@@ -83,13 +81,13 @@ class Country(LocaleBase):
     def __init__(self, alpha2, name):
         self.alpha2 = alpha2
         self.name = name
-        super(Country, self).__init__(alpha2)
+        super().__init__(alpha2)
 
     def __str__(self):
         return self.alpha2
 
     def __repr__(self):
-        return u"<Country '{0.name}' ({0.alpha2})>".format(self)
+        return "<Country '{0.name}' ({0.alpha2})>".format(self)
 
 
 

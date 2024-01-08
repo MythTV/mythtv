@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: bbciplayer_api - Simple-to-use Python interface to the BBC iPlayer RSS feeds
 #                       (http://www.bbc.co.uk)
@@ -39,7 +37,7 @@ from MythTV import MythXML
 from .bbciplayer_exceptions import (BBCUrlError, BBCHttpError, BBCRssError, BBCVideoNotFound, BBCConfigFileError, BBCUrlDownloadError)
 import io
 
-class OutStreamEncoder(object):
+class OutStreamEncoder:
     """Wraps a stream with an encoder"""
     def __init__(self, outstream, encoding=None):
         self.out = outstream
@@ -86,7 +84,7 @@ if version < '2.7.2':
     sys.exit(1)
 
 
-class Videos(object):
+class Videos:
     """Main interface to http://www.bbciplayer.com/
     This is done to support a common naming framework for all python Netvision plugins no matter their site
     target.

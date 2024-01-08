@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: mnvsearch_exceptions - Custom exceptions used or raised by mnvsearch_api
 # Python Script

@@ -1,4 +1,3 @@
-from __future__ import print_function
 # smolt - Fedora hardware profiler
 #
 # Copyright (C) 2009 Sebastian Pipping <sebastian@pipping.org>
@@ -17,8 +16,6 @@ from __future__ import print_function
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
-from builtins import str
-from builtins import object
 import re
 import portage
 
@@ -26,7 +23,7 @@ SHORT_PARA_PATTERN = '-[CfIOW]\\s+\\S+|-[jl](\\s+[^-]\\S*)?|-[^-]\\S+'
 LONG_PARA_PATTERN = '--\\S+|--\\S+=\\S+'
 PARA_PATTERN = re.compile('(%s|%s)\\b' % (SHORT_PARA_PATTERN, LONG_PARA_PATTERN))
 
-class MakeOpts(object):
+class MakeOpts:
     def __init__(self, value=None):
         """
         >>> m = MakeOpts("-C dir -f file -I dir -o file -W file -j 3 -l 4 -j -j3 -l --always-make")

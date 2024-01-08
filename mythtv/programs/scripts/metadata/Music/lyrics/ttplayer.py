@@ -1,4 +1,3 @@
-# -*- Mode: python; coding: utf-8; tab-width: 8; indent-tabs-mode: t; -*-
 """
 Scraper for http://lrcct2.ttplayer.com/
 
@@ -35,7 +34,7 @@ LYRIC_TITLE_STRIP=[r"\(live[^\)]*\)", r"\(acoustic[^\)]*\)",
 LYRIC_TITLE_REPLACE=[("/", "-"),(" & ", " and ")]
 LYRIC_ARTIST_REPLACE=[("/", "-"),(" & ", " and ")]
 
-class ttpClient(object):
+class ttpClient:
     '''
     privide ttplayer specific function, such as encoding artist and title,
     generate a Id code for server authorizition.
@@ -217,7 +216,7 @@ def performSelfTest():
 
 def buildLyrics(lyrics):
     from lxml import etree
-    xml = etree.XML(u'<lyrics></lyrics>')
+    xml = etree.XML('<lyrics></lyrics>')
     etree.SubElement(xml, "artist").text = lyrics.artist
     etree.SubElement(xml, "album").text = lyrics.album
     etree.SubElement(xml, "title").text = lyrics.title
@@ -234,7 +233,7 @@ def buildLyrics(lyrics):
 
 def buildVersion():
     from lxml import etree
-    version = etree.XML(u'<grabber></grabber>')
+    version = etree.XML('<grabber></grabber>')
     etree.SubElement(version, "name").text = __title__
     etree.SubElement(version, "author").text = __author__
     etree.SubElement(version, "command").text = 'ttplayer.py'

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Provides base classes for accessing MythTV
 """
@@ -425,7 +423,7 @@ class BEEventMonitor( BECache ):
     def __init__(self, backend=None, blockshutdown=False,
                        systemevents=False, db=None):
         self.systemevents = systemevents
-        super(BEEventMonitor, self).__init__(backend, blockshutdown, True, db)
+        super().__init__(backend, blockshutdown, True, db)
 
     def _listhandlers(self):
         return [self.eventMonitor]
@@ -440,7 +438,7 @@ class BEEventMonitor( BECache ):
         self.log(MythLog.ALL, MythLog.INFO, event)
 
 class MythSystemEvent( BECache ):
-    class systemeventhandler( object ):
+    class systemeventhandler:
         # decorator class for system events
         bs = BACKEND_SEP.replace('[',r'\[').replace(']',r'\]')
         re_process = re.compile(bs.join([
@@ -506,7 +504,7 @@ class MythSystemEvent( BECache ):
 
     def __init__(self, backend=None, blockshutdown=False, db=None,
                        enablehandler=True):
-        super(MythSystemEvent, self).__init__(backend, blockshutdown, True, db)
+        super().__init__(backend, blockshutdown, True, db)
 
         if enablehandler:
             self._events.append(self._generic_handler)
@@ -521,7 +519,7 @@ class MythSystemEvent( BECache ):
 
 class Frontend( FEConnection ):
     _db = None
-    class _Jump( object ):
+    class _Jump:
         def __str__(self):  return str(self.list())
         def __repr__(self): return str(self)
 
@@ -554,7 +552,7 @@ class Frontend( FEConnection ):
             self._populate()
             return self._points.items()
 
-    class _Key( object ):
+    class _Key:
         _keymap = { 9:'tab',        10:'enter',     27:'escape',
                     32:'space',     92:'backslash', 127:'backspace',
                     258:'down',     259:'up',       260:'left',
@@ -915,7 +913,7 @@ class MythDB( DBCache ):
         if key.endswith('date'):
             prefix = {'on':'=', 'before':'<', 'after':'>'}
             if key[:-4] in prefix:
-                return ('DATE(program.starttime){0}?'.format(prefix[key[:-4]]),
+                return ('DATE(program.starttime){}?'.format(prefix[key[:-4]]),
                         value, 0)
 
         if key == 'startbefore':
@@ -1017,7 +1015,7 @@ class MythDB( DBCache ):
         """
         obj.scanVideo() --> list of new, moved, and deleted Videos
         """
-        startvids = dict([(vid.intid, vid) for vid in Video.getAllEntries(db=self)])
+        startvids = {vid.intid: vid for vid in Video.getAllEntries(db=self)}
 
         be = MythBE(db=self)
         r = re.compile(re.escape(BACKEND_SEP).\

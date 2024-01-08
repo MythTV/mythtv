@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Provides base classes for managing system calls.
 """
@@ -26,7 +24,7 @@ class System( DBCache ):
     """
     logmodule = 'Python system call handler'
 
-    class Process( object ):
+    class Process:
         def __init__(self, cmd, useshell, log):
             self.cmd = cmd
             self.log = log
@@ -348,7 +346,7 @@ class Grabber( System ):
             yield self.cls(item)
 
     def command(self, *args):
-        return self._processMetadata(super(Grabber, self).command(*args))
+        return self._processMetadata(super().command(*args))
 
     def search(self, phrase, subtitle=None, tolerance=None, func=None):
         """

@@ -89,7 +89,7 @@ class TOCError(Exception):
     pass
 
 
-class Disc(object):
+class Disc:
     """The class of the object returned by :func:`read` or :func:`put`.
     """
 

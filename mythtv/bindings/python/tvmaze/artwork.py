@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 #  Copyright (c) 2021 Steve Erlenborn
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +19,7 @@
 #  SOFTWARE.
 
 
-class Artwork(object):
+class Artwork:
     def __init__(self, data):
         self.id = data.get('id')        # ID for the artwork
         self.type = data.get('type')    # 'poster', 'background', or 'banner'

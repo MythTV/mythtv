@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------------------------------------
 # Purpose:   MythTV Python Bindings for TheTVDB v4 API
 # Copyright: (c) 2021 Roland Ernst

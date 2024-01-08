@@ -47,7 +47,7 @@ def convert_etree(etostr):
 def search_releases(artist, album, limit):
     from lxml import etree
 
-    root = etree.XML(u'<searchreleases></searchreleases>')
+    root = etree.XML('<searchreleases></searchreleases>')
 
     result = musicbrainzngs.search_releases(artist=artist, release=album, country="GB", limit=limit)
 
@@ -80,7 +80,7 @@ def search_releases(artist, album, limit):
 def search_artists(artist, limit):
     from lxml import etree
 
-    root = etree.XML(u'<artists></artists>')
+    root = etree.XML('<artists></artists>')
     result = musicbrainzngs.search_artists(artist=artist, limit=limit)
 
     if debug:
@@ -104,7 +104,7 @@ def search_artists(artist, limit):
 def get_artist(artistid):
     from lxml import etree
 
-    root = etree.XML(u'<artist></artist>')
+    root = etree.XML('<artist></artist>')
 
     # lookup the artist id
     result = musicbrainzngs.get_artist_by_id(artistid, includes=['url-rels'])
@@ -135,7 +135,7 @@ def get_artist(artistid):
 def find_coverart(release):
     from lxml import etree
 
-    root = etree.XML(u'<coverart></coverart>')
+    root = etree.XML('<coverart></coverart>')
 
     try:
         data = musicbrainzngs.get_image_list(release)
@@ -168,7 +168,7 @@ def find_coverart(release):
 def find_coverart_releasegroup(releaseGroup):
     from lxml import etree
 
-    root = etree.XML(u'<coverart></coverart>')
+    root = etree.XML('<coverart></coverart>')
 
     try:
         data = musicbrainzngs.get_release_group_image_list(releaseGroup)
@@ -202,7 +202,7 @@ def find_disc(cddrive):
     import discid
     from lxml import etree
 
-    root = etree.XML(u'<finddisc></finddisc>')
+    root = etree.XML('<finddisc></finddisc>')
 
     try:
         disc = discid.read(cddrive, ["mcn", "isrc"])
@@ -275,7 +275,7 @@ def find_disc(cddrive):
 
 def buildVersion():
     from lxml import etree
-    version = etree.XML(u'<version></version>')
+    version = etree.XML('<version></version>')
     etree.SubElement(version, "name").text = __title__
     etree.SubElement(version, "author").text = __author__
     etree.SubElement(version, "command").text = 'mbutils.py'

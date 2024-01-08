@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: UTF-8 -*-
 # ----------------------
 # Name: tmdb3tv.py
 # Python Script
@@ -66,7 +65,7 @@ def main(showType, command):
     parser.add_option("-N", "--numbers", action="store_true", default=False, dest="numbers",
                         help="Get television Season and Episode numbers. " \
                         "Needs title and subtitle or inetref and subtitle.")
-    parser.add_option('-l', "--language", metavar="LANGUAGE", default=u'en',
+    parser.add_option('-l', "--language", metavar="LANGUAGE", default='en',
                       dest="language", help="Specify language for filtering.")
     parser.add_option('-a', "--area", metavar="COUNTRY", default=None,
                       dest="country", help="Specify country for custom data.")

@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 #  Copyright (c) 2020 Lachlan Mackenzie
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -36,7 +34,7 @@ from .episode import Episode
 from .person import Crew, Character
 
 
-class Show(object):
+class Show:
     def __init__(self, data):
         self.score = data.get('score') if 'score' in data else 100
         show = data.get('show') if 'show' in data else data

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """API Client."""
 
 from os import fdopen
@@ -21,7 +19,7 @@ from ._version import __version__
 from .mythversions import MYTHTV_VERSION_LIST
 
 
-class Send(object):
+class Send:
     """Services API."""
 
     def __init__(self, host, port=6544):

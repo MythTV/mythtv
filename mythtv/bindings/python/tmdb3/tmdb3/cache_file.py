@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #-----------------------
 # Name: cache_file.py
 # Python Library
@@ -58,7 +57,7 @@ def _donothing(*args, **kwargs):
 
 try:
     import fcntl
-    class Flock(object):
+    class Flock:
         """
         Context manager to flock file for the duration the object
         exists. Referenced file will be automatically unflocked as the
@@ -99,7 +98,7 @@ try:
 
 except ImportError:
     import msvcrt
-    class Flock( object ):
+    class Flock:
         LOCK_EX = msvcrt.LK_LOCK
         LOCK_SH = msvcrt.LK_LOCK
 
@@ -153,7 +152,7 @@ class FileCacheObject(CacheObject):
         self._data = None
         self._size = None
         self._buff = StringIO()
-        super(FileCacheObject, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def size(self):
@@ -217,7 +216,7 @@ class FileEngine( CacheEngine ):
     _version = 2
 
     def __init__(self, parent):
-        super(FileEngine, self).__init__(parent)
+        super().__init__(parent)
         self.configure(None)
 
     def configure(self, filename, preallocate=256):
@@ -243,13 +242,13 @@ class FileEngine( CacheEngine ):
             if not os.access(self.cachefile, os.W_OK):
                 raise TMDBCacheWriteError(self.cachefile)
 
-        except IOError as e:
+        except OSError as e:
             if e.errno == errno.ENOENT:
                 # file does not exist, create a new one
                 try:
                     self._open('w+b')
                     self._write([])
-                except IOError as e:
+                except OSError as e:
                     if e.errno == errno.ENOENT:
                         # directory does not exist
                         raise TMDBCacheDirectoryError(self.cachefile)
@@ -298,7 +297,7 @@ class FileEngine( CacheEngine ):
                 return
         except:
             pass  # catch issue of no cachefile yet opened
-        self.cachefd = io.open(self.cachefile, mode)
+        self.cachefd = open(self.cachefile, mode)
 
     def _read(self, date):
         try:

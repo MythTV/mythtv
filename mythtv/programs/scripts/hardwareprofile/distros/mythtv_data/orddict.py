@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # smolt - Fedora hardware profiler
 #
 # Copyright (C) 2011 Raymond Wagner <raymond@wagnerrp.com>
@@ -17,9 +16,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
-from builtins import zip
-from builtins import map
-from builtins import str
 __doc__="""This is an ordered dictionary implementation to be used to
 store client data before transmission to the server."""
 
@@ -34,13 +30,13 @@ class OrdDict( dict ):
     """
 
     def __new__(cls, *args, **kwargs):
-        inst = super(OrdDict, cls).__new__(cls, *args, **kwargs)
+        inst = super().__new__(cls, *args, **kwargs)
         inst.__dict__['_field_order'] = []
         return inst
 
     def __getattr__(self, name):
         try:
-            return super(OrdDict, self).__getattr__(name)
+            return super().__getattr__(name)
         except AttributeError:
             try:
                 return self[name]
@@ -49,23 +45,23 @@ class OrdDict( dict ):
 
     def __setattr__(self, name, value):
         if name in self.__dict__:
-            super(OrdDict, self).__setattr__(name, value)
+            super().__setattr__(name, value)
         else:
             self[name] = value
 
     def __delattr__(self, name):
         try:
-            super(OrdDict, self).__delattr__(name)
+            super().__delattr__(name)
         except AttributeError:
             del self[name]
 
     def __setitem__(self, name, value):
         if name not in self:
             self._field_order.append(name)
-        super(OrdDict, self).__setitem__(name, value)
+        super().__setitem__(name, value)
 
     def __delitem__(self, name):
-        super(OrdDict, self).__delitem__(name)
+        super().__delitem__(name)
         self._field_order.remove(key)
 
     def update(self, *data, **kwdata):
@@ -116,7 +112,7 @@ class OrdDict( dict ):
         return c
 
     def clear(self):
-        super(OrdDict, self).clear()
+        super().clear()
         self._field_order = []
 
 # This sets up a factory for urllib2.Request objects, automatically

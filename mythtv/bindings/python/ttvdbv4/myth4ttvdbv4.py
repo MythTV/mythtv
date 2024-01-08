@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------------------------------------
 # Purpose:   MythTV Python Bindings for TheTVDB v4 API
 # Copyright: (c) 2021 Roland Ernst
@@ -123,7 +121,7 @@ class People(IntEnum):
     Executive_Producer = 11
 
 
-class Myth4TTVDBv4(object):
+class Myth4TTVDBv4:
     """
     MythTV Bindings for TheTVDB v4.
     This class implements the following grabber options by means of :
@@ -297,7 +295,7 @@ class Myth4TTVDBv4(object):
         ttvdb.set_session(self.session)
 
         # prepare the resulting xml tree
-        self.tree = etree.XML(u'<metadata></metadata>')
+        self.tree = etree.XML('<metadata></metadata>')
 
     def _get_ellapsed_time(self):
         return (int(time.time() - self.starttime))

@@ -16,8 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
-from builtins import object
-class Distro(object):
+class Distro:
     def _raise_abstract(self):
         raise Exception('Function must be overwritten.')
 

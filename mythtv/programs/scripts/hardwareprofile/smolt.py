@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # smolt - Fedora hardware profiler
 #
 # Copyright (C) 2007 Mike McGrath
@@ -31,7 +29,6 @@
 # Find out what we're not getting
 #
 
-from __future__ import print_function
 #import dbus
 from i18n import _
 import platform
@@ -974,7 +971,7 @@ def read_cpuinfo():
     if not os.access("/proc/cpuinfo", os.R_OK):
         return {}
 
-    cpulist = open("/proc/cpuinfo", "r").read()
+    cpulist = open("/proc/cpuinfo").read()
     uname = os.uname()[4].lower()
 
     # This thing should return a hwdict that has the following
@@ -1161,7 +1158,7 @@ def read_cpuinfo():
         if not os.access("/proc/openprom/banner-name", os.R_OK):
             system = 'Unknown'
         if os.access("/proc/openprom/banner-name", os.R_OK):
-            with open("/proc/openprom/banner-name", "r") as banner_name:
+            with open("/proc/openprom/banner-name") as banner_name:
                 banner_name.read()
         hwdict['platform'] = uname
         hwdict['count'] = get_entry(tmpdict, 'ncpus probed')
@@ -1234,7 +1231,7 @@ def read_memory_2_4():
     if not os.access("/proc/meminfo", os.R_OK):
         return {}
 
-    with open("/proc/meminfo", "r") as m_info:
+    with open("/proc/meminfo") as m_info:
         meminfo = m_info.read()
     lines = meminfo.split("\n")
     curline = lines[1]
@@ -1257,7 +1254,7 @@ def read_memory_2_4():
 def read_memory_2_6():
     if not os.access("/proc/meminfo", os.R_OK):
         return {}
-    with open("/proc/meminfo", "r") as m_info:
+    with open("/proc/meminfo") as m_info:
         meminfo = m_info.read()
     lines = meminfo.split("\n")
     dict = {}
@@ -1312,13 +1309,13 @@ def read_uuid():
     try:
         with open(hw_uuid_file) as hw_uuid:
             UUID = hw_uuid.read().strip()
-    except (FileNotFoundError, IOError):
+    except (FileNotFoundError, OSError):
         try:
             with open('/proc/sys/kernel/random/uuid') as rand_uuid:
                 UUID = rand_uuid.read().strip()
             with open(hw_uuid_file, 'w') as write_uuid:
                 write_uuid.write(UUID)
-        except (FileNotFoundError, IOError):
+        except (FileNotFoundError, OSError):
             sys.stderr.write(_('Unable to determine UUID of system!\n'))
             raise UUIDError('Unable to get/save UUID. file = %s.  Please run once as root.' % hw_uuid_file)
     return UUID

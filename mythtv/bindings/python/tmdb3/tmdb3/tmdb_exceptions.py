@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #-----------------------
 # Name: tmdb_exceptions.py    Common exceptions used in tmdbv3 API library
 # Python Library
@@ -65,24 +64,24 @@ class TMDBCacheError(TMDBRequestError):
 
 class TMDBCacheReadError(TMDBCacheError):
     def __init__(self, filename):
-        super(TMDBCacheReadError, self).__init__(
-            "User does not have permission to access cache file: {0}."\
+        super().__init__(
+            "User does not have permission to access cache file: {}."\
                 .format(filename))
         self.filename = filename
 
 
 class TMDBCacheWriteError(TMDBCacheError):
     def __init__(self, filename):
-        super(TMDBCacheWriteError, self).__init__(
-            "User does not have permission to write cache file: {0}."\
+        super().__init__(
+            "User does not have permission to write cache file: {}."\
                 .format(filename))
         self.filename = filename
 
 
 class TMDBCacheDirectoryError(TMDBCacheError):
     def __init__(self, filename):
-        super(TMDBCacheDirectoryError, self).__init__(
-            "Directory containing cache file does not exist: {0}."\
+        super().__init__(
+            "Directory containing cache file does not exist: {}."\
                 .format(filename))
         self.filename = filename
 
@@ -96,7 +95,7 @@ class TMDBHTTPError(TMDBError):
         self.httperrno = err.code
         self.response = err.fp.read()
         self.headers = err.headers
-        super(TMDBHTTPError, self).__init__(str(err))
+        super().__init__(str(err))
 
 
 class TMDBOffline(TMDBError):

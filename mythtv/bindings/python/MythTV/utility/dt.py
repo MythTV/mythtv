@@ -351,29 +351,29 @@ class datetime( _pydatetime ):
     def now(cls, tz=None):
         if tz is None:
             tz = cls.localTZ()
-        obj = super(datetime, cls).now(tz)
+        obj = super().now(tz)
         return cls.fromDatetime(obj)
 
     @classmethod
     def utcnow(cls):
-        obj = super(datetime, cls).utcnow()
+        obj = super().utcnow()
         return obj.replace(tzinfo=cls.UTCTZ())
 
     @classmethod
     def fromtimestamp(cls, timestamp, tz=None):
         if tz is None:
             tz = cls.localTZ()
-        obj = super(datetime, cls).fromtimestamp(float(timestamp), tz)
+        obj = super().fromtimestamp(float(timestamp), tz)
         return cls.fromDatetime(obj)
 
     @classmethod
     def utcfromtimestamp(cls, timestamp):
-        obj = super(datetime, cls).utcfromtimestamp(float(timestamp))
+        obj = super().utcfromtimestamp(float(timestamp))
         return obj.replace(tzinfo=cls.UTCTZ())
 
     @classmethod
     def strptime(cls, datestring, format, tzinfo=None):
-        obj = super(datetime, cls).strptime(datestring, format)
+        obj = super().strptime(datestring, format)
         return cls.fromDatetime(obj, tzinfo)
 
 # new class methods for interfacing with MythTV
@@ -394,7 +394,7 @@ class datetime( _pydatetime ):
     def fromIso(cls, isotime, sep='T', tz=None):
         match = cls._reiso.match(isotime)
         if match is None:
-            raise TypeError("time data '{0}' does not match ISO 8601 format" \
+            raise TypeError("time data '{}' does not match ISO 8601 format" \
                                 .format(isotime))
 
         dt = [int(a) for a in match.groups()[:5]]
@@ -425,7 +425,7 @@ class datetime( _pydatetime ):
     def fromRfc(cls, rfctime, tz=None):
         match = cls._rerfc.match(rfctime)
         if match is None:
-            raise TypeError("time data '{0}' does not match RFC 822 format"\
+            raise TypeError("time data '{}' does not match RFC 822 format"\
                                 .format(rfctime))
 
         year = int(match.group('year'))
@@ -526,7 +526,7 @@ class datetime( _pydatetime ):
         return self.astimezone(self.UTCTZ()).isoformat().split('+')[0]
 
     def astimezone(self, tz):
-        return self.fromDatetime(super(datetime, self).astimezone(tz))
+        return self.fromDatetime(super().astimezone(tz))
 
     def asnaiveutc(self):
         return self.astimezone(self.UTCTZ()).replace(tzinfo=None)

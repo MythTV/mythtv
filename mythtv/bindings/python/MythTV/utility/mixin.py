@@ -4,7 +4,7 @@
 # Description: Provides mixin's for assorted methods
 #------------------------------
 
-class CMPVideo( object ):
+class CMPVideo:
     """
     Utility class providing comparison operators between data objects
         containing video metadata.  
@@ -223,12 +223,12 @@ class CMPRecord( CMPVideo ):
         if not (hasattr(self, 'chanid') or hasattr(other, 'chanid')):
             # either object is not a recording-related object
             # fall through to video matching
-            return super(CMPRecord, self).__lt__(other)
+            return super().__lt__(other)
 
         # select attributes to use for comparison
         l,r = self.__choose_comparison(self, other)
         if None in (l,r):
-            return super(CMPRecord, self).__lt__(other)
+            return super().__lt__(other)
 
         # generate comparison function, and return result
         check = lambda s,o: (s.chanid, s[l]) < (o.chanid, o[l])
@@ -244,11 +244,11 @@ class CMPRecord( CMPVideo ):
             pass
 
         if not (hasattr(self, 'chanid') or hasattr(other, 'chanid')):
-            return super(CMPRecord, self).__eq__(other)
+            return super().__eq__(other)
 
         l,r = self.__choose_comparison(self, other)
         if None in (l,r):
-            return super(CMPRecord, self).__eq__(other)
+            return super().__eq__(other)
 
         check = lambda s,o: (s.chanid, s[l]) == (o.chanid, o[l])
         self._eq__[type(other)] = check
@@ -263,11 +263,11 @@ class CMPRecord( CMPVideo ):
             pass
 
         if not (hasattr(self, 'chanid') or hasattr(other, 'chanid')):
-            return super(CMPRecord, self).__gt__(other)
+            return super().__gt__(other)
 
         l,r = self.__choose_comparison(self, other)
         if None in (l,r):
-            return super(CMPRecord, self).__gt__(other)
+            return super().__gt__(other)
 
         check = lambda s,o: (s.chanid, s[l]) > (o.chanid, o[l])
         self._gt__[type(other)] = check

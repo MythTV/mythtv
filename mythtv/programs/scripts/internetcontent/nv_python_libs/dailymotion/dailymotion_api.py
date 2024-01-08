@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: dailymotion_api - Simple-to-use Python interface to the dailymotion API (http://www.dailymotion.com)
 # Python Script
@@ -40,14 +38,14 @@ import logging
 from MythTV import MythXML
 
 try:
-    import xml.etree.cElementTree as ElementTree
+    import xml.etree.ElementTree as ElementTree
 except ImportError:
     import xml.etree.ElementTree as ElementTree
 
 from .dailymotion_exceptions import (DailymotionUrlError, DailymotionHttpError, DailymotionRssError, DailymotionVideoNotFound, DailymotionInvalidSearchType, DailymotionXmlError, DailymotionVideoDetailError, DailymotionCategoryNotFound)
 import io
 
-class OutStreamEncoder(object):
+class OutStreamEncoder:
     """Wraps a stream with an encoder"""
     def __init__(self, outstream, encoding=None):
         self.out = outstream
@@ -80,7 +78,7 @@ class XmlHandler:
     def _grabUrl(self, url):
         try:
             urlhandle = urllib.request.urlopen(url)
-        except IOError as errormsg:
+        except OSError as errormsg:
             raise DailymotionHttpError(errormsg)
         return urlhandle.read()
 
@@ -93,7 +91,7 @@ class XmlHandler:
         return et
 
 
-class Videos(object):
+class Videos:
     """Main interface to http://www.dailymotion.com
     This is done to support a common naming framework for all python Netvision plugins no matter their site
     target.

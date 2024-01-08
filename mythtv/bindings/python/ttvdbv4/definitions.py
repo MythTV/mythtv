@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------------------------------------
 # Purpose:   MythTV Python Bindings for TheTVDB v4 API
 # Copyright: (c) 2021 Roland Ernst
@@ -43,14 +41,14 @@ def _handle_list(handle, data):
 # modifications marked with '### XXX'
 
 
-class Alias(object):
+class Alias:
     """An alias model, which can be associated with a series, season, movie, person, or list."""
     def __init__(self, data):
         self.language = data.get('language', '')                             # string
         self.name = data.get('name', '')                                     # string
 
 
-class ArtworkBaseRecord(object):
+class ArtworkBaseRecord:
     """base artwork record"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
@@ -61,7 +59,7 @@ class ArtworkBaseRecord(object):
         self.type = data.get('type', 0)                                      # integer
 
 
-class ArtworkExtendedRecord(object):
+class ArtworkExtendedRecord:
     """extended artwork record"""
     def __init__(self, data):
         self.episodeId = data.get('episodeId', 0)                            # integer
@@ -86,14 +84,14 @@ class ArtworkExtendedRecord(object):
         self.width = data.get('width', 0)                                    # integer
 
 
-class ArtworkStatus(object):
+class ArtworkStatus:
     """artwork status record"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
         self.name = data.get('name', '')                                     # string
 
 
-class ArtworkType(object):
+class ArtworkType:
     """artwork type record"""
     def __init__(self, data):
         self.height = data.get('height', 0)                                  # integer
@@ -107,14 +105,14 @@ class ArtworkType(object):
         self.width = data.get('width', 0)                                    # integer
 
 
-class AwardBaseRecord(object):
+class AwardBaseRecord:
     """base award record"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
         self.name = data.get('name', '')                                     # string
 
 
-class AwardCategoryBaseRecord(object):
+class AwardCategoryBaseRecord:
     """base award category record"""
     def __init__(self, data):
         self.allowCoNominees = data.get('allowCoNominees', False)            # boolean
@@ -125,7 +123,7 @@ class AwardCategoryBaseRecord(object):
         self.name = data.get('name', '')                                     # string
 
 
-class AwardCategoryExtendedRecord(object):
+class AwardCategoryExtendedRecord:
     """extended award category record"""
     def __init__(self, data):
         self.allowCoNominees = data.get('allowCoNominees', False)            # boolean
@@ -137,7 +135,7 @@ class AwardCategoryExtendedRecord(object):
         self.nominees = _handle_list(AwardNomineeBaseRecord, data.get('nominees'))
 
 
-class AwardExtendedRecord(object):
+class AwardExtendedRecord:
     """extended award record"""
     def __init__(self, data):
         self.categories = _handle_list(AwardCategoryBaseRecord, data.get('categories'))
@@ -146,7 +144,7 @@ class AwardExtendedRecord(object):
         self.score = data.get('score', 0)                                    # integer
 
 
-class AwardNomineeBaseRecord(object):
+class AwardNomineeBaseRecord:
     """base award nominee record"""
     def __init__(self, data):
         self.character = _handle_single(Character, data.get('character'))
@@ -161,14 +159,14 @@ class AwardNomineeBaseRecord(object):
         self.name = data.get('name', '')                                     # string
 
 
-class Biography(object):
+class Biography:
     """biography record"""
     def __init__(self, data):
         self.biography = data.get('biography', '')                           # string
         self.language = data.get('language', '')                             # string
 
 
-class Character(object):
+class Character:
     """character record"""
     def __init__(self, data):
         self.aliases = _handle_list(Alias, data.get('aliases'))
@@ -194,7 +192,7 @@ class Character(object):
         self.name_similarity = 0.0
 
 
-class Company(object):
+class Company:
     """A company record"""
     def __init__(self, data):
         self.activeDate = data.get('activeDate', '')                         # string
@@ -214,7 +212,7 @@ class Company(object):
         self.name_similarity = 0.0
 
 
-class ParentCompany(object):
+class ParentCompany:
     """A parent company record"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
@@ -222,21 +220,21 @@ class ParentCompany(object):
         self.relation = _handle_single(CompanyRelationShip, data.get('relation'))
 
 
-class CompanyRelationShip(object):
+class CompanyRelationShip:
     """A company relationship"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
         self.typeName = data.get('typeName', '')                             # string
 
 
-class CompanyType(object):
+class CompanyType:
     """A company type record"""
     def __init__(self, data):
         self.companyTypeId = data.get('companyTypeId', 0)                    # integer
         self.companyTypeName = data.get('companyTypeName', '')               # string
 
 
-class ContentRating(object):
+class ContentRating:
     """content rating record"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
@@ -248,7 +246,7 @@ class ContentRating(object):
         self.fullName = data.get('fullName', '')                             # string
 
 
-class Country(object):
+class Country:
     """country record"""
     def __init__(self, data):
         self.id = data.get('id', '')                                         # string
@@ -256,7 +254,7 @@ class Country(object):
         self.shortCode = data.get('shortCode', '')                           # string
 
 
-class Entity(object):
+class Entity:
     """Entity record"""
     def __init__(self, data):
         self.movieId = data.get('movieId', 0)                                # integer
@@ -264,7 +262,7 @@ class Entity(object):
         self.seriesId = data.get('seriesId', 0)                              # integer
 
 
-class EntityType(object):
+class EntityType:
     """Entity Type record"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
@@ -272,7 +270,7 @@ class EntityType(object):
         self.hasSpecials = data.get('hasSpecials', False)                    # boolean
 
 
-class EntityUpdate(object):
+class EntityUpdate:
     """entity update record"""
     def __init__(self, data):
         self.entityType = data.get('entityType', '')                         # string
@@ -282,7 +280,7 @@ class EntityUpdate(object):
         self.seriesId = data.get('seriesId', 0)                              # integer
 
 
-class EpisodeBaseRecord(object):
+class EpisodeBaseRecord:
     """base episode record"""
     def __init__(self, data):
         self.aired = data.get('aired', '')                                   # string
@@ -310,7 +308,7 @@ class EpisodeBaseRecord(object):
         self.name_similarity = 0.0
 
 
-class EpisodeExtendedRecord(object):
+class EpisodeExtendedRecord:
     """extended episode record"""
     def __init__(self, data):
         self.aired = data.get('aired', '')                                   # string
@@ -348,14 +346,14 @@ class EpisodeExtendedRecord(object):
         self.name_similarity = 0.0
 
 
-class Gender(object):
+class Gender:
     """gender record"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
         self.name = data.get('name', '')                                     # string
 
 
-class GenreBaseRecord(object):
+class GenreBaseRecord:
     """base genre record"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
@@ -363,7 +361,7 @@ class GenreBaseRecord(object):
         self.slug = data.get('slug', '')                                     # string
 
 
-class Language(object):
+class Language:
     """language record"""
     def __init__(self, data):
         self.id = data.get('id', '')                                         # string
@@ -372,7 +370,7 @@ class Language(object):
         self.shortCode = data.get('shortCode', '')                           # string
 
 
-class ListBaseRecord(object):
+class ListBaseRecord:
     """base list record"""
     def __init__(self, data):
         self.aliases = _handle_list(Alias, data.get('aliases'))
@@ -391,7 +389,7 @@ class ListBaseRecord(object):
         self.name_similarity = 0.0
 
 
-class ListExtendedRecord(object):
+class ListExtendedRecord:
     """extended list record"""
     def __init__(self, data):
         self.aliases = _handle_list(Alias, data.get('aliases'))
@@ -411,7 +409,7 @@ class ListExtendedRecord(object):
         self.name_similarity = 0.0
 
 
-class MovieBaseRecord(object):
+class MovieBaseRecord:
     """base movie record"""
     def __init__(self, data):
         self.aliases = _handle_list(Alias, data.get('aliases'))
@@ -430,7 +428,7 @@ class MovieBaseRecord(object):
         self.name_similarity = 0.0
 
 
-class MovieExtendedRecord(object):
+class MovieExtendedRecord:
     """extended movie record"""
     def __init__(self, data):
         self.aliases = _handle_list(Alias, data.get('aliases'))
@@ -471,7 +469,7 @@ class MovieExtendedRecord(object):
         self.name_similarity = 0.0
 
 
-class PeopleBaseRecord(object):
+class PeopleBaseRecord:
     """base people record"""
     def __init__(self, data):
         self.aliases = _handle_list(Alias, data.get('aliases'))
@@ -486,7 +484,7 @@ class PeopleBaseRecord(object):
         self.name_similarity = 0.0
 
 
-class PeopleExtendedRecord(object):
+class PeopleExtendedRecord:
     """extended people record"""
     def __init__(self, data):
         self.aliases = _handle_list(Alias, data.get('aliases'))
@@ -512,20 +510,20 @@ class PeopleExtendedRecord(object):
         self.name_similarity = 0.0
 
 
-class PeopleType(object):
+class PeopleType:
     """people type record"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
         self.name = data.get('name', '')                                     # string
 
 
-class Race(object):
+class Race:
     """race record"""
     def __init__(self, data):
         pass
 
 
-class Release(object):
+class Release:
     """release record"""
     def __init__(self, data):
         self.country = data.get('country', '')                               # string
@@ -533,7 +531,7 @@ class Release(object):
         self.detail = data.get('detail', '')                                 # string
 
 
-class RemoteID(object):
+class RemoteID:
     """remote id record"""
     def __init__(self, data):
         self.id = data.get('id', '')                                         # string
@@ -541,7 +539,7 @@ class RemoteID(object):
         self.sourceName = data.get('sourceName', '')                         # string
 
 
-class SearchResult(object):
+class SearchResult:
     """search result"""
     def __init__(self, data):
         self.aliases = _get_list(data, 'aliases')
@@ -582,7 +580,7 @@ class SearchResult(object):
         self.name_similarity = 0.0                                           ### XXX
 
 
-class SeasonBaseRecord(object):
+class SeasonBaseRecord:
     """season genre record"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
@@ -600,7 +598,7 @@ class SeasonBaseRecord(object):
         self.name_similarity = 0.0
 
 
-class SeasonExtendedRecord(object):
+class SeasonExtendedRecord:
     """extended season record"""
     def __init__(self, data):
         self.artwork = _handle_list(ArtworkBaseRecord, data.get('artwork'))
@@ -623,7 +621,7 @@ class SeasonExtendedRecord(object):
         self.name_similarity = 0.0
 
 
-class SeasonType(object):
+class SeasonType:
     """season type record"""
     def __init__(self, data):
         self.alternateName = data.get('alternateName', '')                   # string
@@ -632,7 +630,7 @@ class SeasonType(object):
         self.type = data.get('type', '')                                     # string
 
 
-class SeriesAirsDays(object):
+class SeriesAirsDays:
     """A series airs day record"""
     def __init__(self, data):
         self.friday = data.get('friday', False)                              # boolean
@@ -644,7 +642,7 @@ class SeriesAirsDays(object):
         self.wednesday = data.get('wednesday', False)                        # boolean
 
 
-class SeriesBaseRecord(object):
+class SeriesBaseRecord:
     """
     The base record for a series. All series airs time like firstAired, lastAired, nextAired, etc.
     are in US EST for US series, and for all non-US series, the time of the show’s
@@ -678,7 +676,7 @@ class SeriesBaseRecord(object):
         self.name_similarity = 0.0
 
 
-class SeriesExtendedRecord(object):
+class SeriesExtendedRecord:
     """
     The extended record for a series. All series airs time like firstAired, lastAired, nextAired, etc.
     are in US EST for US series, and for all non-US series, the time of the show’s country capital
@@ -728,7 +726,7 @@ class SeriesExtendedRecord(object):
         self.name_similarity = 0.0
 
 
-class SourceType(object):
+class SourceType:
     """source type record"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
@@ -739,7 +737,7 @@ class SourceType(object):
         self.sort = data.get('sort', 0)                                      # integer
 
 
-class Status(object):
+class Status:
     """status record"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
@@ -748,7 +746,7 @@ class Status(object):
         self.recordType = data.get('recordType', '')                         # string
 
 
-class StudioBaseRecord(object):
+class StudioBaseRecord:
     """studio record"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
@@ -756,7 +754,7 @@ class StudioBaseRecord(object):
         self.parentStudio = data.get('parentStudio', 0)                      # integer
 
 
-class Tag(object):
+class Tag:
     """tag record"""
     def __init__(self, data):
         self.allowsMultiple = data.get('allowsMultiple', False)              # boolean
@@ -766,7 +764,7 @@ class Tag(object):
         self.options = _handle_list(TagOption, data.get('options'))
 
 
-class TagOption(object):
+class TagOption:
     """tag option record"""
     def __init__(self, data):
         self.helpText = data.get('helpText', '')                             # string
@@ -776,7 +774,7 @@ class TagOption(object):
         self.tagName = data.get('tagName', '')                               # string
 
 
-class Trailer(object):
+class Trailer:
     """trailer record"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
@@ -785,7 +783,7 @@ class Trailer(object):
         self.url = data.get('url', '')                                       # string
 
 
-class Translation(object):
+class Translation:
     """translation record"""
     def __init__(self, data):
         self.aliases = _get_list(data, 'aliases')
@@ -797,13 +795,13 @@ class Translation(object):
         self.tagline = data.get('tagline', '')                               # string
 
 
-class TranslationSimple(object):
+class TranslationSimple:
     """translation simple record"""
     def __init__(self, data):
         self.language = data.get('language', '')                             # string
 
 
-class TranslationExtended(object):
+class TranslationExtended:
     """translation extended record"""
     def __init__(self, data):
         self.nameTranslations = _handle_list(Translation, data.get('nameTranslations'))
@@ -811,7 +809,7 @@ class TranslationExtended(object):
         self.alias = _get_list(data, 'alias')
 
 
-class TagOptionEntity(object):
+class TagOptionEntity:
     """a entity with selected tag option"""
     def __init__(self, data):
         self.name = data.get('name', '')                                     # string
@@ -819,7 +817,7 @@ class TagOptionEntity(object):
         self.tagId = data.get('tagId', 0)                                    # integer
 
 
-class Inspiration(object):
+class Inspiration:
     """Movie inspiration record"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
@@ -828,7 +826,7 @@ class Inspiration(object):
         self.url = data.get('url', '')                                       # string
 
 
-class InspirationType(object):
+class InspirationType:
     """Movie inspiration type record"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
@@ -838,7 +836,7 @@ class InspirationType(object):
         self.url = data.get('url', '')                                       # string
 
 
-class ProductionCountry(object):
+class ProductionCountry:
     """Production country record"""
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
@@ -846,7 +844,7 @@ class ProductionCountry(object):
         self.name = data.get('name', '')                                     # string
 
 
-class Companies(object):
+class Companies:
     """Companies by type record"""
     def __init__(self, data):
         self.studio = _handle_single(Company, data.get('studio'))
@@ -856,7 +854,7 @@ class Companies(object):
         self.special_effects = _handle_single(Company, data.get('special_effects'))
 
 
-class Links(object):
+class Links:
     """Links for next, previous and current record"""
     def __init__(self, data):
         self.prev = data.get('prev', '')                                     # string

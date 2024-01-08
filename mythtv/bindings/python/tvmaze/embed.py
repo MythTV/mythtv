@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 #  Copyright (c) 2020 Lachlan Mackenzie
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,7 +27,7 @@
 # ---------------------------------------------------
 
 
-class Embed(object):
+class Embed:
     def __init__(self, data):
         self.key = 'embed'
         self.value = None

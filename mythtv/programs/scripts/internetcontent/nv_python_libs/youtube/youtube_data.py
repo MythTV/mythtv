@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-
 from string import ascii_uppercase, ascii_lowercase
 
-class getData(object):
+class getData:
     def __init__(self):
         self.a = '4e566d6e466c50784b416e477a527176587337444b5730554530324e4d39706d6774535531614c'
 

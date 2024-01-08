@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2009 Marc Poulhiès
 #
 # Python module for Vimeo
@@ -593,7 +591,7 @@ def video_request(video, format):
 # MythTV Netvideo specific classes start here
 #################################################################################################
 
-class OutStreamEncoder(object):
+class OutStreamEncoder:
     """Wraps a stream with an encoder"""
     def __init__(self, outstream, encoding=None):
         self.out = outstream
@@ -617,7 +615,7 @@ if isinstance(sys.stdout, io.TextIOWrapper):
     sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
-class Videos(object):
+class Videos:
     """Main interface to http://vimeo.com/
     This is done to support a common naming framework for all python Netvision plugins no matter their site
     target.

@@ -1,4 +1,3 @@
-
 __all_exceptions__  = ['MythError', 'MythDBError', 'MythBEError', \
                        'MythFEError', 'MythFileError', 'MythTZError']
 

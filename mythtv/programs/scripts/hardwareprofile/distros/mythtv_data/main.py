@@ -1,4 +1,3 @@
-from __future__ import print_function
 # smolt - Fedora hardware profiler
 #
 # Copyright (C) 2009 Sebastian Pipping <sebastian@pipping.org>

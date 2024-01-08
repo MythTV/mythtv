@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------------------------------------
 # Purpose:   MythTV Python Bindings for TheTVDB v4 API
 # Copyright: (c) 2021 Roland Ernst
@@ -43,7 +41,7 @@ def _query_api(url, params=None):
         # python requests encodes everything with 'quote_plus"
         # thetvdb api may need '%20' instead of '+' for a space character
         if params:
-            url = '{0}?{1}'.format(url, urlencode(params, safe='', quote_via=quote))
+            url = '{}?{}'.format(url, urlencode(params, safe='', quote_via=quote))
         res = ReqSession.get(url)
     else:
         res = ReqSession.get(url, params=params)

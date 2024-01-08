@@ -1,5 +1,3 @@
-# coding: utf-8
-
 """
 Converts a Python dictionary or other native data type into a valid XML string.
 
@@ -8,7 +6,6 @@ Supports item (`int`, `float`, `long`, `decimal.Decimal`, `bool`, `str`, `unicod
 This module works with both Python 2 and 3.
 """
 
-from __future__ import unicode_literals
 
 __version__ = '1.7.4'
 version = __version__
@@ -17,7 +14,7 @@ from random import randint
 try:
     from collections.abc import Iterable
 except ImportError:
-    from collections import Iterable
+    from collections.abc import Iterable
 import numbers
 import logging
 from xml.dom.minidom import parseString

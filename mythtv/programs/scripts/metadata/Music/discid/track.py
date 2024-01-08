@@ -24,7 +24,7 @@ from discid.libdiscid import _LIB
 from discid.util import _decode, _sectors_to_seconds
 
 
-class Track(object):
+class Track:
     """Track objects are part of the :class:`Disc` class.
     """
 

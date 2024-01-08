@@ -2,8 +2,6 @@
 # python_pathfix - adjust python shebang paths
 #
 
-from __future__ import print_function
-from __future__ import unicode_literals
 import sys
 import os
 from stat import ST_MODE
@@ -74,17 +72,17 @@ def pathfix(filename=None, verbose=False, python_interpreter='/usr/bin/python'):
     # open input file
     try:
         infile = open(filename, 'rb')
-    except IOError as msg:
+    except OSError as msg:
         sys.stderr.write('%s: open failed: %r\n' % (filename, msg))
         return 1
     # process first line
     try:
         firstline = infile.readline()
-    except IOError as msg:
+    except OSError as msg:
         sys.stderr.write('%s: read failed: %r\n' % (filename, msg))
         try:
             infile.close()
-        except IOError as msg:
+        except OSError as msg:
             sys.stderr.write('%s: close failed: %r\n' % (filename, msg))
         return 1
     if firstline.rstrip(b'\n').find(b' -') != -1:
@@ -97,7 +95,7 @@ def pathfix(filename=None, verbose=False, python_interpreter='/usr/bin/python'):
             sys.stdout.write('%s: unchanged\n' % (filename))
         try:
             infile.close()
-        except IOError as msg:
+        except OSError as msg:
             sys.stderr.write('%s: close failed: %r\n' % (filename, msg))
         return 0
     # create temporary output
@@ -105,11 +103,11 @@ def pathfix(filename=None, verbose=False, python_interpreter='/usr/bin/python'):
     tempname = os.path.join(head, '@' + tail)
     try:
         outfile = open(tempname, 'wb')
-    except IOError as msg:
+    except OSError as msg:
         sys.stderr.write('%s: create failed: %r\n' % (tempname, msg))
         try:
             infile.close()
-        except IOError as msg:
+        except OSError as msg:
             sys.stderr.write('%s: close failed: %r\n' % (filename, msg))
         return 1
     if verbose:
@@ -117,30 +115,30 @@ def pathfix(filename=None, verbose=False, python_interpreter='/usr/bin/python'):
     # write first new line to temporary output
     try:
         outfile.write(newline)
-    except IOError as msg:
+    except OSError as msg:
         sys.stderr.write('%s: write failed: %r\n' % (tempname, msg))
         try:
             infile.close()
-        except IOError as msg:
+        except OSError as msg:
             sys.stderr.write('%s: close failed: %r\n' % (filename, msg))
         try:
             outfile.close()
-        except IOError as msg:
+        except OSError as msg:
             sys.stderr.write('%s: close failed: %r\n' % (tempname, msg))
         return 1
     # copy rest of file
     while True:
         try:
             chunk = infile.read(32678)
-        except IOError as msg:
+        except OSError as msg:
             sys.stderr.write('%s: read failed: %r\n' % (filename, msg))
             try:
                 infile.close()
-            except IOError as msg:
+            except OSError as msg:
                 sys.stderr.write('%s: close failed: %r\n' % (filename, msg))
             try:
                 outfile.close()
-            except IOError as msg:
+            except OSError as msg:
                 sys.stderr.write('%s: close failed: %r\n' % (tempname, msg))
             try:
                 os.remove(tempname)
@@ -151,15 +149,15 @@ def pathfix(filename=None, verbose=False, python_interpreter='/usr/bin/python'):
             break
         try:
             outfile.write(chunk)
-        except IOError as msg:
+        except OSError as msg:
             sys.stderr.write('%s: write failed: %r\n' % (tempname, msg))
             try:
                 infile.close()
-            except IOError as msg:
+            except OSError as msg:
                 sys.stderr.write('%s: close failed: %r\n' % (filename, msg))
             try:
                 outfile.close()
-            except IOError as msg:
+            except OSError as msg:
                 sys.stderr.write('%s: close failed: %r\n' % (tempname, msg))
             try:
                 os.remove(tempname)
@@ -169,11 +167,11 @@ def pathfix(filename=None, verbose=False, python_interpreter='/usr/bin/python'):
     # close files
     try:
         infile.close()
-    except IOError as msg:
+    except OSError as msg:
         sys.stderr.write('%s: close failed: %r\n' % (filename, msg))
         try:
             outfile.close()
-        except IOError as msg:
+        except OSError as msg:
             sys.stderr.write('%s: close failed: %r\n' % (tempname, msg))
         try:
             os.remove(tempname)
@@ -182,7 +180,7 @@ def pathfix(filename=None, verbose=False, python_interpreter='/usr/bin/python'):
         return 1
     try:
         outfile.close()
-    except IOError as msg:
+    except OSError as msg:
         sys.stderr.write('%s: close failed: %r\n' % (tempname, msg))
         try:
             os.remove(tempname)

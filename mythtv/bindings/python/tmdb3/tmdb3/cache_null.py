@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #-----------------------
 # Name: cache_null.py
 # Python Library

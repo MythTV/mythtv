@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: common_api.py - Common class libraries for all MythNetvision Mashup processing
 # Python Script
@@ -61,7 +59,7 @@ from threading import Thread
 from .common_exceptions import (WebCgiUrlError, WebCgiHttpError, WebCgiRssError, WebCgiVideoNotFound, WebCgiXmlError, )
 import io
 
-class OutStreamEncoder(object):
+class OutStreamEncoder:
     """Wraps a stream with an encoder"""
     def __init__(self, outstream, encoding=None):
         self.out = outstream
@@ -125,7 +123,7 @@ if version < '2.7.2':
 # Start - Utility functions
 #
 ###########################################################################################################
-class Common(object):
+class Common:
     """A collection of common functions used by many grabbers
     """
     def __init__(self,

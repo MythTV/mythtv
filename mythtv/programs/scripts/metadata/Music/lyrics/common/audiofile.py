@@ -1,4 +1,3 @@
-# -*- Mode: python; coding: utf-8; tab-width: 8; indent-tabs-mode: t; -*-
 """
 read audio stream from audio file
 """
@@ -9,7 +8,7 @@ import struct
 class UnknownFormat(Exception):pass
 class FormatError(Exception):pass
 
-class AudioFile(object):
+class AudioFile:
     f = None
     audioStart = 0
 

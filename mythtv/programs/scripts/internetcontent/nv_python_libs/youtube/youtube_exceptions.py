@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: youtube_exceptions - Custom exceptions used or raised by youtube_api
 # Python Script

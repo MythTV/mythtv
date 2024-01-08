@@ -1,4 +1,3 @@
-
 from optparse import OptionParser
 from tmdb3 import *
 

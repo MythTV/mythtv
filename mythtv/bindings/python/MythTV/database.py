@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Provides connection cache and data handlers for accessing the database.
 """
@@ -19,7 +17,6 @@ import datetime as _pydt
 import time as _pyt
 import weakref
 import os
-from builtins import int, str
 
 
 class DBData( DictData, MythSchema ):
@@ -274,7 +271,7 @@ class DBDataWrite( DBData ):
     @classmethod
     def _setClassDefs(cls, db=None):
         db = DBCache(db)
-        super(DBDataWrite, cls)._setClassDefs(db)
+        super()._setClassDefs(db)
         if cls._defaults is None:
             cls._defaults = {}
         create = cls._create_normal
@@ -797,8 +794,8 @@ class DBDataCRef( DBDataRef ):
         self._populate()
         return [a.values()+[a._cref] for a in self.copy()]
 
-class DatabaseConfig( object ):
-    class _WakeOnLanConfig( object ):
+class DatabaseConfig:
+    class _WakeOnLanConfig:
         def __init__(self):
             self.enabled = False
             self.waittime = 0
@@ -902,17 +899,17 @@ class DatabaseConfig( object ):
             obj.confdir = confdir
             if obj.readXML(confdir):
                 log(log.GENERAL, log.DEBUG,
-                          "Trying database credentials from: {0}"\
+                          "Trying database credentials from: {}"\
                                 .format(os.path.join(confdir,'config.xml')))
                 yield obj
             elif obj.readOldXML(confdir):
                 log(log.GENERAL, log.DEBUG,
-                          "Trying old format database credentials from: {0}"\
+                          "Trying old format database credentials from: {}"\
                                 .format(os.path.join(confdir,'config.xml')))
                 yield obj
             else:
                 log(log.GENERAL, log.DEBUG,
-                          "Failed to read database credentials from: {0}"\
+                          "Failed to read database credentials from: {}"\
                                 .format(os.path.join(confdir,'config.xml')))
 
         homedir = os.environ.get('HOME', '')
@@ -921,17 +918,17 @@ class DatabaseConfig( object ):
             obj.confdir = os.path.join(homedir, '.mythtv')
             if obj.readXML(os.path.join(homedir,'.mythtv')):
                 log(log.GENERAL, log.DEBUG,
-                          "Trying database credentials from: {0}"\
+                          "Trying database credentials from: {}"\
                                 .format(os.path.join(homedir,'config.xml')))
                 yield obj
             elif obj.readOldXML(os.path.join(homedir, '.mythtv')):
                 log(log.GENERAL, log.DEBUG,
-                          "Trying old format database credentials from: {0}"\
+                          "Trying old format database credentials from: {}"\
                                 .format(os.path.join(homedir,'config.xml')))
                 yield obj
             else:
                 log(log.GENERAL, log.DEBUG,
-                          "Failed to read database credentials from: {0}"\
+                          "Failed to read database credentials from: {}"\
                                 .format(os.path.join(homedir,'config.xml')))
 
         # try UPnP
@@ -939,12 +936,12 @@ class DatabaseConfig( object ):
             obj = self.copy()
             if obj.readUPNP(conn):
                 log(log.GENERAL, log.DEBUG,
-                          "Trying database credentials from: {0}"\
+                          "Trying database credentials from: {}"\
                                 .format(conn.host))
                 yield obj
             else:
                 log(log.GENERAL, log.DEBUG,
-                          "Failed to read database credentials from: {0}"\
+                          "Failed to read database credentials from: {}"\
                                 .format(conn.host))
 
         # try defaults if user did not specify anything
@@ -1055,7 +1052,7 @@ class DatabaseConfig( object ):
 
         confdir = os.environ.get('MYTHCONFDIR', '')
         if confdir and (confdir != '/'):
-            log(log.GENERAL, log.DEBUG, "Writing new database credentials: {0}"\
+            log(log.GENERAL, log.DEBUG, "Writing new database credentials: {}"\
                                 .format(os.path.join(confdir,'config.xml')))
             fp = open(os.path.join(confdir,'config.xml'), 'w')
             self.confdir = confdir
@@ -1063,7 +1060,7 @@ class DatabaseConfig( object ):
             homedir = os.environ.get('HOME', '')
             if homedir and (homedir != '/'):
                 log(log.GENERAL, log.DEBUG,
-                        "Writing new database credentials: {0}"\
+                        "Writing new database credentials: {}"\
                                 .format(os.path.join(homedir,'config.xml')))
                 fp = open(os.path.join(homedir, '.mythtv', 'config.xml'), 'w')
                 self.confdir = os.path.join(homedir, '.mythtv')

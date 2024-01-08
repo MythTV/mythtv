@@ -37,7 +37,7 @@ def _decode(byte_string):
     """Decode byte string to (unicode) string
     """
     # this test for bytes works on Python 2 and 3
-    if type(byte_string) == type(b"test"):
+    if type(byte_string) == bytes:
         return byte_string.decode()
     else:
         # probably mocked for sphinx

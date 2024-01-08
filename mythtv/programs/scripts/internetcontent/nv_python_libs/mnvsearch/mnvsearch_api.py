@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: mnvsearch_api - Simple-to-use Python interface to search the MythNetvision data base tables
 #
@@ -37,7 +35,7 @@ from operator import itemgetter, attrgetter
 from .mnvsearch_exceptions import (MNVSQLError, MNVVideoNotFound, )
 import io
 
-class OutStreamEncoder(object):
+class OutStreamEncoder:
     """Wraps a stream with an encoder"""
     def __init__(self, outstream, encoding=None):
         self.out = outstream
@@ -110,7 +108,7 @@ if version < '2.7.2':
     sys.exit(1)
 
 
-class Videos(object):
+class Videos:
     """Main interface to the MNV treeview table search
     This is done to support a common naming framework for all python Netvision plugins no matter their site
     target.

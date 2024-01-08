@@ -10,10 +10,9 @@
 #                 removed after the release of MythTV v32!
 #                 Please use the class 'IntEnum' from the module 'enum' provided by python3.
 
-from builtins import int
 from warnings import warn
 
-class EnumValue( object ):
+class EnumValue:
     _next = 0
     _storage = []
     def __init__(self, name, value=None, friendly_name=None):
@@ -30,8 +29,8 @@ class EnumValue( object ):
         if value is not None:
             if cls._next:
                 # this should be zero
-                raise RuntimeError(("Cannot mix specified and auto-increment "
-                                    "values in same Enum"))
+                raise RuntimeError("Cannot mix specified and auto-increment "
+                                    "values in same Enum")
             return value
         # increment and continue
         self._next += 1
@@ -58,7 +57,7 @@ class EnumType( type ):
             return cls(cls._values[key].value)
         raise AttributeError(key)
 
-class BaseEnum( object, metaclass=EnumType ):
+class BaseEnum(metaclass=EnumType ):
 
     def __init__(self, mode):
         warn("Class 'BaseEnum' and it descendants will be removed after MythTV v32 release, "

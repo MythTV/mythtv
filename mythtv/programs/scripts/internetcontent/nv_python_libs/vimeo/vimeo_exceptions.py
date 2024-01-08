@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: vimeo_exceptions - Custom exceptions used or raised by vimeo_api
 # Python Script

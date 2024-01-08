@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # ----------------------
 # Name: pbs_api - Simple-to-use Python interface to the PBS RSS feeds
 #                       (http://video.pbs.org/)
@@ -34,7 +32,7 @@ from operator import itemgetter, attrgetter
 from .pbs_exceptions import (PBSUrlError, PBSHttpError, PBSRssError, PBSVideoNotFound, PBSConfigFileError, PBSUrlDownloadError)
 import io
 
-class OutStreamEncoder(object):
+class OutStreamEncoder:
     """Wraps a stream with an encoder"""
     def __init__(self, outstream, encoding=None):
         self.out = outstream
@@ -99,7 +97,7 @@ if mashups_api.__version__ < '0.1.0':
     sys.exit(1)
 
 
-class Videos(object):
+class Videos:
     """Main interface to http://video.pbs.org/
     This is done to support a common naming framework for all python Netvision plugins no matter their
     site target.
