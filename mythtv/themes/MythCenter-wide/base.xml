@@ -815,7 +815,7 @@
         </textarea>
 
         <textarea name="messagearea" from="basetextarea">
-            <area>100,100,1080,210</area>
+            <area>40,40,1140,320</area>
             <multiline>yes</multiline>
             <font>basemedium</font>
             <align>allcenter</align>
