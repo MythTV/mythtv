@@ -1956,7 +1956,50 @@ static bool doUpgradeTVDatabaseSchema(void)
 "           'smpte2022-1','smpte2022-2'),"
 "  bitrate INT(10) UNSIGNED NOT NULL,"
 "  PRIMARY KEY (iptvid)"
-") ENGINE=MyISAM DEFAULT CHARSET=utf8;"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+
+            "CREATE TABLE IF NOT EXISTS recgroups ("
+                "recgroupid  SMALLINT(4) NOT NULL AUTO_INCREMENT, "
+                "recgroup    VARCHAR(64) NOT NULL DEFAULT '', "
+                "displayname VARCHAR(64) NOT NULL DEFAULT '', "
+                "password    VARCHAR(40) NOT NULL DEFAULT '', "
+                "special     TINYINT(1) NOT NULL DEFAULT '0',"
+                "PRIMARY KEY (recgroupid), "
+                "UNIQUE KEY recgroup ( recgroup )"
+                ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+            // Create the built-in, 'special', groups
+            "INSERT INTO recgroups ( recgroupid, recgroup, special ) VALUES ( 1, 'Default', '1' );",
+            "INSERT INTO recgroups ( recgroupid, recgroup, special ) VALUES ( 2, 'LiveTV', '1' );",
+            "INSERT INTO recgroups ( recgroupid, recgroup, special ) VALUES ( 3, 'Deleted', '1' );",
+            // Copy in the passwords for the built-in groups
+            "DELETE FROM recgrouppassword WHERE password = '';",
+            "UPDATE recgroups r, recgrouppassword p SET r.password = p.password WHERE r.recgroup = p.recgroup;",
+            // Copy over all existing recording groups, this information may be split over three tables!
+            "INSERT IGNORE INTO recgroups ( recgroup, displayname, password ) SELECT DISTINCT recgroup, recgroup, password FROM recgrouppassword;",
+            "INSERT IGNORE INTO recgroups ( recgroup, displayname ) SELECT DISTINCT recgroup, recgroup FROM record;",
+            "INSERT IGNORE INTO recgroups ( recgroup, displayname ) SELECT DISTINCT recgroup, recgroup FROM recorded;",
+            // Create recgroupid columns in record and recorded tables
+            "ALTER TABLE record ADD COLUMN recgroupid SMALLINT(4) NOT NULL DEFAULT '1', ADD INDEX ( recgroupid );",
+            "ALTER TABLE recorded ADD COLUMN recgroupid SMALLINT(4) NOT NULL DEFAULT '1', ADD INDEX ( recgroupid );",
+
+            "ALTER TABLE record ADD COLUMN autoextend TINYINT UNSIGNED DEFAULT 0;",
+
+            "ALTER TABLE record MODIFY COLUMN startdate DATE DEFAULT NULL",
+            "ALTER TABLE record MODIFY COLUMN enddate DATE DEFAULT NULL",
+            "ALTER TABLE record MODIFY COLUMN starttime TIME DEFAULT NULL",
+            "ALTER TABLE record MODIFY COLUMN endtime TIME DEFAULT NULL",
+
+            // All next_record, last_record and last_delete to be NULL.
+            "ALTER TABLE record MODIFY next_record DATETIME NULL",
+            // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
+            "UPDATE record SET next_record = NULL "
+            "    WHERE next_record = '0000-00-00 00:00:00'",
+            "ALTER TABLE record MODIFY last_record DATETIME NULL",
+            "UPDATE record SET last_record = NULL "
+            "    WHERE last_record = '0000-00-00 00:00:00'",
+            "ALTER TABLE record MODIFY last_delete DATETIME NULL",
+            "UPDATE record SET last_delete = NULL "
+            "    WHERE last_delete = '0000-00-00 00:00:00'",
 };
 
         if (!performActualUpdate("MythTV", "DBSchemaVer",
@@ -2498,29 +2541,6 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1320")
     {
         DBUpdates updates {
-            "CREATE TABLE IF NOT EXISTS recgroups ("
-                "recgroupid  SMALLINT(4) NOT NULL AUTO_INCREMENT, "
-                "recgroup    VARCHAR(64) NOT NULL DEFAULT '', "
-                "displayname VARCHAR(64) NOT NULL DEFAULT '', "
-                "password    VARCHAR(40) NOT NULL DEFAULT '', "
-                "special     TINYINT(1) NOT NULL DEFAULT '0',"
-                "PRIMARY KEY (recgroupid), "
-                "UNIQUE KEY recgroup ( recgroup )"
-                ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
-            // Create the built-in, 'special', groups
-            "INSERT INTO recgroups ( recgroupid, recgroup, special ) VALUES ( 1, 'Default', '1' );",
-            "INSERT INTO recgroups ( recgroupid, recgroup, special ) VALUES ( 2, 'LiveTV', '1' );",
-            "INSERT INTO recgroups ( recgroupid, recgroup, special ) VALUES ( 3, 'Deleted', '1' );",
-            // Copy in the passwords for the built-in groups
-            "DELETE FROM recgrouppassword WHERE password = '';",
-            "UPDATE recgroups r, recgrouppassword p SET r.password = p.password WHERE r.recgroup = p.recgroup;",
-            // Copy over all existing recording groups, this information may be split over three tables!
-            "INSERT IGNORE INTO recgroups ( recgroup, displayname, password ) SELECT DISTINCT recgroup, recgroup, password FROM recgrouppassword;",
-            "INSERT IGNORE INTO recgroups ( recgroup, displayname ) SELECT DISTINCT recgroup, recgroup FROM record;",
-            "INSERT IGNORE INTO recgroups ( recgroup, displayname ) SELECT DISTINCT recgroup, recgroup FROM recorded;",
-            // Create recgroupid columns in record and recorded tables
-            "ALTER TABLE record ADD COLUMN recgroupid SMALLINT(4) NOT NULL DEFAULT '1', ADD INDEX ( recgroupid );",
-            "ALTER TABLE recorded ADD COLUMN recgroupid SMALLINT(4) NOT NULL DEFAULT '1', ADD INDEX ( recgroupid );",
             // Populate those columns with the corresponding recgroupid from the new recgroups table
             "UPDATE recorded, recgroups SET recorded.recgroupid = recgroups.recgroupid WHERE recorded.recgroup = recgroups.recgroup;",
             "UPDATE record, recgroups SET record.recgroupid = recgroups.recgroupid WHERE record.recgroup = recgroups.recgroup;"
@@ -2684,7 +2704,9 @@ static bool doUpgradeTVDatabaseSchema(void)
             "ADD COLUMN video_avg_bitrate MEDIUMINT UNSIGNED NOT NULL DEFAULT 0, " // Kbps
             "ADD COLUMN video_max_bitrate MEDIUMINT UNSIGNED NOT NULL DEFAULT 0, " // Kbps
             "ADD COLUMN audio_avg_bitrate MEDIUMINT UNSIGNED NOT NULL DEFAULT 0, " // Kbps
-            "ADD COLUMN audio_max_bitrate MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 ;" // Kbps
+            "ADD COLUMN audio_max_bitrate MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 ;", // Kbps
+
+            "ALTER TABLE recorded ADD COLUMN lastplay TINYINT UNSIGNED DEFAULT 0 AFTER bookmark;",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1330", dbver))
@@ -2986,21 +3008,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1337")
     {
-        DBUpdates updates {
-            // All next_record, last_record and last_delete to be NULL.
-            "ALTER TABLE record MODIFY next_record DATETIME NULL",
-            // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
-            "UPDATE record SET next_record = NULL "
-            "    WHERE next_record = '0000-00-00 00:00:00'",
-            "ALTER TABLE record MODIFY last_record DATETIME NULL",
-            "UPDATE record SET last_record = NULL "
-            "    WHERE last_record = '0000-00-00 00:00:00'",
-            "ALTER TABLE record MODIFY last_delete DATETIME NULL",
-            "UPDATE record SET last_delete = NULL "
-            "    WHERE last_delete = '0000-00-00 00:00:00'"
-        };
-        if (!performActualUpdate("MythTV", "DBSchemaVer",
-                                 updates, "1338", dbver))
+        if (!UpdateDBVersionNumber("MythTV", "DBSchemaVer", "1338", dbver))
             return false;
     }
 
@@ -3291,14 +3299,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1347")
     {
-        DBUpdates updates {
-            "ALTER TABLE record MODIFY COLUMN startdate DATE DEFAULT NULL",
-            "ALTER TABLE record MODIFY COLUMN enddate DATE DEFAULT NULL",
-            "ALTER TABLE record MODIFY COLUMN starttime TIME DEFAULT NULL",
-            "ALTER TABLE record MODIFY COLUMN endtime TIME DEFAULT NULL"
-        };
-        if (!performActualUpdate("MythTV", "DBSchemaVer",
-                                 updates, "1348", dbver))
+        if (!UpdateDBVersionNumber("MythTV", "DBSchemaVer", "1348", dbver))
             return false;
     }
 
@@ -3864,21 +3865,13 @@ static bool doUpgradeTVDatabaseSchema(void)
     {
         // Recording extender tables are now created later.
 
-        // If that worked, modify existing tables.
-        DBUpdates updates = getRecordingExtenderDbInfo(0);
-        if (!performActualUpdate("MythTV", "DBSchemaVer",
-                                 updates, "1372", dbver))
+        if (!UpdateDBVersionNumber("MythTV", "DBSchemaVer", "1372", dbver))
             return false;
     }
 
     if (dbver == "1372")
     {
-        DBUpdates updates {
-            "ALTER TABLE recorded ADD COLUMN lastplay "
-            "    TINYINT UNSIGNED DEFAULT 0 AFTER bookmark;",
-        };
-        if (!performActualUpdate("MythTV", "DBSchemaVer",
-                                 updates, "1373", dbver))
+        if (!UpdateDBVersionNumber("MythTV", "DBSchemaVer", "1373", dbver))
             return false;
     }
 
@@ -5316,12 +5309,6 @@ DBUpdates getRecordingExtenderDbInfo (int version)
             R"(DROP TABLE IF EXISTS sportscleanup;)",
             R"(DROP TABLE IF EXISTS sportslisting;)",
             R"(DROP TABLE IF EXISTS sportsapi;)",
-        };
-
-      case 0:
-        return {
-            R"(ALTER TABLE record ADD COLUMN autoextend
-                TINYINT UNSIGNED DEFAULT 0;)",
         };
 
       case 1:
