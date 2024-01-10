@@ -27,7 +27,6 @@ extern "C" {
 
 // MythMusic
 #include "constants.h"
-
 static constexpr const char* CDEXT { ".cda" };
 static constexpr long kSamplesPerSec { 44100 };
 
@@ -661,7 +660,22 @@ MusicMetadata *CdDecoder::getMetadata()
     if (title.isEmpty() || artist.isEmpty() || album.isEmpty())
 #endif // CDTEXT
     {
-        //TODO: add MusicBrainz lookup
+#ifdef HAVE_MUSICBRAINZ
+        if (isDiscChanged)
+        {
+            // lazy load whole CD metadata
+            getMusicBrainz().queryForDevice(m_deviceName);
+        }
+        if (getMusicBrainz().hasMetadata(m_setTrackNum))
+        {
+            auto *metadata = getMusicBrainz().getMetadata(m_setTrackNum);
+            if (metadata)
+            {
+                metadata->setFilename(getURL());
+                return metadata;
+            }
+        }
+#endif // HAVE_MUSICBRAINZ
     }
 
     if (compilation_artist.toLower().left(7) == "various")
@@ -683,6 +697,17 @@ MusicMetadata *CdDecoder::getMetadata()
 
     return m;
 }
+
+#ifdef HAVE_MUSICBRAINZ
+
+MusicBrainz & CdDecoder::getMusicBrainz()
+{
+    static MusicBrainz s_musicBrainz;
+    return s_musicBrainz;
+}
+
+#endif // HAVE_MUSICBRAINZ
+
 
 // pure virtual
 bool CdDecoderFactory::supports(const QString &source) const
