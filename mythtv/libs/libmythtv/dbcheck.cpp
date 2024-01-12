@@ -2760,6 +2760,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1330")
     {
+        // Adding field lastplay because it is now required in the upgrade to database schema 1331
+        // but only when the are recordings present in the database.
+        // Field lastplay is initially introduced in the upgrade to database schema 1373.
         if (!DBUtil::CheckTableColumnExists(QString("recorded"), QString("lastplay")))
         {
             DBUpdates updates {
