@@ -9,6 +9,9 @@ through windows, dialogs, and various control widgets.
 """
 from typing import Union, List, Dict, Tuple, Optional
 
+# for MythtTV, show "dialog" on stderr
+import sys
+
 __kodistubs__ = True
 
 ACTION_ANALOG_FORWARD = 113
@@ -2935,6 +2938,7 @@ class DialogProgress:
             pDialog.create('Kodi', 'Initializing script...')
             ..
         """
+        print("\tDIALOG created: ", heading, " : ", message, file=sys.stderr)
         pass
     
     def update(self, percent: int, message: str = "") -> None:
@@ -2956,6 +2960,7 @@ class DialogProgress:
             pDialog.update(25, 'Importing modules...')
             ..
         """
+        print("\tDIALOG updated %s: " % percent, message, file=sys.stderr)
         pass
     
     def close(self) -> None:
@@ -2982,7 +2987,8 @@ class DialogProgress:
             if (pDialog.iscanceled()): return
             ..
         """
-        return True
+        # for MythTV, not cancelled is needed to continue the scrapertest.py
+        return False
     
 
 class DialogProgressBG:

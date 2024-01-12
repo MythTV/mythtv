@@ -58,7 +58,11 @@ class Addon:
             locstr = self.Addon.`getLocalizedString`(32000)
             ..
         """
-        return ""
+        # for MythTV, testall/scrapertest needs only 1 message from
+        # resources/language/resource.language.en_us/strings.po
+        if (id == 32163):
+            return "Testing: %s"
+        return "(%s)" % id
     
     def getSettings(self) -> 'Settings':
         """

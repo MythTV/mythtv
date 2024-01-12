@@ -43,7 +43,11 @@ class File:
     """
     
     def __init__(self, filepath: str, mode: Optional[str] = None) -> None:
-        pass
+        self.filename = filepath
+        if mode:
+            self.fh = open(filepath, mode)
+        else:
+            self.fh = open(filepath, "rb")
 
     def __enter__(self) -> 'File':  # Required for context manager
         return self
@@ -73,7 +77,9 @@ class File:
                 b = f.read()
                 ..
         """
-        return ""
+        if numBytes:
+            return self.fh.read(numBytes)
+        return self.fh.read()
     
     def readBytes(self, numBytes: int = 0) -> bytearray:
         """
@@ -97,7 +103,9 @@ class File:
                 b = f.readBytes()
                 ..
         """
-        return bytearray()
+        if numBytes:
+            return bytearray(self.fh.read(numBytes))
+        return bytearray(self.fh.read())
     
     def write(self, buffer: Union[str,  bytes,  bytearray]) -> bool:
         """
@@ -171,7 +179,7 @@ class File:
                 result = f.seek(8129, 0)
                 ..
         """
-        return 0
+        return self.fh.seek(seekBytes, iWhence);
     
     def tell(self) -> int:
         """
@@ -196,7 +204,7 @@ class File:
                 s = f.tell()
                 ..
         """
-        return 0
+        return self.fh.tell()
     
     def close(self) -> None:
         """
@@ -216,6 +224,7 @@ class File:
                 ..
                 ..
         """
+        self.fh.close()
         pass
     
 
@@ -396,7 +405,8 @@ def exists(path: str) -> bool:
         success = xbmcvfs.exists(path)
         ..
     """
-    return True
+    # for musixmatchlrc.py the test must work or return False
+    return False
 
 
 def makeLegalFilename(filename: str) -> str:

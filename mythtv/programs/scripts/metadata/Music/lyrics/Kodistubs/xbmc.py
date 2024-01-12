@@ -3532,6 +3532,9 @@ def log(msg: str, level: int = LOGDEBUG) -> None:
         xbmc.log(msg='This is a test string.', level=xbmc.LOGDEBUG);
         ..
     """
+    # for MythTV, simply send debugging messages to stderr
+    import sys
+    print("debug=%s %s" % (level, msg), file=sys.stderr)
     pass
 
 
