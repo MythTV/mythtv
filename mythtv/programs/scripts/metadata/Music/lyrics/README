@@ -1,10 +1,20 @@
-Lyrics Grabbers
-===============
+Lyrics Grabbers for MythMusic of MythTV
+=======================================
 
 You can add your own grabbers to this directory and MythMusic will
 automatically use them so long as they comply with the other grabbers.
 
-The grabber should support these command line options :-
+The included grabbers are sourced from the CU LRC Kodi addon:
+
+        https://gitlab.com/ronie/script.cu.lrclyrics
+
+./common/main.py implements the below CLI translation to MythTV via a
+slightly modified ./Kodistubs.  So only 20 lines of metadata per
+grabber is needed in this directory.  These files then import only a
+LyricsFetcher from ./lib/culrcscrapers or from ./common for any
+additional grabbers like filelyrics.py.
+
+The grabber should support these command line options:
 
 Options:
   -h, --help            show this help message and exit
@@ -87,18 +97,34 @@ Options:
 
 
 
-Current Grabbers, Their Priority And Whether Synchronized
-=========================================================
+Grabbers as/of 2024/01, Their Priority And Whether Synchronized
+===============================================================
 
-EmbeddedLyrics 100  Yes/No
-FileLyrics     105  Yes/No
+        Local
+
+EmbeddedLyrics   50    Yes/No
+FileLyrics       90    Yes/No
+
+        CU LRC
+
+musixmatchlrc   100     Yes     NEW in v34
+lrclib          110     Yes     NEW in v34
+lyricsify       130     Yes     NEW in v34
+genius          200     No
+musixmatch      210     No      NEW in v34
+lyricsmode      220     No
+azlyrics        230     No      NEW in v34
+lyricscom       240     No
+supermusic      250     No      NEW in v34
+darklyrics      260     No
+megalobiz       400     Yes     (too slow to be earlier, was 140)
+music163        500     Yes     (returns incomplete results, was 120)
+
+        old/non-working grabbers are moved to ./broken-scrapers
+
 TTPlayer       110  Yes
 Alsong         120  Yes
 LetsSingIt     130  No
-LyricsCom      140  No
 LyricsWiki     150  No
-Genius         160  No
-LyricsMode     170  No
-DarkLyrics     180  No
 GomAudio       200  Yes
 Baidu          210  Yes

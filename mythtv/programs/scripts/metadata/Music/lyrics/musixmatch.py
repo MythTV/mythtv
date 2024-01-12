@@ -2,24 +2,21 @@
 
 info = {}
 from common import main
-from lib.culrcscrapers.lyricscom.lyricsScraper import LyricsFetcher
+from lib.culrcscrapers.musixmatch.lyricsScraper import LyricsFetcher
 # make sure this-------^^^^^^^^^ matches this file's basename
 #       and this-------vvvvvvvvv one too:
-info['command']     = 'lyricscom.py'
+info['command']     = 'musixmatch.py'
 
-info['name']        = 'Lyrics.Com'
-info['description'] = 'Search https://lyrics.com for lyrics'
+info['name']        = 'Musixmatch'
+info['description'] = 'Search https://musixmatch.com for lyrics'
 info['author']      = "Paul Harrison and ronie"
-info['priority']    = '240'
+info['priority']    = '210'	# not in v33-
 info['version']     = '2.0'
 info['syncronized'] = False
 
-info['artist']      = 'Dire Straits' # v33-
-info['title']       = 'Money For Nothing'
+info['artist']      = 'Kate Bush'
+info['title']       = 'Wuthering Heights'
 info['album']       = ''
-
-info['artist']      = 'Blur' # v34+
-info['title']       = "You're so Great"
 
 if __name__ == '__main__':
     main.main(info, LyricsFetcher)

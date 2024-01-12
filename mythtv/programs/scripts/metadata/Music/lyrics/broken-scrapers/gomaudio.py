@@ -148,7 +148,7 @@ def buildVersion():
     etree.SubElement(version, "syncronized").text = 'True' if __syncronized__ else 'False'
 
     utilities.log(True, etree.tostring(version, encoding='UTF-8', pretty_print=True,
-                                       xml_declaration=True))
+                                       xml_declaration=True).decode())
     sys.exit(0)
 
 def main():
