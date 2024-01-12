@@ -1971,7 +1971,10 @@ static bool doUpgradeTVDatabaseSchema(void)
     {
         LOG(VB_GENERAL, LOG_CRIT, "Upgrading to MythTV schema version 1302");
 
-        // Adding the default template requires these things.
+        // Adding the default template now requires database table recgroups which was
+        // initially introduced in the upgrade to schema version 1320.
+        // The initial database created with a "clean install" has schema version 1307
+        // so upgrading to schema version 1302 is not often done.
         DBUpdates updates {
             "CREATE TABLE IF NOT EXISTS recgroups ("
                 "recgroupid  SMALLINT(4) NOT NULL AUTO_INCREMENT, "
@@ -1996,13 +1999,13 @@ static bool doUpgradeTVDatabaseSchema(void)
             "INSERT IGNORE INTO recgroups ( recgroup, displayname ) SELECT DISTINCT recgroup, recgroup FROM recorded;",
 
             // Create recgroupid columns in record and recorded tables
-            (!DBUtil::CheckTableColumnExists(QString("record"), QString("recgroupid")) ? 
+            (!DBUtil::CheckTableColumnExists(QString("record"), QString("recgroupid")) ?
                  "ALTER TABLE record ADD COLUMN recgroupid SMALLINT(4) NOT NULL DEFAULT '1', ADD INDEX ( recgroupid );" : ""),
-            (!DBUtil::CheckTableColumnExists(QString("recorded"), QString("recgroupid")) ? 
+            (!DBUtil::CheckTableColumnExists(QString("recorded"), QString("recgroupid")) ?
                 "ALTER TABLE recorded ADD COLUMN recgroupid SMALLINT(4) NOT NULL DEFAULT '1', ADD INDEX ( recgroupid );" : ""),
 
             // Create autoextend column in record
-            (!DBUtil::CheckTableColumnExists(QString("record"), QString("autoextend")) ? 
+            (!DBUtil::CheckTableColumnExists(QString("record"), QString("autoextend")) ?
                 "ALTER TABLE record ADD COLUMN autoextend TINYINT UNSIGNED DEFAULT 0;" : ""),
 
             "ALTER TABLE record MODIFY COLUMN startdate DATE DEFAULT NULL",
@@ -2581,9 +2584,9 @@ static bool doUpgradeTVDatabaseSchema(void)
             "INSERT IGNORE INTO recgroups ( recgroup, displayname ) SELECT DISTINCT recgroup, recgroup FROM record;",
             "INSERT IGNORE INTO recgroups ( recgroup, displayname ) SELECT DISTINCT recgroup, recgroup FROM recorded;",
             // Create recgroupid columns in record and recorded tables
-            (!DBUtil::CheckTableColumnExists(QString("record"), QString("recgroupid")) ? 
+            (!DBUtil::CheckTableColumnExists(QString("record"), QString("recgroupid")) ?
                  "ALTER TABLE record ADD COLUMN recgroupid SMALLINT(4) NOT NULL DEFAULT '1', ADD INDEX ( recgroupid );" : ""),
-            (!DBUtil::CheckTableColumnExists(QString("recorded"), QString("recgroupid")) ? 
+            (!DBUtil::CheckTableColumnExists(QString("recorded"), QString("recgroupid")) ?
                 "ALTER TABLE recorded ADD COLUMN recgroupid SMALLINT(4) NOT NULL DEFAULT '1', ADD INDEX ( recgroupid );" : ""),
             // Populate those columns with the corresponding recgroupid from the new recgroups table
             "UPDATE recorded, recgroups SET recorded.recgroupid = recgroups.recgroupid WHERE recorded.recgroup = recgroups.recgroup;",
@@ -2748,9 +2751,7 @@ static bool doUpgradeTVDatabaseSchema(void)
             "ADD COLUMN video_avg_bitrate MEDIUMINT UNSIGNED NOT NULL DEFAULT 0, " // Kbps
             "ADD COLUMN video_max_bitrate MEDIUMINT UNSIGNED NOT NULL DEFAULT 0, " // Kbps
             "ADD COLUMN audio_avg_bitrate MEDIUMINT UNSIGNED NOT NULL DEFAULT 0, " // Kbps
-            "ADD COLUMN audio_max_bitrate MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 ;", // Kbps
-
-            "ALTER TABLE recorded ADD COLUMN lastplay TINYINT UNSIGNED DEFAULT 0 AFTER bookmark;",
+            "ADD COLUMN audio_max_bitrate MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 ;" // Kbps
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1330", dbver))
@@ -2759,6 +2760,17 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1330")
     {
+        if (!DBUtil::CheckTableColumnExists(QString("recorded"), QString("lastplay")))
+        {
+            DBUpdates updates {
+                "ALTER TABLE recorded ADD COLUMN lastplay TINYINT UNSIGNED DEFAULT 0 AFTER bookmark;",
+            };
+
+            // We don't want to update version yet
+            if (!performUpdateSeries("MythTV", updates))
+                return false;
+        }
+
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT recordedid FROM recorded");
         query.exec();
@@ -2792,10 +2804,13 @@ static bool doUpgradeTVDatabaseSchema(void)
                             recInfo->QueryAverageHeight());
             recFile->m_videoResolution = resolution;
             recFile->m_videoFrameRate = (double)recInfo->QueryAverageFrameRate() / 1000.0;
-            recFile->Save();
+            bool result = recFile->Save();
             delete recInfo;
+            if (!result)
+                return false;
         }
 
+        // Both updates worked, so update version
         if (!UpdateDBVersionNumber("MythTV", "DBSchemaVer", "1331", dbver))
             return false;
     }
