@@ -877,4 +877,52 @@ bool DBUtil::CheckTimeZoneSupport(void)
     return !query.value(0).isNull();
 }
 
+/** \fn DBUtil::CheckTableColumnExists(const QString &tableName, const QString &columnName)
+ *  \brief Checks for the presence of a column in a table in the current database
+ *
+ *   This function will check a table in the current database for the presence
+ *   of a named column.
+ *
+ *  \param tableName Name of table to check
+ *  \param columnName Name of column to look for
+ *  \return true if column exists in the table; false if it does not
+ *  \sa CheckTableColumnExists(const QString &tableName, const QString &columnName)
+ */
+bool DBUtil::CheckTableColumnExists(const QString &tableName, const QString &columnName)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!query.isConnected())
+        return false;
+
+    QString sql = QString("SELECT COUNT(*) FROM information_schema.columns "
+                          "WHERE table_schema = DATABASE() AND "
+                                "table_name = '%1' AND column_name = '%2';")
+                          .arg(tableName, columnName);
+    LOG(VB_GENERAL, LOG_DEBUG,
+            QString("DBUtil::CheckTableColumnExists() SQL: %1").arg(sql));
+
+    if (!query.exec(sql))
+    {
+        MythDB::DBError("DBUtil Check Table Column Exists", query);
+        return false;
+    }
+
+    bool result = false;
+    if (query.next())
+    {
+        result = (query.value(0).toInt() > 0);
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+                            QString("DBUtil::CheckTableColumnExists() - Empty result set"));
+    }
+
+    LOG(VB_GENERAL, LOG_DEBUG,
+            QString("DBUtil::CheckTableColumnExists('%1', '%2') result: %3").arg(tableName,
+                    columnName, QVariant(result).toString()));
+
+    return result;
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

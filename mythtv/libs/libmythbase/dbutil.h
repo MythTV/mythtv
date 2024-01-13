@@ -53,6 +53,7 @@ class MBASE_PUBLIC DBUtil
     static void UnlockSchema(MSqlQuery &query);
 
     static bool CheckTimeZoneSupport(void);
+    static bool CheckTableColumnExists(const QString &tableName, const QString &columnName);
 
     static const int kUnknownVersionNumber;
 
