@@ -111,14 +111,14 @@ uint EITHelper::ProcessEvents(void)
 
     if (!m_incompleteEvents.empty())
     {
-        LOG(VB_EIT, LOG_INFO, LOC_ID +
+        LOG(VB_EIT, LOG_DEBUG, LOC_ID +
             QString("Added %1 events -- complete: %2 incomplete: %3")
                 .arg(insertCount).arg(m_dbEvents.size())
                 .arg(m_incompleteEvents.size()));
     }
     else
     {
-        LOG(VB_EIT, LOG_INFO, LOC_ID +
+        LOG(VB_EIT, LOG_DEBUG, LOC_ID +
             QString("Added %1/%2 events, queued: %3")
                 .arg(insertCount).arg(eventCount).arg(m_dbEvents.size()));
     }

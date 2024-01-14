@@ -251,7 +251,7 @@ event_map_t * EITCache::LoadChannel(uint chanid)
     }
 
     if (!eventMap->empty())
-        LOG(VB_EIT, LOG_INFO, LOC + QString("Loaded %1 entries for chanid %2")
+        LOG(VB_EIT, LOG_DEBUG, LOC + QString("Loaded %1 entries for chanid %2")
                 .arg(eventMap->size()).arg(chanid));
 
     m_entryCnt += eventMap->size();
@@ -303,20 +303,20 @@ bool EITCache::WriteChannelToDB(QStringList &value_clauses, uint chanid)
     {
         if (m_persistent)
         {
-            LOG(VB_EIT, LOG_INFO, LOC +
+            LOG(VB_EIT, LOG_DEBUG, LOC +
                 QString("Writing %1 modified entries of %2 for chanid %3 to database.")
                     .arg(updated).arg(size).arg(chanid));
         }
         else
         {
-            LOG(VB_EIT, LOG_INFO, LOC +
+            LOG(VB_EIT, LOG_DEBUG, LOC +
                 QString("Updated %1 modified entries of %2 for chanid %3 in cache.")
                     .arg(updated).arg(size).arg(chanid));
         }
     }
     if (removed)
     {
-        LOG(VB_EIT, LOG_INFO, LOC + QString("Removed %1 old entries of %2 "
+        LOG(VB_EIT, LOG_DEBUG, LOC + QString("Removed %1 old entries of %2 "
                                       "for chanid %3 from cache.")
                 .arg(removed).arg(size).arg(chanid));
     }
@@ -362,10 +362,10 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
 {
     m_accessCnt++;
 
-    if ((m_accessCnt < 100000 && (m_accessCnt %  10000 == 0)) ||
-        (m_accessCnt % 100000 == 0))
+    if (m_accessCnt %  10000 == 0)
     {
         LOG(VB_EIT, LOG_INFO, LOC + GetStatistics());
+        ResetStatistics();
     }
 
     // Don't re-add pruned entries
@@ -434,7 +434,7 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
  */
 uint EITCache::PruneOldEntries(uint timestamp)
 {
-    if (VERBOSE_LEVEL_CHECK(VB_EIT, LOG_INFO))
+    if (VERBOSE_LEVEL_CHECK(VB_EIT, LOG_DEBUG))
     {
         QDateTime tmptime = MythDate::fromSecsSinceEpoch(timestamp);
         LOG(VB_EIT, LOG_INFO,

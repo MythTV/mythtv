@@ -62,7 +62,10 @@ class EITScanner : public QRunnable
     QStringList           m_activeScanChannels;
     QStringList::iterator m_activeScanNextChan;
 
-    uint                  m_cardnum;
+    uint                  m_cardnum                 {0};
+    uint                  m_sourceid                {0};        // Video source ID
+    QString               m_sourceName;                         // Video source name
+    uint                  m_eitCount                {0};        // Processsed EIT events
 };
 
 #endif // EITSCANNER_H
