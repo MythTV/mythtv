@@ -6785,6 +6785,16 @@ if test "$ID" = "raspbian"; then
     esac
 fi
 
+# FFmpeg on FreeBSD build breaks with clang >= 16. This is because the
+# incompatible function pointer waring has been promoted to an error.
+# Demoting it back to a warning allows the builds to work again.
+# https://lists.ffmpeg.org/pipermail/ffmpeg-devel/2023-March/307515.html
+if test $target_os == "freebsd" &&
+	enabled clangxx &&
+	test $clangxx_major -ge 16; then
+   ffmpeg_extra_cflags="$ffmpeg_extra_cflags -Wno-error=incompatible-function-pointer-types"
+fi
+
 append ffopts \
 --extra-cflags=\'"$ffmpeg_extra_cflags"\' \
 --extra-ldflags=\'"$ffmpeg_extra_ldflags"\' \
