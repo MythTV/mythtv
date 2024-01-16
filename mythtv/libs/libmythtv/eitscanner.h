@@ -34,7 +34,7 @@ class EITScanner : public QRunnable
     void StartEITEventProcessing(ChannelBase *channel, EITSource *eitSource);
     void StopEITEventProcessing(void);
 
-    void StartActiveScan(TVRec *rec, std::chrono::seconds max_seconds_per_source);
+    void StartActiveScan(TVRec *rec, std::chrono::seconds max_seconds_per_multiplex);
     void StopActiveScan(void);
 
   protected:

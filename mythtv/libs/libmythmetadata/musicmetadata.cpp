@@ -1901,7 +1901,7 @@ AlbumArtImages::AlbumArtImages(MusicMetadata *metadata, bool loadFromDB)
 AlbumArtImages::AlbumArtImages(MusicMetadata *metadata, const AlbumArtImages &other)
     : m_parent(metadata)
 {
-    for (auto &srcImage : qAsConst(other.m_imageList))
+    for (const auto &srcImage : qAsConst(other.m_imageList))
     {
         m_imageList.append(new AlbumArtImage(srcImage));
     }
