@@ -3,10 +3,7 @@
 Scraper for file lyrics
 """
 
-import sys, os, re, chardet
-from optparse import OptionParser
 from lib.utils import *
-from common import *
 
 __title__       = "FileLyrics"
 __description__ = "Search the same directory as the track for lyrics"
