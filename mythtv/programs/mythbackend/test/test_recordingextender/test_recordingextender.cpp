@@ -217,11 +217,11 @@ void TestRecordingExtender::test_findKnownSport_data(void)
                                << "baseball" << 1 << QStringList("mlb");
     QTest::newRow("baseball2") << "MLB Baseball" << 2
                                << "baseball" << 1 << QStringList("mlb");
-    // Must be current year.
+    // Must be current year. (For the purposes of these tests, the
+    // current year is 2022.)
     QTest::newRow("baseball3") << "2020 World Series" << 1
                                << "" << 0 << QStringList();
-    QTest::newRow("baseball4") << QString("%1 World Series")
-                                  .arg(QDate::currentDate().year()) << 1
+    QTest::newRow("baseball4") << "2022 World Series" << 1
                                << "baseball" << 1 << QStringList("mlb");
     QTest::newRow("football1") << "NFL Football" << 1
                                << "football" << 1 << QStringList("nfl");
