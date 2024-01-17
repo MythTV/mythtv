@@ -41,14 +41,16 @@ EITHelper::EITHelper(uint cardnum) :
 {
     m_chunkSize = gCoreContext->GetNumSetting("EITEventChunkSize", 20);
     m_queueSize = std::min(m_chunkSize * 50, kMaxQueueSize);
-
     LOG(VB_EIT, LOG_INFO, LOC_ID +
-        QString("EIThelper chunk size %1 and queue size %2 events")
+        QString("EITHelper chunk size %1 and queue size %2 events")
             .arg(m_chunkSize).arg(m_queueSize));
 
     // Save EIT cache in database table eit_cache iff true
     bool persistent = gCoreContext->GetBoolSetting("EITCachePersistent", true);
     s_eitCache->SetPersistent(persistent);
+    LOG(VB_EIT, LOG_INFO, LOC_ID +
+        QString("EITCache %1")
+            .arg(persistent ? "in memory, backup to database" : "in memory only"));
 
     init_fixup(m_fixup);
 }

@@ -66,6 +66,7 @@ class EITScanner : public QRunnable
     uint                  m_sourceid                {0};        // Video source ID
     QString               m_sourceName;                         // Video source name
     uint                  m_eitCount                {0};        // Processsed EIT events
+    uint                  m_mplexid                 {0};        // Transport stream multiplex ID
 };
 
 #endif // EITSCANNER_H

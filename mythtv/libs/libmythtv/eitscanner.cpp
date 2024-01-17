@@ -81,7 +81,9 @@ void EITScanner::run(void)
     m_lock.lock();
 
     MythTimer tsle;             // Time since last event or since start of active scan
-    m_eitCount = 0;             // Number of events processed
+    MythTimer tsrr;             // Time since RescheduleRecordings in passive scan
+    tsrr.start();
+    m_eitCount = 0;             // Number of new events processed
 
     while (!m_exitThread)
     {
@@ -94,16 +96,16 @@ void EITScanner::run(void)
             tsle.start();
         }
 
-        // Tell the scheduler to run if we are in passive scan
-        // and there have been updated events since the last scheduler run
-        // but not in the last 60 seconds
-        if (!m_activeScan && m_eitCount && (tsle.elapsed() > 60s))
+        // Run the scheduler every 5 minutes if we are in passive scan
+        // and there have been new events.
+        if (!m_activeScan && m_eitCount && (tsrr.elapsed() > 5min))
         {
             LOG(VB_EIT, LOG_INFO, LOC +
                 QString("Added %1 EIT events in passive scan ").arg(m_eitCount) +
-                QString("source %1 '%2'").arg(m_sourceid).arg(m_sourceName));
+                QString("for source %1 '%2'").arg(m_sourceid).arg(m_sourceName));
             m_eitCount = 0;
             RescheduleRecordings();
+            tsrr.start();
         }
 
         // Move to the next transport in active scan when no events
@@ -116,8 +118,9 @@ void EITScanner::run(void)
             if (noEvents && !scanTimeUp)
             {
                 LOG(VB_EIT, LOG_INFO, LOC +
-                    QString("No EIT events received in last %1 seconds, move to next transport")
-                        .arg(eventTimeout.count()));
+                    QString("No new EIT events received in last %1 seconds ").arg(eventTimeout.count()) +
+                    QString("for source %2 '%3' ").arg(m_sourceid).arg(m_sourceName) +
+                    QString("on multiplex %4, move to next multiplex").arg(m_mplexid));
             }
 
             if (m_activeScanNextChan == m_activeScanChannels.end())
@@ -132,10 +135,10 @@ void EITScanner::run(void)
                 {
                     uint chanid = ChannelUtil::GetChanID(m_sourceid, *m_activeScanNextChan);
                     m_eitHelper->SetChannelID(chanid);
-                    uint mplexid = ChannelUtil::GetMplexID(chanid);
+                    m_mplexid = ChannelUtil::GetMplexID(chanid);
                     LOG(VB_EIT, LOG_DEBUG, LOC +
                         QString("Next EIT active scan source %1 '%2' multiplex %3 chanid %4 channel %5")
-                            .arg(m_sourceid).arg(m_sourceName).arg(mplexid).arg(chanid).arg(*m_activeScanNextChan));
+                            .arg(m_sourceid).arg(m_sourceName).arg(m_mplexid).arg(chanid).arg(*m_activeScanNextChan));
                 }
             }
 
@@ -196,13 +199,13 @@ void EITScanner::StartEITEventProcessing(ChannelBase *channel,
     QString channum = m_channel->GetChannelName();
     if (chanid > 0)
     {
-        uint mplexid = ChannelUtil::GetMplexID(chanid);
+        m_mplexid = ChannelUtil::GetMplexID(chanid);
         m_eitHelper->SetChannelID(chanid);
         m_eitHelper->SetSourceID(m_sourceid);
         LOG(VB_EIT, LOG_INFO, LOC +
             QString("Start EIT %1 scan source %2 '%3' multiplex %4 chanid %5 channel %6")
                 .arg(m_activeScan ? "active" : "passive").arg(m_sourceid).arg(m_sourceName)
-                .arg(mplexid).arg(chanid).arg(channum));
+                .arg(m_mplexid).arg(chanid).arg(channum));
     }
     else
     {
@@ -222,18 +225,15 @@ void EITScanner::StopEITEventProcessing(void)
     if (!m_eitSource)
         return;
 
+    LOG(VB_EIT, LOG_INFO, LOC +
+        QString("Stop EIT event processing for source %1 '%2', added %3 EIT events")
+            .arg(m_sourceid).arg(m_sourceName).arg(m_eitCount));
+
     if (m_eitCount)
     {
-        LOG(VB_EIT, LOG_INFO, LOC +
-            QString("Added %1 EIT events for source %2 '%3'")
-                .arg(m_eitCount).arg(m_sourceid).arg(m_sourceName));
         m_eitCount = 0;
         RescheduleRecordings();
     }
-
-    LOG(VB_EIT, LOG_INFO, LOC +
-        QString("Stop EIT event processing for source %1 '%2'")
-            .arg(m_sourceid).arg(m_sourceName));
 
     if (m_eitSource)
     {
