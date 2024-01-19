@@ -22,5 +22,5 @@ def log(msg: str, level: int = LOGDEBUG) -> None:
     """
     # for MythTV, simply send debugging messages to stderr
     import sys
-    print("debug=%s %s" % (level, msg), file=sys.stderr)
+    print(msg, file=sys.stderr)
     pass
