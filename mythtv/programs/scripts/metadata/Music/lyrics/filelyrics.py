@@ -14,7 +14,7 @@ __author__      = "Paul Harrison"
 __title__       = "FileLyrics"
 __description__ = "Search the same directory as the track for lyrics"
 __version__     = "0.1"
-__priority__    = "105"
+__priority__    = "90"
 __syncronized__ = True
 
 debug = False
@@ -91,7 +91,7 @@ def buildVersion():
     version = etree.XML(u'<grabber></grabber>')
     etree.SubElement(version, "name").text = __title__
     etree.SubElement(version, "author").text = __author__
-    etree.SubElement(version, "command").text = 'alsong.py'
+    etree.SubElement(version, "command").text = 'filelyrics.py'
     etree.SubElement(version, "type").text = 'lyrics'
     etree.SubElement(version, "description").text = __description__
     etree.SubElement(version, "version").text = __version__

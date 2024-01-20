@@ -18,7 +18,7 @@ class Lyrics:
         self.syncronized = False
 
 def deAccent(str):
-    return unicodedata.normalize('NFKD', unicode(str, 'utf-8'))
+    return unicodedata.normalize('NFKD', str).replace('"', '')
 
 def convert_etree(etostr):
     """lxml.etree.tostring is a bytes object in python3, and a str in python2.

@@ -1,21 +1,21 @@
 # -*- Mode: python; coding: utf-8; tab-width: 8; indent-tabs-mode: t; -*-
 """
-Scraper for http://www.lyrdb.com/
+Scraper for http://www.lyrics.com/
 
 ronie
 """
 
-import sys
 import re
-from urllib.parse import quote_plus
-from urllib.request import urlopen
-
-import socket
+import requests
+import urllib.parse
 import difflib
+from bs4 import BeautifulSoup
+
+import sys
 from optparse import OptionParser
 from common import utilities
 
-__author__      = "Paul Harrison and 'ronie'"
+__author__      = "Paul Harrison and ronie"
 __title__       = "Lyrics.Com"
 __description__ = "Search http://www.lyrics.com for lyrics"
 __priority__    = "240"
@@ -24,8 +24,6 @@ __syncronized__ = False
 
 debug = False
 
-socket.setdefaulttimeout(10)
-
 class LyricsFetcher:
     def __init__( self ):
         self.url = 'http://www.lyrics.com/serp.php?st=%s&qtype=2'
@@ -33,58 +31,45 @@ class LyricsFetcher:
     def get_lyrics(self, lyrics):
         utilities.log(debug, "%s: searching lyrics for %s - %s - %s" % (__title__, lyrics.artist, lyrics.album, lyrics.title))
 
-        try:
-            from bs4 import BeautifulSoup
-        except:
-            utilities.log(True, "Failed to import BeautifulSoup. This grabber requires python-bs4")
-            return False
+        sess = requests.Session()
 
         try:
-            request = urlopen(self.url % quote_plus(lyrics.artist))
-            response = request.read()
+            request = sess.get(self.url % urllib.parse.quote_plus(lyrics.artist), timeout=10)
+            response = request.text
         except:
             return False
-
-        request.close()
         soup = BeautifulSoup(response, 'html.parser')
         url = ''
         for link in soup.find_all('a'):
             if link.string and link.get('href').startswith('artist/'):
-                url = 'http://www.lyrics.com/' + link.get('href')
+                url = 'https://www.lyrics.com/' + link.get('href')
                 break
         if url:
-            utilities.log(debug, "%s: Artist url is %s"  % (__title__, url))
             try:
-                req = urlopen(url)
-                resp = req.read().decode('utf-8')
+                req = sess.get(url, timeout=10)
+                resp = req.text
             except:
                 return False
-            req.close()
             soup = BeautifulSoup(resp, 'html.parser')
             url = ''
             for link in soup.find_all('a'):
-                if link.string and link.get('href').startswith('/lyric/') and (difflib.SequenceMatcher(None, link.string.lower(), lyrics.title.lower()).ratio() > 0.8):
-                    url = 'http://www.lyrics.com' + link.get('href')
+                if link.string and (difflib.SequenceMatcher(None, link.string.lower(), lyrics.title.lower()).ratio() > 0.8):
+                    url = 'https://www.lyrics.com' + link.get('href')
                     break
-
             if url:
-                utilities.log(debug, "%s: Song url is %s"  % (__title__, url))
-
                 try:
-                    req2 = urlopen(url)
-                    resp2 = req2.read().decode('utf-8')
+                    req2 = sess.get(url, timeout=10)
+                    resp2 = req2.text
                 except:
                     return False
-                req2.close()
-
-                matchcode = re.search(u'<pre.*?>(.*?)</pre>', resp2, flags=re.DOTALL)
+                matchcode = re.search('<pre.*?>(.*?)</pre>', resp2, flags=re.DOTALL)
                 if matchcode:
                     lyricscode = (matchcode.group(1))
-                    lyr = re.sub(u'<[^<]+?>', '', lyricscode)
+                    lyr = re.sub('<[^<]+?>', '', lyricscode)
                     lyrics.lyrics = lyr.replace('\\n','\n')
                     return True
 
-            return False
+        return False
 
 def performSelfTest():
     try:
