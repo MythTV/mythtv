@@ -90,15 +90,17 @@ Options:
 Current Grabbers, Their Priority And Whether Synchronized
 =========================================================
 
-EmbeddedLyrics 100  Yes/No
-FileLyrics     105  Yes/No
-TTPlayer       110  Yes
-Alsong         120  Yes
-LetsSingIt     130  No
-LyricsCom      140  No
-LyricsWiki     150  No
-Genius         160  No
-LyricsMode     170  No
-DarkLyrics     180  No
-GomAudio       200  Yes
-Baidu          210  Yes
+EmbeddedLyrics   50     Yes/No
+FileLyrics       90     Yes/No
+musixmatchlrc   100     Yes     NEW in v34
+lrclib          110     Yes     NEW in v34
+lyricsify       130     Yes     NEW in v34
+genius          200     No
+musixmatch      210     No      NEW in v34
+lyricsmode      220     No
+azlyrics        230     No      NEW in v34
+lyricscom       240     No
+supermusic      250     No      NEW in v34
+darklyrics      260     No
+megalobiz       400     Yes     (too slow to be earlier, was 140)
+music163        500     Yes     (returns incomplete results, was 120)

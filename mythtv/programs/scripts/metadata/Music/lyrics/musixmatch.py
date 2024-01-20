@@ -1,76 +1,94 @@
-#-*- coding: UTF-8 -*-
+# -*- Mode: python; coding: utf-8; tab-width: 8; indent-tabs-mode: t; -*-
 """
-Scraper for http://www.genius.com
+Scraper for https://www.musixmatch.com
 
 taxigps
 """
-import sys
-import re
-import urllib.parse
-import requests
-import html
-import difflib
-import json
 
+import os
+import requests
+import re
+import random
+import difflib
+from bs4 import BeautifulSoup
+
+import sys
 from optparse import OptionParser
 from common import utilities
 
-__author__      = "Paul Harrison and ronie"
-__title__       = "Genius"
-__description__ = "Search http://www.genius.com for lyrics"
-__priority__    = "200"
+__author__      = "Paul Harrison and 'ronie'"
+__title__       = "Musixmatch"
+__description__ = "Search https://www.musixmatch.com for lyrics"
+__priority__    = "210"
 __version__     = "0.1"
 __syncronized__ = False
 
-
 debug = False
+
+headers = {}
+headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0'
+
 
 class LyricsFetcher:
     def __init__( self ):
-        self.url = 'http://api.genius.com/search?q=%s%%20%s&access_token=Rq_cyNZ6fUOQr4vhyES6vu1iw3e94RX85ju7S8-0jhM-gftzEvQPG7LJrrnTji11'
+        self.SEARCH_URL = 'https://www.musixmatch.com/search/'
+        self.LYRIC_URL = 'https://www.musixmatch.com'
+
 
     def get_lyrics(self, lyrics):
         utilities.log(debug, "%s: searching lyrics for %s - %s - %s" % (__title__, lyrics.artist, lyrics.album, lyrics.title))
 
+        artist = lyrics.artist.replace(' ', '+')
+        title = lyrics.title.replace(' ', '+')
+        search = '%s+%s' % (artist, title)
         try:
-            headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; rv:77.0) Gecko/20100101 Firefox/77.0'}
-            url = self.url % (urllib.parse.quote(lyrics.artist), urllib.parse.quote(lyrics.title))
-            req = requests.get(url, headers=headers, timeout=10)
-            response = req.text
+            url = self.SEARCH_URL + search
+            response = requests.get(url, headers=headers, timeout=10)
+            result = response.text
         except:
             return False
-        data = json.loads(response)
-        try:
-            name = data['response']['hits'][0]['result']['primary_artist']['name']
-            track = data['response']['hits'][0]['result']['title']
-            if (difflib.SequenceMatcher(None, lyrics.artist.lower(), name.lower()).ratio() > 0.8) and (difflib.SequenceMatcher(None, lyrics.title.lower(), track.lower()).ratio() > 0.8):
-                self.page = data['response']['hits'][0]['result']['url']
-            else:
-                return False
-        except:
+        links = []
+        soup = BeautifulSoup(result, 'html.parser')
+        for item in soup.find_all('li', {'class': 'showArtist'}):
+            artistname = item.find('a', {'class': 'artist'}).get_text()
+            songtitle = item.find('a', {'class': 'title'}).get_text()
+            url = item.find('a', {'class': 'title'}).get('href')
+            if (difflib.SequenceMatcher(None, artist.lower(), artistname.lower()).ratio() > 0.8) and (difflib.SequenceMatcher(None, title.lower(), songtitle.lower()).ratio() > 0.8):
+                links.append((artistname + ' - ' + songtitle, self.LYRIC_URL + url, artistname, songtitle))
+        if len(links) == 0:
             return False
-        utilities.log(debug, '%s: search url: %s' % (__title__, self.page))
+        elif len(links) > 1:
+            lyrics.list = links
+        for link in links:
+            lyr = self.get_lyrics_from_list(link)
+            if lyr:
+                lyrics.lyrics = lyr
+                return True
+        return False
+
+    def get_lyrics_from_list(self, link):
+        title,url,artist,song = link
         try:
-            headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; rv:77.0) Gecko/20100101 Firefox/77.0'}
-            req = requests.get(self.page, headers=headers, timeout=10)
-            response = req.text
+            utilities.log(debug, '%s: search url: %s' % (__title__, url))
+            response = requests.get(url, headers=headers, timeout=10)
+            result = response.text
         except:
-            return False
-        response = html.unescape(response)
-        matchcode = re.findall('class="Lyrics__Container.*?">(.*?)</div><div', response, flags=re.DOTALL)
-        try:
-            lyricscode = ""
-            for matchCodeItem in matchcode:
-                lyricscode = lyricscode + matchCodeItem
-            lyr1 = re.sub('<br/>', '\n', lyricscode)
-            lyr2 = re.sub('<[^<]+?>', '', lyr1)
-            lyr3 = lyr2.replace('\\n','\n').strip()
-            if not lyr3 or lyr3 == '[Instrumental]' or lyr3.startswith('Lyrics for this song have yet to be released'):
-                return False
-            lyrics.lyrics = lyr3
-            return True
-        except:
-            return False
+            return None
+        soup = BeautifulSoup(result, 'html.parser')
+        lyr = soup.find_all('span', {'class': 'lyrics__content__ok'})
+        if lyr:
+            lyrics = ''
+            for part in lyr:
+                lyrics = lyrics + part.get_text() + '\n'
+            return lyrics
+        else:
+            lyr = soup.find_all('span', {'class': 'lyrics__content__error'})
+            if lyr:
+                lyrics = ''
+                for part in lyr:
+                    lyrics = lyrics + part.get_text() + '\n'
+                return lyrics
+
 
 def performSelfTest():
     found = False
@@ -105,8 +123,8 @@ def buildLyrics(lyrics):
     for line in lines:
         etree.SubElement(xml, "lyric").text = line
 
-    utilities.log(True,  utilities.convert_etree(etree.tostring(xml, encoding='UTF-8',
-                                                 pretty_print=True, xml_declaration=True)))
+    utilities.log(True, utilities.convert_etree(etree.tostring(xml, encoding='UTF-8',
+                                                pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def buildVersion():
@@ -114,7 +132,7 @@ def buildVersion():
     version = etree.XML(u'<grabber></grabber>')
     etree.SubElement(version, "name").text = __title__
     etree.SubElement(version, "author").text = __author__
-    etree.SubElement(version, "command").text = 'genius.py'
+    etree.SubElement(version, "command").text = 'musixmatch.py'
     etree.SubElement(version, "type").text = 'lyrics'
     etree.SubElement(version, "description").text = __description__
     etree.SubElement(version, "version").text = __version__

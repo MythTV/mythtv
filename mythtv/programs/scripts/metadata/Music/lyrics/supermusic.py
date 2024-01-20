@@ -1,73 +1,71 @@
-#-*- coding: UTF-8 -*-
+# -*- Mode: python; coding: utf-8; tab-width: 8; indent-tabs-mode: t; -*-
 """
-Scraper for http://www.genius.com
+Scraper for https://supermusic.cz
 
-taxigps
+Jose Riha
 """
-import sys
+
 import re
-import urllib.parse
 import requests
 import html
-import difflib
-import json
 
+import os
+import sys
 from optparse import OptionParser
 from common import utilities
 
-__author__      = "Paul Harrison and ronie"
-__title__       = "Genius"
-__description__ = "Search http://www.genius.com for lyrics"
-__priority__    = "200"
+__author__      = "Paul Harrison and Jose Riha"
+__title__       = "SuperMusic"
+__description__ = "Search https://supermusic.cz for lyrics"
+__priority__    = "250"
 __version__     = "0.1"
 __syncronized__ = False
-
 
 debug = False
 
 class LyricsFetcher:
     def __init__( self ):
-        self.url = 'http://api.genius.com/search?q=%s%%20%s&access_token=Rq_cyNZ6fUOQr4vhyES6vu1iw3e94RX85ju7S8-0jhM-gftzEvQPG7LJrrnTji11'
+        return
 
     def get_lyrics(self, lyrics):
         utilities.log(debug, "%s: searching lyrics for %s - %s - %s" % (__title__, lyrics.artist, lyrics.album, lyrics.title))
 
+        artist = lyrics.artist.lower()
+        title = lyrics.title.lower()
+
         try:
-            headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; rv:77.0) Gecko/20100101 Firefox/77.0'}
-            url = self.url % (urllib.parse.quote(lyrics.artist), urllib.parse.quote(lyrics.title))
-            req = requests.get(url, headers=headers, timeout=10)
+            req = requests.post('https://supermusic.cz/najdi.php', data={'hladane': title, 'typhladania': 'piesen', 'fraza': 'off'})
             response = req.text
         except:
             return False
-        data = json.loads(response)
+        req.close()
+        url = None
         try:
-            name = data['response']['hits'][0]['result']['primary_artist']['name']
-            track = data['response']['hits'][0]['result']['title']
-            if (difflib.SequenceMatcher(None, lyrics.artist.lower(), name.lower()).ratio() > 0.8) and (difflib.SequenceMatcher(None, lyrics.title.lower(), track.lower()).ratio() > 0.8):
-                self.page = data['response']['hits'][0]['result']['url']
-            else:
-                return False
+            items = re.search(r'Počet nájdených piesní.+<br><br>(.*)<BR>', response, re.S).group(1)
+            for match in re.finditer(r'<a href=(?P<url>"[^"]+?") target="_parent"><b>(?P<artist>.*?)</b></a> - (?P<type>.+?) \(<a href', items):
+                matched_url, matched_artist, matched_type = match.groups()
+                if matched_type not in ('text', 'akordy a text'):
+                    continue
+                if matched_artist.lower() == artist:
+                    url = matched_url.strip('"')
+                    break
         except:
             return False
-        utilities.log(debug, '%s: search url: %s' % (__title__, self.page))
+        print(url)
+        if not url:
+            return False
+
         try:
-            headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; rv:77.0) Gecko/20100101 Firefox/77.0'}
-            req = requests.get(self.page, headers=headers, timeout=10)
+            req = requests.get('https://supermusic.cz/%s' % url)
             response = req.text
-        except:
-            return False
-        response = html.unescape(response)
-        matchcode = re.findall('class="Lyrics__Container.*?">(.*?)</div><div', response, flags=re.DOTALL)
-        try:
-            lyricscode = ""
-            for matchCodeItem in matchcode:
-                lyricscode = lyricscode + matchCodeItem
-            lyr1 = re.sub('<br/>', '\n', lyricscode)
-            lyr2 = re.sub('<[^<]+?>', '', lyr1)
-            lyr3 = lyr2.replace('\\n','\n').strip()
-            if not lyr3 or lyr3 == '[Instrumental]' or lyr3.startswith('Lyrics for this song have yet to be released'):
-                return False
-            lyrics.lyrics = lyr3
+            lyr = re.search(r'class=piesen>(.*?)</font>', response, re.S).group(1)
+            lyr = re.sub(r'<sup>.*?</sup>', '', lyr)
+            lyr = re.sub(r'<br\s*/>\s*', '\n', lyr)
+            lyr = re.sub(r'<!--.*?-->', '', lyr, flags=re.DOTALL)
+            lyr = re.sub(r'<[^>]*?>', '', lyr, flags=re.DOTALL)
+            lyr = lyr.strip('\r\n')
+            lyr = html.unescape(lyr)
+            lyrics.lyrics = lyr
             return True
         except:
             return False
@@ -77,9 +75,9 @@ def performSelfTest():
     lyrics = utilities.Lyrics()
     lyrics.source = __title__
     lyrics.syncronized = __syncronized__
-    lyrics.artist = 'Dire Straits'
-    lyrics.album = 'Brothers In Arms'
-    lyrics.title = 'Money For Nothing'
+    lyrics.artist = 'Karel Gott'
+    lyrics.album = ''
+    lyrics.title = 'Trezor'
 
     fetcher = LyricsFetcher()
     found = fetcher.get_lyrics(lyrics)
@@ -105,8 +103,8 @@ def buildLyrics(lyrics):
     for line in lines:
         etree.SubElement(xml, "lyric").text = line
 
-    utilities.log(True,  utilities.convert_etree(etree.tostring(xml, encoding='UTF-8',
-                                                 pretty_print=True, xml_declaration=True)))
+    utilities.log(True, utilities.convert_etree(etree.tostring(xml, encoding='UTF-8',
+                                                pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def buildVersion():
@@ -114,7 +112,7 @@ def buildVersion():
     version = etree.XML(u'<grabber></grabber>')
     etree.SubElement(version, "name").text = __title__
     etree.SubElement(version, "author").text = __author__
-    etree.SubElement(version, "command").text = 'genius.py'
+    etree.SubElement(version, "command").text = 'supermusic.py'
     etree.SubElement(version, "type").text = 'lyrics'
     etree.SubElement(version, "description").text = __description__
     etree.SubElement(version, "version").text = __version__

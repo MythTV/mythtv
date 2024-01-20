@@ -36,18 +36,18 @@ class LyricsFetcher:
 
     def direct_url(self, url):
         try:
-            utilities.log(True, '%s: direct url: %s' % (__title__, url))
+            utilities.log(debug, '%s: direct url: %s' % (__title__, url))
             song_search = requests.get(url, timeout=10)
             response = song_search.text
             if response.find('lyrics_text') >= 0:
                 return response
         except:
-            utilities.log(True, 'error in direct url')
+            utilities.log(debug, 'error in direct url')
 
     def search_url(self, artist, title):
         try:
             url = 'http://www.lyricsmode.com/search.php?search=' + urllib.parse.quote_plus(artist.lower() + ' ' + title.lower())
-            utilities.log(True, '%s: search url: %s' % (__title__, url))
+            utilities.log(debug, '%s: search url: %s' % (__title__, url))
             song_search = requests.get(url, timeout=10)
             response = song_search.text
             matchcode = re.search('lm-list__cell-title">.*?<a href="(.*?)" class="lm-link lm-link--primary', response, flags=re.DOTALL)
@@ -59,7 +59,7 @@ class LyricsFetcher:
             except:
                 return
         except:
-            utilities.log(True, 'error in search url')
+            utilities.log(debug, 'error in search url')
 
 
 def performSelfTest():

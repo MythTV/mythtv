@@ -1,76 +1,73 @@
 #-*- coding: UTF-8 -*-
-"""
-Scraper for http://www.genius.com
+'''
+Scraper for https://lrclib.net/
 
-taxigps
-"""
-import sys
-import re
-import urllib.parse
+lrclib
+
+https://github.com/rtcq/syncedlyrics
+'''
+
 import requests
-import html
 import difflib
-import json
 
+import sys
 from optparse import OptionParser
-from common import utilities
+from common import *
 
 __author__      = "Paul Harrison and ronie"
-__title__       = "Genius"
-__description__ = "Search http://www.genius.com for lyrics"
-__priority__    = "200"
+__title__       = "LrcLib"
+__description__ = "Search https://lrclib.net for lyrics"
+__priority__    = "110"
 __version__     = "0.1"
-__syncronized__ = False
+__syncronized__ = True
 
 
 debug = False
 
 class LyricsFetcher:
     def __init__( self ):
-        self.url = 'http://api.genius.com/search?q=%s%%20%s&access_token=Rq_cyNZ6fUOQr4vhyES6vu1iw3e94RX85ju7S8-0jhM-gftzEvQPG7LJrrnTji11'
+        self.SEARCH_URL = 'https://lrclib.net/api/search?q=%s-%s'
+        self.LYRIC_URL = 'https://lrclib.net/api/get/%i'
 
     def get_lyrics(self, lyrics):
         utilities.log(debug, "%s: searching lyrics for %s - %s - %s" % (__title__, lyrics.artist, lyrics.album, lyrics.title))
 
         try:
-            headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; rv:77.0) Gecko/20100101 Firefox/77.0'}
-            url = self.url % (urllib.parse.quote(lyrics.artist), urllib.parse.quote(lyrics.title))
-            req = requests.get(url, headers=headers, timeout=10)
-            response = req.text
+            url = self.SEARCH_URL % (lyrics.artist, lyrics.title)
+            response = requests.get(url, timeout=10)
+            result = response.json()
         except:
             return False
-        data = json.loads(response)
+        links = []
+        for item in result: 
+            artistname = item['artistName']
+            songtitle = item['name']
+            songid = item['id']
+            if (difflib.SequenceMatcher(None, lyrics.artist.lower(), artistname.lower()).ratio() > 0.8) and (difflib.SequenceMatcher(None, lyrics.title.lower(), songtitle.lower()).ratio() > 0.8):
+                links.append((artistname + ' - ' + songtitle, self.LYRIC_URL % songid, artistname, songtitle))
+        if len(links) == 0:
+            return False
+        elif len(links) > 1:
+            lyrics.list = links
+        for link in links:
+            lyr = self.get_lyrics_from_list(link)
+            if lyr:
+                lyrics.lyrics = lyr
+                return True
+        return False
+
+    def get_lyrics_from_list(self, link):
+        title,url,artist,song = link
         try:
-            name = data['response']['hits'][0]['result']['primary_artist']['name']
-            track = data['response']['hits'][0]['result']['title']
-            if (difflib.SequenceMatcher(None, lyrics.artist.lower(), name.lower()).ratio() > 0.8) and (difflib.SequenceMatcher(None, lyrics.title.lower(), track.lower()).ratio() > 0.8):
-                self.page = data['response']['hits'][0]['result']['url']
-            else:
-                return False
+            utilities.log(debug, '%s: search url: %s' % (__title__, url))
+            response = requests.get(url, timeout=10)
+            result = response.json()
         except:
-            return False
-        utilities.log(debug, '%s: search url: %s' % (__title__, self.page))
-        try:
-            headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; rv:77.0) Gecko/20100101 Firefox/77.0'}
-            req = requests.get(self.page, headers=headers, timeout=10)
-            response = req.text
-        except:
-            return False
-        response = html.unescape(response)
-        matchcode = re.findall('class="Lyrics__Container.*?">(.*?)</div><div', response, flags=re.DOTALL)
-        try:
-            lyricscode = ""
-            for matchCodeItem in matchcode:
-                lyricscode = lyricscode + matchCodeItem
-            lyr1 = re.sub('<br/>', '\n', lyricscode)
-            lyr2 = re.sub('<[^<]+?>', '', lyr1)
-            lyr3 = lyr2.replace('\\n','\n').strip()
-            if not lyr3 or lyr3 == '[Instrumental]' or lyr3.startswith('Lyrics for this song have yet to be released'):
-                return False
-            lyrics.lyrics = lyr3
-            return True
-        except:
-            return False
+            return None
+        if 'syncedLyrics' in result:
+            lyrics = result['syncedLyrics']
+            return lyrics
+
 
 def performSelfTest():
     found = False
@@ -105,8 +102,8 @@ def buildLyrics(lyrics):
     for line in lines:
         etree.SubElement(xml, "lyric").text = line
 
-    utilities.log(True,  utilities.convert_etree(etree.tostring(xml, encoding='UTF-8',
-                                                 pretty_print=True, xml_declaration=True)))
+    utilities.log(True, utilities.convert_etree(etree.tostring(xml, encoding='UTF-8',
+                                                pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def buildVersion():
@@ -114,7 +111,7 @@ def buildVersion():
     version = etree.XML(u'<grabber></grabber>')
     etree.SubElement(version, "name").text = __title__
     etree.SubElement(version, "author").text = __author__
-    etree.SubElement(version, "command").text = 'genius.py'
+    etree.SubElement(version, "command").text = 'lrclib.py'
     etree.SubElement(version, "type").text = 'lyrics'
     etree.SubElement(version, "description").text = __description__
     etree.SubElement(version, "version").text = __version__
@@ -176,8 +173,9 @@ def main():
         buildLyrics(lyrics)
         sys.exit(0)
     else:
-        utilities.log(True, "No lyrics found for this track")
+        utilities.log(True,  "No lyrics found for this track")
         sys.exit(1)
+
 
 if __name__ == '__main__':
     main()
