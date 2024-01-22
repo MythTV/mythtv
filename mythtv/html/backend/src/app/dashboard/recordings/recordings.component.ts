@@ -212,14 +212,23 @@ export class RecordingsComponent implements OnInit {
     return duration;
   }
 
+  // return true causes default browser right click menu to show
+  // return false suppresses default browser right click menu
   onContextMenu(program: ScheduleOrProgram, event: any) {
+    if (this.selection.length == 0)
+      return true;
+    if (event.target && event.target.id && event.target.id.startsWith('download_'))
+      return true;
     if (this.selection.some((x) => !x)) {
+      // This happens if some entries have not been loaded
       this.sendMessage('error', null, '', this.msg.UndefSelection);
       return false;
     }
-    if (this.selection.some((x) => x.Recording.RecordedId == program.Recording.RecordedId))
+    if (this.selection.some((x) => x.Recording.RecordedId == program.Recording.RecordedId)) {
       this.showContextMenu(null, event);
-    return false;
+      return false;
+    }
+    return true;
   }
 
   onSelectChange() {

@@ -114,7 +114,7 @@
                         <a href="{{URLencode('/Content/GetRecording?RecordedId=' + program.Recording.RecordedId)}}"
                             target="_blank" pTooltip="{{ 'dashboard.recordings.download' | translate }}"
                             tooltipPosition="left">
-                            <i class="pi pi-download text-primary"></i></a>
+                            <i class="pi pi-download text-primary" [id]="'download_'+ rowIndex"></i></a>
                         <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
                             (click)="showContextMenu(program,$event)"></button>
                     </td>
