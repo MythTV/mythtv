@@ -1,0 +1,8 @@
+# CU LRC files not needed in MythMusic:
+addon.xml
+default.py
+README.txt
+resources
+
+# twitham's extra files not needed:
+filetweak.py
