@@ -1,10 +1,80 @@
-Lyrics Grabbers
-===============
+Lyrics Grabbers for MythMusic of MythTV
+=======================================
 
 You can add your own grabbers to this directory and MythMusic will
 automatically use them so long as they comply with the other grabbers.
 
-The grabber should support these command line options :-
+The included grabbers are sourced from the CU LRC Kodi addon:
+
+        https://gitlab.com/ronie/script.cu.lrclyrics
+
+
+Copyright / LICENSE
+===================
+
+CU LRC and therefore this directory are licensed under the terms of
+the GNU GPL version 2, see ./LICENSE.txt for details.
+
+
+Grabbers as/of 2024/01, Their Priority And Whether Synchronized
+===============================================================
+
+EmbeddedLyrics   50    Yes/No
+FileLyrics       90    Yes/No
+musixmatchlrc   100     Yes     NEW in v34
+lrclib          110     Yes     NEW in v34
+lyricsify       130     Yes     NEW in v34
+genius          200     No
+musixmatch      210     No      NEW in v34
+lyricsmode      220     No
+azlyrics        230     No      NEW in v34
+lyricscom       240     No
+supermusic      250     No      NEW in v34
+darklyrics      260     No
+megalobiz       400     Yes     (too slow to be earlier, was 140)
+music163        500     Yes     (sometimes returns author only, was 120)
+
+
+To Upgrade to latest CU LRC
+===========================
+
+Simply overwrite lib/ with the latest from the source:
+
+	https://gitlab.com/ronie/script.cu.lrclyrics
+
+* remove any ./*.py that has been removed from lib/culrcscrapers
+
+* add a new ./*.py for any new scraper in lib/culrcscrapers
+
+* adjust the fields of info{} as needed
+
+* overwrite ./changelog.txt from the source, compare its head to line
+  2 of addon.xml in the source and update the latest version number
+  into the header of ./common/culrcwrap.py
+
+* ./testlyrics -k -t
+
+That's all!
+
+As of v34 in 2024/01 this is how we use CU LRC unmodified:
+
+Only a small boilerplate bootstrap file of a few lines of information
+is needed in this directory.  These files import only the
+LyricsFetcher from ./lib/culrcscrapers or from ./common for any
+additional grabbers like filelyrics.py. Finally they run main from
+./common/culrcwrap.py which implements the below CLI translation to
+MythTV via a very tiny and simple ./Kodistubs.
+
+Custom grabbers can similarly use ./common/culrcwrap.py for the CLI
+and simply put their LyricsFetcher in ./common, like filelyrics did.
+
+
+Required command line options for all grabbers
+==============================================
+
+(automatically done by ./common/culrcwrap.py)
+
+All grabbers should support these command line options:
 
 Options:
   -h, --help            show this help message and exit
@@ -87,20 +157,3 @@ Options:
 
 
 
-Current Grabbers, Their Priority And Whether Synchronized
-=========================================================
-
-EmbeddedLyrics   50     Yes/No
-FileLyrics       90     Yes/No
-musixmatchlrc   100     Yes     NEW in v34
-lrclib          110     Yes     NEW in v34
-lyricsify       130     Yes     NEW in v34
-genius          200     No
-musixmatch      210     No      NEW in v34
-lyricsmode      220     No
-azlyrics        230     No      NEW in v34
-lyricscom       240     No
-supermusic      250     No      NEW in v34
-darklyrics      260     No
-megalobiz       400     Yes     (too slow to be earlier, was 140)
-music163        500     Yes     (returns incomplete results, was 120)
