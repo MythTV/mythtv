@@ -4,6 +4,7 @@
 void strings_null() {
     ThemeUI::tr(" Retro Originally by Gerhard Aldorf MythUI version based on MythCenter by Jeroen Brosens Conversion of Retro to MythUI by Chris Candreva A generally blue theme. Icon style is realistic based on clasic, 'Retro' styles. ");
     ThemeUI::tr("# to Keep:");
+    ThemeUI::tr("%(|REMAININGTIME|)%%(|BEHINDTIME|)%");
     ThemeUI::tr("%(|USERRATING)%");
     ThemeUI::tr("%00x00%");
     ThemeUI::tr("%00x00| %%SUBTITLE%");
@@ -51,6 +52,7 @@ void strings_null() {
     ThemeUI::tr("%DESCRIPTION% %\n(|EXTRA|)%");
     ThemeUI::tr("%DESCRIPTION% (%ERRATA%)");
     ThemeUI::tr("%DESCRIPTION% (%LENMINS%) %YEARSTARS% %PROGRAMID%");
+    ThemeUI::tr("%DESCRIPTION%% |VALUE%%UNITS%% (|REMAININGTIME| remaining)%% (|BEHINDTIME| behind)%");
     ThemeUI::tr("%DESCRIPTION%\n%ERRATA%");
     ThemeUI::tr("%DESCRIPTION|\n%%ERRATA%");
     ThemeUI::tr("%DIRECTOR%");
@@ -78,7 +80,6 @@ void strings_null() {
     ThemeUI::tr("%ORIGINALAIRDATE% %REPEAT%");
     ThemeUI::tr("%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME| remaining)%");
     ThemeUI::tr("%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%");
-    ThemeUI::tr("%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME|)%%(|BEHINDTIME|)%");
     ThemeUI::tr("%PLAYEDTIME% of %TOTALTIME%\n%(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%");
     ThemeUI::tr("%PLAYEDTIME| of% %TOTALTIME% %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%");
     ThemeUI::tr("%PLAYGROUP% play group");
@@ -95,6 +96,7 @@ void strings_null() {
     ThemeUI::tr("%SOURCENAME|\n%%CHANID| %");
     ThemeUI::tr("%STARTDATE%  (%STARTTIME% - %ENDTIME%)  %LENMINS%");
     ThemeUI::tr("%STARTDATE% %STARTTIME%%-|ENDTIME| %%00X00| %\n%\"|SUBTITLE|\" %%(|ORIGINALAIRDATE|)%");
+    ThemeUI::tr("%STARTDATE% %STARTTIME%-%ENDTIME% : %LENMINS%");
     ThemeUI::tr("%STARTDATE|, %%STARTTIME%% - |ENDTIME%");
     ThemeUI::tr("%STARTDATE|, %%STARTTIME%% - |ENDTIME|: %%LENMINS%");
     ThemeUI::tr("%STARTDATE|, %%STARTTIME%%- |ENDTIME%");
