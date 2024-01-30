@@ -921,7 +921,9 @@ void VideoDialog::OnPlaybackStopped()
         m_d->m_playbackState.Update(metadata->GetFilename());
     }
     UpdateText(item);
+    UpdateWatchedState(item);
 }
+
 
 VideoDialog::~VideoDialog()
 {
@@ -2335,6 +2337,34 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
 
     if (node)
         node->becomeSelectedChild();
+}
+
+/** \fn VideoDialog::UpdateWatchedState(MythUIButtonListItem *item)
+ *  \brief Update the watched state for a given ButtonListItem from the database.
+ *  \return void.
+ * 
+ *  The player could have updated the watched state of a video after watching.
+ *  We load the metadata of the current item from the database and sync the
+ *  watched state of the current item if it was changed by the player.
+ */
+void VideoDialog::UpdateWatchedState(MythUIButtonListItem *item)
+{
+    if (!gCoreContext->GetBoolSetting("AutomaticSetWatched", false))
+        return;
+
+    if (!item)
+        return;
+
+    VideoMetadata *metadata = GetMetadata(item);
+    if (!metadata)
+        return;
+
+    auto metadataNew = m_d->m_videoList->getListCache().loadOneFromDatabase(metadata->GetID());
+    if (metadata->GetWatched() != metadataNew->GetWatched())
+    {
+        metadata->SetWatched(metadataNew->GetWatched());
+        item->DisplayState(WatchedToState(metadata->GetWatched()), "watchedstate");
+    }
 }
 
 /** \fn VideoDialog::VideoMenu()
