@@ -1881,6 +1881,22 @@ static HostCheckBoxSetting *AutomaticSetWatched()
     return gc;
 }
 
+static HostCheckBoxSetting *AlwaysShowWatchedProgress()
+{
+    auto *gc = new HostCheckBoxSetting("AlwaysShowWatchedProgress");
+
+    gc->setLabel(PlaybackSettings::tr("Always show watched percent progress bar"));
+
+    gc->setValue(false);
+
+    gc->setHelpText(PlaybackSettings::tr("If enabled, shows the watched percent "
+                                         "progress bar even if the recording or "
+                                         "video is marked as watched. "
+                                         "Having a watched percent progress bar at "
+                                         "all depends on the currently used theme."));
+    return gc;
+}
+
 static HostSpinBoxSetting *LiveTVIdleTimeout()
 {
     auto *gs = new HostSpinBoxSetting("LiveTVIdleTimeout", 0, 3600, 1);
@@ -4407,6 +4423,7 @@ void PlaybackSettings::Load(void)
     general->addChild(JumpToProgramOSD());
     general->addChild(UseProgStartMark());
     general->addChild(AutomaticSetWatched());
+    general->addChild(AlwaysShowWatchedProgress());
     general->addChild(ContinueEmbeddedTVPlay());
     general->addChild(LiveTVIdleTimeout());
 

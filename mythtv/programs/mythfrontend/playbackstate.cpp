@@ -1,9 +1,17 @@
 #include "playbackstate.h"
+
+// MythTV
+#include "libmyth/mythcontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/programtypes.h"
 #include "libmythmetadata/videometadata.h"
+
+PlaybackState::PlaybackState()
+{
+    m_alwaysShowWatchedProgress = gCoreContext->GetBoolSetting("AlwaysShowWatchedProgress", false);
+}
 
 void PlaybackState::Initialize()
 {
@@ -115,4 +123,9 @@ uint PlaybackState::GetWatchedPercent(const QString &filename) const
         return 0;
     }
     return std::clamp(100 * pos / total, (uint64_t)0, (uint64_t)100);
+}
+
+bool PlaybackState::AlwaysShowWatchedProgress() const
+{
+    return m_alwaysShowWatchedProgress;
 }

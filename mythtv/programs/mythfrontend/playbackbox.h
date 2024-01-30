@@ -466,6 +466,7 @@ class PlaybackBox : public ScheduleCommon
     bool                m_groupSelected       {false};
     bool                m_passwordEntered     {false};
 
+    bool                m_alwaysShowWatchedProgress {false};
     // This class caches the contents of the jobqueue table to avoid excessive
     // DB queries each time the PBB selection changes (currently 4 queries per
     // displayed item).  The cache remains valid for 15 seconds

@@ -11,7 +11,7 @@
 class PlaybackState
 {
 public:
-    PlaybackState() = default;
+    PlaybackState();
 
     /// Initializes playback state from database
     void Initialize();
@@ -28,6 +28,9 @@ public:
     /// Query watched percent of video with the specified filename
     uint GetWatchedPercent(const QString &filename) const;
 
+    /// Returns cached setting "AlwaysShowWatchedProgress"
+    bool AlwaysShowWatchedProgress() const;
+
 private:
     /// Query playback state from database, only for single video if a filename is specified
     void QueryData(const QString &filterFilename = QString());
@@ -40,6 +43,7 @@ private:
     };
 
     QMap<QString, Markup> m_fileMarkup; ///< maps filename to markup
+    bool m_alwaysShowWatchedProgress {false};
 };
 
 #endif // PLAYBACKSTATE_H_

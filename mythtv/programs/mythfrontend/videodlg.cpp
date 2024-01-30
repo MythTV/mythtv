@@ -575,10 +575,11 @@ namespace
 
         const auto bookmarkState = playbackState.HasBookmark(metadata->GetFilename()) ? "yes" : "no";
         const auto watchedPercent = playbackState.GetWatchedPercent(metadata->GetFilename());
+        const bool showProgress = watchedPercent && (playbackState.AlwaysShowWatchedProgress() || !metadata->GetWatched());
         if (item)
         {
             item->DisplayState(bookmarkState, "bookmarkstate");
-            item->SetProgress1(0, watchedPercent ? 100 : 0, watchedPercent);
+            item->SetProgress1(0, showProgress ? 100 : 0, watchedPercent);
         }
         if (screen)
         {
@@ -586,7 +587,7 @@ namespace
             auto watchedProgress = dynamic_cast<MythUIProgressBar *>(screen->GetChild("watchedprogressbar"));
             if (watchedProgress)
             {
-                watchedProgress->Set(0, 100, watchedPercent);
+                watchedProgress->Set(0, showProgress ? 100 : 0, watchedPercent);
             }
         }
     }
