@@ -61,6 +61,7 @@ class VideoDialog : public MythScreenType
 
   public slots:
     void searchComplete(const QString& string);
+    void playbackStateChanged(const QString &filename);
 
   protected slots:
     void Init() override; /// Called after the screen is created by MythScreenStack

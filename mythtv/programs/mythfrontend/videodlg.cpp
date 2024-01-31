@@ -901,6 +901,17 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, const QString& lname,
     connect(gCoreContext, &MythCoreContext::TVPlaybackAborted, this, &VideoDialog::OnPlaybackStopped);
 }
 
+void VideoDialog::playbackStateChanged(const QString &filename)
+{
+    m_d->m_playbackState.Update(filename);
+    auto *item = GetItemCurrent();
+    const auto *metadata = GetMetadata(item);
+    if (metadata && metadata->GetFilename() == filename)
+    {
+        UpdateText(item);
+    }
+}
+
 void VideoDialog::OnPlaybackStopped()
 {
     auto *item = GetItemCurrent();
