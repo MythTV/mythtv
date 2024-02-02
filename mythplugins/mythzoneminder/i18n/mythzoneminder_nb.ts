@@ -11,22 +11,22 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythzoneminder/mythzoneminder.cpp" line="176"/>
+        <location filename="../mythzoneminder/mythzoneminder.cpp" line="174"/>
         <source>ZoneMinder Console</source>
         <translation>ZoneMinder konsoll</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/mythzoneminder.cpp" line="178"/>
+        <location filename="../mythzoneminder/mythzoneminder.cpp" line="176"/>
         <source>ZoneMinder Live View</source>
         <translation>ZoneMinder live-visning</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/mythzoneminder.cpp" line="180"/>
+        <location filename="../mythzoneminder/mythzoneminder.cpp" line="178"/>
         <source>ZoneMinder Events</source>
         <translation>ZoneMinder hendelser</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/mythzoneminder.cpp" line="182"/>
+        <location filename="../mythzoneminder/mythzoneminder.cpp" line="180"/>
         <source>ZoneMinder Mini Live View</source>
         <translation>ZoneMinder mini live-visning</translation>
     </message>
@@ -626,49 +626,49 @@
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="166"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="337"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="352"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="335"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="350"/>
         <source>All Cameras</source>
         <translation>Alle kamera</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="169"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="361"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="359"/>
         <source>All Dates</source>
         <translation>Alle datoer</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="438"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="436"/>
         <source>Refresh</source>
         <translation>Oppdater</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="441"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="439"/>
         <source>Hide Continuous Events</source>
         <translation>Skjul kontinuerlige hendelser</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="443"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="441"/>
         <source>Show Continuous Events</source>
         <translation>Vis kontinuerlige hendelser</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="445"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="443"/>
         <source>Change View</source>
         <translation>Endre visning</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="446"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="444"/>
         <source>Delete All</source>
         <translation>Slett alle</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="464"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="462"/>
         <source>Delete All Events?</source>
         <translation>Slette alle hendelser?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="465"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="463"/>
         <source>Deleting %1 events in this view.</source>
         <translation>Sletter %1 hendelser i denne visningen.</translation>
     </message>

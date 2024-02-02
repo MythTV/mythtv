@@ -81,12 +81,12 @@ Käytä &apos;Lisää kirjainmerkki&apos; valikosta lisätäksesi uusia kirjainm
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="494"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="492"/>
         <source>Are you sure you want to delete the selected bookmark?</source>
         <translation>Haluatko varmasti poistaa valitun kirjainmerkin?</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="538"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="536"/>
         <source>Are you sure you want to delete the marked bookmarks?</source>
         <translation>Haluatko varmasti poistaa valitut kirjainmerkit?</translation>
     </message>
@@ -128,7 +128,7 @@ Käytä &apos;Lisää kirjainmerkki&apos; valikosta lisätäksesi uusia kirjainm
     <name>MythBrowser</name>
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="139"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="351"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="349"/>
         <source>Enter URL</source>
         <translation>Anna www -osoite</translation>
     </message>
@@ -138,42 +138,42 @@ Käytä &apos;Lisää kirjainmerkki&apos; valikosta lisätäksesi uusia kirjainm
         <translation>Lataa...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="338"/>
         <source>Actions</source>
         <translation>Toiminnot</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="354"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="352"/>
         <source>Back</source>
         <translation>Takaisin</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="355"/>
         <source>Forward</source>
         <translation>Eteenpäin</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="359"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
         <source>Zoom In</source>
         <translation>Suurenna</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="360"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="358"/>
         <source>Zoom Out</source>
         <translation>Loitonna</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="361"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="359"/>
         <source>New Tab</source>
         <translation>Uusi välilehti</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="362"/>
         <source>Delete Tab</source>
         <translation>Poista välilehti</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="366"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
         <source>Add Bookmark</source>
         <translation>Lisää kirjainmerkki</translation>
     </message>

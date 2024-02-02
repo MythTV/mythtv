@@ -79,12 +79,12 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="494"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="492"/>
         <source>Are you sure you want to delete the selected bookmark?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="538"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="536"/>
         <source>Are you sure you want to delete the marked bookmarks?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -130,7 +130,7 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
     <name>MythBrowser</name>
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="139"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="351"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="349"/>
         <source>Enter URL</source>
         <translation type="unfinished"></translation>
     </message>
@@ -140,42 +140,42 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
         <translation>ローディング...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="338"/>
         <source>Actions</source>
         <translation>アクション</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="354"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="352"/>
         <source>Back</source>
         <translation>帰り</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="355"/>
         <source>Forward</source>
         <translation>送る</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="359"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
         <source>Zoom In</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="360"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="358"/>
         <source>Zoom Out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="361"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="359"/>
         <source>New Tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="362"/>
         <source>Delete Tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="366"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
         <source>Add Bookmark</source>
         <translation type="unfinished"></translation>
     </message>

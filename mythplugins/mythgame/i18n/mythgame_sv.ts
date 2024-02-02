@@ -336,27 +336,27 @@ Ta bort det från databasen?</translation>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythgame/mythgame.cpp" line="114"/>
+        <location filename="../mythgame/mythgame.cpp" line="112"/>
         <source>Game frontend</source>
         <translation>Spelgränssnitt</translation>
     </message>
     <message>
-        <location filename="../mythgame/mythgame.cpp" line="117"/>
+        <location filename="../mythgame/mythgame.cpp" line="115"/>
         <source>Toggle the current game as a favorite</source>
         <translation>Växla aktuellt spel som favorit</translation>
     </message>
     <message>
-        <location filename="../mythgame/mythgame.cpp" line="119"/>
+        <location filename="../mythgame/mythgame.cpp" line="117"/>
         <source>Show incremental search dialog</source>
         <translation>Visa inkrementell sökdialog</translation>
     </message>
     <message>
-        <location filename="../mythgame/mythgame.cpp" line="121"/>
+        <location filename="../mythgame/mythgame.cpp" line="119"/>
         <source>Incremental search find next match</source>
         <translation>Nästa träff vid inkrementell sökning</translation>
     </message>
     <message>
-        <location filename="../mythgame/mythgame.cpp" line="123"/>
+        <location filename="../mythgame/mythgame.cpp" line="121"/>
         <source>Download metadata for current item</source>
         <translation>Hämta metadata för aktuell post</translation>
     </message>

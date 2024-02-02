@@ -14,19 +14,19 @@ Have you set the correct path in the settings?</source>
 <context>
     <name>(MythArchiveMain)</name>
     <message>
-        <location filename="../mytharchive/mytharchive.cpp" line="92"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="100"/>
         <source>Found a lock file but the owning process isn&apos;t running!
 Removing stale lock file.</source>
         <translation type="unfinished">Найден файл блокировки, но процесс-владелец не запущен!
 Удаление устаревшего файла блокировки.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mytharchive.cpp" line="203"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="211"/>
         <source>Last run did not create a playable DVD.</source>
         <translation type="unfinished">Последний запуск не создал воспроизводимый DVD.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mytharchive.cpp" line="210"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="218"/>
         <source>Last run failed to create a DVD.</source>
         <translation type="unfinished">Произошел сбой при последнем выполнении создания DVD.</translation>
     </message>
@@ -381,37 +381,37 @@ Removing stale lock file.</source>
 <context>
     <name>BurnMenu</name>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1092"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1091"/>
         <source>Cannot burn a DVD.
 The last run failed to create a DVD.</source>
         <translation type="unfinished">Не могу записать DVD.
 Произошел сбой при последнем выполнении создания DVD.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1098"/>
-        <location filename="../mytharchive/mythburn.cpp" line="1110"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1097"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1109"/>
         <source>Burn DVD</source>
         <translation type="unfinished">Записать DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1099"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1098"/>
         <source>
 Place a blank DVD in the drive and select an option below.</source>
         <translation type="unfinished">
 Поместите чистый DVD в привод и выберите параметры расположенные ниже.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1111"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1110"/>
         <source>Burn DVD Rewritable</source>
         <translation type="unfinished">Записать перезаписываемый DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1112"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1111"/>
         <source>Burn DVD Rewritable (Force Erase)</source>
         <translation type="unfinished">Записать перезаписываемый DVD (Принудительно очистить диск)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1166"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1165"/>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
         <translation type="unfinished">Невозможно запустить mytharchivehelper для записи DVD.</translation>
     </message>
@@ -642,28 +642,28 @@ This may take a few minutes.</source>
         <translation type="obsolete">Не используется список вырезок</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="329"/>
-        <location filename="../mytharchive/mythburn.cpp" line="449"/>
+        <location filename="../mytharchive/mythburn.cpp" line="328"/>
+        <location filename="../mytharchive/mythburn.cpp" line="448"/>
         <source>No Cut List</source>
         <translation>Нет списка вырезок</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="340"/>
+        <location filename="../mytharchive/mythburn.cpp" line="339"/>
         <source>You need to add at least one item to archive!</source>
         <translation>Вы должны добавить в архив минимум один элемент!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="386"/>
+        <location filename="../mytharchive/mythburn.cpp" line="385"/>
         <source>Retrieving File Information. Please Wait...</source>
         <translation>Получение информации о файле. Подождите пожалуйста...</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="452"/>
+        <location filename="../mytharchive/mythburn.cpp" line="451"/>
         <source>Encoder: </source>
         <translation>Кодировщик: </translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="764"/>
+        <location filename="../mytharchive/mythburn.cpp" line="763"/>
         <source>Menu</source>
         <translation>Меню</translation>
     </message>
@@ -676,49 +676,49 @@ This may take a few minutes.</source>
         <translation type="obsolete">Использовать список вырезок</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="318"/>
-        <location filename="../mytharchive/mythburn.cpp" line="438"/>
+        <location filename="../mytharchive/mythburn.cpp" line="317"/>
+        <location filename="../mytharchive/mythburn.cpp" line="437"/>
         <source>Using Cut List</source>
         <translation>Используется список вырезок</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="323"/>
-        <location filename="../mytharchive/mythburn.cpp" line="443"/>
+        <location filename="../mytharchive/mythburn.cpp" line="322"/>
+        <location filename="../mytharchive/mythburn.cpp" line="442"/>
         <source>Not Using Cut List</source>
         <translation>Не используется список вырезок</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="775"/>
+        <location filename="../mytharchive/mythburn.cpp" line="774"/>
         <source>Don&apos;t Use Cut List</source>
         <translation>Не использовать список вырезок</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="780"/>
+        <location filename="../mytharchive/mythburn.cpp" line="779"/>
         <source>Use Cut List</source>
         <translation>Использовать список вырезок</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="785"/>
+        <location filename="../mytharchive/mythburn.cpp" line="784"/>
         <source>Remove Item</source>
         <translation>Удалить элемент</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="786"/>
+        <location filename="../mytharchive/mythburn.cpp" line="785"/>
         <source>Edit Details</source>
         <translation>Изменить подробности</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="787"/>
+        <location filename="../mytharchive/mythburn.cpp" line="786"/>
         <source>Change Encoding Profile</source>
         <translation>Изменить профиль кодирования</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="788"/>
+        <location filename="../mytharchive/mythburn.cpp" line="787"/>
         <source>Edit Thumbnails</source>
         <translation>Редактировать эскизы</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="965"/>
+        <location filename="../mytharchive/mythburn.cpp" line="964"/>
         <source>You don&apos;t have any videos!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -727,7 +727,7 @@ This may take a few minutes.</source>
         <translation type="obsolete">Отмена</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="923"/>
+        <location filename="../mytharchive/mythburn.cpp" line="922"/>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
         <translation>Невозможно создать DVD.  Произошла ошибка во время выполнения скрипта</translation>
     </message>
@@ -735,37 +735,37 @@ This may take a few minutes.</source>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mytharchive/mytharchive.cpp" line="323"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="329"/>
         <source>Toggle use cut list state for selected program</source>
         <translation>Переключить использование списка вырезок для выбранной программы</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mytharchive.cpp" line="326"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="332"/>
         <source>Create DVD</source>
         <translation>Создать DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mytharchive.cpp" line="328"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="334"/>
         <source>Create Archive</source>
         <translation>Создать архив</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mytharchive.cpp" line="330"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="336"/>
         <source>Import Archive</source>
         <translation>Импортировать архив</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mytharchive.cpp" line="332"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="338"/>
         <source>View Archive Log</source>
         <translation>Просмотреть лог архива</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mytharchive.cpp" line="334"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="340"/>
         <source>Play Created DVD</source>
         <translation>Воспроизвести созданный DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mytharchive.cpp" line="336"/>
+        <location filename="../mytharchive/mytharchive.cpp" line="342"/>
         <source>Burn DVD</source>
         <translation>Записать DVD</translation>
     </message>
@@ -2706,17 +2706,17 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="853"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="851"/>
         <source>Menu</source>
         <translation>Меню</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="860"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="858"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Выйти, сохранить эскизы</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="861"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="859"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Выйти, не сохранять эскизы</translation>
     </message>
@@ -2753,7 +2753,7 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <translation>Все видео</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="550"/>
+        <location filename="../mytharchive/videoselector.cpp" line="549"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>Вы должны ввести правильный пароль для этого уровня родительского контроля</translation>
     </message>
