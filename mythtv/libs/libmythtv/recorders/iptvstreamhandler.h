@@ -12,7 +12,6 @@
 #include <QMap>
 
 #include <QNetworkAccessManager>
-#include <QtNetwork>
 
 #include "channelutil.h"
 #include "streamhandler.h"
