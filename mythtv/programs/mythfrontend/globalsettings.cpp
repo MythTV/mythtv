@@ -2198,7 +2198,7 @@ static HostCheckBoxSetting* StereoDiscard()
 {
     auto * cb = new HostCheckBoxSetting("DiscardStereo3D");
     cb->setValue(true);
-    cb->setLabel("Discard 3D stereoscopic fields");
+    cb->setLabel(PlaybackSettings::tr("Discard 3D stereoscopic fields"));
     cb->setHelpText(PlaybackSettings::tr(
         "If 'Side by Side' or 'Top and Bottom' 3D material is detected, "
         "enabling this setting will discard one field (enabled by default)."));
