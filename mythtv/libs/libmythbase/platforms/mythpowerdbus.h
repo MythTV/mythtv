@@ -2,7 +2,9 @@
 #define MYTHPOWERDBUS_H
 
 // Qt
-#include <QtDBus>
+#include <QDBusConnection>
+#include <QDBusInterface>
+#include <QDBusObjectPath>
 
 // MythTV
 #include "mythpower.h"

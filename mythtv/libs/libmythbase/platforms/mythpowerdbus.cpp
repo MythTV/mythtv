@@ -6,6 +6,10 @@
 #include <unistd.h>
 #include <algorithm>
 
+// Qt
+#include <QDBusReply>
+#include <QDBusUnixFileDescriptor>
+
 #define LOC QString("PowerDBus: ")
 
 #define FREE_SERVICE     (QString("org.freedesktop."))
