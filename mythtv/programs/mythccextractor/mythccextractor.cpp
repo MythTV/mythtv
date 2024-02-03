@@ -7,7 +7,6 @@
 #include <QtGlobal>
 #include <QCoreApplication>
 #include <QString>
-#include <QtGui>
 
 // MythTV headers
 #include "libmyth/mythcontext.h"
