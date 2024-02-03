@@ -404,7 +404,7 @@ void MythRenderOpenGL::DebugFeatures(void)
             .arg(fmt.majorVersion()).arg(fmt.minorVersion());
     QString qtglsurface = QString("RGBA: %1:%2:%3:%4 Depth: %5 Stencil: %6")
             .arg(fmt.redBufferSize()).arg(fmt.greenBufferSize())
-            .arg(fmt.greenBufferSize()).arg(fmt.alphaBufferSize())
+            .arg(fmt.blueBufferSize()).arg(fmt.alphaBufferSize())
             .arg(fmt.depthBufferSize()).arg(fmt.stencilBufferSize());
     QStringList shaders {"None"};
     if (m_features & Shaders)
