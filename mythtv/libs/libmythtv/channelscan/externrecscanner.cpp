@@ -142,8 +142,9 @@ void ExternRecChannelScanner::run(void)
     uint idx = 0;
     for (;;)
     {
+        static const QRegularExpression digitRE { "\\D+" };
         QString msg = tr("Channel #%1 : %2").arg(channum, name);
-        QStringList digits = channum.split(QRegularExpression("\\D+"));
+        QStringList digits = channum.split(digitRE);
 
         if (digits.size() > 1)
         {
