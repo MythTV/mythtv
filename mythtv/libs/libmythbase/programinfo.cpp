@@ -1758,7 +1758,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     {
         // This relies upon the translation established in the
         // definition of StorageGroup::kSpecialGroups.
-        // clazy:exclude tr-non-literal
+        // clazy:exclude=tr-non-literal
         progMap["storagegroup"] = QObject::tr(m_storageGroup.toUtf8().constData());
     }
     else
