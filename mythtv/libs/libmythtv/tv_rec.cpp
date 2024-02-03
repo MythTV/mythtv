@@ -3195,7 +3195,7 @@ bool TVRec::QueueEITChannelChange(const QString &name)
 
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("QueueEITChannelChange(%1) -- end --> %2")
-            .arg(name).arg(ok ? "done" : "failed"));
+            .arg(name, ok ? "done" : "failed"));
 
     return ok;
 }
