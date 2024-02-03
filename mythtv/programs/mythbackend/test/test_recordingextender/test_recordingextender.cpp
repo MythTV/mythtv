@@ -19,6 +19,8 @@
  */
 #include <iostream>
 #include <QDateTime>
+#include <QJsonArray>
+#include <QJsonObject>
 
 #include "libmythbase/mythconfig.h"
 #if CONFIG_SQLITE3

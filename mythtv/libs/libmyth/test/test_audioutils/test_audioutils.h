@@ -20,7 +20,7 @@
 
 #include <array>
 
-#include <QtTest/QtTest>
+#include <QTest>
 
 #include "libmythbase/mythcorecontext.h"
 #include "libmyth/audio/audiooutpututil.h"

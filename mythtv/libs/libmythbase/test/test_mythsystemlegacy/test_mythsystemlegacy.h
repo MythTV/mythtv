@@ -20,7 +20,7 @@
 
 #include <unistd.h> // for usleep()
 
-#include <QtTest/QtTest>
+#include <QTest>
 #include <QTemporaryFile>
 #include <QDateTime>
 

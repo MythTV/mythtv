@@ -20,7 +20,7 @@
 
 #include <array>
 #include <iostream>
-#include <QtTest/QtTest>
+#include <QTest>
 
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/programtypes.h"
