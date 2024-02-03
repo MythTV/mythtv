@@ -6198,7 +6198,6 @@ if ! disabled qtdbus; then
         enable qtdbus
     else
         check_ecxx ${qt_inc} <<EOF && enable qtdbus
-#include <QtDBus/QtDBus>
 #include <QtDBus/QDBusInterface>
 int main(void)
 {

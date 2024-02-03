@@ -23,8 +23,11 @@
 // Qt headers
 #include <QtGlobal>
 #if CONFIG_QTDBUS
-#include <QtDBus>
 #include <QDBusConnection>
+#include <QDBusInterface>
+#include <QDBusPendingReply>
+#include <QDBusReply>
+#include <QVersionNumber>
 #include <QXmlStreamReader>
 #endif
 #include <QList>
