@@ -1145,19 +1145,19 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
         <location filename="../mythmusic/musiccommon.cpp" line="2431"/>
         <location filename="../mythmusic/musiccommon.cpp" line="2439"/>
         <source>Play Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Jetzt abspielen</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1540"/>
         <location filename="../mythmusic/musiccommon.cpp" line="2441"/>
         <source>Prefer Play Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Bevorzuge &apos;Jetzt abspielen&apos;</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1542"/>
         <location filename="../mythmusic/musiccommon.cpp" line="2434"/>
         <source>Prefer Add Tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>Bevorzuge &apos;Titel hinzufügen&apos;</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="2123"/>
@@ -1297,7 +1297,7 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
         <location filename="../mythmusic/musiccommon.cpp" line="1354"/>
         <location filename="../mythmusic/musiccommon.cpp" line="2223"/>
         <source>Browse Music Library</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach Musik suchen</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1363"/>
@@ -2174,7 +2174,7 @@ Kategorie: %1 - Name: %2</translation>
         <location filename="../mythmusic/playlisteditorview.cpp" line="745"/>
         <location filename="../mythmusic/playlisteditorview.cpp" line="751"/>
         <source>Play Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Jetzt abspielen</translation>
     </message>
     <message>
         <location filename="../mythmusic/playlisteditorview.cpp" line="328"/>
@@ -2310,7 +2310,7 @@ Name: %1</translation>
         <location filename="../mythmusic/musicbrainz.cpp" line="191"/>
         <location filename="../mythmusic/musicbrainz.cpp" line="199"/>
         <source>Various Artists</source>
-        <translation type="unfinished">Versch. Interpreten</translation>
+        <translation>Versch. Interpreten</translation>
     </message>
     <message>
         <source>Audio CD parser</source>
@@ -3342,18 +3342,18 @@ Wollen Sie die vorhandene Datei dauerhaft löschen?</translation>
         <location filename="../mythmusic/searchview.cpp" line="281"/>
         <location filename="../mythmusic/searchview.cpp" line="288"/>
         <source>Play Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Jetzt abspielen</translation>
     </message>
     <message>
         <location filename="../mythmusic/searchview.cpp" line="192"/>
         <location filename="../mythmusic/searchview.cpp" line="289"/>
         <source>Prefer Play Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Bevorzuge &apos;Jetzt abspielen&apos;</translation>
     </message>
     <message>
         <location filename="../mythmusic/searchview.cpp" line="194"/>
         <source>Prefer Add Tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>Bevorzuge &apos;Titel hinzufügen&apos;</translation>
     </message>
     <message>
         <source>Add To Playlist And Play</source>
@@ -3373,7 +3373,7 @@ Wollen Sie die vorhandene Datei dauerhaft löschen?</translation>
     <message>
         <location filename="../mythmusic/searchview.cpp" line="283"/>
         <source>Prefer Add To Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Bevorzuge &apos;Zu Playlist hinzufügen&apos;</translation>
     </message>
     <message>
         <location filename="../mythmusic/searchview.cpp" line="298"/>
@@ -4191,7 +4191,7 @@ Station: %1 - Sender: %2</translation>
     <message>
         <location filename="themestrings.h" line="111"/>
         <source>By the artist “%ARTIST%” from the album “%ALBUM%”</source>
-        <translation type="unfinished"></translation>
+        <translation>Von Künstler “%ARTIST%” auf Album “%ALBUM%”</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="113"/>
@@ -5011,12 +5011,12 @@ Station: %1 - Sender: %2</translation>
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>%DISCNUM%.%TRACKNUM%</source>
-        <translation type="unfinished"></translation>
+        <translation>%DISCNUM%.%TRACKNUM%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
         <source>%DISCNUM%/%DISCCOUNT%</source>
-        <translation type="unfinished"></translation>
+        <translation>%DISCNUM%/%DISCCOUNT%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
@@ -5046,7 +5046,7 @@ Station: %1 - Sender: %2</translation>
     <message>
         <location filename="themestrings.h" line="32"/>
         <source>%TITLE%  %ARTIST%  %ALBUM%  %TRACKNUM%</source>
-        <translation type="unfinished"></translation>
+        <translation>%TITLE%  %ARTIST%  %ALBUM%  %TRACKNUM%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="34"/>
@@ -5071,7 +5071,7 @@ Station: %1 - Sender: %2</translation>
     <message>
         <location filename="themestrings.h" line="38"/>
         <source>%TRACKNUM%/%TRACKCOUNT%</source>
-        <translation type="unfinished"></translation>
+        <translation>%TRACKNUM%/%TRACKCOUNT%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="39"/>
@@ -5365,7 +5365,7 @@ Station: %1 - Sender: %2</translation>
     <message>
         <location filename="themestrings.h" line="169"/>
         <source>Disc:</source>
-        <translation type="unfinished"></translation>
+        <translation>Disk:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="172"/>
@@ -5505,7 +5505,7 @@ Station: %1 - Sender: %2</translation>
     <message>
         <location filename="themestrings.h" line="227"/>
         <source>Hit M (Menu) to add and play tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>Drücke M (Menü) um Titel hinzuzufügen und abzuspielen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="231"/>
@@ -5690,7 +5690,7 @@ Station: %1 - Sender: %2</translation>
     <message>
         <location filename="themestrings.h" line="312"/>
         <source>Next: %NEXTTITLE%  %NEXTARTIST%  %NEXTALBUM%  %NEXTTRACKNUM%</source>
-        <translation type="unfinished"></translation>
+        <translation>Nächstes: %NEXTTITLE%  %NEXTARTIST%  %NEXTALBUM%  %NEXTTRACKNUM%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="315"/>
@@ -5720,7 +5720,7 @@ Station: %1 - Sender: %2</translation>
     <message>
         <location filename="themestrings.h" line="321"/>
         <source>Now Playing: %TITLE%  %ARTIST%  %ALBUM%  %TRACKNUM%</source>
-        <translation type="unfinished"></translation>
+        <translation>Spiele: %TITLE%  %ARTIST%  %ALBUM%  %TRACKNUM%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="323"/>
@@ -5888,7 +5888,7 @@ Station: %1 - Sender: %2</translation>
     <message>
         <location filename="themestrings.h" line="385"/>
         <source>Press M (Menu) to add and play tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>Drücke M (Menü) um Titel hinzuzufügen und abzuspielen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="388"/>
@@ -6736,7 +6736,7 @@ Station: %1 - Sender: %2</translation>
     <message>
         <location filename="../mythmusic/visualize.cpp" line="1321"/>
         <source>Spectrogram</source>
-        <translation type="unfinished"></translation>
+        <translation>Spectrogram</translation>
     </message>
     <message>
         <location filename="../mythmusic/visualize.cpp" line="1345"/>
@@ -6746,7 +6746,7 @@ Station: %1 - Sender: %2</translation>
     <message>
         <location filename="../mythmusic/visualize.cpp" line="1611"/>
         <source>SpectrumBars</source>
-        <translation type="unfinished"></translation>
+        <translation>SpectrumBars</translation>
     </message>
     <message>
         <location filename="../mythmusic/visualize.cpp" line="1700"/>
