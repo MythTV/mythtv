@@ -6299,32 +6299,32 @@ Disabled by an empty password. Privileges persist until Gallery exits to main me
         <translation type="unfinished">Adding Channels</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="145"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="146"/>
         <source>Channel #%1 : %2</source>
         <translation type="unfinished">Channel #%1 : %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="171"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="172"/>
         <source>Adding %1</source>
         <translation type="unfinished">Adding %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="182"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="183"/>
         <source>Updating %1</source>
         <translation type="unfinished">Updating %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="211"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="212"/>
         <source>Removing unused Channel #%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="220"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="221"/>
         <source>Found %1 channels.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="224"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="225"/>
         <source>Done</source>
         <translation type="unfinished">Done</translation>
     </message>
@@ -15994,6 +15994,11 @@ name cannot be blank.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2189"/>
         <source>By default MythTV uses black letterboxing to match broadcaster letterboxing, but those with plasma screens may prefer gray to minimize burn-in.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2201"/>
+        <source>Discard 3D stereoscopic fields</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

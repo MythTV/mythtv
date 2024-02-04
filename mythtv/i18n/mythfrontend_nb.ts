@@ -6310,32 +6310,32 @@ Slå av med et tomt passord. Privilegier gjelder inntil Galleriet avsluttes til 
         <translation type="unfinished">Legger til kanaler</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="145"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="146"/>
         <source>Channel #%1 : %2</source>
         <translation type="unfinished">Kanal #%1 : %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="171"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="172"/>
         <source>Adding %1</source>
         <translation type="unfinished">Legger til %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="182"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="183"/>
         <source>Updating %1</source>
         <translation type="unfinished">Oppdaterer %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="211"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="212"/>
         <source>Removing unused Channel #%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="220"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="221"/>
         <source>Found %1 channels.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="224"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="225"/>
         <source>Done</source>
         <translation type="unfinished">Ferdig</translation>
     </message>
@@ -16292,6 +16292,11 @@ avspillingsgruppe med navnet «%1».</translation>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2184"/>
         <source>Letterboxing color</source>
         <translation>Farge ved Letterbox visning</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2201"/>
+        <source>Discard 3D stereoscopic fields</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2202"/>

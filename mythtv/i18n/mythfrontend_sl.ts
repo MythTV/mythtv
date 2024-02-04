@@ -5998,32 +5998,32 @@ Device supports up to %1</source>
         <translation type="unfinished">Dodajanje kanalov</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="145"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="146"/>
         <source>Channel #%1 : %2</source>
         <translation type="unfinished">Kanal #%1 : %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="171"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="172"/>
         <source>Adding %1</source>
         <translation type="unfinished">Dodajanje %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="182"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="183"/>
         <source>Updating %1</source>
         <translation type="unfinished">Posodobitev %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="211"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="212"/>
         <source>Removing unused Channel #%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="220"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="221"/>
         <source>Found %1 channels.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="224"/>
+        <location filename="../libs/libmythtv/channelscan/externrecscanner.cpp" line="225"/>
         <source>Done</source>
         <translation type="unfinished">Narejeno</translation>
     </message>
@@ -15757,6 +15757,11 @@ ne more biti prazno.</translation>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2189"/>
         <source>By default MythTV uses black letterboxing to match broadcaster letterboxing, but those with plasma screens may prefer gray to minimize burn-in.</source>
         <translation type="unfinished">Privzeto MythTV uporablja črn &apos;letterbox&apos;, ki se ujema z ponudnikovim &apos;letterbox-om&apos;, tisti z plazma zasloni bodo raje izbrali sivo za zmanjšanje &apos; burn-in&apos; efekta.</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2201"/>
+        <source>Discard 3D stereoscopic fields</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2202"/>
