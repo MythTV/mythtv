@@ -11,13 +11,23 @@ jobs:
     name: build
     strategy:
       matrix:
-        os: ['ubuntu-20.04', 'ubuntu-22.04', 'macos-12', 'macos-13']
+        os: ['ubuntu-20.04', 'ubuntu-22.04', 'macos-12', 'macos-13', 'macos-14']
+        arch: ['x86_64', 'arm64']
         cc: ['gcc', 'clang']
         include:
           - cc: 'gcc'
             cxx: 'g++'
           - cc: 'clang'
             cxx: 'clang++'
+        exclude:
+          - os: 'ubuntu-20.04'
+            arch: 'arm64'
+          - os: 'ubuntu-22.04'
+            arch: 'arm64'
+          - os: 'macos-12'
+            arch: 'arm64'
+          - os: 'macos-13'
+            arch: 'arm64'
       fail-fast: false
     runs-on: ${{ matrix.os }}
 
@@ -29,6 +39,9 @@ jobs:
       run: |
         echo "MYTHTV_CONFIG=--prefix=${{ github.workspace }}/build/install --cc=${{ matrix.cc }} --cxx=${{ matrix.cxx }}" >> $GITHUB_ENV
         echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
+        # As some OSes can cross-compile, establish defaule configrue/make commands which can be overided as appropriate
+        echo "CONFIGURE_CMD=./configure" >> $GITHUB_ENV
+        echo "MAKE_CMD=make" >> $GITHUB_ENV
 
     # GitHub caches are immutable, so to update a cache, use a unique key with a
     # prefixed restore-key.  GitHub will rotate the caches within their 10 GB
@@ -39,6 +52,23 @@ jobs:
         path: ~/.ccache
         key: ${{ matrix.os }}-${{ matrix.cc }}-ccache-${{ github.sha }}
         restore-keys: ${{ matrix.os }}-${{ matrix.cc }}-ccache
+
+    # macOS based github runners starting with macos-14 only run on the arm64 architecture.  To generate x86_64 based executable, the
+    # arch -x86_64 command is needed before any brew commands, make, and install to run as x86_64 via Rosetta2.
+    - name: Check cross-compile environment (macOS)
+      env:
+        ARCH: ${{ matrix.arch }}
+      run: |
+        SYSARCH=$(/usr/bin/uname -m)
+        PKGMGR_CMD='brew'
+        if [ "$SYSARCH" = "$ARCH" ]; then
+          # this is a cross-compile
+          PKGMGR_CMD="arch -${ARCH} $PKGMGR_CMD"
+          echo "CONFIGURE_CMD=arch -${ARCH}  $CONFIGURE_CMD" >> $GITHUB_ENV
+          echo "MAKE_CMD=arch -${ARCH} $MAKE_CMD" >> $GITHUB_ENV
+        fi
+        echo "PKGMGR_CMD=$PKGMGR_CMD" >> $GITHUB_ENV
+      if: runner.os == 'macOS'
 
     # N.B. These dependencies are for the master branch. Unlike the ansible playlists they do not include old dependencies that may
     # be required for older versions. The list is intended to provide as much code coverage as possible (i.e. enable as many options as possible)
@@ -53,10 +83,26 @@ jobs:
       if: runner.os == 'Linux'
 
     - name: Install core dependencies (macOS)
+      env:
+        OS_VERS: ${{ matrix.os }}
       run: |
-        brew install pkg-config ccache qt5 nasm libsamplerate taglib lzo libcec libbluray libass libhdhomerun dav1d x264 x265 libvpx openssl sound-touch lame
-        brew link qt5 --force
-        echo "MYTHTV_CONFIG=$MYTHTV_CONFIG --extra-cxxflags=-I/usr/local/include --extra-ldflags=-L/usr/local/lib" >> $GITHUB_ENV
+        ${PKGMGR_CMD} install pkg-config ccache qt5 nasm libsamplerate taglib lzo libcec libbluray libass libhdhomerun dav1d x264 x265 libvpx openssl sound-touch lame
+        ${PKGMGR_CMD} install freetype libass libiconv libxml2 libzip XviD zlib
+        ${PKGMGR_CMD} install pyenv-virtualenv python-lxml  python-requests python-setuptools
+        ${PKGMGR_CMD} link qt5 --force
+        # macos-14 updated the linker and needs to be run in "classic" mode
+        case $OS_VERS in
+          macos-14)
+            LDFLAGS="-Wl,-ld_classic" 
+          ;;
+        esac
+        # homebrew uses different prefixes on x86_64 and arm64, find the correct one and setup the correct build variables
+        HB_PREFIX=$(${PKGMGR_CMD} --prefix)
+        echo "C_INCLUDE_PATH=$HB_PREFIX/include:$C_INCLUDE_PATH" >> $GITHUB_ENV
+        echo "CPLUS_INCLUDE_PATH=$HB_PREFIX/include:$CPLUS_INCLUDE_PATH" >> $GITHUB_ENV
+        echo "LDFLAGS=-L$HB_PREFIX/lib $LDFLAGS" >> $GITHUB_ENV
+        echo "LIBRARY_PATH=$HB_PREFIX/lib:$LIBRARY_PATH" >> $GITHUB_ENV
+        echo "PKG_CONFIG_PATH=$HB_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
       if: runner.os == 'macOS'
 
     - name: ccache statistics [pre]
@@ -65,20 +111,20 @@ jobs:
 
     - name: Configure core
       working-directory: ./mythtv
-      run: ./configure $MYTHTV_CONFIG --enable-libmp3lame --enable-libvpx --enable-libx264 --enable-libx265 --enable-bdjava --enable-vulkan
+      run: ${CONFIGURE_CMD} $MYTHTV_CONFIG --enable-libmp3lame --enable-libvpx --enable-libx264 --enable-libx265 --enable-bdjava --enable-vulkan
 
     - name: Make core
       working-directory: ./mythtv
-      run: make all_no_test -j4
+      run: ${MAKE_CMD} all_no_test -j4
 
     - name: Install core
       working-directory: ./mythtv
-      run: make install
+      run: ${MAKE_CMD} install
 
     # QTest requires a QT SQL plugin - but there are currently none available via brew on macOS
     - name: Unit test core
       working-directory: ./mythtv
-      run: make test
+      run: ${MAKE_CMD} test
       if: runner.os == 'Linux'
 
     - name: Install plugin dependencies (linux)
@@ -95,16 +141,16 @@ jobs:
       if: matrix.os == 'ubuntu-22.04'
 
     - name: Install plugin dependencies (macOS)
-      run: brew install minizip flac libvorbis libcdio
+      run: ${PKGMGR_CMD} install minizip flac libvorbis libcdio python-pycurl python-oauthlib
       if: runner.os == 'macOS'
 
     - name: Configure plugins
       working-directory: ./mythplugins
-      run: ./configure $MYTHTV_CONFIG
+      run: ${CONFIGURE_CMD} $MYTHTV_CONFIG
 
     - name: Make plugins
       working-directory: ./mythplugins
-      run: make -j4
+      run: ${MAKE_CMD} -j4
 
     - name: ccache statistics [post]
       run: |
