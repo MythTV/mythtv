@@ -1561,7 +1561,7 @@ uint64_t MythMediaBuffer::UpdateDecoderRate(uint64_t Latest)
     if (!m_bitrateMonitorEnabled)
         return 0;
 
-    auto current = std::chrono::milliseconds(QDateTime::currentDateTime().toMSecsSinceEpoch());
+    auto current = std::chrono::milliseconds(QDateTime::currentMSecsSinceEpoch());
     std::chrono::milliseconds expire = current - 1s;
 
     m_decoderReadLock.lock();
@@ -1592,7 +1592,7 @@ uint64_t MythMediaBuffer::UpdateStorageRate(uint64_t Latest)
     if (!m_bitrateMonitorEnabled)
         return 0;
 
-    auto current = std::chrono::milliseconds(QDateTime::currentDateTime().toMSecsSinceEpoch());
+    auto current = std::chrono::milliseconds(QDateTime::currentMSecsSinceEpoch());
     auto expire = current - 1s;
 
     m_storageReadLock.lock();
