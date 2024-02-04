@@ -243,16 +243,16 @@ void MythRenderVulkan::DebugVulkan(void)
     if (VERBOSE_LEVEL_CHECK(VB_GENERAL, LOG_DEBUG))
     {
         LOG(VB_GENERAL, LOG_INFO, QString("%1 device extensions supported:").arg(devextensions.size()));
-        for (const auto& extension : devextensions)
+        for (const auto& extension : std::as_const(devextensions))
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 Version: %2").arg(extension.name.constData()).arg(extension.version));
 
         LOG(VB_GENERAL, LOG_INFO, QString("%1 instance extensions supported:").arg(instextensions.size()));
-        for (const auto& extension : instextensions)
+        for (const auto& extension : std::as_const(instextensions))
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 Version: %2").arg(extension.name.constData()).arg(extension.version));
 
         auto layers = m_window->vulkanInstance()->supportedLayers();
         LOG(VB_GENERAL, LOG_INFO, QString("%1 layer types supported:").arg(layers.size()));
-        for (const auto& layer : layers)
+        for (const auto& layer : std::as_const(layers))
             LOG(VB_GENERAL, LOG_INFO, QString("%1 Version: %2").arg(layer.name.constData()).arg(layer.version));
     }
 }

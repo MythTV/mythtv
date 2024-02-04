@@ -37,7 +37,7 @@ QStringList MythHTTPEncoding::GetMimeTypes(const QString &Accept)
 #endif
 
     std::vector<MimePair> weightings;
-    for (const auto & type : types)
+    for (const auto & type : std::as_const(types))
     {
         QString mime = type.trimmed();
         auto quality = 1.0F;

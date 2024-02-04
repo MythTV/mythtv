@@ -523,7 +523,7 @@ void MythHTTPServer::BuildOrigins()
     QStringList extras = gCoreContext->GetSetting("AllowedOriginsList", QString(
                                                   "https://chromecast.mythtv.org"
                                                   )).split(",");
-    for (const auto & extra : extras)
+    for (const auto & extra : std::as_const(extras))
     {
         QString clean = extra.trimmed();
         if (clean.startsWith("http://") || clean.startsWith("https://"))
@@ -560,7 +560,7 @@ void MythHTTPServer::ResolveMaster(QHostInfo Info)
     auto addresses = BuildAddressList(Info);
 
     // Add status and SSL addressed for each
-    for (const auto & address : addresses)
+    for (const auto & address : std::as_const(addresses))
     {
         m_config.m_allowedOrigins.append(QString("http://%1").arg(address));
         m_config.m_allowedOrigins.append(QString("http://%1:%2").arg(address).arg(m_masterStatusPort));
@@ -592,7 +592,7 @@ void MythHTTPServer::DebugOrigins()
 void MythHTTPServer::ResolveHost(QHostInfo Info)
 {
     auto addresses = BuildAddressList(Info);
-    for (const auto & address : addresses)
+    for (const auto & address : std::as_const(addresses))
     {
         // The port is optional - so just add both to our list to simplify the
         // checks when a request is received

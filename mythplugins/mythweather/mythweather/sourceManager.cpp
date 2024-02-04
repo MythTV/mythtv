@@ -357,7 +357,7 @@ void SourceManager::recurseDirs( QDir dir )
                   QDir::NoDotAndDotDot);
     QFileInfoList files = dir.entryInfoList();
 
-    for (const auto & file : files)
+    for (const auto & file : std::as_const(files))
     {
         QCoreApplication::processEvents();
         if (file.isDir())

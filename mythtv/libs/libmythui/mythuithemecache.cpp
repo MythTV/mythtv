@@ -527,7 +527,7 @@ void MythUIThemeCache::RemoveFromCacheByFile(const QString& File)
     QDir dir(GetThemeCacheDir());
     QFileInfoList list = dir.entryInfoList();
 
-    for (const auto & fileInfo : list)
+    for (const auto & fileInfo : std::as_const(list))
     {
         if (fileInfo.fileName().contains(partialKey))
         {

@@ -1085,7 +1085,7 @@ bool V2Dvr::SetRecordedMarkup(int RecordedId, const QString &MarkupList)
     QJsonObject   markuplist = doc.object();
 
     QJsonArray  marks = markuplist["Mark"].toArray();
-    for (const auto & m : marks)
+    for (const auto & m : std::as_const(marks))
     {
         QJsonObject markup = m.toObject();
         ProgramInfo::MarkupEntry entry;
@@ -1103,7 +1103,7 @@ bool V2Dvr::SetRecordedMarkup(int RecordedId, const QString &MarkupList)
     }
 
     QJsonArray  seeks = markuplist["Seek"].toArray();
-    for (const auto & m : seeks)
+    for (const auto & m : std::as_const(seeks))
     {
         QJsonObject markup = m.toObject();
         ProgramInfo::MarkupEntry entry;

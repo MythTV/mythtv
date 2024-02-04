@@ -908,7 +908,7 @@ bool Dvr::SetRecordedMarkup (int RecordedId, const QJsonObject &jsonObj)
     QJsonObject markuplist = jsonObj["MarkupList"].toObject();
 
     QJsonArray  marks = markuplist["Mark"].toArray();
-    for (const auto & m : marks)
+    for (const auto & m : std::as_const(marks))
     {
         QJsonObject markup = m.toObject();
         ProgramInfo::MarkupEntry entry;
@@ -925,7 +925,7 @@ bool Dvr::SetRecordedMarkup (int RecordedId, const QJsonObject &jsonObj)
     }
 
     QJsonArray  seeks = markuplist["Seek"].toArray();
-    for (const auto & m : seeks)
+    for (const auto & m : std::as_const(seeks))
     {
         QJsonObject markup = m.toObject();
         ProgramInfo::MarkupEntry entry;

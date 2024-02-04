@@ -239,7 +239,7 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
     QStringList sortList = Sort.toLower().split(',',Qt::SkipEmptyParts);
 #endif
     bool next = false;
-    for (const auto & item : sortList)
+    for (const auto & item : std::as_const(sortList))
     {
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList partList = item.split(' ',QString::SkipEmptyParts);

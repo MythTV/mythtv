@@ -275,7 +275,7 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     }
 
     auto values = m_mapHeaders.values("origin");
-    for (const auto & value : values)
+    for (const auto & value : std::as_const(values))
         AddCORSHeaders(value);
 
     if (qEnvironmentVariableIsSet("HTTPREQUEST_DEBUG"))

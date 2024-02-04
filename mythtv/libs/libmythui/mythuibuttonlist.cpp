@@ -3869,7 +3869,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     buttonstate->Reset();
 
     QList<MythUIType *> descendants = buttonstate->GetAllDescendants();
-    for (MythUIType *obj : descendants)
+    for (MythUIType *obj : std::as_const(descendants))
     {
         QString name = obj->objectName();
         if (name == "buttontext")

@@ -213,7 +213,7 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString &label,
         }
 
         // Add button for each drive
-        for (auto *drive : drives)
+        for (auto *drive : std::as_const(drives))
             dlg->AddButton(DevName(drive));
 
         dlg->AddButton(tr("Cancel"));

@@ -1137,7 +1137,7 @@ bool Myth::ManageUrlProtection( const QString &sServices,
     }
     else
     {
-        for (const QString& service : serviceList)
+        for (const QString& service : std::as_const(serviceList))
         {
             if (KnownServices.contains(service))
                 protectedURLs << '/' + service;

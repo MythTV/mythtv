@@ -1288,7 +1288,7 @@ bool MythBDBuffer::RestoreBDStateSnapshot(const QString& State)
 #endif
     QHash<QString, uint64_t> settings;
 
-    for (const QString& state : states)
+    for (const QString& state : std::as_const(states))
     {
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList keyvalue = state.split(":", QString::SkipEmptyParts);

@@ -1481,7 +1481,7 @@ uint propsValueFromString (const QString& name, QMap<T,QString> propNames,
     uint result = 0;
 
     QStringList names = props.split('|');
-    for ( const auto& n : names  )
+    for ( const auto& n : std::as_const(names)  )
     {
         uint bit = propNames.key(n, 0);
         if (bit == 0)

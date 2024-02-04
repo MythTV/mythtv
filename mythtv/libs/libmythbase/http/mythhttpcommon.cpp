@@ -70,7 +70,7 @@ MythSocketProtocol MythHTTPWS::ProtocolFromString(const QString &Protocols)
     auto protocols = Protocols.trimmed().toLower().split(",", Qt::SkipEmptyParts);
 #endif
 
-    for (const auto & protocol : protocols)
+    for (const auto & protocol : std::as_const(protocols))
         if (auto valid = ParseProtocol(protocol); valid != ProtFrame)
             return valid;
 

@@ -4127,7 +4127,7 @@ void SatIPConfigurationGroup::FillDeviceList(void)
     // Now find configured devices
     // Returns each devices as "deviceid friendlyname ip tunerno tunertype"
     QStringList db = CardUtil::GetVideoDevices("SATIP");
-    for (const auto& dev : db)
+    for (const auto& dev : std::as_const(db))
     {
         auto dit = m_deviceList.find(dev);
         if (dit != m_deviceList.end())
