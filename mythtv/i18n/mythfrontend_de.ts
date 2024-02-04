@@ -1474,12 +1474,12 @@
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="467"/>
         <source>URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="468"/>
         <source>URL for streaming of this channel. Used by the IPTV capture card and obtained with an &quot;M3U Import&quot; or with a &quot;HDHomeRun Channel Import&quot; loading of an XML file.</source>
-        <translation type="unfinished"></translation>
+        <translation>URL zum Streamen dieses Kanals. Wird für IPTV Aufnahme verwendet und über &quot;M3U Importieren&quot; oder &quot;HDHomeRun Senderimport&quot; durch Laden einer XML-Datei bezogen.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="485"/>
@@ -1574,7 +1574,7 @@
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="690"/>
         <source>Channel Options - IPTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Sender Einstellungen - IPTV</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="700"/>
@@ -2444,27 +2444,27 @@ Prüfen Sie, ob die Videodatei existiert</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2169"/>
         <source>This setting applies to video playback only, not to the GUI. Most modern displays have square pixels and the aspect ratio of the screen can be computed from the resolution (default). The aspect ratio can also be automatically detected from the connected display - though this may be slightly less accurate. If automatic detection fails, the correct aspect ratio can be specified here. Note: Some values (e.g 32:10) are primarily intended for multiscreen setups.</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Einstellung bezieht sich auf Videowiedergabe, nicht auf die GUI. Die meisten modernen Anzeigen haben quadratische Pixel und das Seitenverhältnis kann aus der Auflösung berechnet werden (Voreinstellung). Das Seitenverhältnis kann auch automatisch von der angeschlossenen Anzeige detektiert werden, jedoch kann das weniger genau sein. Wenn die automatische Erkennung fehlschlägt, kann das korrekte Seitenverhältnis hier angegeben werden. Bemerkung: Einige Werte (z.B. 32:10) sind vorwiegend für den Mehrfach-Bildschirm-Betrieb gedacht.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2320"/>
         <source>Force Full Screen for GUI and TV playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Vollbild für GUI und TV-Wiedergabe erzwingen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2324"/>
         <source>Use Full Screen for GUI and TV playback independent of the settings for the GUI dimensions. This does not change the values of the GUI dimensions so it is easy to switch from window mode to full screen and back.</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwendet Vollbild für GUI und TV-Wiedergabe unabhängig der Einstellungen für die GUI Abmessungen. Dies ändert die Werte für die GUI Abmessungen nicht, somit kann einfach zwischen Fenstermodus und Vollbild gewechselt werden.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2662"/>
         <source>Smooth Transitions</source>
-        <translation type="unfinished"></translation>
+        <translation>Weiche Übergänge</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2666"/>
         <source>Enable smooth transitions with fade-in and fade-out of menu pages and enable GUI animations. Disabling this can make the GUI respond faster especially on low-powered machines.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiviert weiche Übergänge mit Ein- und Ausblenden von Menüseiten und GUI-Animationen. Das Ausschalten kann dazu führen, dass die GUI schneller reagiert, insbesondere auf Rechnern mit geringerer Leistung.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2676"/>
@@ -3371,7 +3371,7 @@ Gerät unterstützt bis zu %1</translation>
         <location filename="../libs/libmyth/audio/audiooutputjack.cpp" line="610"/>
         <source>Calling jack_connect failed on port: %1
 </source>
-        <translation>Aufruf von &apos;jack_connect&apos; auf Port %1 fehlgeschlagen\n</translation>
+        <translation>Fehler bei Aufruf von &apos;jack_connect&apos; auf Port: %1\n</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/audio/audiooutputjack.cpp" line="624"/>
@@ -4336,7 +4336,7 @@ Gerät unterstützt bis zu %1</translation>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2038"/>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2136"/>
         <source>OK</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2039"/>
@@ -4350,13 +4350,13 @@ Gerät unterstützt bis zu %1</translation>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2040"/>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2139"/>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2041"/>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2140"/>
         <source>Cancel All</source>
-        <translation type="unfinished">Alle abbrechen</translation>
+        <translation>Alle abbrechen</translation>
     </message>
     <message numerus="yes">
         <source>Found %n new non-conflicting %1 channel(s).</source>
@@ -4525,7 +4525,7 @@ Gerät unterstützt bis zu %1</translation>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2137"/>
         <source>OK All</source>
-        <translation type="unfinished">Alle Ok</translation>
+        <translation>Alle Ok</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2230"/>
@@ -4705,22 +4705,22 @@ Gerät unterstützt bis zu %1</translation>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_web.cpp" line="443"/>
         <source>Scan Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>Suche komplett</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_web.cpp" line="447"/>
         <source>Scan Shut Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Suche abgebrochen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_web.cpp" line="451"/>
         <source>Scan Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Suche fehlerhaft</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_web.cpp" line="457"/>
         <source>Found %1 Transports</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Transponder gefunden</translation>
     </message>
 </context>
 <context>
@@ -7773,22 +7773,22 @@ Fehler: %1</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2995"/>
         <source>Starting channel for Manual Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Startsender für manuelle Aufnahme</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2996"/>
         <source>Guide Starting Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>EPG Startsender</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2997"/>
         <source>Last Manual Record Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Sender letzter manueller Aufnahme</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2998"/>
         <source>When entering a new Manual Record Rule, the starting channel will default to this.</source>
-        <translation type="unfinished"></translation>
+        <translation>Voreinstellung des Startsenders bei Eingabe einer neuen manuellen Aufnahmeregel.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4548"/>
@@ -8125,43 +8125,43 @@ Fehler: %1</translation>
     <message>
         <location filename="../libs/libmythtv/channelscan/hdhrchannelfetcher.cpp" line="331"/>
         <source>Downloading Channel List</source>
-        <translation type="unfinished">Lade Senderliste herunter</translation>
+        <translation>Lade Senderliste herunter</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/hdhrchannelfetcher.cpp" line="343"/>
         <source>Downloading Channel List Failed</source>
-        <translation type="unfinished">Laden der Senderliste fehlgeschlagen</translation>
+        <translation>Laden der Senderliste fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/hdhrchannelfetcher.cpp" line="355"/>
         <source>Adding Channels</source>
-        <translation type="unfinished">Füge Sender hinzu</translation>
+        <translation>Füge Sender hinzu</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/hdhrchannelfetcher.cpp" line="384"/>
         <source>%1 channel %2: %3</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Sender %2: %3</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/hdhrchannelfetcher.cpp" line="392"/>
         <location filename="../libs/libmythtv/channelscan/hdhrchannelfetcher.cpp" line="400"/>
         <source>Ignoring %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignoriere %1</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/hdhrchannelfetcher.cpp" line="416"/>
         <source>Adding %1</source>
-        <translation type="unfinished">Füge %1 hinzu</translation>
+        <translation>Füge %1 hinzu</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/hdhrchannelfetcher.cpp" line="420"/>
         <source>Updating %1</source>
-        <translation type="unfinished">Aktualisiere %1</translation>
+        <translation>Aktualisiere %1</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/hdhrchannelfetcher.cpp" line="462"/>
         <source>Done</source>
-        <translation type="unfinished">Fertig</translation>
+        <translation>Fertig</translation>
     </message>
 </context>
 <context>
@@ -10152,7 +10152,7 @@ Fehler: %1</translation>
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="1118"/>
         <source>Preview Generation</source>
-        <translation type="unfinished">Vorschaubild erzeugen</translation>
+        <translation>Erzeuge Vorschaubild</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="1128"/>
@@ -13319,12 +13319,12 @@ Fehler: %1</translation>
     <message>
         <location filename="../libs/libmythui/mythdisplay.cpp" line="179"/>
         <source>Current screen	: %1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktueller Bildschirm\t: %1 %2</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythdisplay.cpp" line="181"/>
         <source>Screen		: %1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildschirm\t\t: %1 %2</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythdisplay.cpp" line="182"/>
@@ -13885,7 +13885,7 @@ Fehler: %1</translation>
     <message>
         <location filename="../libs/libmythtv/AirPlay/mythraopconnection.cpp" line="1621"/>
         <source>Key is not a RSA private key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Schlüssel ist kein privater RSA Schlüssel.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/AirPlay/mythraopconnection.cpp" line="1632"/>
@@ -18279,7 +18279,7 @@ name cannot be blank.</source>
         <source>mythtv-setup is deprecated.
 To set up MythTV, start mythbackend and use:
 http://localhost:6544/setupwizard</source>
-        <translation type="unfinished"></translation>
+        <translation>mythtv-setup ist veraltet.\nUm MythTV einzurichten, starte mythbackend und verwende:\nhttp://localhost:6544/setupwizard</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1636"/>
@@ -24760,7 +24760,7 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1791"/>
         <source>URL of M3U file containing RTSP/RTP/UDP/HTTP channel URLs, example for HDHomeRun: http://&lt;ipv4&gt;/lineup.m3u and for Freebox: http://mafreebox.freebox.fr/freeboxtv/playlist.m3u.</source>
-        <translation type="unfinished"></translation>
+        <translation>URL von M3U-Datei welche RTSP/RTP/UDP/HTTP Sender URLs enthält, Beispiel für HDHomeRun: http://&lt;ipv4&gt;/lineup.m3u und für Freebox: http://mafreebox.freebox.fr/freeboxtv/playlist.m3u.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2446"/>
@@ -26373,32 +26373,32 @@ wird bereits verwendet.</translation>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="408"/>
         <source>EIT scan period (mins)</source>
-        <translation type="unfinished"></translation>
+        <translation>EIT Suchdauer (Minuten)</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="410"/>
         <source>Time to do EIT scanning on one capture card before moving to the next capture card in the same input group that is configured for EIT scanning. This can happen with multiple satellite LNBs connected via a DiSEqC switch.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeit für EIT-Suche auf einer TV-Karte vor Wechsel auf neue TV-Karte in der gleichen, für EIT-Suche festgelegten Eingangsgruppe. Dies kann für mehrere über einen DiSEqC-Switch verbundene Satelliten-LNBs erfolgen.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="422"/>
         <source>EIT event chunk size</source>
-        <translation type="unfinished"></translation>
+        <translation>EIT-Ereignis Verarbeitungsgröße</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="424"/>
         <source>Maximum number of DB inserts per ProcessEvents call. This limits the rate at which EIT events are processed in the backend so that there is always enough processing capacity for the other backend tasks.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximale Anzahl von Datenbankeinträgen pro Verarbeitungsaufruf. Dies beschränkt die Verarbeitungsrate der EIT-Ereignisse im Backend um genug Verarbeitungskapazität für die übrigen Backend-Aufgaben zu erhalten.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="436"/>
         <source>EIT cache persistent</source>
-        <translation type="unfinished"></translation>
+        <translation>EIT Cache Persistenz</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="438"/>
         <source>Save the content of the EIT cache in the database and use that at the next start of the backend. This reduces EIT event processing at a restart of the backend but at the cost of updating the copy of the EIT cache in the database continuously.</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichert den Inhalt des EIT Caches in der Datenbank und verwendet diesen beim nächsten Backend-Start wieder. Reduziert Verarbeitung von EIT-Ereignissen bei Neustart des Backends, hat aber zusätzliche Kosten wegen kontinuierlicher Aktualisierung des EIT-Caches in der Datenbank.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="474"/>
@@ -29939,7 +29939,7 @@ Connect video source &apos;%1&apos; to a capture card in the &apos;Input Connect
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_web.cpp" line="182"/>
         <source>This scan type is not supported</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Suchart wird nicht unterstützt</translation>
     </message>
 </context>
 <context>
@@ -30221,7 +30221,7 @@ Connect video source &apos;%1&apos; to a capture card in the &apos;Input Connect
     <message>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="334"/>
         <source>HDHomeRun Channel Import</source>
-        <translation type="unfinished"></translation>
+        <translation>HDHomeRun Senderimport</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="340"/>
@@ -31308,7 +31308,7 @@ Keine weiteren Informationen</translation>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="489"/>
         <source>Database schema version: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Datenbankschema-Version: %1</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="490"/>
@@ -31660,7 +31660,7 @@ Keine weiteren Informationen</translation>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1493"/>
         <source>Current fps	: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuelle FPS\t: %1</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1565"/>
@@ -33744,7 +33744,7 @@ Möchten Sie weitersehen?</translation>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="911"/>
         <source>ERROR downloading theme package from frontend.</source>
-        <translation type="unfinished"></translation>
+        <translation>FEHLER beim Herunterladen des Theme Pakets vom Frontend.</translation>
     </message>
     <message>
         <source>ERROR downloading theme package from master backend.</source>
@@ -36344,7 +36344,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="8"/>
         <source>%(|REMAININGTIME|)%%(|BEHINDTIME|)%</source>
-        <translation type="unfinished">%(|REMAININGTIME|)%%(|BEHINDTIME|)%</translation>
+        <translation>%(|REMAININGTIME|)%%(|BEHINDTIME|)%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1051"/>
@@ -38049,7 +38049,7 @@ Regie: |DIRECTOR%</translation>
     <message>
         <location filename="../themes/themestrings.h" line="56"/>
         <source>%DESCRIPTION%% |VALUE%%UNITS%% (|REMAININGTIME| remaining)%% (|BEHINDTIME| behind)%</source>
-        <translation type="unfinished"></translation>
+        <translation>%DESCRIPTION%% |VALUE%%UNITS%% (|REMAININGTIME| verbleibend)%% (|BEHINDTIME| zurück)%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="59"/>
@@ -38181,12 +38181,12 @@ Regie: |DIRECTOR%</translation>
         <location filename="../themes/themestrings.h" line="99"/>
         <source>%STARTDATE% %STARTTIME%%-|ENDTIME| %%00X00| %
 %&quot;|SUBTITLE|&quot; %%(|ORIGINALAIRDATE|)%</source>
-        <translation type="unfinished"></translation>
+        <translation>%STARTDATE% %STARTTIME%%-|ENDTIME| %%00X00| %\n%\&quot;|SUBTITLE|\&quot; %%(|ORIGINALAIRDATE|)%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="100"/>
         <source>%STARTDATE% %STARTTIME%-%ENDTIME% : %LENMINS%</source>
-        <translation type="unfinished"></translation>
+        <translation>%STARTDATE% %STARTTIME%-%ENDTIME% : %LENMINS%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="103"/>
@@ -39981,22 +39981,22 @@ Regie: |DIRECTOR%</translation>
     <message>
         <location filename="../themes/themestrings.h" line="806"/>
         <source>Duplicate Method:</source>
-        <translation></translation>
+        <translation>Methode für Wdhg.:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="807"/>
         <source>Duplicate Scope:</source>
-        <translation></translation>
+        <translation>Bereich für Wdhg.:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="808"/>
         <source>Duplication Methode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Methode für Wdhg.:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="809"/>
         <source>Duplication Scope:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bereich für Wdhg.:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="810"/>
@@ -45698,7 +45698,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
     <message>
         <location filename="../themes/themestrings.h" line="2230"/>
         <source>[O]k</source>
-        <translation type="unfinished"></translation>
+        <translation>[O]k</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2231"/>
