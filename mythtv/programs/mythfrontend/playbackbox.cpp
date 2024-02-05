@@ -465,6 +465,8 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, const QString& name,
 
     fillRecGroupPasswordCache();
 
+    m_alwaysShowWatchedProgress = gCoreContext->GetBoolSetting("AlwaysShowWatchedProgress", false);
+
     // misc setup
     gCoreContext->addListener(this);
 
@@ -1039,8 +1041,9 @@ void PlaybackBox::ItemVisible(MythUIButtonListItem *item)
     // Flagging status (queued, running, no, yes)
     item->DisplayState(extract_commflag_state(*pginfo), "commflagged");
 
-    item->SetProgress1(0, pginfo->IsWatched() ? 0 : 100,
-                       pginfo->GetWatchedPercent());
+    const auto watchedPercent = pginfo->GetWatchedPercent();
+    const bool showProgress = watchedPercent && (m_alwaysShowWatchedProgress || !pginfo->IsWatched());
+    item->SetProgress1(0, showProgress ? 100 : 0, watchedPercent);
     item->SetProgress2(0, 100, pginfo->GetRecordedPercent());
 
     MythUIButtonListItem *sel_item = item->parent()->GetItemCurrent();

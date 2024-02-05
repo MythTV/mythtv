@@ -4311,68 +4311,106 @@ void ProgramInfo::SaveVideoScanType(uint64_t frame, bool progressive)
 }
 
 
-/// \brief Store the Total Duration at frame 0 in the recordedmarkup table
-void ProgramInfo::SaveTotalDuration(std::chrono::milliseconds duration)
+static void delete_markup_datum(
+    MarkTypes type, uint chanid, const QDateTime &recstartts)
 {
-    if (!IsRecording())
-        return;
-
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("DELETE FROM recordedmarkup "
-                  " WHERE chanid=:CHANID "
-                  " AND starttime=:STARTTIME "
-                  " AND type=:TYPE");
-    query.bindValue(":CHANID", m_chanId);
-    query.bindValue(":STARTTIME", m_recStartTs);
-    query.bindValue(":TYPE", MARK_DURATION_MS);
+                " WHERE chanid=:CHANID "
+                " AND starttime=:STARTTIME "
+                " AND type=:TYPE");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":TYPE", type);
 
     if (!query.exec())
-        MythDB::DBError("Duration delete", query);
+        MythDB::DBError("delete_markup_datum", query);
+}
+
+static void delete_markup_datum(
+    MarkTypes type, const QString &videoPath)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("DELETE FROM filemarkup"
+                " WHERE filename = :PATH "
+                " AND type = :TYPE ;");
+    query.bindValue(":PATH", videoPath);
+    query.bindValue(":TYPE", type);
+
+    if (!query.exec())
+        MythDB::DBError("delete_markup_datum", query);
+}
+
+static void insert_markup_datum(
+    MarkTypes type, uint mark, uint offset, const QString &videoPath)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("INSERT INTO filemarkup"
+                "   (filename, mark, type, `offset`)"
+                " VALUES"
+                "   ( :PATH , :MARK , :TYPE, :OFFSET );");
+    query.bindValue(":PATH", videoPath);
+    query.bindValue(":OFFSET", offset);
+    query.bindValue(":TYPE", type);
+    query.bindValue(":MARK", mark);
+
+    if (!query.exec())
+        MythDB::DBError("insert_markup_datum", query);
+}
+
+static void insert_markup_datum(
+    MarkTypes type, uint mark, uint data, uint chanid, const QDateTime &recstartts)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("INSERT INTO recordedmarkup"
-                  "    (chanid, starttime, mark, type, data)"
-                  "    VALUES"
-                  " ( :CHANID, :STARTTIME, 0, :TYPE, :DATA);");
-    query.bindValue(":CHANID", m_chanId);
-    query.bindValue(":STARTTIME", m_recStartTs);
-    query.bindValue(":TYPE", MARK_DURATION_MS);
-    query.bindValue(":DATA", (uint)(duration.count()));
+                "    (chanid, starttime, mark, type, data)"
+                "    VALUES"
+                " ( :CHANID, :STARTTIME, :MARK, :TYPE, :DATA);");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":DATA", data);
+    query.bindValue(":TYPE", type);
+    query.bindValue(":MARK", mark);
 
     if (!query.exec())
-        MythDB::DBError("Duration insert", query);
+        MythDB::DBError("insert_markup_datum", query);
+}
+
+
+/// \brief Store the Total Duration at frame 0 in the recordedmarkup table
+void ProgramInfo::SaveTotalDuration(std::chrono::milliseconds duration)
+{
+    if (IsVideo())
+    {
+        auto videoPath = StorageGroup::GetRelativePathname(m_pathname);
+        delete_markup_datum(MARK_DURATION_MS, videoPath);
+        insert_markup_datum(MARK_DURATION_MS, 0, duration.count(), videoPath);
+    }
+    else if (IsRecording())
+    {
+        delete_markup_datum(MARK_DURATION_MS, m_chanId, m_recStartTs);
+        insert_markup_datum(MARK_DURATION_MS, 0, duration.count(), m_chanId, m_recStartTs);
+    }
 }
 
 /// \brief Store the Total Frames at frame 0 in the recordedmarkup table
 void ProgramInfo::SaveTotalFrames(int64_t frames)
 {
-    if (!IsRecording())
-        return;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("DELETE FROM recordedmarkup "
-                  " WHERE chanid=:CHANID "
-                  " AND starttime=:STARTTIME "
-                  " AND type=:TYPE");
-    query.bindValue(":CHANID", m_chanId);
-    query.bindValue(":STARTTIME", m_recStartTs);
-    query.bindValue(":TYPE", MARK_TOTAL_FRAMES);
-
-    if (!query.exec())
-        MythDB::DBError("Frames delete", query);
-
-    query.prepare("INSERT INTO recordedmarkup"
-                  "    (chanid, starttime, mark, type, data)"
-                  "    VALUES"
-                  " ( :CHANID, :STARTTIME, 0, :TYPE, :DATA);");
-    query.bindValue(":CHANID", m_chanId);
-    query.bindValue(":STARTTIME", m_recStartTs);
-    query.bindValue(":TYPE", MARK_TOTAL_FRAMES);
-    query.bindValue(":DATA", (uint)(frames));
-
-    if (!query.exec())
-        MythDB::DBError("Total Frames insert", query);
+    if (IsVideo())
+    {
+        auto videoPath = StorageGroup::GetRelativePathname(m_pathname);
+        delete_markup_datum(MARK_TOTAL_FRAMES, videoPath);
+        insert_markup_datum(MARK_TOTAL_FRAMES, 0, frames, videoPath);
+    }
+    else if (IsRecording())
+    {
+        delete_markup_datum(MARK_TOTAL_FRAMES, m_chanId, m_recStartTs);
+        insert_markup_datum(MARK_TOTAL_FRAMES, 0, frames, m_chanId, m_recStartTs);
+    }
 }
 
 /// \brief Store the Resolution at frame in the recordedmarkup table
@@ -4447,6 +4485,40 @@ static uint load_markup_datum(
 
     return (query.next()) ? query.value(0).toUInt() : 0;
 }
+
+static uint load_markup_datum(
+    MarkTypes type, const QString &videoPath)
+{
+    QString qstr = QString(
+        "SELECT filemarkup.`offset` "
+        "FROM filemarkup "
+        "WHERE filemarkup.filename  = :PATH    AND "
+        "      filemarkup.type      = :TYPE "
+        "GROUP BY filemarkup.`offset` "
+        "ORDER BY SUM( ( SELECT IFNULL(fm.mark, filemarkup.mark)"
+        "                FROM filemarkup AS fm "
+        "                WHERE fm.filename  = filemarkup.filename  AND "
+        "                      fm.type      = filemarkup.type      AND "
+        "                      fm.mark      > filemarkup.mark "
+        "                ORDER BY fm.mark ASC LIMIT 1 "
+        "              ) - filemarkup.mark "
+        "            ) DESC "
+        "LIMIT 1");
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(qstr);
+    query.bindValue(":TYPE", (int)type);
+    query.bindValue(":PATH", videoPath);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("load_markup_datum", query);
+        return 0;
+    }
+
+    return (query.next()) ? query.value(0).toUInt() : 0;
+}
+
 
 /** \brief If present in recording this loads average height of the
  *         main video stream from database's stream markup table.
@@ -4555,8 +4627,20 @@ std::chrono::milliseconds ProgramInfo::QueryTotalDuration(void) const
  */
 int64_t ProgramInfo::QueryTotalFrames(void) const
 {
-    int64_t frames = load_markup_datum(MARK_TOTAL_FRAMES, m_chanId, m_recStartTs);
-    return frames;
+    if (IsVideo())
+    {
+        int64_t frames = load_markup_datum(MARK_TOTAL_FRAMES, StorageGroup::GetRelativePathname(m_pathname));
+        return frames;
+    }
+    else if (IsRecording())
+    {
+        int64_t frames = load_markup_datum(MARK_TOTAL_FRAMES, m_chanId, m_recStartTs);
+        return frames;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 void ProgramInfo::QueryMarkup(QVector<MarkupEntry> &mapMark,
@@ -6405,28 +6489,44 @@ void ProgramInfo::CalculateWatchedProgress(uint64_t pos)
     }
 
     uint64_t total = 0;
-    switch (m_recStatus)
+    if (IsVideo())
     {
-      case RecStatus::Recorded:
         total = std::max((int64_t)0, QueryTotalFrames());
-        break;
-      case RecStatus::Recording:
+    }
+    else if (IsRecording())
+    {
+        switch (m_recStatus)
         {
-            // Compute expected total frames based on frame rate.
-            int64_t rate1000 = QueryAverageFrameRate();
-            int64_t duration = m_recStartTs.secsTo(m_recEndTs);
-            total = rate1000 * duration / 1000;
+        case RecStatus::Recorded:
+            total = std::max((int64_t)0, QueryTotalFrames());
+            break;
+        case RecStatus::Recording:
+            {
+                // Compute expected total frames based on frame rate.
+                int64_t rate1000 = QueryAverageFrameRate();
+                int64_t duration = m_recStartTs.secsTo(m_recEndTs);
+                total = rate1000 * duration / 1000;
+            }
+            break;
+        default:
+            break;
         }
-        break;
-      default:
-        break;
     }
 
     if (total == 0)
     {
-        LOG(VB_GUI, LOG_DEBUG,
-            QString("%1 %2 no frame count. Please rebuild seek table for this recording.")
-            .arg(m_recordedId).arg(m_title));
+        if (IsVideo())
+        {
+            LOG(VB_GUI, LOG_DEBUG,
+                QString("%1 %2 no frame count. Please rebuild seek table for this video.")
+                .arg(m_pathname).arg(m_title));
+        }
+        else if (IsRecording())
+        {
+            LOG(VB_GUI, LOG_DEBUG,
+                QString("%1 %2 no frame count. Please rebuild seek table for this recording.")
+                .arg(m_recordedId).arg(m_title));
+        }
         m_watchedPercent = 0;
         return;
     }

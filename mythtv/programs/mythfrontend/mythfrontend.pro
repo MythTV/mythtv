@@ -90,6 +90,9 @@ SOURCES += services/mythfrontendservice.cpp
 HEADERS += progdetails.h proginfolist.h
 SOURCES += progdetails.cpp proginfolist.cpp
 
+HEADERS += playbackstate.h
+SOURCES += playbackstate.cpp
+
 macx {
     mac_bundle {
         CONFIG -= console  # Force behaviour of producing .app bundle
