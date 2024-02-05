@@ -96,7 +96,7 @@ bool PlaybackState::HasBookmark(const QString &filename) const
     {
         return false;
     }
-    return (it.value().bookmarkPos > 0) ? true : false;
+    return it.value().bookmarkPos > 0;
 }
 
 uint64_t PlaybackState::GetLastPlayPos(const QString &filename) const

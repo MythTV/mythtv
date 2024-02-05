@@ -573,7 +573,7 @@ namespace
             return;
         }
 
-        const auto bookmarkState = playbackState.HasBookmark(metadata->GetFilename()) ? "yes" : "no";
+        const auto *const bookmarkState = playbackState.HasBookmark(metadata->GetFilename()) ? "yes" : "no";
         const auto watchedPercent = playbackState.GetWatchedPercent(metadata->GetFilename());
         const bool showProgress = watchedPercent && (playbackState.AlwaysShowWatchedProgress() || !metadata->GetWatched());
         if (item)
@@ -584,7 +584,7 @@ namespace
         if (screen)
         {
             CheckedSet(screen, "bookmarkstate", bookmarkState);
-            auto watchedProgress = dynamic_cast<MythUIProgressBar *>(screen->GetChild("watchedprogressbar"));
+            auto *watchedProgress = dynamic_cast<MythUIProgressBar *>(screen->GetChild("watchedprogressbar"));
             if (watchedProgress)
             {
                 watchedProgress->Set(0, showProgress ? 100 : 0, watchedPercent);
@@ -2360,7 +2360,7 @@ void VideoDialog::UpdateWatchedState(MythUIButtonListItem *item)
     if (!metadata)
         return;
 
-    auto metadataNew = m_d->m_videoList->getListCache().loadOneFromDatabase(metadata->GetID());
+    auto metadataNew = VideoMetadataListManager::loadOneFromDatabase(metadata->GetID());
     if (metadata->GetWatched() != metadataNew->GetWatched())
     {
         metadata->SetWatched(metadataNew->GetWatched());

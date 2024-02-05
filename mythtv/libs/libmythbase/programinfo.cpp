@@ -4632,15 +4632,12 @@ int64_t ProgramInfo::QueryTotalFrames(void) const
         int64_t frames = load_markup_datum(MARK_TOTAL_FRAMES, StorageGroup::GetRelativePathname(m_pathname));
         return frames;
     }
-    else if (IsRecording())
+    if (IsRecording())
     {
         int64_t frames = load_markup_datum(MARK_TOTAL_FRAMES, m_chanId, m_recStartTs);
         return frames;
     }
-    else
-    {
-        return 0;
-    }
+    return 0;
 }
 
 void ProgramInfo::QueryMarkup(QVector<MarkupEntry> &mapMark,
@@ -6519,7 +6516,7 @@ void ProgramInfo::CalculateWatchedProgress(uint64_t pos)
         {
             LOG(VB_GUI, LOG_DEBUG,
                 QString("%1 %2 no frame count. Please rebuild seek table for this video.")
-                .arg(m_pathname).arg(m_title));
+                .arg(m_pathname, m_title));
         }
         else if (IsRecording())
         {
