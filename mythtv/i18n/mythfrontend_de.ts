@@ -16428,7 +16428,7 @@ name cannot be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2201"/>
         <source>Discard 3D stereoscopic fields</source>
-        <translation type="unfinished"></translation>
+        <translation>3D stereoskopische Felder verwerfen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2202"/>
