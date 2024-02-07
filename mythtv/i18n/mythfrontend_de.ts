@@ -16423,12 +16423,12 @@ name cannot be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1888"/>
         <source>Always show watched percent progress bar</source>
-        <translation type="unfinished"></translation>
+        <translation>Ansichtsfortschritt immer anzeigen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1892"/>
         <source>If enabled, shows the watched percent progress bar even if the recording or video is marked as watched. Having a watched percent progress bar at all depends on the currently used theme.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird der Ansichtsfortschritt angzeigt, selbst wenn die Aufnahme oder das Video als gesehen markiert ist. Ob ein Ansichtsfortschritt angezeigt wird, hängt vom aktuellen Erscheinungsbild ab.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2205"/>
