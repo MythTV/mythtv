@@ -849,10 +849,6 @@
         <translation>Science Fiction/Fantasy/Horror</translation>
     </message>
     <message>
-        <source>Soap/melodrama/folkloric</source>
-        <translation type="vanished">Soap/melodrama/folklore</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="400"/>
         <source>Serious/Classical/Religious/Historical Movie/Drama</source>
         <translation>Serious/Classical/Religious/Historical Film/Drama</translation>
@@ -862,14 +858,6 @@
         <source>Adult</source>
         <comment>Adult Movie</comment>
         <translation>Adult Film</translation>
-    </message>
-    <message>
-        <source>News/weather report</source>
-        <translation type="vanished">News/weather report</translation>
-    </message>
-    <message>
-        <source>News magazine</source>
-        <translation type="vanished">News magazine</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="393"/>
@@ -1082,10 +1070,6 @@
         <translation>Nature/Animals/Environment</translation>
     </message>
     <message>
-        <source>Social/Policical/Economics</source>
-        <translation type="vanished">Social/Policical/Economics</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="505"/>
         <source>Magazines/Reports/Documentary</source>
         <translation>Magazines/Reports/Documentary</translation>
@@ -1104,10 +1088,6 @@
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="512"/>
         <source>Education/Science/Factual</source>
         <translation>Education/Science/Factual</translation>
-    </message>
-    <message>
-        <source>Nature/animals/Environment</source>
-        <translation type="vanished">Nature/animals/Environment</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="516"/>
@@ -2204,10 +2184,6 @@ Check if the video exists</translation>
         <translation>Auto (Detect from display)</translation>
     </message>
     <message>
-        <source>Most modern displays have square pixels and the aspect ratio of the screen can be computed from the resolution (default). The aspect ratio can also be automatically detected from the connected display - though this may be slightly less accurate. If automatic detection fails, the correct aspect ratio can be specified here. Note: Some values (e.g 32:10) are primarily intended for multiscreen setups.</source>
-        <translation type="vanished">Most modern displays have square pixels and the aspect ratio of the screen can be computed from the resolution (default). The aspect ratio can also be automatically detected from the connected display - though this may be slightly less accurate. If automatic detection fails, the correct aspect ratio can be specified here. Note: Some values (e.g. 32:10) are primarily intended for multiscreen setups.</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2264"/>
         <source>GUI width (pixels)</source>
         <translation>GUI width (pixels)</translation>
@@ -2354,7 +2330,7 @@ Check if the video exists</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2857"/>
         <source>Enable (recommended) to supply full range RGB output to your display device. Disable to supply limited range RGB output. This setting applies to both the GUI and media playback. Ideally the value of this setting should match a similar setting on your TV or monitor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Enable (recommended) to supply full range RGB output to your display device. Disable to supply limited range RGB output. This setting applies to both the GUI and media playback. Ideally the value of this setting should match a similar setting on your TV or monitor.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3217"/>
@@ -4893,10 +4869,6 @@ Device supports up to %1</translation>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="589"/>
         <source>Userband</source>
         <translation>Userband</translation>
-    </message>
-    <message>
-        <source>Unicable userband ID (0-7) or sometimes (1-8)</source>
-        <translation type="vanished">Unicable userband ID (0-7) or sometimes (1-8)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="617"/>
@@ -11729,14 +11701,6 @@ Please wait...</translation>
         <translation>Disabled</translation>
     </message>
     <message>
-        <source>Current screen %1 %2:</source>
-        <translation type="vanished">Current screen %1 %2:</translation>
-    </message>
-    <message>
-        <source>Screen %1 %2:</source>
-        <translation type="vanished">Screen %1 %2:</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythui/mythdisplay.cpp" line="179"/>
         <source>Current screen	: %1 %2</source>
         <translation>Current screen	: %1 %2</translation>
@@ -17242,10 +17206,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>IP Address</translation>
     </message>
     <message>
-        <source>URL of M3U containing RTSP/RTP/UDP channel URLs.</source>
-        <translation type="vanished">URL of M3U containing RTSP/RTP/UDP channel URLs.</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1812"/>
         <source>ASI device</source>
         <translation>ASI device</translation>
@@ -18342,10 +18302,6 @@ Most DVB-S transponders transmit at 27.5 million symbols per second.</translatio
         <location filename="../libs/libmythtv/videosource.cpp" line="4054"/>
         <source>Position of the LNB on the DiSEqC switch. Leave at 1 if there is no DiSEqC switch and the LNB is directly connected to the SatIP server. This value is used as signal source (attribute src) in the SatIP tune command.</source>
         <translation>Position of the LNB on the DiSEqC switch. Leave at 1 if there is no DiSEqC switch and the LNB is directly connected to the SatIP server. This value is used as signal source (attribute src) in the SatIP tune command.</translation>
-    </message>
-    <message>
-        <source>This name is displayed on screen when Live TV begins and in various other places.  Make sure the last two characters are unique for each input.</source>
-        <translation type="vanished">This name is displayed on screen when Live TV begins and in various other places.  Make sure the last two characters are unique for each input.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2938"/>
@@ -22384,10 +22340,6 @@ is located in %2</translation>
         <translation>Render information.</translation>
     </message>
     <message>
-        <source>Current fps: %1</source>
-        <translation type="vanished">Current FPS: %1</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1520"/>
         <source>GPU memory used     : %1MB</source>
         <translation>GPU memory used     : %1MB</translation>
@@ -22557,10 +22509,6 @@ is located in %2</translation>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1215"/>
         <source>Ethernet</source>
         <translation>Ethernet</translation>
-    </message>
-    <message>
-        <source>Network</source>
-        <translation type="vanished">Network</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1217"/>
@@ -24025,10 +23973,6 @@ Do you wish to continue watching?</translation>
         <translation>ERROR downloading theme package from frontend.</translation>
     </message>
     <message>
-        <source>ERROR downloading theme package from master backend.</source>
-        <translation type="vanished">ERROR downloading theme package from master backend.</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="951"/>
         <source>Error, no theme selected.</source>
         <translation>Error, no theme selected.</translation>
@@ -24430,10 +24374,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1724"/>
         <source>Select Time &amp; Date</source>
         <translation>Select Time &amp; Date</translation>
-    </message>
-    <message>
-        <source>%startdate%%| startyear%, %starttime%</source>
-        <translation type="vanished">%startdate%%| startyear%, %starttime%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2216"/>
