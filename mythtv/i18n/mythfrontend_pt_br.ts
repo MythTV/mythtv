@@ -2626,57 +2626,62 @@ Verifique se o vídeo existe</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3216"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2857"/>
+        <source>Enable (recommended) to supply full range RGB output to your display device. Disable to supply limited range RGB output. This setting applies to both the GUI and media playback. Ideally the value of this setting should match a similar setting on your TV or monitor.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3217"/>
         <source>Language</source>
         <translation type="unfinished">Linguagem</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3234"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3235"/>
         <source>Your preferred language for the user interface.</source>
         <translation type="unfinished">Sua linguagem preferida para a interface de usuário.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3270"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3271"/>
         <source>Guide language #%1</source>
         <translation type="unfinished">Linguagem do Guia de Programação #%1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3276"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3277"/>
         <source>Your #%1 preferred language for Program Guide data and captions.</source>
         <translation type="unfinished">Sua %1ª linguagem preferida para o Guia de Programação e legendas.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4678"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4679"/>
         <source>GUI dimension</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4701"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4702"/>
         <source>Fullscreen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4735"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4736"/>
         <source>All</source>
         <translation type="unfinished">Todos</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4741"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4742"/>
         <source>Theme / Screen Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4783"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4784"/>
         <source>Localization</source>
         <translation type="unfinished">Localização</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4804"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4805"/>
         <source>Select from Channel Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4813"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4814"/>
         <source>Select the channel group to select channels from. &quot;All Channels&quot; lets you choose from all channels of all video sources. &quot;Priority&quot; lets you choose from all channels that have recording priority. The other values let you select a video source to choose channels from.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3846,12 +3851,12 @@ Device supports up to %1</source>
 <context>
     <name>ChannelGroupSetting</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4844"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4845"/>
         <source>Favorites</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5024"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5025"/>
         <source>Group name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3859,32 +3864,32 @@ Device supports up to %1</source>
 <context>
     <name>ChannelGroupSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2906"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2907"/>
         <source>Remember last channel group</source>
         <translation type="unfinished">Lembrar último grupo de canais</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2908"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2909"/>
         <source>If enabled, the EPG will initially display only the channels from the last channel group selected. Pressing &quot;4&quot; will toggle channel group.</source>
         <translation type="unfinished">Se habilitado, o EPG irá inicialmente exibir apenas os canais do último grupo de canais selecionado. Pressionar &quot;4&quot; irá alternar o grupo de canais.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2923"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2924"/>
         <source>Default channel group</source>
         <translation type="unfinished">Grupo de canais padrão</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2929"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2930"/>
         <source>All Channels</source>
         <translation type="unfinished">Todos os Canais</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2936"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2937"/>
         <source>Default channel group to be shown in the EPG.  Pressing GUIDE key will toggle channel group.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4837"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4838"/>
         <source>Select/Unselect channels for this channel group</source>
         <translation type="unfinished">Selecionar/Deselecionar canais para este grupo de canais</translation>
     </message>
@@ -3892,22 +3897,22 @@ Device supports up to %1</source>
 <context>
     <name>ChannelGroupsSetting</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5065"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5066"/>
         <source>Channel Groups</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5071"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5072"/>
         <source>(Create New Channel Group)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5079"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5080"/>
         <source>Favorites</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5094"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5095"/>
         <source>Enter the name of the new channel group</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5751,27 +5756,27 @@ Device supports up to %1</source>
 <context>
     <name>EPGSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3186"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3187"/>
         <source>Guide starts at channel</source>
         <translation type="unfinished">Guia inicia no canal</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3190"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3191"/>
         <source>The program guide starts on this channel if it is run from outside of Live TV mode. Leave blank to enable Live TV automatic start channel.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3202"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3203"/>
         <source>Record threshold</source>
         <translation type="unfinished">Margem de gravação</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3206"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3207"/>
         <source>Pressing SELECT on a show that is at least this many minutes into the future will schedule a recording.</source>
         <translation type="unfinished">Pessionar SELECT num programa que está no mínimo esta quantidade de minutos no futuro irá agendar uma gravação.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4628"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4629"/>
         <source>Program Guide</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6794,117 +6799,117 @@ Error: %1</source>
 <context>
     <name>GeneralRecPrioritiesSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3026"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3027"/>
         <source>Avoid back to back recordings</source>
         <translation type="unfinished">Evitar gravações seguidas</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3030"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3031"/>
         <source>Selects the situations where the scheduler will avoid assigning shows to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</source>
         <translation type="unfinished">Seleciona as situações em que o agendador irá evitar alocar gravações para a mesma placa se o horário de término e o horário de início corresponderem. Isto será permitido quando necessário para resolver conflitos.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3037"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3038"/>
         <source>Never</source>
         <translation type="unfinished">Nunca</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3038"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3039"/>
         <source>Different Channels</source>
         <translation type="unfinished">Canais Diferentes</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3040"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3041"/>
         <source>Always</source>
         <translation type="unfinished">Sempre</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3051"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3052"/>
         <source>Preferred input priority</source>
         <translation type="unfinished">Prioridade de entrada preferida</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3053"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3054"/>
         <source>Additional priority when a showing matches the preferred input selected in the &apos;Scheduling Options&apos; section of the recording rule.</source>
         <translation type="unfinished">Prioridade adicionar quando uma exibição corresponde a entrada preferida selecionara nas &apos;Opções de agendamento&apos; da regra de gravação.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3068"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3069"/>
         <source>HDTV recording priority</source>
         <translation type="unfinished">Prioridade de gravação HDTV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3070"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3071"/>
         <source>Additional priority when a showing is marked as an HDTV broadcast in the TV listings.</source>
         <translation type="unfinished">Prioridade adicional quando uma exibição está marcada como HDTV nas listagens de TV.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3084"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3085"/>
         <source>Widescreen recording priority</source>
         <translation type="unfinished">Prioridade de gravação widescreen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3087"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3088"/>
         <source>Additional priority when a showing is marked as widescreen in the TV listings.</source>
         <translation type="unfinished">Prioridade adicional quando uma exibição está marcada como widescreen nas listagens de TV.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3101"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3102"/>
         <source>Sign language recording priority</source>
         <translation type="unfinished">Prioridade de gravação com linguagem de sinais</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3104"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3105"/>
         <source>Additional priority when a showing is marked as having in-vision sign language.</source>
         <translation type="unfinished">Prioridade adicional quando uma exibição está marcada como tendo linguagem de sinais.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3119"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3120"/>
         <source>In-vision Subtitles Recording Priority</source>
         <translation type="unfinished">Prioridade de Gravação com Legendas In-vision</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3122"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3123"/>
         <source>Additional priority when a showing is marked as having in-vision subtitles.</source>
         <translation type="unfinished">Prioridade adicional quando uma exibição está marcada como tendo legendas in-vision.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3136"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3137"/>
         <source>Subtitles/CC recording priority</source>
         <translation type="unfinished">Prioridade de gravação com legendas/CC</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3139"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3140"/>
         <source>Additional priority when a showing is marked as having subtitles or closed captioning (CC) available.</source>
         <translation type="unfinished">Prioridade adicional quando uma exibição está marcada como tendo legendas ou closed captions (CC) disponíveis.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3154"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3155"/>
         <source>Hard of hearing priority</source>
         <translation type="unfinished">Prioridade deficiente auditivo</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3156"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3157"/>
         <source>Additional priority when a showing is marked as having support for viewers with impaired hearing.</source>
         <translation type="unfinished">Prioridade adicional quando uma exibição está marcada como tendo suporte para telespectadores com deficiência auditiva.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3171"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3172"/>
         <source>Audio described priority</source>
         <translation type="unfinished">Prioridade descrição sonora</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3173"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3174"/>
         <source>Additional priority when a showing is marked as being Audio Described.</source>
         <translation type="unfinished">Prioridade adicional quando uma exibição está marcada como sendo Descrita em Áudio.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4638"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4639"/>
         <source>Scheduler Options</source>
         <translation type="unfinished">Opções do Agendador</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4649"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4650"/>
         <source>Accessibility Options</source>
         <translation type="unfinished">Opções de Acessibilidade</translation>
     </message>
@@ -7123,128 +7128,128 @@ Error: %1</source>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1613"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2873"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2892"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2874"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2893"/>
         <source>callsign</source>
         <translation type="unfinished">apelido</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2868"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2869"/>
         <source>Channel format</source>
         <translation type="unfinished">Formato do canal</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2870"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2889"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2871"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2890"/>
         <source>number</source>
         <translation type="unfinished">número</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2871"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2890"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2872"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2891"/>
         <source>number callsign</source>
         <translation type="unfinished">número apelido</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2872"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2891"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2873"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2892"/>
         <source>number name</source>
         <translation type="unfinished">número nome</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2874"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2893"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2875"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2894"/>
         <source>name</source>
         <translation type="unfinished">nome</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2876"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2877"/>
         <source>Your preferred channel format.</source>
         <translation type="unfinished">Seu formato preferido de canal.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2887"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2888"/>
         <source>Long channel format</source>
         <translation type="unfinished">Formato de canal longo</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2895"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2896"/>
         <source>Your preferred long channel format.</source>
         <translation type="unfinished">Seu formato preferido de canal longo.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2949"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2950"/>
         <source>Browse/change channels from Channel Group</source>
         <translation type="unfinished">Navegar/trocar canais do Grupo de Canais</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2952"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2953"/>
         <source>If enabled, Live TV will browse or change channels from the selected channel group. The &quot;All Channels&quot; channel group may be selected to browse all channels.</source>
         <translation type="unfinished">Se habilitado, a TV ao Vivo irá navegar ou trocar canais do grupo de canais selecionado. O grupo &quot;Todos Canais&quot; pode ser selecionado para navegar em todos os canais.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2966"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2967"/>
         <source>Case-sensitive sorting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2968"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2969"/>
         <source>If enabled, all sorting will be case-sensitive.  This would mean that &quot;bee movie&quot; would sort after &quot;Sea World&quot; as lower case letters sort after uppercase letters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2981"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2982"/>
         <source>Remove prefixes when sorting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2983"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2984"/>
         <source>If enabled, all sorting will remove the common prefixes (The, A, An) from a string prior to sorting.  For example, this would sort the titles &quot;Earth 2&quot;, &quot;The Flash&quot;, and &quot;Kings&quot; in that order.  If disabled, they would sort as &quot;Earth 2&quot;, &quot;Kings&quot;, &quot;The Flash&quot;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3011"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3012"/>
         <source>Starting channel for Manual Record</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3012"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3013"/>
         <source>Guide Starting Channel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3013"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3014"/>
         <source>Last Manual Record Channel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3014"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3015"/>
         <source>When entering a new Manual Record Rule, the starting channel will default to this.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4565"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4567"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4566"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4568"/>
         <source>General (Basic)</source>
         <translation type="unfinished">Geral (Básico)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4576"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4577"/>
         <source>General (Auto-Expire)</source>
         <translation type="unfinished">Geral (Expiração Automática)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4594"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4595"/>
         <source>General (Jobs)</source>
         <translation type="unfinished">Geral (Trabalhos)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4605"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4606"/>
         <source>General (Advanced)</source>
         <translation type="unfinished">Geral (Avançado)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4617"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4618"/>
         <source>General (Channel Groups)</source>
         <translation type="unfinished">Geral (Grupo de Canais)</translation>
     </message>
@@ -9754,152 +9759,152 @@ Error: %1</source>
 <context>
     <name>LcdSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3661"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3662"/>
         <source>Display time</source>
         <translation type="unfinished">Mostrar hora</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3663"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3664"/>
         <source>Display current time on idle LCD display.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3675"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3676"/>
         <source>Display recording status</source>
         <translation type="unfinished">Mostrar status da gravação</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3677"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3678"/>
         <source>Display current recordings information on LCD display.</source>
         <translation type="unfinished">Exibir informações sobre gravações atuais no LCD.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3689"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3690"/>
         <source>Display menus</source>
         <translation type="unfinished">Mostrar menus</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3691"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3692"/>
         <source>Display selected menu on LCD display. </source>
         <translation type="unfinished">Exibir menu selecionado no LCD. </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3702"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3703"/>
         <source>Menu pop-up time</source>
         <translation type="unfinished">Tempo de exibição do Menu</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3704"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3705"/>
         <source>How many seconds the menu will remain visible after navigation.</source>
         <translation type="unfinished">Quantos segundos o menu irá permanecer visível após a navegação.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3716"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3717"/>
         <source>Display music artist and title</source>
         <translation type="unfinished">Mostrar artista e título para música</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3718"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3719"/>
         <source>Display playing artist and song title in MythMusic on LCD display.</source>
         <translation type="unfinished">Exibir artista e título da música atual do MythMusic no LCD.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3730"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3731"/>
         <source>Items</source>
         <translation type="unfinished">Itens</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3732"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3733"/>
         <source>Artist - Title</source>
         <translation type="unfinished">Artista - Título</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3733"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3734"/>
         <source>Artist [Album] Title</source>
         <translation type="unfinished">Artista [Álbum] Título</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3736"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3737"/>
         <source>Which items to show when playing music.</source>
         <translation type="unfinished">Que itens exibir quando estiver tocando música.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3745"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3746"/>
         <source>Display channel information</source>
         <translation type="unfinished">Mostrar informação de canal</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3747"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3748"/>
         <source>Display tuned channel information on LCD display.</source>
         <translation type="unfinished">Exibir informação do canal sintonizado no LCD.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3759"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3760"/>
         <source>Display volume information</source>
         <translation type="unfinished">Mostrar informação de volume</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3761"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3762"/>
         <source>Display volume level information on LCD display.</source>
         <translation type="unfinished">Mostrar informação de nível de volume no LCD.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3773"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3774"/>
         <source>Display generic information</source>
         <translation type="unfinished">Mostrar informação genérica</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3775"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3776"/>
         <source>Display generic information on LCD display.</source>
         <translation type="unfinished">Exibir informação genérica no LCD.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3786"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3787"/>
         <source>Backlight always on</source>
         <translation type="unfinished">Luz de fundo sempre ligada</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3788"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3789"/>
         <source>Turn on the backlight permanently on the LCD display.</source>
         <translation type="unfinished">Ligar a luz de fundo permanentemente no LCD.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3799"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3800"/>
         <source>Heartbeat always on</source>
         <translation type="unfinished">Heartbeat sempre ligado</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3801"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3802"/>
         <source>Turn on the LCD heartbeat.</source>
         <translation type="unfinished">Ligar o heartbeat do LCD.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3812"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3813"/>
         <source>Display large clock</source>
         <translation type="unfinished">Mostrar relógio grande</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3814"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3815"/>
         <source>On multiline displays try and display the time as large as possible.</source>
         <translation type="unfinished">Em mostradores de múltiplas linhas tentar e mostrar o relógio o maior possível.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3826"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3827"/>
         <source>LCD key order</source>
         <translation type="unfinished">Ordem das teclas do LCD</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3831"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3832"/>
         <source>Enter the 6 Keypad Return Codes for your LCD keypad in the order in which you want the functions up/down/left/right/yes/no to operate. (See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] or the matrix for your display)</source>
         <translation type="unfinished">Digite os 6 códigos para o teclado do seu LCD na ordem em que você quer que as funções cima/baixo/esquerda/direita/sim/não operem. (veja lcdproc/server/drivers/hd44780.c/keyMapMatrix[] ou a matriz para o seu display)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3843"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3844"/>
         <source>Enable LCD device</source>
         <translation type="unfinished">Habilitar dispositivo LCD</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3845"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3846"/>
         <source>Use an LCD display to view MythTV status information.</source>
         <translation type="unfinished">Usar um LCD para ver informações de status do MythTV.</translation>
     </message>
@@ -9940,22 +9945,22 @@ Error: %1</source>
 <context>
     <name>MacDesktopSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4042"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4043"/>
         <source>Video on the desktop</source>
         <translation type="unfinished">Vídeo na Área de Trabalho</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4046"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4047"/>
         <source>If enabled, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation type="unfinished">Se habilitado o vídeo será exibido na Área de Trabalho, atrás dos ícones. Válido apenas quando &quot;Usar tamanho da GUI para Reprodução de TV&quot; e &quot;Executar o frontend numa janela&quot; estão marcados.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4060"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4061"/>
         <source>Frames to skip</source>
         <translation type="unfinished">Quadros a pular</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4064"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4065"/>
         <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation type="unfinished">Vídeo na Área de Trabalho irá pular esta quantidade de quadros para cada quadro desenhado. 0 para mostrar todos os quadros.</translation>
     </message>
@@ -9963,22 +9968,22 @@ Error: %1</source>
 <context>
     <name>MacDockSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4012"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4013"/>
         <source>Video in the dock</source>
         <translation type="unfinished">Vídeo no dock</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4016"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4017"/>
         <source>If enabled, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation type="unfinished">Se habilitado o vídeo será exibido no ícone de notificação. Válido apenas quando &quot;Usar tamanho da GUI para Reprodução de TV&quot; e &quot;Executar frontend em uma janela&quot; estão marcados.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4028"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4029"/>
         <source>Frames to skip</source>
         <translation type="unfinished">Quadros a pular</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4032"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4033"/>
         <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation type="unfinished">Vídeo no dock irá pular esta quantidade de quadros para cada quadro desenhhado. 0 para mostrar todos os quadros.</translation>
     </message>
@@ -9986,32 +9991,32 @@ Error: %1</source>
 <context>
     <name>MacFloatSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3966"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3967"/>
         <source>Video in floating window</source>
         <translation type="unfinished">Vídeo em janela flutuante</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3970"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3971"/>
         <source>If enabled, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation type="unfinished">Se habilitado o vídeo será exibido numa janela. Válido apenas quando &quot;Usar tamanho da GUI para reprodução de TV&quot; e &quot;Executar frontend em uma janela&quot; estão marcados.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3982"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3983"/>
         <source>Frames to skip</source>
         <translation type="unfinished">Quadros a pular</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3986"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3987"/>
         <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation type="unfinished">Vídeo na janela flutuante irá pular esta quantidade de quadros para cada quadro desenhado. 0 para mostrar todos os quadros.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3997"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3998"/>
         <source>Opacity</source>
         <translation type="unfinished">Opacidade</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4001"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4002"/>
         <source>The opacity of the floating window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
         <translation type="unfinished">A opacidade da janela flutuante. Configure em 100 para completamente opaco, 0 para completamente transparente.</translation>
     </message>
@@ -10019,32 +10024,32 @@ Error: %1</source>
 <context>
     <name>MacMainSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3919"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3920"/>
         <source>Video in main window</source>
         <translation type="unfinished">Vídeo na janela principal</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3923"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3924"/>
         <source>If enabled, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation type="unfinished">Se habilitado o vídeo será exibido na janela principal da GUI. Desabilite apenas quando você quer o vídeo na Área de Trabalho ou em uma janela. Válido apenas quando o &quot;Usar tamanho da GUI para Reprodução de TV&quot; e &quot;Executar frontend numa janela&quot; estão marcados.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3937"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3938"/>
         <source>Frames to skip</source>
         <translation type="unfinished">Quadros a pular</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3941"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3942"/>
         <source>Video in the main window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation type="unfinished">Vídeo na janela principal irá pular esta quantidade de quadros para cada quadro desenhado. Deixe em 0 para exibir todos os quadros.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3952"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3953"/>
         <source>Opacity</source>
         <translation type="unfinished">Opacidade</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3956"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3957"/>
         <source>The opacity of the main window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
         <translation type="unfinished">A opacidade da janela principal. Configure para 100 para completamente opaco, 0 para completamente transparente.</translation>
     </message>
@@ -10242,197 +10247,197 @@ Error: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2997"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2998"/>
         <source>Names exempt from prefix removal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2999"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3000"/>
         <source>This list of names will be exempt from removing the common prefixes (The, A, An) from a title or filename.   Enter multiple names separated by semicolons.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3286"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3287"/>
         <source>Enable Network Remote Control interface</source>
         <translation type="unfinished">Habilitar interface de Controle Remoto de Rede</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3289"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3290"/>
         <source>This enables support for controlling MythFrontend over the network.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3302"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3303"/>
         <source>Network Remote Control port</source>
         <translation type="unfinished">Porta do Controle Remoto de Rede</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3306"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3307"/>
         <source>This specifies what port the Network Remote Control interface will listen on for new connections.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3317"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3318"/>
         <source>UDP notify port</source>
         <translation type="unfinished">Porta de notificação UDP</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3321"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3322"/>
         <source>MythTV will listen for connections from the &quot;mythutil&quot; program on this port.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3332"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3333"/>
         <source>Enable CEC Control interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3334"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3335"/>
         <source>This enables controlling MythFrontend from a TV remote or powering the TV on and off from a MythTV remote if you have compatible hardware. These settings only take effect after a restart.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3346"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3347"/>
         <source>Allow Power On TV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3347"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3348"/>
         <source>Enables your TV to be powered on from MythTV remote or when MythTV starts if you have compatible hardware.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3357"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3358"/>
         <source>Allow Power Off TV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3358"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3359"/>
         <source>Enables your TV to be powered off from MythTV remote or when MythTV starts if you have compatible hardware.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3368"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3369"/>
         <source>Power on TV At Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3369"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3370"/>
         <source>Powers on your TV when you start MythTV if you have compatible hardware.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3379"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3380"/>
         <source>Power off TV At Exit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3380"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3381"/>
         <source>Powers off your TV when you exit MythTV if you have compatible hardware.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3395"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3396"/>
         <source>Enable AirPlay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3397"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3398"/>
         <source>AirPlay lets you wirelessly view content on your TV from your iPhone, iPad, iPod Touch, or iTunes on your computer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3411"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3412"/>
         <source>Only support AirTunes (no video)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3413"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3414"/>
         <source>Only stream audio from your iPhone, iPad, iPod Touch, or iTunes on your computer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3426"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3427"/>
         <source>Require password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3430"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3431"/>
         <source>Require a password to use AirPlay. Your iPhone, iPad, iPod Touch, or iTunes on your computer will prompt you when required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3441"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3442"/>
         <source>Password</source>
         <translation type="unfinished">Senha</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3445"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3446"/>
         <source>Your iPhone, iPad, iPod Touch, or iTunes on your computer will prompt you for this password when required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3456"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3457"/>
         <source>AirPlay - Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3467"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3468"/>
         <source>AirPlay full screen playback</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3471"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3472"/>
         <source>During music playback, displays album cover and various media information in full screen mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3527"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3528"/>
         <source>Ignore devices</source>
         <translation type="unfinished">Ignorar dispositivos</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3531"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3532"/>
         <source>If there are any devices that you do not want to be monitored, list them here with commas in-between. The plugins will ignore them. Requires restart.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3642"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3643"/>
         <source>Media Monitor</source>
         <translation type="unfinished">Monitor de Mídia</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3644"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3645"/>
         <source>This enables support for monitoring your CD/DVD drives for new disks and launching the proper plugin to handle them. Requires restart.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4091"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4092"/>
         <source>Shutdown/Reboot Settings</source>
         <translation type="unfinished">Configurações de Desligamento/Reinício</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4174"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4175"/>
         <source>Main Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4179"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4180"/>
         <source>Settings Access</source>
         <translation type="unfinished">Configurações de Acesso</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4184"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4185"/>
         <source>General</source>
         <translation type="unfinished">Geral</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4208"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4209"/>
         <source>Remote Control</source>
         <translation type="unfinished">Controle Remoto</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4233"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4234"/>
         <source>AirPlay Settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14044,7 +14049,7 @@ Voltado ao menu anterior.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4543"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4544"/>
         <source>On-screen Display</source>
         <translation type="unfinished">On-screen Display</translation>
     </message>
@@ -15831,117 +15836,117 @@ reprodução não pode ser vazio.</translation>
         <translation type="unfinished">Quando habilitado, estes irão aplicar um zoom predefinido para toda a reprodução de vídeo no MythTV.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3511"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3512"/>
         <source>Enable realtime priority threads</source>
         <translation type="unfinished">Habilitar tarefas com prioridade em tempo real</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3513"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3514"/>
         <source>When running mythfrontend with root privileges, some threads can be given enhanced priority. Disable this if MythFrontend freezes during video playback.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3543"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3544"/>
         <source>Sort titles</source>
         <translation type="unfinished">Ordenar títulos</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3545"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3546"/>
         <source>Alphabetically</source>
         <translation type="unfinished">Alfabeticamente</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3547"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3548"/>
         <source>By recording priority</source>
         <translation type="unfinished">Por prioridade de gravação</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3550"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3551"/>
         <source>Sets the title sorting order when the view is set to Titles only.</source>
         <translation type="unfinished">Configura a ordenação de títulos quando a visualização está configurada para apenas Títulos.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3871"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3872"/>
         <source>Enable gamma correction for video</source>
         <translation type="unfinished">Habilitar correção gamma para o vídeo</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3875"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3876"/>
         <source>If enabled, QuickTime will correct the gamma of the video to match your monitor. Turning this off can save some CPU cycles.</source>
         <translation type="unfinished">Se habilitado, QuickTime irá corrigir o gamma do vídeo para corresponder ao seu monitor. Desligar isso pode salvar alguns ciclos de CPU.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3886"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3887"/>
         <source>Scale video as necessary</source>
         <translation type="unfinished">Redimensionar vídeo como necessário</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3890"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3891"/>
         <source>If enabled, video will be scaled to fit your window or screen. If unchecked, video will never be made larger than its actual pixel size.</source>
         <translation type="unfinished">Se habilitado o vídeo será redimensionado para caber na sua janela ou tela. Se desmarcado o vídeo nunca será maior que seu tamanho real em pixels.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3901"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3902"/>
         <source>Frames to skip in fullscreen mode</source>
         <translation type="unfinished">Pular quadros no modo tela cheia</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3905"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3906"/>
         <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
         <translation type="unfinished">Vídeo exibido em tela cheia ou em modo não-janela irá pular esta quantidade de quadros para cada quadro desenhado. Deixe em 0 para exibir todos os quadros. Válido apenas quando &quot;Usar tamanho da GUI para reprodução de TV&quot; ou &quot;Executar frontend em uma janela&quot; não estão marcados.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4292"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4293"/>
         <source>Scaling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4316"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4317"/>
         <source>No scaling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4416"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4417"/>
         <source>Playback settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4422"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4423"/>
         <source>General Playback</source>
         <translation type="unfinished">Reprodução Geral</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4444"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4445"/>
         <source>Advanced Playback Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4459"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4460"/>
         <source>Add a new playback profile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4465"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4466"/>
         <source>View Recordings</source>
         <translation type="unfinished">Ver Gravações</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4474"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4475"/>
         <source>Recording Groups</source>
         <translation type="unfinished">Grupos de Gravação</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4493"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4494"/>
         <source>Seeking</source>
         <translation type="unfinished">Buscando</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4501"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4502"/>
         <source>Commercial Skip</source>
         <translation type="unfinished">Pular Comercial</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4512"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4513"/>
         <source>Mac OS X Video Settings</source>
         <translation type="unfinished">Configurações de Vídeos do Mac OS X</translation>
     </message>
@@ -15949,22 +15954,22 @@ reprodução não pode ser vazio.</translation>
 <context>
     <name>PlaybackSettingsDialog</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4353"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4354"/>
         <source>Playback Profile Menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4356"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4357"/>
         <source>Move Up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4358"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4359"/>
         <source>Move Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4360"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4361"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
@@ -45073,52 +45078,52 @@ If they no longer exist please remove them</source>
 <context>
     <name>WatchListSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3559"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3560"/>
         <source>Include the &apos;Watch List&apos; group</source>
         <translation type="unfinished">Incluir grupo &apos;Para Assistir&apos;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3563"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3564"/>
         <source>The &apos;Watch List&apos; is an abbreviated list of recordings sorted to highlight series and shows that need attention in order to keep up to date.</source>
         <translation type="unfinished">A lista &apos;Para Assistir&apos; é uma lista abreviada de gravações ordenadas para destacar séries e programas que precisam de atenção para manter em dia.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3575"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3576"/>
         <source>Start from the Watch List view</source>
         <translation type="unfinished">Iniciar da visualização &apos;Para Assistir&apos;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3579"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3580"/>
         <source>If enabled, the &apos;Watch List&apos; will be the initial view each time you enter the Watch Recordings screen</source>
         <translation type="unfinished">Se habilitado, a lista &quot;Para Assistir&quot; será a visualização inicial todas as vezes que você entrar na tela de Ver Gravações</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3589"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3590"/>
         <source>Exclude recordings not set for Auto-Expire</source>
         <translation type="unfinished">Excluir gravações não marcadas para Auto Expirar</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3594"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3595"/>
         <source>Set this if you turn off Auto-Expire only for recordings that you&apos;ve seen and intend to keep. This option will exclude these recordings from the &apos;Watch List&apos;.</source>
         <translation type="unfinished">Configure isso se você desliga a Expiração automática para as gravações que você já viu e quer manter. Esta opção irá excluir estas gravações da lista &quot;Para assistir&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3607"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3608"/>
         <source>Maximum days counted in the score</source>
         <translation type="unfinished">Máximo de dias contados na pontuação</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3611"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3612"/>
         <source>The &apos;Watch List&apos; scores are based on 1 point equals one day since recording. This option limits the maximum score due to age and affects other weighting factors.</source>
         <translation type="unfinished">A pontuação da lista &apos;Para Assistir&apos; é baseada em 1 ponto igual a um dia desde a gravação. Esta opção limita a pontuação máxima devido a idade e afeta outros fatores do peso.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3623"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3624"/>
         <source>Days to exclude weekly episodes after delete</source>
         <translation type="unfinished">Dias para excluir episódios semanas após deletar</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3628"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3629"/>
         <source>When an episode is deleted or marked as watched, other episodes of the series are excluded from the &apos;Watch List&apos; for this interval of time. Daily shows also have a smaller interval based on this setting.</source>
         <translation type="unfinished">Quando um episódio é apagado ou marcado como assistido, outros episídios da série serão omitidos da lista &apos;Para Assistir&apos; durante este intervalo de tempo. Programas diários também têm um intervalo menor baseado nessa configuração.</translation>
     </message>

@@ -2561,17 +2561,22 @@ Překontrolujte zda video existuje</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4678"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2857"/>
+        <source>Enable (recommended) to supply full range RGB output to your display device. Disable to supply limited range RGB output. This setting applies to both the GUI and media playback. Ideally the value of this setting should match a similar setting on your TV or monitor.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4679"/>
         <source>GUI dimension</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4701"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4702"/>
         <source>Fullscreen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4735"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4736"/>
         <source>All</source>
         <translation>Vše</translation>
     </message>
@@ -2769,12 +2774,12 @@ Překontrolujte zda video existuje</translation>
         <translation>Jaký chcete používat formát času?  Musíte vybrat formát s &quot;AM&quot; nebo &quot;PM&quot;, jinak bude čas zobrazován ve 24-hodinovém nebo &quot;vojenském&quot; formátu.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4804"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4805"/>
         <source>Select from Channel Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4813"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4814"/>
         <source>Select the channel group to select channels from. &quot;All Channels&quot; lets you choose from all channels of all video sources. &quot;Priority&quot; lets you choose from all channels that have recording priority. The other values let you select a video source to choose channels from.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2788,32 +2793,32 @@ Překontrolujte zda video existuje</translation>
         <translation type="vanished">Toto nastavuje způsob vykreslování MythTV. Nastavení &quot;%1&quot; je preferované, pokud nepoužíváte systém se špatnou implementací OpenGL (špatný HW, ovladače nebo správce oken) který podporuje pouze Qt.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3216"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3217"/>
         <source>Language</source>
         <translation>Jazyk</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3234"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3235"/>
         <source>Your preferred language for the user interface.</source>
         <translation>Jaký chcete používat jazyk pro uživatelské rozhraní?</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3270"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3271"/>
         <source>Guide language #%1</source>
         <translation>Jazyk průvodce č.%1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3276"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3277"/>
         <source>Your #%1 preferred language for Program Guide data and captions.</source>
         <translation>Váš preferovaný jazyk č.%1 pro Programová data a titulky.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4741"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4742"/>
         <source>Theme / Screen Settings</source>
         <translation>Nastavení motivu / obrazovky</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4783"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4784"/>
         <source>Localization</source>
         <translation>Lokalizace</translation>
     </message>
@@ -4209,12 +4214,12 @@ Zařízení podporuje až %1</translation>
 <context>
     <name>ChannelGroupSetting</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4844"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4845"/>
         <source>Favorites</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5024"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5025"/>
         <source>Group name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4222,32 +4227,32 @@ Zařízení podporuje až %1</translation>
 <context>
     <name>ChannelGroupSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2906"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2907"/>
         <source>Remember last channel group</source>
         <translation>Zapamatovat si poslední skupinu stanic</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2908"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2909"/>
         <source>If enabled, the EPG will initially display only the channels from the last channel group selected. Pressing &quot;4&quot; will toggle channel group.</source>
         <translation>Pokud je zvoleno tak EPG na začátku zobrazí pouze stanice z posledně vybrané skupiny stanic. Stisknutí &quot;4&quot; přepne skupinu stanic.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2923"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2924"/>
         <source>Default channel group</source>
         <translation>Výchozí skupina stanic</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2929"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2930"/>
         <source>All Channels</source>
         <translation>Všechny stanice</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2936"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2937"/>
         <source>Default channel group to be shown in the EPG.  Pressing GUIDE key will toggle channel group.</source>
         <translation>Výchozí skupina stanic, která bude zobrazena v EPG. Stisk klávesy GUIDE přepne skupinu stanic.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4837"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4838"/>
         <source>Select/Unselect channels for this channel group</source>
         <translation type="unfinished">Označte/odznačte stanice pro tuto Skupinu stanic</translation>
     </message>
@@ -4255,22 +4260,22 @@ Zařízení podporuje až %1</translation>
 <context>
     <name>ChannelGroupsSetting</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5065"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5066"/>
         <source>Channel Groups</source>
         <translation type="unfinished">Skupiny stanic</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5071"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5072"/>
         <source>(Create New Channel Group)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5079"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5080"/>
         <source>Favorites</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5094"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="5095"/>
         <source>Enter the name of the new channel group</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6325,27 +6330,27 @@ Vypnutí vymazáním hesla. Privilegia zůstávají dokud se Galerie neukončí 
 <context>
     <name>EPGSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3186"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3187"/>
         <source>Guide starts at channel</source>
         <translation>EPG začíná na stanici</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3190"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3191"/>
         <source>The program guide starts on this channel if it is run from outside of Live TV mode. Leave blank to enable Live TV automatic start channel.</source>
         <translation>EPG se spustí se začátkem na této stanici pokud je spuštěna mimo Živou TV. Nechte prázdné pro automatickou stanici dle Živé TV.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3202"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3203"/>
         <source>Record threshold</source>
         <translation>Prahová hodnota nahrávání</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3206"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3207"/>
         <source>Pressing SELECT on a show that is at least this many minutes into the future will schedule a recording.</source>
         <translation>Stisknutí &quot;SELECT&quot; na pořadu, který je nejméně tolik minut v budoucnu, naplánuje nahrávání.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4628"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4629"/>
         <source>Program Guide</source>
         <translation type="unfinished">Programový průvodce</translation>
     </message>
@@ -7441,117 +7446,117 @@ Chyba: %1</translation>
 <context>
     <name>GeneralRecPrioritiesSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3026"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3027"/>
         <source>Avoid back to back recordings</source>
         <translation>Vyhnout se následnému nahrávání</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3030"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3031"/>
         <source>Selects the situations where the scheduler will avoid assigning shows to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</source>
         <translation>Pokud nastaveno, plánovač se vyhne přiřazení pořadů z různých stanic na stejnou kartu pokud je jejich čas konce a začátku stejný. Toto bude povoleno pouze v případě potřeby pro řešení konfliktů.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3037"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3038"/>
         <source>Never</source>
         <translation>Nikdy</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3038"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3039"/>
         <source>Different Channels</source>
         <translation>Rozdílné stanice</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3040"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3041"/>
         <source>Always</source>
         <translation>Vždy</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3051"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3052"/>
         <source>Preferred input priority</source>
         <translation>Preferovaná priorita vstupu</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3053"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3054"/>
         <source>Additional priority when a showing matches the preferred input selected in the &apos;Scheduling Options&apos; section of the recording rule.</source>
         <translation>Dodatečná priorita když pořad souhlasí s preferovaným vstupem nastaveným v sekci &quot;možnosti plánování&quot; nahrávacího pravidla.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3068"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3069"/>
         <source>HDTV recording priority</source>
         <translation>Priorita nahrávání HDTV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3070"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3071"/>
         <source>Additional priority when a showing is marked as an HDTV broadcast in the TV listings.</source>
         <translation>Dodatečná priorita když je pořad označen jako HDTV vysílání v TV programu.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3084"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3085"/>
         <source>Widescreen recording priority</source>
         <translation>Priorita pro nahrávání &quot;širokoúhle&quot;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3087"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3088"/>
         <source>Additional priority when a showing is marked as widescreen in the TV listings.</source>
         <translation>Dodatečná priorita pro pořady vysílané v širokoúhlém formátu.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3101"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3102"/>
         <source>Sign language recording priority</source>
         <translation>Priorita pro znakovou řeč</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3104"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3105"/>
         <source>Additional priority when a showing is marked as having in-vision sign language.</source>
         <translation>Dodatečná priorita pro pořady označené &quot;Se znakovou řečí&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3119"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3120"/>
         <source>In-vision Subtitles Recording Priority</source>
         <translation>Priorita pro viditelné titulky</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3122"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3123"/>
         <source>Additional priority when a showing is marked as having in-vision subtitles.</source>
         <translation>Dodatečná priorita pokud je pořad označen &quot;S viditelnými titulky&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3136"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3137"/>
         <source>Subtitles/CC recording priority</source>
         <translation>Priorita pro (skryté) titulky</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3139"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3140"/>
         <source>Additional priority when a showing is marked as having subtitles or closed captioning (CC) available.</source>
         <translation>Dodatečná priorita pokud je pořad označen &quot;S titulky nebo skrytými titulky&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3154"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3155"/>
         <source>Hard of hearing priority</source>
         <translation>Priorita pro nedoslýchavé</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3156"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3157"/>
         <source>Additional priority when a showing is marked as having support for viewers with impaired hearing.</source>
         <translation>Dodatečná priorita když je pořad označen &quot;Pro diváky se sluchovým postižením&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3171"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3172"/>
         <source>Audio described priority</source>
         <translation>Priorita &quot;Popisného zvuku&quot;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3173"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3174"/>
         <source>Additional priority when a showing is marked as being Audio Described.</source>
         <translation>Dodatečná priorita když je pořad označen &quot;Popisný zvuk&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4638"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4639"/>
         <source>Scheduler Options</source>
         <translation>Možnosti plánovače</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4649"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4650"/>
         <source>Accessibility Options</source>
         <translation>Možnosti přístupnosti</translation>
     </message>
@@ -7770,128 +7775,128 @@ Chyba: %1</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1613"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2873"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2892"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2874"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2893"/>
         <source>callsign</source>
         <translation>ID stanice</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2868"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2869"/>
         <source>Channel format</source>
         <translation>Formát stanic</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2870"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2889"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2871"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2890"/>
         <source>number</source>
         <translation>číslo</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2871"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2890"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2872"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2891"/>
         <source>number callsign</source>
         <translation>číslo ID stanice</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2872"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2891"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2873"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2892"/>
         <source>number name</source>
         <translation>číslo jméno</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2874"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2893"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2875"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2894"/>
         <source>name</source>
         <translation>jméno</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2876"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2877"/>
         <source>Your preferred channel format.</source>
         <translation>Váš preferovaný formát stanic.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2887"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2888"/>
         <source>Long channel format</source>
         <translation>Dlouhý formát stanic</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2895"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2896"/>
         <source>Your preferred long channel format.</source>
         <translation>Váš preferovaný dlouhý formát stanic.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2949"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2950"/>
         <source>Browse/change channels from Channel Group</source>
         <translation>Prohlížet/přepínat kanály ze skupiny stanic</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2952"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2953"/>
         <source>If enabled, Live TV will browse or change channels from the selected channel group. The &quot;All Channels&quot; channel group may be selected to browse all channels.</source>
         <translation>Pokud je zvoleno tak ŽiváTV prochází nebo přepíná jen mezi stanicemi ze zvolené skupiny stanic. Skupina &quot;Všechny Stanice&quot; může být zvolena, aby se procházely všechny stanice.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2966"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2967"/>
         <source>Case-sensitive sorting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2968"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2969"/>
         <source>If enabled, all sorting will be case-sensitive.  This would mean that &quot;bee movie&quot; would sort after &quot;Sea World&quot; as lower case letters sort after uppercase letters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2981"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2982"/>
         <source>Remove prefixes when sorting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2983"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2984"/>
         <source>If enabled, all sorting will remove the common prefixes (The, A, An) from a string prior to sorting.  For example, this would sort the titles &quot;Earth 2&quot;, &quot;The Flash&quot;, and &quot;Kings&quot; in that order.  If disabled, they would sort as &quot;Earth 2&quot;, &quot;Kings&quot;, &quot;The Flash&quot;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3011"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3012"/>
         <source>Starting channel for Manual Record</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3012"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3013"/>
         <source>Guide Starting Channel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3013"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3014"/>
         <source>Last Manual Record Channel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3014"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3015"/>
         <source>When entering a new Manual Record Rule, the starting channel will default to this.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4565"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4567"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4566"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4568"/>
         <source>General (Basic)</source>
         <translation>Obecné (Základ)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4576"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4577"/>
         <source>General (Auto-Expire)</source>
         <translation>Obecné (AutoExpirace)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4594"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4595"/>
         <source>General (Jobs)</source>
         <translation>Obecné (Úlohy)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4605"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4606"/>
         <source>General (Advanced)</source>
         <translation>Obecné (Rozšířené)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4617"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4618"/>
         <source>General (Channel Groups)</source>
         <translation>Obecná (skupiny kanálů)</translation>
     </message>
@@ -10539,152 +10544,152 @@ Chyba: %1</translation>
 <context>
     <name>LcdSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3661"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3662"/>
         <source>Display time</source>
         <translation>Zobrazit čas</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3663"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3664"/>
         <source>Display current time on idle LCD display.</source>
         <translation>Při nečinnosti zobrazí aktuální čas na LCD displeji.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3675"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3676"/>
         <source>Display recording status</source>
         <translation>Zobrazit stav nahrávání</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3677"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3678"/>
         <source>Display current recordings information on LCD display.</source>
         <translation>Zobrazí informace o nahrávání na LCD displeji.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3689"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3690"/>
         <source>Display menus</source>
         <translation>Zobrazit menu</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3691"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3692"/>
         <source>Display selected menu on LCD display. </source>
         <translation>Zobrazí vybrané menu na LCD displeji.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3702"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3703"/>
         <source>Menu pop-up time</source>
         <translation>Čas zobrazení popup menu</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3704"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3705"/>
         <source>How many seconds the menu will remain visible after navigation.</source>
         <translation>Čas (v sekundách) po který bude menu viditelné.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3716"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3717"/>
         <source>Display music artist and title</source>
         <translation>Zobrazit interpreta a název</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3718"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3719"/>
         <source>Display playing artist and song title in MythMusic on LCD display.</source>
         <translation>Zobrazí interpreta a název skladby v MythMusic na LCD displeji.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3730"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3731"/>
         <source>Items</source>
         <translation>Položky</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3732"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3733"/>
         <source>Artist - Title</source>
         <translation>Interpret - Název</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3733"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3734"/>
         <source>Artist [Album] Title</source>
         <translation>Interpret [Album] Název</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3736"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3737"/>
         <source>Which items to show when playing music.</source>
         <translation>Které položky se zobrazí při přehrávání hudby.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3745"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3746"/>
         <source>Display channel information</source>
         <translation>Zobrazit informace o stanici</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3747"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3748"/>
         <source>Display tuned channel information on LCD display.</source>
         <translation>Na LCD displeji zobrazí informace o naladěné stanici.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3759"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3760"/>
         <source>Display volume information</source>
         <translation>Zobrazit informace o hlasitosti</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3761"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3762"/>
         <source>Display volume level information on LCD display.</source>
         <translation>Zobrazí informace o úrovni hlasitosti na LCD displeji.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3773"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3774"/>
         <source>Display generic information</source>
         <translation>Zobrazit obecné informace</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3775"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3776"/>
         <source>Display generic information on LCD display.</source>
         <translation>Zobrazí obecné informace na LCD displeji.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3786"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3787"/>
         <source>Backlight always on</source>
         <translation>Podsvícení je vždy zapnuto</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3788"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3789"/>
         <source>Turn on the backlight permanently on the LCD display.</source>
         <translation>Trvale zapne podsvícení LCD displeje.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3799"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3800"/>
         <source>Heartbeat always on</source>
         <translation>HeartBeat vždy zapnuto</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3801"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3802"/>
         <source>Turn on the LCD heartbeat.</source>
         <translation>Zapne LCD heartbeat.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3812"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3813"/>
         <source>Display large clock</source>
         <translation>Zobrazit velké hodiny</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3814"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3815"/>
         <source>On multiline displays try and display the time as large as possible.</source>
         <translation>Na víceřádkových displejích zobrazí čas tak velký, jak jen to je možné.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3826"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3827"/>
         <source>LCD key order</source>
         <translation>Pořadí kláves LCD</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3831"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3832"/>
         <source>Enter the 6 Keypad Return Codes for your LCD keypad in the order in which you want the functions up/down/left/right/yes/no to operate. (See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] or the matrix for your display)</source>
         <translation>Zadejte 6 návratových kódů klávesnice pro Vaši LCD klávesnici. (funkční tlačítka) v pořadí v jakém chcete přiřadit funkce nahoru/dolů/vlevo/vpravo/ano/ne. (podívejte se na lcdproc/server/drivers/hd44780.c/keyMapMatrix[] nebo do matice Vašeho displaye</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3843"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3844"/>
         <source>Enable LCD device</source>
         <translation>Povolit LCD zařízení</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3845"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3846"/>
         <source>Use an LCD display to view MythTV status information.</source>
         <translation>Použije LCD displej pro zobrazení informací o stavu MythTV.</translation>
     </message>
@@ -10729,22 +10734,22 @@ Chyba: %1</translation>
 <context>
     <name>MacDesktopSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4042"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4043"/>
         <source>Video on the desktop</source>
         <translation>Video na desktopu</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4046"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4047"/>
         <source>If enabled, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation>Pokud povoleno, video bude zobrazeno na desktopu, za ikonami Finderu. Validní pouze pokud nastavení &quot;Použij velikost GUI pro přehrávání TV&quot; a &quot;Spustit frontend v okně&quot; jsou povolena.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4060"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4061"/>
         <source>Frames to skip</source>
         <translation>Přeskočit tolik snímků</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4064"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4065"/>
         <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation>Video na desktopu vynechá toto množství snímků pro každý zobrazený snímek. Nastavte na 0 pro zobrazení všech snímků.</translation>
     </message>
@@ -10752,22 +10757,22 @@ Chyba: %1</translation>
 <context>
     <name>MacDockSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4012"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4013"/>
         <source>Video in the dock</source>
         <translation>Video v Docku</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4016"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4017"/>
         <source>If enabled, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation>Pokud povoleno, video bude zobrazeno v ikoně aplikace v docku . Pouze validní, pokud &quot;Použít velikost GUI pro přehrávání&quot; a &quot;Spustit frontend v okně&quot; jsou povoleny.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4028"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4029"/>
         <source>Frames to skip</source>
         <translation>Přeskočit tolik snímků</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4032"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4033"/>
         <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation>Video v dokovací ikoně přeskočí toto množství snímků na každý zobrazený. Nastavte na 0 pro zobrazení všech snímků.</translation>
     </message>
@@ -10775,32 +10780,32 @@ Chyba: %1</translation>
 <context>
     <name>MacFloatSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3966"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3967"/>
         <source>Video in floating window</source>
         <translation>Video v plovoucím okně</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3970"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3971"/>
         <source>If enabled, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation>Pokud povoleno, video bude zobrazeno v plovoucím okně. Validní pouze pokud nastavení &quot;Použij velikost GUI pro přehrávání TV&quot; a &quot;Spustit frontend v okně&quot; jsou povolena.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3982"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3983"/>
         <source>Frames to skip</source>
         <translation>Přeskočit tolik snímků</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3986"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3987"/>
         <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation>Video v plovoucím okně vynechá toto množství snímků pro každý zobrazený snímek. Nastavte na 0 pro zobrazení všech snímků.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3997"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3998"/>
         <source>Opacity</source>
         <translation>Neprůhlednost</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4001"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4002"/>
         <source>The opacity of the floating window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
         <translation>Neprůhlednost plovoucího okna. Nastavte na 100 pro kompletní neprůhlednost, 0 pro plnou transparentnost.</translation>
     </message>
@@ -10808,32 +10813,32 @@ Chyba: %1</translation>
 <context>
     <name>MacMainSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3919"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3920"/>
         <source>Video in main window</source>
         <translation>Video v hlavním okně</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3923"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3924"/>
         <source>If enabled, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation>Pokud povoleno, video bude zobrazeno v hlavním okně GUI. Zakažte pokud chcete video na desktopu nebo v plovoucím okně.  Validní pouze pokud nastavení &quot;Použij velikost GUI pro přehrávání TV&quot; a &quot;Spustit frontend v okně&quot; jsou povolena.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3937"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3938"/>
         <source>Frames to skip</source>
         <translation>Přeskočit tolik snímků</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3941"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3942"/>
         <source>Video in the main window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation>Video zobrazené v hlavním okně přeskočí tento počet snímků pro každý zobrazený. Nastavte na 0 pro zobrazení všech snímků.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3952"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3953"/>
         <source>Opacity</source>
         <translation>Neprůhlednost</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3956"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3957"/>
         <source>The opacity of the main window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
         <translation>Neprůhlednost hlavního okna. Nastavte 100 pro úplně neprůhledné, 0 pro transparentní.</translation>
     </message>
@@ -11005,147 +11010,147 @@ Chyba: %1</translation>
         <translation>Tento PIN je použit pro kontrolu přístupu do menu Nastavení. Prázdné nastavení tuto vlastnost vypne. Pokud povoleno, nebudete se moci vrátit na tuto obrazovku a vymazat PIN bez zadání stávajícího PINu.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2997"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2998"/>
         <source>Names exempt from prefix removal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2999"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3000"/>
         <source>This list of names will be exempt from removing the common prefixes (The, A, An) from a title or filename.   Enter multiple names separated by semicolons.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3286"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3287"/>
         <source>Enable Network Remote Control interface</source>
         <translation>Povolit rozhranní ovládání přes síť</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3289"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3290"/>
         <source>This enables support for controlling MythFrontend over the network.</source>
         <translation>Povolí možnost ovládání MythFrontendu přes síť.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3302"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3303"/>
         <source>Network Remote Control port</source>
         <translation>Port pro ovládání přes síť</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3306"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3307"/>
         <source>This specifies what port the Network Remote Control interface will listen on for new connections.</source>
         <translation>Specifikuje, na jakém portu bude poslouchat ovládání přes síť.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3317"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3318"/>
         <source>UDP notify port</source>
         <translation>Port pro UDP hlášení</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3321"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3322"/>
         <source>MythTV will listen for connections from the &quot;mythutil&quot; program on this port.</source>
         <translation>MythTV bude na tomto portu čekat na spojení od programu &quot;mythutil&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3332"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3333"/>
         <source>Enable CEC Control interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3334"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3335"/>
         <source>This enables controlling MythFrontend from a TV remote or powering the TV on and off from a MythTV remote if you have compatible hardware. These settings only take effect after a restart.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3346"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3347"/>
         <source>Allow Power On TV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3347"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3348"/>
         <source>Enables your TV to be powered on from MythTV remote or when MythTV starts if you have compatible hardware.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3357"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3358"/>
         <source>Allow Power Off TV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3358"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3359"/>
         <source>Enables your TV to be powered off from MythTV remote or when MythTV starts if you have compatible hardware.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3368"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3369"/>
         <source>Power on TV At Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3369"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3370"/>
         <source>Powers on your TV when you start MythTV if you have compatible hardware.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3379"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3380"/>
         <source>Power off TV At Exit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3380"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3381"/>
         <source>Powers off your TV when you exit MythTV if you have compatible hardware.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3395"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3396"/>
         <source>Enable AirPlay</source>
         <translation>Povolit AirPlay</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3397"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3398"/>
         <source>AirPlay lets you wirelessly view content on your TV from your iPhone, iPad, iPod Touch, or iTunes on your computer.</source>
         <translation>AirPlay Vám umožní zobrazit na TV obsah z Vašeho iPhone, iPadu, iPod Touch nebo iTunes na PC.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3411"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3412"/>
         <source>Only support AirTunes (no video)</source>
         <translation>Povolit pouze AirTunes (ne video)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3413"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3414"/>
         <source>Only stream audio from your iPhone, iPad, iPod Touch, or iTunes on your computer</source>
         <translation>Přehrávat pouze audio z Vašeho iPhone, iPadu, iPod Touch nebo iTunes na PC</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3426"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3427"/>
         <source>Require password</source>
         <translation>Vyžadovat heslo</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3430"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3431"/>
         <source>Require a password to use AirPlay. Your iPhone, iPad, iPod Touch, or iTunes on your computer will prompt you when required</source>
         <translation>Pro použití AirPlay bude nutné heslo. Váš iPhone, iPad, iPod Touch nebo iTunes na PC Vás vyzvou k jeho zadání až bude potřeba</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3441"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3442"/>
         <source>Password</source>
         <translation type="unfinished">Heslo</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3445"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3446"/>
         <source>Your iPhone, iPad, iPod Touch, or iTunes on your computer will prompt you for this password when required</source>
         <translation> Váš iPhone, iPad, iPod Touch nebo iTunes na PC Vás vyzvou k zadání hesla až bude potřeba</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3456"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3457"/>
         <source>AirPlay - Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3467"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3468"/>
         <source>AirPlay full screen playback</source>
         <translation>Přehrávání AirPlay na celé obrazovce</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3471"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3472"/>
         <source>During music playback, displays album cover and various media information in full screen mode</source>
         <translation>Během přehrávání hudby, zobrazí se obal alba a další informace o médiu přes celou obrazovlku</translation>
     </message>
@@ -11162,27 +11167,27 @@ Chyba: %1</translation>
         <translation type="vanished">AirTunes RSA klíč úspěšně nahrán.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3527"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3528"/>
         <source>Ignore devices</source>
         <translation>Ignorovat zařízení</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3531"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3532"/>
         <source>If there are any devices that you do not want to be monitored, list them here with commas in-between. The plugins will ignore them. Requires restart.</source>
         <translation>Pokud máte zařízení, která nechcete monitorovat, vypište je sem a oddělte je čárkou. Pluginy je budou ignorovat. Vyžaduje restart.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4179"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4180"/>
         <source>Settings Access</source>
         <translation>Nastavení přístupu</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4184"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4185"/>
         <source>General</source>
         <translation>Všeobecné nastavení</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3642"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3643"/>
         <source>Media Monitor</source>
         <translation>Monitor médií</translation>
     </message>
@@ -11217,27 +11222,27 @@ Chyba: %1</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3644"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3645"/>
         <source>This enables support for monitoring your CD/DVD drives for new disks and launching the proper plugin to handle them. Requires restart.</source>
         <translation type="unfinished">Povolí podporu pro monitorování vložení disku do CD/DVD mechanik a spouští vhodné pluginy. Vyžaduje restart.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4174"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4175"/>
         <source>Main Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4208"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4209"/>
         <source>Remote Control</source>
         <translation>Dálkové ovládání</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4233"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4234"/>
         <source>AirPlay Settings</source>
         <translation>Nastavení AirPlay</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4091"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4092"/>
         <source>Shutdown/Reboot Settings</source>
         <translation>Nastavení Vypnutí/Restartu</translation>
     </message>
@@ -15067,7 +15072,7 @@ Větev: %2
         <translation>Pokud povoleno, mód prohlížení bude ukazovat stanice na všech dostupných nahrávacích zařízeních, místo ukazování stanic na současném nahrávacím zařízení.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4543"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4544"/>
         <source>On-screen Display</source>
         <translation>OSD</translation>
     </message>
@@ -16829,57 +16834,57 @@ nesmí být prázdné.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4292"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4293"/>
         <source>Scaling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4316"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4317"/>
         <source>No scaling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4416"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4417"/>
         <source>Playback settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4422"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4423"/>
         <source>General Playback</source>
         <translation type="unfinished">Obecné přehrávání</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4444"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4445"/>
         <source>Advanced Playback Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4459"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4460"/>
         <source>Add a new playback profile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4465"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4466"/>
         <source>View Recordings</source>
         <translation type="unfinished">Zobraz nahrávky</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4474"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4475"/>
         <source>Recording Groups</source>
         <translation type="unfinished">Nahrávací skupiny</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4493"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4494"/>
         <source>Seeking</source>
         <translation type="unfinished">Vyhledávání</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4501"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4502"/>
         <source>Commercial Skip</source>
         <translation type="unfinished">Přeskakování reklam</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4512"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4513"/>
         <source>Mac OS X Video Settings</source>
         <translation type="unfinished">Nastavení videa pro Mac OS X</translation>
     </message>
@@ -17014,62 +17019,62 @@ nesmí být prázdné.</translation>
         <translation>Pokud povoleno, bude aplikován předdefinované zvětšení na všechna přehrávání videa v MythTV.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3511"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3512"/>
         <source>Enable realtime priority threads</source>
         <translation>Povolit vlákna s realtime prioritou</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3513"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3514"/>
         <source>When running mythfrontend with root privileges, some threads can be given enhanced priority. Disable this if MythFrontend freezes during video playback.</source>
         <translation>Když spouštíte MythFrontend s právy &quot;root&quot;, některá vlákna mohou získat rozšířenou prioritu.  Toto vypněte, pokud MythFrontend zamrzá během přehrávání videa.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3543"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3544"/>
         <source>Sort titles</source>
         <translation>Seřadit tituly</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3545"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3546"/>
         <source>Alphabetically</source>
         <translation>Podle abecedy</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3547"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3548"/>
         <source>By recording priority</source>
         <translation>Podle priority nahrávání</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3550"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3551"/>
         <source>Sets the title sorting order when the view is set to Titles only.</source>
         <translation>Nastavuje řazení názvů pro zobrazení &quot;Pouze názvy&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3871"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3872"/>
         <source>Enable gamma correction for video</source>
         <translation>Povolit gama korekci pro video</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3875"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3876"/>
         <source>If enabled, QuickTime will correct the gamma of the video to match your monitor. Turning this off can save some CPU cycles.</source>
         <translation>Pokud povoleno, QuickTime bude korigovat gama složku videa aby odpovídala vašemu monitoru.  Vypnutím snížíte zatížení CPU.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3886"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3887"/>
         <source>Scale video as necessary</source>
         <translation>Zvětšit obraz dle potřeby</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3890"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3891"/>
         <source>If enabled, video will be scaled to fit your window or screen. If unchecked, video will never be made larger than its actual pixel size.</source>
         <translation>Pokud povoleno, video bude přepočítáváno aby odpovídalo velikosti okna nebo obrazovky. Pokud zakázáno, video nikdy nebude větší než jeho fyzická velikost dle pixelů.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3901"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3902"/>
         <source>Frames to skip in fullscreen mode</source>
         <translation>Přeskočit tolik snímků v celoobrazovkovém módu</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3905"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3906"/>
         <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
         <translation>Video zobrazené na celé obrazovce přeskočí tento počet snímků pro každý zobrazený. Nastavte na 0 aby se zobrazily všechny snímky. Validní pouze pokud nastavení &quot;Použij velikost GUI pro přehrávání TV&quot; a &quot;Spustit frontend v okně&quot; nejsou povolena.</translation>
     </message>
@@ -17112,22 +17117,22 @@ nesmí být prázdné.</translation>
 <context>
     <name>PlaybackSettingsDialog</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4353"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4354"/>
         <source>Playback Profile Menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4356"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4357"/>
         <source>Move Up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4358"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4359"/>
         <source>Move Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4360"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4361"/>
         <source>Delete</source>
         <translation type="unfinished">Smazat</translation>
     </message>
@@ -50366,52 +50371,52 @@ Pokud již neexistují, prosím odstraňte je</translation>
 <context>
     <name>WatchListSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3559"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3560"/>
         <source>Include the &apos;Watch List&apos; group</source>
         <translation>Zahrnout skupinu seznamu &quot;K přehrání&quot;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3563"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3564"/>
         <source>The &apos;Watch List&apos; is an abbreviated list of recordings sorted to highlight series and shows that need attention in order to keep up to date.</source>
         <translation>Seznam &quot;K přehrání&quot; je zkrácený seznam nahrávek seřazený k zvýraznění sérií a pořadů které potřebují pozornost k udržení aktuálnosti.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3575"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3576"/>
         <source>Start from the Watch List view</source>
         <translation>Startovat seznamem &quot;K přehrání&quot;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3579"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3580"/>
         <source>If enabled, the &apos;Watch List&apos; will be the initial view each time you enter the Watch Recordings screen</source>
         <translation>Pokud nastaveno, seznam &quot;K přehrání&quot; bude výchozím zobrazením pokaždé když vstoupíte na obrazovku &quot;Nahrané pořady&quot;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3589"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3590"/>
         <source>Exclude recordings not set for Auto-Expire</source>
         <translation>Vyřadit nahrávky nemající nastavenu automatickou expiraci</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3594"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3595"/>
         <source>Set this if you turn off Auto-Expire only for recordings that you&apos;ve seen and intend to keep. This option will exclude these recordings from the &apos;Watch List&apos;.</source>
         <translation>Toto nastavte pokud vypínáte automatickou expiraci pro nahrávky které jste viděl a chcete je zachovat. Tato volba vyjme takové nahrávky ze seznamu &quot;K přehrání&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3607"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3608"/>
         <source>Maximum days counted in the score</source>
         <translation>Maximální počet dní počítaných do skóre</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3611"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3612"/>
         <source>The &apos;Watch List&apos; scores are based on 1 point equals one day since recording. This option limits the maximum score due to age and affects other weighting factors.</source>
         <translation>Skóre seznamu &quot;K přehrání&quot; je založeno na bodech odpovídajících 1 bodu za každý den od nahrávání. Tato možnost limituje maximální skóre podle věku a ovlivňuje ostatní váhové faktory.  </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3623"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3624"/>
         <source>Days to exclude weekly episodes after delete</source>
         <translation>Počet dní pro vynechání epizod po smazání</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3628"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3629"/>
         <source>When an episode is deleted or marked as watched, other episodes of the series are excluded from the &apos;Watch List&apos; for this interval of time. Daily shows also have a smaller interval based on this setting.</source>
         <translation>Když je epizoda smazána nebo označena jako přehraná, ostatní epizody série jsou vynechány ze seznamu &quot;K přehrání&quot; pro tento časový interval. Denní pořady také mají menší interval založený na tomto nastavení.</translation>
     </message>
