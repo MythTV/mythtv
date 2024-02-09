@@ -652,6 +652,15 @@ void WaveForm::saveload(MusicMetadata *meta)
         // but this is now compensated for by drawing wider "pixels"
         m_duration = m_stream ? 60000 : meta->Length().count(); // millisecs
     }
+
+    // A track length of zero milliseconds is most likely wrong but
+    // can accidentally happen.  Rather than crash on divide by zero
+    // later, let's pretend it is 1 minute long.  If the file plays
+    // successfully, then it should record the correct track length
+    // and be more correct next time.
+    if (m_duration <= 0)
+        m_duration = 60000;
+
     if (s_image.isNull())
     {
         s_image = QImage(m_wfsize.width(), m_wfsize.height(), QImage::Format_RGB32);
