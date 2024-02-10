@@ -226,7 +226,7 @@ void EITScanner::StopEITEventProcessing(void)
         return;
 
     LOG(VB_EIT, LOG_INFO, LOC +
-        QString("Stop EIT event processing for source %1 '%2', added %3 EIT events")
+        QString("Stop EIT scan source %1 '%2', added %3 EIT events")
             .arg(m_sourceid).arg(m_sourceName).arg(m_eitCount));
 
     if (m_eitCount)
