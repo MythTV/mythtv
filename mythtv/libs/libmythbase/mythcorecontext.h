@@ -15,7 +15,6 @@
 #include "mythlogging.h"
 #include "mythlocale.h"
 #include "mythsession.h"
-#include "qtuplift.h"
 
 static constexpr const char * MYTH_APPNAME_MYTHBACKEND { "mythbackend" };
 static constexpr const char * MYTH_APPNAME_MYTHJOBQUEUE { "mythjobqueue" };
