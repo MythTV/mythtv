@@ -471,11 +471,7 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
     }
 
     // print type and default for the stored value
-#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-    msg << "Type:        " << QMetaType::typeName(m_type) << Qt::endl;
-#else
     msg << "Type:        " << QMetaType(m_type).name() << Qt::endl;
-#endif
     if (m_default.canConvert<QString>())
         msg << "Default:     " << m_default.toString() << Qt::endl;
 
