@@ -62,12 +62,6 @@
 #include <QVariantMap>
 #include <utility>
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-  #define QT_ENDL endl
-#else
-  #define QT_ENDL Qt::endl
-#endif
-
 // MythTV headers
 #include "mythcommandlineparser.h"
 #include "mythcorecontext.h"
@@ -415,11 +409,11 @@ QString CommandLineArg::GetHelpString(int off, const QString& group, bool force)
     if (!m_parents.isEmpty())
         msg << "  ";
     msg << GetKeywordString().leftJustified(off, ' ')
-        << hlist.takeFirst() << QT_ENDL;
+        << hlist.takeFirst() << Qt::endl;
 
     // print remaining lines with necessary padding
     for (const auto & line : qAsConst(hlist))
-        msg << pad << line << QT_ENDL;
+        msg << pad << line << Qt::endl;
 
     // loop through any child arguments to print underneath
     for (auto * arg : qAsConst(m_children))
@@ -457,7 +451,7 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
         PrintDeprecatedWarning(keyword);
     }
 
-    msg << "Option:      " << keyword << QT_ENDL << QT_ENDL;
+    msg << "Option:      " << keyword << Qt::endl << Qt::endl;
 
     bool first = true;
 
@@ -468,22 +462,22 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
         {
             if (first)
             {
-                msg << "Aliases:     " << word << QT_ENDL;
+                msg << "Aliases:     " << word << Qt::endl;
                 first = false;
             }
             else
-                msg << "             " << word << QT_ENDL;
+                msg << "             " << word << Qt::endl;
         }
     }
 
     // print type and default for the stored value
 #if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-    msg << "Type:        " << QMetaType::typeName(m_type) << QT_ENDL;
+    msg << "Type:        " << QMetaType::typeName(m_type) << Qt::endl;
 #else
-    msg << "Type:        " << QMetaType(m_type).name() << QT_ENDL;
+    msg << "Type:        " << QMetaType(m_type).name() << Qt::endl;
 #endif
     if (m_default.canConvert<QString>())
-        msg << "Default:     " << m_default.toString() << QT_ENDL;
+        msg << "Default:     " << m_default.toString() << Qt::endl;
 
     QStringList help;
     if (m_longhelp.isEmpty())
@@ -493,47 +487,47 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
     wrapList(help, termwidth-13);
 
     // print description, wrapping and padding as necessary
-    msg << "Description: " << help.takeFirst() << QT_ENDL;
+    msg << "Description: " << help.takeFirst() << Qt::endl;
     for (const auto & line : qAsConst(help))
-        msg << "             " << line << QT_ENDL;
+        msg << "             " << line << Qt::endl;
 
     QList<CommandLineArg*>::const_iterator i2;
 
     // loop through the four relation types and print
     if (!m_parents.isEmpty())
     {
-        msg << QT_ENDL << "Can be used in combination with:" << QT_ENDL;
+        msg << Qt::endl << "Can be used in combination with:" << Qt::endl;
         for (auto * parent : qAsConst(m_parents))
             msg << " " << parent->GetPreferredKeyword()
                                     .toLocal8Bit().constData();
-        msg << QT_ENDL;
+        msg << Qt::endl;
     }
 
     if (!m_children.isEmpty())
     {
-        msg << QT_ENDL << "Allows the use of:" << QT_ENDL;
+        msg << Qt::endl << "Allows the use of:" << Qt::endl;
         for (i2 = m_children.constBegin(); i2 != m_children.constEnd(); ++i2)
             msg << " " << (*i2)->GetPreferredKeyword()
                                     .toLocal8Bit().constData();
-        msg << QT_ENDL;
+        msg << Qt::endl;
     }
 
     if (!m_requires.isEmpty())
     {
-        msg << QT_ENDL << "Requires the use of:" << QT_ENDL;
+        msg << Qt::endl << "Requires the use of:" << Qt::endl;
         for (i2 = m_requires.constBegin(); i2 != m_requires.constEnd(); ++i2)
             msg << " " << (*i2)->GetPreferredKeyword()
                                     .toLocal8Bit().constData();
-        msg << QT_ENDL;
+        msg << Qt::endl;
     }
 
     if (!m_blocks.isEmpty())
     {
-        msg << QT_ENDL << "Prevents the use of:" << QT_ENDL;
+        msg << Qt::endl << "Prevents the use of:" << Qt::endl;
         for (i2 = m_blocks.constBegin(); i2 != m_blocks.constEnd(); ++i2)
             msg << " " << (*i2)->GetPreferredKeyword()
                                     .toLocal8Bit().constData();
-        msg << QT_ENDL;
+        msg << Qt::endl;
     }
 
     msg.flush();
@@ -1413,7 +1407,7 @@ QString MythCommandLineParser::GetHelpString(void) const
 
     QString versionStr = QString("%1 version: %2 [%3] www.mythtv.org")
         .arg(m_appname, GetMythSourcePath(), GetMythSourceVersion());
-    msg << versionStr << QT_ENDL;
+    msg << versionStr << Qt::endl;
 
     if (toString("showhelp").isEmpty())
     {
@@ -1421,7 +1415,7 @@ QString MythCommandLineParser::GetHelpString(void) const
 
         QString descr = GetHelpHeader();
         if (descr.size() > 0)
-            msg << QT_ENDL << descr << QT_ENDL << QT_ENDL;
+            msg << Qt::endl << descr << Qt::endl << Qt::endl;
 
         // loop through registered arguments to populate list of groups
         QStringList groups("");
@@ -1439,13 +1433,13 @@ QString MythCommandLineParser::GetHelpString(void) const
         for (const auto & group : qAsConst(groups))
         {
             if (group.isEmpty())
-                msg << "Misc. Options:" << QT_ENDL << QT_ENDL;
+                msg << "Misc. Options:" << Qt::endl << Qt::endl;
             else
-                msg << group.toLocal8Bit().constData() << " Options:" << QT_ENDL << QT_ENDL;
+                msg << group.toLocal8Bit().constData() << " Options:" << Qt::endl << Qt::endl;
 
             for (auto * cmdarg : qAsConst(m_namedArgs))
                 msg << cmdarg->GetHelpString(maxlen, group);
-            msg << QT_ENDL;
+            msg << Qt::endl;
         }
     }
     else

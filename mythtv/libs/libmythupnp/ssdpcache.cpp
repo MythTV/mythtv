@@ -17,14 +17,6 @@
 #include "upnp.h"
 #include "upnptaskcache.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-  #define QT_ENDL endl
-  #define QT_FLUSH flush
-#else
-  #define QT_ENDL Qt::endl
-  #define QT_FLUSH Qt::flush
-#endif
-
 SSDPCache* SSDPCache::g_pSSDPCache = nullptr;
 
 int SSDPCacheEntries::g_nAllocated = 0;       // Debugging only
@@ -195,7 +187,7 @@ QTextStream &SSDPCacheEntries::OutputXML(
         // holds one reference to each entry and we are holding m_mutex.
         os << "<Service usn='" << entry->m_sUSN
            << "' expiresInSecs='" << entry->ExpiresInSecs().count()
-           << "' url='" << entry->m_sLocation << "' />" << QT_ENDL;
+           << "' url='" << entry->m_sLocation << "' />" << Qt::endl;
 
         if (pnEntryCount != nullptr)
             (*pnEntryCount)++;
@@ -559,7 +551,7 @@ QTextStream &SSDPCache::OutputXML(
     {
         if (*it != nullptr)
         {
-            os << "<Device uri='" << it.key() << "'>" << QT_ENDL;
+            os << "<Device uri='" << it.key() << "'>" << Qt::endl;
 
             uint tmp = 0;
 
@@ -568,13 +560,13 @@ QTextStream &SSDPCache::OutputXML(
             if (pnEntryCount != nullptr)
                 *pnEntryCount += tmp;
 
-            os << "</Device>" << QT_ENDL;
+            os << "</Device>" << Qt::endl;
 
             if (pnDevCount != nullptr)
                 (*pnDevCount)++;
         }
     }
-    os << QT_FLUSH;
+    os << Qt::flush;
 
     return os;
 }
