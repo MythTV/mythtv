@@ -4195,11 +4195,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
         return;
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList tokens = Command.split(" ", QString::SkipEmptyParts);
-#else
     QStringList tokens = Command.split(" ", Qt::SkipEmptyParts);
-#endif
     if (tokens.size() < 2)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Not enough tokens in network control command " + QString("'%1'").arg(Command));
@@ -7241,11 +7237,7 @@ void TV::customEvent(QEvent *Event)
     QString message = me->Message();
 
     // TODO Go through these and make sure they make sense...
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList tokens = message.split(" ", QString::SkipEmptyParts);
-#else
     QStringList tokens = message.split(" ", Qt::SkipEmptyParts);
-#endif
 
     if (me->ExtraDataCount() == 1)
     {
@@ -7464,11 +7456,7 @@ void TV::customEvent(QEvent *Event)
         if ((tokens.size() >= 2) &&
             (tokens[1] != "ANSWER") && (tokens[1] != "RESPONSE"))
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList tokens2 = message.split(" ", QString::SkipEmptyParts);
-#else
             QStringList tokens2 = message.split(" ", Qt::SkipEmptyParts);
-#endif
             if ((tokens2.size() >= 2) &&
                 (tokens2[1] != "ANSWER") && (tokens2[1] != "RESPONSE"))
             {
@@ -7524,19 +7512,10 @@ void TV::customEvent(QEvent *Event)
         {
             frm_dir_map_t newMap;
             QStringList mark;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList marks =
-                tokens[2].split(",", QString::SkipEmptyParts);
-#else
             QStringList marks = tokens[2].split(",", Qt::SkipEmptyParts);
-#endif
             for (int j = 0; j < marks.size(); j++)
             {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                mark = marks[j].split(":", QString::SkipEmptyParts);
-#else
                 mark = marks[j].split(":", Qt::SkipEmptyParts);
-#endif
                 if (marks.size() >= 2)
                     newMap[mark[0].toULongLong()] = static_cast<MarkTypes>(mark[1].toInt());
             }

@@ -31,11 +31,7 @@ MythHTTPRequest::MythHTTPRequest(const MythHTTPConfig& Config, QString Method,
     m_timeout(Config.m_timeout)
 {
     // TODO is the simplified() call here always safe?
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList tokens = m_method.simplified().split(' ', QString::SkipEmptyParts);
-#else
     QStringList tokens = m_method.simplified().split(' ', Qt::SkipEmptyParts);
-#endif
 
     // Validation
     // Must have verb and url and optional version
@@ -152,11 +148,7 @@ MythHTTPRequest::MythHTTPRequest(const MythHTTPConfig& Config, QString Method,
 HTTPQueries MythHTTPRequest::ParseQuery(const QString &Query)
 {
     HTTPQueries result;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList params = Query.split('&', QString::SkipEmptyParts);
-#else
-        QStringList params = Query.split('&', Qt::SkipEmptyParts);
-#endif
+    QStringList params = Query.split('&', Qt::SkipEmptyParts);
     for (const auto & param : qAsConst(params))
     {
         QString key   = param.section('=', 0, 0);

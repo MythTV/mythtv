@@ -1586,11 +1586,7 @@ static HostComboBoxSetting *SubtitleCodec()
                                kMSStdOut | kMSDontDisableDrawing));
     cmd->Wait();
     QString results = cmd->GetStandardOutputStream()->readAll();
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList list = results.toLower().split(crlf, QString::SkipEmptyParts);
-#else
     QStringList list = results.toLower().split(crlf, Qt::SkipEmptyParts);
-#endif
     list.replaceInStrings(suffix, "");
     list.sort();
 

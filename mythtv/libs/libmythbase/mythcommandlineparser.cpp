@@ -2124,13 +2124,8 @@ QMap<QString,QString> MythCommandLineParser::GetSettingsOverride(void)
                     QTextStream in(&f);
                     while (!in.atEnd()) {
                         QString line = in.readLine().trimmed();
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                        QStringList tokens = line.split("=",
-                                QString::SkipEmptyParts);
-#else
                         QStringList tokens = line.split("=",
                                 Qt::SkipEmptyParts);
-#endif
                         if (tokens.size() == 2)
                         {
                             static const QRegularExpression kQuoteStartRE { "^[\"']" };

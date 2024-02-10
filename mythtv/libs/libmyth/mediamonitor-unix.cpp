@@ -582,11 +582,7 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
             line = stream.readLine();
             if (line.startsWith("drive name:"))
             {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                l = line.split('\t', QString::SkipEmptyParts);
-#else
                 l = line.split('\t', Qt::SkipEmptyParts);
-#endif
                 l.pop_front();   // Remove 'drive name:' field
                 break;           // file should only contain one drive table?
             }
@@ -791,11 +787,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
             return false;
         dev = dev.mid(pos+kSuperOptDev.size());
         static const QRegularExpression kSeparatorRE { "[, ]" };
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList parts = dev.split(kSeparatorRE, QString::SkipEmptyParts);
-#else
         QStringList parts = dev.split(kSeparatorRE, Qt::SkipEmptyParts);
-#endif
         if (parts[0].isEmpty())
             return false;
         pDevice = MythCDROM::get(this, dev, is_supermount, m_allowEject);
@@ -975,11 +967,7 @@ void MediaMonitorUnix::CheckDeviceNotifications(void)
         qBuffer.append(QString::fromStdString(buffer));
         size = read(m_fifo, buffer.data(), 255);
     }
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    const QStringList list = qBuffer.split('\n', QString::SkipEmptyParts);
-#else
     const QStringList list = qBuffer.split('\n', Qt::SkipEmptyParts);
-#endif
     for (const auto& notif : qAsConst(list))
     {
         if (notif.startsWith("add"))

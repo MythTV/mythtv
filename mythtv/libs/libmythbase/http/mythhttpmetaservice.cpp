@@ -132,11 +132,7 @@ int MythHTTPMetaService::ParseRequestTypes(const QMetaObject& Meta, const QStrin
     int index = Meta.indexOfClassInfo(Method.toLatin1());
     if (index > -1)
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList infos = QString(Meta.classInfo(index).value()).split(';', QString::SkipEmptyParts);
-#else
         QStringList infos = QString(Meta.classInfo(index).value()).split(';', Qt::SkipEmptyParts);
-#endif
         foreach (const QString &info, infos)
         {
             if (info.startsWith(QStringLiteral("methods=")))
@@ -174,11 +170,7 @@ bool MythHTTPMetaService::isProtected(const QMetaObject& Meta, const QString& Me
     int index = Meta.indexOfClassInfo(Method.toLatin1());
     if (index > -1)
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList infos = QString(Meta.classInfo(index).value()).split(';', QString::SkipEmptyParts);
-#else
         QStringList infos = QString(Meta.classInfo(index).value()).split(';', Qt::SkipEmptyParts);
-#endif
         auto isAuth = [](const QString& info)
             { return info.startsWith(QStringLiteral("AuthRequired=")); };
         return std::any_of(infos.cbegin(), infos.cend(), isAuth);

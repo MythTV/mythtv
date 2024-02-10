@@ -775,14 +775,8 @@ void V2Status::FillStatusXML( QDomDocument *pDoc )
 
         QByteArray input = ms.ReadAll();
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList output = QString(input).split('\n',
-                                                  QString::SkipEmptyParts);
-#else
         QStringList output = QString(input).split('\n',
                                                   Qt::SkipEmptyParts);
-#endif
-
         for (const auto & line : qAsConst(output))
         {
             QDomElement info = pDoc->createElement("Information");

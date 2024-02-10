@@ -340,11 +340,7 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval, bool allowEject
 
     if (!ignore.isEmpty())
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        m_ignoreList = ignore.split(',', QString::SkipEmptyParts);
-#else
         m_ignoreList = ignore.split(',', Qt::SkipEmptyParts);
-#endif
     }
 
     LOG(VB_MEDIA, LOG_NOTICE, "Creating MediaMonitor");

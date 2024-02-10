@@ -497,11 +497,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     QString line = listline[0];
 
     line = line.simplified();
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList tokens = line.split(' ', QString::SkipEmptyParts);
-#else
     QStringList tokens = line.split(' ', Qt::SkipEmptyParts);
-#endif
     QString command = tokens[0];
 
     if (command == "MYTH_PROTO_VERSION")
@@ -1244,13 +1240,7 @@ void MainServer::customEvent(QEvent *e)
 
         if (me->Message().startsWith("AUTO_EXPIRE"))
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList tokens = me->Message()
-                .split(" ", QString::SkipEmptyParts);
-#else
             QStringList tokens = me->Message().split(" ", Qt::SkipEmptyParts);
-#endif
-
             if (tokens.size() != 3)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Bad AUTO_EXPIRE message");
@@ -1288,13 +1278,7 @@ void MainServer::customEvent(QEvent *e)
 
         if (me->Message().startsWith("QUERY_NEXT_LIVETV_DIR") && m_sched)
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList tokens = me->Message()
-                .split(" ", QString::SkipEmptyParts);
-#else
             QStringList tokens = me->Message().split(" ", Qt::SkipEmptyParts);
-#endif
-
             if (tokens.size() != 2)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -1308,14 +1292,7 @@ void MainServer::customEvent(QEvent *e)
 
         if (me->Message().startsWith("STOP_RECORDING"))
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList tokens = me->Message().split(" ",
-                                                     QString::SkipEmptyParts);
-#else
             QStringList tokens = me->Message().split(" ", Qt::SkipEmptyParts);
-#endif
-
-
             if (tokens.size() < 3 || tokens.size() > 3)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -1344,14 +1321,7 @@ void MainServer::customEvent(QEvent *e)
         if ((me->Message().startsWith("DELETE_RECORDING")) ||
             (me->Message().startsWith("FORCE_DELETE_RECORDING")))
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList tokens = me->Message()
-                .split(" ", QString::SkipEmptyParts);
-#else
             QStringList tokens = me->Message().split(" ", Qt::SkipEmptyParts);
-#endif
-
-
             if (tokens.size() < 3 || tokens.size() > 5)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -1384,14 +1354,7 @@ void MainServer::customEvent(QEvent *e)
 
         if (me->Message().startsWith("UNDELETE_RECORDING"))
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList tokens = me->Message().split(" ",
-                                                     QString::SkipEmptyParts);
-#else
             QStringList tokens = me->Message().split(" ", Qt::SkipEmptyParts);
-#endif
-
-
             if (tokens.size() < 3 || tokens.size() > 3)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -1419,12 +1382,7 @@ void MainServer::customEvent(QEvent *e)
 
         if (me->Message().startsWith("ADD_CHILD_INPUT"))
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList tokens = me->Message()
-                .split(" ", QString::SkipEmptyParts);
-#else
             QStringList tokens = me->Message().split(" ", Qt::SkipEmptyParts);
-#endif
             if (!m_ismaster)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -1464,13 +1422,7 @@ void MainServer::customEvent(QEvent *e)
 
         if (me->Message().startsWith("UPDATE_RECORDING_STATUS") && m_sched)
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList tokens = me->Message()
-                .split(" ", QString::SkipEmptyParts);
-#else
             QStringList tokens = me->Message().split(" ", Qt::SkipEmptyParts);
-#endif
-
             if (tokens.size() != 6)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +

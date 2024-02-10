@@ -174,11 +174,7 @@ MythHTTPStatus MythHTTPRanges::ParseRanges(const QString& Request, int64_t Total
     }
 
     // Split out individual ranges
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList rangelist = initial.at(1).split(",", QString::SkipEmptyParts);
-#else
     QStringList rangelist = initial.at(1).split(",", Qt::SkipEmptyParts);
-#endif
 
     // No ranges
     if (rangelist.isEmpty())

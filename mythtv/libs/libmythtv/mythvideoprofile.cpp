@@ -216,11 +216,7 @@ bool MythVideoProfileItem::IsMatch(QSize Size, float Framerate, const QString &C
     QString cmp = Get(QString(COND_CODECS));
     if (!cmp.isEmpty())
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList clist = cmp.split(" ", QString::SkipEmptyParts);
-#else
         QStringList clist = cmp.split(" ", Qt::SkipEmptyParts);
-#endif
         if (!clist.empty())
             match &= clist.contains(CodecName,Qt::CaseInsensitive);
     }

@@ -728,13 +728,8 @@ class VideoDialogPrivate
                 QString ratingstring =
                         gCoreContext->GetSetting(QString("mythvideo.AutoR2PL%1")
                                 .arg(sl.GetLevel()));
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                QStringList ratings =
-                        ratingstring.split(':', QString::SkipEmptyParts);
-#else
                 QStringList ratings =
                         ratingstring.split(':', Qt::SkipEmptyParts);
-#endif
                 auto to_pl = [sl](const auto & rating)
                     { return parental_level_map::value_type(rating, sl.GetLevel()); };
                 std::transform(ratings.cbegin(), ratings.cend(),
