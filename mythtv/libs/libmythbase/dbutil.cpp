@@ -25,10 +25,6 @@
 
 #define LOC QString("DBUtil: ")
 
-#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
-#define capturedView capturedRef
-#endif
-
 const int DBUtil::kUnknownVersionNumber = INT_MIN;
 
 /** \fn DBUtil::GetDBMSVersion(void)

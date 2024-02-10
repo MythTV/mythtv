@@ -13,10 +13,6 @@
 // libmythmetadata
 #include "lyricsdata.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
-#define capturedView capturedRef
-#endif
-
 static const QRegularExpression kTimeCode { R"(^(\[(\d\d):(\d\d)(?:\.(\d\d))?\])(.*))" };
 
 /*************************************************************************/

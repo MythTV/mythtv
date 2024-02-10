@@ -21,10 +21,6 @@ static const QRegularExpression kStereo { R"(\b\(?[sS]tereo\)?\b)" };
 static const QRegularExpression kUKSpaceColonStart { R"(^[ |:]*)" };
 static const QRegularExpression kDotAtEnd { "\\.$" };
 
-#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
-#define capturedView capturedRef
-#endif
-
 static const QMap<QChar,quint16> r2v = {
     {'I' ,   1}, {'V' ,   5}, {'X' ,   10}, {'L' , 50},
     {'C' , 100}, {'D' , 500}, {'M' , 1000},

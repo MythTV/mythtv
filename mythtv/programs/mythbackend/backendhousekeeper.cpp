@@ -32,10 +32,6 @@
 
 static constexpr int64_t kFourHours {4LL * 60 * 60};
 
-#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
-#define capturedView capturedRef
-#endif
-
 bool CleanupTask::DoRun(void)
 {
     JobQueue::CleanupOldJobsInQueue();

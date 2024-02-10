@@ -21,10 +21,6 @@
 #include "channeldata.h"
 #include "fillutil.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
-#define capturedView capturedRef
-#endif
-
 static const QRegularExpression parseMajorMinor { R"((\d+)\D(\d+))" };
 
 static void get_atsc_stuff(const QString& channum, int sourceid, int freqid,

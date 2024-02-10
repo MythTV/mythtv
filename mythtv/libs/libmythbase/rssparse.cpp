@@ -15,10 +15,6 @@
 #include "libmythbase/mythsorthelper.h"
 #include "libmythbase/stringutil.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
-#define capturedView capturedRef
-#endif
-
 ResultItem::ResultItem(QString title, QString sortTitle,
               QString subtitle, QString sortSubtitle,
               QString desc, QString URL,
