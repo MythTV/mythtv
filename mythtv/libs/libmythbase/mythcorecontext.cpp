@@ -94,6 +94,7 @@ class MythCoreContextPrivate : public QObject
 
     MythLocale *m_locale { nullptr };
     QString m_language;
+    QString m_audioLanguage;
 
     MythScheduler *m_scheduler { nullptr };
 
@@ -1790,6 +1791,40 @@ QString MythCoreContext::GetLanguageAndVariant(void)
 void MythCoreContext::ResetLanguage(void)
 {
     d->m_language.clear();
+}
+
+/**
+ *  \brief Returns two character ISO-639 language descriptor for audio language.
+ *  \sa iso639_get_language_list()
+ */
+QString MythCoreContext::GetAudioLanguage(void)
+{
+    return GetAudioLanguageAndVariant().left(2);
+}
+
+/**
+ *  \brief Returns the user-set audio language and variant.
+ *
+ *   The string has the form ll or ll_vv, where ll is the two character
+ *   ISO-639 language code, and vv (which may not exist) is the variant.
+ *   Examples include en_AU, en_CA, en_GB, en_US, fr_CH, fr_DE, pt_BR, pt_PT.
+ */
+QString MythCoreContext::GetAudioLanguageAndVariant(void)
+{
+    if (d->m_audioLanguage.isEmpty())
+    {
+        auto menuLanguage = GetLanguageAndVariant();
+        d->m_audioLanguage = GetSetting("AudioLanguage", menuLanguage).toLower();
+
+        LOG(VB_AUDIO, LOG_DEBUG, LOC + QString("audio language:%1 menu language:%2")
+            .arg(d->m_audioLanguage).arg(menuLanguage));
+    }
+    return d->m_audioLanguage;
+}
+
+void MythCoreContext::ResetAudioLanguage(void)
+{
+    d->m_audioLanguage.clear();
 }
 
 void MythCoreContext::ResetSockets(void)

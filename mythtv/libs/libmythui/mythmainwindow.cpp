@@ -634,6 +634,7 @@ bool MythMainWindow::event(QEvent *Event)
 void MythMainWindow::LoadQtConfig()
 {
     gCoreContext->ResetLanguage();
+    gCoreContext->ResetAudioLanguage();
     GetMythUI()->ClearThemeCacheDir();
     QApplication::setStyle("Windows");
 }

@@ -3214,7 +3214,7 @@ static GlobalComboBoxSetting *MythLanguage()
 {
     auto *gc = new GlobalComboBoxSetting("Language");
 
-    gc->setLabel(AppearanceSettings::tr("Language"));
+    gc->setLabel(AppearanceSettings::tr("Menu Language"));
 
     QMap<QString, QString> langMap = MythTranslation::getLanguages();
     QStringList langs = langMap.values();
@@ -3234,6 +3234,36 @@ static GlobalComboBoxSetting *MythLanguage()
 
     gc->setHelpText(AppearanceSettings::tr("Your preferred language for the "
                                            "user interface."));
+    return gc;
+}
+
+static GlobalComboBoxSetting *AudioLanguage()
+{
+    auto *gc = new GlobalComboBoxSetting("AudioLanguage");
+
+    gc->setLabel(AppearanceSettings::tr("Audio Language"));
+
+    QMap<QString, QString> langMap = MythTranslation::getLanguages();
+    QStringList langs = langMap.values();
+    langs.sort();
+    QString langCode = gCoreContext->GetSetting("AudioLanguage").toLower();
+
+    if (langCode.isEmpty())
+    {
+        auto menuLangCode = gCoreContext->GetSetting("Language").toLower();
+        langCode = menuLangCode.isEmpty() ? "en_US" : menuLangCode;
+    }
+
+    gc->clearSelections();
+
+    for (const auto & label : qAsConst(langs))
+    {
+        QString value = langMap.key(label);
+        gc->addSelection(label, value, (value.toLower() == langCode));
+    }
+
+    gc->setHelpText(AppearanceSettings::tr("Preferred language for the "
+                                           "audio track."));
     return gc;
 }
 
@@ -4784,6 +4814,7 @@ AppearanceSettings::AppearanceSettings()
     dates->setLabel(tr("Localization"));
 
     dates->addChild(MythLanguage());
+    dates->addChild(AudioLanguage());
     dates->addChild(ISO639PreferredLanguage(0));
     dates->addChild(ISO639PreferredLanguage(1));
     dates->addChild(MythDateFormatCB());
