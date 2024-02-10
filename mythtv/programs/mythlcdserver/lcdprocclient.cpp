@@ -71,12 +71,7 @@ LCDProcClient::LCDProcClient(LCDServer *lparent)
         LOG(VB_GENERAL, LOG_INFO,
             "LCDProcClient: An LCDProcClient object now exists");
 
-#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-    connect(m_socket, qOverload<QAbstractSocket::SocketError>(&QAbstractSocket::error),
-            this, &LCDProcClient::veryBadThings);
-#else
     connect(m_socket, &QAbstractSocket::errorOccurred, this, &LCDProcClient::veryBadThings);
-#endif
     connect(m_socket, &QIODevice::readyRead, this, &LCDProcClient::serverSendingData);
 
     lcdStartCol = LCD_START_COL;

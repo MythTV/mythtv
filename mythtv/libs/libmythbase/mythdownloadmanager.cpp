@@ -766,13 +766,8 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
                 this, &MythDownloadManager::authCallback);
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-    connect(dlInfo->m_reply, qOverload<QNetworkReply::NetworkError>(&QNetworkReply::error),
-            this, &MythDownloadManager::downloadError);
-#else
     connect(dlInfo->m_reply, &QNetworkReply::errorOccurred,
             this, &MythDownloadManager::downloadError);
-#endif
     connect(dlInfo->m_reply, &QNetworkReply::downloadProgress,
             this, &MythDownloadManager::downloadProgress);
 }
@@ -1281,13 +1276,8 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
 
         m_downloadReplies[dlInfo->m_reply] = dlInfo;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-        connect(dlInfo->m_reply, qOverload<QNetworkReply::NetworkError>(&QNetworkReply::error),
-                this, &MythDownloadManager::downloadError);
-#else
         connect(dlInfo->m_reply, &QNetworkReply::errorOccurred,
                 this, &MythDownloadManager::downloadError);
-#endif
         connect(dlInfo->m_reply, &QNetworkReply::downloadProgress,
                 this, &MythDownloadManager::downloadProgress);
 
