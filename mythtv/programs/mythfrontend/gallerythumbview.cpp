@@ -85,19 +85,11 @@ public:
         int total = std::accumulate(keys.cbegin(), keys.cend(), 0, add_size);
 
         int progressSize = 0;
-#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-        for (auto it = m_files.constKeyValueBegin();
-             it != m_files.constKeyValueEnd(); it++)
-        {
-            const ImagePtrK & im = (*it).first;
-            QString newPath = (*it).second;
-#else
         for (auto it = m_files.constKeyValueBegin();
              it != m_files.constKeyValueEnd(); it++)
         {
             const ImagePtrK & im = it->first;
             QString newPath = it->second;
-#endif
             // Update progress dialog
             if (m_dialog)
             {

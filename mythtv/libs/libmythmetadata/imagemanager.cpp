@@ -253,21 +253,12 @@ int DeviceManager::LocateMount(const QString &mount) const
 StringMap DeviceManager::GetDeviceDirs() const
 {
     StringMap paths;
-#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-    for (auto it = m_devices.constKeyValueBegin();
-         it != m_devices.constKeyValueEnd(); ++it)
-    {
-        if ((*it).second)
-            paths.insert((*it).first, (*it).second->m_mount);
-    }
-#else
     for (auto it = m_devices.constKeyValueBegin();
          it != m_devices.constKeyValueEnd(); ++it)
     {
         if (it->second)
             paths.insert(it->first, it->second->m_mount);
     }
-#endif
     return paths;
 }
 
@@ -276,15 +267,6 @@ StringMap DeviceManager::GetDeviceDirs() const
 QList<int> DeviceManager::GetAbsentees()
 {
     QList<int> absent;
-#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-    for (auto it = m_devices.constKeyValueBegin();
-         it != m_devices.constKeyValueEnd(); it++)
-    {
-        Device *dev = (*it).second;
-        if (dev && !dev->isPresent())
-            absent << (*it).first;
-    }
-#else
     for (auto it = m_devices.constKeyValueBegin();
          it != m_devices.constKeyValueEnd(); it++)
     {
@@ -292,7 +274,6 @@ QList<int> DeviceManager::GetAbsentees()
         if (dev && !dev->isPresent())
             absent << it->first;
     }
-#endif
     return absent;
 }
 
