@@ -4771,7 +4771,7 @@ version2num(){
 }
 
 # Minimum supported Qt version
-QT5_MIN_VERSION_STR="5.14"
+QT5_MIN_VERSION_STR="5.15.2"
 QT6_MIN_VERSION_STR="6.0"
 
 # qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake
