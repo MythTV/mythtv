@@ -125,11 +125,7 @@ class UpnpMediaServer : public MediaServerItem
 UPNPScanner* UPNPScanner::gUPNPScanner        = nullptr;
 bool         UPNPScanner::gUPNPScannerEnabled = false;
 MThread*     UPNPScanner::gUPNPScannerThread  = nullptr;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-QMutex*      UPNPScanner::gUPNPScannerLock    = new QMutex(QMutex::Recursive);
-#else
 QRecursiveMutex* UPNPScanner::gUPNPScannerLock = new QRecursiveMutex();
-#endif
 
 /**
  * \class UPNPScanner

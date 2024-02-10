@@ -5,11 +5,7 @@
 
 // Qt headers
 #include <QList>
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-#include <QMutex>
-#else
 #include <QRecursiveMutex>
-#endif
 #include <QObject>
 #include <QStringList>
 
@@ -320,11 +316,7 @@ signals:
 
   private:
     QTcpSocket *m_socket        {nullptr};
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex   m_socketLock       {QMutex::Recursive};
-#else
     QRecursiveMutex m_socketLock;
-#endif
     QString  m_hostname         {"localhost"};
     uint     m_port             {6545};
     bool     m_connected        {false};

@@ -7,11 +7,7 @@
 // Qt headers
 #include <QWidget>
 #include <QString>
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-#include <QMutex>
-#else
 #include <QRecursiveMutex>
-#endif
 #include <QHash>
 #include <QRect>
 #include <QObject>
@@ -151,15 +147,9 @@ class MTV_PUBLIC PlayerContext
     float               m_tsNormal           {1.0F};
     float               m_tsAlt              {1.5F};
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    mutable QMutex      m_playingInfoLock    {QMutex::Recursive};
-    mutable QMutex      m_deletePlayerLock   {QMutex::Recursive};
-    mutable QMutex      m_stateLock          {QMutex::Recursive};
-#else
     mutable QRecursiveMutex  m_playingInfoLock;
     mutable QRecursiveMutex  m_deletePlayerLock;
     mutable QRecursiveMutex  m_stateLock;
-#endif
 
     // Signal info
     mutable QStringList m_lastSignalMsg;

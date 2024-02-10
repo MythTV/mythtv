@@ -166,11 +166,7 @@ class DTVRecorder :
     std::vector<unsigned char> m_payloadBuffer;
 
     // general recorder stuff
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    mutable QMutex           m_pidLock                    {QMutex::Recursive};
-#else
     mutable QRecursiveMutex  m_pidLock;
-#endif
                              /// PAT on input side
     ProgramAssociationTable *m_inputPat                   {nullptr};
                              /// PMT on input side

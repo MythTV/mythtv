@@ -9,9 +9,7 @@
 #include <QString>
 #include <QMutex>
 #include <QRect>
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 #include <QRecursiveMutex>
-#endif
 #include <QCoreApplication>
 
 // MythTV
@@ -200,11 +198,7 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     QMap<int, QList<std::chrono::seconds> > m_chapterMap;
     MythDVDPlayer  *m_parent                { nullptr };
     float           m_forcedAspect          { -1.0F   };
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex          m_contextLock           { QMutex::Recursive };
-#else
     QRecursiveMutex m_contextLock;
-#endif
     MythDVDContext *m_context               { nullptr };
     dvdnav_status_t m_dvdStat               { DVDNAV_STATUS_OK };
     int32_t         m_dvdEvent              { 0       };

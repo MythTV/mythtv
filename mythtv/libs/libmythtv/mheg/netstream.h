@@ -13,9 +13,7 @@
 #include <QThread>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 #include <QRecursiveMutex>
-#endif
 #include <QSslError>
 #include <QWaitCondition>
 #include <QQueue>
@@ -127,11 +125,7 @@ public:
     static inline void PostEvent(QEvent *e) { manager().Post(e); }
     void Post(QEvent *event);
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    static inline QMutex* GetMutex() { return &manager().m_mutexNAM; }
-#else
     static inline QRecursiveMutex* GetMutex() { return &manager().m_mutexNAM; }
-#endif
 
     static bool isAvailable(); // is network usable
     static QDateTime GetLastModified(const QUrl &url);
@@ -154,11 +148,7 @@ private:
 
     volatile bool          m_bQuit    {false};
     QSemaphore             m_running;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    mutable QMutex         m_mutexNAM {QMutex::Recursive}; // Provides recursive access to m_nam
-#else
     mutable QRecursiveMutex m_mutexNAM; // Provides recursive access to m_nam
-#endif
     QNetworkAccessManager *m_nam      {nullptr};
     mutable QMutex         m_mutex; // Protects r/w access to the following data
     QQueue< QEvent * >     m_workQ;

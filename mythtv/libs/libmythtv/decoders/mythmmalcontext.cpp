@@ -243,11 +243,7 @@ AVPixelFormat MythMMALContext::GetFormat(AVCodecContext*, const AVPixelFormat *P
 
 bool MythMMALContext::HaveMMAL(bool Reinit /*=false*/)
 {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    static QMutex lock(QMutex::Recursive);
-#else
     static QRecursiveMutex lock;
-#endif
     QMutexLocker locker(&lock);
     static bool s_checked = false;
     static bool s_available = false;
@@ -287,11 +283,7 @@ extern "C" {
 
 const MMALProfiles& MythMMALContext::GetProfiles(void)
 {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    static QMutex lock(QMutex::Recursive);
-#else
     static QRecursiveMutex lock;
-#endif
     static bool s_initialised = false;
     static MMALProfiles s_profiles;
 

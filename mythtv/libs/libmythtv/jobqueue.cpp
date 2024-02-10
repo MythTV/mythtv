@@ -37,11 +37,7 @@ static constexpr int64_t kRecentInterval {4LL * 60 * 60};
 
 JobQueue::JobQueue(bool master) :
     m_hostname(gCoreContext->GetHostName()),
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    m_runningJobsLock(new QMutex(QMutex::Recursive)),
-#else
     m_runningJobsLock(new QRecursiveMutex()),
-#endif
     m_isMaster(master),
     m_queueThread(new MThread("JobQueue", this))
 {

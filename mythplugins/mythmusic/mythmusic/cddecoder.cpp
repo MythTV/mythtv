@@ -136,19 +136,11 @@ void CdDecoder::writeBlock()
 }
 
 //static
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-QMutex& CdDecoder::getCdioMutex()
-{
-    static QMutex s_mtx(QMutex::Recursive);
-    return s_mtx;
-}
-#else
 QRecursiveMutex& CdDecoder::getCdioMutex()
 {
     static QRecursiveMutex s_mtx;
     return s_mtx;
 }
-#endif
 
 // pure virtual
 bool CdDecoder::initialize()

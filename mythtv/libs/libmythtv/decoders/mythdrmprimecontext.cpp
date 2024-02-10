@@ -5,11 +5,7 @@
 
 #define LOC QString("DRMPRIMECtx: ")
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-QMutex MythDRMPRIMEContext::s_drmPrimeLock(QMutex::Recursive);
-#else
 QRecursiveMutex MythDRMPRIMEContext::s_drmPrimeLock;
-#endif
 
 QStringList MythDRMPRIMEContext::s_drmPrimeDecoders;
 

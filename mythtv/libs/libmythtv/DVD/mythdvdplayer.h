@@ -81,11 +81,7 @@ class MythDVDPlayer : public MythPlayerUI
     // still frame timing
     MythTimer m_stillFrameTimer       { };
     std::chrono::seconds  m_stillFrameLength  { 0s };
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex   m_stillFrameTimerLock    { QMutex::Recursive };
-#else
     QRecursiveMutex m_stillFrameTimerLock;
-#endif
 };
 
 #endif // MYTHDVDPLAYER_H
