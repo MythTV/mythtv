@@ -107,7 +107,7 @@ bool PSIPTable::HasCRC(void) const
             break;
 //      case TableID::TSDT
 
-        // DVB manditory
+        // DVB mandatory
         case TableID::NIT:
         case TableID::SDT:
         case TableID::PF_EIT:
