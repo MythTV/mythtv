@@ -24,7 +24,6 @@
 #include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QScopedPointer>
 #include <QThread>
 #include <QUrl>
 #ifndef QT_NO_OPENSSL
@@ -764,12 +763,12 @@ void NAMThread::run()
     m_nam->setObjectName("NetStream NAM");
 
     // Setup cache
-    QScopedPointer<QNetworkDiskCache> cache(new QNetworkDiskCache());
+    std::unique_ptr<QNetworkDiskCache> cache(new QNetworkDiskCache());
 
     cache->setCacheDirectory(GetConfDir() + "/cache/netstream-" +
                              gCoreContext->GetHostName());
 
-    m_nam->setCache(cache.take());
+    m_nam->setCache(cache.release());
 
     // Setup a network proxy e.g. for TOR: socks://localhost:9050
     // TODO get this from mythdb
