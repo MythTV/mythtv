@@ -75,19 +75,19 @@ static bool enableSqliteRegex (void)
     // Gaah. Have to manually enable extension loading. If it exists.
     QVariant v = info.qsqldb.driver()->handle();
     if (!v.isValid() || (qstrcmp(v.typeName(), "sqlite3*") != 0)) {
-        QWARN("Can't find sqldb driver.");
+        qWarning("Can't find sqldb driver.");
         return false;
     }
 
     // v.data() returns a pointer to the handle
     sqlite3 *handle = *static_cast<sqlite3 **>(v.data());
     if (handle == nullptr) {
-        QWARN("Can't find sqldb driver handle.");
+        qWarning("Can't find sqldb driver handle.");
         return false;
     }
 
     if (sqlite3_enable_load_extension(handle, 1) != SQLITE_OK) {
-        QWARN("Cannot enable sqlite extensions.");
+        qWarning("Cannot enable sqlite extensions.");
         return false;
     }
 
@@ -100,7 +100,7 @@ static bool enableSqliteRegex (void)
 #endif
     if (sqlite3_load_extension(handle, pcre, nullptr, &errtext) != SQLITE_OK) {
         QString errmsg = QString("Cannot load the PCRE extension: %1.").arg(errtext);
-        QWARN(qPrintable(errmsg));
+        qWarning(qPrintable(errmsg));
         return false;
     }
 
