@@ -183,10 +183,11 @@ QByteArray DigestMd5Response(const QString& response, const QString& option,
     QByteArray passwd   = password.toLatin1();
 
     QCryptographicHash hash(QCryptographicHash::Md5);
+    QByteArray colon(":", 1);
     hash.addData(user);
-    hash.addData(":", 1);
+    hash.addData(colon);
     hash.addData(realm);
-    hash.addData(":", 1);
+    hash.addData(colon);
     hash.addData(passwd);
     QByteArray ha1 = hash.result();
     ha1 = ha1.toHex();
@@ -194,16 +195,16 @@ QByteArray DigestMd5Response(const QString& response, const QString& option,
     // calculate H(A2)
     hash.reset();
     hash.addData(option.toLatin1());
-    hash.addData(":", 1);
+    hash.addData(colon);
     hash.addData(uri);
     QByteArray ha2 = hash.result().toHex();
 
     // calculate response
     hash.reset();
     hash.addData(ha1);
-    hash.addData(":", 1);
+    hash.addData(colon);
     hash.addData(nonce.toLatin1());
-    hash.addData(":", 1);
+    hash.addData(colon);
     hash.addData(ha2);
     return hash.result().toHex();
 }

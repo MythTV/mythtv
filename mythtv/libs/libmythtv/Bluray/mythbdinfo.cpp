@@ -138,11 +138,14 @@ void MythBDInfo::GetNameAndSerialNum(BLURAY* BluRay, QString &Name,
         {
             QCryptographicHash crypto(QCryptographicHash::Sha1);
             // Add the clip number to the hash
-            crypto.addData(reinterpret_cast<const char*>(&idx), sizeof(idx));
+            QByteArray ba = QByteArray::fromRawData(reinterpret_cast<const char*>(&idx), sizeof(idx));
+            crypto.addData(ba);
             // then the length of the file
-            crypto.addData(reinterpret_cast<const char*>(&buffersize), sizeof(buffersize));
+            ba = QByteArray::fromRawData(reinterpret_cast<const char*>(&buffersize), sizeof(buffersize));
+            crypto.addData(ba);
             // and then the contents
-            crypto.addData(reinterpret_cast<const char*>(buffer), static_cast<int>(buffersize));
+            ba = QByteArray::fromRawData(reinterpret_cast<const char*>(buffer), buffersize);
+            crypto.addData(ba);
             SerialNum = QString("%1__gen").arg(QString(crypto.result().toBase64()));
             free(buffer);
             LOG(VB_PLAYBACK, LOG_DEBUG, LogPrefix + QString("Generated serial number '%1'")
