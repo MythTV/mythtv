@@ -479,13 +479,13 @@ void UPNPScanner::Stop(void)
     m_servers.clear();
 
     // cleanup the network
-    for (QNetworkReply *reply : qAsConst(m_descriptionRequests))
+    for (QNetworkReply *reply : std::as_const(m_descriptionRequests))
     {
         reply->abort();
         delete reply;
     }
     m_descriptionRequests.clear();
-    for (QNetworkReply *reply : qAsConst(m_browseRequests))
+    for (QNetworkReply *reply : std::as_const(m_browseRequests))
     {
         reply->abort();
         delete reply;

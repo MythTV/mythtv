@@ -1018,7 +1018,7 @@ void MythDownloadManager::cancelDownload(const QString &url, bool block)
 void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
 {
     m_infoLock->lock();
-    for (const auto& url : qAsConst(urls))
+    for (const auto& url : std::as_const(urls))
     {
         QMutableListIterator<MythDownloadInfo*> lit(m_downloadQueue);
         while (lit.hasNext())
@@ -1737,7 +1737,7 @@ QString MythDownloadManager::getHeader(const QNetworkCacheMetaData &cacheData,
                                        const QString& header)
 {
     auto headers = cacheData.rawHeaders();
-    for (const auto& rh : qAsConst(headers))
+    for (const auto& rh : std::as_const(headers))
         if (QString(rh.first) == header)
             return {rh.second};
     return {};
@@ -1795,7 +1795,7 @@ void MythCookieJar::save(const QString &filename)
     QList<QNetworkCookie> cookieList = allCookies();
     QTextStream stream(&f);
 
-    for (const auto& cookie : qAsConst(cookieList))
+    for (const auto& cookie : std::as_const(cookieList))
         stream << cookie.toRawForm() << Qt::endl;
 }
 

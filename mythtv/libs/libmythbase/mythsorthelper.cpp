@@ -172,7 +172,7 @@ QString MythSortHelper::doTitle(const QString& title) const
         if (m_exclList.contains(ltitle))
             return ltitle;
     } else {
-        for (const auto& str : qAsConst(m_exclList))
+        for (const auto& str : std::as_const(m_exclList))
             if (ltitle.startsWith(str))
                 return ltitle;
     }

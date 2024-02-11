@@ -72,7 +72,7 @@ bool MythVDPAUHelper::HaveVDPAU(bool Reinit /*=false*/)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "Supported/available VDPAU decoders:");
         const VDPAUProfiles& profiles = MythVDPAUHelper::GetProfiles();
-        for (const auto& profile : qAsConst(profiles))
+        for (const auto& profile : std::as_const(profiles))
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 MythCodecContext::GetProfileDescription(profile.first, profile.second.m_maxSize));
     }
@@ -218,7 +218,7 @@ void MythVDPAUHelper::GetDecoderList(QStringList &Decoders)
         return;
 
     Decoders.append("VDPAU:");
-    for (const auto& profile : qAsConst(profiles))
+    for (const auto& profile : std::as_const(profiles))
         if (profile.first != MythCodecContext::MJPEG)
             Decoders.append(MythCodecContext::GetProfileDescription(profile.first, profile.second.m_maxSize));
 }

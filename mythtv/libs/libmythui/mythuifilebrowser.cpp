@@ -521,7 +521,7 @@ void MythUIFileBrowser::updateRemoteFileList()
             m_backButton->SetEnabled(false);
     }
 
-    for (const auto & line : qAsConst(slist))
+    for (const auto & line : std::as_const(slist))
     {
         QStringList tokens = line.split("::");
 
@@ -623,7 +623,7 @@ void MythUIFileBrowser::updateLocalFileList()
     }
     else
     {
-        for (const auto & fi : qAsConst(list))
+        for (const auto & fi : std::as_const(list))
         {
             MFileInfo finfo(fi.filePath());
 

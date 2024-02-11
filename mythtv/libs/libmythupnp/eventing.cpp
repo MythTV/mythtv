@@ -38,7 +38,7 @@ uint StateVariables::BuildNotifyBody(
     ts << "<?xml version=\"1.0\"?>" << Qt::endl
        << "<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">" << Qt::endl;
 
-    for (auto *prop : qAsConst(m_map))
+    for (auto *prop : std::as_const(m_map))
     {
         if ( ttLastNotified < prop->m_ttLastChanged )
         {
@@ -79,7 +79,7 @@ Eventing::Eventing(const QString &sExtensionName,
 
 Eventing::~Eventing()
 {
-    for (const auto *subscriber : qAsConst(m_subscribers))
+    for (const auto *subscriber : std::as_const(m_subscribers))
         delete subscriber;
     m_subscribers.clear();
 }

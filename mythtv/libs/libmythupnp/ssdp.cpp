@@ -407,7 +407,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
 
         QStringMap  headers;
 
-        for (const auto& sLine : qAsConst(lines))
+        for (const auto& sLine : std::as_const(lines))
         {
             QString sName  = sLine.section( ':', 0, 0 ).trimmed();
             QString sValue = sLine.section( ':', 1 );

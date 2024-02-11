@@ -134,7 +134,7 @@ void MythPowerDBus::Init(void)
         if (response.isValid())
         {
             QList devices = response.value();
-            for (const auto& device : qAsConst(devices))
+            for (const auto& device : std::as_const(devices))
                 DeviceAdded(device);
         }
 
@@ -447,7 +447,7 @@ void MythPowerDBus::UpdateBattery(void)
         int   count = 0;
 
         // take an average (who has more than 1 battery?)
-        for (int level : qAsConst(m_batteries))
+        for (int level : std::as_const(m_batteries))
         {
             if (level >= 0 && level <= 100)
             {

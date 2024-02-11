@@ -111,7 +111,7 @@ void ServerPool::SelectDefaultListen(bool force)
 
     // loop through all available interfaces
     QList<QNetworkInterface> IFs = QNetworkInterface::allInterfaces();
-    for (const auto & qni : qAsConst(IFs))
+    for (const auto & qni : std::as_const(IFs))
     {
         if ((qni.flags() & QNetworkInterface::IsRunning) == 0)
             continue;
@@ -312,7 +312,7 @@ QList<QHostAddress> ServerPool::DefaultListenIPv4(void)
     QReadLocker rlock(&naLock);
 
     QList<QHostAddress> alist;
-    for (const auto & nae : qAsConst(naList_4))
+    for (const auto & nae : std::as_const(naList_4))
         if (!alist.contains(nae.ip()))
             alist << nae.ip();
 
@@ -325,7 +325,7 @@ QList<QHostAddress> ServerPool::DefaultListenIPv6(void)
     QReadLocker rlock(&naLock);
 
     QList<QHostAddress> alist;
-    for (const auto & nae : qAsConst(naList_6))
+    for (const auto & nae : std::as_const(naList_6))
         if (!alist.contains(nae.ip()))
             alist << nae.ip();
 
@@ -349,7 +349,7 @@ QList<QHostAddress> ServerPool::DefaultBroadcastIPv4(void)
     QReadLocker rlock(&naLock);
 
     QList<QHostAddress> blist;
-    for (const auto & nae : qAsConst(naList_4))
+    for (const auto & nae : std::as_const(naList_4))
     {
         if (!blist.contains(nae.broadcast()) && (nae.prefixLength() != 32) &&
                 (nae.ip() != QHostAddress::LocalHost))
@@ -392,7 +392,7 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
                         bool requireall, PoolServerType servertype)
 {
     m_port = port;
-    for (const auto & qha : qAsConst(addrs))
+    for (const auto & qha : std::as_const(addrs))
     {
         // If IPV4 support is disabled and this is an IPV4 address,
         // bypass this address
@@ -477,7 +477,7 @@ bool ServerPool::listen(QStringList addrstr, quint16 port, bool requireall,
                         PoolServerType servertype)
 {
     QList<QHostAddress> addrs;
-    for (const auto & str : qAsConst(addrstr))
+    for (const auto & str : std::as_const(addrstr))
         addrs << QHostAddress(str);
     return listen(addrs, port, requireall, servertype);
 }
@@ -492,7 +492,7 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
                       bool requireall)
 {
     m_port = port;
-    for (const auto & qha : qAsConst(addrs))
+    for (const auto & qha : std::as_const(addrs))
     {
         // If IPV4 support is disabled and this is an IPV4 address,
         // bypass this address
@@ -510,7 +510,7 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
 
         if (qha.protocol() == QAbstractSocket::IPv6Protocol)
         {
-            for (const auto& iae : qAsConst(naList_6))
+            for (const auto& iae : std::as_const(naList_6))
             {
                 if (PrivUdpSocket::contains(iae, qha))
                 {
@@ -523,7 +523,7 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
         }
         else
         {
-            for (const auto& iae : qAsConst(naList_4))
+            for (const auto& iae : std::as_const(naList_4))
             {
                 if (PrivUdpSocket::contains(iae, qha))
                 {
@@ -598,7 +598,7 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
 bool ServerPool::bind(QStringList addrstr, quint16 port, bool requireall)
 {
     QList<QHostAddress> addrs;
-    for (const auto & str : qAsConst(addrstr))
+    for (const auto & str : std::as_const(addrstr))
         addrs << QHostAddress(str);
     return bind(addrs, port, requireall);
 }
@@ -639,7 +639,7 @@ qint64 ServerPool::writeDatagram(const char * data, qint64 size,
         LOG(VB_GENERAL, LOG_DEBUG,
             QString("No exact socket match for %1:%2. Searching for wildcard.")
             .arg(prettyip(addr)).arg(port));
-        for (auto *val : qAsConst(m_udpSockets))
+        for (auto *val : std::as_const(m_udpSockets))
         {
             if ((addr.protocol() == QAbstractSocket::IPv6Protocol &&
                  val->host().ip() == QHostAddress::AnyIPv6) ||

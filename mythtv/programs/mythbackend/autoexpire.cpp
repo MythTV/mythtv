@@ -178,7 +178,7 @@ void AutoExpire::CalcParams()
         uint64_t thisKBperMin = 0;
 
         // append unknown recordings to all fsIDs
-        for (auto unknownfs : qAsConst(fsEncoderMap[-1]))
+        for (auto unknownfs : std::as_const(fsEncoderMap[-1]))
             fsEncoderMap[fsit->getFSysID()].push_back(unknownfs);
 
         if (fsEncoderMap.contains(fsit->getFSysID()))
@@ -190,7 +190,7 @@ void AutoExpire::CalcParams()
                 .arg(fsit->getUsedSpace() / 1024.0 / 1024.0, 7, 'f', 1)
                 .arg(fsit->getFreeSpace() / 1024.0 / 1024.0, 7, 'f', 1));
 
-            for (auto cardid : qAsConst(fsEncoderMap[fsit->getFSysID()]))
+            for (auto cardid : std::as_const(fsEncoderMap[fsit->getFSysID()]))
             {
                 auto iter = m_encoderList->constFind(cardid);
                 if (iter == m_encoderList->constEnd())

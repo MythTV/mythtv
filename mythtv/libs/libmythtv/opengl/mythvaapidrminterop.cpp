@@ -448,7 +448,7 @@ void MythVAAPIInteropDRM::CleanupDRMPRIME()
         return;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Releasing %1 DRM descriptors").arg(m_drmFrames.size()));
-    for (auto * frame : qAsConst(m_drmFrames))
+    for (auto * frame : std::as_const(m_drmFrames))
     {
         for (int i = 0; i < frame->nb_objects; i++)
             close(frame->objects[i].fd);

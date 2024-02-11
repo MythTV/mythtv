@@ -303,7 +303,7 @@ V4L2Profiles MythV4L2M2MContext::GetProfiles(const std::vector<V4L2Mapping>& Pro
     QStringList namefilters;
     namefilters.append("video*");
     auto devices = dir.entryList(namefilters, QDir::Files |QDir::System);
-    for (const QString& device : qAsConst(devices))
+    for (const QString& device : std::as_const(devices))
     {
         V4L2util v4l2dev(root + device);
         uint32_t caps = v4l2dev.GetCapabilities();
@@ -435,9 +435,9 @@ bool MythV4L2M2MContext::HaveV4L2Codecs(bool Reinit /*=false*/)
     LOG(VB_GENERAL, LOG_INFO, LOC + "Supported/available V4L2 decoders:");
     s_available = true;
     QSize size {0, 0};
-    for (auto profile : qAsConst(standard))
+    for (auto profile : std::as_const(standard))
         LOG(VB_GENERAL, LOG_INFO, LOC + MythCodecContext::GetProfileDescription(profile, size));
-    for (auto profile : qAsConst(request))
+    for (auto profile : std::as_const(request))
         LOG(VB_GENERAL, LOG_INFO, LOC + MythCodecContext::GetProfileDescription(profile, size) + "(Request)");
     return s_available;
 }

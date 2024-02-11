@@ -93,7 +93,7 @@ void VideoSetupWizard::loadData(void)
 {
     QStringList profiles = MythVideoProfile::GetProfiles(gCoreContext->GetHostName());
 
-    for (const auto & prof : qAsConst(profiles))
+    for (const auto & prof : std::as_const(profiles))
     {
         auto *item = new MythUIButtonListItem(m_playbackProfileButtonList, prof);
         item->SetData(prof);

@@ -176,7 +176,7 @@ V2BackendStatus*  V2Status::GetBackendStatus()
         backend->setType("Master");
         QStringList backends;
         m_pMainServer->GetActiveBackends(backends);
-        for (const QString& hostname : qAsConst(backends))
+        for (const QString& hostname : std::as_const(backends))
         {
             if (hostname != thisHost)
             {
@@ -395,7 +395,7 @@ void V2Status::FillStatusXML( QDomDocument *pDoc )
 
     TVRec::s_inputsLock.lockForRead();
 
-    for (auto * elink : qAsConst(*m_pEncoders))
+    for (auto * elink : std::as_const(*m_pEncoders))
     {
         if (elink != nullptr)
         {
@@ -499,7 +499,7 @@ void V2Status::FillStatusXML( QDomDocument *pDoc )
         fes = nullptr;
 
         frontends.setAttribute( "count", map.size() );
-        for (const auto & entry : qAsConst(map))
+        for (const auto & entry : std::as_const(map))
         {
             QDomElement fe = pDoc->createElement("Frontend");
             frontends.appendChild(fe);
@@ -544,7 +544,7 @@ void V2Status::FillStatusXML( QDomDocument *pDoc )
         sbes->DecrRef();
         sbes = nullptr;
 
-        for (const auto & entry : qAsConst(map))
+        for (const auto & entry : std::as_const(map))
         {
             QUrl url(entry->m_sLocation);
             if (url.host() != ipaddress)
@@ -777,7 +777,7 @@ void V2Status::FillStatusXML( QDomDocument *pDoc )
 
         QStringList output = QString(input).split('\n',
                                                   Qt::SkipEmptyParts);
-        for (const auto & line : qAsConst(output))
+        for (const auto & line : std::as_const(output))
         {
             QDomElement info = pDoc->createElement("Information");
 

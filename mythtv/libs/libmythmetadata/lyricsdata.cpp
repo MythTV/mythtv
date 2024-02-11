@@ -276,7 +276,7 @@ void LyricsData::loadLyrics(const QString &xmlData)
                     lyric.remove(0,match.capturedLength(1));
                     match = kTimeCode.match(lyric);
                 }
-                for (const auto &time : qAsConst(times))
+                for (const auto &time : std::as_const(times))
                     lyrics.append(time + lyric);
             }
             else

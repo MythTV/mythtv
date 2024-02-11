@@ -399,7 +399,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
                        pDevice->m_securityPin ? "true" : "false");
     os << FormatValue( "mythtv:X_protocol", pDevice->m_protocolVersion );
 
-    for (const auto & nit : qAsConst(pDevice->m_lstExtra))
+    for (const auto & nit : std::as_const(pDevice->m_lstExtra))
     {
         os << FormatValue( nit );
     }
@@ -412,7 +412,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     {
         os << "<iconList>\n";
 
-        for (auto *icon : qAsConst(pDevice->m_listIcons))
+        for (auto *icon : std::as_const(pDevice->m_listIcons))
         {
             os << "<icon>\n";
             os << FormatValue( "mimetype", icon->m_sMimeType );
@@ -452,7 +452,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
 
         os << "<serviceList>\n";
 
-        for (auto *service : qAsConst(pDevice->m_listServices))
+        for (auto *service : std::as_const(pDevice->m_listServices))
         {
             if (!bIsXbox360 && service->m_sServiceType.startsWith(
                     "urn:microsoft.com:service:X_MS_MediaReceiverRegistrar",
@@ -564,7 +564,7 @@ QString UPnpDeviceDesc::FindDeviceUDN( UPnpDevice *pDevice, QString sST )
     // Check Embedded Devices for a Match
     // ----------------------------------------------------------------------
 
-    for (auto *device : qAsConst(pDevice->m_listDevices))
+    for (auto *device : std::as_const(pDevice->m_listDevices))
     {
         QString sUDN = FindDeviceUDN( device, sST );
         if (sUDN.length() > 0)
@@ -598,7 +598,7 @@ UPnpDevice *UPnpDeviceDesc::FindDevice( UPnpDevice    *pDevice,
     // Check Embedded Devices for a Match
     // ----------------------------------------------------------------------
 
-    for (const auto & dev : qAsConst(pDevice->m_listDevices))
+    for (const auto & dev : std::as_const(pDevice->m_listDevices))
     {
         UPnpDevice *pFound = FindDevice(dev, sURI);
 
@@ -786,7 +786,7 @@ UPnpService UPnpDevice::GetService(const QString &urn, bool *found) const
 
     bool done = false;
 
-    for (auto *service : qAsConst(m_listServices))
+    for (auto *service : std::as_const(m_listServices))
     {
         // Ignore the service version
         if (service->m_sServiceType.section(':', 0, -2) == urn.section(':', 0, -2))
@@ -843,7 +843,7 @@ QString UPnpDevice::toString(uint padding) const
     if (!m_lstExtra.empty())
     {
         ret += "Extra key value pairs\n";
-        for (const auto & extra : qAsConst(m_lstExtra))
+        for (const auto & extra : std::as_const(m_lstExtra))
         {
             ret += extra.m_sName;
             ret += ":";
@@ -857,21 +857,21 @@ QString UPnpDevice::toString(uint padding) const
     if (!m_listIcons.empty())
     {
         ret += "Icon List:\n";
-        for (auto *icon : qAsConst(m_listIcons))
+        for (auto *icon : std::as_const(m_listIcons))
             ret += icon->toString(padding+2) + "\n";
     }
 
     if (!m_listServices.empty())
     {
         ret += "Service List:\n";
-        for (auto *service : qAsConst(m_listServices))
+        for (auto *service : std::as_const(m_listServices))
             ret += service->toString(padding+2) + "\n";
     }
 
     if (!m_listDevices.empty())
     {
         ret += "Device List:\n";
-        for (auto *device : qAsConst(m_listDevices))
+        for (auto *device : std::as_const(m_listDevices))
             ret += device->toString(padding+2) + "\n";
         ret += "\n";
     }

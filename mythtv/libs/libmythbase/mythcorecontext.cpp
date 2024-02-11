@@ -1210,7 +1210,7 @@ QString MythCoreContext::resolveAddress(const QString &host, ResolveType type,
         QHostAddress v6;
 
         // Return the first address fitting the type critera
-        for (const auto& item : qAsConst(list))
+        for (const auto& item : std::as_const(list))
         {
             addr = item;
             QAbstractSocket::NetworkLayerProtocol prot = addr.protocol();
@@ -1306,13 +1306,13 @@ bool MythCoreContext::CheckSubnet(const QHostAddress &peer)
 
     // loop through all available interfaces
     QList<QNetworkInterface> IFs = QNetworkInterface::allInterfaces();
-    for (const auto & qni : qAsConst(IFs))
+    for (const auto & qni : std::as_const(IFs))
     {
         if ((qni.flags() & QNetworkInterface::IsRunning) == 0)
             continue;
 
         QList<QNetworkAddressEntry> IPs = qni.addressEntries();
-        for (const auto & qnai : qAsConst(IPs))
+        for (const auto & qnai : std::as_const(IPs))
         {
             int pfxlen = qnai.prefixLength();
             // Set this to test rejection without having an extra

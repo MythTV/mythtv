@@ -4739,7 +4739,7 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
                 MythDB::DBError("SaveMarkup seektable data", query);
                 return;
             }
-            for (const auto& entry : qAsConst(mapMark))
+            for (const auto& entry : std::as_const(mapMark))
             {
                 if (entry.type == MARK_DURATION_MS)
                     continue;
@@ -4829,7 +4829,7 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
                 MythDB::DBError("SaveMarkup seektable data", query);
                 return;
             }
-            for (const auto& entry : qAsConst(mapMark))
+            for (const auto& entry : std::as_const(mapMark))
             {
                 if (entry.isDataNull)
                 {
@@ -6122,7 +6122,7 @@ bool LoadFromRecorded(
         // sanity check the fields are one of the above fields
         QString sSortBy;
         QStringList fields = sortBy.split(",");
-        for (const QString& oneField : qAsConst(fields))
+        for (const QString& oneField : std::as_const(fields))
         {
             bool ascending = true;
             QString field = oneField.simplified().toLower();

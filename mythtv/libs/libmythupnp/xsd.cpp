@@ -932,7 +932,7 @@ QString Xsd::ReadPropertyMetadata( QObject *pObject, const QString& sPropName, c
 
         QString     sFullKey  = sKey + "=";
 
-        for (const QString& option : qAsConst(sOptions))
+        for (const QString& option : std::as_const(sOptions))
         {
             if (option.startsWith( sFullKey ))
                 return option.mid( sFullKey.length() );

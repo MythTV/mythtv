@@ -182,7 +182,7 @@ MythSocket *RemoteFile::openSocket(bool control)
         strlist << QString("%1").arg(dir);
         strlist << sgroup;
 
-        for (const auto& fname : qAsConst(m_possibleAuxFiles))
+        for (const auto& fname : std::as_const(m_possibleAuxFiles))
             strlist << fname;
 
         if (!lsock->SendReceiveStringList(strlist))
@@ -1334,7 +1334,7 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
             }
 
             QStringList filteredFiles = files.filter(QRegularExpression(fi.fileName()));
-            for (const QString& file : qAsConst(filteredFiles))
+            for (const QString& file : std::as_const(filteredFiles))
             {
                 strList << MythCoreContext::GenMythURL(gCoreContext->GetHostName(),
                                                        gCoreContext->GetBackendServerPort(),

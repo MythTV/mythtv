@@ -302,7 +302,7 @@ static void UpdateGameCounts(const QStringList& updatelist)
     QString firstname;
     QString basename;
 
-    for (const auto & GameType : qAsConst(updatelist))
+    for (const auto & GameType : std::as_const(updatelist))
     {
         LOG(VB_GENERAL, LOG_NOTICE,
             LOC + QString("Update gametype %1").arg(GameType));
@@ -407,7 +407,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
     int indepth = gCoreContext->GetSetting("GameDeepScan").toInt();
     QString screenShotPath = gCoreContext->GetSetting("mythgame.screenshotdir");
 
-    for (const auto & game : qAsConst(m_gameMap))
+    for (const auto & game : std::as_const(m_gameMap))
     {
 
         if (game.FoundLoc() == inFileSystem)
@@ -576,7 +576,7 @@ int GameHandler::buildFileCount(const QString& directory, GameHandler *handler)
 
     RomDir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList List = RomDir.entryInfoList();
-    for (const auto & Info : qAsConst(List))
+    for (const auto & Info : std::as_const(List))
     {
         if (Info.isDir())
         {
@@ -633,7 +633,7 @@ void GameHandler::buildFileList(const QString& directory, GameHandler *handler,
     RomDir.setSorting( QDir:: DirsFirst | QDir::Name );
     RomDir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList List = RomDir.entryInfoList();
-    for (const auto & Info : qAsConst(List))
+    for (const auto & Info : std::as_const(List))
     {
         QString RomName = Info.fileName();
         QString GameName = Info.completeBaseName();
@@ -761,7 +761,7 @@ void GameHandler::processAllGames(void)
     checkHandlers();
     QStringList updatelist;
 
-    for (auto *handler : qAsConst(*handlers))
+    for (auto *handler : std::as_const(*handlers))
     {
         if (handler)
         {
@@ -782,7 +782,7 @@ GameHandler* GameHandler::GetHandler(RomInfo *rominfo)
     if (!rominfo)
         return nullptr;
 
-    for (auto *handler : qAsConst(*handlers))
+    for (auto *handler : std::as_const(*handlers))
     {
         if (handler)
         {
@@ -799,7 +799,7 @@ GameHandler* GameHandler::GetHandlerByName(const QString& systemname)
     if (systemname.isEmpty())
         return nullptr;
 
-    for (auto *handler : qAsConst(*handlers))
+    for (auto *handler : std::as_const(*handlers))
     {
         if (handler)
         {
@@ -897,7 +897,7 @@ void GameHandler::Launchgame(RomInfo *romdata, const QString& systemname)
     QStringList cmdlist = exec.split(";");
     if (cmdlist.count() > 0)
     {
-        for (const auto & cmd : qAsConst(cmdlist))
+        for (const auto & cmd : std::as_const(cmdlist))
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Executing : %1").arg(cmd));

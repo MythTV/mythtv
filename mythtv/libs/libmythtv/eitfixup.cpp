@@ -325,7 +325,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event)
 
             /* Possible TODO: if EIT inlcude the priority and/or character
              * names for the actors, include them in AddPerson call. */
-            for (const auto & actor : qAsConst(actors))
+            for (const auto & actor : std::as_const(actors))
                 event.AddPerson(DBPerson::kActor, actor);
         }
         // Remove the year and actors from the description
@@ -1146,7 +1146,7 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle)
                 match.captured(5).split(comHemPersSeparator, Qt::SkipEmptyParts);
             /* Possible TODO: if EIT inlcude the priority and/or character
              * names for the actors, include them in AddPerson call. */
-            for (const auto & actor : qAsConst(actors))
+            for (const auto & actor : std::as_const(actors))
                 event.AddPerson(DBPerson::kActor, actor);
         }
 
@@ -1190,7 +1190,7 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle)
             pmatch.captured(2).split(comHemPersSeparator, Qt::SkipEmptyParts);
         /* Possible TODO: if EIT inlcude the priority and/or character
          * names for the actors, include them in AddPerson call. */
-        for (const auto & actor : qAsConst(actors))
+        for (const auto & actor : std::as_const(actors))
             event.AddPerson(role, actor);
 
         // Remove it
@@ -1420,7 +1420,7 @@ void EITFixUp::FixAUFreeview(DBEventEIT &event)
         QStringList actors = match.captured(4).split("/");
         /* Possible TODO: if EIT inlcude the priority and/or character
          * names for the actors, include them in AddPerson call. */
-        for (const QString& actor : qAsConst(actors))
+        for (const QString& actor : std::as_const(actors))
             event.AddPerson(DBPerson::kActor, actor);
         event.m_description = match.captured(1);
         return;
@@ -1433,7 +1433,7 @@ void EITFixUp::FixAUFreeview(DBEventEIT &event)
         QStringList actors = match.captured(3).split("/");
         /* Possible TODO: if EIT inlcude the priority and/or character
          * names for the actors, include them in AddPerson call. */
-        for (const QString& actor : qAsConst(actors))
+        for (const QString& actor : std::as_const(actors))
             event.AddPerson(DBPerson::kActor, actor);
         event.m_description = match.captured(1);
     }
@@ -1566,7 +1566,7 @@ void EITFixUp::FixMCA(DBEventEIT &event)
                 mcaActorsSeparator, Qt::SkipEmptyParts);
             /* Possible TODO: if EIT inlcude the priority and/or character
              * names for the actors, include them in AddPerson call. */
-            for (const auto & actor : qAsConst(actors))
+            for (const auto & actor : std::as_const(actors))
                 event.AddPerson(DBPerson::kActor, actor.trimmed());
             event.m_description = match.captured(1).trimmed();
         }
@@ -1735,7 +1735,7 @@ void EITFixUp::FixPRO7(DBEventEIT &event)
     if (match.hasMatch())
     {
         QStringList cast = match.captured(1).split("\n");
-        for (const auto& line : qAsConst(cast))
+        for (const auto& line : std::as_const(cast))
         {
             static const QRegularExpression pro7CastOne { R"(^([^\(]*?)\((.*)\)$)" };
             auto match2 = pro7CastOne.match(line);
@@ -1759,7 +1759,7 @@ void EITFixUp::FixPRO7(DBEventEIT &event)
     if (match.hasMatch())
     {
         QStringList crew = match.captured(1).split("\n");
-        for (const auto& line : qAsConst(crew))
+        for (const auto& line : std::as_const(crew))
         {
             static const QRegularExpression pro7CrewOne { R"(^(.*?):\s+(.*)$)" };
             auto match2 = pro7CrewOne.match(line);
@@ -1769,7 +1769,7 @@ void EITFixUp::FixPRO7(DBEventEIT &event)
                 if (deCrewTitle.contains(match2.captured(1)))
                     role = deCrewTitle[match2.captured(1)];
                 QStringList names = match2.captured(2).simplified().split(R"(\s*,\s*)");
-                for (const auto & name : qAsConst(names))
+                for (const auto & name : std::as_const(names))
                 {
                     /* Possible TODO: if EIT inlcude the priority
                      * and/or character names for the actors, include
@@ -1908,7 +1908,7 @@ void EITFixUp::FixPremiere(DBEventEIT &event)
             ", ", Qt::SkipEmptyParts);
         /* Possible TODO: if EIT inlcude the priority and/or character
          * names for the actors, include them in AddPerson call. */
-        for (const auto & actor : qAsConst(actors))
+        for (const auto & actor : std::as_const(actors))
             event.AddPerson(DBPerson::kActor, actor);
         event.m_description.remove(match.capturedStart(0),
                                    match.capturedLength(0));
@@ -2077,7 +2077,7 @@ void EITFixUp::FixNL(DBEventEIT &event)
             tmpActorsString.split(nlPersSeparator, Qt::SkipEmptyParts);
         /* Possible TODO: if EIT inlcude the priority and/or character
          * names for the actors, include them in AddPerson call. */
-        for (const auto & actor : qAsConst(actors))
+        for (const auto & actor : std::as_const(actors))
             event.AddPerson(DBPerson::kActor, actor);
         fullinfo.remove(match.capturedStart(), match.capturedLength());
     }
@@ -2092,7 +2092,7 @@ void EITFixUp::FixNL(DBEventEIT &event)
         tmpPresString = tmpPresString.left(tmpPresString.length() -1);
         const QStringList presenters =
             tmpPresString.split(nlPersSeparator, Qt::SkipEmptyParts);
-        for (const auto & presenter : qAsConst(presenters))
+        for (const auto & presenter : std::as_const(presenters))
             event.AddPerson(DBPerson::kPresenter, presenter);
         fullinfo.remove(match.capturedStart(), match.capturedLength());
     }
@@ -2409,7 +2409,7 @@ void EITFixUp::FixDK(DBEventEIT &event)
     {
         QString tmpDirectorsString = match.captured(1);
         directors = tmpDirectorsString.split(dkPersonsSeparator, Qt::SkipEmptyParts);
-        for (const auto & director : qAsConst(directors))
+        for (const auto & director : std::as_const(directors))
         {
             tmpDirectorsString = director.split(":").last().trimmed().
                 remove(kDotAtEnd);
@@ -2426,7 +2426,7 @@ void EITFixUp::FixDK(DBEventEIT &event)
         QString tmpActorsString = match.captured(1);
         const QStringList actors =
             tmpActorsString.split(dkPersonsSeparator, Qt::SkipEmptyParts);
-        for (const auto & actor : qAsConst(actors))
+        for (const auto & actor : std::as_const(actors))
         {
             tmpActorsString = actor.split(":").last().trimmed().remove(kDotAtEnd);
             if (!tmpActorsString.isEmpty() && !directors.contains(tmpActorsString))
@@ -2563,7 +2563,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
         QString tmpActorsString = match.captured(1);
         const QStringList actors =
             tmpActorsString.split(grPeopleSeparator, Qt::SkipEmptyParts);
-        for (const auto & actor : qAsConst(actors))
+        for (const auto & actor : std::as_const(actors))
         {
             tmpActorsString = actor.split(":").last().trimmed().remove(kDotAtEnd);
             if (tmpActorsString != "")
@@ -2580,7 +2580,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
         QString tmpDirectorsString = match.captured(1);
         const QStringList directors =
             tmpDirectorsString.split(grPeopleSeparator, Qt::SkipEmptyParts);
-        for (const auto & director : qAsConst(directors))
+        for (const auto & director : std::as_const(directors))
         {
             tmpDirectorsString = director.split(":").last().trimmed().
                 remove(kDotAtEnd);
@@ -2601,7 +2601,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
         QString tmpPresentersString = match.captured(1);
         const QStringList presenters =
             tmpPresentersString.split(grPeopleSeparator, Qt::SkipEmptyParts);
-        for (const auto & presenter : qAsConst(presenters))
+        for (const auto & presenter : std::as_const(presenters))
         {
             tmpPresentersString = presenter.split(":").last().trimmed().
                 remove(kDotAtEnd);

@@ -732,13 +732,13 @@ void HTTPRequest::FormatActionResponse(const NameValues &args)
     else
         stream << "<" << m_sMethod << "Response>\r\n";
 
-    for (const auto & arg : qAsConst(args))
+    for (const auto & arg : std::as_const(args))
     {
         stream << "<" << arg.m_sName;
 
         if (arg.m_pAttributes)
         {
-            for (const auto & attr : qAsConst(*arg.m_pAttributes))
+            for (const auto & attr : std::as_const(*arg.m_pAttributes))
             {
                 stream << " " << attr.m_sName << "='"
                        << Encode( attr.m_sValue ) << "'";
@@ -1076,7 +1076,7 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
     if (!sParams.isEmpty())
     {
         QStringList params = sParams.split('&', Qt::SkipEmptyParts);
-        for (const auto & param : qAsConst(params))
+        for (const auto & param : std::as_const(params))
         {
             QString sName  = param.section( '=', 0, 0 );
             QString sValue = param.section( '=', 1 );
@@ -2247,7 +2247,7 @@ void HTTPRequest::AddCORSHeaders( const QString &sOrigin )
         gCoreContext->GetSetting("AllowedOriginsList", QString(
             "https://chromecast.mythtv.org")).split(",");
 
-    for (const auto & origin : qAsConst(allowedOriginsList))
+    for (const auto & origin : std::as_const(allowedOriginsList))
     {
          if (origin.isEmpty())
             continue;
@@ -2267,7 +2267,7 @@ void HTTPRequest::AddCORSHeaders( const QString &sOrigin )
 
     if (VERBOSE_LEVEL_CHECK(VB_HTTP, LOG_DEBUG))
     {
-        for (const auto & origin : qAsConst(allowedOrigins))
+        for (const auto & origin : std::as_const(allowedOrigins))
             LOG(VB_HTTP, LOG_DEBUG, QString("Will allow Origin: %1").arg(origin));
     }
 

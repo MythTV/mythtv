@@ -636,7 +636,7 @@ void Playlist::fillSongsFromSonglist(const QString& songList)
     bool badTrack = false;
 
     QStringList list = songList.split(",", Qt::SkipEmptyParts);
-    for (const auto & song : qAsConst(list))
+    for (const auto & song : std::as_const(list))
     {
         MusicMetadata::IdType id = song.toUInt();
         int repo = ID_TO_REPO(id);
@@ -744,7 +744,7 @@ int Playlist::fillSonglistFromQuery(const QString& whereClause,
             QStringList list = orig_songlist.split(",", Qt::SkipEmptyParts);
             bool bFound = false;
             QString tempList;
-            for (const auto& song : qAsConst(list))
+            for (const auto& song : std::as_const(list))
             {
                 int an_int = song.toInt();
                 tempList += "," + song;
@@ -814,7 +814,7 @@ int Playlist::fillSonglistFromList(const QList<int> &songList,
             QStringList list = orig_songlist.split(",", Qt::SkipEmptyParts);
             bool bFound = false;
             QString tempList;
-            for (const auto & song : qAsConst(list))
+            for (const auto & song : std::as_const(list))
             {
                 int an_int = song.toInt();
                 tempList += "," + song;
@@ -1073,7 +1073,7 @@ QString Playlist::removeItemsFromList(const QString &remove_list, const QString 
     QStringList sourceList = source_list.split(",", Qt::SkipEmptyParts);
     QString songlist;
 
-    for (const auto & song : qAsConst(sourceList))
+    for (const auto & song : std::as_const(sourceList))
     {
         if (removeList.indexOf(song) == -1)
             songlist += "," + song;

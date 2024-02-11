@@ -444,7 +444,7 @@ QDomDocument CreateMetadataXML(MetadataLookupList list)
     QDomElement root = doc.createElement("metadata");
     doc.appendChild(root);
 
-    for (const auto & item : qAsConst(list))
+    for (const auto & item : std::as_const(list))
         CreateMetadataXMLItem(item, root, doc);
 
     return doc;
@@ -850,7 +850,7 @@ void AddCategories(MetadataLookup *lookup,
     QDomElement categories = docroot.createElement("categories");
     placetoadd.appendChild(categories);
 
-    for (const auto & str : qAsConst(cats))
+    for (const auto & str : std::as_const(cats))
     {
         QDomElement cat = docroot.createElement("category");
         categories.appendChild(cat);
@@ -867,7 +867,7 @@ void AddStudios(MetadataLookup *lookup,
     QDomElement studios = docroot.createElement("studios");
     placetoadd.appendChild(studios);
 
-    for (const auto & str : qAsConst(studs))
+    for (const auto & str : std::as_const(studs))
     {
         QDomElement stud = docroot.createElement("studio");
         studios.appendChild(stud);
@@ -883,7 +883,7 @@ void AddCountries(MetadataLookup *lookup,
     QDomElement countries = docroot.createElement("countries");
     placetoadd.appendChild(countries);
 
-    for (const auto & str : qAsConst(counts))
+    for (const auto & str : std::as_const(counts))
     {
         QDomElement count = docroot.createElement("country");
         countries.appendChild(count);

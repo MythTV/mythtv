@@ -290,11 +290,11 @@ void TestRecordingExtender::test_findKnownSport(void)
     // Eliminate items that are in both the "expected and "found" sets.
     QSet<QString> expectedSet;
     expectedSet.reserve(expectedLeagues.size());
-    for (const auto& league : qAsConst(expectedLeagues))
+    for (const auto& league : std::as_const(expectedLeagues))
         expectedSet.insert(league);
     QSet<QString> foundSet;
     foundSet.reserve(infoList.size());
-    for (const auto& info : qAsConst(infoList))
+    for (const auto& info : std::as_const(infoList))
         foundSet.insert(info.league);
     auto intersection = foundSet.intersect(expectedSet);
     foundSet = foundSet.subtract(intersection);
@@ -304,14 +304,14 @@ void TestRecordingExtender::test_findKnownSport(void)
     if (!expectedSet.isEmpty())
     {
         QString string;
-        for (const auto& str : qAsConst(expectedSet))
+        for (const auto& str : std::as_const(expectedSet))
             string += str + ' ';
         QFAIL(qPrintable(QString("Missing results: %1").arg(string)));
     }
     if (!foundSet.isEmpty())
     {
         QString string;
-        for (const auto& str : qAsConst(foundSet))
+        for (const auto& str : std::as_const(foundSet))
             string += str + ' ';
         QFAIL(qPrintable(QString("Unexpected results: %1").arg(string)));
     }

@@ -1351,7 +1351,7 @@ void TV::GetStatus()
             QList<std::chrono::seconds> chapters;
             m_player->GetChapterTimes(chapters);
             QVariantList var;
-            for (std::chrono::seconds chapter : qAsConst(chapters))
+            for (std::chrono::seconds chapter : std::as_const(chapters))
                 var << QVariant((long long)chapter.count());
             status.insert("chaptertimes", var);
         }
@@ -1838,7 +1838,7 @@ void TV::HandleOSDAskAllow(const QString& Action)
     }
     else if (Action == "CANCELCONFLICTING")
     {
-        for (const auto& pgm : qAsConst(m_askAllowPrograms))
+        for (const auto& pgm : std::as_const(m_askAllowPrograms))
         {
             if (pgm.m_isConflicting)
                 RemoteCancelNextRecording(pgm.m_info->GetInputID(), true);
@@ -3166,7 +3166,7 @@ QList<QKeyEvent*> TV::ConvertScreenPressKeyMap(const QString &KeyList)
     QList<QKeyEvent*> keyPressList;
     int i = 0;
     QStringList stringKeyList = KeyList.split(',');
-    for (const auto & str : qAsConst(stringKeyList))
+    for (const auto & str : std::as_const(stringKeyList))
     {
         QKeySequence keySequence(str);
         for (i = 0; i < keySequence.count(); i++)
@@ -3393,7 +3393,7 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
 
         if (!handled && !tt_actions.isEmpty())
         {
-            for (const QString& action : qAsConst(tt_actions))
+            for (const QString& action : std::as_const(tt_actions))
             {
                 emit HandleTeletextAction(action, handled);
                 if (handled)
@@ -3413,7 +3413,7 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
 
         if (!handled && !actions.isEmpty())
         {
-            for (const QString& action : qAsConst(actions))
+            for (const QString& action : std::as_const(actions))
             {
                 emit HandleITVAction(action, handled);
                 if (handled)
@@ -3502,7 +3502,7 @@ bool TV::BrowseHandleAction(const QStringList &Actions)
     else
     {
         handled = false;
-        for (const auto& action : qAsConst(Actions))
+        for (const auto& action : std::as_const(Actions))
         {
             if (action.length() == 1 && action[0].isDigit())
             {
@@ -6047,7 +6047,7 @@ void TV::ChangeChannel(uint Chanid, const QString &Channum)
                     Chanid = get_chanid(&m_playerContext, m_playerContext.GetCardID(), Channum);
                 tunable_on = IsTunableOn(&m_playerContext, Chanid);
             }
-            for (const auto& rec : qAsConst(tmp))
+            for (const auto& rec : std::as_const(tmp))
             {
                 if ((Chanid == 0U) || tunable_on.contains(rec.toUInt()))
                     reclist.push_back(rec);
@@ -6664,7 +6664,7 @@ bool TV::IsTunablePriv(uint ChanId)
 static QString toCommaList(const QVector<uint> &list)
 {
     QString ret = "";
-    for (uint i : qAsConst(list))
+    for (uint i : std::as_const(list))
         ret += QString("%1,").arg(i);
 
     if (!ret.isEmpty())
@@ -9406,7 +9406,7 @@ bool TV::HandleJumpToProgramAction(const QStringList &Actions)
         return true;
     }
 
-    for (const auto& action : qAsConst(Actions))
+    for (const auto& action : std::as_const(Actions))
     {
         if (!action.startsWith("JUMPPROG"))
             continue;

@@ -2635,7 +2635,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, std::chrono::seconds prerolls
                     "to reschedule around its tuners.")
                 .arg(nexttv->GetHostName()));
 
-        for (auto * enc : qAsConst(*m_tvList))
+        for (auto * enc : std::as_const(*m_tvList))
         {
             if (enc->GetHostName() == nexttv->GetHostName())
                 enc->SetSleepStatus(sStatus_Undefined);
@@ -2791,7 +2791,7 @@ bool Scheduler::HandleRecording(
                         "to reschedule around its tuners.")
                     .arg(nexttv->GetHostName()));
 
-            for (auto * enc : qAsConst(*m_tvList))
+            for (auto * enc : std::as_const(*m_tvList))
             {
                 if (enc->GetHostName() == nexttv->GetHostName())
                     enc->SetSleepStatus(sStatus_Undefined);
@@ -3479,7 +3479,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
     QReadLocker tvlocker(&TVRec::s_inputsLock);
 
     bool someSlavesCanSleep = false;
-    for (auto * enc : qAsConst(*m_tvList))
+    for (auto * enc : std::as_const(*m_tvList))
     {
         if (enc->CanSleep())
             someSlavesCanSleep = true;
@@ -3562,7 +3562,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
         "be inactive for the next %1 minutes and can be put to sleep.")
             .arg(sleepThreshold.count() / 60));
 
-    for (auto * enc : qAsConst(*m_tvList))
+    for (auto * enc : std::as_const(*m_tvList))
     {
         if ((!enc->IsLocal()) &&
             (enc->IsAwake()) &&
@@ -3586,7 +3586,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
 
                 if (enc->GoToSleep())
                 {
-                    for (auto * slv : qAsConst(*m_tvList))
+                    for (auto * slv : std::as_const(*m_tvList))
                     {
                         if (slv->GetHostName() == thisHost)
                         {
@@ -3604,7 +3604,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
                     LOG(VB_GENERAL, LOG_ERR, LOC +
                         QString("Unable to shutdown %1 slave backend, setting "
                                 "sleep status to undefined.").arg(thisHost));
-                    for (auto * slv : qAsConst(*m_tvList))
+                    for (auto * slv : std::as_const(*m_tvList))
                     {
                         if (slv->GetHostName() == thisHost)
                             slv->SetSleepStatus(sStatus_Undefined);
@@ -3634,7 +3634,7 @@ bool Scheduler::WakeUpSlave(const QString& slaveHostname, bool setWakingStatus)
             QString("Trying to Wake Up %1, but this slave "
                     "does not have a WakeUpCommand set.").arg(slaveHostname));
 
-        for (auto * enc : qAsConst(*m_tvList))
+        for (auto * enc : std::as_const(*m_tvList))
         {
             if (enc->GetHostName() == slaveHostname)
                 enc->SetSleepStatus(sStatus_Undefined);
@@ -3644,7 +3644,7 @@ bool Scheduler::WakeUpSlave(const QString& slaveHostname, bool setWakingStatus)
     }
 
     QDateTime curtime = MythDate::current();
-    for (auto * enc : qAsConst(*m_tvList))
+    for (auto * enc : std::as_const(*m_tvList))
     {
         if (setWakingStatus && (enc->GetHostName() == slaveHostname))
             enc->SetSleepStatus(sStatus_Waking);
@@ -3668,7 +3668,7 @@ void Scheduler::WakeUpSlaves(void)
 
     QStringList SlavesThatCanWake;
     QString thisSlave;
-    for (auto * enc : qAsConst(*m_tvList))
+    for (auto * enc : std::as_const(*m_tvList))
     {
         if (enc->IsLocal())
             continue;
@@ -4336,7 +4336,7 @@ void Scheduler::AddNewRecords(void)
     RecList tmpList;
 
     QMap<int, bool> cardMap;
-    for (auto * enc : qAsConst(*m_tvList))
+    for (auto * enc : std::as_const(*m_tvList))
     {
         if (enc->IsConnected() || enc->IsAsleep())
             cardMap[enc->GetInputID()] = true;
@@ -5487,7 +5487,7 @@ int Scheduler::FillRecordingDir(
                         ProgramInfo *programinfo = expire;
                         bool foundSlave = false;
 
-                        for (auto * enc : qAsConst(*m_tvList))
+                        for (auto * enc : std::as_const(*m_tvList))
                         {
                             if (enc->GetHostName() ==
                                 programinfo->GetHostname())
@@ -5643,7 +5643,7 @@ void Scheduler::SchedLiveTV(void)
         return;
 
     // Build a list of active livetv programs
-    for (auto * enc : qAsConst(*m_tvList))
+    for (auto * enc : std::as_const(*m_tvList))
     {
         if (kState_WatchingLiveTV != enc->GetState())
             continue;
@@ -5773,7 +5773,7 @@ bool Scheduler::CreateConflictLists(void)
         while (checkset != fullset)
         {
             checkset = fullset;
-            for (int item : qAsConst(checkset))
+            for (int item : std::as_const(checkset))
                 fullset += inputSets[item];
         }
 
@@ -5781,7 +5781,7 @@ bool Scheduler::CreateConflictLists(void)
         // and point each inputs list at it.
         auto *conflictlist = new RecList();
         m_conflictLists.push_back(conflictlist);
-        for (int item : qAsConst(checkset))
+        for (int item : std::as_const(checkset))
         {
             LOG(VB_SCHEDULE, LOG_INFO,
                 QString("Assigning input %1 to conflict set %2")

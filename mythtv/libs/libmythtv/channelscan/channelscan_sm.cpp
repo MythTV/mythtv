@@ -369,7 +369,7 @@ void ChannelScanSM::LogLines(const QString& string)
     if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_DEBUG))
     {
         QStringList lines = string.split('\n');
-        for (const QString& line : qAsConst(lines))
+        for (const QString& line : std::as_const(lines))
             LOG(VB_CHANSCAN, LOG_DEBUG, line);
     }
 }
@@ -1334,7 +1334,7 @@ uint ChannelScanSM::GetCurrentTransportInfo(
 
     QMap<uint,ChannelInsertInfo> list = GetChannelList(m_current, m_currentInfo);
     {
-        for (const auto & info : qAsConst(list))
+        for (const auto & info : std::as_const(list))
         {
             max_chan_cnt +=
                 (info.m_inPat || info.m_inPmt ||
@@ -1377,7 +1377,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     }
 
     // PATs
-    for (const auto& pat_list : qAsConst(scan_info->m_pats))
+    for (const auto& pat_list : std::as_const(scan_info->m_pats))
     {
         for (const auto *pat : pat_list)
         {
@@ -1471,7 +1471,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
     // SDTs
     QString siStandard = (scan_info->m_mgt == nullptr) ? "dvb" : "atsc";
-    for (const auto& sdt_list : qAsConst(scan_info->m_sdts))
+    for (const auto& sdt_list : std::as_const(scan_info->m_sdts))
     {
         for (const auto *sdt_it : sdt_list)
         {
@@ -1828,7 +1828,7 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
     DTVTunerType tuner_type;
     tuner_type = GuessDTVTunerType(tuner_type);
 
-    for (const auto & it : qAsConst(m_channelList))
+    for (const auto & it : std::as_const(m_channelList))
     {
         QMap<uint,ChannelInsertInfo> pnum_to_dbchan =
             GetChannelList(it.first, it.second);

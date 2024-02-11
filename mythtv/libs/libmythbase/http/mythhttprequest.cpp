@@ -149,7 +149,7 @@ HTTPQueries MythHTTPRequest::ParseQuery(const QString &Query)
 {
     HTTPQueries result;
     QStringList params = Query.split('&', Qt::SkipEmptyParts);
-    for (const auto & param : qAsConst(params))
+    for (const auto & param : std::as_const(params))
     {
         QString key   = param.section('=', 0, 0);
         QString value = param.section('=', 1);

@@ -86,7 +86,7 @@ static int SetMarkupList(const MythUtilCommandLineParser &cmdline,
     if (newList.isEmpty())
         newList = "(EMPTY)";
 
-    for (const QString& token : qAsConst(tokens))
+    for (const QString& token : std::as_const(tokens))
     {
         QStringList cutpair = token.split("-", Qt::SkipEmptyParts);
         if (isCutlist)
@@ -251,7 +251,7 @@ static int GetMarkup(const MythUtilCommandLineParser &cmdline)
     root.appendChild(item);
     QDomElement markup = xml.createElement("markup");
     item.appendChild(markup);
-    for (const auto & entry : qAsConst(mapMark))
+    for (const auto & entry : std::as_const(mapMark))
     {
         QDomElement child = xml.createElement("mark");
         child.setAttribute("type", entry.type);
@@ -260,7 +260,7 @@ static int GetMarkup(const MythUtilCommandLineParser &cmdline)
             child.setAttribute("data", (qulonglong)entry.data);
         markup.appendChild(child);
     }
-    for (const auto & entry : qAsConst(mapSeek))
+    for (const auto & entry : std::as_const(mapSeek))
     {
         QDomElement child = xml.createElement("seek");
         child.setAttribute("type", entry.type);

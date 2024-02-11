@@ -894,7 +894,7 @@ static void handleGalleryMedia(MythMediaDevice *dev)
     GetMythMainWindow()->GetMainStack()->GetScreenList(screens);
 
 
-    for (const auto *screen : qAsConst(screens))
+    for (const auto *screen : std::as_const(screens))
     {
         if (qobject_cast<const GalleryThumbView*>(screen))
         {

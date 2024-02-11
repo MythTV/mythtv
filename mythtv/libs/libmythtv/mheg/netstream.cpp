@@ -477,7 +477,7 @@ void NetStream::slotSslErrors(const QList<QSslError> &errors)
     if (m_reply)
     {
         bool bIgnore = true;
-        for (const auto& e : qAsConst(errors))
+        for (const auto& e : std::as_const(errors))
         {
             LOG(VB_FILE, LOG_INFO, LOC + QString("(%1) SSL error %2: ")
                 .arg(m_id).arg(e.error()) + e.errorString() );
@@ -950,7 +950,7 @@ QDateTime NAMThread::GetLastModified(const QUrl &url)
     QDateTime lastMod = meta.lastModified();
 
     QNetworkCacheMetaData::RawHeaderList headers = meta.rawHeaders();
-    for (const auto& h : qAsConst(headers))
+    for (const auto& h : std::as_const(headers))
     {
         // RFC 1123 date format: Thu, 01 Dec 1994 16:00:00 GMT
         static const QString kSzFormat { "ddd, dd MMM yyyy HH:mm:ss 'GMT'" };

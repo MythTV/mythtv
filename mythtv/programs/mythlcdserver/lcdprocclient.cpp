@@ -1004,7 +1004,7 @@ void LCDProcClient::scrollWidgets()
         return; // Weird...
 
     unsigned int len = 0;
-    for (const auto & item : qAsConst(*m_lcdTextItems))
+    for (const auto & item : std::as_const(*m_lcdTextItems))
     {
         if (item.getScroll())
         {
@@ -2048,7 +2048,7 @@ QStringList LCDProcClient::formatScrollerText(const QString &text) const
     int lastSplit = 0;
     QString line = "";
 
-    for (const auto& x : qAsConst(text))
+    for (const auto& x : std::as_const(text))
     {
         if (separators.contains(x))
             lastSplit = line.length();

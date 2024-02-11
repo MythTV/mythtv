@@ -242,7 +242,7 @@ class APHTTPRequest
     {
         QMap<QByteArray,QByteArray> result;
         QList<QByteArray> lines = m_body.split('\n');;
-        for (const QByteArray& line : qAsConst(lines))
+        for (const QByteArray& line : std::as_const(lines))
         {
             int index = line.indexOf(":");
             if (index > 0)
@@ -432,7 +432,7 @@ void MythAirplayServer::Teardown(void)
     m_bonjour = nullptr;
 
     // disconnect connections
-    for (QTcpSocket* connection : qAsConst(m_sockets))
+    for (QTcpSocket* connection : std::as_const(m_sockets))
     {
         disconnect(connection, nullptr, nullptr, nullptr);
         delete connection;
@@ -440,7 +440,7 @@ void MythAirplayServer::Teardown(void)
     m_sockets.clear();
 
     // remove all incoming buffers
-    for (APHTTPRequest* request : qAsConst(m_incoming))
+    for (APHTTPRequest* request : std::as_const(m_incoming))
     {
         delete request;
     }

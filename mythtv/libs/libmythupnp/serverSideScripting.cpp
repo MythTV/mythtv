@@ -88,7 +88,7 @@ ServerSideScripting::~ServerSideScripting()
 {
     Lock();
 
-    for (const auto *script : qAsConst(m_mapScripts))
+    for (const auto *script : std::as_const(m_mapScripts))
         delete script;
 
     m_mapScripts.clear();

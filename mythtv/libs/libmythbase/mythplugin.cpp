@@ -109,7 +109,7 @@ MythPluginManager::MythPluginManager()
                     "No libraries in plugins directory " + filterDir.path());
 
         // coverity[auto_causes_copy]
-        for (auto library : qAsConst(libraries))
+        for (auto library : std::as_const(libraries))
         {
             // pull out the base library name
             library = library.right(library.length() - prefixLength);
@@ -220,7 +220,7 @@ MythPlugin *MythPluginManager::GetPlugin(const QString &plugname)
 
 void MythPluginManager::DestroyAllPlugins(void)
 {
-    for (auto *it : qAsConst(m_dict))
+    for (auto *it : std::as_const(m_dict))
     {
         it->destroy();
         delete it;
@@ -233,7 +233,7 @@ void MythPluginManager::DestroyAllPlugins(void)
 QStringList MythPluginManager::EnumeratePlugins(void)
 {
     QStringList ret;
-    for (auto *it : qAsConst(m_dict))
+    for (auto *it : std::as_const(m_dict))
         ret << it->getName();
     return ret;
 }

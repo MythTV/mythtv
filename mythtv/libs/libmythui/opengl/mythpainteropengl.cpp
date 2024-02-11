@@ -50,7 +50,7 @@ void MythOpenGLPainter::FreeResources(void)
         }
         m_mappedBufferPoolReady = false;
     }
-    for (auto * proc : qAsConst(m_procedurals))
+    for (auto * proc : std::as_const(m_procedurals))
         delete proc;
     m_procedurals.clear();
     MythPainterGPU::FreeResources();

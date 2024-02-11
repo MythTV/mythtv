@@ -604,7 +604,7 @@ HouseKeeper::~HouseKeeper(void)
         // issue a terminate call to any long-running tasks
         // this is just a noop unless overwritten by a subclass
         QMutexLocker mapLock(&m_mapLock);
-        for (auto *it : qAsConst(m_taskMap))
+        for (auto *it : std::as_const(m_taskMap))
             it->Terminate();
     }
 

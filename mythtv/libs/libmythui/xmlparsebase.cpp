@@ -637,7 +637,7 @@ bool XMLParseBase::WindowExists(const QString &xmlfile,
                                 const QString &windowname)
 {
     const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
-    for (const auto & dir : qAsConst(searchpath))
+    for (const auto & dir : std::as_const(searchpath))
     {
         QString themefile = dir + xmlfile;
         QFile f(themefile);
@@ -692,7 +692,7 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
     bool showWarnings = true;
 
     const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
-    for (const auto & dir : qAsConst(searchpath))
+    for (const auto & dir : std::as_const(searchpath))
     {
         QString themefile = dir + xmlfile;
         LOG(VB_GUI, LOG_INFO, LOC + QString("Loading window %1 from %2").arg(windowname, themefile));
@@ -843,7 +843,7 @@ bool XMLParseBase::LoadBaseTheme(void)
     bool showWarnings = true;
 
     const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
-    for (const auto & dir : qAsConst(searchpath))
+    for (const auto & dir : std::as_const(searchpath))
     {
         QString themefile = dir + "base.xml";
         if (doLoad(QString(), GetGlobalObjectStore(), themefile,
@@ -883,7 +883,7 @@ bool XMLParseBase::LoadBaseTheme(const QString &baseTheme)
     bool showWarnings = true;
 
     const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
-    for (const auto & dir : qAsConst(searchpath))
+    for (const auto & dir : std::as_const(searchpath))
     {
         QString themefile = dir + baseTheme;
         if (doLoad(QString(), GetGlobalObjectStore(), themefile,

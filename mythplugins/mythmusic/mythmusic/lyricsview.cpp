@@ -448,7 +448,7 @@ void LyricsView::showLyrics(void)
     new MythUIButtonListItem(m_lyricsList, tr("** Lyrics from %1 (%2) **")
                              .arg(m_lyricData->grabber(), syncronized));
 
-    for (auto * line : qAsConst(*m_lyricData->lyrics()))
+    for (auto * line : std::as_const(*m_lyricData->lyrics()))
     {
         if (line)
             new MythUIButtonListItem(m_lyricsList, line->m_lyric, QVariant::fromValue(line));
@@ -597,7 +597,7 @@ bool EditLyricsDialog::somethingChanged(void)
         return true;
 
     int x = 0;
-    for (auto * line : qAsConst(*m_sourceData->lyrics()))
+    for (auto * line : std::as_const(*m_sourceData->lyrics()))
     {
         if (line->toString(m_sourceData->syncronized()) != lines.at(x))
             changed = true;

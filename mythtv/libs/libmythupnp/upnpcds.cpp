@@ -44,7 +44,7 @@ void UPnpCDSExtensionResults::Add( CDSObject *pObject )
 
 void UPnpCDSExtensionResults::Add( const CDSObjects& objects )
 {
-    for (auto *const object : qAsConst(objects))
+    for (auto *const object : std::as_const(objects))
     {
         object->IncrRef();
         m_List.append( object );
@@ -60,7 +60,7 @@ QString UPnpCDSExtensionResults::GetResultXML(FilterMap &filter,
 {
     QString sXML;
 
-    for (auto *item : qAsConst(m_List))
+    for (auto *item : std::as_const(m_List))
         sXML += item->toXml(filter, ignoreChildren);
 
     return sXML;

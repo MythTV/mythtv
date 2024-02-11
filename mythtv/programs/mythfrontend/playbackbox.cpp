@@ -1904,7 +1904,7 @@ bool PlaybackBox::UpdateUILists(void)
 
         if ((m_viewMask & VIEW_WATCHLIST) && !recidWatchListProgram.empty())
         {
-            for (auto *p : qAsConst(recidWatchListProgram))
+            for (auto *p : std::as_const(recidWatchListProgram))
             {
                 m_progLists[m_watchGroupLabel].push_back(p);
             }
@@ -2080,7 +2080,7 @@ bool PlaybackBox::UpdateUILists(void)
     UpdateUIGroupList(groupSelPref);
     UpdateUsageUI();
 
-    for (uint id : qAsConst(m_playList))
+    for (uint id : std::as_const(m_playList))
     {
         ProgramInfo *pginfo = FindProgramInUILists(id);
         if (!pginfo)
@@ -3385,7 +3385,7 @@ void PlaybackBox::doBeginLookup()
 
 void PlaybackBox::doPlaylistJobQueueJob(int jobType, int jobFlags)
 {
-    for (const uint pbs : qAsConst(m_playList))
+    for (const uint pbs : std::as_const(m_playList))
     {
         ProgramInfo *tmpItem = FindProgramInUILists(pbs);
         if (tmpItem &&
@@ -3444,7 +3444,7 @@ void PlaybackBox::PlaylistDelete(bool forgetHistory)
     QString forceDeleteStr("0");
 
     QStringList list;
-    for (int id : qAsConst(m_playList))
+    for (int id : std::as_const(m_playList))
     {
         ProgramInfo *tmpItem = FindProgramInUILists(id);
         if (tmpItem && tmpItem->QueryIsDeleteCandidate())
@@ -3639,7 +3639,7 @@ void PlaybackBox::togglePlayListTitle(void)
 {
     QString groupname = m_groupList->GetItemCurrent()->GetData().toString();
 
-    for (auto *pl : qAsConst(m_progLists[groupname]))
+    for (auto *pl : std::as_const(m_progLists[groupname]))
     {
         if (pl && (pl->GetAvailableStatus() == asAvailable))
             togglePlayListItem(pl);
@@ -4684,7 +4684,7 @@ void PlaybackBox::ShowPlayGroupChanger(bool use_playlist)
     QStringList displayNames("Default");
 
     QStringList list = PlayGroup::GetNames();
-    for (const auto& name : qAsConst(list))
+    for (const auto& name : std::as_const(list))
     {
         displayNames.push_back(name);
         groupNames.push_back(name);
@@ -4857,7 +4857,7 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
 
     if (m_opOnPlaylist)
     {
-        for (int id : qAsConst(m_playList))
+        for (int id : std::as_const(m_playList))
         {
             ProgramInfo *p = FindProgramInUILists(id);
             if (!p)
@@ -5458,7 +5458,7 @@ void PlaybackBox::PbbJobQueue::Update()
         QMap<int, JobQueueEntry> jobs;
         JobQueue::GetJobsInQueue(jobs, JOB_LIST_ALL);
         m_jobs.clear();
-        for (const auto& job : qAsConst(jobs))
+        for (const auto& job : std::as_const(jobs))
         {
             m_jobs.insert(qMakePair(job.chanid, job.recstartts), job);
         }

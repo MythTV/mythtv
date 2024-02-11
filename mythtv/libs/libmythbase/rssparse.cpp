@@ -365,7 +365,7 @@ private:
             parent = parent.parentNode().toElement();
         }
 
-        for (const auto& p : qAsConst(parents))
+        for (const auto& p : std::as_const(parents))
             result += CollectArbitraryLocatedData(p);
 
         return result;
@@ -434,7 +434,7 @@ private:
         QList<MRSSThumbnail> result;
         QList<QDomNode> thumbs = GetDirectChildrenNS(element, Parse::kMediaRSS,
             "thumbnail");
-        for (const auto& dom : qAsConst(thumbs))
+        for (const auto& dom : std::as_const(thumbs))
         {
             QDomElement thumbNode = dom.toElement();
             int widthOpt = GetInt(thumbNode, "width");
@@ -459,7 +459,7 @@ private:
         QList<QDomNode> credits = GetDirectChildrenNS(element, Parse::kMediaRSS,
            "credit");
 
-        for (const auto& dom : qAsConst(credits))
+        for (const auto& dom : std::as_const(credits))
         {
             QDomElement creditNode = dom.toElement();
             if (!creditNode.hasAttribute("role"))
@@ -542,7 +542,7 @@ private:
         QList<QDomNode> links = GetDirectChildrenNS(element, Parse::kMediaRSS,
             "peerLink");
 
-        for (const auto& dom : qAsConst(links))
+        for (const auto& dom : std::as_const(links))
         {
             QDomElement linkNode = dom.toElement();
             MRSSPeerLink pl =

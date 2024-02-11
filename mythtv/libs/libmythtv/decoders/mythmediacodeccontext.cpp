@@ -241,7 +241,7 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext **Contex
     MCProfiles& profiles = MythMediaCodecContext::GetProfiles();
     MythCodecContext::CodecProfile mythprofile =
             MythCodecContext::FFmpegToMythProfile((*Context)->codec_id, (*Context)->profile);
-    for (auto profile : qAsConst(profiles))
+    for (auto profile : std::as_const(profiles))
     {
         if (profile.first == mythprofile &&
             profile.second.width() >= (*Context)->width &&
@@ -498,7 +498,7 @@ void MythMediaCodecContext::GetDecoderList(QStringList &Decoders)
         return;
 
     Decoders.append("MediaCodec:");
-    for (auto profile : qAsConst(profiles))
+    for (auto profile : std::as_const(profiles))
         Decoders.append(MythCodecContext::GetProfileDescription(profile.first, profile.second));
 }
 
@@ -520,7 +520,7 @@ bool MythMediaCodecContext::HaveMediaCodec(bool Reinit /*=false*/)
         {
             s_available = true;
             LOG(VB_GENERAL, LOG_INFO, LOC + "Supported/available MediaCodec decoders:");
-            for (auto profile : qAsConst(profiles))
+            for (auto profile : std::as_const(profiles))
             {
                 LOG(VB_GENERAL, LOG_INFO, LOC +
                     MythCodecContext::GetProfileDescription(profile.first, profile.second));

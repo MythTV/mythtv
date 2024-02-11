@@ -227,7 +227,7 @@ QString MythSystemEventHandler::EventNameToSetting(const QString &name)
 {
     QString result("EventCmd");
     QStringList parts = name.toLower().split('_', Qt::SkipEmptyParts);
-    for (const auto & part : qAsConst(parts))
+    for (const auto & part : std::as_const(parts))
     {
         result += part.at(0).toUpper();
         result += part.mid(1);

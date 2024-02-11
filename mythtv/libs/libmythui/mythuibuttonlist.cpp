@@ -1541,7 +1541,7 @@ void MythUIButtonList::SetValueByData(const QVariant& data)
     if (!m_initialized)
         Init();
 
-    for (auto *item : qAsConst(m_itemList))
+    for (auto *item : std::as_const(m_itemList))
     {
         if (item->GetData() == data)
         {
@@ -1683,7 +1683,7 @@ MythUIButtonListItem *MythUIButtonList::GetItemByData(const QVariant& data)
     if (!m_initialized)
         Init();
 
-    for (auto *item : qAsConst(m_itemList))
+    for (auto *item : std::as_const(m_itemList))
     {
         if (item->GetData() == data)
             return item;
@@ -2491,7 +2491,7 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *event)
     handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
 
     // Handle action remappings
-    for (const QString& action : qAsConst(actions))
+    for (const QString& action : std::as_const(actions))
     {
         if (!m_actionRemap.contains(action))
             continue;

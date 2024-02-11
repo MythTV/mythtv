@@ -682,7 +682,7 @@ void WebSocketWorker::HandleDataFrame(const WebSocketFrame &frame)
                 // For Debugging and fuzz testing
                 if (m_fuzzTesting)
                     SendText(frame.m_payload);
-                for (auto *const extension : qAsConst(m_extensions))
+                for (auto *const extension : std::as_const(m_extensions))
                 {
                     if (extension->HandleTextFrame(frame))
                         break;
@@ -691,7 +691,7 @@ void WebSocketWorker::HandleDataFrame(const WebSocketFrame &frame)
             case WebSocketFrame::kOpBinaryFrame :
                 if (m_fuzzTesting)
                     SendBinary(frame.m_payload);
-                for (auto *const extension : qAsConst(m_extensions))
+                for (auto *const extension : std::as_const(m_extensions))
                 {
                     if (extension->HandleBinaryFrame(frame))
                         break;

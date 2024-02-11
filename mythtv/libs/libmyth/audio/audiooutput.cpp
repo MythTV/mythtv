@@ -394,7 +394,7 @@ static void fillSelectionsFromDir(const QDir &dir,
                                   AudioOutput::ADCVect *list)
 {
     QFileInfoList entries = dir.entryInfoList();
-    for (const auto& fi : qAsConst(entries))
+    for (const auto& fi : std::as_const(entries))
     {
         QString name = fi.absoluteFilePath();
         QString desc = AudioOutput::tr("OSS device");

@@ -753,7 +753,7 @@ LogLevel_t logLevelGet(const QString& level)
         locker.relock();
     }
 
-    for (auto *item : qAsConst(loglevelMap))
+    for (auto *item : std::as_const(loglevelMap))
     {
         if ( item->name == level.toLower() )
             return (LogLevel_t)item->value;
@@ -911,7 +911,7 @@ int verboseArgParse(const QString& arg)
 
     static const QRegularExpression kSeparatorRE { "[^\\w:]+" };
     QStringList verboseOpts = arg.split(kSeparatorRE, Qt::SkipEmptyParts);
-    for (const auto& opt : qAsConst(verboseOpts))
+    for (const auto& opt : std::as_const(verboseOpts))
     {
         option = opt.toLower();
         bool reverseOption = false;

@@ -326,7 +326,7 @@ bool MediaMonitorUnix::CheckMountable(void)
 
         // Parse the returned device array
         const QDBusObjectPathList& list(reply.value());
-        for (const auto& entry : qAsConst(list))
+        for (const auto& entry : std::as_const(list))
         {
             // Create the MythMediaDevice
             MythMediaDevice* pDevice = nullptr;
@@ -374,7 +374,7 @@ bool MediaMonitorUnix::CheckMountable(void)
     sysfs.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
 
     auto list = sysfs.entryList();
-    for (const auto& device : qAsConst(list))
+    for (const auto& device : std::as_const(list))
     {
         // ignore floppies, too slow
         if (device.startsWith("fd"))
@@ -690,7 +690,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
     //
     // Check if this is a duplicate of a device we have already added
     //
-    for (const auto *device : qAsConst(m_devices))
+    for (const auto *device : std::as_const(m_devices))
     {
         if (stat(device->getDevicePath().toLocal8Bit().constData(), &sb) < 0)
         {
@@ -898,7 +898,7 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
 
         bool found_partitions = false;
         QStringList parts = sysfs.entryList();
-        for (const auto& part : qAsConst(parts))
+        for (const auto& part : std::as_const(parts))
         {
             // skip some sysfs dirs that are _not_ sub-partitions
             if (part == "device" || part == "holders" || part == "queue"
@@ -968,7 +968,7 @@ void MediaMonitorUnix::CheckDeviceNotifications(void)
         size = read(m_fifo, buffer.data(), 255);
     }
     const QStringList list = qBuffer.split('\n', Qt::SkipEmptyParts);
-    for (const auto& notif : qAsConst(list))
+    for (const auto& notif : std::as_const(list))
     {
         if (notif.startsWith("add"))
         {

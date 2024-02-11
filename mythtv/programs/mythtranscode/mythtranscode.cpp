@@ -247,7 +247,7 @@ int main(int argc, char *argv[])
 
             uint64_t last = 0;
             QStringList cutlist = cmdline.toStringList("usecutlist", " ");
-            for (const auto & cut : qAsConst(cutlist))
+            for (const auto & cut : std::as_const(cutlist))
             {
                 QStringList startend = cut.split("-", Qt::SkipEmptyParts);
                 if (startend.size() == 2)
@@ -1000,7 +1000,7 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
         QDir dir (fInfo.path());
         QFileInfoList previewFiles = dir.entryInfoList(nameFilters);
 
-        for (const auto & previewFile : qAsConst(previewFiles))
+        for (const auto & previewFile : std::as_const(previewFiles))
         {
             QString oldFileName = previewFile.absoluteFilePath();
 

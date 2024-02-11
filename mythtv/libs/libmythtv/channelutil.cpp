@@ -2162,7 +2162,7 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
 
         chan.m_xmltvId = query.value(11).toString();      /* xmltvid    */
 
-        for (auto inputId : qAsConst(inputIdLists[qSourceID]))
+        for (auto inputId : std::as_const(inputIdLists[qSourceID]))
             chan.AddInputId(inputId);
 
         QStringList groupIDs = query.value(10).toString().split(",");

@@ -251,7 +251,7 @@ unsigned int MetadataDownload::findExactMatchCount(MetadataLookupList list,
     unsigned int exactMatches = 0;
     unsigned int exactMatchesWithArt = 0;
 
-    for (const auto& lkup : qAsConst(list))
+    for (const auto& lkup : std::as_const(list))
     {
         // Consider exact title matches (ignoring case)
         if ((QString::compare(lkup->GetTitle(), originaltitle, Qt::CaseInsensitive) == 0))
@@ -285,7 +285,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
     bool foundMatchWithArt = false;
 
     // Build a list of all the titles
-    for (const auto& lkup : qAsConst(list))
+    for (const auto& lkup : std::as_const(list))
     {
         QString title = lkup->GetTitle();
         LOG(VB_GENERAL, LOG_INFO, QString("Comparing metadata title '%1' [%2] to recording title '%3'")
@@ -369,7 +369,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
                     .arg(originaltitle, bestTitle));
 
     // Grab the one item that matches the besttitle (IMPERFECT)
-    for (const auto& item : qAsConst(list))
+    for (const auto& item : std::as_const(list))
     {
         if (item->GetTitle() == bestTitle)
         {

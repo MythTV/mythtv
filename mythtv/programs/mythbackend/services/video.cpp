@@ -207,7 +207,7 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
 
     //MetadataLookupList is a reference counted list.
     //it will delete all its content at its end of life
-    for(const auto & lookup : qAsConst(list))
+    for(const auto & lookup : std::as_const(list))
     {
         DTC::VideoLookup *pVideoLookup = pVideoLookups->AddNewVideoLookup();
 
@@ -804,7 +804,7 @@ DTC::VideoStreamInfoList* Video::GetStreamInfo
     pVideoStreamInfos->setErrorCode     ( infos.m_errorCode   );
     pVideoStreamInfos->setErrorMsg      ( infos.m_errorMsg    );
 
-    for (const auto & info : qAsConst(infos.m_streamInfoList))
+    for (const auto & info : std::as_const(infos.m_streamInfoList))
     {
         DTC::VideoStreamInfo *pVideoStreamInfo = pVideoStreamInfos->AddNewVideoStreamInfo();
         pVideoStreamInfo->setCodecType       ( QString(QChar(info.m_codecType)) );

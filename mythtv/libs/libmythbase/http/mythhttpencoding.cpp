@@ -116,7 +116,7 @@ void MythHTTPEncoding::GetURLEncodedParameters(MythHTTPRequest* Request)
     if (!payload.isEmpty())
     {
         QStringList params = payload.split('&', Qt::SkipEmptyParts);
-        for (const auto & param : qAsConst(params))
+        for (const auto & param : std::as_const(params))
         {
             QString name  = param.section('=', 0, 0);
             QString value = param.section('=', 1);

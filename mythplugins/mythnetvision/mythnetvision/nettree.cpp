@@ -178,7 +178,7 @@ void NetTree::LoadData(void)
         using MGTreeChildList = QList<MythGenericTree *>;
         MGTreeChildList *lchildren = m_currentNode->getAllChildren();
 
-        for (auto * child : qAsConst(*lchildren))
+        for (auto * child : std::as_const(*lchildren))
         {
             if (child != nullptr)
             {
@@ -531,7 +531,7 @@ void NetTree::FillTree()
         rssGeneric->SetData(QString("%1/mythnetvision/icons/rss.png")
                             .arg(GetShareDir()));
 
-        for (const auto & feed : qAsConst(m_rssList))
+        for (const auto & feed : std::as_const(m_rssList))
         {
             ResultItem::resultList items = getRSSArticles(feed->GetTitle(),
                                                           VIDEO_PODCAST);
@@ -544,7 +544,7 @@ void NetTree::FillTree()
             if (m_type != DLG_TREE)
                 ret->addNode(tr("Back"), kUpFolder, true, false);
 
-            for (const auto & item : qAsConst(items))
+            for (const auto & item : std::as_const(items))
                 AddFileNode(ret, item);
             SetSubfolderData(ret);
         }
@@ -554,7 +554,7 @@ void NetTree::FillTree()
     }
 
     // Now let's add all the grabber trees
-    for (const auto & g : qAsConst(m_grabberList))
+    for (const auto & g : std::as_const(m_grabberList))
     {
 
         QMultiMap<QPair<QString,QString>, ResultItem*> treePathsNodes =
@@ -571,7 +571,7 @@ void NetTree::FillTree()
         if (m_type != DLG_TREE)
             ret->addNode(tr("Back"), kUpFolder, true, false);
 
-        for (const auto & path : qAsConst(paths))
+        for (const auto & path : std::as_const(paths))
         {
             QStringList curPaths = path.first.split("/");
             QString dirthumb = path.second;
@@ -618,7 +618,7 @@ void NetTree::BuildGenericTree(MythGenericTree *dst, QStringList paths,
     else
     {
         // File Handling
-        for (const auto & video : qAsConst(videos))
+        for (const auto & video : std::as_const(videos))
             AddFileNode(folder, video);
     }
     SetSubfolderData(folder);

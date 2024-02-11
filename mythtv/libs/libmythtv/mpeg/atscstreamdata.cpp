@@ -135,11 +135,11 @@ void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
         DeleteCachedTable(m_cachedMgt);
         m_cachedMgt = nullptr;
 
-        for (const auto & cached : qAsConst(m_cachedTvcts))
+        for (const auto & cached : std::as_const(m_cachedTvcts))
             DeleteCachedTable(cached);
         m_cachedTvcts.clear();
 
-        for (const auto & cached : qAsConst(m_cachedCvcts))
+        for (const auto & cached : std::as_const(m_cachedCvcts))
             DeleteCachedTable(cached);
         m_cachedCvcts.clear();
     }
@@ -827,7 +827,7 @@ tvct_vec_t ATSCStreamData::GetCachedTVCTs(bool current) const
     std::vector<const TerrestrialVirtualChannelTable*> tvcts;
 
     m_cacheLock.lock();
-    for (auto *tvct : qAsConst(m_cachedTvcts))
+    for (auto *tvct : std::as_const(m_cachedTvcts))
     {
         IncrementRefCnt(tvct);
         tvcts.push_back(tvct);
@@ -846,7 +846,7 @@ cvct_vec_t ATSCStreamData::GetCachedCVCTs(bool current) const
     std::vector<const CableVirtualChannelTable*> cvcts;
 
     m_cacheLock.lock();
-    for (auto *cvct : qAsConst(m_cachedCvcts))
+    for (auto *cvct : std::as_const(m_cachedCvcts))
     {
         IncrementRefCnt(cvct);
         cvcts.push_back(cvct);

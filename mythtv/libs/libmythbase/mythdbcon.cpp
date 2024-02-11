@@ -486,7 +486,7 @@ void MDBManager::CloseDatabases()
     m_pool[QThread::currentThread()].clear();
     m_lock.unlock();
 
-    for (auto *conn : qAsConst(list))
+    for (auto *conn : std::as_const(list))
     {
         LOG(VB_DATABASE, LOG_INFO,
             "Closing DB connection named '" + conn->m_name + "'");

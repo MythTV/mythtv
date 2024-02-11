@@ -44,7 +44,7 @@ ChannelWizard::ChannelWizard(int id, int default_sourceid)
 
     bool all_v4l = !cardtypes.empty();
     bool all_asi = !cardtypes.empty();
-    for (const QString& cardtype : qAsConst(cardtypes))
+    for (const QString& cardtype : std::as_const(cardtypes))
     {
         all_v4l &= CardUtil::IsV4L(cardtype);
         all_asi &= cardtype == "ASI";

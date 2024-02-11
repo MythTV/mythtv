@@ -32,18 +32,18 @@ static void print(
 {
     QString raw_mins;
     QString raw_maxs;
-    for (uint minima : qAsConst(raw_minimas))
+    for (uint minima : std::as_const(raw_minimas))
         raw_mins += QString("%1,").arg(minima);
-    for (uint maxima : qAsConst(raw_maximas))
+    for (uint maxima : std::as_const(raw_maximas))
         raw_maxs += QString("%1,").arg(maxima);
     LOG(VB_VBI, LOG_DEBUG, QString("raw mins: %1").arg(raw_mins));
     LOG(VB_VBI, LOG_DEBUG, QString("raw maxs: %1").arg(raw_maxs));
 
     QString mins;
     QString maxs;
-    for (float minima : qAsConst(minimas))
+    for (float minima : std::as_const(minimas))
         mins += QString("%1,").arg(minima);
-    for (float maxima : qAsConst(maximas))
+    for (float maxima : std::as_const(maximas))
         maxs += QString("%1,").arg(maxima);
     LOG(VB_VBI, LOG_DEBUG, QString("mins: %1 maxs: %2")
             .arg(mins, maxs));

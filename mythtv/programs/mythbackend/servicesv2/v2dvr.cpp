@@ -1039,7 +1039,7 @@ V2MarkupList* V2Dvr::GetRecordedMarkup ( int RecordedId )
     ri.QueryMarkup(mapMark, mapSeek);
 
     auto* pMarkupList = new V2MarkupList();
-    for (const auto& entry : qAsConst(mapMark))
+    for (const auto& entry : std::as_const(mapMark))
     {
         V2Markup *pMarkup = pMarkupList->AddNewMarkup();
         QString typestr = toString(static_cast<MarkTypes>(entry.type));
@@ -1050,7 +1050,7 @@ V2MarkupList* V2Dvr::GetRecordedMarkup ( int RecordedId )
         else
             pMarkup->setData(QString::number(entry.data));
     }
-    for (const auto& entry : qAsConst(mapSeek))
+    for (const auto& entry : std::as_const(mapSeek))
     {
         V2Markup *pSeek = pMarkupList->AddNewSeek();
         QString typestr = toString(static_cast<MarkTypes>(entry.type));
@@ -1144,7 +1144,7 @@ V2InputList* V2Dvr::GetInputList()
     auto *pList = new V2InputList();
 
     QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo(false);
-    for (const auto & inputInfo : qAsConst(inputInfoList))
+    for (const auto & inputInfo : std::as_const(inputInfoList))
     {
         V2Input *input = pList->AddNewInput();
         V2FillInputInfo(input, inputInfo);

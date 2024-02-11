@@ -141,7 +141,7 @@ public:
     {
         QStringList local;
         QStringList remote;
-        for (int id : qAsConst(ids))
+        for (int id : std::as_const(ids))
         {
             if (ImageItem::IsLocalId(id))
                 local << QString::number(id);

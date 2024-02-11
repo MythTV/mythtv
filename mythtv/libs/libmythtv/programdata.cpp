@@ -898,7 +898,7 @@ uint DBEvent::UpdateDB(
             credit.InsertDB(query, chanid, m_starttime);
     }
 
-    for (const auto & rating : qAsConst(m_ratings))
+    for (const auto & rating : std::as_const(m_ratings))
     {
         query.prepare(
             "INSERT IGNORE INTO programrating "
@@ -1203,7 +1203,7 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid,
     }
 
     table = recording ? "recordedrating" : "programrating";
-    for (const auto & rating : qAsConst(m_ratings))
+    for (const auto & rating : std::as_const(m_ratings))
     {
         query.prepare(QString(
             "INSERT IGNORE INTO %1 "
@@ -1620,7 +1620,7 @@ void ProgramData::HandlePrograms(MSqlQuery             &query,
                                  uint &unchanged,
                                  uint &updated)
 {
-    for (auto *pinfo : qAsConst(sortlist))
+    for (auto *pinfo : std::as_const(sortlist))
     {
         if (IsUnchanged(query, chanid, *pinfo))
         {

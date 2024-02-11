@@ -275,7 +275,7 @@ void GameUI::itemClicked(MythUIButtonListItem* /*item*/)
                 chooseSystemPopup->SetReturnEvent(this, "chooseSystemPopup");
                 QString all_systems = romInfo->AllSystems();
                 QStringList players = all_systems.split(',');
-                for (const auto & player : qAsConst(players))
+                for (const auto & player : std::as_const(players))
                     chooseSystemPopup->AddButton(player);
                 popupStack->AddScreen(chooseSystemPopup);
             }
@@ -984,13 +984,13 @@ void GameUI::OnGameSearchDone(MetadataLookup *lookup)
 
     // Imagery
     ArtworkList coverartlist = lookup->GetArtwork(kArtworkCoverart);
-    for (const auto & art : qAsConst(coverartlist))
+    for (const auto & art : std::as_const(coverartlist))
         coverart.prepend(art.url);
     ArtworkList fanartlist = lookup->GetArtwork(kArtworkFanart);
-    for (const auto & art : qAsConst(fanartlist))
+    for (const auto & art : std::as_const(fanartlist))
         fanart.prepend(art.url);
     ArtworkList screenshotlist = lookup->GetArtwork(kArtworkScreenshot);
-    for (const auto & art : qAsConst(screenshotlist))
+    for (const auto & art : std::as_const(screenshotlist))
         screenshot.prepend(art.url);
 
     StartGameImageSet(node, coverart, fanart, screenshot);

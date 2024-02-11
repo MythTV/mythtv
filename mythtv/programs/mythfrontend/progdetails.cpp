@@ -270,7 +270,7 @@ void ProgDetails::PowerPriorities(const QString & ptable)
                        "      ON ( record.recordid = %1 ) ")
         .arg(recordid);
 
-    for (const auto & [label, csqlStart] : qAsConst(tests))
+    for (const auto & [label, csqlStart] : std::as_const(tests))
     {
         QString sqlStart = csqlStart;
         query.prepare("SELECT " + sqlStart.replace("program.", "p.")
@@ -626,12 +626,12 @@ void ProgDetails::loadPage(void)
 
     if (!actor_list.isEmpty())
     {
-        for (const auto & [actor, role] : qAsConst(actor_list))
+        for (const auto & [actor, role] : std::as_const(actor_list))
             addItem(role, actor, ProgInfoList::kLevel2);
     }
     if (!guest_star_list.isEmpty())
     {
-        for (const auto & [actor, role] : qAsConst(guest_star_list))
+        for (const auto & [actor, role] : std::as_const(guest_star_list))
             addItem(role, actor, ProgInfoList::kLevel2);
     }
 

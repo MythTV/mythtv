@@ -929,7 +929,7 @@ void EditAlbumartDialog::updateImageGrid(void)
 
     m_coverartList->Reset();
 
-    for (auto *art : qAsConst(*albumArtList))
+    for (auto *art : std::as_const(*albumArtList))
     {
         auto *item = new MythUIButtonListItem(m_coverartList,
                                      AlbumArtImages::getTypeName(art->m_imageType),

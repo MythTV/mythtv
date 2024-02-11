@@ -47,7 +47,7 @@ static QHash<uint,bool> extract_pids(const QString &pidsStr, bool required)
     else
     {
         QStringList pidsList = pidsStr.split(",");
-        for (const QString &pidStr : qAsConst(pidsList))
+        for (const QString &pidStr : std::as_const(pidsList))
         {
             bool ok = false;
             uint tmp = pidStr.toUInt(&ok, 0);
@@ -306,7 +306,7 @@ class PTSListener :
     {
         int64_t pts = -1LL;
         uint32_t pts_count = 0;
-        for (uint stream : qAsConst(m_ptsStreams))
+        for (uint stream : std::as_const(m_ptsStreams))
         {
             if(m_ptsCount[stream] > pts_count){
                 pts = m_ptsFirst[stream];
@@ -319,7 +319,7 @@ class PTSListener :
     {
         int64_t pts = -1LL;
         uint32_t pts_count = 0;
-        for (uint stream : qAsConst(m_ptsStreams))
+        for (uint stream : std::as_const(m_ptsStreams))
         {
             if(m_ptsCount[stream] > pts_count){
                 pts = m_ptsLast[stream];

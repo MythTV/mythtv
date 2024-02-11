@@ -598,7 +598,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
             commDetectMethod = COMM_DETECT_UNINIT;
 
             QStringList list = commmethod.split(",", Qt::SkipEmptyParts);
-            for (const auto & it : qAsConst(list))
+            for (const auto & it : std::as_const(list))
             {
                 QString val = it.toLower();
                 if (val == "off")
