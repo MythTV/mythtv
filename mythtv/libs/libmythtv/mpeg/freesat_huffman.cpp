@@ -71,7 +71,7 @@ QString freesat_huffman_to_string(const unsigned char *compressed, uint size)
         {
             if (nextCh != STOP && nextCh != ESCAPE)
             {
-                if (p >= uncompressed.count())
+                if (p >= uncompressed.size())
                     uncompressed.resize(p+10);
                 uncompressed[p++] = nextCh;
             }

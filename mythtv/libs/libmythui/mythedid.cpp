@@ -132,7 +132,7 @@ static QString ParseEdidString(const quint8* data, bool Replace)
     // different values for serialNumber from QScreen
     if (Replace)
     {
-        for (int i = 0; i < buffer.count(); ++i) {
+        for (int i = 0; i < buffer.size(); ++i) {
             if (buffer[i] < '\040' || buffer[i] > '\176')
                 buffer[i] = '-';
         }
