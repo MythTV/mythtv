@@ -106,7 +106,21 @@ if(TARGET PkgConfig::CDIO
   target_sources(mythmusic PRIVATE cddecoder.h cdrip.h cddecoder.cpp cdrip.cpp)
   target_link_libraries(mythmusic PRIVATE PkgConfig::CDIO PkgConfig::CDIO_CDDA
                                           PkgConfig::CDIO_PARANOIA)
+  message(STATUS "Enabling AudioCD playback support.")
   set(HAVE_CDIO TRUE)
+  if(TARGET PkgConfig::MUSICBRAINZ
+     AND TARGET PkgConfig::COVERART
+     AND TARGET PkgConfig::DISCID)
+    target_sources(mythmusic PRIVATE musicbrainz.h musicbrainz.cpp)
+    target_link_libraries(mythmusic PRIVATE PkgConfig::MUSICBRAINZ PkgConfig::COVERART
+                                            PkgConfig::DISCID)
+    message(STATUS "Enabling MusicBrainz support.")
+    set(HAVE_MUSICBRAINZ TRUE)
+  else()
+    message(STATUS "Disabling MusicBrainz support.")
+  endif()
+else()
+  message(STATUS "Disabling AudioCD playback support.")
 endif()
 
 if(MINGW)
