@@ -1817,7 +1817,7 @@ QString MythCoreContext::GetAudioLanguageAndVariant(void)
         d->m_audioLanguage = GetSetting("AudioLanguage", menuLanguage).toLower();
 
         LOG(VB_AUDIO, LOG_DEBUG, LOC + QString("audio language:%1 menu language:%2")
-            .arg(d->m_audioLanguage).arg(menuLanguage));
+            .arg(d->m_audioLanguage, menuLanguage));
     }
     return d->m_audioLanguage;
 }
