@@ -3,5 +3,6 @@
 #define CONFIG_H
 
 #cmakedefine HAVE_CDIO
+#cmakedefine HAVE_MUSICBRAINZ
 
 #endif /* CONFIG_H */
