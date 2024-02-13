@@ -30,6 +30,12 @@ jobs:
             arch: 'arm64'
           - os: 'macos-13'
             arch: 'arm64'
+          - os: 'macos-12'
+            cc: 'gcc'
+          - os: 'macos-13'
+            cc: 'gcc'
+          - os: 'macos-14'
+            cc: 'gcc'
       fail-fast: false
     runs-on: ${{ matrix.os }}
 
@@ -57,16 +63,38 @@ jobs:
           key: ${{ matrix.os }}-${{ matrix.cc }}-ccache-${{ github.sha }}
           restore-keys: ${{ matrix.os }}-${{ matrix.cc }}-ccache
 
-      # macOS based github runners starting with macos-14 only run on the arm64
-      # architecture.  To generate x86_64 based executable, the arch -x86_64
-      # command is needed before any brew commands, make, and install to run
-      # as x86_64 via Rosetta2.
-      - name: Check cross-compile environment (macOS)
+      # macOS runners on github use homebrew which can place executables in
+      # an assortment of places.  Also, the runners tend to be in various
+      # unsynced states that need update to resolve linking
+      - name: Update environment (macOS)
         env:
           ARCH: ${{ matrix.arch }}
+          PYTHONVERS: 3.12
         run: |
           SYSARCH=$(/usr/bin/uname -m)
           PKGMGR_CMD='brew'
+          HB_PREFIX=$(${PKGMGR_CMD} --prefix)
+          echo "HB_PREFIX=$HB_PREFIX" >> $GITHUB_ENV
+          echo "PYTHONVERS=${PYTHONVERS}" >> $GITHUB_ENV
+
+          # remove all casks and formula to prevent linking
+          # issues later.  We'll reinstall the necessities later.
+          ${PKGMGR_CMD} remove --cask --force $(brew list)
+          ${PKGMGR_CMD} remove --force $(brew list --formula)
+          ${PKGMGR_CMD} cleanup
+          for f in "$HB_PREFIX"/bin/*; do
+            if [ -L $f ] && [ "$(basename $f)" != "$PKGMGR_CMD" ]; then
+              sudo rm "$f"
+            fi
+          done
+
+          # update to grab the latest formulas
+          ${PKGMGR_CMD} update
+
+          # macOS based github runners starting at macos-14 only run on arm64
+          # architectures.  To generate x86_64 based executable, the arch
+          # -x86_64 command is needed before any brew commands, make, and
+          # install to run as x86_64 via Rosetta2.
           if [ "$SYSARCH" = "$ARCH" ]; then
             # this is a cross-compile
             PKGMGR_CMD="arch -${ARCH} $PKGMGR_CMD"
@@ -74,6 +102,11 @@ jobs:
             echo "MAKE_CMD=arch -${ARCH} $MAKE_CMD" >> $GITHUB_ENV
           fi
           echo "PKGMGR_CMD=$PKGMGR_CMD" >> $GITHUB_ENV
+
+          # Install/re-install specified python version
+          ${PKGMGR_CMD} install python@${PYTHONVERS} ansible pyenv-virtualenv
+          ${PKGMGR_CMD} link python@${PYTHONVERS} --force --overwrite
+
         if: runner.os == 'macOS'
 
       # N.B. These dependencies are for the master branch. Unlike the ansible
@@ -100,22 +133,22 @@ jobs:
         env:
           OS_VERS: ${{ matrix.os }}
         run: |
-          brew update
-          ${PKGMGR_CMD} install pkg-config ccache qt5 nasm libsamplerate taglib\
-            lzo libcec libbluray libass libhdhomerun dav1d x264 x265 libvpx \
+          ${PKGMGR_CMD} install make automake autoconf libtool pkg-config \
+            ccache qt@5 nasm gnutls texinfo texi2html libsamplerate taglib lzo \
+            libcec libbluray libass libhdhomerun ant dav1d x264 x265 libvpx \
             openssl sound-touch lame freetype libass libiconv libxml2 libzip \
-            XviD zlib pyenv-virtualenv python-lxml  python-requests \
-            python-setuptools
-          ${PKGMGR_CMD} link qt5 --force
+            XviD zlib python-lxml python-requests python-setuptools  --force \
+            --overwrite
+
+          ${PKGMGR_CMD} link qt@5 --force
           # macos-14 updated the linker and needs to be run in "classic" mode
           case $OS_VERS in
-            macos-14)
+            macos-14 | macos-13)
               LDFLAGS="-Wl,-ld_classic"
             ;;
           esac
           # homebrew uses different prefixes on x86_64 and arm64, find the
-          #  correct one and setup the correct build variables
-          HB_PREFIX=$(${PKGMGR_CMD} --prefix)
+          # correct one and setup the correct build variables
           C_INCLUDE_PATH=$HB_PREFIX/include:$C_INCLUDE_PATH
           echo "C_INCLUDE_PATH=$C_INCLUDE_PATH" >> $GITHUB_ENV
           CPLUS_INCLUDE_PATH=$HB_PREFIX/include:$CPLUS_INCLUDE_PATH
@@ -168,8 +201,8 @@ jobs:
         if: matrix.os == 'ubuntu-22.04'
 
       - name: Install plugin dependencies (macOS)
-        run: ${PKGMGR_CMD} install minizip flac libvorbis libcdio python-pycurl
-             python-oauthlib
+        run: ${PKGMGR_CMD} install minizip flac libvorbis libcdio
+          --force --overwrite
         if: runner.os == 'macOS'
 
       - name: Configure plugins
