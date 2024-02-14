@@ -423,10 +423,9 @@ int check_audio_header(ringbuffer *rbuf, audio_frame_t * af, int  off, int le,
 	uint8_t frame = 0;
 	int fr = 0;
 	int half = 0;
-	int c=0;
-	
-	if ( (c = find_audio_sync(rbuf, headr, off, type, le))
-	     != 0 ) {
+
+	int c = find_audio_sync(rbuf, headr, off, type, le);
+	if (c != 0 ) {
 		if (c==-2){
 			LOG(VB_GENERAL, LOG_ERR, "Incomplete audio header");
 			return -2;
@@ -482,13 +481,13 @@ int check_audio_header(ringbuffer *rbuf, audio_frame_t * af, int  off, int le,
 
 int get_audio_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le) 
 {
-	int c = 0;
 	int fr =0;
 	audio_sync_buf headr {};
 
 	af->set=0;
 
-	if ( (c = find_audio_sync(rbuf, headr, off, MPEG_AUDIO,le)) < 0 ) 
+	int c = find_audio_sync(rbuf, headr, off, MPEG_AUDIO,le);
+	if (c < 0 )
 		return c;
 
 	af->layer = (headr[1] & 0x06) >> 1;

@@ -345,8 +345,9 @@ TemplateMatcher::MythPlayerInited(MythPlayer *_player,
     m_player = _player;
     m_fps = m_player->GetFrameRate();
 
-    if (!(m_tmpl = m_templateFinder->getTemplate(&m_tmplRow, &m_tmplCol,
-                    &m_tmplWidth, &m_tmplHeight)))
+    m_tmpl = m_templateFinder->getTemplate(&m_tmplRow, &m_tmplCol,
+                    &m_tmplWidth, &m_tmplHeight);
+    if (m_tmpl == nullptr)
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("TemplateMatcher::MythPlayerInited: no template"));
@@ -449,8 +450,8 @@ TemplateMatcher::analyzeFrame(const MythVideoFrame *frame, long long frameno,
                 m_tmplWidth, m_tmplHeight))
         goto error;
 
-    if (!(edges = m_edgeDetector->detectEdges(&m_cropped, m_tmplHeight,
-                    FRAMESGMPCTILE)))
+    edges = m_edgeDetector->detectEdges(&m_cropped, m_tmplHeight, FRAMESGMPCTILE);
+    if (edges == nullptr)
         goto error;
 
     if (pgm_match(m_tmpl, edges, m_tmplHeight, JITTER_RADIUS, &m_matches[frameno]))

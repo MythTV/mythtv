@@ -120,7 +120,8 @@ bool delete_file_immediately(const QString &filename,
             QString linktext = getSymlinkTarget(filename);
 
             QFile target(linktext);
-            if (!(success1 = target.remove()))
+            success1 = target.remove();
+            if (!success1)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("Error deleting '%1' -> '%2'")
