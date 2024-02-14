@@ -904,7 +904,8 @@ int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
         if (sizeof (char) != 1 || sizeof (int) < 2) /* very unlikely */
             exc_throw(MiscError, "Incompatible variable sizes.");
 
-        if ((p = strrchr(supfile, '.')) != NULL)
+        p = strrchr(supfile, '.');
+        if (p != NULL)
             i = p - supfile;
         else
             i = strlen(supfile);

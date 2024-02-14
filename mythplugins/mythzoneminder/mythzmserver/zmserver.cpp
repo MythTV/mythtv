@@ -1348,7 +1348,8 @@ void ZMServer::handleGetAnalysisFrame(std::vector<std::string> tokens)
         sprintf(str.data(), m_analysisFileFormat.c_str(), frameID);
         frameFile = filepath + str.data();
 
-        if ((fd = fopen(frameFile.c_str(), "r" )))
+        fd = fopen(frameFile.c_str(), "r" );
+        if (fd != nullptr)
         {
             fileSize = fread(s_buffer.data(), 1, s_buffer.size(), fd);
             fclose(fd);
@@ -1369,7 +1370,8 @@ void ZMServer::handleGetAnalysisFrame(std::vector<std::string> tokens)
     sprintf(str.data(), m_eventFileFormat.c_str(), frameID);
     frameFile = filepath + str.data();
 
-    if ((fd = fopen(frameFile.c_str(), "r" )))
+    fd = fopen(frameFile.c_str(), "r" );
+    if (fd != nullptr)
     {
         fileSize = fread(s_buffer.data(), 1, s_buffer.size(), fd);
         fclose(fd);

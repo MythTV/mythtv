@@ -264,7 +264,8 @@ int main(int argc, char **argv)
     FD_ZERO(&read_fds); // NOLINT(readability-isolate-declaration)
 
     // get the listener
-    if ((listener = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+    listener = socket(AF_INET, SOCK_STREAM, 0);
+    if (listener == -1)
     {
         perror("socket");
         return EXIT_SOCKET_ERROR;
@@ -336,9 +337,9 @@ int main(int argc, char **argv)
                 {
                     // handle new connections
                     socklen_t addrlen = sizeof(remoteaddr);
-                    if ((newfd = accept(listener,
-                                        (struct sockaddr *) &remoteaddr,
-                                                               &addrlen)) == -1)
+                    newfd = accept(listener, (struct sockaddr *) &remoteaddr,
+                                   &addrlen);
+                    if (newfd == -1)
                     {
                         perror("accept");
                     }

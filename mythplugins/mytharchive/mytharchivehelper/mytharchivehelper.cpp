@@ -2364,9 +2364,9 @@ static int main_local(int argc, char **argv)
     QCoreApplication::setApplicationName("mytharchivehelper");
 
     // by default we only output our messages
-    int retval = GENERIC_EXIT_OK;
     QString mask("jobqueue");
-    if ((retval = cmdline.ConfigureLogging(mask)) != GENERIC_EXIT_OK)
+    int retval = cmdline.ConfigureLogging(mask);
+    if (retval != GENERIC_EXIT_OK)
         return retval;
 
     ///////////////////////////////////////////////////////////////////////
