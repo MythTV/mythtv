@@ -35,7 +35,6 @@ bool TeletextReader::KeyPress(const QString &Key, bool& Exit)
     }
 
     TeletextSubPage *curpage = FindSubPage(m_curpage, m_cursubpage);
-    TeletextPage *page = nullptr;
 
     if (Key == ACTION_0 || Key == ACTION_1 || Key == ACTION_2 ||
         Key == ACTION_3 || Key == ACTION_4 || Key == ACTION_5 ||
@@ -110,7 +109,8 @@ bool TeletextReader::KeyPress(const QString &Key, bool& Exit)
         if (!curpage)
             return true;
 
-        if ((page = FindPage(curpage->floflink[0])) != nullptr)
+        TeletextPage *page = FindPage(curpage->floflink[0]);
+        if (page != nullptr)
         {
             newPage = page->pagenum;
             newSubPage = -1;
@@ -122,7 +122,8 @@ bool TeletextReader::KeyPress(const QString &Key, bool& Exit)
         if (!curpage)
             return true;
 
-        if ((page = FindPage(curpage->floflink[1])) != nullptr)
+        TeletextPage *page = FindPage(curpage->floflink[1]);
+        if (page != nullptr)
         {
             newPage = page->pagenum;
             newSubPage = -1;
@@ -134,7 +135,8 @@ bool TeletextReader::KeyPress(const QString &Key, bool& Exit)
         if (!curpage)
             return true;
 
-        if ((page = FindPage(curpage->floflink[2])) != nullptr)
+        TeletextPage *page = FindPage(curpage->floflink[2]);
+        if (page != nullptr)
         {
             newPage = page->pagenum;
             newSubPage = -1;
@@ -146,7 +148,8 @@ bool TeletextReader::KeyPress(const QString &Key, bool& Exit)
         if (!curpage)
             return true;
 
-        if ((page = FindPage(curpage->floflink[3])) != nullptr)
+        TeletextPage *page = FindPage(curpage->floflink[3]);
+        if (page != nullptr)
         {
             newPage = page->pagenum;
             newSubPage = -1;
@@ -158,7 +161,8 @@ bool TeletextReader::KeyPress(const QString &Key, bool& Exit)
         if (!curpage)
             return true;
 
-        if ((page = FindPage(curpage->floflink[4])) != nullptr)
+        TeletextPage *page = FindPage(curpage->floflink[4]);
+        if (page != nullptr)
         {
             newPage = page->pagenum;
             newSubPage = -1;

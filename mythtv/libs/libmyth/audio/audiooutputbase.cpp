@@ -1492,7 +1492,8 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
            represent */
 
         // Copy samples into audiobuffer, with upmix if necessary
-        if ((len = CopyWithUpmix((char *)buffer, frames, org_waud)) <= 0)
+        len = CopyWithUpmix((char *)buffer, frames, org_waud);
+        if (len <= 0)
         {
             continue;
         }

@@ -72,9 +72,8 @@ bool HLSRecStream::DecodeData(MythSingleDownload& downloader,
                               const QByteArray& IV, const QString& keypath,
                               QByteArray& data, int64_t sequence)
 {
-    AESKeyMap::iterator Ikey;
-
-    if ((Ikey = m_aesKeys.find(keypath)) == m_aesKeys.end())
+    AESKeyMap::iterator Ikey = m_aesKeys.find(keypath);
+    if (Ikey == m_aesKeys.end())
     {
         auto* key = new AES_KEY;
         DownloadKey(downloader, keypath, key);

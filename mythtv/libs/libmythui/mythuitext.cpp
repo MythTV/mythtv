@@ -478,8 +478,8 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
     int end = 0;
     while ((pos = paragraph.indexOf("[font]", pos, Qt::CaseInsensitive)) != -1)
     {
-        if ((end = paragraph.indexOf("[/font]", pos + 1, Qt::CaseInsensitive))
-            != -1)
+        end = paragraph.indexOf("[/font]", pos + 1, Qt::CaseInsensitive);
+        if (end != -1)
         {
             if (range.length == -1)
             {

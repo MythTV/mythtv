@@ -932,7 +932,8 @@ QString UPnpCDSExtension::RemoveToken( const QString &sToken,
 
     for (int nIdx=0; nIdx < num; nIdx++)
     {
-        if ((nPos = sStr.lastIndexOf( sToken, nPos )) == -1)
+        nPos = sStr.lastIndexOf( sToken, nPos );
+        if (nPos == -1)
             break;
     }
 

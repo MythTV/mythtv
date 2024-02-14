@@ -913,14 +913,14 @@ class VBIDevice : public CaptureCardComboBoxSetting
 
     uint setFilter(const QString &card, const QString &driver)
     {
-        uint count = 0;
         clearSelections();
         QDir dev("/dev/v4l", "vbi*", QDir::Name, QDir::System);
-        if (!(count = fillSelectionsFromDir(dev, card, driver)))
+        uint count = fillSelectionsFromDir(dev, card, driver);
+        if (count == 0)
         {
             dev.setPath("/dev");
-            if (((count = fillSelectionsFromDir(dev, card, driver)) == 0U) &&
-                !getValue().isEmpty())
+            count = fillSelectionsFromDir(dev, card, driver);
+            if ((count == 0U) && !getValue().isEmpty())
             {
                 addSelection(getValue(),getValue(),true);
             }

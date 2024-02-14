@@ -703,7 +703,8 @@ void AVCParser::decode_SPS(BitReader& br)
         profile_idc == 244 || profile_idc == 44  || profile_idc == 83  ||
         profile_idc == 86  || profile_idc == 118 || profile_idc == 128 )
     { // high profile
-        if ((m_chromaFormatIdc = br.get_ue_golomb()) == 3)
+        m_chromaFormatIdc = br.get_ue_golomb();
+        if (m_chromaFormatIdc == 3)
             m_separateColourPlaneFlag = (br.get_bits(1) == 1);
 
         br.get_ue_golomb();     // bit_depth_luma_minus8

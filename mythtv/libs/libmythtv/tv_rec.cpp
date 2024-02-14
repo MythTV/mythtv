@@ -483,10 +483,10 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
 
     bool cancelNext = false;
     PendingInfo pendinfo;
-    PendingMap::iterator it;
 
     m_pendingRecLock.lock();
-    if ((it = m_pendingRecordings.find(m_inputId)) != m_pendingRecordings.end())
+    PendingMap::iterator it = m_pendingRecordings.find(m_inputId);
+    if (it != m_pendingRecordings.end())
     {
         (*it).m_ask = (*it).m_doNotAsk = false;
         cancelNext  = (*it).m_canceled;

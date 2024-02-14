@@ -60,8 +60,8 @@ static BD_DIR_H *MythBDDirOpen(const char* DirName)
     dir->close = MythBDDirClose;
     dir->read = MythBDDirRead;
 
-    int dirID = 0;
-    if ((dirID = MythDirOpen(DirName)))
+    int dirID = MythDirOpen(DirName);
+    if (dirID != 0)
     {
         dir->internal = reinterpret_cast<void*>(static_cast<intptr_t>(dirID));
         return dir;
@@ -125,12 +125,12 @@ static BD_FILE_H *MythBDFileOpen(const char* FileName, const char *CMode)
     file->tell  = MythBDFileTell;
     file->eof   = nullptr;
 
-    int fd = -1;
     int intMode = O_RDONLY;
     if (strcasecmp(CMode, "wb") == 0)
         intMode = O_WRONLY;
 
-    if ((fd = MythFileOpen(FileName, intMode)) >= 0)
+    int fd = MythFileOpen(FileName, intMode);
+    if (fd >= 0)
     {
         file->internal = reinterpret_cast<void*>(static_cast<intptr_t>(fd));
         return file;

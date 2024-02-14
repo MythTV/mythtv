@@ -622,8 +622,8 @@ qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes
     while ((sent < llBytes) && !pDevice->atEnd())
     {
         llBytesToRead  = std::min( (qint64)SENDFILE_BUFFER_SIZE, llBytesRemaining );
-
-        if (( llBytesRead = pDevice->read( aBuffer.data(), llBytesToRead )) != -1 )
+        llBytesRead = pDevice->read( aBuffer.data(), llBytesToRead );
+        if ( llBytesRead != -1 )
         {
             if ( WriteBlock( aBuffer.data(), llBytesRead ) == -1)
                 return -1;

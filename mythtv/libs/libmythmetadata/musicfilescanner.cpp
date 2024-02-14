@@ -806,7 +806,8 @@ void MusicFileScanner::ScanMusic(MusicLoadedMap &music_files)
             for (int x = 0; x < m_startDirs.count(); x++)
             {
                 name = m_startDirs[x] + query.value(0).toString();
-                if ((iter = music_files.find(name)) != music_files.end())
+                iter = music_files.find(name);
+                if (iter != music_files.end())
                     break;
             }
 
@@ -862,7 +863,8 @@ void MusicFileScanner::ScanArtwork(MusicLoadedMap &music_files)
             for (int x = 0; x < m_startDirs.count(); x++)
             {
                 name = m_startDirs[x] + query.value(0).toString();
-                if ((iter = music_files.find(name)) != music_files.end())
+                iter = music_files.find(name);
+                if (iter != music_files.end())
                     break;
             }
 

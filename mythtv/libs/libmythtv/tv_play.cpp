@@ -7924,7 +7924,8 @@ void TV::ChannelEditAutoFill(InfoMap &Info)
 void TV::ChannelEditXDSFill(InfoMap &Info)
 {
     QMap<QString,bool> modifiable;
-    if (!(modifiable["callsign"] = Info["callsign"].isEmpty()))
+    modifiable["callsign"] = Info["callsign"].isEmpty();
+    if (!modifiable["callsign"])
     {
         QString unsetsign = tr("UNKNOWN%1", "Synthesized callsign");
         int unsetcmpl = unsetsign.length() - 2;

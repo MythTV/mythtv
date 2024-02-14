@@ -2848,8 +2848,6 @@ bool MythCommandLineParser::SetValue(const QString &key, const QVariant& value)
  */
 int MythCommandLineParser::ConfigureLogging(const QString& mask, bool progress)
 {
-    int err = 0;
-
     // Setup the defaults
     verboseString = "";
     verboseMask   = 0;
@@ -2857,7 +2855,8 @@ int MythCommandLineParser::ConfigureLogging(const QString& mask, bool progress)
 
     if (toBool("verbose"))
     {
-        if ((err = verboseArgParse(toString("verbose"))) != 0)
+        int err = verboseArgParse(toString("verbose"));
+        if (err != 0)
             return err;
     }
     else if (toBool("verboseint"))

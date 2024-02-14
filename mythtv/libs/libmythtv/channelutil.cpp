@@ -2271,11 +2271,12 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     {
         int a_maj = (!a_minor && isIntA) ? a_int : a_major;
         int b_maj = (!b_minor && isIntB) ? b_int : b_major;
-        int cmp = 0;
-        if ((cmp = a_maj - b_maj))
+        int cmp = a_maj - b_maj;
+        if (cmp != 0)
             return cmp < 0;
 
-        if ((cmp = a_minor - b_minor))
+        cmp = a_minor - b_minor;
+        if (cmp != 0)
             return cmp < 0;
     }
 

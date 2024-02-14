@@ -1898,10 +1898,10 @@ bool CardUtil::IsUniqueDisplayName(const QString &name, uint exclude_inputid)
     if (name.isEmpty())
         return false;
 
-    qsizetype idx { 0 };
     QString   matching;
     bool      two { false };
-    if ((idx = name.indexOf('/')) >= 0)
+    qsizetype idx = name.indexOf('/');
+    if (idx >= 0)
     {
         matching = name.right(name.size() - idx -1);
         two = false;

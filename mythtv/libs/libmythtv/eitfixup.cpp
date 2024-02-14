@@ -931,8 +931,8 @@ void EITFixUp::FixUK(DBEventEIT &event)
             static const QRegularExpression ukYearColon { R"(^[\d]{4}:)" };
             if (!isMovie && (event.m_title.indexOf(ukYearColon) < 0))
             {
-                int position1 = -1;
-                if (((position1 = event.m_title.indexOf(":")) != -1) &&
+                int position1 = event.m_title.indexOf(":");
+                if ((position1 != -1) &&
                     (event.m_description.indexOf(":") < 0 ))
                 {
                     static const QRegularExpression ukCompleteDots { R"(^\.\.+$)" };
@@ -2054,8 +2054,8 @@ void EITFixUp::FixNL(DBEventEIT &event)
 
     // This is trying to catch the case where the subtitle is in the main title
     // but avoid cases where it isn't a subtitle e.g cd:uk
-    int position = 0;
-    if (((position = event.m_title.indexOf(":")) != -1) &&
+    int position = event.m_title.indexOf(":");
+    if ((position != -1) &&
         (event.m_title[position + 1].toUpper() == event.m_title[position + 1]) &&
         (event.m_subtitle.isEmpty()))
     {

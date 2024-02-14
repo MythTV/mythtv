@@ -495,7 +495,8 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
         else
         {
             QFileInfo fi(filename);
-            if ((locally_accessible = fi.isReadable()))
+            locally_accessible = fi.isReadable();
+            if (locally_accessible)
                 previewLastModified = fi.lastModified();
         }
 
@@ -729,10 +730,10 @@ void PreviewGeneratorQueue::SetPreviewGenerator(
  */
 bool PreviewGeneratorQueue::IsGeneratingPreview(const QString &key) const
 {
-    PreviewMap::const_iterator it;
     QMutexLocker locker(&m_lock);
 
-    if ((it = m_previewMap.find(key)) == m_previewMap.end())
+    PreviewMap::const_iterator it = m_previewMap.find(key);
+    if (it == m_previewMap.end())
         return false;
 
     if ((*it).m_blockRetryUntil.isValid())

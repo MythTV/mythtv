@@ -288,15 +288,17 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
     inputs->pad_idx    = 0;
     inputs->next       = nullptr;
 
-    if ((ret = avfilter_graph_parse_ptr(Graph, filters.toLocal8Bit(),
-                                        &inputs, &outputs, nullptr)) < 0)
+    ret = avfilter_graph_parse_ptr(Graph, filters.toLocal8Bit(),
+                                   &inputs, &outputs, nullptr);
+    if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("avfilter_graph_parse_ptr failed for %1")
             .arg(filters));
         goto end;
     }
 
-    if ((ret = avfilter_graph_config(Graph, nullptr)) < 0)
+    ret = avfilter_graph_config(Graph, nullptr);
+    if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("VAAPI deinterlacer config failed - '%1' unsupported?").arg(deinterlacer));

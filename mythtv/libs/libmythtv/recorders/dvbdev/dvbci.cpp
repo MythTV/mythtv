@@ -982,12 +982,15 @@ bool cCiApplicationInformation::Process(int Length, const uint8_t *Data)
             dbgprotocol("%d: <== Application Info\n", SessionId());
             int l = 0;
             const uint8_t *d = GetData(Data, l);
-            if ((l -= 1) < 0) break;
+            l -= 1;
+            if (l < 0) break;
             m_applicationType = *d++;
-            if ((l -= 2) < 0) break;
+            l -= 2;
+            if (l < 0) break;
             m_applicationManufacturer = ntohs(*(uint16_t *)d);
             d += 2;
-            if ((l -= 2) < 0) break;
+            l -= 2;
+            if (l < 0) break;
             m_manufacturerCode = ntohs(*(uint16_t *)d);
             d += 2;
             free(m_menuString);

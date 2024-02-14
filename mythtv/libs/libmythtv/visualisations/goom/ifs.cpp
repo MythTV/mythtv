@@ -217,13 +217,13 @@ init_ifs (int width, int height)
 	for (i = 0; i <= Fractal->m_depth + 2; ++i)
 		Fractal->m_maxPt *= Fractal->m_nbSimi;
 
-	if ((Fractal->m_buffer1 = (IFSPoint *) calloc (Fractal->m_maxPt,
-                                                   sizeof (IFSPoint))) == nullptr) {
+	Fractal->m_buffer1 = (IFSPoint *) calloc (Fractal->m_maxPt, sizeof (IFSPoint));
+	if (Fractal->m_buffer1 == nullptr) {
 		free_ifs (Fractal);
 		return;
 	}
-	if ((Fractal->m_buffer2 = (IFSPoint *) calloc (Fractal->m_maxPt,
-                                                   sizeof (IFSPoint))) == nullptr) {
+	Fractal->m_buffer2 = (IFSPoint *) calloc (Fractal->m_maxPt, sizeof (IFSPoint));
+	if (Fractal->m_buffer2 == nullptr) {
 		free_ifs (Fractal);
 		return;
 	}
