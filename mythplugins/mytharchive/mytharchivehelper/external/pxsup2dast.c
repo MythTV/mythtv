@@ -105,11 +105,17 @@ struct
 // level of recursion, preventing the compiler from complaining about
 // shadowed variables.
 #define exc_try(x) do { struct exc__state exc_s##x; int exc_type##x GCCATTR_UNUSED; \
-    exc_s##x.m_prev = EXC.m_last; EXC.m_last = &exc_s##x; if ((exc_type##x = setjmp(exc_s##x.m_env)) == 0)
+    exc_s##x.m_prev = EXC.m_last; \
+    EXC.m_last = &exc_s##x; \
+    exc_type##x = setjmp(exc_s##x.m_env); \
+    if (exc_type##x == 0)
 
 #define exc_ftry(x) do { struct exc__state exc_s##x, *exc_p##x = EXC.m_last;    \
-    int exc_type##x GCCATTR_UNUSED; exc_s##x.prev = EXC.m_last; \
-    EXC.m_last = &exc_s##x; if ((exc_type##x = setjmp(exc_s##x.env)) == 0)
+    int exc_type##x GCCATTR_UNUSED; \
+    exc_s##x.prev = EXC.m_last; \
+    EXC.m_last = &exc_s##x; \
+    exc_type##x = setjmp(exc_s##x.env); \
+    if (exc_type##x == 0)
 
 #define exc_catch(x,t) else if ((t) == exc_type##x)
 
