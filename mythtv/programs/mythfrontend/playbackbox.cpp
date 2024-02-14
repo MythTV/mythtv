@@ -2519,9 +2519,11 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
     }
 
     ProgramInfo *delItem = nullptr;
-    if (m_delList.empty() && (delItem = GetCurrentProgram()))
+    if (m_delList.empty())
     {
-        push_onto_del(m_delList, *delItem);
+        delItem = GetCurrentProgram();
+        if (delItem != nullptr)
+            push_onto_del(m_delList, *delItem);
     }
     else if (m_delList.size() >= 3)
     {
