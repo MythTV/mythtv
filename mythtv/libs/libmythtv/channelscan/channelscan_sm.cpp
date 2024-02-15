@@ -90,7 +90,7 @@ QString ChannelScanSM::loc(const ChannelScanSM *siscan)
 
 static constexpr qint64 kDecryptionTimeout { 4250 };
 
-static const QString kATSCChannelFormat = "%1_%2";
+static const QString kATSCChannelFormat = "%1.%2";
 
 class ScannedChannelInfo
 {
