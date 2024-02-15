@@ -890,11 +890,10 @@ void EITFixUp::FixUK(DBEventEIT &event)
         {
             QString strPart=event.m_title.remove(ukDoubleDotEnd)+" ";
             strFull = strPart + event.m_description.remove(ukDoubleDotStart);
-            int position1 = -1;
             static const QRegularExpression ukCEPQ { R"([:\!\.\?]\s)" };
             static const QRegularExpression ukSpaceStart { "^ " };
-            if (isMovie &&
-                ((position1 = strFull.indexOf(ukCEPQ,strPart.length())) != -1))
+            int position1 = strFull.indexOf(ukCEPQ,strPart.length());
+            if (isMovie && (position1 != -1))
             {
                  if (strFull[position1] == '!' || strFull[position1] == '?'
                   || (position1>2 && strFull[position1] == '.' && strFull[position1-2] == '.'))

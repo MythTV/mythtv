@@ -1928,7 +1928,8 @@ bool CardUtil::IsUniqueDisplayName(const QString &name, uint exclude_inputid)
     while (query.next())
     {
         QString dn = query.value(1).toString();
-        if (!two && (idx = dn.indexOf('/')) >= 0)
+        idx = dn.indexOf('/');
+        if (!two && idx >= 0)
         {
             if (dn.right(dn.size() - idx - 1) == matching)
                 return false;
