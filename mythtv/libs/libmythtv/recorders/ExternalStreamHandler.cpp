@@ -696,10 +696,13 @@ void ExternalStreamHandler::run(void)
                 }
             }
 
-            if (m_io && (sz = PACKET_SIZE - remainder) > 0)
-                read_len = m_io->Read(buffer, sz, 100ms);
-            else
-                read_len = 0;
+            read_len = 0;
+            if (m_io != nullptr)
+            {
+                sz = PACKET_SIZE - remainder;
+                if (sz > 0)
+                    read_len = m_io->Read(buffer, sz, 100ms);
+            }
         }
         else
             read_len = 0;

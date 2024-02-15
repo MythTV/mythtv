@@ -1119,7 +1119,9 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
     {
         int initialAudio = -1;
         int initialVideo = -1;
-        if (m_itv || (m_itv = m_parent->GetInteractiveTV()))
+        if (m_itv == nullptr)
+            m_itv = m_parent->GetInteractiveTV();
+        if (m_itv != nullptr)
             m_itv->GetInitialStreams(initialAudio, initialVideo);
         if (initialAudio >= 0)
             SetAudioByComponentTag(initialAudio);
@@ -1828,7 +1830,9 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
     if (!m_ic || !m_ic->pmt_section)
         return;
 
-    if (!m_itv && ! (m_itv = m_parent->GetInteractiveTV()))
+    if (m_itv == nullptr)
+        m_itv = m_parent->GetInteractiveTV();
+    if (m_itv == nullptr)
         return;
 
     auto pmt_buffer = MythAVBufferRef(m_ic->pmt_section);
@@ -3867,7 +3871,9 @@ void AvFormatDecoder::ProcessDSMCCPacket([[maybe_unused]] const AVStream *str,
                                          [[maybe_unused]] const AVPacket *pkt)
 {
 #ifdef USING_MHEG
-    if (!m_itv && ! (m_itv = m_parent->GetInteractiveTV()))
+    if (m_itv == nullptr)
+        m_itv = m_parent->GetInteractiveTV();
+    if (m_itv == nullptr)
         return;
 
     // The packet may contain several tables.
@@ -4874,7 +4880,9 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                 pkt = av_packet_alloc();
 
             int retval = 0;
-            if (!m_ic || ((retval = ReadPacket(m_ic, pkt, storevideoframes)) < 0))
+            if (m_ic != nullptr)
+                retval = ReadPacket(m_ic, pkt, storevideoframes);
+            if ((m_ic == nullptr) || (retval < 0))
             {
                 if (retval == -EAGAIN)
                     continue;
@@ -5411,9 +5419,11 @@ void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
         }
     }
     if (duration != INT64_MIN) {
-        int64_t filesize = 0;
         ic->duration = duration;
-        if (ic->pb && (filesize = avio_size(ic->pb)) > 0) {
+        if (!ic->pb)
+            return;
+        int64_t filesize = avio_size(ic->pb);
+        if (filesize > 0) {
             /* compute the bitrate */
             ic->bit_rate = (double)filesize * 8.0 * AV_TIME_BASE /
                 (double)ic->duration;

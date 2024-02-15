@@ -108,11 +108,15 @@ HouseKeeperTask::HouseKeeperTask(const QString &dbTag, HouseKeeperScope scope,
 bool HouseKeeperTask::CheckRun(const QDateTime& now)
 {
     bool check = false;
-    if (!m_confirm && !m_running && (check = DoCheckRun(now)))
+    if (!m_confirm && !m_running)
     {
-        // if m_confirm is already set, the task is already in the queue
-        // and should not be queued a second time
-        m_confirm = true;
+        check = DoCheckRun(now);
+        if (check)
+        {
+            // if m_confirm is already set, the task is already in the queue
+            // and should not be queued a second time
+            m_confirm = true;
+        }
     }
     LOG(VB_GENERAL, LOG_DEBUG, QString("%1 Running? %2/In window? %3.")
         .arg(GetTag(), m_running ? "Yes" : "No", check ? "Yes" : "No"));

@@ -671,10 +671,14 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     }
         // this will always be false for passthrough audio as
         // CanPassthrough() already tested these conditions
-    else if ((m_needResampler =
-              !OutputSettings(m_enc || m_passthru)->IsSupportedRate(m_sampleRate)))
+    else
     {
-        dest_rate = OutputSettings(m_enc)->NearestSupportedRate(m_sampleRate);
+        m_needResampler =
+            !OutputSettings(m_enc || m_passthru)->IsSupportedRate(m_sampleRate);
+        if (m_needResampler)
+        {
+            dest_rate = OutputSettings(m_enc)->NearestSupportedRate(m_sampleRate);
+        }
     }
 
     if (m_needResampler && m_srcQuality > QUALITY_DISABLED)

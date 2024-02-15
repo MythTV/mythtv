@@ -3589,8 +3589,12 @@ void TVRec::HandleTuning(void)
     }
 
     MPEGStreamData *streamData = nullptr;
-    if (HasFlags(kFlagWaitingForSignal) && !(streamData = TuningSignalCheck()))
-        return;
+    if (HasFlags(kFlagWaitingForSignal))
+    {
+        streamData = TuningSignalCheck();
+        if (streamData == nullptr)
+            return;
+    }
 
     if (HasFlags(kFlagNeedToStartRecorder))
     {

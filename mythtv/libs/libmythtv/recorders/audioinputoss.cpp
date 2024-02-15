@@ -273,9 +273,13 @@ int AudioInputOSS::GetNumReadyBytes(void)
                 QString("get ready bytes failed, returned %1: ")
                     .arg(ispace.bytes) + ENO);
         }
-        else if ((readies = ispace.bytes) > 0)
-            LOG(VB_AUDIO, LOG_DEBUG, LOC_DEV + QString("ready bytes %1")
+        else
+        {
+            readies = ispace.bytes;
+            if (readies > 0)
+                LOG(VB_AUDIO, LOG_DEBUG, LOC_DEV + QString("ready bytes %1")
                     .arg(readies));
+        }
     }
     return readies;
 }

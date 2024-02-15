@@ -903,15 +903,19 @@ void EITFixUp::FixUK(DBEventEIT &event)
                  event.m_description = strFull.mid(position1 + 1);
                  event.m_description.remove(ukSpaceStart);
             }
-            else if ((position1 = strFull.indexOf(ukCEPQ)) != -1)
+            else
             {
-                 if (strFull[position1] == '!' || strFull[position1] == '?'
-                  || (position1>2 && strFull[position1] == '.' && strFull[position1-2] == '.'))
-                     position1++;
-                 event.m_title = strFull.left(position1);
-                 event.m_description = strFull.mid(position1 + 1);
-                 event.m_description.remove(ukSpaceStart);
-                 SetUKSubtitle(event);
+                position1 = strFull.indexOf(ukCEPQ);
+                if (position1 != -1)
+                {
+                     if (strFull[position1] == '!' || strFull[position1] == '?'
+                      || (position1>2 && strFull[position1] == '.' && strFull[position1-2] == '.'))
+                         position1++;
+                     event.m_title = strFull.left(position1);
+                     event.m_description = strFull.mid(position1 + 1);
+                     event.m_description.remove(ukSpaceStart);
+                     SetUKSubtitle(event);
+                }
             }
         }
         else if (event.m_description.indexOf(uk24ep) != -1)
@@ -958,25 +962,31 @@ void EITFixUp::FixUK(DBEventEIT &event)
     if (!isMovie && event.m_subtitle.isEmpty() &&
         !event.m_title.startsWith("The X-Files"))
     {
-        int position1 = -1;
-        if ((position1=event.m_description.indexOf(ukTime)) != -1)
+        int position1 = event.m_description.indexOf(ukTime);
+        if (position1 != -1)
         {
             static const QRegularExpression ukColonPeriod { R"([:\.])" };
             int position2 = event.m_description.indexOf(ukColonPeriod);
             if ((position2>=0) && (position2 < (position1-2)))
                 SetUKSubtitle(event);
         }
-        else if ((position1=event.m_title.indexOf("-")) != -1)
+        else
         {
-            if ((uint)position1 < kSubtitleMaxLen)
+            position1 = event.m_title.indexOf("-");
+            if (position1 != -1)
             {
-                event.m_subtitle = event.m_title.mid(position1 + 1);
-                event.m_subtitle.remove(kUKSpaceColonStart);
-                event.m_title = event.m_title.left(position1);
+                if ((uint)position1 < kSubtitleMaxLen)
+                {
+                    event.m_subtitle = event.m_title.mid(position1 + 1);
+                    event.m_subtitle.remove(kUKSpaceColonStart);
+                    event.m_title = event.m_title.left(position1);
+                }
+            }
+            else
+            {
+                SetUKSubtitle(event);
             }
         }
-        else
-            SetUKSubtitle(event);
     }
 
     // Work out the year (if any)
