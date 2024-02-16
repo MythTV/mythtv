@@ -1,0 +1,489 @@
+---
+name: Build MythTV core variants
+
+#
+# This workflow is intended to provide good coverage
+# quickly to insure that the build "basically" works.
+#
+# The containers are selected to be a subset from the
+# set of linux distributions and versions that are
+# currently among the list (or will soon be for beta/rc)
+# of the MythTV project lists of supported variants
+# (which are Ubuntu LTS and current, Debian stable, and
+# Fedora current and current-1.
+#
+# -- Some notes about github actions caches --
+#
+# Due to the github global limit of 10GB for caches, we
+# need to subset the number of variants we build for in
+# order to take advantage of the speedup provided by
+# ccache.
+#
+# To minimize the ccache usage the builds disable
+# building with debugging symbols included (smaller
+# compile cache sizes).
+#
+# Even though we will not use the ccache until later in
+# the workflow, due to github's LRU eviction strategy
+# when we are near the github cache size limit we want
+# to retrieve the cache early before any real work
+# starts for all jobs so that the oldest caches are
+# typically evicted in the order one might prefer.
+# This is a subtle artifact, but was seen with a
+# specific case where the cache was under high usage
+# and the steps for cache retrieval did not occur until
+# much later for some jobs.
+#
+# If the github cache (used for the compiler ccache)
+# has not been flushed, this job should run in about
+# 10 minutes for the linux builds to complete, and
+# about 45 minutes for the macOS native builds.  If the
+# caches are unavailable, it make take three to five
+# times longer for the jobs to complete.
+#
+
+on:                # yamllint disable-line rule:truthy
+
+  push:
+    branches:
+      - 'master'
+
+  pull_request:
+    branches:
+      - 'master'
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-mythtv-linux:
+    name: Building MythTV on ${{ matrix.container.desc }}
+
+    runs-on: ubuntu-latest
+
+    env:
+      TZ: Etc/UTC
+      CCACHE_DIR: $HOME/.ccache
+      CCACHE_COMPRESS: true
+      CCACHE_MAXSIZE: 250M
+      DEBIAN_FRONTEND: noninteractive
+
+    strategy:
+      matrix:
+        container:
+          # Ubuntu group
+          - desc: 'Ubuntu interim'
+            image: 'ubuntu:rolling'
+            update_cmd: 'apt update -y && apt upgrade -y'
+            install_ansible_cmd: 'apt install ansible apt-utils -y'
+            ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
+            install_extra_pkgs_cmd: 'apt install ant default-jdk-headless -y'
+            core_working_subdirectory: 'mythtv'
+            core_configure_cmd: './configure --compile-type=release --enable-debug=0 --disable-debug --enable-libmp3lame --enable-libvpx --enable-libx264 --enable-libx265 --enable-bdjava --enable-vulkan --prefix=$GITHUB_WORKSPACE/build/install'
+            core_build_cmd: 'make -j4 all_no_test'
+            core_install_cmd: 'make -j4 install'
+            core_test_cmd: 'make -j4 tests'
+            plugins_working_subdirectory: 'mythplugins'
+            plugins_configure_cmd: './configure --prefix=$GITHUB_WORKSPACE/build/install'
+            plugins_build_cmd: 'make -j4'
+            plugins_install_cmd: 'make -j4'
+          - desc: 'Ubuntu LTS'
+            image: 'ubuntu:latest'
+            update_cmd: 'apt update -y && apt upgrade -y'
+            install_ansible_cmd: 'apt install ansible apt-utils -y'
+            ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
+            install_extra_pkgs_cmd: 'apt install ant default-jdk-headless -y'
+            core_working_subdirectory: 'mythtv'
+            core_configure_cmd: './configure --compile-type=release --enable-debug=0 --disable-debug --enable-libmp3lame --enable-libvpx --enable-libx264 --enable-libx265 --enable-bdjava --enable-vulkan --prefix=$GITHUB_WORKSPACE/build/install'
+            core_build_cmd: 'make -j4 all_no_test'
+            core_install_cmd: 'make -j4 install'
+            core_test_cmd: 'make -j4 tests'
+            plugins_working_subdirectory: 'mythplugins'
+            plugins_configure_cmd: './configure --prefix=$GITHUB_WORKSPACE/build/install'
+            plugins_build_cmd: 'make -j4'
+            plugins_install_cmd: 'make -j4'
+          - desc: 'Ubuntu devel'
+            image: 'ubuntu:devel'
+            update_cmd: 'apt update -y && apt upgrade -y'
+            install_ansible_cmd: 'apt install ansible apt-utils -y'
+            ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
+            install_extra_pkgs_cmd: 'apt install ant default-jdk-headless -y'
+            core_working_subdirectory: 'mythtv'
+            core_configure_cmd: './configure --compile-type=release --enable-debug=0 --disable-debug --enable-libmp3lame --enable-libvpx --enable-libx264 --enable-libx265 --enable-bdjava --enable-vulkan --prefix=$GITHUB_WORKSPACE/build/install'
+            core_build_cmd: 'make -j4 all_no_test'
+            core_install_cmd: 'make -j4 install'
+            core_test_cmd: 'make -j4 tests'
+            plugins_working_subdirectory: 'mythplugins'
+            plugins_configure_cmd: './configure --prefix=$GITHUB_WORKSPACE/build/install'
+            plugins_build_cmd: 'make -j4'
+            plugins_install_cmd: 'make -j4'
+
+          # Debian group
+          - desc: 'Debian stable'
+            image: 'debian:stable'
+            update_cmd: 'apt update -y && apt upgrade -y'
+            install_ansible_cmd: 'apt install ansible apt-utils -y'
+            ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
+            install_extra_pkgs_cmd: 'apt install ant default-jdk-headless -y'
+            core_working_subdirectory: 'mythtv'
+            core_configure_cmd: './configure --compile-type=release --enable-debug=0 --disable-debug --enable-libmp3lame --enable-libvpx --enable-libx264 --enable-libx265 --enable-bdjava --enable-vulkan --prefix=$GITHUB_WORKSPACE/build/install'
+            core_build_cmd: 'make -j4 all_no_test'
+            core_install_cmd: 'make -j4 install'
+            core_test_cmd: 'make -j4 tests'
+            plugins_working_subdirectory: 'mythplugins'
+            plugins_configure_cmd: './configure --prefix=$GITHUB_WORKSPACE/build/install'
+            plugins_build_cmd: 'make -j4'
+            plugins_install_cmd: 'make -j4'
+
+          # Fedora group
+          - desc: 'Fedora'
+            image: 'quay.io/fedora/fedora:latest'
+            update_cmd: 'dnf upgrade -y'
+            install_ansible_cmd: 'dnf install ansible dnf-plugins-core -y'
+            ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
+            install_extra_pkgs_cmd: 'dnf install ant -y'
+            core_working_subdirectory: 'mythtv'
+            core_configure_cmd: './configure --compile-type=release --enable-debug=0 --disable-debug --enable-libmp3lame --enable-libvpx --enable-libx264 --enable-libx265 --enable-bdjava --enable-vulkan --prefix=$GITHUB_WORKSPACE/build/install'
+            core_build_cmd: 'make -j4 all_no_test'
+            core_install_cmd: 'make -j4 install'
+            core_test_cmd: 'make -j4 tests'
+            plugins_working_subdirectory: 'mythplugins'
+            plugins_configure_cmd: './configure --prefix=$GITHUB_WORKSPACE/build/install'
+            plugins_build_cmd: 'make -j4'
+            plugins_install_cmd: 'make -j4'
+
+          # Qt6, clang, and cmake alternative(s) group
+          - desc: 'Fedora - Qt6'
+            image: 'quay.io/fedora/fedora:latest'
+            update_cmd: 'dnf upgrade -y'
+            install_ansible_cmd: 'dnf install ansible dnf-plugins-core -y'
+            ansible_cmd: 'ansible-playbook --limit localhost -e "qt6=true" mythtv.yml'
+            install_extra_pkgs_cmd: 'dnf install ant -y'
+            core_working_subdirectory: 'mythtv'
+            core_configure_cmd: './configure --qmake=qmake6 --compile-type=release --enable-debug=0 --disable-debug --enable-libmp3lame --enable-libvpx --enable-libx264 --enable-libx265 --enable-bdjava --enable-vulkan --prefix=$GITHUB_WORKSPACE/build/install'
+            core_build_cmd: 'make -j4 all_no_test'
+            core_install_cmd: 'make -j4 install'
+            core_test_cmd: 'make -j4 tests'
+            plugins_working_subdirectory: 'mythplugins'
+            plugins_configure_cmd: './configure --prefix=$GITHUB_WORKSPACE/build/install'
+            plugins_build_cmd: 'make -j4'
+            plugins_install_cmd: 'make -j4'
+          - desc: 'Fedora - clang'
+            image: 'quay.io/fedora/fedora:latest'
+            update_cmd: 'dnf upgrade -y'
+            install_ansible_cmd: 'dnf install ansible dnf-plugins-core -y'
+            ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
+            install_extra_pkgs_cmd: 'dnf install ant clang -y'
+            core_working_subdirectory: 'mythtv'
+            core_configure_cmd: './configure --cc=clang --cxx=clang++ --compile-type=release --enable-debug=0 --disable-debug --enable-libmp3lame --enable-libvpx --enable-libx264 --enable-libx265 --enable-bdjava --enable-vulkan --prefix=$GITHUB_WORKSPACE/build/install'
+            core_build_cmd: 'make -j4 all_no_test'
+            core_install_cmd: 'make -j4 install'
+            core_test_cmd: 'make -j4 tests'
+            plugins_working_subdirectory: 'mythplugins'
+            plugins_configure_cmd: './configure --prefix=$GITHUB_WORKSPACE/build/install'
+            plugins_build_cmd: 'make -j4'
+            plugins_install_cmd: 'make -j4'
+          - desc: 'Fedora - CMake'
+            image: 'quay.io/fedora/fedora:latest'
+            update_cmd: 'dnf upgrade -y'
+            install_ansible_cmd: 'dnf install ansible dnf-plugins-core -y'
+            ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
+            install_extra_pkgs_cmd: 'dnf install ant -y'
+            core_working_subdirectory: ''
+            core_configure_cmd: 'cmake --preset qt5 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/build/install'
+            core_build_cmd: 'cmake --build build-qt5'
+            core_install_cmd: ''
+            core_test_cmd: ''
+            plugins_working_subdirectory: ''
+            plugins_configure_cmd: ''
+            plugins_build_cmd: ''
+            plugins_install_cmd: ''
+
+      fail-fast: false
+
+    container:
+      image: ${{ matrix.container.image }}
+
+    steps:
+      - name: Checkout ccache
+        uses: actions/cache@v4
+        with:
+          path: ~/.ccache
+          key: ${{ matrix.container.desc }}-build-core-ccache-${{ github.sha }}
+          restore-keys: ${{ matrix.container.desc }}-build-core-ccache
+
+      - name: Detect OS release
+        run: |
+          . /etc/os-release
+          echo "OS_RELEASE_ID=$ID" >> $GITHUB_ENV
+          echo "OS_RELEASE_VERSION=$VERSION_ID" >> $GITHUB_ENV
+          echo "OS_RELEASE_VERSION_MAJOR=${VERSION_ID%%.*}" >> $GITHUB_ENV
+          echo "OS_RELEASE_VERSION_CODENAME=$VERSION_CODENAME" >> $GITHUB_ENV
+
+      - name: Debian OS obtain codename for prerelease vesions
+        run: echo "OS_RELEASE_VERSION_CODENAME=`dpkg --status tzdata | grep 'Provides' | cut -f2 -d'-'`" >> $GITHUB_ENV
+        if: env.OS_RELEASE_ID == 'debian' && env.OS_RELEASE_VERSION_CODENAME == ''
+
+      - name: OS update
+        run: ${{ matrix.container.update_cmd }}
+        if: ${{ matrix.container.update_cmd != '' }}
+
+      - name: OS install ansible
+        run: ${{ matrix.container.install_ansible_cmd }}
+        if: ${{ matrix.container.install_ansible_cmd != '' }}
+
+      - name: Checkout MythTV/ansible repository
+        uses: actions/checkout@v4
+        with:
+          repository: MythTV/ansible
+          path: ansible
+
+      - name: Run ansible to install build requirements
+        working-directory: ansible
+        run: ${{ matrix.container.ansible_cmd }}
+        if: ${{ matrix.container.ansible_cmd != '' }}
+
+      - name: Install extra packages for additional coverage
+        run: ${{ matrix.container.install_extra_pkgs_cmd }}
+        if: ${{ matrix.container.install_extra_pkgs_cmd != '' }}
+
+      - name: Checkout Mythtv/mythtv repository
+        uses: actions/checkout@v4
+        with:
+          path: mythtv
+
+      - name: ccache statistics [pre]
+        run: ccache -s
+
+      - name: Configure
+        working-directory: mythtv/${{ matrix.container.core_working_subdirectory }}
+        run: ${{ matrix.container.core_configure_cmd }}
+        if: ${{ matrix.container.core_configure_cmd != '' }}
+
+      - name: Build
+        working-directory: mythtv/${{ matrix.container.core_working_subdirectory }}
+        run: ${{ matrix.container.core_build_cmd }}
+        if: ${{ matrix.container.core_build_cmd != '' }}
+
+      - name: Install
+        working-directory: mythtv/${{ matrix.container.core_working_subdirectory }}
+        run: ${{ matrix.container.core_install_cmd }}
+        if: ${{ matrix.container.core_install_cmd != '' }}
+
+      - name: Test
+        working-directory: mythtv/${{ matrix.container.core_working_subdirectory }}
+        run: ${{ matrix.container.core_test_cmd }}
+        if: ${{ matrix.container.core_test_cmd != '' }}
+
+      - name: Configure Plugins
+        working-directory: mythtv/${{ matrix.container.plugins_working_subdirectory }}
+        run: ${{ matrix.container.plugins_configure_cmd }}
+        if: ${{ matrix.container.plugins_configure_cmd != '' }}
+
+      - name: Build Plugins
+        working-directory: mythtv/${{ matrix.container.plugins_working_subdirectory }}
+        run: ${{ matrix.container.plugins_build_cmd }}
+        if: ${{ matrix.container.plugins_build_cmd != '' }}
+
+      - name: Install Plugins
+        working-directory: mythtv/${{ matrix.container.plugins_working_subdirectory }}
+        run: ${{ matrix.container.plugins_install_cmd }}
+        if: ${{ matrix.container.plugins_install_cmd != '' }}
+
+      - name: ccache statistics [post]
+        run: ccache -s
+
+  build-mythtv-macos:
+    name: Building MythTV on ${{ matrix.os.desc }} using ${{ matrix.compiler.desc }}
+
+    strategy:
+      matrix:
+        os:
+          # macOS group
+          - desc: 'macOS 12 (Monterey) x86_64'
+            runner: 'macOS-12'
+            arch: 'x86_64'
+            python_dot_version: '3.11'
+            qt_version: 'qt5'
+            database_version: 'mysql8'
+            extrapkgs: ''
+            configureopts: '--disable-firewire  --enable-libmp3lame --enable-libvpx  --enable-libxvid --enable-libx264 --enable-libx265 --enable-bdjava'
+            linkerflags: ''
+            cross_compile: false
+          - desc: 'macOS 13 (Ventura) x86_64'
+            runner: 'macOS-13'
+            arch: 'x86_64'
+            python_dot_version: '3.11'
+            qt_version: 'qt5'
+            database_version: 'mysql8'
+            extrapkgs: ''
+            configureopts: '--disable-firewire  --enable-libmp3lame --enable-libvpx  --enable-libxvid --enable-libx264 --enable-libx265 --enable-bdjava'
+            linkerflags: '-Wl,-ld_classic'
+            cross_compile: false
+          - desc: 'macOS 14 (Sonoma) x86_64'
+            runner: 'macOS-14'
+            arch: 'x86_64'
+            python_dot_version: '3.11'
+            qt_version: 'qt5'
+            database_version: 'mysql8'
+            extrapkgs: ''
+            configureopts: '--disable-firewire  --enable-libmp3lame --enable-libvpx  --enable-libxvid --enable-libx264 --enable-libx265 --enable-bdjava'
+            linkerflags: '-Wl,-ld_classic'
+            cross_compile: true
+          - desc: 'macOS 14 (Sonoma) arm64'
+            runner: 'macOS-14'
+            arch: 'arm64'
+            python_dot_version: '3.11'
+            qt_version: 'qt5'
+            database_version: 'mysql8'
+            extrapkgs: ''
+            configureopts: '--disable-firewire  --enable-libmp3lame --enable-libvpx  --enable-libxvid --enable-libx264 --enable-libx265 --enable-bdjava'
+            linkerflags: '-Wl,-ld_classic'
+            cross_compile: false
+
+        compiler:
+          - desc: 'clang'
+            cc: 'clang'
+            cxx: 'clang++'
+
+      fail-fast: false
+
+    runs-on: ${{ matrix.os.runner }}
+
+    env:
+      TZ: Etc/UTC
+      MYTHTV_CONFIG_PREFIX: "${{ github.workspace }}/build/install"
+      MYTHTV_CONFIG_EXTRA: "--cc=${{ matrix.compiler.cc }} --cxx=${{ matrix.compiler.cxx }} --compile-type=release --enable-debug=0 --disable-debug"
+      CCACHE_DIR: $HOME/.ccache
+      CCACHE_COMPRESS: true
+      CCACHE_MAXSIZE: 250M
+      ANSIBLE_CMD: "ansible-playbook-${{ matrix.os.python_dot_version }}"
+      CONFIGURE_CMD: "./configure"
+      MAKE_CMD: 'make'
+      ANSIBLE_EXTRA: ''
+
+    steps:
+      - name: Checkout ccache
+        uses: actions/cache@v4
+        with:
+          path: ~/.ccache
+          key: ${{ matrix.os.desc }}-${{ matrix.compiler.desc }}-build-core-ccache-${{ github.sha }}
+          restore-keys: ${{ matrix.os.desc }}-${{ matrix.compiler.desc }}-build-core-ccache
+
+      - name: Bootstrap Macports
+        env:
+          GH_URL: "https://raw.githubusercontent.com"
+          MP_URL: "GiovanniBussi/macports-ci/master/macports-ci"
+        run: |
+          PKGMGR_PREFIX=/opt/local
+          echo "PKGMGR_PREFIX=$PKGMGR_PREFIX" >> $GITHUB_ENV
+          curl -LJO "${GH_URL}/${MP_URL}"
+          arch -${{ matrix.os.arch }} bash -c "source ./macports-ci install"
+          export PATH=${PKGMGR_PREFIX}/bin:${PKGMGR_PREFIX}/libexec/${{ matrix.os.qt_version }}/bin:${PKGMGR_PREFIX}/sbin:$PATH
+          echo "PKGMGR_CMD=sudo $PKGMGR_PREFIX/bin/port" >> $GITHUB_ENV
+
+      - name: Remove Homebrew
+        env:
+          GH_URL: "https://raw.githubusercontent.com"
+          HB_URL: "Homebrew/install/HEAD/uninstall.sh"
+        run: |
+          /bin/bash -c "$(curl -fsSL ${GH_URL}/${HB_URL})" --force
+          sudo rm -Rf /usr/local/bin/brew
+
+      - name: Setup cross-compile environment
+        run: |
+          echo "PKGMGR_CMD=arch -${{ matrix.os.arch }} sudo ${PKGMGR_PREFIX}/bin/port" >> $GITHUB_ENV
+          echo "ANSIBLE_CMD=arch -${{ matrix.os.arch }} $ANSIBLE_CMD" >> $GITHUB_ENV
+          echo "CONFIGURE_CMD=arch -${{ matrix.os.arch }} $CONFIGURE_CMD" >> $GITHUB_ENV
+          echo "MAKE_CMD=arch -${{ matrix.os.arch }} $MAKE_CMD" >> $GITHUB_ENV
+        if: matrix.os.cross_compile
+
+      - name: Setup build envinomental variables
+        run: |
+          echo "C_INCLUDE_PATH=${PKGMGR_PREFIX}/include" >> $GITHUB_ENV
+          echo "CPLUS_INCLUDE_PATH=${PKGMGR_PREFIX}/include" >> $GITHUB_ENV
+          echo "LDFLAGS=-L${PKGMGR_PREFIX}/lib ${{ matrix.os.linkerflags }}" >> $GITHUB_ENV
+          echo "LIBRARY_PATH=${PKGMGR_PREFIX}/lib" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=${PKGMGR_PREFIX}/lib/pkgconfig" >> $GITHUB_ENV
+          echo "QMAKE_CMD=${PKGMGR_PREFIX}/libexec/${{ matrix.os.qt_version }}/bin/qmake" >> $GITHUB_ENV
+
+      - name: Install ansible, pip, and virtualenv
+        run: |
+          PYTHON_VERSION=${{ matrix.os.python_dot_version }}
+          PYTHON_VERSION=${PYTHON_VERSION//.}
+          ${PKGMGR_CMD} install py${PYTHON_VERSION}-ansible py${PYTHON_VERSION}-pip py${PYTHON_VERSION}-virtualenv
+          ${PKGMGR_CMD} select --set python python${PYTHON_VERSION}
+          ${PKGMGR_CMD} select --set python3 python${PYTHON_VERSION}
+          ${PKGMGR_CMD} select --set ansible py${PYTHON_VERSION}-ansible
+          ANSIBLE_EXTRA="ansible_python_interpreter=${PKGMGR_PREFIX}/bin/python${{ matrix.os.python_dot_version }} database_version=${{ matrix.os.database_version }}"
+          echo "ANSIBLE_EXTRA=$ANSIBLE_EXTRA" >> $GITHUB_ENV
+
+      - name: Setup qt6 variables
+        run: echo "ANSIBLE_EXTRA=$ANSIBLE_EXTRA qt6=true" >> $GITHUB_ENV
+        if: matrix.os.qt_version == 'qt6'
+
+      - name: Checkout MythTV/ansible repository
+        uses: actions/checkout@v4
+        with:
+          repository: MythTV/ansible
+          path: ansible
+
+      - name: Run ansible to install build requirements
+        working-directory: ansible
+        run: ${ANSIBLE_CMD} mythtv.yml --extra-vars="$ANSIBLE_EXTRA" --limit localhost
+
+      - name: Update MYSQL environmental variables
+        run: |
+          PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${PKGMGR_PREFIX}/lib/${{ matrix.os.database_version }}/pkgconfig/
+          echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          MYSQLCLIENT_LDFLAGS="$(${PKGMGR_PREFIX}/bin/pkg-config --libs mysqlclient)"
+          echo "MYSQLCLIENT_LDFLAGS=$MYSQLCLIENT_LDFLAGS" >> $GITHUB_ENV
+          MYSQLCLIENT_CFLAGS="$(${PKGMGR_PREFIX}/bin/pkg-config --cflags mysqlclient)"
+          echo "MYSQLCLIENT_CFLAGS=$MYSQLCLIENT_CFLAGS" >> $GITHUB_ENV
+
+      - name: Source the virtual python environemnt
+        run: |
+          PYTHON_VENV_PATH="$HOME/.mythtv/python-virtualenv"
+          source "${PYTHON_VENV_PATH}/bin/activate"
+          echo "PYTHON_CMD=${PYTHON_VENV_PATH}/bin/python3" >> $GITHUB_ENV
+
+      - name: Checkout Mythtv/mythtv repository
+        uses: actions/checkout@v4
+        with:
+          path: mythtv
+
+      - name: ccache statistics [pre]
+        run: ccache -s
+
+      - name: Configure core
+        working-directory: mythtv/mythtv
+        run: ${CONFIGURE_CMD} --prefix=${MYTHTV_CONFIG_PREFIX} ${MYTHTV_CONFIG_EXTRA} --qmake=${QMAKE_CMD} --python=${PYTHON_CMD} ${{ matrix.os.configureopts }}
+
+      - name: Make core
+        working-directory: mythtv/mythtv
+        run: ${MAKE_CMD} -j4 all_no_test
+
+      - name: Install core
+        working-directory: mythtv/mythtv
+        run: ${MAKE_CMD} -j1 install
+
+      - name: Test core
+        working-directory: mythtv/mythtv
+        run: ${MAKE_CMD} -j1 tests
+
+      - name: Configure plugins
+        working-directory: mythtv/mythplugins
+        run: ${CONFIGURE_CMD} --prefix=${MYTHTV_CONFIG_PREFIX}
+
+      - name: Make plugins
+        working-directory: mythtv/mythplugins
+        run: ${MAKE_CMD} -j4
+
+      - name: Install plugins
+        working-directory: mythtv/mythplugins
+        run: ${MAKE_CMD} -j1 install
+
+      - name: ccache statistics [post]
+        run: ccache -s
