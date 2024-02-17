@@ -5238,10 +5238,21 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
     if ((m_currentTrack[kTrackTypeAudio] >= 0) && m_ic &&
         (m_selectedTrack[kTrackTypeAudio].m_av_stream_index <=
-         (int) m_ic->nb_streams) &&
-        (curstream = m_ic->streams[m_selectedTrack[kTrackTypeAudio]
-                                 .m_av_stream_index]) &&
-        (ctx = m_codecMap.GetCodecContext(curstream)))
+         (int) m_ic->nb_streams))
+    {
+        curstream = m_ic->streams[m_selectedTrack[kTrackTypeAudio]
+                                 .m_av_stream_index];
+        if (curstream != nullptr)
+            ctx = m_codecMap.GetCodecContext(curstream);
+    }
+
+    if (ctx == nullptr)
+    {
+        if (!m_tracks[kTrackTypeAudio].empty())
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "No codec context. Returning false");
+        return false;
+    }
+
     {
         AudioFormat fmt =
             AudioOutputSettings::AVSampleFormatToFormat(ctx->sample_fmt,
@@ -5281,13 +5292,6 @@ bool AvFormatDecoder::SetupAudioStream(void)
         info = AudioInfo(ctx->codec_id, fmt, ctx->sample_rate,
                          requested_channels, using_passthru, ctx->ch_layout.nb_channels,
                          ctx->codec_id == AV_CODEC_ID_DTS ? ctx->profile : 0);
-    }
-
-    if (!ctx)
-    {
-        if (!m_tracks[kTrackTypeAudio].empty())
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "No codec context. Returning false");
-        return false;
     }
 
     if (info == m_audioIn)

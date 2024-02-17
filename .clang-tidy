@@ -40,13 +40,11 @@ Checks: '-*,
 
     bugprone-*,
 
-        # As of 2023-05-22, there are 156 unique warnings. ,
-       -bugprone-assignment-in-if-condition
-
         # As of 2022-12-19, there are 1014 unique warnings. ,
        -bugprone-easily-swappable-parameters,
 
-        # As of 2023-09-19, there are 7 unique warnings. ,
+        # As of 2023-09-19, there are 7 unique warnings. 1 is in
+        # libmythfreesurround and the others are in libmythmheg. ,
        -bugprone-empty-catch,
 
         # As of 2023-05-22, there are 97 unique warnings. ,
