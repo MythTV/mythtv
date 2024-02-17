@@ -5253,47 +5253,44 @@ bool AvFormatDecoder::SetupAudioStream(void)
         return false;
     }
 
+    AudioFormat fmt =
+        AudioOutputSettings::AVSampleFormatToFormat(ctx->sample_fmt,
+                                                    ctx->bits_per_raw_sample);
+
+    if (av_sample_fmt_is_planar(ctx->sample_fmt))
     {
-        AudioFormat fmt =
-            AudioOutputSettings::AVSampleFormatToFormat(ctx->sample_fmt,
-                                                        ctx->bits_per_raw_sample);
-
-        if (av_sample_fmt_is_planar(ctx->sample_fmt))
-        {
-            LOG(VB_AUDIO, LOG_INFO, LOC + QString("Audio data is planar"));
-        }
-
-        if (fmt == FORMAT_NONE)
-        {
-            int bps = av_get_bytes_per_sample(ctx->sample_fmt) << 3;
-            if (ctx->sample_fmt == AV_SAMPLE_FMT_S32 &&
-                ctx->bits_per_raw_sample)
-                bps = ctx->bits_per_raw_sample;
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Unsupported sample format with %1 bits").arg(bps));
-            return false;
-        }
-
-        bool using_passthru = DoPassThrough(curstream->codecpar, false);
-
-        requested_channels = ctx->ch_layout.nb_channels;
-
-        if (!using_passthru &&
-            ctx->ch_layout.nb_channels > (int)m_audio->GetMaxChannels() &&
-            DecoderWillDownmix(ctx))
-        {
-            requested_channels = m_audio->GetMaxChannels();
-
-            AVChannelLayout channel_layout;
-            av_channel_layout_default(&channel_layout, requested_channels);
-            av_opt_set_chlayout(ctx->priv_data, "downmix", &channel_layout, 0);
-        }
-
-        info = AudioInfo(ctx->codec_id, fmt, ctx->sample_rate,
-                         requested_channels, using_passthru, ctx->ch_layout.nb_channels,
-                         ctx->codec_id == AV_CODEC_ID_DTS ? ctx->profile : 0);
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("Audio data is planar"));
     }
 
+    if (fmt == FORMAT_NONE)
+    {
+        int bps = av_get_bytes_per_sample(ctx->sample_fmt) << 3;
+        if (ctx->sample_fmt == AV_SAMPLE_FMT_S32 &&
+            ctx->bits_per_raw_sample)
+            bps = ctx->bits_per_raw_sample;
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Unsupported sample format with %1 bits").arg(bps));
+        return false;
+    }
+
+    bool using_passthru = DoPassThrough(curstream->codecpar, false);
+
+    requested_channels = ctx->ch_layout.nb_channels;
+
+    if (!using_passthru &&
+        ctx->ch_layout.nb_channels > (int)m_audio->GetMaxChannels() &&
+        DecoderWillDownmix(ctx))
+    {
+        requested_channels = m_audio->GetMaxChannels();
+
+        AVChannelLayout channel_layout;
+        av_channel_layout_default(&channel_layout, requested_channels);
+        av_opt_set_chlayout(ctx->priv_data, "downmix", &channel_layout, 0);
+    }
+
+    info = AudioInfo(ctx->codec_id, fmt, ctx->sample_rate,
+                     requested_channels, using_passthru, ctx->ch_layout.nb_channels,
+                     ctx->codec_id == AV_CODEC_ID_DTS ? ctx->profile : 0);
     if (info == m_audioIn)
         return false;
 
