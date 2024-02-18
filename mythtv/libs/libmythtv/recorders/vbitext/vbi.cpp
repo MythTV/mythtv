@@ -21,7 +21,7 @@
 #include "vbi.h"
 #include "vt.h"
 
-#define FAC    (1<<16)         // factor for fix-point arithmetic
+static constexpr int FAC = { 1<<16 };  // factor for fix-point arithmetic
 
 static unsigned char *rawbuf = nullptr;// one common buffer for raw vbi data.
 #ifdef USING_V4L2

@@ -34,7 +34,7 @@ been done before the binary was produced.  Creates a MHParseNode tree structure.
 #include "Groups.h"
 #include "Logging.h"
 
-#define INDEFINITE_LENGTH   (-1)
+static constexpr int INDEFINITE_LENGTH { -1 };
 
 // Get the next byte.  In most all cases it's an error if we reach end-of-file
 // and we throw an exception.
