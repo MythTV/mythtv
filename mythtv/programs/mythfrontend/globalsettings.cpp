@@ -2934,7 +2934,7 @@ static HostComboBoxSetting *ChannelGroupDefault()
                                              "shown in the EPG.  Pressing "
                                              "GUIDE key will toggle channel "
                                              "group."));
-    gc->setValue(false);
+    gc->setValue(0);
 
     return gc;
 }

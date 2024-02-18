@@ -1267,7 +1267,7 @@ int V2Capture::AddRecProfile  ( uint GroupId, const QString& ProfileName,
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString( "AddRecProfile: GroupId and ProfileName are required." ));
-        return false;
+        return 0;
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1289,7 +1289,7 @@ int V2Capture::AddRecProfile  ( uint GroupId, const QString& ProfileName,
         int id = query.value(0).toInt();
         LOG(VB_GENERAL, LOG_ERR,
             QString( "Profile %1 already exists in group id %2 with id %3").arg(ProfileName).arg(GroupId).arg(id));
-        return false;
+        return 0;
     }
 
     query.prepare(
