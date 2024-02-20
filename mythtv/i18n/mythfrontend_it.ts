@@ -2600,7 +2600,7 @@ Controlla se il video esiste</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2857"/>
         <source>Enable (recommended) to supply full range RGB output to your display device. Disable to supply limited range RGB output. This setting applies to both the GUI and media playback. Ideally the value of this setting should match a similar setting on your TV or monitor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Abilitato (consigliato): all&apos;uscita RGB connessa al dispositivo di visualizzazione viene fornita la gamma completa. Disabilitato: all&apos;uscita RGB viene fornito un range limitato. Questa impostazione si applica sia alla GUI che alla riproduzione multimediale. Idealmente il valore di questa impostazione dovrebbe corrispondere a un&apos;impostazione simile sulla TV o sul monitor.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3217"/>
@@ -15158,12 +15158,13 @@ non può essere vuoto.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1888"/>
         <source>Always show watched percent progress bar</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostra sempre la barra percentuale di avanzamento visione</translation>
+     </message>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1892"/>
         <source>If enabled, shows the watched percent progress bar even if the recording or video is marked as watched. Having a watched percent progress bar at all depends on the currently used theme.</source>
-        <translation type="unfinished"></translation>
+        <translation>Se abilitato, mostra la barra di avanzamento con la percentuale vista anche se la registrazione o il video sono contrassegnati come già visti. La barra di avanzamento percentuale vista dipende dal tema attualmente utilizzato.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1904"/>
