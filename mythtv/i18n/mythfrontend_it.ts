@@ -15159,7 +15159,6 @@ non può essere vuoto.</translation>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1888"/>
         <source>Always show watched percent progress bar</source>
         <translation>Mostra sempre la barra percentuale di avanzamento visione</translation>
-     </message>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1892"/>
