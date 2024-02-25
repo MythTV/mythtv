@@ -23,10 +23,6 @@ const QRegularExpression VideoFilterSettings::kReSeason {
 const QRegularExpression VideoFilterSettings::kReDate {
     "-(\\d+)([dwmy])", QRegularExpression::CaseInsensitiveOption };
 
-#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
-#define capturedView capturedRef
-#endif
-
 VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings,
                                          const QString& _prefix)
 {

@@ -63,11 +63,7 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
         return;
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList split = timestr.split(" ", QString::SkipEmptyParts);
-#else
     QStringList split = timestr.split(" ", Qt::SkipEmptyParts);
-#endif
     QString ts = split[0];
     QDate tmpDate;
     QTime tmpTime;
@@ -533,11 +529,7 @@ bool XMLTVParser::parseFile(
                                         tagname = "guest_star";
                                 }
                                 QString name = xml.readElementText(QXmlStreamReader::SkipChildElements);
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                                QStringList characters = character.split("/", QString::SkipEmptyParts);
-#else
                                 QStringList characters = character.split("/", Qt::SkipEmptyParts);
-#endif
                                 if (characters.isEmpty())
                                 {
                                     pginfo->AddPerson(tagname, name,

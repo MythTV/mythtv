@@ -364,11 +364,7 @@ class AvFormatDecoder : public DecoderBase
     // Value in milliseconds, from setting AudioReadAhead
     std::chrono::milliseconds  m_audioReadAhead       {100ms};
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex             m_avCodecLock                  { QMutex::Recursive };
-#else
     QRecursiveMutex    m_avCodecLock;
-#endif
 };
 
 #endif

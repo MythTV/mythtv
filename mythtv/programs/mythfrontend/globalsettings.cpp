@@ -830,7 +830,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_doubleDriver->setEnabled(false);
 
     const QList<QPair<QString,QString> >& options = MythVideoProfile::GetDeinterlacers();
-    for (const auto & option : qAsConst(options))
+    for (const auto & option : std::as_const(options))
     {
         m_singleDeint->addSelection(option.second, option.first);
         m_doubleDeint->addSelection(option.second, option.first);
@@ -1048,13 +1048,13 @@ void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
     QStringList renderers = MythVideoProfile::GetVideoRenderers(dec);
 
     QString prenderer;
-    for (const auto & rend : qAsConst(renderers))
+    for (const auto & rend : std::as_const(renderers))
         prenderer = (rend == vrenderer) ? vrenderer : prenderer;
     if (prenderer.isEmpty())
         prenderer = MythVideoProfile::GetPreferredVideoRenderer(dec);
 
     m_vidRend->clearSelections();
-    for (const auto & rend : qAsConst(renderers))
+    for (const auto & rend : std::as_const(renderers))
     {
         if ((!rend.contains("null")))
             m_vidRend->addSelection(MythVideoProfile::GetVideoRendererName(rend),
@@ -1267,7 +1267,7 @@ void PlaybackProfileConfig::Save(void)
         return;
     }
 
-    for (PlaybackProfileItemConfig *profile : qAsConst(m_profiles))
+    for (PlaybackProfileItemConfig *profile : std::as_const(m_profiles))
     {
         profile->Save();
     }
@@ -1292,7 +1292,7 @@ void PlaybackProfileConfig::Save(void)
 void PlaybackProfileConfig::DeleteProfileItem(
     PlaybackProfileItemConfig *profileToDelete)
 {
-    for (PlaybackProfileItemConfig *profile : qAsConst(m_profiles))
+    for (PlaybackProfileItemConfig *profile : std::as_const(m_profiles))
         profile->Save();
 
     uint i = profileToDelete->GetIndex();
@@ -1304,7 +1304,7 @@ void PlaybackProfileConfig::DeleteProfileItem(
 
 void PlaybackProfileConfig::AddNewEntry(void)
 {
-    for (PlaybackProfileItemConfig *profile : qAsConst(m_profiles))
+    for (PlaybackProfileItemConfig *profile : std::as_const(m_profiles))
         profile->Save();
     m_items.emplace_back();
     ReloadSettings();
@@ -1315,12 +1315,12 @@ void PlaybackProfileConfig::ReloadSettings(void)
     getParent()->removeTargetedChild(m_profileName, m_markForDeletion);
     getParent()->removeTargetedChild(m_profileName, m_addNewEntry);
 
-    for (StandardSetting *setting : qAsConst(m_profiles))
+    for (StandardSetting *setting : std::as_const(m_profiles))
         getParent()->removeTargetedChild(m_profileName, setting);
     m_profiles.clear();
 
     InitUI(getParent());
-    for (StandardSetting *setting : qAsConst(m_profiles))
+    for (StandardSetting *setting : std::as_const(m_profiles))
         setting->Load();
     emit getParent()->settingsChanged();
     setChanged(true);
@@ -1330,7 +1330,7 @@ void PlaybackProfileConfig::ReloadSettings(void)
 // NOLINTNEXTLINE(performance-noexcept-swap)
 void PlaybackProfileConfig::swap(int indexA, int indexB)
 {
-    for (PlaybackProfileItemConfig *profile : qAsConst(m_profiles))
+    for (PlaybackProfileItemConfig *profile : std::as_const(m_profiles))
         profile->Save();
 
     QString pri_i = QString::number(m_items[indexA].GetPriority());
@@ -1364,7 +1364,7 @@ static HostComboBoxSetting * CurrentPlaybackProfile()
         MythVideoProfile::SetDefaultProfileName(profile, host);
     }
 
-    for (const auto & prof : qAsConst(profiles))
+    for (const auto & prof : std::as_const(profiles))
     {
         grouptrigger->addSelection(ProgramInfo::i18n(prof), prof);
         grouptrigger->addTargetedChild(prof,
@@ -1586,15 +1586,11 @@ static HostComboBoxSetting *SubtitleCodec()
                                kMSStdOut | kMSDontDisableDrawing));
     cmd->Wait();
     QString results = cmd->GetStandardOutputStream()->readAll();
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList list = results.toLower().split(crlf, QString::SkipEmptyParts);
-#else
     QStringList list = results.toLower().split(crlf, Qt::SkipEmptyParts);
-#endif
     list.replaceInStrings(suffix, "");
     list.sort();
 
-    for (const auto & codec : qAsConst(list))
+    for (const auto & codec : std::as_const(list))
     {
         QString val = QString(codec);
         gc->addSelection(val, val, val.toLower() == "utf-8");
@@ -1723,7 +1719,7 @@ static HostComboBoxSetting *Visualiser()
                                        "is no video. Defaults to none."));
     combo->addSelection("None", "");
     QStringList visuals = VideoVisual::GetVisualiserList(RenderType::kRenderOpenGL);
-    for (const auto & visual : qAsConst(visuals))
+    for (const auto & visual : std::as_const(visuals))
         combo->addSelection(visual, visual);
     return combo;
 }
@@ -3214,7 +3210,7 @@ static GlobalComboBoxSetting *MythLanguage()
 {
     auto *gc = new GlobalComboBoxSetting("Language");
 
-    gc->setLabel(AppearanceSettings::tr("Language"));
+    gc->setLabel(AppearanceSettings::tr("Menu Language"));
 
     QMap<QString, QString> langMap = MythTranslation::getLanguages();
     QStringList langs = langMap.values();
@@ -3226,7 +3222,7 @@ static GlobalComboBoxSetting *MythLanguage()
 
     gc->clearSelections();
 
-    for (const auto & label : qAsConst(langs))
+    for (const auto & label : std::as_const(langs))
     {
         QString value = langMap.key(label);
         gc->addSelection(label, value, (value.toLower() == langCode));
@@ -3234,6 +3230,36 @@ static GlobalComboBoxSetting *MythLanguage()
 
     gc->setHelpText(AppearanceSettings::tr("Your preferred language for the "
                                            "user interface."));
+    return gc;
+}
+
+static GlobalComboBoxSetting *AudioLanguage()
+{
+    auto *gc = new GlobalComboBoxSetting("AudioLanguage");
+
+    gc->setLabel(AppearanceSettings::tr("Audio Language"));
+
+    QMap<QString, QString> langMap = MythTranslation::getLanguages();
+    QStringList langs = langMap.values();
+    langs.sort();
+    QString langCode = gCoreContext->GetSetting("AudioLanguage").toLower();
+
+    if (langCode.isEmpty())
+    {
+        auto menuLangCode = gCoreContext->GetSetting("Language").toLower();
+        langCode = menuLangCode.isEmpty() ? "en_US" : menuLangCode;
+    }
+
+    gc->clearSelections();
+
+    for (const auto & label : std::as_const(langs))
+    {
+        QString value = langMap.key(label);
+        gc->addSelection(label, value, (value.toLower() == langCode));
+    }
+
+    gc->setHelpText(AppearanceSettings::tr("Preferred language for the "
+                                           "audio track."));
     return gc;
 }
 
@@ -4727,7 +4753,7 @@ void AppearanceSettings::PopulateScreens(int Screens)
 {
     m_screen->clearSelections();
     QList screens = QGuiApplication::screens();
-    for (QScreen *qscreen : qAsConst(screens))
+    for (QScreen *qscreen : std::as_const(screens))
     {
         QString extra = MythDisplay::GetExtraScreenInfo(qscreen);
         m_screen->addSelection(qscreen->name() + extra, qscreen->name());
@@ -4784,6 +4810,7 @@ AppearanceSettings::AppearanceSettings()
     dates->setLabel(tr("Localization"));
 
     dates->addChild(MythLanguage());
+    dates->addChild(AudioLanguage());
     dates->addChild(ISO639PreferredLanguage(0));
     dates->addChild(ISO639PreferredLanguage(1));
     dates->addChild(MythDateFormatCB());

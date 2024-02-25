@@ -176,7 +176,7 @@ class UPNP_PUBLIC StateVariables
         StateVariables() = default;
         virtual ~StateVariables()
         {
-            for (const auto *it : qAsConst(m_map))
+            for (const auto *it : std::as_const(m_map))
                 delete it;
             m_map.clear();
         }

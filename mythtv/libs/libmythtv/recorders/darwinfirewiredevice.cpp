@@ -84,7 +84,7 @@ private:
 
     ~DFDPriv()
     {
-        for (auto dev : qAsConst(m_devices))
+        for (auto dev : std::as_const(m_devices))
             delete dev;
         m_devices.clear();
 
@@ -638,7 +638,7 @@ std::vector<AVCInfo> DarwinFirewireDevice::GetSTBListPrivate(void)
 
     std::vector<AVCInfo> list;
 
-    for (auto dev : qAsConst(m_priv->m_devices))
+    for (auto dev : std::as_const(m_priv->m_devices))
     {
         if (dev->IsSubunitType(kAVCSubunitTypeTuner) &&
             dev->IsSubunitType(kAVCSubunitTypePanel))

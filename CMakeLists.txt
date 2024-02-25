@@ -88,7 +88,7 @@ include(platform/WindowsCrossEarlyInitialization)
 #
 project(
   MythTV-SuperBuild
-  VERSION 34.0.0
+  VERSION 35.0.0
   DESCRIPTION
     "MythTV is a Free Open Source software digital video recorder (DVR) project."
   HOMEPAGE_URL https://www.mythtv.org

@@ -77,6 +77,7 @@ bool StreamView::Create(void)
 void StreamView::ShowMenu(void)
 {
     auto *menu = new MythMenu(tr("Stream Actions"), this, "mainmenu");
+    menu->AddItemV(MusicCommon::tr("Fullscreen Visualizer"), QVariant::fromValue((int)MV_VISUALIZER));
     menu->AddItem(tr("Add Stream"));
 
     if (m_streamList->GetItemCurrent())
@@ -85,7 +86,6 @@ void StreamView::ShowMenu(void)
         menu->AddItem(tr("Remove Stream"));
     }
 
-    menu->AddItemV(MusicCommon::tr("Fullscreen Visualizer"), QVariant::fromValue((int)MV_VISUALIZER));
     menu->AddItemV(MusicCommon::tr("Lyrics"), QVariant::fromValue((int)MV_LYRICS));
 
     menu->AddItem(tr("More Options"), nullptr, createSubMenu());
@@ -213,11 +213,7 @@ void StreamView::customEvent(QEvent *event)
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
             return;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
-#else
         QStringList tokens = me->Message().split(" ", Qt::SkipEmptyParts);
-#endif
 
         if (tokens.isEmpty())
             return;

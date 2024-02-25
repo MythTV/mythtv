@@ -461,7 +461,7 @@ void OSD::Draw()
     QTime now = MythDate::current().time();
 
     CheckExpiry();
-    for (auto * screen : qAsConst(m_children))
+    for (auto * screen : std::as_const(m_children))
     {
         if (screen->IsVisible())
         {
@@ -521,7 +521,7 @@ void OSD::Draw()
     if (visible)
     {
         m_painter->Begin(nullptr);
-        for (auto * screen : qAsConst(m_children))
+        for (auto * screen : std::as_const(m_children))
         {
             if (screen->IsVisible())
             {
@@ -530,7 +530,7 @@ void OSD::Draw()
                 screen->ResetNeedsRedraw();
             }
         }
-        for (auto * notif : qAsConst(notifications))
+        for (auto * notif : std::as_const(notifications))
         {
             if (notif->IsVisible())
             {

@@ -232,7 +232,7 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
                 // We can't use MSqlQuery to determine if we have a schema,
                 // since it will open a new connection, which will try to check
                 // if we have a schema
-                QSqlQuery query = m_db.exec(sql); // don't convert to MSqlQuery
+                QSqlQuery query(sql, m_db); // don't convert to MSqlQuery
                 if (query.next())
                     have_schema = query.value(0).toInt() > 1;
                 GetMythDB()->SetHaveSchema(have_schema);
@@ -278,10 +278,12 @@ bool MSqlDatabase::Reconnect()
 
 void MSqlDatabase::InitSessionVars()
 {
+    QSqlQuery query(m_db);
+
     // Make sure NOW() returns time in UTC...
-    m_db.exec("SET @@session.time_zone='+00:00'");
+    query.exec("SET @@session.time_zone='+00:00'");
     // Disable strict mode
-    m_db.exec("SET @@session.sql_mode=''");
+    query.exec("SET @@session.sql_mode=''");
 }
 
 // -----------------------------------------------------------------------
@@ -486,7 +488,7 @@ void MDBManager::CloseDatabases()
     m_pool[QThread::currentThread()].clear();
     m_lock.unlock();
 
-    for (auto *conn : qAsConst(list))
+    for (auto *conn : std::as_const(list))
     {
         LOG(VB_DATABASE, LOG_INFO,
             "Closing DB connection named '" + conn->m_name + "'");

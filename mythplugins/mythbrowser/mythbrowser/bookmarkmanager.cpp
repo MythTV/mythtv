@@ -551,7 +551,7 @@ void BookmarkManager::slotDoDeleteMarked(bool doDelete)
 
     QString category = m_groupList->GetValue();
 
-    for (auto *site : qAsConst(m_siteList))
+    for (auto *site : std::as_const(m_siteList))
     {
         if (site && site->m_selected)
             RemoveFromDB(site);
@@ -590,7 +590,7 @@ void BookmarkManager::slotShowMarked(void)
     QString zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0");
     QStringList urls;
 
-    for (const auto *site : qAsConst(m_siteList))
+    for (const auto *site : std::as_const(m_siteList))
     {
         if (site && site->m_selected)
             urls.append(site->m_url);

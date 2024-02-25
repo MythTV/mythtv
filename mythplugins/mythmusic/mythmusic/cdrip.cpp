@@ -945,7 +945,7 @@ void Ripper::artistChanged()
 
     if (!m_tracks->empty())
     {
-        for (const auto *track : qAsConst(*m_tracks))
+        for (const auto *track : std::as_const(*m_tracks))
         {
             MusicMetadata *data = track->metadata;
             if (data)
@@ -974,7 +974,7 @@ void Ripper::albumChanged()
 
     if (!m_tracks->empty())
     {
-        for (const auto *track : qAsConst(*m_tracks))
+        for (const auto *track : std::as_const(*m_tracks))
         {
             MusicMetadata *data = track->metadata;
             if (data)
@@ -991,7 +991,7 @@ void Ripper::genreChanged()
 
     if (!m_tracks->empty())
     {
-        for (const auto *track : qAsConst(*m_tracks))
+        for (const auto *track : std::as_const(*m_tracks))
         {
             MusicMetadata *data = track->metadata;
             if (data)
@@ -1008,7 +1008,7 @@ void Ripper::yearChanged()
 
     if (!m_tracks->empty())
     {
-        for (const auto *track : qAsConst(*m_tracks))
+        for (const auto *track : std::as_const(*m_tracks))
         {
             MusicMetadata *data = track->metadata;
             if (data)
@@ -1026,7 +1026,7 @@ void Ripper::compilationChanged(bool state)
         if (!m_tracks->empty())
         {
             // Update artist MetaData of each track on the ablum...
-            for (const auto *track : qAsConst(*m_tracks))
+            for (const auto *track : std::as_const(*m_tracks))
             {
                 MusicMetadata *data = track->metadata;
                 if (data)
@@ -1045,7 +1045,7 @@ void Ripper::compilationChanged(bool state)
         if (!m_tracks->empty())
         {
             // Update artist MetaData of each track on the album...
-            for (const auto *track : qAsConst(*m_tracks))
+            for (const auto *track : std::as_const(*m_tracks))
             {
                 MusicMetadata *data = track->metadata;
 
@@ -1073,7 +1073,7 @@ void Ripper::switchTitlesAndArtists()
     QString tmp;
     if (!m_tracks->empty())
     {
-        for (const auto *track : qAsConst(*m_tracks))
+        for (const auto *track : std::as_const(*m_tracks))
         {
             MusicMetadata *data = track->metadata;
 

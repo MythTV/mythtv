@@ -310,13 +310,8 @@ class XMLTVGrabber : public MythUIComboBoxSetting
                 while (!ostream.atEnd())
                 {
                     QString grabber_list(ostream.readLine());
-    #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                    QStringList grabber_split =
-                        grabber_list.split("|", QString::SkipEmptyParts);
-    #else
                     QStringList grabber_split =
                         grabber_list.split("|", Qt::SkipEmptyParts);
-    #endif
                     QString grabber_name = grabber_split[1] + " (xmltv)";
                     QFileInfo grabber_file(grabber_split[0]);
 
@@ -842,7 +837,7 @@ class VideoDevice : public CaptureCardComboBoxSetting
     {
         uint cnt = 0;
         QFileInfoList entries = dir.entryInfoList();
-        for (const auto & fi : qAsConst(entries))
+        for (const auto & fi : std::as_const(entries))
         {
             struct stat st {};
             QString filepath = fi.absoluteFilePath();
@@ -949,7 +944,7 @@ class VBIDevice : public CaptureCardComboBoxSetting
     {
         QStringList devices;
         QFileInfoList entries = dir.entryInfoList();
-        for (const auto & fi : qAsConst(entries))
+        for (const auto & fi : std::as_const(entries))
         {
             QString    device = fi.absoluteFilePath();
             QByteArray adevice = device.toLatin1();
@@ -970,7 +965,7 @@ class VBIDevice : public CaptureCardComboBoxSetting
         }
 
         QString sel = getValue();
-        for (const QString& device : qAsConst(devices))
+        for (const QString& device : std::as_const(devices))
             addSelection(device, device, device == sel);
 
         return (uint) devices.size();
@@ -1145,7 +1140,7 @@ class DVBCardNum : public CaptureCardComboBoxSetting
 
         QMap<QString,bool> in_use;
         QString sel = current;
-        for (const QString& dev : qAsConst(sdevs))
+        for (const QString& dev : std::as_const(sdevs))
         {
             in_use[dev] = std::find(db.begin(), db.end(), dev) != db.end();
             if (sel.isEmpty() && !in_use[dev])
@@ -1158,7 +1153,7 @@ class DVBCardNum : public CaptureCardComboBoxSetting
         QString usestr = QString(" -- ");
         usestr += QObject::tr("Warning: already in use");
 
-        for (const QString& dev : qAsConst(sdevs))
+        for (const QString& dev : std::as_const(sdevs))
         {
             QString desc = dev + (in_use[dev] ? usestr : "");
             desc = (current == dev) ? dev : desc;
@@ -1500,7 +1495,7 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
     // ProbeVideoDevices returns "deviceid ip" pairs
     QStringList devs = CardUtil::ProbeVideoDevices("HDHOMERUN");
 
-    for (const auto & dev : qAsConst(devs))
+    for (const auto & dev : std::as_const(devs))
     {
         QStringList devinfo = dev.split(" ");
         const QString& devid = devinfo.at(0);
@@ -1532,7 +1527,7 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
 void HDHomeRunConfigurationGroup::SetDeviceCheckBoxes(const QString& devices)
 {
     QStringList devstrs = devices.split(",");
-    for (const QString& devstr : qAsConst(devstrs))
+    for (const QString& devstr : std::as_const(devstrs))
     {
         // Get the HDHomeRun device ID using libhdhomerun.  We need to
         // do it this way because legacy configurations could use an
@@ -1838,7 +1833,7 @@ class ASIDevice : public CaptureCardComboBoxSetting
         // for new configs (preferring non-conflicing devices).
         QMap<QString,bool> in_use;
         QString sel = current;
-        for (const QString& dev : qAsConst(sdevs))
+        for (const QString& dev : std::as_const(sdevs))
         {
             in_use[dev] = std::find(db.begin(), db.end(), dev) != db.end();
             if (sel.isEmpty() && !in_use[dev])
@@ -1854,7 +1849,7 @@ class ASIDevice : public CaptureCardComboBoxSetting
 
         // Add the devices to the UI
         bool found = false;
-        for (const QString& dev : qAsConst(sdevs))
+        for (const QString& dev : std::as_const(sdevs))
         {
             QString desc = dev + (in_use[dev] ? usestr : "");
             desc = (current == dev) ? dev : desc;
@@ -2032,7 +2027,7 @@ void VBoxConfigurationGroup::FillDeviceList(void)
     // ProbeVideoDevices returns "deviceid ip tunerno tunertype"
     QStringList devs = CardUtil::ProbeVideoDevices("VBOX");
 
-    for (const auto & dev : qAsConst(devs))
+    for (const auto & dev : std::as_const(devs))
     {
         QStringList devinfo = dev.split(" ");
         const QString& id = devinfo.at(0);
@@ -2057,7 +2052,7 @@ void VBoxConfigurationGroup::FillDeviceList(void)
     // returns "ip.ip.ip.ip-n-type" or deviceid-n-type values
     QStringList db = CardUtil::GetVideoDevices("VBOX");
 
-    for (const auto & dev : qAsConst(db))
+    for (const auto & dev : std::as_const(db))
     {
         QMap<QString, VBoxDevice>::iterator dit;
         dit = m_deviceList.find(dev);
@@ -3909,7 +3904,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
     {
         m_cardType->clearSelections();
         QStringList delsyslist = CardUtil::ProbeDeliverySystems(videodevice);
-        for (const auto & item : qAsConst(delsyslist))
+        for (const auto & item : std::as_const(delsyslist))
         {
             LOG(VB_GENERAL, LOG_DEBUG, QString("DVBCardType: add deliverysystem:%1")
                 .arg(item));
@@ -4098,7 +4093,7 @@ void SatIPConfigurationGroup::FillDeviceList(void)
     // Returns each devices as "deviceid friendlyname ip tunerno tunertype"
     QStringList devs = CardUtil::ProbeVideoDevices("SATIP");
 
-    for (const auto & dev : qAsConst(devs))
+    for (const auto & dev : std::as_const(devs))
     {
         QStringList devparts = dev.split(" ");
         const QString& id = devparts.value(0);

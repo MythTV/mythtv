@@ -31,7 +31,7 @@ void MythCaptionsOverlay::TearDown()
 void MythCaptionsOverlay::Draw(QRect Rect)
 {
     bool visible = false;
-    for (auto * screen : qAsConst(m_children))
+    for (auto * screen : std::as_const(m_children))
     {
         if (screen->IsVisible())
         {
@@ -43,7 +43,7 @@ void MythCaptionsOverlay::Draw(QRect Rect)
     if (visible)
     {
         m_painter->Begin(nullptr);
-        for (auto * screen : qAsConst(m_children))
+        for (auto * screen : std::as_const(m_children))
         {
             if (screen->IsVisible())
             {

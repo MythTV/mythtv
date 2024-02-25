@@ -188,7 +188,7 @@ bool MythBurn::keyPressEvent(QKeyEvent *event)
 void MythBurn::updateSizeBar(void)
 {
     int64_t size = 0;
-    for (const auto *a : qAsConst(m_archiveList))
+    for (const auto *a : std::as_const(m_archiveList))
         size += a->newsize;
 
     uint usedSpace = size / 1024 / 1024;
@@ -407,7 +407,7 @@ void MythBurn::updateArchiveList(void)
     }
     else
     {
-        for (auto *a : qAsConst(m_archiveList))
+        for (auto *a : std::as_const(m_archiveList))
         {
             QCoreApplication::processEvents();
             // get duration of this file
@@ -544,7 +544,7 @@ EncoderProfile *MythBurn::getDefaultProfile(ArchiveItem *item)
         QString defaultProfile =
                 gCoreContext->GetSetting("MythArchiveDefaultEncProfile", "SP");
 
-        for (auto *x : qAsConst(m_profileList))
+        for (auto *x : std::as_const(m_profileList))
             if (x->name == defaultProfile)
                 profile = x;
     }
@@ -599,7 +599,7 @@ void MythBurn::createConfigFile(const QString &filename)
             QDomElement thumbs = doc.createElement("thumbimages");
             file.appendChild(thumbs);
 
-            for (auto *thumbImage : qAsConst(a->thumbList))
+            for (auto *thumbImage : std::as_const(a->thumbList))
             {
                 QDomElement thumb = doc.createElement("thumb");
                 thumbs.appendChild(thumb);
@@ -690,7 +690,7 @@ void MythBurn::loadConfiguration(void)
 
 EncoderProfile *MythBurn::getProfileFromName(const QString &profileName)
 {
-    for (auto *x : qAsConst(m_profileList))
+    for (auto *x : std::as_const(m_profileList))
         if (x->name == profileName)
             return x;
 
@@ -1024,7 +1024,7 @@ bool ProfileDialog::Create()
         return false;
     }
 
-    for (auto *x : qAsConst(m_profileList))
+    for (auto *x : std::as_const(m_profileList))
     {
         auto *item = new
                 MythUIButtonListItem(m_profileBtnList, x->name);

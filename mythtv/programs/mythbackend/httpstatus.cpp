@@ -206,7 +206,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
     TVRec::s_inputsLock.lockForRead();
 
-    for (auto * elink : qAsConst(*m_pEncoders))
+    for (auto * elink : std::as_const(*m_pEncoders))
     {
         if (elink != nullptr)
         {
@@ -310,7 +310,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         fes = nullptr;
 
         frontends.setAttribute( "count", map.size() );
-        for (const auto & entry : qAsConst(map))
+        for (const auto & entry : std::as_const(map))
         {
             QDomElement fe = pDoc->createElement("Frontend");
             frontends.appendChild(fe);
@@ -355,7 +355,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         sbes->DecrRef();
         sbes = nullptr;
 
-        for (const auto & entry : qAsConst(map))
+        for (const auto & entry : std::as_const(map))
         {
             QUrl url(entry->m_sLocation);
             if (url.host() != ipaddress)
@@ -586,15 +586,9 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
         QByteArray input = ms.ReadAll();
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList output = QString(input).split('\n',
-                                                  QString::SkipEmptyParts);
-#else
         QStringList output = QString(input).split('\n',
                                                   Qt::SkipEmptyParts);
-#endif
-
-        for (const auto & line : qAsConst(output))
+        for (const auto & line : std::as_const(output))
         {
             QDomElement info = pDoc->createElement("Information");
 

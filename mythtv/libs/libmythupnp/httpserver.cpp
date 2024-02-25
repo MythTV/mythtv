@@ -330,7 +330,7 @@ void HttpServer::RegisterExtension( HttpServerExtension *pExtension )
 
         QStringList list = pExtension->GetBasePaths();
 
-        for( const QString& base : qAsConst(list))
+        for( const QString& base : std::as_const(list))
         {
             m_basePaths.insert( base, pExtension );
             LOG(VB_HTTP, LOG_INFO, QString("HttpServer: Registering %1 extension path %2")
@@ -352,7 +352,7 @@ void HttpServer::UnregisterExtension( HttpServerExtension *pExtension )
 
         QStringList list = pExtension->GetBasePaths();
 
-        for( const QString& base : qAsConst(list))
+        for( const QString& base : std::as_const(list))
             m_basePaths.remove( base, pExtension );
 
         m_extensions.removeAll(pExtension);

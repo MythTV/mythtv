@@ -31,11 +31,7 @@ void MythSortHelper::MythSortHelperCommon(void)
     }
     m_prefixesRegex = QRegularExpression(m_prefixes);
     m_prefixesRegex2 = QRegularExpression(m_prefixes + "(.*)");
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    m_exclList = m_exclusions.split(";", QString::SkipEmptyParts);
-#else
     m_exclList = m_exclusions.split(";", Qt::SkipEmptyParts);
-#endif
     // NOLINTNEXTLINE(modernize-loop-convert)
     for (int i = 0; i < m_exclList.size(); i++)
       m_exclList[i] = m_exclList[i].trimmed();
@@ -176,7 +172,7 @@ QString MythSortHelper::doTitle(const QString& title) const
         if (m_exclList.contains(ltitle))
             return ltitle;
     } else {
-        for (const auto& str : qAsConst(m_exclList))
+        for (const auto& str : std::as_const(m_exclList))
             if (ltitle.startsWith(str))
                 return ltitle;
     }

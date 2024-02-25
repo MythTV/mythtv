@@ -241,7 +241,7 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext **Contex
     MCProfiles& profiles = MythMediaCodecContext::GetProfiles();
     MythCodecContext::CodecProfile mythprofile =
             MythCodecContext::FFmpegToMythProfile((*Context)->codec_id, (*Context)->profile);
-    for (auto profile : qAsConst(profiles))
+    for (auto profile : std::as_const(profiles))
     {
         if (profile.first == mythprofile &&
             profile.second.width() >= (*Context)->width &&
@@ -355,11 +355,7 @@ bool MythMediaCodecContext::IsDeinterlacing(bool &DoubleRate, bool)
 MCProfiles &MythMediaCodecContext::GetProfiles(void)
 {
     // TODO Something tells me this is leakier than a leaky thing
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    static QMutex lock(QMutex::Recursive);
-#else
     static QRecursiveMutex lock;
-#endif
     static bool s_initialised = false;
     static MCProfiles s_profiles;
 
@@ -502,17 +498,13 @@ void MythMediaCodecContext::GetDecoderList(QStringList &Decoders)
         return;
 
     Decoders.append("MediaCodec:");
-    for (auto profile : qAsConst(profiles))
+    for (auto profile : std::as_const(profiles))
         Decoders.append(MythCodecContext::GetProfileDescription(profile.first, profile.second));
 }
 
 bool MythMediaCodecContext::HaveMediaCodec(bool Reinit /*=false*/)
 {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    static QMutex lock(QMutex::Recursive);
-#else
     static QRecursiveMutex lock;
-#endif
     static bool s_initialised = false;
     static bool s_available   = false;
 
@@ -528,7 +520,7 @@ bool MythMediaCodecContext::HaveMediaCodec(bool Reinit /*=false*/)
         {
             s_available = true;
             LOG(VB_GENERAL, LOG_INFO, LOC + "Supported/available MediaCodec decoders:");
-            for (auto profile : qAsConst(profiles))
+            for (auto profile : std::as_const(profiles))
             {
                 LOG(VB_GENERAL, LOG_INFO, LOC +
                     MythCodecContext::GetProfileDescription(profile.first, profile.second));

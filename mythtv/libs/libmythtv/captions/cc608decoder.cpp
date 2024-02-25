@@ -626,7 +626,7 @@ QString CC608Decoder::ToASCII(const QString &cc608str, bool suppress_unknown)
 {
     QString ret = "";
 
-    for (const auto& cp : qAsConst(cc608str))
+    for (const auto& cp : std::as_const(cc608str))
     {
         int cpu = cp.unicode();
         if (cpu == 0)

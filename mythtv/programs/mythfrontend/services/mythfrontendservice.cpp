@@ -48,13 +48,13 @@ class FrontendActions
         {
             QStringList contexts = bindings->GetContexts();
             contexts.sort();
-            for (const QString & context : qAsConst(contexts))
+            for (const QString & context : std::as_const(contexts))
             {
                 m_actionDescriptions[context].clear();
                 QStringList ctxactions = bindings->GetActions(context);
                 ctxactions.sort();
                 m_actions << ctxactions;
-                for (const QString & actions : qAsConst(ctxactions))
+                for (const QString & actions : std::as_const(ctxactions))
                 {
                     QString desc = actions + "," + bindings->GetActionDescription(context, actions);
                     m_actionDescriptions[context].append(desc);
@@ -66,7 +66,7 @@ class FrontendActions
         m_actions.sort();
 
         // Build actions that have an implicit value (e.g. SELECTSUBTITLE_0)
-        for (const auto & action : qAsConst(m_actions))
+        for (const auto & action : std::as_const(m_actions))
             if (action.startsWith("select", Qt::CaseInsensitive) && action.contains("_"))
                 m_selectActions.append(action);
 
@@ -201,7 +201,7 @@ FrontendActionList* MythFrontendService::GetActionList(const QString& Context)
 
         // TODO can we keep the context data with QMap<QString, QStringList>?
         QStringList actions = contexts.value();
-        for (const QString & action : qAsConst(actions))
+        for (const QString & action : std::as_const(actions))
         {
             QStringList split = action.split(",");
             if (split.size() == 2)

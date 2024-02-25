@@ -6,11 +6,7 @@
 // Qt headers
 #include <QString>
 #include <QStringList>
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-#include <QMutex>
-#else
 #include <QRecursiveMutex>
-#endif
 #include <QMap>
 
 // MythTV headers
@@ -68,11 +64,7 @@ class SatIPStreamHandler : public StreamHandler
     QUrl         m_tuningurl;
     QUrl         m_oldtuningurl;
     bool         m_setupinvoked   {false};
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex       m_tunelock       {QMutex::Recursive};
-#else
     QRecursiveMutex m_tunelock;
-#endif
     QStringList  m_oldpids;
 
   public:

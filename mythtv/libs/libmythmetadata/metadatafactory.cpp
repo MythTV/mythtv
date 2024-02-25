@@ -440,16 +440,16 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
     QList<PersonInfo> actors = lookup->GetPeople(kPersonActor);
     QList<PersonInfo> gueststars = lookup->GetPeople(kPersonGuestStar);
 
-    for (const auto& actor : qAsConst(gueststars))
+    for (const auto& actor : std::as_const(gueststars))
         actors.append(actor);
 
     VideoMetadata::cast_list cast;
     QStringList cl;
 
-    for (const auto& actor : qAsConst(actors))
+    for (const auto& actor : std::as_const(actors))
         cl.append(actor.name);
 
-    for (const auto& name : qAsConst(cl))
+    for (const auto& name : std::as_const(cl))
     {
         QString cn = name.trimmed();
         if (!cn.isEmpty())
@@ -464,7 +464,7 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
     VideoMetadata::genre_list video_genres;
     QStringList genres = lookup->GetCategories();
 
-    for (const auto& str : qAsConst(genres))
+    for (const auto& str : std::as_const(genres))
     {
         QString genre_name = str.trimmed();
         if (!genre_name.isEmpty())
@@ -479,7 +479,7 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
     VideoMetadata::country_list video_countries;
     QStringList countries = lookup->GetCountries();
 
-    for (const auto& str : qAsConst(countries))
+    for (const auto& str : std::as_const(countries))
     {
         QString country_name = str.trimmed();
         if (!country_name.isEmpty())
@@ -628,7 +628,7 @@ void MetadataFactory::customEvent(QEvent *levent)
             VideoMetadataListManager::loadAllFromDatabase(ml);
             m_mlm->setList(ml);
 
-            for (int id : qAsConst(additions))
+            for (int id : std::as_const(additions))
             {
                 VideoMetadata *metadata = m_mlm->byID(id).get();
 

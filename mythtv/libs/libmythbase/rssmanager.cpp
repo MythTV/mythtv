@@ -46,7 +46,7 @@ void RSSManager::doUpdate()
 {
     m_sites = findAllDBRSS();
 
-    for (const auto *site : qAsConst(m_sites))
+    for (const auto *site : std::as_const(m_sites))
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Updating RSS Feed %1") .arg(site->GetTitle()));
@@ -84,7 +84,7 @@ void RSSManager::processAndInsertRSS(RSSSite *site)
     clearRSSArticles(site->GetTitle(), site->GetType());
 
     ResultItem::resultList rss = site->GetVideoList();
-    for (auto *video : qAsConst(rss))
+    for (auto *video : std::as_const(rss))
     {
         // Insert in the DB here.
         insertRSSArticleInDB(site->GetTitle(), video, site->GetType());
@@ -226,7 +226,7 @@ void RSSSite::process(void)
         Parse parser;
         items = Parse::parseRSS(domDoc);
 
-        for (const auto *item : qAsConst(items))
+        for (const auto *item : std::as_const(items))
         {
             insertRSSArticle(new ResultItem(
                item->GetTitle(), item->GetSortTitle(),

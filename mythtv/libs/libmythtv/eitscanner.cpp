@@ -226,7 +226,7 @@ void EITScanner::StopEITEventProcessing(void)
         return;
 
     LOG(VB_EIT, LOG_INFO, LOC +
-        QString("Stop EIT event processing for source %1 '%2', added %3 EIT events")
+        QString("Stop EIT scan source %1 '%2', added %3 EIT events")
             .arg(m_sourceid).arg(m_sourceName).arg(m_eitCount));
 
     if (m_eitCount)
@@ -295,9 +295,12 @@ void EITScanner::StartActiveScan(TVRec *rec, std::chrono::seconds max_seconds_pe
         // Also, from now on, always start on the next channel.
         // This makes sure the immediately following channels get scanned
         // in a timely manner if we keep erroring out on the previous channel.
-        auto nextChanIndex = MythRandom() % m_activeScanChannels.size();
-        m_activeScanNextChan = m_activeScanChannels.begin() + nextChanIndex;
 
+        if (!m_activeScanChannels.empty())
+        {
+            auto nextChanIndex = MythRandom() % m_activeScanChannels.size();
+            m_activeScanNextChan = m_activeScanChannels.begin() + nextChanIndex;
+        }
         uint sourceid = m_rec->GetSourceID();
         QString sourcename = SourceUtil::GetSourceName(sourceid);
         LOG(VB_EIT, LOG_INFO, LOC +

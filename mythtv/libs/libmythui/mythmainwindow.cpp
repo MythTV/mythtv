@@ -322,7 +322,7 @@ MythScreenStack *MythMainWindow::GetMainStack()
 
 MythScreenStack *MythMainWindow::GetStack(const QString& Stackname)
 {
-    for (auto * widget : qAsConst(m_priv->m_stackList))
+    for (auto * widget : std::as_const(m_priv->m_stackList))
         if (widget->objectName() == Stackname)
             return widget;
     return nullptr;
@@ -352,7 +352,7 @@ void MythMainWindow::Animate(void)
         QVector<MythScreenType *> drawList;
         (*it)->GetDrawOrder(drawList);
 
-        for (auto *screen : qAsConst(drawList))
+        for (auto *screen : std::as_const(drawList))
         {
             screen->Pulse();
 
@@ -369,7 +369,7 @@ void MythMainWindow::Animate(void)
     if (redraw && !m_painterWin->RenderIsShared())
         m_painterWin->update(m_repaintRegion);
 
-    for (auto *widget : qAsConst(m_priv->m_stackList))
+    for (auto *widget : std::as_const(m_priv->m_stackList))
         widget->ScheduleInitIfNeeded();
 }
 
@@ -400,7 +400,7 @@ void MythMainWindow::drawScreen(QPaintEvent* Event)
             QVector<MythScreenType *> redrawList;
             (*it)->GetDrawOrder(redrawList);
 
-            for (const auto *screen : qAsConst(redrawList))
+            for (const auto *screen : std::as_const(redrawList))
             {
                 if (screen->NeedsRedraw())
                 {
@@ -459,7 +459,7 @@ void MythMainWindow::Draw(MythPainter* Painter)
         {
             QVector<MythScreenType *> redrawList;
             (*it)->GetDrawOrder(redrawList);
-            for (auto *screen : qAsConst(redrawList))
+            for (auto *screen : std::as_const(redrawList))
                 screen->Draw(Painter, 0, 0, 255, rect);
         }
     }
@@ -634,6 +634,7 @@ bool MythMainWindow::event(QEvent *Event)
 void MythMainWindow::LoadQtConfig()
 {
     gCoreContext->ResetLanguage();
+    gCoreContext->ResetAudioLanguage();
     GetMythUI()->ClearThemeCacheDir();
     QApplication::setStyle("Windows");
 }
@@ -1027,7 +1028,7 @@ void MythMainWindow::SetDrawEnabled(bool Enable)
 
 void MythMainWindow::SetEffectsEnabled(bool Enable)
 {
-    for (auto *widget : qAsConst(m_priv->m_stackList))
+    for (auto *widget : std::as_const(m_priv->m_stackList))
     {
         if (Enable)
             widget->EnableEffects();
@@ -1938,11 +1939,11 @@ void MythMainWindow::customEvent(QEvent* Event)
         // actions which would not be appropriate when the screen doesn't have
         // focus. It is the programmers responsibility to ignore events when
         // necessary.
-        for (auto * widget : qAsConst(m_priv->m_stackList))
+        for (auto * widget : std::as_const(m_priv->m_stackList))
         {
             QVector<MythScreenType*> screenList;
             widget->GetScreenList(screenList);
-            for (auto * screen : qAsConst(screenList))
+            for (auto * screen : std::as_const(screenList))
                 if (screen)
                     screen->mediaEvent(me);
         }

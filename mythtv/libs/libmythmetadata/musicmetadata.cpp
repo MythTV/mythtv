@@ -1204,7 +1204,7 @@ void MusicMetadata::setEmbeddedAlbumArt(AlbumArtList &albumart)
     if (!m_albumArt)
         m_albumArt = new AlbumArtImages(this, false);
 
-    for (auto *art : qAsConst(albumart))
+    for (auto *art : std::as_const(albumart))
     {
         art->m_filename = QString("%1-%2").arg(m_id).arg(art->m_filename);
         m_albumArt->addImage(art);
@@ -1605,7 +1605,7 @@ void AllMusic::resync()
 
     // get a list of tracks in our cache that's now not in the database
     QList<MusicMetadata::IdType> deleteList;
-    for (const auto *track : qAsConst(m_allMusic))
+    for (const auto *track : std::as_const(m_allMusic))
     {
         if (!idList.contains(track->ID()))
         {
@@ -1661,7 +1661,7 @@ bool AllMusic::updateMetadata(int an_id, MusicMetadata *the_track)
 /// \brief Check each MusicMetadata entry and save those that have changed (ratings, etc.)
 void AllMusic::save(void)
 {
-    for (auto *item : qAsConst(m_allMusic))
+    for (auto *item : std::as_const(m_allMusic))
     {
         if (item->hasChanged())
             item->persist();
@@ -1703,7 +1703,7 @@ bool AllMusic::checkCDTrack(MusicMetadata *the_track)
 
 MusicMetadata* AllMusic::getCDMetadata(int the_track)
 {
-    for (auto *anit : qAsConst(m_cdData))
+    for (auto *anit : std::as_const(m_cdData))
     {
         if (anit->Track() == the_track)
         {
@@ -1901,7 +1901,7 @@ AlbumArtImages::AlbumArtImages(MusicMetadata *metadata, bool loadFromDB)
 AlbumArtImages::AlbumArtImages(MusicMetadata *metadata, const AlbumArtImages &other)
     : m_parent(metadata)
 {
-    for (const auto &srcImage : qAsConst(other.m_imageList))
+    for (const auto &srcImage : std::as_const(other.m_imageList))
     {
         m_imageList.append(new AlbumArtImage(srcImage));
     }
@@ -2116,7 +2116,7 @@ void AlbumArtImages::scanForImages()
 
 AlbumArtImage *AlbumArtImages::getImage(ImageType type)
 {
-    for (auto *item : qAsConst(m_imageList))
+    for (auto *item : std::as_const(m_imageList))
     {
         if (item->m_imageType == type)
             return item;
@@ -2127,7 +2127,7 @@ AlbumArtImage *AlbumArtImages::getImage(ImageType type)
 
 AlbumArtImage *AlbumArtImages::getImageByID(int imageID)
 {
-    for (auto *item : qAsConst(m_imageList))
+    for (auto *item : std::as_const(m_imageList))
     {
         if (item->m_id == imageID)
             return item;
@@ -2140,7 +2140,7 @@ QStringList AlbumArtImages::getImageFilenames(void) const
 {
     QStringList paths;
 
-    for (const auto *item : qAsConst(m_imageList))
+    for (const auto *item : std::as_const(m_imageList))
         paths += item->m_filename;
 
     return paths;
@@ -2237,7 +2237,7 @@ void AlbumArtImages::addImage(const AlbumArtImage * const newImage)
     // do we already have an image of this type?
     AlbumArtImage *image = nullptr;
 
-    for (auto *item : qAsConst(m_imageList))
+    for (auto *item : std::as_const(m_imageList))
     {
         if (item->m_imageType == newImage->m_imageType
             && item->m_embedded == newImage->m_embedded)
@@ -2295,7 +2295,7 @@ void AlbumArtImages::dumpToDatabase(void)
     }
 
     // now add the albumart to the db
-    for (auto *image : qAsConst(m_imageList))
+    for (auto *image : std::as_const(m_imageList))
     {
         //TODO: for the moment just ignore artist images
         if (image->m_imageType == IT_ARTIST)

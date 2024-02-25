@@ -110,7 +110,7 @@ void MythTranslation::reload()
              ++it)
             keys.append(it.key());
 
-        for (const auto& key : qAsConst(keys))
+        for (const auto& key : std::as_const(keys))
             load(key);
     }
 }

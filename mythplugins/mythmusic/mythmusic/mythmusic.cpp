@@ -466,7 +466,7 @@ static QStringList BuildFileList(const QString &dir, const QStringList &filters)
     if (list.isEmpty())
         return ret;
 
-    for (const auto & fi : qAsConst(list))
+    for (const auto & fi : std::as_const(list))
     {
         if (fi.isDir())
         {
@@ -574,7 +574,7 @@ static void handleMedia(MythMediaDevice *cd)
 
     // Read track metadata and add to all_music
     int track = 0;
-    for (const auto & file : qAsConst(trackList))
+    for (const auto & file : std::as_const(trackList))
     {
         QScopedPointer<MusicMetadata> meta(MetaIO::readMetadata(file));
         if (meta)

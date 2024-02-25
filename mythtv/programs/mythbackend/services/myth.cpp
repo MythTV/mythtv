@@ -603,7 +603,7 @@ DTC::FrontendList *Myth::GetFrontends( bool OnLine )
     else
         frontends = gBackendContext->GetFrontends();
 
-    for (auto * fe : qAsConst(frontends))
+    for (auto * fe : std::as_const(frontends))
     {
         DTC::Frontend *pFrontend = pList->AddNewFrontend();
         pFrontend->setName(fe->m_name);

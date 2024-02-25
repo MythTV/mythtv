@@ -37,7 +37,7 @@ namespace
                    const QStringList &image_extensions) :
             m_videoFiles(video_files)
         {
-            for (const auto& ext : qAsConst(image_extensions))
+            for (const auto& ext : std::as_const(image_extensions))
                 m_imageExt.insert(ext.toLower());
         }
 
@@ -91,7 +91,7 @@ VideoScannerThread::~VideoScannerThread()
 void VideoScannerThread::SetHosts(const QStringList &hosts)
 {
     m_liveSGHosts.clear();
-    for (const auto& host : qAsConst(hosts))
+    for (const auto& host : std::as_const(hosts))
         m_liveSGHosts << host.toLower();
 }
 
@@ -165,7 +165,7 @@ void VideoScannerThread::run()
 
     QList<QByteArray> image_types = QImageReader::supportedImageFormats();
     QStringList imageExtensions;
-    for (const auto & format : qAsConst(image_types))
+    for (const auto & format : std::as_const(image_types))
         imageExtensions.push_back(QString(format));
 
     LOG(VB_GENERAL, LOG_INFO, QString("Beginning Video Scan."));
@@ -176,7 +176,7 @@ void VideoScannerThread::run()
     if (m_hasGUI)
         SendProgressEvent(counter, (uint)m_directories.size(),
                           tr("Searching for video files"));
-    for (const auto & dir : qAsConst(m_directories))
+    for (const auto & dir : std::as_const(m_directories))
     {
         if (!buildFileList(dir, imageExtensions, fs_files))
         {
@@ -207,11 +207,11 @@ void VideoScannerThread::run()
 
         QStringList slist;
 
-        for (int id : qAsConst(m_addList))
+        for (int id : std::as_const(m_addList))
             slist << QString("added::%1").arg(id);
-        for (int id : qAsConst(m_movList))
+        for (int id : std::as_const(m_movList))
             slist << QString("moved::%1").arg(id);
-        for (int id : qAsConst(m_delList))
+        for (int id : std::as_const(m_delList))
             slist << QString("deleted::%1").arg(id);
 
         MythEvent me("VIDEO_LIST_CHANGE", slist);

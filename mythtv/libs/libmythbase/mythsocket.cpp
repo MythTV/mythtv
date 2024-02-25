@@ -100,15 +100,9 @@ MythSocket::MythSocket(
     connect(m_tcpSocket,  &QAbstractSocket::connected,
             this, &MythSocket::ConnectHandler,
             Qt::DirectConnection);
-#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-    connect(m_tcpSocket, qOverload<QAbstractSocket::SocketError>(&QAbstractSocket::error),
-            this, &MythSocket::ErrorHandler,
-            Qt::DirectConnection);
-#else
     connect(m_tcpSocket,  &QAbstractSocket::errorOccurred,
             this, &MythSocket::ErrorHandler,
             Qt::DirectConnection);
-#endif
     connect(m_tcpSocket,  &QIODevice::aboutToClose,
             this, &MythSocket::AboutToCloseHandler);
     connect(m_tcpSocket,  &QAbstractSocket::disconnected,

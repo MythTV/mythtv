@@ -63,7 +63,7 @@ bool TeletextScreen::Create()
 void TeletextScreen::ClearScreen()
 {
     DeleteAllChildren();
-    for (const auto & img : qAsConst(m_rowImages))
+    for (const auto & img : std::as_const(m_rowImages))
         delete img;
     m_rowImages.clear();
     SetRedraw();

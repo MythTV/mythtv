@@ -684,7 +684,7 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
         LOG(VB_GENERAL, LOG_INFO, LOC + msg);
     }
 
-    for (const auto & pend : qAsConst(m_pendingRecordings))
+    for (const auto & pend : std::as_const(m_pendingRecordings))
         delete pend.m_info;
     m_pendingRecordings.clear();
 
@@ -3176,7 +3176,7 @@ void TVRec::SetChannel(const QString& name, uint requestType)
 bool TVRec::QueueEITChannelChange(const QString &name)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC +
-        QString("QueueEITChannelChange(%1) -- begin").arg(name));
+        QString("QueueEITChannelChange(%1)").arg(name));
 
     bool ok = false;
     if (m_setChannelLock.tryLock())
@@ -3193,8 +3193,8 @@ bool TVRec::QueueEITChannelChange(const QString &name)
         m_setChannelLock.unlock();
     }
 
-    LOG(VB_CHANNEL, LOG_INFO, LOC +
-        QString("QueueEITChannelChange(%1) -- end --> %2")
+    LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+         QString("QueueEITChannelChange(%1) %2")
             .arg(name, ok ? "done" : "failed"));
 
     return ok;
@@ -3700,7 +3700,8 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
  */
 void TVRec::TuningFrequency(const TuningRequest &request)
 {
-    LOG(VB_GENERAL, LOG_INFO, LOC + "TuningFrequency");
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("TuningFrequency(%1)")
+        .arg(request.toString()));
 
     DTVChannel *dtvchan = GetDTVChannel();
     if (dtvchan)
@@ -3785,7 +3786,6 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Failed to set channel to %1.").arg(channum));
     }
-
 
     bool mpts_only = GetDTVChannel() &&
                      GetDTVChannel()->GetFormat().compare("MPTS") == 0;
@@ -4881,6 +4881,8 @@ TVRec* TVRec::GetTVRec(uint inputid)
 
 void TVRec::EnableActiveScan(bool enable)
 {
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("enable:%1").arg(enable));
+
     if (m_scanner != nullptr)
     {
         if (enable)
@@ -4907,8 +4909,10 @@ void TVRec::EnableActiveScan(bool enable)
 QString TuningRequest::toString(void) const
 {
     return QString("Program(%1) channel(%2) input(%3) flags(%4)")
-        .arg((m_program == nullptr) ? QString("NULL") : m_program->toString(),
-             m_channel, m_input, TVRec::FlagToString(m_flags));
+        .arg(m_program == nullptr ? "NULL" : m_program->toString(),
+             m_channel.isEmpty() ? "<empty>" : m_channel,
+             m_input.isEmpty() ? "<empty>" : m_input,
+             TVRec::FlagToString(m_flags));
 }
 
 #ifdef USING_DVB

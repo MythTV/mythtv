@@ -779,7 +779,7 @@ void SmartPlaylistEditor::saveClicked(void)
     }
 
     // save smartplaylist items
-    for (const auto & row : qAsConst(m_criteriaRows))
+    for (const auto & row : std::as_const(m_criteriaRows))
         row->saveToDatabase(ID);
 
     emit smartPLChanged(category, name);
@@ -984,7 +984,7 @@ QString SmartPlaylistEditor::getWhereClause(void)
     bool bFirst = true;
     QString sql = "WHERE ";
 
-    for (const auto & row : qAsConst(m_criteriaRows))
+    for (const auto & row : std::as_const(m_criteriaRows))
     {
         QString criteria = row->getSQL();
         if (criteria.isEmpty())

@@ -491,13 +491,13 @@ void MythDisplayMutter::UpdateResources()
     for (auto & output : m_outputs)
     {
         QStringList possiblecrtcs;
-        for (auto poss : qAsConst(output.possible_crtcs))
+        for (auto poss : std::as_const(output.possible_crtcs))
             possiblecrtcs.append(QString::number(poss));
         QStringList modes;
-        for (auto mode : qAsConst(output.modes))
+        for (auto mode : std::as_const(output.modes))
             modes.append(QString::number(mode));
         QStringList props;
-        for (const auto& prop : qAsConst(output.properties))
+        for (const auto& prop : std::as_const(output.properties))
             props.append(QString("%1:%2").arg(prop.first, prop.second.variant().toString()));
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("Output %1/%2: CRTC: %3 Possible CRTCs: %4 Name: '%5'")

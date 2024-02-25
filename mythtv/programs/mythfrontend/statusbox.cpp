@@ -852,7 +852,7 @@ void StatusBox::doTunerStatus()
         }
     }
 
-    for (int inputid : qAsConst(inputids))
+    for (int inputid : std::as_const(inputids))
     {
         QStringList statuslist;
         if (info[inputid].m_errored)
@@ -1201,7 +1201,7 @@ void StatusBox::doMachineStatus()
     AddLogLine("   " + tr("Qt version") + QString(": %1").arg(qVersion()));
 
     QList allInterfaces = QNetworkInterface::allInterfaces();
-    for (const QNetworkInterface & iface : qAsConst(allInterfaces))
+    for (const QNetworkInterface & iface : std::as_const(allInterfaces))
     {
         QNetworkInterface::InterfaceFlags f = iface.flags();
         if (!(f & QNetworkInterface::IsUp))
@@ -1216,7 +1216,7 @@ void StatusBox::doMachineStatus()
         AddLogLine("   " + name + QString(" (%1): ").arg(iface.humanReadableName()));
         AddLogLine("        " + tr("MAC Address") + ": " + iface.hardwareAddress());
         QList addresses = iface.addressEntries();
-        for (const QNetworkAddressEntry & addr : qAsConst(addresses))
+        for (const QNetworkAddressEntry & addr : std::as_const(addresses))
         {
             if (addr.ip().protocol() == QAbstractSocket::IPv4Protocol ||
                 addr.ip().protocol() == QAbstractSocket::IPv6Protocol)
@@ -1445,7 +1445,7 @@ void StatusBox::doDecoderStatus()
     }
     else
     {
-        for (const QString & decoder : qAsConst(decoders))
+        for (const QString & decoder : std::as_const(decoders))
             AddLogLine(decoder);
     }
 }
@@ -1462,7 +1462,7 @@ void StatusBox::doDisplayStatus()
         m_justHelpText->SetText(displayhelp);
 
     auto desc = GetMythMainWindow()->GetDisplay()->GetDescription();
-    for (const auto & line : qAsConst(desc))
+    for (const auto & line : std::as_const(desc))
         AddLogLine(line);
 }
 
@@ -1548,7 +1548,7 @@ void StatusBox::doRenderStatus()
         }
 
         auto desc = render->GetDescription();
-        for (const auto & line : qAsConst(desc))
+        for (const auto & line : std::as_const(desc))
             AddLogLine(line);
     }
 }

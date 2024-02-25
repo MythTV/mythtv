@@ -194,11 +194,7 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
         return;
 
     QString line = listline[0].simplified();
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList tokens = line.split(' ', QString::SkipEmptyParts);
-#else
     QStringList tokens = line.split(' ', Qt::SkipEmptyParts);
-#endif
     QString command = tokens[0];
 
     bool handled = false;

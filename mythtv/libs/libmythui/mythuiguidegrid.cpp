@@ -289,7 +289,7 @@ void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     p->SetClipRect(clipRect);
     for (int i = 0; i < m_rowCount; i++)
     {
-        for (auto *data : qAsConst(m_allData[i]))
+        for (auto *data : std::as_const(m_allData[i]))
         {
             if (data->m_recStat == 0)
                 drawBackground(p, xoffset, yoffset, data, alphaMod);
@@ -307,7 +307,7 @@ void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
     for (int i = 0; i < m_rowCount; i++)
     {
-        for (auto *data : qAsConst(m_allData[i]))
+        for (auto *data : std::as_const(m_allData[i]))
         {
             drawRecDecoration(p, xoffset, yoffset, data, alphaMod);
         }
@@ -703,7 +703,7 @@ bool MythUIGuideGrid::parseDefaultCategoryColors(QMap<QString, QString> &catColo
     QFile f;
     QStringList searchpath = GetMythUI()->GetThemeSearchPath();
 
-    for (const auto & path : qAsConst(searchpath))
+    for (const auto & path : std::as_const(searchpath))
     {
         f.setFileName(path + "categories.xml");
 

@@ -104,7 +104,6 @@ if(ENABLE_BINDINGS_PYTHON)
         lxml
         pip>=23.0.1
         requests
-        simplejson
         wheel)
   endif()
 

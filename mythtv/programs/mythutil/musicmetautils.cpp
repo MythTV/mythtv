@@ -487,7 +487,7 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
 
     QStringList scripts;
 
-    for (const auto& fi : qAsConst(list))
+    for (const auto& fi : std::as_const(list))
     {
         LOG(VB_GENERAL, LOG_NOTICE, QString("Found lyric script at: %1").arg(fi.filePath()));
         scripts.append(fi.filePath());

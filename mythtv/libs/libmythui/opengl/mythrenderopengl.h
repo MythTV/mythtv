@@ -25,11 +25,7 @@
 #include <QtOpenGL/QOpenGLDebugLogger>
 #endif
 #include <QHash>
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-#include <QMutex>
-#else
 #include <QRecursiveMutex>
-#endif
 #include <QMatrix4x4>
 #include <QStack>
 
@@ -220,11 +216,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     QList<uint64_t>              m_vboExpiry;
 
     // Locking
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex     m_lock { QMutex::Recursive };
-#else
     QRecursiveMutex  m_lock;
-#endif
     int        m_lockLevel { 0 };
 
     // profile

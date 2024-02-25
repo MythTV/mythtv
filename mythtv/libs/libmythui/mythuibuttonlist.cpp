@@ -1541,7 +1541,7 @@ void MythUIButtonList::SetValueByData(const QVariant& data)
     if (!m_initialized)
         Init();
 
-    for (auto *item : qAsConst(m_itemList))
+    for (auto *item : std::as_const(m_itemList))
     {
         if (item->GetData() == data)
         {
@@ -1683,7 +1683,7 @@ MythUIButtonListItem *MythUIButtonList::GetItemByData(const QVariant& data)
     if (!m_initialized)
         Init();
 
-    for (auto *item : qAsConst(m_itemList))
+    for (auto *item : std::as_const(m_itemList))
     {
         if (item->GetData() == data)
             return item;
@@ -2491,7 +2491,7 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *event)
     handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
 
     // Handle action remappings
-    for (const QString& action : qAsConst(actions))
+    for (const QString& action : std::as_const(actions))
     {
         if (!m_actionRemap.contains(action))
             continue;
@@ -2927,11 +2927,7 @@ bool MythUIButtonList::ParseElement(
             {
                 QString context = element.attribute("context", "");
                 QString keylist = MythMainWindow::GetKey(context, action);
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                QStringList keys = keylist.split(',', QString::SkipEmptyParts);
-#else
                 QStringList keys = keylist.split(',', Qt::SkipEmptyParts);
-#endif
                 if (!keys.empty())
                     m_actionRemap[trigger] = keys[0];
             }
@@ -3384,12 +3380,7 @@ bool MythUIButtonListItem::FindText(const QString &searchStr, const QString &fie
     }
     else
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList fields = fieldList.split(',', QString::SkipEmptyParts);
-#else
         QStringList fields = fieldList.split(',', Qt::SkipEmptyParts);
-#endif
-
         for (int x = 0; x < fields.count(); ++x)
         {
             if (m_strings.contains(fields.at(x).trimmed()))

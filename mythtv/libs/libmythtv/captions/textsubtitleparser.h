@@ -77,11 +77,7 @@ class TextSubtitles : public QObject
     // change from true to false after a recording completes.
     bool                      m_isInProgress     {false};
     bool                      m_hasSubtitles     {false};
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex                    m_lock             {QMutex::Recursive};
-#else
     QRecursiveMutex           m_lock;
-#endif
 };
 
 class SubtitleReader;

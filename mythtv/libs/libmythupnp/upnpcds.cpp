@@ -44,7 +44,7 @@ void UPnpCDSExtensionResults::Add( CDSObject *pObject )
 
 void UPnpCDSExtensionResults::Add( const CDSObjects& objects )
 {
-    for (auto *const object : qAsConst(objects))
+    for (auto *const object : std::as_const(objects))
     {
         object->IncrRef();
         m_List.append( object );
@@ -60,7 +60,7 @@ QString UPnpCDSExtensionResults::GetResultXML(FilterMap &filter,
 {
     QString sXML;
 
-    for (auto *item : qAsConst(m_List))
+    for (auto *item : std::as_const(m_List))
         sXML += item->toXml(filter, ignoreChildren);
 
     return sXML;
@@ -572,13 +572,8 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
 
     static const QRegularExpression re {"\\b(or|and)\\b", QRegularExpression::CaseInsensitiveOption};
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    request.m_sSearchList  = request.m_sSearchCriteria.split(
-        re, QString::SkipEmptyParts);
-#else
     request.m_sSearchList  = request.m_sSearchCriteria.split(
         re, Qt::SkipEmptyParts);
-#endif
     request.m_sSearchClass = "object";  // Default to all objects.
 
     // ----------------------------------------------------------------------
@@ -592,12 +587,7 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     {
         if ((*it).contains("upnp:class derivedfrom", Qt::CaseInsensitive))
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList sParts = (*it).split(' ', QString::SkipEmptyParts);
-#else
             QStringList sParts = (*it).split(' ', Qt::SkipEmptyParts);
-#endif
-
             if (sParts.count() > 2)
             {
                 request.m_sSearchClass = sParts[2].trimmed();

@@ -79,7 +79,7 @@ QStringList SatIP::doUPNPsearch(bool loginfo)
     EntryMap map;
     satipservers->GetEntryMap(map);
 
-    for (auto *BE : qAsConst(map))
+    for (auto *BE : std::as_const(map))
     {
         QString friendlyName = BE->GetFriendlyName();
         UPnpDeviceDesc *desc = BE->GetDeviceDesc();

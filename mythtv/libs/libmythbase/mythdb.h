@@ -7,7 +7,6 @@
 #include "mythbaseexp.h"
 #include "mythdbcon.h"
 #include "mythdbparams.h"
-#include "qtuplift.h"
 
 class MythDBPrivate;
 class MDBManager;

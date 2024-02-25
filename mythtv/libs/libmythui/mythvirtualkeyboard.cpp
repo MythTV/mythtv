@@ -285,7 +285,7 @@ void MythUIVirtualKeyboard::parseKey(const QDomElement &element)
 void MythUIVirtualKeyboard::updateKeys(bool connectSignals)
 {
     QList<MythUIType *> *children = GetAllChildren();
-    for (auto *child : qAsConst(*children))
+    for (auto *child : std::as_const(*children))
     {
         auto *button = dynamic_cast<MythUIButton *>(child);
         if (button)
@@ -645,11 +645,7 @@ void MythUIVirtualKeyboard::loadEventKeyDefinitions(
     const QString &action)
 {
     QString keylist = MythMainWindow::GetKey("Global", action);
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList keys = keylist.split(',', QString::SkipEmptyParts);
-#else
     QStringList keys = keylist.split(',', Qt::SkipEmptyParts);
-#endif
     if (keys.empty())
         return;
 

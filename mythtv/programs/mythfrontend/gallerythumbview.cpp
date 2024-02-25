@@ -85,19 +85,11 @@ public:
         int total = std::accumulate(keys.cbegin(), keys.cend(), 0, add_size);
 
         int progressSize = 0;
-#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-        for (auto it = m_files.constKeyValueBegin();
-             it != m_files.constKeyValueEnd(); it++)
-        {
-            const ImagePtrK & im = (*it).first;
-            QString newPath = (*it).second;
-#else
         for (auto it = m_files.constKeyValueBegin();
              it != m_files.constKeyValueEnd(); it++)
         {
             const ImagePtrK & im = it->first;
             QString newPath = it->second;
-#endif
             // Update progress dialog
             if (m_dialog)
             {
@@ -415,7 +407,7 @@ void GalleryThumbView::customEvent(QEvent *event)
             QString url = m_view->GetCachedThumbUrl(id);
 
             // Set thumbnail for each button now it exists
-            for (const ThumbLocation & location : qAsConst(affected))
+            for (const ThumbLocation & location : std::as_const(affected))
             {
                 MythUIButtonListItem *button = location.first;
                 int                   index  = location.second;
@@ -436,25 +428,14 @@ void GalleryThumbView::customEvent(QEvent *event)
 
             if (!extra.isEmpty())
             {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                QStringList idDeleted =
-                        extra[0].split(",", QString::SkipEmptyParts);
-#else
                 QStringList idDeleted =
                         extra[0].split(",", Qt::SkipEmptyParts);
-#endif
-
                 RemoveImages(idDeleted);
             }
             if (extra.size() >= 2)
             {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                QStringList idChanged =
-                        extra[1].split(",", QString::SkipEmptyParts);
-#else
                 QStringList idChanged =
                         extra[1].split(",", Qt::SkipEmptyParts);
-#endif
                 RemoveImages(idChanged, false);
             }
 
@@ -472,7 +453,7 @@ void GalleryThumbView::customEvent(QEvent *event)
             m_thumbExists.clear();
 
             // Remove thumbs & images from image cache using supplied prefixes
-            for (const QString & url : qAsConst(extra))
+            for (const QString & url : std::as_const(extra))
                 GetMythUI()->RemoveFromCacheByFile(url);
 
             // Refresh display
@@ -593,7 +574,7 @@ void GalleryThumbView::customEvent(QEvent *event)
 */
 void GalleryThumbView::RemoveImages(const QStringList &ids, bool deleted)
 {
-    for (const QString & id : qAsConst(ids))
+    for (const QString & id : std::as_const(ids))
     {
         // Remove image from view
         QStringList urls = m_view->RemoveImage(id.toInt(), deleted);
@@ -601,7 +582,7 @@ void GalleryThumbView::RemoveImages(const QStringList &ids, bool deleted)
         m_thumbExists.remove(id.toInt());
 
         // Remove thumbs & images from image cache
-        for (const QString & url : qAsConst(urls))
+        for (const QString & url : std::as_const(urls))
         {
             LOG(VB_FILE, LOG_DEBUG, LOC +
                 QString("Clearing image cache of '%1'").arg(url));
@@ -684,7 +665,7 @@ void GalleryThumbView::BuildImageList()
     ImagePtrK  selected = m_view->GetSelected();
 
     // go through the entire list and update
-    for (const ImagePtrK & im : qAsConst(nodes))
+    for (const ImagePtrK & im : std::as_const(nodes))
     {
         if (im)
         {
@@ -943,7 +924,7 @@ void GalleryThumbView::UpdateScanProgress(const QString &scanner,
     // Aggregate all running scans
     int currentAgg = 0;
     int totalAgg = 0;
-    for (IntPair scan : qAsConst(m_scanProgress))
+    for (IntPair scan : std::as_const(m_scanProgress))
     {
         currentAgg += scan.first;
         totalAgg   += scan.second;
@@ -1622,7 +1603,7 @@ void GalleryThumbView::DoHideMarked(bool hide)
     else if (hide && !m_mgr.GetVisibility())
     {
         // Unmark invisible files
-        for (int id : qAsConst(m_menuState.m_markedId))
+        for (int id : std::as_const(m_menuState.m_markedId))
             m_view->Mark(id, false);
     }
 }
@@ -1959,7 +1940,7 @@ void GalleryThumbView::Copy(bool deleteAfter)
     // Update filepaths for Db & generate URLs for filesystem copy
     // Only copy files, destination dirs will be created automatically
     TransferThread::TransferMap transfers;
-    for (const ImagePtr & im : qAsConst(files))
+    for (const ImagePtr & im : std::as_const(files))
     {
         // Replace base path with destination path
         im->m_filePath = ImageManagerFe::ConstructPath(destDir->m_filePath,
@@ -1994,14 +1975,14 @@ void GalleryThumbView::Copy(bool deleteAfter)
                     .arg(failed.size()));
 
     // Don't update Db for files that failed
-    for (const ImagePtrK & im : qAsConst(failed))
+    for (const ImagePtrK & im : std::as_const(failed))
         transfers.remove(im);
 
     ImageListK newImages = transfers.keys();
 
     // Include dirs
     QStringList dirPaths;
-    for (const ImagePtr & im : qAsConst(dirs))
+    for (const ImagePtr & im : std::as_const(dirs))
     {
         QString relPath = im->m_filePath.mid(basePathSize);
 
@@ -2029,7 +2010,7 @@ void GalleryThumbView::Copy(bool deleteAfter)
             // Delete files/dirs that have been successfully copied
             // Will fail for dirs containing images that failed to copy
             ImageIdList ids;
-            for (const ImagePtrK & im : qAsConst(newImages))
+            for (const ImagePtrK & im : std::as_const(newImages))
                 ids << im->m_id;
 
             m_mgr.DeleteFiles(ids);
@@ -2095,7 +2076,7 @@ void GalleryThumbView::Move()
 
     // Determine destination URLs
     TransferThread::TransferMap transfers;
-    for (const QSharedPointer<ImageItem> & im : qAsConst(images))
+    for (const QSharedPointer<ImageItem> & im : std::as_const(images))
     {
         // Replace base path with destination path
         QString newPath = ImageManagerFe::ConstructPath(destDir->m_filePath,
@@ -2130,7 +2111,7 @@ void GalleryThumbView::Move()
                     .arg(failed.size()));
 
     // Don't update Db for files that failed
-    for (const ImagePtrK & im : qAsConst(failed))
+    for (const ImagePtrK & im : std::as_const(failed))
         transfers.remove(im);
 
     if (!transfers.isEmpty())
@@ -2138,7 +2119,7 @@ void GalleryThumbView::Move()
         ImageListK moved = transfers.keys();
 
         // Unmark moved files
-        for (const ImagePtrK & im : qAsConst(moved))
+        for (const ImagePtrK & im : std::as_const(moved))
             m_view->Mark(im->m_id, false);
 
         // Update Db

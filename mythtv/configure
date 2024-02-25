@@ -10,14 +10,14 @@
 #
 # All versioning information needed to create a release of MythTV.
 #
-MYTHTV_VERSION_MAJMIN="34.0"
-MYTHTV_LIBVERSION="34"
+MYTHTV_VERSION_MAJMIN="35.0"
+MYTHTV_LIBVERSION="35"
 # See mythtv/libs/libmythbase/mythversion.h.in
-MYTHTV_BINARY_VERSION="34.20220913-1"
+MYTHTV_BINARY_VERSION="35.20220913-1"
 # See bindings/python/MythTV/static.py.in
-MYTHTV_PYTHON_OWN_VERSION="(34,0,-1,0)"
+MYTHTV_PYTHON_OWN_VERSION="(35,0,-1,0)"
 # See python/MythTV/services_api/send.py.in
-MYTHTV_PYTHON_VERSION_LIST="('0.27', '0.28', '29', '30', '31', '32', '33', '34')"
+MYTHTV_PYTHON_VERSION_LIST="('0.27', '0.28', '29', '30', '31', '32', '33', '34', '35')"
 
 # Prevent locale nonsense from breaking basic text processing.
 LC_ALL=C
@@ -4771,8 +4771,8 @@ version2num(){
 }
 
 # Minimum supported Qt version
-QT5_MIN_VERSION_STR="5.12"
-QT6_MIN_VERSION_STR="6.0"
+QT5_MIN_VERSION_STR="5.15.2"
+QT6_MIN_VERSION_STR="6.4"
 
 # qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake
 if [ x"$qmake" = "xqmake" ]; then
@@ -6134,7 +6134,16 @@ case $ID in
        esac
 esac
 
-enabled vulkan && enabled libglslang && require_cpp libglslang glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang ${EXTRA_GLSLANG_LIBS:-} -lOSDependent -lHLSL -lOGLCompiler -lSPVRemapper -lSPIRV -lSPIRV-Tools-opt -lSPIRV-Tools -lpthread
+if enabled vulkan && enabled libglslang ; then
+    # Debian sid no longer ships the OSDependent and HLSL libraries,
+    # but vulkan support on that platform compiles fine without them.
+    # Test to see if these libraries are present, and if not, test
+    # again to see if the compile works without them.
+    GLSLANG_LIBS="${EXTRA_GLSLANG_LIBS:-} -lOSDependent -lSPVRemapper -lSPIRV -lSPIRV-Tools-opt -lSPIRV-Tools -lpthread"
+    check_lib_cpp glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang ${GLSLANG_LIBS} -lHLSL -lOGLCompiler \
+    || check_lib_cpp glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang ${GLSLANG_LIBS}  \
+    || die "ERROR: libglslang (or dependent) library not found"
+fi
 
 # Qt private headers are required for wayland extras and some DRM functionality on linux
 if enabled qtprivateheaders ; then

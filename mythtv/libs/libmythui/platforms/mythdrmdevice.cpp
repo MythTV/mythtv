@@ -131,7 +131,7 @@ MythDRMPtr MythDRMDevice::FindDevice(bool NeedPlanes)
         devices.append(s_mythDRMDevice);
     }
 
-    for (const auto & dev : qAsConst(devices))
+    for (const auto & dev : std::as_const(devices))
         if (auto device = MythDRMDevice::Create(nullptr, root + dev, NeedPlanes); device && device->Authenticated())
             return device;
 
@@ -838,7 +838,7 @@ QString MythDRMDevice::FindBestDevice()
         return {};
     }
 
-    for (const auto& dev : qAsConst(devices))
+    for (const auto& dev : std::as_const(devices))
     {
         QString device = root + dev;
         if (!ConfirmDevice(device))

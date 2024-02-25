@@ -38,11 +38,7 @@ class MythDRMPRIMEContext : public MythCodecContext
                                           MythCodecID     Failure,
                                           const QString  &CodecName,
                                           AVPixelFormat   Format);
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    static QMutex        s_drmPrimeLock;
-#else
     static QRecursiveMutex s_drmPrimeLock;
-#endif
     static QStringList   s_drmPrimeDecoders;
     MythOpenGLInterop   *m_interop { nullptr };
 };

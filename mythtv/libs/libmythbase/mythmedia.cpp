@@ -270,7 +270,7 @@ bool MythMediaDevice::ScanMediaType(const QString &directory, ext_cnt_t &cnt)
 
     d.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList entries = d.entryInfoList();
-    for (const auto& fi : qAsConst(entries))
+    for (const auto& fi : std::as_const(entries))
     {
         if (fi.isSymLink())
             continue;
@@ -300,7 +300,7 @@ void MythMediaDevice::RegisterMediaExtensions(uint mediatype,
                                               const QString &extensions)
 {
     QStringList exts = extensions.split(",");
-    for (const auto& ext : qAsConst(exts))
+    for (const auto& ext : std::as_const(exts))
         s_ext_to_media[ext] |= mediatype;
 }
 

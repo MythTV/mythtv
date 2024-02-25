@@ -595,13 +595,8 @@ int Transcode::TranscodeFile(const QString &inputname,
         QMap<QString, QString> recorderOptionsMap;
         if (!m_recorderOptions.isEmpty())
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList options = m_recorderOptions
-                .split(",", QString::SkipEmptyParts);
-#else
             QStringList options = m_recorderOptions
                 .split(",", Qt::SkipEmptyParts);
-#endif
             int loop = 0;
             while (loop < options.size())
             {

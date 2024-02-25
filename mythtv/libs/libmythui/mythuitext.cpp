@@ -75,7 +75,7 @@ MythUIText::~MythUIText()
     delete m_font;
     m_font = nullptr;
 
-    for (auto *layout : qAsConst(m_layouts))
+    for (auto *layout : std::as_const(m_layouts))
         delete layout;
 }
 
@@ -506,12 +506,7 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
                 range.start = pos;
                 range.length = -1;  // Need to find the end of the effect
                 range.format.setFont(fnt->face());
-#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-                range.format.setFontStyleHint(QFont::SansSerif,
-                                              QFont::OpenGLCompatible);
-#else
                 range.format.setFontStyleHint(QFont::SansSerif);
-#endif
                 range.format.setForeground(fnt->GetBrush());
             }
             else
@@ -665,7 +660,7 @@ bool MythUIText::LayoutParagraphs(const QStringList & paragraphs,
     bool    overflow = false;
     int     idx = 0;
 
-    for (auto *layout : qAsConst(m_layouts))
+    for (auto *layout : std::as_const(m_layouts))
         layout->clearLayout();
 
     for (Ipara = paragraphs.begin(), idx = 0;
@@ -881,13 +876,7 @@ void MythUIText::FillCutMessage(void)
         QTextOption textoption(static_cast<Qt::Alignment>(m_justification));
         textoption.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList paragraphs = m_cutMessage.split('\n',
-                                                    QString::KeepEmptyParts);
-#else
         QStringList paragraphs = m_cutMessage.split('\n', Qt::KeepEmptyParts);
-#endif
-
         for (int idx = m_layouts.size(); idx < paragraphs.size(); ++idx)
             m_layouts.push_back(new QTextLayout);
 

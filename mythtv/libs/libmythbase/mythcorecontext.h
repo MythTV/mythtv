@@ -15,7 +15,6 @@
 #include "mythlogging.h"
 #include "mythlocale.h"
 #include "mythsession.h"
-#include "qtuplift.h"
 
 static constexpr const char * MYTH_APPNAME_MYTHBACKEND { "mythbackend" };
 static constexpr const char * MYTH_APPNAME_MYTHJOBQUEUE { "mythjobqueue" };
@@ -236,6 +235,9 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     QString GetLanguage(void);
     QString GetLanguageAndVariant(void);
     void ResetLanguage(void);
+    QString GetAudioLanguage(void);
+    QString GetAudioLanguageAndVariant(void);
+    void ResetAudioLanguage(void);
     void ResetSockets(void);
 
     using PlaybackStartCb = void (QObject::*)(void);

@@ -252,7 +252,7 @@ public:
 
     void CheckDeletes()
     {
-        for (auto * screen : qAsConst(m_toDelete))
+        for (auto * screen : std::as_const(m_toDelete))
         {
             screen->SetAlpha(0);
             screen->SetVisible(false);
