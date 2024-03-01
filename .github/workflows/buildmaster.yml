@@ -13,7 +13,7 @@ jobs:
     name: build
     strategy:
       matrix:
-        os: ['ubuntu-20.04', 'ubuntu-22.04', 'macos-12', 'macos-13', 'macos-14']
+        os: ['ubuntu-22.04', 'macos-12', 'macos-13', 'macos-14']
         arch: ['x86_64', 'arm64']
         cc: ['gcc', 'clang']
         include:
@@ -22,8 +22,6 @@ jobs:
           - cc: 'clang'
             cxx: 'clang++'
         exclude:
-          - os: 'ubuntu-20.04'
-            arch: 'arm64'
           - os: 'ubuntu-22.04'
             arch: 'arm64'
           - os: 'macos-12'
@@ -41,7 +39,7 @@ jobs:
 
     steps:
       - name: Checkout master
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup build environment
         run: |
@@ -57,7 +55,7 @@ jobs:
       # storage limit.
       # See https://github.com/actions/cache/blob/471fb0c87e5d7210f339d8ea2e01505ddafd793d/workarounds.md#update-a-cache
       - name: Check ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.ccache
           key: ${{ matrix.os }}-${{ matrix.cc }}-ccache-${{ github.sha }}
