@@ -2327,7 +2327,7 @@ Sprwdź czy plik istnieje</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2692"/>
         <source>Startup Screen Delay</source>
-        <translation>Ekran Startowy</translation>
+        <translation>Pokazuj Ekran Startowy</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2696"/>
@@ -2337,7 +2337,7 @@ Sprwdź czy plik istnieje</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2707"/>
         <source>GUI text zoom percentage</source>
-        <translation>Zoom dla GUI (%)</translation>
+        <translation>Ustaw zoom dla GUI (%)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2712"/>
@@ -2347,7 +2347,7 @@ Sprwdź czy plik istnieje</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2855"/>
         <source>Use full range RGB output</source>
-        <translation>Pełny zakres RGB</translation>
+        <translation>Wyświetlaj w pełnym zakresie RGB</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2857"/>
@@ -2362,7 +2362,7 @@ Sprwdź czy plik istnieje</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2159"/>
         <source>Display on screen</source>
-        <translation>Wyświetl</translation>
+        <translation>Wyświetlaj na TV</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1525"/>
@@ -2609,7 +2609,7 @@ Sprwdź czy plik istnieje</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4784"/>
         <source>Localization</source>
-        <translation>Narodowwe</translation>
+        <translation>Ustawienia Narodowe</translation>
     </message>
 </context>
 <context>
@@ -3005,7 +3005,7 @@ Sprwdź czy plik istnieje</translation>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="1236"/>
         <source>Digital output device</source>
-        <translation>Oddzielne Urządzenie Audio</translation>
+        <translation>Dedykowane Urządzenie Audio</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="1250"/>
@@ -3015,7 +3015,7 @@ Sprwdź czy plik istnieje</translation>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="1260"/>
         <source>SPDIF 48kHz rate override</source>
-        <translation>Wymuś zawsze 48kHz w SPDIF</translation>
+        <translation>Wymuś w SPDIF zawsze 48kHz</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="1264"/>
@@ -5583,7 +5583,7 @@ Zabezpieczenia obowiązują aż do wyjścia do Głównego Manu.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="442"/>
         <source>Auto-Expire instead of delete recording</source>
-        <translation>Autokasuj zamiast skasować</translation>
+        <translation>Auto-kasuj zamiast kasować ręcznie</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="446"/>
@@ -7674,7 +7674,7 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="503"/>
         <source>Auto-Expire method</source>
-        <translation>Metoda Autkokasowania</translation>
+        <translation>Metoda auto-kasowania</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="505"/>
@@ -7719,7 +7719,7 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="554"/>
         <source>Live TV max age (days)</source>
-        <translation>Maksymalny czas dla TV na Żywo</translation>
+        <translation>Maksymalny wiek dla TV na Żywo</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="556"/>
@@ -7734,7 +7734,7 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="590"/>
         <source>If enabled, programs that have been marked as watched and are Auto-Expired will be re-recorded if they are shown again.</source>
-        <translation>Jeśli zaznaczone - nagranie ozanczone jako obejrzane i podlegające autokasowaniu będzie nagrane ponownie.</translation>
+        <translation>Jeśli zaznaczone - nagranie ozanczone jako obejrzane i podlegające auto-kasowaniu będzie nagrane ponownie.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="601"/>
@@ -7931,7 +7931,7 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4577"/>
         <source>General (Auto-Expire)</source>
-        <translation>Autokasowanie Nagrań</translation>
+        <translation>Auto-kasowanie Nagrań</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4595"/>
@@ -9289,7 +9289,7 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../html/htmlstrings.h" line="217"/>
         <source>There are no matching programs.</source>
-        <translation>Nie znaleziono pasujących programów</translation>
+        <translation>Nie znaleziono pasujących programów.</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="218"/>
@@ -9372,7 +9372,7 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../html/htmlstrings.h" line="240"/>
         <source>Auto-Expire</source>
-        <translation>Auto-Kasowanie</translation>
+        <translation>Auto-kasowanie</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="241"/>
@@ -9477,7 +9477,7 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../html/htmlstrings.h" line="272"/>
         <source>Allow Auto-Expire</source>
-        <translation>Pozwalaj na Auto-Kasowanie</translation>
+        <translation>Pozwalaj na Auto-kasowanie</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="275"/>
@@ -9722,7 +9722,7 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../html/htmlstrings.h" line="347"/>
         <source>There are no upcoming recordings.</source>
-        <translation>Brak przyszłych nagrań</translation>
+        <translation>Brak przyszłych nagrań.</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="349"/>
@@ -11130,7 +11130,7 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3318"/>
         <source>UDP notify port</source>
-        <translation>Port UDP dla powiadomień</translation>
+        <translation>Port UDP dla powiadomień na OSD</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3322"/>
@@ -11302,7 +11302,7 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2014"/>
         <source>Show suspend</source>
-        <translation>Pokazuj opcje &apos;uśpij&apos;</translation>
+        <translation>Uśpij (na tej maszynie)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2016"/>
@@ -12167,7 +12167,7 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="621"/>
         <source>Toggle the video aspect ratio</source>
-        <translation>Zmień aspekt Video</translation>
+        <translation>Zmień Aspekt Video</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="623"/>
@@ -12177,27 +12177,27 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="625"/>
         <source>Toggle any captions</source>
-        <translation>Zmień napisy</translation>
+        <translation>Włącz/Wyłącz Napisy</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="627"/>
         <source>Enable any captions</source>
-        <translation>Włącz napisy</translation>
+        <translation>Włącz Napisy</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="629"/>
         <source>Disable any captions</source>
-        <translation>Wyłącz napisy</translation>
+        <translation>Wyłącz Napisy</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="631"/>
         <source>Toggle Teletext Captions</source>
-        <translation>Zmień napisy z Teletextu</translation>
+        <translation>Włącz/Wyłącz Teletext</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="633"/>
         <source>Toggle Subtitles</source>
-        <translation>Zmień napisy</translation>
+        <translation>Włącz/Wyłącz Napisy</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="635"/>
@@ -12217,7 +12217,7 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="641"/>
         <source>Toggle External Subtitles</source>
-        <translation>Napisy z pliku On/Off</translation>
+        <translation>Włącz/Wyłącz Napisy z Pliku</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="643"/>
@@ -12232,7 +12232,7 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="647"/>
         <source>Toggle Text Subtitles</source>
-        <translation>Napisy tekstowe On/Off</translation>
+        <translation>Włącz/Wyłącz Napisy Tekstowe</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="650"/>
@@ -13582,7 +13582,7 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../libs/libmythui/mythdisplay.cpp" line="154"/>
         <source>Supported HDR formats	: %1</source>
-        <translation>Supported HDR formats	: %1</translation>
+        <translation>Wspierane formaty HDR	: %1</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythdisplay.cpp" line="156"/>
@@ -13612,7 +13612,7 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../libs/libmythui/mythdisplay.cpp" line="179"/>
         <source>Current screen	: %1 %2</source>
-        <translation>Current screen	: %1 %2</translation>
+        <translation>Aktualnie wyświetlający	: %1 %2</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythdisplay.cpp" line="181"/>
@@ -13622,12 +13622,12 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../libs/libmythui/mythdisplay.cpp" line="182"/>
         <source>Size</source>
-        <translation>Size</translation>
+        <translation>Rozmiar</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythdisplay.cpp" line="188"/>
         <source>Aspect ratio</source>
-        <translation>Aspect ratio</translation>
+        <translation>Proporcje obrazu</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythdisplay.cpp" line="192"/>
@@ -14408,22 +14408,22 @@ Proszę Czekać...</translation>
     <message>
         <location filename="../libs/libmythtv/mythsystemevent.cpp" line="441"/>
         <source>Client connected to master backend</source>
-        <translation>Klient podłączył się do głównego Backend&apos;u</translation>
+        <translation>Klient podłączył się do głównego Backend&apos;a</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythsystemevent.cpp" line="443"/>
         <source>Client disconnected from master backend</source>
-        <translation>Klient odłączył się od głównego Backend&apos;u</translation>
+        <translation>Klient odłączył się od głównego Backend&apos;a</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythsystemevent.cpp" line="445"/>
         <source>Slave backend connected to master</source>
-        <translation>Podrzędny Backend podłączył się do głównego Backend&apos;u</translation>
+        <translation>Podrzędny Backend podłączył się do głównego Backend&apos;a</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythsystemevent.cpp" line="447"/>
         <source>Slave backend disconnected from master</source>
-        <translation>Podrzędny Backend odłączył się od głównego Backend&apos;u</translation>
+        <translation>Podrzędny Backend odłączył się od głównego Backend&apos;a</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythsystemevent.cpp" line="449"/>
@@ -16428,7 +16428,7 @@ name cannot be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="786"/>
         <source>Max CPUs</source>
-        <translation>maks. rdzeni</translation>
+        <translation>Ilość rdzeni CPU dekodująca video (dla dekodowania programowego)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="789"/>
@@ -16650,7 +16650,7 @@ name cannot be blank.</source>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1228"/>
         <source>&amp;</source>
         <comment>and</comment>
-        <translation>ii</translation>
+        <translation>i</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="840"/>
@@ -16802,7 +16802,7 @@ name cannot be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="356"/>
         <source>Commercial skip automatic rewind amount (secs)</source>
-        <translation>Automatyczne przewijanie (w sek.) podczas przeskakiwania reklam</translation>
+        <translation>Automatycznie przewijaj podczas przeskakiwania reklam (sek.)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="359"/>
@@ -16812,7 +16812,7 @@ name cannot be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="372"/>
         <source>Commercial skip notify amount (secs)</source>
-        <translation>Wcześ. powiadamianie o relamie (sek)</translation>
+        <translation>Powiadamiaj wcześniej o relamie (sek)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="374"/>
@@ -16884,7 +16884,7 @@ name cannot be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1441"/>
         <source>Episode sort orderings</source>
-        <translation>Typ Sortowania Epizodów</translation>
+        <translation>Kolejność Sortowania Epizodów</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1456"/>
@@ -17068,7 +17068,7 @@ name cannot be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4494"/>
         <source>Seeking</source>
-        <translation>Wyszukuję</translation>
+        <translation>Przewijanie Nagrań</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4502"/>
@@ -17215,7 +17215,7 @@ name cannot be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3544"/>
         <source>Sort titles</source>
-        <translation>Sortowanie</translation>
+        <translation>Sortowanie Nagrań</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3546"/>
@@ -17876,7 +17876,7 @@ name cannot be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="827"/>
         <source>Auto-expire off</source>
-        <translation>Automatyczna deaktualizacja Wyłączona</translation>
+        <translation>Auto-kasowanie Wyłączone</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="830"/>
@@ -17936,7 +17936,7 @@ name cannot be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="302"/>
         <source> not matched</source>
-        <translation> nie ma pasujących</translation>
+        <translation> Nie ma pasujących</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="305"/>
@@ -22168,12 +22168,12 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="202"/>
         <source>Ignore</source>
-        <translation type="unfinished">Ignoruj</translation>
+        <translation>Ignoruj</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="203"/>
         <source>Detect</source>
-        <translation type="unfinished">Wykryj</translation>
+        <translation>Wykryj</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="204"/>
@@ -22183,7 +22183,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="205"/>
         <source>Interlaced</source>
-        <translation type="unfinished"></translation>
+        <translation>Z przeplotem</translation>
     </message>
     <message>
         <source>Interlaced (Normal)</source>
@@ -22192,7 +22192,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="206"/>
         <source>Interlaced (Reversed)</source>
-        <translation type="unfinished">Przeplot (odwrot.)</translation>
+        <translation>Z Odwrotnym Przeplotem</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="292"/>
@@ -23384,12 +23384,12 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <location filename="../libs/libmythtv/tv.cpp" line="80"/>
         <source>Auto-Skip ON</source>
-        <translation>Automatyczne</translation>
+        <translation>Automatycznie Przeskakuj</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv.cpp" line="81"/>
         <source>Auto-Skip Notify</source>
-        <translation>Tylko powiadom</translation>
+        <translation>Tylko Powiadamiaj</translation>
     </message>
     <message>
         <source>High Quality</source>
@@ -26159,7 +26159,7 @@ No other details</source>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="143"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="319"/>
         <source>AutoExpire List</source>
-        <translation>Lista do auto-deaktualizacji</translation>
+        <translation>Lista do auto-kasowania</translation>
     </message>
     <message>
         <source>Acknowledge all log entries at this priority level or lower?</source>
@@ -26486,7 +26486,7 @@ No other details</source>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1565"/>
         <source>The AutoExpire List shows all recordings which may be expired and the order of their expiration. Recordings at the top of the list will be expired first.</source>
-        <translation>Lista auto-unieważniania pokazuje listę nagrań, które będą w pierwszej kolejności podlegały nieważnieniu. Pozycje na szczycie listy będą pierwsze.</translation>
+        <translation>Lista auto-kasowania pokazuje listę nagrań, które będą w pierwszej kolejności podlegały automatycznemu skasowaniu. Pozycje na szczycie listy będą kasowane jako pierwsze.</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/statusbox.cpp" line="534"/>
@@ -27325,7 +27325,7 @@ Directory From Storage Group?</source>
         <location filename="../libs/libmythtv/tv_play.cpp" line="6979"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9207"/>
         <source>Adjust Time Stretch</source>
-        <translation>Ustaw prędkość</translation>
+        <translation>Zmień Prędkość</translation>
     </message>
     <message>
         <source>Audio Resync</source>
@@ -27623,12 +27623,12 @@ Czy chesz dalej oglądać?</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="8835"/>
         <source>Disable Forced Subtitles</source>
-        <translation>Wyłącz Forced Subtitles</translation>
+        <translation>Wyłącz Wymuszone Napisy</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="8844"/>
         <source>Enable Forced Subtitles</source>
-        <translation>Włącz Forced Subtitles</translation>
+        <translation>Włącz Wymuszone Napisy</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="8851"/>
@@ -27713,12 +27713,12 @@ Czy chesz dalej oglądać?</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="8993"/>
         <source>Turn Auto-Expire OFF</source>
-        <translation>Wyłącz Autokasowanie</translation>
+        <translation>Wyłącz Auto-kasowanie</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="8993"/>
         <source>Turn Auto-Expire ON</source>
-        <translation>Włącz Autokasowanie</translation>
+        <translation>Włącz Auto-kasowanie</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9190"/>
@@ -27787,12 +27787,12 @@ Czy chesz dalej oglądać?</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9380"/>
         <source>Auto-Expire OFF</source>
-        <translation>Autokasowanie Wyłączone</translation>
+        <translation>Auto-kasowanie Wyłączone</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9385"/>
         <source>Auto-Expire ON</source>
-        <translation>Włącz Autokasowanie</translation>
+        <translation>Włącz Auto-kasowanie</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="8075"/>
@@ -35995,7 +35995,7 @@ When you have completed your configuration, press &quot;OK&quot; to search.</sou
     <message>
         <location filename="../themes/themestrings.h" line="389"/>
         <source>Allow Recordings to Auto-Expire</source>
-        <translation>Pozwól na Autokasowanie</translation>
+        <translation>Pozwól na Auto-kasowanie</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1441"/>
@@ -41983,12 +41983,12 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2396"/>
         <source>GUI</source>
-        <translation>GUI</translation>
+        <translation>Rozdzielczość GUI</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2398"/>
         <source>Resolution of screen when not watching a video.</source>
-        <translation>Rozdzielczość ekranu gdy nie oglądasz video/TV.</translation>
+        <translation>Rozdzielczość ekranu dla GUI.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2434"/>
@@ -42003,7 +42003,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2442"/>
         <source>Video output</source>
-        <translation>Wyjście video</translation>
+        <translation>Rozdzielczość video</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2443"/>
@@ -42442,7 +42442,7 @@ Jeśli ta grupa nie istnieje, usuń ją z konfiguracji</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3595"/>
         <source>Set this if you turn off Auto-Expire only for recordings that you&apos;ve seen and intend to keep. This option will exclude these recordings from the &apos;Watch List&apos;.</source>
-        <translation>Zaznacz jeśli praktykujesz wyłączanie Autokasowania wyłącznie dla nagrań które już obejżałeś i które zachowujesz na później. Nagrana tebędą pominięte także w &quot;Liście Podręcznej&quot;.</translation>
+        <translation>Zaznacz jeśli praktykujesz wyłączanie Auto-kasowania wyłącznie dla nagrań które już obejżałeś i które zachowujesz na później. Nagrana te będą pominięte także w Liście Podręcznej.</translation>
     </message>
     <message>
         <source>Sort method</source>
@@ -42465,7 +42465,7 @@ Jeśli ta grupa nie istnieje, usuń ją z konfiguracji</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3608"/>
         <source>Maximum days counted in the score</source>
-        <translation>Maks. liczba dni branych do rankingu</translation>
+        <translation>Maksymalna liczba dni branych do rankingu</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3612"/>
