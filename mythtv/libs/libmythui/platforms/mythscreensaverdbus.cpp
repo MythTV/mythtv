@@ -185,7 +185,6 @@ void MythScreenSaverDBus::Restore()
 
 void MythScreenSaverDBus::Reset()
 {
-    Restore();
 }
 
 bool MythScreenSaverDBus::Asleep()
