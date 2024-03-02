@@ -253,6 +253,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: mythtv
+          fetch-depth: 0
 
       - name: ccache statistics [pre]
         run: ccache -s
