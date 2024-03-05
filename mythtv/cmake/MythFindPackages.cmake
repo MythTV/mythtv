@@ -55,10 +55,13 @@ endif()
 pkg_check_modules(LIBUDFREAD "libudfread>=1.1.1" REQUIRED IMPORTED_TARGET)
 
 #
-# Find an exiv2 that has c++17 support.  The current version number is 0.28 and
-# the c++17 based version is supposed to be 1.0.
+# Find an exiv2 that has c++17 support.  The current version number is 0.27 and
+# the c++17 based version is supposed to be 1.0 but is included in 0.28
 #
-pkg_check_modules(EXIV2 "mythexiv2>=0.99" REQUIRED IMPORTED_TARGET)
+pkg_check_modules(EXIV2 "exiv2>=0.28" QUIET IMPORTED_TARGET)
+if(NOT EXIV2_FOUND)
+  pkg_check_modules(EXIV2 "mythexiv2>=0.28" QUIET IMPORTED_TARGET)
+endif()
 
 #
 # If not provided by the system, this is currently built as part of mythtv (not
