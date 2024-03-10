@@ -960,8 +960,8 @@ bool RecordingRule::IsValid(QString &msg) const
             msg = QString("Invalid start/end date/time.");
             return false;
         }
-        int secsto = QDateTime(m_startdate, m_starttime)
-            .secsTo(QDateTime(m_enddate, m_endtime));
+        qint64 secsto = QDateTime(m_startdate, m_starttime, Qt::UTC)
+            .secsTo(QDateTime(m_enddate, m_endtime, Qt::UTC));
         if (secsto <= 0 || secsto > (8 * 3600))
         {
             msg = QString("Invalid duration.");
