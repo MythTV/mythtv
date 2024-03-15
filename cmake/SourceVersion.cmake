@@ -35,6 +35,10 @@ function(source_version_from_file filename version branch)
     return()
   endif()
 
+  # Unset variables in case they aren't included in the file.
+  unset(${version} PARENT_SCOPE)
+  unset(${branch} PARENT_SCOPE)
+
   list(APPEND CMAKE_MESSAGE_INDENT "  ")
 
   # slurp the file
@@ -170,8 +174,7 @@ function(mythtv_find_source_version version version_major branch)
     set(filename "${mythtv_source_dir}/SRC_VERSION")
     message(STATUS "Checking for version info in ${filename}")
     if(EXISTS ${filename})
-      source_version_from_file(${filename} versionString dummy)
-      unset(branchName)
+      source_version_from_file(${filename} versionString branchName)
       message(STATUS "  version:${versionString}")
     endif()
   endif()
