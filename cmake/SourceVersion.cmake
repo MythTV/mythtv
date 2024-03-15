@@ -46,7 +46,9 @@ function(source_version_from_file filename version branch)
   file(STRINGS ${filename} lines REGEX "SOURCE_VERSION|BRANCH")
   foreach(line IN LISTS lines)
     message(DEBUG "  line: ${line}")
-    if(line MATCHES "^ *SOURCE_VERSION *= *\" *([^ ]+) *\" *$")
+    if(line MATCHES "Format:")
+      continue()
+    elseif(line MATCHES "^ *SOURCE_VERSION *= *\" *([^ ]+) *\" *$")
       set(${version}
           "${CMAKE_MATCH_1}"
           PARENT_SCOPE)
@@ -157,16 +159,19 @@ function(mythtv_find_source_version version version_major branch)
     source_version_from_file(${filename} versionString branchName)
 
     # Fix up version
-    if(NOT versionString MATCHES "^v[0-9]")
+    if(versionString AND NOT versionString MATCHES "^v[0-9]")
       set(filename "${mythtv_source_dir}/SRC_VERSION")
       if(EXISTS ${filename})
+        message(STATUS "Checking for version info in ${filename}")
         source_version_from_file(${filename} prefix dummy)
         set(versionString "${prefix}-${versionString}")
       endif()
     endif()
 
     clean_branch_information(branchName)
-    message(STATUS "  version:${versionString} branch:${branchName}")
+    if(versionString)
+      message(STATUS "  version:${versionString} branch:${branchName}")
+    endif()
   endif()
 
   # Sill haven't found a vesion string. Check for a SRC_VERSION file.
@@ -185,12 +190,10 @@ function(mythtv_find_source_version version version_major branch)
     set(versionMajorString ${CMAKE_MATCH_1})
   else()
     message(WARNING "Invalid source version ${versionString}, must start "
-                    "with v and a number, will use SRC_VERSION file instead")
-    set(filename "${mythtv_source_dir}/SRC_VERSION")
-    message(STATUS "Checking for version info in ${filename}")
-    source_version_from_file(${filename} versionString dummy)
-    unset(branchName)
-    message(STATUS "  version:${versionString}")
+                    "with v and a number. Setting it to unknown.")
+    set(versionString "Unknown")
+    set(versionMajorString "0")
+    set(branchName "Unknown")
   endif()
 
   # Pass data back to caller
