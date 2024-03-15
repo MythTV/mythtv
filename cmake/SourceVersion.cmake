@@ -112,11 +112,33 @@ function(mythtv_find_source_version version version_major branch)
       OUTPUT_VARIABLE versionString
       OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
 
+    if(NOT versionString)
+      execute_process(
+        COMMAND ${GIT_EXECUTABLE} describe
+        OUTPUT_VARIABLE versionString
+        OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+    endif()
+
     # Branch
     execute_process(
       COMMAND ${GIT_EXECUTABLE} branch --show-current
       OUTPUT_VARIABLE branchName
       OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+
+    # While this command appears to work for all cases, it does depend on the
+    # specific git output format, so use it only if the simplier command does
+    # not.
+    if(NOT branchName)
+      execute_process(
+        COMMAND ${GIT_EXECUTABLE} branch --no-color --omit-empty --sort=refname
+                --contains HEAD --merged HEAD
+        OUTPUT_VARIABLE branchNames
+        OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+      string(REGEX MATCHALL "[^\n\r]+" branchNamesList ${branchNames})
+      list(GET branchNamesList 0 branchName)
+      string(REGEX REPLACE "^[\\*\\+] " "" branchName ${branchName})
+      string(STRIP ${branchName} branchName)
+    endif()
 
     if(versionString)
       message(STATUS "  version:${versionString} branch:${branchName}")
