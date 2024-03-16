@@ -60,7 +60,7 @@ pkg_check_modules(LIBUDFREAD "libudfread>=1.1.1" REQUIRED IMPORTED_TARGET)
 #
 pkg_check_modules(EXIV2 "exiv2>=0.28" QUIET IMPORTED_TARGET)
 if(NOT EXIV2_FOUND)
-  pkg_check_modules(EXIV2 "mythexiv2>=0.28" QUIET IMPORTED_TARGET)
+  pkg_check_modules(EXIV2 "mythexiv2>=0.28" REQUIRED IMPORTED_TARGET)
 endif()
 
 #
