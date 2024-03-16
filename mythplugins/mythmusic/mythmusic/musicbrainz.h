@@ -54,7 +54,7 @@ private:
     std::string queryDiscId(const std::string &device);
 
     /// Query release id and release metadata
-    std::string queryRelease(const std::string &disc_id);
+    std::string queryRelease(const std::string &discId);
 
     /// Query coverart for given release id
     QString queryCoverart(const std::string &releaseId);
