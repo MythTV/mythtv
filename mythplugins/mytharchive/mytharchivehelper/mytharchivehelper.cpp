@@ -1521,8 +1521,7 @@ static int doNativeArchive(const QString &jobFile)
         MythDate::toString(MythDate::current(), MythDate::kDatabase));
     gCoreContext->SaveSetting("MythArchiveLastRunStatus", "Running");
 
-    NativeArchive na;
-    int res = na.doNativeArchive(jobFile);
+    int res = NativeArchive::doNativeArchive(jobFile);
     gCoreContext->SaveSetting(
         "MythArchiveLastRunEnd",
         MythDate::toString(MythDate::current(), MythDate::kDatabase));
@@ -1538,8 +1537,7 @@ static int doNativeArchive(const QString &jobFile)
 
 static int doImportArchive(const QString &inFile, int chanID)
 {
-    NativeArchive na;
-    return na.doImportArchive(inFile, chanID);
+    return NativeArchive::doImportArchive(inFile, chanID);
 }
 
 static int grabThumbnail(const QString& inFile, const QString& thumbList, const QString& outFile, int frameCount)

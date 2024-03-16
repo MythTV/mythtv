@@ -1032,11 +1032,11 @@ void ExternalStreamHandler::CloseApp(void)
 
             QString full_command = QString("%1").arg(m_args.join(" "));
 
-            if (!m_io->KillIfRunning(full_command))
+            if (!ExternIO::KillIfRunning(full_command))
             {
                 // Give it one more chance.
                 std::this_thread::sleep_for(50ms);
-                if (!m_io->KillIfRunning(full_command))
+                if (!ExternIO::KillIfRunning(full_command))
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("Unable to kill existing '%1'.")
