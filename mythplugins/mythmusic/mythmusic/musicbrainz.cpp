@@ -270,7 +270,7 @@ static void logError(CoverArtArchive::CCoverArt &coverArt)
 QString MusicBrainz::queryCoverart(const std::string &releaseId)
 {
     const QString fileName = QString("musicbrainz-%1-front.jpg").arg(releaseId.c_str());
-    const QString filePath = QDir::temp().absoluteFilePath(fileName);
+    QString filePath = QDir::temp().absoluteFilePath(fileName);
     LOG(VB_MEDIA, LOG_DEBUG, QString("musicbrainz: Check if coverart file exists for release '%1'").arg(QString::fromStdString(releaseId)));
     if (QDir::temp().exists(fileName))
     {
