@@ -1546,7 +1546,7 @@ QString ChannelImporter::FormatChannels(
     // Sort transports in order of increasing frequency
     struct less_than_key
     {
-        inline bool operator() (const ScanDTVTransport &t1, const ScanDTVTransport &t2)
+        bool operator() (const ScanDTVTransport &t1, const ScanDTVTransport &t2)
         {
             return t1.m_frequency < t2.m_frequency;
         }
@@ -1585,7 +1585,7 @@ QString ChannelImporter::FormatTransports(
     // Sort transports in order of increasing frequency
     struct less_than_key
     {
-        inline bool operator() (const ScanDTVTransport &t1, const ScanDTVTransport &t2)
+        bool operator() (const ScanDTVTransport &t1, const ScanDTVTransport &t2)
         {
             return t1.m_frequency < t2.m_frequency;
         }

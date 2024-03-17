@@ -88,7 +88,7 @@ class MTV_PUBLIC TSHeader
        //1.2  1 bit transport_priority (ignore)
     bool Priority(void) const { return ( m_tsData[1] & 0x20 ) != 0; }
     //1.3  13 bit PID (packet ID, which transport stream)
-    inline unsigned int PID(void) const {
+    unsigned int PID(void) const {
         return ((m_tsData[1] << 8) + m_tsData[2]) & 0x1fff;
     }
     //3.0  2 bit transport_scrambling_control (00,01 OK; 10,11 scrambled)
@@ -219,7 +219,7 @@ class MTV_PUBLIC TSPacket : public TSHeader
         return pkt;
     }
 
-    inline TSPacket* CreateClone(void) const {
+    TSPacket* CreateClone(void) const {
         auto *pkt = new TSPacket();
         memcpy(pkt, this, kSize);
         return pkt;

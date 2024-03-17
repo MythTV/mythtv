@@ -76,7 +76,7 @@ class MythWS
     static QString     OpCodeToString        (WSOpCode Code);
     static WSOpCode    FrameFormatForProtocol(MythSocketProtocol Protocol);
     static bool        UseRawTextForProtocol (MythSocketProtocol Protocol);
-    static inline bool OpCodeIsValid         (WSOpCode Code)
+    static bool        OpCodeIsValid         (WSOpCode Code)
     {
         return Code == WSOpContinuation || Code == WSOpTextFrame ||
                Code == WSOpBinaryFrame  || Code == WSOpClose ||

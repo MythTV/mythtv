@@ -21,7 +21,7 @@ class MBASE_PUBLIC MythHTTPService : public QObject
     Q_OBJECT
 
   public:
-    template<class T> static inline HTTPServicePtr Create() { return std::shared_ptr<MythHTTPService>(new T); }
+    template<class T> static HTTPServicePtr Create() { return std::shared_ptr<MythHTTPService>(new T); }
 
     explicit MythHTTPService(MythHTTPMetaService* MetaService);
    ~MythHTTPService() override = default;
