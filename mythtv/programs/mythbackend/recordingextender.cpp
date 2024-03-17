@@ -1216,7 +1216,12 @@ void RecordingExtender::clearDownloadedInfo()
 // Parse a single string. First split it into parts on a semi-colon or
 // 'period space', and then selectively check those parts for the
 // pattern "A vs B".
-static bool parseProgramString (const QString& string, int limit,
+static bool parseProgramString (const QString& string,
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                                int limit,
+#else
+                                qsizetype limit,
+#endif
                                 QString& team1, QString& team2)
 {
     QString lString = string;
