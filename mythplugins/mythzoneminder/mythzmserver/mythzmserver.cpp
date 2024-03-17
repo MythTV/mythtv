@@ -233,7 +233,7 @@ int main(int argc, char **argv)
     loadZMConfig(zmoverideconfig);
 
     // check we have a version (default to 1.34.16 if not found)
-    if (g_zmversion.length() == 0)
+    if (g_zmversion.empty())
     {
         std::cout << "ZM version not found. Assuming at least v1.34.16 is installed" << std::endl;
         g_majorVersion = 1;
