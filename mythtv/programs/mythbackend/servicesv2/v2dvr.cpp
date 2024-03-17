@@ -901,6 +901,8 @@ bool V2Dvr::SetLastPlayPos( int RecordedId,
                             const QString &offsettype,
                             long Offset )
 {
+    LOG(VB_GENERAL, LOG_WARNING, "Deprecated, use Dvr/UpdateRecordedMetadata.");
+
     if ((RecordedId <= 0) &&
         (chanid <= 0 || !StartTime.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
@@ -2125,7 +2127,9 @@ bool V2Dvr::UpdateRecordedMetadata ( uint             RecordedId,
                                      const QString   &Description,
                                      uint             Episode,
                                      const QString   &Inetref,
-                                           QDate      OriginalAirDate,
+                                     long             LastPlayOffset,
+                                     const QString   &LastPlayOffsetType,
+                                     QDate            OriginalAirDate,
                                      bool             Preserve,
                                      uint             Season,
                                      uint             Stars,
@@ -2222,6 +2226,35 @@ bool V2Dvr::UpdateRecordedMetadata ( uint             RecordedId,
 
     if (HAS_PARAMv2("Inetref"))
         pi.SaveInetRef(Inetref);
+
+    if (HAS_PARAMv2("LastPlayOffset"))
+    {
+
+        if (LastPlayOffset < 0)
+            throw QString("LastPlayOffset must be >= 0.");
+
+        uint64_t position = LastPlayOffset;
+        bool isend=true;
+
+        if (HAS_PARAMv2("LastPlayOffsetType"))
+        {
+            if (LastPlayOffsetType.toLower() == "position")
+            {
+                if (!ri.QueryPositionKeyFrame(&position, LastPlayOffset, isend))
+                        return false;
+            }
+            else if (LastPlayOffsetType.toLower() == "duration")
+            {
+                if (!ri.QueryDurationKeyFrame(&position, LastPlayOffset, isend))
+                        return false;
+            }
+        }
+
+        ri.SaveLastPlayPos(position);
+
+        return true;
+
+    }
 
     if (HAS_PARAMv2("OriginalAirDate"))
     {
