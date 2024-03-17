@@ -183,7 +183,7 @@ public:
 
 private:
     // polar <-> cartesian coodinates conversion
-    static cfloat polar(float a, float p) { return {static_cast<float>(a*std::cos(p)),static_cast<float>(a*std::sin(p))}; }
+    static cfloat polar(float a, float p) { return {(a*std::cos(p)),(a*std::sin(p))}; }
     static float amplitude(FFTComplex z) { return std::hypot(z.re, z.im); }
     static float phase(FFTComplex z) { return std::atan2(z.im, z.re); }
 

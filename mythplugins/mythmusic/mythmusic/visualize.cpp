@@ -1090,7 +1090,7 @@ bool Spectrogram::process(VisualNode */*node*/)
             {
                 painter.drawText(m_scale.pixel(i) - 20, half - 220,
                                  40, 40, Qt::AlignCenter,
-                                 QString("%1").arg(int(i / 12)));
+                                 QString("%1").arg((i / 12)));
             }
         }
         painter.rotate(90);     // frequency in Hz draws down
@@ -1109,7 +1109,7 @@ bool Spectrogram::process(VisualNode */*node*/)
                     painter.drawText(half + 100, -1 * now - 40,
                                      80, 80, Qt::AlignVCenter|Qt::AlignLeft,
                                      QString("%1%2").arg(m_scale.note(i))
-                                     .arg(int(i / 12)));
+                                     .arg((i / 12)));
                 }
                 prev = now;
             }
@@ -1212,7 +1212,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
 
         left *= gain;
         int mag = clamp(left, 255, 0);
-        int z = (int)(mag * 6);
+        int z = (mag * 6);
         left > 255 ? painter.setPen(Qt::white) :
             painter.setPen(qRgb(m_red[z], m_green[z], m_blue[z]));
         if (m_history)
@@ -1237,7 +1237,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
 
         right *= gain;          // copy of above, s/left/right/g
         mag = clamp(right, 255, 0);
-        z = (int)(mag * 6);
+        z = (mag * 6);
         right > 255 ? painter.setPen(Qt::white) :
             painter.setPen(qRgb(m_red[z], m_green[z], m_blue[z]));
         if (m_history)
@@ -1485,7 +1485,7 @@ bool Spectrum::processUndisplayed(VisualNode *node)
     int prev = 0;               // frequency index of previous pixel
     float adjHeight = m_size.height() / 2.0;
 
-    for (int i = 0; (int)i < m_rectsL.size(); i++, w += m_analyzerBarWidth)
+    for (int i = 0; i < m_rectsL.size(); i++, w += m_analyzerBarWidth)
     {
         float magL = 0;         // modified from Spectrogram
         float magR = 0;

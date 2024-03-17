@@ -1144,7 +1144,7 @@ void MusicCommon::seek(std::chrono::seconds pos)
                 QString lcd_time_string = getTimeString(pos, m_maxTime);
 
                 // if the string is longer than the LCD width, remove all spaces
-                if (lcd_time_string.length() > (int)lcd->getLCDWidth())
+                if (lcd_time_string.length() > lcd->getLCDWidth())
                     lcd_time_string.remove(' ');
 
                 lcd->setMusicProgress(lcd_time_string, percent_heard);
@@ -1276,7 +1276,7 @@ void MusicCommon::customEvent(QEvent *event)
                 QString lcd_time_string = time_string;
 
                 // if the string is longer than the LCD width, remove all spaces
-                if (time_string.length() > (int)lcd->getLCDWidth())
+                if (time_string.length() > lcd->getLCDWidth())
                     lcd_time_string.remove(' ');
 
                 lcd->setMusicProgress(lcd_time_string, percent_heard);

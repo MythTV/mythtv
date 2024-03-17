@@ -194,7 +194,7 @@ void MythRenderVulkan::DebugVulkan(void)
                                   .arg(VK_VERSION_PATCH(Version));
     };
 
-    const auto * props = reinterpret_cast<const VkPhysicalDeviceProperties*>(m_window->physicalDeviceProperties());
+    const auto * props = m_window->physicalDeviceProperties();
     if (!props)
         return;
     const auto & limits = props->limits;

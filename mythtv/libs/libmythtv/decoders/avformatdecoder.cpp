@@ -1516,7 +1516,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         QString codecName;
         if (codec2)
             codecName = codec2->name;
-        m_parent->SetVideoParams(width, height, static_cast<double>(m_fps),
+        m_parent->SetVideoParams(width, height, m_fps,
                                  m_currentAspect, false, GetMaxReferenceFrames(enc),
                                  kScan_Detect, codecName);
         if (LCD *lcd = LCD::Get())
@@ -3200,8 +3200,8 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
         double seqFPS = m_avcParser->frameRate();
 
         bool res_changed = ((width  != m_currentWidth) || (height != m_currentHeight));
-        bool fps_changed = (seqFPS > 0.0) && ((seqFPS > static_cast<double>(m_fps) + 0.01) ||
-                                              (seqFPS < static_cast<double>(m_fps) - 0.01));
+        bool fps_changed = (seqFPS > 0.0) && ((seqFPS > m_fps + 0.01) ||
+                                              (seqFPS < m_fps - 0.01));
         bool forcechange = !qFuzzyCompare(aspect + 10.0F, m_currentAspect) &&
                             m_mythCodecCtx && m_mythCodecCtx->DecoderWillResetOnAspect();
         m_currentAspect = aspect;
@@ -3659,14 +3659,14 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
     {
         // If fps has doubled due to frame-doubling deinterlace
         // Set fps to double value.
-        double fpschange = calcfps / static_cast<double>(m_fps);
+        double fpschange = calcfps / m_fps;
         int prior = m_fpsMultiplier;
         if (fpschange > 1.9 && fpschange < 2.1)
             m_fpsMultiplier = 2;
         if (fpschange > 0.9 && fpschange < 1.1)
             m_fpsMultiplier = 1;
         if (m_fpsMultiplier != prior)
-            m_parent->SetFrameRate(static_cast<double>(m_fps));
+            m_parent->SetFrameRate(m_fps);
     }
 
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +

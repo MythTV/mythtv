@@ -718,7 +718,7 @@ QString MythNews::cleanText(const QString &text)
     result.replace( kStartingSpaceRE, "\n");
     // Remove any remaining HTML tags
     static const QRegularExpression kRemoveHtmlRE(QRegularExpression("</?.+>"));
-    result.remove((const QRegularExpression&) kRemoveHtmlRE);
+    result.remove(kRemoveHtmlRE);
     result = result.trimmed();
 
     return result;

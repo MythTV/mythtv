@@ -39,17 +39,17 @@ void TestCommandLineParser::test_getOpt_data (void)
     QTest::addColumn<QString>("expectedOpt");
     QTest::addColumn<QString>("expectedVal");
 
-    QTest::newRow("end")      << static_cast<int>(99) << MythCommandLineParser::Result::kEnd << "" << "";
-    QTest::newRow("empty")    << static_cast<int>(1)  << MythCommandLineParser::Result::kEmpty << "" << "";
-    QTest::newRow("first")    << static_cast<int>(0)  << MythCommandLineParser::Result::kOptOnly << "-h" << "";
-    QTest::newRow("combo")    << static_cast<int>(2)  << MythCommandLineParser::Result::kCombOptVal << "-zed" << "100";
-    QTest::newRow("badcombo") << static_cast<int>(3)  << MythCommandLineParser::Result::kInvalid << "-bad=100=101" << "";
-    QTest::newRow("passthru") << static_cast<int>(4)  << MythCommandLineParser::Result::kPassthrough << "" << "";
-    QTest::newRow("argument") << static_cast<int>(5)  << MythCommandLineParser::Result::kArg << "" << "foo";
-    QTest::newRow("arg val1") << static_cast<int>(6)  << MythCommandLineParser::Result::kOptVal << "-x" << "xray";
-    QTest::newRow("arg val2") << static_cast<int>(8)  << MythCommandLineParser::Result::kOptVal << "-y" << "-";
-    QTest::newRow("arg noval")<< static_cast<int>(10) << MythCommandLineParser::Result::kOptOnly << "-z" << "";
-    QTest::newRow("arg noval")<< static_cast<int>(11) << MythCommandLineParser::Result::kOptOnly << "-a" << "";
+    QTest::newRow("end")      << 99 << MythCommandLineParser::Result::kEnd << "" << "";
+    QTest::newRow("empty")    <<  1 << MythCommandLineParser::Result::kEmpty << "" << "";
+    QTest::newRow("first")    <<  0 << MythCommandLineParser::Result::kOptOnly << "-h" << "";
+    QTest::newRow("combo")    <<  2 << MythCommandLineParser::Result::kCombOptVal << "-zed" << "100";
+    QTest::newRow("badcombo") <<  3 << MythCommandLineParser::Result::kInvalid << "-bad=100=101" << "";
+    QTest::newRow("passthru") <<  4 << MythCommandLineParser::Result::kPassthrough << "" << "";
+    QTest::newRow("argument") <<  5 << MythCommandLineParser::Result::kArg << "" << "foo";
+    QTest::newRow("arg val1") <<  6 << MythCommandLineParser::Result::kOptVal << "-x" << "xray";
+    QTest::newRow("arg val2") <<  8 << MythCommandLineParser::Result::kOptVal << "-y" << "-";
+    QTest::newRow("arg noval")<< 10 << MythCommandLineParser::Result::kOptOnly << "-z" << "";
+    QTest::newRow("arg noval")<< 11 << MythCommandLineParser::Result::kOptOnly << "-a" << "";
 }
 
 // \brief Parse individual arguments.  Reset the parser each time.

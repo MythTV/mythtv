@@ -144,11 +144,11 @@ static void
 free_ifs_buffers (FRACTAL * Fractal)
 {
 	if (Fractal->m_buffer1 != nullptr) {
-		(void) free ((void *) Fractal->m_buffer1);
+		free ((void *) Fractal->m_buffer1);
 		Fractal->m_buffer1 = (IFSPoint *) nullptr;
 	}
 	if (Fractal->m_buffer2 != nullptr) {
-		(void) free ((void *) Fractal->m_buffer2);
+		free ((void *) Fractal->m_buffer2);
 		Fractal->m_buffer2 = (IFSPoint *) nullptr;
 	}
 }
@@ -486,7 +486,7 @@ release_ifs ()
 {
 	if (Root != nullptr) {
 		free_ifs(Root);
-		(void) free ((void *) Root);
+		free ((void *) Root);
 		Root = (FRACTAL *) nullptr;
 	}
 }

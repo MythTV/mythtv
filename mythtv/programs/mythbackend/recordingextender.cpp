@@ -1221,7 +1221,7 @@ static bool parseProgramString (const QString& string, int limit,
 {
     QString lString = string;
     QStringList parts = lString.replace("vs.", "vs").split(kSentencePattern);
-    for (int i = 0; i < std::min(limit,static_cast<int>(parts.size())); i++)
+    for (int i = 0; i < std::min(limit,parts.size()); i++)
     {
         QStringList words = parts[i].split(kVersusPattern);
         if (words.size() == 2)
