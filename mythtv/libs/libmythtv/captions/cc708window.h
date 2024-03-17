@@ -276,7 +276,7 @@ class MTV_PUBLIC CC708Window
     uint            m_true_column_count {0};
 
     CC708Character *m_text              {nullptr};
-    CC708Pen        m_pen               {};
+    CC708Pen        m_pen;
 
  private:
     /// set to false when DeleteWindow is called on the window.
