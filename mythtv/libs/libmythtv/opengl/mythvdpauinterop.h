@@ -56,9 +56,9 @@ class MythVDPAUInterop : public MythOpenGLInterop
     MythVDPAUSurfaceNV  m_outputSurfaceReg  { 0       };
     VdpVideoMixer       m_mixer             { 0       };
     VdpChromaType       m_mixerChroma       { VDP_CHROMA_TYPE_420 };
-    QSize               m_mixerSize         { };
+    QSize               m_mixerSize;
     MythDeintType       m_deinterlacer      { DEINT_BASIC };
-    QVector<AVBufferRef*> m_referenceFrames { };
+    QVector<AVBufferRef*> m_referenceFrames;
     MYTH_VDPAUINITNV    m_initNV            { nullptr };
     MYTH_VDPAUFININV    m_finiNV            { nullptr };
     MYTH_VDPAUREGOUTSURFNV m_registerNV     { nullptr };

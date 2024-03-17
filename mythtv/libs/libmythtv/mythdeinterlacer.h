@@ -38,7 +38,7 @@ class MythDeinterlacer
     MythDeintType    m_deintType  { DEINT_NONE };
     bool             m_doubleRate { false };
     bool             m_topFirst   { true  };
-    MythAVFrame      m_frame      { };
+    MythAVFrame      m_frame;
     AVFilterGraph*   m_graph      { nullptr };
     AVFilterContext* m_source     { nullptr };
     AVFilterContext* m_sink       { nullptr };

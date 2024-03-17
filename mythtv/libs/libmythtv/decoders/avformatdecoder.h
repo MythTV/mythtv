@@ -261,7 +261,7 @@ class AvFormatDecoder : public DecoderBase
     AVCParser         *m_avcParser                    {nullptr};
 
     AVFormatContext   *m_ic                           {nullptr};
-    MythCodecMap       m_codecMap                     { };
+    MythCodecMap       m_codecMap;
 
     // AVFormatParameters params;
 

@@ -166,7 +166,7 @@ class CC708Pen
         m_attr.m_boldface  = false;
     }
   public:
-    CC708CharacterAttribute m_attr {};
+    CC708CharacterAttribute m_attr;
 
     uint m_row    {0};
     uint m_column {0};
@@ -178,7 +178,7 @@ class CC708Character
   public:
     CC708Character() = default;
     explicit CC708Character(const CC708Window &win);
-    CC708CharacterAttribute m_attr {};
+    CC708CharacterAttribute m_attr;
     QChar                   m_character {' '};
 };
 
@@ -188,7 +188,7 @@ class CC708String
     uint                    m_x {0};
     uint                    m_y {0};
     QString                 m_str;
-    CC708CharacterAttribute m_attr {};
+    CC708CharacterAttribute m_attr;
 };
 
 class MTV_PUBLIC CC708Window

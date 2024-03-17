@@ -61,7 +61,7 @@ class MTV_PUBLIC MythPlayerVideoUI : public MythPlayerCaptionsUI
   protected:
     bool InitVideo() override;
 
-    DetectLetterbox m_detectLetterBox { };
+    DetectLetterbox m_detectLetterBox;
 
   private:
     Q_DISABLE_COPY(MythPlayerVideoUI)

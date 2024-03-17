@@ -71,7 +71,7 @@ class MythVAAPIInterop : public MythOpenGLInterop
 
   protected:
     VADisplay        m_vaDisplay         { nullptr };
-    QString          m_vaVendor          { };
+    QString          m_vaVendor;
 
     MythDeintType    m_deinterlacer      { DEINT_NONE };
     bool             m_deinterlacer2x    { false      };

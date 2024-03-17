@@ -234,7 +234,7 @@ class MPEG2fixup
 
     pthread_t     m_thread          {};
 
-    MythCodecMap     m_codecMap     {};
+    MythCodecMap     m_codecMap;
     AVFormatContext *m_inputFC      {nullptr};
     AVFrame         *m_picture      {nullptr};
 

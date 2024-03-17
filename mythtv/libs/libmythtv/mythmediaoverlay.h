@@ -51,14 +51,14 @@ class MythMediaOverlay : public QObject
     TV*             m_tv               { nullptr };
     MythPlayerUI*   m_player           { nullptr };
     MythPainter*    m_painter          { nullptr };
-    QRect           m_rect             { };
+    QRect           m_rect;
     bool            m_uiScaleOverride  { false };
     float           m_savedWMult       { 1.0F };
     float           m_savedHMult       { 1.0F };
-    QRect           m_savedUIRect      { };
+    QRect           m_savedUIRect;
     int             m_fontStretch      { 0 };
     int             m_savedFontStretch { 0 };
-    QMap<QString, MythScreenType*> m_children { };
+    QMap<QString, MythScreenType*> m_children;
 };
 
 #endif

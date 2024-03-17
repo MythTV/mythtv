@@ -93,8 +93,8 @@ class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
     bool      m_isSpontaneous        { false };
     std::chrono::seconds  m_maxRequestedDelay    { 0s };
     std::chrono::seconds  m_maxSupportedDelay    { MAXIMUM_SHUTDOWN_WAIT };
-    QTimer    m_featureTimer         { };
-    QDateTime m_sleepTime            { };
+    QTimer    m_featureTimer;
+    QDateTime m_sleepTime;
     int       m_powerLevel           { Unset };
     bool      m_warnForLowBattery    { false };
 

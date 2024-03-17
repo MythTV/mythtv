@@ -33,11 +33,11 @@ class MTV_PUBLIC MythPlayerVisualiserUI : public MythPlayerVideoUI
   private:
     void        DestroyVisualiser();
 
-    QString      m_defaultVisualiser { };
-    MythVisualiserState m_visualiserState { };
+    QString      m_defaultVisualiser;
+    MythVisualiserState m_visualiserState;
     VideoVisual* m_visual      { nullptr };
-    QRect        m_uiScreenRect{ };
-    QRect        m_embedRect   { };
+    QRect        m_uiScreenRect;
+    QRect        m_embedRect;
 };
 
 #endif

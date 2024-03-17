@@ -42,7 +42,7 @@ class MUI_PUBLIC MythXDisplay
     int      m_depth       { 0 };
     Window   m_root        { 0 };
     QRecursiveMutex  m_lock;
-    QString  m_displayName { };
+    QString  m_displayName;
 };
 
 // These X11 defines conflict with the QT key event enum values

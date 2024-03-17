@@ -57,6 +57,6 @@ class MUI_PUBLIC MythDisplayMode
     int m_widthMM   { 0 };
     int m_heightMM  { 0 };
     double m_aspect { -1.0 };
-    MythDisplayRates m_refreshRates { };
+    MythDisplayRates m_refreshRates;
 };
 #endif

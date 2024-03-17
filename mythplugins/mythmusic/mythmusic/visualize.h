@@ -121,7 +121,7 @@ class StereoScope : public VisualBase
   protected:
     QColor         m_startColor  {Qt::yellow};
     QColor         m_targetColor {Qt::red};
-    std::vector<double> m_magnitudes  {};
+    std::vector<double> m_magnitudes;
     QSize          m_size;
     bool const     m_rubberband  {RUBBERBAND};
     double const   m_falloff     {1.0};
@@ -372,7 +372,7 @@ struct piano_key_data {
     QColor          m_blackStartColor  {10,10,10};
     QColor          m_blackTargetColor {Qt::red};
 
-    std::vector<QRect> m_rects         {};
+    std::vector<QRect> m_rects;
     QSize           m_size;
 
     std::chrono::milliseconds m_offsetProcessed  {0ms};
@@ -380,7 +380,7 @@ struct piano_key_data {
     piano_key_data *m_pianoData        {nullptr};
     piano_audio    *m_audioData        {nullptr};
 
-    std::vector<double> m_magnitude    {};
+    std::vector<double> m_magnitude;
 };
 
 class AlbumArt : public VisualBase

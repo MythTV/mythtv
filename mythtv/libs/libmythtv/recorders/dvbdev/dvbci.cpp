@@ -1024,7 +1024,7 @@ bool cCiApplicationInformation::EnterMenu(void)
 class cCiConditionalAccessSupport : public cCiSession {
 private:
   int m_state {0};
-  dvbca_vector m_caSystemIds {};
+  dvbca_vector m_caSystemIds;
   bool m_needCaPmt {false};
 public:
   cCiConditionalAccessSupport(int SessionId, cCiTransportConnection *Tc);

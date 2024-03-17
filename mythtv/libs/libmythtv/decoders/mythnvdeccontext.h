@@ -60,8 +60,8 @@ class MythNVDECContext : public MythCodecContext
         cudaVideoCodec m_codec          { cudaVideoCodec_NumCodecs };
         uint           m_depth          { 0 };
         cudaVideoChromaFormat m_format  { cudaVideoChromaFormat_Monochrome };
-        QSize          m_minimum        { };
-        QSize          m_maximum        { };
+        QSize          m_minimum;
+        QSize          m_maximum;
         uint           m_macroBlocks    { 0 };
     };
 
