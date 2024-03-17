@@ -32,9 +32,9 @@ void TestLogging::test_syslogGetFacility_data (void)
 #ifdef _WIN32
 #elif defined(Q_OS_ANDROID)
 #else
-    QTest::newRow("auth")   << "auth"   << (LOG_AUTH);
-    QTest::newRow("user")   << "user"   << (LOG_USER);
-    QTest::newRow("local7") << "local7" << (LOG_LOCAL7);
+    QTest::newRow("auth")   << "auth"   << LOG_AUTH;
+    QTest::newRow("user")   << "user"   << LOG_USER;
+    QTest::newRow("local7") << "local7" << LOG_LOCAL7;
     QTest::newRow("random") << "random" << -1;
     QTest::newRow("empty")  << ""       << -1;
 #endif
@@ -280,20 +280,20 @@ void TestLogging::test_logPropagateCalc_data (void)
     QTest::addColumn<QString>("expectedArgs");
 
     QTest::newRow("plain")   << "general"
-                             << 0 << (-1)
+                             << 0 << -1
                              << false
                              << "--verbose general --loglevel info";
     QTest::newRow("path")    << "general"
-                             << 0 << (-1)
+                             << 0 << -1
                              << true
                              << "--verbose general --logpath /tmp --loglevel info";
     QTest::newRow("quiet")   << "general"
-                             << 2 << (-1)
+                             << 2 << -1
                              << false
                              << "--verbose general --loglevel info --quiet --quiet";
 #if !defined(_WIN32) && !defined(Q_OS_ANDROID)
     QTest::newRow("syslog")  << "general"
-                             << 0 << (LOG_DAEMON)
+                             << 0 << LOG_DAEMON
                              << false
                              << "--verbose general --loglevel info --syslog daemon";
 #if CONFIG_SYSTEMD_JOURNAL
@@ -304,11 +304,11 @@ void TestLogging::test_logPropagateCalc_data (void)
 #endif
 #endif
     QTest::newRow("muddle")  << "general,schedule"
-                             << 2 << (LOG_LOCAL0)
+                             << 2 << LOG_LOCAL0
                              << true
                              << "--verbose general,schedule --logpath /tmp --loglevel info --quiet --quiet --syslog local0";
     QTest::newRow("muddle2") << "schedule:debug,general:warn"
-                             << 2 << (LOG_LOCAL0)
+                             << 2 << LOG_LOCAL0
                              << true
                              << "--verbose general,schedule --logpath /tmp --loglevel info --quiet --quiet --syslog local0";
 }
