@@ -15,7 +15,7 @@
 class MSqlQuery;
 class VideoMetadataListManager;
 
-enum { VIDEO_YEAR_DEFAULT = 1895 };
+static constexpr uint16_t VIDEO_YEAR_DEFAULT { 1895 };
 
 const QString VIDEO_SUBTITLE_DEFAULT = "";
 

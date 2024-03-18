@@ -54,11 +54,9 @@ using PlaybackBoxCb = void (PlaybackBox::*)();
 
 static constexpr size_t kMaxJobs {7};
 
-enum {
-    kArtworkFanTimeout    = 300,
-    kArtworkBannerTimeout = 50,
-    kArtworkCoverTimeout  = 50,
-};
+static constexpr uint16_t kArtworkFanTimeout    { 300 };
+static constexpr uint8_t  kArtworkBannerTimeout {  50 };
+static constexpr uint8_t  kArtworkCoverTimeout  {  50 };
 
 class PlaybackBox : public ScheduleCommon
 {

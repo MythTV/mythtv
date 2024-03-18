@@ -38,9 +38,7 @@ enum class SCAN_t : uint8_t;
 
 class H2645Parser {
   public:
-    enum {
-        MAX_SLICE_HEADER_SIZE = 256
-    };
+    static constexpr uint16_t MAX_SLICE_HEADER_SIZE { 256 };
 
     enum field_type {
         FRAME = 'F',
@@ -102,7 +100,7 @@ class H2645Parser {
     };
 
   protected:
-    enum constants {EXTENDED_SAR = 255};
+    static constexpr uint8_t EXTENDED_SAR { 255 };
 
     void resetRBSP(void);
     bool fillRBSP(const uint8_t *byteP, uint32_t byte_count,
