@@ -33,7 +33,7 @@ class MUI_PUBLIC MythHDR
     Q_GADGET
 
   public:
-    enum HDRType
+    enum HDRType : std::uint8_t
     {
         SDR   = 0x00,
         HDR10 = 0x01,

@@ -461,7 +461,7 @@ class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
 
   public:
     // FIXME Not sure about this enum
-    enum TimeInputResolution {
+    enum TimeInputResolution : std::uint16_t {
         // Date Resolution
         kNoDate       = 0x01,
         kYear         = 0x02,

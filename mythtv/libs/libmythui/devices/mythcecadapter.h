@@ -23,7 +23,7 @@ class MythMainWindow;
 class MythCECAdapter
 {
   public:
-    enum MythCECAction
+    enum MythCECAction : std::uint8_t
     {
         None        = 0x00,
         PowerOffTV  = 0x01,

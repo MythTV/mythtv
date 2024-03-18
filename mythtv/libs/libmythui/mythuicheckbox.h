@@ -20,7 +20,8 @@ class MUI_PUBLIC MythUICheckBox : public MythUIType
     MythUICheckBox(MythUIType *parent, const QString &name);
    ~MythUICheckBox() override = default;
 
-    enum StateType { None = 0, Normal, Disabled, Active, Selected,
+    enum StateType : std::uint8_t
+                   { None = 0, Normal, Disabled, Active, Selected,
                      SelectedInactive };
 
     bool gestureEvent(MythGestureEvent *event) override; // MythUIType

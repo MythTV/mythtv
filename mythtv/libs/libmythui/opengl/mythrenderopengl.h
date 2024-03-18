@@ -37,7 +37,7 @@
 #include "libmythui/opengl/mythegl.h"
 #include "libmythui/opengl/mythrenderopengldefs.h"
 
-enum GLFeatures
+enum GLFeatures : std::uint16_t
 {
     kGLFeatNone        = 0x0000,
     kGLBufferMap       = 0x0001,
@@ -81,7 +81,7 @@ class MUI_PUBLIC MythGLTexture
     Q_DISABLE_COPY(MythGLTexture)
 };
 
-enum DefaultShaders
+enum DefaultShaders : std::uint8_t
 {
     kShaderSimple  = 0,
     kShaderDefault,

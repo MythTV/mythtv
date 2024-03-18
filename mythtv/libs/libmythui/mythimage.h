@@ -15,9 +15,9 @@
 #include "libmythbase/referencecounter.h"
 #include "libmythui/mythpainter.h"
 
-enum class ReflectAxis {Horizontal, Vertical};
-enum class FillDirection {LeftToRight, TopToBottom};
-enum class BoundaryWanted {No, Yes};
+enum class ReflectAxis : std::uint8_t {Horizontal, Vertical};
+enum class FillDirection : std::uint8_t {LeftToRight, TopToBottom};
+enum class BoundaryWanted : std::uint8_t {No, Yes};
 
 class QNetworkReply;
 class MythUIHelper;

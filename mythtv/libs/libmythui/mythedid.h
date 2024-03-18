@@ -42,7 +42,7 @@ class MUI_PUBLIC MythEDID
     MythVRRRange GetVRRRange      () const;
 
   private:
-    enum HDREOTF
+    enum HDREOTF : std::uint8_t
     {
         SDR     = 1 << 0,
         HDRTrad = 1 << 1,

@@ -13,7 +13,8 @@ class MythUIType;
 class UIEffects
 {
   public:
-    enum Centre { TopLeft, Top, TopRight,
+    enum Centre : std::uint8_t
+                { TopLeft, Top, TopRight,
                   Left, Middle, Right,
                   BottomLeft, Bottom, BottomRight };
 
@@ -46,8 +47,8 @@ class UIEffects
 class MythUIAnimation : public QVariantAnimation, XMLParseBase
 {
   public:
-    enum Type    { Alpha, Position, Zoom, HorizontalZoom, VerticalZoom, Angle };
-    enum Trigger { AboutToHide, AboutToShow };
+    enum Type    : std::uint8_t { Alpha, Position, Zoom, HorizontalZoom, VerticalZoom, Angle };
+    enum Trigger : std::uint8_t { AboutToHide, AboutToShow };
 
     explicit MythUIAnimation(MythUIType* parent = nullptr,
                     Trigger trigger = AboutToShow, Type type = Alpha)

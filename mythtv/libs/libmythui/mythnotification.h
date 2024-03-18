@@ -55,7 +55,7 @@ class MUI_PUBLIC MythNotification : public MythEvent
      * A notification can be given a priority. Display order of notification
      * will be sorted according to the priority level
      */
-    enum Priority
+    enum Priority : std::uint8_t
     {
         kDefault = 0,
         kLow,
@@ -71,10 +71,10 @@ class MUI_PUBLIC MythNotification : public MythEvent
      * This is used to prevent redundant information appearing more than once:
      * like in MythMusic, there's no need to show music notifications
      */
-    enum Visibility
+    enum Visibility : std::uint8_t
     {
         kNone       = 0,
-        kAll        = ~0,
+        kAll        = 0xFF,
         kPlayback   = (1 << 0),
         kSettings   = (1 << 1),
         kWizard     = (1 << 2),

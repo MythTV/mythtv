@@ -41,7 +41,7 @@ struct muibCbInfo
 class MUI_PUBLIC MythUIButtonListItem
 {
   public:
-    enum CheckState {
+    enum CheckState : std::int8_t {
         CantCheck = -1,
         NotChecked = 0,
         HalfChecked,
@@ -202,9 +202,11 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     bool gestureEvent(MythGestureEvent *event) override; // MythUIType
     void customEvent(QEvent *event) override; // MythUIType
 
-    enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax,
+    enum MovementUnit : std::uint8_t
+                      { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax,
                         MoveMid, MoveByAmount };
-    enum LayoutType  { LayoutVertical, LayoutHorizontal, LayoutGrid };
+    enum LayoutType : std::uint8_t
+                     { LayoutVertical, LayoutHorizontal, LayoutGrid };
 
     void SetDrawFromBottom(bool draw);
 
@@ -272,9 +274,12 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     void itemLoaded(MythUIButtonListItem* item);
 
   protected:
-    enum ScrollStyle { ScrollFree, ScrollCenter, ScrollGroupCenter };
-    enum ArrangeType { ArrangeFixed, ArrangeFill, ArrangeSpread, ArrangeStack };
-    enum WrapStyle   { WrapCaptive = -1, WrapNone = 0, WrapSelect, WrapItems,
+    enum ScrollStyle : std::uint8_t
+                     { ScrollFree, ScrollCenter, ScrollGroupCenter };
+    enum ArrangeType : std::uint8_t
+                     { ArrangeFixed, ArrangeFill, ArrangeSpread, ArrangeStack };
+    enum WrapStyle   : std::int8_t
+                     { WrapCaptive = -1, WrapNone = 0, WrapSelect, WrapItems,
                        WrapFlowing };
 
     void DrawSelf(MythPainter *p, int xoffset, int yoffset,

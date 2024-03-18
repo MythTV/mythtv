@@ -9,7 +9,7 @@ static constexpr int  NV_CTRL_TARGET_TYPE_DISPLAY                     {   8 };
 static constexpr uint NV_CTRL_BINARY_DATA_DISPLAYS_ENABLED_ON_XSCREEN {  17 };
 static constexpr uint NV_CTRL_VRR_ALLOWED                             { 408 };
 static constexpr uint NV_CTRL_DISPLAY_VRR_MODE                        { 429 };
-enum NV_CTRL_DISPLAY_VRR_MODES {
+enum NV_CTRL_DISPLAY_VRR_MODES : std::uint8_t {
     NV_CTRL_DISPLAY_VRR_MODE_NONE                         = 0,
     NV_CTRL_DISPLAY_VRR_MODE_GSYNC                        = 1,
     NV_CTRL_DISPLAY_VRR_MODE_GSYNC_COMPATIBLE             = 2,
