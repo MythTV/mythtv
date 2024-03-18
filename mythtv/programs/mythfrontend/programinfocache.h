@@ -22,7 +22,7 @@ class ProgramInfoCache
     friend class ProgramInfoLoader;
 
   public:
-    enum UpdateState {
+    enum UpdateState : std::uint8_t {
         PIC_NONE              = 0x00,
         PIC_MARK_CHANGED      = 0x01,
         PIC_RECGROUP_CHANGED  = 0x02,

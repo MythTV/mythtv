@@ -21,7 +21,7 @@ class MythCommFlagPlayer;
 class LogoDetectorBase;
 class SceneChangeDetectorBase;
 
-enum frameMaskValues {
+enum frameMaskValues : std::uint8_t {
     COMM_FRAME_SKIPPED       = 0x0001,
     COMM_FRAME_BLANK         = 0x0002,
     COMM_FRAME_SCENE_CHANGE  = 0x0004,

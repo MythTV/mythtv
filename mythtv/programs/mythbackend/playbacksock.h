@@ -17,7 +17,7 @@ class MythSocket;
 class MainServer;
 class ProgramInfo;
 
-enum PlaybackSockEventsMode {
+enum PlaybackSockEventsMode : std::uint8_t {
     kPBSEvents_None       = 0,
     kPBSEvents_Normal     = 1,
     kPBSEvents_NonSystem  = 2,

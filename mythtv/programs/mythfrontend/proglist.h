@@ -12,7 +12,7 @@
 #include "proglist_helpers.h"
 #include "schedulecommon.h"
 
-enum ProgListType {
+enum ProgListType : std::uint8_t {
     plUnknown = 0,
     plTitle = 1,
     plTitleSearch,
@@ -85,7 +85,7 @@ class ProgLister : public ScheduleCommon
     void SwitchToPreviousView(void);
     void SwitchToNextView(void);
 
-    enum SortBy { kTimeSort, kPrevTitleSort, kTitleSort, };
+    enum SortBy : std::uint8_t { kTimeSort, kPrevTitleSort, kTitleSort, };
     SortBy GetSortBy(void) const;
     void SortList(SortBy sortby, bool reverseSort);
 

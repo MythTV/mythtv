@@ -37,7 +37,7 @@ namespace
     class FileAssociationWrap
     {
       public:
-        enum FA_State {
+        enum FA_State : std::uint8_t {
             efsNONE,
             efsDELETE,
             efsSAVE

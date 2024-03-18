@@ -18,54 +18,54 @@ class MythUIText;
 class VideoMetadata;
 class VideoList;
 
-enum GenreFilter {
+enum GenreFilter : std::int8_t {
     kGenreFilterAll = -1,
     kGenreFilterUnknown = 0
 };
 
-enum CountryFilter {
+enum CountryFilter : std::int8_t {
     kCountryFilterAll = -1,
     kCountryFilterUnknown = 0
 };
 
-enum CastFilter {
+enum CastFilter : std::int8_t {
     kCastFilterAll = -1,
     kCastFilterUnknown = 0
 };
 
-enum CategoryFilter {
+enum CategoryFilter : std::int8_t {
     kCategoryFilterAll = -1,
     kCategoryFilterUnknown = 0
 };
 
-enum YearFilter {
+enum YearFilter : std::int8_t {
     kYearFilterAll = -1,
     kYearFilterUnknown = 0
 };
 
-enum RuntimeFilter {
+enum RuntimeFilter : std::int8_t {
     kRuntimeFilterAll = -2,
     kRuntimeFilterUnknown = -1
 };
 
-enum UserRatingFilter {
+enum UserRatingFilter : std::int8_t {
     kUserRatingFilterAll = -1
 };
 
-enum BrowseFilter {
+enum BrowseFilter : std::int8_t {
     kBrowseFilterAll = -1
 };
 
-enum WatchedFilter {
+enum WatchedFilter : std::int8_t {
     kWatchedFilterAll = -1
 };
 
-enum InetRefFilter {
+enum InetRefFilter : std::int8_t {
     kInetRefFilterAll = -1,
     kInetRefFilterUnknown = 0
 };
 
-enum CoverFileFilter {
+enum CoverFileFilter : std::int8_t {
     kCoverFileFilterAll = -1,
     kCoverFileFilterNone = 0
 };
@@ -75,7 +75,7 @@ class VideoFilterSettings
      Q_DECLARE_TR_FUNCTIONS(VideoFilterSettings);
 
   public:
-    enum FilterChanges {
+    enum FilterChanges : std::uint16_t {
         kSortOrderChanged = (1 << 0),
         kFilterCategoryChanged = (1 << 1),
         kFilterGenreChanged = (1 << 2),
@@ -103,7 +103,7 @@ class VideoFilterSettings
 
     void saveAsDefault();
 
-    enum ordering
+    enum ordering : std::uint8_t
     {
         // These values must be explicitly assigned; they represent
         // database values

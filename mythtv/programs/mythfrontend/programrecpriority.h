@@ -72,7 +72,7 @@ class ProgramRecPriority : public ScheduleCommon
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void customEvent(QEvent *event) override; // ScheduleCommon
 
-    enum SortType
+    enum SortType : std::uint8_t
     {
         byTitle,
         byRecPriority,

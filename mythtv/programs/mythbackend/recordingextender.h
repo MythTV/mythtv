@@ -192,7 +192,7 @@ class RecExtDataPage : public QObject
 class RecExtEspnDataPage : public RecExtDataPage
 {
     // Games status codes.
-    enum GameStatus {
+    enum GameStatus : std::uint8_t {
         TBD = 0,
         SCHEDULED = 1,
         INPROGRESS = 2,

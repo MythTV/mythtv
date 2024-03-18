@@ -10,7 +10,7 @@
 
 static constexpr int64_t MAX_BLANK_FRAMES { 180 };
 
-enum CommMapValue {
+enum CommMapValue : std::uint8_t {
     MARK_START   = 0,
     MARK_END     = 1,
     MARK_PRESENT = 2,

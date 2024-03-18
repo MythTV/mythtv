@@ -19,7 +19,7 @@ class PreviewGenerator;
 class PBHEventHandler;
 class ProgramInfo;
 
-enum CheckAvailabilityType {
+enum CheckAvailabilityType : std::uint8_t {
     kCheckForCache,
     kCheckForMenuAction,
     kCheckForPlayAction,

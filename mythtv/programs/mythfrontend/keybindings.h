@@ -36,7 +36,7 @@
 class KeyBindings
 {
   public:
-    enum Filter
+    enum Filter : std::uint8_t
     {
         AllBindings,
         NoModifiers,
@@ -44,7 +44,7 @@ class KeyBindings
     };
 
     /// \brief Levels of conflict
-    enum ConflictLevels { kKeyBindingWarning, kKeyBindingError, };
+    enum ConflictLevels : std::uint8_t { kKeyBindingWarning, kKeyBindingError, };
 
     explicit KeyBindings(QString hostname, Filter Filters = AllBindings);
 

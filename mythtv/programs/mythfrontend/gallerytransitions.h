@@ -11,7 +11,7 @@
 
 
 //! Available transitions
-enum ImageTransitionType {
+enum ImageTransitionType : std::uint8_t {
     // First transition must be 0 and useable by all painters
     kNoTransition      = 0,
     kRandomTransition  = 1,

@@ -33,7 +33,7 @@ public:
     virtual const char *name(void) const = 0;
 
     /* Analyze a video frame. */
-    enum analyzeFrameResult {
+    enum analyzeFrameResult : std::uint8_t {
         ANALYZE_OK,         /* Analysis OK */
         ANALYZE_ERROR,      /* Recoverable error */
         ANALYZE_FINISHED,   /* Analysis complete, don't need more frames. */

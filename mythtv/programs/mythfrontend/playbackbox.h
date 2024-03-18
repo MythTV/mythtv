@@ -66,7 +66,7 @@ class PlaybackBox : public ScheduleCommon
 
   public:
     // ViewType values cannot change; they are stored in the database.
-    enum ViewType {
+    enum ViewType : std::uint8_t {
         TitlesOnly = 0,
         TitlesCategories = 1,
         TitlesCategoriesRecGroups = 2,
@@ -78,13 +78,13 @@ class PlaybackBox : public ScheduleCommon
     };
 
     // Sort function when TitlesOnly. Values are stored in database.
-    enum ViewTitleSort {
+    enum ViewTitleSort : std::uint8_t {
         TitleSortAlphabetical = 0,
         TitleSortRecPriority = 1,
         TitleSortMethods,           // placeholder value, not in database
     };
 
-    enum ViewMask {
+    enum ViewMask : std::uint16_t {
         VIEW_NONE       =  0x0000,
         VIEW_TITLES     =  0x0001,
         VIEW_CATEGORIES =  0x0002,
@@ -96,14 +96,14 @@ class PlaybackBox : public ScheduleCommon
         VIEW_WATCHED    =  0x8000
     };
 
-    enum DeletePopupType
+    enum DeletePopupType : std::uint8_t
     {
         kDeleteRecording,
         kStopRecording,
         kForceDeleteRecording,
     };
 
-    enum DeleteFlags
+    enum DeleteFlags : std::uint8_t
     {
         kNoFlags       = 0x00,
         kForgetHistory = 0x01,
@@ -112,7 +112,7 @@ class PlaybackBox : public ScheduleCommon
         kAllRemaining  = 0x08,
     };
 
-    enum killStateType
+    enum killStateType : std::uint8_t
     {
         kNvpToPlay,
         kNvpToStop,

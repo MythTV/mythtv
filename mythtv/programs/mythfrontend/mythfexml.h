@@ -12,7 +12,7 @@
 #include "libmythupnp/eventing.h"
 #include "libmythupnp/upnp.h"
 
-enum MythFEXMLMethod
+enum MythFEXMLMethod : std::uint8_t
 {
     MFEXML_Unknown = 0,
     MFEXML_GetServiceDescription,

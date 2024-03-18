@@ -50,7 +50,7 @@ class ImportIconsWizard : public MythScreenType
 
   private:
 
-    enum dialogState
+    enum dialogState : std::uint8_t
     {
         STATE_NORMAL,
         STATE_SEARCHING,

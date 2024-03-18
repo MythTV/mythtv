@@ -37,7 +37,7 @@ class ChannelEditor : public MythScreenType
     void itemChanged(MythUIButtonListItem *item);
 
   private:
-    enum sourceFilter {
+    enum sourceFilter : std::int8_t {
         FILTER_ALL = -1,
         FILTER_UNASSIGNED = 0
     };

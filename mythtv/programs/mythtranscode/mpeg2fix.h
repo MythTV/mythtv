@@ -38,7 +38,7 @@ extern "C"
 // MythTranscode
 #include "transcodedefs.h"
 
-enum MPFListType {
+enum MPFListType : std::uint8_t {
     MPF_TYPE_CUTLIST = 0,
     MPF_TYPE_SAVELIST,
 };
