@@ -263,7 +263,7 @@ class MHParameter
     void PrintMe(FILE *fd, int nTabs) const;
     MHObjectRef *GetReference(); // Get an indirect reference.
 
-    enum ParamTypes {
+    enum ParamTypes : std::uint8_t {
         P_Int,
         P_Bool,
         P_String,
@@ -295,7 +295,7 @@ class MHUnion
     void GetValueFrom(const MHParameter &value, MHEngine *engine); // Copies the argument, getting the value of an indirect args.
     QString Printable() const;
 
-    enum UnionTypes { U_Int, U_Bool, U_String, U_ObjRef, U_ContentRef, U_None } m_Type {U_None};
+    enum UnionTypes : std::uint8_t { U_Int, U_Bool, U_String, U_ObjRef, U_ContentRef, U_None } m_Type {U_None};
     void CheckType (enum UnionTypes t) const; // Check a type and fail if it doesn't match.
     static const char *GetAsString(enum UnionTypes t);
 

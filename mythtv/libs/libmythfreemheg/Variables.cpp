@@ -29,7 +29,7 @@
 #include "Engine.h"
 #include "Logging.h"
 
-enum TestCodes { TC_Equal = 1, TC_NotEqual, TC_Less, TC_LessOrEqual, TC_Greater, TC_GreaterOrEqual };
+enum TestCodes : std::uint8_t { TC_Equal = 1, TC_NotEqual, TC_Less, TC_LessOrEqual, TC_Greater, TC_GreaterOrEqual };
 
 static const char *TestToText(int tc)
 {

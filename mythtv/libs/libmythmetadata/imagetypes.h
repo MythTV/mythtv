@@ -31,7 +31,7 @@ static constexpr int PHOTO_DB_ID { 1 };
 
 //! Type of image node
 // We need to use other names to avoid getting coflicts with the videolist.h file
-enum ImageNodeType {
+enum ImageNodeType : std::uint8_t {
     kUnknown   = 0, //!< Unprocessable file type
     kDevice    = 1, //!< Storage Group and local mounted media
     kCloneDir  = 2, //!< A device sub dir comprised from multiple SG dirs
@@ -42,7 +42,7 @@ enum ImageNodeType {
 
 
 //! Image ordering
-enum ImageSortOrder {
+enum ImageSortOrder : std::uint8_t {
     kSortByNameAsc     = 1, //!< Name A-Z
     kSortByNameDesc    = 2, //!< Name Z-A
     kSortByModTimeAsc  = 3, //!< File modified time Earliest -> Latest

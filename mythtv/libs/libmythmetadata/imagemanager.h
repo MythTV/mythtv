@@ -74,7 +74,7 @@ class MythMediaDevice;
 class MythMediaEvent;
 
 //! Display filter
-enum ImageDisplayType {
+enum ImageDisplayType : std::uint8_t {
     kPicAndVideo = 0, //!< Show Pictures & Videos
     kPicOnly     = 1, //!< Hide videos
     kVideoOnly   = 2  //!< Hide pictures

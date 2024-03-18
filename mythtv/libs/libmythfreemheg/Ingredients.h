@@ -68,7 +68,7 @@ class MHIngredient : public MHRoot
     bool    m_fShared                  {false};
     // Original content.  The original included content and the other fields are
     // mutually exclusive.
-    enum { IN_NoContent, IN_IncludedContent, IN_ReferencedContent } m_contentType {IN_NoContent};
+    enum : std::uint8_t { IN_NoContent, IN_IncludedContent, IN_ReferencedContent } m_contentType {IN_NoContent};
     MHOctetString   m_origIncludedContent;
     MHContentRef    m_origContentRef;
     int             m_nOrigContentSize {0};

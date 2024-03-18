@@ -76,9 +76,9 @@ class MHText : public MHVisible
     MHColour        m_originalTextColour, m_originalBgColour;
     int             m_nCharSet        {-1};
 
-    enum Justification   { Start = 1, End, Centre, Justified };
-    enum LineOrientation { Vertical = 1, Horizontal };
-    enum StartCorner     { UpperLeft = 1, UpperRight, LowerLeft, LowerRight };
+    enum Justification   : std::uint8_t { Start = 1, End, Centre, Justified };
+    enum LineOrientation : std::uint8_t { Vertical = 1, Horizontal };
+    enum StartCorner     : std::uint8_t { UpperLeft = 1, UpperRight, LowerLeft, LowerRight };
     Justification   m_horizJ          {Start};
     Justification   m_vertJ           {Start};
     LineOrientation m_lineOrientation {Horizontal};

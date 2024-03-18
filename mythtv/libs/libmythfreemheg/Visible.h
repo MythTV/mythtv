@@ -109,7 +109,7 @@ class MHLineArt : public MHVisible
     // Exchanged attributes,
     bool    m_fBorderedBBox      {true}; // Does it have lines round or not?
     int     m_nOriginalLineWidth {1};
-    enum { LineStyleSolid = 1, LineStyleDashed = 2, LineStyleDotted = 3 };
+    enum : std::uint8_t { LineStyleSolid = 1, LineStyleDashed = 2, LineStyleDotted = 3 };
     int     m_originalLineStyle  {LineStyleSolid};
     MHColour    m_origLineColour, m_origFillColour;
     // Internal attributes
@@ -219,7 +219,7 @@ class MHSlider : public MHVisible, public MHInteractible
 
     // Exchanged attributes
     // Orientation and direction of increasing value.
-    enum SliderOrientation { SliderLeft = 1, SliderRight, SliderUp, SliderDown }
+    enum SliderOrientation : std::uint8_t { SliderLeft = 1, SliderRight, SliderUp, SliderDown }
         m_orientation     {SliderLeft};
     int m_initialValue    {1};
     int m_initialPortion  {0};
@@ -229,7 +229,7 @@ class MHSlider : public MHVisible, public MHInteractible
     // Style of slider.  Normal represents a mark on a scale,
     // Thermometer a range from the start up to the mark and Proportional
     // a range from the slider to the portion.
-    enum SliderStyle { SliderNormal = 1, SliderThermo, SliderProp }
+    enum SliderStyle : std::uint8_t { SliderNormal = 1, SliderThermo, SliderProp }
         m_style           {SliderNormal};
     MHColour m_sliderRefColour;
     // Internal attributes
@@ -329,7 +329,7 @@ class MHSetColour: public MHElemAction
     virtual void SetColour(const MHColour &colour, MHEngine *engine) = 0;
     // The colour can be specified as either an index or an absolute colour.
     // It's optional for the fill colour.
-    enum { CT_None, CT_Indexed, CT_Absolute } m_colourType { CT_None };
+    enum : std::uint8_t { CT_None, CT_Indexed, CT_Absolute } m_colourType { CT_None };
     MHGenericInteger m_indexed;
     MHGenericOctetString m_absolute;
 };

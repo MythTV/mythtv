@@ -29,7 +29,7 @@
 //! \details Ordered to optimise perceived client performance, ie. pictures will be
 //! displayed before directories (4 thumbnails), then videos (slow to generate) are filled
 //! in last.
-enum ImageThumbPriority {
+enum ImageThumbPriority : std::int8_t {
     kUrgentPriority     = -10, //!< Scanner request needed to complete a scan
     kPicRequestPriority =  -7, //!< Client request to display an image thumbnail
     kDirRequestPriority =  -3, //!< Client request to display a directory thumbnail

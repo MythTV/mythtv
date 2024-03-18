@@ -67,7 +67,7 @@ class MHEG
 };
 
 // Logging control
-enum {
+enum MHLog : std::uint8_t {
     MHLogError = 1,         // Log errors - these are errors that need to be reported to the user.
     MHLogWarning = 2,       // Log warnings - typically bad MHEG which might be an error in this program
     MHLogNotifications = 4, // General things to log.

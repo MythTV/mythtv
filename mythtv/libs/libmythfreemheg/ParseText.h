@@ -48,7 +48,8 @@ class MHParseText: public MHParseBase
 
     int            m_lineCount     {1};
 
-    enum ParseTextType { PTTag, PTInt, PTString, PTEnum, PTStartSection,
+    enum ParseTextType : std::uint8_t
+                       { PTTag, PTInt, PTString, PTEnum, PTStartSection,
                          PTEndSection, PTStartSeq, PTEndSeq, PTNull,
                          PTEOF, PTBool };
     ParseTextType  m_nType         {PTNull};

@@ -26,7 +26,7 @@ static constexpr uint16_t SURROUND_BUFSIZE { 8192 };
 class Q_DECL_EXPORT FreeSurround
 {
 public:
-    enum SurroundMode
+    enum SurroundMode : std::uint8_t
     {
         SurroundModePassive,
         SurroundModeActiveSimple,
