@@ -118,7 +118,7 @@ class MBASE_PUBLIC MythCommandLineParser
   public:
     friend TestCommandLineParser;
 
-    enum class Result {
+    enum class Result : std::uint8_t {
         kEnd          = 0,
         kEmpty        = 1,
         kOptOnly      = 2,

@@ -21,7 +21,7 @@ extern "C" {
 }
 #include "eldutils.h"
 
-enum AudioFormat {
+enum AudioFormat : std::uint8_t {
     FORMAT_NONE = 0,
     FORMAT_U8,
     FORMAT_S16,
@@ -31,7 +31,7 @@ enum AudioFormat {
     FORMAT_FLT
 };
 
-enum DigitalFeature {
+enum DigitalFeature : std::uint8_t {
     FEATURE_NONE   = 0,
     FEATURE_AC3    = 1 << 0,
     FEATURE_DTS    = 1 << 1,

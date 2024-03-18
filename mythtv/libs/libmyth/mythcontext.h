@@ -56,7 +56,7 @@ class MPUBLIC MythContext
 
     void SetDisableEventPopup(bool check);
 
-    enum WebOnlyStartup {
+    enum WebOnlyStartup : std::uint8_t {
         kWebOnlyNone = 0,
         kWebOnlyDBSetup = 1,
         kWebOnlyDBTimezone = 2,

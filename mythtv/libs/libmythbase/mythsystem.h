@@ -53,7 +53,7 @@ enum MythSystemFlag {
                                         ///  propagation
 };
 
-enum MythSignal {
+enum MythSignal : std::uint8_t {
     kSignalNone,
     kSignalUnknown,
     kSignalHangup,
@@ -81,7 +81,7 @@ class MBASE_PUBLIC MythSystem
 {
   public:
     /// Priorities that can be used for cpu and disk usage of child process
-    enum Priority {
+    enum Priority : std::uint8_t {
         kIdlePriority   = 0, ///< run only when no one else wants to
         kLowestPriority,
         kLowPriority,

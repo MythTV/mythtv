@@ -8,7 +8,7 @@ class QThread;
 class PulseHandler
 {
   public:
-    enum PulseAction
+    enum PulseAction : std::uint8_t
     {
         kPulseSuspend = 0,
         kPulseResume,

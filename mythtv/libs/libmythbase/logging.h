@@ -35,7 +35,7 @@ void loggingDeregisterThread(void);
 
 class QWaitCondition;
 
-enum LoggingType {
+enum LoggingType : std::uint8_t {
     kMessage       = 0x01,
     kRegistering   = 0x02,
     kDeregistering = 0x04,

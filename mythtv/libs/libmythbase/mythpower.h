@@ -21,7 +21,7 @@ class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
     Q_OBJECT
 
   public:
-    enum PowerLevel
+    enum PowerLevel : std::int8_t
     {
         UPS           = -2,
         ACPower       = -1,
@@ -32,7 +32,7 @@ class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
         Unset
     };
 
-    enum Feature
+    enum Feature : std::uint8_t
     {
         FeatureNone        = 0x00,
         FeatureShutdown    = 0x01,

@@ -73,7 +73,7 @@
 #endif
 
 #define LOGLEVEL_PREAMBLE \
-    enum LogLevel_t {
+    enum LogLevel_t : std::int8_t {
 #define LOGLEVEL_POSTAMBLE \
     };
 #define LOGLEVEL_MAP(name,value,shortname) \

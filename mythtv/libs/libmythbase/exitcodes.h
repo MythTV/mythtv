@@ -1,13 +1,15 @@
 #ifndef MYTH_EXIT_CODES_H
 #define MYTH_EXIT_CODES_H
 
+#include <cstdint>
+
 // ALL statuses that are not to be mapped directly to an exit code *should*
 // be > 128 so as to not show up as a commercial count on commflag runs.
 // However, they *must* be <= 255 as exit codes only can be 8-bits.
 // Additionally, the functionality of mythwelcome/welcomedialog.cpp depends on
 // being able to use exit code as an 8-bit masked integer.
 
-enum EXIT_CODES {
+enum EXIT_CODES : std::uint8_t {
     GENERIC_EXIT_OK                   =   0, ///< Exited with no error
     GENERIC_EXIT_NOT_OK               = 128, ///< Exited with error
     GENERIC_EXIT_CMD_NOT_FOUND        = 129, ///< Command not found

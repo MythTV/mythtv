@@ -12,7 +12,7 @@ class MBASE_PUBLIC RecStatus : public QObject
   Q_OBJECT
 
   public:
-    enum Type {
+    enum Type : std::int8_t {
         Pending = -15,
         Failing = -14,
         //OtherRecording = -13, (obsolete)

@@ -50,7 +50,7 @@ class MythWebSocket : public QObject
     void SendPing       ();
     void SendFrame      (WSOpCode Code, const DataPayloads& Payloads);
 
-    enum ReadState
+    enum ReadState : std::uint8_t
     {
         ReadHeader = 0,
         Read16BitLength,

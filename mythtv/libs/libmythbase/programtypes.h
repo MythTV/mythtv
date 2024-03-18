@@ -44,7 +44,7 @@ MBASE_PUBLIC extern const QString kCCExtractorInUseID;
 /// Frame # -> File offset map
 using frm_pos_map_t = QMap<long long, long long>;
 
-enum MarkTypes {
+enum MarkTypes : std::int16_t {
     MARK_INVALID       = -9999,
     MARK_ALL           = -100,
     MARK_UNSET         = -10,
@@ -117,7 +117,7 @@ MBASE_PUBLIC MarkTypes markTypeFromString(const QString & str);
 /// Frame # -> Mark map
 using frm_dir_map_t = QMap<uint64_t, MarkTypes>;
 
-enum CommFlagStatus {
+enum CommFlagStatus : std::uint8_t {
     COMM_FLAG_NOT_FLAGGED = 0,
     COMM_FLAG_DONE = 1,
     COMM_FLAG_PROCESSING = 2,
@@ -125,7 +125,7 @@ enum CommFlagStatus {
 };
 
 /// This is used as a bitmask.
-enum SkipType {
+enum SkipType : std::int16_t {
     COMM_DETECT_COMMFREE    = -2,
     COMM_DETECT_UNINIT      = -1,
     COMM_DETECT_OFF         = 0x00000000,
@@ -154,7 +154,7 @@ enum SkipType {
 MBASE_PUBLIC QString SkipTypeToString(int flags);
 MBASE_PUBLIC std::deque<int> GetPreferredSkipTypeCombinations(void);
 
-enum TranscodingStatus {
+enum TranscodingStatus : std::uint8_t {
     TRANSCODING_NOT_TRANSCODED = 0,
     TRANSCODING_COMPLETE       = 1,
     TRANSCODING_RUNNING        = 2
@@ -164,7 +164,7 @@ enum TranscodingStatus {
 #include "programtypeflags.h"
 #undef DEFINE_FLAGS_ENUM
 
-enum ProgramInfoType {
+enum ProgramInfoType : std::uint8_t {
     kProgramInfoTypeRecording = 0,
     kProgramInfoTypeVideoFile,
     kProgramInfoTypeVideoDVD,
@@ -173,7 +173,7 @@ enum ProgramInfoType {
     kProgramInfoTypeVideoBD,
 };
 
-enum AvailableStatusType {
+enum AvailableStatusType : std::uint8_t {
     asAvailable = 0,
     asNotYetAvailable,
     asPendingDelete,
@@ -183,14 +183,14 @@ enum AvailableStatusType {
 }; // note stored in uint8_t in ProgramInfo
 MBASE_PUBLIC QString toString(AvailableStatusType status);
 
-enum WatchListStatus {
+enum WatchListStatus : std::int8_t {
     wlDeleted = -4,
     wlEarlier = -3,
     wlWatched = -2,
     wlExpireOff = -1
 };
 
-enum AutoExpireType {
+enum AutoExpireType : std::uint16_t {
     kDisableAutoExpire = 0,
     kNormalAutoExpire  = 1,
     kDeletedAutoExpire = 9999,

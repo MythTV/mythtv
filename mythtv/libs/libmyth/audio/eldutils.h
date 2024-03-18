@@ -54,7 +54,7 @@ class MPUBLIC eld
     int maxChannels();
     QString codecs_desc() const;
     
-    enum cea_audio_coding_types {
+    enum cea_audio_coding_types : std::uint8_t {
         TYPE_REF_STREAM_HEADER =  0,
         TYPE_LPCM              =  1,
         TYPE_AC3               =  2,

@@ -9,14 +9,14 @@
 #include <memory>
 #include "mythbaseexp.h"
 
-enum SortPrefixMode
+enum SortPrefixMode : std::uint8_t
 {
     SortPrefixKeep,
     SortPrefixRemove,
     SortPrefixToEnd,
 };
 
-enum SortExclusionMode
+enum SortExclusionMode : std::uint8_t
 {
     SortExclusionMatch,
     SortExclusionPrefix,

@@ -3,11 +3,13 @@
 
 #include "mythbaseexp.h"
 
+#include <cstdint>
+
 #include <QString>
 #include <QDateTime>
 #include <QMap>
 
-enum DigestUserActions {
+enum DigestUserActions : std::uint8_t {
     DIGEST_USER_ADD,
     DIGEST_USER_REMOVE,
     DIGEST_USER_CHANGE_PW

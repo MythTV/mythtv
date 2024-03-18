@@ -205,7 +205,7 @@ class AudioOutputBase : public AudioOutput, public MThread
 
     int               m_configuredChannels         {0};
     int               m_maxChannels                {0};
-    enum
+    enum : std::int8_t
     {
         QUALITY_DISABLED = -1,
         QUALITY_LOW      =  0,

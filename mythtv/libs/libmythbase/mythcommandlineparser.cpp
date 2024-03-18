@@ -155,7 +155,7 @@ QStringList MythCommandLineParser::MythSplitCommandString(const QString &line)
 /**
  * States for the command line parser.
  */
-    enum states {
+    enum states : std::uint8_t {
         START,     ///< No current token.
         INTEXT,    ///< Collecting token text.
         INSQUOTE,  ///< Collecting token, inside single quotes.

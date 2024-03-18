@@ -73,7 +73,8 @@ class MBASE_PUBLIC ProgramInfo
     static const std::array<const QString,5> kCatName;
   public:
     static constexpr int kNumCatTypes = 5;
-    enum CategoryType { kCategoryNone, kCategoryMovie, kCategorySeries,
+    enum CategoryType : std::uint8_t
+                      { kCategoryNone, kCategoryMovie, kCategorySeries,
                         kCategorySports, kCategoryTVShow };
 
     /// Null constructor
@@ -503,7 +504,7 @@ class MBASE_PUBLIC ProgramInfo
 
     void ProgramFlagsFromNames(const QString & names);
 
-    enum Verbosity
+    enum Verbosity : std::uint8_t
     {
         kLongDescription,
         kTitleSubtitle,

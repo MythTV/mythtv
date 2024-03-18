@@ -15,7 +15,7 @@
 // Myth
 #include "mythbaseexp.h"
 
-enum PIAction {
+enum PIAction : std::uint8_t {
     kPIAdd,
     kPIDelete,
     kPIUpdate,
