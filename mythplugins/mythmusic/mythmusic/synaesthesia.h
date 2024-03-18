@@ -20,7 +20,7 @@ static constexpr uint8_t Brightness {        150 };
 using samp_dbl_array = std::array<double,NumSamples>;
 using samp_int_array = std::array<int,NumSamples>;
 
-enum Mode {
+enum Mode : std::uint8_t {
     Flame = 0,
     Wave  = 1,
     Stars = 2

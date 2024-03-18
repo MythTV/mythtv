@@ -28,7 +28,7 @@ class MythUIButton;
 class MythUICheckBox;
 class MythMenu;
 
-enum MusicView
+enum MusicView : std::uint8_t
 {
     MV_PLAYLIST,
     MV_LYRICS,

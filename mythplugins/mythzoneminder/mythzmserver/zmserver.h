@@ -65,7 +65,7 @@ const std::string RESTART          = "restart";
 const std::string RELOAD           = "reload";
 const std::string RUNNING          = "running";
 
-enum State
+enum State : std::uint8_t
 {
     IDLE,
     PREALARM,
@@ -220,7 +220,7 @@ struct SharedData34
 
 
 
-enum TriggerState { TRIGGER_CANCEL, TRIGGER_ON, TRIGGER_OFF };
+enum TriggerState : std::uint8_t { TRIGGER_CANCEL, TRIGGER_ON, TRIGGER_OFF };
 
 // Triggerdata for ZM version 1.24.x and 1.25.x
 struct TriggerData

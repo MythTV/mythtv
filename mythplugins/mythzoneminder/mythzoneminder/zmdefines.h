@@ -80,7 +80,7 @@ class Event
     QDateTime m_startTime;
 };
 
-enum State
+enum State : std::uint8_t
 {
     IDLE,
     PREALARM,
