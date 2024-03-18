@@ -13,7 +13,7 @@
 //NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #ifdef DEFINE_FLAGS_ENUM
 #define FLAGS_PREAMBLE(NAME, TYPE) \
-    enum NAME {
+    enum NAME : TYPE {
 #define FLAGS_POSTAMBLE(NAME, TYPE) \
     }; \
     using NAME##Type = TYPE;

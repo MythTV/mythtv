@@ -134,11 +134,11 @@ RecordingInfo::RecordingInfo(
         m_originalAirDate = QDate();
 
     m_programFlags &= ~FL_REPEAT;
-    m_programFlags |= _repeat ? FL_REPEAT : 0;
+    m_programFlags |= _repeat ? FL_REPEAT : FL_NONE;
     m_programFlags &= ~FL_REACTIVATE;
-    m_programFlags |= _reactivate ? FL_REACTIVATE : 0;
+    m_programFlags |= _reactivate ? FL_REACTIVATE : FL_NONE;
     m_programFlags &= ~FL_CHANCOMMFREE;
-    m_programFlags |= _commfree ? FL_CHANCOMMFREE : 0;
+    m_programFlags |= _commfree ? FL_CHANCOMMFREE : FL_NONE;
 
     m_recordId = _recordid;
     m_parentId = _parentid;
@@ -225,7 +225,7 @@ RecordingInfo::RecordingInfo(
     m_findId = _findid;
 
     m_programFlags &= ~FL_CHANCOMMFREE;
-    m_programFlags |= _commfree ? FL_CHANCOMMFREE : 0;
+    m_programFlags |= _commfree ? FL_CHANCOMMFREE : FL_NONE;
 
     LoadRecordingFile();
 }
@@ -309,7 +309,7 @@ RecordingInfo::RecordingInfo(
     m_chanName             = query.value(3).toString();
     m_programFlags &= ~FL_CHANCOMMFREE;
     m_programFlags |= (query.value(4).toInt() == COMM_DETECT_COMMFREE) ?
-        FL_CHANCOMMFREE : 0;
+        FL_CHANCOMMFREE : FL_NONE;
     m_chanPlaybackFilters  = query.value(5).toString();
 
     {

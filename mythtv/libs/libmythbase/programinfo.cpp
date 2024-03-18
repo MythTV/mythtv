@@ -473,7 +473,7 @@ ProgramInfo::ProgramInfo(
     m_recordId(_recordid),
     m_findId(_findid),
 
-    m_programFlags((duplicate) ? FL_DUPLICATE : 0),
+    m_programFlags((duplicate) ? FL_DUPLICATE : FL_NONE),
 
     m_recStatus(_recstatus),
     m_recType(_rectype),
@@ -578,8 +578,8 @@ ProgramInfo::ProgramInfo(
     m_recStatus(_recstatus),
     m_recType(_rectype)
 {
-    m_programFlags |= (commfree) ? FL_CHANCOMMFREE : 0;
-    m_programFlags |= (repeat)   ? FL_REPEAT       : 0;
+    m_programFlags |= (commfree) ? FL_CHANCOMMFREE : FL_NONE;
+    m_programFlags |= (repeat)   ? FL_REPEAT       : FL_NONE;
 
     if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1895, 12, 28))
         m_originalAirDate = QDate();
