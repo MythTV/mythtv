@@ -200,6 +200,11 @@ Checks: '-*,
         # As of 2023-09-19, there are 443 unique warnings. ,
        -performance-avoid-endl,
 
+        # New in clang-18. As of 2024-03-18, there are 349 unique
+        # warnings. These warnings are all in Qt macros like
+        # Q_DECLARE_METATYPE or QStringLiteral. ,
+       -performance-enum-size,
+
         # The Q_DECLARE_METATYPE macro triggers a warning from this
         # new clang12 checker.  As of 2022-12-19, the vast majority
         # of these (236 of 292) warnings are associated with this
