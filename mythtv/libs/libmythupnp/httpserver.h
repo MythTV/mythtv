@@ -53,7 +53,7 @@ class QSslCertificate;
 class QSslConfiguration;
 #endif
 
-enum ContentProtection
+enum ContentProtection : std::uint8_t
 {
     cpLocalNoAuth = 0x00,  // Can only be accessed locally, but no authentication is required
     cpLocalAuth   = 0x01,  // Can only be accessed locally, authentication is required

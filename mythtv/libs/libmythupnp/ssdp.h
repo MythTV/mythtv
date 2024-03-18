@@ -30,14 +30,14 @@ static constexpr const char* SSDP_GROUP { "239.255.255.250" };
 static constexpr uint16_t SSDP_PORT       { 1900 };
 static constexpr uint16_t SSDP_SEARCHPORT { 6549 };
 
-enum SSDPMethod
+enum SSDPMethod : std::uint8_t
 {
     SSDPM_Unknown         = 0,
     SSDPM_GetDeviceDesc   = 1,
     SSDPM_GetDeviceList   = 2
 };
 
-enum SSDPRequestType
+enum SSDPRequestType : std::uint8_t
 {
     SSDP_Unknown        = 0,
     SSDP_MSearch        = 1,
@@ -53,7 +53,7 @@ enum SSDPRequestType
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-enum SocketIdxType
+enum SocketIdxType : std::uint8_t
 {
     SocketIdx_Search     = 0,
     SocketIdx_Multicast  = 1,

@@ -30,7 +30,7 @@
 
 class UPnpCDS;
 
-enum UPnpCDSMethod
+enum UPnpCDSMethod : std::uint8_t
 {
     CDSM_Unknown                = 0,
     CDSM_GetServiceDescription  = 1,
@@ -43,14 +43,14 @@ enum UPnpCDSMethod
     CDSM_GetServiceResetToken   = 8
 };
 
-enum UPnpCDSBrowseFlag
+enum UPnpCDSBrowseFlag : std::uint8_t
 {
     CDS_BrowseUnknown         = 0,
     CDS_BrowseMetadata        = 1,
     CDS_BrowseDirectChildren  = 2
 };
 
-enum UPnpCDSClient
+enum UPnpCDSClient : std::uint8_t
 {
     CDS_ClientDefault         = 0,      // (no special attention required)
     CDS_ClientWMP             = 1,      // Windows Media Player
@@ -147,7 +147,7 @@ class UPNP_PUBLIC UPnPShortcutFeature : public UPnPFeature
      * ContentDirectory Service v4 2014
      * Table E-13  allowedValueListfor the Shortcut Name element
      */
-    enum ShortCutType
+    enum ShortCutType : std::uint8_t
     {
         MUSIC,
         MUSIC_ALBUMS,

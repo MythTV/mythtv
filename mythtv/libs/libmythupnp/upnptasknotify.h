@@ -36,7 +36,7 @@ class UPnpDevice;
 // Typedefs
 /////////////////////////////////////////////////////////////////////////////
 
-enum UPnpNotifyNTS
+enum UPnpNotifyNTS : std::uint8_t
 {
     NTS_alive   = 0,
     NTS_byebye  = 1
