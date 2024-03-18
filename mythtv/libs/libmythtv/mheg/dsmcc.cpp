@@ -15,13 +15,13 @@
 //static constexpr uint8_t DSMCC_TRANSPORT_ERROR { 0x80 };
 //static constexpr uint8_t DSMCC_START_INDICATOR { 0x40 };
 
-enum DSMCC_MESSAGES {
+enum DSMCC_MESSAGES : std::uint16_t {
     DSMCC_MESSAGE_DSI         = 0x1006,
     DSMCC_MESSAGE_DII         = 0x1002,
     DSMCC_MESSAGE_DDB         = 0x1003,
 };
 
-enum DSMCC_SECTIONS {
+enum DSMCC_SECTIONS : std::uint8_t {
     DSMCC_SECTION_INDICATION  = 0x3B,
     DSMCC_SECTION_DATA        = 0x3C,
     DSMCC_SECTION_DESCR       = 0x3D,

@@ -162,7 +162,7 @@ class CueIdentifierDescriptor : public MPEGDescriptor
     // descriptor_tag           8   0.0       0x8A
     // descriptor_length        8   1.0       0x01
     // cue_stream_type          8   2.0
-    enum // Table 6.3 Cue Stream Types
+    enum : std::uint8_t // Table 6.3 Cue Stream Types
     {
         kLimited        = 0x0, ///< Only splice null, insert, and schedule
         kAllCommands    = 0x1, ///< Carries all commands.

@@ -247,7 +247,7 @@ static constexpr int     MAX_TPDU_DATA  { MAX_TPDU_SIZE - 4 };
 
 static constexpr uint8_t DATA_INDICATOR { 0x80 };
 
-enum T_VALUES {
+enum T_VALUES : std::uint8_t {
     T_SB             = 0x80,
     T_RCV            = 0x81,
     T_CREATE_TC      = 0x82,
@@ -389,7 +389,7 @@ uint8_t cTPDU::Status(void)
 
 // --- cCiTransportConnection ------------------------------------------------
 
-enum eState { stIDLE, stCREATION, stACTIVE, stDELETION };
+enum eState : std::uint8_t { stIDLE, stCREATION, stACTIVE, stDELETION };
 
 class cCiTransportConnection {
   friend class cCiTransportLayer;
@@ -693,7 +693,7 @@ cCiTransportConnection *cCiTransportLayer::Process(int Slot)
 
 // Session Tags:
 
-enum SESSION_TAGS {
+enum SESSION_TAGS : std::uint8_t {
     ST_SESSION_NUMBER             = 0x90,
     ST_OPEN_SESSION_REQUEST       = 0x91,
     ST_OPEN_SESSION_RESPONSE      = 0x92,
@@ -705,7 +705,7 @@ enum SESSION_TAGS {
 
 // Session Status:
 
-enum SESSION_STATUS {
+enum SESSION_STATUS : std::uint8_t {
     SS_OK               = 0x00,
     SS_NOT_ALLOCATED    = 0xF0,
 };
@@ -1197,14 +1197,14 @@ bool cCiDateTime::Process(int Length, const uint8_t *Data)
 
 // Close MMI Commands:
 
-enum CLOSE_MMI {
+enum CLOSE_MMI : std::uint8_t {
     CLOSE_MMI_IMMEDIATE                  = 0x00,
     CLOSE_MMI_DELAY                      = 0x01,
 };
 
 // Display Control Commands:
 
-enum DISPLAY_CONTROL {
+enum DISPLAY_CONTROL : std::uint8_t {
     DCC_SET_MMI_MODE                            = 0x01,
     DCC_DISPLAY_CHARACTER_TABLE_LIST            = 0x02,
     DCC_INPUT_CHARACTER_TABLE_LIST              = 0x03,
@@ -1214,7 +1214,7 @@ enum DISPLAY_CONTROL {
 
 // MMI Modes:
 
-enum MMI_MODES {
+enum MMI_MODES : std::uint8_t {
     MM_HIGH_LEVEL                        = 0x01,
     MM_LOW_LEVEL_OVERLAY_GRAPHICS        = 0x02,
     MM_LOW_LEVEL_FULL_SCREEN_GRAPHICS    = 0x03,
@@ -1222,7 +1222,7 @@ enum MMI_MODES {
 
 // Display Reply IDs:
 
-enum DISPLAY_REPLY_IDS {
+enum DISPLAY_REPLY_IDS : std::uint8_t {
     DRI_MMI_MODE_ACK                                = 0x01,
     DRI_LIST_DISPLAY_CHARACTER_TABLES               = 0x02,
     DRI_LIST_INPUT_CHARACTER_TABLES                 = 0x03,
@@ -1239,7 +1239,7 @@ static constexpr uint8_t EF_BLIND { 0x01 };
 
 // Answer IDs:
 
-enum ANSWER_IDS {
+enum ANSWER_IDS : std::uint8_t {
     AI_CANCEL    = 0x00,
     AI_ANSWER    = 0x01,
 };
@@ -1490,7 +1490,7 @@ bool cCiEnquiry::Cancel(void)
 
 // Ca Pmt Cmd Ids:
 
-enum CPCI_IDS {
+enum CPCI_IDS : std::uint8_t {
     CPCI_OK_DESCRAMBLING    = 0x01,
     CPCI_OK_MMI             = 0x02,
     CPCI_QUERY              = 0x03,

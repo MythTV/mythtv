@@ -177,7 +177,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
 
     // Create ProgramInfo that overlaps the desired time on the
     // specified channel id.
-    enum LoadStatus {
+    enum LoadStatus : std::uint8_t {
         kNoProgram           = 0,
         kFoundProgram        = 1,
         kFakedLiveTVProgram  = 2,
@@ -187,7 +187,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
                   bool genUnknown, std::chrono::hours maxHours = 0h,
                   LoadStatus *status = nullptr);
 
-    enum SpecialRecordingGroups {
+    enum SpecialRecordingGroups : std::uint8_t {
         kDefaultRecGroup     = 1, // Auto-increment columns start at one
         kLiveTVRecGroup      = 2,
         kDeletedRecGroup     = 3,

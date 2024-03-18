@@ -8,21 +8,21 @@
 // MythTV
 #include "mythtvexp.h"
 
-enum MenuCategory
+enum MenuCategory : std::uint8_t
 {
     kMenuCategoryItem,
     kMenuCategoryItemlist,
     kMenuCategoryMenu
 };
 
-enum MenuShowContext
+enum MenuShowContext : std::uint8_t
 {
     kMenuShowActive,
     kMenuShowInactive,
     kMenuShowAlways
 };
 
-enum MenuCurrentContext
+enum MenuCurrentContext : std::uint8_t
 {
     kMenuCurrentDefault,
     kMenuCurrentActive,
@@ -33,7 +33,7 @@ enum MenuCurrentContext
 // and stashed inside of a TV object. They are used to find the
 // original menu again, instead of serializing/deserializing the
 // entire MythTVMenu object to/from a QVariant.
-enum MenuTypeId
+enum MenuTypeId : std::uint8_t
 {
     kMenuIdUnknown,
     kMenuIdPlayback,

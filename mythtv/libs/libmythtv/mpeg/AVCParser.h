@@ -32,7 +32,7 @@ class AVCParser : public H2645Parser
   public:
 
     // ITU-T Rec. H.264 table 7-1
-    enum NAL_unit_type {
+    enum NAL_unit_type : std::int8_t {
         UNKOWN          = -1,
         SLICE           = 1,   // 1 - 5 are VCL NAL units
         SLICE_DPA       = 2,
@@ -53,7 +53,7 @@ class AVCParser : public H2645Parser
         SLICE_EXTENSION = 20
     };
 
-    enum SEI_type {
+    enum SEI_type : std::uint8_t {
         SEI_TYPE_PIC_TIMING             = 1,
         SEI_FILLER_PAYLOAD              = 3,
         SEI_TYPE_USER_DATA_UNREGISTERED = 5,

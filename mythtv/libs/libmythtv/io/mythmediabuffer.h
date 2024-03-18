@@ -36,7 +36,7 @@ class MythBDBuffer;
 class LiveTVChain;
 class RemoteFile;
 
-enum MythBufferType
+enum MythBufferType : std::uint8_t
 {
     kMythBufferUnknown = 0,
     kMythBufferFile,

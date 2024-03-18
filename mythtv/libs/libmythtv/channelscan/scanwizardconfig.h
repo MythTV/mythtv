@@ -69,7 +69,7 @@ class ScanTypeSetting : public TransMythUIComboBoxSetting
     friend class ScanWizard;
     Q_OBJECT
   public:
-    enum Type
+    enum Type : std::uint8_t
     {
         Error_Open = 0,
         Error_Probe,

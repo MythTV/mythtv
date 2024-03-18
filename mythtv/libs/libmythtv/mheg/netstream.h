@@ -33,7 +33,7 @@ class NetStream : public QObject
     Q_OBJECT
 
 public:
-    enum EMode { kNeverCache, kPreferCache, kAlwaysCache };
+    enum EMode : std::uint8_t { kNeverCache, kPreferCache, kAlwaysCache };
     explicit NetStream(const QUrl &url, EMode mode = kPreferCache,
                        QByteArray cert = QByteArray());
     ~NetStream() override;
@@ -96,7 +96,8 @@ private:
 
     mutable QMutex    m_mutex; // Protects r/w access to the following data
     QNetworkRequest   m_request;
-    enum { kClosed, kPending, kStarted, kReady, kFinished } m_state {kClosed};
+    enum : std::uint8_t
+         { kClosed, kPending, kStarted, kReady, kFinished } m_state {kClosed};
     NetStreamRequest* m_pending       {nullptr};
     QNetworkReply*    m_reply         {nullptr};
     int               m_nRedirections {0};

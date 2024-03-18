@@ -17,7 +17,7 @@
 #include "libmythbase/programtypes.h"
 #include "libmythtv/mythtvexp.h"
 
-enum ChannelVisibleType
+enum ChannelVisibleType : std::int8_t
 {
     kChannelAlwaysVisible = 2,
     kChannelVisible       = 1,
@@ -46,7 +46,7 @@ class MTV_PUBLIC ChannelInfo
         
     bool Load(uint lchanid = -1);
 
-    enum ChannelFormat { kChannelShort, kChannelLong };
+    enum ChannelFormat : std::uint8_t { kChannelShort, kChannelLong };
     QString GetFormatted(ChannelFormat format) const;
     void ToMap(InfoMap &infoMap);
 

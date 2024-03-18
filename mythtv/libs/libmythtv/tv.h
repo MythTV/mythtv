@@ -1,12 +1,13 @@
 #ifndef TV_H
 #define TV_H
 
+#include <cstdint>
 #include <QString>
 
 class VBIMode
 {
   public:
-    enum vbimode_t
+    enum vbimode_t : std::uint8_t
     {
         None    = 0,
         PAL_TT  = 1,
@@ -25,7 +26,7 @@ class VBIMode
 /** \brief ChannelChangeDirection is an enumeration of possible channel
  *         changing directions.
  */
-enum ChannelChangeDirection
+enum ChannelChangeDirection : std::uint8_t
 {
     CHANNEL_DIRECTION_UP       = 0,
     CHANNEL_DIRECTION_DOWN     = 1,
@@ -34,7 +35,7 @@ enum ChannelChangeDirection
 };
 
 /// Used to request ProgramInfo for channel browsing.
-enum BrowseDirection
+enum BrowseDirection : std::int8_t
 {
     BROWSE_INVALID = -1,
     BROWSE_SAME = 0, ///< Fetch browse information on current channel and time
@@ -47,7 +48,7 @@ enum BrowseDirection
 
 /** \brief TVState is an enumeration of the states used by TV and TVRec.
  */
-enum TVState
+enum TVState : std::int8_t
 {
     /** \brief Error State, if we ever try to enter this state errored is set.
      */
@@ -94,7 +95,7 @@ QString StateToString(TVState state);
 
 /** \brief SleepStatus is an enumeration of the awake/sleep status of a slave.
  */
-enum SleepStatus {
+enum SleepStatus : std::uint8_t {
     /** \brief A slave is awake when it is connected to the master
       */
     sStatus_Awake         = 0x0,
@@ -117,7 +118,7 @@ enum SleepStatus {
     sStatus_Undefined     = 0x8
 };
 
-enum PictureAdjustType
+enum PictureAdjustType : std::uint8_t
 {
     kAdjustingPicture_None = 0,
     kAdjustingPicture_Playback,
@@ -127,7 +128,7 @@ enum PictureAdjustType
 QString toTypeString(PictureAdjustType type);
 QString toTitleString(PictureAdjustType type);
 
-enum CommSkipMode
+enum CommSkipMode : std::uint8_t
 {
     kCommSkipOff    = 0,
     kCommSkipOn     = 1,

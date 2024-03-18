@@ -17,7 +17,7 @@ void ifs_update (guint32 * data, const guint32 * back, int width, int height,
 	static std::array<int,4> s_v { 2, 4, 3, 2 };
 	static std::array<int,4> s_col { 2, 4, 3, 2 };
 
-        enum MODE {
+        enum MODE : std::uint8_t {
             MOD_MER    = 0,
             MOD_FEU    = 1,
             MOD_MERVER = 2

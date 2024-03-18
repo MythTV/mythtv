@@ -7,7 +7,7 @@
 #include "mythtvexp.h"
 #include "signalmonitorvalue.h"
 
-enum SignalMonitorMessageType {
+enum SignalMonitorMessageType : std::uint8_t {
     kAllGood,
     kStatusChannelTuned,
     kStatusSignalLock,

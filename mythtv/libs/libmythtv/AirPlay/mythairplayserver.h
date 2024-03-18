@@ -23,7 +23,7 @@ QByteArray  DigestMd5Response(const QString& response, const QString& option,
                               const QString& nonce, const QString& password,
                               QByteArray &auth);
 
-enum AirplayEvent
+enum AirplayEvent : std::int8_t
 {
     AP_EVENT_NONE = -1,
     AP_EVENT_PLAYING = 0,

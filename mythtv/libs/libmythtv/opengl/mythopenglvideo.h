@@ -24,7 +24,7 @@ class MythOpenGLVideo : public MythVideoGPU
     Q_OBJECT
 
   public:
-    enum VideoShaderType
+    enum VideoShaderType : std::uint8_t
     {
         Default       = 0, // Plain blit
         Progressive   = 1, // Progressive video frame

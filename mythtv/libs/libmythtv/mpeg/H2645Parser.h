@@ -40,7 +40,7 @@ class H2645Parser {
   public:
     static constexpr uint16_t kMaxSliceHeaderSize { 256 };
 
-    enum field_type {
+    enum field_type : std::uint8_t {
         FRAME = 'F',
         FIELD_TOP = 'T',
         FIELD_BOTTOM = 'B'
@@ -81,11 +81,11 @@ class H2645Parser {
     uint32_t GetUnitsInTick(void) const { return m_unitsInTick; }
     SCAN_t GetScanType(void) const { return m_scanType; }
 
-    enum NAL_unit_type {
+    enum NAL_unit_type : std::int8_t {
         UNKNOWN = -1
     };
 
-    enum SLICE_type {
+    enum SLICE_type : std::uint8_t {
         SLICE_P = 0,
         SLICE_B = 1,
         SLICE_I = 2,

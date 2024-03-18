@@ -26,7 +26,7 @@
 #include "channelscantypes.h"
 #include "channelscanner_web.h"
 
-enum OkCancelType {
+enum OkCancelType : std::int8_t {
     kOCTCancelAll = -1,
     kOCTCancel    = +0,
     kOCTOk        = +1,
@@ -84,27 +84,27 @@ class MTV_PUBLIC ChannelImporter : public QObject
     void Process(const ScanDTVTransportList &_transports, int sourceid = -1);
 
   protected:
-    enum DeleteAction
+    enum DeleteAction : std::uint8_t
     {
         kDeleteAll,
         kDeleteManual,
         kDeleteIgnoreAll,
         kDeleteInvisibleAll,
     };
-    enum InsertAction
+    enum InsertAction : std::uint8_t
     {
         kInsertAll,
         kInsertManual,
         kInsertIgnoreAll,
     };
-    enum UpdateAction
+    enum UpdateAction : std::uint8_t
     {
         kUpdateAll,
         kUpdateManual,
         kUpdateIgnoreAll,
     };
 
-    enum ChannelType
+    enum ChannelType : std::uint8_t
     {
         kChannelTypeFirst = 0,
 

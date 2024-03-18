@@ -7,7 +7,7 @@
 #include <QObject>
 
 // Caption Display modes
-enum
+enum : std::uint16_t
 {
     kDisplayNone                = 0x000,
     kDisplayNUVTeletextCaptions = 0x001,
@@ -39,7 +39,7 @@ inline bool OptionalCaptionEnabled(uint Captions)
            (kDisplayTeletextMenu        == Captions);
 }
 
-enum ZoomDirection
+enum ZoomDirection : std::uint8_t
 {
     kZoomHome = 0,
     kZoomIn,
@@ -57,7 +57,7 @@ enum ZoomDirection
     kZoom_END
 };
 
-enum AspectOverrideMode
+enum AspectOverrideMode : std::int8_t
 {
     kAspect_Toggle = -1,
     kAspect_Off = 0,
@@ -68,7 +68,7 @@ enum AspectOverrideMode
     kAspect_END
 };
 
-enum AdjustFillMode
+enum AdjustFillMode : std::int8_t
 {
     kAdjustFill_Toggle = -1,
     kAdjustFill_Off = 0,
@@ -83,7 +83,7 @@ enum AdjustFillMode
     kAdjustFill_AutoDetect_DefaultHalf,
 };
 
-enum LetterBoxColour
+enum LetterBoxColour : std::int8_t
 {
     kLetterBoxColour_Toggle = -1,
     kLetterBoxColour_Black = 0,
@@ -91,7 +91,7 @@ enum LetterBoxColour
     kLetterBoxColour_END
 };
 
-enum FrameScanType
+enum FrameScanType : std::int8_t
 {
     kScan_Ignore       = -1,
     kScan_Detect       =  0,
@@ -100,7 +100,7 @@ enum FrameScanType
     kScan_Progressive  =  3,
 };
 
-enum PictureAttribute
+enum PictureAttribute : std::uint8_t
 {
     kPictureAttribute_None = 0,
     kPictureAttribute_MIN = 0,
@@ -113,7 +113,7 @@ enum PictureAttribute
     kPictureAttribute_MAX
 };
 
-enum PictureAttributeSupported
+enum PictureAttributeSupported : std::uint8_t
 {
     kPictureAttributeSupported_None       = 0x00,
     kPictureAttributeSupported_Brightness = 0x01,
@@ -131,7 +131,7 @@ enum PictureAttributeSupported
      kPictureAttributeSupported_Hue | \
      kPictureAttributeSupported_Range)
 
-enum StereoscopicMode
+enum StereoscopicMode : std::uint8_t
 {
     kStereoscopicModeAuto,
     kStereoscopicModeIgnore3D,
@@ -139,7 +139,7 @@ enum StereoscopicMode
     kStereoscopicModeTopAndBottomDiscard
 };
 
-enum PrimariesMode
+enum PrimariesMode : std::uint8_t
 {
     PrimariesDisabled = 0,
     PrimariesRelaxed,
@@ -179,7 +179,7 @@ inline QString StereoscopictoString(StereoscopicMode Mode)
     return QObject::tr("Unknown");
 }
 
-enum VideoErrorState
+enum VideoErrorState : std::uint8_t
 {
     kError_None            = 0x00,
     kError_Unknown         = 0x01,

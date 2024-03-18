@@ -21,7 +21,7 @@
 class MTV_PUBLIC IPTVTuningData
 {
   public:
-    enum FECType
+    enum FECType : std::uint8_t
     {
         kNone,
         kRFC2733,
@@ -29,7 +29,7 @@ class MTV_PUBLIC IPTVTuningData
         kSMPTE2022,
     };
 
-    enum IPTVType
+    enum IPTVType : std::uint8_t
     {
         kData = 1,
         kRFC2733_1,
@@ -40,7 +40,7 @@ class MTV_PUBLIC IPTVTuningData
         kSMPTE2022_2,
     };
 
-    enum IPTVProtocol
+    enum IPTVProtocol : std::uint8_t
     {
         inValid = 0,
         udp,

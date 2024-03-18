@@ -631,7 +631,7 @@ void MHIContext::Reinit(const QRect videoRect, const QRect dispRect, float aspec
     m_videoDisplayRect = QRect();
 
     // MHEG presumes square pixels
-    enum { kNone, kHoriz, kBoth };
+    enum : std::uint8_t { kNone, kHoriz, kBoth };
     int mode = gCoreContext->GetNumSetting("MhegAspectCorrection", kNone);
     auto const aspectd = static_cast<double>(aspect);
     double const vz = (mode == kBoth) ? std::min(1.15, 1. / sqrt(aspectd)) : 1.;

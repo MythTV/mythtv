@@ -19,7 +19,7 @@
 #define DEBUG_CC_DECODE        0
 #define DEBUG_CC_PARSE         0
 
-enum kCCTypes
+enum kCCTypes : std::uint8_t
 {
     NTSC_CC_f1         = 0,
     NTSC_CC_f2         = 1,
@@ -83,7 +83,7 @@ void CC708Decoder::services(std::chrono::seconds seconds, cc708_seen_flags & see
         seen[i] = (m_lastSeen[i] >= then);
 }
 
-enum C0
+enum C0 : std::uint8_t
 {
     NUL  = 0x00,
     ETX  = 0x03,
@@ -95,7 +95,7 @@ enum C0
     P16  = 0x18,
 };
 
-enum C1
+enum C1 : std::uint8_t
 {
     CW0=0x80, CW1, CW2, CW3, CW4, CW5, CW6, CW7,
     CLW,      DSW, HDW, TGW, DLW, DLY, DLC, RST,

@@ -9,7 +9,7 @@
 
 class RecordingRule;
 
-enum AVContainer
+enum AVContainer : std::uint8_t
 {
     formatUnknown  = 0,
     formatNUV      = 1,

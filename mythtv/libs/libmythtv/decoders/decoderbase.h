@@ -23,7 +23,7 @@ const int kDecoderProbeBufferSize = 256 * 1024;
 using TestBufferVec = std::vector<char>;
 
 /// Track types
-enum TrackType
+enum TrackType : std::uint8_t
 {
     kTrackTypeUnknown = 0,
     kTrackTypeAudio,            // 1
@@ -44,7 +44,7 @@ enum TrackType
 QString toString(TrackType type);
 int to_track_type(const QString &str);
 
-enum DecodeType
+enum DecodeType : std::uint8_t
 {
     kDecodeNothing = 0x00, // Demux and preprocess only.
     kDecodeVideo   = 0x01,
@@ -52,7 +52,7 @@ enum DecodeType
     kDecodeAV      = 0x03,
 };
 
-enum AudioTrackType
+enum AudioTrackType : std::uint8_t
 {
     kAudioTypeNormal = 0,
     kAudioTypeAudioDescription, // Audio Description for the visually impaired
@@ -64,7 +64,7 @@ enum AudioTrackType
 QString toString(AudioTrackType type);
 
 // Eof States
-enum EofState
+enum EofState : std::uint8_t
 {
     kEofStateNone,     // no eof
     kEofStateDelayed,  // decoder eof, but let player drain buffered frames

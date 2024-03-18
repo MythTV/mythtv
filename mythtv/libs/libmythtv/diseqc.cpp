@@ -50,7 +50,7 @@ static constexpr uint8_t    DISEQC_FRM_REPEAT     {1 << 0};
 #endif
 
 // Address byte
-enum DISEQC_ADRS {
+enum DISEQC_ADRS : std::uint8_t {
     DISEQC_ADR_ALL          = 0x00,
     DISEQC_ADR_SW_ALL       = 0x10,
     DISEQC_ADR_LNB          = 0x11,
@@ -66,7 +66,7 @@ enum DISEQC_ADRS {
 };
 
 // Command byte
-enum DISEQC_CMDS {
+enum DISEQC_CMDS : std::uint8_t {
     DISEQC_CMD_RESET        = 0x00,
     DISEQC_CMD_CLR_RESET    = 0x01,
     DISEQC_CMD_WRITE_N0     = 0x38,

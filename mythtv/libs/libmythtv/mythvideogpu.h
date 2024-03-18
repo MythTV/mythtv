@@ -22,7 +22,7 @@ class MythVideoGPU : public QObject
     Q_OBJECT
 
   public:
-    enum VideoResize
+    enum VideoResize : std::uint8_t
     {
         None         = 0x000,
         Deinterlacer = 0x001,

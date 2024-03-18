@@ -18,7 +18,7 @@ extern const std::array<const uint8_t,    256> hamm24val;
 extern const std::array<const uint16_t,    64> hamm24err;
 extern const std::array<const int32_t,     64> hamm24cor;
 
-enum vbimode
+enum vbimode : std::uint8_t
 {
     VBI_IVTV,        /// < IVTV packet
     VBI_DVB,         /// < DVB packet

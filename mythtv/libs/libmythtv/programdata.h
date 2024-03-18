@@ -25,7 +25,7 @@ class MTV_PUBLIC DBPerson
 {
     friend class TestEITFixups;
   public:
-    enum Role
+    enum Role : std::uint8_t
     {
         kUnknown = 0,
         kActor,

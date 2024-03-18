@@ -44,13 +44,13 @@ class RecordingInfo;
     F(JOB_CANCELLED,    0x0140, JobQueue::tr("Cancelled")) \
 
 #define JOBSTATUS_ENUM(A,B,C)   A = (B) ,
-enum JobStatus {
+enum JobStatus : std::uint16_t {
     JOBSTATUS_MAP(JOBSTATUS_ENUM)
 };
 
 // NOLINTEND(cppcoreguidelines-macro-usage)
 
-enum JobCmds {
+enum JobCmds : std::uint8_t {
     JOB_RUN          = 0x0000,
     JOB_PAUSE        = 0x0001,
     JOB_RESUME       = 0x0002,
@@ -58,7 +58,7 @@ enum JobCmds {
     JOB_RESTART      = 0x0008
 };
 
-enum JobFlags {
+enum JobFlags : std::uint8_t {
     JOB_NO_FLAGS     = 0x0000,
     JOB_USE_CUTLIST  = 0x0001,
     JOB_LIVE_REC     = 0x0002,
@@ -66,7 +66,7 @@ enum JobFlags {
     JOB_REBUILD      = 0x0008
 };
 
-enum JobLists {
+enum JobLists : std::uint8_t {
     JOB_LIST_ALL      = 0x0001,
     JOB_LIST_DONE     = 0x0002,
     JOB_LIST_NOT_DONE = 0x0004,
@@ -74,7 +74,7 @@ enum JobLists {
     JOB_LIST_RECENT   = 0x0010
 };
 
-enum JobTypes {
+enum JobTypes : std::uint16_t {
     JOB_NONE         = 0x0000,
 
     JOB_SYSTEMJOB    = 0x00ff,

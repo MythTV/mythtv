@@ -150,7 +150,7 @@ class DiSEqCDevDevice
     virtual bool Store(void) const = 0;
 
     // Sets
-    enum dvbdev_t
+    enum dvbdev_t : std::uint8_t
     {
         kTypeSwitch = 0,
         kTypeRotor = 1,
@@ -234,7 +234,7 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
     bool Store(void) const override; // DiSEqCDevDevice
 
     // Sets
-    enum dvbdev_switch_t
+    enum dvbdev_switch_t : std::uint8_t
     {
         kTypeTone              = 0,
         kTypeDiSEqCCommitted   = 1,
@@ -313,7 +313,7 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
     bool Store(void) const override; // DiSEqCDevDevice
 
     // Sets
-    enum dvbdev_rotor_t { kTypeDiSEqC_1_2 = 0, kTypeDiSEqC_1_3 = 1, };
+    enum dvbdev_rotor_t : std::uint8_t { kTypeDiSEqC_1_2 = 0, kTypeDiSEqC_1_3 = 1, };
     void   SetType(dvbdev_rotor_t type)    { m_type     = type;  }
     void   SetLoSpeed(double speed)        { m_speedLo = speed;  }
     void   SetHiSpeed(double speed)        { m_speedHi = speed;  }
@@ -394,7 +394,7 @@ class DiSEqCDevSCR : public DiSEqCDevDevice
     bool Store(void) const override; // DiSEqCDevDevice
 
     // Sets
-    enum dvbdev_pos_t
+    enum dvbdev_pos_t : std::uint8_t
     {
         kTypeScrPosA               = 0,
         kTypeScrPosB               = 1,
@@ -455,7 +455,7 @@ class DiSEqCDevLNB : public DiSEqCDevDevice
     bool Store(void) const override; // DiSEqCDevDevice
 
     // Sets
-    enum dvbdev_lnb_t
+    enum dvbdev_lnb_t : std::uint8_t
     {
         kTypeFixed                 = 0,
         kTypeVoltageControl        = 1,

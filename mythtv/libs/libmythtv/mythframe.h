@@ -17,7 +17,7 @@
 static constexpr uint8_t MYTH_WIDTH_ALIGNMENT  { 64 };
 static constexpr uint8_t MYTH_HEIGHT_ALIGNMENT { 16 };
 
-enum VideoFrameType
+enum VideoFrameType : std::int8_t
 {
     FMT_NONE = -1,
     // YV12 and variants
@@ -64,7 +64,7 @@ enum VideoFrameType
     FMT_DRMPRIME
 };
 
-enum MythDeintType
+enum MythDeintType : std::uint8_t
 {
     DEINT_NONE   = 0x0000,
     DEINT_BASIC  = 0x0001,

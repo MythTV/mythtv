@@ -37,7 +37,7 @@ struct osdInfo
     QHash<QString,int>  values;
 };
 
-enum PseudoState
+enum PseudoState : std::uint8_t
 {
     kPseudoNormalLiveTV  = 0,
     kPseudoChangeChannel = 1,

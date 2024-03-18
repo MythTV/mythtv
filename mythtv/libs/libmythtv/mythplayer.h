@@ -51,7 +51,7 @@ class MythDecoderThread;
 using StatusCallback = void (*)(int, void*);
 
 /// Timecode types
-enum TCTypes
+enum TCTypes : std::uint8_t
 {
     TC_VIDEO = 0,
     TC_AUDIO,

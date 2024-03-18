@@ -7,7 +7,7 @@
 
 #include "libmythtv/mythframe.h"
 
-enum HTTPLiveStreamStatus {
+enum HTTPLiveStreamStatus : std::int8_t {
     kHLSStatusUndefined    = -1,
     kHLSStatusQueued       = 0,
     kHLSStatusStarting     = 1,

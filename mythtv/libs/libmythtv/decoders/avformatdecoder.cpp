@@ -52,7 +52,7 @@ extern "C" {
  */
 
 /* Line type IDs */
-enum V4L2_MPEG_LINE_TYPES {
+enum V4L2_MPEG_LINE_TYPES : std::uint8_t {
     V4L2_MPEG_VBI_IVTV_TELETEXT_B     = 1, ///< Teletext (uses lines 6-22 for PAL, 10-21 for NTSC)
     V4L2_MPEG_VBI_IVTV_CAPTION_525    = 4, ///< Closed Captions (line 21 NTSC, line 22 PAL)
     V4L2_MPEG_VBI_IVTV_WSS_625        = 5, ///< Wide Screen Signal (line 20 NTSC, line 23 PAL)

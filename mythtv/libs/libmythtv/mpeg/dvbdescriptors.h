@@ -138,7 +138,7 @@ class LinkageDescriptor : public MPEGDescriptor
     // service_id              16   6.0
     uint ServiceID(void)       const { return (m_data[6]<<8) | m_data[7]; }
     // linkage_type             8   8.0
-    enum
+    enum : std::uint8_t
     {
         kInformationService          = 0x01,
         kEPGService                  = 0x02,
@@ -160,7 +160,7 @@ class LinkageDescriptor : public MPEGDescriptor
     // if (linkage_type == 0x08)
     // {
     //    hand-over_type        4   9.0
-    enum
+    enum : std::uint8_t
     {
         kHandOverIdentical         = 0x01,
         kHandOverLocalVariation    = 0x02,
@@ -170,7 +170,7 @@ class LinkageDescriptor : public MPEGDescriptor
     QString MobileHandOverTypeString(void) const;
     //    reserved_future_use   3   9.4
     //    origin_type           1   9.7
-    enum
+    enum : std::uint8_t
     {
         kOriginNIT = 0x0,
         kOriginSDT = 0x1,
@@ -771,7 +771,7 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
     }
     // reserved_future_use     12   6.0
     // FEC_outer                4   7.4
-    enum
+    enum : std::uint8_t
     {
         kOuterFEC_None        = 0x1,
         kOuterFEC_RS204_RS188 = 0x2,
@@ -783,7 +783,7 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
             ((FECOuter() == kOuterFEC_RS204_RS188) ? "RS(204/188)" : "unknown");
     }
     // modulation               8   8.0
-    enum
+    enum : std::uint8_t
     {
         kModulationQAM16  = 0x01,
         kModulationQAM32  = 0x02,
@@ -811,7 +811,7 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
                 (byteBCDH2int(m_data[12]) * 100));
     }
     // FEC_inner                4  12.4
-    enum
+    enum : std::uint8_t
     {
         kInnerFEC_1_2_ConvolutionCodeRate = 0x1,
         kInnerFEC_2_3_ConvolutionCodeRate = 0x2,
@@ -873,7 +873,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     bool IsHorizontalLeftPolarization(void) const { return ((m_data[8]>>5)&0x1) != 0; }
     bool IsVerticalRightPolarization(void) const  { return ((m_data[8]>>5)&0x1) == 0; }
     // roll off                 2   8.3
-    enum
+    enum : std::uint8_t
     {
         kRollOff_35,
         kRollOff_20,
@@ -893,7 +893,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
         return ModulationSystem() ? "DVB-S2" : "DVB-S";
     }
     // modulation               2   8.6
-    enum
+    enum : std::uint8_t
     {
         kModulationQPSK_NS = 0x0, // Non standard QPSK for Bell ExpressVu
         // should be "auto" according to DVB SI standard
@@ -919,7 +919,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
                 (byteBCDH2int(m_data[12]) * 100));
     }
     // FEC_inner                4  12.4
-    enum
+    enum : std::uint8_t
     {
         kInnerFEC_1_2_ConvolutionCodeRate = 0x1,
         kInnerFEC_2_3_ConvolutionCodeRate = 0x2,
@@ -955,7 +955,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     uint64_t FrequencyHz(void) const { return uint64_t(Frequency()) * 10ULL; }
 
     // bandwidth                3   6.0
-    enum
+    enum : std::uint8_t
     {
         kBandwidth8Mhz = 0x0,
         kBandwidth7Mhz = 0x1,
@@ -977,7 +977,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     bool IsMPE_FECUsed(void) const { return (m_data[6] & 0x04) == 0; }
     // reserved_future_use      2   6.6
     // constellation            2   7.0
-    enum
+    enum : std::uint8_t
     {
         kConstellationQPSK  = 0x0,
         kConstellationQAM16 = 0x1,
@@ -992,7 +992,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
             cs[Constellation()] : "auto";
     }
     // hierarchy_information    3   7.2
-    enum
+    enum : std::uint8_t
     {
         kHierarchyInfoNonHierarchicalNativeInterleaver  = 0x0,
         kHierarchyInfoAlpha1NativeInterleaver           = 0x1,
@@ -1018,7 +1018,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
         return (0x2 == i) ? 4 : i;
     }
     // code_rate-HP_stream      3   7.5
-    enum
+    enum : std::uint8_t
     {
         kCodeRate_1_2 = 0x0,
         kCodeRate_2_3 = 0x1,
@@ -1044,7 +1044,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
         return cr[CodeRateLP()];
     }
     // guard_interval           2   8.3
-    enum
+    enum : std::uint8_t
     {
         kGuardInterval_1_32 = 0x0,
         kGuardInterval_1_16 = 0x1,
@@ -1058,7 +1058,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
         return gi[GuardInterval()];
     }
     // transmission_mode        2   8.5
-    enum
+    enum : std::uint8_t
     {
         kTransmissionMode2k = 0x00,
         kTransmissionMode8k = 0x01,
@@ -1163,7 +1163,7 @@ class T2DeliverySystemDescriptor : public MPEGDescriptor
     }
 
     // bandwidth                4   6.2
-    enum
+    enum : std::uint8_t
     {
         kBandwidth8Mhz = 0x0,
         kBandwidth7Mhz = 0x1,
@@ -1187,7 +1187,7 @@ class T2DeliverySystemDescriptor : public MPEGDescriptor
     }
 
     // guard_interval           3   7.0
-    enum
+    enum : std::uint8_t
     {
         kGuardInterval_1_32    = 0x0,
         kGuardInterval_1_16    = 0x1,
@@ -1206,7 +1206,7 @@ class T2DeliverySystemDescriptor : public MPEGDescriptor
     }
 
     // transmission_mode        3   7.3
-    enum
+    enum : std::uint8_t
     {
         kTransmissionMode2k  = 0x00,
         kTransmissionMode8k  = 0x01,
@@ -1619,7 +1619,7 @@ class FrequencyListDescriptor : public MPEGDescriptor
 
     // reserved_future_use      6   2.0
     // coding_type              2   2.6
-    enum
+    enum : std::uint8_t
     {
         kCodingTypeNotDefined  = 0x0,
         kCodingTypeSatellite   = 0x1,
@@ -1960,7 +1960,7 @@ class ServiceDescriptorMapping
 {
   public:
     explicit ServiceDescriptorMapping(const uint service_type) { m_serviceType = service_type; }
-    enum
+    enum : std::uint8_t
     {
         kServiceTypeDigitalTelevision          = 0x01,
         kServiceTypeDigitalRadioSound          = 0x02,
