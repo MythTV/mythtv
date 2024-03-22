@@ -9,7 +9,8 @@
 # useful.  Delete them.
 #
 # Code copied from:  https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#force-deleting-cache-entries
-# 
+# modified based on: https://github.com/actions/gh-actions-cache/issues/85
+#
 
 name: Cleanup caches after PR closed
 
@@ -21,6 +22,8 @@ on:                # yamllint disable-line rule:truthy
 jobs:
   cleanup:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
     steps:
       - name: Cleanup
         run: |
