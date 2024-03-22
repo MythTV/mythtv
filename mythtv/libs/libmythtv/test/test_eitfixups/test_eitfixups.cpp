@@ -166,7 +166,11 @@ void TestEITFixups::printEvent(const DBEventEIT& event)
     }
     if (!event.m_items.isEmpty())
     {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         printf("Items        %3d\n", event.m_items.count());
+#else
+        printf("Items        %3lld\n", event.m_items.count());
+#endif
     }
     printf("Category       %3u\n", event.m_categoryType);
     printf("\n");
