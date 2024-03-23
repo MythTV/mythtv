@@ -27,10 +27,6 @@
 #include "recorders/v4l2encstreamhandler.h"
 #include "recorders/v4lchannel.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-  #define loadRelaxed load
-#endif
-
 const std::array<const std::string,15> V4L2encStreamHandler::kStreamTypes
 {
     "MPEG-2 PS", "MPEG-2 TS",     "MPEG-1 VCD",    "PES AV",

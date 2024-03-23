@@ -43,11 +43,7 @@ class MTV_PUBLIC MythPlayerOverlayUI : public MythPlayerUIBase
     std::chrono::seconds GetTotalSeconds(bool HonorCutList) const;
 
     OSD    m_osd;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex m_osdLock   { QMutex::Recursive };
-#else
     QRecursiveMutex m_osdLock;
-#endif
     bool   m_browsing  { false };
     bool   m_editing   { false };
     // Set in the decoder thread

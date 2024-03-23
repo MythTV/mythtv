@@ -10,11 +10,7 @@
 #include <vector>
 
 #include <QString>
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-#include <QMutex>
-#else
 #include <QRecursiveMutex>
-#endif
 #include <QChar>
 
 #include "libmythtv/format.h"
@@ -146,11 +142,7 @@ class CC608Decoder
     uint            m_xdsCrcPassed          {0};
     uint            m_xdsCrcFailed          {0};
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    mutable QMutex  m_xdsLock               {QMutex::Recursive};
-#else
     mutable QRecursiveMutex  m_xdsLock;
-#endif
     std::array<uint,2> m_xdsRatingSystems   {0};
     std::array<std::array<uint,4>,2> m_xdsRating       {{}};
     std::array<QString,2>            m_xdsProgramName;

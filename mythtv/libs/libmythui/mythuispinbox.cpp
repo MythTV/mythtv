@@ -233,7 +233,7 @@ bool MythUISpinBox::keyPressEvent(QKeyEvent *event)
     if (!isNumber)
         return MythUIButtonList::keyPressEvent(event);
 
-    for (const QString& action : qAsConst(actions))
+    for (const QString& action : std::as_const(actions))
     {
         if (action >= ACTION_0 && action <= ACTION_9)
         {

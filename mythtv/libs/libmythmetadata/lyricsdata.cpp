@@ -13,10 +13,6 @@
 // libmythmetadata
 #include "lyricsdata.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
-#define capturedView capturedRef
-#endif
-
 static const QRegularExpression kTimeCode { R"(^(\[(\d\d):(\d\d)(?:\.(\d\d))?\])(.*))" };
 
 /*************************************************************************/
@@ -280,7 +276,7 @@ void LyricsData::loadLyrics(const QString &xmlData)
                     lyric.remove(0,match.capturedLength(1));
                     match = kTimeCode.match(lyric);
                 }
-                for (const auto &time : qAsConst(times))
+                for (const auto &time : std::as_const(times))
                     lyrics.append(time + lyric);
             }
             else

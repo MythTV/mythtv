@@ -203,7 +203,7 @@ void LogViewer::updateClicked(void)
                 (m_logList->GetCount() == m_logList->GetCurrentPos() + 1) ||
                 (m_logList->GetCurrentPos() == 0);
 
-        for (const auto & label : qAsConst(list))
+        for (const auto & label : std::as_const(list))
             new MythUIButtonListItem(m_logList, label);
 
         if (bUpdateCurrent)

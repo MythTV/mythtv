@@ -170,7 +170,7 @@ ChannelTVFormat::ChannelTVFormat(const ChannelID &id) :
     addSelection(QCoreApplication::translate("(Common)", "Default"), "Default");
 
     QStringList list = GetFormats();
-    for (const QString& format : qAsConst(list))
+    for (const QString& format : std::as_const(list))
         addSelection(format);
 }
 
@@ -325,7 +325,7 @@ class XmltvID : public MythUIComboBoxSetting
 
             idList.sort();
 
-            for (const QString& idName : qAsConst(idList))
+            for (const QString& idName : std::as_const(idList))
                 addSelection(idName, idName);
         }
     }

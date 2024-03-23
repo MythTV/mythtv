@@ -352,7 +352,7 @@ static QString normalizeString(const QString& s)
     QString result;
 
     QString norm = s.normalized(QString::NormalizationForm_D);
-    for (QChar c : qAsConst(norm))
+    for (QChar c : std::as_const(norm))
     {
         switch (c.category())
         {
@@ -435,7 +435,7 @@ bool RecExtEspnDataPage::findGameInfo(ActiveGame& game)
 
     // Process the games
     QJsonArray eventArray = json["events"].toArray();
-    for (const auto& eventValue : qAsConst(eventArray))
+    for (const auto& eventValue : std::as_const(eventArray))
     {
         // Process info at the game level
         if (!eventValue.isObject())
@@ -822,7 +822,7 @@ bool RecExtMlbDataPage::findGameInfo(ActiveGame& game)
     }
 
     // Process each of the three dates
-    for (const auto& dateValue : qAsConst(datesArray))
+    for (const auto& dateValue : std::as_const(datesArray))
     {
         if (!dateValue.isObject())
         {
@@ -841,7 +841,7 @@ bool RecExtMlbDataPage::findGameInfo(ActiveGame& game)
         }
 
         // Process each game on a given date
-        for (const auto& gameValue : qAsConst(gamesArray))
+        for (const auto& gameValue : std::as_const(gamesArray))
         {
             if (!gameValue.isObject())
             {

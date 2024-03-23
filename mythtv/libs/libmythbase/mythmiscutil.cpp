@@ -863,7 +863,7 @@ void setHttpProxy(void)
 
     proxies = QNetworkProxyFactory::systemProxyForQuery(query);
 
-    for (const auto& p : qAsConst(proxies))
+    for (const auto& p : std::as_const(proxies))
     {
         QString host = p.hostName();
         int     port = p.port();

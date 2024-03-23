@@ -113,7 +113,10 @@ export class JobqueueBackendComponent implements OnInit, AfterViewInit {
     });
     this.JobQueueWindowStartHT$
       .subscribe({
-        next: data => this.setupService.parseTime(this.JobQueueWindowStart, data.String),
+        next: data => {
+          this.setupService.parseTime(this.JobQueueWindowStart, data.String);
+          this.JobQueueWindowStartHT.updateInputfield();
+        },
         error: () => this.errorCount++
       });
     this.JobQueueWindowEndHT$ = this.mythService.GetSetting({
@@ -121,7 +124,10 @@ export class JobqueueBackendComponent implements OnInit, AfterViewInit {
     });
     this.JobQueueWindowEndHT$
       .subscribe({
-        next: data => this.setupService.parseTime(this.JobQueueWindowEnd, data.String),
+        next: data => {
+          this.setupService.parseTime(this.JobQueueWindowEnd, data.String);
+          this.JobQueueWindowEndHT.updateInputfield();
+        },
         error: () => this.errorCount++
       });
     this.mythService.GetSetting({ HostName: this.hostName, Key: "JobQueueCPU", Default: "0" })

@@ -80,7 +80,7 @@ bool MythVideoProfileItem::CheckRange(const QString& Key,
     {
         cmp.replace(QLatin1String(" "),QLatin1String(""));
         QStringList exprList = cmp.split("&");
-        for (const QString& expr : qAsConst(exprList))
+        for (const QString& expr : std::as_const(exprList))
         {
             if (expr.isEmpty())
             {
@@ -216,11 +216,7 @@ bool MythVideoProfileItem::IsMatch(QSize Size, float Framerate, const QString &C
     QString cmp = Get(QString(COND_CODECS));
     if (!cmp.isEmpty())
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList clist = cmp.split(" ", QString::SkipEmptyParts);
-#else
         QStringList clist = cmp.split(" ", Qt::SkipEmptyParts);
-#endif
         if (!clist.empty())
             match &= clist.contains(CodecName,Qt::CaseInsensitive);
     }
@@ -1262,7 +1258,7 @@ QStringList MythVideoProfile::GetFilteredRenderers(const QString &Decoder, const
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Safe renderers for '%1': %2").arg(Decoder, safe.join(",")));
 
     QStringList filtered;
-    for (const auto& dec : qAsConst(safe))
+    for (const auto& dec : std::as_const(safe))
         if (Renderers.contains(dec))
             filtered.push_back(dec);
 
@@ -1276,7 +1272,7 @@ QString MythVideoProfile::GetBestVideoRenderer(const QStringList &Renderers)
 
     uint    toppriority = 0;
     QString toprenderer;
-    for (const auto& renderer : qAsConst(Renderers))
+    for (const auto& renderer : std::as_const(Renderers))
     {
         QMap<QString,uint>::const_iterator it = kSafeRendererPriority.constFind(renderer);
         if ((it != kSafeRendererPriority.constEnd()) && (*it >= toppriority))
@@ -1363,7 +1359,7 @@ void MythVideoProfile::InitStatics(bool Reinit /*= false*/)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Available GPU interops: %1")
         .arg(MythInteropGPU::TypesToString(interops)));
 
-    for (const QString& decoder : qAsConst(kSafeDecoders))
+    for (const QString& decoder : std::as_const(kSafeDecoders))
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Decoder/render support: %1%2")
             .arg(decoder, -12).arg(GetVideoRenderers(decoder).join(" ")));

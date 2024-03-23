@@ -45,11 +45,7 @@
 
 QString LookupUDN( const QString &sDeviceType )
 {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList sList = sDeviceType.split(':', QString::SkipEmptyParts);
-#else
     QStringList sList = sDeviceType.split(':', Qt::SkipEmptyParts);
-#endif
     QString     sLoc  = "LookupUDN(" + sDeviceType + ')';
 
     if (sList.size() <= 2) 

@@ -28,10 +28,6 @@ class MythWaylandDevice;
 // received by the window
 //#define DEBUG_PAINTERWIN_EVENTS
 
-#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-#define USING_WAYLAND_EXPOSE_HACK 1
-#endif
-
 class MythMainWindow;
 class MythPainter;
 
@@ -65,13 +61,6 @@ class MythPainterWindow : public QWidget
     Q_DISABLE_COPY(MythPainterWindow)
 
 
-#ifdef USING_WAYLAND_EXPOSE_HACK
-  protected slots:
-    void CheckWindowIsExposed();
-
-  private:
-    QTimer* m_exposureCheckTimer { nullptr };
-#endif
 #ifdef USING_WAYLANDEXTRAS
     MythWaylandDevice* m_waylandDev { nullptr };
 #endif

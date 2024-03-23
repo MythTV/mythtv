@@ -103,7 +103,7 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
                         && qstrcmp(inheritsClass, "QWidget") == 0);
     const QLatin1String oName(objName);
 
-    for (auto *obj : qAsConst(children))
+    for (auto *obj : std::as_const(children))
     {
         if (onlyWidgets)
         {
@@ -203,7 +203,7 @@ QList<MythUIType *> MythUIType::GetAllDescendants(void)
 {
     QList<MythUIType *> descendants {};
 
-    for (const auto & item :qAsConst(m_childrenList))
+    for (const auto & item :std::as_const(m_childrenList))
     {
         descendants += item;
         descendants += item->GetAllDescendants();
@@ -282,11 +282,11 @@ MythUIType *MythUIType::GetChildAt(const QPoint p, bool recursive,
 
 void MythUIType::ActivateAnimations(MythUIAnimation::Trigger trigger)
 {
-    for (MythUIAnimation* animation : qAsConst(m_animations))
+    for (MythUIAnimation* animation : std::as_const(m_animations))
         if (animation->GetTrigger() == trigger)
             animation->Activate();
 
-    for (MythUIType* uiType : qAsConst(m_childrenList))
+    for (MythUIType* uiType : std::as_const(m_childrenList))
         uiType->ActivateAnimations(trigger);
 }
 
@@ -1453,7 +1453,7 @@ void MythUIType::ConnectDependants(bool recurse)
         operators.clear();
         QString name = it.value();
         QStringList tmp1 = name.split("&");
-        for (const QString& t1 : qAsConst(tmp1))
+        for (const QString& t1 : std::as_const(tmp1))
         {
             QStringList tmp2 = t1.split("|");
 
@@ -1470,7 +1470,7 @@ void MythUIType::ConnectDependants(bool recurse)
         if (dependant)
         {
             dependant->m_dependOperator = operators;
-            for (QString dependeeName : qAsConst(dependees))
+            for (QString dependeeName : std::as_const(dependees))
             {
                 bool reverse = false;
                 if (dependeeName.startsWith('!'))

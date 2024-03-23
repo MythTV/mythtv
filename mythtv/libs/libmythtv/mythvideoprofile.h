@@ -6,11 +6,7 @@
 
 // Qt
 #include <QStringList>
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-#include <QMutex>
-#else
 #include <QRecursiveMutex>
-#endif
 #include <QSize>
 #include <QMap>
 
@@ -152,22 +148,14 @@ class MTV_PUBLIC MythVideoProfile : public QObject
     void    SetPreference(const QString &Key, const QString &Value);
 
   private:
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    mutable QMutex        m_lock                { QMutex::Recursive };
-#else
     mutable QRecursiveMutex m_lock;
-#endif
     QSize                 m_lastSize            { 0, 0 };
     float                 m_lastRate            { 0.0F };
     QString               m_lastCodecName       { };
     QMap<QString,QString> m_currentPreferences  { };
     std::vector<MythVideoProfileItem> m_allowedPreferences { };
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    static inline QMutex                    kSafeLock = QMutex(QMutex::Recursive);
-#else
     static inline QRecursiveMutex           kSafeLock;
-#endif
     static inline bool                      kSafeInitialized = false;
     static inline QMap<QString,QStringList> kSafeRenderer = {};
     static inline QMap<QString,QStringList> kSafeRendererGroup = {};

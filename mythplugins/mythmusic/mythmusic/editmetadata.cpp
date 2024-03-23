@@ -780,11 +780,7 @@ void EditMetadataDialog::customEvent(QEvent *event)
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
             return;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
-#else
         QStringList tokens = me->Message().split(" ", Qt::SkipEmptyParts);
-#endif
 
         if (!tokens.isEmpty())
         {
@@ -933,7 +929,7 @@ void EditAlbumartDialog::updateImageGrid(void)
 
     m_coverartList->Reset();
 
-    for (auto *art : qAsConst(*albumArtList))
+    for (auto *art : std::as_const(*albumArtList))
     {
         auto *item = new MythUIButtonListItem(m_coverartList,
                                      AlbumArtImages::getTypeName(art->m_imageType),
@@ -1172,11 +1168,7 @@ void EditAlbumartDialog::customEvent(QEvent *event)
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
             return;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
-#else
         QStringList tokens = me->Message().split(" ", Qt::SkipEmptyParts);
-#endif
 
         if (!tokens.isEmpty())
         {

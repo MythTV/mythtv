@@ -31,7 +31,7 @@ static QString extract_query_list(
 {
     QString list;
 
-    for (const auto *val : qAsConst(settings))
+    for (const auto *val : std::as_const(settings))
     {
         const auto *group = dynamic_cast<const MythSettingGroup*>(val);
         if (group)
@@ -56,7 +56,7 @@ static void fill_setting(
     const auto *group = dynamic_cast<const MythSettingGroup*>(sb);
     if (group)
     {
-        for (auto *setting : qAsConst(group->m_settings))
+        for (auto *setting : std::as_const(group->m_settings))
             fill_setting(setting, map, stype);
         return;
     }
@@ -132,7 +132,7 @@ static void fill_settings(
     while (query.next())
         map[query.value(0).toString()] = query.value(1).toString();
 
-    for (auto *setting : qAsConst(settings))
+    for (auto *setting : std::as_const(settings))
         fill_setting(setting, map, stype);
 }
 
@@ -148,7 +148,7 @@ QString MythSettingGroup::ToHTML(uint depth) const
             .arg(depth+1).arg(m_human_label).arg(depth+1);
     }
 
-    for (const auto *setting : qAsConst(m_settings))
+    for (const auto *setting : std::as_const(m_settings))
         ret += setting->ToHTML(depth+1);
 
     ret += indent(depth) +"</div>";
@@ -408,7 +408,7 @@ QStringList GetSettingValueList(const QString &type)
     if (type == "LocalIPAddress")
     {
         QList<QHostAddress> list = QNetworkInterface::allAddresses();
-        for (const auto & addr : qAsConst(list))
+        for (const auto & addr : std::as_const(list))
         {
             if (addr.toString().contains(":"))
                 continue; // ignore IP6 addresses for now
@@ -451,7 +451,7 @@ QString StringListToJSON(const QString &key,
 {
     QString result;
 
-    for (const auto & item : qAsConst(sList))
+    for (const auto & item : std::as_const(sList))
     {
         if (result.isEmpty())
             result += QString("{ \"%1\" : [ ").arg(key);

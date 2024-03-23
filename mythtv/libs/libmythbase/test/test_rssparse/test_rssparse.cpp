@@ -31,7 +31,7 @@ void TestRSSParse::initTestCase()
     QList<QByteArray> timezones = QTimeZone::availableTimeZoneIds();
 
     std::cerr << "Time Zone Names:" << std::endl;
-    for (const auto & name : qAsConst(timezones))
+    for (const auto & name : std::as_const(timezones))
         std::cerr << "  " << name.data() << std::endl;
 #endif
 }

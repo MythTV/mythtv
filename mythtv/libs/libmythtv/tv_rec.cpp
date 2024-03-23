@@ -684,7 +684,7 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
         LOG(VB_GENERAL, LOG_INFO, LOC + msg);
     }
 
-    for (const auto & pend : qAsConst(m_pendingRecordings))
+    for (const auto & pend : std::as_const(m_pendingRecordings))
         delete pend.m_info;
     m_pendingRecordings.clear();
 

@@ -444,7 +444,7 @@ QString MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "Supported/available VAAPI decoders:");
             const auto & profiles = MythVAAPIContext::GetProfiles();
-            for (const auto & profile : qAsConst(profiles))
+            for (const auto & profile : std::as_const(profiles))
             {
                 if (profile.first != MythCodecContext::MJPEG)
                 {
@@ -465,11 +465,7 @@ QString MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
 
 const VAAPIProfiles& MythVAAPIContext::GetProfiles()
 {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    static QMutex lock(QMutex::Recursive);
-#else
     static QRecursiveMutex lock;
-#endif
     static bool s_initialised = false;
     static VAAPIProfiles s_profiles;
 
@@ -582,7 +578,7 @@ void MythVAAPIContext::GetDecoderList(QStringList& Decoders)
     if (profiles.isEmpty())
         return;
     Decoders.append("VAAPI:");
-    for (const auto & profile : qAsConst(profiles))
+    for (const auto & profile : std::as_const(profiles))
         if (profile.first != MythCodecContext::MJPEG)
             Decoders.append(MythCodecContext::GetProfileDescription(profile.first, profile.second.second));
 }

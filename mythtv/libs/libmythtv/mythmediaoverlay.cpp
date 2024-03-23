@@ -44,7 +44,7 @@ void MythMediaOverlay::SetPlayer(MythPlayerUI *Player)
 
 void MythMediaOverlay::TearDown()
 {
-    for (MythScreenType * screen : qAsConst(m_children))
+    for (MythScreenType * screen : std::as_const(m_children))
         delete screen;
     m_children.clear();
 }

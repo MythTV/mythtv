@@ -230,11 +230,7 @@ QString MythXMLPListSerialiser::GetContentName(const QString& Name, const QMetaO
     // Try to read Name or TypeName from classinfo metadata.
     if (int index = MetaObject ? MetaObject->indexOfClassInfo(Name.toLatin1()) : -1; index >= 0)
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList infos = QString(MetaObject->classInfo(index).value()).split(';', QString::SkipEmptyParts);
-#else
         QStringList infos = QString(MetaObject->classInfo(index).value()).split(';', Qt::SkipEmptyParts);
-#endif
         QString type; // fallback
         foreach (const QString &info, infos)
         {

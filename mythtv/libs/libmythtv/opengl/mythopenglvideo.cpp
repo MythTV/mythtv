@@ -316,7 +316,7 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
     if ((Default == Type) || (BicubicUpsize == Type) || (!MythVideoFrame::YUVFormat(m_outputType)))
     {
         QString glsldefines;
-        for (const QString& define : qAsConst(defines))
+        for (const QString& define : std::as_const(defines))
             glsldefines += QString("#define MYTHTV_%1\n").arg(define);
         fragment = glsldefines + YUVFragmentExtensions + ((BicubicUpsize == Type) ? BicubicShader : RGBFragmentShader);
 
@@ -436,7 +436,7 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
         defines << m_videoColourSpace->GetColourMappingDefines();
 
         // Add defines
-        for (const QString& define : qAsConst(defines))
+        for (const QString& define : std::as_const(defines))
             glsldefines += QString("#define MYTHTV_%1\n").arg(define);
 
         // Add the required samplers

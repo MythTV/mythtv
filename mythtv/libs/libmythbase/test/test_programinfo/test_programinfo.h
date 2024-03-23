@@ -622,7 +622,7 @@ class TestProgramInfo : public QObject
                   << std::endl;
         auto keys = progMap.keys();
         keys.sort();
-        for (auto key : qAsConst(keys))
+        for (auto key : std::as_const(keys))
         {
             if (progMap[key].size() > 1)
                 std::cerr << qPrintable(QString("  %1: string [%2]").arg(key).arg(progMap[key])) << std::endl;

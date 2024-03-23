@@ -143,7 +143,7 @@ void MThread::Cleanup(void)
 {
     QMutexLocker locker(&s_all_threads_lock);
     QSet<MThread*> badGuys;
-    for (auto *thread : qAsConst(s_all_threads))
+    for (auto *thread : std::as_const(s_all_threads))
     {
         if (thread->isRunning())
         {
@@ -157,7 +157,7 @@ void MThread::Cleanup(void)
 
     // logging has been stopped so we need to use iostream...
     std::cerr<<"Error: Not all threads were shut down properly: "<<std::endl;
-    for (auto *thread : qAsConst(badGuys))
+    for (auto *thread : std::as_const(badGuys))
     {
         std::cerr<<"Thread "<<qPrintable(thread->objectName())
                  <<" is still running"<<std::endl;
@@ -179,14 +179,14 @@ void MThread::Cleanup(void)
 void MThread::GetAllThreadNames(QStringList &list)
 {
     QMutexLocker locker(&s_all_threads_lock);
-    for (auto *thread : qAsConst(s_all_threads))
+    for (auto *thread : std::as_const(s_all_threads))
         list.push_back(thread->objectName());
 }
 
 void MThread::GetAllRunningThreadNames(QStringList &list)
 {
     QMutexLocker locker(&s_all_threads_lock);
-    for (auto *thread : qAsConst(s_all_threads))
+    for (auto *thread : std::as_const(s_all_threads))
     {
         if (thread->isRunning())
             list.push_back(thread->objectName());

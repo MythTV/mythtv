@@ -170,7 +170,7 @@ void ThumbThread<DBFS>::run()
         }
         else if (task->m_action == "DELETE")
         {
-            for (const auto& im : qAsConst(task->m_images))
+            for (const auto& im : std::as_const(task->m_images))
             {
                 QString thumbnail = im->m_thumbPath;
                 if (!QDir::root().remove(thumbnail))
@@ -191,7 +191,7 @@ void ThumbThread<DBFS>::run()
         }
         else if (task->m_action == "MOVE")
         {
-            for (const auto& im : qAsConst(task->m_images))
+            for (const auto& im : std::as_const(task->m_images))
             {
                 // Build new thumb path
                 QString newThumbPath =
@@ -375,7 +375,7 @@ void ImageThumb<DBFS>::ClearThumbs(int devId, const QString &action)
 
     // Generate file & thumbnail urls (as per image cache) of mountpoints
     QStringList mesg;
-    for (const auto& mount : qAsConst(mountPaths))
+    for (const auto& mount : std::as_const(mountPaths))
         mesg << m_dbfs.MakeFileUrl(mount)
              << m_dbfs.MakeThumbUrl(mount);
 
@@ -398,7 +398,7 @@ QString ImageThumb<DBFS>::DeleteThumbs(const ImageList &images)
     // Pictures & videos are deleted by their own threads
     ImageListK pics;
     ImageListK videos;
-    for (const auto& im : qAsConst(images))
+    for (const auto& im : std::as_const(images))
     {
         if (im->m_type == kVideoFile)
             videos.append(im);

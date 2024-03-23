@@ -13,13 +13,16 @@
 #
 # A comment from 2023-01-18 in a github Exiv issue #2406 discussing releases:
 #
-# Dear folks, Exiv2 v0.27.6 has been released!  I'll start working on the v1.0.0
-# major release based on 9ca161d.
+#   Dear folks, Exiv2 v0.27.6 has been released!  I'll start working on the v1.0.0
+#   major release based on 9ca161d.
+#
+# However, Exiv2 v0.28 was released with C++17 support included, so we can use
+# that version if the distro includes it.
 #
 function(find_or_build_exiv2)
-  pkg_check_modules(EXIV2 "exiv2>=1.0" QUIET IMPORTED_TARGET)
+  pkg_check_modules(EXIV2 "exiv2>=0.28" QUIET IMPORTED_TARGET)
   if(NOT EXIV2_FOUND)
-    pkg_check_modules(EXIV2 "mythexiv2>=0.99" QUIET IMPORTED_TARGET)
+    pkg_check_modules(EXIV2 "mythexiv2>=0.28" QUIET IMPORTED_TARGET)
   endif()
   if(TARGET PkgConfig::EXIV2)
     message(STATUS "Found Exiv2 ${EXIV2_VERSION} ${EXIV2_LINK_LIBRARIES}")

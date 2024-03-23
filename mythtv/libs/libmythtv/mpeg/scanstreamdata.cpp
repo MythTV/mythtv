@@ -93,7 +93,7 @@ QString ScanStreamData::GetSIStandard(const QString& guess) const
 
     QMutexLocker locker(&m_cacheLock);
 
-    for (const auto *pmt : qAsConst(m_cachedPmts))
+    for (const auto *pmt : std::as_const(m_cachedPmts))
     {
         for (uint i = 0; (guess != "dvb") && (i < pmt->StreamCount()); i++)
         {

@@ -37,6 +37,9 @@ add_library(
 # All remaining target information
 #
 
+# Don't set the hidden visibility flag for this target.
+set_property(TARGET mythmpeg2 PROPERTY C_VISIBILITY_PRESET)
+
 target_include_directories(
   mythmpeg2
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR} # For config.h

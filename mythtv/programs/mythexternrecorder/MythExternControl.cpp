@@ -264,11 +264,7 @@ bool Commands::ProcessCommand(const QString & cmd)
         return true;
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList tokens = cmd.split(':', QString::SkipEmptyParts);
-#else
     QStringList tokens = cmd.split(':', Qt::SkipEmptyParts);
-#endif
     if (tokens.size() < 2)
     {
         SendStatus(cmd, "0",

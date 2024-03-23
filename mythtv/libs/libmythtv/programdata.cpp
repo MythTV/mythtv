@@ -548,19 +548,11 @@ static int score_match(const QString &a, const QString &b)
     if (A == B)
         return 1000;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList al = A.split(" ", QString::SkipEmptyParts);
-#else
     QStringList al = A.split(" ", Qt::SkipEmptyParts);
-#endif
     if (al.isEmpty())
         return 0;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList bl = B.split(" ", QString::SkipEmptyParts);
-#else
     QStringList bl = B.split(" ", Qt::SkipEmptyParts);
-#endif
     if (bl.isEmpty())
         return 0;
 
@@ -906,7 +898,7 @@ uint DBEvent::UpdateDB(
             credit.InsertDB(query, chanid, m_starttime);
     }
 
-    for (const auto & rating : qAsConst(m_ratings))
+    for (const auto & rating : std::as_const(m_ratings))
     {
         query.prepare(
             "INSERT IGNORE INTO programrating "
@@ -1211,7 +1203,7 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid,
     }
 
     table = recording ? "recordedrating" : "programrating";
-    for (const auto & rating : qAsConst(m_ratings))
+    for (const auto & rating : std::as_const(m_ratings))
     {
         query.prepare(QString(
             "INSERT IGNORE INTO %1 "
@@ -1628,7 +1620,7 @@ void ProgramData::HandlePrograms(MSqlQuery             &query,
                                  uint &unchanged,
                                  uint &updated)
 {
-    for (auto *pinfo : qAsConst(sortlist))
+    for (auto *pinfo : std::as_const(sortlist))
     {
         if (IsUnchanged(query, chanid, *pinfo))
         {

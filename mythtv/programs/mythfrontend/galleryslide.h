@@ -248,11 +248,7 @@ protected:
     QString BufferState();
 
     // Must be recursive to enable Flush->signal->Get whilst retaining lock
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex         m_mutexQ   {QMutex::Recursive}; //!< Queue protection
-#else
     QRecursiveMutex m_mutexQ;      //!< Queue protection
-#endif
     QQueue<Slide*> m_queue;        //!< Queue of slides
     int            m_nextLoad {0}; //!< Index of first spare slide, (or last slide if none spare)
 };

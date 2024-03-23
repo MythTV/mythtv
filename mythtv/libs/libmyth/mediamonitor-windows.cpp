@@ -105,7 +105,7 @@ bool MediaMonitorWindows::AddDevice(MythMediaDevice *pDevice)
     //
     // Check if this is a duplicate of a device we have already added
     //
-    for (const auto *device : qAsConst(m_devices))
+    for (const auto *device : std::as_const(m_devices))
     {
         if (device->getDevicePath() == path)
         {

@@ -52,7 +52,7 @@ ImportIconsWizard::~ImportIconsWizard()
     if (m_tmpDir.exists())
     {
         QStringList files = m_tmpDir.entryList();
-        for (const QString &file : qAsConst(files))
+        for (const QString &file : std::as_const(files))
             m_tmpDir.remove(file);
         m_tmpDir.rmpath(m_tmpDir.absolutePath());
     }
@@ -500,7 +500,7 @@ QStringList ImportIconsWizard::extract_csv(const QString &line)
     bool in_comment = false;
     bool in_escape = false;
     int comma_count = 0;
-    for (const auto& cur : qAsConst(line))
+    for (const auto& cur : std::as_const(line))
     {
         if (in_escape)
         {
@@ -689,7 +689,7 @@ bool ImportIconsWizard::search(const QString& strParam)
         QString prevIconName;
         int namei = 1;
 
-        for (const QString& row : qAsConst(strSplit))
+        for (const QString& row : std::as_const(strSplit))
         {
             if (row != "#" )
             {
@@ -757,12 +757,8 @@ bool ImportIconsWizard::findmissing(const QString& strParam)
 
     LOG(VB_CHANNEL, LOG_INFO,
         QString("Icon Import: Working findmissing : %1") .arg(str));
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList strSplit = str.split("\n", QString::SkipEmptyParts);
-#else
     QStringList strSplit = str.split("\n", Qt::SkipEmptyParts);
-#endif
-    for (const auto& line : qAsConst(strSplit))
+    for (const auto& line : std::as_const(strSplit))
     {
         if (line[0] == QChar('#'))
             continue;
@@ -807,26 +803,18 @@ bool ImportIconsWizard::submit()
 
     LOG(VB_CHANNEL, LOG_INFO, QString("Icon Import: Working submit : %1")
         .arg(str));
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList strSplit = str.split("\n", QString::SkipEmptyParts);
-#else
     QStringList strSplit = str.split("\n", Qt::SkipEmptyParts);
-#endif
     unsigned atsc = 0;
     unsigned dvb = 0;
     unsigned callsign = 0;
     unsigned tv = 0;
     unsigned xmltvid = 0;
-    for (const auto& line : qAsConst(strSplit))
+    for (const auto& line : std::as_const(strSplit))
     {
         if (line[0] == QChar('#'))
             continue;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList strSplit2=(line).split(":", QString::SkipEmptyParts);
-#else
         QStringList strSplit2=(line).split(":", Qt::SkipEmptyParts);
-#endif
         if (strSplit2.size() < 2)
             continue;
 

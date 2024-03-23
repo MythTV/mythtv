@@ -2566,19 +2566,11 @@ QString ProgramInfo::GetPlaybackURL(
         QUrl    url  = QUrl(fullpath);
         QString path = url.path();
         QString host = url.toString(QUrl::RemovePath).mid(7);
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList list = host.split(":", QString::SkipEmptyParts);
-#else
         QStringList list = host.split(":", Qt::SkipEmptyParts);
-#endif
         if (!list.empty())
         {
             host = list[0];
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            list = host.split("@", QString::SkipEmptyParts);
-#else
             list = host.split("@", Qt::SkipEmptyParts);
-#endif
             QString group;
             if (!list.empty() && list.size() < 3)
             {
@@ -4747,7 +4739,7 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
                 MythDB::DBError("SaveMarkup seektable data", query);
                 return;
             }
-            for (const auto& entry : qAsConst(mapMark))
+            for (const auto& entry : std::as_const(mapMark))
             {
                 if (entry.type == MARK_DURATION_MS)
                     continue;
@@ -4837,7 +4829,7 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
                 MythDB::DBError("SaveMarkup seektable data", query);
                 return;
             }
-            for (const auto& entry : qAsConst(mapMark))
+            for (const auto& entry : std::as_const(mapMark))
             {
                 if (entry.isDataNull)
                 {
@@ -6130,7 +6122,7 @@ bool LoadFromRecorded(
         // sanity check the fields are one of the above fields
         QString sSortBy;
         QStringList fields = sortBy.split(",");
-        for (const QString& oneField : qAsConst(fields))
+        for (const QString& oneField : std::as_const(fields))
         {
             bool ascending = true;
             QString field = oneField.simplified().toLower();

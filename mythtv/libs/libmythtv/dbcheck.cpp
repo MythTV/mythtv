@@ -3521,7 +3521,7 @@ static bool doUpgradeTVDatabaseSchema(void)
                 profiles.push_back(temp);
             }
 
-            for (const MythVideoProfileItem& profile : qAsConst(profiles))
+            for (const MythVideoProfileItem& profile : std::as_const(profiles))
             {
                 QString newdecoder;
                 QString newrender;
@@ -3712,7 +3712,7 @@ static bool doUpgradeTVDatabaseSchema(void)
                 profiles.push_back(temp);
             }
 
-            for (const MythVideoProfileItem& profile : qAsConst(profiles))
+            for (const MythVideoProfileItem& profile : std::as_const(profiles))
             {
                 // the old deinterlacers will have been converted already
                 QString oldrender  = profile.Get("pref_videorenderer");

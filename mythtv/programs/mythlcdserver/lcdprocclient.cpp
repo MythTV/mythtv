@@ -71,12 +71,7 @@ LCDProcClient::LCDProcClient(LCDServer *lparent)
         LOG(VB_GENERAL, LOG_INFO,
             "LCDProcClient: An LCDProcClient object now exists");
 
-#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-    connect(m_socket, qOverload<QAbstractSocket::SocketError>(&QAbstractSocket::error),
-            this, &LCDProcClient::veryBadThings);
-#else
     connect(m_socket, &QAbstractSocket::errorOccurred, this, &LCDProcClient::veryBadThings);
-#endif
     connect(m_socket, &QIODevice::readyRead, this, &LCDProcClient::serverSendingData);
 
     lcdStartCol = LCD_START_COL;
@@ -1009,7 +1004,7 @@ void LCDProcClient::scrollWidgets()
         return; // Weird...
 
     unsigned int len = 0;
-    for (const auto & item : qAsConst(*m_lcdTextItems))
+    for (const auto & item : std::as_const(*m_lcdTextItems))
     {
         if (item.getScroll())
         {
@@ -2053,7 +2048,7 @@ QStringList LCDProcClient::formatScrollerText(const QString &text) const
     int lastSplit = 0;
     QString line = "";
 
-    for (const auto& x : qAsConst(text))
+    for (const auto& x : std::as_const(text))
     {
         if (separators.contains(x))
             lastSplit = line.length();

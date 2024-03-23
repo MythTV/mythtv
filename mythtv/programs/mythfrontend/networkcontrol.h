@@ -9,9 +9,7 @@
 #include <QRunnable>
 #include <QMutex>
 #include <QEvent>
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 #include <QRecursiveMutex>
-#endif
 
 #include "libmythbase/mthread.h"
 #include "libmythbase/serverpool.h"
@@ -144,11 +142,7 @@ class NetworkControl : public ServerPool, public QRunnable
     QMap <QString, int>     m_keyMap;
     QMap <int, QString>     m_keyTextMap;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    mutable QMutex  m_clientLock {QMutex::Recursive};
-#else
     mutable QRecursiveMutex  m_clientLock;
-#endif
     QList<NetworkControlClient*> m_clients;
 
     QList<NetworkCommand*> m_networkControlCommands; // protected by ncLock

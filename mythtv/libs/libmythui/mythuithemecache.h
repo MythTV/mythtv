@@ -3,11 +3,7 @@
 
 // Qt
 #include <QMap>
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-#include <QMutex>
-#else
 #include <QRecursiveMutex>
-#endif
 
 // MythTV
 #include "libmythbase/mythchrono.h"
@@ -52,11 +48,7 @@ class MUI_PUBLIC MythUIThemeCache
 
     QMap<QString, MythImage *> m_imageCache;
     QMap<QString, SystemTime> m_cacheTrack;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex m_cacheLock                    { QMutex::Recursive };
-#else
     QRecursiveMutex m_cacheLock;
-#endif
     QAtomicInteger<qint64> m_cacheSize    { 0 };
     QAtomicInteger<qint64> m_maxCacheSize { 30LL * 1024 * 1024 };
     QString m_themecachedir;

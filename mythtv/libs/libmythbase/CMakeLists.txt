@@ -66,7 +66,6 @@ set(LIBMYTHBASE_HEADERS
     programinfo.h
     programtypes.h
     programtypeflags.h
-    qtuplift.h
     recordingstatus.h
     recordingtypes.h
     referencecounter.h

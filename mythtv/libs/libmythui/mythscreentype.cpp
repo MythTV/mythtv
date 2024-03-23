@@ -119,7 +119,7 @@ bool MythScreenType::SetFocusWidget(MythUIType *widget)
 {
     if (!widget || !widget->IsVisible(true))
     {
-        for (auto *current : qAsConst(m_focusWidgetList))
+        for (auto *current : std::as_const(m_focusWidgetList))
         {
             if (current->CanTakeFocus() && current->IsVisible(true))
             {

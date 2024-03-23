@@ -29,11 +29,7 @@ static int handleMedia(const QString &url, const QString &directory, const QStri
         return 1;
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList urls = url.split(" ", QString::SkipEmptyParts);
-#else
     QStringList urls = url.split(" ", Qt::SkipEmptyParts);
-#endif
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 

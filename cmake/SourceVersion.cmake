@@ -35,6 +35,10 @@ function(source_version_from_file filename version branch)
     return()
   endif()
 
+  # Unset variables in case they aren't included in the file.
+  unset(${version} PARENT_SCOPE)
+  unset(${branch} PARENT_SCOPE)
+
   list(APPEND CMAKE_MESSAGE_INDENT "  ")
 
   # slurp the file
@@ -42,7 +46,9 @@ function(source_version_from_file filename version branch)
   file(STRINGS ${filename} lines REGEX "SOURCE_VERSION|BRANCH")
   foreach(line IN LISTS lines)
     message(DEBUG "  line: ${line}")
-    if(line MATCHES "^ *SOURCE_VERSION *= *\" *([^ ]+) *\" *$")
+    if(line MATCHES "Format:")
+      continue()
+    elseif(line MATCHES "^ *SOURCE_VERSION *= *\" *([^ ]+) *\" *$")
       set(${version}
           "${CMAKE_MATCH_1}"
           PARENT_SCOPE)
@@ -112,11 +118,33 @@ function(mythtv_find_source_version version version_major branch)
       OUTPUT_VARIABLE versionString
       OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
 
+    if(NOT versionString)
+      execute_process(
+        COMMAND ${GIT_EXECUTABLE} describe
+        OUTPUT_VARIABLE versionString
+        OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+    endif()
+
     # Branch
     execute_process(
       COMMAND ${GIT_EXECUTABLE} branch --show-current
       OUTPUT_VARIABLE branchName
       OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+
+    # While this command appears to work for all cases, it does depend on the
+    # specific git output format, so use it only if the simplier command does
+    # not.
+    if(NOT branchName)
+      execute_process(
+        COMMAND ${GIT_EXECUTABLE} branch --no-color --omit-empty --sort=refname
+                --contains HEAD --merged HEAD
+        OUTPUT_VARIABLE branchNames
+        OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+      string(REGEX MATCHALL "[^\n\r]+" branchNamesList ${branchNames})
+      list(GET branchNamesList 0 branchName)
+      string(REGEX REPLACE "^[\\*\\+] " "" branchName ${branchName})
+      string(STRIP ${branchName} branchName)
+    endif()
 
     if(versionString)
       message(STATUS "  version:${versionString} branch:${branchName}")
@@ -131,16 +159,19 @@ function(mythtv_find_source_version version version_major branch)
     source_version_from_file(${filename} versionString branchName)
 
     # Fix up version
-    if(NOT versionString MATCHES "^v[0-9]")
+    if(versionString AND NOT versionString MATCHES "^v[0-9]")
       set(filename "${mythtv_source_dir}/SRC_VERSION")
       if(EXISTS ${filename})
+        message(STATUS "Checking for version info in ${filename}")
         source_version_from_file(${filename} prefix dummy)
         set(versionString "${prefix}-${versionString}")
       endif()
     endif()
 
     clean_branch_information(branchName)
-    message(STATUS "  version:${versionString} branch:${branchName}")
+    if(versionString)
+      message(STATUS "  version:${versionString} branch:${branchName}")
+    endif()
   endif()
 
   # Sill haven't found a vesion string. Check for a SRC_VERSION file.
@@ -148,8 +179,7 @@ function(mythtv_find_source_version version version_major branch)
     set(filename "${mythtv_source_dir}/SRC_VERSION")
     message(STATUS "Checking for version info in ${filename}")
     if(EXISTS ${filename})
-      source_version_from_file(${filename} versionString dummy)
-      unset(branchName)
+      source_version_from_file(${filename} versionString branchName)
       message(STATUS "  version:${versionString}")
     endif()
   endif()
@@ -160,12 +190,10 @@ function(mythtv_find_source_version version version_major branch)
     set(versionMajorString ${CMAKE_MATCH_1})
   else()
     message(WARNING "Invalid source version ${versionString}, must start "
-                    "with v and a number, will use SRC_VERSION file instead")
-    set(filename "${mythtv_source_dir}/SRC_VERSION")
-    message(STATUS "Checking for version info in ${filename}")
-    source_version_from_file(${filename} versionString dummy)
-    unset(branchName)
-    message(STATUS "  version:${versionString}")
+                    "with v and a number. Setting it to unknown.")
+    set(versionString "Unknown")
+    set(versionMajorString "0")
+    set(branchName "Unknown")
   endif()
 
   # Pass data back to caller

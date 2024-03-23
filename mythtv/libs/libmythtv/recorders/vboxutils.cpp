@@ -90,7 +90,7 @@ QStringList VBox::doUPNPSearch(void)
     EntryMap map;
     vboxes->GetEntryMap(map);
 
-    for (auto *BE : qAsConst(map))
+    for (auto *BE : std::as_const(map))
     {
         if (!BE->GetDeviceDesc())
         {

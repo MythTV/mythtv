@@ -78,22 +78,13 @@ class MPLUGIN_PUBLIC ZMClient : public QObject
     bool readData(unsigned char *data, int dataSize);
     bool sendReceiveStringList(QStringList &strList);
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex              m_listLock          {QMutex::Recursive};
-    QMutex              m_commandLock       {QMutex::Recursive};
-#else
     QRecursiveMutex     m_listLock;
     QRecursiveMutex     m_commandLock;
-#endif
     QList<Monitor*>     m_monitorList;
     QMap<int, Monitor*> m_monitorMap;
 
     MythSocket       *m_socket              {nullptr};
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex            m_socketLock          {QMutex::Recursive};
-#else
     QRecursiveMutex   m_socketLock;
-#endif
     QString           m_hostname            {"localhost"};
     uint              m_port                {6548};
     bool              m_bConnected          {false};

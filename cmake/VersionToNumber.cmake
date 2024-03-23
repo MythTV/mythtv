@@ -8,9 +8,9 @@ function(version_to_number out version hex)
   if(hex)
     set(_format HEXA)
   endif()
-  if(version MATCHES "^([0-9]+)\.([0-9])+(\.([0-9]+))?")
+  if(version MATCHES "^([0-9]+)\.([0-9]+)(\.([0-9]+))?")
     math(EXPR _value
-         "${CMAKE_MATCH_1} * 65536 + ${CMAKE_MATCH_2} * 256 + 0${CMAKE_MATCH_3}"
+         "${CMAKE_MATCH_1} * 65536 + ${CMAKE_MATCH_2} * 256 + 0${CMAKE_MATCH_4}"
          OUTPUT_FORMAT ${_format}DECIMAL)
   else()
     message(FATAL_ERROR "Can't parse ${version} into maj/min/patch")

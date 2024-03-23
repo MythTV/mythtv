@@ -799,7 +799,7 @@ void FormattedTextSubtitle::Layout(void)
     // Calculate dimensions of bounding rectangle
     int anchor_width = 0;
     int anchor_height = 0;
-    for (const auto & line : qAsConst(m_lines))
+    for (const auto & line : std::as_const(m_lines))
     {
         QSize sz = line.CalcSize(LINE_SPACING);
         anchor_width = std::max(anchor_width, sz.width());
@@ -939,7 +939,7 @@ void FormattedTextSubtitle::Draw(void)
 QStringList FormattedTextSubtitle::ToSRT(void) const
 {
     QStringList result;
-    for (const auto & ftl : qAsConst(m_lines))
+    for (const auto & ftl : std::as_const(m_lines))
     {
         QString line;
         if (ftl.m_origX > 0)
@@ -1015,7 +1015,7 @@ void FormattedTextSubtitleSRT::Init(const QStringList &subs)
         "</?.+>", QRegularExpression::InvertedGreedinessOption };
     QString htmlPrefix("<font color=\"");
     QString htmlSuffix("\">");
-    for (const QString& subtitle : qAsConst(subs))
+    for (const QString& subtitle : std::as_const(subs))
     {
         FormattedTextLine line;
         QString text(subtitle);

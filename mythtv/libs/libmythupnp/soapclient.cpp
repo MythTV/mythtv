@@ -85,11 +85,7 @@ bool SOAPClient::Init(const QUrl    &url,
 QDomNode SOAPClient::FindNode(
     const QString &sName, const QDomNode &baseNode) const
 {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList parts = sName.split('/', QString::SkipEmptyParts);
-#else
     QStringList parts = sName.split('/', Qt::SkipEmptyParts);
-#endif
     return FindNodeInternal(parts, baseNode);
 }
 

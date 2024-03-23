@@ -968,13 +968,8 @@ V2GrabberList* V2Channel::GetGrabberList  (  )
         while (!ostream.atEnd())
         {
             QString grabber_list(ostream.readLine());
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList grabber_split =
-                grabber_list.split("|", QString::SkipEmptyParts);
-#else
             QStringList grabber_split =
                 grabber_list.split("|", Qt::SkipEmptyParts);
-#endif
             QString grabber_name = grabber_split[1];
             QFileInfo grabber_file(grabber_split[0]);
             QString program = grabber_file.fileName();

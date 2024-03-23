@@ -270,7 +270,7 @@ RemoteEncoder *RemoteRequestFreeRecorderFromList
     std::vector<InputInfo> inputs =
         RemoteRequestFreeInputInfo(excluded_input);
 
-    for (const auto & recorder : qAsConst(qualifiedRecorders))
+    for (const auto & recorder : std::as_const(qualifiedRecorders))
     {
         uint inputid = recorder.toUInt();
         auto sameinput = [inputid](const auto & input){ return input.m_inputId == inputid; };

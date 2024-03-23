@@ -207,7 +207,7 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
 
     //MetadataLookupList is a reference counted list.
     //it will delete all its content at its end of life
-    for(const auto & lookup : qAsConst(list))
+    for(const auto & lookup : std::as_const(list))
     {
         DTC::VideoLookup *pVideoLookup = pVideoLookups->AddNewVideoLookup();
 
@@ -734,12 +734,7 @@ bool Video::UpdateVideoMetadata ( int           nId,
     if (m_parsedParams.contains("genres"))
     {
         VideoMetadata::genre_list genres;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList genresList = sGenres.split(',', QString::SkipEmptyParts);
-#else
         QStringList genresList = sGenres.split(',', Qt::SkipEmptyParts);
-#endif
-
         std::transform(genresList.cbegin(), genresList.cend(), std::back_inserter(genres),
                        [](const QString& name)
                            {return VideoMetadata::genre_list::value_type(-1, name.simplified());} );
@@ -751,12 +746,7 @@ bool Video::UpdateVideoMetadata ( int           nId,
     if (m_parsedParams.contains("cast"))
     {
         VideoMetadata::cast_list cast;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList castList = sCast.split(',', QString::SkipEmptyParts);
-#else
         QStringList castList = sCast.split(',', Qt::SkipEmptyParts);
-#endif
-
         std::transform(castList.cbegin(), castList.cend(), std::back_inserter(cast),
                        [](const QString& name)
                            {return VideoMetadata::cast_list::value_type(-1, name.simplified());} );
@@ -768,12 +758,7 @@ bool Video::UpdateVideoMetadata ( int           nId,
     if (m_parsedParams.contains("countries"))
     {
         VideoMetadata::country_list countries;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList countryList = sCountries.split(',', QString::SkipEmptyParts);
-#else
         QStringList countryList = sCountries.split(',', Qt::SkipEmptyParts);
-#endif
-
         std::transform(countryList.cbegin(), countryList.cend(), std::back_inserter(countries),
                        [](const QString& name)
                            {return VideoMetadata::country_list::value_type(-1, name.simplified());} );
@@ -819,7 +804,7 @@ DTC::VideoStreamInfoList* Video::GetStreamInfo
     pVideoStreamInfos->setErrorCode     ( infos.m_errorCode   );
     pVideoStreamInfos->setErrorMsg      ( infos.m_errorMsg    );
 
-    for (const auto & info : qAsConst(infos.m_streamInfoList))
+    for (const auto & info : std::as_const(infos.m_streamInfoList))
     {
         DTC::VideoStreamInfo *pVideoStreamInfo = pVideoStreamInfos->AddNewVideoStreamInfo();
         pVideoStreamInfo->setCodecType       ( QString(QChar(info.m_codecType)) );

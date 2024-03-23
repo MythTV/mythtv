@@ -271,7 +271,7 @@ void InfoList::Display(ImageItemK &im, const QStringList &tagStrings)
         // Create buttons for exif/video tags
         // Multimap iterates each key latest->earliest so we must do it the long way
         QList groups = tags.uniqueKeys();
-        for (const QString & group : qAsConst(groups))
+        for (const QString & group : std::as_const(groups))
         {
             // Iterate earliest->latest to preserve tag order
             using TagList = QList<QStringList>;

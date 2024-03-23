@@ -23,12 +23,6 @@
 #include "channelutil.h"
 #include "mpeg/mpegstreamdata.h" // for kEncDecrypted
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-  #define QT_ENDL endl
-#else
-  #define QT_ENDL Qt::endl
-#endif
-
 #define LOC QString("ChanImport: ")
 
 static const QString kATSCChannelFormat = "%1_%2";
@@ -130,27 +124,27 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     {
         bool require_av = (m_serviceRequirements & kRequireAV) == kRequireAV;
         bool require_a  = (m_serviceRequirements & kRequireAudio) != 0;
-        ssMsg << QT_ENDL << QT_ENDL;
-        ssMsg << "Scan parameters:" << QT_ENDL;
-        ssMsg << "Desired Services            : " << (require_av ? "tv" : require_a ? "tv+radio" : "all") << QT_ENDL;
-        ssMsg << "Unencrypted Only            : " << (m_ftaOnly           ? "yes" : "no") << QT_ENDL;
-        ssMsg << "Logical Channel Numbers only: " << (m_lcnOnly           ? "yes" : "no") << QT_ENDL;
-        ssMsg << "Complete scan data required : " << (m_completeOnly      ? "yes" : "no") << QT_ENDL;
-        ssMsg << "Full search for old channels: " << (m_fullChannelSearch ? "yes" : "no") << QT_ENDL;
-        ssMsg << "Remove duplicates           : " << (m_removeDuplicates  ? "yes" : "no") << QT_ENDL;
+        ssMsg << Qt::endl << Qt::endl;
+        ssMsg << "Scan parameters:" << Qt::endl;
+        ssMsg << "Desired Services            : " << (require_av ? "tv" : require_a ? "tv+radio" : "all") << Qt::endl;
+        ssMsg << "Unencrypted Only            : " << (m_ftaOnly           ? "yes" : "no") << Qt::endl;
+        ssMsg << "Logical Channel Numbers only: " << (m_lcnOnly           ? "yes" : "no") << Qt::endl;
+        ssMsg << "Complete scan data required : " << (m_completeOnly      ? "yes" : "no") << Qt::endl;
+        ssMsg << "Full search for old channels: " << (m_fullChannelSearch ? "yes" : "no") << Qt::endl;
+        ssMsg << "Remove duplicates           : " << (m_removeDuplicates  ? "yes" : "no") << Qt::endl;
     }
 
     // Transports and channels before processing
     if (!transports.empty())
     {
-        ssMsg << QT_ENDL;
-        ssMsg << "Transport list before processing (" << transports.size() << "):" << QT_ENDL;
+        ssMsg << Qt::endl;
+        ssMsg << "Transport list before processing (" << transports.size() << "):" << Qt::endl;
         ssMsg << FormatTransports(transports).toLatin1().constData();
 
         ChannelImporterBasicStats info = CollectStats(transports);
-        ssMsg << QT_ENDL;
+        ssMsg << Qt::endl;
         ssMsg << "Channel list before processing (";
-        ssMsg << SimpleCountChannels(transports) << "):" << QT_ENDL;
+        ssMsg << SimpleCountChannels(transports) << "):" << Qt::endl;
         ssMsg << FormatChannels(transports, &info).toLatin1().constData();
     }
     LOG(VB_GENERAL, LOG_INFO, LOC + msg);
@@ -170,11 +164,11 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
         if (!duplicates.empty())
         {
             msg = "";
-            ssMsg << QT_ENDL;
-            ssMsg << "Discarded duplicate transports (" << duplicates.size() << "):" << QT_ENDL;
-            ssMsg << FormatTransports(duplicates).toLatin1().constData() << QT_ENDL;
-            ssMsg << "Discarded duplicate channels (" << SimpleCountChannels(duplicates) << "):" << QT_ENDL;
-            ssMsg << FormatChannels(duplicates).toLatin1().constData() << QT_ENDL;
+            ssMsg << Qt::endl;
+            ssMsg << "Discarded duplicate transports (" << duplicates.size() << "):" << Qt::endl;
+            ssMsg << FormatTransports(duplicates).toLatin1().constData() << Qt::endl;
+            ssMsg << "Discarded duplicate channels (" << SimpleCountChannels(duplicates) << "):" << Qt::endl;
+            ssMsg << FormatChannels(duplicates).toLatin1().constData() << Qt::endl;
             LOG(VB_CHANSCAN, LOG_INFO, LOC + msg);
         }
     }
@@ -192,12 +186,12 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     // Channels not found in scan but only in DB are returned in db_trans
     ScanDTVTransportList db_trans = GetDBTransports(sourceid, transports);
     msg = "";
-    ssMsg << QT_ENDL;
+    ssMsg << Qt::endl;
     if (!db_trans.empty())
     {
-        ssMsg << QT_ENDL;
+        ssMsg << Qt::endl;
         ssMsg << "Transports with channels in DB but not in scan (";
-        ssMsg << db_trans.size() << "):" << QT_ENDL;
+        ssMsg << db_trans.size() << "):" << Qt::endl;
         ssMsg << FormatTransports(db_trans).toLatin1().constData();
     }
 
@@ -207,9 +201,9 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     // All channels in the scan after comparing with the database
     {
         ChannelImporterBasicStats info = CollectStats(transports);
-        ssMsg << QT_ENDL;
+        ssMsg << Qt::endl;
         ssMsg << "Channel list after compare with database (";
-        ssMsg << SimpleCountChannels(transports) << "):" << QT_ENDL;
+        ssMsg << SimpleCountChannels(transports) << "):" << Qt::endl;
         ssMsg << FormatChannels(transports, &info).toLatin1().constData();
     }
 
@@ -232,13 +226,13 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
         CollectUniquenessStats(transports, info);
 
     // Final channel list
-    ssMsg << QT_ENDL;
-    ssMsg << "Channel list (" << SimpleCountChannels(transports) << "):" << QT_ENDL;
+    ssMsg << Qt::endl;
+    ssMsg << "Channel list (" << SimpleCountChannels(transports) << "):" << Qt::endl;
     ssMsg << FormatChannels(transports).toLatin1().constData();
 
     // Create summary
-    ssMsg << QT_ENDL;
-    ssMsg << GetSummary(info, stats) << QT_ENDL;
+    ssMsg << Qt::endl;
+    ssMsg << GetSummary(info, stats) << Qt::endl;
 
     LOG(VB_GENERAL, LOG_INFO, LOC + msg);
 
@@ -513,30 +507,30 @@ void ChannelImporter::InsertChannels(
 
     if (!updated.empty())
     {
-        ssMsg << QT_ENDL << QT_ENDL;
-        ssMsg << "Updated old transports (" << updated.size() << "):" << QT_ENDL;
+        ssMsg << Qt::endl << Qt::endl;
+        ssMsg << "Updated old transports (" << updated.size() << "):" << Qt::endl;
         ssMsg << FormatTransports(updated).toLatin1().constData();
 
-        ssMsg << QT_ENDL;
-        ssMsg << "Updated old channels (" << SimpleCountChannels(updated) << "):" << QT_ENDL;
+        ssMsg << Qt::endl;
+        ssMsg << "Updated old channels (" << SimpleCountChannels(updated) << "):" << Qt::endl;
         ssMsg << FormatChannels(updated).toLatin1().constData();
     }
     if (!skipped_updates.empty())
     {
-        ssMsg << QT_ENDL;
-        ssMsg << "Skipped old channels (" << SimpleCountChannels(skipped_updates) << "):" << QT_ENDL;
+        ssMsg << Qt::endl;
+        ssMsg << "Skipped old channels (" << SimpleCountChannels(skipped_updates) << "):" << Qt::endl;
         ssMsg << FormatChannels(skipped_updates).toLatin1().constData();
     }
     if (!inserted.empty())
     {
-        ssMsg << QT_ENDL;
-        ssMsg << "Inserted new channels (" << SimpleCountChannels(inserted) << "):" << QT_ENDL;
+        ssMsg << Qt::endl;
+        ssMsg << "Inserted new channels (" << SimpleCountChannels(inserted) << "):" << Qt::endl;
         ssMsg << FormatChannels(inserted).toLatin1().constData();
     }
     if (!skipped_inserts.empty())
     {
-        ssMsg << QT_ENDL;
-        ssMsg << "Skipped new channels (" << SimpleCountChannels(skipped_inserts) << "):" << QT_ENDL;
+        ssMsg << Qt::endl;
+        ssMsg << "Skipped new channels (" << SimpleCountChannels(skipped_inserts) << "):" << Qt::endl;
         ssMsg << FormatChannels(skipped_inserts).toLatin1().constData();
     }
 
@@ -545,9 +539,9 @@ void ChannelImporter::InsertChannels(
     {
         ChannelImporterBasicStats      ninfo  = CollectStats(list);
         ChannelImporterUniquenessStats nstats = CollectUniquenessStats(list, ninfo);
-        ssMsg << QT_ENDL;
-        ssMsg << "Remaining channels (" << SimpleCountChannels(list) << "):" << QT_ENDL;
-        ssMsg << FormatChannels(list).toLatin1().constData() << QT_ENDL;
+        ssMsg << Qt::endl;
+        ssMsg << "Remaining channels (" << SimpleCountChannels(list) << "):" << Qt::endl;
+        ssMsg << FormatChannels(list).toLatin1().constData() << Qt::endl;
         ssMsg << GetSummary(ninfo, nstats).toLatin1().constData();
     }
     LOG(VB_GENERAL, LOG_INFO, LOC + msg);

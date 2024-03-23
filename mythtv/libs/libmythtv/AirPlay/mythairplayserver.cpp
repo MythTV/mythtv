@@ -34,11 +34,7 @@
 
 MythAirplayServer* MythAirplayServer::gMythAirplayServer = nullptr;
 MThread*           MythAirplayServer::gMythAirplayServerThread = nullptr;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-QMutex*            MythAirplayServer::gMythAirplayServerMutex = new QMutex(QMutex::Recursive);
-#else
 QRecursiveMutex*   MythAirplayServer::gMythAirplayServerMutex = new QRecursiveMutex();
-#endif
 
 #define LOC QString("AirPlay: ")
 
@@ -187,10 +183,11 @@ QByteArray DigestMd5Response(const QString& response, const QString& option,
     QByteArray passwd   = password.toLatin1();
 
     QCryptographicHash hash(QCryptographicHash::Md5);
+    QByteArray colon(":", 1);
     hash.addData(user);
-    hash.addData(":", 1);
+    hash.addData(colon);
     hash.addData(realm);
-    hash.addData(":", 1);
+    hash.addData(colon);
     hash.addData(passwd);
     QByteArray ha1 = hash.result();
     ha1 = ha1.toHex();
@@ -198,16 +195,16 @@ QByteArray DigestMd5Response(const QString& response, const QString& option,
     // calculate H(A2)
     hash.reset();
     hash.addData(option.toLatin1());
-    hash.addData(":", 1);
+    hash.addData(colon);
     hash.addData(uri);
     QByteArray ha2 = hash.result().toHex();
 
     // calculate response
     hash.reset();
     hash.addData(ha1);
-    hash.addData(":", 1);
+    hash.addData(colon);
     hash.addData(nonce.toLatin1());
-    hash.addData(":", 1);
+    hash.addData(colon);
     hash.addData(ha2);
     return hash.result().toHex();
 }
@@ -245,7 +242,7 @@ class APHTTPRequest
     {
         QMap<QByteArray,QByteArray> result;
         QList<QByteArray> lines = m_body.split('\n');;
-        for (const QByteArray& line : qAsConst(lines))
+        for (const QByteArray& line : std::as_const(lines))
         {
             int index = line.indexOf(":");
             if (index > 0)
@@ -435,7 +432,7 @@ void MythAirplayServer::Teardown(void)
     m_bonjour = nullptr;
 
     // disconnect connections
-    for (QTcpSocket* connection : qAsConst(m_sockets))
+    for (QTcpSocket* connection : std::as_const(m_sockets))
     {
         disconnect(connection, nullptr, nullptr, nullptr);
         delete connection;
@@ -443,7 +440,7 @@ void MythAirplayServer::Teardown(void)
     m_sockets.clear();
 
     // remove all incoming buffers
-    for (APHTTPRequest* request : qAsConst(m_incoming))
+    for (APHTTPRequest* request : std::as_const(m_incoming))
     {
         delete request;
     }

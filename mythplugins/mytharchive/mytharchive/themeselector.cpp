@@ -134,7 +134,7 @@ void DVDThemeSelector::getThemeList(void)
         filters << "*";
         QFileInfoList list = d.entryInfoList(filters, QDir::Dirs, QDir::Name);
 
-        for (const auto & fi : qAsConst(list))
+        for (const auto & fi : std::as_const(list))
         {
             if (QFile::exists(m_themeDir + fi.fileName() + "/preview.png"))
             {

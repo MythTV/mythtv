@@ -34,7 +34,7 @@ void ProfileGroup::HostName::fillSelections()
 {
     QStringList hostnames;
     ProfileGroup::getHostNames(&hostnames);
-    for (const auto & hostname : qAsConst(hostnames))
+    for (const auto & hostname : std::as_const(hostnames))
         this->addSelection(hostname);
 }
 

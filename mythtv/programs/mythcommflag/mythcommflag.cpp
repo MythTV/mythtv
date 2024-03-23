@@ -337,11 +337,7 @@ static void incomingCustomEvent(QEvent* e)
         QString message = me->Message();
 
         message = message.simplified();
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList tokens = message.split(" ", QString::SkipEmptyParts);
-#else
         QStringList tokens = message.split(" ", Qt::SkipEmptyParts);
-#endif
 
         LOG(VB_COMMFLAG, LOG_INFO,
             QString("mythcommflag: Received Event: '%1'") .arg(message));
@@ -601,12 +597,8 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
             // not an integer, attempt comma separated list
             commDetectMethod = COMM_DETECT_UNINIT;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList list = commmethod.split(",", QString::SkipEmptyParts);
-#else
             QStringList list = commmethod.split(",", Qt::SkipEmptyParts);
-#endif
-            for (const auto & it : qAsConst(list))
+            for (const auto & it : std::as_const(list))
             {
                 QString val = it.toLower();
                 if (val == "off")

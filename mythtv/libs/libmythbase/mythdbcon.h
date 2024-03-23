@@ -12,7 +12,6 @@
 
 #include "mythbaseexp.h"
 #include "mythdbparams.h"
-#include "qtuplift.h"
 
 #define REUSE_CONNECTION 1 // NOLINT(cppcoreguidelines-macro-usage)
 

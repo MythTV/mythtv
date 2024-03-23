@@ -358,7 +358,7 @@ void MythUIStateType::RecalculateArea(bool recurse)
 
     if (recurse)
     {
-        for (auto * child : qAsConst(m_childrenList))
+        for (auto * child : std::as_const(m_childrenList))
             child->RecalculateArea(recurse);
     }
 }
@@ -371,7 +371,7 @@ void MythUIStateType::AdjustDependence(void)
         return;
     }
     QList<MythUIType *> *children = m_currentState->GetAllChildren();
-    for (auto *child : qAsConst(*children))
+    for (auto *child : std::as_const(*children))
     {
         if (child->IsVisible())
         {

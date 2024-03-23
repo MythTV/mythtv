@@ -17,9 +17,7 @@
 #include <QString>
 #include <QMutex>
 #include <QMap>
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 #include <QRecursiveMutex>
-#endif
 #include <QVector>
 
 // MythTV
@@ -553,20 +551,12 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 
     // Ask Allow state
     QMap<QString,AskProgramInfo> m_askAllowPrograms;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex                       m_askAllowLock {QMutex::Recursive};
-#else
     QRecursiveMutex              m_askAllowLock;
-#endif
 
     QMutex                    m_progListsLock;
     QMap<QString,ProgramList> m_progLists;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    mutable QMutex m_chanEditMapLock {QMutex::Recursive}; ///< Lock for chanEditMap and ddMap
-#else
     mutable QRecursiveMutex m_chanEditMapLock; ///< Lock for chanEditMap and ddMap
-#endif
     InfoMap        m_chanEditMap;          ///< Channel Editing initial map
 
     class SleepTimerInfo;

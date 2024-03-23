@@ -4,11 +4,7 @@
 #include "mythplayerstate.h"
 
 #include <QCoreApplication>
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-#include <QMutex>
-#else
 #include <QRecursiveMutex>
-#endif
 
 #include <cstdint>
 #include <vector>
@@ -115,11 +111,7 @@ class MTV_PUBLIC AudioPlayer : public QObject
     AudioOutput *m_audioOutput       {nullptr};
     MythAudioPlayerState m_state     { };
     float        m_stretchFactor     {1.0F};
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex       m_lock              {QMutex::Recursive};
-#else
     QRecursiveMutex m_lock;
-#endif
     bool         m_mutedOnCreation   {false};
     QString      m_mainDevice;
     QString      m_passthruDevice;

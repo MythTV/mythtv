@@ -283,7 +283,7 @@ void MythControls::SetListContents(
     uilist->Reset();
 
     // add each new string
-    for (const auto & content : qAsConst(contents))
+    for (const auto & content : std::as_const(contents))
     {
         auto *item = new MythUIButtonListItem(uilist, content);
         item->setDrawArrow(arrows);
@@ -502,7 +502,7 @@ void MythControls::LoadData(const QString &hostname)
     m_sortedContexts.insert(m_sortedContexts.begin(),
                             ActionSet::kJumpContext);
 
-    for (const auto & ctx_name : qAsConst(m_sortedContexts))
+    for (const auto & ctx_name : std::as_const(m_sortedContexts))
     {
         QStringList actions = m_bindings->GetActions(ctx_name);
         actions.sort();

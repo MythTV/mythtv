@@ -85,7 +85,7 @@ void MythMenu::AddItem(MythMenuItem *item, bool selected, MythMenu *subMenu)
 
 void MythMenu::SetSelectedByTitle(const QString& title)
 {
-    for (auto *item : qAsConst(m_menuItems))
+    for (auto *item : std::as_const(m_menuItems))
     {
         if (!item)
             continue;
@@ -100,7 +100,7 @@ void MythMenu::SetSelectedByTitle(const QString& title)
 
 void MythMenu::SetSelectedByData(const QVariant& data)
 {
-    for (auto *item : qAsConst(m_menuItems))
+    for (auto *item : std::as_const(m_menuItems))
     {
         if (!item)
             continue;
@@ -848,7 +848,7 @@ void MythUISearchDialog::slotUpdateList(void)
 {
     m_itemList->Reset();
 
-    for (const QString& item : qAsConst(m_list))
+    for (const QString& item : std::as_const(m_list))
     {
         if (m_matchAnywhere)
         {

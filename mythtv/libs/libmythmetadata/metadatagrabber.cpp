@@ -90,7 +90,7 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
 
             // loop through different types of grabber scripts and the 
             // directories they are stored in
-            for (const auto& grabberType : qAsConst(grabberTypes))
+            for (const auto& grabberType : std::as_const(grabberTypes))
             {
                 QString path = (grabberType.m_path).arg(GetShareDir());
                 QDir dir = QDir(path);
@@ -108,7 +108,7 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
                     continue;
 
                 // loop through discovered scripts
-                for (const auto& name : qAsConst(scripts))
+                for (const auto& name : std::as_const(scripts))
                 {
                     QString cmd = QDir(path).filePath(name);
                     MetaGrabberScript script(cmd);
@@ -131,7 +131,7 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
         tmpGrabberList = s_grabberList;
     }
 
-    for (const auto& item : qAsConst(tmpGrabberList))
+    for (const auto& item : std::as_const(tmpGrabberList))
     {
         if ((type == kGrabberAll) || (item.GetType() == type))
             retGrabberList.append(item);
@@ -194,7 +194,7 @@ MetaGrabberScript MetaGrabberScript::GetType(const GrabberType type)
 
     // just pull it from the cache
     GrabberList list = GetList(type);
-    for (const auto& item : qAsConst(list))
+    for (const auto& item : std::as_const(list))
         if (item.GetPath().endsWith(cmd))
             return item;
 
@@ -217,7 +217,7 @@ MetaGrabberScript MetaGrabberScript::FromTag(const QString &tag,
     GrabberList list = GetList();
 
     // search for direct match on tag
-    for (const auto& item : qAsConst(list))
+    for (const auto& item : std::as_const(list))
     {
         if (item.GetCommand() == tag)
         {
@@ -228,7 +228,7 @@ MetaGrabberScript MetaGrabberScript::FromTag(const QString &tag,
     // no direct match. do we require a direct match? search for one that works
     if (!absolute)
     {
-        for (const auto& item : qAsConst(list))
+        for (const auto& item : std::as_const(list))
         {
             if (item.Accepts(tag))
             {

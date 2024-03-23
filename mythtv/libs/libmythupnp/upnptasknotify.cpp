@@ -91,7 +91,7 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
 
     QList<QHostAddress> addressList = UPnp::g_IPAddrList;
 
-    for (const auto & addr : qAsConst(addressList))
+    for (const auto & addr : std::as_const(addressList))
     {
         if (addr.toString().isEmpty())
         {
@@ -205,6 +205,6 @@ void UPnpNotifyTask::ProcessDevice(
     // Process any Embedded Devices
     // ----------------------------------------------------------------------
 
-    for (const auto & dev : qAsConst(pDevice->m_listDevices))
+    for (const auto & dev : std::as_const(pDevice->m_listDevices))
         ProcessDevice( pSocket, dev);
 }

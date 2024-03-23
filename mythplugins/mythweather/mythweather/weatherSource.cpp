@@ -568,21 +568,13 @@ void WeatherSource::processExit(void)
 void WeatherSource::processData()
 {
     QString unicode_buffer = QString::fromUtf8(m_buffer);
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList data = unicode_buffer.split('\n', QString::SkipEmptyParts);
-#else
     QStringList data = unicode_buffer.split('\n', Qt::SkipEmptyParts);
-#endif
 
     m_data.clear();
 
     for (int i = 0; i < data.size(); ++i)
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList temp = data[i].split("::", QString::SkipEmptyParts);
-#else
         QStringList temp = data[i].split("::", Qt::SkipEmptyParts);
-#endif
         if (temp.size() > 2)
             LOG(VB_GENERAL, LOG_ERR, "Error parsing script file, ignoring");
         if (temp.size() < 2)

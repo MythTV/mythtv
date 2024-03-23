@@ -729,7 +729,7 @@ void MythUIImage::SetDelays(const QVector<std::chrono::milliseconds>& delays)
     QWriteLocker updateLocker(&d->m_updateLock);
     QMutexLocker imageLocker(&m_imagesLock);
 
-    for (std::chrono::milliseconds delay : qAsConst(delays))
+    for (std::chrono::milliseconds delay : std::as_const(delays))
         m_delays[m_delays.size()] = delay;
 
     if (m_delay == -1ms)
@@ -814,7 +814,7 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
 
     m_imageProperties.m_isThemeImage = false;
 
-    for (auto *im : qAsConst(*images))
+    for (auto *im : std::as_const(*images))
     {
         if (!im)
         {
@@ -876,7 +876,7 @@ void MythUIImage::SetAnimationFrames(const AnimationFrames& frames)
     QVector<std::chrono::milliseconds> delays;
     QVector<MythImage *> images;
 
-    for (const auto & frame : qAsConst(frames))
+    for (const auto & frame : std::as_const(frames))
     {
         images.append(frame.first);
         delays.append(frame.second);
@@ -1339,7 +1339,7 @@ bool MythUIImage::ParseElement(
         {
             QVector<std::chrono::milliseconds> delays;
             QStringList tokens = value.split(",");
-            for (const auto & token : qAsConst(tokens))
+            for (const auto & token : std::as_const(tokens))
             {
                 if (token.isEmpty())
                 {
@@ -1565,7 +1565,7 @@ void MythUIImage::customEvent(QEvent *event)
 
             if (animationFrames)
             {
-                for (const auto & frame : qAsConst(*animationFrames))
+                for (const auto & frame : std::as_const(*animationFrames))
                 {
                     MythImage *im = frame.first;
                     if (im)
@@ -1648,7 +1648,7 @@ void MythUIImage::FindRandomImage(void)
         QStringList imageTypes;
 
         QList< QByteArray > exts = QImageReader::supportedImageFormats();
-        for (const auto & ext : qAsConst(exts))
+        for (const auto & ext : std::as_const(exts))
         {
             imageTypes.append(QString("*.").append(ext));
         }

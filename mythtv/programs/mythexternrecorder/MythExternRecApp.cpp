@@ -123,7 +123,7 @@ bool MythExternRecApp::config(void)
         settings.beginGroup("VARIABLES");
 
         QStringList childKeys = settings.childKeys();
-        for (const QString & var : qAsConst(childKeys))
+        for (const QString & var : std::as_const(childKeys))
         {
             m_settingVars[var] = settings.value(var).toString();
             LOG(VB_CHANNEL, LOG_INFO, QString("%1=%2")

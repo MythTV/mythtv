@@ -75,7 +75,7 @@ void AudioDeviceComboBox::AudioRescan()
 
     // Adding the current value first avoids marking the setting as changed
     addSelection(value, value, true);
-    for (const auto & it : qAsConst(vect))
+    for (const auto & it : std::as_const(vect))
     {
         if (value != it.m_name)
             addSelection(it.m_name, it.m_name);
@@ -243,7 +243,7 @@ void AudioConfigSettings::AudioRescan()
     AudioOutput::ADCVect* list = AudioOutput::GetOutputList();
 
     m_audioDevs.clear();
-    for (const auto & dev : qAsConst(*list))
+    for (const auto & dev : std::as_const(*list))
         m_audioDevs.insert(dev.m_name, dev);
 
     m_devices = *list;
@@ -578,7 +578,7 @@ static void fillSelectionsFromDir(HostComboBoxSetting *comboBox,
 
 {
     QFileInfoList entries = dir.entryInfoList();
-    for (const auto & fi : qAsConst(entries))
+    for (const auto & fi : std::as_const(entries))
     {
         if (absPath)
             comboBox->addSelection( fi.absoluteFilePath() );

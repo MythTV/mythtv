@@ -144,7 +144,7 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
 
     if (!m_children.isEmpty())
     {
-        for (auto *draw : qAsConst(m_drawOrder))
+        for (auto *draw : std::as_const(m_drawOrder))
         {
             if (draw != screen && !draw->IsDeleting())
             {
@@ -239,7 +239,7 @@ void MythScreenStack::RecalculateDrawOrder(void)
     if (m_children.isEmpty())
         return;
 
-    for (auto *screen : qAsConst(m_children))
+    for (auto *screen : std::as_const(m_children))
     {
         if (screen->IsFullscreen())
             m_drawOrder.clear();
@@ -263,7 +263,7 @@ void MythScreenStack::DoNewFadeTransition(void)
 
     if (m_newTop->IsFullscreen())
     {
-        for (auto *draw : qAsConst(m_drawOrder))
+        for (auto *draw : std::as_const(m_drawOrder))
         {
             if (!draw->IsDeleting())
                 draw->AdjustAlpha(1, -kFadeVal);
@@ -315,7 +315,7 @@ void MythScreenStack::CheckDeletes(bool force)
         {
             bool found = false;
 
-            for (const auto *test : qAsConst(m_drawOrder))
+            for (const auto *test : std::as_const(m_drawOrder))
             {
                 if (*it == test)
                 {
@@ -365,7 +365,7 @@ QString MythScreenStack::GetLocation(bool fullPath) const
     if (fullPath)
     {
         QString path;
-        for (auto *child : qAsConst(m_children))
+        for (auto *child : std::as_const(m_children))
         {
             if (!child->IsDeleting())
             {

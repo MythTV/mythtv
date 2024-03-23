@@ -412,7 +412,7 @@ void GamePlayersList::CreateNewPlayer(const QString& name)
         return;
 
     // Database name must be unique
-    for (StandardSetting* child : qAsConst(*getSubSettings()))
+    for (StandardSetting* child : std::as_const(*getSubSettings()))
     {
         if (child->getName() == name)
         {

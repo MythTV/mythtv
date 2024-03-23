@@ -76,12 +76,6 @@ extern "C" {
 #include "../mytharchive/archiveutil.h"
 #include "../mytharchive/remoteavformatcontext.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-  #define QT_ENDL endl
-#else
-  #define QT_ENDL Qt::endl
-#endif
-
 class NativeArchive
 {
   public:
@@ -1167,11 +1161,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
     // copy file to video directory
     QString path = gCoreContext->GetSetting("VideoStartupDir");
     QString origFilename = findNodeText(videoNode, "filename");
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList dirList = origFilename.split("/", QString::SkipEmptyParts);
-#else
     QStringList dirList = origFilename.split("/", Qt::SkipEmptyParts);
-#endif
     QDir dir;
     for (int x = 0; x < dirList.count() - 1; x++)
     {
@@ -1624,11 +1614,7 @@ static int grabThumbnail(const QString& inFile, const QString& thumbList, const 
     }
 
     // get list of required thumbs
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList list = thumbList.split(",", QString::SkipEmptyParts);
-#else
     QStringList list = thumbList.split(",", Qt::SkipEmptyParts);
-#endif
     MythAVFrame frame;
     if (!frame)
     {
@@ -1962,11 +1948,7 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
         {
             case AVMEDIA_TYPE_VIDEO:
             {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                QStringList param = QString::fromStdString(buf).split(',', QString::SkipEmptyParts);
-#else
                 QStringList param = QString::fromStdString(buf).split(',', Qt::SkipEmptyParts);
-#endif
                 QString codec = param[0].remove("Video:", Qt::CaseInsensitive).remove(QChar::Null);
                 QDomElement stream = doc.createElement("video");
                 stream.setAttribute("streamindex", i);
@@ -2093,11 +2075,7 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
 
             case AVMEDIA_TYPE_AUDIO:
             {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                QStringList param = QString::fromStdString(buf).split(',', QString::SkipEmptyParts);
-#else
                 QStringList param = QString::fromStdString(buf).split(',', Qt::SkipEmptyParts);
-#endif
                 QString codec = param[0].remove("Audio:", Qt::CaseInsensitive).remove(QChar::Null);
 
                 QDomElement stream = doc.createElement("audio");
@@ -2142,11 +2120,7 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
 
             case AVMEDIA_TYPE_SUBTITLE:
             {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                QStringList param = QString::fromStdString(buf).split(',', QString::SkipEmptyParts);
-#else
                 QStringList param = QString::fromStdString(buf).split(',', Qt::SkipEmptyParts);
-#endif
                 QString codec = param[0].remove("Subtitle:", Qt::CaseInsensitive).remove(QChar::Null);
 
                 QDomElement stream = doc.createElement("subtitle");
@@ -2218,12 +2192,12 @@ static int getDBParamters(const QString& outFile)
     }
 
     QTextStream t(&f);
-    t << params.m_dbHostName << QT_ENDL;
-    t << params.m_dbUserName << QT_ENDL;
-    t << params.m_dbPassword << QT_ENDL;
-    t << params.m_dbName << QT_ENDL;
-    t << gCoreContext->GetHostName() << QT_ENDL;
-    t << GetInstallPrefix() << QT_ENDL;
+    t << params.m_dbHostName << Qt::endl;
+    t << params.m_dbUserName << Qt::endl;
+    t << params.m_dbPassword << Qt::endl;
+    t << params.m_dbName << Qt::endl;
+    t << gCoreContext->GetHostName() << Qt::endl;
+    t << GetInstallPrefix() << Qt::endl;
     f.close();
 
     return 0;

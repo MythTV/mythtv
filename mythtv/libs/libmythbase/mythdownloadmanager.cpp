@@ -766,13 +766,8 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
                 this, &MythDownloadManager::authCallback);
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-    connect(dlInfo->m_reply, qOverload<QNetworkReply::NetworkError>(&QNetworkReply::error),
-            this, &MythDownloadManager::downloadError);
-#else
     connect(dlInfo->m_reply, &QNetworkReply::errorOccurred,
             this, &MythDownloadManager::downloadError);
-#endif
     connect(dlInfo->m_reply, &QNetworkReply::downloadProgress,
             this, &MythDownloadManager::downloadProgress);
 }
@@ -1023,7 +1018,7 @@ void MythDownloadManager::cancelDownload(const QString &url, bool block)
 void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
 {
     m_infoLock->lock();
-    for (const auto& url : qAsConst(urls))
+    for (const auto& url : std::as_const(urls))
     {
         QMutableListIterator<MythDownloadInfo*> lit(m_downloadQueue);
         while (lit.hasNext())
@@ -1281,13 +1276,8 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
 
         m_downloadReplies[dlInfo->m_reply] = dlInfo;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-        connect(dlInfo->m_reply, qOverload<QNetworkReply::NetworkError>(&QNetworkReply::error),
-                this, &MythDownloadManager::downloadError);
-#else
         connect(dlInfo->m_reply, &QNetworkReply::errorOccurred,
                 this, &MythDownloadManager::downloadError);
-#endif
         connect(dlInfo->m_reply, &QNetworkReply::downloadProgress,
                 this, &MythDownloadManager::downloadProgress);
 
@@ -1747,7 +1737,7 @@ QString MythDownloadManager::getHeader(const QNetworkCacheMetaData &cacheData,
                                        const QString& header)
 {
     auto headers = cacheData.rawHeaders();
-    for (const auto& rh : qAsConst(headers))
+    for (const auto& rh : std::as_const(headers))
         if (QString(rh.first) == header)
             return {rh.second};
     return {};
@@ -1805,13 +1795,8 @@ void MythCookieJar::save(const QString &filename)
     QList<QNetworkCookie> cookieList = allCookies();
     QTextStream stream(&f);
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    for (const auto& cookie : qAsConst(cookieList))
-        stream << cookie.toRawForm() << endl;
-#else
-    for (const auto& cookie : qAsConst(cookieList))
+    for (const auto& cookie : std::as_const(cookieList))
         stream << cookie.toRawForm() << Qt::endl;
-#endif
 }
 
 

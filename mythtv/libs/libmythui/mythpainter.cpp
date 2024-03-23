@@ -38,7 +38,7 @@ void MythPainter::Teardown(void)
             .arg(m_allocatedImages.size()));
     }
 
-    for (auto *image : qAsConst(m_allocatedImages))
+    for (auto *image : std::as_const(m_allocatedImages))
         image->SetParent(nullptr);
     m_allocatedImages.clear();
 }
@@ -251,9 +251,6 @@ void MythPainter::DrawTextPriv(MythImage *im, const QString &msg, int flags,
 
     QPainter tmp(&pm);
     QFont tmpfont = font.face();
-#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-    tmpfont.setStyleStrategy(QFont::OpenGLCompatible);
-#endif
     tmp.setFont(tmpfont);
 
     QPainterPath path;
@@ -384,7 +381,7 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
                        QString::number(dest.height()) +
                        font.GetHash();
 
-    for (auto *layout : qAsConst(layouts))
+    for (auto *layout : std::as_const(layouts))
         incoming += layout->text();
 
     MythImage *im = nullptr;
@@ -416,9 +413,6 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
         clip.setSize(canvas.size());
 
         QFont tmpfont = font.face();
-#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-        tmpfont.setStyleStrategy(QFont::OpenGLCompatible);
-#endif
         painter.setFont(tmpfont);
         painter.setRenderHint(QPainter::Antialiasing);
 
@@ -439,12 +433,12 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
             shadowRect.translate(shadow.x(), shadow.y());
 
             painter.setPen(shadowColor);
-            for (auto *layout : qAsConst(layouts))
+            for (auto *layout : std::as_const(layouts))
                 layout->draw(&painter, shadowRect.topLeft(), formats, clip);
         }
 
         painter.setPen(QPen(font.GetBrush(), 0));
-        for (auto *layout : qAsConst(layouts))
+        for (auto *layout : std::as_const(layouts))
         {
             layout->draw(&painter, canvas.topLeft(),
                            layout->formats(), clip);
@@ -496,7 +490,7 @@ MythImage* MythPainter::GetImageFromRect(const QRect area, int radius,
                              ((0xfff & (uint64_t)gradient->finalStop().x()) << 24) +
                              ((0xfff & (uint64_t)gradient->finalStop().y()) << 36));
             QGradientStops stops = gradient->stops();
-            for (const auto & stop : qAsConst(stops))
+            for (const auto & stop : std::as_const(stops))
             {
                 incoming += QString::number(
                              ((0xfff * (uint64_t)(stop.first * 100))) +
@@ -592,7 +586,7 @@ void MythPainter::ExpireImages(int64_t max)
     if (recompute)
     {
         m_softwareCacheSize = 0;
-        for (auto *img : qAsConst(m_stringToImageMap))
+        for (auto *img : std::as_const(m_stringToImageMap))
             m_softwareCacheSize += img->GetSize();
     }
 }

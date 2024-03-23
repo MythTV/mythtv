@@ -11,9 +11,7 @@
 #include <QString>
 #include <QMutex>
 #include <QMap>
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 #include <QRecursiveMutex>
-#endif
 
 // MythTV headers
 #include "libmythbase/mthread.h"
@@ -130,11 +128,7 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     bool                m_usingSectionReader    {false};
     QWaitCondition      m_runningStateChanged;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    mutable QMutex      m_pidLock               {QMutex::Recursive};
-#else
     mutable QRecursiveMutex m_pidLock;
-#endif
     std::vector<uint>   m_eitPids;
     PIDInfoMap          m_pidInfo;
     uint                m_openPidFilters        {0};
@@ -147,11 +141,7 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     QMutex              m_mptsLock;
 
     using StreamDataList = QHash<MPEGStreamData*,QString>;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    mutable QMutex      m_listenerLock         {QMutex::Recursive};
-#else
     mutable QRecursiveMutex m_listenerLock;
-#endif
     StreamDataList      m_streamDataList;
 };
 

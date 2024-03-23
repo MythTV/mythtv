@@ -41,7 +41,7 @@ void MarkedFiles::Invert(const ImageIdList &all)
     QSet tmp;
     for (int tmpint : all)
         tmp.insert(tmpint);
-    for (int tmpint : qAsConst(*this))
+    for (int tmpint : std::as_const(*this))
         tmp.remove(tmpint);
     swap(tmp);
 }
@@ -53,7 +53,7 @@ void MarkedFiles::Invert(const ImageIdList &all)
 ImageListK FlatView::GetAllNodes() const
 {
     ImageListK files;
-    for (int id : qAsConst(m_sequence))
+    for (int id : std::as_const(m_sequence))
         files.append(m_images.value(id));
     return files;
 }
@@ -222,7 +222,7 @@ void FlatView::Populate(ImageList &files)
     if (files.isEmpty())
         return;
 
-    for (const QSharedPointer<ImageItem> & im : qAsConst(files))
+    for (const QSharedPointer<ImageItem> & im : std::as_const(files))
     {
         // Add image to view
         m_images.insert(im->m_id, im);
@@ -235,7 +235,7 @@ void FlatView::Populate(ImageList &files)
     if (files.size() == 1 || m_order == kOrdered || m_order == kShuffle)
     {
         // Default sequence is ordered
-        for (const QSharedPointer<ImageItem> & im : qAsConst(files))
+        for (const QSharedPointer<ImageItem> & im : std::as_const(files))
             m_sequence.append(im->m_id);
     }
 
@@ -457,7 +457,7 @@ void FlatView::Cache(int id, int parent, const QString &url, const QString &thum
 QString DirCacheEntry::ToString(int id) const
 {
     QStringList ids;
-    for (const auto & thumb : qAsConst(m_thumbs))
+    for (const auto & thumb : std::as_const(m_thumbs))
         ids << QString::number(thumb.first);
     return QString("Dir %1 (%2, %3) Thumbs %4 (%5) Parent %6")
             .arg(id).arg(m_fileCount).arg(m_dirCount).arg(ids.join(","))
@@ -521,7 +521,7 @@ bool DirectoryView::LoadFromDb(int parentId)
     }
 
     // Populate all subdirs
-    for (const ImagePtr & im : qAsConst(dirs))
+    for (const ImagePtr & im : std::as_const(dirs))
     {
         if (im)
             // Load sufficient thumbs from each dir as subsequent dirs may be empty
@@ -539,7 +539,7 @@ bool DirectoryView::LoadFromDb(int parentId)
     if (!m_marked.isEmpty())
     {
         QSet<int> ids;
-        for (const QSharedPointer<ImageItem> & im : qAsConst(images))
+        for (const QSharedPointer<ImageItem> & im : std::as_const(images))
             ids.insert(im->m_id);
         m_marked.intersect(ids);
     }
@@ -606,7 +606,7 @@ void DirectoryView::PopulateThumbs(ImageItem &parent, int thumbsNeeded,
     {
         ImageList images = files + dirs;
         // ImageItem has been explicitly marked Q_DISABLE_COPY
-        for (const ImagePtr & im : qAsConst(images))
+        for (const ImagePtr & im : std::as_const(images))
         {
             if (im && im->m_id == parent.m_userThumbnail)
             { // cppcheck-suppress useStlAlgorithm
@@ -655,7 +655,7 @@ void DirectoryView::PopulateThumbs(ImageItem &parent, int thumbsNeeded,
         else
         {
             // Recursively load subdir thumbs to try to get 1 thumb from each
-            for (const ImagePtr & im : qAsConst(thumbDirs))
+            for (const ImagePtr & im : std::as_const(thumbDirs))
             {
                 if (!im)
                     continue;
@@ -680,7 +680,7 @@ void DirectoryView::PopulateThumbs(ImageItem &parent, int thumbsNeeded,
             int i = 0;
             while (thumbsNeeded > 0 && ++i < kMaxFolderThumbnails)
             {
-                for (const QSharedPointer<ImageItem> & im : qAsConst(thumbDirs))
+                for (const QSharedPointer<ImageItem> & im : std::as_const(thumbDirs))
                 {
                     if (i < im->m_thumbNails.size())
                     {
@@ -810,7 +810,7 @@ MenuSubjects DirectoryView::GetMenuSubjects()
     // unhiddenMarked is true if 1 or more marked items are not hidden
     bool hiddenMarked   = false;
     bool unhiddenMarked = false;
-    for (int id : qAsConst(m_marked))
+    for (int id : std::as_const(m_marked))
     {
         ImagePtrK im = m_images.value(id);
         if (!im)
@@ -867,7 +867,7 @@ void DirectoryView::Cache(ImageItemK &dir, int thumbCount)
     m_dirCache.insert(dir.m_id, cacheEntry);
 
     // Cache images used by dir thumbnails
-    for (const ThumbPair & thumb : qAsConst(dir.m_thumbNails))
+    for (const ThumbPair & thumb : std::as_const(dir.m_thumbNails))
     {
         // Do not overwrite any existing image url nor parent.
         // Image url is cached when image is displayed as a child, but not as a

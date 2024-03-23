@@ -85,12 +85,7 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
         if (line.startsWith("#"))
             continue;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList list = line.split(":", QString::SkipEmptyParts);
-#else
         QStringList list = line.split(":", Qt::SkipEmptyParts);
-#endif
-
         if (list.empty())
             continue;
 
@@ -101,11 +96,7 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
         {
             channelNo = str.mid(1).toInt();
             line = stream.readLine();
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            list = line.split(":", QString::SkipEmptyParts);
-#else
             list = line.split(":", Qt::SkipEmptyParts);
-#endif
         }
 
         if (list.size() < 4)

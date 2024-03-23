@@ -217,7 +217,7 @@ void MythBinaryPList::ArrayToXML(const QVariant& Data, QXmlStreamWriter& Xml)
 {
     Xml.writeStartElement("array");
     auto list = Data.value<QSequentialIterable>();
-    for (const auto & item : qAsConst(list))
+    for (const auto & item : std::as_const(list))
         ToXML(item, Xml);
     Xml.writeEndElement();
 }

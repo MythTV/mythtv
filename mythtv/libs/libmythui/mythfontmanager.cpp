@@ -38,7 +38,7 @@ void MythFontManager::LoadFonts(const QString &directory,
 #else
     QStringList families = QFontDatabase::families();
 #endif
-    for (const QString & family : qAsConst(families))
+    for (const QString & family : std::as_const(families))
     {
         QString result = QString("Font Family '%1': ").arg(family);
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
@@ -46,7 +46,7 @@ void MythFontManager::LoadFonts(const QString &directory,
 #else
         QStringList styles = QFontDatabase::styles(family);
 #endif
-        for (const QString & style : qAsConst(styles))
+        for (const QString & style : std::as_const(styles))
         {
             result += QString("%1(").arg(style);
 
@@ -56,7 +56,7 @@ void MythFontManager::LoadFonts(const QString &directory,
 #else
             QList<int> pointList = QFontDatabase::smoothSizes(family, style);
 #endif
-            for (int points : qAsConst(pointList))
+            for (int points : std::as_const(pointList))
                 sizes += QString::number(points) + ' ';
 
             result += QString("%1) ").arg(sizes.trimmed());
@@ -97,7 +97,7 @@ void MythFontManager::LoadFonts(const QString &directory,
     // Recurse through subdirectories
     QDir dir(directory);
     QFileInfoList files = dir.entryInfoList();
-    for (const auto& info : qAsConst(files))
+    for (const auto& info : std::as_const(files))
     {
         // Skip '.' and '..' and other files starting with "." by checking
         // baseName()
@@ -176,7 +176,7 @@ void MythFontManager::LoadFontsFromDirectory(const QString &directory,
     QDir dir(directory);
     QStringList nameFilters = QStringList() << "*.ttf" << "*.otf" << "*.ttc";
     QStringList fontFiles = dir.entryList(nameFilters);
-    for (const auto & path : qAsConst(fontFiles))
+    for (const auto & path : std::as_const(fontFiles))
         LoadFontFile(dir.absoluteFilePath(path), registeredFor);
 }
 

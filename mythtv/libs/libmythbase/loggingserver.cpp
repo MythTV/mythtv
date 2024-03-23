@@ -481,7 +481,7 @@ void LogForwardThread::forwardMessage(LoggingItem *item)
     if (logItem->m_itemList && !logItem->m_itemList->isEmpty())
     {
         // Log this item on each of the loggers.
-        for (auto *it : qAsConst(*logItem->m_itemList))
+        for (auto *it : std::as_const(*logItem->m_itemList))
             it->logmsg(item);
     }
 }

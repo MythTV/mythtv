@@ -127,7 +127,7 @@ void PlaylistContainer::describeYourself(void) const
 {
     //    Debugging
     m_activePlaylist->describeYourself();
-    for (const auto & playlist : qAsConst(*m_allPlaylists))
+    for (const auto & playlist : std::as_const(*m_allPlaylists))
         playlist->describeYourself();
 }
 
@@ -287,7 +287,7 @@ QStringList PlaylistContainer::getPlaylistNames(void)
 {
     QStringList res;
 
-    for (const auto & playlist : qAsConst(*m_allPlaylists))
+    for (const auto & playlist : std::as_const(*m_allPlaylists))
     {
         res.append(playlist->getName());
     }

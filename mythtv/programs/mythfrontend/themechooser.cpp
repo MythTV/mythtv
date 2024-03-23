@@ -145,7 +145,7 @@ void ThemeChooser::Load(void)
 
     m_infoList = themes.entryInfoList();
 
-    for (const auto &theme : qAsConst(m_infoList))
+    for (const auto &theme : std::as_const(m_infoList))
     {
         if (loadThemeInfo(theme))
         {
@@ -156,7 +156,7 @@ void ThemeChooser::Load(void)
 
     themes.setPath(GetThemesParentDir());
     QFileInfoList sharedThemes = themes.entryInfoList();
-    for (const auto &sharedTheme : qAsConst(sharedThemes))
+    for (const auto &sharedTheme : std::as_const(sharedThemes))
     {
         if ((!themesSeen.contains(sharedTheme.fileName())) &&
             (loadThemeInfo(sharedTheme)))
@@ -342,7 +342,7 @@ bool ThemeChooser::LoadVersion(const QString &version,
         themes.setPath(themesPath);
 
         QFileInfoList downloadableThemes = themes.entryInfoList();
-        for (const auto &dtheme : qAsConst(downloadableThemes))
+        for (const auto &dtheme : std::as_const(downloadableThemes))
         {
             QString dirName = dtheme.fileName();
             QString themeName = dirName;
@@ -423,7 +423,7 @@ void ThemeChooser::Init(void)
     MythUIButtonListItem *item = nullptr;
 
     m_themes->Reset();
-    for (const auto &theme : qAsConst(m_infoList))
+    for (const auto &theme : std::as_const(m_infoList))
     {
         if (!m_themeFileNameInfos.contains(theme.filePath()))
             continue;
@@ -986,7 +986,7 @@ bool ThemeChooser::removeThemeDir(const QString &dirname)
     dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList list = dir.entryInfoList();
 
-    for (const auto &fi : qAsConst(list))
+    for (const auto &fi : std::as_const(list))
     {
         if (fi.isFile() && !fi.isSymLink())
         {

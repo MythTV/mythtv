@@ -444,17 +444,17 @@ void MythCCExtractorPlayer::Ingest708Caption(
     cc708win[windowIdx].text = winContent;
 
     QMap<uint, QStringList> orderedContent;
-    for (const auto& ccIt : qAsConst(cc708win))
+    for (const auto& ccIt : std::as_const(cc708win))
     {
         uint idx = ccIt.row * 1000 + ccIt.column;
-        for (const auto& str : qAsConst(ccIt.text))
+        for (const auto& str : std::as_const(ccIt.text))
         {
             orderedContent[idx] += str;
         }
     }
 
     QStringList screenContent;
-    for (const auto & ordered : qAsConst(orderedContent))
+    for (const auto & ordered : std::as_const(orderedContent))
         screenContent += ordered;
     IngestSubtitle(m_cc708Info[streamId].m_subs[serviceIdx], screenContent);
 }

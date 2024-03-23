@@ -651,7 +651,7 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
     QStringList sdevs = CardUtil::ProbeVideoDevices(CardType);
 
     auto* pList = new V2CaptureDeviceList();
-    for (const auto & it : qAsConst(sdevs))
+    for (const auto & it : std::as_const(sdevs))
     {
         auto* pDev = pList->AddCaptureDevice();
         pDev->setCardType (CardType);
@@ -796,7 +796,7 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
             }
         }
 #endif // USING_VBOX
-    } // endfor (const auto & it : qAsConst(sdevs))
+    } // endfor (const auto & it : std::as_const(sdevs))
     return pList;
 }
 

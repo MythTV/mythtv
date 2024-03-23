@@ -19,11 +19,7 @@
 
 MythRAOPDevice *MythRAOPDevice::gMythRAOPDevice = nullptr;
 MThread        *MythRAOPDevice::gMythRAOPDeviceThread = nullptr;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-QMutex         *MythRAOPDevice::gMythRAOPDeviceMutex = new QMutex(QMutex::Recursive);
-#else
 QRecursiveMutex *MythRAOPDevice::gMythRAOPDeviceMutex = new QRecursiveMutex();
-#endif
 
 #define LOC QString("RAOP Device: ")
 
@@ -91,11 +87,7 @@ void MythRAOPDevice::Cleanup(void)
 }
 
 MythRAOPDevice::MythRAOPDevice()
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    : m_lock(new QMutex(QMutex::Recursive))
-#else
     : m_lock(new QRecursiveMutex())
-#endif
 {
     m_hardwareId = QByteArray::fromHex(AirPlayHardwareId().toLatin1());
 }

@@ -658,11 +658,7 @@ void MythWebView::customEvent(QEvent *event)
         if (me == nullptr)
             return;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
-#else
         QStringList tokens = me->Message().split(" ", Qt::SkipEmptyParts);
-#endif
         if (tokens.isEmpty())
             return;
 

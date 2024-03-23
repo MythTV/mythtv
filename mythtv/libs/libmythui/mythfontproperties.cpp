@@ -467,7 +467,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
 #else
             QStringList families = QFontDatabase::families();
 #endif
-            for (const QString & family : qAsConst(families))
+            for (const QString & family : std::as_const(families))
             {
                 QStringList family_styles;
 
@@ -477,7 +477,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
 #else
                 QStringList styles = QFontDatabase::styles(family);
 #endif
-                for (const QString & style : qAsConst(styles))
+                for (const QString & style : std::as_const(styles))
                 {
                     family_styles << style + ":";
 
@@ -488,7 +488,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
 #else
                     QList<int> pointList = QFontDatabase::smoothSizes(family, style);
 #endif
-                    for (int points : qAsConst(pointList))
+                    for (int points : std::as_const(pointList))
                     {
                         if (tic)
                             sizes += ",";

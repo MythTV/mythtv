@@ -168,7 +168,7 @@ void ChannelScannerGUI::MonitorProgress(bool lock, bool strength,
     {
         connect(m_scanStage, &MythScreenType::Exiting, this, &ChannelScannerGUI::quitScanning);
 
-        for (const QString& msg : qAsConst(m_messageList))
+        for (const QString& msg : std::as_const(m_messageList))
             m_scanStage->AppendLine(msg);
         mainStack->AddScreen(m_scanStage);
     }

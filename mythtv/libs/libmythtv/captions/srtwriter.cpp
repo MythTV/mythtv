@@ -1,11 +1,5 @@
 #include "captions/srtwriter.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-  #define QT_ENDL endl
-#else
-  #define QT_ENDL Qt::endl
-#endif
-
 // SRTWriter implementation
 
 /**
@@ -13,16 +7,16 @@
  */
 void SRTWriter::AddSubtitle(const OneSubtitle &sub, int number)
 {
-    m_outStream << number << QT_ENDL;
+    m_outStream << number << Qt::endl;
 
     m_outStream << FormatTime(sub.m_startTime) << " --> ";
-    m_outStream << FormatTime(sub.m_startTime + sub.m_length) << QT_ENDL;
+    m_outStream << FormatTime(sub.m_startTime + sub.m_length) << Qt::endl;
 
     if (!sub.m_text.isEmpty())
     {
-        for (const auto & text : qAsConst(sub.m_text))
-            m_outStream << text << QT_ENDL;
-        m_outStream << QT_ENDL;
+        for (const auto & text : std::as_const(sub.m_text))
+            m_outStream << text << Qt::endl;
+        m_outStream << Qt::endl;
     }
 }
 

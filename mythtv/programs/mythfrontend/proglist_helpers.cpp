@@ -45,7 +45,7 @@ bool PhrasePopup::Create()
         new MythUIButtonListItem(m_phraseList, tr("<New Phrase>"), nullptr, false);
     }
 
-    for (const QString& item : qAsConst(m_list))
+    for (const QString& item : std::as_const(m_list))
     {
         new MythUIButtonListItem(m_phraseList, item, nullptr, false);
     }
@@ -231,7 +231,7 @@ bool PowerSearchPopup::Create()
     m_titleText->SetText(tr("Select Search"));
     new MythUIButtonListItem(m_phraseList, tr("<New Search>"), nullptr, false);
 
-    for (const QString &item : qAsConst(m_list))
+    for (const QString &item : std::as_const(m_list))
     {
         new MythUIButtonListItem(m_phraseList, item, nullptr, false);
     }

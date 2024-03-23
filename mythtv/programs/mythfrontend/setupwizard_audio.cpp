@@ -157,7 +157,7 @@ void AudioSetupWizard::Init(void)
             delete adc;
         }
     }
-    for (const auto & ao : qAsConst(*m_outputlist))
+    for (const auto & ao : std::as_const(*m_outputlist))
     {
         QString name = ao.m_name;
         auto *output = new MythUIButtonListItem(m_audioDeviceButtonList, name);

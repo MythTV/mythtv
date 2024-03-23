@@ -156,11 +156,7 @@ class MUI_PUBLIC MythRenderD3D9 : public MythRender
     IDirect3DSurface9      *m_default_surface     {nullptr};
     IDirect3DSurface9      *m_current_surface     {nullptr};
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex                  m_lock                {QMutex::Recursive};
-#else
     QRecursiveMutex         m_lock;
-#endif
     bool                    m_blend               {true};
     bool                    m_multi_texturing     {true};
     bool                    m_texture_vertices    {true};

@@ -472,7 +472,7 @@ void LIRC::run(void)
             continue;
 
         QList<QByteArray> codes = GetCodes();
-        for (const auto & code : qAsConst(codes))
+        for (const auto & code : std::as_const(codes))
             Process(code);
     }
 #if 0

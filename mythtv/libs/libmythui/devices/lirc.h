@@ -5,9 +5,7 @@
 #include <QString>
 #include <QObject>
 #include <QMutex>
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 #include <QRecursiveMutex>
-#endif
 #include <QList>
 
 #include <sys/types.h>   // for uint
@@ -46,11 +44,7 @@ class LIRC : public QObject, public MThread
     QList<QByteArray> GetCodes(void);
     void Process(const QByteArray &data);
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    mutable QMutex  m_lock        {QMutex::Recursive};
-#else
     mutable QRecursiveMutex  m_lock;
-#endif
     static  QMutex  s_lirclibLock;
     QObject        *m_mainWindow  {nullptr}; ///< window to send key events to
     QString         m_lircdDevice;           ///< device on which to receive lircd data

@@ -149,15 +149,15 @@ void MPEGStreamData::Reset(int desiredProgram)
     {
         QMutexLocker locker(&m_cacheLock);
 
-        for (const auto & cached : qAsConst(m_cachedPats))
+        for (const auto & cached : std::as_const(m_cachedPats))
             DeleteCachedTable(cached);
         m_cachedPats.clear();
 
-        for (const auto & cached : qAsConst(m_cachedPmts))
+        for (const auto & cached : std::as_const(m_cachedPmts))
             DeleteCachedTable(cached);
         m_cachedPmts.clear();
 
-        for (const auto & cached : qAsConst(m_cachedCats))
+        for (const auto & cached : std::as_const(m_cachedCats))
             DeleteCachedTable(cached);
         m_cachedCats.clear();
     }
@@ -1319,7 +1319,7 @@ bool MPEGStreamData::HasCachedAllPMTs(void) const
     if (m_cachedPats.empty())
         return false;
 
-    for (auto *pat : qAsConst(m_cachedPats))
+    for (auto *pat : std::as_const(m_cachedPats))
     {
         if (!HasCachedAllPAT(pat->TransportStreamID()))
             return false;
@@ -1374,7 +1374,7 @@ pat_vec_t MPEGStreamData::GetCachedPATs(void) const
     QMutexLocker locker(&m_cacheLock);
     pat_vec_t pats;
 
-    for (auto *pat : qAsConst(m_cachedPats))
+    for (auto *pat : std::as_const(m_cachedPats))
     {
         IncrementRefCnt(pat);
         pats.push_back(pat);
@@ -1416,7 +1416,7 @@ cat_vec_t MPEGStreamData::GetCachedCATs(void) const
     QMutexLocker locker(&m_cacheLock);
     cat_vec_t cats;
 
-    for (auto *cat : qAsConst(m_cachedCats))
+    for (auto *cat : std::as_const(m_cachedCats))
     {
         IncrementRefCnt(cat);
         cats.push_back(cat);
@@ -1444,7 +1444,7 @@ pmt_vec_t MPEGStreamData::GetCachedPMTs(void) const
     QMutexLocker locker(&m_cacheLock);
     std::vector<const ProgramMapTable*> pmts;
 
-    for (auto *pmt : qAsConst(m_cachedPmts))
+    for (auto *pmt : std::as_const(m_cachedPmts))
     {
         IncrementRefCnt(pmt);
         pmts.push_back(pmt);
@@ -1458,7 +1458,7 @@ pmt_map_t MPEGStreamData::GetCachedPMTMap(void) const
     QMutexLocker locker(&m_cacheLock);
     pmt_map_t pmts;
 
-    for (auto *pmt : qAsConst(m_cachedPmts))
+    for (auto *pmt : std::as_const(m_cachedPmts))
     {
         IncrementRefCnt(pmt);
         pmts[pmt->ProgramNumber()].push_back(pmt);

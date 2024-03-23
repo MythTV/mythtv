@@ -23,10 +23,6 @@
 #include "videometadatalistmanager.h"
 #include "videoutils.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
-#define capturedView capturedRef
-#endif
-
 class VideoMetadataImp
 {
   public:
@@ -422,7 +418,7 @@ bool VideoMetadataImp::removeDir(const QString &dirName)
         return d.rmdir(dirName);
     }
 
-    for (const auto& entry : qAsConst(contents))
+    for (const auto& entry : std::as_const(contents))
     {
         if (entry.isDir())
         {

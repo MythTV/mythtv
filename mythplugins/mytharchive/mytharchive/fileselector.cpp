@@ -209,7 +209,7 @@ void FileSelector::OKPressed()
 
         // remove any items that have been removed from the list
         QList<ArchiveItem *> tempAList;
-        for (auto *a : qAsConst(*m_archiveList))
+        for (auto *a : std::as_const(*m_archiveList))
         {
             if (a->type != "File")
                 continue;
@@ -219,23 +219,23 @@ void FileSelector::OKPressed()
                 tempAList.append(a);
         }
 
-        for (auto *x : qAsConst(tempAList))
+        for (auto *x : std::as_const(tempAList))
             m_archiveList->removeAll(x);
 
         // remove any items that are already in the list
         QStringList tempSList;
-        for (const QString & f : qAsConst(m_selectedList))
+        for (const QString & f : std::as_const(m_selectedList))
         {
             auto namematch = [f](const auto *a){ return a->filename == f; };
             if (std::any_of(m_archiveList->cbegin(), m_archiveList->cend(), namematch))
                 tempSList.append(f);
         }
 
-        for (const auto & name : qAsConst(tempSList))
+        for (const auto & name : std::as_const(tempSList))
             m_selectedList.removeAll(name);
 
         // add all that are left
-        for (const auto & f : qAsConst(m_selectedList))
+        for (const auto & f : std::as_const(m_selectedList))
         {
             QFile file(f);
             if (file.exists())
@@ -329,7 +329,7 @@ void FileSelector::updateSelectedList()
         m_selectedList.takeFirst();
     m_selectedList.clear();
 
-    for (const auto *a : qAsConst(*m_archiveList))
+    for (const auto *a : std::as_const(*m_archiveList))
     {
         auto samename = [a](const auto *f)
             { return f->filename == a->filename; };
@@ -362,7 +362,7 @@ void FileSelector::updateFileList()
         filters << "*";
         QFileInfoList list = d.entryInfoList(filters, QDir::Dirs, QDir::Name);
 
-        for (const auto & fi : qAsConst(list))
+        for (const auto & fi : std::as_const(list))
         {
             if (fi.fileName() != ".")
             {
@@ -386,13 +386,9 @@ void FileSelector::updateFileList()
         {
             // second get a list of file's in the current directory
             filters.clear();
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            filters = m_filemask.split(" ", QString::SkipEmptyParts);
-#else
             filters = m_filemask.split(" ", Qt::SkipEmptyParts);
-#endif
             list = d.entryInfoList(filters, QDir::Files, QDir::Name);
-            for (const auto & fi : qAsConst(list))
+            for (const auto & fi : std::as_const(list))
             {
                 auto  *data = new FileData;
                 data->selected = false;

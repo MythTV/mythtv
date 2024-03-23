@@ -24,7 +24,6 @@
 #include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QScopedPointer>
 #include <QThread>
 #include <QUrl>
 #ifndef QT_NO_OPENSSL
@@ -478,7 +477,7 @@ void NetStream::slotSslErrors(const QList<QSslError> &errors)
     if (m_reply)
     {
         bool bIgnore = true;
-        for (const auto& e : qAsConst(errors))
+        for (const auto& e : std::as_const(errors))
         {
             LOG(VB_FILE, LOG_INFO, LOC + QString("(%1) SSL error %2: ")
                 .arg(m_id).arg(e.error()) + e.errorString() );
@@ -764,12 +763,12 @@ void NAMThread::run()
     m_nam->setObjectName("NetStream NAM");
 
     // Setup cache
-    QScopedPointer<QNetworkDiskCache> cache(new QNetworkDiskCache());
+    std::unique_ptr<QNetworkDiskCache> cache(new QNetworkDiskCache());
 
     cache->setCacheDirectory(GetConfDir() + "/cache/netstream-" +
                              gCoreContext->GetHostName());
 
-    m_nam->setCache(cache.take());
+    m_nam->setCache(cache.release());
 
     // Setup a network proxy e.g. for TOR: socks://localhost:9050
     // TODO get this from mythdb
@@ -951,7 +950,7 @@ QDateTime NAMThread::GetLastModified(const QUrl &url)
     QDateTime lastMod = meta.lastModified();
 
     QNetworkCacheMetaData::RawHeaderList headers = meta.rawHeaders();
-    for (const auto& h : qAsConst(headers))
+    for (const auto& h : std::as_const(headers))
     {
         // RFC 1123 date format: Thu, 01 Dec 1994 16:00:00 GMT
         static const QString kSzFormat { "ddd, dd MMM yyyy HH:mm:ss 'GMT'" };

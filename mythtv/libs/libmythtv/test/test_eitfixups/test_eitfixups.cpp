@@ -231,7 +231,7 @@ void TestEITFixups::checkCast(const DBEventEIT& event,
 
 void TestEITFixups::checkRating(const DBEventEIT& event, const QString& e_system, const QString& e_rating)
 {
-    for (const auto& rating : qAsConst(event.m_ratings))
+    for (const auto& rating : std::as_const(event.m_ratings))
     {
         QCOMPARE(rating.m_system, e_system);
         QCOMPARE(rating.m_rating, e_rating);

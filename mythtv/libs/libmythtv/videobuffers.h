@@ -7,11 +7,7 @@
 
 // Qt
 #include <QSize>
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-#include <QMutex>
-#else
 #include <QRecursiveMutex>
-#endif
 #include <QString>
 
 // MythTV
@@ -121,11 +117,7 @@ class MTV_PUBLIC VideoBuffers
     uint                 m_needPrebufferFramesSmall  { 0 };
     uint                 m_rpos                      { 0 };
     uint                 m_vpos                      { 0 };
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    mutable QMutex       m_globalLock                { QMutex::Recursive };
-#else
     mutable QRecursiveMutex m_globalLock;
-#endif
 };
 
 #endif // VIDEOBUFFERS_H

@@ -91,7 +91,7 @@ void MythNotificationScreenStack::PopScreen(MythScreenType *screen, bool allowFa
 
     if (!m_children.isEmpty())
     {
-        for (auto *draw : qAsConst(m_drawOrder))
+        for (auto *draw : std::as_const(m_drawOrder))
         {
             if (draw != screen && !draw->IsDeleting())
             {
@@ -771,7 +771,7 @@ NCPrivate::~NCPrivate()
     DeleteAllScreens();
 
     // Delete all outstanding queued notifications
-    for (MythNotification *n : qAsConst(m_notifications))
+    for (MythNotification *n : std::as_const(m_notifications))
     {
         delete n;
     }
@@ -910,7 +910,7 @@ void NCPrivate::ProcessQueue(void)
 
     DeleteAllScreens();
 
-    for (MythNotification *n : qAsConst(m_notifications))
+    for (MythNotification *n : std::as_const(m_notifications))
     {
         int id = n->GetId();
         bool created = false;
@@ -1055,7 +1055,7 @@ void NCPrivate::UnRegister(void *from, int id, bool closeimemdiately)
 
 void NCPrivate::DeleteAllRegistrations(void)
 {
-    for (auto *registration : qAsConst(m_registrations))
+    for (auto *registration : std::as_const(m_registrations))
     {
         if (registration)
         {
@@ -1232,7 +1232,7 @@ void NCPrivate::GetNotificationScreens(QList<MythScreenType*> &_screens)
     m_screenStack->GetScreenList(screens);
 
     int position = 0;
-    for (auto *item : qAsConst(screens))
+    for (auto *item : std::as_const(screens))
     {
         auto *screen = qobject_cast<MythNotificationScreen*>(item);
         if (screen)

@@ -337,7 +337,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
     {
         QFileInfo fi(filename);
         QDir dir = fi.absoluteDir();
-        for (const auto & file : qAsConst(checkfiles))
+        for (const auto & file : std::as_const(checkfiles))
         {
             if (dir.exists(file) &&
                 QFileInfo(dir, file).size() >= kReadTestSize)
@@ -408,7 +408,7 @@ bool FileServerHandler::HandleQueryFreeSpace(SocketHandler *socket)
     QStringList res;
 
     QList<FileSystemInfo> disks = QueryFileSystems();
-    for (const auto & disk : qAsConst(disks))
+    for (const auto & disk : std::as_const(disks))
         disk.ToStringList(res);
 
     socket->WriteStringList(res);
@@ -421,7 +421,7 @@ bool FileServerHandler::HandleQueryFreeSpaceList(SocketHandler *socket)
     QStringList hosts;
 
     QList<FileSystemInfo> disks = QueryAllFileSystems();
-    for (const auto & disk : qAsConst(disks))
+    for (const auto & disk : std::as_const(disks))
         if (!hosts.contains(disk.getHostname()))
             hosts << disk.getHostname();
 
@@ -430,7 +430,7 @@ bool FileServerHandler::HandleQueryFreeSpaceList(SocketHandler *socket)
 
     long long total = 0;
     long long used = 0;
-    for (const auto & disk : qAsConst(disks))
+    for (const auto & disk : std::as_const(disks))
     {
         disk.ToStringList(res);
         total += disk.getTotalSpace();
@@ -459,7 +459,7 @@ bool FileServerHandler::HandleQueryFreeSpaceSummary(SocketHandler *socket)
 
     long long total = 0;
     long long used = 0;
-    for (const auto & disk : qAsConst(disks))
+    for (const auto & disk : std::as_const(disks))
     {
         total += disk.getTotalSpace();
         used  += disk.getUsedSpace();

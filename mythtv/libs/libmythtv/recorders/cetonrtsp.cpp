@@ -334,7 +334,7 @@ bool CetonRTSP::Describe(void)
     bool found = false;
     QUrl base = m_controlUrl = GetBaseUrl();
 
-    for (const QString& line : qAsConst(lines))
+    for (const QString& line : std::as_const(lines))
     {
         if (line.startsWith("m="))
         {

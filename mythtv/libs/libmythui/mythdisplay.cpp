@@ -169,7 +169,7 @@ QStringList MythDisplay::GetDescription()
     auto * current = GetCurrentScreen();
     const auto screens = QGuiApplication::screens();
     bool first = true;
-    for (auto *screen : qAsConst(screens))
+    for (auto *screen : std::as_const(screens))
     {
         if (!first)
             result.append("");
@@ -350,7 +350,7 @@ QScreen *MythDisplay::GetDesiredScreen()
         // the window manager rather than Qt. So could be wrong.
         QPoint point = windowed ? override.topLeft() : override.bottomRight();
         QList screens = QGuiApplication::screens();
-        for (QScreen *screen : qAsConst(screens))
+        for (QScreen *screen : std::as_const(screens))
         {
             if (screen->geometry().contains(point))
             {
@@ -374,7 +374,7 @@ QScreen *MythDisplay::GetDesiredScreen()
     if (!newscreen)
     {
         QList screens = QGuiApplication::screens();
-        for (QScreen *screen : qAsConst(screens))
+        for (QScreen *screen : std::as_const(screens))
         {
             if (!name.isEmpty() && name == screen->name())
             {
@@ -611,7 +611,7 @@ void MythDisplay::Initialise()
 void MythDisplay::InitScreenBounds()
 {
     const auto screens = QGuiApplication::screens();
-    for (auto * screen : qAsConst(screens))
+    for (auto * screen : std::as_const(screens))
     {
         auto dim = screen->geometry();
         auto extra = MythDisplay::GetExtraScreenInfo(screen);

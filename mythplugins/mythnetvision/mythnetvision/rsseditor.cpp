@@ -38,7 +38,7 @@ namespace
         QStringList ret;
 
         QList<QByteArray> exts = QImageReader::supportedImageFormats();
-        for (const auto & ext : qAsConst(exts))
+        for (const auto & ext : std::as_const(exts))
             ret.append(QString("*.").append(ext));
 
         return ret;
@@ -420,7 +420,7 @@ void RSSEditor::fillRSSButtonList()
 
     m_sites->Reset();
 
-    for (const auto & site : qAsConst(m_siteList))
+    for (const auto & site : std::as_const(m_siteList))
     {
         auto *item = new MythUIButtonListItem(m_sites, site->GetTitle());
         item->SetText(site->GetTitle(), "title");

@@ -58,11 +58,7 @@ class CdDecoder : public Decoder
 
     QString            m_deviceName;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    static QMutex& getCdioMutex();
-#else
     static QRecursiveMutex& getCdioMutex();
-#endif
 
     DecoderEvent::Type m_stat        {DecoderEvent::kError};
     char              *m_outputBuf   {nullptr};

@@ -382,7 +382,7 @@ bool HDHRStreamHandler::Connect(void)
     }
 
     QStringList devices = m_device.split(",");
-    for (const QString& device : qAsConst(devices))
+    for (const QString& device : std::as_const(devices))
     {
         QByteArray ba = device.toUtf8();
         int n = hdhomerun_device_selector_load_from_str(

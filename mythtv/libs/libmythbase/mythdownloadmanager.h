@@ -9,9 +9,7 @@
 #include <QNetworkDiskCache>
 #include <QNetworkProxy>
 #include <QNetworkReply>
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 #include <QRecursiveMutex>
-#endif
 #include <QString>
 #include <QTimer>
 #include <QWaitCondition>
@@ -57,11 +55,7 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
      */
     MythDownloadManager()
         : MThread("DownloadManager"),
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-          m_infoLock(new QMutex(QMutex::Recursive))
-#else
           m_infoLock(new QRecursiveMutex())
-#endif
         {}
 
    ~MythDownloadManager() override;
@@ -169,11 +163,7 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     QWaitCondition                                m_queueWaitCond;
     QMutex                                        m_queueWaitLock;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex                                       *m_infoLock    {nullptr};
-#else
     QRecursiveMutex                              *m_infoLock    {nullptr};
-#endif
     QMap <QString, MythDownloadInfo*>             m_downloadInfos;
     QMap <QNetworkReply*, MythDownloadInfo*>      m_downloadReplies;
     QList <MythDownloadInfo*>                     m_downloadQueue;

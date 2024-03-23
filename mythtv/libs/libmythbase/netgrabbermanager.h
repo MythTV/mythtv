@@ -6,9 +6,7 @@
 #include <QDomElement>
 #include <QMetaType>
 #include <QMutex>
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 #include <QRecursiveMutex>
-#endif
 #include <QTimer>
 
 #include "libmythbase/mthread.h"
@@ -62,11 +60,7 @@ class MBASE_PUBLIC GrabberScript : public QObject, public MThread
     void parseDBTree(const QString &feedtitle, const QString &path,
                      const QString &pathThumb, QDomElement& domElem,
                      ArticleType type);
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    mutable QMutex m_lock {QMutex::Recursive};
-#else
     mutable QRecursiveMutex m_lock;
-#endif
 
     QString     m_title;
     QString     m_image;
@@ -100,11 +94,7 @@ class MBASE_PUBLIC GrabberManager : public QObject
 
   private:
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    mutable QMutex                 m_lock         {QMutex::Recursive};
-#else
     mutable QRecursiveMutex        m_lock;
-#endif
     QTimer                        *m_timer        {nullptr};
     GrabberScript::scriptList      m_scripts;
     std::chrono::hours             m_updateFreq   {24h};

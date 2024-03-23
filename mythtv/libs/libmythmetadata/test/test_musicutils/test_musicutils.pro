@@ -27,7 +27,7 @@ LIBS += -L../../../../external/FFmpeg/libpostproc -lmythpostproc
 LIBS += -L../.. -lmythmetadata-$$LIBVERSION
 
 
-using_system_exiv2 {
+using_system_libexiv2 {
 LIBS += -lexiv2
 } else {
 LIBS += -L../../../../external/libexiv2 -lmythexiv2-0.28

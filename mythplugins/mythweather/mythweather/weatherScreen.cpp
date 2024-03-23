@@ -24,7 +24,7 @@ WeatherScreen::WeatherScreen(MythScreenStack *parent,
 
     QStringList types = m_screenDefn->m_dataTypes;
 
-    for (const QString& type : qAsConst(types))
+    for (const QString& type : std::as_const(types))
     {
         m_dataValueMap[type] =  "";
     }

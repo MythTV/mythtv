@@ -3999,11 +3999,7 @@ bool AvFormatDecoder::ProcessRawTextPacket(AVPacket* Packet)
     auto toUtf16 = QStringDecoder(QStringDecoder::Utf8);
     QString text = toUtf16.decode(Packet->data);
 #endif
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    auto list = text.split('\n', QString::SkipEmptyParts);
-#else
     auto list = text.split('\n', Qt::SkipEmptyParts);
-#endif
     m_parent->GetSubReader(id)->AddRawTextSubtitle(list, std::chrono::milliseconds(Packet->duration));
     return true;
 }

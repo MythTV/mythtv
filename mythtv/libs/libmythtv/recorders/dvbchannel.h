@@ -156,11 +156,7 @@ class DVBChannel : public DTVChannel
 
     // Tuning State
     mutable QMutex    m_tuneLock;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    mutable QMutex    m_hwLock              {QMutex::Recursive};
-#else
     mutable QRecursiveMutex m_hwLock;
-#endif
 
     DTVMultiplex      m_desiredTuning;      // Last tuning options Tune() attempted to send to hardware
     DTVMultiplex      m_prevTuning;         // Last tuning options Tune() succesfully sent to hardware

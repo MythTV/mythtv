@@ -1036,7 +1036,7 @@ void ImportCoverArtDialog::scanDirectory()
     if (list.isEmpty())
         return;
 
-    for (const auto & fi : qAsConst(list))
+    for (const auto & fi : std::as_const(list))
     {
         QString filename = fi.absoluteFilePath();
         if (!fi.isDir())

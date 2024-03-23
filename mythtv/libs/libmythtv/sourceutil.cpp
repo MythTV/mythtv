@@ -237,7 +237,7 @@ bool SourceUtil::IsProperlyConnected(uint sourceid, bool strict)
 {
     QStringList types = get_inputtypes(sourceid);
     QMap<QString,uint> counts;
-    for (const auto & type : qAsConst(types))
+    for (const auto & type : std::as_const(types))
     {
         counts[type]++;
 

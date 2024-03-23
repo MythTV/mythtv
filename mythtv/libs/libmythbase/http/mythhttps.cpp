@@ -24,7 +24,7 @@ bool MythHTTPS::InitSSLServer(QSslConfiguration& Config)
 
     auto availableCiphers = QSslConfiguration::supportedCiphers();
     QList<QSslCipher> secureCiphers;
-    for (const auto & cipher : qAsConst(availableCiphers))
+    for (const auto & cipher : std::as_const(availableCiphers))
     {
         // Remove weak ciphers from the cipher list
         if (cipher.usedBits() < 128)

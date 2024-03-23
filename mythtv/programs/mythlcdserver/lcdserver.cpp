@@ -160,7 +160,7 @@ QStringList LCDServer::parseCommand(QString &command)
     QChar c;
     bool bInString = false;
 
-    for (auto && x : qAsConst(command))
+    for (auto && x : std::as_const(command))
     {
         c = x;
         if (!bInString && c == '"')

@@ -376,11 +376,7 @@ bool MHIContext::CheckCarouselObject(const QString& objectPath)
         return m_ic.CheckFile(objectPath, cert);
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList path = objectPath.split(QChar('/'), QString::SkipEmptyParts);
-#else
     QStringList path = objectPath.split(QChar('/'), Qt::SkipEmptyParts);
-#endif
     QByteArray result; // Unused
     QMutexLocker locker(&m_dsmccLock);
     int res = m_dsmcc->GetDSMCCObject(path, result);
@@ -389,11 +385,7 @@ bool MHIContext::CheckCarouselObject(const QString& objectPath)
 
 bool MHIContext::GetDSMCCObject(const QString &objectPath, QByteArray &result)
 {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList path = objectPath.split(QChar('/'), QString::SkipEmptyParts);
-#else
     QStringList path = objectPath.split(QChar('/'), Qt::SkipEmptyParts);
-#endif
     QMutexLocker locker(&m_dsmccLock);
     int res = m_dsmcc->GetDSMCCObject(path, result);
     return (res == 0);
@@ -452,11 +444,7 @@ bool MHIContext::GetCarouselData(const QString& objectPath, QByteArray &result)
 
     // Get the path components.  The string will normally begin with "//"
     // since this is an absolute path but that will be removed by split.
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList path = objectPath.split(QChar('/'), QString::SkipEmptyParts);
-#else
     QStringList path = objectPath.split(QChar('/'), Qt::SkipEmptyParts);
-#endif
     // Since the DSMCC carousel and the MHEG engine are currently on the
     // same thread this is safe.  Otherwise we need to make a deep copy of
     // the result.

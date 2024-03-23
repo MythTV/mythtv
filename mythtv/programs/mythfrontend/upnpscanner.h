@@ -5,11 +5,7 @@
 
 // Qt headers
 #include <QDomDocument>
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-#include <QMutex>
-#else
 #include <QRecursiveMutex>
-#endif
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -112,18 +108,10 @@ class UPNPScanner : public QObject
     static  UPNPScanner* gUPNPScanner;
     static  bool         gUPNPScannerEnabled;
     static  MThread*     gUPNPScannerThread;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    static  QMutex*      gUPNPScannerLock;
-#else
     static  QRecursiveMutex* gUPNPScannerLock;
-#endif
 
     UPNPSubscription *m_subscription {nullptr};
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex  m_lock {QMutex::Recursive};
-#else
     QRecursiveMutex  m_lock;
-#endif
     QHash<QString,UpnpMediaServer*> m_servers;
     QNetworkAccessManager *m_network {nullptr};
     // TODO Move to QMultiHash when we move to Qt >=4.7
