@@ -1,10 +1,11 @@
-# -*- Mode: python; coding: utf-8; tab-width: 8; indent-tabs-mode: t; -*-
+#-*- coding: UTF-8 -*-
 """
 read audio stream from audio file
 """
 
 import os
 import struct
+import xbmcvfs
 
 class UnknownFormat(Exception):pass
 class FormatError(Exception):pass
@@ -19,7 +20,7 @@ class AudioFile(object):
 
     def Open(self,filename):
         self.audioStart = 0
-        self.f = file(filename)
+        self.f = xbmcvfs.File(filename)
         ext = os.path.splitext(filename)[1].lower()
         if   ext == '.mp3':  self.AnalyzeMp3()
         elif ext == '.ogg':  self.AnalyzeOgg()
@@ -39,32 +40,32 @@ class AudioFile(object):
 
     def ReadAudioStream(self, len, offset=0):
         self.f.seek(self.audioStart+offset, 0)
-        return self.f.read(len)
+        return self.f.readBytes(len)
 
     def AnalyzeMp3(self):
         # Searching ID3v2 tag
         while True:
-            buf = self.f.read(3)
+            buf = self.f.readBytes(3)
             if len(buf) < 3 or self.f.tell() > 50000:
                 # ID tag is not found
                 self.f.seek(0,0)
                 self.audioStart = 0
                 return
-            if buf == 'ID3':
+            if buf == b'ID3':
                 self.f.seek(3,1)     # skip version/flag
                 # ID length (synchsafe integer)
-                tl = struct.unpack('4b', self.f.read(4))
+                tl = struct.unpack('4b', self.f.readBytes(4))
                 taglen = (tl[0]<<21)|(tl[1]<<14)|(tl[2]<<7)|tl[3]
                 self.f.seek(taglen,1)
                 break
             self.f.seek(-2,1)
         # Searching MPEG SOF
         while True:
-            buf = self.f.read(1)
+            buf = self.f.readBytes(1)
             if len(buf) < 1 or self.f.seek(0,1) > 1000000:
                 raise FormatError
-            if buf == '\xff':
-                rbit = struct.unpack('B',self.f.read(1))[0] >> 5
+            if buf == b'\xff':
+                rbit = struct.unpack('B',self.f.readBytes(1))[0] >> 5
                 if rbit == 7:   # 11 1's in total
                     self.f.seek(-2,1)
                     self.audioStart = self.f.tell()
@@ -73,21 +74,21 @@ class AudioFile(object):
     def AnalyzeOgg(self):
         # Parse page (OggS)
         while True:
-            buf = self.f.read(27)    # header
+            buf = self.f.readBytes(27)    # header
             if len(buf) < 27 or self.f.tell() > 50000:
                 # parse error
                 raise FormatError
-            if buf[0:4] != 'OggS':
+            if buf[0:4] != b'OggS':
                 # not supported page format
                 raise UnknownFormat
             numseg = struct.unpack('B', buf[26])[0]
             #print "#seg: %d" % numseg
 
-            segtbl = struct.unpack('%dB'%numseg, self.f.read(numseg))    # segment table
+            segtbl = struct.unpack('%dB'%numseg, self.f.readBytes(numseg))    # segment table
             for seglen in segtbl:
-                buf = self.f.read(7)    # segment header
+                buf = self.f.readBytes(7)    # segment header
                 #print "segLen(%s): %d" % (buf[1:7],seglen)
-                if buf == "\x05vorbis":
+                if buf == b"\x05vorbis":
                     self.f.seek(-7,1)   # rollback
                     self.audioStart = self.f.tell()
                     return
@@ -96,7 +97,7 @@ class AudioFile(object):
     def AnalyzeWma(self):
         # Searching GUID
         while True:
-            buf = self.f.read(16)
+            buf = self.f.readBytes(16)
             if len(buf) < 16 or self.f.tell() > 50000:
                 raise FormatError
             guid = buf.encode("hex");
@@ -106,15 +107,15 @@ class AudioFile(object):
                 self.audioStart = self.f.tell()
                 return
             else:
-                objlen = struct.unpack('<Q', self.f.read(8))[0]
+                objlen = struct.unpack('<Q', self.f.readBytes(8))[0]
                 self.f.seek(objlen-24,1)     # jump to next object
 
     def AnalyzeFlac(self):
-        if self.f.read(4) != 'fLaC':
+        if self.f.readBytes(4) != b'fLaC':
             raise UnknownFormat
         # Searching GUID
         while True:
-            buf = self.f.read(4)
+            buf = self.f.readBytes(4)
             if len(buf) < 16 or self.f.tell() > 50000:
                 # not found
                 raise FormatError
@@ -124,4 +125,3 @@ class AudioFile(object):
                 # it was the last metadata block
                 self.audioStart = self.f.tell()
                 return
-
