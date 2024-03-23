@@ -38,7 +38,7 @@ class Buffer : QObject
     Q_OBJECT
 
   public:
-    static constexpr uint16_t MAX_QUEUE { 500 };
+    static constexpr uint16_t kMaxQueue { 500 };
 
     explicit Buffer(MythExternControl * parent);
     ~Buffer(void) override = default;

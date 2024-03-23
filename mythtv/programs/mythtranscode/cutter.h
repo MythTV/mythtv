@@ -31,8 +31,8 @@ class Cutter
     int64_t       m_videoFramesToCut {0};
     int64_t       m_audioFramesToCut {0};
     float         m_audioFramesPerVideoFrame {0.0};
-    static constexpr uint8_t MAXLEADIN { 200 };
-    static constexpr uint8_t MINCUT { 20 };
+    static constexpr uint8_t kMaxLeadIn { 200 };
+    static constexpr uint8_t kMinCut { 20 };
 };
 
 #endif

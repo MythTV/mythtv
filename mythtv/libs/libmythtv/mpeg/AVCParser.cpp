@@ -455,7 +455,7 @@ void AVCParser::processRBSP(bool rbsp_complete)
     {
         /* Need only parse the header. So return only
          * if we have insufficient bytes */
-        if (!rbsp_complete && m_rbspIndex < MAX_SLICE_HEADER_SIZE)
+        if (!rbsp_complete && m_rbspIndex < kMaxSliceHeaderSize)
             return;
 
         decode_Header(br);
