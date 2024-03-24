@@ -255,6 +255,7 @@ inline void BitReader::refill_cache(unsigned min_bits)
         }
         else
         {
+            // NOLINTNEXTLINE(clang-analyzer-core.BitwiseShift)
             m_cache |= int64_t(*m_buffer & ((1 << bits) - 1)) >> (bits - shift);
             m_bitIndex  += shift;
             m_cacheSize += shift;
