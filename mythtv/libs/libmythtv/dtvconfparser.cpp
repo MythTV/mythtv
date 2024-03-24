@@ -46,8 +46,9 @@
     ++it; } while(false)
 
 #define PARSE_CONF(VAR) do { \
-    if (it == tokens.end() || !(VAR).ParseConf(*it++)) \
-        return false; } while(false)
+    if (it == tokens.end()) return false; \
+    if (!(VAR).ParseConf(*it)) return false; \
+    it++; } while(false)
 
 #define PARSE_STR(VAR) do { \
     if (it != tokens.end()) (VAR) = *it++; else return false; } while(false)
