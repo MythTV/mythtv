@@ -416,7 +416,7 @@ AvFormatDecoder::~AvFormatDecoder()
 
     sws_freeContext(m_swsCtx);
 
-    av_freep(&m_audioSamples);
+    av_freep(reinterpret_cast<void*>(&m_audioSamples));
 
     delete m_avfRingBuffer;
 

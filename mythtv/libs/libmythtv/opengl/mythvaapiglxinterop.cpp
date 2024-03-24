@@ -394,7 +394,7 @@ MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL* Context,
         }
 
         GLXFBConfig fbconfig = fbs[0];
-        XFree(fbs);
+        XFree(reinterpret_cast<void*>(fbs));
 
         // create pixmaps
         uint width  = static_cast<uint>(m_textureSize.width());

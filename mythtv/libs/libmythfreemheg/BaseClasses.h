@@ -42,7 +42,7 @@ template <class BASE> class MHSequence {
     public:
         MHSequence() = default;
         // The destructor frees the vector but not the elements.
-        ~MHSequence() { free(m_values); }
+        ~MHSequence() { free(reinterpret_cast<void*>(m_values)); }
         // Get the current size.
         int Size() const { return m_vecSize; }
         // Get an element at a particular index.
@@ -53,7 +53,7 @@ template <class BASE> class MHSequence {
         void InsertAt(BASE b, int n) {
             MHASSERT(n >= 0 && n <= m_vecSize);
             // NOLINTNEXTLINE(bugprone-sizeof-expression)
-            BASE *ptr = (BASE*)realloc(m_values, (m_vecSize+1) * sizeof(BASE));
+            BASE *ptr = (BASE*)realloc(reinterpret_cast<void*>(m_values), (m_vecSize+1) * sizeof(BASE));
             if (ptr == nullptr) throw "Out of Memory";
             m_values = ptr;
             for (int i = m_vecSize; i > n; i--) m_values[i] = m_values[i-1];

@@ -1155,7 +1155,7 @@ void MythSystemLegacyUnix::Fork(std::chrono::seconds timeout)
     {
         for (int i = 0; cmdargs[i]; i++)
             free( cmdargs[i] );
-        free( cmdargs );
+        free( reinterpret_cast<void*>(cmdargs) );
     }
 
     if( GetStatus() != GENERIC_EXIT_RUNNING )

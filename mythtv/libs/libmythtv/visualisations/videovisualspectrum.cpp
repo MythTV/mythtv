@@ -21,8 +21,8 @@ VideoVisualSpectrum::VideoVisualSpectrum(AudioPlayer* Audio, MythRender* Render)
 
 VideoVisualSpectrum::~VideoVisualSpectrum()
 {
-    av_freep(&m_dftL);
-    av_freep(&m_dftR);
+    av_freep(reinterpret_cast<void*>(&m_dftL));
+    av_freep(reinterpret_cast<void*>(&m_dftR));
     av_fft_end(m_fftContextForward);
 }
 

@@ -1573,9 +1573,9 @@ bool MythDVDBuffer::DecodeSubtitles(AVSubtitle *Subtitle, int *GotSubtitles,
                     {
                         av_free(Subtitle->rects[i]->data[0]);
                         av_free(Subtitle->rects[i]->data[1]);
-                        av_freep(&Subtitle->rects[i]);
+                        av_freep(reinterpret_cast<void*>(&Subtitle->rects[i]));
                     }
-                    av_freep(&Subtitle->rects);
+                    av_freep(reinterpret_cast<void*>(&Subtitle->rects));
                     Subtitle->num_rects = 0;
                 }
 
@@ -1685,7 +1685,7 @@ void MythDVDBuffer::ClearMenuButton(void)
             av_free(rect->data[1]);
             av_free(rect);
         }
-        av_free(m_dvdMenuButton.rects);
+        av_free(reinterpret_cast<void*>(m_dvdMenuButton.rects));
         m_dvdMenuButton.rects = nullptr;
         m_dvdMenuButton.num_rects = 0;
         m_buttonExists = false;
@@ -2104,7 +2104,7 @@ int MythDVDBuffer::FindSmallestBoundingRectangle(AVSubtitle *Subtitle)
 
     if (bottom == Subtitle->rects[0]->h)
     {
-        av_freep(&Subtitle->rects[0]->data[0]);
+        av_freep(reinterpret_cast<void*>(&Subtitle->rects[0]->data[0]));
         Subtitle->rects[0]->w = Subtitle->rects[0]->h = 0;
         return 0;
     }
@@ -2145,7 +2145,7 @@ int MythDVDBuffer::FindSmallestBoundingRectangle(AVSubtitle *Subtitle)
               (bottom + y) * Subtitle->rects[0]->linesize[0], static_cast<size_t>(width));
     }
 
-    av_freep(&Subtitle->rects[0]->data[0]);
+    av_freep(reinterpret_cast<void*>(&Subtitle->rects[0]->data[0]));
     Subtitle->rects[0]->data[0] = bitmap;
     Subtitle->rects[0]->linesize[0] = width;
     Subtitle->rects[0]->w = width;

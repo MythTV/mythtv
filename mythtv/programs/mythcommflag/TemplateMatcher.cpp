@@ -335,7 +335,7 @@ TemplateMatcher::~TemplateMatcher(void)
 {
     delete []m_matches;
     delete []m_match;
-    av_freep(&m_cropped.data[0]);
+    av_freep(reinterpret_cast<void*>(&m_cropped.data[0]));
 }
 
 enum FrameAnalyzer::analyzeFrameResult
@@ -389,7 +389,7 @@ TemplateMatcher::MythPlayerInited(MythPlayer *_player,
     return ANALYZE_OK;
 
 free_cropped:
-    av_freep(&m_cropped.data[0]);
+    av_freep(reinterpret_cast<void*>(&m_cropped.data[0]));
     return ANALYZE_FATAL;
 }
 

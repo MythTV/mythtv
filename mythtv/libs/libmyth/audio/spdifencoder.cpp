@@ -215,7 +215,7 @@ void SPDIFEncoder::Destroy()
         if (m_oc->pb)
         {
             av_free(m_oc->pb->buffer);
-            av_freep(&m_oc->pb);
+            av_freep(reinterpret_cast<void*>(&m_oc->pb));
         }
         avformat_free_context(m_oc);
         m_oc = nullptr;

@@ -669,7 +669,7 @@ bool MythCodecContext::RetrieveHWFrame(MythVideoFrame *Frame, AVFrame *AvFrame)
             }
         }
     }
-    av_freep(&pixelformats);
+    av_freep(reinterpret_cast<void*>(&pixelformats));
 
     // retrieve data from GPU to CPU
     if (ret >= 0)

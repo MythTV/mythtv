@@ -1030,8 +1030,8 @@ Spectrogram::Spectrogram(bool hist)
 
 Spectrogram::~Spectrogram()
 {
-    av_freep(&m_dftL);
-    av_freep(&m_dftR);
+    av_freep(reinterpret_cast<void*>(&m_dftL));
+    av_freep(reinterpret_cast<void*>(&m_dftR));
     av_rdft_end(m_rdftContext);
 }
 
@@ -1386,8 +1386,8 @@ Spectrum::Spectrum()
 
 Spectrum::~Spectrum()
 {
-    av_freep(&m_dftL);
-    av_freep(&m_dftR);
+    av_freep(reinterpret_cast<void*>(&m_dftL));
+    av_freep(reinterpret_cast<void*>(&m_dftR));
     av_rdft_end(m_rdftContext);
 }
 

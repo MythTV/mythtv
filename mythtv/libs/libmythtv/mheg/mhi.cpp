@@ -1954,7 +1954,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
                 m_image.setPixel(j, i, qRgb(red, green, blue));
             }
         }
-        av_freep(&outputbuf);
+        av_freep(reinterpret_cast<void*>(&outputbuf));
     }
 
 Close:
