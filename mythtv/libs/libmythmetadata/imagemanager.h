@@ -166,9 +166,13 @@ public:
 
     //! Determine file type from its extension
     ImageNodeType GetImageType(const QString &ext) const
-    { return m_imageFileExt.contains(ext)
-                ? kImageFile
-                : m_videoFileExt.contains(ext) ? kVideoFile : kUnknown; }
+    {
+        if (m_imageFileExt.contains(ext))
+            return kImageFile;
+        if (m_videoFileExt.contains(ext))
+            return kVideoFile;
+        return kUnknown;
+    }
 protected:
     ImageAdapterBase();
     virtual ~ImageAdapterBase() = default;

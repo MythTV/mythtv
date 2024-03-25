@@ -2404,9 +2404,11 @@ QString ImageManagerFe::CrumbName(ImageItemK &im, bool getPath) const
 
 void ImageManagerFe::CloseDevices(int devId, bool eject)
 {
-    QString reason = (devId == DEVICE_INVALID)
-            ? "DEVICE CLOSE ALL"
-            : eject ? "DEVICE EJECT" : "DEVICE REMOVE";
+    QString reason { "DEVICE REMOVE" };
+    if (devId == DEVICE_INVALID)
+        reason = "DEVICE CLOSE ALL";
+    else if (eject)
+        reason = "DEVICE EJECT";
     HandleScanRequest(reason, devId);
 }
 

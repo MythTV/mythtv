@@ -624,8 +624,14 @@ static int picture_coding_ext (mpeg2dec_t * mpeg2dec)
 	if (!(mpeg2dec->sequence.flags & SEQ_FLAG_PROGRESSIVE_SEQUENCE)) {
 	    picture->nb_fields = (buffer[3] & 2) ? 3 : 2;
 	    flags |= (buffer[3] & 128) ? PIC_FLAG_TOP_FIELD_FIRST : 0;
-	} else
-	    picture->nb_fields = (buffer[3]&2) ? ((buffer[3]&128) ? 6 : 4) : 2;
+	} else {
+            if (buffer[3]&2 == 0)
+                picture->nb_fields = 2;
+            else if (buffer[3]&128 == 0)
+                picture->nb_fields = 4;
+            else
+                picture->nb_fields = 6;
+        }
 	break;
     default:
 	return 1;
