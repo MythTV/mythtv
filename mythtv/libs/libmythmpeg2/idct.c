@@ -256,7 +256,7 @@ void mpeg2_idct_init (uint32_t accel)
 	mpeg2_idct_add = mpeg2_idct_add_alpha;
 	mpeg2_idct_alpha_init ();
 	for (int i = -3840; i < 3840 + 256; i++)
-	    CLIP(i) = (i < 0) ? 0 : ((i > 255) ? 255 : i);
+	    CLIP(i) = clamp(i, 0, 255);
     } else
     {
 	extern uint8_t mpeg2_scan_norm[64];
@@ -265,7 +265,7 @@ void mpeg2_idct_init (uint32_t accel)
 	mpeg2_idct_copy = mpeg2_idct_copy_c;
 	mpeg2_idct_add = mpeg2_idct_add_c;
 	for (int i = -3840; i < 3840 + 256; i++)
-	    CLIP(i) = (i < 0) ? 0 : ((i > 255) ? 255 : i);
+	    CLIP(i) = clamp(i, 0, 255);
 	for (int i = 0; i < 64; i++) {
 	    int j = mpeg2_scan_norm[i];
 	    mpeg2_scan_norm[i] = ((j & 0x36) >> 1) | ((j & 0x09) << 2);

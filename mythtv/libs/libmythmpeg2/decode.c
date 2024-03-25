@@ -339,8 +339,8 @@ void mpeg2_skip (mpeg2dec_t * mpeg2dec, int skip)
 
 void mpeg2_slice_region (mpeg2dec_t * mpeg2dec, int start, int end)
 {
-    start = (start < 1) ? 1 : (start > 0xb0) ? 0xb0 : start;
-    end = (end < start) ? start : (end > 0xb0) ? 0xb0 : end;
+    start = clamp(start, 1, 0xb0);
+    end = clamp(end, start, 0xb0);
     mpeg2dec->first_decode_slice = start;
     mpeg2dec->nb_decode_slices = end - start;
 }
