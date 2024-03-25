@@ -134,9 +134,8 @@ int RTjpeg::b2s(const RTjpegData16 &data, int8_t *strm, uint8_t /*bt8*/)
 // return 2;
 
  // first byte allways written
- ustrm[0]=
-      (uint8_t)(data[RTjpeg_ZZ[0]]>254) ? 254:((data[RTjpeg_ZZ[0]]<0)?0:data[RTjpeg_ZZ[0]]);
-
+ int32_t value = data[RTjpeg_ZZ[0]];
+ ustrm[0]= static_cast<uint8_t>(std::clamp(value, 0, 254));
 
  int ci=63;
  while (data[RTjpeg_ZZ[ci]]==0 && ci>0) ci--;
