@@ -190,8 +190,11 @@ void Synaesthesia::fft(double *x, double *y)
 
 void Synaesthesia::setStarSize(double lsize)
 {
-    double fadeModeFudge = (m_fadeMode == Wave ? 0.4 :
-                           (m_fadeMode == Flame ? 0.6 : 0.78));
+    double fadeModeFudge { 0.78 };
+    if (m_fadeMode == Wave)
+        fadeModeFudge = 0.4;
+    else if (m_fadeMode == Flame)
+        fadeModeFudge = 0.6;
 
     int factor = 0;
     if (lsize > 0.0)

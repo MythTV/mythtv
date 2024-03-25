@@ -1014,6 +1014,16 @@ Spectrogram::Spectrogram(bool hist)
     static const std::array<int,6> red   {  0,  0, UP,  1,  1, DN }; // 0=OFF, 1=ON
     static const std::array<int,6> green { UP,  1,  1, DN,  0,  0 };
     static const std::array<int,6> blue  {  1, DN,  0,  0, UP,  1 };
+
+    auto updateColor = [](int color, int up, int down)
+    {
+        if (color == UP)
+            return up;
+        if (color == DN)
+            return down;
+        return color * 255;
+    };
+
     for (int i = 0; i < 6; i++) // for 6 color transitions...
     {
         int r = red[i];         // 0=OFF, 1=ON, UP, or DN
@@ -1021,9 +1031,9 @@ Spectrogram::Spectrogram(bool hist)
         int b = blue[i];
         for (int u = 0; u < 256; u++) { // u ramps up
             int d = 256 - u;            // d ramps down
-            m_red[  i * 256 + u] = r == UP ? u : r == DN ? d : r * 255;
-            m_green[i * 256 + u] = g == UP ? u : g == DN ? d : g * 255;
-            m_blue[ i * 256 + u] = b == UP ? u : b == DN ? d : b * 255;
+            m_red[  i * 256 + u] = updateColor(r, u, d);
+            m_green[i * 256 + u] = updateColor(g, u, d);
+            m_blue[ i * 256 + u] = updateColor(b, u, d);
         }
     }
 }
@@ -1155,9 +1165,12 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
         int end = m_fftlen / 40; // ramp window ends down to zero crossing
         for (int k = 0; k < m_fftlen; k++)
         {
-            mult = k < end ? (float)k / (float)end
-                       : k > m_fftlen - end ?
-                (float)(m_fftlen - k) / (float)end : 1;
+            if (k < end)
+                mult = (float)k / (float)end;
+            else if (k > m_fftlen - end)
+                mult = (float)(m_fftlen - k) / (float)end;
+            else
+                mult = 1;
             m_dftL[k] = m_sigL[k] * mult;
             m_dftR[k] = m_sigR[k] * mult;
         }
@@ -1187,9 +1200,9 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
         for (auto j = prev + 1; j <= index; j++) // log scale!
         {    // for the freqency bins of this pixel, find peak or mean
             tmp = sq(m_dftL[2 * j]) + sq(m_dftL[2 * j + 1]);
-            left  = m_binpeak ? (tmp > left  ? tmp : left ) : left  + tmp;
+            left  = m_binpeak ? std::max(tmp, left) : left + tmp;
             tmp = sq(m_dftR[2 * j]) + sq(m_dftR[2 * j + 1]);
-            right = m_binpeak ? (tmp > right ? tmp : right) : right + tmp;
+            right = m_binpeak ? std::max(tmp, right) : right + tmp;
             count++;
         }
         if (!m_binpeak  && count > 0)
@@ -1467,8 +1480,12 @@ bool Spectrum::processUndisplayed(VisualNode *node)
         int end = m_fftlen / 40; // ramp window ends down to zero crossing
         for (int k = 0; k < m_fftlen; k++)
         {
-            mult = k < end ? k / end : k > m_fftlen - end ?
-                (m_fftlen - k) / end : 1;
+            if (k < end)
+                mult = static_cast<float>(k) / end;
+            else if (k > m_fftlen - end)
+                mult = static_cast<float>(m_fftlen - k) / end;
+            else
+                mult = 1;
             m_dftL[k] = m_sigL[k] * mult;
             m_dftR[k] = m_sigR[k] * mult;
         }
