@@ -102,8 +102,12 @@ class MythSystemLegacyWrapper : public MythSystem
     ///         timeout will be rounded.
     bool Wait(std::chrono::milliseconds timeout) override // MythSystem
     {
-        timeout = (timeout >= 1s) ? timeout + 500ms :
-            ((timeout == 0ms) ? 0ms : 1s);
+        if (timeout >= 1s)
+            timeout = timeout + 500ms;
+        else if (timeout == 0ms)
+            timeout = 0ms;
+        else
+            timeout = 1s;
         uint legacy_wait_ret = m_legacy->Wait(duration_cast<std::chrono::seconds>(timeout));
         return GENERIC_EXIT_RUNNING != legacy_wait_ret;
     }

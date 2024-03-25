@@ -17,7 +17,11 @@ void MythHTTPRanges::HandleRangeRequest(MythHTTPResponse* Response, const QStrin
     // Check content type and size first
     auto * data = std::get_if<HTTPData>(&(Response->m_response));
     auto * file = std::get_if<HTTPFile>(&(Response->m_response));
-    int64_t size = data ? (*data)->size() : file ? (*file)->size() : 0;
+    int64_t size {0};
+    if (data)
+        size = (*data)->size();
+    else if (file)
+        size = (*file)->size();
     if (size < 1)
         return;
 
@@ -36,7 +40,11 @@ void MythHTTPRanges::BuildMultipartHeaders(MythHTTPResponse* Response)
 
     auto * data = std::get_if<HTTPData>(&(Response->m_response));
     auto * file = std::get_if<HTTPFile>(&(Response->m_response));
-    int64_t size = data ? (*data)->size() : file ? (*file)->size() : 0;
+    int64_t size {0};
+    if (data)
+        size = (*data)->size();
+    else if (file)
+        size = (*file)->size();
     if (size < 1)
         return;
 

@@ -174,9 +174,11 @@ void MythHTTPCache::PreConditionHeaders(const HTTPResponse& Response)
     }
 
     // Add the default cache control header
-    QString duration = ((cache & HTTPLongLife)   == HTTPLongLife)   ? "604800" :   // 7 days
-                       ((cache & HTTPMediumLife) == HTTPMediumLife) ? "7200" :     // 2 Hours
-                                                                    "0";           // ??
+    QString duration {"0"};    // ??
+    if ((cache & HTTPLongLife) == HTTPLongLife)
+        duration = "604800";   // 7 days
+    else if ((cache & HTTPMediumLife) == HTTPMediumLife)
+        duration = "7200";     // 2 Hours
     Response->AddHeader("Cache-Control", "no-cache=\"Ext\",max-age=" + duration);
 
     if ((cache & HTTPETag) == HTTPETag)

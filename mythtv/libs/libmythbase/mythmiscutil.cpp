@@ -725,8 +725,11 @@ enum { IOPRIO_WHO_PROCESS = 1, IOPRIO_WHO_PGRP, IOPRIO_WHO_USER, };
 
 bool myth_ioprio(int val)
 {
-    int new_ioclass = (val < 0) ? IOPRIO_CLASS_RT :
-        (val > 7) ? IOPRIO_CLASS_IDLE : IOPRIO_CLASS_BE;
+    int new_ioclass {IOPRIO_CLASS_BE};
+    if (val < 0)
+        new_ioclass = IOPRIO_CLASS_RT;
+    else if (val > 7)
+        new_ioclass = IOPRIO_CLASS_IDLE;
     int new_iodata = (new_ioclass == IOPRIO_CLASS_BE) ? val : 0;
     int new_ioprio = IOPRIO_PRIO_VALUE(new_ioclass, new_iodata);
 

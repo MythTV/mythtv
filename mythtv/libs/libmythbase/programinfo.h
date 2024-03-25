@@ -423,8 +423,11 @@ class MBASE_PUBLIC ProgramInfo
     QString GetStorageGroup(void)         const { return m_storageGroup; }
     uint    GetYearOfInitialRelease(void) const
     {
-        return ((m_year) ? m_year :
-                (m_originalAirDate.isValid()) ? m_originalAirDate.year() : 0);
+        if (m_year > 0)
+            return m_year;
+        if (m_originalAirDate.isValid())
+            return m_originalAirDate.year();
+        return 0;
     }
     QDate   GetOriginalAirDate(void)      const { return m_originalAirDate; }
     QDateTime GetLastModifiedTime(void)   const { return m_lastModified; }
