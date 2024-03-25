@@ -188,8 +188,13 @@ class MPEG2fixup
     static char GetFrameTypeT(const MPEG2frame *frame)
     {
         int type = GetFrameTypeN(frame);
-        return (type == 1 ? 'I' :
-                (type == 2 ? 'P' : (type == 3 ? 'B' : 'X')));
+        if (type == 1)
+            return 'I';
+        if (type == 2)
+            return 'P';
+        if (type == 3)
+            return 'B';
+        return 'X';
     }
     static int GetNbFields(const MPEG2frame *frame)
     {

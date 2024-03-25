@@ -39,7 +39,11 @@ sort_ascending_float(const void *aa, const void *bb)
 {
     float faa = *(float*)aa;
     float fbb = *(float*)bb;
-    return faa < fbb ? -1 : faa == fbb ? 0 : 1;
+    if (faa < fbb)
+        return -1;
+    if (faa == fbb)
+        return 0;
+    return 1;
 }
 
 bool

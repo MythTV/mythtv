@@ -524,10 +524,13 @@ void ChannelEditor::deleteChannels(void)
     bool del_all = m_sourceFilter == FILTER_ALL;
     bool del_nul = m_sourceFilter == FILTER_UNASSIGNED;
 
-    QString message =
-        (del_all) ? tr("Delete ALL channels?") :
-        ((del_nul) ? tr("Delete all unassigned channels?") :
-            tr("Delete all channels on %1?").arg(currentLabel));
+    QString message;
+    if (del_all)
+        message = tr("Delete ALL channels?");
+    else if (del_nul)
+        message = tr("Delete all unassigned channels?");
+    else
+        message =tr("Delete all channels on %1?").arg(currentLabel);
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     auto *dialog = new MythConfirmationDialog(popupStack, message, true);

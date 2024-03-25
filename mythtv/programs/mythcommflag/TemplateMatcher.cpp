@@ -632,7 +632,11 @@ TemplateMatcher::templateCoverage(long long nframes, bool final) const
     if (!final)
         return 0;   /* real-time flagging */
 
-    return brklen < MINBREAKS ? 1 : brklen <= MAXBREAKS ? 0 : -1;
+    if (brklen < MINBREAKS)
+        return 1;
+    if (brklen <= MAXBREAKS)
+        return 0;
+    return -1;
 }
 
 int
