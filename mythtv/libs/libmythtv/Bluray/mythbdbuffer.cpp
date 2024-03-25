@@ -160,8 +160,7 @@ long long MythBDBuffer::SeekInternal(long long Position, int Whence)
     else
     {
         QString cmd = QString("Seek(%1, %2)").arg(Position)
-            .arg((Whence == SEEK_SET) ? "SEEK_SET" :
-                 ((Whence == SEEK_CUR) ?"SEEK_CUR" : "SEEK_END"));
+            .arg(seek2string(Whence));
         LOG(VB_GENERAL, LOG_ERR, LOC + cmd + " Failed" + ENO);
     }
 

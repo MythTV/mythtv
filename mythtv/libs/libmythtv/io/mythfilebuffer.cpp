@@ -775,8 +775,7 @@ long long MythFileBuffer::SeekInternal(long long Position, int Whence)
                 {
                     QString cmd2 = QString("Seek(%1, %2) int ")
                         .arg(m_internalReadPos)
-                        .arg((SEEK_SET == Whence) ? "SEEK_SET" :
-                             ((SEEK_CUR == Whence) ?"SEEK_CUR" : "SEEK_END"));
+                        .arg(seek2string(Whence));
                     LOG(VB_GENERAL, LOG_ERR, LOC + cmd2 + " succeeded");
                 }
                 ret = -1;
@@ -824,8 +823,7 @@ long long MythFileBuffer::SeekInternal(long long Position, int Whence)
     else
     {
         QString cmd = QString("Seek(%1, %2)").arg(Position)
-            .arg((Whence == SEEK_SET) ? "SEEK_SET" :
-                 ((Whence == SEEK_CUR) ? "SEEK_CUR" : "SEEK_END"));
+            .arg(seek2string(Whence));
         LOG(VB_GENERAL, LOG_ERR, LOC + cmd + " Failed" + ENO);
     }
 
