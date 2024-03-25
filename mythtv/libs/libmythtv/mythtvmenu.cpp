@@ -310,9 +310,11 @@ bool MythTVMenu::Show(const QDomNode& Node, const QDomNode& Selected,
             QDomElement element = node.toElement();
             QString text  = Translate(element.attribute("text", ""));
             QString show = element.attribute("show", "");
-            MenuShowContext showContext =
-                (show == "active" ? kMenuShowActive :
-                 show == "inactive" ? kMenuShowInactive : kMenuShowAlways);
+            MenuShowContext showContext {kMenuShowAlways};
+            if (show == "active")
+                showContext = kMenuShowActive;
+            else if (show == "inactive")
+                showContext = kMenuShowInactive;
             QString current = element.attribute("current", "");
             MenuCurrentContext currentContext = kMenuCurrentDefault;
             if ((current == "active") && !hasSelected)

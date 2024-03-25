@@ -203,20 +203,26 @@ class MPEG2audType : public MythUIComboBoxSetting, public CodecParamStorage
 
         if ((val == "Layer I") && !m_allowLayer1)
         {
-            val = (m_allowLayer2) ? "Layer II" :
-                ((m_allowLayer3) ? "Layer III" : val);
+            if (m_allowLayer2)
+                val = "Layer II";
+            else if (m_allowLayer3)
+                val = "Layer III";
         }
 
         if ((val == "Layer II") && !m_allowLayer2)
         {
-            val = (m_allowLayer3) ? "Layer III" :
-                ((m_allowLayer1) ? "Layer I" : val);
+            if (m_allowLayer3)
+                val = "Layer III";
+            else if (m_allowLayer1)
+                val = "Layer I";
         }
 
         if ((val == "Layer III") && !m_allowLayer3)
         {
-            val = (m_allowLayer2) ? "Layer II" :
-                ((m_allowLayer1) ? "Layer I" : val);
+            if (m_allowLayer2)
+                val = "Layer II";
+            else if (m_allowLayer1)
+                val = "Layer I";
         }
 
         if (getValue() != val)

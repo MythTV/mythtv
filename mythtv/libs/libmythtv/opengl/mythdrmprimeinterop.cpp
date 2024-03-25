@@ -232,7 +232,12 @@ MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context,
         Frame->m_deinterlaceInuse = DEINT_DRIVER | DEINT_BASIC;
         Frame->m_deinterlaceInuse2x = doublerate;
         bool tff = Frame->m_interlacedReverse ? !Frame->m_topFieldFirst : Frame->m_topFieldFirst;
-        result.emplace_back(m_openglTextures[id].at(Scan == kScan_Interlaced ? (tff ? 1 : 0) : tff ? 0 : 1));
+        int value {0};
+        if (Scan == kScan_Interlaced)
+            value = tff ? 1 : 0;
+        else
+            value = tff ? 0 : 1;
+        result.emplace_back(m_openglTextures[id].at(value));
     }
 
     return result;

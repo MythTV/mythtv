@@ -150,8 +150,10 @@ void CC608Reader::SetMode(int mode)
 {
     // TODO why was the clearing code removed?
     //int oldmode = m_ccMode;
-    m_ccMode = (mode <= 2) ? ((mode == 1) ? CC_CC1 : CC_CC2) :
-                           ((mode == 3) ? CC_CC3 : CC_CC4);
+    if (mode <= 2)
+        m_ccMode = (mode == 1) ? CC_CC1 : CC_CC2;
+    else
+        m_ccMode = (mode == 3) ? CC_CC3 : CC_CC4;
     //if (oldmode != m_ccMode)
     //    ClearBuffers(true, true);
 }

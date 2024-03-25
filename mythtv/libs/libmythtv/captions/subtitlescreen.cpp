@@ -1353,8 +1353,11 @@ void FormattedTextSubtitle708::Init(const CC708Window &win,
     if (m_subScreen)
         m_subScreen->SetFontSize(pixelSize);
 
-    float xrange  = win.m_relative_pos ? 100.0F :
-                    (aspect > 1.4F) ? 210.0F : 160.0F;
+    float xrange { 160.0F };
+    if (win.m_relative_pos)
+        xrange = 100.0F;
+    else if (aspect > 1.4F)
+        xrange = 210.0F;
     float yrange  = win.m_relative_pos ? 100.0F : 75.0F;
     float xmult   = (float)m_safeArea.width() / xrange;
     float ymult   = (float)m_safeArea.height() / yrange;
@@ -2019,14 +2022,20 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                     if ((m_player->GetFrameRate() > 26.0F ||
                          m_player->GetFrameRate() < 24.0F) && bottom <= 480)
                         sd_height = 480;
-                    int height = ((currentFrame->m_height <= sd_height) &&
-                                  (bottom <= sd_height)) ? sd_height :
-                                 ((currentFrame->m_height <= 720) && bottom <= 720)
-                                   ? 720 : 1080;
-                    int width  = ((currentFrame->m_width  <= 720) &&
-                                  (right <= 720)) ? 720 :
-                                 ((currentFrame->m_width  <= 1280) &&
-                                  (right <= 1280)) ? 1280 : 1920;
+
+                    int height { 1080 };
+                    if ((currentFrame->m_height <= sd_height) &&
+                        (bottom <= sd_height))
+                        height = sd_height;
+                    else if ((currentFrame->m_height <= 720) && bottom <= 720)
+                        height = 720;
+
+                    int width { 1920 };
+                    if ((currentFrame->m_width  <= 720) && (right <= 720))
+                        width = 720;
+                    else if ((currentFrame->m_width  <= 1280) &&
+                             (right <= 1280))
+                        width = 1280;
                     display = QRect(0, 0, width, height);
                 }
 

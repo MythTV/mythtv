@@ -564,7 +564,13 @@ QString FrequencyListDescriptor::toString() const
     for (uint i = 0; i < FrequencyCount(); i++)
     {
         str += QString("%1").arg(FrequencyHz(i));
-        str += (i+1 < FrequencyCount()) ? ((i+4)%10) ? ", " : ",\n      " : "";
+        if (i+1 < FrequencyCount())
+        {
+            if ((i+4)%10)
+                str += ", ";
+            else
+                str += ",\n      ";
+        }
     }
 
     return str;
@@ -934,7 +940,13 @@ QString DVBLogicalChannelDescriptor::toString() const
     for (uint i = 0; i < ChannelCount(); i++)
     {
         ret += QString("%1->%2").arg(ServiceID(i)).arg(ChannelNumber(i));
-        ret += (i+1 < ChannelCount()) ? ((i+4)%10) ? ", " : ",\n      " : "";
+        if (i+1 < ChannelCount())
+        {
+            if ((i+4)%10)
+                ret += ", ";
+            else
+                ret += ",\n      ";
+        }
     }
     return ret;
 }
@@ -945,7 +957,13 @@ QString DVBSimulcastChannelDescriptor::toString() const
     for (uint i = 0; i < ChannelCount(); i++)
     {
         ret += QString("%1->%2").arg(ServiceID(i)).arg(ChannelNumber(i));
-        ret += (i+1 < ChannelCount()) ? ((i+3)%10) ? ", " : ",\n      " : "";
+        if (i+1 < ChannelCount())
+        {
+            if ((i+3)%10)
+                ret += ", ";
+            else
+                ret += ",\n      ";
+        }
     }
     return ret;
 }

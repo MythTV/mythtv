@@ -324,8 +324,11 @@ QRect MythVideoOutput::GetImageRect(const QRect Rect, QRect* DisplayRect)
     qreal hscale = 0.0;
     QSize video_size   = GetVideoDispDim();
     int image_height   = video_size.height();
-    int image_width    = (image_height > 720) ? 1920 :
-                         (image_height > 576) ? 1280 : 720;
+    int image_width {720};
+    if (image_height > 720)
+        image_width = 1920;
+    else if (image_height > 576)
+        image_width = 1280;
     qreal image_aspect = static_cast<qreal>(image_width) / image_height;
     qreal pixel_aspect = static_cast<qreal>(video_size.width()) / video_size.height();
 

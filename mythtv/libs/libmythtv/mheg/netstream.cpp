@@ -99,11 +99,14 @@ NetStream::NetStream(const QUrl &url, EMode mode /*= kPreferCache*/,
 {
     setObjectName("NetStream " + url.toString());
 
-    m_request.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
-        mode == kAlwaysCache ? QNetworkRequest::AlwaysCache :
-        mode == kPreferCache ? QNetworkRequest::PreferCache :
-        mode == kNeverCache ? QNetworkRequest::AlwaysNetwork :
-            QNetworkRequest::PreferNetwork );
+    QNetworkRequest::CacheLoadControl attr {QNetworkRequest::PreferNetwork};
+    if (mode == kAlwaysCache)
+        attr =  QNetworkRequest::AlwaysCache;
+    else if (mode == kPreferCache)
+        attr = QNetworkRequest::PreferCache;
+    else if (mode == kNeverCache)
+        attr = QNetworkRequest::AlwaysNetwork;
+    m_request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, attr);
 
     // Receive requestStarted signals from NAMThread when it processes a NetStreamRequest
     connect(&NAMThread::manager(), &NAMThread::requestStarted,
@@ -780,14 +783,18 @@ void NAMThread::run()
     if (!proxy.isEmpty())
     {
         QUrl url(proxy, QUrl::TolerantMode);
-        QNetworkProxy::ProxyType type =
-            url.scheme().isEmpty() ? QNetworkProxy::HttpProxy :
-            url.scheme() == "socks" ? QNetworkProxy::Socks5Proxy :
-            url.scheme() == "http" ? QNetworkProxy::HttpProxy :
-            url.scheme() == "https" ? QNetworkProxy::HttpProxy :
-            url.scheme() == "cache" ? QNetworkProxy::HttpCachingProxy :
-            url.scheme() == "ftp" ? QNetworkProxy::FtpCachingProxy :
-            QNetworkProxy::NoProxy;
+        QNetworkProxy::ProxyType type {QNetworkProxy::NoProxy};
+        if (url.scheme().isEmpty()
+            || (url.scheme() == "http")
+            || (url.scheme() == "https"))
+            type = QNetworkProxy::HttpProxy;
+        else if (url.scheme() == "socks")
+            type = QNetworkProxy::Socks5Proxy;
+        else if (url.scheme() == "cache")
+            type = QNetworkProxy::HttpCachingProxy;
+        else if (url.scheme() == "ftp")
+            type = QNetworkProxy::FtpCachingProxy;
+
         if (QNetworkProxy::NoProxy != type)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "Using proxy: " + proxy);

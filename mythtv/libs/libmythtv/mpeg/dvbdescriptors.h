@@ -779,8 +779,11 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
     uint FECOuter(void) const { return m_data[7] & 0xf; }
     QString FECOuterString(void) const
     {
-        return (FECOuter() == kOuterFEC_None) ? "None" :
-            ((FECOuter() == kOuterFEC_RS204_RS188) ? "RS(204/188)" : "unknown");
+        if (FECOuter() == kOuterFEC_None)
+            return "None";
+        if (FECOuter() == kOuterFEC_RS204_RS188)
+            return "RS(204/188)";
+        return "unknown";
     }
     // modulation               8   8.0
     enum : std::uint8_t

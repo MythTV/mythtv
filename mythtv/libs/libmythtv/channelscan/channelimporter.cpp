@@ -116,11 +116,14 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
                                               "No new channels to process") :
                                              "No channels to process.."));
 
-            QString msg(
-                channels ?
-                (m_success ? tr("Found %n channel(s)", "", channels) :
-                             tr("Failed to find any new channels!"))
-                           : tr("Failed to find any channels."));
+            QString msg;
+            if (!channels)
+                msg = tr("Failed to find any channels.");
+            else if (m_success)
+                msg = tr("Found %n channel(s)", "", channels);
+            else
+                msg = tr("Failed to find any new channels!");
+
             if (m_useWeb)
                 m_pWeb->m_dlgMsg = msg;
             else
@@ -151,9 +154,14 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     {
         bool require_av = (m_serviceRequirements & kRequireAV) == kRequireAV;
         bool require_a  = (m_serviceRequirements & kRequireAudio) != 0;
+        const char *desired { "all" };
+        if (require_av)
+            desired = "tv";
+        else if (require_a)
+            desired = "tv+radio";
         ssMsg << Qt::endl << Qt::endl;
         ssMsg << "Scan parameters:" << Qt::endl;
-        ssMsg << "Desired Services            : " << (require_av ? "tv" : require_a ? "tv+radio" : "all") << Qt::endl;
+        ssMsg << "Desired Services            : " << desired << Qt::endl;
         ssMsg << "Unencrypted Only            : " << (m_ftaOnly           ? "yes" : "no") << Qt::endl;
         ssMsg << "Logical Channel Numbers only: " << (m_lcnOnly           ? "yes" : "no") << Qt::endl;
         ssMsg << "Complete scan data required : " << (m_completeOnly      ? "yes" : "no") << Qt::endl;
@@ -864,6 +872,13 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                 chan.m_dbMplexId = ChannelUtil::CreateMultiplex(
                     chan.m_sourceId, transport, tsid, chan.m_origNetId);
 
+                ChannelVisibleType visible { kChannelVisible };
+                if (chan.m_visible == kChannelAlwaysVisible ||
+                      chan.m_visible == kChannelNeverVisible)
+                    visible = chan.m_visible;
+                else if (chan.m_hidden)
+                    visible = kChannelNotVisible;
+
                 updated = ChannelUtil::UpdateChannel(
                     chan.m_dbMplexId,
                     chan.m_sourceId,
@@ -875,10 +890,7 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                     chan.m_atscMajorChannel,
                     chan.m_atscMinorChannel,
                     chan.m_useOnAirGuide,
-                    ((chan.m_visible == kChannelAlwaysVisible ||
-                      chan.m_visible == kChannelNeverVisible) ?
-                     chan.m_visible :
-                     (chan.m_hidden ? kChannelNotVisible : kChannelVisible)),
+                    visible,
                     chan.m_freqId,
                     QString(),
                     chan.m_format,
@@ -1461,8 +1473,9 @@ ChannelImporterBasicStats ChannelImporter::CollectStats(
     {
         for (const auto & chan : transport.m_channels)
         {
-            int enc = (chan.m_isEncrypted) ?
-                ((chan.m_decryptionStatus == kEncDecrypted) ? 2 : 1) : 0;
+            int enc {0};
+            if (chan.m_isEncrypted)
+                enc = (chan.m_decryptionStatus == kEncDecrypted) ? 2 : 1;
             if (chan.m_siStandard == "atsc")      info.m_atscChannels[enc] += 1;
             if (chan.m_siStandard == "dvb")       info.m_dvbChannels[enc]  += 1;
             if (chan.m_siStandard == "mpeg")      info.m_mpegChannels[enc] += 1;

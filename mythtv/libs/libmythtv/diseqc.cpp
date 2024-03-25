@@ -800,8 +800,11 @@ bool DiSEqCDevTree::SetVoltage(uint voltage)
     if (voltage == m_lastVoltage)
         return true;
 
-    int volts = ((voltage == SEC_VOLTAGE_18) ? 18 :
-                 ((voltage == SEC_VOLTAGE_13) ? 13 : 0));
+    int volts {0};
+    if (voltage == SEC_VOLTAGE_18)
+        volts = 18;
+    else if (voltage == SEC_VOLTAGE_13)
+        volts = 13;
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Changing LNB voltage to " +
             QString("%1V").arg(volts));

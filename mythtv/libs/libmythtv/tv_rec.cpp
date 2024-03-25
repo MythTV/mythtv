@@ -941,16 +941,25 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     MarkTypes aspectRatio = curRec->QueryAverageAspectRatio();
     uint avg_height = curRec->QueryAverageHeight();
     bool progressive = curRec->QueryAverageScanProgressive();
+
+    uint16_t flags {VID_UNKNOWN};
+    if (avg_height > 2000)
+        flags |= VID_4K;
+    else if (avg_height > 1000)
+        flags |= VID_1080;
+    else if (avg_height > 700)
+        flags |= VID_720;
+    if (progressive)
+        flags |= VID_PROGRESSIVE;
+    if (!is_good)
+        flags |= VID_DAMAGED;
+    if ((aspectRatio == MARK_ASPECT_16_9) ||
+        (aspectRatio == MARK_ASPECT_2_21_1))
+        flags |= VID_WIDESCREEN;
+
     curRec->SaveVideoProperties
         (VID_4K | VID_1080 | VID_720 | VID_DAMAGED |
-         VID_WIDESCREEN | VID_PROGRESSIVE,
-        ((avg_height > 2000) ? VID_4K :
-         ((avg_height > 1000) ? VID_1080 :
-          ((avg_height > 700) ? VID_720 : 0))) |
-         (progressive ? VID_PROGRESSIVE : 0) |
-        ((is_good) ? 0 : VID_DAMAGED) |
-        (((aspectRatio == MARK_ASPECT_16_9) ||
-          (aspectRatio == MARK_ASPECT_2_21_1)) ? VID_WIDESCREEN : 0));
+         VID_WIDESCREEN | VID_PROGRESSIVE, flags);
 
     // Make sure really short recordings have positive run time.
     if (curRec->GetRecordingEndTime() <= curRec->GetRecordingStartTime())

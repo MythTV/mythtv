@@ -628,11 +628,15 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                         QString("---- DVDNAV_CELL_CHANGE - Cell #%1 Menu %2 Length %3")
                           .arg(cell_event->cellN).arg(m_inMenu ? "Yes" : "No")
                           .arg(static_cast<double>(cell_event->cell_length) / 90000.0, 0, 'f', 1));
-                    QString still = stillTimer ? ((stillTimer < 0xff) ?
-                        QString("Stillframe: %1 seconds").arg(stillTimer) :
-                        QString("Infinite stillframe")) :
-                        QString("Length: %1 seconds")
+                    QString still;
+                    if (stillTimer == 0)
+                        still = QString("Length: %1 seconds")
                             .arg(duration_cast<std::chrono::seconds>(m_pgcLength).count());
+                    else if (stillTimer < 0xff)
+                        still = QString("Stillframe: %1 seconds").arg(stillTimer);
+                    else
+                        still = QString("Infinite stillframe");
+
                     if (m_title == 0)
                     {
                         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Menu #%1 %2")

@@ -246,10 +246,12 @@ void IPTVStreamHandler::run(void)
 
         // we bind to destination address if it's a multicast address, or
         // the local ones otherwise
-        if (!m_sockets[i]->bind(is_multicast ?
-                                dest_addr :
-                                (ipv6 ? QHostAddress::AnyIPv6 : QHostAddress::Any),
-                                port))
+        QHostAddress a {QHostAddress::Any};
+        if (is_multicast)
+            a = dest_addr;
+        else if (ipv6)
+            a = QHostAddress::AnyIPv6;
+        if (!m_sockets[i]->bind(a, port))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Binding to port failed.");
             error = true;

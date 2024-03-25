@@ -17,9 +17,11 @@ class VBIMode
     static uint Parse(const QString& vbiformat)
     {
         QString fmt = vbiformat.toLower().left(3);
-        vbimode_t mode = None;
-        mode = (fmt == "pal") ? PAL_TT : ((fmt == "nts") ? NTSC_CC : None);
-        return (uint) mode;
+        if (fmt == "pal")
+            return PAL_TT;
+        if (fmt == "nts")
+            return NTSC_CC;
+        return None;
     }
 };
 
