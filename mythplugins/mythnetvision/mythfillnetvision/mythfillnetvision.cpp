@@ -78,8 +78,8 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     QCoreApplication::setApplicationName("mythfillnetvision");
 
-    int retval = GENERIC_EXIT_OK;
-    if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
+    int retval = cmdline.ConfigureLogging();
+    if (retval != GENERIC_EXIT_OK)
         return retval;
     
     ///////////////////////////////////////////////////////////////////////
