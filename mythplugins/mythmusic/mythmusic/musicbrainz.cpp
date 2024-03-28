@@ -283,7 +283,7 @@ QString MusicBrainz::queryCoverart(const std::string &releaseId)
     try
     {
         std::vector<unsigned char> imageData = coverArt.FetchFront(releaseId);
-        if (imageData.size())
+        if (!imageData.empty())
         {
             LOG(VB_MEDIA, LOG_DEBUG, QString("musicbrainz: Saving front coverart to '%1'").arg(filePath));
 
