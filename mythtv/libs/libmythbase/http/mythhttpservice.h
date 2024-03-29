@@ -86,7 +86,7 @@ class MBASE_PUBLIC V2HttpRedirectException
                                   !std::is_same_v<T, QVariantList>,void> \
         set##Name(T value) { m_##Name = value; }                    \
     private:                                             \
-    Type m_##Name;
+    Type m_##Name { }; // NOLINT(readability-redundant-member-init)
 
 #define SERVICE_PROPERTY_RO_REF( type, name ) \
     private: type m_##name;              \
