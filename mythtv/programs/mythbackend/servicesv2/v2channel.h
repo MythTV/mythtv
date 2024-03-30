@@ -34,6 +34,7 @@
 #include "v2grabber.h"
 #include "v2commMethod.h"
 #include "v2channelScan.h"
+#include "v2channelRestore.h"
 
 #define CHANNEL_SERVICE QString("/Channel/")
 #define CHANNEL_HANDLE  QString("Channel")
@@ -56,6 +57,7 @@ class V2Channel : public MythHTTPService
     Q_CLASSINFO("StartScan",              "methods=POST;name=bool")
     Q_CLASSINFO("StopScan",               "methods=POST;name=bool")
     Q_CLASSINFO("SendScanDialogResponse", "methods=POST;name=bool")
+    Q_CLASSINFO("SaveRestoreData",        "methods=POST;name=bool")
 
     public:
         V2Channel();
@@ -230,6 +232,13 @@ class V2Channel : public MythHTTPService
         static bool               SendScanDialogResponse  ( uint Cardid,
                                                             const QString &DialogString,
                                                             int DialogButton );
+
+        static V2ChannelRestore*  GetRestoreData          ( uint SourceId,
+                                                            bool XmltvId,
+                                                            bool Icon,
+                                                            bool Visible);
+
+        static bool               SaveRestoreData         ( uint SourceId);
 
     private:
         Q_DISABLE_COPY(V2Channel)

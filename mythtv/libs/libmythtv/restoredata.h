@@ -83,22 +83,36 @@ class MTV_PUBLIC RestoreData : public GroupSetting
 {
   Q_OBJECT
   public:
-    explicit RestoreData(uint sourceid);
+    explicit RestoreData(uint sourceid, bool useGUI = true);
+    static RestoreData * getInstance(uint sourceid);
+    static void freeInstance();
     void Load(void) override; // StandardSetting
     void Save(void) override; // StandardSetting
+    bool doSave(void);
+    QString doRestore(bool do_xmltvid, bool do_icon, bool do_visible);
 
   public slots:
     void Restore(void);
 
   private:
+    static RestoreData    *s_Instance;
     VideoSourceShow       *m_videosource      {nullptr};
     RestoreXMLTVID        *m_restoreXMLTVID   {nullptr};
     RestoreVisible        *m_restoreVisible   {nullptr};
     RestoreIcon           *m_restoreIcon      {nullptr};
 
     uint m_sourceid {0};
+    bool m_useGUI   {false};
 
     std::vector<OldChannelData> m_ocd;
+
+  public:
+    // Return values for the API
+    int m_num_channels {0};
+    int m_num_xmltvid {0};
+    int m_num_icon    {0};
+    int m_num_visible {0};
+
 };
 
 #endif // RESTOREDATA_H

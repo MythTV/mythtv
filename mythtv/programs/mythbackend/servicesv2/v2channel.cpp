@@ -48,6 +48,7 @@
 #include "libmythbase/mythdate.h"
 #include "libmythtv/frequencies.h"
 #include "libmythbase/mythsystemlegacy.h"
+#include "libmythtv/restoredata.h"
 
 // MythBackend
 #include "v2artworkInfoList.h"
@@ -90,6 +91,7 @@ void V2Channel::RegisterCustomTypes()
     qRegisterMetaType<V2ScanStatus*>("V2ScanStatus");
     qRegisterMetaType<V2Scan*>("V2Scan");
     qRegisterMetaType<V2ScanList*>("V2ScanList");
+    qRegisterMetaType<V2ChannelRestore*>("V2ChannelRestore");
 }
 
 V2Channel::V2Channel() : MythHTTPService(s_service)
@@ -1139,4 +1141,29 @@ bool  V2Channel::SendScanDialogResponse ( uint Cardid,
         return true;
     }
     return false;
+}
+
+V2ChannelRestore* V2Channel::GetRestoreData ( uint SourceId,
+                                    bool XmltvId,
+                                    bool Icon,
+                                    bool Visible)
+{
+    auto * pResult = new V2ChannelRestore();
+    RestoreData* rd = RestoreData::getInstance(SourceId);
+    QString result = rd->doRestore(XmltvId, Icon, Visible);
+    if (result.isEmpty())
+        throw( QString("GetRestoreData failed."));
+    pResult->setNumChannels(rd->m_num_channels);
+    pResult->setNumXLMTVID(rd->m_num_xmltvid);
+    pResult->setNumIcon(rd->m_num_icon);
+    pResult->setNumVisible(rd->m_num_visible);
+    return pResult;
+}
+
+bool V2Channel::SaveRestoreData ( uint SourceId )
+{
+    RestoreData* rd = RestoreData::getInstance(SourceId);
+    bool result = rd->doSave();
+    RestoreData::freeInstance();
+    return result;
 }
