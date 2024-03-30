@@ -118,7 +118,8 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
     m_port = lport;
 
     // Don't even try to connect if we're currently disabled.
-    if (!(m_enabled = GetMythDB()->GetBoolSetting("LCDEnable", false)))
+    m_enabled = GetMythDB()->GetBoolSetting("LCDEnable", false);
+    if (!m_enabled)
     {
         m_connected = false;
         m_serverUnavailable = true;

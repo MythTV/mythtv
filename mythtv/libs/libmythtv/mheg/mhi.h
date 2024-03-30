@@ -228,10 +228,10 @@ class MHIContext : public MHContext, public QRunnable
     using ChannelCache_t = QMultiMap< Key_t, Val_t >;
     ChannelCache_t  m_channelCache;
     QMutex          m_channelMutex;
-    static inline int Tid(ChannelCache_t::const_iterator it) { return it->first; }
-    static inline int Cid(ChannelCache_t::const_iterator it) { return it->second; }
-    static inline int Nid(ChannelCache_t::const_iterator it) { return it.key().first; }
-    static inline int Sid(ChannelCache_t::const_iterator it) { return it.key().second; }
+    static int Tid(ChannelCache_t::const_iterator it) { return it->first; }
+    static int Cid(ChannelCache_t::const_iterator it) { return it->second; }
+    static int Nid(ChannelCache_t::const_iterator it) { return it.key().first; }
+    static int Sid(ChannelCache_t::const_iterator it) { return it.key().second; }
 };
 
 // Object for drawing text.

@@ -82,24 +82,24 @@ class MUI_PUBLIC MythDRMDevice
 
     bool       m_valid         { false };
     QScreen*   m_screen        { nullptr };
-    QString    m_deviceName    { };
+    QString    m_deviceName;
     bool       m_openedDevice  { true };
     int        m_fd            { -1 };
     bool       m_atomic        { false };
     bool       m_authenticated { false };
-    DRMConns   m_connectors    {};
-    DRMEncs    m_encoders      {};
-    DRMCrtcs   m_crtcs         {};
-    DRMPlanes  m_planes        {};
+    DRMConns   m_connectors;
+    DRMEncs    m_encoders;
+    DRMCrtcs   m_crtcs;
+    DRMPlanes  m_planes;
     DRMConn    m_connector     { nullptr };
     DRMCrtc    m_crtc          { nullptr };
-    QSize      m_resolution    { };
-    QSize      m_physicalSize  { };
+    QSize      m_resolution;
+    QSize      m_physicalSize;
     double     m_refreshRate   { 0.0 };
     double     m_adjustedRefreshRate { 0.0 };
-    QString    m_serialNumber  { };
+    QString    m_serialNumber;
     LogLevel_t m_verbose       { LOG_INFO };
-    MythEDID   m_edid          { };
+    MythEDID   m_edid;
 };
 
 #endif

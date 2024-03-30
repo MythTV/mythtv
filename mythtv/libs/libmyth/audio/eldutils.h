@@ -107,7 +107,7 @@ class MPUBLIC eld
         int      baseline_len    { 0 };
         int      eld_ver         { 0 };
         int      cea_edid_ver    { 0 };
-        QString  monitor_name    {};
+        QString  monitor_name;
         int      manufacture_id  { 0 };
         int      product_id      { 0 };
         uint64_t port_id         { 0 };

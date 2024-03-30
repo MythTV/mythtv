@@ -553,7 +553,7 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
         {
             item = logQueue.dequeue();
             qLock.unlock();
-            logThread->handleItem(item);
+            LoggerThread::handleItem(item);
             logThread->logConsole(item);
             item->DecrRef();
             qLock.relock();

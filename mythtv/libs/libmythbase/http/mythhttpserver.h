@@ -79,7 +79,7 @@ class MythHTTPServer : public MythHTTPThreadPool
     MythHTTPConfig    m_config;
     int               m_masterStatusPort { 0 };
     int               m_masterSSLPort    { 0 };
-    QString           m_masterIPAddress  { };
+    QString           m_masterIPAddress;
     QQueue<qintptr>   m_connectionQueue;
     int               m_threadNum { 0 };
 };

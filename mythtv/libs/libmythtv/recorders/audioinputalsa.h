@@ -39,7 +39,7 @@ class AudioInputALSA : public AudioInput
     ~AudioInputALSA() override { AudioInputALSA::Close(); }
 
     bool Open(uint sample_bits, uint sample_rate, uint channels) override; // AudioInput
-    inline bool IsOpen(void) override // AudioInput
+    bool IsOpen(void) override // AudioInput
         { return (m_pcmHandle != nullptr); }
     void Close(void) override; // AudioInput
 
@@ -47,7 +47,7 @@ class AudioInputALSA : public AudioInput
         { return (m_pcmHandle != nullptr); }
     bool Stop(void) override; // AudioInput
 
-    inline int GetBlockSize(void) override // AudioInput
+    int GetBlockSize(void) override // AudioInput
         { return m_mythBlockBytes; }
     int GetSamples(void* buf, uint nbytes) override; // AudioInput
     int GetNumReadyBytes(void) override; // AudioInput

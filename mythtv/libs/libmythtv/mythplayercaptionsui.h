@@ -72,10 +72,10 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     uint m_lastTextDisplayMode        { kDisplayNone };
     uint m_lastValidTextDisplayMode   { kDisplayNone };
     InteractiveTV *m_interactiveTV    { nullptr };
-    QMutex m_itvLock    { };
+    QMutex m_itvLock;
     bool m_itvEnabled   { false };
     bool m_itvVisible   { false };
-    QString m_newStream { };
+    QString m_newStream;
 
   private:
     void DisableTeletext();

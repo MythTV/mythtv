@@ -489,7 +489,7 @@ void MythDVDPlayer::SetTrack(uint Type, uint TrackNo)
 {
     if (kTrackTypeAudio == Type)
     {
-        StreamInfo stream = m_decoder->GetTrackInfo(Type, static_cast<uint>(TrackNo));
+        StreamInfo stream = m_decoder->GetTrackInfo(Type, TrackNo);
         m_playerCtx->m_buffer->DVD()->SetTrack(Type, stream.m_stream_id);
     }
 

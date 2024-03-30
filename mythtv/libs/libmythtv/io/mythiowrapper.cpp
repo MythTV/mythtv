@@ -485,9 +485,8 @@ char *MythDirRead(int DirID)
     }
     else if (s_localdirs.contains(DirID))
     {
-        struct dirent *dir = nullptr;
-        // glibc deprecated readdir_r in version 2.24,
-        if ((dir = readdir(s_localdirs[DirID])) != nullptr)
+        struct dirent *dir = readdir(s_localdirs[DirID]);
+        if (dir != nullptr)
             return strdup(dir->d_name);
     }
 

@@ -696,10 +696,13 @@ void ExternalStreamHandler::run(void)
                 }
             }
 
-            if (m_io && (sz = PACKET_SIZE - remainder) > 0)
-                read_len = m_io->Read(buffer, sz, 100ms);
-            else
-                read_len = 0;
+            read_len = 0;
+            if (m_io != nullptr)
+            {
+                sz = PACKET_SIZE - remainder;
+                if (sz > 0)
+                    read_len = m_io->Read(buffer, sz, 100ms);
+            }
         }
         else
             read_len = 0;
@@ -1032,11 +1035,11 @@ void ExternalStreamHandler::CloseApp(void)
 
             QString full_command = QString("%1").arg(m_args.join(" "));
 
-            if (!m_io->KillIfRunning(full_command))
+            if (!ExternIO::KillIfRunning(full_command))
             {
                 // Give it one more chance.
                 std::this_thread::sleep_for(50ms);
-                if (!m_io->KillIfRunning(full_command))
+                if (!ExternIO::KillIfRunning(full_command))
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("Unable to kill existing '%1'.")

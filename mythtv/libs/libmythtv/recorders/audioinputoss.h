@@ -31,7 +31,7 @@ class AudioInputOSS : public AudioInput
         ~AudioInputOSS() override { AudioInputOSS::Close(); }
 
         bool Open(uint sample_bits, uint sample_rate, uint channels) override; // AudioInput
-        inline bool IsOpen(void) override // AudioInput
+        bool IsOpen(void) override // AudioInput
             { return (m_dspFd > -1); }
         void Close(void) override; // AudioInput
 

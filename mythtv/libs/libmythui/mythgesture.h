@@ -82,7 +82,7 @@ class MUI_PUBLIC MythGestureEvent : public QEvent
     ~MythGestureEvent() override = default;
 
     QString         GetName     () const;
-    inline Gesture  GetGesture  () const { return m_gesture; }
+    Gesture         GetGesture  () const { return m_gesture; }
     void            SetPosition (QPoint Position) { m_position = Position; }
     QPoint          GetPosition () const { return m_position; }
     Qt::MouseButton GetButton   () const { return m_button; }

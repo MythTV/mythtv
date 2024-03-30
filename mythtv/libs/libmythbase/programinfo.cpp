@@ -2847,29 +2847,36 @@ uint64_t ProgramInfo::QueryProgStart(void) const
 
 uint64_t ProgramInfo::QueryStartMark(void) const
 {
-    uint64_t start = 0;
-    if ((start = QueryLastPlayPos()) > 0)
+    uint64_t start = QueryLastPlayPos();
+    if (start > 0)
     {
         LOG(VB_PLAYBACK, LOG_INFO, QString("Using last position @ %1").arg(start));
+        return start;
     }
-    else if ((start = QueryBookmark()) > 0)
+
+    start = QueryBookmark();
+    if (start > 0)
     {
         LOG(VB_PLAYBACK, LOG_INFO, QString("Using bookmark @ %1").arg(start));
+        return start;
     }
-    else if (HasCutlist())
+
+    if (HasCutlist())
     {
         // Disable progstart if the program has a cutlist.
         LOG(VB_PLAYBACK, LOG_INFO, "Ignoring progstart as cutlist exists");
+        return 0;
     }
-    else if ((start = QueryProgStart()) > 0)
+
+    start = QueryProgStart();
+    if (start > 0)
     {
         LOG(VB_PLAYBACK, LOG_INFO, QString("Using progstart @ %1").arg(start));
+        return start;
     }
-    else
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, "Using file start");
-    }
-    return start;
+
+    LOG(VB_PLAYBACK, LOG_INFO, "Using file start");
+    return 0;
 }
 
 /** \brief Queries "dvdbookmark" table for bookmarking DVD serial

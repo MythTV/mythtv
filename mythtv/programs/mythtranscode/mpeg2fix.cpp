@@ -1166,7 +1166,8 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, const QString& fname)
 
     if (!m_picture)
     {
-        if (!(m_picture = av_frame_alloc()))
+        m_picture = av_frame_alloc();
+        if (m_picture == nullptr)
         {
             return true;
         }
@@ -1826,7 +1827,8 @@ int MPEG2fixup::ConvertToI(FrameList *orderedFrames, int headPos)
     for (const auto & of : std::as_const(*orderedFrames))
     {
         int i = GetFrameNum(of);
-        if ((spare = DecodeToFrame(i, static_cast<int>(headPos == 0))) == nullptr)
+        spare = DecodeToFrame(i, static_cast<int>(headPos == 0));
+        if (spare == nullptr)
         {
             LOG(VB_GENERAL, LOG_WARNING,
                 QString("ConvertToI skipping undecoded frame #%1").arg(i));
@@ -1883,7 +1885,8 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
         return 0;
     }
 
-    if ((spare = DecodeToFrame(frameNum, 0)) == nullptr)
+    spare = DecodeToFrame(frameNum, 0);
+    if (spare == nullptr)
     {
         av_packet_free(&pkt);
         return -1;
@@ -2258,7 +2261,8 @@ int MPEG2fixup::Start()
                     int count = Lreorder.count();
                     while (m_vFrame.count() - frame_pos - count < 20 && !m_fileEnd)
                     {
-                        if ((ret = GetFrame(pkt)) < 0)
+                        ret = GetFrame(pkt);
+                        if (ret < 0)
                         {
                             av_packet_free(&pkt);
                             av_packet_free(&lastRealvPkt);

@@ -101,14 +101,14 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void EditorStateChanged(const MythEditorState& EditorState);
 
   protected:
-    MythOverlayState     m_overlayState     { };
+    MythOverlayState     m_overlayState;
     MythAudioPlayerState m_audioPlayerState { };
-    MythAudioState       m_audioState       { };
+    MythAudioState       m_audioState;
     MythCaptionsState    m_captionsState    { };
-    MythVideoBoundsState m_videoBoundsState { };
-    MythVideoColourState m_videoColourState { };
-    MythVisualiserState  m_visualiserState  { };
-    MythEditorState      m_editorState      { };
+    MythVideoBoundsState m_videoBoundsState;
+    MythVideoColourState m_videoColourState;
+    MythVisualiserState  m_visualiserState;
+    MythEditorState      m_editorState;
 };
 
 #endif

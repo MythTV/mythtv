@@ -7298,7 +7298,7 @@ fi
 
 if enabled freetype2; then
     if test $target_os = "freebsd"; then
-        echo "FREETYPE_CFLAGS=$($pkg_config --cflags $pkg_config_flags freetype2 | sed -E -e 's#-I/usr/local/include ##g' -e 's#-I/usr/local/include\$##g')" >> $TMPMAK
+        echo "FREETYPE_CFLAGS=$($pkg_config --cflags $pkg_config_flags freetype2 | sed -E -e 's#-I/usr/local/include ##g' -e 's#-I/usr/local/include$##g')" >> $TMPMAK
     else
         echo "FREETYPE_CFLAGS=$($pkg_config --cflags $pkg_config_flags freetype2)" >> $TMPMAK
     fi

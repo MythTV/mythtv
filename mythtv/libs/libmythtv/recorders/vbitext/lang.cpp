@@ -110,8 +110,8 @@ conv2latin(unsigned char *p, int n, int lang)
 
     while (n--)
     {
-       int c = 0;
-       if (lang_char[c = *p])
+       int c = *p;
+       if (lang_char[c])
        {
            if (! gfx || (c & 0xa0) != 0x20)
                *p = lang_chars[lang + 1][lang_char[c]];
@@ -194,7 +194,8 @@ do_enhancements(struct enhance *eh, struct vt_page *vtp)
            else
            {
                // row functions
-               if ((adr -= 40) == 0)
+               adr -= 40;
+               if (adr == 0)
                    adr = 24;
 
                switch (mode)

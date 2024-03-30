@@ -33,7 +33,7 @@
 #include "captions/textsubtitleparser.h"
 #include "captions/subtitlereader.h"
 
-#define IO_BUFFER_SIZE 32768
+static constexpr uint32_t IO_BUFFER_SIZE { 32768 };
 
 // This background thread helper class is adapted from the
 // RebuildSaver class in mythcommflagplayer.cpp.

@@ -136,7 +136,8 @@ int main(int argc, char **argv)
 #endif
 
 
-    if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
+    retval = cmdline.ConfigureLogging();
+    if (retval != GENERIC_EXIT_OK)
         return retval;
 
     gContext = new MythContext(MYTH_BINARY_VERSION);

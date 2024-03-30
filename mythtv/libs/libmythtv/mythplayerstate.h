@@ -83,12 +83,12 @@ class MTV_PUBLIC MythNavigationState
                         int CurrentAngle,   std::vector<QString> AngleNames);
 
     int                  m_currentChapter { 0 };
-    std::vector<int64_t> m_chapterTimes   {   };
+    std::vector<int64_t> m_chapterTimes;
     int                  m_currentTitle   { 0 };
-    std::vector<int64_t> m_titleDurations {   };
-    std::vector<QString> m_titleNames     {   };
+    std::vector<int64_t> m_titleDurations;
+    std::vector<QString> m_titleNames;
     int                  m_currentAngle   { 0 };
-    std::vector<QString> m_angleNames     {   };
+    std::vector<QString> m_angleNames;
 };
 
 Q_DECLARE_METATYPE(MythNavigationState)
@@ -135,8 +135,8 @@ class MTV_PUBLIC MythVisualiserState
     bool        m_canVisualise   { false };
     bool        m_embedding      { false };
     bool        m_visualising    { false };
-    QString     m_visualiserName { };
-    QStringList m_visualiserList { };
+    QString     m_visualiserName;
+    QStringList m_visualiserList;
 };
 
 Q_DECLARE_METATYPE(MythVisualiserState)

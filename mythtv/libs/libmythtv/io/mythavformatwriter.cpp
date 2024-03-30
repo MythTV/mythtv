@@ -649,14 +649,16 @@ bool MythAVFormatWriter::OpenAudio(void)
     if (av_get_packed_sample_fmt(context->sample_fmt) == AV_SAMPLE_FMT_FLT)
     {
         // allocate buffer to convert from S16 to float
-        if (!(m_audioInBuf = static_cast<unsigned char*>(av_malloc(size))))
+        m_audioInBuf = static_cast<unsigned char*>(av_malloc(size));
+        if (m_audioInBuf == nullptr)
             return false;
     }
 
     if (av_sample_fmt_is_planar(context->sample_fmt))
     {
         // allocate buffer to convert interleaved to planar audio
-        if (!(m_audioInPBuf = static_cast<unsigned char*>(av_malloc(size))))
+        m_audioInPBuf = static_cast<unsigned char*>(av_malloc(size));
+        if (m_audioInPBuf == nullptr)
             return false;
     }
     return true;

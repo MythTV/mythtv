@@ -2125,7 +2125,8 @@ void MythMainWindow::HideMouseTimeout()
 */
 void MythMainWindow::DisableIdleTimer(bool DisableIdle)
 {
-    if ((m_priv->m_disableIdle = DisableIdle))
+    m_priv->m_disableIdle = DisableIdle;
+    if (m_priv->m_disableIdle)
         m_idleTimer.stop();
     else
         m_idleTimer.start();

@@ -49,8 +49,8 @@ public:
     float                   m_fps                {0.0F};
 
     /* per-frame info */
-    std::vector<SceneChangeData> m_scData        {};
-    std::vector<uint16_t>        m_scDiff        {};
+    std::vector<SceneChangeData> m_scData;
+    std::vector<uint16_t>        m_scDiff;
 
     FrameAnalyzer::FrameMap m_changeMap;
 

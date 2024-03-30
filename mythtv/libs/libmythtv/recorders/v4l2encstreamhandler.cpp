@@ -507,7 +507,8 @@ bool V4L2encStreamHandler::StartEncoding(void)
         return false;
     }
 
-    if ((old_cnt = m_streamingCnt.loadRelaxed()) == 0)
+    old_cnt = m_streamingCnt.loadRelaxed();
+    if (old_cnt == 0)
     {
         // Start encoding
 

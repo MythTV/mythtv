@@ -27,7 +27,7 @@ class ExternalChannel;
 
 class ExternIO
 {
-    enum constants { kMaxErrorCnt = 20 };
+    static constexpr uint8_t kMaxErrorCnt { 20 };
 
   public:
     ExternIO(const QString & app, const QStringList & args);

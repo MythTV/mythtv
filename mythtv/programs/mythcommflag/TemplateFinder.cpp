@@ -170,7 +170,6 @@ bounding_box(const AVFrame *img, int imgheight,
 
     for (;;)
     {
-        float           newscore = NAN;
         bool            improved = false;
 
         LOG(VB_COMMFLAG, LOG_INFO, QString("bounding_box %1x%2@(%3,%4)")
@@ -181,8 +180,9 @@ bounding_box(const AVFrame *img, int imgheight,
         newrow = row;
         for (int ii = 1; ii < height; ii++)
         {
-            if ((newscore = bounding_score(img, row + ii, col,
-                            width, height - ii)) < score)
+            float newscore =
+                bounding_score(img, row + ii, col, width, height - ii);
+            if (newscore < score)
                 break;
             score = newscore;
             newrow = row + ii;
@@ -194,8 +194,9 @@ bounding_box(const AVFrame *img, int imgheight,
         newcol = col;
         for (int ii = 1; ii < width; ii++)
         {
-            if ((newscore = bounding_score(img, row, col + ii,
-                            width - ii, height)) < score)
+            float newscore =
+                bounding_score(img, row, col + ii, width - ii, height);
+            if (newscore < score)
                 break;
             score = newscore;
             newcol = col + ii;
@@ -207,8 +208,9 @@ bounding_box(const AVFrame *img, int imgheight,
         newbottom = row + height;
         for (int ii = 1; ii < height; ii++)
         {
-            if ((newscore = bounding_score(img, row, col,
-                            width, height - ii)) < score)
+            float newscore =
+                bounding_score(img, row, col, width, height - ii);
+            if (newscore  < score)
                 break;
             score = newscore;
             newbottom = row + height - ii;
@@ -220,8 +222,9 @@ bounding_box(const AVFrame *img, int imgheight,
         newright = col + width;
         for (int ii = 1; ii < width; ii++)
         {
-            if ((newscore = bounding_score(img, row, col,
-                            width - ii, height)) < score)
+            float newscore =
+                bounding_score(img, row, col, width - ii, height);
+            if (newscore < score)
                 break;
             score = newscore;
             newright = col + width - ii;
@@ -789,9 +792,10 @@ TemplateFinder::MythPlayerInited(MythPlayer *player,
 
     if (m_debugTemplate)
     {
-        if ((m_tmplDone = readTemplate(m_debugData, &m_tmplRow, &m_tmplCol,
+        m_tmplDone = readTemplate(m_debugData, &m_tmplRow, &m_tmplCol,
                         &m_tmplWidth, &m_tmplHeight, m_debugTmpl, &m_tmpl,
-                        &m_tmplValid)))
+                        &m_tmplValid);
+        if (m_tmplDone)
         {
             tmpldims = m_tmplValid ? QString("%1x%2@(%3,%4)")
                 .arg(m_tmplWidth).arg(m_tmplHeight).arg(m_tmplCol).arg(m_tmplRow) :
@@ -997,8 +1001,9 @@ TemplateFinder::finished([[maybe_unused]] long long nframes, bool final)
         {
             if (final && m_debugTemplate)
             {
-                if (!(m_tmplValid = writeTemplate(m_debugTmpl, &m_tmpl, m_debugData,
-                                m_tmplRow, m_tmplCol, m_tmplWidth, m_tmplHeight)))
+                m_tmplValid = writeTemplate(m_debugTmpl, &m_tmpl, m_debugData,
+                                m_tmplRow, m_tmplCol, m_tmplWidth, m_tmplHeight);
+                if (!m_tmplValid)
                     goto free_tmpl;
 
                 LOG(VB_COMMFLAG, LOG_INFO,

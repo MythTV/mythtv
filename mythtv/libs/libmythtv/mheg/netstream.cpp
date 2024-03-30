@@ -429,16 +429,20 @@ void NetStream::slotFinished()
                     .arg(m_id));
                 m_state = kFinished;
             }
-            else if ((url = m_request.url().resolved(url)) == m_request.url())
-            {
-                LOG(VB_FILE, LOG_WARNING, LOC + QString("(%1) Redirection loop to %2")
-                    .arg(m_id).arg(url.toString()) );
-                m_state = kFinished;
-            }
             else
             {
-                LOG(VB_FILE, LOG_INFO, LOC + QString("(%1) Redirecting").arg(m_id));
-                m_state = Request(url) ? kPending : kFinished;
+                url = m_request.url().resolved(url);
+                if (url == m_request.url())
+                {
+                    LOG(VB_FILE, LOG_WARNING, LOC + QString("(%1) Redirection loop to %2")
+                        .arg(m_id).arg(url.toString()) );
+                    m_state = kFinished;
+                }
+                else
+                {
+                    LOG(VB_FILE, LOG_INFO, LOC + QString("(%1) Redirecting").arg(m_id));
+                    m_state = Request(url) ? kPending : kFinished;
+                }
             }
         }
         else

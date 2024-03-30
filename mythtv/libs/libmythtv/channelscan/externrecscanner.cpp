@@ -102,7 +102,8 @@ void ExternRecChannelScanner::run(void)
 
     ExternalRecChannelFetcher fetch(m_cardId, cmd);
 
-    if ((m_channelTotal = fetch.LoadChannels()) < 1)
+    m_channelTotal = fetch.LoadChannels();
+    if (m_channelTotal < 1)
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + "Failed to load channels");
         QMutexLocker locker(&m_lock);
@@ -190,8 +191,8 @@ void ExternRecChannelScanner::run(void)
 
         SetNumChannelsInserted(cnt);
 
-        if ((Iold = std::find(existing.begin(), existing.end(), chanid)) !=
-             existing.end())
+        Iold = std::find(existing.begin(), existing.end(), chanid);
+        if (Iold != existing.end())
         {
             existing.erase(Iold);
         }

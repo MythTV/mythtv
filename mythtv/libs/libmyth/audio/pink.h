@@ -4,10 +4,10 @@
 #include <array>
 #include "libmyth/mythexp.h"
 
-#define PINK_DEFAULT_ROWS      (12)
-#define PINK_MAX_RANDOM_ROWS   (32)
-#define PINK_RANDOM_BITS       (24)
-#define PINK_RANDOM_SHIFT      ((sizeof(int32_t)*8)-PINK_RANDOM_BITS)
+static constexpr int8_t PINK_DEFAULT_ROWS    { 12 };
+static constexpr int8_t PINK_MAX_RANDOM_ROWS { 32 };
+static constexpr int8_t PINK_RANDOM_BITS     { 24 };
+static constexpr int8_t PINK_RANDOM_SHIFT    { (sizeof(int32_t)*8)-PINK_RANDOM_BITS };
 
 struct pink_noise_t
 {

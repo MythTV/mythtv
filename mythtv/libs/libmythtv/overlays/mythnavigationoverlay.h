@@ -38,7 +38,7 @@ class MythNavigationOverlay : public MythScreenType
     MythUIButton*   m_muteButton      { nullptr };
     MythUIButton*   m_unMuteButton    { nullptr };
     bool            m_paused          { false   };
-    MythAudioState  m_audioState      { };
+    MythAudioState  m_audioState;
     int             m_visibleGroup    { 0 };
     int             m_maxGroupNum     { -1 };
 };

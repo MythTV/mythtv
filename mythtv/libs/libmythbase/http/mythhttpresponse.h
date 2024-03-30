@@ -53,7 +53,7 @@ class MBASE_PUBLIC MythHTTPResponse
     MythHTTPRequestType m_requestType     { HTTPGet };
     int                 m_allowed         { HTTP_DEFAULT_ALLOWED };
     HTTPHeaders         m_requestHeaders  { nullptr };
-    HTTPContents        m_responseHeaders { };
+    HTTPContents        m_responseHeaders;
     HTTPVariant         m_response        { std::monostate() };
 
   protected:

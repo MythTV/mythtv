@@ -14,8 +14,8 @@ using namespace std::chrono_literals;
 #include "http/mythwebsocket.h"
 
 #define LOC QString("WS: ")
-#define MAX_FRAME_SIZE   (1048576) // 1MB
-#define MAX_MESSAGE_SIZE (4194304) // 4MB
+static constexpr int64_t MAX_FRAME_SIZE   { 1048576 }; // 1MB
+static constexpr int64_t MAX_MESSAGE_SIZE { 4194304 }; // 4MB
 
 /*! \class MythWebSocket
  * \brief An implementation of the WebSocket protocol...

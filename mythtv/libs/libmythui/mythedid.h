@@ -60,12 +60,12 @@ class MUI_PUBLIC MythEDID
     bool        ParseExtended     (const quint8* Data, size_t Offset, size_t Length);
 
     bool        m_valid           { false };
-    QByteArray  m_data            { };
+    QByteArray  m_data;
     size_t      m_size            { 0 };
     quint8      m_minorVersion    { 0 };
-    QSize       m_displaySize     { };    // N.B. Either size or aspect are valid
+    QSize       m_displaySize;    // N.B. Either size or aspect are valid
     double      m_displayAspect   { 0.0 };
-    QStringList m_serialNumbers   { };
+    QStringList m_serialNumbers;
     QString     m_name;
     int         m_vrangeMin       { 0 };
     int         m_vrangeMax       { 0 };

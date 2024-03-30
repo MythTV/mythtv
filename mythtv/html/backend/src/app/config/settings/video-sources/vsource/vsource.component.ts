@@ -107,10 +107,14 @@ export class VsourceComponent implements OnInit, AfterViewInit {
       || this.videoSource.Grabber == '' || this.videoSource.SourceName == ''
       || this.work.validateError)
       this.configCommand = '';
-    else
+    else {
+      let confDir = this.backendInfo.BackendInfo.Env.MYTHCONFDIR;
+      if (!confDir)
+        confDir = this.backendInfo.BackendInfo.Env.HOME + "/.mythtv";
       this.configCommand = "sudo -u " + this.backendInfo.BackendInfo.Env.USER + " "
         + this.videoSource.Grabber + ' --configure --config-file "'
-        + this.backendInfo.BackendInfo.Env.MYTHCONFDIR + '/' + this.videoSource.SourceName + '.xmltv"';
+        + confDir + '/' + this.videoSource.SourceName + '.xmltv"';
+    }
   }
 
   // good response to add: {"int": 19}

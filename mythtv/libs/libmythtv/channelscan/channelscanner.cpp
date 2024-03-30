@@ -251,7 +251,8 @@ void ChannelScanner::Scan(
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
                 QString("ScanIPTVChannels(%1) IPTV MPTS").arg(sourceid));
 
-            if ((ok = m_sigmonScanner->ScanIPTVChannels(sourceid, m_iptvChannels)))
+            ok = m_sigmonScanner->ScanIPTVChannels(sourceid, m_iptvChannels);
+            if (ok)
                 m_scanMonitor->ScanPercentComplete(0);
             else
             {

@@ -322,7 +322,8 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     }
 
     setting.clear();
-    if ((tmp = profile->byName("audiocodec")))
+    tmp = profile->byName("audiocodec");
+    if (tmp != nullptr)
         setting = tmp->getValue();
 
     if (setting == "MP3")
@@ -631,7 +632,6 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
 {
     if (!skipdevice)
     {
-        int blocksize = 0;
         m_audioDevice = AudioInput::CreateDevice(m_audioDeviceName.toLatin1());
         if (!m_audioDevice)
         {
@@ -647,7 +647,8 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
             return 1;
         }
 
-        if ((blocksize = m_audioDevice->GetBlockSize()) <= 0)
+        int blocksize = m_audioDevice->GetBlockSize();
+        if (blocksize <= 0)
         {
             blocksize = 1024;
             LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -666,7 +667,6 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
 
     if (m_compressAudio)
     {
-        int tmp = 0;
         m_gf = lame_init();
         lame_set_bWriteVbrTag(m_gf, 0);
         lame_set_quality(m_gf, m_mp3Quality);
@@ -674,7 +674,8 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
         lame_set_mode(m_gf, m_audioChannels == 2 ? STEREO : MONO);
         lame_set_num_channels(m_gf, m_audioChannels);
         lame_set_in_samplerate(m_gf, m_audioSampleRate);
-        if ((tmp = lame_init_params(m_gf)) != 0)
+        int tmp = lame_init_params(m_gf);
+        if (tmp != 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("AudioInit(): lame_init_params error %1").arg(tmp));

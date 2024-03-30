@@ -76,10 +76,10 @@ class MythDVDPlayer : public MythPlayerUI
     int      m_initialTitle           { -1 };
     int      m_initialAudioTrack      { -1 };
     int      m_initialSubtitleTrack   { -1 };
-    QString  m_initialDvdState        { };
+    QString  m_initialDvdState;
 
     // still frame timing
-    MythTimer m_stillFrameTimer       { };
+    MythTimer m_stillFrameTimer;
     std::chrono::seconds  m_stillFrameLength  { 0s };
     QRecursiveMutex m_stillFrameTimerLock;
 };

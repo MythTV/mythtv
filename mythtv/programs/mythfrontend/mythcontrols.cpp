@@ -445,10 +445,11 @@ uint MythControls::GetCurrentButton(void)
 QString MythControls::GetCurrentKey(void)
 {
     MythUIButtonListItem* currentButton = nullptr;
-    if (m_leftListType == kKeyList &&
-        (currentButton = m_leftList->GetItemCurrent()))
+    if (m_leftListType == kKeyList)
     {
-        return currentButton->GetText();
+        currentButton = m_leftList->GetItemCurrent();
+        if (currentButton != nullptr)
+            return currentButton->GetText();
     }
 
     if (GetFocusWidget() == m_leftList)

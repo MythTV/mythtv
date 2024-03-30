@@ -211,7 +211,7 @@ QString SCTENetworkInformationTable::toString(void) const
     else if (kModulationModeSubtable == TableSubtype())
     {
         for (uint i = 0;  i < NumberOfRecords(); i++)
-            str += ModulationMode(i).toString() + "\n";
+            str += ModulationModeSubtable::toString() + "\n";
     }
 
     return str;

@@ -819,10 +819,14 @@ void GameHandler::Launchgame(RomInfo *romdata, const QString& systemname)
     {
         handler = GetHandlerByName(systemname);
     }
-    else if (!(handler = GetHandler(romdata)))
+    else
     {
-        // Couldn't get handler so abort.
-        return;
+        handler = GetHandler(romdata);
+        if (handler == nullptr)
+        {
+            // Couldn't get handler so abort.
+            return;
+        }
     }
     QString exec = handler->SystemCmdLine();
 

@@ -88,7 +88,8 @@ int main(int argc, char *argv[])
 
     bool daemonize = cmdline.toBool("daemon");
     QString mask("general");
-    if ((retval = cmdline.ConfigureLogging(mask, daemonize)) != GENERIC_EXIT_OK)
+    retval = cmdline.ConfigureLogging(mask, daemonize);
+    if (retval != GENERIC_EXIT_OK)
         return retval;
 
     CleanupGuard callCleanup(cleanup);

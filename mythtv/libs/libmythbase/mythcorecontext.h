@@ -319,9 +319,9 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void connectionClosed(MythSocket *sock) override; // MythSocketCBs
     void readyRead(MythSocket *sock) override; // MythSocketCBs
 
-    QMap<QString,int>     m_testOverrideInts    {};
-    QMap<QString,double>  m_testOverrideFloats  {};
-    QMap<QString,QString> m_testOverrideStrings {};
+    QMap<QString,int>     m_testOverrideInts;
+    QMap<QString,double>  m_testOverrideFloats;
+    QMap<QString,QString> m_testOverrideStrings;
 
   private:
     bool m_dvbv3                {false};

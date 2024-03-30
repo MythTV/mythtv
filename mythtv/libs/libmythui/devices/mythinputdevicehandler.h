@@ -45,7 +45,7 @@ class MythInputDeviceHandler : public QObject
 #endif
 
 #ifdef USING_LIBCEC
-    MythCECAdapter  m_cecAdapter { };
+    MythCECAdapter  m_cecAdapter;
 #endif
 
 #ifdef USE_JOYSTICK_MENU

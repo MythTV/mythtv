@@ -191,11 +191,15 @@ HistogramAnalyzer::MythPlayerInited(MythPlayer *player, long long nframes)
     unsigned int width  = buf_dim.width();
     unsigned int height = buf_dim.height();
 
-    if (m_logoFinder && (m_logo = m_logoFinder->getTemplate(&m_logoRr1, &m_logoCc1,
-                    &m_logoWidth, &m_logoHeight)))
+    if (m_logoFinder != nullptr)
     {
-        m_logoRr2 = m_logoRr1 + m_logoHeight - 1;
-        m_logoCc2 = m_logoCc1 + m_logoWidth - 1;
+        m_logo = m_logoFinder->getTemplate(&m_logoRr1, &m_logoCc1,
+                                           &m_logoWidth, &m_logoHeight);
+        if (m_logo != nullptr)
+        {
+            m_logoRr2 = m_logoRr1 + m_logoHeight - 1;
+            m_logoCc2 = m_logoCc1 + m_logoWidth - 1;
+        }
     }
     QString details = m_logo ? QString("logo %1x%2@(%3,%4)")
         .arg(m_logoWidth).arg(m_logoHeight).arg(m_logoCc1).arg(m_logoRr1) :

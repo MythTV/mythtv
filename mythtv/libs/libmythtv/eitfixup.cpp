@@ -890,11 +890,10 @@ void EITFixUp::FixUK(DBEventEIT &event)
         {
             QString strPart=event.m_title.remove(ukDoubleDotEnd)+" ";
             strFull = strPart + event.m_description.remove(ukDoubleDotStart);
-            int position1 = -1;
             static const QRegularExpression ukCEPQ { R"([:\!\.\?]\s)" };
             static const QRegularExpression ukSpaceStart { "^ " };
-            if (isMovie &&
-                ((position1 = strFull.indexOf(ukCEPQ,strPart.length())) != -1))
+            int position1 = strFull.indexOf(ukCEPQ,strPart.length());
+            if (isMovie && (position1 != -1))
             {
                  if (strFull[position1] == '!' || strFull[position1] == '?'
                   || (position1>2 && strFull[position1] == '.' && strFull[position1-2] == '.'))
@@ -903,15 +902,19 @@ void EITFixUp::FixUK(DBEventEIT &event)
                  event.m_description = strFull.mid(position1 + 1);
                  event.m_description.remove(ukSpaceStart);
             }
-            else if ((position1 = strFull.indexOf(ukCEPQ)) != -1)
+            else
             {
-                 if (strFull[position1] == '!' || strFull[position1] == '?'
-                  || (position1>2 && strFull[position1] == '.' && strFull[position1-2] == '.'))
-                     position1++;
-                 event.m_title = strFull.left(position1);
-                 event.m_description = strFull.mid(position1 + 1);
-                 event.m_description.remove(ukSpaceStart);
-                 SetUKSubtitle(event);
+                position1 = strFull.indexOf(ukCEPQ);
+                if (position1 != -1)
+                {
+                     if (strFull[position1] == '!' || strFull[position1] == '?'
+                      || (position1>2 && strFull[position1] == '.' && strFull[position1-2] == '.'))
+                         position1++;
+                     event.m_title = strFull.left(position1);
+                     event.m_description = strFull.mid(position1 + 1);
+                     event.m_description.remove(ukSpaceStart);
+                     SetUKSubtitle(event);
+                }
             }
         }
         else if (event.m_description.indexOf(uk24ep) != -1)
@@ -931,8 +934,8 @@ void EITFixUp::FixUK(DBEventEIT &event)
             static const QRegularExpression ukYearColon { R"(^[\d]{4}:)" };
             if (!isMovie && (event.m_title.indexOf(ukYearColon) < 0))
             {
-                int position1 = -1;
-                if (((position1 = event.m_title.indexOf(":")) != -1) &&
+                int position1 = event.m_title.indexOf(":");
+                if ((position1 != -1) &&
                     (event.m_description.indexOf(":") < 0 ))
                 {
                     static const QRegularExpression ukCompleteDots { R"(^\.\.+$)" };
@@ -958,25 +961,31 @@ void EITFixUp::FixUK(DBEventEIT &event)
     if (!isMovie && event.m_subtitle.isEmpty() &&
         !event.m_title.startsWith("The X-Files"))
     {
-        int position1 = -1;
-        if ((position1=event.m_description.indexOf(ukTime)) != -1)
+        int position1 = event.m_description.indexOf(ukTime);
+        if (position1 != -1)
         {
             static const QRegularExpression ukColonPeriod { R"([:\.])" };
             int position2 = event.m_description.indexOf(ukColonPeriod);
             if ((position2>=0) && (position2 < (position1-2)))
                 SetUKSubtitle(event);
         }
-        else if ((position1=event.m_title.indexOf("-")) != -1)
+        else
         {
-            if ((uint)position1 < kSubtitleMaxLen)
+            position1 = event.m_title.indexOf("-");
+            if (position1 != -1)
             {
-                event.m_subtitle = event.m_title.mid(position1 + 1);
-                event.m_subtitle.remove(kUKSpaceColonStart);
-                event.m_title = event.m_title.left(position1);
+                if ((uint)position1 < kSubtitleMaxLen)
+                {
+                    event.m_subtitle = event.m_title.mid(position1 + 1);
+                    event.m_subtitle.remove(kUKSpaceColonStart);
+                    event.m_title = event.m_title.left(position1);
+                }
+            }
+            else
+            {
+                SetUKSubtitle(event);
             }
         }
-        else
-            SetUKSubtitle(event);
     }
 
     // Work out the year (if any)
@@ -1478,7 +1487,11 @@ void EITFixUp::FixMCA(DBEventEIT &event)
     if (match.hasMatch())
     {
         uint matchLen = match.capturedLength(1);
-        uint evDescLen = std::max(static_cast<int>(event.m_description.length()), 1);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        uint evDescLen = std::max(event.m_description.length(), 1);
+#else
+        uint evDescLen = std::max(event.m_description.length(), 1LL);
+#endif
 
         if ((matchLen < lSUBTITLE_MAX_LEN) &&
             ((matchLen * 100 / evDescLen) < SUBTITLE_PCT))
@@ -1692,7 +1705,11 @@ void EITFixUp::FixRTL(DBEventEIT &event)
         if (match.hasMatch())
         {
             uint matchLen = match.capturedLength(1);
-            uint evDescLen = std::max(static_cast<int>(event.m_description.length()), 1);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            uint evDescLen = std::max(event.m_description.length(), 1);
+#else
+            uint evDescLen = std::max(event.m_description.length(), 1LL);
+#endif
 
             if ((matchLen < lSUBTITLE_MAX_LEN) &&
                 (matchLen * 100 / evDescLen < SUBTITLE_PCT))
@@ -2054,8 +2071,8 @@ void EITFixUp::FixNL(DBEventEIT &event)
 
     // This is trying to catch the case where the subtitle is in the main title
     // but avoid cases where it isn't a subtitle e.g cd:uk
-    int position = 0;
-    if (((position = event.m_title.indexOf(":")) != -1) &&
+    int position = event.m_title.indexOf(":");
+    if ((position != -1) &&
         (event.m_title[position + 1].toUpper() == event.m_title[position + 1]) &&
         (event.m_subtitle.isEmpty()))
     {

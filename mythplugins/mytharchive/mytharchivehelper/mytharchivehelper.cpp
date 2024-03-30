@@ -1521,8 +1521,7 @@ static int doNativeArchive(const QString &jobFile)
         MythDate::toString(MythDate::current(), MythDate::kDatabase));
     gCoreContext->SaveSetting("MythArchiveLastRunStatus", "Running");
 
-    NativeArchive na;
-    int res = na.doNativeArchive(jobFile);
+    int res = NativeArchive::doNativeArchive(jobFile);
     gCoreContext->SaveSetting(
         "MythArchiveLastRunEnd",
         MythDate::toString(MythDate::current(), MythDate::kDatabase));
@@ -1538,8 +1537,7 @@ static int doNativeArchive(const QString &jobFile)
 
 static int doImportArchive(const QString &inFile, int chanID)
 {
-    NativeArchive na;
-    return na.doImportArchive(inFile, chanID);
+    return NativeArchive::doImportArchive(inFile, chanID);
 }
 
 static int grabThumbnail(const QString& inFile, const QString& thumbList, const QString& outFile, int frameCount)
@@ -2366,9 +2364,9 @@ static int main_local(int argc, char **argv)
     QCoreApplication::setApplicationName("mytharchivehelper");
 
     // by default we only output our messages
-    int retval = GENERIC_EXIT_OK;
     QString mask("jobqueue");
-    if ((retval = cmdline.ConfigureLogging(mask)) != GENERIC_EXIT_OK)
+    int retval = cmdline.ConfigureLogging(mask);
+    if (retval != GENERIC_EXIT_OK)
         return retval;
 
     ///////////////////////////////////////////////////////////////////////

@@ -59,7 +59,7 @@ V2MusicMetadataInfoList* V2Music::GetTrackList(int nStartIndex,
 
     auto *pMusicMetadataInfos = new V2MusicMetadataInfoList();
 
-    auto musicListCount = static_cast<int>(musicList->count());
+    int musicListCount = musicList->count();
     nStartIndex   = (nStartIndex > 0) ? std::min( nStartIndex, musicListCount ) : 0;
     nCount        = (nCount > 0) ? std::min( nCount, musicListCount ) : musicListCount;
     int nEndIndex = std::min((nStartIndex + nCount), musicListCount );

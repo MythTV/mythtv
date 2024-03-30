@@ -825,7 +825,11 @@ class HLSStream
             // not even size, pad with front 0
             line.insert(2, QLatin1String("0"));
         }
-        int padding = std::max(0, AES_BLOCK_SIZE - (static_cast<int>(line.size()) - 2));
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        int padding = std::max(0, AES_BLOCK_SIZE - (line.size() - 2));
+#else
+        int padding = std::max(0LL, AES_BLOCK_SIZE - (line.size() - 2));
+#endif
         QByteArray ba = QByteArray(padding, 0x0);
         ba.append(QByteArray::fromHex(QByteArray(line.toLatin1().constData() + 2)));
         std::copy(ba.cbegin(), ba.cend(), m_aesIv.begin());

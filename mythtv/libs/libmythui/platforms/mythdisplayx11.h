@@ -31,7 +31,7 @@ class MythDisplayX11 : public MythDisplay
                                     QScreen* qScreen, RROutput* Output = nullptr);
     void GetEDID(MythXDisplay* mDisplay);
 
-    QMap<uint64_t, unsigned long> m_modeMap { };
+    QMap<uint64_t, unsigned long> m_modeMap;
     unsigned long m_crtc { 0 };
 };
 

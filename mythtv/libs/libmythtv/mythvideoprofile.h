@@ -77,7 +77,7 @@ class MTV_PUBLIC MythVideoProfileItem
 
   private:
     uint       m_profileid        { 0 };
-    QMap<QString,QString> m_pref  { };
+    QMap<QString,QString> m_pref;
 };
 
 class MTV_PUBLIC MythVideoProfile : public QObject
@@ -151,9 +151,9 @@ class MTV_PUBLIC MythVideoProfile : public QObject
     mutable QRecursiveMutex m_lock;
     QSize                 m_lastSize            { 0, 0 };
     float                 m_lastRate            { 0.0F };
-    QString               m_lastCodecName       { };
-    QMap<QString,QString> m_currentPreferences  { };
-    std::vector<MythVideoProfileItem> m_allowedPreferences { };
+    QString               m_lastCodecName;
+    QMap<QString,QString> m_currentPreferences;
+    std::vector<MythVideoProfileItem> m_allowedPreferences;
 
     static inline QRecursiveMutex           kSafeLock;
     static inline bool                      kSafeInitialized = false;

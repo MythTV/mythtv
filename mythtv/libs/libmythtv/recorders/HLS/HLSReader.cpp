@@ -354,10 +354,10 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                 }
                 else
                 {
-                    StreamContainer::iterator Istream;
                     QString url = RelativeURI(m_segmentBase, uri).toString();
 
-                    if ((Istream = m_streams.find(url)) == m_streams.end())
+                    StreamContainer::iterator Istream = m_streams.find(url);
+                    if (Istream == m_streams.end())
                     {
                         int id = 0;
                         uint64_t bandwidth = 0;
@@ -389,10 +389,9 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
         if (stream == nullptr)
         {
             /* No Meta playlist used */
-            StreamContainer::iterator Istream;
-
-            if ((Istream = m_streams.find(M3U::DecodedURI(m_m3u8))) ==
-                m_streams.end())
+            StreamContainer::iterator Istream =
+                m_streams.find(M3U::DecodedURI(m_m3u8));
+            if (Istream == m_streams.end())
             {
                 hls = new HLSRecStream(0, 0, m_m3u8, m_segmentBase);
                 if (hls)

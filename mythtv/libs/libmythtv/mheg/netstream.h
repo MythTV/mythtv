@@ -122,10 +122,10 @@ public:
     static NAMThread & manager(); // Singleton
     ~NAMThread() override;
 
-    static inline void PostEvent(QEvent *e) { manager().Post(e); }
+    static void PostEvent(QEvent *e) { manager().Post(e); }
     void Post(QEvent *event);
 
-    static inline QRecursiveMutex* GetMutex() { return &manager().m_mutexNAM; }
+    static QRecursiveMutex* GetMutex() { return &manager().m_mutexNAM; }
 
     static bool isAvailable(); // is network usable
     static QDateTime GetLastModified(const QUrl &url);

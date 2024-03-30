@@ -528,8 +528,8 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
     if ( sMAN                  != "\"ssdp:discover\"" ) return false;
     if ( sST.length()          == 0                   ) return false;
     if ( sMX.length()          == 0                   ) return false;
-    if ((nMX = std::chrono::seconds(sMX.toInt())) == 0s) return false;
-    if ( nMX                    < 0s                  ) return false;
+    nMX = std::chrono::seconds(sMX.toInt());
+    if ( nMX                   <= 0s                  ) return false;
 
     // ----------------------------------------------------------------------
     // Adjust timeout to be a random interval between 0 and MX (max of 120)
@@ -612,7 +612,8 @@ bool SSDP::ProcessSearchResponse( const QStringMap &headers )
     if (nPos < 0)
         return false;
 
-    if ((nPos = sCache.indexOf("=", nPos)) < 0)
+    nPos = sCache.indexOf("=", nPos);
+    if (nPos < 0)
         return false;
 
     auto nSecs = std::chrono::seconds(sCache.mid( nPos+1 ).toInt());
@@ -650,7 +651,8 @@ bool SSDP::ProcessNotify( const QStringMap &headers )
         if (nPos < 0)
             return false;
 
-        if ((nPos = sCache.indexOf("=", nPos)) < 0)
+        nPos = sCache.indexOf("=", nPos);
+        if (nPos < 0)
             return false;
 
         auto nSecs = std::chrono::seconds(sCache.mid( nPos+1 ).toInt());

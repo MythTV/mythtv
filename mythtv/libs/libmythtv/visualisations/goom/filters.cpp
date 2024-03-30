@@ -391,9 +391,9 @@ getPixelRGB_ (const Uint * buffer, Uint x, Color * c)
 
 #else
 	/* ATTENTION AU PETIT INDIEN  */
-	c->b = *(unsigned char *) (tmp8 = (unsigned char *) (buffer + x));
-	c->v = *(unsigned char *) (++tmp8);
-	c->r = *(unsigned char *) (++tmp8);
+	c->b = *(tmp8 = (unsigned char *) (buffer + x));
+	c->v = *(++tmp8);
+	c->r = *(++tmp8);
 	// *c = (Color) buffer[x+y*WIDTH] ;
 #endif
 }

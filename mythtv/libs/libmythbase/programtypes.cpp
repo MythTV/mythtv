@@ -67,8 +67,8 @@ QString toString(MarkTypes type)
 
 MarkTypes markTypeFromString(const QString & str)
 {
-    stringMarkMap::const_iterator Im;
-    if ((Im = MarkTypeStrings.find(str)) == MarkTypeStrings.end())
+    auto Im = MarkTypeStrings.find(str);
+    if (Im == MarkTypeStrings.end())
         return MARK_INVALID;
     return (*Im).second;
 }

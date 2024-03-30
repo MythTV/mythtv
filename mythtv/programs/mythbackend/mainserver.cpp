@@ -120,7 +120,8 @@ bool delete_file_immediately(const QString &filename,
             QString linktext = getSymlinkTarget(filename);
 
             QFile target(linktext);
-            if (!(success1 = target.remove()))
+            success1 = target.remove();
+            if (!success1)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("Error deleting '%1' -> '%2'")
@@ -128,11 +129,14 @@ bool delete_file_immediately(const QString &filename,
             }
         }
     }
-    if ((!checkexists || checkFile.exists()) &&
-            !(success2 = checkFile.remove()))
+    if (!checkexists || checkFile.exists())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error deleting '%1': %2")
+        success2 = checkFile.remove();
+        if (!success2)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error deleting '%1': %2")
                 .arg(filename, strerror(errno)));
+        }
     }
     return success1 && success2;
 }

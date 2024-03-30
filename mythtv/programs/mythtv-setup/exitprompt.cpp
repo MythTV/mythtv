@@ -69,7 +69,11 @@ void ExitPrompter::handleExit()
     {
         // Only report the first 4 problems
         QStringList problems;
-        int limit = std::min(4, static_cast<int>(allproblems.size()));
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        int limit = std::min(4, allproblems.size());
+#else
+        int limit = std::min(4LL, allproblems.size());
+#endif
         for (int i = 0; i < limit; ++i)
         {
             problems.push_back(allproblems[i]);

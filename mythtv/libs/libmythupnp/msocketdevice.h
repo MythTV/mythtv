@@ -118,12 +118,12 @@ public:
     qint64  waitForMore(std::chrono::milliseconds msecs, bool *timeout = nullptr) const;
     virtual qint64 writeBlock(const char *data, quint64 len,
                               const QHostAddress & host, quint16 port);
-    inline qint64  writeBlock(const char *data, quint64 len)
+    qint64  writeBlock(const char *data, quint64 len)
     {
         return write(data, len);
     }
 
-    inline qint64 readBlock(char *data, quint64 maxlen)
+    qint64 readBlock(char *data, quint64 maxlen)
     {
         // read() does not correctly handle zero-byte udp packets
         // so call readData() directly which does
@@ -151,7 +151,7 @@ public:
     };
     Error  error() const;
 
-    inline bool isSequential() const override // QIODevice
+    bool isSequential() const override // QIODevice
     {
         return true;
     }

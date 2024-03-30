@@ -339,7 +339,8 @@ void DecoderHandler::doConnectDecoder(const QUrl &url, const QString &format)
 
     if (!m_decoder)
     {
-        if ((m_decoder = Decoder::create(format, nullptr, true)) == nullptr)
+        m_decoder = Decoder::create(format, nullptr, true);
+        if (m_decoder == nullptr)
         {
             doFailed(url, QString("No decoder for this format '%1'").arg(format));
             return;

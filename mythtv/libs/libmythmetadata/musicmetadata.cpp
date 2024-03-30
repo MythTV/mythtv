@@ -1263,16 +1263,14 @@ QString MusicMetadata::getAlbumArtFile(void)
     AlbumArtImage *albumart_image = nullptr;
     QString res;
 
-    if ((albumart_image = m_albumArt->getImage(IT_FRONTCOVER)))
-        res = albumart_image->m_filename; // NOLINT(bugprone-branch-clone)
-    else if ((albumart_image = m_albumArt->getImage(IT_UNKNOWN)))
+    for (ImageType Type : {IT_FRONTCOVER, IT_UNKNOWN, IT_BACKCOVER, IT_INLAY, IT_CD})
+    {
+        albumart_image = m_albumArt->getImage(Type);
+        if (albumart_image == nullptr)
+            continue;
         res = albumart_image->m_filename;
-    else if ((albumart_image = m_albumArt->getImage(IT_BACKCOVER)))
-        res = albumart_image->m_filename;
-    else if ((albumart_image = m_albumArt->getImage(IT_INLAY)))
-        res = albumart_image->m_filename;
-    else if ((albumart_image = m_albumArt->getImage(IT_CD)))
-        res = albumart_image->m_filename;
+        break;
+    }
 
     // check file exists
     if (!res.isEmpty() && albumart_image)

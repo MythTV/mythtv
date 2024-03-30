@@ -48,7 +48,7 @@ private:
 
     ptrdiff_t      m_bpl            {0};
 
-    std::vector<std::vector<unsigned char> > m_phongDat {};
+    std::vector<std::vector<unsigned char> > m_phongDat;
     unsigned char *m_rgbBuf         {nullptr};
     std::array<double,256> m_intense1 {};
     std::array<double,256> m_intense2 {};

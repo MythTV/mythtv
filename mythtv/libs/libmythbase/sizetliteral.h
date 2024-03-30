@@ -32,9 +32,9 @@
 // at some point in the future when the code is uplifted to compile with
 // -std=c++23 these should be converted to use the compiler supplied Z/UZ.
 
-inline constexpr ssize_t operator ""  _Z(unsigned long long v)
+constexpr ssize_t operator ""  _Z(unsigned long long v)
     { return static_cast<ssize_t>(v); }
-inline constexpr size_t  operator "" _UZ(unsigned long long v)
+constexpr size_t  operator "" _UZ(unsigned long long v)
     { return static_cast<size_t>(v); }
 
 #endif // SIZETLITERAL_H

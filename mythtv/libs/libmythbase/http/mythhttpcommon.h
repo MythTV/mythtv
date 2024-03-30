@@ -73,7 +73,7 @@ class MythHTTPWS
   public:
     static QString ProtocolToString(MythSocketProtocol Protocol);
     static MythSocketProtocol ProtocolFromString(const QString& Protocols);
-    static inline QString BitrateToString(uint64_t Rate)
+    static QString BitrateToString(uint64_t Rate)
     {
         if (Rate < 1)
             return "-";

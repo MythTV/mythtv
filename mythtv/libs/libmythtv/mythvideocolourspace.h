@@ -84,7 +84,7 @@ class MythVideoColourSpace : public QObject, public QMatrix4x4, public Reference
     int               m_chromaLocation         { AVCHROMA_LOC_LEFT };
     float             m_colourGamma            { 2.2F };
     float             m_displayGamma           { 2.2F };
-    QMatrix4x4        m_primaryMatrix          { };
+    QMatrix4x4        m_primaryMatrix;
     float             m_customDisplayGamma     { 0.0F };
     MythColourSpace*  m_customDisplayPrimaries { nullptr };
 };

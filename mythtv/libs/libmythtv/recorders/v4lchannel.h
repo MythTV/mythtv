@@ -96,7 +96,7 @@ class V4LChannel : public DTVChannel
     QString           m_driverName;
     QMap<QString,int> m_pictAttrDefault;
 
-    CHANLIST_vec     m_curList            {};
+    CHANLIST_vec     m_curList;
 
     bool             m_hasStreamIO        {false};
     bool             m_hasStdIO           {false};
