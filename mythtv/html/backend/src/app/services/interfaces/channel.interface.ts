@@ -171,3 +171,10 @@ export interface Scan {
     Processed:              boolean;
     ScanDate:               string;       // Date
 }
+
+export interface ChannelRestoreData {
+    NumChannels:            number;
+    NumXLMTVID:             number;
+    NumIcon:                number;
+    NumVisible:             number;
+}

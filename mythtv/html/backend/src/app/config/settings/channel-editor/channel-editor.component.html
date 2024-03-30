@@ -22,15 +22,19 @@
                             </p-dropdown>
                         </ng-template>
                     </p-columnFilter>
-                    <p-button icon="pi pi-trash" (onClick)="deleteSourceRequest()"
-                        *ngIf="setupService.pageType == 'S' else explain"
-                        pTooltip="{{ 'settings.chanedit.delete_source' | translate }}"
+                    <p-button icon="pi pi-trash" (onClick)="deleteSourceRequest()" *ngIf="setupService.pageType == 'S' "
+                        pTooltip="{{ 'settings.chanedit.delete_source' | translate }}" tooltipPosition="top"
                         label="{{ 'common.delete' | translate }}" styleClass="p-button-danger"
-                        [disabled]="setupService.schedulingEnabled">
+                        [disabled]="setupService.schedulingEnabled" class="p-2">
                     </p-button>
-                    <ng-template #explain>
+                    <p-button icon="pi pi-history" (onClick)="restoreDataRequest()"
+                        pTooltip="Restore Icons, Visible status, and XMLTV Id after a new scan." tooltipPosition="top"
+                        label="Restore Data" styleClass="p-button-success" class="p-2">
+                    </p-button>
+                    <div *ngIf="setupService.pageType != 'S' " class="p-2">
                         {{ 'settings.chanedit.delete_message' | translate }}
-                    </ng-template>
+                    </div>
+
                 </th>
             </tr>
             <tr>
@@ -253,7 +257,7 @@
             <p-button icon="pi pi-times-circle" (onClick)="closeDialog()" label="{{ 'common.close' | translate }}"
                 styleClass="p-button-warning">
             </p-button>
-            <p-button icon="pi pi-check-circle" (onClick)="saveChannel();" label="{{ 'common.save' | translate }}"
+            <p-button icon="pi pi-save" (onClick)="saveChannel();" label="{{ 'common.save' | translate }}"
                 styleClass="p-button-success" [disabled]="!chanform.dirty || channel.ChannelName.trim() == ''
                  || channel.ChanNum.trim() == '' || channel.CallSign.trim() == ''"></p-button>
         </ng-template>
@@ -316,4 +320,77 @@
                 label="{{ 'common.delete' | translate }}" styleClass="p-button-danger"></p-button>
         </ng-template>
     </p-dialog>
+
+    <p-dialog header="Restore Data" [(visible)]="resShowDialog" [modal]="true" [closable]="false"
+        [closeOnEscape]="false">
+
+        <div class="form-group field">
+            <label for="resSourceId" class="label block">{{ 'settings.chanedit.source_label' | translate
+                }}</label>
+            <p-dropdown [options]="resSources" [(ngModel)]="resSourceId" [editable]="false" optionLabel="SourceName"
+                optionValue="Id" [maxlength]="0" [style]="{'minWidth':'400px'}" name="resSourceId">
+            </p-dropdown>
+            <small class="block">
+                {{ 'settings.chanedit.res_source_desc' | translate }}
+            </small>
+        </div>
+
+        <div class="form-group field">
+            <p-checkbox inputId="resXMLTV" [(ngModel)]="resXMLTV" name="resXMLTV" class="label mb-2 w-full"
+                [binary]="true" label="{{ 'settings.chanedit.res_xmltv_label' | translate }}">
+            </p-checkbox>
+            <small class="block">
+                {{ 'settings.chanedit.res_xmltv_desc' | translate }}
+            </small>
+        </div>
+
+        <div class="form-group field">
+            <p-checkbox inputId="resVisible" [(ngModel)]="resVisible" name="resVisible" class="label mb-2 w-full"
+                [binary]="true" label="{{ 'settings.chanedit.res_visible_label' | translate }}">
+            </p-checkbox>
+            <small class="block">
+                {{ 'settings.chanedit.res_visible_desc' | translate }}
+            </small>
+        </div>
+
+        <div class="form-group field">
+            <p-checkbox inputId="resIcon" [(ngModel)]="resIcon" name="resIcon" class="label mb-2 w-full" [binary]="true"
+                label="{{ 'settings.chanedit.res_icon_label' | translate }}">
+            </p-checkbox>
+            <small class="block">
+                {{ 'settings.chanedit.res_icon_desc' | translate }}
+            </small>
+        </div>
+
+        <ng-template pTemplate="footer">
+            <div class="col-12" style="text-align: left;">
+                <p-message *ngIf="resSearchDone && !chanform.dirty" severity="info" text="{{ 'settings.chanedit.restore_details' |
+                    translate: {NumChannels: resResult.NumChannels,
+                     NumXLMTVID: resResult.NumXLMTVID,
+                     NumVisible: resResult.NumVisible,
+                     NumIcon: resResult.NumIcon} }}">
+                </p-message>
+            </div>
+            <div class="col-12" style="text-align: left;">
+                <p-message *ngIf="successCount > 0 && errorCount == 0 && !chanform.dirty" severity="success"
+                    text="{{ 'common.savesuccess' | translate }}"></p-message>
+            </div>
+            <div class="col-12" style="text-align: left;">
+                <p-message *ngIf="errorCount > 0" severity="error"
+                    text="{{ 'common.networkfail' | translate }}"></p-message>
+            </div>
+            <p-button icon="pi pi-times-circle" (onClick)="closeDialog()" label="{{ 'common.close' | translate }}"
+                styleClass="p-button-warning">
+            </p-button>
+
+            <p-button icon="pi pi-search" (onClick)="restoreSearch();" label="{{ 'common.search' | translate }}"
+                styleClass="p-button-success"
+                [disabled]="!resSourceId || (!resXMLTV && !resIcon && !resVisible)"></p-button>
+
+            <p-button icon="pi pi-save" (onClick)="restoreSave();" label="{{ 'common.save' | translate }}" styleClass="p-button-success"
+                [disabled]="!resSearchDone || !resResult.NumChannels || !chanform.pristine"></p-button>
+
+        </ng-template>
+    </p-dialog>
+
 </form>

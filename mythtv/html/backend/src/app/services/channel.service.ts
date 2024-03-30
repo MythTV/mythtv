@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
   Channel,
+  ChannelRestoreData,
   ChannelScanRequest,
   ChannelScanStatus,
   CommMethodList,
@@ -15,7 +16,7 @@ import {
   UpdateVideoSourceRequest
 } from './interfaces/channel.interface';
 import { ChannelInfoList } from './interfaces/channelinfolist.interface';
-import { BoolResponse, StringListResponse } from './interfaces/common.interface';
+import { BoolResponse, StringListResponse, StringResponse } from './interfaces/common.interface';
 import { GetDDLineupListRequest, LineupList } from './interfaces/lineup.interface';
 import { VideoMultiplex, VideoMultiplexList } from './interfaces/multiplex.interface';
 import { FreqTableList, GrabberList, VideoSource, VideoSourceList } from './interfaces/videosource.interface';
@@ -164,6 +165,19 @@ export class ChannelService {
 
   public SendScanDialogResponse(request: ScanDialogResponse): Observable<BoolResponse> {
     return this.httpClient.post<BoolResponse>('/Channel/SendScanDialogResponse', request);
+  }
+
+  public GetRestoreData (sourceId: number, xmltvId: boolean, icon: boolean, visible: boolean) : Observable<{ChannelRestore:ChannelRestoreData}> {
+    let params = new HttpParams()
+      .set("SourceId", sourceId)
+      .set("XmltvId", xmltvId)
+      .set("Icon", icon)
+      .set("Visible", visible)
+    return this.httpClient.get<{ChannelRestore:ChannelRestoreData}>('/Channel/GetRestoreData', { params });
+  }
+
+  public SaveRestoreData (sourceId: number) : Observable<BoolResponse> {
+   return this.httpClient.post<BoolResponse>('/Channel/SaveRestoreData', { SourceId: sourceId });
   }
 
 }
