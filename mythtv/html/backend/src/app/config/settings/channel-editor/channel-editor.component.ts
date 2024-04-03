@@ -411,7 +411,7 @@ export class ChannelEditorComponent implements OnInit {
     this.resSearchDone = false;
     this.allChannels.forEach((entry) => {
       if (entry.MplexId) {
-        if (!this.resSources.find((x) => x.Id = entry.SourceId)) {
+        if (!this.resSources.find((x) => x.Id == entry.SourceId)) {
           const sourceEntry = this.videoSources.find((x1) => x1.Id == entry.SourceId);
           if (sourceEntry)
             this.resSources.push(sourceEntry);

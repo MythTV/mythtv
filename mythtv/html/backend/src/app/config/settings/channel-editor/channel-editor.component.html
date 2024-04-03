@@ -29,7 +29,7 @@
                     </p-button>
                     <p-button icon="pi pi-history" (onClick)="restoreDataRequest()"
                         pTooltip="Restore Icons, Visible status, and XMLTV Id after a new scan." tooltipPosition="top"
-                        label="Restore Data" styleClass="p-button-success" class="p-2">
+                        label="Restore Data" styleClass="p-button-success" class="p-2" [disabled]="videoSources.length == 0">
                     </p-button>
                     <div *ngIf="setupService.pageType != 'S' " class="p-2">
                         {{ 'settings.chanedit.delete_message' | translate }}
