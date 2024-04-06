@@ -108,7 +108,7 @@ void StandardSetting::addTargetedChildren(const QString &value,
                               std::initializer_list<StandardSetting *> settings)
 {
     m_targets[value].reserve(settings.size());
-    for (auto *setting : qAsConst(settings))
+    for (auto *setting : std::as_const(settings))
     {
         m_targets[value].append(setting);
         setting->setParent(this);
@@ -135,7 +135,7 @@ void StandardSetting::clearTargetedSettings(const QString &value)
 {
     if (m_targets.contains(value))
     {
-        for (auto *setting : qAsConst(m_targets[value]))
+        for (auto *setting : std::as_const(m_targets[value]))
         {
             delete setting;
         }
@@ -262,7 +262,7 @@ StandardSetting* StandardSetting::byName(const QString &name)
     if (name == m_name)
         return this;
 
-    for (auto *setting : qAsConst(*getSubSettings()))
+    for (auto *setting : std::as_const(*getSubSettings()))
     {
         StandardSetting *s = setting->byName(name);
         if (s)
@@ -609,7 +609,7 @@ void MythUIComboBoxSetting::resultEdit(DialogCompletionEvent *dce)
 void MythUIComboBoxSetting::fillSelectionsFromDir(const QDir &dir, bool absPath)
 {
     QFileInfoList entries = dir.entryInfoList();
-    for (const auto& fi : qAsConst(entries))
+    for (const auto& fi : std::as_const(entries))
     {
         if (absPath)
             addSelection( fi.absoluteFilePath() );

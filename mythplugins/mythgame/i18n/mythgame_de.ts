@@ -348,27 +348,27 @@ Aus der Datenbank entfernen?</translation>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythgame/mythgame.cpp" line="114"/>
+        <location filename="../mythgame/mythgame.cpp" line="112"/>
         <source>Game frontend</source>
         <translation>Spielfrontend</translation>
     </message>
     <message>
-        <location filename="../mythgame/mythgame.cpp" line="117"/>
+        <location filename="../mythgame/mythgame.cpp" line="115"/>
         <source>Toggle the current game as a favorite</source>
         <translation>Das aktuelle Spiel als Favorit hinzufügen/entfernen</translation>
     </message>
     <message>
-        <location filename="../mythgame/mythgame.cpp" line="119"/>
+        <location filename="../mythgame/mythgame.cpp" line="117"/>
         <source>Show incremental search dialog</source>
         <translation>Inkrementellen Suchdialog anzeigen</translation>
     </message>
     <message>
-        <location filename="../mythgame/mythgame.cpp" line="121"/>
+        <location filename="../mythgame/mythgame.cpp" line="119"/>
         <source>Incremental search find next match</source>
         <translation>Inkrementelle Suche - Nächsten Treffer anzeigen</translation>
     </message>
     <message>
-        <location filename="../mythgame/mythgame.cpp" line="123"/>
+        <location filename="../mythgame/mythgame.cpp" line="121"/>
         <source>Download metadata for current item</source>
         <translation>Metadaten für das aktuelle Element herunterladen</translation>
     </message>

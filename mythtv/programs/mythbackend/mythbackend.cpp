@@ -112,7 +112,8 @@ int main(int argc, char **argv)
 
     bool daemonize = cmdline.toBool("daemon");
     QString mask("general");
-    if ((retval = cmdline.ConfigureLogging(mask, daemonize)) != GENERIC_EXIT_OK)
+    retval = cmdline.ConfigureLogging(mask, daemonize);
+    if (retval != GENERIC_EXIT_OK)
         return retval;
 
     if (daemonize)
@@ -138,6 +139,8 @@ int main(int argc, char **argv)
     {
         auto config = XmlConfiguration();
         ignoreDB = !config.FileExists();
+        if (ignoreDB)
+            gContext->setWebOnly(MythContext::kWebOnlyDBSetup);
     }
 
     // Init Parameters:
@@ -149,8 +152,7 @@ int main(int argc, char **argv)
     if (!gContext->Init(false,false,false,ignoreDB))
     {
         LOG(VB_GENERAL, LOG_CRIT, "Failed to init MythContext.");
-        gCoreContext->GetDB()->IgnoreDatabase(true);
-        // return GENERIC_EXIT_NO_MYTHCONTEXT;
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
     MythTranslation::load("mythfrontend");

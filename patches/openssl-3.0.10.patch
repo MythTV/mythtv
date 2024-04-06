@@ -1,0 +1,17 @@
+diff --git a/Configurations/15-android.conf b/Configurations/15-android.conf
+index 41ad922..dc65e02 100644
+--- a/Configurations/15-android.conf
++++ b/Configurations/15-android.conf
+@@ -62,7 +62,11 @@
+             } elsif ($is_standalone_toolchain) {
+                 $sysroot = "$ndk/sysroot";
+             } else {
+-                $api = "*";
++                # Allow the build system to pass in the desired version.
++                $api = "$ENV{ANDROID_SDK}";
++
++                # The following works, but it results in warnings
++                # about multiple definitions of __ANDROID_API__.
+ 
+                 # see if user passed -D__ANDROID_API__=N
+                 foreach (@{$useradd{CPPDEFINES}}, @{$user{CPPFLAGS}}) {

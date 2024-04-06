@@ -18,7 +18,7 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include <QtTest/QtTest>
+#include <QTest>
 
 #include "libmythtv/eithelper.h" /* for FixupValue */
 #include "libmythtv/programdata.h"

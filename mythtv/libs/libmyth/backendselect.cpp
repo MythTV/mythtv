@@ -260,7 +260,7 @@ void BackendSelection::Init(void)
         pEntries->GetEntryMap(ourMap);
         pEntries->DecrRef();
 
-        for (auto * devLoc : qAsConst(ourMap))
+        for (auto * devLoc : std::as_const(ourMap))
         {
             AddItem(devLoc);
             devLoc->DecrRef();

@@ -405,7 +405,7 @@ void MHListGroup::Preparation(MHEngine *engine)
             MHRoot *pItem = engine->FindObject(m_tokenGrpItems.GetAt(i)->m_Object);
             MHListItem *p = nullptr;
 
-            for (auto *item : qAsConst(m_itemList))
+            for (auto *item : std::as_const(m_itemList))
             {
                 p = item;
 
@@ -429,7 +429,7 @@ void MHListGroup::Preparation(MHEngine *engine)
 void MHListGroup::Destruction(MHEngine *engine)
 {
     // Reset the positions of the visibles.
-    for (auto *item : qAsConst(m_itemList))
+    for (auto *item : std::as_const(m_itemList))
         item->m_pVisible->ResetPosition();
 
     MHTokenGroup::Destruction(engine);
@@ -446,7 +446,7 @@ void MHListGroup::Activation(MHEngine *engine)
 void MHListGroup::Deactivation(MHEngine *engine)
 {
     // Deactivate the visibles.
-    for (auto *item : qAsConst(m_itemList))
+    for (auto *item : std::as_const(m_itemList))
         item->m_pVisible->Deactivation(engine);
 
     MHTokenGroup::Deactivation(engine);
@@ -535,7 +535,11 @@ void MHListGroup::Update(MHEngine *engine)
     if (m_nLastCount - m_nLastFirstItem != m_itemList.size() - m_nFirstItem)
     {
         engine->EventTriggered(this, EventTailItems,
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+			       (m_itemList.size()) - m_nFirstItem);
+#else
 			       static_cast<int>(m_itemList.size()) - m_nFirstItem);
+#endif
     }
 
     m_nLastCount = m_itemList.size();
@@ -546,7 +550,7 @@ void MHListGroup::Update(MHEngine *engine)
 void MHListGroup::AddItem(int nIndex, MHRoot *pItem, MHEngine *engine)
 {
     // See if the item is already there and ignore this if it is.
-    for (auto *item : qAsConst(m_itemList))
+    for (auto *item : std::as_const(m_itemList))
     {
         if (item->m_pVisible == pItem)
         {

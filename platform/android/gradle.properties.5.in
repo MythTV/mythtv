@@ -1,0 +1,3 @@
+qtTargetSdkVersion=@ANDROID_TARGET_SDK_VERSION@
+qtMinSdkVersion=@ANDROID_MIN_SDK_VERSION@
+wtfami=kissoff

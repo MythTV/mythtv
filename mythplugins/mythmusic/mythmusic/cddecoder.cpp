@@ -27,7 +27,6 @@ extern "C" {
 
 // MythMusic
 #include "constants.h"
-
 static constexpr const char* CDEXT { ".cda" };
 static constexpr long kSamplesPerSec { 44100 };
 
@@ -137,19 +136,11 @@ void CdDecoder::writeBlock()
 }
 
 //static
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-QMutex& CdDecoder::getCdioMutex()
-{
-    static QMutex s_mtx(QMutex::Recursive);
-    return s_mtx;
-}
-#else
 QRecursiveMutex& CdDecoder::getCdioMutex()
 {
     static QRecursiveMutex s_mtx;
     return s_mtx;
 }
-#endif
 
 // pure virtual
 bool CdDecoder::initialize()
@@ -661,7 +652,22 @@ MusicMetadata *CdDecoder::getMetadata()
     if (title.isEmpty() || artist.isEmpty() || album.isEmpty())
 #endif // CDTEXT
     {
-        //TODO: add MusicBrainz lookup
+#ifdef HAVE_MUSICBRAINZ
+        if (isDiscChanged)
+        {
+            // lazy load whole CD metadata
+            getMusicBrainz().queryForDevice(m_deviceName);
+        }
+        if (getMusicBrainz().hasMetadata(m_setTrackNum))
+        {
+            auto *metadata = getMusicBrainz().getMetadata(m_setTrackNum);
+            if (metadata)
+            {
+                metadata->setFilename(getURL());
+                return metadata;
+            }
+        }
+#endif // HAVE_MUSICBRAINZ
     }
 
     if (compilation_artist.toLower().left(7) == "various")
@@ -683,6 +689,17 @@ MusicMetadata *CdDecoder::getMetadata()
 
     return m;
 }
+
+#ifdef HAVE_MUSICBRAINZ
+
+MusicBrainz & CdDecoder::getMusicBrainz()
+{
+    static MusicBrainz s_musicBrainz;
+    return s_musicBrainz;
+}
+
+#endif // HAVE_MUSICBRAINZ
+
 
 // pure virtual
 bool CdDecoderFactory::supports(const QString &source) const

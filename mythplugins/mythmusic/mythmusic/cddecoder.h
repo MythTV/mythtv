@@ -15,6 +15,10 @@
 # endif
 #endif
 
+#ifdef HAVE_MUSICBRAINZ
+    #include "musicbrainz.h"
+#endif // HAVE_MUSICBRAINZ
+
 class MusicMetadata;
 
 class CdDecoder : public Decoder
@@ -54,11 +58,7 @@ class CdDecoder : public Decoder
 
     QString            m_deviceName;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    static QMutex& getCdioMutex();
-#else
     static QRecursiveMutex& getCdioMutex();
-#endif
 
     DecoderEvent::Type m_stat        {DecoderEvent::kError};
     char              *m_outputBuf   {nullptr};
@@ -84,6 +84,11 @@ class CdDecoder : public Decoder
     lsn_t              m_end         {CDIO_INVALID_LSN};
     lsn_t              m_curPos      {CDIO_INVALID_LSN};
 #endif
+
+#ifdef HAVE_MUSICBRAINZ
+    static MusicBrainz & getMusicBrainz();
+#endif // HAVE_MUSICBRAINZ
+
 };
 
 #endif

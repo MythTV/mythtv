@@ -18,6 +18,7 @@ export class EitScannerComponent implements OnInit, AfterViewInit {
   errorCount = 0;
   EITTransportTimeout = 5;
   EITCrawIdleStart = 60;
+  EITScanPeriod = 15;
 
   constructor(public setupService: SetupService, private mythService: MythService) {
     this.getEITScanner();
@@ -40,6 +41,11 @@ export class EitScannerComponent implements OnInit, AfterViewInit {
     this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "EITCrawIdleStart", Default: "60" })
       .subscribe({
         next: data => this.EITCrawIdleStart = Number(data.String),
+        error: () => this.errorCount++
+      });
+      this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "EITScanPeriod", Default: "15" })
+      .subscribe({
+        next: data => this.EITScanPeriod = Number(data.String),
         error: () => this.errorCount++
       });
 
@@ -73,6 +79,10 @@ export class EitScannerComponent implements OnInit, AfterViewInit {
     this.mythService.PutSetting({
       HostName: '_GLOBAL_', Key: "EITCrawIdleStart",
       Value: String(this.EITCrawIdleStart)
+    }).subscribe(this.eitObserver);
+    this.mythService.PutSetting({
+      HostName: '_GLOBAL_', Key: "EITScanPeriod",
+      Value: String(this.EITScanPeriod)
     }).subscribe(this.eitObserver);
   }
 

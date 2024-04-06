@@ -708,7 +708,7 @@ void FillEncoderList(QVariantList &list, QObject* parent)
 {
     QReadLocker tvlocker(&TVRec::s_inputsLock);
     QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo(true);
-    for (auto * elink : qAsConst(gTVList))
+    for (auto * elink : std::as_const(gTVList))
     {
         if (elink != nullptr)
         {
@@ -727,7 +727,7 @@ void FillEncoderList(QVariantList &list, QObject* parent)
             else
                 pEncoder->setHostName( elink->GetHostName() );
 
-            for (const auto & inputInfo : qAsConst(inputInfoList))
+            for (const auto & inputInfo : std::as_const(inputInfoList))
             {
                 if (inputInfo.m_inputId == static_cast<uint>(elink->GetInputID()))
                 {
@@ -849,7 +849,7 @@ void FillFrontendList(QVariantList &list, QObject* parent, bool OnLine)
     else
         frontends = gBackendContext->GetFrontends();
 
-    for (auto * fe : qAsConst(frontends))
+    for (auto * fe : std::as_const(frontends))
     {
         auto *pFrontend = new V2Frontend( parent );
         list.append( QVariant::fromValue<QObject *>( pFrontend ));
@@ -889,7 +889,7 @@ DBCredits * V2jsonCastToCredits(const QJsonObject &cast)
     auto* credits = new DBCredits;
 
     QJsonArray members = cast["CastMembers"].toArray();
-    for (const auto & m : members)
+    for (const auto & m : std::as_const(members))
     {
         QJsonObject actor     = m.toObject();
         QString     name      = actor.value("Name").toString("");
@@ -943,7 +943,7 @@ uint fillSelectionsFromDir(const QDir& dir,
     uint cnt = 0;
     QMap<uint, uint> minorlist;
     QFileInfoList entries = dir.entryInfoList();
-    for (const auto & fi : qAsConst(entries))
+    for (const auto & fi : std::as_const(entries))
     {
         struct stat st {};
         QString filepath = fi.absoluteFilePath();

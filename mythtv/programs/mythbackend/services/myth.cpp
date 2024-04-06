@@ -603,7 +603,7 @@ DTC::FrontendList *Myth::GetFrontends( bool OnLine )
     else
         frontends = gBackendContext->GetFrontends();
 
-    for (auto * fe : qAsConst(frontends))
+    for (auto * fe : std::as_const(frontends))
     {
         DTC::Frontend *pFrontend = pList->AddNewFrontend();
         pFrontend->setName(fe->m_name);
@@ -1137,7 +1137,7 @@ bool Myth::ManageUrlProtection( const QString &sServices,
     }
     else
     {
-        for (const QString& service : serviceList)
+        for (const QString& service : std::as_const(serviceList))
         {
             if (KnownServices.contains(service))
                 protectedURLs << '/' + service;

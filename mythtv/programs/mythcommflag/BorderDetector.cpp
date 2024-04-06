@@ -40,13 +40,16 @@ BorderDetector::MythPlayerInited([[maybe_unused]] const MythPlayer *player)
 void
 BorderDetector::setLogoState(TemplateFinder *finder)
 {
-    if ((m_logoFinder = finder) && (m_logo = m_logoFinder->getTemplate(
-                    &m_logoRow, &m_logoCol, &m_logoWidth, &m_logoHeight)))
-    {
-        LOG(VB_COMMFLAG, LOG_INFO,
-            QString("BorderDetector::setLogoState: %1x%2@(%3,%4)")
-                .arg(m_logoWidth).arg(m_logoHeight).arg(m_logoCol).arg(m_logoRow));
-    }
+    m_logoFinder = finder;
+    if (m_logoFinder == nullptr)
+        return;
+    m_logo = m_logoFinder->getTemplate(&m_logoRow, &m_logoCol,
+                                       &m_logoWidth, &m_logoHeight);
+    if (m_logo == nullptr)
+        return;
+    LOG(VB_COMMFLAG, LOG_INFO,
+        QString("BorderDetector::setLogoState: %1x%2@(%3,%4)")
+        .arg(m_logoWidth).arg(m_logoHeight).arg(m_logoCol).arg(m_logoRow));
 }
 
 int

@@ -410,7 +410,7 @@ class HLSStream
         if (!copy)
             return;
         // copy all the segments across
-        for (auto *old : qAsConst(m_segments))
+        for (auto *old : std::as_const(m_segments))
         {
             auto *segment = new HLSSegment(*old);
             AppendSegment(segment);
@@ -419,7 +419,7 @@ class HLSStream
 
     ~HLSStream()
     {
-        for (const auto & segment : qAsConst(m_segments))
+        for (const auto & segment : std::as_const(m_segments))
             delete segment;
     }
 
@@ -766,7 +766,7 @@ class HLSStream
     void Cancel(void)
     {
         QMutexLocker lock(&m_lock);
-        for (const auto & segment : qAsConst(m_segments))
+        for (const auto & segment : std::as_const(m_segments))
         {
             if (segment)
             {
@@ -825,7 +825,11 @@ class HLSStream
             // not even size, pad with front 0
             line.insert(2, QLatin1String("0"));
         }
-        int padding = std::max(0, AES_BLOCK_SIZE - (static_cast<int>(line.size()) - 2));
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        int padding = std::max(0, AES_BLOCK_SIZE - (line.size() - 2));
+#else
+        int padding = std::max(0LL, AES_BLOCK_SIZE - (line.size() - 2));
+#endif
         QByteArray ba = QByteArray(padding, 0x0);
         ba.append(QByteArray::fromHex(QByteArray(line.toLatin1().constData() + 2)));
         std::copy(ba.cbegin(), ba.cend(), m_aesIv.begin());
@@ -1747,7 +1751,7 @@ QString HLSRingBuffer::ParseAttributes(const QString &line, const char *attr)
         return {};
 
     QStringList list = line.mid(p+1).split(',');
-    for (const auto& it : qAsConst(list))
+    for (const auto& it : std::as_const(list))
     {
         QString arg = it.trimmed();
         if (arg.startsWith(attr))

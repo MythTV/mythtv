@@ -216,7 +216,7 @@ QList<ThemeInfo> MythUIThemeHelper::GetThemes(ThemeType Type)
     fileList.append(themeDirs.entryInfoList());
 
     QList<ThemeInfo> themeList;
-    for (const auto & theme : qAsConst(fileList))
+    for (const auto & theme : std::as_const(fileList))
     {
         if (theme.baseName() == "default" || theme.baseName() == "default-wide" ||
             theme.baseName() == "Slave")
@@ -248,7 +248,7 @@ bool MythUIThemeHelper::FindThemeFile(QString& Path)
     bool foundit = false;
     const QStringList searchpath = GetThemeSearchPath();
 
-    for (const auto & ii : qAsConst(searchpath))
+    for (const auto & ii : std::as_const(searchpath))
     {
         if (fi.isRelative())
             file = ii + fi.filePath();

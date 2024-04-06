@@ -541,13 +541,8 @@ ExternalStreamHandler::ExternalStreamHandler(const QString & path,
 {
     setObjectName("ExternSH");
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    m_args = path.split(' ',QString::SkipEmptyParts) +
-             logPropagateArgs.split(' ', QString::SkipEmptyParts);
-#else
     m_args = path.split(' ',Qt::SkipEmptyParts) +
              logPropagateArgs.split(' ', Qt::SkipEmptyParts);
-#endif
     m_app = m_args.first();
     m_args.removeFirst();
 
@@ -701,10 +696,13 @@ void ExternalStreamHandler::run(void)
                 }
             }
 
-            if (m_io && (sz = PACKET_SIZE - remainder) > 0)
-                read_len = m_io->Read(buffer, sz, 100ms);
-            else
-                read_len = 0;
+            read_len = 0;
+            if (m_io != nullptr)
+            {
+                sz = PACKET_SIZE - remainder;
+                if (sz > 0)
+                    read_len = m_io->Read(buffer, sz, 100ms);
+            }
         }
         else
             read_len = 0;
@@ -864,12 +862,7 @@ bool ExternalStreamHandler::SetAPIVersion(void)
 
     if (ProcessCommand("APIVersion?", result, 10s))
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList tokens = result.split(':', QString::SkipEmptyParts);
-#else
         QStringList tokens = result.split(':', Qt::SkipEmptyParts);
-#endif
-
         if (tokens.size() > 1)
             m_apiVersion = tokens[1].toUInt();
         m_apiVersion = std::min(m_apiVersion, static_cast<int>(MAX_API_VERSION));
@@ -1042,11 +1035,11 @@ void ExternalStreamHandler::CloseApp(void)
 
             QString full_command = QString("%1").arg(m_args.join(" "));
 
-            if (!m_io->KillIfRunning(full_command))
+            if (!ExternIO::KillIfRunning(full_command))
             {
                 // Give it one more chance.
                 std::this_thread::sleep_for(50ms);
-                if (!m_io->KillIfRunning(full_command))
+                if (!ExternIO::KillIfRunning(full_command))
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("Unable to kill existing '%1'.")
@@ -1405,11 +1398,7 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
             if (!result.isEmpty())
             {
                 raw = result;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                tokens = result.split(':', QString::SkipEmptyParts);
-#else
                 tokens = result.split(':', Qt::SkipEmptyParts);
-#endif
 
                 // Look for result with the serial number of this query
                 if (tokens.size() > 1 && tokens[0].toUInt() >= m_serialNo)
@@ -1524,12 +1513,7 @@ bool ExternalStreamHandler::CheckForError(void)
         {
             if (m_apiVersion > 1)
             {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                QStringList tokens = result.split(':', QString::SkipEmptyParts);
-#else
                 QStringList tokens = result.split(':', Qt::SkipEmptyParts);
-#endif
-
                 tokens.removeFirst();
                 result = tokens.join(':');
                 for (int idx = 1; idx < tokens.size(); ++idx)

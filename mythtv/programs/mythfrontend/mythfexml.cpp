@@ -180,7 +180,7 @@ void MythFEXML::GetActionListTest(HTTPRequest *pRequest)
     {
         contexts.next();
         QStringList actions = contexts.value();
-        for (const QString & action : qAsConst(actions))
+        for (const QString & action : std::as_const(actions))
         {
             QStringList split = action.split(",");
             if (split.size() == 2)

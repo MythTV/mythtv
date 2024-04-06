@@ -56,10 +56,23 @@ class MPUBLIC MythContext
 
     void SetDisableEventPopup(bool check);
 
+    enum WebOnlyStartup {
+        kWebOnlyNone = 0,
+        kWebOnlyDBSetup = 1,
+        kWebOnlyDBTimezone = 2,
+        kWebOnlyWebOnlyParm = 3,
+        kWebOnlyIPAddress = 4,
+        kWebOnlySchemaUpdate = 5
+    };
+
+    void setWebOnly(WebOnlyStartup w) {m_webOnly = w;}
+    WebOnlyStartup getWebOnly(void) {return m_webOnly;}
+
   private:
     Q_DISABLE_COPY(MythContext)
     MythContextPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
     QString             m_appBinaryVersion;
+    WebOnlyStartup      m_webOnly {kWebOnlyNone};
 };
 
 /// This global variable contains the MythContext instance for the application

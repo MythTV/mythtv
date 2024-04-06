@@ -37,7 +37,7 @@ class MUI_PUBLIC MythDisplayDRM : public MythDisplay
 
   private:
     MythDRMPtr m_device;
-    QMap<uint64_t, int> m_modeMap { };
+    QMap<uint64_t, int> m_modeMap;
 };
 
 #endif

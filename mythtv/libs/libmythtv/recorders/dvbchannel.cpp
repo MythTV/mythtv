@@ -1589,7 +1589,9 @@ bool DVBChannel::WaitForBackend(std::chrono::milliseconds timeout_ms)
     const int fd  = m_fdFrontend;
     auto seconds = duration_cast<std::chrono::seconds>(timeout_ms);
     auto usecs = duration_cast<std::chrono::microseconds>(timeout_ms) - seconds;
-    struct timeval select_timeout = { seconds.count(), usecs.count()};
+    struct timeval select_timeout = {
+         static_cast<typeof(select_timeout.tv_sec)>(seconds.count()),
+         static_cast<typeof(select_timeout.tv_usec)>(usecs.count())};
     fd_set fd_select_set;
     FD_ZERO(    &fd_select_set); // NOLINT(readability-isolate-declaration)
     FD_SET (fd, &fd_select_set);

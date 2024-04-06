@@ -19,7 +19,7 @@ MythOpenGLPerf::MythOpenGLPerf(QString Name,
     while (m_timerData.size() < m_timerNames.size())
         m_timerData.append(0);
 
-    setSampleCount(static_cast<int>(m_timerNames.size()) + 1);
+    setSampleCount(m_timerNames.size() + 1);
     if (!create())
     {
         LOG(VB_GENERAL, LOG_WARNING, m_name + "Failed to initialise OpenGL timers");

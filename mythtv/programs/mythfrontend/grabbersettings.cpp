@@ -75,7 +75,7 @@ void GrabberSettings::Load(void)
 
 void GrabberSettings::Init(void)
 {
-    for (const auto & grabber : qAsConst(m_movieGrabberList))
+    for (const auto & grabber : std::as_const(m_movieGrabberList))
     {
         InfoMap map;
         grabber.toMap(map);
@@ -87,7 +87,7 @@ void GrabberSettings::Init(void)
 
     m_movieGrabberList.clear();
 
-    for (const auto & grabber: qAsConst(m_tvGrabberList))
+    for (const auto & grabber: std::as_const(m_tvGrabberList))
     {
         InfoMap map;
         grabber.toMap(map);
@@ -99,7 +99,7 @@ void GrabberSettings::Init(void)
 
     m_tvGrabberList.clear();
 
-    for (const auto & grabber : qAsConst(m_gameGrabberList))
+    for (const auto & grabber : std::as_const(m_gameGrabberList))
     {
         InfoMap map;
         grabber.toMap(map);

@@ -5,89 +5,72 @@ Scraper for http://www.genius.com
 taxigps
 """
 import sys
-from urllib.request import urlopen, Request
-from urllib.parse import quote
-from html import parser as html_parser
-try:
-    # may be necessary for python 3.10
-    import html
-except:
-    pass
-import socket
 import re
-from hashlib import md5
+import urllib.parse
+import requests
+import html
 import difflib
+import json
+
 from optparse import OptionParser
 from common import utilities
 
-import json as simplejson
-
-__author__      = "Paul Harrison and ronie'"
+__author__      = "Paul Harrison and ronie"
 __title__       = "Genius"
 __description__ = "Search http://www.genius.com for lyrics"
-__priority__    = "160"
+__priority__    = "200"
 __version__     = "0.1"
 __syncronized__ = False
 
 
 debug = False
 
-socket.setdefaulttimeout(10)
-
 class LyricsFetcher:
     def __init__( self ):
-        self.url = 'http://api.genius.com/search?q=%s%s%s&access_token=7pTrhwtmyQmccHoJX8HjXpYmyAdkbe19x5sjvwkf1UEIQTrPeXEm6LgylJi9GiPO'
+        self.url = 'http://api.genius.com/search?q=%s%%20%s&access_token=Rq_cyNZ6fUOQr4vhyES6vu1iw3e94RX85ju7S8-0jhM-gftzEvQPG7LJrrnTji11'
 
     def get_lyrics(self, lyrics):
         utilities.log(debug, "%s: searching lyrics for %s - %s - %s" % (__title__, lyrics.artist, lyrics.album, lyrics.title))
 
         try:
-            request = Request(self.url % (quote(lyrics.artist), '%20', quote(lyrics.title)))
-            request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; rv:77.0) Gecko/20100101 Firefox/77.0')
-            req = urlopen(request)
-            response = req.read().decode('utf-8')
+            headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; rv:77.0) Gecko/20100101 Firefox/77.0'}
+            url = self.url % (urllib.parse.quote(lyrics.artist), urllib.parse.quote(lyrics.title))
+            req = requests.get(url, headers=headers, timeout=10)
+            response = req.text
         except:
             return False
-
-        req.close()
-        data = simplejson.loads(response)
-
+        data = json.loads(response)
         try:
             name = data['response']['hits'][0]['result']['primary_artist']['name']
             track = data['response']['hits'][0]['result']['title']
             if (difflib.SequenceMatcher(None, lyrics.artist.lower(), name.lower()).ratio() > 0.8) and (difflib.SequenceMatcher(None, lyrics.title.lower(), track.lower()).ratio() > 0.8):
                 self.page = data['response']['hits'][0]['result']['url']
             else:
-                return None
+                return False
         except:
             return False
-
-        utilities.log(debug, "%s: search url: %s" % (__title__, self.page))
-
+        utilities.log(debug, '%s: search url: %s' % (__title__, self.page))
         try:
-            request = Request(self.page)
-            request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; rv:77.0) Gecko/20100101 Firefox/77.0')
-            req = urlopen(request)
-            response = req.read()
+            headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; rv:77.0) Gecko/20100101 Firefox/77.0'}
+            req = requests.get(self.page, headers=headers, timeout=10)
+            response = req.text
         except:
             return False
-
-        req.close()
+        response = html.unescape(response)
+        matchcode = re.findall('class="Lyrics__Container.*?">(.*?)</div><div', response, flags=re.DOTALL)
         try:
-            htmlparser = html_parser.HTMLParser()
-            response = htmlparser.unescape(response.decode('utf-8'))
-        except:
-            # may be necessary for python 3.10
-            response = html.unescape(response.decode('utf-8'))
-        matchcode = re.search(u'<div class="[lL]yrics.*?">(.*?)</div>', response, flags=re.DOTALL)
-        try:
-            lyricscode = (matchcode.group(1))
-            lyr = re.sub('<[^<]+?>', '', lyricscode)
-            lyrics.lyrics = lyr.replace('\\n','\n').strip()
+            lyricscode = ""
+            for matchCodeItem in matchcode:
+                lyricscode = lyricscode + matchCodeItem
+            lyr1 = re.sub('<br/>', '\n', lyricscode)
+            lyr2 = re.sub('<[^<]+?>', '', lyr1)
+            lyr3 = lyr2.replace('\\n','\n').strip()
+            if not lyr3 or lyr3 == '[Instrumental]' or lyr3.startswith('Lyrics for this song have yet to be released'):
+                return False
+            lyrics.lyrics = lyr3
             return True
         except:
             return False
-
 
 def performSelfTest():
     found = False
@@ -131,7 +114,7 @@ def buildVersion():
     version = etree.XML(u'<grabber></grabber>')
     etree.SubElement(version, "name").text = __title__
     etree.SubElement(version, "author").text = __author__
-    etree.SubElement(version, "command").text = 'minilyrics.py'
+    etree.SubElement(version, "command").text = 'genius.py'
     etree.SubElement(version, "type").text = 'lyrics'
     etree.SubElement(version, "description").text = __description__
     etree.SubElement(version, "version").text = __version__
@@ -198,4 +181,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

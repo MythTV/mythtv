@@ -56,12 +56,7 @@ MythHTTPSocket::MythHTTPSocket(qintptr Socket, bool SSL, MythHTTPConfig Config)
     connect(m_socket, &QTcpSocket::bytesWritten, this, &MythHTTPSocket::Write);
     connect(m_socket, &QTcpSocket::disconnected, this, &MythHTTPSocket::Disconnected);
     connect(m_socket, &QTcpSocket::disconnected, QThread::currentThread(), &QThread::quit);
-#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-    connect(m_socket, qOverload<QAbstractSocket::SocketError>(&QTcpSocket::error),
-                                                 this, &MythHTTPSocket::Error);
-#else
     connect(m_socket, &QTcpSocket::errorOccurred, this, &MythHTTPSocket::Error);
-#endif
     m_socket->setSocketDescriptor(m_socketFD);
 
 #ifndef QT_NO_OPENSSL
@@ -323,7 +318,7 @@ void MythHTTPSocket::Read()
     // then simple file path handlers
     if (response == nullptr)
     {
-        for (const auto & path : qAsConst(m_config.m_filePaths))
+        for (const auto & path : std::as_const(m_config.m_filePaths))
         {
             if (path == rpath)
             {
@@ -380,7 +375,7 @@ void MythHTTPSocket::Respond(const HTTPResponse& Response)
     Response->Finalise(m_config);
 
     // Queue headers
-    for (const auto & header : qAsConst(Response->m_responseHeaders))
+    for (const auto & header : std::as_const(Response->m_responseHeaders))
     {
         LOG(VB_HTTP, LOG_DEBUG, header->trimmed().constData());
         m_queue.emplace_back(header);
@@ -395,7 +390,7 @@ void MythHTTPSocket::Respond(const HTTPResponse& Response)
     // Sum the expected number of bytes to be written. This is the size of the
     // data or file OR the total size of the range request. For multipart range
     // requests, add the total size of the additional headers.
-    for (const auto & content : qAsConst(m_queue))
+    for (const auto & content : std::as_const(m_queue))
     {
         if (const auto * data = std::get_if<HTTPData>(&content))
         {
@@ -428,7 +423,7 @@ void MythHTTPSocket::RespondDirect(qintptr Socket, const HTTPResponse& Response,
     Response->Finalise(Config);
     auto * socket = new QTcpSocket();
     socket->setSocketDescriptor(Socket);
-    for (const auto & header : qAsConst(Response->m_responseHeaders))
+    for (const auto & header : std::as_const(Response->m_responseHeaders))
         socket->write(*header);
     socket->flush();
     socket->disconnectFromHost();

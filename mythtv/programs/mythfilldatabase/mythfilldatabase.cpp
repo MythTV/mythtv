@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
     QStringList sl = cmdline.toStringList("refresh");
     if (!sl.isEmpty())
     {
-        for (const auto & item : qAsConst(sl))
+        for (const auto & item : std::as_const(sl))
         {
             QString warn = QString("Invalid entry in --refresh list: %1")
                                 .arg(item);

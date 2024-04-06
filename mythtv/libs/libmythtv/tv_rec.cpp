@@ -483,10 +483,10 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
 
     bool cancelNext = false;
     PendingInfo pendinfo;
-    PendingMap::iterator it;
 
     m_pendingRecLock.lock();
-    if ((it = m_pendingRecordings.find(m_inputId)) != m_pendingRecordings.end())
+    PendingMap::iterator it = m_pendingRecordings.find(m_inputId);
+    if (it != m_pendingRecordings.end())
     {
         (*it).m_ask = (*it).m_doNotAsk = false;
         cancelNext  = (*it).m_canceled;
@@ -684,7 +684,7 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
         LOG(VB_GENERAL, LOG_INFO, LOC + msg);
     }
 
-    for (const auto & pend : qAsConst(m_pendingRecordings))
+    for (const auto & pend : std::as_const(m_pendingRecordings))
         delete pend.m_info;
     m_pendingRecordings.clear();
 
@@ -1263,6 +1263,7 @@ V4LChannel *TVRec::GetV4LChannel(void)
 #endif // USING_V4L2
 }
 
+// Check if EIT is enabled for the video source connected to this input
 static bool get_use_eit(uint inputid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1270,7 +1271,7 @@ static bool get_use_eit(uint inputid)
         "SELECT SUM(useeit) "
         "FROM videosource, capturecard "
         "WHERE videosource.sourceid = capturecard.sourceid AND"
-        "      capturecard.cardid     = :INPUTID");
+        "      capturecard.cardid   = :INPUTID");
     query.bindValue(":INPUTID", inputid);
 
     if (!query.exec() || !query.isActive())
@@ -1508,7 +1509,7 @@ void TVRec::run(void)
             else if (!get_use_eit(GetInputId()))
             {
                 LOG(VB_EIT, LOG_INFO, LOC +
-                    QString("EIT scanning disabled for all inputs connected to video source %1")
+                    QString("EIT scanning disabled for video source %1")
                         .arg(GetSourceID()));
                 m_eitScanStartTime = MythDate::current().addYears(10);
             }
@@ -3175,7 +3176,7 @@ void TVRec::SetChannel(const QString& name, uint requestType)
 bool TVRec::QueueEITChannelChange(const QString &name)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC +
-        QString("QueueEITChannelChange(%1) -- begin").arg(name));
+        QString("QueueEITChannelChange(%1)").arg(name));
 
     bool ok = false;
     if (m_setChannelLock.tryLock())
@@ -3192,9 +3193,9 @@ bool TVRec::QueueEITChannelChange(const QString &name)
         m_setChannelLock.unlock();
     }
 
-    LOG(VB_CHANNEL, LOG_INFO, LOC +
-        QString("QueueEITChannelChange(%1) -- end --> %2")
-            .arg(name).arg(ok ? "done" : "failed"));
+    LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+         QString("QueueEITChannelChange(%1) %2")
+            .arg(name, ok ? "done" : "failed"));
 
     return ok;
 }
@@ -3588,8 +3589,12 @@ void TVRec::HandleTuning(void)
     }
 
     MPEGStreamData *streamData = nullptr;
-    if (HasFlags(kFlagWaitingForSignal) && !(streamData = TuningSignalCheck()))
-        return;
+    if (HasFlags(kFlagWaitingForSignal))
+    {
+        streamData = TuningSignalCheck();
+        if (streamData == nullptr)
+            return;
+    }
 
     if (HasFlags(kFlagNeedToStartRecorder))
     {
@@ -3699,7 +3704,8 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
  */
 void TVRec::TuningFrequency(const TuningRequest &request)
 {
-    LOG(VB_GENERAL, LOG_INFO, LOC + "TuningFrequency");
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("TuningFrequency(%1)")
+        .arg(request.toString()));
 
     DTVChannel *dtvchan = GetDTVChannel();
     if (dtvchan)
@@ -3784,7 +3790,6 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Failed to set channel to %1.").arg(channum));
     }
-
 
     bool mpts_only = GetDTVChannel() &&
                      GetDTVChannel()->GetFormat().compare("MPTS") == 0;
@@ -4098,8 +4103,8 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
             else
             {
                 LOG(VB_EIT, LOG_INFO, LOC +
-                    "EIT scanning disabled for all sources on this input.");
-            }
+                    QString("EIT scanning disabled for video source %1")
+                        .arg(GetSourceID()));            }
         }
     }
 
@@ -4880,6 +4885,8 @@ TVRec* TVRec::GetTVRec(uint inputid)
 
 void TVRec::EnableActiveScan(bool enable)
 {
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("enable:%1").arg(enable));
+
     if (m_scanner != nullptr)
     {
         if (enable)
@@ -4906,8 +4913,10 @@ void TVRec::EnableActiveScan(bool enable)
 QString TuningRequest::toString(void) const
 {
     return QString("Program(%1) channel(%2) input(%3) flags(%4)")
-        .arg((m_program == nullptr) ? QString("NULL") : m_program->toString(),
-             m_channel, m_input, TVRec::FlagToString(m_flags));
+        .arg(m_program == nullptr ? "NULL" : m_program->toString(),
+             m_channel.isEmpty() ? "<empty>" : m_channel,
+             m_input.isEmpty() ? "<empty>" : m_input,
+             TVRec::FlagToString(m_flags));
 }
 
 #ifdef USING_DVB

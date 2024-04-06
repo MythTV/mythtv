@@ -41,8 +41,6 @@ Further Example:
 """
 from __future__ import print_function
 
-from future import standard_library
-standard_library.install_aliases()
 from builtins import object
 from email.generator import _make_boundary
 import mimetypes

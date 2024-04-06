@@ -167,7 +167,7 @@ class MTV_PUBLIC MythVideoFrame
     QRect          m_srcRect;
     QRect          m_dstRect;
 
-    static inline int BitsPerPixel(VideoFrameType Type)
+    static int BitsPerPixel(VideoFrameType Type)
     {
         switch (Type)
         {
@@ -211,7 +211,7 @@ class MTV_PUBLIC MythVideoFrame
         return 8;
     }
 
-    static inline uint GetNumPlanes(VideoFrameType Type)
+    static uint GetNumPlanes(VideoFrameType Type)
     {
         switch (Type)
         {
@@ -255,7 +255,7 @@ class MTV_PUBLIC MythVideoFrame
         return 0;
     }
 
-    static inline int GetHeightForPlane(VideoFrameType Type, int Height, uint Plane)
+    static int GetHeightForPlane(VideoFrameType Type, int Height, uint Plane)
     {
         switch (Type)
         {
@@ -301,7 +301,7 @@ class MTV_PUBLIC MythVideoFrame
         return 0;
     }
 
-    static inline int GetPitchForPlane(VideoFrameType Type, int Width, uint Plane)
+    static int GetPitchForPlane(VideoFrameType Type, int Width, uint Plane)
     {
         switch (Type)
         {
@@ -351,7 +351,7 @@ class MTV_PUBLIC MythVideoFrame
         return 0;
     }
 
-    static inline int GetWidthForPlane(VideoFrameType Type, int Width, uint Plane)
+    static int GetWidthForPlane(VideoFrameType Type, int Width, uint Plane)
     {
         switch (Type)
         {
@@ -396,7 +396,7 @@ class MTV_PUBLIC MythVideoFrame
         return 0;
     }
 
-    static inline int ColorDepth(int Format)
+    static int ColorDepth(int Format)
     {
         switch (Format)
         {
@@ -422,7 +422,7 @@ class MTV_PUBLIC MythVideoFrame
         return 8;
     }
 
-    static inline bool HardwareFormat(VideoFrameType Type)
+    static bool HardwareFormat(VideoFrameType Type)
     {
         return (Type == FMT_VDPAU) || (Type == FMT_VAAPI) ||
                (Type == FMT_DXVA2) || (Type == FMT_MMAL) ||
@@ -430,46 +430,46 @@ class MTV_PUBLIC MythVideoFrame
                (Type == FMT_NVDEC) || (Type == FMT_DRMPRIME);
     }
 
-    static inline bool HardwareFramesFormat(VideoFrameType Type)
+    static bool HardwareFramesFormat(VideoFrameType Type)
     {
         return (Type == FMT_VDPAU) || (Type == FMT_VAAPI) || (Type == FMT_NVDEC);
     }
 
-    static inline bool FormatIs420(VideoFrameType Type)
+    static bool FormatIs420(VideoFrameType Type)
     {
         return (Type == FMT_YV12) || (Type == FMT_YUV420P9) || (Type == FMT_YUV420P10) ||
                (Type == FMT_YUV420P12) || (Type == FMT_YUV420P14) || (Type == FMT_YUV420P16);
     }
 
-    static inline bool FormatIs422(VideoFrameType Type)
+    static bool FormatIs422(VideoFrameType Type)
     {
         return (Type == FMT_YUV422P)   || (Type == FMT_YUV422P9) || (Type == FMT_YUV422P10) ||
                (Type == FMT_YUV422P12) || (Type == FMT_YUV422P14) || (Type == FMT_YUV422P16);
     }
 
-    static inline bool FormatIs444(VideoFrameType Type)
+    static bool FormatIs444(VideoFrameType Type)
     {
         return (Type == FMT_YUV444P)   || (Type == FMT_YUV444P9) || (Type == FMT_YUV444P10) ||
                (Type == FMT_YUV444P12) || (Type == FMT_YUV444P14) || (Type == FMT_YUV444P16);
     }
 
-    static inline bool FormatIsNV12(VideoFrameType Type)
+    static bool FormatIsNV12(VideoFrameType Type)
     {
         return (Type == FMT_NV12) || (Type == FMT_P010) || (Type == FMT_P016);
     }
 
-    static inline bool PackedFormat(VideoFrameType Type)
+    static bool PackedFormat(VideoFrameType Type)
     {
         return Type == FMT_YUY2;
     }
 
-    static inline bool YUVFormat(VideoFrameType Type)
+    static bool YUVFormat(VideoFrameType Type)
     {
         return FormatIs420(Type)  || FormatIs422(Type) || FormatIs444(Type) ||
                FormatIsNV12(Type) || PackedFormat(Type);
     }
 
-    static inline bool FormatIsRGB(VideoFrameType Type)
+    static bool FormatIsRGB(VideoFrameType Type)
     {
         return (FMT_RGB24  == Type) || (FMT_BGRA   == Type) || (FMT_RGB32 == Type) ||
                (FMT_ARGB32 == Type) || (FMT_RGBA32 == Type);

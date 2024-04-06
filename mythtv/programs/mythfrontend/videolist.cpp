@@ -236,11 +236,7 @@ static meta_dir_node *AddMetadataToDir(VideoMetadata *metadata,
         insert_chunk = metadata->GetFilename().mid(dir->getFQPath().length());
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList path = insert_chunk.split("/", QString::SkipEmptyParts);
-#else
     QStringList path = insert_chunk.split("/", Qt::SkipEmptyParts);
-#endif
     if (path.size() > 1)
     {
         path.pop_back();
@@ -250,7 +246,7 @@ static meta_dir_node *AddMetadataToDir(VideoMetadata *metadata,
         path.clear();
     }
 
-    for (const auto & part : qAsConst(path))
+    for (const auto & part : std::as_const(path))
     {
         smart_dir_node sdn = start->addSubDir(part, "" , host, prefix);
         start = sdn.get();

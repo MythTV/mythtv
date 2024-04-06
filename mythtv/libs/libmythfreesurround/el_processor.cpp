@@ -183,12 +183,12 @@ public:
 
 private:
     // polar <-> cartesian coodinates conversion
-    static inline cfloat polar(float a, float p) { return {static_cast<float>(a*std::cos(p)),static_cast<float>(a*std::sin(p))}; }
-    static inline float amplitude(FFTComplex z) { return std::hypot(z.re, z.im); }
-    static inline float phase(FFTComplex z) { return std::atan2(z.im, z.re); }
+    static cfloat polar(float a, float p) { return {a*std::cos(p), a*std::sin(p)}; }
+    static float amplitude(FFTComplex z) { return std::hypot(z.re, z.im); }
+    static float phase(FFTComplex z) { return std::atan2(z.im, z.re); }
 
     /// Clamp the input to the interval [-1, 1], i.e. clamp the magnitude to the unit interval [0, 1]
-    static inline float clamp_unit_mag(float x) { return std::clamp(x, -1.0F, 1.0F); }
+    static float clamp_unit_mag(float x) { return std::clamp(x, -1.0F, 1.0F); }
 
     // handle the output buffering for overlapped calls of block_decode
     void add_output(InputBufs input1, InputBufs input2, float center_width, float dimension, float adaption_rate, bool /*result*/=false) {
@@ -341,7 +341,7 @@ private:
 
 #define FASTER_CALC
     // map from amplitude difference and phase difference to yfs
-    static inline double get_yfs(double ampDiff, double phaseDiff) {
+    static double get_yfs(double ampDiff, double phaseDiff) {
         double x = 1-(((1-sqr(ampDiff))*phaseDiff)/M_PI*2);
 #ifdef FASTER_CALC
         double tanX = tan(x);
@@ -354,7 +354,7 @@ private:
     }
 
     // map from amplitude difference and yfs to xfs
-    static inline double get_xfs(double ampDiff, double yfs) {
+    static double get_xfs(double ampDiff, double yfs) {
         double x=ampDiff;
         double y=yfs;
 #ifdef FASTER_CALC

@@ -626,7 +626,7 @@ QString CC608Decoder::ToASCII(const QString &cc608str, bool suppress_unknown)
 {
     QString ret = "";
 
-    for (const auto& cp : qAsConst(cc608str))
+    for (const auto& cp : std::as_const(cc608str))
     {
         int cpu = cp.unicode();
         if (cpu == 0)
@@ -668,7 +668,11 @@ void CC608Decoder::BufferCC(size_t mode, int len, int clr)
     {
         // calculate UTF-8 encoding length
         tmpbuf = m_ccBuf[mode].toUtf8();
-        len = std::min(static_cast<int>(tmpbuf.length()), 255);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        len = std::min(tmpbuf.length(), 255);
+#else
+        len = std::min(tmpbuf.length(), 255LL);
+#endif
     }
 
     unsigned char *bp = m_rbuf;

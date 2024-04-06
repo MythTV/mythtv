@@ -38,13 +38,16 @@ class EITCache
     event_map_t * LoadChannel(uint chanid);
     bool WriteChannelToDB(QStringList &value_clauses, uint chanid);
 
-    // event key cache
+    // Event key cache
     key_map_t      m_channelMap;
 
     mutable QMutex m_eventMapLock;
     uint           m_lastPruneTime;
 
-    // statistics
+    // Cache persistency in database table eit_cache
+    bool           m_persistent         {true};
+
+    // Statistics
     uint           m_accessCnt          {0};
     uint           m_hitCnt             {0};
     uint           m_tblChgCnt          {0};
@@ -60,6 +63,7 @@ class EITCache
 
   public:
     static MTV_PUBLIC void ClearChannelLocks(void);
+    void SetPersistent(bool persistent) { m_persistent = persistent; }
 };
 
 #endif // EIT_CACHE_H

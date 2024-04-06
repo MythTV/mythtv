@@ -14,6 +14,7 @@ export interface EnvInfo {
     SchedulingEnabled: boolean;
     IsDatabaseIgnored: boolean;
     DBTimezoneSupport: boolean;
+    WebOnlyStartup:  string;
 }
 
 export interface LogInfo {

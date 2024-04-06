@@ -8,7 +8,7 @@
 
 #include <QString>
 #if CONFIG_QTDBUS
-#include <QtDBus>
+#include <QDBusObjectPath>
 #endif
 
 #include "mythmediamonitor.h"

@@ -275,7 +275,7 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     }
 
     auto values = m_mapHeaders.values("origin");
-    for (const auto & value : values)
+    for (const auto & value : std::as_const(values))
         AddCORSHeaders(value);
 
     if (qEnvironmentVariableIsSet("HTTPREQUEST_DEBUG"))
@@ -622,8 +622,8 @@ qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes
     while ((sent < llBytes) && !pDevice->atEnd())
     {
         llBytesToRead  = std::min( (qint64)SENDFILE_BUFFER_SIZE, llBytesRemaining );
-
-        if (( llBytesRead = pDevice->read( aBuffer.data(), llBytesToRead )) != -1 )
+        llBytesRead = pDevice->read( aBuffer.data(), llBytesToRead );
+        if ( llBytesRead != -1 )
         {
             if ( WriteBlock( aBuffer.data(), llBytesRead ) == -1)
                 return -1;
@@ -732,13 +732,13 @@ void HTTPRequest::FormatActionResponse(const NameValues &args)
     else
         stream << "<" << m_sMethod << "Response>\r\n";
 
-    for (const auto & arg : qAsConst(args))
+    for (const auto & arg : std::as_const(args))
     {
         stream << "<" << arg.m_sName;
 
         if (arg.m_pAttributes)
         {
-            for (const auto & attr : qAsConst(*arg.m_pAttributes))
+            for (const auto & attr : std::as_const(*arg.m_pAttributes))
             {
                 stream << " " << attr.m_sName << "='"
                        << Encode( attr.m_sValue ) << "'";
@@ -1075,13 +1075,8 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
 
     if (!sParams.isEmpty())
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList params = sParams.split('&', QString::SkipEmptyParts);
-#else
         QStringList params = sParams.split('&', Qt::SkipEmptyParts);
-#endif
-
-        for (const auto & param : qAsConst(params))
+        for (const auto & param : std::as_const(params))
         {
             QString sName  = param.section( '=', 0, 0 );
             QString sValue = param.section( '=', 1 );
@@ -1388,11 +1383,7 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
 {
     m_sRawRequest = sLine;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList tokens = sLine.split(m_procReqLineExp, QString::SkipEmptyParts);
-#else
     QStringList tokens = sLine.split(m_procReqLineExp, Qt::SkipEmptyParts);
-#endif
     int         nCount = tokens.count();
 
     // ----------------------------------------------------------------------
@@ -1483,12 +1474,7 @@ bool HTTPRequest::ParseRange( QString sRange,
     // Split multiple ranges
     // ----------------------------------------------------------------------
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList ranges = sRange.split(',', QString::SkipEmptyParts);
-#else
     QStringList ranges = sRange.split(',', Qt::SkipEmptyParts);
-#endif
-
     if (ranges.count() == 0)
         return false;
 
@@ -1567,12 +1553,7 @@ void HTTPRequest::ExtractMethodFromURL()
     static const QRegularExpression re {"^http[s]?://.*?/"};
     m_sBaseUrl.replace(re, "/");
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList sList = m_sBaseUrl.split('/', QString::SkipEmptyParts);
-#else
     QStringList sList = m_sBaseUrl.split('/', Qt::SkipEmptyParts);
-#endif
-
     m_sMethod = "";
 
     if (!sList.isEmpty())
@@ -2266,7 +2247,7 @@ void HTTPRequest::AddCORSHeaders( const QString &sOrigin )
         gCoreContext->GetSetting("AllowedOriginsList", QString(
             "https://chromecast.mythtv.org")).split(",");
 
-    for (const auto & origin : qAsConst(allowedOriginsList))
+    for (const auto & origin : std::as_const(allowedOriginsList))
     {
          if (origin.isEmpty())
             continue;
@@ -2286,7 +2267,7 @@ void HTTPRequest::AddCORSHeaders( const QString &sOrigin )
 
     if (VERBOSE_LEVEL_CHECK(VB_HTTP, LOG_DEBUG))
     {
-        for (const auto & origin : qAsConst(allowedOrigins))
+        for (const auto & origin : std::as_const(allowedOrigins))
             LOG(VB_HTTP, LOG_DEBUG, QString("Will allow Origin: %1").arg(origin));
     }
 

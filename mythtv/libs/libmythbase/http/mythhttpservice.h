@@ -21,7 +21,7 @@ class MBASE_PUBLIC MythHTTPService : public QObject
     Q_OBJECT
 
   public:
-    template<class T> static inline HTTPServicePtr Create() { return std::shared_ptr<MythHTTPService>(new T); }
+    template<class T> static HTTPServicePtr Create() { return std::shared_ptr<MythHTTPService>(new T); }
 
     explicit MythHTTPService(MythHTTPMetaService* MetaService);
    ~MythHTTPService() override = default;
@@ -86,7 +86,7 @@ class MBASE_PUBLIC V2HttpRedirectException
                                   !std::is_same_v<T, QVariantList>,void> \
         set##Name(T value) { m_##Name = value; }                    \
     private:                                             \
-    Type m_##Name { };
+    Type m_##Name;
 
 #define SERVICE_PROPERTY_RO_REF( type, name ) \
     private: type m_##name;              \
@@ -126,7 +126,7 @@ class MBASE_PUBLIC V2HttpRedirectException
 template< class T >
 void CopyListContents( QObject *pParent, QVariantList &dst, const QVariantList &src )
 {
-    for (const auto& vValue : qAsConst(src))
+    for (const auto& vValue : std::as_const(src))
     {
         if ( vValue.canConvert< QObject* >())
         {

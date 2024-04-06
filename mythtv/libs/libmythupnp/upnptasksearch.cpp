@@ -106,10 +106,10 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
     //
     // loop through all available interfaces
     QList<QNetworkInterface> IFs = QNetworkInterface::allInterfaces();
-    for (const auto & qni : qAsConst(IFs))
+    for (const auto & qni : std::as_const(IFs))
     {
         QList<QNetworkAddressEntry> netAddressList = qni.addressEntries();
-        for (const auto & netAddr : qAsConst(netAddressList))
+        for (const auto & netAddr : std::as_const(netAddressList))
         {
             QString ip_subnet = QString("%1/%2").arg(netAddr.ip().toString()).arg(netAddr.prefixLength());
             QPair<QHostAddress, int> subnet = QHostAddress::parseSubnet(ip_subnet);
@@ -224,7 +224,7 @@ void UPnpSearchTask::ProcessDevice(
     // Process any Embedded Devices
     // ----------------------------------------------------------------------
 
-    for (auto *device : qAsConst(pDevice->m_listDevices))
+    for (auto *device : std::as_const(pDevice->m_listDevices))
         ProcessDevice( pSocket, device);
 }
 

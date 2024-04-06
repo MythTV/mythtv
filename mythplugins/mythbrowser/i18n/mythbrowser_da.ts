@@ -81,12 +81,12 @@ Brug &apos;Tilføj bogmærke&apos; for at tilføje nye bogmærker</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="494"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="492"/>
         <source>Are you sure you want to delete the selected bookmark?</source>
         <translation>Er du sikker på at du vil slette det valgte bogmærke?</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="538"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="536"/>
         <source>Are you sure you want to delete the marked bookmarks?</source>
         <translation>Er du sikker på at du vil slette det markerede bogmærke?</translation>
     </message>
@@ -128,7 +128,7 @@ Brug &apos;Tilføj bogmærke&apos; for at tilføje nye bogmærker</translation>
     <name>MythBrowser</name>
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="139"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="351"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="349"/>
         <source>Enter URL</source>
         <translation>Indtast URL</translation>
     </message>
@@ -138,42 +138,42 @@ Brug &apos;Tilføj bogmærke&apos; for at tilføje nye bogmærker</translation>
         <translation>Indlæser...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="338"/>
         <source>Actions</source>
         <translation>Handlinger</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="354"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="352"/>
         <source>Back</source>
         <translation>Tilbage</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="355"/>
         <source>Forward</source>
         <translation>Frem</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="359"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
         <source>Zoom In</source>
         <translation>Zoom ind</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="360"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="358"/>
         <source>Zoom Out</source>
         <translation>Zoom ud</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="361"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="359"/>
         <source>New Tab</source>
         <translation>Ny tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="362"/>
         <source>Delete Tab</source>
         <translation>Luk tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="366"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
         <source>Add Bookmark</source>
         <translation>Tilføj bogmærke</translation>
     </message>

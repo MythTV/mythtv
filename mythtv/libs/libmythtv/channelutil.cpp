@@ -17,6 +17,7 @@
 #include "channelutil.h"
 #include "mpeg/dvbtables.h"
 #include "recorders/HLS/HLSReader.h"
+#include "sourceutil.h"
 
 #define LOC QString("ChanUtil: ")
 
@@ -1986,8 +1987,8 @@ bool ChannelUtil::GetChannelData(
     if (!chanid)
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("Could not find channel '%1' in DB for source '%2'.")
-                .arg(channum).arg(sourceid));
+            QString("Could not find channel '%1' in DB for source %2 '%3'.")
+                .arg(channum).arg(sourceid).arg(SourceUtil::GetSourceName(sourceid)));
         return false;
     }
 
@@ -2161,7 +2162,7 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
 
         chan.m_xmltvId = query.value(11).toString();      /* xmltvid    */
 
-        for (auto inputId : qAsConst(inputIdLists[qSourceID]))
+        for (auto inputId : std::as_const(inputIdLists[qSourceID]))
             chan.AddInputId(inputId);
 
         QStringList groupIDs = query.value(10).toString().split(",");
@@ -2270,11 +2271,12 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     {
         int a_maj = (!a_minor && isIntA) ? a_int : a_major;
         int b_maj = (!b_minor && isIntB) ? b_int : b_major;
-        int cmp = 0;
-        if ((cmp = a_maj - b_maj))
+        int cmp = a_maj - b_maj;
+        if (cmp != 0)
             return cmp < 0;
 
-        if ((cmp = a_minor - b_minor))
+        cmp = a_minor - b_minor;
+        if (cmp != 0)
             return cmp < 0;
     }
 

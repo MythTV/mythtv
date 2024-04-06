@@ -71,7 +71,7 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
     static constexpr std::chrono::milliseconds kLongTimeout  { kMythSocketLongTimeout };
 
   private:
-    inline QString LOC()
+    QString LOC()
     {
         return QString("MythSocket(%1:%2): ")
             .arg((intptr_t)(this), 0, 16).arg(GetSocketDescriptor());

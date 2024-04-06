@@ -86,7 +86,7 @@ void MusicFileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_f
 
     // Recursively traverse directory
     int newparentid = 0;
-    for (const auto& fi : qAsConst(list))
+    for (const auto& fi : std::as_const(list))
     {
         QString filename = fi.absoluteFilePath();
         if (fi.isDir())
@@ -806,7 +806,8 @@ void MusicFileScanner::ScanMusic(MusicLoadedMap &music_files)
             for (int x = 0; x < m_startDirs.count(); x++)
             {
                 name = m_startDirs[x] + query.value(0).toString();
-                if ((iter = music_files.find(name)) != music_files.end())
+                iter = music_files.find(name);
+                if (iter != music_files.end())
                     break;
             }
 
@@ -862,7 +863,8 @@ void MusicFileScanner::ScanArtwork(MusicLoadedMap &music_files)
             for (int x = 0; x < m_startDirs.count(); x++)
             {
                 name = m_startDirs[x] + query.value(0).toString();
-                if ((iter = music_files.find(name)) != music_files.end())
+                iter = music_files.find(name);
+                if (iter != music_files.end())
                     break;
             }
 

@@ -136,7 +136,7 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
                         // check that IPv6 is enabled on that interface
                         QList<QNetworkAddressEntry> addresses = card.addressEntries();
                         bool foundv6 = false;
-                        for (const auto& ae : qAsConst(addresses))
+                        for (const auto& ae : std::as_const(addresses))
                         {
                             if (ae.ip().protocol() == QAbstractSocket::IPv6Protocol)
                             {

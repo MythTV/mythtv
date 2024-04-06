@@ -285,11 +285,11 @@ void RecordingSelector::OKPressed()
     // loop though selected recordings and add them to the list
     // remove any items that have been removed from the list
     QList<ArchiveItem *> tempAList;
-    for (auto *a : qAsConst(*m_archiveList))
+    for (auto *a : std::as_const(*m_archiveList))
     {
         bool found = false;
 
-        for (auto *p : qAsConst(m_selectedList))
+        for (auto *p : std::as_const(m_selectedList))
         {
             if (a->type != "Recording" || a->filename == p->GetPlaybackURL(false, true))
             {
@@ -302,14 +302,14 @@ void RecordingSelector::OKPressed()
             tempAList.append(a);
     }
 
-    for (auto *x : qAsConst(tempAList))
+    for (auto *x : std::as_const(tempAList))
         m_archiveList->removeAll(x);
 
     // remove any items that are already in the list
     QList<ProgramInfo *> tempSList;
-    for (auto *p : qAsConst(m_selectedList))
+    for (auto *p : std::as_const(m_selectedList))
     {
-        for (const auto *a : qAsConst(*m_archiveList))
+        for (const auto *a : std::as_const(*m_archiveList))
         {
             if (a->filename == p->GetPlaybackURL(false, true))
             {
@@ -319,11 +319,11 @@ void RecordingSelector::OKPressed()
         }
     }
 
-    for (auto *x : qAsConst(tempSList))
+    for (auto *x : std::as_const(tempSList))
         m_selectedList.removeAll(x);
 
     // add all that are left
-    for (auto *p : qAsConst(m_selectedList))
+    for (auto *p : std::as_const(m_selectedList))
     {
         auto *a = new ArchiveItem;
         a->type = "Recording";
@@ -498,7 +498,7 @@ void RecordingSelector::updateSelectedList()
 
     m_selectedList.clear();
 
-    for (const auto *a : qAsConst(*m_archiveList))
+    for (const auto *a : std::as_const(*m_archiveList))
     {
         for (auto *p : *m_recordingList)
         {

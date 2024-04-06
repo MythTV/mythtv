@@ -1120,6 +1120,29 @@ V2BackendInfo* V2Myth::GetBackendInfo( void )
     pLog->setLogArgs       ( logPropagateArgs      );
     pEnv->setIsDatabaseIgnored(gCoreContext->GetDB()->IsDatabaseIgnored());
     pEnv->setDBTimezoneSupport(DBUtil::CheckTimeZoneSupport());
+    auto nWebOnly = gContext->getWebOnly();
+    QString webOnly;
+    switch (nWebOnly) {
+        case MythContext::kWebOnlyNone:
+            webOnly = "NONE";
+            break;
+        case MythContext::kWebOnlyDBSetup:
+            webOnly = "DBSETUP";
+            break;
+        case MythContext::kWebOnlyDBTimezone:
+            webOnly = "DBTIMEZONE";
+            break;
+        case MythContext::kWebOnlyWebOnlyParm:
+            webOnly = "WEBONLYPARM";
+            break;
+        case MythContext::kWebOnlyIPAddress:
+            webOnly = "IPADDRESS";
+            break;
+        case MythContext::kWebOnlySchemaUpdate:
+            webOnly = "SCHEMAUPDATE";
+            break;
+    }
+    pEnv->setWebOnlyStartup (webOnly);
 
     // ----------------------------------------------------------------------
     // Return the pointer... caller is responsible to delete it!!!
@@ -1203,7 +1226,7 @@ bool V2Myth::ManageUrlProtection( const QString &sServices,
     }
     else
     {
-        for (const QString& service : serviceList)
+        for (const QString& service : std::as_const(serviceList))
         {
             if (KnownServicesV2.contains(service))
                 protectedURLs << '/' + service;

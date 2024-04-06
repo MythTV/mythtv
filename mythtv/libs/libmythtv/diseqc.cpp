@@ -1814,18 +1814,10 @@ bool DiSEqCDevRotor::Load(void)
 
         // form of "angle1=index1:angle2=index2:..."
         QString positions = query.value(1).toString();
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList pos = positions.split(":", QString::SkipEmptyParts);
-#else
         QStringList pos = positions.split(":", Qt::SkipEmptyParts);
-#endif
-        for (const auto & kv : qAsConst(pos))
+        for (const auto & kv : std::as_const(pos))
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            const QStringList eq = kv.split("=", QString::SkipEmptyParts);
-#else
             const QStringList eq = kv.split("=", Qt::SkipEmptyParts);
-#endif
             if (eq.size() == 2)
                 m_posmap[eq[0].toFloat()] = eq[1].toUInt();
         }

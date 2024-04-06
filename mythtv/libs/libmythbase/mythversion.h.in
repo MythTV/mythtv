@@ -2,7 +2,7 @@
 #define MYTHVERSION_H_
 
 #include <qglobal.h>
-#include "mythbaseexp.h"
+#include "libmythbase/mythbaseexp.h"
 #include "mythconfig.h"
 
 #if ( QT_VERSION < QT_MIN_VERSION )

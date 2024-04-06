@@ -224,7 +224,8 @@ int AudioOutputDigitalEncoder::Encode(void *input, int len, AudioFormat format)
         AudioOutputSettings::SampleSize(MYTH_SAMPLE_FORMAT);
     if (!m_frame)
     {
-        if (!(m_frame = av_frame_alloc()))
+        m_frame = av_frame_alloc();
+        if (m_frame == nullptr)
         {
             m_inbuf = nullptr;
             m_inSize = 0;

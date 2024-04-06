@@ -117,7 +117,7 @@ class AVCParser : public H2645Parser
     double frameRate(void) const;
     void getFrameRate(FrameRate &result) const override;
 
-    inline void set_AU_pending(void)
+    void set_AU_pending(void)
         {
             if (!m_auPending)
             {

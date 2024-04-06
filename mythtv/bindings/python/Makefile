@@ -32,7 +32,7 @@ python_build:
 	$(PYTHON) -m pip wheel $(PIP_OPTIONS) --wheel-dir ./$(WHEEL_DIR) .
 
 install:
-	$(PYTHON) -m pip install $(ROOT_FLAGS) $(PREFIX_FLAGS) $(PIP_OPTIONS) --find-links ./$(WHEEL_DIR) MythTV
+	$(PYTHON) -m pip install $(ROOT_FLAGS) $(PREFIX_FLAGS) $(PIP_OPTIONS) --ignore-installed --find-links ./$(WHEEL_DIR) MythTV
 
 uninstall:
 	$(warning python pip uninstall is not supported for python bindings)

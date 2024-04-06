@@ -1351,7 +1351,7 @@ void TV::GetStatus()
             QList<std::chrono::seconds> chapters;
             m_player->GetChapterTimes(chapters);
             QVariantList var;
-            for (std::chrono::seconds chapter : qAsConst(chapters))
+            for (std::chrono::seconds chapter : std::as_const(chapters))
                 var << QVariant((long long)chapter.count());
             status.insert("chaptertimes", var);
         }
@@ -1838,7 +1838,7 @@ void TV::HandleOSDAskAllow(const QString& Action)
     }
     else if (Action == "CANCELCONFLICTING")
     {
-        for (const auto& pgm : qAsConst(m_askAllowPrograms))
+        for (const auto& pgm : std::as_const(m_askAllowPrograms))
         {
             if (pgm.m_isConflicting)
                 RemoteCancelNextRecording(pgm.m_info->GetInputID(), true);
@@ -2724,6 +2724,17 @@ void TV::PrepareToExitPlayer(int Line)
             at_end = true;
         }
 
+        // Save total frames for video file if not already present
+        if (m_playerContext.m_playingInfo->IsVideoFile())
+        {
+            auto totalFrames = m_playerContext.m_playingInfo->QueryTotalFrames();
+            if (!totalFrames)
+            {
+                totalFrames = m_playerContext.m_player->GetCurrentFrameCount();
+                m_playerContext.m_playingInfo->SaveTotalFrames(totalFrames);
+            }
+        }
+
         // Clear/Save play position without notification
         // The change must be broadcast when file is no longer in use
         // to update previews, ie. with the MarkNotInUse notification
@@ -3155,7 +3166,7 @@ QList<QKeyEvent*> TV::ConvertScreenPressKeyMap(const QString &KeyList)
     QList<QKeyEvent*> keyPressList;
     int i = 0;
     QStringList stringKeyList = KeyList.split(',');
-    for (const auto & str : qAsConst(stringKeyList))
+    for (const auto & str : std::as_const(stringKeyList))
     {
         QKeySequence keySequence(str);
         for (i = 0; i < keySequence.count(); i++)
@@ -3382,7 +3393,7 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
 
         if (!handled && !tt_actions.isEmpty())
         {
-            for (const QString& action : qAsConst(tt_actions))
+            for (const QString& action : std::as_const(tt_actions))
             {
                 emit HandleTeletextAction(action, handled);
                 if (handled)
@@ -3402,7 +3413,7 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
 
         if (!handled && !actions.isEmpty())
         {
-            for (const QString& action : qAsConst(actions))
+            for (const QString& action : std::as_const(actions))
             {
                 emit HandleITVAction(action, handled);
                 if (handled)
@@ -3491,7 +3502,7 @@ bool TV::BrowseHandleAction(const QStringList &Actions)
     else
     {
         handled = false;
-        for (const auto& action : qAsConst(Actions))
+        for (const auto& action : std::as_const(Actions))
         {
             if (action.length() == 1 && action[0].isDigit())
             {
@@ -4184,11 +4195,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
         return;
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList tokens = Command.split(" ", QString::SkipEmptyParts);
-#else
     QStringList tokens = Command.split(" ", Qt::SkipEmptyParts);
-#endif
     if (tokens.size() < 2)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Not enough tokens in network control command " + QString("'%1'").arg(Command));
@@ -6040,7 +6047,7 @@ void TV::ChangeChannel(uint Chanid, const QString &Channum)
                     Chanid = get_chanid(&m_playerContext, m_playerContext.GetCardID(), Channum);
                 tunable_on = IsTunableOn(&m_playerContext, Chanid);
             }
-            for (const auto& rec : qAsConst(tmp))
+            for (const auto& rec : std::as_const(tmp))
             {
                 if ((Chanid == 0U) || tunable_on.contains(rec.toUInt()))
                     reclist.push_back(rec);
@@ -6657,7 +6664,7 @@ bool TV::IsTunablePriv(uint ChanId)
 static QString toCommaList(const QVector<uint> &list)
 {
     QString ret = "";
-    for (uint i : qAsConst(list))
+    for (uint i : std::as_const(list))
         ret += QString("%1,").arg(i);
 
     if (!ret.isEmpty())
@@ -7230,11 +7237,7 @@ void TV::customEvent(QEvent *Event)
     QString message = me->Message();
 
     // TODO Go through these and make sure they make sense...
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList tokens = message.split(" ", QString::SkipEmptyParts);
-#else
     QStringList tokens = message.split(" ", Qt::SkipEmptyParts);
-#endif
 
     if (me->ExtraDataCount() == 1)
     {
@@ -7453,11 +7456,7 @@ void TV::customEvent(QEvent *Event)
         if ((tokens.size() >= 2) &&
             (tokens[1] != "ANSWER") && (tokens[1] != "RESPONSE"))
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList tokens2 = message.split(" ", QString::SkipEmptyParts);
-#else
             QStringList tokens2 = message.split(" ", Qt::SkipEmptyParts);
-#endif
             if ((tokens2.size() >= 2) &&
                 (tokens2[1] != "ANSWER") && (tokens2[1] != "RESPONSE"))
             {
@@ -7513,19 +7512,10 @@ void TV::customEvent(QEvent *Event)
         {
             frm_dir_map_t newMap;
             QStringList mark;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList marks =
-                tokens[2].split(",", QString::SkipEmptyParts);
-#else
             QStringList marks = tokens[2].split(",", Qt::SkipEmptyParts);
-#endif
             for (int j = 0; j < marks.size(); j++)
             {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                mark = marks[j].split(":", QString::SkipEmptyParts);
-#else
                 mark = marks[j].split(":", Qt::SkipEmptyParts);
-#endif
                 if (marks.size() >= 2)
                     newMap[mark[0].toULongLong()] = static_cast<MarkTypes>(mark[1].toInt());
             }
@@ -7934,7 +7924,8 @@ void TV::ChannelEditAutoFill(InfoMap &Info)
 void TV::ChannelEditXDSFill(InfoMap &Info)
 {
     QMap<QString,bool> modifiable;
-    if (!(modifiable["callsign"] = Info["callsign"].isEmpty()))
+    modifiable["callsign"] = Info["callsign"].isEmpty();
+    if (!modifiable["callsign"])
     {
         QString unsetsign = tr("UNKNOWN%1", "Synthesized callsign");
         int unsetcmpl = unsetsign.length() - 2;
@@ -9416,7 +9407,7 @@ bool TV::HandleJumpToProgramAction(const QStringList &Actions)
         return true;
     }
 
-    for (const auto& action : qAsConst(Actions))
+    for (const auto& action : std::as_const(Actions))
     {
         if (!action.startsWith("JUMPPROG"))
             continue;

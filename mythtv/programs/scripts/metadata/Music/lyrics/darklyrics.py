@@ -7,20 +7,26 @@ scraper by smory
 
 import hashlib
 import math
-from urllib.request import Request, urlopen
-from urllib.parse import quote
+import requests
+import urllib.parse
 import re
 import time
 import chardet
+
+try:
+    from ctypes import c_int32 # ctypes not supported on xbox
+except:
+    pass
+
 import sys
 from optparse import OptionParser
 from common import utilities
 
-__author__      = "Paul Harrison and smory'"
+__author__      = "Paul Harrison and smory"
 __title__       = "DarkLyrics"
 __description__ = "Search http://www.darklyrics.com/ - the largest metal lyrics archive on the Web"
-__priority__    = "180"
-__version__     = "0.2"
+__priority__    = "260"
+__version__     = "0.3"
 __syncronized__ = False
 
 debug = False
@@ -29,107 +35,94 @@ class LyricsFetcher:
 
     def __init__( self ):
         self.base_url = "http://www.darklyrics.com/"
-        self.searchUrl = "http://www.darklyrics.com/search?q=%term%"
+        self.searchUrl = "http://www.darklyrics.com/search?q=%s"
         self.cookie = self.getCookie()
-
     def getCookie(self):
-         # http://www.darklyrics.com/tban.js
-         lastvisitts = str(int(math.ceil(time.time() * 1000 / (60 * 60 * 6 * 1000))))
+        # http://www.darklyrics.com/tban.js
+         lastvisitts = 'Nergal' + str(math.ceil(time.time() * 1000 / (60 * 60 * 6 * 1000)))
          lastvisittscookie = 0
-         for i in range(len(lastvisitts)):
-             lastvisittscookie = ((lastvisittscookie << 5) - lastvisittscookie) + ord(lastvisitts[i])
-             lastvisittscookie = lastvisittscookie & lastvisittscookie
+         i = 0
+         while i < len(lastvisitts):
+             try:
+                 lastvisittscookie = c_int32((c_int32(lastvisittscookie<<5).value - c_int32(lastvisittscookie).value) + ord(lastvisitts[i])).value
+             except:
+                 return
+             i += 1
+         lastvisittscookie = lastvisittscookie & lastvisittscookie
          return str(lastvisittscookie)
 
     def search(self, artist, title):
-        term = quote((artist if artist else "") + " " + (title if title else ""))
-
+        term = urllib.parse.quote((artist if artist else '') + '+' + (title if title else ''))
         try:
             headers = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0'}
-            cookies={'lastvisitts': self.cookie}
-            request = Request(self.searchUrl.replace("%term%", term))
-            request.add_header('User-Agent', headers['user-agent'])
-            request.add_header("Cookie", "lastvisitts=%s"% self.cookie)
-            content = urlopen(request, timeout=10)
-            searchResponse = content.read()
+            req = requests.get(self.searchUrl % term, headers=headers, cookies={'lastvisitts': self.cookie}, timeout=10)
+            searchResponse = req.text
+
         except:
             return None
-
-        searchResult = re.findall(rb"<h2><a\shref=\"(.*?#([0-9]+))\".*?>(.*?)</a></h2>", searchResponse)
-
+        searchResult = re.findall('<h2><a\shref="(.*?#([0-9]+))".*?>(.*?)</a></h2>', searchResponse)
         if len(searchResult) == 0:
             return None
-
         links = []
-
         i = 0
         for result in searchResult:
             a = []
-            a.append(result[2] + ( b" " + self.getAlbumName(self.base_url + result[0].decode('utf-8') )if i < 6 else b"")) # title from server + album nane
-            a.append(self.base_url + result[0].decode('utf-8'))  # url with lyrics
+            a.append(result[2] + (' ' + self.getAlbumName(self.base_url + result[0]) if i < 6 else '')) # title from server + album name
+            a.append(self.base_url + result[0]) # url with lyrics
             a.append(artist)
             a.append(title)
             a.append(result[1]) # id of the side part containing this song lyrics
             links.append(a)
             i += 1
-
         return links
 
     def findLyrics(self, url, index):
         try:
-            request = urlopen(url)
-            res = request.read()
+            headers = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0'}
+            req = requests.get(url, headers=headers, cookies={'lastvisitts': self.cookie}, timeout=10)
+            res = req.text
         except:
             return None
-
-        pattern = rb"<a\sname=\"%index%\">(.*?)(?:<h3>|<div)"  # require multi line and dot all mode
-        pattern = pattern.replace(b"%index%", index)
-
+        pattern = '<a\sname="%index%">(.*?)(?:<h3>|<div)' # require multi line and dot all mode
+        pattern = pattern.replace('%index%', index)
         match = re.search(pattern, res, re.MULTILINE | re.DOTALL)
         if match:
             s = match.group(1)
-            s = s.replace(b"<br />", b"")
-            s = s.replace(b"<i>", b"")
-            s = s.replace(b"</i>", b"")
-            s = s.replace(b"</a>", b"")
-            s = s.replace(b"</h3>", b"")
+            s = s.replace('<br />', '')
+            s = s.replace('<i>', '')
+            s = s.replace('</i>', '')
+            s = s.replace('</a>', '')
+            s = s.replace('</h3>', '')
             return s
         else:
             return None
 
     def getAlbumName(self, url):
         try:
-            request = urlopen(url)
-            res = request.read()
+            headers = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0'}
+            req = requests.get(url, headers=headers, cookies={'lastvisitts': self.cookie}, timeout=10)
+            res = req.text
         except:
-            return b""
-
-        match = re.search(rb"<h2>(?:album|single|ep|live):?\s?(.*?)</h2>", res, re.IGNORECASE)
-
+            return ''
+        match = re.search('<h2>(?:album|single|ep|live):?\s?(.*?)</h2>', res, re.IGNORECASE)
         if match:
-            ret = (b"(" + match.group(1) + b")").replace(b"\"", b"")
+            return ('(' + match.group(1) + ')').replace('\'', '')
         else:
-            ret = b""
-        return(ret)
-
+            return ''
 
     def get_lyrics(self, lyrics):
         utilities.log(debug, "%s: searching lyrics for %s - %s - %s" % (__title__, lyrics.artist, lyrics.album, lyrics.title))
         links = self.search(lyrics.artist, lyrics.title)
-
         if(links == None or len(links) == 0):
             return False
         elif len(links) > 1:
             lyrics.list = links
-
         lyr = self.get_lyrics_from_list(links[0])
         if not lyr:
             return False
-
-        enc = chardet.detect(lyr)
-        lyr = lyr.decode(enc['encoding'], 'ignore')
         lyrics.lyrics = lyr
         return True
+
 
     def get_lyrics_from_list(self, link):
         title, url, artist, song, index = link
@@ -140,9 +133,9 @@ def performSelfTest():
     lyrics = utilities.Lyrics()
     lyrics.source = __title__
     lyrics.syncronized = __syncronized__
-    lyrics.artist = 'Dagon'
-    lyrics.album = 'Terraphobic'
-    lyrics.title = 'Cut To The Heart'
+    lyrics.artist = 'Neurosis'
+    lyrics.album = ''
+    lyrics.title = 'Lost'
 
     fetcher = LyricsFetcher()
     found = fetcher.get_lyrics(lyrics)

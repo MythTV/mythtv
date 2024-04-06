@@ -336,27 +336,27 @@ Remove it from the database?</source>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythgame/mythgame.cpp" line="114"/>
+        <location filename="../mythgame/mythgame.cpp" line="112"/>
         <source>Game frontend</source>
         <translation>Panel del juego</translation>
     </message>
     <message>
-        <location filename="../mythgame/mythgame.cpp" line="117"/>
+        <location filename="../mythgame/mythgame.cpp" line="115"/>
         <source>Toggle the current game as a favorite</source>
         <translation>Marcar el juego actual como favorito</translation>
     </message>
     <message>
-        <location filename="../mythgame/mythgame.cpp" line="119"/>
+        <location filename="../mythgame/mythgame.cpp" line="117"/>
         <source>Show incremental search dialog</source>
         <translation>Mostrar el diálogo de búsqueda progresiva</translation>
     </message>
     <message>
-        <location filename="../mythgame/mythgame.cpp" line="121"/>
+        <location filename="../mythgame/mythgame.cpp" line="119"/>
         <source>Incremental search find next match</source>
         <translation>Siguiente coincidencia de la búsqueda progresiva</translation>
     </message>
     <message>
-        <location filename="../mythgame/mythgame.cpp" line="123"/>
+        <location filename="../mythgame/mythgame.cpp" line="121"/>
         <source>Download metadata for current item</source>
         <translation>Descargar metadatos para el elemento actual</translation>
     </message>

@@ -125,11 +125,7 @@ class UpnpMediaServer : public MediaServerItem
 UPNPScanner* UPNPScanner::gUPNPScanner        = nullptr;
 bool         UPNPScanner::gUPNPScannerEnabled = false;
 MThread*     UPNPScanner::gUPNPScannerThread  = nullptr;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-QMutex*      UPNPScanner::gUPNPScannerLock    = new QMutex(QMutex::Recursive);
-#else
 QRecursiveMutex* UPNPScanner::gUPNPScannerLock = new QRecursiveMutex();
-#endif
 
 /**
  * \class UPNPScanner
@@ -483,13 +479,13 @@ void UPNPScanner::Stop(void)
     m_servers.clear();
 
     // cleanup the network
-    for (QNetworkReply *reply : qAsConst(m_descriptionRequests))
+    for (QNetworkReply *reply : std::as_const(m_descriptionRequests))
     {
         reply->abort();
         delete reply;
     }
     m_descriptionRequests.clear();
-    for (QNetworkReply *reply : qAsConst(m_browseRequests))
+    for (QNetworkReply *reply : std::as_const(m_browseRequests))
     {
         reply->abort();
         delete reply;

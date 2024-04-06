@@ -9,9 +9,7 @@
 #include <QObject>
 #include <QEvent>
 #include <QMutex>
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 #include <QRecursiveMutex>
-#endif
 #include <QMap>
 
 #include "mythtvexp.h"
@@ -267,11 +265,7 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
 //  QMutex                     m_controlFlagsLock;
 //  QMap<QString, int *>       m_jobControlFlags;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex                    *m_runningJobsLock     {nullptr};
-#else
     QRecursiveMutex           *m_runningJobsLock     {nullptr};
-#endif
     QMap<int, RunningJobInfo>  m_runningJobs;
 
     bool                       m_isMaster;

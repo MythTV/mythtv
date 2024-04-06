@@ -39,12 +39,12 @@ class MBASE_PUBLIC MythHTTPMetaMethod
   private:
     Q_DISABLE_COPY(MythHTTPMetaMethod)
 
-    static inline bool ValidReturnType(int Type)
+    static bool ValidReturnType(int Type)
     {
         return (Type != QMetaType::UnknownType && Type != QMetaType::Void);
     }
 
-    static inline bool ToBool(const QString& Value)
+    static bool ToBool(const QString& Value)
     {
         if (Value.compare("1", Qt::CaseInsensitive) == 0)
             return true;

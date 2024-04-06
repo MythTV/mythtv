@@ -151,14 +151,8 @@ bool XmlConfiguration::Save()
 
 QDomNode XmlConfiguration::FindNode(const QString &setting, bool create)
 {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList path = setting.split('/', QString::SkipEmptyParts);
-#else
     QStringList path = setting.split('/', Qt::SkipEmptyParts);
-#endif
-
     return FindNode(path, m_rootNode, create);
-
 }
 
 QDomNode XmlConfiguration::FindNode(QStringList &path, QDomNode &current, bool create)
@@ -193,11 +187,15 @@ QString XmlConfiguration::GetValue(const QString &setting)
     QDomNode node = FindNode(setting, false);
     QDomText textNode;
     // -=>TODO: This Always assumes firstChild is a Text Node... should change
-    if (!node.isNull() && !(textNode = node.firstChild().toText()).isNull())
+    if (!node.isNull())
     {
-        LOG(VB_GENERAL, LOG_DEBUG, QString("Got \"%1\" for \"%2\"").arg(textNode.nodeValue(), setting));
+        textNode = node.firstChild().toText();
+        if (!textNode.isNull())
+        {
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Got \"%1\" for \"%2\"").arg(textNode.nodeValue(), setting));
 
-        return textNode.nodeValue();
+            return textNode.nodeValue();
+        }
     }
 
     LOG(VB_GENERAL, LOG_DEBUG, QString("Using default for \"%1\"").arg(setting));

@@ -233,20 +233,12 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
     if (bDescending)
         defSeq = " DESC";
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList sortList = Sort.toLower().split(',',QString::SkipEmptyParts);
-#else
     QStringList sortList = Sort.toLower().split(',',Qt::SkipEmptyParts);
-#endif
     bool next = false;
-    for (const auto & item : sortList)
+    for (const auto & item : std::as_const(sortList))
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList partList = item.split(' ',QString::SkipEmptyParts);
-#else
         QStringList partList = item.split(' ',Qt::SkipEmptyParts);
-#endif
-        if (partList.length() == 0)
+        if (partList.empty())
             continue;
         QString sort = partList[0];
         if (sort == "added")
@@ -407,7 +399,7 @@ V2VideoLookupList* V2Video::LookupVideo( const QString    &Title,
 
     //MetadataLookupList is a reference counted list.
     //it will delete all its content at its end of life
-    for(const auto & lookup : qAsConst(list))
+    for(const auto & lookup : std::as_const(list))
     {
         V2VideoLookup *pVideoLookup = pVideoLookups->AddNewVideoLookup();
 
@@ -867,12 +859,7 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
     if (HAS_PARAMv2("Genres"))
     {
         VideoMetadata::genre_list genres;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList genresList = sGenres.split(',', QString::SkipEmptyParts);
-#else
         QStringList genresList = sGenres.split(',', Qt::SkipEmptyParts);
-#endif
-
         std::transform(genresList.cbegin(), genresList.cend(), std::back_inserter(genres),
                        [](const QString& name)
                            {return VideoMetadata::genre_list::value_type(-1, name.simplified());} );
@@ -884,12 +871,7 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
     if (HAS_PARAMv2("Cast"))
     {
         VideoMetadata::cast_list cast;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList castList = sCast.split(',', QString::SkipEmptyParts);
-#else
         QStringList castList = sCast.split(',', Qt::SkipEmptyParts);
-#endif
-
         std::transform(castList.cbegin(), castList.cend(), std::back_inserter(cast),
                        [](const QString& name)
                            {return VideoMetadata::cast_list::value_type(-1, name.simplified());} );
@@ -901,12 +883,7 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
     if (HAS_PARAMv2("Countries"))
     {
         VideoMetadata::country_list countries;
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList countryList = sCountries.split(',', QString::SkipEmptyParts);
-#else
         QStringList countryList = sCountries.split(',', Qt::SkipEmptyParts);
-#endif
-
         std::transform(countryList.cbegin(), countryList.cend(), std::back_inserter(countries),
                        [](const QString& name)
                            {return VideoMetadata::country_list::value_type(-1, name.simplified());} );
@@ -1100,7 +1077,7 @@ V2VideoStreamInfoList* V2Video::GetStreamInfo
     pVideoStreamInfos->setErrorCode     ( infos.m_errorCode   );
     pVideoStreamInfos->setErrorMsg      ( infos.m_errorMsg    );
 
-    for (const auto & info : qAsConst(infos.m_streamInfoList))
+    for (const auto & info : std::as_const(infos.m_streamInfoList))
     {
         V2VideoStreamInfo *pVideoStreamInfo = pVideoStreamInfos->AddNewVideoStreamInfo();
         pVideoStreamInfo->setCodecType       ( QString(QChar(info.m_codecType)) );

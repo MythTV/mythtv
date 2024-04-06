@@ -455,14 +455,14 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
     {
         QDir dir("/dev/dvb", "adapter*", QDir::Name, QDir::Dirs);
         QFileInfoList entries = dir.entryInfoList();
-        for (const auto & it : qAsConst(entries))
+        for (const auto & it : std::as_const(entries))
         {
             QDir subdir(it.filePath(), "frontend*", QDir::Name, QDir::Files | QDir::System);
             const QFileInfoList subil = subdir.entryInfoList();
             if (subil.isEmpty())
                 continue;
 
-            for (const auto & subit : qAsConst(subil))
+            for (const auto & subit : std::as_const(subil))
                 devs.push_back(subit.filePath());
         }
     }
@@ -470,7 +470,7 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
     {
         QDir dir("/dev/", "asirx*", QDir::Name, QDir::System);
         QFileInfoList entries = dir.entryInfoList();
-        for (const auto & it : qAsConst(entries))
+        for (const auto & it : std::as_const(entries))
         {
             if (GetASIDeviceNumber(it.filePath()) >= 0)
             {
@@ -663,7 +663,7 @@ QStringList CardUtil::ProbeDeliverySystems([[maybe_unused]] const QString &devic
     delsyslist = ProbeDeliverySystems(fd_frontend);
 
     QString msg = "Delivery systems:";
-    for (const auto & item : qAsConst(delsyslist))
+    for (const auto & item : std::as_const(delsyslist))
     {
         msg += " ";
         msg += item;
@@ -1898,10 +1898,10 @@ bool CardUtil::IsUniqueDisplayName(const QString &name, uint exclude_inputid)
     if (name.isEmpty())
         return false;
 
-    qsizetype idx { 0 };
     QString   matching;
     bool      two { false };
-    if ((idx = name.indexOf('/')) >= 0)
+    qsizetype idx = name.indexOf('/');
+    if (idx >= 0)
     {
         matching = name.right(name.size() - idx -1);
         two = false;
@@ -1928,7 +1928,8 @@ bool CardUtil::IsUniqueDisplayName(const QString &name, uint exclude_inputid)
     while (query.next())
     {
         QString dn = query.value(1).toString();
-        if (!two && (idx = dn.indexOf('/')) >= 0)
+        idx = dn.indexOf('/');
+        if (!two && idx >= 0)
         {
             if (dn.right(dn.size() - idx - 1) == matching)
                 return false;

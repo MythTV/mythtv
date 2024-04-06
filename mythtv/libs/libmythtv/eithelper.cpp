@@ -21,8 +21,7 @@
 #include "programdata.h"
 #include "scheduledrecording.h"  // for ScheduledRecording
 
-const uint EITHelper::kChunkSize =   20;
-const uint EITHelper::kMaxSize   = 1000;
+const uint EITHelper::kMaxQueueSize   = 10000;
 
 EITCache *EITHelper::s_eitCache = new EITCache();
 
@@ -40,6 +39,19 @@ static void init_fixup(FixupMap &fix);
 EITHelper::EITHelper(uint cardnum) :
     m_cardnum(cardnum)
 {
+    m_chunkSize = gCoreContext->GetNumSetting("EITEventChunkSize", 20);
+    m_queueSize = std::min(m_chunkSize * 50, kMaxQueueSize);
+    LOG(VB_EIT, LOG_INFO, LOC_ID +
+        QString("EITHelper chunk size %1 and queue size %2 events")
+            .arg(m_chunkSize).arg(m_queueSize));
+
+    // Save EIT cache in database table eit_cache iff true
+    bool persistent = gCoreContext->GetBoolSetting("EITCachePersistent", true);
+    s_eitCache->SetPersistent(persistent);
+    LOG(VB_EIT, LOG_INFO, LOC_ID +
+        QString("EITCache %1")
+            .arg(persistent ? "in memory, backup to database" : "in memory only"));
+
     init_fixup(m_fixup);
 }
 
@@ -59,7 +71,7 @@ uint EITHelper::GetListSize(void) const
 bool EITHelper::EventQueueFull(void) const
 {
     uint listsize = GetListSize();
-    bool full = listsize > kMaxSize;
+    bool full = listsize > m_queueSize;
     return full;
 }
 
@@ -74,13 +86,15 @@ bool EITHelper::EventQueueFull(void) const
 uint EITHelper::ProcessEvents(void)
 {
     QMutexLocker locker(&m_eitListLock);
-    uint insertCount = 0;
 
     if (m_dbEvents.empty())
         return 0;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    for (uint i = 0; (i < kChunkSize) && (!m_dbEvents.empty()); i++)
+
+    uint eventCount = 0;
+    uint insertCount = 0;
+    for (; (eventCount < m_chunkSize) && (!m_dbEvents.empty()); eventCount++)
     {
         DBEventEIT *event = m_dbEvents.dequeue();
         m_eitListLock.unlock();
@@ -99,15 +113,16 @@ uint EITHelper::ProcessEvents(void)
 
     if (!m_incompleteEvents.empty())
     {
-        LOG(VB_EIT, LOG_INFO, LOC_ID +
+        LOG(VB_EIT, LOG_DEBUG, LOC_ID +
             QString("Added %1 events -- complete: %2 incomplete: %3")
                 .arg(insertCount).arg(m_dbEvents.size())
                 .arg(m_incompleteEvents.size()));
     }
     else
     {
-        LOG(VB_EIT, LOG_INFO, LOC_ID +
-            QString("Added %1 events").arg(insertCount));
+        LOG(VB_EIT, LOG_DEBUG, LOC_ID +
+            QString("Added %1/%2 events, queued: %3")
+                .arg(insertCount).arg(eventCount).arg(m_dbEvents.size()));
     }
 
     return insertCount;

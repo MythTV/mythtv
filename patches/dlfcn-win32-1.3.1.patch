@@ -1,0 +1,11 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 160d787..dd280b4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,5 @@
+-cmake_minimum_required(VERSION 2.8.11...3.2)
++#MythTV requires a minimum of 3.16. Bump the version here to eliminate a warning about 2.8.11.
++cmake_minimum_required(VERSION 3.16)
+ 
+ if (NOT DEFINED CMAKE_BUILD_TYPE)
+   set (CMAKE_BUILD_TYPE Release CACHE STRING "Build type")

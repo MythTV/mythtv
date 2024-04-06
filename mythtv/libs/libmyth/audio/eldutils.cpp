@@ -110,19 +110,21 @@ static const std::array<const QString,18> audiotype_names {
 /*
  * SF2:SF1:SF0 index => sampling frequency
  */
-#define SNDRV_PCM_RATE_5512             (1<<0)          /* 5512Hz */
-#define SNDRV_PCM_RATE_8000             (1<<1)          /* 8000Hz */
-#define SNDRV_PCM_RATE_11025            (1<<2)          /* 11025Hz */
-#define SNDRV_PCM_RATE_16000            (1<<3)          /* 16000Hz */
-#define SNDRV_PCM_RATE_22050            (1<<4)          /* 22050Hz */
-#define SNDRV_PCM_RATE_32000            (1<<5)          /* 32000Hz */
-#define SNDRV_PCM_RATE_44100            (1<<6)          /* 44100Hz */
-#define SNDRV_PCM_RATE_48000            (1<<7)          /* 48000Hz */
-#define SNDRV_PCM_RATE_64000            (1<<8)          /* 64000Hz */
-#define SNDRV_PCM_RATE_88200            (1<<9)          /* 88200Hz */
-#define SNDRV_PCM_RATE_96000            (1<<10)         /* 96000Hz */
-#define SNDRV_PCM_RATE_176400           (1<<11)         /* 176400Hz */
-#define SNDRV_PCM_RATE_192000           (1<<12)         /* 192000Hz */
+enum : std::uint16_t {
+    SNDRV_PCM_RATE_5512   = (1<<0),          /* 5512Hz */
+    SNDRV_PCM_RATE_8000   = (1<<1),          /* 8000Hz */
+    SNDRV_PCM_RATE_11025  = (1<<2),          /* 11025Hz */
+    SNDRV_PCM_RATE_16000  = (1<<3),          /* 16000Hz */
+    SNDRV_PCM_RATE_22050  = (1<<4),          /* 22050Hz */
+    SNDRV_PCM_RATE_32000  = (1<<5),          /* 32000Hz */
+    SNDRV_PCM_RATE_44100  = (1<<6),          /* 44100Hz */
+    SNDRV_PCM_RATE_48000  = (1<<7),          /* 48000Hz */
+    SNDRV_PCM_RATE_64000  = (1<<8),          /* 64000Hz */
+    SNDRV_PCM_RATE_88200  = (1<<9),          /* 88200Hz */
+    SNDRV_PCM_RATE_96000  = (1<<10),         /* 96000Hz */
+    SNDRV_PCM_RATE_176400 = (1<<11),         /* 176400Hz */
+    SNDRV_PCM_RATE_192000 = (1<<12),         /* 192000Hz */
+};
 
 static const std::array<const int,8> cea_sampling_frequencies {
     0,                       /* 0: Refer to Stream Header */

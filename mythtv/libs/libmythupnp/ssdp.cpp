@@ -386,11 +386,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
         
         // ------------------------------------------------------------------
         QString     str          = QString(buffer.constData());
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList lines        = str.split("\r\n", QString::SkipEmptyParts);
-#else
         QStringList lines        = str.split("\r\n", Qt::SkipEmptyParts);
-#endif
         QString     sRequestLine = !lines.empty() ? lines[0] : "";
 
         if (!lines.isEmpty())
@@ -411,7 +407,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
 
         QStringMap  headers;
 
-        for (const auto& sLine : qAsConst(lines))
+        for (const auto& sLine : std::as_const(lines))
         {
             QString sName  = sLine.section( ':', 0, 0 ).trimmed();
             QString sValue = sLine.section( ':', 1 );
@@ -468,11 +464,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
 
 SSDPRequestType SSDP::ProcessRequestLine( const QString &sLine )
 {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList tokens = sLine.split(m_procReqLineExp, QString::SkipEmptyParts);
-#else
     QStringList tokens = sLine.split(m_procReqLineExp, Qt::SkipEmptyParts);
-#endif
 
     // ----------------------------------------------------------------------
     // if this is actually a response, then sLine's format will be:
@@ -536,8 +528,8 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
     if ( sMAN                  != "\"ssdp:discover\"" ) return false;
     if ( sST.length()          == 0                   ) return false;
     if ( sMX.length()          == 0                   ) return false;
-    if ((nMX = std::chrono::seconds(sMX.toInt())) == 0s) return false;
-    if ( nMX                    < 0s                  ) return false;
+    nMX = std::chrono::seconds(sMX.toInt());
+    if ( nMX                   <= 0s                  ) return false;
 
     // ----------------------------------------------------------------------
     // Adjust timeout to be a random interval between 0 and MX (max of 120)
@@ -620,7 +612,8 @@ bool SSDP::ProcessSearchResponse( const QStringMap &headers )
     if (nPos < 0)
         return false;
 
-    if ((nPos = sCache.indexOf("=", nPos)) < 0)
+    nPos = sCache.indexOf("=", nPos);
+    if (nPos < 0)
         return false;
 
     auto nSecs = std::chrono::seconds(sCache.mid( nPos+1 ).toInt());
@@ -658,7 +651,8 @@ bool SSDP::ProcessNotify( const QStringMap &headers )
         if (nPos < 0)
             return false;
 
-        if ((nPos = sCache.indexOf("=", nPos)) < 0)
+        nPos = sCache.indexOf("=", nPos);
+        if (nPos < 0)
             return false;
 
         auto nSecs = std::chrono::seconds(sCache.mid( nPos+1 ).toInt());

@@ -982,8 +982,8 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 	while (filestack)
 	{
 		char *string = nullptr;
-		if((ret=lirc_readline(state,&string,filestack->m_file))==-1 ||
-		   string==nullptr)
+		ret=lirc_readline(state,&string,filestack->m_file);
+		if(ret==-1 || string==nullptr)
 		{
 			fclose(filestack->m_file);
 			if(open_files == 1 && full_name != nullptr)

@@ -61,7 +61,7 @@ bool MythNavigationOverlay::Create()
         if (i != m_visibleGroup)
             group->SetVisible(false);
         QList<MythUIType *> * children = group->GetAllChildren();
-        for (auto * child : qAsConst(*children))
+        for (auto * child : std::as_const(*children))
         {
             if (child != more)
             {

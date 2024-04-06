@@ -153,7 +153,7 @@ V2CountryList* V2Config::GetCountries()
 
     auto* pList = new V2CountryList();
 
-    for (const auto& country : qAsConst(locales))
+    for (const auto& country : std::as_const(locales))
     {
         const QString code = localesMap.key(country);
         const QString nativeCountry = GetISO3166CountryName(code);
@@ -179,7 +179,7 @@ V2LanguageList* V2Config::GetLanguages()
 
     auto* pList = new V2LanguageList();
 
-    for (const auto& nativeLang : qAsConst(langs))
+    for (const auto& nativeLang : std::as_const(langs))
     {
         const QString code = langMap.key(nativeLang);
         const QString language = GetISO639EnglishLanguageName(code);

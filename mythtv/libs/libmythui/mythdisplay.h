@@ -91,11 +91,11 @@ class MUI_PUBLIC MythDisplay : public QObject
     double          m_aspectRatioOverride { 0.0  };
     QSize           m_resolution       { 0, 0 };
     QSize           m_physicalSize     { 0, 0 };
-    MythEDID        m_edid             { };
+    MythEDID        m_edid;
     QWidget*        m_widget           { nullptr };
     QWindow*        m_window           { nullptr };
     QScreen*        m_screen           { nullptr };
-    MythDisplayModes m_videoModes      { };
+    MythDisplayModes m_videoModes;
     MythHDRPtr      m_hdrState         { nullptr };
     MythVRRPtr      m_vrrState         { nullptr };
 
@@ -105,11 +105,11 @@ class MUI_PUBLIC MythDisplay : public QObject
 
     bool            m_initialised      { false };
     bool            m_firstScreenChange{ true };
-    QRect           m_screenBounds     { };
-    MythDisplayMode m_desktopMode      { };
-    MythDisplayMode m_guiMode          { };
-    MythDisplayMode m_videoMode        { };
-    DisplayModeMap  m_overrideVideoModes { };
+    QRect           m_screenBounds;
+    MythDisplayMode m_desktopMode;
+    MythDisplayMode m_guiMode;
+    MythDisplayMode m_videoMode;
+    DisplayModeMap  m_overrideVideoModes;
 };
 
 #endif

@@ -509,7 +509,7 @@ void ChannelGroup::UpdateChannelGroups(void)
     }
 
     // Remove channelgroup channels and the channelgroupname for disconnected video sources.
-    for (const auto &sourceName : qAsConst(removeSources))
+    for (const auto &sourceName : std::as_const(removeSources))
     {
         RemoveChannelGroup(sourceName);
     }
@@ -544,7 +544,7 @@ void ChannelGroup::UpdateChannelGroups(void)
     if (connectedSources.size() > 1)
     {
         // Add channelgroupname entry if it does not exist yet
-        for (const auto &sourceName : qAsConst(connectedSources))
+        for (const auto &sourceName : std::as_const(connectedSources))
         {
             AddChannelGroup(sourceName);
         }

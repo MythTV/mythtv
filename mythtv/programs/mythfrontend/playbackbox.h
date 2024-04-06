@@ -54,11 +54,9 @@ using PlaybackBoxCb = void (PlaybackBox::*)();
 
 static constexpr size_t kMaxJobs {7};
 
-enum {
-    kArtworkFanTimeout    = 300,
-    kArtworkBannerTimeout = 50,
-    kArtworkCoverTimeout  = 50,
-};
+static constexpr uint16_t kArtworkFanTimeout    { 300 };
+static constexpr uint8_t  kArtworkBannerTimeout {  50 };
+static constexpr uint8_t  kArtworkCoverTimeout  {  50 };
 
 class PlaybackBox : public ScheduleCommon
 {
@@ -466,6 +464,7 @@ class PlaybackBox : public ScheduleCommon
     bool                m_groupSelected       {false};
     bool                m_passwordEntered     {false};
 
+    bool                m_alwaysShowWatchedProgress {false};
     // This class caches the contents of the jobqueue table to avoid excessive
     // DB queries each time the PBB selection changes (currently 4 queries per
     // displayed item).  The cache remains valid for 15 seconds

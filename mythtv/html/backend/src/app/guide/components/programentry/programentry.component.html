@@ -1,4 +1,4 @@
-<div class="programBox cursor-pointer" [ngClass]="'type_' + program.CatType" [style.width.%]=durationToWidth() (click)="openDialog()"
+<div class="programBox cursor-pointer" [ngClass]="[typeclass, catclass, 'guide_type_default']" [style.width.%]=durationToWidth() (click)="openDialog()"
     pTooltip="{{program.Description}}" tooltipPosition="top">
     <div class="programTitle">{{ program.Title }}</div>
     <div class="programBody">

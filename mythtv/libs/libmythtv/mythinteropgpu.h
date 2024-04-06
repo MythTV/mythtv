@@ -59,7 +59,7 @@ class MythInteropGPU : public QObject, public ReferenceCounter
 
   protected:
     MythRender*         m_context              { nullptr };
-    QSize               m_textureSize          { };
+    QSize               m_textureSize;
     uint64_t            m_discontinuityCounter { 0 };
     FreeAVHWDeviceContext m_defaultFree        { nullptr };
     void*               m_defaultUserOpaque    { nullptr };

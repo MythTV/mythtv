@@ -1,0 +1,23 @@
+[binaries]
+ar = '@CMAKE_AR@'
+c = '@CROSS_CC@'
+cpp = '@CROSS_CXX@'
+ranlib = '@CMAKE_RANLIB@'
+strip = '@CMAKE_STRIP@'
+
+[properties]
+# Don't set sys_root.  It causes pkg_config to return wrong values for
+# the include directories.  It will return <sys_root>/<actual_dir>
+# instead of <actual_dir>.
+#
+# sys_root = '@CMAKE_ANDROID_NDK_TOOLCHAIN_UNIFIED@'
+
+[built-in options]
+c_link_args = ['-lc++']
+cpp_link_args = ['-lc++']
+
+[host_machine]
+system = 'android'
+cpu_family = '@MESON_SYSTEM_CPU_FAMILY@'
+cpu = '@CMAKE_ANDROID_ARCH_ABI@'
+endian = 'little'

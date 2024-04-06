@@ -265,11 +265,7 @@ bool PrevRecordedList::LoadDates(void)
         int month(query.value(1).toInt());
         program = new ProgramInfo();
         QDate startdate(year,month,1);
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QDateTime starttime(startdate);
-#else
         QDateTime starttime = startdate.startOfDay();
-#endif
         program->SetRecordingStartTime(starttime);
         QString date = QString("%1/%2")
             .arg(year,4,10,QChar('0')).arg(month,2,10,QChar('0'));

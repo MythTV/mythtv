@@ -94,6 +94,7 @@ class MythCoreContextPrivate : public QObject
 
     MythLocale *m_locale { nullptr };
     QString m_language;
+    QString m_audioLanguage;
 
     MythScheduler *m_scheduler { nullptr };
 
@@ -1209,7 +1210,7 @@ QString MythCoreContext::resolveAddress(const QString &host, ResolveType type,
         QHostAddress v6;
 
         // Return the first address fitting the type critera
-        for (const auto& item : qAsConst(list))
+        for (const auto& item : std::as_const(list))
         {
             addr = item;
             QAbstractSocket::NetworkLayerProtocol prot = addr.protocol();
@@ -1305,13 +1306,13 @@ bool MythCoreContext::CheckSubnet(const QHostAddress &peer)
 
     // loop through all available interfaces
     QList<QNetworkInterface> IFs = QNetworkInterface::allInterfaces();
-    for (const auto & qni : qAsConst(IFs))
+    for (const auto & qni : std::as_const(IFs))
     {
         if ((qni.flags() & QNetworkInterface::IsRunning) == 0)
             continue;
 
         QList<QNetworkAddressEntry> IPs = qni.addressEntries();
-        for (const auto & qnai : qAsConst(IPs))
+        for (const auto & qnai : std::as_const(IPs))
         {
             int pfxlen = qnai.prefixLength();
             // Set this to test rejection without having an extra
@@ -1570,11 +1571,7 @@ void MythCoreContext::readyRead(MythSocket *sock)
 
         QString prefix = strlist[0];
         QString message = strlist[1];
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList tokens = message.split(" ", QString::SkipEmptyParts);
-#else
         QStringList tokens = message.split(" ", Qt::SkipEmptyParts);
-#endif
 
         if (prefix == "OK")
         {
@@ -1792,6 +1789,40 @@ void MythCoreContext::ResetLanguage(void)
     d->m_language.clear();
 }
 
+/**
+ *  \brief Returns two character ISO-639 language descriptor for audio language.
+ *  \sa iso639_get_language_list()
+ */
+QString MythCoreContext::GetAudioLanguage(void)
+{
+    return GetAudioLanguageAndVariant().left(2);
+}
+
+/**
+ *  \brief Returns the user-set audio language and variant.
+ *
+ *   The string has the form ll or ll_vv, where ll is the two character
+ *   ISO-639 language code, and vv (which may not exist) is the variant.
+ *   Examples include en_AU, en_CA, en_GB, en_US, fr_CH, fr_DE, pt_BR, pt_PT.
+ */
+QString MythCoreContext::GetAudioLanguageAndVariant(void)
+{
+    if (d->m_audioLanguage.isEmpty())
+    {
+        auto menuLanguage = GetLanguageAndVariant();
+        d->m_audioLanguage = GetSetting("AudioLanguage", menuLanguage).toLower();
+
+        LOG(VB_AUDIO, LOG_DEBUG, LOC + QString("audio language:%1 menu language:%2")
+            .arg(d->m_audioLanguage, menuLanguage));
+    }
+    return d->m_audioLanguage;
+}
+
+void MythCoreContext::ResetAudioLanguage(void)
+{
+    d->m_audioLanguage.clear();
+}
+
 void MythCoreContext::ResetSockets(void)
 {
     QMutexLocker locker(&d->m_sockLock);
@@ -1891,7 +1922,7 @@ void MythCoreContext::WaitUntilSignals(std::vector<CoreWaitInfo> & sigs) const
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("Waiting for signal %1")
             .arg(s.name));
-        connect(this, s.fn, &eventLoop, &QEventLoop::quit);// clazy:exclude connect-non-signal
+        connect(this, s.fn, &eventLoop, &QEventLoop::quit);// clazy:exclude=connect-non-signal
     }
 
     eventLoop.exec(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);

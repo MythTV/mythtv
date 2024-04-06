@@ -39,7 +39,9 @@ int ring_init (ringbuffer *rbuf, int size)
 {
 	if (size > 0){
 		rbuf->size = size;
-		if( !(rbuf->buffer = (uint8_t *) malloc(sizeof(uint8_t)*size)) ){
+		rbuf->buffer = (uint8_t *) malloc(sizeof(uint8_t)*size);
+		if (rbuf->buffer == nullptr)
+                {
 			LOG(VB_GENERAL, LOG_ERR,
 			    "Not enough memory for ringbuffer");
 			return -1;

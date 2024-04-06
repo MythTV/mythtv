@@ -184,8 +184,8 @@ public:
         return *this;
     }
 
-    RefCountedList<T>() = default;
-    RefCountedList<T>(const RefCountedList<T>&) = default;
+    RefCountedList() = default;
+    RefCountedList(const RefCountedList&) = default;
 };
 
 using ReferenceCounterList = RefCountedList<ReferenceCounter>;

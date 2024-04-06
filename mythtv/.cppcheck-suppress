@@ -1,0 +1,17 @@
+// errorid{:path{:line}}
+
+// Ignore all warnings in these files (third party code)
+*:libs/libdvbdev/dvbci.h
+*:libs/libdvbdev/dvbci.cpp
+
+// Ignore all warnings in these files (MythTV code)
+*:*/docs/doxygen-architecture-document.cpp
+*:*/filters/*
+*:*/html/*
+*:*/libs/libmythfreemheg/*
+*:*/libs/libmythfreesurround/*
+*:*/libs/libmythmpeg2/*
+*:*/libs/libmythtv/visualisations/goom/*
+*:*/programs/mythbackend/serviceHosts/*
+*:*/programs/mythbackend/services/*
+*:*/test/*

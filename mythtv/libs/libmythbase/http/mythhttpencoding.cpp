@@ -30,14 +30,10 @@ using MimePair = std::pair<float,QString>;
 QStringList MythHTTPEncoding::GetMimeTypes(const QString &Accept)
 {
     // Split out mime types
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    auto types = Accept.split(",", QString::SkipEmptyParts);
-#else
     auto types = Accept.split(",", Qt::SkipEmptyParts);
-#endif
 
     std::vector<MimePair> weightings;
-    for (const auto & type : types)
+    for (const auto & type : std::as_const(types))
     {
         QString mime = type.trimmed();
         auto quality = 1.0F;
@@ -83,12 +79,7 @@ void MythHTTPEncoding::GetContentType(MythHTTPRequest* Request)
     auto contenttype = MythHTTP::GetHeader(Request->m_headers, "content-type");
 
     // type is e.g. text/html; charset=UTF-8 or multipart/form-data; boundary=something
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    auto types = contenttype.split(";", QString::SkipEmptyParts);
-#else
     auto types = contenttype.split(";", Qt::SkipEmptyParts);
-#endif
-
     if (types.isEmpty())
         return;
 
@@ -124,12 +115,8 @@ void MythHTTPEncoding::GetURLEncodedParameters(MythHTTPRequest* Request)
     payload.replace("&amp;", "&");
     if (!payload.isEmpty())
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList params = payload.split('&', QString::SkipEmptyParts);
-#else
         QStringList params = payload.split('&', Qt::SkipEmptyParts);
-#endif
-        for (const auto & param : qAsConst(params))
+        for (const auto & param : std::as_const(params))
         {
             QString name  = param.section('=', 0, 0);
             QString value = param.section('=', 1);

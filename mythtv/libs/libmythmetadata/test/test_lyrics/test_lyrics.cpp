@@ -27,7 +27,7 @@ void TestLyrics::initTestCase()
 void TestLyrics::dump(const LyricsLineMap* lyrics)
 {
     auto keys = lyrics->keys();
-    for (auto key : keys)
+    for (auto key : std::as_const(keys))
     {
         auto *value = lyrics->value(key);
         QString valuestr = QString("%1:%2").arg(value->m_time.count()).arg(value->m_lyric);

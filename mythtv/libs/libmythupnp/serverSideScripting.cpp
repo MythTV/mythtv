@@ -88,7 +88,7 @@ ServerSideScripting::~ServerSideScripting()
 {
     Lock();
 
-    for (const auto *script : qAsConst(m_mapScripts))
+    for (const auto *script : std::as_const(m_mapScripts))
         delete script;
 
     m_mapScripts.clear();
@@ -627,12 +627,7 @@ bool ServerSideScripting::ProcessLine( QTextStream &sCode,
 
                     // Extract filename (remove quotes)
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                    QStringList sParts = sSegment.split( ' ', QString::SkipEmptyParts );
-#else
                     QStringList sParts = sSegment.split( ' ', Qt::SkipEmptyParts );
-#endif
-
                     if (sParts.length() > 1 )
                     {
                         QString sFileName = sParts[1].mid( 1, sParts[1].length() - 2 );

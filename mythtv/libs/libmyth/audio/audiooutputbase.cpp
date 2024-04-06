@@ -671,10 +671,14 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     }
         // this will always be false for passthrough audio as
         // CanPassthrough() already tested these conditions
-    else if ((m_needResampler =
-              !OutputSettings(m_enc || m_passthru)->IsSupportedRate(m_sampleRate)))
+    else
     {
-        dest_rate = OutputSettings(m_enc)->NearestSupportedRate(m_sampleRate);
+        m_needResampler =
+            !OutputSettings(m_enc || m_passthru)->IsSupportedRate(m_sampleRate);
+        if (m_needResampler)
+        {
+            dest_rate = OutputSettings(m_enc)->NearestSupportedRate(m_sampleRate);
+        }
     }
 
     if (m_needResampler && m_srcQuality > QUALITY_DISABLED)
@@ -1492,7 +1496,8 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
            represent */
 
         // Copy samples into audiobuffer, with upmix if necessary
-        if ((len = CopyWithUpmix((char *)buffer, frames, org_waud)) <= 0)
+        len = CopyWithUpmix((char *)buffer, frames, org_waud);
+        if (len <= 0)
         {
             continue;
         }

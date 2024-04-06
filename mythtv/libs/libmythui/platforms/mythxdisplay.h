@@ -3,11 +3,7 @@
 
 // Qt
 #include <QString>
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-#include <QMutex>
-#else
 #include <QRecursiveMutex>
-#endif
 #include <QSize>
 
 // MythTV
@@ -45,12 +41,8 @@ class MUI_PUBLIC MythXDisplay
     Screen*  m_screen      { nullptr };
     int      m_depth       { 0 };
     Window   m_root        { 0 };
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex   m_lock        { QMutex::Recursive };
-#else
     QRecursiveMutex  m_lock;
-#endif
-    QString  m_displayName { };
+    QString  m_displayName;
 };
 
 // These X11 defines conflict with the QT key event enum values

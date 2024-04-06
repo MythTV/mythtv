@@ -28,6 +28,7 @@ class V2EnvInfo : public QObject
     SERVICE_PROPERTY2( bool,    SchedulingEnabled );
     SERVICE_PROPERTY2( bool,    IsDatabaseIgnored );
     SERVICE_PROPERTY2( bool,    DBTimezoneSupport );
+    SERVICE_PROPERTY2( QString, WebOnlyStartup );
 
     public:
 
@@ -37,7 +38,8 @@ class V2EnvInfo : public QObject
               m_LCALL       ( ""     ),
               m_LCCTYPE     ( ""     ),
               m_HOME        ( ""     ),
-              m_MYTHCONFDIR ( ""     )
+              m_MYTHCONFDIR ( ""     ),
+              m_WebOnlyStartup ("")
         {
         }
 
@@ -50,6 +52,7 @@ class V2EnvInfo : public QObject
             m_USER        = src->m_USER;
             m_MYTHCONFDIR = src->m_MYTHCONFDIR;
             m_SchedulingEnabled = src->m_SchedulingEnabled;
+            m_WebOnlyStartup = src->m_WebOnlyStartup;
         }
 
     private:

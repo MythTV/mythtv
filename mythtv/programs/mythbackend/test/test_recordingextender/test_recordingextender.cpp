@@ -19,6 +19,8 @@
  */
 #include <iostream>
 #include <QDateTime>
+#include <QJsonArray>
+#include <QJsonObject>
 
 #include "libmythbase/mythconfig.h"
 #if CONFIG_SQLITE3
@@ -73,19 +75,19 @@ static bool enableSqliteRegex (void)
     // Gaah. Have to manually enable extension loading. If it exists.
     QVariant v = info.qsqldb.driver()->handle();
     if (!v.isValid() || (qstrcmp(v.typeName(), "sqlite3*") != 0)) {
-        QWARN("Can't find sqldb driver.");
+        qWarning("Can't find sqldb driver.");
         return false;
     }
 
     // v.data() returns a pointer to the handle
     sqlite3 *handle = *static_cast<sqlite3 **>(v.data());
     if (handle == nullptr) {
-        QWARN("Can't find sqldb driver handle.");
+        qWarning("Can't find sqldb driver handle.");
         return false;
     }
 
     if (sqlite3_enable_load_extension(handle, 1) != SQLITE_OK) {
-        QWARN("Cannot enable sqlite extensions.");
+        qWarning("Cannot enable sqlite extensions.");
         return false;
     }
 
@@ -98,7 +100,7 @@ static bool enableSqliteRegex (void)
 #endif
     if (sqlite3_load_extension(handle, pcre, nullptr, &errtext) != SQLITE_OK) {
         QString errmsg = QString("Cannot load the PCRE extension: %1.").arg(errtext);
-        QWARN(qPrintable(errmsg));
+        qWarning(qPrintable(errmsg));
         return false;
     }
 
@@ -217,11 +219,11 @@ void TestRecordingExtender::test_findKnownSport_data(void)
                                << "baseball" << 1 << QStringList("mlb");
     QTest::newRow("baseball2") << "MLB Baseball" << 2
                                << "baseball" << 1 << QStringList("mlb");
-    // Must be current year.
+    // Must be current year. (For the purposes of these tests, the
+    // current year is 2022.)
     QTest::newRow("baseball3") << "2020 World Series" << 1
                                << "" << 0 << QStringList();
-    QTest::newRow("baseball4") << QString("%1 World Series")
-                                  .arg(QDate::currentDate().year()) << 1
+    QTest::newRow("baseball4") << "2022 World Series" << 1
                                << "baseball" << 1 << QStringList("mlb");
     QTest::newRow("football1") << "NFL Football" << 1
                                << "football" << 1 << QStringList("nfl");
@@ -288,11 +290,11 @@ void TestRecordingExtender::test_findKnownSport(void)
     // Eliminate items that are in both the "expected and "found" sets.
     QSet<QString> expectedSet;
     expectedSet.reserve(expectedLeagues.size());
-    for (const auto& league : qAsConst(expectedLeagues))
+    for (const auto& league : std::as_const(expectedLeagues))
         expectedSet.insert(league);
     QSet<QString> foundSet;
     foundSet.reserve(infoList.size());
-    for (const auto& info : qAsConst(infoList))
+    for (const auto& info : std::as_const(infoList))
         foundSet.insert(info.league);
     auto intersection = foundSet.intersect(expectedSet);
     foundSet = foundSet.subtract(intersection);
@@ -302,14 +304,14 @@ void TestRecordingExtender::test_findKnownSport(void)
     if (!expectedSet.isEmpty())
     {
         QString string;
-        for (const auto& str : qAsConst(expectedSet))
+        for (const auto& str : std::as_const(expectedSet))
             string += str + ' ';
         QFAIL(qPrintable(QString("Missing results: %1").arg(string)));
     }
     if (!foundSet.isEmpty())
     {
         QString string;
-        for (const auto& str : qAsConst(foundSet))
+        for (const auto& str : std::as_const(foundSet))
             string += str + ' ';
         QFAIL(qPrintable(QString("Unexpected results: %1").arg(string)));
     }

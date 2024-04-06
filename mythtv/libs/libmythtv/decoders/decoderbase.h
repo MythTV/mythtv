@@ -264,6 +264,7 @@ class DecoderBase
     static AVPixelFormat GetBestVideoFormat(AVPixelFormat* Formats, const VideoFrameTypes* RenderFormats);
 
   protected:
+    int          BestTrack(uint Type, bool forcedPreferred, int preferredLanguage = 0);
     virtual int  AutoSelectTrack(uint Type);
     void         AutoSelectTracks(void);
     void         ResetTracks(void);
@@ -321,11 +322,7 @@ class DecoderBase
     bool                 m_posmapStarted           {false};
     MarkTypes            m_positionMapType         {MARK_UNSET};
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    mutable QMutex       m_positionMapLock         {QMutex::Recursive};
-#else
     mutable QRecursiveMutex m_positionMapLock;
-#endif
     std::vector<PosMapEntry>  m_positionMap;
     frm_pos_map_t        m_frameToDurMap; // guarded by m_positionMapLock
     frm_pos_map_t        m_durToFrameMap; // guarded by m_positionMapLock
@@ -350,16 +347,13 @@ class DecoderBase
     uint                 m_stereo3D                {0};
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex               m_trackLock                     { QMutex::Recursive };
-#else
     QRecursiveMutex      m_trackLock;
-#endif
     bool                 m_decodeAllSubtitles            { false };
     std::array<int,        kTrackTypeCount> m_currentTrack {};
     std::array<sinfo_vec_t,kTrackTypeCount> m_tracks;
     std::array<StreamInfo, kTrackTypeCount> m_wantedTrack;
     std::array<StreamInfo, kTrackTypeCount> m_selectedTrack;
+    std::array<StreamInfo, kTrackTypeCount> m_selectedForcedTrack;
 
     /// language preferences for auto-selection of streams
     std::vector<int>     m_languagePreference;

@@ -243,6 +243,7 @@ namespace
         {
             QString msg = tr("DVD/Video contains a bookmark");
 
+            m_videoDlg = dynamic_cast<VideoDialog*>(GetScreenStack()->GetTopScreen());
             auto *popup = new MythDialogBox(msg, GetScreenStack(), "bookmarkdialog");
             if (!popup->Create())
             {
@@ -283,9 +284,21 @@ namespace
             else if (buttonText == m_btnPlayBegin)
                 TV::StartTV(m_pgi, kStartTVIgnoreLastPlayPos | kStartTVIgnoreBookmark);
             else if (buttonText == m_btnClearBookmark)
+            {
                 m_pgi->SaveBookmark(0);
+                if (m_videoDlg)
+                {
+                    m_videoDlg->playbackStateChanged(m_pgi->GetBasename());
+                }
+            }
             else if (buttonText == m_btnClearLast)
+            {
                 m_pgi->SaveLastPlayPos(0);
+                if (m_videoDlg)
+                {
+                    m_videoDlg->playbackStateChanged(m_pgi->GetBasename());
+                }
+            }
             delete m_pgi;
         }
 
@@ -298,6 +311,7 @@ namespace
         QString      m_btnPlayBegin;
         QString      m_btnPlayLast;
         QString      m_btnClearLast;
+        VideoDialog  *m_videoDlg        {nullptr};
     };
 
     void cleanup()
@@ -880,7 +894,7 @@ static void handleGalleryMedia(MythMediaDevice *dev)
     GetMythMainWindow()->GetMainStack()->GetScreenList(screens);
 
 
-    for (const auto *screen : qAsConst(screens))
+    for (const auto *screen : std::as_const(screens))
     {
         if (qobject_cast<const GalleryThumbView*>(screen))
         {

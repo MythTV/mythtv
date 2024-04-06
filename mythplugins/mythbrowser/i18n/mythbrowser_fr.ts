@@ -81,12 +81,12 @@ Utiliser l&apos;option « Ajouter un signet » du menu pour ajouter de nouveaux 
         <translation>Réglages</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="494"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="492"/>
         <source>Are you sure you want to delete the selected bookmark?</source>
         <translation>Êtes-vous sûr de vouloir supprimer le signet sélectionné ?</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="538"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="536"/>
         <source>Are you sure you want to delete the marked bookmarks?</source>
         <translation>Êtes-vous sûr de vouloir supprimer les signets marqués ?</translation>
     </message>
@@ -128,7 +128,7 @@ Utiliser l&apos;option « Ajouter un signet » du menu pour ajouter de nouveaux 
     <name>MythBrowser</name>
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="139"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="351"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="349"/>
         <source>Enter URL</source>
         <translation>Entrer l&apos;URL</translation>
     </message>
@@ -138,42 +138,42 @@ Utiliser l&apos;option « Ajouter un signet » du menu pour ajouter de nouveaux 
         <translation>Chargement...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="338"/>
         <source>Actions</source>
         <translation>Actions</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="354"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="352"/>
         <source>Back</source>
         <translation>Retour</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="355"/>
         <source>Forward</source>
         <translation>Avancer</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="359"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
         <source>Zoom In</source>
         <translation>Zoom avant</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="360"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="358"/>
         <source>Zoom Out</source>
         <translation>Zoom arrière</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="361"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="359"/>
         <source>New Tab</source>
         <translation>Nouvel onglet</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="362"/>
         <source>Delete Tab</source>
         <translation>Supprimer l&apos;onglet</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="366"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
         <source>Add Bookmark</source>
         <translation>Ajouter un signet</translation>
     </message>

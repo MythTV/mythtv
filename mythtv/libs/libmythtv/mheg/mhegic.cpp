@@ -8,7 +8,6 @@
 #include <QMutexLocker>
 #include <QNetworkRequest>
 #include <QStringList>
-#include <QScopedPointer>
 #include <QApplication>
 
 // Myth
@@ -29,9 +28,9 @@ MHInteractionChannel::MHInteractionChannel(QObject* parent) : QObject(parent)
 MHInteractionChannel::~MHInteractionChannel()
 {
     QMutexLocker locker(&m_mutex);
-    for (const auto & req : qAsConst(m_pending))
+    for (const auto & req : std::as_const(m_pending))
         req->deleteLater();
-    for (const auto & req : qAsConst(m_finished))
+    for (const auto & req : std::as_const(m_finished))
         req->deleteLater();
 }
 
@@ -81,15 +80,15 @@ bool MHInteractionChannel::CheckFile(const QString& csPath, const QByteArray &ce
 
     // Queue a request
     LOG(VB_MHEG, LOG_DEBUG, LOC + QString("CheckFile queue %1").arg(csPath));
-    QScopedPointer< NetStream > p(new NetStream(url, NetStream::kPreferCache, cert));
+    std::unique_ptr< NetStream > p(new NetStream(url, NetStream::kPreferCache, cert));
     if (!p || !p->IsOpen())
     {
         LOG(VB_MHEG, LOG_WARNING, LOC + QString("CheckFile failed %1").arg(csPath) );
         return false;
     }
 
-    connect(p.data(), &NetStream::Finished, this, &MHInteractionChannel::slotFinished );
-    m_pending.insert(url, p.take());
+    connect(p.get(), &NetStream::Finished, this, &MHInteractionChannel::slotFinished );
+    m_pending.insert(url, p.release());
 
     return false; // It's now pending so unavailable
 }
@@ -107,7 +106,7 @@ MHInteractionChannel::GetFile(const QString &csPath, QByteArray &data,
         return kPending;
 
     // Is it complete?
-    QScopedPointer< NetStream > p(m_finished.take(url));
+    std::unique_ptr< NetStream > p(m_finished.take(url));
     if (p)
     {
         if (p->GetError() == QNetworkReply::NoError)
@@ -145,15 +144,15 @@ MHInteractionChannel::GetFile(const QString &csPath, QByteArray &data,
 
     // Queue a download
     LOG(VB_MHEG, LOG_DEBUG, LOC + QString("GetFile queue %1").arg(csPath) );
-    p.reset(new NetStream(url, NetStream::kPreferCache, cert));
+    p = std::make_unique<NetStream>(url, NetStream::kPreferCache, cert);
     if (!p || !p->IsOpen())
     {
         LOG(VB_MHEG, LOG_WARNING, LOC + QString("GetFile failed %1").arg(csPath) );
         return kError;
     }
 
-    connect(p.data(), &NetStream::Finished, this, &MHInteractionChannel::slotFinished );
-    m_pending.insert(url, p.take());
+    connect(p.get(), &NetStream::Finished, this, &MHInteractionChannel::slotFinished );
+    m_pending.insert(url, p.release());
 
     return kPending;
 }

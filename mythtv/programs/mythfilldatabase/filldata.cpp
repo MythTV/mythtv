@@ -705,7 +705,7 @@ bool FillData::Run(DataSourceList &sourcelist)
 
     if (!m_fatalErrors.empty())
     {
-        for (const QString& error : qAsConst(m_fatalErrors))
+        for (const QString& error : std::as_const(m_fatalErrors))
         {
             LOG(VB_GENERAL, LOG_CRIT, LOC + "Encountered Fatal Error: " + error);
         }

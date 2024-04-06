@@ -673,8 +673,11 @@ bool MythCodecContext::RetrieveHWFrame(MythVideoFrame *Frame, AVFrame *AvFrame)
 
     // retrieve data from GPU to CPU
     if (ret >= 0)
-        if ((ret = av_hwframe_transfer_data(temp, AvFrame, 0)) < 0)
+    {
+        ret = av_hwframe_transfer_data(temp, AvFrame, 0);
+        if (ret < 0)
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error %1 transferring the data to system memory").arg(ret));
+    }
 
     Frame->m_colorshifted = true;
     av_frame_free(&temp);

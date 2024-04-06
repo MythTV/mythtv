@@ -1,0 +1,107 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6bb912f..dfd8fa6 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -25,11 +25,8 @@ MATH(EXPR MARIADB_PACKAGE_VERSION_ID "${CPACK_PACKAGE_VERSION_MAJOR} * 10000 +
+                             ${CPACK_PACKAGE_VERSION_MINOR} * 100   +
+                             ${CPACK_PACKAGE_VERSION_PATCH}")
+ #Minimum required version is Cmake 2.8.8, since we need to build object libraries
+-IF(WIN32)
+-  CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8 FATAL_ERROR)
+-ELSE()
+-  CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8 FATAL_ERROR)
+-ENDIF()
++#MythTV requires a minimum of 3.16. Bump the version here to eliminate a warning about 2.8.12.
++CMAKE_MINIMUM_REQUIRED(VERSION 3.16 FATAL_ERROR)
+ IF(COMMAND CMAKE_POLICY)
+   CMAKE_POLICY(SET CMP0003 NEW)
+ ENDIF()
+@@ -103,6 +103,9 @@ IF(CMAKE_COMPILER_IS_GNUCC)
+   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wunused -Wno-uninitialized")
+ ENDIF()
+ 
++# MythTV tweaks
++SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Dushort=uint16_t -Wno-pointer-sign")
++
+ # If the build type isn't specified, set to Relwithdebinfo as default.
+ IF(NOT CMAKE_BUILD_TYPE)
+   SET(CMAKE_BUILD_TYPE "Relwithdebinfo")
+diff --git a/cmake/CheckFunctions.cmake b/cmake/CheckFunctions.cmake
+index 2af01da..3001256 100644
+--- a/cmake/CheckFunctions.cmake
++++ b/cmake/CheckFunctions.cmake
+@@ -17,10 +17,12 @@ CHECK_FUNCTION_EXISTS (access HAVE_ACCESS)
+ CHECK_FUNCTION_EXISTS (aiowait HAVE_AIOWAIT)
+ CHECK_FUNCTION_EXISTS (alarm HAVE_ALARM)
+ CHECK_FUNCTION_EXISTS (alloca HAVE_ALLOCA)
+-CHECK_FUNCTION_EXISTS (bcmp HAVE_BCMP)
++#CHECK_FUNCTION_EXISTS (bcmp HAVE_BCMP)
++SET (HAVE_BCMP TRUE)
+ CHECK_FUNCTION_EXISTS (bfill HAVE_BFILL)
+ CHECK_FUNCTION_EXISTS (bmove HAVE_BMOVE)
+-CHECK_FUNCTION_EXISTS (bzero HAVE_BZERO)
++#CHECK_FUNCTION_EXISTS (bzero HAVE_BZERO)
++SET (HAVE_BZERO TRUE)
+ CHECK_FUNCTION_EXISTS (clock_gettime HAVE_CLOCK_GETTIME)
+ CHECK_FUNCTION_EXISTS (compress HAVE_COMPRESS)
+ CHECK_FUNCTION_EXISTS (crypt HAVE_CRYPT)
+@@ -26,6 +26,7 @@ CHECK_FUNCTION_EXISTS (compress HAVE_COMPRESS)
+ CHECK_FUNCTION_EXISTS (crypt HAVE_CRYPT)
+ CHECK_FUNCTION_EXISTS (dlerror HAVE_DLERROR)
+ CHECK_FUNCTION_EXISTS (dlopen HAVE_DLOPEN)
++CHECK_FUNCTION_EXISTS (endpwent HAVE_ENDPWENT)
+ CHECK_FUNCTION_EXISTS (fchmod HAVE_FCHMOD)
+ CHECK_FUNCTION_EXISTS (fcntl HAVE_FCNTL)
+ CHECK_FUNCTION_EXISTS (fconvert HAVE_FCONVERT)
+diff --git a/cmake/CheckIncludeFiles.cmake b/cmake/CheckIncludeFiles.cmake
+index 8eff9ac..02acf6c 100644
+--- a/cmake/CheckIncludeFiles.cmake
++++ b/cmake/CheckIncludeFiles.cmake
+@@ -72,9 +72,9 @@ CHECK_INCLUDE_FILES (sys/un.h HAVE_SYS_UN_H)
+ CHECK_INCLUDE_FILES (sysent.h HAVE_SYSENT_H)
+ CHECK_INCLUDE_FILES (termio.h HAVE_TERMIO_H)
+ CHECK_INCLUDE_FILES (termios.h HAVE_TERMIOS_H)
+-CHECK_INCLUDE_FILES (ucontext.h HAVE_UCONTEXT_H)
++#CHECK_INCLUDE_FILES (ucontext.h HAVE_UCONTEXT_H)
+ IF(NOT HAVE_UCONTEXT_H)
+-  CHECK_INCLUDE_FILES (sys/ucontext.h HAVE_UCONTEXT_H)
++  #CHECK_INCLUDE_FILES (sys/ucontext.h HAVE_UCONTEXT_H)
+ ENDIF()
+ CHECK_INCLUDE_FILES (unistd.h HAVE_UNISTD_H)
+ CHECK_INCLUDE_FILES (utime.h HAVE_UTIME_H)
+diff --git a/cmake/ConnectorName.cmake b/cmake/ConnectorName.cmake
+index b7bbbad..357b8ac 100644
+--- a/cmake/ConnectorName.cmake
++++ b/cmake/ConnectorName.cmake
+@@ -22,7 +22,7 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
+     SET(MACHINE_NAME "x64")
+   ELSE()
+     SET(MACHINE_NAME "32")
+-  END()
++  ENDIF()
+ ENDIF()
+ 
+ SET(product_name "mysql-connector-c-${CPACK_PACKAGE_VERSION}-${PLATFORM_NAME}${CONCAT_SIGN}${MACHINE_NAME}")
+diff --git a/libmariadb/mf_pack.c b/libmariadb/mf_pack.c
+index d97e93b..5c780e5 100644
+--- a/libmariadb/mf_pack.c
++++ b/libmariadb/mf_pack.c
+@@ -26,6 +26,8 @@
+ #include <descrip.h>
+ #endif /* VMS */
+ 
++#define bcmp memcmp
++
+ static my_string NEAR_F expand_tilde(my_string *path);
+ 
+ 	/* Pack a dirname ; Changes HOME to ~/ and current dev to ./ */
+@@ -324,7 +324,9 @@ static my_string NEAR_F expand_tilde(my_string *path)
+     save= *str; *str= '\0';
+     user_entry=getpwnam(*path);
+     *str=save;
++#ifdef HAVE_ENDPWENT
+     endpwent();
++#endif
+     if (user_entry)
+     {
+       *path=str;

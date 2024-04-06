@@ -1538,7 +1538,7 @@ QStringList MetadataOptions::GetSupportedImageExtensionFilter()
     QStringList ret;
 
     QList<QByteArray> exts = QImageReader::supportedImageFormats();
-    for (const auto & ext : qAsConst(exts))
+    for (const auto & ext : std::as_const(exts))
     {
         ret.append(QString("*.").append(ext));
     }

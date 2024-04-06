@@ -21,7 +21,7 @@
 #include "vbi.h"
 #include "vt.h"
 
-#define FAC    (1<<16)         // factor for fix-point arithmetic
+static constexpr int FAC = { 1<<16 };  // factor for fix-point arithmetic
 
 static unsigned char *rawbuf = nullptr;// one common buffer for raw vbi data.
 #ifdef USING_V4L2
@@ -392,7 +392,8 @@ vbi_line(struct vbi *vbi, const unsigned char *p)
            if (data[0] != 0x27)        // really 11100100? (rev order!)
                return -1;
 
-           if ((i = vt_line(vbi, data.data()+1)))
+           i = vt_line(vbi, data.data()+1);
+           if (i != 0)
            {
                if (i < 0)
                    pll_add(vbi, 2, -i);
@@ -453,9 +454,8 @@ vbi_handler(struct vbi *vbi, [[maybe_unused]] int fd)
 int
 vbi_add_handler(struct vbi *vbi, vbic_handler handler, void *data)
 {
-    struct vbi_client *cl = nullptr;
-
-    if (!(cl = new struct vbi_client))
+    auto *cl = new struct vbi_client;
+    if (cl == nullptr)
        return -1;
     cl->handler = handler;
     cl->data = data;
@@ -571,7 +571,8 @@ setup_dev([[maybe_unused]] struct vbi *vbi)
     {
        delete [] rawbuf;
        rawbuf_size = vbi->bufsize;
-       if (!(rawbuf = new u_char[rawbuf_size]))
+       rawbuf = new u_char[rawbuf_size];
+       if (rawbuf == nullptr)
        {
             error("unable to allocate in setup_dev()\n");
        }
@@ -605,7 +606,8 @@ vbi_open(const char *vbi_dev_name,
        goto fail1;
     }
 
-    if ((vbi->fd = open(vbi_dev_name, O_RDONLY)) == -1)
+    vbi->fd = open(vbi_dev_name, O_RDONLY);
+    if (vbi->fd == -1)
     {
        error("cannot open vbi device");
        goto fail2;

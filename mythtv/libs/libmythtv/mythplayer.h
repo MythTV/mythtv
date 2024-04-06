@@ -10,9 +10,7 @@
 #include <QCoreApplication>
 #include <QList>
 #include <QMutex>
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 #include <QRecursiveMutex>
-#endif
 #include <QTime>
 #include <QString>
 #include <QRect>
@@ -201,9 +199,6 @@ class MTV_PUBLIC MythPlayer : public QObject
 
     // Public Audio/Subtitle/EIA-608/EIA-708 stream selection - thread safe
     void EnableForcedSubtitles(bool enable);
-    bool ForcedSubtitlesFavored(void) const {
-        return m_allowForcedSubtitles && !m_captionsEnabledbyDefault;
-    }
     // How to handle forced Subtitles (i.e. when in a movie someone speaks
     // in a different language than the rest of the movie, subtitles are
     // forced on even if the user doesn't have them turned on.)
@@ -365,11 +360,7 @@ class MTV_PUBLIC MythPlayer : public QObject
 
   protected:
     DecoderBase     *m_decoder            {nullptr};
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    mutable QMutex   m_decoderChangeLock  {QMutex::Recursive};
-#else
     mutable QRecursiveMutex  m_decoderChangeLock;
-#endif
     MythVideoOutput *m_videoOutput        {nullptr};
     const VideoFrameTypes* m_renderFormats { &MythVideoFrame::kDefaultRenderFormats };
     PlayerContext   *m_playerCtx          {nullptr};
@@ -488,11 +479,7 @@ class MTV_PUBLIC MythPlayer : public QObject
 
     // Playback (output) speed control
     /// Lock for next_play_speed and next_normal_speed
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QMutex     m_decoderLock              {QMutex::Recursive};
-#else
     QRecursiveMutex  m_decoderLock;
-#endif
     float      m_nextPlaySpeed            {1.0F};
     float      m_playSpeed                {1.0F};
     std::chrono::microseconds m_frameInterval

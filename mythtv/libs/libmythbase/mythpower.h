@@ -3,11 +3,7 @@
 
 // Qt
 #include <QtGlobal>
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-#include <QMutex>
-#else
 #include <QRecursiveMutex>
-#endif
 #include <QObject>
 #include <QDateTime>
 #include <QTimer>
@@ -77,11 +73,7 @@ class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
     virtual void Refresh (void) {  }
 
   protected:
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    static QMutex s_lock;
-#else
     static QRecursiveMutex s_lock;
-#endif
 
     MythPower();
     ~MythPower() override = default;
@@ -101,8 +93,8 @@ class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
     bool      m_isSpontaneous        { false };
     std::chrono::seconds  m_maxRequestedDelay    { 0s };
     std::chrono::seconds  m_maxSupportedDelay    { MAXIMUM_SHUTDOWN_WAIT };
-    QTimer    m_featureTimer         { };
-    QDateTime m_sleepTime            { };
+    QTimer    m_featureTimer;
+    QDateTime m_sleepTime;
     int       m_powerLevel           { Unset };
     bool      m_warnForLowBattery    { false };
 

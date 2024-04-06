@@ -151,6 +151,8 @@ class EITHelper
     uint                    m_channelid    {0};       // Channel ID
     QDateTime               m_maxStarttime;           // Latest starttime of changed events
     bool                    m_seenEITother {false};   // If false we only reschedule the active mplex
+    uint                    m_chunkSize    {20};      // Maximum number of DB inserts per ProcessEvents call
+    uint                    m_queueSize    {1000};    // Maximum number of events waiting to be processed
 
     FixupMap                m_fixup;
     ATSCSRCToEvents         m_incompleteEvents;
@@ -159,8 +161,7 @@ class EITHelper
 
     QMap<uint,uint>         m_languagePreferences;
 
-    static const uint kChunkSize;   // Maximum number of DB inserts per ProcessEvents call
-    static const uint kMaxSize;     // Maximum number of events waiting to be processed
+    static const uint       kMaxQueueSize;            // Maximum queue size for events waiting to be processed
 };
 
 #endif // EIT_HELPER_H

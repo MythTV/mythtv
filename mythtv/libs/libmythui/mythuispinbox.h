@@ -41,7 +41,7 @@ class MUI_PUBLIC MythUISpinBox : public MythUIButtonList
     template <typename T>
         std::enable_if_t<std::chrono::__is_duration<T>::value, void>
         SetDuration(T val)
-    { return SetValueByData(static_cast<int>(val.count())); }
+    { SetValueByData(static_cast<int>(val.count())); }
 
   protected:
     bool ParseElement(const QString &filename, QDomElement &element,

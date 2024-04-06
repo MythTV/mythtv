@@ -108,11 +108,15 @@ HouseKeeperTask::HouseKeeperTask(const QString &dbTag, HouseKeeperScope scope,
 bool HouseKeeperTask::CheckRun(const QDateTime& now)
 {
     bool check = false;
-    if (!m_confirm && !m_running && (check = DoCheckRun(now)))
+    if (!m_confirm && !m_running)
     {
-        // if m_confirm is already set, the task is already in the queue
-        // and should not be queued a second time
-        m_confirm = true;
+        check = DoCheckRun(now);
+        if (check)
+        {
+            // if m_confirm is already set, the task is already in the queue
+            // and should not be queued a second time
+            m_confirm = true;
+        }
     }
     LOG(VB_GENERAL, LOG_DEBUG, QString("%1 Running? %2/In window? %3.")
         .arg(GetTag(), m_running ? "Yes" : "No", check ? "Yes" : "No"));
@@ -604,7 +608,7 @@ HouseKeeper::~HouseKeeper(void)
         // issue a terminate call to any long-running tasks
         // this is just a noop unless overwritten by a subclass
         QMutexLocker mapLock(&m_mapLock);
-        for (auto *it : qAsConst(m_taskMap))
+        for (auto *it : std::as_const(m_taskMap))
             it->Terminate();
     }
 
@@ -840,13 +844,8 @@ void HouseKeeper::customEvent(QEvent *e)
         if ((me->Message().left(20) == "HOUSE_KEEPER_RUNNING") ||
             (me->Message().left(23) == "HOUSE_KEEPER_SUCCESSFUL"))
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList tokens = me->Message()
-                                    .split(" ", QString::SkipEmptyParts);
-#else
             QStringList tokens = me->Message()
                                     .split(" ", Qt::SkipEmptyParts);
-#endif
             if (tokens.size() != 4)
                 return;
 

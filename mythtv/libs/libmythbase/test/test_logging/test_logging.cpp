@@ -32,9 +32,9 @@ void TestLogging::test_syslogGetFacility_data (void)
 #ifdef _WIN32
 #elif defined(Q_OS_ANDROID)
 #else
-    QTest::newRow("auth")   << "auth"   << static_cast<int>(LOG_AUTH);
-    QTest::newRow("user")   << "user"   << static_cast<int>(LOG_USER);
-    QTest::newRow("local7") << "local7" << static_cast<int>(LOG_LOCAL7);
+    QTest::newRow("auth")   << "auth"   << LOG_AUTH;
+    QTest::newRow("user")   << "user"   << LOG_USER;
+    QTest::newRow("local7") << "local7" << LOG_LOCAL7;
     QTest::newRow("random") << "random" << -1;
     QTest::newRow("empty")  << ""       << -1;
 #endif
@@ -213,18 +213,18 @@ void TestLogging::test_verboseArgParse_level_data (void)
     // program even though they should produce identical output.
     QTest::newRow("general")         << "general"
                                      << static_cast<uint64_t>(VB_GENERAL)
-                                     << static_cast<uint64_t>(0) << static_cast<int>(0)
-                                     << static_cast<uint64_t>(0) << static_cast<int>(0)
+                                     << static_cast<uint64_t>(0) << 0
+                                     << static_cast<uint64_t>(0) << 0
                                      << "general";
     QTest::newRow("general:info")    << "general:info"
                                      << static_cast<uint64_t>(VB_GENERAL)
                                      << static_cast<uint64_t>(VB_GENERAL) << static_cast<int>(LOG_INFO)
-                                     << static_cast<uint64_t>(0) << static_cast<int>(0)
+                                     << static_cast<uint64_t>(0) << 0
                                      << "general";
     QTest::newRow("general:notice")  << "general:notice"
                                      << static_cast<uint64_t>(VB_GENERAL)
                                      << static_cast<uint64_t>(VB_GENERAL) << static_cast<int>(LOG_NOTICE)
-                                     << static_cast<uint64_t>(0) << static_cast<int>(0)
+                                     << static_cast<uint64_t>(0) << 0
                                      << "general";
     QTest::newRow("general:notice,file:debug")
                                      << "general:notice,file:debug"
@@ -280,35 +280,35 @@ void TestLogging::test_logPropagateCalc_data (void)
     QTest::addColumn<QString>("expectedArgs");
 
     QTest::newRow("plain")   << "general"
-                             << static_cast<int>(0) << static_cast<int>(-1)
+                             << 0 << -1
                              << false
                              << "--verbose general --loglevel info";
     QTest::newRow("path")    << "general"
-                             << static_cast<int>(0) << static_cast<int>(-1)
+                             << 0 << -1
                              << true
                              << "--verbose general --logpath /tmp --loglevel info";
     QTest::newRow("quiet")   << "general"
-                             << static_cast<int>(2) << static_cast<int>(-1)
+                             << 2 << -1
                              << false
                              << "--verbose general --loglevel info --quiet --quiet";
 #if !defined(_WIN32) && !defined(Q_OS_ANDROID)
     QTest::newRow("syslog")  << "general"
-                             << static_cast<int>(0) << static_cast<int>(LOG_DAEMON)
+                             << 0 << LOG_DAEMON
                              << false
                              << "--verbose general --loglevel info --syslog daemon";
 #if CONFIG_SYSTEMD_JOURNAL
     QTest::newRow("systemd") << "general"
-                             << static_cast<int>(0) << SYSTEMD_JOURNAL_FACILITY
+                             << 0 << SYSTEMD_JOURNAL_FACILITY
                              << false
                              << "--verbose general --loglevel info --systemd-journal";
 #endif
 #endif
     QTest::newRow("muddle")  << "general,schedule"
-                             << static_cast<int>(2) << static_cast<int>(LOG_LOCAL0)
+                             << 2 << LOG_LOCAL0
                              << true
                              << "--verbose general,schedule --logpath /tmp --loglevel info --quiet --quiet --syslog local0";
     QTest::newRow("muddle2") << "schedule:debug,general:warn"
-                             << static_cast<int>(2) << static_cast<int>(LOG_LOCAL0)
+                             << 2 << LOG_LOCAL0
                              << true
                              << "--verbose general,schedule --logpath /tmp --loglevel info --quiet --quiet --syslog local0";
 }

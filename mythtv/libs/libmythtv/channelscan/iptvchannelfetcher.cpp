@@ -536,6 +536,7 @@ static bool parse_extinf(const QString &line,
 
     // Parse extension, HDHomeRun style
     // EG. #EXTINF:-1 channel-id="22" channel-number="22" tvg-name="Omroep Brabant",22 Omroep Brabant
+    //     #EXTINF:-1 channel-id="2.1" channel-number="2.1" tvg-name="CBS2-HD",2.1 CBS2-HD
     static const QRegularExpression chanNumName6
         { R"(^-?\d+\s+channel-id=\"([^\"]+)\"\s+channel-number=\"([^\"]+)\"\s+tvg-name=\"([^\"]+)\".*$)" };
     match = chanNumName6.match(line);
@@ -543,9 +544,7 @@ static bool parse_extinf(const QString &line,
     {
         channum = match.captured(2).simplified();
         name = match.captured(3).simplified();
-        bool ok = false;
-        int channel_number = channum.toInt (&ok);
-        if (ok && (channel_number > 0))
+        if (!channum.isEmpty() && !name.isEmpty())
         {
             return true;
         }

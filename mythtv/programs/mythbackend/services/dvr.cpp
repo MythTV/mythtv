@@ -863,7 +863,7 @@ DTC::MarkupList* Dvr::GetRecordedMarkup ( int RecordedId )
     ri.QueryMarkup(mapMark, mapSeek);
 
     auto* pMarkupList = new DTC::MarkupList();
-    for (const auto& entry : qAsConst(mapMark))
+    for (const auto& entry : std::as_const(mapMark))
     {
         DTC::Markup *pMarkup = pMarkupList->AddNewMarkup();
         QString typestr = toString(static_cast<MarkTypes>(entry.type));
@@ -874,7 +874,7 @@ DTC::MarkupList* Dvr::GetRecordedMarkup ( int RecordedId )
         else
             pMarkup->setData(QString::number(entry.data));
     }
-    for (const auto& entry : qAsConst(mapSeek))
+    for (const auto& entry : std::as_const(mapSeek))
     {
         DTC::Markup *pSeek = pMarkupList->AddNewSeek();
         QString typestr = toString(static_cast<MarkTypes>(entry.type));
@@ -908,7 +908,7 @@ bool Dvr::SetRecordedMarkup (int RecordedId, const QJsonObject &jsonObj)
     QJsonObject markuplist = jsonObj["MarkupList"].toObject();
 
     QJsonArray  marks = markuplist["Mark"].toArray();
-    for (const auto & m : marks)
+    for (const auto & m : std::as_const(marks))
     {
         QJsonObject markup = m.toObject();
         ProgramInfo::MarkupEntry entry;
@@ -925,7 +925,7 @@ bool Dvr::SetRecordedMarkup (int RecordedId, const QJsonObject &jsonObj)
     }
 
     QJsonArray  seeks = markuplist["Seek"].toArray();
-    for (const auto & m : seeks)
+    for (const auto & m : std::as_const(seeks))
     {
         QJsonObject markup = m.toObject();
         ProgramInfo::MarkupEntry entry;
@@ -1004,7 +1004,7 @@ DTC::EncoderList* Dvr::GetEncoderList()
 
     QReadLocker tvlocker(&TVRec::s_inputsLock);
     QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo(true);
-    for (auto * elink : qAsConst(gTVList))
+    for (auto * elink : std::as_const(gTVList))
     {
         if (elink != nullptr)
         {
@@ -1022,7 +1022,7 @@ DTC::EncoderList* Dvr::GetEncoderList()
             else
                 pEncoder->setHostName( elink->GetHostName() );
 
-            for (const auto & inputInfo : qAsConst(inputInfoList))
+            for (const auto & inputInfo : std::as_const(inputInfoList))
             {
                 if (inputInfo.m_inputId == static_cast<uint>(elink->GetInputID()))
                 {
@@ -1068,7 +1068,7 @@ DTC::InputList* Dvr::GetInputList()
     auto *pList = new DTC::InputList();
 
     QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo(false);
-    for (const auto & inputInfo : qAsConst(inputInfoList))
+    for (const auto & inputInfo : std::as_const(inputInfoList))
     {
         DTC::Input *input = pList->AddNewInput();
         FillInputInfo(input, inputInfo);

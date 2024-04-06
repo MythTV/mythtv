@@ -2,7 +2,9 @@
 #define MYTHPOWERDBUS_H
 
 // Qt
-#include <QtDBus>
+#include <QDBusConnection>
+#include <QDBusInterface>
+#include <QDBusObjectPath>
 
 // MythTV
 #include "mythpower.h"
@@ -45,12 +47,12 @@ class MythPowerDBus : public MythPower
     void AcquireLock         (Features Types);
 
     bool               m_onBattery        { false };
-    QMap<QString,int>  m_batteries        { };
+    QMap<QString,int>  m_batteries;
     QDBusConnection    m_bus              { QDBusConnection::systemBus() };
     QDBusInterface    *m_upowerInterface  { nullptr };
     QDBusInterface    *m_logindInterface  { nullptr };
     int                m_lockHandle       { -1 };
-    QTimer             m_delayTimer       { };
+    QTimer             m_delayTimer;
 };
 
 #endif // MYTHPOWERDBUS_H

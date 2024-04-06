@@ -1,0 +1,9 @@
+// errorid{:path{:line}}
+
+// These are QT macros
+cstyleCast:mythgame/mythgame/rominfo.h:174
+cstyleCast:mythgallery/mythgallery/iconview.h:49
+cstyleCast:mythbrowser/mythbrowser/bookmarkmanager.h:105
+
+// Ignore all warnings in these files (third party code)
+*:*/mytharchive/mytharchivehelper/pxsup2dast.c

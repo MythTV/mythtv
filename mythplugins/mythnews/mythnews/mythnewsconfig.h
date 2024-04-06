@@ -3,11 +3,7 @@
 
 // Qt headers
 #include <QtGlobal>
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-#include <QMutex>
-#else
 #include <QRecursiveMutex>
-#endif
 
 // MythTV headers
 #include <libmythui/mythscreentype.h>
@@ -33,11 +29,7 @@ class MythNewsConfig : public MythScreenType
     void loadData(void);
     void populateSites(void);
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    mutable QMutex      m_lock           {QMutex::Recursive};
-#else
     mutable QRecursiveMutex  m_lock;
-#endif
     MythNewsConfigPriv *m_priv           {nullptr};
 
     MythUIButtonList   *m_categoriesList {nullptr};

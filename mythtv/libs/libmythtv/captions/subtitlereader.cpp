@@ -57,11 +57,19 @@ void SubtitleReader::SeekFrame(int64_t ts, int flags)
 
 bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
                                    bool fix_position,
+                                   bool is_selected_forced_track,
                                    bool allow_forced,
-                                   bool  isExternal)
+                                   bool isExternal)
 {
     bool enableforced = false;
     bool forced = false;
+
+    if (m_avSubtitlesEnabled && is_selected_forced_track)
+    {
+        FreeAVSubtitle(subtitle);
+        return enableforced;
+    }
+
     for (unsigned i = 0; i < subtitle.num_rects; i++)
     {
         forced = forced || static_cast<bool>(subtitle.rects[i]->flags & AV_SUBTITLE_FLAG_FORCED);

@@ -40,9 +40,9 @@ static uint ELFHash(const QByteArray &ba)
     {
         while (*k)
         {
-            uint g = 0;
             h = (h << 4) + *k++;
-            if ((g = (h & 0xf0000000)) != 0)
+            uint g = (h & 0xf0000000);
+            if (g != 0)
                 h ^= g >> 24;
             h &= ~g;
         }
@@ -63,11 +63,7 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
         return;
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList split = timestr.split(" ", QString::SkipEmptyParts);
-#else
     QStringList split = timestr.split(" ", Qt::SkipEmptyParts);
-#endif
     QString ts = split[0];
     QDate tmpDate;
     QTime tmpTime;
@@ -533,11 +529,7 @@ bool XMLTVParser::parseFile(
                                         tagname = "guest_star";
                                 }
                                 QString name = xml.readElementText(QXmlStreamReader::SkipChildElements);
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                                QStringList characters = character.split("/", QString::SkipEmptyParts);
-#else
                                 QStringList characters = character.split("/", Qt::SkipEmptyParts);
-#endif
                                 if (characters.isEmpty())
                                 {
                                     pginfo->AddPerson(tagname, name,

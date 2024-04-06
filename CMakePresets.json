@@ -1,0 +1,188 @@
+{
+"version": 1,
+    "configurePresets": [
+        {
+            "name": "ci-base",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "build-${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": {
+                    "type": "STRING",
+                    "value": "Debug"
+                }
+            }
+        },
+        {
+            "name": "ci-sibling-build",
+            "hidden": true,
+            "cacheVariables": {
+                "LIBS_INSTALL_PREFIX": {
+                    "type": "STRING",
+                    "value": "${sourceDir}/libsinstall-${presetName}"
+                }
+            }
+        },
+        {
+            "name": "ci-qt6",
+            "hidden": true,
+            "cacheVariables": {
+                "QT_VERSION_MAJOR": {
+                    "type": "STRING",
+                    "value": "6"
+                }
+            }
+        },
+
+        {
+            "name": "qt5",
+            "inherits": "ci-base",
+            "displayName": "Native system qt5"
+        },
+        {
+            "name": "qt6",
+            "inherits": [ "ci-base", "ci-qt6" ],
+            "displayName": "Native system qt6"
+        },
+
+        {
+            "name": "android-v7-qt5",
+            "inherits": "ci-base",
+            "displayName": "Android armeabi-v7a qt5",
+            "cacheVariables": {
+                "CMAKE_ANDROID_ARCH_ABI": {
+                    "type": "STRING",
+                    "value": "armeabi-v7a"
+                }
+            }
+        },
+        {
+            "name": "android-v7-qt6",
+            "inherits": [ "android-v7-qt5", "ci-qt6" ],
+            "displayName": "Android armeabi-v7a qt6"
+        },
+
+        {
+            "name": "android-v8-qt5",
+            "inherits": "ci-base",
+            "displayName": "Android arm64-v8a qt5",
+            "cacheVariables": {
+                "CMAKE_ANDROID_ARCH_ABI": {
+                    "type": "STRING",
+                    "value": "arm64-v8a"
+                }
+            }
+        },
+        {
+            "name": "android-v8-qt6",
+            "inherits": [ "android-v8-qt5", "ci-qt6" ],
+            "displayName": "Android arm64-v8a qt6"
+        },
+
+        {
+            "name": "android-x86-qt5",
+            "inherits": "ci-base",
+            "displayName": "Android x86 qt5",
+            "cacheVariables": {
+                "CMAKE_ANDROID_ARCH_ABI": {
+                    "type": "STRING",
+                    "value": "x86"
+                }
+            }
+        },
+        {
+            "name": "android-x86-qt6",
+            "inherits": [ "android-x86-qt5", "ci-qt6" ],
+            "displayName": "Android x86 qt6"
+        },
+
+        {
+            "name": "android-x86_64-qt5",
+            "inherits": "ci-base",
+            "displayName": "Android x86_64 qt5",
+            "cacheVariables": {
+                "CMAKE_ANDROID_ARCH_ABI": {
+                    "type": "STRING",
+                    "value": "x86_64"
+                }
+            }
+        },
+        {
+            "name": "android-x86_64-qt6",
+            "inherits": [ "android-x86_64-qt5", "ci-qt6" ],
+            "displayName": "Android x86_64 qt6"
+        },
+
+
+        {
+            "name": "mingw-qt5",
+            "inherits": "ci-base",
+            "displayName": "Windows qt5",
+            "cacheVariables":
+            {
+                "CMAKE_TOOLCHAIN_FILE": {
+                    "type": "FILEPATH",
+                    "value": "${sourceDir}/cmake/mingw-w64-x86_64.cmake"
+                }
+            }
+        },
+        {
+            "name": "mingw-qt6",
+            "inherits": [ "mingw-qt5", "ci-qt6" ],
+            "displayName": "Windows qt6 (not working)"
+        },
+
+
+        {
+            "name": "android-v7-qt5-libs",
+            "inherits": [ "android-v7-qt5", "ci-sibling-build" ],
+            "displayName": "Android armeabi-v7a qt5 (separate lib install)"
+        },
+        {
+            "name": "android-v7-qt6-libs",
+            "inherits": [ "android-v7-qt6", "ci-sibling-build" ],
+            "displayName": "Android armeabi-v7a qt6 (separate lib install)"
+        },
+        {
+            "name": "android-v8-qt5-libs",
+            "inherits": [ "android-v8-qt5", "ci-sibling-build" ],
+            "displayName": "Android arm64-v8a qt5 (separate lib install)"
+        },
+        {
+            "name": "android-v8-qt6-libs",
+            "inherits": [ "android-v8-qt6", "ci-sibling-build" ],
+            "displayName": "Android arm64-v8a qt6 (separate lib install)"
+        },
+        {
+            "name": "android-x86-qt5-libs",
+            "inherits": [ "android-x86-qt5", "ci-sibling-build" ],
+            "displayName": "Android arm64-x86 qt5 (separate lib install)"
+        },
+        {
+            "name": "android-x86-qt6-libs",
+            "inherits": [ "android-x86-qt6", "ci-sibling-build" ],
+            "displayName": "Android arm64-x86 qt6 (separate lib install)"
+        },
+        {
+            "name": "android-x86_64-qt5-libs",
+            "inherits": [ "android-x86_64-qt5", "ci-sibling-build" ],
+            "displayName": "Android arm64-x86_64 qt5 (separate lib install)"
+        },
+        {
+            "name": "android-x86_64-qt6-libs",
+            "inherits": [ "android-x86_64-qt6", "ci-sibling-build" ],
+            "displayName": "Android arm64-x86_64 qt6 (separate lib install)"
+        },
+        {
+            "name": "mingw-qt5-libs",
+            "inherits": [ "mingw-qt5", "ci-sibling-build" ],
+            "displayName": "Windows qt5 (separate lib install)"
+        },
+        {
+            "name": "mingw-qt6-libs",
+            "inherits": [ "mingw-qt6", "ci-sibling-build" ],
+            "displayName": "Windows qt6 (separate lib install, not working)"
+        }
+
+    ]
+}

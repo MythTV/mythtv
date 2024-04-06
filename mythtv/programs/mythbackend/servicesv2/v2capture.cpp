@@ -651,7 +651,7 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
     QStringList sdevs = CardUtil::ProbeVideoDevices(CardType);
 
     auto* pList = new V2CaptureDeviceList();
-    for (const auto & it : qAsConst(sdevs))
+    for (const auto & it : std::as_const(sdevs))
     {
         auto* pDev = pList->AddCaptureDevice();
         pDev->setCardType (CardType);
@@ -796,7 +796,7 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
             }
         }
 #endif // USING_VBOX
-    } // endfor (const auto & it : qAsConst(sdevs))
+    } // endfor (const auto & it : std::as_const(sdevs))
     return pList;
 }
 
@@ -1267,7 +1267,7 @@ int V2Capture::AddRecProfile  ( uint GroupId, const QString& ProfileName,
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString( "AddRecProfile: GroupId and ProfileName are required." ));
-        return false;
+        return 0;
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1289,7 +1289,7 @@ int V2Capture::AddRecProfile  ( uint GroupId, const QString& ProfileName,
         int id = query.value(0).toInt();
         LOG(VB_GENERAL, LOG_ERR,
             QString( "Profile %1 already exists in group id %2 with id %3").arg(ProfileName).arg(GroupId).arg(id));
-        return false;
+        return 0;
     }
 
     query.prepare(

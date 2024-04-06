@@ -2,7 +2,11 @@
 #define MYTHMUTTERDISPLAYCONFIG_H
 
 // Qt
-#include <QtDBus>
+#include <QDBusArgument>
+#include <QDBusInterface>
+#include <QDBusMetaType>
+#include <QDBusReply>
+#include <QDBusVariant>
 #include <QObject>
 
 // MythTV

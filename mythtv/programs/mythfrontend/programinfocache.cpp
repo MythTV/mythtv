@@ -334,7 +334,7 @@ ProgramInfo *ProgramInfoCache::GetRecordingInfo(uint recordingID) const
 /// Clears the cache, m_lock must be held when this is called.
 void ProgramInfoCache::Clear(void)
 {
-    for (const auto & pi : qAsConst(m_cache))
+    for (const auto & pi : std::as_const(m_cache))
         delete pi;
     m_cache.clear();
 }

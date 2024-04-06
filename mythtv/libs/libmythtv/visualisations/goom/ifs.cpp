@@ -144,11 +144,11 @@ static void
 free_ifs_buffers (FRACTAL * Fractal)
 {
 	if (Fractal->m_buffer1 != nullptr) {
-		(void) free ((void *) Fractal->m_buffer1);
+		free ((void *) Fractal->m_buffer1);
 		Fractal->m_buffer1 = (IFSPoint *) nullptr;
 	}
 	if (Fractal->m_buffer2 != nullptr) {
-		(void) free ((void *) Fractal->m_buffer2);
+		free ((void *) Fractal->m_buffer2);
 		Fractal->m_buffer2 = (IFSPoint *) nullptr;
 	}
 }
@@ -217,13 +217,13 @@ init_ifs (int width, int height)
 	for (i = 0; i <= Fractal->m_depth + 2; ++i)
 		Fractal->m_maxPt *= Fractal->m_nbSimi;
 
-	if ((Fractal->m_buffer1 = (IFSPoint *) calloc (Fractal->m_maxPt,
-                                                   sizeof (IFSPoint))) == nullptr) {
+	Fractal->m_buffer1 = (IFSPoint *) calloc (Fractal->m_maxPt, sizeof (IFSPoint));
+	if (Fractal->m_buffer1 == nullptr) {
 		free_ifs (Fractal);
 		return;
 	}
-	if ((Fractal->m_buffer2 = (IFSPoint *) calloc (Fractal->m_maxPt,
-                                                   sizeof (IFSPoint))) == nullptr) {
+	Fractal->m_buffer2 = (IFSPoint *) calloc (Fractal->m_maxPt, sizeof (IFSPoint));
+	if (Fractal->m_buffer2 == nullptr) {
 		free_ifs (Fractal);
 		return;
 	}
@@ -486,7 +486,7 @@ release_ifs ()
 {
 	if (Root != nullptr) {
 		free_ifs(Root);
-		(void) free ((void *) Root);
+		free ((void *) Root);
 		Root = (FRACTAL *) nullptr;
 	}
 }

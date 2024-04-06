@@ -26,8 +26,8 @@ class MythHTTPThreadPool : public ServerPool
   private:
     Q_DISABLE_COPY(MythHTTPThreadPool)
     size_t m_maxThreads { 4 };
-    std::list<MythHTTPThread*> m_threads { };
-    std::list<MythHTTPThread*> m_upgradedThreads { };
+    std::list<MythHTTPThread*> m_threads;
+    std::list<MythHTTPThread*> m_upgradedThreads;
 };
 
 #endif

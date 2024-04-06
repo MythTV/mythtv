@@ -79,7 +79,7 @@ QStringList SatIP::doUPNPsearch(bool loginfo)
     EntryMap map;
     satipservers->GetEntryMap(map);
 
-    for (auto *BE : qAsConst(map))
+    for (auto *BE : std::as_const(map))
     {
         QString friendlyName = BE->GetFriendlyName();
         UPnpDeviceDesc *desc = BE->GetDeviceDesc();
@@ -100,7 +100,7 @@ QStringList SatIP::doUPNPsearch(bool loginfo)
             {
                 QStringList caps = attrib.m_sValue.split(",");
 
-                for (const auto& cap : caps)
+                for (const auto& cap : std::as_const(caps))
                 {
                     QStringList tuner = cap.split("-");
 
@@ -153,7 +153,7 @@ QString SatIP::findDeviceIP(const QString& deviceuuid)
 {
     QStringList devs = SatIP::findServers();
 
-    for (const auto& dev : devs)
+    for (const auto& dev : std::as_const(devs))
     {
         QStringList devinfo = dev.split(" ");
         const QString& id = devinfo.at(0);

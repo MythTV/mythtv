@@ -1,0 +1,469 @@
+#!/usr/bin/perl -w
+
+# mythtv-balance-expire by twitham@sbcglobal.net, 2017-02-18
+
+# See --help and --man for the complete manual, at __END__ below
+
+# All disks must have expiring recordings, ideally from the full range
+# of recorded time so that each disk expires only oldest recordings.
+# This distributes expirable recordings evenly over all disks and
+# time.  If a move makes a disk fuller than the last, then a trade
+# with a keeper is done to keep similar disk headroom.  Assumptions:
+# all files are local.  Tested with 2 disks but should work with many.
+
+use warnings;
+use strict;
+use MythTV;
+use Getopt::Long;
+use Pod::Usage;
+
+my %opt = (delta => 10);       # lower = better balance but more moves
+GetOptions(\%opt, qw(help|? manual delta=i titles subtitles verbose go
+    size files delete keepers=i disks=i))
+    or pod2usage(2);
+pod2usage(-verbose => 0) if $opt{help};
+pod2usage(-verbose => 2) if $opt{manual};
+$opt{files} or $opt{size} = 1;	# --size is default if not --files
+
+my $interactive = -t STDOUT;	# interactive terminal updates?
+
+# How to copy the files.  If successful, originals are unlinked
+my @copy = qw(ionice -n 7 nice rsync -a); # must exit 0 on success only
+push @copy, '--progress' if $interactive;
+my $RECENT = time - 3 * 24 * 60 * 60; # don't move recent files
+my $MAX = 0.7;			# maximum free space to use for copies
+my $MIN = 2.0;			# minimum disk headroom in GB
+my $KB = 1024;
+my $MB = $KB * $KB;
+my $GB = $MB * $KB;
+my @exp;			# ordered expiring basenames
+my %exp;			# {dir}{expiring basenames}
+my %keep;			# {dir}{keeping basenames}
+my %size = (one => 0);		# {basename} = bytes in file
+my %title;			# {basename} = title [/ subtitle]
+my %where;			# {basename} = dir
+my %moved;			# {basename} = position
+my %show;			# {basename} = {show}
+my %free;			# {dir} = bytes free on disk
+my %count = qw(< 0 > 0 GB< 0 GB> 0); # {type} = count/size of moves
+my $count = 0;			     # record count
+
+do { $| = 1; print "Reading database, please wait..." } if $interactive;
+
+my $myth = new MythTV();   # we'll keep expires in chronological order:
+my %rows = $myth->backend_rows('QUERY_RECORDINGS Ascending');
+my $rows = @{$rows{rows}} or die "no records found!\n";
+
+# UNDOCUMENTED: simulate alternate disks or keep percentage for testing
+($opt{disks} or defined $opt{keepers}) and $opt{go} = 0;
+
+foreach my $row (@{$rows{rows}}) { # gather status and location of shows
+    printf "%5d /%5d recordings = %3d%%%s", ++$count, $rows,
+	$count / $rows * 100, "\b" x 30 if $interactive;
+    my $show = $myth->new_recording(@$row);
+    my $key = $show->{basename};
+    my $path = $show->{local_path};
+    -f $path or next;	  # skip remote paths
+    $opt{disks} and	  # UNDOCUMENTED: pretend different disk count
+	$path =~ s{.*/}{sprintf "/var/lib/mythtv%d/recordings/",
+			    1 + rand $opt{disks}}e;
+    (my $dir = $path) =~ s@/[^/]+$@@;
+    $dir =~ /live/i and next;	# ignore temporary livetv
+    $dir =~ m@/@ or next;	# only files in a local path
+    $show->{lastmodified} < $RECENT or next; # ignore recent files
+    $show{$key} = $show;
+    $size{$key} = $show->{filesize};
+    $title{$key} = $show->{title};
+    $opt{subtitles} and $title{$key} .= " -- $show->{subtitle}";
+    $where{$key} = $dir;
+    defined $opt{keepers} and  # UNDOCUMENTED: pretend X % are keepers
+	$show->{auto_expire} = rand(100) > $opt{keepers} ? 1 : 0;
+    $show->{auto_expire} ? push @exp, $key : $keep{$dir}{$key}++;
+    $exp{$dir} or $exp{$dir} = { one => 1 };
+}
+
+print "\r", ' ' x 35, "\r" if $interactive; # erase status line
+
+my @path = sort keys %exp;	# storage paths found
+my @oops = grep { ! -w $_ } @path;
+$opt{go} and @oops and
+    die "@oops not writable, are you root or owner?\n";
+my $n = 0;
+my %n;				# {dir} = disknumber
+for my $dir (@path) {		# per-disk metrics
+    $n{$dir} = $n++;		# disk number, for indent columns
+    $free{$dir} = &free($dir);	# bytes free, updated by &move
+}
+
+my $delete = 0;			   # Deleted files to delete..
+my $old = time - 14 * 24 * 60 * 60; # .. if older than this
+while (my $move = shift @exp) {	   # expirables in time order
+    my $show = $show{$move};
+    if ($show->{recgroup} eq 'Deleted' and
+	$show->{lastmodified} < $old) {
+	my $title = "$show->{title} -- $show->{subtitle}";
+	if ($opt{delete}) {
+	    print "DELETE:  $where{$move}/$move\t$title\n";
+	    # from flush_deleted_recgroup.pl:
+	    my $delete_command = 'DELETE_RECORDING ' .
+		$show->{'chanid'} . ' ' .
+		unix_to_myth_time($show->{'recstartts'}) .
+		' NO_FORCE';
+	    my $err = $myth->backend_command($delete_command);
+	    if ($err ne '-1') {
+		print "  error:  $err\n";
+	    } else {
+		$delete++;
+	    }
+	} else {
+	    print "# use --delete to remove $where{$move}/$move\t$title\n";
+	    $delete++;
+	}
+	next;
+    }
+    @path > 1 or next;		# one disk can offer --delete only
+    my @p = $opt{size} ? sort { &expsize($a) <=> &expsize($b) } @path
+	: sort { keys %{$exp{$a}} <=> keys %{$exp{$b}} } @path;
+    my $more = pop @p;		# path with most expires
+    my $less = shift @p;	# path with least expires
+    my $exp = scalar keys %{$exp{$where{$move}}};
+    print "\t" x $n{$where{$move}},
+	$opt{size} ? sprintf "%.1f", &expsize($where{$move}) / $GB : $exp,
+	"\t" x ($n - $n{$where{$move}});
+    my $diff = $opt{size} ? (&expsize($more) - &expsize($less)) / $GB
+	:  ((keys %{$exp{$more}}) - (keys %{$exp{$less}}));
+    printf "%.0f\t", $diff;
+    printf "%.3f\t", $size{$move} / $GB;
+    my $t = $opt{titles} ? "\t$title{$move}" : "";
+    print "$move\t$where{$move}\t$show{$move}{recgroup}$t", $moved{$move} ?
+	" # moved \@ $moved{$move}\n" : "\n";
+    unless ($where{$move} eq $more) { # keep it here if not path of most
+	$exp{$where{$move}}{$move}++;
+	next;
+    }
+    if ($moved{$move} or	# move files only once
+	$diff < $opt{delta}) {
+	$exp{$more}{$move}++;	# balanced, keep it here
+	next;
+    }
+    # don't move to fuller disk unless full disk has larger trade
+    my $large = (sort { $size{$a} <=> $size{$b} }
+		 grep { !$moved{$_} } keys %{$keep{$less}},
+		 grep { $where{$_} eq $less } @exp)[-1];
+    if ($free{$less} < $free{$more} and
+	(!$large or $size{$large} < $size{$move})) {
+	$large ||= 'NONE'; $size{NONE} = 0;
+	printf "# largest trade $large %.3f < $move %.3f, skipping\n",
+	    $size{$large} / $GB, $size{$move} / $GB;
+	$exp{$more}{$move}++;	# skipped, keep it here
+	next;
+    }
+    my $code = &move($more, $less, $move, '<'); # move expiring file
+    $code < 0 and last;		# bail out on copy error
+    $code > 0 or ++$exp{$more}{$move} and next; # keep going on file skip
+    $exp{$less}{$move}++;	# record the move to new disk
+
+    # auto-balance uneven disks by deciding if keeper trade is needed
+    int($free{$less} / $GB) >= int($free{$more} / $GB) and next;
+
+    # trade keeper file or future expire of best size to balance headroom
+    my $which = '>';		# keepers first
+    my $find = ($free{$more} - $free{$less}) / 2;
+    my $swap = (sort { abs($size{$a} - $find) <=>
+			   abs($size{$b} - $find) } keys %{$keep{$less}})[0];
+    $swap or			# use younger expires if no keepers
+	$swap = (sort { abs($size{$a} - $find) <=>
+			    abs($size{$b} - $find) }
+		 grep { $where{$_} eq $less } @exp)[0] and $which = '<';
+    $swap or
+	print "# no file available for trade, continuing\n"
+	and next;
+    $code = &move($less, $more, $swap, $which); # move swapper file
+    $code < 0 and last;
+    if ($which eq '>') {	# record the move
+	$keep{$more}{$swap}++; delete $keep{$less}{$swap};
+    }
+    $moved{$swap} = $exp;
+}
+for my $dir (sort keys %exp) {	# results summary footer
+    my $e = (keys %{$exp{$dir}}) - 1;
+    my $k = keys %{$keep{$dir}};
+    my $t = $e + $k;
+    my $T = keys %size;
+    printf "SUMMARY <<<%5d/%3.0f%% expires <<< + >>>%5d/%3.0f%% keepers >>>"
+	. " = %5d/%3.0f%% + %.3fGB free on %s\n",
+	$e, $e / $t * 100, $k, $k / $t * 100, $t, $t / $T * 100,
+	$free{$dir} / $GB, $dir;
+}
+print $opt{go} ? "MOVED:  <<< "
+    : "NOTHING DONE!  Add --go to actually move <<< ";
+printf "%d = %.3f GB expires <<< and >>> %d = %.3f GB keepers >>>.\n",
+    map { $count{$_} } qw(< GB< > GB>);
+@oops and print
+    "WARNING: @oops not writeable, must be root or owner to --go\n";
+$delete and print "NOTE: ", $opt{delete} ?
+    "$delete files were deleted from the Deleted group\n" :
+    "use --delete to delete above $delete files from the Deleted group\n";
+@path > 1 or
+    die "need 2 or more paths to balance, found: @path\n";
+
+exit 0;				# all done!
+
+sub expsize {
+    my($path) = @_;
+    my $tot = 0;
+    map { $tot += $size{$_} } keys %{$exp{$path}};
+    return $tot;
+}
+sub move {		 # -1 = copy error, 0 = skip, 1 = copy success
+    my($src, $dst, $file, $which) = @_;
+    my $free = $free{$dst};
+    if (($free - $size{$file}) / $GB < $MIN or
+	$size{$file} > $free * $MAX) { # file too big?
+	printf "# skipping %.3f GB $file, %.3f free on $dst\n",
+	    $size{$file} / $GB, $free / $GB;
+	return 0;
+    }
+    $free -= $size{$file};
+    printf "$which %7.3f $file: $src -> $dst %4d %7.3f $which %s\n",
+	$size{$file} / $GB, scalar(keys %{$exp{$dst}}), $free / $GB, $title{$file};
+
+    my @src = glob "$src/${file}*"; # list includes thumbnails
+    my @cmd = (@copy, @src, "$dst/");
+    $opt{verbose} and print "@cmd\n";
+    if ($opt{go}) {		# actually do copy and unlink
+	system(@cmd) == 0
+	    or warn sprintf("exit %d from (@cmd)\n", $? >> 8)
+	    and return -1;
+	map { unlink $_ or warn "could not unlink $_: $!\n" } @src;
+	$free{$src} = &free($src); # actual disk headrooms
+	$free{$dst} = &free($dst);
+    } else {			# estimated disk headrooms
+	$free{$src} += $size{$file};
+	$free{$dst} -= $size{$file};
+    }
+    $count{$which}++;
+    $count{"GB$which"} += $size{$file} / $GB;
+    return 1;			# only if copy successful
+}
+
+sub free {			# free space of path in GB
+    my($dir) = @_;
+    $opt{disks} and return rand(20 * $GB); # random free space
+    return (&df($dir))[3] * $KB;
+}
+
+sub df {			# df of $file in KB
+    my($file) = @_;
+    my @out = split "\n", `df -k $file`;
+    return split /\s+/, $out[-1];
+}
+__END__
+
+=head1 NAME
+
+mythtv-balance-expire - move recording files to balance multiple disks
+
+=head1 SYNOPSIS
+
+ mythtv-balance-expire [--help | --man | options]
+    --help	show these options and exit
+    --man	show the full manual page and exit
+    --files	balance by file count rather than by file size
+    --delta=N	expiring file delta allowed between disks [10]
+    --titles	append titles to all files, not just moving files
+    --subtitles	append subtitles to titles
+    --delete	delete older recordings from Deleted group
+    --verbose	show the commands that would be run, or are being run:
+    --go	actually do the moves, else just show what would be done
+
+=head1 DESCRIPTION
+
+B<mythtv-balance-expire> trades recording files between multiple local
+disks in a mythtv server to better balance the files over recorded
+time.  Why would you want to do this you ask?
+
+Say you have 6 months of recordings but your disk is full so you add
+another.  The new disk now gets most new recordings since it has more
+free space.  6 months later both are full and recording new shows.
+But the original disk is now expiring files from 1 year ago while the
+new disk is expiring files only 6 months old.  Mythtv's auto-expire
+list implies your are losing 1 year old recordings but this is
+misleading since the new disk must expire shows much younger.
+
+Or, say you have a small disk and a large one, both full and recording
+via auto-expire.  And you disable auto-expire on shows you really want
+to see someday to make sure you don't lose them to auto-expire.  If
+you save a significant amount of shows this way, you can eventually
+have the small drive nearly full of saved files.  So the auto-expire
+to record a new show is from just a few days ago, even if the large
+disk is expiring shows over a year old!
+
+So, what you really need is for all disks to hold a similar amount of
+oldest expiring files.  B<This does that> by moving recordings among
+the disks.
+
+=head2 Usage and output
+
+Run with no arguments.  This will take no actions and just show the
+expiring recordings and recommended moves.
+
+The output shows expiring recordings in time sorted order.  Sums are
+indented per disk, so each sum "column" is a different disk.  The
+lines look like:
+
+    SUM DELTA GB CHAN_YYYYMMDDHHMMSS.ts /path/to/recording GROUP
+
+=over 4
+
+=item B<SUM>
+
+Amount of expiring data so far on this recording path, before placing
+the current file.  Each path is indented to a unique column.
+
+=item B<DELTA>
+
+Current delta of the path with the most expiring content compared to
+the path with the least.  When this value exceeds B<--delta>, a move
+is triggered.
+
+=item B<GB>
+
+Size in gigabytes of this expiring file.
+
+=item B<CHAN_YYYYMMDDHHMMSS.ts>
+
+Recording file name: channel, time stamp and file extension.  The
+lines are sorted by the YYYYMMDDHHMMSS time stamp of the recording.
+
+=item B</path/to/recording>
+
+Current path to the recording file.
+
+=item B<GROUP>  [title]
+
+Recording group of the file and optionally its B<--title> and
+B<--subtitle>
+
+=back
+
+Suggested moves are shown when a file should move to produce a better
+balance.  These lines look like this:
+
+    < GB expirefile /too/many/path -> /too/few/path XXX free < title
+    > GB keeperfile /too/few/path -> /too/many/path YYY free > title
+
+The expiring file is delimited by < and shown with its size in
+gigabytes.  It should move from the left path with too many to the
+right path with too few as shown by the arrow.  The resulting file
+count and free space of the destination location is shown.  Finally
+the recording group, title (and optionally B<--subtitle>) of the
+moving file is displayed.
+
+If the destination is now more full than the source, a trade is made.
+A file with auto-expire disabled (a permanent "keeper" file) is
+preferred.  This keeper file is delimited by >.  It is selected by
+size that would result in closest headroom on the disks.  If no
+keepers are left, then a future expiring file is used for trade
+instead.  When balancing to a disk with more free space, no trade is
+needed.
+
+A footer is provided which shows the end state of each disk.  A notice
+is given if nothing has actually happened yet, see B<--go>.
+
+If the suggested moves look correct, you can add B<--verbose> to see
+the commands that will be run.  For the successful copies, the
+original location will be removed.  If this still looks good, simply
+add B<--go> to actually do the given file moves.  When using B<--go>
+you must be root or the owner of the recording directories (perhaps
+mythtv) so that you have permission to move the files.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--file>
+
+Balance by expiring file count rather than file size.
+
+=item B<--delta N>
+
+Require each disk's expiring size or file count over time to be within
+N of all other disks.  If a disk has > N more than another, this
+triggers a file move to maintain this delta <= N.  Lower values
+produce a better balance while higher values need less moves.  You can
+manipulate this value to see how many moves will be required and how
+they will affect disk headroom, before deciding to use B<--go>.  A
+high value like 9999 will simply show the current [im]balance with no
+moves.  When used with B<--file>, the units are file counts, otherwise
+the units are gigabytes.  The default delta is 10.
+
+=item B<--titles>
+
+Show titles of all recording files.  Without this option, titles are
+shown only for files that are moving.
+
+=item B<--subtitles>
+
+Append subtitles to all titles.
+
+=item B<--delete>
+
+Old recordings found in the Deleted recording group are displayed with
+a note that B<--delete> may be used to delete them.  This could be
+needed for example when these recordings are no longer offered in the
+frontend due to a deletepending flag in the database.  See:
+https://forum.mythtv.org/viewtopic.php?f=36&t=2888&p=14057 Once used,
+the MythTV backend will do the file removes over some time.  This
+option has no effect if no old Deleted files are found.
+
+=item B<--verbose>
+
+Show the commands that will be run, or are being run with B<--go>.  If
+STDOUT is a terminal, then rsync(1) will use its B<--progress> option
+to show copy progress, even without this B<--verbose>.
+
+=item B<--go>
+
+Actually do the file moves with rsync(1), removing the original only
+if successful.  This requires write permission to the local recording
+directories so you must be root or mythtv on the server.  If this
+option is not given, then no actions are taken.
+
+=back
+
+=head1 CAVEATS
+
+You must have ~/.mythtv/config.xml configured to read your database
+and must be root or mythtv on the server for write permission to move
+the files.  As shown in B<--verbose>, rsync(1) is required.
+
+This only works with local files and may be confused by multiple
+backends or remote paths.  Patches welcome if you have such a setup.
+
+Of course moving dozens of files will take a long time, so be patient
+when using B<--go>.  The initial B<--go> will need to move more files
+than later runs.  Rsync(1) --progress is shown on the terminal.
+
+This does not update the database at all.  Mythtv will automatically
+discover the new locations of the recordings.  Allow time for this to
+happen between B<--go> runs.
+
+If your disks are different sizes, it may not be possible to balance
+recent time.  This is normal - you will balance that time later when
+you run this again in the future.  In fact, it is a good idea to run
+this periodically; I do so once a month.  Once you trust the actions,
+you may crontab(1) this job with B<--go>.
+
+=head1 AUTHOR
+
+Timothy D Witham <twitham@sbcglobal.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2017-2024 Timothy D Witham.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

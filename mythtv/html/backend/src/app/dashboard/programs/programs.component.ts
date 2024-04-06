@@ -14,13 +14,12 @@ import { UtilityService } from 'src/app/services/utility.service';
 export class ProgramsComponent implements OnInit {
   @Input() programs: ScheduleOrProgram[] = [];
   @Input() inter!: ScheduleLink;
-  // Usage: GUIDE, UPCOMING
-  @Input() usage: string = '';
 
   displayStop = false;
   successCount = 0;
   errorCount = 0;
   program?: ScheduleOrProgram;
+  regex = /[^a-z0-9]/g;
 
   constructor(public dataService: DataService, private dvrService: DvrService,
     private utility: UtilityService) {
@@ -29,14 +28,7 @@ export class ProgramsComponent implements OnInit {
   ngOnInit(): void { }
 
   formatStartDate(program: ScheduleOrProgram): string {
-    let starttm;
-    if (this.usage == 'UPCOMING') {
-      starttm = program.Recording.StartTs;
-    }
-    else {
-      starttm = program.StartTime;
-    }
-    return this.utility.formatDate(starttm, true);
+    return this.utility.formatDate(program.StartTime, true);
   }
 
   formatAirDate(program: ScheduleOrProgram): string {
@@ -48,28 +40,21 @@ export class ProgramsComponent implements OnInit {
 
 
   formatStartTime(program: ScheduleOrProgram): string {
-    let starttm;
-    if (this.usage == 'UPCOMING') {
-      starttm = new Date(program.Recording.StartTs).getTime();
-    }
-    else {
-      starttm = new Date(program.StartTime).getTime();
-    }
+    let starttm = new Date(program.StartTime).getTime();
     const tWithSecs = new Date(starttm).toLocaleTimeString() + ' ';
     return tWithSecs.replace(/:.. /, ' ');
   }
 
+  getClasses(program: ScheduleOrProgram): string[] {
+    let typeclass = 'guide_type_' + program.CatType;
+    let catclass = 'guide_cat_'
+      + program.Category.toLowerCase().replace(this.regex, '_');
+    return [typeclass, catclass, 'guide_type_default'];
+  }
+
   getDuration(program: ScheduleOrProgram): number {
-    let starttm;
-    let endtm;
-    if (this.usage == 'UPCOMING') {
-      starttm = new Date(program.Recording.StartTs).getTime();
-      endtm = new Date(program.Recording.EndTs).getTime();
-    }
-    else {
-      starttm = new Date(program.StartTime).getTime();
-      endtm = new Date(program.EndTime).getTime();
-    }
+    let  starttm = new Date(program.StartTime).getTime();
+    let  endtm = new Date(program.EndTime).getTime();
     const duration = (endtm - starttm) / 60000;
     return duration;
   }

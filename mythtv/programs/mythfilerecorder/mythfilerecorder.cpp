@@ -97,7 +97,11 @@ void Streamer::SendBytes(void)
         int rate  = (delta * m_dataRate) - m_dataRead;
 
         read_sz = std::min(rate, read_sz);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        read_sz = std::min((m_bufferMax - m_buffer.size()), read_sz);
+#else
         read_sz = std::min(static_cast<int>(m_bufferMax - m_buffer.size()), read_sz);
+#endif
 
         if (read_sz > 0)
         {

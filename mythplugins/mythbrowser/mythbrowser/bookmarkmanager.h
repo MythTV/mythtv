@@ -20,11 +20,11 @@ class Bookmark
     bool    m_isHomepage {false};
     bool    m_selected   {false};
 
-    inline bool operator == (const Bookmark &b) const
+    bool operator == (const Bookmark &b) const
     {
         return m_category == b.m_category && m_name == b.m_name && m_url == b.m_url;
     }
-    static inline bool sortByName(Bookmark *a, Bookmark *b)
+    static bool sortByName(Bookmark *a, Bookmark *b)
         { return StringUtil::naturalCompare(a->m_sortName, b->m_sortName) < 0; }
 };
 

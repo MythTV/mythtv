@@ -36,7 +36,7 @@ class LoggerBase : public QObject
     /// \brief Reopen the log file to facilitate log rolling
     virtual void reopen(void) = 0;
   protected:
-    QString m_handle {}; ///< semi-opaque handle for identifying instance
+    QString m_handle; ///< semi-opaque handle for identifying instance
 };
 
 /// \brief File-based logger - used for logfiles and console

@@ -1,4 +1,4 @@
-#include <QtTest/QtTest>
+#include <QTest>
 
 #include "libmyth/standardsettings.h"
 

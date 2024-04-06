@@ -216,12 +216,13 @@ export class ScheduleComponent implements OnInit {
       this.allChannels = data.ChannelInfoList.ChannelInfos;
       this.allChannels.forEach(channel => channel.Description
         = channel.ChanNum + ' ' + channel.ChannelName + ' (' + channel.CallSign + ')')
+      this.loadSuccess();
     });
   }
 
   loadSuccess() {
     this.loadCount++;
-    if (this.loadCount == 10) {
+    if (this.loadCount == 11) {
       this.loadCount = 0;
       this.setupData();
       this.displayDlg = true;
@@ -267,7 +268,10 @@ export class ScheduleComponent implements OnInit {
     }
     else
       this.recRule = undefined;
-    this.channel = this.reqChannel;
+    if (this.reqChannel)
+      this.channel = this.reqChannel;
+    else if (this.reqRecRule)
+      this.channel = this.allChannels.find((entry) => entry.ChanId == this.reqRecRule?.ChanId);
     if (this.program) {
       if (!this.channel && this.program.Channel)
         this.channel = this.program.Channel;

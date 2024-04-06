@@ -23,10 +23,6 @@
 #include "satiprtsp.h"
 #include "satipstreamhandler.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
-#define capturedView capturedRef
-#endif
-
 #define LOC  QString("SatIPRTSP[%1]: ").arg(m_inputId)
 #define LOC2 QString("SatIPRTSP[%1](%2): ").arg(m_inputId).arg(m_requestUrl.toString())
 

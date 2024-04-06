@@ -596,7 +596,7 @@ QStringList VideoMetaData::GetAllTags()
             group.append(prefix);
         }
 
-        for (const auto& field : qAsConst(fields))
+        for (const auto& field : std::as_const(fields))
         {
             // Expect label=value
             QStringList parts = field.split('=');
@@ -719,7 +719,7 @@ const QString ImageMetaData::kSeparator = "|-|";
 ImageMetaData::TagMap ImageMetaData::ToMap(const QStringList &tagStrings)
 {
     TagMap tags;
-    for (const auto& token : qAsConst(tagStrings))
+    for (const auto& token : std::as_const(tagStrings))
     {
         QStringList parts = FromString(token);
         // Expect Key, Label, Value.

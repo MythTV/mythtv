@@ -94,7 +94,7 @@ void MythUIThemeCache::ClearOldImageCache()
 
     QMap<QDateTime, QString> dirtimes;
 
-    for (const auto & fi : qAsConst(list))
+    for (const auto & fi : std::as_const(list))
     {
         if (fi.isDir() && !fi.isSymLink())
         {
@@ -117,7 +117,7 @@ void MythUIThemeCache::ClearOldImageCache()
         dirtimes.erase(dirtimes.begin());
     }
 
-    for (const auto & dirtime : qAsConst(dirtimes))
+    for (const auto & dirtime : std::as_const(dirtimes))
         LOG(VB_GUI | VB_FILE, LOG_INFO, LOC + QString("Keeping cache dir: %1").arg(dirtime));
 }
 
@@ -136,7 +136,7 @@ void MythUIThemeCache::RemoveCacheDir(const QString& Dir)
 
     dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList list = dir.entryInfoList();
-    for (const auto & fi : qAsConst(list))
+    for (const auto & fi : std::as_const(list))
     {
         if (fi.isFile() && !fi.isSymLink())
         {
@@ -189,7 +189,7 @@ void MythUIThemeCache::PruneCacheDir(const QString& dirname)
     int kept = 0;
     int deleted = 0;
     int errors = 0;
-    for (const QFileInfo & fi : qAsConst(entries))
+    for (const QFileInfo & fi : std::as_const(entries))
     {
         struct stat buf {};
         QString fullname = fi.filePath();
@@ -527,7 +527,7 @@ void MythUIThemeCache::RemoveFromCacheByFile(const QString& File)
     QDir dir(GetThemeCacheDir());
     QFileInfoList list = dir.entryInfoList();
 
-    for (const auto & fileInfo : list)
+    for (const auto & fileInfo : std::as_const(list))
     {
         if (fileInfo.fileName().contains(partialKey))
         {

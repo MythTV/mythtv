@@ -1,20 +1,16 @@
 #-*- coding: UTF-8 -*-
-import sys
-
-try:
-    from urllib import urlopen, quote_plus
-except ImportError:
-    from urllib.request import urlopen
-    from urllib.parse import quote_plus
-
+import requests
+import urllib.parse
 import re
+
+import sys
 from optparse import OptionParser
 from common import utilities
 
-__author__      = "Paul Harrison and ronie'"
+__author__      = "Paul Harrison and ronie"
 __title__       = "LyricsMode"
 __description__ = "Search http://www.lyricsmode.com for lyrics"
-__priority__    = "170"
+__priority__    = "240"
 __version__     = "0.1"
 __syncronized__ = False
 
@@ -22,77 +18,49 @@ debug = False
 
 class LyricsFetcher:
     def __init__( self ):
-        self.clean_lyrics_regex = re.compile( "<.+?>" )
-        self.normalize_lyrics_regex = re.compile( "&#[x]*(?P<name>[0-9]+);*" )
-        self.clean_br_regex = re.compile( r"<br[ /]*>[\s]*", re.IGNORECASE )
-        self.search_results_regex = re.compile("<a href=\"[^\"]+\">([^<]+)</a></td>[^<]+<td><a href=\"([^\"]+)\" class=\"b\">[^<]+</a></td>", re.IGNORECASE)
-        self.next_results_regex = re.compile("<A href=\"([^\"]+)\" class=\"pages\">next .</A>", re.IGNORECASE)
+        return
 
     def get_lyrics(self, lyrics):
         utilities.log(debug, "%s: searching lyrics for %s - %s - %s" % (__title__, lyrics.artist, lyrics.album, lyrics.title))
 
         artist = utilities.deAccent(lyrics.artist)
         title = utilities.deAccent(lyrics.title)
-        try: # below is borowed from XBMC Lyrics
-            url = "http://www.lyricsmode.com/lyrics/%s/%s/%s.html" % (artist.lower()[:1], artist.lower().replace("&","and").replace(" ","_"), title.lower().replace("&","and").replace(" ","_"))
-            lyrics_found = False
-            while True:
-                utilities.log(debug, "%s: search url: %s" % (__title__, url))
-                song_search = urlopen(url).read()
-                if song_search.find("<p id=\"lyrics_text\" class=\"ui-annotatable\">") >= 0:
-                    break
-
-                if lyrics_found:
-                    # if we're here, we found the lyrics page but it didn't
-                    # contains the lyrics part (licensing issue or some bug)
-                    return False
-
-                # Let's try to use the research box if we didn't yet
-                if not 'search' in url:
-                    url = "http://www.lyricsmode.com/search.php?what=songs&s=" + quote_plus(title.lower())
-                else:
-                    # the search gave more than on result, let's try to find our song
-                    url = ""
-                    start = song_search.find('<!--output-->')
-                    end = song_search.find('<!--/output-->', start)
-                    results = self.search_results_regex.findall(song_search, start, end)
-
-                    for result in results:
-                        if result[0].lower() in artist.lower():
-                            url = "http://www.lyricsmode.com" + result[1]
-                            lyrics_found = True
-                            break
-
-                    if not url:
-                        # Is there a next page of results ?
-                        match = self.next_results_regex.search(song_search[end:])
-                        if match:
-                            url = "http://www.lyricsmode.com/search.php" + match.group(1)
-                        else:
-                            return False
-
-            lyr = song_search.split("<p id=\"lyrics_text\" class=\"ui-annotatable\">")[1].split('</p><p id=\"lyrics_text_selected\">')[0]
-            lyr = self.clean_br_regex.sub( "\n", lyr ).strip()
-            lyr = self.clean_lyrics_regex.sub( "", lyr ).strip()
-            lyr = self.normalize_lyrics_regex.sub( lambda m: unichr( int( m.group( 1 ) ) ), lyr.decode("ISO-8859-1") )
-            lir = []
-            for line in lyr.splitlines():
-                line.strip()
-                if line.find("Lyrics from:") < 0:
-                    lir.append(line)
-            lyr = u"\n".join( lir )
-            if lyr.startswith('These lyrics are missing'):
-                return False
-            lyrics.lyrics = lyr
+        url = 'http://www.lyricsmode.com/lyrics/%s/%s/%s.html' % (artist.lower()[:1], artist.lower().replace('&','and').replace(' ','_'), title.lower().replace('&','and').replace(' ','_'))
+        result = self.direct_url(url)
+        if not result:
+            result = self.search_url(artist, title)
+        if result:
+            lyr = result.split('style="position: relative;">')[1].split('<div')[0]
+            lyrics.lyrics = lyr.replace('<br />', '')
             return True
+
+    def direct_url(self, url):
+        try:
+            utilities.log(debug, '%s: direct url: %s' % (__title__, url))
+            song_search = requests.get(url, timeout=10)
+            response = song_search.text
+            if response.find('lyrics_text') >= 0:
+                return response
         except:
-            utilities.log(True, "%s: %s::%s (%d) [%s]" % (
-                   __title__, self.__class__.__name__,
-                   sys.exc_info()[ 2 ].tb_frame.f_code.co_name,
-                   sys.exc_info()[ 2 ].tb_lineno,
-                   sys.exc_info()[ 1 ]
-                   ))
-            return False
+            utilities.log(debug, 'error in direct url')
+
+    def search_url(self, artist, title):
+        try:
+            url = 'http://www.lyricsmode.com/search.php?search=' + urllib.parse.quote_plus(artist.lower() + ' ' + title.lower())
+            utilities.log(debug, '%s: search url: %s' % (__title__, url))
+            song_search = requests.get(url, timeout=10)
+            response = song_search.text
+            matchcode = re.search('lm-list__cell-title">.*?<a href="(.*?)" class="lm-link lm-link--primary', response, flags=re.DOTALL)
+            try:
+                url = 'http://www.lyricsmode.com' + (matchcode.group(1))
+                result = self.direct_url(url)
+                if result:
+                    return result
+            except:
+                return
+        except:
+            utilities.log(debug, 'error in search url')
+
 
 def performSelfTest():
     found = False

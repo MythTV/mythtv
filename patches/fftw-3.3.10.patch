@@ -1,0 +1,14 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b6e4666..aaea6ef 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -309,6 +309,9 @@ if (BUILD_SHARED_LIBS)
+ endif ()
+ 
+ add_library (${fftw3_lib} ${SOURCEFILES})
++if (WIN32)
++  target_link_options (${fftw3_lib} PRIVATE -Wl,--export-all-symbols)
++endif ()
+ target_include_directories (${fftw3_lib} INTERFACE $<INSTALL_INTERFACE:include>)
+ if (MSVC AND NOT (CMAKE_C_COMPILER_ID STREQUAL "Intel"))
+   target_compile_definitions (${fftw3_lib} PRIVATE /bigobj)

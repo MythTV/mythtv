@@ -21,7 +21,7 @@
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 
-#include <QtTest/QtTest>
+#include <QTest>
 
 #include "mythtimer.h"
 

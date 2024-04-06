@@ -30,6 +30,15 @@
                         </small>
                     </div>
 
+                    <div class="form-group field">
+                        <label for="EITScanPeriod" class="label block" >{{ 'settings.eit.scan_label' | translate }}</label>
+                        <p-inputNumber [(ngModel)]="EITScanPeriod" name="EITScanPeriod" id="EITScanPeriod"
+                            [showButtons]="true" [min]="5" [max]="60" [step]="5"></p-inputNumber>
+                        <small class="block">
+                            {{ 'settings.eit.scan_desc' | translate }}
+                        </small>
+                    </div>
+
                 </div>
 
             </div>

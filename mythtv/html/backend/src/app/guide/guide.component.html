@@ -2,11 +2,18 @@
 <div *ngIf="loaded; else loading">
     <div class="flex">
 
+        <div class="flex align-items-center pr-5" *ngIf="displayType == GRID">
+            <p-dropdown [(ngModel)]="channelGroup" [options]="channelGroups" name="channelGroup" (onChange)="refresh()"
+                optionLabel="Name" pTooltip="{{ 'dashboard.guide.channel_group' | translate }}" tooltipPosition="top">
+            </p-dropdown>
+        </div>
+
         <div class="flex align-items-center">
             <p-calendar [(ngModel)]="m_pickerDate" [showTime]="true" [stepMinute]="30" [dateFormat]="'yy/mm/dd'"
                 (onClose)="onDateChange()" (keyup.enter)="onDateChange()" (onBlur)="onDateChange()"
-                [selectOtherMonths]="true" [showIcon]="true" [showOnFocus]="false" [showButtonBar]="true"
-                [clearButtonStyleClass]="'hidden'">
+                [selectOtherMonths]="true" [showIcon]="true" [showOnFocus]="true" [showButtonBar]="true"
+                [clearButtonStyleClass]="'hidden'"
+                pTooltip="{{ 'dashboard.guide.calendar_tip' | translate }}" tooltipPosition="top">
             </p-calendar>
         </div>
 
@@ -29,17 +36,18 @@
             <input type="text" pInputText id="searchValue" [(ngModel)]="searchValue" name="searchValue" class="text-xl"
                 placeholder="Search" />
             <button pButton pRipple icon="pi pi-search" class="p-button-text" (click)="titleSearch()"
-                pTooltip="{{ 'dashboard.guide.title_search' | translate }}"></button>
+                pTooltip="{{ 'dashboard.guide.title_search' | translate }}" tooltipPosition="top"></button>
             <button pButton pRipple icon="pi pi-user" class="p-button-text" (click)="peopleSearch()"
-                pTooltip="{{ 'dashboard.guide.people_search' | translate }}"></button>
+                pTooltip="{{ 'dashboard.guide.people_search' | translate }}" tooltipPosition="top"></button>
             <button pButton pRipple icon="pi pi-search-plus" class="p-button-text" (click)="fullSearch()"
-                pTooltip="{{ 'dashboard.guide.full_search' | translate }}"></button>
+                pTooltip="{{ 'dashboard.guide.full_search' | translate }}" tooltipPosition="top"></button>
         </div>
 
         <div class="flex align-items-center"
             *ngIf="[CHANNEL,TITLESEARCH,PEOPLESEARCH,FULLSEARCH].indexOf(displayType) > -1">
             <button pButton pRipple icon="pi pi-table" class="p-button-text"
-                pTooltip="{{ 'dashboard.guide.retgrid' | translate }}" (click)="onGrid()"></button>
+                pTooltip="{{ 'dashboard.guide.retgrid' | translate }}" (click)="onGrid()"
+                tooltipPosition="top"></button>
         </div>
         <div class="flex align-items-center">
             <div *ngIf="refreshing else refreshBn"><p-progressSpinner
@@ -47,15 +55,14 @@
             <ng-template #refreshBn>
                 <div *ngIf="[CHANNEL,GRID].indexOf(displayType) > -1 ">
                     <button pButton pRipple icon="pi pi-refresh" class="p-button-text"
-                        (click)="refreshing=true;refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
+                        (click)="refreshing=true;refresh()" pTooltip="{{ 'common.refresh' | translate }}"
+                        tooltipPosition="top"></button>
                 </div>
             </ng-template>
         </div>
         <div class="flex align-items-center">
-            <div class="type_series p-2 mx-2 font-bold">{{ 'dashboard.guide.type_series' | translate }}</div>
-            <div class="type_tvshow p-2 mx-2 font-bold">{{ 'dashboard.guide.type_tvshow' | translate }}</div>
-            <div class="type_movie p-2 mx-2 font-bold">{{ 'dashboard.guide.type_movie' | translate }}</div>
-            <div class="type_sports p-2 mx-2 font-bold">{{ 'dashboard.guide.type_sports' | translate }}</div>
+            <button type="text" pButton label="{{ 'dashboard.guide.colors' | translate }}"
+                (click)="showLegend = true"></button>
         </div>
     </div>
     <div *ngIf="displayType == GRID">
@@ -94,12 +101,23 @@
             </p-dataView>
         </p-scrollPanel>
     </div>
+
     <div *ngIf="[CHANNEL,TITLESEARCH,PEOPLESEARCH,FULLSEARCH].indexOf(displayType) > -1 ">
-        <app-programs [inter]="inter" [programs]="listPrograms" [usage]="'GUIDE'"></app-programs>
+        <app-programs [inter]="inter" [programs]="listPrograms"></app-programs>
     </div>
 
 </div>
+
 <app-schedule [inter]="inter"></app-schedule>
+
 <ng-template #loading>
     <p-progressSpinner></p-progressSpinner>
 </ng-template>
+
+<p-dialog header="{{ 'dashboard.guide.colors' | translate }}" [(visible)]="showLegend" [style]="{width: '80vw'}"
+    [modal]="true">
+    <ng-template pTemplate>
+        <app-legend [programGuide]="displayType == GRID ? m_programGuide : null"
+            [listPrograms]="displayType == GRID ? null : listPrograms"></app-legend>
+    </ng-template>
+</p-dialog>

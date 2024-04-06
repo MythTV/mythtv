@@ -1,0 +1,7 @@
+:host ::ng-deep .p-tieredmenu {
+    border: 2px solid;
+}
+
+:host ::ng-deep .p-tieredmenu .p-submenu-list {
+    border: 2px solid;
+}

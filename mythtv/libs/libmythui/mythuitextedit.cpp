@@ -222,7 +222,7 @@ void MythUITextEdit::InsertText(const QString &text)
     if (!m_text)
         return;
 
-    for (const auto& c : qAsConst(text))
+    for (const auto& c : std::as_const(text))
         InsertCharacter(c);
 
     emit valueChanged();

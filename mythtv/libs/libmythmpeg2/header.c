@@ -32,12 +32,14 @@
 #include "attributes.h"
 #include "mpeg2_internal.h"
 
-#define SEQ_EXT 2
-#define SEQ_DISPLAY_EXT 4
-#define QUANT_MATRIX_EXT 8
-#define COPYRIGHT_EXT 0x10
-#define PIC_DISPLAY_EXT 0x80
-#define PIC_CODING_EXT 0x100
+enum {
+    SEQ_EXT          = 0x002,
+    SEQ_DISPLAY_EXT  = 0x004,
+    QUANT_MATRIX_EXT = 0x008,
+    COPYRIGHT_EXT    = 0x010,
+    PIC_DISPLAY_EXT  = 0x080,
+    PIC_CODING_EXT   = 0x100,
+};
 
 /* default intra quant matrix, in zig-zag order */
 static const uint8_t default_intra_quantizer_matrix[64] ATTR_ALIGN(16) = {
@@ -145,9 +147,11 @@ int mpeg2_header_sequence (mpeg2dec_t * mpeg2dec)
 	return 1;
 
     int i = (buffer[0] << 16) | (buffer[1] << 8) | buffer[2];
-    if (! (sequence->display_width = sequence->picture_width = i >> 12))
+    sequence->display_width = sequence->picture_width = i >> 12;
+    if (sequence->display_width == 0)
 	return 1;
-    if (! (sequence->display_height = sequence->picture_height = i & 0xfff))
+    sequence->display_height = sequence->picture_height = i & 0xfff;
+    if (sequence->display_height == 0)
 	return 1;
     sequence->width = (sequence->picture_width + 15) & ~15;
     sequence->height = (sequence->picture_height + 15) & ~15;

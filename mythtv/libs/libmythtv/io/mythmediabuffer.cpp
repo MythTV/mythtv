@@ -1561,7 +1561,7 @@ uint64_t MythMediaBuffer::UpdateDecoderRate(uint64_t Latest)
     if (!m_bitrateMonitorEnabled)
         return 0;
 
-    auto current = std::chrono::milliseconds(QDateTime::currentDateTime().toMSecsSinceEpoch());
+    auto current = std::chrono::milliseconds(QDateTime::currentMSecsSinceEpoch());
     std::chrono::milliseconds expire = current - 1s;
 
     m_decoderReadLock.lock();
@@ -1592,7 +1592,7 @@ uint64_t MythMediaBuffer::UpdateStorageRate(uint64_t Latest)
     if (!m_bitrateMonitorEnabled)
         return 0;
 
-    auto current = std::chrono::milliseconds(QDateTime::currentDateTime().toMSecsSinceEpoch());
+    auto current = std::chrono::milliseconds(QDateTime::currentMSecsSinceEpoch());
     auto expire = current - 1s;
 
     m_storageReadLock.lock();
@@ -1860,11 +1860,7 @@ MythBDBuffer  *MythMediaBuffer::BD(void)
 
 void MythMediaBuffer::AVFormatInitNetwork(void)
 {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    static QMutex s_avnetworkLock(QMutex::Recursive);
-#else
     static QRecursiveMutex s_avnetworkLock;
-#endif
     static bool s_avnetworkInitialised = false;
     QMutexLocker lock(&s_avnetworkLock);
     if (!s_avnetworkInitialised)

@@ -4,7 +4,6 @@
 #include <QSet>
 #include "mythevent.h"
 #include "mythbaseexp.h"
-#include "qtuplift.h"
 
 class QObject;
 class QMutex;

@@ -1,0 +1,20 @@
+[binaries]
+ar = '@CMAKE_AR@'
+c = '@CMAKE_C_COMPILER@'
+cpp = '@CMAKE_CXX_COMPILER@'
+ranlib = '@CMAKE_RANLIB@'
+strip = '@CMAKE_STRIP@'
+windres = '@CMAKE_RC_COMPILER@'
+
+[properties]
+# Don't set sys_root.  It causes pkg_config to return wrong values for
+# the include directories.  It will return <sys_root>/<actual_dir>
+# instead of <actual_dir>.
+#
+# sys_root = '@MINGW_SYSROOT@'
+
+[host_machine]
+system = 'windows'
+cpu_family = 'x86_64'
+cpu = 'x86_64'
+endian = 'little'

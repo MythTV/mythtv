@@ -309,7 +309,7 @@ void MythHTTPServer::NewPaths(const QStringList &Paths)
 {
     if (Paths.isEmpty())
         return;
-    for (const auto & path : qAsConst(Paths))
+    for (const auto & path : std::as_const(Paths))
     {
         if (ReservedPath(path))
             continue;
@@ -326,7 +326,7 @@ void MythHTTPServer::StalePaths(const QStringList& Paths)
 {
     if (Paths.isEmpty())
         return;
-    for (const auto & path : qAsConst(Paths))
+    for (const auto & path : std::as_const(Paths))
     {
         if (m_config.m_filePaths.contains(path))
         {
@@ -361,7 +361,7 @@ void MythHTTPServer::StalePaths(const QStringList& Paths)
 void MythHTTPServer::NewHandlers(const HTTPHandlers& Handlers)
 {
     bool newhandlers = false;
-    for (const auto & handler : qAsConst(Handlers))
+    for (const auto & handler : std::as_const(Handlers))
     {
         if (ReservedPath(handler.first))
             continue;
@@ -385,7 +385,7 @@ void MythHTTPServer::NewHandlers(const HTTPHandlers& Handlers)
 void MythHTTPServer::StaleHandlers(const HTTPHandlers& Handlers)
 {
     bool stalehandlers = false;
-    for (const auto & handler : qAsConst(Handlers))
+    for (const auto & handler : std::as_const(Handlers))
     {
         auto found = std::find_if(m_config.m_handlers.begin(), m_config.m_handlers.end(),
                                   [&handler](const HTTPHandler& Handler) {  return Handler.first == handler.first; });
@@ -402,7 +402,7 @@ void MythHTTPServer::StaleHandlers(const HTTPHandlers& Handlers)
 void MythHTTPServer::NewServices(const HTTPServices& Services)
 {
     bool newservices = false;
-    for (const auto & service : qAsConst(Services))
+    for (const auto & service : std::as_const(Services))
     {
         if (ReservedPath(service.first))
             continue;
@@ -426,7 +426,7 @@ void MythHTTPServer::NewServices(const HTTPServices& Services)
 void MythHTTPServer::StaleServices(const HTTPServices& Services)
 {
     bool staleservices = false;
-    for (const auto & service : qAsConst(Services))
+    for (const auto & service : std::as_const(Services))
     {
         auto found = std::find_if(m_config.m_services.begin(), m_config.m_services.end(),
                                   [&service](const HTTPService& Service) {  return Service.first == service.first; });
@@ -464,7 +464,7 @@ void MythHTTPServer::BuildHosts()
     auto defaults = DefaultListen();
     bool allipv4 = false;
     bool allipv6 = false;
-    for (const auto & address : qAsConst(defaults))
+    for (const auto & address : std::as_const(defaults))
     {
         if (address == QHostAddress::AnyIPv4)
             allipv4 |= true;
@@ -479,7 +479,7 @@ void MythHTTPServer::BuildHosts()
     if (allipv4 || allipv6)
     {
         auto addresses = QNetworkInterface::allAddresses();
-        for (const auto & address : qAsConst(addresses))
+        for (const auto & address : std::as_const(addresses))
         {
             if ((allipv4 && address.protocol() == QAbstractSocket::IPv4Protocol) ||
                 (allipv6 && address.protocol() ==  QAbstractSocket::IPv6Protocol))
@@ -523,7 +523,7 @@ void MythHTTPServer::BuildOrigins()
     QStringList extras = gCoreContext->GetSetting("AllowedOriginsList", QString(
                                                   "https://chromecast.mythtv.org"
                                                   )).split(",");
-    for (const auto & extra : extras)
+    for (const auto & extra : std::as_const(extras))
     {
         QString clean = extra.trimmed();
         if (clean.startsWith("http://") || clean.startsWith("https://"))
@@ -560,7 +560,7 @@ void MythHTTPServer::ResolveMaster(QHostInfo Info)
     auto addresses = BuildAddressList(Info);
 
     // Add status and SSL addressed for each
-    for (const auto & address : addresses)
+    for (const auto & address : std::as_const(addresses))
     {
         m_config.m_allowedOrigins.append(QString("http://%1").arg(address));
         m_config.m_allowedOrigins.append(QString("http://%1:%2").arg(address).arg(m_masterStatusPort));
@@ -582,7 +582,7 @@ void MythHTTPServer::DebugOrigins()
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Name resolution complete: %1 'Origins' found").arg(m_config.m_allowedOrigins.size()));
-        for (const auto & address : qAsConst(m_config.m_allowedOrigins))
+        for (const auto & address : std::as_const(m_config.m_allowedOrigins))
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Allowed origin: %1").arg(address));
     }
 }
@@ -592,7 +592,7 @@ void MythHTTPServer::DebugOrigins()
 void MythHTTPServer::ResolveHost(QHostInfo Info)
 {
     auto addresses = BuildAddressList(Info);
-    for (const auto & address : addresses)
+    for (const auto & address : std::as_const(addresses))
     {
         // The port is optional - so just add both to our list to simplify the
         // checks when a request is received
@@ -614,7 +614,7 @@ void MythHTTPServer::DebugHosts()
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Name resolution complete: %1 'Hosts' found").arg(m_config.m_hosts.size()));
-        for (const auto & address : qAsConst(m_config.m_hosts))
+        for (const auto & address : std::as_const(m_config.m_hosts))
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Host: %1").arg(address));
     }
 }

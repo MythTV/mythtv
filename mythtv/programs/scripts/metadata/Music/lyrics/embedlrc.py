@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 # ----------------------
 """
@@ -10,11 +10,11 @@ import xml.dom.minidom as xml
 from optparse import OptionParser
 from common import utilities
 
-__author__      = "Paul Harrison and 'ronin'"
+__author__      = "Paul Harrison and ronin"
 __title__       = "EmbeddedLyrics"
 __description__ = "Search tracks tag for embedded lyrics"
 __version__     = "0.2"
-__priority__    = "100"
+__priority__    = "50"
 __syncronized__ = True
 
 debug = False
@@ -202,7 +202,7 @@ def buildVersion():
     version = etree.XML(u'<grabber></grabber>')
     etree.SubElement(version, "name").text = __title__
     etree.SubElement(version, "author").text = __author__
-    etree.SubElement(version, "command").text = 'alsong.py'
+    etree.SubElement(version, "command").text = 'embedlrc.py'
     etree.SubElement(version, "type").text = 'lyrics'
     etree.SubElement(version, "description").text = __description__
     etree.SubElement(version, "version").text = __version__

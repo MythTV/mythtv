@@ -23,8 +23,11 @@
 // Qt headers
 #include <QtGlobal>
 #if CONFIG_QTDBUS
-#include <QtDBus>
 #include <QDBusConnection>
+#include <QDBusInterface>
+#include <QDBusPendingReply>
+#include <QDBusReply>
+#include <QVersionNumber>
 #include <QXmlStreamReader>
 #endif
 #include <QList>
@@ -323,7 +326,7 @@ bool MediaMonitorUnix::CheckMountable(void)
 
         // Parse the returned device array
         const QDBusObjectPathList& list(reply.value());
-        for (const auto& entry : qAsConst(list))
+        for (const auto& entry : std::as_const(list))
         {
             // Create the MythMediaDevice
             MythMediaDevice* pDevice = nullptr;
@@ -371,7 +374,7 @@ bool MediaMonitorUnix::CheckMountable(void)
     sysfs.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
 
     auto list = sysfs.entryList();
-    for (const auto& device : qAsConst(list))
+    for (const auto& device : std::as_const(list))
     {
         // ignore floppies, too slow
         if (device.startsWith("fd"))
@@ -579,11 +582,7 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
             line = stream.readLine();
             if (line.startsWith("drive name:"))
             {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                l = line.split('\t', QString::SkipEmptyParts);
-#else
                 l = line.split('\t', Qt::SkipEmptyParts);
-#endif
                 l.pop_front();   // Remove 'drive name:' field
                 break;           // file should only contain one drive table?
             }
@@ -691,7 +690,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
     //
     // Check if this is a duplicate of a device we have already added
     //
-    for (const auto *device : qAsConst(m_devices))
+    for (const auto *device : std::as_const(m_devices))
     {
         if (stat(device->getDevicePath().toLocal8Bit().constData(), &sb) < 0)
         {
@@ -788,11 +787,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
             return false;
         dev = dev.mid(pos+kSuperOptDev.size());
         static const QRegularExpression kSeparatorRE { "[, ]" };
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList parts = dev.split(kSeparatorRE, QString::SkipEmptyParts);
-#else
         QStringList parts = dev.split(kSeparatorRE, Qt::SkipEmptyParts);
-#endif
         if (parts[0].isEmpty())
             return false;
         pDevice = MythCDROM::get(this, dev, is_supermount, m_allowEject);
@@ -903,7 +898,7 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
 
         bool found_partitions = false;
         QStringList parts = sysfs.entryList();
-        for (const auto& part : qAsConst(parts))
+        for (const auto& part : std::as_const(parts))
         {
             // skip some sysfs dirs that are _not_ sub-partitions
             if (part == "device" || part == "holders" || part == "queue"
@@ -972,12 +967,8 @@ void MediaMonitorUnix::CheckDeviceNotifications(void)
         qBuffer.append(QString::fromStdString(buffer));
         size = read(m_fifo, buffer.data(), 255);
     }
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    const QStringList list = qBuffer.split('\n', QString::SkipEmptyParts);
-#else
     const QStringList list = qBuffer.split('\n', Qt::SkipEmptyParts);
-#endif
-    for (const auto& notif : qAsConst(list))
+    for (const auto& notif : std::as_const(list))
     {
         if (notif.startsWith("add"))
         {

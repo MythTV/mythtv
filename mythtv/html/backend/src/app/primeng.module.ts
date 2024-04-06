@@ -33,6 +33,7 @@ import { TabMenuModule } from 'primeng/tabmenu';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SlideMenuModule } from 'primeng/slidemenu';
 import {InputTextareaModule} from 'primeng/inputtextarea';
+import {TieredMenuModule} from 'primeng/tieredmenu';
 
 @NgModule({
     exports: [
@@ -68,7 +69,8 @@ import {InputTextareaModule} from 'primeng/inputtextarea';
         TabMenuModule,
         MultiSelectModule,
         SlideMenuModule,
-        InputTextareaModule
+        InputTextareaModule,
+        TieredMenuModule
     ]
 })
 

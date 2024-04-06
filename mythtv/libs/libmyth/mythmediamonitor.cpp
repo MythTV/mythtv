@@ -213,7 +213,7 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString &label,
         }
 
         // Add button for each drive
-        for (auto *drive : drives)
+        for (auto *drive : std::as_const(drives))
             dlg->AddButton(DevName(drive));
 
         dlg->AddButton(tr("Cancel"));
@@ -340,11 +340,7 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval, bool allowEject
 
     if (!ignore.isEmpty())
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        m_ignoreList = ignore.split(',', QString::SkipEmptyParts);
-#else
         m_ignoreList = ignore.split(',', Qt::SkipEmptyParts);
-#endif
     }
 
     LOG(VB_MEDIA, LOG_NOTICE, "Creating MediaMonitor");
@@ -352,7 +348,7 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval, bool allowEject
 
     // If any of IgnoreDevices are symlinks, also add the real device
     QStringList symlinked;
-    for (const auto & ignored : qAsConst(m_ignoreList))
+    for (const auto & ignored : std::as_const(m_ignoreList))
     {
         if (auto fi = QFileInfo(ignored); fi.isSymLink())
         {
@@ -533,7 +529,7 @@ MythMediaDevice* MediaMonitor::GetMedia(const QString& path)
 {
     QMutexLocker locker(&m_devicesLock);
 
-    for (auto *dev : qAsConst(m_devices))
+    for (auto *dev : std::as_const(m_devices))
     {
         if (dev->isSameDevice(path) &&
             ((dev->getStatus() == MEDIASTAT_USEABLE) ||
@@ -606,7 +602,7 @@ QList<MythMediaDevice*> MediaMonitor::GetMedias(unsigned mediatypes)
 
     QList<MythMediaDevice*> medias;
 
-    for (auto *dev : qAsConst(m_devices))
+    for (auto *dev : std::as_const(m_devices))
     {
         if ((dev->getMediaType() & mediatypes) &&
             ((dev->getStatus() == MEDIASTAT_USEABLE) ||
@@ -941,7 +937,7 @@ QString MediaMonitor::listDevices(void)
 {
     QStringList list;
 
-    for (const auto *dev : qAsConst(m_devices))
+    for (const auto *dev : std::as_const(m_devices))
     {
         QString devStr;
         QString model = dev->getDeviceModel();

@@ -1,0 +1,84 @@
+/*  Customize the guide colors here.
+
+    Note that changes you make here may be overwritten if you subsequently install a new
+    build  of MythTV. Therefore keep a copy of your changed file somewhere else and copy
+    it back here if you install MythTV again or upgrade it.
+
+    Use ".guide_type_" prefix for "Category Type" in the listings. Normally there are only 4
+    types: series, tvshow, movie, sports.
+
+    Use ".guide_cat_" prefix for "Category" in the listings. Following this is the category,
+    converted to lower case, all characters other than a-z and 0-9 changed to underscore.
+    For example "Science fiction" becomes .guide_cat_science_fiction and "Bus./financial" becomes
+    .guide_cat_bus__financial (two underscores).
+
+    If you edit this file with Visual C++, it will provide a color selector to  make selecting
+    colors easy.
+*/
+
+/*  The default color must be first in the list. Do not remove this default. You can change it
+    if needed.  If you remove it the default colors may be unreadable. */
+.guide_type_default { background-color: #403060 !important; color: white !important; }
+
+/* The type colors are next in the list. If you do not want colors for these types you 
+    can remove or comment these lines.
+    If a show matches a type and a category, the last match will take effect, in other
+    words the category will be used. If you want all movies to have the same color
+    irrespective of the category, put the .guide_type_movie entry at the end of this file */
+.guide_type_sports  { background-color: #005030 !important; color: white !important; }
+.guide_type_series  { background-color: darkblue !important; color: white !important; }
+.guide_type_tvshow  { background-color: rgb(117, 189, 189) !important; color: black !important; }
+.guide_type_movie   { background-color: #fc7b7b !important; color: black !important; }
+
+/* The category colors are after the type colors. If there is a matching category its
+    color will override the type color. Any time there is a multiple match, the last one
+    in this file that matches will take effect.
+    You can change these, remove entries or add missing entries.
+    If you add a light background color, you may want to change the text color from white
+    to black */
+.guide_cat_action         { background-color: #906020 !important; color: white !important; }
+.guide_cat_adult          { background-color: #702020 !important; color: white !important; }
+.guide_cat_animals        { background-color: #609060 !important; color: white !important; }
+.guide_cat_art            { background-color: #801060 !important; color: white !important; }
+.guide_cat_bus__financial { background-color: #703010 !important; color: white !important; }
+.guide_cat_children       { background-color: #B00010 !important; color: white !important; }
+.guide_cat_animated       { background-color: #B00010 !important; color: white !important; }
+.guide_cat_comedy         { background-color: #006080 !important; color: white !important; }
+.guide_cat_sitcom         { background-color: #006080 !important; color: white !important; }
+.guide_cat_comedy_drama   { background-color: #006080 !important; color: white !important; }
+.guide_cat_cooking        { background-color: #208040 !important; color: white !important; }
+.guide_cat_crime          { background-color: #105050 !important; color: white !important; }
+.guide_cat_crime_drama    { background-color: #105050 !important; color: white !important; }
+.guide_cat_documentary    { background-color: #504020 !important; color: white !important; }
+.guide_cat_docudrama      { background-color: #504020 !important; color: white !important; }
+.guide_cat_drama          { background-color: #400060 !important; color: white !important; }
+.guide_cat_educational    { background-color: #606060 !important; color: white !important; }
+.guide_cat_fantasy        { background-color: #606090 !important; color: white !important; }
+.guide_cat_game_show      { background-color: #701010 !important; color: white !important; }
+.guide_cat_health         { background-color: #806060 !important; color: white !important; }
+.guide_cat_history        { background-color: #807020 !important; color: white !important; }
+.guide_cat_historical_drama { background-color: #807020 !important; color: white !important; }
+.guide_cat_house_garden   { background-color: #A0A000 !important; color: white !important; }
+.guide_cat_how_to         { background-color: #A0A000 !important; color: white !important; }
+.guide_cat_horror         { background-color: #101040 !important; color: white !important; }
+.guide_cat_health         { background-color: #806060 !important; color: white !important; }
+.guide_cat_music          { background-color: #801060 !important; color: white !important; }
+.guide_cat_mystery        { background-color: #105050 !important; color: white !important; }
+.guide_cat_news           { background-color: #606040 !important; color: white !important; }
+.guide_cat_newsmagazine   { background-color: #606040 !important; color: white !important; }
+.guide_cat_reality        { background-color: #304040 !important; color: white !important; }
+.guide_cat_religious      { background-color: #804080 !important; color: white !important; }
+.guide_cat_romance        { background-color: #A02050 !important; color: white !important; }
+.guide_cat_science        { background-color: #008050 !important; color: white !important; }
+.guide_cat_nature         { background-color: #008050 !important; color: white !important; }
+.guide_cat_science_fiction { background-color: #606090 !important; color: white !important; }
+.guide_cat_shopping       { background-color: #103010 !important; color: white !important; }
+.guide_cat_soap           { background-color: #508080 !important; color: white !important; }
+.guide_cat_sports_talk    { background-color: #005030 !important; color: white !important; }
+.guide_cat_sports_non_event { background-color: #005030 !important; color: white !important; }
+.guide_cat_talk           { background-color: #203040 !important; color: white !important; }
+.guide_cat_tba            { background-color: #303030 !important; color: white !important; }
+.guide_cat_travel         { background-color: #2060B0 !important; color: white !important; }
+.guide_cat_war            { background-color: #B06050 !important; color: white !important; }
+.guide_cat_western        { background-color: #806040 !important; color: white !important; }
+

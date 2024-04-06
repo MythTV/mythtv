@@ -18,8 +18,6 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
 import smolt
 import json
 

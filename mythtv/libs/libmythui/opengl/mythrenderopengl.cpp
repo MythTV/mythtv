@@ -404,7 +404,7 @@ void MythRenderOpenGL::DebugFeatures(void)
             .arg(fmt.majorVersion()).arg(fmt.minorVersion());
     QString qtglsurface = QString("RGBA: %1:%2:%3:%4 Depth: %5 Stencil: %6")
             .arg(fmt.redBufferSize()).arg(fmt.greenBufferSize())
-            .arg(fmt.greenBufferSize()).arg(fmt.alphaBufferSize())
+            .arg(fmt.blueBufferSize()).arg(fmt.alphaBufferSize())
             .arg(fmt.depthBufferSize()).arg(fmt.stencilBufferSize());
     QStringList shaders {"None"};
     if (m_features & Shaders)
@@ -1429,7 +1429,7 @@ QOpenGLShaderProgram *MythRenderOpenGL::CreateShaderProgram(const QString &Verte
     if (VERBOSE_LEVEL_CHECK(VB_GENERAL, LOG_DEBUG))
     {
         QList<QOpenGLShader*> shaders = program->shaders();
-        for (QOpenGLShader* shader : qAsConst(shaders))
+        for (QOpenGLShader* shader : std::as_const(shaders))
             LOG(VB_GENERAL, LOG_DEBUG, "\n" + shader->sourceCode());
     }
     program->bindAttributeLocation("a_position",  VERTEX_INDEX);
@@ -1453,7 +1453,7 @@ QOpenGLShaderProgram* MythRenderOpenGL::CreateComputeShader(const QString &Sourc
     if (VERBOSE_LEVEL_CHECK(VB_GENERAL, LOG_DEBUG))
     {
         QList<QOpenGLShader*> shaders = program->shaders();
-        for (QOpenGLShader* shader : qAsConst(shaders))
+        for (QOpenGLShader* shader : std::as_const(shaders))
             LOG(VB_GENERAL, LOG_DEBUG, "\n" + shader->sourceCode());
     }
 

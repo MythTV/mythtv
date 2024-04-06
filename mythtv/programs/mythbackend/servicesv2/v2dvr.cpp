@@ -901,6 +901,8 @@ bool V2Dvr::SetLastPlayPos( int RecordedId,
                             const QString &offsettype,
                             long Offset )
 {
+    LOG(VB_GENERAL, LOG_WARNING, "Deprecated, use Dvr/UpdateRecordedMetadata.");
+
     if ((RecordedId <= 0) &&
         (chanid <= 0 || !StartTime.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
@@ -1039,7 +1041,7 @@ V2MarkupList* V2Dvr::GetRecordedMarkup ( int RecordedId )
     ri.QueryMarkup(mapMark, mapSeek);
 
     auto* pMarkupList = new V2MarkupList();
-    for (const auto& entry : qAsConst(mapMark))
+    for (const auto& entry : std::as_const(mapMark))
     {
         V2Markup *pMarkup = pMarkupList->AddNewMarkup();
         QString typestr = toString(static_cast<MarkTypes>(entry.type));
@@ -1050,7 +1052,7 @@ V2MarkupList* V2Dvr::GetRecordedMarkup ( int RecordedId )
         else
             pMarkup->setData(QString::number(entry.data));
     }
-    for (const auto& entry : qAsConst(mapSeek))
+    for (const auto& entry : std::as_const(mapSeek))
     {
         V2Markup *pSeek = pMarkupList->AddNewSeek();
         QString typestr = toString(static_cast<MarkTypes>(entry.type));
@@ -1085,7 +1087,7 @@ bool V2Dvr::SetRecordedMarkup(int RecordedId, const QString &MarkupList)
     QJsonObject   markuplist = doc.object();
 
     QJsonArray  marks = markuplist["Mark"].toArray();
-    for (const auto & m : marks)
+    for (const auto & m : std::as_const(marks))
     {
         QJsonObject markup = m.toObject();
         ProgramInfo::MarkupEntry entry;
@@ -1103,7 +1105,7 @@ bool V2Dvr::SetRecordedMarkup(int RecordedId, const QString &MarkupList)
     }
 
     QJsonArray  seeks = markuplist["Seek"].toArray();
-    for (const auto & m : seeks)
+    for (const auto & m : std::as_const(seeks))
     {
         QJsonObject markup = m.toObject();
         ProgramInfo::MarkupEntry entry;
@@ -1144,7 +1146,7 @@ V2InputList* V2Dvr::GetInputList()
     auto *pList = new V2InputList();
 
     QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo(false);
-    for (const auto & inputInfo : qAsConst(inputInfoList))
+    for (const auto & inputInfo : std::as_const(inputInfoList))
     {
         V2Input *input = pList->AddNewInput();
         V2FillInputInfo(input, inputInfo);
@@ -2125,7 +2127,9 @@ bool V2Dvr::UpdateRecordedMetadata ( uint             RecordedId,
                                      const QString   &Description,
                                      uint             Episode,
                                      const QString   &Inetref,
-                                           QDate      OriginalAirDate,
+                                     long             LastPlayOffset,
+                                     const QString   &LastPlayOffsetType,
+                                     QDate            OriginalAirDate,
                                      bool             Preserve,
                                      uint             Season,
                                      uint             Stars,
@@ -2222,6 +2226,35 @@ bool V2Dvr::UpdateRecordedMetadata ( uint             RecordedId,
 
     if (HAS_PARAMv2("Inetref"))
         pi.SaveInetRef(Inetref);
+
+    if (HAS_PARAMv2("LastPlayOffset"))
+    {
+
+        if (LastPlayOffset < 0)
+            throw QString("LastPlayOffset must be >= 0.");
+
+        uint64_t position = LastPlayOffset;
+        bool isend=true;
+
+        if (HAS_PARAMv2("LastPlayOffsetType"))
+        {
+            if (LastPlayOffsetType.toLower() == "position")
+            {
+                if (!ri.QueryPositionKeyFrame(&position, LastPlayOffset, isend))
+                        return false;
+            }
+            else if (LastPlayOffsetType.toLower() == "duration")
+            {
+                if (!ri.QueryDurationKeyFrame(&position, LastPlayOffset, isend))
+                        return false;
+            }
+        }
+
+        ri.SaveLastPlayPos(position);
+
+        return true;
+
+    }
 
     if (HAS_PARAMv2("OriginalAirDate"))
     {

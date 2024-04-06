@@ -15,6 +15,7 @@
 
 // Qt headers
 #include <QCoreApplication>
+#include <QRegularExpression>
 #include <QUrl>
 #include <QUrlQuery>
 

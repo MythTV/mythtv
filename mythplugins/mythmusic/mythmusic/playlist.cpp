@@ -338,7 +338,8 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                 if (mdata)
                 {
                     album = mdata->Album() + " ~ " + QString("%1").arg(mdata->getAlbumId());
-                    if ((Ialbum = album_map.find(album)) == album_map.end())
+                    Ialbum = album_map.find(album);
+                    if (Ialbum == album_map.end())
                         album_map.insert(AlbumMap::value_type(album, 0));
                 }
             }
@@ -360,7 +361,8 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                 {
                     uint32_t album_order = 1;
                     album = album = mdata->Album() + " ~ " + QString("%1").arg(mdata->getAlbumId());;
-                    if ((Ialbum = album_map.find(album)) == album_map.end())
+                    Ialbum = album_map.find(album);
+                    if (Ialbum == album_map.end())
                     {
                         // we didn't find this album in the map,
                         // yet we pre-loaded them all. we are broken,
@@ -408,7 +410,8 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                 if (mdata)
                 {
                     artist = mdata->Artist() + " ~ " + mdata->Title();
-                    if ((Iartist = artist_map.find(artist)) == artist_map.end())
+                    Iartist = artist_map.find(artist);
+                    if (Iartist == artist_map.end())
                         artist_map.insert(ArtistMap::value_type(artist,0));
                 }
             }
@@ -430,7 +433,8 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                 {
                     uint32_t artist_order = 1;
                     artist = mdata->Artist() + " ~ " + mdata->Title();
-                    if ((Iartist = artist_map.find(artist)) == artist_map.end())
+                    Iartist = artist_map.find(artist);
+                    if (Iartist == artist_map.end())
                     {
                         // we didn't find this artist in the map,
                         // yet we pre-loaded them all. we are broken,
@@ -635,12 +639,8 @@ void Playlist::fillSongsFromSonglist(const QString& songList)
 {
     bool badTrack = false;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList list = songList.split(",", QString::SkipEmptyParts);
-#else
     QStringList list = songList.split(",", Qt::SkipEmptyParts);
-#endif
-    for (const auto & song : qAsConst(list))
+    for (const auto & song : std::as_const(list))
     {
         MusicMetadata::IdType id = song.toUInt();
         int repo = ID_TO_REPO(id);
@@ -745,14 +745,10 @@ int Playlist::fillSonglistFromQuery(const QString& whereClause,
 
         case PL_INSERTAFTERCURRENT:
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList list = orig_songlist.split(",", QString::SkipEmptyParts);
-#else
             QStringList list = orig_songlist.split(",", Qt::SkipEmptyParts);
-#endif
             bool bFound = false;
             QString tempList;
-            for (const auto& song : qAsConst(list))
+            for (const auto& song : std::as_const(list))
             {
                 int an_int = song.toInt();
                 tempList += "," + song;
@@ -819,14 +815,10 @@ int Playlist::fillSonglistFromList(const QList<int> &songList,
 
         case PL_INSERTAFTERCURRENT:
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            QStringList list = orig_songlist.split(",", QString::SkipEmptyParts);
-#else
             QStringList list = orig_songlist.split(",", Qt::SkipEmptyParts);
-#endif
             bool bFound = false;
             QString tempList;
-            for (const auto & song : qAsConst(list))
+            for (const auto & song : std::as_const(list))
             {
                 int an_int = song.toInt();
                 tempList += "," + song;
@@ -1081,16 +1073,11 @@ void Playlist::savePlaylist(const QString& a_name, const QString& a_host)
 //         processing.
 QString Playlist::removeItemsFromList(const QString &remove_list, const QString &source_list)
 {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList removeList = remove_list.split(",", QString::SkipEmptyParts);
-    QStringList sourceList = source_list.split(",", QString::SkipEmptyParts);
-#else
     QStringList removeList = remove_list.split(",", Qt::SkipEmptyParts);
     QStringList sourceList = source_list.split(",", Qt::SkipEmptyParts);
-#endif
     QString songlist;
 
-    for (const auto & song : qAsConst(sourceList))
+    for (const auto & song : std::as_const(sourceList))
     {
         if (removeList.indexOf(song) == -1)
             songlist += "," + song;
@@ -1182,11 +1169,7 @@ void Playlist::cdrecordData(int fd)
         // Track 01:    6 of  147 MB written (fifo 100%) [buf  99%]  16.3x.
         QString data(buf);
         static const QRegularExpression newline { "\\R" }; // Any unicode newline
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList list = data.split(newline, QString::SkipEmptyParts);
-#else
         QStringList list = data.split(newline, Qt::SkipEmptyParts);
-#endif
 
         for (int i = 0; i < list.size(); i++)
         {

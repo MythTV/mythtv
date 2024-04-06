@@ -330,6 +330,7 @@ export class SetupService {
     schedulingEnabled = true;
     isDatabaseIgnored = false;
     DBTimezoneSupport = false;
+    WebOnlyStartup = '';
     // pageType: Setup: 'S', Dashboard: 'D'
     pageType = '';
 }

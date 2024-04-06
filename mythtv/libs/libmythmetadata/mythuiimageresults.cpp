@@ -47,7 +47,7 @@ bool ImageSearchResultsDialog::Create()
         return false;
     }
 
-    for (const auto & info : qAsConst(m_list))
+    for (const auto & info : std::as_const(m_list))
     {
             auto *button = new MythUIButtonListItem(m_resultsList, QString());
             button->SetText(info.label, "label");
