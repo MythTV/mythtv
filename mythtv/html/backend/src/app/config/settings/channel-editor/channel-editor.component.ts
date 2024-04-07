@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of, PartialObserver } from 'rxjs';
 import { ChannelService } from 'src/app/services/channel.service';
-import { Channel, CommMethod, DBChannelRequest } from 'src/app/services/interfaces/channel.interface';
+import { Channel, ChannelRestoreData, CommMethod, DBChannelRequest } from 'src/app/services/interfaces/channel.interface';
 import { VideoMultiplex } from 'src/app/services/interfaces/multiplex.interface';
 import { VideoSource } from 'src/app/services/interfaces/videosource.interface';
 import { SetupService } from 'src/app/services/setup.service';
@@ -29,6 +29,7 @@ export class ChannelEditorComponent implements OnInit {
   commMethods: CommMethod[] = [];
   sourceNames: string[] = [];
   multiplexes: VideoMultiplex[] = [];
+  resSources: VideoSource[] = [];
 
   tvFormats = [
     { value: "Default", prompt: "common.default" },
@@ -81,12 +82,24 @@ export class ChannelEditorComponent implements OnInit {
         value: ''
       }
     }
-
+  };
+  resSourceId = 0;
+  resXMLTV = false;
+  resVisible = false;
+  resIcon = false;
+  resSearchDone = false;
+  resShowDialog = false;
+  resResult: ChannelRestoreData = {
+    NumChannels: 0,
+    NumXLMTVID: 0,
+    NumIcon: 0,
+    NumVisible: 0
   };
 
   channel: MyChannel = this.resetChannel();
   editingChannel?: MyChannel;
-  // channelOperation -2 = delete source -1 = delete channel, 0 = update, 1 = add
+  // channelOperation:
+  // -2 = delete source, -1 = delete channel, 0 = update, 1 = add, 2 = save restore data
   channelOperation = 0;
 
   constructor(private channelService: ChannelService, private translate: TranslateService,
@@ -243,26 +256,32 @@ export class ChannelEditorComponent implements OnInit {
         this.currentForm.form.markAsPristine();
         switch (this.channelOperation) {
           case 0:
+            // update channel
             if (this.editingChannel) {
               Object.assign(this.editingChannel, this.channel);
               this.editingChannel.Source = this.getSource(this.editingChannel);
             }
             break;
           case 1:
+            // add channel
             this.allChannels.push(this.channel);
             break;
           case -1:
-            // Delete channel request
+            // Delete channel
             this.channel.ChanId = -99;
             this.displayDelete = false;
             this.displayDeleteSource = false;
             this.currentForm.form.markAsPristine();
             break;
           case -2:
-            // Delete source request
+            // Delete source
             this.channel.ChanId = -99;
             // continue with next channel
             this.deleteSource();
+            break;
+          case 2:
+            // save restore data
+            this.resSearchDone = false;
             break;
         }
       }
@@ -327,20 +346,24 @@ export class ChannelEditorComponent implements OnInit {
         // Close on the unsaved warning
         this.displayUnsaved = false;
         this.displayChannelDlg = false;
+        this.resShowDialog = false;
         this.editingChannel = undefined;
         this.currentForm.form.markAsPristine();
+        return;
       }
-      else
+      else if (this.displayChannelDlg) {
         // Close on the channel edit dialog
         // Open the unsaved warning
         this.displayUnsaved = true;
+        return;
+      }
     }
-    else {
-      // Close on the channel edit dialog
-      this.displayChannelDlg = false;
-      this.displayUnsaved = false;
-      this.editingChannel = undefined;
-    };
+    // Close on the channel edit or restore data dialog
+    this.currentForm.form.markAsPristine();
+    this.displayChannelDlg = false;
+    this.resShowDialog = false;
+    this.displayUnsaved = false;
+    this.editingChannel = undefined;
   }
 
   deleteRequest(channel: MyChannel) {
@@ -381,6 +404,41 @@ export class ChannelEditorComponent implements OnInit {
       this.currentForm.form.markAsPristine();
       this.working = false;
     }
+  }
+
+  restoreDataRequest() {
+    this.resSources = [];
+    this.resSearchDone = false;
+    this.allChannels.forEach((entry) => {
+      if (entry.MplexId) {
+        if (!this.resSources.find((x) => x.Id == entry.SourceId)) {
+          const sourceEntry = this.videoSources.find((x1) => x1.Id == entry.SourceId);
+          if (sourceEntry)
+            this.resSources.push(sourceEntry);
+        }
+      }
+    });
+    this.resShowDialog = true;
+    this.markPristine();
+  }
+
+  restoreSearch() {
+    this.successCount = 0;
+    this.errorCount = 0;
+    this.resSearchDone = false;
+    this.channelService.GetRestoreData(this.resSourceId, this.resXMLTV,
+      this.resIcon, this.resVisible).subscribe((resp) => {
+        this.resResult = resp.ChannelRestore;
+        this.resSearchDone = true;
+      });
+      this.markPristine();
+    }
+
+  restoreSave() {
+    this.errorCount = 0;
+    this.successCount = 0;
+    this.channelOperation = 2;
+    this.channelService.SaveRestoreData(this.resSourceId).subscribe(this.saveObserver);
   }
 
   onFilter(event: any) {

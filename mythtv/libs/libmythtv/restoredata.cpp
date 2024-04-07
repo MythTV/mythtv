@@ -99,9 +99,37 @@ class RestoreIcon : public TransMythUICheckBoxSetting
     };
 };
 
-RestoreData::RestoreData(uint sourceid) :
-    m_sourceid(sourceid)
+RestoreData *RestoreData::s_Instance = nullptr;
+
+RestoreData *RestoreData::getInstance(uint sourceid)
 {
+    if (s_Instance != nullptr)
+    {
+        if (sourceid != s_Instance->m_sourceid)
+        {
+            delete s_Instance;
+            s_Instance = nullptr;
+        }
+    }
+    if (s_Instance == nullptr)
+        s_Instance = new RestoreData(sourceid, false);
+    return s_Instance;
+}
+
+void RestoreData::freeInstance()
+{
+    if (s_Instance != nullptr)
+    {
+        delete s_Instance;
+        s_Instance = nullptr;
+    }
+}
+
+RestoreData::RestoreData(uint sourceid, bool useGUI) :
+    m_sourceid(sourceid), m_useGUI(useGUI)
+{
+    if (!m_useGUI)
+        return;
     setLabel(tr("Restore Data"));
 
     m_videosource = new VideoSourceShow(m_sourceid);
@@ -133,10 +161,16 @@ RestoreData::RestoreData(uint sourceid) :
 
 void RestoreData::Restore()
 {
+    if (!m_useGUI)
+        return;
     bool do_xmltvid = m_restoreXMLTVID->boolValue();
     bool do_icon    = m_restoreIcon->boolValue();
     bool do_visible = m_restoreVisible->boolValue();
+    doRestore(do_xmltvid, do_icon, do_visible);
+}
 
+QString RestoreData::doRestore(bool do_xmltvid, bool do_icon, bool do_visible)
+{
     if (do_xmltvid || do_icon || do_visible)
     {
         QString msg = QString("Restore data from deleted channels for fields ");
@@ -175,7 +209,7 @@ void RestoreData::Restore()
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("RestoreData::Restore(1)", query);
-        return;
+        return QString();
     }
     while (query.next())
     {
@@ -190,9 +224,16 @@ void RestoreData::Restore()
         cd.icon        = query.value(7).toString();
         cd.visible     = query.value(8).toInt();
 
+        bool nullNetwork = query.isNull(5);
         cd.found_xmltvid = false;
         cd.found_icon    = false;
         cd.found_visible = false;
+
+        QString networkCheck;
+        if (nullNetwork)
+            networkCheck = " networkid IS NULL";
+        else
+            networkCheck = " networkid = :NETWORKID ";
 
         // Get xmltvid from the last deleted channel
         // from any video source or from a channel
@@ -204,7 +245,7 @@ void RestoreData::Restore()
                 "FROM channel, dtv_multiplex "
                 "WHERE serviceid   = :SERVICEID "
                 "  AND transportid = :TRANSPORTID "
-                "  AND networkid   = :NETWORKID "
+                "  AND " + networkCheck +
                 "  AND channel.mplexid = dtv_multiplex.mplexid "
                 "  AND xmltvid != ''"
                 "  AND (deleted IS NOT NULL OR "
@@ -212,12 +253,13 @@ void RestoreData::Restore()
                 "ORDER BY deleted DESC;");
             query2.bindValue(":SERVICEID",   cd.serviceid);
             query2.bindValue(":TRANSPORTID", cd.transportid);
-            query2.bindValue(":NETWORKID",   cd.networkid);
+            if (!nullNetwork)
+                query2.bindValue(":NETWORKID",   cd.networkid);
             query2.bindValue(":SOURCEID",    m_sourceid);
             if (!query2.exec() || !query2.isActive())
             {
                 MythDB::DBError("RestoreData::Restore(2)", query);
-                return;
+                return QString();
             }
             if (query2.next())
             {
@@ -236,7 +278,6 @@ void RestoreData::Restore()
                 "FROM channel, dtv_multiplex "
                 "WHERE serviceid   = :SERVICEID "
                 "  AND transportid = :TRANSPORTID "
-                "  AND networkid   = :NETWORKID "
                 "  AND channel.mplexid = dtv_multiplex.mplexid "
                 "  AND icon != ''"
                 "  AND (deleted IS NOT NULL OR "
@@ -244,12 +285,13 @@ void RestoreData::Restore()
                 "ORDER BY deleted DESC;");
             query2.bindValue(":SERVICEID",   cd.serviceid);
             query2.bindValue(":TRANSPORTID", cd.transportid);
-            query2.bindValue(":NETWORKID",   cd.networkid);
+            if (!nullNetwork)
+                query2.bindValue(":NETWORKID",   cd.networkid);
             query2.bindValue(":SOURCEID",    m_sourceid);
             if (!query2.exec() || !query2.isActive())
             {
                 MythDB::DBError("RestoreData::Restore(3)", query);
-                return;
+                return QString();
             }
             if (query2.next())
             {
@@ -267,19 +309,20 @@ void RestoreData::Restore()
                 "FROM channel, dtv_multiplex "
                 "WHERE serviceid   = :SERVICEID "
                 "  AND transportid = :TRANSPORTID "
-                "  AND networkid   = :NETWORKID "
+                "  AND " + networkCheck +
                 "  AND channel.sourceid = :SOURCEID "
                 "  AND channel.mplexid  = dtv_multiplex.mplexid "
                 "  AND deleted IS NOT NULL "
                 "ORDER BY deleted DESC;");
             query2.bindValue(":SERVICEID",   cd.serviceid);
             query2.bindValue(":TRANSPORTID", cd.transportid);
-            query2.bindValue(":NETWORKID",   cd.networkid);
+            if (!nullNetwork)
+                query2.bindValue(":NETWORKID",   cd.networkid);
             query2.bindValue(":SOURCEID",    m_sourceid);
             if (!query2.exec() || !query2.isActive())
             {
                 MythDB::DBError("RestoreData::Restore(4)", query);
-                return;
+                return QString();
             }
             if (query2.next())
             {
@@ -311,29 +354,30 @@ void RestoreData::Restore()
     }
 
     // Log of all channels that will be updated
-    int num_xmltvid = 0;
-    int num_icon    = 0;
-    int num_visible = 0;
+    m_num_xmltvid = 0;
+    m_num_icon    = 0;
+    m_num_visible = 0;
     for (auto & cd : m_ocd)
     {
         QString msg = QString("Channel %1 \'%2\' update ").arg(cd.channum, cd.name);
         if (cd.found_xmltvid)
         {
             msg += QString("xmltvid(%1) ").arg(cd.xmltvid);
-            num_xmltvid++;
+            m_num_xmltvid++;
         }
         if (cd.found_icon)
         {
             msg += QString("icon(%1) ").arg(cd.icon);
-            num_icon++;
+            m_num_icon++;
         }
         if (cd.found_visible)
         {
             msg += QString("visible(%1) ").arg(cd.visible);
-            num_visible++;
+            m_num_visible++;
         }
         LOG(VB_GENERAL, LOG_INFO, LOC + msg);
     }
+    m_num_channels = m_ocd.size();
 
     // Show totals of what has been found.
     {
@@ -345,21 +389,24 @@ void RestoreData::Restore()
         else
         {
             msg = QString("Found data for %1 channels\n").arg(m_ocd.size());
-            if (num_xmltvid > 0)
+            if (m_num_xmltvid > 0)
             {
-                msg += QString("xmltvid: %1  ").arg(num_xmltvid);
+                msg += QString("xmltvid: %1  ").arg(m_num_xmltvid);
             }
-            if (num_icon > 0)
+            if (m_num_icon > 0)
             {
-                msg += QString("icon: %1  ").arg(num_icon);
+                msg += QString("icon: %1  ").arg(m_num_icon);
             }
-            if (num_visible > 0)
+            if (m_num_visible > 0)
             {
-                msg += QString("visible: %1").arg(num_visible);
+                msg += QString("visible: %1").arg(m_num_visible);
             }
         }
-        WaitFor(ShowOkPopup(msg));
+        if (m_useGUI)
+            WaitFor(ShowOkPopup(msg));
+        return msg;
     }
+
 }
 
 // Load value of selected video source (for display only)
@@ -371,6 +418,16 @@ void RestoreData::Load(void)
 // Do the actual updating if "Save and Exit" is selected in the "Exit Settings?" dialog.
 void RestoreData::Save(void)
 {
+    doSave();
+}
+
+bool RestoreData::doSave(void)
+{
+    if (m_ocd.empty())
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("No data to Restore"));
+        return false;
+    }
     MSqlQuery query(MSqlQuery::InitCon());
     for (auto & cd : m_ocd)
     {
@@ -387,8 +444,9 @@ void RestoreData::Save(void)
         if (!query.exec() || !query.isActive())
         {
             MythDB::DBError("RestoreData::Restore(5)", query);
-            return;
+            return false;
         }
     }
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Restored data for %1 channels").arg(m_ocd.size()));
+    return true;
 }
