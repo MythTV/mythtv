@@ -684,6 +684,8 @@
             "res_icon_desc": "Si está marcado, copie el nombre del archivo del icono en el campo \"icono\" de un canal eliminado o de un canal en otra fuente de video.",
             "res_icon_label": "Restaurar nombre de archivo del icono",
             "res_source_desc": "Sólo se muestran las fuentes escaneables. La búsqueda de datos no escaneados se realiza para todos los canales en la fuente de video seleccionada.",
+            "res_title": "Restaurar datos",
+            "res_tooltip": "Restaure los íconos, el estado visible y la identificación de XMLTV después de un nuevo escaneo.",
             "res_visible_desc": "Si está marcado, copie el estado Visible en el campo \"visible\" de un canal eliminado en esta fuente de video.",
             "res_visible_label": "Restaurar estado visible",
             "res_xmltv_desc": "Si está marcado, copie el ID de XMLTV en el campo \"xmltvid\" de un canal eliminado o de un canal en otra fuente de video.",

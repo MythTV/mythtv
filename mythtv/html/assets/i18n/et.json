@@ -684,6 +684,8 @@
             "res_icon_desc": "Kui see on märgitud, kopeerige ikooni failinimi väljale \"ikoon\" kustutatud kanalilt või mõnest muust videoallikast.",
             "res_icon_label": "Taasta ikooni failinimi",
             "res_source_desc": "Kuvatakse ainult skannitavad allikad. Skaneerimata andmete otsimine toimub kõigi valitud videoallika kanalite jaoks.",
+            "res_title": "Taastage andmed",
+            "res_tooltip": "Taastage ikoonid, nähtav olek ja XMLTV ID pärast uut skannimist.",
             "res_visible_desc": "Kui see on märgitud, kopeerige selle videoallika kustutatud kanalilt väljale \"nähtav\" olek Nähtav.",
             "res_visible_label": "Taastage nähtav olek",
             "res_xmltv_desc": "Kui see on märgitud, kopeerige XMLTV ID väljale \"xmltvid\" kustutatud kanalilt või mõnest muust videoallikast.",

@@ -684,6 +684,8 @@
             "res_icon_desc": "If checked, copy the Icon filename in field \"icon\" from a deleted channel or from a channel in another video source.",
             "res_icon_label": "Restore Icon Filename",
             "res_source_desc": "Only scannable sources are shown. Searching for non-scanned data is done for all channels in the selected video source.",
+            "res_title": "Restore Data",
+            "res_tooltip": "Restore Icons, Visible status, and XMLTV Id after a new scan.",
             "res_visible_desc": "If checked, copy the Visible status in field \"visible\" from a deleted channel in this video source.",
             "res_visible_label": "Restore Visible Status",
             "res_xmltv_desc": "If checked, copy the XMLTV ID in field \"xmltvid\" from a deleted channel or from a channel in another video source.",

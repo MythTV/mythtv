@@ -684,6 +684,8 @@
             "res_icon_desc": "Wenn diese Option aktiviert ist, kopieren Sie den Symboldateinamen im Feld „Symbol“ von einem gelöschten Kanal oder von einem Kanal in einer anderen Videoquelle.",
             "res_icon_label": "Dateiname des Symbols wiederherstellen",
             "res_source_desc": "Es werden nur scannbare Quellen angezeigt. Die Suche nach nicht gescannten Daten erfolgt für alle Kanäle in der ausgewählten Videoquelle.",
+            "res_title": "Daten wiederherstellen",
+            "res_tooltip": "Stellen Sie Symbole, Sichtbarkeitsstatus und XMLTV-ID nach einem neuen Scan wieder her.",
             "res_visible_desc": "Wenn diese Option aktiviert ist, kopieren Sie den Sichtbar-Status im Feld „sichtbar“ von einem gelöschten Kanal in dieser Videoquelle.",
             "res_visible_label": "Sichtbaren Status wiederherstellen",
             "res_xmltv_desc": "Wenn diese Option aktiviert ist, kopieren Sie die XMLTV-ID im Feld „xmltvid“ von einem gelöschten Kanal oder von einem Kanal in einer anderen Videoquelle.",

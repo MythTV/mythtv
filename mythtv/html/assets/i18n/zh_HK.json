@@ -684,6 +684,8 @@
             "res_icon_desc": "如果選中，則從已刪除的通道或另一個視訊來源中的通道複製「圖示」欄位中的圖示檔案名稱。",
             "res_icon_label": "恢復圖示檔名",
             "res_source_desc": "僅顯示可掃描的來源。搜尋非掃描資料是針對所選視訊來源中的所有頻道進行的。",
+            "res_title": "恢復數據",
+            "res_tooltip": "新掃描後恢復圖示、可見狀態和 XMLTV Id。",
             "res_visible_desc": "如果選中，則從該視訊來源中已刪除的通道複製「可見」欄位中的可見狀態。",
             "res_visible_label": "恢復可見狀態",
             "res_xmltv_desc": "如果選中，則從已刪除的頻道或另一個視訊來源中的頻道複製「xmltvid」欄位中的 XMLTV ID。",

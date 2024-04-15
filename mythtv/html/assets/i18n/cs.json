@@ -684,6 +684,8 @@
             "res_icon_desc": "Pokud je zaškrtnuto, zkopírujte název souboru ikony v poli „ikona“ ze smazaného kanálu nebo z kanálu v jiném zdroji videa.",
             "res_icon_label": "Obnovit název souboru ikony",
             "res_source_desc": "Jsou zobrazeny pouze skenovatelné zdroje. Vyhledávání nenaskenovaných dat se provádí pro všechny kanály ve vybraném zdroji videa.",
+            "res_title": "Obnovit data",
+            "res_tooltip": "Obnovte ikony, stav viditelnosti a ID XMLTV po novém skenování.",
             "res_visible_desc": "Pokud je zaškrtnuto, zkopírujte stav Viditelné v poli „viditelné“ z odstraněného kanálu v tomto zdroji videa.",
             "res_visible_label": "Obnovit viditelný stav",
             "res_xmltv_desc": "Pokud je zaškrtnuto, zkopírujte XMLTV ID v poli „xmltvid“ z odstraněného kanálu nebo z kanálu v jiném zdroji videa.",

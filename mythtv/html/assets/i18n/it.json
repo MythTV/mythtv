@@ -684,6 +684,8 @@
             "res_icon_desc": "Se selezionato, copia il nome del file dell'icona nel campo \"icona\" da un canale eliminato o da un canale in un'altra sorgente video.",
             "res_icon_label": "Ripristina nome file icona",
             "res_source_desc": "Vengono visualizzate solo le origini scansionabili. La ricerca dei dati non scansionati viene eseguita per tutti i canali nella sorgente video selezionata.",
+            "res_title": "Ripristinare i dati",
+            "res_tooltip": "Ripristina icone, stato visibile e ID XMLTV dopo una nuova scansione.",
             "res_visible_desc": "Se selezionato, copia lo stato Visibile nel campo \"visibile\" da un canale eliminato in questa sorgente video.",
             "res_visible_label": "Ripristina lo stato visibile",
             "res_xmltv_desc": "Se selezionato, copia l'ID XMLTV nel campo \"xmltvid\" da un canale eliminato o da un canale in un'altra sorgente video.",

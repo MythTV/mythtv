@@ -684,6 +684,8 @@
             "res_icon_desc": "Si cette case est cochée, copiez le nom du fichier d'icône dans le champ \"icône\" d'une chaîne supprimée ou d'une chaîne d'une autre source vidéo.",
             "res_icon_label": "Restaurer le nom du fichier de l'icône",
             "res_source_desc": "Seules les sources numérisables sont affichées. La recherche de données non numérisées est effectuée pour tous les canaux de la source vidéo sélectionnée.",
+            "res_title": "Restaurer les données",
+            "res_tooltip": "Restaurez les icônes, l'état visible et l'identifiant XMLTV après une nouvelle analyse.",
             "res_visible_desc": "Si coché, copiez l'état Visible dans le champ \"visible\" d'une chaîne supprimée dans cette source vidéo.",
             "res_visible_label": "Restaurer l'état visible",
             "res_xmltv_desc": "Si coché, copiez l'ID XMLTV dans le champ \"xmltvid\" d'une chaîne supprimée ou d'une chaîne d'une autre source vidéo.",

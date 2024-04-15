@@ -684,6 +684,8 @@
             "res_icon_desc": "Jeśli zaznaczone, skopiuj nazwę pliku ikony w polu „ikona” z usuniętego kanału lub z kanału w innym źródle wideo.",
             "res_icon_label": "Przywróć nazwę pliku ikony",
             "res_source_desc": "Wyświetlane są tylko źródła, które można przeskanować. Wyszukiwanie niezeskanowanych danych odbywa się dla wszystkich kanałów w wybranym źródle wideo.",
+            "res_title": "Przywróć dane",
+            "res_tooltip": "Przywróć ikony, status widoczny i identyfikator XMLTV po nowym skanowaniu.",
             "res_visible_desc": "Jeśli zaznaczone, skopiuj stan Widoczny w polu „widoczny” z usuniętego kanału w tym źródle wideo.",
             "res_visible_label": "Przywróć widoczny status",
             "res_xmltv_desc": "Jeśli zaznaczone, skopiuj identyfikator XMLTV z pola „xmltvid” z usuniętego kanału lub z kanału w innym źródle wideo.",

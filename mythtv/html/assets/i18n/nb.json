@@ -684,6 +684,8 @@
             "res_icon_desc": "Hvis det er merket av, kopierer du ikonfilnavnet i feltet \"ikon\" fra en slettet kanal eller fra en kanal i en annen videokilde.",
             "res_icon_label": "Gjenopprett ikonfilnavn",
             "res_source_desc": "Bare skannbare kilder vises. Søking etter ikke-skannede data gjøres for alle kanalene i den valgte videokilden.",
+            "res_title": "Gjenopprett data",
+            "res_tooltip": "Gjenopprett ikoner, synlig status og XMLTV-ID etter en ny skanning.",
             "res_visible_desc": "Hvis det er merket av, kopierer du Synlig-statusen i feltet \"synlig\" fra en slettet kanal i denne videokilden.",
             "res_visible_label": "Gjenopprett synlig status",
             "res_xmltv_desc": "Hvis det er merket av for, kopierer du XMLTV-ID-en i feltet \"xmltvid\" fra en slettet kanal eller fra en kanal i en annen videokilde.",

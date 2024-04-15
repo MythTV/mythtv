@@ -684,6 +684,8 @@
             "res_icon_desc": "Hvis det er markeret, skal du kopiere ikonfilnavnet i feltet \"ikon\" fra en slettet kanal eller fra en kanal i en anden videokilde.",
             "res_icon_label": "Gendan ikon filnavn",
             "res_source_desc": "Kun scanningsbare kilder vises. Søgning efter ikke-scannede data udføres for alle kanaler i den valgte videokilde.",
+            "res_title": "Gendan data",
+            "res_tooltip": "Gendan ikoner, synlig status og XMLTV-id efter en ny scanning.",
             "res_visible_desc": "Hvis det er markeret, skal du kopiere den synlige status i feltet \"synlig\" fra en slettet kanal i denne videokilde.",
             "res_visible_label": "Gendan synlig status",
             "res_xmltv_desc": "Hvis markeret, kopier XMLTV ID'et i feltet \"xmltvid\" fra en slettet kanal eller fra en kanal i en anden videokilde.",

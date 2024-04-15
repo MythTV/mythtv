@@ -684,6 +684,8 @@
             "res_icon_desc": "Indien aangevinkt kopieert u de pictogrambestandsnaam in het veld \"icon\" van een verwijderd kanaal of van een kanaal in een andere videobron.",
             "res_icon_label": "Pictogram bestandsnaam herstellen",
             "res_source_desc": "Alleen scanbare bronnen worden getoond. Er wordt gezocht naar niet-gescande gegevens voor alle kanalen in de geselecteerde videobron.",
+            "res_title": "Data herstellen",
+            "res_tooltip": "Herstel pictogrammen, zichtbare status en XMLTV-ID na een nieuwe scan.",
             "res_visible_desc": "Indien aangevinkt kopieert u de status Zichtbaar in het veld \"zichtbaar\" van een verwijderd kanaal in deze videobron.",
             "res_visible_label": "Herstel zichtbare status",
             "res_xmltv_desc": "Indien aangevinkt kopieert u de XMLTV-ID in het veld \"xmltvid\" van een verwijderd kanaal of van een kanaal in een andere videobron.",

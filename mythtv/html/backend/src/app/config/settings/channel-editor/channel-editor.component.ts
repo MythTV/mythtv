@@ -282,6 +282,7 @@ export class ChannelEditorComponent implements OnInit {
           case 2:
             // save restore data
             this.resSearchDone = false;
+            this.loadLists();
             break;
         }
       }

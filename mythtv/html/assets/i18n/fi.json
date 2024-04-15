@@ -684,6 +684,8 @@
             "res_icon_desc": "Jos tämä on valittuna, kopioi kuvakkeen tiedostonimi kenttään \"kuvake\" poistetulta kanavalta tai toisen videolähteen kanavalta.",
             "res_icon_label": "Palauta kuvakkeen tiedostonimi",
             "res_source_desc": "Vain skannattavat lähteet näytetään. Ei-skannattuja tietoja etsitään valitun videolähteen kaikilta kanavilta.",
+            "res_title": "Palauta tiedot",
+            "res_tooltip": "Palauta kuvakkeet, näkyvä tila ja XMLTV-tunnus uuden skannauksen jälkeen.",
             "res_visible_desc": "Jos tämä on valittuna, kopioi näkyvissä oleva tila \"näkyvä\"-kenttään poistetusta kanavasta tässä videolähteessä.",
             "res_visible_label": "Palauta näkyvä tila",
             "res_xmltv_desc": "Jos tämä on valittuna, kopioi XMLTV-tunnus kenttään \"xmltvid\" poistetulta kanavalta tai toisen videolähteen kanavalta.",

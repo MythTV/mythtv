@@ -684,6 +684,8 @@
             "res_icon_desc": "Si està marcat, copieu el nom del fitxer de la icona al camp \"icona\" d'un canal suprimit o d'un canal d'una altra font de vídeo.",
             "res_icon_label": "Restaura el nom del fitxer de la icona",
             "res_source_desc": "Només es mostren les fonts escanejables. La cerca de dades no escanejades es fa per a tots els canals de la font de vídeo seleccionada.",
+            "res_title": "Restaura les dades",
+            "res_tooltip": "Restaura les icones, l'estat visible i l'identificador XMLTV després d'una nova exploració.",
             "res_visible_desc": "Si està marcat, copieu l'estat de visible al camp \"visible\" d'un canal suprimit d'aquesta font de vídeo.",
             "res_visible_label": "Restaura l'estat visible",
             "res_xmltv_desc": "Si està marcat, copieu l'identificador XMLTV al camp \"xmltvid\" d'un canal suprimit o d'un canal d'una altra font de vídeo.",

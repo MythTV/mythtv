@@ -684,6 +684,8 @@
             "res_icon_desc": "Ef hakað er við, afritaðu táknskráarnafnið í reitnum „tákn“ af rás sem hefur verið eytt eða frá rás í annarri mynduppsprettu.",
             "res_icon_label": "Endurheimta táknskráarheiti",
             "res_source_desc": "Aðeins skannanlegar heimildir eru sýndar. Leitað er að óskönnuðum gögnum fyrir allar rásir í völdum mynduppsprettu.",
+            "res_title": "Endurheimta gögn",
+            "res_tooltip": "Endurheimtu tákn, sýnilega stöðu og XMLTV auðkenni eftir nýja skönnun.",
             "res_visible_desc": "Ef hakað er við, afritaðu sýnilega stöðuna í reitnum „sýnilegt“ frá eyddri rás í þessari mynduppsprettu.",
             "res_visible_label": "Endurheimta sýnilega stöðu",
             "res_xmltv_desc": "Ef hakað er við, afritaðu XMLTV auðkennið í reitinn \"xmltvid\" frá eytt rás eða frá rás í annarri mynduppsprettu.",

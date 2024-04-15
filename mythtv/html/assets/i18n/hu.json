@@ -684,6 +684,8 @@
             "res_icon_desc": "Ha be van jelölve, másolja ki az Ikon fájlnevet az \"ikon\" mezőben egy törölt csatornáról vagy egy másik videoforrás csatornájáról.",
             "res_icon_label": "Ikon fájlnév visszaállítása",
             "res_source_desc": "Csak a beolvasható források jelennek meg. A nem szkennelt adatok keresése a kiválasztott videoforrás összes csatornájára vonatkozóan megtörténik.",
+            "res_title": "Adatok visszaállítása",
+            "res_tooltip": "Állítsa vissza az ikonokat, a látható állapotot és az XMLTV-azonosítót egy új vizsgálat után.",
             "res_visible_desc": "Ha be van jelölve, másolja ki a Látható állapotot a \"látható\" mezőben egy törölt csatornáról ebben a videóforrásban.",
             "res_visible_label": "Látható állapot visszaállítása",
             "res_xmltv_desc": "Ha be van jelölve, másolja ki az XMLTV azonosítót az „xmltvid” mezőben egy törölt csatornáról vagy egy másik videóforrás csatornájáról.",

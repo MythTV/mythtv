@@ -28,8 +28,8 @@
                         [disabled]="setupService.schedulingEnabled" class="p-2">
                     </p-button>
                     <p-button icon="pi pi-history" (onClick)="restoreDataRequest()"
-                        pTooltip="Restore Icons, Visible status, and XMLTV Id after a new scan." tooltipPosition="top"
-                        label="Restore Data" styleClass="p-button-success" class="p-2" [disabled]="videoSources.length == 0">
+                        pTooltip="{{ 'settings.chanedit.res_tooltip' | translate }}" tooltipPosition="top"
+                        label="{{ 'settings.chanedit.res_title' | translate }}" styleClass="p-button-success" class="p-2" [disabled]="videoSources.length == 0">
                     </p-button>
                     <div *ngIf="setupService.pageType != 'S' " class="p-2">
                         {{ 'settings.chanedit.delete_message' | translate }}
@@ -321,7 +321,7 @@
         </ng-template>
     </p-dialog>
 
-    <p-dialog header="Restore Data" [(visible)]="resShowDialog" [modal]="true" [closable]="false"
+    <p-dialog header="{{ 'settings.chanedit.res_title' | translate }}" [(visible)]="resShowDialog" [modal]="true" [closable]="false"
         [closeOnEscape]="false">
 
         <div class="form-group field">

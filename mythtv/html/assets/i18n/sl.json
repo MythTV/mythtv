@@ -684,6 +684,8 @@
             "res_icon_desc": "Če je označeno, kopirajte ime datoteke ikone v polje \"ikona\" iz izbrisanega kanala ali iz kanala v drugem video viru.",
             "res_icon_label": "Ime datoteke ikone za obnovitev",
             "res_source_desc": "Prikazani so samo viri, ki jih je mogoče skenirati. Iskanje neskeniranih podatkov se izvede za vse kanale v izbranem video viru.",
+            "res_title": "Obnovi podatke",
+            "res_tooltip": "Po novem skeniranju obnovite ikone, vidno stanje in ID XMLTV.",
             "res_visible_desc": "Če je označeno, kopirajte stanje Vidno v polje »vidno« iz izbrisanega kanala v tem video viru.",
             "res_visible_label": "Obnovi vidno stanje",
             "res_xmltv_desc": "Če je označeno, kopirajte XMLTV ID v polje \"xmltvid\" iz izbrisanega kanala ali iz kanala v drugem video viru.",

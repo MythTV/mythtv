@@ -684,6 +684,8 @@
             "res_icon_desc": "Ako je označeno, kopirajte naziv datoteke ikone u polje \"ikona\" s izbrisanog kanala ili s kanala u drugom video izvoru.",
             "res_icon_label": "Vrati naziv datoteke ikone",
             "res_source_desc": "Prikazani su samo izvori koji se mogu skenirati. Traženje neskeniranih podataka vrši se za sve kanale u odabranom video izvoru.",
+            "res_title": "Vrati podatke",
+            "res_tooltip": "Vratite ikone, vidljiv status i XMLTV ID nakon novog skeniranja.",
             "res_visible_desc": "Ako je označeno, kopirajte status Vidljivo u polju \"vidljivo\" s izbrisanog kanala u ovom video izvoru.",
             "res_visible_label": "Vratite vidljiv status",
             "res_xmltv_desc": "Ako je označeno, kopirajte XMLTV ID u polje \"xmltvid\" s izbrisanog kanala ili s kanala u drugom video izvoru.",

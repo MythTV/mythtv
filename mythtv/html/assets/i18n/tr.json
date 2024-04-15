@@ -684,6 +684,8 @@
             "res_icon_desc": "İşaretliyse, \"icon\" alanındaki Simge dosya adını silinmiş bir kanaldan veya başka bir video kaynağındaki bir kanaldan kopyalayın.",
             "res_icon_label": "Simge Dosya Adını Geri Yükle",
             "res_source_desc": "Yalnızca taranabilir kaynaklar gösterilir. Taranmamış verilerin aranması seçilen video kaynağındaki tüm kanallar için yapılır.",
+            "res_title": "Verileri geri yükle",
+            "res_tooltip": "Yeni bir taramanın ardından Simgeleri, Görünür durumu ve XMLTV Kimliğini geri yükleyin.",
             "res_visible_desc": "İşaretliyse, bu video kaynağındaki silinmiş bir kanaldan \"görünür\" alanındaki Görünür durumunu kopyalayın.",
             "res_visible_label": "Görünür Durumu Geri Yükle",
             "res_xmltv_desc": "İşaretliyse, \"xmltvid\" alanındaki XMLTV kimliğini silinmiş bir kanaldan veya başka bir video kaynağındaki bir kanaldan kopyalayın.",

@@ -684,6 +684,8 @@
             "res_icon_desc": "Om markerat, kopiera ikonfilnamnet i fältet \"ikon\" från en raderad kanal eller från en kanal i en annan videokälla.",
             "res_icon_label": "Återställ ikonfilnamn",
             "res_source_desc": "Endast skanningsbara källor visas. Sökning efter icke-skannad data görs för alla kanaler i den valda videokällan.",
+            "res_title": "Återskapa data",
+            "res_tooltip": "Återställ ikoner, synlig status och XMLTV-ID efter en ny skanning.",
             "res_visible_desc": "Om markerad kopierar du statusen Synlig i fältet \"synlig\" från en raderad kanal i den här videokällan.",
             "res_visible_label": "Återställ synlig status",
             "res_xmltv_desc": "Om markerat, kopiera XMLTV-ID:t i fältet \"xmltvid\" från en raderad kanal eller från en kanal i en annan videokälla.",
