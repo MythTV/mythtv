@@ -29,6 +29,7 @@
 
 // Qt
 #include <QList>
+#include <QTemporaryFile>
 
 // MythTV
 #include "libmythbase/http/mythhttpmetaservice.h"
@@ -38,6 +39,8 @@
 #include "libmythbase/mythversion.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/programtypes.h"
+#include "libmythbase/mythdirs.h"
+#include "libmythbase/mythdownloadmanager.h"
 #include "libmythtv/channelutil.h"
 #include "libmythtv/channelscan/scanwizardconfig.h"
 #include "libmythtv/channelscan/channelscanner_web.h"
@@ -702,15 +705,20 @@ V2VideoMultiplexList* V2Channel::GetVideoMultiplexList( uint nSourceID,
     if (!query.isConnected())
         throw( QString("Database not open while trying to list "
                        "Video Sources."));
-
-    query.prepare("SELECT mplexid, sourceid, transportid, networkid, "
+    QString where;
+    if (nSourceID > 0)
+        where = "WHERE sourceid = :SOURCEID";
+    QString sql = QString("SELECT mplexid, sourceid, transportid, networkid, "
                   "frequency, inversion, symbolrate, fec, polarity, "
                   "modulation, bandwidth, lp_code_rate, transmission_mode, "
                   "guard_interval, visible, constellation, hierarchy, hp_code_rate, "
                   "mod_sys, rolloff, sistandard, serviceversion, updatetimestamp, "
-                  "default_authority FROM dtv_multiplex WHERE sourceid = :SOURCEID "
-                  "ORDER BY mplexid" );
-    query.bindValue(":SOURCEID", nSourceID);
+                  "default_authority FROM dtv_multiplex %1 "
+                  "ORDER BY mplexid").arg(where);
+
+    query.prepare(sql);
+    if (nSourceID > 0)
+        query.bindValue(":SOURCEID", nSourceID);
 
     if (!query.exec())
     {
@@ -1166,4 +1174,81 @@ bool V2Channel::SaveRestoreData ( uint SourceId )
     bool result = rd->doSave();
     RestoreData::freeInstance();
     return result;
+}
+
+
+bool V2Channel::CopyIconToBackend(const QString& Url, const QString& ChanId)
+{
+    QString filename = Url.section('/', -1);
+
+    QString dirpath = GetConfDir();
+    QDir configDir(dirpath);
+    if (!configDir.exists() && !configDir.mkdir(dirpath))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Could not create %1").arg(dirpath));
+    }
+
+    QString channelDir = QString("%1/%2").arg(configDir.absolutePath(),
+                                           "/channels");
+    QDir strChannelDir(channelDir);
+    if (!strChannelDir.exists() && !strChannelDir.mkdir(channelDir))
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Could not create %1").arg(channelDir));
+    }
+    channelDir += "/";
+
+    QString filePath = channelDir + filename;
+
+    // If we get to this point we've already checked whether the icon already
+    // exist locally, we want to download anyway to fix a broken image or
+    // get the latest version of the icon
+
+    QTemporaryFile tmpFile(filePath);
+    if (!tmpFile.open())
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Icon Download: Couldn't create temporary file");
+        return false;
+    }
+
+    bool fRet = GetMythDownloadManager()->download(Url, tmpFile.fileName());
+
+    if (!fRet)
+    {
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Download for icon %1 failed").arg(filename));
+        return false;
+    }
+
+    QImage icon(tmpFile.fileName());
+    if (icon.isNull())
+    {
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Downloaded icon for %1 isn't a valid image").arg(filename));
+        return false;
+    }
+
+    // Remove any existing icon
+    QFile file(filePath);
+    file.remove();
+
+    // Rename temporary file & prevent it being cleaned up
+    tmpFile.rename(filePath);
+    tmpFile.setAutoRemove(false);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString  qstr = "UPDATE channel SET icon = :ICON "
+                    "WHERE chanid = :CHANID";
+
+    query.prepare(qstr);
+    query.bindValue(":ICON", filename);
+    query.bindValue(":CHANID", ChanId);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("Error inserting channel icon", query);
+        return false;
+    }
+
+    return fRet;
 }

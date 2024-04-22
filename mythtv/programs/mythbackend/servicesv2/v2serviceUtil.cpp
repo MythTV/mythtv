@@ -192,6 +192,7 @@ bool V2FillChannelInfo( V2ChannelInfo *pChannel,
         QString sIconURL  = QString( "/Guide/GetChannelIcon?ChanId=%3")
                                     .arg( channelInfo.m_chanId );
         pChannel->setIconURL( sIconURL );
+        pChannel->setIcon( channelInfo.m_icon );
     }
     pChannel->setChannelName(channelInfo.m_name);
     pChannel->setVisible(channelInfo.m_visible > kChannelNotVisible);

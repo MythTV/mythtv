@@ -4,6 +4,7 @@
 #include <QCryptographicHash>
 #include <QHostAddress>
 #include <QUdpSocket>
+#include <QNetworkRequest>
 
 // MythTV
 #include "libmythbase/dbutil.h"
@@ -18,6 +19,7 @@
 #include "libmythbase/mythversion.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythbase/version.h"
+#include "libmythbase/mythdownloadmanager.h"
 #include "libmythtv/tv_rec.h"
 
 // MythBackend
@@ -263,10 +265,15 @@ QStringList V2Myth::GetKeys()
 // DirListing gets a list of subdirectories
 /////////////////////////////////////////////////////////////////////////////
 
-QStringList V2Myth::GetDirListing ( const QString &DirName)
+QStringList V2Myth::GetDirListing ( const QString &DirName, bool Files)
 {
     QDir directory(DirName);
-    return directory.entryList(QDir::AllDirs|QDir::NoDotAndDotDot, QDir::Name);
+    QDir::Filters filts = QDir::AllDirs|QDir::NoDotAndDotDot;
+    if (Files)
+        filts = QDir::Files;
+    else
+        filts = QDir::AllDirs|QDir::NoDotAndDotDot;
+    return directory.entryList(filts, QDir::Name);
 }
 
 
@@ -1282,4 +1289,26 @@ bool V2Myth::Shutdown ( int Retcode, bool Restart )
     }
     QCoreApplication::exit(Retcode);
     return true;
+}
+
+QString  V2Myth::Proxy ( const QString &urlString)
+{
+    QUrl url(urlString);
+
+    QByteArray data;
+
+    auto *req = new QNetworkRequest(url);
+    req->setHeader(QNetworkRequest::ContentTypeHeader, QString("application/x-www-form-urlencoded"));
+    // req->setHeader(QNetworkRequest::ContentLengthHeader, data.size());
+
+    LOG(VB_CHANNEL, LOG_DEBUG, QString("ImportIconsWizard: posting to: %1")
+                                       .arg(url.toString()));
+
+    if (GetMythDownloadManager()->post(req, &data))
+    {
+        LOG(VB_CHANNEL, LOG_DEBUG, QString("ImportIconsWizard: result: %1").arg(QString(data)));
+        return {data};
+    }
+
+    return {};
 }

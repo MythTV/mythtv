@@ -58,6 +58,7 @@ class V2Channel : public MythHTTPService
     Q_CLASSINFO("StopScan",               "methods=POST;name=bool")
     Q_CLASSINFO("SendScanDialogResponse", "methods=POST;name=bool")
     Q_CLASSINFO("SaveRestoreData",        "methods=POST;name=bool")
+    Q_CLASSINFO("CopyIconToBackend",      "methods=POST")
 
     public:
         V2Channel();
@@ -240,6 +241,8 @@ class V2Channel : public MythHTTPService
 
         static bool               SaveRestoreData         ( uint SourceId);
 
+        static bool               CopyIconToBackend        (  const QString& Url,
+                                                             const QString& ChanId);
     private:
         Q_DISABLE_COPY(V2Channel)
 

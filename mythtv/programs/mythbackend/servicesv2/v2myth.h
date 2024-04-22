@@ -48,7 +48,7 @@ class V2Myth : public MythHTTPService
     Q_CLASSINFO( "SetConnectionInfo",     "methods=POST"                )
     Q_CLASSINFO("ManageScheduler",        "methods=POST")
     Q_CLASSINFO("Shutdown",               "methods=POST")
-
+    Q_CLASSINFO("Proxy",                  "methods=GET,POST")
 
   public:
     V2Myth();
@@ -72,7 +72,8 @@ class V2Myth : public MythHTTPService
 
     static QStringList  GetKeys             ( );
 
-    static QStringList  GetDirListing          ( const QString &DirName );
+    static QStringList  GetDirListing          ( const QString &DirName,
+                                                 bool  Files );
 
     static V2StorageGroupDirList*  GetStorageGroupDirs ( const QString   &GroupName,
                                                   const QString   &HostName );
@@ -183,6 +184,8 @@ class V2Myth : public MythHTTPService
                                               bool Disable );
 
     static bool         Shutdown    ( int Retcode, bool Restart);
+
+    static QString      Proxy             ( const QString &Url);
 
   private:
     Q_DISABLE_COPY(V2Myth)
