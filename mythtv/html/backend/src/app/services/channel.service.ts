@@ -180,4 +180,8 @@ export class ChannelService {
    return this.httpClient.post<BoolResponse>('/Channel/SaveRestoreData', { SourceId: sourceId });
   }
 
+  public CopyIconToBackend(chanid: number, url: string) :  Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Channel/CopyIconToBackend', { ChanId: chanid, Url: url });
+  }
+
 }

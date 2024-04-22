@@ -29,7 +29,13 @@
                     </p-button>
                     <p-button icon="pi pi-history" (onClick)="restoreDataRequest()"
                         pTooltip="{{ 'settings.chanedit.res_tooltip' | translate }}" tooltipPosition="top"
-                        label="{{ 'settings.chanedit.res_title' | translate }}" styleClass="p-button-success" class="p-2" [disabled]="videoSources.length == 0">
+                        label="{{ 'settings.chanedit.res_title' | translate }}" styleClass="p-button-success"
+                        class="p-2" [disabled]="videoSources.length == 0">
+                    </p-button>
+                    <p-button icon="pi pi-download" pTooltip="{{ 'settings.chanedit.icondld_tooltip' | translate }}"
+                        tooltipPosition="top" (onClick)="downloadIconsRequest()"
+                        label="{{ 'settings.chanedit.icondld_title' | translate }}" styleClass="p-button-success"
+                        class="p-2" [disabled]="videoSources.length == 0">
                     </p-button>
                     <div *ngIf="setupService.pageType != 'S' " class="p-2">
                         {{ 'settings.chanedit.delete_message' | translate }}
@@ -321,9 +327,8 @@
         </ng-template>
     </p-dialog>
 
-    <p-dialog header="{{ 'settings.chanedit.res_title' | translate }}" [(visible)]="resShowDialog" [modal]="true" [closable]="false"
-        [closeOnEscape]="false">
-
+    <p-dialog header="{{ 'settings.chanedit.res_title' | translate }}" [(visible)]="resShowDialog" [modal]="true"
+        [closable]="false" [closeOnEscape]="false">
         <div class="form-group field">
             <label for="resSourceId" class="label block">{{ 'settings.chanedit.source_label' | translate
                 }}</label>
@@ -387,8 +392,66 @@
                 styleClass="p-button-success"
                 [disabled]="!resSourceId || (!resXMLTV && !resIcon && !resVisible)"></p-button>
 
-            <p-button icon="pi pi-save" (onClick)="restoreSave();" label="{{ 'common.save' | translate }}" styleClass="p-button-success"
+            <p-button icon="pi pi-save" (onClick)="restoreSave();" label="{{ 'common.save' | translate }}"
+                styleClass="p-button-success"
                 [disabled]="!resSearchDone || !resResult.NumChannels || !chanform.pristine"></p-button>
+
+        </ng-template>
+    </p-dialog>
+
+    <p-dialog header="{{ 'settings.chanedit.icondld_title' | translate }}" [(visible)]="icondldShowDialog"
+        [modal]="true" [closable]="false" [closeOnEscape]="false">
+
+        <div class="field-radiobutton">
+            <p-radioButton name="dldtype" value="all" [(ngModel)]="icondldType" inputId="dldAll"
+                [disabled]="icondldStatus > 0"></p-radioButton>
+            <label for="dldAll" class="label block">{{ 'settings.chanedit.iconall_title' | translate }}</label>
+        </div>
+        <div class="field-radiobutton">
+            <p-radioButton name="dldtype" value="missing" [(ngModel)]="icondldType" inputId="dldMissing"
+                [disabled]="icondldStatus > 0"></p-radioButton>
+            <label for="dldMissing" class="label block">{{ 'settings.chanedit.iconmissing_title' | translate }}</label>
+        </div>
+
+        <ng-template pTemplate="footer">
+            <div class="col-12" style="text-align: left;" *ngIf="icondldStatus > 0">
+                {{ 'settings.chanedit.icondld_details' |
+                translate: {Count: icondldCount,
+                Max: icondldMax} }}
+                <table>
+                    <tr>
+                        <td>
+                            {{ 'settings.chanedit.icondld_found' | translate }}
+                        </td>
+                        <td>{{icondldFound}}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{ 'settings.chanedit.icondld_success' | translate }}
+                        </td>
+                        <td>{{successCount}}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{ 'settings.chanedit.icondld_failed' | translate }}
+                        </td>
+                        <td>{{errorCount}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-12" style="text-align: left;">
+                <p-message *ngIf="icondldStatus == 2" severity="success" text="Icon Download Complete"></p-message>
+            </div>
+            <p-button icon="pi pi-times-circle" (onClick)="closeDialog()" label="{{ 'common.close' | translate }}"
+                styleClass="p-button-warning" [disabled]="icondldStatus == 1">
+            </p-button>
+
+            <p-button icon="pi pi-play" (onClick)="startIcondld();" label="{{ 'common.start' | translate }}"
+                styleClass="p-button-success"
+                [disabled]="!icondldType || icondldStatus == 1 || icondldStatus == 2"></p-button>
+
+            <p-button icon="pi pi-stop" (onClick)="stopIcondld();" label="{{ 'common.stop' | translate }}"
+                styleClass="p-button-success" [disabled]="!icondldType || icondldStatus != 1"></p-button>
 
         </ng-template>
     </p-dialog>
