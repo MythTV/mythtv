@@ -82,4 +82,4 @@ void TestDbCon::cleanupTestCase()
 {
 }
 
-QTEST_APPLESS_MAIN(TestDbCon)
+QTEST_GUILESS_MAIN(TestDbCon)

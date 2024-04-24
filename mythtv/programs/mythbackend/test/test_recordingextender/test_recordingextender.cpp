@@ -921,4 +921,4 @@ void TestRecordingExtender::test_processNewRecordings(void)
     QVERIFY(game.getGameUrl().url().endsWith(expectedGameUrl));
 }
 
-QTEST_APPLESS_MAIN(TestRecordingExtender)
+QTEST_GUILESS_MAIN(TestRecordingExtender)
